@@ -112,16 +112,6 @@ namespace Reni.Syntax
             return result;
         }
 
-        internal Result PrefixOperationResult(ContextBase context, Category category, ISearchTarget target)
-        {
-            var searchResult = Type(context).Search<IPrefixFeature>(target, null);
-            if(searchResult == null)
-                return null;
-            return searchResult.Result(category);
-        }
-
-        internal IEnumerable<Probe> PrefixOperationProbes(ContextBase context, ISearchTarget target) { return Type(context).Probes<IPrefixFeature>(target, null); }
-
         internal bool IsDataLessStructureElement(ContextBase context)
         {
             var result = IsDataLess;
@@ -155,5 +145,6 @@ namespace Reni.Syntax
             NotImplementedMethod(context, category);
             return null;
         }
+
     }
 }

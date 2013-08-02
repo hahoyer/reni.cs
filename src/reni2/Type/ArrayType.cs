@@ -37,17 +37,10 @@ using Reni.TokenClasses;
 namespace Reni.Type
 {
     sealed class ArrayType
-        : TypeBase, IRepeaterType
-            , ISearchPath<ISuffixFeature, SequenceType>
-            , IFeature
+        : TypeBase
+        , IRepeaterType
             , IFunctionFeature
-            , INamedFeaturePath<ISuffixFeature, DumpPrintToken>
-            , INamedFeaturePath<ISuffixFeature, ConcatArrays>
-            , INamedFeaturePath<ISearchPath<ISuffixFeature, PointerType>, ConcatArrays>
-            , INamedFeaturePath<ISuffixFeature, EnableArrayOverSize>
-            , INamedFeaturePath<ISuffixFeature, TextItems>
-            , INamedFeaturePath<ISuffixFeature, SequenceToken>
-            , IConversionFeaturePath<ISearchPath<ISuffixFeature, EnableArrayOverSizeType>, ArrayType>
+        , IFeatureImplementation
     {
         [Node]
         internal readonly TypeBase ElementType;
@@ -74,21 +67,6 @@ namespace Reni.Type
 
         TypeBase IRepeaterType.ElementType { get { return ElementType; } }
         Size IRepeaterType.IndexSize { get { return IndexSize; } }
-
-        ISuffixFeature IFeaturePath<ISuffixFeature, DumpPrintToken>.GetFeature(DumpPrintToken target) { return Extension.Feature(DumpPrintTokenResult); }
-        ISuffixFeature IFeaturePath<ISuffixFeature, ConcatArrays>.GetFeature(ConcatArrays target) { return Extension.Feature(ConcatArraysResult); }
-        ISearchPath<ISuffixFeature, PointerType> IFeaturePath<ISearchPath<ISuffixFeature, PointerType>, ConcatArrays>.GetFeature(ConcatArrays target) { return Extension.Feature<PointerType>(ConcatArrayFromReference); }
-        ISuffixFeature IFeaturePath<ISuffixFeature, EnableArrayOverSize>.GetFeature(EnableArrayOverSize target) { return Extension.Feature(EnableArrayOverSizeResult); }
-        ISuffixFeature IFeaturePath<ISuffixFeature, TextItems>.GetFeature(TextItems target) { return Extension.Feature(TextItemsResult); }
-        ISuffixFeature IFeaturePath<ISuffixFeature, SequenceToken>.GetFeature(SequenceToken target) { return Extension.Feature(SequenceTokenResult); }
-        ISearchPath<ISuffixFeature, EnableArrayOverSizeType> IFeaturePath<ISearchPath<ISuffixFeature, EnableArrayOverSizeType>, ArrayType>.GetFeature(ArrayType target)
-        {
-            if(ElementType != target.ElementType)
-                return null;
-            NotImplementedMethod(target);
-            return null;
-        }
-
 
         [Node]
         [DisableDump]
@@ -175,9 +153,11 @@ namespace Reni.Type
         [DisableDump]
         internal TypeBase IndexType { get { return RootContext.BitType.UniqueNumber(IndexSize.ToInt()); } }
         Size IndexSize { get { return Size.AutoSize(Count).Align(Root.DefaultRefAlignParam.AlignBits); } }
-        IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
-        IFunctionFeature IFeature.Function { get { return this; } }
-        ISimpleFeature IFeature.Simple { get { return null; } }
+
+        IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return null; } }
+        IFunctionFeature IFeatureImplementation.Function { get { return this; } }
+        ISimpleFeature IFeatureImplementation.Simple { get { return null; } }
+        
         bool IFunctionFeature.IsImplicit { get { return false; } }
         IContextReference IFunctionFeature.ObjectReference { get { return ObjectReference; } }
 
@@ -248,7 +228,6 @@ namespace Reni.Type
                 .UniqueTypeType
                 .Result(category);
         }
-        ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type) { return type.ConversionFeature(this); }
 
         Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType) { return ApplyResult(category, argsType); }
         Result ApplyResult(Category category, TypeBase argsType)

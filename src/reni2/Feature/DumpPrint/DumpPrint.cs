@@ -33,8 +33,6 @@ namespace Reni.Feature.DumpPrint
 {
     sealed class StructReferenceFeature
         : ReniObject
-          , ISearchPath<ISuffixFeature, PointerType>
-          , ISuffixFeature
           , ISimpleFeature
     {
         [EnableDump]
@@ -42,20 +40,11 @@ namespace Reni.Feature.DumpPrint
 
         public StructReferenceFeature(StructureType structureType) { _structureType = structureType; }
 
-        ISuffixFeature ISearchPath<ISuffixFeature, PointerType>.Convert(PointerType type)
-        {
-            Tracer.Assert(Root.DefaultRefAlignParam == _structureType.RefAlignParam);
-            return this;
-        }
-
         Result ISimpleFeature.Result(Category category)
         {
             return _structureType
                 .Structure
                 .DumpPrintResultViaContextReference(category);
         }
-        IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
-        IFunctionFeature IFeature.Function { get { return null; } }
-        ISimpleFeature IFeature.Simple { get { return this; } }
     }
 }

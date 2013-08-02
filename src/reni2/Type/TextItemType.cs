@@ -26,14 +26,11 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
-using Reni.Feature;
-using Reni.Feature.DumpPrint;
 
 namespace Reni.Type
 {
     sealed class TextItemType
         : TagChild<TypeBase>
-            , INamedFeaturePath<ISuffixFeature, DumpPrintToken>
     {
         public TextItemType(TypeBase parent)
             : base(parent)
@@ -41,8 +38,6 @@ namespace Reni.Type
             Tracer.Assert(!(parent is ArrayType));
             StopByObjectId(-10);
         }
-
-        ISuffixFeature IFeaturePath<ISuffixFeature, DumpPrintToken>.GetFeature(DumpPrintToken target) { return Extension.Feature(DumpPrintTokenResult); }
 
         [DisableDump]
         protected override string TagTitle { get { return "text_item"; } }

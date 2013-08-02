@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2012 - 2012 Harald Hoyer
+//     Copyright (C) 2012 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -43,52 +43,30 @@ namespace Reni.Feature
         static readonly DictionaryEx<Func<Category, Result>, Simple> _simpleCache
             = new DictionaryEx<Func<Category, Result>, Simple>(function => new Simple(function));
 
-        internal static TFeature CheckedConvert<TFeature, TType>(this ISearchPath<TFeature, TType> feature, TType target)
+        internal static TFeature CheckedConvert<TFeature, TType>(this IPathFeature<TFeature, TType> feature, TType target)
             where TFeature : class, IFeature
+            where TType : IFeatureProvider
         {
             if(feature == null)
                 return null;
             return feature.Convert(target);
         }
-
-        internal static string Dump(this IFeature feature) { return Tracer.Dump(feature); }
-
         internal static Simple Feature(Func<Category, Result> function) { return _simpleCache[function]; }
-        internal static Simple<T> Feature<T>(Func<Category, T, Result> function) { return new Simple<T>(function); }
-        internal static Simple<T1, T2> Feature<T1, T2>(Func<Category, T1, T2, Result> function) { return new Simple<T1, T2>(function); }
-        
+
+        internal static string Dump(this IFeatureImplementation feature) { return Tracer.Dump(feature); }
         internal static Function Feature(Func<Category, IContextReference, TypeBase, Result> function)
         {
             return
                 new Function(function);
         }
-        
-        internal static Function<T> Feature<T>(Func<Category, IContextReference, TypeBase, Result> function)
-        {
-            return
-                new Function<T>(function);
-        }
-        
-        internal static MetaFunction Feature(Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result> function)
-        {
-            return _metaFunctionCache[function];
-        }
+
+        internal static MetaFunction Feature(Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result> function) { return _metaFunctionCache[function]; }
 
         [UsedImplicitly]
         static bool _isPrettySearchPathHumanFriendly = true;
 
-        internal static string PrettySearchPath(this System.Type type)
-        {
-            if(!_isPrettySearchPathHumanFriendly 
-                || !type.IsGenericType 
-                || type.GetGenericTypeDefinition() != typeof(ISearchPath<,>))
-                return type.PrettyName();
 
-            var types = type.GetGenericArguments();
-            return PrettySearchPath(types[0]) + " -> " + types[1].PrettyName();
-        }
-
-        internal static ISimpleFeature SimpleFeature(this IFeature feature, bool hasNoArg)
+        internal static ISimpleFeature SimpleFeature(this IFeatureImplementation feature, bool hasNoArg)
         {
             if(!hasNoArg)
                 return null;
@@ -100,26 +78,13 @@ namespace Reni.Feature
             return feature.Simple;
         }
 
-        internal static bool HasCodeArgs(this IFeature feature, ContextBase context, TypeBase objectType, Func<Category, Result> converterResult, CompileSyntax right)
+        internal static bool HasCodeArgs(this IFeatureImplementation feature, ContextBase context, TypeBase objectType, Func<Category, Result> converterResult, CompileSyntax right)
         {
             return context
                 .Result(Category.CodeArgs, feature, objectType, right)
                 .ReplaceArg(converterResult)
                 .CodeArgs
                 .HasArg;
-        }
-
-        internal static bool IsEqual(this ISearchPath one, ISearchPath other)
-        {
-            if(one == other)
-                return true;
-            if(one.GetType() != other.GetType())
-                return false;
-            var simple = one as SimpleBase;
-            if(simple != null)
-                return simple.IsEqual((SimpleBase)other);
-            Tracer.ConditionalBreak(true);
-            return false;
         }
     }
 }

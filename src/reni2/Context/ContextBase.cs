@@ -22,6 +22,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
@@ -71,9 +72,9 @@ namespace Reni.Context
         internal Structure UniqueStructure(Container container, int accessPosition) { return _cache.Structures[container][accessPosition]; }
         internal ContainerContextObject UniqueContainerContext(Container context) { return _cache.ContainerContextObjects[context]; }
 
-        internal virtual void Search(ContextSearchVisitor searchVisitor) { searchVisitor.Search(); }
+        internal abstract void Search(ContextSearchVisitor searchVisitor);
 
-        //[DebuggerHidden]
+        [DebuggerHidden]
         internal Result UniqueResult(Category category, CompileSyntax syntax)
         {
             var cacheItem = _cache.ResultCache[syntax];
@@ -93,7 +94,7 @@ namespace Reni.Context
 
         internal Result FindResult(Category category, CompileSyntax syntax) { return _cache.ResultCache[syntax].Data & category; }
 
-        //[DebuggerHidden]
+        [DebuggerHidden]
         Result ObtainResult(Category category, CompileSyntax syntax)
         {
             var trace = syntax.ObjectId == 1728 && ObjectId == 7 && category.HasCode;
@@ -111,7 +112,7 @@ namespace Reni.Context
             }
         }
 
-        //[DebuggerHidden]
+        [DebuggerHidden]
         ResultCache CreateCacheElement(CompileSyntax syntax)
         {
             var result = new ResultCache(category => ObtainResult(category, syntax));
@@ -123,16 +124,9 @@ namespace Reni.Context
 
         internal ISearchResult Search(ISearchTarget target)
         {
-            var visitor = new ContextSearchVisitor(target, null);
+            var visitor = new ContextSearchVisitor(target);
             visitor.Search(this);
             return visitor.SearchResult;
-        }
-
-        internal IEnumerable<Probe> Probes(ISearchTarget target)
-        {
-            var visitor = new ContextSearchVisitor(target, null);
-            visitor.Search(this);
-            return visitor.Probes.Values;
         }
 
         internal virtual Structure ObtainRecentStructure() { return null; }
@@ -251,7 +245,7 @@ namespace Reni.Context
             return functionalObjectDescriptor.Result(category, this, left, right);
         }
 
-        internal Result Result(Category category, IFeature feature, TypeBase objectType, CompileSyntax right)
+        internal Result Result(Category category, IFeatureImplementation feature, TypeBase objectType, CompileSyntax right)
         {
             var trace = ObjectId == 3 && feature is FunctionBase && feature.GetObjectId() == 0 && category.HasCode;
             StartMethodDump(trace, category, feature, objectType, right);

@@ -39,9 +39,13 @@ namespace Reni
 
         protected abstract SearchVisitor PathItem<TProvider>(TProvider provider) where TProvider : IFeatureProvider;
 
+        [DisableDump]
         internal abstract bool IsSuccessFull { get; }
+        [DisableDump]
         internal abstract bool IsSuccessFullTarget { get; }
+        [DisableDump]
         internal abstract IConversionFunction[] ConversionFunctions { set; get; }
+
         internal void Add(IConversionFunction conversionFunction) { ConversionFunctions = ConversionFunctions.Concat(new[] {conversionFunction}).ToArray(); }
 
         protected abstract void SearchNameSpace(StructureType structureType);
@@ -111,14 +115,14 @@ namespace Reni
     }
 
     abstract class SearchVisitor<TFeature> : SearchVisitor
-        where TFeature : class, ISearchPath
+        where TFeature : class, IFeature
     {
         readonly ExpressionSyntax _syntax;
 
         protected SearchVisitor(ExpressionSyntax syntax) { _syntax = syntax; }
 
-        internal abstract TFeature InternalResultProvider { set; }
-        internal abstract TFeature InternalResultTarget { set; }
+        internal abstract IFeatureImplementation InternalResultProvider { set; }
+        internal abstract IFeatureImplementation InternalResultTarget { set; }
         internal abstract ISearchTarget Target { get; }
         internal abstract DictionaryEx<System.Type, Probe> Probes { get; }
 
@@ -127,15 +131,7 @@ namespace Reni
         {
             Tracer.Assert(!IsSuccessFull, () => Tracer.Dump(Probes));
             Probes.IsValid(typeof(TFeature), true);
-            InternalResultTarget = Target as TFeature;
-        }
-
-        internal override void Search(IssueType target)
-        {
-            var searchResult = target.SearchResult(Target, _syntax);
-            var internalResult = searchResult as TFeature;
-            //Tracer.Assert(internalResult != null, ()=>typeof(TFeature).PrettyName());
-            InternalResultTarget = internalResult;
+            InternalResultTarget = (IFeatureImplementation) Target;
         }
 
         protected override SearchVisitor PathItem<TProvider>(TProvider provider) { return new PathItemSearchVisitor<TFeature, TProvider>(this, provider, _syntax); }

@@ -7,8 +7,6 @@ namespace Reni.Sequence
 {
     internal sealed class OperationPrefixFeature 
         : ReniObject
-        , ISearchPath<IPrefixFeature, SequenceType>
-        , ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, ArrayType>
     {
         [EnableDump]
         private readonly BitType.IPrefix _definable;
@@ -20,8 +18,5 @@ namespace Reni.Sequence
             _bitType = bitType;
             _definable = definable;
         }
-
-        IPrefixFeature ISearchPath<IPrefixFeature, SequenceType>.Convert(SequenceType type) { return type.PrefixFeature(_definable); }
-        ISearchPath<IPrefixFeature, SequenceType> ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, ArrayType>.Convert(ArrayType type) { return this; }
     }
 }

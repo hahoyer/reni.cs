@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -28,18 +28,17 @@ using Reni.Type;
 
 namespace Reni.Sequence
 {
-    sealed class Feature : FeatureBase
+    sealed class Feature : ReniObject, FunctionFeature.ISequenceFeature
     {
+        readonly BitType.IOperation _definable;
         readonly BitType _bitType;
         public Feature(BitType.IOperation definable, BitType bitType)
-            : base(definable)
         {
+            _definable = definable;
             _bitType = bitType;
         }
 
-        internal override TypeBase ResultType(int objSize, int argsSize)
-        {
-            return _bitType.UniqueNumber(Definable.Signature(objSize, argsSize));
-        }
+        TypeBase FunctionFeature.ISequenceFeature.ResultType(int objSize, int argsSize) { return _bitType.UniqueNumber(_definable.Signature(objSize, argsSize)); }
+        BitType.IOperation FunctionFeature.ISequenceFeature.Definable { get { return _definable; } }
     }
 }

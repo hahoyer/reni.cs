@@ -24,13 +24,9 @@ using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using Reni.Feature;
-using Reni.Type;
 
 namespace Reni.TokenClasses
 {
-    sealed class ToNumberOfBase : Defineable<ToNumberOfBase>, ISearchPath<ISuffixFeature, TextItemsType>
-    {
-        ISuffixFeature ISearchPath<ISuffixFeature, TextItemsType>.Convert(TextItemsType type) { return Extension.Feature(type.ToNumberOfBaseResult); }
-    }
+    sealed class ToNumberOfBase : Defineable<ToNumberOfBase>
+    {}
 }

@@ -24,42 +24,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using Reni.Sequence;
-using Reni.Struct;
 using Reni.TokenClasses;
-using Reni.Type;
 
 namespace Reni.Feature.DumpPrint
 {
-    sealed class DumpPrintToken :
-        Defineable<DumpPrintToken>,
-        ISearchPath<ISuffixFeature, TypeType>,
-        ISearchPath<ISuffixFeature, FunctionBodyType>,
-        ISearchPath<ISuffixFeature, BitType>,
-        ISearchPath<ISuffixFeature, VoidType>,
-        ISearchPath<ISuffixFeature, StructureType>,
-        ISearchPath<ISuffixFeature, ArrayType>,
-        ISearchPath<ISuffixFeature, TextItemsType>,
-        ISearchPath<ISuffixFeature, TextItemType>,
-        ISearchPath<ISearchPath<ISuffixFeature, PointerType>, StructureType>,
-        ISearchPath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, BitType>
+    sealed class DumpPrintToken : Defineable<DumpPrintToken>
     {
-        ISuffixFeature ISearchPath<ISuffixFeature, TypeType>.Convert(TypeType type) { return Extension.Feature(type.DumpPrintTokenResult); }
-        ISuffixFeature ISearchPath<ISuffixFeature, BitType>.Convert(BitType type) { return Extension.Feature(type.DumpPrintTokenResult); }
-        ISuffixFeature ISearchPath<ISuffixFeature, VoidType>.Convert(VoidType type) { return Extension.Feature(type.DumpPrintTokenResult); }
-        ISuffixFeature ISearchPath<ISuffixFeature, StructureType>.Convert(StructureType type) { return Extension.Feature(type.DumpPrintTokenResult); }
-        ISuffixFeature ISearchPath<ISuffixFeature, ArrayType>.Convert(ArrayType type) { return Extension.Feature(type.DumpPrintTokenResult); }
-        ISuffixFeature ISearchPath<ISuffixFeature, TextItemType>.Convert(TextItemType type) { return Extension.Feature(type.DumpPrintTokenResult); }
-        ISuffixFeature ISearchPath<ISuffixFeature, FunctionBodyType>.Convert(FunctionBodyType type) { return Extension.Feature(type.DumpPrintTokenResult); }
-        ISuffixFeature ISearchPath<ISuffixFeature, TextItemsType>.Convert(TextItemsType type) { return Extension.Feature(type.DumpPrintTokenResult); }
-
-        ISearchPath<ISuffixFeature, PointerType> ISearchPath<ISearchPath<ISuffixFeature, PointerType>, StructureType>.Convert
-            (StructureType type) { return type.DumpPrintReferenceFeature; }
-        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>
-            ISearchPath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, BitType>.Convert(BitType type) { return Extension.Feature<SequenceType, ArrayType>(type.DumpPrintTokenResult); }
-
         internal static DumpPrintToken Create() { return new DumpPrintToken {Name = "<dump_print>"}; }
     }
-
-
 }

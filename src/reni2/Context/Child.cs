@@ -1,6 +1,7 @@
-// 
+#region Copyright (C) 2013
+
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -17,12 +18,13 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
 using HWClassLibrary.TreeStructure;
-using Reni.Basics;
 using Reni.Struct;
 
 namespace Reni.Context
@@ -33,17 +35,16 @@ namespace Reni.Context
         readonly ContextBase _parent;
 
         internal Child(ContextBase parent) { _parent = parent; }
+
         [Node]
         internal ContextBase Parent { get { return _parent; } }
+
         [DisableDump]
         internal override Root RootContext { get { return Parent.RootContext; } }
 
         internal override void Search(ContextSearchVisitor searchVisitor)
         {
             Parent.Search(searchVisitor);
-            if(searchVisitor.IsSuccessFull)
-                return;
-            base.Search(searchVisitor);
         }
 
         internal override Structure ObtainRecentStructure() { return Parent.ObtainRecentStructure(); }

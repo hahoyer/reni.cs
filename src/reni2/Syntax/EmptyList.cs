@@ -27,6 +27,7 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
+using Reni.ReniParser;
 
 namespace Reni.Syntax
 {
@@ -41,5 +42,16 @@ namespace Reni.Syntax
         protected override string GetNodeDump() { return "()"; }
 
         internal override Result ObtainResult(ContextBase context, Category category) { return context.RootContext.VoidResult(category); }
+
+        internal sealed class Half : CompileSyntax
+        {
+            public Half(TokenData leftToken)
+                : base(leftToken) { }
+
+            internal override TokenData LastToken { get { return FirstToken; } }
+            protected override string GetNodeDump() { return "("; }
+            internal override ParsedSyntax RightParenthesis(int level, TokenData token) { return new EmptyList(Token, token); }
+        }
+
     }
 }

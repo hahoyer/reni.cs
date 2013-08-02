@@ -39,6 +39,7 @@ namespace Reni.Parser
             : base(_nextObjectId++) { StopByObjectId(-31); }
 
         string IIconKeyProvider.IconKey { get { return "Symbol"; } }
+        [EnableDumpExcept(null)]
         protected virtual ITokenFactory NewTokenFactory { get { return null; } }
         string INameProvider.Name { set { Name = value; } }
 

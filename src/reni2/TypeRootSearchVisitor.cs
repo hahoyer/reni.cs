@@ -25,31 +25,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using Reni.Feature;
-using Reni.ReniParser;
 using Reni.Type;
 
 namespace Reni
 {
-    sealed class TypeRootSearchVisitor<TFeature> : RootSearchVisitor<TFeature>
-        where TFeature : class, IFeature
+    sealed class SuffixSearchResult : SearchResult
     {
-        [EnableDump]
         readonly TypeBase _type;
-
-        internal TypeRootSearchVisitor(ISearchTarget target, TypeBase type, ExpressionSyntax syntax)
-            : base(target, syntax) { _type = type; }
-
-        [EnableDump]
-        internal IEnumerable<string> ProbeStr { get { return Probes.Values.Select(probe => probe.LogDump); } }
-
-        internal SearchResult SearchResult
-        {
-            get
-            {
-                if(IsSuccessFull)
-                    return new TypeSearchResult(ResultProvider, ConversionFunctions, _type);
-                return null;
-            }
-        }
+        public SuffixSearchResult(TypeBase type, IFeatureImplementation feature, IConversionFunction[] conversionFunctions = null)
+            : base(feature, conversionFunctions ?? new IConversionFunction[0]) { _type = type; }
+        protected override TypeBase DefiningType { get { return _type; } }
     }
 }

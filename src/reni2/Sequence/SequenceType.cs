@@ -36,14 +36,11 @@ namespace Reni.Sequence
 {
     sealed class SequenceType
         : TagChild<ArrayType>
-            , ISearchPath<ISuffixFeature, SequenceType>
-            , ISearchPath<ISearchPath<ISuffixFeature, Type.EnableCut>, SequenceType>
-            , INamedFeaturePath<ISuffixFeature, ConcatArrays>
-            , INamedFeaturePath<ISuffixFeature, TokenClasses.EnableCut>
-            , INamedFeaturePath<ISuffixFeature, UndecorateToken>
-            , IConversionFeaturePath<ISuffixFeature, SequenceType>
-            , IConversionFeaturePath<ISearchPath<ISuffixFeature, Type.EnableCut>, SequenceType>
-            , IConversionFeaturePath<ISuffixFeature, ArrayType>
+            , ISymbolFeature<ConcatArrays>
+            , ISymbolFeature<TokenClasses.EnableCut>
+            , ISymbolFeature<UndecorateToken>
+            , IPathFeature<IConversionFeature, SequenceType>
+            , IPathFeature<IConversionFeature, ArrayType>
     {
         readonly DictionaryEx<RefAlignParam, ObjectReference> _objectReferencesCache;
 
@@ -65,23 +62,16 @@ namespace Reni.Sequence
             StopByObjectId(-172);
         }
 
-        ISuffixFeature IFeaturePath<ISuffixFeature, ConcatArrays>.GetFeature(ConcatArrays target) { return Extension.Feature(ConcatArraysResult); }
-        ISuffixFeature IFeaturePath<ISuffixFeature, TokenClasses.EnableCut>.GetFeature(TokenClasses.EnableCut target) { return Extension.Feature(EnableCutResult); }
-        ISuffixFeature IFeaturePath<ISuffixFeature, UndecorateToken>.GetFeature(UndecorateToken target) { return Extension.Feature(UndecorateTokenResult); }
-        ISuffixFeature IFeaturePath<ISuffixFeature, SequenceType>.GetFeature(SequenceType target) { return ConversionFeature(target); }
-        ISearchPath<ISuffixFeature, Type.EnableCut>
-            IFeaturePath<ISearchPath<ISuffixFeature, Type.EnableCut>, SequenceType>.GetFeature(SequenceType target) { return ConversionFeatureWithCut(target); }
-        ISuffixFeature IFeaturePath<ISuffixFeature, ArrayType>.GetFeature(ArrayType target) { return ConversionFeature(target); }
+        IFeatureImplementation ISymbolFeature<ConcatArrays>.Feature { get { return Extension.Feature(ConcatArraysResult); } }
+        IFeatureImplementation ISymbolFeature<TokenClasses.EnableCut>.Feature { get { return Extension.Feature(EnableCutResult); } }
+        IFeatureImplementation ISymbolFeature<UndecorateToken>.Feature { get { return Extension.Feature(UndecorateTokenResult); } }
 
-        ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type) { return type.ConversionFeature(this); }
+        IConversionFeature IPathFeature<IConversionFeature, SequenceType>.Convert(SequenceType target) { throw new NotImplementedException(); }
+        IConversionFeature IPathFeature<IConversionFeature, ArrayType>.Convert(ArrayType target) { throw new NotImplementedException(); }
 
-        ISearchPath<ISuffixFeature, Type.EnableCut>
-            ISearchPath<ISearchPath<ISuffixFeature, Type.EnableCut>, SequenceType>.Convert(SequenceType type) { return type.ConversionFeatureWithCut(this); }
-        ISearchPath<ISuffixFeature, Type.EnableCut> ConversionFeatureWithCut(SequenceType destination)
-        {
-            return
-                Extension.Feature<Type.EnableCut>((c, t) => ConvertWithCut(c, destination));
-        }
+        Simple GetFeature(SequenceType target) { return ConversionFeature(target); }
+        Simple GetFeature(ArrayType target) { return ConversionFeature(target); }
+        Simple Convert2(SequenceType type) { return type.ConversionFeature(this); }
 
         [DisableDump]
         protected override string TagTitle { get { return "Sequence"; } }
@@ -93,17 +83,15 @@ namespace Reni.Sequence
         [DisableDump]
         internal override string DumpPrintText { get { return "(" + Element.DumpPrintText + ")sequence(" + Count + ")"; } }
 
-        internal new ISuffixFeature Feature(FeatureBase featureBase) { return new FunctionFeature(this, featureBase); }
-        internal IPrefixFeature PrefixFeature(BitType.IPrefix definable) { return new PrefixFeature(this, definable); }
 
-        ISuffixFeature ConversionFeature(SequenceType destination)
+        Simple ConversionFeature(SequenceType destination)
         {
             return destination.Count >= Count
                 ? Extension.Feature(c => ConversionAsReference(c, destination))
                 : null;
         }
 
-        internal ISuffixFeature ConversionFeature(ArrayType destination)
+        internal Simple ConversionFeature(ArrayType destination)
         {
             return Parent == destination
                 ? Extension.Feature(PointerConversionResult)

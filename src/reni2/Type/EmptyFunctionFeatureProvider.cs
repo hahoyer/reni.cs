@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2012 - 2012 Harald Hoyer
+//     Copyright (C) 2012 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -28,11 +28,11 @@ using Reni.Feature;
 
 namespace Reni.Type
 {
-    sealed class EmptyFeature : ReniObject, IFeature
+    sealed class EmptyFeature : ReniObject, IFeatureImplementation
     {
-        internal static readonly IFeature Instance = new EmptyFeature();
-        IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
-        IFunctionFeature IFeature.Function { get { return null; } }
-        ISimpleFeature IFeature.Simple { get { return null; } }
+        internal static readonly IFeatureImplementation Instance = new EmptyFeature();
+        IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return null; } }
+        IFunctionFeature IFeatureImplementation.Function { get { return null; } }
+        ISimpleFeature IFeatureImplementation.Simple { get { return null; } }
     }
 }

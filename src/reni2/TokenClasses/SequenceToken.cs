@@ -24,21 +24,10 @@ using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using Reni.Feature;
-using Reni.Type;
 
 namespace Reni.TokenClasses
 {
     sealed class SequenceToken
         : Defineable<SequenceToken>
-            , ISearchPath<ISuffixFeature, ArrayType>
-            , ISearchPath<ISuffixFeature, TypeType>
-    {
-        ISuffixFeature ISearchPath<ISuffixFeature, ArrayType>.Convert(ArrayType type) { return Extension.Feature(type.SequenceTokenResult); }
-        ISuffixFeature ISearchPath<ISuffixFeature, TypeType>.Convert(TypeType type)
-        {
-            var value = type.Value as ArrayType;
-            return value == null ? null : Extension.Feature(value.SequenceTypeResult);
-        }
-    }
+    {}
 }

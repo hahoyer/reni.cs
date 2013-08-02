@@ -24,15 +24,9 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
-using Reni.Feature;
-using Reni.Type;
 
 namespace Reni.TokenClasses
 {
-    sealed class EnableArrayOverSize
-        : Defineable<EnableArrayOverSize>
-            , ISearchPath<ISuffixFeature, ArrayType>
-    {
-        public ISuffixFeature Convert(ArrayType type) { return Extension.Feature(type.EnableArrayOverSizeResult); }
-    }
+    sealed class EnableArrayOverSize : Defineable<EnableArrayOverSize>
+    {}
 }

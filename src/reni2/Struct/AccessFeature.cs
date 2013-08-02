@@ -32,7 +32,7 @@ using Reni.TokenClasses;
 
 namespace Reni.Struct
 {
-    sealed class AccessFeature : ReniObject, ISuffixFeature, IContextFeature, ISimpleFeature
+    sealed class AccessFeature : ReniObject, ISimpleFeature, IFeatureImplementation, IFeature, IContextFeature
     {
         static int _nextObjectId;
 
@@ -67,7 +67,7 @@ namespace Reni.Struct
             }
         }
 
-        IMetaFunctionFeature IFeature.MetaFunction
+        IMetaFunctionFeature IFeatureImplementation.MetaFunction
         {
             get
             {
@@ -76,7 +76,7 @@ namespace Reni.Struct
             }
         }
 
-        IFunctionFeature IFeature.Function { get { return FunctionFeature; } }
+        IFunctionFeature IFeatureImplementation.Function { get { return FunctionFeature; } }
         IFunctionFeature FunctionFeature { get { return _functionFeature.Value; } }
 
         IFunctionFeature ObtainFunctionFeature()
@@ -91,7 +91,7 @@ namespace Reni.Struct
             return feature.Function;
         }
 
-        ISimpleFeature IFeature.Simple
+        ISimpleFeature IFeatureImplementation.Simple
         {
             get
             {

@@ -27,8 +27,6 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
-using Reni.Feature;
-using Reni.TokenClasses;
 
 namespace Reni.Type
 {
@@ -37,7 +35,6 @@ namespace Reni.Type
             , IProxyType
             , IConverter
             , IReferenceType
-            , INamedFeaturePath<ISuffixFeature, Assignment>
     {
         readonly int _order;
 
@@ -50,7 +47,6 @@ namespace Reni.Type
         IConverter IReferenceType.Converter { get { return this; } }
         TypeBase IConverter.TargetType { get { return ValueType; } }
         Result IConverter.Result(Category category) { return GetterResult(category); }
-        ISuffixFeature IFeaturePath<ISuffixFeature, Assignment>.GetFeature(Assignment target) { return Extension.Feature(AssignmentResult); }
 
         internal Result AssignmentResult(Category category, IContextReference objectReference, TypeBase argsType)
         {
@@ -110,6 +106,7 @@ namespace Reni.Type
 
         [DisableDump]
         internal override TypeBase TypeForTypeOperator { get { return ValueType.TypeForTypeOperator; } }
+
         [DisableDump]
         internal override TypeBase ElementTypeForReference { get { return ValueType.ElementTypeForReference; } }
     }

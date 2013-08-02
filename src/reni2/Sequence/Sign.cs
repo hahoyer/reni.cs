@@ -32,12 +32,10 @@ namespace Reni.Sequence
 {
     sealed class Sign
         : Operation
-            , ISearchPath<ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, ArrayType>, BitType>
             , BitType.IPrefix
     {
-        protected override TPath GetFeature<TPath>(TypeBase provider) { return provider.GetFeature<TPath, Sign>(this) ?? base.GetFeature<TPath>(provider); }
+        protected override IFeatureImplementation GetFeature(TypeBase provider) { return provider.GetFeature(this) ?? base.GetFeature(provider); }
 
-        ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, ArrayType> ISearchPath<ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, ArrayType>, BitType>.Convert(BitType type) { return new OperationPrefixFeature(type, this); }
         string BitType.IPrefix.Name { get { return DataFunctionName; } }
         protected override int Signature(int objSize, int argSize) { return BitsConst.PlusSize(objSize, argSize); }
     }

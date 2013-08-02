@@ -26,6 +26,7 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
+using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
@@ -327,14 +328,14 @@ namespace Reni.Struct
     }
 
 
-    sealed class StructurePosition : ReniObject, ISearchPath<ISuffixFeature, StructureType>
+    sealed class StructurePosition : ReniObject, IPathFeature<IFeature, StructureType>
     {
         [EnableDump]
         readonly int _position;
 
         internal StructurePosition(int position) { _position = position; }
 
-        ISuffixFeature ISearchPath<ISuffixFeature, StructureType>.Convert(StructureType structureType) { return Convert(structureType.Structure); }
+        IFeature IPathFeature<IFeature, StructureType>.Convert(StructureType structureType) { return Convert(structureType.Structure); }
         internal IContextFeature ConvertToContextFeature(Structure accessPoint) { return Convert(accessPoint); }
         internal AccessFeature Convert(Structure accessPoint) { return accessPoint.UniqueAccessFeature(_position); }
     }

@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Feature;
 using Reni.ReniParser;
 using Reni.Struct;
 using Reni.TokenClasses;
@@ -36,6 +37,7 @@ using Reni.Type;
 namespace Reni.Context
 {
     sealed class Root : ContextBase
+        , ISymbolFeature<ConcatArrays>
     {
         [DisableDump]
         [Node]
@@ -56,16 +58,29 @@ namespace Reni.Context
 
         [DisableDump]
         internal override Root RootContext { get { return this; } }
+
         [DisableDump]
         [Node]
         internal BitType BitType { get { return _bitCache.Value; } }
+
         [DisableDump]
         [Node]
         internal VoidType VoidType { get { return _voidCache.Value; } }
+
         [DisableDump]
         internal int FunctionCount { get { return _functions.Count; } }
 
         internal static RefAlignParam DefaultRefAlignParam { get { return new RefAlignParam(BitsConst.SegmentAlignBits, Size.Create(32)); } }
+
+        IFeatureImplementation ISymbolFeature<ConcatArrays>.Feature { get { return Extension.Feature(ConcatArraysResult); } }
+
+        internal override void Search(ContextSearchVisitor searchVisitor) { NotImplementedMethod(searchVisitor); }
+
+        Result ConcatArraysResult(Category category, IContextReference context, TypeBase argsType)
+        {
+            NotImplementedMethod(category, context, argsType);
+            return null;
+        }
 
         internal FunctionType FunctionInstance(Structure structure, FunctionSyntax body, TypeBase argsType)
         {

@@ -111,7 +111,6 @@
     <Compile Include="Graphics\Syntax.cs" />
     <Compile Include="Graphics\SyntaxDrawer.cs" />
     <Compile Include="IProxyType.cs" />
-    <Compile Include="MetaData.cs" />
     <Compile Include="Parser\SimpleTokenFactory.cs" />
     <Compile Include="Parser\Match.cs" />
     <Compile Include="Parser\MatchExtension.cs" />
@@ -243,7 +242,6 @@
     <Compile Include="Runtime\DataHandler.cs" />
     <Compile Include="Sequence\CompareFeature.cs" />
     <Compile Include="Sequence\Feature.cs" />
-    <Compile Include="Sequence\FeatureBase.cs" />
     <Compile Include="Sequence\ObjectReference.cs" />
     <Compile Include="Sequence\PrefixFeature.cs" />
     <Compile Include="Sequence\SequenceType.cs" />
@@ -272,7 +270,6 @@
     <Compile Include="Feature\DumpPrint\DumpPrint.cs" />
     <Compile Include="Feature\TypeOperator.cs" />
     <Compile Include="Parser\TokenFactory.cs" />
-    <Compile Include="RootSearchVisitor.cs" />
     <Compile Include="SearchVisitor.cs" />
     <Compile Include="Struct\AtToken.cs" />
     <Compile Include="FeatureTest\DefaultOperations.cs" />
