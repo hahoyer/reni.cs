@@ -35,6 +35,7 @@ namespace Reni
 {
     sealed class ContextSearchVisitor : SearchVisitor
     {
+        [EnableDump]
         readonly ISearchTarget _target;
 
         internal ContextSearchVisitor(ISearchTarget target) { _target = target; }
@@ -48,8 +49,6 @@ namespace Reni
                 return null;
             }
         }
-
-        internal void Search(ContextBase contextBase) { contextBase.Search(this); }
 
         internal void Search(Struct.Context context)
         {
@@ -87,6 +86,13 @@ namespace Reni
         protected override void SearchNameSpace(StructureType structureType) { throw new NotImplementedException(); }
         internal override void Search() { NotImplementedMethod(); }
         internal override void Search(IssueType target) { throw new NotImplementedException(); }
+        internal void Search(ContextBase contextBase)
+        {
+            var s = _target.GetFeature(contextBase);
+            
+            
+            throw new NotImplementedException();
+        }
     }
 
     sealed class ContextSearchResult : SearchResult

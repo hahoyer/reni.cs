@@ -33,7 +33,7 @@ namespace Reni
 {
     sealed class PathItemSearchVisitor<TFeature, TProvider>: SearchVisitor<IPathFeature<TFeature, TProvider>>
         where TFeature : class, IFeature
-        where TProvider : IFeatureProvider
+        where TProvider : IOldFeatureProvider
     {
         internal override DictionaryEx<System.Type, Probe> Probes { get { return _parent.Probes; } }
         [DisableDump]

@@ -46,7 +46,7 @@ namespace Reni.Sequence
     abstract class Operation<TTarget> : Operation
         where TTarget : Defineable
     {
-        protected override IFeatureImplementation GetFeature(TypeBase provider)
+        protected override IFeatureImplementation GetFeature(IFeatureProvider provider)
         {
             return provider.GetFeature(this as TTarget)
                 ?? base.GetFeature(provider);

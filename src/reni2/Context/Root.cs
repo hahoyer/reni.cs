@@ -1,7 +1,7 @@
 #region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2013 Harald Hoyer
+//     Copyright (C) 2013 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -74,7 +74,7 @@ namespace Reni.Context
 
         IFeatureImplementation ISymbolFeature<ConcatArrays>.Feature { get { return Extension.Feature(ConcatArraysResult); } }
 
-        internal override void Search(ContextSearchVisitor searchVisitor) { NotImplementedMethod(searchVisitor); }
+        internal override void Search(ContextSearchVisitor searchVisitor) { searchVisitor.Search(this); }
 
         Result ConcatArraysResult(Category category, IContextReference context, TypeBase argsType)
         {

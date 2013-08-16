@@ -41,7 +41,7 @@ namespace Reni.Type
         : ReniObject
             , IContextReferenceProvider
             , IIconKeyProvider
-            , ISearchTarget
+            , IConversionTarget
             , IFeatureProvider
     {
         sealed class Cache
@@ -101,7 +101,7 @@ namespace Reni.Type
         protected TypeBase()
             : base(_nextObjectId++) { _cache = new Cache(this); }
 
-        IFeatureImplementation ISearchTarget.GetFeature(TypeBase typeBase) { return GetConversions(typeBase).SingleOrDefault(); }
+        IFeatureImplementation IConversionTarget.GetFeature(TypeBase provider) { return GetConversions(provider).SingleOrDefault(); }
 
         IContextReference IContextReferenceProvider.ContextReference { get { return UniquePointerType; } }
 
@@ -137,8 +137,7 @@ namespace Reni.Type
         [DisableDump]
         internal virtual TypeBase[] ToList { get { return new[] {this}; } }
 
-        string ISearchTarget.StructFeatureName { get { return null; } }
-
+    
         [DisableDump]
         internal virtual string DumpPrintText
         {
@@ -309,9 +308,6 @@ namespace Reni.Type
         internal virtual IFeatureImplementation Feature { get { return this as IFeatureImplementation; } }
 
         [DisableDump]
-        ISearchTarget ConversionProvider { get { return this; } }
-
-        [DisableDump]
         internal virtual bool HasQuickSize { get { return true; } }
 
         [DisableDump]
@@ -406,12 +402,11 @@ namespace Reni.Type
             return featurePath == null ? null : featurePath.Feature;
         }
 
-        IFeatureImplementation IFeatureProvider.GetFeature(ISearchTarget target) { return target.GetFeature(this); }
         protected virtual IEnumerable<IFeatureImplementation> GetConversions(TypeBase typeBase) { yield break; }
 
         internal ISearchResult SuffixSearch(ISearchTarget target) { return new SuffixSearchResult(this, target.GetFeature(this)); }
 
-        internal ISearchResult ContextSearch(ISearchTarget target)
+        internal ISearchResult ConversionSearch(ISearchTarget target)
         {
             NotImplementedMethod(target);
             return null;
@@ -554,7 +549,7 @@ namespace Reni.Type
             return result;
         }
 
-        ISearchResult Converter(TypeBase destination) { return ContextSearch(destination.ConversionProvider); }
+        ISearchResult Converter(TypeBase destination) { return ConversionSearch(destination.ConversionProvider); }
 
         internal Result TextItemResult(Category category)
         {
@@ -647,6 +642,7 @@ namespace Reni.Type
         }
     }
 
+ 
 
     abstract class ConverterBase : ReniObject, IFeatureImplementation, ISimpleFeature
     {

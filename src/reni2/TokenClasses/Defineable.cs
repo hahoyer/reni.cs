@@ -50,14 +50,14 @@ namespace Reni.TokenClasses
         [DisableDump]
         protected string DataFunctionName { get { return Name.Symbolize(); } }
         string ISearchTarget.StructFeatureName { get { return Name; } }
-        IFeatureImplementation ISearchTarget.GetFeature(TypeBase typeBase) { return GetFeature(typeBase); }
-        protected virtual IFeatureImplementation GetFeature(TypeBase typeBase) { return null; }
+        IFeatureImplementation ISearchTarget.GetFeature(IFeatureProvider provider) { return GetFeature(provider); }
+        protected virtual IFeatureImplementation GetFeature(IFeatureProvider typeBase) { return null; }
     }
 
     abstract class Defineable<TTarget> : Defineable
         where TTarget : Defineable
     {
-        protected override IFeatureImplementation GetFeature(TypeBase provider)
+        protected override IFeatureImplementation GetFeature(IFeatureProvider provider)
         {
             return provider.GetFeature(this as TTarget)
                 ?? base.GetFeature(provider);

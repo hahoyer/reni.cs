@@ -45,7 +45,7 @@ namespace Reni.Feature
 
         internal static TFeature CheckedConvert<TFeature, TType>(this IPathFeature<TFeature, TType> feature, TType target)
             where TFeature : class, IFeature
-            where TType : IFeatureProvider
+            where TType : IOldFeatureProvider
         {
             if(feature == null)
                 return null;

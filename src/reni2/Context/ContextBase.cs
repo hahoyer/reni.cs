@@ -41,7 +41,7 @@ namespace Reni.Context
     /// <summary>
     ///     Base class for compiler environments
     /// </summary>
-    abstract class ContextBase : ReniObject, IIconKeyProvider
+    abstract class ContextBase : ReniObject, IIconKeyProvider, IFeatureProvider
     {
         static int _nextId;
 
@@ -125,7 +125,7 @@ namespace Reni.Context
         internal ISearchResult Search(ISearchTarget target)
         {
             var visitor = new ContextSearchVisitor(target);
-            visitor.Search(this);
+            this.Search(visitor);
             return visitor.SearchResult;
         }
 

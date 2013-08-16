@@ -37,7 +37,7 @@ namespace Reni
     {
         internal static bool Trace;
 
-        protected abstract SearchVisitor PathItem<TProvider>(TProvider provider) where TProvider : IFeatureProvider;
+        protected abstract SearchVisitor PathItem<TProvider>(TProvider provider) where TProvider : IOldFeatureProvider;
 
         [DisableDump]
         internal abstract bool IsSuccessFull { get; }

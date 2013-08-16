@@ -43,7 +43,7 @@ namespace Reni.Feature
 
     interface IPathFeature<out TOutType, in TInType> : IFeature
         where TOutType : IFeature
-        where TInType : IFeatureProvider
+        where TInType : IOldFeatureProvider
     {
         TOutType Convert(TInType target);
     }
@@ -118,10 +118,20 @@ namespace Reni.Feature
     interface ISearchTarget
     {
         string StructFeatureName { get; }
-        IFeatureImplementation GetFeature(TypeBase typeBase);
+        IFeatureImplementation GetFeature(IFeatureProvider provider);
     }
 
     interface IFeatureProvider
+    {
+        IFeatureImplementation GetFeature(ISearchTarget target);
+    }
+
+    interface IConversionTarget
+    {
+        IFeatureImplementation GetFeature(TypeBase provider);
+    }
+
+    interface IOldFeatureProvider
     {
         IFeatureImplementation GetFeature(ISearchTarget target);
     }
