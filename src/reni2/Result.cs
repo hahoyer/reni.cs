@@ -36,7 +36,7 @@ using Reni.Type;
 
 namespace Reni
 {
-    sealed class Result : ReniObject, ITreeNodeSupport
+    sealed class Result : ReniObject, ITreeNodeSupport, IAggregateable<Result>
     {
         static int _nextObjectId = 1;
         bool _isDirty;
@@ -459,6 +459,8 @@ namespace Reni
                 AssertValid();
             }
         }
+
+        Result IAggregateable<Result>.Aggregate(Result other) { return this + other; }
 
         public override string DumpData()
         {
@@ -927,5 +929,6 @@ namespace Reni
                 .ObviousExactConversion(CompleteCategory, destinationType)
                 .ReplaceArg(this);
         }
+
     }
 }
