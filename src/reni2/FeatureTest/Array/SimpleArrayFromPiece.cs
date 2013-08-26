@@ -25,12 +25,14 @@ using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
+using Reni.Parser;
 
 namespace Reni.FeatureTest.Array
 {
     [TestFixture]
     [Target("(<<5) dump_print")]
     [Output("array(#(#align3#)# (bit)sequence(4),(5))")]
+    [ParserTest]
     public sealed class SimpleArrayFromPiece : CompilerTest
     {
         [Test]

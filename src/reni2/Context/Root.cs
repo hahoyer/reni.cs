@@ -28,7 +28,6 @@ using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Code;
-using Reni.Feature;
 using Reni.ReniParser;
 using Reni.Struct;
 using Reni.TokenClasses;
@@ -37,7 +36,6 @@ using Reni.Type;
 namespace Reni.Context
 {
     sealed class Root : ContextBase
-        , ISymbolFeature<ConcatArrays>
     {
         [DisableDump]
         [Node]
@@ -71,10 +69,6 @@ namespace Reni.Context
         internal int FunctionCount { get { return _functions.Count; } }
 
         internal static RefAlignParam DefaultRefAlignParam { get { return new RefAlignParam(BitsConst.SegmentAlignBits, Size.Create(32)); } }
-
-        IFeatureImplementation ISymbolFeature<ConcatArrays>.Feature { get { return Extension.Feature(ConcatArraysResult); } }
-
-        internal override void Search(ContextSearchVisitor searchVisitor) { searchVisitor.Search(this); }
 
         Result ConcatArraysResult(Category category, IContextReference context, TypeBase argsType)
         {

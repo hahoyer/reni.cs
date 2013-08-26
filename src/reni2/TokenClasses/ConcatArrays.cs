@@ -28,6 +28,6 @@ using HWClassLibrary.Debug;
 
 namespace Reni.TokenClasses
 {
-    sealed class ConcatArrays : Defineable<ConcatArrays>
+    sealed class ConcatArrays : Defineable
     {}
 }

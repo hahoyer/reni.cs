@@ -62,12 +62,6 @@ namespace Reni.Type
         internal override Result Copier(Category category) { return Parent.Copier(category); }
         internal override Result ApplyTypeOperator(Result argResult) { return Parent.ApplyTypeOperator(argResult); }
         protected override string GetNodeDump() { return base.GetNodeDump() + "(" + Parent.NodeDump + ")"; }
-        internal override void Search(SearchVisitor searchVisitor)
-        {
-            searchVisitor.Search(this, () => Parent);
-            if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor);
-        }
 
         protected override Result ParentConversionResult(Category category) { return Parent.UniquePointer.ArgResult(category); }
 

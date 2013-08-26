@@ -41,8 +41,6 @@ namespace Reni.Type
         : ReniObject
             , IContextReferenceProvider
             , IIconKeyProvider
-            , IConversionTarget
-            , IFeatureProvider
     {
         sealed class Cache
         {
@@ -101,7 +99,6 @@ namespace Reni.Type
         protected TypeBase()
             : base(_nextObjectId++) { _cache = new Cache(this); }
 
-        IFeatureImplementation IConversionTarget.GetFeature(TypeBase provider) { return GetConversions(provider).SingleOrDefault(); }
 
         IContextReference IContextReferenceProvider.ContextReference { get { return UniquePointerType; } }
 
@@ -137,7 +134,7 @@ namespace Reni.Type
         [DisableDump]
         internal virtual TypeBase[] ToList { get { return new[] {this}; } }
 
-    
+
         [DisableDump]
         internal virtual string DumpPrintText
         {
@@ -395,24 +392,13 @@ namespace Reni.Type
             return -1;
         }
 
-        internal virtual IFeatureImplementation GetFeature<TTarget>(TTarget target)
-            where TTarget : Defineable
-        {
-            var featurePath = this as ISymbolFeature<TTarget>;
-            return featurePath == null ? null : featurePath.Feature;
-        }
-
         protected virtual IEnumerable<IFeatureImplementation> GetConversions(TypeBase typeBase) { yield break; }
 
-        internal ISearchResult SuffixSearch(ISearchTarget target) { return new SuffixSearchResult(this, target.GetFeature(this)); }
-
-        internal ISearchResult ConversionSearch(ISearchTarget target)
+        internal ISearchResult Search(Defineable target)
         {
             NotImplementedMethod(target);
             return null;
         }
-
-        internal virtual void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, null); }
 
         internal Result LocalReferenceResult(Category category)
         {
@@ -473,7 +459,7 @@ namespace Reni.Type
         }
 
         [NotNull]
-        internal Result GenericDumpPrintResult(Category category) { return SuffixSearch(_dumpPrintToken.Value).Result(category); }
+        internal Result GenericDumpPrintResult(Category category) { return Search(_dumpPrintToken.Value).SimpleResult(category); }
 
         static readonly SimpleCache<DumpPrintToken> _dumpPrintToken = new SimpleCache<DumpPrintToken>(DumpPrintToken.Create);
 
@@ -507,7 +493,7 @@ namespace Reni.Type
             }
 
             var result = searchResult
-                .Result(category.Typed)
+                .SimpleResult(category.Typed)
                 .ReplaceArg(c => ObviousExactConversion(c.Typed, TypeForConversion));
 
             var obviousConversion = result.Type.ObviousConversion(category, destination);
@@ -549,7 +535,11 @@ namespace Reni.Type
             return result;
         }
 
-        ISearchResult Converter(TypeBase destination) { return ConversionSearch(destination.ConversionProvider); }
+        ISearchResult Converter(TypeBase destination)
+        {
+            NotImplementedMethod(destination);
+            return null;
+        }
 
         internal Result TextItemResult(Category category)
         {
@@ -642,7 +632,6 @@ namespace Reni.Type
         }
     }
 
- 
 
     abstract class ConverterBase : ReniObject, IFeatureImplementation, ISimpleFeature
     {
@@ -658,7 +647,7 @@ namespace Reni.Type
         [EnableDump]
         readonly ISearchResult _childConverter;
         public AlignConverter(ISearchResult childConverter) { _childConverter = childConverter; }
-        protected override Result Result(Category category) { return _childConverter.Result(category.Typed); }
+        protected override Result Result(Category category) { return _childConverter.SimpleResult(category.Typed); }
     }
 
     // Krautpuster

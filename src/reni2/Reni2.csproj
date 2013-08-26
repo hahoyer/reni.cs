@@ -123,7 +123,6 @@
     <Compile Include="ReniParser\ParsedSyntaxExtension.cs" />
     <Compile Include="ReniParser\Probe.cs" />
     <Compile Include="ResultCache.cs" />
-    <Compile Include="PathItemSearchVisitor.cs" />
     <Compile Include="Code\Arg.cs" />
     <Compile Include="Code\Assign.cs" />
     <Compile Include="Code\BinaryOp.cs" />
@@ -265,12 +264,10 @@
     <Compile Include="Syntax\LeftParenthesis.cs" />
     <Compile Include="Syntax\ListSyntax.cs" />
     <Compile Include="T4Compiler.cs" />
-    <Compile Include="ConversionFunction.cs" />
     <Compile Include="Parser\IParsedSyntax.cs" />
     <Compile Include="Feature\DumpPrint\DumpPrint.cs" />
     <Compile Include="Feature\TypeOperator.cs" />
     <Compile Include="Parser\TokenFactory.cs" />
-    <Compile Include="SearchVisitor.cs" />
     <Compile Include="Struct\AtToken.cs" />
     <Compile Include="FeatureTest\DefaultOperations.cs" />
     <Compile Include="FeatureTest\IntegerStruct.cs" />

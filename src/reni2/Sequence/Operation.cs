@@ -24,14 +24,13 @@ using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using Reni.Feature;
 using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Sequence
 {
     abstract class Operation
-        : Defineable<Operation>
+        : Defineable
             , BitType.IOperation
     {
         int BitType.IOperation.Signature(int objectBitCount, int argsBitCount) { return Signature(objectBitCount, argsBitCount); }
@@ -45,11 +44,5 @@ namespace Reni.Sequence
 
     abstract class Operation<TTarget> : Operation
         where TTarget : Defineable
-    {
-        protected override IFeatureImplementation GetFeature(IFeatureProvider provider)
-        {
-            return provider.GetFeature(this as TTarget)
-                ?? base.GetFeature(provider);
-        }
-    }
+    {}
 }

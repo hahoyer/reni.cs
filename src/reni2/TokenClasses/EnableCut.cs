@@ -27,6 +27,6 @@ using System;
 
 namespace Reni.TokenClasses
 {
-    sealed class EnableCut : Defineable<EnableCut>
+    sealed class EnableCut : Defineable
     {}
 }

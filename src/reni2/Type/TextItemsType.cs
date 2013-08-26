@@ -57,13 +57,6 @@ namespace Reni.Type
         [DisableDump]
         public override TypeBase ArrayElementType { get { return Parent.ArrayElementType; } }
 
-        internal override void Search(SearchVisitor searchVisitor)
-        {
-            searchVisitor.Search(this, () => Parent);
-            if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor);
-        }
-
         internal override int? SmartArrayLength(TypeBase elementType) { return Parent.SmartArrayLength(elementType); }
 
         internal Result ConcatArraysResult(Category category, IContextReference objectReference, TypeBase argsType)

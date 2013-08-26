@@ -28,7 +28,7 @@ using Reni.TokenClasses;
 
 namespace Reni.Feature.DumpPrint
 {
-    sealed class DumpPrintToken : Defineable<DumpPrintToken>
+    sealed class DumpPrintToken : Defineable
     {
         internal static DumpPrintToken Create() { return new DumpPrintToken {Name = "<dump_print>"}; }
     }

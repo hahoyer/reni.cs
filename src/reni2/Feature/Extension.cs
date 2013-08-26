@@ -43,14 +43,6 @@ namespace Reni.Feature
         static readonly DictionaryEx<Func<Category, Result>, Simple> _simpleCache
             = new DictionaryEx<Func<Category, Result>, Simple>(function => new Simple(function));
 
-        internal static TFeature CheckedConvert<TFeature, TType>(this IPathFeature<TFeature, TType> feature, TType target)
-            where TFeature : class, IFeature
-            where TType : IOldFeatureProvider
-        {
-            if(feature == null)
-                return null;
-            return feature.Convert(target);
-        }
         internal static Simple Feature(Func<Category, Result> function) { return _simpleCache[function]; }
 
         internal static string Dump(this IFeatureImplementation feature) { return Tracer.Dump(feature); }

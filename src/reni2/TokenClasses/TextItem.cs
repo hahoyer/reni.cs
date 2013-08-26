@@ -27,6 +27,6 @@ using System;
 
 namespace Reni.TokenClasses
 {
-    sealed class TextItem : Defineable<TextItem>
+    sealed class TextItem : Defineable
     {}
 }

@@ -33,11 +33,5 @@ namespace Reni.Type
             : base(parent) {}
         protected override string TagTitle { get { return "enable_array_oversize"; } }
 
-        internal override void Search(SearchVisitor searchVisitor)
-        {
-            searchVisitor.Search(this, () => Parent);
-            if (!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor);
-        }
     }
 }

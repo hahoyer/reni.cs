@@ -26,35 +26,16 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Context;
-using Reni.Feature;
-using Reni.Feature.DumpPrint;
 using Reni.Type;
 
 namespace Reni.Struct
 {
     sealed class StructureType
         : TypeBase
-            , ISymbolFeature<DumpPrintToken>
-            , IPathFeature<ISymbolFeature<DumpPrintToken>, PointerType>
     {
         readonly Structure _structure;
 
         internal StructureType(Structure structure) { _structure = structure; }
-
-        IFeatureImplementation ISymbolFeature<DumpPrintToken>.Feature
-        {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
-        }
-
-        ISymbolFeature<DumpPrintToken> IPathFeature<ISymbolFeature<DumpPrintToken>, PointerType>.Convert(PointerType target)
-        {
-            NotImplementedMethod(target);
-            return null;
-        }
 
         [DisableDump]
         internal RefAlignParam RefAlignParam { get { return Structure.RefAlignParam; } }
@@ -66,22 +47,6 @@ namespace Reni.Struct
         protected override Size GetSize() { return Structure.StructSize; }
 
         protected override string GetNodeDump() { return "type(" + Structure.NodeDump + ")"; }
-
-        internal override void Search(SearchVisitor searchVisitor)
-        {
-            searchVisitor.Search(this);
-            if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor);
-        }
-
-        internal void SearchNameSpace<TFeature>(SearchVisitor<TFeature> searchVisitor)
-            where TFeature : class, IFeature
-        {
-            var searchVisitorChild = searchVisitor as SearchVisitor<IFeature>;
-            if(searchVisitorChild == null || searchVisitorChild.IsSuccessFull)
-                return;
-            searchVisitorChild.InternalResultProvider = (IFeatureImplementation) Structure.Search(searchVisitorChild.Target).CheckedConvert(this);
-        }
 
         [DisableDump]
         internal override Structure FindRecentStructure { get { return Structure; } }

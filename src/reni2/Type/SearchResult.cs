@@ -48,7 +48,7 @@ namespace Reni.Type
             StopByObjectId(-1);
         }
 
-        Result ISearchResult.Result(Category category)
+        Result ISearchResult.SimpleResult(Category category)
         {
             category = category.Typed;
             var featureResult = Feature.Simple.Result(category);

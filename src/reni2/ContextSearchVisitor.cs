@@ -24,77 +24,11 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
-using Reni.Basics;
-using Reni.Context;
 using Reni.Feature;
-using Reni.Struct;
 using Reni.Type;
-using Reni.Validation;
 
 namespace Reni
 {
-    sealed class ContextSearchVisitor : SearchVisitor
-    {
-        [EnableDump]
-        readonly ISearchTarget _target;
-
-        internal ContextSearchVisitor(ISearchTarget target) { _target = target; }
-
-        internal ISearchResult SearchResult
-        {
-            get
-            {
-                if(IsSuccessFull)
-                    return new ContextSearchResult(ResultProvider, ConversionFunctions);
-                return null;
-            }
-        }
-
-        internal void Search(Struct.Context context)
-        {
-            var accessPoint = context.Structure;
-            var feature = accessPoint.Search(_target);
-            if(feature == null)
-                return;
-            InternalResultProvider = feature.ConvertToContextFeature(accessPoint);
-            Add(new ConversionFunction(context));
-        }
-
-        [DisableDump]
-        IContextFeature InternalResultProvider { get; set; }
-        [DisableDump]
-        IFeatureImplementation ResultProvider { get; set; }
-
-        sealed class ConversionFunction : ReniObject, IConversionFunction
-        {
-            readonly Struct.Context _parent;
-            public ConversionFunction(Struct.Context parent) { _parent = parent; }
-            Result IConversionFunction.Result(Category category) { return _parent.ObjectResult(category); }
-        }
-
-        protected override SearchVisitor PathItem<TProvider>(TProvider provider) { throw new NotImplementedException(); }
-
-        [DisableDump]
-        internal override bool IsSuccessFull { get { return false; } }
-
-        [DisableDump]
-        internal override bool IsSuccessFullTarget { get { return false; } }
-
-        [DisableDump]
-        internal override IConversionFunction[] ConversionFunctions { get; set; }
-
-        protected override void SearchNameSpace(StructureType structureType) { throw new NotImplementedException(); }
-        internal override void Search() { NotImplementedMethod(); }
-        internal override void Search(IssueType target) { throw new NotImplementedException(); }
-        internal void Search(ContextBase contextBase)
-        {
-            var s = _target.GetFeature(contextBase);
-            
-            
-            throw new NotImplementedException();
-        }
-    }
-
     sealed class ContextSearchResult : SearchResult
     {
         internal ContextSearchResult(IFeatureImplementation feature, IConversionFunction[] conversionFunctions)

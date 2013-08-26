@@ -26,20 +26,12 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Context;
-using Reni.Feature;
-using Reni.Feature.DumpPrint;
-using Reni.Sequence;
 using Reni.Struct;
 using Reni.Syntax;
-using Reni.TokenClasses;
 
 namespace Reni.Type
 {
     sealed class TypeType : TypeBase
-        ,ISymbolFeature <DumpPrintToken>
-        ,ISymbolFeature <Slash>
-        ,ISymbolFeature <Star>
-        ,ISymbolFeature <SequenceToken>
 
     {
         readonly TypeBase _value;
@@ -50,28 +42,18 @@ namespace Reni.Type
             StopByObjectId(61);
         }
 
-        IFeatureImplementation ISymbolFeature<DumpPrintToken>.Feature { get { throw new NotImplementedException(); } }
-        IFeatureImplementation ISymbolFeature<Slash>.Feature { get { throw new NotImplementedException(); } }
-        IFeatureImplementation ISymbolFeature<Star>.Feature { get { throw new NotImplementedException(); } }
-        IFeatureImplementation ISymbolFeature<SequenceToken>.Feature { get { throw new NotImplementedException(); } }
-
         [DisableDump]
         internal override Root RootContext { get { return _value.RootContext; } }
+
         [DisableDump]
         internal override bool IsDataLess { get { return true; } }
+
         [DisableDump]
         internal TypeBase Value { get { return _value; } }
 
         internal override string DumpPrintText { get { return "(" + Value.DumpPrintText + "()) type"; } }
 
         protected override string GetNodeDump() { return "(" + Value.NodeDump + ") type"; }
-
-        internal override void Search(SearchVisitor searchVisitor)
-        {
-            searchVisitor.Search(this, null);
-            if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor);
-        }
 
         internal override Result InstanceResult(Category category, Func<Category, Result> getRightResult) { return RawInstanceResult(category.Typed, getRightResult).LocalPointerKindResult & category; }
 

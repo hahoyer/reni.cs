@@ -29,7 +29,6 @@ using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Context;
-using Reni.Feature;
 using Reni.Parser;
 using Reni.ReniParser;
 using Reni.Syntax;
@@ -328,15 +327,13 @@ namespace Reni.Struct
     }
 
 
-    sealed class StructurePosition : ReniObject, IPathFeature<IFeature, StructureType>
+    sealed class StructurePosition : ReniObject
     {
         [EnableDump]
         readonly int _position;
 
         internal StructurePosition(int position) { _position = position; }
 
-        IFeature IPathFeature<IFeature, StructureType>.Convert(StructureType structureType) { return Convert(structureType.Structure); }
-        internal IContextFeature ConvertToContextFeature(Structure accessPoint) { return Convert(accessPoint); }
         internal AccessFeature Convert(Structure accessPoint) { return accessPoint.UniqueAccessFeature(_position); }
     }
 }

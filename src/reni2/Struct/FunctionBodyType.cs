@@ -30,14 +30,12 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Feature.DumpPrint;
 using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class FunctionBodyType : TypeBase, IFunctionFeature, ISimpleFeature
-        , ISymbolFeature<DumpPrintToken>, IFeatureImplementation
+    sealed class FunctionBodyType : TypeBase, IFunctionFeature, ISimpleFeature, IFeatureImplementation
     {
         [EnableDump]
         [Node]
@@ -80,7 +78,7 @@ namespace Reni.Struct
         internal override bool IsDataLess { get { return true; } }
         [DisableDump]
         internal override string DumpPrintText { get { return _syntax.DumpPrintText; } }
-        internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, null); }
+
         internal Result DumpPrintTokenResult(Category category) { return DumpPrintTypeNameResult(category); }
 
         [DisableDump]
@@ -133,6 +131,5 @@ namespace Reni.Struct
             NotImplementedMethod(category);
             return null;
         }
-        IFeatureImplementation ISymbolFeature<DumpPrintToken>.Feature { get { return this; } }
     }
 }

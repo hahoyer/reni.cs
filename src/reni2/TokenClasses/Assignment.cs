@@ -27,6 +27,6 @@ using System;
 
 namespace Reni.TokenClasses
 {
-    sealed class Assignment: Defineable<Assignment>
+    sealed class Assignment: Defineable
     {}
 }

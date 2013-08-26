@@ -5,7 +5,7 @@ using HWClassLibrary.Debug;
 
 namespace Reni.TokenClasses
 {
-    internal sealed class UserSymbol : Defineable<UserSymbol>
+    internal sealed class UserSymbol : Defineable
     {
         internal UserSymbol(string name) { Name = name; }
     }

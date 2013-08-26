@@ -91,13 +91,6 @@ namespace Reni.Type
         [DisableDump]
         internal override Root RootContext { get { return ValueType.RootContext; } }
 
-        internal override void Search(SearchVisitor searchVisitor)
-        {
-            searchVisitor.Search(this, () => ValueType);
-            if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor);
-        }
-
         internal ResultCache ForceDePointer(Category category)
         {
             var result = GetterResult(category.Typed);

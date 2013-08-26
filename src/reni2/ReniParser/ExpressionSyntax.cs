@@ -73,7 +73,7 @@ namespace Reni.ReniParser
                     : context
                         .Type(Left)
                         .TypeForSearchProbes
-                        .SuffixSearch(_tokenClass);
+                        .Search(_tokenClass);
             return searchResult == null
                 ? null
                 : searchResult.FunctionResult(context, category, this);

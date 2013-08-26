@@ -30,17 +30,15 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Feature.DumpPrint;
 using Reni.Sequence;
-using Reni.TokenClasses;
 
 namespace Reni.Type
 {
     sealed class ArrayType
         : TypeBase
-        , IRepeaterType
+            , IRepeaterType
             , IFunctionFeature
-        , IFeatureImplementation
+            , IFeatureImplementation
     {
         [Node]
         internal readonly TypeBase ElementType;
@@ -71,29 +69,27 @@ namespace Reni.Type
         [Node]
         [DisableDump]
         internal SequenceType UniqueSequence { get { return _sequenceCache.Value; } }
+
         [Node]
         [DisableDump]
         internal TextItemsType UniqueTextItemsType { get { return _textItemsCache.Value; } }
+
         [Node]
         [DisableDump]
         internal EnableArrayOverSizeType EnableArrayOverSizeType { get { return _enableArrayOverSizeTypeCache.Value; } }
+
         [DisableDump]
         internal override bool IsDataLess { get { return Count == 0 || ElementType.IsDataLess; } }
+
         [DisableDump]
         public override TypeBase ArrayElementType { get { return ElementType; } }
+
         internal override string DumpPrintText { get { return "(" + ElementType.DumpPrintText + ")array(" + Count + ")"; } }
 
         internal override int? SmartArrayLength(TypeBase elementType) { return ElementType.IsConvertable(elementType) ? Count : base.SmartArrayLength(elementType); }
         protected override Size GetSize() { return ElementType.Size * Count; }
         internal override Result Destructor(Category category) { return ElementType.ArrayDestructor(category, Count); }
         internal override Result Copier(Category category) { return ElementType.ArrayCopier(category, Count); }
-
-        internal override void Search(SearchVisitor searchVisitor)
-        {
-            searchVisitor.Search(this, () => ElementType);
-            if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor);
-        }
 
         internal Result TextItemsResult(Category category) { return UniqueTextItemsType.PointerResult(category, PointerArgResult); }
 
@@ -149,16 +145,19 @@ namespace Reni.Type
 
         [DisableDump]
         internal override sealed Root RootContext { get { return ElementType.RootContext; } }
+
         [DisableDump]
         IContextReference ObjectReference { get { return UniquePointerType; } }
+
         [DisableDump]
         internal TypeBase IndexType { get { return RootContext.BitType.UniqueNumber(IndexSize.ToInt()); } }
+
         Size IndexSize { get { return Size.AutoSize(Count).Align(Root.DefaultRefAlignParam.AlignBits); } }
 
         IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return null; } }
         IFunctionFeature IFeatureImplementation.Function { get { return this; } }
         ISimpleFeature IFeatureImplementation.Simple { get { return null; } }
-        
+
         bool IFunctionFeature.IsImplicit { get { return false; } }
         IContextReference IFunctionFeature.ObjectReference { get { return ObjectReference; } }
 

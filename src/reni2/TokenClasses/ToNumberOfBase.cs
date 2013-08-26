@@ -27,6 +27,6 @@ using System;
 
 namespace Reni.TokenClasses
 {
-    sealed class ToNumberOfBase : Defineable<ToNumberOfBase>
+    sealed class ToNumberOfBase : Defineable
     {}
 }

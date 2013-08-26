@@ -27,6 +27,6 @@ using HWClassLibrary.Debug;
 
 namespace Reni.TokenClasses
 {
-    sealed class TextItems : Defineable<TextItems>
+    sealed class TextItems : Defineable
     {}
 }

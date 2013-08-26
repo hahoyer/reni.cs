@@ -25,7 +25,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using Reni.Basics;
-using Reni.Feature;
 using Reni.Type;
 
 namespace Reni.Sequence
@@ -34,8 +33,6 @@ namespace Reni.Sequence
         : Operation
             , BitType.IPrefix
     {
-        protected override IFeatureImplementation GetFeature(IFeatureProvider provider) { return provider.GetFeature(this) ?? base.GetFeature(provider); }
-
         string BitType.IPrefix.Name { get { return DataFunctionName; } }
         protected override int Signature(int objSize, int argSize) { return BitsConst.PlusSize(objSize, argSize); }
     }

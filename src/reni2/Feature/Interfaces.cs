@@ -29,44 +29,16 @@ using Reni.Code;
 using Reni.Context;
 using Reni.ReniParser;
 using Reni.Syntax;
-using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Feature
 {
-
-    interface IFeature
-    { }
-
-    interface IContextFeature
-    { }
-
-    interface IPathFeature<out TOutType, in TInType> : IFeature
-        where TOutType : IFeature
-        where TInType : IOldFeatureProvider
-    {
-        TOutType Convert(TInType target);
-    }
-
-    interface IFeatureImplementation 
+    interface IFeatureImplementation
     {
         IMetaFunctionFeature MetaFunction { get; }
         IFunctionFeature Function { get; }
         ISimpleFeature Simple { get; }
     }
-
-    interface ISymbolFeature<TInType> : IFeature
-        where TInType : Defineable
-    {
-        IFeatureImplementation Feature { get; }
-    }
-
-    interface IContextFeature<TInType> : IContextFeature
-        where TInType : Defineable
-    { }
-
-    interface IConversionFeature : IFeature
-    { }
 
     interface ISimpleFeature
     {
@@ -82,6 +54,7 @@ namespace Reni.Feature
         /// <param name="argsType"> </param>
         /// <returns> </returns>
         Result ApplyResult(Category category, TypeBase argsType);
+
         /// <summary>
         ///     Gets a value indicating whether this function requires implicit call (i. e. call without argument list).
         /// </summary>
@@ -90,6 +63,7 @@ namespace Reni.Feature
         /// </value>
         [DisableDump]
         bool IsImplicit { get; }
+
         [DisableDump]
         IContextReference ObjectReference { get; }
     }
@@ -99,40 +73,14 @@ namespace Reni.Feature
         Result ApplyResult(ContextBase contextBase, Category category, CompileSyntax left, CompileSyntax right);
     }
 
-    interface IFeaturePath<out TPath, in TTarget>
-    {
-        TPath GetFeature(TTarget target);
-    }
-
     interface ISearchResult
     {
         Result FunctionResult(ContextBase context, Category category, ExpressionSyntax syntax);
-        Result Result(Category category);
+        Result SimpleResult(Category category);
     }
 
     interface IConversionFunction
     {
         Result Result(Category category);
-    }
-
-    interface ISearchTarget
-    {
-        string StructFeatureName { get; }
-        IFeatureImplementation GetFeature(IFeatureProvider provider);
-    }
-
-    interface IFeatureProvider
-    {
-        IFeatureImplementation GetFeature(ISearchTarget target);
-    }
-
-    interface IConversionTarget
-    {
-        IFeatureImplementation GetFeature(TypeBase provider);
-    }
-
-    interface IOldFeatureProvider
-    {
-        IFeatureImplementation GetFeature(ISearchTarget target);
     }
 }

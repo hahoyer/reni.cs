@@ -27,7 +27,6 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
-using Reni.Feature;
 using Reni.ReniParser;
 using Reni.Type;
 
@@ -44,7 +43,6 @@ namespace Reni.Validation
             _issue = issue;
             _rootContext = rootContext;
         }
-        internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this); }
 
         [DisableDump]
         internal override Root RootContext { get { return _rootContext; } }
@@ -63,15 +61,10 @@ namespace Reni.Validation
         {
             [EnableDump]
             readonly IssueType _parent;
-            [EnableDump]
-            readonly ISearchTarget _target;
-            readonly ExpressionSyntax _syntax;
 
-            public ImplicitSearchResult(IssueType parent, ISearchTarget target, ExpressionSyntax syntax)
+            public ImplicitSearchResult(IssueType parent)
             {
                 _parent = parent;
-                _target = target;
-                _syntax = syntax;
             }
         }
     }

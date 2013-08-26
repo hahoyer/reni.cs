@@ -27,6 +27,6 @@ using HWClassLibrary.Debug;
 
 namespace Reni.TokenClasses
 {
-    sealed class EnableArrayOverSize : Defineable<EnableArrayOverSize>
+    sealed class EnableArrayOverSize : Defineable
     {}
 }

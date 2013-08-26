@@ -44,14 +44,6 @@ namespace Reni.Struct
         [DisableDump]
         internal Structure Structure { get { return Parent.UniqueStructure(Container, Position); } }
 
-        internal override void Search(ContextSearchVisitor searchVisitor)
-        {
-            searchVisitor.Search(this);
-            if(searchVisitor.IsSuccessFull)
-                return;
-            base.Search(searchVisitor);
-        }
-
         internal Result ObjectResult(Category category) { return Structure.StructReferenceViaContextReference(category); }
 
         internal override Structure ObtainRecentStructure() { return Structure; }

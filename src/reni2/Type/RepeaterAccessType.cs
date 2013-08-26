@@ -44,13 +44,6 @@ namespace Reni.Type
 
         protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize + RepeaterType.IndexSize; }
 
-        internal override void Search(SearchVisitor searchVisitor)
-        {
-            searchVisitor.Search(this, () => ValueType);
-            if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor);
-        }
-
         protected override CodeBase SetterCode()
         {
             return Pair(ValueType.PointerKind)

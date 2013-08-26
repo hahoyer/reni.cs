@@ -29,18 +29,12 @@ using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
-using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Sequence
 {
     sealed class SequenceType
         : TagChild<ArrayType>
-            , ISymbolFeature<ConcatArrays>
-            , ISymbolFeature<TokenClasses.EnableCut>
-            , ISymbolFeature<UndecorateToken>
-            , IPathFeature<IConversionFeature, SequenceType>
-            , IPathFeature<IConversionFeature, ArrayType>
     {
         readonly DictionaryEx<RefAlignParam, ObjectReference> _objectReferencesCache;
 
@@ -61,17 +55,6 @@ namespace Reni.Sequence
             _objectReferencesCache = new DictionaryEx<RefAlignParam, ObjectReference>(refAlignParam => new ObjectReference(this, refAlignParam));
             StopByObjectId(-172);
         }
-
-        IFeatureImplementation ISymbolFeature<ConcatArrays>.Feature { get { return Extension.Feature(ConcatArraysResult); } }
-        IFeatureImplementation ISymbolFeature<TokenClasses.EnableCut>.Feature { get { return Extension.Feature(EnableCutResult); } }
-        IFeatureImplementation ISymbolFeature<UndecorateToken>.Feature { get { return Extension.Feature(UndecorateTokenResult); } }
-
-        IConversionFeature IPathFeature<IConversionFeature, SequenceType>.Convert(SequenceType target) { throw new NotImplementedException(); }
-        IConversionFeature IPathFeature<IConversionFeature, ArrayType>.Convert(ArrayType target) { throw new NotImplementedException(); }
-
-        Simple GetFeature(SequenceType target) { return ConversionFeature(target); }
-        Simple GetFeature(ArrayType target) { return ConversionFeature(target); }
-        Simple Convert2(SequenceType type) { return type.ConversionFeature(this); }
 
         [DisableDump]
         protected override string TagTitle { get { return "Sequence"; } }
@@ -110,13 +93,6 @@ namespace Reni.Sequence
                 return 1;
             NotImplementedMethod(elementType);
             return null;
-        }
-
-        internal override void Search(SearchVisitor searchVisitor)
-        {
-            searchVisitor.Search(this, () => Parent);
-            if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor);
         }
 
         internal Result ConcatArraysResult(Category category, IContextReference objectReference, TypeBase argsType)

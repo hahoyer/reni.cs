@@ -28,6 +28,6 @@ using System;
 namespace Reni.TokenClasses
 {
     sealed class SequenceToken
-        : Defineable<SequenceToken>
+        : Defineable
     {}
 }

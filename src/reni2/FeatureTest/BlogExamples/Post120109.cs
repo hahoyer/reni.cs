@@ -25,10 +25,12 @@ using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
+using Reni.Parser;
 
 namespace Reni.FeatureTest.BlogExamples
 {
     [TestFixture]
+    [ParserTest]
     [TargetSet("\"Hello world\"#(* Das ist ein Kommentar *)#dump_print", "Hello world")]
     [TargetSet("\"Hello world\"#(ignorieren Das ist ein Kommentar\n ignorieren)#dump_print", "Hello world")]
     [TargetSet("\"Hello world\"# Das ist der auszugebende String\ndump_print # ... und damit wird er ausgegeben", "Hello world")]

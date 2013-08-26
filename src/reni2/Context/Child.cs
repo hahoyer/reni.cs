@@ -42,11 +42,6 @@ namespace Reni.Context
         [DisableDump]
         internal override Root RootContext { get { return Parent.RootContext; } }
 
-        internal override void Search(ContextSearchVisitor searchVisitor)
-        {
-            Parent.Search(searchVisitor);
-        }
-
         internal override Structure ObtainRecentStructure() { return Parent.ObtainRecentStructure(); }
         internal override IFunctionContext ObtainRecentFunctionContext() { return Parent.ObtainRecentFunctionContext(); }
     }

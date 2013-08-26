@@ -27,6 +27,6 @@ using HWClassLibrary.Debug;
 
 namespace Reni.TokenClasses
 {
-    sealed class UndecorateToken : Defineable<UndecorateToken>
+    sealed class UndecorateToken : Defineable
     {}
 }

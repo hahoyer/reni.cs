@@ -29,7 +29,6 @@ using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
-using Reni.Feature;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -124,6 +123,7 @@ namespace Reni.Struct
 
         [DisableDump]
         internal bool IsDataLess { get { return ContainerContextObject.StructureIsDataLess(EndPosition); } }
+
         [DisableDump]
         internal Root RootContext { get { return ContainerContextObject.RootContext; } }
 
@@ -152,7 +152,7 @@ namespace Reni.Struct
         {
             var position = rightResult
                 .Conversion(IndexType)
-				.DereferenceResult
+                .DereferenceResult
                 .Evaluate(ContainerContextObject.RootContext.ExecutionContext)
                 .ToInt32();
             return AccessViaThisReference(category, position);
@@ -171,7 +171,7 @@ namespace Reni.Struct
             return RootContext.ConcatPrintResult
                 (
                     category,
-					EndPosition,
+                    EndPosition,
                     position => DumpPrintResultViaAccessReference(category, position));
         }
 
@@ -251,13 +251,6 @@ namespace Reni.Struct
             return ContainerContextObject
                 .AccessType(EndPosition, position)
                 .TypeForStructureElement;
-        }
-
-        internal StructurePosition Search(ISearchTarget target)
-        {
-            return ContainerContextObject
-                .Container
-                .Find(target.StructFeatureName);
         }
     }
 }

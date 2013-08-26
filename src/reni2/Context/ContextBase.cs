@@ -33,6 +33,7 @@ using Reni.Feature;
 using Reni.ReniParser;
 using Reni.Struct;
 using Reni.Syntax;
+using Reni.TokenClasses;
 using Reni.Type;
 using Reni.Validation;
 
@@ -41,7 +42,7 @@ namespace Reni.Context
     /// <summary>
     ///     Base class for compiler environments
     /// </summary>
-    abstract class ContextBase : ReniObject, IIconKeyProvider, IFeatureProvider
+    abstract class ContextBase : ReniObject, IIconKeyProvider
     {
         static int _nextId;
 
@@ -71,8 +72,6 @@ namespace Reni.Context
         internal Structure UniqueStructure(Container container) { return UniqueStructure(container, container.EndPosition); }
         internal Structure UniqueStructure(Container container, int accessPosition) { return _cache.Structures[container][accessPosition]; }
         internal ContainerContextObject UniqueContainerContext(Container context) { return _cache.ContainerContextObjects[context]; }
-
-        internal abstract void Search(ContextSearchVisitor searchVisitor);
 
         [DebuggerHidden]
         internal Result UniqueResult(Category category, CompileSyntax syntax)
@@ -122,13 +121,6 @@ namespace Reni.Context
 
         internal TypeBase Type(CompileSyntax syntax) { return UniqueResult(Category.Type, syntax).Type; }
 
-        internal ISearchResult Search(ISearchTarget target)
-        {
-            var visitor = new ContextSearchVisitor(target);
-            this.Search(visitor);
-            return visitor.SearchResult;
-        }
-
         internal virtual Structure ObtainRecentStructure() { return null; }
         internal virtual IFunctionContext ObtainRecentFunctionContext() { return null; }
 
@@ -166,23 +158,22 @@ namespace Reni.Context
 
             public Cache(ContextBase target)
             {
-                UndefinedSymbolType = new DictionaryEx<ExpressionSyntax, IssueType>
-                    (syntax => UndefinedSymbolIssue.Type(target, syntax));
+                UndefinedSymbolType = new DictionaryEx<ExpressionSyntax, IssueType>(syntax => UndefinedSymbolIssue.Type(target, syntax));
                 ResultCache = new DictionaryEx<CompileSyntax, ResultCache>(target.CreateCacheElement);
                 StructContexts = new DictionaryEx<Container, DictionaryEx<int, ContextBase>>
                     (
                     container =>
                         new DictionaryEx<int, ContextBase>
-                            (
-                            position => new Struct.Context(target, container, position)));
+                            (position => new Struct.Context(target, container, position))
+                    );
                 RecentStructure = new SimpleCache<Structure>(target.ObtainRecentStructure);
                 RecentFunctionContextObject = new SimpleCache<IFunctionContext>(target.ObtainRecentFunctionContext);
                 Structures = new DictionaryEx<Container, DictionaryEx<int, Structure>>
                     (
                     container =>
                         new DictionaryEx<int, Structure>
-                            (
-                            position => new Structure(ContainerContextObjects[container], position)));
+                            (position => new Structure(ContainerContextObjects[container], position))
+                    );
                 ContainerContextObjects = new DictionaryEx<Container, ContainerContextObject>
                     (container => new ContainerContextObject(container, target));
             }
@@ -272,6 +263,12 @@ namespace Reni.Context
             {
                 EndMethodDump();
             }
+        }
+
+        internal ISearchResult Search(Defineable tokenClass)
+        {
+            NotImplementedMethod(tokenClass);
+            return null;
         }
     }
 }

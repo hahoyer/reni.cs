@@ -73,13 +73,6 @@ namespace Reni.Type
                 .AddToReference(() => FieldOffset);
         }
 
-        internal override void Search(SearchVisitor searchVisitor)
-        {
-            searchVisitor.Search(this, () => ValueType);
-            if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor);
-        }
-
         internal override int? SmartSequenceLength(TypeBase elementType)
         {
             return ValueType

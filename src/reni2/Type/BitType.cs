@@ -28,8 +28,6 @@ using HWClassLibrary.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
-using Reni.Feature;
-using Reni.Feature.DumpPrint;
 using Reni.Sequence;
 
 namespace Reni.Type
@@ -38,15 +36,14 @@ namespace Reni.Type
     {
         readonly Root _rootContext;
 
-        internal BitType(Root rootContext)
-        {
-            _rootContext = rootContext;
-        }
+        internal BitType(Root rootContext) { _rootContext = rootContext; }
 
         [DisableDump]
         internal override bool IsDataLess { get { return false; } }
+
         [DisableDump]
         internal override string DumpPrintText { get { return "bit"; } }
+
         [DisableDump]
         internal override Root RootContext { get { return _rootContext; } }
 
@@ -64,13 +61,6 @@ namespace Reni.Type
         {
             return VoidType
                 .Result(category, DumpPrintNumberCode, CodeArgs.Arg);
-        }
-
-        internal override void Search(SearchVisitor searchVisitor)
-        {
-            searchVisitor.Search(this, null);
-            if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor);
         }
 
         protected override string Dump(bool isRecursion) { return GetType().PrettyName(); }
@@ -94,6 +84,7 @@ namespace Reni.Type
         internal interface IOperation
         {
             int Signature(int objectBitCount, int argsBitCount);
+
             [DisableDump]
             string Name { get; }
         }

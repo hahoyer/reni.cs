@@ -110,12 +110,6 @@ namespace Reni.Type
                     , CodeArgs.Arg
                 );
         }
-        internal override void Search(SearchVisitor searchVisitor)
-        {
-            searchVisitor.Search(this, () => ValueType);
-            if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor);
-        }
 
         protected override ArrayType ObtainArray(int count) { return ValueType.UniqueArray(count); }
 
