@@ -1,7 +1,7 @@
 #region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2013 Harald Hoyer
+//     Copyright (C) 2013 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -20,23 +20,19 @@
 
 #endregion
 
-using HWClassLibrary.Debug;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
+using HWClassLibrary.Debug;
 using Reni.Feature;
-using Reni.Type;
 
-namespace Reni
+namespace Reni.Type
 {
     sealed class TypeSearchResult : SearchResult
     {
-        [EnableDump]
         readonly TypeBase _type;
-
-        internal TypeSearchResult(IFeatureImplementation feature, IConversionFunction[] conversionFunctions, TypeBase type)
-            : base(feature, conversionFunctions) { _type = type; }
-        [DisableDump]
+        public TypeSearchResult(TypeBase type, IFeatureImplementation feature)
+            : base(feature, new IConversionFunction[0]) { _type = type; }
         protected override TypeBase DefiningType { get { return _type; } }
     }
 }

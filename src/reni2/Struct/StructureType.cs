@@ -26,16 +26,22 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Feature;
+using Reni.Feature.DumpPrint;
+using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Struct
 {
     sealed class StructureType
         : TypeBase
+            , ISymbolProvider<DumpPrintToken>
     {
         readonly Structure _structure;
 
         internal StructureType(Structure structure) { _structure = structure; }
+
+        IFeatureImplementation ISymbolProvider<DumpPrintToken>.Feature { get { return Extension.Feature(DumpPrintTokenResult); } }
 
         [DisableDump]
         internal RefAlignParam RefAlignParam { get { return Structure.RefAlignParam; } }
@@ -58,5 +64,7 @@ namespace Reni.Struct
 
         [DisableDump]
         internal override bool HasQuickSize { get { return false; } }
+
+        internal override IFeatureImplementation GetFeatureDefinition(Defineable target) { return target.GetFeature(this) ?? base.GetFeatureDefinition(target); }
     }
 }

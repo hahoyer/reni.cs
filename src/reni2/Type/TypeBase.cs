@@ -392,9 +392,15 @@ namespace Reni.Type
             return -1;
         }
 
-        protected virtual IEnumerable<IFeatureImplementation> GetConversions(TypeBase typeBase) { yield break; }
-
         internal ISearchResult Search(Defineable target)
+        {
+            var feature = GetFeatureDefinition(target);
+            if(feature == null)
+                return null;
+            return new TypeSearchResult(this, feature);
+        }
+
+        internal virtual IFeatureImplementation GetFeatureDefinition(Defineable target)
         {
             NotImplementedMethod(target);
             return null;

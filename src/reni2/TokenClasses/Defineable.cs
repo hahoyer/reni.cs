@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using Reni.Feature;
 using Reni.Parser;
 using Reni.ReniParser;
 using Reni.Syntax;
@@ -44,12 +45,17 @@ namespace Reni.TokenClasses
         protected override sealed ParsedSyntax Prefix(TokenData token, ParsedSyntax right)
         {
             return new ExpressionSyntax(this, null, token, (CompileSyntax) right);
-            ;
         }
         protected override sealed ParsedSyntax Suffix(ParsedSyntax left, TokenData token) { return left.CreateSyntaxOrDeclaration(this, token, null); }
         protected override sealed ParsedSyntax Infix(ParsedSyntax left, TokenData token, ParsedSyntax right) { return left.CreateSyntaxOrDeclaration(this, token, right); }
 
         [DisableDump]
         protected string DataFunctionName { get { return Name.Symbolize(); } }
+
+        internal virtual IFeatureImplementation GetFeature<TProvider>(TProvider provider)
+        {
+            NotImplementedMethod(provider);
+            return null;
+        }
     }
 }

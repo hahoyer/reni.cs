@@ -176,7 +176,6 @@
     <Compile Include="Code\Visitor.cs" />
     <Compile Include="Compiler.cs" />
     <Compile Include="CompilerParameters.cs" />
-    <Compile Include="ContextSearchVisitor.cs" />
     <Compile Include="Context\Child.cs" />
     <Compile Include="Context\ContextBase.cs" />
     <Compile Include="Context\ContextOperator.cs" />
@@ -317,8 +316,6 @@
     <Compile Include="TokenClasses\UndecorateToken.cs" />
     <Compile Include="TokenClasses\UserSymbol.cs" />
     <Compile Include="TokenClasses\NewValueToken.cs" />
-    <Compile Include="TypeRootSearchVisitor.cs" />
-    <Compile Include="TypeSearchResult.cs" />
     <Compile Include="Type\DataSetterTargetType.cs" />
     <Compile Include="Type\EnableArrayOverSizeType.cs" />
     <Compile Include="Type\RepeaterAccessType.cs" />
@@ -352,6 +349,7 @@
     <Compile Include="Type\TextItemsType.cs" />
     <Compile Include="Type\TextItemType.cs" />
     <Compile Include="Type\TypeBase.cs" />
+    <Compile Include="Type\TypeSearchResult.cs" />
     <Compile Include="Type\TypeType.cs" />
     <Compile Include="Type\VoidType.cs" />
     <Compile Include="Validation\CompileSyntaxError.cs" />

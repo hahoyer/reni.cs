@@ -25,7 +25,6 @@ using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
 using Reni.Basics;
-using Reni.Sequence;
 
 namespace Reni.Feature
 {
@@ -37,16 +36,12 @@ namespace Reni.Feature
         protected SimpleBase(Func<Category, Result> function)
             : base(_nextObjectId++) { _function = function; }
         Result ISimpleFeature.Result(Category category) { return _function(category); }
-
     }
 
     sealed class Simple : SimpleBase, IFeatureImplementation
     {
         public Simple(Func<Category, Result> function)
-            : base(function)
-        {
-            StopByObjectId(0);
-        }
+            : base(function) { }
 
         IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return null; } }
         IFunctionFeature IFeatureImplementation.Function { get { return null; } }

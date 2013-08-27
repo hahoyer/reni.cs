@@ -29,6 +29,7 @@ using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
+using Reni.Feature.DumpPrint;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -78,5 +79,18 @@ namespace Reni.Feature
                 .CodeArgs
                 .HasArg;
         }
+
+        internal static IFeatureImplementation GetSpecialFeatureDefinition<TProvider, TDefinable>(this TProvider provider)
+        {
+            var resultProvider = provider as ISymbolProvider<TDefinable>;
+            if(resultProvider == null)
+                return null;
+            return resultProvider.Feature;
+        }
+    }
+
+    interface ISymbolProvider<TDefinable>
+    {
+        IFeatureImplementation Feature { get; }
     }
 }
