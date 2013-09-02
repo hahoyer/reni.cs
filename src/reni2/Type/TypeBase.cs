@@ -40,7 +40,7 @@ namespace Reni.Type
     abstract class TypeBase
         : ReniObject
             , IContextReferenceProvider
-            , IIconKeyProvider
+            , IIconKeyProvider, ISearchTarget
     {
         sealed class Cache
         {
@@ -392,20 +392,6 @@ namespace Reni.Type
             return -1;
         }
 
-        internal ISearchResult Search(Defineable target)
-        {
-            var feature = GetFeatureDefinition(target);
-            if(feature == null)
-                return null;
-            return new TypeSearchResult(this, feature);
-        }
-
-        internal virtual IFeatureImplementation GetFeatureDefinition(Defineable target)
-        {
-            NotImplementedMethod(target);
-            return null;
-        }
-
         internal Result LocalReferenceResult(Category category)
         {
             if(IsDataLess)
@@ -636,25 +622,76 @@ namespace Reni.Type
                 .DePointer(alignedSize)
                 .DumpPrintNumber(alignedSize);
         }
+
+        internal ISearchResult Search(Defineable target) { return GetSearchResult(target); }
+
+        internal virtual ISearchResult GetSearchResult(ISearchObject @object) { return @object.GetFeatureGenericized(this); }
+
+        internal ISearchResult GetSearchResultForChild<TProvider>(ISearchObject @object, TProvider parent)
+        {
+            ISearchTarget target = new FeaturePathBridge<TProvider>(parent, this);
+            var result = @object.GetFeatureGenericized(target);
+            if(result != null)
+                return result;
+
+            var proxyType = parent as IProxyType;
+            if(proxyType == null)
+                return null;
+
+            Tracer.Assert(proxyType.Converter.TargetType == this);
+            result = GetSearchResult(@object);
+
+            if(result == null)
+                return null;
+
+            return result.WithConversion(proxyType);
+        }
+
+        ISearchResult ISearchTarget.GetFeature<TTarget>(TTarget target)
+        {
+            var resultProvider = this as ISymbolProvider<TTarget>;
+            if(resultProvider == null)
+                return null;
+            return new TypeSearchResult(this, resultProvider.Feature);
+        }
     }
 
-
-    abstract class ConverterBase : ReniObject, IFeatureImplementation, ISimpleFeature
-    {
-        IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return null; } }
-        IFunctionFeature IFeatureImplementation.Function { get { return null; } }
-        ISimpleFeature IFeatureImplementation.Simple { get { return this; } }
-        Result ISimpleFeature.Result(Category category) { return Result(category); }
-        protected abstract Result Result(Category category);
-    }
-
-    sealed class AlignConverter : ConverterBase
+    sealed class FeaturePathBridge<TProvider> : ReniObject, ISearchTarget
     {
         [EnableDump]
-        readonly ISearchResult _childConverter;
-        public AlignConverter(ISearchResult childConverter) { _childConverter = childConverter; }
-        protected override Result Result(Category category) { return _childConverter.SimpleResult(category.Typed); }
+        readonly TProvider _innerProvider;
+        [EnableDump]
+        readonly TypeBase _mainProvider;
+
+        public FeaturePathBridge(TProvider innerProvider, TypeBase mainProvider)
+        {
+            _innerProvider = innerProvider;
+            _mainProvider = mainProvider;
+        }
+
+        ISearchResult ISearchTarget.GetFeature<TTarget>(TTarget target)
+        {
+            return _mainProvider
+                .GetSearchResult(new PathSearchObject<TTarget, TProvider>(target, _innerProvider));
+        }
     }
+
+    sealed class PathSearchObject<TTarget, TProvider> : ReniObject, ISearchObject
+    {
+        [EnableDump]
+        readonly TTarget _target;
+        [EnableDump]
+        readonly TProvider _provider;
+
+        internal PathSearchObject(TTarget target, TProvider provider)
+        {
+            _target = target;
+            _provider = provider;
+        }
+
+        ISearchResult ISearchObject.GetFeatureGenericized(ISearchTarget target) { return target.GetFeature(this); }
+    }
+
 
     // Krautpuster
     // Gurkennudler

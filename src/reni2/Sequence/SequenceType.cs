@@ -29,6 +29,7 @@ using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
+using Reni.Feature.DumpPrint;
 using Reni.Type;
 
 namespace Reni.Sequence
@@ -66,9 +67,8 @@ namespace Reni.Sequence
         [DisableDump]
         internal override string DumpPrintText { get { return "(" + Element.DumpPrintText + ")sequence(" + Count + ")"; } }
 
-
         Simple ConversionFeature(SequenceType destination)
-        {
+        {       
             return destination.Count >= Count
                 ? Extension.Feature(c => ConversionAsReference(c, destination))
                 : null;

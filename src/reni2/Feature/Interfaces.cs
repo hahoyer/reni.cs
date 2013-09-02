@@ -27,8 +27,10 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
+using Reni.Feature.DumpPrint;
 using Reni.ReniParser;
 using Reni.Syntax;
+using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Feature
@@ -77,10 +79,21 @@ namespace Reni.Feature
     {
         Result FunctionResult(ContextBase context, Category category, ExpressionSyntax syntax);
         Result SimpleResult(Category category);
+        ISearchResult WithConversion(IProxyType proxyType);
     }
 
     interface IConversionFunction
     {
         Result Result(Category category);
+    }
+
+    interface ISearchObject
+    {
+        ISearchResult GetFeatureGenericized(ISearchTarget target);
+    }
+
+    interface ISearchTarget
+    {
+        ISearchResult GetFeature<TTarget>(TTarget target);
     }
 }

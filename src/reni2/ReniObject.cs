@@ -112,15 +112,4 @@ namespace Reni
             IsStopByObjectIdActive = isStopByObjectIdActive;
         }
     }
-
-    static class ReniObjectExtension
-    {
-        internal static string NodeDump(this object o)
-        {
-            var r = o as ReniObject;
-            if(r != null)
-                return r.NodeDump;
-            return o.ToString();
-        }
-    }
 }

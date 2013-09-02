@@ -31,6 +31,6 @@ namespace Reni.Feature.DumpPrint
     sealed class DumpPrintToken : Defineable
     {
         internal static DumpPrintToken Create() { return new DumpPrintToken {Name = "<dump_print>"}; }
-        internal override IFeatureImplementation GetFeature<TProvider>(TProvider provider) { return provider.GetSpecialFeatureDefinition<TProvider, DumpPrintToken>()?? base.GetFeature(provider); }
+        internal override ISearchResult GetFeatureGenericized(ISearchTarget target) { return target.GetFeature(this); }
     }
 }

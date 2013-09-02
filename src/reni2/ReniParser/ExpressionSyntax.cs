@@ -57,16 +57,6 @@ namespace Reni.ReniParser
 
         internal override Result ObtainResult(ContextBase context, Category category)
         {
-            var result = ResultBySearch(context, category);
-            if(result == null)
-                return UndefinedSymbolIssue.Type(context, this).IssueResult(category);
-
-            Tracer.Assert(category <= result.CompleteCategory);
-            return result;
-        }
-
-        Result ResultBySearch(ContextBase context, Category category)
-        {
             var searchResult
                 = Left == null
                     ? context.Search(_tokenClass)
@@ -74,9 +64,13 @@ namespace Reni.ReniParser
                         .Type(Left)
                         .TypeForSearchProbes
                         .Search(_tokenClass);
-            return searchResult == null
-                ? null
-                : searchResult.FunctionResult(context, category, this);
+
+            if(searchResult == null)
+                return UndefinedSymbolIssue.Type(context, this).IssueResult(category);
+            
+            var result = searchResult.FunctionResult(context, category, this); 
+            Tracer.Assert(category <= result.CompleteCategory);
+            return result;
         }
 
         internal Probe[] Probes(ContextBase context) { throw new NotImplementedException(); }

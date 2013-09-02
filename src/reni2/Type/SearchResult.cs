@@ -36,17 +36,10 @@ namespace Reni.Type
         static int _nextObjectId;
         [EnableDump]
         internal readonly IFeatureImplementation Feature;
-        [EnableDump]
-        readonly IConversionFunction[] _conversionFunctions;
 
-        internal SearchResult(IFeatureImplementation feature, IConversionFunction[] conversionFunctions)
-            : base(_nextObjectId++)
-        {
-            Tracer.Assert(feature != null);
-            Feature = feature;
-            _conversionFunctions = conversionFunctions;
-            StopByObjectId(-1);
-        }
+        readonly IConversionFunction[] _conversionFunctions = new IConversionFunction[0];
+
+        internal SearchResult(IFeatureImplementation feature) { Feature = feature; }
 
         Result ISearchResult.SimpleResult(Category category)
         {
@@ -60,8 +53,17 @@ namespace Reni.Type
             return result;
         }
 
+        ISearchResult ISearchResult.WithConversion(IProxyType proxyType)
+        {
+            NotImplementedMethod(proxyType);
+            return null;
+        }
+
         [DisableDump]
         protected abstract TypeBase DefiningType { get; }
+
+        [DisableDump]
+        CallDescriptor CallDescriptor { get { return new CallDescriptor(DefiningType, Feature, ConverterResult); } }
 
         Result ConverterResult(Category category)
         {
@@ -91,8 +93,8 @@ namespace Reni.Type
 
         Result ISearchResult.FunctionResult(ContextBase context, Category category, ExpressionSyntax syntax)
         {
-            var objectDescriptor = new CallDescriptor(DefiningType, Feature, ConverterResult);
-            return objectDescriptor.Result(category, context, syntax.Left, syntax.Right);
+            return CallDescriptor
+                .Result(category, context, syntax.Left, syntax.Right);
         }
     }
 }

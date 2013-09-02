@@ -25,7 +25,7 @@ using HWClassLibrary.Debug;
 
 namespace Reni
 {
-    static class ReniObjectExtender
+    static class ReniObjectExtension
     {
         [DebuggerHidden]
         public static void StopByObjectId(this object t, int objectId)
@@ -44,6 +44,13 @@ namespace Reni
             if(reniObject is T)
                 return ((ReniObject)reniObject).ObjectId;
             return null;
+        }
+        internal static string NodeDump(this object o)
+        {
+            var r = o as ReniObject;
+            if(r != null)
+                return r.NodeDump;
+            return o.ToString();
         }
     }
 }

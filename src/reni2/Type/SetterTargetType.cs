@@ -27,6 +27,7 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
+using Reni.Feature;
 
 namespace Reni.Type
 {
@@ -47,6 +48,12 @@ namespace Reni.Type
         IConverter IReferenceType.Converter { get { return this; } }
         TypeBase IConverter.TargetType { get { return ValueType; } }
         Result IConverter.Result(Category category) { return GetterResult(category); }
+
+        internal override ISearchResult GetSearchResult(ISearchObject @object)
+        {
+            return base.GetSearchResult(@object)
+                ?? ValueType.GetSearchResultForChild(@object, this);
+        }
 
         internal Result AssignmentResult(Category category, IContextReference objectReference, TypeBase argsType)
         {

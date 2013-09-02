@@ -52,3 +52,4 @@ namespace Reni.Type
         protected abstract CodeBase GetterCode();
     }
 }
+

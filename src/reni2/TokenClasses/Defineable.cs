@@ -31,7 +31,7 @@ using Reni.Syntax;
 
 namespace Reni.TokenClasses
 {
-    abstract class Defineable : TokenClass
+    abstract class Defineable : TokenClass, ISearchObject
     {
         protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
         {
@@ -42,19 +42,18 @@ namespace Reni.TokenClasses
             return left.CreateSyntaxOrDeclaration(this, token, right);
         }
         protected override sealed ParsedSyntax Terminal(TokenData token) { return new DefinableTokenSyntax(this, token); }
-        protected override sealed ParsedSyntax Prefix(TokenData token, ParsedSyntax right)
-        {
-            return new ExpressionSyntax(this, null, token, (CompileSyntax) right);
-        }
+        protected override sealed ParsedSyntax Prefix(TokenData token, ParsedSyntax right) { return new ExpressionSyntax(this, null, token, (CompileSyntax) right); }
         protected override sealed ParsedSyntax Suffix(ParsedSyntax left, TokenData token) { return left.CreateSyntaxOrDeclaration(this, token, null); }
         protected override sealed ParsedSyntax Infix(ParsedSyntax left, TokenData token, ParsedSyntax right) { return left.CreateSyntaxOrDeclaration(this, token, right); }
 
         [DisableDump]
         protected string DataFunctionName { get { return Name.Symbolize(); } }
 
-        internal virtual IFeatureImplementation GetFeature<TProvider>(TProvider provider)
+        ISearchResult ISearchObject.GetFeatureGenericized(ISearchTarget target) { return GetFeatureGenericized(target); }
+
+        internal virtual ISearchResult GetFeatureGenericized(ISearchTarget target)
         {
-            NotImplementedMethod(provider);
+            NotImplementedMethod(target);
             return null;
         }
     }

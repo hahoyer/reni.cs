@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 
 namespace Reni.Parser
 {
-    internal static class TokenClassExtender
+    internal static class TokenClassExtension
     {
         [UsedImplicitly]
         internal static string Symbolize(this string token) { return token.Aggregate("", (current, tokenChar) => current + SymbolizeChar(tokenChar)); }

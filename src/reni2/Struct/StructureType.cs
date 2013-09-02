@@ -28,7 +28,6 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
-using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Struct
@@ -64,7 +63,5 @@ namespace Reni.Struct
 
         [DisableDump]
         internal override bool HasQuickSize { get { return false; } }
-
-        internal override IFeatureImplementation GetFeatureDefinition(Defineable target) { return target.GetFeature(this) ?? base.GetFeatureDefinition(target); }
     }
 }

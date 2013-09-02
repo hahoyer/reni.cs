@@ -32,7 +32,7 @@ namespace Reni.Type
     {
         readonly TypeBase _type;
         public TypeSearchResult(TypeBase type, IFeatureImplementation feature)
-            : base(feature, new IConversionFunction[0]) { _type = type; }
+            : base(feature) { _type = type; }
         protected override TypeBase DefiningType { get { return _type; } }
     }
 }

@@ -47,6 +47,7 @@ namespace Reni.Type
 
         [DisableDump]
         internal override bool IsDataLess { get { return false; } }
+
         [DisableDump]
         RefAlignParam RefAlignParam { get { return _structure.RefAlignParam; } }
 

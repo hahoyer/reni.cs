@@ -31,6 +31,7 @@ using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Sequence;
+using Reni.TokenClasses;
 
 namespace Reni.Type
 {
