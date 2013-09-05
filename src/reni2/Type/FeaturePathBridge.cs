@@ -28,16 +28,24 @@ using Reni.Feature;
 
 namespace Reni.Type
 {
-    sealed class TypeSearchResult<TPath> : SearchResult
+    sealed class FeaturePathBridge<TProvider> : ReniObject, ISearchTarget
+        where TProvider : TypeBase
     {
-        readonly TypeBase _type;
-        readonly TPath _feature;
-        public TypeSearchResult(TypeBase type, TPath feature)
-            : base(feature as IFeatureImplementation)
+        [EnableDump]
+        readonly TProvider _innerProvider;
+        [EnableDump]
+        readonly TypeBase _mainProvider;
+
+        public FeaturePathBridge(TProvider innerProvider, TypeBase mainProvider)
         {
-            _type = type;
-            _feature = feature;
+            _innerProvider = innerProvider;
+            _mainProvider = mainProvider;
         }
-        protected override TypeBase DefiningType { get { return _type; } }
+
+        ISearchResult ISearchTarget.GetFeature<TDefinable, TPath>()
+        {
+            return _mainProvider
+                .GetSearchResult(new Path<TDefinable, IPath<TPath, TProvider>>());
+        }
     }
 }

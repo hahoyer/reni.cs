@@ -30,6 +30,7 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Syntax;
+using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Feature
@@ -44,6 +45,21 @@ namespace Reni.Feature
             = new DictionaryEx<Func<Category, Result>, Simple>(function => new Simple(function));
 
         internal static Simple Feature(Func<Category, Result> function) { return _simpleCache[function]; }
+
+        internal static Simple<T1> Feature<T1>(Func<Category, T1, Result> function)
+            where T1 : TypeBase
+        {
+            return
+                new Simple<T1>(function);
+        }
+
+        internal static Simple<T1, T2> Feature<T1, T2>(Func<Category, T1, T2, Result> function)
+            where T1 : TypeBase
+            where T2 : TypeBase
+        {
+            return
+                new Simple<T1, T2>(function);
+        }
 
         internal static string Dump(this IFeatureImplementation feature) { return Tracer.Dump(feature); }
         internal static Function Feature(Func<Category, IContextReference, TypeBase, Result> function)
@@ -78,10 +94,8 @@ namespace Reni.Feature
                 .CodeArgs
                 .HasArg;
         }
-    }
 
-    interface ISymbolProvider<TDefinable>
-    {
-        IFeatureImplementation Feature { get; }
+        internal static ISearchResult GetFeature<TDefinable>(this ISearchTarget target, TDefinable definable)
+            where TDefinable : Defineable { return target.GetFeature<TDefinable, IFeatureImplementation>(); }
     }
 }

@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
 using Reni.Basics;
+using Reni.Type;
 
 namespace Reni.Feature
 {
@@ -46,5 +47,27 @@ namespace Reni.Feature
         IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return null; } }
         IFunctionFeature IFeatureImplementation.Function { get { return null; } }
         ISimpleFeature IFeatureImplementation.Simple { get { return this; } }
+    }
+
+    sealed class Simple<TType>
+        : ReniObject
+            , IPath<IFeatureImplementation, TType>
+        where TType : TypeBase
+    {
+        readonly Func<Category, TType, Result> _function;
+
+        public Simple(Func<Category, TType, Result> function) { _function = function; }
+        IFeatureImplementation IPath<IFeatureImplementation, TType>.Convert(TType provider) { return new Simple((category) => _function(category, provider)); }
+    }
+
+    sealed class Simple<TType1, TType2>
+        : ReniObject
+            , IPath<IPath<IFeatureImplementation, TType1>, TType2>
+        where TType2 : TypeBase
+        where TType1 : TypeBase
+    {
+        readonly Func<Category, TType1, TType2, Result> _function;
+        internal Simple(Func<Category, TType1, TType2, Result> function) { _function = function; }
+        IPath<IFeatureImplementation, TType1> IPath<IPath<IFeatureImplementation, TType1>, TType2>.Convert(TType2 provider) { return new Simple<TType1>((category, type1) => _function(category, type1, provider)); }
     }
 }

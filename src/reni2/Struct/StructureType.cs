@@ -34,13 +34,13 @@ namespace Reni.Struct
 {
     sealed class StructureType
         : TypeBase
-            , ISymbolProvider<DumpPrintToken>
+            , ISymbolProvider<DumpPrintToken, IFeatureImplementation>
     {
         readonly Structure _structure;
 
         internal StructureType(Structure structure) { _structure = structure; }
 
-        IFeatureImplementation ISymbolProvider<DumpPrintToken>.Feature { get { return Extension.Feature(DumpPrintTokenResult); } }
+        IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature { get { return Extension.Feature(DumpPrintTokenResult); } }
 
         [DisableDump]
         internal RefAlignParam RefAlignParam { get { return Structure.RefAlignParam; } }

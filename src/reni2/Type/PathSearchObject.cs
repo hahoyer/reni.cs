@@ -25,19 +25,13 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Feature;
+using Reni.TokenClasses;
 
 namespace Reni.Type
 {
-    sealed class TypeSearchResult<TPath> : SearchResult
+    sealed class Path<TDefineable, TProvider> : ReniObject, ISearchObject
+        where TDefineable : Defineable
     {
-        readonly TypeBase _type;
-        readonly TPath _feature;
-        public TypeSearchResult(TypeBase type, TPath feature)
-            : base(feature as IFeatureImplementation)
-        {
-            _type = type;
-            _feature = feature;
-        }
-        protected override TypeBase DefiningType { get { return _type; } }
+        ISearchResult ISearchObject.GetFeatureGenericized(ISearchTarget target) { return target.GetFeature<TDefineable,TProvider>(); }
     }
 }

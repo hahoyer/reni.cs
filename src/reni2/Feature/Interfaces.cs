@@ -27,7 +27,6 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
-using Reni.Feature.DumpPrint;
 using Reni.ReniParser;
 using Reni.Syntax;
 using Reni.TokenClasses;
@@ -94,6 +93,20 @@ namespace Reni.Feature
 
     interface ISearchTarget
     {
-        ISearchResult GetFeature<TTarget>(TTarget target);
+        ISearchResult GetFeature<TDefinable , TPath>()
+            where TDefinable : Defineable;
     }
+
+    interface ISymbolProvider<TDefinable, out TPath>
+        where TDefinable : Defineable
+    {
+        TPath Feature { get; }
+    }
+
+    interface IPath<out TPath, in TProvider>
+        where TProvider : TypeBase
+    {
+        TPath Convert(TProvider provider);
+    }
+
 }

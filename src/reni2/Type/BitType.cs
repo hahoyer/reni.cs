@@ -28,11 +28,15 @@ using HWClassLibrary.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
+using Reni.Feature;
+using Reni.Feature.DumpPrint;
 using Reni.Sequence;
 
 namespace Reni.Type
 {
-    sealed class BitType : TypeBase
+    sealed class BitType
+        : TypeBase
+            , ISymbolProvider<DumpPrintToken, IPath<IPath<IFeatureImplementation, SequenceType>, ArrayType>>
     {
         readonly Root _rootContext;
 
@@ -49,7 +53,17 @@ namespace Reni.Type
 
         protected override Size GetSize() { return Size.Create(1); }
 
-        internal Result DumpPrintTokenResult(Category category, SequenceType sequenceType, ArrayType arrayType)
+        IPath<IPath<IFeatureImplementation, SequenceType>, ArrayType> ISymbolProvider<DumpPrintToken, IPath<IPath<IFeatureImplementation, SequenceType>, ArrayType>>.Feature
+        {
+            get
+            {
+                var feature = Extension
+                    .Feature<SequenceType, ArrayType>(DumpPrintTokenResult);
+                return feature;
+            }
+        }
+
+        Result DumpPrintTokenResult(Category category, SequenceType sequenceType, ArrayType arrayType)
         {
             Tracer.Assert(sequenceType.Parent == arrayType);
             Tracer.Assert(arrayType.ElementType == this);

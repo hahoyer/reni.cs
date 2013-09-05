@@ -40,7 +40,8 @@ namespace Reni.Type
     abstract class TypeBase
         : ReniObject
             , IContextReferenceProvider
-            , IIconKeyProvider, ISearchTarget
+            , IIconKeyProvider
+            , ISearchTarget
     {
         sealed class Cache
         {
@@ -627,7 +628,8 @@ namespace Reni.Type
 
         internal virtual ISearchResult GetSearchResult(ISearchObject @object) { return @object.GetFeatureGenericized(this); }
 
-        internal ISearchResult GetSearchResultForChild<TProvider>(ISearchObject @object, TProvider parent)
+        internal ISearchResult GetSearchResultForChild<TProvider>(ISearchObject @object, TProvider parent) 
+            where TProvider : TypeBase
         {
             ISearchTarget target = new FeaturePathBridge<TProvider>(parent, this);
             var result = @object.GetFeatureGenericized(target);
@@ -640,56 +642,29 @@ namespace Reni.Type
 
             Tracer.Assert(proxyType.Converter.TargetType == this);
             result = GetSearchResult(@object);
+            if(result != null)
+                return result.WithConversion(proxyType);
 
-            if(result == null)
-                return null;
-
-            return result.WithConversion(proxyType);
+            return null;
         }
 
-        ISearchResult ISearchTarget.GetFeature<TTarget>(TTarget target)
+        ISearchResult ISearchTarget.GetFeature<TDefinable, TPath>()
         {
-            var resultProvider = this as ISymbolProvider<TTarget>;
-            if(resultProvider == null)
-                return null;
-            return new TypeSearchResult(this, resultProvider.Feature);
+            var resultProvider = this as ISymbolProvider<TDefinable, TPath>;
+            Tracer.FlaggedLine(" Probe:");
+            Tracer.LinePart("   this: " + GetType().PrettyName()
+                + "\nTTarget: " + typeof(TDefinable).PrettyName()
+                + "\n  TPath: " + typeof(TPath).PrettyName());
+            if (resultProvider != null)
+            {
+                Tracer.Line(" ... success\n");
+                TPath feature = resultProvider.Feature;
+                return new TypeSearchResult<TPath>(this, feature);
+            }
+
+            Tracer.Line(" ... fail\n");
+            return null;
         }
-    }
-
-    sealed class FeaturePathBridge<TProvider> : ReniObject, ISearchTarget
-    {
-        [EnableDump]
-        readonly TProvider _innerProvider;
-        [EnableDump]
-        readonly TypeBase _mainProvider;
-
-        public FeaturePathBridge(TProvider innerProvider, TypeBase mainProvider)
-        {
-            _innerProvider = innerProvider;
-            _mainProvider = mainProvider;
-        }
-
-        ISearchResult ISearchTarget.GetFeature<TTarget>(TTarget target)
-        {
-            return _mainProvider
-                .GetSearchResult(new PathSearchObject<TTarget, TProvider>(target, _innerProvider));
-        }
-    }
-
-    sealed class PathSearchObject<TTarget, TProvider> : ReniObject, ISearchObject
-    {
-        [EnableDump]
-        readonly TTarget _target;
-        [EnableDump]
-        readonly TProvider _provider;
-
-        internal PathSearchObject(TTarget target, TProvider provider)
-        {
-            _target = target;
-            _provider = provider;
-        }
-
-        ISearchResult ISearchObject.GetFeatureGenericized(ISearchTarget target) { return target.GetFeature(this); }
     }
 
 
