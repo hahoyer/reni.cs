@@ -40,14 +40,14 @@ namespace Reni
         static int _nextId;
         readonly List<IContextReference> _data;
         SizeArray _sizesCache;
-        readonly SimpleCache<IContextReference[]> _sortedDataCache;
+        readonly ValueCache<IContextReference[]> _sortedDataCache;
         public static int NextOrder;
 
         CodeArgs()
             : base(_nextId++)
         {
             _data = new List<IContextReference>();
-            _sortedDataCache = new SimpleCache<IContextReference[]>(ObtainSortedData);
+            _sortedDataCache = new ValueCache<IContextReference[]>(ObtainSortedData);
             StopByObjectId(-10);
         }
 

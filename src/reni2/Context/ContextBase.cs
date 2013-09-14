@@ -130,51 +130,51 @@ namespace Reni.Context
         {
             [Node]
             [DisableDump]
-            internal readonly SimpleCache<Structure> RecentStructure;
+            internal readonly ValueCache<Structure> RecentStructure;
 
             [Node]
             [DisableDump]
-            internal readonly SimpleCache<IFunctionContext> RecentFunctionContextObject;
+            internal readonly ValueCache<IFunctionContext> RecentFunctionContextObject;
 
             [Node]
             [SmartNode]
-            internal readonly DictionaryEx<Container, DictionaryEx<int, ContextBase>> StructContexts;
+            internal readonly FunctionCache<Container, FunctionCache<int, ContextBase>> StructContexts;
 
             [Node]
             [SmartNode]
-            internal readonly DictionaryEx<Container, DictionaryEx<int, Structure>> Structures;
+            internal readonly FunctionCache<Container, FunctionCache<int, Structure>> Structures;
 
             [Node]
             [SmartNode]
-            internal readonly DictionaryEx<Container, ContainerContextObject> ContainerContextObjects;
+            internal readonly FunctionCache<Container, ContainerContextObject> ContainerContextObjects;
 
             [Node]
             [SmartNode]
-            internal readonly DictionaryEx<CompileSyntax, ResultCache> ResultCache;
+            internal readonly FunctionCache<CompileSyntax, ResultCache> ResultCache;
 
             [Node]
             [SmartNode]
-            internal readonly DictionaryEx<ExpressionSyntax, IssueType> UndefinedSymbolType;
+            internal readonly FunctionCache<ExpressionSyntax, IssueType> UndefinedSymbolType;
 
             public Cache(ContextBase target)
             {
-                UndefinedSymbolType = new DictionaryEx<ExpressionSyntax, IssueType>(syntax => UndefinedSymbolIssue.Type(target, syntax));
-                ResultCache = new DictionaryEx<CompileSyntax, ResultCache>(target.CreateCacheElement);
-                StructContexts = new DictionaryEx<Container, DictionaryEx<int, ContextBase>>
+                UndefinedSymbolType = new FunctionCache<ExpressionSyntax, IssueType>(syntax => UndefinedSymbolIssue.Type(target, syntax));
+                ResultCache = new FunctionCache<CompileSyntax, ResultCache>(target.CreateCacheElement);
+                StructContexts = new FunctionCache<Container, FunctionCache<int, ContextBase>>
                     (
                     container =>
-                        new DictionaryEx<int, ContextBase>
+                        new FunctionCache<int, ContextBase>
                             (position => new Struct.Context(target, container, position))
                     );
-                RecentStructure = new SimpleCache<Structure>(target.ObtainRecentStructure);
-                RecentFunctionContextObject = new SimpleCache<IFunctionContext>(target.ObtainRecentFunctionContext);
-                Structures = new DictionaryEx<Container, DictionaryEx<int, Structure>>
+                RecentStructure = new ValueCache<Structure>(target.ObtainRecentStructure);
+                RecentFunctionContextObject = new ValueCache<IFunctionContext>(target.ObtainRecentFunctionContext);
+                Structures = new FunctionCache<Container, FunctionCache<int, Structure>>
                     (
                     container =>
-                        new DictionaryEx<int, Structure>
+                        new FunctionCache<int, Structure>
                             (position => new Structure(ContainerContextObjects[container], position))
                     );
-                ContainerContextObjects = new DictionaryEx<Container, ContainerContextObject>
+                ContainerContextObjects = new FunctionCache<Container, ContainerContextObject>
                     (container => new ContainerContextObject(container, target));
             }
 

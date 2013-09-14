@@ -11,10 +11,10 @@ namespace Reni.Code.ReplaceVisitor
     /// </summary>
     internal abstract class Base : Visitor<CodeBase>
     {
-        private readonly DictionaryEx<LocalReference, LocalReference> _internalRefs;
+        private readonly FunctionCache<LocalReference, LocalReference> _internalRefs;
 
         protected Base(int objectId)
-            : base(objectId) { _internalRefs = new DictionaryEx<LocalReference, LocalReference>(ReVisit); }
+            : base(objectId) { _internalRefs = new FunctionCache<LocalReference, LocalReference>(ReVisit); }
 
         internal override CodeBase Arg(Arg visitedObject) { return null; }
         internal override CodeBase ContextRef(ReferenceCode visitedObject) { return null; }

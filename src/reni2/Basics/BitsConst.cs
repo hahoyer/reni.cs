@@ -42,14 +42,14 @@ namespace Reni.Basics
 
         readonly Size _size;
         readonly byte[] _data;
-        readonly SimpleCache<BigInteger> _dataCache;
+        readonly ValueCache<BigInteger> _dataCache;
 
         BitsConst(Size size)
             : base(_nextObjectId++)
         {
             _size = size;
             _data = CreateDataArray();
-            _dataCache = new SimpleCache<BigInteger>(() => new BigInteger(_data));
+            _dataCache = new ValueCache<BigInteger>(() => new BigInteger(_data));
             StopByObjectId(-7);
         }
 

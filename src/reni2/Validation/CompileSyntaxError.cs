@@ -37,14 +37,14 @@ namespace Reni.Validation
         [EnableDump]
         readonly IssueId _issueId;
         readonly CompileSyntaxError _next;
-        readonly SimpleCache<CompileSyntaxIssue> _issueCache;
+        readonly ValueCache<CompileSyntaxIssue> _issueCache;
 
         public CompileSyntaxError(TokenData token, IssueId issueId, CompileSyntaxError next = null)
             : base(token)
         {
             _issueId = issueId;
             _next = next;
-            _issueCache = new SimpleCache<CompileSyntaxIssue>(() => new CompileSyntaxIssue(_issueId, Token));
+            _issueCache = new ValueCache<CompileSyntaxIssue>(() => new CompileSyntaxIssue(_issueId, Token));
         }
 
         CompileSyntaxIssue Issue { get { return _issueCache.Value; } }

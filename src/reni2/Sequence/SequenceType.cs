@@ -37,7 +37,7 @@ namespace Reni.Sequence
     sealed class SequenceType
         : TagChild<ArrayType>
     {
-        readonly DictionaryEx<RefAlignParam, ObjectReference> _objectReferencesCache;
+        readonly FunctionCache<RefAlignParam, ObjectReference> _objectReferencesCache;
 
         internal Result EnableCutResult(Category category)
         {
@@ -53,7 +53,7 @@ namespace Reni.Sequence
         public SequenceType(ArrayType parent)
             : base(parent)
         {
-            _objectReferencesCache = new DictionaryEx<RefAlignParam, ObjectReference>(refAlignParam => new ObjectReference(this, refAlignParam));
+            _objectReferencesCache = new FunctionCache<RefAlignParam, ObjectReference>(refAlignParam => new ObjectReference(this, refAlignParam));
             StopByObjectId(-172);
         }
 

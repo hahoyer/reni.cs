@@ -29,7 +29,7 @@ namespace Reni.Code
     sealed class FrameData : ReniObject, IStackDataAddressBase
     {
         readonly StackData _data;
-        internal readonly DictionaryEx<string, StackData> Locals = new DictionaryEx<string, StackData>();
+        internal readonly FunctionCache<string, StackData> Locals = new FunctionCache<string, StackData>();
         internal bool IsRepeatRequired;
 
         public FrameData(StackData data) { _data = data; }

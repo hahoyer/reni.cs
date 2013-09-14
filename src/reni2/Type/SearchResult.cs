@@ -37,9 +37,14 @@ namespace Reni.Type
         [EnableDump]
         internal readonly IFeatureImplementation Feature;
 
-        readonly IConversionFunction[] _conversionFunctions = new IConversionFunction[0];
+        readonly IConverter[] _conversionFunctions = new IConverter[0];
 
         internal SearchResult(IFeatureImplementation feature) { Feature = feature; }
+        protected SearchResult(IFeatureImplementation feature, IConverter converter)
+        {
+            Feature = feature;
+            _conversionFunctions = new[] {converter};
+        }
 
         Result ISearchResult.SimpleResult(Category category)
         {
@@ -53,14 +58,10 @@ namespace Reni.Type
             return result;
         }
 
-        ISearchResult ISearchResult.WithConversion(IProxyType proxyType)
-        {
-            NotImplementedMethod(proxyType);
-            return null;
-        }
+        ISearchResult ISearchResult.WithConversion(IConverter converter) { return new ConverterResult(this, converter); }
 
         [DisableDump]
-        protected abstract TypeBase DefiningType { get; }
+        internal abstract TypeBase DefiningType { get; }
 
         [DisableDump]
         CallDescriptor CallDescriptor { get { return new CallDescriptor(DefiningType, Feature, ConverterResult); } }
@@ -96,5 +97,15 @@ namespace Reni.Type
             return CallDescriptor
                 .Result(category, context, syntax.Left, syntax.Right);
         }
+    }
+
+    sealed class ConverterResult : SearchResult
+    {
+        readonly SearchResult _searchResult;
+
+        internal ConverterResult(SearchResult searchResult, IConverter converter)
+            : base(searchResult.Feature, converter) { _searchResult = searchResult; }
+
+        internal override TypeBase DefiningType { get { return _searchResult.DefiningType; } }
     }
 }

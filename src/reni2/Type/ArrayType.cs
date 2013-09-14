@@ -46,10 +46,10 @@ namespace Reni.Type
         [Node]
         internal readonly int Count;
 
-        readonly SimpleCache<RepeaterAccessType> _arrayAccessTypeCache;
-        readonly SimpleCache<EnableArrayOverSizeType> _enableArrayOverSizeTypeCache;
-        readonly SimpleCache<SequenceType> _sequenceCache;
-        readonly SimpleCache<TextItemsType> _textItemsCache;
+        readonly ValueCache<RepeaterAccessType> _arrayAccessTypeCache;
+        readonly ValueCache<EnableArrayOverSizeType> _enableArrayOverSizeTypeCache;
+        readonly ValueCache<SequenceType> _sequenceCache;
+        readonly ValueCache<TextItemsType> _textItemsCache;
 
         public ArrayType(TypeBase elementType, int count)
         {
@@ -58,10 +58,10 @@ namespace Reni.Type
             Tracer.Assert(count > 0);
             Tracer.Assert(elementType.ReferenceType == null);
             Tracer.Assert(!elementType.IsDataLess);
-            _arrayAccessTypeCache = new SimpleCache<RepeaterAccessType>(() => new RepeaterAccessType(this));
-            _enableArrayOverSizeTypeCache = new SimpleCache<EnableArrayOverSizeType>(() => new EnableArrayOverSizeType(this));
-            _sequenceCache = new SimpleCache<SequenceType>(() => new SequenceType(this));
-            _textItemsCache = new SimpleCache<TextItemsType>(() => new TextItemsType(this));
+            _arrayAccessTypeCache = new ValueCache<RepeaterAccessType>(() => new RepeaterAccessType(this));
+            _enableArrayOverSizeTypeCache = new ValueCache<EnableArrayOverSizeType>(() => new EnableArrayOverSizeType(this));
+            _sequenceCache = new ValueCache<SequenceType>(() => new SequenceType(this));
+            _textItemsCache = new ValueCache<TextItemsType>(() => new TextItemsType(this));
         }
 
         TypeBase IRepeaterType.ElementType { get { return ElementType; } }
@@ -103,7 +103,7 @@ namespace Reni.Type
         internal override Result ConstructorResult(Category category, TypeBase argsType)
         {
             return Result
-                (
+                (                                                       
                     category,
                     c => InternalConstructorResult(c, argsType)
                 );

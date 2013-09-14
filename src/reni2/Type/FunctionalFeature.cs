@@ -34,13 +34,13 @@ namespace Reni.Type
     abstract class FunctionalFeature : ReniObject
     {
         static int _nextObjectId;
-        readonly SimpleCache<TypeBase> _functionalTypesCache;
+        readonly ValueCache<TypeBase> _functionalTypesCache;
 
         protected FunctionalFeature()
             : base(_nextObjectId++)
         {
             _functionalTypesCache
-                = new SimpleCache<TypeBase>(() => new FunctionFeatureType(this));
+                = new ValueCache<TypeBase>(() => new FunctionFeatureType(this));
         }
 
         [DisableDump]

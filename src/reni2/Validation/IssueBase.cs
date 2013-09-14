@@ -34,13 +34,13 @@ namespace Reni.Validation
     public abstract class IssueBase : ReniObject
     {
         internal static readonly IEnumerable<IssueBase> Empty = new IssueBase[0];
-        readonly DictionaryEx<ExpressionSyntax, ConsequentialError> _consequentialError;
+        readonly FunctionCache<ExpressionSyntax, ConsequentialError> _consequentialError;
         internal readonly IssueId IssueId;
 
         internal IssueBase(IssueId issueId)
         {
             IssueId = issueId;
-            _consequentialError = new DictionaryEx<ExpressionSyntax, ConsequentialError>(syntax => new ConsequentialError(syntax,this));
+            _consequentialError = new FunctionCache<ExpressionSyntax, ConsequentialError>(syntax => new ConsequentialError(syntax,this));
         }
 
         internal abstract string LogDump { get; }

@@ -227,7 +227,7 @@ namespace Reni.Code
                 SubVisit("then:", thenCode);
         }
 
-        DictionaryEx<string, StackData> Locals { get { return _localData.Frame.Locals; } }
+        FunctionCache<string, StackData> Locals { get { return _localData.Frame.Locals; } }
 
         void IVisitor.LocalVariableAccess(string holder, Size offset, Size size, Size dataSize) { Push(Locals[holder].DoPull(offset).DoGetTop(dataSize).BitCast(size)); }
 

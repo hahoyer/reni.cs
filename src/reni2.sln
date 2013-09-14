@@ -68,6 +68,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{42AF69
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{A045FCB3-C25B-416E-87DD-CC932863375C}"
+	ProjectSection(SolutionItems) = preProject
+		..\build\CSharp.Exe.targets = ..\build\CSharp.Exe.targets
+		..\build\CSharp.Library.targets = ..\build\CSharp.Library.targets
+		..\build\CSharp.Library.UnitTest.targets = ..\build\CSharp.Library.UnitTest.targets
+		..\build\CSharp.targets = ..\build\CSharp.targets
+		..\build\CSharp.WinExe.targets = ..\build\CSharp.WinExe.targets
+		..\build\HoyerWare.CSharp.targets = ..\build\HoyerWare.CSharp.targets
+		..\build\NuGetPackage.targets = ..\build\NuGetPackage.targets
+		..\build\sys.targets = ..\build\sys.targets
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

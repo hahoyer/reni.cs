@@ -36,16 +36,16 @@ namespace Reni.Context
     sealed class FunctionList : ReniObject
     {
         [Node]
-        readonly DictionaryEx<FunctionSyntax, DictionaryEx<Structure, DictionaryEx<TypeBase, int>>> _dictionary;
+        readonly FunctionCache<FunctionSyntax, FunctionCache<Structure, FunctionCache<TypeBase, int>>> _dictionary;
 
         [Node]
         readonly List<FunctionType> _list = new List<FunctionType>();
 
         public FunctionList()
         {
-            _dictionary = new DictionaryEx<FunctionSyntax, DictionaryEx<Structure, DictionaryEx<TypeBase, int>>>
-                (syntax => new DictionaryEx<Structure, DictionaryEx<TypeBase, int>>
-                               (structure => new DictionaryEx<TypeBase, int>
+            _dictionary = new FunctionCache<FunctionSyntax, FunctionCache<Structure, FunctionCache<TypeBase, int>>>
+                (syntax => new FunctionCache<Structure, FunctionCache<TypeBase, int>>
+                               (structure => new FunctionCache<TypeBase, int>
                                                  (-1, args => CreateFunctionInstance(args, syntax, structure))));
         }
 

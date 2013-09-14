@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using HWClassLibrary.Helper;
+using HWClassLibrary.IO;
 using Reni.Parser;
 
 namespace Reni.Proof

@@ -42,16 +42,16 @@ namespace Reni.Struct
         [EnableDump]
         readonly CompileSyntax _body;
 
-        readonly SimpleCache<CodeBase> _bodyCodeCache;
-        readonly SimpleCache<ContextBase> _contextCache;
+        readonly ValueCache<CodeBase> _bodyCodeCache;
+        readonly ValueCache<ContextBase> _contextCache;
         readonly ResultCache _resultCache;
 
         protected FunctionInstance(FunctionType parent, CompileSyntax body)
         {
             _body = body;
             Parent = parent;
-            _bodyCodeCache = new SimpleCache<CodeBase>(ObtainBodyCode);
-            _contextCache = new SimpleCache<ContextBase>(ObtainContext);
+            _bodyCodeCache = new ValueCache<CodeBase>(ObtainBodyCode);
+            _contextCache = new ValueCache<ContextBase>(ObtainContext);
             _resultCache = new ResultCache(ObtainResult);
         }
 

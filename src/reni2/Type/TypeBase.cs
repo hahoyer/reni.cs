@@ -47,41 +47,41 @@ namespace Reni.Type
         {
             [Node]
             [SmartNode]
-            public readonly DictionaryEx<int, Aligner> Aligner;
+            public readonly FunctionCache<int, Aligner> Aligner;
             [Node]
             [SmartNode]
-            public readonly DictionaryEx<int, ArrayType> Array;
+            public readonly FunctionCache<int, ArrayType> Array;
             [Node]
             [SmartNode]
-            public readonly DictionaryEx<TypeBase, Pair> Pair;
+            public readonly FunctionCache<TypeBase, Pair> Pair;
             [Node]
             [SmartNode]
-            public readonly SimpleCache<IReferenceType> Pointer;
+            public readonly ValueCache<IReferenceType> Pointer;
             [Node]
             [SmartNode]
-            public readonly SimpleCache<TypeType> TypeType;
+            public readonly ValueCache<TypeType> TypeType;
             [Node]
             [SmartNode]
-            public readonly SimpleCache<FunctionInstanceType> FunctionInstanceType;
+            public readonly ValueCache<FunctionInstanceType> FunctionInstanceType;
             [Node]
             [SmartNode]
-            public readonly SimpleCache<TextItemType> TextItem;
+            public readonly ValueCache<TextItemType> TextItem;
             [Node]
             [SmartNode]
-            public readonly SimpleCache<EnableCut> EnableCut;
-            public readonly SimpleCache<Size> Size;
+            public readonly ValueCache<EnableCut> EnableCut;
+            public readonly ValueCache<Size> Size;
 
             public Cache(TypeBase parent)
             {
-                EnableCut = new SimpleCache<EnableCut>(() => new EnableCut(parent));
-                Pointer = new SimpleCache<IReferenceType>(parent.ObtainPointer);
-                Pair = new DictionaryEx<TypeBase, Pair>(first => new Pair(first, parent));
-                Array = new DictionaryEx<int, ArrayType>(parent.ObtainArray);
-                Aligner = new DictionaryEx<int, Aligner>(alignBits => new Aligner(parent, alignBits));
-                FunctionInstanceType = new SimpleCache<FunctionInstanceType>(() => new FunctionInstanceType(parent));
-                TypeType = new SimpleCache<TypeType>(() => new TypeType(parent));
-                TextItem = new SimpleCache<TextItemType>(() => new TextItemType(parent));
-                Size = new SimpleCache<Size>(parent.ObtainSize);
+                EnableCut = new ValueCache<EnableCut>(() => new EnableCut(parent));
+                Pointer = new ValueCache<IReferenceType>(parent.ObtainPointer);
+                Pair = new FunctionCache<TypeBase, Pair>(first => new Pair(first, parent));
+                Array = new FunctionCache<int, ArrayType>(parent.ObtainArray);
+                Aligner = new FunctionCache<int, Aligner>(alignBits => new Aligner(parent, alignBits));
+                FunctionInstanceType = new ValueCache<FunctionInstanceType>(() => new FunctionInstanceType(parent));
+                TypeType = new ValueCache<TypeType>(() => new TypeType(parent));
+                TextItem = new ValueCache<TextItemType>(() => new TextItemType(parent));
+                Size = new ValueCache<Size>(parent.ObtainSize);
             }
         }
 
@@ -454,7 +454,7 @@ namespace Reni.Type
         [NotNull]
         internal Result GenericDumpPrintResult(Category category) { return Search(_dumpPrintToken.Value).SimpleResult(category); }
 
-        static readonly SimpleCache<DumpPrintToken> _dumpPrintToken = new SimpleCache<DumpPrintToken>(DumpPrintToken.Create);
+        static readonly ValueCache<DumpPrintToken> _dumpPrintToken = new ValueCache<DumpPrintToken>(DumpPrintToken.Create);
 
         internal Result CreateArray(Category category)
         {
@@ -643,7 +643,7 @@ namespace Reni.Type
             Tracer.Assert(proxyType.Converter.TargetType == this);
             result = GetSearchResult(@object);
             if(result != null)
-                return result.WithConversion(proxyType);
+                return result.WithConversion(proxyType.Converter);
 
             return null;
         }

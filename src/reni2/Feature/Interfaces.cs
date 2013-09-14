@@ -78,12 +78,7 @@ namespace Reni.Feature
     {
         Result FunctionResult(ContextBase context, Category category, ExpressionSyntax syntax);
         Result SimpleResult(Category category);
-        ISearchResult WithConversion(IProxyType proxyType);
-    }
-
-    interface IConversionFunction
-    {
-        Result Result(Category category);
+        ISearchResult WithConversion(IConverter converter);
     }
 
     interface ISearchObject

@@ -44,7 +44,7 @@ namespace Reni.Syntax
         // Used for debug only
         [DisableDump]
         [Node("Cache")]
-        readonly DictionaryEx<ContextBase, object> ResultCache = new DictionaryEx<ContextBase, object>();
+        readonly FunctionCache<ContextBase, object> ResultCache = new FunctionCache<ContextBase, object>();
 
         internal CompileSyntax(TokenData token)
             : base(token) { }

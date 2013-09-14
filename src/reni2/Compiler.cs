@@ -26,6 +26,7 @@ using System.Linq;
 using System.Threading;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
+using HWClassLibrary.IO;
 using HWClassLibrary.TreeStructure;
 using Reni.Code;
 using Reni.Context;
@@ -44,11 +45,11 @@ namespace Reni
         readonly Root _rootContext;
         readonly string _className;
 
-        readonly SimpleCache<Source> _source;
-        readonly SimpleCache<ParserInst> _parser;
-        readonly SimpleCache<ParsedSyntax> _syntax;
-        readonly SimpleCache<CodeContainer> _codeContainer;
-        readonly SimpleCache<string> _cSharpCode;
+        readonly ValueCache<Source> _source;
+        readonly ValueCache<ParserInst> _parser;
+        readonly ValueCache<ParsedSyntax> _syntax;
+        readonly ValueCache<CodeContainer> _codeContainer;
+        readonly ValueCache<string> _cSharpCode;
 
         /// <summary>
         ///     ctor from file
@@ -63,11 +64,11 @@ namespace Reni
             _rootContext = new Root(this);
             _parameters = parameters ?? new CompilerParameters();
 
-            _source = new SimpleCache<Source>(() => new Source(FileName.FileHandle()));
-            _parser = new SimpleCache<ParserInst>(() => new ParserInst(new ReniScanner(), new MainTokenFactory()));
-            _syntax = new SimpleCache<ParsedSyntax>(() => (ParsedSyntax) _parser.Value.Compile(Source));
-            _codeContainer = new SimpleCache<CodeContainer>(() => new CodeContainer(RootContext, Syntax, Source.Data));
-            _cSharpCode = new SimpleCache<string>(() => _codeContainer.Value.CreateCSharpString(_className));
+            _source = new ValueCache<Source>(() => new Source(FileName.FileHandle()));
+            _parser = new ValueCache<ParserInst>(() => new ParserInst(new ReniScanner(), new MainTokenFactory()));
+            _syntax = new ValueCache<ParsedSyntax>(() => (ParsedSyntax) _parser.Value.Compile(Source));
+            _codeContainer = new ValueCache<CodeContainer>(() => new CodeContainer(RootContext, Syntax, Source.Data));
+            _cSharpCode = new ValueCache<string>(() => _codeContainer.Value.CreateCSharpString(_className));
         }
 
         [DisableDump]

@@ -69,10 +69,10 @@ namespace Reni.Proof
             }
         }
 
-        protected override DictionaryEx<string, TokenClass> GetPredefinedTokenClasses()
+        protected override FunctionCache<string, TokenClass> GetPredefinedTokenClasses()
         {
             var result =
-                new DictionaryEx<string, TokenClass>
+                new FunctionCache<string, TokenClass>
                 {
                     {"{", new LeftParenthesis(1)},
                     {"[", new LeftParenthesis(2)},

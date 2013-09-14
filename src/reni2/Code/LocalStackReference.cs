@@ -29,11 +29,11 @@ namespace Reni.Code
     sealed class LocalStackReference : ReniObject, IStackDataAddressBase
     {
         [EnableDump]
-        readonly DictionaryEx<string, StackData> _locals;
+        readonly FunctionCache<string, StackData> _locals;
         [EnableDump]
         readonly string _holder;
 
-        public LocalStackReference(DictionaryEx<string, StackData> locals, string holder)
+        public LocalStackReference(FunctionCache<string, StackData> locals, string holder)
         {
             _locals = locals;
             _holder = holder;

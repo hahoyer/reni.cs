@@ -65,11 +65,11 @@ namespace Reni
             Root rootContext = null)
             : this()
         {
-            var isDataLess = getDataLess == null ? null : new SimpleCache<bool>(getDataLess);
-            var size = getSize == null ? null : new SimpleCache<Size>(getSize);
-            var type = getType == null ? null : new SimpleCache<TypeBase>(getType);
-            var code = getCode == null ? null : new SimpleCache<CodeBase>(getCode);
-            var codeArgs = getArgs == null ? null : new SimpleCache<CodeArgs>(getArgs);
+            var isDataLess = getDataLess == null ? null : new ValueCache<bool>(getDataLess);
+            var size = getSize == null ? null : new ValueCache<Size>(getSize);
+            var type = getType == null ? null : new ValueCache<TypeBase>(getType);
+            var code = getCode == null ? null : new ValueCache<CodeBase>(getCode);
+            var codeArgs = getArgs == null ? null : new ValueCache<CodeArgs>(getArgs);
 
             if(category.HasType)
                 _type = ObtainType(isDataLess, size, type, code, rootContext);
@@ -91,10 +91,10 @@ namespace Reni
 
         CodeBase ObtainCode
             (
-            SimpleCache<bool> getDataLess,
-            SimpleCache<Size> getSize,
-            SimpleCache<TypeBase> getType,
-            SimpleCache<CodeBase> getCode)
+            ValueCache<bool> getDataLess,
+            ValueCache<Size> getSize,
+            ValueCache<TypeBase> getType,
+            ValueCache<CodeBase> getCode)
         {
             if(getCode != null)
                 return getCode.Value;
@@ -109,10 +109,10 @@ namespace Reni
 
         TypeBase ObtainType
             (
-            SimpleCache<bool> getDataLess,
-            SimpleCache<Size> getSize,
-            SimpleCache<TypeBase> getType,
-            SimpleCache<CodeBase> getCode,
+            ValueCache<bool> getDataLess,
+            ValueCache<Size> getSize,
+            ValueCache<TypeBase> getType,
+            ValueCache<CodeBase> getCode,
             Root rootContext)
         {
             if(getType != null)
@@ -128,10 +128,10 @@ namespace Reni
 
         Size ObtainSize
             (
-            SimpleCache<bool> getDataLess,
-            SimpleCache<Size> getSize,
-            SimpleCache<TypeBase> getType,
-            SimpleCache<CodeBase> getCode)
+            ValueCache<bool> getDataLess,
+            ValueCache<Size> getSize,
+            ValueCache<TypeBase> getType,
+            ValueCache<CodeBase> getCode)
         {
             var result = TryObtainSize(getDataLess, getSize, getType, getCode);
             Tracer.Assert(result != null, () => "Size cannot be determned " + ToString());
@@ -140,10 +140,10 @@ namespace Reni
 
         static Size TryObtainSize
             (
-            SimpleCache<bool> getDataLess,
-            SimpleCache<Size> getSize,
-            SimpleCache<TypeBase> getType,
-            SimpleCache<CodeBase> getCode)
+            ValueCache<bool> getDataLess,
+            ValueCache<Size> getSize,
+            ValueCache<TypeBase> getType,
+            ValueCache<CodeBase> getCode)
         {
             if(getSize != null)
                 return getSize.Value;
@@ -158,10 +158,10 @@ namespace Reni
 
         bool ObtainIsDataLess
             (
-            SimpleCache<bool> getDataLess,
-            SimpleCache<Size> getSize,
-            SimpleCache<TypeBase> getType,
-            SimpleCache<CodeBase> getCode)
+            ValueCache<bool> getDataLess,
+            ValueCache<Size> getSize,
+            ValueCache<TypeBase> getType,
+            ValueCache<CodeBase> getCode)
         {
             var result = TryObtainIsDataLess(getDataLess, getSize, getType, getCode);
             if(result != null)
@@ -172,10 +172,10 @@ namespace Reni
 
         static bool? TryObtainIsDataLess
             (
-            SimpleCache<bool> getDataLess,
-            SimpleCache<Size> getSize,
-            SimpleCache<TypeBase> getType,
-            SimpleCache<CodeBase> getCode)
+            ValueCache<bool> getDataLess,
+            ValueCache<Size> getSize,
+            ValueCache<TypeBase> getType,
+            ValueCache<CodeBase> getCode)
         {
             if(getDataLess != null)
                 return getDataLess.Value;
@@ -190,11 +190,11 @@ namespace Reni
 
         CodeArgs ObtainCodeArgs
             (
-            SimpleCache<bool> getDataLess,
-            SimpleCache<Size> getSize,
-            SimpleCache<TypeBase> getType,
-            SimpleCache<CodeBase> getCode,
-            SimpleCache<CodeArgs> getArgs)
+            ValueCache<bool> getDataLess,
+            ValueCache<Size> getSize,
+            ValueCache<TypeBase> getType,
+            ValueCache<CodeBase> getCode,
+            ValueCache<CodeArgs> getArgs)
         {
             if(getArgs != null)
                 return getArgs.Value;

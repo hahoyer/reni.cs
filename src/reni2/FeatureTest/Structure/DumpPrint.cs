@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
+using Reni.FeatureSearch;
 using Reni.Parser;
 
 namespace Reni.FeatureTest.Structure
@@ -32,7 +33,7 @@ namespace Reni.FeatureTest.Structure
     [TestFixture]
     [Target(@"(1, 2, 3, 4, 5, 6) dump_print")]
     [Output("(1, 2, 3, 4, 5, 6)")]
-    [PrioTableTest]
+    [PrioTableTest, UnitTest]
     public sealed class DumpPrint : CompilerTest
     {
         [Test]

@@ -43,13 +43,13 @@ namespace Reni.Struct
         [EnableDump]
         [Node]
         readonly FunctionSyntax _syntax;
-        readonly SimpleCache<IContextReference> _objectReferenceCache;
+        readonly ValueCache<IContextReference> _objectReferenceCache;
 
         public FunctionBodyType(Structure structure, FunctionSyntax syntax)
         {
             _structure = structure;
             _syntax = syntax;
-            _objectReferenceCache = new SimpleCache<IContextReference>(() => new ContextReference(this));
+            _objectReferenceCache = new ValueCache<IContextReference>(() => new ContextReference(this));
         }
 
         sealed class ContextReference : ReniObject, IContextReference

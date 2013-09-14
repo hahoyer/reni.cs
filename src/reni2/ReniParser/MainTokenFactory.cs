@@ -102,13 +102,13 @@ namespace Reni.ReniParser
         ///     Creates the main token classes.
         /// </summary>
         /// <returns> </returns>
-        protected override DictionaryEx<string, TokenClasses.TokenClass> GetPredefinedTokenClasses() { return TokenClasses; }
+        protected override FunctionCache<string, TokenClasses.TokenClass> GetPredefinedTokenClasses() { return TokenClasses; }
 
-        internal static DictionaryEx<string, TokenClasses.TokenClass> TokenClasses
+        internal static FunctionCache<string, TokenClasses.TokenClass> TokenClasses
         {
             get
             {
-                return new DictionaryEx<string, TokenClasses.TokenClass>
+                return new FunctionCache<string, TokenClasses.TokenClass>
                 {
                     {"{", new LeftParenthesis(1)},
                     {"[", new LeftParenthesis(2)},

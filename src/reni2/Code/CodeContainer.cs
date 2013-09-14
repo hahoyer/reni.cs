@@ -38,15 +38,15 @@ namespace Reni.Code
     {
         readonly Root _rootContext;
         [Node]
-        readonly SimpleCache<Container> _mainCache;
+        readonly ValueCache<Container> _mainCache;
         [Node]
-        readonly DictionaryEx<int, FunctionContainer> _functions;
+        readonly FunctionCache<int, FunctionContainer> _functions;
 
         public CodeContainer(Root rootContext, ParsedSyntax syntax, string description)
         {
             _rootContext = rootContext;
-            _mainCache = new SimpleCache<Container>(() => rootContext.MainContainer(syntax, description));
-            _functions = new DictionaryEx<int, FunctionContainer>(_rootContext.FunctionContainer);
+            _mainCache = new ValueCache<Container>(() => rootContext.MainContainer(syntax, description));
+            _functions = new FunctionCache<int, FunctionContainer>(_rootContext.FunctionContainer);
         }
 
         internal IEnumerable<IssueBase> Issues
@@ -59,7 +59,7 @@ namespace Reni.Code
             }
         }
 
-        DictionaryEx<int, FunctionContainer> Functions
+        FunctionCache<int, FunctionContainer> Functions
         {
             get
             {

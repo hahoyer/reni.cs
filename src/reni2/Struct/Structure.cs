@@ -40,26 +40,26 @@ namespace Reni.Struct
         readonly ContainerContextObject _containerContextObject;
         readonly int _endPosition;
         [Node]
-        readonly SimpleCache<StructureType> _typeCache;
+        readonly ValueCache<StructureType> _typeCache;
         [Node]
-        readonly DictionaryEx<int, TypeBase> _accessTypesCache;
+        readonly FunctionCache<int, TypeBase> _accessTypesCache;
         [Node]
-        readonly DictionaryEx<int, AccessFeature> _accessFeaturesCache;
+        readonly FunctionCache<int, AccessFeature> _accessFeaturesCache;
         [Node]
-        readonly DictionaryEx<int, FieldAccessType> _fieldAccessTypeCache;
+        readonly FunctionCache<int, FieldAccessType> _fieldAccessTypeCache;
         [Node]
-        readonly DictionaryEx<FunctionSyntax, FunctionBodyType> _functionBodyTypeCache;
+        readonly FunctionCache<FunctionSyntax, FunctionBodyType> _functionBodyTypeCache;
 
         internal Structure(ContainerContextObject containerContextObject, int endPosition)
             : base(_nextObjectId++)
         {
-            _functionBodyTypeCache = new DictionaryEx<FunctionSyntax, FunctionBodyType>(syntax => new FunctionBodyType(this, syntax));
-            _fieldAccessTypeCache = new DictionaryEx<int, FieldAccessType>(position => new FieldAccessType(this, position));
+            _functionBodyTypeCache = new FunctionCache<FunctionSyntax, FunctionBodyType>(syntax => new FunctionBodyType(this, syntax));
+            _fieldAccessTypeCache = new FunctionCache<int, FieldAccessType>(position => new FieldAccessType(this, position));
             _containerContextObject = containerContextObject;
             _endPosition = endPosition;
-            _typeCache = new SimpleCache<StructureType>(() => new StructureType(this));
-            _accessTypesCache = new DictionaryEx<int, TypeBase>(ObtainAccessType);
-            _accessFeaturesCache = new DictionaryEx<int, AccessFeature>(position => new AccessFeature(this, position));
+            _typeCache = new ValueCache<StructureType>(() => new StructureType(this));
+            _accessTypesCache = new FunctionCache<int, TypeBase>(ObtainAccessType);
+            _accessFeaturesCache = new FunctionCache<int, AccessFeature>(position => new AccessFeature(this, position));
             StopByObjectId(-313);
         }
 

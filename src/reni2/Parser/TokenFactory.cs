@@ -33,20 +33,20 @@ namespace Reni.Parser
         where TTokenClass : class, IType<IParsedSyntax>, INameProvider
     {
         readonly PrioTable _prioTable;
-        readonly SimpleCache<DictionaryEx<string, TTokenClass>> _tokenClasses;
-        readonly SimpleCache<TTokenClass> _number;
-        readonly SimpleCache<TTokenClass> _text;
-        readonly SimpleCache<TTokenClass> _beginOfText;
-        readonly SimpleCache<TTokenClass> _endOfText;
+        readonly ValueCache<FunctionCache<string, TTokenClass>> _tokenClasses;
+        readonly ValueCache<TTokenClass> _number;
+        readonly ValueCache<TTokenClass> _text;
+        readonly ValueCache<TTokenClass> _beginOfText;
+        readonly ValueCache<TTokenClass> _endOfText;
 
         internal TokenFactory(PrioTable prioTable)
         {
             _prioTable = prioTable;
-            _endOfText = new SimpleCache<TTokenClass>(InternalGetEndOfText);
-            _beginOfText = new SimpleCache<TTokenClass>(InternalGetBeginOfText);
-            _number = new SimpleCache<TTokenClass>(InternalGetNumber);
-            _tokenClasses = new SimpleCache<DictionaryEx<string, TTokenClass>>(GetTokenClasses);
-            _text = new SimpleCache<TTokenClass>(InternalGetText);
+            _endOfText = new ValueCache<TTokenClass>(InternalGetEndOfText);
+            _beginOfText = new ValueCache<TTokenClass>(InternalGetBeginOfText);
+            _number = new ValueCache<TTokenClass>(InternalGetNumber);
+            _tokenClasses = new ValueCache<FunctionCache<string, TTokenClass>>(GetTokenClasses);
+            _text = new ValueCache<TTokenClass>(InternalGetText);
         }
         TTokenClass InternalGetBeginOfText()
         {
@@ -61,9 +61,9 @@ namespace Reni.Parser
             return result;
         }
 
-        DictionaryEx<string, TTokenClass> GetTokenClasses()
+        FunctionCache<string, TTokenClass> GetTokenClasses()
         {
-            var result = new DictionaryEx<string, TTokenClass>(GetPredefinedTokenClasses(), InternalGetTokenClass);
+            var result = new FunctionCache<string, TTokenClass>(GetPredefinedTokenClasses(), InternalGetTokenClass);
             foreach(var pair in result)
                 pair.Value.Name = pair.Key;
             return result;
@@ -99,7 +99,7 @@ namespace Reni.Parser
         IType<IParsedSyntax> ITokenFactory.EndOfText { get { return _endOfText.Value; } }
 
         protected abstract TTokenClass GetSyntaxError(string message);
-        protected abstract DictionaryEx<string, TTokenClass> GetPredefinedTokenClasses();
+        protected abstract FunctionCache<string, TTokenClass> GetPredefinedTokenClasses();
 
         protected virtual TTokenClass GetEndOfText() { return GetSyntaxError("unexpected end of text".Quote()); }
         protected virtual TTokenClass GetBeginOfText() { return GetSyntaxError("unexpected begin of text".Quote()); }
@@ -107,7 +107,7 @@ namespace Reni.Parser
         protected virtual TTokenClass GetNumber() { return GetSyntaxError("unexpected number"); }
         protected virtual TTokenClass GetText() { return GetSyntaxError("unexpected string"); }
 
-        DictionaryEx<string, TTokenClass> TokenClasses { get { return _tokenClasses.Value; } }
+        FunctionCache<string, TTokenClass> TokenClasses { get { return _tokenClasses.Value; } }
         protected IType<IParsedSyntax> TokenClass(string name) { return ((ITokenFactory) this).TokenClass(name); }
     }
 }

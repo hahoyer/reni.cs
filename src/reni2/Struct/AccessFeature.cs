@@ -40,14 +40,14 @@ namespace Reni.Struct
         readonly Structure _structure;
         [EnableDump]
         readonly int _position;
-        readonly SimpleCache<IFunctionFeature > _functionFeature;
+        readonly ValueCache<IFunctionFeature > _functionFeature;
 
         internal AccessFeature(Structure structure, int position)
             : base(_nextObjectId++)
         {
             _structure = structure;
             _position = position;
-            _functionFeature = new SimpleCache<IFunctionFeature>(ObtainFunctionFeature);
+            _functionFeature = new ValueCache<IFunctionFeature>(ObtainFunctionFeature);
         }
 
         Result ISimpleFeature.Result(Category category)

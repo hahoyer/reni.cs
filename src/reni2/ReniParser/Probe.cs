@@ -30,14 +30,14 @@ namespace Reni.ReniParser
 {
     sealed class Probe : ReniObject
     {
-        static readonly DictionaryEx<System.Type, Probe> _probes = new DictionaryEx<System.Type, Probe>(type => new Probe(type));
+        static readonly FunctionCache<System.Type, Probe> _probes = new FunctionCache<System.Type, Probe>(type => new Probe(type));
         readonly System.Type _type;
-        readonly SimpleCache<string[]> _instancesCache;
+        readonly ValueCache<string[]> _instancesCache;
 
         Probe(System.Type type)
         {
             _type = type;
-            _instancesCache = new SimpleCache<string[]>(() => FindInstances(_type).ToArray());
+            _instancesCache = new ValueCache<string[]>(() => FindInstances(_type).ToArray());
         }
 
         static IEnumerable<string> FindInstances(System.Type type)

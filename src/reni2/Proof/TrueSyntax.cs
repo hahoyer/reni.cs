@@ -9,7 +9,7 @@ namespace Reni.Proof.TokenClasses
     internal sealed class TrueSyntax : ParsedSyntax, IComparableEx<TrueSyntax>
     {
         internal static ParsedSyntax Instance { get { return _instance.Value; } }
-        private static readonly SimpleCache<ParsedSyntax> _instance = new SimpleCache<ParsedSyntax>(Create);
+        private static readonly ValueCache<ParsedSyntax> _instance = new ValueCache<ParsedSyntax>(Create);
         private static ParsedSyntax Create() { return new TrueSyntax(); }
 
         private TrueSyntax()

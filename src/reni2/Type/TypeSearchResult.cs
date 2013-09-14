@@ -24,20 +24,79 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using Reni.Basics;
+using Reni.Context;
 using Reni.Feature;
+using Reni.ReniParser;
 
 namespace Reni.Type
 {
-    sealed class TypeSearchResult<TPath> : SearchResult
+    sealed class TypeSearchResult<TPath> : ReniObject, ISearchResult
     {
+        [EnableDump]
         readonly TypeBase _type;
+        [EnableDump]
         readonly TPath _feature;
-        public TypeSearchResult(TypeBase type, TPath feature)
-            : base(feature as IFeatureImplementation)
+
+        internal TypeSearchResult(TypeBase type, TPath feature)
         {
             _type = type;
             _feature = feature;
         }
-        protected override TypeBase DefiningType { get { return _type; } }
+
+        Result ISearchResult.FunctionResult(ContextBase context, Category category, ExpressionSyntax syntax)
+        {
+            return CallDescriptor
+                .Result(category, context, syntax.Left, syntax.Right);
+        }
+        Result ISearchResult.SimpleResult(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
+        }
+        ISearchResult ISearchResult.WithConversion(IConverter converter) { return new SearchResultWithConversion(this, converter); }
+
+        CallDescriptor CallDescriptor { get { return new CallDescriptor(_type, Feature, category => null); } }
+
+        IFeatureImplementation Feature
+        {
+            get
+            {
+                var result = _feature as IFeatureImplementation;
+                if(result != null)
+                    return result;
+                NotImplementedMethod();
+                return null;
+            }
+        }
+    }
+
+    sealed class SearchResultWithConversion : ReniObject, ISearchResult
+    {
+        [EnableDump]
+        readonly ISearchResult _searchResult;
+        [EnableDump]
+        readonly IConverter _converter;
+
+        internal SearchResultWithConversion(ISearchResult searchResult, IConverter converter)
+        {
+            _searchResult = searchResult;
+            _converter = converter;
+        }
+        Result ISearchResult.FunctionResult(ContextBase context, Category category, ExpressionSyntax syntax)
+        {
+            NotImplementedMethod(context, category, syntax);
+            return null;
+        }
+        Result ISearchResult.SimpleResult(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
+        }
+        ISearchResult ISearchResult.WithConversion(IConverter converter)
+        {
+            NotImplementedMethod(converter);
+            return null;
+        }
     }
 }

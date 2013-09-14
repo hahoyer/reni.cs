@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
+using HWClassLibrary.IO;
 using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
 using Reni.Basics;
@@ -44,7 +45,7 @@ namespace Reni.Struct
         readonly TokenData _firstToken;
         readonly TokenData _lastToken;
         readonly CompileSyntax[] _statements;
-        readonly DictionaryEx<string, int> _dictionary;
+        readonly FunctionCache<string, int> _dictionary;
         readonly int[] _converters;
         static readonly string _runId = Compiler.FormattedNow + "\n";
         public static bool IsInContainerDump;
@@ -59,7 +60,7 @@ namespace Reni.Struct
 
         [Node]
         [SmartNode]
-        internal DictionaryEx<string, int> Dictionary { get { return _dictionary; } }
+        internal FunctionCache<string, int> Dictionary { get { return _dictionary; } }
 
         [Node]
         [SmartNode]
@@ -76,7 +77,7 @@ namespace Reni.Struct
             TokenData leftToken,
             TokenData rightToken,
             CompileSyntax[] statements,
-            DictionaryEx<string, int> dictionary,
+            FunctionCache<string, int> dictionary,
             int[] converters)
             : base(leftToken, _nextObjectId++)
         {
@@ -109,7 +110,7 @@ namespace Reni.Struct
         sealed class PreContainer : ReniObject
         {
             readonly List<CompileSyntax> _list = new List<CompileSyntax>();
-            readonly DictionaryEx<string, int> _dictionary = new DictionaryEx<string, int>();
+            readonly FunctionCache<string, int> _dictionary = new FunctionCache<string, int>();
             readonly List<int> _converters = new List<int>();
 
             public void Add(IParsedSyntax parsedSyntax)

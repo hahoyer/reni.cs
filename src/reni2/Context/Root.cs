@@ -44,14 +44,14 @@ namespace Reni.Context
         [Node]
         internal readonly IExecutionContext ExecutionContext;
 
-        readonly SimpleCache<BitType> _bitCache;
-        readonly SimpleCache<VoidType> _voidCache;
+        readonly ValueCache<BitType> _bitCache;
+        readonly ValueCache<VoidType> _voidCache;
 
         internal Root(IExecutionContext executionContext)
         {
             ExecutionContext = executionContext;
-            _bitCache = new SimpleCache<BitType>(() => new BitType(this));
-            _voidCache = new SimpleCache<VoidType>(() => new VoidType(this));
+            _bitCache = new ValueCache<BitType>(() => new BitType(this));
+            _voidCache = new ValueCache<VoidType>(() => new VoidType(this));
         }
 
         [DisableDump]

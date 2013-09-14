@@ -37,9 +37,9 @@ namespace Reni.Parser
             : base(prioTable) { }
 
         protected override TokenClass GetSyntaxError(string message) { throw new Exception("Syntax error: " + message); }
-        protected override DictionaryEx<string, TokenClass> GetPredefinedTokenClasses()
+        protected override FunctionCache<string, TokenClass> GetPredefinedTokenClasses()
         {
-            return new DictionaryEx<string, TokenClass>
+            return new FunctionCache<string, TokenClass>
             {
                 {"{", new OpenToken(1)},
                 {"(", new OpenToken(3)},

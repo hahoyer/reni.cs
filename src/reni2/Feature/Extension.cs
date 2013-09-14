@@ -37,12 +37,12 @@ namespace Reni.Feature
 {
     static class Extension
     {
-        static readonly DictionaryEx<Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result>, MetaFunction> _metaFunctionCache
-            = new DictionaryEx<Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result>, MetaFunction>
+        static readonly FunctionCache<Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result>, MetaFunction> _metaFunctionCache
+            = new FunctionCache<Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result>, MetaFunction>
                 (function => new MetaFunction(function));
 
-        static readonly DictionaryEx<Func<Category, Result>, Simple> _simpleCache
-            = new DictionaryEx<Func<Category, Result>, Simple>(function => new Simple(function));
+        static readonly FunctionCache<Func<Category, Result>, Simple> _simpleCache
+            = new FunctionCache<Func<Category, Result>, Simple>(function => new Simple(function));
 
         internal static Simple Feature(Func<Category, Result> function) { return _simpleCache[function]; }
 

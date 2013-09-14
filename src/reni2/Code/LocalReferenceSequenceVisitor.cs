@@ -33,22 +33,22 @@ namespace Reni.Code
 {
     sealed class LocalReferenceSequenceVisitor : Base
     {
-        readonly SimpleCache<CodeBase> _codeCache;
+        readonly ValueCache<CodeBase> _codeCache;
 
         [Node]
         [EnableDump]
         readonly List<LocalReference> _data = new List<LocalReference>();
         [Node]
         [EnableDump]
-        readonly DictionaryEx<LocalReference, int> _localReferences;
+        readonly FunctionCache<LocalReference, int> _localReferences;
 
         static int _nextObjectId;
 
         public LocalReferenceSequenceVisitor()
             : base(_nextObjectId++)
         {
-            _localReferences = new DictionaryEx<LocalReference, int>(-1, ObtainHolderIndex);
-            _codeCache = new SimpleCache<CodeBase>(Convert);
+            _localReferences = new FunctionCache<LocalReference, int>(-1, ObtainHolderIndex);
+            _codeCache = new ValueCache<CodeBase>(Convert);
         }
 
         CodeBase Convert()
