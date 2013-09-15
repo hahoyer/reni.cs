@@ -28,7 +28,7 @@ using Reni.Feature;
 
 namespace Reni.Type
 {
-    sealed class FeaturePathBridge<TProvider> : ReniObject, ISearchTarget
+    sealed class FeaturePathBridge<TProvider> : DumpableObject, ISearchTarget
         where TProvider : TypeBase
     {
         [EnableDump]

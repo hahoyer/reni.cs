@@ -37,7 +37,6 @@ namespace Reni.ReniParser
         {
             Defineable = defineable;
             Definition = definition;
-            StopByObjectId(-876);
         }
 
         protected override string GetNodeDump() { return Defineable.Name + ": " + Definition.NodeDump; }

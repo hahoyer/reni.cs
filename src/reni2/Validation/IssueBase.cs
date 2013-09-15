@@ -31,7 +31,7 @@ using Reni.ReniParser;
 
 namespace Reni.Validation
 {
-    public abstract class IssueBase : ReniObject
+    public abstract class IssueBase : DumpableObject
     {
         internal static readonly IEnumerable<IssueBase> Empty = new IssueBase[0];
         readonly FunctionCache<ExpressionSyntax, ConsequentialError> _consequentialError;

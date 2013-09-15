@@ -32,11 +32,11 @@ using Reni.Struct;
 
 namespace Reni.Code
 {
-    sealed class DataStack : ReniObject, IVisitor
+    sealed class DataStack : DumpableObject, IVisitor
     {
         private readonly IExecutionContext _context;
 
-        sealed class LocalData : ReniObject, IStackDataAddressBase
+        sealed class LocalData : DumpableObject, IStackDataAddressBase
         {
             public StackData Data;
             public FrameData Frame = new FrameData(null);

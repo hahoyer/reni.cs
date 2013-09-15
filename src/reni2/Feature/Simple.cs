@@ -29,7 +29,7 @@ using Reni.Type;
 
 namespace Reni.Feature
 {
-    abstract class SimpleBase : ReniObject, ISimpleFeature
+    abstract class SimpleBase : DumpableObject, ISimpleFeature
     {
         [EnableDump]
         Func<Category, Result> _function;
@@ -50,7 +50,7 @@ namespace Reni.Feature
     }
 
     sealed class Simple<TType>
-        : ReniObject
+        : DumpableObject
             , IPath<IFeatureImplementation, TType>
         where TType : TypeBase
     {
@@ -61,7 +61,7 @@ namespace Reni.Feature
     }
 
     sealed class Simple<TType1, TType2>
-        : ReniObject
+        : DumpableObject
             , IPath<IPath<IFeatureImplementation, TType1>, TType2>
         where TType2 : TypeBase
         where TType1 : TypeBase

@@ -6,6 +6,8 @@
     <TargetTypeEx>CSharp.Library</TargetTypeEx>
     <TargetFrameworkVersion>v4.0.1</TargetFrameworkVersion>
     <TargetFrameworkProfile />
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -13,14 +15,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\HWClassLibrary\HWClassLibrary.csproj">
-      <Name>HWClassLibrary</Name>
-      <Project>{0402FAE1-D5D6-490F-BC68-C26C8873C0B2}</Project>
-      <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-      <Private>False</Private>
-    </ProjectReference>
-  </ItemGroup>
   <ItemGroup>
     <Compile Include="Basics\BitsConst.cs" />
     <Compile Include="Basics\Category.cs" />
@@ -100,24 +94,84 @@
     <Compile Include="Feature\Function.cs" />
     <Compile Include="Feature\MetaFunction.cs" />
     <Compile Include="Feature\Simple.cs" />
-    <Compile Include="Graphics\IGraphTarget.cs" />
-    <Compile Include="Graphics\SVG\Circle.cs" />
-    <Compile Include="Graphics\SVG\Content.cs" />
-    <Compile Include="Graphics\SVG\Path.cs" />
-    <Compile Include="Graphics\SVG\Rect.cs" />
-    <Compile Include="Graphics\SVG\Root.cs" />
-    <Compile Include="Graphics\SVG\SVG.cs" />
-    <Compile Include="Graphics\SVG\SyntaxDrawer.cs" />
-    <Compile Include="Graphics\SVG\Text.cs" />
-    <Compile Include="Graphics\Syntax.cs" />
-    <Compile Include="Graphics\SyntaxDrawer.cs" />
+    <Compile Include="hw\Debug\DisableDumpAttribute.cs" />
+    <Compile Include="hw\Debug\Dumpable.cs" />
+    <Compile Include="hw\Debug\DumpableObject.cs" />
+    <Compile Include="hw\Debug\DumpAttribute.cs" />
+    <Compile Include="hw\Debug\DumpClassAttribute.cs" />
+    <Compile Include="hw\Debug\DumpDataClassAttribute.cs" />
+    <Compile Include="hw\Debug\DumpEnabledAttribute.cs" />
+    <Compile Include="hw\Debug\DumpToStringAttribute.cs" />
+    <Compile Include="hw\Debug\EnableDumpAttribute.cs" />
+    <Compile Include="hw\Debug\EnableDumpExceptAttribute.cs" />
+    <Compile Include="hw\Debug\EnableDumpWithExceptionPredicateAttribute.cs" />
+    <Compile Include="hw\Debug\Profiler.cs" />
+    <Compile Include="hw\Debug\Tracer.cs" />
+    <Compile Include="hw\Graphics\IGraphTarget.cs" />
+    <Compile Include="hw\Graphics\SVG\Circle.cs" />
+    <Compile Include="hw\Graphics\SVG\Content.cs" />
+    <Compile Include="hw\Graphics\SVG\Path.cs" />
+    <Compile Include="hw\Graphics\SVG\Rect.cs" />
+    <Compile Include="hw\Graphics\SVG\Root.cs" />
+    <Compile Include="hw\Graphics\SVG\SVG.cs" />
+    <Compile Include="hw\Graphics\SVG\SyntaxDrawer.cs" />
+    <Compile Include="hw\Graphics\SVG\Text.cs" />
+    <Compile Include="hw\Graphics\Syntax.cs" />
+    <Compile Include="hw\Graphics\SyntaxDrawer.cs" />
+    <Compile Include="hw\Helper\Box.cs" />
+    <Compile Include="hw\Helper\DateTimeExtender.cs" />
+    <Compile Include="hw\Helper\EnumEx.cs" />
+    <Compile Include="hw\Helper\File.cs" />
+    <Compile Include="hw\Helper\FunctionCache.cs" />
+    <Compile Include="hw\Helper\ListExtender.cs" />
+    <Compile Include="hw\Helper\LongExtender.cs" />
+    <Compile Include="hw\Helper\ReflectionExtender.cs" />
+    <Compile Include="hw\Helper\RelationExtender.cs" />
+    <Compile Include="hw\Helper\StringAligner.cs" />
+    <Compile Include="hw\Helper\StringExtender.cs" />
+    <Compile Include="hw\Helper\T4Context.cs" />
+    <Compile Include="hw\Helper\T4Extender.cs" />
+    <Compile Include="hw\Helper\TypeNameExtender.cs" />
+    <Compile Include="hw\Helper\ValueCache.cs" />
+    <Compile Include="hw\JetBrainsAnnotations.cs" />
+    <Compile Include="hw\Parser\IParsedSyntax.cs" />
+    <Compile Include="hw\Parser\ITokenClass.cs" />
+    <Compile Include="hw\Parser\ITokenFactory.cs" />
+    <Compile Include="hw\Parser\ParsedSyntaxBase.cs" />
+    <Compile Include="hw\Parser\ParserInst.cs" />
+    <Compile Include="hw\Parser\PushedSyntax.cs" />
+    <Compile Include="hw\Parser\Scanner.cs" />
+    <Compile Include="hw\Parser\Token.cs" />
+    <Compile Include="hw\Parser\TokenClass.cs" />
+    <Compile Include="hw\Parser\TokenFactory.cs" />
+    <Compile Include="hw\PrioParser\Extension.cs" />
+    <Compile Include="hw\PrioParser\IOperator.cs" />
+    <Compile Include="hw\PrioParser\IPart.cs" />
+    <Compile Include="hw\PrioParser\IPosition.cs" />
+    <Compile Include="hw\PrioParser\Item.cs" />
+    <Compile Include="hw\PrioParser\IType.cs" />
+    <Compile Include="hw\PrioParser\OpenItem.cs" />
+    <Compile Include="hw\PrioParser\PrioTable.cs" />
+    <Compile Include="hw\Scanner\Match.cs" />
+    <Compile Include="hw\Scanner\MatchExtension.cs" />
+    <Compile Include="hw\Scanner\Source.cs" />
+    <Compile Include="hw\Scanner\SourcePosn.cs" />
+    <Compile Include="hw\TreeStructure\Extender.cs" />
+    <Compile Include="hw\TreeStructure\Helper.cs" />
+    <Compile Include="hw\TreeStructure\TreeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="hw\TreeStructure\TreeForm.Designer.cs" />
+    <Compile Include="hw\UnitTest\CategoryAttribute.cs" />
+    <Compile Include="hw\UnitTest\DependantAttribute.cs" />
+    <Compile Include="hw\UnitTest\TestExtender.cs" />
+    <Compile Include="hw\UnitTest\TestMethod.cs" />
+    <Compile Include="hw\UnitTest\TestRunner.cs" />
+    <Compile Include="hw\UnitTest\TestType.cs" />
     <Compile Include="IProxyType.cs" />
     <Compile Include="Parser\SimpleTokenFactory.cs" />
-    <Compile Include="Parser\Match.cs" />
-    <Compile Include="Parser\MatchExtension.cs" />
     <Compile Include="Parser\PrioTableTest.cs" />
     <Compile Include="Parser\ReniScanner.cs" />
-    <Compile Include="Parser\Scanner.cs" />
     <Compile Include="Parser\Services.cs" />
     <Compile Include="Parser\SyntaxIssue.cs" />
     <Compile Include="ReniObjectExtender.cs" />
@@ -191,46 +245,8 @@
     <Compile Include="FeatureTest\Text.cs" />
     <Compile Include="Feature\DumpPrint\DumpPrintToken.cs" />
     <Compile Include="Feature\Interfaces.cs" />
-    <Compile Include="Parser\ITokenClass.cs" />
-    <Compile Include="Parser\ITokenFactory.cs" />
-    <Compile Include="Parser\ParsedSyntaxBase.cs" />
     <Compile Include="Parser\SyntaxError.cs" />
-    <Compile Include="Parser\TokenClass.cs" />
     <Compile Include="Parser\TokenClassExtender.cs" />
-    <Compile Include="Proof\AndSyntax.cs" />
-    <Compile Include="Proof\EqualSyntax.cs" />
-    <Compile Include="Proof\FactorSyntax.cs" />
-    <Compile Include="Proof\IsolateAndReplaceStrategy.cs" />
-    <Compile Include="Proof\IStrategy.cs" />
-    <Compile Include="Proof\ParsedSyntaxExtender.cs" />
-    <Compile Include="Proof\TokenClasses\And.cs" />
-    <Compile Include="Proof\AssociativeSyntax.cs" />
-    <Compile Include="Proof\ClauseSyntax.cs" />
-    <Compile Include="Proof\TokenClasses\Caret.cs" />
-    <Compile Include="Proof\TokenClasses\Element.cs" />
-    <Compile Include="Proof\TokenClasses\Equal.cs" />
-    <Compile Include="Proof\TokenClasses\GreatesCommonDenominator.cs" />
-    <Compile Include="Proof\Holder.cs" />
-    <Compile Include="Proof\TokenClasses\Integer.cs" />
-    <Compile Include="Proof\IntegerSyntax.cs" />
-    <Compile Include="Proof\TokenClasses\LeftParenthesis.cs" />
-    <Compile Include="Proof\LeftParenthesisSyntax.cs" />
-    <Compile Include="Proof\Main.cs" />
-    <Compile Include="Proof\TokenClasses\List.cs" />
-    <Compile Include="Proof\TokenClasses\Minus.cs" />
-    <Compile Include="Proof\TokenClasses\Number.cs" />
-    <Compile Include="Proof\NumberSyntax.cs" />
-    <Compile Include="Proof\PairSyntax.cs" />
-    <Compile Include="Proof\ParsedSyntax.cs" />
-    <Compile Include="Proof\TokenClasses\PairToken.cs" />
-    <Compile Include="Proof\PlusSyntax.cs" />
-    <Compile Include="Proof\TokenClasses\RightParenthesis.cs" />
-    <Compile Include="Proof\TokenClasses\Plus.cs" />
-    <Compile Include="Proof\TokenClasses\TokenClass.cs" />
-    <Compile Include="Proof\TrueSyntax.cs" />
-    <Compile Include="Proof\TokenFactory.cs" />
-    <Compile Include="Proof\TokenClasses\UserSymbol.cs" />
-    <Compile Include="Proof\VariableSyntax.cs" />
     <Compile Include="ReniParser\DeclarationSyntax.cs" />
     <Compile Include="ReniParser\DeclarationTokenFactory.cs" />
     <Compile Include="ReniParser\DefineableToken.cs" />
@@ -264,10 +280,8 @@
     <Compile Include="Syntax\LeftParenthesis.cs" />
     <Compile Include="Syntax\ListSyntax.cs" />
     <Compile Include="T4Compiler.cs" />
-    <Compile Include="Parser\IParsedSyntax.cs" />
     <Compile Include="Feature\DumpPrint\DumpPrint.cs" />
     <Compile Include="Feature\TypeOperator.cs" />
-    <Compile Include="Parser\TokenFactory.cs" />
     <Compile Include="Struct\AtToken.cs" />
     <Compile Include="FeatureTest\DefaultOperations.cs" />
     <Compile Include="FeatureTest\IntegerStruct.cs" />
@@ -278,11 +292,6 @@
     <Compile Include="Syntax\CompileSyntax.cs" />
     <Compile Include="Syntax\ConverterSyntax.cs" />
     <Compile Include="Runtime\OutStream.cs" />
-    <Compile Include="Parser\ParserInst.cs" />
-    <Compile Include="Parser\PushedSyntax.cs" />
-    <Compile Include="Parser\Source.cs" />
-    <Compile Include="Parser\SourcePosn.cs" />
-    <Compile Include="Parser\Token.cs" />
     <Compile Include="Syntax\Special.cs" />
     <Compile Include="Syntax\EmptyList.cs" />
     <Compile Include="TokenClasses\ArgToken.cs" />
@@ -304,6 +313,7 @@
     <Compile Include="TokenClasses\InstanceToken.cs" />
     <Compile Include="TokenClasses\RawAddress.cs" />
     <Compile Include="TokenClasses\TextItems.cs" />
+    <Compile Include="TokenClasses\TokenClass.cs" />
     <Compile Include="TokenClasses\ToNumberOfBase.cs" />
     <Compile Include="TokenClasses\LeftParenthesis.cs" />
     <Compile Include="TokenClasses\List.cs" />
@@ -313,7 +323,6 @@
     <Compile Include="TokenClasses\Text.cs" />
     <Compile Include="TokenClasses\TextItem.cs" />
     <Compile Include="TokenClasses\ThenToken.cs" />
-    <Compile Include="TokenClasses\TokenClass.cs" />
     <Compile Include="TokenClasses\UndecorateToken.cs" />
     <Compile Include="TokenClasses\UserSymbol.cs" />
     <Compile Include="TokenClasses\NewValueToken.cs" />
@@ -335,7 +344,6 @@
     <Compile Include="Type\FunctionInstanceType.cs" />
     <Compile Include="CodeArgs.cs" />
     <Compile Include="ReniException.cs" />
-    <Compile Include="ReniObject.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="Runtime\Data.cs" />
     <Compile Include="Struct\Container.cs" />
@@ -369,12 +377,17 @@
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>CSharp_Generated.cs</LastGenOutput>
     </None>
+    <None Include="packages.config" />
     <None Include="ParsedSyntax.cd" />
     <None Include="Visitor.cd" />
     <None Include="sys.targets" />
     <None Include="TokenClass.cd" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="EnvDTE, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.TextTemplating, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -388,5 +401,9 @@
     <Folder Include="FeatureTest\Enumeration\" />
     <Folder Include="FeatureTest\Reference\" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="hw\TreeStructure\TreeForm.resx" />
+  </ItemGroup>
   <Import Project="sys.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
 </Project>

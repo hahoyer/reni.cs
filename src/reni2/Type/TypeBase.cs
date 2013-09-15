@@ -38,7 +38,7 @@ using Reni.TokenClasses;
 namespace Reni.Type
 {
     abstract class TypeBase
-        : ReniObject
+        : DumpableObject
             , IContextReferenceProvider
             , IIconKeyProvider
             , ISearchTarget
@@ -95,7 +95,7 @@ namespace Reni.Type
         internal abstract Root RootContext { get; }
 
         [UsedImplicitly]
-        static ReniObject _lastSearchVisitor;
+        static DumpableObject _lastSearchVisitor;
 
         protected TypeBase()
             : base(_nextObjectId++) { _cache = new Cache(this); }

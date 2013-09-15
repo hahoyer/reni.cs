@@ -32,7 +32,7 @@ using Reni.Validation;
 
 namespace Reni.Code
 {
-    sealed class Container : ReniObject
+    sealed class Container : DumpableObject
     {
         static int _nextObjectId;
         static readonly Container _unexpectedVisitOfPending = new Container("UnexpectedVisitOfPending");

@@ -32,7 +32,7 @@ using Reni.TokenClasses;
 
 namespace Reni.Struct
 {
-    sealed class AccessFeature : ReniObject, ISimpleFeature, IFeatureImplementation
+    sealed class AccessFeature : DumpableObject, ISimpleFeature, IFeatureImplementation
     {
         static int _nextObjectId;
 

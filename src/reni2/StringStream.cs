@@ -28,7 +28,7 @@ using HWClassLibrary.Debug;
 
 namespace Reni
 {
-    sealed class StringStream : ReniObject, IOutStream
+    sealed class StringStream : DumpableObject, IOutStream
     {
         readonly StringBuilder _data = new StringBuilder();
         readonly StringBuilder _log = new StringBuilder();

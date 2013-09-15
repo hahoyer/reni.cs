@@ -30,7 +30,7 @@ using Reni.Struct;
 
 namespace Reni.Code
 {
-    sealed class FormalValueAccess : ReniObject
+    sealed class FormalValueAccess : DumpableObject
     {
         readonly int _index;
         readonly int _size;
@@ -139,7 +139,7 @@ namespace Reni.Code
         }
     }
 
-    abstract class NamedValue : ReniObject, IFormalValue
+    abstract class NamedValue : DumpableObject, IFormalValue
     {
         string CreateText(int size)
         {
@@ -238,7 +238,7 @@ namespace Reni.Code
         }
     }
 
-    sealed class BitCastValue : ReniObject, IFormalValue
+    sealed class BitCastValue : DumpableObject, IFormalValue
     {
         readonly IFormalValue _formalSubValue;
         readonly int _castedBits;
@@ -266,7 +266,7 @@ namespace Reni.Code
         }
     }
 
-    sealed class BitsArrayValue : ReniObject, IFormalValue
+    sealed class BitsArrayValue : DumpableObject, IFormalValue
     {
         readonly BitsConst _data;
 

@@ -29,7 +29,7 @@ using Reni.Validation;
 
 namespace Reni.Code
 {
-    sealed class FunctionContainer : ReniObject
+    sealed class FunctionContainer : DumpableObject
     {
         [Node]
         internal readonly Container Getter;

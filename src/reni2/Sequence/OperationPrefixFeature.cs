@@ -6,7 +6,7 @@ using Reni.Type;
 namespace Reni.Sequence
 {
     internal sealed class OperationPrefixFeature 
-        : ReniObject
+        : DumpableObject
     {
         [EnableDump]
         private readonly BitType.IPrefix _definable;

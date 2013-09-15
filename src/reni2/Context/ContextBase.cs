@@ -42,7 +42,7 @@ namespace Reni.Context
     /// <summary>
     ///     Base class for compiler environments
     /// </summary>
-    abstract class ContextBase : ReniObject, IIconKeyProvider
+    abstract class ContextBase : DumpableObject, IIconKeyProvider
     {
         static int _nextId;
 
@@ -126,7 +126,7 @@ namespace Reni.Context
 
         internal virtual bool? QuickIsDataLess(CompileSyntax compileSyntax) { return null; }
 
-        sealed class Cache : ReniObject, IIconKeyProvider
+        sealed class Cache : DumpableObject, IIconKeyProvider
         {
             [Node]
             [DisableDump]

@@ -52,7 +52,7 @@ namespace Reni.Struct
             _objectReferenceCache = new ValueCache<IContextReference>(() => new ContextReference(this));
         }
 
-        sealed class ContextReference : ReniObject, IContextReference
+        sealed class ContextReference : DumpableObject, IContextReference
         {
             [Node]
             readonly FunctionBodyType _parent;

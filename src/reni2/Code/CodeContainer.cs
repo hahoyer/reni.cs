@@ -34,7 +34,7 @@ using Reni.Validation;
 
 namespace Reni.Code
 {
-    sealed class CodeContainer : ReniObject
+    sealed class CodeContainer : DumpableObject
     {
         readonly Root _rootContext;
         [Node]

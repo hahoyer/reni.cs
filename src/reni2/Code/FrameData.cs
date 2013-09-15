@@ -26,7 +26,7 @@ using Reni.Basics;
 
 namespace Reni.Code
 {
-    sealed class FrameData : ReniObject, IStackDataAddressBase
+    sealed class FrameData : DumpableObject, IStackDataAddressBase
     {
         readonly StackData _data;
         internal readonly FunctionCache<string, StackData> Locals = new FunctionCache<string, StackData>();

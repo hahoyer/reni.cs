@@ -30,7 +30,7 @@ using Reni.Code;
 
 namespace Reni.Sequence
 {
-    sealed class ObjectReference : ReniObject, IContextReference
+    sealed class ObjectReference : DumpableObject, IContextReference
     {
         static int _nextObjectId;
 

@@ -71,7 +71,7 @@
 
     </Target>
 
-    <Target Name="DeployPackage" DependsOnTargets="BuildPackages" >
+    <Target Name="DeployPackage" DependsOnTargets="BuildPackages">
         <ItemGroup>
             <PackageFiles Include="$(PackageOutputDir)\*.nupkg" Exclude="$(PackageOutputDir)\*.symbols.nupkg" />
         </ItemGroup>
@@ -79,6 +79,7 @@
         <Exec Command="$(NuGetCommand) setApiKey a5f7f807-2780-44f4-8346-648338424192" />
         
         <Exec  
+            Condition="'$(Configuration)' == 'Release'"
             Command="$(NuGetCommand) push &quot;%(PackageFiles.Identity)&quot;"
             IgnoreExitCode="true"
             ConsoleToMSBuild="true"

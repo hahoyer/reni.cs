@@ -32,7 +32,7 @@ using Reni.Type;
 
 namespace Reni.Sequence
 {
-    sealed class PrefixFeature : ReniObject, ISimpleFeature
+    sealed class PrefixFeature : DumpableObject, ISimpleFeature
     {
         readonly SequenceType _objectType;
         readonly BitType.IPrefix _definable;

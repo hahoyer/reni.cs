@@ -30,7 +30,7 @@ namespace Reni.Basics
 {
     [AdditionalNodeInfo("DebuggerDumpString")]
     [DebuggerDisplay("{NodeDump,nq}")]
-    internal sealed class Size : ReniObject, IIconKeyProvider, IComparable<Size>
+    internal sealed class Size : DumpableObject, IIconKeyProvider, IComparable<Size>
     {
         private static readonly Hashtable _values = new Hashtable();
         private readonly int _value;

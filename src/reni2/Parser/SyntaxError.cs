@@ -29,7 +29,7 @@ using Reni.Validation;
 
 namespace Reni.Parser
 {
-    sealed class SyntaxError : ReniObject, IType<IParsedSyntax>, Match.IError
+    sealed class SyntaxError : DumpableObject, IType<IParsedSyntax>, Match.IError
     {
         [EnableDump]
         readonly IssueId _issueId;

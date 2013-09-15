@@ -30,7 +30,7 @@ using Reni.Struct;
 namespace Reni.Feature.DumpPrint
 {
     sealed class StructReferenceFeature
-        : ReniObject
+        : DumpableObject
             , ISimpleFeature
     {
         [EnableDump]

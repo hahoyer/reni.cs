@@ -7,7 +7,7 @@ using Reni.Feature;
 
 namespace Reni.Type
 {
-    abstract class ConverterBase : ReniObject, IFeatureImplementation, ISimpleFeature
+    abstract class ConverterBase : DumpableObject, IFeatureImplementation, ISimpleFeature
     {
         IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return null; } }
         IFunctionFeature IFeatureImplementation.Function { get { return null; } }

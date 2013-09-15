@@ -28,7 +28,7 @@ using Reni.Code;
 
 namespace Reni.FeatureTest
 {
-    sealed class TargetSetData : ReniObject
+    sealed class TargetSetData : DumpableObject
     {
         internal readonly string Target;
         internal readonly string Output;

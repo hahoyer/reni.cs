@@ -24,7 +24,7 @@ using Reni.Basics;
 
 namespace Reni.Code
 {
-    internal abstract class StackData : ReniObject
+    internal abstract class StackData : DumpableObject
     {
         internal readonly IOutStream OutStream;
         

@@ -32,7 +32,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class ContainerContextObject : ReniObject, IContextReference
+    sealed class ContainerContextObject : DumpableObject, IContextReference
     {
         static int _nextObjectId;
         readonly Container _container;

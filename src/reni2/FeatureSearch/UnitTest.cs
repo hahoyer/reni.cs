@@ -42,17 +42,17 @@ namespace Reni.FeatureSearch
         }
     }
 
-    abstract class SymbolBase : ReniObject
+    abstract class SymbolBase : DumpableObject
     {
-        internal virtual Feature GetFeature(Type type) { return null; }
+        internal virtual Feature GetFeature(TypeBase type) { return null; }
     }
 
     sealed class Symbol : SymbolBase
     {
-        internal override Feature GetFeature(Type type) { return type.GetFeature<Symbol>(); }
+        internal override Feature GetFeature(TypeBase type) { return type.GetFeature<Symbol>(); }
     }
 
-    abstract class TypeBase : ReniObject
+    abstract class TypeBase : DumpableObject
     {
         public Feature Search(SymbolBase symbol) { return symbol.GetFeature(this); }
 
@@ -73,6 +73,6 @@ namespace Reni.FeatureSearch
         public Feature Feature { get { return new Feature(); } }
     }
 
-    class Feature : ReniObject
+    class Feature : DumpableObject
     {}
 }

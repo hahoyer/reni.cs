@@ -25,7 +25,6 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
-using HWClassLibrary.IO;
 using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
 using Reni.Basics;
@@ -107,7 +106,7 @@ namespace Reni.Struct
         [DisableDump]
         protected override ParsedSyntaxBase[] Children { get { return Statements.ToArray<ParsedSyntaxBase>(); } }
 
-        sealed class PreContainer : ReniObject
+        sealed class PreContainer : DumpableObject
         {
             readonly List<CompileSyntax> _list = new List<CompileSyntax>();
             readonly FunctionCache<string, int> _dictionary = new FunctionCache<string, int>();
@@ -328,7 +327,7 @@ namespace Reni.Struct
     }
 
 
-    sealed class StructurePosition : ReniObject
+    sealed class StructurePosition : DumpableObject
     {
         [EnableDump]
         readonly int _position;

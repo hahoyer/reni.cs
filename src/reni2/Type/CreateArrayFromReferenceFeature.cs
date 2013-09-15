@@ -28,7 +28,7 @@ using Reni.Basics;
 
 namespace Reni.Type
 {
-    sealed class CreateArrayFromReferenceFeature : ReniObject
+    sealed class CreateArrayFromReferenceFeature : DumpableObject
     {
         [EnableDump]
         readonly TypeBase _type;

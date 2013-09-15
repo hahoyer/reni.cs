@@ -36,7 +36,7 @@ using Reni.Type;
 
 namespace Reni
 {
-    sealed class Result : ReniObject, ITreeNodeSupport, IAggregateable<Result>
+    sealed class Result : DumpableObject, ITreeNodeSupport, IAggregateable<Result>
     {
         static int _nextObjectId = 1;
         bool _isDirty;

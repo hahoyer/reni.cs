@@ -28,7 +28,7 @@ using HWClassLibrary.Helper;
 
 namespace Reni.ReniParser
 {
-    sealed class Probe : ReniObject
+    sealed class Probe : DumpableObject
     {
         static readonly FunctionCache<System.Type, Probe> _probes = new FunctionCache<System.Type, Probe>(type => new Probe(type));
         readonly System.Type _type;

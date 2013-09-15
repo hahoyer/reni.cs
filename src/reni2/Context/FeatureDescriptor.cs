@@ -32,7 +32,7 @@ using Reni.Type;
 
 namespace Reni.Context
 {
-    abstract class FeatureDescriptor : ReniObject
+    abstract class FeatureDescriptor : DumpableObject
     {
         internal abstract TypeBase Type { get; }
         protected abstract IFeatureImplementation Feature { get; }

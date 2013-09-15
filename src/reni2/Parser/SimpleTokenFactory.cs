@@ -54,7 +54,7 @@ namespace Reni.Parser
         protected override TokenClass GetText() { return CommonTokenClass; }
         static TokenClass CommonTokenClass { get { return new AnyTokenClass(); } }
 
-        internal abstract class Syntax : ReniObject, IParsedSyntax, IGraphTarget
+        internal abstract class Syntax : DumpableObject, IParsedSyntax, IGraphTarget
         {
             [EnableDump]
             readonly TokenData _token;
@@ -141,7 +141,7 @@ namespace Reni.Parser
             internal virtual Syntax ParenthesisMatch(TokenData token, Syntax argument) { return CreateSyntax(this, token, argument); }
         }
 
-        internal new abstract class TokenClass : ReniObject, IType<IParsedSyntax>, INameProvider
+        internal new abstract class TokenClass : DumpableObject, IType<IParsedSyntax>, INameProvider
         {
             IParsedSyntax IType<IParsedSyntax>.Create(IParsedSyntax left, IPart<IParsedSyntax> part, IParsedSyntax right) { return CreateSyntax((Syntax) left,(TokenData) part,(Syntax) right); }
             string IType<IParsedSyntax>.PrioTableName { get { throw new NotImplementedException(); } }

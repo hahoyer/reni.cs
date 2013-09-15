@@ -29,7 +29,7 @@ using HWClassLibrary.Debug;
 namespace Reni.Basics
 {
     [Dump("Dump")]
-    sealed class Category : ReniObject, IEquatable<Category>
+    sealed class Category : DumpableObject, IEquatable<Category>
     {
         readonly bool _code;
         readonly bool _type;

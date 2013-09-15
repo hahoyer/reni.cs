@@ -33,7 +33,7 @@ using Reni.Type;
 
 namespace Reni.Context
 {
-    sealed class FunctionList : ReniObject
+    sealed class FunctionList : DumpableObject
     {
         [Node]
         readonly FunctionCache<FunctionSyntax, FunctionCache<Structure, FunctionCache<TypeBase, int>>> _dictionary;

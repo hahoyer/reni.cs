@@ -27,7 +27,7 @@ using HWClassLibrary.Debug;
 
 namespace Reni.Struct
 {
-    sealed class FunctionId : ReniObject
+    sealed class FunctionId : DumpableObject
     {
         public static FunctionId Getter(int index) { return new FunctionId(index, true); }
         public static FunctionId Setter(int index) { return new FunctionId(index, false); }

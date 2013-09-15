@@ -11,12 +11,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System.Drawing" />
-    <ProjectReference Include="..\HWClassLibrary\HWClassLibrary.csproj">
-      <Name>HWClassLibrary</Name>
-      <Project>{0402FAE1-D5D6-490F-BC68-C26C8873C0B2}</Project>
-      <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\reni2\Reni2.csproj">
       <Project>{EBB73C84-6622-4183-A28F-B0DFF606006B}</Project>
       <Name>Reni2</Name>

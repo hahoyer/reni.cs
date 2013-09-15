@@ -42,13 +42,13 @@ namespace Reni.TokenClasses
             )
         {
             return
-                this.Operation((ParsedSyntax) left, (TokenData) token, (ParsedSyntax) right);
+                this.Operation((ParsedSyntax)left, (TokenData)token, (ParsedSyntax)right);
         }
 
-        ParsedSyntax IOperator<ParsedSyntax>.Terminal(IOperatorPart token) { return Terminal((TokenData) token); }
-        ParsedSyntax IOperator<ParsedSyntax>.Prefix(IOperatorPart token, ParsedSyntax right) { return Prefix((TokenData) token, right); }
-        ParsedSyntax IOperator<ParsedSyntax>.Suffix(ParsedSyntax left, IOperatorPart token) { return Suffix(left, (TokenData) token); }
-        ParsedSyntax IOperator<ParsedSyntax>.Infix(ParsedSyntax left, IOperatorPart token, ParsedSyntax right) { return Infix(left, (TokenData) token, right); }
+        ParsedSyntax IOperator<ParsedSyntax>.Terminal(IOperatorPart token) { return Terminal((TokenData)token); }
+        ParsedSyntax IOperator<ParsedSyntax>.Prefix(IOperatorPart token, ParsedSyntax right) { return Prefix((TokenData)token, right); }
+        ParsedSyntax IOperator<ParsedSyntax>.Suffix(ParsedSyntax left, IOperatorPart token) { return Suffix(left, (TokenData)token); }
+        ParsedSyntax IOperator<ParsedSyntax>.Infix(ParsedSyntax left, IOperatorPart token, ParsedSyntax right) { return Infix(left, (TokenData)token, right); }
 
         protected virtual ParsedSyntax Syntax
             (ParsedSyntax left

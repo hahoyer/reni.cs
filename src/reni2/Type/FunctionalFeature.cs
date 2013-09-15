@@ -31,7 +31,7 @@ using Reni.Context;
 
 namespace Reni.Type
 {
-    abstract class FunctionalFeature : ReniObject
+    abstract class FunctionalFeature : DumpableObject
     {
         static int _nextObjectId;
         readonly ValueCache<TypeBase> _functionalTypesCache;

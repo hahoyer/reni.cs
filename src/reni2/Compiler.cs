@@ -26,7 +26,6 @@ using System.Linq;
 using System.Threading;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
-using HWClassLibrary.IO;
 using HWClassLibrary.TreeStructure;
 using Reni.Code;
 using Reni.Context;
@@ -38,7 +37,7 @@ using Reni.Validation;
 
 namespace Reni
 {
-    public sealed class Compiler : ReniObject, IExecutionContext
+    public sealed class Compiler : DumpableObject, IExecutionContext
     {
         readonly string _fileName;
         readonly CompilerParameters _parameters;

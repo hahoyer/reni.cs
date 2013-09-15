@@ -33,7 +33,7 @@ using Reni.Type;
 
 namespace Reni
 {
-    sealed class ResultCache : ReniObject, ITreeNodeSupport
+    sealed class ResultCache : DumpableObject, ITreeNodeSupport
     {
         readonly Result _data = new Result();
         readonly Func<Category, Result> _obtainResult;

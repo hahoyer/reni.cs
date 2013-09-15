@@ -31,7 +31,7 @@ using Reni.TokenClasses;
 
 namespace Reni.ReniParser
 {
-    sealed class DefineableToken : ReniObject, IIconKeyProvider
+    sealed class DefineableToken : DumpableObject, IIconKeyProvider
     {
         readonly TokenData _data;
         readonly Defineable _tokenClass;

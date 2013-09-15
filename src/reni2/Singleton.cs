@@ -27,7 +27,7 @@ using HWClassLibrary.Debug;
 
 namespace Reni
 {
-    abstract class Singleton<T, TBase> : ReniObject
+    abstract class Singleton<T, TBase> : DumpableObject
         where T : TBase, new()
     {
         internal static readonly T Instance = new T();

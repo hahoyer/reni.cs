@@ -34,7 +34,7 @@ using Reni.Runtime;
 namespace Reni.Basics
 {
     [DumpToString]
-    sealed class BitsConst : ReniObject
+    sealed class BitsConst : DumpableObject
     {
         const string Digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         internal const int SegmentAlignBits = 3;

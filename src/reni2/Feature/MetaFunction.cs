@@ -30,7 +30,7 @@ using Reni.Syntax;
 
 namespace Reni.Feature
 {
-    sealed class MetaFunction : ReniObject, IFeatureImplementation, IMetaFunctionFeature
+    sealed class MetaFunction : DumpableObject, IFeatureImplementation, IMetaFunctionFeature
     {
         readonly Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result> _function;
         public MetaFunction(Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result> function) { _function = function; }

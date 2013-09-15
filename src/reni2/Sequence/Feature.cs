@@ -28,7 +28,7 @@ using Reni.Type;
 
 namespace Reni.Sequence
 {
-    sealed class Feature : ReniObject, FunctionFeature.ISequenceFeature
+    sealed class Feature : DumpableObject, FunctionFeature.ISequenceFeature
     {
         readonly BitType.IOperation _definable;
         readonly BitType _bitType;

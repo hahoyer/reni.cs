@@ -35,7 +35,7 @@ namespace Reni
     /// <summary>
     ///     Contains list of references to compiler environemnts.
     /// </summary>
-    sealed class CodeArgs : ReniObject, ITreeNodeSupport
+    sealed class CodeArgs : DumpableObject, ITreeNodeSupport
     {
         static int _nextId;
         readonly List<IContextReference> _data;
@@ -214,7 +214,7 @@ namespace Reni
         public static CodeArgs operator -(CodeArgs x, IContextReference y) { return x.Without(y); }
         IEnumerable<TreeNode> ITreeNodeSupport.CreateNodes() { return _data.CreateNodes(); }
 
-        sealed class CodeArg : Singleton<CodeArg, ReniObject>, IContextReference
+        sealed class CodeArg : Singleton<CodeArg, DumpableObject>, IContextReference
         {
             Size IContextReference.Size
             {

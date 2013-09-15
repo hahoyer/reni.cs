@@ -56,7 +56,7 @@ namespace Reni.Validation
         CodeBase Code() { return _issue.Code; }
 
         internal sealed class ImplicitSearchResult
-            : ReniObject
+            : DumpableObject
 
         {
             [EnableDump]

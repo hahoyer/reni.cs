@@ -30,7 +30,7 @@ using Reni.Type;
 
 namespace Reni.Feature
 {
-    abstract class FunctionBase : ReniObject, IFunctionFeature
+    abstract class FunctionBase : DumpableObject, IFunctionFeature
     {
         [EnableDump]
         readonly Func<Category, IContextReference, TypeBase, Result> _function;

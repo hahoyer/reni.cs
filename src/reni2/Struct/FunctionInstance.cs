@@ -34,7 +34,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    abstract class FunctionInstance : ReniObject
+    abstract class FunctionInstance : DumpableObject
     {
         [DisableDump]
         protected readonly FunctionType Parent;

@@ -32,7 +32,7 @@ namespace Reni.Code
     ///     General visitor template for code
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    abstract class Visitor<T> : ReniObject
+    abstract class Visitor<T> : DumpableObject
     {
         protected Visitor(int objectId)
             : base(objectId) { }

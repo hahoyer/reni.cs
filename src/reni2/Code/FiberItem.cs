@@ -29,7 +29,7 @@ using Reni.Validation;
 
 namespace Reni.Code
 {
-    abstract class FiberItem : ReniObject, IFormalCodeItem
+    abstract class FiberItem : DumpableObject, IFormalCodeItem
     {
         static int _nextObjectId;
         static string _newCombinedReason;

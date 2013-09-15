@@ -8,7 +8,7 @@ namespace Reni.Runtime
     /// <summary>
     ///     Handle printouts
     /// </summary>
-    public sealed class OutStream : ReniObject, IOutStream
+    public sealed class OutStream : DumpableObject, IOutStream
     {
         private string _data = "";
         private string _log = "";

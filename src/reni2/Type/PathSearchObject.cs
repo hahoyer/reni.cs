@@ -29,7 +29,7 @@ using Reni.TokenClasses;
 
 namespace Reni.Type
 {
-    sealed class Path<TDefineable, TProvider> : ReniObject, ISearchObject
+    sealed class Path<TDefineable, TProvider> : DumpableObject, ISearchObject
         where TDefineable : Defineable
     {
         ISearchResult ISearchObject.GetFeatureGenericized(ISearchTarget target) { return target.GetFeature<TDefineable,TProvider>(); }

@@ -31,7 +31,7 @@ using Reni.ReniParser;
 
 namespace Reni.Type
 {
-    sealed class TypeSearchResult<TPath> : ReniObject, ISearchResult
+    sealed class TypeSearchResult<TPath> : DumpableObject, ISearchResult
     {
         [EnableDump]
         readonly TypeBase _type;
@@ -71,7 +71,7 @@ namespace Reni.Type
         }
     }
 
-    sealed class SearchResultWithConversion : ReniObject, ISearchResult
+    sealed class SearchResultWithConversion : DumpableObject, ISearchResult
     {
         [EnableDump]
         readonly ISearchResult _searchResult;

@@ -28,7 +28,7 @@ using Reni.Feature;
 
 namespace Reni.Type
 {
-    sealed class EmptyFeature : ReniObject, IFeatureImplementation
+    sealed class EmptyFeature : DumpableObject, IFeatureImplementation
     {
         internal static readonly IFeatureImplementation Instance = new EmptyFeature();
         IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return null; } }

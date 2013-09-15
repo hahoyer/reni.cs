@@ -37,7 +37,7 @@ namespace Reni.Type
         public static IConverter Concat(this IConverter first, IConverter second) { return new ConcatConverter(first, second); }
     }
 
-    sealed class ConcatConverter : ReniObject, IConverter
+    sealed class ConcatConverter : DumpableObject, IConverter
     {
         readonly IConverter _first;
         readonly IConverter _second;

@@ -31,7 +31,7 @@ using Reni.ReniParser;
 
 namespace Reni.Type
 {
-    abstract class SearchResult : ReniObject, ISearchResult
+    abstract class SearchResult : DumpableObject, ISearchResult
     {
         static int _nextObjectId;
         [EnableDump]

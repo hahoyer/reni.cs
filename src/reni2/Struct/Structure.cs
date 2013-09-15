@@ -34,7 +34,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class Structure : ReniObject
+    sealed class Structure : DumpableObject
     {
         static int _nextObjectId;
         readonly ContainerContextObject _containerContextObject;

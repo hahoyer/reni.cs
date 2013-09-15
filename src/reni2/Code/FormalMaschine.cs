@@ -33,7 +33,7 @@ using Reni.Struct;
 namespace Reni.Code
 {
     [UsedImplicitly]
-    sealed class FormalMachine : ReniObject, IVisitor
+    sealed class FormalMachine : DumpableObject, IVisitor
     {
         readonly Size _startAddress;
 

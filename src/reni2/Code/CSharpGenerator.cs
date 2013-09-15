@@ -32,7 +32,7 @@ using Reni.Struct;
 
 namespace Reni.Code
 {
-    sealed class CSharpGenerator : ReniObject, IVisitor
+    sealed class CSharpGenerator : DumpableObject, IVisitor
     {
         readonly int _temporaryByteCount;
         readonly List<string> _data = new List<string>();

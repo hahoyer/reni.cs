@@ -34,7 +34,7 @@ using Reni.Validation;
 
 namespace Reni.Code
 {
-    abstract class CodeBase : ReniObject, IIconKeyProvider, IFormalCodeItem
+    abstract class CodeBase : DumpableObject, IIconKeyProvider, IFormalCodeItem
     {
         protected CodeBase(int objectId)
             : base(objectId) { }
