@@ -23,8 +23,8 @@
 using System.Linq;
 using System.Collections.Generic;
 using System;
-using HWClassLibrary.Debug;
-using Reni.Parser;
+using hw.Debug;
+using hw.Parser;
 using Reni.ReniParser;
 
 namespace Reni.TokenClasses

@@ -27,8 +27,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
+using hw.Debug;
+using hw.Helper;
 using Microsoft.CSharp;
 using Reni.Struct;
 
@@ -77,7 +77,7 @@ namespace Reni.Code
                 = new[]
                 {
                     Assembly.GetAssembly(typeof(Generator)).Location,
-                    Assembly.GetAssembly(typeof(HWClassLibrary.Helper.File)).Location,
+                    Assembly.GetAssembly(typeof(hw.Helper.File)).Location,
                 };
             cp.ReferencedAssemblies.AddRange(referencedAssemblies);
             var cr = _provider.CompileAssemblyFromFile(cp, name);

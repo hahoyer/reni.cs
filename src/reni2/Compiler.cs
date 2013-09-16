@@ -24,9 +24,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
-using HWClassLibrary.TreeStructure;
+using hw.Debug;
+using hw.Helper;
+using hw.Parser;
+using hw.Scanner;
+using hw.TreeStructure;
 using Reni.Code;
 using Reni.Context;
 using Reni.Parser;
@@ -72,21 +74,27 @@ namespace Reni
 
         [DisableDump]
         string FileName { get { return _fileName; } }
+
         [Node]
         [DisableDump]
         Source Source { get { return _source.Value; } }
+
         [Node]
         [DisableDump]
         internal ParsedSyntax Syntax { get { return _syntax.Value; } }
+
         [Node]
         [DisableDump]
         CodeContainer CodeContainer { get { return _codeContainer.Value; } }
+
         [DisableDump]
         [Node]
         internal string CSharpCode { get { return _cSharpCode.Value; } }
+
         [Node]
         [DisableDump]
         Root RootContext { get { return _rootContext; } }
+
         [DisableDump]
         bool IsInExecutionPhase { get; set; }
 

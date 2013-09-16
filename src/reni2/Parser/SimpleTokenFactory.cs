@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2012 - 2012 Harald Hoyer
+//     Copyright (C) 2012 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -23,11 +23,12 @@
 using System.Linq;
 using System.Collections.Generic;
 using System;
-using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
-using HWClassLibrary.Parser;
-using HWClassLibrary.TreeStructure;
-using Reni.Graphics;
+using hw.Debug;
+using hw.Graphics;
+using hw.Helper;
+using hw.Parser;
+using hw.PrioParser;
+using hw.TreeStructure;
 
 namespace Reni.Parser
 {
@@ -60,19 +61,27 @@ namespace Reni.Parser
             readonly TokenData _token;
 
             protected Syntax(TokenData token) { _token = token; }
+
             [DisableDump]
             string IIconKeyProvider.IconKey { get { return "Syntax"; } }
+
             [DisableDump]
             TokenData IParsedSyntax.Token { get { return _token; } }
+
             [DisableDump]
             TokenData IParsedSyntax.FirstToken { get { return FirstToken; } }
+
             [DisableDump]
             TokenData IParsedSyntax.LastToken { get { return LastToken; } }
+
             [DisableDump]
             protected virtual TokenData FirstToken { get { return _token; } }
+
             [DisableDump]
             internal virtual TokenData LastToken { get { return _token; } }
+
             public string Title { get { return _token.Name; } }
+
             [DisableDump]
             public IGraphTarget[] Children { get { return new[] {Left, Right}; } }
 
@@ -143,7 +152,7 @@ namespace Reni.Parser
 
         internal new abstract class TokenClass : DumpableObject, IType<IParsedSyntax>, INameProvider
         {
-            IParsedSyntax IType<IParsedSyntax>.Create(IParsedSyntax left, IPart<IParsedSyntax> part, IParsedSyntax right) { return CreateSyntax((Syntax) left,(TokenData) part,(Syntax) right); }
+            IParsedSyntax IType<IParsedSyntax>.Create(IParsedSyntax left, IPart<IParsedSyntax> part, IParsedSyntax right) { return CreateSyntax((Syntax) left, (TokenData) part, (Syntax) right); }
             string IType<IParsedSyntax>.PrioTableName { get { throw new NotImplementedException(); } }
             bool IType<IParsedSyntax>.IsEnd { get { throw new NotImplementedException(); } }
             protected abstract Syntax CreateSyntax(Syntax left, TokenData token, Syntax right);

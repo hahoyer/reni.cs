@@ -23,7 +23,9 @@
 using System.Linq;
 using System.Collections.Generic;
 using System;
-using HWClassLibrary.Debug;
+using hw.Debug;
+using hw.Parser;
+using hw.Scanner;
 using Reni.Validation;
 
 namespace Reni.Parser

@@ -42,7 +42,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     </AssemblyAttributes>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\HWClassLibrary\HWClassLibrary.csproj">
+    <ProjectReference Include="..\HWClassLibrary\hw.csproj">
       <Project>{0402FAE1-D5D6-490F-BC68-C26C8873C0B2}</Project>
       <Name>HWClassLibrary</Name>
     </ProjectReference>

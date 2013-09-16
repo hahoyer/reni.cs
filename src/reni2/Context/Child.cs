@@ -20,11 +20,11 @@
 
 #endregion
 
-using HWClassLibrary.Debug;
+using hw.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using HWClassLibrary.TreeStructure;
+using hw.TreeStructure;
 using Reni.Struct;
 
 namespace Reni.Context

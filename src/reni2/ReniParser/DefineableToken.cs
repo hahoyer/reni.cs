@@ -23,10 +23,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
-using HWClassLibrary.TreeStructure;
-using Reni.Parser;
+using hw.Debug;
+using hw.Helper;
+using hw.TreeStructure;
+using hw.Parser;
 using Reni.TokenClasses;
 
 namespace Reni.ReniParser

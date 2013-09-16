@@ -24,9 +24,11 @@ using System.Drawing;
 using System.Linq;
 using System.Collections.Generic;
 using System;
-using HWClassLibrary.Debug;
-using HWClassLibrary.Parser;
-using Reni.Graphics;
+using hw.Debug;
+using hw.Graphics;
+using hw.Parser;
+using hw.PrioParser;
+using hw.Scanner;
 
 namespace Reni.Parser
 {

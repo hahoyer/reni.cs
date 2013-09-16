@@ -24,9 +24,9 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using System.Text.RegularExpressions;
-using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
-using HWClassLibrary.UnitTest;
+using hw.Debug;
+using hw.Helper;
+using hw.UnitTest;
 using Reni.Validation;
 
 namespace Reni.FeatureTest.Validation

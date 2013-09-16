@@ -23,8 +23,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HWClassLibrary.Debug;
-using HWClassLibrary.TreeStructure;
+using hw.Debug;
+using hw.TreeStructure;
 using Reni.Basics;
 using Reni.Code.ReplaceVisitor;
 using Reni.Context;
@@ -156,7 +156,8 @@ namespace Reni.Code
         }
 
         /// <summary>
-        ///     Replaces appearences of context in code tree. Assumes, that replacement requires offset alignment when walking along code tree
+        ///     Replaces appearences of context in code tree. Assumes, that replacement requires offset alignment when walking
+        ///     along code tree
         /// </summary>
         /// <typeparam name="TContext"> </typeparam>
         /// <param name="context"> The context. </param>
@@ -172,7 +173,8 @@ namespace Reni.Code
         }
 
         /// <summary>
-        ///     Replaces appearences of context in code tree. Assumes, that replacement isn't a reference, that changes when walking along the code tree
+        ///     Replaces appearences of context in code tree. Assumes, that replacement isn't a reference, that changes when
+        ///     walking along the code tree
         /// </summary>
         /// <typeparam name="TContext"> </typeparam>
         /// <param name="context"> The context. </param>

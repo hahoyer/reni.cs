@@ -17,11 +17,11 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
-using HWClassLibrary.Debug;
+using hw.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using HWClassLibrary.TreeStructure;
+using hw.TreeStructure;
 using Reni.Basics;
 using Reni.Context;
 

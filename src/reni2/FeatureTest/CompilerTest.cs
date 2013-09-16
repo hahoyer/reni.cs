@@ -23,9 +23,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
-using HWClassLibrary.UnitTest;
+using hw.Debug;
+using hw.Helper;
+using hw.UnitTest;
 using Reni.Code;
 using Reni.Runtime;
 using Reni.Validation;

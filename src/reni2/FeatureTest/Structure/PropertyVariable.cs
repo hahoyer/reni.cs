@@ -23,8 +23,8 @@
 using System.Linq;
 using System.Collections.Generic;
 using System;
-using HWClassLibrary.Debug;
-using HWClassLibrary.UnitTest;
+using hw.Debug;
+using hw.UnitTest;
 using Reni.FeatureTest.Function;
 
 namespace Reni.FeatureTest.Structure

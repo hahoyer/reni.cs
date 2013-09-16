@@ -23,8 +23,9 @@
 using System.Linq;
 using System.Collections.Generic;
 using System;
-using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
+using hw.Debug;
+using hw.Helper;
+using hw.Parser;
 using Reni.Parser;
 using Reni.ReniParser;
 using Reni.Validation;
@@ -61,8 +62,10 @@ namespace Reni.Context
                 return result;
             }
         }
+
         [DisableDump]
         Probe[] Probes { get { return _syntax.Probes(_context); } }
+
         internal static IssueType Type(ContextBase context, ExpressionSyntax syntax) { return new IssueType(new UndefinedSymbolIssue(context, syntax), context.RootContext); }
     }
 }

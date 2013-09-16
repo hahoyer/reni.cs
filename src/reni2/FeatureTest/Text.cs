@@ -20,11 +20,11 @@
 
 #endregion
 
-using HWClassLibrary.Debug;
+using hw.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using HWClassLibrary.UnitTest;
+using hw.UnitTest;
 using Reni.FeatureTest.Array;
 using Reni.FeatureTest.BitArrayOp;
 

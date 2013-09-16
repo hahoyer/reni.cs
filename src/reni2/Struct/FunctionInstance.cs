@@ -23,9 +23,9 @@
 using System.Linq;
 using System.Collections.Generic;
 using System;
-using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
-using HWClassLibrary.TreeStructure;
+using hw.Debug;
+using hw.Helper;
+using hw.TreeStructure;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;

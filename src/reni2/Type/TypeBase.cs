@@ -23,9 +23,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
-using HWClassLibrary.TreeStructure;
+using hw.Debug;
+using hw.Helper;
+using hw.TreeStructure;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
@@ -93,9 +93,6 @@ namespace Reni.Type
         [DisableDump]
         [Node]
         internal abstract Root RootContext { get; }
-
-        [UsedImplicitly]
-        static DumpableObject _lastSearchVisitor;
 
         protected TypeBase()
             : base(_nextObjectId++) { _cache = new Cache(this); }
@@ -628,7 +625,7 @@ namespace Reni.Type
 
         internal virtual ISearchResult GetSearchResult(ISearchObject @object) { return @object.GetFeatureGenericized(this); }
 
-        internal ISearchResult GetSearchResultForChild<TProvider>(ISearchObject @object, TProvider parent) 
+        internal ISearchResult GetSearchResultForChild<TProvider>(ISearchObject @object, TProvider parent)
             where TProvider : TypeBase
         {
             ISearchTarget target = new FeaturePathBridge<TProvider>(parent, this);
@@ -655,10 +652,10 @@ namespace Reni.Type
             Tracer.LinePart("   this: " + GetType().PrettyName()
                 + "\nTTarget: " + typeof(TDefinable).PrettyName()
                 + "\n  TPath: " + typeof(TPath).PrettyName());
-            if (resultProvider != null)
+            if(resultProvider != null)
             {
                 Tracer.Line(" ... success\n");
-                TPath feature = resultProvider.Feature;
+                var feature = resultProvider.Feature;
                 return new TypeSearchResult<TPath>(this, feature);
             }
 

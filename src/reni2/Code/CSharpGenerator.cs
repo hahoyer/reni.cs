@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -23,8 +23,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
+using hw.Debug;
+using hw.Helper;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Runtime;
@@ -46,8 +46,8 @@ namespace Reni.Code
             {
                 var start = String.Format("\nvar data = Data.Create({0})", _temporaryByteCount);
                 return _data
-                           .Aggregate(start, (x, y) => x + ";\n" + y)
-                       + ";\n";
+                    .Aggregate(start, (x, y) => x + ";\n" + y)
+                    + ";\n";
             }
         }
 
@@ -95,8 +95,8 @@ namespace Reni.Code
         {
             AddCode
                 ("data.Push({0}(data.Pull({1})))"
-                 , Generator.FunctionName(functionId)
-                 , argsAndRefsSize.SaveByteCount
+                    , Generator.FunctionName(functionId)
+                    , argsAndRefsSize.SaveByteCount
                 );
         }
 
@@ -104,9 +104,9 @@ namespace Reni.Code
         {
             AddCode
                 ("data.Push(data.Get({0}, {1}){2})"
-                 , dataSize.ByteCount
-                 , offset.SaveByteCount
-                 , BitCast(size, dataSize)
+                    , dataSize.ByteCount
+                    , offset.SaveByteCount
+                    , BitCast(size, dataSize)
                 );
         }
 
@@ -114,9 +114,9 @@ namespace Reni.Code
         {
             AddCode
                 ("data.Push(frame.Get({0}, {1}){2})"
-                 , dataSize.ByteCount
-                 , offset.SaveByteCount
-                 , BitCast(size, dataSize)
+                    , dataSize.ByteCount
+                    , offset.SaveByteCount
+                    , BitCast(size, dataSize)
                 );
         }
 
@@ -124,10 +124,10 @@ namespace Reni.Code
         {
             AddCode
                 ("data.Push({0}.Get({1}, {2}){3})"
-                 , holder
-                 , dataSize.ByteCount
-                 , offset.SaveByteCount
-                 , BitCast(size, dataSize)
+                    , holder
+                    , dataSize.ByteCount
+                    , offset.SaveByteCount
+                    , BitCast(size, dataSize)
                 );
         }
 
@@ -135,9 +135,9 @@ namespace Reni.Code
         {
             AddCode
                 ("data.Push(data.Pull({0}).DePointer({1}){2})"
-                 , RefBytes
-                 , dataSize.ByteCount
-                 , BitCast(size, dataSize)
+                    , RefBytes
+                    , dataSize.ByteCount
+                    , BitCast(size, dataSize)
                 );
         }
 
@@ -150,9 +150,9 @@ namespace Reni.Code
             else
                 AddCode
                     ("data.{0}Prefix(sizeBytes:{1}, argBytes:{2})"
-                     , operation
-                     , sizeBytes
-                     , argBytes
+                        , operation
+                        , sizeBytes
+                        , argBytes
                     );
         }
 
@@ -163,10 +163,10 @@ namespace Reni.Code
             var rightBytes = rightSize.SaveByteCount;
             AddCode
                 ("data.{0}(sizeBytes:{1}, leftBytes:{2}, rightBytes:{3})"
-                 , opToken
-                 , sizeBytes
-                 , leftBytes
-                 , rightBytes
+                    , opToken
+                    , sizeBytes
+                    , leftBytes
+                    , rightBytes
                 );
         }
 

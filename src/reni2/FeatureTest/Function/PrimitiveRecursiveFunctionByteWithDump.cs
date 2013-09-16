@@ -23,8 +23,8 @@
 using System.Linq;
 using System.Collections.Generic;
 using System;
-using HWClassLibrary.Debug;
-using HWClassLibrary.UnitTest;
+using hw.Debug;
+using hw.UnitTest;
 using Reni.FeatureTest.BitArrayOp;
 using Reni.FeatureTest.Structure;
 using Reni.FeatureTest.ThenElse;

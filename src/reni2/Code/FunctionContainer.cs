@@ -23,8 +23,8 @@
 using System.Linq;
 using System.Collections.Generic;
 using System;
-using HWClassLibrary.Debug;
-using HWClassLibrary.TreeStructure;
+using hw.Debug;
+using hw.TreeStructure;
 using Reni.Validation;
 
 namespace Reni.Code

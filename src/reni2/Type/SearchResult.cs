@@ -20,10 +20,10 @@
 
 #endregion
 
-using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using hw.Debug;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
@@ -33,7 +33,6 @@ namespace Reni.Type
 {
     abstract class SearchResult : DumpableObject, ISearchResult
     {
-        static int _nextObjectId;
         [EnableDump]
         internal readonly IFeatureImplementation Feature;
 

@@ -24,14 +24,13 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
-using HWClassLibrary.TreeStructure;
+using hw.Debug;
+using hw.Helper;
+using hw.Parser;
+using hw.TreeStructure;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
-using Reni.Feature;
-using Reni.Parser;
 using Reni.ReniParser;
 using Reni.Struct;
 using Reni.TokenClasses;
@@ -54,8 +53,10 @@ namespace Reni.Syntax
 
         [DisableDump]
         internal bool IsLambda { get { return GetIsLambda(); } }
+
         [DisableDump]
         internal virtual bool? IsDataLess { get { return IsLambda ? (bool?) true : null; } }
+
         [DisableDump]
         internal virtual string DumpPrintText
         {
@@ -65,6 +66,7 @@ namespace Reni.Syntax
                 return null;
             }
         }
+
         [DisableDump]
         internal virtual bool IsImplicit { get { throw new NotImplementedException(); } }
 
@@ -145,6 +147,5 @@ namespace Reni.Syntax
             NotImplementedMethod(context, category);
             return null;
         }
-
     }
 }

@@ -1,8 +1,7 @@
-﻿#region Copyright (C) 2012
+﻿#region Copyright (C) 2013
 
-// 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -24,12 +23,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HWClassLibrary.Debug;
+using hw.Debug;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
-using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Sequence
@@ -53,9 +51,12 @@ namespace Reni.Sequence
 
         [DisableDump]
         internal override IContextReference ObjectReference { get { return GetObjectReference(); } }
+
         internal override Root RootContext { get { return _objectType.RootContext; } }
+
         [DisableDump]
         IContextReference IFunctionFeature.ObjectReference { get { return ObjectReference; } }
+
         [DisableDump]
         bool IFunctionFeature.IsImplicit { get { return false; } }
 

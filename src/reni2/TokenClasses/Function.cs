@@ -20,11 +20,11 @@
 
 #endregion
 
-using HWClassLibrary.Debug;
+using hw.Debug;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Reni.Parser;
+using hw.Parser;
 using Reni.ReniParser;
 using Reni.Validation;
 

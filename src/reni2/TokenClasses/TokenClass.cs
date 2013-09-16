@@ -1,7 +1,7 @@
 #region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2013 Harald Hoyer
+//     Copyright (C) 2013 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -20,12 +20,11 @@
 
 #endregion
 
-using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using HWClassLibrary.Parser;
-using Reni.Parser;
+using hw.Parser;
+using hw.PrioParser;
 using Reni.ReniParser;
 
 namespace Reni.TokenClasses
@@ -33,27 +32,27 @@ namespace Reni.TokenClasses
     /// <summary>
     ///     Base clas for compiler tokens
     /// </summary>
-    abstract class TokenClass : Parser.TokenClass, IOperator<ParsedSyntax>
+    abstract class TokenClass : hw.Parser.TokenClass, IOperator<ParsedSyntax>
     {
         protected override sealed IParsedSyntax Create
             (IParsedSyntax left
-             , IPart<IParsedSyntax> token
-             , IParsedSyntax right
+                , IPart<IParsedSyntax> token
+                , IParsedSyntax right
             )
         {
             return
-                this.Operation((ParsedSyntax)left, (TokenData)token, (ParsedSyntax)right);
+                this.Operation((ParsedSyntax) left, (TokenData) token, (ParsedSyntax) right);
         }
 
-        ParsedSyntax IOperator<ParsedSyntax>.Terminal(IOperatorPart token) { return Terminal((TokenData)token); }
-        ParsedSyntax IOperator<ParsedSyntax>.Prefix(IOperatorPart token, ParsedSyntax right) { return Prefix((TokenData)token, right); }
-        ParsedSyntax IOperator<ParsedSyntax>.Suffix(ParsedSyntax left, IOperatorPart token) { return Suffix(left, (TokenData)token); }
-        ParsedSyntax IOperator<ParsedSyntax>.Infix(ParsedSyntax left, IOperatorPart token, ParsedSyntax right) { return Infix(left, (TokenData)token, right); }
+        ParsedSyntax IOperator<ParsedSyntax>.Terminal(IOperatorPart token) { return Terminal((TokenData) token); }
+        ParsedSyntax IOperator<ParsedSyntax>.Prefix(IOperatorPart token, ParsedSyntax right) { return Prefix((TokenData) token, right); }
+        ParsedSyntax IOperator<ParsedSyntax>.Suffix(ParsedSyntax left, IOperatorPart token) { return Suffix(left, (TokenData) token); }
+        ParsedSyntax IOperator<ParsedSyntax>.Infix(ParsedSyntax left, IOperatorPart token, ParsedSyntax right) { return Infix(left, (TokenData) token, right); }
 
         protected virtual ParsedSyntax Syntax
             (ParsedSyntax left
-             , TokenData token
-             , ParsedSyntax right
+                , TokenData token
+                , ParsedSyntax right
             )
         {
             NotImplementedMethod(left, token, right);

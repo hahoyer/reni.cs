@@ -23,12 +23,12 @@
 using System.Linq;
 using System.Collections.Generic;
 using System;
-using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
+using hw.Debug;
+using hw.Helper;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Parser;
+using hw.Parser;
 using Reni.Struct;
 using Reni.Syntax;
 

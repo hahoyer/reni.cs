@@ -23,11 +23,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HWClassLibrary.Debug;
-using HWClassLibrary.TreeStructure;
+using hw.Debug;
+using hw.Parser;
+using hw.TreeStructure;
 using Reni.Basics;
 using Reni.Context;
-using Reni.Parser;
 
 namespace Reni.Syntax
 {
@@ -55,6 +55,7 @@ namespace Reni.Syntax
 
         [DisableDump]
         internal override TokenData FirstToken { get { return Token; } }
+
         [DisableDump]
         internal override TokenData LastToken { get { return Token; } }
     }
@@ -83,10 +84,13 @@ namespace Reni.Syntax
         }
 
         protected override string GetNodeDump() { return base.GetNodeDump() + "(" + _right.NodeDump + ")"; }
+
         [DisableDump]
         internal override TokenData FirstToken { get { return Token; } }
+
         [DisableDump]
         internal override TokenData LastToken { get { return _right.LastToken; } }
+
         [DisableDump]
         protected override ParsedSyntaxBase[] Children { get { return new ParsedSyntaxBase[] {null, _right}; } }
     }
@@ -139,10 +143,13 @@ namespace Reni.Syntax
             result += ")";
             return result;
         }
+
         [DisableDump]
         internal override TokenData FirstToken { get { return _left.FirstToken; } }
+
         [DisableDump]
         internal override TokenData LastToken { get { return _right.LastToken; } }
+
         [DisableDump]
         protected override ParsedSyntaxBase[] Children { get { return new ParsedSyntaxBase[] {_left, _right}; } }
     }
@@ -179,8 +186,10 @@ namespace Reni.Syntax
 
         [DisableDump]
         internal override TokenData FirstToken { get { return _left.FirstToken; } }
+
         [DisableDump]
         internal override TokenData LastToken { get { return Token; } }
+
         [DisableDump]
         protected override ParsedSyntaxBase[] Children { get { return new ParsedSyntaxBase[] {_left}; } }
     }

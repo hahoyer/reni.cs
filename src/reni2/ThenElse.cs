@@ -23,12 +23,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HWClassLibrary.Debug;
-using HWClassLibrary.TreeStructure;
+using hw.Debug;
+using hw.Parser;
+using hw.TreeStructure;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Context;
-using Reni.Parser;
 using Reni.ReniParser;
 using Reni.Syntax;
 using Reni.Type;
@@ -61,6 +61,7 @@ namespace Reni
         }
 
         internal override Result ObtainResult(ContextBase context, Category category) { return InternalResult(context, category); }
+
         [DisableDump]
         protected override ParsedSyntaxBase[] Children { get { return new ParsedSyntaxBase[] {Cond, Then, Else}; } }
 

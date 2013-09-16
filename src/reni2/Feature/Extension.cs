@@ -23,8 +23,8 @@
 using System.Linq;
 using System.Collections.Generic;
 using System;
-using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
+using hw.Debug;
+using hw.Helper;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
@@ -70,6 +70,7 @@ namespace Reni.Feature
 
         internal static MetaFunction Feature(Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result> function) { return _metaFunctionCache[function]; }
 
+#pragma warning disable 0414
         [UsedImplicitly]
         static bool _isPrettySearchPathHumanFriendly = true;
 

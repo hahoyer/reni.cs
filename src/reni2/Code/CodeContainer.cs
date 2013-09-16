@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2012 - 2012 Harald Hoyer
+//     Copyright (C) 2012 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -24,9 +24,9 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using System.Reflection;
-using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
-using HWClassLibrary.TreeStructure;
+using hw.Debug;
+using hw.Helper;
+using hw.TreeStructure;
 using Reni.Context;
 using Reni.ReniParser;
 using Reni.Struct;
@@ -63,11 +63,12 @@ namespace Reni.Code
         {
             get
             {
-                for (var i = 0; i < _rootContext.FunctionCount; i++)
+                for(var i = 0; i < _rootContext.FunctionCount; i++)
                     _functions.IsValid(i, true);
                 return _functions;
             }
         }
+
         Container Main { get { return _mainCache.Value; } }
 
         internal void Execute(IExecutionContext context) { Main.Data.Execute(context); }
@@ -94,7 +95,7 @@ namespace Reni.Code
         public override string DumpData()
         {
             var result = "main\n" + Main.Dump() + "\n";
-            for (var i = 0; i < _rootContext.FunctionCount; i++)
+            for(var i = 0; i < _rootContext.FunctionCount; i++)
                 result += "function index=" + i + "\n" + _functions[i].Dump() + "\n";
             return result;
         }

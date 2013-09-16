@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2012 - 2012 Harald Hoyer
+//     Copyright (C) 2012 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -23,8 +23,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using System;
-using HWClassLibrary.Debug;
-using HWClassLibrary.UnitTest;
+using hw.UnitTest;
 using Reni.FeatureSearch;
 using Reni.Parser;
 
@@ -33,7 +32,8 @@ namespace Reni.FeatureTest.Structure
     [TestFixture]
     [Target(@"(1, 2, 3, 4, 5, 6) dump_print")]
     [Output("(1, 2, 3, 4, 5, 6)")]
-    [PrioTableTest, UnitTest]
+    [PrioTableTest]
+    [UnitTest]
     public sealed class DumpPrint : CompilerTest
     {
         [Test]

@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2012 - 2012 Harald Hoyer
+//     Copyright (C) 2012 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -23,7 +23,6 @@
 using System.Linq;
 using System.Collections.Generic;
 using System;
-using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Context;
 
@@ -52,7 +51,7 @@ namespace Reni.Code
 
 
             var castedIndex = index.BitCast(Root.DefaultRefAlignParam.RefSize);
-            if (elementSize.ToInt64() == 1)
+            if(elementSize.ToInt64() == 1)
                 return castedIndex;
             return (castedIndex + CodeBase.BitsConst(elementSize))
                 .Add(AddressMultiply);

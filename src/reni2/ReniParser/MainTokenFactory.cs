@@ -20,23 +20,22 @@
 
 #endregion
 
-using HWClassLibrary.Helper;
-using HWClassLibrary.Parser;
-using Reni.Context;
-using Reni.Feature;
-using Reni.Feature.DumpPrint;
-using Reni.Parser;
-using Reni.Sequence;
-using Reni.Struct;
-using Reni.TokenClasses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HWClassLibrary.Debug;
+using hw.Helper;
+using hw.Parser;
+using hw.PrioParser;
+using Reni.Context;
+using Reni.Feature;
+using Reni.Feature.DumpPrint;
+using Reni.Sequence;
+using Reni.Struct;
+using Reni.TokenClasses;
 
 namespace Reni.ReniParser
 {
-    sealed class MainTokenFactory : Parser.TokenFactory<TokenClasses.TokenClass>
+    sealed class MainTokenFactory : TokenFactory<TokenClasses.TokenClass>
     {
         public MainTokenFactory(PrioTable prioTable)
             : base(prioTable) { }
@@ -162,7 +161,7 @@ namespace Reni.ReniParser
 
         protected override TokenClasses.TokenClass GetEndOfText() { return new RightParenthesis(0); }
         protected override TokenClasses.TokenClass GetBeginOfText() { return new LeftParenthesis(0); }
-        protected override TokenClasses.TokenClass GetNumber() { return new TokenClasses.Number(); }
+        protected override TokenClasses.TokenClass GetNumber() { return new Number(); }
         protected override TokenClasses.TokenClass GetTokenClass(string name) { return new UserSymbol(name); }
         protected override TokenClasses.TokenClass GetSyntaxError(string message) { return new SyntaxError(message); }
         protected override TokenClasses.TokenClass GetText() { return new Text(); }

@@ -23,10 +23,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HWClassLibrary.Debug;
+using hw.Parser;
 using Reni.Basics;
 using Reni.Context;
-using Reni.Parser;
 using Reni.ReniParser;
 using Reni.Syntax;
 using Reni.Validation;
@@ -42,10 +41,14 @@ namespace Reni.TokenClasses
 
     abstract class TerminalToken : Special, ITerminal
     {
-        sealed protected override ParsedSyntax Terminal(TokenData token) { return new TerminalSyntax(token, this); }
-        sealed protected override ParsedSyntax Prefix(TokenData token, ParsedSyntax right) { return LeftAndRightMustBeNull(null, right); }
-        sealed protected override ParsedSyntax Suffix(ParsedSyntax left, TokenData token) { return LeftAndRightMustBeNull(left, null); ; }
-        sealed protected override ParsedSyntax Infix(ParsedSyntax left, TokenData token, ParsedSyntax right) { return LeftAndRightMustBeNull(left, right); }
+        protected override sealed ParsedSyntax Terminal(TokenData token) { return new TerminalSyntax(token, this); }
+        protected override sealed ParsedSyntax Prefix(TokenData token, ParsedSyntax right) { return LeftAndRightMustBeNull(null, right); }
+        protected override sealed ParsedSyntax Suffix(ParsedSyntax left, TokenData token)
+        {
+            return LeftAndRightMustBeNull(left, null);
+            ;
+        }
+        protected override sealed ParsedSyntax Infix(ParsedSyntax left, TokenData token, ParsedSyntax right) { return LeftAndRightMustBeNull(left, right); }
         protected abstract CompileSyntaxError LeftAndRightMustBeNull(ParsedSyntax left, ParsedSyntax right);
 
         public abstract Result Result(ContextBase context, Category category, TokenData token);
@@ -118,9 +121,9 @@ namespace Reni.TokenClasses
         {
             return new InfixSyntax
                 (token
-                 , left.CheckedToCompiledSyntax(token, LeftMustNotBeNullError)
-                 , this
-                 , right.CheckedToCompiledSyntax(token, RightMustNotBeNullError)
+                    , left.CheckedToCompiledSyntax(token, LeftMustNotBeNullError)
+                    , this
+                    , right.CheckedToCompiledSyntax(token, RightMustNotBeNullError)
                 );
         }
     }

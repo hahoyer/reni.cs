@@ -24,7 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using HWClassLibrary.Debug;
+using hw.Debug;
 using JetBrains.Annotations;
 using Reni.Basics;
 

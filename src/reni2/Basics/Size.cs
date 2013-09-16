@@ -1,5 +1,7 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+#region Copyright (C) 2013
+
+//     Project Reni2
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,27 +18,29 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using HWClassLibrary.Debug;
-using HWClassLibrary.TreeStructure;
-using HWClassLibrary.UnitTest;
+using hw.Debug;
+using hw.TreeStructure;
+using hw.UnitTest;
 using JetBrains.Annotations;
 
 namespace Reni.Basics
 {
     [AdditionalNodeInfo("DebuggerDumpString")]
     [DebuggerDisplay("{NodeDump,nq}")]
-    internal sealed class Size : DumpableObject, IIconKeyProvider, IComparable<Size>
+    sealed class Size : DumpableObject, IIconKeyProvider, IComparable<Size>
     {
-        private static readonly Hashtable _values = new Hashtable();
-        private readonly int _value;
-        private static int _nextObjectId;
+        static readonly Hashtable _values = new Hashtable();
+        readonly int _value;
+        static int _nextObjectId;
 
-        private Size(int value)
+        Size(int value)
             : base(_nextObjectId++) { _value = value; }
 
         public bool IsZero { get { return _value == 0; } }
@@ -63,7 +67,7 @@ namespace Reni.Basics
         {
             var size = 1;
             var xn = value >= 0 ? value : -value;
-            for (Int64 upper = 1; xn >= upper; size++, upper *= 2)
+            for(Int64 upper = 1; xn >= upper; size++, upper *= 2)
                 continue;
             return Create(size);
         }
@@ -94,7 +98,7 @@ namespace Reni.Basics
             throw new NotAlignableException(this, alignBits);
         }
 
-        private int SaveSizeToPacketCount(int alignBits)
+        int SaveSizeToPacketCount(int alignBits)
         {
             AssertAlignedSize(alignBits);
             return SizeToPacketCount(alignBits);
@@ -102,9 +106,9 @@ namespace Reni.Basics
 
         public int ToInt() { return _value; }
 
-        private bool LessThan(Size x) { return _value < x._value; }
+        bool LessThan(Size x) { return _value < x._value; }
 
-        private Size Modulo(Size x) { return Create(_value%x._value); }
+        Size Modulo(Size x) { return Create(_value % x._value); }
 
         public static bool operator <(Size x, Size y) { return x.LessThan(y); }
 
@@ -144,19 +148,19 @@ namespace Reni.Basics
 
         public static Size Multiply(int x, Size y) { return y.Times(x); }
 
-        private Size Plus(int y) { return Create(_value + y); }
+        Size Plus(int y) { return Create(_value + y); }
 
-        private Size Times(int y) { return Create(_value*y); }
+        Size Times(int y) { return Create(_value * y); }
 
-        private Size Minus(int y) { return Create(_value - y); }
+        Size Minus(int y) { return Create(_value - y); }
 
-        private Size Divide(int y) { return Create(_value/y); }
+        Size Divide(int y) { return Create(_value / y); }
 
-        private Size Plus(Size y) { return Create(_value + y._value); }
+        Size Plus(Size y) { return Create(_value + y._value); }
 
-        private int Divide(Size y) { return _value/y._value; }
+        int Divide(Size y) { return _value / y._value; }
 
-        private Size Minus(Size y) { return Create(_value - y._value); }
+        Size Minus(Size y) { return Create(_value - y._value); }
 
         public Size Max(Size x)
         {
@@ -182,9 +186,9 @@ namespace Reni.Basics
         public override string ToString() { return ToInt().ToString(); }
 
         [TestFixture]
-        private sealed class Tests
+        sealed class Tests
         {
-            private static void TestNextPacketSize(int x, int b)
+            static void TestNextPacketSize(int x, int b)
             {
                 var xs = Create(x);
                 Tracer.Assert(xs.NextPacketSize(BitsConst.SegmentAlignBits) == Create(b));
@@ -223,12 +227,12 @@ namespace Reni.Basics
             {
                 if(IsPositive)
                     return this;
-                return this*-1;
+                return this * -1;
             }
         }
     }
 
-    internal sealed class NotAlignableException : Exception
+    sealed class NotAlignableException : Exception
     {
         [EnableDump]
         internal readonly int Bits;
@@ -246,7 +250,7 @@ namespace Reni.Basics
     /// <summary>
     ///     Array of size objects
     /// </summary>
-    internal sealed class SizeArray : List<Size>
+    sealed class SizeArray : List<Size>
     {
         /// <summary>
         ///     obtain size

@@ -20,7 +20,7 @@
 
 #endregion
 
-using HWClassLibrary.UnitTest;
+using hw.UnitTest;
 using Reni.FeatureTest.Structure;
 
 namespace Reni.FeatureTest.BlogExamples

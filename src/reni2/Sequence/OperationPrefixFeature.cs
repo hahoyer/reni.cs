@@ -1,4 +1,4 @@
-using HWClassLibrary.Debug;
+using hw.Debug;
 using Reni.Code;
 using Reni.Feature;
 using Reni.Type;

@@ -23,10 +23,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HWClassLibrary.Debug;
+using hw.Debug;
 using Reni.Basics;
 using Reni.Context;
-using Reni.Parser;
+using hw.Parser;
 using Reni.ReniParser;
 using Reni.Validation;
 

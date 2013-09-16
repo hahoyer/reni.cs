@@ -19,7 +19,7 @@
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 #>
 <#@ template language="C#" #>
-<#@ import namespace="global::HWClassLibrary.Helper" #>
+<#@ import namespace="global::hw.Helper" #>
 <#@ import namespace="global::Reni.Basics" #>
 
 using System;

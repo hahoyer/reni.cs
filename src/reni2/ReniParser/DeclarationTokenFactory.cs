@@ -1,7 +1,7 @@
-﻿#region Copyright (C) 2012
+﻿#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -23,15 +23,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
-using HWClassLibrary.Parser;
-using Reni.Parser;
+using hw.Helper;
+using hw.PrioParser;
 using Reni.TokenClasses;
 
 namespace Reni.ReniParser
 {
-    sealed class DeclarationTokenFactory : Parser.TokenFactory<TokenClasses.TokenClass>
+    sealed class DeclarationTokenFactory : hw.Parser.TokenFactory<TokenClass>
     {
         public DeclarationTokenFactory()
             : base(PrioTable) { }
@@ -53,14 +51,14 @@ namespace Reni.ReniParser
             }
         }
 
-        protected override FunctionCache<string, TokenClasses.TokenClass> GetPredefinedTokenClasses()
+        protected override FunctionCache<string, TokenClass> GetPredefinedTokenClasses()
         {
-            return new FunctionCache<string, TokenClasses.TokenClass>
+            return new FunctionCache<string, TokenClass>
             {
                 {"converter", new ConverterToken()},
             };
         }
 
-        protected override TokenClasses.TokenClass GetSyntaxError(string message) { return new SyntaxError(message); }
+        protected override TokenClass GetSyntaxError(string message) { return new SyntaxError(message); }
     }
 }

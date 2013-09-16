@@ -20,15 +20,14 @@
 
 #endregion
 
-using HWClassLibrary.Debug;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HWClassLibrary.TreeStructure;
+using hw.Debug;
+using hw.Parser;
+using hw.TreeStructure;
 using Reni.Basics;
 using Reni.Context;
-using Reni.Feature;
-using Reni.Parser;
 using Reni.Syntax;
 using Reni.TokenClasses;
 
@@ -67,8 +66,8 @@ namespace Reni.ReniParser
 
             if(searchResult == null)
                 return UndefinedSymbolIssue.Type(context, this).IssueResult(category);
-            
-            var result = searchResult.FunctionResult(context, category, this); 
+
+            var result = searchResult.FunctionResult(context, category, this);
             Tracer.Assert(category <= result.CompleteCategory);
             return result;
         }
@@ -84,10 +83,13 @@ namespace Reni.ReniParser
                 result += "(" + Right.NodeDump + ")";
             return result;
         }
+
         [DisableDump]
         protected override ParsedSyntaxBase[] Children { get { return new ParsedSyntaxBase[] {Left, Right}; } }
+
         [DisableDump]
         internal override TokenData FirstToken { get { return Left == null ? Token : Left.FirstToken; } }
+
         [DisableDump]
         internal override TokenData LastToken { get { return Right == null ? Token : Right.LastToken; } }
 
@@ -103,7 +105,6 @@ namespace Reni.ReniParser
                 return result;
             }
         }
-
     }
 
     // Lord of the weed

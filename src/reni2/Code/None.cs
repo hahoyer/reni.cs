@@ -24,7 +24,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using System;
-using HWClassLibrary.Debug;
+using hw.Debug;
 
 namespace Reni.Code
 {

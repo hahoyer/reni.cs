@@ -23,7 +23,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using System;
-using HWClassLibrary.Debug;
+using hw.Debug;
 using Reni.Feature;
 
 namespace Reni.Type
