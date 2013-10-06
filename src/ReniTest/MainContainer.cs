@@ -116,7 +116,7 @@ ParLevel ( { ) }
             }
 
             [DebuggerHidden]
-            static void InternalTest(Type type, string expectedTypeName) { Tracer.Assert(1, type.PrettyName() == expectedTypeName, () => type + "\nFound   : " + type.PrettyName() + "\nExpected: " + expectedTypeName); }
+            static void InternalTest(Type type, string expectedTypeName) { Tracer.Assert(type.PrettyName() == expectedTypeName, () => type + "\nFound   : " + type.PrettyName() + "\nExpected: " + expectedTypeName,stackFrameDepth:1); }
         }
     }
 }

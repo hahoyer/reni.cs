@@ -42,19 +42,19 @@ namespace Reni.FeatureTest
         static Dictionary<System.Type, CompilerTest> _cache;
         bool _needToRunDependants = true;
 
-        internal void CreateFileAndRunCompiler(string name, string text, string expectedOutput = null, Action<Compiler> expectedResult = null) { CreateFileAndRunCompiler(1, name, new TargetSetData(text, expectedOutput), expectedResult); }
+        internal void CreateFileAndRunCompiler(string name, string text, string expectedOutput = null, Action<Compiler> expectedResult = null) { CreateFileAndRunCompiler(name, new TargetSetData(text, expectedOutput), expectedResult, 1); }
 
-        void CreateFileAndRunCompiler(int depth, string name, TargetSetData targetSetData, Action<Compiler> expectedResult)
+        void CreateFileAndRunCompiler(string name, TargetSetData targetSetData, Action<Compiler> expectedResult, int stackFrameDepth = 0)
         {
             var fileName = name + ".reni";
             var f = fileName.FileHandle();
             f.String = targetSetData.Target;
-            InternalRunCompiler(depth + 1, fileName, expectedResult, targetSetData);
+            InternalRunCompiler(fileName, expectedResult, targetSetData, stackFrameDepth + 1);
         }
 
-        void InternalRunCompiler(int depth, string fileName, Action<Compiler> expectedResult, TargetSetData targetSet)
+        void InternalRunCompiler(string fileName, Action<Compiler> expectedResult, TargetSetData targetSet, int stackFrameDepth = 0)
         {
-            Tracer.FlaggedLine(depth + 1, "Position of method tested", FilePositionTag.Test);
+            Tracer.FlaggedLine("Position of method tested", FilePositionTag.Test, stackFrameDepth: stackFrameDepth+1);
             if(TestRunner.IsModeErrorFocus)
                 Parameters.Trace.All();
 
@@ -110,7 +110,7 @@ namespace Reni.FeatureTest
                 _cache = new Dictionary<System.Type, CompilerTest>();
 
             foreach(var tuple in TargetSet)
-                CreateFileAndRunCompiler(depth + 1, GetType().PrettyName(), tuple, AssertValid);
+                CreateFileAndRunCompiler(GetType().PrettyName(), tuple, AssertValid, depth + 1);
         }
 
 

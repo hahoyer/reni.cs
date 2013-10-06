@@ -537,7 +537,7 @@ namespace Reni.Basics
             public MissingMethodException(string operation)
             {
                 _operation = operation;
-                Tracer.ThrowAssertionFailed(1, "", () => Tracer.Dump(this));
+                Tracer.ThrowAssertionFailed( "", () => Tracer.Dump(this),stackFrameDepth:1);
             }
         }
     }

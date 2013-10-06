@@ -39,40 +39,41 @@ namespace Reni.FeatureSearch
 
             var feature = type.Search(symbol);
             Tracer.Assert(feature != null);
+            Tracer.Assert(false);
         }
-    }
 
-    abstract class SymbolBase : DumpableObject
-    {
-        internal virtual Feature GetFeature(TypeBase type) { return null; }
-    }
-
-    sealed class Symbol : SymbolBase
-    {
-        internal override Feature GetFeature(TypeBase type) { return type.GetFeature<Symbol>(); }
-    }
-
-    abstract class TypeBase : DumpableObject
-    {
-        public Feature Search(SymbolBase symbol) { return symbol.GetFeature(this); }
-
-        public Feature GetFeature<T>()
+        abstract class SymbolBase : DumpableObject
         {
-            var provider = this as ISymbolProvider<T>;
-            return provider == null ? null : provider.Feature;
+            internal virtual Feature GetFeature(TypeBase type) { return null; }
         }
-    }
 
-    interface ISymbolProvider<T>
-    {
-        Feature Feature { get; }
-    }
+        sealed class Symbol : SymbolBase
+        {
+            internal override Feature GetFeature(TypeBase type) { return type.GetFeature<Symbol>(); }
+        }
 
-    sealed class Type : TypeBase, ISymbolProvider<Symbol>
-    {
-        public Feature Feature { get { return new Feature(); } }
-    }
+        abstract class TypeBase : DumpableObject
+        {
+            public Feature Search(SymbolBase symbol) { return symbol.GetFeature(this); }
 
-    class Feature : DumpableObject
-    {}
+            public Feature GetFeature<T>()
+            {
+                var provider = this as ISymbolProvider<T>;
+                return provider == null ? null : provider.Feature;
+            }
+        }
+
+        interface ISymbolProvider<T>
+        {
+            Feature Feature { get; }
+        }
+
+        sealed class Type : TypeBase, ISymbolProvider<Symbol>
+        {
+            public Feature Feature { get { return new Feature(); } }
+        }
+
+        class Feature : DumpableObject
+        {}
+    }
 }

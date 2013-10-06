@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2012 - 2012 Harald Hoyer
+//     Copyright (C) 2012 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -23,8 +23,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.Debug;
 using hw.UnitTest;
+using Reni.FeatureSearch;
 
 namespace Reni.FeatureTest.Array
 {
@@ -32,6 +32,7 @@ namespace Reni.FeatureTest.Array
     [SimpleArrayFromPiece]
     [Target("(<<5<<3<<5<<1) dump_print")]
     [Output("array(#(#align3#)# (bit)sequence(4),(5, 3, 5, 1))")]
+    [UnitTest]
     public sealed class ArrayFromPieces : CompilerTest
     {
         [Test]
