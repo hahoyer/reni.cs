@@ -38,8 +38,9 @@ namespace Reni
         }
         public string Code()
         {
-            const string fileName = "temptest.reni";
+            var fileName = Environment.GetEnvironmentVariable("temp") + "\\reni\\T4Compiler.reni";
             var f = fileName.FileHandle();
+            f.AssumeDirectoryOfFileExists();
             f.String = _text;
             var compiler = new Compiler(fileName, className: _className);
             return compiler.CSharpCode;
