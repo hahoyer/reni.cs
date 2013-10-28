@@ -1,6 +1,6 @@
 #region Copyright (C) 2013
 
-//     Project Reni2
+//     Project hw.nuget
 //     Copyright (C) 2013 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
@@ -20,31 +20,33 @@
 
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
-using System.Threading;
-using hw.Helper;
+using System.Windows.Forms;
+using hw.Forms;
 
-namespace Reni
+namespace hw.TreeStructure
 {
-    public sealed class T4Compiler
+    public sealed partial class TreeForm : Form
     {
-        readonly string _text;
-        readonly string _className;
-        public T4Compiler(string text, string className = "Reni")
+        readonly PositionConfig _positionConfig;
+        object _target;
+        public TreeForm()
         {
-            _text = text;
-            _className = className;
+            InitializeComponent();
+            _positionConfig = new PositionConfig(this);
         }
-        public string Code()
+
+        public object Target
         {
-            var fileName = Environment.GetEnvironmentVariable("temp") + "\\reni\\T4Compiler.reni";
-            var f = fileName.FileHandle();
-            f.AssumeDirectoryOfFileExists();
-            f.String = _text;
-            var compiler = new Compiler(fileName, className: _className);
-            return compiler.CSharpCode;
+            get { return _target; }
+            set
+            {
+                _target = value;
+                treeView1.Connect(_target);
+                Text = _target.GetAdditionalInfo();
+            }
         }
     }
 }
