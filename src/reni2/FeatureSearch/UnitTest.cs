@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.UnitTest;
+using Reni.Basics;
 
 namespace Reni.FeatureSearch
 {
@@ -39,7 +40,27 @@ namespace Reni.FeatureSearch
 
             var feature = type.Search(symbol);
             Tracer.Assert(feature != null);
+        }
+
+        [Test]
+        public void DefinedAtParent()
+        {
+
+            var type = new TaggedType(new Type());
+            var symbol = new Symbol();
+
+            var feature = type.Search(symbol);
+            Tracer.Assert(feature != null);
             Tracer.Assert(false);
+        }
+
+        sealed class TaggedType : TypeBase
+        {
+            readonly TypeBase _parent;
+            public TaggedType(TypeBase parent) { _parent = parent; }
+
+            Result UnTagResult(Category category){}
+
         }
 
         abstract class SymbolBase : DumpableObject
@@ -49,7 +70,11 @@ namespace Reni.FeatureSearch
 
         sealed class Symbol : SymbolBase
         {
-            internal override Feature GetFeature(TypeBase type) { return type.GetFeature<Symbol>(); }
+            internal override Feature GetFeature(TypeBase type)
+            {
+                return type.GetFeature<Symbol>()
+                       ?? base.GetFeature(type);
+            }
         }
 
         abstract class TypeBase : DumpableObject
