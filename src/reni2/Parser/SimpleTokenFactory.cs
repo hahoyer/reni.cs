@@ -28,7 +28,7 @@ using hw.Graphics;
 using hw.Helper;
 using hw.Parser;
 using hw.PrioParser;
-using hw.TreeStructure;
+using hw.Forms;
 
 namespace Reni.Parser
 {

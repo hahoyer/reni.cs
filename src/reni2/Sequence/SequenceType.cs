@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Helper;
-using hw.TreeStructure;
+using hw.Forms;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
@@ -70,14 +70,14 @@ namespace Reni.Sequence
         Simple ConversionFeature(SequenceType destination)
         {       
             return destination.Count >= Count
-                ? Extension.Feature(c => ConversionAsReference(c, destination))
+                ? Reni.Feature.Extension.Feature(c => ConversionAsReference(c, destination))
                 : null;
         }
 
         internal Simple ConversionFeature(ArrayType destination)
         {
             return Parent == destination
-                ? Extension.Feature(PointerConversionResult)
+                ? Reni.Feature.Extension.Feature(PointerConversionResult)
                 : null;
         }
 

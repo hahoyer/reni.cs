@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Helper;
-using hw.TreeStructure;
+using hw.Forms;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
@@ -584,14 +584,14 @@ namespace Reni.Type
         Simple Convert(Aligner type)
         {
             if(type.Parent == this)
-                return Extension.Feature(PointerArgResult);
+                return Reni.Feature.Extension.Feature(PointerArgResult);
             return null;
         }
 
         protected virtual Simple Convert(TypeBase type)
         {
             if(type.TypeForConversion == TypeForConversion)
-                return Extension.Feature(DereferenceReferenceResult);
+                return Reni.Feature.Extension.Feature(DereferenceReferenceResult);
 
             return null;
         }

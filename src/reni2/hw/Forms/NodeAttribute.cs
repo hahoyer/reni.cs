@@ -23,10 +23,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Forms;
 using JetBrains.Annotations;
 
-namespace hw.TreeStructure
+namespace hw.Forms
 {
     /// <summary>
     ///     Attribute to define a subnode for treeview. Only for public properties. Only the first attribute is considered
@@ -36,59 +35,18 @@ namespace hw.TreeStructure
     public sealed class NodeAttribute : Attribute
     {
         public readonly string IconKey;
-
-        /// <summary>
-        ///     Default attribute to define a subnode for treeview. Property name will be used as title of subnode
-        /// </summary>
-        /// created 06.02.2007 23:35
-        public NodeAttribute() { }
+        public readonly string Name;
 
         /// <summary>
         ///     Attribute to define a subnode for treeview with title provided
         /// </summary>
         /// <param name="iconKey"> The icon key. </param>
+        /// <param name="name"></param>
         /// created 06.02.2007 23:35
-        public NodeAttribute(string iconKey) { IconKey = iconKey; }
-    }
-
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public sealed class SmartNodeAttribute : Attribute
-    {
-        public static TreeNode Process(TreeNode treeNode)
+        public NodeAttribute(string iconKey = null, string name = null)
         {
-            treeNode.CreateNodeList();
-            switch(treeNode.Nodes.Count)
-            {
-                case 0:
-                    return null;
-                case 1:
-                    var node = treeNode.Nodes[0];
-                    node.Text = treeNode.Text + " \\ " + node.Text;
-                    return Process(node);
-            }
-            return treeNode;
+            IconKey = iconKey;
+            Name = name;
         }
-    }
-
-    /// <summary>
-    ///     Provides Icon key for treeview
-    /// </summary>
-    public interface IIconKeyProvider
-    {
-        /// <summary>
-        ///     Gets the icon key.
-        /// </summary>
-        /// <value> The icon key. </value>
-        string IconKey { get; }
-    }
-
-    public interface ITreeNodeSupport
-    {
-        IEnumerable<TreeNode> CreateNodes();
-    }
-
-    public interface IAdditionalNodeInfoProvider
-    {
-        string AdditionalNodeInfo { get; }
     }
 }
