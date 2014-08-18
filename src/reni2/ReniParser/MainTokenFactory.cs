@@ -1,26 +1,4 @@
-﻿#region Copyright (C) 2013
-
-//     Project Reni2
-//     Copyright (C) 2011 - 2013 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-#endregion
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Helper;
@@ -35,7 +13,7 @@ using Reni.TokenClasses;
 
 namespace Reni.ReniParser
 {
-    sealed class MainTokenFactory : TokenFactory<TokenClasses.TokenClass>
+    sealed class MainTokenFactory : hw.Parser.TokenFactory<TokenClasses.TokenClass>
     {
         public MainTokenFactory(PrioTable prioTable)
             : base(prioTable) { }
@@ -115,6 +93,7 @@ namespace Reni.ReniParser
                     {"}", new RightParenthesis(1)},
                     {"]", new RightParenthesis(2)},
                     {")", new RightParenthesis(3)},
+                    {".", new ArgToken()},
                     {",", new List()},
                     {";", new List()},
                     {"@", new AtOperator()},
@@ -133,12 +112,11 @@ namespace Reni.ReniParser
                     {"+", new Sign()},
                     {"/", new Slash()},
                     {"/\\", new TokenClasses.Function()},
-                    {"/!\\", new TokenClasses.Function(isImplicit: true)},
+                    {"/!\\", new TokenClasses.Function(true)},
                     {"/\\/\\", new TokenClasses.Function(isMetaFunction: true)},
-                    {"/!\\/!\\", new TokenClasses.Function(isImplicit: true, isMetaFunction: true)},
+                    {"/!\\/!\\", new TokenClasses.Function(true, true)},
                     {"*", new Star()},
                     {"_A_T_", new AtToken()},
-                    {"arg", new ArgToken()},
                     {"dump_print", new DumpPrintToken()},
                     {"else", new ElseToken()},
                     {"enable_array_oversize", new EnableArrayOverSize()},
@@ -171,11 +149,5 @@ namespace Reni.ReniParser
     {
         readonly string _message;
         public SyntaxError(string message) { _message = message; }
-
-        protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
-        {
-            NotImplementedMethod(left, token, right);
-            return null;
-        }
     }
 }

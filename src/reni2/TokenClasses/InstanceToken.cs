@@ -33,7 +33,7 @@ namespace Reni.TokenClasses
 {
     sealed class InstanceToken : Infix, IPendingProvider
     {
-        protected override Result Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
+        public override Result Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
             return left
                 .Type(context)

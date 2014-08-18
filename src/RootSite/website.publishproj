@@ -42,10 +42,6 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     </AssemblyAttributes>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\HWClassLibrary\hw.csproj">
-      <Project>{0402FAE1-D5D6-490F-BC68-C26C8873C0B2}</Project>
-      <Name>HWClassLibrary</Name>
-    </ProjectReference>
     <ProjectReference Include="..\reni2\Reni2.csproj">
       <Project>{EBB73C84-6622-4183-A28F-B0DFF606006B}</Project>
       <Name>Reni2</Name>

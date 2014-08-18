@@ -1,26 +1,4 @@
-﻿#region Copyright (C) 2013
-
-//     Project Reni2
-//     Copyright (C) 2011 - 2013 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-#endregion
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Parser;
@@ -28,103 +6,54 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.ReniParser;
 using Reni.Syntax;
-using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
-    abstract class Special : TokenClass
+    abstract class TerminalToken : TokenClass, ITerminal
     {
-        protected static IssueId LeftMustNotBeNullError() { return IssueId.MissingLeftOperand; }
-        protected static IssueId RightMustNotBeNullError() { return IssueId.MissingRightOperand; }
-        protected static IssueId RightMustBeNullIssue() { return IssueId.UnexpectedRightOperand; }
-    }
-
-    abstract class TerminalToken : Special, ITerminal
-    {
-        protected override sealed ParsedSyntax Terminal(TokenData token) { return new TerminalSyntax(token, this); }
-        protected override sealed ParsedSyntax Prefix(TokenData token, ParsedSyntax right) { return LeftAndRightMustBeNull(null, right); }
-        protected override sealed ParsedSyntax Suffix(ParsedSyntax left, TokenData token)
-        {
-            return LeftAndRightMustBeNull(left, null);
-            ;
-        }
-        protected override sealed ParsedSyntax Infix(ParsedSyntax left, TokenData token, ParsedSyntax right) { return LeftAndRightMustBeNull(left, right); }
-        protected abstract CompileSyntaxError LeftAndRightMustBeNull(ParsedSyntax left, ParsedSyntax right);
-
+        protected override sealed ParsedSyntax TerminalSyntax(TokenData token) { return new TerminalSyntax(token, this); }
         public abstract Result Result(ContextBase context, Category category, TokenData token);
     }
 
-    abstract class NonPrefix : Special, ITerminal, ISuffix
+    abstract class NonPrefix : TokenClass, ITerminal, ISuffix
     {
-        protected override sealed ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
-        {
-            if(right != null)
-                return RightMustBeNull(right);
-            if(left == null)
-                return new TerminalSyntax(token, this);
-            return new SuffixSyntax(token, left.ToCompiledSyntax(), this);
-        }
-        protected abstract CompileSyntaxError RightMustBeNull(ParsedSyntax right);
+        protected override sealed ParsedSyntax TerminalSyntax(TokenData token) { return new TerminalSyntax(token, this); }
+        protected override sealed ParsedSyntax SuffixSyntax(ParsedSyntax left, TokenData token) { return new SuffixSyntax(token, left.ToCompiledSyntax(), this); }
         public abstract Result Result(ContextBase context, Category category, TokenData token);
         public abstract Result Result(ContextBase context, Category category, CompileSyntax left);
     }
 
-    abstract class NonSuffix : Special, ITerminal, IPrefix
+    abstract class NonSuffix : TokenClass, ITerminal, IPrefix
     {
-        protected override sealed ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
-        {
-            if(left != null)
-                return LeftMustBeNull(right);
-            if(right == null)
-                return new TerminalSyntax(token, this);
-            return new PrefixSyntax(token, this, right.ToCompiledSyntax());
-        }
-        protected abstract CompileSyntaxError LeftMustBeNull(ParsedSyntax left);
+        protected override ParsedSyntax TerminalSyntax(TokenData token) { return new TerminalSyntax(token, this); }
+        protected override ParsedSyntax PrefixSyntax(TokenData token, ParsedSyntax right) { return new PrefixSyntax(token, this, right.ToCompiledSyntax()); }
         public abstract Result Result(ContextBase context, Category category, TokenData token);
         public abstract Result Result(ContextBase context, Category category, TokenData token, CompileSyntax right);
     }
 
-    abstract class Prefix : Special, IPrefix
+    abstract class Prefix : TokenClass, IPrefix
     {
+        protected override ParsedSyntax PrefixSyntax(TokenData token, ParsedSyntax right) { return new PrefixSyntax(token, this, right.ToCompiledSyntax()); }
         public abstract Result Result(ContextBase context, Category category, TokenData token, CompileSyntax right);
-
-        protected override sealed ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
-        {
-            if(left != null)
-                return LeftMustBeNull(right);
-            return new PrefixSyntax(token, this, right.CheckedToCompiledSyntax(token, RightMustNotBeNullError));
-        }
-        protected abstract CompileSyntaxError LeftMustBeNull(ParsedSyntax left);
     }
 
-    abstract class Suffix : Special, ISuffix
+    abstract class Suffix : TokenClass, ISuffix
     {
-        Result ISuffix.Result(ContextBase context, Category category, CompileSyntax left) { return Result(context, category, left); }
-
-        protected abstract Result Result(ContextBase context, Category category, CompileSyntax left);
-
-        protected override sealed ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
-        {
-            if(right != null)
-                return right.MustBeNullError(RightMustBeNullIssue);
-            return new SuffixSyntax(token, left.CheckedToCompiledSyntax(token, LeftMustNotBeNullError), this);
-        }
+        protected override sealed ParsedSyntax SuffixSyntax(ParsedSyntax left, TokenData token) { return new SuffixSyntax(token, left.ToCompiledSyntax(), this); }
+        public abstract Result Result(ContextBase context, Category category, CompileSyntax left);
     }
 
-    abstract class Infix : Special, IInfix
+    abstract class Infix : TokenClass, IInfix
     {
-        Result IInfix.Result(ContextBase callContext, Category category, CompileSyntax left, CompileSyntax right) { return Result(callContext, category, left, right); }
-
-        protected abstract Result Result(ContextBase callContext, Category category, CompileSyntax left, CompileSyntax right);
-
-        protected override sealed ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
+        protected override sealed ParsedSyntax InfixSyntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
         {
             return new InfixSyntax
                 (token
-                    , left.CheckedToCompiledSyntax(token, LeftMustNotBeNullError)
+                    , left.ToCompiledSyntax()
                     , this
-                    , right.CheckedToCompiledSyntax(token, RightMustNotBeNullError)
+                    , right.ToCompiledSyntax()
                 );
         }
+        public abstract Result Result(ContextBase callContext, Category category, CompileSyntax left, CompileSyntax right);
     }
 }

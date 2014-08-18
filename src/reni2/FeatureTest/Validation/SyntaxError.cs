@@ -63,7 +63,6 @@ world'
             var issueArray = issues.ToArray();
             var i = 0;
             Tracer.Assert(issueArray[i++].IsLogdumpLike(2, 1, IssueId.EOLInString, "' hallo\r"));
-            Tracer.Assert(issueArray[i++].IsLogdumpLike(3, 6, IssueId.EOLInString, "'\r"));
             Tracer.Assert(issueArray.Length == i);
         }
     }

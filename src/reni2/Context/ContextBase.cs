@@ -238,31 +238,17 @@ namespace Reni.Context
 
         internal Result Result(Category category, IFeatureImplementation feature, TypeBase objectType, CompileSyntax right)
         {
-            var trace = ObjectId == 3 && feature is FunctionBase && feature.GetObjectId() == 0 && category.HasCode;
-            StartMethodDump(trace, category, feature, objectType, right);
-            try
-            {
-                var simpleFeature = feature.SimpleFeature(right == null);
-                if(simpleFeature != null)
-                    return ReturnMethodDump(simpleFeature.Result(category));
+            var simpleFeature = feature.SimpleFeature(right == null);
+            if (simpleFeature != null)
+                return (simpleFeature.Result(category));
 
-                var function = feature.Function;
-                var applyResult = function.ApplyResult(category, ArgsResult(Category.Type, right).Type);
-                Tracer.Assert(category == applyResult.CompleteCategory);
-                Dump("applyResult", applyResult);
-                var replaceArg = applyResult.ReplaceArg(c => ArgsResult(c, right));
-                Dump("replaceArg", replaceArg);
-                Dump("function.ObjectReference", function.ObjectReference);
-                Dump("objectType.PointerKind", objectType.PointerKind);
-                BreakExecution();
+            var function = feature.Function;
+            var applyResult = function.ApplyResult(category, ArgsResult(Category.Type, right).Type);
+            Tracer.Assert(category == applyResult.CompleteCategory);
+            var replaceArg = applyResult.ReplaceArg(c => ArgsResult(c, right));
 
-                var result = replaceArg.ReplaceAbsolute(function.ObjectReference, c => objectType.PointerKind.ArgResult(c));
-                return ReturnMethodDump(result);
-            }
-            finally
-            {
-                EndMethodDump();
-            }
+            var result = replaceArg.ReplaceAbsolute(function.ObjectReference, c => objectType.PointerKind.ArgResult(c));
+            return (result);
         }
 
         internal ISearchResult Search(Defineable tokenClass)

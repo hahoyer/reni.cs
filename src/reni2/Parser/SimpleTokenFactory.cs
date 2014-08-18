@@ -1,34 +1,12 @@
-#region Copyright (C) 2013
-
-//     Project Reni2
-//     Copyright (C) 2012 - 2013 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-#endregion
-
 using System.Linq;
 using System.Collections.Generic;
 using System;
 using hw.Debug;
+using hw.Forms;
 using hw.Graphics;
 using hw.Helper;
 using hw.Parser;
 using hw.PrioParser;
-using hw.Forms;
 
 namespace Reni.Parser
 {
@@ -152,11 +130,15 @@ namespace Reni.Parser
 
         internal new abstract class TokenClass : DumpableObject, IType<IParsedSyntax>, INameProvider
         {
-            IParsedSyntax IType<IParsedSyntax>.Create(IParsedSyntax left, IPart<IParsedSyntax> part, IParsedSyntax right) { return CreateSyntax((Syntax) left, (TokenData) part, (Syntax) right); }
-            string IType<IParsedSyntax>.PrioTableName { get { throw new NotImplementedException(); } }
-            bool IType<IParsedSyntax>.IsEnd { get { throw new NotImplementedException(); } }
+            string _name;
+            IParsedSyntax IType<IParsedSyntax>.Create(IParsedSyntax left, IPart<IParsedSyntax> part, IParsedSyntax right, bool isMatch)
+            {
+                return CreateSyntax((Syntax)left, (TokenData)part, (Syntax)right);
+            }
+            string IType<IParsedSyntax>.PrioTableName { get { return _name; } }
+            bool IType<IParsedSyntax>.IsEnd { get { return _name == PrioTable.EndOfText; } }
             protected abstract Syntax CreateSyntax(Syntax left, TokenData token, Syntax right);
-            string INameProvider.Name { set { throw new NotImplementedException(); } }
+            string INameProvider.Name { set { _name = value; } }
         }
 
         sealed class AnyTokenClass : TokenClass
@@ -171,9 +153,8 @@ namespace Reni.Parser
             public CloseToken(int level) { _level = level; }
             protected override Syntax CreateSyntax(Syntax left, TokenData token, Syntax right)
             {
-                Tracer.Assert(left != null);
                 Tracer.Assert(right == null);
-                return left.Match(_level, token);
+                return left == null ? null : left.Match(_level, token);
             }
         }
 

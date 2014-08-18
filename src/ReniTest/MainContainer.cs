@@ -26,7 +26,7 @@ namespace ReniTest
             ExecTest();
 
             if(Debugger.IsAttached)
-                TestRunner.IsModeErrorFocus = true;
+                TestRunner.IsModeErrorFocus = false;
             Assembly.GetExecutingAssembly().RunTests();
             //InspectCompiler();
             //Reni.Proof.Main.Run();
@@ -94,7 +94,12 @@ ParLevel ( { ) }
             }
 
             [DebuggerHidden]
-            static void InternalTest(Type type, string expectedTypeName) { Tracer.Assert(type.PrettyName() == expectedTypeName, () => type + "\nFound   : " + type.PrettyName() + "\nExpected: " + expectedTypeName, 1); }
+            static void InternalTest(Type type, string expectedTypeName)
+            {
+                Tracer
+                    .Assert(type.PrettyName() == expectedTypeName,
+                        () => type + "\nFound   : " + type.PrettyName() + "\nExpected: " + expectedTypeName, 1);
+            }
         }
     }
 }

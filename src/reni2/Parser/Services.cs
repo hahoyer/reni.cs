@@ -44,7 +44,7 @@ namespace Reni.Parser
 
         public static IGraphTarget Syntax(this PrioTable prioTable, string code)
         {
-            if(code == null)
+            if(string.IsNullOrEmpty(code))
                 return null;
 
             var parser = new ParserInst(new ReniScanner(), new SimpleTokenFactory(prioTable));

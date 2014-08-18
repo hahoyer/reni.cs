@@ -34,7 +34,6 @@
     <Compile Include="Code\ArrayAccess.cs" />
     <Compile Include="Context\FeatureDescriptor.cs" />
     <Compile Include="Context\UndefinedSymbolType.cs" />
-    <Compile Include="FeatureSearch\UnitTest.cs" />
     <Compile Include="FeatureTest\Array\ArrayFromPieces.cs" />
     <Compile Include="FeatureTest\Array\CombineArraysFromPieces.cs" />
     <Compile Include="FeatureTest\Array\DefaultInitialized.cs" />
@@ -140,10 +139,9 @@
     <Compile Include="hw\Helper\EnumEx.cs" />
     <Compile Include="hw\Helper\File.cs" />
     <Compile Include="hw\Helper\FunctionCache.cs" />
-    <Compile Include="hw\Helper\ListExtender.cs" />
+    <Compile Include="hw\Helper\LinqExtension.cs" />
     <Compile Include="hw\Helper\LongExtender.cs" />
     <Compile Include="hw\Helper\ReflectionExtender.cs" />
-    <Compile Include="hw\Helper\RelationExtender.cs" />
     <Compile Include="hw\Helper\StringAligner.cs" />
     <Compile Include="hw\Helper\StringExtender.cs" />
     <Compile Include="hw\Helper\TypeLibrary.cs" />

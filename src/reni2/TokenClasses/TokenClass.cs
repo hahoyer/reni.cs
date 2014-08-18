@@ -44,12 +44,12 @@ namespace Reni.TokenClasses
                 this.Operation((ParsedSyntax) left, (TokenData) token, (ParsedSyntax) right);
         }
 
-        ParsedSyntax IOperator<ParsedSyntax>.Terminal(IOperatorPart token) { return Terminal((TokenData) token); }
-        ParsedSyntax IOperator<ParsedSyntax>.Prefix(IOperatorPart token, ParsedSyntax right) { return Prefix((TokenData) token, right); }
-        ParsedSyntax IOperator<ParsedSyntax>.Suffix(ParsedSyntax left, IOperatorPart token) { return Suffix(left, (TokenData) token); }
-        ParsedSyntax IOperator<ParsedSyntax>.Infix(ParsedSyntax left, IOperatorPart token, ParsedSyntax right) { return Infix(left, (TokenData) token, right); }
+        ParsedSyntax IOperator<ParsedSyntax>.Terminal(IOperatorPart token) { return TerminalSyntax((TokenData) token); }
+        ParsedSyntax IOperator<ParsedSyntax>.Prefix(IOperatorPart token, ParsedSyntax right) { return PrefixSyntax((TokenData) token, right); }
+        ParsedSyntax IOperator<ParsedSyntax>.Suffix(ParsedSyntax left, IOperatorPart token) { return SuffixSyntax(left, (TokenData) token); }
+        ParsedSyntax IOperator<ParsedSyntax>.Infix(ParsedSyntax left, IOperatorPart token, ParsedSyntax right) { return InfixSyntax(left, (TokenData) token, right); }
 
-        protected virtual ParsedSyntax Syntax
+        protected ParsedSyntax Syntax
             (ParsedSyntax left
                 , TokenData token
                 , ParsedSyntax right
@@ -59,25 +59,25 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        protected virtual ParsedSyntax Terminal(TokenData token)
+        protected virtual ParsedSyntax TerminalSyntax(TokenData token)
         {
             NotImplementedMethod(token);
             return null;
         }
 
-        protected virtual ParsedSyntax Prefix(TokenData token, ParsedSyntax right)
+        protected virtual ParsedSyntax PrefixSyntax(TokenData token, ParsedSyntax right)
         {
             NotImplementedMethod(token, right);
             return null;
         }
 
-        protected virtual ParsedSyntax Suffix(ParsedSyntax left, TokenData token)
+        protected virtual ParsedSyntax SuffixSyntax(ParsedSyntax left, TokenData token)
         {
             NotImplementedMethod(left, token);
             return null;
         }
 
-        protected virtual ParsedSyntax Infix(ParsedSyntax left, TokenData token, ParsedSyntax right)
+        protected virtual ParsedSyntax InfixSyntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
         {
             NotImplementedMethod(left, token, right);
             return null;

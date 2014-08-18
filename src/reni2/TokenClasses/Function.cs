@@ -1,36 +1,12 @@
-#region Copyright (C) 2012
-
-//     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-#endregion
-
-using hw.Debug;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Parser;
 using Reni.ReniParser;
-using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
-    sealed class Function : Special
+    sealed class Function : TokenClass
     {
         readonly bool _isImplicit;
         readonly bool _isMetaFunction;
@@ -40,16 +16,26 @@ namespace Reni.TokenClasses
             _isMetaFunction = isMetaFunction;
         }
 
-        protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
+        protected override ParsedSyntax PrefixSyntax(TokenData token, ParsedSyntax right)
         {
             return new FunctionSyntax
                 (token
-                 , left.ToCompiledSyntaxOrNull()
-                 , _isImplicit
-                 , _isMetaFunction
-                 , right.CheckedToCompiledSyntax(token, RightMustNotBeNullError)
+                    , null
+                    , _isImplicit
+                    , _isMetaFunction
+                    , right.ToCompiledSyntax()
                 );
         }
-        new static IssueId RightMustNotBeNullError() { return IssueId.MissingFunctionGetter; }
+
+        protected override ParsedSyntax InfixSyntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
+        {
+            return new FunctionSyntax
+                (token
+                    , left.ToCompiledSyntax()
+                    , _isImplicit
+                    , _isMetaFunction
+                    , right.ToCompiledSyntax()
+                );
+        }
     }
 }
