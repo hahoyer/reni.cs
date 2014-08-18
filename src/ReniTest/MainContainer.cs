@@ -1,25 +1,3 @@
-#region Copyright (C) 2012
-
-//     Project reniTest
-//     Copyright (C) 2011 - 2012 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-#endregion
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -27,8 +5,8 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using hw.Debug;
-using hw.Helper;
 using hw.Forms;
+using hw.Helper;
 using hw.UnitTest;
 using Reni;
 using Reni.FeatureTest.TypeType;
@@ -54,7 +32,7 @@ namespace ReniTest
             //Reni.Proof.Main.Run();
         }
 
-        const string Target = @"f: /\arg(); x: 1; f(/\x) dump_print";
+        const string Target = @"f: /\ .(); x: 1; f(/\x) dump_print";
         const string Output = "1";
         static void InspectCompiler() { Application.Run(new TreeForm {Target = CreateCompiler(Target)}); }
         static void ShowSyntaxTree()
@@ -75,8 +53,8 @@ ParLevel ( { ) }
             var image = prioTable.SyntaxGraph("(x a)(b)");
             var mainForm = new Form
             {
-                ClientSize = image.Size, 
-                BackgroundImage = image, 
+                ClientSize = image.Size,
+                BackgroundImage = image,
                 BackgroundImageLayout = ImageLayout.Stretch
             };
 
@@ -116,7 +94,7 @@ ParLevel ( { ) }
             }
 
             [DebuggerHidden]
-            static void InternalTest(Type type, string expectedTypeName) { Tracer.Assert(type.PrettyName() == expectedTypeName, () => type + "\nFound   : " + type.PrettyName() + "\nExpected: " + expectedTypeName,stackFrameDepth:1); }
+            static void InternalTest(Type type, string expectedTypeName) { Tracer.Assert(type.PrettyName() == expectedTypeName, () => type + "\nFound   : " + type.PrettyName() + "\nExpected: " + expectedTypeName, 1); }
         }
     }
 }

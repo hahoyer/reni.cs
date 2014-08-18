@@ -1,29 +1,6 @@
-#region Copyright (C) 2013
-
-//     Project Reni2
-//     Copyright (C) 2011 - 2013 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-#endregion
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.Debug;
 using hw.UnitTest;
 using Reni.FeatureTest.Array;
 using Reni.FeatureTest.Function;
@@ -44,7 +21,7 @@ systemdata:
 ; FreePointer: Memory(0) raw_address
 };
 
-repeat: /\arg while() then(arg body(), repeat(arg));
+repeat: /\ . while() then(. body(), repeat(.));
 
 system: /!\
 { MaxNumber8: /!\ '7f' to_number_of_base 16 
@@ -55,25 +32,25 @@ system: /!\
 ; TextItemType: /!\ text_item(MaxNumber8) type 
 
 ; NewMemory: /\ 
-    { result: (arg elementType * MaxNumber32) instance_from_raw_address (systemdata FreePointer)
-    , initializer: arg initializer
-    , length: arg length
-    , position: 0
+    { result: ((. elementType * MaxNumber32) instance_from_raw_address (systemdata FreePointer)) enable_reassign
+    , initializer: . initializer
+    , length: . length
+    , position: 0 enable_reassign
     , repeat
         ( while: /\ position < length
         , body: /\ (result(position) := initializer(position), position :+ 1) 
         )
-    , systemdata FreePointer := systemdata FreePointer + (arg elementType size * arg length)
+    , systemdata FreePointer := systemdata FreePointer + (. elementType size * . length)
     } result 
 };
 
 Text: /\
-{ data: (system TextItemType * system MaxNumber32) instance (arg enable_array_oversize)
-; _length: system MaxNumber32 type instance (arg type / system TextItemType)
+{ data: ((system TextItemType * system MaxNumber32) instance (. enable_array_oversize)) enable_reassign
+; _length: system MaxNumber32 type instance (. type / system TextItemType)
 ; AfterCopy: /\ data:= system NewMemory
     ( elementType: system TextItemType
     , length: _length
-    , initializer: /\ data(arg)
+    , initializer: /\ data(.)
     )
 ; AfterCopy()
 ; dump_print: /\(_data dump_print);
