@@ -1,33 +1,11 @@
-#region Copyright (C) 2013
-
-//     Project Reni2
-//     Copyright (C) 2011 - 2013 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-#endregion
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
+using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
-using Reni.ReniParser;
 using Reni.Syntax;
 using Reni.TokenClasses;
 using Reni.Type;
@@ -71,12 +49,21 @@ namespace Reni.Feature
 
     interface IMetaFunctionFeature
     {
-        Result ApplyResult(ContextBase contextBase, Category category, CompileSyntax left, CompileSyntax right);
+        Result Result(ContextBase contextBase, Category category, CompileSyntax right);
     }
 
     interface ISearchResult
     {
-        Result FunctionResult(ContextBase context, Category category, ExpressionSyntax syntax);
+        Result FunctionResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right);
+        Result SimpleResult(Category category);
+        ISearchResult WithConversion(IConverter converter);
+
+        ISearchResult Convert<TProvider>(TProvider innerProvider);
+    }
+
+    interface IContextSearchResult
+    {
+        Result FunctionResult(ContextBase context, Category category, CompileSyntax right);
         Result SimpleResult(Category category);
         ISearchResult WithConversion(IConverter converter);
     }
@@ -88,7 +75,7 @@ namespace Reni.Feature
 
     interface ISearchTarget
     {
-        ISearchResult GetFeature<TDefinable , TPath>()
+        ISearchResult GetFeature<TDefinable, TPath>()
             where TDefinable : Defineable;
     }
 
@@ -104,4 +91,51 @@ namespace Reni.Feature
         TPath Convert(TProvider provider);
     }
 
+    sealed class ContextSearchResult
+    {
+        internal readonly IAccessFeature Data;
+        internal ContextSearchResult(IAccessFeature data) { Data = data; }
+    }
+
+    abstract class SearchResult : DumpableObject
+    {
+        public abstract Result CallResult(ContextBase context, Category category, [NotNull] CompileSyntax left, CompileSyntax right);
+        public abstract Result CallResult(Category category);
+    }
+
+    sealed class TypeSearchResult : SearchResult 
+    {
+        readonly IFeatureImplementation _data;
+        readonly TypeBase _definingType;
+
+        internal TypeSearchResult(IFeatureImplementation data, TypeBase definingType)
+        {
+            _data = data;
+            _definingType = definingType;
+        }
+
+        public override Result CallResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
+        {
+            return new CallDescriptor(_definingType, _data, ConverterResult)
+                .Result(category, context, right)
+                .ReplaceArg(c => context.ObjectResult(c, left));
+        }
+
+        public override Result CallResult(Category category)
+        {
+            return new CallDescriptor(_definingType, _data, ConverterResult)
+                .Result(category);
+        }
+
+        static Result ConverterResult(Category category) { return null; }
+    }
+    interface IFeature
+    {
+        Result FunctionResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right);
+    }
+
+    interface IAccessFeature
+    {
+        Result FunctionResult(ContextBase context, Category category, CompileSyntax right);
+    }
 }

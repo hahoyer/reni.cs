@@ -7,6 +7,7 @@ using Reni.Feature;
 using Reni.Parser;
 using Reni.ReniParser;
 using Reni.Syntax;
+using Reni.Type;
 
 namespace Reni.TokenClasses
 {
@@ -23,6 +24,13 @@ namespace Reni.TokenClasses
         ISearchResult ISearchObject.GetFeatureGenericized(ISearchTarget target) { return GetFeatureGenericized(target); }
 
         internal virtual ISearchResult GetFeatureGenericized(ISearchTarget target)
+        {
+            NotImplementedMethod(target);
+            return null;
+        }
+
+        internal virtual SearchResult Declarations<TType>(TType target)
+            where TType : TypeBase
         {
             NotImplementedMethod(target);
             return null;

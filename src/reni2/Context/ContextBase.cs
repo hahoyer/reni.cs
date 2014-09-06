@@ -1,32 +1,10 @@
-#region Copyright (C) 2013
-
-//     Project Reni2
-//     Copyright (C) 2011 - 2013 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-#endregion
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using hw.Debug;
-using hw.Helper;
 using hw.Forms;
+using hw.Helper;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Feature;
@@ -193,20 +171,17 @@ namespace Reni.Context
             return FindRecentFunctionContextObject
                 .CreateArgReferenceResult(category);
         }
-        Result ArgsResult(Category category, CompileSyntax right)
+        internal Result ArgsResult(Category category, CompileSyntax right)
         {
             return right == null
                 ? RootContext.VoidType.Result(category.Typed)
                 : right.SmartUnFunctionedReferenceResult(this, category);
         }
 
-        internal Result ObjectResult(Category category, CompileSyntax left)
+        internal Result ObjectResult(Category category, [NotNull] CompileSyntax left)
         {
-            if(left == null)
-                return null;
-            var resultType = Type(left).TypeForSearchProbes;
-            var result = UniqueResult(category.Typed, left);
-            return result.Conversion(resultType);
+            return UniqueResult(category.Typed, left)
+                .Conversion(Type(left).TypeForSearchProbes);
         }
 
         /// <summary>
@@ -219,7 +194,7 @@ namespace Reni.Context
         internal Result FunctionalArgResult(Category category, CompileSyntax right)
         {
             var functionalArgDescriptor = new FunctionalArgDescriptor(this);
-            return functionalArgDescriptor.Result(category, this, null, right);
+            return functionalArgDescriptor.Result(category, this, right);
         }
 
         /// <summary>
@@ -230,28 +205,20 @@ namespace Reni.Context
         /// <param name="left"> the expression left to the feature access, if provided </param>
         /// <param name="right"> the expression right to the feature access, if provided </param>
         /// <returns> </returns>
-        internal Result FunctionalObjectResult(Category category, CompileSyntax left, CompileSyntax right)
+        internal Result FunctionalObjectResult(Category category, [NotNull] CompileSyntax left, CompileSyntax right)
         {
             var functionalObjectDescriptor = new FunctionalObjectDescriptor(this, left);
-            return functionalObjectDescriptor.Result(category, this, left, right);
+            return functionalObjectDescriptor.Result(category, this, right)
+                .ReplaceArg(c => ObjectResult(c, left));
         }
 
-        internal Result Result(Category category, IFeatureImplementation feature, TypeBase objectType, CompileSyntax right)
+        internal IContextSearchResult Search(Defineable tokenClass)
         {
-            var simpleFeature = feature.SimpleFeature(right == null);
-            if (simpleFeature != null)
-                return (simpleFeature.Result(category));
-
-            var function = feature.Function;
-            var applyResult = function.ApplyResult(category, ArgsResult(Category.Type, right).Type);
-            Tracer.Assert(category == applyResult.CompleteCategory);
-            var replaceArg = applyResult.ReplaceArg(c => ArgsResult(c, right));
-
-            var result = replaceArg.ReplaceAbsolute(function.ObjectReference, c => objectType.PointerKind.ArgResult(c));
-            return (result);
+            NotImplementedMethod(tokenClass);
+            return null;
         }
 
-        internal ISearchResult Search(Defineable tokenClass)
+        internal ContextSearchResult DeclarationsForType(Defineable tokenClass)
         {
             NotImplementedMethod(tokenClass);
             return null;

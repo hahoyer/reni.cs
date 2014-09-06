@@ -37,6 +37,7 @@ namespace Reni.Type
             , IProxyType
             , IConverter
             , IReferenceType
+        , ISymbolInheritor
     {
         readonly TypeBase _valueType;
         readonly int _order;
@@ -61,6 +62,8 @@ namespace Reni.Type
         IConverter IProxyType.Converter { get { return this; } }
         TypeBase IConverter.TargetType { get { return ValueType; } }
         Result IConverter.Result(Category category) { return DereferenceResult(category); }
+        Result ISymbolInheritor.Source(Category category) { return DereferenceResult(category); }
+
         internal override string DumpPrintText { get { return GetNodeDump(); } }
 
         [DisableDump]

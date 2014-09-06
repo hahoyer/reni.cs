@@ -91,7 +91,6 @@
     <Compile Include="Feature\Extension.cs" />
     <Compile Include="Feature\FeatureResult.cs" />
     <Compile Include="Feature\Function.cs" />
-    <Compile Include="Feature\MetaFunction.cs" />
     <Compile Include="Feature\Simple.cs" />
     <Compile Include="hw\Debug\Configuration.cs" />
     <Compile Include="hw\Debug\DisableDumpAttribute.cs" />
@@ -364,13 +363,13 @@
     <Compile Include="Type\Pair.cs" />
     <Compile Include="Type\PointerType.cs" />
     <Compile Include="Type\RepeaterType.cs" />
-    <Compile Include="Type\SearchResult.cs" />
+    <Compile Include="Type\OldSearchResult.cs" />
     <Compile Include="Type\SetterTargetType.cs" />
     <Compile Include="Type\TagChild.cs" />
     <Compile Include="Type\TextItemsType.cs" />
     <Compile Include="Type\TextItemType.cs" />
     <Compile Include="Type\TypeBase.cs" />
-    <Compile Include="Type\TypeSearchResult.cs" />
+    <Compile Include="Type\OldTypeSearchResult.cs" />
     <Compile Include="Type\TypeType.cs" />
     <Compile Include="Type\VoidType.cs" />
     <Compile Include="Validation\CompileSyntaxError.cs" />

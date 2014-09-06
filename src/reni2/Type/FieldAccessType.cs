@@ -30,7 +30,7 @@ using Reni.Struct;
 
 namespace Reni.Type
 {
-    sealed class FieldAccessType : DataSetterTargetType
+    sealed class  FieldAccessType : DataSetterTargetType
     {
         [EnableDump]
         readonly Structure _structure;
