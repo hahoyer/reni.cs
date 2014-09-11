@@ -659,11 +659,6 @@ namespace Reni.Type
         }
     }
 
-    interface ISymbolInheritor
-    {
-        Result Source(Category category);
-    }
-
     // Krautpuster
     // Gurkennudler
 }

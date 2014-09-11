@@ -77,27 +77,4 @@ namespace Reni.Feature
         }
     }
 
-    sealed class InheritedSearchResult : SearchResult
-    {
-        [EnableDump]
-        readonly SearchResult _result;
-        [EnableDump]
-        readonly ISymbolInheritor _inheritor;
-
-        public InheritedSearchResult(SearchResult result, ISymbolInheritor inheritor)
-        {
-            _result = result;
-            _inheritor = inheritor;
-        }
-        public override Result CallResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
-        {
-            NotImplementedMethod(context, category, left, right);
-            return null;
-        }
-        public override Result CallResult(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
-        }
-    }
 }

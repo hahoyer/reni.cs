@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
-using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -99,11 +98,22 @@ namespace Reni.Feature
 
     abstract class SearchResult : DumpableObject
     {
-        public abstract Result CallResult(ContextBase context, Category category, [NotNull] CompileSyntax left, CompileSyntax right);
-        public abstract Result CallResult(Category category);
+        public abstract IFeatureImplementation Feature { get; }
+        public abstract Result Converter(Category category);
+        public abstract TypeBase Type { get; }
+
+        public CallDescriptor CallDescriptor { get { return new CallDescriptor(Type, Feature, Converter); } }
+        public Result CallResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
+        {
+            return CallDescriptor
+                .Result(category, context, right)
+                .ReplaceArg(c => context.ObjectResult(c, left));
+        }
+
+        public Result CallResult(Category category) { return CallDescriptor.Result(category); }
     }
 
-    sealed class TypeSearchResult : SearchResult 
+    sealed class TypeSearchResult : SearchResult
     {
         readonly IFeatureImplementation _data;
         readonly TypeBase _definingType;
@@ -114,21 +124,42 @@ namespace Reni.Feature
             _definingType = definingType;
         }
 
-        public override Result CallResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
-        {
-            return new CallDescriptor(_definingType, _data, ConverterResult)
-                .Result(category, context, right)
-                .ReplaceArg(c => context.ObjectResult(c, left));
-        }
+        [DisableDump]
+        public override IFeatureImplementation Feature { get { return _data; } }
 
-        public override Result CallResult(Category category)
-        {
-            return new CallDescriptor(_definingType, _data, ConverterResult)
-                .Result(category);
-        }
+        public override Result Converter(Category category) { return _definingType.ArgResult(category); }
 
-        static Result ConverterResult(Category category) { return null; }
+        [DisableDump]
+        public override TypeBase Type { get { return _definingType; } }
     }
+
+    sealed class InheritedSearchResult : SearchResult
+    {
+        [EnableDump]
+        readonly SearchResult _result;
+        [EnableDump]
+        readonly ISymbolInheritor _inheritor;
+
+        public InheritedSearchResult(SearchResult result, ISymbolInheritor inheritor)
+        {
+            _result = result;
+            _inheritor = inheritor;
+        }
+
+        [DisableDump]
+        public override IFeatureImplementation Feature { get { return _result.Feature; } }
+
+        public override Result Converter(Category category)
+        {
+            return _result
+                .Converter(category)
+                .ReplaceArg(_inheritor.Source);
+        }
+
+        [DisableDump]
+        public override TypeBase Type { get { return _result.Type; } }
+    }
+
     interface IFeature
     {
         Result FunctionResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right);
@@ -137,5 +168,10 @@ namespace Reni.Feature
     interface IAccessFeature
     {
         Result FunctionResult(ContextBase context, Category category, CompileSyntax right);
+    }
+
+    interface ISymbolInheritor
+    {
+        Result Source(Category category);
     }
 }
