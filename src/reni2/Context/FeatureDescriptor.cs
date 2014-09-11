@@ -12,9 +12,12 @@ namespace Reni.Context
 {
     abstract class FeatureDescriptor : DumpableObject
     {
+        [DisableDump]
         protected abstract TypeBase Type { get; }
+        [DisableDump]
         protected abstract IFeatureImplementation Feature { get; }
 
+        [DisableDump]
         protected abstract Func<Category, Result> ConverterResult { get; }
 
         internal Result Result(Category category, ContextBase context, CompileSyntax right)
@@ -73,6 +76,7 @@ namespace Reni.Context
             _feature = feature;
             _converterResult = converterResult;
         }
+        [DisableDump]
         protected override TypeBase Type
         {
             get
