@@ -1,37 +1,14 @@
-#region Copyright (C) 2013
-
-//     Project Reni2
-//     Copyright (C) 2011 - 2013 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-#endregion
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
-using hw.Helper;
 using hw.Forms;
+using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Sequence;
-using Reni.TokenClasses;
 
 namespace Reni.Type
 {
@@ -49,6 +26,7 @@ namespace Reni.Type
         readonly ValueCache<RepeaterAccessType> _arrayAccessTypeCache;
         readonly ValueCache<EnableArrayOverSizeType> _enableArrayOverSizeTypeCache;
         readonly ValueCache<SequenceType> _sequenceCache;
+        readonly ValueCache<NumberType> _numberCache;
         readonly ValueCache<TextItemsType> _textItemsCache;
 
         public ArrayType(TypeBase elementType, int count)
@@ -61,6 +39,7 @@ namespace Reni.Type
             _arrayAccessTypeCache = new ValueCache<RepeaterAccessType>(() => new RepeaterAccessType(this));
             _enableArrayOverSizeTypeCache = new ValueCache<EnableArrayOverSizeType>(() => new EnableArrayOverSizeType(this));
             _sequenceCache = new ValueCache<SequenceType>(() => new SequenceType(this));
+            _numberCache = new ValueCache<NumberType>(() => new NumberType(this));
             _textItemsCache = new ValueCache<TextItemsType>(() => new TextItemsType(this));
         }
 
@@ -70,6 +49,8 @@ namespace Reni.Type
         [Node]
         [DisableDump]
         internal SequenceType UniqueSequence { get { return _sequenceCache.Value; } }
+        [DisableDump]
+        public NumberType UniqueNumber { get { return _numberCache.Value; } }
 
         [Node]
         [DisableDump]
@@ -87,7 +68,10 @@ namespace Reni.Type
 
         internal override string DumpPrintText { get { return "(" + ElementType.DumpPrintText + ")array(" + Count + ")"; } }
 
-        internal override int? SmartArrayLength(TypeBase elementType) { return ElementType.IsConvertable(elementType) ? Count : base.SmartArrayLength(elementType); }
+        internal override int? SmartArrayLength(TypeBase elementType)
+        {
+            return ElementType.IsConvertable(elementType) ? Count : base.SmartArrayLength(elementType);
+        }
         protected override Size GetSize() { return ElementType.Size * Count; }
         internal override Result Destructor(Category category) { return ElementType.ArrayDestructor(category, Count); }
         internal override Result Copier(Category category) { return ElementType.ArrayCopier(category, Count); }
@@ -95,15 +79,18 @@ namespace Reni.Type
         internal override ISearchResult GetSearchResult(ISearchObject @object)
         {
             return base.GetSearchResult(@object)
-                ?? ElementType.GetSearchResultForChild(@object,this);
+                ?? ElementType.GetSearchResultForChild(@object, this);
         }
-        
-        internal Result TextItemsResult(Category category) { return UniqueTextItemsType.PointerResult(category, PointerArgResult); }
+
+        internal Result TextItemsResult(Category category)
+        {
+            return UniqueTextItemsType.PointerResult(category, PointerArgResult);
+        }
 
         internal override Result ConstructorResult(Category category, TypeBase argsType)
         {
             return Result
-                (                                                       
+                (
                     category,
                     c => InternalConstructorResult(c, argsType)
                 );
@@ -151,7 +138,7 @@ namespace Reni.Type
         TypeBase ElementAccessType { get { return ElementType.TypeForArrayElement; } }
 
         [DisableDump]
-        internal override sealed Root RootContext { get { return ElementType.RootContext; } }
+        internal override Root RootContext { get { return ElementType.RootContext; } }
 
         [DisableDump]
         IContextReference ObjectReference { get { return UniquePointerType; } }
@@ -170,8 +157,14 @@ namespace Reni.Type
 
         protected override string GetNodeDump() { return ElementType.NodeDump + "*" + Count; }
 
-        internal Result ConcatArraysResult(Category category, IContextReference objectReference, TypeBase argsType) { return InternalConcatArrays(category, objectReference, argsType); }
-        internal Result ConcatArraysFromReference(Category category, IContextReference objectReference, TypeBase argsType) { return InternalConcatArrays(category, objectReference, argsType); }
+        internal Result ConcatArraysResult(Category category, IContextReference objectReference, TypeBase argsType)
+        {
+            return InternalConcatArrays(category, objectReference, argsType);
+        }
+        internal Result ConcatArraysFromReference(Category category, IContextReference objectReference, TypeBase argsType)
+        {
+            return InternalConcatArrays(category, objectReference, argsType);
+        }
 
         internal Result InternalConcatArrays(Category category, IContextReference objectReference, TypeBase argsType)
         {

@@ -1,25 +1,3 @@
-#region Copyright (C) 2013
-
-//     Project Reni2
-//     Copyright (C) 2011 - 2013 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-#endregion
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,7 +31,8 @@ namespace Reni.Type
 
         protected override Size GetSize() { return Size.Create(1); }
 
-        IPath<IPath<IFeatureImplementation, SequenceType>, ArrayType> ISymbolProvider<DumpPrintToken, IPath<IPath<IFeatureImplementation, SequenceType>, ArrayType>>.Feature
+        IPath<IPath<IFeatureImplementation, SequenceType>, ArrayType>
+            ISymbolProvider<DumpPrintToken, IPath<IPath<IFeatureImplementation, SequenceType>, ArrayType>>.Feature
         {
             get
             {
@@ -80,11 +59,11 @@ namespace Reni.Type
         protected override string Dump(bool isRecursion) { return GetType().PrettyName(); }
 
         protected override string GetNodeDump() { return "bit"; }
-        internal SequenceType UniqueNumber(int bitCount) { return UniqueArray(bitCount).UniqueSequence; }
+        internal NumberType UniqueNumber(int bitCount) { return UniqueArray(bitCount).UniqueNumber; }
         internal Result Result(Category category, BitsConst bitsConst)
         {
             return UniqueNumber(bitsConst.Size.ToInt())
-                .Result(category, getCode: () => CodeBase.BitsConst(bitsConst));
+                .Result(category, () => CodeBase.BitsConst(bitsConst));
         }
         internal CodeBase ApplyCode(Size size, string token, int objectBits, int argsBits)
         {
@@ -114,7 +93,12 @@ namespace Reni.Type
             var typedCategory = category.Typed;
             var argsBitCount = argsType.SequenceLength(this);
             var resultBitCount = operation.Signature(objectBitCount, argsBitCount);
-            var result = UniqueNumber(resultBitCount).Result(category, () => ApplyCode(Size.Create(resultBitCount), operation.Name, objectBitCount, argsBitCount), CodeArgs.Arg);
+            var result = UniqueNumber(resultBitCount)
+                .Result
+                (
+                    category,
+                    () => ApplyCode(Size.Create(resultBitCount), operation.Name, objectBitCount, argsBitCount),
+                    CodeArgs.Arg);
             var objectResult = UniqueNumber(objectBitCount).UniqueObjectReference(Root.DefaultRefAlignParam).Result(typedCategory);
             var convertedObjectResult = objectResult.BitSequenceOperandConversion(typedCategory);
             var convertedArgsResult = argsType.BitSequenceOperandConversion(typedCategory);

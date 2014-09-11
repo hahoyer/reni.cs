@@ -338,6 +338,7 @@
     <Compile Include="Type\DataSetterTargetType.cs" />
     <Compile Include="Type\EnableArrayOverSizeType.cs" />
     <Compile Include="Type\FeaturePathBridge.cs" />
+    <Compile Include="Type\NumberType.cs" />
     <Compile Include="Type\PathSearchObject.cs" />
     <Compile Include="Type\RepeaterAccessType.cs" />
     <Compile Include="Type\Child.cs" />
