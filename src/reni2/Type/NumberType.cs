@@ -8,6 +8,7 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
 using Reni.Sequence;
+using Reni.TokenClasses;
 
 namespace Reni.Type
 {
@@ -40,6 +41,8 @@ namespace Reni.Type
         {
             get { return Extension.Feature(DumpPrintTokenResult); }
         }
+
+        internal override SearchResult DeclarationsForType(Defineable tokenClass) { return tokenClass.Declarations(this); }
 
         Result DumpPrintTokenResult(Category category)
         {
