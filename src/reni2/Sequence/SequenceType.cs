@@ -95,12 +95,6 @@ namespace Reni.Sequence
             return null;
         }
 
-        internal override ISearchResult GetSearchResult(ISearchObject @object)
-        {
-            return base.GetSearchResult(@object)
-                ?? Parent.GetSearchResultForChild(@object,this);
-        }
-
         internal Result ConcatArraysResult(Category category, IContextReference objectReference, TypeBase argsType)
         {
             var trace = ObjectId == -1 && category.HasCode;

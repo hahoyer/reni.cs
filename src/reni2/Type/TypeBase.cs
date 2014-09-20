@@ -73,7 +73,10 @@ namespace Reni.Type
         internal abstract Root RootContext { get; }
 
         protected TypeBase()
-            : base(_nextObjectId++) { _cache = new Cache(this); }
+            : base(_nextObjectId++)
+        {
+            _cache = new Cache(this);
+        }
 
 
         IContextReference IContextReferenceProvider.ContextReference { get { return UniquePointerType; } }
@@ -180,7 +183,10 @@ namespace Reni.Type
             }
         }
 
-        Result VoidCodeAndRefs(Category category) { return RootContext.VoidResult(category & (Category.Code | Category.CodeArgs)); }
+        Result VoidCodeAndRefs(Category category)
+        {
+            return RootContext.VoidResult(category & (Category.Code | Category.CodeArgs));
+        }
 
         internal ArrayType UniqueArray(int count) { return _cache.Array[count]; }
         protected virtual TypeBase ReversePair(TypeBase first) { return first._cache.Pair[this]; }
@@ -189,10 +195,16 @@ namespace Reni.Type
         internal virtual Result ArrayDestructor(Category category, int count) { return VoidCodeAndRefs(category); }
         internal virtual Result Copier(Category category) { return VoidCodeAndRefs(category); }
         internal virtual Result ArrayCopier(Category category, int count) { return VoidCodeAndRefs(category); }
-        internal virtual Result ApplyTypeOperator(Result argResult) { return argResult.Type.Conversion(argResult.CompleteCategory, this).ReplaceArg(argResult); }
+        internal virtual Result ApplyTypeOperator(Result argResult)
+        {
+            return argResult.Type.Conversion(argResult.CompleteCategory, this).ReplaceArg(argResult);
+        }
         internal Result ArgResult(Category category) { return Result(category, () => ArgCode, CodeArgs.Arg); }
         internal Result PointerArgResult(Category category) { return UniquePointer.ArgResult(category); }
-        internal Result PointerResult(Category category, Func<Category, Result> getCodeAndRefs) { return UniquePointer.Result(category, getCodeAndRefs); }
+        internal Result PointerResult(Category category, Func<Category, Result> getCodeAndRefs)
+        {
+            return UniquePointer.Result(category, getCodeAndRefs);
+        }
 
         internal Result Result(Category category, IContextReference target)
         {
@@ -242,9 +254,15 @@ namespace Reni.Type
 
         internal TypeBase CommonType(TypeBase elseType) { return elseType.IsConvertable(this) ? this : elseType; }
 
-        Result ConvertToSequence(Category category, TypeBase elementType) { return Conversion(category, CreateSequenceType(elementType)); }
+        Result ConvertToSequence(Category category, TypeBase elementType)
+        {
+            return Conversion(category, CreateSequenceType(elementType));
+        }
 
-        Result ConvertToBitSequence(Category category) { return ConvertToSequence(category, BitType).Align(BitsConst.SegmentAlignBits); }
+        Result ConvertToBitSequence(Category category)
+        {
+            return ConvertToSequence(category, BitType).Align(BitsConst.SegmentAlignBits);
+        }
 
         /// <summary>
         ///     Gets the icon key.
@@ -428,8 +446,6 @@ namespace Reni.Type
             return DeclarationsForType<DumpPrintToken>().CallResult(category);
         }
 
-        static readonly ValueCache<DumpPrintToken> _dumpPrintToken = new ValueCache<DumpPrintToken>(DumpPrintToken.Create);
-
         internal Result CreateArray(Category category)
         {
             return UniqueAlign
@@ -440,7 +456,7 @@ namespace Reni.Type
         internal bool IsConvertable(TypeBase destination)
         {
             return TypeForConversion == destination.TypeForConversion
-                || Converter(destination) != null;
+                || ConvertersForType(destination, ConversionParameter.Instance) != null;
         }
 
         internal Result Conversion(Category category, TypeBase destination)
@@ -452,19 +468,26 @@ namespace Reni.Type
             if(obviousConversionResult != null)
                 return obviousConversionResult;
 
-            var searchResult = TypeForConversion.Converter(destination.TypeForConversion);
-            if(searchResult == null)
+            var searchResults = TypeForConversion
+                .ConvertersForType(destination.TypeForConversion, ConversionParameter.Instance)
+                .ToArray();
+
+            switch(searchResults.Length)
             {
-                NotImplementedMethod(category, destination);
-                return null;
+                case 0:
+                    NotImplementedMethod(category, destination);
+                    return null;
+                case 1:
+                    var result = searchResults[0]
+                        .CallResult(category.Typed)
+                        .ReplaceArg(c => ObviousExactConversion(c.Typed, TypeForConversion));
+
+                    var obviousConversion = result.Type.ObviousConversion(category, destination);
+                    return obviousConversion.ReplaceArg(result) & category;
             }
 
-            var result = searchResult
-                .SimpleResult(category.Typed)
-                .ReplaceArg(c => ObviousExactConversion(c.Typed, TypeForConversion));
-
-            var obviousConversion = result.Type.ObviousConversion(category, destination);
-            return obviousConversion.ReplaceArg(result) & category;
+            NotImplementedMethod(category, destination);
+            return null;
         }
 
         Result ObviousConversion(Category category, TypeBase destination)
@@ -502,12 +525,6 @@ namespace Reni.Type
             return result;
         }
 
-        ISearchResult Converter(TypeBase destination)
-        {
-            NotImplementedMethod(destination);
-            return null;
-        }
-
         internal Result TextItemResult(Category category)
         {
             var uniqueTextItem = UniqueTextItemType;
@@ -517,7 +534,10 @@ namespace Reni.Type
                 ;
         }
 
-        internal virtual Result ConstructorResult(Category category, TypeBase argsType) { return argsType.Conversion(category, this); }
+        internal virtual Result ConstructorResult(Category category, TypeBase argsType)
+        {
+            return argsType.Conversion(category, this);
+        }
 
         internal Result ConcatArrayFromReference(Category category, PointerType pointerType)
         {
@@ -535,16 +555,6 @@ namespace Reni.Type
         {
             return ConvertToBitSequence(category).AutomaticDereferenceResult
                 .Align(BitsConst.SegmentAlignBits);
-        }
-
-        internal virtual IFeatureImplementation AlignConversion(TypeBase destination)
-        {
-            var childConverter = Converter(destination);
-            var searchResult = childConverter;
-            if(searchResult != null)
-                return new AlignConverter(searchResult);
-
-            return null;
         }
 
         internal Result DumpPrintTypeNameResult(Category category)
@@ -565,7 +575,7 @@ namespace Reni.Type
             return null;
         }
 
-        protected virtual Simple Convert(TypeBase type)
+        protected Simple Convert(TypeBase type)
         {
             if(type.TypeForConversion == TypeForConversion)
                 return Reni.Feature.Extension.Feature(DereferenceReferenceResult);
@@ -574,7 +584,10 @@ namespace Reni.Type
         }
 
         internal TypeBase SmartUn<T>()
-            where T : IConverter { return this is T ? ((IConverter) this).Result(Category.Type).Type : this; }
+            where T : IConverter
+        {
+            return this is T ? ((IConverter) this).Result(Category.Type).Type : this;
+        }
 
         internal Result PointerConversionResult(Category category, TypeBase destinationType)
         {
@@ -598,65 +611,40 @@ namespace Reni.Type
                 .DumpPrintNumber(alignedSize);
         }
 
-        internal virtual ISearchResult GetSearchResult(ISearchObject @object) { return @object.GetFeatureGenericized(this); }
-
-        internal ISearchResult GetSearchResultForChild<TProvider>(ISearchObject @object, TProvider parent)
-            where TProvider : TypeBase
+        internal virtual IEnumerable<SearchResult> ConvertersForType(TypeBase destination, IConversionParameter parameter)
         {
-            ISearchTarget target = new FeaturePathBridge<TProvider>(parent, this);
-            var result = @object.GetFeatureGenericized(target);
-            if(result != null)
-                return result;
-
-            var proxyType = parent as IProxyType;
-            if(proxyType == null)
-                return null;
-
-            Tracer.Assert(proxyType.Converter.TargetType == this);
-            result = GetSearchResult(@object);
-            if(result != null)
-                return result.WithConversion(proxyType.Converter);
-
-            return null;
+            return destination.Genericize.SelectMany(g=>g.ConvertersForType(this, parameter));
         }
 
-        ISearchResult ISearchTarget.GetFeature<TDefinable, TPath>()
+        internal IEnumerable<SearchResult> ConvertersForType<TDestination>(TDestination destination, IConversionParameter parameter)
         {
-            var resultProvider = this as ISymbolProvider<TDefinable, TPath>;
-            Tracer.FlaggedLine(" Probe:");
-            Tracer.LinePart("   this: " + GetType().PrettyName()
-                + "\nTTarget: " + typeof(TDefinable).PrettyName()
-                + "\n  TPath: " + typeof(TPath).PrettyName());
-            if(resultProvider != null)
+            var provider = this as IConverterProvider<TDestination, IFeatureImplementation>;
+            if(provider != null)
             {
-                Tracer.Line(" ... success\n");
-                var feature = resultProvider.Feature;
-                return new OldTypeSearchResult<TPath>(this, feature);
+                var feature = provider.Feature(destination,parameter);
+                if(feature != null)
+                    yield return new TypeSearchResult(feature, this);
             }
-
-            Tracer.Line(" ... fail\n");
-            return null;
         }
 
-        internal virtual SearchResult DeclarationsForType(Defineable tokenClass)
-        {
-            NotImplementedMethod(tokenClass);
-            return null;
-        }
+        internal SearchResult DeclarationsForType(Defineable tokenClass) { return tokenClass.FindGenericDeclarationsForType(this); }
 
         internal SearchResult DeclarationsForType<TDefinable>() where TDefinable : Defineable
         {
             var provider = this as ISymbolProvider<TDefinable, IFeatureImplementation>;
             if(provider != null)
                 return new TypeSearchResult(provider.Feature, this);
-           
-            var inheritor = this as ISymbolInheritor;
+            var inheritor = this as IFeatureInheritor;
             if(inheritor != null)
-                return inheritor.DeclarationsForType<TDefinable>();
-
+                return inheritor.ResolveDeclarationsForType<TDefinable>();
             NotImplementedMethod();
             return null;
+
         }
+
+        [DisableDump]
+        protected virtual IEnumerable<IGenericProviderForType> Genericize { get { return this.GenericList(); } }
+    
     }
 
     // Krautpuster

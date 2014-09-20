@@ -76,12 +76,6 @@ namespace Reni.Type
         internal override Result Destructor(Category category) { return ElementType.ArrayDestructor(category, Count); }
         internal override Result Copier(Category category) { return ElementType.ArrayCopier(category, Count); }
 
-        internal override ISearchResult GetSearchResult(ISearchObject @object)
-        {
-            return base.GetSearchResult(@object)
-                ?? ElementType.GetSearchResultForChild(@object, this);
-        }
-
         internal Result TextItemsResult(Category category)
         {
             return UniqueTextItemsType.PointerResult(category, PointerArgResult);

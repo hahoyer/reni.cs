@@ -11,29 +11,35 @@ using Reni.Type;
 
 namespace Reni.TokenClasses
 {
-    abstract class Defineable : TokenClass, ISearchObject
+    abstract class Defineable : TokenClass
     {
         protected override sealed ParsedSyntax TerminalSyntax(TokenData token) { return new DefinableTokenSyntax(this, token); }
-        protected override sealed ParsedSyntax PrefixSyntax(TokenData token, ParsedSyntax right) { return new ExpressionSyntax(this, null, token, (CompileSyntax) right); }
-        protected override sealed ParsedSyntax SuffixSyntax(ParsedSyntax left, TokenData token) { return left.CreateSyntaxOrDeclaration(this, token, null); }
-        protected override sealed ParsedSyntax InfixSyntax(ParsedSyntax left, TokenData token, ParsedSyntax right) { return left.CreateSyntaxOrDeclaration(this, token, right); }
+        protected override sealed ParsedSyntax PrefixSyntax(TokenData token, ParsedSyntax right)
+        {
+            return new ExpressionSyntax(this, null, token, (CompileSyntax) right);
+        }
+        protected override sealed ParsedSyntax SuffixSyntax(ParsedSyntax left, TokenData token)
+        {
+            return left.CreateSyntaxOrDeclaration(this, token, null);
+        }
+        protected override sealed ParsedSyntax InfixSyntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
+        {
+            return left.CreateSyntaxOrDeclaration(this, token, right);
+        }
 
         [DisableDump]
         protected string DataFunctionName { get { return Name.Symbolize(); } }
 
-        ISearchResult ISearchObject.GetFeatureGenericized(ISearchTarget target) { return GetFeatureGenericized(target); }
+        public virtual SearchResult FindGenericDeclarationsForType(TypeBase provider) { return provider.DeclarationsForType<Defineable>(); }
+    }
 
-        internal virtual ISearchResult GetFeatureGenericized(ISearchTarget target)
+    abstract class Defineable<TTarget> : Defineable
+        where TTarget : Defineable
+    {
+        public override SearchResult FindGenericDeclarationsForType(TypeBase provider)
         {
-            NotImplementedMethod(target);
-            return null;
-        }
-
-        internal virtual SearchResult Declarations<TType>(TType target)
-            where TType : TypeBase
-        {
-            NotImplementedMethod(target);
-            return null;
+            return provider.DeclarationsForType<TTarget>()
+                ?? base.FindGenericDeclarationsForType(provider);
         }
     }
 }

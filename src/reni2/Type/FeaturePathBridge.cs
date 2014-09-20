@@ -20,11 +20,5 @@ namespace Reni.Type
             _mainProvider = mainProvider;
         }
 
-        ISearchResult ISearchTarget.GetFeature<TDefinable, TPath>()
-        {
-            var searchResult = _mainProvider
-                .GetSearchResult(new Path<TDefinable, IPath<TPath, TProvider>>());
-            return searchResult == null ? null : searchResult.Convert(_innerProvider);
-        }
     }
 }

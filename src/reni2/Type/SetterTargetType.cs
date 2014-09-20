@@ -14,7 +14,7 @@ namespace Reni.Type
             , IProxyType
             , IConverter
             , IReferenceType
-            , ISymbolInheritor
+            , IFeatureInheritor
     {
         readonly int _order;
 
@@ -27,13 +27,7 @@ namespace Reni.Type
         IConverter IReferenceType.Converter { get { return this; } }
         TypeBase IConverter.TargetType { get { return ValueType; } }
         Result IConverter.Result(Category category) { return GetterResult(category); }
-        Result ISymbolInheritor.Source(Category category) { return GetterResult(category); }
-
-        internal override ISearchResult GetSearchResult(ISearchObject @object)
-        {
-            return base.GetSearchResult(@object)
-                ?? ValueType.GetSearchResultForChild(@object, this);
-        }
+        Result IFeatureInheritor.Source(Category category) { return GetterResult(category); }
 
         internal Result AssignmentResult(Category category, IContextReference objectReference, TypeBase argsType)
         {

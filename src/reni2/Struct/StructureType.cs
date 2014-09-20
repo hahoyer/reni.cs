@@ -42,7 +42,5 @@ namespace Reni.Struct
 
         [DisableDump]
         internal override bool HasQuickSize { get { return false; } }
-
-        internal override SearchResult DeclarationsForType(Defineable tokenClass) { return tokenClass.Declarations(this); }
     }
 }

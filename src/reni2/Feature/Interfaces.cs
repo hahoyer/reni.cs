@@ -67,21 +67,18 @@ namespace Reni.Feature
         ISearchResult WithConversion(IConverter converter);
     }
 
-    interface ISearchObject
-    {
-        ISearchResult GetFeatureGenericized(ISearchTarget target);
-    }
-
     interface ISearchTarget
-    {
-        ISearchResult GetFeature<TDefinable, TPath>()
-            where TDefinable : Defineable;
-    }
+    {}
 
     interface ISymbolProvider<TDefinable, out TPath>
         where TDefinable : Defineable
     {
         TPath Feature { get; }
+    }
+
+    interface IConverterProvider<in TDestination, out TPath>
+    {
+        TPath Feature(TDestination destination, IConversionParameter parameter);
     }
 
     interface IPath<out TPath, in TProvider>
@@ -138,9 +135,9 @@ namespace Reni.Feature
         [EnableDump]
         readonly SearchResult _result;
         [EnableDump]
-        readonly ISymbolInheritor _inheritor;
+        readonly IFeatureInheritor _inheritor;
 
-        public InheritedSearchResult(SearchResult result, ISymbolInheritor inheritor)
+        public InheritedSearchResult(SearchResult result, IFeatureInheritor inheritor)
         {
             _result = result;
             _inheritor = inheritor;
@@ -170,8 +167,29 @@ namespace Reni.Feature
         Result FunctionResult(ContextBase context, Category category, CompileSyntax right);
     }
 
-    interface ISymbolInheritor
+    interface IFeatureInheritor
     {
         Result Source(Category category);
+    }
+
+    interface IPuppet<in TSource, TPath>
+    {
+        SearchResult ResolveConverter(TSource source);
+    }
+
+    interface IGenericProviderForType
+    {
+        IEnumerable<SearchResult> ConvertersForType(TypeBase source, IConversionParameter parameter);
+    }
+
+    sealed class GenericProviderForType<T> : DumpableObject, IGenericProviderForType
+    {
+        readonly T _target;
+        public GenericProviderForType(T target) { _target = target; }
+
+        IEnumerable<SearchResult> IGenericProviderForType.ConvertersForType(TypeBase source, IConversionParameter parameter)
+        {
+            return source.ConvertersForType(_target, parameter);
+        }
     }
 }

@@ -8,13 +8,14 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
 using Reni.Sequence;
-using Reni.TokenClasses;
 
 namespace Reni.Type
 {
     sealed class NumberType
         : TypeBase
             , ISymbolProvider<DumpPrintToken, IFeatureImplementation>
+            , ISymbolProvider<TokenClasses.EnableCut, IFeatureImplementation>
+            , IConverterProvider<NumberType, IFeatureImplementation>
     {
         readonly FunctionCache<RefAlignParam, ObjectReference> _objectReferencesCache;
         readonly ArrayType _parent;
@@ -31,6 +32,10 @@ namespace Reni.Type
         protected override Size GetSize() { return _parent.Size; }
         [DisableDump]
         internal override bool IsDataLess { get { return _parent.IsDataLess; } }
+        [EnableDump]
+        internal int Bits { get { return Size.ToInt(); } }
+        [DisableDump]
+        protected override IEnumerable<IGenericProviderForType> Genericize { get { return this.GenericList(base.Genericize); } }
 
         internal ObjectReference UniqueObjectReference(RefAlignParam refAlignParam)
         {
@@ -42,11 +47,47 @@ namespace Reni.Type
             get { return Extension.Feature(DumpPrintTokenResult); }
         }
 
-        internal override SearchResult DeclarationsForType(Defineable tokenClass) { return tokenClass.Declarations(this); }
 
-        Result DumpPrintTokenResult(Category category)
+        IFeatureImplementation ISymbolProvider<TokenClasses.EnableCut, IFeatureImplementation>.Feature
         {
-            return VoidType.Result(category, DumpPrintNumberCode, CodeArgs.Arg);
+            get { return Extension.Feature(EnableCutTokenResult); }
+        }
+
+        IFeatureImplementation IConverterProvider<NumberType, IFeatureImplementation>.Feature
+            (NumberType destination, IConversionParameter parameter)
+        {
+            if(!parameter.EnableCut && Bits > destination.Bits)
+                return null;
+            return Extension.Feature(ca => ConversionAsReference(ca, destination));
+        }
+
+        Result DumpPrintTokenResult(Category category) { return VoidType.Result(category, DumpPrintNumberCode, CodeArgs.Arg); }
+        Result EnableCutTokenResult(Category category) { return UniqueEnableCutType.UniquePointer.ArgResult(category.Typed); }
+
+        Result ConversionAsReference(Category category, NumberType destination)
+        {
+            return FlatConversion(category, destination)
+                .ReplaceArg(UnalignedDereferencePointerResult)
+                .LocalPointerKindResult;
+        }
+
+        Result FlatConversion(Category category, NumberType destination)
+        {
+            if(Bits == destination.Bits)
+                return ArgResult(category.Typed);
+
+            return destination
+                .Result
+                (
+                    category,
+                    () => ArgCode.BitCast(Size),
+                    CodeArgs.Arg
+                );
+        }
+
+        Result UnalignedDereferencePointerResult(Category category)
+        {
+            return PointerKind.ArgResult(category.Typed).DereferenceResult & category;
         }
     }
 }

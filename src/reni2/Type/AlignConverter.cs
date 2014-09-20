@@ -10,8 +10,8 @@ namespace Reni.Type
     sealed class AlignConverter : ConverterBase
     {
         [EnableDump]
-        readonly ISearchResult _childConverter;
-        public AlignConverter(ISearchResult childConverter) { _childConverter = childConverter; }
-        protected override Result Result(Category category) { return _childConverter.SimpleResult(category.Typed); }
+        readonly SearchResult _childConverter;
+        public AlignConverter(SearchResult childConverter) { _childConverter = childConverter; }
+        protected override Result Result(Category category) { return _childConverter.CallResult(category.Typed); }
     }
 }

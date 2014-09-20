@@ -26,7 +26,7 @@ namespace ReniTest
             ExecTest();
 
             if(Debugger.IsAttached)
-                TestRunner.IsModeErrorFocus = false;
+                TestRunner.IsModeErrorFocus = true;
             Assembly.GetExecutingAssembly().RunTests();
             //InspectCompiler();
             //Reni.Proof.Main.Run();

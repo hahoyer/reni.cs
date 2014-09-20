@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using System;
 using hw.Debug;
 using hw.Helper;
-using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
-using Reni.Context;
-using Reni.Syntax;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -42,11 +39,6 @@ namespace Reni.Feature
                 new Function(function);
         }
 
-#pragma warning disable 0414
-        [UsedImplicitly]
-        static bool _isPrettySearchPathHumanFriendly = true;
-
-
         internal static ISimpleFeature SimpleFeature(this IFeatureImplementation feature)
         {
             var function = feature.Function;
@@ -56,15 +48,7 @@ namespace Reni.Feature
             return feature.Simple;
         }
 
-        internal static ISearchResult GetFeature<TDefinable>(this ISearchTarget target, TDefinable definable)
-            where TDefinable : Defineable
-        {
-            var result = target.GetFeature<TDefinable, IFeatureImplementation>();
-            if(result == null)
-                return null;
-            return result;
-        }
-        public static SearchResult DeclarationsForType<TDefinable>(this ISymbolInheritor inheritor)
+        public static SearchResult ResolveDeclarationsForType<TDefinable>(this IFeatureInheritor inheritor)
             where TDefinable : Defineable
         {
             var result = inheritor
@@ -75,6 +59,39 @@ namespace Reni.Feature
                 return null;
             return new InheritedSearchResult(result, inheritor);
         }
+
+        public static SearchResult ResolveConverterForType<TSource, TPath>(this IPuppet<TSource, TPath> puppet, TSource source)
+            where TSource : TypeBase
+        {
+            var result = puppet
+                .ResolveConverter(source);
+            if(result == null)
+                return null;
+            Dumpable.NotImplementedFunction(puppet, source);
+            return null;
+        }
+
+        public static SearchResult ResolveConverterForType<TSource, TPath>
+            (this IConverterProvider<TSource, TPath> provider, TypeBase destination, TSource source)
+            where TSource : TypeBase
+        {
+            Dumpable.NotImplementedFunction(provider, source);
+            return null;
+        }
     }
 
+    static class GenericizeExtension
+    {
+        public static IEnumerable<IGenericProviderForType> GenericList<T>(this T target, IEnumerable<IGenericProviderForType> baseList = null) where T : TypeBase {
+            return CreateList(baseList, () => new GenericProviderForType<T>(target));
+        }
+
+        static IEnumerable<TGeneric> CreateList<TGeneric>(IEnumerable<TGeneric> baseList, Func<TGeneric> creator)
+        {
+            yield return creator();
+            if(baseList != null)
+                foreach(var item in baseList)
+                    yield return item;
+        }
+    }
 }
