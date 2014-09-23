@@ -32,6 +32,8 @@ namespace Reni.Type
         protected override Size GetSize() { return _parent.Size; }
         [DisableDump]
         internal override bool Hllw { get { return _parent.Hllw; } }
+        [DisableDump]
+        internal override string DumpPrintText { get { return "number(" + Bits + ")"; } }
         [EnableDump]
         internal int Bits { get { return Size.ToInt(); } }
         [DisableDump]
