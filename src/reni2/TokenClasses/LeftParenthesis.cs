@@ -19,10 +19,16 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal int Level { get { return _level; } }
 
-        protected override ParsedSyntax PrefixSyntax(TokenData token, ParsedSyntax right) { return new Syntax.LeftParenthesis(_level, null, this, token, right); }
+        protected override ParsedSyntax PrefixSyntax(TokenData token, ParsedSyntax right)
+        {
+            return new Syntax.LeftParenthesis(_level, null, this, token, right);
+        }
         protected override ParsedSyntax TerminalSyntax(TokenData token) { return new EmptyList.Half(token); }
 
-        Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right) { return context.FunctionalObjectResult(category, left, right); }
+        Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
+        {
+            return context.FunctionalObjectResult(category, left, right);
+        }
         Result ITerminal.Result(ContextBase context, Category category, TokenData token)
         {
             NotImplementedMethod(context, category, token);

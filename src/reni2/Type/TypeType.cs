@@ -46,7 +46,7 @@ namespace Reni.Type
         internal override Root RootContext { get { return _value.RootContext; } }
 
         [DisableDump]
-        internal override bool IsDataLess { get { return true; } }
+        internal override bool Hllw { get { return true; } }
 
         [DisableDump]
         internal TypeBase Value { get { return _value; } }

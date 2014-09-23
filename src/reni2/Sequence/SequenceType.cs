@@ -194,7 +194,10 @@ namespace Reni.Sequence
             }
         }
 
-        Result UnalignedDereferencePointerResult(Category category) { return PointerKind.ArgResult(category.Typed).DereferenceResult & category; }
+        Result UnalignedDereferencePointerResult(Category category)
+        {
+            return PointerKind.ArgResult(category.Typed).DereferenceResult & category;
+        }
 
         Result ConvertWithCut(Category category, SequenceType destination)
         {

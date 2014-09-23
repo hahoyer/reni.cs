@@ -1,31 +1,9 @@
-#region Copyright (C) 2013
-
-//     Project Reni2
-//     Copyright (C) 2011 - 2013 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-#endregion
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
-using hw.Helper;
 using hw.Forms;
+using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -53,7 +31,8 @@ namespace Reni.Struct
         internal Structure(ContainerContextObject containerContextObject, int endPosition)
             : base(_nextObjectId++)
         {
-            _functionBodyTypeCache = new FunctionCache<FunctionSyntax, FunctionBodyType>(syntax => new FunctionBodyType(this, syntax));
+            _functionBodyTypeCache = new FunctionCache<FunctionSyntax, FunctionBodyType>
+                (syntax => new FunctionBodyType(this, syntax));
             _fieldAccessTypeCache = new FunctionCache<int, FieldAccessType>(position => new FieldAccessType(this, position));
             _containerContextObject = containerContextObject;
             _endPosition = endPosition;
@@ -88,7 +67,10 @@ namespace Reni.Struct
         [DisableDump]
         internal TypeBase PointerKind { get { return Type.PointerKind; } }
 
-        protected override string GetNodeDump() { return base.GetNodeDump() + "(" + ContainerContextObject.NodeDump + "@" + EndPosition + ")"; }
+        protected override string GetNodeDump()
+        {
+            return base.GetNodeDump() + "(" + ContainerContextObject.NodeDump + "@" + EndPosition + ")";
+        }
 
         [DisableDump]
         internal RefAlignParam RefAlignParam { get { return ContainerContextObject.RefAlignParam; } }
@@ -122,7 +104,7 @@ namespace Reni.Struct
         }
 
         [DisableDump]
-        internal bool IsDataLess { get { return ContainerContextObject.StructureIsDataLess(EndPosition); } }
+        internal bool Hllw { get { return ContainerContextObject.StructureHllw(EndPosition); } }
 
         [DisableDump]
         internal Root RootContext { get { return ContainerContextObject.RootContext; } }
@@ -143,7 +125,7 @@ namespace Reni.Struct
         TypeBase ObtainAccessType(int position)
         {
             var accessType = ContainerContextObject.AccessType(EndPosition, position);
-            if(accessType.IsLambda || accessType.IsDataLess)
+            if(accessType.IsLambda || accessType.Hllw)
                 return accessType;
             return UniqueFieldAccessType(position);
         }
@@ -158,7 +140,10 @@ namespace Reni.Struct
             return AccessViaThisReference(category, position);
         }
 
-        internal Size FieldOffset(int position) { return ContainerContextObject.FieldOffsetFromAccessPoint(EndPosition, position); }
+        internal Size FieldOffset(int position)
+        {
+            return ContainerContextObject.FieldOffsetFromAccessPoint(EndPosition, position);
+        }
 
         internal Result DumpPrintResultViaStructReference(Category category)
         {
@@ -178,7 +163,7 @@ namespace Reni.Struct
         internal Result AccessViaThisReference(Category category, int position)
         {
             var resultType = UniqueAccessType(position);
-            if(resultType.IsDataLess)
+            if(resultType.Hllw)
                 return resultType.Result(category);
 
             return resultType
@@ -204,7 +189,7 @@ namespace Reni.Struct
 
         internal Result StructReferenceViaContextReference(Category category)
         {
-            if(IsDataLess)
+            if(Hllw)
                 return Type.Result(category);
 
             return PointerKind

@@ -60,13 +60,13 @@ namespace Reni.Code.ReplaceVisitor
             public string Dump()
             {
                 var data = "\nVisitedObject="
-                           + Tracer.Dump(_visitedObject)
-                           + "\nActual="
-                           + Tracer.Dump(_actual);
+                    + Tracer.Dump(_visitedObject)
+                    + "\nActual="
+                    + Tracer.Dump(_actual);
 
                 return "TypeException\n{"
-                       + data.Indent()
-                       + "\n}";
+                    + data.Indent()
+                    + "\n}";
             }
         }
     }

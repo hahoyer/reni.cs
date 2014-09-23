@@ -3,10 +3,8 @@ using System.Linq;
 using System;
 using hw.Parser;
 using Reni.Basics;
-using Reni.ReniParser;
 using Reni.Syntax;
 using Reni.TokenClasses;
-using Reni.Validation;
 
 namespace Reni.Context
 {
@@ -32,7 +30,7 @@ namespace Reni.Context
                 var structure = leftResult.FindRecentStructure;
                 Dump("structure", structure);
                 BreakExecution();
-                if(structure.IsDataLess)
+                if(structure.Hllw)
                 {
                     NotImplementedMethod(context, category, left);
                     return null;

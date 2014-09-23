@@ -1,28 +1,5 @@
-#region Copyright (C) 2012
-
-//     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-#endregion
-
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 using hw.Debug;
@@ -39,10 +16,7 @@ namespace Reni
         readonly Func<Category, Result> _obtainResult;
         internal string FunctionDump = "";
 
-        public ResultCache(Func<Category, Result> obtainResult)
-        {
-            _obtainResult = obtainResult ?? NotSupported;
-        }
+        public ResultCache(Func<Category, Result> obtainResult) { _obtainResult = obtainResult ?? NotSupported; }
 
         ResultCache(Result data)
         {
@@ -65,10 +39,10 @@ namespace Reni
         {
             var localCategory = category - _data.CompleteCategory - _data.PendingCategory;
 
-            if(localCategory.HasIsDataLess && _data.FindIsDataLess != null)
+            if(localCategory.HasHllw && _data.FindHllw != null)
             {
-                _data.IsDataLess = _data.FindIsDataLess;
-                localCategory -= Category.IsDataLess;
+                _data.Hllw = _data.FindHllw;
+                localCategory -= Category.Hllw;
             }
 
             if(localCategory.HasSize && _data.FindSize != null)
@@ -77,10 +51,10 @@ namespace Reni
                 localCategory -= Category.Size;
             }
 
-            if(localCategory.HasArgs && _data.FindArgs != null)
+            if(localCategory.HasExts && _data.FindArgs != null)
             {
-                _data.CodeArgs = _data.FindArgs;
-                localCategory -= Category.CodeArgs;
+                _data.Exts = _data.FindArgs;
+                localCategory -= Category.Exts;
             }
 
             if(localCategory.HasAny)
@@ -100,7 +74,10 @@ namespace Reni
             }
         }
 
-        public static Result operator &(ResultCache resultCache, Category category) { return resultCache.GetCategories(category); }
+        public static Result operator &(ResultCache resultCache, Category category)
+        {
+            return resultCache.GetCategories(category);
+        }
 
         Result GetCategories(Category category)
         {
@@ -109,15 +86,15 @@ namespace Reni
             return Data & category;
         }
 
-        bool HasIsDataLess
+        bool HasHllw
         {
-            get { return _data.HasIsDataLess; }
+            get { return _data.HasHllw; }
             set
             {
                 if(value)
-                    Update(Category.IsDataLess);
+                    Update(Category.Hllw);
                 else
-                    _data.IsDataLess = null;
+                    _data.Hllw = null;
             }
         }
 
@@ -159,13 +136,13 @@ namespace Reni
 
         bool HasCodeArgs
         {
-            get { return _data.HasArgs; }
+            get { return _data.HasExts; }
             set
             {
                 if(value)
-                    Update(Category.CodeArgs);
+                    Update(Category.Exts);
                 else
-                    _data.CodeArgs = null;
+                    _data.Exts = null;
             }
         }
 
@@ -192,8 +169,8 @@ namespace Reni
         {
             get
             {
-                Update(Category.CodeArgs);
-                return Data.CodeArgs;
+                Update(Category.Exts);
+                return Data.Exts;
             }
         }
         [DisableDump]
@@ -206,12 +183,12 @@ namespace Reni
             }
         }
         [DisableDump]
-        internal bool? IsDataLess
+        internal bool? Hllw
         {
             get
             {
-                Update(Category.IsDataLess);
-                return Data.IsDataLess;
+                Update(Category.Hllw);
+                return Data.Hllw;
             }
         }
 

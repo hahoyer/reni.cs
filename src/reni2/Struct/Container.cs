@@ -1,35 +1,12 @@
-#region Copyright (C) 2013
-
-//     Project Reni2
-//     Copyright (C) 2011 - 2013 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-#endregion
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
-using hw.Helper;
 using hw.Forms;
-using JetBrains.Annotations;
+using hw.Helper;
+using hw.Parser;
 using Reni.Basics;
 using Reni.Context;
-using hw.Parser;
 using Reni.ReniParser;
 using Reni.Syntax;
 using Reni.Type;
@@ -89,12 +66,12 @@ namespace Reni.Struct
 
         internal override CompileSyntax ToCompiledSyntax() { return this; }
         [DisableDump]
-        internal override bool? IsDataLess
+        internal override bool? Hllw
         {
             get
             {
                 return Statements
-                    .All(syntax => syntax.IsDataLess == true);
+                    .All(syntax => syntax.Hllw == true);
             }
         }
 
@@ -131,7 +108,10 @@ namespace Reni.Struct
                 _list.Add(((ParsedSyntax) parsedSyntax).ToCompiledSyntax());
             }
 
-            public Container ToContainer(TokenData leftToken, TokenData rightToken) { return new Container(leftToken, rightToken, _list.ToArray(), _dictionary, _converters.ToArray()); }
+            public Container ToContainer(TokenData leftToken, TokenData rightToken)
+            {
+                return new Container(leftToken, rightToken, _list.ToArray(), _dictionary, _converters.ToArray());
+            }
         }
 
 
@@ -150,7 +130,10 @@ namespace Reni.Struct
             return result.ToContainer(leftToken, rightToken);
         }
 
-        internal static Container Create(ParsedSyntax parsedSyntax) { return Create(parsedSyntax.FirstToken, parsedSyntax.LastToken, parsedSyntax); }
+        internal static Container Create(ParsedSyntax parsedSyntax)
+        {
+            return Create(parsedSyntax.FirstToken, parsedSyntax.LastToken, parsedSyntax);
+        }
 
         public override string DumpData()
         {
@@ -230,16 +213,16 @@ namespace Reni.Struct
             }
         }
 
-        bool InternalInnerIsDataLess(ContextBase parent, int position)
+        bool InternalInnerHllw(ContextBase parent, int position)
         {
             var uniqueChildContext = parent
                 .UniqueStructurePositionContext(this, position);
-            return Statements[position].IsDataLessStructureElement(uniqueChildContext);
+            return Statements[position].HllwStructureElement(uniqueChildContext);
         }
 
-        bool? InternalInnerIsDataLess(int position) { return Statements[position].IsDataLess; }
+        bool? InternalInnerHllw(int position) { return Statements[position].Hllw; }
 
-        internal bool ObtainIsDataLess(ContextBase parent, int accessPosition)
+        internal bool ObtainHllw(ContextBase parent, int accessPosition)
         {
             var trace = ObjectId == -10 && accessPosition == 3 && parent.ObjectId == 4;
             StartMethodDump(trace, parent, accessPosition);
@@ -248,16 +231,16 @@ namespace Reni.Struct
                 var subStatementIds = accessPosition.Select().ToArray();
                 Dump("subStatementIds", subStatementIds);
                 BreakExecution();
-                if(subStatementIds.Any(position => InternalInnerIsDataLess(position) == false))
+                if(subStatementIds.Any(position => InternalInnerHllw(position) == false))
                     return ReturnMethodDump(false);
                 var quickNonDataLess = subStatementIds
-                    .Where(position => InternalInnerIsDataLess(position) == null)
+                    .Where(position => InternalInnerHllw(position) == null)
                     .ToArray();
                 Dump("quickNonDataLess", quickNonDataLess);
                 BreakExecution();
                 if(quickNonDataLess.Length == 0)
                     return ReturnMethodDump(true);
-                if(quickNonDataLess.Any(position => InternalInnerIsDataLess(parent, position) == false))
+                if(quickNonDataLess.Any(position => InternalInnerHllw(parent, position) == false))
                     return ReturnMethodDump(false);
                 return ReturnMethodDump(true);
             }
@@ -296,7 +279,10 @@ namespace Reni.Struct
             }
         }
 
-        internal Size StructureSize(ContextBase parent, int fromPosition, int fromNotPosition) { return StructureResult(Category.Size, parent, fromPosition, fromNotPosition).Size; }
+        internal Size StructureSize(ContextBase parent, int fromPosition, int fromNotPosition)
+        {
+            return StructureResult(Category.Size, parent, fromPosition, fromNotPosition).Size;
+        }
 
         internal TypeBase AccessType(ContextBase parent, int accessPosition, int position)
         {
@@ -320,7 +306,7 @@ namespace Reni.Struct
             return Statements
                 .Length
                 .Select()
-                .Where(i => !InternalInnerIsDataLess(parent, i))
+                .Where(i => !InternalInnerHllw(parent, i))
                 .Select(i => i.ToString() + "=" + InnerResult(Category.Size, parent, i).Size.ToString())
                 .ToArray();
         }

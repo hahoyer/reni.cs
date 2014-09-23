@@ -13,14 +13,18 @@ namespace Reni.Feature
         Func<Category, Result> _function;
         static int _nextObjectId;
         protected SimpleBase(Func<Category, Result> function)
-            : base(_nextObjectId++) { _function = function; }
+            : base(_nextObjectId++)
+        {
+            _function = function;
+        }
         Result ISimpleFeature.Result(Category category) { return _function(category); }
     }
 
     sealed class Simple : SimpleBase, IFeatureImplementation
     {
         public Simple(Func<Category, Result> function)
-            : base(function) { }
+            : base(function)
+        {}
 
         IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return null; } }
         IFunctionFeature IFeatureImplementation.Function { get { return null; } }
@@ -35,7 +39,10 @@ namespace Reni.Feature
         readonly Func<Category, TType, Result> _function;
 
         public Simple(Func<Category, TType, Result> function) { _function = function; }
-        IFeatureImplementation IPath<IFeatureImplementation, TType>.Convert(TType provider) { return new Simple(category => _function(category, provider)); }
+        IFeatureImplementation IPath<IFeatureImplementation, TType>.Convert(TType provider)
+        {
+            return new Simple(category => _function(category, provider));
+        }
     }
 
     sealed class Simple<TType1, TType2>
@@ -47,7 +54,10 @@ namespace Reni.Feature
     {
         readonly Func<Category, TType1, TType2, Result> _function;
         internal Simple(Func<Category, TType1, TType2, Result> function) { _function = function; }
-        IPath<IFeatureImplementation, TType1> IPath<IPath<IFeatureImplementation, TType1>, TType2>.Convert(TType2 provider) { return new Simple<TType1>((category, type1) => _function(category, type1, provider)); }
+        IPath<IFeatureImplementation, TType1> IPath<IPath<IFeatureImplementation, TType1>, TType2>.Convert(TType2 provider)
+        {
+            return new Simple<TType1>((category, type1) => _function(category, type1, provider));
+        }
 
         IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return null; } }
         IFunctionFeature IFeatureImplementation.Function { get { return null; } }

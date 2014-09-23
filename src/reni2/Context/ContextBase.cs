@@ -29,7 +29,10 @@ namespace Reni.Context
         readonly Cache _cache;
 
         protected ContextBase()
-            : base(_nextId++) { _cache = new Cache(this); }
+            : base(_nextId++)
+        {
+            _cache = new Cache(this);
+        }
 
         string IIconKeyProvider.IconKey { get { return "Context"; } }
 
@@ -44,12 +47,24 @@ namespace Reni.Context
         internal IFunctionContext FindRecentFunctionContextObject { get { return _cache.RecentFunctionContextObject.Value; } }
 
         [UsedImplicitly]
-        internal int SizeToPacketCount(Size size) { return size.SizeToPacketCount(Root.DefaultRefAlignParam.AlignBits); }
+        internal int SizeToPacketCount(Size size)
+        {
+            return size.SizeToPacketCount(Root.DefaultRefAlignParam.AlignBits);
+        }
 
-        internal ContextBase UniqueStructurePositionContext(Container container, int position) { return _cache.StructContexts[container][position]; }
+        internal ContextBase UniqueStructurePositionContext(Container container, int position)
+        {
+            return _cache.StructContexts[container][position];
+        }
         internal Structure UniqueStructure(Container container) { return UniqueStructure(container, container.EndPosition); }
-        internal Structure UniqueStructure(Container container, int accessPosition) { return _cache.Structures[container][accessPosition]; }
-        internal ContainerContextObject UniqueContainerContext(Container context) { return _cache.ContainerContextObjects[context]; }
+        internal Structure UniqueStructure(Container container, int accessPosition)
+        {
+            return _cache.Structures[container][accessPosition];
+        }
+        internal ContainerContextObject UniqueContainerContext(Container context)
+        {
+            return _cache.ContainerContextObjects[context];
+        }
 
         [DebuggerHidden]
         internal Result UniqueResult(Category category, CompileSyntax syntax)
@@ -102,7 +117,7 @@ namespace Reni.Context
         internal virtual Structure ObtainRecentStructure() { return null; }
         internal virtual IFunctionContext ObtainRecentFunctionContext() { return null; }
 
-        internal virtual bool? QuickIsDataLess(CompileSyntax compileSyntax) { return null; }
+        internal virtual bool? QuickHllw(CompileSyntax compileSyntax) { return null; }
 
         sealed class Cache : DumpableObject, IIconKeyProvider
         {
@@ -136,7 +151,8 @@ namespace Reni.Context
 
             public Cache(ContextBase target)
             {
-                UndefinedSymbolType = new FunctionCache<ExpressionSyntax, IssueType>(syntax => UndefinedSymbolIssue.Type(target, syntax));
+                UndefinedSymbolType = new FunctionCache<ExpressionSyntax, IssueType>
+                    (syntax => UndefinedSymbolIssue.Type(target, syntax));
                 ResultCache = new FunctionCache<CompileSyntax, ResultCache>(target.CreateCacheElement);
                 StructContexts = new FunctionCache<Container, FunctionCache<int, ContextBase>>
                     (

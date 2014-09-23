@@ -8,10 +8,10 @@ using Reni.Validation;
 
 namespace Reni.Code
 {
-    internal sealed class List : FiberHead
+    sealed class List : FiberHead
     {
-        private readonly CodeBase[] _data;
-        private static int _nextObjectId;
+        readonly CodeBase[] _data;
+        static int _nextObjectId;
 
         [Node]
         internal CodeBase[] Data { get { return _data; } }
@@ -19,7 +19,7 @@ namespace Reni.Code
         internal static List Create(params CodeBase[] data) { return new List(data); }
         internal static List Create(IEnumerable<CodeBase> data) { return new List(data); }
 
-        private void AssertValid()
+        void AssertValid()
         {
             foreach(var codeBase in _data)
             {
@@ -29,7 +29,7 @@ namespace Reni.Code
             Tracer.Assert(_data.Length > 1);
         }
 
-        private List(IEnumerable<CodeBase> data)
+        List(IEnumerable<CodeBase> data)
             : base(_nextObjectId++)
         {
             _data = data.ToArray();
@@ -62,7 +62,7 @@ namespace Reni.Code
             get
             {
                 for(var i = 0; i < _data.Length - 1; i++)
-                    if(!_data[i].IsDataLess)
+                    if(!_data[i].Hllw)
                         return false;
                 return true;
             }

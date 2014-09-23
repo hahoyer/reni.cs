@@ -14,6 +14,7 @@ namespace Reni.Type
 
         [DisableDump]
         protected override string TagTitle { get { return "enable_cut"; } }
+
         internal override IEnumerable<SearchResult> ConvertersForType(TypeBase destination, IConversionParameter parameter)
         {
             return Parent.ConvertersForType(destination, parameter.EnsureEnableCut);

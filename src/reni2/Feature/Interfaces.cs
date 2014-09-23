@@ -99,15 +99,26 @@ namespace Reni.Feature
         public abstract Result Converter(Category category);
         public abstract TypeBase Type { get; }
 
-        public CallDescriptor CallDescriptor { get { return new CallDescriptor(Type, Feature, Converter); } }
-        public Result CallResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
+        CallDescriptor CallDescriptor { get { return new CallDescriptor(Type, Feature, Converter); } }
+
+        internal Result CallResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
             return CallDescriptor
                 .Result(category, context, right)
                 .ReplaceArg(c => context.ObjectResult(c, left));
         }
 
-        public Result CallResult(Category category) { return CallDescriptor.Result(category); }
+        internal Result CallResult(Category category) { return CallDescriptor.Result(category); }
+
+        internal Result ConversionResult(Category category, TypeBase source, TypeBase destination)
+        {
+            var callResult = CallResult(category.Typed);
+            var result = callResult
+                .ReplaceArg(source.ArgResult);
+
+            var obviousConversion = result.Type.ObviousConversion(category, destination);
+            return obviousConversion.ReplaceArg(result) & category;
+        }
     }
 
     sealed class TypeSearchResult : SearchResult

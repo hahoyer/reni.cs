@@ -1,29 +1,7 @@
-#region Copyright (C) 2012
-
-//     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-#endregion
-
-using hw.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using hw.Debug;
 using hw.Forms;
 using Reni.Basics;
 using Reni.Code;
@@ -70,27 +48,21 @@ namespace Reni.Struct
 
         internal TypeBase AccessType(int accessPosition, int position)
         {
-            return Container
-                .AccessType(_parent, accessPosition, position);
+            return Container.AccessType(_parent, accessPosition, position);
         }
 
         internal Size StructureSize(int position)
         {
-            if(StructureIsDataLess(position))
+            if(StructureHllw(position))
                 return Size.Zero;
             return StructureSize(0, position);
         }
 
-        internal bool StructureIsDataLess(int accessPosition)
-        {
-            return Container
-                .ObtainIsDataLess(Parent, accessPosition);
-        }
+        internal bool StructureHllw(int accessPosition) { return Container.ObtainHllw(Parent, accessPosition); }
 
         internal Result ContextReferenceViaStructReference(int position, Result result)
         {
-            return result
-                .ReplaceAbsolute(this, () => ContextReferenceViaStructReferenceCode(position), CodeArgs.Arg);
+            return result.ReplaceAbsolute(this, () => ContextReferenceViaStructReferenceCode(position), CodeArgs.Arg);
         }
 
         internal Result Result(Category category, Result innerResult)
@@ -105,8 +77,7 @@ namespace Reni.Struct
 
         Size StructureSize(int fromPosition, int fromNotPosition)
         {
-            return Container
-                .StructureSize(Parent, fromPosition, fromNotPosition);
+            return Container.StructureSize(Parent, fromPosition, fromNotPosition);
         }
 
         CodeBase ContextReferenceViaStructReferenceCode(int accessPosition)
@@ -119,8 +90,7 @@ namespace Reni.Struct
 
         internal Size FieldOffsetFromAccessPoint(int accessPosition, int fieldPosition)
         {
-            return Container
-                .StructureSize(Parent, fieldPosition + 1, accessPosition);
+            return Container.StructureSize(Parent, fieldPosition + 1, accessPosition);
         }
     }
 }

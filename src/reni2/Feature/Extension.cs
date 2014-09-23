@@ -20,23 +20,20 @@ namespace Reni.Feature
         internal static Simple<T1> Feature<T1>(Func<Category, T1, Result> function)
             where T1 : TypeBase
         {
-            return
-                new Simple<T1>(function);
+            return new Simple<T1>(function);
         }
 
         internal static Simple<T1, T2> Feature<T1, T2>(Func<Category, T1, T2, Result> function)
             where T1 : TypeBase
             where T2 : TypeBase
         {
-            return
-                new Simple<T1, T2>(function);
+            return new Simple<T1, T2>(function);
         }
 
         internal static string Dump(this IFeatureImplementation feature) { return Tracer.Dump(feature); }
         internal static Function Feature(Func<Category, IContextReference, TypeBase, Result> function)
         {
-            return
-                new Function(function);
+            return new Function(function);
         }
 
         internal static ISimpleFeature SimpleFeature(this IFeatureImplementation feature)
@@ -82,7 +79,9 @@ namespace Reni.Feature
 
     static class GenericizeExtension
     {
-        public static IEnumerable<IGenericProviderForType> GenericList<T>(this T target, IEnumerable<IGenericProviderForType> baseList = null) where T : TypeBase {
+        public static IEnumerable<IGenericProviderForType> GenericList<T>
+            (this T target, IEnumerable<IGenericProviderForType> baseList = null) where T : TypeBase
+        {
             return CreateList(baseList, () => new GenericProviderForType<T>(target));
         }
 

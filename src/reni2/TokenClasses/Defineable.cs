@@ -30,7 +30,10 @@ namespace Reni.TokenClasses
         [DisableDump]
         protected string DataFunctionName { get { return Name.Symbolize(); } }
 
-        public virtual SearchResult FindGenericDeclarationsForType(TypeBase provider) { return provider.DeclarationsForType<Defineable>(); }
+        public virtual SearchResult FindGenericDeclarationsForType(TypeBase provider)
+        {
+            return provider.DeclarationsForType<Defineable>();
+        }
     }
 
     abstract class Defineable<TTarget> : Defineable

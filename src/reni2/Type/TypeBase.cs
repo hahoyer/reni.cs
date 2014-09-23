@@ -94,13 +94,13 @@ namespace Reni.Type
         [NotNull]
         Size ObtainSize()
         {
-            if(IsDataLess)
+            if(Hllw)
                 return Size.Zero;
             return GetSize();
         }
 
         [DisableDump]
-        internal virtual bool IsDataLess
+        internal virtual bool Hllw
         {
             get
             {
@@ -165,7 +165,7 @@ namespace Reni.Type
         {
             get
             {
-                if(IsDataLess)
+                if(Hllw)
                     return this;
                 return UniquePointer;
             }
@@ -183,10 +183,7 @@ namespace Reni.Type
             }
         }
 
-        Result VoidCodeAndRefs(Category category)
-        {
-            return RootContext.VoidResult(category & (Category.Code | Category.CodeArgs));
-        }
+        Result VoidCodeAndRefs(Category category) { return RootContext.VoidResult(category & (Category.Code | Category.Exts)); }
 
         internal ArrayType UniqueArray(int count) { return _cache.Array[count]; }
         protected virtual TypeBase ReversePair(TypeBase first) { return first._cache.Pair[this]; }
@@ -208,7 +205,7 @@ namespace Reni.Type
 
         internal Result Result(Category category, IContextReference target)
         {
-            if(IsDataLess)
+            if(Hllw)
                 return Result(category);
             return new Result
                 (
@@ -225,19 +222,19 @@ namespace Reni.Type
                 category,
                 getType: () => this,
                 getCode: () => codeAndRefs.Code,
-                getArgs: () => codeAndRefs.CodeArgs
+                getExts: () => codeAndRefs.Exts
                 );
         }
 
         internal Result Result(Category category, Func<Category, Result> getCodeAndRefs)
         {
-            var localCategory = category & (Category.Code | Category.CodeArgs);
+            var localCategory = category & (Category.Code | Category.Exts);
             var codeAndRefs = getCodeAndRefs(localCategory);
             return Result
                 (
                     category,
                     () => codeAndRefs.Code,
-                    () => codeAndRefs.CodeArgs
+                    () => codeAndRefs.Exts
                 );
         }
 
@@ -248,7 +245,7 @@ namespace Reni.Type
                 category,
                 getType: () => this,
                 getCode: getCode,
-                getArgs: getArgs
+                getExts: getArgs
                 );
         }
 
@@ -316,6 +313,9 @@ namespace Reni.Type
                     .DeAlign(Category.Type).Type;
             }
         }
+
+        [DisableDump]
+        internal virtual TypeBase CoreType { get { return this; } }
 
         [DisableDump]
         internal TypeBase TypeForSearchProbes
@@ -388,7 +388,7 @@ namespace Reni.Type
 
         internal Result LocalReferenceResult(Category category)
         {
-            if(IsDataLess)
+            if(Hllw)
                 return ArgResult(category);
 
             return UniquePointer
@@ -396,7 +396,7 @@ namespace Reni.Type
                 (
                     category,
                     LocalReferenceCode,
-                    () => Destructor(Category.CodeArgs).CodeArgs + CodeArgs.Arg()
+                    () => Destructor(Category.Exts).Exts + CodeArgs.Arg()
                 );
         }
 
@@ -414,7 +414,7 @@ namespace Reni.Type
 
         internal Result ContextAccessResult(Category category, IContextReference target, Func<Size> getOffset)
         {
-            if(IsDataLess)
+            if(Hllw)
                 return Result(category);
             return new Result
                 (
@@ -474,23 +474,15 @@ namespace Reni.Type
 
             switch(searchResults.Length)
             {
-                case 0:
-                    NotImplementedMethod(category, destination);
-                    return null;
                 case 1:
-                    var result = searchResults[0]
-                        .CallResult(category.Typed)
-                        .ReplaceArg(c => ObviousExactConversion(c.Typed, TypeForConversion));
-
-                    var obviousConversion = result.Type.ObviousConversion(category, destination);
-                    return obviousConversion.ReplaceArg(result) & category;
+                    return searchResults[0].ConversionResult(category, this, destination);
             }
 
             NotImplementedMethod(category, destination);
             return null;
         }
 
-        Result ObviousConversion(Category category, TypeBase destination)
+        internal Result ObviousConversion(Category category, TypeBase destination)
         {
             if(TypeForConversion != destination.TypeForConversion)
                 return null;
@@ -503,26 +495,28 @@ namespace Reni.Type
 
         internal Result ObviousExactConversion(Category category, TypeBase destination)
         {
-            if(TypeForConversion != destination.TypeForConversion)
-                return null;
+            if(CoreType == destination.CoreType)
+                return destination.ArgResult(category);
 
-            if(ReferenceType == null && destination.ReferenceType != null)
-                return LocalReferenceResult(category);
+            var sourcePointer = this as PointerType;
+            if(sourcePointer == null)
+                return UniquePointer
+                    .ObviousExactConversion(category, destination)
+                    .ReplaceArg(LocalReferenceResult(category));
 
-            var result = ArgResult(category);
-
-            if(this != destination)
+            var destinationPointer = destination as PointerType;
+            if(destinationPointer == null)
             {
-                if(ReferenceType != null)
-                    result = result.DereferenceResult;
-
-                if(destination is Aligner)
-                    result = result.Align(Root.DefaultRefAlignParam.AlignBits);
-                else if(ReferenceType == null)
-                    result = result.UnalignedResult;
+                var pointer = destination.UniquePointer;
+                return pointer.DePointer(category).Data
+                    .ReplaceArg(ObviousExactConversion(category, pointer));
             }
 
-            return result;
+            if(sourcePointer.ValueType.CoreType == destinationPointer.ValueType.CoreType)
+                return destination.Result(category, () => ArgCode, CodeArgs.Arg);
+
+            NotImplementedMethod(category, destination);
+            return null;
         }
 
         internal Result TextItemResult(Category category)
@@ -613,21 +607,25 @@ namespace Reni.Type
 
         internal virtual IEnumerable<SearchResult> ConvertersForType(TypeBase destination, IConversionParameter parameter)
         {
-            return destination.Genericize.SelectMany(g=>g.ConvertersForType(this, parameter));
+            return destination.Genericize.SelectMany(g => g.ConvertersForType(this, parameter));
         }
 
-        internal IEnumerable<SearchResult> ConvertersForType<TDestination>(TDestination destination, IConversionParameter parameter)
+        internal IEnumerable<SearchResult> ConvertersForType<TDestination>
+            (TDestination destination, IConversionParameter parameter)
         {
             var provider = this as IConverterProvider<TDestination, IFeatureImplementation>;
             if(provider != null)
             {
-                var feature = provider.Feature(destination,parameter);
+                var feature = provider.Feature(destination, parameter);
                 if(feature != null)
                     yield return new TypeSearchResult(feature, this);
             }
         }
 
-        internal SearchResult DeclarationsForType(Defineable tokenClass) { return tokenClass.FindGenericDeclarationsForType(this); }
+        internal SearchResult DeclarationsForType(Defineable tokenClass)
+        {
+            return tokenClass.FindGenericDeclarationsForType(this);
+        }
 
         internal SearchResult DeclarationsForType<TDefinable>() where TDefinable : Defineable
         {
@@ -639,12 +637,10 @@ namespace Reni.Type
                 return inheritor.ResolveDeclarationsForType<TDefinable>();
             NotImplementedMethod();
             return null;
-
         }
 
         [DisableDump]
         protected virtual IEnumerable<IGenericProviderForType> Genericize { get { return this.GenericList(); } }
-    
     }
 
     // Krautpuster

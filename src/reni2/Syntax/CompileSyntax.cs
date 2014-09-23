@@ -1,33 +1,11 @@
-#region Copyright (C) 2013
-
-//     Project Reni2
-//     Copyright (C) 2011 - 2013 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-#endregion
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using hw.Debug;
+using hw.Forms;
 using hw.Helper;
 using hw.Parser;
-using hw.Forms;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -46,16 +24,18 @@ namespace Reni.Syntax
         readonly FunctionCache<ContextBase, object> ResultCache = new FunctionCache<ContextBase, object>();
 
         internal CompileSyntax(TokenData token)
-            : base(token) { }
+            : base(token)
+        {}
 
         internal CompileSyntax(TokenData token, int objectId)
-            : base(token, objectId) { }
+            : base(token, objectId)
+        {}
 
         [DisableDump]
         internal bool IsLambda { get { return GetIsLambda(); } }
 
         [DisableDump]
-        internal virtual bool? IsDataLess { get { return IsLambda ? (bool?) true : null; } }
+        internal virtual bool? Hllw { get { return IsLambda ? (bool?) true : null; } }
 
         [DisableDump]
         internal virtual string DumpPrintText
@@ -78,7 +58,10 @@ namespace Reni.Syntax
         }
 
         protected virtual bool GetIsLambda() { return false; }
-        internal override ParsedSyntax CreateSyntaxOrDeclaration(Defineable tokenClass, TokenData token, ParsedSyntax right) { return new ExpressionSyntax(tokenClass, this, token, right.ToCompiledSyntaxOrNull()); }
+        internal override ParsedSyntax CreateSyntaxOrDeclaration(Defineable tokenClass, TokenData token, ParsedSyntax right)
+        {
+            return new ExpressionSyntax(tokenClass, this, token, right.ToCompiledSyntaxOrNull());
+        }
         internal override ParsedSyntax SurroundedByParenthesis(TokenData token, TokenData rightToken) { return this; }
         internal override CompileSyntax ToCompiledSyntax() { return this; }
         internal void AddToCacheForDebug(ContextBase context, object cacheItem) { ResultCache.Add(context, cacheItem); }
@@ -86,7 +69,10 @@ namespace Reni.Syntax
         //[DebuggerHidden]
         internal Result Result(ContextBase context, Category category) { return context.UniqueResult(category, this); }
         Result FindResult(ContextBase context, Category category) { return context.FindResult(category, this); }
-        internal BitsConst Evaluate(ContextBase context) { return Result(context).Evaluate(context.RootContext.ExecutionContext); }
+        internal BitsConst Evaluate(ContextBase context)
+        {
+            return Result(context).Evaluate(context.RootContext.ExecutionContext);
+        }
 
         internal Result AtTokenResult(ContextBase context, Category category, CompileSyntax right)
         {
@@ -114,24 +100,27 @@ namespace Reni.Syntax
             return result;
         }
 
-        internal bool IsDataLessStructureElement(ContextBase context)
+        internal bool HllwStructureElement(ContextBase context)
         {
-            var result = IsDataLess;
+            var result = Hllw;
             if(result != null)
                 return result.Value;
 
-            result = context.QuickIsDataLess(this);
+            result = context.QuickHllw(this);
             if(result != null)
                 return result.Value;
 
             var type = FindResult(context, Category.Type).Type;
             if(type != null)
-                return type.SmartUn<FunctionType>().IsDataLess;
+                return type.SmartUn<FunctionType>().Hllw;
 
-            return Type(context).SmartUn<FunctionType>().IsDataLess;
+            return Type(context).SmartUn<FunctionType>().Hllw;
         }
 
-        internal Result PointerKindResult(ContextBase context, Category category) { return Result(context, category.Typed).LocalPointerKindResult; }
+        internal Result PointerKindResult(ContextBase context, Category category)
+        {
+            return Result(context, category.Typed).LocalPointerKindResult;
+        }
 
         internal Result SmartUnFunctionedReferenceResult(ContextBase context, Category category)
         {

@@ -15,7 +15,8 @@ namespace Reni.Code
     abstract class CodeBase : DumpableObject, IIconKeyProvider, IFormalCodeItem
     {
         protected CodeBase(int objectId)
-            : base(objectId) { }
+            : base(objectId)
+        {}
 
         [Node]
         [DisableDump]
@@ -25,7 +26,7 @@ namespace Reni.Code
         internal Size TemporarySize { get { return GetTemporarySize(); } }
 
         [DisableDump]
-        internal CodeArgs CodeArgs { get { return GetRefsImplementation(); } }
+        internal CodeArgs Exts { get { return GetRefsImplementation(); } }
 
         [DisableDump]
         internal virtual bool IsEmpty { get { return false; } }
@@ -88,8 +89,14 @@ namespace Reni.Code
             return Add(new ReferencePlusConstant(right, CallingMethodName));
         }
 
-        internal CodeBase ArrayAccess(Size elementSize, Size indexSize) { return Add(new ArrayGetter(elementSize, indexSize, CallingMethodName)); }
-        internal CodeBase ArrayAssignment(Size elementSize, Size indexSize) { return Add(new ArraySetter(elementSize, indexSize, CallingMethodName)); }
+        internal CodeBase ArrayAccess(Size elementSize, Size indexSize)
+        {
+            return Add(new ArrayGetter(elementSize, indexSize, CallingMethodName));
+        }
+        internal CodeBase ArrayAssignment(Size elementSize, Size indexSize)
+        {
+            return Add(new ArraySetter(elementSize, indexSize, CallingMethodName));
+        }
 
         internal CodeBase DePointer(Size targetSize)
         {
@@ -207,7 +214,7 @@ namespace Reni.Code
         internal abstract IEnumerable<IssueBase> Issues { get; }
 
         [DisableDump]
-        internal bool IsDataLess { get { return Size.IsZero; } }
+        internal bool Hllw { get { return Size.IsZero; } }
 
         internal CodeBase LocalBlock(CodeBase copier)
         {
@@ -230,12 +237,21 @@ namespace Reni.Code
             return result.Add(new Drop(Size, resultSize));
         }
 
-        internal CodeBase BitSequenceOperation(string name, Size size, Size leftSize) { return Add(new BitArrayBinaryOp(name, size, leftSize, Size - leftSize)); }
+        internal CodeBase BitSequenceOperation(string name, Size size, Size leftSize)
+        {
+            return Add(new BitArrayBinaryOp(name, size, leftSize, Size - leftSize));
+        }
         internal CodeBase DumpPrintNumber(Size leftSize) { return Add(new DumpPrintNumberOperation(leftSize, Size - leftSize)); }
         internal CodeBase DumpPrintText(Size itemSize) { return Add(new DumpPrintTextOperation(Size, itemSize)); }
-        internal CodeBase BitSequenceOperation(string operation, Size size) { return Add(new BitArrayPrefixOp(operation, size, Size)); }
+        internal CodeBase BitSequenceOperation(string operation, Size size)
+        {
+            return Add(new BitArrayPrefixOp(operation, size, Size));
+        }
 
-        internal static CodeBase LocalVariableReference(string holder, Size offset = null) { return new LocalVariableReference(holder, offset); }
+        internal static CodeBase LocalVariableReference(string holder, Size offset = null)
+        {
+            return new LocalVariableReference(holder, offset);
+        }
 
         internal CodeBase AddRange(IEnumerable<FiberItem> subsequentElement)
         {
@@ -261,12 +277,15 @@ namespace Reni.Code
 
         protected static CodeArgs GetRefs(CodeBase[] codeBases)
         {
-            var refs = codeBases.Select(code => code.CodeArgs).ToArray();
+            var refs = codeBases.Select(code => code.Exts).ToArray();
             return refs.Aggregate(CodeArgs.Void(), (r1, r2) => r1.Sequence(r2));
         }
 
         internal static CodeBase Arg(TypeBase type) { return new Arg(type); }
-        internal Container Container(string description, FunctionId functionId = null) { return new Container(this, description, functionId); }
+        internal Container Container(string description, FunctionId functionId = null)
+        {
+            return new Container(this, description, functionId);
+        }
 
         public static CodeBase operator +(CodeBase a, CodeBase b) { return a.Sequence(b); }
     }
@@ -276,10 +295,19 @@ namespace Reni.Code
 
     static class CodeBaseExtender
     {
-        internal static CodeBase ToSequence(this IEnumerable<CodeBase> x) { return x.Aggregate(CodeBase.Void, (code, result) => code + result); }
+        internal static CodeBase ToSequence(this IEnumerable<CodeBase> x)
+        {
+            return x.Aggregate(CodeBase.Void, (code, result) => code + result);
+        }
 
-        internal static CodeBase ToLocalVariables(this IEnumerable<CodeBase> codeBases, string holderPattern) { return CodeBase.List(codeBases.Select((x, i) => LocalVariableDefinition(string.Format(holderPattern, i), x))); }
+        internal static CodeBase ToLocalVariables(this IEnumerable<CodeBase> codeBases, string holderPattern)
+        {
+            return CodeBase.List(codeBases.Select((x, i) => LocalVariableDefinition(string.Format(holderPattern, i), x)));
+        }
 
-        static CodeBase LocalVariableDefinition(string holderName, CodeBase value) { return value.Add(new LocalVariableDefinition(holderName, value.Size)); }
+        static CodeBase LocalVariableDefinition(string holderName, CodeBase value)
+        {
+            return value.Add(new LocalVariableDefinition(holderName, value.Size));
+        }
     }
 }

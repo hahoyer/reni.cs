@@ -21,7 +21,7 @@ namespace Reni.Type
         internal BitType(Root rootContext) { _rootContext = rootContext; }
 
         [DisableDump]
-        internal override bool IsDataLess { get { return false; } }
+        internal override bool Hllw { get { return false; } }
 
         [DisableDump]
         internal override string DumpPrintText { get { return "bit"; } }

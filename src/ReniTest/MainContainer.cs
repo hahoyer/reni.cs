@@ -97,8 +97,11 @@ ParLevel ( { ) }
             static void InternalTest(Type type, string expectedTypeName)
             {
                 Tracer
-                    .Assert(type.PrettyName() == expectedTypeName,
-                        () => type + "\nFound   : " + type.PrettyName() + "\nExpected: " + expectedTypeName, 1);
+                    .Assert
+                    (
+                        type.PrettyName() == expectedTypeName,
+                        () => type + "\nFound   : " + type.PrettyName() + "\nExpected: " + expectedTypeName,
+                        1);
             }
         }
     }

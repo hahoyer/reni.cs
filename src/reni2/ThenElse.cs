@@ -1,31 +1,9 @@
-#region Copyright (C) 2013
-
-//     Project Reni2
-//     Copyright (C) 2011 - 2013 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-#endregion
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
-using hw.Parser;
 using hw.Forms;
+using hw.Parser;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Context;
@@ -60,7 +38,10 @@ namespace Reni
             Else = elseSyntax ?? new EmptyList(thenToken, thenToken);
         }
 
-        internal override Result ObtainResult(ContextBase context, Category category) { return InternalResult(context, category); }
+        internal override Result ObtainResult(ContextBase context, Category category)
+        {
+            return InternalResult(context, category);
+        }
 
         [DisableDump]
         protected override ParsedSyntaxBase[] Children { get { return new ParsedSyntaxBase[] {Cond, Then, Else}; } }
@@ -108,7 +89,7 @@ namespace Reni
                     ,
                     () => condResult.Code.ThenElse(thenResult.Code, elseResult.Code)
                     ,
-                    () => condResult.CodeArgs + thenResult.CodeArgs + elseResult.CodeArgs
+                    () => condResult.Exts + thenResult.Exts + elseResult.Exts
                 );
         }
 
@@ -126,9 +107,13 @@ namespace Reni
     sealed class ThenSyntax : CondSyntax
     {
         internal ThenSyntax(CompileSyntax condSyntax, TokenData thenToken, CompileSyntax thenSyntax)
-            : base(condSyntax, thenToken, thenSyntax, null) { }
+            : base(condSyntax, thenToken, thenSyntax, null)
+        {}
 
-        internal override ParsedSyntax CreateElseSyntax(TokenData token, CompileSyntax elseSyntax) { return new ThenElseSyntax(Cond, Token, Then, token, elseSyntax); }
+        internal override ParsedSyntax CreateElseSyntax(TokenData token, CompileSyntax elseSyntax)
+        {
+            return new ThenElseSyntax(Cond, Token, Then, token, elseSyntax);
+        }
 
         internal override Result ObtainPendingResult(ContextBase context, Category category)
         {
@@ -150,7 +135,10 @@ namespace Reni
             CompileSyntax thenSyntax,
             TokenData elseToken,
             CompileSyntax elseSyntax)
-            : base(condSyntax, thenToken, thenSyntax, elseSyntax) { _elseToken = elseToken; }
+            : base(condSyntax, thenToken, thenSyntax, elseSyntax)
+        {
+            _elseToken = elseToken;
+        }
 
         protected override string GetNodeDump()
         {

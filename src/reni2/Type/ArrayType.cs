@@ -35,7 +35,7 @@ namespace Reni.Type
             Count = count;
             Tracer.Assert(count > 0);
             Tracer.Assert(elementType.ReferenceType == null);
-            Tracer.Assert(!elementType.IsDataLess);
+            Tracer.Assert(!elementType.Hllw);
             _arrayAccessTypeCache = new ValueCache<RepeaterAccessType>(() => new RepeaterAccessType(this));
             _enableArrayOverSizeTypeCache = new ValueCache<EnableArrayOverSizeType>(() => new EnableArrayOverSizeType(this));
             _sequenceCache = new ValueCache<SequenceType>(() => new SequenceType(this));
@@ -61,7 +61,7 @@ namespace Reni.Type
         internal EnableArrayOverSizeType EnableArrayOverSizeType { get { return _enableArrayOverSizeTypeCache.Value; } }
 
         [DisableDump]
-        internal override bool IsDataLess { get { return Count == 0 || ElementType.IsDataLess; } }
+        internal override bool Hllw { get { return Count == 0 || ElementType.Hllw; } }
 
         [DisableDump]
         public override TypeBase ArrayElementType { get { return ElementType; } }
@@ -186,7 +186,7 @@ namespace Reni.Type
                 (
                     category,
                     CreateDumpPrintCode,
-                    () => ElementType.GenericDumpPrintResult(Category.CodeArgs).CodeArgs
+                    () => ElementType.GenericDumpPrintResult(Category.Exts).Exts
                 );
         }
 

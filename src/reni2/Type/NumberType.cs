@@ -31,7 +31,7 @@ namespace Reni.Type
         internal override Root RootContext { get { return _parent.RootContext; } }
         protected override Size GetSize() { return _parent.Size; }
         [DisableDump]
-        internal override bool IsDataLess { get { return _parent.IsDataLess; } }
+        internal override bool Hllw { get { return _parent.Hllw; } }
         [EnableDump]
         internal int Bits { get { return Size.ToInt(); } }
         [DisableDump]
@@ -66,21 +66,21 @@ namespace Reni.Type
 
         Result ConversionAsReference(Category category, NumberType destination)
         {
-            return FlatConversion(category, destination)
+            return destination
+                .FlatConversion(category, this)
                 .ReplaceArg(UnalignedDereferencePointerResult)
                 .LocalPointerKindResult;
         }
 
-        Result FlatConversion(Category category, NumberType destination)
+        Result FlatConversion(Category category, NumberType source)
         {
-            if(Bits == destination.Bits)
+            if(Bits == source.Bits)
                 return ArgResult(category.Typed);
 
-            return destination
-                .Result
+            return Result
                 (
                     category,
-                    () => ArgCode.BitCast(Size),
+                    () => source.ArgCode.BitCast(Size),
                     CodeArgs.Arg
                 );
         }

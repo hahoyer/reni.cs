@@ -6,7 +6,6 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
-using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Struct
@@ -19,7 +18,10 @@ namespace Reni.Struct
 
         internal StructureType(Structure structure) { _structure = structure; }
 
-        IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature { get { return Extension.Feature(DumpPrintTokenResult); } }
+        IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature
+        {
+            get { return Extension.Feature(DumpPrintTokenResult); }
+        }
 
         [DisableDump]
         internal RefAlignParam RefAlignParam { get { return Structure.RefAlignParam; } }
@@ -36,7 +38,7 @@ namespace Reni.Struct
         internal override Structure FindRecentStructure { get { return Structure; } }
 
         [DisableDump]
-        internal override bool IsDataLess { get { return Structure.IsDataLess; } }
+        internal override bool Hllw { get { return Structure.Hllw; } }
 
         internal Result DumpPrintTokenResult(Category category) { return Structure.DumpPrintResultViaStructReference(category); }
 
