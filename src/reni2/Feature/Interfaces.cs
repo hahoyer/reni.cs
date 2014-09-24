@@ -203,4 +203,16 @@ namespace Reni.Feature
             return source.ConvertersForType(_target, parameter);
         }
     }
+
+    sealed class MetaFunction : DumpableObject, IFeatureImplementation, IMetaFunctionFeature
+    {
+        readonly Func<ContextBase, Category, CompileSyntax, Result> _function;
+        public MetaFunction(Func<ContextBase, Category, CompileSyntax, Result> function) { _function = function; }
+
+        IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return this; } }
+        IFunctionFeature IFeatureImplementation.Function { get { return null; } }
+        ISimpleFeature IFeatureImplementation.Simple { get { return null; } }
+
+        Result IMetaFunctionFeature.Result(ContextBase contextBase, Category category, CompileSyntax right) { return _function(contextBase, category, right); }
+    }
 }

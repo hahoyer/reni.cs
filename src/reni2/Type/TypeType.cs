@@ -6,6 +6,7 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
+using Reni.Sequence;
 using Reni.Struct;
 using Reni.Syntax;
 
@@ -14,6 +15,7 @@ namespace Reni.Type
     sealed class TypeType
         : TypeBase
             , ISymbolProvider<DumpPrintToken, IFeatureImplementation>
+            , ISymbolProvider<Star, IFeatureImplementation>
     {
         readonly TypeBase _value;
 
@@ -37,6 +39,10 @@ namespace Reni.Type
             get { return Extension.Feature(DumpPrintTokenResult); }
         }
 
+        IFeatureImplementation ISymbolProvider<Star, IFeatureImplementation>.Feature
+        {
+            get { return Extension.Feature(StarResult); }
+        }
         internal override string DumpPrintText { get { return "(" + Value.DumpPrintText + "()) type"; } }
 
         protected override string GetNodeDump() { return "(" + Value.NodeDump + ") type"; }
@@ -57,38 +63,17 @@ namespace Reni.Type
 
         internal Result DumpPrintTokenResult(Category category) { return Value.DumpPrintTypeNameResult(category); }
 
-        internal Result StarResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
+        Result StarResult(ContextBase context, Category category, CompileSyntax right)
         {
-            var trace = ObjectId == -54 && context.ObjectId == 20 && left.ObjectId == 225;
-            StartMethodDump(trace, context, category, left, right);
-            try
-            {
-                var countResult = right.Result(context).AutomaticDereferenceResult;
-
-                Dump("countResult", countResult);
-                BreakExecution();
-
-                var count = countResult
-                    .Evaluate(context.RootContext.ExecutionContext)
-                    .ToInt32();
-
-                Dump("count", count);
-                BreakExecution();
-
-                var type = Value
-                    .UniqueAlign
-                    .UniqueArray(count)
-                    .UniqueTypeType;
-
-                Dump("type", type);
-                BreakExecution();
-
-                return ReturnMethodDump(type.Result(category));
-            }
-            finally
-            {
-                EndMethodDump();
-            }
+            var countResult = right.Result(context).AutomaticDereferenceResult;
+            var count = countResult
+                .Evaluate(context.RootContext.ExecutionContext)
+                .ToInt32();
+            var type = Value
+                .UniqueAlign
+                .UniqueArray(count)
+                .UniqueTypeType;
+            return type.Result(category);
         }
 
         internal Result SlashResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)

@@ -635,7 +635,7 @@ namespace Reni.Type
             var inheritor = this as IFeatureInheritor;
             if(inheritor != null)
                 return inheritor.ResolveDeclarationsForType<TDefinable>();
-            NotImplementedMethod();
+            NotImplementedMethod("TDefinable",typeof(TDefinable).PrettyName());
             return null;
         }
 

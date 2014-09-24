@@ -5,6 +5,8 @@ using hw.Debug;
 using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Context;
+using Reni.Syntax;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -12,6 +14,10 @@ namespace Reni.Feature
 {
     static class Extension
     {
+        static readonly FunctionCache<Func<ContextBase, Category, CompileSyntax, Result>, MetaFunction> _metaFunctionCache
+            = new FunctionCache<Func<ContextBase, Category, CompileSyntax, Result>, MetaFunction>
+                (function => new MetaFunction(function));
+
         static readonly FunctionCache<Func<Category, Result>, Simple> _simpleCache
             = new FunctionCache<Func<Category, Result>, Simple>(function => new Simple(function));
 
@@ -43,6 +49,11 @@ namespace Reni.Feature
                 return null;
 
             return feature.Simple;
+        }
+
+        internal static MetaFunction Feature(Func<ContextBase, Category, CompileSyntax, Result> function)
+        {
+            return _metaFunctionCache[function];
         }
 
         public static SearchResult ResolveDeclarationsForType<TDefinable>(this IFeatureInheritor inheritor)
