@@ -14,7 +14,7 @@ namespace Reni.ReniParser
     sealed class ExpressionSyntax : CompileSyntax
     {
         [Node]
-        readonly Defineable _tokenClass;
+        readonly Definable _tokenClass;
         [Node]
         internal readonly CompileSyntax Left;
         [Node]
@@ -23,7 +23,7 @@ namespace Reni.ReniParser
         internal readonly CompileSyntax Right;
 
         internal ExpressionSyntax
-            (Defineable tokenClass, CompileSyntax left, TokenData token, CompileSyntax right)
+            (Definable tokenClass, CompileSyntax left, TokenData token, CompileSyntax right)
             : base(token)
         {
             _tokenClass = tokenClass;
@@ -35,33 +35,27 @@ namespace Reni.ReniParser
         internal override Result ObtainResult(ContextBase context, Category category)
         {
             if(Left == null)
-            {
-                var searchResult
-                    = context.DeclarationsForType(_tokenClass);
+                return context.ObtainResult(category, _token, _tokenClass, Right);
 
-                if(searchResult != null)
-                {
-                    var result = searchResult.Data.FunctionResult(context, category, Right);
-                    Tracer.Assert(category <= result.CompleteCategory);
-                    return result;
-                }
-            }
-            else
-            {
-                var searchResult
-                    = context
-                        .Type(Left)
-                        .TypeForSearchProbes
-                        .DeclarationsForType(_tokenClass);
+            var typeForSearch = context.Type(Left).TypeForSearchProbes;
+            var searchResults
+                = typeForSearch
+                    .DeclarationsForType(_tokenClass)
+                    .ToArray();
 
-                if(searchResult != null)
-                    return searchResult.CallResult(context, category, Left, Right);
+            switch(searchResults.Length)
+            {
+                case 0:
+                    return UndefinedSymbolIssue.Type(_token, typeForSearch ).IssueResult(category);
+
+                case 1:
+                    return searchResults[0].CallResult(context, category, c => context.ObjectResult(c, Left), Right);
+
+                default:
+                    return AmbiguousSymbolIssue.Type(_token, context.RootContext).IssueResult(category);
             }
 
-            return UndefinedSymbolIssue.Type(context, this).IssueResult(category);
         }
-
-        internal Probe[] Probes(ContextBase context) { throw new NotImplementedException(); }
 
         protected override string GetNodeDump()
         {

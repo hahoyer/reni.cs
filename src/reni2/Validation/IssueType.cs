@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
+using hw.Parser;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
-using Reni.ReniParser;
 using Reni.Type;
 
 namespace Reni.Validation
@@ -27,9 +27,10 @@ namespace Reni.Validation
 
         [DisableDump]
         internal override bool Hllw { get { return true; } }
+        internal override string DumpPrintText { get { return _issue.IssueId.Tag; } }
 
         internal Result IssueResult(Category category) { return Result(category, Code); }
-        IssueType ConsequentialErrorType(ExpressionSyntax syntax) { return _issue.ConsequentialError(syntax).Type(RootContext); }
+        IssueType ConsequentialErrorType(TokenData position) { return _issue.ConsequentialError(position).Type(RootContext); }
 
         CodeBase Code() { return _issue.Code; }
 

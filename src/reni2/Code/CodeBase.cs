@@ -237,13 +237,13 @@ namespace Reni.Code
             return result.Add(new Drop(Size, resultSize));
         }
 
-        internal CodeBase BitSequenceOperation(string name, Size size, Size leftSize)
+        internal CodeBase NumberOperation(string name, Size size, Size leftSize)
         {
             return Add(new BitArrayBinaryOp(name, size, leftSize, Size - leftSize));
         }
         internal CodeBase DumpPrintNumber(Size leftSize) { return Add(new DumpPrintNumberOperation(leftSize, Size - leftSize)); }
         internal CodeBase DumpPrintText(Size itemSize) { return Add(new DumpPrintTextOperation(Size, itemSize)); }
-        internal CodeBase BitSequenceOperation(string operation, Size size)
+        internal CodeBase NumberOperation(string operation, Size size)
         {
             return Add(new BitArrayPrefixOp(operation, size, Size));
         }

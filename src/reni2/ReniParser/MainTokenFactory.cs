@@ -49,14 +49,15 @@ namespace Reni.ReniParser
                 x += PrioTable.Left("!&!");
                 x += PrioTable.Left("!|!");
 
-                x += PrioTable.Right(":=", "prototype", ":+", ":-", ":*", ":/", ":\\");
+                x += PrioTable.Right(":=");
 
                 x = x.ThenElseLevel("then", "else");
                 x += PrioTable.Right("!");
-                x += PrioTable.Left("/\\", "/!\\", "/\\/\\", "/!\\/!\\");
+                x += PrioTable.Left("/\\", "/!\\", "/\\/\\");
                 x += PrioTable.Right(":");
                 x += PrioTable.Right(",");
                 x += PrioTable.Right(";");
+                x += PrioTable.Right(".");
                 x = x.ParenthesisLevel
                     (
                         new[] {"(", "[", "{"},
@@ -93,11 +94,12 @@ namespace Reni.ReniParser
                     {"}", new RightParenthesis(1)},
                     {"]", new RightParenthesis(2)},
                     {")", new RightParenthesis(3)},
-                    {".", new ArgToken()},
+                    {"^", new ArgToken()},
+                    {"^^", new ContextOperator()},
+                    {".", new List()},
                     {",", new List()},
                     {";", new List()},
                     {"@", new AtOperator()},
-                    {"^", new ContextOperator()},
                     {":", new Colon()},
                     {":=", new Assignment()},
                     {"=", new CompareOperation()},
@@ -107,14 +109,14 @@ namespace Reni.ReniParser
                     {"<=", new CompareOperation()},
                     {"<>", new CompareOperation()},
                     {"<<", new ConcatArrays()},
-                    {"-", new Sign()},
+                    {"<:=>", new EnableReassignToken()},
+                    {"-", new Minus()},
                     {"!", new Exclamation()},
-                    {"+", new Sign()},
+                    {"+", new Plus()},
                     {"/", new Slash()},
                     {"/\\", new TokenClasses.Function()},
                     {"/!\\", new TokenClasses.Function(true)},
                     {"/\\/\\", new TokenClasses.Function(isMetaFunction: true)},
-                    {"/!\\/!\\", new TokenClasses.Function(true, true)},
                     {"*", new Star()},
                     {"_A_T_", new AtToken()},
                     {"dump_print", new DumpPrintToken()},
@@ -126,7 +128,6 @@ namespace Reni.ReniParser
                     {"instance_from_raw_address", new InstanceFromRawAddress()},
                     {"new_value", new NewValueToken()},
                     {"raw_address", new RawAddress()},
-                    {"sequence", new SequenceToken()},
                     {"text_item", new TextItem()},
                     {"text_items", new TextItems()},
                     {"then", new ThenToken()},

@@ -94,7 +94,7 @@ namespace Reni.Struct
                 while(parsedSyntax is DeclarationSyntax)
                 {
                     var d = (DeclarationSyntax) parsedSyntax;
-                    _dictionary.Add(d.Defineable.Name, _list.Count);
+                    _dictionary.Add(d.Definable.Name, _list.Count);
                     parsedSyntax = d.Definition;
                 }
 

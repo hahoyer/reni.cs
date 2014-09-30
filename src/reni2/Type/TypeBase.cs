@@ -438,12 +438,12 @@ namespace Reni.Type
 
         protected virtual ArrayType ObtainArray(int count) { return new ArrayType(this, count); }
 
-        internal CodeBase BitSequenceOperation(string token) { return UniqueAlign.ArgCode.BitSequenceOperation(token, Size); }
+        internal CodeBase BitSequenceOperation(string token) { return UniqueAlign.ArgCode.NumberOperation(token, Size); }
 
         [NotNull]
         internal Result GenericDumpPrintResult(Category category)
         {
-            return DeclarationsForType<DumpPrintToken>().CallResult(category);
+            return Declarations<DumpPrintToken>(null).Single().CallResult(category);
         }
 
         internal Result CreateArray(Category category)
@@ -565,14 +565,14 @@ namespace Reni.Type
         Simple Convert(Aligner type)
         {
             if(type.Parent == this)
-                return Reni.Feature.Extension.Feature(PointerArgResult);
+                return Reni.Feature.Extension.SimpleFeature(PointerArgResult);
             return null;
         }
 
         protected Simple Convert(TypeBase type)
         {
             if(type.TypeForConversion == TypeForConversion)
-                return Reni.Feature.Extension.Feature(DereferenceReferenceResult);
+                return Reni.Feature.Extension.SimpleFeature(DereferenceReferenceResult);
 
             return null;
         }
@@ -607,7 +607,7 @@ namespace Reni.Type
 
         internal virtual IEnumerable<SearchResult> ConvertersForType(TypeBase destination, IConversionParameter parameter)
         {
-            return destination.Genericize.SelectMany(g => g.ConvertersForType(this, parameter));
+            return destination.Genericize.SelectMany(g => g.Converters(this, parameter));
         }
 
         internal IEnumerable<SearchResult> ConvertersForType<TDestination>
@@ -622,25 +622,23 @@ namespace Reni.Type
             }
         }
 
-        internal SearchResult DeclarationsForType(Defineable tokenClass)
+        internal IEnumerable<SearchResult> DeclarationsForType(Definable tokenClass)
         {
-            return tokenClass.FindGenericDeclarationsForType(this);
+            return tokenClass.Genericize.SelectMany(g=>g.Declarations(this));
         }
 
-        internal SearchResult DeclarationsForType<TDefinable>() where TDefinable : Defineable
+        internal IEnumerable<SearchResult> Declarations<TDefinable>(TDefinable tokenClass) where TDefinable : Definable
         {
             var provider = this as ISymbolProvider<TDefinable, IFeatureImplementation>;
             if(provider != null)
-                return new TypeSearchResult(provider.Feature, this);
+                yield return new TypeSearchResult(provider.Feature(tokenClass), this);
             var inheritor = this as IFeatureInheritor;
             if(inheritor != null)
-                return inheritor.ResolveDeclarationsForType<TDefinable>();
-            NotImplementedMethod("TDefinable",typeof(TDefinable).PrettyName());
-            return null;
+                yield return inheritor.ResolveDeclarations(tokenClass);
         }
 
         [DisableDump]
-        protected virtual IEnumerable<IGenericProviderForType> Genericize { get { return this.GenericList(); } }
+        protected virtual IEnumerable<IGenericProviderForType> Genericize { get { return this.GenericListFromType(); } }
     }
 
     // Krautpuster

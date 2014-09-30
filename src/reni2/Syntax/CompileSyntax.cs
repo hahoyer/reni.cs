@@ -58,7 +58,7 @@ namespace Reni.Syntax
         }
 
         protected virtual bool GetIsLambda() { return false; }
-        internal override ParsedSyntax CreateSyntaxOrDeclaration(Defineable tokenClass, TokenData token, ParsedSyntax right)
+        internal override ParsedSyntax CreateSyntaxOrDeclaration(Definable tokenClass, TokenData token, ParsedSyntax right)
         {
             return new ExpressionSyntax(tokenClass, this, token, right.ToCompiledSyntaxOrNull());
         }

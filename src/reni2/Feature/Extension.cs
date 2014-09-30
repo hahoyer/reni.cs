@@ -6,6 +6,7 @@ using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
+using Reni.Sequence;
 using Reni.Syntax;
 using Reni.TokenClasses;
 using Reni.Type;
@@ -21,7 +22,7 @@ namespace Reni.Feature
         static readonly FunctionCache<Func<Category, Result>, Simple> _simpleCache
             = new FunctionCache<Func<Category, Result>, Simple>(function => new Simple(function));
 
-        internal static Simple Feature(Func<Category, Result> function) { return _simpleCache[function]; }
+        internal static Simple SimpleFeature(Func<Category, Result> function) { return _simpleCache[function]; }
 
         internal static Simple<T1> Feature<T1>(Func<Category, T1, Result> function)
             where T1 : TypeBase
@@ -37,11 +38,18 @@ namespace Reni.Feature
         }
 
         internal static string Dump(this IFeatureImplementation feature) { return Tracer.Dump(feature); }
-        internal static Function Feature(Func<Category, IContextReference, TypeBase, Result> function)
+        internal static Function FunctionFeature(Func<Category, IContextReference, TypeBase, Result> function)
         {
             return new Function(function);
         }
 
+        public static IFeatureImplementation FunctionFeature<T>
+            (Func<Category, IContextReference, TypeBase, T, Result> function, T arg)
+        {
+            return new ExtendedFunction<T>(function, arg);
+        }
+
+        
         internal static ISimpleFeature SimpleFeature(this IFeatureImplementation feature)
         {
             var function = feature.Function;
@@ -51,21 +59,22 @@ namespace Reni.Feature
             return feature.Simple;
         }
 
-        internal static MetaFunction Feature(Func<ContextBase, Category, CompileSyntax, Result> function)
+        internal static MetaFunction MetaFeature(Func<ContextBase, Category, CompileSyntax, Result> function)
         {
             return _metaFunctionCache[function];
         }
 
-        public static SearchResult ResolveDeclarationsForType<TDefinable>(this IFeatureInheritor inheritor)
-            where TDefinable : Defineable
+        public static SearchResult ResolveDeclarations<TDefinable>(this IFeatureInheritor inheritor, TDefinable tokenClass)
+            where TDefinable : Definable
         {
             var result = inheritor
                 .Source(Category.Type)
                 .Type
-                .DeclarationsForType<TDefinable>();
+                .Declarations(tokenClass)
+                .SingleOrDefault();
             if(result == null)
                 return null;
-            return new InheritedSearchResult(result, inheritor);
+            return new InheritedTypeSearchResult(result, inheritor);
         }
 
         public static SearchResult ResolveConverterForType<TSource, TPath>(this IPuppet<TSource, TPath> puppet, TSource source)
@@ -90,18 +99,28 @@ namespace Reni.Feature
 
     static class GenericizeExtension
     {
-        public static IEnumerable<IGenericProviderForType> GenericList<T>
-            (this T target, IEnumerable<IGenericProviderForType> baseList = null) where T : TypeBase
+        public static IEnumerable<IGenericProviderForType> GenericListFromType<T>
+            (this T target, IEnumerable<IGenericProviderForType> baseList = null) 
+            where T : TypeBase
         {
             return CreateList(baseList, () => new GenericProviderForType<T>(target));
+        }
+
+        public static IEnumerable<IGenericProviderForDefinable> GenericListFromDefinable<T>
+            (this T target, IEnumerable<IGenericProviderForDefinable> baseList = null) 
+            where T : Definable
+        {
+            return CreateList(baseList, () => new GenericProviderForDefinable<T>(target));
         }
 
         static IEnumerable<TGeneric> CreateList<TGeneric>(IEnumerable<TGeneric> baseList, Func<TGeneric> creator)
         {
             yield return creator();
-            if(baseList != null)
-                foreach(var item in baseList)
-                    yield return item;
+            if(baseList == null)
+                yield break;
+            
+            foreach(var item in baseList)
+                yield return item;
         }
     }
 }

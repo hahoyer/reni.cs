@@ -8,6 +8,7 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.ReniParser;
 using Reni.Struct;
+using Reni.Syntax;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -24,16 +25,21 @@ namespace Reni.Context
 
         readonly ValueCache<BitType> _bitCache;
         readonly ValueCache<VoidType> _voidCache;
+        readonly Dictionary<string, CompileSyntax> _metaDictionary;
 
         internal Root(IExecutionContext executionContext)
         {
+            _metaDictionary = new FunctionCache<string, CompileSyntax>(CreateMetaDictionary);
             ExecutionContext = executionContext;
             _bitCache = new ValueCache<BitType>(() => new BitType(this));
             _voidCache = new ValueCache<VoidType>(() => new VoidType(this));
         }
 
+        CompileSyntax CreateMetaDictionary(string source) { return ExecutionContext.Parse(source); }
+
         [DisableDump]
         internal override Root RootContext { get { return this; } }
+        public override string DumpPrintText { get { return "root"; } }
 
         [DisableDump]
         [Node]
@@ -102,5 +108,7 @@ namespace Reni.Context
                 .Code(this)
                 .Container(description);
         }
+
+        internal CompileSyntax Parse(string source) { return  _metaDictionary[source]; }
     }
 }

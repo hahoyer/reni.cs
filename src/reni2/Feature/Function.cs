@@ -1,31 +1,10 @@
-#region Copyright (C) 2013
-
-//     Project Reni2
-//     Copyright (C) 2012 - 2013 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-#endregion
-
 using System.Linq;
 using System.Collections.Generic;
 using System;
 using hw.Debug;
 using Reni.Basics;
 using Reni.Code;
+using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Feature
@@ -45,7 +24,11 @@ namespace Reni.Feature
             Tracer.Assert(_function.Target is IContextReferenceProvider);
         }
 
-        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType) { return _function(category, ObjectReference, argsType); }
+        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
+        {
+            return _function(category, ObjectReference, argsType);
+        }
+
         bool IFunctionFeature.IsImplicit { get { return false; } }
         IContextReference IFunctionFeature.ObjectReference { get { return ObjectReference; } }
         IContextReference ObjectReference { get { return ((IContextReferenceProvider) _function.Target).ContextReference; } }
@@ -54,11 +37,43 @@ namespace Reni.Feature
     sealed class Function : FunctionBase, IFeatureImplementation
     {
         public Function(Func<Category, IContextReference, TypeBase, Result> function)
-            : base(function) { }
+            : base(function)
+        {}
 
         IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return null; } }
         IFunctionFeature IFeatureImplementation.Function { get { return this; } }
         ISimpleFeature IFeatureImplementation.Simple { get { return null; } }
     }
 
+    sealed class ExtendedFunction<T> : DumpableObject, IFunctionFeature, IFeatureImplementation
+    {
+        static int _nextObjectId;
+        readonly int _order;
+
+        [EnableDump]
+        readonly Func<Category, IContextReference, TypeBase, T, Result> _function;
+        readonly T _arg;
+
+        public ExtendedFunction(Func<Category, IContextReference, TypeBase, T, Result> function, T arg)
+            : base(_nextObjectId++)
+        {
+            _order = CodeArgs.NextOrder++;
+            _function = function;
+            _arg = arg;
+            Tracer.Assert(_function.Target is IContextReferenceProvider);
+        }
+
+        IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return null; } }
+        IFunctionFeature IFeatureImplementation.Function { get { return this; } }
+        ISimpleFeature IFeatureImplementation.Simple { get { return null; } }
+
+        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
+        {
+            return _function(category, ObjectReference, argsType, _arg);
+        }
+
+        bool IFunctionFeature.IsImplicit { get { return false; } }
+        IContextReference IFunctionFeature.ObjectReference { get { return ObjectReference; } }
+        IContextReference ObjectReference { get { return ((IContextReferenceProvider) _function.Target).ContextReference; } }
+    }
 }

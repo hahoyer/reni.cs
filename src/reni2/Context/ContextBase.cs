@@ -5,10 +5,10 @@ using System.Linq;
 using hw.Debug;
 using hw.Forms;
 using hw.Helper;
+using hw.Parser;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Feature;
-using Reni.ReniParser;
 using Reni.Struct;
 using Reni.Syntax;
 using Reni.TokenClasses;
@@ -20,7 +20,9 @@ namespace Reni.Context
     /// <summary>
     ///     Base class for compiler environments
     /// </summary>
-    abstract class ContextBase : DumpableObject, IIconKeyProvider
+    abstract class ContextBase
+        : DumpableObject
+            , IIconKeyProvider
     {
         static int _nextId;
 
@@ -45,6 +47,7 @@ namespace Reni.Context
 
         [DisableDump]
         internal IFunctionContext FindRecentFunctionContextObject { get { return _cache.RecentFunctionContextObject.Value; } }
+        public abstract string DumpPrintText { get; }
 
         [UsedImplicitly]
         internal int SizeToPacketCount(Size size)
@@ -147,12 +150,12 @@ namespace Reni.Context
 
             [Node]
             [SmartNode]
-            internal readonly FunctionCache<ExpressionSyntax, IssueType> UndefinedSymbolType;
+            internal readonly FunctionCache<TokenData, IssueType> UndefinedSymbolType;
 
             public Cache(ContextBase target)
             {
-                UndefinedSymbolType = new FunctionCache<ExpressionSyntax, IssueType>
-                    (syntax => UndefinedSymbolIssue.Type(target, syntax));
+                UndefinedSymbolType = new FunctionCache<TokenData, IssueType>
+                    (tokenData => UndefinedSymbolIssue.Type(tokenData, target));
                 ResultCache = new FunctionCache<CompileSyntax, ResultCache>(target.CreateCacheElement);
                 StructContexts = new FunctionCache<Container, FunctionCache<int, ContextBase>>
                     (
@@ -228,16 +231,28 @@ namespace Reni.Context
                 .ReplaceArg(c => ObjectResult(c, left));
         }
 
-        internal IContextSearchResult Search(Defineable tokenClass)
+        ContextSearchResult Declarations(Definable tokenClass)
         {
-            NotImplementedMethod(tokenClass);
-            return null;
+            return tokenClass.Genericize.SelectMany(g => g.Declarations(this)).Single();
         }
 
-        internal ContextSearchResult DeclarationsForType(Defineable tokenClass)
+        [NotNull]
+        internal Result ObtainResult(Category category, TokenData position, Definable tokenClass, CompileSyntax right)
         {
-            NotImplementedMethod(tokenClass);
-            return null;
+            var searchResult = Declarations(tokenClass);
+            if(searchResult == null)
+                return UndefinedSymbolIssue.Type(position, RootContext).IssueResult(category);
+
+            var result = searchResult.CallResult(this, category, right);
+            Tracer.Assert(category <= result.CompleteCategory);
+            return result;
+        }
+
+        internal IEnumerable<ContextSearchResult> Declarations<TDefinable>(TDefinable tokenClass) where TDefinable : Definable
+        {
+            var provider = this as ISymbolProvider<TDefinable, IFeatureImplementation>;
+            if(provider != null)
+                yield return new ContextSearchResult(provider.Feature(tokenClass), this);
         }
     }
 }

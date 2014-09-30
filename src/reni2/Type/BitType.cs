@@ -31,15 +31,11 @@ namespace Reni.Type
 
         protected override Size GetSize() { return Size.Create(1); }
 
-        IPath<IPath<IFeatureImplementation, SequenceType>, ArrayType>
-            ISymbolProvider<DumpPrintToken, IPath<IPath<IFeatureImplementation, SequenceType>, ArrayType>>.Feature
+        IPath<IPath<IFeatureImplementation, SequenceType>, ArrayType> ISymbolProvider<DumpPrintToken, IPath<IPath<IFeatureImplementation, SequenceType>, ArrayType>>.Feature(DumpPrintToken token)
         {
-            get
-            {
-                var feature = Extension
-                    .Feature<SequenceType, ArrayType>(DumpPrintTokenResult);
-                return feature;
-            }
+            var feature = Extension
+                .Feature<SequenceType, ArrayType>(DumpPrintTokenResult);
+            return feature;
         }
 
         Result DumpPrintTokenResult(Category category, SequenceType sequenceType, ArrayType arrayType)
@@ -71,15 +67,7 @@ namespace Reni.Type
             var argsType = UniqueNumber(argsBits).UniqueAlign;
             return objectType
                 .Pair(argsType).ArgCode
-                .BitSequenceOperation(token, size, Size.Create(objectBits).ByteAlignedSize);
-        }
-
-        internal interface IOperation
-        {
-            int Signature(int objectBitCount, int argsBitCount);
-
-            [DisableDump]
-            string Name { get; }
+                .NumberOperation(token, size, Size.Create(objectBits).ByteAlignedSize);
         }
 
         internal interface IPrefix
@@ -88,7 +76,7 @@ namespace Reni.Type
             string Name { get; }
         }
 
-        Result ApplyResult(Category category, IOperation operation, int objectBitCount, TypeBase argsType)
+        internal Result ApplyResult(Category category, NumberType.IOperation operation, int objectBitCount, TypeBase argsType)
         {
             var typedCategory = category.Typed;
             var argsBitCount = argsType.SequenceLength(this);

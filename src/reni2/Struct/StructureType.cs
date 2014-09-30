@@ -18,9 +18,9 @@ namespace Reni.Struct
 
         internal StructureType(Structure structure) { _structure = structure; }
 
-        IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature
+        IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken token)
         {
-            get { return Extension.Feature(DumpPrintTokenResult); }
+            return Extension.SimpleFeature(DumpPrintTokenResult);
         }
 
         [DisableDump]

@@ -70,14 +70,14 @@ namespace Reni.Sequence
         Simple ConversionFeature(SequenceType destination)
         {       
             return destination.Count >= Count
-                ? Reni.Feature.Extension.Feature(c => ConversionAsReference(c, destination))
+                ? Reni.Feature.Extension.SimpleFeature(c => ConversionAsReference(c, destination))
                 : null;
         }
 
         internal Simple ConversionFeature(ArrayType destination)
         {
             return Parent == destination
-                ? Reni.Feature.Extension.Feature(PointerConversionResult)
+                ? Reni.Feature.Extension.SimpleFeature(PointerConversionResult)
                 : null;
         }
 

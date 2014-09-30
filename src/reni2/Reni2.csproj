@@ -185,7 +185,6 @@
     <Compile Include="Parser\SyntaxIssue.cs" />
     <Compile Include="ReniObjectExtender.cs" />
     <Compile Include="ReniParser\ParsedSyntaxExtension.cs" />
-    <Compile Include="ReniParser\Probe.cs" />
     <Compile Include="ResultCache.cs" />
     <Compile Include="Code\Arg.cs" />
     <Compile Include="Code\Assign.cs" />
@@ -258,7 +257,7 @@
     <Compile Include="Parser\TokenClassExtender.cs" />
     <Compile Include="ReniParser\DeclarationSyntax.cs" />
     <Compile Include="ReniParser\DeclarationTokenFactory.cs" />
-    <Compile Include="ReniParser\DefineableToken.cs" />
+    <Compile Include="ReniParser\DefinableToken.cs" />
     <Compile Include="ReniParser\ExpressionSyntax.cs" />
     <Compile Include="ReniParser\MainTokenFactory.cs" />
     <Compile Include="ReniParser\ParsedSyntax.cs" />
@@ -311,7 +310,7 @@
     <Compile Include="TokenClasses\CompareOperation.cs" />
     <Compile Include="TokenClasses\ConcatArrays.cs" />
     <Compile Include="TokenClasses\DefinableTokenSyntax.cs" />
-    <Compile Include="TokenClasses\Defineable.cs" />
+    <Compile Include="TokenClasses\Definable.cs" />
     <Compile Include="TokenClasses\ElseToken.cs" />
     <Compile Include="TokenClasses\EnableArrayOverSize.cs" />
     <Compile Include="TokenClasses\EnableCut.cs" />
@@ -328,7 +327,6 @@
     <Compile Include="TokenClasses\List.cs" />
     <Compile Include="TokenClasses\Number.cs" />
     <Compile Include="TokenClasses\RightParenthesis.cs" />
-    <Compile Include="TokenClasses\SequenceToken.cs" />
     <Compile Include="TokenClasses\Text.cs" />
     <Compile Include="TokenClasses\TextItem.cs" />
     <Compile Include="TokenClasses\ThenToken.cs" />
@@ -341,7 +339,6 @@
     <Compile Include="Type\EnableArrayOverSizeType.cs" />
     <Compile Include="Type\FeaturePathBridge.cs" />
     <Compile Include="Type\NumberType.cs" />
-    <Compile Include="Type\PathSearchObject.cs" />
     <Compile Include="Type\RepeaterAccessType.cs" />
     <Compile Include="Type\Child.cs" />
     <Compile Include="Type\Converter.cs" />

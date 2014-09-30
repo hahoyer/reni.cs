@@ -34,15 +34,12 @@ namespace Reni.Type
         [DisableDump]
         internal TypeBase Value { get { return _value; } }
 
-        IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature
+        IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
         {
-            get { return Extension.Feature(DumpPrintTokenResult); }
+            return Extension.SimpleFeature(DumpPrintTokenResult);
         }
 
-        IFeatureImplementation ISymbolProvider<Star, IFeatureImplementation>.Feature
-        {
-            get { return Extension.Feature(StarResult); }
-        }
+        IFeatureImplementation ISymbolProvider<Star, IFeatureImplementation>.Feature(Star token) { return Extension.MetaFeature(StarResult); }
         internal override string DumpPrintText { get { return "(" + Value.DumpPrintText + "()) type"; } }
 
         protected override string GetNodeDump() { return "(" + Value.NodeDump + ") type"; }

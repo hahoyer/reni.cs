@@ -30,8 +30,7 @@ namespace Reni.Type
 
         Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
         {
-            return _functionalFeature
-                .ApplyResult(category, argsType);
+            return _functionalFeature.ApplyResult(category, argsType);
         }
     }
 }

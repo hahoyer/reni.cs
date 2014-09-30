@@ -31,17 +31,17 @@ namespace Reni.ReniParser
 {
     sealed class DeclarationSyntax : ParsedSyntax
     {
-        internal readonly Defineable Defineable;
+        internal readonly Definable Definable;
         internal readonly ParsedSyntax Definition;
 
-        internal DeclarationSyntax(Defineable defineable, TokenData token, ParsedSyntax definition)
+        internal DeclarationSyntax(Definable definable, TokenData token, ParsedSyntax definition)
             : base(token)
         {
-            Defineable = defineable;
+            Definable = definable;
             Definition = definition;
         }
 
-        protected override string GetNodeDump() { return Defineable.Name + ": " + Definition.NodeDump; }
+        protected override string GetNodeDump() { return Definable.Name + ": " + Definition.NodeDump; }
 
         internal override ParsedSyntax SurroundedByParenthesis(TokenData leftToken, TokenData rightToken) { return Container.Create(leftToken, rightToken, this); }
     }

@@ -4,6 +4,6 @@ using System;
 
 namespace Reni.TokenClasses
 {
-    sealed class AtOperator : Defineable
+    sealed class AtOperator : Definable
     {}
 }

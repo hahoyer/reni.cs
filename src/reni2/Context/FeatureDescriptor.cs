@@ -22,15 +22,10 @@ namespace Reni.Context
 
         internal Result Result(Category category, ContextBase context, CompileSyntax right)
         {
-            return Result(context, category, right)
-                .ReplaceArg(ConverterResult);
+            return Result(context, category, right).ReplaceArg(ConverterResult);
         }
 
-        internal Result Result(Category category)
-        {
-            return SimpleResult(category)
-                .ReplaceArg(ConverterResult);
-        }
+        internal Result Result(Category category) { return SimpleResult(category).ReplaceArg(ConverterResult); }
 
         Result Result(ContextBase context, Category category, CompileSyntax right)
         {
@@ -49,12 +44,13 @@ namespace Reni.Context
                 .ReplaceAbsolute(function.ObjectReference, Type.PointerKind.ArgResult);
             return result;
         }
+
         Result SimpleResult(Category category)
         {
             Tracer.Assert(Feature.MetaFunction == null);
 
             var simpleFeature = Feature.SimpleFeature();
-            if (simpleFeature != null)
+            if(simpleFeature != null)
                 return simpleFeature.Result(category);
 
             var function = Feature.Function;

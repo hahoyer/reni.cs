@@ -1,30 +1,21 @@
 using System.Linq;
 using System.Collections.Generic;
 using System;
-using hw.Debug;
-using hw.Helper;
 using hw.Parser;
 using Reni.Parser;
-using Reni.ReniParser;
+using Reni.Type;
 using Reni.Validation;
 
 namespace Reni.Context
 {
     sealed class UndefinedSymbolIssue : SyntaxIssue
-
     {
-        [EnableDump]
-        readonly ContextBase _context;
-        readonly ExpressionSyntax _syntax;
+        readonly string _targetIdentifier;
 
-        [EnableDump]
-        TokenData Token { get { return _syntax.Token; } }
-
-        internal UndefinedSymbolIssue(ContextBase context, ExpressionSyntax syntax)
-            : base(syntax, IssueId.UndefinedSymbol)
+        UndefinedSymbolIssue(TokenData position, string targetIdentifier)
+            : base(position, IssueId.UndefinedSymbol)
         {
-            _context = context;
-            _syntax = syntax;
+            _targetIdentifier = targetIdentifier;
             StopByObjectId(266);
         }
 
@@ -33,20 +24,32 @@ namespace Reni.Context
             get
             {
                 var result = base.LogDump;
-                var probes = Probes.Where(p => p.HasImplementations).ToArray();
-                if(probes.Length == 0)
-                    return result;
-                result += ("\n" + probes.Select(x => x.LogDump).Stringify("\n")).Indent();
+                result += " " + _targetIdentifier;
                 return result;
             }
         }
 
-        [DisableDump]
-        Probe[] Probes { get { return _syntax.Probes(_context); } }
-
-        internal static IssueType Type(ContextBase context, ExpressionSyntax syntax)
+        internal static IssueType Type(TokenData position, TypeBase target)
         {
-            return new IssueType(new UndefinedSymbolIssue(context, syntax), context.RootContext);
+            return new IssueType(new UndefinedSymbolIssue(position, "Type: "+ target.DumpPrintText), target.RootContext);
+        }
+        public static IssueType Type(TokenData position, ContextBase target)
+        {
+            return new IssueType(new UndefinedSymbolIssue(position, "Context: "+ target.DumpPrintText), target.RootContext);
+        }
+    }
+
+    sealed class AmbiguousSymbolIssue : SyntaxIssue
+    {
+        AmbiguousSymbolIssue(TokenData position)
+            : base(position, IssueId.UndefinedSymbol)
+        {
+            StopByObjectId(266);
+        }
+
+        internal static IssueType Type(TokenData position, Root rootContext)
+        {
+            return new IssueType(new AmbiguousSymbolIssue(position), rootContext);
         }
     }
 }
