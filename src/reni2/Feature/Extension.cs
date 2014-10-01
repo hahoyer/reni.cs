@@ -44,7 +44,7 @@ namespace Reni.Feature
         }
 
         public static IFeatureImplementation FunctionFeature<T>
-            (Func<Category, IContextReference, TypeBase, T, Result> function, T arg)
+            (Func<Category, TypeBase, T, Result> function, T arg)
         {
             return new ExtendedFunction<T>(function, arg);
         }

@@ -37,12 +37,26 @@ namespace Reni.Context
             if(simpleFeature != null && right == null)
                 return simpleFeature.Result(category);
 
-            var function = Feature.Function;
-            var result = function
-                .ApplyResult(category, context.ArgsResult(Category.Type, right).Type)
-                .ReplaceArg(c => context.ArgsResult(c, right))
-                .ReplaceAbsolute(function.ObjectReference, Type.PointerKind.ArgResult);
-            return result;
+            StartMethodDump(category.HasCode, context, category, right);
+            try
+            {
+                var function = Feature.Function;
+                var applyResult = function
+                    .ApplyResult(category, context.ArgsResult(Category.Type, right).Type);
+                var replaceArg = applyResult
+                    .ReplaceArg(c => context.ArgsResult(c, right));
+                var result = replaceArg
+                    .ReplaceAbsolute(function.ObjectReference, Type.PointerKind.ArgResult);
+
+                Dump("applyResult", applyResult);
+                Dump("replaceArg", replaceArg);
+
+                return ReturnMethodDump(result);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
 
         Result SimpleResult(Category category)
@@ -81,7 +95,9 @@ namespace Reni.Context
                 return result != null ? result.Type : _definingType;
             }
         }
+        [DisableDump]
         protected override IFeatureImplementation Feature { get { return _feature; } }
+        [DisableDump]
         protected override Func<Category, Result> ConverterResult { get { return _converterResult; } }
     }
 

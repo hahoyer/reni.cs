@@ -67,7 +67,7 @@ namespace Reni.Type
             var argsType = UniqueNumber(argsBits).UniqueAlign;
             return objectType
                 .Pair(argsType).ArgCode
-                .NumberOperation(token, size, Size.Create(objectBits).ByteAlignedSize);
+                .NumberOperation(token, size, Size.Create(objectBits).ByteAlignedSize, Size.Create(argsBits));
         }
 
         internal interface IPrefix

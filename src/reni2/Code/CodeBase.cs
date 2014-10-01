@@ -237,9 +237,9 @@ namespace Reni.Code
             return result.Add(new Drop(Size, resultSize));
         }
 
-        internal CodeBase NumberOperation(string name, Size size, Size leftSize)
+        internal CodeBase NumberOperation(string name, Size resultSize, Size leftSize, Size rightSize)
         {
-            return Add(new BitArrayBinaryOp(name, size, leftSize, Size - leftSize));
+            return Add(new BitArrayBinaryOp(name, resultSize, leftSize, rightSize));
         }
         internal CodeBase DumpPrintNumber(Size leftSize) { return Add(new DumpPrintNumberOperation(leftSize, Size - leftSize)); }
         internal CodeBase DumpPrintText(Size itemSize) { return Add(new DumpPrintTextOperation(Size, itemSize)); }

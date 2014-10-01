@@ -11,7 +11,6 @@ namespace Reni.Feature
 {
     abstract class FunctionBase : DumpableObject, IFunctionFeature
     {
-        [EnableDump]
         readonly Func<Category, IContextReference, TypeBase, Result> _function;
         static int _nextObjectId;
         readonly int _order;
@@ -50,11 +49,10 @@ namespace Reni.Feature
         static int _nextObjectId;
         readonly int _order;
 
-        [EnableDump]
-        readonly Func<Category, IContextReference, TypeBase, T, Result> _function;
+        readonly Func<Category, TypeBase, T, Result> _function;
         readonly T _arg;
 
-        public ExtendedFunction(Func<Category, IContextReference, TypeBase, T, Result> function, T arg)
+        public ExtendedFunction(Func<Category, TypeBase, T, Result> function, T arg)
             : base(_nextObjectId++)
         {
             _order = CodeArgs.NextOrder++;
@@ -69,7 +67,7 @@ namespace Reni.Feature
 
         Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
         {
-            return _function(category, ObjectReference, argsType, _arg);
+            return _function(category, argsType, _arg);
         }
 
         bool IFunctionFeature.IsImplicit { get { return false; } }

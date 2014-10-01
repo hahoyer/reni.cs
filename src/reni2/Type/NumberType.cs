@@ -75,36 +75,63 @@ namespace Reni.Type
         Result DumpPrintTokenResult(Category category) { return VoidType.Result(category, DumpPrintNumberCode, CodeArgs.Arg); }
         Result EnableCutTokenResult(Category category) { return UniqueEnableCutType.UniquePointer.ArgResult(category.Typed); }
 
-        Result OperationResult(Category category, IContextReference left, TypeBase right, IOperation operation)
+        Result OperationResult(Category category, TypeBase right, IOperation operation)
         {
             var rightNumber = right.SmartUn<PointerType>() as NumberType;
             if(rightNumber != null)
-                return OperationResult(category, left, rightNumber, operation);
+                return OperationResult(category, rightNumber, operation);
 
-            NotImplementedMethod(category, left, right, operation);
+            NotImplementedMethod(category, right, operation);
             return null;
         }
 
-        Result OperationResult(Category category, IContextReference left, NumberType right, IOperation operation)
+        Result OperationResult(Category category, NumberType right, IOperation operation)
         {
-            var leftBits = Bits;
-            var rightBits = right.Bits;
-            var resultBits = operation.Signature(leftBits, rightBits);
-            var resultType = RootContext.BitType.UniqueNumber(resultBits);
-            var result = resultType.Result
-                (
-                    category,
-                    () => ApplyCode(resultType.Size, operation.Name, right),
-                    CodeArgs.Arg
-                );
-            var leftResult = UniqueObjectReference(Root.DefaultRefAlignParam).Result(category.Typed);
-            return result.ReplaceArg(leftResult + right.UniquePointer.ArgResult(category.Typed));
+            var trace = category.HasCode;
+            StartMethodDump(trace, category, right, operation);
+            try
+            {
+                var leftBits = Bits;
+                var rightBits = right.Bits;
+                var resultBits = operation.Signature(leftBits, rightBits);
+                var resultType = RootContext.BitType.UniqueNumber(resultBits);
+                var result = resultType.Result
+                    (
+                        category,
+                        () => ApplyCode(resultType.Size, operation.Name, right),
+                        CodeArgs.Arg
+                    );
+
+                Dump("result", result);
+
+                var leftResult = UniqueObjectReference(Root.DefaultRefAlignParam)
+                    .Result(category.Typed)
+                    .ObviousExactConversion(UniqueAlign)
+                    .Align(Root.DefaultRefAlignParam.AlignBits);
+                var rightResult = right.UniquePointer
+                    .ArgResult(category.Typed)
+                    .ObviousExactConversion(right);
+
+                var pair = leftResult + rightResult;
+
+                Dump("leftResult", leftResult);
+                Dump("rightResult", rightResult);
+                Dump("pair", pair);
+                BreakExecution();
+
+                return ReturnMethodDump(result.ReplaceArg(pair));
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
 
-        CodeBase ApplyCode(Size size, string token, TypeBase right)
+        CodeBase ApplyCode(Size resultSize, string token, TypeBase right)
         {
-            return UniquePointer.Pair(right.UniquePointer).ArgCode
-                .NumberOperation(token, size, Size.ByteAlignedSize);
+            Tracer.Assert(!(right is PointerType));
+            return UniqueAlign.Pair(right).ArgCode
+                .NumberOperation(token, resultSize, Size.ByteAlignedSize, right.Size);
         }
 
         Result ConversionAsReference(Category category, NumberType destination)
