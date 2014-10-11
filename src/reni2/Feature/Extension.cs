@@ -6,7 +6,6 @@ using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
-using Reni.Sequence;
 using Reni.Syntax;
 using Reni.TokenClasses;
 using Reni.Type;
@@ -49,7 +48,7 @@ namespace Reni.Feature
             return new ExtendedFunction<T>(function, arg);
         }
 
-        
+
         internal static ISimpleFeature SimpleFeature(this IFeatureImplementation feature)
         {
             var function = feature.Function;
@@ -63,6 +62,8 @@ namespace Reni.Feature
         {
             return _metaFunctionCache[function];
         }
+
+        internal static TypeBase ResultType(this ISimpleFeature f) { return f.Result(Category.Type).Type; }
 
         public static SearchResult ResolveDeclarations<TDefinable>(this IFeatureInheritor inheritor, TDefinable tokenClass)
             where TDefinable : Definable
@@ -100,14 +101,14 @@ namespace Reni.Feature
     static class GenericizeExtension
     {
         public static IEnumerable<IGenericProviderForType> GenericListFromType<T>
-            (this T target, IEnumerable<IGenericProviderForType> baseList = null) 
+            (this T target, IEnumerable<IGenericProviderForType> baseList = null)
             where T : TypeBase
         {
             return CreateList(baseList, () => new GenericProviderForType<T>(target));
         }
 
         public static IEnumerable<IGenericProviderForDefinable> GenericListFromDefinable<T>
-            (this T target, IEnumerable<IGenericProviderForDefinable> baseList = null) 
+            (this T target, IEnumerable<IGenericProviderForDefinable> baseList = null)
             where T : Definable
         {
             return CreateList(baseList, () => new GenericProviderForDefinable<T>(target));
@@ -118,7 +119,7 @@ namespace Reni.Feature
             yield return creator();
             if(baseList == null)
                 yield break;
-            
+
             foreach(var item in baseList)
                 yield return item;
         }

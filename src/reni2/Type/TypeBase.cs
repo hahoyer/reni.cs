@@ -48,6 +48,9 @@ namespace Reni.Type
             [SmartNode]
             public readonly ValueCache<EnableCut> EnableCut;
             public readonly ValueCache<Size> Size;
+            [Node]
+            [SmartNode]
+            public readonly ValueCache<IEnumerable<ISimpleFeature>> Conversions;
 
             public Cache(TypeBase parent)
             {
@@ -60,6 +63,26 @@ namespace Reni.Type
                 TypeType = new ValueCache<TypeType>(() => new TypeType(parent));
                 TextItem = new ValueCache<TextItemType>(() => new TextItemType(parent));
                 Size = new ValueCache<Size>(parent.ObtainSize);
+                Conversions = new ValueCache<IEnumerable<ISimpleFeature>>(parent.CheckedGetConversions);
+            }
+        }
+
+        IEnumerable<ISimpleFeature> CheckedGetConversions()
+        {
+            return Conversions
+                .ToDictionary(x => x.ResultType())
+                .Values;
+        }
+
+        [DisableDump]
+        protected virtual IEnumerable<ISimpleFeature> Conversions
+        {
+            get
+            {
+                if(!(this is Aligner))
+                    yield return Reni.Feature.Extension.SimpleFeature(AlignResult);
+                if (!(this is PointerType))
+                    yield return Reni.Feature.Extension.SimpleFeature(LocalReferenceResult);
             }
         }
 
@@ -493,29 +516,18 @@ namespace Reni.Type
             return ArgResult(category);
         }
 
+
         internal Result ObviousExactConversion(Category category, TypeBase destination)
         {
-            if(CoreType == destination.CoreType)
-                return destination.ArgResult(category);
-
-            var sourcePointer = this as PointerType;
-            if(sourcePointer == null)
-                return UniquePointer
-                    .ObviousExactConversion(category, destination)
-                    .ReplaceArg(LocalReferenceResult(category));
-
-            var destinationPointer = destination as PointerType;
-            if(destinationPointer == null)
+            var path = ConversionService.FindPath(this, destination);
+            if(path != null)
             {
-                var pointer = destination.UniquePointer;
-                return pointer.DePointer(category).Data
-                    .ReplaceArg(ObviousExactConversion(category, pointer));
+                if (path.Length == 1)
+                    return path[0].Result(category);
             }
-
-            if(sourcePointer.ValueType.CoreType == destinationPointer.ValueType.CoreType)
-                return destination.Result(category, () => ArgCode, CodeArgs.Arg);
-
-            NotImplementedMethod(category, destination);
+            
+            var reachable = ConversionService.DumpObvious(this);
+            NotImplementedMethod(category, destination, "path", path, "reachable", reachable);
             return null;
         }
 
@@ -624,7 +636,7 @@ namespace Reni.Type
 
         internal IEnumerable<SearchResult> DeclarationsForType(Definable tokenClass)
         {
-            return tokenClass.Genericize.SelectMany(g=>g.Declarations(this));
+            return tokenClass.Genericize.SelectMany(g => g.Declarations(this));
         }
 
         internal IEnumerable<SearchResult> Declarations<TDefinable>(TDefinable tokenClass) where TDefinable : Definable
@@ -639,6 +651,9 @@ namespace Reni.Type
 
         [DisableDump]
         protected virtual IEnumerable<IGenericProviderForType> Genericize { get { return this.GenericListFromType(); } }
+        public IEnumerable<ISimpleFeature> ConversionElements { get { return _cache.Conversions.Value; } }
+
+        Result AlignResult(Category category) { return UniqueAlign.Result(category, () => ArgCode.Align(), CodeArgs.Arg); }
     }
 
     // Krautpuster

@@ -56,6 +56,11 @@ namespace Reni.Type
         [DisableDump]
         internal override bool Hllw { get { return false; } }
 
+        [DisableDump]
+        protected override IEnumerable<ISimpleFeature> Conversions
+        {
+            get { return base.Conversions.Concat(new ISimpleFeature[] { Extension.SimpleFeature(DereferenceResult) }); }
+        }
         protected override string GetNodeDump() { return ValueType.NodeDump + "[Pointer]"; }
         internal override int? SmartSequenceLength(TypeBase elementType) { return ValueType.SmartSequenceLength(elementType); }
         internal override int? SmartArrayLength(TypeBase elementType) { return ValueType.SmartArrayLength(elementType); }
@@ -65,6 +70,7 @@ namespace Reni.Type
         Result DereferenceResult(Category category)
         {
             return ValueType
+                .UniqueAlign
                 .Result
                 (
                     category,

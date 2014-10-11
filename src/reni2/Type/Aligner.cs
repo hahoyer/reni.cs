@@ -41,7 +41,7 @@ namespace Reni.Type
         internal override Result ApplyTypeOperator(Result argResult) { return Parent.ApplyTypeOperator(argResult); }
         protected override string GetNodeDump() { return base.GetNodeDump() + "(" + Parent.NodeDump + ")"; }
 
-        protected override Result ParentConversionResult(Category category) { return Parent.UniquePointer.ArgResult(category); }
+        protected override Result ParentConversionResult(Category category) { return UnalignedResult(category); }
 
         public Result UnalignedResult(Category category) { return Parent.Result(category, () => ArgCode.BitCast(Parent.Size)); }
     }

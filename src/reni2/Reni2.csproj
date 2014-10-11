@@ -334,6 +334,7 @@
     <Compile Include="TokenClasses\UserSymbol.cs" />
     <Compile Include="TokenClasses\NewValueToken.cs" />
     <Compile Include="Type\AlignConverter.cs" />
+    <Compile Include="Type\ConversionService.cs" />
     <Compile Include="Type\ConverterBase.cs" />
     <Compile Include="Type\DataSetterTargetType.cs" />
     <Compile Include="Type\EnableArrayOverSizeType.cs" />

@@ -22,9 +22,9 @@ namespace Reni.Feature
 
     sealed class Simple : SimpleBase, IFeatureImplementation
     {
+        readonly Func<Category, Result> _function;
         public Simple(Func<Category, Result> function)
-            : base(function)
-        {}
+            : base(function) { _function = function; }
 
         IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return null; } }
         IFunctionFeature IFeatureImplementation.Function { get { return null; } }
