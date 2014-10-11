@@ -77,7 +77,7 @@ namespace Reni.Type
 
         Result OperationResult(Category category, TypeBase right, IOperation operation)
         {
-            var rightNumber = right.SmartUn<PointerType>() as NumberType;
+            var rightNumber = right.SmartUn<PointerType>().SmartUn<Aligner>() as NumberType;
             if(rightNumber != null)
                 return OperationResult(category, rightNumber, operation);
 
@@ -87,7 +87,7 @@ namespace Reni.Type
 
         Result OperationResult(Category category, NumberType right, IOperation operation)
         {
-            var trace = category.HasCode;
+            var trace = ObjectId == 2 && category.HasCode;
             StartMethodDump(trace, category, right, operation);
             try
             {
@@ -106,11 +106,10 @@ namespace Reni.Type
 
                 var leftResult = UniqueObjectReference(Root.DefaultRefAlignParam)
                     .Result(category.Typed)
-                    .ObviousExactConversion(UniqueAlign)
-                    .Align(Root.DefaultRefAlignParam.AlignBits);
+                    .ObviousExactConversion(UniqueAlign);
                 var rightResult = right.UniquePointer
                     .ArgResult(category.Typed)
-                    .ObviousExactConversion(right);
+                    .ObviousExactConversion(right.UniqueAlign);
 
                 var pair = leftResult + rightResult;
 
@@ -130,8 +129,8 @@ namespace Reni.Type
         CodeBase ApplyCode(Size resultSize, string token, TypeBase right)
         {
             Tracer.Assert(!(right is PointerType));
-            return UniqueAlign.Pair(right).ArgCode
-                .NumberOperation(token, resultSize, Size.ByteAlignedSize, right.Size);
+            return UniqueAlign.Pair(right.UniqueAlign).ArgCode
+                .NumberOperation(token, resultSize, UniqueAlign.Size, right.UniqueAlign.Size);
         }
 
         Result ConversionAsReference(Category category, NumberType destination)
