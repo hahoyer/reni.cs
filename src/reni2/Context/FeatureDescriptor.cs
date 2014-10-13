@@ -37,7 +37,8 @@ namespace Reni.Context
             if(simpleFeature != null && right == null)
                 return simpleFeature.Result(category);
 
-            StartMethodDump(category.HasCode, context, category, right);
+            var trace = ObjectId < 0 && category.HasCode;
+            StartMethodDump(trace, context, category, right);
             try
             {
                 var function = Feature.Function;

@@ -520,15 +520,22 @@ namespace Reni.Type
         internal Result ObviousExactConversion(Category category, TypeBase destination)
         {
             var path = ConversionService.FindPath(this, destination);
-            if(path != null)
+            if(path == null)
             {
-                if (path.Length == 1)
-                    return path[0].Result(category);
+                var reachable = ConversionService.DumpObvious(this);
+                NotImplementedMethod(category, destination, "path", path, "reachable", reachable);
+                return null;
             }
-            
-            var reachable = ConversionService.DumpObvious(this);
-            NotImplementedMethod(category, destination, "path", path, "reachable", reachable);
-            return null;
+
+            if (path.Length == 1)
+                return path[0].Result(category);
+            if(path.Length == 2)
+                return path[0].Result(category).ReplaceArg(path[1].Result(category));
+            {
+                var reachable = ConversionService.DumpObvious(this);
+                NotImplementedMethod(category, destination, "path", path, "reachable", reachable);
+                return null;
+            }
         }
 
         internal Result TextItemResult(Category category)

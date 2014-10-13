@@ -87,7 +87,7 @@ namespace Reni.Type
 
         Result OperationResult(Category category, NumberType right, IOperation operation)
         {
-            var trace = ObjectId == 2 && category.HasCode;
+            var trace = ObjectId == -2 && category.HasCode;
             StartMethodDump(trace, category, right, operation);
             try
             {

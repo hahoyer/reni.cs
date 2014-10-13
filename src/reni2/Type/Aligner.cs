@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using Reni.Basics;
+using Reni.Feature;
 
 namespace Reni.Type
 {
@@ -32,6 +33,12 @@ namespace Reni.Type
         internal override IReferenceType UniquePointerType { get { return Parent.UniquePointerType; } }
 
         internal override Result DeAlign(Category category) { return Parent.Result(category, ArgResult); }
+
+        [DisableDump]
+        protected override IEnumerable<ISimpleFeature> Conversions
+        {
+            get { return base.Conversions.Concat(new ISimpleFeature[] { Extension.SimpleFeature(UnalignedResult) }); }
+        }
 
         protected override Size GetSize() { return Parent.Size.Align(_alignBits); }
         internal override int? SmartSequenceLength(TypeBase elementType) { return Parent.SmartSequenceLength(elementType); }

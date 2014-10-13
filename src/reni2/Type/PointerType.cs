@@ -74,7 +74,7 @@ namespace Reni.Type
                 .Result
                 (
                     category,
-                    () => ArgCode.DePointer(ValueType.Size),
+                    () => ArgCode.DePointer(ValueType.Size).Align(),
                     CodeArgs.Arg
                 );
         }
