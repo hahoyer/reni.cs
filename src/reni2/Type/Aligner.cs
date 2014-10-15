@@ -9,6 +9,7 @@ namespace Reni.Type
 {
     sealed class Aligner
         : Child<TypeBase>
+        , IFeatureInheritor
     {
         [DisableDump]
         readonly int _alignBits;
@@ -39,6 +40,8 @@ namespace Reni.Type
         {
             get { return base.Conversions.Concat(new ISimpleFeature[] { Extension.SimpleFeature(UnalignedResult) }); }
         }
+        
+        Result IFeatureInheritor.Source(Category category) { return UnalignedResult(category); }
 
         protected override Size GetSize() { return Parent.Size.Align(_alignBits); }
         internal override int? SmartSequenceLength(TypeBase elementType) { return Parent.SmartSequenceLength(elementType); }

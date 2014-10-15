@@ -65,17 +65,14 @@ namespace Reni.Feature
 
         internal static TypeBase ResultType(this ISimpleFeature f) { return f.Result(Category.Type).Type; }
 
-        public static SearchResult ResolveDeclarations<TDefinable>(this IFeatureInheritor inheritor, TDefinable tokenClass)
+        public static IEnumerable<SearchResult> ResolveDeclarations<TDefinable>(this IFeatureInheritor inheritor, TDefinable tokenClass)
             where TDefinable : Definable
         {
-            var result = inheritor
+            return inheritor
                 .Source(Category.Type)
                 .Type
                 .Declarations(tokenClass)
-                .SingleOrDefault();
-            if(result == null)
-                return null;
-            return new InheritedTypeSearchResult(result, inheritor);
+                .Select(result => new InheritedTypeSearchResult(result, inheritor));
         }
 
         public static SearchResult ResolveConverterForType<TSource, TPath>(this IPuppet<TSource, TPath> puppet, TSource source)

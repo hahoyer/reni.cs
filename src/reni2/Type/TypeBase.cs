@@ -649,10 +649,13 @@ namespace Reni.Type
         {
             var provider = this as ISymbolProvider<TDefinable, IFeatureImplementation>;
             if(provider != null)
-                yield return new TypeSearchResult(provider.Feature(tokenClass), this);
+                return new[] {new TypeSearchResult(provider.Feature(tokenClass), this)};
+            
             var inheritor = this as IFeatureInheritor;
             if(inheritor != null)
-                yield return inheritor.ResolveDeclarations(tokenClass);
+                return inheritor.ResolveDeclarations(tokenClass);
+
+            return new SearchResult[0];
         }
 
         [DisableDump]
