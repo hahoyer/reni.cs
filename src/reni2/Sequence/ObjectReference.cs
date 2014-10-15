@@ -8,6 +8,7 @@ using Reni.Type;
 
 namespace Reni.Sequence
 {
+    [Obsolete("",true)]
     sealed class ObjectReference : DumpableObject, IContextReference
     {
         static int _nextObjectId;

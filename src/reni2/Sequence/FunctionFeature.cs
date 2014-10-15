@@ -53,13 +53,13 @@ namespace Reni.Sequence
         {
             var typedCategory = category.Typed;
             var result = Apply(category, _objectType.Count, argsType.SequenceLength(_objectType.Element));
-            var objectResult = GetObjectReference().Result(typedCategory);
+            var objectResult = _objectType.Result(typedCategory, GetObjectReference());
             var convertedObjectResult = objectResult.BitSequenceOperandConversion(typedCategory);
             var convertedArgsResult = argsType.BitSequenceOperandConversion(typedCategory);
             return result.ReplaceArg(convertedObjectResult + convertedArgsResult);
         }
 
-        ObjectReference GetObjectReference() { return _objectType.UniqueObjectReference(Root.DefaultRefAlignParam); }
+        IContextReference GetObjectReference() { return _objectType.UniquePointerType; }
 
         Result Apply(Category category, int objSize, int argsSize)
         {

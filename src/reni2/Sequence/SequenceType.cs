@@ -1,35 +1,12 @@
-#region Copyright (C) 2013
-
-//     Project Reni2
-//     Copyright (C) 2011 - 2013 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-#endregion
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
-using hw.Helper;
 using hw.Forms;
+using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
-using Reni.Feature.DumpPrint;
 using Reni.Type;
 
 namespace Reni.Sequence
@@ -37,8 +14,6 @@ namespace Reni.Sequence
     sealed class SequenceType
         : TagChild<ArrayType>
     {
-        readonly FunctionCache<RefAlignParam, ObjectReference> _objectReferencesCache;
-
         internal Result EnableCutResult(Category category)
         {
             return UniqueEnableCutType
@@ -53,7 +28,6 @@ namespace Reni.Sequence
         public SequenceType(ArrayType parent)
             : base(parent)
         {
-            _objectReferencesCache = new FunctionCache<RefAlignParam, ObjectReference>(refAlignParam => new ObjectReference(this, refAlignParam));
             StopByObjectId(-172);
         }
 
@@ -68,7 +42,7 @@ namespace Reni.Sequence
         internal override string DumpPrintText { get { return "(" + Element.DumpPrintText + ")sequence(" + Count + ")"; } }
 
         Simple ConversionFeature(SequenceType destination)
-        {       
+        {
             return destination.Count >= Count
                 ? Reni.Feature.Extension.SimpleFeature(c => ConversionAsReference(c, destination))
                 : null;
@@ -147,8 +121,6 @@ namespace Reni.Sequence
             return result;
         }
 
-        internal ObjectReference UniqueObjectReference(RefAlignParam refAlignParam) { return _objectReferencesCache[refAlignParam]; }
-
         Result FlatConversion(Category category, SequenceType destination)
         {
             var result = ArgResult(category.Typed);
@@ -160,10 +132,14 @@ namespace Reni.Sequence
                 DumpDataWithBreak
                     (
                         "Element type dismatch",
-                        "category", category,
-                        "source", this,
-                        "destination", destination,
-                        "result", result
+                        "category",
+                        category,
+                        "source",
+                        this,
+                        "destination",
+                        destination,
+                        "result",
+                        result
                     );
                 return null;
             }

@@ -101,7 +101,6 @@ namespace Reni.Type
             _cache = new Cache(this);
         }
 
-
         IContextReference IContextReferenceProvider.ContextReference { get { return UniquePointerType; } }
 
         [Node]

@@ -87,7 +87,7 @@ namespace Reni.Type
                     category,
                     () => ApplyCode(Size.Create(resultBitCount), operation.Name, objectBitCount, argsBitCount),
                     CodeArgs.Arg);
-            var objectResult = UniqueNumber(objectBitCount).UniqueObjectReference(Root.DefaultRefAlignParam).Result(typedCategory);
+            var objectResult = UniqueNumber(objectBitCount).UniquePointer.Result(typedCategory);
             var convertedObjectResult = objectResult.BitSequenceOperandConversion(typedCategory);
             var convertedArgsResult = argsType.BitSequenceOperandConversion(typedCategory);
             return result.ReplaceArg(convertedObjectResult + convertedArgsResult);

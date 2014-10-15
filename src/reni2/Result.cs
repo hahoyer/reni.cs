@@ -81,7 +81,7 @@ namespace Reni
 // ReSharper restore ExpressionIsAlwaysNull
             if(hllw == true)
                 return CodeBase.Void;
-            Tracer.AssertionFailed("Code cannot be determned", ToString);
+            Tracer.AssertionFailed("Code cannot be determined", ToString);
             return null;
         }
 

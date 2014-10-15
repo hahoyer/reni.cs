@@ -18,14 +18,11 @@ namespace Reni.Type
             ISymbolProvider<TokenClasses.EnableCut, IFeatureImplementation>,
             IConverterProvider<NumberType, IFeatureImplementation>
     {
-        readonly FunctionCache<RefAlignParam, ObjectReference> _objectReferencesCache;
         readonly ArrayType _parent;
 
         public NumberType(ArrayType parent)
         {
             _parent = parent;
-            _objectReferencesCache = new FunctionCache<RefAlignParam, ObjectReference>
-                (refAlignParam => new ObjectReference(this, refAlignParam));
         }
 
         [DisableDump]
@@ -41,11 +38,6 @@ namespace Reni.Type
         protected override IEnumerable<IGenericProviderForType> Genericize
         {
             get { return this.GenericListFromType(base.Genericize); }
-        }
-
-        internal ObjectReference UniqueObjectReference(RefAlignParam refAlignParam)
-        {
-            return _objectReferencesCache[refAlignParam];
         }
 
         IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken token)
@@ -104,8 +96,7 @@ namespace Reni.Type
 
                 Dump("result", result);
 
-                var leftResult = UniqueObjectReference(Root.DefaultRefAlignParam)
-                    .Result(category.Typed)
+                var leftResult = UniquePointer.Result(category.Typed, UniquePointerType)
                     .ObviousExactConversion(UniqueAlign);
                 var rightResult = right.UniquePointer
                     .ArgResult(category.Typed)
