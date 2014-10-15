@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using Reni.Basics;
+using Reni.Feature;
 
 namespace Reni.Type
 {
@@ -32,8 +33,14 @@ namespace Reni.Type
         internal override sealed Result ArrayCopier(Category category, int count) { return Parent.ArrayCopier(category, count); }
         protected override Result ParentConversionResult(Category category)
         {
-            return Parent.PointerResult(category, PointerArgResult);
+            return Parent.Result(category, ArgResult);
         }
         internal Result PointerConversionResult(Category category) { return PointerConversionResult(category, Parent); }
+
+        [DisableDump]
+        protected override IEnumerable<ISimpleFeature> Conversions
+        {
+            get { return base.Conversions.Concat(new ISimpleFeature[] { Extension.SimpleFeature(ParentConversionResult) }); }
+        }
     }
 }

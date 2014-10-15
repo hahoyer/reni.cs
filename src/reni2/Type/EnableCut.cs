@@ -10,7 +10,9 @@ namespace Reni.Type
     {
         internal EnableCut(TypeBase parent)
             : base(parent)
-        {}
+        {
+            Tracer.Assert(Parent.IsCuttingPossible, Parent.Dump);
+        }
 
         [DisableDump]
         protected override string TagTitle { get { return "enable_cut"; } }

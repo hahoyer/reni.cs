@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
-using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -20,10 +19,7 @@ namespace Reni.Type
     {
         readonly ArrayType _parent;
 
-        public NumberType(ArrayType parent)
-        {
-            _parent = parent;
-        }
+        public NumberType(ArrayType parent) { _parent = parent; }
 
         [DisableDump]
         internal override Root RootContext { get { return _parent.RootContext; } }
@@ -32,6 +28,8 @@ namespace Reni.Type
         internal override bool Hllw { get { return _parent.Hllw; } }
         [DisableDump]
         internal override string DumpPrintText { get { return "number(" + Bits + ")"; } }
+        [DisableDump]
+        internal override bool IsCuttingPossible { get { return true; } }
         [EnableDump]
         internal int Bits { get { return Size.ToInt(); } }
         [DisableDump]

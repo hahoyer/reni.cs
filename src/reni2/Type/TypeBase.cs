@@ -83,6 +83,8 @@ namespace Reni.Type
                     yield return Reni.Feature.Extension.SimpleFeature(AlignResult);
                 if (!(this is PointerType))
                     yield return Reni.Feature.Extension.SimpleFeature(LocalReferenceResult);
+                if (IsCuttingPossible)
+                    yield return Reni.Feature.Extension.SimpleFeature(EnableCutResult);
             }
         }
 
@@ -204,6 +206,8 @@ namespace Reni.Type
                 return _cache.Aligner[alignBits];
             }
         }
+
+        virtual internal bool IsCuttingPossible { get { return false; } }
 
         Result VoidCodeAndRefs(Category category) { return RootContext.VoidResult(category & (Category.Code | Category.Exts)); }
 
@@ -663,6 +667,7 @@ namespace Reni.Type
         public IEnumerable<ISimpleFeature> ConversionElements { get { return _cache.Conversions.Value; } }
 
         Result AlignResult(Category category) { return UniqueAlign.Result(category, () => ArgCode.Align(), CodeArgs.Arg); }
+        Result EnableCutResult(Category category) { return UniqueEnableCutType.Result(category, ArgResult); }
     }
 
     // Krautpuster
