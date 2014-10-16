@@ -19,6 +19,7 @@ namespace Reni.Type
         {
             _alignBits = alignBits;
             StopByObjectId(-9);
+            Tracer.Assert(Parent.IsAligningPossible, Parent.Dump);
         }
 
         [DisableDump]
@@ -40,7 +41,10 @@ namespace Reni.Type
         {
             get { return base.Conversions.Concat(new ISimpleFeature[] { Extension.SimpleFeature(UnalignedResult) }); }
         }
-        
+
+        [DisableDump]
+        internal override bool IsAligningPossible { get { return false; } }
+
         Result IFeatureInheritor.Source(Category category) { return UnalignedResult(category); }
 
         protected override Size GetSize() { return Parent.Size.Align(_alignBits); }

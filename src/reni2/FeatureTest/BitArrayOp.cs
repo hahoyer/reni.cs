@@ -20,16 +20,16 @@ namespace Reni.FeatureTest.BitArrayOp
         [Test]
         public void NegativeNumber()
         {
-            CreateFileAndRunCompiler("Negative number", @"(0-1)dump_print", "-1");
-            CreateFileAndRunCompiler("Negative number", @"(0-12)dump_print", "-12");
-            CreateFileAndRunCompiler("Negative number", @"(0-123)dump_print", "-123");
-            CreateFileAndRunCompiler("Negative number", @"(0-1234)dump_print", "-1234");
-            CreateFileAndRunCompiler("Negative number", @"(0-12345)dump_print", "-12345");
-            CreateFileAndRunCompiler("Negative number", @"(0-123456)dump_print", "-123456");
-            CreateFileAndRunCompiler("Negative number", @"(0-1234567)dump_print", "-1234567");
-            CreateFileAndRunCompiler("Negative number", @"(0-12345678)dump_print", "-12345678");
-            CreateFileAndRunCompiler("Negative number", @"(0-123456789)dump_print", "-123456789");
-            CreateFileAndRunCompiler("Negative number", @"(0-1234567890)dump_print", "-1234567890");
+            CreateFileAndRunCompiler("Negative number", @"(-1)dump_print", "-1");
+            CreateFileAndRunCompiler("Negative number", @"(-12)dump_print", "-12");
+            CreateFileAndRunCompiler("Negative number", @"(-123)dump_print", "-123");
+            CreateFileAndRunCompiler("Negative number", @"(-1234)dump_print", "-1234");
+            CreateFileAndRunCompiler("Negative number", @"(-12345)dump_print", "-12345");
+            CreateFileAndRunCompiler("Negative number", @"(-123456)dump_print", "-123456");
+            CreateFileAndRunCompiler("Negative number", @"(-1234567)dump_print", "-1234567");
+            CreateFileAndRunCompiler("Negative number", @"(-12345678)dump_print", "-12345678");
+            CreateFileAndRunCompiler("Negative number", @"(-123456789)dump_print", "-123456789");
+            CreateFileAndRunCompiler("Negative number", @"(-1234567890)dump_print", "-1234567890");
         }
 
         public override void Run() { }

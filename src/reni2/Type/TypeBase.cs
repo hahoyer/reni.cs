@@ -79,7 +79,7 @@ namespace Reni.Type
         {
             get
             {
-                if(!(this is Aligner))
+                if(IsAligningPossible)
                     yield return Reni.Feature.Extension.SimpleFeature(AlignResult);
                 if (!(this is PointerType))
                     yield return Reni.Feature.Extension.SimpleFeature(LocalReferenceResult);
@@ -207,7 +207,11 @@ namespace Reni.Type
             }
         }
 
+        [DisableDump]
         virtual internal bool IsCuttingPossible { get { return false; } }
+        
+        [DisableDump]
+        virtual internal bool IsAligningPossible { get { return true; } }
 
         Result VoidCodeAndRefs(Category category) { return RootContext.VoidResult(category & (Category.Code | Category.Exts)); }
 

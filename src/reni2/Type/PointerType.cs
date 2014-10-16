@@ -61,6 +61,10 @@ namespace Reni.Type
         {
             get { return base.Conversions.Concat(new ISimpleFeature[] { Extension.SimpleFeature(DereferenceResult) }); }
         }
+
+        [DisableDump]
+        internal override bool IsAligningPossible { get { return false; } }
+        
         protected override string GetNodeDump() { return ValueType.NodeDump + "[Pointer]"; }
         internal override int? SmartSequenceLength(TypeBase elementType) { return ValueType.SmartSequenceLength(elementType); }
         internal override int? SmartArrayLength(TypeBase elementType) { return ValueType.SmartArrayLength(elementType); }
