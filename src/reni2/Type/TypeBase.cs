@@ -43,9 +43,6 @@ namespace Reni.Type
             public readonly ValueCache<FunctionInstanceType> FunctionInstanceType;
             [Node]
             [SmartNode]
-            public readonly ValueCache<TextItemType> TextItem;
-            [Node]
-            [SmartNode]
             public readonly ValueCache<EnableCut> EnableCut;
             public readonly ValueCache<Size> Size;
             [Node]
@@ -61,7 +58,6 @@ namespace Reni.Type
                 Aligner = new FunctionCache<int, Aligner>(alignBits => new Aligner(parent, alignBits));
                 FunctionInstanceType = new ValueCache<FunctionInstanceType>(() => new FunctionInstanceType(parent));
                 TypeType = new ValueCache<TypeType>(() => new TypeType(parent));
-                TextItem = new ValueCache<TextItemType>(() => new TextItemType(parent));
                 Size = new ValueCache<Size>(parent.ObtainSize);
                 Conversions = new ValueCache<IEnumerable<ISimpleFeature>>(parent.CheckedGetConversions);
             }
@@ -159,9 +155,6 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        internal TextItemType UniqueTextItemType { get { return _cache.TextItem.Value; } }
-
-        [DisableDump]
         internal EnableCut UniqueEnableCutType { get { return _cache.EnableCut.Value; } }
 
         [DisableDump]
@@ -213,6 +206,10 @@ namespace Reni.Type
         [DisableDump]
         virtual internal bool IsAligningPossible { get { return true; } }
 
+        [DisableDump]
+        virtual internal Size SimpleItemSize { get { return null; } }
+
+        
         Result VoidCodeAndRefs(Category category) { return RootContext.VoidResult(category & (Category.Code | Category.Exts)); }
 
         internal ArrayType UniqueArray(int count) { return _cache.Array[count]; }
@@ -543,15 +540,6 @@ namespace Reni.Type
                 NotImplementedMethod(category, destination, "path", path, "reachable", reachable);
                 return null;
             }
-        }
-
-        internal Result TextItemResult(Category category)
-        {
-            var uniqueTextItem = UniqueTextItemType;
-            return
-                uniqueTextItem.UniquePointer
-                    .Result(category, UniquePointer.ArgResult(category))
-                ;
         }
 
         internal virtual Result ConstructorResult(Category category, TypeBase argsType)

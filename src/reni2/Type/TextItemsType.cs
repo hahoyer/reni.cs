@@ -70,7 +70,7 @@ namespace Reni.Type
                 BreakExecution();
 
                 var type = (ArrayType) result.Type;
-                return ReturnMethodDump(type.UniqueTextItemsType.Result(category, result));
+                return ReturnMethodDump(type.UniqueTextItemType.Result(category, result));
             }
             finally
             {

@@ -14,7 +14,8 @@ namespace Reni.Type
 {
     sealed class NumberType
         : TypeBase
-            , ISymbolProvider<DumpPrintToken, IFeatureImplementation>, ISymbolProvider<Operation, IFeatureImplementation>
+            , ISymbolProvider<DumpPrintToken, IFeatureImplementation>
+            , ISymbolProvider<Operation, IFeatureImplementation>
             , ISymbolProvider<TokenClasses.EnableCut, IFeatureImplementation>
             , ISymbolProvider<Negate, IFeatureImplementation>
             , IConverterProvider<NumberType, IFeatureImplementation>
@@ -89,7 +90,7 @@ namespace Reni.Type
                 .OperationResult(category, this, _minusOperation)
                 .ReplaceAbsolute(_zeroResult.Value.Type.UniquePointerType, c => _zeroResult.Value.LocalPointerKindResult & (c));
         }
-        
+
         Result DumpPrintTokenResult(Category category) { return VoidType.Result(category, DumpPrintNumberCode, CodeArgs.Arg); }
         Result EnableCutTokenResult(Category category) { return UniqueEnableCutType.UniquePointer.ArgResult(category.Typed); }
 
@@ -165,6 +166,5 @@ namespace Reni.Type
             [DisableDump]
             string Name { get; }
         }
-
     }
 }

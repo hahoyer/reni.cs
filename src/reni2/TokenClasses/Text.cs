@@ -14,10 +14,10 @@ namespace Reni.TokenClasses
         {
             var data = StripQutes(token.Name);
             return context
-                .RootContext.BitType.UniqueNumber(BitsConst.BitSize(data[0].GetType()))
+                .RootContext.BitType.UniqueArray(BitsConst.BitSize(data[0].GetType()))
                 .UniqueTextItemType
                 .UniqueArray(data.Length)
-                .UniqueTextItemsType
+                .UniqueTextItemType
                 .Result(category, () => CodeBase.BitsConst(BitsConst.ConvertAsText(data)), CodeArgs.Void);
         }
 

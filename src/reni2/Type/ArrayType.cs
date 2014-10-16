@@ -27,7 +27,7 @@ namespace Reni.Type
         readonly ValueCache<EnableArrayOverSizeType> _enableArrayOverSizeTypeCache;
         readonly ValueCache<SequenceType> _sequenceCache;
         readonly ValueCache<NumberType> _numberCache;
-        readonly ValueCache<TextItemsType> _textItemsCache;
+        readonly ValueCache<TextItemType> _textItemCache;
 
         public ArrayType(TypeBase elementType, int count)
         {
@@ -40,7 +40,7 @@ namespace Reni.Type
             _enableArrayOverSizeTypeCache = new ValueCache<EnableArrayOverSizeType>(() => new EnableArrayOverSizeType(this));
             _sequenceCache = new ValueCache<SequenceType>(() => new SequenceType(this));
             _numberCache = new ValueCache<NumberType>(() => new NumberType(this));
-            _textItemsCache = new ValueCache<TextItemsType>(() => new TextItemsType(this));
+            _textItemCache = new ValueCache<TextItemType>(() => new TextItemType(this));
         }
 
         TypeBase IRepeaterType.ElementType { get { return ElementType; } }
@@ -54,7 +54,7 @@ namespace Reni.Type
 
         [Node]
         [DisableDump]
-        internal TextItemsType UniqueTextItemsType { get { return _textItemsCache.Value; } }
+        internal TextItemType UniqueTextItemType { get { return _textItemCache.Value; } }
 
         [Node]
         [DisableDump]
@@ -76,9 +76,13 @@ namespace Reni.Type
         internal override Result Destructor(Category category) { return ElementType.ArrayDestructor(category, Count); }
         internal override Result Copier(Category category) { return ElementType.ArrayCopier(category, Count); }
 
-        internal Result TextItemsResult(Category category)
+        internal Result TextItemResult(Category category)
         {
-            return UniqueTextItemsType.PointerResult(category, PointerArgResult);
+            var uniqueTextItem = UniqueTextItemType;
+            return
+                uniqueTextItem.UniquePointer
+                    .Result(category, UniquePointer.ArgResult(category))
+                ;
         }
 
         internal override Result ConstructorResult(Category category, TypeBase argsType)

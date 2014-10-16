@@ -130,7 +130,6 @@ namespace Reni.ReniParser
                     {"new_value", new NewValueToken()},
                     {"raw_address", new RawAddress()},
                     {"text_item", new TextItem()},
-                    {"text_items", new TextItems()},
                     {"then", new ThenToken()},
                     {"to_number_of_base", new ToNumberOfBase()},
                     {"undecorate", new UndecorateToken()},
