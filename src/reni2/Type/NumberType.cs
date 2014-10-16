@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
+using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -13,13 +14,28 @@ namespace Reni.Type
 {
     sealed class NumberType
         : TypeBase
-            , ISymbolProvider<DumpPrintToken, IFeatureImplementation>, ISymbolProvider<Operation, IFeatureImplementation>,
-            ISymbolProvider<TokenClasses.EnableCut, IFeatureImplementation>,
-            IConverterProvider<NumberType, IFeatureImplementation>
+            , ISymbolProvider<DumpPrintToken, IFeatureImplementation>, ISymbolProvider<Operation, IFeatureImplementation>
+            , ISymbolProvider<TokenClasses.EnableCut, IFeatureImplementation>
+            , ISymbolProvider<Negate, IFeatureImplementation>
+            , IConverterProvider<NumberType, IFeatureImplementation>
     {
         readonly ArrayType _parent;
+        static readonly Minus _minusOperation = new Minus();
+        readonly ValueCache<Result> _zeroResult;
 
-        public NumberType(ArrayType parent) { _parent = parent; }
+        public NumberType(ArrayType parent)
+        {
+            _parent = parent;
+            _zeroResult = new ValueCache<Result>(GetZeroResult);
+        }
+
+        Result GetZeroResult()
+        {
+            return RootContext
+                .BitType
+                .UniqueNumber(1)
+                .Result(Category.All, () => CodeBase.BitsConst(BitsConst.Convert(0)));
+        }
 
         [DisableDump]
         internal override Root RootContext { get { return _parent.RootContext; } }
@@ -38,18 +54,18 @@ namespace Reni.Type
             get { return this.GenericListFromType(base.Genericize); }
         }
 
-        IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken token)
+        IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
         {
             return Extension.SimpleFeature(DumpPrintTokenResult);
         }
 
-        IFeatureImplementation ISymbolProvider<Operation, IFeatureImplementation>.Feature(Operation token)
+        IFeatureImplementation ISymbolProvider<Operation, IFeatureImplementation>.Feature(Operation tokenClass)
         {
-            return Extension.FunctionFeature(OperationResult, token);
+            return Extension.FunctionFeature(OperationResult, tokenClass);
         }
 
         IFeatureImplementation ISymbolProvider<TokenClasses.EnableCut, IFeatureImplementation>.Feature
-            (TokenClasses.EnableCut token)
+            (TokenClasses.EnableCut tokenClass)
         {
             return Extension.SimpleFeature(EnableCutTokenResult);
         }
@@ -62,6 +78,18 @@ namespace Reni.Type
             return Extension.SimpleFeature(ca => ConversionAsReference(ca, destination));
         }
 
+        IFeatureImplementation ISymbolProvider<Negate, IFeatureImplementation>.Feature(Negate tokenClass)
+        {
+            return Extension.SimpleFeature(NegationResult);
+        }
+
+        Result NegationResult(Category category)
+        {
+            return ((NumberType) _zeroResult.Value.Type)
+                .OperationResult(category, this, _minusOperation)
+                .ReplaceAbsolute(_zeroResult.Value.Type.UniquePointerType, c => _zeroResult.Value.LocalPointerKindResult & (c));
+        }
+        
         Result DumpPrintTokenResult(Category category) { return VoidType.Result(category, DumpPrintNumberCode, CodeArgs.Arg); }
         Result EnableCutTokenResult(Category category) { return UniqueEnableCutType.UniquePointer.ArgResult(category.Typed); }
 
@@ -77,45 +105,27 @@ namespace Reni.Type
 
         Result OperationResult(Category category, NumberType right, IOperation operation)
         {
-            var trace = ObjectId == -2 && category.HasCode;
-            StartMethodDump(trace, category, right, operation);
-            try
-            {
-                var leftBits = Bits;
-                var rightBits = right.Bits;
-                var resultBits = operation.Signature(leftBits, rightBits);
-                var resultType = RootContext.BitType.UniqueNumber(resultBits);
-                var result = resultType.Result
-                    (
-                        category,
-                        () => ApplyCode(resultType.Size, operation.Name, right),
-                        CodeArgs.Arg
-                    );
+            var leftBits = Bits;
+            var rightBits = right.Bits;
+            var resultBits = operation.Signature(leftBits, rightBits);
+            var resultType = RootContext.BitType.UniqueNumber(resultBits);
+            var result = resultType.Result
+                (
+                    category,
+                    () => OperationCode(resultType.Size, operation.Name, right),
+                    CodeArgs.Arg
+                );
 
-                Dump("result", result);
-
-                var leftResult = UniquePointer.Result(category.Typed, UniquePointerType)
-                    .ObviousExactConversion(UniqueAlign);
-                var rightResult = right.UniquePointer
-                    .ArgResult(category.Typed)
-                    .ObviousExactConversion(right.UniqueAlign);
-
-                var pair = leftResult + rightResult;
-
-                Dump("leftResult", leftResult);
-                Dump("rightResult", rightResult);
-                Dump("pair", pair);
-                BreakExecution();
-
-                return ReturnMethodDump(result.ReplaceArg(pair));
-            }
-            finally
-            {
-                EndMethodDump();
-            }
+            var leftResult = UniquePointer.Result(category.Typed, UniquePointerType)
+                .ObviousExactConversion(UniqueAlign);
+            var rightResult = right.UniquePointer
+                .ArgResult(category.Typed)
+                .ObviousExactConversion(right.UniqueAlign);
+            var pair = leftResult + rightResult;
+            return result.ReplaceArg(pair);
         }
 
-        CodeBase ApplyCode(Size resultSize, string token, TypeBase right)
+        CodeBase OperationCode(Size resultSize, string token, TypeBase right)
         {
             Tracer.Assert(!(right is PointerType));
             return UniqueAlign.Pair(right.UniqueAlign).ArgCode
@@ -155,5 +165,6 @@ namespace Reni.Type
             [DisableDump]
             string Name { get; }
         }
+
     }
 }

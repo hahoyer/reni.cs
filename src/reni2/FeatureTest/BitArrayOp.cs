@@ -11,6 +11,7 @@ namespace Reni.FeatureTest.BitArrayOp
     /// </summary>
     [TestFixture]
     [Number]
+    [Negate]
     public sealed class BitArrayOp : CompilerTest
     {
         /// <summary>
@@ -33,6 +34,16 @@ namespace Reni.FeatureTest.BitArrayOp
         }
 
         public override void Run() { }
+    }
+
+    [TestFixture]
+    [Target(@"(1 negate)dump_print")]
+    [Output("-1")]
+    [Number]
+    public sealed class Negate: CompilerTest
+    {
+        [Test]
+        public override void Run() { BaseRun(); }
     }
 
     [TestFixture]

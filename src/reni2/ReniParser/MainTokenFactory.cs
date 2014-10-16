@@ -40,7 +40,7 @@ namespace Reni.ReniParser
                 x += PrioTable.Left("|");
 
                 x += PrioTable.Left("*", "/", "\\");
-                x += PrioTable.Left("+", "-");
+                x += PrioTable.Left("+", Minus.Id);
 
                 x += PrioTable.Left("<", ">", "<=", ">=");
                 x += PrioTable.Left("=", "<>");
@@ -88,13 +88,15 @@ namespace Reni.ReniParser
             {
                 return new FunctionCache<string, TokenClasses.TokenClass>
                 {
+                    {ArgToken.Id, new ArgToken()},
+                    {Minus.Id, new Minus()},
+                    {Negate.Id, new Negate()},
                     {"{", new LeftParenthesis(1)},
                     {"[", new LeftParenthesis(2)},
                     {"(", new LeftParenthesis(3)},
                     {"}", new RightParenthesis(1)},
                     {"]", new RightParenthesis(2)},
                     {")", new RightParenthesis(3)},
-                    {"^", new ArgToken()},
                     {"^^", new ContextOperator()},
                     {".", new List()},
                     {",", new List()},
@@ -110,7 +112,6 @@ namespace Reni.ReniParser
                     {"<>", new CompareOperation()},
                     {"<<", new ConcatArrays()},
                     {"<:=>", new EnableReassignToken()},
-                    {"-", new Minus()},
                     {"!", new Exclamation()},
                     {"+", new Plus()},
                     {"/", new Slash()},

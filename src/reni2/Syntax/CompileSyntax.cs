@@ -67,8 +67,8 @@ namespace Reni.Syntax
         internal void AddToCacheForDebug(ContextBase context, object cacheItem) { ResultCache.Add(context, cacheItem); }
         internal Result Result(ContextBase context) { return Result(context, Category.All); }
         //[DebuggerHidden]
-        internal Result Result(ContextBase context, Category category) { return context.UniqueResult(category, this); }
-        Result FindResult(ContextBase context, Category category) { return context.FindResult(category, this); }
+        internal Result Result(ContextBase context, Category category) { return context.Result(category, this); }
+
         internal BitsConst Evaluate(ContextBase context)
         {
             return Result(context).Evaluate(context.RootContext.ExecutionContext);
@@ -110,7 +110,7 @@ namespace Reni.Syntax
             if(result != null)
                 return result.Value;
 
-            var type = FindResult(context, Category.Type).Type;
+            var type = context.TypeIfKnown(this);
             if(type != null)
                 return type.SmartUn<FunctionType>().Hllw;
 
@@ -136,5 +136,26 @@ namespace Reni.Syntax
             NotImplementedMethod(context, category);
             return null;
         }
+
+        public CompileSyntax ReplaceArg(CompileSyntax value) { return Visit(new ReplaceArgVisitor(value)); }
+        
+        virtual internal CompileSyntax Visit(ISyntaxVisitor visitor)
+        {
+            NotImplementedMethod(visitor);
+            return null;
+
+        }
+    }
+
+    sealed class ReplaceArgVisitor : DumpableObject, ISyntaxVisitor
+    {
+        readonly CompileSyntax _value;
+        public ReplaceArgVisitor(CompileSyntax value) { _value = value; }
+        CompileSyntax ISyntaxVisitor.Arg { get { return _value; } }
+    }
+
+    interface ISyntaxVisitor
+    {
+        CompileSyntax Arg { get; }
     }
 }

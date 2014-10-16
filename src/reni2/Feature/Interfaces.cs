@@ -73,7 +73,7 @@ namespace Reni.Feature
     interface ISymbolProvider<TDefinable, out TPath>
         where TDefinable : Definable
     {
-        TPath Feature(TDefinable tokenCLass);
+        TPath Feature(TDefinable tokenClass);
     }
 
     interface IConverterProvider<in TDestination, out TPath>
@@ -251,10 +251,13 @@ namespace Reni.Feature
         readonly T _target;
         public GenericProviderForDefinable(T target) { _target = target; }
 
-        IEnumerable<SearchResult> IGenericProviderForDefinable.Declarations(TypeBase source) { return source.Declarations(_target); }
+        IEnumerable<SearchResult> IGenericProviderForDefinable.Declarations(TypeBase source)
+        {
+            return source.Declarations(_target);
+        }
         IEnumerable<ContextSearchResult> IGenericProviderForDefinable.Declarations(ContextBase source)
         {
-            return source.Declarations<T>(_target);
+            return source.Declarations(_target);
         }
     }
 
@@ -270,6 +273,22 @@ namespace Reni.Feature
         Result IMetaFunctionFeature.Result(ContextBase contextBase, Category category, CompileSyntax right)
         {
             return _function(contextBase, category, right);
+        }
+    }
+
+    sealed class MetaFunctionFromSyntax : DumpableObject, IFeatureImplementation, IMetaFunctionFeature
+    {
+        [EnableDump]
+        readonly CompileSyntax _definition;
+        public MetaFunctionFromSyntax(CompileSyntax definition) { _definition = definition; }
+
+        IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return this; } }
+        IFunctionFeature IFeatureImplementation.Function { get { return null; } }
+        ISimpleFeature IFeatureImplementation.Simple { get { return null; } }
+
+        Result IMetaFunctionFeature.Result(ContextBase callContext, Category category, CompileSyntax right)
+        {
+            return callContext.Result(category, _definition.ReplaceArg(right));
         }
     }
 }

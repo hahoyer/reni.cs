@@ -6,7 +6,9 @@ using hw.Forms;
 using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Feature;
 using Reni.ReniParser;
+using Reni.Sequence;
 using Reni.Struct;
 using Reni.Syntax;
 using Reni.TokenClasses;
@@ -14,7 +16,7 @@ using Reni.Type;
 
 namespace Reni.Context
 {
-    sealed class Root : ContextBase
+    sealed class Root : ContextBase, ISymbolProvider<Minus, IFeatureImplementation>
     {
         [DisableDump]
         [Node]
@@ -25,7 +27,8 @@ namespace Reni.Context
 
         readonly ValueCache<BitType> _bitCache;
         readonly ValueCache<VoidType> _voidCache;
-        readonly Dictionary<string, CompileSyntax> _metaDictionary;
+        readonly ValueCache<IFeatureImplementation> _minusFeatureCache;
+        readonly FunctionCache<string, CompileSyntax> _metaDictionary;
 
         internal Root(IExecutionContext executionContext)
         {
@@ -33,6 +36,7 @@ namespace Reni.Context
             ExecutionContext = executionContext;
             _bitCache = new ValueCache<BitType>(() => new BitType(this));
             _voidCache = new ValueCache<VoidType>(() => new VoidType(this));
+            _minusFeatureCache = new ValueCache<IFeatureImplementation>(() => new MetaFunctionFromSyntax(_metaDictionary[ArgToken.Id + " " + Negate.Id]));
         }
 
         CompileSyntax CreateMetaDictionary(string source) { return ExecutionContext.Parse(source); }
@@ -55,6 +59,11 @@ namespace Reni.Context
         internal static RefAlignParam DefaultRefAlignParam
         {
             get { return new RefAlignParam(BitsConst.SegmentAlignBits, Size.Create(32)); }
+        }
+
+        IFeatureImplementation ISymbolProvider<Minus, IFeatureImplementation>.Feature(Minus tokenClass)
+        {
+            return _minusFeatureCache.Value;
         }
 
         Result ConcatArraysResult(Category category, IContextReference context, TypeBase argsType)
@@ -109,6 +118,7 @@ namespace Reni.Context
                 .Container(description);
         }
 
-        internal CompileSyntax Parse(string source) { return  _metaDictionary[source]; }
+        internal CompileSyntax Parse(string source) { return _metaDictionary[source]; }
+
     }
 }

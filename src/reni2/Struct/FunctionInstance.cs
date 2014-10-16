@@ -104,7 +104,7 @@ namespace Reni.Struct
                 if(trace)
                     category = category | Category.Code;
                 BreakExecution();
-                var rawResult = Context.UniqueResult(category.Typed, _body);
+                var rawResult = Context.Result(category.Typed, _body);
                 Tracer.Assert(rawResult.CompleteCategory == category.Typed);
                 if(rawResult.FindArgs != null)
                     Tracer.Assert(!rawResult.SmartArgs.Contains(CodeArgs.Arg()), rawResult.Dump);

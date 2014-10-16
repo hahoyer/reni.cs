@@ -70,7 +70,7 @@ namespace Reni.Context
         }
 
         [DebuggerHidden]
-        internal Result UniqueResult(Category category, CompileSyntax syntax)
+        internal Result Result(Category category, CompileSyntax syntax)
         {
             var cacheItem = _cache.ResultCache[syntax];
             cacheItem.Update(category);
@@ -87,7 +87,7 @@ namespace Reni.Context
             return result;
         }
 
-        internal Result FindResult(Category category, CompileSyntax syntax) { return _cache.ResultCache[syntax].Data & category; }
+        internal TypeBase TypeIfKnown(CompileSyntax syntax) { return _cache.ResultCache[syntax].Data.Type; }
 
         [DebuggerHidden]
         Result ObtainResult(Category category, CompileSyntax syntax)
@@ -115,7 +115,7 @@ namespace Reni.Context
             return result;
         }
 
-        internal TypeBase Type(CompileSyntax syntax) { return UniqueResult(Category.Type, syntax).Type; }
+        internal TypeBase Type(CompileSyntax syntax) { return Result(Category.Type, syntax).Type; }
 
         internal virtual Structure ObtainRecentStructure() { return null; }
         internal virtual IFunctionContext ObtainRecentFunctionContext() { return null; }
@@ -181,7 +181,7 @@ namespace Reni.Context
 
         internal Result ResultAsReference(Category category, CompileSyntax syntax)
         {
-            return UniqueResult(category.Typed, syntax)
+            return Result(category.Typed, syntax)
                 .LocalPointerKindResult;
         }
 
@@ -190,7 +190,7 @@ namespace Reni.Context
             return FindRecentFunctionContextObject
                 .CreateArgReferenceResult(category);
         }
-        internal Result ArgsResult(Category category, CompileSyntax right)
+        internal Result ArgsResult(Category category, [CanBeNull]CompileSyntax right)
         {
             return right == null
                 ? RootContext.VoidType.Result(category.Typed)
@@ -199,7 +199,7 @@ namespace Reni.Context
 
         internal Result ObjectResult(Category category, [NotNull] CompileSyntax left)
         {
-            return UniqueResult(category.Typed, left)
+            return Result(category.Typed, left)
                 .Conversion(Type(left).TypeForSearchProbes);
         }
 
@@ -233,7 +233,8 @@ namespace Reni.Context
 
         ContextSearchResult Declarations(Definable tokenClass)
         {
-            return tokenClass.Genericize.SelectMany(g => g.Declarations(this)).Single();
+            var genericize = tokenClass.Genericize.ToArray();
+            return genericize.SelectMany(g => g.Declarations(this)).Single();
         }
 
         [NotNull]
@@ -248,7 +249,7 @@ namespace Reni.Context
             return result;
         }
 
-        internal IEnumerable<ContextSearchResult> Declarations<TDefinable>(TDefinable tokenClass) where TDefinable : Definable
+        virtual internal IEnumerable<ContextSearchResult> Declarations<TDefinable>(TDefinable tokenClass) where TDefinable : Definable
         {
             var provider = this as ISymbolProvider<TDefinable, IFeatureImplementation>;
             if(provider != null)

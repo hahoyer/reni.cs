@@ -21,7 +21,16 @@ namespace hw.Parser
         [EnableDumpExcept(null)]
         protected virtual ITokenFactory NewTokenFactory { get { return null; } }
 
-        string INameProvider.Name { set { Name = value; } }
+        string INameProvider.Name
+        {
+            set
+            {
+                if(Name == value)
+                    return;
+                Tracer.Assert(Name == null, Name);
+                Name = value;
+            }
+        }
 
         IParsedSyntax IType<IParsedSyntax>.Create(IParsedSyntax left, IPart<IParsedSyntax> part, IParsedSyntax right, bool isMatch)
         {

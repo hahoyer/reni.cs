@@ -46,7 +46,7 @@ namespace Reni.ReniParser
             switch(searchResults.Length)
             {
                 case 0:
-                    return UndefinedSymbolIssue.Type(_token, typeForSearch ).IssueResult(category);
+                    return UndefinedSymbolIssue.Type(_token, typeForSearch).IssueResult(category);
 
                 case 1:
                     return searchResults[0].CallResult(context, category, c => context.ObjectResult(c, Left), Right);
@@ -54,7 +54,16 @@ namespace Reni.ReniParser
                 default:
                     return AmbiguousSymbolIssue.Type(_token, context.RootContext).IssueResult(category);
             }
+        }
 
+        internal override CompileSyntax Visit(ISyntaxVisitor visitor)
+        {
+            var left = Left == null ? null : Left.Visit(visitor);
+            var right = Right == null ? null : Right.Visit(visitor);
+            if(left == null && right == null)
+                return this;
+
+            return (CompileSyntax) _tokenClass.Create(left ?? Left, _token, right ?? Right);
         }
 
         protected override string GetNodeDump()

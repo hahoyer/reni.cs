@@ -53,6 +53,11 @@ namespace Reni.Syntax
                 .Result(context, category, Token);
         }
 
+        internal override CompileSyntax Visit(ISyntaxVisitor visitor)
+        {
+            return Terminal.Visit(visitor);
+        }
+
         [DisableDump]
         internal override TokenData FirstToken { get { return Token; } }
 
@@ -197,6 +202,7 @@ namespace Reni.Syntax
     interface ITerminal
     {
         Result Result(ContextBase context, Category category, TokenData token);
+        CompileSyntax Visit(ISyntaxVisitor visitor);
     }
 
     interface IPrefix

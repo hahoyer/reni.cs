@@ -34,5 +34,10 @@ namespace Reni.TokenClasses
             NotImplementedMethod(context, category, token);
             return null;
         }
+        CompileSyntax ITerminal.Visit(ISyntaxVisitor visitor)
+        {
+            NotImplementedMethod(visitor);
+            return null;
+        }
     }
 }

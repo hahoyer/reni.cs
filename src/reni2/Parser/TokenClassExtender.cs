@@ -1,4 +1,3 @@
-using hw.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
@@ -6,12 +5,15 @@ using JetBrains.Annotations;
 
 namespace Reni.Parser
 {
-    internal static class TokenClassExtension
+    static class TokenClassExtension
     {
         [UsedImplicitly]
-        internal static string Symbolize(this string token) { return token.Aggregate("", (current, tokenChar) => current + SymbolizeChar(tokenChar)); }
+        internal static string Symbolize(this string token)
+        {
+            return token.Aggregate("", (current, tokenChar) => current + SymbolizeChar(tokenChar));
+        }
 
-        private static string SymbolizeChar(Char @char)
+        static string SymbolizeChar(Char @char)
         {
             switch(@char)
             {

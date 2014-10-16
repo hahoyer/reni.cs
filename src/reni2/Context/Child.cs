@@ -3,6 +3,7 @@ using System.Linq;
 using System;
 using hw.Debug;
 using hw.Forms;
+using Reni.Feature;
 using Reni.Struct;
 
 namespace Reni.Context
@@ -26,5 +27,10 @@ namespace Reni.Context
         protected abstract string ChildDumpPrintText { get; }
         internal override Structure ObtainRecentStructure() { return Parent.ObtainRecentStructure(); }
         internal override IFunctionContext ObtainRecentFunctionContext() { return Parent.ObtainRecentFunctionContext(); }
+        internal override IEnumerable<ContextSearchResult> Declarations<TDefinable>(TDefinable tokenClass)
+        {
+            var result = base.Declarations(tokenClass).ToArray();
+            return result.Any() ? result : Parent.Declarations(tokenClass);
+        }
     }
 }

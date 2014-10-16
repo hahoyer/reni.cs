@@ -31,7 +31,7 @@ namespace Reni.Type
 
         protected override Size GetSize() { return Size.Create(1); }
 
-        IPath<IPath<IFeatureImplementation, SequenceType>, ArrayType> ISymbolProvider<DumpPrintToken, IPath<IPath<IFeatureImplementation, SequenceType>, ArrayType>>.Feature(DumpPrintToken token)
+        IPath<IPath<IFeatureImplementation, SequenceType>, ArrayType> ISymbolProvider<DumpPrintToken, IPath<IPath<IFeatureImplementation, SequenceType>, ArrayType>>.Feature(DumpPrintToken tokenClass)
         {
             var feature = Extension
                 .Feature<SequenceType, ArrayType>(DumpPrintTokenResult);

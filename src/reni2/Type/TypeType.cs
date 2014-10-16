@@ -39,7 +39,7 @@ namespace Reni.Type
             return Extension.SimpleFeature(DumpPrintTokenResult);
         }
 
-        IFeatureImplementation ISymbolProvider<Star, IFeatureImplementation>.Feature(Star token) { return Extension.MetaFeature(StarResult); }
+        IFeatureImplementation ISymbolProvider<Star, IFeatureImplementation>.Feature(Star tokenClass) { return Extension.MetaFeature(StarResult); }
         internal override string DumpPrintText { get { return "(" + Value.DumpPrintText + "()) type"; } }
 
         protected override string GetNodeDump() { return "(" + Value.NodeDump + ") type"; }
