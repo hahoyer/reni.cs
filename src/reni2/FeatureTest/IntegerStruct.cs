@@ -19,11 +19,11 @@ namespace Reni.FeatureTest.Integer
                 @"
 Integer8: 
 /\{
-    _data: 127 type instance(. enable_cut);
+    _data: 127 type instance(^ enable_cut);
 
-    create   : /\(Integer8(.));
+    create   : /\(Integer8(^));
     dump_print: /\(_data dump_print);
-    +        :  /\create(_data + create(.) _data);
+    +        :  /\create(_data + create(^) _data);
     clone: /!\create(_data) ;
     enable_cut: /!\_data enable_cut;
     !converter: /\ _data ;

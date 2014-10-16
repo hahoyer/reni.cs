@@ -22,7 +22,8 @@ namespace Reni.Context
 
         internal Result Result(Category category, ContextBase context, CompileSyntax right)
         {
-            return Result(context, category, right).ReplaceArg(ConverterResult);
+            var result = Result(context, category, right);
+            return result.ReplaceArg(ConverterResult);
         }
 
         internal Result Result(Category category) { return SimpleResult(category).ReplaceArg(ConverterResult); }

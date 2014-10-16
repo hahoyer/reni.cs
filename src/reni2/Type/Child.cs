@@ -16,7 +16,7 @@ namespace Reni.Type
         protected Child(TParent parent) { _parent = parent; }
 
         [DisableDump]
-        internal override sealed Root RootContext { get { return _parent.RootContext; } }
+        internal override Root RootContext { get { return _parent.RootContext; } }
         [Node]
         [DisableDump]
         public TParent Parent { get { return _parent; } }

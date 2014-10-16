@@ -72,7 +72,7 @@ x(4) dump_print;
 
     [TestFixture]
     [Hallo]
-    [TargetSet("text_item(108) dump_print", "l")]
+    [TargetSet("108 text_item dump_print", "l")]
     public sealed class ConvertFromNumber : CompilerTest
     {
         [Test]
@@ -81,7 +81,7 @@ x(4) dump_print;
 
     [TestFixture]
     [ConvertFromNumber]
-    [TargetSet("(<< text_item(108)<< text_item(109))text_items dump_print", "lm")]
+    [TargetSet("(<< (108)text_item<< (109)text_item)text_item dump_print", "lm")]
     [ArrayFromPieces]
     [Hallo]
     public sealed class ConvertFromNumbers : CompilerTest

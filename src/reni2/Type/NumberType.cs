@@ -9,24 +9,25 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
 using Reni.Sequence;
+using Reni.TokenClasses;
 
 namespace Reni.Type
 {
     sealed class NumberType
-        : TypeBase
+        : Child<ArrayType>
             , ISymbolProvider<DumpPrintToken, IFeatureImplementation>
             , ISymbolProvider<Operation, IFeatureImplementation>
             , ISymbolProvider<TokenClasses.EnableCut, IFeatureImplementation>
             , ISymbolProvider<Negate, IFeatureImplementation>
+            , ISymbolProvider<TextItem, IFeatureImplementation>
             , IConverterProvider<NumberType, IFeatureImplementation>
     {
-        readonly ArrayType _parent;
         static readonly Minus _minusOperation = new Minus();
         readonly ValueCache<Result> _zeroResult;
 
         public NumberType(ArrayType parent)
+            : base(parent)
         {
-            _parent = parent;
             _zeroResult = new ValueCache<Result>(GetZeroResult);
         }
 
@@ -39,10 +40,9 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        internal override Root RootContext { get { return _parent.RootContext; } }
-        protected override Size GetSize() { return _parent.Size; }
+        internal override Root RootContext { get { return Parent.RootContext; } }
         [DisableDump]
-        internal override bool Hllw { get { return _parent.Hllw; } }
+        internal override bool Hllw { get { return Parent.Hllw; } }
         [DisableDump]
         internal override string DumpPrintText { get { return "number(" + Bits + ")"; } }
         [DisableDump]
@@ -82,6 +82,22 @@ namespace Reni.Type
         IFeatureImplementation ISymbolProvider<Negate, IFeatureImplementation>.Feature(Negate tokenClass)
         {
             return Extension.SimpleFeature(NegationResult);
+        }
+
+        IFeatureImplementation ISymbolProvider<TextItem, IFeatureImplementation>.Feature(TextItem tokenClass)
+        {
+            return Extension.SimpleFeature(TextItemResult);
+        }
+
+        protected override Result ParentConversionResult(Category category) { return Parent.Result(category, ArgResult); }
+
+        protected override Size GetSize() { return Parent.Size; }
+
+        Result TextItemResult(Category category)
+        {
+            return Parent
+                .TextItemResult(category)
+                .ReplaceArg(ParentConversionResult);
         }
 
         Result NegationResult(Category category)

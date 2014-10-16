@@ -4,7 +4,6 @@ using System;
 using hw.Parser;
 using hw.PrioParser;
 using Reni.ReniParser;
-using Reni.Syntax;
 
 namespace Reni.TokenClasses
 {
@@ -17,7 +16,7 @@ namespace Reni.TokenClasses
         {
             return Create((ParsedSyntax) left, (TokenData) token, (ParsedSyntax) right);
         }
-        
+
         internal ParsedSyntax Create(ParsedSyntax left, TokenData tokenData, ParsedSyntax right)
         {
             return this.Operation(left, tokenData, right);
@@ -35,19 +34,6 @@ namespace Reni.TokenClasses
         ParsedSyntax IOperator<ParsedSyntax>.Infix(ParsedSyntax left, IOperatorPart token, ParsedSyntax right)
         {
             return InfixSyntax(left, (TokenData) token, right);
-        }
-
-        protected ParsedSyntax Syntax
-            (
-            ParsedSyntax left
-            ,
-            TokenData token
-            ,
-            ParsedSyntax right
-            )
-        {
-            NotImplementedMethod(left, token, right);
-            return null;
         }
 
         protected virtual ParsedSyntax TerminalSyntax(TokenData token)
