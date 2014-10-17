@@ -49,7 +49,7 @@ namespace Reni.ReniParser
                     return UndefinedSymbolIssue.Type(_token, typeForSearch).IssueResult(category);
 
                 case 1:
-                    return searchResults[0].CallResult(context, category, c => context.ObjectResult(c, Left), Right);
+                    return searchResults[0].CallResult(context, category, Left, Right);
 
                 default:
                     return AmbiguousSymbolIssue.Type(_token, context.RootContext).IssueResult(category);

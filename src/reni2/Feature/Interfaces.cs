@@ -16,6 +16,7 @@ namespace Reni.Feature
         IMetaFunctionFeature MetaFunction { get; }
         IFunctionFeature Function { get; }
         ISimpleFeature Simple { get; }
+        IContextMetaFunctionFeature ContextMetaFunction { get; }
     }
 
     interface ISimpleFeature
@@ -47,6 +48,11 @@ namespace Reni.Feature
     }
 
     interface IMetaFunctionFeature
+    {
+        Result Result(ContextBase contextBase, Category category, CompileSyntax left, CompileSyntax right);
+    }
+
+    interface IContextMetaFunctionFeature
     {
         Result Result(ContextBase contextBase, Category category, CompileSyntax right);
     }
@@ -141,11 +147,10 @@ namespace Reni.Feature
         CallDescriptor CallDescriptor { get { return new CallDescriptor(Type, Feature, Converter); } }
 
         internal Result CallResult
-            (ContextBase context, Category category, Func<Category, Result> getResultForLeft, CompileSyntax right)
+            (ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
             return CallDescriptor
-                .Result(category, context, right)
-                .ReplaceArg(getResultForLeft);
+                .Result(category, context, left, right);
         }
 
         internal Result CallResult(Category category) { return CallDescriptor.Result(category); }
@@ -263,30 +268,32 @@ namespace Reni.Feature
 
     sealed class MetaFunction : DumpableObject, IFeatureImplementation, IMetaFunctionFeature
     {
-        readonly Func<ContextBase, Category, CompileSyntax, Result> _function;
-        public MetaFunction(Func<ContextBase, Category, CompileSyntax, Result> function) { _function = function; }
+        readonly Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result> _function;
+        public MetaFunction(Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result> function) { _function = function; }
 
+        IContextMetaFunctionFeature IFeatureImplementation.ContextMetaFunction { get { return null; } }
         IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return this; } }
         IFunctionFeature IFeatureImplementation.Function { get { return null; } }
         ISimpleFeature IFeatureImplementation.Simple { get { return null; } }
 
-        Result IMetaFunctionFeature.Result(ContextBase contextBase, Category category, CompileSyntax right)
+        Result IMetaFunctionFeature.Result(ContextBase contextBase, Category category, CompileSyntax left, CompileSyntax right)
         {
-            return _function(contextBase, category, right);
+            return _function(contextBase, category, left, right);
         }
     }
 
-    sealed class MetaFunctionFromSyntax : DumpableObject, IFeatureImplementation, IMetaFunctionFeature
+    sealed class ContextMetaFunctionFromSyntax : DumpableObject, IFeatureImplementation, IContextMetaFunctionFeature
     {
         [EnableDump]
         readonly CompileSyntax _definition;
-        public MetaFunctionFromSyntax(CompileSyntax definition) { _definition = definition; }
+        public ContextMetaFunctionFromSyntax(CompileSyntax definition) { _definition = definition; }
 
-        IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return this; } }
+        IContextMetaFunctionFeature IFeatureImplementation.ContextMetaFunction { get { return this; } }
+        IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return null; } }
         IFunctionFeature IFeatureImplementation.Function { get { return null; } }
         ISimpleFeature IFeatureImplementation.Simple { get { return null; } }
 
-        Result IMetaFunctionFeature.Result(ContextBase callContext, Category category, CompileSyntax right)
+        Result IContextMetaFunctionFeature.Result(ContextBase callContext, Category category, CompileSyntax right)
         {
             return callContext.Result(category, _definition.ReplaceArg(right));
         }

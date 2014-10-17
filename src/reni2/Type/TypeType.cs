@@ -60,8 +60,10 @@ namespace Reni.Type
 
         internal Result DumpPrintTokenResult(Category category) { return Value.DumpPrintTypeNameResult(category); }
 
-        Result StarResult(ContextBase context, Category category, CompileSyntax right)
+        Result StarResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
+            NotImplementedMethod(context, category, left, right);
+
             var countResult = right.Result(context).AutomaticDereferenceResult;
             var count = countResult
                 .Evaluate(context.RootContext.ExecutionContext)

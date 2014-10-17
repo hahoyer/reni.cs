@@ -20,8 +20,25 @@ namespace Reni.Context
         [DisableDump]
         protected abstract Func<Category, Result> ConverterResult { get; }
 
+        internal Result Result(Category category, ContextBase context, CompileSyntax left, CompileSyntax right)
+        {
+            var metaFeature = Feature.MetaFunction;
+            if (metaFeature != null)
+                return metaFeature.Result(context, category, left, right);
+
+            var result = Result(context, category, right);
+            return result
+                .ReplaceArg(ConverterResult)
+                .ReplaceArg(context.ObjectResult(category, left))
+            ;
+        }
+
         internal Result Result(Category category, ContextBase context, CompileSyntax right)
         {
+            var metaFeature = Feature.ContextMetaFunction;
+            if (metaFeature != null)
+                return metaFeature.Result(context, category, right);
+
             var result = Result(context, category, right);
             return result.ReplaceArg(ConverterResult);
         }
@@ -30,10 +47,6 @@ namespace Reni.Context
 
         Result Result(ContextBase context, Category category, CompileSyntax right)
         {
-            var metaFeature = Feature.MetaFunction;
-            if(metaFeature != null)
-                return metaFeature.Result(context, category, right);
-
             var simpleFeature = Feature.SimpleFeature();
             if(simpleFeature != null && right == null)
                 return simpleFeature.Result(category);

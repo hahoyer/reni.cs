@@ -72,8 +72,7 @@ namespace Reni.Type
 
         Result ISearchResult.FunctionResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
-            return CallDescriptor.Result(category, context, right)
-                .ReplaceArg(c => context.ObjectResult(c, left));
+            return CallDescriptor.Result(category, context, left, right);
         }
     }
 
@@ -82,7 +81,10 @@ namespace Reni.Type
         readonly OldSearchResult _searchResult;
 
         internal ConverterResult(OldSearchResult searchResult, IConverter converter)
-            : base(searchResult.Feature, converter) { _searchResult = searchResult; }
+            : base(searchResult.Feature, converter)
+        {
+            _searchResult = searchResult;
+        }
 
         internal override TypeBase DefiningType { get { return _searchResult.DefiningType; } }
     }

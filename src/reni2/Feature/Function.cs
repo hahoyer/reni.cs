@@ -4,7 +4,6 @@ using System;
 using hw.Debug;
 using Reni.Basics;
 using Reni.Code;
-using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Feature
@@ -39,6 +38,7 @@ namespace Reni.Feature
             : base(function)
         {}
 
+        IContextMetaFunctionFeature IFeatureImplementation.ContextMetaFunction { get { return null; } }
         IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return null; } }
         IFunctionFeature IFeatureImplementation.Function { get { return this; } }
         ISimpleFeature IFeatureImplementation.Simple { get { return null; } }
@@ -61,14 +61,12 @@ namespace Reni.Feature
             Tracer.Assert(_function.Target is IContextReferenceProvider);
         }
 
+        IContextMetaFunctionFeature IFeatureImplementation.ContextMetaFunction { get { return null; } }
         IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return null; } }
         IFunctionFeature IFeatureImplementation.Function { get { return this; } }
         ISimpleFeature IFeatureImplementation.Simple { get { return null; } }
 
-        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
-        {
-            return _function(category, argsType, _arg);
-        }
+        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType) { return _function(category, argsType, _arg); }
 
         bool IFunctionFeature.IsImplicit { get { return false; } }
         IContextReference IFunctionFeature.ObjectReference { get { return ObjectReference; } }

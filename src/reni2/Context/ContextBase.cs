@@ -227,8 +227,7 @@ namespace Reni.Context
         internal Result FunctionalObjectResult(Category category, [NotNull] CompileSyntax left, CompileSyntax right)
         {
             var functionalObjectDescriptor = new FunctionalObjectDescriptor(this, left);
-            return functionalObjectDescriptor.Result(category, this, right)
-                .ReplaceArg(c => ObjectResult(c, left));
+            return functionalObjectDescriptor.Result(category, this, left, right);
         }
 
         ContextSearchResult Declarations(Definable tokenClass)

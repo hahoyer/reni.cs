@@ -24,8 +24,7 @@ namespace Reni.Type
 
         Result ISearchResult.FunctionResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
-            return CallDescriptor.Result(category, context, right)
-                .ReplaceArg(c => context.ObjectResult(c, left));
+            return CallDescriptor.Result(category, context, left, right);
         }
         Result ISearchResult.SimpleResult(Category category) { return Feature.Simple.Result(category); }
         ISearchResult ISearchResult.WithConversion(IConverter converter) { return new SearchResultWithConversion(this, converter); }

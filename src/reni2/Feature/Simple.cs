@@ -26,6 +26,7 @@ namespace Reni.Feature
         public Simple(Func<Category, Result> function)
             : base(function) { _function = function; }
 
+        IContextMetaFunctionFeature IFeatureImplementation.ContextMetaFunction { get { return null; } }
         IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return null; } }
         IFunctionFeature IFeatureImplementation.Function { get { return null; } }
         ISimpleFeature IFeatureImplementation.Simple { get { return this; } }
@@ -59,6 +60,7 @@ namespace Reni.Feature
             return new Simple<TType1>((category, type1) => _function(category, type1, provider));
         }
 
+        IContextMetaFunctionFeature IFeatureImplementation.ContextMetaFunction { get { return null; } }
         IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return null; } }
         IFunctionFeature IFeatureImplementation.Function { get { return null; } }
         ISimpleFeature IFeatureImplementation.Simple

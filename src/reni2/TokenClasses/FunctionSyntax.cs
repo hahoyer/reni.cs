@@ -91,9 +91,17 @@ namespace Reni.TokenClasses
             return setter + base.GetNodeDump() + getter;
         }
 
-        internal IMetaFunctionFeature MetaFunctionFeature(Structure structure)
+        internal IContextMetaFunctionFeature ContextMetaFunctionFeature(Structure structure)
         {
             if(!_isMetaFunction)
+                return null;
+            NotImplementedMethod(structure);
+            return null;
+        }
+
+        internal IMetaFunctionFeature MetaFunctionFeature(Structure structure)
+        {
+            if (!_isMetaFunction)
                 return null;
             NotImplementedMethod(structure);
             return null;
