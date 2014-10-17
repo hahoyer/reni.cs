@@ -8,12 +8,14 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
 using Reni.Syntax;
+using Reni.TokenClasses;
 
 namespace Reni.Type
 {
     sealed class TextItemType
         : TagChild<ArrayType>
             , ISymbolProvider<DumpPrintToken, IFeatureImplementation>
+            , ISymbolProvider<ToNumberOfBase, IFeatureImplementation>
     {
         public TextItemType(ArrayType parent)
             : base(parent)
@@ -30,6 +32,11 @@ namespace Reni.Type
         IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
         {
             return Extension.SimpleFeature(DumpPrintTokenResult);
+        }
+
+        IFeatureImplementation ISymbolProvider<ToNumberOfBase, IFeatureImplementation>.Feature(ToNumberOfBase tokenClass)
+        {
+            return Extension.MetaFeature(ToNumberOfBaseResult);
         }
 
         Result DumpPrintTokenResult(Category category) { return VoidType.Result(category, DumpPrintCode, CodeArgs.Arg); }
@@ -79,5 +86,17 @@ namespace Reni.Type
                 EndMethodDump();
             }
         }
+
+        /* 
+         digits: "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+         ("  " type) !inject_declaration to_number_of_base : /\/\ digits index(^ ^^ (0))* ^ ^ + digits index(^ ^^(1))
+         
+         
+         
+         
+         */
+
+
+
     }
 }
