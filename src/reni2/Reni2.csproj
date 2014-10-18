@@ -350,7 +350,7 @@
     <Compile Include="Runtime\Data.cs" />
     <Compile Include="Struct\Container.cs" />
     <Compile Include="ThenElse.cs" />
-    <Compile Include="Type\Aligner.cs" />
+    <Compile Include="Type\AlignType.cs" />
     <Compile Include="Type\ArrayType.cs" />
     <Compile Include="Type\BitType.cs" />
     <Compile Include="Type\FunctionFeatureType.cs" />

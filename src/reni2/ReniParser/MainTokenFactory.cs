@@ -87,6 +87,7 @@ namespace Reni.ReniParser
             {
                 return new FunctionCache<string, TokenClass>
                 {
+                    {AlignToken.Id, new AlignToken()},
                     {ArgToken.Id, new ArgToken()},
                     {Minus.Id, new Minus()},
                     {Negate.Id, new Negate()},

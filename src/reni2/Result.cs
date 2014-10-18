@@ -760,7 +760,7 @@ namespace Reni
             get
             {
                 Tracer.Assert(HasType, () => "UnalignedResult requires type category:\n " + Dump());
-                return ((Aligner) Type)
+                return ((AlignType) Type)
                     .UnalignedResult(CompleteCategory)
                     .ReplaceArg(this);
             }

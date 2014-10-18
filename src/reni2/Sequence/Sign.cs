@@ -47,4 +47,14 @@ namespace Reni.Sequence
         }
     }
 
+    sealed class AlignToken : Definable
+    {
+        public const string Id = "!!!";
+        [DisableDump]
+        internal override IEnumerable<IGenericProviderForDefinable> Genericize
+        {
+            get { return this.GenericListFromDefinable(base.Genericize); }
+        }
+    }
+
 }

@@ -9,12 +9,14 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
 using Reni.Sequence;
+using Reni.TokenClasses;
 
 namespace Reni.Type
 {
     sealed class ArrayType
         : TypeBase
             , ISymbolProvider<DumpPrintToken, IFeatureImplementation>
+            , ISymbolProvider<ConcatArrays, IFeatureImplementation>
             , IRepeaterType
             , IFunctionFeature
             , IFeatureImplementation
@@ -62,11 +64,16 @@ namespace Reni.Type
         [DisableDump]
         public override TypeBase ArrayElementType { get { return ElementType; } }
 
-        internal override string DumpPrintText { get { return "(" + ElementType.DumpPrintText + ")array(" + Count + ")"; } }
+        internal override string DumpPrintText { get { return "(" + ElementType.DumpPrintText + ")*" + Count; } }
 
         IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
         {
             return Extension.SimpleFeature(DumpPrintTokenResult);
+        }
+
+        IFeatureImplementation ISymbolProvider<ConcatArrays, IFeatureImplementation>.Feature(ConcatArrays tokenClass)
+        {
+            return Extension.FunctionFeature(ConcatArraysResult);
         }
 
         internal override int? SmartArrayLength(TypeBase elementType)

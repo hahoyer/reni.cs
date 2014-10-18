@@ -25,7 +25,7 @@ namespace Reni.Type
         {
             [Node]
             [SmartNode]
-            public readonly FunctionCache<int, Aligner> Aligner;
+            public readonly FunctionCache<int, AlignType> Aligner;
             [Node]
             [SmartNode]
             public readonly FunctionCache<int, ArrayType> Array;
@@ -55,7 +55,7 @@ namespace Reni.Type
                 Pointer = new ValueCache<IReferenceType>(parent.ObtainPointer);
                 Pair = new FunctionCache<TypeBase, Pair>(first => new Pair(first, parent));
                 Array = new FunctionCache<int, ArrayType>(parent.ObtainArray);
-                Aligner = new FunctionCache<int, Aligner>(alignBits => new Aligner(parent, alignBits));
+                Aligner = new FunctionCache<int, AlignType>(alignBits => new AlignType(parent, alignBits));
                 FunctionInstanceType = new ValueCache<FunctionInstanceType>(() => new FunctionInstanceType(parent));
                 TypeType = new ValueCache<TypeType>(() => new TypeType(parent));
                 Size = new ValueCache<Size>(parent.ObtainSize);
@@ -575,7 +575,7 @@ namespace Reni.Type
                 );
         }
 
-        Simple Convert(Aligner type)
+        Simple Convert(AlignType type)
         {
             if(type.Parent == this)
                 return Reni.Feature.Extension.SimpleFeature(PointerArgResult);

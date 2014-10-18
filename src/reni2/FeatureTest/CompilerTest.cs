@@ -85,10 +85,7 @@ namespace Reni.FeatureTest
             Run();
         }
 
-        public virtual void Run()
-        {
-            BaseRun(1);
-        }
+        public virtual void Run() { BaseRun(1); }
 
         protected void BaseRun(int depth = 0)
         {

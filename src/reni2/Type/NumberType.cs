@@ -44,7 +44,7 @@ namespace Reni.Type
         [DisableDump]
         internal override bool Hllw { get { return Parent.Hllw; } }
         [DisableDump]
-        internal override string DumpPrintText { get { return "number(" + Bits + ")"; } }
+        internal override string DumpPrintText { get { return "number(bits:" + Bits + ")"; } }
         [DisableDump]
         internal override bool IsCuttingPossible { get { return true; } }
         [EnableDump]
@@ -112,7 +112,7 @@ namespace Reni.Type
 
         Result OperationResult(Category category, TypeBase right, IOperation operation)
         {
-            var rightNumber = right.SmartUn<PointerType>().SmartUn<Aligner>() as NumberType;
+            var rightNumber = right.SmartUn<PointerType>().SmartUn<AlignType>() as NumberType;
             if(rightNumber != null)
                 return OperationResult(category, rightNumber, operation);
 
