@@ -264,7 +264,7 @@ namespace Reni.Struct
                     .Select(i => fromPosition + i)
                     .Where(position => !Statements[position].IsLambda)
                     .Select(position => InnerResult(category, parent, position))
-                    .Select(r => r.Align(Root.DefaultRefAlignParam.AlignBits))
+                    .Select(r => r.Align)
                     .Select(r => r.LocalBlock(category))
                     .ToArray();
                 Dump("results", results);

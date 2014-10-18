@@ -117,8 +117,7 @@ namespace Reni.Struct
                 Dump("automaticDereferenceResult", automaticDereferenceResult);
                 BreakExecution();
 
-                var postProcessedResult = automaticDereferenceResult
-                    .Align(Root.DefaultRefAlignParam.AlignBits)
+                var postProcessedResult = automaticDereferenceResult.Align
                     .LocalBlock(category);
 
                 Dump("postProcessedResult", postProcessedResult);

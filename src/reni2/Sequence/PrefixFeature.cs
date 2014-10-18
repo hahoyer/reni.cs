@@ -26,7 +26,6 @@ using System.Linq;
 using hw.Debug;
 using Reni.Basics;
 using Reni.Code;
-using Reni.Context;
 using Reni.Feature;
 using Reni.Type;
 
@@ -52,8 +51,7 @@ namespace Reni.Sequence
                     category1
                         => _objectType
                             .UniquePointer
-                            .ArgResult(category1.Typed).AutomaticDereferenceResult
-                            .Align(Root.DefaultRefAlignParam.AlignBits));
+                            .ArgResult(category1.Typed).AutomaticDereferenceResult.Align);
         }
     }
 }

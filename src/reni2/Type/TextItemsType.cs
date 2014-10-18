@@ -44,8 +44,7 @@ namespace Reni.Type
             var conversionBase = right.Evaluate(context).ToInt32();
             Tracer.Assert(conversionBase >= 2, conversionBase.ToString);
             var result = BitsConst.Convert(target, conversionBase);
-            return RootContext.BitType.Result(category, result)
-                .Align(Root.DefaultRefAlignParam.AlignBits);
+            return RootContext.BitType.Result(category, result).Align;
         }
 
         [DisableDump]

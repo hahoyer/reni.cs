@@ -8,8 +8,15 @@ namespace Reni.FeatureTest.Array
 {
     [TestFixture]
     [Target("(<<5) dump_print")]
-    [Output("array(number(bits:4),(5))")]
+    [Output("<<(5)")]
     [ParserTest]
     public sealed class SimpleArrayFromPiece : CompilerTest
+    {}
+
+    [TestFixture]
+    [Target("(<<5) type dump_print")]
+    [Output("Number(bits:4)*(1)")]
+    [ParserTest]
+    public sealed class TypeOfSimpleArrayFromPiece : CompilerTest
     {}
 }

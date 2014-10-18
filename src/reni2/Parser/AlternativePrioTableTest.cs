@@ -12,7 +12,7 @@ namespace Reni.Parser
     public sealed class AlternativePrioTableTest : CompilerTest
     {
         [Test]
-        public void AlternativePrioTableConverter()
+        public void Converter()
         {
             var syntaxPrototype = LikeSyntax.Struct
                 (
@@ -26,7 +26,7 @@ namespace Reni.Parser
         }
 
         [Test]
-        public void AlternativePrioTableConverterAndProperty()
+        public void ConverterAndProperty()
         {
             var syntaxPrototype = LikeSyntax.Struct
                 (                              

@@ -254,5 +254,10 @@ namespace Reni.Context
             if(provider != null)
                 yield return new ContextSearchResult(provider.Feature(tokenClass), this);
         }
+        internal Result CreateArrayResult(Category category, CompileSyntax argsType)
+        {
+            var target = Result(category.Typed, argsType).Align;
+            return target.Type.UniqueAlign.UniqueArray(1).Result(category, target);
+        }
     }
 }

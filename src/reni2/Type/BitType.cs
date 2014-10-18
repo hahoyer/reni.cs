@@ -103,8 +103,7 @@ namespace Reni.Type
                     category1
                         => objectType
                             .UniquePointer
-                            .ArgResult(category1.Typed).AutomaticDereferenceResult
-                            .Align(Root.DefaultRefAlignParam.AlignBits));
+                            .ArgResult(category1.Typed).AutomaticDereferenceResult.Align);
         }
     }
 }

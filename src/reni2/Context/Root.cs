@@ -76,10 +76,10 @@ namespace Reni.Context
             return _createArrayFeatureCache.Value;
         }
 
-        Result CreateArrayResult(ContextBase context, Category category, CompileSyntax argsType) 
+        static Result CreateArrayResult(ContextBase context, Category category, CompileSyntax argsType)
         {
-            NotImplementedMethod(context, category, argsType);
-            return null;
+            var target = context.Result(category.Typed, argsType).Align;
+            return target.Type.UniqueAlign.UniqueArray(1).Result(category, target);
         }
 
         internal FunctionType FunctionInstance(Structure structure, FunctionSyntax body, TypeBase argsType)

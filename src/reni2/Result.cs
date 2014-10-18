@@ -486,52 +486,36 @@ namespace Reni
 
         Result Filter(Category category)
         {
-            return new Result
-                (
-                CompleteCategory & category
-// ReSharper disable PossibleInvalidOperationException
-                ,
-                () => Hllw.Value
-// ReSharper restore PossibleInvalidOperationException
-                ,
-                () => Size
-                ,
-                () => Type
-                ,
-                () => Code
-                ,
-                () => Exts
-                )
-            {_pendingCategory = _pendingCategory & category};
+            return new Result(CompleteCategory & category, () => Hllw.Value, () => Size, () => Type, () => Code, () => Exts)
+            {
+                _pendingCategory = _pendingCategory & category
+            };
         }
 
-        internal Result Align(int alignBits)
+        [DisableDump]
+        internal Result Align
         {
-            var size = FindSize;
-            if(size == null)
-                return this;
+            get
+            {
+                var size = FindSize;
+                if(size == null)
+                    return this;
 
-            var alignedSize = size.Align(alignBits);
-            if(alignedSize == size)
-                return this;
+                var alignBits = Root.DefaultRefAlignParam.AlignBits;
+                var alignedSize = size.Align(alignBits);
+                if(alignedSize == size)
+                    return this;
 
-            var result = new Result
-                (
-                CompleteCategory
-// ReSharper disable PossibleInvalidOperationException
-                ,
-                () => Hllw.Value
-// ReSharper restore PossibleInvalidOperationException
-                ,
-                () => alignedSize
-                ,
-                () => Type.UniqueAlign
-                ,
-                () => Code.BitCast(alignedSize)
-                ,
-                () => Exts
-                );
-            return result;
+                var result = new Result
+                    (
+                    CompleteCategory,
+                    () => Hllw.Value,
+                    () => alignedSize,
+                    () => Type.UniqueAlign,
+                    () => Code.BitCast(alignedSize),
+                    () => Exts);
+                return result;
+            }
         }
 
         [DisableDump]
@@ -738,7 +722,7 @@ namespace Reni
         internal BitsConst Evaluate(IExecutionContext context)
         {
             Tracer.Assert(Exts.IsNone, Dump);
-            var result = Align(3).LocalBlock(CompleteCategory);
+            var result = Align.LocalBlock(CompleteCategory);
             return result.Code.Evaluate(context);
         }
 

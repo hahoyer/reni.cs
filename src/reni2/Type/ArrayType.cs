@@ -2,25 +2,24 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
-using hw.Forms;
 using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Feature.DumpPrint;
 using Reni.Sequence;
 
 namespace Reni.Type
 {
     sealed class ArrayType
         : TypeBase
+            , ISymbolProvider<DumpPrintToken, IFeatureImplementation>
             , IRepeaterType
             , IFunctionFeature
             , IFeatureImplementation
     {
-        [Node]
         internal readonly TypeBase ElementType;
-        [Node]
         internal readonly int Count;
 
         readonly ValueCache<RepeaterAccessType> _arrayAccessTypeCache;
@@ -46,17 +45,14 @@ namespace Reni.Type
         TypeBase IRepeaterType.ElementType { get { return ElementType; } }
         Size IRepeaterType.IndexSize { get { return IndexSize; } }
 
-        [Node]
         [DisableDump]
         internal SequenceType UniqueSequence { get { return _sequenceCache.Value; } }
         [DisableDump]
         public NumberType UniqueNumber { get { return _numberCache.Value; } }
 
-        [Node]
         [DisableDump]
         internal TextItemType UniqueTextItemType { get { return _textItemCache.Value; } }
 
-        [Node]
         [DisableDump]
         internal EnableArrayOverSizeType EnableArrayOverSizeType { get { return _enableArrayOverSizeTypeCache.Value; } }
 
@@ -67,6 +63,11 @@ namespace Reni.Type
         public override TypeBase ArrayElementType { get { return ElementType; } }
 
         internal override string DumpPrintText { get { return "(" + ElementType.DumpPrintText + ")array(" + Count + ")"; } }
+
+        IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
+        {
+            return Extension.SimpleFeature(DumpPrintTokenResult);
+        }
 
         internal override int? SmartArrayLength(TypeBase elementType)
         {
@@ -200,7 +201,7 @@ namespace Reni.Type
             var elementReference = ElementType.UniquePointer;
             var argCode = UniquePointer.ArgCode;
             var elementDumpPrint = elementReference.GenericDumpPrintResult(Category.Code).Code;
-            var code = CodeBase.DumpPrintText("array(" + ElementType.DumpPrintText + ",(");
+            var code = CodeBase.DumpPrintText("<<(");
             for(var i = 0; i < Count; i++)
             {
                 if(i > 0)
@@ -208,7 +209,7 @@ namespace Reni.Type
                 var elemCode = elementDumpPrint.ReplaceArg(elementReference, argCode.ReferencePlus(ElementType.Size * i));
                 code = code + elemCode;
             }
-            return code + CodeBase.DumpPrintText("))");
+            return code + CodeBase.DumpPrintText(")");
         }
 
         internal Result SequenceTokenResult(Category category)

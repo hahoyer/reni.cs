@@ -285,7 +285,7 @@ namespace Reni.Type
 
         Result ConvertToBitSequence(Category category)
         {
-            return ConvertToSequence(category, BitType).Align(BitsConst.SegmentAlignBits);
+            return ConvertToSequence(category, BitType).Align;
         }
 
         /// <summary>
@@ -561,8 +561,7 @@ namespace Reni.Type
 
         internal Result BitSequenceOperandConversion(Category category)
         {
-            return ConvertToBitSequence(category).AutomaticDereferenceResult
-                .Align(BitsConst.SegmentAlignBits);
+            return ConvertToBitSequence(category).AutomaticDereferenceResult.Align;
         }
 
         internal Result DumpPrintTypeNameResult(Category category)
