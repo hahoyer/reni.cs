@@ -9,8 +9,8 @@ namespace Reni.Type
 {
     abstract class ConverterBase : DumpableObject, IFeatureImplementation, ISimpleFeature
     {
-        IContextMetaFunctionFeature IFeatureImplementation.ContextMetaFunction { get { return null; } }
-        IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return null; } }
+        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta { get { return null; } }
+        IMetaFunctionFeature IFeatureImplementation.Meta { get { return null; } }
         IFunctionFeature IFeatureImplementation.Function { get { return null; } }
         ISimpleFeature IFeatureImplementation.Simple { get { return this; } }
         Result ISimpleFeature.Result(Category category) { return Result(category); }

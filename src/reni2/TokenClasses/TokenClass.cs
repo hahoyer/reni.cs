@@ -8,13 +8,22 @@ using Reni.ReniParser;
 namespace Reni.TokenClasses
 {
     /// <summary>
-    ///     Base clas for compiler tokens
+    ///     Base class for compiler tokens
     /// </summary>
     abstract class TokenClass : hw.Parser.TokenClass, IOperator<ParsedSyntax>
     {
-        protected override sealed IParsedSyntax Create(IParsedSyntax left, IPart<IParsedSyntax> token, IParsedSyntax right)
+        protected override sealed IParsedSyntax Create(IParsedSyntax left, IPart token, IParsedSyntax right)
         {
-            return Create((ParsedSyntax) left, (TokenData) token, (ParsedSyntax) right);
+            StartMethodDump(false, left, token, right);
+            try
+            {
+                var result = Create((ParsedSyntax) left, (TokenData) token, (ParsedSyntax) right);
+                return ReturnMethodDump(result);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
 
         internal ParsedSyntax Create(ParsedSyntax left, TokenData tokenData, ParsedSyntax right)

@@ -158,7 +158,7 @@ namespace hw.Debug
         /// <param name="lineFormat"></param>
         public static void FlaggedLine(string s, FilePositionTag flagText = FilePositionTag.Debug, bool showParam = false, int stackFrameDepth = 0, Func<string, int, int, string, string> lineFormat = null)
         {
-            var methodHeader = MethodHeader(flagText, stackFrameDepth: stackFrameDepth + 1, showParam: showParam, lineFormat: lineFormat);
+            var methodHeader = MethodHeader(flagText, stackFrameDepth: stackFrameDepth + 1, showParam: showParam,lineFormat:lineFormat);
             Line(methodHeader + " " + s);
         }
 

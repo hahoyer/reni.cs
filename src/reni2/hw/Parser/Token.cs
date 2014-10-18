@@ -32,7 +32,7 @@ using JetBrains.Annotations;
 namespace hw.Parser
 {
     [DebuggerDisplay("{NodeDump}")]
-    sealed class TokenData : Dumpable, IPart<IParsedSyntax>, IOperatorPart
+    sealed class TokenData : Dumpable, IPart, IOperatorPart
     {
         readonly int _length;
         readonly Source _source;

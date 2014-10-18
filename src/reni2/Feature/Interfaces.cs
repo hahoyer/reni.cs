@@ -13,10 +13,27 @@ namespace Reni.Feature
 {
     interface IFeatureImplementation
     {
-        IMetaFunctionFeature MetaFunction { get; }
+        IMetaFunctionFeature Meta { get; }
         IFunctionFeature Function { get; }
         ISimpleFeature Simple { get; }
-        IContextMetaFunctionFeature ContextMetaFunction { get; }
+        IContextMetaFunctionFeature ContextMeta { get; }
+    }
+
+    abstract class EmptyFeatureImplementation : DumpableObject, IFeatureImplementation
+    {
+        public EmptyFeatureImplementation(int? nextObjectId)
+            : base(nextObjectId) {}
+        public EmptyFeatureImplementation() {}
+
+        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta { get { return ContextMeta; } }
+        IMetaFunctionFeature IFeatureImplementation.Meta { get { return Meta; } }
+        IFunctionFeature IFeatureImplementation.Function { get { return Function; } }
+        ISimpleFeature IFeatureImplementation.Simple { get { return Simple; } }
+
+        protected virtual IContextMetaFunctionFeature ContextMeta { get { return null; } }
+        protected virtual IMetaFunctionFeature Meta { get { return null; } }
+        protected virtual IFunctionFeature Function { get { return null; } }
+        protected virtual ISimpleFeature Simple { get { return null; } }
     }
 
     interface ISimpleFeature
@@ -271,8 +288,8 @@ namespace Reni.Feature
         readonly Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result> _function;
         public MetaFunction(Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result> function) { _function = function; }
 
-        IContextMetaFunctionFeature IFeatureImplementation.ContextMetaFunction { get { return null; } }
-        IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return this; } }
+        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta { get { return null; } }
+        IMetaFunctionFeature IFeatureImplementation.Meta { get { return this; } }
         IFunctionFeature IFeatureImplementation.Function { get { return null; } }
         ISimpleFeature IFeatureImplementation.Simple { get { return null; } }
 
@@ -282,14 +299,27 @@ namespace Reni.Feature
         }
     }
 
+    sealed class ContextMetaFunction : EmptyFeatureImplementation, IContextMetaFunctionFeature
+    {
+        readonly Func<ContextBase, Category, CompileSyntax, Result> _function;
+        public ContextMetaFunction(Func<ContextBase, Category, CompileSyntax, Result> function) { _function = function; }
+
+        protected override IContextMetaFunctionFeature ContextMeta { get { return this; } }
+
+        Result IContextMetaFunctionFeature.Result(ContextBase contextBase, Category category, CompileSyntax right)
+        {
+            return _function(contextBase, category, right);
+        }
+    }
+
     sealed class ContextMetaFunctionFromSyntax : DumpableObject, IFeatureImplementation, IContextMetaFunctionFeature
     {
         [EnableDump]
         readonly CompileSyntax _definition;
         public ContextMetaFunctionFromSyntax(CompileSyntax definition) { _definition = definition; }
 
-        IContextMetaFunctionFeature IFeatureImplementation.ContextMetaFunction { get { return this; } }
-        IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return null; } }
+        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta { get { return this; } }
+        IMetaFunctionFeature IFeatureImplementation.Meta { get { return null; } }
         IFunctionFeature IFeatureImplementation.Function { get { return null; } }
         ISimpleFeature IFeatureImplementation.Simple { get { return null; } }
 

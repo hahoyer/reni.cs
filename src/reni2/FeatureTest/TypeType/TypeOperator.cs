@@ -11,7 +11,7 @@ namespace Reni.FeatureTest.TypeType
     public sealed class TypeOperator : CompilerTest
     {
         protected override string Target { get { return @"31 type dump_print"; } }
-        protected override string Output { get { return "number(6)"; } }
+        protected override string Output { get { return "number(bits: 6)"; } }
 
         [Test]
         public override void Run() { BaseRun(); }

@@ -30,6 +30,6 @@ namespace hw.PrioParser
         where T : class
     {
         Item<T> GetItemAndAdvance(Stack<OpenItem<T>> stack);
-        IPart<T> Span(IPosition<T> end);
+        IPart Span(IPosition<T> end);
     }
 }

@@ -27,7 +27,7 @@ using hw.Debug;
 
 namespace hw.Scanner
 {
-    interface IMatch
+    public interface IMatch
     {
         int? Match(SourcePosn sourcePosn);
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Helper;
+using hw.UnitTest;
 using Reni.Basics;
 using Reni.Feature;
 using Reni.Syntax;
@@ -10,7 +11,7 @@ using Reni.TokenClasses;
 
 namespace Reni.Struct
 {
-    sealed class AccessFeature : DumpableObject, ISimpleFeature, IFeatureImplementation
+    sealed class AccessFeature : EmptyFeatureImplementation, ISimpleFeature
     {
         static int _nextObjectId;
 
@@ -45,7 +46,7 @@ namespace Reni.Struct
             }
         }
 
-        IContextMetaFunctionFeature IFeatureImplementation.ContextMetaFunction
+        protected override IContextMetaFunctionFeature ContextMeta
         {
             get
             {
@@ -54,7 +55,7 @@ namespace Reni.Struct
                 
             }
         }
-        IMetaFunctionFeature IFeatureImplementation.MetaFunction
+        protected override IMetaFunctionFeature Meta
         {
             get
             {
@@ -63,8 +64,7 @@ namespace Reni.Struct
             }
         }
 
-        IFunctionFeature IFeatureImplementation.Function { get { return FunctionFeature; } }
-        IFunctionFeature FunctionFeature { get { return _functionFeature.Value; } }
+        protected override IFunctionFeature Function { get { return _functionFeature.Value; } }
 
         IFunctionFeature ObtainFunctionFeature()
         {
@@ -78,11 +78,11 @@ namespace Reni.Struct
             return feature.Function;
         }
 
-        ISimpleFeature IFeatureImplementation.Simple
+        protected override ISimpleFeature Simple
         {
             get
             {
-                var function = FunctionFeature;
+                var function = _functionFeature.Value;
                 if(function != null && function.IsImplicit)
                     return null;
                 return this;

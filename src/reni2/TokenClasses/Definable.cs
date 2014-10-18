@@ -32,4 +32,13 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal virtual IEnumerable<IGenericProviderForDefinable> Genericize { get { return this.GenericListFromDefinable(); } }
     }
+
+    sealed class ConcatArrays : Definable
+    {
+        [DisableDump]
+        internal override IEnumerable<IGenericProviderForDefinable> Genericize
+        {
+            get { return this.GenericListFromDefinable(base.Genericize); }
+        }
+    }
 }

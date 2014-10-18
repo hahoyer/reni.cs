@@ -131,7 +131,7 @@ namespace Reni.Parser
         internal new abstract class TokenClass : DumpableObject, IType<IParsedSyntax>, INameProvider
         {
             string _name;
-            IParsedSyntax IType<IParsedSyntax>.Create(IParsedSyntax left, IPart<IParsedSyntax> part, IParsedSyntax right, bool isMatch)
+            IParsedSyntax IType<IParsedSyntax>.Create(IParsedSyntax left, IPart part, IParsedSyntax right, bool isMatch)
             {
                 return CreateSyntax((Syntax)left, (TokenData)part, (Syntax)right);
             }

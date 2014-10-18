@@ -4,16 +4,8 @@
     <ProjectGuid>{EBB73C84-6622-4183-A28F-B0DFF606006B}</ProjectGuid>
     <AssemblyName>Reni</AssemblyName>
     <TargetTypeEx>CSharp.Library</TargetTypeEx>
-    <TargetFrameworkVersion>v4.0.1</TargetFrameworkVersion>
-    <TargetFrameworkProfile />
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Basics\BitsConst.cs" />
@@ -95,6 +87,7 @@
     <Compile Include="Feature\IConversionParameter.cs" />
     <Compile Include="Feature\Simple.cs" />
     <Compile Include="hw\Debug\Configuration.cs" />
+    <Compile Include="hw\Debug\DebugTextWriter.cs" />
     <Compile Include="hw\Debug\DisableDumpAttribute.cs" />
     <Compile Include="hw\Debug\Dumpable.cs" />
     <Compile Include="hw\Debug\DumpableObject.cs" />
@@ -108,6 +101,7 @@
     <Compile Include="hw\Debug\EnableDumpExceptAttribute.cs" />
     <Compile Include="hw\Debug\EnableDumpWithExceptionPredicateAttribute.cs" />
     <Compile Include="hw\Debug\Profiler.cs" />
+    <Compile Include="hw\Debug\TextWriters.cs" />
     <Compile Include="hw\Debug\Tracer.cs" />
     <Compile Include="hw\Debug\Writer.cs" />
     <Compile Include="hw\Forms\CursorUtil.cs" />
@@ -173,11 +167,13 @@
     <Compile Include="hw\Scanner\SourcePosn.cs" />
     <Compile Include="hw\UnitTest\CategoryAttribute.cs" />
     <Compile Include="hw\UnitTest\DependantAttribute.cs" />
+    <Compile Include="hw\UnitTest\ITestFixture.cs" />
     <Compile Include="hw\UnitTest\TestExtender.cs" />
     <Compile Include="hw\UnitTest\TestMethod.cs" />
     <Compile Include="hw\UnitTest\TestRunner.cs" />
     <Compile Include="hw\UnitTest\TestType.cs" />
     <Compile Include="IProxyType.cs" />
+    <Compile Include="Parser\AlternativePrioTableTest.cs" />
     <Compile Include="Parser\SimpleTokenFactory.cs" />
     <Compile Include="Parser\PrioTableTest.cs" />
     <Compile Include="Parser\ReniScanner.cs" />
@@ -308,7 +304,6 @@
     <Compile Include="TokenClasses\Base.cs" />
     <Compile Include="TokenClasses\Colon.cs" />
     <Compile Include="TokenClasses\CompareOperation.cs" />
-    <Compile Include="TokenClasses\ConcatArrays.cs" />
     <Compile Include="TokenClasses\DefinableTokenSyntax.cs" />
     <Compile Include="TokenClasses\Definable.cs" />
     <Compile Include="TokenClasses\ElseToken.cs" />

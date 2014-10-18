@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Parser;
+using hw.PrioParser;
+using hw.Scanner;
 using Reni.ReniParser;
 using Reni.Syntax;
 using Reni.Validation;
@@ -18,13 +20,16 @@ namespace Reni.TokenClasses
         }
     }
 
-    sealed class Exclamation : TokenClass
+    sealed class Exclamation : TokenClass, IRescannable<IParsedSyntax>
     {
         static readonly ITokenFactory _tokenFactory = DeclarationTokenFactory.Instance;
-
-        [DisableDump]
-        protected override ITokenFactory NewTokenFactory { get { return _tokenFactory; } }
-        protected override ParsedSyntax TerminalSyntax(TokenData token) { return new ExclamationSyntax(token); }
+        //protected override ParsedSyntax TerminalSyntax(TokenData token) { return new ExclamationSyntax(token); }
+        Item<IParsedSyntax> IRescannable<IParsedSyntax>.Execute
+            (IPart part, SourcePosn sourcePosn, Stack<OpenItem<IParsedSyntax>> stack)
+        {
+            NotImplementedMethod(part, sourcePosn, stack);
+            return null;
+        }
     }
 
     sealed class ConverterToken : TokenClass
@@ -39,7 +44,8 @@ namespace Reni.TokenClasses
     abstract class DeclarationExtensionSyntax : ParsedSyntax
     {
         protected DeclarationExtensionSyntax(TokenData token)
-            : base(token) { }
+            : base(token)
+        {}
 
         internal virtual ParsedSyntax ExtendByConverter(TokenData token)
         {
@@ -53,13 +59,18 @@ namespace Reni.TokenClasses
         readonly TokenData _token;
 
         internal ConverterDeclarationSyntax(TokenData token, TokenData otherToken)
-            : base(token) { _token = otherToken; }
+            : base(token)
+        {
+            _token = otherToken;
+        }
 
         internal override ParsedSyntax CreateDeclarationSyntax(TokenData token, ParsedSyntax right)
         {
             return new ConverterSyntax
-                (_token
-                    , right.CheckedToCompiledSyntax(token, RightMustNotBeNullError)
+                (
+                _token
+                ,
+                right.CheckedToCompiledSyntax(token, RightMustNotBeNullError)
                 );
         }
         IssueId RightMustNotBeNullError()
@@ -72,14 +83,9 @@ namespace Reni.TokenClasses
     sealed class ExclamationSyntax : DeclarationExtensionSyntax
     {
         internal ExclamationSyntax(TokenData token)
-            : base(token) { }
+            : base(token)
+        {}
 
-        internal override ParsedSyntax ExtendByConverter(TokenData token)
-        {
-            return new ConverterDeclarationSyntax
-                (Token
-                    , token
-                );
-        }
+        internal override ParsedSyntax ExtendByConverter(TokenData token) { return new ConverterDeclarationSyntax(Token, token); }
     }
 }

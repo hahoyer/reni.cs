@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using hw.Debug;
 using hw.Parser;
 using Reni.ReniParser;
 using Reni.Syntax;
@@ -17,8 +18,11 @@ namespace Reni.TokenClasses
             _definable = definable;
         }
 
+        [DisableDump]
         internal override TokenData FirstToken { get { return Token; } }
+        [DisableDump]
         internal override TokenData LastToken { get { return Token; } }
+
         internal override ParsedSyntax CreateDeclarationSyntax(TokenData token, ParsedSyntax right)
         {
             return new DeclarationSyntax(_definable, token, right);

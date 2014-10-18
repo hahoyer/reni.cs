@@ -146,8 +146,8 @@ namespace Reni.Type
 
         Size IndexSize { get { return Size.AutoSize(Count).Align(Root.DefaultRefAlignParam.AlignBits); } }
 
-        IContextMetaFunctionFeature IFeatureImplementation.ContextMetaFunction { get { return null; } }
-        IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return null; } }
+        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta { get { return null; } }
+        IMetaFunctionFeature IFeatureImplementation.Meta { get { return null; } }
         IFunctionFeature IFeatureImplementation.Function { get { return this; } }
         ISimpleFeature IFeatureImplementation.Simple { get { return null; } }
 

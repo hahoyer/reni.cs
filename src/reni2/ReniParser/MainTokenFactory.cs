@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.Helper;
-using hw.Parser;
 using hw.PrioParser;
 using Reni.Context;
 using Reni.Feature;
@@ -13,7 +12,7 @@ using Reni.TokenClasses;
 
 namespace Reni.ReniParser
 {
-    sealed class MainTokenFactory : hw.Parser.TokenFactory<TokenClasses.TokenClass>
+    sealed class MainTokenFactory : hw.Parser.TokenFactory<TokenClass>
     {
         public MainTokenFactory(PrioTable prioTable)
             : base(prioTable) { }
@@ -80,13 +79,13 @@ namespace Reni.ReniParser
         ///     Creates the main token classes.
         /// </summary>
         /// <returns> </returns>
-        protected override FunctionCache<string, TokenClasses.TokenClass> GetPredefinedTokenClasses() { return TokenClasses; }
+        protected override FunctionCache<string, TokenClass> GetPredefinedTokenClasses() { return TokenClasses; }
 
-        internal static FunctionCache<string, TokenClasses.TokenClass> TokenClasses
+        internal static FunctionCache<string, TokenClass> TokenClasses
         {
             get
             {
-                return new FunctionCache<string, TokenClasses.TokenClass>
+                return new FunctionCache<string, TokenClass>
                 {
                     {ArgToken.Id, new ArgToken()},
                     {Minus.Id, new Minus()},
@@ -138,15 +137,15 @@ namespace Reni.ReniParser
             }
         }
 
-        protected override TokenClasses.TokenClass GetEndOfText() { return new RightParenthesis(0); }
-        protected override TokenClasses.TokenClass GetBeginOfText() { return new LeftParenthesis(0); }
-        protected override TokenClasses.TokenClass GetNumber() { return new Number(); }
-        protected override TokenClasses.TokenClass GetTokenClass(string name) { return new UserSymbol(name); }
-        protected override TokenClasses.TokenClass GetSyntaxError(string message) { return new SyntaxError(message); }
-        protected override TokenClasses.TokenClass GetText() { return new Text(); }
+        protected override TokenClass GetEndOfText() { return new RightParenthesis(0); }
+        protected override TokenClass GetBeginOfText() { return new LeftParenthesis(0); }
+        protected override TokenClass GetNumber() { return new Number(); }
+        protected override TokenClass GetTokenClass(string name) { return new UserSymbol(name); }
+        protected override TokenClass GetSyntaxError(string message) { return new SyntaxError(message); }
+        protected override TokenClass GetText() { return new Text(); }
     }
 
-    sealed class SyntaxError : TokenClasses.TokenClass
+    sealed class SyntaxError : TokenClass
     {
         readonly string _message;
         public SyntaxError(string message) { _message = message; }

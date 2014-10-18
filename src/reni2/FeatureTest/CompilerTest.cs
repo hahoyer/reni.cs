@@ -13,7 +13,7 @@ namespace Reni.FeatureTest
     ///     Helper class for unittests, that compile something
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
-    public abstract class CompilerTest : DependantAttribute
+    public abstract class CompilerTest : DependantAttribute, ITestFixture
     {
         internal readonly CompilerParameters Parameters = new CompilerParameters();
         static Dictionary<System.Type, CompilerTest> _cache;
@@ -37,7 +37,6 @@ namespace Reni.FeatureTest
         void InternalRunCompiler
             (string fileName, Action<Compiler> expectedResult, TargetSetData targetSet, int stackFrameDepth = 0)
         {
-            Tracer.FlaggedLine("Position of method tested", FilePositionTag.Test, stackFrameDepth: stackFrameDepth + 1);
             if(TestRunner.IsModeErrorFocus)
                 Parameters.Trace.All();
 
@@ -86,7 +85,6 @@ namespace Reni.FeatureTest
             Run();
         }
 
-        [Test]
         public virtual void Run()
         {
             BaseRun(1);

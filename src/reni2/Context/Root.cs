@@ -16,7 +16,10 @@ using Reni.Type;
 
 namespace Reni.Context
 {
-    sealed class Root : ContextBase, ISymbolProvider<Minus, IFeatureImplementation>
+    sealed class Root 
+        : ContextBase
+        , ISymbolProvider<Minus, IFeatureImplementation>
+        , ISymbolProvider<ConcatArrays, IFeatureImplementation>
     {
         [DisableDump]
         [Node]
@@ -29,6 +32,7 @@ namespace Reni.Context
         readonly ValueCache<VoidType> _voidCache;
         readonly ValueCache<IFeatureImplementation> _minusFeatureCache;
         readonly FunctionCache<string, CompileSyntax> _metaDictionary;
+        readonly ValueCache<IFeatureImplementation> _createArrayFeatureCache;
 
         internal Root(IExecutionContext executionContext)
         {
@@ -37,6 +41,7 @@ namespace Reni.Context
             _bitCache = new ValueCache<BitType>(() => new BitType(this));
             _voidCache = new ValueCache<VoidType>(() => new VoidType(this));
             _minusFeatureCache = new ValueCache<IFeatureImplementation>(() => new ContextMetaFunctionFromSyntax(_metaDictionary[ArgToken.Id + " " + Negate.Id]));
+            _createArrayFeatureCache = new ValueCache<IFeatureImplementation>(() => new ContextMetaFunction(CreateArrayResult));
         }
 
         CompileSyntax CreateMetaDictionary(string source) { return ExecutionContext.Parse(source); }
@@ -66,9 +71,14 @@ namespace Reni.Context
             return _minusFeatureCache.Value;
         }
 
-        Result ConcatArraysResult(Category category, IContextReference context, TypeBase argsType)
+        IFeatureImplementation ISymbolProvider<ConcatArrays, IFeatureImplementation>.Feature(ConcatArrays tokenClass)
         {
-            NotImplementedMethod(category, context, argsType);
+            return _createArrayFeatureCache.Value;
+        }
+
+        Result CreateArrayResult(ContextBase context, Category category, CompileSyntax argsType) 
+        {
+            NotImplementedMethod(context, category, argsType);
             return null;
         }
 

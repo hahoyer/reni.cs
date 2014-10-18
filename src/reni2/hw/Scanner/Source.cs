@@ -28,7 +28,7 @@ using hw.Helper;
 
 namespace hw.Scanner
 {
-    sealed class Source : Dumpable
+    public sealed class Source : Dumpable
     {
         readonly string _data;
         readonly File _file;

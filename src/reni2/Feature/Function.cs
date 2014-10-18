@@ -38,8 +38,8 @@ namespace Reni.Feature
             : base(function)
         {}
 
-        IContextMetaFunctionFeature IFeatureImplementation.ContextMetaFunction { get { return null; } }
-        IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return null; } }
+        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta { get { return null; } }
+        IMetaFunctionFeature IFeatureImplementation.Meta { get { return null; } }
         IFunctionFeature IFeatureImplementation.Function { get { return this; } }
         ISimpleFeature IFeatureImplementation.Simple { get { return null; } }
     }
@@ -61,8 +61,8 @@ namespace Reni.Feature
             Tracer.Assert(_function.Target is IContextReferenceProvider);
         }
 
-        IContextMetaFunctionFeature IFeatureImplementation.ContextMetaFunction { get { return null; } }
-        IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return null; } }
+        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta { get { return null; } }
+        IMetaFunctionFeature IFeatureImplementation.Meta { get { return null; } }
         IFunctionFeature IFeatureImplementation.Function { get { return this; } }
         ISimpleFeature IFeatureImplementation.Simple { get { return null; } }
 

@@ -22,7 +22,7 @@ namespace Reni.Context
 
         internal Result Result(Category category, ContextBase context, CompileSyntax left, CompileSyntax right)
         {
-            var metaFeature = Feature.MetaFunction;
+            var metaFeature = Feature.Meta;
             if (metaFeature != null)
                 return metaFeature.Result(context, category, left, right);
 
@@ -35,7 +35,7 @@ namespace Reni.Context
 
         internal Result Result(Category category, ContextBase context, CompileSyntax right)
         {
-            var metaFeature = Feature.ContextMetaFunction;
+            var metaFeature = Feature.ContextMeta;
             if (metaFeature != null)
                 return metaFeature.Result(context, category, right);
 
@@ -76,7 +76,7 @@ namespace Reni.Context
 
         Result SimpleResult(Category category)
         {
-            Tracer.Assert(Feature.MetaFunction == null);
+            Tracer.Assert(Feature.Meta == null);
 
             var simpleFeature = Feature.SimpleFeature();
             if(simpleFeature != null)
