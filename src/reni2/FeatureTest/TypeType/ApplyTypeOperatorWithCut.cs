@@ -12,8 +12,5 @@ namespace Reni.FeatureTest.TypeType
         protected override string Target { get { return @"31 type instance (100 enable_cut) dump_print"; } }
         protected override string Output { get { return "-28"; } }
         protected override IEnumerable<System.Type> DependsOn { get { return new[] {typeof(ApplyTypeOperator)}; } }
-
-        [Test]
-        public override void Run() { BaseRun(); }
     }
 }

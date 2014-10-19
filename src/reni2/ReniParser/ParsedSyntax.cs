@@ -12,10 +12,12 @@ namespace Reni.ReniParser
     abstract class ParsedSyntax : ParsedSyntaxBase
     {
         protected ParsedSyntax(TokenData token)
-            : base(token) { }
+            : base(token)
+        {}
 
         protected ParsedSyntax(TokenData token, int nextObjectId)
-            : base(token, nextObjectId) { }
+            : base(token, nextObjectId)
+        {}
 
         internal virtual CompileSyntax ToCompiledSyntax()
         {
@@ -29,7 +31,10 @@ namespace Reni.ReniParser
             return null;
         }
 
-        internal virtual ParsedSyntax CreateThenSyntax(TokenData token, CompileSyntax condition) { return new ThenSyntax(condition, token, ToCompiledSyntax()); }
+        internal virtual ParsedSyntax CreateThenSyntax(TokenData token, CompileSyntax condition)
+        {
+            return new ThenSyntax(condition, token, ToCompiledSyntax());
+        }
 
         internal virtual ParsedSyntax CreateElseSyntax(TokenData token, CompileSyntax elseSyntax)
         {
@@ -49,7 +54,10 @@ namespace Reni.ReniParser
             return null;
         }
 
-        internal virtual ParsedSyntax CreateSyntaxOrDeclaration(Definable tokenClass, TokenData token, ParsedSyntax right) { return new ExpressionSyntax(tokenClass, ToCompiledSyntax(), token, right.ToCompiledSyntaxOrNull()); }
+        internal virtual ParsedSyntax CreateSyntaxOrDeclaration(Definable tokenClass, TokenData token, ParsedSyntax right)
+        {
+            return new ExpressionSyntax(tokenClass, ToCompiledSyntax(), token, right.ToCompiledSyntaxOrNull());
+        }
 
         static bool _isInDump;
 
