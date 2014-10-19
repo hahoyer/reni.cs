@@ -15,5 +15,7 @@ namespace Reni.Type
         ISimpleFeature IFeatureImplementation.Simple { get { return this; } }
         Result ISimpleFeature.Result(Category category) { return Result(category); }
         protected abstract Result Result(Category category);
+        TypeBase ISimpleFeature.TargetType { get { return TargetType; } }
+        protected abstract TypeBase TargetType { get; }
     }
 }

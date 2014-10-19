@@ -14,14 +14,19 @@ namespace Reni.Feature
 {
     static class Extension
     {
-        static readonly FunctionCache<Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result>, MetaFunction> _metaFunctionCache
-            = new FunctionCache<Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result>, MetaFunction>
-                (function => new MetaFunction(function));
+        static readonly FunctionCache<Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result>, MetaFunction>
+            _metaFunctionCache
+                = new FunctionCache<Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result>, MetaFunction>
+                    (function => new MetaFunction(function));
 
-        static readonly FunctionCache<Func<Category, Result>, Simple> _simpleCache
-            = new FunctionCache<Func<Category, Result>, Simple>(function => new Simple(function));
+        static readonly FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Simple>> _simpleCache
+            = new FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Simple>>
+                (function => new FunctionCache<TypeBase, Simple>(type => new Simple(function, type)));
 
-        internal static Simple SimpleFeature(Func<Category, Result> function) { return _simpleCache[function]; }
+        internal static Simple SimpleFeature(Func<Category, Result> function, TypeBase target = null)
+        {
+            return _simpleCache[function][(target ?? function.Target as TypeBase).AssertNotNull()];
+        }
 
         internal static Simple<T1> Feature<T1>(Func<Category, T1, Result> function)
             where T1 : TypeBase
@@ -65,7 +70,8 @@ namespace Reni.Feature
 
         internal static TypeBase ResultType(this ISimpleFeature f) { return f.Result(Category.Type).Type; }
 
-        public static IEnumerable<SearchResult> ResolveDeclarations<TDefinable>(this IFeatureInheritor inheritor, TDefinable tokenClass)
+        public static IEnumerable<SearchResult> ResolveDeclarations<TDefinable>
+            (this IFeatureInheritor inheritor, TDefinable tokenClass)
             where TDefinable : Definable
         {
             return inheritor

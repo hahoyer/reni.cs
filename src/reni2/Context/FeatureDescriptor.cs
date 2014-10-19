@@ -23,20 +23,20 @@ namespace Reni.Context
         internal Result Result(Category category, ContextBase context, CompileSyntax left, CompileSyntax right)
         {
             var metaFeature = Feature.Meta;
-            if (metaFeature != null)
+            if(metaFeature != null)
                 return metaFeature.Result(context, category, left, right);
 
             var result = Result(context, category, right);
             return result
                 .ReplaceArg(ConverterResult)
                 .ReplaceArg(context.ObjectResult(category, left))
-            ;
+                ;
         }
 
         internal Result Result(Category category, ContextBase context, CompileSyntax right)
         {
             var metaFeature = Feature.ContextMeta;
-            if (metaFeature != null)
+            if(metaFeature != null)
                 return metaFeature.Result(context, category, right);
 
             var result = Result(context, category, right);

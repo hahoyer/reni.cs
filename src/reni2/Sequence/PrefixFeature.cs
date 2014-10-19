@@ -53,5 +53,7 @@ namespace Reni.Sequence
                             .UniquePointer
                             .ArgResult(category1.Typed).AutomaticDereferenceResult.Align);
         }
+
+        TypeBase ISimpleFeature.TargetType { get { return _objectType; } }
     }
 }

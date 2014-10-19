@@ -890,14 +890,14 @@ namespace Reni
             var destinationType = Type
                 .AutomaticDereferenceType.UniqueAlign;
             return Type
-                .ObviousExactConversion(CompleteCategory, destinationType)
+                .SimpleConversion(CompleteCategory, destinationType)
                 .ReplaceArg(this);
         }
 
         internal Result ObviousExactConversion(TypeBase destinationType)
         {
             return Type
-                .ObviousExactConversion(CompleteCategory, destinationType)
+                .SimpleConversion(CompleteCategory, destinationType)
                 .ReplaceArg(this);
         }
     }

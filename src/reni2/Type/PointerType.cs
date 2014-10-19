@@ -42,7 +42,7 @@ namespace Reni.Type
         Result IConverter.Result(Category category) { return DereferenceResult(category); }
         Result IFeatureInheritor.Source(Category category) { return DereferenceResult(category); }
 
-        internal override string DumpPrintText { get { return GetNodeDump(); } }
+        internal override string DumpPrintText { get { return "(" + ValueType.DumpPrintText + ")~~~"; } }
 
         [DisableDump]
         internal TypeBase ValueType { get { return _valueType; } }

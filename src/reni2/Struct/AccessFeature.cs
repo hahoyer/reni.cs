@@ -8,6 +8,7 @@ using Reni.Basics;
 using Reni.Feature;
 using Reni.Syntax;
 using Reni.TokenClasses;
+using Reni.Type;
 
 namespace Reni.Struct
 {
@@ -34,6 +35,8 @@ namespace Reni.Struct
             return _structure
                 .AccessViaThisReference(category, _position);
         }
+
+        TypeBase ISimpleFeature.TargetType { get { return _structure.Type; } }
 
         CompileSyntax Statement
         {

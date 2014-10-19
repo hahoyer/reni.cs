@@ -21,6 +21,7 @@ namespace Reni.Type
             , ISymbolProvider<Negate, IFeatureImplementation>
             , ISymbolProvider<TextItem, IFeatureImplementation>
             , IConverterProvider<NumberType, IFeatureImplementation>
+        , ISpecificConversionProvider<NumberType>
     {
         static readonly Minus _minusOperation = new Minus();
         readonly ValueCache<Result> _zeroResult;
@@ -77,6 +78,12 @@ namespace Reni.Type
             if(!parameter.EnableCut && Bits > destination.Bits)
                 return null;
             return Extension.SimpleFeature(ca => ConversionAsReference(ca, destination));
+        }
+
+        IEnumerable<ISimpleFeature> ISpecificConversionProvider<NumberType>.Result(NumberType destination)
+        {
+            if(Bits <= destination.Bits)
+                yield return Extension.SimpleFeature(category => destination.FlatConversion(category, this), this);
         }
 
         IFeatureImplementation ISymbolProvider<Negate, IFeatureImplementation>.Feature(Negate tokenClass)
@@ -175,6 +182,12 @@ namespace Reni.Type
             return PointerKind.ArgResult(category.Typed).DereferenceResult & category;
         }
 
+        IEnumerable<ISimpleFeature> GetSpecificReverseConversions(NumberType source)
+        {
+            if(source.Bits <= Bits)
+                yield return Extension.SimpleFeature(category => FlatConversion(category, source));
+        }
+
         internal interface IOperation
         {
             int Signature(int objectBitCount, int argsBitCount);
@@ -182,5 +195,6 @@ namespace Reni.Type
             [DisableDump]
             string Name { get; }
         }
+
     }
 }

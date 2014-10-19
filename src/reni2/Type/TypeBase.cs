@@ -63,6 +63,24 @@ namespace Reni.Type
             }
         }
 
+        internal IEnumerable<ConversionService.Path> SimpleConversions
+        {
+            get
+            {
+                return this.FeatureClosure
+                    (
+                        type => type
+                            .ConversionElements
+                            .Select(element => new ConversionService.Path(element))
+                            );
+            }
+        }
+
+        internal IEnumerable<TypeBase> ReachableTypes
+        {
+            get { return SimpleConversions.Select(element => element.Destination); }
+        }
+
         IEnumerable<ISimpleFeature> CheckedGetConversions()
         {
             return Conversions
@@ -77,9 +95,9 @@ namespace Reni.Type
             {
                 if(IsAligningPossible)
                     yield return Reni.Feature.Extension.SimpleFeature(AlignResult);
-                if (!(this is PointerType))
+                if(!(this is PointerType))
                     yield return Reni.Feature.Extension.SimpleFeature(LocalReferenceResult);
-                if (IsCuttingPossible)
+                if(IsCuttingPossible)
                     yield return Reni.Feature.Extension.SimpleFeature(EnableCutResult);
             }
         }
@@ -201,15 +219,15 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        virtual internal bool IsCuttingPossible { get { return false; } }
-        
-        [DisableDump]
-        virtual internal bool IsAligningPossible { get { return true; } }
+        internal virtual bool IsCuttingPossible { get { return false; } }
 
         [DisableDump]
-        virtual internal Size SimpleItemSize { get { return null; } }
+        internal virtual bool IsAligningPossible { get { return true; } }
 
-        
+        [DisableDump]
+        internal virtual Size SimpleItemSize { get { return null; } }
+
+
         Result VoidCodeAndRefs(Category category) { return RootContext.VoidResult(category & (Category.Code | Category.Exts)); }
 
         internal ArrayType UniqueArray(int count) { return _cache.Array[count]; }
@@ -283,10 +301,7 @@ namespace Reni.Type
             return Conversion(category, CreateSequenceType(elementType));
         }
 
-        Result ConvertToBitSequence(Category category)
-        {
-            return ConvertToSequence(category, BitType).Align;
-        }
+        Result ConvertToBitSequence(Category category) { return ConvertToSequence(category, BitType).Align; }
 
         /// <summary>
         ///     Gets the icon key.
@@ -482,8 +497,7 @@ namespace Reni.Type
 
         internal bool IsConvertable(TypeBase destination)
         {
-            return TypeForConversion == destination.TypeForConversion
-                || ConvertersForType(destination, ConversionParameter.Instance) != null;
+            return ConversionService.FindPath(this, destination, ConversionParameter.Instance) != null;
         }
 
         internal Result Conversion(Category category, TypeBase destination)
@@ -491,55 +505,20 @@ namespace Reni.Type
             if(category <= (Category.Type.Replenished))
                 return destination.PointerKind.Result(category);
 
-            var obviousConversionResult = ObviousConversion(category.Typed, destination);
-            if(obviousConversionResult != null)
-                return obviousConversionResult;
+            var path = ConversionService.FindPath(this, destination, ConversionParameter.Instance);
+            if(path != null)
+                return path.Elements.Aggregate(destination.ArgResult(category), (c, n) => c.ReplaceArg(n.Result));
 
-            var searchResults = TypeForConversion
-                .ConvertersForType(destination.TypeForConversion, ConversionParameter.Instance)
-                .ToArray();
-
-            switch(searchResults.Length)
-            {
-                case 1:
-                    return searchResults[0].ConversionResult(category, this, destination);
-            }
-
-            NotImplementedMethod(category, destination);
+            var reachable = ConversionService.DumpObvious(this);
+            NotImplementedMethod(category, destination, "path", path, "reachable", reachable);
             return null;
         }
 
-        internal Result ObviousConversion(Category category, TypeBase destination)
+        internal Result SimpleConversion(Category category, TypeBase destination) { return Conversion(category, destination); }
+
+        internal virtual IEnumerable<SearchResult> ConvertersForType(TypeBase destination, IConversionParameter parameter)
         {
-            if(TypeForConversion != destination.TypeForConversion)
-                return null;
-
-            if(ReferenceType == null)
-                return LocalReferenceResult(category);
-
-            return ArgResult(category);
-        }
-
-
-        internal Result ObviousExactConversion(Category category, TypeBase destination)
-        {
-            var path = ConversionService.FindPath(this, destination);
-            if(path == null)
-            {
-                var reachable = ConversionService.DumpObvious(this);
-                NotImplementedMethod(category, destination, "path", path, "reachable", reachable);
-                return null;
-            }
-
-            if (path.Length == 1)
-                return path[0].Result(category);
-            if(path.Length == 2)
-                return path[0].Result(category).ReplaceArg(path[1].Result(category));
-            {
-                var reachable = ConversionService.DumpObvious(this);
-                NotImplementedMethod(category, destination, "path", path, "reachable", reachable);
-                return null;
-            }
+            return destination.Genericize.SelectMany(g => g.Converters(this, parameter));
         }
 
         internal virtual Result ConstructorResult(Category category, TypeBase argsType)
@@ -618,11 +597,6 @@ namespace Reni.Type
                 .DumpPrintNumber(alignedSize);
         }
 
-        internal virtual IEnumerable<SearchResult> ConvertersForType(TypeBase destination, IConversionParameter parameter)
-        {
-            return destination.Genericize.SelectMany(g => g.Converters(this, parameter));
-        }
-
         internal IEnumerable<SearchResult> ConvertersForType<TDestination>
             (TDestination destination, IConversionParameter parameter)
         {
@@ -645,7 +619,7 @@ namespace Reni.Type
             var provider = this as ISymbolProvider<TDefinable, IFeatureImplementation>;
             if(provider != null)
                 return new[] {new TypeSearchResult(provider.Feature(tokenClass), this)};
-            
+
             var inheritor = this as IFeatureInheritor;
             if(inheritor != null)
                 return inheritor.ResolveDeclarations(tokenClass);
@@ -659,6 +633,29 @@ namespace Reni.Type
 
         Result AlignResult(Category category) { return UniqueAlign.Result(category, () => ArgCode.Align(), CodeArgs.Arg); }
         Result EnableCutResult(Category category) { return UniqueEnableCutType.Result(category, ArgResult); }
+
+        internal IEnumerable<ISimpleFeature> GetSpecificConversions(TypeBase destination)
+        {
+            var genericProviderForTypes = destination
+                .Genericize
+                .ToArray();
+            return genericProviderForTypes
+                .SelectMany(g => g.GetSpecificReverseConversions(this).ToArray())
+                .ToArray();
+        }
+
+        internal virtual IEnumerable<ISimpleFeature> GetSpecificConversions<TDestination>(TDestination destination)
+        {
+            var provider = this as ISpecificConversionProvider<TDestination>;
+            if(provider != null)
+                return provider.Result(destination);
+            return new ISimpleFeature[0];
+        }
+    }
+
+    interface ISpecificConversionProvider<in TDestination>
+    {
+        IEnumerable<ISimpleFeature> Result(TDestination destination);
     }
 
     // Krautpuster

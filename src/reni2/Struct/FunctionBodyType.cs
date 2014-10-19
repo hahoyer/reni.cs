@@ -66,6 +66,7 @@ namespace Reni.Struct
 
         IContextReference IFunctionFeature.ObjectReference { get { return ObjectReference; } }
         bool IFunctionFeature.IsImplicit { get { return _syntax.IsImplicit; } }
+        TypeBase ISimpleFeature.TargetType { get { return this; } }
 
         Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
         {

@@ -22,8 +22,9 @@ namespace Reni.Feature
     abstract class EmptyFeatureImplementation : DumpableObject, IFeatureImplementation
     {
         public EmptyFeatureImplementation(int? nextObjectId)
-            : base(nextObjectId) {}
-        public EmptyFeatureImplementation() {}
+            : base(nextObjectId)
+        {}
+        public EmptyFeatureImplementation() { }
 
         IContextMetaFunctionFeature IFeatureImplementation.ContextMeta { get { return ContextMeta; } }
         IMetaFunctionFeature IFeatureImplementation.Meta { get { return Meta; } }
@@ -39,6 +40,7 @@ namespace Reni.Feature
     interface ISimpleFeature
     {
         Result Result(Category category);
+        TypeBase TargetType { get; }
     }
 
     interface IFunctionFeature
@@ -148,7 +150,6 @@ namespace Reni.Feature
             {
                 NotImplementedMethod();
                 return null;
-                ;
             }
         }
         protected override IFeatureImplementation Feature { get { return _feature; } }
@@ -166,21 +167,10 @@ namespace Reni.Feature
         internal Result CallResult
             (ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
-            return CallDescriptor
-                .Result(category, context, left, right);
+            return CallDescriptor.Result(category, context, left, right);
         }
 
         internal Result CallResult(Category category) { return CallDescriptor.Result(category); }
-
-        internal Result ConversionResult(Category category, TypeBase source, TypeBase destination)
-        {
-            var callResult = CallResult(category.Typed);
-            var result = callResult
-                .ReplaceArg(source.ArgResult);
-
-            var obviousConversion = result.Type.ObviousConversion(category, destination);
-            return obviousConversion.ReplaceArg(result) & category;
-        }
     }
 
     sealed class TypeSearchResult : SearchResult
@@ -248,6 +238,7 @@ namespace Reni.Feature
     interface IGenericProviderForType
     {
         IEnumerable<SearchResult> Converters(TypeBase source, IConversionParameter parameter);
+        IEnumerable<ISimpleFeature> GetSpecificReverseConversions(TypeBase typeBase);
     }
 
     interface IGenericProviderForDefinable
@@ -264,6 +255,10 @@ namespace Reni.Feature
         IEnumerable<SearchResult> IGenericProviderForType.Converters(TypeBase source, IConversionParameter parameter)
         {
             return source.ConvertersForType(_target, parameter);
+        }
+        IEnumerable<ISimpleFeature> IGenericProviderForType.GetSpecificReverseConversions(TypeBase source)
+        {
+            return source.GetSpecificConversions(_target);
         }
     }
 
@@ -328,4 +323,5 @@ namespace Reni.Feature
             return callContext.Result(category, _definition.ReplaceArg(right));
         }
     }
+
 }

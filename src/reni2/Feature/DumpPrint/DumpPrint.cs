@@ -4,6 +4,7 @@ using System.Linq;
 using hw.Debug;
 using Reni.Basics;
 using Reni.Struct;
+using Reni.Type;
 
 namespace Reni.Feature.DumpPrint
 {
@@ -22,5 +23,6 @@ namespace Reni.Feature.DumpPrint
                 .Structure
                 .DumpPrintResultViaContextReference(category);
         }
+        TypeBase ISimpleFeature.TargetType { get { return _structureType; } }
     }
 }
