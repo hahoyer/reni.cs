@@ -23,6 +23,11 @@ namespace Reni.TokenClasses
         {
             return new Syntax.LeftParenthesis(_level, null, this, token, right);
         }
+        protected override ParsedSyntax InfixSyntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
+        {
+            return new Syntax.LeftParenthesis(_level, left, this, token, right);
+        }
+
         protected override ParsedSyntax TerminalSyntax(TokenData token) { return new EmptyList.Half(token); }
 
         Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
