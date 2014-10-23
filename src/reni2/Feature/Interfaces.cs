@@ -80,9 +80,6 @@ namespace Reni.Feature
     {
         Result FunctionResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right);
         Result SimpleResult(Category category);
-        ISearchResult WithConversion(IConverter converter);
-
-        ISearchResult Convert<TProvider>(TProvider innerProvider);
     }
 
     interface IContextSearchResult

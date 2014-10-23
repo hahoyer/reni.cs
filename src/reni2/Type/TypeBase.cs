@@ -308,16 +308,6 @@ namespace Reni.Type
         internal BitType BitType { get { return RootContext.BitType; } }
 
         [DisableDump]
-        internal TypeBase TypeForConversion
-        {
-            get
-            {
-                return DePointer(Category.Type).Type
-                    .DeAlign(Category.Type).Type;
-            }
-        }
-
-        [DisableDump]
         internal virtual TypeBase CoreType { get { return this; } }
 
         [DisableDump]
@@ -471,7 +461,7 @@ namespace Reni.Type
                 return path.Elements.Aggregate(destination.ArgResult(category), (c, n) => c.ReplaceArg(n.Result));
 
             var reachable = ConversionService.DumpObvious(this);
-            NotImplementedMethod(category, destination, "path", path, "reachable", reachable);
+            NotImplementedMethod(category, destination, "reachable", reachable);
             return null;
         }
 
@@ -513,21 +503,6 @@ namespace Reni.Type
                     () => CodeBase.DumpPrintText(DumpPrintText),
                     CodeArgs.Void
                 );
-        }
-
-        Simple Convert(AlignType type)
-        {
-            if(type.Parent == this)
-                return Reni.Feature.Extension.SimpleFeature(PointerArgResult);
-            return null;
-        }
-
-        protected Simple Convert(TypeBase type)
-        {
-            if(type.TypeForConversion == TypeForConversion)
-                return Reni.Feature.Extension.SimpleFeature(DereferenceReferenceResult);
-
-            return null;
         }
 
         internal TypeBase SmartUn<T>()
