@@ -259,8 +259,6 @@
     <Compile Include="ReniParser\ParsedSyntax.cs" />
     <Compile Include="Runtime\BiasCache.cs" />
     <Compile Include="Runtime\DataHandler.cs" />
-    <Compile Include="Sequence\CompareFeature.cs" />
-    <Compile Include="Sequence\Feature.cs" />
     <Compile Include="Sequence\ObjectReference.cs" />
     <Compile Include="Sequence\PrefixFeature.cs" />
     <Compile Include="Sequence\SequenceType.cs" />
@@ -336,11 +334,9 @@
     <Compile Include="Type\NumberType.cs" />
     <Compile Include="Type\RepeaterAccessType.cs" />
     <Compile Include="Type\Child.cs" />
-    <Compile Include="Type\Converter.cs" />
     <Compile Include="Type\CreateArrayFromReferenceFeature.cs" />
     <Compile Include="Type\EmptyFunctionFeatureProvider.cs" />
     <Compile Include="Type\EnableCut.cs" />
-    <Compile Include="Sequence\FunctionFeature.cs" />
     <Compile Include="Type\FieldAccessType.cs" />
     <Compile Include="Type\FunctionalFeature.cs" />
     <Compile Include="Type\FunctionInstanceType.cs" />

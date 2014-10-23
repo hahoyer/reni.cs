@@ -188,7 +188,6 @@ namespace Reni.Type
         [DisableDump]
         internal virtual Size SimpleItemSize { get { return null; } }
 
-
         Result VoidCodeAndRefs(Category category) { return RootContext.VoidResult(category & (Category.Code | Category.Exts)); }
 
         internal ArrayType UniqueArray(int count) { return _cache.Array[count]; }
@@ -203,11 +202,7 @@ namespace Reni.Type
             return argResult.Type.Conversion(argResult.CompleteCategory, this).ReplaceArg(argResult);
         }
         internal Result ArgResult(Category category) { return Result(category, () => ArgCode, CodeArgs.Arg); }
-        internal Result PointerArgResult(Category category) { return UniquePointer.ArgResult(category); }
-        internal Result PointerResult(Category category, Func<Category, Result> getCodeAndRefs)
-        {
-            return UniquePointer.Result(category, getCodeAndRefs);
-        }
+        Result PointerArgResult(Category category) { return UniquePointer.ArgResult(category); }
 
         internal Result Result(Category category, IContextReference target)
         {
@@ -256,13 +251,6 @@ namespace Reni.Type
         }
 
         internal TypeBase CommonType(TypeBase elseType) { return elseType.IsConvertable(this) ? this : elseType; }
-
-        Result ConvertToSequence(Category category, TypeBase elementType)
-        {
-            return Conversion(category, CreateSequenceType(elementType));
-        }
-
-        Result ConvertToBitSequence(Category category) { return ConvertToSequence(category, BitType).Align; }
 
         /// <summary>
         ///     Gets the icon key.
@@ -348,8 +336,8 @@ namespace Reni.Type
             }
         }
 
-        internal virtual Result DeAlign(Category category) { return ArgResult(category); }
-        internal virtual ResultCache DeFunction(Category category) { return ArgResult(category); }
+        protected virtual Result DeAlign(Category category) { return ArgResult(category); }
+        protected virtual ResultCache DeFunction(Category category) { return ArgResult(category); }
         internal virtual ResultCache DePointer(Category category) { return ArgResult(category); }
 
         TypeBase CreateSequenceType(TypeBase elementType)
@@ -465,33 +453,9 @@ namespace Reni.Type
             return null;
         }
 
-        internal Result SimpleConversion(Category category, TypeBase destination) { return Conversion(category, destination); }
-
-        internal virtual IEnumerable<SearchResult> ConvertersForType(TypeBase destination, IConversionParameter parameter)
-        {
-            return destination.Genericize.SelectMany(g => g.Converters(this, parameter));
-        }
-
         internal virtual Result ConstructorResult(Category category, TypeBase argsType)
         {
             return argsType.Conversion(category, this);
-        }
-
-        internal Result ConcatArrayFromReference(Category category, PointerType pointerType)
-        {
-            NotImplementedMethod(category, pointerType);
-            return null;
-        }
-
-        Result DereferenceReferenceResult(Category category)
-        {
-            return UniquePointer
-                .ArgResult(category.Typed).DereferenceResult;
-        }
-
-        internal Result BitSequenceOperandConversion(Category category)
-        {
-            return ConvertToBitSequence(category).AutomaticDereferenceResult.Align;
         }
 
         internal Result DumpPrintTypeNameResult(Category category)
@@ -506,9 +470,9 @@ namespace Reni.Type
         }
 
         internal TypeBase SmartUn<T>()
-            where T : IConverter
+            where T : ISimpleFeature
         {
-            return this is T ? ((IConverter) this).Result(Category.Type).Type : this;
+            return this is T ? ((ISimpleFeature)this).Result(Category.Type).Type : this;
         }
 
         internal Result PointerConversionResult(Category category, TypeBase destinationType)
@@ -569,7 +533,6 @@ namespace Reni.Type
         public IEnumerable<ISimpleFeature> ReflexiveConversions { get { return _cache.ReflexiveConversions.Value; } }
 
         Result AlignResult(Category category) { return UniqueAlign.Result(category, () => ArgCode.Align(), CodeArgs.Arg); }
-        Result EnableCutResult(Category category) { return UniqueEnableCutType.Result(category, ArgResult); }
 
         IEnumerable<ISimpleFeature> ObtainReflexiveConversions()
         {
@@ -587,11 +550,9 @@ namespace Reni.Type
                 yield return Reni.Feature.Extension.SimpleFeature(AlignResult);
             if(!(this is PointerType))
                 yield return Reni.Feature.Extension.SimpleFeature(LocalReferenceResult);
-            if(IsCuttingPossible)
-                yield return Reni.Feature.Extension.SimpleFeature(EnableCutResult);
         }
 
-        internal virtual IEnumerable<ISimpleFeature> GetForcedConversions(TypeBase destination)
+        internal IEnumerable<ISimpleFeature> GetForcedConversions(TypeBase destination)
         {
             var genericProviderForTypes = destination
                 .Genericize
@@ -601,7 +562,7 @@ namespace Reni.Type
                 .ToArray();
         }
 
-        internal virtual IEnumerable<ISimpleFeature> GetForcedConversions<TDestination>(TDestination destination)
+        internal IEnumerable<ISimpleFeature> GetForcedConversions<TDestination>(TDestination destination)
         {
             var provider = this as ISpecificConversionProvider<TDestination>;
             if(provider != null)

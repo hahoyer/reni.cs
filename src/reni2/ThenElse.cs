@@ -52,7 +52,7 @@ namespace Reni
                 .Result(context, category.Typed)
                 .Conversion(context.RootContext.BitType)
                 .LocalBlock(category.Typed)
-                .ObviousExactConversion(context.RootContext.BitType);
+                .Conversion(context.RootContext.BitType);
         }
 
         Result ElseResult(ContextBase context, Category category) { return BranchResult(context, category, Else); }
@@ -68,7 +68,7 @@ namespace Reni
                 .Conversion(category.Typed, commonType)
                 .ReplaceArg(branchResult)
                 .LocalBlock(category.Typed)
-                .ObviousExactConversion(commonType)
+                .Conversion(commonType)
                 & category;
         }
 

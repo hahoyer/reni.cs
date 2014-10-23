@@ -13,7 +13,7 @@ namespace Reni.Type
     sealed class PointerType
         : TypeBase
             , IProxyType
-            , IConverter
+            , ISimpleFeature
             , IReferenceType
             , IFeatureInheritor
     {
@@ -31,15 +31,15 @@ namespace Reni.Type
 
         Size IContextReference.Size { get { return Size; } }
         int IContextReference.Order { get { return _order; } }
-        IConverter IReferenceType.Converter { get { return this; } }
+        ISimpleFeature IReferenceType.Converter { get { return this; } }
         bool IReferenceType.IsWeak { get { return true; } }
 
         [DisableDump]
         internal override Root RootContext { get { return _valueType.RootContext; } }
 
-        IConverter IProxyType.Converter { get { return this; } }
-        TypeBase IConverter.TargetType { get { return ValueType; } }
-        Result IConverter.Result(Category category) { return DereferenceResult(category); }
+        ISimpleFeature IProxyType.Converter { get { return this; } }
+        TypeBase ISimpleFeature.TargetType { get { return ValueType; } }
+        Result ISimpleFeature.Result(Category category) { return DereferenceResult(category); }
         Result IFeatureInheritor.Source(Category category) { return DereferenceResult(category); }
 
         internal override string DumpPrintText { get { return "(" + ValueType.DumpPrintText + ")~~~"; } }
@@ -63,7 +63,7 @@ namespace Reni.Type
 
         [DisableDump]
         internal override bool IsAligningPossible { get { return false; } }
-        
+
         protected override string GetNodeDump() { return ValueType.NodeDump + "[Pointer]"; }
         internal override int? SmartSequenceLength(TypeBase elementType) { return ValueType.SmartSequenceLength(elementType); }
         internal override int? SmartArrayLength(TypeBase elementType) { return ValueType.SmartArrayLength(elementType); }

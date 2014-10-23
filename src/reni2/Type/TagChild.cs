@@ -17,7 +17,7 @@ namespace Reni.Type
         [DisableDump]
         protected abstract string TagTitle { get; }
         [DisableDump]
-        internal override string DumpPrintText { get { return "("+Parent.DumpPrintText + ")" + TagTitle; } }
+        internal override string DumpPrintText { get { return "(" + Parent.DumpPrintText + ")" + TagTitle; } }
         [DisableDump]
         internal override sealed bool Hllw { get { return Parent.Hllw; } }
         [DisableDump]
@@ -31,16 +31,10 @@ namespace Reni.Type
         }
         internal override sealed Result Copier(Category category) { return Parent.Copier(category); }
         internal override sealed Result ArrayCopier(Category category, int count) { return Parent.ArrayCopier(category, count); }
-        
-        protected override Result ParentConversionResult(Category category)
-        {
-            return Parent.Result(category, ArgResult);
-        }
+
+        protected override Result ParentConversionResult(Category category) { return Parent.Result(category, ArgResult); }
         internal Result PointerConversionResult(Category category) { return PointerConversionResult(category, Parent); }
 
-        protected override IEnumerable<ISimpleFeature> ObtainRawReflexiveConversions()
-        {
-            return base.ObtainRawReflexiveConversions().Concat(new ISimpleFeature[] {Extension.SimpleFeature(ParentConversionResult)});
-        }
+        sealed internal override ISimpleFeature GetStripConversion() { return Extension.SimpleFeature(ParentConversionResult); }
     }
 }

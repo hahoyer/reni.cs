@@ -27,7 +27,6 @@ namespace Reni.Type
             return CallDescriptor.Result(category, context, left, right);
         }
         Result ISearchResult.SimpleResult(Category category) { return Feature.Simple.Result(category); }
-        ISearchResult ISearchResult.WithConversion(IConverter converter) { return new SearchResultWithConversion(this, converter); }
 
         CallDescriptor CallDescriptor { get { return new CallDescriptor(_type, Feature, category => null); } }
 
@@ -43,12 +42,6 @@ namespace Reni.Type
             }
         }
 
-
-        ISearchResult ISearchResult.Convert<TProvider>(TProvider innerProvider)
-        {
-            NotImplementedMethod(innerProvider);
-            return null;
-        }
     }
 
     sealed class SearchResultWithConversion : DumpableObject, ISearchResult
@@ -56,9 +49,9 @@ namespace Reni.Type
         [EnableDump]
         readonly ISearchResult _searchResult;
         [EnableDump]
-        readonly IConverter _converter;
+        readonly ISimpleFeature _converter;
 
-        internal SearchResultWithConversion(ISearchResult searchResult, IConverter converter)
+        internal SearchResultWithConversion(ISearchResult searchResult, ISimpleFeature converter)
         {
             _searchResult = searchResult;
             _converter = converter;
@@ -86,17 +79,6 @@ namespace Reni.Type
                 EndMethodDump();
             }
         }
-        ISearchResult ISearchResult.WithConversion(IConverter converter)
-        {
-            NotImplementedMethod(converter);
-            return null;
-        }
 
-
-        ISearchResult ISearchResult.Convert<TProvider>(TProvider innerProvider)
-        {
-            NotImplementedMethod(innerProvider);
-            return null;
-        }
     }
 }

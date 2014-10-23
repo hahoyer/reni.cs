@@ -35,7 +35,7 @@ namespace Reni.Type
         [DisableDump]
         internal override IReferenceType UniquePointerType { get { return Parent.UniquePointerType; } }
 
-        internal override Result DeAlign(Category category) { return Parent.Result(category, ArgResult); }
+        protected override Result DeAlign(Category category) { return Parent.Result(category, ArgResult); }
 
         protected override IEnumerable<ISimpleFeature> ObtainRawReflexiveConversions()
         {

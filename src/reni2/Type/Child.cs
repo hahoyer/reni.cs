@@ -5,10 +5,11 @@ using hw.Debug;
 using hw.Forms;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Feature;
 
 namespace Reni.Type
 {
-    abstract class Child<TParent> : TypeBase, IProxyType, IConverter
+    abstract class Child<TParent> : TypeBase, IProxyType, ISimpleFeature
         where TParent : TypeBase
     {
         readonly TParent _parent;
@@ -21,9 +22,9 @@ namespace Reni.Type
         [DisableDump]
         public TParent Parent { get { return _parent; } }
 
-        IConverter IProxyType.Converter { get { return this; } }
-        TypeBase IConverter.TargetType { get { return _parent; } }
-        Result IConverter.Result(Category category) { return ParentConversionResult(category); }
+        ISimpleFeature IProxyType.Converter { get { return this; } }
+        TypeBase ISimpleFeature.TargetType { get { return _parent; } }
+        Result ISimpleFeature.Result(Category category) { return ParentConversionResult(category); }
         protected abstract Result ParentConversionResult(Category category);
     }
 }

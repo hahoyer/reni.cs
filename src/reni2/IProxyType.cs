@@ -1,12 +1,12 @@
 using System.Linq;
 using System.Collections.Generic;
 using System;
-using Reni.Type;
+using Reni.Feature;
 
 namespace Reni
 {
     interface IProxyType
     {
-        IConverter Converter { get; }
+        ISimpleFeature Converter { get; }
     }
 }

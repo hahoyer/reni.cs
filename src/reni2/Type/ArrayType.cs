@@ -126,7 +126,7 @@ namespace Reni.Type
             var constructorResult = function.ApplyResult(category.Typed, indexType);
             var elements = Count
                 .Select(i => ElementConstructorResult(category, constructorResult, i, indexType))
-                .Aggregate((c,n)=>n+c)
+                .Aggregate((c, n) => n + c)
                 ?? VoidType.Result(category);
             return Result(category, elements);
         }
@@ -135,11 +135,10 @@ namespace Reni.Type
         {
             var resultForArg = indexType
                 .Result(category.Typed, () => CodeBase.BitsConst(indexType.Size, BitsConst.Convert(i)));
-            var replaceArg = elementConstructorResult
-                .ReplaceArg(resultForArg);
-            return replaceArg
+            return elementConstructorResult
+                .ReplaceArg(resultForArg)
                 .Conversion(ElementAccessType)
-                .ObviousExactConversion(ElementType)
+                .Conversion(ElementType)
                 & category;
         }
 

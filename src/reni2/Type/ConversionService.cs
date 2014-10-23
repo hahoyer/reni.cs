@@ -46,7 +46,7 @@ namespace Reni.Type
                 return Elements
                     .Select(element => element.ResultType().DumpPrintText + " <== ")
                     .Stringify("")
-                       + Source.DumpPrintText;
+                    + Source.DumpPrintText;
             }
         }
 
@@ -60,7 +60,15 @@ namespace Reni.Type
             if(result != null)
                 return result;
 
-            var stripConversions = conversions.SelectMany(path => StripConversions(destination, path)).ToArray();
+            var stripConversions = conversions.SelectMany
+                (
+                    path => path
+                        .Destination
+                        .GetStripConversion()
+                        .NullableToArray()
+                        .SelectMany(conversion => destination.Combine(conversion, path))
+                )
+                .ToArray();
             result = stripConversions.SingleOrDefault(x => x.Destination == destination);
             if(result != null)
                 return result;
@@ -79,16 +87,6 @@ namespace Reni.Type
                 .SelectMany(element => destination.Combine(element, path));
         }
 
-        static IEnumerable<Path> StripConversions(TypeBase destination, Path path)
-        {
-            var conversion = path.Destination.GetStripConversion();
-            if(conversion == null)
-                return new Path[0];
-            return destination
-                .Combine(conversion, path)
-                .ToArray();
-        }
-
         static IEnumerable<Path> Combine(this TypeBase destination, ISimpleFeature element, Path path)
         {
             return element
@@ -100,7 +98,7 @@ namespace Reni.Type
                 ;
         }
 
-        static IEnumerable<T> NullableToArray<T>(this T target) { return target.Equals(default(T)) ? new T[0] : new[] {target}; }
+        static IEnumerable<T> NullableToArray<T>(this T target) { return Equals(target, default(T)) ? new T[0] : new[] {target}; }
 
         public static string DumpObvious(TypeBase source) { return DumpReachable(source, type => type.ReflexiveConversions); }
 

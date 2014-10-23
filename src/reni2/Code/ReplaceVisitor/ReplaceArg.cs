@@ -36,7 +36,7 @@ namespace Reni.Code.ReplaceVisitor
                 return Actual;
             var conversion = ActualArg
                 .Type
-                .SimpleConversion(Category.Code.Typed, visitedObject.Type);
+                .Conversion(Category.Code.Typed, visitedObject.Type);
             if(conversion != null)
                 return conversion
                     .ReplaceArg(ActualArg)

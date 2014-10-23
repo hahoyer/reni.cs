@@ -14,10 +14,10 @@ namespace Reni.Type
         [EnableDump]
         internal readonly IFeatureImplementation Feature;
 
-        readonly IConverter[] _conversionFunctions = new IConverter[0];
+        readonly ISimpleFeature[] _conversionFunctions = new ISimpleFeature[0];
 
         internal OldSearchResult(IFeatureImplementation feature) { Feature = feature; }
-        protected OldSearchResult(IFeatureImplementation feature, IConverter converter)
+        protected OldSearchResult(IFeatureImplementation feature, ISimpleFeature converter)
         {
             Feature = feature;
             _conversionFunctions = new[] {converter};
@@ -34,9 +34,6 @@ namespace Reni.Type
             var result = featureResult.ReplaceArg(converterResult);
             return result;
         }
-
-        ISearchResult ISearchResult.WithConversion(IConverter converter) { return new ConverterResult(this, converter); }
-        ISearchResult ISearchResult.Convert<TProvider>(TProvider innerProvider) { throw new NotImplementedException(); }
 
         [DisableDump]
         internal abstract TypeBase DefiningType { get; }
@@ -74,18 +71,5 @@ namespace Reni.Type
         {
             return CallDescriptor.Result(category, context, left, right);
         }
-    }
-
-    sealed class ConverterResult : OldSearchResult
-    {
-        readonly OldSearchResult _searchResult;
-
-        internal ConverterResult(OldSearchResult searchResult, IConverter converter)
-            : base(searchResult.Feature, converter)
-        {
-            _searchResult = searchResult;
-        }
-
-        internal override TypeBase DefiningType { get { return _searchResult.DefiningType; } }
     }
 }

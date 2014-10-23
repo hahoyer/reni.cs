@@ -9,6 +9,7 @@ using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
+using Reni.Feature;
 using Reni.Struct;
 using Reni.Type;
 
@@ -862,7 +863,7 @@ namespace Reni
 
         internal Result AddToReference(Func<Size> func) { return Change(code => code.ReferencePlus(func())); }
 
-        public Result Change(Func<CodeBase, CodeBase> func)
+        Result Change(Func<CodeBase, CodeBase> func)
         {
             if(!HasCode)
                 return this;
@@ -871,33 +872,21 @@ namespace Reni
             return result;
         }
 
-        internal Result Un<T>()
-            where T : IConverter
+        Result Un<T>()
+            where T : ISimpleFeature
         {
-            var result = ((IConverter) Type).Result(CompleteCategory);
+            var result = ((ISimpleFeature) Type).Result(CompleteCategory);
             return result.ReplaceArg(this);
         }
 
-        internal Result SmartUn<T>() where T : IConverter { return Type is T ? Un<T>() : this; }
-
-        internal Result BitSequenceOperandConversion(Category category)
-        {
-            return Type.BitSequenceOperandConversion(category).ReplaceArg(this);
-        }
+        internal Result SmartUn<T>() where T : ISimpleFeature { return Type is T ? Un<T>() : this; }
 
         internal Result DereferencedAlignedResult()
         {
             var destinationType = Type
                 .AutomaticDereferenceType.UniqueAlign;
             return Type
-                .SimpleConversion(CompleteCategory, destinationType)
-                .ReplaceArg(this);
-        }
-
-        internal Result ObviousExactConversion(TypeBase destinationType)
-        {
-            return Type
-                .SimpleConversion(CompleteCategory, destinationType)
+                .Conversion(CompleteCategory, destinationType)
                 .ReplaceArg(this);
         }
     }

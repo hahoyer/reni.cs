@@ -12,7 +12,7 @@ namespace Reni.Type
     abstract class SetterTargetType
         : TypeBase
             , IProxyType
-            , IConverter
+            , ISimpleFeature
             , IReferenceType
             , IFeatureInheritor
     {
@@ -22,11 +22,11 @@ namespace Reni.Type
 
         Size IContextReference.Size { get { return Size; } }
         int IContextReference.Order { get { return _order; } }
-        IConverter IProxyType.Converter { get { return this; } }
+        ISimpleFeature IProxyType.Converter { get { return this; } }
         bool IReferenceType.IsWeak { get { return true; } }
-        IConverter IReferenceType.Converter { get { return this; } }
-        TypeBase IConverter.TargetType { get { return ValueType; } }
-        Result IConverter.Result(Category category) { return GetterResult(category); }
+        ISimpleFeature IReferenceType.Converter { get { return this; } }
+        TypeBase ISimpleFeature.TargetType { get { return ValueType; } }
+        Result ISimpleFeature.Result(Category category) { return GetterResult(category); }
         Result IFeatureInheritor.Source(Category category) { return GetterResult(category); }
 
         internal Result AssignmentResult(Category category, IContextReference objectReference, TypeBase argsType)

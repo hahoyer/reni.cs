@@ -141,10 +141,10 @@ namespace Reni.Type
                 );
 
             var leftResult = UniquePointer.Result(category.Typed, UniquePointerType)
-                .ObviousExactConversion(UniqueAlign);
+                .Conversion(UniqueAlign);
             var rightResult = right.UniquePointer
                 .ArgResult(category.Typed)
-                .ObviousExactConversion(right.UniqueAlign);
+                .Conversion(right.UniqueAlign);
             var pair = leftResult + rightResult;
             return result.ReplaceArg(pair);
         }

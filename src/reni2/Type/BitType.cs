@@ -46,12 +46,6 @@ namespace Reni.Type
                 .Result(category, sequenceType.DumpPrintNumberCode, CodeArgs.Arg);
         }
 
-        internal Result DumpPrintTokenResult(Category category)
-        {
-            return VoidType
-                .Result(category, DumpPrintNumberCode, CodeArgs.Arg);
-        }
-
         protected override string Dump(bool isRecursion) { return GetType().PrettyName(); }
 
         protected override string GetNodeDump() { return "bit"; }
@@ -61,49 +55,11 @@ namespace Reni.Type
             return UniqueNumber(bitsConst.Size.ToInt())
                 .Result(category, () => CodeBase.BitsConst(bitsConst));
         }
-        internal CodeBase ApplyCode(Size size, string token, int objectBits, int argsBits)
-        {
-            var objectType = UniqueNumber(objectBits).UniqueAlign;
-            var argsType = UniqueNumber(argsBits).UniqueAlign;
-            return objectType
-                .Pair(argsType).ArgCode
-                .NumberOperation(token, size, Size.Create(objectBits).ByteAlignedSize, Size.Create(argsBits));
-        }
 
         internal interface IPrefix
         {
             [DisableDump]
             string Name { get; }
-        }
-
-        internal Result ApplyResult(Category category, NumberType.IOperation operation, int objectBitCount, TypeBase argsType)
-        {
-            var typedCategory = category.Typed;
-            var argsBitCount = argsType.SequenceLength(this);
-            var resultBitCount = operation.Signature(objectBitCount, argsBitCount);
-            var result = UniqueNumber(resultBitCount)
-                .Result
-                (
-                    category,
-                    () => ApplyCode(Size.Create(resultBitCount), operation.Name, objectBitCount, argsBitCount),
-                    CodeArgs.Arg);
-            var objectResult = UniqueNumber(objectBitCount).UniquePointer.Result(typedCategory);
-            var convertedObjectResult = objectResult.BitSequenceOperandConversion(typedCategory);
-            var convertedArgsResult = argsType.BitSequenceOperandConversion(typedCategory);
-            return result.ReplaceArg(convertedObjectResult + convertedArgsResult);
-        }
-
-        Result PrefixResult(Category category, string operation, int objectBitCount)
-        {
-            var objectType = UniqueNumber(objectBitCount);
-            return objectType
-                .Result(category, () => objectType.BitSequenceOperation(operation), CodeArgs.Arg)
-                .ReplaceArg
-                (
-                    category1
-                        => objectType
-                            .UniquePointer
-                            .ArgResult(category1.Typed).AutomaticDereferenceResult.Align);
         }
     }
 }
