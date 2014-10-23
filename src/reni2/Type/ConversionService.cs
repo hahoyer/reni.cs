@@ -46,7 +46,7 @@ namespace Reni.Type
                 return Elements
                     .Select(element => element.ResultType().DumpPrintText + " <== ")
                     .Stringify("")
-                    + Source.DumpPrintText;
+                       + Source.DumpPrintText;
             }
         }
 
@@ -60,7 +60,7 @@ namespace Reni.Type
             if(result != null)
                 return result;
 
-            var stripConversions = conversions.SelectMany(StripConversions).ToArray();
+            var stripConversions = conversions.SelectMany(path => StripConversions(destination, path)).ToArray();
             result = stripConversions.SingleOrDefault(x => x.Destination == destination);
             if(result != null)
                 return result;
@@ -76,21 +76,28 @@ namespace Reni.Type
             return destination
                 .GetReachableTypes()
                 .SelectMany(destinationEntry => path.Destination.GetForcedConversions(destinationEntry))
-                .SelectMany(element => Combine(destination, element, path));
+                .SelectMany(element => destination.Combine(element, path));
         }
 
-        static IEnumerable<Path> StripConversions(Path path)
+        static IEnumerable<Path> StripConversions(TypeBase destination, Path path)
         {
             var conversion = path.Destination.GetStripConversion();
             if(conversion == null)
                 return new Path[0];
-            return
-                conversion
-                    .ResultType()
-                    .GetReflexiveConversionPaths()
-                    .ToArray()
-                    .Combine(path)
-                    .ToArray();
+            return destination
+                .Combine(conversion, path)
+                .ToArray();
+        }
+
+        static IEnumerable<Path> Combine(this TypeBase destination, ISimpleFeature element, Path path)
+        {
+            return element
+                .ResultType()
+                .GetReflexiveConversionPaths()
+                .Where(e => e.Destination == destination)
+                .Combine(new Path(element))
+                .Combine(path)
+                ;
         }
 
         static IEnumerable<T> NullableToArray<T>(this T target) { return target.Equals(default(T)) ? new T[0] : new[] {target}; }
@@ -161,21 +168,6 @@ namespace Reni.Type
                     }
                 )
                 .ToArray();
-        }
-
-        static IEnumerable<Path> Combine(this TypeBase destination, ISimpleFeature element, Path path)
-        {
-            return element
-                .ResultType()
-                .GetReflexiveConversionPaths()
-                .ToArray()
-                .Where(e => e.Destination == destination)
-                .ToArray()
-                .Combine(new Path(element))
-                .ToArray()
-                .Combine(path)
-                .ToArray()
-                ;
         }
 
         static IEnumerable<Path> GetReflexiveConversionPaths(this TypeBase target)
