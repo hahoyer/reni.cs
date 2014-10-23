@@ -126,7 +126,7 @@ namespace Reni.Type
             var constructorResult = function.ApplyResult(category.Typed, indexType);
             var elements = Count
                 .Select(i => ElementConstructorResult(category, constructorResult, i, indexType))
-                .Aggregate()
+                .Aggregate((c,n)=>n+c)
                 ?? VoidType.Result(category);
             return Result(category, elements);
         }
