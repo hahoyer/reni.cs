@@ -12,12 +12,9 @@ namespace Reni.FeatureTest.Validation
     [TestFixture]
     [Target(@"x")]
     [Output("")]
-    [LowPriority]
     [PrioTableTest]
     public sealed class UndefinedContextSymbol : CompilerTest
     {
-        [Test]
-        public override void Run() { BaseRun(); }
         protected override void Verify(IEnumerable<IssueBase> issues)
         {
             var issue = issues.Single();
@@ -29,12 +26,9 @@ namespace Reni.FeatureTest.Validation
     [TestFixture]
     [PrioTableTest]
     [Target(@"x: 3; x x")]
-    [LowPriority]
     [Output("")]
     public sealed class UndefinedSymbol : CompilerTest
     {
-        [Test]
-        public override void Run() { BaseRun(); }
         protected override void Verify(IEnumerable<IssueBase> issues) { var issue = (UndefinedSymbolIssue) issues.Single(); }
     }
 
@@ -44,8 +38,6 @@ namespace Reni.FeatureTest.Validation
     [UndefinedContextSymbol]
     public sealed class UseOfUndefinedContextSymbol : CompilerTest
     {
-        [Test]
-        public override void Run() { BaseRun(); }
         protected override void Verify(IEnumerable<IssueBase> issues)
         {
             var issueArray = issues.ToArray();
@@ -61,8 +53,6 @@ namespace Reni.FeatureTest.Validation
     [UseOfUndefinedContextSymbol]
     public sealed class IndirectUseOfUndefinedContextSymbol : CompilerTest
     {
-        [Test]
-        public override void Run() { BaseRun(); }
         protected override void Verify(IEnumerable<IssueBase> issues)
         {
             var issueArray = issues.ToArray();

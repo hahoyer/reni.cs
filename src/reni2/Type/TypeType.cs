@@ -62,8 +62,6 @@ namespace Reni.Type
 
         Result StarResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
-            NotImplementedMethod(context, category, left, right);
-
             var countResult = right.Result(context).AutomaticDereferenceResult;
             var count = countResult
                 .Evaluate(context.RootContext.ExecutionContext)

@@ -35,21 +35,14 @@ namespace Reni.Struct
             StopByObjectId(-10);
         }
 
-        CodeArgs ObtainCodeArgs()
-        {
-            var result = _getter.Exts;
-            Tracer.Assert(result != null);
-            if(_setter != null)
-                result += _setter.Exts;
-            return result;
-        }
-
         [DisableDump]
         internal override TypeBase ValueType { get { return _getter.ReturnType; } }
         [DisableDump]
         internal override bool Hllw { get { return CodeArgs.IsNone && ArgsType.Hllw; } }
         [DisableDump]
         internal override Structure FindRecentStructure { get { return _structure; } }
+        [DisableDump]
+        internal override bool HasQuickSize { get { return false; } }
 
         [Node]
         [DisableDump]
@@ -66,6 +59,17 @@ namespace Reni.Struct
             }
         }
 
+        internal override string DumpPrintText
+        {
+            get
+            {
+                var result = ValueType.DumpPrintText;
+                result += " /\\(";
+                result += ArgsType.DumpPrintText;
+                result += ")";
+                return result;
+            }
+        }
         protected override Result SetterResult(Category category) { return _setter.CallResult(category); }
         protected override Result GetterResult(Category category) { return _getter.CallResult(category); }
         protected override Size GetSize() { return ArgsType.Size + CodeArgs.Size; }
@@ -112,6 +116,14 @@ namespace Reni.Struct
             return result;
         }
 
-        internal override bool HasQuickSize { get { return false; } }
+        CodeArgs ObtainCodeArgs()
+        {
+            var result = _getter.Exts;
+            Tracer.Assert(result != null);
+            if (_setter != null)
+                result += _setter.Exts;
+            return result;
+        }
+
     }
 }

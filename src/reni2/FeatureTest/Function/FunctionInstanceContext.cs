@@ -9,7 +9,7 @@ namespace Reni.FeatureTest.Function
 {
     [LowPriority]
     [TestFixture]
-    [TargetSet(@"a:(x: 100;f: /\ . + x); a f(1) function_instance ^ dump_print;", @"(100, /\(.)+(x))")]
+    [TargetSet(@"a:(x: 100;f: /\ ^ + x); a f(1) function_instance ^^ dump_print;", @"(100, /\(^)+(x))")]
     [SomeVariables]
     [Add2Numbers]
     [AccessMember]
@@ -18,8 +18,5 @@ namespace Reni.FeatureTest.Function
     [TwoFunctions]
     [FunctionWithRefArg]
     public sealed class FunctionInstanceContext : CompilerTest
-    {
-        [Test]
-        public override void Run() { BaseRun(); }
-    }
+    {}
 }

@@ -16,7 +16,10 @@ namespace Reni.Struct
     {
         readonly Structure _structure;
 
-        internal StructureType(Structure structure) { _structure = structure; }
+        internal StructureType(Structure structure)
+        {
+            _structure = structure;
+        }
 
         IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
         {
@@ -29,10 +32,8 @@ namespace Reni.Struct
         [DisableDump]
         internal Structure Structure { get { return _structure; } }
 
+        [DisableDump]
         internal override Root RootContext { get { return _structure.RootContext; } }
-        protected override Size GetSize() { return Structure.StructSize; }
-
-        protected override string GetNodeDump() { return "type(" + Structure.NodeDump + ")"; }
 
         [DisableDump]
         internal override Structure FindRecentStructure { get { return Structure; } }
@@ -44,5 +45,9 @@ namespace Reni.Struct
 
         [DisableDump]
         internal override bool HasQuickSize { get { return false; } }
+
+        protected override Size GetSize() { return Structure.StructSize; }
+
+        protected override string GetNodeDump() { return "type(" + Structure.NodeDump + ")"; }
     }
 }

@@ -21,7 +21,7 @@ namespace Reni.Type
             , ISymbolProvider<Negate, IFeatureImplementation>
             , ISymbolProvider<TextItem, IFeatureImplementation>
             , IConverterProvider<NumberType, IFeatureImplementation>
-        , ISpecificConversionProvider<NumberType>
+            , ISpecificConversionProvider<NumberType>
     {
         static readonly Minus _minusOperation = new Minus();
         readonly ValueCache<Result> _zeroResult;
@@ -195,6 +195,5 @@ namespace Reni.Type
             [DisableDump]
             string Name { get; }
         }
-
     }
 }

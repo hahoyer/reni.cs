@@ -2,6 +2,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using hw.UnitTest;
+using Reni.FeatureTest.Structure;
 
 namespace Reni.FeatureTest.Array
 {
@@ -19,20 +20,22 @@ namespace Reni.FeatureTest.Array
 
     [TestFixture]
     [ArrayFromPieces]
+    [TwoStatements]
     [TargetSet("x: <<5<<3; x dump_print", "array(#(#align3#)# (bit)sequence(4),(5, 3))")]
-    [LowPriority]
     public sealed class ArrayVariable : CompilerTest
     {}
 
     [TestFixture]
     [ElementAccessVariable]
     [ArrayVariable]
+    [TwoStatements]
     [TargetSet("x: (<<5) enable_reassign; x(0) := 2; x dump_print", "array(#(#align3#)# (bit)sequence(4),(2))")]
     public sealed class ElementAccessVariableSetterSimple : CompilerTest
     {}
 
     [TestFixture]
     [ElementAccessVariableSetterSimple]
+    [TwoStatements]
     [TargetSet("x: (<<5<<3<<5<<1<<3) enable_reassign; x(3) := 2; x dump_print",
         "array(#(#align3#)# (bit)sequence(4),(5, 3, 5, 2, 3))")]
     public sealed class ElementAccessVariableSetter : CompilerTest
@@ -40,6 +43,7 @@ namespace Reni.FeatureTest.Array
 
     [TestFixture]
     [ElementAccess]
+    [TwoStatements]
     [TargetSet("x: <<5<<3<<5<<1<<3; x(3) dump_print", "1")]
     public sealed class ElementAccessVariable : CompilerTest
     {}

@@ -117,11 +117,12 @@ namespace Reni.Type
             NotImplementedMethod(category, argsType);
             return null;
         }
+
         Result InternalConstructorResult(Category category, IFunctionFeature function)
         {
             var indexType = BitType
-                .UniqueArray(BitsConst.Convert(Count).Size.ToInt())
-                .UniqueSequence.UniqueAlign;
+                .UniqueNumber(BitsConst.Convert(Count).Size.ToInt())
+                .UniqueAlign;
             var constructorResult = function.ApplyResult(category.Typed, indexType);
             var elements = Count
                 .Select(i => ElementConstructorResult(category, constructorResult, i, indexType))
@@ -134,8 +135,9 @@ namespace Reni.Type
         {
             var resultForArg = indexType
                 .Result(category.Typed, () => CodeBase.BitsConst(indexType.Size, BitsConst.Convert(i)));
-            return elementConstructorResult
-                .ReplaceArg(resultForArg)
+            var replaceArg = elementConstructorResult
+                .ReplaceArg(resultForArg);
+            return replaceArg
                 .Conversion(ElementAccessType)
                 .ObviousExactConversion(ElementType)
                 & category;

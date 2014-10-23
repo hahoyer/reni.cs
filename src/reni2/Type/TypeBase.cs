@@ -47,7 +47,7 @@ namespace Reni.Type
             public readonly ValueCache<Size> Size;
             [Node]
             [SmartNode]
-            public readonly ValueCache<IEnumerable<ISimpleFeature>> Conversions;
+            public readonly ValueCache<IEnumerable<ISimpleFeature>> ReflexiveConversions;
 
             public Cache(TypeBase parent)
             {
@@ -59,46 +59,7 @@ namespace Reni.Type
                 FunctionInstanceType = new ValueCache<FunctionInstanceType>(() => new FunctionInstanceType(parent));
                 TypeType = new ValueCache<TypeType>(() => new TypeType(parent));
                 Size = new ValueCache<Size>(parent.ObtainSize);
-                Conversions = new ValueCache<IEnumerable<ISimpleFeature>>(parent.CheckedGetConversions);
-            }
-        }
-
-        internal IEnumerable<ConversionService.Path> SimpleConversions
-        {
-            get
-            {
-                return this.FeatureClosure
-                    (
-                        type => type
-                            .ConversionElements
-                            .Select(element => new ConversionService.Path(element))
-                            );
-            }
-        }
-
-        internal IEnumerable<TypeBase> ReachableTypes
-        {
-            get { return SimpleConversions.Select(element => element.Destination); }
-        }
-
-        IEnumerable<ISimpleFeature> CheckedGetConversions()
-        {
-            return Conversions
-                .ToDictionary(x => x.ResultType())
-                .Values;
-        }
-
-        [DisableDump]
-        protected virtual IEnumerable<ISimpleFeature> Conversions
-        {
-            get
-            {
-                if(IsAligningPossible)
-                    yield return Reni.Feature.Extension.SimpleFeature(AlignResult);
-                if(!(this is PointerType))
-                    yield return Reni.Feature.Extension.SimpleFeature(LocalReferenceResult);
-                if(IsCuttingPossible)
-                    yield return Reni.Feature.Extension.SimpleFeature(EnableCutResult);
+                ReflexiveConversions = new ValueCache<IEnumerable<ISimpleFeature>>(parent.ObtainReflexiveConversions);
             }
         }
 
@@ -497,7 +458,7 @@ namespace Reni.Type
 
         internal bool IsConvertable(TypeBase destination)
         {
-            return ConversionService.FindPath(this, destination, ConversionParameter.Instance) != null;
+            return ConversionService.FindPath(this, destination) != null;
         }
 
         internal Result Conversion(Category category, TypeBase destination)
@@ -505,7 +466,7 @@ namespace Reni.Type
             if(category <= (Category.Type.Replenished))
                 return destination.PointerKind.Result(category);
 
-            var path = ConversionService.FindPath(this, destination, ConversionParameter.Instance);
+            var path = ConversionService.FindPath(this, destination);
             if(path != null)
                 return path.Elements.Aggregate(destination.ArgResult(category), (c, n) => c.ReplaceArg(n.Result));
 
@@ -629,12 +590,33 @@ namespace Reni.Type
 
         [DisableDump]
         protected virtual IEnumerable<IGenericProviderForType> Genericize { get { return this.GenericListFromType(); } }
-        public IEnumerable<ISimpleFeature> ConversionElements { get { return _cache.Conversions.Value; } }
+        [DisableDump]
+        public IEnumerable<ISimpleFeature> ReflexiveConversions { get { return _cache.ReflexiveConversions.Value; } }
 
         Result AlignResult(Category category) { return UniqueAlign.Result(category, () => ArgCode.Align(), CodeArgs.Arg); }
         Result EnableCutResult(Category category) { return UniqueEnableCutType.Result(category, ArgResult); }
 
-        internal IEnumerable<ISimpleFeature> GetSpecificConversions(TypeBase destination)
+        IEnumerable<ISimpleFeature> ObtainReflexiveConversions()
+        {
+            var simpleFeatures = ObtainRawReflexiveConversions().ToArray();
+            return simpleFeatures
+                .ToDictionary(x => x.ResultType())
+                .Values;
+        }
+
+        protected virtual IEnumerable<ISimpleFeature> ObtainRawReflexiveConversions()
+        {
+            if(Hllw)
+                yield break;
+            if(IsAligningPossible)
+                yield return Reni.Feature.Extension.SimpleFeature(AlignResult);
+            if(!(this is PointerType))
+                yield return Reni.Feature.Extension.SimpleFeature(LocalReferenceResult);
+            if(IsCuttingPossible)
+                yield return Reni.Feature.Extension.SimpleFeature(EnableCutResult);
+        }
+
+        internal virtual IEnumerable<ISimpleFeature> GetForcedConversions(TypeBase destination)
         {
             var genericProviderForTypes = destination
                 .Genericize
@@ -644,13 +626,15 @@ namespace Reni.Type
                 .ToArray();
         }
 
-        internal virtual IEnumerable<ISimpleFeature> GetSpecificConversions<TDestination>(TDestination destination)
+        internal virtual IEnumerable<ISimpleFeature> GetForcedConversions<TDestination>(TDestination destination)
         {
             var provider = this as ISpecificConversionProvider<TDestination>;
             if(provider != null)
                 return provider.Result(destination);
             return new ISimpleFeature[0];
         }
+        
+        internal virtual ISimpleFeature GetStripConversion() { return null; }
     }
 
     interface ISpecificConversionProvider<in TDestination>

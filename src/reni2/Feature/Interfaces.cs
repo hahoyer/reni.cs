@@ -258,7 +258,7 @@ namespace Reni.Feature
         }
         IEnumerable<ISimpleFeature> IGenericProviderForType.GetSpecificReverseConversions(TypeBase source)
         {
-            return source.GetSpecificConversions(_target);
+            return source.GetForcedConversions(_target);
         }
     }
 

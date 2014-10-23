@@ -83,5 +83,9 @@ namespace Reni.Type
 
         [DisableDump]
         internal override TypeBase ElementTypeForReference { get { return ValueType.ElementTypeForReference; } }
+
+        protected override IEnumerable<ISimpleFeature> ObtainRawReflexiveConversions() { yield break; }
+
+        internal override ISimpleFeature GetStripConversion() { return Extension.SimpleFeature(GetterResult); }
     }
 }

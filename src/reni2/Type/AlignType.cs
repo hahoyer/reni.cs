@@ -37,10 +37,9 @@ namespace Reni.Type
 
         internal override Result DeAlign(Category category) { return Parent.Result(category, ArgResult); }
 
-        [DisableDump]
-        protected override IEnumerable<ISimpleFeature> Conversions
+        protected override IEnumerable<ISimpleFeature> ObtainRawReflexiveConversions()
         {
-            get { return base.Conversions.Concat(new ISimpleFeature[] { Extension.SimpleFeature(UnalignedResult) }); }
+            return base.ObtainRawReflexiveConversions().Concat(new ISimpleFeature[] {Extension.SimpleFeature(UnalignedResult)});
         }
 
         [DisableDump]

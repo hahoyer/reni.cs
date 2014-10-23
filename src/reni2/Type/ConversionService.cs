@@ -50,60 +50,52 @@ namespace Reni.Type
             }
         }
 
-
-        public static Path FindPath(TypeBase source, TypeBase destination, IConversionParameter instance)
+        public static Path FindPath(TypeBase source, TypeBase destination)
         {
             if(source == destination)
                 return new Path(source);
-            var closure = source.SimpleConversions.ToArray();
-            var result = closure.SingleOrDefault(x => x.Destination == destination);
+
+            var conversions = source.GetReflexiveConversionPaths().ToArray();
+            var result = conversions.SingleOrDefault(x => x.Destination == destination);
             if(result != null)
                 return result;
 
-            var simpleFeatureses = SimpleFeatureses(destination, closure);
-            var specificClosure = simpleFeatureses.ToArray();
-            result = specificClosure.SingleOrDefault(x => x.Destination == destination);
+            var stripConversions = conversions.SelectMany(StripConversions).ToArray();
+            result = stripConversions.SingleOrDefault(x => x.Destination == destination);
             if(result != null)
                 return result;
 
-            return null;
-        }
-        static IEnumerable<Path> SimpleFeatureses(TypeBase destination, Path[] closure)
-        {
-            var featureses = new List<Path>();
-            foreach(var path in closure)
-                featureses.AddRange(SpecificConversions(destination, path));
-            return featureses;
-        }
-        static IEnumerable<Path> SpecificConversions(TypeBase destination, Path path)
-        {
-            var reachableTypes = destination
-                .ReachableTypes
-                .ToArray();
-            var simpleFeatures = reachableTypes
-                .SelectMany(destinationEntry => path.Destination.GetSpecificConversions(destinationEntry))
-                .ToArray();
-            var result = simpleFeatures
-                .SelectMany(element => Enumerable(destination, path, element))
-                .ToArray();
-            return result;
+            return conversions
+                .Concat(stripConversions)
+                .SelectMany(path => ForcedConversions(destination, path))
+                .SingleOrDefault(x => x.Destination == destination);
         }
 
-        static IEnumerable<Path> Enumerable(TypeBase destination, Path path, ISimpleFeature element)
+        static IEnumerable<Path> ForcedConversions(TypeBase destination, Path path)
         {
-            var enumerable = element.ResultType()
-                .SimpleConversions.Where(e => e.Destination == destination)
-                .ToArray();
-            var combine = enumerable
-                .Combine(new Path(element))
-                .ToArray();
-            var array = combine
-                .Combine(path)
-                .ToArray();
-            return array;
+            return destination
+                .GetReachableTypes()
+                .SelectMany(destinationEntry => path.Destination.GetForcedConversions(destinationEntry))
+                .SelectMany(element => Combine(destination, element, path));
         }
 
-        public static string DumpObvious(TypeBase source) { return DumpReachable(source, type => type.ConversionElements); }
+        static IEnumerable<Path> StripConversions(Path path)
+        {
+            var conversion = path.Destination.GetStripConversion();
+            if(conversion == null)
+                return new Path[0];
+            return
+                conversion
+                    .ResultType()
+                    .GetReflexiveConversionPaths()
+                    .ToArray()
+                    .Combine(path)
+                    .ToArray();
+        }
+
+        static IEnumerable<T> NullableToArray<T>(this T target) { return target.Equals(default(T)) ? new T[0] : new[] {target}; }
+
+        public static string DumpObvious(TypeBase source) { return DumpReachable(source, type => type.ReflexiveConversions); }
 
         static string DumpReachable(TypeBase source, Func<TypeBase, IEnumerable<ISimpleFeature>> getConversionElements)
         {
@@ -126,7 +118,7 @@ namespace Reni.Type
             return types;
         }
 
-        internal static IEnumerable<Path> FeatureClosure
+        static IEnumerable<Path> FeatureClosure
             (this TypeBase source, Func<TypeBase, IEnumerable<Path>> getElements)
         {
             var identity = new Path(source);
@@ -154,8 +146,7 @@ namespace Reni.Type
             } while(newTypes.Any());
         }
 
-        static IEnumerable<Path> Combine
-            (this IEnumerable<Path> listOfNewContinuations, Path path)
+        static IEnumerable<Path> Combine(this IEnumerable<Path> listOfNewContinuations, Path path)
         {
             return listOfNewContinuations.Select
                 (
@@ -167,7 +158,41 @@ namespace Reni.Type
                                 () => "\npath=" + path.NodeDump + "\nnewPath=" + newPath.NodeDump
                             );
                         return new Path(newPath.Elements.Concat(path.Elements).ToArray());
-                    });
+                    }
+                )
+                .ToArray();
+        }
+
+        static IEnumerable<Path> Combine(this TypeBase destination, ISimpleFeature element, Path path)
+        {
+            return element
+                .ResultType()
+                .GetReflexiveConversionPaths()
+                .ToArray()
+                .Where(e => e.Destination == destination)
+                .ToArray()
+                .Combine(new Path(element))
+                .ToArray()
+                .Combine(path)
+                .ToArray()
+                ;
+        }
+
+        static IEnumerable<Path> GetReflexiveConversionPaths(this TypeBase target)
+        {
+            return target.FeatureClosure
+                (
+                    type => type
+                        .ReflexiveConversions
+                        .Select(element => new Path(element))
+                );
+        }
+
+        static IEnumerable<TypeBase> GetReachableTypes(this TypeBase target)
+        {
+            return target
+                .GetReflexiveConversionPaths()
+                .Select(element => element.Destination);
         }
     }
 }
