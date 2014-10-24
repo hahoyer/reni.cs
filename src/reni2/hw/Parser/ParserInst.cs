@@ -7,55 +7,41 @@ using hw.Scanner;
 
 namespace hw.Parser
 {
-    /// <summary>
-    ///     The parser singleton
-    /// </summary>
-    sealed class ParserInst
+    sealed class Position : Dumpable, IPosition<IParsedSyntax>
     {
+        internal readonly SourcePosn SourcePosn;
         readonly Scanner _scanner;
         readonly ITokenFactory _tokenFactory;
 
-        public ParserInst(Scanner scanner, ITokenFactory tokenFactory)
+        Position(SourcePosn sourcePosn, ITokenFactory tokenFactory, Scanner scanner)
         {
-            _scanner = scanner;
+            SourcePosn = sourcePosn;
             _tokenFactory = tokenFactory;
+            _scanner = scanner;
+        }
+
+        Item<IParsedSyntax> IPosition<IParsedSyntax>.GetItemAndAdvance(Stack<OpenItem<IParsedSyntax>> stack)
+        {
+            return _scanner.CreateToken(SourcePosn, _tokenFactory, stack);
+        }
+        
+        IPart IPosition<IParsedSyntax>.Span(IPosition<IParsedSyntax> end) { return TokenData.Span(SourcePosn, end); }
+
+        /// <summary>
+        ///     Scans and parses source and creates the syntax tree
+        /// </summary>
+        public static IParsedSyntax Parse(Source source, ITokenFactory tokenFactory, Scanner scanner, Stack<OpenItem<IParsedSyntax>> stack = null)
+        {
+            return Parse(source+0, tokenFactory,scanner,stack);
         }
 
         /// <summary>
         ///     Scans and parses source and creates the syntax tree
         /// </summary>
-        /// <param name="source"> </param>
-        /// <returns> </returns>
-        public IParsedSyntax Compile(Source source)
+        public static IParsedSyntax Parse(SourcePosn sourcePosn, ITokenFactory tokenFactory, Scanner scanner, Stack<OpenItem<IParsedSyntax>> stack = null)
         {
-            IPosition<IParsedSyntax> sourcePosn = new Position(source, this);
-            return sourcePosn.Parse(_tokenFactory.PrioTable);
-        }
-
-        internal Item<IParsedSyntax> GetItemAndAdvance(SourcePosn sourcePosn, Stack<OpenItem<IParsedSyntax>> stack)
-        {
-            return _scanner.CreateToken(sourcePosn, _tokenFactory, stack);
-        }
-    }
-
-    sealed class Position : Dumpable, IPosition<IParsedSyntax>
-    {
-        internal readonly SourcePosn SourcePosn;
-        readonly ParserInst _parserInst;
-
-        public Position(Source source, ParserInst parserInst)
-        {
-            SourcePosn = source + 0;
-            _parserInst = parserInst;
-        }
-
-        Item<IParsedSyntax> IPosition<IParsedSyntax>.GetItemAndAdvance(Stack<OpenItem<IParsedSyntax>> stack)
-        {
-            return _parserInst.GetItemAndAdvance(SourcePosn,stack);
-        }
-        IPart IPosition<IParsedSyntax>.Span(IPosition<IParsedSyntax> end)
-        {
-            return TokenData.Span(SourcePosn, end);
+            var p = new Position(sourcePosn, tokenFactory, scanner);
+            return p.Parse(tokenFactory.PrioTable, stack);
         }
     }
 }

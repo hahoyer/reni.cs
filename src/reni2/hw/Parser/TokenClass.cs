@@ -8,7 +8,7 @@ using hw.PrioParser;
 
 namespace hw.Parser
 {
-    abstract class TokenClass : DumpableObject, IIconKeyProvider, ITokenClass 
+    abstract class TokenClass : DumpableObject, IIconKeyProvider, ITokenClass
     {
         static int _nextObjectId;
         string _name;

@@ -41,5 +41,22 @@ namespace Reni.Parser
                     @"!converter: 3; !converter: 4",
                     expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
         }
+
+        [Test]
+        public void StrangeDeclarationSyntax()
+        {
+            var syntaxPrototype = LikeSyntax.Struct
+                (
+                    new[] { LikeSyntax.Number(3), LikeSyntax.Number(4) },
+                    new Declaration[] { },
+                    new[] { 0, 1 }
+                );
+            Parameters.ParseOnly = true;
+            CreateFileAndRunCompiler
+                (
+                    "UseAlternativePrioTable",
+                    @"!",
+                    expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
+        }
     }
 }

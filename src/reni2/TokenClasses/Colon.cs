@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.Debug;
 using hw.Parser;
 using hw.PrioParser;
 using hw.Scanner;
@@ -27,13 +26,21 @@ namespace Reni.TokenClasses
         Item<IParsedSyntax> IRescannable<IParsedSyntax>.Execute
             (IPart part, SourcePosn sourcePosn, Stack<OpenItem<IParsedSyntax>> stack)
         {
-            NotImplementedMethod(part, sourcePosn, stack);
+            stack.Push(OpenItem<IParsedSyntax>.StartItem(sourcePosn));
+            var result = Compiler.Parse(sourcePosn, _tokenFactory, stack);
+            NotImplementedMethod(part,sourcePosn,stack, "result", result);
             return null;
+
         }
     }
 
     sealed class ConverterToken : TokenClass
     {
+        protected override ParsedSyntax TerminalSyntax(TokenData token)
+        {
+            return new ConverterDeclarationSyntax(token, token);
+        }
+
         protected override ParsedSyntax SuffixSyntax(ParsedSyntax left, TokenData token)
         {
             return ((DeclarationExtensionSyntax) left)

@@ -17,6 +17,7 @@ namespace Reni.TokenClasses
             StartMethodDump(false, left, token, right);
             try
             {
+                BreakExecution();
                 var result = Create((ParsedSyntax) left, (TokenData) token, (ParsedSyntax) right);
                 return ReturnMethodDump(result);
             }

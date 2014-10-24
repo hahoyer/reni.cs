@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using hw.Debug;
 
 namespace hw.PrioParser
 {
@@ -14,6 +15,9 @@ namespace hw.PrioParser
                 stack.Push(OpenItem<T>.StartItem(current));
             }
 
+            var stackOrigin = stack.Count;
+            Tracer.Assert(stackOrigin > 0);
+
             do
             {
                 var item = current.GetItemAndAdvance(stack);
@@ -26,11 +30,10 @@ namespace hw.PrioParser
                     if(relation != '+')
                         result = stack.Pop().Create(result);
 
-                    if(relation == '-')
-                        continue;
-
-                    if(item.IsEnd)
+                    if(stack.Count < stackOrigin)
                         return result;
+                    if (relation == '-')
+                        continue;
 
                     stack.Push(new OpenItem<T>(result, item, relation == '='));
                     result = null;

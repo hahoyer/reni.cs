@@ -6,6 +6,7 @@ using hw.Debug;
 using hw.Forms;
 using hw.Helper;
 using hw.Parser;
+using hw.PrioParser;
 using hw.Scanner;
 using Reni.Code;
 using Reni.Context;
@@ -14,7 +15,6 @@ using Reni.ReniParser;
 using Reni.Runtime;
 using Reni.Struct;
 using Reni.Syntax;
-using Reni.TokenClasses;
 using Reni.Validation;
 
 namespace Reni
@@ -25,9 +25,10 @@ namespace Reni
         readonly CompilerParameters _parameters;
         readonly Root _rootContext;
         readonly string _className;
+        static readonly ReniScanner _scanner = new ReniScanner();
+        readonly MainTokenFactory _tokenFactory = new MainTokenFactory();
 
         readonly ValueCache<Source> _source;
-        readonly ValueCache<ParserInst> _parser;
         readonly ValueCache<ParsedSyntax> _syntax;
         readonly ValueCache<CodeContainer> _codeContainer;
         readonly ValueCache<string> _cSharpCode;
@@ -46,11 +47,11 @@ namespace Reni
             _parameters = parameters ?? new CompilerParameters();
 
             _source = new ValueCache<Source>(() => new Source(FileName.FileHandle()));
-            _parser = new ValueCache<ParserInst>(() => new ParserInst(new ReniScanner(), new MainTokenFactory()));
-            _syntax = new ValueCache<ParsedSyntax>(() => (ParsedSyntax) _parser.Value.Compile(Source));
+            _syntax = new ValueCache<ParsedSyntax>(() => Parse(Source+0, _tokenFactory));
             _codeContainer = new ValueCache<CodeContainer>(() => new CodeContainer(RootContext, Syntax, Source.Data));
             _cSharpCode = new ValueCache<string>(() => _codeContainer.Value.CreateCSharpString(_className));
         }
+
 
         [DisableDump]
         string FileName { get { return _fileName; } }
@@ -101,7 +102,7 @@ namespace Reni
         CodeBase IExecutionContext.Function(FunctionId functionId) { return CodeContainer.Function(functionId); }
         CompileSyntax IExecutionContext.Parse(string source) { return Parse(source); }
 
-        CompileSyntax Parse(string sourceText) { return ((ParsedSyntax) _parser.Value.Compile(new Source(sourceText))).ToCompiledSyntax(); }
+        CompileSyntax Parse(string sourceText) { return Parse(new Source(sourceText) + 0, _tokenFactory).ToCompiledSyntax(); }
 
         /// <summary>
         ///     Performs compilation
@@ -156,6 +157,16 @@ namespace Reni
         }
 
         internal IEnumerable<IssueBase> Issues { get { return CodeContainer.Issues; } }
+
+        internal static ParsedSyntax Parse(SourcePosn source, ITokenFactory tokenFactory, Stack<OpenItem<IParsedSyntax>> stack = null)
+        {
+            return (ParsedSyntax) Position.Parse
+                (
+                    source,
+                    tokenFactory,
+                    _scanner,
+                    stack);
+        }
 
         void RunFromCode() { _codeContainer.Value.Execute(this); }
 
