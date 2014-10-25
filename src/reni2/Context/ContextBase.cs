@@ -6,11 +6,12 @@ using hw.Debug;
 using hw.Forms;
 using hw.Helper;
 using hw.Parser;
+using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Feature;
+using Reni.ReniSyntax;
 using Reni.Struct;
-using Reni.Syntax;
 using Reni.TokenClasses;
 using Reni.Type;
 using Reni.Validation;
@@ -150,11 +151,11 @@ namespace Reni.Context
 
             [Node]
             [SmartNode]
-            internal readonly FunctionCache<TokenData, IssueType> UndefinedSymbolType;
+            internal readonly FunctionCache<SourcePart, IssueType> UndefinedSymbolType;
 
             public Cache(ContextBase target)
             {
-                UndefinedSymbolType = new FunctionCache<TokenData, IssueType>
+                UndefinedSymbolType = new FunctionCache<SourcePart, IssueType>
                     (tokenData => UndefinedSymbolIssue.Type(tokenData, target));
                 ResultCache = new FunctionCache<CompileSyntax, ResultCache>(target.CreateCacheElement);
                 StructContexts = new FunctionCache<Container, FunctionCache<int, ContextBase>>
@@ -237,7 +238,7 @@ namespace Reni.Context
         }
 
         [NotNull]
-        internal Result ObtainResult(Category category, TokenData position, Definable tokenClass, CompileSyntax right)
+        internal Result ObtainResult(Category category, SourcePart position, Definable tokenClass, CompileSyntax right)
         {
             var searchResult = Declarations(tokenClass);
             if(searchResult == null)

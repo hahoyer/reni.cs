@@ -1,14 +1,15 @@
 using System;
 using System.Collections.Generic;
+using hw.Helper;
 using System.Linq;
 using hw.Debug;
 using hw.Forms;
-using hw.Helper;
 using hw.Parser;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.ReniParser;
-using Reni.Syntax;
+using Reni.ReniSyntax;
 using Reni.Type;
 
 namespace Reni.Struct
@@ -18,8 +19,6 @@ namespace Reni.Struct
     /// </summary>
     sealed class Container : CompileSyntax
     {
-        readonly TokenData _firstToken;
-        readonly TokenData _lastToken;
         readonly CompileSyntax[] _statements;
         readonly FunctionCache<string, int> _dictionary;
         readonly int[] _converters;
@@ -42,23 +41,14 @@ namespace Reni.Struct
         [SmartNode]
         internal int[] Converters { get { return _converters; } }
 
-        [DisableDump]
-        internal override TokenData FirstToken { get { return _firstToken; } }
-
-        [DisableDump]
-        internal override TokenData LastToken { get { return _lastToken; } }
-
         Container
             (
-            TokenData leftToken,
-            TokenData rightToken,
+            SourcePart token,
             CompileSyntax[] statements,
             FunctionCache<string, int> dictionary,
             int[] converters)
-            : base(leftToken, _nextObjectId++)
+            : base(token, _nextObjectId++)
         {
-            _firstToken = leftToken;
-            _lastToken = rightToken;
             _statements = statements;
             _dictionary = dictionary;
             _converters = converters;
@@ -81,7 +71,7 @@ namespace Reni.Struct
         protected override string GetNodeDump() { return "container." + ObjectId; }
 
         [DisableDump]
-        protected override ParsedSyntaxBase[] Children { get { return Statements.ToArray<ParsedSyntaxBase>(); } }
+        protected override ParsedSyntax[] Children { get { return Statements.ToArray<ParsedSyntax>(); } }
 
         sealed class PreContainer : DumpableObject
         {
@@ -89,7 +79,7 @@ namespace Reni.Struct
             readonly FunctionCache<string, int> _dictionary = new FunctionCache<string, int>();
             readonly List<int> _converters = new List<int>();
 
-            public void Add(IParsedSyntax parsedSyntax)
+            public void Add(Syntax parsedSyntax)
             {
                 while(parsedSyntax is DeclarationSyntax)
                 {
@@ -105,17 +95,17 @@ namespace Reni.Struct
                     _converters.Add(_list.Count);
                 }
 
-                _list.Add(((ParsedSyntax) parsedSyntax).ToCompiledSyntax());
+                _list.Add(parsedSyntax.ToCompiledSyntax());
             }
 
-            public Container ToContainer(TokenData leftToken, TokenData rightToken)
+            public Container ToContainer(SourcePart leftToken, SourcePart rightToken)
             {
-                return new Container(leftToken, rightToken, _list.ToArray(), _dictionary, _converters.ToArray());
+                return new Container(leftToken, _list.ToArray(), _dictionary, _converters.ToArray());
             }
         }
 
 
-        internal static Container Create(TokenData leftToken, TokenData rightToken, List<IParsedSyntax> parsed)
+        internal static Container Create(SourcePart leftToken, SourcePart rightToken, List<Syntax> parsed)
         {
             var result = new PreContainer();
             foreach(var parsedSyntax in parsed)
@@ -123,16 +113,16 @@ namespace Reni.Struct
             return result.ToContainer(leftToken, rightToken);
         }
 
-        internal static Container Create(TokenData leftToken, TokenData rightToken, ParsedSyntax parsedSyntax)
+        internal static Container Create(SourcePart leftToken, SourcePart rightToken, Syntax parsedSyntax)
         {
             var result = new PreContainer();
             result.Add(parsedSyntax);
             return result.ToContainer(leftToken, rightToken);
         }
 
-        internal static Container Create(ParsedSyntax parsedSyntax)
+        internal static Container Create(Syntax parsedSyntax)
         {
-            return Create(parsedSyntax.FirstToken, parsedSyntax.LastToken, parsedSyntax);
+            return Create(parsedSyntax.Token, parsedSyntax.Token, parsedSyntax);
         }
 
         public override string DumpData()

@@ -5,7 +5,7 @@ using hw.Debug;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Syntax;
+using Reni.ReniSyntax;
 
 namespace Reni.Type
 {

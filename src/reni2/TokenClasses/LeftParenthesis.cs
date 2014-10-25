@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
-using hw.Parser;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.ReniParser;
-using Reni.Syntax;
+using Reni.ReniSyntax;
 
 namespace Reni.TokenClasses
 {
@@ -19,22 +19,22 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal int Level { get { return _level; } }
 
-        protected override ParsedSyntax PrefixSyntax(TokenData token, ParsedSyntax right)
+        protected override Syntax PrefixSyntax(SourcePart token, Syntax right)
         {
-            return new Syntax.LeftParenthesis(_level, null, this, token, right);
+            return new ReniSyntax.LeftParenthesis(_level, null, this, token, right);
         }
-        protected override ParsedSyntax InfixSyntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
+        protected override Syntax InfixSyntax(Syntax left, SourcePart token, Syntax right)
         {
-            return new Syntax.LeftParenthesis(_level, left, this, token, right);
+            return new ReniSyntax.LeftParenthesis(_level, left, this, token, right);
         }
 
-        protected override ParsedSyntax TerminalSyntax(TokenData token) { return new EmptyList.Half(token); }
+        protected override Syntax TerminalSyntax(SourcePart token) { return new EmptyList.Half(token); }
 
         Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
             return context.FunctionalObjectResult(category, left, right);
         }
-        Result ITerminal.Result(ContextBase context, Category category, TokenData token)
+        Result ITerminal.Result(ContextBase context, Category category, SourcePart token)
         {
             NotImplementedMethod(context, category, token);
             return null;

@@ -2,49 +2,46 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
-using hw.PrioParser;
 using hw.Scanner;
 
 namespace hw.Parser
 {
-    abstract class Scanner : Dumpable
+    public class Scanner<TTreeItem> : Dumpable, IScanner<TTreeItem>
+        where TTreeItem : class
     {
-        protected abstract int WhiteSpace(SourcePosn sourcePosn);
-        protected abstract int? Number(SourcePosn sourcePosn);
-        protected abstract int? Text(SourcePosn sourcePosn);
-        protected abstract int? Any(SourcePosn sourcePosn);
+        readonly ILexer _lexer;
 
-        internal Item<IParsedSyntax> CreateToken
-            (SourcePosn sourcePosn, ITokenFactory tokenFactory, Stack<OpenItem<IParsedSyntax>> stack)
+        public Scanner(ILexer lexer) { _lexer = lexer; }
+
+        int WhiteSpace(SourcePosn sourcePosn) { return ExceptionGuard(sourcePosn, _lexer.WhiteSpace); }
+        int? Number(SourcePosn sourcePosn) { return ExceptionGuard(sourcePosn, _lexer.Number); }
+        int? Text(SourcePosn sourcePosn) { return ExceptionGuard(sourcePosn, _lexer.Text); }
+        int? Any(SourcePosn sourcePosn) { return ExceptionGuard(sourcePosn, _lexer.Any); }
+
+        ScannerItem<TTreeItem> IScanner<TTreeItem>.NextToken
+            (SourcePosn sourcePosn, ITokenFactory<TTreeItem> tokenFactory, Stack<OpenItem<TTreeItem>> stack)
         {
-            var item = InternalCreateToken(sourcePosn, tokenFactory);
-            var type = item.Type;
-            var rescannable = type as IRescannable<IParsedSyntax>;
-            if(rescannable != null)
-                return rescannable.Execute(item.Part, sourcePosn, stack);
-
-            return new Item<IParsedSyntax>((IType<IParsedSyntax>) type, item.Part);
+            return NextToken(sourcePosn, tokenFactory);
         }
 
-        RawItem InternalCreateToken
-            (SourcePosn sourcePosn, ITokenFactory tokenFactory)
+        ScannerItem<TTreeItem> NextToken(SourcePosn sourcePosn, ITokenFactory<TTreeItem> tokenFactory)
         {
             try
             {
                 sourcePosn.Position += WhiteSpace(sourcePosn);
-                return CreateAndAdvance(sourcePosn, sp => sp.IsEnd ? (int?)0 : null, tokenFactory.EndOfText)
+                return CreateAndAdvance(sourcePosn, sp => sp.IsEnd ? (int?) 0 : null, tokenFactory.EndOfText)
                     ?? CreateAndAdvance(sourcePosn, Number, tokenFactory.Number)
                         ?? CreateAndAdvance(sourcePosn, Text, tokenFactory.Text)
                             ?? CreateAndAdvance(sourcePosn, Any, tokenFactory.TokenClass)
                                 ?? WillReturnNull(sourcePosn);
             }
-            catch (Exception exception)
+            catch(Exception exception)
             {
-                return CreateAndAdvance(exception.SourcePosn, sp => exception.Length, exception.TokenClass);
+                return CreateAndAdvance(exception.SourcePosn, sp => exception.Length, tokenFactory.Error(exception.Error));
             }
         }
 
-        RawItem WillReturnNull(SourcePosn sourcePosn)
+        ScannerItem<TTreeItem> WillReturnNull(SourcePosn sourcePosn)
         {
             NotImplementedMethod(sourcePosn);
             return null;
@@ -53,40 +50,54 @@ namespace hw.Parser
         internal sealed class Exception : System.Exception
         {
             public readonly SourcePosn SourcePosn;
-            public readonly IType TokenClass;
-            public readonly int Length;
+            internal readonly int Length;
+            public readonly Match.IError Error;
 
-            public Exception(SourcePosn sourcePosn, IType tokenClass, int length)
+            public Exception(SourcePosn sourcePosn, int length, Match.IError error)
             {
                 SourcePosn = sourcePosn;
-                TokenClass = tokenClass;
                 Length = length;
+                Error = error;
             }
         }
 
-        static RawItem CreateAndAdvance
-            (SourcePosn sourcePosn, Func<SourcePosn, int?> getLength, IType tokenClass)
+        static ScannerItem<TTreeItem> CreateAndAdvance
+            (SourcePosn sourcePosn, Func<SourcePosn, int?> getLength, IType<TTreeItem> tokenClass)
         {
             return CreateAndAdvance(sourcePosn, getLength, (sp, l) => tokenClass);
         }
-        static RawItem CreateAndAdvance
-            (SourcePosn sourcePosn, Func<SourcePosn, int?> getLength, Func<string, IType> getTokenClass)
+        static ScannerItem<TTreeItem> CreateAndAdvance
+            (SourcePosn sourcePosn, Func<SourcePosn, int?> getLength, Func<string, IType<TTreeItem>> getTokenClass)
         {
             return CreateAndAdvance(sourcePosn, getLength, (sp, l) => getTokenClass(sp.SubString(0, l)));
         }
 
-        static RawItem CreateAndAdvance
-            (SourcePosn sourcePosn, Func<SourcePosn, int?> getLength, Func<SourcePosn, int, IType> getTokenClass)
+        static ScannerItem<TTreeItem> CreateAndAdvance
+            (
+            SourcePosn sourcePosn,
+            Func<SourcePosn, int?> getLength,
+            Func<SourcePosn, int, IType<TTreeItem>> getTokenClass)
         {
             var length = getLength(sourcePosn);
             if(length == null)
                 return null;
 
-            var result = new RawItem
-                (getTokenClass(sourcePosn, length.Value), TokenData.Span(sourcePosn, length.Value));
+            var result = new ScannerItem<TTreeItem>
+                (getTokenClass(sourcePosn, length.Value), SourcePart.Span(sourcePosn, length.Value));
             sourcePosn.Position += length.Value;
             return result;
         }
-    }
 
+        TResult ExceptionGuard<TResult>(SourcePosn sourcePosn, Func<SourcePosn, TResult> match)
+        {
+            try
+            {
+                return match(sourcePosn);
+            }
+            catch(Match.Exception exception)
+            {
+                throw new Exception(sourcePosn, sourcePosn - exception.SourcePosn, exception.Error);
+            }
+        }
+    }
 }

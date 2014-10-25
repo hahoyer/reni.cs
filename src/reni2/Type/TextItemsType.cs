@@ -28,7 +28,7 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Syntax;
+using Reni.ReniSyntax;
 
 namespace Reni.Type
 {

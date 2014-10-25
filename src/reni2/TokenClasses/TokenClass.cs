@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using hw.Parser;
-using hw.PrioParser;
+using hw.Scanner;
 using Reni.ReniParser;
 
 namespace Reni.TokenClasses
@@ -10,15 +10,15 @@ namespace Reni.TokenClasses
     /// <summary>
     ///     Base class for compiler tokens
     /// </summary>
-    abstract class TokenClass : hw.Parser.TokenClass, IOperator<ParsedSyntax>
+    abstract class TokenClass : TokenClass<Syntax>, IOperator<Syntax>
     {
-        protected override sealed IParsedSyntax Create(IParsedSyntax left, IPart token, IParsedSyntax right)
+        protected override sealed Syntax Create(Syntax left, SourcePart token, Syntax right)
         {
             StartMethodDump(false, left, token, right);
             try
             {
                 BreakExecution();
-                var result = Create((ParsedSyntax) left, (TokenData) token, (ParsedSyntax) right);
+                var result = CreateForVisit(left, token, right);
                 return ReturnMethodDump(result);
             }
             finally
@@ -26,45 +26,33 @@ namespace Reni.TokenClasses
                 EndMethodDump();
             }
         }
+        internal Syntax CreateForVisit(Syntax left, SourcePart token, Syntax right) { return this.Operation(left, token, right); }
 
-        internal ParsedSyntax Create(ParsedSyntax left, TokenData tokenData, ParsedSyntax right)
-        {
-            return this.Operation(left, tokenData, right);
-        }
 
-        ParsedSyntax IOperator<ParsedSyntax>.Terminal(IOperatorPart token) { return TerminalSyntax((TokenData) token); }
-        ParsedSyntax IOperator<ParsedSyntax>.Prefix(IOperatorPart token, ParsedSyntax right)
-        {
-            return PrefixSyntax((TokenData) token, right);
-        }
-        ParsedSyntax IOperator<ParsedSyntax>.Suffix(ParsedSyntax left, IOperatorPart token)
-        {
-            return SuffixSyntax(left, (TokenData) token);
-        }
-        ParsedSyntax IOperator<ParsedSyntax>.Infix(ParsedSyntax left, IOperatorPart token, ParsedSyntax right)
-        {
-            return InfixSyntax(left, (TokenData) token, right);
-        }
+        Syntax IOperator<Syntax>.Terminal(SourcePart token) { return TerminalSyntax(token); }
+        Syntax IOperator<Syntax>.Prefix(SourcePart token, Syntax right) { return PrefixSyntax(token, right); }
+        Syntax IOperator<Syntax>.Suffix(Syntax left, SourcePart token) { return SuffixSyntax(left, token); }
+        Syntax IOperator<Syntax>.Infix(Syntax left, SourcePart token, Syntax right) { return InfixSyntax(left, token, right); }
 
-        protected virtual ParsedSyntax TerminalSyntax(TokenData token)
+        protected virtual Syntax TerminalSyntax(SourcePart token)
         {
             NotImplementedMethod(token);
             return null;
         }
 
-        protected virtual ParsedSyntax PrefixSyntax(TokenData token, ParsedSyntax right)
+        protected virtual Syntax PrefixSyntax(SourcePart token, Syntax right)
         {
             NotImplementedMethod(token, right);
             return null;
         }
 
-        protected virtual ParsedSyntax SuffixSyntax(ParsedSyntax left, TokenData token)
+        protected virtual Syntax SuffixSyntax(Syntax left, SourcePart token)
         {
             NotImplementedMethod(left, token);
             return null;
         }
 
-        protected virtual ParsedSyntax InfixSyntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
+        protected virtual Syntax InfixSyntax(Syntax left, SourcePart token, Syntax right)
         {
             NotImplementedMethod(left, token, right);
             return null;

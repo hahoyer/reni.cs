@@ -26,7 +26,7 @@ using System;
 using hw.Debug;
 using Reni.Basics;
 using Reni.Context;
-using Reni.Syntax;
+using Reni.ReniSyntax;
 using Reni.Type;
 
 namespace Reni.Struct

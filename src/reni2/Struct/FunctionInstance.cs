@@ -7,7 +7,7 @@ using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
-using Reni.Syntax;
+using Reni.ReniSyntax;
 using Reni.Type;
 
 namespace Reni.Struct

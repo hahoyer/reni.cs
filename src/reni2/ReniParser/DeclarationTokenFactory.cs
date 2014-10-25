@@ -2,15 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.Helper;
-using hw.PrioParser;
+using hw.Parser;
 using Reni.TokenClasses;
 
 namespace Reni.ReniParser
 {
-    sealed class DeclarationTokenFactory : hw.Parser.TokenFactory<TokenClass>
+    sealed class DeclarationTokenFactory : TokenFactory<TokenClass, Syntax>
     {
-        DeclarationTokenFactory()
-            : base(PrioTable) { }
         internal static DeclarationTokenFactory Instance { get { return new DeclarationTokenFactory(); } }
 
         static PrioTable PrioTable

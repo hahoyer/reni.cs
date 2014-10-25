@@ -6,9 +6,9 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
+using Reni.ReniSyntax;
 using Reni.Sequence;
 using Reni.Struct;
-using Reni.Syntax;
 
 namespace Reni.Type
 {

@@ -2,59 +2,49 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Parser;
-using hw.PrioParser;
 using hw.Scanner;
 using Reni.ReniParser;
-using Reni.Syntax;
+using Reni.ReniSyntax;
 using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
     sealed class Colon : TokenClass
     {
-        protected override ParsedSyntax InfixSyntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
+        protected override Syntax InfixSyntax(Syntax left, SourcePart token, Syntax right)
         {
             return left
                 .CreateDeclarationSyntax(token, right);
         }
     }
 
-    sealed class Exclamation : TokenClass, IRescannable<IParsedSyntax>
+    sealed class Exclamation : TokenClass
     {
-        static readonly ITokenFactory _tokenFactory = DeclarationTokenFactory.Instance;
-        //protected override ParsedSyntax TerminalSyntax(TokenData token) { return new ExclamationSyntax(token); }
-        Item<IParsedSyntax> IRescannable<IParsedSyntax>.Execute
-            (IPart part, SourcePosn sourcePosn, Stack<OpenItem<IParsedSyntax>> stack)
-        {
-            stack.Push(OpenItem<IParsedSyntax>.StartItem(sourcePosn));
-            var result = Compiler.Parse(sourcePosn, _tokenFactory, stack);
-            NotImplementedMethod(part,sourcePosn,stack, "result", result);
-            return null;
-
-        }
+        static readonly ITokenFactory<Syntax> _tokenFactory = DeclarationTokenFactory.Instance;
+        protected override Syntax TerminalSyntax(SourcePart token) { return new ExclamationSyntax(token); }
     }
 
     sealed class ConverterToken : TokenClass
     {
-        protected override ParsedSyntax TerminalSyntax(TokenData token)
+        protected override Syntax TerminalSyntax(SourcePart token)
         {
             return new ConverterDeclarationSyntax(token, token);
         }
 
-        protected override ParsedSyntax SuffixSyntax(ParsedSyntax left, TokenData token)
+        protected override Syntax SuffixSyntax(Syntax left, SourcePart token)
         {
             return ((DeclarationExtensionSyntax) left)
                 .ExtendByConverter(token);
         }
     }
 
-    abstract class DeclarationExtensionSyntax : ParsedSyntax
+    abstract class DeclarationExtensionSyntax : Syntax
     {
-        protected DeclarationExtensionSyntax(TokenData token)
+        protected DeclarationExtensionSyntax(SourcePart token)
             : base(token)
         {}
 
-        internal virtual ParsedSyntax ExtendByConverter(TokenData token)
+        internal virtual Syntax ExtendByConverter(SourcePart token)
         {
             NotImplementedMethod(token);
             return null;
@@ -63,20 +53,19 @@ namespace Reni.TokenClasses
 
     sealed class ConverterDeclarationSyntax : DeclarationExtensionSyntax
     {
-        readonly TokenData _token;
+        readonly SourcePart _token;
 
-        internal ConverterDeclarationSyntax(TokenData token, TokenData otherToken)
+        internal ConverterDeclarationSyntax(SourcePart token, SourcePart otherToken)
             : base(token)
         {
             _token = otherToken;
         }
 
-        internal override ParsedSyntax CreateDeclarationSyntax(TokenData token, ParsedSyntax right)
+        internal override Syntax CreateDeclarationSyntax(SourcePart token, Syntax right)
         {
             return new ConverterSyntax
                 (
-                _token
-                ,
+                _token,
                 right.CheckedToCompiledSyntax(token, RightMustNotBeNullError)
                 );
         }
@@ -89,10 +78,10 @@ namespace Reni.TokenClasses
 
     sealed class ExclamationSyntax : DeclarationExtensionSyntax
     {
-        internal ExclamationSyntax(TokenData token)
+        internal ExclamationSyntax(SourcePart token)
             : base(token)
         {}
 
-        internal override ParsedSyntax ExtendByConverter(TokenData token) { return new ConverterDeclarationSyntax(Token, token); }
+        internal override Syntax ExtendByConverter(SourcePart token) { return new ConverterDeclarationSyntax(Token, token); }
     }
 }

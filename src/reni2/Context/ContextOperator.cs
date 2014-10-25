@@ -1,16 +1,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using hw.Parser;
+using hw.Scanner;
 using Reni.Basics;
-using Reni.Syntax;
+using Reni.ReniSyntax;
 using Reni.TokenClasses;
 
 namespace Reni.Context
 {
     sealed class ContextOperator : NonPrefix
     {
-        public override Result Result(ContextBase context, Category category, TokenData token)
+        public override Result Result(ContextBase context, Category category, SourcePart token)
         {
             return context
                 .FindRecentStructure

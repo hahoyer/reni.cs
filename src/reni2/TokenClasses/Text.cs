@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using hw.Parser;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -10,7 +10,7 @@ namespace Reni.TokenClasses
 {
     sealed class Text : TerminalToken
     {
-        public override Result Result(ContextBase context, Category category, TokenData token)
+        public override Result Result(ContextBase context, Category category, SourcePart token)
         {
             var data = StripQutes(token.Name);
             return context

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.Helper;
-using hw.PrioParser;
+using hw.Parser;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
@@ -12,14 +12,8 @@ using Reni.TokenClasses;
 
 namespace Reni.ReniParser
 {
-    sealed class MainTokenFactory : hw.Parser.TokenFactory<TokenClass>
+    sealed class MainTokenFactory : TokenFactory<TokenClass, Syntax>
     {
-        public MainTokenFactory(PrioTable prioTable)
-            : base(prioTable) { }
-
-        public MainTokenFactory()
-            : base(PrioTable) { }
-
         static PrioTable PrioTable
         {
             get
@@ -139,7 +133,6 @@ namespace Reni.ReniParser
         }
 
         protected override TokenClass GetEndOfText() { return new RightParenthesis(0); }
-        protected override TokenClass GetBeginOfText() { return new LeftParenthesis(0); }
         protected override TokenClass GetNumber() { return new Number(); }
         protected override TokenClass GetTokenClass(string name) { return new UserSymbol(name); }
         protected override TokenClass GetSyntaxError(string message) { return new SyntaxError(message); }

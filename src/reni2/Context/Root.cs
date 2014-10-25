@@ -8,9 +8,9 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
 using Reni.ReniParser;
+using Reni.ReniSyntax;
 using Reni.Sequence;
 using Reni.Struct;
-using Reni.Syntax;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -120,7 +120,7 @@ namespace Reni.Context
 
         internal FunctionContainer FunctionContainer(int index) { return _functions.Container(index); }
 
-        internal Code.Container MainContainer(ParsedSyntax syntax, string description)
+        internal Code.Container MainContainer(ReniParser.Syntax syntax, string description)
         {
             return Struct.Container
                 .Create(syntax)

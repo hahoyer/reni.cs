@@ -7,7 +7,7 @@ using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
-using Reni.Syntax;
+using Reni.ReniSyntax;
 using Reni.TokenClasses;
 
 namespace Reni.Type

@@ -6,7 +6,7 @@ using hw.Helper;
 using hw.UnitTest;
 using Reni.Basics;
 using Reni.Feature;
-using Reni.Syntax;
+using Reni.ReniSyntax;
 using Reni.TokenClasses;
 using Reni.Type;
 

@@ -4,9 +4,10 @@ using System.Linq;
 using hw.Debug;
 using hw.Forms;
 using hw.Parser;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
-using Reni.Syntax;
+using Reni.ReniSyntax;
 using Reni.TokenClasses;
 
 namespace Reni.ReniParser
@@ -18,12 +19,12 @@ namespace Reni.ReniParser
         [Node]
         internal readonly CompileSyntax Left;
         [Node]
-        readonly TokenData _token;
+        readonly SourcePart _token;
         [Node]
         internal readonly CompileSyntax Right;
 
         internal ExpressionSyntax
-            (Definable tokenClass, CompileSyntax left, TokenData token, CompileSyntax right)
+            (Definable tokenClass, CompileSyntax left, SourcePart token, CompileSyntax right)
             : base(token)
         {
             _tokenClass = tokenClass;
@@ -63,7 +64,7 @@ namespace Reni.ReniParser
             if(left == null && right == null)
                 return this;
 
-            return (CompileSyntax) _tokenClass.Create(left ?? Left, _token, right ?? Right);
+            return (CompileSyntax) _tokenClass.CreateForVisit(left ?? Left, _token, right ?? Right);
         }
 
         protected override string GetNodeDump()
@@ -77,13 +78,7 @@ namespace Reni.ReniParser
         }
 
         [DisableDump]
-        protected override ParsedSyntaxBase[] Children { get { return new ParsedSyntaxBase[] {Left, Right}; } }
-
-        [DisableDump]
-        internal override TokenData FirstToken { get { return Left == null ? Token : Left.FirstToken; } }
-
-        [DisableDump]
-        internal override TokenData LastToken { get { return Right == null ? Token : Right.LastToken; } }
+        protected override ParsedSyntax[] Children { get { return new ParsedSyntax[] {Left, Right}; } }
 
         internal override string DumpPrintText
         {

@@ -1,14 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.Parser;
+using hw.Scanner;
 using Reni.ReniParser;
-using Reni.Syntax;
+using Reni.ReniSyntax;
 
 namespace Reni.TokenClasses
 {
     sealed class List : TokenClass
     {
-        protected override ParsedSyntax InfixSyntax(ParsedSyntax left, TokenData token, ParsedSyntax right) { return new ListSyntax(left, token, right); }
+        protected override Syntax InfixSyntax(Syntax left, SourcePart token, Syntax right)
+        {
+            return new ListSyntax(left, token, right);
+        }
     }
 }

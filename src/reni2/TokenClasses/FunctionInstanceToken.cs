@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System;
 using Reni.Basics;
 using Reni.Context;
-using Reni.Syntax;
+using Reni.ReniSyntax;
 
 namespace Reni.TokenClasses
 {

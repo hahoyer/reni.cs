@@ -1,16 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.PrioParser;
+using hw.Scanner;
 
 namespace hw.Parser
 {
-    interface ITokenFactory
+    public interface ITokenFactory<TTreeItem>
+        where TTreeItem : class
     {
-        IType TokenClass(string name);
-        PrioTable PrioTable { get; }
-        IType Number { get; }
-        IType Text { get; }
-        IType EndOfText { get; }
+        IType<TTreeItem> TokenClass(string name);
+        IType<TTreeItem> Number { get; }
+        IType<TTreeItem> Text { get; }
+        IType<TTreeItem> EndOfText { get; }
+        IType<TTreeItem> Error(Match.IError error);
     }
 }

@@ -2,18 +2,18 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using hw.Debug;
 using hw.Forms;
 using hw.Helper;
 using JetBrains.Annotations;
 
-namespace hw.PrioParser
+namespace hw.Parser
 {
     /// <summary>
     ///     Priority table used in parsing to create the syntax tree.
     /// </summary>
     public sealed class PrioTable
     {
+        public string Title;
         public const string Any = "(any)";
         public const string EndOfText = "(eot)";
         public const string BeginOfText = "(bot)";
@@ -54,7 +54,7 @@ namespace hw.PrioParser
         ///     Equal sign: New token and found token are matching
         /// </summary>
         /// <returns> </returns>
-        public override string ToString()
+        public string Dump()
         {
             var maxlen = _token.Max(t => t.Length);
             var head0 = "";
@@ -72,8 +72,15 @@ namespace hw.PrioParser
                     result += _dataCache.Value[i, j];
                 result += "\n";
             }
-            return head0 + "\n" + head1 + "\n" + result;
+
+
+            result = head0 + "\n" + head1 + "\n" + result;
+            if(Title != null)
+                result = Title + "\n" + result;
+            return result;
         }
+
+        public override string ToString() { return Title ?? Dump(); }
 
         public static PrioTable FromText(string text) { return FromText(text.Split(new[] {'\n', '\r'})); }
 
@@ -95,10 +102,12 @@ namespace hw.PrioParser
                         result += Right(data);
                         break;
                     case "parlevel":
-                        result = result.ParenthesisLevel(data.Take(tokenCount).ToArray(), data.Skip(tokenCount).Take(tokenCount).ToArray());
+                        result = result.ParenthesisLevel
+                            (data.Take(tokenCount).ToArray(), data.Skip(tokenCount).Take(tokenCount).ToArray());
                         break;
                     case "televel":
-                        result = result.ThenElseLevel(data.Take(tokenCount).ToArray(), data.Skip(tokenCount).Take(tokenCount).ToArray());
+                        result = result.ThenElseLevel
+                            (data.Take(tokenCount).ToArray(), data.Skip(tokenCount).Take(tokenCount).ToArray());
                         break;
                     case "-":
                     case "+":
@@ -194,7 +203,6 @@ namespace hw.PrioParser
                 return x._dataCache.Value[i - left.Length, j - left.Length];
 
             if(iGroup == 2 && jGroup == 0)
-            {
                 switch(Math.Sign(left.Length + x.Length - i + j))
                 {
                     case -1:
@@ -206,7 +214,6 @@ namespace hw.PrioParser
                     default:
                         throw new InvalidExpressionException();
                 }
-            }
             return data[iGroup][jGroup];
         }
         /// <summary>
@@ -232,21 +239,30 @@ namespace hw.PrioParser
         /// </summary>
         /// <param name="x"> </param>
         /// <returns> </returns>
-        public static PrioTable Left(params string[] x) { return new PrioTable('-', x); }
+        public static PrioTable Left(params string[] x)
+        {
+            return new PrioTable('-', x);
+        }
 
         /// <summary>
         ///     Define a prio table with tokens that have the same priority and are right associative
         /// </summary>
         /// <param name="x"> </param>
         /// <returns> </returns>
-        public static PrioTable Right(params string[] x) { return new PrioTable('+', x); }
+        public static PrioTable Right(params string[] x)
+        {
+            return new PrioTable('+', x);
+        }
 
         /// <summary>
         ///     Define a prio table with tokens that have the same priority and are like a list
         /// </summary>
         /// <param name="x"> </param>
         /// <returns> </returns>
-        public static PrioTable List(params string[] x) { return new PrioTable('=', x); }
+        public static PrioTable List(params string[] x)
+        {
+            return new PrioTable('=', x);
+        }
 
         /// <summary>
         ///     Define a prio table that adds a parenthesis level.
@@ -269,12 +285,21 @@ namespace hw.PrioParser
         /// <param name="lToken"> list of strings that play the role of left parenthesis </param>
         /// <param name="rToken"> list of strings that play the role of right parenthesis </param>
         /// <returns> </returns>
-        public PrioTable Level(string[] data, string[] lToken, string[] rToken) { return new PrioTable(this, data, lToken, rToken); }
+        public PrioTable Level(string[] data, string[] lToken, string[] rToken)
+        {
+            return new PrioTable(this, data, lToken, rToken);
+        }
 
         public PrioTable ParenthesisLevel(string[] lToken, string[] rToken) { return Level(_parenthesisTable, lToken, rToken); }
         public PrioTable ThenElseLevel(string[] lToken, string[] rToken) { return Level(_thenElseTable, lToken, rToken); }
-        public PrioTable ParenthesisLevel(string lToken, string rToken) { return Level(_parenthesisTable, new[] {lToken}, new[] {rToken}); }
-        public PrioTable ThenElseLevel(string lToken, string rToken) { return Level(_thenElseTable, new[] {lToken}, new[] {rToken}); }
+        public PrioTable ParenthesisLevel(string lToken, string rToken)
+        {
+            return Level(_parenthesisTable, new[] {lToken}, new[] {rToken});
+        }
+        public PrioTable ThenElseLevel(string lToken, string rToken)
+        {
+            return Level(_thenElseTable, new[] {lToken}, new[] {rToken});
+        }
 
         public static PrioTable operator +(PrioTable x, PrioTable y) { return new PrioTable(x, y); }
 
@@ -285,7 +310,10 @@ namespace hw.PrioParser
         /// <param name="y"> lower priority tokens </param>
         /// <returns> </returns>
         [UsedImplicitly]
-        public static PrioTable Add(PrioTable x, PrioTable y) { return new PrioTable(x, y); }
+        public static PrioTable Add(PrioTable x, PrioTable y)
+        {
+            return new PrioTable(x, y);
+        }
 
         /// <summary>
         ///     Manual correction of table entries
@@ -294,7 +322,10 @@ namespace hw.PrioParser
         /// <param name="t"> </param>
         /// <param name="d"> </param>
         [UsedImplicitly]
-        public void Correct(string n, string t, char d) { _dataCache.Value[Index(n), Index(t)] = d; }
+        public void Correct(string n, string t, char d)
+        {
+            _dataCache.Value[Index(n), Index(t)] = d;
+        }
 
         /// <summary>
         ///     List of names, without the special tokens "frame", "end" and "else" in angle brackets
@@ -364,9 +395,9 @@ namespace hw.PrioParser
             }
         }
 
-        static readonly string[] _parenthesisTable = new[] {"++-", "+?-", "?--"};
+        static readonly string[] _parenthesisTable = {"++-", "+?-", "?--"};
 
-        static readonly string[] _thenElseTable = new[] {"+--", "+?+", "?-+"};
+        static readonly string[] _thenElseTable = {"+--", "+?+", "?-+"};
 
         void Sort()
         {

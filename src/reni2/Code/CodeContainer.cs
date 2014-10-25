@@ -42,7 +42,7 @@ namespace Reni.Code
         [Node]
         readonly FunctionCache<int, FunctionContainer> _functions;
 
-        public CodeContainer(Root rootContext, ParsedSyntax syntax, string description)
+        public CodeContainer(Root rootContext, ReniParser.Syntax syntax, string description)
         {
             _rootContext = rootContext;
             _mainCache = new ValueCache<Container>(() => rootContext.MainContainer(syntax, description));

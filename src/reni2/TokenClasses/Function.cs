@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.Parser;
+using hw.Scanner;
 using Reni.ReniParser;
 
 namespace Reni.TokenClasses
@@ -16,25 +16,27 @@ namespace Reni.TokenClasses
             _isMetaFunction = isMetaFunction;
         }
 
-        protected override ParsedSyntax PrefixSyntax(TokenData token, ParsedSyntax right)
+        protected override Syntax PrefixSyntax(SourcePart token, Syntax right)
         {
             return new FunctionSyntax
-                (token
-                    , null
-                    , _isImplicit
-                    , _isMetaFunction
-                    , right.ToCompiledSyntax()
+                (
+                token,
+                null,
+                _isImplicit,
+                _isMetaFunction,
+                right.ToCompiledSyntax()
                 );
         }
 
-        protected override ParsedSyntax InfixSyntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
+        protected override Syntax InfixSyntax(Syntax left, SourcePart token, Syntax right)
         {
             return new FunctionSyntax
-                (token
-                    , left.ToCompiledSyntax()
-                    , _isImplicit
-                    , _isMetaFunction
-                    , right.ToCompiledSyntax()
+                (
+                token,
+                left.ToCompiledSyntax(),
+                _isImplicit,
+                _isMetaFunction,
+                right.ToCompiledSyntax()
                 );
         }
     }

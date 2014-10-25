@@ -1,26 +1,26 @@
 using System;
 using System.Collections.Generic;
+using hw.Helper;
 using System.Linq;
 using hw.Debug;
 using hw.Forms;
-using hw.Helper;
-using hw.Parser;
+using hw.Scanner;
 using Reni.TokenClasses;
 
 namespace Reni.ReniParser
 {
     sealed class DefinableToken : DumpableObject, IIconKeyProvider
     {
-        readonly TokenData _data;
+        readonly SourcePart _data;
         readonly Definable _tokenClass;
 
-        internal DefinableToken(Definable tokenClass, TokenData tokenData)
+        internal DefinableToken(Definable tokenClass, SourcePart tokenData)
         {
             _data = tokenData;
             _tokenClass = tokenClass;
         }
 
-        public TokenData Data { get { return _data; } }
+        public SourcePart Data { get { return _data; } }
 
         [Node]
         internal Definable TokenClass { get { return _tokenClass; } }

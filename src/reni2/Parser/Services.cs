@@ -1,11 +1,10 @@
-using System.Drawing;
 using System.Linq;
 using System.Collections.Generic;
 using System;
+using System.Drawing;
 using hw.Debug;
 using hw.Graphics;
 using hw.Parser;
-using hw.PrioParser;
 using hw.Scanner;
 
 namespace Reni.Parser
@@ -25,7 +24,7 @@ namespace Reni.Parser
             if(string.IsNullOrEmpty(code))
                 return null;
 
-            return (IGraphTarget) Position.Parse(new Source(code), new SimpleTokenFactory(prioTable),new ReniScanner());
+            return (IGraphTarget) Position.Parse(new Source(code), new SimpleTokenFactory(prioTable), new ReniScanner());
         }
 
         public static string ToBase64(this Image image)

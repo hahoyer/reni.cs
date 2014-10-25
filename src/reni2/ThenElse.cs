@@ -4,11 +4,12 @@ using System.Linq;
 using hw.Debug;
 using hw.Forms;
 using hw.Parser;
+using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Context;
 using Reni.ReniParser;
-using Reni.Syntax;
+using Reni.ReniSyntax;
 using Reni.Type;
 
 namespace Reni
@@ -28,14 +29,14 @@ namespace Reni
         protected CondSyntax
             (
             CompileSyntax condSyntax,
-            TokenData thenToken,
+            SourcePart thenToken,
             CompileSyntax thenSyntax,
             CompileSyntax elseSyntax)
             : base(thenToken)
         {
             Cond = condSyntax;
             Then = thenSyntax;
-            Else = elseSyntax ?? new EmptyList(thenToken, thenToken);
+            Else = elseSyntax ?? new EmptyList(thenToken);
         }
 
         internal override Result ObtainResult(ContextBase context, Category category)
@@ -44,7 +45,7 @@ namespace Reni
         }
 
         [DisableDump]
-        protected override ParsedSyntaxBase[] Children { get { return new ParsedSyntaxBase[] {Cond, Then, Else}; } }
+        protected override ParsedSyntax[] Children { get { return new ParsedSyntax[] {Cond, Then, Else}; } }
 
         Result CondResult(ContextBase context, Category category)
         {
@@ -106,11 +107,11 @@ namespace Reni
 
     sealed class ThenSyntax : CondSyntax
     {
-        internal ThenSyntax(CompileSyntax condSyntax, TokenData thenToken, CompileSyntax thenSyntax)
+        internal ThenSyntax(CompileSyntax condSyntax, SourcePart thenToken, CompileSyntax thenSyntax)
             : base(condSyntax, thenToken, thenSyntax, null)
         {}
 
-        internal override ParsedSyntax CreateElseSyntax(TokenData token, CompileSyntax elseSyntax)
+        internal override Syntax CreateElseSyntax(SourcePart token, CompileSyntax elseSyntax)
         {
             return new ThenElseSyntax(Cond, Token, Then, token, elseSyntax);
         }
@@ -126,14 +127,14 @@ namespace Reni
     sealed class ThenElseSyntax : CondSyntax
     {
         [Node]
-        readonly TokenData _elseToken;
+        readonly SourcePart _elseToken;
 
         public ThenElseSyntax
             (
             CompileSyntax condSyntax,
-            TokenData thenToken,
+            SourcePart thenToken,
             CompileSyntax thenSyntax,
-            TokenData elseToken,
+            SourcePart elseToken,
             CompileSyntax elseSyntax)
             : base(condSyntax, thenToken, thenSyntax, elseSyntax)
         {

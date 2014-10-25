@@ -1,35 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using hw.Helper;
 using System.Linq;
 using System.Threading;
 using hw.Debug;
 using hw.Forms;
-using hw.Helper;
 using hw.Parser;
-using hw.PrioParser;
 using hw.Scanner;
 using Reni.Code;
 using Reni.Context;
 using Reni.Parser;
 using Reni.ReniParser;
+using Reni.ReniSyntax;
 using Reni.Runtime;
 using Reni.Struct;
-using Reni.Syntax;
 using Reni.Validation;
 
 namespace Reni
 {
     public sealed class Compiler : DumpableObject, IExecutionContext
     {
-        readonly string _fileName;
         readonly CompilerParameters _parameters;
-        readonly Root _rootContext;
         readonly string _className;
         static readonly ReniScanner _scanner = new ReniScanner();
         readonly MainTokenFactory _tokenFactory = new MainTokenFactory();
 
         readonly ValueCache<Source> _source;
-        readonly ValueCache<ParsedSyntax> _syntax;
+        readonly ValueCache<Syntax> _syntax;
         readonly ValueCache<CodeContainer> _codeContainer;
         readonly ValueCache<string> _cSharpCode;
 
@@ -42,19 +39,19 @@ namespace Reni
         public Compiler(string fileName, CompilerParameters parameters = null, string className = null)
         {
             _className = className ?? fileName.Symbolize();
-            _fileName = fileName;
-            _rootContext = new Root(this);
+            FileName = fileName;
+            RootContext = new Root(this);
             _parameters = parameters ?? new CompilerParameters();
 
             _source = new ValueCache<Source>(() => new Source(FileName.FileHandle()));
-            _syntax = new ValueCache<ParsedSyntax>(() => Parse(Source+0, _tokenFactory));
+            _syntax = new ValueCache<Syntax>(() => Parse(Source + 0, _tokenFactory));
             _codeContainer = new ValueCache<CodeContainer>(() => new CodeContainer(RootContext, Syntax, Source.Data));
             _cSharpCode = new ValueCache<string>(() => _codeContainer.Value.CreateCSharpString(_className));
         }
 
 
         [DisableDump]
-        string FileName { get { return _fileName; } }
+        string FileName { get; }
 
         [Node]
         [DisableDump]
@@ -62,7 +59,7 @@ namespace Reni
 
         [Node]
         [DisableDump]
-        internal ParsedSyntax Syntax { get { return _syntax.Value; } }
+        internal Syntax Syntax { get { return _syntax.Value; } }
 
         [Node]
         [DisableDump]
@@ -74,7 +71,7 @@ namespace Reni
 
         [Node]
         [DisableDump]
-        Root RootContext { get { return _rootContext; } }
+        Root RootContext { get; }
 
         [DisableDump]
         bool IsInExecutionPhase { get; set; }
@@ -158,9 +155,10 @@ namespace Reni
 
         internal IEnumerable<IssueBase> Issues { get { return CodeContainer.Issues; } }
 
-        internal static ParsedSyntax Parse(SourcePosn source, ITokenFactory tokenFactory, Stack<OpenItem<IParsedSyntax>> stack = null)
+        internal static Syntax Parse
+            (SourcePosn source, ITokenFactory<Syntax> tokenFactory, Stack<OpenItem<Syntax>> stack = null)
         {
-            return (ParsedSyntax) Position.Parse
+            return (Syntax) Position.Parse
                 (
                     source,
                     tokenFactory,
@@ -187,7 +185,10 @@ namespace Reni
             fileHandle.AssumeDirectoryOfFileExists();
             fileHandle.String = text;
             var stringStream = new StringStream();
-            var parameters = new CompilerParameters {OutStream = stringStream};
+            var parameters = new CompilerParameters
+            {
+                OutStream = stringStream
+            };
             var c = new Compiler(fileName, parameters);
 
             var exceptionText = "";

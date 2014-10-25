@@ -8,3 +8,4 @@ obj/
 *.dll
 *.pdb
 /src/packages/**
+*.sln.ide

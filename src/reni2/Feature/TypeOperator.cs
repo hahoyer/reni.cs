@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Reni.Basics;
 using Reni.Context;
-using Reni.Syntax;
+using Reni.ReniSyntax;
 using Reni.TokenClasses;
 
 namespace Reni.Feature

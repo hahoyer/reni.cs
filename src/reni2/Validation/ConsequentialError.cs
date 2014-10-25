@@ -2,7 +2,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using hw.Debug;
-using hw.Parser;
+using hw.Scanner;
 using Reni.Code;
 using Reni.Parser;
 
@@ -13,7 +13,7 @@ namespace Reni.Validation
         [EnableDump]
         readonly IssueBase _issueBase;
 
-        public ConsequentialError(TokenData position, IssueBase issueBase)
+        public ConsequentialError(SourcePart position, IssueBase issueBase)
             : base(position, IssueId.ConsequentialError) { _issueBase = issueBase; }
         internal override CodeBase Code { get { return _issueBase.Code + base.Code; } }
     }

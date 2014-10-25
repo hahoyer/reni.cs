@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.Parser;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.ReniParser;
-using Reni.Syntax;
+using Reni.ReniSyntax;
 
 namespace Reni.TokenClasses
 {
     abstract class TerminalToken : TokenClass, ITerminal
     {
-        protected override sealed ParsedSyntax TerminalSyntax(TokenData token) { return new TerminalSyntax(token, this); }
-        public abstract Result Result(ContextBase context, Category category, TokenData token);
+        protected override sealed Syntax TerminalSyntax(SourcePart token) { return new TerminalSyntax(token, this); }
+        public abstract Result Result(ContextBase context, Category category, SourcePart token);
         CompileSyntax ITerminal.Visit(ISyntaxVisitor visitor) { return Visit(visitor); }
-        
+
         internal virtual CompileSyntax Visit(ISyntaxVisitor visitor)
         {
             NotImplementedMethod(visitor);
@@ -24,12 +24,12 @@ namespace Reni.TokenClasses
 
     abstract class NonPrefix : TokenClass, ITerminal, ISuffix
     {
-        protected override sealed ParsedSyntax TerminalSyntax(TokenData token) { return new TerminalSyntax(token, this); }
-        protected override sealed ParsedSyntax SuffixSyntax(ParsedSyntax left, TokenData token)
+        protected override sealed Syntax TerminalSyntax(SourcePart token) { return new TerminalSyntax(token, this); }
+        protected override sealed Syntax SuffixSyntax(Syntax left, SourcePart token)
         {
             return new SuffixSyntax(token, left.ToCompiledSyntax(), this);
         }
-        public abstract Result Result(ContextBase context, Category category, TokenData token);
+        public abstract Result Result(ContextBase context, Category category, SourcePart token);
         public abstract Result Result(ContextBase context, Category category, CompileSyntax left);
         CompileSyntax ITerminal.Visit(ISyntaxVisitor visitor) { return Visit(visitor); }
 
@@ -42,13 +42,13 @@ namespace Reni.TokenClasses
 
     abstract class NonSuffix : TokenClass, ITerminal, IPrefix
     {
-        protected override ParsedSyntax TerminalSyntax(TokenData token) { return new TerminalSyntax(token, this); }
-        protected override ParsedSyntax PrefixSyntax(TokenData token, ParsedSyntax right)
+        protected override Syntax TerminalSyntax(SourcePart token) { return new TerminalSyntax(token, this); }
+        protected override Syntax PrefixSyntax(SourcePart token, Syntax right)
         {
             return new PrefixSyntax(token, this, right.ToCompiledSyntax());
         }
-        public abstract Result Result(ContextBase context, Category category, TokenData token);
-        public abstract Result Result(ContextBase context, Category category, TokenData token, CompileSyntax right);
+        public abstract Result Result(ContextBase context, Category category, SourcePart token);
+        public abstract Result Result(ContextBase context, Category category, SourcePart token, CompileSyntax right);
         CompileSyntax ITerminal.Visit(ISyntaxVisitor visitor) { return Visit(visitor); }
 
         internal virtual CompileSyntax Visit(ISyntaxVisitor visitor)
@@ -60,16 +60,16 @@ namespace Reni.TokenClasses
 
     abstract class Prefix : TokenClass, IPrefix
     {
-        protected override ParsedSyntax PrefixSyntax(TokenData token, ParsedSyntax right)
+        protected override Syntax PrefixSyntax(SourcePart token, Syntax right)
         {
             return new PrefixSyntax(token, this, right.ToCompiledSyntax());
         }
-        public abstract Result Result(ContextBase context, Category category, TokenData token, CompileSyntax right);
+        public abstract Result Result(ContextBase context, Category category, SourcePart token, CompileSyntax right);
     }
 
     abstract class Suffix : TokenClass, ISuffix
     {
-        protected override sealed ParsedSyntax SuffixSyntax(ParsedSyntax left, TokenData token)
+        protected override sealed Syntax SuffixSyntax(Syntax left, SourcePart token)
         {
             return new SuffixSyntax(token, left.ToCompiledSyntax(), this);
         }
@@ -78,7 +78,7 @@ namespace Reni.TokenClasses
 
     abstract class Infix : TokenClass, IInfix
     {
-        protected override sealed ParsedSyntax InfixSyntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
+        protected override sealed Syntax InfixSyntax(Syntax left, SourcePart token, Syntax right)
         {
             return new InfixSyntax
                 (

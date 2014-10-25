@@ -4,8 +4,8 @@ using System;
 using hw.Debug;
 using Reni.Basics;
 using Reni.Feature;
+using Reni.ReniSyntax;
 using Reni.Struct;
-using Reni.Syntax;
 using Reni.Type;
 
 namespace Reni.Context

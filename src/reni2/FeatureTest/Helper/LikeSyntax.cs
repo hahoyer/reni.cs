@@ -26,8 +26,8 @@ using System.Linq;
 using hw.Debug;
 using hw.Parser;
 using Reni.ReniParser;
+using Reni.ReniSyntax;
 using Reni.Struct;
-using Reni.Syntax;
 
 namespace Reni.FeatureTest.Helper
 {
@@ -43,7 +43,7 @@ namespace Reni.FeatureTest.Helper
 
         public static LikeSyntax Struct(LikeSyntax[] list, Declaration[] declarations, int[] converters) { return new Struct(list, declarations, converters); }
 
-        public abstract void AssertLike(IParsedSyntax syntax);
+        public abstract void AssertLike(Syntax syntax);
 
         public static LikeSyntax operator +(LikeSyntax x, LikeSyntax y) { return x.Expression("+", y); }
         public static LikeSyntax operator -(LikeSyntax x, LikeSyntax y) { return x.Expression("-", y); }
@@ -60,7 +60,7 @@ namespace Reni.FeatureTest.Helper
 
     sealed class Empty : LikeSyntax
     {
-        public override void AssertLike(IParsedSyntax syntax) { Tracer.Assert(syntax is EmptyList); }
+        public override void AssertLike(Syntax syntax) { Tracer.Assert(syntax is EmptyList); }
     }
 
     sealed class Declaration
@@ -94,7 +94,7 @@ namespace Reni.FeatureTest.Helper
             _converters = converters;
         }
 
-        public override void AssertLike(IParsedSyntax syntax)
+        public override void AssertLike(Syntax syntax)
         {
             var co = (Container) syntax;
             Tracer.Assert(_list.Length == co.Statements.Length);
@@ -124,7 +124,7 @@ namespace Reni.FeatureTest.Helper
             _s3 = s3;
         }
 
-        public override void AssertLike(IParsedSyntax syntax)
+        public override void AssertLike(Syntax syntax)
         {
             var ex = (ExpressionSyntax) syntax;
             AssertLike(_s1, ex.Left);
@@ -147,7 +147,7 @@ namespace Reni.FeatureTest.Helper
 
         internal Number(Int64 i) { _i = i; }
 
-        public override void AssertLike(IParsedSyntax syntax)
+        public override void AssertLike(Syntax syntax)
         {
             var terminalSyntax = (TerminalSyntax) syntax;
             Tracer.Assert(terminalSyntax.Terminal is TokenClasses.Number);
