@@ -119,7 +119,7 @@ ParLevel ( { ) }
         <div>
             <textarea name="Code" rows="2" cols="50" onchange=" submit() ">@code</textarea>
         </div>
-        @Html.Raw(Root.Create(prioTable.Syntax(code)).SerializeObject())
+        @Html.Raw(Root.Create(prioTable.Parse(code)).SerializeObject())
     </div>
 </form>
 <br />

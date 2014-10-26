@@ -22,14 +22,20 @@ namespace Reni
     {
         readonly CompilerParameters _parameters;
         readonly string _className;
-        static readonly ReniScanner _scanner = new ReniScanner();
-        readonly MainTokenFactory _tokenFactory = new MainTokenFactory();
+        readonly string _fileName;
+
+        readonly IParser<Syntax> _parser = new PrioParser<Syntax>
+            (MainTokenFactory.PrioTable, new Scanner<Syntax>(ReniLexer.Instance), new MainTokenFactory());
 
         readonly ValueCache<Source> _source;
         readonly ValueCache<Syntax> _syntax;
         readonly ValueCache<CodeContainer> _codeContainer;
         readonly ValueCache<string> _cSharpCode;
 
+        [Node]
+        readonly Root _rootContext;
+
+        bool _isInExecutionPhase;
         /// <summary>
         ///     ctor from file
         /// </summary>
@@ -39,19 +45,16 @@ namespace Reni
         public Compiler(string fileName, CompilerParameters parameters = null, string className = null)
         {
             _className = className ?? fileName.Symbolize();
-            FileName = fileName;
-            RootContext = new Root(this);
+            _fileName = fileName;
+            _rootContext = new Root(this);
             _parameters = parameters ?? new CompilerParameters();
 
-            _source = new ValueCache<Source>(() => new Source(FileName.FileHandle()));
-            _syntax = new ValueCache<Syntax>(() => Parse(Source + 0, _tokenFactory));
-            _codeContainer = new ValueCache<CodeContainer>(() => new CodeContainer(RootContext, Syntax, Source.Data));
+            _source = new ValueCache<Source>(() => new Source(_fileName.FileHandle()));
+            _syntax = new ValueCache<Syntax>(() => Parse(Source + 0));
+            _codeContainer = new ValueCache<CodeContainer>(() => new CodeContainer(_rootContext, Syntax, Source.Data));
             _cSharpCode = new ValueCache<string>(() => _codeContainer.Value.CreateCSharpString(_className));
         }
 
-
-        [DisableDump]
-        string FileName { get; }
 
         [Node]
         [DisableDump]
@@ -68,13 +71,6 @@ namespace Reni
         [DisableDump]
         [Node]
         internal string CSharpCode { get { return _cSharpCode.Value; } }
-
-        [Node]
-        [DisableDump]
-        Root RootContext { get; }
-
-        [DisableDump]
-        bool IsInExecutionPhase { get; set; }
 
         internal static string FormattedNow
         {
@@ -95,11 +91,11 @@ namespace Reni
         }
 
         IOutStream IExecutionContext.OutStream { get { return _parameters.OutStream; } }
-        bool IExecutionContext.IsTraceEnabled { get { return IsInExecutionPhase && _parameters.Trace.Functions; } }
+        bool IExecutionContext.IsTraceEnabled { get { return _isInExecutionPhase && _parameters.Trace.Functions; } }
         CodeBase IExecutionContext.Function(FunctionId functionId) { return CodeContainer.Function(functionId); }
         CompileSyntax IExecutionContext.Parse(string source) { return Parse(source); }
 
-        CompileSyntax Parse(string sourceText) { return Parse(new Source(sourceText) + 0, _tokenFactory).ToCompiledSyntax(); }
+        CompileSyntax Parse(string sourceText) { return Parse(new Source(sourceText) + 0).ToCompiledSyntax(); }
 
         /// <summary>
         ///     Performs compilation
@@ -138,7 +134,7 @@ namespace Reni
                     .GetExportedTypes()[0]
                     .GetMethod(Generator.MainFunctionName);
 
-                IsInExecutionPhase = true;
+                _isInExecutionPhase = true;
                 method.Invoke(null, new object[0]);
             }
             catch(CSharpCompilerErrorException e)
@@ -148,23 +144,14 @@ namespace Reni
             }
             finally
             {
-                IsInExecutionPhase = false;
+                _isInExecutionPhase = false;
                 Data.OutStream = null;
             }
         }
 
         internal IEnumerable<IssueBase> Issues { get { return CodeContainer.Issues; } }
 
-        internal static Syntax Parse
-            (SourcePosn source, ITokenFactory<Syntax> tokenFactory, Stack<OpenItem<Syntax>> stack = null)
-        {
-            return (Syntax) Position.Parse
-                (
-                    source,
-                    tokenFactory,
-                    _scanner,
-                    stack);
-        }
+        internal Syntax Parse(SourcePosn source) { return _parser.Execute(source); }
 
         void RunFromCode() { _codeContainer.Value.Execute(this); }
 

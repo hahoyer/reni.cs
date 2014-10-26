@@ -14,15 +14,16 @@ namespace Reni.Validation
     {
         [EnableDump]
         readonly IssueBase _issue;
+        readonly Root _rootContext;
 
         public IssueType(IssueBase issue, Root rootContext)
         {
             _issue = issue;
-            RootContext = rootContext;
+            _rootContext = rootContext;
         }
 
         [DisableDump]
-        internal override Root RootContext { get; }
+        internal override Root RootContext { get { return _rootContext; } }
 
         [DisableDump]
         internal override bool Hllw { get { return true; } }

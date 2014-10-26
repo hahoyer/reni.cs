@@ -14,7 +14,7 @@ namespace Reni.ReniParser
 {
     sealed class MainTokenFactory : TokenFactory<TokenClass, Syntax>
     {
-        static PrioTable PrioTable
+        internal static PrioTable PrioTable
         {
             get
             {
