@@ -14,25 +14,39 @@ namespace Reni.TokenClasses
     {
         protected override sealed Syntax Create(Syntax left, SourcePart token, Syntax right)
         {
-            StartMethodDump(false, left, token, right);
-            try
-            {
-                BreakExecution();
-                var result = CreateForVisit(left, token, right);
-                return ReturnMethodDump(result);
-            }
-            finally
-            {
-                EndMethodDump();
-            }
+            return this.Operation(left, token, right);
         }
         internal Syntax CreateForVisit(Syntax left, SourcePart token, Syntax right) { return this.Operation(left, token, right); }
 
 
-        Syntax IOperator<Syntax>.Terminal(SourcePart token) { return TerminalSyntax(token); }
-        Syntax IOperator<Syntax>.Prefix(SourcePart token, Syntax right) { return PrefixSyntax(token, right); }
-        Syntax IOperator<Syntax>.Suffix(Syntax left, SourcePart token) { return SuffixSyntax(left, token); }
-        Syntax IOperator<Syntax>.Infix(Syntax left, SourcePart token, Syntax right) { return InfixSyntax(left, token, right); }
+        Syntax IOperator<Syntax>.Terminal(SourcePart token) { return Terminal(token); }
+        Syntax IOperator<Syntax>.Prefix(SourcePart token, Syntax right) { return Prefix(token, right); }
+        Syntax IOperator<Syntax>.Suffix(Syntax left, SourcePart token) { return Suffix(left, token); }
+        Syntax IOperator<Syntax>.Infix(Syntax left, SourcePart token, Syntax right) { return Infix(left, token, right); }
+
+        protected virtual Syntax Terminal(SourcePart token)
+        {
+            NotImplementedMethod(token);
+            return null;
+        }
+
+        protected virtual Syntax Prefix(SourcePart token, Syntax right)
+        {
+            NotImplementedMethod(token, right);
+            return null;
+        }
+
+        protected virtual Syntax Suffix(Syntax left, SourcePart token)
+        {
+            NotImplementedMethod(left, token);
+            return null;
+        }
+
+        protected virtual Syntax Infix(Syntax left, SourcePart token, Syntax right)
+        {
+            NotImplementedMethod(left, token, right);
+            return null;
+        }
 
         protected virtual Syntax TerminalSyntax(SourcePart token)
         {

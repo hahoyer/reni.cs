@@ -10,7 +10,7 @@ using Reni.ReniSyntax;
 
 namespace Reni.TokenClasses
 {
-    sealed class LeftParenthesis : TokenClass, IInfix, ITerminal
+    sealed class LeftParenthesis : TokenClass, IInfix
     {
         readonly int _level;
 
@@ -18,28 +18,35 @@ namespace Reni.TokenClasses
 
         [DisableDump]
         internal int Level { get { return _level; } }
+        [DisableDump]
+        protected override bool AcceptsMatch { get { return true; } }
 
-        protected override Syntax PrefixSyntax(SourcePart token, Syntax right)
+        protected override Syntax Prefix(SourcePart token, Syntax right)
         {
-            return new ReniSyntax.LeftParenthesis(_level, null, this, token, right);
+            return new LeftParenthesisSyntax(_level, null, this, token, right);
         }
         protected override Syntax InfixSyntax(Syntax left, SourcePart token, Syntax right)
         {
-            return new ReniSyntax.LeftParenthesis(_level, left, this, token, right);
+            NotImplementedMethod(left, token, right);
+            return null;
+            return new LeftParenthesisSyntax(_level, left, this, token, right);
         }
 
-        protected override Syntax TerminalSyntax(SourcePart token) { return new EmptyList.Half(token); }
+        protected override Syntax Terminal(SourcePart token)
+        {
+            return new LeftParenthesisSyntax(_level, null, this, token, null);
+        }
 
         Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
             return context.FunctionalObjectResult(category, left, right);
         }
-        Result ITerminal.Result(ContextBase context, Category category, SourcePart token)
+        Result ITerminal_Result(ContextBase context, Category category, SourcePart token)
         {
             NotImplementedMethod(context, category, token);
             return null;
         }
-        CompileSyntax ITerminal.Visit(ISyntaxVisitor visitor)
+        CompileSyntax ITerminal_Visit(ISyntaxVisitor visitor)
         {
             NotImplementedMethod(visitor);
             return null;

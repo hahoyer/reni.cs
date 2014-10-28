@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
-using hw.Parser;
 using hw.Scanner;
 using Reni.Feature;
 using Reni.Parser;
@@ -13,8 +12,8 @@ namespace Reni.TokenClasses
 {
     abstract class Definable : TokenClass
     {
-        protected override sealed ReniParser.Syntax TerminalSyntax(SourcePart token) { return new DefinableTokenSyntax(this, token); }
-        protected override sealed ReniParser.Syntax PrefixSyntax(SourcePart token, ReniParser.Syntax right)
+        protected override sealed Syntax TerminalSyntax(SourcePart token) { return new DefinableTokenSyntax(this, token); }
+        protected override sealed Syntax PrefixSyntax(SourcePart token, Syntax right)
         {
             return new ExpressionSyntax(this, null, token, (CompileSyntax) right);
         }
@@ -22,7 +21,7 @@ namespace Reni.TokenClasses
         {
             return left.CreateSyntaxOrDeclaration(this, token, null);
         }
-        protected override sealed Syntax InfixSyntax(Syntax left, SourcePart token, Syntax right)
+        protected override sealed Syntax Infix(Syntax left, SourcePart token, Syntax right)
         {
             return left.CreateSyntaxOrDeclaration(this, token, right);
         }

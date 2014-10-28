@@ -4,21 +4,22 @@ using System.Linq;
 using hw.Debug;
 using hw.Scanner;
 using Reni.ReniParser;
+using Reni.TokenClasses;
 
 namespace Reni.ReniSyntax
 {
-    sealed class LeftParenthesis : Syntax
+    sealed class LeftParenthesisSyntax : Syntax
     {
         readonly int _leftLevel;
         [EnableDump]
         readonly Syntax _left;
         [EnableDump]
-        readonly TokenClasses.LeftParenthesis _parenthesis;
+        readonly LeftParenthesis _parenthesis;
         [EnableDump]
         readonly Syntax _right;
 
-        public LeftParenthesis
-            (int leftLevel, Syntax left, TokenClasses.LeftParenthesis parenthesis, SourcePart token, Syntax right)
+        public LeftParenthesisSyntax
+            (int leftLevel, Syntax left, LeftParenthesis parenthesis, SourcePart token, Syntax right)
             : base(token)
         {
             _leftLevel = leftLevel;
@@ -45,16 +46,37 @@ namespace Reni.ReniSyntax
 
         sealed class ParenthesisMissmatchException : Exception
         {
-            readonly LeftParenthesis _leftParenthesis;
+            readonly LeftParenthesisSyntax _leftParenthesis;
             readonly int _level;
             readonly SourcePart _token;
 
-            public ParenthesisMissmatchException(LeftParenthesis leftParenthesis, int level, SourcePart token)
+            public ParenthesisMissmatchException(LeftParenthesisSyntax leftParenthesis, int level, SourcePart token)
             {
                 _leftParenthesis = leftParenthesis;
                 _level = level;
                 _token = token;
             }
+        }
+    }
+
+    sealed class RightParenthesisSyntax : Syntax
+    {
+        readonly int _rightLevel;
+        [EnableDump]
+        readonly Syntax _left;
+        [EnableDump]
+        readonly RightParenthesis _parenthesis;
+        [EnableDump]
+        readonly Syntax _right;
+
+        public RightParenthesisSyntax
+            (int level, Syntax left, RightParenthesis parenthesis, SourcePart token, Syntax right)
+            : base(token)
+        {
+            _rightLevel = level;
+            _left = left;
+            _parenthesis = parenthesis;
+            _right = right;
         }
     }
 }

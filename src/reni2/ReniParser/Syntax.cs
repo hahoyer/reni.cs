@@ -55,7 +55,7 @@ namespace Reni.ReniParser
             return null;
         }
 
-        internal virtual Syntax CreateSyntaxOrDeclaration(Definable tokenClass, SourcePart token, Syntax right)
+        internal Syntax CreateSyntaxOrDeclaration(Definable tokenClass, SourcePart token, Syntax right)
         {
             return new ExpressionSyntax(tokenClass, ToCompiledSyntax(), token, right.ToCompiledSyntaxOrNull());
         }

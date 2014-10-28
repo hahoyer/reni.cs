@@ -32,7 +32,7 @@ using Reni.Validation;
 
 namespace Reni.Struct
 {
-    sealed class AtToken : Infix
+    sealed class AtToken : InfixToken
     {
         public override Result Result(ContextBase callContext, Category category, CompileSyntax left, CompileSyntax right)
         {

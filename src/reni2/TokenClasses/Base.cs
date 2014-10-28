@@ -11,7 +11,7 @@ namespace Reni.TokenClasses
 {
     abstract class TerminalToken : TokenClass, ITerminal
     {
-        protected override sealed Syntax TerminalSyntax(SourcePart token) { return new TerminalSyntax(token, this); }
+        protected override sealed Syntax Terminal(SourcePart token) { return new TerminalSyntax(token, this); }
         public abstract Result Result(ContextBase context, Category category, SourcePart token);
         CompileSyntax ITerminal.Visit(ISyntaxVisitor visitor) { return Visit(visitor); }
 
@@ -58,7 +58,7 @@ namespace Reni.TokenClasses
         }
     }
 
-    abstract class Prefix : TokenClass, IPrefix
+    abstract class PrefixToken : TokenClass, IPrefix
     {
         protected override Syntax PrefixSyntax(SourcePart token, Syntax right)
         {
@@ -67,29 +67,20 @@ namespace Reni.TokenClasses
         public abstract Result Result(ContextBase context, Category category, SourcePart token, CompileSyntax right);
     }
 
-    abstract class Suffix : TokenClass, ISuffix
+    abstract class SuffixToken : TokenClass, ISuffix
     {
-        protected override sealed Syntax SuffixSyntax(Syntax left, SourcePart token)
+        protected override sealed Syntax Suffix(Syntax left, SourcePart token)
         {
             return new SuffixSyntax(token, left.ToCompiledSyntax(), this);
         }
         public abstract Result Result(ContextBase context, Category category, CompileSyntax left);
     }
 
-    abstract class Infix : TokenClass, IInfix
+    abstract class InfixToken : TokenClass, IInfix
     {
         protected override sealed Syntax InfixSyntax(Syntax left, SourcePart token, Syntax right)
         {
-            return new InfixSyntax
-                (
-                token
-                ,
-                left.ToCompiledSyntax()
-                ,
-                this
-                ,
-                right.ToCompiledSyntax()
-                );
+            return new InfixSyntax(token, left.ToCompiledSyntax(), this, right.ToCompiledSyntax());
         }
         public abstract Result Result(ContextBase callContext, Category category, CompileSyntax left, CompileSyntax right);
     }

@@ -1,15 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.Debug;
-using hw.Parser;
 using hw.Scanner;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
 
 namespace Reni.TokenClasses
 {
-    sealed class DefinableTokenSyntax : ReniParser.Syntax
+    sealed class DefinableTokenSyntax : Syntax
     {
         readonly Definable _definable;
 

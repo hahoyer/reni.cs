@@ -7,7 +7,7 @@ using Reni.ReniSyntax;
 
 namespace Reni.TokenClasses
 {
-    sealed class FunctionInstanceToken : Suffix
+    sealed class FunctionInstanceToken : SuffixToken
     {
         public override Result Result(ContextBase context, Category category, CompileSyntax left)
         {

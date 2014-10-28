@@ -31,7 +31,7 @@ using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
-    sealed class InstanceToken : Infix, IPendingProvider
+    sealed class InstanceToken : InfixToken, IPendingProvider
     {
         public override Result Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {

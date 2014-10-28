@@ -58,10 +58,7 @@ namespace Reni.ReniSyntax
         }
 
         protected virtual bool GetIsLambda() { return false; }
-        internal override Syntax CreateSyntaxOrDeclaration(Definable tokenClass, SourcePart token, Syntax right)
-        {
-            return new ExpressionSyntax(tokenClass, this, token, right.ToCompiledSyntaxOrNull());
-        }
+
         internal override Syntax SurroundedByParenthesis(SourcePart token, SourcePart rightToken) { return this; }
         internal override CompileSyntax ToCompiledSyntax() { return this; }
         internal void AddToCacheForDebug(ContextBase context, object cacheItem) { ResultCache.Add(context, cacheItem); }

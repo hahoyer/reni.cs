@@ -85,6 +85,7 @@ namespace Reni.ReniSyntax
             _left = left;
             _infix = infix;
             _right = right;
+            StopByObjectId(12);
         }
 
         internal override Result ObtainResult(ContextBase context, Category category)

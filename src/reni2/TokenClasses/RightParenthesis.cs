@@ -12,7 +12,6 @@ namespace Reni.TokenClasses
 
         internal RightParenthesis(int level) { _level = level; }
 
-        protected override Syntax SuffixSyntax(Syntax left, SourcePart token) { return left.RightParenthesis(_level, token); }
-        protected override bool AcceptsMatch { get { return true; } }
+        protected override Syntax Suffix(Syntax left, SourcePart token) { return left.RightParenthesis(_level, token); }
     }
 }

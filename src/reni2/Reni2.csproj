@@ -281,7 +281,7 @@
     <Compile Include="Struct\Structure.cs" />
     <Compile Include="Struct\StructureType.cs" />
     <Compile Include="Struct\FunctionInstance.cs" />
-    <Compile Include="ReniSyntax\LeftParenthesis.cs" />
+    <Compile Include="ReniSyntax\LeftParenthesisSyntax.cs" />
     <Compile Include="ReniSyntax\ListSyntax.cs" />
     <Compile Include="T4Compiler.cs" />
     <Compile Include="Feature\DumpPrint\DumpPrint.cs" />
