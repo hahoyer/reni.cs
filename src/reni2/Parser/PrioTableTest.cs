@@ -30,7 +30,7 @@ Left + -
     / 04 +----++-
     + 05 +-------
     - 06 +-------
-(eot) 07 =-------
+(eot) 07 --------
 ";
             Tracer.Assert(dump == expected.Replace("\r\n", "\n"));
         }
