@@ -30,7 +30,7 @@ namespace Reni.Parser
 
         sealed class AnyTokenClass : Services.TokenClass
         {
-            protected override Services.Syntax CreateSyntax(Services.Syntax left, SourcePart token, Services.Syntax right)
+            protected override Services.Syntax Create(Services.Syntax left, SourcePart token, Services.Syntax right)
             {
                 return Services.Syntax.CreateSyntax(left, token, right);
             }
@@ -41,7 +41,7 @@ namespace Reni.Parser
             [EnableDump]
             readonly int _level;
             public CloseToken(int level) { _level = level; }
-            protected override Services.Syntax CreateSyntax(Services.Syntax left, SourcePart token, Services.Syntax right)
+            protected override Services.Syntax Create(Services.Syntax left, SourcePart token, Services.Syntax right)
             {
                 Tracer.Assert(right == null);
                 return left == null ? null : left.Match(_level, token);
@@ -53,7 +53,7 @@ namespace Reni.Parser
             [EnableDump]
             readonly int _level;
             public OpenToken(int level) { _level = level; }
-            protected override Services.Syntax CreateSyntax(Services.Syntax left, SourcePart token, Services.Syntax right)
+            protected override Services.Syntax Create(Services.Syntax left, SourcePart token, Services.Syntax right)
             {
                 return new OpenSyntax(left, token, right, _level);
             }

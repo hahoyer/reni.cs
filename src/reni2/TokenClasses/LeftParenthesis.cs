@@ -18,8 +18,6 @@ namespace Reni.TokenClasses
 
         [DisableDump]
         internal int Level { get { return _level; } }
-        [DisableDump]
-        protected override bool AcceptsMatch { get { return true; } }
 
         protected override Syntax Prefix(SourcePart token, Syntax right)
         {

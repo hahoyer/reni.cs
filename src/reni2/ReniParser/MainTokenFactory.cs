@@ -51,7 +51,7 @@ namespace Reni.ReniParser
                 x += PrioTable.Right(",");
                 x += PrioTable.Right(";");
                 x += PrioTable.Right(".");
-                x = x.ParenthesisLevel
+                x = x.ParenthesisLevelRight
                     (
                         new[] {"(", "[", "{"},
                         new[] {")", "]", "}"}
@@ -62,7 +62,7 @@ namespace Reni.ReniParser
 
                 x += PrioTable.Right(PrioTable.Error);
 
-                x = x.ParenthesisLevel(PrioTable.BeginOfText, PrioTable.EndOfText);
+                x = x.ParenthesisLevelLeft(new []{PrioTable.BeginOfText}, new[] {PrioTable.EndOfText});
 
                 //Tracer.FlaggedLine("\n"+x.ToString());
                 return x;

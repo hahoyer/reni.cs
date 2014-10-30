@@ -17,7 +17,7 @@ namespace Reni.ReniParser
             {
                 var prioTable = PrioTable.Left(PrioTable.BeginOfText);
                 prioTable += PrioTable.Left("converter");
-                prioTable = prioTable.ParenthesisLevel
+                prioTable = prioTable.ParenthesisLevelRight
                     (
                         new[] {"(", "[", "{"},
                         new[] {")", "]", "}"}

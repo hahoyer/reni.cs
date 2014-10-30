@@ -1,7 +1,7 @@
+using System.Drawing;
 using System.Linq;
 using System.Collections.Generic;
 using System;
-using System.Drawing;
 using hw.Debug;
 using hw.Forms;
 using hw.Graphics;
@@ -25,8 +25,9 @@ namespace Reni.Parser
             if(string.IsNullOrEmpty(code))
                 return null;
 
-            IParser<Syntax> parser = new PrioParser<Syntax>(prioTable, new Scanner<Syntax>(ReniLexer.Instance),new SimpleTokenFactory() );
-            return (IGraphTarget) parser.Execute(new Source(code)+0);
+            IParser<Syntax> parser = new PrioParser<Syntax>
+                (prioTable, new Scanner<Syntax>(ReniLexer.Instance), new SimpleTokenFactory());
+            return parser.Execute(new Source(code) + 0);
         }
 
         public static string ToBase64(this Image image)
@@ -47,13 +48,10 @@ namespace Reni.Parser
         internal abstract class TokenClass : DumpableObject, IType<Syntax>, INameProvider
         {
             string _name;
-            Syntax IType<Syntax>.Create(Syntax left, SourcePart part, Syntax right, bool isMatch)
-            {
-                return CreateSyntax((Syntax)left, (SourcePart)part, (Syntax)right);
-            }
+            Syntax IType<Syntax>.Create(Syntax left, SourcePart part, Syntax right) { return Create(left, part, right); }
             string IType<Syntax>.PrioTableName { get { return _name; } }
             ISubParser<Syntax> IType<Syntax>.Next { get { return null; } }
-            protected abstract Syntax CreateSyntax(Syntax left, SourcePart token, Syntax right);
+            protected abstract Syntax Create(Syntax left, SourcePart token, Syntax right);
             string INameProvider.Name { set { _name = value; } }
         }
 
@@ -76,21 +74,21 @@ namespace Reni.Parser
             public string Title { get { return _token.Name; } }
 
             [DisableDump]
-            public IGraphTarget[] Children { get { return new[] { Left, Right }; } }
+            public IGraphTarget[] Children { get { return new[] {Left, Right}; } }
 
             protected virtual IGraphTarget Right { get { return null; } }
             protected virtual IGraphTarget Left { get { return null; } }
 
             internal static Syntax CreateSyntax(Syntax left, SourcePart token, Syntax right)
             {
-                if (left == null)
+                if(left == null)
                 {
-                    if (right == null)
+                    if(right == null)
                         return new TerminalSyntax(token);
                     return new PrefixSyntax(token, right);
                 }
 
-                if (right == null)
+                if(right == null)
                     return new SuffixSyntax(left, token);
                 return new InfixSyntax(left, token, right);
             }
@@ -139,7 +137,7 @@ namespace Reni.Parser
             {
                 public TerminalSyntax(SourcePart token)
                     : base(token)
-                { }
+                {}
                 internal override Syntax ParenthesisMatch(SourcePart token, Syntax argument)
                 {
                     return CreateSyntax(null, FirstToken, argument);
