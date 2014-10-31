@@ -42,8 +42,8 @@ namespace Reni.TokenClasses
 
     abstract class NonSuffix : TokenClass, ITerminal, IPrefix
     {
-        protected override Syntax TerminalSyntax(SourcePart token) { return new TerminalSyntax(token, this); }
-        protected override Syntax PrefixSyntax(SourcePart token, Syntax right)
+        protected override Syntax Terminal(SourcePart token) { return new TerminalSyntax(token, this); }
+        protected override Syntax Prefix(SourcePart token, Syntax right)
         {
             return new PrefixSyntax(token, this, right.ToCompiledSyntax());
         }

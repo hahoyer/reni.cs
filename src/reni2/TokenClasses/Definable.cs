@@ -12,8 +12,8 @@ namespace Reni.TokenClasses
 {
     abstract class Definable : TokenClass
     {
-        protected override sealed Syntax TerminalSyntax(SourcePart token) { return new DefinableTokenSyntax(this, token); }
-        protected override sealed Syntax PrefixSyntax(SourcePart token, Syntax right)
+        protected override sealed Syntax Terminal(SourcePart token) { return new DefinableTokenSyntax(this, token); }
+        protected override sealed Syntax Prefix(SourcePart token, Syntax right)
         {
             return new ExpressionSyntax(this, null, token, (CompileSyntax) right);
         }
