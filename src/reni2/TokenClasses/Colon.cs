@@ -11,7 +11,7 @@ namespace Reni.TokenClasses
 {
     sealed class Colon : TokenClass
     {
-        protected override Syntax InfixSyntax(Syntax left, SourcePart token, Syntax right)
+        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
         {
             return left
                 .CreateDeclarationSyntax(token, right);
@@ -20,16 +20,14 @@ namespace Reni.TokenClasses
 
     sealed class Exclamation : TokenClass
     {
-        static readonly ITokenFactory<Syntax> _tokenFactory = DeclarationTokenFactory.Instance;
+        static readonly ISubParser<Syntax> _parser = MainTokenFactory.DeclarationSyntaxParserInstance;
         protected override Syntax TerminalSyntax(SourcePart token) { return new ExclamationSyntax(token); }
+        protected override ISubParser<Syntax> Next { get { return _parser; } }
     }
 
     sealed class ConverterToken : TokenClass
     {
-        protected override Syntax TerminalSyntax(SourcePart token)
-        {
-            return new ConverterDeclarationSyntax(token, token);
-        }
+        protected override Syntax Terminal(SourcePart token) { return new ConverterDeclarationSyntax(token, token); }
 
         protected override Syntax SuffixSyntax(Syntax left, SourcePart token)
         {
@@ -41,8 +39,7 @@ namespace Reni.TokenClasses
     abstract class DeclarationExtensionSyntax : Syntax
     {
         protected DeclarationExtensionSyntax(SourcePart token)
-            : base(token)
-        {}
+            : base(token) { }
 
         internal virtual Syntax ExtendByConverter(SourcePart token)
         {
@@ -56,10 +53,7 @@ namespace Reni.TokenClasses
         readonly SourcePart _token;
 
         internal ConverterDeclarationSyntax(SourcePart token, SourcePart otherToken)
-            : base(token)
-        {
-            _token = otherToken;
-        }
+            : base(token) { _token = otherToken; }
 
         internal override Syntax CreateDeclarationSyntax(SourcePart token, Syntax right)
         {
@@ -79,8 +73,7 @@ namespace Reni.TokenClasses
     sealed class ExclamationSyntax : DeclarationExtensionSyntax
     {
         internal ExclamationSyntax(SourcePart token)
-            : base(token)
-        {}
+            : base(token) { }
 
         internal override Syntax ExtendByConverter(SourcePart token) { return new ConverterDeclarationSyntax(Token, token); }
     }

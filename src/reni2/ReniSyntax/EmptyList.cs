@@ -28,7 +28,7 @@ namespace Reni.ReniSyntax
             {}
 
             protected override string GetNodeDump() { return "("; }
-            internal override Syntax RightParenthesis(int level, SourcePart token) { return new EmptyList(Token); }
+            internal Syntax RightParenthesis(int level, SourcePart token) { return new EmptyList(Token); }
         }
     }
 }

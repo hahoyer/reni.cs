@@ -78,7 +78,7 @@ namespace Reni.TokenClasses
 
     abstract class InfixToken : TokenClass, IInfix
     {
-        protected override sealed Syntax InfixSyntax(Syntax left, SourcePart token, Syntax right)
+        protected override sealed Syntax Infix(Syntax left, SourcePart token, Syntax right)
         {
             return new InfixSyntax(token, left.ToCompiledSyntax(), this, right.ToCompiledSyntax());
         }

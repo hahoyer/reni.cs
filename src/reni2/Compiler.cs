@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading;
 using hw.Debug;
 using hw.Forms;
-using hw.Parser;
 using hw.Scanner;
 using Reni.Code;
 using Reni.Context;
@@ -23,9 +22,6 @@ namespace Reni
         readonly CompilerParameters _parameters;
         readonly string _className;
         readonly string _fileName;
-
-        readonly IParser<Syntax> _parser = new PrioParser<Syntax>
-            (MainTokenFactory.PrioTable, new Scanner<Syntax>(ReniLexer.Instance), new MainTokenFactory());
 
         readonly ValueCache<Source> _source;
         readonly ValueCache<Syntax> _syntax;
@@ -151,7 +147,7 @@ namespace Reni
 
         internal IEnumerable<IssueBase> Issues { get { return CodeContainer.Issues; } }
 
-        internal Syntax Parse(SourcePosn source) { return _parser.Execute(source); }
+        internal static Syntax Parse(SourcePosn source) { return MainTokenFactory.ParserInstance.Execute(source); }
 
         void RunFromCode() { _codeContainer.Value.Execute(this); }
 

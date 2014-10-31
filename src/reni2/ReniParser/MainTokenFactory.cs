@@ -6,6 +6,7 @@ using hw.Parser;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
+using Reni.Parser;
 using Reni.Sequence;
 using Reni.Struct;
 using Reni.TokenClasses;
@@ -14,7 +15,9 @@ namespace Reni.ReniParser
 {
     sealed class MainTokenFactory : TokenFactory<TokenClass, Syntax>
     {
-        internal static PrioTable PrioTable
+        static readonly ITokenFactory<Syntax> _instance = new MainTokenFactory();
+
+        static PrioTable PrioTable
         {
             get
             {
@@ -62,12 +65,13 @@ namespace Reni.ReniParser
 
                 x += PrioTable.Right(PrioTable.Error);
 
-                x = x.ParenthesisLevelLeft(new []{PrioTable.BeginOfText}, new[] {PrioTable.EndOfText});
+                x = x.ParenthesisLevelLeft(new[] {PrioTable.BeginOfText}, new[] {PrioTable.EndOfText});
 
                 //Tracer.FlaggedLine("\n"+x.ToString());
                 return x;
             }
         }
+
 
         /// <summary>
         ///     Creates the main token classes.
@@ -75,7 +79,7 @@ namespace Reni.ReniParser
         /// <returns> </returns>
         protected override FunctionCache<string, TokenClass> GetPredefinedTokenClasses() { return TokenClasses; }
 
-        internal static FunctionCache<string, TokenClass> TokenClasses
+        static FunctionCache<string, TokenClass> TokenClasses
         {
             get
             {
@@ -130,6 +134,25 @@ namespace Reni.ReniParser
                     {"type", new TypeOperator()}
                 };
             }
+        }
+
+        public static readonly IParser<Syntax> ParserInstance = new PrioParser<Syntax>
+            (
+            PrioTable,
+            new Scanner<Syntax>(ReniLexer.Instance),
+            _instance
+            );
+
+
+        public static readonly ISubParser<Syntax> DeclarationSyntaxParserInstance = new SubParser<Syntax>
+            (
+            DeclarationTokenFactory.ParserInstance,
+            Pack
+            );
+
+        static IType<Syntax> Pack(Syntax options)
+        {
+            return new SyntaxBoxToken(options);
         }
 
         protected override TokenClass GetEndOfText() { return new RightParenthesis(0); }

@@ -17,7 +17,7 @@ namespace Reni.TokenClasses
         {
             return new ExpressionSyntax(this, null, token, (CompileSyntax) right);
         }
-        protected override sealed Syntax SuffixSyntax(Syntax left, SourcePart token)
+        protected override sealed Syntax Suffix(Syntax left, SourcePart token)
         {
             return left.CreateSyntaxOrDeclaration(this, token, null);
         }
