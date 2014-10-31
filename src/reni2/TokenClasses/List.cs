@@ -9,7 +9,7 @@ namespace Reni.TokenClasses
 {
     sealed class List : TokenClass
     {
-        protected override Syntax InfixSyntax(Syntax left, SourcePart token, Syntax right)
+        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
         {
             return new ListSyntax(left, token, right);
         }
