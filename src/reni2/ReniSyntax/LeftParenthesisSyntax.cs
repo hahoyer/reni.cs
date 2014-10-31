@@ -28,7 +28,7 @@ namespace Reni.ReniSyntax
             _right = right;
         }
 
-        internal Syntax RightParenthesis(int level, SourcePart token)
+        internal override Syntax RightParenthesisOnLeft(int level, SourcePart token)
         {
             if(level != _leftLevel)
                 throw new ParenthesisMissmatchException(this, level, token);
