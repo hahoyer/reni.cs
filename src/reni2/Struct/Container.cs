@@ -125,6 +125,13 @@ namespace Reni.Struct
             return Create(parsedSyntax.Token, parsedSyntax.Token, parsedSyntax);
         }
 
+        internal static Syntax Create(SourcePart token, ConverterSyntax body)
+        {
+            var result = new PreContainer();
+            result.Add(body);
+            return result.ToContainer(body.Token, token);
+        }
+
         public override string DumpData()
         {
             var isInsideFileDump = _isInsideFileDump;

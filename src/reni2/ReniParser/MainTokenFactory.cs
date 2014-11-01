@@ -73,21 +73,29 @@ namespace Reni.ReniParser
 
         public readonly IParser<Syntax> Parser;
 
-        readonly ISubParser<Syntax> _declarationSyntaxParser;
+        readonly ISubParser<Syntax> _declarationSyntaxSubParser;
+        readonly PrioParser<Syntax> _declarationSyntaxParser;
 
         public MainTokenFactory()
         {
             Parser = new PrioParser<Syntax>(PrioTable, new Scanner<Syntax>(ReniLexer.Instance), this);
-            _declarationSyntaxParser = new SubParser<Syntax>
+            _declarationSyntaxParser = new PrioParser<Syntax>
                 (
-                new PrioParser<Syntax>
-                    (
-                    DeclarationTokenFactory.PrioTable,
-                    new Scanner<Syntax>(ReniLexer.Instance),
-                    new DeclarationTokenFactory()
-                    ),
-                Pack
+                DeclarationTokenFactory.PrioTable,
+                new Scanner<Syntax>(ReniLexer.Instance),
+                new DeclarationTokenFactory()
                 );
+            _declarationSyntaxSubParser = new SubParser<Syntax>(_declarationSyntaxParser, Pack);
+        }
+
+        public bool Trace
+        {
+            get { return Parser.Trace; }
+            set
+            {
+                Parser.Trace = value;
+                _declarationSyntaxParser.Trace = value;
+            }
         }
 
 
@@ -95,10 +103,7 @@ namespace Reni.ReniParser
         ///     Creates the main token classes.
         /// </summary>
         /// <returns> </returns>
-        protected override FunctionCache<string, TokenClass> GetPredefinedTokenClasses()
-        {
-            return TokenClasses;
-        }
+        protected override FunctionCache<string, TokenClass> GetPredefinedTokenClasses() { return TokenClasses; }
 
         FunctionCache<string, TokenClass> TokenClasses
         {
@@ -131,7 +136,7 @@ namespace Reni.ReniParser
                     {"<>", new CompareOperation()},
                     {"<<", new ConcatArrays()},
                     {"<:=>", new EnableReassignToken()},
-                    {"!", new Exclamation(_declarationSyntaxParser)},
+                    {"!", new Exclamation(_declarationSyntaxSubParser)},
                     {"+", new Plus()},
                     {"/", new Slash()},
                     {"/\\", new TokenClasses.Function()},

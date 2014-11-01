@@ -76,14 +76,14 @@ namespace hw.Parser
                     TracePop();
                 }
 
-                if(relation == '-')
-                    return;
-
                 if(_startLevel > _stack.Count)
                 {
                     _result = _type.Create(_left, _part, null);
                     return;
                 }
+
+                if (relation == '-')
+                    return;
 
                 var matchedItemType = relation == '=' ? _type.NextTypeIfMatched : null;
                 TraceItemLine("matchedItemType", matchedItemType);

@@ -21,6 +21,24 @@ namespace Reni.ReniSyntax
 
         protected override string GetNodeDump() { return "(" + _left.NodeDump + ", " + _right.NodeDump + ")"; }
 
+        internal override Syntax RightParenthesis(int level, SourcePart token)
+        {
+            if(level != 0)
+                return base.RightParenthesis(level, token);
+
+            var list = new List<Syntax>();
+            Syntax next = this;
+            do
+            {
+                var current = (ListSyntax)next;
+                list.Add(current._left);
+                next = current._right;
+            } while (next is ListSyntax);
+
+            list.Add(next);
+
+            return Container.Create(list[0].Token, token, list);
+        }
         internal override Syntax SurroundedByParenthesis(SourcePart leftToken, SourcePart rightToken)
         {
             var list = new List<Syntax>();

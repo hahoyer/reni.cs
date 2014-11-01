@@ -46,7 +46,7 @@ namespace Reni
             _rootContext = new Root(this);
             _parameters = parameters ?? new CompilerParameters();
             _tokenFactory = new MainTokenFactory();
-            _tokenFactory.Parser.Trace = _parameters.TraceOptions.Parser;
+            _tokenFactory.Trace = _parameters.TraceOptions.Parser;
 
             _source = new ValueCache<Source>(() => new Source(_fileName.FileHandle()));
             _syntax = new ValueCache<Syntax>(() => Parse(Source + 0));

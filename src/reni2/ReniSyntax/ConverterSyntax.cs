@@ -19,6 +19,13 @@ namespace Reni.ReniSyntax
 
         protected override string GetNodeDump() { return "converter (" + Body.NodeDump + ")"; }
 
+        internal override Syntax RightParenthesis(int level, SourcePart token)
+        {
+            if(level == 0)
+                return Container.Create(token, this);
+
+            return base.RightParenthesis(level, token);
+        }
         internal override Syntax RightParenthesisOnRight(int level, SourcePart rightToken)
         {
             return Container.Create(Token, rightToken, this);

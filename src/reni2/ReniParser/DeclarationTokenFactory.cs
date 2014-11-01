@@ -22,10 +22,10 @@ namespace Reni.ReniParser
                         new[] { ")", "]", "}" }
                     );
                 prioTable += PrioTable.Left(PrioTable.Any);
-                prioTable.Correct(PrioTable.Any, PrioTable.BeginOfText, '-');
-                prioTable.Correct(")", PrioTable.BeginOfText, '-');
-                prioTable.Correct("]", PrioTable.BeginOfText, '-');
-                prioTable.Correct("}", PrioTable.BeginOfText, '-');
+                prioTable.Correct(PrioTable.Any, PrioTable.BeginOfText, '=');
+                prioTable.Correct(")", PrioTable.BeginOfText, '=');
+                prioTable.Correct("]", PrioTable.BeginOfText, '=');
+                prioTable.Correct("}", PrioTable.BeginOfText, '=');
                 return prioTable;
             }
         }
