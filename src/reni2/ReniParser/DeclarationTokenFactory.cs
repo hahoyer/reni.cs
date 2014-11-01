@@ -10,15 +10,13 @@ namespace Reni.ReniParser
 {
     sealed class DeclarationTokenFactory : TokenFactory<TokenClass, Syntax>
     {
-        static readonly DeclarationTokenFactory _instance = new DeclarationTokenFactory();
-
-        static PrioTable PrioTable
+        public static PrioTable PrioTable
         {
             get
             {
                 var prioTable = PrioTable.Left(PrioTable.BeginOfText);
                 prioTable += PrioTable.Left("converter");
-                prioTable = prioTable.ParenthesisLevelRight
+                prioTable = prioTable.ParenthesisLevelLeft
                     (
                         new[] { "(", "[", "{" },
                         new[] { ")", "]", "}" }
@@ -31,14 +29,6 @@ namespace Reni.ReniParser
                 return prioTable;
             }
         }
-
-
-        public static readonly IParser<Syntax> ParserInstance = new PrioParser<Syntax>
-            (
-            PrioTable,
-            new Scanner<Syntax>(ReniLexer.Instance),
-            _instance
-            );
 
         protected override FunctionCache<string, TokenClass> GetPredefinedTokenClasses()
         {

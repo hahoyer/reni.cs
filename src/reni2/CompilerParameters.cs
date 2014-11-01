@@ -1,26 +1,4 @@
-﻿#region Copyright (C) 2013
-
-//     Project Reni2
-//     Copyright (C) 2011 - 2013 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-#endregion
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
@@ -31,12 +9,12 @@ namespace Reni
     /// <summary>
     ///     Parameters for compilation
     /// </summary>
-    public sealed class CompilerParameters
+    public sealed class CompilerParameters : Attribute
     {
         internal static CompilerParameters CreateTraceAll()
         {
             var result = new CompilerParameters();
-            result.Trace.All();
+            result.TraceOptions.UseOnModeErrorFocus();
             return result;
         }
 
@@ -45,13 +23,13 @@ namespace Reni
         /// </summary>
         [Node]
         [EnableDump]
-        public readonly TraceParamters Trace = new TraceParamters();
+        public readonly TraceOptionsClass TraceOptions = new TraceOptionsClass();
 
         public bool ParseOnly;
         public bool RunFromCode;
         public IOutStream OutStream;
 
-        public sealed class TraceParamters
+        public sealed class TraceOptionsClass 
         {
             [Node]
             [EnableDump]
@@ -71,8 +49,11 @@ namespace Reni
 
             [Node]
             [EnableDump]
-            public bool Syntax;
+            public bool Parser;
 
+            [Node]
+            [EnableDump]
+            public bool Syntax;
             [Node]
             [EnableDump]
             public bool GeneratorFilePosn;
@@ -81,12 +62,13 @@ namespace Reni
             {
                 Source = false;
                 Syntax = false;
+                Parser = false;
                 CodeSequence = false;
                 ExecutedCode = false;
                 Functions = false;
             }
 
-            public void All()
+            public void UseOnModeErrorFocus()
             {
                 Source = true;
                 Syntax = true;
@@ -95,6 +77,11 @@ namespace Reni
                 Functions = true;
                 GeneratorFilePosn = true;
             }
+        }
+
+        public sealed class Trace
+        {
+            public class Parser : Attribute{ }
         }
     }
 }

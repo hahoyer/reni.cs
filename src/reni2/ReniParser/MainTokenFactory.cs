@@ -15,8 +15,6 @@ namespace Reni.ReniParser
 {
     sealed class MainTokenFactory : TokenFactory<TokenClass, Syntax>
     {
-        static readonly ITokenFactory<Syntax> _instance = new MainTokenFactory();
-
         static PrioTable PrioTable
         {
             get
@@ -54,7 +52,7 @@ namespace Reni.ReniParser
                 x += PrioTable.Right(",");
                 x += PrioTable.Right(";");
                 x += PrioTable.Right(".");
-                x = x.ParenthesisLevelRight
+                x = x.ParenthesisLevelLeft
                     (
                         new[] {"(", "[", "{"},
                         new[] {")", "]", "}"}
@@ -73,13 +71,36 @@ namespace Reni.ReniParser
         }
 
 
+        public readonly IParser<Syntax> Parser;
+
+        readonly ISubParser<Syntax> _declarationSyntaxParser;
+
+        public MainTokenFactory()
+        {
+            Parser = new PrioParser<Syntax>(PrioTable, new Scanner<Syntax>(ReniLexer.Instance), this);
+            _declarationSyntaxParser = new SubParser<Syntax>
+                (
+                new PrioParser<Syntax>
+                    (
+                    DeclarationTokenFactory.PrioTable,
+                    new Scanner<Syntax>(ReniLexer.Instance),
+                    new DeclarationTokenFactory()
+                    ),
+                Pack
+                );
+        }
+
+
         /// <summary>
         ///     Creates the main token classes.
         /// </summary>
         /// <returns> </returns>
-        protected override FunctionCache<string, TokenClass> GetPredefinedTokenClasses() { return TokenClasses; }
+        protected override FunctionCache<string, TokenClass> GetPredefinedTokenClasses()
+        {
+            return TokenClasses;
+        }
 
-        static FunctionCache<string, TokenClass> TokenClasses
+        FunctionCache<string, TokenClass> TokenClasses
         {
             get
             {
@@ -110,7 +131,7 @@ namespace Reni.ReniParser
                     {"<>", new CompareOperation()},
                     {"<<", new ConcatArrays()},
                     {"<:=>", new EnableReassignToken()},
-                    {"!", new Exclamation()},
+                    {"!", new Exclamation(_declarationSyntaxParser)},
                     {"+", new Plus()},
                     {"/", new Slash()},
                     {"/\\", new TokenClasses.Function()},
@@ -136,24 +157,7 @@ namespace Reni.ReniParser
             }
         }
 
-        public static readonly IParser<Syntax> ParserInstance = new PrioParser<Syntax>
-            (
-            PrioTable,
-            new Scanner<Syntax>(ReniLexer.Instance),
-            _instance
-            );
-
-
-        public static readonly ISubParser<Syntax> DeclarationSyntaxParserInstance = new SubParser<Syntax>
-            (
-            DeclarationTokenFactory.ParserInstance,
-            Pack
-            );
-
-        static IType<Syntax> Pack(Syntax options)
-        {
-            return new SyntaxBoxToken(options);
-        }
+        static IType<Syntax> Pack(Syntax options) { return new SyntaxBoxToken(options); }
 
         protected override TokenClass GetEndOfText() { return new RightParenthesis(0); }
         protected override TokenClass GetNumber() { return new Number(); }

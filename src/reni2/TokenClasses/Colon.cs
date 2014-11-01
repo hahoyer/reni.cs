@@ -20,7 +20,8 @@ namespace Reni.TokenClasses
 
     sealed class Exclamation : TokenClass
     {
-        static readonly ISubParser<Syntax> _parser = MainTokenFactory.DeclarationSyntaxParserInstance;
+        readonly ISubParser<Syntax> _parser;
+        public Exclamation(ISubParser<Syntax> parser) { _parser = parser; }
         protected override Syntax TerminalSyntax(SourcePart token) { return new ExclamationSyntax(token); }
         protected override ISubParser<Syntax> Next { get { return _parser; } }
     }

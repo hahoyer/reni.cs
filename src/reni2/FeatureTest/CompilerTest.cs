@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
+using hw.Helper;
 using System.Linq;
 using hw.Debug;
-using hw.Helper;
 using hw.UnitTest;
 using Reni.Runtime;
 using Reni.Validation;
@@ -15,32 +15,37 @@ namespace Reni.FeatureTest
     [AttributeUsage(AttributeTargets.Class)]
     public abstract class CompilerTest : DependantAttribute, ITestFixture
     {
-        internal readonly CompilerParameters Parameters = new CompilerParameters();
+        internal readonly CompilerParameters Parameters;
         static Dictionary<System.Type, CompilerTest> _cache;
         bool _needToRunDependants = true;
+
+        public CompilerTest()
+        {
+            Parameters = new CompilerParameters();
+            if(TestRunner.IsModeErrorFocus)
+                Parameters.TraceOptions.UseOnModeErrorFocus();
+            if(GetType().GetAttributes<CompilerParameters.Trace.Parser>(true).Any())
+                Parameters.TraceOptions.Parser = true;
+        }
 
         internal void CreateFileAndRunCompiler
             (string name, string text, string expectedOutput = null, Action<Compiler> expectedResult = null)
         {
-            CreateFileAndRunCompiler(name, new TargetSetData(text, expectedOutput), expectedResult, 1);
+            CreateFileAndRunCompiler(name, new TargetSetData(text, expectedOutput), expectedResult);
         }
 
         void CreateFileAndRunCompiler
-            (string name, TargetSetData targetSetData, Action<Compiler> expectedResult, int stackFrameDepth = 0)
+            (string name, TargetSetData targetSetData, Action<Compiler> expectedResult)
         {
             var fileName = name + ".reni";
             var f = fileName.FileHandle();
             f.String = targetSetData.Target;
-            InternalRunCompiler(fileName, expectedResult, targetSetData, stackFrameDepth + 1);
+            InternalRunCompiler(fileName, expectedResult, targetSetData);
         }
 
         void InternalRunCompiler
-            (string fileName, Action<Compiler> expectedResult, TargetSetData targetSet, int stackFrameDepth = 0)
+            (string fileName, Action<Compiler> expectedResult, TargetSetData targetSet)
         {
-            if(TestRunner.IsModeErrorFocus)
-                Parameters.Trace.All();
-
-            //Parameters.RunFromCode = true;
             InternalRunCompiler(Parameters, fileName, expectedResult, targetSet);
         }
 
@@ -93,7 +98,7 @@ namespace Reni.FeatureTest
                 _cache = new Dictionary<System.Type, CompilerTest>();
 
             foreach(var tuple in TargetSet)
-                CreateFileAndRunCompiler(GetType().PrettyName(), tuple, AssertValid, depth + 1);
+                CreateFileAndRunCompiler(GetType().PrettyName(), tuple, AssertValid);
         }
 
 
@@ -147,8 +152,8 @@ namespace Reni.FeatureTest
 
         internal string GetStringAttribute<T>() where T : StringAttribute
         {
-            var attrs = GetType().GetCustomAttributes(typeof(T), true);
-            return attrs.Length == 1 ? ((T) attrs[0]).Value : "";
+            var result = GetType().GetAttribute<T>(true);
+            return result == null ? "" : result.Value;
         }
 
         protected virtual void AssertValid(Compiler c) { }

@@ -50,7 +50,9 @@ namespace Reni.Parser
             string _name;
             Syntax IType<Syntax>.Create(Syntax left, SourcePart part, Syntax right) { return Create(left, part, right); }
             string IType<Syntax>.PrioTableName { get { return _name; } }
-            ISubParser<Syntax> IType<Syntax>.Next { get { return null; } }
+            ISubParser<Syntax> IType<Syntax>.NextParser { get { return null; } }
+            IType<Syntax> IType<Syntax>.NextTypeIfMatched { get { return NextTypeIfMatched; } }
+            virtual internal IType<Syntax> NextTypeIfMatched { get { return null; } }
             protected abstract Syntax Create(Syntax left, SourcePart token, Syntax right);
             string INameProvider.Name { set { _name = value; } }
         }

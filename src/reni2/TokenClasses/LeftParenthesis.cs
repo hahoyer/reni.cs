@@ -21,18 +21,19 @@ namespace Reni.TokenClasses
 
         protected override Syntax Prefix(SourcePart token, Syntax right)
         {
-            return new LeftParenthesisSyntax(_level, null, this, token, right);
+            return new LeftParenthesisPrefixSyntax(_level, token, right);
         }
-        protected override Syntax InfixSyntax(Syntax left, SourcePart token, Syntax right)
+
+        protected Syntax InfixSyntax(Syntax left, SourcePart token, Syntax right)
         {
             NotImplementedMethod(left, token, right);
             return null;
-            return new LeftParenthesisSyntax(_level, left, this, token, right);
+            return new LeftParenthesisSyntax(left, _level, token, right);
         }
 
-        protected override Syntax Terminal(SourcePart token)
+        protected Syntax Terminal(SourcePart token)
         {
-            return new LeftParenthesisSyntax(_level, null, this, token, null);
+            return new LeftParenthesisSyntax(null, _level, token, null);
         }
 
         Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)

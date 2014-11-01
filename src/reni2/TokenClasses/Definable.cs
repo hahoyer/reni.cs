@@ -15,7 +15,7 @@ namespace Reni.TokenClasses
         protected override sealed Syntax Terminal(SourcePart token) { return new DefinableTokenSyntax(this, token); }
         protected override sealed Syntax Prefix(SourcePart token, Syntax right)
         {
-            return new ExpressionSyntax(this, null, token, (CompileSyntax) right);
+            return new ExpressionSyntax(this, null, token, right.ToCompiledSyntax());
         }
         protected override sealed Syntax Suffix(Syntax left, SourcePart token)
         {

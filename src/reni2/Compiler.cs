@@ -19,6 +19,7 @@ namespace Reni
 {
     public sealed class Compiler : DumpableObject, IExecutionContext
     {
+        readonly MainTokenFactory _tokenFactory;
         readonly CompilerParameters _parameters;
         readonly string _className;
         readonly string _fileName;
@@ -44,6 +45,8 @@ namespace Reni
             _fileName = fileName;
             _rootContext = new Root(this);
             _parameters = parameters ?? new CompilerParameters();
+            _tokenFactory = new MainTokenFactory();
+            _tokenFactory.Parser.Trace = _parameters.TraceOptions.Parser;
 
             _source = new ValueCache<Source>(() => new Source(_fileName.FileHandle()));
             _syntax = new ValueCache<Syntax>(() => Parse(Source + 0));
@@ -87,7 +90,7 @@ namespace Reni
         }
 
         IOutStream IExecutionContext.OutStream { get { return _parameters.OutStream; } }
-        bool IExecutionContext.IsTraceEnabled { get { return _isInExecutionPhase && _parameters.Trace.Functions; } }
+        bool IExecutionContext.IsTraceEnabled { get { return _isInExecutionPhase && _parameters.TraceOptions.Functions; } }
         CodeBase IExecutionContext.Function(FunctionId functionId) { return CodeContainer.Function(functionId); }
         CompileSyntax IExecutionContext.Parse(string source) { return Parse(source); }
 
@@ -98,10 +101,10 @@ namespace Reni
         /// </summary>
         public void Exececute()
         {
-            if(_parameters.Trace.Source)
+            if(_parameters.TraceOptions.Source)
                 Tracer.Line("Dump Source\n" + Source.Dump());
 
-            if(_parameters.Trace.Syntax)
+            if(_parameters.TraceOptions.Syntax)
                 Tracer.FlaggedLine("Syntax\n" + Syntax.Dump());
 
             if(_parameters.ParseOnly)
@@ -113,10 +116,10 @@ namespace Reni
                 return;
             }
 
-            if(_parameters.Trace.CodeSequence)
+            if(_parameters.TraceOptions.CodeSequence)
                 Tracer.FlaggedLine("Code\n" + CodeContainer.Dump());
 
-            if(_parameters.Trace.ExecutedCode)
+            if(_parameters.TraceOptions.ExecutedCode)
                 Tracer.FlaggedLine(CSharpCode);
 
             foreach(var t in Issues)
@@ -126,7 +129,7 @@ namespace Reni
             try
             {
                 var method = CodeContainer
-                    .CreateCSharpAssembly(_className, _parameters.Trace.GeneratorFilePosn)
+                    .CreateCSharpAssembly(_className, _parameters.TraceOptions.GeneratorFilePosn)
                     .GetExportedTypes()[0]
                     .GetMethod(Generator.MainFunctionName);
 
@@ -147,7 +150,7 @@ namespace Reni
 
         internal IEnumerable<IssueBase> Issues { get { return CodeContainer.Issues; } }
 
-        internal static Syntax Parse(SourcePosn source) { return MainTokenFactory.ParserInstance.Execute(source); }
+        internal Syntax Parse(SourcePosn source) { return _tokenFactory.Parser.Execute(source); }
 
         void RunFromCode() { _codeContainer.Value.Execute(this); }
 

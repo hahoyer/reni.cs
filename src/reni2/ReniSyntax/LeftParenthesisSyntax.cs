@@ -3,26 +3,58 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Scanner;
+using Reni.Basics;
+using Reni.Context;
 using Reni.ReniParser;
 using Reni.TokenClasses;
 
 namespace Reni.ReniSyntax
 {
-    sealed class LeftParenthesisSyntax : Syntax
+    sealed class LeftParenthesisPrefixSyntax : Syntax
     {
-        readonly int _leftLevel;
         [EnableDump]
-        readonly Syntax _left;
-        [EnableDump]
-        readonly LeftParenthesis _parenthesis;
+        readonly int _level;
         [EnableDump]
         readonly Syntax _right;
 
-        public LeftParenthesisSyntax
-            (int leftLevel, Syntax left, LeftParenthesis parenthesis, SourcePart token, Syntax right)
+        public LeftParenthesisPrefixSyntax
+            (int level, SourcePart token, Syntax right)
             : base(token)
         {
-            _leftLevel = leftLevel;
+            _level = level;
+            _right = right;
+        }
+
+        internal override Syntax RightParenthesis(int level, SourcePart token)
+        {
+            Tracer.Assert(level == _level);
+            return _right;
+        }
+    }
+
+    sealed class LeftParenthesisSyntax : Syntax
+    {
+        [EnableDump]
+        readonly Syntax _left;
+        [EnableDump]
+        readonly int _parenthesis;
+        [EnableDump]
+        readonly Syntax _right;
+        static readonly IInfix _operator = new FunctionCallOperator();
+
+        sealed class FunctionCallOperator : DumpableObject, IInfix
+        {
+            Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
+            {
+                NotImplementedMethod(context, category, left, right);
+                return null;
+            }
+        }
+
+        public LeftParenthesisSyntax
+            (Syntax left, int parenthesis, SourcePart token, Syntax right)
+            : base(token)
+        {
             _left = left;
             _parenthesis = parenthesis;
             _right = right;
@@ -30,13 +62,13 @@ namespace Reni.ReniSyntax
 
         internal override Syntax RightParenthesisOnLeft(int level, SourcePart token)
         {
-            if(level != _leftLevel)
+            if(level != _parenthesis)
                 throw new ParenthesisMissmatchException(this, level, token);
             var surroundedByParenthesis = SurroundedByParenthesis(token);
             if(_left == null)
                 return surroundedByParenthesis;
             Tracer.Assert(_right != null, () => Dump() + "\ntoken=" + token.Dump());
-            return new InfixSyntax(token, _left.ToCompiledSyntax(), _parenthesis, _right.ToCompiledSyntax());
+            return new InfixSyntax(token, _left.ToCompiledSyntax(), _operator, _right.ToCompiledSyntax());
         }
 
         Syntax SurroundedByParenthesis(SourcePart token)

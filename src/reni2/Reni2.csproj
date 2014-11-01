@@ -154,7 +154,6 @@
     <Compile Include="hw\Parser\IType.cs" />
     <Compile Include="hw\Parser\OpenItem.cs" />
     <Compile Include="hw\Parser\ParsedSyntax.cs" />
-    <Compile Include="hw\Parser\ParserItem.cs" />
     <Compile Include="hw\Parser\PrioParser.cs" />
     <Compile Include="hw\Parser\PrioTable.cs" />
     <Compile Include="hw\Parser\Scanner.cs" />

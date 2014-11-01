@@ -50,6 +50,14 @@ namespace Reni.ReniSyntax
         [DisableDump]
         internal virtual bool IsImplicit { get { throw new NotImplementedException(); } }
 
+        internal override Syntax RightParenthesis(int level, SourcePart token)
+        {
+            if(level == 0)
+                return this;
+            return base.RightParenthesis(level, token);
+        }
+
+        
         //[DebuggerHidden]
         internal virtual Result ObtainResult(ContextBase context, Category category)
         {

@@ -26,6 +26,12 @@ namespace Reni.ReniParser
             return null;
         }
 
+        internal virtual Syntax RightParenthesis(int level, SourcePart token)
+        {
+            NotImplementedMethod(level, token);
+            return null;
+        }
+
         internal virtual Syntax RightParenthesisOnLeft(int level, SourcePart token)
         {
             NotImplementedMethod(level, token);
