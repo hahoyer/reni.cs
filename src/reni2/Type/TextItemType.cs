@@ -16,6 +16,7 @@ namespace Reni.Type
         : TagChild<ArrayType>
             , ISymbolProvider<DumpPrintToken, IFeatureImplementation>
             , ISymbolProvider<ToNumberOfBase, IFeatureImplementation>
+            , ISymbolProvider<ConcatArrays, IFeatureImplementation>
     {
         public TextItemType(ArrayType parent)
             : base(parent)
@@ -37,6 +38,11 @@ namespace Reni.Type
         IFeatureImplementation ISymbolProvider<ToNumberOfBase, IFeatureImplementation>.Feature(ToNumberOfBase tokenClass)
         {
             return Extension.MetaFeature(ToNumberOfBaseResult);
+        }
+
+        IFeatureImplementation ISymbolProvider<ConcatArrays, IFeatureImplementation>.Feature(ConcatArrays tokenClass)
+        {
+            return Extension.FunctionFeature(ConcatArraysResult);
         }
 
         Result DumpPrintTokenResult(Category category) { return VoidType.Result(category, DumpPrintCode, CodeArgs.Arg); }
@@ -67,7 +73,7 @@ namespace Reni.Type
 
         internal override int? SmartArrayLength(TypeBase elementType) { return Parent.SmartArrayLength(elementType); }
 
-        internal Result ConcatArraysResult(Category category, IContextReference objectReference, TypeBase argsType)
+        Result ConcatArraysResult(Category category, IContextReference objectReference, TypeBase argsType)
         {
             var trace = ObjectId == -1 && category.HasCode;
             StartMethodDump(trace, category, objectReference, argsType);
@@ -94,8 +100,5 @@ namespace Reni.Type
          
          
          */
-
-
-
     }
 }
