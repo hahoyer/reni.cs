@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Scanner;
 using Reni.ReniParser;
-using Reni.ReniSyntax;
 
 namespace Reni.TokenClasses
 {
@@ -18,11 +17,6 @@ namespace Reni.TokenClasses
 
     sealed class EndToken : TokenClass
     {
-        protected override Syntax Suffix(Syntax left, SourcePart token)
-        {
-            return ListSyntax
-                .Spread(left)
-                .ToContainer;
-        }
+        protected override Syntax Suffix(Syntax left, SourcePart token) { return left; }
     }
 }

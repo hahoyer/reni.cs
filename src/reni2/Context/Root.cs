@@ -123,8 +123,9 @@ namespace Reni.Context
 
         internal Code.Container MainContainer(Syntax syntax, string description)
         {
-            return syntax
-                .ToCompiledSyntax
+            return ListSyntax
+                .Spread(syntax)
+                .ToContainer
                 .Code(this)
                 .Container(description);
         }
