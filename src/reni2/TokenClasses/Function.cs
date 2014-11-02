@@ -24,7 +24,7 @@ namespace Reni.TokenClasses
                 null,
                 _isImplicit,
                 _isMetaFunction,
-                right.ToCompiledSyntax()
+                right.ToCompiledSyntax
                 );
         }
 
@@ -33,10 +33,10 @@ namespace Reni.TokenClasses
             return new FunctionSyntax
                 (
                 token,
-                left.ToCompiledSyntax(),
+                left.ToCompiledSyntax,
                 _isImplicit,
                 _isMetaFunction,
-                right.ToCompiledSyntax()
+                right.ToCompiledSyntax
                 );
         }
     }

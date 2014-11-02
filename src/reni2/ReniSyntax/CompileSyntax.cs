@@ -50,14 +50,7 @@ namespace Reni.ReniSyntax
         [DisableDump]
         internal virtual bool IsImplicit { get { throw new NotImplementedException(); } }
 
-        internal override Syntax RightParenthesis(int level, SourcePart token)
-        {
-            if(level == 0)
-                return this;
-            return base.RightParenthesis(level, token);
-        }
 
-        
         //[DebuggerHidden]
         internal virtual Result ObtainResult(ContextBase context, Category category)
         {
@@ -68,7 +61,7 @@ namespace Reni.ReniSyntax
         protected virtual bool GetIsLambda() { return false; }
 
         internal override Syntax SurroundedByParenthesis(SourcePart token, SourcePart rightToken) { return this; }
-        internal override CompileSyntax ToCompiledSyntax() { return this; }
+        internal override CompileSyntax ToCompiledSyntax { get { return this; } }
         internal void AddToCacheForDebug(ContextBase context, object cacheItem) { ResultCache.Add(context, cacheItem); }
         internal Result Result(ContextBase context) { return Result(context, Category.All); }
         //[DebuggerHidden]

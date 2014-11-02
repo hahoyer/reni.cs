@@ -11,7 +11,7 @@ namespace Reni.TokenClasses
         protected override Syntax InfixSyntax(Syntax left, SourcePart token, Syntax right)
         {
             return left
-                .CreateElseSyntax(token, right.ToCompiledSyntax());
+                .CreateElseSyntax(token, right.ToCompiledSyntax);
         }
     }
 }

@@ -15,17 +15,17 @@ namespace Reni.TokenClasses
 
         protected override sealed Syntax Prefix(SourcePart token, Syntax right)
         {
-            return new ExpressionSyntax(this, null, token, right.ToCompiledSyntax());
+            return new ExpressionSyntax(this, null, token, right.ToCompiledSyntax);
         }
 
         protected override sealed Syntax Suffix(Syntax left, SourcePart token)
         {
-            return new ExpressionSyntax(this, left.ToCompiledSyntax(), token, null);
+            return new ExpressionSyntax(this, left.ToCompiledSyntax, token, null);
         }
 
         protected override sealed Syntax Infix(Syntax left, SourcePart token, Syntax right)
         {
-            return new ExpressionSyntax(this, left.ToCompiledSyntax(), token, right.ToCompiledSyntax());
+            return new ExpressionSyntax(this, left.ToCompiledSyntax, token, right.ToCompiledSyntax);
         }
 
         [DisableDump]

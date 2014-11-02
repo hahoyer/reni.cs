@@ -27,7 +27,7 @@ namespace Reni.TokenClasses
         protected override sealed Syntax TerminalSyntax(SourcePart token) { return new TerminalSyntax(token, this); }
         protected override sealed Syntax SuffixSyntax(Syntax left, SourcePart token)
         {
-            return new SuffixSyntax(token, left.ToCompiledSyntax(), this);
+            return new SuffixSyntax(token, left.ToCompiledSyntax, this);
         }
         public abstract Result Result(ContextBase context, Category category, SourcePart token);
         public abstract Result Result(ContextBase context, Category category, CompileSyntax left);
@@ -45,7 +45,7 @@ namespace Reni.TokenClasses
         protected override Syntax Terminal(SourcePart token) { return new TerminalSyntax(token, this); }
         protected override Syntax Prefix(SourcePart token, Syntax right)
         {
-            return new PrefixSyntax(token, this, right.ToCompiledSyntax());
+            return new PrefixSyntax(token, this, right.ToCompiledSyntax);
         }
         public abstract Result Result(ContextBase context, Category category, SourcePart token);
         public abstract Result Result(ContextBase context, Category category, SourcePart token, CompileSyntax right);
@@ -62,7 +62,7 @@ namespace Reni.TokenClasses
     {
         protected override Syntax PrefixSyntax(SourcePart token, Syntax right)
         {
-            return new PrefixSyntax(token, this, right.ToCompiledSyntax());
+            return new PrefixSyntax(token, this, right.ToCompiledSyntax);
         }
         public abstract Result Result(ContextBase context, Category category, SourcePart token, CompileSyntax right);
     }
@@ -71,7 +71,7 @@ namespace Reni.TokenClasses
     {
         protected override sealed Syntax Suffix(Syntax left, SourcePart token)
         {
-            return new SuffixSyntax(token, left.ToCompiledSyntax(), this);
+            return new SuffixSyntax(token, left.ToCompiledSyntax, this);
         }
         public abstract Result Result(ContextBase context, Category category, CompileSyntax left);
     }
@@ -80,7 +80,7 @@ namespace Reni.TokenClasses
     {
         protected override sealed Syntax Infix(Syntax left, SourcePart token, Syntax right)
         {
-            return new InfixSyntax(token, left.ToCompiledSyntax(), this, right.ToCompiledSyntax());
+            return new InfixSyntax(token, left.ToCompiledSyntax, this, right.ToCompiledSyntax);
         }
         public abstract Result Result(ContextBase callContext, Category category, CompileSyntax left, CompileSyntax right);
     }

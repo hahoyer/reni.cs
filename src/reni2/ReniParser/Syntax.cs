@@ -20,11 +20,17 @@ namespace Reni.ReniParser
             : base(token, nextObjectId)
         {}
 
-        internal virtual CompileSyntax ToCompiledSyntax()
+        internal virtual Syntax ExtractBody { get { return this; } }
+
+        internal virtual CompileSyntax ToCompiledSyntax
         {
-            NotImplementedMethod(); //Probably it's a missing right parenthesis
-            return null;
+            get
+            {
+                NotImplementedMethod(); //Probably it's a missing right parenthesis
+                return null;
+            }
         }
+        internal virtual IEnumerable<KeyValuePair<string, int>> GetDeclarations(int index) { yield break; }
 
         internal virtual Syntax RightParenthesis(int level, SourcePart token)
         {
@@ -45,7 +51,7 @@ namespace Reni.ReniParser
 
         internal virtual Syntax CreateThenSyntax(SourcePart token, CompileSyntax condition)
         {
-            return new ThenSyntax(condition, token, ToCompiledSyntax());
+            return new ThenSyntax(condition, token, ToCompiledSyntax);
         }
 
         internal virtual Syntax CreateElseSyntax(SourcePart token, CompileSyntax elseSyntax)
@@ -68,7 +74,7 @@ namespace Reni.ReniParser
 
         internal Syntax CreateSyntaxOrDeclaration(Definable tokenClass, SourcePart token, Syntax right)
         {
-            return new ExpressionSyntax(tokenClass, ToCompiledSyntax(), token, right.ToCompiledSyntaxOrNull());
+            return new ExpressionSyntax(tokenClass, ToCompiledSyntax, token, right.ToCompiledSyntaxOrNull());
         }
 
         static bool _isInDump;
@@ -102,10 +108,6 @@ namespace Reni.ReniParser
             return null;
         }
 
-        virtual public IEnumerable<CompileSyntax> ToList(List type)
-        {
-            NotImplementedMethod(type);
-            return null;
-        }
+        internal virtual IEnumerable<Syntax> ToList(List type) { yield return this; }
     }
 }

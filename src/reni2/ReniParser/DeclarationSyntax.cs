@@ -10,20 +10,23 @@ namespace Reni.ReniParser
     sealed class DeclarationSyntax : Syntax
     {
         internal readonly Definable Definable;
-        internal readonly Syntax Definition;
+        internal readonly Syntax Body;
 
-        internal DeclarationSyntax(Definable definable, SourcePart token, Syntax definition)
+        internal DeclarationSyntax(Definable definable, SourcePart token, Syntax body)
             : base(token)
         {
             Definable = definable;
-            Definition = definition;
+            Body = body;
         }
 
-        protected override string GetNodeDump() { return Definable.Name + ": " + Definition.NodeDump; }
+        protected override string GetNodeDump() { return Definable.Name + ": " + Body.NodeDump; }
 
-        internal override Syntax SurroundedByParenthesis(SourcePart leftToken, SourcePart rightToken)
+        internal override Syntax ExtractBody { get { return Body.ExtractBody; } }
+        internal override IEnumerable<KeyValuePair<string, int>> GetDeclarations(int index)
         {
-            return Container.Create(leftToken, this);
+            yield return new KeyValuePair<string, int>(Definable.Name, index);
+            foreach(var result in Body.GetDeclarations(index))
+                yield return result;
         }
     }
 }

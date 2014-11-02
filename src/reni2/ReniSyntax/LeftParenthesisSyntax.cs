@@ -68,7 +68,7 @@ namespace Reni.ReniSyntax
             if(_left == null)
                 return surroundedByParenthesis;
             Tracer.Assert(_right != null, () => Dump() + "\ntoken=" + token.Dump());
-            return new InfixSyntax(token, _left.ToCompiledSyntax(), _operator, _right.ToCompiledSyntax());
+            return new InfixSyntax(token, _left.ToCompiledSyntax, _operator, _right.ToCompiledSyntax);
         }
 
         Syntax SurroundedByParenthesis(SourcePart token)

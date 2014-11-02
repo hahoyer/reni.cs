@@ -16,10 +16,10 @@ using Reni.Type;
 
 namespace Reni.Context
 {
-    sealed class Root 
+    sealed class Root
         : ContextBase
-        , ISymbolProvider<Minus, IFeatureImplementation>
-        , ISymbolProvider<ConcatArrays, IFeatureImplementation>
+            , ISymbolProvider<Minus, IFeatureImplementation>
+            , ISymbolProvider<ConcatArrays, IFeatureImplementation>
     {
         [DisableDump]
         [Node]
@@ -40,7 +40,8 @@ namespace Reni.Context
             ExecutionContext = executionContext;
             _bitCache = new ValueCache<BitType>(() => new BitType(this));
             _voidCache = new ValueCache<VoidType>(() => new VoidType(this));
-            _minusFeatureCache = new ValueCache<IFeatureImplementation>(() => new ContextMetaFunctionFromSyntax(_metaDictionary[ArgToken.Id + " " + Negate.Id]));
+            _minusFeatureCache = new ValueCache<IFeatureImplementation>
+                (() => new ContextMetaFunctionFromSyntax(_metaDictionary[ArgToken.Id + " " + Negate.Id]));
             _createArrayFeatureCache = new ValueCache<IFeatureImplementation>(() => new ContextMetaFunction(CreateArrayResult));
         }
 
@@ -120,15 +121,14 @@ namespace Reni.Context
 
         internal FunctionContainer FunctionContainer(int index) { return _functions.Container(index); }
 
-        internal Code.Container MainContainer(ReniParser.Syntax syntax, string description)
+        internal Code.Container MainContainer(Syntax syntax, string description)
         {
-            return Struct.Container
-                .Create(syntax)
+            return syntax
+                .ToCompiledSyntax
                 .Code(this)
                 .Container(description);
         }
 
         internal CompileSyntax Parse(string source) { return _metaDictionary[source]; }
-
     }
 }

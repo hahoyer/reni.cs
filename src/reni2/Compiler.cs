@@ -94,7 +94,7 @@ namespace Reni
         CodeBase IExecutionContext.Function(FunctionId functionId) { return CodeContainer.Function(functionId); }
         CompileSyntax IExecutionContext.Parse(string source) { return Parse(source); }
 
-        CompileSyntax Parse(string sourceText) { return Parse(new Source(sourceText) + 0).ToCompiledSyntax(); }
+        CompileSyntax Parse(string sourceText) { return Parse(new Source(sourceText) + 0).ToCompiledSyntax; }
 
         /// <summary>
         ///     Performs compilation

@@ -13,14 +13,14 @@ namespace Reni.ReniParser
         {
             if(parsedSyntax == null)
                 return new CompileSyntaxError(token, getError());
-            return parsedSyntax.ToCompiledSyntax();
+            return parsedSyntax.ToCompiledSyntax;
         }
 
         internal static CompileSyntax ToCompiledSyntaxOrNull(this Syntax parsedSyntax)
         {
             if(parsedSyntax == null)
                 return null;
-            return parsedSyntax.ToCompiledSyntax();
+            return parsedSyntax.ToCompiledSyntax;
         }
     }
 }

@@ -35,7 +35,6 @@ namespace Reni.ReniSyntax
         }
 
         internal override CompileSyntax Visit(ISyntaxVisitor visitor) { return Terminal.Visit(visitor); }
-        public override IEnumerable<CompileSyntax> ToList(List type) { yield return ToCompiledSyntax(); }
     }
 
     sealed class PrefixSyntax : SpecialSyntax

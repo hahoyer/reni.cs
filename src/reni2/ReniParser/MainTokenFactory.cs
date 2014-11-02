@@ -164,12 +164,13 @@ namespace Reni.ReniParser
 
         static IType<Syntax> Pack(Syntax options) { return new SyntaxBoxToken(options); }
 
-        protected override TokenClass GetEndOfText() { return new RightParenthesis(0); }
+        protected override TokenClass GetEndOfText() { return new EndToken(); }
         protected override TokenClass GetNumber() { return new Number(); }
         protected override TokenClass GetTokenClass(string name) { return new UserSymbol(name); }
         protected override TokenClass GetSyntaxError(string message) { return new SyntaxError(message); }
         protected override TokenClass GetText() { return new Text(); }
     }
+
 
     sealed class SyntaxError : TokenClass
     {

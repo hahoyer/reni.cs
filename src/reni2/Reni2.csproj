@@ -183,6 +183,7 @@
     <Compile Include="ReniObjectExtender.cs" />
     <Compile Include="ReniParser\ParsedSyntaxExtension.cs" />
     <Compile Include="ReniParser\SyntaxBoxToken.cs" />
+    <Compile Include="ReniSyntax\ListSyntax.cs" />
     <Compile Include="ResultCache.cs" />
     <Compile Include="Code\Arg.cs" />
     <Compile Include="Code\Assign.cs" />

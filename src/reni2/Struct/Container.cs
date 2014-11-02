@@ -20,7 +20,7 @@ namespace Reni.Struct
     sealed class Container : CompileSyntax
     {
         readonly CompileSyntax[] _statements;
-        readonly FunctionCache<string, int> _dictionary;
+        readonly Dictionary<string, int> _dictionary;
         readonly int[] _converters;
         static readonly string _runId = Compiler.FormattedNow + "\n";
         public static bool IsInContainerDump;
@@ -35,17 +35,17 @@ namespace Reni.Struct
 
         [Node]
         [SmartNode]
-        internal FunctionCache<string, int> Dictionary { get { return _dictionary; } }
+        internal Dictionary<string, int> Dictionary { get { return _dictionary; } }
 
         [Node]
         [SmartNode]
         internal int[] Converters { get { return _converters; } }
 
-        Container
+        internal Container
             (
             SourcePart token,
             CompileSyntax[] statements,
-            FunctionCache<string, int> dictionary,
+            Dictionary<string, int> dictionary,
             int[] converters)
             : base(token, _nextObjectId++)
         {
@@ -54,7 +54,7 @@ namespace Reni.Struct
             _converters = converters;
         }
 
-        internal override CompileSyntax ToCompiledSyntax() { return this; }
+        internal override CompileSyntax ToCompiledSyntax { get { return this; } }
         [DisableDump]
         internal override bool? Hllw
         {
@@ -72,65 +72,6 @@ namespace Reni.Struct
 
         [DisableDump]
         protected override ParsedSyntax[] Children { get { return Statements.ToArray<ParsedSyntax>(); } }
-
-        sealed class PreContainer : DumpableObject
-        {
-            readonly List<CompileSyntax> _list = new List<CompileSyntax>();
-            readonly FunctionCache<string, int> _dictionary = new FunctionCache<string, int>();
-            readonly List<int> _converters = new List<int>();
-
-            public void Add(Syntax parsedSyntax)
-            {
-                while(parsedSyntax is DeclarationSyntax)
-                {
-                    var d = (DeclarationSyntax) parsedSyntax;
-                    _dictionary.Add(d.Definable.Name, _list.Count);
-                    parsedSyntax = d.Definition;
-                }
-
-                if(parsedSyntax is ConverterSyntax)
-                {
-                    var body = ((ConverterSyntax) parsedSyntax).Body;
-                    parsedSyntax = body;
-                    _converters.Add(_list.Count);
-                }
-
-                _list.Add(parsedSyntax.ToCompiledSyntax());
-            }
-
-            public Container ToContainer(SourcePart part)
-            {
-                return new Container(part, _list.ToArray(), _dictionary, _converters.ToArray());
-            }
-        }
-
-
-        internal static Container Create(SourcePart part, IEnumerable<Syntax> parsed)
-        {
-            var result = new PreContainer();
-            foreach(var parsedSyntax in parsed)
-                result.Add(parsedSyntax);
-            return result.ToContainer(part);
-        }
-
-        internal static Container Create(SourcePart part, Syntax parsedSyntax)
-        {
-            var result = new PreContainer();
-            result.Add(parsedSyntax);
-            return result.ToContainer(part);
-        }
-
-        internal static Container Create(Syntax parsedSyntax)
-        {
-            return Create(parsedSyntax.Token, parsedSyntax);
-        }
-
-        internal static Syntax Create(SourcePart token, ConverterSyntax body)
-        {
-            var result = new PreContainer();
-            result.Add(body);
-            return result.ToContainer(body.Token);
-        }
 
         public override string DumpData()
         {
@@ -169,7 +110,7 @@ namespace Reni.Struct
         {
             if(name == null)
                 return null;
-            if(!Dictionary.IsValid(name))
+            if(!Dictionary.ContainsKey(name))
                 return null;
 
             var position = Dictionary[name];

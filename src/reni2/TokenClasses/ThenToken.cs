@@ -10,7 +10,7 @@ namespace Reni.TokenClasses
     {
         protected override Syntax InfixSyntax(Syntax left, SourcePart token, Syntax right)
         {
-            return right.CreateThenSyntax(token, left.ToCompiledSyntax());
+            return right.CreateThenSyntax(token, left.ToCompiledSyntax);
         }
     }
 }

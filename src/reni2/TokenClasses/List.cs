@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Scanner;
 using Reni.ReniParser;
-using Reni.Struct;
+using Reni.ReniSyntax;
 
 namespace Reni.TokenClasses
 {
@@ -11,10 +11,7 @@ namespace Reni.TokenClasses
     {
         protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
         {
-            var leftList = left.ToList(this);
-            var rightList = right.ToList(this);
-            var compileSyntaxs = leftList.Concat(rightList).ToArray();
-            return Container.Create(token, compileSyntaxs);
+            return new ListSyntax(this, token, left.ToList(this).Concat(right.ToList(this)).ToArray());
         }
     }
 }
