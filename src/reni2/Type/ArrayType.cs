@@ -17,6 +17,7 @@ namespace Reni.Type
         : TypeBase
             , ISymbolProvider<DumpPrintToken, IFeatureImplementation>
             , ISymbolProvider<ConcatArrays, IFeatureImplementation>
+            , ISymbolProvider<TextItem, IFeatureImplementation>
             , IRepeaterType
             , IFunctionFeature
             , IFeatureImplementation
@@ -74,6 +75,11 @@ namespace Reni.Type
         IFeatureImplementation ISymbolProvider<ConcatArrays, IFeatureImplementation>.Feature(ConcatArrays tokenClass)
         {
             return Extension.FunctionFeature(ConcatArraysResult);
+        }
+
+        IFeatureImplementation ISymbolProvider<TextItem, IFeatureImplementation>.Feature(TextItem tokenClass)
+        {
+            return Extension.SimpleFeature(TextItemResult);
         }
 
         internal override int? SmartArrayLength(TypeBase elementType)

@@ -79,7 +79,7 @@ namespace Reni.Context
         static Result CreateArrayResult(ContextBase context, Category category, CompileSyntax argsType)
         {
             var target = context.Result(category.Typed, argsType).Align;
-            return target.Type.UniqueAlign.UniqueArray(1).Result(category, target);
+            return target.Type.UniqueAlign.UniqueArray(1).PointerKind.Result(category, target);
         }
 
         internal FunctionType FunctionInstance(Structure structure, FunctionSyntax body, TypeBase argsType)

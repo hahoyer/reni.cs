@@ -61,7 +61,7 @@ x(4) dump_print;
 
     [TestFixture]
     [ConvertFromNumber]
-    [CompilerParameters.Trace.Parser]
+    //[CompilerParameters.Trace.Parser]
     [TargetSet("(<< (108)text_item<< (109)text_item)text_item dump_print", "lm")]
     [ArrayFromPieces]
     [Hallo]
