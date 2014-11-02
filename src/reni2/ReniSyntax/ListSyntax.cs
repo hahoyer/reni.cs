@@ -32,7 +32,7 @@ namespace Reni.ReniSyntax
 
         internal override CompileSyntax ToCompiledSyntax { get { return ToContainer; } }
 
-        internal Container ToContainer
+        internal override Container ToContainer
         {
             get
             {

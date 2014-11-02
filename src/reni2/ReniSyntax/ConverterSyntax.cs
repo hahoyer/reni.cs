@@ -17,5 +17,6 @@ namespace Reni.ReniSyntax
         protected override string GetNodeDump() { return "converter (" + Body.NodeDump + ")"; }
 
         internal override Syntax ExtractBody { get { return Body.ExtractBody; } }
+        internal override CompileSyntax ToCompiledSyntax { get { return ToContainer; } }
     }
 }

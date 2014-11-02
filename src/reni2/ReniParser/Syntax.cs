@@ -109,5 +109,6 @@ namespace Reni.ReniParser
         }
 
         internal virtual IEnumerable<Syntax> ToList(List type) { yield return this; }
+        internal virtual Container ToContainer { get { return ListSyntax.Spread(this).ToContainer; } }
     }
 }

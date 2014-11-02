@@ -17,6 +17,6 @@ namespace Reni.TokenClasses
 
     sealed class EndToken : TokenClass
     {
-        protected override Syntax Suffix(Syntax left, SourcePart token) { return left; }
+        protected override Syntax Suffix(Syntax left, SourcePart token) { return left.ToCompiledSyntax; }
     }
 }
