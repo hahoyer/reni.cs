@@ -101,5 +101,11 @@ namespace Reni.ReniParser
             NotImplementedMethod(getIssue());
             return null;
         }
+
+        virtual public IEnumerable<CompileSyntax> ToList(List type)
+        {
+            NotImplementedMethod(type);
+            return null;
+        }
     }
 }

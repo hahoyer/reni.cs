@@ -28,11 +28,11 @@ namespace Reni.ReniSyntax
         }
         internal override Syntax RightParenthesisOnRight(int level, SourcePart rightToken)
         {
-            return Container.Create(Token, rightToken, this);
+            return Container.Create(Token, (Syntax) this);
         }
         internal override Syntax SurroundedByParenthesis(SourcePart leftToken, SourcePart rightToken)
         {
-            return Container.Create(leftToken, rightToken, this);
+            return Container.Create(leftToken, (Syntax) this);
         }
     }
 }

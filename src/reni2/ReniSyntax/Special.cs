@@ -8,6 +8,7 @@ using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.ReniParser;
+using Reni.TokenClasses;
 
 namespace Reni.ReniSyntax
 {
@@ -34,6 +35,7 @@ namespace Reni.ReniSyntax
         }
 
         internal override CompileSyntax Visit(ISyntaxVisitor visitor) { return Terminal.Visit(visitor); }
+        public override IEnumerable<CompileSyntax> ToList(List type) { yield return ToCompiledSyntax(); }
     }
 
     sealed class PrefixSyntax : SpecialSyntax

@@ -23,7 +23,7 @@ namespace Reni.ReniParser
 
         internal override Syntax SurroundedByParenthesis(SourcePart leftToken, SourcePart rightToken)
         {
-            return Container.Create(leftToken, rightToken, this);
+            return Container.Create(leftToken, this);
         }
     }
 }

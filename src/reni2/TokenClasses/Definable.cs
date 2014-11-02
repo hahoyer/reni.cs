@@ -6,24 +6,26 @@ using hw.Scanner;
 using Reni.Feature;
 using Reni.Parser;
 using Reni.ReniParser;
-using Reni.ReniSyntax;
 
 namespace Reni.TokenClasses
 {
     abstract class Definable : TokenClass
     {
         protected override sealed Syntax Terminal(SourcePart token) { return new DefinableTokenSyntax(this, token); }
+
         protected override sealed Syntax Prefix(SourcePart token, Syntax right)
         {
             return new ExpressionSyntax(this, null, token, right.ToCompiledSyntax());
         }
+
         protected override sealed Syntax Suffix(Syntax left, SourcePart token)
         {
-            return left.CreateSyntaxOrDeclaration(this, token, null);
+            return new ExpressionSyntax(this, left.ToCompiledSyntax(), token, null);
         }
+
         protected override sealed Syntax Infix(Syntax left, SourcePart token, Syntax right)
         {
-            return left.CreateSyntaxOrDeclaration(this, token, right);
+            return new ExpressionSyntax(this, left.ToCompiledSyntax(), token, right.ToCompiledSyntax());
         }
 
         [DisableDump]

@@ -98,38 +98,38 @@ namespace Reni.Struct
                 _list.Add(parsedSyntax.ToCompiledSyntax());
             }
 
-            public Container ToContainer(SourcePart leftToken, SourcePart rightToken)
+            public Container ToContainer(SourcePart part)
             {
-                return new Container(leftToken, _list.ToArray(), _dictionary, _converters.ToArray());
+                return new Container(part, _list.ToArray(), _dictionary, _converters.ToArray());
             }
         }
 
 
-        internal static Container Create(SourcePart leftToken, SourcePart rightToken, List<Syntax> parsed)
+        internal static Container Create(SourcePart part, IEnumerable<Syntax> parsed)
         {
             var result = new PreContainer();
             foreach(var parsedSyntax in parsed)
                 result.Add(parsedSyntax);
-            return result.ToContainer(leftToken, rightToken);
+            return result.ToContainer(part);
         }
 
-        internal static Container Create(SourcePart leftToken, SourcePart rightToken, Syntax parsedSyntax)
+        internal static Container Create(SourcePart part, Syntax parsedSyntax)
         {
             var result = new PreContainer();
             result.Add(parsedSyntax);
-            return result.ToContainer(leftToken, rightToken);
+            return result.ToContainer(part);
         }
 
         internal static Container Create(Syntax parsedSyntax)
         {
-            return Create(parsedSyntax.Token, parsedSyntax.Token, parsedSyntax);
+            return Create(parsedSyntax.Token, parsedSyntax);
         }
 
         internal static Syntax Create(SourcePart token, ConverterSyntax body)
         {
             var result = new PreContainer();
             result.Add(body);
-            return result.ToContainer(body.Token, token);
+            return result.ToContainer(body.Token);
         }
 
         public override string DumpData()
