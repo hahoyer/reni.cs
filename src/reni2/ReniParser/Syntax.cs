@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using hw.Debug;
 using hw.Parser;
 using hw.Scanner;
 using Reni.ReniSyntax;
@@ -20,8 +21,10 @@ namespace Reni.ReniParser
             : base(token, nextObjectId)
         {}
 
+        [DisableDump]
         internal virtual Syntax ExtractBody { get { return this; } }
 
+        [DisableDump]
         internal virtual CompileSyntax ToCompiledSyntax
         {
             get

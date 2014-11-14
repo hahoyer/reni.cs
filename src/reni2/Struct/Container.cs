@@ -54,6 +54,7 @@ namespace Reni.Struct
             _converters = converters;
         }
 
+        [DisableDump]
         internal override CompileSyntax ToCompiledSyntax { get { return this; } }
         [DisableDump]
         internal override bool? Hllw
@@ -131,7 +132,7 @@ namespace Reni.Struct
 
         Result Result(Category category, ContextBase parent, int accessPosition, int position)
         {
-            var trace = new[] {-1}.Contains(ObjectId) && accessPosition == 1 && position == 1;
+            var trace = ObjectId.In(1) && accessPosition == 0 && position == 0;
             StartMethodDump(trace, category, parent, accessPosition, position);
             try
             {
@@ -139,8 +140,11 @@ namespace Reni.Struct
                     .UniqueStructurePositionContext(this, accessPosition);
                 Dump("Statements[position]", Statements[position]);
                 BreakExecution();
-                var result = Statements[position]
-                    .Result(uniqueChildContext, category.Typed)
+                var result1 = Statements[position]
+                    .Result(uniqueChildContext, category.Typed);
+                Dump("result1", result1);
+                BreakExecution();
+                var result = result1
                     .SmartUn<FunctionType>();
                 Dump("result", result);
                 return ReturnMethodDump(result.AutomaticDereferenceResult);
@@ -192,17 +196,25 @@ namespace Reni.Struct
         {
             if(category.IsNone)
                 return new Result();
-            var trace = ObjectId == -1 && category.HasSize;
+            var trace = ObjectId == 1 && category.HasCode;
             StartMethodDump(trace, category, parent, fromPosition, fromNotPosition);
             try
             {
                 Dump("Statements", Statements);
 
-                var results = (fromNotPosition - fromPosition)
+                var enumerable = (fromNotPosition - fromPosition)
                     .Select(i => fromPosition + i)
                     .Where(position => !Statements[position].IsLambda)
+                    .ToArray();
+                Dump("Statements", enumerable);
+                BreakExecution();
+                var @select = enumerable
                     .Select(position => InnerResult(category, parent, position))
                     .Select(r => r.Align)
+                    .ToArray();
+                Dump("Statements", select);
+                BreakExecution();
+                var results = @select
                     .Select(r => r.LocalBlock(category))
                     .ToArray();
                 Dump("results", results);

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using hw.Debug;
 using hw.Scanner;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
@@ -21,7 +22,10 @@ namespace Reni.TokenClasses
         {
             return new DeclarationSyntax(_definable, token, right);
         }
+
         internal override Syntax SurroundedByParenthesis(SourcePart leftToken, SourcePart rightToken) { return this; }
+
+        [DisableDump]
         internal override CompileSyntax ToCompiledSyntax { get { return new ExpressionSyntax(_definable, null, Token, null); } }
     }
 }

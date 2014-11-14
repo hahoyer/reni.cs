@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using hw.Debug;
 using hw.Scanner;
 using Reni.ReniParser;
 using Reni.TokenClasses;
@@ -16,7 +17,9 @@ namespace Reni.ReniSyntax
 
         protected override string GetNodeDump() { return "converter (" + Body.NodeDump + ")"; }
 
+        [DisableDump]
         internal override Syntax ExtractBody { get { return Body.ExtractBody; } }
+        [DisableDump]
         internal override CompileSyntax ToCompiledSyntax { get { return ToContainer; } }
     }
 }

@@ -31,8 +31,6 @@ namespace Reni.FeatureTest.BitArrayOp
             CreateFileAndRunCompiler("Negative number", @"(-123456789)dump_print", "-123456789");
             CreateFileAndRunCompiler("Negative number", @"(-1234567890)dump_print", "-1234567890");
         }
-
-        public override void Run() { }
     }
 
     [TestFixture]

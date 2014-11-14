@@ -30,6 +30,7 @@ namespace Reni.ReniSyntax
             return _data;
         }
 
+        [DisableDump]
         internal override CompileSyntax ToCompiledSyntax { get { return ToContainer; } }
 
         internal override Container ToContainer
