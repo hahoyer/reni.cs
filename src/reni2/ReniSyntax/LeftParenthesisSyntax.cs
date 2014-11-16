@@ -60,6 +60,14 @@ namespace Reni.ReniSyntax
             _right = right;
         }
 
+        internal override Syntax RightParenthesis(int level, SourcePart token)
+        {
+            Tracer.Assert(level == _parenthesis);
+            if(_left==null && _right == null)
+                return new EmptyList(token);
+            return base.RightParenthesis(level, token);
+        }
+
         internal override Syntax RightParenthesisOnLeft(int level, SourcePart token)
         {
             if(level != _parenthesis)

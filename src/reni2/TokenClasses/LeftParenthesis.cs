@@ -31,7 +31,7 @@ namespace Reni.TokenClasses
             return new LeftParenthesisSyntax(left, _level, token, right);
         }
 
-        protected Syntax Terminal(SourcePart token)
+        protected override Syntax Terminal(SourcePart token)
         {
             return new LeftParenthesisSyntax(null, _level, token, null);
         }
