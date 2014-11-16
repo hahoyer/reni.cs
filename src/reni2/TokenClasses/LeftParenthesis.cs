@@ -10,7 +10,7 @@ using Reni.ReniSyntax;
 
 namespace Reni.TokenClasses
 {
-    sealed class LeftParenthesis : TokenClass, IInfix
+    sealed class LeftParenthesis : TokenClass
     {
         readonly int _level;
 
@@ -24,31 +24,14 @@ namespace Reni.TokenClasses
             return new LeftParenthesisPrefixSyntax(_level, token, right);
         }
 
-        protected Syntax InfixSyntax(Syntax left, SourcePart token, Syntax right)
+        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
         {
-            NotImplementedMethod(left, token, right);
-            return null;
             return new LeftParenthesisSyntax(left, _level, token, right);
         }
 
         protected override Syntax Terminal(SourcePart token)
         {
             return new LeftParenthesisSyntax(null, _level, token, null);
-        }
-
-        Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
-        {
-            return context.FunctionalObjectResult(category, left, right);
-        }
-        Result ITerminal_Result(ContextBase context, Category category, SourcePart token)
-        {
-            NotImplementedMethod(context, category, token);
-            return null;
-        }
-        CompileSyntax ITerminal_Visit(ISyntaxVisitor visitor)
-        {
-            NotImplementedMethod(visitor);
-            return null;
         }
     }
 }

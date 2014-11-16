@@ -46,8 +46,7 @@ namespace Reni.ReniSyntax
         {
             Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
             {
-                NotImplementedMethod(context, category, left, right);
-                return null;
+                return context.FunctionalObjectResult(category, left, right);
             }
         }
 
@@ -65,6 +64,8 @@ namespace Reni.ReniSyntax
             Tracer.Assert(level == _parenthesis);
             if(_left==null && _right == null)
                 return new EmptyList(token);
+            if (_left != null && _right != null)
+                return new InfixSyntax(token, _left.ToCompiledSyntax, _operator, _right.ToCompiledSyntax);
             return base.RightParenthesis(level, token);
         }
 
