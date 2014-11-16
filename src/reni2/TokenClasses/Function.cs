@@ -16,7 +16,7 @@ namespace Reni.TokenClasses
             _isMetaFunction = isMetaFunction;
         }
 
-        protected override Syntax PrefixSyntax(SourcePart token, Syntax right)
+        protected override Syntax Prefix(SourcePart token, Syntax right)
         {
             return new FunctionSyntax
                 (
@@ -28,7 +28,7 @@ namespace Reni.TokenClasses
                 );
         }
 
-        protected override Syntax InfixSyntax(Syntax left, SourcePart token, Syntax right)
+        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
         {
             return new FunctionSyntax
                 (
