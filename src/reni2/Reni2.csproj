@@ -377,6 +377,7 @@
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>CSharp_Generated.cs</LastGenOutput>
     </None>
+    <None Include="hw\CSharp.Exe.targets" />
     <None Include="packages.config" />
     <None Include="ParsedSyntax.cd" />
     <None Include="Visitor.cd" />
