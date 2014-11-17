@@ -58,7 +58,6 @@ Text: /\
 ";
         }
 
-        public override void Run() { }
         protected override string Target { get { return Definition() + "; " + InstanceCode + " dump_print"; } }
         protected virtual string InstanceCode { get { return GetStringAttribute<InstanceCodeAttribute>(); } }
     }
@@ -78,8 +77,6 @@ Text: /\
     [Repeater]
     public sealed class Text1 : TextStruct
     {
-        [Test]
-        public override void Run() { BaseRun(); }
     }
 
     [TestFixture]
@@ -88,7 +85,5 @@ Text: /\
     [Text1]
     public sealed class TextConcat : TextStruct
     {
-        [Test]
-        public override void Run() { BaseRun(); }
     }
 }

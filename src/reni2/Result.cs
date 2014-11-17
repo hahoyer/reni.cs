@@ -514,7 +514,8 @@ namespace Reni
                     () => alignedSize,
                     () => Type.UniqueAlign,
                     () => Code.BitCast(alignedSize),
-                    () => Exts);
+                    () => Exts
+                    );
                 return result;
             }
         }
