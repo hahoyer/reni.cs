@@ -93,7 +93,7 @@ namespace Reni.Context
         [DebuggerHidden]
         Result ObtainResult(Category category, CompileSyntax syntax)
         {
-            var trace = syntax.ObjectId == 1728 && ObjectId == 7 && category.HasCode;
+            var trace = syntax.ObjectId == -23 && ObjectId == 1 && category.HasCode;
             StartMethodDump(trace, category, syntax);
             try
             {

@@ -137,7 +137,7 @@ namespace Reni.Struct
         CodeBase CreateContextRefCode()
         {
             return CodeBase
-                .FrameRef(Root.DefaultRefAlignParam)
+                .FrameRef()
                 .ReferencePlus(ArgsPartSize);
         }
 

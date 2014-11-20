@@ -80,7 +80,13 @@ namespace Reni.Context
         static Result CreateArrayResult(ContextBase context, Category category, CompileSyntax argsType)
         {
             var target = context.Result(category.Typed, argsType).Align;
-            return target.Type.UniqueAlign.UniqueArray(1).PointerKind.Result(category, target);
+            return target
+                .Type
+                .UniqueAlign
+                .UniqueArray(1)
+                .Result(category.Typed, target)
+                .LocalPointerKindResult
+                & category;
         }
 
         internal FunctionType FunctionInstance(Structure structure, FunctionSyntax body, TypeBase argsType)
@@ -97,26 +103,43 @@ namespace Reni.Context
             if(!(category.HasCode || category.HasExts))
                 return result;
 
-            if(category.HasCode)
-                result.Code = CodeBase.DumpPrintText("(");
-
-            for(var i = 0; i < count; i++)
+            StartMethodDump(false, category, count, "elemResults");
+            try
             {
-                var elemResult = elemResults(i);
-                result.IsDirty = true;
                 if(category.HasCode)
+                    result.Code = CodeBase.DumpPrintText("(");
+
+                for(var i = 0; i < count; i++)
                 {
-                    if(i > 0)
-                        result.Code = result.Code + CodeBase.DumpPrintText(", ");
-                    result.Code = result.Code + elemResult.Code;
+                    Dump("i", i); 
+
+                    var elemResult = elemResults(i);
+
+                    Dump("elemResult", elemResult); 
+                    BreakExecution();
+
+                    result.IsDirty = true;
+                    if(category.HasCode)
+                    {
+                        if(i > 0)
+                            result.Code = result.Code + CodeBase.DumpPrintText(", ");
+                        result.Code = result.Code + elemResult.Code;
+                    }
+                    if(category.HasExts)
+                        result.Exts = result.Exts.Sequence(elemResult.Exts);
+                    result.IsDirty = false;
+
+                    Dump("result", result); 
+                    BreakExecution();
                 }
-                if(category.HasExts)
-                    result.Exts = result.Exts.Sequence(elemResult.Exts);
-                result.IsDirty = false;
+                if(category.HasCode)
+                    result.Code = result.Code + CodeBase.DumpPrintText(")");
+                return ReturnMethodDump(result);
             }
-            if(category.HasCode)
-                result.Code = result.Code + CodeBase.DumpPrintText(")");
-            return result;
+            finally
+            {
+                EndMethodDump();
+            }
         }
 
         internal FunctionContainer FunctionContainer(int index) { return _functions.Container(index); }

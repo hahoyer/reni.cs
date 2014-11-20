@@ -43,11 +43,11 @@ namespace Reni.Code
         internal static CodeBase BitsConst(Size size, BitsConst t) { return new BitArray(size, t); }
         internal static CodeBase BitsConst(BitsConst t) { return BitsConst(t.Size, t); }
         internal static CodeBase DumpPrintText(string dumpPrintText) { return new DumpPrintText(dumpPrintText); }
-        internal static CodeBase FrameRef(RefAlignParam refAlignParam) { return new TopFrameRef(); }
+        internal static CodeBase FrameRef() { return new TopFrameRef(); }
         internal static FiberItem RecursiveCall(Size refsSize) { return new RecursiveCallCandidate(refsSize); }
         internal static CodeBase ReferenceCode(IContextReference reference) { return new ReferenceCode(reference); }
         internal static CodeBase Void { get { return BitArray.Void; } }
-        internal static CodeBase TopRef(RefAlignParam refAlignParam) { return new TopRef(); }
+        internal static CodeBase TopRef() { return new TopRef(); }
 
         internal static CodeBase List(IEnumerable<CodeBase> data)
         {

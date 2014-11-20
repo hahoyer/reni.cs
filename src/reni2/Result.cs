@@ -618,10 +618,10 @@ namespace Reni
             if(resultForArg != null)
             {
                 if(HasCode)
-                    result.Code = Code.ReplaceArg(getResultForArg(Category.Type | Category.Code));
+                    result.Code = Code.ReplaceArg(resultForArg & (Category.Type | Category.Code));
                 if(HasExts)
                     result.Exts = Exts.WithoutArg()
-                        + getResultForArg(Category.Exts).Exts;
+                        + resultForArg.Exts;
             }
             result.IsDirty = false;
             return result;

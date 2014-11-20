@@ -26,11 +26,11 @@ namespace Reni.Context
             if(metaFeature != null)
                 return metaFeature.Result(context, category, left, right);
 
-            var result = Result(context, category, right);
-            return result
-                .ReplaceArg(ConverterResult)
-                .ReplaceArg(context.ObjectResult(category, left))
-                ;
+            var rawResult = Result(context, category, right);
+            var resultWithConversions = rawResult.ReplaceArg(ConverterResult);
+            var objectResult = context.ObjectResult(category, left).LocalPointerKindResult;
+            var result = resultWithConversions.ReplaceArg(objectResult);
+            return result;
         }
 
         internal Result Result(Category category, ContextBase context, CompileSyntax right)

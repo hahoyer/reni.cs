@@ -184,7 +184,7 @@ namespace Reni.Feature
         [DisableDump]
         public override IFeatureImplementation Feature { get { return _data; } }
 
-        public override Result Converter(Category category) { return _definingItem.ArgResult(category); }
+        public override Result Converter(Category category) { return _definingItem.PointerKind.ArgResult(category); }
 
         [DisableDump]
         public override TypeBase Type { get { return _definingItem; } }

@@ -405,7 +405,11 @@ namespace Reni.Type
                 );
         }
 
-        IReferenceType ObtainPointer() { return this as IReferenceType ?? new PointerType(this); }
+        IReferenceType ObtainPointer()
+        {
+            Tracer.Assert(!Hllw);
+            return this as IReferenceType ?? new PointerType(this);
+        }
 
         [DisableDump]
         public virtual TypeBase ArrayElementType
