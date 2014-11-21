@@ -134,7 +134,7 @@ namespace Reni.Struct
         {
             var position = rightResult
                 .Conversion(IndexType)
-                .DereferenceResult
+                .SmartUn<PointerType>()
                 .Evaluate(ContainerContextObject.RootContext.ExecutionContext)
                 .ToInt32();
             return AccessViaThisReference(category, position);
