@@ -37,12 +37,13 @@ namespace Reni.Code.ReplaceVisitor
             : base(actualArg)
         {
             _offset = offset;
-            StopByObjectId(-22);
+            StopByObjectId(9);
         }
 
         internal ReplaceRelRefArg(Result actualArg)
             : this(actualArg, Size.Create(0)) { }
 
+        [DisableDump]
         protected override CodeBase Actual
         {
             get
@@ -53,6 +54,7 @@ namespace Reni.Code.ReplaceVisitor
             }
         }
 
+        [DisableDump]
         Size Offset { get { return _offset; } }
 
         protected override Visitor<CodeBase> After(Size size) { return new ReplaceRelRefArg(ActualArg, Offset + size); }

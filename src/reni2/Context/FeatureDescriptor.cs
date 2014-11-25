@@ -2,6 +2,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using hw.Debug;
+using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Feature;
 using Reni.ReniSyntax;
@@ -20,17 +21,33 @@ namespace Reni.Context
         [DisableDump]
         protected abstract Func<Category, Result> ConverterResult { get; }
 
-        internal Result Result(Category category, ContextBase context, CompileSyntax left, CompileSyntax right)
+        internal Result Result([NotNull]Category category, [NotNull]ContextBase context, CompileSyntax left, CompileSyntax right)
         {
             var metaFeature = Feature.Meta;
             if(metaFeature != null)
                 return metaFeature.Result(context, category, left, right);
 
-            var rawResult = Result(context, category, right);
-            var resultWithConversions = rawResult.ReplaceArg(ConverterResult);
-            var objectResult = context.ObjectResult(category, left).LocalPointerKindResult;
-            var result = resultWithConversions.ReplaceArg(objectResult);
-            return result;
+            var trace = ObjectId == -40 && category.HasCode;
+            StartMethodDump(trace, context, category, left, right);
+            try
+            {
+                var rawResult = Result(context, category, right);
+                var converterResult = ConverterResult(category.Typed);
+                Dump("rawResult", rawResult);
+                Dump("converterResult", converterResult); 
+                BreakExecution();
+                var resultWithConversions = rawResult.ReplaceArg(ConverterResult);
+                Dump("resultWithConversions", resultWithConversions); 
+                BreakExecution();
+                var objectResult = context.ObjectResult(category, left).LocalPointerKindResult;
+                var result = resultWithConversions.ReplaceArg(objectResult);
+                return ReturnMethodDump(result);
+            }
+            finally
+            {
+                EndMethodDump();
+
+            }
         }
 
         internal Result Result(Category category, ContextBase context, CompileSyntax right)

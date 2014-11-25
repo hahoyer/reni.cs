@@ -122,7 +122,16 @@ namespace Reni.Code
 
         protected virtual IEnumerable<CodeBase> AsList() { return new[] {this}; }
 
-        internal CodeBase ReplaceArg(TypeBase type, CodeBase code) { return ReplaceArg(new Result {Type = type, Code = code}); }
+        internal CodeBase ReplaceArg(TypeBase type, CodeBase code)
+        {
+            return ReplaceArg
+                (
+                    new Result
+                    {
+                        Type = type,
+                        Code = code
+                    });
+        }
 
         internal CodeBase ReplaceArg(Result arg)
         {
