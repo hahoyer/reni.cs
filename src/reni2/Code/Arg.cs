@@ -23,9 +23,6 @@ namespace Reni.Code
         [Node]
         internal TypeBase Type { get { return _type; } }
 
-        [DisableDump]
-        internal override bool IsRelativeReference { get { return _type is IReferenceType; } }
-
         protected override Size GetSize() { return _type.Size; }
         protected override CodeArgs GetRefsImplementation() { return CodeArgs.Arg(); }
         protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.Arg(this); }

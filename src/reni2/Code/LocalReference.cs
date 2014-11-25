@@ -27,9 +27,6 @@ namespace Reni.Code
             StopByObjectId(-8);
         }
 
-        [DisableDump]
-        internal override bool IsRelativeReference { get { return false; } }
-
         internal CodeBase Code { get { return _unalignedCode.Align(); } }
 
         protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
