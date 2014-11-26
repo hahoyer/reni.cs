@@ -222,6 +222,7 @@ namespace Reni.Code
     {
         IOutStream OutStream { get; }
         bool IsTraceEnabled { get; }
+        bool ProcessErrors { get; }
         CodeBase Function(FunctionId functionId);
         CompileSyntax Parse(string source);
     }

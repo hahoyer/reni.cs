@@ -27,6 +27,10 @@ namespace Reni
 
         public bool ParseOnly;
         public bool RunFromCode;
+        [Node]
+        [EnableDump]
+        public bool ProcessErrors = false;
+
         public IOutStream OutStream;
 
         public sealed class TraceOptionsClass 
@@ -83,5 +87,6 @@ namespace Reni
         {
             public class Parser : Attribute{ }
         }
+
     }
 }

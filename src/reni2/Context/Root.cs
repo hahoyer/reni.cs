@@ -67,6 +67,8 @@ namespace Reni.Context
             get { return new RefAlignParam(BitsConst.SegmentAlignBits, Size.Create(32)); }
         }
 
+        public bool ProcessErrors{ get { return ExecutionContext.ProcessErrors; } }
+
         IFeatureImplementation ISymbolProvider<Minus, IFeatureImplementation>.Feature(Minus tokenClass)
         {
             return _minusFeatureCache.Value;

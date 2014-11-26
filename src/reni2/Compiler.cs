@@ -91,6 +91,7 @@ namespace Reni
 
         IOutStream IExecutionContext.OutStream { get { return _parameters.OutStream; } }
         bool IExecutionContext.IsTraceEnabled { get { return _isInExecutionPhase && _parameters.TraceOptions.Functions; } }
+        bool IExecutionContext.ProcessErrors { get { return _parameters.ProcessErrors; } }
         CodeBase IExecutionContext.Function(FunctionId functionId) { return CodeContainer.Function(functionId); }
         CompileSyntax IExecutionContext.Parse(string source) { return Parse(source); }
 

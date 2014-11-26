@@ -234,10 +234,16 @@ namespace Reni.Context
         ContextSearchResult Declarations(Definable tokenClass)
         {
             var genericize = tokenClass.Genericize.ToArray();
-            return genericize.SelectMany(g => g.Declarations(this)).Single();
+            var result = genericize
+                .SelectMany(g => g.Declarations(this))
+                .SingleOrDefault();
+            if(RootContext.ProcessErrors)
+                return result;
+            NotImplementedMethod(tokenClass);
+            return null;
+
         }
 
-        [NotNull]
         internal Result ObtainResult(Category category, SourcePart position, Definable tokenClass, CompileSyntax right)
         {
             var searchResult = Declarations(tokenClass);

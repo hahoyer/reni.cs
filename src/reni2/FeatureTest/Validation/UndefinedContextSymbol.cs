@@ -15,11 +15,14 @@ namespace Reni.FeatureTest.Validation
     [PrioTableTest]
     public sealed class UndefinedContextSymbol : CompilerTest
     {
+        public UndefinedContextSymbol() { Parameters.ProcessErrors = true; }
         protected override void Verify(IEnumerable<IssueBase> issues)
         {
-            var issue = issues.Single();
-            Tracer.DumpStaticMethodWithData(issue);
-            Tracer.TraceBreak();
+            var issueArray = issues.ToArray();
+            var i = 0;
+            Tracer.Assert(issueArray[i] is UndefinedSymbolIssue, issueArray[i].Dump);
+            i++;
+            Tracer.Assert(i == issueArray.Length);
         }
     }
 
@@ -29,7 +32,15 @@ namespace Reni.FeatureTest.Validation
     [Output("")]
     public sealed class UndefinedSymbol : CompilerTest
     {
-        protected override void Verify(IEnumerable<IssueBase> issues) { var issue = (UndefinedSymbolIssue) issues.Single(); }
+        public UndefinedSymbol() { Parameters.ProcessErrors = true; }
+        protected override void Verify(IEnumerable<IssueBase> issues)
+        {
+            var issueArray = issues.ToArray();
+            var i = 0;
+            Tracer.Assert(issueArray[i] is UndefinedSymbolIssue, issueArray[i].Dump);
+            i++;
+            Tracer.Assert(i == issueArray.Length);
+        }
     }
 
     [TestFixture]
@@ -38,12 +49,16 @@ namespace Reni.FeatureTest.Validation
     [UndefinedContextSymbol]
     public sealed class UseOfUndefinedContextSymbol : CompilerTest
     {
+        public UseOfUndefinedContextSymbol() { Parameters.ProcessErrors = true; }
         protected override void Verify(IEnumerable<IssueBase> issues)
         {
             var issueArray = issues.ToArray();
-            Tracer.Assert(issueArray.Length == 2);
-            Tracer.Assert(issueArray[0] is UndefinedSymbolIssue);
-            Tracer.Assert(issueArray[1] is ConsequentialError);
+            var i = 0;
+            Tracer.Assert(issueArray[i] is UndefinedSymbolIssue, issueArray[i].Dump);
+            i++;
+            Tracer.Assert(issueArray[i] is ConsequentialError, issueArray[i].Dump);
+            i++;
+            Tracer.Assert(i == issueArray.Length);
         }
     }
 
@@ -53,13 +68,18 @@ namespace Reni.FeatureTest.Validation
     [UseOfUndefinedContextSymbol]
     public sealed class IndirectUseOfUndefinedContextSymbol : CompilerTest
     {
+        public IndirectUseOfUndefinedContextSymbol() { Parameters.ProcessErrors = true; }
         protected override void Verify(IEnumerable<IssueBase> issues)
         {
             var issueArray = issues.ToArray();
-            Tracer.Assert(issueArray.Length == 3);
-            Tracer.Assert(issueArray[0] is UndefinedSymbolIssue);
-            Tracer.Assert(issueArray[1] is ConsequentialError);
-            Tracer.Assert(issueArray[2] is ConsequentialError);
+            var i = 0;
+            Tracer.Assert(issueArray[i] is UndefinedSymbolIssue, issueArray[i].Dump);
+            i++;
+            Tracer.Assert(issueArray[i] is ConsequentialError, issueArray[i].Dump);
+            i++;
+            Tracer.Assert(issueArray[i] is ConsequentialError, issueArray[i].Dump);
+            i++;
+            Tracer.Assert(i == issueArray.Length);
         }
     }
 }
