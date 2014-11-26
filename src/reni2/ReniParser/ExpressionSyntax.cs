@@ -9,6 +9,7 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.ReniSyntax;
 using Reni.TokenClasses;
+using Reni.Validation;
 
 namespace Reni.ReniParser
 {
@@ -91,6 +92,15 @@ namespace Reni.ReniParser
                     result += "(" + Right.DumpPrintText + ")";
                 return result;
             }
+        }
+
+        internal override Syntax SyntaxError(IssueId issue, SourcePart token)
+        {
+            if(Right == null)
+                return Left.SyntaxError(issue, token);
+            NotImplementedMethod(issue,token);
+            return null;
+
         }
     }
 

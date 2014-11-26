@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Helper;
 using hw.Parser;
-using Reni.Parser;
+using hw.Scanner;
 using Reni.TokenClasses;
 
 namespace Reni.ReniParser
@@ -18,8 +18,8 @@ namespace Reni.ReniParser
                 prioTable += PrioTable.Left("converter");
                 prioTable = prioTable.ParenthesisLevelLeft
                     (
-                        new[] { "(", "[", "{" },
-                        new[] { ")", "]", "}" }
+                        new[] {"(", "[", "{"},
+                        new[] {")", "]", "}"}
                     );
                 prioTable += PrioTable.Left(PrioTable.Any);
                 prioTable.Correct(PrioTable.Any, PrioTable.BeginOfText, '=');
@@ -38,6 +38,10 @@ namespace Reni.ReniParser
             };
         }
 
-        protected override TokenClass GetSyntaxError(string message) { return new SyntaxError(message); }
+        protected override TokenClass GetEndOfText() { throw new NotImplementedException(); }
+        protected override TokenClass GetTokenClass(string name) { throw new NotImplementedException(); }
+        protected override TokenClass GetNumber() { throw new NotImplementedException(); }
+        protected override TokenClass GetText() { throw new NotImplementedException(); }
+        protected override TokenClass GetError(Match.IError message) { return new SyntaxError(message); }
     }
 }

@@ -12,7 +12,7 @@ namespace Reni.ReniParser
         internal static CompileSyntax CheckedToCompiledSyntax(this Syntax parsedSyntax, SourcePart token, Func<IssueId> getError)
         {
             if(parsedSyntax == null)
-                return new CompileSyntaxError(token, getError());
+                return new CompileSyntaxError(getError(), token);
             return parsedSyntax.ToCompiledSyntax;
         }
 

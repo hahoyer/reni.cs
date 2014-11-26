@@ -29,7 +29,7 @@ namespace hw.Parser
             result.Name = PrioTable.EndOfText;
             return result;
         }
-
+                                                                    
         FunctionCache<string, TTokenClass> GetTokenClasses()
         {
             var result = new FunctionCache<string, TTokenClass>(GetPredefinedTokenClasses(), InternalGetTokenClass);
@@ -64,17 +64,17 @@ namespace hw.Parser
         IType<TTreeItem> ITokenFactory<TTreeItem>.Number { get { return _number.Value; } }
         IType<TTreeItem> ITokenFactory<TTreeItem>.Text { get { return _text.Value; } }
         IType<TTreeItem> ITokenFactory<TTreeItem>.EndOfText { get { return _endOfText.Value; } }
-        IType<TTreeItem> ITokenFactory<TTreeItem>.Error(Match.IError error) { return GetSyntaxError(error.ToString()); }
+        IType<TTreeItem> ITokenFactory<TTreeItem>.Error(Match.IError error) { return GetError(error); }
 
-        protected abstract TTokenClass GetSyntaxError(string message);
+        protected abstract TTokenClass GetError(Match.IError message);
         protected abstract FunctionCache<string, TTokenClass> GetPredefinedTokenClasses();
-
-        protected virtual TTokenClass GetEndOfText() { return GetSyntaxError("unexpected end of text".Quote()); }
-        protected virtual TTokenClass GetTokenClass(string name) { return GetSyntaxError("invalid symbol: " + name.Quote()); }
-        protected virtual TTokenClass GetNumber() { return GetSyntaxError("unexpected number"); }
-        protected virtual TTokenClass GetText() { return GetSyntaxError("unexpected string"); }
+        protected abstract TTokenClass GetEndOfText();
+        protected abstract TTokenClass GetTokenClass(string name);
+        protected abstract TTokenClass GetNumber();
+        protected abstract TTokenClass GetText();
 
         FunctionCache<string, TTokenClass> TokenClasses { get { return _tokenClasses.Value; } }
         protected IType<TTreeItem> TokenClass(string name) { return TokenClasses[name]; }
     }
+
 }

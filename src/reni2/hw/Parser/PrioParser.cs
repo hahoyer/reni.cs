@@ -74,12 +74,12 @@ namespace hw.Parser
                 {
                     _left = _stack.Pop().Create(_left);
                     TracePop();
-                }
 
-                if(_startLevel > _stack.Count)
-                {
-                    _result = _type.Create(_left, _part, null);
-                    return;
+                    if (_startLevel > _stack.Count)
+                    {
+                        _result = _type.Create(_left, _part, null);
+                        return;
+                    }
                 }
 
                 if (relation == '-')

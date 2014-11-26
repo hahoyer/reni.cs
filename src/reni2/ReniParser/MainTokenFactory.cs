@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Helper;
 using hw.Parser;
+using hw.Scanner;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
@@ -10,6 +11,7 @@ using Reni.Parser;
 using Reni.Sequence;
 using Reni.Struct;
 using Reni.TokenClasses;
+using Reni.Validation;
 
 namespace Reni.ReniParser
 {
@@ -167,14 +169,17 @@ namespace Reni.ReniParser
         protected override TokenClass GetEndOfText() { return new EndToken(); }
         protected override TokenClass GetNumber() { return new Number(); }
         protected override TokenClass GetTokenClass(string name) { return new UserSymbol(name); }
-        protected override TokenClass GetSyntaxError(string message) { return new SyntaxError(message); }
+        protected override TokenClass GetError(Match.IError message) { return new SyntaxError(message); }
         protected override TokenClass GetText() { return new Text(); }
     }
 
 
     sealed class SyntaxError : TokenClass
     {
-        readonly string _message;
-        public SyntaxError(string message) { _message = message; }
+        readonly IssueId _issue;
+        public SyntaxError(IssueId issue) { _issue = issue; }
+        public SyntaxError(Match.IError message) { _issue = ReniLexer.Parse(message); }
+        protected override Syntax Terminal(SourcePart token) { return new CompileSyntaxError(_issue, token); }
+        protected override Syntax Suffix(Syntax left, SourcePart token) { return left.SyntaxError(_issue,token); }
     }
 }

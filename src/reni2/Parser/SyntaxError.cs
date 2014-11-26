@@ -18,8 +18,10 @@ namespace Reni.Parser
 
         Syntax IType<Syntax>.Create(Syntax left, SourcePart part, Syntax right)
         {
-            return new CompileSyntaxError(part, _issueId);
+            NotImplementedMethod(left, part, right);
+            return null;
         }
+
         string IType<Syntax>.PrioTableName { get { return PrioTable.Error; } }
         ISubParser<Syntax> IType<Syntax>.NextParser { get { return null; } }
         IType<Syntax> IType<Syntax>.NextTypeIfMatched { get { return null; } }

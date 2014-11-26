@@ -6,6 +6,7 @@ using hw.Helper;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
+using Reni.ReniParser;
 using Reni.ReniSyntax;
 
 namespace Reni.Validation
@@ -14,14 +15,18 @@ namespace Reni.Validation
     {
         [EnableDump]
         readonly IssueId _issueId;
-        readonly CompileSyntaxError _next;
+        readonly CompileSyntaxError _previous;
         readonly ValueCache<CompileSyntaxIssue> _issueCache;
 
-        public CompileSyntaxError(SourcePart token, IssueId issueId, CompileSyntaxError next = null)
+        public CompileSyntaxError(IssueId issueId, SourcePart token)
+            : this(issueId, token, null)
+        {}
+
+        CompileSyntaxError(IssueId issueId, SourcePart token, CompileSyntaxError previous)
             : base(token)
         {
             _issueId = issueId;
-            _next = next;
+            _previous = previous;
             _issueCache = new ValueCache<CompileSyntaxIssue>(() => new CompileSyntaxIssue(_issueId, Token));
         }
 
@@ -44,11 +49,16 @@ namespace Reni.Validation
                 do
                 {
                     yield return current;
-                    current = current._next;
+                    current = current._previous;
                 } while(current != null);
             }
         }
 
         IssueType IssueType(ContextBase context) { return new IssueType(Issue, context.RootContext); }
+
+        internal override Syntax SyntaxError(IssueId issue, SourcePart token)
+        {
+            return new CompileSyntaxError(issue, token, this);
+        }
     }
 }

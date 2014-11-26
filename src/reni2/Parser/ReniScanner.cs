@@ -10,9 +10,9 @@ namespace Reni.Parser
 {
     sealed class ReniLexer : ILexer
     {
-        internal static ILexer Instance = new ReniLexer();
+        internal static readonly ILexer Instance = new ReniLexer();
 
-        internal sealed class Error : Match.IError
+        sealed class Error : Match.IError
         {
             public readonly IssueId IssueId;
             public Error(IssueId issueId) { IssueId = issueId; }
@@ -67,5 +67,6 @@ namespace Reni.Parser
         int? ILexer.Number(SourcePosn sourcePosn) { return sourcePosn.Match(_number); }
         int? ILexer.Any(SourcePosn sourcePosn) { return sourcePosn.Match(_any); }
         int? ILexer.Text(SourcePosn sourcePosn) { return sourcePosn.Match(_text); }
+        public static IssueId Parse(Match.IError error) { return ((Error) error).IssueId; }
     }
 }

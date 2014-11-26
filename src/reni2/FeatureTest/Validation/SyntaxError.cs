@@ -15,8 +15,6 @@ namespace Reni.FeatureTest.Validation
     [UseOfUndefinedContextSymbol]
     public sealed class SyntaxErrorComment : CompilerTest
     {
-        [Test]
-        public override void Run() { BaseRun(); }
         protected override void Verify(IEnumerable<IssueBase> issues)
         {
             var issueArray = issues.ToArray();
@@ -34,18 +32,17 @@ world'
     [Output("")]
     public sealed class SyntaxErrorString : CompilerTest
     {
-        [Test]
-        public override void Run() { BaseRun(); }
         protected override void Verify(IEnumerable<IssueBase> issues)
         {
             var issueArray = issues.ToArray();
-            var i = 0;
+            var i = 0;                                                               
+            Tracer.Assert(issueArray[i++].IsLogdumpLike(3, 6, IssueId.EOLInString, "'\r"));
             Tracer.Assert(issueArray[i++].IsLogdumpLike(2, 1, IssueId.EOLInString, "' hallo\r"));
             Tracer.Assert(issueArray.Length == i);
         }
     }
 
-    static class SyntaxErrorExpansion
+    static class SyntaxErrorExtension
     {
         const string Pattern = ".*\\.reni\\({0},{1}\\): error {2}: (.*)";
 
@@ -54,9 +51,11 @@ world'
             if(target.IssueId != issueId)
                 return false;
 
-            return new Regex(Pattern.ReplaceArgs(line, column, issueId)).Match(target.LogDump).Groups[1]
-                .Value
-                == text;
+            var value = new Regex(Pattern.ReplaceArgs(line, column, issueId)).Match(target.LogDump).Groups[1]
+                .Value;
+            if(value != text)
+                return false;
+            return true;
         }
     }
 }
