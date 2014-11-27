@@ -237,11 +237,10 @@ namespace Reni.Context
             var result = genericize
                 .SelectMany(g => g.Declarations(this))
                 .SingleOrDefault();
-            if(RootContext.ProcessErrors)
+            if(result != null || RootContext.ProcessErrors)
                 return result;
             NotImplementedMethod(tokenClass);
             return null;
-
         }
 
         internal Result ObtainResult(Category category, SourcePart position, Definable tokenClass, CompileSyntax right)
@@ -259,8 +258,10 @@ namespace Reni.Context
         {
             var provider = this as ISymbolProvider<TDefinable, IFeatureImplementation>;
             if(provider != null)
-                yield return new ContextSearchResult(provider.Feature(tokenClass), this);
+                return new[] {new ContextSearchResult(provider.Feature(tokenClass), this)};
+            return new ContextSearchResult[0];
         }
+
         internal Result CreateArrayResult(Category category, CompileSyntax argsType)
         {
             var target = Result(category.Typed, argsType).Align;
