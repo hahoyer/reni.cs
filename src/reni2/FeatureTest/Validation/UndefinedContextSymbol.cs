@@ -46,6 +46,7 @@ namespace Reni.FeatureTest.Validation
     [TestFixture]
     [Target(@"x dump_print")]
     [Output("")]
+    [LowPriority]
     [UndefinedContextSymbol]
     public sealed class UseOfUndefinedContextSymbol : CompilerTest
     {

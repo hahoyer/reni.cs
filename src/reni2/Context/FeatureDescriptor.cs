@@ -2,7 +2,6 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using hw.Debug;
-using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Feature;
 using Reni.ReniSyntax;
@@ -21,23 +20,23 @@ namespace Reni.Context
         [DisableDump]
         protected abstract Func<Category, Result> ConverterResult { get; }
 
-        internal Result Result([NotNull]Category category, [NotNull]ContextBase context, CompileSyntax left, CompileSyntax right)
+        internal Result Result(Category category, ContextBase context, CompileSyntax left, CompileSyntax right)
         {
             var metaFeature = Feature.Meta;
             if(metaFeature != null)
                 return metaFeature.Result(context, category, left, right);
 
-            var trace = ObjectId == -40 && category.HasCode;
+            var trace = ObjectId == -118 && category.HasCode;
             StartMethodDump(trace, context, category, left, right);
             try
             {
                 var rawResult = Result(context, category, right);
                 var converterResult = ConverterResult(category.Typed);
                 Dump("rawResult", rawResult);
-                Dump("converterResult", converterResult); 
+                Dump("converterResult", converterResult);
                 BreakExecution();
                 var resultWithConversions = rawResult.ReplaceArg(ConverterResult);
-                Dump("resultWithConversions", resultWithConversions); 
+                Dump("resultWithConversions", resultWithConversions);
                 BreakExecution();
                 var objectResult = context.ObjectResult(category, left).LocalPointerKindResult;
                 var result = resultWithConversions.ReplaceArg(objectResult);
@@ -46,7 +45,6 @@ namespace Reni.Context
             finally
             {
                 EndMethodDump();
-
             }
         }
 
@@ -68,7 +66,7 @@ namespace Reni.Context
             if(simpleFeature != null && right == null)
                 return simpleFeature.Result(category);
 
-            var trace = ObjectId == -41 && category.HasCode;
+            var trace = ObjectId == -118 && category.HasCode;
             StartMethodDump(trace, context, category, right);
             try
             {
