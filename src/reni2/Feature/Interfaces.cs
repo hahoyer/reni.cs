@@ -235,7 +235,7 @@ namespace Reni.Feature
     interface IGenericProviderForType
     {
         IEnumerable<SearchResult> Converters(TypeBase source, IConversionParameter parameter);
-        IEnumerable<ISimpleFeature> GetSpecificReverseConversions(TypeBase typeBase);
+        IEnumerable<ISimpleFeature> GetForcedConversions(TypeBase typeBase);
     }
 
     interface IGenericProviderForDefinable
@@ -253,7 +253,7 @@ namespace Reni.Feature
         {
             return source.ConvertersForType(_target, parameter);
         }
-        IEnumerable<ISimpleFeature> IGenericProviderForType.GetSpecificReverseConversions(TypeBase source)
+        IEnumerable<ISimpleFeature> IGenericProviderForType.GetForcedConversions(TypeBase source)
         {
             return source.GetForcedConversions(_target);
         }

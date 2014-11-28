@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
+using hw.Helper;
 using System.Linq;
 using hw.Debug;
-using hw.Helper;
 using Reni.Feature;
 
 namespace Reni.Type
@@ -69,14 +69,39 @@ namespace Reni.Type
                         .SelectMany(conversion => destination.Combine(conversion, path))
                 )
                 .ToArray();
+
+            var destinations = destination.GetReflexiveConversionPaths().ToArray();
+            var conversionsWithStrip = conversions.Concat(stripConversions).ToArray();
+
             result = stripConversions.SingleOrDefault(x => x.Destination == destination);
             if(result != null)
                 return result;
 
-            return conversions
-                .Concat(stripConversions)
-                .SelectMany(path => ForcedConversions(destination, path))
+            return conversionsWithStrip
+                .SelectMany(outer => destinations.SelectMany(inner => ForcedConversions(outer, inner)))
                 .SingleOrDefault(x => x.Destination == destination);
+        }
+
+        static IEnumerable<Path> ForcedConversions(Path source, Path destination)
+        {
+            return source
+                .Destination
+                .GetForcedConversions(destination.Source)
+                .Select(conversion=> Combine(source, conversion, destination));
+        }
+
+        static Path Combine(Path source, ISimpleFeature conversion, Path destination)
+        {
+            var simpleFeatures = destination.Elements
+                .Concat(new[] {conversion})
+                .Concat(source.Elements);
+            return new Path(simpleFeatures.ToArray());
+        }
+
+        static Path Combine(Path outer, Path inner)
+        {
+            Dumpable.NotImplementedFunction(outer, inner);
+            return new Path(outer.Elements.Concat(inner.Elements).ToArray());
         }
 
         static IEnumerable<Path> ForcedConversions(TypeBase destination, Path path)
@@ -128,7 +153,10 @@ namespace Reni.Type
         {
             var identity = new Path(source);
             var types = new TypeBase[0];
-            var elements = new Dictionary<TypeBase, Path> {{source, identity}};
+            var elements = new Dictionary<TypeBase, Path>
+            {
+                {source, identity}
+            };
             yield return identity;
 
             var newTypes = new[] {source};
@@ -175,7 +203,9 @@ namespace Reni.Type
                     type => type
                         .ReflexiveConversions
                         .Select(element => new Path(element))
-                );
+                )
+                .ToArray()
+                ;
         }
 
         static IEnumerable<TypeBase> GetReachableTypes(this TypeBase target)

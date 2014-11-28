@@ -21,7 +21,7 @@ namespace Reni.Type
             , ISymbolProvider<Negate, IFeatureImplementation>
             , ISymbolProvider<TextItem, IFeatureImplementation>
             , IConverterProvider<NumberType, IFeatureImplementation>
-            , ISpecificConversionProvider<NumberType>
+            , IForcedConversionProvider<NumberType>
     {
         static readonly Minus _minusOperation = new Minus();
         readonly ValueCache<Result> _zeroResult;
@@ -56,6 +56,11 @@ namespace Reni.Type
             get { return this.GenericListFromType(base.Genericize); }
         }
 
+        internal override IEnumerable<ISimpleFeature> CutEnabledConversion(NumberType destination)
+        {
+            yield return Extension.SimpleFeature(category => BitCountConversion(category, destination), UniqueEnableCutType);
+        }
+
         IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
         {
             return Extension.SimpleFeature(DumpPrintTokenResult);
@@ -80,7 +85,7 @@ namespace Reni.Type
             return Extension.SimpleFeature(ca => ConversionAsReference(ca, destination));
         }
 
-        IEnumerable<ISimpleFeature> ISpecificConversionProvider<NumberType>.Result(NumberType destination)
+        IEnumerable<ISimpleFeature> IForcedConversionProvider<NumberType>.Result(NumberType destination)
         {
             if(Bits <= destination.Bits)
                 yield return Extension.SimpleFeature(category => destination.FlatConversion(category, this), this);
@@ -115,7 +120,13 @@ namespace Reni.Type
         }
 
         Result DumpPrintTokenResult(Category category) { return VoidType.Result(category, DumpPrintNumberCode, CodeArgs.Arg); }
-        Result EnableCutTokenResult(Category category) { return UniqueEnableCutType.UniquePointer.ArgResult(category.Typed); }
+
+        Result EnableCutTokenResult(Category category)
+        {
+            return UniqueEnableCutType
+                .UniquePointer
+                .Result(category.Typed, UniquePointer.ArgResult(category));
+        }
 
         Result OperationResult(Category category, TypeBase right, IOperation operation)
         {
@@ -177,15 +188,23 @@ namespace Reni.Type
                 );
         }
 
+        Result BitCountConversion(Category category, NumberType destination)
+        {
+            if(Bits == destination.Bits)
+                return ArgResult(category.Typed);
+
+            return destination
+                .Result
+                (
+                    category,
+                    () => ArgCode.BitCast(destination.Size),
+                    CodeArgs.Arg
+                );
+        }
+
         Result UnalignedDereferencePointerResult(Category category)
         {
             return PointerKind.ArgResult(category.Typed).DereferenceResult & category;
-        }
-
-        IEnumerable<ISimpleFeature> GetSpecificReverseConversions(NumberType source)
-        {
-            if(source.Bits <= Bits)
-                yield return Extension.SimpleFeature(category => FlatConversion(category, source));
         }
 
         internal interface IOperation

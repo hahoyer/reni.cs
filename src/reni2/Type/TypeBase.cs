@@ -476,7 +476,7 @@ namespace Reni.Type
         internal TypeBase SmartUn<T>()
             where T : ISimpleFeature
         {
-            return this is T ? ((ISimpleFeature)this).Result(Category.Type).Type : this;
+            return this is T ? ((ISimpleFeature) this).Result(Category.Type).Type : this;
         }
 
         internal Result PointerConversionResult(Category category, TypeBase destinationType)
@@ -562,22 +562,23 @@ namespace Reni.Type
                 .Genericize
                 .ToArray();
             return genericProviderForTypes
-                .SelectMany(g => g.GetSpecificReverseConversions(this).ToArray())
+                .SelectMany(g => g.GetForcedConversions(this).ToArray())
                 .ToArray();
         }
 
         internal IEnumerable<ISimpleFeature> GetForcedConversions<TDestination>(TDestination destination)
         {
-            var provider = this as ISpecificConversionProvider<TDestination>;
+            var provider = this as IForcedConversionProvider<TDestination>;
             if(provider != null)
                 return provider.Result(destination);
             return new ISimpleFeature[0];
         }
-        
+
         internal virtual ISimpleFeature GetStripConversion() { return null; }
+        internal virtual IEnumerable<ISimpleFeature> CutEnabledConversion(NumberType destination) { yield break; }
     }
 
-    interface ISpecificConversionProvider<in TDestination>
+    interface IForcedConversionProvider<in TDestination>
     {
         IEnumerable<ISimpleFeature> Result(TDestination destination);
     }
