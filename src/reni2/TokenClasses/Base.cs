@@ -24,7 +24,7 @@ namespace Reni.TokenClasses
 
     abstract class NonPrefix : TokenClass, ITerminal, ISuffix
     {
-        protected override sealed Syntax TerminalSyntax(SourcePart token) { return new TerminalSyntax(token, this); }
+        protected override sealed Syntax Terminal(SourcePart token) { return new TerminalSyntax(token, this); }
         protected override sealed Syntax SuffixSyntax(Syntax left, SourcePart token)
         {
             return new SuffixSyntax(token, left.ToCompiledSyntax, this);
