@@ -5,7 +5,6 @@ using System.Linq;
 using hw.Debug;
 using hw.Forms;
 using hw.Helper;
-using hw.Parser;
 using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Basics;
@@ -191,7 +190,7 @@ namespace Reni.Context
             return FindRecentFunctionContextObject
                 .CreateArgReferenceResult(category);
         }
-        internal Result ArgsResult(Category category, [CanBeNull]CompileSyntax right)
+        internal Result ArgsResult(Category category, [CanBeNull] CompileSyntax right)
         {
             return right == null
                 ? RootContext.VoidType.Result(category.Typed)
@@ -234,9 +233,8 @@ namespace Reni.Context
         ContextSearchResult Declarations(Definable tokenClass)
         {
             var genericize = tokenClass.Genericize.ToArray();
-            var result = genericize
-                .SelectMany(g => g.Declarations(this))
-                .SingleOrDefault();
+            var results = genericize.SelectMany(g => g.Declarations(this));
+            var result = results.SingleOrDefault();
             if(result != null || RootContext.ProcessErrors)
                 return result;
             NotImplementedMethod(tokenClass);
@@ -254,11 +252,16 @@ namespace Reni.Context
             return result;
         }
 
-        virtual internal IEnumerable<ContextSearchResult> Declarations<TDefinable>(TDefinable tokenClass) where TDefinable : Definable
+        internal virtual IEnumerable<ContextSearchResult> Declarations<TDefinable>(TDefinable tokenClass)
+            where TDefinable : Definable
         {
             var provider = this as ISymbolProvider<TDefinable, IFeatureImplementation>;
             if(provider != null)
-                return new[] {new ContextSearchResult(provider.Feature(tokenClass), this)};
+            {
+                var feature = provider.Feature(tokenClass);
+                if(feature != null)
+                    return new[] {new ContextSearchResult(feature, this)};
+            }
             return new ContextSearchResult[0];
         }
 
