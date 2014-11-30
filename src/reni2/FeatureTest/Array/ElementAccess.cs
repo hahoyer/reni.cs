@@ -29,14 +29,14 @@ namespace Reni.FeatureTest.Array
     [ElementAccessVariable]
     [ArrayVariable]
     [TwoStatements]
-    [TargetSet("x: (<<5) enable_reassign; x(0) := 2; x dump_print", "array(#(#align3#)# (bit)sequence(4),(2))")]
+    [TargetSet("x: <:=> <<5; x(0) := 2; x dump_print", "array(#(#align3#)# (bit)sequence(4),(2))")]
     public sealed class ElementAccessVariableSetterSimple : CompilerTest
     {}
 
     [TestFixture]
     [ElementAccessVariableSetterSimple]
     [TwoStatements]
-    [TargetSet("x: (<<5<<3<<5<<1<<3) enable_reassign; x(3) := 2; x dump_print",
+    [TargetSet("x: <:=> <<5<<3<<5<<1<<3; x(3) := 2; x dump_print",
         "array(#(#align3#)# (bit)sequence(4),(5, 3, 5, 2, 3))")]
     public sealed class ElementAccessVariableSetter : CompilerTest
     {}

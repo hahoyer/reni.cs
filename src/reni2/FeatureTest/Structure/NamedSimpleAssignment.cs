@@ -7,10 +7,7 @@ namespace Reni.FeatureTest.Structure
 {
     [TestFixture]
     [SimpleAssignment]
-    [TargetSet(@"(x: 10 enable_reassign, x := 4) dump_print", "(4, )")]
+    [TargetSet(@"(x: <:=>10 , x := 4) dump_print", "(4, )")]
     public sealed class NamedSimpleAssignment : CompilerTest
-    {
-        [Test]
-        public override void Run() { BaseRun(); }
-    }
+    {}
 }

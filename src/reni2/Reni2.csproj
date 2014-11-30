@@ -299,7 +299,7 @@
     <Compile Include="ReniSyntax\Special.cs" />
     <Compile Include="ReniSyntax\EmptyList.cs" />
     <Compile Include="TokenClasses\ArgToken.cs" />
-    <Compile Include="TokenClasses\Assignment.cs" />
+    <Compile Include="TokenClasses\ReassignToken.cs" />
     <Compile Include="TokenClasses\AtOperator.cs" />
     <Compile Include="TokenClasses\Base.cs" />
     <Compile Include="TokenClasses\Colon.cs" />

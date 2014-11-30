@@ -4,9 +4,13 @@ using System;
 
 namespace Reni.TokenClasses
 {
-    sealed class Assignment : Definable
-    {}
+    sealed class ReassignToken : Definable
+    {
+        public const string Id = ":=";
+    }
 
     sealed class EnableReassignToken : TokenClass
-    {}
+    {
+        public const string Id = "<:=>";
+    }
 }

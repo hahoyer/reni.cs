@@ -11,10 +11,10 @@ namespace Reni.FeatureTest.Function
 {
     [TestFixture]
     [Target(@"
-repeat: /\ .() while then repeat(.);
+repeat: /\ ^() while then repeat(^);
 
 count: 10,
-index: (count type instance(0)) enable_reassign,
+index: <:=> count type instance(0),
 repeat
 (/\(
     while: index < count, 
@@ -34,17 +34,14 @@ repeat
     [UseThen]
     [FunctionOfFunction]
     public sealed class SimpleRepeater : CompilerTest
-    {
-        [Test]
-        public override void Run() { BaseRun(); }
-    }
+    {}
 
     [TestFixture]
     [Target(@"
-repeat: /\ . while() then(. body(), repeat(.));
+repeat: /\ ^ while() then(^ body(), repeat(^));
 
 count: 10,
-index: (count type instance(0)) enable_reassign,
+index: <:=> count type instance(0),
 repeat
 (
     while: /\ index < count, 
@@ -59,8 +56,5 @@ repeat
     [Output("0 1 2 3 4 5 6 7 8 9 ")]
     [SimpleRepeater]
     public sealed class Repeater : CompilerTest
-    {
-        [Test]
-        public override void Run() { BaseRun(); }
-    }
+    {}
 }

@@ -45,11 +45,11 @@ namespace Reni.ReniParser
                 x += PrioTable.Left("!&!");
                 x += PrioTable.Left("!|!");
 
-                x += PrioTable.Right(":=");
+                x += PrioTable.Right(ReassignToken.Id);
 
                 x = x.ThenElseLevel("then", "else");
                 x += PrioTable.Right("!");
-                x += PrioTable.Left("/\\", "/!\\", "/\\/\\");
+                x += PrioTable.Left("/\\", "/!\\", "/\\/\\", EnableReassignToken.Id);
                 x += PrioTable.Right(":");
                 x += PrioTable.Right(",");
                 x += PrioTable.Right(";");
@@ -115,6 +115,8 @@ namespace Reni.ReniParser
                 {
                     {AlignToken.Id, new AlignToken()},
                     {ArgToken.Id, new ArgToken()},
+                    {ReassignToken.Id, new ReassignToken()},
+                    {EnableReassignToken.Id, new EnableReassignToken()},
                     {Minus.Id, new Minus()},
                     {Negate.Id, new Negate()},
                     {"{", new LeftParenthesis(1)},
@@ -129,7 +131,6 @@ namespace Reni.ReniParser
                     {";", new List()},
                     {"@", new AtOperator()},
                     {":", new Colon()},
-                    {":=", new Assignment()},
                     {"=", new CompareOperation()},
                     {">", new CompareOperation()},
                     {">=", new CompareOperation()},
@@ -137,7 +138,6 @@ namespace Reni.ReniParser
                     {"<=", new CompareOperation()},
                     {"<>", new CompareOperation()},
                     {"<<", new ConcatArrays()},
-                    {"<:=>", new EnableReassignToken()},
                     {"!", new Exclamation(_declarationSyntaxSubParser)},
                     {"+", new Plus()},
                     {"/", new Slash()},
@@ -180,6 +180,6 @@ namespace Reni.ReniParser
         public SyntaxError(IssueId issue) { _issue = issue; }
         public SyntaxError(Match.IError message) { _issue = ReniLexer.Parse(message); }
         protected override Syntax Terminal(SourcePart token) { return new CompileSyntaxError(_issue, token); }
-        protected override Syntax Suffix(Syntax left, SourcePart token) { return left.SyntaxError(_issue,token); }
+        protected override Syntax Suffix(Syntax left, SourcePart token) { return left.SyntaxError(_issue, token); }
     }
 }
