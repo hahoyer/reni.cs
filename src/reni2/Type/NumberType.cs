@@ -10,6 +10,7 @@ using Reni.Feature;
 using Reni.Feature.DumpPrint;
 using Reni.Sequence;
 using Reni.TokenClasses;
+using Reni.Type.ConversionService;
 
 namespace Reni.Type
 {
@@ -130,9 +131,9 @@ namespace Reni.Type
 
         Result OperationResult(Category category, TypeBase right, IOperation operation)
         {
-            var rightNumber = right.SmartUn<PointerType>().SmartUn<AlignType>() as NumberType;
-            if(rightNumber != null)
-                return OperationResult(category, rightNumber, operation);
+            var path = FindPath<NumberType>(right);
+            if(path != null)
+                return OperationResult(category, (NumberType) path.Destination, operation);
 
             NotImplementedMethod(category, right, operation);
             return null;

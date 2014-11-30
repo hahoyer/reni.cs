@@ -52,13 +52,11 @@ namespace Reni.Type
 
         public static Path FindPath(TypeBase source, TypeBase destination)
         {
-            if(source == destination)
-                return new Path(source);
-
-            var conversions = source.GetReflexiveConversionPaths().ToArray();
-            var result = conversions.SingleOrDefault(x => x.Destination == destination);
+            var result = FindPath(source, t => t == destination, () => destination.GetReflexiveConversionPaths().ToArray());
             if(result != null)
                 return result;
+
+            var conversions = source.GetReflexiveConversionPaths().ToArray();
 
             var stripConversions = conversions.SelectMany
                 (
@@ -71,15 +69,54 @@ namespace Reni.Type
                 .ToArray();
 
             var destinations = destination.GetReflexiveConversionPaths().ToArray();
+
             var conversionsWithStrip = conversions.Concat(stripConversions).ToArray();
-
-            result = stripConversions.SingleOrDefault(x => x.Destination == destination);
-            if(result != null)
-                return result;
-
             return conversionsWithStrip
                 .SelectMany(outer => destinations.SelectMany(inner => ForcedConversions(outer, inner)))
                 .SingleOrDefault(x => x.Destination == destination);
+        }
+
+        public static Path FindPath<TDestination>(TypeBase source)
+        {
+            return FindPath(source, destination => destination is TDestination);
+        }
+
+        static Path FindPath(TypeBase source, Func<TypeBase, bool> isDestination, Func<Path[]> getDestinations = null)
+        {
+            if(isDestination(source))
+                return new Path(source);
+
+            var conversions = source.GetReflexiveConversionPaths().ToArray();
+            var result = conversions.SingleOrDefault(x => isDestination(x.Destination));
+            if(result != null)
+                return result;
+
+            var stripConversions = conversions
+                .SelectMany
+                (
+                    path => path
+                        .Destination
+                        .GetStripConversion()
+                        .NullableToArray()
+                        .SelectMany(conversion => Combine(isDestination, conversion, path))
+                )
+                .ToArray();
+
+            var resultWithStrip = stripConversions.SingleOrDefault(x => isDestination(x.Destination));
+            if(resultWithStrip != null || getDestinations == null)
+                return resultWithStrip;
+
+            var conversionsWithStrip = conversions.Concat(stripConversions).ToArray();
+            if(!conversionsWithStrip.Any())
+                return null;
+
+            var destinations = getDestinations();
+            if(!destinations.Any())
+                return null;
+
+            return conversionsWithStrip
+                .SelectMany(outer => destinations.SelectMany(inner => ForcedConversions(outer, inner)))
+                .SingleOrDefault(x => isDestination(x.Destination));
         }
 
         static IEnumerable<Path> ForcedConversions(Path source, Path destination)
@@ -87,7 +124,7 @@ namespace Reni.Type
             return source
                 .Destination
                 .GetForcedConversions(destination.Source)
-                .Select(conversion=> Combine(source, conversion, destination));
+                .Select(conversion => Combine(source, conversion, destination));
         }
 
         static Path Combine(Path source, ISimpleFeature conversion, Path destination)
@@ -96,20 +133,6 @@ namespace Reni.Type
                 .Concat(new[] {conversion})
                 .Concat(source.Elements);
             return new Path(simpleFeatures.ToArray());
-        }
-
-        static Path Combine(Path outer, Path inner)
-        {
-            Dumpable.NotImplementedFunction(outer, inner);
-            return new Path(outer.Elements.Concat(inner.Elements).ToArray());
-        }
-
-        static IEnumerable<Path> ForcedConversions(TypeBase destination, Path path)
-        {
-            return destination
-                .GetReachableTypes()
-                .SelectMany(destinationEntry => path.Destination.GetForcedConversions(destinationEntry))
-                .SelectMany(element => destination.Combine(element, path));
         }
 
         static IEnumerable<Path> Combine(this TypeBase destination, ISimpleFeature element, Path path)
@@ -123,6 +146,16 @@ namespace Reni.Type
                 ;
         }
 
+        static IEnumerable<Path> Combine(Func<TypeBase, bool> isDestination, ISimpleFeature element, Path path)
+        {
+            return element
+                .ResultType()
+                .GetReflexiveConversionPaths()
+                .Where(e => isDestination(e.Destination))
+                .Combine(new Path(element))
+                .Combine(path)
+                ;
+        }
         static IEnumerable<T> NullableToArray<T>(this T target) { return Equals(target, default(T)) ? new T[0] : new[] {target}; }
 
         public static string DumpObvious(TypeBase source) { return DumpReachable(source, type => type.ReflexiveConversions); }
@@ -206,13 +239,6 @@ namespace Reni.Type
                 )
                 .ToArray()
                 ;
-        }
-
-        static IEnumerable<TypeBase> GetReachableTypes(this TypeBase target)
-        {
-            return target
-                .GetReflexiveConversionPaths()
-                .Select(element => element.Destination);
         }
     }
 }
