@@ -16,8 +16,8 @@ namespace Reni.TokenClasses
         {
             return this.Operation(left, token, right);
         }
-        internal Syntax CreateForVisit(Syntax left, SourcePart token, Syntax right) { return this.Operation(left, token, right); }
 
+        internal Syntax CreateForVisit(Syntax left, SourcePart token, Syntax right) { return this.Operation(left, token, right); }
 
         Syntax IOperator<Syntax>.Terminal(SourcePart token) { return Terminal(token); }
         Syntax IOperator<Syntax>.Prefix(SourcePart token, Syntax right) { return Prefix(token, right); }

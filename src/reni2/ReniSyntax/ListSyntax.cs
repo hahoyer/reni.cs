@@ -38,8 +38,7 @@ namespace Reni.ReniSyntax
             get
             {
                 var list = _data
-                    .Select(syntax => syntax.ExtractBody)
-                    .Select(syntax => syntax.ToCompiledSyntax);
+                    .Select(syntax => syntax.ExtractBody.ToCompiledSyntax);
 
                 var dictionary = _data
                     .SelectMany((syntax, index) => syntax.GetDeclarations(index))

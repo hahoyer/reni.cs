@@ -58,15 +58,6 @@ namespace Reni.TokenClasses
         }
     }
 
-    abstract class PrefixToken : TokenClass, IPrefix
-    {
-        protected override Syntax PrefixSyntax(SourcePart token, Syntax right)
-        {
-            return new PrefixSyntax(token, this, right.ToCompiledSyntax);
-        }
-        public abstract Result Result(ContextBase context, Category category, SourcePart token, CompileSyntax right);
-    }
-
     abstract class SuffixToken : TokenClass, ISuffix
     {
         protected override sealed Syntax Suffix(Syntax left, SourcePart token)

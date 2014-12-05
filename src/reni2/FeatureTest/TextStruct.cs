@@ -76,14 +76,12 @@ Text: /\
     [FunctionVariable]
     [Repeater]
     public sealed class Text1 : TextStruct
-    {
-    }
+    {}
 
     [TestFixture]
     [Output("Hallo")]
     [InstanceCode("(Text('H') << 'allo'")]
     [Text1]
     public sealed class TextConcat : TextStruct
-    {
-    }
+    {}
 }
