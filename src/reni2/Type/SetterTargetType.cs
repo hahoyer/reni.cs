@@ -6,6 +6,7 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.TokenClasses;
 
 namespace Reni.Type
 {
@@ -15,6 +16,7 @@ namespace Reni.Type
             , ISimpleFeature
             , IReferenceType
             , IFeatureInheritor
+            , ISymbolProvider<ReassignToken, IFeatureImplementation>
     {
         readonly int _order;
 
@@ -28,6 +30,11 @@ namespace Reni.Type
         TypeBase ISimpleFeature.TargetType { get { return ValueType; } }
         Result ISimpleFeature.Result(Category category) { return GetterResult(category); }
         Result IFeatureInheritor.Source(Category category) { return GetterResult(category); }
+
+        IFeatureImplementation ISymbolProvider<ReassignToken, IFeatureImplementation>.Feature(ReassignToken tokenClass)
+        {
+            return Extension.FunctionFeature(AssignmentResult);
+        }
 
         internal Result AssignmentResult(Category category, IContextReference objectReference, TypeBase argsType)
         {
