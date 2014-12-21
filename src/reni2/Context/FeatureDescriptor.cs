@@ -153,12 +153,12 @@ namespace Reni.Context
         [DisableDump]
         FunctionBodyType FunctionBodyType { get { return (FunctionBodyType) _context.ArgReferenceResult(Category.Type).Type; } }
         [DisableDump]
-        Structure Structure { get { return FunctionBodyType.FindRecentStructure; } }
+        ContainerView ContainerView { get { return FunctionBodyType.FindRecentContainerView; } }
 
         [DisableDump]
-        protected override Func<Category, Result> ConverterResult { get { return Structure.StructReferenceViaContextReference; } }
+        protected override Func<Category, Result> ConverterResult { get { return ContainerView.StructReferenceViaContextReference; } }
         [DisableDump]
-        protected override TypeBase Type { get { return Structure.Type; } }
+        protected override TypeBase Type { get { return ContainerView.Type; } }
         [DisableDump]
         protected override IFeatureImplementation Feature { get { return FunctionBodyType.Feature; } }
     }

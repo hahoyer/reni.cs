@@ -43,7 +43,7 @@ namespace Reni.Context
         internal abstract Root RootContext { get; }
 
         [DisableDump]
-        internal Structure FindRecentStructure { get { return _cache.RecentStructure.Value; } }
+        internal ContainerView FindRecentContainerView { get { return _cache.RecentStructure.Value; } }
 
         [DisableDump]
         internal IFunctionContext FindRecentFunctionContextObject { get { return _cache.RecentFunctionContextObject.Value; } }
@@ -55,16 +55,16 @@ namespace Reni.Context
             return size.SizeToPacketCount(Root.DefaultRefAlignParam.AlignBits);
         }
 
-        internal ContextBase UniqueStructurePositionContext(Container container, int position)
+        internal ContextBase UniqueStructurePositionContext(ContainerSyntax container, int position)
         {
             return _cache.StructContexts[container][position];
         }
-        internal Structure UniqueStructure(Container container) { return UniqueStructure(container, container.EndPosition); }
-        internal Structure UniqueStructure(Container container, int accessPosition)
+        internal ContainerView UniqueStructure(ContainerSyntax container) { return UniqueStructure(container, container.EndPosition); }
+        internal ContainerView UniqueStructure(ContainerSyntax container, int accessPosition)
         {
             return _cache.Structures[container][accessPosition];
         }
-        internal ContainerContextObject UniqueContainerContext(Container context)
+        internal Container UniqueContainerContext(ContainerSyntax context)
         {
             return _cache.ContainerContextObjects[context];
         }
@@ -117,7 +117,7 @@ namespace Reni.Context
 
         internal TypeBase Type(CompileSyntax syntax) { return Result(Category.Type, syntax).Type; }
 
-        internal virtual Structure ObtainRecentStructure() { return null; }
+        internal virtual ContainerView ObtainRecentStructure() { return null; }
         internal virtual IFunctionContext ObtainRecentFunctionContext() { return null; }
 
         internal virtual bool? QuickHllw(CompileSyntax compileSyntax) { return null; }
@@ -126,7 +126,7 @@ namespace Reni.Context
         {
             [Node]
             [DisableDump]
-            internal readonly ValueCache<Structure> RecentStructure;
+            internal readonly ValueCache<ContainerView> RecentStructure;
 
             [Node]
             [DisableDump]
@@ -134,15 +134,15 @@ namespace Reni.Context
 
             [Node]
             [SmartNode]
-            internal readonly FunctionCache<Container, FunctionCache<int, ContextBase>> StructContexts;
+            internal readonly FunctionCache<ContainerSyntax, FunctionCache<int, ContextBase>> StructContexts;
 
             [Node]
             [SmartNode]
-            internal readonly FunctionCache<Container, FunctionCache<int, Structure>> Structures;
+            internal readonly FunctionCache<ContainerSyntax, FunctionCache<int, ContainerView>> Structures;
 
             [Node]
             [SmartNode]
-            internal readonly FunctionCache<Container, ContainerContextObject> ContainerContextObjects;
+            internal readonly FunctionCache<ContainerSyntax, Container> ContainerContextObjects;
 
             [Node]
             [SmartNode]
@@ -157,22 +157,22 @@ namespace Reni.Context
                 UndefinedSymbolType = new FunctionCache<SourcePart, IssueType>
                     (tokenData => UndefinedSymbolIssue.Type(tokenData, target));
                 ResultCache = new FunctionCache<CompileSyntax, ResultCache>(target.CreateCacheElement);
-                StructContexts = new FunctionCache<Container, FunctionCache<int, ContextBase>>
+                StructContexts = new FunctionCache<ContainerSyntax, FunctionCache<int, ContextBase>>
                     (
                     container =>
                         new FunctionCache<int, ContextBase>
                             (position => new Struct.Context(target, container, position))
                     );
-                RecentStructure = new ValueCache<Structure>(target.ObtainRecentStructure);
+                RecentStructure = new ValueCache<ContainerView>(target.ObtainRecentStructure);
                 RecentFunctionContextObject = new ValueCache<IFunctionContext>(target.ObtainRecentFunctionContext);
-                Structures = new FunctionCache<Container, FunctionCache<int, Structure>>
+                Structures = new FunctionCache<ContainerSyntax, FunctionCache<int, ContainerView>>
                     (
                     container =>
-                        new FunctionCache<int, Structure>
-                            (position => new Structure(ContainerContextObjects[container], position))
+                        new FunctionCache<int, ContainerView>
+                            (position => new ContainerView(ContainerContextObjects[container], position))
                     );
-                ContainerContextObjects = new FunctionCache<Container, ContainerContextObject>
-                    (container => new ContainerContextObject(container, target));
+                ContainerContextObjects = new FunctionCache<ContainerSyntax, Container>
+                    (container => new Container(container, target));
             }
 
             [DisableDump]

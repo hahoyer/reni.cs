@@ -35,6 +35,6 @@ namespace Reni.Type
         [DisableDump]
         protected override string TagTitle { get { return "function_instance"; } }
         [DisableDump]
-        internal override Structure FindRecentStructure { get { return Parent.FindRecentStructure; } }
+        internal override ContainerView FindRecentContainerView { get { return Parent.FindRecentContainerView; } }
     }
 }

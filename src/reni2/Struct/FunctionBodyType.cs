@@ -17,15 +17,15 @@ namespace Reni.Struct
     {
         [EnableDump]
         [Node]
-        readonly Structure _structure;
+        readonly ContainerView _containerView;
         [EnableDump]
         [Node]
         readonly FunctionSyntax _syntax;
         readonly ValueCache<IContextReference> _objectReferenceCache;
 
-        public FunctionBodyType(Structure structure, FunctionSyntax syntax)
+        public FunctionBodyType(ContainerView containerView, FunctionSyntax syntax)
         {
-            _structure = structure;
+            _containerView = containerView;
             _syntax = syntax;
             _objectReferenceCache = new ValueCache<IContextReference>(() => new ContextReference(this));
         }
@@ -49,9 +49,9 @@ namespace Reni.Struct
         }
 
         [DisableDump]
-        internal override Structure FindRecentStructure { get { return _structure; } }
+        internal override ContainerView FindRecentContainerView { get { return _containerView; } }
         [DisableDump]
-        internal override Root RootContext { get { return _structure.RootContext; } }
+        internal override Root RootContext { get { return _containerView.RootContext; } }
         [DisableDump]
         internal override bool Hllw { get { return true; } }
         [DisableDump]
@@ -90,8 +90,8 @@ namespace Reni.Struct
                 var result = applyResult
                     .ReplaceAbsolute
                     (
-                        _structure.ContainerContextObject,
-                        () => CodeBase.ReferenceCode(ObjectReference).ReferencePlus(_structure.StructSize),
+                        _containerView.Container,
+                        () => CodeBase.ReferenceCode(ObjectReference).ReferencePlus(_containerView.StructSize),
                         () => CodeArgs.Create(ObjectReference)
                     );
 
@@ -102,7 +102,7 @@ namespace Reni.Struct
                 EndMethodDump();
             }
         }
-        FunctionType Function(TypeBase argsType) { return _structure.Function(_syntax, argsType); }
+        FunctionType Function(TypeBase argsType) { return _containerView.Function(_syntax, argsType); }
         IContextMetaFunctionFeature IFeatureImplementation.ContextMeta { get { return null; } }
         IMetaFunctionFeature IFeatureImplementation.Meta { get { return null; } }
         IFunctionFeature IFeatureImplementation.Function { get { return this; } }

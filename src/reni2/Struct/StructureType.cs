@@ -14,11 +14,11 @@ namespace Reni.Struct
         : TypeBase
             , ISymbolProvider<DumpPrintToken, IFeatureImplementation>
     {
-        readonly Structure _structure;
+        readonly ContainerView _containerView;
 
-        internal StructureType(Structure structure)
+        internal StructureType(ContainerView containerView)
         {
-            _structure = structure;
+            _containerView = containerView;
         }
 
         IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
@@ -27,24 +27,24 @@ namespace Reni.Struct
         }
 
         [DisableDump]
-        internal Structure Structure { get { return _structure; } }
+        internal ContainerView ContainerView { get { return _containerView; } }
 
         [DisableDump]
-        internal override Root RootContext { get { return _structure.RootContext; } }
+        internal override Root RootContext { get { return _containerView.RootContext; } }
 
         [DisableDump]
-        internal override Structure FindRecentStructure { get { return Structure; } }
+        internal override ContainerView FindRecentContainerView { get { return ContainerView; } }
 
         [DisableDump]
-        internal override bool Hllw { get { return Structure.Hllw; } }
+        internal override bool Hllw { get { return ContainerView.Hllw; } }
 
-        internal Result DumpPrintTokenResult(Category category) { return Structure.DumpPrintResultViaStructReference(category); }
+        internal Result DumpPrintTokenResult(Category category) { return ContainerView.DumpPrintResultViaStructReference(category); }
 
         [DisableDump]
         internal override bool HasQuickSize { get { return false; } }
 
-        protected override Size GetSize() { return Structure.StructSize; }
+        protected override Size GetSize() { return ContainerView.StructSize; }
 
-        protected override string GetNodeDump() { return "type(" + Structure.NodeDump + ")"; }
+        protected override string GetNodeDump() { return "type(" + ContainerView.NodeDump + ")"; }
     }
 }

@@ -91,10 +91,10 @@ namespace Reni.Context
                 & category;
         }
 
-        internal FunctionType FunctionInstance(Structure structure, FunctionSyntax body, TypeBase argsType)
+        internal FunctionType FunctionInstance(ContainerView containerView, FunctionSyntax body, TypeBase argsType)
         {
             var alignedArgsType = argsType.UniqueAlign;
-            var functionInstance = _functions.Find(body, structure, alignedArgsType);
+            var functionInstance = _functions.Find(body, containerView, alignedArgsType);
             return functionInstance;
         }
         internal Result VoidResult(Category category) { return VoidType.Result(category); }

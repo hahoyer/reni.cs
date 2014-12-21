@@ -1,153 +1,218 @@
-using System;
 using System.Collections.Generic;
-using hw.Helper;
 using System.Linq;
+using System;
 using hw.Debug;
 using hw.Forms;
-using hw.Parser;
-using hw.Scanner;
+using hw.Helper;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Context;
-using Reni.ReniParser;
-using Reni.ReniSyntax;
-using Reni.TokenClasses;
+using Reni.Type;
 
 namespace Reni.Struct
 {
-    /// <summary>
-    ///     Structured data, context free version
-    /// </summary>
-    sealed class Container : CompileSyntax
+    sealed class Container : DumpableObject, IContextReference
     {
-        readonly Data[] _data;
-        static readonly string _runId = Compiler.FormattedNow + "\n";
-        public static bool IsInContainerDump;
-        static bool _isInsideFileDump;
         static int _nextObjectId;
+        readonly ContainerSyntax _syntax;
+        readonly ContextBase _parent;
+        readonly int _order;
 
+        internal Container(ContainerSyntax syntax, ContextBase parent)
+            : base(_nextObjectId++)
+        {
+            _order = CodeArgs.NextOrder++;
+            _syntax = syntax;
+            _parent = parent;
+        }
+
+        int IContextReference.Order { get { return _order; } }
+        Size IContextReference.Size { get { return Root.DefaultRefAlignParam.RefSize; } }
         [Node]
-        internal CompileSyntax[] Statements { get { return _data.Select(s => s.Statement).ToArray(); } }
+        internal ContainerSyntax Syntax { get { return _syntax; } }
+        [Node]
+        internal ContextBase Parent { get { return _parent; } }
 
         [DisableDump]
-        internal int EndPosition { get { return Statements.Length; } }
-
-        internal Container
-            (
-            SourcePart token,
-            Syntax[] statements)
-            : base(token, _nextObjectId++) { _data = statements.Select((s, i) => new Data(s, i)).ToArray(); }
+        internal TypeBase IndexType { get { return _parent.RootContext.BitType.UniqueNumber(IndexSize.ToInt()); } }
 
         [DisableDump]
-        internal override CompileSyntax ToCompiledSyntax { get { return this; } }
+        internal Root RootContext { get { return Parent.RootContext; } }
+
         [DisableDump]
-        internal override bool? Hllw
+        ContainerView ToContainerView { get { return _parent.UniqueStructure(Syntax); } }
+
+        Size IndexSize { get { return Syntax.IndexSize; } }
+
+        internal Size StructureSize(int position)
         {
-            get
+            if(StructureHllw(position))
+                return Size.Zero;
+            return StructureResult(Category.Size, 0, position).Size;
+        }
+
+        internal bool StructureHllw(int accessPosition) { return ObtainHllw(accessPosition); }
+
+        internal Result ContextReferenceViaStructReference(int position, Result result)
+        {
+            return result.ReplaceAbsolute(this, () => ContextReferenceViaStructReferenceCode(position), CodeArgs.Arg);
+        }
+
+        internal Size ContextReferenceOffsetFromAccessPoint(int position)
+        {
+            return StructureResult(Category.Size, 0, position).Size;
+        }
+
+        CodeBase ContextReferenceViaStructReferenceCode(int accessPosition)
+        {
+            return Parent
+                .UniqueStructure(Syntax, accessPosition)
+                .PointerKind.ArgCode
+                .ReferencePlus(ContextReferenceOffsetFromAccessPoint(accessPosition));
+        }
+
+        internal Size FieldOffsetFromAccessPoint(int accessPosition, int fieldPosition)
+        {
+            return StructureResult(Category.Size, fieldPosition + 1, accessPosition).Size;
+        }
+
+        Result StructureResult(Category category, int fromPosition, int fromNotPosition)
+        {
+            if(category.IsNone)
+                return new Result();
+            var trace = ObjectId == 0 && category.HasCode;
+            StartMethodDump(trace, category, fromPosition, fromNotPosition);
+            try
             {
-                return Statements
-                    .All(syntax => syntax.Hllw == true);
+                Dump("Statements", _syntax.Statements);
+                var statements = (fromNotPosition - fromPosition)
+                    .Select(i => fromPosition + i)
+                    .Where(position => !_syntax.Statements[position].IsLambda)
+                    .Select(position => AccessResult(category, position))
+                    .Select(r => r.Align)
+                    .ToArray();
+                Dump("Statements", statements);
+                BreakExecution();
+                var results = statements
+                    .Select(r => r.LocalBlock(category))
+                    .ToArray();
+                Dump("results", results);
+                BreakExecution();
+                var result = results
+                    .Aggregate(Parent.RootContext.VoidResult(category), (current, next) => current + next);
+                return ReturnMethodDump(result);
+            }
+            finally
+            {
+                EndMethodDump();
             }
         }
 
-        [DisableDump]
-        internal Size IndexSize { get { return Size.AutoSize(Statements.Length); } }
-
-        protected override string GetNodeDump() { return "container." + ObjectId; }
-
-        [DisableDump]
-        protected override ParsedSyntax[] Children { get { return Statements.ToArray<ParsedSyntax>(); } }
-        [DisableDump]
-        public string[] Names { get { return _data.SelectMany(s => s.Names).ToArray(); } }
-        [DisableDump]
-        public int[] Converters { get { return _data.SelectMany((s, i) => s.IsConverter ? new[] {i} : new int[0]).ToArray(); } }
-
-        public override string DumpData()
+        internal Result Result(Category category)
         {
-            var isInsideFileDump = _isInsideFileDump;
-            _isInsideFileDump = true;
-            var result = isInsideFileDump ? DumpDataToString() : DumpDataToFile();
-            _isInsideFileDump = isInsideFileDump;
+            var result = StructureResult(category - Category.Type, 0, Syntax.EndPosition)
+                .ReplaceRelative(this, CodeBase.TopRef, CodeArgs.Void);
+            if(category.HasType)
+                result.Type = ToContainerView.Type;
             return result;
         }
 
-        string DumpDataToFile()
+        Result AccessResult(Category category, int position)
         {
-            var dumpFile = ("struct." + ObjectId).FileHandle();
-            var oldResult = dumpFile.String;
-            var newResult = (_runId + DumpDataToString()).Replace("\n", "\r\n");
-            if(oldResult == null || !oldResult.StartsWith(_runId))
+            Tracer.Assert(!Syntax.Statements[position].IsLambda);
+            return AccessResult(category, position, position);
+        }
+
+        Result AccessResult(Category category, int accessPosition, int position)
+        {
+            var trace = ObjectId.In(-1) && accessPosition >= 0 && position >= 0 && category.HasType;
+            StartMethodDump(trace, category, accessPosition, position);
+            try
             {
-                oldResult = newResult;
-                dumpFile.String = oldResult;
+                var uniqueChildContext = Parent
+                    .UniqueStructurePositionContext(Syntax, accessPosition);
+                Dump("Statements[position]", Syntax.Statements[position]);
+                BreakExecution();
+                var result1 = Syntax.Statements[position]
+                    .Result(uniqueChildContext, category.Typed);
+                Dump("result1", result1);
+                BreakExecution();
+                var result = result1
+                    .SmartUn<FunctionType>();
+                Dump("result", result);
+                return ReturnMethodDump(result.AutomaticDereferenceResult);
             }
-            else
-                Tracer.Assert(oldResult == newResult);
-            return Tracer.FilePosn(dumpFile.FullName, 1, 0, FilePositionTag.Debug) + "see there" + "\n";
-        }
-
-        string DumpDataToString()
-        {
-            var isInDump = IsInContainerDump;
-            IsInContainerDump = true;
-            var result = base.DumpData();
-            IsInContainerDump = isInDump;
-            return result;
-        }
-
-        internal StructurePosition Find(string name)
-        {
-            if(name == null)
-                return null;
-            var result = _data.SingleOrDefault(s => s.Defines(name));
-            if(result == null)
-                return null;
-
-            return new StructurePosition(result.Position);
-        }
-
-        internal override Result ObtainResult(ContextBase context, Category category)
-        {
-            return context
-                .UniqueContainerContext(this)
-                .Result(category);
-        }
-
-        sealed class Data : DumpableObject
-        {
-            readonly Syntax _rawStatement;
-            public readonly int Position;
-            readonly ValueCache<string[]> _namesCache;
-            readonly ValueCache<CompileSyntax> _statement;
-
-            public Data(Syntax rawStatement, int position)
+            finally
             {
-                _rawStatement = rawStatement;
-                Position = position;
-                _statement = new ValueCache<CompileSyntax>(GetStatement);
-                _namesCache = new ValueCache<string[]>(GetNames);
+                EndMethodDump();
             }
-
-            public CompileSyntax Statement { get { return _statement.Value; } }
-            public bool Defines(string name) { return Names.Contains(name); }
-            public bool IsConverter { get { return _rawStatement is ConverterSyntax; } }
-            public IEnumerable<string> Names { get { return _namesCache.Value; } }
-            public bool IsConst { get { return !(_rawStatement.IsEnableReassignSyntax); } }
-
-            CompileSyntax GetStatement() { return _rawStatement.ContainerStatementToCompileSyntax; }
-            string[] GetNames() { return _rawStatement.GetDeclarations().ToArray(); }
         }
 
-        public bool IsConst(int position) { return _data[position].IsConst; }
-    }
+        internal TypeBase AccessType(int accessPosition, int position)
+        {
+            var trace = ObjectId == -10 && accessPosition == 1 && position == 0;
+            StartMethodDump(trace, accessPosition, position);
+            try
+            {
+                Dump("Statements[position]", Syntax.Statements[position]);
+                BreakExecution();
+                var result = AccessResult(Category.Type, accessPosition, position).Type;
+                return ReturnMethodDump(result);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
+        }
 
+        bool ObtainHllw(int accessPosition)
+        {
+            var trace = ObjectId == -10 && accessPosition == 3 && Parent.ObjectId == 4;
+            StartMethodDump(trace, accessPosition);
+            try
+            {
+                var subStatementIds = accessPosition.Select().ToArray();
+                Dump("subStatementIds", subStatementIds);
+                BreakExecution();
+                if(subStatementIds.Any(position => InnerHllwStatic(position) == false))
+                    return ReturnMethodDump(false);
+                var quickNonDataLess = subStatementIds
+                    .Where(position => InnerHllwStatic(position) == null)
+                    .ToArray();
+                Dump("quickNonDataLess", quickNonDataLess);
+                BreakExecution();
+                if(quickNonDataLess.Length == 0)
+                    return ReturnMethodDump(true);
+                if(quickNonDataLess.Any(position => InternalInnerHllwStructureElement(position) == false))
+                    return ReturnMethodDump(false);
+                return ReturnMethodDump(true);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
+        }
 
-    sealed class StructurePosition : DumpableObject
-    {
-        [EnableDump]
-        internal readonly int Position;
+        bool InternalInnerHllwStructureElement(int position)
+        {
+            var uniqueChildContext = Parent
+                .UniqueStructurePositionContext(Syntax, position);
+            return Syntax
+                .Statements[position]
+                .HllwStructureElement(uniqueChildContext);
+        }
 
-        internal StructurePosition(int position) { Position = position; }
+        bool? InnerHllwStatic(int position) { return Syntax.Statements[position].Hllw; }
 
-        internal AccessFeature Convert(Structure accessPoint) { return accessPoint.UniqueAccessFeature(Position); }
+        internal string[] DataIndexList()
+        {
+            return Syntax
+                .Statements
+                .Length
+                .Select()
+                .Where(i => !InternalInnerHllwStructureElement(i))
+                .Select(i => i.ToString() + "=" + AccessResult(Category.Size, i).Size.ToString())
+                .ToArray();
+        }
     }
 }

@@ -13,7 +13,7 @@ namespace Reni.Context
         public override Result Result(ContextBase context, Category category, SourcePart token)
         {
             return context
-                .FindRecentStructure
+                .FindRecentContainerView
                 .StructReferenceViaContextReference(category);
         }
 
@@ -27,15 +27,15 @@ namespace Reni.Context
                 Dump("leftResult", leftResult);
                 BreakExecution();
 
-                var structure = leftResult.FindRecentStructure;
-                Dump("structure", structure);
+                var structure = leftResult.FindRecentContainerView;
+                Dump("ContainerView", structure);
                 BreakExecution();
                 if(structure.Hllw)
                 {
                     NotImplementedMethod(context, category, left);
                     return null;
                 }
-                var result = structure.PointerKind.Result(category, structure.ContainerContextObject);
+                var result = structure.PointerKind.Result(category, structure.Container);
                 return ReturnMethodDump(result);
             }
             finally

@@ -16,7 +16,7 @@ namespace Reni.Struct
     {
         readonly int _index;
         [Node]
-        readonly Structure _structure;
+        readonly ContainerView _containerView;
         [Node]
         internal readonly TypeBase ArgsType;
         [Node]
@@ -25,12 +25,12 @@ namespace Reni.Struct
         [Node]
         readonly GetterFunction _getter;
 
-        internal FunctionType(int index, FunctionSyntax body, Structure structure, TypeBase argsType)
+        internal FunctionType(int index, FunctionSyntax body, ContainerView containerView, TypeBase argsType)
         {
             _getter = new GetterFunction(this, index, body.Getter);
             _setter = body.Setter == null ? null : new SetterFunction(this, index, body.Setter);
             _index = index;
-            _structure = structure;
+            _containerView = containerView;
             ArgsType = argsType;
             StopByObjectId(-10);
         }
@@ -40,7 +40,7 @@ namespace Reni.Struct
         [DisableDump]
         internal override bool Hllw { get { return CodeArgs.IsNone && ArgsType.Hllw; } }
         [DisableDump]
-        internal override Structure FindRecentStructure { get { return _structure; } }
+        internal override ContainerView FindRecentContainerView { get { return _containerView; } }
         [DisableDump]
         internal override bool HasQuickSize { get { return false; } }
 
@@ -76,7 +76,7 @@ namespace Reni.Struct
 
         internal ContextBase CreateSubContext(bool useValue)
         {
-            return new Reni.Context.Function(_structure.UniqueContext, ArgsType, useValue ? ValueType : null);
+            return new Reni.Context.Function(_containerView.UniqueContext, ArgsType, useValue ? ValueType : null);
         }
 
         public string DumpFunction()
@@ -86,7 +86,7 @@ namespace Reni.Struct
             result += "\n";
             result += "argsType=" + ArgsType.Dump();
             result += "\n";
-            result += "context=" + _structure.Dump();
+            result += "context=" + _containerView.Dump();
             result += "\n";
             result += "Getter=" + _getter.DumpFunction();
             result += "\n";

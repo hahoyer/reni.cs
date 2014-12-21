@@ -12,26 +12,26 @@ namespace Reni.Type
     sealed class FieldAccessType : DataSetterTargetType
     {
         [EnableDump]
-        readonly Structure _structure;
+        readonly ContainerView _containerView;
         [EnableDump]
         readonly int _position;
 
-        internal FieldAccessType(Structure structure, int position)
+        internal FieldAccessType(ContainerView containerView, int position)
         {
-            _structure = structure;
+            _containerView = containerView;
             _position = position;
         }
 
-        internal override TypeBase ValueType { get { return _structure.ValueType(_position); } }
+        internal override TypeBase ValueType { get { return _containerView.ValueType(_position); } }
 
         [DisableDump]
         internal override bool Hllw { get { return false; } }
 
-        protected override string GetNodeDump() { return base.GetNodeDump() + "{" + _structure.NodeDump + "@" + _position + "}"; }
+        protected override string GetNodeDump() { return base.GetNodeDump() + "{" + _containerView.NodeDump + "@" + _position + "}"; }
 
         protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
 
-        Size FieldOffset { get { return _structure.FieldOffset(_position); } }
+        Size FieldOffset { get { return _containerView.FieldOffset(_position); } }
 
         protected override CodeBase GetterCode() { return ArgCode.ReferencePlus(FieldOffset); }
 

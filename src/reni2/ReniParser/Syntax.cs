@@ -88,8 +88,8 @@ namespace Reni.ReniParser
             if(isRecursion)
                 return "ObjectId=" + ObjectId;
 
-            var isInContainerDump = Container.IsInContainerDump;
-            Container.IsInContainerDump = false;
+            var isInContainerDump = ContainerSyntax.IsInContainerDump;
+            ContainerSyntax.IsInContainerDump = false;
             var isInDump = _isInDump;
             _isInDump = true;
             var result = GetNodeDump();
@@ -101,7 +101,7 @@ namespace Reni.ReniParser
                 result += " ObjectId=" + ObjectId;
             else
                 result += "\n" + base.Dump(false);
-            Container.IsInContainerDump = isInContainerDump;
+            ContainerSyntax.IsInContainerDump = isInContainerDump;
             _isInDump = isInDump;
             return result;
         }
@@ -113,7 +113,7 @@ namespace Reni.ReniParser
         }
 
         internal virtual IEnumerable<Syntax> ToList(List type) { yield return this; }
-        internal virtual Container ToContainer => ListSyntax.Spread(this).ToContainer;
+        internal virtual ContainerSyntax ToContainer => ListSyntax.Spread(this).ToContainer;
 
         internal virtual bool IsEnableReassignSyntax
         {

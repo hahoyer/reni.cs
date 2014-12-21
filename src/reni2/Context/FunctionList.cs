@@ -36,15 +36,15 @@ namespace Reni.Context
     sealed class FunctionList : DumpableObject
     {
         [Node]
-        readonly FunctionCache<FunctionSyntax, FunctionCache<Structure, FunctionCache<TypeBase, int>>> _dictionary;
+        readonly FunctionCache<FunctionSyntax, FunctionCache<ContainerView, FunctionCache<TypeBase, int>>> _dictionary;
 
         [Node]
         readonly List<FunctionType> _list = new List<FunctionType>();
 
         public FunctionList()
         {
-            _dictionary = new FunctionCache<FunctionSyntax, FunctionCache<Structure, FunctionCache<TypeBase, int>>>
-                (syntax => new FunctionCache<Structure, FunctionCache<TypeBase, int>>
+            _dictionary = new FunctionCache<FunctionSyntax, FunctionCache<ContainerView, FunctionCache<TypeBase, int>>>
+                (syntax => new FunctionCache<ContainerView, FunctionCache<TypeBase, int>>
                                (structure => new FunctionCache<TypeBase, int>
                                                  (-1, args => CreateFunctionInstance(args, syntax, structure))));
         }
@@ -52,18 +52,18 @@ namespace Reni.Context
         internal FunctionType this[int i] { get { return _list[i]; } }
         internal int Count { get { return _list.Count; } }
 
-        internal FunctionType Find(FunctionSyntax syntax, Structure structure, TypeBase argsType)
+        internal FunctionType Find(FunctionSyntax syntax, ContainerView containerView, TypeBase argsType)
         {
-            var index = _dictionary[syntax][structure][argsType];
+            var index = _dictionary[syntax][containerView][argsType];
             return _list[index];
         }
 
         internal FunctionContainer Container(int index) { return _list[index].Container; }
 
-        int CreateFunctionInstance(TypeBase args, FunctionSyntax syntax, Structure structure)
+        int CreateFunctionInstance(TypeBase args, FunctionSyntax syntax, ContainerView containerView)
         {
             var index = _list.Count;
-            var f = new FunctionType(index, syntax, structure, args);
+            var f = new FunctionType(index, syntax, containerView, args);
             _list.Add(f);
             return index;
         }

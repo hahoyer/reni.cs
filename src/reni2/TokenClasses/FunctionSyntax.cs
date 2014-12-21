@@ -42,7 +42,7 @@ namespace Reni.TokenClasses
         internal override Result ObtainResult(ContextBase context, Category category)
         {
             return context
-                .FindRecentStructure
+                .FindRecentContainerView
                 .UniqueFunctionalType(this)
                 .Result(category);
         }
@@ -68,27 +68,27 @@ namespace Reni.TokenClasses
             return setter + base.GetNodeDump() + getter;
         }
 
-        internal IContextMetaFunctionFeature ContextMetaFunctionFeature(Structure structure)
+        internal IContextMetaFunctionFeature ContextMetaFunctionFeature(ContainerView containerView)
         {
             if(!_isMetaFunction)
                 return null;
-            NotImplementedMethod(structure);
+            NotImplementedMethod(containerView);
             return null;
         }
 
-        internal IMetaFunctionFeature MetaFunctionFeature(Structure structure)
+        internal IMetaFunctionFeature MetaFunctionFeature(ContainerView containerView)
         {
             if(!_isMetaFunction)
                 return null;
-            NotImplementedMethod(structure);
+            NotImplementedMethod(containerView);
             return null;
         }
 
-        internal IFunctionFeature FunctionFeature(Structure structure)
+        internal IFunctionFeature FunctionFeature(ContainerView containerView)
         {
             if(_isMetaFunction)
                 return null;
-            return new FunctionBodyType(structure, this);
+            return new FunctionBodyType(containerView, this);
         }
     }
 }

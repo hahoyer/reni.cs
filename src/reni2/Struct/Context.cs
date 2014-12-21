@@ -17,9 +17,9 @@ namespace Reni.Struct
         [Node]
         internal readonly int Position;
         [Node]
-        internal readonly Container Container;
+        internal readonly ContainerSyntax Container;
 
-        internal Context(ContextBase parent, Container container, int position)
+        internal Context(ContextBase parent, ContainerSyntax container, int position)
             : base(parent)
         {
             Position = position;
@@ -27,17 +27,17 @@ namespace Reni.Struct
         }
 
         [DisableDump]
-        internal Structure Structure { get { return Parent.UniqueStructure(Container, Position); } }
+        internal ContainerView ContainerView { get { return Parent.UniqueStructure(Container, Position); } }
 
         IFeatureImplementation ISymbolProvider<Definable, IFeatureImplementation>.Feature(Definable tokenClass)
         {
             var structurePosition = Container.Find(tokenClass.Name);
-            return structurePosition == null ? null : structurePosition.Convert(Structure);
+            return structurePosition == null ? null : structurePosition.Convert(ContainerView);
         }
 
-        internal Result ObjectResult(Category category) { return Structure.StructReferenceViaContextReference(category); }
+        internal Result ObjectResult(Category category) { return ContainerView.StructReferenceViaContextReference(category); }
 
         protected override string ChildDumpPrintText { get { return Container.DumpPrintText; } }
-        internal override Structure ObtainRecentStructure() { return Structure; }
+        internal override ContainerView ObtainRecentStructure() { return ContainerView; }
     }
 }

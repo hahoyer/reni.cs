@@ -79,7 +79,7 @@ namespace Reni.ReniSyntax
             var rightResult = right.Result(context);
             return leftResultAsRef
                 .Type
-                .FindRecentStructure
+                .FindRecentContainerView
                 .AccessViaThisReference(category, rightResult)
                 .ReplaceArg(leftResultAsRef);
         }

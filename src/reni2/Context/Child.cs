@@ -25,7 +25,7 @@ namespace Reni.Context
             get { return ChildDumpPrintText + (Parent == RootContext ? "" : " in " + _parent.DumpPrintText); }
         }
         protected abstract string ChildDumpPrintText { get; }
-        internal override Structure ObtainRecentStructure() { return Parent.ObtainRecentStructure(); }
+        internal override ContainerView ObtainRecentStructure() { return Parent.ObtainRecentStructure(); }
         internal override IFunctionContext ObtainRecentFunctionContext() { return Parent.ObtainRecentFunctionContext(); }
         internal override IEnumerable<ContextCallDescriptor> Declarations<TDefinable>(TDefinable tokenClass)
         {

@@ -48,7 +48,7 @@ namespace Reni.Type
         internal TypeBase ValueType { get { return _valueType; } }
 
         [DisableDump]
-        internal override Structure FindRecentStructure { get { return ValueType.FindRecentStructure; } }
+        internal override ContainerView FindRecentContainerView { get { return ValueType.FindRecentContainerView; } }
 
         [DisableDump]
         internal override IFeatureImplementation Feature { get { return ValueType.Feature; } }

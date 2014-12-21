@@ -33,7 +33,7 @@ namespace Reni.ReniSyntax
         [DisableDump]
         internal override CompileSyntax ToCompiledSyntax { get { return ToContainer; } }
 
-        internal override Container ToContainer { get { return new Container(Token, _data); } }
+        internal override ContainerSyntax ToContainer { get { return new ContainerSyntax(Token, _data); } }
 
         internal static ListSyntax Spread(Syntax statement)
         {
