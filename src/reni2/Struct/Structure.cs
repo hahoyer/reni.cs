@@ -15,16 +15,18 @@ namespace Reni.Struct
     sealed class Structure : DumpableObject
     {
         static int _nextObjectId;
-        readonly ContainerContextObject _containerContextObject;
-        readonly int _endPosition;
+        [EnableDump]
+        [Node]
+        internal ContainerContextObject ContainerContextObject;
+        [EnableDump]
+        [Node]
+        internal int EndPosition;
         [Node]
         readonly ValueCache<StructureType> _typeCache;
         [Node]
         readonly FunctionCache<int, TypeBase> _accessTypesCache;
         [Node]
         readonly FunctionCache<int, AccessFeature> _accessFeaturesCache;
-        [Node]
-        readonly FunctionCache<int, FieldAccessType> _fieldAccessTypeCache;
         [Node]
         readonly FunctionCache<FunctionSyntax, FunctionBodyType> _functionBodyTypeCache;
 
@@ -33,22 +35,13 @@ namespace Reni.Struct
         {
             _functionBodyTypeCache = new FunctionCache<FunctionSyntax, FunctionBodyType>
                 (syntax => new FunctionBodyType(this, syntax));
-            _fieldAccessTypeCache = new FunctionCache<int, FieldAccessType>(position => new FieldAccessType(this, position));
-            _containerContextObject = containerContextObject;
-            _endPosition = endPosition;
+            ContainerContextObject = containerContextObject;
+            EndPosition = endPosition;
             _typeCache = new ValueCache<StructureType>(() => new StructureType(this));
-            _accessTypesCache = new FunctionCache<int, TypeBase>(ObtainAccessType);
+            _accessTypesCache = new FunctionCache<int, TypeBase>(AccessTypeForCache);
             _accessFeaturesCache = new FunctionCache<int, AccessFeature>(position => new AccessFeature(this, position));
             StopByObjectId(-313);
         }
-
-        [EnableDump]
-        [Node]
-        internal int EndPosition { get { return _endPosition; } }
-
-        [EnableDump]
-        [Node]
-        internal ContainerContextObject ContainerContextObject { get { return _containerContextObject; } }
 
         [DisableDump]
         internal ContextBase UniqueContext
@@ -73,10 +66,7 @@ namespace Reni.Struct
         }
 
         [DisableDump]
-        internal RefAlignParam RefAlignParam { get { return ContainerContextObject.RefAlignParam; } }
-
-        [DisableDump]
-        internal TypeBase IndexType { get { return ContainerContextObject.IndexType; } }
+        TypeBase IndexType { get { return ContainerContextObject.IndexType; } }
 
         bool _isObtainStructSizeActive;
 
@@ -120,14 +110,12 @@ namespace Reni.Struct
 
         TypeBase UniqueAccessType(int position) { return _accessTypesCache[position]; }
         internal AccessFeature UniqueAccessFeature(int position) { return _accessFeaturesCache[position]; }
-        FieldAccessType UniqueFieldAccessType(int position) { return _fieldAccessTypeCache[position]; }
 
-        TypeBase ObtainAccessType(int position)
+        TypeBase AccessTypeForCache(int position)
         {
-            var accessType = ContainerContextObject.AccessType(EndPosition, position);
-            if(accessType.IsLambda || accessType.Hllw)
-                return accessType;
-            return UniqueFieldAccessType(position);
+            if(ContainerContextObject.Container.IsConst(position))
+                return ContainerContextObject.AccessType(EndPosition, position);
+            return new FieldAccessType(this, position);
         }
 
         internal Result AccessViaThisReference(Category category, Result rightResult)
@@ -185,6 +173,7 @@ namespace Reni.Struct
                 .AddToReference(ContextOffset);
             return result;
         }
+
         Size ContextOffset() { return ContainerContextObject.ContextReferenceOffsetFromAccessPoint(EndPosition) * -1; }
 
         internal Result StructReferenceViaContextReference(Category category)
@@ -225,6 +214,7 @@ namespace Reni.Struct
             return ContainerContextObject
                 .ContextReferenceViaStructReference(EndPosition, result);
         }
+
         CodeBase StructReferenceCodeViaContextReference()
         {
             return CodeBase.ReferenceCode(ContainerContextObject)

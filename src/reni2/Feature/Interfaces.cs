@@ -109,26 +109,6 @@ namespace Reni.Feature
         TPath Convert(TProvider provider);
     }
 
-    sealed class ContextSearchResult : DumpableObject
-    {
-        [EnableDump]
-        readonly IFeatureImplementation _feature;
-        [EnableDump]
-        readonly ContextBase _definingItem;
-        internal ContextSearchResult(IFeatureImplementation feature, ContextBase definingItem)
-        {
-            _feature = feature;
-            _definingItem = definingItem;
-        }
-
-        FeatureDescriptor FeatureDescriptor { get { return new ContextCallDescriptor(_definingItem, _feature); } }
-
-        public Result CallResult(ContextBase callContext, Category category, CompileSyntax right)
-        {
-            return FeatureDescriptor.Result(category, callContext, right);
-        }
-    }
-
     sealed class ContextCallDescriptor : FeatureDescriptor
     {
         [EnableDump]
@@ -241,7 +221,7 @@ namespace Reni.Feature
     interface IGenericProviderForDefinable
     {
         IEnumerable<SearchResult> Declarations(TypeBase source);
-        IEnumerable<ContextSearchResult> Declarations(ContextBase source);
+        IEnumerable<ContextCallDescriptor> Declarations(ContextBase source);
     }
 
     sealed class GenericProviderForType<T> : DumpableObject, IGenericProviderForType
@@ -269,7 +249,7 @@ namespace Reni.Feature
         {
             return source.Declarations(_target);
         }
-        IEnumerable<ContextSearchResult> IGenericProviderForDefinable.Declarations(ContextBase source)
+        IEnumerable<ContextCallDescriptor> IGenericProviderForDefinable.Declarations(ContextBase source)
         {
             return source.Declarations(_target);
         }

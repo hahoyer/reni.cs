@@ -4,6 +4,7 @@ using System;
 using hw.Debug;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Context;
 using Reni.Struct;
 
 namespace Reni.Type
@@ -26,12 +27,9 @@ namespace Reni.Type
         [DisableDump]
         internal override bool Hllw { get { return false; } }
 
-        [DisableDump]
-        RefAlignParam RefAlignParam { get { return _structure.RefAlignParam; } }
-
         protected override string GetNodeDump() { return base.GetNodeDump() + "{" + _structure.NodeDump + "@" + _position + "}"; }
 
-        protected override Size GetSize() { return RefAlignParam.RefSize; }
+        protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
 
         Size FieldOffset { get { return _structure.FieldOffset(_position); } }
 

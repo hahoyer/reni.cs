@@ -33,23 +33,7 @@ namespace Reni.ReniSyntax
         [DisableDump]
         internal override CompileSyntax ToCompiledSyntax { get { return ToContainer; } }
 
-        internal override Container ToContainer
-        {
-            get
-            {
-                var list = _data
-                    .Select(syntax => syntax.ExtractBody.ToCompiledSyntax);
-
-                var dictionary = _data
-                    .SelectMany((syntax, index) => syntax.GetDeclarations(index))
-                    .ToDictionary(syntax => syntax.Key, syntax => syntax.Value);
-
-                var converters = _data
-                    .SelectMany((syntax, index) => syntax is ConverterSyntax ? new[] {index} : new int[0]);
-
-                return new Container(Token, list.ToArray(), dictionary, converters.ToArray());
-            }
-        }
+        internal override Container ToContainer { get { return new Container(Token, _data); } }
 
         internal static ListSyntax Spread(Syntax statement)
         {

@@ -230,7 +230,7 @@ namespace Reni.Context
             return functionalObjectDescriptor.Result(category, this, left, right);
         }
 
-        ContextSearchResult Declarations(Definable tokenClass)
+        ContextCallDescriptor Declarations(Definable tokenClass)
         {
             var genericize = tokenClass.Genericize.ToArray();
             var results = genericize.SelectMany(g => g.Declarations(this));
@@ -247,12 +247,12 @@ namespace Reni.Context
             if(searchResult == null)
                 return UndefinedSymbolIssue.Type(position, RootContext).IssueResult(category);
 
-            var result = searchResult.CallResult(this, category, right);
+            var result = searchResult.Result(category, this, right);
             Tracer.Assert(category <= result.CompleteCategory);
             return result;
         }
 
-        internal virtual IEnumerable<ContextSearchResult> Declarations<TDefinable>(TDefinable tokenClass)
+        internal virtual IEnumerable<ContextCallDescriptor> Declarations<TDefinable>(TDefinable tokenClass)
             where TDefinable : Definable
         {
             var provider = this as ISymbolProvider<TDefinable, IFeatureImplementation>;
@@ -260,9 +260,9 @@ namespace Reni.Context
             {
                 var feature = provider.Feature(tokenClass);
                 if(feature != null)
-                    return new[] {new ContextSearchResult(feature, this)};
+                    return new[] {new ContextCallDescriptor(this, feature)};
             }
-            return new ContextSearchResult[0];
+            return new ContextCallDescriptor[0];
         }
 
         internal Result CreateArrayResult(Category category, CompileSyntax argsType)

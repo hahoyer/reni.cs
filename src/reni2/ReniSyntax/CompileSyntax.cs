@@ -21,7 +21,7 @@ namespace Reni.ReniSyntax
         // Used for debug only
         [DisableDump]
         [Node("Cache")]
-        readonly FunctionCache<ContextBase, object> ResultCache = new FunctionCache<ContextBase, object>();
+        readonly FunctionCache<ContextBase, object> _resultCache = new FunctionCache<ContextBase, object>();
 
         internal CompileSyntax(SourcePart token)
             : base(token)
@@ -61,8 +61,9 @@ namespace Reni.ReniSyntax
         protected virtual bool GetIsLambda() { return false; }
 
         internal override Syntax SurroundedByParenthesis(SourcePart token, SourcePart rightToken) { return this; }
+        internal override bool IsEnableReassignSyntax { get { return false; } }
         internal override CompileSyntax ToCompiledSyntax { get { return this; } }
-        internal void AddToCacheForDebug(ContextBase context, object cacheItem) { ResultCache.Add(context, cacheItem); }
+        internal void AddToCacheForDebug(ContextBase context, object cacheItem) { _resultCache.Add(context, cacheItem); }
         internal Result Result(ContextBase context) { return Result(context, Category.All); }
         //[DebuggerHidden]
         internal Result Result(ContextBase context, Category category) { return context.Result(category, this); }

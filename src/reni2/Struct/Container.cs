@@ -10,7 +10,7 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
-using Reni.Type;
+using Reni.TokenClasses;
 
 namespace Reni.Struct
 {
@@ -19,40 +19,23 @@ namespace Reni.Struct
     /// </summary>
     sealed class Container : CompileSyntax
     {
-        readonly CompileSyntax[] _statements;
-        readonly Dictionary<string, int> _dictionary;
-        readonly int[] _converters;
+        readonly Data[] _data;
         static readonly string _runId = Compiler.FormattedNow + "\n";
         public static bool IsInContainerDump;
         static bool _isInsideFileDump;
         static int _nextObjectId;
 
         [Node]
-        internal CompileSyntax[] Statements { get { return _statements; } }
+        internal CompileSyntax[] Statements { get { return _data.Select(s => s.Statement).ToArray(); } }
 
         [DisableDump]
         internal int EndPosition { get { return Statements.Length; } }
 
-        [Node]
-        [SmartNode]
-        internal Dictionary<string, int> Dictionary { get { return _dictionary; } }
-
-        [Node]
-        [SmartNode]
-        internal int[] Converters { get { return _converters; } }
-
         internal Container
             (
             SourcePart token,
-            CompileSyntax[] statements,
-            Dictionary<string, int> dictionary,
-            int[] converters)
-            : base(token, _nextObjectId++)
-        {
-            _statements = statements;
-            _dictionary = dictionary;
-            _converters = converters;
-        }
+            Syntax[] statements)
+            : base(token, _nextObjectId++) { _data = statements.Select((s, i) => new Data(s, i)).ToArray(); }
 
         [DisableDump]
         internal override CompileSyntax ToCompiledSyntax { get { return this; } }
@@ -73,6 +56,10 @@ namespace Reni.Struct
 
         [DisableDump]
         protected override ParsedSyntax[] Children { get { return Statements.ToArray<ParsedSyntax>(); } }
+        [DisableDump]
+        public string[] Names { get { return _data.SelectMany(s => s.Names).ToArray(); } }
+        [DisableDump]
+        public int[] Converters { get { return _data.SelectMany((s, i) => s.IsConverter ? new[] {i} : new int[0]).ToArray(); } }
 
         public override string DumpData()
         {
@@ -111,165 +98,56 @@ namespace Reni.Struct
         {
             if(name == null)
                 return null;
-            if(!Dictionary.ContainsKey(name))
+            var result = _data.SingleOrDefault(s => s.Defines(name));
+            if(result == null)
                 return null;
 
-            var position = Dictionary[name];
-            return new StructurePosition(position);
+            return new StructurePosition(result.Position);
         }
 
         internal override Result ObtainResult(ContextBase context, Category category)
         {
-            var innerResult = StructureResult(category - Category.Type, context, 0, EndPosition);
-            return context.UniqueContainerContext(this).Result(category, innerResult);
+            return context
+                .UniqueContainerContext(this)
+                .Result(category);
         }
 
-        Result InnerResult(Category category, ContextBase parent, int position)
+        sealed class Data : DumpableObject
         {
-            Tracer.Assert(!Statements[position].IsLambda);
-            return Result(category, parent, position, position);
+            readonly Syntax _rawStatement;
+            public readonly int Position;
+            readonly ValueCache<string[]> _namesCache;
+            readonly ValueCache<CompileSyntax> _statement;
+
+            public Data(Syntax rawStatement, int position)
+            {
+                _rawStatement = rawStatement;
+                Position = position;
+                _statement = new ValueCache<CompileSyntax>(GetStatement);
+                _namesCache = new ValueCache<string[]>(GetNames);
+            }
+
+            public CompileSyntax Statement { get { return _statement.Value; } }
+            public bool Defines(string name) { return Names.Contains(name); }
+            public bool IsConverter { get { return _rawStatement is ConverterSyntax; } }
+            public IEnumerable<string> Names { get { return _namesCache.Value; } }
+            public bool IsConst { get { return !(_rawStatement.IsEnableReassignSyntax); } }
+
+            CompileSyntax GetStatement() { return _rawStatement.ContainerStatementToCompileSyntax; }
+            string[] GetNames() { return _rawStatement.GetDeclarations().ToArray(); }
         }
 
-        Result Result(Category category, ContextBase parent, int accessPosition, int position)
-        {
-            var trace = ObjectId.In(-1) && accessPosition >= 0 && position >= 0 && category.HasCode;
-            StartMethodDump(trace, category, parent, accessPosition, position);
-            try
-            {
-                var uniqueChildContext = parent
-                    .UniqueStructurePositionContext(this, accessPosition);
-                Dump("Statements[position]", Statements[position]);
-                BreakExecution();
-                var result1 = Statements[position]
-                    .Result(uniqueChildContext, category.Typed);
-                Dump("result1", result1);
-                BreakExecution();
-                var result = result1
-                    .SmartUn<FunctionType>();
-                Dump("result", result);
-                return ReturnMethodDump(result.AutomaticDereferenceResult);
-            }
-            finally
-            {
-                EndMethodDump();
-            }
-        }
-
-        bool InternalInnerHllw(ContextBase parent, int position)
-        {
-            var uniqueChildContext = parent
-                .UniqueStructurePositionContext(this, position);
-            return Statements[position].HllwStructureElement(uniqueChildContext);
-        }
-
-        bool? InternalInnerHllw(int position) { return Statements[position].Hllw; }
-
-        internal bool ObtainHllw(ContextBase parent, int accessPosition)
-        {
-            var trace = ObjectId == -10 && accessPosition == 3 && parent.ObjectId == 4;
-            StartMethodDump(trace, parent, accessPosition);
-            try
-            {
-                var subStatementIds = accessPosition.Select().ToArray();
-                Dump("subStatementIds", subStatementIds);
-                BreakExecution();
-                if(subStatementIds.Any(position => InternalInnerHllw(position) == false))
-                    return ReturnMethodDump(false);
-                var quickNonDataLess = subStatementIds
-                    .Where(position => InternalInnerHllw(position) == null)
-                    .ToArray();
-                Dump("quickNonDataLess", quickNonDataLess);
-                BreakExecution();
-                if(quickNonDataLess.Length == 0)
-                    return ReturnMethodDump(true);
-                if(quickNonDataLess.Any(position => InternalInnerHllw(parent, position) == false))
-                    return ReturnMethodDump(false);
-                return ReturnMethodDump(true);
-            }
-            finally
-            {
-                EndMethodDump();
-            }
-        }
-
-        internal Result StructureResult(Category category, ContextBase parent, int fromPosition, int fromNotPosition)
-        {
-            if(category.IsNone)
-                return new Result();
-            var trace = ObjectId == -1 && category.HasCode;
-            StartMethodDump(trace, category, parent, fromPosition, fromNotPosition);
-            try
-            {
-                Dump("Statements", Statements);
-
-                var enumerable = (fromNotPosition - fromPosition)
-                    .Select(i => fromPosition + i)
-                    .Where(position => !Statements[position].IsLambda)
-                    .ToArray();
-                Dump("Statements", enumerable);
-                BreakExecution();
-                var @select = enumerable
-                    .Select(position => InnerResult(category, parent, position))
-                    .Select(r => r.Align)
-                    .ToArray();
-                Dump("Statements", select);
-                BreakExecution();
-                var results = @select
-                    .Select(r => r.LocalBlock(category))
-                    .ToArray();
-                Dump("results", results);
-                BreakExecution();
-                var result = results
-                    .Aggregate(parent.RootContext.VoidResult(category), (current, next) => current + next);
-                return ReturnMethodDump(result);
-            }
-            finally
-            {
-                EndMethodDump();
-            }
-        }
-
-        internal Size StructureSize(ContextBase parent, int fromPosition, int fromNotPosition)
-        {
-            return StructureResult(Category.Size, parent, fromPosition, fromNotPosition).Size;
-        }
-
-        internal TypeBase AccessType(ContextBase parent, int accessPosition, int position)
-        {
-            var trace = ObjectId == -10 && accessPosition == 1 && position == 0;
-            StartMethodDump(trace, parent, accessPosition, position);
-            try
-            {
-                Dump("Statements[position]", Statements[position]);
-                BreakExecution();
-                var result = Result(Category.Type, parent, accessPosition, position).Type;
-                return ReturnMethodDump(result);
-            }
-            finally
-            {
-                EndMethodDump();
-            }
-        }
-
-        internal string[] DataIndexList(ContextBase parent)
-        {
-            return Statements
-                .Length
-                .Select()
-                .Where(i => !InternalInnerHllw(parent, i))
-                .Select(i => i.ToString() + "=" + InnerResult(Category.Size, parent, i).Size.ToString())
-                .ToArray();
-        }
+        public bool IsConst(int position) { return _data[position].IsConst; }
     }
 
 
     sealed class StructurePosition : DumpableObject
     {
         [EnableDump]
-        readonly int _position;
+        internal readonly int Position;
 
-        internal StructurePosition(int position) { _position = position; }
+        internal StructurePosition(int position) { Position = position; }
 
-        internal AccessFeature Convert(Structure accessPoint) { return accessPoint.UniqueAccessFeature(_position); }
+        internal AccessFeature Convert(Structure accessPoint) { return accessPoint.UniqueAccessFeature(Position); }
     }
 }

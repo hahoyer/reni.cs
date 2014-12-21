@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Helper;
-using hw.UnitTest;
 using Reni.Basics;
 using Reni.Feature;
 using Reni.ReniSyntax;
@@ -55,7 +54,6 @@ namespace Reni.Struct
             {
                 var syntax = Statement as FunctionSyntax;
                 return syntax == null ? null : syntax.ContextMetaFunctionFeature(_structure);
-                
             }
         }
         protected override IMetaFunctionFeature Meta

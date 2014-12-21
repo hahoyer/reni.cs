@@ -1,5 +1,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 14
+VisualStudioVersion = 14.0.22310.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{71905A24-D1C7-468D-8E25-553FA67DA2D9}"
 	ProjectSection(SolutionItems) = preProject
 		Resources\Bool.ico = Resources\Bool.ico
@@ -38,7 +40,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReniExe", "ReniExe\ReniExe.
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "RootSite", "http://localhost:60845", "{9FC7AA26-0AF2-4E78-A0CC-FF456A3FF598}"
 	ProjectSection(WebsiteProperties) = preProject
-		Frontpage = "false"
 		UseIISExpress = "true"
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5"
 		ProjectReferences = "{ebb73c84-6622-4183-a28f-b0dff606006b}|Reni.dll;"
@@ -58,6 +59,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "RootSite", "http://localhos
 		Release.AspNetCompiler.Debug = "False"
 		SlnRelativePath = "RootSite\"
 		DefaultWebSiteLanguage = "Visual C#"
+		StartServerOnDebug = "false"
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{42AF6999-EE7E-46AC-BF8E-14F2F567ECF1}"
@@ -80,9 +82,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{A045FCB3
 	EndProjectSection
 EndProject
 Global
-	GlobalSection(CodealikeProperties) = postSolution
-		SolutionGuid = eaf46459-7dac-4986-b4bb-bb69ffbc6141
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -110,5 +109,8 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		VisualSVNWorkingCopyRoot = .
+	EndGlobalSection
+	GlobalSection(CodealikeProperties) = postSolution
+		SolutionGuid = eaf46459-7dac-4986-b4bb-bb69ffbc6141
 	EndGlobalSection
 EndGlobal

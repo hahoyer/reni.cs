@@ -14,7 +14,7 @@ EinsDazu: /\ ^ + 1 ;
 Konstrukt: 
 /\(
     Simpel: ^; 
-    Pelsim: <:=> EinsDazu(^) ; 
+    Pelsim: :=! EinsDazu(^) ; 
     Fun: /\ Simpel+ EinsDazu(^)
 );
 lorum: Konstrukt(23);

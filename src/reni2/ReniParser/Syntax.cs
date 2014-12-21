@@ -22,7 +22,7 @@ namespace Reni.ReniParser
         {}
 
         [DisableDump]
-        internal virtual Syntax ExtractBody { get { return this; } }
+        internal virtual CompileSyntax ContainerStatementToCompileSyntax { get { return ToCompiledSyntax; } }
 
         [DisableDump]
         internal virtual CompileSyntax ToCompiledSyntax
@@ -34,6 +34,7 @@ namespace Reni.ReniParser
             }
         }
         internal virtual IEnumerable<KeyValuePair<string, int>> GetDeclarations(int index) { yield break; }
+        internal virtual IEnumerable<string> GetDeclarations() { yield break; }
 
         internal virtual Syntax RightParenthesis(int level, SourcePart token)
         {
@@ -112,7 +113,16 @@ namespace Reni.ReniParser
         }
 
         internal virtual IEnumerable<Syntax> ToList(List type) { yield return this; }
-        internal virtual Container ToContainer { get { return ListSyntax.Spread(this).ToContainer; } }
+        internal virtual Container ToContainer => ListSyntax.Spread(this).ToContainer;
+
+        internal virtual bool IsEnableReassignSyntax
+        {
+            get
+            {
+                NotImplementedMethod();
+                return false;
+            }
+        }
 
         internal virtual Syntax SyntaxError(IssueId issue, SourcePart token)
         {

@@ -74,10 +74,12 @@ namespace Reni.FeatureTest.Helper
             _position = position;
         }
 
-        public void AssertLike(KeyValuePair<string, int> item)
+        public void AssertContains(Container container)
         {
-            Tracer.Assert(_name == item.Key);
-            Tracer.Assert(_position == item.Value);
+            var s = container.Find(_name);
+
+            Tracer.Assert(s != null);
+            Tracer.Assert(_position == s.Position);
         }
     }
 
@@ -100,13 +102,11 @@ namespace Reni.FeatureTest.Helper
             Tracer.Assert(_list.Length == co.Statements.Length);
             for(var i = 0; i < _list.Length; i++)
                 _list[i].AssertLike(co.Statements[i]);
-            Tracer.Assert(_declarations.Length == co.Dictionary.Count);
-            var coi = co.Dictionary.GetEnumerator();
-            coi.MoveNext();
-            for(var i = 0; i < _declarations.Length; i++, coi.MoveNext())
-                _declarations[i].AssertLike(coi.Current);
+            Tracer.Assert(_declarations.Length == co.Names.Length);
+            foreach(var declaration in _declarations)
+                declaration.AssertContains(co);
             Tracer.Assert(_converters.Length == co.Converters.Length);
-            for(var i = 0; i < _converters.Length; i++)
+            for (var i = 0; i < _converters.Length; i++)
                 Tracer.Assert(_converters[i] == co.Converters[i]);
         }
     }

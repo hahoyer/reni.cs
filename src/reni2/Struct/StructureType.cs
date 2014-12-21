@@ -27,9 +27,6 @@ namespace Reni.Struct
         }
 
         [DisableDump]
-        internal RefAlignParam RefAlignParam { get { return Structure.RefAlignParam; } }
-
-        [DisableDump]
         internal Structure Structure { get { return _structure; } }
 
         [DisableDump]
