@@ -79,7 +79,7 @@ namespace Reni.ReniSyntax
             var rightResult = right.Result(context);
             return leftResultAsRef
                 .Type
-                .FindRecentContainerView
+                .FindRecentCompoundView
                 .AccessViaThisReference(category, rightResult)
                 .ReplaceArg(leftResultAsRef);
         }
@@ -105,10 +105,6 @@ namespace Reni.ReniSyntax
             if(result != null)
                 return result.Value;
 
-            result = context.QuickHllw(this);
-            if(result != null)
-                return result.Value;
-
             var type = context.TypeIfKnown(this);
             if(type != null)
                 return type.SmartUn<FunctionType>().Hllw;
@@ -124,10 +120,7 @@ namespace Reni.ReniSyntax
         internal Result SmartUnFunctionedReferenceResult(ContextBase context, Category category)
         {
             var result = Result(context, category.Typed);
-            if(result == null)
-                return null;
-            return result
-                .SmartUn<FunctionType>().LocalPointerKindResult;
+            return result?.SmartUn<FunctionType>().LocalPointerKindResult;
         }
 
         internal virtual Result ObtainPendingResult(ContextBase context, Category category)

@@ -20,7 +20,7 @@ namespace Reni.Feature.DumpPrint
         Result ISimpleFeature.Result(Category category)
         {
             return _structureType
-                .ContainerView
+                .CompoundView
                 .DumpPrintResultViaContextReference(category);
         }
         TypeBase ISimpleFeature.TargetType { get { return _structureType; } }

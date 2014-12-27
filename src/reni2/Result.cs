@@ -804,7 +804,7 @@ namespace Reni
             }
         }
 
-        internal Result ContextReferenceViaStructReference(ContainerView accessPoint)
+        internal Result ContextReferenceViaStructReference(CompoundView accessPoint)
         {
             return accessPoint
                 .ContextReferenceViaStructReference(this);

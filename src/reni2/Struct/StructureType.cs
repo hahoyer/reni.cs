@@ -14,11 +14,11 @@ namespace Reni.Struct
         : TypeBase
             , ISymbolProvider<DumpPrintToken, IFeatureImplementation>
     {
-        readonly ContainerView _containerView;
+        readonly CompoundView _compoundView;
 
-        internal StructureType(ContainerView containerView)
+        internal StructureType(CompoundView compoundView)
         {
-            _containerView = containerView;
+            _compoundView = compoundView;
         }
 
         IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
@@ -27,24 +27,24 @@ namespace Reni.Struct
         }
 
         [DisableDump]
-        internal ContainerView ContainerView { get { return _containerView; } }
+        internal CompoundView CompoundView { get { return _compoundView; } }
 
         [DisableDump]
-        internal override Root RootContext { get { return _containerView.RootContext; } }
+        internal override Root RootContext { get { return _compoundView.RootContext; } }
 
         [DisableDump]
-        internal override ContainerView FindRecentContainerView { get { return ContainerView; } }
+        internal override CompoundView FindRecentCompoundView { get { return CompoundView; } }
 
         [DisableDump]
-        internal override bool Hllw { get { return ContainerView.Hllw; } }
+        internal override bool Hllw { get { return CompoundView.Hllw; } }
 
-        internal Result DumpPrintTokenResult(Category category) { return ContainerView.DumpPrintResultViaStructReference(category); }
+        internal Result DumpPrintTokenResult(Category category) { return CompoundView.DumpPrintResultViaStructReference(category); }
 
         [DisableDump]
         internal override bool HasQuickSize { get { return false; } }
 
-        protected override Size GetSize() { return ContainerView.StructSize; }
+        protected override Size GetSize() { return CompoundView.StructSize; }
 
-        protected override string GetNodeDump() { return "type(" + ContainerView.NodeDump + ")"; }
+        protected override string GetNodeDump() { return "type(" + CompoundView.NodeDump + ")"; }
     }
 }

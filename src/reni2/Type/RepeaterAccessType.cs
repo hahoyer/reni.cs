@@ -1,10 +1,8 @@
-using System.Linq;
-using System.Collections.Generic;
-using System;
 using hw.Debug;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
+
 
 namespace Reni.Type
 {
@@ -18,6 +16,16 @@ namespace Reni.Type
 
         [DisableDump]
         internal override bool Hllw { get { return false; } }
+
+        public override bool IsReassignPossible
+        {
+            get
+            {
+                NotImplementedMethod();
+                return false;
+            }
+        }
+
         internal override TypeBase ValueType { get { return RepeaterType.ElementType; } }
 
         protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize + RepeaterType.IndexSize; }

@@ -1,37 +1,40 @@
-using System.Linq;
-using System.Collections.Generic;
-using System;
 using hw.Debug;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Struct;
 
+
 namespace Reni.Type
 {
     sealed class FieldAccessType : DataSetterTargetType
     {
         [EnableDump]
-        readonly ContainerView _containerView;
+        readonly CompoundView _compoundView;
         [EnableDump]
         readonly int _position;
 
-        internal FieldAccessType(ContainerView containerView, int position)
+        internal FieldAccessType(CompoundView compoundView, int position)
         {
-            _containerView = containerView;
+            _compoundView = compoundView;
             _position = position;
         }
 
-        internal override TypeBase ValueType { get { return _containerView.ValueType(_position); } }
+        public override bool IsReassignPossible => _compoundView.Compound.Syntax.IsReassignable(_position);
+
+        internal override TypeBase ValueType { get { return _compoundView.ValueType(_position); } }
 
         [DisableDump]
         internal override bool Hllw { get { return false; } }
 
-        protected override string GetNodeDump() { return base.GetNodeDump() + "{" + _containerView.NodeDump + "@" + _position + "}"; }
+        protected override string GetNodeDump()
+        {
+            return base.GetNodeDump() + "{" + _compoundView.NodeDump + "@" + _position + "}";
+        }
 
         protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
 
-        Size FieldOffset { get { return _containerView.FieldOffset(_position); } }
+        Size FieldOffset { get { return _compoundView.FieldOffset(_position); } }
 
         protected override CodeBase GetterCode() { return ArgCode.ReferencePlus(FieldOffset); }
 
@@ -50,8 +53,14 @@ namespace Reni.Type
                 .AddToReference(() => FieldOffset);
         }
 
-        internal override int? SmartSequenceLength(TypeBase elementType) { return ValueType.SmartSequenceLength(elementType); }
+        internal override int? SmartSequenceLength(TypeBase elementType)
+        {
+            return ValueType.SmartSequenceLength(elementType);
+        }
 
-        internal override int? SmartArrayLength(TypeBase elementType) { return ValueType.SmartArrayLength(elementType); }
+        internal override int? SmartArrayLength(TypeBase elementType)
+        {
+            return ValueType.SmartArrayLength(elementType);
+        }
     }
 }

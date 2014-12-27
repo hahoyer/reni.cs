@@ -265,7 +265,7 @@ namespace Reni.Type
         internal TypeBase UniqueFunctionInstanceType { get { return _cache.FunctionInstanceType.Value; } }
 
         [DisableDump]
-        internal virtual ContainerView FindRecentContainerView
+        internal virtual CompoundView FindRecentCompoundView
         {
             get
             {

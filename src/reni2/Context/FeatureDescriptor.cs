@@ -26,7 +26,7 @@ namespace Reni.Context
             if(metaFeature != null)
                 return metaFeature.Result(context, category, left, right);
 
-            var trace = ObjectId == -118 && category.HasCode;
+            var trace = ObjectId == 33 && category.HasCode;
             StartMethodDump(trace, context, category, left, right);
             try
             {
@@ -153,12 +153,12 @@ namespace Reni.Context
         [DisableDump]
         FunctionBodyType FunctionBodyType { get { return (FunctionBodyType) _context.ArgReferenceResult(Category.Type).Type; } }
         [DisableDump]
-        ContainerView ContainerView { get { return FunctionBodyType.FindRecentContainerView; } }
+        CompoundView CompoundView { get { return FunctionBodyType.FindRecentCompoundView; } }
 
         [DisableDump]
-        protected override Func<Category, Result> ConverterResult { get { return ContainerView.StructReferenceViaContextReference; } }
+        protected override Func<Category, Result> ConverterResult { get { return CompoundView.StructReferenceViaContextReference; } }
         [DisableDump]
-        protected override TypeBase Type { get { return ContainerView.Type; } }
+        protected override TypeBase Type { get { return CompoundView.Type; } }
         [DisableDump]
         protected override IFeatureImplementation Feature { get { return FunctionBodyType.Feature; } }
     }

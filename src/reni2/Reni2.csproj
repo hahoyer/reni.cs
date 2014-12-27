@@ -272,14 +272,14 @@
     <Compile Include="Sequence\Star.cs" />
     <Compile Include="Singleton.cs" />
     <Compile Include="StringStream.cs" />
-    <Compile Include="Struct\Container.cs" />
+    <Compile Include="Struct\Compound.cs" />
     <Compile Include="Struct\Context.cs" />
     <Compile Include="Struct\FunctionBodyType.cs" />
     <Compile Include="Struct\FunctionId.cs" />
     <Compile Include="Struct\FunctionType.cs" />
     <Compile Include="Struct\GetterFunctionType.cs" />
     <Compile Include="Struct\SetterFunctionType.cs" />
-    <Compile Include="Struct\ContainerView.cs" />
+    <Compile Include="Struct\CompoundView.cs" />
     <Compile Include="Struct\StructureType.cs" />
     <Compile Include="Struct\FunctionInstance.cs" />
     <Compile Include="ReniSyntax\LeftParenthesisSyntax.cs" />
@@ -346,7 +346,7 @@
     <Compile Include="ReniException.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="Runtime\Data.cs" />
-    <Compile Include="Struct\ContainerSyntax.cs" />
+    <Compile Include="Struct\CompoundSyntax.cs" />
     <Compile Include="ThenElse.cs" />
     <Compile Include="Type\AlignType.cs" />
     <Compile Include="Type\ArrayType.cs" />

@@ -16,7 +16,7 @@ namespace Reni.Struct
     {
         readonly int _index;
         [Node]
-        readonly ContainerView _containerView;
+        readonly CompoundView _compoundView;
         [Node]
         internal readonly TypeBase ArgsType;
         [Node]
@@ -25,22 +25,24 @@ namespace Reni.Struct
         [Node]
         readonly GetterFunction _getter;
 
-        internal FunctionType(int index, FunctionSyntax body, ContainerView containerView, TypeBase argsType)
+        internal FunctionType(int index, FunctionSyntax body, CompoundView compoundView, TypeBase argsType)
         {
             _getter = new GetterFunction(this, index, body.Getter);
             _setter = body.Setter == null ? null : new SetterFunction(this, index, body.Setter);
             _index = index;
-            _containerView = containerView;
+            _compoundView = compoundView;
             ArgsType = argsType;
             StopByObjectId(-10);
         }
+
+        public override bool IsReassignPossible => _setter != null;
 
         [DisableDump]
         internal override TypeBase ValueType { get { return _getter.ReturnType; } }
         [DisableDump]
         internal override bool Hllw { get { return CodeArgs.IsNone && ArgsType.Hllw; } }
         [DisableDump]
-        internal override ContainerView FindRecentContainerView { get { return _containerView; } }
+        internal override CompoundView FindRecentCompoundView { get { return _compoundView; } }
         [DisableDump]
         internal override bool HasQuickSize { get { return false; } }
 
@@ -76,7 +78,7 @@ namespace Reni.Struct
 
         internal ContextBase CreateSubContext(bool useValue)
         {
-            return new Reni.Context.Function(_containerView.UniqueContext, ArgsType, useValue ? ValueType : null);
+            return new Reni.Context.Function(_compoundView.UniqueContext, ArgsType, useValue ? ValueType : null);
         }
 
         public string DumpFunction()
@@ -86,7 +88,7 @@ namespace Reni.Struct
             result += "\n";
             result += "argsType=" + ArgsType.Dump();
             result += "\n";
-            result += "context=" + _containerView.Dump();
+            result += "context=" + _compoundView.Dump();
             result += "\n";
             result += "Getter=" + _getter.DumpFunction();
             result += "\n";

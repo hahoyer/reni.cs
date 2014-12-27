@@ -16,33 +16,33 @@ namespace Reni.Struct
         static int _nextObjectId;
 
         [EnableDump]
-        readonly ContainerView _containerView;
+        readonly CompoundView _compoundView;
         [EnableDump]
         readonly int _position;
         readonly ValueCache<IFunctionFeature> _functionFeature;
 
-        internal AccessFeature(ContainerView containerView, int position)
+        internal AccessFeature(CompoundView compoundView, int position)
             : base(_nextObjectId++)
         {
-            _containerView = containerView;
+            _compoundView = compoundView;
             _position = position;
             _functionFeature = new ValueCache<IFunctionFeature>(ObtainFunctionFeature);
         }
 
         Result ISimpleFeature.Result(Category category)
         {
-            return _containerView
+            return _compoundView
                 .AccessViaThisReference(category, _position);
         }
 
-        TypeBase ISimpleFeature.TargetType { get { return _containerView.Type; } }
+        TypeBase ISimpleFeature.TargetType { get { return _compoundView.Type; } }
 
         CompileSyntax Statement
         {
             get
             {
-                return _containerView
-                    .Container
+                return _compoundView
+                    .Compound
                     .Syntax
                     .Statements[_position];
             }
@@ -53,7 +53,7 @@ namespace Reni.Struct
             get
             {
                 var syntax = Statement as FunctionSyntax;
-                return syntax == null ? null : syntax.ContextMetaFunctionFeature(_containerView);
+                return syntax == null ? null : syntax.ContextMetaFunctionFeature(_compoundView);
             }
         }
         protected override IMetaFunctionFeature Meta
@@ -61,7 +61,7 @@ namespace Reni.Struct
             get
             {
                 var syntax = Statement as FunctionSyntax;
-                return syntax == null ? null : syntax.MetaFunctionFeature(_containerView);
+                return syntax == null ? null : syntax.MetaFunctionFeature(_compoundView);
             }
         }
 
@@ -71,9 +71,9 @@ namespace Reni.Struct
         {
             var functionSyntax = Statement as FunctionSyntax;
             if(functionSyntax != null)
-                return functionSyntax.FunctionFeature(_containerView);
+                return functionSyntax.FunctionFeature(_compoundView);
 
-            var feature = _containerView.ValueType(_position).Feature;
+            var feature = _compoundView.ValueType(_position).Feature;
             if(feature == null)
                 return null;
             return feature.Function;
