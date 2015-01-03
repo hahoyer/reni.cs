@@ -121,6 +121,8 @@ namespace Reni.Feature
             _definingItem = definingItem;
             _feature = feature;
         }
+
+        [DisableDump]
         protected override TypeBase Type
         {
             get
@@ -129,8 +131,18 @@ namespace Reni.Feature
                 return null;
             }
         }
-        protected override IFeatureImplementation Feature { get { return _feature; } }
-        protected override Func<Category, Result> ConverterResult { get { return null; } }
+
+        [DisableDump]
+        protected override IFeatureImplementation Feature => _feature;
+
+        [DisableDump]
+        protected override Func<Category, Result> ConverterResult
+        {
+            get
+            {
+                return _definingItem.GetObjectResult;
+            }
+        }
     }
 
     abstract class SearchResult : DumpableObject

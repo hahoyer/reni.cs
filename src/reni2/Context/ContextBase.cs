@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -15,6 +14,7 @@ using Reni.TokenClasses;
 using Reni.Type;
 using Reni.Validation;
 
+
 namespace Reni.Context
 {
     /// <summary>
@@ -22,7 +22,8 @@ namespace Reni.Context
     /// </summary>
     abstract class ContextBase
         : DumpableObject
-            , IIconKeyProvider
+            ,
+            IIconKeyProvider
     {
         static int _nextId;
 
@@ -46,7 +47,11 @@ namespace Reni.Context
         internal CompoundView FindRecentCompoundView { get { return _cache.RecentStructure.Value; } }
 
         [DisableDump]
-        internal IFunctionContext FindRecentFunctionContextObject { get { return _cache.RecentFunctionContextObject.Value; } }
+        internal IFunctionContext FindRecentFunctionContextObject
+        {
+            get { return _cache.RecentFunctionContextObject.Value; }
+        }
+
         public abstract string DumpPrintText { get; }
 
         [UsedImplicitly]
@@ -59,15 +64,18 @@ namespace Reni.Context
         {
             return _cache.StructContexts[container][position];
         }
-        internal CompoundView UniqueStructure(CompoundSyntax syntax) { return UniqueStructure(syntax, syntax.EndPosition); }
-        internal CompoundView UniqueStructure(CompoundSyntax syntax, int accessPosition)
+
+        internal CompoundView UniqueCompoundView(CompoundSyntax syntax)
+        {
+            return UniqueCompoundView(syntax, syntax.EndPosition);
+        }
+
+        internal CompoundView UniqueCompoundView(CompoundSyntax syntax, int accessPosition)
         {
             return _cache.CompoundViews[syntax][accessPosition];
         }
-        internal Compound UniqueContainerContext(CompoundSyntax context)
-        {
-            return _cache.Compounds[context];
-        }
+
+        internal Compound UniqueCompound(CompoundSyntax context) { return _cache.Compounds[context]; }
 
         [DebuggerHidden]
         internal Result Result(Category category, CompileSyntax syntax)
@@ -117,7 +125,7 @@ namespace Reni.Context
 
         internal TypeBase Type(CompileSyntax syntax) { return Result(Category.Type, syntax).Type; }
 
-        internal virtual CompoundView ObtainRecentStructure() { return null; }
+        internal virtual CompoundView ObtainRecentCompoundView() { return null; }
         internal virtual IFunctionContext ObtainRecentFunctionContext() { return null; }
 
         sealed class Cache : DumpableObject, IIconKeyProvider
@@ -161,7 +169,7 @@ namespace Reni.Context
                         new FunctionCache<int, ContextBase>
                             (position => new Struct.Context(target, container, position))
                     );
-                RecentStructure = new ValueCache<CompoundView>(target.ObtainRecentStructure);
+                RecentStructure = new ValueCache<CompoundView>(target.ObtainRecentCompoundView);
                 RecentFunctionContextObject = new ValueCache<IFunctionContext>(target.ObtainRecentFunctionContext);
                 CompoundViews = new FunctionCache<CompoundSyntax, FunctionCache<int, CompoundView>>
                     (
@@ -188,6 +196,7 @@ namespace Reni.Context
             return FindRecentFunctionContextObject
                 .CreateArgReferenceResult(category);
         }
+
         internal Result ArgsResult(Category category, [CanBeNull] CompileSyntax right)
         {
             return right == null
@@ -267,6 +276,12 @@ namespace Reni.Context
         {
             var target = Result(category.Typed, argsType).Align;
             return target.Type.UniqueAlign.UniqueArray(1).Result(category, target);
+        }
+
+        public Result GetObjectResult(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
         }
     }
 }

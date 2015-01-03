@@ -27,7 +27,7 @@ namespace Reni.Struct
         }
 
         [DisableDump]
-        internal CompoundView CompoundView { get { return Parent.UniqueStructure(Syntax, Position); } }
+        internal CompoundView CompoundView { get { return Parent.UniqueCompoundView(Syntax, Position); } }
 
         IFeatureImplementation ISymbolProvider<Definable, IFeatureImplementation>.Feature(Definable tokenClass)
         {
@@ -38,6 +38,6 @@ namespace Reni.Struct
         internal Result ObjectResult(Category category) { return CompoundView.StructReferenceViaContextReference(category); }
 
         protected override string ChildDumpPrintText { get { return Syntax.DumpPrintText; } }
-        internal override CompoundView ObtainRecentStructure() { return CompoundView; }
+        internal override CompoundView ObtainRecentCompoundView() { return CompoundView; }
     }
 }
