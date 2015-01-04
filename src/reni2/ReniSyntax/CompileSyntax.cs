@@ -11,7 +11,6 @@ using Reni.Code;
 using Reni.Context;
 using Reni.ReniParser;
 using Reni.Struct;
-using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.ReniSyntax
@@ -47,9 +46,6 @@ namespace Reni.ReniSyntax
             }
         }
 
-        [DisableDump]
-        internal virtual bool IsImplicit { get { throw new NotImplementedException(); } }
-
 
         //[DebuggerHidden]
         internal virtual Result ObtainResult(ContextBase context, Category category)
@@ -60,7 +56,6 @@ namespace Reni.ReniSyntax
 
         protected virtual bool GetIsLambda() { return false; }
 
-        internal override Syntax SurroundedByParenthesis(SourcePart token, SourcePart rightToken) { return this; }
         internal override bool IsEnableReassignSyntax { get { return false; } }
         internal override CompileSyntax ToCompiledSyntax { get { return this; } }
         internal void AddToCacheForDebug(ContextBase context, object cacheItem) { _resultCache.Add(context, cacheItem); }
@@ -110,11 +105,6 @@ namespace Reni.ReniSyntax
                 return type.SmartUn<FunctionType>().Hllw;
 
             return Type(context).SmartUn<FunctionType>().Hllw;
-        }
-
-        internal Result PointerKindResult(ContextBase context, Category category)
-        {
-            return Result(context, category.Typed).LocalPointerKindResult;
         }
 
         internal Result SmartUnFunctionedReferenceResult(ContextBase context, Category category)

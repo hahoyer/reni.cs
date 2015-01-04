@@ -42,18 +42,7 @@ namespace Reni.ReniParser
             return null;
         }
 
-        internal virtual Syntax RightParenthesisOnLeft(int level, SourcePart token)
-        {
-            NotImplementedMethod(level, token);
-            return null;
-        }
-
-        internal virtual Syntax RightParenthesisOnRight(int level, SourcePart token)
-        {
-            return SurroundedByParenthesis(Token, token);
-        }
-
-        internal virtual Syntax CreateThenSyntax(SourcePart token, CompileSyntax condition)
+        internal Syntax CreateThenSyntax(SourcePart token, CompileSyntax condition)
         {
             return new ThenSyntax(condition, token, ToCompiledSyntax);
         }
@@ -68,17 +57,6 @@ namespace Reni.ReniParser
         {
             NotImplementedMethod(token, right);
             return null;
-        }
-
-        internal virtual Syntax SurroundedByParenthesis(SourcePart leftToken, SourcePart rightToken)
-        {
-            NotImplementedMethod(leftToken, rightToken); //Probably it's a missing right parenthesis
-            return null;
-        }
-
-        internal Syntax CreateSyntaxOrDeclaration(Definable tokenClass, SourcePart token, Syntax right)
-        {
-            return new ExpressionSyntax(tokenClass, ToCompiledSyntax, token, right.ToCompiledSyntaxOrNull());
         }
 
         static bool _isInDump;
@@ -104,12 +82,6 @@ namespace Reni.ReniParser
             CompoundSyntax.IsInContainerDump = isInContainerDump;
             _isInDump = isInDump;
             return result;
-        }
-
-        internal CompileSyntax MustBeNullError(Func<IssueId> getIssue)
-        {
-            NotImplementedMethod(getIssue());
-            return null;
         }
 
         internal virtual IEnumerable<Syntax> ToList(List type) { yield return this; }

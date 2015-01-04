@@ -23,8 +23,6 @@ namespace Reni.TokenClasses
             return new DeclarationSyntax(_definable, token, right);
         }
 
-        internal override Syntax SurroundedByParenthesis(SourcePart leftToken, SourcePart rightToken) { return this; }
-
         [DisableDump]
         internal override CompileSyntax ToCompiledSyntax { get { return new ExpressionSyntax(_definable, null, Token, null); } }
     }

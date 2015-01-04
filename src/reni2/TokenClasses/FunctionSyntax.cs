@@ -13,31 +13,29 @@ namespace Reni.TokenClasses
 {
     sealed class FunctionSyntax : SpecialSyntax
     {
-        public readonly CompileSyntax Getter;
-        readonly bool _isImplicit;
-        readonly bool _isMetaFunction;
-        public readonly CompileSyntax Setter;
+        internal CompileSyntax Getter { get; }
+        bool IsMetaFunction { get; }
+        internal CompileSyntax Setter { get; }
+        internal bool IsImplicit { get; }
 
         public FunctionSyntax(SourcePart token, CompileSyntax setter, bool isImplicit, bool isMetaFunction, CompileSyntax getter)
             : base(token)
         {
             Getter = getter;
             Setter = setter;
-            _isImplicit = isImplicit;
-            _isMetaFunction = isMetaFunction;
+            IsImplicit = isImplicit;
+            IsMetaFunction = isMetaFunction;
         }
 
         string Tag
         {
             get
             {
-                return (_isMetaFunction ? "{0}{0}" : "{0}")
+                return (IsMetaFunction ? "{0}{0}" : "{0}")
                     .ReplaceArgs("/{0}\\")
                     .ReplaceArgs(IsImplicit ? "!" : "");
             }
         }
-
-        internal override bool IsImplicit { get { return _isImplicit; } }
 
         internal override Result ObtainResult(ContextBase context, Category category)
         {
@@ -70,7 +68,7 @@ namespace Reni.TokenClasses
 
         internal IContextMetaFunctionFeature ContextMetaFunctionFeature(CompoundView compoundView)
         {
-            if(!_isMetaFunction)
+            if(!IsMetaFunction)
                 return null;
             NotImplementedMethod(compoundView);
             return null;
@@ -78,7 +76,7 @@ namespace Reni.TokenClasses
 
         internal IMetaFunctionFeature MetaFunctionFeature(CompoundView compoundView)
         {
-            if(!_isMetaFunction)
+            if(!IsMetaFunction)
                 return null;
             NotImplementedMethod(compoundView);
             return null;
@@ -86,7 +84,7 @@ namespace Reni.TokenClasses
 
         internal IFunctionFeature FunctionFeature(CompoundView compoundView)
         {
-            if(_isMetaFunction)
+            if(IsMetaFunction)
                 return null;
             return new FunctionBodyType(compoundView, this);
         }
