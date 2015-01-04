@@ -86,8 +86,6 @@ namespace Reni.Code
         {
             AddCode("data.Push({0})", context.NodeDump());
             return;
-            NotImplementedMethod(context);
-            throw new UnexpectedContextReference(context);
         }
         void IVisitor.RecursiveCallCandidate() { throw new UnexpectedRecursiveCallCandidate(); }
 
