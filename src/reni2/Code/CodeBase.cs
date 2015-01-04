@@ -15,8 +15,7 @@ namespace Reni.Code
     abstract class CodeBase : DumpableObject, IIconKeyProvider, IFormalCodeItem
     {
         protected CodeBase(int objectId)
-            : base(objectId)
-        {}
+            : base(objectId) {}
 
         [Node]
         [DisableDump]
@@ -250,6 +249,7 @@ namespace Reni.Code
         {
             return Add(new BitArrayBinaryOp(name, resultSize, leftSize, rightSize));
         }
+        internal CodeBase DumpPrintNumber() { return Add(new DumpPrintNumberOperation(Size, Size.Zero)); }
         internal CodeBase DumpPrintNumber(Size leftSize) { return Add(new DumpPrintNumberOperation(leftSize, Size - leftSize)); }
         internal CodeBase DumpPrintText(Size itemSize) { return Add(new DumpPrintTextOperation(Size, itemSize)); }
         internal CodeBase NumberOperation(string operation, Size size)
@@ -299,8 +299,7 @@ namespace Reni.Code
         public static CodeBase operator +(CodeBase a, CodeBase b) { return a.Sequence(b); }
     }
 
-    abstract class UnexpectedVisitOfPending : Exception
-    {}
+    abstract class UnexpectedVisitOfPending : Exception {}
 
     static class CodeBaseExtender
     {

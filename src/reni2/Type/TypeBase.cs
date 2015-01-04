@@ -485,15 +485,6 @@ namespace Reni.Type
             return null;
         }
 
-        internal CodeBase DumpPrintNumberCode()
-        {
-            var alignedSize = Size.Align(Root.DefaultRefAlignParam.AlignBits);
-            return UniquePointer
-                .ArgCode
-                .DePointer(alignedSize)
-                .DumpPrintNumber(alignedSize);
-        }
-
         internal IEnumerable<SearchResult> ConvertersForType<TDestination>
             (TDestination destination, IConversionParameter parameter)
         {

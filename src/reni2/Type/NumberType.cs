@@ -122,6 +122,15 @@ namespace Reni.Type
 
         Result DumpPrintTokenResult(Category category) { return VoidType.Result(category, DumpPrintNumberCode, CodeArgs.Arg); }
 
+        CodeBase DumpPrintNumberCode()
+        {
+            var alignedSize = Size.Align(Root.DefaultRefAlignParam.AlignBits);
+            return UniquePointer
+                .ArgCode
+                .DePointer(alignedSize)
+                .DumpPrintNumber(alignedSize);
+        }
+
         Result EnableCutTokenResult(Category category)
         {
             return UniqueEnableCutType

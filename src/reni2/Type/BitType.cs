@@ -6,11 +6,14 @@ using hw.Debug;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
+using Reni.Feature;
+using Reni.Feature.DumpPrint;
 
 namespace Reni.Type
 {
     sealed class BitType
         : TypeBase
+            , ISymbolProvider<DumpPrintToken, IFeatureImplementation>
     {
         readonly Root _rootContext;
 
@@ -42,5 +45,10 @@ namespace Reni.Type
             [DisableDump]
             string Name { get; }
         }
+
+        IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
+            => Extension.SimpleFeature(DumpPrintTokenResult);
+
+        Result DumpPrintTokenResult(Category category) => VoidType.Result(category, () => ArgCode.Align().DumpPrintNumber(), CodeArgs.Arg);
     }
 }
