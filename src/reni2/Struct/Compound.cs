@@ -78,7 +78,7 @@ namespace Reni.Struct
         {
             if(category.IsNone)
                 return new Result();
-            var trace = ObjectId == 1 && category.HasCode;
+            var trace = ObjectId == -1 && category.HasCode;
             StartMethodDump(trace, category, fromPosition, fromNotPosition);
             try
             {
@@ -123,9 +123,9 @@ namespace Reni.Struct
 
         Result AccessResult(Category category, int accessPosition, int position)
         {
-            var trace = ObjectId.In(1) && accessPosition >= 0 && position == 1 && category.HasCode;
+            var trace = ObjectId.In(-1) && accessPosition >= 0 && position == 1 && category.HasCode;
             StartMethodDump(trace, category, accessPosition, position);
-            try
+            try        
             {
                 var uniqueChildContext = Parent
                     .UniqueStructurePositionContext(Syntax, accessPosition);

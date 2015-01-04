@@ -263,13 +263,9 @@ namespace Reni.Context
             where TDefinable : Definable
         {
             var provider = this as ISymbolProvider<TDefinable, IFeatureImplementation>;
-            if(provider != null)
-            {
-                var feature = provider.Feature(tokenClass);
-                if(feature != null)
-                    return new[] {new ContextCallDescriptor(this, feature)};
-            }
-            return new ContextCallDescriptor[0];
+            var feature = provider?.Feature(tokenClass);
+            if(feature != null)
+                yield return new ContextCallDescriptor(this, feature);
         }
 
         internal Result CreateArrayResult(Category category, CompileSyntax argsType)
@@ -278,10 +274,6 @@ namespace Reni.Context
             return target.Type.UniqueAlign.UniqueArray(1).Result(category, target);
         }
 
-        public Result GetObjectResult(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
-        }
+        internal Result GetObjectResult(Category category) => FindRecentCompoundView.StructReferenceViaContextReference(category);
     }
 }
