@@ -7,7 +7,7 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
 using Reni.ReniSyntax;
-using Reni.Sequence;
+using Reni.Numeric;
 using Reni.Struct;
 
 namespace Reni.Type

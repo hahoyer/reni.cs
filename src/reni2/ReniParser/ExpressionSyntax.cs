@@ -37,7 +37,7 @@ namespace Reni.ReniParser
         internal override Result ObtainResult(ContextBase context, Category category)
         {
             if(Left == null)
-                return context.ObtainResult(category, _token, _tokenClass, Right);
+                return context.PrefixResult(category, _token, _tokenClass, Right);
 
             var typeForSearch = context.Type(Left).TypeForSearchProbes;
             var searchResults
@@ -60,8 +60,8 @@ namespace Reni.ReniParser
 
         internal override CompileSyntax Visit(ISyntaxVisitor visitor)
         {
-            var left = Left == null ? null : Left.Visit(visitor);
-            var right = Right == null ? null : Right.Visit(visitor);
+            var left = Left?.Visit(visitor);
+            var right = Right?.Visit(visitor);
             if(left == null && right == null)
                 return this;
 

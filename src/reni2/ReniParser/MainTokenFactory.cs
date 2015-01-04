@@ -8,7 +8,7 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
 using Reni.Parser;
-using Reni.Sequence;
+using Reni.Numeric;
 using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Validation;

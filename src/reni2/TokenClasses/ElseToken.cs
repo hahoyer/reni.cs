@@ -8,10 +8,7 @@ namespace Reni.TokenClasses
 {
     sealed class ElseToken : TokenClass
     {
-        protected override Syntax InfixSyntax(Syntax left, SourcePart token, Syntax right)
-        {
-            return left
-                .CreateElseSyntax(token, right.ToCompiledSyntax);
-        }
+        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
+            => left.CreateElseSyntax(token, right.ToCompiledSyntax);
     }
 }

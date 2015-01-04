@@ -8,7 +8,7 @@ using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
-using Reni.Sequence;
+using Reni.Numeric;
 using Reni.TokenClasses;
 using Reni.Type.ConversionService;
 
@@ -116,7 +116,7 @@ namespace Reni.Type
         Result NegationResult(Category category)
         {
             return ((NumberType) _zeroResult.Value.Type)
-                .OperationResult(category, this, _minusOperation)
+                .OperationResult(category, _minusOperation, this)
                 .ReplaceAbsolute(_zeroResult.Value.Type.UniquePointerType, c => _zeroResult.Value.LocalPointerKindResult & (c));
         }
 
@@ -133,22 +133,27 @@ namespace Reni.Type
         {
             var path = FindPath<NumberType>(right);
             if(path != null)
-                return OperationResult(category, (NumberType) path.Destination, operation);
+                return OperationResult(category, operation, (NumberType) path.Destination);
 
             NotImplementedMethod(category, right, operation);
             return null;
         }
 
-        Result OperationResult(Category category, NumberType right, IOperation operation)
+        Result OperationResult(Category category, IOperation operation, NumberType right)
         {
-            var leftBits = Bits;
-            var rightBits = right.Bits;
-            var resultBits = operation.Signature(leftBits, rightBits);
-            var resultType = RootContext.BitType.UniqueNumber(resultBits);
+            var transformation = operation as ITransformation;
+            var resultType = transformation == null
+                ? (TypeBase)RootContext.BitType
+                : RootContext.BitType.UniqueNumber(transformation.Signature(Bits, right.Bits));
+            return OperationResult(category, resultType, operation.Name, right);
+        }
+
+        Result OperationResult(Category category, TypeBase resultType, string operationName, NumberType right)
+        {
             var result = resultType.Result
                 (
                     category,
-                    () => OperationCode(resultType.Size, operation.Name, right),
+                    () => OperationCode(resultType.Size, operationName, right),
                     CodeArgs.Arg
                 );
 
@@ -210,10 +215,13 @@ namespace Reni.Type
 
         internal interface IOperation
         {
-            int Signature(int objectBitCount, int argsBitCount);
-
             [DisableDump]
             string Name { get; }
+        }
+
+        internal interface ITransformation
+        {
+            int Signature(int objectBitCount, int argsBitCount);
         }
     }
 }

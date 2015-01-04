@@ -4,7 +4,7 @@ using System.Linq;
 using hw.Debug;
 using Reni.Basics;
 using Reni.Feature;
-using Reni.Sequence;
+using Reni.Numeric;
 
 namespace Reni.Type
 {

@@ -248,7 +248,7 @@ namespace Reni.Context
             return null;
         }
 
-        internal Result ObtainResult(Category category, SourcePart position, Definable tokenClass, CompileSyntax right)
+        internal Result PrefixResult(Category category, SourcePart position, Definable tokenClass, CompileSyntax right)
         {
             var searchResult = Declarations(tokenClass);
             if(searchResult == null)

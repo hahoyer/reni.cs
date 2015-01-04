@@ -8,9 +8,7 @@ namespace Reni.TokenClasses
 {
     sealed class ThenToken : TokenClass
     {
-        protected override Syntax InfixSyntax(Syntax left, SourcePart token, Syntax right)
-        {
-            return right.CreateThenSyntax(token, left.ToCompiledSyntax);
-        }
+        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
+            => right.CreateThenSyntax(token, left.ToCompiledSyntax);
     }
 }

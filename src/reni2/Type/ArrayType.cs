@@ -8,7 +8,7 @@ using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
-using Reni.Sequence;
+using Reni.Numeric;
 using Reni.TokenClasses;
 
 namespace Reni.Type
@@ -27,7 +27,6 @@ namespace Reni.Type
 
         readonly ValueCache<RepeaterAccessType> _arrayAccessTypeCache;
         readonly ValueCache<EnableArrayOverSizeType> _enableArrayOverSizeTypeCache;
-        readonly ValueCache<SequenceType> _sequenceCache;
         readonly ValueCache<NumberType> _numberCache;
         readonly ValueCache<TextItemType> _textItemCache;
 
@@ -40,7 +39,6 @@ namespace Reni.Type
             Tracer.Assert(!elementType.Hllw);
             _arrayAccessTypeCache = new ValueCache<RepeaterAccessType>(() => new RepeaterAccessType(this));
             _enableArrayOverSizeTypeCache = new ValueCache<EnableArrayOverSizeType>(() => new EnableArrayOverSizeType(this));
-            _sequenceCache = new ValueCache<SequenceType>(() => new SequenceType(this));
             _numberCache = new ValueCache<NumberType>(() => new NumberType(this));
             _textItemCache = new ValueCache<TextItemType>(() => new TextItemType(this));
         }
@@ -48,8 +46,6 @@ namespace Reni.Type
         TypeBase IRepeaterType.ElementType { get { return ElementType; } }
         Size IRepeaterType.IndexSize { get { return IndexSize; } }
 
-        [DisableDump]
-        internal SequenceType UniqueSequence { get { return _sequenceCache.Value; } }
         [DisableDump]
         public NumberType UniqueNumber { get { return _numberCache.Value; } }
 
@@ -225,23 +221,6 @@ namespace Reni.Type
                 code = code + elemCode;
             }
             return code + CodeBase.DumpPrintText(")");
-        }
-
-        internal Result SequenceTokenResult(Category category)
-        {
-            return ElementType
-                .AutomaticDereferenceType
-                .UniqueArray(Count)
-                .UniqueSequence
-                .UniquePointer
-                .Result(category, UniquePointer.ArgResult(category));
-        }
-
-        internal Result SequenceTypeResult(Category category)
-        {
-            return UniqueSequence
-                .UniqueTypeType
-                .Result(category);
         }
 
         Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType) { return ApplyResult(category, argsType); }

@@ -340,13 +340,6 @@ namespace Reni.Type
         protected virtual ResultCache DeFunction(Category category) { return ArgResult(category); }
         internal virtual ResultCache DePointer(Category category) { return ArgResult(category); }
 
-        TypeBase CreateSequenceType(TypeBase elementType)
-        {
-            return elementType
-                .UniqueArray(SequenceLength(elementType))
-                .UniqueSequence;
-        }
-
         internal int SequenceLength(TypeBase elementType)
         {
             var length = SmartSequenceLength(elementType);

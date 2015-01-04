@@ -51,7 +51,7 @@ namespace Reni
         {
             return Cond
                 .Result(context, category.Typed)
-                .Conversion(context.RootContext.BitType)
+                .Conversion(context.RootContext.BitType.UniqueAlign)
                 .LocalBlock(category.Typed)
                 .Conversion(context.RootContext.BitType);
         }
