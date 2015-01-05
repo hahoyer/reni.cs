@@ -22,7 +22,7 @@ namespace Reni.Type
             _feature = feature;
         }
 
-        Result ISearchResult.FunctionResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
+        public Result FunctionResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
             return CallDescriptor.Result(category, context, left, right);
         }
@@ -56,7 +56,7 @@ namespace Reni.Type
             _searchResult = searchResult;
             _converter = converter;
         }
-        Result ISearchResult.FunctionResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
+        public Result FunctionResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
             NotImplementedMethod(context, category, left, right);
             return null;

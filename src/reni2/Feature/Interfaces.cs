@@ -21,20 +21,19 @@ namespace Reni.Feature
 
     abstract class EmptyFeatureImplementation : DumpableObject, IFeatureImplementation
     {
-        public EmptyFeatureImplementation(int? nextObjectId)
-            : base(nextObjectId)
-        {}
-        public EmptyFeatureImplementation() { }
+        protected EmptyFeatureImplementation(int? nextObjectId)
+            : base(nextObjectId) { }
+        protected EmptyFeatureImplementation() { }
 
-        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta { get { return ContextMeta; } }
-        IMetaFunctionFeature IFeatureImplementation.Meta { get { return Meta; } }
-        IFunctionFeature IFeatureImplementation.Function { get { return Function; } }
-        ISimpleFeature IFeatureImplementation.Simple { get { return Simple; } }
+        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => ContextMeta;
+        IMetaFunctionFeature IFeatureImplementation.Meta => Meta;
+        IFunctionFeature IFeatureImplementation.Function => Function;
+        ISimpleFeature IFeatureImplementation.Simple => Simple;
 
-        protected virtual IContextMetaFunctionFeature ContextMeta { get { return null; } }
-        protected virtual IMetaFunctionFeature Meta { get { return null; } }
-        protected virtual IFunctionFeature Function { get { return null; } }
-        protected virtual ISimpleFeature Simple { get { return null; } }
+        protected virtual IContextMetaFunctionFeature ContextMeta => null;
+        protected virtual IMetaFunctionFeature Meta => null;
+        protected virtual IFunctionFeature Function => null;
+        protected virtual ISimpleFeature Simple => null;
     }
 
     interface ISimpleFeature
@@ -78,21 +77,12 @@ namespace Reni.Feature
 
     interface ISearchResult
     {
-        Result FunctionResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right);
         Result SimpleResult(Category category);
     }
 
-    interface IContextSearchResult
-    {
-        Result FunctionResult(ContextBase context, Category category, CompileSyntax right);
-        Result SimpleResult(Category category);
-        ISearchResult WithConversion(ISimpleFeature converter);
-    }
+    interface ISearchTarget {}
 
-    interface ISearchTarget
-    {}
-
-    interface ISymbolProvider<TDefinable, out TPath>
+    interface ISymbolProvider<in TDefinable, out TPath>
         where TDefinable : Definable
     {
         TPath Feature(TDefinable tokenClass);
@@ -101,12 +91,6 @@ namespace Reni.Feature
     interface IConverterProvider<in TDestination, out TPath>
     {
         TPath Feature(TDestination destination, IConversionParameter parameter);
-    }
-
-    interface IPath<out TPath, in TProvider>
-        where TProvider : TypeBase
-    {
-        TPath Convert(TProvider provider);
     }
 
     sealed class ContextCallDescriptor : FeatureDescriptor
@@ -136,13 +120,7 @@ namespace Reni.Feature
         protected override IFeatureImplementation Feature => _feature;
 
         [DisableDump]
-        protected override Func<Category, Result> ConverterResult
-        {
-            get
-            {
-                return _definingItem.GetObjectResult;
-            }
-        }
+        protected override Func<Category, Result> ConverterResult => _definingItem.GetObjectResult;
     }
 
     abstract class SearchResult : DumpableObject
@@ -151,35 +129,31 @@ namespace Reni.Feature
         public abstract Result Converter(Category category);
         public abstract TypeBase Type { get; }
 
-        CallDescriptor CallDescriptor { get { return new CallDescriptor(Type, Feature, Converter); } }
+        CallDescriptor CallDescriptor => new CallDescriptor(Type, Feature, Converter);
 
-        internal Result CallResult
-            (ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
-        {
-            return CallDescriptor.Result(category, context, left, right);
-        }
+        internal Result CallResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
+            => CallDescriptor.Result(category, context, left, right);
 
-        internal Result CallResult(Category category) { return CallDescriptor.Result(category); }
+        internal Result CallResult(Category category) => CallDescriptor.Result(category);
     }
 
     sealed class TypeSearchResult : SearchResult
     {
-        readonly IFeatureImplementation _data;
         readonly TypeBase _definingItem;
 
         internal TypeSearchResult(IFeatureImplementation data, TypeBase definingItem)
         {
-            _data = data;
+            Feature = data;
             _definingItem = definingItem;
         }
 
         [DisableDump]
-        public override IFeatureImplementation Feature { get { return _data; } }
+        public override IFeatureImplementation Feature { get; }
 
-        public override Result Converter(Category category) { return _definingItem.PointerKind.ArgResult(category); }
+        public override Result Converter(Category category) => _definingItem.PointerKind.ArgResult(category);
 
         [DisableDump]
-        public override TypeBase Type { get { return _definingItem; } }
+        public override TypeBase Type => _definingItem;
     }
 
     sealed class InheritedTypeSearchResult : SearchResult
@@ -196,22 +170,14 @@ namespace Reni.Feature
         }
 
         [DisableDump]
-        public override IFeatureImplementation Feature { get { return _result.Feature; } }
+        public override IFeatureImplementation Feature => _result.Feature;
 
-        public override Result Converter(Category category)
-        {
-            return _result
-                .Converter(category)
-                .ReplaceArg(_inheritor.Source);
-        }
+        public override Result Converter(Category category) => _result
+            .Converter(category)
+            .ReplaceArg(_inheritor.Source);
 
         [DisableDump]
-        public override TypeBase Type { get { return _result.Type; } }
-    }
-
-    interface IContextFeatureInheritor
-    {
-        Result Source(Category category);
+        public override TypeBase Type => _result.Type;
     }
 
     interface IFeatureInheritor
@@ -219,14 +185,8 @@ namespace Reni.Feature
         Result Source(Category category);
     }
 
-    interface IPuppet<in TSource, TPath>
-    {
-        SearchResult ResolveConverter(TSource source);
-    }
-
     interface IGenericProviderForType
     {
-        IEnumerable<SearchResult> Converters(TypeBase source, IConversionParameter parameter);
         IEnumerable<ISimpleFeature> GetForcedConversions(TypeBase typeBase);
     }
 
@@ -241,14 +201,8 @@ namespace Reni.Feature
         readonly T _target;
         public GenericProviderForType(T target) { _target = target; }
 
-        IEnumerable<SearchResult> IGenericProviderForType.Converters(TypeBase source, IConversionParameter parameter)
-        {
-            return source.ConvertersForType(_target, parameter);
-        }
         IEnumerable<ISimpleFeature> IGenericProviderForType.GetForcedConversions(TypeBase source)
-        {
-            return source.GetForcedConversions(_target);
-        }
+            => source.GetForcedConversions(_target);
     }
 
     sealed class GenericProviderForDefinable<T> : DumpableObject, IGenericProviderForDefinable
@@ -257,14 +211,9 @@ namespace Reni.Feature
         readonly T _target;
         public GenericProviderForDefinable(T target) { _target = target; }
 
-        IEnumerable<SearchResult> IGenericProviderForDefinable.Declarations(TypeBase source)
-        {
-            return source.Declarations(_target);
-        }
+        IEnumerable<SearchResult> IGenericProviderForDefinable.Declarations(TypeBase source) => source.Declarations(_target);
         IEnumerable<ContextCallDescriptor> IGenericProviderForDefinable.Declarations(ContextBase source)
-        {
-            return source.Declarations(_target);
-        }
+            => source.Declarations(_target);
     }
 
     sealed class MetaFunction : DumpableObject, IFeatureImplementation, IMetaFunctionFeature
@@ -272,15 +221,13 @@ namespace Reni.Feature
         readonly Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result> _function;
         public MetaFunction(Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result> function) { _function = function; }
 
-        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta { get { return null; } }
-        IMetaFunctionFeature IFeatureImplementation.Meta { get { return this; } }
-        IFunctionFeature IFeatureImplementation.Function { get { return null; } }
-        ISimpleFeature IFeatureImplementation.Simple { get { return null; } }
+        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
+        IMetaFunctionFeature IFeatureImplementation.Meta => this;
+        IFunctionFeature IFeatureImplementation.Function => null;
+        ISimpleFeature IFeatureImplementation.Simple => null;
 
         Result IMetaFunctionFeature.Result(ContextBase contextBase, Category category, CompileSyntax left, CompileSyntax right)
-        {
-            return _function(contextBase, category, left, right);
-        }
+            => _function(contextBase, category, left, right);
     }
 
     sealed class ContextMetaFunction : EmptyFeatureImplementation, IContextMetaFunctionFeature
@@ -288,12 +235,10 @@ namespace Reni.Feature
         readonly Func<ContextBase, Category, CompileSyntax, Result> _function;
         public ContextMetaFunction(Func<ContextBase, Category, CompileSyntax, Result> function) { _function = function; }
 
-        protected override IContextMetaFunctionFeature ContextMeta { get { return this; } }
+        protected override IContextMetaFunctionFeature ContextMeta => this;
 
         Result IContextMetaFunctionFeature.Result(ContextBase contextBase, Category category, CompileSyntax right)
-        {
-            return _function(contextBase, category, right);
-        }
+            => _function(contextBase, category, right);
     }
 
     sealed class ContextMetaFunctionFromSyntax : DumpableObject, IFeatureImplementation, IContextMetaFunctionFeature
@@ -302,15 +247,12 @@ namespace Reni.Feature
         readonly CompileSyntax _definition;
         public ContextMetaFunctionFromSyntax(CompileSyntax definition) { _definition = definition; }
 
-        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta { get { return this; } }
-        IMetaFunctionFeature IFeatureImplementation.Meta { get { return null; } }
-        IFunctionFeature IFeatureImplementation.Function { get { return null; } }
-        ISimpleFeature IFeatureImplementation.Simple { get { return null; } }
+        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => this;
+        IMetaFunctionFeature IFeatureImplementation.Meta => null;
+        IFunctionFeature IFeatureImplementation.Function => null;
+        ISimpleFeature IFeatureImplementation.Simple => null;
 
         Result IContextMetaFunctionFeature.Result(ContextBase callContext, Category category, CompileSyntax right)
-        {
-            return callContext.Result(category, _definition.ReplaceArg(right));
-        }
+            => callContext.Result(category, _definition.ReplaceArg(right));
     }
-
 }

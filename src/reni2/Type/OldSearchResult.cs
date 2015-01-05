@@ -67,7 +67,7 @@ namespace Reni.Type
             }
         }
 
-        Result ISearchResult.FunctionResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
+        public Result FunctionResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
             return CallDescriptor.Result(category, context, left, right);
         }
