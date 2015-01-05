@@ -66,7 +66,7 @@ namespace Reni.Context
             if(simpleFeature != null && right == null)
                 return simpleFeature.Result(category);
 
-            var trace = ObjectId == -118 && category.HasCode;
+            var trace = ObjectId == 43; //&& category.HasCode;
             StartMethodDump(trace, context, category, right);
             try
             {
@@ -75,11 +75,12 @@ namespace Reni.Context
                     .ApplyResult(category, context.ArgsResult(Category.Type, right).Type);
                 var replaceArg = applyResult
                     .ReplaceArg(c => context.ArgsResult(c, right));
-                var result = replaceArg
-                    .ReplaceAbsolute(function.ObjectReference, Type.PointerKind.ArgResult);
-
                 Dump("applyResult", applyResult);
                 Dump("replaceArg", replaceArg);
+                BreakExecution();
+
+                var result = replaceArg
+                    .ReplaceAbsolute(function.ObjectReference, c => Type.PointerKind.ArgResult(c));
 
                 return ReturnMethodDump(result);
             }
@@ -156,7 +157,10 @@ namespace Reni.Context
         CompoundView CompoundView { get { return FunctionBodyType.FindRecentCompoundView; } }
 
         [DisableDump]
-        protected override Func<Category, Result> ConverterResult { get { return CompoundView.StructReferenceViaContextReference; } }
+        protected override Func<Category, Result> ConverterResult
+        {
+            get { return CompoundView.StructReferenceViaContextReference; }
+        }
         [DisableDump]
         protected override TypeBase Type { get { return CompoundView.Type; } }
         [DisableDump]

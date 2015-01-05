@@ -634,6 +634,9 @@ namespace Reni
             if(HasExts && !Exts.Contains(refInCode))
                 return this;
 
+            if (!HasCode && !HasExts)
+                return this;
+
             var result = new Result
             {
                 Hllw = Hllw,
@@ -654,6 +657,9 @@ namespace Reni
             where TRefInCode : IContextReference
         {
             if(HasExts && !Exts.Contains(refInCode))
+                return this;
+
+            if(!HasCode && !HasExts)
                 return this;
 
             var replacement = getReplacement(CompleteCategory - Category.Size - Category.Type);
@@ -677,6 +683,9 @@ namespace Reni
             where TRefInCode : IContextReference
         {
             if(HasExts && !Exts.Contains(refInCode))
+                return this;
+
+            if (!HasCode && !HasExts)
                 return this;
 
             var result = new Result {Hllw = Hllw, Size = Size, Type = Type};
