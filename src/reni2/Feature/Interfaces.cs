@@ -82,7 +82,9 @@ namespace Reni.Feature
 
     interface ISearchTarget {}
 
-    interface ISymbolProvider<in TDefinable, out TPath>
+    // ReSharper disable once TypeParameterCanBeVariant
+    // Exact match for TDefinable is required here.
+    interface ISymbolProvider<TDefinable, out TPath>
         where TDefinable : Definable
     {
         TPath Feature(TDefinable tokenClass);
