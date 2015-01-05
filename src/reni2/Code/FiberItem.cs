@@ -39,7 +39,7 @@ namespace Reni.Code
         internal string ReasonForCombine { get { return _reason == "" ? NodeDumpForDebug() : _reason; } }
 
         [DisableDump]
-        string NewCombinedReason
+        static string NewCombinedReason
         {
             get
             {
