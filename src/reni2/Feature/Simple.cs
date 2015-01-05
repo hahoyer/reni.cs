@@ -23,14 +23,17 @@ namespace Reni.Feature
         Result ISimpleFeature.Result(Category category) => _function(category);
         TypeBase ISimpleFeature.TargetType => _target;
         protected override string GetNodeDump()
-            => _function(Category.Type).Type.DumpPrintText + " <== " + ((TypeBase) _function.Target).DumpPrintText + "."
+            => _function(Category.Type).Type.DumpPrintText
+                + " <== "
+                + ((TypeBase) _function.Target).DumpPrintText
+                + "."
                 + _function.Method.Name;
     }
 
     sealed class Simple : SimpleBase, IFeatureImplementation
     {
         public Simple(Func<Category, Result> function, TypeBase type)
-            : base(function, type) {}
+            : base(function, type) { }
 
         IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
         IMetaFunctionFeature IFeatureImplementation.Meta => null;
