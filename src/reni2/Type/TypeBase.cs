@@ -431,10 +431,7 @@ namespace Reni.Type
                 .Result(category, PointerArgResult(category));
         }
 
-        internal bool IsConvertable(TypeBase destination)
-        {
-            return ConversionService.FindPath(this, destination) != null;
-        }
+        internal bool IsConvertable(TypeBase destination) { return ConversionService.FindPath(this, destination) != null; }
 
         internal Result Conversion(Category category, TypeBase destination)
         {
@@ -523,12 +520,9 @@ namespace Reni.Type
         Result AlignResult(Category category) { return UniqueAlign.Result(category, () => ArgCode.Align(), CodeArgs.Arg); }
 
         IEnumerable<ISimpleFeature> ObtainReflexiveConversions()
-        {
-            var simpleFeatures = ObtainRawReflexiveConversions().ToArray();
-            return simpleFeatures
+            => ObtainRawReflexiveConversions()
                 .ToDictionary(x => x.ResultType())
                 .Values;
-        }
 
         protected virtual IEnumerable<ISimpleFeature> ObtainRawReflexiveConversions()
         {

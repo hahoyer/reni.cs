@@ -15,75 +15,52 @@ namespace Reni.Struct
     {
         static int _nextObjectId;
 
-        [EnableDump]
-        readonly CompoundView _compoundView;
-        [EnableDump]
-        readonly int _position;
-        readonly ValueCache<IFunctionFeature> _functionFeature;
-
         internal AccessFeature(CompoundView compoundView, int position)
             : base(_nextObjectId++)
         {
-            _compoundView = compoundView;
-            _position = position;
-            _functionFeature = new ValueCache<IFunctionFeature>(ObtainFunctionFeature);
+            View = compoundView;
+            Position = position;
+            FunctionFeature = new ValueCache<IFunctionFeature>(ObtainFunctionFeature);
         }
 
-        Result ISimpleFeature.Result(Category category)
-        {
-            return _compoundView
-                .AccessViaThisReference(category, _position);
-        }
+        [EnableDump]
+        public CompoundView View { get; }
+        [EnableDump]
+        public int Position { get; }
 
-        TypeBase ISimpleFeature.TargetType { get { return _compoundView.Type; } }
+        ValueCache<IFunctionFeature> FunctionFeature { get; }
 
-        CompileSyntax Statement
-        {
-            get
-            {
-                return _compoundView
-                    .Compound
-                    .Syntax
-                    .Statements[_position];
-            }
-        }
+        Result ISimpleFeature.Result(Category category) => View
+            .AccessViaThisReference(category, Position);
+
+        TypeBase ISimpleFeature.TargetType => View.Type;
+
+        CompileSyntax Statement => View
+            .Compound
+            .Syntax
+            .Statements[Position];
 
         protected override IContextMetaFunctionFeature ContextMeta
-        {
-            get
-            {
-                var syntax = Statement as FunctionSyntax;
-                return syntax == null ? null : syntax.ContextMetaFunctionFeature(_compoundView);
-            }
-        }
-        protected override IMetaFunctionFeature Meta
-        {
-            get
-            {
-                var syntax = Statement as FunctionSyntax;
-                return syntax == null ? null : syntax.MetaFunctionFeature(_compoundView);
-            }
-        }
+            => (Statement as FunctionSyntax)?.ContextMetaFunctionFeature(View);
 
-        protected override IFunctionFeature Function { get { return _functionFeature.Value; } }
+        protected override IMetaFunctionFeature Meta => (Statement as FunctionSyntax)?.MetaFunctionFeature(View);
+
+        protected override IFunctionFeature Function => FunctionFeature.Value;
 
         IFunctionFeature ObtainFunctionFeature()
         {
             var functionSyntax = Statement as FunctionSyntax;
             if(functionSyntax != null)
-                return functionSyntax.FunctionFeature(_compoundView);
+                return functionSyntax.FunctionFeature(View);
 
-            var feature = _compoundView.ValueType(_position).Feature;
-            if(feature == null)
-                return null;
-            return feature.Function;
+            return View.ValueType(Position).Feature?.Function;
         }
 
         protected override ISimpleFeature Simple
         {
             get
             {
-                var function = _functionFeature.Value;
+                var function = FunctionFeature.Value;
                 if(function != null && function.IsImplicit)
                     return null;
                 return this;

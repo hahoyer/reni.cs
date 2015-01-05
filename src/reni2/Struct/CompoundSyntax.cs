@@ -26,7 +26,7 @@ namespace Reni.Struct
         static int _nextObjectId;
 
         [Node]
-        internal CompileSyntax[] Statements { get { return _data.Select(s => s.Statement).ToArray(); } }
+        internal CompileSyntax[] Statements => _data.Select(s => s.Statement).ToArray();
 
         [DisableDump]
         internal int EndPosition { get { return Statements.Length; } }

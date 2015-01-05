@@ -1,18 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using hw.Debug;
 using hw.Scanner;
 using Reni.ReniSyntax;
-using Reni.Struct;
 using Reni.TokenClasses;
 
 namespace Reni.ReniParser
 {
     sealed class DeclarationSyntax : Syntax
     {
-        internal readonly Definable Definable;
-        internal readonly Syntax Body;
-
         internal DeclarationSyntax(Definable definable, SourcePart token, Syntax body)
             : base(token)
         {
@@ -20,9 +17,18 @@ namespace Reni.ReniParser
             Body = body;
         }
 
-        protected override string GetNodeDump() { return Definable.Name + ": " + Body.NodeDump; }
+        [EnableDump]
+        Definable Definable { get; }
+        [EnableDump]
+        Syntax Body { get; }
+        [DisableDump]
+        internal override bool IsEnableReassignSyntax => Body.IsEnableReassignSyntax;
+        [DisableDump]
+        internal override CompileSyntax ToCompiledSyntax => ToContainer;
+        [DisableDump]
+        internal override CompileSyntax ContainerStatementToCompileSyntax => Body.ContainerStatementToCompileSyntax;
 
-        internal override CompileSyntax ContainerStatementToCompileSyntax { get { return Body.ContainerStatementToCompileSyntax; } }
+        protected override string GetNodeDump() => Definable.Name + ": " + Body.NodeDump;
 
         internal override IEnumerable<KeyValuePair<string, int>> GetDeclarations(int index)
         {
@@ -34,9 +40,8 @@ namespace Reni.ReniParser
         internal override IEnumerable<string> GetDeclarations()
         {
             yield return Definable.Name;
-            foreach (var result in Body.GetDeclarations())
+            foreach(var result in Body.GetDeclarations())
                 yield return result;
         }
-        internal override bool IsEnableReassignSyntax { get { return Body.IsEnableReassignSyntax; } }
     }
 }

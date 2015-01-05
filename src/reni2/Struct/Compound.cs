@@ -1,7 +1,9 @@
+using System;
+using System.Collections.Generic;
+using hw.Helper;
 using System.Linq;
 using hw.Debug;
 using hw.Forms;
-using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -49,30 +51,20 @@ namespace Reni.Struct
             return ResultsOfStatements(Category.Size, 0, position).Size;
         }
 
-        internal bool StructureHllw(int accessPosition) { return ObtainHllw(accessPosition); }
+        internal bool StructureHllw(int accessPosition) => ObtainHllw(accessPosition);
 
         internal Result ContextReferenceViaStructReference(int position, Result result)
-        {
-            return result.ReplaceAbsolute(this, () => ContextReferenceViaStructReferenceCode(position), CodeArgs.Arg);
-        }
+            => result.ReplaceAbsolute(this, () => ContextReferenceViaStructReferenceCode(position), CodeArgs.Arg);
 
-        internal Size ContextReferenceOffsetFromAccessPoint(int position)
-        {
-            return ResultsOfStatements(Category.Size, 0, position).Size;
-        }
+        internal Size ContextReferenceOffsetFromAccessPoint(int position) => ResultsOfStatements(Category.Size, 0, position).Size;
 
-        CodeBase ContextReferenceViaStructReferenceCode(int accessPosition)
-        {
-            return Parent
-                .UniqueCompoundView(Syntax, accessPosition)
-                .PointerKind.ArgCode
-                .ReferencePlus(ContextReferenceOffsetFromAccessPoint(accessPosition));
-        }
+        CodeBase ContextReferenceViaStructReferenceCode(int accessPosition) => Parent
+            .UniqueCompoundView(Syntax, accessPosition)
+            .PointerKind.ArgCode
+            .ReferencePlus(ContextReferenceOffsetFromAccessPoint(accessPosition));
 
         internal Size FieldOffsetFromAccessPoint(int accessPosition, int fieldPosition)
-        {
-            return ResultsOfStatements(Category.Size, fieldPosition + 1, accessPosition).Size;
-        }
+            => ResultsOfStatements(Category.Size, fieldPosition + 1, accessPosition).Size;
 
         Result ResultsOfStatements(Category category, int fromPosition, int fromNotPosition)
         {
@@ -125,7 +117,7 @@ namespace Reni.Struct
         {
             var trace = ObjectId.In(-1) && accessPosition >= 0 && position == 1 && category.HasCode;
             StartMethodDump(trace, category, accessPosition, position);
-            try        
+            try
             {
                 var uniqueChildContext = Parent
                     .UniqueStructurePositionContext(Syntax, accessPosition);
@@ -147,9 +139,7 @@ namespace Reni.Struct
         }
 
         internal TypeBase AccessType(int accessPosition, int position)
-        {
-            return AccessResult(Category.Type, accessPosition, position).Type;
-        }
+            => AccessResult(Category.Type, accessPosition, position).Type;
 
         bool ObtainHllw(int accessPosition)
         {
@@ -188,17 +178,15 @@ namespace Reni.Struct
                 .HllwStructureElement(uniqueChildContext);
         }
 
-        bool? InnerHllwStatic(int position) { return Syntax.Statements[position].Hllw; }
+        bool? InnerHllwStatic(int position) => Syntax.Statements[position].Hllw;
 
         internal string[] DataIndexList()
-        {
-            return Syntax
+            => Syntax
                 .Statements
                 .Length
                 .Select()
                 .Where(i => !InternalInnerHllwStructureElement(i))
                 .Select(i => i.ToString() + "=" + AccessResult(Category.Size, i).Size.ToString())
                 .ToArray();
-        }
     }
 }

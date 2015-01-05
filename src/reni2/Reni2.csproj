@@ -269,14 +269,14 @@
     <Compile Include="Singleton.cs" />
     <Compile Include="StringStream.cs" />
     <Compile Include="Struct\Compound.cs" />
-    <Compile Include="Struct\Context.cs" />
+    <Compile Include="Struct\CompoundViewContext.cs" />
     <Compile Include="Struct\FunctionBodyType.cs" />
     <Compile Include="Struct\FunctionId.cs" />
     <Compile Include="Struct\FunctionType.cs" />
     <Compile Include="Struct\GetterFunctionType.cs" />
     <Compile Include="Struct\SetterFunctionType.cs" />
     <Compile Include="Struct\CompoundView.cs" />
-    <Compile Include="Struct\StructureType.cs" />
+    <Compile Include="Struct\CompoundType.cs" />
     <Compile Include="Struct\FunctionInstance.cs" />
     <Compile Include="ReniSyntax\LeftParenthesisSyntax.cs" />
     <Compile Include="T4Compiler.cs" />

@@ -12,32 +12,28 @@ namespace Reni.ReniSyntax
 {
     sealed class ListSyntax : Syntax
     {
-        [EnableDump]
-        readonly List _type;
-        [EnableDump]
-        readonly Syntax[] _data;
-
         public ListSyntax(List type, SourcePart token, IEnumerable<Syntax> data)
             : base(token)
         {
-            _type = type;
-            _data = data.ToArray();
+            Type = type;
+            Data = data.ToArray();
         }
+
+        [EnableDump]
+        List Type { get; }
+        [EnableDump]
+        Syntax[] Data { get; }
+        [DisableDump]
+        internal override CompileSyntax ToCompiledSyntax => ToContainer;
+        [DisableDump]
+        internal override CompoundSyntax ToContainer => new CompoundSyntax(Token, Data);
 
         internal override IEnumerable<Syntax> ToList(List type)
         {
-            Tracer.Assert(_type == null || type == null || _type == type, () => type.Name.Quote() + " != " + _type.Name.Quote());
-            return _data;
+            Tracer.Assert(Type == null || type == null || Type == type, () => Type.Name.Quote() + " != " + type?.Name.Quote());
+            return Data;
         }
 
-        [DisableDump]
-        internal override CompileSyntax ToCompiledSyntax { get { return ToContainer; } }
-
-        internal override CompoundSyntax ToContainer { get { return new CompoundSyntax(Token, _data); } }
-
-        internal static ListSyntax Spread(Syntax statement)
-        {
-            return new ListSyntax(null, statement.Token, statement.ToList(null));
-        }
+        internal static ListSyntax Spread(Syntax statement) => new ListSyntax(null, statement.Token, statement.ToList(null));
     }
 }

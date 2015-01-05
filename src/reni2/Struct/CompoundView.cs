@@ -1,19 +1,22 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using hw.Debug;
 using hw.Forms;
 using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
+using Reni.Feature;
 using Reni.TokenClasses;
 using Reni.Type;
 
 
 namespace Reni.Struct
 {
-    internal sealed class CompoundView : DumpableObject
+    sealed class CompoundView : DumpableObject
     {
-        private static int _nextObjectId;
+        static int _nextObjectId;
         [EnableDump]
         [Node]
         internal Compound Compound;
@@ -21,15 +24,15 @@ namespace Reni.Struct
         [Node]
         internal int ViewPosition;
         [Node]
-        private readonly ValueCache<StructureType> _typeCache;
+        readonly ValueCache<CompoundType> _typeCache;
         [Node]
-        private readonly FunctionCache<int, TypeBase> _accessTypesCache;
+        readonly FunctionCache<int, TypeBase> _accessTypesCache;
         [Node]
-        private readonly FunctionCache<int, AccessFeature> _accessFeaturesCache;
+        readonly FunctionCache<int, AccessFeature> _accessFeaturesCache;
         [Node]
-        private readonly FunctionCache<int, FieldAccessType> _fieldAccessTypeCache;
+        readonly FunctionCache<int, FieldAccessType> _fieldAccessTypeCache;
         [Node]
-        private readonly FunctionCache<FunctionSyntax, FunctionBodyType> _functionBodyTypeCache;
+        readonly FunctionCache<FunctionSyntax, FunctionBodyType> _functionBodyTypeCache;
 
         internal CompoundView(Compound compound, int viewPosition)
             : base(_nextObjectId++)
@@ -40,37 +43,28 @@ namespace Reni.Struct
                 (syntax => new FunctionBodyType(this, syntax));
             Compound = compound;
             ViewPosition = viewPosition;
-            _typeCache = new ValueCache<StructureType>(() => new StructureType(this));
-            _accessTypesCache = new FunctionCache<int, TypeBase>(position1 => AccessType(position1));
+            _typeCache = new ValueCache<CompoundType>(() => new CompoundType(this));
+            _accessTypesCache = new FunctionCache<int, TypeBase>(AccessType);
             _accessFeaturesCache = new FunctionCache<int, AccessFeature>(position => new AccessFeature(this, position));
             StopByObjectId(-313);
         }
 
         [DisableDump]
-        internal ContextBase UniqueContext
-        {
-            get
-            {
-                return Compound.Parent
-                    .UniqueStructurePositionContext(Compound.Syntax, ViewPosition);
-            }
-        }
+        internal ContextBase UniqueContext => Compound.Parent
+            .UniqueStructurePositionContext(Compound.Syntax, ViewPosition);
 
         [DisableDump]
-        internal StructureType Type { get { return _typeCache.Value; } }
+        internal CompoundType Type => _typeCache.Value;
 
         [DisableDump]
-        internal TypeBase PointerKind { get { return Type.PointerKind; } }
+        internal TypeBase PointerKind => Type.PointerKind;
 
-        protected override string GetNodeDump()
-        {
-            return base.GetNodeDump() + "(" + Compound.NodeDump + "@" + ViewPosition + ")";
-        }
+        protected override string GetNodeDump() => base.GetNodeDump() + "(" + Compound.NodeDump + "@" + ViewPosition + ")";
 
         [DisableDump]
-        private TypeBase IndexType { get { return Compound.IndexType; } }
+        TypeBase IndexType => Compound.IndexType;
 
-        private bool _isObtainStructSizeActive;
+        bool _isObtainStructSizeActive;
 
         [DisableDump]
         internal Size StructSize
@@ -96,27 +90,24 @@ namespace Reni.Struct
         }
 
         [DisableDump]
-        internal bool Hllw { get { return Compound.StructureHllw(ViewPosition); } }
+        internal bool Hllw => Compound.StructureHllw(ViewPosition);
 
         [DisableDump]
-        internal Root RootContext { get { return Compound.RootContext; } }
+        internal Root RootContext => Compound.RootContext;
 
-        private sealed class RecursionWhileObtainingStructSizeException : Exception
+        sealed class RecursionWhileObtainingStructSizeException : Exception
         {
             [EnableDump]
-            private readonly CompoundView _compoundView;
+            readonly CompoundView _compoundView;
 
-            public RecursionWhileObtainingStructSizeException(CompoundView compoundView)
-            {
-                _compoundView = compoundView;
-            }
+            public RecursionWhileObtainingStructSizeException(CompoundView compoundView) { _compoundView = compoundView; }
         }
 
-        internal TypeBase UniqueFunctionalType(FunctionSyntax syntax) { return _functionBodyTypeCache[syntax]; }
+        internal TypeBase UniqueFunctionalType(FunctionSyntax syntax) => _functionBodyTypeCache[syntax];
 
-        internal AccessFeature UniqueAccessFeature(int position) { return _accessFeaturesCache[position]; }
+        internal AccessFeature UniqueAccessFeature(int position) => _accessFeaturesCache[position];
 
-        private TypeBase AccessType(int position)
+        TypeBase AccessType(int position)
         {
             var result = Compound.AccessType(ViewPosition, position);
             if(result.Hllw)
@@ -134,22 +125,18 @@ namespace Reni.Struct
             return AccessViaThisReference(category, position);
         }
 
-        internal Size FieldOffset(int position) { return Compound.FieldOffsetFromAccessPoint(ViewPosition, position); }
+        internal Size FieldOffset(int position) => Compound.FieldOffsetFromAccessPoint(ViewPosition, position);
 
-        internal Result DumpPrintResultViaStructReference(Category category)
-        {
-            return DumpPrintResultViaContextReference(category)
-                .ContextReferenceViaStructReference(this);
-        }
+        internal Result DumpPrintResultViaStructReference(Category category) => DumpPrintResultViaContextReference(category)
+            .ContextReferenceViaStructReference(this);
 
         internal Result DumpPrintResultViaContextReference(Category category)
-        {
-            return RootContext.ConcatPrintResult
+            => RootContext.ConcatPrintResult
                 (
                     category,
                     ViewPosition,
-                    position => DumpPrintResultViaAccessReference(category, position));
-        }
+                    position => DumpPrintResultViaAccessReference(category, position)
+                );
 
         internal Result AccessViaThisReference(Category category, int position)
         {
@@ -161,12 +148,9 @@ namespace Reni.Struct
                 .Result(category, PointerKind.ArgResult(category));
         }
 
-        internal FunctionType Function(FunctionSyntax body, TypeBase argsType)
-        {
-            return Compound
-                .RootContext
-                .FunctionInstance(this, body, argsType);
-        }
+        internal FunctionType Function(FunctionSyntax body, TypeBase argsType) => Compound
+            .RootContext
+            .FunctionInstance(this, body, argsType);
 
         internal Result AccessViaContextReference(Category category, int position)
         {
@@ -177,7 +161,7 @@ namespace Reni.Struct
             return result;
         }
 
-        private Size ContextOffset() { return Compound.ContextReferenceOffsetFromAccessPoint(ViewPosition)*-1; }
+        Size ContextOffset() => Compound.ContextReferenceOffsetFromAccessPoint(ViewPosition) * -1;
 
         internal Result StructReferenceViaContextReference(Category category)
         {
@@ -193,7 +177,7 @@ namespace Reni.Struct
                 );
         }
 
-        private Result DumpPrintResultViaAccessReference(Category category, int position)
+        Result DumpPrintResultViaAccessReference(Category category, int position)
         {
             var trace = position == -10;
             StartMethodDump(trace, category, position);
@@ -212,23 +196,17 @@ namespace Reni.Struct
             }
         }
 
-        internal Result ContextReferenceViaStructReference(Result result)
-        {
-            return Compound
-                .ContextReferenceViaStructReference(ViewPosition, result);
-        }
+        internal Result ContextReferenceViaStructReference(Result result) => Compound
+            .ContextReferenceViaStructReference(ViewPosition, result);
 
-        private CodeBase StructReferenceCodeViaContextReference()
-        {
-            return CodeBase.ReferenceCode(Compound)
-                .ReferencePlus(StructSize*-1);
-        }
+        CodeBase StructReferenceCodeViaContextReference() => CodeBase.ReferenceCode(Compound)
+            .ReferencePlus(StructSize * -1);
 
-        internal TypeBase ValueType(int position)
-        {
-            return Compound
-                .AccessType(ViewPosition, position)
-                .TypeForStructureElement;
-        }
+        internal TypeBase ValueType(int position) => Compound
+            .AccessType(ViewPosition, position)
+            .TypeForStructureElement;
+
+        internal IFeatureImplementation Find(Definable definable)
+            => Compound.Syntax.Find(definable.Name)?.Convert(this);
     }
 }

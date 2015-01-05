@@ -13,16 +13,16 @@ namespace Reni.Feature.DumpPrint
             , ISimpleFeature
     {
         [EnableDump]
-        readonly StructureType _structureType;
+        readonly CompoundType _compoundType;
 
-        public StructReferenceFeature(StructureType structureType) { _structureType = structureType; }
+        public StructReferenceFeature(CompoundType compoundType) { _compoundType = compoundType; }
 
         Result ISimpleFeature.Result(Category category)
         {
-            return _structureType
-                .CompoundView
+            return _compoundType
+                .View
                 .DumpPrintResultViaContextReference(category);
         }
-        TypeBase ISimpleFeature.TargetType { get { return _structureType; } }
+        TypeBase ISimpleFeature.TargetType { get { return _compoundType; } }
     }
 }

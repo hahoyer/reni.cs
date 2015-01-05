@@ -22,8 +22,7 @@ namespace Reni.Context
     /// </summary>
     abstract class ContextBase
         : DumpableObject
-            ,
-            IIconKeyProvider
+            ,      IIconKeyProvider
     {
         static int _nextId;
 
@@ -167,7 +166,7 @@ namespace Reni.Context
                     (
                     container =>
                         new FunctionCache<int, ContextBase>
-                            (position => new Struct.Context(target, container, position))
+                            (position => new CompoundViewContext(target, target.UniqueCompoundView(container, position)))
                     );
                 RecentStructure = new ValueCache<CompoundView>(target.ObtainRecentCompoundView);
                 RecentFunctionContextObject = new ValueCache<IFunctionContext>(target.ObtainRecentFunctionContext);
