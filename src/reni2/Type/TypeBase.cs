@@ -501,9 +501,10 @@ namespace Reni.Type
 
         internal IEnumerable<SearchResult> Declarations<TDefinable>(TDefinable tokenClass) where TDefinable : Definable
         {
-            var provider = this as ISymbolProvider<TDefinable, IFeatureImplementation>;
-            if(provider != null)
-                return new[] {new TypeSearchResult(provider.Feature(tokenClass), this)};
+            var feature = (this as ISymbolProvider<TDefinable, IFeatureImplementation>)
+                ?.Feature(tokenClass);
+            if(feature != null)
+                return new[] {new TypeSearchResult(feature, this)};
 
             var inheritor = this as IFeatureInheritor;
             if(inheritor != null)
