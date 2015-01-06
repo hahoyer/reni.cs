@@ -109,14 +109,7 @@ namespace Reni.Feature
         }
 
         [DisableDump]
-        protected override TypeBase Type
-        {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
-        }
+        protected override TypeBase Type => _definingItem.FindRecentCompoundView.Type;
 
         [DisableDump]
         protected override IFeatureImplementation Feature => _feature;
