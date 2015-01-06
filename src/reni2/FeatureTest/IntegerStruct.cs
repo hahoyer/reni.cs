@@ -31,7 +31,6 @@ Integer8:
 ";
         }
 
-        public override void Run() { }
         protected override string Target { get { return Definition() + "; " + InstanceCode + " dump_print()"; } }
         protected virtual string InstanceCode { get { return GetStringAttribute<InstanceCodeAttribute>(); } }
     }
@@ -40,11 +39,7 @@ Integer8:
     [Output("3")]
     [InstanceCode("(Integer8(1)+Integer8(2))")]
     [IntegerPlusNumber]
-    public sealed class IntegerPlusInteger : IntegerStruct
-    {
-        [Test]
-        public override void Run() { BaseRun(); }
-    }
+    public sealed class IntegerPlusInteger : IntegerStruct {}
 
     [TestFixture]
     [Output("3")]
@@ -53,22 +48,14 @@ Integer8:
     [ObjectFunction]
     [TwoFunctions1]
     //[LowPriority]
-    public sealed class IntegerPlusNumber : IntegerStruct
-    {
-        [Test]
-        public override void Run() { BaseRun(); }
-    }
+    public sealed class IntegerPlusNumber : IntegerStruct {}
 
     [TestFixture]
     [Output("23")]
     [InstanceCode("Integer8(23) clone")]
     [Create]
     [TwoFunctions1]
-    public sealed class Clone : IntegerStruct
-    {
-        [Test]
-        public override void Run() { BaseRun(); }
-    }
+    public sealed class Clone : IntegerStruct {}
 
     [TestFixture]
     [Output("23")]
@@ -76,11 +63,7 @@ Integer8:
     [Integer1]
     [Integer2]
     [Integer127]
-    public sealed class Create : IntegerStruct
-    {
-        [Test]
-        public override void Run() { BaseRun(); }
-    }
+    public sealed class Create : IntegerStruct {}
 
     [TestFixture]
     [PropertyVariable]
@@ -89,29 +72,17 @@ Integer8:
     [ObjectProperty]
     [Output("1")]
     [InstanceCode("Integer8(1)")]
-    public sealed class Integer1 : IntegerStruct
-    {
-        [Test]
-        public override void Run() { BaseRun(); }
-    }
+    public sealed class Integer1 : IntegerStruct {}
 
     [TestFixture]
     [Output("2")]
     [Integer1]
     [InstanceCode("Integer8(2)")]
-    public sealed class Integer2 : IntegerStruct
-    {
-        [Test]
-        public override void Run() { BaseRun(); }
-    }
+    public sealed class Integer2 : IntegerStruct {}
 
     [TestFixture]
     [Integer2]
     [Output("127")]
     [InstanceCode("Integer8(127)")]
-    public sealed class Integer127 : IntegerStruct
-    {
-        [Test]
-        public override void Run() { BaseRun(); }
-    }
+    public sealed class Integer127 : IntegerStruct {}
 }
