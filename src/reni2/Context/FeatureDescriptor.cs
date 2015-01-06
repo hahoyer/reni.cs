@@ -66,13 +66,17 @@ namespace Reni.Context
             if(simpleFeature != null && right == null)
                 return simpleFeature.Result(category);
 
-            var trace = ObjectId == 43; //&& category.HasCode;
+            var trace = ObjectId == -95 && category.HasCode;
             StartMethodDump(trace, context, category, right);
             try
             {
                 var function = Feature.Function;
+                var argsType = context.ArgsResult(Category.Type, right).Type;
+                Dump("argsType", argsType);
+                BreakExecution();
+
                 var applyResult = function
-                    .ApplyResult(category, context.ArgsResult(Category.Type, right).Type);
+                    .ApplyResult(category, argsType);
                 var replaceArg = applyResult
                     .ReplaceArg(c => context.ArgsResult(c, right));
                 Dump("applyResult", applyResult);

@@ -13,7 +13,11 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class FunctionBodyType : TypeBase, IFunctionFeature, ISimpleFeature, IFeatureImplementation
+    sealed class FunctionBodyType
+        : TypeBase
+            , IFunctionFeature
+            , ISimpleFeature
+            , IFeatureImplementation
     {
         [EnableDump]
         [Node]
@@ -70,7 +74,7 @@ namespace Reni.Struct
 
         Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
         {
-            var trace = ObjectId == -5 && (category.HasCode);
+            var trace = ObjectId == -3 && (category.HasCode);
             StartMethodDump(trace, category, argsType);
             try
             {
