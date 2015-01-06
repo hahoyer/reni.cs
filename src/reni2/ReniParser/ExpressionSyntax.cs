@@ -15,46 +15,59 @@ namespace Reni.ReniParser
 {
     sealed class ExpressionSyntax : CompileSyntax
     {
-        [Node]
-        readonly Definable _tokenClass;
-        [Node]
-        internal readonly CompileSyntax Left;
-        [Node]
-        readonly SourcePart _token;
-        [Node]
-        internal readonly CompileSyntax Right;
-
         internal ExpressionSyntax
-            (Definable tokenClass, CompileSyntax left, SourcePart token, CompileSyntax right)
+            (Definable @operator, CompileSyntax left, SourcePart token, CompileSyntax right)
             : base(token)
         {
-            _tokenClass = tokenClass;
+            Operator = @operator;
             Left = left;
-            _token = token;
             Right = right;
+        }
+
+        [Node]
+        internal CompileSyntax Left { get; }
+        [Node]
+        public Definable Operator { get; }
+        [Node]
+        internal CompileSyntax Right { get; }
+
+        [DisableDump]
+        protected override ParsedSyntax[] Children => new ParsedSyntax[] { Left, Right };
+
+        internal override string DumpPrintText
+        {
+            get
+            {
+                var result = base.GetNodeDump();
+                if (Left != null)
+                    result = "(" + Left.DumpPrintText + ")" + result;
+                if (Right != null)
+                    result += "(" + Right.DumpPrintText + ")";
+                return result;
+            }
         }
 
         internal override Result ObtainResult(ContextBase context, Category category)
         {
             if(Left == null)
-                return context.PrefixResult(category, _token, _tokenClass, Right);
+                return context.PrefixResult(category, Token, Operator, Right);
 
             var typeForSearch = context.Type(Left).TypeForSearchProbes;
             var searchResults
                 = typeForSearch
-                    .DeclarationsForType(_tokenClass)
+                    .DeclarationsForType(Operator)
                     .ToArray();
 
             switch(searchResults.Length)
             {
                 case 0:
-                    return UndefinedSymbolIssue.Type(_token, typeForSearch).IssueResult(category);
+                    return UndefinedSymbolIssue.Type(Token, typeForSearch).IssueResult(category);
 
                 case 1:
                     return searchResults[0].CallResult(context, category, Left, Right);
 
                 default:
-                    return AmbiguousSymbolIssue.Type(_token, context.RootContext).IssueResult(category);
+                    return AmbiguousSymbolIssue.Type(Token, context.RootContext).IssueResult(category);
             }
         }
 
@@ -65,7 +78,7 @@ namespace Reni.ReniParser
             if(left == null && right == null)
                 return this;
 
-            return (CompileSyntax) _tokenClass.CreateForVisit(left ?? Left, _token, right ?? Right);
+            return (CompileSyntax) Operator.CreateForVisit(left ?? Left, Token, right ?? Right);
         }
 
         protected override string GetNodeDump()
@@ -78,29 +91,12 @@ namespace Reni.ReniParser
             return result;
         }
 
-        [DisableDump]
-        protected override ParsedSyntax[] Children { get { return new ParsedSyntax[] {Left, Right}; } }
-
-        internal override string DumpPrintText
-        {
-            get
-            {
-                var result = base.GetNodeDump();
-                if(Left != null)
-                    result = "(" + Left.DumpPrintText + ")" + result;
-                if(Right != null)
-                    result += "(" + Right.DumpPrintText + ")";
-                return result;
-            }
-        }
-
         internal override Syntax SyntaxError(IssueId issue, SourcePart token)
         {
             if(Right == null)
                 return Left.SyntaxError(issue, token);
-            NotImplementedMethod(issue,token);
+            NotImplementedMethod(issue, token);
             return null;
-
         }
     }
 
