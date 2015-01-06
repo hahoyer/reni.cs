@@ -6,6 +6,7 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.ReniSyntax;
+using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -130,6 +131,10 @@ namespace Reni.Feature
             => CallDescriptor.Result(category, context, left, right);
 
         internal Result CallResult(Category category) => CallDescriptor.Result(category);
+
+        internal abstract bool Overrides(SearchResult other);
+        internal abstract bool IsOverriddenBy(TypeSearchResult other);
+        internal abstract bool IsOverriddenBy(InheritedTypeSearchResult other);
     }
 
     sealed class TypeSearchResult : SearchResult
@@ -149,6 +154,25 @@ namespace Reni.Feature
 
         [DisableDump]
         public override TypeBase Type => _definingItem;
+        internal override bool Overrides(SearchResult other) => other.IsOverriddenBy(this);
+        internal override bool IsOverriddenBy(TypeSearchResult other)
+        {
+            if(_definingItem == other._definingItem)
+                return other.Feature.Overrides(Feature);
+            NotImplementedMethod(other);
+            return false;
+        }
+        internal override bool IsOverriddenBy(InheritedTypeSearchResult other)
+        {
+            NotImplementedMethod(other);
+            return false;
+        }
+    }
+
+    interface IDefinitionPriority
+    {
+        bool Overrides(IDefinitionPriority other);
+        bool IsOverriddenBy(AccessFeature other);
     }
 
     sealed class InheritedTypeSearchResult : SearchResult
@@ -173,6 +197,19 @@ namespace Reni.Feature
 
         [DisableDump]
         public override TypeBase Type => _result.Type;
+        internal override bool Overrides(SearchResult other) => other.IsOverriddenBy(this);
+        internal override bool IsOverriddenBy(TypeSearchResult other)
+        {
+            NotImplementedMethod(other);
+            return false;
+        }
+        internal override bool IsOverriddenBy(InheritedTypeSearchResult other)
+        {
+            if(_inheritor == other._inheritor)
+                return other._result.Overrides(_result);
+            NotImplementedMethod(other);
+            return false;
+        }
     }
 
     interface IFeatureInheritor

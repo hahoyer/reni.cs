@@ -7,6 +7,7 @@ using hw.Parser;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Feature;
 using Reni.ReniSyntax;
 using Reni.TokenClasses;
 using Reni.Validation;
@@ -56,6 +57,7 @@ namespace Reni.ReniParser
             var searchResults
                 = typeForSearch
                     .DeclarationsForType(Operator)
+                    .FilterLowerPriority()
                     .ToArray();
 
             switch(searchResults.Length)

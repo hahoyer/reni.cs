@@ -10,7 +10,6 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
-using Reni.TokenClasses;
 
 namespace Reni.Struct
 {
@@ -21,45 +20,37 @@ namespace Reni.Struct
     {
         readonly Data[] _data;
         static readonly string _runId = Compiler.FormattedNow + "\n";
-        public static bool IsInContainerDump;
+        internal static bool IsInContainerDump;
         static bool _isInsideFileDump;
         static int _nextObjectId;
 
-        [Node]
-        internal CompileSyntax[] Statements => _data.Select(s => s.Statement).ToArray();
-
-        [DisableDump]
-        internal int EndPosition { get { return Statements.Length; } }
-
-        internal CompoundSyntax
-            (
-            SourcePart token,
-            Syntax[] statements)
-            : base(token, _nextObjectId++) { _data = statements.Select((s, i) => new Data(s, i)).ToArray(); }
-
-        [DisableDump]
-        internal override CompileSyntax ToCompiledSyntax { get { return this; } }
-        [DisableDump]
-        internal override bool? Hllw
+        internal CompoundSyntax(SourcePart token, Syntax[] statements)
+            : base(token, _nextObjectId++)
         {
-            get
-            {
-                return Statements
-                    .All(syntax => syntax.Hllw == true);
-            }
+            _data = statements
+                .Select((s, i) => new Data(s, i))
+                .ToArray();
         }
 
+        [Node]
+        internal CompileSyntax[] Statements => _data.Select(s => s.Statement).ToArray();
         [DisableDump]
-        internal Size IndexSize { get { return Size.AutoSize(Statements.Length); } }
+        internal int EndPosition => Statements.Length;
+        [DisableDump]
+        internal override CompileSyntax ToCompiledSyntax => this;
+        [DisableDump]
+        internal override bool? Hllw => Statements.All(syntax => syntax.Hllw == true);
+        [DisableDump]
+        internal Size IndexSize => Size.AutoSize(Statements.Length);
+        [DisableDump]
+        protected override ParsedSyntax[] Children => Statements.ToArray<ParsedSyntax>();
+        [DisableDump]
+        internal string[] Names { get { return _data.SelectMany(s => s.Names).ToArray(); } }
+        [DisableDump]
+        internal int[] Converters { get { return _data.SelectMany((s, i) => s.IsConverter ? new[] {i} : new int[0]).ToArray(); } }
 
-        protected override string GetNodeDump() { return "Compound." + ObjectId; }
-
-        [DisableDump]
-        protected override ParsedSyntax[] Children { get { return Statements.ToArray<ParsedSyntax>(); } }
-        [DisableDump]
-        public string[] Names { get { return _data.SelectMany(s => s.Names).ToArray(); } }
-        [DisableDump]
-        public int[] Converters { get { return _data.SelectMany((s, i) => s.IsConverter ? new[] {i} : new int[0]).ToArray(); } }
+        protected override string GetNodeDump() => "Compound." + ObjectId;
+        internal bool IsReassignable(int position) => _data[position].IsReassignable;
 
         public override string DumpData()
         {
@@ -94,7 +85,7 @@ namespace Reni.Struct
             return result;
         }
 
-        internal StructurePosition Find(string name)
+        internal Position Find(string name)
         {
             if(name == null)
                 return null;
@@ -102,52 +93,45 @@ namespace Reni.Struct
             if(result == null)
                 return null;
 
-            return new StructurePosition(result.Position);
+            return new Position(result.Position);
         }
 
-        internal override Result ObtainResult(ContextBase context, Category category)
-        {
-            return context
-                .UniqueCompound(this)
-                .Result(category);
-        }
+        internal override Result ObtainResult(ContextBase context, Category category) => context
+            .UniqueCompound(this)
+            .Result(category);
 
         sealed class Data : DumpableObject
         {
-            readonly Syntax _rawStatement;
-            public readonly int Position;
-            readonly ValueCache<string[]> _namesCache;
-            readonly ValueCache<CompileSyntax> _statement;
-
             public Data(Syntax rawStatement, int position)
             {
-                _rawStatement = rawStatement;
+                RawStatement = rawStatement;
                 Position = position;
-                _statement = new ValueCache<CompileSyntax>(GetStatement);
-                _namesCache = new ValueCache<string[]>(GetNames);
+                StatementCache = new ValueCache<CompileSyntax>(GetStatement);
+                NamesCache = new ValueCache<string[]>(GetNames);
             }
 
-            public CompileSyntax Statement => _statement.Value;
-            public bool Defines(string name) => Names.Contains(name);
-            public bool IsConverter => _rawStatement is ConverterSyntax;
-            public IEnumerable<string> Names => _namesCache.Value;
-            public bool IsReassignable => _rawStatement.IsEnableReassignSyntax;
+            Syntax RawStatement { get; }
+            public int Position { get; }
 
-            CompileSyntax GetStatement() { return _rawStatement.ContainerStatementToCompileSyntax; }
-            string[] GetNames() { return _rawStatement.GetDeclarations().ToArray(); }
+            ValueCache<string[]> NamesCache { get; }
+            ValueCache<CompileSyntax> StatementCache { get; }
+
+            public CompileSyntax Statement => StatementCache.Value;
+            public bool Defines(string name) => Names.Contains(name);
+            public bool IsConverter => RawStatement is ConverterSyntax;
+            public IEnumerable<string> Names => NamesCache.Value;
+            public bool IsReassignable => RawStatement.IsEnableReassignSyntax;
+
+            CompileSyntax GetStatement() => RawStatement.ContainerStatementToCompileSyntax;
+            string[] GetNames() => RawStatement.GetDeclarations().ToArray();
         }
 
-        public bool IsReassignable(int position) { return _data[position].IsReassignable; }
+        internal sealed class Position : DumpableObject
+        {
+            internal int Value { get; }
+            internal Position(int value) { Value = value; }
+            internal AccessFeature Convert(CompoundView accessPoint) => accessPoint.UniqueAccessFeature(Value);
+        }
     }
 
-
-    sealed class StructurePosition : DumpableObject
-    {
-        [EnableDump]
-        internal readonly int Position;
-
-        internal StructurePosition(int position) { Position = position; }
-
-        internal AccessFeature Convert(CompoundView accessPoint) { return accessPoint.UniqueAccessFeature(Position); }
-    }
 }

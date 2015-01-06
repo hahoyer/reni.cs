@@ -11,7 +11,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class AccessFeature : EmptyFeatureImplementation, ISimpleFeature
+    sealed class AccessFeature : EmptyFeatureImplementation, ISimpleFeature, IDefinitionPriority
     {
         static int _nextObjectId;
 
@@ -30,31 +30,12 @@ namespace Reni.Struct
 
         ValueCache<IFunctionFeature> FunctionFeature { get; }
 
-        Result ISimpleFeature.Result(Category category) => View
-            .AccessViaThisReference(category, Position);
-
-        TypeBase ISimpleFeature.TargetType => View.Type;
-
-        CompileSyntax Statement => View
-            .Compound
-            .Syntax
-            .Statements[Position];
-
         protected override IContextMetaFunctionFeature ContextMeta
             => (Statement as FunctionSyntax)?.ContextMetaFunctionFeature(View);
 
         protected override IMetaFunctionFeature Meta => (Statement as FunctionSyntax)?.MetaFunctionFeature(View);
 
         protected override IFunctionFeature Function => FunctionFeature.Value;
-
-        IFunctionFeature ObtainFunctionFeature()
-        {
-            var functionSyntax = Statement as FunctionSyntax;
-            if(functionSyntax != null)
-                return functionSyntax.FunctionFeature(View);
-
-            return View.ValueType(Position).Feature?.Function;
-        }
 
         protected override ISimpleFeature Simple
         {
@@ -65,6 +46,28 @@ namespace Reni.Struct
                     return null;
                 return this;
             }
+        }
+
+        Result ISimpleFeature.Result(Category category) => View
+            .AccessViaThisReference(category, Position);
+
+        TypeBase ISimpleFeature.TargetType => View.Type;
+
+        CompileSyntax Statement => View
+            .Compound
+            .Syntax
+            .Statements[Position];
+
+        bool IDefinitionPriority.Overrides(IDefinitionPriority other) => other.IsOverriddenBy(this);
+        bool IDefinitionPriority.IsOverriddenBy(AccessFeature accessFeature) => false;
+
+        IFunctionFeature ObtainFunctionFeature()
+        {
+            var functionSyntax = Statement as FunctionSyntax;
+            if(functionSyntax != null)
+                return functionSyntax.FunctionFeature(View);
+
+            return View.ValueType(Position).Feature?.Function;
         }
     }
 }

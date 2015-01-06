@@ -79,7 +79,7 @@ namespace Reni.FeatureTest.Helper
             var s = container.Find(_name);
 
             Tracer.Assert(s != null);
-            Tracer.Assert(_position == s.Position);
+            Tracer.Assert(_position == s.Value);
         }
     }
 

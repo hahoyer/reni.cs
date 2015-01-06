@@ -482,18 +482,6 @@ namespace Reni.Type
             return null;
         }
 
-        internal IEnumerable<SearchResult> ConvertersForType<TDestination>
-            (TDestination destination, IConversionParameter parameter)
-        {
-            var provider = this as IConverterProvider<TDestination, IFeatureImplementation>;
-            if(provider != null)
-            {
-                var feature = provider.Feature(destination, parameter);
-                if(feature != null)
-                    yield return new TypeSearchResult(feature, this);
-            }
-        }
-
         internal IEnumerable<SearchResult> DeclarationsForType(Definable tokenClass)
         {
             return tokenClass.Genericize.SelectMany(g => g.Declarations(this));
