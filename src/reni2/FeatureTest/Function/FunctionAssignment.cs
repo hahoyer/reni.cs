@@ -7,10 +7,6 @@ namespace Reni.FeatureTest.Function
 {
     [TestFixture]
     [SimpleFunctionWithNonLocal]
-    [TargetSet(@"f: (. + new_value)dump_print/\ .;f(100) := 2;", "102")]
-    public sealed class FunctionAssignment : CompilerTest
-    {
-        [Test]
-        public override void Run() { BaseRun(); }
-    }
+    [TargetSet(@"f: (^ + new_value)dump_print/\ ^; f(100) := 2;", "102")]
+    public sealed class FunctionAssignment : CompilerTest {}
 }
