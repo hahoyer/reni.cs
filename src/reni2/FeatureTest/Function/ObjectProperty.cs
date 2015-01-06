@@ -9,7 +9,7 @@ namespace Reni.FeatureTest.Function
     [TestFixture]
     [FunctionWithNonLocal]
     [PropertyVariable]
-    [Target(@"f: /\(value: ., x: /!\value);f(2) x dump_print")]
+    [Target(@"f: /\(value: ^, x: /!\value);f(2) x dump_print")]
     [Output("2")]
     public sealed class ObjectProperty : CompilerTest
     {
