@@ -40,7 +40,7 @@ namespace Reni.Struct
         [DisableDump]
         internal override TypeBase ValueType { get { return _getter.ReturnType; } }
         [DisableDump]
-        internal override bool Hllw { get { return CodeArgs.IsNone && ArgsType.Hllw; } }
+        internal override bool Hllw { get { return Exts.IsNone && ArgsType.Hllw; } }
         [DisableDump]
         internal override CompoundView FindRecentCompoundView { get { return _compoundView; } }
         [DisableDump]
@@ -48,7 +48,7 @@ namespace Reni.Struct
 
         [Node]
         [DisableDump]
-        CodeArgs CodeArgs { get { return ObtainCodeArgs(); } }
+        CodeArgs Exts { get { return GetExts(); } }
 
         [DisableDump]
         internal FunctionContainer Container
@@ -74,7 +74,7 @@ namespace Reni.Struct
         }
         protected override Result SetterResult(Category category) { return _setter.CallResult(category); }
         protected override Result GetterResult(Category category) { return _getter.CallResult(category); }
-        protected override Size GetSize() { return ArgsType.Size + CodeArgs.Size; }
+        protected override Size GetSize() { return ArgsType.Size + Exts.Size; }
 
         internal ContextBase CreateSubContext(bool useValue)
         {
@@ -108,17 +108,15 @@ namespace Reni.Struct
         {
             var result = Result
                 (
-                    category
-                    ,
-                    () => CodeArgs.ToCode() + ArgsType.ArgCode
-                    ,
-                    () => CodeArgs + CodeArgs.Arg()
+                    category,
+                    () => Exts.ToCode() + ArgsType.ArgCode,
+                    () => Exts + CodeArgs.Arg()
                 );
             Tracer.Assert(category == result.CompleteCategory);
             return result;
         }
 
-        CodeArgs ObtainCodeArgs()
+        CodeArgs GetExts()
         {
             var result = _getter.Exts;
             Tracer.Assert(result != null);
