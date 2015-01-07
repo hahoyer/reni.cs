@@ -14,15 +14,19 @@ namespace Reni.Struct
 {
     sealed class FunctionType : SetterTargetType
     {
+        [EnableDump]
         readonly int _index;
         [Node]
+        [EnableDump]
         readonly CompoundView _compoundView;
         [Node]
         internal readonly TypeBase ArgsType;
         [Node]
+        [EnableDump]
         readonly SetterFunction _setter;
         [NotNull]
         [Node]
+        [EnableDump]
         readonly GetterFunction _getter;
 
         internal FunctionType(int index, FunctionSyntax body, CompoundView compoundView, TypeBase argsType)

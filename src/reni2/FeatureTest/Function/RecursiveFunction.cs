@@ -27,12 +27,12 @@ f: /\
     1000 type instance
     (
         {
-            . = 1 then 1 
+            ^ = 1 then 1 
             else 
             (
-                . * f
+                ^ * f
                 [
-                    . type instance((. - 1)enable_cut)
+                    ^ type instance((^ - 1)enable_cut)
                 ]
             )
         }
@@ -42,9 +42,5 @@ f: /\
 f(4)dump_print"
         )]
     [Output("24")]
-    public sealed class RecursiveFunction : CompilerTest
-    {
-        [Test]
-        public override void Run() { BaseRun(); }
-    }
+    public sealed class RecursiveFunction : CompilerTest {}
 }

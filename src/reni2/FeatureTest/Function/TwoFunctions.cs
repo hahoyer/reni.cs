@@ -19,7 +19,7 @@ namespace Reni.FeatureTest.Function
 x: 100;
 f1: /\((
   y: 3;
-  f: /\ . * y + x;
+  f: /\ ^ * y + x;
   f(2)
 ) _A_T_ 2);
 
@@ -29,8 +29,5 @@ f1()dump_print;
         }
 
         protected override string Output { get { return "106"; } }
-
-        [Test]
-        public override void Run() { BaseRun(); }
     }
 }
