@@ -4,7 +4,6 @@ using System.Linq;
 using hw.UnitTest;
 using Reni.FeatureTest;
 using Reni.FeatureTest.Helper;
-using Reni.Type;
 
 namespace Reni.Parser
 {
@@ -24,6 +23,7 @@ namespace Reni.Parser
         }
 
         [Test]
+        [FeatureTest.ConversionService.Test]
         public void Add2Numbers()
         {
             var syntaxPrototype =

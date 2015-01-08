@@ -25,28 +25,19 @@ namespace Reni.Type
             {
                 Tracer.Assert(elements.Any());
                 Tracer.Assert(!elements.Skip(1).Where((element, i) => element.TargetType != elements[i].ResultType()).Any());
-                Source = elements.Last().TargetType;
+                Source = elements.First().TargetType;
                 Elements = elements;
                 Tracer.Assert(Source != null);
             }
 
-            public TypeBase Destination
-            {
-                get
-                {
-                    var result = Elements.FirstOrDefault();
-                    if(result != null)
-                        return result.ResultType();
-                    return Source;
-                }
-            }
+            public TypeBase Destination => Elements.LastOrDefault()?.ResultType() ?? Source;
 
             protected override string GetNodeDump()
             {
                 return Elements
-                    .Select(element => element.ResultType().DumpPrintText + " <== ")
+                    .Select(element => element.TargetType.DumpPrintText + " -> ")
                     .Stringify("")
-                    + Source.DumpPrintText;
+                    + Destination.DumpPrintText;
             }
 
             public static Path CreateFromList(TypeBase source, TypeBase destination, ISimpleFeature[] features)
@@ -268,7 +259,7 @@ namespace Reni.Type
                 .Select(t => Path.CreateFromList(t, destination, features));
         }
 
-        static IEnumerable<Path> SymmetricPathsClosure(this TypeBase source)
+        internal static IEnumerable<Path> SymmetricPathsClosure(this TypeBase source)
         {
             var features = source
                 .SymmetricFeatureClosure()
