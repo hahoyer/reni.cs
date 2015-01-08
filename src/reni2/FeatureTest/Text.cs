@@ -72,6 +72,7 @@ x(4) dump_print;
     [Hallo]
     [Number]
     [ConvertFromNumber]
+    [ConversionService.Test]
     [TargetSet("('80' to_number_of_base 16) dump_print", "128")]
     public sealed class ConvertHexadecimal : CompilerTest
     {}

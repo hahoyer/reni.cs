@@ -35,6 +35,6 @@ namespace Reni.Type
         protected override Result ParentConversionResult(Category category) { return Parent.Result(category, ArgResult); }
         internal Result PointerConversionResult(Category category) { return PointerConversionResult(category, Parent); }
 
-        sealed internal override ISimpleFeature GetStripConversion() { return Extension.SimpleFeature(ParentConversionResult); }
+        internal override IEnumerable<ISimpleFeature> StripConversions { get { yield return Extension.SimpleFeature(ParentConversionResult); } }
     }
 }

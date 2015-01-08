@@ -4,10 +4,12 @@ using System.Linq;
 using hw.UnitTest;
 using Reni.FeatureTest;
 using Reni.FeatureTest.Helper;
+using Reni.Type;
 
 namespace Reni.Parser
 {
     [TestFixture]
+    [FeatureTest.ConversionService.Test]
     public sealed class ParserTest : CompilerTest
     {
         public override void Run() { }

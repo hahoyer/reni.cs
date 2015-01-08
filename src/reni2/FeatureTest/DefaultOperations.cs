@@ -7,6 +7,7 @@ using Reni.FeatureTest.BitArrayOp;
 namespace Reni.FeatureTest.DefaultOperations
 {
     [TestFixture]
+    [ConversionService.Test]
     public abstract class ApplyCompareOperator : CompilerTest
     {
         protected override string Target { get { return "(1" + Operator + "100)dump_print"; } }

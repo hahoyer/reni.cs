@@ -56,9 +56,9 @@ namespace Reni.Type
         [DisableDump]
         internal override bool Hllw { get { return false; } }
 
-        protected override IEnumerable<ISimpleFeature> ObtainRawReflexiveConversions()
+        protected override IEnumerable<ISimpleFeature> ObtainRawSymmetricConversions()
         {
-            return base.ObtainRawReflexiveConversions().Concat(new ISimpleFeature[] {Extension.SimpleFeature(DereferenceResult)});
+            return base.ObtainRawSymmetricConversions().Concat(new ISimpleFeature[] {Extension.SimpleFeature(DereferenceResult)});
         }
 
         [DisableDump]

@@ -10,9 +10,6 @@ namespace Reni.FeatureTest.Structure
     [Target(@"(1, 2, 3, 4, 5, 6) dump_print")]
     [Output("(1, 2, 3, 4, 5, 6)")]
     [PrioTableTest]
-    public sealed class DumpPrint : CompilerTest
-    {
-        [Test]
-        public override void Run() { BaseRun(); }
-    }
+    [ConversionService.Test]
+    public sealed class DumpPrint : CompilerTest {}
 }

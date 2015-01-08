@@ -21,10 +21,10 @@ namespace Reni.Type
                 Tracer.Assert(Source != null);
             }
 
-            public Path(params ISimpleFeature[] elements)
+            Path(params ISimpleFeature[] elements)
             {
                 Tracer.Assert(elements.Any());
-                Tracer.Assert(!elements.Skip(1).Where((element, i) => element.ResultType() != elements[i].TargetType).Any());
+                Tracer.Assert(!elements.Skip(1).Where((element, i) => element.TargetType != elements[i].ResultType()).Any());
                 Source = elements.Last().TargetType;
                 Elements = elements;
                 Tracer.Assert(Source != null);
@@ -48,75 +48,118 @@ namespace Reni.Type
                     .Stringify("")
                     + Source.DumpPrintText;
             }
+
+            public static Path CreateFromList(TypeBase source, TypeBase destination, ISimpleFeature[] features)
+            {
+                return (features.Length + 1)
+                    .Select()
+                    .Select(length => CreateFromList(length, source, destination, features))
+                    .First(p => p != null);
+            }
+
+            static Path CreateFromList(int length, TypeBase source, TypeBase destination, ISimpleFeature[] features)
+            {
+                if(source == destination)
+                    return new Path(source);
+
+                if(length == 0)
+                    return null;
+
+                return features
+                    .Where(f => f.TargetType == source)
+                    .Select(f => PrefixIfNotNull(f, CreateFromList(length - 1, f.ResultType(), destination, features)))
+                    .FirstOrDefault(p => p != null);
+            }
+
+            static Path PrefixIfNotNull(ISimpleFeature a, Path b) => b == null ? null : a + b;
+
+            public static Path operator +(Path a, Path b) => new Path(a.Elements.Concat(b.Elements).ToArray());
+            public static IEnumerable<Path> operator +(IEnumerable<Path> a, Path b) => a.Select(left => left + b);
+            public static IEnumerable<Path> operator +(Path a, IEnumerable<Path> b) => b.Select(right => a + right);
+            public static IEnumerable<Path> operator +(Path a, IEnumerable<ISimpleFeature> b) => b.Select(right => a + right);
+            public static Path operator +(ISimpleFeature a, Path b) => new Path(new[] {a}.Concat(b.Elements).ToArray());
+            public static Path operator +(Path a, ISimpleFeature b) => new Path(a.Elements.Concat(new[] {b}).ToArray());
+
+            Path CheckedAppend(Path other)
+            {
+                if(Destination == other.Source)
+                    return this + other;
+                return null;
+            }
+
+            internal IEnumerable<Path> CheckedAppend(IEnumerable<Path> b)
+            {
+                return b.SelectMany(right => CheckedAppend(right).NullableToArray());
+            }
         }
 
         public static Path FindPath(TypeBase source, TypeBase destination)
         {
-            var result = FindPath(source, t => t == destination, () => destination.GetReflexiveConversionPaths().ToArray());
+            if(source == destination)
+                return new Path(source);
+
+            var destinationPaths = destination.PrefixSymmetricPathsClosure().ToArray();
+            var result = destinationPaths.SingleOrDefault(p => p.Source == source);
             if(result != null)
                 return result;
 
-            var conversions = source.GetReflexiveConversionPaths().ToArray();
-
-            var stripConversions = conversions.SelectMany
-                (
-                    path => path
-                        .Destination
-                        .GetStripConversion()
-                        .NullableToArray()
-                        .SelectMany(conversion => destination.Combine(conversion, path))
-                )
+            var sourcePaths = source
+                .SymmetricPathsClosure()
                 .ToArray();
 
-            var destinations = destination.GetReflexiveConversionPaths().ToArray();
+            var stripPaths = sourcePaths
+                .SelectMany(path => path + path.Destination.StripConversions)
+                .ToArray();
 
-            var conversionsWithStrip = conversions.Concat(stripConversions).ToArray();
-            return conversionsWithStrip
-                .SelectMany(outer => destinations.SelectMany(inner => ForcedConversions(outer, inner)))
-                .SingleOrDefault(x => x.Destination == destination);
+            result = stripPaths.CheckedAppend(destinationPaths).SingleOrDefault();
+            if(result != null)
+                return result;
+
+            var doubleStriped = stripPaths
+                .SelectMany(path => path + path.Destination.SymmetricPathsClosure())
+                .SelectMany(path => path + path.Destination.StripConversions)
+                ;
+
+            Tracer.Assert(!doubleStriped.Any());
+
+            return sourcePaths.Concat(stripPaths)
+                .SelectMany(left => destinationPaths.SelectMany(right => left + ForcedConversions(left, right) + right))
+                .SingleOrDefault();
         }
 
         public static Path FindPath<TDestination>(TypeBase source)
         {
-            return FindPath(source, destination => destination is TDestination);
-        }
-
-        static Path FindPath(TypeBase source, Func<TypeBase, bool> isDestination, Func<Path[]> getDestinations = null)
-        {
-            if(isDestination(source))
+            if(source is TDestination)
                 return new Path(source);
 
-            var conversions = source.GetReflexiveConversionPaths().ToArray();
-            var result = conversions.SingleOrDefault(x => isDestination(x.Destination));
+            var sourcePaths = source
+                .SymmetricPathsClosure()
+                .ToArray();
+
+            var result = sourcePaths.SingleOrDefault(path => path.Destination is TDestination);
             if(result != null)
                 return result;
 
-            var stripConversions = conversions
-                .SelectMany
-                (
-                    path => path
-                        .Destination
-                        .GetStripConversion()
-                        .NullableToArray()
-                        .SelectMany(conversion => Combine(isDestination, conversion, path))
-                )
+            var stripPaths = sourcePaths
+                .SelectMany(path => path + path.Destination.StripConversions)
                 .ToArray();
 
-            var resultWithStrip = stripConversions.SingleOrDefault(x => isDestination(x.Destination));
-            if(resultWithStrip != null || getDestinations == null)
-                return resultWithStrip;
+            var stripPathsFeaturePathClosure = stripPaths
+                .SelectMany(path => path + path.Destination.SymmetricPathsClosure())
+                .ToArray();
 
-            var conversionsWithStrip = conversions.Concat(stripConversions).ToArray();
-            if(!conversionsWithStrip.Any())
-                return null;
+            result = stripPathsFeaturePathClosure.SingleOrDefault(path => path.Destination is TDestination);
+            if(result != null)
+                return result;
 
-            var destinations = getDestinations();
-            if(!destinations.Any())
-                return null;
+            var doubleStriped = stripPathsFeaturePathClosure
+                .SelectMany(path => path + path.Destination.StripConversions)
+                ;
 
-            return conversionsWithStrip
-                .SelectMany(outer => destinations.SelectMany(inner => ForcedConversions(outer, inner)))
-                .SingleOrDefault(x => isDestination(x.Destination));
+            Tracer.Assert(!doubleStriped.Any());
+
+            Dumpable.NotImplementedFunction(source);
+            return null;
         }
 
         static IEnumerable<Path> ForcedConversions(Path source, Path destination)
@@ -124,41 +167,13 @@ namespace Reni.Type
             return source
                 .Destination
                 .GetForcedConversions(destination.Source)
-                .Select(conversion => Combine(source, conversion, destination));
-        }
-
-        static Path Combine(Path source, ISimpleFeature conversion, Path destination)
-        {
-            var simpleFeatures = destination.Elements
-                .Concat(new[] {conversion})
-                .Concat(source.Elements);
-            return new Path(simpleFeatures.ToArray());
-        }
-
-        static IEnumerable<Path> Combine(this TypeBase destination, ISimpleFeature element, Path path)
-        {
-            return element
-                .ResultType()
-                .GetReflexiveConversionPaths()
-                .Where(e => e.Destination == destination)
-                .Combine(new Path(element))
-                .Combine(path)
+                .Select(conversion => source + conversion + destination)
                 ;
         }
 
-        static IEnumerable<Path> Combine(Func<TypeBase, bool> isDestination, ISimpleFeature element, Path path)
-        {
-            return element
-                .ResultType()
-                .GetReflexiveConversionPaths()
-                .Where(e => isDestination(e.Destination))
-                .Combine(new Path(element))
-                .Combine(path)
-                ;
-        }
-        static IEnumerable<T> NullableToArray<T>(this T target) { return Equals(target, default(T)) ? new T[0] : new[] {target}; }
+        static IEnumerable<T> NullableToArray<T>(this T target) => Equals(target, default(T)) ? new T[0] : new[] {target};
 
-        public static string DumpObvious(TypeBase source) { return DumpReachable(source, type => type.ReflexiveConversions); }
+        public static string DumpObvious(TypeBase source) { return DumpReachable(source, type => type.SymmetricConversions); }
 
         static string DumpReachable(TypeBase source, Func<TypeBase, IEnumerable<ISimpleFeature>> getConversionElements)
         {
@@ -181,64 +196,90 @@ namespace Reni.Type
             return types;
         }
 
-        static IEnumerable<Path> FeatureClosure
-            (this TypeBase source, Func<TypeBase, IEnumerable<Path>> getElements)
+        internal static IEnumerable<ISimpleFeature> SymmetricFeatureClosure(this TypeBase source)
         {
-            var identity = new Path(source);
-            var types = new TypeBase[0];
-            var elements = new Dictionary<TypeBase, Path>
-            {
-                {source, identity}
-            };
-            yield return identity;
+            var result = RawSymmetricFeatureClosure(source).ToArray();
+            Tracer.Assert
+                (
+                    result.IsSymmetric(),
+                    result.Select
+                        (
+                            path => new
+                            {
+                                source = path.TargetType.DumpPrintText,
+                                destination = path.ResultType().DumpPrintText
+                            }
+                        )
+                        .Stringify("\n")
+                );
+            return result;
+        }
 
+        static bool IsSymmetric(this ISimpleFeature[] list)
+        {
+            var x = list
+                .Types()
+                .Select(t => t.RawSymmetricFeatureClosure().Types().OrderBy(f => f.ObjectId).Count())
+                .ToArray();
+            var y = x.Distinct().ToArray();
+            return y.Length == 1 && x.Length == y.Single();
+        }
+
+        internal static IEnumerable<TypeBase> Types(this IEnumerable<ISimpleFeature> list)
+        {
+            return list
+                .SelectMany(i => new[] {i.TargetType, i.ResultType()})
+                .Distinct();
+        }
+
+        static bool IsSymmetric(ISimpleFeature left, ISimpleFeature right)
+            => left.ResultType() == right.TargetType
+                && right.ResultType() == left.TargetType;
+
+        static IEnumerable<ISimpleFeature> RawSymmetricFeatureClosure(this TypeBase source)
+        {
+            var types = new TypeBase[0];
             var newTypes = new[] {source};
+
             do
             {
                 types = types.Union(newTypes).ToArray();
                 var newElements = newTypes
-                    .SelectMany(type => getElements(type).Combine(elements[type]))
-                    .Where(element => !types.Contains(element.Destination))
+                    .SelectMany(type => type.SymmetricConversions)
                     .ToArray();
                 foreach(var element in newElements)
-                {
                     yield return element;
-                    elements.Add(element.Destination, element);
-                }
 
                 newTypes = newElements
-                    .Select(element => element.Destination)
+                    .Select(element => element.ResultType())
+                    .Except(types)
                     .ToArray();
             } while(newTypes.Any());
         }
 
-        static IEnumerable<Path> Combine(this IEnumerable<Path> listOfNewContinuations, Path path)
+        static IEnumerable<Path> PrefixSymmetricPathsClosure(this TypeBase destination)
         {
-            return listOfNewContinuations.Select
-                (
-                    newPath =>
-                    {
-                        Tracer.Assert
-                            (
-                                path.Destination == newPath.Source,
-                                () => "\npath=" + path.NodeDump + "\nnewPath=" + newPath.NodeDump
-                            );
-                        return new Path(newPath.Elements.Concat(path.Elements).ToArray());
-                    }
-                )
+            var features = destination
+                .SymmetricFeatureClosure()
                 .ToArray();
+            return features
+                .Select(f => f.TargetType)
+                .Distinct()
+                .Select(t => Path.CreateFromList(t, destination, features));
         }
 
-        static IEnumerable<Path> GetReflexiveConversionPaths(this TypeBase target)
+        static IEnumerable<Path> SymmetricPathsClosure(this TypeBase source)
         {
-            return target.FeatureClosure
-                (
-                    type => type
-                        .ReflexiveConversions
-                        .Select(element => new Path(element))
-                )
-                .ToArray()
-                ;
+            var features = source
+                .SymmetricFeatureClosure()
+                .ToArray();
+            return features
+                .Select(f => f.ResultType())
+                .Distinct()
+                .Select(t => Path.CreateFromList(source, t, features));
         }
+
+        static IEnumerable<Path> CheckedAppend(this IEnumerable<Path> a, IEnumerable<Path> b)
+            => a.SelectMany(left => left.CheckedAppend(b));
     }
 }

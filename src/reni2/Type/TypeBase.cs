@@ -47,7 +47,7 @@ namespace Reni.Type
             public readonly ValueCache<Size> Size;
             [Node]
             [SmartNode]
-            public readonly ValueCache<IEnumerable<ISimpleFeature>> ReflexiveConversions;
+            public readonly ValueCache<IEnumerable<ISimpleFeature>> SymmetricConversions;
 
             public Cache(TypeBase parent)
             {
@@ -59,7 +59,7 @@ namespace Reni.Type
                 FunctionInstanceType = new ValueCache<FunctionInstanceType>(() => new FunctionInstanceType(parent));
                 TypeType = new ValueCache<TypeType>(() => new TypeType(parent));
                 Size = new ValueCache<Size>(parent.ObtainSize);
-                ReflexiveConversions = new ValueCache<IEnumerable<ISimpleFeature>>(parent.ObtainReflexiveConversions);
+                SymmetricConversions = new ValueCache<IEnumerable<ISimpleFeature>>(parent.ObtainSymmetricConversions);
             }
         }
 
@@ -504,16 +504,17 @@ namespace Reni.Type
         [DisableDump]
         protected virtual IEnumerable<IGenericProviderForType> Genericize { get { return this.GenericListFromType(); } }
         [DisableDump]
-        public IEnumerable<ISimpleFeature> ReflexiveConversions { get { return _cache.ReflexiveConversions.Value; } }
+        [NotNull]
+        public IEnumerable<ISimpleFeature> SymmetricConversions { get { return _cache.SymmetricConversions.Value; } }
 
         Result AlignResult(Category category) { return UniqueAlign.Result(category, () => ArgCode.Align(), CodeArgs.Arg); }
 
-        IEnumerable<ISimpleFeature> ObtainReflexiveConversions()
-            => ObtainRawReflexiveConversions()
+        IEnumerable<ISimpleFeature> ObtainSymmetricConversions()
+            => ObtainRawSymmetricConversions()
                 .ToDictionary(x => x.ResultType())
                 .Values;
 
-        protected virtual IEnumerable<ISimpleFeature> ObtainRawReflexiveConversions()
+        protected virtual IEnumerable<ISimpleFeature> ObtainRawSymmetricConversions()
         {
             if(Hllw)
                 yield break;
@@ -541,7 +542,7 @@ namespace Reni.Type
             return new ISimpleFeature[0];
         }
 
-        internal virtual ISimpleFeature GetStripConversion() { return null; }
+        internal virtual IEnumerable<ISimpleFeature> StripConversions { get { yield break; } }
         internal virtual IEnumerable<ISimpleFeature> CutEnabledConversion(NumberType destination) { yield break; }
     }
 

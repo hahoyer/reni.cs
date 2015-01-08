@@ -37,6 +37,7 @@ namespace Reni.FeatureTest.BitArrayOp
     [Target(@"(1 negate)dump_print")]
     [Output("-1")]
     [Number]
+    [ConversionService.Test]
     public sealed class Negate : CompilerTest
     {}
 
@@ -44,6 +45,7 @@ namespace Reni.FeatureTest.BitArrayOp
     [Target(@"(1, 12)dump_print")]
     [Output("(1, 12)")]
     [Number]
+    [ConversionService.Test]
     public sealed class TwoPositiveNumbers : CompilerTest
     {}
 
@@ -78,6 +80,7 @@ namespace Reni.FeatureTest.BitArrayOp
     [Target(@"(2+4) dump_print")]
     [Output("6")]
     [Number]
+    [ConversionService.Test]
     public sealed class Add2Numbers : CompilerTest
     {}
 
@@ -85,6 +88,7 @@ namespace Reni.FeatureTest.BitArrayOp
     [Target(@"(40000 - 1  )dump_print")]
     [Output("39999")]
     [Number]
+    [ConversionService.Test]
     public sealed class SubtractOddSizedNumber : CompilerTest
     {}
 
@@ -92,6 +96,7 @@ namespace Reni.FeatureTest.BitArrayOp
     [Target(@"(40000 + 1  )dump_print")]
     [Output("40001")]
     [Number]
+    [ConversionService.Test]
     public sealed class AddOddSizedNumber : CompilerTest
     {}
 
@@ -99,6 +104,7 @@ namespace Reni.FeatureTest.BitArrayOp
     [Target(@"(40000 - 43210)dump_print")]
     [Output("-3210")]
     [Number]
+    [ConversionService.Test]
     public sealed class SubtractLargeEqualSizedNumber : CompilerTest
     {}
 
@@ -106,6 +112,7 @@ namespace Reni.FeatureTest.BitArrayOp
     [Target(@"(400 - 43210)dump_print")]
     [Output("-42810")]
     [Number]
+    [ConversionService.Test]
     public sealed class SubtractLargerSizedNumber : CompilerTest
     {}
 }
