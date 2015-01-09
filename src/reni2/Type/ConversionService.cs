@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using hw.Helper;
 using System.Linq;
 using hw.Debug;
+using Reni.Basics;
 using Reni.Feature;
 
 namespace Reni.Type
@@ -24,7 +25,18 @@ namespace Reni.Type
             Path(params ISimpleFeature[] elements)
             {
                 Tracer.Assert(elements.Any());
-                Tracer.Assert(!elements.Skip(1).Where((element, i) => element.TargetType != elements[i].ResultType()).Any());
+                var features = elements
+                    .Skip(1)
+                    .Select
+                    (
+                        (element, i) => new
+                        {
+                            i,
+                            result = elements[i].ResultType(),
+                            next = element.TargetType
+                        })
+                    .Where(item => item.result != item.next);
+                Tracer.Assert(!features.Any(), features.Stringify("\n"));
                 Source = elements.First().TargetType;
                 Elements = elements;
                 Tracer.Assert(Source != null);
@@ -71,17 +83,10 @@ namespace Reni.Type
             public static Path operator +(ISimpleFeature a, Path b) => new Path(new[] {a}.Concat(b.Elements).ToArray());
             public static Path operator +(Path a, ISimpleFeature b) => new Path(a.Elements.Concat(new[] {b}).ToArray());
 
-            Path CheckedAppend(Path other)
-            {
-                if(Destination == other.Source)
-                    return this + other;
-                return null;
-            }
+            Path CheckedAppend(Path other) => Destination == other.Source ? this + other : null;
 
-            internal IEnumerable<Path> CheckedAppend(IEnumerable<Path> b)
-            {
-                return b.SelectMany(right => CheckedAppend(right).NullableToArray());
-            }
+            internal IEnumerable<Path> CheckedAppend(IEnumerable<Path> b) => b.SelectMany(right => CheckedAppend(right).NullableToArray());
+            internal Result Execute(Category category) => Elements.Aggregate(Source.ArgResult(category), (c,n)=> n.Result(category).ReplaceArg(c));
         }
 
         public static Path FindPath(TypeBase source, TypeBase destination)
@@ -153,14 +158,9 @@ namespace Reni.Type
             return null;
         }
 
-        static IEnumerable<Path> ForcedConversions(Path source, Path destination)
-        {
-            return source
-                .Destination
-                .GetForcedConversions(destination.Source)
-                .Select(conversion => source + conversion + destination)
-                ;
-        }
+        static IEnumerable<ISimpleFeature> ForcedConversions(Path source, Path destination)
+            => source.Destination
+                .GetForcedConversions(destination.Source);
 
         static IEnumerable<T> NullableToArray<T>(this T target) => Equals(target, default(T)) ? new T[0] : new[] {target};
 

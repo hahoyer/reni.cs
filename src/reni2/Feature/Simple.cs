@@ -25,7 +25,7 @@ namespace Reni.Feature
         protected override string GetNodeDump()
             => _function(Category.Type).Type.DumpPrintText
                 + " <== "
-                + ((TypeBase) _function.Target).DumpPrintText
+                + _target.DumpPrintText
                 + "."
                 + _function.Method.Name;
     }

@@ -440,7 +440,7 @@ namespace Reni.Type
 
             var path = ConversionService.FindPath(this, destination);
             if(path != null)
-                return path.Elements.Aggregate(destination.ArgResult(category), (c, n) => c.ReplaceArg(n.Result));
+                return path.Execute(category);
 
             var reachable = ConversionService.DumpObvious(this);
             NotImplementedMethod(category, destination, "reachable", reachable);
@@ -529,9 +529,14 @@ namespace Reni.Type
             var genericProviderForTypes = destination
                 .Genericize
                 .ToArray();
-            return genericProviderForTypes
+            var result = genericProviderForTypes
                 .SelectMany(g => g.GetForcedConversions(this).ToArray())
                 .ToArray();
+
+            Tracer.Assert(result.All(f => f.TargetType == this));
+            Tracer.Assert(result.All(f => f.ResultType() == destination));
+
+            return result;
         }
 
         internal IEnumerable<ISimpleFeature> GetForcedConversions<TDestination>(TDestination destination)

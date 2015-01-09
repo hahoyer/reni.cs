@@ -9,8 +9,7 @@ namespace Reni.FeatureTest.TypeType
     [ApplyTypeOperator]
     public sealed class ApplyTypeOperatorWithCut : CompilerTest
     {
-        protected override string Target { get { return @"31 type instance (100 enable_cut) dump_print"; } }
-        protected override string Output { get { return "-28"; } }
-        protected override IEnumerable<System.Type> DependsOn { get { return new[] {typeof(ApplyTypeOperator)}; } }
+        protected override string Target => @"31 type instance (100 enable_cut) dump_print";
+        protected override string Output => "-28";
     }
 }
