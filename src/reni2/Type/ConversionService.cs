@@ -107,75 +107,81 @@ namespace Reni.Type
                 => Elements.Aggregate(Source.ArgResult(category), (c, n) => n.Result(category).ReplaceArg(c));
         }
 
+        abstract class ConversionProcess : DumpableObject
+        {
+            TypeBase Source { get; }
+            protected ConversionProcess(TypeBase source) { Source = source; }
+            public Path Execute()
+            {
+                if(IsDestination(Source))
+                    return SimplePath;
+
+                var result = DestinationFilter(SymmetricPathsClosureSource);
+                if (result != null)
+                    return result;
+
+                result = DestinationFilter(StripPathsSource);
+                if (result != null)
+                    return result;
+
+                var results = StripPathsSource
+                        .SelectMany(GetForcedConversions)
+                        .ToArray();
+
+                var length = results.Min(path => (int?)path.Elements.Length);
+                return results.SingleOrDefault(path => path.Elements.Length == length);
+            }
+
+            protected abstract IEnumerable<Path> GetForcedConversions(Path left);
+            protected abstract bool IsDestination(TypeBase source);
+
+            Path SimplePath => new Path(Source);
+            IEnumerable<Path> SymmetricPathsClosureSource => Source.SymmetricPathsClosure();
+
+            protected IEnumerable<Path> StripPathsSource 
+                => SymmetricPathsClosureSource
+                .Union(new[] {SimplePath})
+                .SelectMany(path => path + path.Destination.StripConversions);
+
+            Path DestinationFilter(IEnumerable<Path> paths) 
+                => paths
+                .SingleOrDefault(path=>IsDestination(path.Destination));
+
+        }
+
+        sealed class GenericConversionProcess<TDestination> : ConversionProcess
+        {
+            public GenericConversionProcess(TypeBase source) : base(source) { }
+
+            protected override IEnumerable<Path> GetForcedConversions(Path left) => left + left.Destination.GetForcedConversions<TDestination>();
+            protected override bool IsDestination(TypeBase source) => source is TDestination;
+        }
+
+        sealed class ExplicitConversionProcess : ConversionProcess
+        {
+            TypeBase Destination{ get; }
+            public ExplicitConversionProcess(TypeBase source, TypeBase destination)
+                : base(source) { Destination = destination; }
+
+            protected override IEnumerable<Path> GetForcedConversions(Path left) 
+                => SymmetricPathsClosureDestination
+                .SelectMany(right => left + left.Destination.GetForcedConversions(right.Source) + right);
+
+            IEnumerable<Path> SymmetricPathsClosureDestination => Destination.PrefixSymmetricPathsClosure();
+            protected override bool IsDestination(TypeBase source) => source == Destination;
+        }
+
         public static Path FindPath(TypeBase source, TypeBase destination)
         {
-            var sourcePaths = new[] {new Path(source)};
-            if(source == destination)
-                return sourcePaths.Single();
-
-            var destinationPaths = destination.PrefixSymmetricPathsClosure().ToArray();
-            var result = destinationPaths.SingleOrDefault(p => p.Source == source);
-            if(result != null)
-                return result;
-
-            var sourceAndClosurePaths = sourcePaths.Union(source.SymmetricPathsClosure(), Path.Comparer)
-                .ToArray();
-
-            var stripPaths = sourceAndClosurePaths
-                .SelectMany(path => path + path.Destination.StripConversions)
-                .ToArray();
-
-            result = stripPaths.CheckedAppend(destinationPaths).SingleOrDefault();
-            if(result != null)
-                return result;
-
-            var doubleStriped = stripPaths
-                .SelectMany(path => path + path.Destination.SymmetricPathsClosure())
-                .SelectMany(path => path + path.Destination.StripConversions)
-                ;
-
-            Tracer.Assert(!doubleStriped.Any());
-
-            var results = sourceAndClosurePaths.Union(stripPaths, Path.Comparer)
-                .SelectMany(left => destinationPaths.SelectMany(right => left + ForcedConversions(left, right) + right))
-                .ToArray();
-            var length = results.Min(path => (int?)path.Elements.Length);
-            return results.SingleOrDefault(path=>path.Elements.Length == length);
+            var p = new ExplicitConversionProcess(source, destination);
+            return p.Execute();
         }
 
         public static Path FindPath<TDestination>(TypeBase source)
         {
-            var sourcePaths = new[] {new Path(source)};
-            if(source is TDestination)
-                return sourcePaths.Single();
+            var p = new GenericConversionProcess<TDestination>(source);
+            return p.Execute();
 
-            sourcePaths = sourcePaths.Union(source.SymmetricPathsClosure(), Path.Comparer)
-                .ToArray();
-
-            var result = sourcePaths.SingleOrDefault(path => path.Destination is TDestination);
-            if(result != null)
-                return result;
-
-            var stripPaths = sourcePaths
-                .SelectMany(path => path + path.Destination.StripConversions)
-                .ToArray();
-
-            var stripPathsFeaturePathClosure = stripPaths
-                .SelectMany(path => path + path.Destination.SymmetricPathsClosure())
-                .ToArray();
-
-            result = stripPathsFeaturePathClosure.SingleOrDefault(path => path.Destination is TDestination);
-            if(result != null)
-                return result;
-
-            var doubleStriped = stripPathsFeaturePathClosure
-                .SelectMany(path => path + path.Destination.StripConversions)
-                ;
-
-            Tracer.Assert(!doubleStriped.Any());
-
-            Dumpable.NotImplementedFunction(source);
-            return null;
         }
 
         internal static IEnumerable<ISimpleFeature> ForcedConversions(Path source, Path destination)

@@ -528,8 +528,15 @@ namespace Reni.Type
 
             Tracer.Assert(result.All(f => f.TargetType == this));
             Tracer.Assert(result.All(f => f.ResultType() == destination));
+            Tracer.Assert(result.Count() <= 1);
 
             return result;
+        }
+        internal IEnumerable<ISimpleFeature> GetForcedConversions<TDestination>()
+        {
+            NotImplementedMethod();
+            return null;
+
         }
 
         internal IEnumerable<ISimpleFeature> GetForcedConversions<TDestination>(TDestination destination)
