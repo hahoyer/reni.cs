@@ -139,7 +139,7 @@ namespace Reni.Type
             var results = sourceAndClosurePaths.Union(stripPaths, Path.Comparer)
                 .SelectMany(left => destinationPaths.SelectMany(right => left + ForcedConversions(left, right) + right))
                 .ToArray();
-            var length = results.Min(path => path.Elements.Length);
+            var length = results.Min(path => (int?)path.Elements.Length);
             return results.SingleOrDefault(path=>path.Elements.Length == length);
         }
 
