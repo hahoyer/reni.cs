@@ -14,6 +14,21 @@ namespace Reni.Type
         {
             public readonly TypeBase Source;
             public readonly ISimpleFeature[] Elements;
+            static readonly IEqualityComparer<Path> _comparer = new PathComparer();
+
+            sealed class PathComparer : DumpableObject, IEqualityComparer<Path>
+            {
+                public bool Equals(Path x, Path y)
+                {
+                    if(x.Source != y.Source)
+                        return false;
+                    if(x.Elements.Length != y.Elements.Length)
+                        return false;
+                    var @equals = !x.Elements.Where((e, i) => e != y.Elements[i]).Any();
+                    return @equals;
+                }
+                public int GetHashCode(Path obj) => 0;
+            }
 
             public Path(TypeBase source)
             {
@@ -43,6 +58,7 @@ namespace Reni.Type
             }
 
             public TypeBase Destination => Elements.LastOrDefault()?.ResultType() ?? Source;
+            public static IEqualityComparer<Path> Comparer { get { return _comparer; } }
 
             protected override string GetNodeDump()
             {
@@ -85,25 +101,27 @@ namespace Reni.Type
 
             Path CheckedAppend(Path other) => Destination == other.Source ? this + other : null;
 
-            internal IEnumerable<Path> CheckedAppend(IEnumerable<Path> b) => b.SelectMany(right => CheckedAppend(right).NullableToArray());
-            internal Result Execute(Category category) => Elements.Aggregate(Source.ArgResult(category), (c,n)=> n.Result(category).ReplaceArg(c));
+            internal IEnumerable<Path> CheckedAppend(IEnumerable<Path> b)
+                => b.SelectMany(right => CheckedAppend(right).NullableToArray());
+            internal Result Execute(Category category)
+                => Elements.Aggregate(Source.ArgResult(category), (c, n) => n.Result(category).ReplaceArg(c));
         }
 
         public static Path FindPath(TypeBase source, TypeBase destination)
         {
+            var sourcePaths = new[] {new Path(source)};
             if(source == destination)
-                return new Path(source);
+                return sourcePaths.Single();
 
             var destinationPaths = destination.PrefixSymmetricPathsClosure().ToArray();
             var result = destinationPaths.SingleOrDefault(p => p.Source == source);
             if(result != null)
                 return result;
 
-            var sourcePaths = source
-                .SymmetricPathsClosure()
+            var sourceAndClosurePaths = sourcePaths.Union(source.SymmetricPathsClosure(), Path.Comparer)
                 .ToArray();
 
-            var stripPaths = sourcePaths
+            var stripPaths = sourceAndClosurePaths
                 .SelectMany(path => path + path.Destination.StripConversions)
                 .ToArray();
 
@@ -118,18 +136,20 @@ namespace Reni.Type
 
             Tracer.Assert(!doubleStriped.Any());
 
-            return sourcePaths.Concat(stripPaths)
+            var results = sourceAndClosurePaths.Union(stripPaths, Path.Comparer)
                 .SelectMany(left => destinationPaths.SelectMany(right => left + ForcedConversions(left, right) + right))
-                .SingleOrDefault();
+                .ToArray();
+
+            return results.SingleOrDefault();
         }
 
         public static Path FindPath<TDestination>(TypeBase source)
         {
+            var sourcePaths = new[] {new Path(source)};
             if(source is TDestination)
-                return new Path(source);
+                return sourcePaths.Single();
 
-            var sourcePaths = source
-                .SymmetricPathsClosure()
+            sourcePaths = sourcePaths.Union(source.SymmetricPathsClosure(), Path.Comparer)
                 .ToArray();
 
             var result = sourcePaths.SingleOrDefault(path => path.Destination is TDestination);
@@ -158,7 +178,7 @@ namespace Reni.Type
             return null;
         }
 
-        static IEnumerable<ISimpleFeature> ForcedConversions(Path source, Path destination)
+        internal static IEnumerable<ISimpleFeature> ForcedConversions(Path source, Path destination)
             => source.Destination
                 .GetForcedConversions(destination.Source);
 
@@ -208,6 +228,8 @@ namespace Reni.Type
 
         static bool IsSymmetric(this ISimpleFeature[] list)
         {
+            if(!list.Any())
+                return true;
             var x = list
                 .Types()
                 .Select(t => t.RawSymmetricFeatureClosure().Types().OrderBy(f => f.ObjectId).Count())
