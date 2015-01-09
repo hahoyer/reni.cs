@@ -114,14 +114,7 @@ namespace Reni.Type
 
 
         [DisableDump]
-        internal virtual string DumpPrintText
-        {
-            get
-            {
-                NotImplementedMethod();
-                return "";
-            }
-        }
+        internal virtual string DumpPrintText => NodeDump;
 
         internal virtual int? SmartSequenceLength(TypeBase elementType) { return SmartArrayLength(elementType); }
 

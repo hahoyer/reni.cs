@@ -139,8 +139,8 @@ namespace Reni.Type
             var results = sourceAndClosurePaths.Union(stripPaths, Path.Comparer)
                 .SelectMany(left => destinationPaths.SelectMany(right => left + ForcedConversions(left, right) + right))
                 .ToArray();
-
-            return results.SingleOrDefault();
+            var length = results.Min(path => path.Elements.Length);
+            return results.SingleOrDefault(path=>path.Elements.Length == length);
         }
 
         public static Path FindPath<TDestination>(TypeBase source)
@@ -213,7 +213,7 @@ namespace Reni.Type
             Tracer.Assert
                 (
                     result.IsSymmetric(),
-                    result.Select
+                    ()=>result.Select
                         (
                             path => new
                             {
