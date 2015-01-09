@@ -140,7 +140,7 @@ namespace Reni.Type
 
         Result OperationResult(Category category, TypeBase right, IOperation operation)
         {
-            var path = FindPath<NumberType>(right);
+            var path = FindPath(right, x=> x is NumberType);
             if(path != null)
                 return OperationResult(category, operation, (NumberType) path.Destination);
 

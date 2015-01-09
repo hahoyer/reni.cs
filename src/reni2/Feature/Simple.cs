@@ -40,4 +40,26 @@ namespace Reni.Feature
         IFunctionFeature IFeatureImplementation.Function => null;
         ISimpleFeature IFeatureImplementation.Simple => this;
     }
+
+    sealed class Combination : DumpableObject, ISimpleFeature, IEquatable<ISimpleFeature>
+    {
+        ISimpleFeature Left { get; }
+        ISimpleFeature Right { get; }
+        public Combination(ISimpleFeature left, ISimpleFeature right)
+        {
+            Left = left;
+            Right = right;
+        }
+        Result ISimpleFeature.Result(Category category) => Right.Result(category).ReplaceArg(Left.Result);
+        TypeBase ISimpleFeature.TargetType => Left.TargetType;
+
+        bool IEquatable<ISimpleFeature>.Equals(ISimpleFeature other)
+        {
+            var typedOther = other as Combination;
+            if (typedOther == null)
+                return false;
+            return Left == typedOther.Left
+                && Right == typedOther.Right;
+        }
+    }
 }

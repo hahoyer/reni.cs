@@ -435,8 +435,7 @@ namespace Reni.Type
             if(path != null)
                 return path.Execute(category);
 
-            var reachable = ConversionService.DumpObvious(this);
-            NotImplementedMethod(category, destination, "reachable", reachable);
+            NotImplementedMethod(category, destination);
             return null;
         }
 

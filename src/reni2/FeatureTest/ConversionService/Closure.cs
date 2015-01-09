@@ -48,7 +48,7 @@ namespace Reni.FeatureTest.ConversionService
         {
             var numberSmall = new Root(null).BitType.UniqueNumber(4);
             var numberLarge = new Root(null).BitType.UniqueNumber(8);
-            var paths = ForcedConversions(new Path(numberSmall), new Path(numberLarge)).ToArray();
+            var paths = ForcedConversions(new Path((TypeBase)numberSmall), new Path((TypeBase)numberLarge)).ToArray();
 
             Tracer.Assert(paths.Length == 1);
         }

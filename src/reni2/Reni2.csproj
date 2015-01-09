@@ -354,6 +354,7 @@
     <Compile Include="Type\PointerType.cs" />
     <Compile Include="Type\RepeaterType.cs" />
     <Compile Include="Type\SetterTargetType.cs" />
+    <Compile Include="Type\SymmetricClosureService.cs" />
     <Compile Include="Type\TagChild.cs" />
     <Compile Include="Type\TextItemsType.cs" />
     <Compile Include="Type\TextItemType.cs" />
