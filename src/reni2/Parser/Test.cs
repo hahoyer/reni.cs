@@ -8,7 +8,7 @@ using Reni.FeatureTest.Helper;
 namespace Reni.Parser
 {
     [TestFixture]
-    [FeatureTest.ConversionService.Test]
+    [FeatureTest.ConversionService.Closure]
     public sealed class ParserTest : CompilerTest
     {
         public override void Run() { }
@@ -23,7 +23,7 @@ namespace Reni.Parser
         }
 
         [Test]
-        [FeatureTest.ConversionService.Test]
+        [FeatureTest.ConversionService.Closure]
         public void Add2Numbers()
         {
             var syntaxPrototype =

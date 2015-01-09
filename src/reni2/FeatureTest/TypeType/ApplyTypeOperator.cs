@@ -8,7 +8,7 @@ namespace Reni.FeatureTest.TypeType
 {
     [TestFixture]
     [PrioTableTest]
-    [ConversionService.Test]
+    [ConversionService.Closure]
     public sealed class ApplyTypeOperator : CompilerTest
     {
         protected override string Target => @"(31 type instance (28))dump_print";

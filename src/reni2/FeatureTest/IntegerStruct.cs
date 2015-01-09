@@ -39,7 +39,7 @@ Integer8:
     [Output("3")]
     [InstanceCode("(Integer8(1)+Integer8(2))")]
     [IntegerPlusNumber]
-    [ConversionService.Test]
+    [ConversionService.Closure]
     public sealed class IntegerPlusInteger : IntegerStruct {}
 
     [TestFixture]
