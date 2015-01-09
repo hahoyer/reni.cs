@@ -36,8 +36,8 @@ world'
         {
             var issueArray = issues.ToArray();
             var i = 0;                                                               
-            Tracer.Assert(issueArray[i++].IsLogdumpLike(3, 6, IssueId.EOLInString, "'\r"));
-            Tracer.Assert(issueArray[i++].IsLogdumpLike(2, 1, IssueId.EOLInString, "' hallo\r"));
+            Tracer.Assert(issueArray[i++].IsLogdumpLike(3, 6, IssueId.EOLInString, "'"));
+            Tracer.Assert(issueArray[i++].IsLogdumpLike(2, 1, IssueId.EOLInString, "' hallo"));
             Tracer.Assert(issueArray.Length == i);
         }
     }
@@ -51,7 +51,7 @@ world'
             if(target.IssueId != issueId)
                 return false;
 
-            var value = new Regex(Pattern.ReplaceArgs(line, column, issueId)).Match(target.LogDump).Groups[1]
+            var value = new Regex(Pattern.ReplaceArgs(line, column, issueId)).Match(target.LogDump.Replace("\r", "")).Groups[1]
                 .Value;
             if(value != text)
                 return false;
