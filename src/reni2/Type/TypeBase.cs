@@ -546,6 +546,7 @@ namespace Reni.Type
             return new ISimpleFeature[0];
         }
 
+        [DisableDump]
         internal virtual IEnumerable<ISimpleFeature> StripConversions { get { yield break; } }
         internal virtual IEnumerable<ISimpleFeature> CutEnabledConversion(NumberType destination) { yield break; }
     }

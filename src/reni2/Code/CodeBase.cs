@@ -141,9 +141,9 @@ namespace Reni.Code
                     : Visit(new ReplaceAbsoluteArg(arg));
                 return result ?? this;
             }
-            catch(ReplaceArg.TypeException sizeException)
+            catch(ReplaceArg.TypeException typeException)
             {
-                DumpDataWithBreak("", "this", this, "arg", arg, "sizeException", sizeException);
+                DumpDataWithBreak("", "this", this, "arg", arg, "typeException", typeException);
                 throw;
             }
         }

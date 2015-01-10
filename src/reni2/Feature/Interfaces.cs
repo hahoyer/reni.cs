@@ -150,7 +150,7 @@ namespace Reni.Feature
         [DisableDump]
         public override IFeatureImplementation Feature { get; }
 
-        public override Result Converter(Category category) => _definingItem.PointerKind.ArgResult(category);
+        public override Result Converter(Category category) => _definingItem.ArgResult(category);
 
         [DisableDump]
         public override TypeBase Type => _definingItem;
@@ -191,9 +191,10 @@ namespace Reni.Feature
         [DisableDump]
         public override IFeatureImplementation Feature => _result.Feature;
 
-        public override Result Converter(Category category) => _result
-            .Converter(category)
-            .ReplaceArg(_inheritor.Source);
+        public override Result Converter(Category category)
+            => _result
+                .Converter(category)
+                .ReplaceArg(_inheritor.Source);
 
         [DisableDump]
         public override TypeBase Type => _result.Type;

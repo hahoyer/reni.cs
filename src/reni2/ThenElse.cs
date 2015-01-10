@@ -86,10 +86,8 @@ namespace Reni
             return commonType
                 .Result
                 (
-                    category
-                    ,
-                    () => condResult.Code.ThenElse(thenResult.Code, elseResult.Code)
-                    ,
+                    category,
+                    () => condResult.Code.ThenElse(thenResult.Code, elseResult.Code),
                     () => condResult.Exts + thenResult.Exts + elseResult.Exts
                 );
         }

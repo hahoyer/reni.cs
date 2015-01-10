@@ -11,30 +11,30 @@ namespace Reni.Type
         where TParent : TypeBase
     {
         protected TagChild(TParent parent)
-            : base(parent)
-        {}
+            : base(parent) {}
 
         [DisableDump]
         protected abstract string TagTitle { get; }
         [DisableDump]
-        internal override string DumpPrintText { get { return "(" + Parent.DumpPrintText + ")" + TagTitle; } }
+        internal override string DumpPrintText => "(" + Parent.DumpPrintText + ")" + TagTitle;
         [DisableDump]
-        internal override sealed bool Hllw { get { return Parent.Hllw; } }
+        internal override sealed bool Hllw => Parent.Hllw;
         [DisableDump]
-        internal override sealed TypeBase CoreType { get { return Parent.CoreType; } }
-        protected override sealed Size GetSize() { return Parent.Size; }
-        protected override string GetNodeDump() { return Parent.NodeDump + "[" + TagTitle + "]"; }
-        internal override sealed Result Destructor(Category category) { return Parent.Destructor(category); }
-        internal override sealed Result ArrayDestructor(Category category, int count)
+        internal override sealed TypeBase CoreType => Parent.CoreType;
+        protected override sealed Size GetSize() => Parent.Size;
+        protected override string GetNodeDump() => Parent.NodeDump + "[" + TagTitle + "]";
+        internal override sealed Result Destructor(Category category) => Parent.Destructor(category);
+        internal override sealed Result ArrayDestructor(Category category, int count) => Parent.ArrayDestructor(category, count);
+        internal override sealed Result Copier(Category category) => Parent.Copier(category);
+        internal override sealed Result ArrayCopier(Category category, int count) => Parent.ArrayCopier(category, count);
+
+        protected override Result ParentConversionResult(Category category) => Parent.Result(category, ArgResult);
+        internal Result PointerConversionResult(Category category) => PointerConversionResult(category, Parent);
+
+        [DisableDump]
+        internal override IEnumerable<ISimpleFeature> StripConversions
         {
-            return Parent.ArrayDestructor(category, count);
+            get { yield return Extension.SimpleFeature(ParentConversionResult); }
         }
-        internal override sealed Result Copier(Category category) { return Parent.Copier(category); }
-        internal override sealed Result ArrayCopier(Category category, int count) { return Parent.ArrayCopier(category, count); }
-
-        protected override Result ParentConversionResult(Category category) { return Parent.Result(category, ArgResult); }
-        internal Result PointerConversionResult(Category category) { return PointerConversionResult(category, Parent); }
-
-        internal override IEnumerable<ISimpleFeature> StripConversions { get { yield return Extension.SimpleFeature(ParentConversionResult); } }
     }
 }

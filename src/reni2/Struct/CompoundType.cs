@@ -29,6 +29,16 @@ namespace Reni.Struct
         [DisableDump]
         internal override bool HasQuickSize => false;
 
+        [DisableDump]
+        internal override IEnumerable<ISimpleFeature> StripConversions
+        {
+            get
+            {
+                Tracer.Assert(Hllw);
+                yield return Extension.SimpleFeature(RootContext.VoidType.ArgResult, this);
+            }
+        }
+
         IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
             => Extension.SimpleFeature(DumpPrintTokenResult);
 

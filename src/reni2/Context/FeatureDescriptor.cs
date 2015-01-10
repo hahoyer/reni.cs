@@ -26,7 +26,7 @@ namespace Reni.Context
             if(metaFeature != null)
                 return metaFeature.Result(context, category, left, right);
 
-            var trace = ObjectId == -33 && category.HasCode;
+            var trace = ObjectId == -49 && category.HasCode;
             StartMethodDump(trace, context, category, left, right);
             try
             {
@@ -38,7 +38,7 @@ namespace Reni.Context
                 var resultWithConversions = rawResult.ReplaceArg(ConverterResult);
                 Dump("resultWithConversions", resultWithConversions);
                 BreakExecution();
-                var objectResult = context.ObjectResult(category, left).LocalPointerKindResult;
+                var objectResult = context.ObjectResult(category, left);
                 var result = resultWithConversions.ReplaceArg(objectResult);
                 return ReturnMethodDump(result);
             }
@@ -66,7 +66,7 @@ namespace Reni.Context
             if(simpleFeature != null && right == null)
                 return simpleFeature.Result(category);
 
-            var trace = ObjectId == -95 && category.HasCode;
+            var trace = ObjectId == -49 && category.HasCode;
             StartMethodDump(trace, context, category, right);
             try
             {
@@ -84,7 +84,7 @@ namespace Reni.Context
                 BreakExecution();
 
                 var result = replaceArg
-                    .ReplaceAbsolute(function.ObjectReference, c => Type.PointerKind.ArgResult(c));
+                    .ReplaceAbsolute(function.ObjectReference, c => Type.ArgResult(c.Typed).LocalPointerKindResult);
 
                 return ReturnMethodDump(result);
             }
@@ -120,6 +120,7 @@ namespace Reni.Context
             _definingType = definingType;
             _feature = feature;
             _converterResult = converterResult;
+            StopByObjectId(-49);
         }
         [DisableDump]
         protected override TypeBase Type

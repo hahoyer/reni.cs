@@ -97,6 +97,7 @@ namespace Reni.Type
 
         protected override IEnumerable<ISimpleFeature> ObtainRawSymmetricConversions() { yield break; }
 
+        [DisableDump]
         internal override IEnumerable<ISimpleFeature> StripConversions { get { yield return Extension.SimpleFeature(GetterResult); } }
     }
 }

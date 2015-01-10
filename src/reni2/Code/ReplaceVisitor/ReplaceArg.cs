@@ -34,13 +34,6 @@ namespace Reni.Code.ReplaceVisitor
         {
             if(ActualArg.Type == visitedObject.Type)
                 return Actual;
-            var conversion = ActualArg
-                .Type
-                .Conversion(Category.Code.Typed, visitedObject.Type);
-            if(conversion != null)
-                return conversion
-                    .ReplaceArg(ActualArg)
-                    .Code;
             throw new TypeException(Actual, visitedObject);
         }
 
