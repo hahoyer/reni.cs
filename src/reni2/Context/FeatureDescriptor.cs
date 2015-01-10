@@ -26,10 +26,11 @@ namespace Reni.Context
             if(metaFeature != null)
                 return metaFeature.Result(context, category, left, right);
 
-            var trace = ObjectId == -49 && category.HasCode;
+            var trace = ObjectId == 24 && category.HasCode;
             StartMethodDump(trace, context, category, left, right);
             try
             {
+                BreakExecution();
                 var rawResult = Result(context, category, right);
                 var converterResult = ConverterResult(category.Typed);
                 Dump("rawResult", rawResult);
@@ -66,7 +67,7 @@ namespace Reni.Context
             if(simpleFeature != null && right == null)
                 return simpleFeature.Result(category);
 
-            var trace = ObjectId == -49 && category.HasCode;
+            var trace = ObjectId == -48 && category.HasCode;
             StartMethodDump(trace, context, category, right);
             try
             {

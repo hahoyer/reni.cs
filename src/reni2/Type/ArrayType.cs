@@ -86,14 +86,8 @@ namespace Reni.Type
         internal override Result Destructor(Category category) { return ElementType.ArrayDestructor(category, Count); }
         internal override Result Copier(Category category) { return ElementType.ArrayCopier(category, Count); }
 
-        internal Result TextItemResult(Category category)
-        {
-            var uniqueTextItem = UniqueTextItemType;
-            return
-                uniqueTextItem.UniquePointer
-                    .Result(category, UniquePointer.ArgResult(category))
-                ;
-        }
+        internal Result TextItemResult(Category category) 
+            => UniqueTextItemType.Result(category, ArgResult(category));
 
         internal override Result ConstructorResult(Category category, TypeBase argsType)
         {
