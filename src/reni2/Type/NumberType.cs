@@ -125,9 +125,7 @@ namespace Reni.Type
         CodeBase DumpPrintNumberCode()
         {
             var alignedSize = Size.Align(Root.DefaultRefAlignParam.AlignBits);
-            return UniquePointer
-                .ArgCode
-                .DePointer(alignedSize)
+            return ArgCode
                 .DumpPrintNumber(alignedSize);
         }
 
