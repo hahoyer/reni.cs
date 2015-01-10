@@ -45,15 +45,9 @@ namespace Reni.Type
             return Extension.FunctionFeature(ConcatArraysResult);
         }
 
-        Result DumpPrintTokenResult(Category category) { return VoidType.Result(category, DumpPrintCode, CodeArgs.Arg); }
+        Result DumpPrintTokenResult(Category category) => VoidType.Result(category, DumpPrintCode, CodeArgs.Arg);
 
-        CodeBase DumpPrintCode()
-        {
-            return UniquePointer
-                .ArgCode
-                .DePointer(Size)
-                .DumpPrintText(SimpleItemSize);
-        }
+        CodeBase DumpPrintCode() => ArgCode.DumpPrintText(SimpleItemSize);
 
 
         internal Result ToNumberOfBaseResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
