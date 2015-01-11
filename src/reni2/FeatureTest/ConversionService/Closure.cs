@@ -24,6 +24,19 @@ namespace Reni.FeatureTest.ConversionService
         }
 
         [Test]
+        public void ClosureServiceOfNumber()
+        {
+            var source = new Root(null).BitType.Number(1);
+            var paths = Type.ConversionService.ClosureService.Result(source);
+            var destinations = paths.Select(p => p.Destination).ToArray();
+
+            Tracer.Assert(destinations.Contains(source.Pointer));
+            Tracer.Assert(destinations.Contains(source.Align));
+            Tracer.Assert(destinations.Contains(source));
+            Tracer.Assert(destinations.Length == 3);
+        }
+
+        [Test]
         public void OfNumberPointer()
         {
             var number = new Root(null).BitType.Number(4);
@@ -39,5 +52,6 @@ namespace Reni.FeatureTest.ConversionService
             Tracer.Assert(destinations.Contains(number));
             Tracer.Assert(destinations.Length == 3);
         }
+
     }
 }
