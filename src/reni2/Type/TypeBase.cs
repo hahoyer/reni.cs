@@ -73,10 +73,7 @@ namespace Reni.Type
         internal abstract Root RootContext { get; }
 
         protected TypeBase()
-            : base(_nextObjectId++)
-        {
-            _cache = new Cache(this);
-        }
+            : base(_nextObjectId++) { _cache = new Cache(this); }
 
         IContextReference IContextReferenceProvider.ContextReference => Reference;
 
@@ -326,8 +323,9 @@ namespace Reni.Type
                 );
         }
 
-        CodeBase LocalReferenceCode() => ArgCode
-            .LocalReference(Destructor(Category.Code).Code);
+        CodeBase LocalReferenceCode()
+            => ArgCode
+                .LocalReference(this, Destructor(Category.Code).Code);
 
         internal Result ReferenceInCode(Category category, IContextReference target) => Pointer
             .Result(category, target);

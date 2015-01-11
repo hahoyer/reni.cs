@@ -1,27 +1,30 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.Debug;
 using hw.Helper;
+using Reni.Type;
 
 namespace Reni.Code.ReplaceVisitor
 {
     /// <summary>
     ///     Base class for code replacements
     /// </summary>
-    internal abstract class Base : Visitor<CodeBase>
+    abstract class Base : Visitor<CodeBase>
     {
-        private readonly FunctionCache<LocalReference, LocalReference> _internalRefs;
+        readonly FunctionCache<LocalReference, LocalReference> _internalRefs;
 
         protected Base(int objectId)
-            : base(objectId) { _internalRefs = new FunctionCache<LocalReference, LocalReference>(ReVisit); }
+            : base(objectId)
+        {
+            _internalRefs = new FunctionCache<LocalReference, LocalReference>(ReVisit);
+        }
 
-        internal override CodeBase Arg(Arg visitedObject) { return null; }
-        internal override CodeBase ContextRef(ReferenceCode visitedObject) { return null; }
-        internal override CodeBase BitArray(BitArray visitedObject) { return null; }
-        internal override CodeBase Default(CodeBase codeBase) { return null; }
+        internal override CodeBase Arg(Arg visitedObject) => null;
+        internal override CodeBase ContextRef(ReferenceCode visitedObject) => null;
+        internal override CodeBase BitArray(BitArray visitedObject) => null;
+        internal override CodeBase Default(CodeBase codeBase) => null;
 
-        internal override CodeBase LocalReference(LocalReference visitedObject) { return _internalRefs[visitedObject]; }
+        internal override CodeBase LocalReference(LocalReference visitedObject) => _internalRefs[visitedObject];
 
         protected override CodeBase List(List visitedObject, IEnumerable<CodeBase> newList)
         {
@@ -30,7 +33,7 @@ namespace Reni.Code.ReplaceVisitor
                 return null;
             var newListCompleted = newListAsArray
                 .Select((x, i) => x ?? visitedObject.Data[i])
-                .Where(x=>!x.IsEmpty)
+                .Where(x => !x.IsEmpty)
                 .ToArray();
 
             switch(newListCompleted.Length)
@@ -40,7 +43,7 @@ namespace Reni.Code.ReplaceVisitor
                 case 1:
                     return newListCompleted[0];
             }
-            
+
             return CodeBase.List(newListCompleted);
         }
 
@@ -60,11 +63,9 @@ namespace Reni.Code.ReplaceVisitor
         }
 
         internal LocalReference ReVisit(LocalReference visitedObject)
-        {
-            var newCode = visitedObject.Code.Visit(this);
-            if(newCode == null)
-                return null;
-            return newCode.LocalReference(visitedObject.DestructorCode);
-        }
+            => visitedObject
+                .ValueCode
+                .Visit(this)
+                ?.LocalReference(visitedObject.ValueType, visitedObject.DestructorCode);
     }
 }

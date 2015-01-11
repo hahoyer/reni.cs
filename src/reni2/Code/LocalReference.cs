@@ -5,6 +5,7 @@ using hw.Debug;
 using hw.Forms;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Type;
 
 namespace Reni.Code
 {
@@ -12,31 +13,34 @@ namespace Reni.Code
     {
         static int _nextObjectId;
 
-        [Node]
-        readonly CodeBase _unalignedCode;
-
-        [Node]
-        [DisableDump]
-        internal readonly CodeBase DestructorCode;
-
-        public LocalReference(CodeBase code, CodeBase destructorCode)
+        public LocalReference(TypeBase valueType, CodeBase valueCode, CodeBase destructorCode)
             : base(_nextObjectId++)
         {
-            _unalignedCode = code;
+            ValueType = valueType;
+            ValueCode = valueCode;
+            Tracer.Assert(valueCode.Size == ValueType.Size);
             DestructorCode = destructorCode;
             StopByObjectId(-8);
         }
 
-        internal CodeBase Code { get { return _unalignedCode.Align(); } }
+        [Node]
+        [DisableDump]
+        internal CodeBase DestructorCode { get; }
+        [Node]
+        internal CodeBase ValueCode { get; }
+        [Node]
+        public TypeBase ValueType { get; }
 
-        protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
-        protected override CodeArgs GetRefsImplementation() { return _unalignedCode.Exts + DestructorCode.Exts; }
-        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.LocalReference(this); }
+        internal CodeBase Code => ValueCode.Align();
+
+        protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
+        protected override CodeArgs GetRefsImplementation() => ValueCode.Exts + DestructorCode.Exts;
+        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) => actual.LocalReference(this);
 
         internal CodeBase AccompayningDestructorCode(ref Size size, string holder)
         {
             size += Code.Size;
-            return DestructorCode.ReplaceArg(null, LocalVariableReference(holder));
+            return DestructorCode.ReplaceArg(ValueType.Pointer, LocalVariableReference(holder));
         }
     }
 }
