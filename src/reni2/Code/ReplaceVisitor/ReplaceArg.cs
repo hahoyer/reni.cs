@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
+using hw.Helper;
 using System.Linq;
 using hw.Debug;
-using hw.Helper;
 using JetBrains.Annotations;
-using Reni.Basics;
 
 namespace Reni.Code.ReplaceVisitor
 {
@@ -14,7 +13,6 @@ namespace Reni.Code.ReplaceVisitor
     abstract class ReplaceArg : Base
     {
         static int _nextObjectId;
-        readonly Result _actualArg;
 
         internal ReplaceArg(Result actualArg)
             : base(_nextObjectId++)
@@ -22,11 +20,11 @@ namespace Reni.Code.ReplaceVisitor
             Tracer.Assert(actualArg != null, () => "actualArg != null");
             Tracer.Assert(actualArg.HasCode, () => "actualArg.HasCode");
             //Tracer.Assert(actualArg.HasType, () => "actualArg.HasType");
-            _actualArg = actualArg;
+            ActualArg = actualArg;
         }
 
         [DisableDump]
-        protected Result ActualArg { get { return _actualArg; } }
+        protected Result ActualArg { get; }
 
         protected abstract CodeBase Actual { get; }
 
