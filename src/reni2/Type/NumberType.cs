@@ -129,7 +129,7 @@ namespace Reni.Type
             {
                 var conversion = right.Conversion(Category.Code, destination).Code;
                 return OperationResult(category, operation, destination)
-                    .ReplaceArg(c => right.Conversion(c, destination));
+                    .ReplaceArg(c => right.Conversion(c, destination.Pointer));
             }
 
             NotImplementedMethod(category, right, operation);
