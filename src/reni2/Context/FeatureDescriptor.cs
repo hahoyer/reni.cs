@@ -26,7 +26,7 @@ namespace Reni.Context
             if(metaFeature != null)
                 return metaFeature.Result(context, category, left, right);
 
-            var trace = ObjectId == -24 && category.HasCode;
+            var trace = ObjectId == 37 && category.HasCode;
             StartMethodDump(trace, context, category, left, right);
             try
             {

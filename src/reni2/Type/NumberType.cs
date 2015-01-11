@@ -110,7 +110,7 @@ namespace Reni.Type
         {
             return Parent
                 .TextItemResult(category)
-                .ReplaceArg(ParentConversionResult);
+                .ReplaceArg(c => PointerConversionResult(c, Parent));
         }
 
         Result NegationResult(Category category)
