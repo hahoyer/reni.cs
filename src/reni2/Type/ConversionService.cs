@@ -128,9 +128,10 @@ namespace Reni.Type
             public ExplicitConversionProcess(TypeBase source, TypeBase destination)
                 : base(source) { Destination = destination; }
 
-            protected override IEnumerable<Path> GetForcedConversions(Path left)
-                => Destination.PreviousConversionStep()
-                    .SelectMany(right => left + left.Destination.GetForcedConversions(right.TargetType) + new Path(right));
+            protected override IEnumerable<Path> GetForcedConversions(Path left) 
+                => Destination
+                .SymmetricPathsClosureBackwards()
+                .SelectMany(right => left + left.Destination.GetForcedConversions(right.Source) + right);
 
             protected override bool IsDestination(TypeBase source) => source == Destination;
         }
@@ -240,12 +241,12 @@ namespace Reni.Type
         internal static IEnumerable<Path> SymmetricPathsClosure(this TypeBase source)
             => new[] {new Path(source)}.Concat(SymmetricClosureService.From(source).Select(f => new Path(f)));
 
-        static IEnumerable<ISimpleFeature> PreviousConversionStep(this TypeBase destination)
-            => SymmetricClosureService.To(destination);
+        internal static IEnumerable<Path> SymmetricPathsClosureBackwards(this TypeBase source)
+            => new[] { new Path(source) }.Concat(SymmetricClosureService.To(source).Select(f => new Path(f)));
 
-        sealed class ClosureService
+        internal sealed class ClosureService
         {
-            internal static IEnumerable<Path> Result(TypeBase source) => new ClosureService(source).Value;
+            internal static IEnumerable<Path> Result(TypeBase source) => new ClosureService(source).Result();
 
             static IEnumerable<ISimpleFeature> NextConversionStep(TypeBase source)
                 => SymmetricClosureService.From(source).Union(source.StripConversions);
@@ -262,37 +263,40 @@ namespace Reni.Type
                 if(startFeature != null)
                     startType = startFeature.Destination;
 
-                foreach(var feature in NextConversionStep(startType))
+                var newFeatures = NextConversionStep(startType)
+                    .Where(feature => !_foundTypes.Contains(feature.ResultType()))
+                    .Select(feature => startFeature == null ? new Path(feature) : startFeature + feature);
+                foreach(var newPath in newFeatures)
                 {
-                    var destination = feature.ResultType();
-                    if(_foundTypes.Contains(destination))
-                        continue;
-                    var newFeature = startFeature == null ? new Path(feature) : startFeature + feature;
-                    yield return newFeature;
-                    _newPaths.Add(newFeature);
-                    _foundTypes.Add(destination);
+                    yield return newPath;
+                    AddPath(newPath);
                 }
             }
 
-            IEnumerable<Path> Value
+            void AddPath(Path newPath)
             {
-                get
-                {
-                    _foundTypes = new List<TypeBase>();
+                if (_newPaths == null)
                     _newPaths = new List<Path>();
+                _newPaths.Add(newPath);
 
-                    yield return new Path(Source);
+                if (_foundTypes == null)
+                    _foundTypes = new List<TypeBase>();
+                _foundTypes.Add(newPath.Destination);
+            }
 
-                    foreach(var feature in Combination())
-                        yield return feature;
+            IEnumerable<Path> Result()
+            {
+                _newPaths = null;
+                var singularPath = new Path(Source);
+                yield return singularPath;
+                AddPath(singularPath);
 
-                    while(_newPaths.Any())
-                    {
-                        var features = _newPaths;
-                        _newPaths = new List<Path>();
-                        foreach(var feature in features.SelectMany(Combination))
-                            yield return feature;
-                    }
+                while (_newPaths != null && _newPaths.Any())
+                {
+                    var features = _newPaths;
+                    _newPaths = null;
+                    foreach(var newPath in (features.SelectMany(Combination).ToArray()))
+                        yield return newPath;
                 }
             }
         }
