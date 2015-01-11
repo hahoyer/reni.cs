@@ -101,7 +101,7 @@ namespace Reni.Code
         {
             if(Size.IsZero && targetSize.IsZero)
                 return this;
-            return Add(new DePointer(targetSize, targetSize));
+            return Add(new DePointer(targetSize.ByteAlignedSize, targetSize));
         }
 
         internal CodeBase BitCast(Size size)
