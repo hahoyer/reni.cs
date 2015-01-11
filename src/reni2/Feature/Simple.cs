@@ -45,7 +45,21 @@ namespace Reni.Feature
     {
         ISimpleFeature Left { get; }
         ISimpleFeature Right { get; }
-        public Combination(ISimpleFeature left, ISimpleFeature right)
+
+        static public ISimpleFeature CheckedCreate(ISimpleFeature left, ISimpleFeature right)
+        {
+            if(left == null)
+                return right;
+            if(right == null)
+                return left;
+            Tracer.Assert(left.ResultType() == right.TargetType);
+            if(right.ResultType() == left.TargetType)
+                return null;
+
+            return new Combination(left,right);
+        }
+
+        Combination(ISimpleFeature left, ISimpleFeature right)
         {
             Left = left;
             Right = right;

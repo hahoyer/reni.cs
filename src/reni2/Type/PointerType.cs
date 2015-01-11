@@ -14,7 +14,7 @@ namespace Reni.Type
         : TypeBase
             , IProxyType
             , ISimpleFeature
-            , IReferenceType
+            , IReference
             , IFeatureInheritor
     {
         readonly int _order;
@@ -33,8 +33,8 @@ namespace Reni.Type
 
         Size IContextReference.Size => Size;
         int IContextReference.Order => _order;
-        ISimpleFeature IReferenceType.Converter => this;
-        bool IReferenceType.IsWeak => true;
+        ISimpleFeature IReference.Converter => this;
+        bool IReference.IsWeak => true;
 
         [DisableDump]
         internal override Root RootContext => ValueType.RootContext;
@@ -67,12 +67,12 @@ namespace Reni.Type
         internal override int? SmartSequenceLength(TypeBase elementType) => ValueType.SmartSequenceLength(elementType);
         internal override int? SmartArrayLength(TypeBase elementType) => ValueType.SmartArrayLength(elementType);
         protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
-        protected override ArrayType ObtainArray(int count) => ValueType.UniqueArray(count);
+        protected override ArrayType ObtainArray(int count) => ValueType.Array(count);
 
         Result DereferenceResult(Category category)
         {
             return ValueType
-                .UniqueAlign
+                .Align
                 .Result
                 (
                     category,

@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
+using hw.Helper;
 using System.Linq;
 using hw.Debug;
-using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
-using Reni.Numeric;
 using Reni.TokenClasses;
 
 namespace Reni.Type
@@ -43,59 +42,49 @@ namespace Reni.Type
             _textItemCache = new ValueCache<TextItemType>(() => new TextItemType(this));
         }
 
-        TypeBase IRepeaterType.ElementType { get { return ElementType; } }
-        Size IRepeaterType.IndexSize { get { return IndexSize; } }
+        TypeBase IRepeaterType.ElementType => ElementType;
+        Size IRepeaterType.IndexSize => IndexSize;
 
         [DisableDump]
-        public NumberType UniqueNumber { get { return _numberCache.Value; } }
+        public NumberType Number => _numberCache.Value;
 
         [DisableDump]
-        internal TextItemType UniqueTextItemType { get { return _textItemCache.Value; } }
+        internal TextItemType TextItemType => _textItemCache.Value;
 
         [DisableDump]
-        internal EnableArrayOverSizeType EnableArrayOverSizeType { get { return _enableArrayOverSizeTypeCache.Value; } }
+        internal EnableArrayOverSizeType EnableArrayOverSizeType => _enableArrayOverSizeTypeCache.Value;
 
         [DisableDump]
-        internal override bool Hllw { get { return Count == 0 || ElementType.Hllw; } }
+        internal override bool Hllw => Count == 0 || ElementType.Hllw;
 
         [DisableDump]
-        public override TypeBase ArrayElementType { get { return ElementType; } }
+        public override TypeBase ArrayElementType => ElementType;
 
-        internal override string DumpPrintText { get { return "(" + ElementType.DumpPrintText + ")*" + Count; } }
+        internal override string DumpPrintText => "(" + ElementType.DumpPrintText + ")*" + Count;
 
         IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
-        {
-            return Extension.SimpleFeature(DumpPrintTokenResult);
-        }
+            => Extension.SimpleFeature(DumpPrintTokenResult);
 
         IFeatureImplementation ISymbolProvider<ConcatArrays, IFeatureImplementation>.Feature(ConcatArrays tokenClass)
-        {
-            return Extension.FunctionFeature(ConcatArraysResult);
-        }
+            => Extension.FunctionFeature(ConcatArraysResult);
 
         IFeatureImplementation ISymbolProvider<TextItem, IFeatureImplementation>.Feature(TextItem tokenClass)
-        {
-            return Extension.SimpleFeature(TextItemResult);
-        }
+            => Extension.SimpleFeature(TextItemResult);
 
         internal override int? SmartArrayLength(TypeBase elementType)
-        {
-            return ElementType.IsConvertable(elementType) ? Count : base.SmartArrayLength(elementType);
-        }
-        protected override Size GetSize() { return ElementType.Size * Count; }
-        internal override Result Destructor(Category category) { return ElementType.ArrayDestructor(category, Count); }
-        internal override Result Copier(Category category) { return ElementType.ArrayCopier(category, Count); }
+            => ElementType.IsConvertable(elementType) ? Count : base.SmartArrayLength(elementType);
 
-        internal Result TextItemResult(Category category) => PointerConversionResult(category, UniqueTextItemType);
+        protected override Size GetSize() => ElementType.Size * Count;
+        internal override Result Destructor(Category category) => ElementType.ArrayDestructor(category, Count);
+        internal override Result Copier(Category category) => ElementType.ArrayCopier(category, Count);
 
-        internal override Result ConstructorResult(Category category, TypeBase argsType)
-        {
-            return Result
-                (
-                    category,
-                    c => InternalConstructorResult(c, argsType)
-                );
-        }
+        internal Result TextItemResult(Category category) => PointerConversionResult(category, TextItemType);
+
+        internal override Result ConstructorResult(Category category, TypeBase argsType) => Result
+            (
+                category,
+                c => InternalConstructorResult(c, argsType)
+            );
 
         Result InternalConstructorResult(Category category, TypeBase argsType)
         {
@@ -116,8 +105,8 @@ namespace Reni.Type
         Result InternalConstructorResult(Category category, IFunctionFeature function)
         {
             var indexType = BitType
-                .UniqueNumber(BitsConst.Convert(Count).Size.ToInt())
-                .UniqueAlign;
+                .Number(BitsConst.Convert(Count).Size.ToInt())
+                .Align;
             var constructorResult = function.ApplyResult(category.Typed, indexType);
             var elements = Count
                 .Select(i => ElementConstructorResult(category, constructorResult, i, indexType))
@@ -137,42 +126,38 @@ namespace Reni.Type
                 & category;
         }
 
-        TypeBase ElementAccessType { get { return ElementType.TypeForArrayElement; } }
+        TypeBase ElementAccessType => ElementType.TypeForArrayElement;
 
         [DisableDump]
-        internal override Root RootContext { get { return ElementType.RootContext; } }
+        internal override Root RootContext => ElementType.RootContext;
 
         [DisableDump]
-        IContextReference ObjectReference { get { return UniquePointerType; } }
+        IContextReference ObjectReference => Reference;
 
         [DisableDump]
-        internal TypeBase IndexType { get { return RootContext.BitType.UniqueNumber(IndexSize.ToInt()); } }
+        internal TypeBase IndexType => RootContext.BitType.Number(IndexSize.ToInt());
 
-        Size IndexSize { get { return Size.AutoSize(Count).Align(Root.DefaultRefAlignParam.AlignBits); } }
+        Size IndexSize => Size.AutoSize(Count).Align(Root.DefaultRefAlignParam.AlignBits);
 
-        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta { get { return null; } }
-        IMetaFunctionFeature IFeatureImplementation.Meta { get { return null; } }
-        IFunctionFeature IFeatureImplementation.Function { get { return this; } }
-        ISimpleFeature IFeatureImplementation.Simple { get { return null; } }
+        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
+        IMetaFunctionFeature IFeatureImplementation.Meta => null;
+        IFunctionFeature IFeatureImplementation.Function => this;
+        ISimpleFeature IFeatureImplementation.Simple => null;
 
-        bool IFunctionFeature.IsImplicit { get { return false; } }
-        IContextReference IFunctionFeature.ObjectReference { get { return ObjectReference; } }
+        bool IFunctionFeature.IsImplicit => false;
+        IContextReference IFunctionFeature.ObjectReference => ObjectReference;
 
-        protected override string GetNodeDump() { return ElementType.NodeDump + "*" + Count; }
+        protected override string GetNodeDump() => ElementType.NodeDump + "*" + Count;
 
         internal Result ConcatArraysResult(Category category, IContextReference objectReference, TypeBase argsType)
-        {
-            return InternalConcatArrays(category, objectReference, argsType);
-        }
+            => InternalConcatArrays(category, objectReference, argsType);
 
         internal Result ConcatArraysFromReference(Category category, IContextReference objectReference, TypeBase argsType)
-        {
-            return InternalConcatArrays(category, objectReference, argsType);
-        }
+            => InternalConcatArrays(category, objectReference, argsType);
 
         internal Result InternalConcatArrays(Category category, IContextReference objectReference, TypeBase argsType)
         {
-            var oldElementsResult = UniquePointer
+            var oldElementsResult = Pointer
                 .Result(category.Typed, objectReference).DereferenceResult;
 
             var isElementArg = argsType.IsConvertable(ElementAccessType);
@@ -180,11 +165,11 @@ namespace Reni.Type
             var newElementsResultRaw
                 = isElementArg
                     ? argsType.Conversion(category.Typed, ElementAccessType)
-                    : argsType.Conversion(category.Typed, ElementType.UniqueArray(newCount));
+                    : argsType.Conversion(category.Typed, ElementType.Array(newCount));
 
             var newElementsResult = newElementsResultRaw.DereferencedAlignedResult();
             var result = ElementType
-                .UniqueArray(Count + newCount)
+                .Array(Count + newCount)
                 .Result(category, newElementsResult + oldElementsResult);
             return result;
         }
@@ -199,8 +184,8 @@ namespace Reni.Type
 
         CodeBase CreateDumpPrintCode()
         {
-            var elementReference = ElementType.UniquePointer;
-            var argCode = UniquePointer.ArgCode;
+            var elementReference = ElementType.Pointer;
+            var argCode = Pointer.ArgCode;
             var elementDumpPrint = elementReference.GenericDumpPrintResult(Category.Code).Code;
             var code = CodeBase.DumpPrintText("<<(");
             for(var i = 0; i < Count; i++)
@@ -213,10 +198,10 @@ namespace Reni.Type
             return code + CodeBase.DumpPrintText(")");
         }
 
-        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType) { return ApplyResult(category, argsType); }
+        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType) => ApplyResult(category, argsType);
         Result ApplyResult(Category category, TypeBase argsType)
         {
-            var objectResult = UniquePointer
+            var objectResult = Pointer
                 .Result(category, ObjectReference);
 
             var argsResult = argsType
@@ -236,7 +221,7 @@ namespace Reni.Type
                 .Result
                 (
                     category,
-                    () => PointerKind.ArgCode.DePointer(Size),
+                    () => SmartPointer.ArgCode.DePointer(Size),
                     CodeArgs.Arg
                 );
         }

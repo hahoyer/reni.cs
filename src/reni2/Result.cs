@@ -512,7 +512,7 @@ namespace Reni
                     CompleteCategory,
                     () => Hllw.Value,
                     () => alignedSize,
-                    () => Type.UniqueAlign,
+                    () => Type.Align,
                     () => Code.BitCast(alignedSize),
                     () => Exts
                     );
@@ -805,7 +805,7 @@ namespace Reni
             {
                 if(Type.Hllw)
                     return this;
-                if(Type is IReferenceType)
+                if(Type is IReference)
                     return this;
                 return Type
                     .LocalReferenceResult(CompleteCategory)
@@ -894,7 +894,7 @@ namespace Reni
         internal Result DereferencedAlignedResult()
         {
             var destinationType = Type
-                .AutomaticDereferenceType.UniqueAlign;
+                .AutomaticDereferenceType.Align;
             return Type
                 .Conversion(CompleteCategory, destinationType)
                 .ReplaceArg(this);

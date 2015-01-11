@@ -41,7 +41,7 @@ namespace Reni.Type
         protected override CodeBase SetterCode()
         {
             return
-                Pair(ValueType.PointerKind)
+                Pair(ValueType.SmartPointer)
                     .ArgCode
                     .Assignment(ValueType.Size);
         }

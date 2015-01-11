@@ -42,7 +42,7 @@ namespace Reni.Struct
         }
 
         protected override FunctionId FunctionId { get { return _functionId; } }
-        protected override TypeBase CallType { get { return base.CallType.Pair(Parent.ValueType.UniquePointer); } }
+        protected override TypeBase CallType { get { return base.CallType.Pair(Parent.ValueType.Pointer); } }
         protected override Size RelevantValueSize { get { return Root.DefaultRefAlignParam.RefSize; } }
     }
 }

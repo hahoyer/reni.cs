@@ -97,7 +97,7 @@ namespace Reni.Struct
         }
 
         internal override Result ObtainResult(ContextBase context, Category category) => context
-            .UniqueCompound(this)
+            .Compound(this)
             .Result(category);
 
         sealed class Data : DumpableObject
@@ -130,7 +130,7 @@ namespace Reni.Struct
         {
             internal int Value { get; }
             internal Position(int value) { Value = value; }
-            internal AccessFeature Convert(CompoundView accessPoint) => accessPoint.UniqueAccessFeature(Value);
+            internal AccessFeature Convert(CompoundView accessPoint) => accessPoint.AccessFeature(Value);
         }
     }
 

@@ -46,10 +46,12 @@ namespace Reni.Type
                 var destination = navigator.End(feature);
                 if(_foundTypes.Contains(destination))
                     continue;
+                _foundTypes.Add(destination);
                 var newFeature = navigator.Combine(startFeature, feature);
+                if(newFeature == null)
+                    continue;
                 yield return newFeature;
                 _newFeatures.Add(newFeature);
-                _foundTypes.Add(destination);
             }
         }
 
@@ -76,9 +78,7 @@ namespace Reni.Type
             TypeBase INavigator.End(ISimpleFeature feature) => feature.ResultType();
 
             ISimpleFeature INavigator.Combine(ISimpleFeature start, ISimpleFeature end)
-                => start == null
-                    ? end
-                    : new Combination(start, end);
+                => Feature.Combination.CheckedCreate(start, end);
         }
 
         sealed class BackwardNavigator : INavigator
@@ -87,9 +87,7 @@ namespace Reni.Type
             TypeBase INavigator.End(ISimpleFeature feature) => feature.TargetType;
 
             ISimpleFeature INavigator.Combine(ISimpleFeature start, ISimpleFeature end)
-                => start == null
-                    ? end
-                    : new Combination(end, start);
+                => Feature.Combination.CheckedCreate(end, start);
         }
     }
 }

@@ -21,7 +21,7 @@ namespace Reni.Type
         protected override Result GetterResult(Category category)
         {
             return ValueType
-                .PointerKind
+                .SmartPointer
                 .Result(category, GetterCode);
         }
 

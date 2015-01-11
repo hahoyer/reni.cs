@@ -34,7 +34,7 @@ namespace Reni.Type
             public readonly FunctionCache<TypeBase, Pair> Pair;
             [Node]
             [SmartNode]
-            public readonly ValueCache<IReferenceType> Pointer;
+            public readonly ValueCache<IReference> Reference;
             [Node]
             [SmartNode]
             public readonly ValueCache<TypeType> TypeType;
@@ -52,7 +52,7 @@ namespace Reni.Type
             public Cache(TypeBase parent)
             {
                 EnableCut = new ValueCache<EnableCut>(() => new EnableCut(parent));
-                Pointer = new ValueCache<IReferenceType>(parent.ObtainPointer);
+                Reference = new ValueCache<IReference>(parent.ObtainReference);
                 Pair = new FunctionCache<TypeBase, Pair>(first => new Pair(first, parent));
                 Array = new FunctionCache<int, ArrayType>(parent.ObtainArray);
                 Aligner = new FunctionCache<int, AlignType>(alignBits => new AlignType(parent, alignBits));
@@ -78,10 +78,10 @@ namespace Reni.Type
             _cache = new Cache(this);
         }
 
-        IContextReference IContextReferenceProvider.ContextReference { get { return UniquePointerType; } }
+        IContextReference IContextReferenceProvider.ContextReference => Reference;
 
         [Node]
-        internal Size Size { get { return _cache.Size.Value; } }
+        internal Size Size => _cache.Size.Value;
 
         [NotNull]
         protected virtual Size GetSize()
@@ -110,13 +110,13 @@ namespace Reni.Type
 
 
         [DisableDump]
-        internal virtual TypeBase[] ToList { get { return new[] {this}; } }
+        internal virtual TypeBase[] ToList => new[] {this};
 
 
         [DisableDump]
         internal virtual string DumpPrintText => NodeDump;
 
-        internal virtual int? SmartSequenceLength(TypeBase elementType) { return SmartArrayLength(elementType); }
+        internal virtual int? SmartSequenceLength(TypeBase elementType) => SmartArrayLength(elementType);
 
         internal virtual int? SmartArrayLength(TypeBase elementType)
         {
@@ -127,41 +127,26 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        internal EnableCut UniqueEnableCutType { get { return _cache.EnableCut.Value; } }
+        internal EnableCut EnableCut => _cache.EnableCut.Value;
 
         [DisableDump]
-        internal TypeBase UniquePointer { get { return UniquePointerType.Type(); } }
+        internal TypeBase Pointer => Reference.Type();
 
         [DisableDump]
-        internal virtual IReferenceType UniquePointerType { get { return _cache.Pointer.Value; } }
+        internal virtual IReference Reference => _cache.Reference.Value;
 
         [DisableDump]
-        internal CodeBase ArgCode { get { return CodeBase.Arg(this); } }
+        internal CodeBase ArgCode => CodeBase.Arg(this);
 
         [DisableDump]
         internal TypeBase AutomaticDereferenceType
-        {
-            get
-            {
-                if(IsWeakReference)
-                    return ReferenceType.Converter.TargetType.AutomaticDereferenceType;
-                return this;
-            }
-        }
+            => IsWeakReference ? ReferenceType.Converter.TargetType.AutomaticDereferenceType : this;
 
         [DisableDump]
-        internal TypeBase PointerKind
-        {
-            get
-            {
-                if(Hllw)
-                    return this;
-                return UniquePointer;
-            }
-        }
+        internal TypeBase SmartPointer => Hllw ? this : Pointer;
 
         [DisableDump]
-        internal TypeBase UniqueAlign
+        internal TypeBase Align
         {
             get
             {
@@ -173,29 +158,27 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        internal virtual bool IsCuttingPossible { get { return false; } }
+        internal virtual bool IsCuttingPossible => false;
 
         [DisableDump]
-        internal virtual bool IsAligningPossible { get { return true; } }
+        internal virtual bool IsAligningPossible => true;
 
         [DisableDump]
-        internal virtual Size SimpleItemSize { get { return null; } }
+        internal virtual Size SimpleItemSize => null;
 
-        Result VoidCodeAndRefs(Category category) { return RootContext.VoidResult(category & (Category.Code | Category.Exts)); }
+        Result VoidCodeAndRefs(Category category) => RootContext.VoidResult(category & (Category.Code | Category.Exts));
 
-        internal ArrayType UniqueArray(int count) { return _cache.Array[count]; }
-        protected virtual TypeBase ReversePair(TypeBase first) { return first._cache.Pair[this]; }
-        internal virtual TypeBase Pair(TypeBase second) { return second.ReversePair(this); }
-        internal virtual Result Destructor(Category category) { return VoidCodeAndRefs(category); }
-        internal virtual Result ArrayDestructor(Category category, int count) { return VoidCodeAndRefs(category); }
-        internal virtual Result Copier(Category category) { return VoidCodeAndRefs(category); }
-        internal virtual Result ArrayCopier(Category category, int count) { return VoidCodeAndRefs(category); }
+        internal ArrayType Array(int count) => _cache.Array[count];
+        protected virtual TypeBase ReversePair(TypeBase first) => first._cache.Pair[this];
+        internal virtual TypeBase Pair(TypeBase second) => second.ReversePair(this);
+        internal virtual Result Destructor(Category category) => VoidCodeAndRefs(category);
+        internal virtual Result ArrayDestructor(Category category, int count) => VoidCodeAndRefs(category);
+        internal virtual Result Copier(Category category) => VoidCodeAndRefs(category);
+        internal virtual Result ArrayCopier(Category category, int count) => VoidCodeAndRefs(category);
         internal virtual Result ApplyTypeOperator(Result argResult)
-        {
-            return argResult.Type.Conversion(argResult.CompleteCategory, this).ReplaceArg(argResult);
-        }
+            => argResult.Type.Conversion(argResult.CompleteCategory, this).ReplaceArg(argResult);
         internal Result ArgResult(Category category) { return Result(category, () => ArgCode, CodeArgs.Arg); }
-        Result PointerArgResult(Category category) { return UniquePointer.ArgResult(category); }
+        Result PointerArgResult(Category category) => Pointer.ArgResult(category);
 
         internal Result Result(Category category, IContextReference target)
         {
@@ -209,16 +192,13 @@ namespace Reni.Type
                 );
         }
 
-        internal Result Result(Category category, Result codeAndRefs)
-        {
-            return new Result
-                (
-                category,
-                getType: () => this,
-                getCode: () => codeAndRefs.Code,
-                getExts: () => codeAndRefs.Exts
-                );
-        }
+        internal Result Result(Category category, Result codeAndRefs) => new Result
+            (
+            category,
+            getType: () => this,
+            getCode: () => codeAndRefs.Code,
+            getExts: () => codeAndRefs.Exts
+            );
 
         internal Result Result(Category category, Func<Category, Result> getCodeAndRefs)
         {
@@ -232,30 +212,27 @@ namespace Reni.Type
                 );
         }
 
-        internal Result Result(Category category, Func<CodeBase> getCode = null, Func<CodeArgs> getArgs = null)
-        {
-            return new Result
-                (
-                category,
-                getType: () => this,
-                getCode: getCode,
-                getExts: getArgs
-                );
-        }
+        internal Result Result(Category category, Func<CodeBase> getCode = null, Func<CodeArgs> getArgs = null) => new Result
+            (
+            category,
+            getType: () => this,
+            getCode: getCode,
+            getExts: getArgs
+            );
 
-        internal TypeBase CommonType(TypeBase elseType) { return elseType.IsConvertable(this) ? this : elseType; }
+        internal TypeBase CommonType(TypeBase elseType) => elseType.IsConvertable(this) ? this : elseType;
 
         /// <summary>
         ///     Gets the icon key.
         /// </summary>
         /// <value> The icon key. </value>
-        string IIconKeyProvider.IconKey { get { return "Type"; } }
+        string IIconKeyProvider.IconKey => "Type";
 
         [DisableDump]
-        internal TypeType UniqueTypeType { get { return _cache.TypeType.Value; } }
+        internal TypeType TypeType => _cache.TypeType.Value;
 
         [DisableDump]
-        internal TypeBase UniqueFunctionInstanceType { get { return _cache.FunctionInstanceType.Value; } }
+        internal TypeBase FunctionInstance => _cache.FunctionInstanceType.Value;
 
         [DisableDump]
         internal virtual CompoundView FindRecentCompoundView
@@ -268,70 +245,52 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        internal virtual bool IsLambda { get { return false; } }
+        internal virtual bool IsLambda => false;
 
         [DisableDump]
-        internal virtual IReferenceType ReferenceType { get { return this as IReferenceType; } }
+        internal virtual IReference ReferenceType => this as IReference;
 
         [DisableDump]
-        internal bool IsWeakReference { get { return ReferenceType != null && ReferenceType.IsWeak; } }
+        internal bool IsWeakReference => ReferenceType != null && ReferenceType.IsWeak;
 
         [DisableDump]
-        internal virtual IFeatureImplementation Feature { get { return this as IFeatureImplementation; } }
+        internal virtual IFeatureImplementation Feature => this as IFeatureImplementation;
 
         [DisableDump]
-        internal virtual bool HasQuickSize { get { return true; } }
+        internal virtual bool HasQuickSize => true;
 
         [DisableDump]
-        internal VoidType VoidType { get { return RootContext.VoidType; } }
+        internal VoidType VoidType => RootContext.VoidType;
 
         [DisableDump]
-        internal BitType BitType { get { return RootContext.BitType; } }
+        internal BitType BitType => RootContext.BitType;
 
         [DisableDump]
-        internal virtual TypeBase CoreType { get { return this; } }
+        internal virtual TypeBase CoreType => this;
 
         [DisableDump]
-        internal TypeBase TypeForSearchProbes
-        {
-            get
-            {
-                return DePointer(Category.Type).Type
-                    .DeAlign(Category.Type).Type;
-            }
-        }
+        internal TypeBase TypeForSearchProbes => DePointer(Category.Type).Type
+            .DeAlign(Category.Type).Type;
 
         [DisableDump]
-        internal TypeBase TypeForStructureElement { get { return DeAlign(Category.Type).Type; } }
+        internal TypeBase TypeForStructureElement => DeAlign(Category.Type).Type;
 
         [DisableDump]
-        internal TypeBase TypeForArrayElement { get { return DeAlign(Category.Type).Type; } }
+        internal TypeBase TypeForArrayElement => DeAlign(Category.Type).Type;
 
         [DisableDump]
-        internal virtual TypeBase TypeForTypeOperator
-        {
-            get
-            {
-                return DeFunction(Category.Type).Type
-                    .DePointer(Category.Type).Type
-                    .DeAlign(Category.Type).Type;
-            }
-        }
+        internal virtual TypeBase TypeForTypeOperator => DeFunction(Category.Type).Type
+            .DePointer(Category.Type).Type
+            .DeAlign(Category.Type).Type;
 
         [DisableDump]
-        internal virtual TypeBase ElementTypeForReference
-        {
-            get
-            {
-                return DeFunction(Category.Type).Type
-                    .DePointer(Category.Type).Type
-                    .DeAlign(Category.Type).Type;
-            }
-        }
+        internal virtual TypeBase ElementTypeForReference => DeFunction(Category.Type).Type
+            .DePointer(Category.Type).Type
+            .DeAlign(Category.Type).Type;
 
-        protected virtual Result DeAlign(Category category) { return ArgResult(category); }
-        protected virtual ResultCache DeFunction(Category category) { return ArgResult(category); }
-        internal virtual ResultCache DePointer(Category category) { return ArgResult(category); }
+        protected virtual Result DeAlign(Category category) => ArgResult(category);
+        protected virtual ResultCache DeFunction(Category category) => ArgResult(category);
+        internal virtual ResultCache DePointer(Category category) => ArgResult(category);
 
         internal int SequenceLength(TypeBase elementType)
         {
@@ -358,7 +317,7 @@ namespace Reni.Type
             if(Hllw)
                 return ArgResult(category);
 
-            return UniquePointer
+            return Pointer
                 .Result
                 (
                     category,
@@ -367,17 +326,11 @@ namespace Reni.Type
                 );
         }
 
-        CodeBase LocalReferenceCode()
-        {
-            return ArgCode
-                .LocalReference(Destructor(Category.Code).Code);
-        }
+        CodeBase LocalReferenceCode() => ArgCode
+            .LocalReference(Destructor(Category.Code).Code);
 
-        internal Result ReferenceInCode(Category category, IContextReference target)
-        {
-            return UniquePointer
-                .Result(category, target);
-        }
+        internal Result ReferenceInCode(Category category, IContextReference target) => Pointer
+            .Result(category, target);
 
         internal Result ContextAccessResult(Category category, IContextReference target, Func<Size> getOffset)
         {
@@ -391,10 +344,10 @@ namespace Reni.Type
                 );
         }
 
-        IReferenceType ObtainPointer()
+        IReference ObtainReference()
         {
             Tracer.Assert(!Hllw);
-            return this as IReferenceType ?? new PointerType(this);
+            return this as IReference ?? new PointerType(this);
         }
 
         [DisableDump]
@@ -407,29 +360,24 @@ namespace Reni.Type
             }
         }
 
-        protected virtual ArrayType ObtainArray(int count) { return new ArrayType(this, count); }
+        protected virtual ArrayType ObtainArray(int count) => new ArrayType(this, count);
 
-        internal CodeBase BitSequenceOperation(string token) { return UniqueAlign.ArgCode.NumberOperation(token, Size); }
+        internal CodeBase BitSequenceOperation(string token) => Align.ArgCode.NumberOperation(token, Size);
 
         [NotNull]
         internal Result GenericDumpPrintResult(Category category)
-        {
-            return Declarations<DumpPrintToken>(null).Single().CallResult(category);
-        }
+            => Declarations<DumpPrintToken>(null).Single().CallResult(category);
 
-        internal Result CreateArray(Category category)
-        {
-            return UniqueAlign
-                .UniqueArray(1).UniquePointer
-                .Result(category, PointerArgResult(category));
-        }
+        internal Result CreateArray(Category category) => Align
+            .Array(1).Pointer
+            .Result(category, PointerArgResult(category));
 
-        internal bool IsConvertable(TypeBase destination) { return ConversionService.FindPath(this, destination) != null; }
+        internal bool IsConvertable(TypeBase destination) => ConversionService.FindPath(this, destination) != null;
 
         internal Result Conversion(Category category, TypeBase destination)
         {
             if(category <= (Category.Type.Replenished))
-                return destination.PointerKind.Result(category);
+                return destination.SmartPointer.Result(category);
 
             var path = ConversionService.FindPath(this, destination);
             if(path != null)
@@ -439,34 +387,22 @@ namespace Reni.Type
             return null;
         }
 
-        internal virtual Result ConstructorResult(Category category, TypeBase argsType)
-        {
-            return argsType.Conversion(category, this);
-        }
+        internal virtual Result ConstructorResult(Category category, TypeBase argsType) => argsType.Conversion(category, this);
 
-        internal Result DumpPrintTypeNameResult(Category category)
-        {
-            return VoidType
-                .Result
-                (
-                    category,
-                    () => CodeBase.DumpPrintText(DumpPrintText),
-                    CodeArgs.Void
-                );
-        }
+        internal Result DumpPrintTypeNameResult(Category category) => VoidType
+            .Result
+            (
+                category,
+                () => CodeBase.DumpPrintText(DumpPrintText),
+                CodeArgs.Void
+            );
 
         internal TypeBase SmartUn<T>()
-            where T : ISimpleFeature
-        {
-            return this is T ? ((ISimpleFeature) this).Result(Category.Type).Type : this;
-        }
+            where T : ISimpleFeature => this is T ? ((ISimpleFeature) this).Result(Category.Type).Type : this;
 
-        internal Result PointerConversionResult(Category category, TypeBase destinationType)
-        {
-            return destinationType
-                .UniquePointer
-                .Result(category, UniquePointer.ArgResult(category.Typed));
-        }
+        internal Result PointerConversionResult(Category category, TypeBase destinationType) => destinationType
+            .Pointer
+            .Result(category, Pointer.ArgResult(category.Typed));
 
         internal virtual Result InstanceResult(Category category, Func<Category, Result> getRightResult)
         {
@@ -475,9 +411,7 @@ namespace Reni.Type
         }
 
         internal IEnumerable<SearchResult> DeclarationsForType(Definable tokenClass)
-        {
-            return tokenClass.Genericize.SelectMany(g => g.Declarations(this));
-        }
+            => tokenClass.Genericize.SelectMany(g => g.Declarations(this));
 
         internal IEnumerable<SearchResult> Declarations<TDefinable>(TDefinable tokenClass) where TDefinable : Definable
         {
@@ -494,12 +428,12 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        protected virtual IEnumerable<IGenericProviderForType> Genericize { get { return this.GenericListFromType(); } }
+        protected virtual IEnumerable<IGenericProviderForType> Genericize => this.GenericListFromType();
         [DisableDump]
         [NotNull]
-        public IEnumerable<ISimpleFeature> SymmetricConversions { get { return _cache.SymmetricConversions.Value; } }
+        public IEnumerable<ISimpleFeature> SymmetricConversions => _cache.SymmetricConversions.Value;
 
-        Result AlignResult(Category category) { return UniqueAlign.Result(category, () => ArgCode.Align(), CodeArgs.Arg); }
+        Result AlignResult(Category category) { return Align.Result(category, () => ArgCode.Align(), CodeArgs.Arg); }
 
         IEnumerable<ISimpleFeature> ObtainSymmetricConversions()
             => ObtainRawSymmetricConversions()

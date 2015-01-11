@@ -37,7 +37,7 @@ namespace Reni.Type
         {
             return RootContext
                 .BitType
-                .UniqueNumber(1)
+                .Number(1)
                 .Result(Category.All, () => CodeBase.BitsConst(BitsConst.Convert(0)));
         }
 
@@ -59,7 +59,7 @@ namespace Reni.Type
 
         internal override IEnumerable<ISimpleFeature> CutEnabledConversion(NumberType destination)
         {
-            yield return Extension.SimpleFeature(category => BitCountConversion(category, destination), UniqueEnableCutType);
+            yield return Extension.SimpleFeature(category => BitCountConversion(category, destination), EnableCut);
         }
 
         IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
@@ -117,13 +117,13 @@ namespace Reni.Type
         {
             return ((NumberType) _zeroResult.Value.Type)
                 .OperationResult(category, _minusOperation, this)
-                .ReplaceAbsolute(_zeroResult.Value.Type.UniquePointerType, c => _zeroResult.Value.LocalPointerKindResult & (c));
+                .ReplaceAbsolute(_zeroResult.Value.Type.Reference, c => _zeroResult.Value.LocalPointerKindResult & (c));
         }
 
         protected override CodeBase DumpPrintCode()
         {
             var alignedSize = Size.Align(Root.DefaultRefAlignParam.AlignBits);
-            return UniquePointer
+            return Pointer
                 .ArgCode
                 .DePointer(alignedSize)
                 .DumpPrintNumber(alignedSize);
@@ -131,9 +131,9 @@ namespace Reni.Type
 
         Result EnableCutTokenResult(Category category)
         {
-            return UniqueEnableCutType
-                .UniquePointer
-                .Result(category.Typed, UniquePointer.ArgResult(category));
+            return EnableCut
+                .Pointer
+                .Result(category.Typed, Pointer.ArgResult(category));
         }
 
         Result OperationResult(Category category, TypeBase right, IOperation operation)
@@ -151,7 +151,7 @@ namespace Reni.Type
             var transformation = operation as ITransformation;
             var resultType = transformation == null
                 ? (TypeBase) RootContext.BitType
-                : RootContext.BitType.UniqueNumber(transformation.Signature(Bits, right.Bits));
+                : RootContext.BitType.Number(transformation.Signature(Bits, right.Bits));
             return OperationResult(category, resultType, operation.Name, right);
         }
 
@@ -164,9 +164,9 @@ namespace Reni.Type
                     CodeArgs.Arg
                 );
 
-            var leftResult = UniquePointer.Result(category.Typed, UniquePointerType)
-                .Conversion(UniqueAlign);
-            var rightResult = right.UniquePointer.ArgResult(category.Typed).Conversion(right.UniqueAlign);
+            var leftResult = Pointer.Result(category.Typed, Reference)
+                .Conversion(Align);
+            var rightResult = right.Pointer.ArgResult(category.Typed).Conversion(right.Align);
             var pair = leftResult + rightResult;
             return result.ReplaceArg(pair);
         }
@@ -174,10 +174,10 @@ namespace Reni.Type
         CodeBase OperationCode(Size resultSize, string token, TypeBase right)
         {
             Tracer.Assert(!(right is PointerType));
-            return UniqueAlign
-                .Pair(right.UniqueAlign)
+            return Align
+                .Pair(right.Align)
                 .ArgCode
-                .NumberOperation(token, resultSize, UniqueAlign.Size, right.UniqueAlign.Size);
+                .NumberOperation(token, resultSize, Align.Size, right.Align.Size);
         }
 
         Result ConversionAsReference(Category category, NumberType destination)
@@ -217,7 +217,7 @@ namespace Reni.Type
 
         Result UnalignedDereferencePointerResult(Category category)
         {
-            return PointerKind.ArgResult(category.Typed).DereferenceResult & category;
+            return SmartPointer.ArgResult(category.Typed).DereferenceResult & category;
         }
 
         internal interface IOperation

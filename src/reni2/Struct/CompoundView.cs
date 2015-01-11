@@ -50,14 +50,14 @@ namespace Reni.Struct
         }
 
         [DisableDump]
-        internal ContextBase UniqueContext => Compound.Parent
-            .UniqueStructurePositionContext(Compound.Syntax, ViewPosition);
+        internal ContextBase Context => Compound.Parent
+            .StructurePositionContext(Compound.Syntax, ViewPosition);
 
         [DisableDump]
         internal CompoundType Type => _typeCache.Value;
 
         [DisableDump]
-        internal TypeBase PointerKind => Type.PointerKind;
+        internal TypeBase PointerKind => Type.SmartPointer;
 
         protected override string GetNodeDump() => base.GetNodeDump() + "(" + Compound.NodeDump + "@" + ViewPosition + ")";
 
@@ -103,9 +103,9 @@ namespace Reni.Struct
             public RecursionWhileObtainingStructSizeException(CompoundView compoundView) { _compoundView = compoundView; }
         }
 
-        internal TypeBase UniqueFunctionalType(FunctionSyntax syntax) => _functionBodyTypeCache[syntax];
+        internal TypeBase FunctionalType(FunctionSyntax syntax) => _functionBodyTypeCache[syntax];
 
-        internal AccessFeature UniqueAccessFeature(int position) => _accessFeaturesCache[position];
+        internal AccessFeature AccessFeature(int position) => _accessFeaturesCache[position];
 
         TypeBase AccessType(int position)
         {

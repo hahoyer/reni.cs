@@ -35,6 +35,8 @@
     <Compile Include="FeatureTest\BlogExamples\Post120109.cs" />
     <Compile Include="FeatureTest\BlogExamples\Post120617.cs" />
     <Compile Include="FeatureTest\ConversionService\Closure.cs" />
+    <Compile Include="FeatureTest\ConversionService\NumberExtensionConversion.cs" />
+    <Compile Include="FeatureTest\ConversionService\NumberPointerCutConversion.cs" />
     <Compile Include="FeatureTest\Function\ConstantFunction.cs" />
     <Compile Include="FeatureTest\Function\Function.cs" />
     <Compile Include="FeatureTest\Function\FunctionInstanceContext.cs" />

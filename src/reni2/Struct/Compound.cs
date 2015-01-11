@@ -34,13 +34,13 @@ namespace Reni.Struct
         Size IContextReference.Size => Root.DefaultRefAlignParam.RefSize;
 
         [DisableDump]
-        internal TypeBase IndexType => Parent.RootContext.BitType.UniqueNumber(IndexSize.ToInt());
+        internal TypeBase IndexType => Parent.RootContext.BitType.Number(IndexSize.ToInt());
 
         [DisableDump]
         internal Root RootContext => Parent.RootContext;
 
         [DisableDump]
-        CompoundView ToCompoundView => Parent.UniqueCompoundView(Syntax);
+        CompoundView ToCompoundView => Parent.CompoundView(Syntax);
 
         Size IndexSize => Syntax.IndexSize;
 
@@ -59,7 +59,7 @@ namespace Reni.Struct
         internal Size ContextReferenceOffsetFromAccessPoint(int position) => ResultsOfStatements(Category.Size, 0, position).Size;
 
         CodeBase ContextReferenceViaStructReferenceCode(int accessPosition) => Parent
-            .UniqueCompoundView(Syntax, accessPosition)
+            .CompoundView(Syntax, accessPosition)
             .PointerKind.ArgCode
             .ReferencePlus(ContextReferenceOffsetFromAccessPoint(accessPosition));
 
@@ -120,7 +120,7 @@ namespace Reni.Struct
             try
             {
                 var uniqueChildContext = Parent
-                    .UniqueStructurePositionContext(Syntax, accessPosition);
+                    .StructurePositionContext(Syntax, accessPosition);
                 Dump("Statements[position]", Syntax.Statements[position]);
                 BreakExecution();
                 var result1 = Syntax.Statements[position]
@@ -172,7 +172,7 @@ namespace Reni.Struct
         bool InternalInnerHllwStructureElement(int position)
         {
             var uniqueChildContext = Parent
-                .UniqueStructurePositionContext(Syntax, position);
+                .StructurePositionContext(Syntax, position);
             return Syntax
                 .Statements[position]
                 .HllwStructureElement(uniqueChildContext);

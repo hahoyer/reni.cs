@@ -47,7 +47,7 @@ namespace Reni.Type
                 BreakExecution();
 
                 var type = (ArrayType) result.Type;
-                return ReturnMethodDump(type.UniqueTextItemType.Result(category, result));
+                return ReturnMethodDump(type.TextItemType.Result(category, result));
             }
             finally
             {
@@ -56,7 +56,7 @@ namespace Reni.Type
         }
 
         protected override CodeBase DumpPrintCode()
-            => UniquePointer
+            => Pointer
                 .ArgCode
                 .DePointer(Size)
                 .DumpPrintText(Parent.ElementType.Size);

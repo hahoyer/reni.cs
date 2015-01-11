@@ -16,21 +16,19 @@ namespace Reni.Type
         internal FunctionFeatureType(FunctionalFeature functionalFeature) { _functionalFeature = functionalFeature; }
 
         [DisableDump]
-        internal override bool Hllw { get { return false; } }
+        internal override bool Hllw => false;
         [DisableDump]
-        bool IFunctionFeature.IsImplicit { get { return false; } }
+        bool IFunctionFeature.IsImplicit => false;
         [DisableDump]
-        internal override bool IsLambda { get { return true; } }
+        internal override bool IsLambda => true;
         [DisableDump]
-        IContextReference IFunctionFeature.ObjectReference { get { return _functionalFeature.ObjectReference; } }
+        IContextReference IFunctionFeature.ObjectReference => _functionalFeature.ObjectReference;
         [DisableDump]
-        internal override Root RootContext { get { return _functionalFeature.RootContext; } }
-        protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
-        protected override string GetNodeDump() { return base.GetNodeDump() + "(" + _functionalFeature.NodeDump + ")"; }
+        internal override Root RootContext => _functionalFeature.RootContext;
+        protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
+        protected override string GetNodeDump() => base.GetNodeDump() + "(" + _functionalFeature.NodeDump + ")";
 
         Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
-        {
-            return _functionalFeature.ApplyResult(category, argsType);
-        }
+            => _functionalFeature.ApplyResult(category, argsType);
     }
 }

@@ -84,8 +84,8 @@ namespace Reni.Context
             var target = context.Result(category.Typed, argsType).SmartUn<PointerType>();
             return target
                 .Type
-                .UniqueAlign
-                .UniqueArray(1)
+                .Align
+                .Array(1)
                 .Result(category.Typed, target)
                 .LocalPointerKindResult
                 & category;
@@ -93,7 +93,7 @@ namespace Reni.Context
 
         internal FunctionType FunctionInstance(CompoundView compoundView, FunctionSyntax body, TypeBase argsType)
         {
-            var alignedArgsType = argsType.UniqueAlign;
+            var alignedArgsType = argsType.Align;
             var functionInstance = _functions.Find(body, compoundView, alignedArgsType);
             return functionInstance;
         }

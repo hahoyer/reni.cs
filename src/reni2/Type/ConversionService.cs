@@ -22,26 +22,24 @@ namespace Reni.Type
                 Tracer.Assert(Source != null);
             }
 
-            internal Path(params ISimpleFeature[] elements)
+            internal Path(params ISimpleFeature[] rawElements)
             {
-                Tracer.Assert(elements.Any());
-                var features = elements
-                    .Skip(1)
-                    .Select
-                    (
-                        (element, i) => new
-                        {
-                            i,
-                            result = elements[i].ResultType(),
-                            next = element.TargetType
-                        })
-                    .Where(item => item.result != item.next)
-                    .ToArray();
-                Tracer.Assert(!features.Any(), features.Stringify("\n"));
-                Source = elements.First().TargetType;
-                Elements = elements;
+                Tracer.Assert(rawElements.Any());
+                Source = rawElements.First().TargetType;
                 Tracer.Assert(Source != null);
+
+                Elements = rawElements.RemoveCycles().ToArray();
+                Tracer.Assert
+                    (
+                        Types.Count() == Elements.Count() + 1,
+                        () => "\n" + Types.Select(t => t.DumpPrintText).Stringify("\n") + "\n****\n" + Dump()
+                    );
             }
+            IEnumerable<TypeBase> Types
+                => Elements
+                    .Select(element => element.TargetType)
+                    .Concat(new[] {Destination})
+                    .Distinct();
 
             internal TypeBase Destination => Elements.LastOrDefault()?.ResultType() ?? Source;
 
@@ -80,7 +78,7 @@ namespace Reni.Type
             TypeBase Source { get; }
             protected ConversionProcess(TypeBase source) { Source = source; }
 
-            internal Path Value
+            internal Path Result
             {
                 get
                 {
@@ -117,10 +115,7 @@ namespace Reni.Type
             readonly Func<TypeBase, bool> _isDestination;
 
             public GenericConversionProcess(TypeBase source, Func<TypeBase, bool> isDestination)
-                : base(source)
-            {
-                _isDestination = isDestination;
-            }
+                : base(source) { _isDestination = isDestination; }
 
             protected override IEnumerable<Path> GetForcedConversions(Path left)
                 => left + left.Destination.GetForcedConversions(_isDestination);
@@ -131,10 +126,7 @@ namespace Reni.Type
         {
             TypeBase Destination { get; }
             public ExplicitConversionProcess(TypeBase source, TypeBase destination)
-                : base(source)
-            {
-                Destination = destination;
-            }
+                : base(source) { Destination = destination; }
 
             protected override IEnumerable<Path> GetForcedConversions(Path left)
                 => Destination.PreviousConversionStep()
@@ -144,10 +136,10 @@ namespace Reni.Type
         }
 
         public static Path FindPath(TypeBase source, TypeBase destination)
-            => new ExplicitConversionProcess(source, destination).Value;
+            => new ExplicitConversionProcess(source, destination).Result;
 
         public static Path FindPath(TypeBase source, Func<TypeBase, bool> isDestination)
-            => new GenericConversionProcess(source, isDestination).Value;
+            => new GenericConversionProcess(source, isDestination).Result;
 
         internal static IEnumerable<ISimpleFeature> ForcedConversions(Path source, Path destination)
             => source.Destination
@@ -189,6 +181,40 @@ namespace Reni.Type
             return list
                 .SelectMany(i => new[] {i.TargetType, i.ResultType()})
                 .Distinct();
+        }
+
+        static void AssertPath(this IReadOnlyList<ISimpleFeature> elements)
+        {
+            var features = elements
+                .Skip(1)
+                .Select
+                (
+                    (element, i) => new
+                    {
+                        i,
+                        result = elements[i].ResultType(),
+                        next = element.TargetType
+                    })
+                .Where(item => item.result != item.next)
+                .ToArray();
+            Tracer.Assert(!features.Any(), features.Stringify("\n"));
+        }
+
+        static IEnumerable<ISimpleFeature> RemoveCycles(this IEnumerable<ISimpleFeature> list)
+        {
+            var result = new List<ISimpleFeature>(list);
+            result.AssertPath();
+            if(result.Any() && result.First().TargetType == result.Last().ResultType())
+                return new ISimpleFeature[0];
+
+            for(var i = 0; i < result.Count; i++)
+            {
+                var s = result[i].TargetType;
+                var tailLength = result.Skip(i).Reverse().SkipWhile(element => element.TargetType != s).Count();
+                if(tailLength != 0)
+                    result.RemoveRange(i, i + result.Count - tailLength);
+            }
+            return result;
         }
 
         static IEnumerable<ISimpleFeature> RawSymmetricFeatureClosure(this TypeBase source)
@@ -241,7 +267,7 @@ namespace Reni.Type
                     var destination = feature.ResultType();
                     if(_foundTypes.Contains(destination))
                         continue;
-                    var newFeature = startFeature == null? new Path(feature) :  startFeature + feature ;
+                    var newFeature = startFeature == null ? new Path(feature) : startFeature + feature;
                     yield return newFeature;
                     _newPaths.Add(newFeature);
                     _foundTypes.Add(destination);

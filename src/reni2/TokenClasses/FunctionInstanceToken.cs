@@ -12,7 +12,7 @@ namespace Reni.TokenClasses
         public override Result Result(ContextBase context, Category category, CompileSyntax left)
         {
             var leftResult = left.Result(context, category.Typed);
-            return leftResult.Type.UniqueFunctionInstanceType.Result(category, leftResult);
+            return leftResult.Type.FunctionInstance.Result(category, leftResult);
         }
     }
 }

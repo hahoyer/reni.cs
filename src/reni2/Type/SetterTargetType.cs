@@ -14,7 +14,7 @@ namespace Reni.Type
         : TypeBase
             , IProxyType
             , ISimpleFeature
-            , IReferenceType
+            , IReference
             , IFeatureInheritor
             , ISymbolProvider<ReassignToken, IFeatureImplementation>
     {
@@ -25,8 +25,8 @@ namespace Reni.Type
         Size IContextReference.Size => Size;
         int IContextReference.Order => _order;
         ISimpleFeature IProxyType.Converter => this;
-        bool IReferenceType.IsWeak => true;
-        ISimpleFeature IReferenceType.Converter => this;
+        bool IReference.IsWeak => true;
+        ISimpleFeature IReference.Converter => this;
         TypeBase ISimpleFeature.TargetType => ValueType;
         Result ISimpleFeature.Result(Category category) => GetterResult(category);
         Result IFeatureInheritor.ConvertToBaseType(Category category) => GetterResult(category);

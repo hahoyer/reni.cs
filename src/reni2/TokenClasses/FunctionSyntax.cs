@@ -41,7 +41,7 @@ namespace Reni.TokenClasses
         {
             return context
                 .FindRecentCompoundView
-                .UniqueFunctionalType(this)
+                .FunctionalType(this)
                 .Result(category);
         }
 

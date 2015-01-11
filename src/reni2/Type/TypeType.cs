@@ -67,9 +67,9 @@ namespace Reni.Type
                 .Evaluate(context.RootContext.ExecutionContext)
                 .ToInt32();
             var type = Value
-                .UniqueAlign
-                .UniqueArray(count)
-                .UniqueTypeType;
+                .Align
+                .Array(count)
+                .TypeType;
             return type.Result(category);
         }
 

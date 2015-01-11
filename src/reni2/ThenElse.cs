@@ -51,7 +51,7 @@ namespace Reni
         {
             return Cond
                 .Result(context, category.Typed)
-                .Conversion(context.RootContext.BitType.UniqueAlign)
+                .Conversion(context.RootContext.BitType.Align)
                 .LocalBlock(category.Typed)
                 .Conversion(context.RootContext.BitType);
         }
@@ -97,7 +97,7 @@ namespace Reni
             return Then
                 .Type(context)
                 .CommonType(Else.Type(context))
-                .UniqueAlign;
+                .Align;
         }
 
         protected override string GetNodeDump() { return "(" + Cond.NodeDump + ")then(" + Then.NodeDump + ")"; }

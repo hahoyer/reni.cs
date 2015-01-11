@@ -6,7 +6,7 @@ using Reni.Feature;
 
 namespace Reni.Type
 {
-    interface IReferenceType : IContextReference
+    interface IReference : IContextReference
     {
         ISimpleFeature Converter { get; }
         bool IsWeak { get; }
@@ -14,6 +14,6 @@ namespace Reni.Type
 
     static class ReferenceExtension
     {
-        internal static TypeBase Type(this IReferenceType referenceType) { return (TypeBase) referenceType; }
+        internal static TypeBase Type(this IReference referenceType) { return (TypeBase) referenceType; }
     }
 }

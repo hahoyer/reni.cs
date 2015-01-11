@@ -31,10 +31,10 @@ namespace Reni.Type
         protected override string Dump(bool isRecursion) => GetType().PrettyName();
 
         protected override string GetNodeDump() => "bit";
-        internal NumberType UniqueNumber(int bitCount) => UniqueArray(bitCount).UniqueNumber;
+        internal NumberType Number(int bitCount) => Array(bitCount).Number;
         internal Result Result(Category category, BitsConst bitsConst)
         {
-            return UniqueNumber(bitsConst.Size.ToInt())
+            return Number(bitsConst.Size.ToInt())
                 .Result(category, () => CodeBase.BitsConst(bitsConst));
         }
 
@@ -42,7 +42,7 @@ namespace Reni.Type
             => Extension.SimpleFeature(DumpPrintTokenResult, this);
 
         protected override CodeBase DumpPrintCode()
-            => UniquePointer
+            => Pointer
                 .ArgCode
                 .DePointer(Size)
                 .DumpPrintNumber();

@@ -110,7 +110,7 @@ namespace Reni.Context
             var function = Feature.Function;
             var result = function
                 .ApplyResult(category, Type.RootContext.VoidType)
-                .ReplaceAbsolute(function.ObjectReference, Type.PointerKind.ArgResult);
+                .ReplaceAbsolute(function.ObjectReference, Type.SmartPointer.ArgResult);
             return result;
         }
     }

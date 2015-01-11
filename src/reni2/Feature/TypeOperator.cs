@@ -18,7 +18,7 @@ namespace Reni.Feature
                 return left
                     .Type(context)
                     .TypeForTypeOperator
-                    .UniqueTypeType
+                    .TypeType
                     .Result(category);
             return context
                 .RootContext

@@ -82,7 +82,7 @@ namespace Reni.Struct
 
         internal ContextBase CreateSubContext(bool useValue)
         {
-            return new Reni.Context.Function(_compoundView.UniqueContext, ArgsType, useValue ? ValueType : null);
+            return new Reni.Context.Function(_compoundView.Context, ArgsType, useValue ? ValueType : null);
         }
 
         public string DumpFunction()

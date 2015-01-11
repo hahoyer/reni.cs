@@ -151,7 +151,7 @@ namespace Reni.Feature
         [DisableDump]
         public override IFeatureImplementation Feature { get; }
 
-        public override Result Converter(Category category) => _definingItem.UniquePointer.ArgResult(category);
+        public override Result Converter(Category category) => _definingItem.SmartPointer.ArgResult(category);
 
         [DisableDump]
         public override TypeBase Type => _definingItem;

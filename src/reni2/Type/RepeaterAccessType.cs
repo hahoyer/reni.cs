@@ -32,7 +32,7 @@ namespace Reni.Type
 
         protected override CodeBase SetterCode()
         {
-            return Pair(ValueType.PointerKind)
+            return Pair(ValueType.SmartPointer)
                 .ArgCode
                 .ArrayAssignment(ValueType.Size, RepeaterType.IndexSize);
         }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace Reni.Context
     /// </summary>
     abstract class ContextBase
         : DumpableObject
-            ,      IIconKeyProvider
+            , IIconKeyProvider
     {
         static int _nextId;
 
@@ -31,38 +32,34 @@ namespace Reni.Context
         readonly Cache _cache;
 
         protected ContextBase()
-            : base(_nextId++)
-        {
-            _cache = new Cache(this);
-        }
+            : base(_nextId++) { _cache = new Cache(this); }
 
-        string IIconKeyProvider.IconKey { get { return "Context"; } }
+        string IIconKeyProvider.IconKey => "Context";
 
         [DisableDump]
         [Node]
         internal abstract Root RootContext { get; }
 
         [DisableDump]
-        internal CompoundView FindRecentCompoundView { get { return _cache.RecentStructure.Value; } }
+        internal CompoundView FindRecentCompoundView => _cache.RecentStructure.Value;
 
         [DisableDump]
-        internal IFunctionContext FindRecentFunctionContextObject
-        {
-            get { return _cache.RecentFunctionContextObject.Value; }
-        }
+        internal IFunctionContext FindRecentFunctionContextObject => _cache.RecentFunctionContextObject.Value;
 
         public abstract string DumpPrintText { get; }
 
         [UsedImplicitly]
         internal int SizeToPacketCount(Size size) => size.SizeToPacketCount(Root.DefaultRefAlignParam.AlignBits);
 
-        internal ContextBase UniqueStructurePositionContext(CompoundSyntax container, int position) => _cache.StructContexts[container][position];
+        internal ContextBase StructurePositionContext(CompoundSyntax container, int position)
+            => _cache.CompoundContexts[container][position];
 
-        internal CompoundView UniqueCompoundView(CompoundSyntax syntax) => UniqueCompoundView(syntax, syntax.EndPosition);
+        internal CompoundView CompoundView(CompoundSyntax syntax) => CompoundView(syntax, syntax.EndPosition);
 
-        internal CompoundView UniqueCompoundView(CompoundSyntax syntax, int accessPosition) => _cache.CompoundViews[syntax][accessPosition];
+        internal CompoundView CompoundView(CompoundSyntax syntax, int accessPosition)
+            => _cache.CompoundViews[syntax][accessPosition];
 
-        internal Compound UniqueCompound(CompoundSyntax context) => _cache.Compounds[context];
+        internal Compound Compound(CompoundSyntax context) => _cache.Compounds[context];
 
         [DebuggerHidden]
         internal Result Result(Category category, CompileSyntax syntax)
@@ -127,7 +124,7 @@ namespace Reni.Context
 
             [Node]
             [SmartNode]
-            internal readonly FunctionCache<CompoundSyntax, FunctionCache<int, ContextBase>> StructContexts;
+            internal readonly FunctionCache<CompoundSyntax, FunctionCache<int, ContextBase>> CompoundContexts;
 
             [Node]
             [SmartNode]
@@ -150,11 +147,11 @@ namespace Reni.Context
                 UndefinedSymbolType = new FunctionCache<SourcePart, IssueType>
                     (tokenData => UndefinedSymbolIssue.Type(tokenData, target));
                 ResultCache = new FunctionCache<CompileSyntax, ResultCache>(target.CreateCacheElement);
-                StructContexts = new FunctionCache<CompoundSyntax, FunctionCache<int, ContextBase>>
+                CompoundContexts = new FunctionCache<CompoundSyntax, FunctionCache<int, ContextBase>>
                     (
                     container =>
                         new FunctionCache<int, ContextBase>
-                            (position => new CompoundViewContext(target, target.UniqueCompoundView(container, position)))
+                            (position => new CompoundViewContext(target, target.CompoundView(container, position)))
                     );
                 RecentStructure = new ValueCache<CompoundView>(target.ObtainRecentCompoundView);
                 RecentFunctionContextObject = new ValueCache<IFunctionContext>(target.ObtainRecentFunctionContext);
@@ -169,21 +166,25 @@ namespace Reni.Context
             }
 
             [DisableDump]
-            public string IconKey { get { return "Cache"; } }
+            public string IconKey => "Cache";
         }
 
-        internal Result ResultAsReference(Category category, CompileSyntax syntax) => Result(category.Typed, syntax)
-            .LocalPointerKindResult;
+        internal Result ResultAsReference(Category category, CompileSyntax syntax)
+            => Result(category.Typed, syntax)
+                .LocalPointerKindResult;
 
-        internal Result ArgReferenceResult(Category category) => FindRecentFunctionContextObject
-            .CreateArgReferenceResult(category);
+        internal Result ArgReferenceResult(Category category)
+            => FindRecentFunctionContextObject
+                .CreateArgReferenceResult(category);
 
-        internal Result ArgsResult(Category category, [CanBeNull] CompileSyntax right) => right == null
-            ? RootContext.VoidType.Result(category.Typed)
-            : right.SmartUnFunctionedReferenceResult(this, category);
+        internal Result ArgsResult(Category category, [CanBeNull] CompileSyntax right)
+            => right == null
+                ? RootContext.VoidType.Result(category.Typed)
+                : right.SmartUnFunctionedReferenceResult(this, category);
 
-        internal Result ObjectResult(Category category, [NotNull] CompileSyntax left) => Result(category.Typed, left)
-            .Conversion(Type(left).UniquePointer);
+        internal Result ObjectResult(Category category, [NotNull] CompileSyntax left)
+            => Result(category.Typed, left)
+                .Conversion(Type(left).SmartPointer);
 
         /// <summary>
         ///     Obtains the feature result of a functional argument object.
@@ -246,7 +247,7 @@ namespace Reni.Context
         internal Result CreateArrayResult(Category category, CompileSyntax argsType)
         {
             var target = Result(category.Typed, argsType).Align;
-            return target.Type.UniqueAlign.UniqueArray(1).Result(category, target);
+            return target.Type.Align.Array(1).Result(category, target);
         }
 
         internal Result GetObjectResult(Category category) => FindRecentCompoundView.StructReferenceViaContextReference(category);
