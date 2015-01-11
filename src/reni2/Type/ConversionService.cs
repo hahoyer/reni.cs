@@ -238,7 +238,7 @@ namespace Reni.Type
         }
 
         internal static IEnumerable<Path> SymmetricPathsClosure(this TypeBase source)
-            => SymmetricClosureService.From(source).Select(f => new Path(f));
+            => new[] {new Path(source)}.Concat(SymmetricClosureService.From(source).Select(f => new Path(f)));
 
         static IEnumerable<ISimpleFeature> PreviousConversionStep(this TypeBase destination)
             => SymmetricClosureService.To(destination);
