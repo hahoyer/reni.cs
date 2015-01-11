@@ -59,24 +59,17 @@ namespace Reni.Type
 
         internal override IEnumerable<ISimpleFeature> CutEnabledConversion(NumberType destination)
         {
-            yield return Extension.SimpleFeature(category => BitCountConversion(category, destination), EnableCut);
+            yield return Extension.SimpleFeature(category => CutEnabledBitCountConversion(category, destination), EnableCut);
         }
 
         IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
-        {
-            return Extension.SimpleFeature(DumpPrintTokenResult, this);
-        }
+            => Extension.SimpleFeature(DumpPrintTokenResult, this);
 
         IFeatureImplementation ISymbolProvider<Operation, IFeatureImplementation>.Feature(Operation tokenClass)
-        {
-            return Extension.FunctionFeature(OperationResult, tokenClass);
-        }
+            => Extension.FunctionFeature(OperationResult, tokenClass);
 
         IFeatureImplementation ISymbolProvider<TokenClasses.EnableCut, IFeatureImplementation>.Feature
-            (TokenClasses.EnableCut tokenClass)
-        {
-            return Extension.SimpleFeature(EnableCutTokenResult);
-        }
+            (TokenClasses.EnableCut tokenClass) => Extension.SimpleFeature(EnableCutTokenResult);
 
         IFeatureImplementation IConverterProvider<NumberType, IFeatureImplementation>.Feature
             (NumberType destination, IConversionParameter parameter)
@@ -93,18 +86,14 @@ namespace Reni.Type
         }
 
         IFeatureImplementation ISymbolProvider<Negate, IFeatureImplementation>.Feature(Negate tokenClass)
-        {
-            return Extension.SimpleFeature(NegationResult);
-        }
+            => Extension.SimpleFeature(NegationResult);
 
         IFeatureImplementation ISymbolProvider<TextItem, IFeatureImplementation>.Feature(TextItem tokenClass)
-        {
-            return Extension.SimpleFeature(TextItemResult);
-        }
+            => Extension.SimpleFeature(TextItemResult);
 
-        protected override Result ParentConversionResult(Category category) { return Parent.Result(category, ArgResult); }
+        protected override Result ParentConversionResult(Category category) => Parent.Result(category, ArgResult);
 
-        protected override Size GetSize() { return Parent.Size; }
+        protected override Size GetSize() => Parent.Size;
 
         Result TextItemResult(Category category)
         {
@@ -129,12 +118,9 @@ namespace Reni.Type
                 .DumpPrintNumber(alignedSize);
         }
 
-        Result EnableCutTokenResult(Category category)
-        {
-            return EnableCut
-                .Pointer
-                .Result(category.Typed, Pointer.ArgResult(category));
-        }
+        Result EnableCutTokenResult(Category category) => EnableCut
+            .Pointer
+            .Result(category.Typed, Pointer.ArgResult(category));
 
         Result OperationResult(Category category, TypeBase right, IOperation operation)
         {
@@ -180,13 +166,10 @@ namespace Reni.Type
                 .NumberOperation(token, resultSize, Align.Size, right.Align.Size);
         }
 
-        Result ConversionAsReference(Category category, NumberType destination)
-        {
-            return destination
-                .FlatConversion(category, this)
-                .ReplaceArg(UnalignedDereferencePointerResult)
-                .LocalPointerKindResult;
-        }
+        Result ConversionAsReference(Category category, NumberType destination) => destination
+            .FlatConversion(category, this)
+            .ReplaceArg(UnalignedDereferencePointerResult)
+            .LocalPointerKindResult;
 
         Result FlatConversion(Category category, NumberType source)
         {
@@ -201,24 +184,22 @@ namespace Reni.Type
                 );
         }
 
-        Result BitCountConversion(Category category, NumberType destination)
+        Result CutEnabledBitCountConversion(Category category, NumberType destination)
         {
             if(Bits == destination.Bits)
-                return ArgResult(category.Typed);
+                return Result(category, EnableCut.ArgResult(category));
 
             return destination
                 .Result
                 (
                     category,
-                    () => ArgCode.BitCast(destination.Size),
+                    () => EnableCut.ArgCode.BitCast(destination.Size),
                     CodeArgs.Arg
                 );
         }
 
         Result UnalignedDereferencePointerResult(Category category)
-        {
-            return SmartPointer.ArgResult(category.Typed).DereferenceResult & category;
-        }
+            => SmartPointer.ArgResult(category.Typed).DereferenceResult & category;
 
         internal interface IOperation
         {
