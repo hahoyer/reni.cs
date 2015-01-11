@@ -34,8 +34,10 @@ namespace Reni.Struct
         {
             get
             {
-                Tracer.Assert(Hllw);
-                yield return Extension.SimpleFeature(RootContext.VoidType.ArgResult, this);
+                Tracer.Assert(!View.Compound.Syntax.Converters.Any());
+
+                if(Hllw)
+                    yield return Extension.SimpleFeature(RootContext.VoidType.ArgResult, this);
             }
         }
 
@@ -45,7 +47,7 @@ namespace Reni.Struct
         IFeatureImplementation ISymbolProvider<Definable, IFeatureImplementation>.Feature(Definable tokenClass)
             => View.Find(tokenClass);
 
-        protected override Size GetSize() => View.StructSize;
+        protected override Size GetSize() => View.CompoundSize;
 
         protected override string GetNodeDump() => "type(" + View.NodeDump + ")";
 

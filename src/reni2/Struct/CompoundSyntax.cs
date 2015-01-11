@@ -45,9 +45,18 @@ namespace Reni.Struct
         [DisableDump]
         protected override ParsedSyntax[] Children => Statements.ToArray<ParsedSyntax>();
         [DisableDump]
-        internal string[] Names { get { return _data.SelectMany(s => s.Names).ToArray(); } }
+        internal string[] Names => _data.SelectMany(s => s.Names).ToArray();
         [DisableDump]
-        internal int[] Converters { get { return _data.SelectMany((s, i) => s.IsConverter ? new[] {i} : new int[0]).ToArray(); } }
+        internal int[] ConverterStatementPositions
+            => _data
+                .SelectMany((s, i) => s.IsConverter ? new[] {i} : new int[0])
+                .ToArray();
+
+        [DisableDump]
+        public IEnumerable<CompileSyntax> Converters
+            => _data
+                .Where(data => data.IsConverter)
+                .Select(data => data.Statement);
 
         protected override string GetNodeDump() => "Compound." + ObjectId;
         internal bool IsReassignable(int position) => _data[position].IsReassignable;
@@ -133,5 +142,4 @@ namespace Reni.Struct
             internal AccessFeature Convert(CompoundView accessPoint) => accessPoint.AccessFeature(Value);
         }
     }
-
 }

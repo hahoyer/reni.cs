@@ -105,9 +105,9 @@ namespace Reni.FeatureTest.Helper
             Tracer.Assert(_declarations.Length == co.Names.Length);
             foreach(var declaration in _declarations)
                 declaration.AssertContains(co);
-            Tracer.Assert(_converters.Length == co.Converters.Length);
+            Tracer.Assert(_converters.Length == co.ConverterStatementPositions.Length);
             for (var i = 0; i < _converters.Length; i++)
-                Tracer.Assert(_converters[i] == co.Converters[i]);
+                Tracer.Assert(_converters[i] == co.ConverterStatementPositions[i]);
         }
     }
 
