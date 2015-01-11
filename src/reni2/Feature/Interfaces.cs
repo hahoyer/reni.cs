@@ -195,7 +195,7 @@ namespace Reni.Feature
         public override Result Converter(Category category)
             => _result
                 .Converter(category)
-                .ReplaceArg(_inheritor.Source);
+                .ReplaceArg(_inheritor.ConvertToBaseType);
 
         [DisableDump]
         public override TypeBase Type => _result.Type;
@@ -216,7 +216,8 @@ namespace Reni.Feature
 
     interface IFeatureInheritor
     {
-        Result Source(Category category);
+        TypeBase BaseType { get; }
+        Result ConvertToBaseType(Category category);
     }
 
     interface IGenericProviderForType

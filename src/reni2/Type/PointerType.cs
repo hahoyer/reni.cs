@@ -17,58 +17,57 @@ namespace Reni.Type
             , IReferenceType
             , IFeatureInheritor
     {
-        readonly TypeBase _valueType;
         readonly int _order;
 
         internal PointerType(TypeBase valueType)
         {
             _order = CodeArgs.NextOrder++;
-            _valueType = valueType;
+            ValueType = valueType;
             Tracer.Assert(!valueType.Hllw, valueType.Dump);
             Tracer.Assert(!(valueType.CoreType is PointerType), valueType.Dump);
             StopByObjectId(-10);
         }
 
-        Size IContextReference.Size { get { return Size; } }
-        int IContextReference.Order { get { return _order; } }
-        ISimpleFeature IReferenceType.Converter { get { return this; } }
-        bool IReferenceType.IsWeak { get { return true; } }
+        [DisableDump]
+        TypeBase ValueType { get; }
+
+        Size IContextReference.Size => Size;
+        int IContextReference.Order => _order;
+        ISimpleFeature IReferenceType.Converter => this;
+        bool IReferenceType.IsWeak => true;
 
         [DisableDump]
-        internal override Root RootContext { get { return _valueType.RootContext; } }
+        internal override Root RootContext => ValueType.RootContext;
 
-        ISimpleFeature IProxyType.Converter { get { return this; } }
-        TypeBase ISimpleFeature.TargetType { get { return ValueType; } }
-        Result ISimpleFeature.Result(Category category) { return DereferenceResult(category); }
-        Result IFeatureInheritor.Source(Category category) { return DereferenceResult(category); }
+        ISimpleFeature IProxyType.Converter => this;
+        TypeBase ISimpleFeature.TargetType => ValueType;
+        Result ISimpleFeature.Result(Category category) => DereferenceResult(category);
+        Result IFeatureInheritor.ConvertToBaseType(Category category) => ArgResult(category);
+        TypeBase IFeatureInheritor.BaseType => ValueType;
 
-        internal override string DumpPrintText { get { return "(" + ValueType.DumpPrintText + ")~~~"; } }
+        internal override string DumpPrintText => "(" + ValueType.DumpPrintText + ")~~~";
 
-        [DisableDump]
-        internal TypeBase ValueType { get { return _valueType; } }
-
-        [DisableDump]
-        internal override CompoundView FindRecentCompoundView { get { return ValueType.FindRecentCompoundView; } }
 
         [DisableDump]
-        internal override IFeatureImplementation Feature { get { return ValueType.Feature; } }
+        internal override CompoundView FindRecentCompoundView => ValueType.FindRecentCompoundView;
 
         [DisableDump]
-        internal override bool Hllw { get { return false; } }
+        internal override IFeatureImplementation Feature => ValueType.Feature;
+
+        [DisableDump]
+        internal override bool Hllw => false;
 
         protected override IEnumerable<ISimpleFeature> ObtainRawSymmetricConversions()
-        {
-            return base.ObtainRawSymmetricConversions().Concat(new ISimpleFeature[] {Extension.SimpleFeature(DereferenceResult)});
-        }
+            => base.ObtainRawSymmetricConversions().Concat(new ISimpleFeature[] {Extension.SimpleFeature(DereferenceResult)});
 
         [DisableDump]
-        internal override bool IsAligningPossible { get { return false; } }
+        internal override bool IsAligningPossible => false;
 
-        protected override string GetNodeDump() { return ValueType.NodeDump + "[Pointer]"; }
-        internal override int? SmartSequenceLength(TypeBase elementType) { return ValueType.SmartSequenceLength(elementType); }
-        internal override int? SmartArrayLength(TypeBase elementType) { return ValueType.SmartArrayLength(elementType); }
-        protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
-        protected override ArrayType ObtainArray(int count) { return ValueType.UniqueArray(count); }
+        protected override string GetNodeDump() => ValueType.NodeDump + "[Pointer]";
+        internal override int? SmartSequenceLength(TypeBase elementType) => ValueType.SmartSequenceLength(elementType);
+        internal override int? SmartArrayLength(TypeBase elementType) => ValueType.SmartArrayLength(elementType);
+        protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
+        protected override ArrayType ObtainArray(int count) => ValueType.UniqueArray(count);
 
         Result DereferenceResult(Category category)
         {

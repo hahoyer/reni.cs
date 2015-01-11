@@ -17,7 +17,7 @@ namespace Reni.Type
         [DisableDump]
         internal override bool Hllw { get { return false; } }
 
-        public override bool IsReassignPossible
+        protected override bool IsReassignPossible
         {
             get
             {

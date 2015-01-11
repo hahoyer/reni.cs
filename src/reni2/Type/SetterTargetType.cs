@@ -22,14 +22,15 @@ namespace Reni.Type
 
         protected SetterTargetType() { _order = CodeArgs.NextOrder++; }
 
-        Size IContextReference.Size { get { return Size; } }
-        int IContextReference.Order { get { return _order; } }
-        ISimpleFeature IProxyType.Converter { get { return this; } }
-        bool IReferenceType.IsWeak { get { return true; } }
-        ISimpleFeature IReferenceType.Converter { get { return this; } }
-        TypeBase ISimpleFeature.TargetType { get { return ValueType; } }
-        Result ISimpleFeature.Result(Category category) { return GetterResult(category); }
-        Result IFeatureInheritor.Source(Category category) { return GetterResult(category); }
+        Size IContextReference.Size => Size;
+        int IContextReference.Order => _order;
+        ISimpleFeature IProxyType.Converter => this;
+        bool IReferenceType.IsWeak => true;
+        ISimpleFeature IReferenceType.Converter => this;
+        TypeBase ISimpleFeature.TargetType => ValueType;
+        Result ISimpleFeature.Result(Category category) => GetterResult(category);
+        Result IFeatureInheritor.ConvertToBaseType(Category category) => GetterResult(category);
+        TypeBase IFeatureInheritor.BaseType => ValueType;
 
         IFeatureImplementation ISymbolProvider<ReassignToken, IFeatureImplementation>.Feature(ReassignToken tokenClass)
         {
@@ -38,9 +39,9 @@ namespace Reni.Type
             return null;
         }
 
-        public abstract bool IsReassignPossible { get; }
+        protected abstract bool IsReassignPossible { get; }
 
-        internal Result ReassignResult(Category category, IContextReference objectReference, TypeBase argsType)
+        Result ReassignResult(Category category, IContextReference objectReference, TypeBase argsType)
         {
             if(category == Category.Type)
                 return RootContext.VoidResult(category);
@@ -76,12 +77,12 @@ namespace Reni.Type
         }
 
         internal abstract TypeBase ValueType { get; }
-        internal virtual Result DestinationResult(Category category) { return ArgResult(category); }
+        internal virtual Result DestinationResult(Category category) => ArgResult(category);
         protected abstract Result SetterResult(Category category);
         protected abstract Result GetterResult(Category category);
 
         [DisableDump]
-        internal override Root RootContext { get { return ValueType.RootContext; } }
+        internal override Root RootContext => ValueType.RootContext;
 
         internal ResultCache ForceDePointer(Category category)
         {
@@ -90,14 +91,17 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        internal override TypeBase TypeForTypeOperator { get { return ValueType.TypeForTypeOperator; } }
+        internal override TypeBase TypeForTypeOperator => ValueType.TypeForTypeOperator;
 
         [DisableDump]
-        internal override TypeBase ElementTypeForReference { get { return ValueType.ElementTypeForReference; } }
+        internal override TypeBase ElementTypeForReference => ValueType.ElementTypeForReference;
 
         protected override IEnumerable<ISimpleFeature> ObtainRawSymmetricConversions() { yield break; }
 
         [DisableDump]
-        internal override IEnumerable<ISimpleFeature> StripConversions { get { yield return Extension.SimpleFeature(GetterResult); } }
+        internal override IEnumerable<ISimpleFeature> StripConversions
+        {
+            get { yield return Extension.SimpleFeature(GetterResult); }
+        }
     }
 }

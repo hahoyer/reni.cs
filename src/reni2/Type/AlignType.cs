@@ -10,7 +10,7 @@ namespace Reni.Type
 {
     sealed class AlignType
         : Child<TypeBase>
-        , IFeatureInheritor
+            , IFeatureInheritor
     {
         [DisableDump]
         readonly int _alignBits;
@@ -24,38 +24,37 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        internal override string DumpPrintText { get { return "("+Parent.DumpPrintText + ")"+AlignToken.Id + _alignBits; } }
+        internal override string DumpPrintText => "(" + Parent.DumpPrintText + ")" + AlignToken.Id + _alignBits;
 
         [DisableDump]
-        internal override IReferenceType ReferenceType { get { return Parent.ReferenceType; } }
+        internal override IReferenceType ReferenceType => Parent.ReferenceType;
 
         [DisableDump]
-        internal override bool Hllw { get { return Parent.Hllw; } }
+        internal override bool Hllw => Parent.Hllw;
 
         [DisableDump]
-        internal override IReferenceType UniquePointerType { get { return Parent.UniquePointerType; } }
+        internal override IReferenceType UniquePointerType => Parent.UniquePointerType;
 
-        protected override Result DeAlign(Category category) { return Parent.Result(category, ArgResult); }
+        protected override Result DeAlign(Category category) => Parent.Result(category, ArgResult);
 
         protected override IEnumerable<ISimpleFeature> ObtainRawSymmetricConversions()
-        {
-            return base.ObtainRawSymmetricConversions().Concat(new ISimpleFeature[] {Extension.SimpleFeature(UnalignedResult)});
-        }
+            => base.ObtainRawSymmetricConversions().Concat(new ISimpleFeature[] {Extension.SimpleFeature(UnalignedResult)});
 
         [DisableDump]
-        internal override bool IsAligningPossible { get { return false; } }
+        internal override bool IsAligningPossible => false;
 
-        Result IFeatureInheritor.Source(Category category) { return UnalignedResult(category); }
+        Result IFeatureInheritor.ConvertToBaseType(Category category) => PointerConversionResult(category, Parent);
+        TypeBase IFeatureInheritor.BaseType => Parent;
 
-        protected override Size GetSize() { return Parent.Size.Align(_alignBits); }
-        internal override int? SmartSequenceLength(TypeBase elementType) { return Parent.SmartSequenceLength(elementType); }
-        internal override int? SmartArrayLength(TypeBase elementType) { return Parent.SmartArrayLength(elementType); }
-        internal override Result Destructor(Category category) { return Parent.Destructor(category); }
-        internal override Result Copier(Category category) { return Parent.Copier(category); }
-        internal override Result ApplyTypeOperator(Result argResult) { return Parent.ApplyTypeOperator(argResult); }
-        protected override string GetNodeDump() { return base.GetNodeDump() + "(" + Parent.NodeDump + ")"; }
+        protected override Size GetSize() => Parent.Size.Align(_alignBits);
+        internal override int? SmartSequenceLength(TypeBase elementType) => Parent.SmartSequenceLength(elementType);
+        internal override int? SmartArrayLength(TypeBase elementType) => Parent.SmartArrayLength(elementType);
+        internal override Result Destructor(Category category) => Parent.Destructor(category);
+        internal override Result Copier(Category category) => Parent.Copier(category);
+        internal override Result ApplyTypeOperator(Result argResult) => Parent.ApplyTypeOperator(argResult);
+        protected override string GetNodeDump() => base.GetNodeDump() + "(" + Parent.NodeDump + ")";
 
-        protected override Result ParentConversionResult(Category category) { return UnalignedResult(category); }
+        protected override Result ParentConversionResult(Category category) => UnalignedResult(category);
 
         public Result UnalignedResult(Category category) { return Parent.Result(category, () => ArgCode.BitCast(Parent.Size)); }
     }

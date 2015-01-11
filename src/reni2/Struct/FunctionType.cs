@@ -39,7 +39,7 @@ namespace Reni.Struct
             StopByObjectId(-10);
         }
 
-        public override bool IsReassignPossible => _setter != null;
+        protected override bool IsReassignPossible => _setter != null;
 
         [DisableDump]
         internal override TypeBase ValueType { get { return _getter.ReturnType; } }

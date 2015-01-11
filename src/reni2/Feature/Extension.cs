@@ -48,8 +48,7 @@ namespace Reni.Feature
             where TDefinable : Definable
         {
             return inheritor
-                .Source(Category.Type)
-                .Type
+                .BaseType
                 .Declarations(tokenClass)
                 .Select(result => new InheritedTypeSearchResult(result, inheritor));
         }
