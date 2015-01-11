@@ -24,6 +24,20 @@ namespace Reni.FeatureTest.ConversionService
         }
 
         [Test]
+        public void ClosureServiceOfNumberBackwards()
+        {
+            var source= new Root(null).BitType.Number(8);
+            var paths = source.SymmetricPathsClosureBackwards().ToArray();
+
+            var destinations = paths.Select(p => p.Source).ToArray();
+
+            Tracer.Assert(destinations.Contains(source.Pointer));
+            Tracer.Assert(destinations.Contains(source.Align));
+            Tracer.Assert(destinations.Contains(source));
+            Tracer.Assert(destinations.Length == 3);
+        }
+
+        [Test]
         public void ClosureServiceOfNumber()
         {
             var source = new Root(null).BitType.Number(1);

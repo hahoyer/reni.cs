@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.UnitTest;
+using Reni.FeatureTest.ConversionService;
 using Reni.FeatureTest.Structure;
 
 namespace Reni.FeatureTest.ThenElse
@@ -11,6 +12,7 @@ namespace Reni.FeatureTest.ThenElse
     [Output("1")]
     [InnerAccess]
     [SomeVariables]
+    [Closure]
     public sealed class UseThen : CompilerTest {}
 
     [TestFixture]
@@ -18,5 +20,6 @@ namespace Reni.FeatureTest.ThenElse
     [Output("100")]
     [InnerAccess]
     [SomeVariables]
+    [Closure]
     public sealed class UseElse : CompilerTest {}
 }
