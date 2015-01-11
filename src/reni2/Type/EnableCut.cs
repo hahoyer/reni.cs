@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
@@ -16,11 +17,9 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        protected override string TagTitle { get { return "enable_cut"; } }
+        protected override string TagTitle => "enable_cut";
 
         IEnumerable<ISimpleFeature> IForcedConversionProvider<NumberType>.Result(NumberType destination)
-        {
-            return Parent.CutEnabledConversion(destination);
-        }
+            => Parent.CutEnabledConversion(destination);
     }
 }

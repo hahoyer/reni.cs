@@ -6,8 +6,8 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
-using Reni.ReniSyntax;
 using Reni.Numeric;
+using Reni.ReniSyntax;
 using Reni.Struct;
 
 namespace Reni.Type
@@ -17,44 +17,40 @@ namespace Reni.Type
             , ISymbolProvider<DumpPrintToken, IFeatureImplementation>
             , ISymbolProvider<Star, IFeatureImplementation>
     {
-        readonly TypeBase _value;
-
         public TypeType(TypeBase value)
         {
-            _value = value;
+            Value = value;
             StopByObjectId(61);
         }
 
         [DisableDump]
-        internal override Root RootContext { get { return _value.RootContext; } }
+        internal override Root RootContext => Value.RootContext;
 
         [DisableDump]
-        internal override bool Hllw { get { return true; } }
+        internal override bool Hllw => true;
 
         [DisableDump]
-        internal TypeBase Value { get { return _value; } }
+        internal TypeBase Value { get; }
 
         IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
-        {
-            return Extension.SimpleFeature(DumpPrintTokenResult);
-        }
+            => Extension.SimpleFeature(DumpPrintTokenResult);
 
-        IFeatureImplementation ISymbolProvider<Star, IFeatureImplementation>.Feature(Star tokenClass) { return Extension.MetaFeature(StarResult); }
-        internal override string DumpPrintText { get { return "(" + Value.DumpPrintText + "()) type"; } }
+        IFeatureImplementation ISymbolProvider<Star, IFeatureImplementation>.Feature(Star tokenClass)
+            => Extension.MetaFeature(StarResult);
+        internal override string DumpPrintText => "(" + Value.DumpPrintText + "()) type";
 
-        protected override string GetNodeDump() { return "(" + Value.NodeDump + ") type"; }
+        protected override string GetNodeDump() => "(" + Value.NodeDump + ") type";
 
         internal override Result InstanceResult(Category category, Func<Category, Result> getRightResult)
-        {
-            return RawInstanceResult(category.Typed, getRightResult).LocalPointerKindResult & category;
-        }
+            => RawInstanceResult(category.Typed, getRightResult).LocalPointerKindResult & category;
 
         Result RawInstanceResult(Category category, Func<Category, Result> getRightResult)
         {
             if(category <= Category.Type.Replenished)
                 return Value.Result(category.Typed);
-            return Value
-                .ConstructorResult(category, getRightResult(Category.Type).Type)
+            var constructorResult = Value
+                .ConstructorResult(category, getRightResult(Category.Type).Type);
+            return constructorResult
                 .ReplaceArg(getRightResult);
         }
 

@@ -2,6 +2,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using hw.Debug;
+using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Type;
@@ -12,6 +13,7 @@ namespace Reni.Feature
     {
         readonly Func<Category, IContextReference, TypeBase, Result> _function;
         static int _nextObjectId;
+        [UsedImplicitly]
         readonly int _order;
 
         protected FunctionBase(Func<Category, IContextReference, TypeBase, Result> function)
@@ -23,30 +25,28 @@ namespace Reni.Feature
         }
 
         Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
-        {
-            return _function(category, ObjectReference, argsType);
-        }
+            => _function(category, ObjectReference, argsType);
 
-        bool IFunctionFeature.IsImplicit { get { return false; } }
-        IContextReference IFunctionFeature.ObjectReference { get { return ObjectReference; } }
-        IContextReference ObjectReference { get { return ((IContextReferenceProvider) _function.Target).ContextReference; } }
+        bool IFunctionFeature.IsImplicit => false;
+        IContextReference IFunctionFeature.ObjectReference => ObjectReference;
+        IContextReference ObjectReference => ((IContextReferenceProvider) _function.Target).ContextReference;
     }
 
     sealed class Function : FunctionBase, IFeatureImplementation
     {
         public Function(Func<Category, IContextReference, TypeBase, Result> function)
-            : base(function)
-        {}
+            : base(function) {}
 
-        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta { get { return null; } }
-        IMetaFunctionFeature IFeatureImplementation.Meta { get { return null; } }
-        IFunctionFeature IFeatureImplementation.Function { get { return this; } }
-        ISimpleFeature IFeatureImplementation.Simple { get { return null; } }
+        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
+        IMetaFunctionFeature IFeatureImplementation.Meta => null;
+        IFunctionFeature IFeatureImplementation.Function => this;
+        ISimpleFeature IFeatureImplementation.Simple => null;
     }
 
     sealed class ExtendedFunction<T> : DumpableObject, IFunctionFeature, IFeatureImplementation
     {
         static int _nextObjectId;
+        [UsedImplicitly]
         readonly int _order;
 
         readonly Func<Category, TypeBase, T, Result> _function;
@@ -61,15 +61,15 @@ namespace Reni.Feature
             Tracer.Assert(_function.Target is IContextReferenceProvider);
         }
 
-        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta { get { return null; } }
-        IMetaFunctionFeature IFeatureImplementation.Meta { get { return null; } }
-        IFunctionFeature IFeatureImplementation.Function { get { return this; } }
-        ISimpleFeature IFeatureImplementation.Simple { get { return null; } }
+        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
+        IMetaFunctionFeature IFeatureImplementation.Meta => null;
+        IFunctionFeature IFeatureImplementation.Function => this;
+        ISimpleFeature IFeatureImplementation.Simple => null;
 
-        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType) { return _function(category, argsType, _arg); }
+        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType) => _function(category, argsType, _arg);
 
-        bool IFunctionFeature.IsImplicit { get { return false; } }
-        IContextReference IFunctionFeature.ObjectReference { get { return ObjectReference; } }
-        IContextReference ObjectReference { get { return ((IContextReferenceProvider) _function.Target).ContextReference; } }
+        bool IFunctionFeature.IsImplicit => false;
+        IContextReference IFunctionFeature.ObjectReference => ObjectReference;
+        IContextReference ObjectReference => ((IContextReferenceProvider) _function.Target).ContextReference;
     }
 }
