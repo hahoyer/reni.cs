@@ -54,27 +54,15 @@ namespace Reni.Context
         public abstract string DumpPrintText { get; }
 
         [UsedImplicitly]
-        internal int SizeToPacketCount(Size size)
-        {
-            return size.SizeToPacketCount(Root.DefaultRefAlignParam.AlignBits);
-        }
+        internal int SizeToPacketCount(Size size) => size.SizeToPacketCount(Root.DefaultRefAlignParam.AlignBits);
 
-        internal ContextBase UniqueStructurePositionContext(CompoundSyntax container, int position)
-        {
-            return _cache.StructContexts[container][position];
-        }
+        internal ContextBase UniqueStructurePositionContext(CompoundSyntax container, int position) => _cache.StructContexts[container][position];
 
-        internal CompoundView UniqueCompoundView(CompoundSyntax syntax)
-        {
-            return UniqueCompoundView(syntax, syntax.EndPosition);
-        }
+        internal CompoundView UniqueCompoundView(CompoundSyntax syntax) => UniqueCompoundView(syntax, syntax.EndPosition);
 
-        internal CompoundView UniqueCompoundView(CompoundSyntax syntax, int accessPosition)
-        {
-            return _cache.CompoundViews[syntax][accessPosition];
-        }
+        internal CompoundView UniqueCompoundView(CompoundSyntax syntax, int accessPosition) => _cache.CompoundViews[syntax][accessPosition];
 
-        internal Compound UniqueCompound(CompoundSyntax context) { return _cache.Compounds[context]; }
+        internal Compound UniqueCompound(CompoundSyntax context) => _cache.Compounds[context];
 
         [DebuggerHidden]
         internal Result Result(Category category, CompileSyntax syntax)
@@ -94,7 +82,7 @@ namespace Reni.Context
             return result;
         }
 
-        internal TypeBase TypeIfKnown(CompileSyntax syntax) { return _cache.ResultCache[syntax].Data.Type; }
+        internal TypeBase TypeIfKnown(CompileSyntax syntax) => _cache.ResultCache[syntax].Data.Type;
 
         [DebuggerHidden]
         Result ObtainResult(Category category, CompileSyntax syntax)
@@ -122,10 +110,10 @@ namespace Reni.Context
             return result;
         }
 
-        internal TypeBase Type(CompileSyntax syntax) { return Result(Category.Type, syntax).Type; }
+        internal TypeBase Type(CompileSyntax syntax) => Result(Category.Type, syntax).Type;
 
-        internal virtual CompoundView ObtainRecentCompoundView() { return null; }
-        internal virtual IFunctionContext ObtainRecentFunctionContext() { return null; }
+        internal virtual CompoundView ObtainRecentCompoundView() => null;
+        internal virtual IFunctionContext ObtainRecentFunctionContext() => null;
 
         sealed class Cache : DumpableObject, IIconKeyProvider
         {
@@ -184,30 +172,18 @@ namespace Reni.Context
             public string IconKey { get { return "Cache"; } }
         }
 
-        internal Result ResultAsReference(Category category, CompileSyntax syntax)
-        {
-            return Result(category.Typed, syntax)
-                .LocalPointerKindResult;
-        }
+        internal Result ResultAsReference(Category category, CompileSyntax syntax) => Result(category.Typed, syntax)
+            .LocalPointerKindResult;
 
-        internal Result ArgReferenceResult(Category category)
-        {
-            return FindRecentFunctionContextObject
-                .CreateArgReferenceResult(category);
-        }
+        internal Result ArgReferenceResult(Category category) => FindRecentFunctionContextObject
+            .CreateArgReferenceResult(category);
 
-        internal Result ArgsResult(Category category, [CanBeNull] CompileSyntax right)
-        {
-            return right == null
-                ? RootContext.VoidType.Result(category.Typed)
-                : right.SmartUnFunctionedReferenceResult(this, category);
-        }
+        internal Result ArgsResult(Category category, [CanBeNull] CompileSyntax right) => right == null
+            ? RootContext.VoidType.Result(category.Typed)
+            : right.SmartUnFunctionedReferenceResult(this, category);
 
-        internal Result ObjectResult(Category category, [NotNull] CompileSyntax left)
-        {
-            return Result(category.Typed, left)
-                .Conversion(Type(left).TypeForSearchProbes);
-        }
+        internal Result ObjectResult(Category category, [NotNull] CompileSyntax left) => Result(category.Typed, left)
+            .Conversion(Type(left).UniquePointer);
 
         /// <summary>
         ///     Obtains the feature result of a functional argument object.

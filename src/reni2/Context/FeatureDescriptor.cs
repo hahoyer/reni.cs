@@ -40,6 +40,8 @@ namespace Reni.Context
                 Dump("resultWithConversions", resultWithConversions);
                 BreakExecution();
                 var objectResult = context.ObjectResult(category, left);
+                Dump("objectResult", objectResult);
+                BreakExecution();
                 var result = resultWithConversions.ReplaceArg(objectResult);
                 return ReturnMethodDump(result);
             }
@@ -59,7 +61,7 @@ namespace Reni.Context
             return result.ReplaceArg(ConverterResult);
         }
 
-        internal Result Result(Category category) { return SimpleResult(category).ReplaceArg(ConverterResult); }
+        internal Result Result(Category category) => SimpleResult(category).ReplaceArg(ConverterResult);
 
         Result Result(ContextBase context, Category category, CompileSyntax right)
         {
@@ -67,7 +69,7 @@ namespace Reni.Context
             if(simpleFeature != null && right == null)
                 return simpleFeature.Result(category);
 
-            var trace = ObjectId == -48 && category.HasCode;
+            var trace = ObjectId == -55 && category.HasCode;
             StartMethodDump(trace, context, category, right);
             try
             {
@@ -78,9 +80,11 @@ namespace Reni.Context
 
                 var applyResult = function
                     .ApplyResult(category, argsType);
+                Dump("applyResult", applyResult);
+                BreakExecution();
+
                 var replaceArg = applyResult
                     .ReplaceArg(c => context.ArgsResult(c, right));
-                Dump("applyResult", applyResult);
                 Dump("replaceArg", replaceArg);
                 BreakExecution();
 
@@ -114,14 +118,12 @@ namespace Reni.Context
     sealed class CallDescriptor : FeatureDescriptor
     {
         readonly TypeBase _definingType;
-        readonly IFeatureImplementation _feature;
-        readonly Func<Category, Result> _converterResult;
         public CallDescriptor(TypeBase definingType, IFeatureImplementation feature, Func<Category, Result> converterResult)
         {
             _definingType = definingType;
-            _feature = feature;
-            _converterResult = converterResult;
-            StopByObjectId(-49);
+            Feature = feature;
+            ConverterResult = converterResult;
+            StopByObjectId(-41);
         }
         [DisableDump]
         protected override TypeBase Type
@@ -133,9 +135,9 @@ namespace Reni.Context
             }
         }
         [DisableDump]
-        protected override IFeatureImplementation Feature { get { return _feature; } }
+        protected override IFeatureImplementation Feature { get; }
         [DisableDump]
-        protected override Func<Category, Result> ConverterResult { get { return _converterResult; } }
+        protected override Func<Category, Result> ConverterResult { get; }
     }
 
     sealed class FunctionalObjectDescriptor : FeatureDescriptor
@@ -147,9 +149,9 @@ namespace Reni.Context
             _context = context;
             _left = left;
         }
-        protected override TypeBase Type { get { return _context.Type(_left); } }
-        protected override Func<Category, Result> ConverterResult { get { return null; } }
-        protected override IFeatureImplementation Feature { get { return Type.Feature; } }
+        protected override TypeBase Type => _context.Type(_left);
+        protected override Func<Category, Result> ConverterResult => null;
+        protected override IFeatureImplementation Feature => Type.Feature;
     }
 
     sealed class FunctionalArgDescriptor : FeatureDescriptor
@@ -158,18 +160,15 @@ namespace Reni.Context
         internal FunctionalArgDescriptor(ContextBase context) { _context = context; }
 
         [DisableDump]
-        FunctionBodyType FunctionBodyType { get { return (FunctionBodyType) _context.ArgReferenceResult(Category.Type).Type; } }
+        FunctionBodyType FunctionBodyType => (FunctionBodyType) _context.ArgReferenceResult(Category.Type).Type;
         [DisableDump]
-        CompoundView CompoundView { get { return FunctionBodyType.FindRecentCompoundView; } }
+        CompoundView CompoundView => FunctionBodyType.FindRecentCompoundView;
 
         [DisableDump]
-        protected override Func<Category, Result> ConverterResult
-        {
-            get { return CompoundView.StructReferenceViaContextReference; }
-        }
+        protected override Func<Category, Result> ConverterResult => CompoundView.StructReferenceViaContextReference;
         [DisableDump]
-        protected override TypeBase Type { get { return CompoundView.Type; } }
+        protected override TypeBase Type => CompoundView.Type;
         [DisableDump]
-        protected override IFeatureImplementation Feature { get { return FunctionBodyType.Feature; } }
+        protected override IFeatureImplementation Feature => FunctionBodyType.Feature;
     }
 }

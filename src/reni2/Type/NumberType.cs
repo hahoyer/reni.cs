@@ -64,7 +64,7 @@ namespace Reni.Type
 
         IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
         {
-            return Extension.SimpleFeature(DumpPrintTokenResult);
+            return Extension.SimpleFeature(DumpPrintTokenResult, this);
         }
 
         IFeatureImplementation ISymbolProvider<Operation, IFeatureImplementation>.Feature(Operation tokenClass)
@@ -120,12 +120,12 @@ namespace Reni.Type
                 .ReplaceAbsolute(_zeroResult.Value.Type.UniquePointerType, c => _zeroResult.Value.LocalPointerKindResult & (c));
         }
 
-        Result DumpPrintTokenResult(Category category) { return VoidType.Result(category, DumpPrintNumberCode, CodeArgs.Arg); }
-
-        CodeBase DumpPrintNumberCode()
+        protected override CodeBase DumpPrintCode()
         {
             var alignedSize = Size.Align(Root.DefaultRefAlignParam.AlignBits);
-            return ArgCode
+            return UniquePointer
+                .ArgCode
+                .DePointer(alignedSize)
                 .DumpPrintNumber(alignedSize);
         }
 
@@ -138,7 +138,7 @@ namespace Reni.Type
 
         Result OperationResult(Category category, TypeBase right, IOperation operation)
         {
-            var path = FindPath(right, x=> x is NumberType);
+            var path = FindPath(right, x => x is NumberType);
             if(path != null)
                 return OperationResult(category, operation, (NumberType) path.Destination);
 
@@ -150,7 +150,7 @@ namespace Reni.Type
         {
             var transformation = operation as ITransformation;
             var resultType = transformation == null
-                ? (TypeBase)RootContext.BitType
+                ? (TypeBase) RootContext.BitType
                 : RootContext.BitType.UniqueNumber(transformation.Signature(Bits, right.Bits));
             return OperationResult(category, resultType, operation.Name, right);
         }
@@ -166,9 +166,7 @@ namespace Reni.Type
 
             var leftResult = UniquePointer.Result(category.Typed, UniquePointerType)
                 .Conversion(UniqueAlign);
-            var rightResult = right.UniquePointer
-                .ArgResult(category.Typed)
-                .Conversion(right.UniqueAlign);
+            var rightResult = right.UniquePointer.ArgResult(category.Typed).Conversion(right.UniqueAlign);
             var pair = leftResult + rightResult;
             return result.ReplaceArg(pair);
         }
@@ -176,7 +174,9 @@ namespace Reni.Type
         CodeBase OperationCode(Size resultSize, string token, TypeBase right)
         {
             Tracer.Assert(!(right is PointerType));
-            return UniqueAlign.Pair(right.UniqueAlign).ArgCode
+            return UniqueAlign
+                .Pair(right.UniqueAlign)
+                .ArgCode
                 .NumberOperation(token, resultSize, UniqueAlign.Size, right.UniqueAlign.Size);
         }
 

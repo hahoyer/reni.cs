@@ -145,12 +145,13 @@ namespace Reni.Feature
         {
             Feature = data;
             _definingItem = definingItem;
+            StopByObjectId(-39);
         }
 
         [DisableDump]
         public override IFeatureImplementation Feature { get; }
 
-        public override Result Converter(Category category) => _definingItem.ArgResult(category);
+        public override Result Converter(Category category) => _definingItem.UniquePointer.ArgResult(category);
 
         [DisableDump]
         public override TypeBase Type => _definingItem;

@@ -25,7 +25,8 @@ namespace Reni.Code
             StopByObjectId(-3);
         }
 
-        protected override FiberItem[] TryToCombineImplementation(FiberItem subsequentElement) => subsequentElement.TryToCombineBack(this);
+        protected override FiberItem[] TryToCombineImplementation(FiberItem subsequentElement)
+            => subsequentElement.TryToCombineBack(this);
 
         [DisableDump]
         internal override Size OutputSize { get; }
@@ -63,7 +64,8 @@ namespace Reni.Code
 
         internal override void Visit(IVisitor visitor) => visitor.BitArrayPrefixOp(Operation, OutputSize, ArgSize);
 
-        protected override FiberItem[] TryToCombineImplementation(FiberItem subsequentElement) => subsequentElement.TryToCombineBack(this);
+        protected override FiberItem[] TryToCombineImplementation(FiberItem subsequentElement)
+            => subsequentElement.TryToCombineBack(this);
 
         protected override string GetNodeDump() => base.GetNodeDump() + " " + Operation + " " + ArgSize;
     }
@@ -74,7 +76,10 @@ namespace Reni.Code
     sealed class DumpPrintNumberOperation : BinaryOp
     {
         internal DumpPrintNumberOperation(Size leftSize, Size rightSize)
-            : base(leftSize, rightSize) {}
+            : base(leftSize, rightSize)
+        {
+            StopByObjectId(-10);
+        }
 
         [DisableDump]
         internal override Size OutputSize => Size.Zero;

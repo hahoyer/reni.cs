@@ -535,7 +535,6 @@ namespace Reni.Type
         {
             NotImplementedMethod();
             return null;
-
         }
 
         internal IEnumerable<ISimpleFeature> GetForcedConversions<TDestination>(TDestination destination)
@@ -549,6 +548,14 @@ namespace Reni.Type
         [DisableDump]
         internal virtual IEnumerable<ISimpleFeature> StripConversions { get { yield break; } }
         internal virtual IEnumerable<ISimpleFeature> CutEnabledConversion(NumberType destination) { yield break; }
+
+        protected Result DumpPrintTokenResult(Category category) => VoidType.Result(category, DumpPrintCode, CodeArgs.Arg);
+
+        protected virtual CodeBase DumpPrintCode()
+        {
+            NotImplementedMethod();
+            return null;
+        }
     }
 
     interface IForcedConversionProvider<in TDestination>

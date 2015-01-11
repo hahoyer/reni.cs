@@ -15,40 +15,36 @@ namespace Reni.Type
         : TypeBase
             , ISymbolProvider<DumpPrintToken, IFeatureImplementation>
     {
-        readonly Root _rootContext;
-
-        internal BitType(Root rootContext) { _rootContext = rootContext; }
+        internal BitType(Root rootContext) { RootContext = rootContext; }
 
         [DisableDump]
-        internal override bool Hllw { get { return false; } }
+        internal override bool Hllw => false;
 
         [DisableDump]
-        internal override string DumpPrintText { get { return "bit"; } }
+        internal override string DumpPrintText => "bit";
 
         [DisableDump]
-        internal override Root RootContext { get { return _rootContext; } }
+        internal override Root RootContext { get; }
 
-        protected override Size GetSize() { return Size.Create(1); }
+        protected override Size GetSize() => Size.Create(1);
 
-        protected override string Dump(bool isRecursion) { return GetType().PrettyName(); }
+        protected override string Dump(bool isRecursion) => GetType().PrettyName();
 
-        protected override string GetNodeDump() { return "bit"; }
-        internal NumberType UniqueNumber(int bitCount) { return UniqueArray(bitCount).UniqueNumber; }
+        protected override string GetNodeDump() => "bit";
+        internal NumberType UniqueNumber(int bitCount) => UniqueArray(bitCount).UniqueNumber;
         internal Result Result(Category category, BitsConst bitsConst)
         {
             return UniqueNumber(bitsConst.Size.ToInt())
                 .Result(category, () => CodeBase.BitsConst(bitsConst));
         }
 
-        internal interface IPrefix
-        {
-            [DisableDump]
-            string Name { get; }
-        }
-
         IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
-            => Extension.SimpleFeature(DumpPrintTokenResult);
+            => Extension.SimpleFeature(DumpPrintTokenResult, this);
 
-        Result DumpPrintTokenResult(Category category) => VoidType.Result(category, () => ArgCode.Align().DumpPrintNumber(), CodeArgs.Arg);
+        protected override CodeBase DumpPrintCode()
+            => UniquePointer
+                .ArgCode
+                .DePointer(Size)
+                .DumpPrintNumber();
     }
 }

@@ -58,7 +58,7 @@ namespace Reni.Type
                 .ReplaceArg(getRightResult);
         }
 
-        internal Result DumpPrintTokenResult(Category category) { return Value.DumpPrintTypeNameResult(category); }
+        new Result DumpPrintTokenResult(Category category) => Value.DumpPrintTypeNameResult(category);
 
         Result StarResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {

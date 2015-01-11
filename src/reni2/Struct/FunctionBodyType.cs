@@ -61,7 +61,7 @@ namespace Reni.Struct
         [DisableDump]
         internal override string DumpPrintText { get { return _syntax.DumpPrintText; } }
 
-        internal Result DumpPrintTokenResult(Category category) { return DumpPrintTypeNameResult(category); }
+        internal new Result DumpPrintTokenResult(Category category) => DumpPrintTypeNameResult(category);
 
         [DisableDump]
         IContextReference ObjectReference { get { return _objectReferenceCache.Value; } }

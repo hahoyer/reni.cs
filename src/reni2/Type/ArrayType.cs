@@ -190,16 +190,13 @@ namespace Reni.Type
             return result;
         }
 
-        internal Result DumpPrintTokenResult(Category category)
-        {
-            return VoidType
-                .Result
-                (
-                    category,
-                    CreateDumpPrintCode,
-                    () => ElementType.GenericDumpPrintResult(Category.Exts).Exts
-                );
-        }
+        new Result DumpPrintTokenResult(Category category) => VoidType
+            .Result
+            (
+                category,
+                CreateDumpPrintCode,
+                () => ElementType.GenericDumpPrintResult(Category.Exts).Exts
+            );
 
         CodeBase CreateDumpPrintCode()
         {
