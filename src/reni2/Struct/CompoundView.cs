@@ -64,43 +64,43 @@ namespace Reni.Struct
         [DisableDump]
         TypeBase IndexType => Compound.IndexType;
 
-        bool _isObtainStructSizeActive;
+        bool _isObtainCompoundSizeActive;
 
         [DisableDump]
-        internal Size StructSize
+        internal Size CompoundSize
         {
             get
             {
-                if(_isObtainStructSizeActive)
-                    throw new RecursionWhileObtainingStructSizeException(this);
+                if(_isObtainCompoundSizeActive)
+                    throw new RecursionWhileObtainingCompoundSizeException(this);
 
                 try
                 {
-                    _isObtainStructSizeActive = true;
-                    var result = Compound.StructureSize(ViewPosition);
-                    _isObtainStructSizeActive = false;
+                    _isObtainCompoundSizeActive = true;
+                    var result = Compound.Size(ViewPosition);
+                    _isObtainCompoundSizeActive = false;
                     return result;
                 }
-                catch(RecursionWhileObtainingStructSizeException)
+                catch(RecursionWhileObtainingCompoundSizeException)
                 {
-                    _isObtainStructSizeActive = false;
+                    _isObtainCompoundSizeActive = false;
                     return null;
                 }
             }
         }
 
         [DisableDump]
-        internal bool Hllw => Compound.StructureHllw(ViewPosition);
+        internal bool Hllw => Compound.Hllw(ViewPosition);
 
         [DisableDump]
         internal Root RootContext => Compound.RootContext;
 
-        sealed class RecursionWhileObtainingStructSizeException : Exception
+        sealed class RecursionWhileObtainingCompoundSizeException : Exception
         {
             [EnableDump]
             readonly CompoundView _compoundView;
 
-            public RecursionWhileObtainingStructSizeException(CompoundView compoundView) { _compoundView = compoundView; }
+            public RecursionWhileObtainingCompoundSizeException(CompoundView compoundView) { _compoundView = compoundView; }
         }
 
         internal TypeBase FunctionalType(FunctionSyntax syntax) => _functionBodyTypeCache[syntax];
@@ -200,7 +200,7 @@ namespace Reni.Struct
             .ContextReferenceViaStructReference(ViewPosition, result);
 
         CodeBase StructReferenceCodeViaContextReference() => CodeBase.ReferenceCode(Compound)
-            .ReferencePlus(StructSize * -1);
+            .ReferencePlus(CompoundSize * -1);
 
         internal TypeBase ValueType(int position) => Compound
             .AccessType(ViewPosition, position)

@@ -95,7 +95,7 @@ namespace Reni.Struct
                     .ReplaceAbsolute
                     (
                         _compoundView.Compound,
-                        () => CodeBase.ReferenceCode(ObjectReference).ReferencePlus(_compoundView.StructSize),
+                        () => CodeBase.ReferenceCode(ObjectReference).ReferencePlus(_compoundView.CompoundSize),
                         () => CodeArgs.Create(ObjectReference)
                     );
 

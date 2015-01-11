@@ -44,14 +44,14 @@ namespace Reni.Struct
 
         Size IndexSize => Syntax.IndexSize;
 
-        internal Size StructureSize(int position)
+        internal Size Size(int position)
         {
-            if(StructureHllw(position))
-                return Size.Zero;
+            if(Hllw(position))
+                return Basics.Size.Zero;
             return ResultsOfStatements(Category.Size, 0, position).Size;
         }
 
-        internal bool StructureHllw(int accessPosition) => ObtainHllw(accessPosition);
+        internal bool Hllw(int accessPosition) => ObtainHllw(accessPosition);
 
         internal Result ContextReferenceViaStructReference(int position, Result result)
             => result.ReplaceAbsolute(this, () => ContextReferenceViaStructReferenceCode(position), CodeArgs.Arg);
