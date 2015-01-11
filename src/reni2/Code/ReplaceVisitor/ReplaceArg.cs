@@ -19,7 +19,7 @@ namespace Reni.Code.ReplaceVisitor
         {
             Tracer.Assert(actualArg != null, () => "actualArg != null");
             Tracer.Assert(actualArg.HasCode, () => "actualArg.HasCode");
-            //Tracer.Assert(actualArg.HasType, () => "actualArg.HasType");
+            Tracer.Assert(actualArg.HasType, () => "actualArg.HasType");
             ActualArg = actualArg;
         }
 

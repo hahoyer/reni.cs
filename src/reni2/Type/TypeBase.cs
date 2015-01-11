@@ -381,7 +381,7 @@ namespace Reni.Type
 
             var path = ConversionService.FindPath(this, destination);
             if(path != null)
-                return path.Execute(category);
+                return path.Execute(category.Typed);
 
             NotImplementedMethod(category, destination);
             return null;

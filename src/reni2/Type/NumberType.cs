@@ -124,9 +124,13 @@ namespace Reni.Type
 
         Result OperationResult(Category category, TypeBase right, IOperation operation)
         {
-            var path = FindPath(right, x => x is NumberType);
-            if(path != null)
-                return OperationResult(category, operation, (NumberType) path.Destination);
+            var destination = FindPathDestination<NumberType>(right);
+            if (destination != null)
+            {
+                var conversion = right.Conversion(Category.Code, destination).Code;
+                return OperationResult(category, operation, destination)
+                    .ReplaceArg(c => right.Conversion(c, destination));
+            }
 
             NotImplementedMethod(category, right, operation);
             return null;
