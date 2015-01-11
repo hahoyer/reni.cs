@@ -5,6 +5,7 @@ using hw.Debug;
 using Reni.Basics;
 using Reni.Feature;
 using Reni.TokenClasses;
+using Reni.Type;
 
 namespace Reni.Numeric
 {
@@ -12,9 +13,13 @@ namespace Reni.Numeric
         : TransformationOperation
     {
         public const string Id = "-";
+        public Minus() { Name = Id; }
         protected override int Signature(int objSize, int argSize) { return BitsConst.PlusSize(objSize, argSize); }
         [DisableDump]
-        internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
+        internal override IEnumerable<IGenericProviderForDefinable> Genericize
+        {
+            get { return this.GenericListFromDefinable(base.Genericize); }
+        }
     }
 
     sealed class Plus
@@ -22,20 +27,30 @@ namespace Reni.Numeric
     {
         protected override int Signature(int objSize, int argSize) { return BitsConst.PlusSize(objSize, argSize); }
         [DisableDump]
-        internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
+        internal override IEnumerable<IGenericProviderForDefinable> Genericize
+        {
+            get { return this.GenericListFromDefinable(base.Genericize); }
+        }
     }
 
     sealed class Negate : Definable
     {
         public const string Id = "negate";
         [DisableDump]
-        internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
+        internal override IEnumerable<IGenericProviderForDefinable> Genericize
+        {
+            get { return this.GenericListFromDefinable(base.Genericize); }
+        }
     }
 
     sealed class AlignToken : Definable
     {
         public const string Id = "!!!";
         [DisableDump]
-        internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
+        internal override IEnumerable<IGenericProviderForDefinable> Genericize
+        {
+            get { return this.GenericListFromDefinable(base.Genericize); }
+        }
     }
+
 }
