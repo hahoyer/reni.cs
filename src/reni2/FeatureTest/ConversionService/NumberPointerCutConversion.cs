@@ -4,11 +4,7 @@ using System.Linq;
 using hw.Debug;
 using hw.UnitTest;
 using Reni.Basics;
-using Reni.Code;
-using Reni.Code.ReplaceVisitor;
 using Reni.Context;
-using Reni.Struct;
-using Reni.Type;
 using Reni.Type.ConversionService;
 
 namespace Reni.FeatureTest.ConversionService
@@ -28,8 +24,7 @@ namespace Reni.FeatureTest.ConversionService
             var calulatedDestination = path.Execute(Category.Type).Type;
             Tracer.Assert(calulatedDestination == destination);
 
-            var code = path.Execute(Category.Code).Code.ReplaceArg(source.ArgResult(Category.Code.Typed));
-
+            var code = path.Execute(Category.Code.Typed).Code.ReplaceArg(source.ArgResult(Category.Code.Typed));
         }
     }
 }
