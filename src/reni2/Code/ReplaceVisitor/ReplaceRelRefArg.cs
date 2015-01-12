@@ -37,7 +37,7 @@ namespace Reni.Code.ReplaceVisitor
             : base(actualArg)
         {
             _offset = offset;
-            StopByObjectId(9);
+            StopByObjectId(-9);
         }
 
         internal ReplaceRelRefArg(Result actualArg)

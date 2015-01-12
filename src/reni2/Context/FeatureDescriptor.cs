@@ -74,7 +74,7 @@ namespace Reni.Context
             if(simpleFeature != null && right == null)
                 return simpleFeature.Result(category);
 
-            var trace = ObjectId == 152 && category.HasCode;
+            var trace = ObjectId == -77 && category.HasCode;
             StartMethodDump(trace, context, category, right);
             try
             {
@@ -94,7 +94,7 @@ namespace Reni.Context
                 BreakExecution();
 
                 var result = replaceArg
-                    .ReplaceAbsolute(function.ObjectReference, c => Type.ArgResult(c.Typed).LocalPointerKindResult);
+                    .ReplaceAbsolute(function.ObjectReference, c => Type.Pointer.ArgResult(c.Typed));
 
                 return ReturnMethodDump(result);
             }
