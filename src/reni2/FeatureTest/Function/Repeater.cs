@@ -40,8 +40,8 @@ repeat
     [Target(@"
 repeat: /\ ^ while() then(^ body(), repeat(^));
 
-count: 10,
-index: :=! count type instance(0),
+count: 10;
+index: :=! count type instance(0);
 repeat
 (
     while: /\ index < count, 
