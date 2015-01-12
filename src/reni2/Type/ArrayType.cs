@@ -73,7 +73,7 @@ namespace Reni.Type
                 Extension.FunctionFeature
                     (
                         (category, objectReference, argsType) =>
-                            ConcatArraysResult(category, objectReference, argsType, tokenClass.IsMutable));
+                            ConcatArraysResult(category, objectReference, argsType, tokenClass.IsMutable), this);
 
         IFeatureImplementation ISymbolProvider<TextItem, IFeatureImplementation>.Feature(TextItem tokenClass)
             => Extension.SimpleFeature(TextItemResult);

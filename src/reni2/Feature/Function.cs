@@ -12,16 +12,17 @@ namespace Reni.Feature
     abstract class FunctionBase : DumpableObject, IFunctionFeature
     {
         readonly Func<Category, IContextReference, TypeBase, Result> _function;
+        readonly IContextReferenceProvider _target;
         static int _nextObjectId;
         [UsedImplicitly]
         readonly int _order;
 
-        protected FunctionBase(Func<Category, IContextReference, TypeBase, Result> function)
+        protected FunctionBase(Func<Category, IContextReference, TypeBase, Result> function, IContextReferenceProvider target)
             : base(_nextObjectId++)
         {
             _order = CodeArgs.NextOrder++;
             _function = function;
-            Tracer.Assert(_function.Target is IContextReferenceProvider);
+            _target = target;
         }
 
         Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
@@ -29,13 +30,13 @@ namespace Reni.Feature
 
         bool IFunctionFeature.IsImplicit => false;
         IContextReference IFunctionFeature.ObjectReference => ObjectReference;
-        IContextReference ObjectReference => ((IContextReferenceProvider) _function.Target).ContextReference;
+        IContextReference ObjectReference => _target.ContextReference;
     }
 
     sealed class Function : FunctionBase, IFeatureImplementation
     {
-        public Function(Func<Category, IContextReference, TypeBase, Result> function)
-            : base(function) {}
+        public Function(Func<Category, IContextReference, TypeBase, Result> function, IContextReferenceProvider target)
+            : base(function, target) {}
 
         IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
         IMetaFunctionFeature IFeatureImplementation.Meta => null;

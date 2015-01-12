@@ -22,8 +22,8 @@ namespace Reni.Feature
         internal static Simple SimpleFeature(Func<Category, Result> function, TypeBase target = null)
             => _simpleCache[function][(target ?? function.Target as TypeBase).AssertNotNull()];
 
-        internal static Function FunctionFeature(Func<Category, IContextReference, TypeBase, Result> function)
-            => new Function(function);
+        internal static Function FunctionFeature(Func<Category, IContextReference, TypeBase, Result> function, IContextReferenceProvider target = null)
+            => new Function(function, (target ?? function.Target as IContextReferenceProvider).AssertNotNull());
 
         internal static IFeatureImplementation FunctionFeature<T>
             (Func<Category, TypeBase, T, Result> function, T arg) => new ExtendedFunction<T>(function, arg);
