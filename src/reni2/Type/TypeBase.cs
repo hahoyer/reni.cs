@@ -442,7 +442,7 @@ namespace Reni.Type
         {
             if(Hllw)
                 yield break;
-            if(IsAligningPossible)
+            if(IsAligningPossible && Align.Size != Size)
                 yield return Reni.Feature.Extension.SimpleFeature(AlignResult);
             if(!(this is PointerType))
                 yield return Reni.Feature.Extension.SimpleFeature(LocalReferenceResult);
