@@ -81,10 +81,9 @@ namespace Reni.Context
 
         static Result CreateArrayResult(ContextBase context, Category category, CompileSyntax argsType)
         {
-            var target = context.Result(category.Typed, argsType).SmartUn<PointerType>();
+            var target = context.Result(category.Typed, argsType).SmartUn<PointerType>().Align;
             return target
                 .Type
-                .Align
                 .Array(1)
                 .Result(category.Typed, target)
                 .LocalReferenceResult
