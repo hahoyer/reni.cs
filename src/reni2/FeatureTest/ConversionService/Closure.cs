@@ -24,7 +24,7 @@ namespace Reni.FeatureTest.ConversionService
         }
 
         [Test]
-        public void ClosureServiceOfNumberBackwards()
+        public void ClosureServiceOfAlignedNumber()
         {
             var source= new Root(null).BitType.Number(8);
             var paths = source.SymmetricPathsClosureBackwards().ToArray();
@@ -34,7 +34,21 @@ namespace Reni.FeatureTest.ConversionService
             Tracer.Assert(destinations.Contains(source.Pointer));
             Tracer.Assert(destinations.Contains(source.Align));
             Tracer.Assert(destinations.Contains(source));
-            Tracer.Assert(destinations.Length == 3);
+            Tracer.Assert(destinations.Length == 2);
+        }
+
+        [Test]
+        public void ClosureServiceOfAlignedNumberBackwards()
+        {
+            var source = new Root(null).BitType.Number(8);
+            var paths = source.SymmetricPathsClosureBackwards().ToArray();
+
+            var destinations = paths.Select(p => p.Source).ToArray();
+
+            Tracer.Assert(destinations.Contains(source.Pointer));
+            Tracer.Assert(destinations.Contains(source.Align));
+            Tracer.Assert(destinations.Contains(source));
+            Tracer.Assert(destinations.Length == 2);
         }
 
         [Test]
