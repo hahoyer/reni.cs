@@ -32,7 +32,7 @@ namespace Reni.FeatureTest.Array
     [TestFixture]
     [ElementAccessVariableSetterSimple]
     [TwoStatements]
-    [TargetSet("x:  <<:=5<<3<<5<<1<<3; x(3) := 2; x dump_print", "<<:=(5, 3, 5, 2, 3)")]
+    [TargetSet("x:  <<5<<3<<5<<1<<:=3; x(3) := 2; x dump_print", "<<:=(5, 3, 5, 2, 3)")]
     public sealed class ElementAccessVariableSetter : CompilerTest {}
 
     [TestFixture]
