@@ -35,7 +35,7 @@ namespace Reni.Context
                 Dump("rawResult", rawResult);
                 BreakExecution();
 
-                var converterResult = ConverterResult(category.Typed);
+                var converterResult = ConverterResult?.Invoke(category.Typed);
                 Dump("converterResult", converterResult);
                 BreakExecution();
 
