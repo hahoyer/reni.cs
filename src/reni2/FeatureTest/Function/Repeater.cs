@@ -13,8 +13,8 @@ namespace Reni.FeatureTest.Function
     [Target(@"
 repeat: /\ ^() while then repeat(^);
 
-count: 10,
-index: :=! count type instance(0),
+count: 10;
+index: :=! count type instance(0);
 repeat
 (/\(
     while: index < count, 
