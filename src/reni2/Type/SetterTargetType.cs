@@ -29,7 +29,7 @@ namespace Reni.Type
         ISimpleFeature IReference.Converter => this;
         TypeBase ISimpleFeature.TargetType => ValueType;
         Result ISimpleFeature.Result(Category category) => GetterResult(category);
-        Result IFeatureInheritor.ConvertToBaseType(Category category) => GetterResult(category);
+        Result IFeatureInheritor.ConvertToBaseType(Category category) => GetterResult(category).LocalPointerKindResult;
         TypeBase IFeatureInheritor.BaseType => ValueType;
 
         IFeatureImplementation ISymbolProvider<ReassignToken, IFeatureImplementation>.Feature(ReassignToken tokenClass)
