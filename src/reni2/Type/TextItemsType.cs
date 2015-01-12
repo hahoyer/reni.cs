@@ -36,13 +36,13 @@ namespace Reni.Type
 
         internal override int? SmartArrayLength(TypeBase elementType) { return Parent.SmartArrayLength(elementType); }
 
-        internal Result ConcatArraysResult(Category category, IContextReference objectReference, TypeBase argsType)
+        internal Result ConcatArraysResult(Category category, IContextReference objectReference, TypeBase argsType, bool isMutable)
         {
             var trace = ObjectId == -1 && category.HasCode;
             StartMethodDump(trace, category, objectReference, argsType);
             try
             {
-                var result = Parent.InternalConcatArrays(category.Typed, objectReference, argsType);
+                var result = Parent.InternalConcatArrays(category.Typed, objectReference, argsType, isMutable);
                 Dump("result", result);
                 BreakExecution();
 

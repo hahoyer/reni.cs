@@ -14,9 +14,9 @@ namespace Reni.TokenClasses
         {
             var data = StripQutes(token.Name);
             return context
-                .RootContext.BitType.Array(BitsConst.BitSize(data[0].GetType()))
+                .RootContext.BitType.Array(BitsConst.BitSize(data[0].GetType()), false)
                 .TextItemType
-                .Array(data.Length)
+                .Array(data.Length, false)
                 .TextItemType
                 .Result(category, () => CodeBase.BitsConst(BitsConst.ConvertAsText(data)), CodeArgs.Void);
         }

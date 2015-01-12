@@ -23,16 +23,18 @@ namespace Reni.Type
     {
         internal readonly TypeBase ElementType;
         internal readonly int Count;
+        readonly bool _isMutable;
 
         readonly ValueCache<RepeaterAccessType> _arrayAccessTypeCache;
         readonly ValueCache<EnableArrayOverSizeType> _enableArrayOverSizeTypeCache;
         readonly ValueCache<NumberType> _numberCache;
         readonly ValueCache<TextItemType> _textItemCache;
 
-        public ArrayType(TypeBase elementType, int count)
+        public ArrayType(TypeBase elementType, int count, bool isMutable)
         {
             ElementType = elementType;
             Count = count;
+            _isMutable = isMutable;
             Tracer.Assert(count > 0);
             Tracer.Assert(elementType.ReferenceType == null);
             Tracer.Assert(!elementType.Hllw);
@@ -44,6 +46,7 @@ namespace Reni.Type
 
         TypeBase IRepeaterType.ElementType => ElementType;
         Size IRepeaterType.IndexSize => IndexSize;
+        bool IRepeaterType.IsMutable => _isMutable;
 
         [DisableDump]
         public NumberType Number => _numberCache.Value;
@@ -66,7 +69,11 @@ namespace Reni.Type
             => Extension.SimpleFeature(DumpPrintTokenResult);
 
         IFeatureImplementation ISymbolProvider<ConcatArrays, IFeatureImplementation>.Feature(ConcatArrays tokenClass)
-            => Extension.FunctionFeature(ConcatArraysResult);
+            =>
+                Extension.FunctionFeature
+                    (
+                        (category, objectReference, argsType) =>
+                            ConcatArraysResult(category, objectReference, argsType, tokenClass.IsMutable));
 
         IFeatureImplementation ISymbolProvider<TextItem, IFeatureImplementation>.Feature(TextItem tokenClass)
             => Extension.SimpleFeature(TextItemResult);
@@ -149,13 +156,16 @@ namespace Reni.Type
 
         protected override string GetNodeDump() => ElementType.NodeDump + "*" + Count;
 
-        internal Result ConcatArraysResult(Category category, IContextReference objectReference, TypeBase argsType)
-            => InternalConcatArrays(category, objectReference, argsType);
+        internal Result ConcatArraysResult
+            (Category category, IContextReference objectReference, TypeBase argsType, bool isMutable)
+            => InternalConcatArrays(category, objectReference, argsType, isMutable);
 
-        internal Result ConcatArraysFromReference(Category category, IContextReference objectReference, TypeBase argsType)
-            => InternalConcatArrays(category, objectReference, argsType);
+        internal Result ConcatArraysFromReference
+            (Category category, IContextReference objectReference, TypeBase argsType, bool isMutable)
+            => InternalConcatArrays(category, objectReference, argsType, isMutable);
 
-        internal Result InternalConcatArrays(Category category, IContextReference objectReference, TypeBase argsType)
+        internal Result InternalConcatArrays
+            (Category category, IContextReference objectReference, TypeBase argsType, bool isMutable)
         {
             var oldElementsResult = Pointer
                 .Result(category.Typed, objectReference).DereferenceResult;
@@ -165,11 +175,11 @@ namespace Reni.Type
             var newElementsResultRaw
                 = isElementArg
                     ? argsType.Conversion(category.Typed, ElementAccessType)
-                    : argsType.Conversion(category.Typed, ElementType.Array(newCount));
+                    : argsType.Conversion(category.Typed, ElementType.Array(newCount, isMutable));
 
             var newElementsResult = newElementsResultRaw.DereferencedAlignedResult();
             var result = ElementType
-                .Array(Count + newCount)
+                .Array(Count + newCount, isMutable)
                 .Result(category, newElementsResult + oldElementsResult);
             return result;
         }
@@ -187,7 +197,7 @@ namespace Reni.Type
             var elementReference = ElementType.Pointer;
             var argCode = Pointer.ArgCode;
             var elementDumpPrint = elementReference.GenericDumpPrintResult(Category.Code).Code;
-            var code = CodeBase.DumpPrintText("<<(");
+            var code = CodeBase.DumpPrintText("<<" + (_isMutable ? ":=" : "") + "(");
             for(var i = 0; i < Count; i++)
             {
                 if(i > 0)

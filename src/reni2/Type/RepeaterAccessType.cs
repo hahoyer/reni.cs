@@ -17,14 +17,7 @@ namespace Reni.Type
         [DisableDump]
         internal override bool Hllw { get { return false; } }
 
-        protected override bool IsReassignPossible
-        {
-            get
-            {
-                NotImplementedMethod();
-                return false;
-            }
-        }
+        protected override bool IsMutable => RepeaterType.IsMutable;
 
         internal override TypeBase ValueType { get { return RepeaterType.ElementType; } }
 

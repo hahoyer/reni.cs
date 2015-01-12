@@ -28,7 +28,7 @@ namespace Reni.Type
             public readonly FunctionCache<int, AlignType> Aligner;
             [Node]
             [SmartNode]
-            public readonly FunctionCache<int, ArrayType> Array;
+            public readonly FunctionCache<int, FunctionCache<bool, ArrayType>> Array;
             [Node]
             [SmartNode]
             public readonly FunctionCache<TypeBase, Pair> Pair;
@@ -54,7 +54,8 @@ namespace Reni.Type
                 EnableCut = new ValueCache<EnableCut>(() => new EnableCut(parent));
                 Reference = new ValueCache<IReference>(parent.ObtainReference);
                 Pair = new FunctionCache<TypeBase, Pair>(first => new Pair(first, parent));
-                Array = new FunctionCache<int, ArrayType>(parent.ObtainArray);
+                Array = new FunctionCache<int, FunctionCache<bool, ArrayType>>(
+                    count => new FunctionCache<bool, ArrayType>(isMutable=>parent.ObtainArray(count, isMutable)));
                 Aligner = new FunctionCache<int, AlignType>(alignBits => new AlignType(parent, alignBits));
                 FunctionInstanceType = new ValueCache<FunctionInstanceType>(() => new FunctionInstanceType(parent));
                 TypeType = new ValueCache<TypeType>(() => new TypeType(parent));
@@ -165,7 +166,7 @@ namespace Reni.Type
 
         Result VoidCodeAndRefs(Category category) => RootContext.VoidResult(category & (Category.Code | Category.Exts));
 
-        internal ArrayType Array(int count) => _cache.Array[count];
+        internal ArrayType Array(int count, bool isMutable) => _cache.Array[count][isMutable];
         protected virtual TypeBase ReversePair(TypeBase first) => first._cache.Pair[this];
         internal virtual TypeBase Pair(TypeBase second) => second.ReversePair(this);
         internal virtual Result Destructor(Category category) => VoidCodeAndRefs(category);
@@ -358,7 +359,7 @@ namespace Reni.Type
             }
         }
 
-        protected virtual ArrayType ObtainArray(int count) => new ArrayType(this, count);
+        protected virtual ArrayType ObtainArray(int count, bool isMutable) => new ArrayType(this, count, isMutable);
 
         internal CodeBase BitSequenceOperation(string token) => Align.ArgCode.NumberOperation(token, Size);
 
@@ -366,8 +367,8 @@ namespace Reni.Type
         internal Result GenericDumpPrintResult(Category category)
             => Declarations<DumpPrintToken>(null).Single().CallResult(category);
 
-        internal Result CreateArray(Category category) => Align
-            .Array(1).Pointer
+        internal Result CreateArray(Category category, bool isMutable) => Align
+            .Array(1, isMutable).Pointer
             .Result(category, PointerArgResult(category));
 
         internal bool IsConvertable(TypeBase destination) => ConversionService.FindPath(this, destination) != null;

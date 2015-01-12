@@ -42,14 +42,15 @@ namespace Reni.Type
 
         IFeatureImplementation ISymbolProvider<ConcatArrays, IFeatureImplementation>.Feature(ConcatArrays tokenClass)
         {
-            return Extension.FunctionFeature(ConcatArraysResult);
+            return Extension.FunctionFeature
+                ((category, objectReference, argsType) => ConcatArraysResult(category, objectReference, argsType, tokenClass.IsMutable));
         }
 
-        protected override CodeBase DumpPrintCode() 
+        protected override CodeBase DumpPrintCode()
             => Pointer
-            .ArgCode
-            .DePointer(Size)
-            .DumpPrintText(SimpleItemSize);
+                .ArgCode
+                .DePointer(Size)
+                .DumpPrintText(SimpleItemSize);
 
         internal Result ToNumberOfBaseResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
@@ -68,13 +69,13 @@ namespace Reni.Type
 
         internal override int? SmartArrayLength(TypeBase elementType) { return Parent.SmartArrayLength(elementType); }
 
-        Result ConcatArraysResult(Category category, IContextReference objectReference, TypeBase argsType)
+        Result ConcatArraysResult(Category category, IContextReference objectReference, TypeBase argsType, bool isMutable)
         {
             var trace = ObjectId == -1 && category.HasCode;
             StartMethodDump(trace, category, objectReference, argsType);
             try
             {
-                var result = Parent.InternalConcatArrays(category.Typed, objectReference, argsType);
+                var result = Parent.InternalConcatArrays(category.Typed, objectReference, argsType, isMutable);
                 Dump("result", result);
                 BreakExecution();
 

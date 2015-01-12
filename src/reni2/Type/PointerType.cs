@@ -67,7 +67,7 @@ namespace Reni.Type
         internal override int? SmartSequenceLength(TypeBase elementType) => ValueType.SmartSequenceLength(elementType);
         internal override int? SmartArrayLength(TypeBase elementType) => ValueType.SmartArrayLength(elementType);
         protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
-        protected override ArrayType ObtainArray(int count) => ValueType.Array(count);
+        protected override ArrayType ObtainArray(int count, bool isMutable) => ValueType.Array(count, isMutable);
 
         Result DereferenceResult(Category category)
         {

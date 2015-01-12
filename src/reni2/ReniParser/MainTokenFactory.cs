@@ -29,7 +29,7 @@ namespace Reni.ReniParser
                         "to_number_of_base"
                     );
 
-                x += PrioTable.Left("<<");
+                x += PrioTable.Left("<<", "<<:=");
 
                 x += PrioTable.Left("~");
                 x += PrioTable.Left("&");
@@ -137,7 +137,8 @@ namespace Reni.ReniParser
                     {"<", new CompareOperation()},
                     {"<=", new CompareOperation()},
                     {"<>", new CompareOperation()},
-                    {"<<", new ConcatArrays()},
+                    {"<<", new ConcatArrays(isMutable:false)},
+                    { "<<:=", new ConcatArrays(isMutable:true)},
                     {"!", new Exclamation(_declarationSyntaxSubParser)},
                     {"+", new Plus()},
                     {"/", new Slash()},

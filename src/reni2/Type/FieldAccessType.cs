@@ -20,7 +20,7 @@ namespace Reni.Type
             _position = position;
         }
 
-        protected override bool IsReassignPossible => _compoundView.Compound.Syntax.IsReassignable(_position);
+        protected override bool IsMutable => _compoundView.Compound.Syntax.IsReassignable(_position);
 
         internal override TypeBase ValueType { get { return _compoundView.ValueType(_position); } }
 

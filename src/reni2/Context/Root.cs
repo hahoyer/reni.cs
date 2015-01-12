@@ -7,9 +7,9 @@ using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
+using Reni.Numeric;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
-using Reni.Numeric;
 using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Type;
@@ -32,7 +32,7 @@ namespace Reni.Context
         readonly ValueCache<VoidType> _voidCache;
         readonly ValueCache<IFeatureImplementation> _minusFeatureCache;
         readonly FunctionCache<string, CompileSyntax> _metaDictionary;
-        readonly ValueCache<IFeatureImplementation> _createArrayFeatureCache;
+        readonly FunctionCache<bool, IFeatureImplementation> _createArrayFeatureCache;
 
         internal Root(IExecutionContext executionContext)
         {
@@ -42,7 +42,10 @@ namespace Reni.Context
             _voidCache = new ValueCache<VoidType>(() => new VoidType(this));
             _minusFeatureCache = new ValueCache<IFeatureImplementation>
                 (() => new ContextMetaFunctionFromSyntax(_metaDictionary[ArgToken.Id + " " + Negate.Id]));
-            _createArrayFeatureCache = new ValueCache<IFeatureImplementation>(() => new ContextMetaFunction(CreateArrayResult));
+            _createArrayFeatureCache = new FunctionCache<bool,IFeatureImplementation>
+                (
+                isMutable =>
+                    new ContextMetaFunction((context, category, argsType) => CreateArrayResult(context, category, argsType, isMutable)));
         }
 
         CompileSyntax CreateMetaDictionary(string source) { return ExecutionContext.Parse(source); }
@@ -67,7 +70,7 @@ namespace Reni.Context
             get { return new RefAlignParam(BitsConst.SegmentAlignBits, Size.Create(32)); }
         }
 
-        public bool ProcessErrors{ get { return ExecutionContext.ProcessErrors; } }
+        public bool ProcessErrors { get { return ExecutionContext.ProcessErrors; } }
 
         IFeatureImplementation ISymbolProvider<Minus, IFeatureImplementation>.Feature(Minus tokenClass)
         {
@@ -76,15 +79,15 @@ namespace Reni.Context
 
         IFeatureImplementation ISymbolProvider<ConcatArrays, IFeatureImplementation>.Feature(ConcatArrays tokenClass)
         {
-            return _createArrayFeatureCache.Value;
+            return _createArrayFeatureCache[tokenClass.IsMutable];
         }
 
-        static Result CreateArrayResult(ContextBase context, Category category, CompileSyntax argsType)
+        static Result CreateArrayResult(ContextBase context, Category category, CompileSyntax argsType, bool isMutable)
         {
             var target = context.Result(category.Typed, argsType).SmartUn<PointerType>().Align;
             return target
                 .Type
-                .Array(1)
+                .Array(1, isMutable)
                 .Result(category.Typed, target)
                 .LocalReferenceResult
                 & category;
@@ -112,11 +115,11 @@ namespace Reni.Context
 
                 for(var i = 0; i < count; i++)
                 {
-                    Dump("i", i); 
+                    Dump("i", i);
 
                     var elemResult = elemResults(i);
 
-                    Dump("elemResult", elemResult); 
+                    Dump("elemResult", elemResult);
                     BreakExecution();
 
                     result.IsDirty = true;
@@ -130,7 +133,7 @@ namespace Reni.Context
                         result.Exts = result.Exts.Sequence(elemResult.Exts);
                     result.IsDirty = false;
 
-                    Dump("result", result); 
+                    Dump("result", result);
                     BreakExecution();
                 }
                 if(category.HasCode)
@@ -145,7 +148,7 @@ namespace Reni.Context
 
         internal FunctionContainer FunctionContainer(int index) { return _functions.Container(index); }
 
-        internal Code.Container MainContainer(Syntax syntax, string description)
+        internal Container MainContainer(Syntax syntax, string description)
         {
             return ListSyntax
                 .Spread(syntax)

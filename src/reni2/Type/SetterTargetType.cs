@@ -34,12 +34,12 @@ namespace Reni.Type
 
         IFeatureImplementation ISymbolProvider<ReassignToken, IFeatureImplementation>.Feature(ReassignToken tokenClass)
         {
-            if(IsReassignPossible)
+            if(IsMutable)
                 return Extension.FunctionFeature(ReassignResult);
             return null;
         }
 
-        protected abstract bool IsReassignPossible { get; }
+        protected abstract bool IsMutable { get; }
 
         Result ReassignResult(Category category, IContextReference objectReference, TypeBase argsType)
         {

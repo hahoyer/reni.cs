@@ -37,10 +37,11 @@ namespace Reni.TokenClasses
 
     sealed class ConcatArrays : Definable
     {
+        internal bool IsMutable { get; }
+
+        public ConcatArrays(bool isMutable) { IsMutable = isMutable; }
+
         [DisableDump]
-        internal override IEnumerable<IGenericProviderForDefinable> Genericize
-        {
-            get { return this.GenericListFromDefinable(base.Genericize); }
-        }
+        internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
     }
 }

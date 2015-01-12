@@ -31,7 +31,7 @@ namespace Reni.Type
         protected override string Dump(bool isRecursion) => GetType().PrettyName();
 
         protected override string GetNodeDump() => "bit";
-        internal NumberType Number(int bitCount) => Array(bitCount).Number;
+        internal NumberType Number(int bitCount) => Array(bitCount, false).Number;
         internal Result Result(Category category, BitsConst bitsConst)
         {
             return Number(bitsConst.Size.ToInt())
