@@ -26,22 +26,27 @@ namespace Reni.Context
             if(metaFeature != null)
                 return metaFeature.Result(context, category, left, right);
 
-            var trace = ObjectId == 37 && category.HasCode;
+            var trace = ObjectId == -56 && category.HasCode;
             StartMethodDump(trace, context, category, left, right);
             try
             {
                 BreakExecution();
                 var rawResult = Result(context, category, right);
-                var converterResult = ConverterResult(category.Typed);
                 Dump("rawResult", rawResult);
+                BreakExecution();
+
+                var converterResult = ConverterResult(category.Typed);
                 Dump("converterResult", converterResult);
                 BreakExecution();
+
                 var resultWithConversions = rawResult.ReplaceArg(ConverterResult);
                 Dump("resultWithConversions", resultWithConversions);
                 BreakExecution();
+
                 var objectResult = context.ObjectResult(category, left);
                 Dump("objectResult", objectResult);
                 BreakExecution();
+
                 var result = resultWithConversions.ReplaceArg(objectResult);
                 return ReturnMethodDump(result);
             }
