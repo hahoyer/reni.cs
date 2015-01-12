@@ -43,7 +43,7 @@ namespace Reni.Type
         IFeatureImplementation ISymbolProvider<ConcatArrays, IFeatureImplementation>.Feature(ConcatArrays tokenClass)
         {
             return Extension.FunctionFeature
-                ((category, objectReference, argsType) => ConcatArraysResult(category, objectReference, argsType, tokenClass.IsMutable));
+                ((category, objectReference, argsType) => ConcatArraysResult(category, objectReference, argsType, tokenClass.IsMutable), this);
         }
 
         protected override CodeBase DumpPrintCode()
