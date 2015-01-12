@@ -42,7 +42,7 @@ namespace Reni.Type
         protected override string GetNodeDump() => "(" + Value.NodeDump + ") type";
 
         internal override Result InstanceResult(Category category, Func<Category, Result> getRightResult)
-            => RawInstanceResult(category.Typed, getRightResult).LocalPointerKindResult & category;
+            => RawInstanceResult(category.Typed, getRightResult).LocalReferenceResult & category;
 
         Result RawInstanceResult(Category category, Func<Category, Result> getRightResult)
         {

@@ -171,7 +171,7 @@ namespace Reni.Context
 
         internal Result ResultAsReference(Category category, CompileSyntax syntax)
             => Result(category.Typed, syntax)
-                .LocalPointerKindResult;
+                .LocalReferenceResult;
 
         internal Result ArgReferenceResult(Category category)
             => FindRecentFunctionContextObject

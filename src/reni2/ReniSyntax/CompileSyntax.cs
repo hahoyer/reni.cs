@@ -110,7 +110,7 @@ namespace Reni.ReniSyntax
         internal Result SmartUnFunctionedReferenceResult(ContextBase context, Category category)
         {
             var result = Result(context, category.Typed);
-            return result?.SmartUn<FunctionType>().LocalPointerKindResult;
+            return result?.SmartUn<FunctionType>().LocalReferenceResult;
         }
 
         internal virtual Result ObtainPendingResult(ContextBase context, Category category)

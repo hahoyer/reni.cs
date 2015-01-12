@@ -87,7 +87,7 @@ namespace Reni.Context
                 .Align
                 .Array(1)
                 .Result(category.Typed, target)
-                .LocalPointerKindResult
+                .LocalReferenceResult
                 & category;
         }
 

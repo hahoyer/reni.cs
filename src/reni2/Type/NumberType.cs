@@ -106,7 +106,7 @@ namespace Reni.Type
         {
             return ((NumberType) _zeroResult.Value.Type)
                 .OperationResult(category, _minusOperation, this)
-                .ReplaceAbsolute(_zeroResult.Value.Type.Reference, c => _zeroResult.Value.LocalPointerKindResult & (c));
+                .ReplaceAbsolute(_zeroResult.Value.Type.Reference, c => _zeroResult.Value.LocalReferenceResult & (c));
         }
 
         protected override CodeBase DumpPrintCode()
@@ -173,7 +173,7 @@ namespace Reni.Type
         Result ConversionAsReference(Category category, NumberType destination) => destination
             .FlatConversion(category, this)
             .ReplaceArg(UnalignedDereferencePointerResult)
-            .LocalPointerKindResult;
+            .LocalReferenceResult;
 
         Result FlatConversion(Category category, NumberType source)
         {
