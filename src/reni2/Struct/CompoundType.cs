@@ -37,9 +37,11 @@ namespace Reni.Struct
                 Tracer.Assert(!View.Compound.Syntax.Converters.Any());
 
                 if(Hllw)
-                    yield return Extension.SimpleFeature(RootContext.VoidType.ArgResult, this);
+                    yield return Extension.SimpleFeature(VoidConversion);
             }
         }
+
+        Result VoidConversion(Category category) => RootContext.VoidType.Result(category, ArgResult);
 
         IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
             => Extension.SimpleFeature(DumpPrintTokenResult);
