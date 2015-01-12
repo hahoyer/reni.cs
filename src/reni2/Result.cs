@@ -799,11 +799,13 @@ namespace Reni
         }
 
         [DisableDump]
-        internal Result LocalPointerKindResult
+        internal Result LocalReferenceResult
         {
             get
             {
-                if(Type.Hllw)
+                if(!HasCode && !HasType && !HasSize)
+                    return this;
+                if (Type.Hllw)
                     return this;
                 if(Type is IReference)
                     return this;
