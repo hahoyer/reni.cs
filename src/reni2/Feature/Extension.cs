@@ -45,13 +45,10 @@ namespace Reni.Feature
 
         internal static IEnumerable<SearchResult> ResolveDeclarations<TDefinable>
             (this IFeatureInheritor inheritor, TDefinable tokenClass)
-            where TDefinable : Definable
-        {
-            return inheritor
+            where TDefinable : Definable => inheritor
                 .BaseType
                 .Declarations(tokenClass)
                 .Select(result => new InheritedTypeSearchResult(result, inheritor));
-        }
 
         internal static IEnumerable<SearchResult> FilterLowerPriority(this IEnumerable<SearchResult> target)
             => target.FrameElementList((x, y) => x!=y && y.Overrides(x));
@@ -63,10 +60,7 @@ namespace Reni.Feature
                 return false;
 
             var r = right as IDefinitionPriority;
-            if (r == null)
-                return true;
-
-            return l.Overrides(r);
+            return r == null || l.Overrides(r);
         }
     }
 
@@ -74,17 +68,11 @@ namespace Reni.Feature
     {
         public static IEnumerable<IGenericProviderForType> GenericListFromType<T>
             (this T target, IEnumerable<IGenericProviderForType> baseList = null)
-            where T : TypeBase
-        {
-            return CreateList(baseList, () => new GenericProviderForType<T>(target));
-        }
+            where T : TypeBase => CreateList(baseList, () => new GenericProviderForType<T>(target));
 
         public static IEnumerable<IGenericProviderForDefinable> GenericListFromDefinable<T>
             (this T target, IEnumerable<IGenericProviderForDefinable> baseList = null)
-            where T : Definable
-        {
-            return CreateList(baseList, () => new GenericProviderForDefinable<T>(target));
-        }
+            where T : Definable => CreateList(baseList, () => new GenericProviderForDefinable<T>(target));
 
         static IEnumerable<TGeneric> CreateList<TGeneric>(IEnumerable<TGeneric> baseList, Func<TGeneric> creator)
         {

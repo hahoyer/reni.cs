@@ -21,8 +21,7 @@ namespace Reni.Feature
                     .TypeType
                     .Result(category);
             return context
-                .RootContext
-                .VoidResult(category);
+                .RootContext.VoidType.Result(category);
         }
     }
 }

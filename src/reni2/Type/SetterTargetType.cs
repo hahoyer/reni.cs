@@ -44,7 +44,7 @@ namespace Reni.Type
         Result ReassignResult(Category category, IContextReference objectReference, TypeBase argsType)
         {
             if(category == Category.Type)
-                return RootContext.VoidResult(category);
+                return RootContext.VoidType.Result(category);
 
             var trace = ObjectId == -1;
             StartMethodDump(trace, category, argsType);

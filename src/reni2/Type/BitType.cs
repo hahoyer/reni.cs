@@ -7,7 +7,6 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Feature.DumpPrint;
 
 namespace Reni.Type
 {

@@ -9,7 +9,6 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Feature.DumpPrint;
 using Reni.Struct;
 using Reni.TokenClasses;
 
@@ -54,8 +53,9 @@ namespace Reni.Type
                 EnableCut = new ValueCache<EnableCut>(() => new EnableCut(parent));
                 Reference = new ValueCache<IReference>(parent.ObtainReference);
                 Pair = new FunctionCache<TypeBase, Pair>(first => new Pair(first, parent));
-                Array = new FunctionCache<int, FunctionCache<bool, ArrayType>>(
-                    count => new FunctionCache<bool, ArrayType>(isMutable=>parent.ObtainArray(count, isMutable)));
+                Array = new FunctionCache<int, FunctionCache<bool, ArrayType>>
+                    (
+                    count => new FunctionCache<bool, ArrayType>(isMutable => parent.ObtainArray(count, isMutable)));
                 Aligner = new FunctionCache<int, AlignType>(alignBits => new AlignType(parent, alignBits));
                 FunctionInstanceType = new ValueCache<FunctionInstanceType>(() => new FunctionInstanceType(parent));
                 TypeType = new ValueCache<TypeType>(() => new TypeType(parent));
@@ -114,8 +114,6 @@ namespace Reni.Type
         [DisableDump]
         internal virtual string DumpPrintText => NodeDump;
 
-        internal virtual int? SmartSequenceLength(TypeBase elementType) => SmartArrayLength(elementType);
-
         internal virtual int? SmartArrayLength(TypeBase elementType)
         {
             if(IsConvertable(elementType))
@@ -164,7 +162,7 @@ namespace Reni.Type
         [DisableDump]
         internal virtual Size SimpleItemSize => null;
 
-        Result VoidCodeAndRefs(Category category) => RootContext.VoidResult(category & (Category.Code | Category.Exts));
+        Result VoidCodeAndRefs(Category category) => RootContext.VoidType.Result(category & (Category.Code | Category.Exts));
 
         internal ArrayType Array(int count, bool isMutable) => _cache.Array[count][isMutable];
         protected virtual TypeBase ReversePair(TypeBase first) => first._cache.Pair[this];
@@ -243,9 +241,6 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        internal virtual bool IsLambda => false;
-
-        [DisableDump]
         internal virtual IReference ReferenceType => this as IReference;
 
         [DisableDump]
@@ -267,8 +262,9 @@ namespace Reni.Type
         internal virtual TypeBase CoreType => this;
 
         [DisableDump]
-        internal TypeBase TypeForSearchProbes => DePointer(Category.Type).Type
-            .DeAlign(Category.Type).Type;
+        internal TypeBase TypeForSearchProbes
+            => DePointer(Category.Type).Type
+                .DeAlign(Category.Type).Type;
 
         [DisableDump]
         internal TypeBase TypeForStructureElement => DeAlign(Category.Type).Type;
@@ -277,28 +273,17 @@ namespace Reni.Type
         internal TypeBase TypeForArrayElement => DeAlign(Category.Type).Type;
 
         [DisableDump]
-        internal virtual TypeBase TypeForTypeOperator => DeFunction(Category.Type).Type
-            .DePointer(Category.Type).Type
-            .DeAlign(Category.Type).Type;
+        internal virtual TypeBase TypeForTypeOperator
+            => DePointer(Category.Type).Type
+                .DeAlign(Category.Type).Type;
 
         [DisableDump]
-        internal virtual TypeBase ElementTypeForReference => DeFunction(Category.Type).Type
-            .DePointer(Category.Type).Type
-            .DeAlign(Category.Type).Type;
+        internal virtual TypeBase ElementTypeForReference
+            => DePointer(Category.Type).Type
+                .DeAlign(Category.Type).Type;
 
         protected virtual Result DeAlign(Category category) => ArgResult(category);
-        protected virtual ResultCache DeFunction(Category category) => ArgResult(category);
         internal virtual ResultCache DePointer(Category category) => ArgResult(category);
-
-        internal int SequenceLength(TypeBase elementType)
-        {
-            var length = SmartSequenceLength(elementType);
-            if(length != null)
-                return length.Value;
-
-            NotImplementedMethod(elementType);
-            return -1;
-        }
 
         internal int ArrayLength(TypeBase elementType)
         {
@@ -328,9 +313,6 @@ namespace Reni.Type
             => ArgCode
                 .LocalReference(this, Destructor(Category.Code).Code);
 
-        internal Result ReferenceInCode(Category category, IContextReference target) => Pointer
-            .Result(category, target);
-
         internal Result ContextAccessResult(Category category, IContextReference target, Func<Size> getOffset)
         {
             if(Hllw)
@@ -349,19 +331,7 @@ namespace Reni.Type
             return this as IReference ?? new PointerType(this);
         }
 
-        [DisableDump]
-        public virtual TypeBase ArrayElementType
-        {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
-        }
-
         protected virtual ArrayType ObtainArray(int count, bool isMutable) => new ArrayType(this, count, isMutable);
-
-        internal CodeBase BitSequenceOperation(string token) => Align.ArgCode.NumberOperation(token, Size);
 
         [NotNull]
         internal Result GenericDumpPrintResult(Category category)
@@ -463,11 +433,6 @@ namespace Reni.Type
             Tracer.Assert(result.Count() <= 1);
 
             return result;
-        }
-        internal IEnumerable<ISimpleFeature> GetForcedConversions<TDestination>()
-        {
-            NotImplementedMethod();
-            return null;
         }
 
         internal IEnumerable<ISimpleFeature> GetForcedConversions<TDestination>(TDestination destination)

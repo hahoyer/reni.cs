@@ -5,7 +5,6 @@ using hw.Debug;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Feature.DumpPrint;
 using Reni.Numeric;
 using Reni.ReniSyntax;
 using Reni.Struct;

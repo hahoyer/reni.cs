@@ -7,7 +7,6 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Feature.DumpPrint;
 using Reni.TokenClasses;
 
 namespace Reni.Type
@@ -61,7 +60,7 @@ namespace Reni.Type
         internal override bool Hllw => Count == 0 || ElementType.Hllw;
 
         [DisableDump]
-        public override TypeBase ArrayElementType => ElementType;
+        public TypeBase ArrayElementType => ElementType;
 
         internal override string DumpPrintText => "(" + ElementType.DumpPrintText + ")*" + Count;
 

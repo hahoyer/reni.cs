@@ -11,42 +11,24 @@ namespace Reni.TokenClasses
 {
     sealed class Colon : TokenClass
     {
-        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
-        {
-            return left
-                .CreateDeclarationSyntax(token, right);
-        }
+        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right) => left.CreateDeclarationSyntax(token, right);
     }
 
     sealed class Exclamation : TokenClass
     {
-        readonly ISubParser<Syntax> _parser;
-        public Exclamation(ISubParser<Syntax> parser) { _parser = parser; }
-        protected override Syntax TerminalSyntax(SourcePart token) { return new ExclamationSyntax(token); }
-        protected override ISubParser<Syntax> Next { get { return _parser; } }
+        public Exclamation(ISubParser<Syntax> parser) { Next = parser; }
+        protected override ISubParser<Syntax> Next { get; }
     }
 
     sealed class ConverterToken : TokenClass
     {
-        protected override Syntax Terminal(SourcePart token) { return new ConverterDeclarationSyntax(token, token); }
-
-        protected override Syntax SuffixSyntax(Syntax left, SourcePart token)
-        {
-            return ((DeclarationExtensionSyntax) left)
-                .ExtendByConverter(token);
-        }
+        protected override Syntax Terminal(SourcePart token) => new ConverterDeclarationSyntax(token, token);
     }
 
     abstract class DeclarationExtensionSyntax : Syntax
     {
         protected DeclarationExtensionSyntax(SourcePart token)
             : base(token) { }
-
-        internal virtual Syntax ExtendByConverter(SourcePart token)
-        {
-            NotImplementedMethod(token);
-            return null;
-        }
     }
 
     sealed class ConverterDeclarationSyntax : DeclarationExtensionSyntax
@@ -57,25 +39,12 @@ namespace Reni.TokenClasses
             : base(token) { _token = otherToken; }
 
         internal override Syntax CreateDeclarationSyntax(SourcePart token, Syntax right)
-        {
-            return new ConverterSyntax
-                (
-                _token,
-                right.CheckedToCompiledSyntax(token, RightMustNotBeNullError)
-                );
-        }
+            => new ConverterSyntax(_token, right.CheckedToCompiledSyntax(token, RightMustNotBeNullError));
+
         IssueId RightMustNotBeNullError()
         {
             NotImplementedMethod();
             return null;
         }
-    }
-
-    sealed class ExclamationSyntax : DeclarationExtensionSyntax
-    {
-        internal ExclamationSyntax(SourcePart token)
-            : base(token) { }
-
-        internal override Syntax ExtendByConverter(SourcePart token) { return new ConverterDeclarationSyntax(Token, token); }
     }
 }

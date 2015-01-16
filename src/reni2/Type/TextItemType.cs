@@ -6,7 +6,6 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Feature.DumpPrint;
 using Reni.ReniSyntax;
 using Reni.TokenClasses;
 
@@ -25,26 +24,19 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        protected override string TagTitle { get { return "text_item"; } }
+        protected override string TagTitle => "text_item";
 
         [DisableDump]
-        internal override Size SimpleItemSize { get { return Parent.ElementType.SimpleItemSize ?? Size; } }
+        internal override Size SimpleItemSize => Parent.ElementType.SimpleItemSize ?? Size;
 
         IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
-        {
-            return Extension.SimpleFeature(DumpPrintTokenResult);
-        }
+            => Extension.SimpleFeature(DumpPrintTokenResult);
 
         IFeatureImplementation ISymbolProvider<ToNumberOfBase, IFeatureImplementation>.Feature(ToNumberOfBase tokenClass)
-        {
-            return Extension.MetaFeature(ToNumberOfBaseResult);
-        }
+            => Extension.MetaFeature(ToNumberOfBaseResult);
 
-        IFeatureImplementation ISymbolProvider<ConcatArrays, IFeatureImplementation>.Feature(ConcatArrays tokenClass)
-        {
-            return Extension.FunctionFeature
-                ((category, objectReference, argsType) => ConcatArraysResult(category, objectReference, argsType, tokenClass.IsMutable), this);
-        }
+        IFeatureImplementation ISymbolProvider<ConcatArrays, IFeatureImplementation>.Feature(ConcatArrays tokenClass) => Extension.FunctionFeature
+            ((category, objectReference, argsType) => ConcatArraysResult(category, objectReference, argsType, tokenClass.IsMutable), this);
 
         protected override CodeBase DumpPrintCode()
             => Pointer
@@ -52,7 +44,7 @@ namespace Reni.Type
                 .DePointer(Size)
                 .DumpPrintText(SimpleItemSize);
 
-        internal Result ToNumberOfBaseResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
+        Result ToNumberOfBaseResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
             var target = left.Evaluate(context).ToString(Parent.ElementType.Size);
             var conversionBase = right.Evaluate(context).ToInt32();
@@ -62,12 +54,9 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        internal override IFeatureImplementation Feature { get { return Parent.Feature; } }
+        internal override IFeatureImplementation Feature => Parent.Feature;
 
-        [DisableDump]
-        public override TypeBase ArrayElementType { get { return Parent.ArrayElementType; } }
-
-        internal override int? SmartArrayLength(TypeBase elementType) { return Parent.SmartArrayLength(elementType); }
+        internal override int? SmartArrayLength(TypeBase elementType) => Parent.SmartArrayLength(elementType);
 
         Result ConcatArraysResult(Category category, IContextReference objectReference, TypeBase argsType, bool isMutable)
         {

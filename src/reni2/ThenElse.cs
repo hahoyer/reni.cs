@@ -117,8 +117,7 @@ namespace Reni
         internal override Result ObtainPendingResult(ContextBase context, Category category)
         {
             return context
-                .RootContext
-                .VoidResult(category);
+                .RootContext.VoidType.Result(category);
         }
     }
 

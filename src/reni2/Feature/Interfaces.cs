@@ -76,11 +76,6 @@ namespace Reni.Feature
         Result Result(ContextBase contextBase, Category category, CompileSyntax right);
     }
 
-    interface ISearchResult
-    {
-        Result SimpleResult(Category category);
-    }
-
     interface ISearchTarget {}
 
     // ReSharper disable once TypeParameterCanBeVariant
@@ -89,11 +84,6 @@ namespace Reni.Feature
         where TDefinable : Definable
     {
         TPath Feature(TDefinable tokenClass);
-    }
-
-    interface IConverterProvider<in TDestination, out TPath>
-    {
-        TPath Feature(TDestination destination, IConversionParameter parameter);
     }
 
     sealed class ContextCallDescriptor : FeatureDescriptor

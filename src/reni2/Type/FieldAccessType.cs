@@ -53,11 +53,6 @@ namespace Reni.Type
                 .AddToReference(() => FieldOffset);
         }
 
-        internal override int? SmartSequenceLength(TypeBase elementType)
-        {
-            return ValueType.SmartSequenceLength(elementType);
-        }
-
         internal override int? SmartArrayLength(TypeBase elementType)
         {
             return ValueType.SmartArrayLength(elementType);

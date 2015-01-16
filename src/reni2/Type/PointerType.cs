@@ -64,14 +64,12 @@ namespace Reni.Type
         internal override bool IsAligningPossible => false;
 
         protected override string GetNodeDump() => ValueType.NodeDump + "[Pointer]";
-        internal override int? SmartSequenceLength(TypeBase elementType) => ValueType.SmartSequenceLength(elementType);
         internal override int? SmartArrayLength(TypeBase elementType) => ValueType.SmartArrayLength(elementType);
         protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
         protected override ArrayType ObtainArray(int count, bool isMutable) => ValueType.Array(count, isMutable);
 
         Result DereferenceResult(Category category)
-        {
-            return ValueType
+            => ValueType
                 .Align
                 .Result
                 (
@@ -79,17 +77,14 @@ namespace Reni.Type
                     () => ArgCode.DePointer(ValueType.Size).Align(),
                     CodeArgs.Arg
                 );
-        }
 
         internal override ResultCache DePointer(Category category)
-        {
-            return ValueType
+            => ValueType
                 .Result
                 (
                     category,
                     () => ArgCode.DePointer(ValueType.Size),
                     CodeArgs.Arg
                 );
-        }
     }
 }

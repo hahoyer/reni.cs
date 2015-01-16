@@ -7,7 +7,6 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Feature.DumpPrint;
 using Reni.Numeric;
 using Reni.TokenClasses;
 using Reni.Type.ConversionService;
@@ -21,7 +20,6 @@ namespace Reni.Type
             , ISymbolProvider<TokenClasses.EnableCut, IFeatureImplementation>
             , ISymbolProvider<Negate, IFeatureImplementation>
             , ISymbolProvider<TextItem, IFeatureImplementation>
-            , IConverterProvider<NumberType, IFeatureImplementation>
             , IForcedConversionProvider<NumberType>
     {
         static readonly Minus _minusOperation = new Minus();
@@ -70,14 +68,6 @@ namespace Reni.Type
 
         IFeatureImplementation ISymbolProvider<TokenClasses.EnableCut, IFeatureImplementation>.Feature
             (TokenClasses.EnableCut tokenClass) => Extension.SimpleFeature(EnableCutTokenResult);
-
-        IFeatureImplementation IConverterProvider<NumberType, IFeatureImplementation>.Feature
-            (NumberType destination, IConversionParameter parameter)
-        {
-            if(!parameter.EnableCut && Bits > destination.Bits)
-                return null;
-            return Extension.SimpleFeature(ca => ConversionAsReference(ca, destination));
-        }
 
         IEnumerable<ISimpleFeature> IForcedConversionProvider<NumberType>.Result(NumberType destination)
         {

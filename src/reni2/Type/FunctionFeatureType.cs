@@ -20,8 +20,6 @@ namespace Reni.Type
         [DisableDump]
         bool IFunctionFeature.IsImplicit => false;
         [DisableDump]
-        internal override bool IsLambda => true;
-        [DisableDump]
         IContextReference IFunctionFeature.ObjectReference => _functionalFeature.ObjectReference;
         [DisableDump]
         internal override Root RootContext => _functionalFeature.RootContext;

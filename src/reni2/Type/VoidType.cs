@@ -6,7 +6,6 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Feature.DumpPrint;
 
 namespace Reni.Type
 {
@@ -26,7 +25,7 @@ namespace Reni.Type
             => Extension.SimpleFeature(DumpPrintTokenResult);
 
         internal override TypeBase Pair(TypeBase second) => second;
-        new Result DumpPrintTokenResult(Category category) => VoidType.Result(category);
+        new Result DumpPrintTokenResult(Category category) => Result(category);
         internal override string DumpPrintText => "void";
         protected override string GetNodeDump() => "void";
     }

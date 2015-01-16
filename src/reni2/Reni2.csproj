@@ -83,11 +83,8 @@
     <Compile Include="FeatureTest\TypeType\TypeOperatorWithVariable.cs" />
     <Compile Include="FeatureTest\Validation\SyntaxError.cs" />
     <Compile Include="FeatureTest\Validation\UndefinedContextSymbol.cs" />
-    <Compile Include="Feature\ConversionParameter.cs" />
     <Compile Include="Feature\Extension.cs" />
-    <Compile Include="Feature\FeatureResult.cs" />
     <Compile Include="Feature\Function.cs" />
-    <Compile Include="Feature\IConversionParameter.cs" />
     <Compile Include="Feature\Simple.cs" />
     <Compile Include="hw\Debug\Configuration.cs" />
     <Compile Include="hw\Debug\DebugTextWriter.cs" />
@@ -253,7 +250,7 @@
     <Compile Include="Context\Root.cs" />
     <Compile Include="FeatureTest\TextStruct.cs" />
     <Compile Include="FeatureTest\Text.cs" />
-    <Compile Include="Feature\DumpPrint\DumpPrintToken.cs" />
+    <Compile Include="Feature\DumpPrintToken.cs" />
     <Compile Include="Feature\Interfaces.cs" />
     <Compile Include="Parser\SyntaxError.cs" />
     <Compile Include="Parser\TokenClassExtender.cs" />
@@ -283,7 +280,6 @@
     <Compile Include="Struct\FunctionInstance.cs" />
     <Compile Include="ReniSyntax\LeftParenthesisSyntax.cs" />
     <Compile Include="T4Compiler.cs" />
-    <Compile Include="Feature\DumpPrint\DumpPrint.cs" />
     <Compile Include="Feature\TypeOperator.cs" />
     <Compile Include="Struct\AtToken.cs" />
     <Compile Include="FeatureTest\DefaultOperations.cs" />
@@ -326,9 +322,7 @@
     <Compile Include="TokenClasses\UndecorateToken.cs" />
     <Compile Include="TokenClasses\UserSymbol.cs" />
     <Compile Include="TokenClasses\NewValueToken.cs" />
-    <Compile Include="Type\AlignConverter.cs" />
     <Compile Include="Type\ConversionService.cs" />
-    <Compile Include="Type\ConverterBase.cs" />
     <Compile Include="Type\DataSetterTargetType.cs" />
     <Compile Include="Type\EnableArrayOverSizeType.cs" />
     <Compile Include="Type\FeaturePathBridge.cs" />
@@ -358,7 +352,6 @@
     <Compile Include="Type\SetterTargetType.cs" />
     <Compile Include="Type\SymmetricClosureService.cs" />
     <Compile Include="Type\TagChild.cs" />
-    <Compile Include="Type\TextItemsType.cs" />
     <Compile Include="Type\TextItemType.cs" />
     <Compile Include="Type\TypeBase.cs" />
     <Compile Include="Type\TypeType.cs" />

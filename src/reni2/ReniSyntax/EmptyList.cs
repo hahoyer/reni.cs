@@ -13,6 +13,6 @@ namespace Reni.ReniSyntax
             : base(token) { }
 
         protected override string GetNodeDump() => "()";
-        internal override Result ObtainResult(ContextBase context, Category category) => context.RootContext.VoidResult(category);
+        internal override Result ObtainResult(ContextBase context, Category category) => context.RootContext.VoidType.Result(category);
     }
 }

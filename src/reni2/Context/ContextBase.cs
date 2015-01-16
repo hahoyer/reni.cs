@@ -244,12 +244,6 @@ namespace Reni.Context
                 yield return new ContextCallDescriptor(this, feature);
         }
 
-        internal Result CreateArrayResult(Category category, CompileSyntax argsType, bool isMutable)
-        {
-            var target = Result(category.Typed, argsType).Align;
-            return target.Type.Align.Array(1, isMutable).Result(category, target);
-        }
-
         internal Result GetObjectResult(Category category) => FindRecentCompoundView.StructReferenceViaContextReference(category);
     }
 }

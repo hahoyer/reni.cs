@@ -42,45 +42,37 @@ namespace Reni.Context
             _voidCache = new ValueCache<VoidType>(() => new VoidType(this));
             _minusFeatureCache = new ValueCache<IFeatureImplementation>
                 (() => new ContextMetaFunctionFromSyntax(_metaDictionary[ArgToken.Id + " " + Negate.Id]));
-            _createArrayFeatureCache = new FunctionCache<bool,IFeatureImplementation>
+            _createArrayFeatureCache = new FunctionCache<bool, IFeatureImplementation>
                 (
                 isMutable =>
                     new ContextMetaFunction((context, category, argsType) => CreateArrayResult(context, category, argsType, isMutable)));
         }
 
-        CompileSyntax CreateMetaDictionary(string source) { return ExecutionContext.Parse(source); }
+        CompileSyntax CreateMetaDictionary(string source) => ExecutionContext.Parse(source);
 
         [DisableDump]
-        internal override Root RootContext { get { return this; } }
-        public override string DumpPrintText { get { return "root"; } }
-
-        [DisableDump]
-        [Node]
-        internal BitType BitType { get { return _bitCache.Value; } }
+        internal override Root RootContext => this;
+        public override string DumpPrintText => "root";
 
         [DisableDump]
         [Node]
-        internal VoidType VoidType { get { return _voidCache.Value; } }
+        internal BitType BitType => _bitCache.Value;
 
         [DisableDump]
-        internal int FunctionCount { get { return _functions.Count; } }
+        [Node]
+        internal VoidType VoidType => _voidCache.Value;
 
-        internal static RefAlignParam DefaultRefAlignParam
-        {
-            get { return new RefAlignParam(BitsConst.SegmentAlignBits, Size.Create(32)); }
-        }
+        [DisableDump]
+        internal int FunctionCount => _functions.Count;
 
-        public bool ProcessErrors { get { return ExecutionContext.ProcessErrors; } }
+        internal static RefAlignParam DefaultRefAlignParam => new RefAlignParam(BitsConst.SegmentAlignBits, Size.Create(32));
 
-        IFeatureImplementation ISymbolProvider<Minus, IFeatureImplementation>.Feature(Minus tokenClass)
-        {
-            return _minusFeatureCache.Value;
-        }
+        public bool ProcessErrors => ExecutionContext.ProcessErrors;
+
+        IFeatureImplementation ISymbolProvider<Minus, IFeatureImplementation>.Feature(Minus tokenClass) => _minusFeatureCache.Value;
 
         IFeatureImplementation ISymbolProvider<ConcatArrays, IFeatureImplementation>.Feature(ConcatArrays tokenClass)
-        {
-            return _createArrayFeatureCache[tokenClass.IsMutable];
-        }
+            => _createArrayFeatureCache[tokenClass.IsMutable];
 
         static Result CreateArrayResult(ContextBase context, Category category, CompileSyntax argsType, bool isMutable)
         {
@@ -90,7 +82,7 @@ namespace Reni.Context
                 .Array(1, isMutable)
                 .Result(category.Typed, target)
                 .LocalReferenceResult
-                & category;
+                   & category;
         }
 
         internal FunctionType FunctionInstance(CompoundView compoundView, FunctionSyntax body, TypeBase argsType)
@@ -99,11 +91,10 @@ namespace Reni.Context
             var functionInstance = _functions.Find(body, compoundView, alignedArgsType);
             return functionInstance;
         }
-        internal Result VoidResult(Category category) { return VoidType.Result(category); }
 
         internal Result ConcatPrintResult(Category category, int count, Func<int, Result> elemResults)
         {
-            var result = VoidResult(category);
+            var result = VoidType.Result(category);
             if(!(category.HasCode || category.HasExts))
                 return result;
 
@@ -146,17 +137,12 @@ namespace Reni.Context
             }
         }
 
-        internal FunctionContainer FunctionContainer(int index) { return _functions.Container(index); }
+        internal FunctionContainer FunctionContainer(int index) => _functions.Container(index);
 
-        internal Container MainContainer(Syntax syntax, string description)
-        {
-            return ListSyntax
-                .Spread(syntax)
-                .ToContainer
-                .Code(this)
-                .Container(description);
-        }
-
-        internal CompileSyntax Parse(string source) { return _metaDictionary[source]; }
+        internal Container MainContainer(Syntax syntax, string description) => ListSyntax
+            .Spread(syntax)
+            .ToContainer
+            .Code(this)
+            .Container(description);
     }
 }

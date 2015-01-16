@@ -47,7 +47,6 @@ namespace Reni.Type
         TypeBase IFeatureInheritor.BaseType => Parent;
 
         protected override Size GetSize() => Parent.Size.Align(_alignBits);
-        internal override int? SmartSequenceLength(TypeBase elementType) => Parent.SmartSequenceLength(elementType);
         internal override int? SmartArrayLength(TypeBase elementType) => Parent.SmartArrayLength(elementType);
         internal override Result Destructor(Category category) => Parent.Destructor(category);
         internal override Result Copier(Category category) => Parent.Copier(category);

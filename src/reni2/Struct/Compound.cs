@@ -89,7 +89,7 @@ namespace Reni.Struct
                 Dump("results", results);
                 BreakExecution();
                 var result = results
-                    .Aggregate(Parent.RootContext.VoidResult(category), (current, next) => current + next);
+                    .Aggregate(Parent.RootContext.VoidType.Result(category), (current, next) => current + next);
                 return ReturnMethodDump(result);
             }
             finally

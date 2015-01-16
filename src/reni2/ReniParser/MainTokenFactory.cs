@@ -6,7 +6,6 @@ using hw.Parser;
 using hw.Scanner;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Feature.DumpPrint;
 using Reni.Parser;
 using Reni.Numeric;
 using Reni.Struct;
