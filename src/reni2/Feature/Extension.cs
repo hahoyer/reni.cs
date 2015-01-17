@@ -22,11 +22,18 @@ namespace Reni.Feature
         internal static Simple SimpleFeature(Func<Category, Result> function, TypeBase target = null)
             => _simpleCache[function][(target ?? function.Target as TypeBase).AssertNotNull()];
 
-        internal static Function FunctionFeature(Func<Category, IContextReference, TypeBase, Result> function, IContextReferenceProvider target = null)
-            => new Function(function, (target ?? function.Target as IContextReferenceProvider).AssertNotNull());
+        internal static Function FunctionFeature
+            (
+            Func<Category, IContextReference, TypeBase, Result> function,
+            IContextReferenceProvider target = null
+            )
+        {
+            var context = (target ?? function.Target as IContextReferenceProvider).AssertNotNull();
+            return new Function(function, context);
+        }
 
-        internal static IFeatureImplementation FunctionFeature<T>
-            (Func<Category, TypeBase, T, Result> function, T arg) => new ExtendedFunction<T>(function, arg);
+        internal static IFeatureImplementation FunctionFeature<T>(Func<Category, TypeBase, T, Result> function, T arg)
+            => new ExtendedFunction<T>(function, arg);
 
 
         internal static ISimpleFeature SimpleFeature(this IFeatureImplementation feature)
@@ -43,36 +50,20 @@ namespace Reni.Feature
 
         internal static TypeBase ResultType(this ISimpleFeature f) => f.Result(Category.Type).Type;
 
-        internal static IEnumerable<SearchResult> ResolveDeclarations<TDefinable>
-            (this IFeatureInheritor inheritor, TDefinable tokenClass)
-            where TDefinable : Definable => inheritor
-                .BaseType
-                .Declarations(tokenClass)
-                .Select(result => new InheritedTypeSearchResult(result, inheritor));
-
-        internal static IEnumerable<SearchResult> FilterLowerPriority(this IEnumerable<SearchResult> target)
-            => target.FrameElementList((x, y) => x!=y && y.Overrides(x));
-
-        internal static bool Overrides(this IFeatureImplementation left, IFeatureImplementation right)
-        {
-            var l = left as IDefinitionPriority;
-            if (l == null)
-                return false;
-
-            var r = right as IDefinitionPriority;
-            return r == null || l.Overrides(r);
-        }
+        internal static bool IsRelative(ISimpleFeature feature) => !(feature is IStepRelative);
     }
 
     static class GenericizeExtension
     {
         public static IEnumerable<IGenericProviderForType> GenericListFromType<T>
             (this T target, IEnumerable<IGenericProviderForType> baseList = null)
-            where T : TypeBase => CreateList(baseList, () => new GenericProviderForType<T>(target));
+            where T : TypeBase
+            => CreateList(baseList, () => new GenericProviderForType<T>(target));
 
         public static IEnumerable<IGenericProviderForDefinable> GenericListFromDefinable<T>
             (this T target, IEnumerable<IGenericProviderForDefinable> baseList = null)
-            where T : Definable => CreateList(baseList, () => new GenericProviderForDefinable<T>(target));
+            where T : Definable
+            => CreateList(baseList, () => new GenericProviderForDefinable<T>(target));
 
         static IEnumerable<TGeneric> CreateList<TGeneric>(IEnumerable<TGeneric> baseList, Func<TGeneric> creator)
         {

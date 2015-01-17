@@ -64,6 +64,11 @@ namespace Reni.Type
 
         internal override string DumpPrintText => "(" + ElementType.DumpPrintText + ")*" + Count;
 
+        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
+        IMetaFunctionFeature IFeatureImplementation.Meta => null;
+        IFunctionFeature IFeatureImplementation.Function => this;
+        ISimpleFeature IFeatureImplementation.Simple => null;
+
         IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
             => Extension.SimpleFeature(DumpPrintTokenResult);
 
@@ -144,11 +149,6 @@ namespace Reni.Type
         internal TypeBase IndexType => RootContext.BitType.Number(IndexSize.ToInt());
 
         Size IndexSize => Size.AutoSize(Count).Align(Root.DefaultRefAlignParam.AlignBits);
-
-        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
-        IMetaFunctionFeature IFeatureImplementation.Meta => null;
-        IFunctionFeature IFeatureImplementation.Function => this;
-        ISimpleFeature IFeatureImplementation.Simple => null;
 
         bool IFunctionFeature.IsImplicit => false;
         IContextReference IFunctionFeature.ObjectReference => ObjectReference;

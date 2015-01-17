@@ -11,7 +11,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class AccessFeature : EmptyFeatureImplementation, ISimpleFeature, IDefinitionPriority
+    sealed class AccessFeature : DumpableObject, IFeatureImplementation, ISimpleFeature, IDefinitionPriority
     {
         static int _nextObjectId;
 
@@ -30,14 +30,14 @@ namespace Reni.Struct
 
         ValueCache<IFunctionFeature> FunctionFeature { get; }
 
-        protected override IContextMetaFunctionFeature ContextMeta
+        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta
             => (Statement as FunctionSyntax)?.ContextMetaFunctionFeature(View);
 
-        protected override IMetaFunctionFeature Meta => (Statement as FunctionSyntax)?.MetaFunctionFeature(View);
+        IMetaFunctionFeature IFeatureImplementation.Meta => (Statement as FunctionSyntax)?.MetaFunctionFeature(View);
 
-        protected override IFunctionFeature Function => FunctionFeature.Value;
+        IFunctionFeature IFeatureImplementation.Function => FunctionFeature.Value;
 
-        protected override ISimpleFeature Simple
+        ISimpleFeature IFeatureImplementation.Simple
         {
             get
             {

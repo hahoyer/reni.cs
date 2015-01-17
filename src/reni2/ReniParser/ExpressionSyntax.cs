@@ -53,11 +53,10 @@ namespace Reni.ReniParser
             if(Left == null)
                 return context.PrefixResult(category, Token, Operator, Right);
 
-            var typeForSearch = context.Type(Left).TypeForSearchProbes;
+            var typeForSearch = context.Type(Left);
             var searchResults
                 = typeForSearch
-                    .DeclarationsForType(Operator)
-                    .FilterLowerPriority()
+                    .DeclarationsForTypeAndRelatives(Operator)
                     .ToArray();
 
             switch(searchResults.Length)

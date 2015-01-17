@@ -6,6 +6,7 @@ using hw.Debug;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
+using Reni.TokenClasses;
 
 namespace Reni.Type
 {
@@ -46,19 +47,15 @@ namespace Reni.Type
                     .Concat(new[] {Destination})
                     .Distinct();
 
-            IEnumerable<CodeBase> Conversions
+            IEnumerable<string> DumpConversions
                 => Elements
-                    .Select(element => element.Result(Category.Code).Code);
+                    .Select(element => element.Result(Category.Code).Code.DebuggerDumpString)
+                .ToArray();
 
             internal TypeBase Destination => Elements.LastOrDefault()?.ResultType() ?? Source;
 
-            protected override string GetNodeDump()
-            {
-                return Elements
-                    .Select(element => element.TargetType.DumpPrintText + " -> ")
-                    .Stringify("")
-                    + Destination.DumpPrintText;
-            }
+            [DisableDump]
+            internal bool IsRelativeConversion => Elements.Any() && Elements.All(Extension.IsRelative);
 
             public static Path operator +(Path a, Path b) => new Path(a.Elements.Concat(b.Elements).ToArray());
             public static IEnumerable<Path> operator +(IEnumerable<Path> a, Path b) => a.Select(left => left + b);
@@ -79,6 +76,12 @@ namespace Reni.Type
                 if(Elements.Length != other.Elements.Length)
                     return false;
                 return !Elements.Where((element, index) => element != Elements[index]).Any();
+            }
+            internal IEnumerable<SearchResult> RelativeSearchResults(Definable definable)
+            {
+                return Destination
+                    .DeclarationsForType(definable)
+                    .Select(result => new SearchResult(result, this));
             }
         }
 
@@ -145,19 +148,24 @@ namespace Reni.Type
             protected override bool IsDestination(TypeBase source) => source == Destination;
         }
 
-        public static Path FindPath(TypeBase source, TypeBase destination)
+        internal static Path FindPath(TypeBase source, TypeBase destination)
             => new ExplicitConversionProcess(source, destination).Result;
 
         static Path FindPath(TypeBase source, Func<TypeBase, bool> isDestination)
             => new GenericConversionProcess(source, isDestination).Result;
 
-        public static TDestination FindPathDestination<TDestination>(TypeBase source)
+        internal static TDestination FindPathDestination<TDestination>(TypeBase source)
             where TDestination : TypeBase
             => (TDestination) FindPath(source, t => t is TDestination)?.Destination;
 
         internal static IEnumerable<ISimpleFeature> ForcedConversions(Path source, Path destination)
             => source.Destination
                 .GetForcedConversions(destination.Source);
+
+        internal static IEnumerable<Path> RelativeConversions(this TypeBase source)
+            => ClosureService
+                .Result(source)
+                .Where(path => path.IsRelativeConversion);
 
         internal static IEnumerable<ISimpleFeature> SymmetricFeatureClosure(this TypeBase source)
         {
@@ -261,7 +269,7 @@ namespace Reni.Type
             => new[] {new Path(source)}.Concat(SymmetricClosureService.From(source).Select(f => new Path(f)));
 
         internal static IEnumerable<Path> SymmetricPathsClosureBackwards(this TypeBase destination)
-            => new[] { new Path(destination) }.Concat(SymmetricClosureService.To(destination).Select(f => new Path(f)));
+            => new[] {new Path(destination)}.Concat(SymmetricClosureService.To(destination).Select(f => new Path(f)));
 
         internal sealed class ClosureService
         {

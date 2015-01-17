@@ -10,7 +10,6 @@ namespace Reni.Type
 {
     sealed class AlignType
         : Child<TypeBase>
-            , IFeatureInheritor
     {
         [DisableDump]
         readonly int _alignBits;
@@ -42,9 +41,6 @@ namespace Reni.Type
 
         [DisableDump]
         internal override bool IsAligningPossible => false;
-
-        Result IFeatureInheritor.ConvertToBaseType(Category category) => PointerConversionResult(category, Parent);
-        TypeBase IFeatureInheritor.BaseType => Parent;
 
         protected override Size GetSize() => Parent.Size.Align(_alignBits);
         internal override int? SmartArrayLength(TypeBase elementType) => Parent.SmartArrayLength(elementType);

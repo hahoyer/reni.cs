@@ -36,7 +36,7 @@ namespace Reni.Feature
     sealed class Function : FunctionBase, IFeatureImplementation
     {
         public Function(Func<Category, IContextReference, TypeBase, Result> function, IContextReferenceProvider target)
-            : base(function, target) {}
+            : base(function, target) { }
 
         IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
         IMetaFunctionFeature IFeatureImplementation.Meta => null;
@@ -44,7 +44,7 @@ namespace Reni.Feature
         ISimpleFeature IFeatureImplementation.Simple => null;
     }
 
-    sealed class ExtendedFunction<T> : DumpableObject, IFunctionFeature, IFeatureImplementation
+    sealed class ExtendedFunction<T> : FunctionFeatureImplementation
     {
         static int _nextObjectId;
         [UsedImplicitly]
@@ -62,15 +62,8 @@ namespace Reni.Feature
             Tracer.Assert(_function.Target is IContextReferenceProvider);
         }
 
-        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
-        IMetaFunctionFeature IFeatureImplementation.Meta => null;
-        IFunctionFeature IFeatureImplementation.Function => this;
-        ISimpleFeature IFeatureImplementation.Simple => null;
-
-        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType) => _function(category, argsType, _arg);
-
-        bool IFunctionFeature.IsImplicit => false;
-        IContextReference IFunctionFeature.ObjectReference => ObjectReference;
-        IContextReference ObjectReference => ((IContextReferenceProvider) _function.Target).ContextReference;
+        internal override Result ApplyResult(Category category, TypeBase argsType) => _function(category, argsType, _arg);
+        internal override bool IsImplicit => false;
+        internal override IContextReference ObjectReference => ((IContextReferenceProvider) _function.Target).ContextReference;
     }
 }

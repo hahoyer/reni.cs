@@ -83,8 +83,10 @@
     <Compile Include="FeatureTest\TypeType\TypeOperatorWithVariable.cs" />
     <Compile Include="FeatureTest\Validation\SyntaxError.cs" />
     <Compile Include="FeatureTest\Validation\UndefinedContextSymbol.cs" />
+    <Compile Include="Feature\CallDescriptor.cs" />
     <Compile Include="Feature\Extension.cs" />
     <Compile Include="Feature\Function.cs" />
+    <Compile Include="Feature\SearchResult.cs" />
     <Compile Include="Feature\Simple.cs" />
     <Compile Include="hw\Debug\Configuration.cs" />
     <Compile Include="hw\Debug\DebugTextWriter.cs" />
@@ -327,6 +329,7 @@
     <Compile Include="Type\EnableArrayOverSizeType.cs" />
     <Compile Include="Type\FeaturePathBridge.cs" />
     <Compile Include="Type\NumberType.cs" />
+    <Compile Include="Type\RawPointerType.cs" />
     <Compile Include="Type\RepeaterAccessType.cs" />
     <Compile Include="Type\Child.cs" />
     <Compile Include="Type\CreateArrayFromReferenceFeature.cs" />

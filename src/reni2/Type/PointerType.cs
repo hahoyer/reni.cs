@@ -7,6 +7,7 @@ using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Struct;
+using Reni.TokenClasses;
 
 namespace Reni.Type
 {
@@ -15,7 +16,7 @@ namespace Reni.Type
             , IProxyType
             , ISimpleFeature
             , IReference
-            , IFeatureInheritor
+            , ISymbolProvider<RawAddress, IFeatureImplementation>
     {
         readonly int _order;
 
@@ -31,37 +32,32 @@ namespace Reni.Type
         [DisableDump]
         TypeBase ValueType { get; }
 
+        [DisableDump]
+        internal override Root RootContext => ValueType.RootContext;
+        internal override string DumpPrintText => "(" + ValueType.DumpPrintText + ")~~~";
+        [DisableDump]
+        internal override CompoundView FindRecentCompoundView => ValueType.FindRecentCompoundView;
+        [DisableDump]
+        internal override IFeatureImplementation Feature => ValueType.Feature;
+        [DisableDump]
+        internal override bool Hllw => false;
+        [DisableDump]
+        internal override bool IsAligningPossible => false;
+
         Size IContextReference.Size => Size;
         int IContextReference.Order => _order;
         ISimpleFeature IReference.Converter => this;
         bool IReference.IsWeak => true;
-
-        [DisableDump]
-        internal override Root RootContext => ValueType.RootContext;
-
         ISimpleFeature IProxyType.Converter => this;
         TypeBase ISimpleFeature.TargetType => ValueType;
         Result ISimpleFeature.Result(Category category) => DereferenceResult(category);
-        Result IFeatureInheritor.ConvertToBaseType(Category category) => ArgResult(category);
-        TypeBase IFeatureInheritor.BaseType => ValueType;
 
-        internal override string DumpPrintText => "(" + ValueType.DumpPrintText + ")~~~";
+        IFeatureImplementation ISymbolProvider<RawAddress, IFeatureImplementation>.Feature(RawAddress tokenClass)
+            => Reni.Feature.Extension.SimpleFeature(RawAddressResult);
 
-
-        [DisableDump]
-        internal override CompoundView FindRecentCompoundView => ValueType.FindRecentCompoundView;
-
-        [DisableDump]
-        internal override IFeatureImplementation Feature => ValueType.Feature;
-
-        [DisableDump]
-        internal override bool Hllw => false;
 
         protected override IEnumerable<ISimpleFeature> ObtainRawSymmetricConversions()
             => base.ObtainRawSymmetricConversions().Concat(new ISimpleFeature[] {Extension.SimpleFeature(DereferenceResult)});
-
-        [DisableDump]
-        internal override bool IsAligningPossible => false;
 
         protected override string GetNodeDump() => ValueType.NodeDump + "[Pointer]";
         internal override int? SmartArrayLength(TypeBase elementType) => ValueType.SmartArrayLength(elementType);
@@ -86,5 +82,13 @@ namespace Reni.Type
                     () => ArgCode.DePointer(ValueType.Size),
                     CodeArgs.Arg
                 );
+  
+        Result RawAddressResult(Category category)
+        {
+            return RootContext
+                .BitType
+                .RawPointer
+                .Result(category, () => ArgCode);
+        }
     }
 }

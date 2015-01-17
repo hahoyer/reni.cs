@@ -46,7 +46,7 @@ namespace Reni.Feature
         ISimpleFeature Left { get; }
         ISimpleFeature Right { get; }
 
-        static public ISimpleFeature CheckedCreate(ISimpleFeature left, ISimpleFeature right)
+        public static ISimpleFeature CheckedCreate(ISimpleFeature left, ISimpleFeature right)
         {
             if(left == null)
                 return right;
@@ -56,7 +56,7 @@ namespace Reni.Feature
             if(right.ResultType() == left.TargetType)
                 return null;
 
-            return new Combination(left,right);
+            return new Combination(left, right);
         }
 
         Combination(ISimpleFeature left, ISimpleFeature right)
@@ -70,7 +70,7 @@ namespace Reni.Feature
         bool IEquatable<ISimpleFeature>.Equals(ISimpleFeature other)
         {
             var typedOther = other as Combination;
-            if (typedOther == null)
+            if(typedOther == null)
                 return false;
             return Left == typedOther.Left
                 && Right == typedOther.Right;

@@ -210,7 +210,7 @@ namespace Reni.Context
         internal Result FunctionalObjectResult(Category category, [NotNull] CompileSyntax left, CompileSyntax right)
         {
             var functionalObjectDescriptor = new FunctionalObjectDescriptor(this, left);
-            return functionalObjectDescriptor.Result(category, this, left, right);
+            return functionalObjectDescriptor.Result(category, this, left, right, null);
         }
 
         ContextCallDescriptor Declarations(Definable tokenClass)
@@ -230,7 +230,7 @@ namespace Reni.Context
             if(searchResult == null)
                 return UndefinedSymbolIssue.Type(position, RootContext).IssueResult(category);
 
-            var result = searchResult.Result(category, this, right);
+            var result = searchResult.Result(category, this, right, GetObjectResult);
             Tracer.Assert(category <= result.CompleteCategory);
             return result;
         }

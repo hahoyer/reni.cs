@@ -38,7 +38,7 @@ system: /!\
     . position: :=! length type instance (0) 
     . repeat
         ( while: ^ position < length
-        . body: ^ (result(position) := initializer(position), position :+ 1) 
+        . body: ^ (result(position) := initializer(position), position := position + 1) 
         )
     . systemdata FreePointer := systemdata FreePointer + (^ elementType size * ^ length)
     } result 

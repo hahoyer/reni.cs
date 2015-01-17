@@ -11,6 +11,7 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.Struct;
 using Reni.TokenClasses;
+using Reni.Type.ConversionService;
 
 namespace Reni.Type
 {
@@ -47,6 +48,9 @@ namespace Reni.Type
             [Node]
             [SmartNode]
             public readonly ValueCache<IEnumerable<ISimpleFeature>> SymmetricConversions;
+            [Node]
+            [SmartNode]
+            public readonly ValueCache<RawPointerType> RawPointer;
 
             public Cache(TypeBase parent)
             {
@@ -61,6 +65,7 @@ namespace Reni.Type
                 TypeType = new ValueCache<TypeType>(() => new TypeType(parent));
                 Size = new ValueCache<Size>(parent.ObtainSize);
                 SymmetricConversions = new ValueCache<IEnumerable<ISimpleFeature>>(parent.ObtainSymmetricConversions);
+                RawPointer = new ValueCache<RawPointerType>(() => new RawPointerType(parent));
             }
         }
 
@@ -188,23 +193,23 @@ namespace Reni.Type
                 );
         }
 
-        internal Result Result(Category category, Result codeAndRefs) => new Result
+        internal Result Result(Category category, Result codeAndExts) => new Result
             (
             category,
             getType: () => this,
-            getCode: () => codeAndRefs.Code,
-            getExts: () => codeAndRefs.Exts
+            getCode: () => codeAndExts.Code,
+            getExts: () => codeAndExts.Exts
             );
 
         internal Result Result(Category category, Func<Category, Result> getCodeAndRefs)
         {
             var localCategory = category & (Category.Code | Category.Exts);
-            var codeAndRefs = getCodeAndRefs(localCategory);
+            var codeAndExts = getCodeAndRefs(localCategory);
             return Result
                 (
                     category,
-                    () => codeAndRefs.Code,
-                    () => codeAndRefs.Exts
+                    () => codeAndExts.Code,
+                    () => codeAndExts.Exts
                 );
         }
 
@@ -230,6 +235,7 @@ namespace Reni.Type
         [DisableDump]
         internal TypeBase FunctionInstance => _cache.FunctionInstanceType.Value;
 
+        internal TypeBase RawPointer => _cache.RawPointer.Value;
         [DisableDump]
         internal virtual CompoundView FindRecentCompoundView
         {
@@ -260,11 +266,6 @@ namespace Reni.Type
 
         [DisableDump]
         internal virtual TypeBase CoreType => this;
-
-        [DisableDump]
-        internal TypeBase TypeForSearchProbes
-            => DePointer(Category.Type).Type
-                .DeAlign(Category.Type).Type;
 
         [DisableDump]
         internal TypeBase TypeForStructureElement => DeAlign(Category.Type).Type;
@@ -341,14 +342,14 @@ namespace Reni.Type
             .Array(1, isMutable).Pointer
             .Result(category, PointerArgResult(category));
 
-        internal bool IsConvertable(TypeBase destination) => ConversionService.FindPath(this, destination) != null;
+        internal bool IsConvertable(TypeBase destination) => FindPath(this, destination) != null;
 
         internal Result Conversion(Category category, TypeBase destination)
         {
             if(category <= (Category.Type.Replenished))
                 return destination.SmartPointer.Result(category);
 
-            var path = ConversionService.FindPath(this, destination);
+            var path = FindPath(this, destination);
             if(path != null)
                 return path.Execute(category.Typed);
 
@@ -379,21 +380,25 @@ namespace Reni.Type
             return null;
         }
 
-        internal IEnumerable<SearchResult> DeclarationsForType(Definable tokenClass)
-            => tokenClass.Genericize.SelectMany(g => g.Declarations(this));
+        internal IEnumerable<SearchResult> DeclarationsForType(Definable definable)
+            => definable.Genericize.SelectMany(g => g.Declarations(this));
+
+        internal IEnumerable<SearchResult> DeclarationsForTypeAndRelatives(Definable tokenClass)
+        {
+            var result = DeclarationsForType(tokenClass);
+            if(result.Any())
+                return result;
+
+            var relativeConversions = this.RelativeConversions();
+            result = relativeConversions.SelectMany(path=>path.RelativeSearchResults(tokenClass));
+            return result;
+        }
 
         internal IEnumerable<SearchResult> Declarations<TDefinable>(TDefinable tokenClass) where TDefinable : Definable
         {
             var feature = (this as ISymbolProvider<TDefinable, IFeatureImplementation>)
                 ?.Feature(tokenClass);
-            if(feature != null)
-                return new[] {new TypeSearchResult(feature, this)};
-
-            var inheritor = this as IFeatureInheritor;
-            if(inheritor != null)
-                return inheritor.ResolveDeclarations(tokenClass);
-
-            return new SearchResult[0];
+            return feature.NullableToArray().Select(f=> new SearchResult(f, this));
         }
 
         [DisableDump]
@@ -455,6 +460,7 @@ namespace Reni.Type
             return null;
         }
     }
+
 
     interface IForcedConversionProvider<in TDestination>
     {

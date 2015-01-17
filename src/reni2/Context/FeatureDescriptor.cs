@@ -17,17 +17,14 @@ namespace Reni.Context
         [DisableDump]
         protected abstract IFeatureImplementation Feature { get; }
 
-        [DisableDump]
-        protected abstract Func<Category, Result> ConverterResult { get; }
-
-        internal Result Result(Category category, ContextBase context, CompileSyntax left, CompileSyntax right)
+        internal Result Result(Category category, ContextBase context, CompileSyntax left, CompileSyntax right, Func<Category, Result> converterResult)
         {
             var metaFeature = Feature.Meta;
             if(metaFeature != null)
                 return metaFeature.Result(context, category, left, right);
 
-            var trace = ObjectId == -56 && category.HasCode;
-            StartMethodDump(trace, context, category, left, right);
+            var trace = ObjectId == -62 && category.HasCode;
+            StartMethodDump(trace, context, category, left, right,null);
             try
             {
                 BreakExecution();
@@ -35,11 +32,11 @@ namespace Reni.Context
                 Dump("rawResult", rawResult);
                 BreakExecution();
 
-                var converterResult = ConverterResult?.Invoke(category.Typed);
-                Dump("converterResult", converterResult);
+                var converterResultForAll = converterResult(category.Typed);
+                Dump("converterResult", converterResultForAll);
                 BreakExecution();
 
-                var resultWithConversions = rawResult.ReplaceArg(ConverterResult);
+                var resultWithConversions = rawResult.ReplaceArg(converterResult);
                 Dump("resultWithConversions", resultWithConversions);
                 BreakExecution();
 
@@ -56,17 +53,17 @@ namespace Reni.Context
             }
         }
 
-        internal Result Result(Category category, ContextBase context, CompileSyntax right)
+        internal Result Result(Category category, ContextBase context, CompileSyntax right, Func<Category, Result> converterResult)
         {
             var metaFeature = Feature.ContextMeta;
             if(metaFeature != null)
                 return metaFeature.Result(context, category, right);
 
             var result = Result(context, category, right);
-            return result.ReplaceArg(ConverterResult);
+            return result.ReplaceArg(converterResult);
         }
 
-        internal Result Result(Category category) => SimpleResult(category).ReplaceArg(ConverterResult);
+        internal Result Result(Category category, Func<Category, Result> converterResult) => SimpleResult(category).ReplaceArg(converterResult);
 
         Result Result(ContextBase context, Category category, CompileSyntax right)
         {
@@ -120,60 +117,4 @@ namespace Reni.Context
         }
     }
 
-    sealed class CallDescriptor : FeatureDescriptor
-    {
-        readonly TypeBase _definingType;
-        public CallDescriptor(TypeBase definingType, IFeatureImplementation feature, Func<Category, Result> converterResult)
-        {
-            _definingType = definingType;
-            Feature = feature;
-            ConverterResult = converterResult;
-            StopByObjectId(-41);
-        }
-        [DisableDump]
-        protected override TypeBase Type
-        {
-            get
-            {
-                var result = ConverterResult(Category.Type);
-                return result != null ? result.Type : _definingType;
-            }
-        }
-        [DisableDump]
-        protected override IFeatureImplementation Feature { get; }
-        [DisableDump]
-        protected override Func<Category, Result> ConverterResult { get; }
-    }
-
-    sealed class FunctionalObjectDescriptor : FeatureDescriptor
-    {
-        readonly ContextBase _context;
-        readonly CompileSyntax _left;
-        internal FunctionalObjectDescriptor(ContextBase context, CompileSyntax left)
-        {
-            _context = context;
-            _left = left;
-        }
-        protected override TypeBase Type => _context.Type(_left);
-        protected override Func<Category, Result> ConverterResult => null;
-        protected override IFeatureImplementation Feature => Type.Feature;
-    }
-
-    sealed class FunctionalArgDescriptor : FeatureDescriptor
-    {
-        readonly ContextBase _context;
-        internal FunctionalArgDescriptor(ContextBase context) { _context = context; }
-
-        [DisableDump]
-        FunctionBodyType FunctionBodyType => (FunctionBodyType) _context.ArgReferenceResult(Category.Type).Type;
-        [DisableDump]
-        CompoundView CompoundView => FunctionBodyType.FindRecentCompoundView;
-
-        [DisableDump]
-        protected override Func<Category, Result> ConverterResult => CompoundView.StructReferenceViaContextReference;
-        [DisableDump]
-        protected override TypeBase Type => CompoundView.Type;
-        [DisableDump]
-        protected override IFeatureImplementation Feature => FunctionBodyType.Feature;
-    }
 }
