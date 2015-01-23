@@ -40,20 +40,17 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        internal override Root RootContext { get { return Parent.RootContext; } }
+        internal override Root RootContext => Parent.RootContext;
         [DisableDump]
-        internal override bool Hllw { get { return Parent.Hllw; } }
+        internal override bool Hllw => Parent.Hllw;
         [DisableDump]
-        internal override string DumpPrintText { get { return "number(bits:" + Bits + ")"; } }
+        internal override string DumpPrintText => "number(bits:" + Bits + ")";
         [DisableDump]
-        internal override bool IsCuttingPossible { get { return true; } }
+        internal override bool IsCuttingPossible => true;
         [EnableDump]
-        internal int Bits { get { return Size.ToInt(); } }
+        internal int Bits => Size.ToInt();
         [DisableDump]
-        protected override IEnumerable<IGenericProviderForType> Genericize
-        {
-            get { return this.GenericListFromType(base.Genericize); }
-        }
+        protected override IEnumerable<IGenericProviderForType> Genericize => this.GenericListFromType(base.Genericize);
 
         internal override IEnumerable<ISimpleFeature> CutEnabledConversion(NumberType destination)
         {
@@ -85,19 +82,13 @@ namespace Reni.Type
 
         protected override Size GetSize() => Parent.Size;
 
-        Result TextItemResult(Category category)
-        {
-            return Parent
-                .TextItemResult(category)
-                .ReplaceArg(c => PointerConversionResult(c, Parent));
-        }
+        Result TextItemResult(Category category) => Parent
+            .TextItemResult(category)
+            .ReplaceArg(c => PointerConversionResult(c, Parent));
 
-        Result NegationResult(Category category)
-        {
-            return ((NumberType) _zeroResult.Value.Type)
-                .OperationResult(category, _minusOperation, this)
-                .ReplaceAbsolute(_zeroResult.Value.Type.Reference, c => _zeroResult.Value.LocalReferenceResult & (c));
-        }
+        Result NegationResult(Category category) => ((NumberType) _zeroResult.Value.Type)
+            .OperationResult(category, _minusOperation, this)
+            .ReplaceAbsolute(_zeroResult.Value.Type.Reference, c => _zeroResult.Value.LocalReferenceResult & (c));
 
         protected override CodeBase DumpPrintCode()
         {
@@ -115,7 +106,7 @@ namespace Reni.Type
         Result OperationResult(Category category, TypeBase right, IOperation operation)
         {
             var destination = FindPathDestination<NumberType>(right);
-            if (destination != null)
+            if(destination != null)
             {
                 var conversion = right.Conversion(Category.Code, destination).Code;
                 return OperationResult(category, operation, destination)
