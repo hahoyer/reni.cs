@@ -6,16 +6,15 @@ using hw.Graphics;
 using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
-using Reni.Parser.Services;
 
 namespace Reni.Parser
 {
-    sealed class SimpleTokenFactory : TokenFactory<TokenClass, Services.Syntax>
+    sealed class SimpleTokenFactory : TokenFactory<Services.TokenClass, Services.Syntax>
     {
-        protected override TokenClass GetError(Match.IError message) { throw new Exception("Syntax error: " + message); }
-        protected override FunctionCache<string, TokenClass> GetPredefinedTokenClasses()
+        protected override Services.TokenClass GetError(Match.IError message) { throw new Exception("Syntax error: " + message); }
+        protected override FunctionCache<string, Services.TokenClass> GetPredefinedTokenClasses()
         {
-            return new FunctionCache<string, TokenClass>
+            return new FunctionCache<string, Services.TokenClass>
             {
                 {"{", new OpenToken(1)},
                 {"(", new OpenToken(3)},
@@ -23,13 +22,13 @@ namespace Reni.Parser
                 {")", new CloseToken(3)}
             };
         }
-        protected override TokenClass GetEndOfText() { return new CloseToken(0); }
-        protected override TokenClass GetTokenClass(string name) { return CommonTokenClass; }
-        protected override TokenClass GetNumber() { return CommonTokenClass; }
-        protected override TokenClass GetText() { return CommonTokenClass; }
-        static TokenClass CommonTokenClass { get { return new AnyTokenClass(); } }
+        protected override Services.TokenClass GetEndOfText() { return new CloseToken(0); }
+        protected override Services.TokenClass GetTokenClass(string name) { return CommonTokenClass; }
+        protected override Services.TokenClass GetNumber() { return CommonTokenClass; }
+        protected override Services.TokenClass GetText() { return CommonTokenClass; }
+        static Services.TokenClass CommonTokenClass { get { return new AnyTokenClass(); } }
 
-        sealed class AnyTokenClass : TokenClass
+        sealed class AnyTokenClass : Services.TokenClass
         {
             protected override Services.Syntax Create(Services.Syntax left, SourcePart token, Services.Syntax right)
             {
@@ -37,7 +36,7 @@ namespace Reni.Parser
             }
         }
 
-        sealed class CloseToken : TokenClass
+        sealed class CloseToken : Services.TokenClass
         {
             [EnableDump]
             readonly int _level;
@@ -49,7 +48,7 @@ namespace Reni.Parser
             }
         }
 
-        sealed class OpenToken : TokenClass
+        sealed class OpenToken : Services.TokenClass
         {
             [EnableDump]
             readonly int _level;

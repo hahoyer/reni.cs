@@ -5,7 +5,6 @@ using hw.Debug;
 using hw.UnitTest;
 using Reni.Basics;
 using Reni.Context;
-using Reni.Type.ConversionService;
 
 namespace Reni.FeatureTest.ConversionService
 {
@@ -17,7 +16,7 @@ namespace Reni.FeatureTest.ConversionService
         {
             var source = new Root(null).BitType.Number(8).EnableCut.Pointer;
             var destination = new Root(null).BitType.Number(6);
-            var path = FindPath(source, destination);
+            var path = Type.ConversionService.FindPath(source, destination);
 
             Tracer.Assert(path != null);
 

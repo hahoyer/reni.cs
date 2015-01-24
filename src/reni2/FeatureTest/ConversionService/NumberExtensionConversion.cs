@@ -5,7 +5,6 @@ using hw.Debug;
 using hw.UnitTest;
 using Reni.Context;
 using Reni.Type;
-using Reni.Type.ConversionService;
 
 namespace Reni.FeatureTest.ConversionService
 {
@@ -17,7 +16,7 @@ namespace Reni.FeatureTest.ConversionService
         {
             var numberSmall = new Root(null).BitType.Number(4);
             var numberLarge = new Root(null).BitType.Number(8);
-            var paths = ForcedConversions(new Path((TypeBase)numberSmall), new Path((TypeBase)numberLarge)).ToArray();
+            var paths = Reni.Type.ConversionService.ForcedConversions(new Reni.Type.ConversionService.Path((TypeBase)numberSmall), new Reni.Type.ConversionService.Path((TypeBase)numberLarge)).ToArray();
 
             Tracer.Assert(paths.Length == 1);
         }
@@ -26,7 +25,7 @@ namespace Reni.FeatureTest.ConversionService
         {
             var numberSmall = new Root(null).BitType.Number(1);
             var numberLarge = new Root(null).BitType.Number(3);
-            var paths = ForcedConversions(new Path((TypeBase)numberSmall), new Path((TypeBase)numberLarge)).ToArray();
+            var paths = Reni.Type.ConversionService.ForcedConversions(new Reni.Type.ConversionService.Path((TypeBase)numberSmall), new Reni.Type.ConversionService.Path((TypeBase)numberLarge)).ToArray();
 
             Tracer.Assert(paths.Length == 1);
         }
@@ -37,7 +36,7 @@ namespace Reni.FeatureTest.ConversionService
         {
             var source = new Root(null).BitType.Number(1);
             var destination = new Root(null).BitType.Number(3);
-            var paths = FindPath(source, destination);
+            var paths = Reni.Type.ConversionService.FindPath(source, destination);
 
             Tracer.Assert(paths!= null);
         }

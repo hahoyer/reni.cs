@@ -7,19 +7,18 @@ using Reni.Context;
 using Reni.ReniSyntax;
 using Reni.Struct;
 using Reni.Type;
-using Reni.Type.ConversionService;
 
 namespace Reni.Feature
 {
     sealed class CallDescriptor : FeatureDescriptor
     {
-        public CallDescriptor(IFeatureImplementation feature, Path converterPath)
+        public CallDescriptor(IFeatureImplementation feature, ConversionService.Path converterPath)
         {
             ConverterPath = converterPath;
             Feature = feature;
         }
 
-        Path ConverterPath { get; }
+        ConversionService.Path ConverterPath { get; }
         [DisableDump]
         protected override TypeBase Type => ConverterPath.Destination;
         [DisableDump]
