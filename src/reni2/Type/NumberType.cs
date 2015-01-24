@@ -89,14 +89,7 @@ namespace Reni.Type
             .OperationResult(category, _minusOperation, this)
             .ReplaceAbsolute(_zeroResult.Value.Type.Reference, c => _zeroResult.Value.LocalReferenceResult & (c));
 
-        protected override CodeBase DumpPrintCode()
-        {
-            var alignedSize = Size.Align(Root.DefaultRefAlignParam.AlignBits);
-            return Pointer
-                .ArgCode
-                .DePointer(alignedSize)
-                .DumpPrintNumber(alignedSize);
-        }
+        protected override CodeBase DumpPrintCode() => Align.ArgCode.DumpPrintNumber(Align.Size);
 
         Result EnableCutTokenResult(Category category) => EnableCut
             .Pointer

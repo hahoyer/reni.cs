@@ -37,13 +37,11 @@ namespace Reni.Type
                 .Result(category, () => CodeBase.BitsConst(bitsConst));
         }
 
-        IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
+        IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>.Feature
+            (DumpPrintToken tokenClass)
             => Extension.SimpleFeature(DumpPrintTokenResult, this);
 
         protected override CodeBase DumpPrintCode()
-            => Pointer
-                .ArgCode
-                .DePointer(Size)
-                .DumpPrintNumber();
+            => Align.ArgCode.DumpPrintNumber();
     }
 }
