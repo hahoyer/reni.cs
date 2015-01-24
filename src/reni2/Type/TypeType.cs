@@ -13,8 +13,8 @@ namespace Reni.Type
 {
     sealed class TypeType
         : TypeBase
-            , ISymbolProvider<DumpPrintToken, IFeatureImplementation>
-            , ISymbolProvider<Star, IFeatureImplementation>
+            , ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>
+            , ISymbolProviderForPointer<Star, IFeatureImplementation>
     {
         public TypeType(TypeBase value)
         {
@@ -31,10 +31,10 @@ namespace Reni.Type
         [DisableDump]
         internal TypeBase Value { get; }
 
-        IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
+        IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
             => Extension.SimpleFeature(DumpPrintTokenResult);
 
-        IFeatureImplementation ISymbolProvider<Star, IFeatureImplementation>.Feature(Star tokenClass)
+        IFeatureImplementation ISymbolProviderForPointer<Star, IFeatureImplementation>.Feature(Star tokenClass)
             => Extension.MetaFeature(StarResult);
         internal override string DumpPrintText => "(" + Value.DumpPrintText + "()) type";
 

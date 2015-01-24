@@ -13,9 +13,9 @@ namespace Reni.Type
 {
     sealed class TextItemType
         : TagChild<ArrayType>
-            , ISymbolProvider<DumpPrintToken, IFeatureImplementation>
-            , ISymbolProvider<ToNumberOfBase, IFeatureImplementation>
-            , ISymbolProvider<ConcatArrays, IFeatureImplementation>
+            , ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>
+            , ISymbolProviderForPointer<ToNumberOfBase, IFeatureImplementation>
+            , ISymbolProviderForPointer<ConcatArrays, IFeatureImplementation>
     {
         public TextItemType(ArrayType parent)
             : base(parent) { StopByObjectId(-10); }
@@ -26,13 +26,13 @@ namespace Reni.Type
         [DisableDump]
         internal override Size SimpleItemSize => Parent.ElementType.SimpleItemSize ?? Size;
 
-        IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
+        IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
             => Extension.SimpleFeature(DumpPrintTokenResult);
 
-        IFeatureImplementation ISymbolProvider<ToNumberOfBase, IFeatureImplementation>.Feature(ToNumberOfBase tokenClass)
+        IFeatureImplementation ISymbolProviderForPointer<ToNumberOfBase, IFeatureImplementation>.Feature(ToNumberOfBase tokenClass)
             => Extension.MetaFeature(ToNumberOfBaseResult);
 
-        IFeatureImplementation ISymbolProvider<ConcatArrays, IFeatureImplementation>.Feature(ConcatArrays tokenClass)
+        IFeatureImplementation ISymbolProviderForPointer<ConcatArrays, IFeatureImplementation>.Feature(ConcatArrays tokenClass)
             => Extension.FunctionFeature
                 (
                     (category, objectReference, argsType) =>

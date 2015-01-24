@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using hw.Helper;
 using System.Linq;
 using hw.Debug;
 using Reni.Basics;
@@ -53,7 +54,7 @@ namespace Reni.Type
         Result ISimpleFeature.Result(Category category) => DereferenceResult(category);
 
         IFeatureImplementation ISymbolProvider<RawAddress, IFeatureImplementation>.Feature(RawAddress tokenClass)
-            => Reni.Feature.Extension.SimpleFeature(RawAddressResult);
+            => Extension.SimpleFeature(RawAddressResult);
 
 
         protected override IEnumerable<ISimpleFeature> ObtainRawSymmetricConversions()
@@ -63,6 +64,16 @@ namespace Reni.Type
         internal override int? SmartArrayLength(TypeBase elementType) => ValueType.SmartArrayLength(elementType);
         protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
         protected override ArrayType ObtainArray(int count, bool isMutable) => ValueType.Array(count, isMutable);
+
+        internal override IEnumerable<SearchResult> Declarations<TDefinable>(TDefinable tokenClass)
+        {
+            var feature = (ValueType as ISymbolProviderForPointer<TDefinable, IFeatureImplementation>)
+                ?.Feature(tokenClass);
+            var result = feature.NullableToArray().Select(f => new SearchResult(f, Pointer));
+            if(result.Any())
+                return result;
+            return base.Declarations(tokenClass);
+        }
 
         Result DereferenceResult(Category category)
             => ValueType
@@ -82,7 +93,7 @@ namespace Reni.Type
                     () => ArgCode.DePointer(ValueType.Size),
                     CodeArgs.Arg
                 );
-  
+
         Result RawAddressResult(Category category)
         {
             return RootContext

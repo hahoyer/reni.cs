@@ -238,7 +238,7 @@ namespace Reni.Context
         internal virtual IEnumerable<ContextCallDescriptor> Declarations<TDefinable>(TDefinable tokenClass)
             where TDefinable : Definable
         {
-            var provider = this as ISymbolProvider<TDefinable, IFeatureImplementation>;
+            var provider = this as ISymbolProviderForPointer<TDefinable, IFeatureImplementation>;
             var feature = provider?.Feature(tokenClass);
             if(feature != null)
                 yield return new ContextCallDescriptor(this, feature);

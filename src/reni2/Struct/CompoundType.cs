@@ -12,8 +12,8 @@ namespace Reni.Struct
 {
     sealed class CompoundType
         : TypeBase
-            , ISymbolProvider<DumpPrintToken, IFeatureImplementation>
-            , ISymbolProvider<Definable, IFeatureImplementation>
+            , ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>
+            , ISymbolProviderForPointer<Definable, IFeatureImplementation>
     {
         internal CompoundType(CompoundView view) { View = view; }
 
@@ -42,10 +42,10 @@ namespace Reni.Struct
 
         Result VoidConversion(Category category) => RootContext.VoidType.Result(category, ArgResult);
 
-        IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
+        IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
             => Extension.SimpleFeature(DumpPrintTokenResult);
 
-        IFeatureImplementation ISymbolProvider<Definable, IFeatureImplementation>.Feature(Definable tokenClass)
+        IFeatureImplementation ISymbolProviderForPointer<Definable, IFeatureImplementation>.Feature(Definable tokenClass)
             => View.Find(tokenClass);
 
         protected override Size GetSize() => View.CompoundSize;

@@ -389,11 +389,11 @@ namespace Reni.Type
                 return result;
 
             var relativeConversions = this.RelativeConversions();
-            result = relativeConversions.SelectMany(path=>path.RelativeSearchResults(tokenClass));
+            result = relativeConversions.SelectMany(path => path.RelativeSearchResults(tokenClass));
             return result;
         }
 
-        internal IEnumerable<SearchResult> Declarations<TDefinable>(TDefinable tokenClass) where TDefinable : Definable
+        internal virtual IEnumerable<SearchResult> Declarations<TDefinable>(TDefinable tokenClass) where TDefinable : Definable
         {
             var feature = (this as ISymbolProvider<TDefinable, IFeatureImplementation>)
                 ?.Feature(tokenClass);
@@ -451,7 +451,10 @@ namespace Reni.Type
         internal virtual IEnumerable<ISimpleFeature> StripConversions { get { yield break; } }
         internal virtual IEnumerable<ISimpleFeature> CutEnabledConversion(NumberType destination) { yield break; }
 
-        protected Result DumpPrintTokenResult(Category category) => VoidType.Result(category, DumpPrintCode, CodeArgs.Arg);
+        protected Result DumpPrintTokenResult(Category category) 
+            => VoidType
+            .Result(category, DumpPrintCode, CodeArgs.Arg)
+            .ReplaceArg(Pointer.ArgResult(category).DereferenceResult);
 
         protected virtual CodeBase DumpPrintCode()
         {

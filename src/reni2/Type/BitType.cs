@@ -12,7 +12,7 @@ namespace Reni.Type
 {
     sealed class BitType
         : TypeBase
-            , ISymbolProvider<DumpPrintToken, IFeatureImplementation>
+            , ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>
     {
         internal BitType(Root rootContext) { RootContext = rootContext; }
 
@@ -37,7 +37,7 @@ namespace Reni.Type
                 .Result(category, () => CodeBase.BitsConst(bitsConst));
         }
 
-        IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
+        IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
             => Extension.SimpleFeature(DumpPrintTokenResult, this);
 
         protected override CodeBase DumpPrintCode()

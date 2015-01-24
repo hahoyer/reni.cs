@@ -18,8 +18,8 @@ namespace Reni.Context
 {
     sealed class Root
         : ContextBase
-            , ISymbolProvider<Minus, IFeatureImplementation>
-            , ISymbolProvider<ConcatArrays, IFeatureImplementation>
+            , ISymbolProviderForPointer<Minus, IFeatureImplementation>
+            , ISymbolProviderForPointer<ConcatArrays, IFeatureImplementation>
     {
         [DisableDump]
         [Node]
@@ -69,9 +69,9 @@ namespace Reni.Context
 
         public bool ProcessErrors => ExecutionContext.ProcessErrors;
 
-        IFeatureImplementation ISymbolProvider<Minus, IFeatureImplementation>.Feature(Minus tokenClass) => _minusFeatureCache.Value;
+        IFeatureImplementation ISymbolProviderForPointer<Minus, IFeatureImplementation>.Feature(Minus tokenClass) => _minusFeatureCache.Value;
 
-        IFeatureImplementation ISymbolProvider<ConcatArrays, IFeatureImplementation>.Feature(ConcatArrays tokenClass)
+        IFeatureImplementation ISymbolProviderForPointer<ConcatArrays, IFeatureImplementation>.Feature(ConcatArrays tokenClass)
             => _createArrayFeatureCache[tokenClass.IsMutable];
 
         static Result CreateArrayResult(ContextBase context, Category category, CompileSyntax argsType, bool isMutable)

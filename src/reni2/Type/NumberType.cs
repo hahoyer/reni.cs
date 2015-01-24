@@ -14,11 +14,11 @@ namespace Reni.Type
 {
     sealed class NumberType
         : Child<ArrayType>
-            , ISymbolProvider<DumpPrintToken, IFeatureImplementation>
-            , ISymbolProvider<Operation, IFeatureImplementation>
-            , ISymbolProvider<TokenClasses.EnableCut, IFeatureImplementation>
-            , ISymbolProvider<Negate, IFeatureImplementation>
-            , ISymbolProvider<TextItem, IFeatureImplementation>
+            , ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>
+            , ISymbolProviderForPointer<Operation, IFeatureImplementation>
+            , ISymbolProviderForPointer<TokenClasses.EnableCut, IFeatureImplementation>
+            , ISymbolProviderForPointer<Negate, IFeatureImplementation>
+            , ISymbolProviderForPointer<TextItem, IFeatureImplementation>
             , IForcedConversionProvider<NumberType>
     {
         static readonly Minus _minusOperation = new Minus();
@@ -56,13 +56,13 @@ namespace Reni.Type
             yield return Extension.SimpleFeature(category => CutEnabledBitCountConversion(category, destination), EnableCut);
         }
 
-        IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
+        IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
             => Extension.SimpleFeature(DumpPrintTokenResult, this);
 
-        IFeatureImplementation ISymbolProvider<Operation, IFeatureImplementation>.Feature(Operation tokenClass)
+        IFeatureImplementation ISymbolProviderForPointer<Operation, IFeatureImplementation>.Feature(Operation tokenClass)
             => Extension.FunctionFeature(OperationResult, tokenClass);
 
-        IFeatureImplementation ISymbolProvider<TokenClasses.EnableCut, IFeatureImplementation>.Feature
+        IFeatureImplementation ISymbolProviderForPointer<TokenClasses.EnableCut, IFeatureImplementation>.Feature
             (TokenClasses.EnableCut tokenClass) => Extension.SimpleFeature(EnableCutTokenResult);
 
         IEnumerable<ISimpleFeature> IForcedConversionProvider<NumberType>.Result(NumberType destination)
@@ -71,10 +71,10 @@ namespace Reni.Type
                 yield return Extension.SimpleFeature(category => destination.FlatConversion(category, this), this);
         }
 
-        IFeatureImplementation ISymbolProvider<Negate, IFeatureImplementation>.Feature(Negate tokenClass)
+        IFeatureImplementation ISymbolProviderForPointer<Negate, IFeatureImplementation>.Feature(Negate tokenClass)
             => Extension.SimpleFeature(NegationResult);
 
-        IFeatureImplementation ISymbolProvider<TextItem, IFeatureImplementation>.Feature(TextItem tokenClass)
+        IFeatureImplementation ISymbolProviderForPointer<TextItem, IFeatureImplementation>.Feature(TextItem tokenClass)
             => Extension.SimpleFeature(TextItemResult);
 
         protected override Result ParentConversionResult(Category category) => Parent.Result(category, ArgResult);

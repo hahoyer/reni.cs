@@ -13,9 +13,9 @@ namespace Reni.Type
 {
     sealed class ArrayType
         : TypeBase
-            , ISymbolProvider<DumpPrintToken, IFeatureImplementation>
-            , ISymbolProvider<ConcatArrays, IFeatureImplementation>
-            , ISymbolProvider<TextItem, IFeatureImplementation>
+            , ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>
+            , ISymbolProviderForPointer<ConcatArrays, IFeatureImplementation>
+            , ISymbolProviderForPointer<TextItem, IFeatureImplementation>
             , IRepeaterType
             , IFunctionFeature
             , IFeatureImplementation
@@ -69,17 +69,17 @@ namespace Reni.Type
         IFunctionFeature IFeatureImplementation.Function => this;
         ISimpleFeature IFeatureImplementation.Simple => null;
 
-        IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
+        IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
             => Extension.SimpleFeature(DumpPrintTokenResult);
 
-        IFeatureImplementation ISymbolProvider<ConcatArrays, IFeatureImplementation>.Feature(ConcatArrays tokenClass)
+        IFeatureImplementation ISymbolProviderForPointer<ConcatArrays, IFeatureImplementation>.Feature(ConcatArrays tokenClass)
             =>
                 Extension.FunctionFeature
                     (
                         (category, objectReference, argsType) =>
                             ConcatArraysResult(category, objectReference, argsType, tokenClass.IsMutable), this);
 
-        IFeatureImplementation ISymbolProvider<TextItem, IFeatureImplementation>.Feature(TextItem tokenClass)
+        IFeatureImplementation ISymbolProviderForPointer<TextItem, IFeatureImplementation>.Feature(TextItem tokenClass)
             => Extension.SimpleFeature(TextItemResult);
 
         internal override int? SmartArrayLength(TypeBase elementType)
