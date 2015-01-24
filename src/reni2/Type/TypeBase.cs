@@ -335,7 +335,10 @@ namespace Reni.Type
 
         [NotNull]
         internal Result GenericDumpPrintResult(Category category)
-            => Declarations<DumpPrintToken>(null).Single().CallResult(category);
+        {
+            var searchResults = Pointer.Declarations<DumpPrintToken>(null);
+            return searchResults.Single().CallResult(category);
+        }
 
         internal Result CreateArray(Category category, bool isMutable) => Align
             .Array(1, isMutable).Pointer

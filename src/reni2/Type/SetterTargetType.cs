@@ -15,7 +15,7 @@ namespace Reni.Type
             , IProxyType
             , ISimpleFeature
             , IReference
-            , ISymbolProviderForPointer<ReassignToken, IFeatureImplementation>
+            , ISymbolProvider<ReassignToken, IFeatureImplementation>
     {
         readonly int _order;
 
@@ -29,7 +29,7 @@ namespace Reni.Type
         TypeBase ISimpleFeature.TargetType => ValueType;
         Result ISimpleFeature.Result(Category category) => GetterResult(category);
 
-        IFeatureImplementation ISymbolProviderForPointer<ReassignToken, IFeatureImplementation>.Feature(ReassignToken tokenClass)
+        IFeatureImplementation ISymbolProvider<ReassignToken, IFeatureImplementation>.Feature(ReassignToken tokenClass)
             => IsMutable ? Extension.FunctionFeature(ReassignResult) : null;
 
         [EnableDumpExcept(false)]

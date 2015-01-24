@@ -177,17 +177,28 @@ namespace Reni.Struct
                 );
         }
 
+        internal Result AccessValueViaThisReference(Category category, int position)
+        {
+            var resultType = ValueType(position);
+            if (resultType.Hllw)
+                return resultType.Result(category);
+
+            return resultType
+               .Pointer 
+               .Result(category, PointerKind.ArgResult(category).AddToReference(()=>FieldOffset(position)));
+        }
+
         Result DumpPrintResultViaAccessReference(Category category, int position)
         {
             var trace = position == -10;
             StartMethodDump(trace, category, position);
             try
             {
-                var accessType = AccessType(position);
+                var accessType = ValueType(position);
                 var genericDumpPrintResult = accessType.GenericDumpPrintResult(category);
                 Dump("genericDumpPrintResult", genericDumpPrintResult);
                 BreakExecution();
-                var accessViaThisReference = AccessViaThisReference(category.Typed, position);
+                var accessViaThisReference = AccessValueViaThisReference(category.Typed, position);
                 return ReturnMethodDump(genericDumpPrintResult.ReplaceArg(accessViaThisReference));
             }
             finally
