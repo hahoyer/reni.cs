@@ -29,7 +29,6 @@ namespace Reni.Type
         internal override sealed Result ArrayCopier(Category category, int count) => Parent.ArrayCopier(category, count);
 
         protected override Result ParentConversionResult(Category category) => Parent.Result(category, ArgResult);
-        internal Result PointerConversionResult(Category category) => PointerConversionResult(category, Parent);
 
         [DisableDump]
         internal override IEnumerable<ISimpleFeature> StripConversions

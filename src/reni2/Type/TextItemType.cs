@@ -18,10 +18,7 @@ namespace Reni.Type
             , ISymbolProvider<ConcatArrays, IFeatureImplementation>
     {
         public TextItemType(ArrayType parent)
-            : base(parent)
-        {
-            StopByObjectId(-10);
-        }
+            : base(parent) { StopByObjectId(-10); }
 
         [DisableDump]
         protected override string TagTitle => "text_item";
@@ -35,14 +32,14 @@ namespace Reni.Type
         IFeatureImplementation ISymbolProvider<ToNumberOfBase, IFeatureImplementation>.Feature(ToNumberOfBase tokenClass)
             => Extension.MetaFeature(ToNumberOfBaseResult);
 
-        IFeatureImplementation ISymbolProvider<ConcatArrays, IFeatureImplementation>.Feature(ConcatArrays tokenClass) => Extension.FunctionFeature
-            ((category, objectReference, argsType) => ConcatArraysResult(category, objectReference, argsType, tokenClass.IsMutable), this);
+        IFeatureImplementation ISymbolProvider<ConcatArrays, IFeatureImplementation>.Feature(ConcatArrays tokenClass)
+            => Extension.FunctionFeature
+                (
+                    (category, objectReference, argsType) =>
+                        ConcatArraysResult(category, objectReference, argsType, tokenClass.IsMutable),
+                    this);
 
-        protected override CodeBase DumpPrintCode()
-            => Pointer
-                .ArgCode
-                .DePointer(Size)
-                .DumpPrintText(SimpleItemSize);
+        protected override CodeBase DumpPrintCode() => ArgCode.DumpPrintText(SimpleItemSize);
 
         Result ToNumberOfBaseResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {

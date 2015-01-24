@@ -9,25 +9,29 @@ namespace Reni.Feature
 {
     abstract class SimpleBase : DumpableObject, ISimpleFeature
     {
-        [EnableDump]
-        Func<Category, Result> _function;
-        readonly TypeBase _target;
         static int _nextObjectId;
+
         protected SimpleBase(Func<Category, Result> function, TypeBase target)
             : base(_nextObjectId++)
         {
-            _function = function;
-            _target = target;
-            Tracer.Assert(_target != null);
+            Function = function;
+            Target = target;
+            Tracer.Assert(Target != null);
         }
-        Result ISimpleFeature.Result(Category category) => _function(category);
-        TypeBase ISimpleFeature.TargetType => _target;
+
+        [EnableDump]
+        internal Func<Category, Result> Function { get; }
+        TypeBase Target { get; }
+
+        Result ISimpleFeature.Result(Category category) => Function(category);
+        TypeBase ISimpleFeature.TargetType => Target;
+
         protected override string GetNodeDump()
-            => _function(Category.Type).Type.DumpPrintText
+            => Function(Category.Type).Type.DumpPrintText
                 + " <== "
-                + _target.DumpPrintText
+                + Target.DumpPrintText
                 + "."
-                + _function.Method.Name;
+                + Function.Method.Name;
     }
 
     sealed class Simple : SimpleBase, IFeatureImplementation
