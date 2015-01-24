@@ -6,26 +6,28 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.ReniSyntax;
 using Reni.Type;
-using Reni.Type.ConversionService;
 
 namespace Reni.Feature
 {
     sealed class SearchResult : DumpableObject
     {
         public IFeatureImplementation Feature { get; }
-        public Path ConverterPath { get; }
+        public ConversionService.Path ConverterPath { get; }
 
-        internal SearchResult(SearchResult result, Path relativeConversion)
+        internal SearchResult(SearchResult result, ConversionService.Path relativeConversion)
         {
-            ConverterPath = result.ConverterPath + relativeConversion;
             Feature = result.Feature;
+            ConverterPath = result.ConverterPath + relativeConversion;
+            StopByObjectId(-37);
         }
 
         internal SearchResult(IFeatureImplementation feature, TypeBase definingItem)
         {
             Feature = feature;
-            ConverterPath = new Path(definingItem.Pointer);
+            ConverterPath = new ConversionService.Path(definingItem);
+            StopByObjectId(-37);
         }
+
         CallDescriptor CallDescriptor => new CallDescriptor(Feature, ConverterPath);
 
         internal Result CallResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)

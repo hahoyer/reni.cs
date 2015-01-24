@@ -89,7 +89,7 @@ namespace Reni.Type
         internal override Result Destructor(Category category) => ElementType.ArrayDestructor(category, Count);
         internal override Result Copier(Category category) => ElementType.ArrayCopier(category, Count);
 
-        internal Result TextItemResult(Category category) => PointerConversionResult(category, TextItemType);
+        internal Result TextItemResult(Category category) => ResultFromPointer(category, TextItemType);
 
         internal override Result ConstructorResult(Category category, TypeBase argsType) => Result
             (

@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
+using hw.Helper;
 using System.Linq;
 using hw.Debug;
 using hw.Forms;
-using hw.Helper;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
@@ -11,7 +11,6 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.Struct;
 using Reni.TokenClasses;
-using Reni.Type.ConversionService;
 
 namespace Reni.Type
 {
@@ -342,14 +341,14 @@ namespace Reni.Type
             .Array(1, isMutable).Pointer
             .Result(category, PointerArgResult(category));
 
-        internal bool IsConvertable(TypeBase destination) => FindPath(this, destination) != null;
+        internal bool IsConvertable(TypeBase destination) => ConversionService.FindPath(this, destination) != null;
 
         internal Result Conversion(Category category, TypeBase destination)
         {
             if(category <= (Category.Type.Replenished))
                 return destination.SmartPointer.Result(category);
 
-            var path = FindPath(this, destination);
+            var path = ConversionService.FindPath(this, destination);
             if(path != null)
                 return path.Execute(category.Typed);
 
@@ -370,7 +369,7 @@ namespace Reni.Type
         internal TypeBase SmartUn<T>()
             where T : ISimpleFeature => this is T ? ((ISimpleFeature) this).Result(Category.Type).Type : this;
 
-        internal Result PointerConversionResult(Category category, TypeBase destinationType) => destinationType
+        internal Result ResultFromPointer(Category category, TypeBase resultType) => resultType
             .Pointer
             .Result(category, Pointer.ArgResult(category.Typed));
 
@@ -398,7 +397,7 @@ namespace Reni.Type
         {
             var feature = (this as ISymbolProvider<TDefinable, IFeatureImplementation>)
                 ?.Feature(tokenClass);
-            return feature.NullableToArray().Select(f=> new SearchResult(f, this));
+            return feature.NullableToArray().Select(f => new SearchResult(f, Pointer));
         }
 
         [DisableDump]

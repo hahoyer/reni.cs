@@ -9,7 +9,6 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.Numeric;
 using Reni.TokenClasses;
-using Reni.Type.ConversionService;
 
 namespace Reni.Type
 {
@@ -84,7 +83,7 @@ namespace Reni.Type
 
         Result TextItemResult(Category category) => Parent
             .TextItemResult(category)
-            .ReplaceArg(c => PointerConversionResult(c, Parent));
+            .ReplaceArg(c => ResultFromPointer(c, Parent));
 
         Result NegationResult(Category category) => ((NumberType) _zeroResult.Value.Type)
             .OperationResult(category, _minusOperation, this)
@@ -105,7 +104,7 @@ namespace Reni.Type
 
         Result OperationResult(Category category, TypeBase right, IOperation operation)
         {
-            var destination = FindPathDestination<NumberType>(right);
+            var destination = ConversionService.FindPathDestination<NumberType>(right);
             if(destination != null)
             {
                 var conversion = right.Conversion(Category.Code, destination).Code;
