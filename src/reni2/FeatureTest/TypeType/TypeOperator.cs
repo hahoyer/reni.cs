@@ -8,10 +8,7 @@ namespace Reni.FeatureTest.TypeType
 {
     [TestFixture]
     [PrioTableTest]
-    public sealed class TypeOperator : CompilerTest
-    {
-        protected override string Target { get { return @"31 type dump_print"; } }
-        protected override string Output { get { return "number(bits:6)"; } }
-    }
-
+    [Target("31 type dump_print")]
+    [Output("number(bits:6)")]
+    public sealed class TypeOperator : CompilerTest {}
 }

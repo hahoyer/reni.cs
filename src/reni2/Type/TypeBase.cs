@@ -336,7 +336,7 @@ namespace Reni.Type
         [NotNull]
         internal Result GenericDumpPrintResult(Category category)
         {
-            var searchResults = Pointer.Declarations<DumpPrintToken>(null);
+            var searchResults = SmartPointer.Declarations<DumpPrintToken>(null);
             return searchResults.Single().CallResult(category);
         }
 
@@ -400,7 +400,7 @@ namespace Reni.Type
         {
             var feature = (this as ISymbolProvider<TDefinable, IFeatureImplementation>)
                 ?.Feature(tokenClass);
-            return feature.NullableToArray().Select(f => new SearchResult(f, Pointer));
+            return feature.NullableToArray().Select(f => new SearchResult(f, this));
         }
 
         [DisableDump]
