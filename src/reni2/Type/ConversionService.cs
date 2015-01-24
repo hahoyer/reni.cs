@@ -4,7 +4,6 @@ using hw.Helper;
 using System.Linq;
 using hw.Debug;
 using Reni.Basics;
-using Reni.Code;
 using Reni.Feature;
 using Reni.TokenClasses;
 
@@ -50,7 +49,7 @@ namespace Reni.Type
             IEnumerable<string> DumpConversions
                 => Elements
                     .Select(element => element.Result(Category.Code).Code.DebuggerDumpString)
-                .ToArray();
+                    .ToArray();
 
             internal TypeBase Destination => Elements.LastOrDefault()?.ResultType() ?? Source;
 
@@ -82,6 +81,18 @@ namespace Reni.Type
                 return Destination
                     .DeclarationsForType(definable)
                     .Select(result => new SearchResult(result, this));
+            }
+
+            internal bool HasHigherPriority(Path other)
+            {
+                if(Elements.Length < other.Elements.Length)
+                    return true;
+
+                if (Elements.Length > other.Elements.Length)
+                    return false;
+
+                NotImplementedMethod(other);
+                return true;
             }
         }
 
