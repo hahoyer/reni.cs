@@ -42,17 +42,17 @@ namespace Reni.Struct
         protected override bool IsMutable => _setter != null;
 
         [DisableDump]
-        internal override TypeBase ValueType { get { return _getter.ReturnType; } }
+        internal override TypeBase ValueType => _getter.ReturnType;
         [DisableDump]
-        internal override bool Hllw { get { return Exts.IsNone && ArgsType.Hllw; } }
+        internal override bool Hllw => Exts.IsNone && ArgsType.Hllw;
         [DisableDump]
-        internal override CompoundView FindRecentCompoundView { get { return _compoundView; } }
+        internal override CompoundView FindRecentCompoundView => _compoundView;
         [DisableDump]
-        internal override bool HasQuickSize { get { return false; } }
+        internal override bool HasQuickSize => false;
 
         [Node]
         [DisableDump]
-        CodeArgs Exts { get { return GetExts(); } }
+        CodeArgs Exts => GetExts();
 
         [DisableDump]
         internal FunctionContainer Container
@@ -60,7 +60,7 @@ namespace Reni.Struct
             get
             {
                 var getter = _getter.Container;
-                var setter = _setter == null ? null : _setter.Container;
+                var setter = _setter?.Container;
                 return new FunctionContainer(getter, setter);
             }
         }
@@ -76,14 +76,12 @@ namespace Reni.Struct
                 return result;
             }
         }
-        protected override Result SetterResult(Category category) { return _setter.CallResult(category); }
-        protected override Result GetterResult(Category category) { return _getter.CallResult(category); }
-        protected override Size GetSize() { return ArgsType.Size + Exts.Size; }
+        protected override Result SetterResult(Category category) => _setter.CallResult(category);
+        protected override Result GetterResult(Category category) => _getter.CallResult(category);
+        protected override Size GetSize() => ArgsType.Size + Exts.Size;
 
         internal ContextBase CreateSubContext(bool useValue)
-        {
-            return new Reni.Context.Function(_compoundView.Context, ArgsType, useValue ? ValueType : null);
-        }
+            => new Context.Function(_compoundView.Context, ArgsType, useValue ? ValueType : null);
 
         public string DumpFunction()
         {
@@ -124,10 +122,9 @@ namespace Reni.Struct
         {
             var result = _getter.Exts;
             Tracer.Assert(result != null);
-            if (_setter != null)
+            if(_setter != null)
                 result += _setter.Exts;
             return result;
         }
-
     }
 }
