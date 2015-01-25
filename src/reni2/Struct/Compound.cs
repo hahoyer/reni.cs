@@ -7,6 +7,7 @@ using hw.Forms;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
+using Reni.Feature;
 using Reni.Type;
 
 
@@ -76,7 +77,7 @@ namespace Reni.Struct
             {
                 Dump("Statements", Syntax.Statements);
                 var statements = (fromNotPosition - fromPosition)
-                    .Select(i => fromPosition + i)
+                    .Select(i => fromPosition + i)              
                     .Where(position => !Syntax.Statements[position].IsLambda)
                     .Select(position => AccessResult(category, position))
                     .Select(r => r.Align)
@@ -120,7 +121,7 @@ namespace Reni.Struct
             try
             {
                 var uniqueChildContext = Parent
-                    .StructurePositionContext(Syntax, accessPosition);
+                    .CompoundPositionContext(Syntax, accessPosition);
                 Dump("Statements[position]", Syntax.Statements[position]);
                 BreakExecution();
                 var result1 = Syntax.Statements[position]
@@ -172,7 +173,7 @@ namespace Reni.Struct
         bool InternalInnerHllwStructureElement(int position)
         {
             var uniqueChildContext = Parent
-                .StructurePositionContext(Syntax, position);
+                .CompoundPositionContext(Syntax, position);
             return Syntax
                 .Statements[position]
                 .HllwStructureElement(uniqueChildContext);

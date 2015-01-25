@@ -51,13 +51,11 @@ namespace Reni.Context
         [UsedImplicitly]
         internal int SizeToPacketCount(Size size) => size.SizeToPacketCount(Root.DefaultRefAlignParam.AlignBits);
 
-        internal ContextBase StructurePositionContext(CompoundSyntax container, int position)
+        internal ContextBase CompoundPositionContext(CompoundSyntax container, int position)
             => _cache.CompoundContexts[container][position];
 
-        internal CompoundView CompoundView(CompoundSyntax syntax) => CompoundView(syntax, syntax.EndPosition);
-
-        internal CompoundView CompoundView(CompoundSyntax syntax, int accessPosition)
-            => _cache.CompoundViews[syntax][accessPosition];
+        internal CompoundView CompoundView(CompoundSyntax syntax, int? accessPosition = null)
+            => _cache.CompoundViews[syntax][accessPosition??syntax.EndPosition];
 
         internal Compound Compound(CompoundSyntax context) => _cache.Compounds[context];
 

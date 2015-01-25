@@ -51,7 +51,7 @@ namespace Reni.Struct
 
         [DisableDump]
         internal ContextBase Context => Compound.Parent
-            .StructurePositionContext(Compound.Syntax, ViewPosition);
+            .CompoundPositionContext(Compound.Syntax, ViewPosition);
 
         [DisableDump]
         internal CompoundType Type => _typeCache.Value;
@@ -94,6 +94,13 @@ namespace Reni.Struct
 
         [DisableDump]
         internal Root RootContext => Compound.RootContext;
+
+        [DisableDump]
+        internal IEnumerable<ISimpleFeature> ConverterFeatures
+            => Compound
+            .Syntax
+            .Converters
+            .Select(body => Function(body, RootContext.VoidType));
 
         sealed class RecursionWhileObtainingCompoundSizeException : Exception
         {
@@ -151,15 +158,6 @@ namespace Reni.Struct
         internal FunctionType Function(FunctionSyntax body, TypeBase argsType) => Compound
             .RootContext
             .FunctionInstance(this, body, argsType);
-
-        internal Result AccessViaContextReference(Category category, int position)
-        {
-            var accessType = AccessType(position);
-            var result = accessType
-                .Result(category, Compound)
-                .AddToReference(ContextOffset);
-            return result;
-        }
 
         Size ContextOffset() => Compound.ContextReferenceOffsetFromAccessPoint(ViewPosition) * -1;
 
@@ -219,5 +217,6 @@ namespace Reni.Struct
 
         internal IFeatureImplementation Find(Definable definable)
             => Compound.Syntax.Find(definable.Name)?.Convert(this);
+
     }
 }
