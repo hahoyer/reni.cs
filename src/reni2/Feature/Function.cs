@@ -62,8 +62,8 @@ namespace Reni.Feature
             Tracer.Assert(_function.Target is IContextReferenceProvider);
         }
 
-        internal override Result ApplyResult(Category category, TypeBase argsType) => _function(category, argsType, _arg);
-        internal override bool IsImplicit => false;
-        internal override IContextReference ObjectReference => ((IContextReferenceProvider) _function.Target).ContextReference;
+        protected override Result ApplyResult(Category category, TypeBase argsType) => _function(category, argsType, _arg);
+        protected override bool IsImplicit => false;
+        protected override IContextReference ObjectReference => ((IContextReferenceProvider) _function.Target).ContextReference;
     }
 }

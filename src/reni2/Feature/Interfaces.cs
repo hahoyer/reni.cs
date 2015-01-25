@@ -45,8 +45,8 @@ namespace Reni.Feature
         Result ISimpleFeature.Result(Category category) => Result(category);
         TypeBase ISimpleFeature.TargetType => TargetType;
 
-        internal abstract Result Result(Category category);
-        internal abstract TypeBase TargetType { get; }
+        protected abstract Result Result(Category category);
+        protected abstract TypeBase TargetType { get; }
     }
 
     abstract class MetaFeatureImplementation : DumpableObject, IFeatureImplementation, IMetaFunctionFeature
@@ -62,7 +62,7 @@ namespace Reni.Feature
         ISimpleFeature IFeatureImplementation.Simple => null;
         Result IMetaFunctionFeature.Result(ContextBase contextBase, Category category, CompileSyntax left, CompileSyntax right)
             => Result(contextBase, category, left, right);
-        internal abstract Result Result(ContextBase contextBase, Category category, CompileSyntax left, CompileSyntax right);
+        protected abstract Result Result(ContextBase contextBase, Category category, CompileSyntax left, CompileSyntax right);
     }
 
     abstract class FunctionFeatureImplementation : DumpableObject, IFeatureImplementation, IFunctionFeature
@@ -81,9 +81,9 @@ namespace Reni.Feature
         bool IFunctionFeature.IsImplicit => IsImplicit;
         IContextReference IFunctionFeature.ObjectReference => ObjectReference;
 
-        internal abstract Result ApplyResult(Category category, TypeBase argsType);
-        internal abstract bool IsImplicit { get; }
-        internal abstract IContextReference ObjectReference { get; }
+        protected abstract Result ApplyResult(Category category, TypeBase argsType);
+        protected abstract bool IsImplicit { get; }
+        protected abstract IContextReference ObjectReference { get; }
     }
 
     abstract class ContextMetaFeatureImplementation : DumpableObject, IFeatureImplementation, IContextMetaFunctionFeature
@@ -99,7 +99,7 @@ namespace Reni.Feature
         ISimpleFeature IFeatureImplementation.Simple => null;
         Result IContextMetaFunctionFeature.Result(ContextBase contextBase, Category category, CompileSyntax right)
             => Result(contextBase, category, right);
-        internal abstract Result Result(ContextBase contextBase, Category category, CompileSyntax right);
+        protected abstract Result Result(ContextBase contextBase, Category category, CompileSyntax right);
     }
 
     interface ISimpleFeature
@@ -157,12 +157,6 @@ namespace Reni.Feature
         TPath Feature(TDefinable tokenClass);
     }
 
-    interface IDefinitionPriority
-    {
-        bool Overrides(IDefinitionPriority other);
-        bool IsOverriddenBy(AccessFeature other);
-    }
-
     interface IGenericProviderForType
     {
         IEnumerable<ISimpleFeature> GetForcedConversions(TypeBase typeBase);
@@ -213,7 +207,7 @@ namespace Reni.Feature
         readonly Func<ContextBase, Category, CompileSyntax, Result> _function;
         public ContextMetaFunction(Func<ContextBase, Category, CompileSyntax, Result> function) { _function = function; }
 
-        internal override Result Result(ContextBase contextBase, Category category, CompileSyntax right)
+        protected override Result Result(ContextBase contextBase, Category category, CompileSyntax right)
             => _function(contextBase, category, right);
     }
 

@@ -11,7 +11,10 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class AccessFeature : DumpableObject, IFeatureImplementation, ISimpleFeature, IDefinitionPriority
+    sealed class AccessFeature
+        : DumpableObject
+            , IFeatureImplementation
+            , ISimpleFeature
     {
         static int _nextObjectId;
 
@@ -57,9 +60,6 @@ namespace Reni.Struct
             .Compound
             .Syntax
             .Statements[Position];
-
-        bool IDefinitionPriority.Overrides(IDefinitionPriority other) => other.IsOverriddenBy(this);
-        bool IDefinitionPriority.IsOverriddenBy(AccessFeature accessFeature) => false;
 
         IFunctionFeature ObtainFunctionFeature()
         {
