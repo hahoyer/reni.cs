@@ -28,7 +28,7 @@ namespace Reni.Type
                 Tracer.Assert(rawElements.Any());
                 Source = rawElements.First().TargetType;
                 Tracer.Assert(Source != null);
-                Elements = rawElements.RemoveCycles().ToArray();
+                Elements = rawElements.RemoveCircles().ToArray();
 
                 if(Elements.Any())
                     Tracer.Assert(Source == Elements.First().TargetType);
@@ -88,7 +88,7 @@ namespace Reni.Type
                 if(Elements.Length < other.Elements.Length)
                     return true;
 
-                if (Elements.Length > other.Elements.Length)
+                if(Elements.Length > other.Elements.Length)
                     return false;
 
                 NotImplementedMethod(other);
@@ -233,7 +233,7 @@ namespace Reni.Type
             Tracer.Assert(!features.Any(), features.Stringify("\n"));
         }
 
-        static IEnumerable<ISimpleFeature> RemoveCycles(this IEnumerable<ISimpleFeature> list)
+        static IEnumerable<ISimpleFeature> RemoveCircles(this IEnumerable<ISimpleFeature> list)
         {
             var result = new List<ISimpleFeature>(list);
             result.AssertPath();
