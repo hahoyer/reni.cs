@@ -26,7 +26,7 @@ namespace Reni.Type
         ISimpleFeature IProxyType.Converter => this;
         bool IReference.IsWeak => true;
         ISimpleFeature IReference.Converter => this;
-        TypeBase ISimpleFeature.TargetType => ValueType;
+        TypeBase ISimpleFeature.TargetType => TargetType;
         Result ISimpleFeature.Result(Category category) => GetterResult(category);
 
         IFeatureImplementation ISymbolProvider<ReassignToken, IFeatureImplementation>.Feature(ReassignToken tokenClass)
@@ -34,6 +34,15 @@ namespace Reni.Type
 
         [EnableDumpExcept(false)]
         protected abstract bool IsMutable { get; }
+
+        internal virtual TypeBase TargetType
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
 
         Result ReassignResult(Category category, IContextReference objectReference, TypeBase argsType)
         {
