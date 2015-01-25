@@ -78,7 +78,10 @@ namespace Reni.Type
         internal abstract Root RootContext { get; }
 
         protected TypeBase()
-            : base(_nextObjectId++) { _cache = new Cache(this); }
+            : base(_nextObjectId++)
+        {
+            _cache = new Cache(this);
+        }
 
         IContextReference IContextReferenceProvider.ContextReference => Reference;
 
@@ -391,9 +394,9 @@ namespace Reni.Type
             if(result.Any())
                 return result;
 
-            var relativeConversions = this.RelativeConversions();
-            result = relativeConversions.SelectMany(path => path.RelativeSearchResults(tokenClass));
-            return result;
+            return this
+                .RelativeConversions()
+                .SelectMany(path => path.RelativeSearchResults(tokenClass));
         }
 
         internal virtual IEnumerable<SearchResult> Declarations<TDefinable>(TDefinable tokenClass) where TDefinable : Definable
@@ -454,10 +457,10 @@ namespace Reni.Type
         internal virtual IEnumerable<ISimpleFeature> StripConversions { get { yield break; } }
         internal virtual IEnumerable<ISimpleFeature> CutEnabledConversion(NumberType destination) { yield break; }
 
-        protected Result DumpPrintTokenResult(Category category) 
+        protected Result DumpPrintTokenResult(Category category)
             => VoidType
-            .Result(category, DumpPrintCode, CodeArgs.Arg)
-            .ReplaceArg(Pointer.ArgResult(category.Typed).DereferenceResult);
+                .Result(category, DumpPrintCode, CodeArgs.Arg)
+                .ReplaceArg(Pointer.ArgResult(category.Typed).DereferenceResult);
 
         protected virtual CodeBase DumpPrintCode()
         {

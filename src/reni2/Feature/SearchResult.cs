@@ -5,6 +5,8 @@ using hw.Debug;
 using Reni.Basics;
 using Reni.Context;
 using Reni.ReniSyntax;
+using Reni.Struct;
+using Reni.Numeric;
 using Reni.Type;
 
 namespace Reni.Feature
@@ -34,5 +36,10 @@ namespace Reni.Feature
             => CallDescriptor.Result(category, context, left, right, ConverterPath.Execute);
 
         internal Result CallResult(Category category) => CallDescriptor.Result(category, ConverterPath.Execute);
+
+        internal bool HasHigherPriority(SearchResult other)
+            => (Feature is AccessFeature) == (other.Feature is AccessFeature)
+                ? ConverterPath.HasHigherPriority(other.ConverterPath)
+                : Feature is AccessFeature;
     }
 }

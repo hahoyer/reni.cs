@@ -78,8 +78,9 @@ namespace Reni.Type
             }
             internal IEnumerable<SearchResult> RelativeSearchResults(Definable definable)
             {
-                return Destination
-                    .DeclarationsForType(definable)
+                var declarationsForType = Destination
+                    .DeclarationsForType(definable);
+                return declarationsForType
                     .Select(result => new SearchResult(result, this));
             }
 
@@ -281,6 +282,15 @@ namespace Reni.Type
 
         internal static IEnumerable<Path> SymmetricPathsClosureBackwards(this TypeBase destination)
             => new[] {new Path(destination)}.Concat(SymmetricClosureService.To(destination).Select(f => new Path(f)));
+
+        internal static IEnumerable<SearchResult> RemoveLowPriorityResults(this IEnumerable<SearchResult> list)
+            => list.FrameElementList((a, b) => a.HasHigherPriority(b));
+
+        static IEnumerable<T> FrameElementList<T>(this IEnumerable<T> list, Func<T, T, bool> isInRelation)
+        {
+            var l = list.ToArray();
+            return l.Where(item => l.All(other => other.Equals(item) || !isInRelation(other, item)));
+        }
 
         internal sealed class ClosureService
         {

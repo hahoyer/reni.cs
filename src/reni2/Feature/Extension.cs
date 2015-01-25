@@ -13,11 +13,14 @@ namespace Reni.Feature
 {
     static class Extension
     {
-        static readonly FunctionCache<Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result>, MetaFunction> _metaFunctionCache
-                = new FunctionCache<Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result>, MetaFunction>(function => new MetaFunction(function));
+        static readonly FunctionCache<Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result>, MetaFunction>
+            _metaFunctionCache
+                = new FunctionCache<Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result>, MetaFunction>
+                    (function => new MetaFunction(function));
 
         static readonly FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Simple>> _simpleCache
-            = new FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Simple>>(function => new FunctionCache<TypeBase, Simple>(type => new Simple(function, type)));
+            = new FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Simple>>
+                (function => new FunctionCache<TypeBase, Simple>(type => new Simple(function, type)));
 
         internal static Simple SimpleFeature(Func<Category, Result> function, TypeBase target = null)
             => _simpleCache[function][(target ?? function.Target as TypeBase).AssertNotNull()];
@@ -51,10 +54,7 @@ namespace Reni.Feature
         internal static TypeBase ResultType(this ISimpleFeature f) => f.Result(Category.Type).Type;
 
         internal static bool IsRelative(ISimpleFeature feature) => !(feature is IStepRelative);
-    }
 
-    static class GenericizeExtension
-    {
         public static IEnumerable<IGenericProviderForType> GenericListFromType<T>
             (this T target, IEnumerable<IGenericProviderForType> baseList = null)
             where T : TypeBase
@@ -74,5 +74,6 @@ namespace Reni.Feature
             foreach(var item in baseList)
                 yield return item;
         }
+
     }
 }

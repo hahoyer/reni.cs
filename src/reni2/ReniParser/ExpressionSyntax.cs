@@ -7,9 +7,9 @@ using hw.Parser;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
-using Reni.Feature;
 using Reni.ReniSyntax;
 using Reni.TokenClasses;
+using Reni.Type;
 using Reni.Validation;
 
 namespace Reni.ReniParser
@@ -33,16 +33,16 @@ namespace Reni.ReniParser
         internal CompileSyntax Right { get; }
 
         [DisableDump]
-        protected override ParsedSyntax[] Children => new ParsedSyntax[] { Left, Right };
+        protected override ParsedSyntax[] Children => new ParsedSyntax[] {Left, Right};
 
         internal override string DumpPrintText
         {
             get
             {
                 var result = base.GetNodeDump();
-                if (Left != null)
+                if(Left != null)
                     result = "(" + Left.DumpPrintText + ")" + result;
-                if (Right != null)
+                if(Right != null)
                     result += "(" + Right.DumpPrintText + ")";
                 return result;
             }
@@ -57,6 +57,7 @@ namespace Reni.ReniParser
             var searchResults
                 = typeForSearch
                     .DeclarationsForTypeAndRelatives(Operator)
+                    .RemoveLowPriorityResults()
                     .ToArray();
 
             switch(searchResults.Length)
