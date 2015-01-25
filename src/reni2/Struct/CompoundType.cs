@@ -33,9 +33,10 @@ namespace Reni.Struct
         {
             get
             {
-                Tracer.Assert(!View.Compound.Syntax.Converters.Any());
+                foreach (var converter in View.ConverterFeatures)
+                    yield return converter;
 
-                if(Hllw)
+                if (Hllw)
                     yield return Extension.SimpleFeature(VoidConversion);
             }
         }
