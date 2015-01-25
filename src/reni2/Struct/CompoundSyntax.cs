@@ -8,8 +8,11 @@ using hw.Parser;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Feature;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
+using Reni.TokenClasses;
+using Reni.Type;
 
 namespace Reni.Struct
 {
@@ -53,10 +56,10 @@ namespace Reni.Struct
                 .ToArray();
 
         [DisableDump]
-        public IEnumerable<CompileSyntax> Converters
+        public IEnumerable<FunctionSyntax> Converters
             => _data
                 .Where(data => data.IsConverter)
-                .Select(data => data.Statement);
+                .Select(data => (FunctionSyntax)data.Statement);
 
         protected override string GetNodeDump() => "Compound." + ObjectId;
         internal bool IsReassignable(int position) => _data[position].IsReassignable;
@@ -141,5 +144,6 @@ namespace Reni.Struct
             internal Position(int value) { Value = value; }
             internal AccessFeature Convert(CompoundView accessPoint) => accessPoint.AccessFeature(Value);
         }
+
     }
 }
