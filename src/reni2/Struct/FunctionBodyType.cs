@@ -66,8 +66,6 @@ namespace Reni.Struct
         [DisableDump]
         IContextReference ObjectReference { get { return _objectReferenceCache.Value; } }
 
-        //ISuffixFeature IFeaturePath<ISuffixFeature, DumpPrintToken>.GetFeature(DumpPrintToken target) { return Extension.Feature(DumpPrintTokenResult); }
-
         IContextReference IFunctionFeature.ObjectReference { get { return ObjectReference; } }
         bool IFunctionFeature.IsImplicit { get { return _syntax.IsImplicit; } }
         TypeBase ISimpleFeature.TargetType { get { return this; } }
