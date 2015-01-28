@@ -10,10 +10,6 @@ namespace Reni.Context
 {
     sealed class Function : Child, IFunctionContext
     {
-        [Node]
-        internal readonly TypeBase ArgsType;
-        [Node]
-        readonly TypeBase _valueType;
         readonly int _order;
 
         internal Function(ContextBase parent, TypeBase argsType, TypeBase valueType = null)
@@ -21,15 +17,21 @@ namespace Reni.Context
         {
             _order = CodeArgs.NextOrder++;
             ArgsType = argsType;
-            _valueType = valueType;
+            ValueType = valueType;
         }
 
-        Size IContextReference.Size { get { return Root.DefaultRefAlignParam.RefSize; } }
-        int IContextReference.Order { get { return _order; } }
+        [Node]
+        internal TypeBase ArgsType { get; }
+        [Node]
+        TypeBase ValueType { get; }
 
-        protected override string ChildDumpPrintText { get { return _valueType.DumpPrintText + "(" + ArgsType.DumpPrintText + ")"; } }
+        Size IContextReference.Size => Root.DefaultRefAlignParam.RefSize;
+        int IContextReference.Order => _order;
 
-        internal override IFunctionContext ObtainRecentFunctionContext() { return this; }
+        protected override string GetContextChildIdentificationDump() => ArgsType.ObjectId.ToString();
+        protected override string ChildDumpPrintText => ValueType.DumpPrintText + "(" + ArgsType.DumpPrintText + ")";
+
+        internal override IFunctionContext ObtainRecentFunctionContext() => this;
 
         Result IFunctionContext.CreateArgReferenceResult(Category category)
         {
@@ -40,16 +42,15 @@ namespace Reni.Context
 
         Result IFunctionContext.CreateValueReferenceResult(Category category)
         {
-            if(_valueType == null)
+            if(ValueType == null)
                 throw new ValueCannotBeUsedHereException();
-            return _valueType.Pointer
+            return ValueType.Pointer
                 .ContextAccessResult(category.Typed, this, () => (ArgsType.Size + Root.DefaultRefAlignParam.RefSize) * -1)
                 & category;
         }
     }
 
-    sealed class ValueCannotBeUsedHereException : Exception
-    {}
+    sealed class ValueCannotBeUsedHereException : Exception {}
 
     interface IFunctionContext : IContextReference
     {

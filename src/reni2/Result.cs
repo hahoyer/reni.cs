@@ -815,10 +815,10 @@ namespace Reni
             }
         }
 
-        internal Result ContextReferenceViaStructReference(CompoundView accessPoint)
+        internal Result ContextViaObjectPointer(CompoundView accessPoint)
         {
             return accessPoint
-                .ContextReferenceViaStructReference(this);
+                .ContextViaObjectPointer(this);
         }
 
         [DebuggerHidden]

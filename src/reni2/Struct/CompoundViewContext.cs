@@ -18,14 +18,19 @@ namespace Reni.Struct
             : base(parent) { View = view; }
 
         [Node]
+        [EnableDump]
         CompoundView View { get; }
+
+        string GetCompoundIdentificationDump() => View.GetCompoundIdentificationDump();
+
+        protected override string GetContextChildIdentificationDump() => GetCompoundIdentificationDump();
         [DisableDump]
         protected override string ChildDumpPrintText => View.Compound.Syntax.DumpPrintText;
 
         IFeatureImplementation ISymbolProviderForPointer<Definable, IFeatureImplementation>.Feature(Definable tokenClass)
             => View.Find(tokenClass);
 
-        internal Result ObjectResult(Category category) => View.StructReferenceViaContextReference(category);
+        internal Result ObjectResult(Category category) => View.ObjectPointerViaContext(category);
 
         internal override CompoundView ObtainRecentCompoundView() => View;
     }

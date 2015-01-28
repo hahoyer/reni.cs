@@ -10,6 +10,13 @@ namespace Reni.Context
 {
     abstract class Child : ContextBase
     {
+        public override sealed string GetContextIdentificationDump()
+            => Parent.GetContextIdentificationDump() 
+            + "->" 
+            + GetContextChildIdentificationDump();
+
+        protected abstract string GetContextChildIdentificationDump();
+
         [DisableDump]
         readonly ContextBase _parent;
 

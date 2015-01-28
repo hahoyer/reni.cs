@@ -14,7 +14,7 @@ namespace Reni.Context
         {
             return context
                 .FindRecentCompoundView
-                .StructReferenceViaContextReference(category);
+                .ObjectPointerViaContext(category);
         }
 
         public override Result Result(ContextBase context, Category category, CompileSyntax left)
@@ -35,7 +35,7 @@ namespace Reni.Context
                     NotImplementedMethod(context, category, left);
                     return null;
                 }
-                var result = structure.PointerKind.Result(category, structure.Compound);
+                var result = structure.Type.SmartPointer.Result(category, structure.Compound);
                 return ReturnMethodDump(result);
             }
             finally

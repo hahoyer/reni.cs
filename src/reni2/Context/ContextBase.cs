@@ -25,6 +25,8 @@ namespace Reni.Context
         : DumpableObject
             , IIconKeyProvider
     {
+        protected override string GetNodeDump() => base.GetNodeDump() + "(" + GetContextIdentificationDump() + ")";
+
         static int _nextId;
 
         [DisableDump]
@@ -33,6 +35,8 @@ namespace Reni.Context
 
         protected ContextBase()
             : base(_nextId++) { _cache = new Cache(this); }
+
+        abstract public string GetContextIdentificationDump();
 
         string IIconKeyProvider.IconKey => "Context";
 
@@ -242,6 +246,6 @@ namespace Reni.Context
                 yield return new ContextCallDescriptor(this, feature);
         }
 
-        internal Result GetObjectResult(Category category) => FindRecentCompoundView.StructReferenceViaContextReference(category);
+        internal Result GetObjectResult(Category category) => FindRecentCompoundView.ObjectPointerViaContext(category);
     }
 }

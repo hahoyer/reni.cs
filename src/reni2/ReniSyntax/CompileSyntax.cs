@@ -75,7 +75,7 @@ namespace Reni.ReniSyntax
             return leftResultAsRef
                 .Type
                 .FindRecentCompoundView
-                .AccessViaThisReference(category, rightResult)
+                .AccessViaObjectPointer(category, rightResult)
                 .ReplaceArg(leftResultAsRef);
         }
 

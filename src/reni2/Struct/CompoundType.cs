@@ -49,10 +49,10 @@ namespace Reni.Struct
         IFeatureImplementation ISymbolProviderForPointer<Definable, IFeatureImplementation>.Feature(Definable tokenClass)
             => View.Find(tokenClass);
 
-        protected override Size GetSize() => View.CompoundSize;
+        protected override Size GetSize() => View.CompoundViewSize;
 
-        protected override string GetNodeDump() => "type(" + View.NodeDump + ")";
+        protected override string GetNodeDump() => base.GetNodeDump() + "(" + View.GetCompoundIdentificationDump()+ ")";
 
-        new Result DumpPrintTokenResult(Category category) => View.DumpPrintResultViaStructReference(category);
+        new Result DumpPrintTokenResult(Category category) => View.DumpPrintResultViaObjectPointer(category);
     }
 }

@@ -46,29 +46,29 @@ namespace Reni.Struct
                 _parent = parent;
                 StopByObjectId(-5);
             }
-            int IContextReference.Order { get { return _order; } }
-            Size IContextReference.Size { get { return Root.DefaultRefAlignParam.RefSize; } }
+            int IContextReference.Order => _order;
+            Size IContextReference.Size => Root.DefaultRefAlignParam.RefSize;
             [EnableDump]
-            FunctionSyntax Syntax { get { return _parent._syntax; } }
+            FunctionSyntax Syntax => _parent._syntax;
         }
 
         [DisableDump]
-        internal override CompoundView FindRecentCompoundView { get { return _compoundView; } }
+        internal override CompoundView FindRecentCompoundView => _compoundView;
         [DisableDump]
-        internal override Root RootContext { get { return _compoundView.RootContext; } }
+        internal override Root RootContext => _compoundView.RootContext;
         [DisableDump]
-        internal override bool Hllw { get { return true; } }
+        internal override bool Hllw => true;
         [DisableDump]
-        internal override string DumpPrintText { get { return _syntax.DumpPrintText; } }
+        internal override string DumpPrintText => _syntax.DumpPrintText;
 
         internal new Result DumpPrintTokenResult(Category category) => DumpPrintTypeNameResult(category);
 
         [DisableDump]
-        IContextReference ObjectReference { get { return _objectReferenceCache.Value; } }
+        IContextReference ObjectReference => _objectReferenceCache.Value;
 
-        IContextReference IFunctionFeature.ObjectReference { get { return ObjectReference; } }
-        bool IFunctionFeature.IsImplicit { get { return _syntax.IsImplicit; } }
-        TypeBase ISimpleFeature.TargetType { get { return this; } }
+        IContextReference IFunctionFeature.ObjectReference => ObjectReference;
+        bool IFunctionFeature.IsImplicit => _syntax.IsImplicit;
+        TypeBase ISimpleFeature.TargetType => this;
 
         Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
         {
@@ -93,7 +93,7 @@ namespace Reni.Struct
                     .ReplaceAbsolute
                     (
                         _compoundView.Compound,
-                        () => CodeBase.ReferenceCode(ObjectReference).ReferencePlus(_compoundView.CompoundSize),
+                        () => CodeBase.ReferenceCode(ObjectReference).ReferencePlus(_compoundView.CompoundViewSize),
                         () => CodeArgs.Create(ObjectReference)
                     );
 
@@ -104,11 +104,11 @@ namespace Reni.Struct
                 EndMethodDump();
             }
         }
-        FunctionType Function(TypeBase argsType) { return _compoundView.Function(_syntax, argsType); }
-        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta { get { return null; } }
-        IMetaFunctionFeature IFeatureImplementation.Meta { get { return null; } }
-        IFunctionFeature IFeatureImplementation.Function { get { return this; } }
-        ISimpleFeature IFeatureImplementation.Simple { get { return this; } }
+        FunctionType Function(TypeBase argsType) => _compoundView.Function(_syntax, argsType);
+        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
+        IMetaFunctionFeature IFeatureImplementation.Meta => null;
+        IFunctionFeature IFeatureImplementation.Function => this;
+        ISimpleFeature IFeatureImplementation.Simple => this;
         Result ISimpleFeature.Result(Category category)
         {
             NotImplementedMethod(category);

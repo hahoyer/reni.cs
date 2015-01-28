@@ -2,6 +2,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using hw.Debug;
+using hw.Helper;
 using Reni.Basics;
 using Reni.Feature;
 using Reni.ReniSyntax;
@@ -67,14 +68,17 @@ namespace Reni.Context
 
         Result Result(ContextBase context, Category category, CompileSyntax right)
         {
-            var simpleFeature = Feature.SimpleFeature();
-            if(simpleFeature != null && right == null)
-                return simpleFeature.Result(category);
-
-            var trace = ObjectId == -77 && category.HasCode;
+            var trace = ObjectId.In(730) && category.HasCode;
             StartMethodDump(trace, context, category, right);
             try
             {
+                var simpleFeature = Feature.SimpleFeature();
+                if (simpleFeature != null && right == null)
+                {
+                    var simpleResult = simpleFeature.Result(category);
+                    return ReturnMethodDump(simpleResult);
+                }
+
                 var function = Feature.Function;
                 BreakExecution();
 

@@ -31,6 +31,9 @@ namespace Reni.Struct
             Parent = parent;
         }
 
+        public string GetCompoundIdentificationDump() => Syntax.GetCompoundIdentificationDump();
+        protected override string GetNodeDump() => base.GetNodeDump() + "(" + GetCompoundIdentificationDump() + ")";
+
         int IContextReference.Order => _order;
         Size IContextReference.Size => Root.DefaultRefAlignParam.RefSize;
 
@@ -54,15 +57,18 @@ namespace Reni.Struct
 
         internal bool Hllw(int accessPosition) => ObtainHllw(accessPosition);
 
-        internal Result ContextReferenceViaStructReference(int position, Result result)
+        internal Result ContextViaObjectPointer(int position, Result result)
             => result.ReplaceAbsolute(this, () => ContextReferenceViaStructReferenceCode(position), CodeArgs.Arg);
 
-        internal Size ContextReferenceOffsetFromAccessPoint(int position) => ResultsOfStatements(Category.Size, 0, position).Size;
+        internal Size SizeUntil(int position) => ResultsOfStatements(Category.Size, 0, position).Size;
 
-        CodeBase ContextReferenceViaStructReferenceCode(int accessPosition) => Parent
+        CodeBase ContextReferenceViaStructReferenceCode(int accessPosition) 
+            => Parent
             .CompoundView(Syntax, accessPosition)
-            .PointerKind.ArgCode
-            .ReferencePlus(ContextReferenceOffsetFromAccessPoint(accessPosition));
+            .Type
+            .SmartPointer
+            .ArgCode
+            .ReferencePlus(SizeUntil(accessPosition));
 
         internal Size FieldOffsetFromAccessPoint(int accessPosition, int fieldPosition)
             => ResultsOfStatements(Category.Size, fieldPosition + 1, accessPosition).Size;

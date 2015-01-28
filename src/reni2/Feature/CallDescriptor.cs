@@ -52,7 +52,7 @@ namespace Reni.Feature
         [DisableDump]
         protected override IFeatureImplementation Feature => FunctionBodyType.Feature;
         public Result Result(Category category, ContextBase context, CompileSyntax right)
-            => base.Result(category, context, right, CompoundView.StructReferenceViaContextReference);
+            => base.Result(category, context, right, CompoundView.ObjectPointerViaContext);
     }
 
     sealed class ContextCallDescriptor : FeatureDescriptor

@@ -50,6 +50,7 @@ namespace Reni.Context
 
         CompileSyntax CreateMetaDictionary(string source) => ExecutionContext.Parse(source);
 
+        public override string GetContextIdentificationDump() => "r";
         [DisableDump]
         internal override Root RootContext => this;
         public override string DumpPrintText => "root";

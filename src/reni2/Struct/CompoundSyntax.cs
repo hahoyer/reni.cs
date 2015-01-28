@@ -35,6 +35,7 @@ namespace Reni.Struct
                 .ToArray();
         }
 
+        public string GetCompoundIdentificationDump() => "."+ ObjectId + "i";
         [Node]
         internal CompileSyntax[] Statements => _data.Select(s => s.Statement).ToArray();
         [DisableDump]
@@ -61,7 +62,7 @@ namespace Reni.Struct
                 .Where(data => data.IsConverter)
                 .Select(data => (FunctionSyntax)data.Statement);
 
-        protected override string GetNodeDump() => "Compound." + ObjectId;
+        protected override string GetNodeDump() => GetType().PrettyName() + "(" + GetCompoundIdentificationDump() + ")";
         internal bool IsReassignable(int position) => _data[position].IsReassignable;
 
         public override string DumpData()
@@ -75,7 +76,7 @@ namespace Reni.Struct
 
         string DumpDataToFile()
         {
-            var dumpFile = ("struct." + ObjectId).FileHandle();
+            var dumpFile = ("compound." + ObjectId).FileHandle();
             var oldResult = dumpFile.String;
             var newResult = (_runId + DumpDataToString()).Replace("\n", "\r\n");
             if(oldResult == null || !oldResult.StartsWith(_runId))
@@ -85,7 +86,7 @@ namespace Reni.Struct
             }
             else
                 Tracer.Assert(oldResult == newResult);
-            return Tracer.FilePosn(dumpFile.FullName, 1, 0, FilePositionTag.Debug) + "see there" + "\n";
+            return Tracer.FilePosn(dumpFile.FullName, 1, 0, FilePositionTag.Debug) + "see there\n";
         }
 
         string DumpDataToString()
