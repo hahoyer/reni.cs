@@ -72,7 +72,7 @@ namespace Reni.Struct
 
         Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
         {
-            var trace = ObjectId == -3 && (category.HasCode);
+            var trace = ObjectId == -4 && (category.HasCode);
             StartMethodDump(trace, category, argsType);
             try
             {
@@ -90,12 +90,13 @@ namespace Reni.Struct
                 BreakExecution();
 
                 var result = applyResult
-                    .ReplaceAbsolute
-                    (
-                        _compoundView.Compound,
-                        () => CodeBase.ReferenceCode(ObjectReference).ReferencePlus(_compoundView.CompoundViewSize),
-                        () => CodeArgs.Create(ObjectReference)
-                    );
+                    //.ReplaceAbsolute
+                    //(
+                    //    _compoundView.Compound,
+                    //    () => CodeBase.ReferenceCode(ObjectReference).ReferencePlus(_compoundView.CompoundViewSize),
+                    //    () => CodeArgs.Create(ObjectReference)
+                    //)
+                    ;
 
                 return ReturnMethodDump(result);
             }
