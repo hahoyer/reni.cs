@@ -22,14 +22,14 @@ namespace Reni.Code
         }
 
         [Node]
-        internal IContextReference Context { get { return _context; } }
+        internal IContextReference Context => _context;
 
-        protected override CodeArgs GetRefsImplementation() { return CodeArgs.Create(_context); }
+        protected override CodeArgs GetRefsImplementation() => CodeArgs.Create(_context);
 
-        protected override Size GetSize() { return _context.Size; }
-        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.ContextRef(this); }
-        internal override void Visit(IVisitor visitor) { visitor.ReferenceCode(Context); }
+        protected override Size GetSize() => _context.Size;
+        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) => actual.ContextRef(this);
+        internal override void Visit(IVisitor visitor) => visitor.ReferenceCode(Context);
 
-        public override string DumpData() { return _context.NodeDump(); }
+        public override string DumpData() => _context.NodeDump();
     }
 }

@@ -1,51 +1,42 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using hw.Debug;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Struct;
 
-
 namespace Reni.Type
 {
     sealed class FieldAccessType : DataSetterTargetType
     {
-        [EnableDump]
-        readonly CompoundView _compoundView;
-        [EnableDump]
-        readonly int _position;
-
         internal FieldAccessType(CompoundView compoundView, int position)
         {
-            _compoundView = compoundView;
-            _position = position;
+            View = compoundView;
+            Position = position;
         }
 
-        protected override bool IsMutable => _compoundView.Compound.Syntax.IsReassignable(_position);
-        protected override TypeBase TargetType { get { return _compoundView.Type; } }
+        [EnableDump]
+        public CompoundView View { get; }
+        [EnableDump]
+        public int Position { get; }
 
-        internal override TypeBase ValueType { get { return _compoundView.ValueType(_position); } }
-
+        protected override bool IsMutable => View.Compound.Syntax.IsReassignable(Position);
+        protected override TypeBase TargetType => View.Type;
+        internal override TypeBase ValueType => View.ValueType(Position);
         [DisableDump]
-        internal override bool Hllw { get { return false; } }
+        internal override bool Hllw => false;
+        Size FieldOffset => View.FieldOffset(Position);
 
-        protected override string GetNodeDump()
-        {
-            return base.GetNodeDump() + "{" + _compoundView.NodeDump + "@" + _position + "}";
-        }
+        string GetCompoundIdentificationDump() => View.GetCompoundIdentificationDump() + ":" + Position;
+        protected override string GetNodeDump() => base.GetNodeDump() + "(" + GetCompoundIdentificationDump() + ")";
 
-        protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
-
-        Size FieldOffset { get { return _compoundView.FieldOffset(_position); } }
-
-        protected override CodeBase GetterCode() { return ArgCode.ReferencePlus(FieldOffset); }
-
-        protected override CodeBase SetterCode()
-        {
-            return
-                Pair(ValueType.SmartPointer)
-                    .ArgCode
-                    .Assignment(ValueType.Size);
-        }
+        protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
+        protected override CodeBase GetterCode() => ArgCode.ReferencePlus(FieldOffset);
+        protected override CodeBase SetterCode() => Pair(ValueType.SmartPointer)
+            .ArgCode
+            .Assignment(ValueType.Size);
 
         internal override Result DestinationResult(Category category)
         {
@@ -54,9 +45,6 @@ namespace Reni.Type
                 .AddToReference(() => FieldOffset);
         }
 
-        internal override int? SmartArrayLength(TypeBase elementType)
-        {
-            return ValueType.SmartArrayLength(elementType);
-        }
+        internal override int? SmartArrayLength(TypeBase elementType) => ValueType.SmartArrayLength(elementType);
     }
 }
