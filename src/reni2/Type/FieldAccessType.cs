@@ -21,6 +21,7 @@ namespace Reni.Type
         }
 
         protected override bool IsMutable => _compoundView.Compound.Syntax.IsReassignable(_position);
+        protected override TypeBase TargetType { get { return _compoundView.Type; } }
 
         internal override TypeBase ValueType { get { return _compoundView.ValueType(_position); } }
 

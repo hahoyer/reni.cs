@@ -35,7 +35,7 @@ namespace Reni.Type
         [EnableDumpExcept(false)]
         protected abstract bool IsMutable { get; }
 
-        internal virtual TypeBase TargetType
+        protected virtual TypeBase TargetType
         {
             get
             {

@@ -40,7 +40,7 @@ namespace Reni.Struct
         }
 
         protected override bool IsMutable => _setter != null;
-        internal override TypeBase TargetType => _compoundView.Type;
+        protected override TypeBase TargetType => _compoundView.Type;
 
         [DisableDump]
         internal override TypeBase ValueType => _getter.ReturnType;
