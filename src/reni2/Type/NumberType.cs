@@ -94,7 +94,8 @@ namespace Reni.Type
 
         Result NegationResult(Category category) => ((NumberType) _zeroResult.Value.Type)
             .OperationResult(category, _minusOperation, this)
-            .ReplaceAbsolute(_zeroResult.Value.Type.ForcedReference, c => _zeroResult.Value.LocalReferenceResult & (c));
+            .ReplaceAbsolute(_zeroResult.Value.Type.ForcedReference, c => _zeroResult.Value.LocalReferenceResult & (c))
+            .ReplaceArg(ReferenceResult);
 
         protected override CodeBase DumpPrintCode() => Align.ArgCode.DumpPrintNumber(Align.Size);
 
