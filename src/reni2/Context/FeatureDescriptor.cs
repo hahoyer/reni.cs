@@ -4,6 +4,7 @@ using System;
 using hw.Debug;
 using hw.Helper;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Feature;
 using Reni.ReniSyntax;
 using Reni.Struct;
@@ -16,6 +17,8 @@ namespace Reni.Context
         [DisableDump]
         protected abstract TypeBase Type { get; }
         [DisableDump]
+        protected abstract IContextReference ObjectReference { get; }
+        [DisableDump]
         protected abstract IFeatureImplementation Feature { get; }
 
         internal Result Result(Category category, ContextBase context, CompileSyntax left, CompileSyntax right, Func<Category, Result> converterResult)
@@ -24,7 +27,7 @@ namespace Reni.Context
             if(metaFeature != null)
                 return metaFeature.Result(context, category, left, right);
 
-            var trace = ObjectId == 92 && category.HasCode;
+            var trace = ObjectId == -62 && category.HasCode;
             StartMethodDump(trace, category, context, left, right,null);
             try
             {
@@ -33,29 +36,25 @@ namespace Reni.Context
                 Dump("rawResult", rawResult);
                 BreakExecution();
 
-                var converterResultForAll = converterResult(category.Typed);
-                Dump("converterResult", converterResultForAll);
-                BreakExecution();
-
-                var rawResult2 = rawResult;
-                var compoundType = Type.AutomaticDereferenceType as CompoundType;
-                if(compoundType != null)
+                if(trace)
                 {
-                    rawResult2 = rawResult.ContextViaObjectPointer(compoundType.View);
-                    Dump("rawResult2", rawResult2);
+                    var objectResult = context.ResultAsReference(category, left);
+                    Dump("objectResult", objectResult);
                     BreakExecution();
+
+                    var converterResultForAll
+                        = converterResult(category.Typed)
+                        .ReplaceArg(objectResult)
+                        ;
+                    Dump("converterResult", converterResultForAll);
+                    BreakExecution();
+
+                    Tracer.Assert(converterResultForAll.Type.ForcedReference == ObjectReference);
                 }
 
-                var resultWithConversions = rawResult2
-                    .ReplaceArg(converterResult);
-                Dump("resultWithConversions", resultWithConversions);
-                BreakExecution();
 
-                var objectResult = context.ObjectResult(category, left);
-                Dump("objectResult", objectResult);
-                BreakExecution();
-
-                var result = resultWithConversions.ReplaceArg(objectResult);
+                var result = rawResult
+                    .ReplaceAbsolute(ObjectReference, c=> converterResult(c).ReplaceArg(c1=>context.ResultAsReference(c1,left)));
                 return ReturnMethodDump(result);
             }
             finally
@@ -78,7 +77,7 @@ namespace Reni.Context
 
         Result Result(Category category, ContextBase context, CompileSyntax right)
         {
-            var trace = ObjectId.In(-92) && category.HasCode;
+            var trace = ObjectId.In(662) && category.HasCode;
             StartMethodDump(trace, category, context, right);
             try
             {
@@ -100,13 +99,7 @@ namespace Reni.Context
                 Dump("applyResult", applyResult);
                 BreakExecution();
 
-                var replaceArg = applyResult.ReplaceArg(c => context.ArgsResult(c, right));
-                Dump("replaceArg", replaceArg);
-                BreakExecution();
-
-                var result = replaceArg
-                    .ReplaceAbsolute(function.ObjectReference, c => Type.Pointer.ArgResult(c.Typed));
-
+                var result = applyResult.ReplaceArg(c => context.ArgsResult(c, right));
                 return ReturnMethodDump(result);
             }
             finally

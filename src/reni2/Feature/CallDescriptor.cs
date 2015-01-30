@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using hw.Helper;
 using System.Linq;
 using hw.Debug;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Context;
 using Reni.ReniSyntax;
 using Reni.Struct;
@@ -21,6 +23,7 @@ namespace Reni.Feature
         ConversionService.Path ConverterPath { get; }
         [DisableDump]
         protected override TypeBase Type => ConverterPath.Destination;
+        protected override IContextReference ObjectReference => ConverterPath.Destination.CheckedReference.AssertNotNull();
         [DisableDump]
         protected override IFeatureImplementation Feature { get; }
     }
@@ -35,7 +38,15 @@ namespace Reni.Feature
             _left = left;
         }
         protected override TypeBase Type => _context.Type(_left);
-        protected override IFeatureImplementation Feature => Type.Feature;
+        protected override IContextReference ObjectReference
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
+        protected override IFeatureImplementation Feature => Type.CheckedFeature;
     }
 
     sealed class FunctionalArgDescriptor : FeatureDescriptor
@@ -49,8 +60,16 @@ namespace Reni.Feature
         CompoundView CompoundView => FunctionBodyType.FindRecentCompoundView;
         [DisableDump]
         protected override TypeBase Type => CompoundView.Type;
+        protected override IContextReference ObjectReference
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
         [DisableDump]
-        protected override IFeatureImplementation Feature => FunctionBodyType.Feature;
+        protected override IFeatureImplementation Feature => FunctionBodyType.CheckedFeature;
         public Result Result(Category category, ContextBase context, CompileSyntax right)
             => base.Result(category, context, right, CompoundView.ObjectPointerViaContext);
     }
@@ -70,9 +89,9 @@ namespace Reni.Feature
 
         [DisableDump]
         protected override TypeBase Type => _definingItem.FindRecentCompoundView.Type;
+        protected override IContextReference ObjectReference => _definingItem.FindRecentCompoundView.Compound;
 
         [DisableDump]
         protected override IFeatureImplementation Feature => _feature;
-
     }
 }

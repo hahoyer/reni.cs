@@ -184,10 +184,6 @@ namespace Reni.Context
                 ? RootContext.VoidType.Result(category.Typed)
                 : right.SmartUnFunctionedReferenceResult(this, category);
 
-        internal Result ObjectResult(Category category, [NotNull] CompileSyntax left)
-            => Result(category.Typed, left)
-                .Conversion(Type(left).SmartPointer);
-
         /// <summary>
         ///     Obtains the feature result of a functional argument object.
         ///     Actual arguments, if provided, as well as object reference are replaced.
