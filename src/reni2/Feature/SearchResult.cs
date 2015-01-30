@@ -31,8 +31,6 @@ namespace Reni.Feature
             StopByObjectId(-37);
         }
 
-        IContextReference ObjectReference => ConverterPath.Destination.CheckedReference.AssertNotNull();
-
         internal Result Execute(Category category, ResultCache left, ContextBase context, CompileSyntax right)
         {
             var metaFeature = Feature.Meta;
@@ -45,7 +43,7 @@ namespace Reni.Feature
 
         Result Result(Category category, ResultCache left, ResultCache right)
             => Result(category, right)
-                .ReplaceAbsolute(ObjectReference, ConverterPath.Execute)
+                .ReplaceAbsolute(ConverterPath.Destination.CheckedReference, ConverterPath.Execute)
                 .ReplaceArg(left);
 
         Result Result(Category category, ResultCache right)
