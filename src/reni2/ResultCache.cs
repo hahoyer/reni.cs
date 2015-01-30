@@ -12,19 +12,18 @@ namespace Reni
 {
     sealed class ResultCache : DumpableObject, ITreeNodeSupport
     {
-        readonly Result _data = new Result();
-        readonly Func<Category, Result> _obtainResult;
+        Func<Category, Result> ObtainResult { get; }
         internal string FunctionDump = "";
 
-        public ResultCache(Func<Category, Result> obtainResult) { _obtainResult = obtainResult ?? NotSupported; }
+        public ResultCache(Func<Category, Result> obtainResult) { ObtainResult = obtainResult ?? NotSupported; }
 
         ResultCache(Result data)
         {
-            _data = data;
-            _obtainResult = NotSupported;
+            Data = data;
+            ObtainResult = NotSupported;
         }
 
-        public static implicit operator ResultCache(Result x) { return new ResultCache(x); }
+        public static implicit operator ResultCache(Result x) => new ResultCache(x);
 
         Result NotSupported(Category category)
         {
@@ -32,52 +31,49 @@ namespace Reni
             return null;
         }
 
-        internal Result Data { get { return _data; } }
+        internal Result Data { get; } = new Result();
 
         //[DebuggerHidden]
         internal void Update(Category category)
         {
-            var localCategory = category - _data.CompleteCategory - _data.PendingCategory;
+            var localCategory = category - Data.CompleteCategory - Data.PendingCategory;
 
-            if(localCategory.HasHllw && _data.FindHllw != null)
+            if(localCategory.HasHllw && Data.FindHllw != null)
             {
-                _data.Hllw = _data.FindHllw;
+                Data.Hllw = Data.FindHllw;
                 localCategory -= Category.Hllw;
             }
 
-            if(localCategory.HasSize && _data.FindSize != null)
+            if(localCategory.HasSize && Data.FindSize != null)
             {
-                _data.Size = _data.FindSize;
+                Data.Size = Data.FindSize;
                 localCategory -= Category.Size;
             }
 
-            if(localCategory.HasExts && _data.FindArgs != null)
+            if(localCategory.HasExts && Data.FindArgs != null)
             {
-                _data.Exts = _data.FindArgs;
+                Data.Exts = Data.FindArgs;
                 localCategory -= Category.Exts;
             }
 
             if(localCategory.HasAny)
             {
-                var oldPendingCategory = _data.PendingCategory;
+                var oldPendingCategory = Data.PendingCategory;
                 try
                 {
-                    _data.PendingCategory |= localCategory;
-                    var result = _obtainResult(localCategory);
+                    Data.PendingCategory |= localCategory;
+                    var result = ObtainResult(localCategory);
                     Tracer.Assert(localCategory <= result.CompleteCategory);
-                    _data.Update(result);
+                    Data.Update(result);
                 }
                 finally
                 {
-                    _data.PendingCategory = oldPendingCategory;
+                    Data.PendingCategory = oldPendingCategory;
                 }
             }
         }
 
-        public static Result operator &(ResultCache resultCache, Category category)
-        {
-            return resultCache.GetCategories(category);
-        }
+        public static Result operator &(ResultCache resultCache, Category category) => resultCache.GetCategories(category);
 
         Result GetCategories(Category category)
         {
@@ -88,61 +84,61 @@ namespace Reni
 
         bool HasHllw
         {
-            get { return _data.HasHllw; }
+            get { return Data.HasHllw; }
             set
             {
                 if(value)
                     Update(Category.Hllw);
                 else
-                    _data.Hllw = null;
+                    Data.Hllw = null;
             }
         }
 
         bool HasSize
         {
-            get { return _data.HasSize; }
+            get { return Data.HasSize; }
             set
             {
                 if(value)
                     Update(Category.Size);
                 else
-                    _data.Size = null;
+                    Data.Size = null;
             }
         }
 
         bool HasType
         {
-            get { return _data.HasType; }
+            get { return Data.HasType; }
             set
             {
                 if(value)
                     Update(Category.Type);
                 else
-                    _data.Type = null;
+                    Data.Type = null;
             }
         }
 
         internal bool HasCode
         {
-            get { return _data.HasCode; }
+            get { return Data.HasCode; }
             set
             {
                 if(value)
                     Update(Category.Code);
                 else
-                    _data.Code = null;
+                    Data.Code = null;
             }
         }
 
         bool HasCodeArgs
         {
-            get { return _data.HasExts; }
+            get { return Data.HasExts; }
             set
             {
                 if(value)
                     Update(Category.Exts);
                 else
-                    _data.Exts = null;
+                    Data.Exts = null;
             }
         }
 
@@ -201,6 +197,6 @@ namespace Reni
             return result;
         }
 
-        IEnumerable<TreeNode> ITreeNodeSupport.CreateNodes() { return _data.TreeNodes; }
+        IEnumerable<TreeNode> ITreeNodeSupport.CreateNodes() => Data.TreeNodes;
     }
 }

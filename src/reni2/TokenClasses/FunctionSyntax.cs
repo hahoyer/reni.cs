@@ -37,7 +37,7 @@ namespace Reni.TokenClasses
             }
         }
 
-        internal override Result ObtainResult(ContextBase context, Category category)
+        internal override Result ResultForCache(ContextBase context, Category category)
         {
             return context
                 .FindRecentCompoundView

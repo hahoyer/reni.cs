@@ -21,11 +21,13 @@ namespace Reni.Context
         [DisableDump]
         protected abstract IFeatureImplementation Feature { get; }
 
-        internal Result Result(Category category, ContextBase context, CompileSyntax left, CompileSyntax right, Func<Category, Result> converterResult)
+        protected abstract Result ConverterResult(Category category);
+
+        internal Result Result(Category category, ContextBase context, CompileSyntax left, CompileSyntax right)
         {
             var metaFeature = Feature.Meta;
             if(metaFeature != null)
-                return metaFeature.Result(context, category, left, right);
+                return metaFeature.Result(category, null, context, right);
 
             var trace = ObjectId == -62 && category.HasCode;
             StartMethodDump(trace, category, context, left, right,null);
@@ -36,31 +38,20 @@ namespace Reni.Context
                 Dump("rawResult", rawResult);
                 BreakExecution();
 
-                if(trace)
-                {
-                    var objectResult = context.ResultAsReference(category, left);
-                    Dump("objectResult", objectResult);
-                    BreakExecution();
-
-                    var converterResultForAll
-                        = converterResult(category.Typed)
-                        .ReplaceArg(objectResult)
-                        ;
-                    Dump("converterResult", converterResultForAll);
-                    BreakExecution();
-
-                    Tracer.Assert(converterResultForAll.Type.ForcedReference == ObjectReference);
-                }
-
-
                 var result = rawResult
-                    .ReplaceAbsolute(ObjectReference, c=> converterResult(c).ReplaceArg(c1=>context.ResultAsReference(c1,left)));
+                    .ReplaceAbsolute(ObjectReference, c=> ConvertedLeftResult(c, context, left));
                 return ReturnMethodDump(result);
             }
             finally
             {
                 EndMethodDump();
             }
+        }
+
+        Result ConvertedLeftResult(Category category, ContextBase context, CompileSyntax left)
+        {
+            return ConverterResult(category)
+                .ReplaceArg(c1=>context.ResultAsReference(c1,left));
         }
 
         internal Result Result(Category category, ContextBase context, CompileSyntax right, Func<Category, Result> converterResult)
@@ -75,7 +66,7 @@ namespace Reni.Context
 
         internal Result Result(Category category, Func<Category, Result> converterResult) => SimpleResult(category).ReplaceArg(converterResult);
 
-        Result Result(Category category, ContextBase context, CompileSyntax right)
+        internal  Result Result(Category category, ContextBase context, CompileSyntax right)
         {
             var trace = ObjectId.In(662) && category.HasCode;
             StartMethodDump(trace, category, context, right);

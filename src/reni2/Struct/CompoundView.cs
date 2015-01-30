@@ -195,12 +195,14 @@ namespace Reni.Struct
             StartMethodDump(trace, category, position);
             try
             {
-                var accessType = ValueType(position);
+                var accessType = ValueType(position).SmartPointer;
                 var genericDumpPrintResult = accessType.GenericDumpPrintResult(category);
                 Dump("genericDumpPrintResult", genericDumpPrintResult);
                 BreakExecution();
-                var accessViaThisReference = AccessValueViaObjectPointer(category.Typed, position);
-                return ReturnMethodDump(genericDumpPrintResult.ReplaceArg(accessViaThisReference));
+                return ReturnMethodDump
+                    (
+                        genericDumpPrintResult.ReplaceAbsolute
+                            (accessType.CheckedReference, c => AccessValueViaObjectPointer(c, position)));
             }
             finally
             {

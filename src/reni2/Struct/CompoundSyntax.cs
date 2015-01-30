@@ -109,7 +109,7 @@ namespace Reni.Struct
             return new Position(result.Position);
         }
 
-        internal override Result ObtainResult(ContextBase context, Category category) => context
+        internal override Result ResultForCache(ContextBase context, Category category) => context
             .Compound(this)
             .Result(category);
 

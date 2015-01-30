@@ -48,12 +48,14 @@ namespace Reni.ReniParser
             }
         }
 
-        internal override Result ObtainResult(ContextBase context, Category category)
+        internal override Result ResultForCache(ContextBase context, Category category)
         {
             if(Left == null)
                 return context.PrefixResult(category, Token, Operator, Right);
 
-            var typeForSearch = context.Type(Left).SmartPointer;
+            var left = new ResultCache(c=> context.ResultAsReference(c, Left));
+
+            var typeForSearch = left.Type;
             var searchResults
                 = typeForSearch
                     .DeclarationsForTypeAndRelatives(Operator)
@@ -66,7 +68,7 @@ namespace Reni.ReniParser
                     return UndefinedSymbolIssue.Type(Token, typeForSearch).IssueResult(category);
 
                 case 1:
-                    return searchResults[0].CallResult(context, category, Left, Right);
+                    return searchResults[0].Execute(category, left, context, Right);
 
                 default:
                     return AmbiguousSymbolIssue.Type(Token, context.RootContext).IssueResult(category);

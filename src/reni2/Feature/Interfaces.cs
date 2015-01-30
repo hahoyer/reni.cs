@@ -60,9 +60,9 @@ namespace Reni.Feature
         IMetaFunctionFeature IFeatureImplementation.Meta => this;
         IFunctionFeature IFeatureImplementation.Function => null;
         ISimpleFeature IFeatureImplementation.Simple => null;
-        Result IMetaFunctionFeature.Result(ContextBase contextBase, Category category, CompileSyntax left, CompileSyntax right)
-            => Result(contextBase, category, left, right);
-        protected abstract Result Result(ContextBase contextBase, Category category, CompileSyntax left, CompileSyntax right);
+        Result IMetaFunctionFeature.Result(Category category, ResultCache left, ContextBase contextBase, CompileSyntax right)
+            => Result(category, left, contextBase, right);
+        protected abstract Result Result(Category category, ResultCache left, ContextBase contextBase, CompileSyntax right);
     }
 
     abstract class FunctionFeatureImplementation : DumpableObject, IFeatureImplementation, IFunctionFeature
@@ -133,7 +133,7 @@ namespace Reni.Feature
 
     interface IMetaFunctionFeature
     {
-        Result Result(ContextBase contextBase, Category category, CompileSyntax left, CompileSyntax right);
+        Result Result(Category category, ResultCache left, ContextBase contextBase, CompileSyntax right);
     }
 
     interface IContextMetaFunctionFeature
@@ -190,16 +190,16 @@ namespace Reni.Feature
 
     sealed class MetaFunction : DumpableObject, IFeatureImplementation, IMetaFunctionFeature
     {
-        readonly Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result> _function;
-        public MetaFunction(Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result> function) { _function = function; }
+        readonly Func<Category, ResultCache, ContextBase, CompileSyntax, Result> _function;
+        public MetaFunction(Func<Category, ResultCache, ContextBase, CompileSyntax, Result> function) { _function = function; }
 
         IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
         IMetaFunctionFeature IFeatureImplementation.Meta => this;
         IFunctionFeature IFeatureImplementation.Function => null;
         ISimpleFeature IFeatureImplementation.Simple => null;
 
-        Result IMetaFunctionFeature.Result(ContextBase contextBase, Category category, CompileSyntax left, CompileSyntax right)
-            => _function(contextBase, category, left, right);
+        Result IMetaFunctionFeature.Result(Category category, ResultCache left, ContextBase contextBase, CompileSyntax right)
+            => _function(category, left, contextBase, right);
     }
 
     sealed class ContextMetaFunction : ContextMetaFeatureImplementation

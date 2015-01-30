@@ -66,7 +66,7 @@ namespace Reni.Context
         [DebuggerHidden]
         internal Result Result(Category category, CompileSyntax syntax)
         {
-            var cacheItem = _cache.ResultCache[syntax];
+            var cacheItem = ResultCache(syntax);
             cacheItem.Update(category);
             var result = cacheItem.Data & category;
 
@@ -81,17 +81,19 @@ namespace Reni.Context
             return result;
         }
 
+        internal ResultCache ResultCache(CompileSyntax syntax) { return _cache.ResultCache[syntax]; }
+
         internal TypeBase TypeIfKnown(CompileSyntax syntax) => _cache.ResultCache[syntax].Data.Type;
 
         [DebuggerHidden]
-        Result ObtainResult(Category category, CompileSyntax syntax)
+        Result ResultForCache(Category category, CompileSyntax syntax)
         {
             var trace = syntax.ObjectId == -23 && ObjectId == 1 && category.HasCode;
             StartMethodDump(trace, category, syntax);
             try
             {
                 BreakExecution();
-                var result = syntax.ObtainResult(this, category.Replenished);
+                var result = syntax.ResultForCache(this, category.Replenished);
                 Tracer.Assert(category <= result.CompleteCategory);
                 return ReturnMethodDump(result);
             }
@@ -104,7 +106,7 @@ namespace Reni.Context
         [DebuggerHidden]
         ResultCache CreateCacheElement(CompileSyntax syntax)
         {
-            var result = new ResultCache(category => ObtainResult(category, syntax));
+            var result = new ResultCache(category => ResultForCache(category, syntax));
             syntax.AddToCacheForDebug(this, result);
             return result;
         }
@@ -208,7 +210,7 @@ namespace Reni.Context
         internal Result FunctionalObjectResult(Category category, [NotNull] CompileSyntax left, CompileSyntax right)
         {
             var functionalObjectDescriptor = new FunctionalObjectDescriptor(this, left);
-            return functionalObjectDescriptor.Result(category, this, left, right, null);
+            return functionalObjectDescriptor.Result(category, this, left, right);
         }
 
         ContextCallDescriptor Declarations(Definable tokenClass)

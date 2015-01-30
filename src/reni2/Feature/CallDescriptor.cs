@@ -14,18 +14,19 @@ namespace Reni.Feature
 {
     sealed class CallDescriptor : FeatureDescriptor
     {
-        public CallDescriptor(IFeatureImplementation feature, ConversionService.Path converterPath)
+        public CallDescriptor(IFeatureImplementation feature, ConversionPath converterPath)
         {
             ConverterPath = converterPath;
             Feature = feature;
         }
 
-        ConversionService.Path ConverterPath { get; }
+        ConversionPath ConverterPath { get; }
         [DisableDump]
         protected override TypeBase Type => ConverterPath.Destination;
         protected override IContextReference ObjectReference => ConverterPath.Destination.CheckedReference.AssertNotNull();
         [DisableDump]
         protected override IFeatureImplementation Feature { get; }
+        protected override Result ConverterResult(Category category) => ConverterPath.Execute(category);
     }
 
     sealed class FunctionalObjectDescriptor : FeatureDescriptor
@@ -47,6 +48,11 @@ namespace Reni.Feature
             }
         }
         protected override IFeatureImplementation Feature => Type.CheckedFeature;
+        protected override Result ConverterResult(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
+        }
     }
 
     sealed class FunctionalArgDescriptor : FeatureDescriptor
@@ -70,7 +76,12 @@ namespace Reni.Feature
         }
         [DisableDump]
         protected override IFeatureImplementation Feature => FunctionBodyType.CheckedFeature;
-        public Result Result(Category category, ContextBase context, CompileSyntax right)
+        protected override Result ConverterResult(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
+        }
+        public new Result Result(Category category, ContextBase context, CompileSyntax right)
             => base.Result(category, context, right, CompoundView.ObjectPointerViaContext);
     }
 
@@ -93,5 +104,10 @@ namespace Reni.Feature
 
         [DisableDump]
         protected override IFeatureImplementation Feature => _feature;
+        protected override Result ConverterResult(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
+        }
     }
 }

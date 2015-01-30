@@ -41,9 +41,9 @@ namespace Reni.Type
 
         protected override CodeBase DumpPrintCode() => ArgCode.DumpPrintText(SimpleItemSize);
 
-        Result ToNumberOfBaseResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
+        Result ToNumberOfBaseResult(Category category, ResultCache left, ContextBase context, CompileSyntax right)
         {
-            var target = left.Evaluate(context).ToString(Parent.ElementType.Size);
+            var target = (left & Category.All).Evaluate(context.RootContext.ExecutionContext).ToString(Parent.ElementType.Size);
             var conversionBase = right.Evaluate(context).ToInt32();
             Tracer.Assert(conversionBase >= 2, conversionBase.ToString);
             var result = BitsConst.Convert(target, conversionBase);

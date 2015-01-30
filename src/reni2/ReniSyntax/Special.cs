@@ -28,7 +28,7 @@ namespace Reni.ReniSyntax
             : base(token) { Terminal = terminal; }
 
         internal override string DumpPrintText { get { return Token.Name; } }
-        internal override Result ObtainResult(ContextBase context, Category category)
+        internal override Result ResultForCache(ContextBase context, Category category)
         {
             return Terminal
                 .Result(context, category, Token);
@@ -54,7 +54,7 @@ namespace Reni.ReniSyntax
             _right = right;
         }
 
-        internal override Result ObtainResult(ContextBase context, Category category)
+        internal override Result ResultForCache(ContextBase context, Category category)
         {
             return _prefix
                 .Result(context, category, Token, _right);
@@ -89,7 +89,7 @@ namespace Reni.ReniSyntax
             StopByObjectId(12);
         }
 
-        internal override Result ObtainResult(ContextBase context, Category category)
+        internal override Result ResultForCache(ContextBase context, Category category)
         {
             return _infix
                 .Result(context, category, _left, _right);
@@ -142,7 +142,7 @@ namespace Reni.ReniSyntax
             _suffix = suffix;
         }
 
-        internal override Result ObtainResult(ContextBase context, Category category)
+        internal override Result ResultForCache(ContextBase context, Category category)
         {
             return _suffix
                 .Result(context, category, _left);

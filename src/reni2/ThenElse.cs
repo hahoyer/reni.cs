@@ -39,7 +39,7 @@ namespace Reni
             Else = elseSyntax ?? new EmptyList(thenToken);
         }
 
-        internal override Result ObtainResult(ContextBase context, Category category)
+        internal override Result ResultForCache(ContextBase context, Category category)
         {
             return InternalResult(context, category);
         }

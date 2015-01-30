@@ -1,22 +1,23 @@
 using System;
 using System.Collections.Generic;
+using hw.Helper;
 using System.Linq;
 using hw.Debug;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Context;
 using Reni.ReniSyntax;
 using Reni.Struct;
-using Reni.Numeric;
 using Reni.Type;
 
 namespace Reni.Feature
 {
     sealed class SearchResult : DumpableObject
     {
-        public IFeatureImplementation Feature { get; }
-        public ConversionService.Path ConverterPath { get; }
+        IFeatureImplementation Feature { get; }
+        ConversionPath ConverterPath { get; }
 
-        internal SearchResult(SearchResult result, ConversionService.Path relativeConversion)
+        internal SearchResult(SearchResult result, ConversionPath relativeConversion)
         {
             Feature = result.Feature;
             ConverterPath = result.ConverterPath + relativeConversion;
@@ -26,16 +27,45 @@ namespace Reni.Feature
         internal SearchResult(IFeatureImplementation feature, TypeBase definingItem)
         {
             Feature = feature;
-            ConverterPath = new ConversionService.Path(definingItem);
+            ConverterPath = new ConversionPath(definingItem);
             StopByObjectId(-37);
         }
 
-        CallDescriptor CallDescriptor => new CallDescriptor(Feature, ConverterPath);
+        IContextReference ObjectReference => ConverterPath.Destination.CheckedReference.AssertNotNull();
 
-        internal Result CallResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
-            => CallDescriptor.Result(category, context, left, right, ConverterPath.Execute);
+        internal Result Execute(Category category, ResultCache left, ContextBase context, CompileSyntax right)
+        {
+            var metaFeature = Feature.Meta;
+            if(metaFeature != null)
+                return metaFeature.Result(category, left, context, right);
 
-        internal Result CallResult(Category category) => CallDescriptor.Result(category, ConverterPath.Execute);
+            var re = right == null ? null : context.ResultCache(right);
+            return Result(category, left, re);
+        }
+
+        Result Result(Category category, ResultCache left, ResultCache right)
+            => Result(category, right)
+                .ReplaceAbsolute(ObjectReference, ConverterPath.Execute)
+                .ReplaceArg(left);
+
+        Result Result(Category category, ResultCache right)
+        {
+            var simpleFeature = Feature.SimpleFeature();
+            if(simpleFeature != null && right == null)
+            {
+                var simpleResult = simpleFeature.Result(category);
+                return (simpleResult);
+            }
+
+            right = right ?? ConverterPath.Destination.RootContext.VoidType.Result(Category.All);
+
+            return Feature
+                .Function
+                .ApplyResult(category, right.Type)
+                .ReplaceArg(right);
+        }
+
+        internal Result CallResult(Category category) => Result(category, null);
 
         internal bool HasHigherPriority(SearchResult other)
             => (Feature is AccessFeature) == (other.Feature is AccessFeature)

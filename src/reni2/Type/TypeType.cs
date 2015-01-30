@@ -55,7 +55,7 @@ namespace Reni.Type
 
         new Result DumpPrintTokenResult(Category category) => Value.DumpPrintTypeNameResult(category);
 
-        Result StarResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
+        Result StarResult(Category category, ResultCache left, ContextBase context, CompileSyntax right)
         {
             var countResult = right.Result(context).AutomaticDereferenceResult;
             var count = countResult

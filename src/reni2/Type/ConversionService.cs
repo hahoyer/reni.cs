@@ -3,106 +3,18 @@ using System.Collections.Generic;
 using hw.Helper;
 using System.Linq;
 using hw.Debug;
-using Reni.Basics;
 using Reni.Feature;
-using Reni.TokenClasses;
 
 namespace Reni.Type
 {
     static class ConversionService
     {
-        internal sealed class Path : DumpableObject, IEquatable<Path>
-        {
-            internal readonly TypeBase Source;
-            internal readonly ISimpleFeature[] Elements;
-
-            internal Path(TypeBase source)
-            {
-                Source = source;
-                Elements = new ISimpleFeature[0];
-                Tracer.Assert(Source != null);
-            }
-
-            internal Path(params ISimpleFeature[] rawElements)
-            {
-                Tracer.Assert(rawElements.Any());
-                Source = rawElements.First().TargetType;
-                Tracer.Assert(Source != null);
-                Elements = rawElements.RemoveCircles().ToArray();
-
-                if(Elements.Any())
-                    Tracer.Assert(Source == Elements.First().TargetType);
-
-                Tracer.Assert
-                    (
-                        Types.Count() == Elements.Count() + 1,
-                        () => "\n" + Types.Select(t => t.DumpPrintText).Stringify("\n") + "\n****\n" + Dump()
-                    );
-            }
-
-            IEnumerable<TypeBase> Types
-                => Elements
-                    .Select(element => element.TargetType)
-                    .Concat(new[] {Destination})
-                    .Distinct();
-
-            IEnumerable<string> DumpConversions
-                => Elements
-                    .Select(element => element.Result(Category.Code).Code.DebuggerDumpString)
-                    .ToArray();
-
-            internal TypeBase Destination => Elements.LastOrDefault()?.ResultType() ?? Source;
-
-            [DisableDump]
-            internal bool IsRelativeConversion => Elements.Any() && Elements.All(Extension.IsRelative);
-
-            public static Path operator +(Path a, Path b) => new Path(a.Elements.Concat(b.Elements).ToArray());
-            public static IEnumerable<Path> operator +(IEnumerable<Path> a, Path b) => a.Select(left => left + b);
-            public static IEnumerable<Path> operator +(Path a, IEnumerable<Path> b) => b.Select(right => a + right);
-            public static IEnumerable<Path> operator +(Path a, IEnumerable<ISimpleFeature> b) => b.Select(right => a + right);
-            public static Path operator +(ISimpleFeature a, Path b) => new Path(new[] {a}.Concat(b.Elements).ToArray());
-            public static Path operator +(Path a, ISimpleFeature b) => new Path(a.Elements.Concat(new[] {b}).ToArray());
-
-            internal Result Execute(Category category)
-                => Elements.Aggregate(Source.ArgResult(category), (c, n) => n.Result(category).ReplaceArg(c));
-
-            bool IEquatable<Path>.Equals(Path other)
-            {
-                if(this == other)
-                    return true;
-                if(Source != other.Source)
-                    return false;
-                if(Elements.Length != other.Elements.Length)
-                    return false;
-                return !Elements.Where((element, index) => element != Elements[index]).Any();
-            }
-            internal IEnumerable<SearchResult> RelativeSearchResults(Definable definable)
-            {
-                var declarationsForType = Destination
-                    .DeclarationsForType(definable);
-                return declarationsForType
-                    .Select(result => new SearchResult(result, this));
-            }
-
-            internal bool HasHigherPriority(Path other)
-            {
-                if(Elements.Length < other.Elements.Length)
-                    return true;
-
-                if(Elements.Length > other.Elements.Length)
-                    return false;
-
-                NotImplementedMethod(other);
-                return true;
-            }
-        }
-
         abstract class ConversionProcess : DumpableObject
         {
             TypeBase Source { get; }
             protected ConversionProcess(TypeBase source) { Source = source; }
 
-            internal Path Result
+            internal ConversionPath Result
             {
                 get
                 {
@@ -110,7 +22,7 @@ namespace Reni.Type
                         return SimplePath;
 
                     var paths = ClosureService.Result(Source);
-                    var others = new List<Path>();
+                    var others = new List<ConversionPath>();
 
                     foreach(var path in paths)
                     {
@@ -128,10 +40,10 @@ namespace Reni.Type
                 }
             }
 
-            protected abstract IEnumerable<Path> GetForcedConversions(Path left);
+            protected abstract IEnumerable<ConversionPath> GetForcedConversions(ConversionPath left);
             protected abstract bool IsDestination(TypeBase source);
 
-            Path SimplePath => new Path(Source);
+            ConversionPath SimplePath => new ConversionPath(Source);
         }
 
         sealed class GenericConversionProcess : ConversionProcess
@@ -141,7 +53,7 @@ namespace Reni.Type
             public GenericConversionProcess(TypeBase source, Func<TypeBase, bool> isDestination)
                 : base(source) { _isDestination = isDestination; }
 
-            protected override IEnumerable<Path> GetForcedConversions(Path left)
+            protected override IEnumerable<ConversionPath> GetForcedConversions(ConversionPath left)
                 => left + left.Destination.GetForcedConversions(_isDestination);
             protected override bool IsDestination(TypeBase source) => _isDestination(source);
         }
@@ -152,7 +64,7 @@ namespace Reni.Type
             public ExplicitConversionProcess(TypeBase source, TypeBase destination)
                 : base(source) { Destination = destination; }
 
-            protected override IEnumerable<Path> GetForcedConversions(Path left)
+            protected override IEnumerable<ConversionPath> GetForcedConversions(ConversionPath left)
                 => Destination
                     .SymmetricPathsClosureBackwards()
                     .SelectMany(right => left + left.Destination.GetForcedConversions(right.Source) + right);
@@ -160,21 +72,21 @@ namespace Reni.Type
             protected override bool IsDestination(TypeBase source) => source == Destination;
         }
 
-        internal static Path FindPath(TypeBase source, TypeBase destination)
+        internal static ConversionPath FindPath(TypeBase source, TypeBase destination)
             => new ExplicitConversionProcess(source, destination).Result;
 
-        static Path FindPath(TypeBase source, Func<TypeBase, bool> isDestination)
+        static ConversionPath FindPath(TypeBase source, Func<TypeBase, bool> isDestination)
             => new GenericConversionProcess(source, isDestination).Result;
 
         internal static TDestination FindPathDestination<TDestination>(TypeBase source)
             where TDestination : TypeBase
             => (TDestination) FindPath(source, t => t is TDestination)?.Destination;
 
-        internal static IEnumerable<ISimpleFeature> ForcedConversions(Path source, Path destination)
+        internal static IEnumerable<ISimpleFeature> ForcedConversions(ConversionPath source, ConversionPath destination)
             => source.Destination
                 .GetForcedConversions(destination.Source);
 
-        internal static IEnumerable<Path> RelativeConversions(this TypeBase source)
+        internal static IEnumerable<ConversionPath> RelativeConversions(this TypeBase source)
             => ClosureService
                 .Result(source)
                 .Where(path => path.IsRelativeConversion);
@@ -234,7 +146,7 @@ namespace Reni.Type
             Tracer.Assert(!features.Any(), features.Stringify("\n"));
         }
 
-        static IEnumerable<ISimpleFeature> RemoveCircles(this IEnumerable<ISimpleFeature> list)
+        internal static IEnumerable<ISimpleFeature> RemoveCircles(this IEnumerable<ISimpleFeature> list)
         {
             var result = new List<ISimpleFeature>(list);
             result.AssertPath();
@@ -277,11 +189,11 @@ namespace Reni.Type
             } while(newTypes.Any());
         }
 
-        internal static IEnumerable<Path> SymmetricPathsClosure(this TypeBase source)
-            => new[] {new Path(source)}.Concat(SymmetricClosureService.From(source).Select(f => new Path(f)));
+        internal static IEnumerable<ConversionPath> SymmetricPathsClosure(this TypeBase source)
+            => new[] {new ConversionPath(source)}.Concat(SymmetricClosureService.From(source).Select(f => new ConversionPath(f)));
 
-        internal static IEnumerable<Path> SymmetricPathsClosureBackwards(this TypeBase destination)
-            => new[] {new Path(destination)}.Concat(SymmetricClosureService.To(destination).Select(f => new Path(f)));
+        internal static IEnumerable<ConversionPath> SymmetricPathsClosureBackwards(this TypeBase destination)
+            => new[] {new ConversionPath(destination)}.Concat(SymmetricClosureService.To(destination).Select(f => new ConversionPath(f)));
 
         internal static IEnumerable<SearchResult> RemoveLowPriorityResults(this IEnumerable<SearchResult> list)
             => list.FrameElementList((a, b) => a.HasHigherPriority(b));
@@ -294,18 +206,18 @@ namespace Reni.Type
 
         internal sealed class ClosureService
         {
-            internal static IEnumerable<Path> Result(TypeBase source) => new ClosureService(source).Result();
+            internal static IEnumerable<ConversionPath> Result(TypeBase source) => new ClosureService(source).Result();
 
             static IEnumerable<ISimpleFeature> NextConversionStep(TypeBase source)
                 => SymmetricClosureService.From(source).Union(source.StripConversions);
 
             TypeBase Source { get; }
             List<TypeBase> _foundTypes;
-            List<Path> _newPaths;
+            List<ConversionPath> _newPaths;
 
             ClosureService(TypeBase source) { Source = source; }
 
-            IEnumerable<Path> Combination(Path startFeature = null)
+            IEnumerable<ConversionPath> Combination(ConversionPath startFeature = null)
             {
                 var startType = Source;
                 if(startFeature != null)
@@ -313,8 +225,8 @@ namespace Reni.Type
 
                 var newFeatures = NextConversionStep(startType)
                     .Where(feature => !_foundTypes.Contains(feature.ResultType()))
-                    .Select(feature => startFeature == null ? new Path(feature) : startFeature + feature);
-                var result = new List<Path>();
+                    .Select(feature => startFeature == null ? new ConversionPath(feature) : startFeature + feature);
+                var result = new List<ConversionPath>();
                 foreach(var newPath in newFeatures)
                 {
                     Tracer.Assert(newPath.Source == Source);
@@ -324,10 +236,10 @@ namespace Reni.Type
                 return result;
             }
 
-            void AddPath(Path newPath)
+            void AddPath(ConversionPath newPath)
             {
                 if(_newPaths == null)
-                    _newPaths = new List<Path>();
+                    _newPaths = new List<ConversionPath>();
                 _newPaths.Add(newPath);
 
                 if(_foundTypes == null)
@@ -335,10 +247,10 @@ namespace Reni.Type
                 _foundTypes.Add(newPath.Destination);
             }
 
-            IEnumerable<Path> Result()
+            IEnumerable<ConversionPath> Result()
             {
                 _newPaths = null;
-                var singularPath = new Path(Source);
+                var singularPath = new ConversionPath(Source);
                 AddPath(singularPath);
                 Tracer.Assert(singularPath.Source == Source);
                 yield return singularPath;

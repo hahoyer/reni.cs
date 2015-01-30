@@ -32,7 +32,7 @@ namespace Reni.Validation
 
         CompileSyntaxIssue Issue { get { return _issueCache.Value; } }
 
-        internal override Result ObtainResult(ContextBase context, Category category)
+        internal override Result ResultForCache(ContextBase context, Category category)
         {
             var result = Chain
                 .Select(error => error.IssueType(context).IssueResult(category))

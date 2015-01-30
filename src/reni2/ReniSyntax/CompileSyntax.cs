@@ -48,7 +48,7 @@ namespace Reni.ReniSyntax
 
 
         //[DebuggerHidden]
-        internal virtual Result ObtainResult(ContextBase context, Category category)
+        internal virtual Result ResultForCache(ContextBase context, Category category)
         {
             NotImplementedMethod(context, category);
             return null;
