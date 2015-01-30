@@ -52,7 +52,7 @@ namespace Reni.Struct
         }
 
         Result ISimpleFeature.Result(Category category) => View
-            .AccessViaContext(category, Position);
+            .AccessViaObjectPointer(category, Position);
 
         TypeBase ISimpleFeature.TargetType => View.Type;
 
