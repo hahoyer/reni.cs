@@ -757,7 +757,7 @@ namespace Reni
             get
             {
                 Tracer.Assert(HasType, () => "Dereference requires type category:\n " + Dump());
-                var referenceType = Type.ReferenceType;
+                var referenceType = Type.CheckedReference;
                 var converter = referenceType.Converter;
                 var result = converter.Result(CompleteCategory);
                 return result

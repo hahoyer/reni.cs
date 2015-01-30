@@ -17,10 +17,10 @@ namespace Reni.Type
             Position = position;
         }
 
-        [EnableDump]
-        public CompoundView View { get; }
-        [EnableDump]
-        public int Position { get; }
+        [DisableDump]
+        CompoundView View { get; }
+        [DisableDump]
+        int Position { get; }
 
         protected override bool IsMutable => View.Compound.Syntax.IsReassignable(Position);
         protected override TypeBase TargetType => View.Type;

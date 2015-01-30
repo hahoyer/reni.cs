@@ -67,7 +67,7 @@ namespace Reni.Struct
             if(functionSyntax != null)
                 return functionSyntax.FunctionFeature(View);
 
-            return View.ValueType(Position).Feature?.Function;
+            return View.ValueType(Position).CheckedFeature?.Function;
         }
     }
 }

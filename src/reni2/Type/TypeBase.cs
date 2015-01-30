@@ -33,7 +33,7 @@ namespace Reni.Type
             public readonly FunctionCache<TypeBase, Pair> Pair;
             [Node]
             [SmartNode]
-            public readonly ValueCache<IReference> Reference;
+            public readonly ValueCache<IReference> ForcedReference;
             [Node]
             [SmartNode]
             public readonly ValueCache<TypeType> TypeType;
@@ -54,7 +54,7 @@ namespace Reni.Type
             public Cache(TypeBase parent)
             {
                 EnableCut = new ValueCache<EnableCut>(() => new EnableCut(parent));
-                Reference = new ValueCache<IReference>(parent.ObtainReference);
+                ForcedReference = new ValueCache<IReference>(parent.ForcedReferenceForCache);
                 Pair = new FunctionCache<TypeBase, Pair>(first => new Pair(first, parent));
                 Array = new FunctionCache<int, FunctionCache<bool, ArrayType>>
                     (
@@ -83,7 +83,7 @@ namespace Reni.Type
             _cache = new Cache(this);
         }
 
-        IContextReference IContextReferenceProvider.ContextReference => Reference;
+        IContextReference IContextReferenceProvider.ContextReference => ForcedReference;
 
         [Node]
         internal Size Size => _cache.Size.Value;
@@ -133,17 +133,17 @@ namespace Reni.Type
         internal EnableCut EnableCut => _cache.EnableCut.Value;
 
         [DisableDump]
-        internal TypeBase Pointer => Reference.Type();
+        internal TypeBase Pointer => ForcedReference.Type();
 
         [DisableDump]
-        internal virtual IReference Reference => _cache.Reference.Value;
+        internal virtual IReference ForcedReference => _cache.ForcedReference.Value;
 
         [DisableDump]
         internal CodeBase ArgCode => CodeBase.Arg(this);
 
         [DisableDump]
         internal TypeBase AutomaticDereferenceType
-            => IsWeakReference ? ReferenceType.Converter.TargetType.AutomaticDereferenceType : this;
+            => IsWeakReference ? CheckedReference.Converter.TargetType.AutomaticDereferenceType : this;
 
         [DisableDump]
         internal TypeBase SmartPointer => Hllw ? this : Pointer;
@@ -249,13 +249,13 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        internal virtual IReference ReferenceType => this as IReference;
+        internal virtual IReference CheckedReference => this as IReference;
 
         [DisableDump]
-        internal bool IsWeakReference => ReferenceType != null && ReferenceType.IsWeak;
+        internal bool IsWeakReference => CheckedReference != null && CheckedReference.IsWeak;
 
         [DisableDump]
-        internal virtual IFeatureImplementation Feature => this as IFeatureImplementation;
+        internal virtual IFeatureImplementation CheckedFeature => this as IFeatureImplementation;
 
         [DisableDump]
         internal virtual bool HasQuickSize => true;
@@ -328,10 +328,10 @@ namespace Reni.Type
                 );
         }
 
-        IReference ObtainReference()
+        IReference ForcedReferenceForCache()
         {
             Tracer.Assert(!Hllw);
-            return this as IReference ?? new PointerType(this);
+            return CheckedReference ?? new PointerType(this);
         }
 
         protected virtual ArrayType ObtainArray(int count, bool isMutable) => new ArrayType(this, count, isMutable);
@@ -460,7 +460,7 @@ namespace Reni.Type
         protected Result DumpPrintTokenResult(Category category)
             => VoidType
                 .Result(category, DumpPrintCode, CodeArgs.Arg)
-                .ReplaceArg(Pointer.ArgResult(category.Typed).DereferenceResult);
+                .ReplaceArg(Pointer.Result(category.Typed, ForcedReference).DereferenceResult);
 
         protected virtual CodeBase DumpPrintCode()
         {

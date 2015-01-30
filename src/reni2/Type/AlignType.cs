@@ -26,13 +26,13 @@ namespace Reni.Type
         internal override string DumpPrintText => "(" + Parent.DumpPrintText + ")" + AlignToken.Id + _alignBits;
 
         [DisableDump]
-        internal override IReference ReferenceType => Parent.ReferenceType;
+        internal override IReference CheckedReference => Parent.CheckedReference;
 
         [DisableDump]
         internal override bool Hllw => Parent.Hllw;
 
         [DisableDump]
-        internal override IReference Reference => Parent.Reference;
+        internal override IReference ForcedReference => Parent.ForcedReference;
 
         protected override Result DeAlign(Category category) => Parent.Result(category, ArgResult);
 

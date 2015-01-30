@@ -51,7 +51,7 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        internal override IFeatureImplementation Feature => Parent.Feature;
+        internal override IFeatureImplementation CheckedFeature => Parent.CheckedFeature;
 
         internal override int? SmartArrayLength(TypeBase elementType) => Parent.SmartArrayLength(elementType);
 

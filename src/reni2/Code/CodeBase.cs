@@ -77,7 +77,10 @@ namespace Reni.Code
 
         internal CodeBase ThenElse(CodeBase thenCode, CodeBase elseCode) { return Add(new ThenElse(thenCode, elseCode)); }
 
-        internal LocalReference LocalReference(TypeBase type, CodeBase destructorCode) { return new LocalReference(type, this, destructorCode); }
+        internal LocalReference LocalReference(TypeBase type, CodeBase destructorCode)
+        {
+            return new LocalReference(type, this, destructorCode);
+        }
 
         internal abstract CodeBase Add(FiberItem subsequentElement);
 

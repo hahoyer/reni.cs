@@ -39,7 +39,7 @@ namespace Reni.Type
         [DisableDump]
         internal override CompoundView FindRecentCompoundView => ValueType.FindRecentCompoundView;
         [DisableDump]
-        internal override IFeatureImplementation Feature => ValueType.Feature;
+        internal override IFeatureImplementation CheckedFeature => ValueType.CheckedFeature;
         [DisableDump]
         internal override bool Hllw => false;
         [DisableDump]

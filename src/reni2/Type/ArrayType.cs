@@ -35,7 +35,7 @@ namespace Reni.Type
             Count = count;
             _isMutable = isMutable;
             Tracer.Assert(count > 0);
-            Tracer.Assert(elementType.ReferenceType == null);
+            Tracer.Assert(elementType.CheckedReference == null);
             Tracer.Assert(!elementType.Hllw);
             _arrayAccessTypeCache = new ValueCache<RepeaterAccessType>(() => new RepeaterAccessType(this));
             _enableArrayOverSizeTypeCache = new ValueCache<EnableArrayOverSizeType>(() => new EnableArrayOverSizeType(this));
@@ -143,7 +143,7 @@ namespace Reni.Type
         internal override Root RootContext => ElementType.RootContext;
 
         [DisableDump]
-        IContextReference ObjectReference => Reference;
+        IContextReference ObjectReference => ForcedReference;
 
         [DisableDump]
         internal TypeBase IndexType => RootContext.BitType.Number(IndexSize.ToInt());
