@@ -43,7 +43,10 @@ namespace Reni.Type
 
         Result ToNumberOfBaseResult(Category category, ResultCache left, ContextBase context, CompileSyntax right)
         {
-            var target = (left & Category.All).Evaluate(context.RootContext.ExecutionContext).ToString(Parent.ElementType.Size);
+            var target = (left & Category.All)
+                .DereferencedAlignedResult()
+                .Evaluate(context.RootContext.ExecutionContext)
+                .ToString(Parent.ElementType.Size);
             var conversionBase = right.Evaluate(context).ToInt32();
             Tracer.Assert(conversionBase >= 2, conversionBase.ToString);
             var result = BitsConst.Convert(target, conversionBase);
