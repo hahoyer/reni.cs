@@ -210,8 +210,7 @@ namespace Reni.Type
         Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType) => ApplyResult(category, argsType);
         Result ApplyResult(Category category, TypeBase argsType)
         {
-            var objectResult = Pointer
-                .Result(category, ObjectReference);
+            var objectResult = ReferenceResult(category);
 
             var argsResult = argsType
                 .Conversion(category.Typed, IndexType)

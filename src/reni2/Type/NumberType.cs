@@ -81,9 +81,16 @@ namespace Reni.Type
 
         protected override Size GetSize() => Parent.Size;
 
-        Result TextItemResult(Category category) => Parent
-            .TextItemResult(category)
-            .ReplaceArg(c => ResultFromPointer(c, Parent));
+        Result TextItemResult(Category category)
+        {
+            return Parent
+                .TextItemType
+                .Pointer
+                .Result(category, Parent
+                    .Pointer
+                    .Result(category, ReferenceResult(category.Typed)))
+                ;
+        }
 
         Result NegationResult(Category category) => ((NumberType) _zeroResult.Value.Type)
             .OperationResult(category, _minusOperation, this)
@@ -127,7 +134,7 @@ namespace Reni.Type
                     CodeArgs.Arg
                 );
 
-            var leftResult = Pointer.Result(category.Typed, ForcedReference)
+            var leftResult = ReferenceResult(category.Typed)
                 .Conversion(Align);
             var rightResult = right.Pointer.ArgResult(category.Typed).Conversion(right.Align);
             var pair = leftResult + rightResult;

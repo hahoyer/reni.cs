@@ -460,7 +460,9 @@ namespace Reni.Type
         protected Result DumpPrintTokenResult(Category category)
             => VoidType
                 .Result(category, DumpPrintCode, CodeArgs.Arg)
-                .ReplaceArg(Pointer.Result(category.Typed, ForcedReference).DereferenceResult);
+                .ReplaceArg(ReferenceResult(category).DereferenceResult);
+
+        internal Result ReferenceResult(Category category) => Pointer.Result(category.Typed, ForcedReference);
 
         protected virtual CodeBase DumpPrintCode()
         {
