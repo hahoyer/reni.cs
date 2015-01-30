@@ -6,9 +6,9 @@ namespace Reni.Code.ReplaceVisitor
 {
     sealed class ReplaceAbsoluteArg : ReplaceArg
     {
-        public ReplaceAbsoluteArg(Result actualArg)
+        public ReplaceAbsoluteArg(ResultCache actualArg)
             : base(actualArg) { }
 
-        protected override CodeBase Actual => ActualArg.Code;
+        protected override CodeBase ActualCode => ActualArg.Code;
     }
 }

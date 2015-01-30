@@ -258,7 +258,7 @@ namespace Reni
             }
         }
 
-        IEnumerable<TreeNode> ITreeNodeSupport.CreateNodes() { return TreeNodes; }
+        IEnumerable<TreeNode> ITreeNodeSupport.CreateNodes() => TreeNodes;
 
         [DisableDump]
         internal IEnumerable<TreeNode> TreeNodes
@@ -439,7 +439,7 @@ namespace Reni
             }
         }
 
-        Result IAggregateable<Result>.Aggregate(Result other) { return this + other; }
+        Result IAggregateable<Result>.Aggregate(Result other) => this + other;
 
         public override string DumpData()
         {
@@ -550,7 +550,7 @@ namespace Reni
             Tracer.Assert((CompleteCategory & PendingCategory) == Category.None);
         }
 
-        void Add(Result other) { Add(other, CompleteCategory); }
+        void Add(Result other) => Add(other, CompleteCategory);
 
         void Add(Result other, Category category)
         {
@@ -577,28 +577,10 @@ namespace Reni
             return result;
         }
 
-        internal Result ReplaceArg(Func<Category, Result> getResultForArg)
-        {
-            if(HasArg && getResultForArg != null)
-                return InternalReplaceArg(getResultForArg);
-            return this;
-        }
+        internal Result ReplaceArg(ResultCache resultCache) => HasArg ? InternalReplaceArg(resultCache) : this;
+        internal Result ReplaceArg(Func<Category, Result> getArgs) => HasArg ? InternalReplaceArg(new ResultCache(getArgs)) : this;
 
-        internal Result ReplaceArg(ResultCache resultCache)
-        {
-            if(HasArg)
-                return InternalReplaceArg(category => resultCache & category);
-            return this;
-        }
-
-        internal Result ReplaceArg(Result resultForArg)
-        {
-            if(HasArg && resultForArg != null)
-                return InternalReplaceArg(category => resultForArg);
-            return this;
-        }
-
-        Result InternalReplaceArg(Func<Category, Result> getResultForArg)
+        Result InternalReplaceArg(ResultCache getResultForArg)
         {
             var result = new Result
             {
@@ -614,11 +596,11 @@ namespace Reni
             if(HasCode)
                 categoryForArg |= Category.Type;
 
-            var resultForArg = getResultForArg(categoryForArg);
+            var resultForArg = getResultForArg & categoryForArg;
             if(resultForArg != null)
             {
                 if(HasCode)
-                    result.Code = Code.ReplaceArg(resultForArg & (Category.Type | Category.Code));
+                    result.Code = Code.ReplaceArg(resultForArg);
                 if(HasExts)
                     result.Exts = Exts.WithoutArg()
                         + resultForArg.Exts;
@@ -778,10 +760,7 @@ namespace Reni
         }
 
         [DebuggerHidden]
-        public static Result operator &(Result result, Category category)
-        {
-            return result.Filter(category);
-        }
+        public static Result operator &(Result result, Category category) => result.Filter(category);
 
         [DebuggerHidden]
         public static Result operator |(Result aResult, Result bResult)
@@ -793,10 +772,7 @@ namespace Reni
         }
 
         [DebuggerHidden]
-        public static Result operator +(Result aResult, Result bResult)
-        {
-            return aResult.Sequence(bResult);
-        }
+        public static Result operator +(Result aResult, Result bResult) => aResult.Sequence(bResult);
 
         [DisableDump]
         internal Result LocalReferenceResult
@@ -815,11 +791,8 @@ namespace Reni
             }
         }
 
-        internal Result ContextViaObjectPointer(CompoundView accessPoint)
-        {
-            return accessPoint
-                .ContextViaObjectPointer(this);
-        }
+        internal Result ContextViaObjectPointer(CompoundView accessPoint) => accessPoint
+            .ContextViaObjectPointer(this);
 
         [DebuggerHidden]
         internal void AssertVoidOrValidReference()
@@ -891,7 +864,7 @@ namespace Reni
             return result.ReplaceArg(this);
         }
 
-        internal Result SmartUn<T>() where T : ISimpleFeature { return Type is T ? Un<T>() : this; }
+        internal Result SmartUn<T>() where T : ISimpleFeature => Type is T ? Un<T>() : this;
 
         internal Result DereferencedAlignedResult()
         {

@@ -42,7 +42,7 @@ namespace Reni.Feature
         }
 
         Result Result(Category category, ResultCache left, ResultCache right)
-            => Result(category, right)
+            => Result(category.Typed, right)
                 .ReplaceAbsolute(ConverterPath.Destination.CheckedReference, ConverterPath.Execute)
                 .ReplaceArg(left);
 

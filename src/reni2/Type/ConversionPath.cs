@@ -62,7 +62,7 @@ namespace Reni.Type
         public static ConversionPath operator +(ConversionPath a, ISimpleFeature b) => new ConversionPath(a.Elements.Concat(new[] {b}).ToArray());
 
         internal Result Execute(Category category)
-            => Elements.Aggregate(Source.ArgResult(category), (c, n) => n.Result(category).ReplaceArg(c));
+            => Elements.Aggregate(new ResultCache(Source.ArgResult), (c, n) => n.Result(category).ReplaceArg(c)) & category;
 
         bool IEquatable<ConversionPath>.Equals(ConversionPath other)
         {

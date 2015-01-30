@@ -135,7 +135,7 @@ namespace Reni.Code
                     });
         }
 
-        internal CodeBase ReplaceArg(Result arg)
+        internal CodeBase ReplaceArg(ResultCache arg)
         {
             try
             {

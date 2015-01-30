@@ -14,25 +14,23 @@ namespace Reni.Code.ReplaceVisitor
     {
         static int _nextObjectId;
 
-        internal ReplaceArg(Result actualArg)
+        internal ReplaceArg(ResultCache actualArg)
             : base(_nextObjectId++)
         {
             Tracer.Assert(actualArg != null, () => "actualArg != null");
-            Tracer.Assert(actualArg.HasCode, () => "actualArg.HasCode");
-            Tracer.Assert(actualArg.HasType, () => "actualArg.HasType");
             ActualArg = actualArg;
         }
 
         [DisableDump]
-        protected Result ActualArg { get; }
+        protected ResultCache ActualArg { get; }
 
-        protected abstract CodeBase Actual { get; }
+        protected abstract CodeBase ActualCode { get; }
 
         internal override CodeBase Arg(Arg visitedObject)
         {
             if(ActualArg.Type == visitedObject.Type)
-                return Actual;
-            throw new TypeException(Actual, visitedObject);
+                return ActualCode;
+            throw new TypeException(ActualCode, visitedObject);
         }
 
         [Dump("Dump")]
