@@ -27,10 +27,10 @@ namespace Reni.Feature
         TypeBase ISimpleFeature.TargetType => Target;
 
         protected override string GetNodeDump()
-            => Function(Category.Type).Type.DumpPrintText
-                + " <== "
-                + Target.DumpPrintText
-                + "."
+            => Target.DumpPrintText
+                + "-->"
+                + Function(Category.Type).Type.DumpPrintText
+                + " MethodName="
                 + Function.Method.Name;
     }
 
