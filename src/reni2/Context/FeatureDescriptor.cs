@@ -64,9 +64,7 @@ namespace Reni.Context
             return result.ReplaceArg(converterResult);
         }
 
-        internal Result Result(Category category, Func<Category, Result> converterResult) => SimpleResult(category).ReplaceArg(converterResult);
-
-        internal  Result Result(Category category, ContextBase context, CompileSyntax right)
+        Result Result(Category category, ContextBase context, CompileSyntax right)
         {
             var trace = ObjectId.In(662) && category.HasCode;
             StartMethodDump(trace, category, context, right);
@@ -97,21 +95,6 @@ namespace Reni.Context
             {
                 EndMethodDump();
             }
-        }
-
-        Result SimpleResult(Category category)
-        {
-            Tracer.Assert(Feature.Meta == null);
-
-            var simpleFeature = Feature.SimpleFeature();
-            if(simpleFeature != null)
-                return simpleFeature.Result(category);
-
-            var function = Feature.Function;
-            var result = function
-                .ApplyResult(category, Type.RootContext.VoidType)
-                .ReplaceAbsolute(function.ObjectReference, Type.SmartPointer.ArgResult);
-            return result;
         }
     }
 
