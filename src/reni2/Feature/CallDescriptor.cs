@@ -81,7 +81,7 @@ namespace Reni.Feature
             NotImplementedMethod(category);
             return null;
         }
-        public new Result Result(Category category, ContextBase context, CompileSyntax right)
+        public Result Result(Category category, ContextBase context, CompileSyntax right)
             => base.Result(category, context, right, CompoundView.ObjectPointerViaContext);
     }
 
