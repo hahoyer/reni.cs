@@ -14,6 +14,8 @@ namespace Reni.Struct
         : TypeBase
             , ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>
             , ISymbolProviderForPointer<Definable, IFeatureImplementation>
+            , ISymbolProvider<DumpPrintToken, IFeatureImplementation>
+            , ISymbolProvider<Definable, IFeatureImplementation>
     {
         internal CompoundType(CompoundView view) { View = view; }
 
@@ -33,25 +35,32 @@ namespace Reni.Struct
         {
             get
             {
-                foreach (var converter in View.ConverterFeatures)
+                foreach(var converter in View.ConverterFeatures)
                     yield return converter;
 
-                if (Hllw)
+                if(Hllw)
                     yield return Extension.SimpleFeature(VoidConversion);
             }
         }
 
         Result VoidConversion(Category category) => RootContext.VoidType.Result(category, ArgResult);
 
-        IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
+        IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>.Feature
+            (DumpPrintToken tokenClass)
             => Extension.SimpleFeature(DumpPrintTokenResult);
 
         IFeatureImplementation ISymbolProviderForPointer<Definable, IFeatureImplementation>.Feature(Definable tokenClass)
             => View.Find(tokenClass);
 
+        IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
+            => Extension.SimpleFeature(DumpPrintTokenResult);
+
+        IFeatureImplementation ISymbolProvider<Definable, IFeatureImplementation>.Feature(Definable tokenClass)
+            => View.Find(tokenClass);
+
         protected override Size GetSize() => View.CompoundViewSize;
 
-        protected override string GetNodeDump() => base.GetNodeDump() + "(" + View.GetCompoundIdentificationDump()+ ")";
+        protected override string GetNodeDump() => base.GetNodeDump() + "(" + View.GetCompoundIdentificationDump() + ")";
 
         new Result DumpPrintTokenResult(Category category) => View.DumpPrintResultViaObjectPointer(category);
     }
