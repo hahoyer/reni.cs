@@ -27,6 +27,8 @@ namespace Reni.ReniSyntax
         internal override CompileSyntax ToCompiledSyntax => ToContainer;
         [DisableDump]
         internal override CompoundSyntax ToContainer => new CompoundSyntax(Token, Data);
+        [DisableDump]
+        internal override bool IsMutableSyntax => false;
 
         internal override IEnumerable<Syntax> ToList(List type)
         {
