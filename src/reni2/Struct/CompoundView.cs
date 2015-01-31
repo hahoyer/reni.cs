@@ -26,8 +26,6 @@ namespace Reni.Struct
         [Node]
         readonly ValueCache<CompoundType> _typeCache;
         [Node]
-        readonly FunctionCache<int, TypeBase> _accessTypesCache;
-        [Node]
         readonly FunctionCache<int, AccessFeature> _accessFeaturesCache;
         [Node]
         readonly FunctionCache<int, FieldAccessType> _fieldAccessTypeCache;
@@ -44,7 +42,6 @@ namespace Reni.Struct
             Compound = compound;
             ViewPosition = viewPosition;
             _typeCache = new ValueCache<CompoundType>(() => new CompoundType(this));
-            _accessTypesCache = new FunctionCache<int, TypeBase>(AccessType);
             _accessFeaturesCache = new FunctionCache<int, AccessFeature>(position => new AccessFeature(this, position));
             StopByObjectId(-313);
         }
