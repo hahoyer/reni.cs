@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
-using hw.Helper;
 using System.Linq;
 using hw.Debug;
 using Reni.Basics;
-using Reni.Code;
 using Reni.Context;
 using Reni.ReniSyntax;
 using Reni.Struct;
@@ -31,14 +29,44 @@ namespace Reni.Feature
             StopByObjectId(-37);
         }
 
+        internal Result ExecuteForDebug(Category category, ResultCache left, ContextBase context, CompileSyntax right, CompileSyntax leftSyntax)
+        {
+            var trace = ObjectId == -124 && category.HasCode;
+            if(!trace)
+                return Execute(category, left, context, right);
+
+            StartMethodDump(trace, category, left & category, context, right, leftSyntax);
+            try
+            {
+                var r = Result(category.Typed, right == null ? null : context.ResultCache(right));
+                Dump("r", r);
+                BreakExecution();
+
+                var rr = r
+                    .ReplaceAbsolute(ConverterPath.Destination.CheckedReference, ConverterPath.Execute)
+                    ;
+                Dump("rr", rr);
+                BreakExecution();
+
+                var rrr = rr.ReplaceArg(left);
+                Dump("rrr", rrr);
+                BreakExecution();
+
+                return ReturnMethodDump(Execute(category, left, context, right), false);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
+        }
+
         internal Result Execute(Category category, ResultCache left, ContextBase context, CompileSyntax right)
         {
             var metaFeature = Feature.Meta;
             if(metaFeature != null)
                 return metaFeature.Result(category, left, context, right);
 
-            var re = right == null ? null : context.ResultCache(right);
-            return Result(category, left, re);
+            return Result(category, left, right == null ? null : context.ResultCache(right));
         }
 
         Result Result(Category category, ResultCache left, ResultCache right)

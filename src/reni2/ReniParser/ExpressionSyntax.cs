@@ -68,7 +68,7 @@ namespace Reni.ReniParser
                     return UndefinedSymbolIssue.Type(Token, typeForSearch).IssueResult(category);
 
                 case 1:
-                    return searchResults[0].Execute(category, left, context, Right);
+                    return searchResults[0].ExecuteForDebug(category, left, context, Right, Left);
 
                 default:
                     return AmbiguousSymbolIssue.Type(Token, context.RootContext).IssueResult(category);
