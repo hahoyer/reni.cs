@@ -28,7 +28,8 @@ namespace Reni.ReniParser
                         "to_number_of_base"
                     );
 
-                x += PrioTable.Left("<<", "<<:=");
+                x += PrioTable.Left(ArrayAccess.Id);
+                x += PrioTable.Left(ConcatArrays.Id, ConcatArrays.MutableId);
 
                 x += PrioTable.Left("~");
                 x += PrioTable.Left("&");
@@ -112,8 +113,11 @@ namespace Reni.ReniParser
             {
                 return new FunctionCache<string, TokenClass>
                 {
+                    {ArrayAccess.Id, new ArrayAccess()},
                     {AlignToken.Id, new AlignToken()},
                     {ArgToken.Id, new ArgToken()},
+                    {ConcatArrays.Id, new ConcatArrays(isMutable:false)},
+                    {ConcatArrays.MutableId, new ConcatArrays(isMutable:true)},
                     {ReassignToken.Id, new ReassignToken()},
                     {EnableReassignToken.Id, new EnableReassignToken()},
                     {Minus.Id, new Minus()},
@@ -136,8 +140,6 @@ namespace Reni.ReniParser
                     {"<", new CompareOperation()},
                     {"<=", new CompareOperation()},
                     {"<>", new CompareOperation()},
-                    {"<<", new ConcatArrays(isMutable:false)},
-                    { "<<:=", new ConcatArrays(isMutable:true)},
                     {"!", new Exclamation(_declarationSyntaxSubParser)},
                     {"+", new Plus()},
                     {"/", new Slash()},

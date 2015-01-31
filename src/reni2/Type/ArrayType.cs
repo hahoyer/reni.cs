@@ -16,14 +16,9 @@ namespace Reni.Type
             , ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>
             , ISymbolProviderForPointer<ConcatArrays, IFeatureImplementation>
             , ISymbolProviderForPointer<TextItem, IFeatureImplementation>
+            , ISymbolProviderForPointer<TokenClasses.ArrayAccess, IFeatureImplementation>
             , IRepeaterType
-            , IFunctionFeature
-            , IFeatureImplementation
     {
-        internal readonly TypeBase ElementType;
-        internal readonly int Count;
-        readonly bool _isMutable;
-
         readonly ValueCache<RepeaterAccessType> _arrayAccessTypeCache;
         readonly ValueCache<EnableArrayOverSizeType> _enableArrayOverSizeTypeCache;
         readonly ValueCache<NumberType> _numberCache;
@@ -33,7 +28,7 @@ namespace Reni.Type
         {
             ElementType = elementType;
             Count = count;
-            _isMutable = isMutable;
+            IsMutable = isMutable;
             Tracer.Assert(count > 0);
             Tracer.Assert(elementType.CheckedReference == null);
             Tracer.Assert(!elementType.Hllw);
@@ -43,9 +38,13 @@ namespace Reni.Type
             _textItemCache = new ValueCache<TextItemType>(() => new TextItemType(this));
         }
 
+        internal TypeBase ElementType { get; }
+        int Count { get; }
+        bool IsMutable { get; }
+
         TypeBase IRepeaterType.ElementType => ElementType;
         Size IRepeaterType.IndexSize => IndexSize;
-        bool IRepeaterType.IsMutable => _isMutable;
+        bool IRepeaterType.IsMutable => IsMutable;
 
         [DisableDump]
         public NumberType Number => _numberCache.Value;
@@ -54,20 +53,12 @@ namespace Reni.Type
         internal TextItemType TextItemType => _textItemCache.Value;
 
         [DisableDump]
-        internal EnableArrayOverSizeType EnableArrayOverSizeType => _enableArrayOverSizeTypeCache.Value;
+        EnableArrayOverSizeType EnableArrayOverSizeType => _enableArrayOverSizeTypeCache.Value;
 
         [DisableDump]
         internal override bool Hllw => Count == 0 || ElementType.Hllw;
 
-        [DisableDump]
-        public TypeBase ArrayElementType => ElementType;
-
         internal override string DumpPrintText => "(" + ElementType.DumpPrintText + ")*" + Count;
-
-        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
-        IMetaFunctionFeature IFeatureImplementation.Meta => null;
-        IFunctionFeature IFeatureImplementation.Function => this;
-        ISimpleFeature IFeatureImplementation.Simple => null;
 
         IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>.Feature
             (DumpPrintToken tokenClass)
@@ -84,6 +75,10 @@ namespace Reni.Type
         IFeatureImplementation ISymbolProviderForPointer<TextItem, IFeatureImplementation>.Feature(TextItem tokenClass)
             => Extension.SimpleFeature(TextItemResult);
 
+        IFeatureImplementation ISymbolProviderForPointer<TokenClasses.ArrayAccess, IFeatureImplementation>.Feature
+            (TokenClasses.ArrayAccess tokenClass)
+            => Extension.FunctionFeature(ElementAccessResult);
+
         internal override int? SmartArrayLength(TypeBase elementType)
             => ElementType.IsConvertable(elementType) ? Count : base.SmartArrayLength(elementType);
 
@@ -91,7 +86,7 @@ namespace Reni.Type
         internal override Result Destructor(Category category) => ElementType.ArrayDestructor(category, Count);
         internal override Result Copier(Category category) => ElementType.ArrayCopier(category, Count);
 
-        internal Result TextItemResult(Category category) => ResultFromPointer(category, TextItemType);
+        Result TextItemResult(Category category) => ResultFromPointer(category, TextItemType);
 
         internal override Result ConstructorResult(Category category, TypeBase argsType) => Result
             (
@@ -145,23 +140,13 @@ namespace Reni.Type
         internal override Root RootContext => ElementType.RootContext;
 
         [DisableDump]
-        IContextReference ObjectReference => ForcedReference;
-
-        [DisableDump]
-        internal TypeBase IndexType => RootContext.BitType.Number(IndexSize.ToInt());
+        TypeBase IndexType => RootContext.BitType.Number(IndexSize.ToInt());
 
         Size IndexSize => Size.AutoSize(Count).Align(Root.DefaultRefAlignParam.AlignBits);
 
-        bool IFunctionFeature.IsImplicit => false;
-        IContextReference IFunctionFeature.ObjectReference => ObjectReference;
-
         protected override string GetNodeDump() => ElementType.NodeDump + "*" + Count;
 
-        internal Result ConcatArraysResult
-            (Category category, IContextReference objectReference, TypeBase argsType, bool isMutable)
-            => InternalConcatArrays(category, objectReference, argsType, isMutable);
-
-        internal Result ConcatArraysFromReference
+        Result ConcatArraysResult
             (Category category, IContextReference objectReference, TypeBase argsType, bool isMutable)
             => InternalConcatArrays(category, objectReference, argsType, isMutable);
 
@@ -191,7 +176,7 @@ namespace Reni.Type
             if(!category.HasCode)
                 return result;
 
-            result.Code = CodeBase.DumpPrintText("<<" + (_isMutable ? ":=" : "")) + result.Code;
+            result.Code = CodeBase.DumpPrintText("<<" + (IsMutable ? ":=" : "")) + result.Code;
             return result;
         }
 
@@ -207,32 +192,9 @@ namespace Reni.Type
                 );
         }
 
-
-        CodeBase CreateDumpPrintCode()
+        Result ElementAccessResult(Category category, IContextReference objectReference, TypeBase argsType)
         {
-            var elementReference = ElementType.Pointer;
-            var argCode = ReferenceResult(Category.Code).Code;
-            var elementDumpPrint = elementReference.GenericDumpPrintResult(Category.Code).Code;
-            var code = CodeBase.DumpPrintText("<<" + (_isMutable ? ":=" : "") + "(");
-            for(var i = 0; i < Count; i++)
-            {
-                if(i > 0)
-                    code = code + CodeBase.DumpPrintText(", ");
-                var elemCode = elementDumpPrint
-                    .ReplaceAbsolute
-                    (
-                        elementReference.CheckedReference,
-                        () => argCode.ReferencePlus(ElementType.Size * i)
-                    );
-                code = code + elemCode;
-            }
-            return code + CodeBase.DumpPrintText(")");
-        }
-
-        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType) => ApplyResult(category, argsType);
-        Result ApplyResult(Category category, TypeBase argsType)
-        {
-            var objectResult = ReferenceResult(category);
+            var objectResult = Pointer.Result(category,objectReference);
 
             var argsResult = argsType
                 .Conversion(category.Typed, IndexType)
