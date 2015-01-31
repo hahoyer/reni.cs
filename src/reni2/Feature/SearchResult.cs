@@ -78,13 +78,13 @@ namespace Reni.Feature
             .ReplaceAbsolute(ConverterPath.Destination.CheckedReference, ConverterPath.Execute)
             .ReplaceArg(left);
 
-        Result Result(Category category, ResultCache right)
+        Result Result(Category category, ResultCache rightArg)
         {
             var simpleFeature = Feature.SimpleFeature();
-            if(simpleFeature != null && right == null)
+            if(simpleFeature != null && rightArg == null)
                 return simpleFeature.Result(category);
 
-            right = right ?? RootContext.VoidType.Result(Category.All);
+            var right = rightArg ?? RootContext.VoidType.Result(Category.All);
 
             return Feature
                 .Function
