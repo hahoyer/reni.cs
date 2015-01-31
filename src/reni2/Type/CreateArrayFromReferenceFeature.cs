@@ -11,6 +11,6 @@ namespace Reni.Type
         [EnableDump]
         readonly TypeBase _type;
         public CreateArrayFromReferenceFeature(TypeBase type) { _type = type; }
-        Result Result(Category category) { return _type.CreateArray(category, false); }
+        Result Result(Category category) => _type.CreateArray(category);
     }
 }

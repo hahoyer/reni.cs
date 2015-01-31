@@ -9,9 +9,6 @@ namespace Reni.TokenClasses
     sealed class EnableCut : Definable
     {
         [DisableDump]
-        internal override IEnumerable<IGenericProviderForDefinable> Genericize
-        {
-            get { return this.GenericListFromDefinable(base.Genericize); }
-        }
+        internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
     }
 }

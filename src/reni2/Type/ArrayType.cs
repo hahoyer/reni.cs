@@ -17,18 +17,55 @@ namespace Reni.Type
             , ISymbolProviderForPointer<ConcatArrays, IFeatureImplementation>
             , ISymbolProviderForPointer<TextItem, IFeatureImplementation>
             , ISymbolProviderForPointer<TokenClasses.ArrayAccess, IFeatureImplementation>
+            , ISymbolProviderForPointer<EnableArrayOverSize, IFeatureImplementation>
             , IRepeaterType
     {
+        sealed internal class Options : DumpableObject
+        {
+            public static readonly Options None = new Options(false, false, false);
+
+            Options(bool isMutable, bool isTextItem, bool isOversizeable)
+            {
+                IsMutable = isMutable;
+                IsTextItem = isTextItem;
+                IsOversizeable = isOversizeable;
+                Mutable = isMutable ? this :  new Options(true, isTextItem, isOversizeable);
+            }
+
+            public bool IsMutable { get; }
+            public bool IsTextItem { get; }
+            public bool IsOversizeable { get; }
+            public Options Mutable;
+
+            IEnumerable<string> Tags
+            {
+                get
+                {
+                    if (IsMutable)
+                        yield return EnableReassignToken.Id;
+                    if (IsTextItem)
+                        yield return TextItem.Id;
+                    if (IsOversizeable)
+                        yield return EnableArrayOverSize.Id;
+                }
+            }
+
+            public string DumpPrintText => Tags.Stringify(" ");
+            public static Options Instance(bool isMutable) => isMutable ? None.Mutable : None;
+
+        }
+
+
         readonly ValueCache<RepeaterAccessType> _arrayAccessTypeCache;
         readonly ValueCache<EnableArrayOverSizeType> _enableArrayOverSizeTypeCache;
         readonly ValueCache<NumberType> _numberCache;
         readonly ValueCache<TextItemType> _textItemCache;
 
-        public ArrayType(TypeBase elementType, int count, bool isMutable)
+        public ArrayType(TypeBase elementType, int count, Options options)
         {
             ElementType = elementType;
             Count = count;
-            IsMutable = isMutable;
+            this.options = options;
             Tracer.Assert(count > 0);
             Tracer.Assert(elementType.CheckedReference == null);
             Tracer.Assert(!elementType.Hllw);
@@ -40,11 +77,11 @@ namespace Reni.Type
 
         internal TypeBase ElementType { get; }
         int Count { get; }
-        bool IsMutable { get; }
+        Options options { get; }
 
         TypeBase IRepeaterType.ElementType => ElementType;
         Size IRepeaterType.IndexSize => IndexSize;
-        bool IRepeaterType.IsMutable => IsMutable;
+        bool IRepeaterType.IsMutable => options.IsMutable;
 
         [DisableDump]
         public NumberType Number => _numberCache.Value;
@@ -60,6 +97,10 @@ namespace Reni.Type
 
         internal override string DumpPrintText => "(" + ElementType.DumpPrintText + ")*" + Count;
 
+        IFeatureImplementation ISymbolProviderForPointer<EnableArrayOverSize, IFeatureImplementation>.Feature
+            (EnableArrayOverSize tokenClass)
+            => Extension.SimpleFeature(EnableArrayOverSizeResult);
+
         IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>.Feature
             (DumpPrintToken tokenClass)
             => Extension.SimpleFeature(DumpPrintTokenResult);
@@ -69,7 +110,7 @@ namespace Reni.Type
                 Extension.FunctionFeature
                     (
                         (category, objectReference, argsType) =>
-                            ConcatArraysResult(category, objectReference, argsType, tokenClass.IsMutable),
+                            ConcatArraysResult(category, objectReference, argsType, Options.Instance(isMutable:tokenClass.IsMutable)),
                         this);
 
         IFeatureImplementation ISymbolProviderForPointer<TextItem, IFeatureImplementation>.Feature(TextItem tokenClass)
@@ -147,11 +188,11 @@ namespace Reni.Type
         protected override string GetNodeDump() => ElementType.NodeDump + "*" + Count;
 
         Result ConcatArraysResult
-            (Category category, IContextReference objectReference, TypeBase argsType, bool isMutable)
-            => InternalConcatArrays(category, objectReference, argsType, isMutable);
+            (Category category, IContextReference objectReference, TypeBase argsType, Options options)
+            => InternalConcatArrays(category, objectReference, argsType, options);
 
         internal Result InternalConcatArrays
-            (Category category, IContextReference objectReference, TypeBase argsType, bool isMutable)
+            (Category category, IContextReference objectReference, TypeBase argsType, Options options)
         {
             var oldElementsResult = Pointer
                 .Result(category.Typed, objectReference).DereferenceResult;
@@ -161,11 +202,11 @@ namespace Reni.Type
             var newElementsResultRaw
                 = isElementArg
                     ? argsType.Conversion(category.Typed, ElementAccessType)
-                    : argsType.Conversion(category.Typed, ElementType.Array(newCount, isMutable));
+                    : argsType.Conversion(category.Typed, ElementType.Array(newCount, this.options));
 
             var newElementsResult = newElementsResultRaw.DereferencedAlignedResult();
             var result = ElementType
-                .Array(Count + newCount, isMutable)
+                .Array(Count + newCount, options)
                 .Result(category, newElementsResult + oldElementsResult);
             return result;
         }
@@ -176,7 +217,7 @@ namespace Reni.Type
             if(!category.HasCode)
                 return result;
 
-            result.Code = CodeBase.DumpPrintText("<<" + (IsMutable ? ":=" : "")) + result.Code;
+            result.Code = CodeBase.DumpPrintText("<<" + (options.IsMutable? ":=" :"")) + result.Code;
             return result;
         }
 
@@ -194,7 +235,7 @@ namespace Reni.Type
 
         Result ElementAccessResult(Category category, IContextReference objectReference, TypeBase argsType)
         {
-            var objectResult = Pointer.Result(category,objectReference);
+            var objectResult = Pointer.Result(category, objectReference);
 
             var argsResult = argsType
                 .Conversion(category.Typed, IndexType)
@@ -207,15 +248,10 @@ namespace Reni.Type
             return result;
         }
 
-        internal Result EnableArrayOverSizeResult(Category category)
+        Result EnableArrayOverSizeResult(Category category)
         {
-            return EnableArrayOverSizeType
-                .Result
-                (
-                    category,
-                    () => SmartPointer.ArgCode.DePointer(Size),
-                    CodeArgs.Arg
-                );
+            NotImplementedMethod(category);
+            return null;
         }
     }
 }

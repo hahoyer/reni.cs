@@ -16,6 +16,7 @@ namespace Reni.Type
             , ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>
             , ISymbolProviderForPointer<ToNumberOfBase, IFeatureImplementation>
             , ISymbolProviderForPointer<ConcatArrays, IFeatureImplementation>
+            , ISymbolProviderForPointer<EnableArrayOverSize, IFeatureImplementation>
     {
         public TextItemType(ArrayType parent)
             : base(parent) { StopByObjectId(-10); }
@@ -32,11 +33,14 @@ namespace Reni.Type
         IFeatureImplementation ISymbolProviderForPointer<ToNumberOfBase, IFeatureImplementation>.Feature(ToNumberOfBase tokenClass)
             => Extension.MetaFeature(ToNumberOfBaseResult);
 
+        IFeatureImplementation ISymbolProviderForPointer<EnableArrayOverSize, IFeatureImplementation>.Feature(EnableArrayOverSize tokenClass)
+            => Extension.SimpleFeature(EnableArrayOverSizeResult);
+
         IFeatureImplementation ISymbolProviderForPointer<ConcatArrays, IFeatureImplementation>.Feature(ConcatArrays tokenClass)
             => Extension.FunctionFeature
                 (
                     (category, objectReference, argsType) =>
-                        ConcatArraysResult(category, objectReference, argsType, tokenClass.IsMutable),
+                        ConcatArraysResult(category, objectReference, argsType, ArrayType.Options.Instance(isMutable:tokenClass.IsMutable)),
                     this);
 
         protected override CodeBase DumpPrintCode() => ArgCode.DumpPrintText(SimpleItemSize);
@@ -58,13 +62,13 @@ namespace Reni.Type
 
         internal override int? SmartArrayLength(TypeBase elementType) => Parent.SmartArrayLength(elementType);
 
-        Result ConcatArraysResult(Category category, IContextReference objectReference, TypeBase argsType, bool isMutable)
+        Result ConcatArraysResult(Category category, IContextReference objectReference, TypeBase argsType, ArrayType.Options options)
         {
             var trace = ObjectId == -1 && category.HasCode;
             StartMethodDump(trace, category, objectReference, argsType);
             try
             {
-                var result = Parent.InternalConcatArrays(category.Typed, objectReference, argsType, isMutable);
+                var result = Parent.InternalConcatArrays(category.Typed, objectReference, argsType, options);
                 Dump("result", result);
                 BreakExecution();
 
@@ -75,6 +79,12 @@ namespace Reni.Type
             {
                 EndMethodDump();
             }
+        }
+
+        Result EnableArrayOverSizeResult(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
         }
 
         /* 

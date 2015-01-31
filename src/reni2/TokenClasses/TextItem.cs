@@ -13,5 +13,6 @@ namespace Reni.TokenClasses
         {
             get { return this.GenericListFromDefinable(base.Genericize); }
         }
+        public static string Id = "text_item";
     }
 }

@@ -27,7 +27,7 @@ namespace Reni.Type
             public readonly FunctionCache<int, AlignType> Aligner;
             [Node]
             [SmartNode]
-            public readonly FunctionCache<int, FunctionCache<bool, ArrayType>> Array;
+            public readonly FunctionCache<int, FunctionCache<ArrayType.Options, ArrayType>> Array;
             [Node]
             [SmartNode]
             public readonly FunctionCache<TypeBase, Pair> Pair;
@@ -56,9 +56,18 @@ namespace Reni.Type
                 EnableCut = new ValueCache<EnableCut>(() => new EnableCut(parent));
                 ForcedReference = new ValueCache<IReference>(parent.ForcedReferenceForCache);
                 Pair = new FunctionCache<TypeBase, Pair>(first => new Pair(first, parent));
-                Array = new FunctionCache<int, FunctionCache<bool, ArrayType>>
+                Array = new FunctionCache<int, FunctionCache<ArrayType.Options, ArrayType>>
                     (
-                    count => new FunctionCache<bool, ArrayType>(isMutable => parent.ObtainArray(count, isMutable)));
+                    count
+                        =>
+                        new FunctionCache<ArrayType.Options, ArrayType>
+                            (
+                            options
+                                =>
+                                parent.ArrayForCache(count, options)
+                            )
+                    );
+
                 Aligner = new FunctionCache<int, AlignType>(alignBits => new AlignType(parent, alignBits));
                 FunctionInstanceType = new ValueCache<FunctionInstanceType>(() => new FunctionInstanceType(parent));
                 TypeType = new ValueCache<TypeType>(() => new TypeType(parent));
@@ -78,10 +87,7 @@ namespace Reni.Type
         internal abstract Root RootContext { get; }
 
         protected TypeBase()
-            : base(_nextObjectId++)
-        {
-            _cache = new Cache(this);
-        }
+            : base(_nextObjectId++) { _cache = new Cache(this); }
 
         IContextReference IContextReferenceProvider.ContextReference => ForcedReference;
 
@@ -171,7 +177,7 @@ namespace Reni.Type
 
         Result VoidCodeAndRefs(Category category) => RootContext.VoidType.Result(category & (Category.Code | Category.Exts));
 
-        internal ArrayType Array(int count, bool isMutable) => _cache.Array[count][isMutable];
+        internal ArrayType Array(int count, ArrayType.Options options = null) => _cache.Array[count][options??ArrayType.Options.None];
         protected virtual TypeBase ReversePair(TypeBase first) => first._cache.Pair[this];
         internal virtual TypeBase Pair(TypeBase second) => second.ReversePair(this);
         internal virtual Result Destructor(Category category) => VoidCodeAndRefs(category);
@@ -334,7 +340,8 @@ namespace Reni.Type
             return CheckedReference ?? new PointerType(this);
         }
 
-        protected virtual ArrayType ObtainArray(int count, bool isMutable) => new ArrayType(this, count, isMutable);
+        protected virtual ArrayType ArrayForCache(int count, ArrayType.Options options)
+            => new ArrayType(this, count, options);
 
         [NotNull]
         internal Result GenericDumpPrintResult(Category category)
@@ -343,8 +350,8 @@ namespace Reni.Type
             return searchResults.Single().CallResult(category);
         }
 
-        internal Result CreateArray(Category category, bool isMutable) => Align
-            .Array(1, isMutable).Pointer
+        internal Result CreateArray(Category category, ArrayType.Options options = null) => Align
+            .Array(1, options).Pointer
             .Result(category, PointerArgResult(category));
 
         internal bool IsConvertable(TypeBase destination) => ConversionService.FindPath(this, destination) != null;

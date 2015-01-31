@@ -63,7 +63,8 @@ namespace Reni.Type
         protected override string GetNodeDump() => ValueType.NodeDump + "[Pointer]";
         internal override int? SmartArrayLength(TypeBase elementType) => ValueType.SmartArrayLength(elementType);
         protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
-        protected override ArrayType ObtainArray(int count, bool isMutable) => ValueType.Array(count, isMutable);
+        protected override ArrayType ArrayForCache(int count, ArrayType.Options options)
+            => ValueType.Array(count, options);
 
         internal override IEnumerable<SearchResult> Declarations<TDefinable>(TDefinable tokenClass)
         {
@@ -99,7 +100,7 @@ namespace Reni.Type
             return RootContext
                 .BitType
                 .RawPointer
-                .Result(category, () => ArgCode);
+                .Result(category, ValueType.ReferenceResult);
         }
     }
 }

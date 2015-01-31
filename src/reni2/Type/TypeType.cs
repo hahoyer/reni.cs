@@ -19,7 +19,7 @@ namespace Reni.Type
         public TypeType(TypeBase value)
         {
             Value = value;
-            StopByObjectId(61);
+            StopByObjectId(-61);
         }
 
         [DisableDump]
@@ -63,7 +63,7 @@ namespace Reni.Type
                 .ToInt32();
             var type = Value
                 .Align
-                .Array(count, false)
+                .Array(count, ArrayType.Options.None)
                 .TypeType;
             return type.Result(category);
         }

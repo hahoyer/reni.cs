@@ -18,7 +18,7 @@ namespace Reni.FeatureTest
                 @"
 systemdata:
 { Memory: (0 type * ('100' to_number_of_base 256)) instance()
-. FreePointer: Memory(0) raw_address
+. FreePointer: (Memory >>0) raw_address
 };
 
 repeat: /\ ^ while() then(^ body(), repeat(^));
@@ -29,7 +29,7 @@ system: /!\
 . MaxNumber32: /!\ '7fffffff' to_number_of_base 16 
 . MaxNumber64: /!\ '7fffffffffffffff' to_number_of_base 16 
 
-. TextItemType: /!\ text_item(MaxNumber8) type 
+. TextItemType: /!\ MaxNumber8 text_item type 
 
 . NewMemory: /\ 
     { result: :=! ((^ elementType * MaxNumber32) instance_from_raw_address (systemdata FreePointer)) 
@@ -38,7 +38,7 @@ system: /!\
     . position: :=! length type instance (0) 
     . repeat
         ( while: ^ position < length
-        . body: ^ (result(position) := initializer(position), position := position + 1) 
+        . body: ^ ( result >> position := initializer(position), position := position + 1) 
         )
     . systemdata FreePointer := systemdata FreePointer + (^ elementType size * ^ length)
     } result 
@@ -50,7 +50,7 @@ Text: /\
 . AfterCopy: /\ data:= system NewMemory
     ( elementType: system TextItemType
     . length: _length
-    . initializer: /\ data(^)
+    . initializer: /\ data >> ^
     )
 . AfterCopy()
 . dump_print: /!\ _data dump_print

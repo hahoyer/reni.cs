@@ -58,8 +58,11 @@ namespace Reni.Feature
             if(metaFeature != null)
                 return metaFeature.Result(category, left, context, right);
 
-            return Result(category.Typed, context, right)
-                .ReplaceAbsolute(ConverterPath.Destination.CheckedReference, ConverterPath.Execute)
+
+            var result1 = Result(category.Typed, context, right);
+            var result = result1
+                .ReplaceAbsolute(ConverterPath.Destination.CheckedReference, ConverterPath.Execute);
+            return result
                 .ReplaceArg(left);
         }
 
