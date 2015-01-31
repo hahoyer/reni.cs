@@ -58,7 +58,7 @@ namespace Reni.ReniParser
             var typeForSearch = left.Type;
             var searchResults
                 = typeForSearch
-                    .DeclarationsForTypeAndRelatives(Operator)
+                    .DeclarationsForTypeAndCloseRelatives(Operator)
                     .RemoveLowPriorityResults()
                     .ToArray();
 
