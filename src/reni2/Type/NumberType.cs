@@ -56,7 +56,8 @@ namespace Reni.Type
             yield return Extension.SimpleFeature(category => CutEnabledBitCountConversion(category, destination), EnableCut);
         }
 
-        IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
+        IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>.Feature
+            (DumpPrintToken tokenClass)
             => Extension.SimpleFeature(DumpPrintTokenResult, this);
 
         IFeatureImplementation ISymbolProviderForPointer<Operation, IFeatureImplementation>.Feature(Operation tokenClass)
@@ -86,9 +87,12 @@ namespace Reni.Type
             return Parent
                 .TextItemType
                 .Pointer
-                .Result(category, Parent
-                    .Pointer
-                    .Result(category, ReferenceResult(category.Typed)))
+                .Result
+                (
+                    category,
+                    Parent
+                        .Pointer
+                        .Result(category, ReferenceResult(category.Typed)))
                 ;
         }
 
@@ -99,9 +103,10 @@ namespace Reni.Type
 
         protected override CodeBase DumpPrintCode() => Align.ArgCode.DumpPrintNumber(Align.Size);
 
-        Result EnableCutTokenResult(Category category) => EnableCut
-            .Pointer
-            .Result(category.Typed, Pointer.ArgResult(category));
+        Result EnableCutTokenResult(Category category)
+            => EnableCut
+                .Pointer
+                .Result(category.Typed, ReferenceResult(category));
 
         Result OperationResult(Category category, TypeBase right, IOperation operation)
         {
