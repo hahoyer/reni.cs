@@ -137,7 +137,7 @@ namespace Reni.Struct
                 (
                     category,
                     ViewPosition,
-                    position => DumpPrintResultViaAccessReference(category, position)
+                    DumpPrintResultViaAccessReference
                 );
 
         internal Result AccessViaObjectPointer(Category category, int position)

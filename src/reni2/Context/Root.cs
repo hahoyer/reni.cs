@@ -93,7 +93,7 @@ namespace Reni.Context
             return functionInstance;
         }
 
-        internal Result ConcatPrintResult(Category category, int count, Func<int, Result> elemResults)
+        internal Result ConcatPrintResult(Category category, int count, Func<Category, int, Result> elemResults)
         {
             var result = VoidType.Result(category);
             if(!(category.HasCode || category.HasExts))
@@ -109,7 +109,7 @@ namespace Reni.Context
                 {
                     Dump("i", i);
 
-                    var elemResult = elemResults(i);
+                    var elemResult = elemResults(category, i);
 
                     Dump("elemResult", elemResult);
                     BreakExecution();
