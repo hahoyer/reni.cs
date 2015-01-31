@@ -21,17 +21,12 @@ namespace Reni.TokenClasses
 
         protected override Syntax Prefix(SourcePart token, Syntax right)
         {
-            return new LeftParenthesisPrefixSyntax(_level, token, right);
-        }
-
-        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
-        {
-            return new LeftParenthesisSyntax(left, _level, token, right);
+            return new LeftParenthesisSyntax(_level, token, right);
         }
 
         protected override Syntax Terminal(SourcePart token)
         {
-            return new LeftParenthesisSyntax(null, _level, token, null);
+            return new LeftParenthesisSyntax(_level, token, null);
         }
     }
 }
