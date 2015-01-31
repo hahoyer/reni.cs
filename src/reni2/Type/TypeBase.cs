@@ -424,9 +424,9 @@ namespace Reni.Type
             if(Hllw)
                 yield break;
             if(IsAligningPossible && Align.Size != Size)
-                yield return Reni.Feature.Extension.SimpleFeature(AlignResult);
+                yield return Feature.Extension.SimpleFeature(AlignResult);
             if(!(this is PointerType))
-                yield return Reni.Feature.Extension.SimpleFeature(LocalReferenceResult);
+                yield return Feature.Extension.SimpleFeature(LocalReferenceResult);
         }
 
         internal IEnumerable<ISimpleFeature> GetForcedConversions(TypeBase destination)
@@ -462,7 +462,8 @@ namespace Reni.Type
                 .Result(category, DumpPrintCode, CodeArgs.Arg)
                 .ReplaceArg(ReferenceResult(category).DereferenceResult);
 
-        internal Result ReferenceResult(Category category) => Pointer.Result(category.Typed, ForcedReference);
+        internal Result ReferenceResult(Category category)
+            => Hllw ? Result(category) : Pointer.Result(category.Typed, ForcedReference);
 
         protected virtual CodeBase DumpPrintCode()
         {
