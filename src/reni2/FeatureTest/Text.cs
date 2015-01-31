@@ -16,11 +16,11 @@ namespace Reni.FeatureTest.Text
     [TestFixture]
     [TargetSet(@"
 x: 'Hallo';
-x(0) dump_print;
-x(1) dump_print;
-x(2) dump_print;
-x(3) dump_print;
-x(4) dump_print;
+(x>>0) dump_print;
+(x>>1) dump_print;
+(x>>2) dump_print;
+(x>>3) dump_print;
+(x>>4) dump_print;
 ", "Hallo")]
     [Hallo]
     [ElementAccessVariable]
