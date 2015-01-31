@@ -388,15 +388,18 @@ namespace Reni.Type
         internal IEnumerable<SearchResult> DeclarationsForType(Definable definable)
             => definable.Genericize.SelectMany(g => g.Declarations(this));
 
-        internal IEnumerable<SearchResult> DeclarationsForTypeAndRelatives(Definable tokenClass)
+        internal IEnumerable<SearchResult> DeclarationsForTypeAndCloseRelatives(Definable tokenClass)
         {
-            var result = DeclarationsForType(tokenClass);
+            var result = DeclarationsForType(tokenClass).ToArray();
             if(result.Any())
                 return result;
 
-            return this
-                .RelativeConversions()
-                .SelectMany(path => path.RelativeSearchResults(tokenClass));
+            var closeRelativeConversions = this
+                .CloseRelativeConversions()
+                .ToArray();
+            return closeRelativeConversions
+                .SelectMany(path => path.CloseRelativeSearchResults(tokenClass).ToArray())
+                .ToArray();
         }
 
         internal virtual IEnumerable<SearchResult> Declarations<TDefinable>(TDefinable tokenClass) where TDefinable : Definable

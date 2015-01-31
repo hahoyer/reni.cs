@@ -62,7 +62,7 @@ namespace Reni.Type
         internal TypeBase Destination => Elements.LastOrDefault()?.ResultType() ?? Source;
 
         [DisableDump]
-        internal bool IsRelativeConversion => Elements.Any() && Elements.All(Extension.IsRelative);
+        internal bool IsCloseRelativeConversion => Elements.Any() && Elements.All(Extension.IsCloseRelative);
 
         public static ConversionPath operator +(ConversionPath a, ConversionPath b)
             => new ConversionPath(a.Elements.Concat(b.Elements).ToArray());
@@ -90,7 +90,7 @@ namespace Reni.Type
                 return false;
             return !Elements.Where((element, index) => element != Elements[index]).Any();
         }
-        internal IEnumerable<SearchResult> RelativeSearchResults(Definable definable)
+        internal IEnumerable<SearchResult> CloseRelativeSearchResults(Definable definable)
         {
             var declarationsForType = Destination
                 .DeclarationsForType(definable);
@@ -100,7 +100,13 @@ namespace Reni.Type
 
         internal bool HasHigherPriority(ConversionPath other)
         {
-            if(Elements.Length < other.Elements.Length)
+            if(Destination is PointerType && !(other.Destination is PointerType))
+                return true;
+
+            if (other.Destination is PointerType && !(Destination is PointerType))
+                return false;
+
+            if (Elements.Length < other.Elements.Length)
                 return true;
 
             if(Elements.Length > other.Elements.Length)

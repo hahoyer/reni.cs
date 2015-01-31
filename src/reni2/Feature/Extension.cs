@@ -53,7 +53,7 @@ namespace Reni.Feature
 
         internal static TypeBase ResultType(this ISimpleFeature f) => f.Result(Category.Type).Type;
 
-        internal static bool IsRelative(ISimpleFeature feature) => !(feature is IStepRelative);
+        internal static bool IsCloseRelative(ISimpleFeature feature) => !(feature is IStepRelative);
 
         public static IEnumerable<IGenericProviderForType> GenericListFromType<T>
             (this T target, IEnumerable<IGenericProviderForType> baseList = null)
