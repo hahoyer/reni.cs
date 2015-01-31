@@ -69,7 +69,8 @@ namespace Reni.Type
         IFunctionFeature IFeatureImplementation.Function => this;
         ISimpleFeature IFeatureImplementation.Simple => null;
 
-        IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
+        IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>.Feature
+            (DumpPrintToken tokenClass)
             => Extension.SimpleFeature(DumpPrintTokenResult);
 
         IFeatureImplementation ISymbolProviderForPointer<ConcatArrays, IFeatureImplementation>.Feature(ConcatArrays tokenClass)
@@ -77,7 +78,8 @@ namespace Reni.Type
                 Extension.FunctionFeature
                     (
                         (category, objectReference, argsType) =>
-                            ConcatArraysResult(category, objectReference, argsType, tokenClass.IsMutable), this);
+                            ConcatArraysResult(category, objectReference, argsType, tokenClass.IsMutable),
+                        this);
 
         IFeatureImplementation ISymbolProviderForPointer<TextItem, IFeatureImplementation>.Feature(TextItem tokenClass)
             => Extension.SimpleFeature(TextItemResult);
@@ -183,25 +185,45 @@ namespace Reni.Type
             return result;
         }
 
-        new Result DumpPrintTokenResult(Category category) => VoidType
-            .Result
-            (
-                category,
-                CreateDumpPrintCode,
-                () => ElementType.GenericDumpPrintResult(Category.Exts).Exts
-            );
+        new Result DumpPrintTokenResult(Category category)
+        {
+            var result = RootContext.ConcatPrintResult(category, Count, DumpPrintResult);
+            if(!category.HasCode)
+                return result;
+
+            result.Code = CodeBase.DumpPrintText("<<" + (_isMutable ? ":=" : "")) + result.Code;
+            return result;
+        }
+
+        Result DumpPrintResult(Category category, int position)
+        {
+            return ElementType
+                .SmartPointer
+                .GenericDumpPrintResult(category)
+                .ReplaceAbsolute
+                (
+                    ElementType.Pointer.CheckedReference,
+                    c => ReferenceResult(c).AddToReference(() => ElementType.Size * position)
+                );
+        }
+
 
         CodeBase CreateDumpPrintCode()
         {
             var elementReference = ElementType.Pointer;
-            var argCode = Pointer.ArgCode;
+            var argCode = ReferenceResult(Category.Code).Code;
             var elementDumpPrint = elementReference.GenericDumpPrintResult(Category.Code).Code;
             var code = CodeBase.DumpPrintText("<<" + (_isMutable ? ":=" : "") + "(");
             for(var i = 0; i < Count; i++)
             {
                 if(i > 0)
                     code = code + CodeBase.DumpPrintText(", ");
-                var elemCode = elementDumpPrint.ReplaceArg(elementReference, argCode.ReferencePlus(ElementType.Size * i));
+                var elemCode = elementDumpPrint
+                    .ReplaceAbsolute
+                    (
+                        elementReference.CheckedReference,
+                        () => argCode.ReferencePlus(ElementType.Size * i)
+                    );
                 code = code + elemCode;
             }
             return code + CodeBase.DumpPrintText(")");
