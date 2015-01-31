@@ -63,7 +63,7 @@ namespace Reni.Type
                 .ToInt32();
             var type = Value
                 .Align
-                .Array(count, ArrayType.Options.None)
+                .Array(count)
                 .TypeType;
             return type.Result(category);
         }

@@ -330,7 +330,6 @@
     <Compile Include="Type\ConversionPath.cs" />
     <Compile Include="Type\ConversionService.cs" />
     <Compile Include="Type\DataSetterTargetType.cs" />
-    <Compile Include="Type\EnableArrayOverSizeType.cs" />
     <Compile Include="Type\FeaturePathBridge.cs" />
     <Compile Include="Type\NumberType.cs" />
     <Compile Include="Type\RawPointerType.cs" />
@@ -359,7 +358,6 @@
     <Compile Include="Type\SetterTargetType.cs" />
     <Compile Include="Type\SymmetricClosureService.cs" />
     <Compile Include="Type\TagChild.cs" />
-    <Compile Include="Type\TextItemType.cs" />
     <Compile Include="Type\TypeBase.cs" />
     <Compile Include="Type\TypeType.cs" />
     <Compile Include="Type\VoidType.cs" />

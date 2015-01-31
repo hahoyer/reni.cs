@@ -177,7 +177,7 @@ namespace Reni.Type
 
         Result VoidCodeAndRefs(Category category) => RootContext.VoidType.Result(category & (Category.Code | Category.Exts));
 
-        internal ArrayType Array(int count, ArrayType.Options options = null) => _cache.Array[count][options??ArrayType.Options.None];
+        internal ArrayType Array(int count, ArrayType.Options options = null) => _cache.Array[count][options??ArrayType.Options.Instance()];
         protected virtual TypeBase ReversePair(TypeBase first) => first._cache.Pair[this];
         internal virtual TypeBase Pair(TypeBase second) => second.ReversePair(this);
         internal virtual Result Destructor(Category category) => VoidCodeAndRefs(category);
