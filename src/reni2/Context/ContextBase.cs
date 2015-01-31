@@ -199,20 +199,6 @@ namespace Reni.Context
             return functionalArgDescriptor.Result(category, this, right);
         }
 
-        /// <summary>
-        ///     Obtains the feature result of a functional object.
-        ///     Actual arguments, if provided, as well as object reference are replaced.
-        /// </summary>
-        /// <param name="category"> the categories in result </param>
-        /// <param name="left"> the expression left to the feature access, if provided </param>
-        /// <param name="right"> the expression right to the feature access, if provided </param>
-        /// <returns> </returns>
-        internal Result FunctionalObjectResult(Category category, [NotNull] CompileSyntax left, CompileSyntax right)
-        {
-            var functionalObjectDescriptor = new FunctionalObjectDescriptor(this, left);
-            return functionalObjectDescriptor.Result(category, this, left, right);
-        }
-
         ContextCallDescriptor Declarations(Definable tokenClass)
         {
             var genericize = tokenClass.Genericize.ToArray();
