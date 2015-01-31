@@ -14,9 +14,11 @@ namespace Reni.Feature
     {
         IFeatureImplementation Feature { get; }
         ConversionPath ConverterPath { get; }
+        Root RootContext { get; }
 
         internal SearchResult(SearchResult result, ConversionPath relativeConversion)
         {
+            RootContext = result.RootContext;
             Feature = result.Feature;
             ConverterPath = result.ConverterPath + relativeConversion;
             StopByObjectId(-37);
@@ -25,11 +27,13 @@ namespace Reni.Feature
         internal SearchResult(IFeatureImplementation feature, TypeBase definingItem)
         {
             Feature = feature;
+            RootContext = definingItem.RootContext;
             ConverterPath = new ConversionPath(definingItem);
             StopByObjectId(-37);
         }
 
-        internal Result ExecuteForDebug(Category category, ResultCache left, ContextBase context, CompileSyntax right, CompileSyntax leftSyntax)
+        internal Result ExecuteForDebug
+            (Category category, ResultCache left, ContextBase context, CompileSyntax right, CompileSyntax leftSyntax)
         {
             var trace = ObjectId == -124 && category.HasCode;
             if(!trace)
@@ -66,30 +70,28 @@ namespace Reni.Feature
             if(metaFeature != null)
                 return metaFeature.Result(category, left, context, right);
 
-            return Result(category, left, right == null ? null : new ResultCache(c=> context.ResultAsReference(c, right)));
+            return Result(category, left, right == null ? null : new ResultCache(c => context.ResultAsReference(c, right)));
         }
 
-        Result Result(Category category, ResultCache left, ResultCache right)
+        Result Result(Category category, ResultCache left, ResultCache right) 
             => Result(category.Typed, right)
-                .ReplaceAbsolute(ConverterPath.Destination.CheckedReference, ConverterPath.Execute)
-                .ReplaceArg(left);
+            .ReplaceAbsolute(ConverterPath.Destination.CheckedReference, ConverterPath.Execute)
+            .ReplaceArg(left);
 
         Result Result(Category category, ResultCache right)
         {
             var simpleFeature = Feature.SimpleFeature();
             if(simpleFeature != null && right == null)
-            {
-                var simpleResult = simpleFeature.Result(category);
-                return (simpleResult);
-            }
+                return simpleFeature.Result(category);
 
-            right = right ?? ConverterPath.Destination.RootContext.VoidType.Result(Category.All);
+            right = right ?? RootContext.VoidType.Result(Category.All);
 
             return Feature
                 .Function
                 .ApplyResult(category, right.Type)
                 .ReplaceArg(right);
         }
+
 
         internal Result CallResult(Category category) => Result(category, null);
 
