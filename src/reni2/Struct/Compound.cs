@@ -7,7 +7,6 @@ using hw.Forms;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
-using Reni.Feature;
 using Reni.Type;
 
 
@@ -58,17 +57,17 @@ namespace Reni.Struct
         internal bool Hllw(int accessPosition) => ObtainHllw(accessPosition);
 
         internal Result ContextViaObjectPointer(int position, Result result)
-            => result.ReplaceAbsolute(this, () => ContextReferenceViaStructReferenceCode(position), CodeArgs.Arg);
+            => result.ReplaceAbsolute(this, () => ContextViaObjectPointerCode(position), CodeArgs.Arg);
 
         internal Size SizeUntil(int position) => ResultsOfStatements(Category.Size, 0, position).Size;
 
-        CodeBase ContextReferenceViaStructReferenceCode(int accessPosition) 
+        CodeBase ContextViaObjectPointerCode(int accessPosition)
             => Parent
-            .CompoundView(Syntax, accessPosition)
-            .Type
-            .SmartPointer
-            .ArgCode
-            .ReferencePlus(SizeUntil(accessPosition));
+                .CompoundView(Syntax, accessPosition)
+                .Type
+                .SmartPointer
+                .ArgCode
+                .ReferencePlus(SizeUntil(accessPosition));
 
         internal Size FieldOffsetFromAccessPoint(int accessPosition, int fieldPosition)
             => ResultsOfStatements(Category.Size, fieldPosition + 1, accessPosition).Size;
@@ -77,7 +76,7 @@ namespace Reni.Struct
         {
             if(category.IsNone)
                 return new Result();
-            var trace = ObjectId == -10 && category.HasCode;
+            var trace = Syntax.ObjectId == -10 && category.HasCode;
             StartMethodDump(trace, category, fromPosition, fromNotPosition);
             try
             {
@@ -85,7 +84,7 @@ namespace Reni.Struct
                 BreakExecution();
 
                 var statements = (fromNotPosition - fromPosition)
-                    .Select(i => fromPosition + i)              
+                    .Select(i => fromPosition + i)
                     .Where(position => !Syntax.Statements[position].IsLambda)
                     .Select(position => AccessResult(category, position))
                     .Select(r => r.Align)
@@ -110,11 +109,18 @@ namespace Reni.Struct
         internal Result Result(Category category)
         {
             var resultsOfStatements = ResultsOfStatements(category - Category.Type, 0, Syntax.EndPosition);
-            var result = resultsOfStatements.ReplaceRelative(this, CodeBase.TopRef, CodeArgs.Void);
+            var result = Syntax
+                .EndPosition
+                .Select()
+                .Aggregate(resultsOfStatements, Combine)
+                .ReplaceRelative(this, CodeBase.TopRef, CodeArgs.Void)
+                ;
             if(category.HasType)
                 result.Type = ToCompoundView.Type;
             return result;
         }
+
+        Result Combine(Result result, int position) => Parent.CompoundView(Syntax, position).ReplaceObjectPointerByContext(result);
 
         Result AccessResult(Category category, int position)
         {
@@ -124,7 +130,7 @@ namespace Reni.Struct
 
         Result AccessResult(Category category, int accessPosition, int position)
         {
-            var trace = ObjectId.In(-10) && accessPosition == 0 && position == 0 && category.HasCode;
+            var trace = Syntax.ObjectId.In(-10) && accessPosition >= 0 && position >= 0 && category.HasCode;
             StartMethodDump(trace, category, accessPosition, position);
             try
             {

@@ -153,9 +153,18 @@ namespace Reni.Struct
                 .Result(category, Type.SmartPointer.ArgResult(category));
         }
 
+        internal Result AccessAsLeftReference(Category category, int position)
+            => AccessType(position).Result(category, Type.ReferenceResult);
+
         internal Result AccessViaContext(Category category, int position)
             => AccessViaObjectPointer(category, position)
                 .ReplaceArg(ObjectPointerViaContext);
+
+        internal Result ReplaceObjectPointerByContext(Result target)
+        {
+            var reference = Type.SmartPointer.CheckedReference;
+            return target.ReplaceAbsolute(reference, ObjectPointerViaContext);
+        }
 
 
         internal FunctionType Function(FunctionSyntax body, TypeBase argsType) => Compound
