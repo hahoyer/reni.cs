@@ -66,7 +66,7 @@ namespace Reni.Feature
             if(metaFeature != null)
                 return metaFeature.Result(category, left, context, right);
 
-            return Result(category, left, right == null ? null : context.ResultCache(right));
+            return Result(category, left, right == null ? null : new ResultCache(c=> context.ResultAsReference(c, right)));
         }
 
         Result Result(Category category, ResultCache left, ResultCache right)
