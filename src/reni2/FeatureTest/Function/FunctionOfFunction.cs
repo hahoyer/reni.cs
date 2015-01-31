@@ -14,6 +14,6 @@ namespace Reni.FeatureTest.Function
 
     [TestFixture]
     [FunctionOfFunction]
-    [TargetSet(@"f: /\ ^ + 2; g: ^(10); g(f)dump_print", "12")]
+    [TargetSet(@"f: /\ ^ + 2; g: /\ ^(10); g(f)dump_print", "12")]
     public sealed class FunctionArgument : CompilerTest { }
 }

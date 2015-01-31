@@ -87,7 +87,6 @@
     <Compile Include="FeatureTest\TypeType\TypeOperatorWithVariable.cs" />
     <Compile Include="FeatureTest\Validation\SyntaxError.cs" />
     <Compile Include="FeatureTest\Validation\UndefinedContextSymbol.cs" />
-    <Compile Include="Feature\CallDescriptor.cs" />
     <Compile Include="Feature\Extension.cs" />
     <Compile Include="Feature\Function.cs" />
     <Compile Include="Feature\SearchResult.cs" />
