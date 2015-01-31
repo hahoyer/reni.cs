@@ -75,6 +75,7 @@ Text: /\
     [DefaultInitialized]
     [FunctionVariable]
     [Repeater]
+    [FunctionArgument]
     public sealed class Text1 : TextStruct
     {}
 

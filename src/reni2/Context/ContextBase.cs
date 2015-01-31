@@ -36,7 +36,7 @@ namespace Reni.Context
         protected ContextBase()
             : base(_nextId++) { _cache = new Cache(this); }
 
-        abstract public string GetContextIdentificationDump();
+        public abstract string GetContextIdentificationDump();
 
         string IIconKeyProvider.IconKey => "Context";
 
@@ -59,7 +59,7 @@ namespace Reni.Context
             => _cache.CompoundContexts[container][position];
 
         internal CompoundView CompoundView(CompoundSyntax syntax, int? accessPosition = null)
-            => _cache.CompoundViews[syntax][accessPosition??syntax.EndPosition];
+            => _cache.CompoundViews[syntax][accessPosition ?? syntax.EndPosition];
 
         internal Compound Compound(CompoundSyntax context) => _cache.Compounds[context];
 
@@ -195,11 +195,12 @@ namespace Reni.Context
         /// <returns> </returns>
         internal Result FunctionalArgResult(Category category, CompileSyntax right)
         {
-            var functionalArgDescriptor = new FunctionalArgDescriptor(this);
-            return functionalArgDescriptor.Result(category, this, right);
+            var argsType = FindRecentFunctionContextObject.ArgsType;
+            var functionalArgDescriptor = new ContextSearchResult(argsType.CheckedFeature, RootContext);
+            return functionalArgDescriptor.Execute(category, argsType.FindRecentCompoundView.ObjectPointerViaContext, this, right);
         }
 
-        ContextCallDescriptor Declarations(Definable tokenClass)
+        ContextSearchResult Declarations(Definable tokenClass)
         {
             var genericize = tokenClass.Genericize.ToArray();
             var results = genericize.SelectMany(g => g.Declarations(this));
@@ -216,20 +217,19 @@ namespace Reni.Context
             if(searchResult == null)
                 return UndefinedSymbolIssue.Type(position, RootContext).IssueResult(category);
 
-            var result = searchResult.Result(category, this, right, GetObjectResult);
+            var result = searchResult.Execute(category, FindRecentCompoundView.ObjectPointerViaContext, this, right);
             Tracer.Assert(category <= result.CompleteCategory);
             return result;
         }
 
-        internal virtual IEnumerable<ContextCallDescriptor> Declarations<TDefinable>(TDefinable tokenClass)
+        internal virtual IEnumerable<ContextSearchResult> Declarations<TDefinable>(TDefinable tokenClass)
             where TDefinable : Definable
         {
             var provider = this as ISymbolProviderForPointer<TDefinable, IFeatureImplementation>;
             var feature = provider?.Feature(tokenClass);
             if(feature != null)
-                yield return new ContextCallDescriptor(this, feature);
+                yield return new 
+                    ContextSearchResult(feature, RootContext);
         }
-
-        internal Result GetObjectResult(Category category) => FindRecentCompoundView.ObjectPointerViaContext(category);
     }
 }

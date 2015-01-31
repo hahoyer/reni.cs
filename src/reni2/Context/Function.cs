@@ -4,6 +4,7 @@ using System.Linq;
 using hw.Forms;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Struct;
 using Reni.Type;
 
 namespace Reni.Context
@@ -33,6 +34,8 @@ namespace Reni.Context
 
         internal override IFunctionContext ObtainRecentFunctionContext() => this;
 
+        TypeBase IFunctionContext.ArgsType => ArgsType;
+
         Result IFunctionContext.CreateArgReferenceResult(Category category)
         {
             return ArgsType
@@ -56,5 +59,6 @@ namespace Reni.Context
     {
         Result CreateArgReferenceResult(Category category);
         Result CreateValueReferenceResult(Category category);
+        TypeBase ArgsType { get; }
     }
 }

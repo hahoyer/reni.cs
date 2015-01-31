@@ -34,7 +34,7 @@ namespace Reni.Context
         protected abstract string ChildDumpPrintText { get; }
         internal override CompoundView ObtainRecentCompoundView() { return Parent.ObtainRecentCompoundView(); }
         internal override IFunctionContext ObtainRecentFunctionContext() { return Parent.ObtainRecentFunctionContext(); }
-        internal override IEnumerable<ContextCallDescriptor> Declarations<TDefinable>(TDefinable tokenClass)
+        internal override IEnumerable<ContextSearchResult> Declarations<TDefinable>(TDefinable tokenClass)
         {
             var result = base.Declarations(tokenClass).ToArray();
             return result.Any() ? result : Parent.Declarations(tokenClass);

@@ -165,7 +165,7 @@ namespace Reni.Feature
     interface IGenericProviderForDefinable
     {
         IEnumerable<SearchResult> Declarations(TypeBase source);
-        IEnumerable<ContextCallDescriptor> Declarations(ContextBase source);
+        IEnumerable<ContextSearchResult> Declarations(ContextBase source);
     }
 
     sealed class GenericProviderForType<T> : DumpableObject, IGenericProviderForType
@@ -184,7 +184,7 @@ namespace Reni.Feature
         public GenericProviderForDefinable(T target) { _target = target; }
 
         IEnumerable<SearchResult> IGenericProviderForDefinable.Declarations(TypeBase source) => source.Declarations(_target);
-        IEnumerable<ContextCallDescriptor> IGenericProviderForDefinable.Declarations(ContextBase source)
+        IEnumerable<ContextSearchResult> IGenericProviderForDefinable.Declarations(ContextBase source)
             => source.Declarations(_target);
     }
 

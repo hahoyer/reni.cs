@@ -1,113 +1,40 @@
 using System;
 using System.Collections.Generic;
-using hw.Helper;
 using System.Linq;
 using hw.Debug;
 using Reni.Basics;
-using Reni.Code;
 using Reni.Context;
 using Reni.ReniSyntax;
-using Reni.Struct;
-using Reni.Type;
 
 namespace Reni.Feature
 {
-    sealed class CallDescriptor : FeatureDescriptor
+    abstract class FeatureContainer : DumpableObject
     {
-        public CallDescriptor(IFeatureImplementation feature, ConversionPath converterPath)
+        protected FeatureContainer(IFeatureImplementation feature, Root rootContext)
         {
-            ConverterPath = converterPath;
+            RootContext = rootContext;
             Feature = feature;
         }
 
-        ConversionPath ConverterPath { get; }
-        [DisableDump]
-        protected override TypeBase Type => ConverterPath.Destination;
-        protected override IContextReference ObjectReference => ConverterPath.Destination.CheckedReference.AssertNotNull();
-        [DisableDump]
-        protected override IFeatureImplementation Feature { get; }
-        protected override Result ConverterResult(Category category) => ConverterPath.Execute(category);
-    }
+        protected Root RootContext { get; }
+        protected IFeatureImplementation Feature { get; }
 
-    sealed class FunctionalObjectDescriptor : FeatureDescriptor
-    {
-        readonly ContextBase _context;
-        readonly CompileSyntax _left;
-        internal FunctionalObjectDescriptor(ContextBase context, CompileSyntax left)
+        protected Result Result(Category category, ContextBase context, CompileSyntax right)
         {
-            _context = context;
-            _left = left;
-        }
-        protected override TypeBase Type => _context.Type(_left);
-        protected override IContextReference ObjectReference
-        {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
-        }
-        protected override IFeatureImplementation Feature => Type.CheckedFeature;
-        protected override Result ConverterResult(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
+            var simpleFeature = Feature.SimpleFeature();
+            if(simpleFeature != null && right == null)
+                return simpleFeature.Result(category);
+
+            var rightResult = new ResultCache(c=> right == null 
+                ? RootContext.VoidType.Result(c)
+                : context.ResultAsReference(c,right));
+
+            return Feature
+                .Function
+                .ApplyResult(category, rightResult.Type)
+                .ReplaceArg(rightResult);
         }
     }
 
-    sealed class FunctionalArgDescriptor : FeatureDescriptor
-    {
-        readonly ContextBase _context;
-        internal FunctionalArgDescriptor(ContextBase context) { _context = context; }
 
-        [DisableDump]
-        FunctionBodyType FunctionBodyType => (FunctionBodyType) _context.ArgReferenceResult(Category.Type).Type;
-        [DisableDump]
-        CompoundView CompoundView => FunctionBodyType.FindRecentCompoundView;
-        [DisableDump]
-        protected override TypeBase Type => CompoundView.Type;
-        protected override IContextReference ObjectReference
-        {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
-        }
-        [DisableDump]
-        protected override IFeatureImplementation Feature => FunctionBodyType.CheckedFeature;
-        protected override Result ConverterResult(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
-        }
-        public Result Result(Category category, ContextBase context, CompileSyntax right)
-            => base.Result(category, context, right, CompoundView.ObjectPointerViaContext);
-    }
-
-    sealed class ContextCallDescriptor : FeatureDescriptor
-    {
-        [EnableDump]
-        readonly ContextBase _definingItem;
-        [EnableDump]
-        readonly IFeatureImplementation _feature;
-
-        public ContextCallDescriptor(ContextBase definingItem, IFeatureImplementation feature)
-        {
-            _definingItem = definingItem;
-            _feature = feature;
-        }
-
-        [DisableDump]
-        protected override TypeBase Type => _definingItem.FindRecentCompoundView.Type;
-        protected override IContextReference ObjectReference => _definingItem.FindRecentCompoundView.Compound;
-
-        [DisableDump]
-        protected override IFeatureImplementation Feature => _feature;
-        protected override Result ConverterResult(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
-        }
-    }
 }
