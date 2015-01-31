@@ -22,7 +22,7 @@ namespace Reni.ReniParser
         [EnableDump]
         Syntax Body { get; }
         [DisableDump]
-        internal override bool IsEnableReassignSyntax => Body.IsEnableReassignSyntax;
+        internal override bool IsMutableSyntax => Body.IsMutableSyntax;
         [DisableDump]
         internal override CompileSyntax ToCompiledSyntax => ToContainer;
         [DisableDump]

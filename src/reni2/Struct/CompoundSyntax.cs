@@ -33,6 +33,7 @@ namespace Reni.Struct
             _data = statements
                 .Select((s, i) => new Data(s, i))
                 .ToArray();
+
         }
 
         public string GetCompoundIdentificationDump() => "."+ ObjectId + "i";
@@ -63,7 +64,7 @@ namespace Reni.Struct
                 .Select(data => (FunctionSyntax)data.Statement);
 
         protected override string GetNodeDump() => GetType().PrettyName() + "(" + GetCompoundIdentificationDump() + ")";
-        internal bool IsReassignable(int position) => _data[position].IsReassignable;
+        internal bool IsMutable(int position) => _data[position].IsMutable;
 
         public override string DumpData()
         {
@@ -133,7 +134,7 @@ namespace Reni.Struct
             public bool Defines(string name) => Names.Contains(name);
             public bool IsConverter => RawStatement is ConverterSyntax;
             public IEnumerable<string> Names => NamesCache.Value;
-            public bool IsReassignable => RawStatement.IsEnableReassignSyntax;
+            public bool IsMutable => RawStatement.IsMutableSyntax;
 
             CompileSyntax GetStatement() => RawStatement.ContainerStatementToCompileSyntax;
             string[] GetNames() => RawStatement.GetDeclarations().ToArray();

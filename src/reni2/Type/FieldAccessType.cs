@@ -22,7 +22,7 @@ namespace Reni.Type
         [DisableDump]
         int Position { get; }
 
-        protected override bool IsMutable => View.Compound.Syntax.IsReassignable(Position);
+        protected override bool IsMutable => View.Compound.Syntax.IsMutable(Position);
         protected override TypeBase TargetType => View.Type;
         internal override TypeBase ValueType => View.ValueType(Position);
         [DisableDump]

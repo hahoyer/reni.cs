@@ -34,6 +34,6 @@ namespace Reni.TokenClasses
 
         protected override string GetNodeDump() => base.GetNodeDump() + "(" + _target.NodeDump + ")";
         internal override CompileSyntax ContainerStatementToCompileSyntax => _target.ContainerStatementToCompileSyntax;
-        internal override bool IsEnableReassignSyntax => true;
+        internal override bool IsMutableSyntax => true;
     }
 }

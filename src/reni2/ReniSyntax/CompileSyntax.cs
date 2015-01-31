@@ -56,7 +56,7 @@ namespace Reni.ReniSyntax
 
         protected virtual bool GetIsLambda() { return false; }
 
-        internal override bool IsEnableReassignSyntax { get { return false; } }
+        internal override bool IsMutableSyntax { get { return false; } }
         internal override CompileSyntax ToCompiledSyntax { get { return this; } }
         internal void AddToCacheForDebug(ContextBase context, object cacheItem) { _resultCache.Add(context, cacheItem); }
         internal Result Result(ContextBase context) { return Result(context, Category.All); }
