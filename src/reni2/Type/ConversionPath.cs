@@ -1,20 +1,28 @@
 using System;
 using System.Collections.Generic;
+using hw.Helper;
 using System.Linq;
 using hw.Debug;
-using hw.Helper;
 using Reni.Basics;
 using Reni.Feature;
 using Reni.TokenClasses;
 
 namespace Reni.Type
 {
-    internal sealed class ConversionPath : DumpableObject, IEquatable<ConversionPath>
+    sealed class ConversionPath : DumpableObject, IEquatable<ConversionPath>
     {
+        static int _nextObjectId;
+
         internal readonly TypeBase Source;
         internal readonly ISimpleFeature[] Elements;
 
+        ConversionPath()
+            : base(_nextObjectId++)
+        {
+        }
+
         internal ConversionPath(TypeBase source)
+            : this()
         {
             Source = source;
             Elements = new ISimpleFeature[0];
@@ -22,6 +30,7 @@ namespace Reni.Type
         }
 
         internal ConversionPath(params ISimpleFeature[] rawElements)
+            : this()
         {
             Tracer.Assert(rawElements.Any());
             Source = rawElements.First().TargetType;
@@ -36,6 +45,7 @@ namespace Reni.Type
                     Types.Count() == Elements.Count() + 1,
                     () => "\n" + Types.Select(t => t.DumpPrintText).Stringify("\n") + "\n****\n" + Dump()
                 );
+            StopByObjectId(-284);
         }
 
         IEnumerable<TypeBase> Types
@@ -54,12 +64,18 @@ namespace Reni.Type
         [DisableDump]
         internal bool IsRelativeConversion => Elements.Any() && Elements.All(Extension.IsRelative);
 
-        public static ConversionPath operator +(ConversionPath a, ConversionPath b) => new ConversionPath(a.Elements.Concat(b.Elements).ToArray());
-        public static IEnumerable<ConversionPath> operator +(IEnumerable<ConversionPath> a, ConversionPath b) => a.Select(left => left + b);
-        public static IEnumerable<ConversionPath> operator +(ConversionPath a, IEnumerable<ConversionPath> b) => b.Select(right => a + right);
-        public static IEnumerable<ConversionPath> operator +(ConversionPath a, IEnumerable<ISimpleFeature> b) => b.Select<ISimpleFeature, ConversionPath>(right => a + right);
-        public static ConversionPath operator +(ISimpleFeature a, ConversionPath b) => new ConversionPath(new[] {a}.Concat(b.Elements).ToArray());
-        public static ConversionPath operator +(ConversionPath a, ISimpleFeature b) => new ConversionPath(a.Elements.Concat(new[] {b}).ToArray());
+        public static ConversionPath operator +(ConversionPath a, ConversionPath b)
+            => new ConversionPath(a.Elements.Concat(b.Elements).ToArray());
+        public static IEnumerable<ConversionPath> operator +(IEnumerable<ConversionPath> a, ConversionPath b)
+            => a.Select(left => left + b);
+        public static IEnumerable<ConversionPath> operator +(ConversionPath a, IEnumerable<ConversionPath> b)
+            => b.Select(right => a + right);
+        public static IEnumerable<ConversionPath> operator +(ConversionPath a, IEnumerable<ISimpleFeature> b)
+            => b.Select(right => a + right);
+        public static ConversionPath operator +(ISimpleFeature a, ConversionPath b)
+            => new ConversionPath(new[] {a}.Concat(b.Elements).ToArray());
+        public static ConversionPath operator +(ConversionPath a, ISimpleFeature b)
+            => new ConversionPath(a.Elements.Concat(new[] {b}).ToArray());
 
         internal Result Execute(Category category)
             => Elements.Aggregate(new ResultCache(Source.ArgResult), (c, n) => n.Result(category.Typed).ReplaceArg(c)) & category;
