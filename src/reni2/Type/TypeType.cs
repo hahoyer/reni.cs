@@ -8,6 +8,7 @@ using Reni.Feature;
 using Reni.Numeric;
 using Reni.ReniSyntax;
 using Reni.Struct;
+using Reni.TokenClasses;
 
 namespace Reni.Type
 {
@@ -15,6 +16,8 @@ namespace Reni.Type
         : TypeBase
             , ISymbolProvider<DumpPrintToken, IFeatureImplementation>
             , ISymbolProvider<Star, IFeatureImplementation>
+            , ISymbolProvider<Slash, IFeatureImplementation>
+            , ISymbolProvider<InstanceFromRawAddress, IFeatureImplementation>
     {
         public TypeType(TypeBase value)
         {
@@ -31,17 +34,28 @@ namespace Reni.Type
         [DisableDump]
         internal TypeBase Value { get; }
 
+        internal override string DumpPrintText => "(" + Value.DumpPrintText + "()) type";
+
         IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
             => Extension.SimpleFeature(DumpPrintTokenResult);
 
         IFeatureImplementation ISymbolProvider<Star, IFeatureImplementation>.Feature(Star tokenClass)
             => Extension.MetaFeature(StarResult);
-        internal override string DumpPrintText => "(" + Value.DumpPrintText + "()) type";
+
+        IFeatureImplementation ISymbolProvider<Slash, IFeatureImplementation>.Feature(Slash tokenClass)
+            => Extension.MetaFeature(SlashResult);
+
+        IFeatureImplementation ISymbolProvider<InstanceFromRawAddress, IFeatureImplementation>.Feature
+            (InstanceFromRawAddress tokenClass)
+            => Value.Hllw ? null : Extension.FunctionFeature(InstanceFromRawAddressResult);
+
+        Result InstanceFromRawAddressResult(Category category, TypeBase right)
+            => Value.Pointer.Result(category, right.Pointer.ArgResult(category));
 
         protected override string GetNodeDump() => "(" + Value.NodeDump + ") type";
 
         internal override Result InstanceResult(Category category, Func<Category, Result> getRightResult)
-            => RawInstanceResult(category.Typed, getRightResult).LocalReferenceResult & category;
+            => RawInstanceResult(category.Typed, getRightResult).LocalReferenceResult;
 
         Result RawInstanceResult(Category category, Func<Category, Result> getRightResult)
         {
@@ -68,7 +82,7 @@ namespace Reni.Type
             return type.Result(category);
         }
 
-        internal Result SlashResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
+        Result SlashResult(Category category, ResultCache left, ContextBase context, CompileSyntax right)
         {
             var rightType = right
                 .Type(context)
