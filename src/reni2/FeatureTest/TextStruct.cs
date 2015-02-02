@@ -32,20 +32,20 @@ system: /!\
 . TextItemType: /!\ MaxNumber8 text_item type 
 
 . NewMemory: /\ 
-    { result: :=! ((^ elementType * MaxNumber32) instance_from_raw_address (systemdata FreePointer)) 
+    { result: ((^ elementType * MaxNumber32 :=!) instance_from_raw_address (systemdata FreePointer)) 
     . initializer: ^ initializer
     . length: ^ length
     . position: :=! length type instance (0) 
     . repeat
-        ( while: ^ position < length
-        . body: ^ ( result >> position := initializer(position), position := position + 1) 
+        ( while: position < length
+        . body: ( result >> position := initializer(position), position := position + 1) 
         )
     . systemdata FreePointer := systemdata FreePointer + (^ elementType size * ^ length)
     } result 
 };
 
 Text: /\
-{ data: :=! ((system TextItemType * system MaxNumber32) instance (^ enable_array_oversize)) 
+{ data: :=! ((system TextItemType * system MaxNumber32) instance_from_raw_address (^ enable_array_oversize)) 
 . _length: system MaxNumber32 type instance (^ type / system TextItemType)
 . AfterCopy: /\ data:= system NewMemory
     ( elementType: system TextItemType
