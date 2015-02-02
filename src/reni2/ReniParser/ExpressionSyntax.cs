@@ -50,15 +50,17 @@ namespace Reni.ReniParser
 
         internal override Result ResultForCache(ContextBase context, Category category)
         {
-            if(Left == null)
-                return context.PrefixResult(category, Token, Operator, Right);
+            var @operator = Operator;
+
+            if (Left == null)
+                return context.PrefixResult(category, Token, @operator, Right);
 
             var left = new ResultCache(c=> context.ResultAsReference(c, Left));
 
             var typeForSearch = left.Type;
             var searchResults
                 = typeForSearch
-                    .DeclarationsForTypeAndCloseRelatives(Operator)
+                    .DeclarationsForTypeAndCloseRelatives(@operator)
                     .RemoveLowPriorityResults()
                     .ToArray();
 
