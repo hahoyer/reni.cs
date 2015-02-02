@@ -25,15 +25,17 @@ namespace Reni.Feature
         internal static Simple SimpleFeature(Func<Category, Result> function, TypeBase target = null)
             => _simpleCache[function][(target ?? function.Target as TypeBase).AssertNotNull()];
 
-        internal static Function FunctionFeature
+        internal static ObjectFunction FunctionFeature
             (
             Func<Category, IContextReference, TypeBase, Result> function,
             IContextReferenceProvider target = null
             )
         {
             var context = (target ?? function.Target as IContextReferenceProvider).AssertNotNull();
-            return new Function(function, context);
+            return new ObjectFunction(function, context);
         }
+
+        internal static Function FunctionFeature(Func<Category, TypeBase, Result> function) => new Function(function);
 
         internal static IFeatureImplementation FunctionFeature<T>(Func<Category, TypeBase, T, Result> function, T arg)
             => new ExtendedFunction<T>(function, arg);
@@ -74,6 +76,5 @@ namespace Reni.Feature
             foreach(var item in baseList)
                 yield return item;
         }
-
     }
 }

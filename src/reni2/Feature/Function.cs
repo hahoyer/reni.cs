@@ -9,7 +9,7 @@ using Reni.Type;
 
 namespace Reni.Feature
 {
-    abstract class FunctionBase : DumpableObject, IFunctionFeature
+    abstract class ObjectFunctionBase : DumpableObject, IFunctionFeature
     {
         readonly Func<Category, IContextReference, TypeBase, Result> _function;
         readonly IContextReferenceProvider _target;
@@ -17,7 +17,8 @@ namespace Reni.Feature
         [UsedImplicitly]
         readonly int _order;
 
-        protected FunctionBase(Func<Category, IContextReference, TypeBase, Result> function, IContextReferenceProvider target)
+        protected ObjectFunctionBase
+            (Func<Category, IContextReference, TypeBase, Result> function, IContextReferenceProvider target)
             : base(_nextObjectId++)
         {
             _order = CodeArgs.NextOrder++;
@@ -33,15 +34,26 @@ namespace Reni.Feature
         IContextReference ObjectReference => _target.ContextReference;
     }
 
-    sealed class Function : FunctionBase, IFeatureImplementation
+    sealed class ObjectFunction : ObjectFunctionBase, IFeatureImplementation
     {
-        public Function(Func<Category, IContextReference, TypeBase, Result> function, IContextReferenceProvider target)
-            : base(function, target) { }
+        public ObjectFunction(Func<Category, IContextReference, TypeBase, Result> function, IContextReferenceProvider target)
+            : base(function, target) {}
 
         IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
         IMetaFunctionFeature IFeatureImplementation.Meta => null;
         IFunctionFeature IFeatureImplementation.Function => this;
         ISimpleFeature IFeatureImplementation.Simple => null;
+    }
+
+    sealed class Function : FunctionFeatureImplementation
+    {
+        readonly Func<Category, TypeBase, Result> _function;
+
+        internal Function(Func<Category, TypeBase, Result> function) { _function = function; }
+
+        protected override Result ApplyResult(Category category, TypeBase argsType) => _function(category, argsType);
+        protected override bool IsImplicit => false;
+        protected override IContextReference ObjectReference => null;
     }
 
     sealed class ExtendedFunction<T> : FunctionFeatureImplementation
