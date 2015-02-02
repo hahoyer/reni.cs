@@ -5,6 +5,7 @@ using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
+using Reni.Type;
 
 namespace Reni.TokenClasses
 {
@@ -15,9 +16,9 @@ namespace Reni.TokenClasses
             var data = StripQutes(token.Name);
             return context
                 .RootContext.BitType.Array(BitsConst.BitSize(data[0].GetType()))
-                .TextItemType
+                .TextItem
                 .Array(data.Length)
-                .TextItemType
+                .TextItem
                 .Result(category, () => CodeBase.BitsConst(BitsConst.ConvertAsText(data)), CodeArgs.Void);
         }
 

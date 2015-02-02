@@ -85,7 +85,7 @@ namespace Reni.Type
         Result TextItemResult(Category category)
         {
             return Parent
-                .TextItemType
+                .TextItem
                 .Pointer
                 .Result
                 (

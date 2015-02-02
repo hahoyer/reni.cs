@@ -70,13 +70,13 @@ namespace Reni.Type
                     if(IsMutable)
                         yield return EnableReassignToken.Id;
                     if(IsTextItem)
-                        yield return TextItem.Id;
+                        yield return TokenClasses.TextItem.Id;
                     if(IsOversizeable)
                         yield return EnableArrayOverSize.Id;
                 }
             }
 
-            public string DumpPrintText => Tags.Stringify(" ");
+            protected override string GetNodeDump() => Tags.Select(t => "[" + t + "]").Stringify("");
             public Options ToTextItem(bool value = true) => Instance(IsMutable, value, IsOversizeable);
             public Options ToMutable(bool value = true) => Instance(value, IsTextItem, IsOversizeable);
             public Options ToEnableArrayOverSize(bool value = true) => Instance(IsMutable, IsTextItem, value);
@@ -113,7 +113,9 @@ namespace Reni.Type
         public NumberType Number => _numberCache.Value;
 
         [DisableDump]
-        internal ArrayType TextItemType => ElementType.Array(Count, Option.ToTextItem());
+        internal ArrayType TextItem => ElementType.Array(Count, Option.ToTextItem());
+        [DisableDump]
+        internal ArrayType Mutable => ElementType.Array(Count, Option.ToMutable());
 
         [DisableDump]
         ArrayType EnableArrayOverSizeType => ElementType.Array(Count, Option.ToEnableArrayOverSize());
@@ -165,7 +167,7 @@ namespace Reni.Type
         internal override Result Destructor(Category category) => ElementType.ArrayDestructor(category, Count);
         internal override Result Copier(Category category) => ElementType.ArrayCopier(category, Count);
 
-        Result TextItemResult(Category category) => ResultFromPointer(category, TextItemType);
+        Result TextItemResult(Category category) => ResultFromPointer(category, TextItem);
         Result EnableArrayOverSizeResult(Category category) => ResultFromPointer(category, EnableArrayOverSizeType);
 
         internal override Result ConstructorResult(Category category, TypeBase argsType) => Result
@@ -224,7 +226,7 @@ namespace Reni.Type
 
         Size IndexSize => Size.AutoSize(Count).Align(Root.DefaultRefAlignParam.AlignBits);
 
-        protected override string GetNodeDump() => ElementType.NodeDump + "*" + Count;
+        protected override string GetNodeDump() => ElementType.NodeDump + "*" + Count + Option.NodeDump;
 
         Result ConcatArraysResult(Category category, IContextReference objectReference, TypeBase argsType, Options options)
         {
