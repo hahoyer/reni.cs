@@ -24,12 +24,14 @@ namespace Reni.Feature
         protected Result Result(Category category, ContextBase context, CompileSyntax right)
         {
             var simpleFeature = Feature.SimpleFeature();
-            if (simpleFeature != null && right == null)
+            if(simpleFeature != null && right == null)
                 return simpleFeature.Result(category);
 
-            var rightResult = new ResultCache(c => right == null
-                ? RootContext.VoidType.Result(c)
-                : context.ResultAsReference(c, right));
+            var rightResult = new ResultCache
+                (
+                c => right == null
+                    ? RootContext.VoidType.Result(c)
+                    : context.ResultAsReference(c, right));
 
             return Feature
                 .Function
@@ -41,7 +43,10 @@ namespace Reni.Feature
     sealed class SearchResult : FeatureContainer
     {
         internal SearchResult(SearchResult result, ConversionPath relativeConversion)
-            : base(result.Feature, result.RootContext) { ConverterPath = result.ConverterPath + relativeConversion; }
+            : base(result.Feature, result.RootContext)
+        {
+            ConverterPath = result.ConverterPath + relativeConversion;
+        }
 
         internal SearchResult(IFeatureImplementation feature, TypeBase definingItem)
             : base(feature, definingItem.RootContext)
@@ -57,7 +62,6 @@ namespace Reni.Feature
             var metaFeature = Feature.Meta;
             if(metaFeature != null)
                 return metaFeature.Result(category, left, context, right);
-
 
             var result1 = Result(category.Typed, context, right);
             var result = result1
@@ -77,7 +81,10 @@ namespace Reni.Feature
     sealed class ContextSearchResult : FeatureContainer
     {
         internal ContextSearchResult(IFeatureImplementation feature, Root rootContext)
-            : base(feature, rootContext) { }
+            : base(feature, rootContext)
+        {
+            Tracer.Assert(feature != null);
+        }
 
         public Result Execute(Category category, Func<Category, Result> objectReference, ContextBase context, CompileSyntax right)
         {
@@ -85,7 +92,7 @@ namespace Reni.Feature
             if(metaFeature != null)
                 return metaFeature.Result(context, category, right);
 
-            return Result(category,context,right)
+            return Result(category, context, right)
                 .ReplaceArg(objectReference);
         }
     }
