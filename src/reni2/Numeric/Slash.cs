@@ -10,11 +10,8 @@ namespace Reni.Numeric
     sealed class Slash
         : TransformationOperation
     {
-        protected override int Signature(int objSize, int argSize) { return BitsConst.DivideSize(objSize, argSize); }
+        protected override int Signature(int objSize, int argSize) => BitsConst.DivideSize(objSize, argSize);
         [DisableDump]
-        internal override IEnumerable<IGenericProviderForDefinable> Genericize
-        {
-            get { return this.GenericListFromDefinable(base.Genericize); }
-        }
+        internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
     }
 }
