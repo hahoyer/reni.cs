@@ -30,9 +30,9 @@ namespace Reni.ReniParser
             }
         }
 
-        protected override FunctionCache<string, TokenClass> GetPredefinedTokenClasses()
+        protected override IDictionary<string, TokenClass> GetPredefinedTokenClasses()
         {
-            return new FunctionCache<string, TokenClass>
+            return new Dictionary<string, TokenClass>
             {
                 {"converter", new ConverterToken()}
             };

@@ -59,10 +59,9 @@ namespace hw.Helper
             }
             set
             {
-                using(var f = System.IO.File.CreateText(_name))
-                {
-                    f.Write(value);
-                }
+                var f = System.IO.File.CreateText(_name);
+                f.Write(value);
+                f.Close();
             }
         }
 

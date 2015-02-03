@@ -12,21 +12,41 @@ using Reni.Type;
 
 namespace Reni.TokenClasses
 {
-    sealed class ReassignToken : Definable
+    sealed class ReassignToken : Definable, ITokenClassWithId
     {
         public const string Id = ":=";
-
+        string ITokenClassWithId.Id => Id;
         [DisableDump]
         internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
     }
 
-    sealed class EnableReassignToken : TokenClass
+    sealed class ForceMutabilityToken : Definable, ITokenClassWithId
+    {
+        public const string Id = "force_mutability";
+        string ITokenClassWithId.Id => Id;
+        internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
+    }
+
+    sealed class EnableMutabilityToken : Definable, ITokenClassWithId
+    {
+        public const string Id = "enable_mutability";
+        string ITokenClassWithId.Id => Id;
+        internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
+    }
+
+    sealed class EnableReinterpretationToken : Definable, ITokenClassWithId
+    {
+        public const string Id = "enable_reinterpretation";
+        string ITokenClassWithId.Id => Id;
+        internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
+    }
+
+    sealed class EnableReassignToken : TokenClass, ITokenClassWithId
     {
         public const string Id = ":=!";
+        string ITokenClassWithId.Id => Id;
         protected override Syntax Prefix(SourcePart token, Syntax right)
             => new EnableReassignSyntax(token, right.ToCompiledSyntax);
-        protected override Syntax Suffix(Syntax left, SourcePart token)
-            => new EnableReassignTypeSyntax(left.ToCompiledSyntax, token);
     }
 
     sealed class EnableReassignSyntax : Syntax

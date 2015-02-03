@@ -12,9 +12,9 @@ namespace Reni.Parser
     sealed class SimpleTokenFactory : TokenFactory<Services.TokenClass, Services.Syntax>
     {
         protected override Services.TokenClass GetError(Match.IError message) { throw new Exception("Syntax error: " + message); }
-        protected override FunctionCache<string, Services.TokenClass> GetPredefinedTokenClasses()
+        protected override IDictionary<string, Services.TokenClass> GetPredefinedTokenClasses()
         {
-            return new FunctionCache<string, Services.TokenClass>
+            return new Dictionary<string, Services.TokenClass>
             {
                 {"{", new OpenToken(1)},
                 {"(", new OpenToken(3)},

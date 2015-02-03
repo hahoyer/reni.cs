@@ -105,66 +105,71 @@ namespace Reni.ReniParser
         ///     Creates the main token classes.
         /// </summary>
         /// <returns> </returns>
-        protected override FunctionCache<string, TokenClass> GetPredefinedTokenClasses() { return TokenClasses; }
-
-        FunctionCache<string, TokenClass> TokenClasses
+        protected override IDictionary<string, TokenClass> GetPredefinedTokenClasses()
         {
-            get
-            {
-                return new FunctionCache<string, TokenClass>
-                {
-                    {ArrayAccess.Id, new ArrayAccess()},
-                    {AlignToken.Id, new AlignToken()},
-                    {ArgToken.Id, new ArgToken()},
-                    {ConcatArrays.Id, new ConcatArrays(isMutable:false)},
-                    {ConcatArrays.MutableId, new ConcatArrays(isMutable:true)},
-                    {ReassignToken.Id, new ReassignToken()},
-                    {EnableReassignToken.Id, new EnableReassignToken()},
-                    {Minus.Id, new Minus()},
-                    {Negate.Id, new Negate()},
-                    {TextItem.Id, new TextItem()},
-                    {EnableArrayOverSize.Id, new EnableArrayOverSize()},
-                    {"{", new LeftParenthesis(1)},
-                    {"[", new LeftParenthesis(2)},
-                    {"(", new LeftParenthesis(3)},
-                    {"}", new RightParenthesis(1)},
-                    {"]", new RightParenthesis(2)},
-                    {")", new RightParenthesis(3)},
-                    {"^^", new ContextOperator()},
-                    {".", new List()},
-                    {",", new List()},
-                    {";", new List()},
-                    {"@", new AtOperator()},
-                    {":", new Colon()},
-                    {"=", new CompareOperation()},
-                    {">", new CompareOperation()},
-                    {">=", new CompareOperation()},
-                    {"<", new CompareOperation()},
-                    {"<=", new CompareOperation()},
-                    {"<>", new CompareOperation()},
-                    {"!", new Exclamation(_declarationSyntaxSubParser)},
-                    {"+", new Plus()},
-                    {"/", new Slash()},
-                    {"/\\", new TokenClasses.Function()},
-                    {"/!\\", new TokenClasses.Function(true)},
-                    {"/\\/\\", new TokenClasses.Function(isMetaFunction: true)},
-                    {"*", new Star()},
-                    {"_A_T_", new AtToken()},
-                    {"dump_print", new DumpPrintToken()},
-                    {"else", new ElseToken()},
-                    {"enable_cut", new EnableCut()},
-                    {"function_instance", new FunctionInstanceToken()},
-                    {"instance", new InstanceToken()},
-                    {"instance_from_raw_address", new InstanceFromRawAddress()},
-                    {"new_value", new NewValueToken()},
-                    {"raw_address", new RawAddress()},
-                    {"then", new ThenToken()},
-                    {"to_number_of_base", new ToNumberOfBase()},
-                    {"undecorate", new UndecorateToken()},
-                    {"type", new TypeOperator()}
-                };
-            }
+            return TokenClassesEx
+                .ToDictionary(t => t.Id, t => (TokenClass)t)
+                .Concat(TokenClasses)
+                .ToDictionary(t=>t.Key, t=>t.Value);
         }
+
+        IDictionary<string, TokenClass> TokenClasses => new Dictionary<string, TokenClass>
+        {
+            {"{", new LeftParenthesis(1)},
+            {"[", new LeftParenthesis(2)},
+            {"(", new LeftParenthesis(3)},
+            {"}", new RightParenthesis(1)},
+            {"]", new RightParenthesis(2)},
+            {")", new RightParenthesis(3)},
+            {"^^", new ContextOperator()},
+            {".", new List()},
+            {",", new List()},
+            {";", new List()},
+            {"@", new AtOperator()},
+            {":", new Colon()},
+            {"=", new CompareOperation()},
+            {">", new CompareOperation()},
+            {">=", new CompareOperation()},
+            {"<", new CompareOperation()},
+            {"<=", new CompareOperation()},
+            {"<>", new CompareOperation()},
+            {"!", new Exclamation(_declarationSyntaxSubParser)},
+            {"+", new Plus()},
+            {"/", new Slash()},
+            {"/\\", new TokenClasses.Function()},
+            {"/!\\", new TokenClasses.Function(true)},
+            {"/\\/\\", new TokenClasses.Function(isMetaFunction: true)},
+            {"*", new Star()},
+            {"_A_T_", new AtToken()},
+            {"dump_print", new DumpPrintToken()},
+            {"else", new ElseToken()},
+            {"enable_cut", new EnableCut()},
+            {"function_instance", new FunctionInstanceToken()},
+            {"instance", new InstanceToken()},
+            {"new_value", new NewValueToken()},
+            {"raw_address", new RawAddress()},
+            {"then", new ThenToken()},
+            {"to_number_of_base", new ToNumberOfBase()},
+            {"undecorate", new UndecorateToken()},
+            {"type", new TypeOperator()}
+        };
+
+        static IEnumerable<ITokenClassWithId> TokenClassesEx => new ITokenClassWithId[]
+        {
+            new ArrayAccess(),
+            new AlignToken(),
+            new ArgToken(),
+            new ConcatArrays(isMutable:false),
+            new ConcatArrays(isMutable:true),
+            new EnableMutabilityToken(),
+            new EnableReassignToken(),
+            new EnableReinterpretationToken(), 
+            new ForceMutabilityToken(), 
+            new Minus(),
+            new Negate(),
+            new ReassignToken(),
+            new TextItem(),
+        };
 
         static IType<Syntax> Pack(Syntax options) { return new SyntaxBoxToken(options); }
 

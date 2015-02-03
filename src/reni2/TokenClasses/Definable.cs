@@ -35,22 +35,25 @@ namespace Reni.TokenClasses
         internal virtual IEnumerable<IGenericProviderForDefinable> Genericize { get { return this.GenericListFromDefinable(); } }
     }
 
-    sealed class ConcatArrays : Definable
+    sealed class ConcatArrays : Definable, ITokenClassWithId
     {
-        public static readonly string Id = "<<";
-        public static readonly string MutableId = "<<:=";
+        public const string Id = "<<";
+        public const string MutableId = "<<:=";
         internal bool IsMutable { get; }
 
         public ConcatArrays(bool isMutable) { IsMutable = isMutable; }
 
         [DisableDump]
         internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
+
+        string ITokenClassWithId.Id => IsMutable ? MutableId : Id;
     }
 
-    sealed class ArrayAccess : Definable
+    sealed class ArrayAccess : Definable, ITokenClassWithId
     {
-        public static readonly string Id = ">>";
+        public const string Id = ">>";
         [DisableDump]
         internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
+        string ITokenClassWithId.Id => Id;
     }
 }

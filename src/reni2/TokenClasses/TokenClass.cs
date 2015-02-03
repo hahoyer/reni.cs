@@ -45,4 +45,9 @@ namespace Reni.TokenClasses
             return null;
         }
     }
+
+    interface ITokenClassWithId
+    {
+        string Id { get; }
+    }
 }

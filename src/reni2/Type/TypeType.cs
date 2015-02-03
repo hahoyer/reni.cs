@@ -8,7 +8,6 @@ using Reni.Feature;
 using Reni.Numeric;
 using Reni.ReniSyntax;
 using Reni.Struct;
-using Reni.TokenClasses;
 
 namespace Reni.Type
 {
@@ -17,7 +16,6 @@ namespace Reni.Type
             , ISymbolProvider<DumpPrintToken, IFeatureImplementation>
             , ISymbolProvider<Star, IFeatureImplementation>
             , ISymbolProvider<Slash, IFeatureImplementation>
-            , ISymbolProvider<InstanceFromRawAddress, IFeatureImplementation>
     {
         public TypeType(TypeBase value)
         {
@@ -44,13 +42,6 @@ namespace Reni.Type
 
         IFeatureImplementation ISymbolProvider<Slash, IFeatureImplementation>.Feature(Slash tokenClass)
             => Extension.MetaFeature(SlashResult);
-
-        IFeatureImplementation ISymbolProvider<InstanceFromRawAddress, IFeatureImplementation>.Feature
-            (InstanceFromRawAddress tokenClass)
-            => Value.Hllw ? null : Extension.FunctionFeature(InstanceFromRawAddressResult);
-
-        Result InstanceFromRawAddressResult(Category category, TypeBase right)
-            => Value.Pointer.Result(category, right.Pointer.ArgResult(category));
 
         protected override string GetNodeDump() => "(" + Value.NodeDump + ") type";
 
