@@ -8,7 +8,6 @@ using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Struct;
-using Reni.TokenClasses;
 
 namespace Reni.Type
 {
@@ -17,7 +16,6 @@ namespace Reni.Type
             , IProxyType
             , ISimpleFeature
             , IReference
-            , ISymbolProvider<RawAddress, IFeatureImplementation>
     {
         readonly int _order;
 
@@ -53,18 +51,14 @@ namespace Reni.Type
         TypeBase ISimpleFeature.TargetType => ValueType;
         Result ISimpleFeature.Result(Category category) => DereferenceResult(category);
 
-        IFeatureImplementation ISymbolProvider<RawAddress, IFeatureImplementation>.Feature(RawAddress tokenClass)
-            => Extension.SimpleFeature(RawAddressResult);
-
-
         protected override IEnumerable<ISimpleFeature> ObtainRawSymmetricConversions()
             => base.ObtainRawSymmetricConversions().Concat(new ISimpleFeature[] {Extension.SimpleFeature(DereferenceResult)});
 
         protected override string GetNodeDump() => ValueType.NodeDump + "[Pointer]";
         internal override int? SmartArrayLength(TypeBase elementType) => ValueType.SmartArrayLength(elementType);
         protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
-        protected override ArrayType ArrayForCache(int count, ArrayType.Options options)
-            => ValueType.Array(count, options);
+        protected override ArrayType ArrayForCache(int count, string optionsId)
+            => ValueType.Array(count, optionsId);
 
         internal override IEnumerable<SearchResult> Declarations<TDefinable>(TDefinable tokenClass)
         {
@@ -94,13 +88,5 @@ namespace Reni.Type
                     () => ArgCode.DePointer(ValueType.Size),
                     CodeArgs.Arg
                 );
-
-        Result RawAddressResult(Category category)
-        {
-            return RootContext
-                .BitType
-                .RawPointer
-                .Result(category, ValueType.ReferenceResult);
-        }
     }
 }

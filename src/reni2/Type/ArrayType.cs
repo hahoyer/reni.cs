@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using hw.Helper;
 using System.Linq;
 using hw.Debug;
+using hw.Forms;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -19,126 +20,117 @@ namespace Reni.Type
             , ISymbolProviderForPointer<TextItem, IFeatureImplementation>
             , ISymbolProviderForPointer<TokenClasses.ArrayAccess, IFeatureImplementation>
             , ISymbolProviderForPointer<ToNumberOfBase, IFeatureImplementation>
+            , ISymbolProviderForPointer<Mutable, IFeatureImplementation>
+            , ISymbolProviderForPointer<Reference, IFeatureImplementation>
             , IRepeaterType
     {
+        [Node]
+        [SmartNode]
+        readonly ValueCache<RepeaterAccessType> _arrayAccessTypeCache;
+        [Node]
+        [SmartNode]
+        readonly ValueCache<NumberType> _numberCache;
+        [Node]
+        [SmartNode]
+        readonly FunctionCache<string, ReferenceType> _referenceCache;
+
         internal sealed class Options : DumpableObject
         {
-            static int Index(bool isMutable, bool isTextItem)
+            OptionsData OptionsData { get; }
+
+            Options(string optionsId)
             {
-                var result = 0;
-                if(isMutable)
-                    result++;
-                result *= 2;
-                if(isTextItem)
-                    result++;
-                return result;
+                OptionsData = new OptionsData(optionsId);
+                IsMutable = new OptionsData.Option(OptionsData);
+                IsTextItem = new OptionsData.Option(OptionsData);
+                OptionsData.Align();
+                Tracer.Assert(OptionsData.IsValid);
             }
 
-            static IEnumerable<Options> CreateInstances()
-            {
-                yield return new Options(false, false);
-                yield return new Options(false, true);
-                yield return new Options(true, false);
-                yield return new Options(true, true);
-            }
+            public OptionsData.Option IsMutable { get; }
+            public OptionsData.Option IsTextItem { get; }
 
-            internal static readonly Options[] Instances = CreateInstances().ToArray();
-
-            Options(bool isMutable, bool isTextItem)
-            {
-                IsMutable = isMutable;
-                IsTextItem = isTextItem;
-            }
-
-            public bool IsMutable { get; }
-            public bool IsTextItem { get; }
-
-            IEnumerable<string> Tags
-            {
-                get
-                {
-                    if(IsMutable)
-                        yield return EnableReassignToken.Id;
-                    if(IsTextItem)
-                        yield return TokenClasses.TextItem.Id;
-                }
-            }
-
-            protected override string GetNodeDump() => Tags.Select(t => "[" + t + "]").Stringify("");
-            public Options ToTextItem(bool value = true) => Instance(IsMutable, value);
-            public Options ToMutable(bool value = true) => Instance(value, IsTextItem);
-
-            public static Options Instance(bool isMutable = false, bool isTextItem = false)
-                => Instances[Index(isMutable, isTextItem)];
+            public static Options Create(string optionsId = null) => new Options(optionsId);
+            internal static readonly string DefaultOptionsId = Create().OptionsData.Id;
+            protected override string GetNodeDump()
+                => (IsMutable.Value ? "m" : "")
+                    + (IsTextItem.Value ? "t" : "");
         }
 
-
-        readonly ValueCache<RepeaterAccessType> _arrayAccessTypeCache;
-        readonly ValueCache<NumberType> _numberCache;
-
-        public ArrayType(TypeBase elementType, int count, Options option)
+        public ArrayType(TypeBase elementType, int count, string optionsId)
         {
             ElementType = elementType;
             Count = count;
-            Option = option;
+            options = Options.Create(optionsId);
             Tracer.Assert(count > 0);
             Tracer.Assert(elementType.CheckedReference == null);
             Tracer.Assert(!elementType.Hllw);
             _arrayAccessTypeCache = new ValueCache<RepeaterAccessType>(() => new RepeaterAccessType(this));
             _numberCache = new ValueCache<NumberType>(() => new NumberType(this));
+            _referenceCache = new FunctionCache<string, ReferenceType>(id => new ReferenceType(this, id));
         }
+
+
+        public bool IsMutable => options.IsMutable.Value;
 
         internal TypeBase ElementType { get; }
         int Count { get; }
-        Options Option { get; }
+        Options options { get; }
 
         TypeBase IRepeaterType.ElementType => ElementType;
         Size IRepeaterType.IndexSize => IndexSize;
-        bool IRepeaterType.IsMutable => Option.IsMutable;
+        bool IRepeaterType.IsMutable => IsMutable;
 
         [DisableDump]
         public NumberType Number => _numberCache.Value;
 
         [DisableDump]
-        internal ArrayType TextItem => ElementType.Array(Count, Option.ToTextItem());
+        internal ArrayType TextItem => ElementType.Array(Count, options.IsTextItem.SetTo(true));
         [DisableDump]
-        internal ArrayType Mutable => ElementType.Array(Count, Option.ToMutable());
+        internal ArrayType Mutable => ElementType.Array(Count, options.IsMutable.SetTo(true));
 
+        internal ReferenceType Reference(string optionsId=null) => _referenceCache[optionsId ?? ReferenceType.Options.DefaultOptionsId];
         [DisableDump]
         internal override bool Hllw => Count == 0 || ElementType.Hllw;
 
         internal override string DumpPrintText => "(" + ElementType.DumpPrintText + ")*" + Count;
 
         [DisableDump]
-        internal override Size SimpleItemSize => Option.IsTextItem ? (ElementType.SimpleItemSize ?? Size) : base.SimpleItemSize;
+        internal override Size SimpleItemSize
+            => options.IsTextItem.Value ? (ElementType.SimpleItemSize ?? Size) : base.SimpleItemSize;
 
         IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>.Feature
             (DumpPrintToken tokenClass)
             =>
-                Option.IsTextItem
-                    ? Extension.SimpleFeature(DumpPrintTokenResult)
-                    : Extension.SimpleFeature(DumpPrintTokenArrayResult);
+                options.IsTextItem.Value
+                    ? Feature.Extension.SimpleFeature(DumpPrintTokenResult)
+                    : Feature.Extension.SimpleFeature(DumpPrintTokenArrayResult);
 
         IFeatureImplementation ISymbolProviderForPointer<ConcatArrays, IFeatureImplementation>.Feature(ConcatArrays tokenClass)
             =>
-                Extension.FunctionFeature
+                Feature.Extension.FunctionFeature
                     (
                         (category, objectReference, argsType) =>
                             ConcatArraysResult
-                                (category, objectReference, argsType, Option.ToMutable(tokenClass.IsMutable)),
+                                (category, objectReference, argsType, options.IsMutable.SetTo(tokenClass.IsMutable)),
                         this);
 
         IFeatureImplementation ISymbolProviderForPointer<TextItem, IFeatureImplementation>.Feature(TextItem tokenClass)
-            => Extension.SimpleFeature(TextItemResult);
+            => Feature.Extension.SimpleFeature(TextItemResult);
+
+        IFeatureImplementation ISymbolProviderForPointer<Mutable, IFeatureImplementation>.Feature(Mutable tokenClass)
+            => Feature.Extension.SimpleFeature(MutableResult);
 
         IFeatureImplementation ISymbolProviderForPointer<TokenClasses.ArrayAccess, IFeatureImplementation>.Feature
             (TokenClasses.ArrayAccess tokenClass)
-            => Extension.FunctionFeature(ElementAccessResult);
+            => Feature.Extension.FunctionFeature(ElementAccessResult);
 
         IFeatureImplementation ISymbolProviderForPointer<ToNumberOfBase, IFeatureImplementation>.Feature
             (ToNumberOfBase tokenClass)
-            => Option.IsTextItem ? Extension.MetaFeature(ToNumberOfBaseResult) : null;
+            => options.IsTextItem.Value ? Feature.Extension.MetaFeature(ToNumberOfBaseResult) : null;
 
+        IFeatureImplementation ISymbolProviderForPointer<Reference, IFeatureImplementation>.Feature(Reference tokenClass)
+            => Feature.Extension.SimpleFeature(ReferenceResult);
 
         internal override int? SmartArrayLength(TypeBase elementType)
             => ElementType.IsConvertable(elementType) ? Count : base.SmartArrayLength(elementType);
@@ -148,6 +140,8 @@ namespace Reni.Type
         internal override Result Copier(Category category) => ElementType.ArrayCopier(category, Count);
 
         Result TextItemResult(Category category) => ResultFromPointer(category, TextItem);
+        Result MutableResult(Category category) => ResultFromPointer(category, Mutable);
+        new Result ReferenceResult(Category category) => ResultFromPointer(category, Reference());
 
         internal override Result ConstructorResult(Category category, TypeBase argsType) => Result
             (
@@ -205,9 +199,9 @@ namespace Reni.Type
 
         Size IndexSize => Size.AutoSize(Count).Align(Root.DefaultRefAlignParam.AlignBits);
 
-        protected override string GetNodeDump() => ElementType.NodeDump + "*" + Count + Option.NodeDump;
+        protected override string GetNodeDump() => ElementType.NodeDump + "*" + Count + options.NodeDump;
 
-        Result ConcatArraysResult(Category category, IContextReference objectReference, TypeBase argsType, Options options)
+        Result ConcatArraysResult(Category category, IContextReference objectReference, TypeBase argsType, string options)
         {
             var oldElementsResult = Pointer
                 .Result(category.Typed, objectReference).DereferenceResult;
@@ -217,7 +211,7 @@ namespace Reni.Type
             var newElementsResultRaw
                 = isElementArg
                     ? argsType.Conversion(category.Typed, ElementAccessType)
-                    : argsType.Conversion(category.Typed, ElementType.Array(newCount, Option));
+                    : argsType.Conversion(category.Typed, ElementType.Array(newCount, options));
 
             var newElementsResult = newElementsResultRaw.DereferencedAlignedResult();
             var result = ElementType
@@ -234,7 +228,7 @@ namespace Reni.Type
             if(!category.HasCode)
                 return result;
 
-            result.Code = CodeBase.DumpPrintText("<<" + (Option.IsMutable ? ":=" : "")) + result.Code;
+            result.Code = CodeBase.DumpPrintText("<<" + (options.IsMutable.Value ? ":=" : "")) + result.Code;
             return result;
         }
 

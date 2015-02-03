@@ -8,6 +8,7 @@ using Reni.Feature;
 using Reni.Numeric;
 using Reni.ReniSyntax;
 using Reni.Struct;
+using Reni.TokenClasses;
 
 namespace Reni.Type
 {
@@ -16,6 +17,7 @@ namespace Reni.Type
             , ISymbolProvider<DumpPrintToken, IFeatureImplementation>
             , ISymbolProvider<Star, IFeatureImplementation>
             , ISymbolProvider<Slash, IFeatureImplementation>
+            , ISymbolProvider<Mutable, IFeatureImplementation>
     {
         public TypeType(TypeBase value)
         {
@@ -42,6 +44,9 @@ namespace Reni.Type
 
         IFeatureImplementation ISymbolProvider<Slash, IFeatureImplementation>.Feature(Slash tokenClass)
             => Extension.MetaFeature(SlashResult);
+
+        IFeatureImplementation ISymbolProvider<Mutable, IFeatureImplementation>.Feature(Mutable tokenClass)
+            => Value is ArrayType ? Extension.SimpleFeature(MutableResult) : null;
 
         protected override string GetNodeDump() => "(" + Value.NodeDump + ") type";
 
@@ -95,5 +100,7 @@ namespace Reni.Type
 
             return RootContext.BitType.Result(category, BitsConst.Convert(count.Value));
         }
+
+        Result MutableResult(Category category) => ((ArrayType) Value).Mutable.TypeType.Result(category);
     }
 }

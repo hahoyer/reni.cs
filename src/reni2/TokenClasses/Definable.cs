@@ -11,28 +11,21 @@ namespace Reni.TokenClasses
 {
     abstract class Definable : TokenClass
     {
-        protected override sealed Syntax Terminal(SourcePart token) { return new DefinableTokenSyntax(this, token); }
+        protected override sealed Syntax Terminal(SourcePart token) => new DefinableTokenSyntax(this, token, false);
 
         protected override sealed Syntax Prefix(SourcePart token, Syntax right)
-        {
-            return new ExpressionSyntax(this, null, token, right.ToCompiledSyntax);
-        }
+            => new ExpressionSyntax(this, null, token, right.ToCompiledSyntax);
 
-        protected override sealed Syntax Suffix(Syntax left, SourcePart token)
-        {
-            return new ExpressionSyntax(this, left.ToCompiledSyntax, token, null);
-        }
+        protected override sealed Syntax Suffix(Syntax left, SourcePart token) => left.SuffixedBy(this, token);
 
         protected override sealed Syntax Infix(Syntax left, SourcePart token, Syntax right)
-        {
-            return new ExpressionSyntax(this, left.ToCompiledSyntax, token, right.ToCompiledSyntax);
-        }
+            => new ExpressionSyntax(this, left.ToCompiledSyntax, token, right.ToCompiledSyntax);
 
         [DisableDump]
-        protected string DataFunctionName { get { return Name.Symbolize(); } }
+        protected string DataFunctionName => Name.Symbolize();
 
         [DisableDump]
-        internal virtual IEnumerable<IGenericProviderForDefinable> Genericize { get { return this.GenericListFromDefinable(); } }
+        internal virtual IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable();
     }
 
     sealed class ConcatArrays : Definable, ITokenClassWithId
@@ -52,6 +45,14 @@ namespace Reni.TokenClasses
     sealed class ArrayAccess : Definable, ITokenClassWithId
     {
         public const string Id = ">>";
+        [DisableDump]
+        internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
+        string ITokenClassWithId.Id => Id;
+    }
+
+    sealed class Reference: Definable, ITokenClassWithId
+    {
+        public const string Id = "reference";
         [DisableDump]
         internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
         string ITokenClassWithId.Id => Id;

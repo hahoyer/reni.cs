@@ -10,25 +10,32 @@ namespace Reni.ReniParser
 {
     sealed class DeclarationSyntax : Syntax
     {
-        internal DeclarationSyntax(Definable definable, SourcePart token, Syntax body)
+        internal DeclarationSyntax(SourcePart token, Syntax body, Definable definable = null, bool isConverter = false, bool isMutable = false)
             : base(token)
         {
             Definable = definable;
+            IsConverter = isConverter;
+            IsMutable = isMutable;
             Body = body;
         }
 
         [EnableDump]
         Definable Definable { get; }
         [EnableDump]
+        bool IsConverter { get; }
+        [EnableDump]
+        bool IsMutable { get; }
+        [EnableDump]
         Syntax Body { get; }
         [DisableDump]
-        internal override bool IsMutableSyntax => Body.IsMutableSyntax;
+        internal override bool IsMutableSyntax => IsMutable;
+        internal override bool IsConverterSyntax => IsConverter;
         [DisableDump]
         internal override CompileSyntax ToCompiledSyntax => ToContainer;
         [DisableDump]
         internal override CompileSyntax ContainerStatementToCompileSyntax => Body.ContainerStatementToCompileSyntax;
 
-        protected override string GetNodeDump() => Definable.Name + ": " + Body.NodeDump;
+        protected override string GetNodeDump() => (Definable?.Name??"") + ": " + Body.NodeDump;
 
         internal override IEnumerable<KeyValuePair<string, int>> GetDeclarations(int index)
         {

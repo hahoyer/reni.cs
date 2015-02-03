@@ -17,8 +17,8 @@ namespace Reni.FeatureTest
             return
                 @"
 systemdata:
-{ Memory: ((0 type * ('100' to_number_of_base 256)) enable_mutability) instance()
-. FreePointer: :=! (Memory >> 0) raw_address enable_mutability
+{ Memory: ((0 type * ('100' to_number_of_base 256)) mutable) instance()
+. !mutable FreePointer: Memory reference mutable
 };
 
 repeat: /\ ^ while() then(^ body(), repeat(^));
@@ -32,10 +32,10 @@ system: /!\
 . TextItemType: /!\ MaxNumber8 text_item type 
 
 . NewMemory: /\ 
-    { result: (^ elementType raw_address enable_mutability) instance (systemdata FreePointer enable_reinterpretation) 
+    { result: ((^ elementType *1) reference mutable oversizeable) instance (systemdata FreePointer enable_reinterpretation) 
     . initializer: ^ initializer
     . length: ^ length
-    . position: :=! length type instance (0) 
+    . !mutable position: length type instance (0) 
     . repeat
     (
         while: /\ position < length,
@@ -48,15 +48,16 @@ system: /!\
     . systemdata FreePointer :=
         (systemdata FreePointer type) 
         instance 
-        ((result >> length) raw_address enable_mutability enable_reinterpretation)
+        ((result + length) mutable enable_reinterpretation) 
     } result 
 };
 
 Text: /\
-{ data: :=! (^ >> 0) raw_address 
-. _length: ^ type / (^ >> 0)type
+{ !mutable data: ^ reference 
+. _elementType: (^ >> 0)type
+. _length: ^ type / _elementType
 . AfterCopy: /\ data:= system NewMemory
-    ( elementType: (^ >> 0)type
+    ( elementType: _elementType
     . length: _length
     . initializer: /\ data >> ^
     )

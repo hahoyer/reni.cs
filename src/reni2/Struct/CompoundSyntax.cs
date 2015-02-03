@@ -132,7 +132,7 @@ namespace Reni.Struct
 
             public CompileSyntax Statement => StatementCache.Value;
             public bool Defines(string name) => Names.Contains(name);
-            public bool IsConverter => RawStatement is ConverterSyntax;
+            public bool IsConverter => RawStatement.IsConverterSyntax;
             public IEnumerable<string> Names => NamesCache.Value;
             public bool IsMutable => RawStatement.IsMutableSyntax;
 

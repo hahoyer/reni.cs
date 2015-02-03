@@ -8,11 +8,12 @@ using Reni.TokenClasses;
 
 namespace Reni.ReniSyntax
 {
-    sealed class ConverterSyntax : Syntax
+    [Obsolete("",true)]
+    sealed class DeclarationSyntax : Syntax
     {
         internal readonly CompileSyntax Body;
 
-        internal ConverterSyntax(SourcePart token, CompileSyntax body)
+        internal DeclarationSyntax(SourcePart token, CompileSyntax body)
             : base(token) { Body = body; }
 
         protected override string GetNodeDump() { return "converter (" + Body.NodeDump + ")"; }

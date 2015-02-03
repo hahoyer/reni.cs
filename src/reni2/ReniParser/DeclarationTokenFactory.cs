@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
 using Reni.TokenClasses;
@@ -15,7 +14,7 @@ namespace Reni.ReniParser
             get
             {
                 var prioTable = PrioTable.Left(PrioTable.BeginOfText);
-                prioTable += PrioTable.Left("converter");
+                prioTable += PrioTable.Left("converter", "mutable");
                 prioTable = prioTable.ParenthesisLevelLeft
                     (
                         new[] {"(", "[", "{"},
@@ -32,10 +31,12 @@ namespace Reni.ReniParser
 
         protected override IDictionary<string, TokenClass> GetPredefinedTokenClasses()
         {
-            return new Dictionary<string, TokenClass>
+            return new ITokenClassWithId[]
             {
-                {"converter", new ConverterToken()}
-            };
+                new ConverterToken(),
+                new MutableDeclarationToken()
+            }
+                .ToDictionary(t => t.Id, t => (TokenClass) t);
         }
 
         protected override TokenClass GetEndOfText() { throw new NotImplementedException(); }

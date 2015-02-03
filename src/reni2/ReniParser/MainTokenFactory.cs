@@ -49,7 +49,7 @@ namespace Reni.ReniParser
 
                 x = x.ThenElseLevel("then", "else");
                 x += PrioTable.Right("!");
-                x += PrioTable.Left("/\\", "/!\\", "/\\/\\", EnableReassignToken.Id);
+                x += PrioTable.Left("/\\", "/!\\", "/\\/\\");
                 x += PrioTable.Right(":");
                 x += PrioTable.Right(",");
                 x += PrioTable.Right(";");
@@ -147,7 +147,6 @@ namespace Reni.ReniParser
             {"function_instance", new FunctionInstanceToken()},
             {"instance", new InstanceToken()},
             {"new_value", new NewValueToken()},
-            {"raw_address", new RawAddress()},
             {"then", new ThenToken()},
             {"to_number_of_base", new ToNumberOfBase()},
             {"undecorate", new UndecorateToken()},
@@ -161,13 +160,13 @@ namespace Reni.ReniParser
             new ArgToken(),
             new ConcatArrays(isMutable:false),
             new ConcatArrays(isMutable:true),
-            new EnableMutabilityToken(),
-            new EnableReassignToken(),
+            new Mutable(),
             new EnableReinterpretationToken(), 
             new ForceMutabilityToken(), 
             new Minus(),
             new Negate(),
             new ReassignToken(),
+            new Reference(), 
             new TextItem(),
         };
 

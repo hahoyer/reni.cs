@@ -20,26 +20,55 @@ namespace Reni.TokenClasses
         protected override ISubParser<Syntax> Next { get; }
     }
 
-    sealed class ConverterToken : TokenClass
+    abstract class DeclarationToken : TokenClass
     {
-        protected override Syntax Terminal(SourcePart token) => new ConverterDeclarationSyntax(token, token);
+        protected override Syntax Terminal(SourcePart token) => new DeclarationTokenSyntax(this, token);
+        internal abstract Syntax DeclarationSyntax(SourcePart token, CompileSyntax body);
+        internal abstract Syntax DefinableSyntax(Definable definable, SourcePart token);
     }
 
-    abstract class DeclarationExtensionSyntax : Syntax
+    sealed class ConverterToken : DeclarationToken, ITokenClassWithId
     {
-        protected DeclarationExtensionSyntax(SourcePart token)
-            : base(token) { }
+        public const string Id = "converter";
+        string ITokenClassWithId.Id => Id;
+        internal override Syntax DeclarationSyntax(SourcePart token, CompileSyntax body)
+            => new ReniParser.DeclarationSyntax(token, body, isConverter: true);
+        internal override Syntax DefinableSyntax(Definable definable, SourcePart token)
+        {
+            NotImplementedMethod(definable, token);
+            return null;
+        }
     }
 
-    sealed class ConverterDeclarationSyntax : DeclarationExtensionSyntax
+    sealed class MutableDeclarationToken : DeclarationToken, ITokenClassWithId
     {
-        readonly SourcePart _token;
+        public const string Id = "mutable";
+        string ITokenClassWithId.Id => Id;
+        internal override Syntax DeclarationSyntax(SourcePart token, CompileSyntax body)
+        {
+            NotImplementedMethod(token, body);
+            return null;
+        }
+        internal override Syntax DefinableSyntax(Definable definable, SourcePart token)
+            => new DefinableTokenSyntax(definable, token, true);
+    }
 
-        internal ConverterDeclarationSyntax(SourcePart token, SourcePart otherToken)
-            : base(token) { _token = otherToken; }
+    sealed class DeclarationTokenSyntax : Syntax
+    {
+        readonly DeclarationToken _declaration;
+
+        internal DeclarationTokenSyntax(DeclarationToken declaration, SourcePart token)
+            : base(token)
+        {
+            _declaration = declaration;
+        }
 
         internal override Syntax CreateDeclarationSyntax(SourcePart token, Syntax right)
-            => new ConverterSyntax(_token, right.CheckedToCompiledSyntax(token, RightMustNotBeNullError));
+            => _declaration.DeclarationSyntax(token, right.CheckedToCompiledSyntax(token, RightMustNotBeNullError));
+
+        internal override Syntax SuffixedBy(Definable definable, SourcePart token)
+            => _declaration.DefinableSyntax(definable, token);
+
 
         IssueId RightMustNotBeNullError()
         {

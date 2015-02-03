@@ -27,7 +27,7 @@ namespace Reni.Type
             public readonly FunctionCache<int, AlignType> Aligner;
             [Node]
             [SmartNode]
-            public readonly FunctionCache<int, FunctionCache<ArrayType.Options, ArrayType>> Array;
+            public readonly FunctionCache<int, FunctionCache<string, ArrayType>> Array;
             [Node]
             [SmartNode]
             public readonly FunctionCache<TypeBase, Pair> Pair;
@@ -47,24 +47,21 @@ namespace Reni.Type
             [Node]
             [SmartNode]
             public readonly ValueCache<IEnumerable<ISimpleFeature>> SymmetricConversions;
-            [Node]
-            [SmartNode]
-            public readonly ValueCache<RawPointerType> RawPointer;
 
             public Cache(TypeBase parent)
             {
                 EnableCut = new ValueCache<EnableCut>(() => new EnableCut(parent));
                 ForcedReference = new ValueCache<IReference>(parent.ForcedReferenceForCache);
                 Pair = new FunctionCache<TypeBase, Pair>(first => new Pair(first, parent));
-                Array = new FunctionCache<int, FunctionCache<ArrayType.Options, ArrayType>>
+                Array = new FunctionCache<int, FunctionCache<string, ArrayType>>
                     (
                     count
                         =>
-                        new FunctionCache<ArrayType.Options, ArrayType>
+                        new FunctionCache<string, ArrayType>
                             (
-                            options
+                            optionsId
                                 =>
-                                parent.ArrayForCache(count, options)
+                                parent.ArrayForCache(count, optionsId)
                             )
                     );
 
@@ -73,7 +70,6 @@ namespace Reni.Type
                 TypeType = new ValueCache<TypeType>(() => new TypeType(parent));
                 Size = new ValueCache<Size>(parent.ObtainSize);
                 SymmetricConversions = new ValueCache<IEnumerable<ISimpleFeature>>(parent.ObtainSymmetricConversions);
-                RawPointer = new ValueCache<RawPointerType>(() => new RawPointerType(parent));
             }
         }
 
@@ -177,7 +173,7 @@ namespace Reni.Type
 
         Result VoidCodeAndRefs(Category category) => RootContext.VoidType.Result(category & (Category.Code | Category.Exts));
 
-        internal ArrayType Array(int count, ArrayType.Options options = null) => _cache.Array[count][options??ArrayType.Options.Instance()];
+        internal ArrayType Array(int count, string options = null) => _cache.Array[count][options ?? ArrayType.Options.DefaultOptionsId];
         protected virtual TypeBase ReversePair(TypeBase first) => first._cache.Pair[this];
         internal virtual TypeBase Pair(TypeBase second) => second.ReversePair(this);
         internal virtual Result Destructor(Category category) => VoidCodeAndRefs(category);
@@ -243,7 +239,6 @@ namespace Reni.Type
         [DisableDump]
         internal TypeBase FunctionInstance => _cache.FunctionInstanceType.Value;
 
-        internal TypeBase RawPointer => _cache.RawPointer.Value;
         [DisableDump]
         internal virtual CompoundView FindRecentCompoundView
         {
@@ -340,8 +335,8 @@ namespace Reni.Type
             return CheckedReference ?? new PointerType(this);
         }
 
-        protected virtual ArrayType ArrayForCache(int count, ArrayType.Options options)
-            => new ArrayType(this, count, options);
+        protected virtual ArrayType ArrayForCache(int count, string optionsId)
+            => new ArrayType(this, count, optionsId);
 
         [NotNull]
         internal Result GenericDumpPrintResult(Category category)
@@ -350,8 +345,8 @@ namespace Reni.Type
             return searchResults.Single().CallResult(category);
         }
 
-        internal Result CreateArray(Category category, ArrayType.Options options = null) => Align
-            .Array(1, options).Pointer
+        internal Result CreateArray(Category category, string optionsId = null) => Align
+            .Array(1, optionsId).Pointer
             .Result(category, PointerArgResult(category));
 
         internal bool IsConvertable(TypeBase destination) => ConversionService.FindPath(this, destination) != null;

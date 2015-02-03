@@ -32,7 +32,7 @@ namespace Reni.Context
         readonly ValueCache<VoidType> _voidCache;
         readonly ValueCache<IFeatureImplementation> _minusFeatureCache;
         readonly FunctionCache<string, CompileSyntax> _metaDictionary;
-        readonly FunctionCache<ArrayType.Options, IFeatureImplementation> _createArrayFeatureCache;
+        readonly FunctionCache<bool, IFeatureImplementation> _createArrayFeatureCache;
 
         internal Root(IExecutionContext executionContext)
         {
@@ -42,10 +42,10 @@ namespace Reni.Context
             _voidCache = new ValueCache<VoidType>(() => new VoidType(this));
             _minusFeatureCache = new ValueCache<IFeatureImplementation>
                 (() => new ContextMetaFunctionFromSyntax(_metaDictionary[ArgToken.Id + " " + Negate.Id]));
-            _createArrayFeatureCache = new FunctionCache<ArrayType.Options, IFeatureImplementation>
+            _createArrayFeatureCache = new FunctionCache<bool, IFeatureImplementation>
                 (
-                options =>
-                    new ContextMetaFunction((context, category, argsType) => CreateArrayResult(context, category, argsType, options)));
+                isMutable =>
+                    new ContextMetaFunction((context, category, argsType) => CreateArrayResult(context, category, argsType, isMutable)));
         }
 
         CompileSyntax CreateMetaDictionary(string source) => ExecutionContext.Parse(source);
@@ -73,14 +73,14 @@ namespace Reni.Context
         IFeatureImplementation ISymbolProviderForPointer<Minus, IFeatureImplementation>.Feature(Minus tokenClass) => _minusFeatureCache.Value;
 
         IFeatureImplementation ISymbolProviderForPointer<ConcatArrays, IFeatureImplementation>.Feature(ConcatArrays tokenClass)
-            => _createArrayFeatureCache[ArrayType.Options.Instance(isMutable:tokenClass.IsMutable)];
+            => _createArrayFeatureCache[tokenClass.IsMutable];
 
-        static Result CreateArrayResult(ContextBase context, Category category, CompileSyntax argsType, ArrayType.Options options)
+        static Result CreateArrayResult(ContextBase context, Category category, CompileSyntax argsType, bool isMutable)
         {
             var target = context.Result(category.Typed, argsType).SmartUn<PointerType>().Align;
             return target
                 .Type
-                .Array(1, options)
+                .Array(1, ArrayType.Options.Create().IsMutable.SetTo(isMutable))
                 .Result(category.Typed, target)
                 .LocalReferenceResult
                    & category;

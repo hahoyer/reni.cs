@@ -14,12 +14,10 @@ namespace Reni.ReniParser
     abstract class Syntax : ParsedSyntax
     {
         protected Syntax(SourcePart token)
-            : base(token)
-        {}
+            : base(token) {}
 
         protected Syntax(SourcePart token, int nextObjectId)
-            : base(token, nextObjectId)
-        {}
+            : base(token, nextObjectId) {}
 
         [DisableDump]
         internal virtual CompileSyntax ContainerStatementToCompileSyntax { get { return ToCompiledSyntax; } }
@@ -86,21 +84,16 @@ namespace Reni.ReniParser
 
         internal virtual IEnumerable<Syntax> ToList(List type) { yield return this; }
         internal virtual CompoundSyntax ToContainer => ListSyntax.Spread(this).ToContainer;
-
-        [DisableDump]
-        internal virtual bool IsMutableSyntax
-        {
-            get
-            {
-                NotImplementedMethod();
-                return false;
-            }
-        }
+        internal virtual bool IsMutableSyntax => false;
+        internal virtual bool IsConverterSyntax => false;
 
         internal virtual Syntax SyntaxError(IssueId issue, SourcePart token)
         {
             NotImplementedMethod(issue, token);
             return null;
         }
+
+        internal virtual Syntax SuffixedBy(Definable definable, SourcePart token)
+            => new ExpressionSyntax(definable, ToCompiledSyntax, token, null);
     }
 }

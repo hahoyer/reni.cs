@@ -10,20 +10,27 @@ namespace Reni.TokenClasses
 {
     sealed class DefinableTokenSyntax : Syntax
     {
-        readonly Definable _definable;
-
-        internal DefinableTokenSyntax(Definable definable, SourcePart tokenData)
+        internal DefinableTokenSyntax(Definable definable, SourcePart tokenData, bool isMutable)
             : base(tokenData)
         {
-            _definable = definable;
+            IsMutable = isMutable;
+            Definable = definable;
         }
+
+        bool IsMutable { get; }
+        Definable Definable { get; }
 
         internal override Syntax CreateDeclarationSyntax(SourcePart token, Syntax right)
-        {
-            return new DeclarationSyntax(_definable, token, right);
-        }
+            => new ReniParser.DeclarationSyntax(token, right, Definable, isMutable: IsMutable);
 
         [DisableDump]
-        internal override CompileSyntax ToCompiledSyntax { get { return new ExpressionSyntax(_definable, null, Token, null); } }
+        internal override CompileSyntax ToCompiledSyntax
+        {
+            get
+            {
+                Tracer.Assert(!IsMutable);
+                return new ExpressionSyntax(Definable, null, Token, null);
+            }
+        }
     }
 }

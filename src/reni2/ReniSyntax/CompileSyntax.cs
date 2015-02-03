@@ -11,6 +11,7 @@ using Reni.Code;
 using Reni.Context;
 using Reni.ReniParser;
 using Reni.Struct;
+using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.ReniSyntax
@@ -23,12 +24,10 @@ namespace Reni.ReniSyntax
         readonly FunctionCache<ContextBase, object> _resultCache = new FunctionCache<ContextBase, object>();
 
         internal CompileSyntax(SourcePart token)
-            : base(token)
-        {}
+            : base(token) {}
 
         internal CompileSyntax(SourcePart token, int objectId)
-            : base(token, objectId)
-        {}
+            : base(token, objectId) {}
 
         [DisableDump]
         internal bool IsLambda { get { return GetIsLambda(); } }
@@ -54,19 +53,15 @@ namespace Reni.ReniSyntax
             return null;
         }
 
-        protected virtual bool GetIsLambda() { return false; }
+        protected virtual bool GetIsLambda() => false;
 
-        internal override bool IsMutableSyntax { get { return false; } }
         internal override CompileSyntax ToCompiledSyntax { get { return this; } }
-        internal void AddToCacheForDebug(ContextBase context, object cacheItem) { _resultCache.Add(context, cacheItem); }
-        internal Result Result(ContextBase context) { return Result(context, Category.All); }
+        internal void AddToCacheForDebug(ContextBase context, object cacheItem) => _resultCache.Add(context, cacheItem);
+        internal Result Result(ContextBase context) => Result(context, Category.All);
         //[DebuggerHidden]
-        internal Result Result(ContextBase context, Category category) { return context.Result(category, this); }
+        internal Result Result(ContextBase context, Category category) => context.Result(category, this);
 
-        internal BitsConst Evaluate(ContextBase context)
-        {
-            return Result(context).Evaluate(context.RootContext.ExecutionContext);
-        }
+        internal BitsConst Evaluate(ContextBase context) => Result(context).Evaluate(context.RootContext.ExecutionContext);
 
         internal Result AtTokenResult(ContextBase context, Category category, CompileSyntax right)
         {
@@ -119,7 +114,7 @@ namespace Reni.ReniSyntax
             return null;
         }
 
-        public CompileSyntax ReplaceArg(CompileSyntax value) { return Visit(new ReplaceArgVisitor(value)); }
+        public CompileSyntax ReplaceArg(CompileSyntax value) => Visit(new ReplaceArgVisitor(value));
 
         internal virtual CompileSyntax Visit(ISyntaxVisitor visitor)
         {
