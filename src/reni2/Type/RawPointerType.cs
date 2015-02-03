@@ -4,8 +4,6 @@ using System.Linq;
 using hw.Debug;
 using Reni.Basics;
 using Reni.Context;
-using Reni.Feature;
-using Reni.Struct;
 
 namespace Reni.Type
 {
@@ -28,13 +26,13 @@ namespace Reni.Type
 
         [DisableDump]
         internal override Root RootContext => ValueType.RootContext;
-        internal override string DumpPrintText => "(" + ValueType.DumpPrintText + ")~~~";
+        internal override string DumpPrintText => "(" + ValueType.DumpPrintText + ")raw_address";
         [DisableDump]
         internal override bool Hllw => false;
         [DisableDump]
         internal override bool IsAligningPossible => false;
 
-        protected override string GetNodeDump() => ValueType.NodeDump + "[RawPointer]";
+        protected override string GetNodeDump() => ValueType.NodeDump + "[raw_address]";
         protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
     }
 }

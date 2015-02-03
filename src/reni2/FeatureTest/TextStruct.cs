@@ -17,8 +17,8 @@ namespace Reni.FeatureTest
             return
                 @"
 systemdata:
-{ Memory: (0 type * ('100' to_number_of_base 256)) instance()
-. FreePointer: (Memory >>0) raw_address
+{ Memory: ((0 type * ('100' to_number_of_base 256)) enable_mutability) instance()
+. FreePointer: :=! (Memory >> 0) raw_address enable_mutability
 };
 
 repeat: /\ ^ while() then(^ body(), repeat(^));
@@ -32,23 +32,31 @@ system: /!\
 . TextItemType: /!\ MaxNumber8 text_item type 
 
 . NewMemory: /\ 
-    { result: ((^ elementType * MaxNumber32 :=!) instance_from_raw_address (systemdata FreePointer)) 
+    { result: (^ elementType raw_address enable_mutability) instance (systemdata FreePointer enable_reinterpretation) 
     . initializer: ^ initializer
     . length: ^ length
     . position: :=! length type instance (0) 
     . repeat
-        ( while: position < length
-        . body: ( result >> position := initializer(position), position := position + 1) 
-        )
-    . systemdata FreePointer := systemdata FreePointer + (^ elementType size * ^ length)
+    (
+        while: /\ position < length,
+        body: /\ 
+        ( 
+            result >> position := initializer(position), 
+            position := (position + 1) enable_cut
+        ) 
+    )
+    . systemdata FreePointer :=
+        (systemdata FreePointer type) 
+        instance 
+        ((result >> length) raw_address enable_mutability enable_reinterpretation)
     } result 
 };
 
 Text: /\
-{ data: :=! ((system TextItemType * system MaxNumber32) instance_from_raw_address (^ enable_array_oversize)) 
-. _length: system MaxNumber32 type instance (^ type / system TextItemType)
+{ data: :=! (^ >> 0) raw_address 
+. _length: ^ type / (^ >> 0)type
 . AfterCopy: /\ data:= system NewMemory
-    ( elementType: system TextItemType
+    ( elementType: (^ >> 0)type
     . length: _length
     . initializer: /\ data >> ^
     )
@@ -58,8 +66,8 @@ Text: /\
 ";
         }
 
-        protected override string Target { get { return Definition() + "; " + InstanceCode + " dump_print"; } }
-        protected virtual string InstanceCode { get { return GetStringAttribute<InstanceCodeAttribute>(); } }
+        protected override string Target => Definition() + "; " + InstanceCode + " dump_print";
+        protected virtual string InstanceCode => GetStringAttribute<InstanceCodeAttribute>();
     }
 
     [TestFixture]
@@ -76,13 +84,11 @@ Text: /\
     [FunctionVariable]
     [Repeater]
     [FunctionArgument]
-    public sealed class Text1 : TextStruct
-    {}
+    public sealed class Text1 : TextStruct {}
 
     [TestFixture]
     [Output("Hallo")]
     [InstanceCode("(Text('H') << 'allo'")]
     [Text1]
-    public sealed class TextConcat : TextStruct
-    {}
+    public sealed class TextConcat : TextStruct {}
 }

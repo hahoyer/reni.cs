@@ -307,9 +307,7 @@
     <Compile Include="TokenClasses\DefinableTokenSyntax.cs" />
     <Compile Include="TokenClasses\Definable.cs" />
     <Compile Include="TokenClasses\ElseToken.cs" />
-    <Compile Include="TokenClasses\EnableArrayOverSize.cs" />
     <Compile Include="TokenClasses\EnableCut.cs" />
-    <Compile Include="TokenClasses\InstanceFromRawAddress.cs" />
     <Compile Include="TokenClasses\Function.cs" />
     <Compile Include="TokenClasses\FunctionInstanceToken.cs" />
     <Compile Include="TokenClasses\FunctionSyntax.cs" />

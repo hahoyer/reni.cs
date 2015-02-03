@@ -18,13 +18,12 @@ namespace Reni.Type
             , ISymbolProviderForPointer<ConcatArrays, IFeatureImplementation>
             , ISymbolProviderForPointer<TextItem, IFeatureImplementation>
             , ISymbolProviderForPointer<TokenClasses.ArrayAccess, IFeatureImplementation>
-            , ISymbolProviderForPointer<EnableArrayOverSize, IFeatureImplementation>
             , ISymbolProviderForPointer<ToNumberOfBase, IFeatureImplementation>
             , IRepeaterType
     {
         internal sealed class Options : DumpableObject
         {
-            static int Index(bool isMutable, bool isTextItem, bool isOversizeable)
+            static int Index(bool isMutable, bool isTextItem)
             {
                 var result = 0;
                 if(isMutable)
@@ -32,36 +31,27 @@ namespace Reni.Type
                 result *= 2;
                 if(isTextItem)
                     result++;
-                result *= 2;
-                if(isOversizeable)
-                    result++;
                 return result;
             }
 
             static IEnumerable<Options> CreateInstances()
             {
-                yield return new Options(false, false, false);
-                yield return new Options(false, false, true);
-                yield return new Options(false, true, false);
-                yield return new Options(false, true, true);
-                yield return new Options(true, false, false);
-                yield return new Options(true, false, true);
-                yield return new Options(true, true, false);
-                yield return new Options(true, true, true);
+                yield return new Options(false, false);
+                yield return new Options(false, true);
+                yield return new Options(true, false);
+                yield return new Options(true, true);
             }
 
             internal static readonly Options[] Instances = CreateInstances().ToArray();
 
-            Options(bool isMutable, bool isTextItem, bool isOversizeable)
+            Options(bool isMutable, bool isTextItem)
             {
                 IsMutable = isMutable;
                 IsTextItem = isTextItem;
-                IsOversizeable = isOversizeable;
             }
 
             public bool IsMutable { get; }
             public bool IsTextItem { get; }
-            public bool IsOversizeable { get; }
 
             IEnumerable<string> Tags
             {
@@ -71,18 +61,15 @@ namespace Reni.Type
                         yield return EnableReassignToken.Id;
                     if(IsTextItem)
                         yield return TokenClasses.TextItem.Id;
-                    if(IsOversizeable)
-                        yield return EnableArrayOverSize.Id;
                 }
             }
 
             protected override string GetNodeDump() => Tags.Select(t => "[" + t + "]").Stringify("");
-            public Options ToTextItem(bool value = true) => Instance(IsMutable, value, IsOversizeable);
-            public Options ToMutable(bool value = true) => Instance(value, IsTextItem, IsOversizeable);
-            public Options ToEnableArrayOverSize(bool value = true) => Instance(IsMutable, IsTextItem, value);
+            public Options ToTextItem(bool value = true) => Instance(IsMutable, value);
+            public Options ToMutable(bool value = true) => Instance(value, IsTextItem);
 
-            public static Options Instance(bool isMutable = false, bool isTextItem = false, bool isOversizeable = false)
-                => Instances[Index(isMutable, isTextItem, isOversizeable)];
+            public static Options Instance(bool isMutable = false, bool isTextItem = false)
+                => Instances[Index(isMutable, isTextItem)];
         }
 
 
@@ -118,19 +105,12 @@ namespace Reni.Type
         internal ArrayType Mutable => ElementType.Array(Count, Option.ToMutable());
 
         [DisableDump]
-        ArrayType EnableArrayOverSizeType => ElementType.Array(Count, Option.ToEnableArrayOverSize());
-
-        [DisableDump]
         internal override bool Hllw => Count == 0 || ElementType.Hllw;
 
         internal override string DumpPrintText => "(" + ElementType.DumpPrintText + ")*" + Count;
 
         [DisableDump]
         internal override Size SimpleItemSize => Option.IsTextItem ? (ElementType.SimpleItemSize ?? Size) : base.SimpleItemSize;
-
-        IFeatureImplementation ISymbolProviderForPointer<EnableArrayOverSize, IFeatureImplementation>.Feature
-            (EnableArrayOverSize tokenClass)
-            => Extension.SimpleFeature(EnableArrayOverSizeResult);
 
         IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>.Feature
             (DumpPrintToken tokenClass)
@@ -168,7 +148,6 @@ namespace Reni.Type
         internal override Result Copier(Category category) => ElementType.ArrayCopier(category, Count);
 
         Result TextItemResult(Category category) => ResultFromPointer(category, TextItem);
-        Result EnableArrayOverSizeResult(Category category) => ResultFromPointer(category, EnableArrayOverSizeType);
 
         internal override Result ConstructorResult(Category category, TypeBase argsType) => Result
             (
