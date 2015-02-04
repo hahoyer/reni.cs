@@ -12,10 +12,11 @@ namespace Reni.Type
     sealed class ReferenceType
         : TypeBase
             , ISymbolProviderForPointer<Mutable, IFeatureImplementation>
+            , ISymbolProviderForPointer<EnableReinterpretation, IFeatureImplementation>
     {
         readonly int _order;
 
-        sealed internal class Options : DumpableObject
+        internal sealed class Options : DumpableObject
         {
             OptionsData OptionsData { get; }
 
@@ -23,17 +24,20 @@ namespace Reni.Type
             {
                 OptionsData = new OptionsData(optionsId);
                 IsMutable = new OptionsData.Option(OptionsData);
+                IsOverSizeable = new OptionsData.Option(OptionsData);
+                IsEnableReinterpretation = new OptionsData.Option(OptionsData);
                 OptionsData.Align();
                 Tracer.Assert(OptionsData.IsValid);
             }
 
-            public OptionsData.Option IsMutable { get; }
+            internal OptionsData.Option IsMutable { get; }
+            internal OptionsData.Option IsOverSizeable { get; }
+            internal OptionsData.Option IsEnableReinterpretation { get; }
 
-            public static Options Create(string optionsId = null) => new Options(optionsId);
-            internal static readonly string DefaultOptionsId = Options.Create().OptionsData.Id;
+            internal static Options Create(string optionsId = null) => new Options(optionsId);
+            internal static readonly string DefaultOptionsId = Create().OptionsData.Id;
             protected override string GetNodeDump()
-                => (IsMutable.Value ? "m" : "")
-                ;
+                => (IsMutable.Value ? "m" : "");
         }
 
         internal ReferenceType(ArrayType valueType, string optionsId)
@@ -46,7 +50,7 @@ namespace Reni.Type
             StopByObjectId(-10);
         }
 
-        ArrayType ValueType { get; }
+        internal ArrayType ValueType { get; }
         Options options { get; }
 
         [DisableDump]
@@ -62,11 +66,26 @@ namespace Reni.Type
 
         [DisableDump]
         internal ReferenceType Mutable => ValueType.Reference(options.IsMutable.SetTo(true));
+        [DisableDump]
+        internal ReferenceType OverSizeable => ValueType.Reference(options.IsOverSizeable.SetTo(true));
+        [DisableDump]
+        internal ReferenceType EnableReinterpretation => ValueType.Reference(options.IsEnableReinterpretation.SetTo(true));
 
 
         IFeatureImplementation ISymbolProviderForPointer<Mutable, IFeatureImplementation>.Feature(Mutable tokenClass)
-            => Feature.Extension.SimpleFeature(MutableResult);
+            => Extension.SimpleFeature(MutableResult);
 
-        Result MutableResult(Category category) => ResultFromPointer(category, Mutable);
+        IFeatureImplementation ISymbolProviderForPointer<EnableReinterpretation, IFeatureImplementation>.Feature
+            (EnableReinterpretation tokenClass)
+            => Extension.SimpleFeature(EnableReinterpretationResult);
+
+
+        Result MutableResult(Category category)
+        {
+            Tracer.Assert(ValueType.IsMutable);
+            return ResultFromPointer(category, Mutable);
+        }
+
+        Result EnableReinterpretationResult(Category category) => ResultFromPointer(category, EnableReinterpretation);
     }
 }

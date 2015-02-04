@@ -379,7 +379,7 @@ namespace Reni.Type
 
         internal Result ResultFromPointer(Category category, TypeBase resultType) => resultType
             .Pointer
-            .Result(category, Pointer.ArgResult(category.Typed));
+            .Result(category, PointerObjectResult);
 
         internal virtual Result InstanceResult(Category category, Func<Category, Result> getRightResult)
         {
@@ -465,9 +465,9 @@ namespace Reni.Type
         protected Result DumpPrintTokenResult(Category category)
             => VoidType
                 .Result(category, DumpPrintCode, CodeArgs.Arg)
-                .ReplaceArg(ReferenceResult(category).DereferenceResult);
+                .ReplaceArg(PointerObjectResult(category).DereferenceResult);
 
-        internal Result ReferenceResult(Category category)
+        internal Result PointerObjectResult(Category category)
             => Hllw ? Result(category) : Pointer.Result(category.Typed, ForcedReference);
 
         protected virtual CodeBase DumpPrintCode()

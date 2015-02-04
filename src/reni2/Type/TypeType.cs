@@ -18,6 +18,8 @@ namespace Reni.Type
             , ISymbolProvider<Star, IFeatureImplementation>
             , ISymbolProvider<Slash, IFeatureImplementation>
             , ISymbolProvider<Mutable, IFeatureImplementation>
+            , ISymbolProvider<Reference, IFeatureImplementation>
+            , ISymbolProvider<OverSizeable, IFeatureImplementation>
     {
         public TypeType(TypeBase value)
         {
@@ -46,7 +48,18 @@ namespace Reni.Type
             => Extension.MetaFeature(SlashResult);
 
         IFeatureImplementation ISymbolProvider<Mutable, IFeatureImplementation>.Feature(Mutable tokenClass)
-            => Value is ArrayType ? Extension.SimpleFeature(MutableResult) : null;
+            => Value is ArrayType
+                ? Extension.SimpleFeature(MutableArrayResult)
+                : Value is ReferenceType
+                    ? Extension.SimpleFeature(MutableReferenceResult)
+                    : null;
+
+        IFeatureImplementation ISymbolProvider<Reference, IFeatureImplementation>.Feature(Reference tokenClass)
+            => Value is ArrayType ? Extension.SimpleFeature(ReferenceResult) : null;
+
+        IFeatureImplementation ISymbolProvider<OverSizeable, IFeatureImplementation>.Feature(OverSizeable tokenClass)
+            => Value is ReferenceType ? Extension.SimpleFeature(OverSizeableReferenceResult) : null;
+
 
         protected override string GetNodeDump() => "(" + Value.NodeDump + ") type";
 
@@ -101,6 +114,9 @@ namespace Reni.Type
             return RootContext.BitType.Result(category, BitsConst.Convert(count.Value));
         }
 
-        Result MutableResult(Category category) => ((ArrayType) Value).Mutable.TypeType.Result(category);
+        Result MutableArrayResult(Category category) => ((ArrayType) Value).Mutable.TypeType.Result(category);
+        Result ReferenceResult(Category category) => ((ArrayType) Value).Reference().TypeType.Result(category);
+        Result MutableReferenceResult(Category category) => ((ReferenceType) Value).Mutable.TypeType.Result(category);
+        Result OverSizeableReferenceResult(Category category) => ((ReferenceType)Value).OverSizeable.TypeType.Result(category);
     }
 }

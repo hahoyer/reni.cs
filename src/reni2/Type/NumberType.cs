@@ -92,21 +92,21 @@ namespace Reni.Type
                     category,
                     Parent
                         .Pointer
-                        .Result(category, ReferenceResult(category.Typed)))
+                        .Result(category, PointerObjectResult(category.Typed)))
                 ;
         }
 
         Result NegationResult(Category category) => ((NumberType) _zeroResult.Value.Type)
             .OperationResult(category, _minusOperation, this)
             .ReplaceAbsolute(_zeroResult.Value.Type.ForcedReference, c => _zeroResult.Value.LocalReferenceResult & (c))
-            .ReplaceArg(ReferenceResult);
+            .ReplaceArg(PointerObjectResult);
 
         protected override CodeBase DumpPrintCode() => Align.ArgCode.DumpPrintNumber(Align.Size);
 
         Result EnableCutTokenResult(Category category)
             => EnableCut
                 .Pointer
-                .Result(category.Typed, ReferenceResult(category));
+                .Result(category.Typed, PointerObjectResult(category));
 
         Result OperationResult(Category category, TypeBase right, IOperation operation)
         {
@@ -140,7 +140,7 @@ namespace Reni.Type
                     CodeArgs.Arg
                 );
 
-            var leftResult = ReferenceResult(category.Typed)
+            var leftResult = PointerObjectResult(category.Typed)
                 .Conversion(Align);
             var rightResult = right.Pointer.ArgResult(category.Typed).Conversion(right.Align);
             var pair = leftResult + rightResult;

@@ -30,7 +30,15 @@ namespace Reni.TokenClasses
         internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
     }
 
-    sealed class EnableReinterpretationToken : Definable, ITokenClassWithId
+    sealed class OverSizeable : Definable, ITokenClassWithId
+    {
+        public const string Id = "oversizeable";
+        string ITokenClassWithId.Id => Id;
+        [DisableDump]
+        internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
+    }
+
+    sealed class EnableReinterpretation : Definable, ITokenClassWithId
     {
         public const string Id = "enable_reinterpretation";
         string ITokenClassWithId.Id => Id;

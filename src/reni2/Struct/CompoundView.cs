@@ -151,7 +151,7 @@ namespace Reni.Struct
         }
 
         internal Result AccessAsLeftReference(Category category, int position)
-            => AccessType(position).Result(category, Type.ReferenceResult);
+            => AccessType(position).Result(category, Type.PointerObjectResult);
 
         internal Result AccessViaContext(Category category, int position)
             => AccessViaObjectPointer(category, position)

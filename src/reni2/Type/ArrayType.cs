@@ -70,16 +70,16 @@ namespace Reni.Type
             _referenceCache = new FunctionCache<string, ReferenceType>(id => new ReferenceType(this, id));
         }
 
-
-        public bool IsMutable => options.IsMutable.Value;
-
-        internal TypeBase ElementType { get; }
+        TypeBase ElementType { get; }
         int Count { get; }
         Options options { get; }
 
         TypeBase IRepeaterType.ElementType => ElementType;
         Size IRepeaterType.IndexSize => IndexSize;
         bool IRepeaterType.IsMutable => IsMutable;
+
+        [DisableDump]
+        internal bool IsMutable => options.IsMutable.Value;
 
         [DisableDump]
         public NumberType Number => _numberCache.Value;
