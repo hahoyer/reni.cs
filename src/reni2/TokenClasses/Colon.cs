@@ -45,10 +45,7 @@ namespace Reni.TokenClasses
         public const string Id = "mutable";
         string ITokenClassWithId.Id => Id;
         internal override Syntax DeclarationSyntax(SourcePart token, CompileSyntax body)
-        {
-            NotImplementedMethod(token, body);
-            return null;
-        }
+            => new ReniParser.DeclarationSyntax(token, body, isMutable: true);
         internal override Syntax DefinableSyntax(Definable definable, SourcePart token)
             => new DefinableTokenSyntax(definable, token, true);
     }
