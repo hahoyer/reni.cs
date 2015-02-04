@@ -141,7 +141,7 @@ namespace Reni.Type
 
         Result TextItemResult(Category category) => ResultFromPointer(category, TextItem);
         Result MutableResult(Category category) => ResultFromPointer(category, Mutable);
-        new Result ReferenceResult(Category category) => ResultFromPointer(category, Reference());
+        Result ReferenceResult(Category category) => ResultFromPointer(category, Reference());
 
         internal override Result ConstructorResult(Category category, TypeBase argsType) => Result
             (
