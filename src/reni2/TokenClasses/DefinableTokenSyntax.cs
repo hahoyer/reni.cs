@@ -21,7 +21,7 @@ namespace Reni.TokenClasses
         Definable Definable { get; }
 
         internal override Syntax CreateDeclarationSyntax(SourcePart token, Syntax right)
-            => new ReniParser.DeclarationSyntax(token, right, Definable, isMutable: IsMutable);
+            => new ReniParser.DeclarationSyntax(token, right.ToCompiledSyntax, Definable, isMutable: IsMutable);
 
         [DisableDump]
         internal override CompileSyntax ToCompiledSyntax

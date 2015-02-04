@@ -10,7 +10,7 @@ namespace Reni.ReniParser
 {
     sealed class DeclarationSyntax : Syntax
     {
-        internal DeclarationSyntax(SourcePart token, Syntax body, Definable definable = null, bool isConverter = false, bool isMutable = false)
+        internal DeclarationSyntax(SourcePart token, CompileSyntax body, Definable definable = null, bool isConverter = false, bool isMutable = false)
             : base(token)
         {
             Definable = definable;
@@ -46,9 +46,9 @@ namespace Reni.ReniParser
 
         internal override IEnumerable<string> GetDeclarations()
         {
+            if(Definable == null)
+                yield break;
             yield return Definable.Name;
-            foreach(var result in Body.GetDeclarations())
-                yield return result;
         }
     }
 }
