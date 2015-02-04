@@ -37,7 +37,10 @@ namespace Reni.Type
             internal static Options Create(string optionsId = null) => new Options(optionsId);
             internal static readonly string DefaultOptionsId = Create().OptionsData.Id;
             protected override string GetNodeDump()
-                => (IsMutable.Value ? "m" : "");
+                => (IsMutable.Value ? "m" : "")
+                + (IsOverSizeable.Value ? "o" : "")
+                + (IsEnableReinterpretation.Value ? "r" : "")
+                ;
         }
 
         internal ReferenceType(ArrayType valueType, string optionsId)
@@ -61,7 +64,7 @@ namespace Reni.Type
         [DisableDump]
         internal override bool IsAligningPossible => false;
 
-        protected override string GetNodeDump() => ValueType.NodeDump + "[reference]";
+        protected override string GetNodeDump() => ValueType.NodeDump + "[reference]" + options.NodeDump;
         protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
 
         [DisableDump]
