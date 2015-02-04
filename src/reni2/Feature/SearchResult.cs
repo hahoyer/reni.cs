@@ -38,6 +38,22 @@ namespace Reni.Feature
                 .ApplyResult(category, rightResult.Type)
                 .ReplaceArg(rightResult);
         }
+
+        protected Result ResultForDebug(Category category, ContextBase context, CompileSyntax right)
+        {
+            var trace = ObjectId == 773;
+            StartMethodDump(trace, category, context, right);
+            try
+            {
+                BreakExecution();
+                var result = Result(category,context,right);
+                return ReturnMethodDump(result);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
+        }
     }
 
     sealed class SearchResult : FeatureContainer
@@ -63,7 +79,7 @@ namespace Reni.Feature
             if(metaFeature != null)
                 return metaFeature.Result(category, left, context, right);
 
-            var result1 = Result(category.Typed, context, right);
+            var result1 = ResultForDebug(category.Typed, context, right);
             var result = result1
                 .ReplaceAbsolute(ConverterPath.Destination.CheckedReference, ConverterPath.Execute);
             return result
