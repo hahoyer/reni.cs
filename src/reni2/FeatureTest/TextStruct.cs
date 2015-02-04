@@ -85,6 +85,7 @@ Text: /\
     [FunctionVariable]
     [Repeater]
     [FunctionArgument]
+    [PrimitiveRecursiveFunctionHuge]
     public sealed class Text1 : TextStruct {}
 
     [TestFixture]

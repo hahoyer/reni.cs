@@ -14,7 +14,7 @@ namespace Reni.FeatureTest.Function
 repeat: /\ ^() while then repeat(^);
 
 count: 10;
-index: :=! count type instance(0);
+!mutable index: count type instance(0);
 repeat
 (/\(
     while: index < count, 
@@ -41,7 +41,7 @@ repeat
 repeat: /\ ^ while() then(^ body(), repeat(^));
 
 count: 10;
-index: :=! count type instance(0);
+!mutable index: count type instance(0);
 repeat
 (
     while: /\ index < count, 
