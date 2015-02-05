@@ -35,7 +35,9 @@
     <Compile Include="FeatureTest\Array\DefaultInitialized.cs" />
     <Compile Include="FeatureTest\Array\ElementAccess.cs" />
     <Compile Include="FeatureTest\Array\FromTypeAndFunction.cs" />
+    <Compile Include="FeatureTest\Array\ReferenceSimple.cs" />
     <Compile Include="FeatureTest\Array\SimpleArrayFromPiece.cs" />
+    <Compile Include="FeatureTest\Array\TypeOfSimpleArrayFromPiece.cs" />
     <Compile Include="FeatureTest\BlogExamples\Post120109.cs" />
     <Compile Include="FeatureTest\BlogExamples\Post120617.cs" />
     <Compile Include="FeatureTest\ConversionService\Closure.cs" />
@@ -64,6 +66,7 @@
     <Compile Include="FeatureTest\Function\TwoFunctions.cs" />
     <Compile Include="FeatureTest\Function\TwoFunctions1.cs" />
     <Compile Include="FeatureTest\Helper\LikeSyntax.cs" />
+    <Compile Include="FeatureTest\Reference\All.cs" />
     <Compile Include="FeatureTest\Structure\Access.cs" />
     <Compile Include="FeatureTest\Structure\AccessAndAdd.cs" />
     <Compile Include="FeatureTest\Structure\AccessAndAddComplex.cs" />
@@ -322,7 +325,6 @@
     <Compile Include="TokenClasses\Text.cs" />
     <Compile Include="TokenClasses\TextItem.cs" />
     <Compile Include="TokenClasses\ThenToken.cs" />
-    <Compile Include="TokenClasses\UndecorateToken.cs" />
     <Compile Include="TokenClasses\UserSymbol.cs" />
     <Compile Include="TokenClasses\NewValueToken.cs" />
     <Compile Include="Type\ConversionPath.cs" />
@@ -392,7 +394,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="FeatureTest\Enumeration\" />
-    <Folder Include="FeatureTest\Reference\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="hw\Forms\TreeForm.resx" />

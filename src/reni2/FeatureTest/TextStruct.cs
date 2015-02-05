@@ -5,6 +5,7 @@ using hw.UnitTest;
 using Reni.FeatureTest.Array;
 using Reni.FeatureTest.Function;
 using Reni.FeatureTest.Integer;
+using Reni.FeatureTest.Reference;
 using Reni.FeatureTest.Text;
 using Reni.FeatureTest.TypeType;
 
@@ -32,7 +33,7 @@ system: /!\
 . TextItemType: /!\ MaxNumber8 text_item type 
 
 . NewMemory: /\ 
-    { result: ((^ elementType *1) reference mutable oversizeable) instance (systemdata FreePointer enable_reinterpretation) 
+    { result: (((^ elementType) * 1) reference mutable oversizeable) instance (systemdata FreePointer enable_reinterpretation) 
     . initializer: ^ initializer
     . length: ^ length
     . !mutable position: length type instance (0) 
@@ -41,7 +42,7 @@ system: /!\
         while: /\ position < length,
         body: /\ 
         ( 
-            result >> position := initializer(position), 
+            result target >> position := initializer(position), 
             position := (position + 1) enable_cut
         ) 
     )
@@ -59,10 +60,10 @@ Text: /\
 . AfterCopy: /\ data:= system NewMemory
     ( elementType: _elementType
     . length: _length
-    . initializer: /\ data >> ^
+    . initializer: /\ data target >> ^
     )
 . AfterCopy()
-. dump_print: /!\ _data dump_print
+. dump_print: /!\ data target dump_print
 }
 ";
         }
@@ -72,8 +73,8 @@ Text: /\
     }
 
     [TestFixture]
-    [Output("a")]
-    [InstanceCode("Text('a')")]
+    [Output("ab")]
+    [InstanceCode("Text('ab')")]
     [Integer1]
     [TwoFunctions]
     [FromTypeAndFunction]
@@ -86,6 +87,7 @@ Text: /\
     [Repeater]
     [FunctionArgument]
     [PrimitiveRecursiveFunctionHuge]
+    [ArrayElementType]
     public sealed class Text1 : TextStruct {}
 
     [TestFixture]
