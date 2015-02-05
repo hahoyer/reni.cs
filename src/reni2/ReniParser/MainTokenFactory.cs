@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Parser;
 using Reni.Numeric;
+using Reni.Parser;
 using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Validation;
@@ -108,9 +107,9 @@ namespace Reni.ReniParser
         protected override IDictionary<string, TokenClass> GetPredefinedTokenClasses()
         {
             return TokenClassesEx
-                .ToDictionary(t => t.Id, t => (TokenClass)t)
+                .ToDictionary(t => t.Id, t => (TokenClass) t)
                 .Concat(TokenClasses)
-                .ToDictionary(t=>t.Key, t=>t.Value);
+                .ToDictionary(t => t.Key, t => t.Value);
         }
 
         IDictionary<string, TokenClass> TokenClasses => new Dictionary<string, TokenClass>
@@ -149,7 +148,6 @@ namespace Reni.ReniParser
             {"new_value", new NewValueToken()},
             {"then", new ThenToken()},
             {"to_number_of_base", new ToNumberOfBase()},
-            {"undecorate", new UndecorateToken()},
             {"type", new TypeOperator()}
         };
 
@@ -158,17 +156,18 @@ namespace Reni.ReniParser
             new ArrayAccess(),
             new AlignToken(),
             new ArgToken(),
-            new ConcatArrays(isMutable:false),
-            new ConcatArrays(isMutable:true),
-            new EnableReinterpretation(), 
-            new ForceMutabilityToken(), 
+            new ConcatArrays(false),
+            new ConcatArrays(true),
+            new EnableReinterpretation(),
+            new ForceMutabilityToken(),
             new Minus(),
             new Mutable(),
             new Negate(),
-            new OverSizeable(), 
+            new OverSizeable(),
             new ReassignToken(),
-            new Reference(), 
-            new TextItem(),
+            new Reference(),
+            new Target(),
+            new TextItem()
         };
 
         static IType<Syntax> Pack(Syntax options) { return new SyntaxBoxToken(options); }

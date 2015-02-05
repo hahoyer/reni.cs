@@ -57,4 +57,12 @@ namespace Reni.TokenClasses
         internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
         string ITokenClassWithId.Id => Id;
     }
+
+    sealed class Target: Definable, ITokenClassWithId
+    {
+        public const string Id = "target";
+        [DisableDump]
+        internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
+        string ITokenClassWithId.Id => Id;
+    }
 }
