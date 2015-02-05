@@ -99,7 +99,7 @@ namespace Reni.Type
         [DisableDump]
         internal override TypeBase ElementTypeForReference => ValueType.ElementTypeForReference;
 
-        protected override IEnumerable<ISimpleFeature> ObtainRawSymmetricConversions() { yield break; }
+        protected override IEnumerable<ISimpleFeature> RawSymmetricConversions { get { yield break; } }
 
         [DisableDump]
         internal override IEnumerable<ISimpleFeature> StripConversions

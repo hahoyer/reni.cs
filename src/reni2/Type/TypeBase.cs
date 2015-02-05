@@ -68,8 +68,8 @@ namespace Reni.Type
                 Aligner = new FunctionCache<int, AlignType>(alignBits => new AlignType(parent, alignBits));
                 FunctionInstanceType = new ValueCache<FunctionInstanceType>(() => new FunctionInstanceType(parent));
                 TypeType = new ValueCache<TypeType>(() => new TypeType(parent));
-                Size = new ValueCache<Size>(parent.ObtainSize);
-                SymmetricConversions = new ValueCache<IEnumerable<ISimpleFeature>>(parent.ObtainSymmetricConversions);
+                Size = new ValueCache<Size>(parent.GetSizeForCache);
+                SymmetricConversions = new ValueCache<IEnumerable<ISimpleFeature>>(parent.GetSymmetricConversionsForCache);
             }
         }
 
@@ -98,7 +98,7 @@ namespace Reni.Type
         }
 
         [NotNull]
-        Size ObtainSize()
+        Size GetSizeForCache()
         {
             if(Hllw)
                 return Size.Zero;
@@ -419,19 +419,23 @@ namespace Reni.Type
 
         Result AlignResult(Category category) { return Align.Result(category, () => ArgCode.Align(), CodeArgs.Arg); }
 
-        IEnumerable<ISimpleFeature> ObtainSymmetricConversions()
-            => ObtainRawSymmetricConversions()
+        IEnumerable<ISimpleFeature> GetSymmetricConversionsForCache()
+            => RawSymmetricConversions
                 .ToDictionary(x => x.ResultType())
                 .Values;
 
-        protected virtual IEnumerable<ISimpleFeature> ObtainRawSymmetricConversions()
+        [DisableDump]
+        protected virtual IEnumerable<ISimpleFeature> RawSymmetricConversions
         {
-            if(Hllw)
-                yield break;
-            if(IsAligningPossible && Align.Size != Size)
-                yield return Feature.Extension.SimpleFeature(AlignResult);
-            if(!(this is PointerType))
-                yield return Feature.Extension.SimpleFeature(LocalReferenceResult);
+            get
+            {
+                if(Hllw)
+                    yield break;
+                if(IsAligningPossible && Align.Size != Size)
+                    yield return Feature.Extension.SimpleFeature(AlignResult);
+                if(!(this is PointerType))
+                    yield return Feature.Extension.SimpleFeature(LocalReferenceResult);
+            }
         }
 
         internal IEnumerable<ISimpleFeature> GetForcedConversions(TypeBase destination)
