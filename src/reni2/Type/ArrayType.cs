@@ -41,8 +41,8 @@ namespace Reni.Type
             Options(string optionsId)
             {
                 OptionsData = new OptionsData(optionsId);
-                IsMutable = new OptionsData.Option(OptionsData);
-                IsTextItem = new OptionsData.Option(OptionsData);
+                IsMutable = new OptionsData.Option(OptionsData, "mutable");
+                IsTextItem = new OptionsData.Option(OptionsData, "text_item");
                 OptionsData.Align();
                 Tracer.Assert(OptionsData.IsValid);
             }
@@ -52,9 +52,10 @@ namespace Reni.Type
 
             public static Options Create(string optionsId = null) => new Options(optionsId);
             internal static readonly string DefaultOptionsId = Create().OptionsData.Id;
-            protected override string GetNodeDump()
-                => (IsMutable.Value ? "m" : "")
-                    + (IsTextItem.Value ? "t" : "");
+
+            protected override string GetNodeDump()=> OptionsData.DumpPrintText;
+            public string DumpPrintText => OptionsData.DumpPrintText;
+
         }
 
         public ArrayType(TypeBase elementType, int count, string optionsId)
@@ -70,7 +71,7 @@ namespace Reni.Type
             _referenceCache = new FunctionCache<string, ReferenceType>(id => new ReferenceType(this, id));
         }
 
-        TypeBase ElementType { get; }
+        internal TypeBase ElementType { get; }
         int Count { get; }
         Options options { get; }
 
@@ -93,7 +94,7 @@ namespace Reni.Type
         [DisableDump]
         internal override bool Hllw => Count == 0 || ElementType.Hllw;
 
-        internal override string DumpPrintText => "(" + ElementType.DumpPrintText + ")*" + Count;
+        internal override string DumpPrintText => "(" + ElementType.DumpPrintText + ")*" + Count + options.DumpPrintText;
 
         [DisableDump]
         internal override Size SimpleItemSize
@@ -197,7 +198,7 @@ namespace Reni.Type
         [DisableDump]
         TypeBase IndexType => RootContext.BitType.Number(IndexSize.ToInt());
 
-        Size IndexSize => Size.AutoSize(Count).Align(Root.DefaultRefAlignParam.AlignBits);
+        internal Size IndexSize => Size.AutoSize(Count).Align(Root.DefaultRefAlignParam.AlignBits);
 
         protected override string GetNodeDump() => ElementType.NodeDump + "*" + Count + options.NodeDump;
 

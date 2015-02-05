@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using hw.Helper;
 using System.Linq;
 using hw.Debug;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.TokenClasses;
@@ -13,6 +15,8 @@ namespace Reni.Type
         : TypeBase
             , ISymbolProviderForPointer<Mutable, IFeatureImplementation>
             , ISymbolProviderForPointer<EnableReinterpretation, IFeatureImplementation>
+            , ISymbolProviderForPointer<Target, IFeatureImplementation>
+            , IForcedConversionProvider<ReferenceType>
     {
         readonly int _order;
 
@@ -23,9 +27,9 @@ namespace Reni.Type
             Options(string optionsId)
             {
                 OptionsData = new OptionsData(optionsId);
-                IsMutable = new OptionsData.Option(OptionsData);
-                IsOverSizeable = new OptionsData.Option(OptionsData);
-                IsEnableReinterpretation = new OptionsData.Option(OptionsData);
+                IsMutable = new OptionsData.Option(OptionsData,"mutable");
+                IsOverSizeable = new OptionsData.Option(OptionsData, "oversizeable");
+                IsEnableReinterpretation = new OptionsData.Option(OptionsData,"enable_reinterpretation");
                 OptionsData.Align();
                 Tracer.Assert(OptionsData.IsValid);
             }
@@ -38,9 +42,8 @@ namespace Reni.Type
             internal static readonly string DefaultOptionsId = Create().OptionsData.Id;
             protected override string GetNodeDump()
                 => (IsMutable.Value ? "m" : "")
-                + (IsOverSizeable.Value ? "o" : "")
-                + (IsEnableReinterpretation.Value ? "r" : "")
-                ;
+                    + (IsOverSizeable.Value ? "o" : "")
+                    + (IsEnableReinterpretation.Value ? "r" : "");
         }
 
         internal ReferenceType(ArrayType valueType, string optionsId)
@@ -53,7 +56,7 @@ namespace Reni.Type
             StopByObjectId(-10);
         }
 
-        internal ArrayType ValueType { get; }
+        ArrayType ValueType { get; }
         Options options { get; }
 
         [DisableDump]
@@ -63,9 +66,13 @@ namespace Reni.Type
         internal override bool Hllw => false;
         [DisableDump]
         internal override bool IsAligningPossible => false;
+        [DisableDump]
+        protected override IEnumerable<IGenericProviderForType> Genericize => this.GenericListFromType(base.Genericize);
+        [DisableDump]
+        protected override IEnumerable<ISimpleFeature> RawSymmetricConversions => base.RawSymmetricConversions;
 
         protected override string GetNodeDump() => ValueType.NodeDump + "[reference]" + options.NodeDump;
-        protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
+        protected override Size GetSize() => ValueType.Pointer.Size + ValueType.IndexSize;
 
         [DisableDump]
         internal ReferenceType Mutable => ValueType.Reference(options.IsMutable.SetTo(true));
@@ -74,6 +81,8 @@ namespace Reni.Type
         [DisableDump]
         internal ReferenceType EnableReinterpretation => ValueType.Reference(options.IsEnableReinterpretation.SetTo(true));
 
+        IEnumerable<ISimpleFeature> IForcedConversionProvider<ReferenceType>.Result(ReferenceType destination)
+            => ForcedConversion(destination).NullableToArray();
 
         IFeatureImplementation ISymbolProviderForPointer<Mutable, IFeatureImplementation>.Feature(Mutable tokenClass)
             => Extension.SimpleFeature(MutableResult);
@@ -82,6 +91,8 @@ namespace Reni.Type
             (EnableReinterpretation tokenClass)
             => Extension.SimpleFeature(EnableReinterpretationResult);
 
+        IFeatureImplementation ISymbolProviderForPointer<Target, IFeatureImplementation>.Feature(Target tokenClass)
+            => Extension.SimpleFeature(TargetResult);
 
         Result MutableResult(Category category)
         {
@@ -90,5 +101,48 @@ namespace Reni.Type
         }
 
         Result EnableReinterpretationResult(Category category) => ResultFromPointer(category, EnableReinterpretation);
+
+        ISimpleFeature ForcedConversion(ReferenceType destination)
+        {
+            if(this == destination)
+                return Extension.SimpleFeature(ArgResult);
+
+            if(destination.options.IsMutable.Value && !options.IsMutable.Value)
+                return null;
+
+            if(ValueType == destination.ValueType)
+            {
+                NotImplementedMethod(destination);
+                return null;
+            }
+
+            if(ValueType.ElementType == destination.ValueType.ElementType)
+            {
+                NotImplementedMethod(destination);
+                return null;
+            }
+
+            if(!options.IsEnableReinterpretation.Value)
+                return null;
+
+            return Extension.SimpleFeature(category => destination.ConversionResult(category, this), this);
+        }
+
+        Result ConversionResult(Category category, ReferenceType source)
+            => Result(category, () => ConversionCode(source), CodeArgs.Arg);
+
+        CodeBase ConversionCode(ReferenceType source)
+        {
+            NotImplementedMethod(source);
+            return null;
+        }
+
+        Result TargetResult(Category category) => ValueType.Pointer.Result(category, TargetCode, CodeArgs.Arg);
+
+        CodeBase TargetCode()
+        {
+            NotImplementedMethod();
+            return null;
+        }
     }
 }

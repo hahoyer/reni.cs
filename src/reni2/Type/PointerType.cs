@@ -51,8 +51,9 @@ namespace Reni.Type
         TypeBase ISimpleFeature.TargetType => ValueType;
         Result ISimpleFeature.Result(Category category) => DereferenceResult(category);
 
-        protected override IEnumerable<ISimpleFeature> ObtainRawSymmetricConversions()
-            => base.ObtainRawSymmetricConversions().Concat(new ISimpleFeature[] {Extension.SimpleFeature(DereferenceResult)});
+        [DisableDump]
+        protected override IEnumerable<ISimpleFeature> RawSymmetricConversions
+            => base.RawSymmetricConversions.Concat(new ISimpleFeature[] {Extension.SimpleFeature(DereferenceResult)});
 
         protected override string GetNodeDump() => ValueType.NodeDump + "[Pointer]";
         internal override int? SmartArrayLength(TypeBase elementType) => ValueType.SmartArrayLength(elementType);
