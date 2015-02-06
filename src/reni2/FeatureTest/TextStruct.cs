@@ -63,7 +63,19 @@ Text: /\
     . initializer: /\ data >> ^
     )
 . AfterCopy()
-. dump_print: /!\ data dump_print
+. dump_print: /!\ 
+    {
+        !mutable position: _count type instance (0) ;
+        repeat
+        (
+            while: /\ position < _count,
+            body: /\ 
+            ( 
+                (data >> position) dump_print, 
+                position := (position + 1) enable_cut
+            ) 
+        )
+    }
 }
 ";
         }
