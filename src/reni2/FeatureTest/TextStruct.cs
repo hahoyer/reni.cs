@@ -19,7 +19,7 @@ namespace Reni.FeatureTest
                 @"
 systemdata:
 { Memory: ((0 type * ('100' to_number_of_base 256)) mutable) instance()
-. !mutable FreePointer: Memory reference mutable
+. !mutable FreePointer: Memory array_reference mutable
 };
 
 repeat: /\ ^ while() then(^ body(), repeat(^));
@@ -33,7 +33,7 @@ system: /!\
 . TextItemType: /!\ MaxNumber8 text_item type 
 
 . NewMemory: /\ 
-    { result: (((^ elementType) * 1) reference mutable oversizeable) instance (systemdata FreePointer enable_reinterpretation) 
+    { result: (((^ elementType) * 1) array_reference mutable) instance (systemdata FreePointer enable_reinterpretation) 
     . initializer: ^ initializer
     . length: ^ length
     . !mutable position: length type instance (0) 
@@ -42,7 +42,7 @@ system: /!\
         while: /\ position < length,
         body: /\ 
         ( 
-            result target >> position := initializer(position), 
+            result >> position := initializer(position), 
             position := (position + 1) enable_cut
         ) 
     )
@@ -54,16 +54,16 @@ system: /!\
 };
 
 Text: /\
-{ !mutable data: ^ reference 
-. _elementType: (^ >> 0)type
-. _length: ^ type / _elementType
+{ !mutable data: ^ array_reference 
+. _elementType: ^ type >>
+. _length: ^ length
 . AfterCopy: /\ data:= system NewMemory
     ( elementType: _elementType
     . length: _length
-    . initializer: /\ data target >> ^
+    . initializer: /\ data >> ^
     )
 . AfterCopy()
-. dump_print: /!\ data target dump_print
+. dump_print: /!\ data dump_print
 }
 ";
         }
