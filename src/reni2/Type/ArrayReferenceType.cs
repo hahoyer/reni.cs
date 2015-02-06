@@ -8,6 +8,7 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Numeric;
 using Reni.TokenClasses;
 
 namespace Reni.Type
@@ -17,8 +18,10 @@ namespace Reni.Type
             , ISymbolProviderForPointer<Mutable, IFeatureImplementation>
             , ISymbolProviderForPointer<EnableReinterpretation, IFeatureImplementation>
             , ISymbolProviderForPointer<TokenClasses.ArrayAccess, IFeatureImplementation>
+            , ISymbolProviderForPointer<Plus, IFeatureImplementation>
+            , ISymbolProviderForPointer<Minus, IFeatureImplementation>
             , IForcedConversionProvider<ArrayReferenceType>
-        , IRepeaterType
+            , IRepeaterType
     {
         internal sealed class Options : DumpableObject
         {
@@ -79,7 +82,8 @@ namespace Reni.Type
         [DisableDump]
         internal ArrayReferenceType Mutable => ValueType.ArrayReference(options.IsMutable.SetTo(true));
         [DisableDump]
-        internal ArrayReferenceType EnableReinterpretation => ValueType.ArrayReference(options.IsEnableReinterpretation.SetTo(true));
+        internal ArrayReferenceType EnableReinterpretation
+            => ValueType.ArrayReference(options.IsEnableReinterpretation.SetTo(true));
 
         TypeBase IRepeaterType.ElementType => ValueType;
         Size IRepeaterType.IndexSize => Size;
@@ -95,8 +99,16 @@ namespace Reni.Type
             (EnableReinterpretation tokenClass)
             => Feature.Extension.SimpleFeature(EnableReinterpretationResult);
 
-        IFeatureImplementation ISymbolProviderForPointer<TokenClasses.ArrayAccess, IFeatureImplementation>.Feature(TokenClasses.ArrayAccess tokenClass)
+        IFeatureImplementation ISymbolProviderForPointer<TokenClasses.ArrayAccess, IFeatureImplementation>.Feature
+            (TokenClasses.ArrayAccess tokenClass)
             => Feature.Extension.FunctionFeature(AccessResult);
+
+        IFeatureImplementation ISymbolProviderForPointer<Minus, IFeatureImplementation>.Feature(Minus tokenClass)
+            => Feature.Extension.FunctionFeature(MinusResult);
+
+        IFeatureImplementation ISymbolProviderForPointer<Plus, IFeatureImplementation>.Feature(Plus tokenClass)
+            => Feature.Extension.FunctionFeature(PlusResult);
+
 
         Result MutableResult(Category category)
         {
@@ -107,29 +119,26 @@ namespace Reni.Type
         Result EnableReinterpretationResult(Category category) => ResultFromPointer(category, EnableReinterpretation);
 
         ISimpleFeature ForcedConversion(ArrayReferenceType destination)
+            =>
+                HasForcedConversion(destination)
+                    ? Feature.Extension.SimpleFeature(category => destination.ConversionResult(category, this), this)
+                    : null;
+
+        bool HasForcedConversion(ArrayReferenceType destination)
         {
             if(this == destination)
-                return Feature.Extension.SimpleFeature(ArgResult);
+                return true;
 
             if(destination.options.IsMutable.Value && !options.IsMutable.Value)
-                return null;
+                return false;
 
             if(ValueType == destination.ValueType)
-            {
-                NotImplementedMethod(destination);
-                return null;
-            }
+                return true;
 
             if(ValueType == destination.ValueType)
-            {
                 NotImplementedMethod(destination);
-                return null;
-            }
 
-            if(!options.IsEnableReinterpretation.Value)
-                return null;
-
-            return Feature.Extension.SimpleFeature(category => destination.ConversionResult(category, this), this);
+            return options.IsEnableReinterpretation.Value;
         }
 
         Result ConversionResult(Category category, ArrayReferenceType source)
@@ -154,6 +163,20 @@ namespace Reni.Type
                 .Result(category, PointerObjectResult(category.Typed) + argsResult);
 
             return result;
+        }
+
+        Result MinusResult(Category category, TypeBase right)
+        {
+            NotImplementedMethod(category, right);
+            return null;
+        }
+
+        Result PlusResult(Category category, TypeBase right) => Result(category, c => AccessResult(c, right));
+
+        CodeBase OffsetCode(TypeBase right, bool isPlus)
+        {
+            NotImplementedMethod(right, isPlus);
+            return null;
         }
     }
 }
