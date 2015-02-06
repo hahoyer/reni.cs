@@ -154,19 +154,19 @@ namespace Reni.ReniParser
         static IEnumerable<ITokenClassWithId> TokenClassesEx => new ITokenClassWithId[]
         {
             new ArrayAccess(),
+            new ArrayReference(),
             new AlignToken(),
             new ArgToken(),
             new ConcatArrays(false),
             new ConcatArrays(true),
             new EnableReinterpretation(),
             new ForceMutabilityToken(),
+            new Length(),
             new Minus(),
             new Mutable(),
             new Negate(),
-            new OverSizeable(),
             new ReassignToken(),
             new Reference(),
-            new Target(),
             new TextItem()
         };
 

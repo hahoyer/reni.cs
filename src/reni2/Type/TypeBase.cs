@@ -47,6 +47,9 @@ namespace Reni.Type
             [Node]
             [SmartNode]
             public readonly ValueCache<IEnumerable<ISimpleFeature>> SymmetricConversions;
+            [Node]
+            [SmartNode]
+            internal readonly FunctionCache<string, ArrayReferenceType> ArrayReferenceCache;
 
             public Cache(TypeBase parent)
             {
@@ -70,6 +73,7 @@ namespace Reni.Type
                 TypeType = new ValueCache<TypeType>(() => new TypeType(parent));
                 Size = new ValueCache<Size>(parent.GetSizeForCache);
                 SymmetricConversions = new ValueCache<IEnumerable<ISimpleFeature>>(parent.GetSymmetricConversionsForCache);
+                ArrayReferenceCache = new FunctionCache<string, ArrayReferenceType>(id => new ArrayReferenceType(parent, id));
             }
         }
 
@@ -174,6 +178,7 @@ namespace Reni.Type
         Result VoidCodeAndRefs(Category category) => RootContext.VoidType.Result(category & (Category.Code | Category.Exts));
 
         internal ArrayType Array(int count, string options = null) => _cache.Array[count][options ?? ArrayType.Options.DefaultOptionsId];
+        internal ArrayReferenceType ArrayReference(string optionsId) => _cache.ArrayReferenceCache[optionsId];
         protected virtual TypeBase ReversePair(TypeBase first) => first._cache.Pair[this];
         internal virtual TypeBase Pair(TypeBase second) => second.ReversePair(this);
         internal virtual Result Destructor(Category category) => VoidCodeAndRefs(category);

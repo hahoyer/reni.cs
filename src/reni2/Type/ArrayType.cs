@@ -21,18 +21,16 @@ namespace Reni.Type
             , ISymbolProviderForPointer<TokenClasses.ArrayAccess, IFeatureImplementation>
             , ISymbolProviderForPointer<ToNumberOfBase, IFeatureImplementation>
             , ISymbolProviderForPointer<Mutable, IFeatureImplementation>
-            , ISymbolProviderForPointer<Reference, IFeatureImplementation>
+            , ISymbolProviderForPointer<ArrayReference, IFeatureImplementation>
+            , ISymbolProviderForPointer<Length, IFeatureImplementation>
             , IRepeaterType
     {
         [Node]
         [SmartNode]
-        readonly ValueCache<RepeaterAccessType> _arrayAccessTypeCache;
+        readonly ValueCache<RepeaterAccessType> _repeaterAccessTypeCache;
         [Node]
         [SmartNode]
         readonly ValueCache<NumberType> _numberCache;
-        [Node]
-        [SmartNode]
-        readonly FunctionCache<string, ReferenceType> _referenceCache;
 
         internal sealed class Options : DumpableObject
         {
@@ -53,9 +51,8 @@ namespace Reni.Type
             public static Options Create(string optionsId = null) => new Options(optionsId);
             internal static readonly string DefaultOptionsId = Create().OptionsData.Id;
 
-            protected override string GetNodeDump()=> OptionsData.DumpPrintText;
+            protected override string GetNodeDump() => OptionsData.DumpPrintText;
             public string DumpPrintText => OptionsData.DumpPrintText;
-
         }
 
         public ArrayType(TypeBase elementType, int count, string optionsId)
@@ -66,11 +63,11 @@ namespace Reni.Type
             Tracer.Assert(count > 0);
             Tracer.Assert(elementType.CheckedReference == null);
             Tracer.Assert(!elementType.Hllw);
-            _arrayAccessTypeCache = new ValueCache<RepeaterAccessType>(() => new RepeaterAccessType(this));
+            _repeaterAccessTypeCache = new ValueCache<RepeaterAccessType>(() => new RepeaterAccessType(this));
             _numberCache = new ValueCache<NumberType>(() => new NumberType(this));
-            _referenceCache = new FunctionCache<string, ReferenceType>(id => new ReferenceType(this, id));
         }
 
+        [DisableDump]
         internal TypeBase ElementType { get; }
         int Count { get; }
         Options options { get; }
@@ -90,7 +87,9 @@ namespace Reni.Type
         [DisableDump]
         internal ArrayType Mutable => ElementType.Array(Count, options.IsMutable.SetTo(true));
 
-        internal ReferenceType Reference(string optionsId=null) => _referenceCache[optionsId ?? ReferenceType.Options.DefaultOptionsId];
+        internal ArrayReferenceType Reference(bool isForceMutable)
+            => ElementType.ArrayReference(ArrayReferenceType.Options.ForceMutable(isForceMutable));
+
         [DisableDump]
         internal override bool Hllw => Count == 0 || ElementType.Hllw;
 
@@ -130,11 +129,15 @@ namespace Reni.Type
             (ToNumberOfBase tokenClass)
             => options.IsTextItem.Value ? Feature.Extension.MetaFeature(ToNumberOfBaseResult) : null;
 
-        IFeatureImplementation ISymbolProviderForPointer<Reference, IFeatureImplementation>.Feature(Reference tokenClass)
+        IFeatureImplementation ISymbolProviderForPointer<ArrayReference, IFeatureImplementation>.Feature
+            (ArrayReference tokenClass)
             => Feature.Extension.SimpleFeature(ReferenceResult);
 
         internal override int? SmartArrayLength(TypeBase elementType)
             => ElementType.IsConvertable(elementType) ? Count : base.SmartArrayLength(elementType);
+
+        IFeatureImplementation ISymbolProviderForPointer<Length, IFeatureImplementation>.Feature(Length tokenClass)
+            => Feature.Extension.MetaFeature(LengthResult);
 
         protected override Size GetSize() => ElementType.Size * Count;
         internal override Result Destructor(Category category) => ElementType.ArrayDestructor(category, Count);
@@ -142,7 +145,7 @@ namespace Reni.Type
 
         Result TextItemResult(Category category) => ResultFromPointer(category, TextItem);
         Result MutableResult(Category category) => ResultFromPointer(category, Mutable);
-        Result ReferenceResult(Category category) => ResultFromPointer(category, Reference());
+        Result ReferenceResult(Category category) => ResultFromPointer(category, Reference(IsMutable));
 
         internal override Result ConstructorResult(Category category, TypeBase argsType) => Result
             (
@@ -198,11 +201,11 @@ namespace Reni.Type
         [DisableDump]
         TypeBase IndexType => RootContext.BitType.Number(IndexSize.ToInt());
 
-        internal Size IndexSize => Size.AutoSize(Count).Align(Root.DefaultRefAlignParam.AlignBits);
+        Size IndexSize => Size.AutoSize(Count).Align(Root.DefaultRefAlignParam.AlignBits);
 
         protected override string GetNodeDump() => ElementType.NodeDump + "*" + Count + options.NodeDump;
 
-        Result ConcatArraysResult(Category category, IContextReference objectReference, TypeBase argsType, string options)
+        Result ConcatArraysResult(Category category, IContextReference objectReference, TypeBase argsType, string argsOptions)
         {
             var oldElementsResult = Pointer
                 .Result(category.Typed, objectReference).DereferenceResult;
@@ -212,11 +215,11 @@ namespace Reni.Type
             var newElementsResultRaw
                 = isElementArg
                     ? argsType.Conversion(category.Typed, ElementAccessType)
-                    : argsType.Conversion(category.Typed, ElementType.Array(newCount, options));
+                    : argsType.Conversion(category.Typed, ElementType.Array(newCount, argsOptions));
 
             var newElementsResult = newElementsResultRaw.DereferencedAlignedResult();
             var result = ElementType
-                .Array(Count + newCount, options)
+                .Array(Count + newCount, argsOptions)
                 .Result(category, newElementsResult + oldElementsResult);
             return result;
         }
@@ -253,7 +256,7 @@ namespace Reni.Type
                 .Conversion(category.Typed, IndexType)
                 .DereferencedAlignedResult();
 
-            var result = _arrayAccessTypeCache
+            var result = _repeaterAccessTypeCache
                 .Value
                 .Result(category, objectResult + argsResult);
 
@@ -270,6 +273,12 @@ namespace Reni.Type
             Tracer.Assert(conversionBase >= 2, conversionBase.ToString);
             var result = BitsConst.Convert(target, conversionBase);
             return RootContext.BitType.Result(category, result).Align;
+        }
+
+        Result LengthResult(Category category, ResultCache left, ContextBase context, CompileSyntax right)
+        {
+            Tracer.Assert(right == null);
+            return IndexType.Result(category, () => CodeBase.BitsConst(IndexSize, BitsConst.Convert(Count)));
         }
     }
 }

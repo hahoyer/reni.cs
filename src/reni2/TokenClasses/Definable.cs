@@ -50,6 +50,14 @@ namespace Reni.TokenClasses
         string ITokenClassWithId.Id => Id;
     }
 
+    sealed class Length : Definable, ITokenClassWithId
+    {
+        public const string Id = "length";
+        [DisableDump]
+        internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
+        string ITokenClassWithId.Id => Id;
+    }
+
     sealed class Reference: Definable, ITokenClassWithId
     {
         public const string Id = "reference";
@@ -58,9 +66,9 @@ namespace Reni.TokenClasses
         string ITokenClassWithId.Id => Id;
     }
 
-    sealed class Target: Definable, ITokenClassWithId
+    sealed class ArrayReference : Definable, ITokenClassWithId
     {
-        public const string Id = "target";
+        public const string Id = "array_reference";
         [DisableDump]
         internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
         string ITokenClassWithId.Id => Id;

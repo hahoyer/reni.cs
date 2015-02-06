@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using hw.Helper;
 using System.Linq;
 using hw.Debug;
+using hw.Forms;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -11,15 +12,14 @@ using Reni.TokenClasses;
 
 namespace Reni.Type
 {
-    sealed class ReferenceType
+    sealed class ArrayReferenceType
         : TypeBase
             , ISymbolProviderForPointer<Mutable, IFeatureImplementation>
             , ISymbolProviderForPointer<EnableReinterpretation, IFeatureImplementation>
-            , ISymbolProviderForPointer<Target, IFeatureImplementation>
-            , IForcedConversionProvider<ReferenceType>
+            , ISymbolProviderForPointer<TokenClasses.ArrayAccess, IFeatureImplementation>
+            , IForcedConversionProvider<ArrayReferenceType>
+        , IRepeaterType
     {
-        readonly int _order;
-
         internal sealed class Options : DumpableObject
         {
             OptionsData OptionsData { get; }
@@ -27,36 +27,38 @@ namespace Reni.Type
             Options(string optionsId)
             {
                 OptionsData = new OptionsData(optionsId);
-                IsMutable = new OptionsData.Option(OptionsData,"mutable");
-                IsOverSizeable = new OptionsData.Option(OptionsData, "oversizeable");
-                IsEnableReinterpretation = new OptionsData.Option(OptionsData,"enable_reinterpretation");
+                IsForceMutable = new OptionsData.Option(OptionsData, "force_mutable");
+                IsMutable = new OptionsData.Option(OptionsData, "mutable");
+                IsEnableReinterpretation = new OptionsData.Option(OptionsData, "enable_reinterpretation");
                 OptionsData.Align();
                 Tracer.Assert(OptionsData.IsValid);
             }
 
             internal OptionsData.Option IsMutable { get; }
-            internal OptionsData.Option IsOverSizeable { get; }
+            internal OptionsData.Option IsForceMutable { get; }
             internal OptionsData.Option IsEnableReinterpretation { get; }
 
-            internal static Options Create(string optionsId = null) => new Options(optionsId);
-            internal static readonly string DefaultOptionsId = Create().OptionsData.Id;
-            protected override string GetNodeDump()
-                => (IsMutable.Value ? "m" : "")
-                    + (IsOverSizeable.Value ? "o" : "")
-                    + (IsEnableReinterpretation.Value ? "r" : "");
+            internal static Options Create(string optionsId) => new Options(optionsId);
+            internal static string ForceMutable(bool value) => Create(null).IsForceMutable.SetTo(value);
+            protected override string GetNodeDump() => OptionsData.DumpPrintText;
         }
 
-        internal ReferenceType(ArrayType valueType, string optionsId)
+        [Node]
+        [SmartNode]
+        readonly ValueCache<RepeaterAccessType> _repeaterAccessTypeCache;
+
+        internal ArrayReferenceType(TypeBase valueType, string optionsId)
         {
             options = Options.Create(optionsId);
-            _order = CodeArgs.NextOrder++;
             ValueType = valueType;
             Tracer.Assert(!valueType.Hllw, valueType.Dump);
             Tracer.Assert(!(valueType.CoreType is PointerType), valueType.Dump);
+            _repeaterAccessTypeCache = new ValueCache<RepeaterAccessType>(() => new RepeaterAccessType(this));
+
             StopByObjectId(-10);
         }
 
-        ArrayType ValueType { get; }
+        TypeBase ValueType { get; }
         Options options { get; }
 
         [DisableDump]
@@ -72,40 +74,42 @@ namespace Reni.Type
         protected override IEnumerable<ISimpleFeature> RawSymmetricConversions => base.RawSymmetricConversions;
 
         protected override string GetNodeDump() => ValueType.NodeDump + "[reference]" + options.NodeDump;
-        protected override Size GetSize() => ValueType.Pointer.Size + ValueType.IndexSize;
+        protected override Size GetSize() => ValueType.Pointer.Size;
 
         [DisableDump]
-        internal ReferenceType Mutable => ValueType.Reference(options.IsMutable.SetTo(true));
+        internal ArrayReferenceType Mutable => ValueType.ArrayReference(options.IsMutable.SetTo(true));
         [DisableDump]
-        internal ReferenceType OverSizeable => ValueType.Reference(options.IsOverSizeable.SetTo(true));
-        [DisableDump]
-        internal ReferenceType EnableReinterpretation => ValueType.Reference(options.IsEnableReinterpretation.SetTo(true));
+        internal ArrayReferenceType EnableReinterpretation => ValueType.ArrayReference(options.IsEnableReinterpretation.SetTo(true));
 
-        IEnumerable<ISimpleFeature> IForcedConversionProvider<ReferenceType>.Result(ReferenceType destination)
+        TypeBase IRepeaterType.ElementType => ValueType;
+        Size IRepeaterType.IndexSize => Size;
+        bool IRepeaterType.IsMutable => options.IsForceMutable.Value;
+
+        IEnumerable<ISimpleFeature> IForcedConversionProvider<ArrayReferenceType>.Result(ArrayReferenceType destination)
             => ForcedConversion(destination).NullableToArray();
 
         IFeatureImplementation ISymbolProviderForPointer<Mutable, IFeatureImplementation>.Feature(Mutable tokenClass)
-            => Extension.SimpleFeature(MutableResult);
+            => Feature.Extension.SimpleFeature(MutableResult);
 
         IFeatureImplementation ISymbolProviderForPointer<EnableReinterpretation, IFeatureImplementation>.Feature
             (EnableReinterpretation tokenClass)
-            => Extension.SimpleFeature(EnableReinterpretationResult);
+            => Feature.Extension.SimpleFeature(EnableReinterpretationResult);
 
-        IFeatureImplementation ISymbolProviderForPointer<Target, IFeatureImplementation>.Feature(Target tokenClass)
-            => Extension.SimpleFeature(TargetResult);
+        IFeatureImplementation ISymbolProviderForPointer<TokenClasses.ArrayAccess, IFeatureImplementation>.Feature(TokenClasses.ArrayAccess tokenClass)
+            => Feature.Extension.FunctionFeature(AccessResult);
 
         Result MutableResult(Category category)
         {
-            Tracer.Assert(ValueType.IsMutable);
+            Tracer.Assert(options.IsForceMutable.Value);
             return ResultFromPointer(category, Mutable);
         }
 
         Result EnableReinterpretationResult(Category category) => ResultFromPointer(category, EnableReinterpretation);
 
-        ISimpleFeature ForcedConversion(ReferenceType destination)
+        ISimpleFeature ForcedConversion(ArrayReferenceType destination)
         {
             if(this == destination)
-                return Extension.SimpleFeature(ArgResult);
+                return Feature.Extension.SimpleFeature(ArgResult);
 
             if(destination.options.IsMutable.Value && !options.IsMutable.Value)
                 return null;
@@ -116,7 +120,7 @@ namespace Reni.Type
                 return null;
             }
 
-            if(ValueType.ElementType == destination.ValueType.ElementType)
+            if(ValueType == destination.ValueType)
             {
                 NotImplementedMethod(destination);
                 return null;
@@ -125,24 +129,31 @@ namespace Reni.Type
             if(!options.IsEnableReinterpretation.Value)
                 return null;
 
-            return Extension.SimpleFeature(category => destination.ConversionResult(category, this), this);
+            return Feature.Extension.SimpleFeature(category => destination.ConversionResult(category, this), this);
         }
 
-        Result ConversionResult(Category category, ReferenceType source)
+        Result ConversionResult(Category category, ArrayReferenceType source)
             => Result(category, () => ConversionCode(source), CodeArgs.Arg);
 
-        CodeBase ConversionCode(ReferenceType source)
+        CodeBase ConversionCode(ArrayReferenceType source)
         {
             NotImplementedMethod(source);
             return null;
         }
 
-        Result TargetResult(Category category) => ValueType.Pointer.Result(category, TargetCode, CodeArgs.Arg);
-
-        CodeBase TargetCode()
+        Result AccessResult(Category category, TypeBase right)
         {
-            NotImplementedMethod();
-            return null;
+            var indexType = ConversionService.FindPathDestination<NumberType>(right);
+
+            var argsResult = right
+                .Conversion(category.Typed, indexType)
+                .DereferencedAlignedResult();
+
+            var result = _repeaterAccessTypeCache
+                .Value
+                .Result(category, PointerObjectResult(category.Typed) + argsResult);
+
+            return result;
         }
     }
 }

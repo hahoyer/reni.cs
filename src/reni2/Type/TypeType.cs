@@ -18,8 +18,8 @@ namespace Reni.Type
             , ISymbolProvider<Star, IFeatureImplementation>
             , ISymbolProvider<Slash, IFeatureImplementation>
             , ISymbolProvider<Mutable, IFeatureImplementation>
-            , ISymbolProvider<Reference, IFeatureImplementation>
-            , ISymbolProvider<OverSizeable, IFeatureImplementation>
+            , ISymbolProvider<ArrayReference, IFeatureImplementation>
+            , ISymbolProvider<ArrayAccess, IFeatureImplementation>
     {
         public TypeType(TypeBase value)
         {
@@ -50,15 +50,15 @@ namespace Reni.Type
         IFeatureImplementation ISymbolProvider<Mutable, IFeatureImplementation>.Feature(Mutable tokenClass)
             => Value is ArrayType
                 ? Extension.SimpleFeature(MutableArrayResult)
-                : Value is ReferenceType
+                : Value is ArrayReferenceType
                     ? Extension.SimpleFeature(MutableReferenceResult)
                     : null;
 
-        IFeatureImplementation ISymbolProvider<Reference, IFeatureImplementation>.Feature(Reference tokenClass)
-            => Value is ArrayType ? Extension.SimpleFeature(ReferenceResult) : null;
+        IFeatureImplementation ISymbolProvider<ArrayReference, IFeatureImplementation>.Feature(ArrayReference tokenClass)
+            => Value is ArrayType ? Extension.SimpleFeature(ArrayReferenceResult) : null;
 
-        IFeatureImplementation ISymbolProvider<OverSizeable, IFeatureImplementation>.Feature(OverSizeable tokenClass)
-            => Value is ReferenceType ? Extension.SimpleFeature(OverSizeableReferenceResult) : null;
+        IFeatureImplementation ISymbolProvider<ArrayAccess, IFeatureImplementation>.Feature(ArrayAccess tokenClass)
+            => Value is ArrayType ? Extension.SimpleFeature(ArrayAccessResult) : null;
 
 
         protected override string GetNodeDump() => "(" + Value.NodeDump + ") type";
@@ -115,8 +115,8 @@ namespace Reni.Type
         }
 
         Result MutableArrayResult(Category category) => ((ArrayType) Value).Mutable.TypeType.Result(category);
-        Result ReferenceResult(Category category) => ((ArrayType) Value).Reference().TypeType.Result(category);
-        Result MutableReferenceResult(Category category) => ((ReferenceType) Value).Mutable.TypeType.Result(category);
-        Result OverSizeableReferenceResult(Category category) => ((ReferenceType)Value).OverSizeable.TypeType.Result(category);
+        Result ArrayReferenceResult(Category category) => ((ArrayType) Value).Reference(true).TypeType.Result(category);
+        Result ArrayAccessResult(Category category) => ((ArrayType)Value).ElementType.TypeType.Result(category);
+        Result MutableReferenceResult(Category category) => ((ArrayReferenceType) Value).Mutable.TypeType.Result(category);
     }
 }
