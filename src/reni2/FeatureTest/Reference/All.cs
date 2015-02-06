@@ -21,19 +21,19 @@ t dump_print
 NewMemory: /\ 
 { 
     result: (((^ elementType) * 1) array_reference mutable),
-    length: ^ length
+    count: ^ count
 };
 
 Text: /\
 { 
     !mutable data: ^ array_reference;
     _elementType: ^ type >>;
-    _length: ^ length;
-    AfterCopy: /\ NewMemory(elementType: _elementType, length: _length);
+    _count: ^ count;
+    AfterCopy: /\ NewMemory(elementType: _elementType, count: _count);
 };
 
 Text('Hallo') AfterCopy() result dump_print
 ")]
-    [Output("(((bit)*8[text_item])*1)reference")]
+    [Output("((bit)*8[text_item])reference")]
     public sealed class ArrayElementType1 : CompilerTest {}
 }
