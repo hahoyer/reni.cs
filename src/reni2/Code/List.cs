@@ -10,47 +10,46 @@ namespace Reni.Code
 {
     sealed class List : FiberHead
     {
-        readonly CodeBase[] _data;
         static int _nextObjectId;
 
         [Node]
-        internal CodeBase[] Data { get { return _data; } }
+        internal CodeBase[] Data { get; }
 
-        internal static List Create(params CodeBase[] data) { return new List(data); }
-        internal static List Create(IEnumerable<CodeBase> data) { return new List(data); }
+        internal static List Create(params CodeBase[] data) => new List(data);
+        internal static List Create(IEnumerable<CodeBase> data) => new List(data);
 
         void AssertValid()
         {
-            foreach(var codeBase in _data)
+            foreach(var codeBase in Data)
             {
                 Tracer.Assert(!(codeBase is List));
                 Tracer.Assert(!(codeBase.IsEmpty));
             }
-            Tracer.Assert(_data.Length > 1);
+            Tracer.Assert(Data.Length > 1);
         }
 
         List(IEnumerable<CodeBase> data)
             : base(_nextObjectId++)
         {
-            _data = data.ToArray();
+            Data = data.ToArray();
             AssertValid();
             StopByObjectId(-10);
         }
 
-        protected override IEnumerable<CodeBase> AsList() { return _data; }
-        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.List(this); }
+        protected override IEnumerable<CodeBase> AsList() => Data;
+        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) => actual.List(this);
         [DisableDump]
-        internal override IEnumerable<IssueBase> Issues { get { return _data.SelectMany(data => data.Issues); } }
+        internal override IEnumerable<IssueBase> Issues { get { return Data.SelectMany(data => data.Issues); } }
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement)
         {
             if(IsNonFiberHeadList)
             {
-                var newData = new CodeBase[_data.Length];
+                var newData = new CodeBase[Data.Length];
                 var i = 0;
-                for(; i < _data.Length - 1; i++)
-                    newData[i] = _data[i];
-                newData[i] = _data[i].Add(subsequentElement);
+                for(; i < Data.Length - 1; i++)
+                    newData[i] = Data[i];
+                newData[i] = Data[i].Add(subsequentElement);
                 return List(newData);
             }
             return subsequentElement.TryToCombineBack(this);
@@ -61,8 +60,8 @@ namespace Reni.Code
         {
             get
             {
-                for(var i = 0; i < _data.Length - 1; i++)
-                    if(!_data[i].Hllw)
+                for(var i = 0; i < Data.Length - 1; i++)
+                    if(!Data[i].Hllw)
                         return false;
                 return true;
             }
@@ -72,7 +71,7 @@ namespace Reni.Code
         {
             var result = Size.Zero;
             var sizeSoFar = Size.Zero;
-            foreach(var codeBase in _data)
+            foreach(var codeBase in Data)
             {
                 var newResult = sizeSoFar + codeBase.TemporarySize;
                 sizeSoFar += codeBase.Size;
@@ -81,13 +80,10 @@ namespace Reni.Code
             return result;
         }
 
-        protected override Size GetSize()
-        {
-            return _data
-                .Aggregate(Size.Zero, (size, codeBase) => size + codeBase.Size);
-        }
+        protected override Size GetSize() => Data
+            .Aggregate(Size.Zero, (size, codeBase) => size + codeBase.Size);
 
-        protected override CodeArgs GetRefsImplementation() { return GetRefs(_data); }
-        internal override void Visit(IVisitor visitor) { visitor.List(_data); }
+        protected override CodeArgs GetRefsImplementation() => GetRefs(Data);
+        internal override void Visit(IVisitor visitor) => visitor.List(Data);
     }
 }
