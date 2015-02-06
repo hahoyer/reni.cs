@@ -24,7 +24,7 @@ namespace Reni.Type
             _order = CodeArgs.NextOrder++;
             ValueType = valueType;
             Tracer.Assert(!valueType.Hllw, valueType.Dump);
-            Tracer.Assert(!(valueType.CoreType is PointerType), valueType.Dump);
+            Tracer.Assert(!(valueType is IReference), valueType.Dump);
             StopByObjectId(-10);
         }
 
