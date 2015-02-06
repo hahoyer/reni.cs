@@ -36,8 +36,8 @@ namespace Reni.Type
 
         protected override Result DeAlign(Category category) => Parent.Result(category, ArgResult);
 
-        protected override IEnumerable<ISimpleFeature> ObtainRawSymmetricConversions()
-            => base.ObtainRawSymmetricConversions().Concat(new ISimpleFeature[] {Extension.SimpleFeature(UnalignedResult)});
+        protected override IEnumerable<ISimpleFeature> RawSymmetricConversions
+            => base.RawSymmetricConversions.Concat(new ISimpleFeature[] {Extension.SimpleFeature(UnalignedResult)});
 
         [DisableDump]
         internal override bool IsAligningPossible => false;

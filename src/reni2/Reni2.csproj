@@ -333,7 +333,7 @@
     <Compile Include="Type\FeaturePathBridge.cs" />
     <Compile Include="Type\NumberType.cs" />
     <Compile Include="Type\Options.cs" />
-    <Compile Include="Type\ReferenceType.cs" />
+    <Compile Include="Type\ArrayReferenceType.cs" />
     <Compile Include="Type\RepeaterAccessType.cs" />
     <Compile Include="Type\Child.cs" />
     <Compile Include="Type\CreateArrayFromReferenceFeature.cs" />
