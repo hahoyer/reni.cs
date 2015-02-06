@@ -34,6 +34,6 @@ Text: /\
 
 Text('Hallo') AfterCopy() result dump_print
 ")]
-    [Output("((bit)*8[text_item])reference")]
+    [Output("((bit)*8[text_item])reference[force_mutable][mutable]")]
     public sealed class ArrayElementType1 : CompilerTest {}
 }
