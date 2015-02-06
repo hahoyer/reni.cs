@@ -9,7 +9,7 @@ namespace Reni.FeatureTest.Reference
     [ArrayElementType1]
     [Target(@"
 a: 'Text';
-t: (a >> 0) type;
+t: a type >>;
 t dump_print
 ")]
     [Output("(bit)*8[text_item]")]
@@ -20,15 +20,15 @@ t dump_print
     [Target(@"
 NewMemory: /\ 
 { 
-    result: (((^ elementType) * 1) reference mutable oversizeable),
+    result: (((^ elementType) * 1) array_reference mutable),
     length: ^ length
 };
 
 Text: /\
 { 
-    !mutable data: ^ reference;
-    _elementType: (^ >> 0)type;
-    _length: ^ type / _elementType;
+    !mutable data: ^ array_reference;
+    _elementType: ^ type >>;
+    _length: ^ length;
     AfterCopy: /\ NewMemory(elementType: _elementType, length: _length);
 };
 
