@@ -15,13 +15,15 @@ namespace Reni.Type
 {
     sealed class ArrayReferenceType
         : TypeBase
-            , ISymbolProviderForPointer<Mutable, IFeatureImplementation>
-            , ISymbolProviderForPointer<EnableReinterpretation, IFeatureImplementation>
-            , ISymbolProviderForPointer<TokenClasses.ArrayAccess, IFeatureImplementation>
-            , ISymbolProviderForPointer<Plus, IFeatureImplementation>
-            , ISymbolProviderForPointer<Minus, IFeatureImplementation>
+            , ISymbolProvider<Mutable, IFeatureImplementation>
+            , ISymbolProvider<EnableReinterpretation, IFeatureImplementation>
+            , ISymbolProvider<TokenClasses.ArrayAccess, IFeatureImplementation>
+            , ISymbolProvider<Plus, IFeatureImplementation>
+            , ISymbolProvider<Minus, IFeatureImplementation>
             , IForcedConversionProvider<ArrayReferenceType>
             , IRepeaterType
+            , IReference
+            , ISimpleFeature
     {
         internal sealed class Options : DumpableObject
         {
@@ -43,15 +45,18 @@ namespace Reni.Type
 
             internal static Options Create(string optionsId) => new Options(optionsId);
             internal static string ForceMutable(bool value) => Create(null).IsForceMutable.SetTo(value);
-            protected override string GetNodeDump() => OptionsData.DumpPrintText;
+            protected override string GetNodeDump() => DumpPrintText;
+            public string DumpPrintText => OptionsData.DumpPrintText;
         }
 
+        readonly int _order;
         [Node]
         [SmartNode]
         readonly ValueCache<RepeaterAccessType> _repeaterAccessTypeCache;
 
         internal ArrayReferenceType(TypeBase valueType, string optionsId)
         {
+            _order = CodeArgs.NextOrder++;
             options = Options.Create(optionsId);
             ValueType = valueType;
             Tracer.Assert(!valueType.Hllw, valueType.Dump);
@@ -66,7 +71,7 @@ namespace Reni.Type
 
         [DisableDump]
         internal override Root RootContext => ValueType.RootContext;
-        internal override string DumpPrintText => "(" + ValueType.DumpPrintText + ")reference";
+        internal override string DumpPrintText => "(" + ValueType.DumpPrintText + ")reference" + options.DumpPrintText;
         [DisableDump]
         internal override bool Hllw => false;
         [DisableDump]
@@ -89,24 +94,32 @@ namespace Reni.Type
         Size IRepeaterType.IndexSize => Size;
         bool IRepeaterType.IsMutable => options.IsForceMutable.Value;
 
+        ISimpleFeature IReference.Converter => this;
+        bool IReference.IsWeak => false;
+        Size IContextReference.Size => Size;
+        int IContextReference.Order => _order;
+
+        TypeBase ISimpleFeature.TargetType => ValueType;
+        Result ISimpleFeature.Result(Category category) => DereferenceResult(category);
+
         IEnumerable<ISimpleFeature> IForcedConversionProvider<ArrayReferenceType>.Result(ArrayReferenceType destination)
             => ForcedConversion(destination).NullableToArray();
 
-        IFeatureImplementation ISymbolProviderForPointer<Mutable, IFeatureImplementation>.Feature(Mutable tokenClass)
+        IFeatureImplementation ISymbolProvider<Mutable, IFeatureImplementation>.Feature(Mutable tokenClass)
             => Feature.Extension.SimpleFeature(MutableResult);
 
-        IFeatureImplementation ISymbolProviderForPointer<EnableReinterpretation, IFeatureImplementation>.Feature
+        IFeatureImplementation ISymbolProvider<EnableReinterpretation, IFeatureImplementation>.Feature
             (EnableReinterpretation tokenClass)
             => Feature.Extension.SimpleFeature(EnableReinterpretationResult);
 
-        IFeatureImplementation ISymbolProviderForPointer<TokenClasses.ArrayAccess, IFeatureImplementation>.Feature
+        IFeatureImplementation ISymbolProvider<TokenClasses.ArrayAccess, IFeatureImplementation>.Feature
             (TokenClasses.ArrayAccess tokenClass)
             => Feature.Extension.FunctionFeature(AccessResult);
 
-        IFeatureImplementation ISymbolProviderForPointer<Minus, IFeatureImplementation>.Feature(Minus tokenClass)
+        IFeatureImplementation ISymbolProvider<Minus, IFeatureImplementation>.Feature(Minus tokenClass)
             => Feature.Extension.FunctionFeature(MinusResult);
 
-        IFeatureImplementation ISymbolProviderForPointer<Plus, IFeatureImplementation>.Feature(Plus tokenClass)
+        IFeatureImplementation ISymbolProvider<Plus, IFeatureImplementation>.Feature(Plus tokenClass)
             => Feature.Extension.FunctionFeature(PlusResult);
 
 
@@ -142,41 +155,26 @@ namespace Reni.Type
         }
 
         Result ConversionResult(Category category, ArrayReferenceType source)
-            => Result(category, () => ConversionCode(source), CodeArgs.Arg);
-
-        CodeBase ConversionCode(ArrayReferenceType source)
-        {
-            NotImplementedMethod(source);
-            return null;
-        }
+            => Result(category, source.ArgResult);
 
         Result AccessResult(Category category, TypeBase right)
-        {
-            var indexType = ConversionService.FindPathDestination<NumberType>(right);
+            => _repeaterAccessTypeCache.Value.AccessResult(category, this, right);
 
-            var argsResult = right
-                .Conversion(category.Typed, indexType)
-                .DereferencedAlignedResult();
-
-            var result = _repeaterAccessTypeCache
-                .Value
-                .Result(category, PointerObjectResult(category.Typed) + argsResult);
-
-            return result;
-        }
-
+        Result PlusResult(Category category, TypeBase right) => _repeaterAccessTypeCache.Value.PlusResult(category, this, right);
         Result MinusResult(Category category, TypeBase right)
         {
             NotImplementedMethod(category, right);
             return null;
         }
 
-        Result PlusResult(Category category, TypeBase right) => Result(category, c => AccessResult(c, right));
-
-        CodeBase OffsetCode(TypeBase right, bool isPlus)
-        {
-            NotImplementedMethod(right, isPlus);
-            return null;
-        }
+        Result DereferenceResult(Category category)
+            => ValueType
+                .Align
+                .Result
+                (
+                    category,
+                    () => ArgCode.DePointer(ValueType.Size).Align(),
+                    CodeArgs.Arg
+                );
     }
 }

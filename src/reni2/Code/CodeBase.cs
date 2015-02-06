@@ -91,11 +91,11 @@ namespace Reni.Code
             return Add(new ReferencePlusConstant(right, CallingMethodName));
         }
 
-        internal CodeBase ArrayAccess(Size elementSize, Size indexSize)
+        internal CodeBase ArrayGetter(Size elementSize, Size indexSize)
         {
             return Add(new ArrayGetter(elementSize, indexSize, CallingMethodName));
         }
-        internal CodeBase ArrayAssignment(Size elementSize, Size indexSize)
+        internal CodeBase ArraySetter(Size elementSize, Size indexSize)
         {
             return Add(new ArraySetter(elementSize, indexSize, CallingMethodName));
         }

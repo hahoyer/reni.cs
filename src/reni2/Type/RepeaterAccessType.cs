@@ -28,8 +28,24 @@ namespace Reni.Type
         protected override CodeBase SetterCode()
             => Pair(ValueType.SmartPointer)
                 .ArgCode
-                .ArrayAssignment(ValueType.Size, RepeaterType.IndexSize);
+                .ArraySetter(ValueType.Size, RepeaterType.IndexSize);
 
-        protected override CodeBase GetterCode() => ArgCode.ArrayAccess(ValueType.Size, RepeaterType.IndexSize);
+        protected override CodeBase GetterCode() => ArrayGetter;
+        internal CodeBase ArrayGetter => ArgCode.ArrayGetter(ValueType.Size, RepeaterType.IndexSize);
+
+        internal Result AccessResult(Category category, TypeBase left, TypeBase right)
+        {
+            var rightType = RootContext.BitType.Number(RepeaterType.IndexSize.ToInt());
+
+            var rightResult = right
+                .Conversion(category.Typed, rightType)
+                .DereferencedAlignedResult();
+
+            return Result(category, left.PointerObjectResult(category) + rightResult);
+        }
+        internal Result PlusResult(Category category, ArrayReferenceType left, TypeBase right)
+            => left
+                .Result(category, Conversion(category, RepeaterType.ElementType.Pointer))
+                .ReplaceArg(AccessResult(category, left, right));
     }
 }
