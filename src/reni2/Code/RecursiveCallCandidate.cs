@@ -26,6 +26,13 @@ namespace Reni.Code
             return base.TryToCombineBack(precedingElement);
         }
 
+        internal override CodeBase TryToCombineBack(List precedingElement)
+        {
+            if (precedingElement.IsCombinePossible(this))
+                return new RecursiveCall();
+            return base.TryToCombineBack(precedingElement);
+        }
+
         internal RecursiveCallCandidate(Size refsSize) { InputSize = refsSize; }
     }
 }

@@ -85,5 +85,25 @@ namespace Reni.Code
 
         protected override CodeArgs GetRefsImplementation() => GetRefs(Data);
         internal override void Visit(IVisitor visitor) => visitor.List(Data);
+
+        internal bool IsCombinePossible(RecursiveCallCandidate recursiveCallCandidate)
+        {
+            if(!(recursiveCallCandidate.DeltaSize + Size).IsZero)
+                return false;
+
+            var topFrameDatas = Data.Select(element => element as TopFrameData).ToArray();
+            if(topFrameDatas.Any(element => element == null))
+                return false;
+
+            var size = Size;
+            foreach(var d in topFrameDatas)
+            {
+                if(d.Size + d.Offset != size)
+                    return false;
+                size -= d.Size;
+            }
+
+            return size.IsZero;
+        }
     }
 }
