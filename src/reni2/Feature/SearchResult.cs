@@ -41,7 +41,7 @@ namespace Reni.Feature
 
         protected Result ResultForDebug(Category category, ContextBase context, CompileSyntax right)
         {
-            var trace = ObjectId == 773;
+            var trace = ObjectId == -1032;
             StartMethodDump(trace, category, context, right);
             try
             {

@@ -50,9 +50,9 @@ namespace Reni.TokenClasses
         string ITokenClassWithId.Id => Id;
     }
 
-    sealed class Length : Definable, ITokenClassWithId
+    sealed class Count : Definable, ITokenClassWithId
     {
-        public const string Id = "length";
+        public const string Id = "count";
         [DisableDump]
         internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
         string ITokenClassWithId.Id => Id;

@@ -35,11 +35,11 @@ system: /!\
 . NewMemory: /\ 
     { result: (((^ elementType) * 1) array_reference mutable) instance (systemdata FreePointer enable_reinterpretation) 
     . initializer: ^ initializer
-    . length: ^ length
-    . !mutable position: length type instance (0) 
+    . count: ^ count
+    . !mutable position: count type instance (0) 
     . repeat
     (
-        while: /\ position < length,
+        while: /\ position < count,
         body: /\ 
         ( 
             result >> position := initializer(position), 
@@ -49,17 +49,17 @@ system: /!\
     . systemdata FreePointer :=
         (systemdata FreePointer type) 
         instance 
-        ((result + length) mutable enable_reinterpretation) 
+        ((result + count) mutable enable_reinterpretation) 
     } result 
 };
 
 Text: /\
 { !mutable data: ^ array_reference 
 . _elementType: ^ type >>
-. _length: ^ length
+. _count: ^ count
 . AfterCopy: /\ data:= system NewMemory
     ( elementType: _elementType
-    . length: _length
+    . count: _count
     . initializer: /\ data >> ^
     )
 . AfterCopy()

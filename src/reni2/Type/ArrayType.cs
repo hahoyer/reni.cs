@@ -22,7 +22,7 @@ namespace Reni.Type
             , ISymbolProviderForPointer<ToNumberOfBase, IFeatureImplementation>
             , ISymbolProviderForPointer<Mutable, IFeatureImplementation>
             , ISymbolProviderForPointer<ArrayReference, IFeatureImplementation>
-            , ISymbolProviderForPointer<Length, IFeatureImplementation>
+            , ISymbolProviderForPointer<Count, IFeatureImplementation>
             , IRepeaterType
     {
         [Node]
@@ -136,8 +136,8 @@ namespace Reni.Type
         internal override int? SmartArrayLength(TypeBase elementType)
             => ElementType.IsConvertable(elementType) ? Count : base.SmartArrayLength(elementType);
 
-        IFeatureImplementation ISymbolProviderForPointer<Length, IFeatureImplementation>.Feature(Length tokenClass)
-            => Feature.Extension.MetaFeature(LengthResult);
+        IFeatureImplementation ISymbolProviderForPointer<Count, IFeatureImplementation>.Feature(Count tokenClass)
+            => Feature.Extension.MetaFeature(CountResult);
 
         protected override Size GetSize() => ElementType.Size * Count;
         internal override Result Destructor(Category category) => ElementType.ArrayDestructor(category, Count);
@@ -275,7 +275,7 @@ namespace Reni.Type
             return RootContext.BitType.Result(category, result).Align;
         }
 
-        Result LengthResult(Category category, ResultCache left, ContextBase context, CompileSyntax right)
+        Result CountResult(Category category, ResultCache left, ContextBase context, CompileSyntax right)
         {
             Tracer.Assert(right == null);
             return IndexType.Result(category, () => CodeBase.BitsConst(IndexSize, BitsConst.Convert(Count)));
