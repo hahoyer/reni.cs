@@ -12,9 +12,7 @@ namespace Reni.Code
     /// </summary>
     sealed class RecursiveCallCandidate : FiberItem
     {
-        readonly Size _refsSize;
-
-        internal override Size InputSize => _refsSize;
+        internal override Size InputSize { get; }
 
         internal override Size OutputSize => Size.Zero;
 
@@ -28,6 +26,6 @@ namespace Reni.Code
             return base.TryToCombineBack(precedingElement);
         }
 
-        internal RecursiveCallCandidate(Size refsSize) { _refsSize = refsSize; }
+        internal RecursiveCallCandidate(Size refsSize) { InputSize = refsSize; }
     }
 }
