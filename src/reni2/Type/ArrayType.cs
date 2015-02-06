@@ -51,7 +51,7 @@ namespace Reni.Type
             public static Options Create(string optionsId = null) => new Options(optionsId);
             internal static readonly string DefaultOptionsId = Create().OptionsData.Id;
 
-            protected override string GetNodeDump() => OptionsData.DumpPrintText;
+            protected override string GetNodeDump() => DumpPrintText;
             public string DumpPrintText => OptionsData.DumpPrintText;
         }
 
@@ -229,10 +229,8 @@ namespace Reni.Type
         Result DumpPrintTokenArrayResult(Category category)
         {
             var result = RootContext.ConcatPrintResult(category, Count, DumpPrintResult);
-            if(!category.HasCode)
-                return result;
-
-            result.Code = CodeBase.DumpPrintText("<<" + (options.IsMutable.Value ? ":=" : "")) + result.Code;
+            if(category.HasCode)
+                result.Code = CodeBase.DumpPrintText("<<" + (options.IsMutable.Value ? ":=" : "")) + result.Code;
             return result;
         }
 
