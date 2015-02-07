@@ -41,7 +41,7 @@ namespace Reni.Type
                 .Conversion(category.Typed, rightType)
                 .DereferencedAlignedResult();
 
-            return Result(category, left.PointerObjectResult(category) + rightResult);
+            return Result(category, left.ObjectResult(category) + rightResult);
         }
         internal Result PlusResult(Category category, ArrayReferenceType left, TypeBase right)
             => left

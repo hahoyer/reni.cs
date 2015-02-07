@@ -51,7 +51,7 @@ namespace Reni.Struct
             }
         }
 
-        Result ISimpleFeature.Result(Category category) => View.AccessAsLeftReference(category, Position);
+        Result ISimpleFeature.Result(Category category) => View.AccessViaObject(category, Position);
 
         TypeBase ISimpleFeature.TargetType => View.Type;
 

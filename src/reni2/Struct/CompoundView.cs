@@ -129,18 +129,15 @@ namespace Reni.Struct
 
         internal Size FieldOffset(int position) => Compound.FieldOffsetFromAccessPoint(ViewPosition, position);
 
-        internal Result DumpPrintResultViaObjectPointer(Category category) => DumpPrintResultViaContext(category)
-            .ContextViaObjectPointer(this);
-
-        internal Result DumpPrintResultViaContext(Category category)
+        internal Result DumpPrintResultViaObject(Category category) 
             => RootContext.ConcatPrintResult
                 (
                     category,
                     ViewPosition,
-                    DumpPrintResultViaAccessReference
+                    DumpPrintResultViaObject
                 );
 
-        internal Result AccessViaObjectPointer(Category category, int position)
+        Result AccessViaObjectPointer(Category category, int position)
         {
             var resultType = AccessType(position);
             if(resultType.Hllw)
@@ -150,17 +147,24 @@ namespace Reni.Struct
                 .Result(category, Type.SmartPointer.ArgResult(category));
         }
 
-        internal Result AccessAsLeftReference(Category category, int position)
+        internal Result AccessViaObject(Category category, int position)
         {
             var resultType = AccessType(position);
             if(resultType.Hllw)
                 return resultType.Result(category);
-            return resultType.Result(category, Type.PointerObjectResult);
+
+            return resultType.Result(category, Type.ObjectResult);
         }
 
-        internal Result AccessViaContext(Category category, int position)
-            => AccessViaObjectPointer(category, position)
-                .ReplaceArg(ObjectPointerViaContext);
+        Result AccessValueViaObject(Category category, int position)
+        {
+            var resultType = ValueType(position);
+            if (resultType.Hllw)
+                return resultType.Result(category);
+
+            return resultType.Result(category, c=>Type.ObjectResult(c).AddToReference(() => FieldOffset(position)));
+        }
+
 
         internal Result ReplaceObjectPointerByContext(Result target)
         {
@@ -172,8 +176,6 @@ namespace Reni.Struct
         internal FunctionType Function(FunctionSyntax body, TypeBase argsType) => Compound
             .RootContext
             .FunctionInstance(this, body, argsType);
-
-        Size ContextOffset() => Compound.SizeUntil(ViewPosition) * -1;
 
         internal Result ObjectPointerViaContext(Category category)
         {
@@ -189,20 +191,9 @@ namespace Reni.Struct
                 );
         }
 
-        internal Result AccessValueViaObjectPointer(Category category, int position)
+        Result DumpPrintResultViaObject(Category category, int position)
         {
-            var resultType = ValueType(position);
-            if(resultType.Hllw)
-                return resultType.Result(category);
-
-            return resultType
-                .Pointer
-                .Result(category, Type.SmartPointer.ArgResult(category).AddToReference(() => FieldOffset(position)));
-        }
-
-        Result DumpPrintResultViaAccessReference(Category category, int position)
-        {
-            var trace = position == -10;
+            var trace = ObjectId == -10 && position == 0;
             StartMethodDump(trace, category, position);
             try
             {
@@ -213,7 +204,7 @@ namespace Reni.Struct
                 return ReturnMethodDump
                     (
                         genericDumpPrintResult.ReplaceAbsolute
-                            (accessType.CheckedReference, c => AccessValueViaObjectPointer(c, position)));
+                            (accessType.CheckedReference, c => AccessValueViaObject(c, position)));
             }
             finally
             {

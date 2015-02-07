@@ -62,6 +62,6 @@ namespace Reni.Struct
 
         protected override string GetNodeDump() => base.GetNodeDump() + "(" + View.GetCompoundIdentificationDump() + ")";
 
-        new Result DumpPrintTokenResult(Category category) => View.DumpPrintResultViaObjectPointer(category);
+        new Result DumpPrintTokenResult(Category category) => View.DumpPrintResultViaObject(category);
     }
 }
