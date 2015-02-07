@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.UnitTest;
 using Reni.FeatureTest.Array;
+using Reni.FeatureTest.BlogExamples;
 using Reni.FeatureTest.Function;
 using Reni.FeatureTest.Integer;
 using Reni.FeatureTest.Reference;
@@ -96,6 +97,7 @@ Text: /\
     [TypeOperator]
     [DefaultInitialized]
     [FunctionVariable]
+    [WikiExamples]
     [Repeater]
     [FunctionArgument]
     [PrimitiveRecursiveFunctionHuge]
