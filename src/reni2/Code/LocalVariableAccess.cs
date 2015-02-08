@@ -32,17 +32,13 @@ namespace Reni.Code
             StopByObjectId(-7);
         }
 
-        protected override string GetNodeDump()
-        {
-            return base.GetNodeDump()
-                + " Holder=" + Holder
-                + " Offset=" + Offset
-                + " DataSize=" + DataSize
-                ;
-        }
+        protected override string GetNodeDump() => base.GetNodeDump()
+            + " Holder=" + Holder
+            + " Offset=" + Offset
+            + " DataSize=" + DataSize;
 
-        protected override Size GetSize() { return _size; }
-        internal override void Visit(IVisitor visitor) { visitor.LocalVariableAccess(Holder, Offset, Size, DataSize); }
-        protected override CodeBase TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
+        protected override Size GetSize() => _size;
+        internal override void Visit(IVisitor visitor) => visitor.LocalVariableAccess(Holder, Offset, Size, DataSize);
+        protected override CodeBase TryToCombine(FiberItem subsequentElement) => subsequentElement.TryToCombineBack(this);
     }
 }
