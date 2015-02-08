@@ -23,7 +23,7 @@ namespace ReniTest
             Application.SetCompatibleTextRenderingDefault(false);
 
             //if(false)
-            ExecTest();
+            //ExecTest();
 
             if(Debugger.IsAttached)
                 TestRunner.IsModeErrorFocus = true;
@@ -34,7 +34,7 @@ namespace ReniTest
 
         const string Target = @"f: /\ ^(); x: 1; f(/\x) dump_print";
         const string Output = "1";
-        static void InspectCompiler() { Application.Run(new TreeForm {Target = CreateCompiler(Target)}); }
+        static void InspectCompiler() => Application.Run(new TreeForm {Target = CreateCompiler(Target)});
         static void ShowSyntaxTree()
         {
             var prioTable = @"Left not
