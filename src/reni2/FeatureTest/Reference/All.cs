@@ -15,7 +15,6 @@ t dump_print
     [Output("(bit)*8[text_item]")]
     public sealed class ArrayElementType : CompilerTest {}
 
-
     [TestFixture]
     [Target(@"
 NewMemory: /\ 
@@ -36,4 +35,16 @@ Text('Hallo') AfterCopy() result dump_print
 ")]
     [Output("((bit)*8[text_item])reference[force_mutable][mutable]")]
     public sealed class ArrayElementType1 : CompilerTest {}
+
+    [TestFixture]
+    [Target(@"
+d: 'abcd';
+ref: d array_reference;
+(ref >> 0) dump_print;
+(ref >> 1) dump_print;
+(ref >> 2) dump_print;
+(ref >> 3) dump_print
+")]
+    [Output("((bit)*8[text_item])reference[force_mutable][mutable]")]
+    public sealed class ArrayReferenceCopy : CompilerTest { }
 }

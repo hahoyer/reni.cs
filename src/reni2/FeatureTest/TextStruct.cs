@@ -102,6 +102,7 @@ Text: /\
     [FunctionArgument]
     [PrimitiveRecursiveFunctionHuge]
     [ArrayElementType]
+    [ArrayReferenceCopy]
     public sealed class Text1 : TextStruct {}
 
     [TestFixture]
