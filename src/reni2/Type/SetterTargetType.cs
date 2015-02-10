@@ -39,39 +39,32 @@ namespace Reni.Type
         [EnableDumpExcept(false)]
         protected abstract bool IsMutable { get; }
 
-        protected virtual TypeBase TargetType
-        {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
-        }
+        protected abstract TypeBase TargetType { get; }
 
-        Result ReassignResult(Category category, IContextReference objectReference, TypeBase argsType)
+        Result ReassignResult(Category category, TypeBase right)
         {
             if(category == Category.Type)
                 return RootContext.VoidType.Result(category);
 
-            var trace = ObjectId == -1;
-            StartMethodDump(trace, category, argsType);
+            var trace = ObjectId == -42 && category.HasCode;
+            StartMethodDump(trace, category, right);
             try
             {
                 BreakExecution();
-                var sourceResult = argsType
+                var sourceResult = right
                     .Conversion(category.Typed, ValueType).LocalReferenceResult;
                 Dump("sourceResult", sourceResult);
                 BreakExecution();
 
                 var destinationResult = DestinationResult(category.Typed)
-                    .ReplaceArg(Result(category.Typed, objectReference));
+                    .ReplaceArg(Result(category.Typed, this));
                 Dump("destinationResult", destinationResult);
                 BreakExecution();
 
                 var resultForArg = destinationResult + sourceResult;
                 Dump("resultForArg", resultForArg);
 
-                var result = RootContext.VoidType.Result(category, SetterResult);
+                var result = SetterResult(category);
                 Dump("result", result);
                 BreakExecution();
 
@@ -90,12 +83,6 @@ namespace Reni.Type
 
         [DisableDump]
         internal override Root RootContext => ValueType.RootContext;
-
-        internal ResultCache ForceDePointer(Category category)
-        {
-            var result = GetterResult(category.Typed);
-            return result.Type.DePointer(category).Data.ReplaceArg(result);
-        }
 
         [DisableDump]
         internal override TypeBase TypeForTypeOperator => ValueType.TypeForTypeOperator;
