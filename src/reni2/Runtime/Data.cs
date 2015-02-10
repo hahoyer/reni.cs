@@ -1,25 +1,3 @@
-#region Copyright (C) 2012
-
-//     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-#endregion
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -36,10 +14,13 @@ namespace Reni.Runtime
         readonly byte[] _data;
         int _length;
 
-        public static IOutStream OutStream { get; set; }
+        public static IOutStream OutStream { internal get; set; }
 
-        public static Data Create(int bytes) { return new Data(new byte[bytes]); }
-        public static Data Create(byte[] bytes) { return new Data(bytes) {StartIndex = 0}; }
+        public static Data Create(int bytes) => new Data(new byte[bytes]);
+        public static Data Create(byte[] bytes) => new Data(bytes)
+        {
+            StartIndex = 0
+        };
 
         Data(byte[] result)
         {
@@ -53,7 +34,7 @@ namespace Reni.Runtime
             bytes.CopyTo(_data, StartIndex);
         }
 
-        public void Push(Data data) { Push(data.GetBytes(data._length)); }
+        public void Push(Data data) => Push(data.GetBytes(data._length));
 
         public Data Pull(int bytes)
         {
@@ -71,7 +52,7 @@ namespace Reni.Runtime
             return result;
         }
 
-        public byte[] GetBytes() { return GetBytes(_length); }
+        public byte[] GetBytes() => GetBytes(_length);
 
         int StartIndex
         {
@@ -82,20 +63,20 @@ namespace Reni.Runtime
                 EnsureLength();
             }
         }
-        void EnsureLength() { Tracer.Assert(StartIndex >= 0); }
+        void EnsureLength() => Tracer.Assert(StartIndex >= 0);
 
-        public Data Pointer(int offset) { return Create(_data.Pointer(StartIndex + offset)); }
-        public void PointerPlus(int offset) { _data.DoRefPlus(StartIndex, offset); }
-        public Data DePointer(int bytes) { return Create(_data.Dereference(StartIndex, bytes)); }
-        public Data Get(int bytes, int offset) { return Create(_data.Get(StartIndex + offset, bytes)); }
-        public Data GetFromBack(int bytes, int offset) { return Create(_data.Get(_data.Length + offset, bytes)); }
-        public void PrintNumber() { GetBytes().PrintNumber(); }
+        public Data Pointer(int offset) => Create(_data.Pointer(StartIndex + offset));
+        public void PointerPlus(int offset) => _data.DoRefPlus(StartIndex, offset);
+        public Data DePointer(int bytes) => Create(_data.Dereference(StartIndex, bytes));
+        public Data Get(int bytes, int offset) => Create(_data.Get(StartIndex + offset, bytes));
+        public Data GetFromBack(int bytes, int offset) => Create(_data.Get(_data.Length + offset, bytes));
+        public void PrintNumber() => GetBytes().PrintNumber();
         public void PrintText(int itemBytes)
         {
             Tracer.Assert(itemBytes == 1);
             GetBytes(_length).PrintText();
         }
-        public static void PrintText(string data) { data.PrintText(); }
+        public static void PrintText(string data) => data.PrintText();
 
         public void Assign(int bytes)
         {
@@ -138,17 +119,17 @@ namespace Reni.Runtime
         string AddressDump { get { return _biasCache.AddressDump(this) + "=" + DataDump; } }
 
         [UsedImplicitly]
-        public void Equal(int sizeBytes, int leftBytes, int rightBytes) { Compare(sizeBytes, leftBytes, rightBytes, DataHandler.IsEqual); }
+        public void Equal(int sizeBytes, int leftBytes, int rightBytes) => Compare(sizeBytes, leftBytes, rightBytes, DataHandler.IsEqual);
         [UsedImplicitly]
-        public void LessGreater(int sizeBytes, int leftBytes, int rightBytes) { Compare(sizeBytes, leftBytes, rightBytes, DataHandler.IsNotEqual); }
+        public void LessGreater(int sizeBytes, int leftBytes, int rightBytes) => Compare(sizeBytes, leftBytes, rightBytes, DataHandler.IsNotEqual);
         [UsedImplicitly]
-        public void Less(int sizeBytes, int leftBytes, int rightBytes) { Compare(sizeBytes, leftBytes, rightBytes, DataHandler.IsLess); }
+        public void Less(int sizeBytes, int leftBytes, int rightBytes) => Compare(sizeBytes, leftBytes, rightBytes, DataHandler.IsLess);
         [UsedImplicitly]
-        public void Greater(int sizeBytes, int leftBytes, int rightBytes) { Compare(sizeBytes, leftBytes, rightBytes, DataHandler.IsGreater); }
+        public void Greater(int sizeBytes, int leftBytes, int rightBytes) => Compare(sizeBytes, leftBytes, rightBytes, DataHandler.IsGreater);
         [UsedImplicitly]
-        public void LessEqual(int sizeBytes, int leftBytes, int rightBytes) { Compare(sizeBytes, leftBytes, rightBytes, DataHandler.IsLessEqual); }
+        public void LessEqual(int sizeBytes, int leftBytes, int rightBytes) => Compare(sizeBytes, leftBytes, rightBytes, DataHandler.IsLessEqual);
         [UsedImplicitly]
-        public void GreaterEqual(int sizeBytes, int leftBytes, int rightBytes) { Compare(sizeBytes, leftBytes, rightBytes, DataHandler.IsGreaterEqual); }
+        public void GreaterEqual(int sizeBytes, int leftBytes, int rightBytes) => Compare(sizeBytes, leftBytes, rightBytes, DataHandler.IsGreaterEqual);
 
         void Compare(int sizeBytes, int leftBytes, int rightBytes, Func<byte[], byte[], bool> operation)
         {
@@ -162,7 +143,7 @@ namespace Reni.Runtime
         [UsedImplicitly]
         public void MinusPrefix(int bytes)
         {
-            var data = Pull(bytes);             
+            var data = Pull(bytes);
             data._data.MinusPrefix();
             Push(data);
         }
