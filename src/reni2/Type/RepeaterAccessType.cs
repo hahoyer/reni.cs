@@ -20,10 +20,23 @@ namespace Reni.Type
 
         [DisableDump]
         TypeBase IndexType { get; }
+
         [DisableDump]
         protected override bool IsMutable { get; }
+
+        [DisableDump]
+        protected override TypeBase TargetType
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
+
         [DisableDump]
         internal override TypeBase ValueType { get; }
+
         [DisableDump]
         internal override bool Hllw => false;
 
