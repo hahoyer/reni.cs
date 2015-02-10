@@ -43,7 +43,7 @@ system: /!\
         while: /\ position < count,
         body: /\ 
         ( 
-            result >> position := initializer(position), 
+            (result >> position) := initializer(position), 
             position := (position + 1) enable_cut
         ) 
     )
