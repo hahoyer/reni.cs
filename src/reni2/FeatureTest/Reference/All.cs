@@ -38,13 +38,29 @@ Text('Hallo') AfterCopy() result dump_print
 
     [TestFixture]
     [Target(@"
-d: 'abcd';
+d: <<5<<2<<3;
 ref: d array_reference;
 (ref >> 0) dump_print;
 (ref >> 1) dump_print;
 (ref >> 2) dump_print;
-(ref >> 3) dump_print
 ")]
-    [Output("((bit)*8[text_item])reference[force_mutable][mutable]")]
-    public sealed class ArrayReferenceCopy : CompilerTest { }
+    [Output("523")]
+    public sealed class ArrayReferenceCopy : CompilerTest {}
+
+    [TestFixture]
+    [Target(@"
+d: <<5<<2<<:=3;
+ref: d array_reference;
+(d >> 0):= 1;
+(ref >> 0) dump_print;
+(ref >> 1) dump_print;
+(ref >> 2) dump_print;
+")]
+    [Output("123")]
+    public sealed class ArrayReferenceCopyAssign : CompilerTest {}
+
+    [TestFixture]
+    [ArrayReferenceCopyAssign]
+    [ArrayReferenceCopy]
+    public sealed class ArrayReferenceAll : CompilerTest {}
 }
