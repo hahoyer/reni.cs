@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
 using hw.Debug;
+using hw.Helper;
 using hw.UnitTest;
 using Reni.Context;
 using Reni.Type;
@@ -20,7 +22,7 @@ namespace Reni.FeatureTest.ConversionService
             Tracer.Assert(types.Contains(number));
             Tracer.Assert(types.Contains(number.Align));
             Tracer.Assert(types.Contains(number.Pointer));
-            Tracer.Assert(types.Length == 3);
+            Tracer.Assert(types.Length == 3, ()=>"\n"+types.Stringify("\n"));
         }
 
         [Test]
