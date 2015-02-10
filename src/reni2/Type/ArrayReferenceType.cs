@@ -157,43 +157,15 @@ namespace Reni.Type
             => Result(category, source.ArgResult);
 
         Result AccessResult(Category category, TypeBase right)
-        {
-            var objectResult = ObjectResult(category);
-            var dereferencedAlignedResult = objectResult.DereferencedAlignedResult();
-            var result = AccessType.Result(category, dereferencedAlignedResult, right);
-            if(false && category.HasCode)
-                NotImplementedMethod
-                    (
-                        category,
-                        right,
-                        nameof(objectResult),
-                        objectResult,
-                        nameof(dereferencedAlignedResult),
-                        dereferencedAlignedResult,
-                        nameof(result),
-                        result)
-                    ;
-
-            return result;
-        }
+            => AccessType
+                .Result(category, ObjectResult(category).DereferencedAlignedResult(), right);
 
         Result PlusResult(Category category, TypeBase right)
         {
-            var conversion = AccessType.Conversion(category, ValueType.Pointer);
-            var result = Result(category, conversion);
-            var accessResult = AccessType.Result(category, ObjectResult(category).DereferencedAlignedResult(), right);
-            NotImplementedMethod
-                (
-                    category,
-                    right,
-                    nameof(conversion),
-                    conversion,
-                    nameof(result),
-                    result,
-                    nameof(accessResult),
-                    accessResult);
-            return result.ReplaceArg(accessResult);
+            var codeAndExts = AccessResult(category, right).DereferenceResult;
+            return Result(category, codeAndExts);
         }
+
         Result MinusResult(Category category, TypeBase right)
         {
             NotImplementedMethod(category, right);
