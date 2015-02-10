@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using System;
+using hw.Debug;
 using Reni.Basics;
 using Reni.Code;
 
@@ -12,9 +13,11 @@ namespace Reni.Type
             => new Result(category, getCode: SetterCode);
 
         protected override Result GetterResult(Category category)
-            => ValueType
-                .SmartPointer
+        {
+            return ValueType
+                .ForcedPointer
                 .Result(category, GetterCode);
+        }
 
         protected abstract CodeBase SetterCode();
         protected abstract CodeBase GetterCode();

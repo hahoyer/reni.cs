@@ -36,6 +36,9 @@ namespace Reni.Type
             public readonly ValueCache<IReference> ForcedReference;
             [Node]
             [SmartNode]
+            public readonly ValueCache<PointerType> ForcedPointer;
+            [Node]
+            [SmartNode]
             public readonly ValueCache<TypeType> TypeType;
             [Node]
             [SmartNode]
@@ -55,6 +58,7 @@ namespace Reni.Type
             {
                 EnableCut = new ValueCache<EnableCut>(() => new EnableCut(parent));
                 ForcedReference = new ValueCache<IReference>(parent.ForcedReferenceForCache);
+                ForcedPointer = new ValueCache<PointerType>(()=>new PointerType(parent));
                 Pair = new FunctionCache<TypeBase, Pair>(first => new Pair(first, parent));
                 Array = new FunctionCache<int, FunctionCache<string, ArrayType>>
                     (
@@ -173,6 +177,8 @@ namespace Reni.Type
         internal virtual bool IsAligningPossible => true;
 
         [DisableDump]
+        virtual internal bool IsPointerPossible => true;
+        [DisableDump]
         internal virtual Size SimpleItemSize => null;
 
         Result VoidCodeAndRefs(Category category) => RootContext.VoidType.Result(category & (Category.Code | Category.Exts));
@@ -244,6 +250,7 @@ namespace Reni.Type
         [DisableDump]
         internal TypeBase FunctionInstance => _cache.FunctionInstanceType.Value;
 
+        public PointerType ForcedPointer => _cache.ForcedPointer.Value;
         [DisableDump]
         internal virtual CompoundView FindRecentCompoundView
         {
@@ -309,7 +316,7 @@ namespace Reni.Type
             if(Hllw)
                 return ArgResult(category);
 
-            return Pointer
+            return ForcedPointer
                 .Result
                 (
                     category,
@@ -337,7 +344,7 @@ namespace Reni.Type
         IReference ForcedReferenceForCache()
         {
             Tracer.Assert(!Hllw);
-            return CheckedReference ?? new PointerType(this);
+            return CheckedReference ?? ForcedPointer;
         }
 
         protected virtual ArrayType ArrayForCache(int count, string optionsId)
@@ -438,7 +445,7 @@ namespace Reni.Type
                     yield break;
                 if(IsAligningPossible && Align.Size != Size)
                     yield return Feature.Extension.SimpleFeature(AlignResult);
-                if(!(this is IReference))
+                if(IsPointerPossible)
                     yield return Feature.Extension.SimpleFeature(LocalReferenceResult);
             }
         }

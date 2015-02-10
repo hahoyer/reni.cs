@@ -28,6 +28,10 @@ namespace Reni.Type
         ISimpleFeature IReference.Converter => this;
         TypeBase ISimpleFeature.TargetType => TargetType;
         Result ISimpleFeature.Result(Category category) => GetterResult(category);
+        [DisableDump]
+        internal override bool IsAligningPossible => false;
+        [DisableDump]
+        internal override bool IsPointerPossible => false;
 
         IFeatureImplementation ISymbolProvider<ReassignToken, IFeatureImplementation>.Feature(ReassignToken tokenClass)
             => IsMutable ? Extension.FunctionFeature(ReassignResult) : null;

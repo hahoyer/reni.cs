@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using hw.Helper;
 using System.Linq;
 using hw.Debug;
-using hw.Forms;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -50,18 +49,16 @@ namespace Reni.Type
         }
 
         readonly int _order;
-        [Node]
-        [SmartNode]
         readonly ValueCache<RepeaterAccessType> _repeaterAccessTypeCache;
 
         internal ArrayReferenceType(TypeBase valueType, string optionsId)
         {
             _order = CodeArgs.NextOrder++;
             options = Options.Create(optionsId);
+            _repeaterAccessTypeCache = new ValueCache<RepeaterAccessType>(() => new RepeaterAccessType(this));
             ValueType = valueType;
             Tracer.Assert(!valueType.Hllw, valueType.Dump);
             Tracer.Assert(!(valueType.CoreType is PointerType), valueType.Dump);
-            _repeaterAccessTypeCache = new ValueCache<RepeaterAccessType>(() => new RepeaterAccessType(this));
 
             StopByObjectId(-10);
         }
@@ -72,6 +69,8 @@ namespace Reni.Type
         [DisableDump]
         internal override Root RootContext => ValueType.RootContext;
         internal override string DumpPrintText => "(" + ValueType.DumpPrintText + ")reference" + options.DumpPrintText;
+        [DisableDump]
+        RepeaterAccessType AccessType => _repeaterAccessTypeCache.Value;
         [DisableDump]
         internal override bool Hllw => false;
         [DisableDump]
@@ -91,7 +90,7 @@ namespace Reni.Type
             => ValueType.ArrayReference(options.IsEnableReinterpretation.SetTo(true));
 
         TypeBase IRepeaterType.ElementType => ValueType;
-        Size IRepeaterType.IndexSize => Size;
+        TypeBase IRepeaterType.IndexType => RootContext.BitType.Number(Size.ToInt());
         bool IRepeaterType.IsMutable => options.IsForceMutable.Value;
 
         ISimpleFeature IReference.Converter => this;
@@ -106,21 +105,21 @@ namespace Reni.Type
             => ForcedConversion(destination).NullableToArray();
 
         IFeatureImplementation ISymbolProvider<Mutable, IFeatureImplementation>.Feature(Mutable tokenClass)
-            => Feature.Extension.SimpleFeature(MutableResult);
+            => Extension.SimpleFeature(MutableResult);
 
         IFeatureImplementation ISymbolProvider<EnableReinterpretation, IFeatureImplementation>.Feature
             (EnableReinterpretation tokenClass)
-            => Feature.Extension.SimpleFeature(EnableReinterpretationResult);
+            => Extension.SimpleFeature(EnableReinterpretationResult);
 
         IFeatureImplementation ISymbolProvider<TokenClasses.ArrayAccess, IFeatureImplementation>.Feature
             (TokenClasses.ArrayAccess tokenClass)
-            => Feature.Extension.FunctionFeature(AccessResult);
+            => Extension.FunctionFeature(AccessResult);
 
         IFeatureImplementation ISymbolProvider<Minus, IFeatureImplementation>.Feature(Minus tokenClass)
-            => Feature.Extension.FunctionFeature(MinusResult);
+            => Extension.FunctionFeature(MinusResult);
 
         IFeatureImplementation ISymbolProvider<Plus, IFeatureImplementation>.Feature(Plus tokenClass)
-            => Feature.Extension.FunctionFeature(PlusResult);
+            => Extension.FunctionFeature(PlusResult);
 
 
         Result MutableResult(Category category)
@@ -134,7 +133,7 @@ namespace Reni.Type
         ISimpleFeature ForcedConversion(ArrayReferenceType destination)
             =>
                 HasForcedConversion(destination)
-                    ? Feature.Extension.SimpleFeature(category => destination.ConversionResult(category, this), this)
+                    ? Extension.SimpleFeature(category => destination.ConversionResult(category, this), this)
                     : null;
 
         bool HasForcedConversion(ArrayReferenceType destination)
@@ -158,9 +157,43 @@ namespace Reni.Type
             => Result(category, source.ArgResult);
 
         Result AccessResult(Category category, TypeBase right)
-            => _repeaterAccessTypeCache.Value.AccessResult(category, this, right);
+        {
+            var objectResult = ObjectResult(category);
+            var dereferencedAlignedResult = objectResult.DereferencedAlignedResult();
+            var result = AccessType.Result(category, dereferencedAlignedResult, right);
+            if(false && category.HasCode)
+                NotImplementedMethod
+                    (
+                        category,
+                        right,
+                        nameof(objectResult),
+                        objectResult,
+                        nameof(dereferencedAlignedResult),
+                        dereferencedAlignedResult,
+                        nameof(result),
+                        result)
+                    ;
 
-        Result PlusResult(Category category, TypeBase right) => _repeaterAccessTypeCache.Value.PlusResult(category, this, right);
+            return result;
+        }
+
+        Result PlusResult(Category category, TypeBase right)
+        {
+            var conversion = AccessType.Conversion(category, ValueType.Pointer);
+            var result = Result(category, conversion);
+            var accessResult = AccessType.Result(category, ObjectResult(category).DereferencedAlignedResult(), right);
+            NotImplementedMethod
+                (
+                    category,
+                    right,
+                    nameof(conversion),
+                    conversion,
+                    nameof(result),
+                    result,
+                    nameof(accessResult),
+                    accessResult);
+            return result.ReplaceArg(accessResult);
+        }
         Result MinusResult(Category category, TypeBase right)
         {
             NotImplementedMethod(category, right);

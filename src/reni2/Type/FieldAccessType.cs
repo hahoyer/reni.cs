@@ -34,7 +34,7 @@ namespace Reni.Type
 
         protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
         protected override CodeBase GetterCode() => ArgCode.ReferencePlus(FieldOffset);
-        protected override CodeBase SetterCode() => Pair(ValueType.SmartPointer)
+        protected override CodeBase SetterCode() => Pair(ValueType.ForcedPointer)
             .ArgCode
             .Assignment(ValueType.Size);
 

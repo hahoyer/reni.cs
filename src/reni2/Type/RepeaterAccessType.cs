@@ -11,41 +11,39 @@ namespace Reni.Type
     sealed class RepeaterAccessType
         : DataSetterTargetType
     {
+        internal RepeaterAccessType(IRepeaterType repeaterType)
+        {
+            IsMutable = repeaterType.IsMutable;
+            ValueType = repeaterType.ElementType;
+            IndexType = repeaterType.IndexType;
+        }
+
         [DisableDump]
-        IRepeaterType RepeaterType { get; }
-
-        internal RepeaterAccessType(IRepeaterType repeaterType) { RepeaterType = repeaterType; }
-
+        TypeBase IndexType { get; }
+        [DisableDump]
+        protected override bool IsMutable { get; }
+        [DisableDump]
+        internal override TypeBase ValueType { get; }
         [DisableDump]
         internal override bool Hllw => false;
 
-        protected override bool IsMutable => RepeaterType.IsMutable;
-
-        internal override TypeBase ValueType => RepeaterType.ElementType;
-
-        protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize + RepeaterType.IndexSize;
+        protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize + IndexType.Size;
 
         protected override CodeBase SetterCode()
             => Pair(ValueType.SmartPointer)
                 .ArgCode
-                .ArraySetter(ValueType.Size, RepeaterType.IndexSize);
+                .ArraySetter(ValueType.Size, IndexType.Size);
 
         protected override CodeBase GetterCode() => ArrayGetter;
-        internal CodeBase ArrayGetter => ArgCode.ArrayGetter(ValueType.Size, RepeaterType.IndexSize);
+        CodeBase ArrayGetter => ArgCode.ArrayGetter(ValueType.Size, IndexType.Size);
 
-        internal Result AccessResult(Category category, TypeBase left, TypeBase right)
+        internal Result Result(Category category, Result leftResult, TypeBase right)
         {
-            var rightType = RootContext.BitType.Number(RepeaterType.IndexSize.ToInt());
-
             var rightResult = right
-                .Conversion(category.Typed, rightType)
+                .Conversion(category.Typed, IndexType)
                 .DereferencedAlignedResult();
 
-            return Result(category, left.ObjectResult(category) + rightResult);
+            return Result(category, leftResult + rightResult);
         }
-        internal Result PlusResult(Category category, ArrayReferenceType left, TypeBase right)
-            => left
-                .Result(category, Conversion(category, RepeaterType.ElementType.Pointer))
-                .ReplaceArg(AccessResult(category, left, right));
     }
 }

@@ -8,7 +8,7 @@ namespace Reni.Type
     interface IRepeaterType
     {
         TypeBase ElementType { get; }
-        Size IndexSize { get; }
+        TypeBase IndexType { get; }
         bool IsMutable { get; }
     }
 }

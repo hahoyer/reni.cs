@@ -24,7 +24,7 @@ namespace Reni.Type
             _order = CodeArgs.NextOrder++;
             ValueType = valueType;
             Tracer.Assert(!valueType.Hllw, valueType.Dump);
-            Tracer.Assert(!(valueType is IReference), valueType.Dump);
+           Tracer.Assert(valueType.IsPointerPossible, valueType.Dump);
             StopByObjectId(-10);
         }
 
@@ -42,6 +42,8 @@ namespace Reni.Type
         internal override bool Hllw => false;
         [DisableDump]
         internal override bool IsAligningPossible => false;
+        [DisableDump]
+        internal override bool IsPointerPossible => false;
 
         Size IContextReference.Size => Size;
         int IContextReference.Order => _order;

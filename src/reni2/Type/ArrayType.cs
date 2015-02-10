@@ -73,8 +73,10 @@ namespace Reni.Type
         Options options { get; }
 
         TypeBase IRepeaterType.ElementType => ElementType;
-        Size IRepeaterType.IndexSize => IndexSize;
+        TypeBase IRepeaterType.IndexType => RootContext.BitType.Number(IndexSize.ToInt());
         bool IRepeaterType.IsMutable => IsMutable;
+        [DisableDump]
+        RepeaterAccessType AccessType => _repeaterAccessTypeCache.Value;
 
         [DisableDump]
         internal bool IsMutable => options.IsMutable.Value;
@@ -246,20 +248,7 @@ namespace Reni.Type
                 );
         }
 
-        Result ElementAccessResult(Category category, IContextReference objectReference, TypeBase argsType)
-        {
-            var objectResult = Pointer.Result(category, objectReference);
-
-            var argsResult = argsType
-                .Conversion(category.Typed, IndexType)
-                .DereferencedAlignedResult();
-
-            var result = _repeaterAccessTypeCache
-                .Value
-                .Result(category, objectResult + argsResult);
-
-            return result;
-        }
+        Result ElementAccessResult(Category category, TypeBase right) => AccessType.Result(category, ObjectResult(category), right);
 
         Result ToNumberOfBaseResult(Category category, ResultCache left, ContextBase context, CompileSyntax right)
         {
