@@ -58,7 +58,7 @@ namespace Reni.Type
             {
                 EnableCut = new ValueCache<EnableCut>(() => new EnableCut(parent));
                 ForcedReference = new ValueCache<IReference>(parent.ForcedReferenceForCache);
-                ForcedPointer = new ValueCache<PointerType>(()=>new PointerType(parent));
+                ForcedPointer = new ValueCache<PointerType>(parent.ForcedPointerForCache);
                 Pair = new FunctionCache<TypeBase, Pair>(first => new Pair(first, parent));
                 Array = new FunctionCache<int, FunctionCache<string, ArrayType>>
                     (
@@ -91,7 +91,10 @@ namespace Reni.Type
         internal abstract Root RootContext { get; }
 
         protected TypeBase()
-            : base(_nextObjectId++) { _cache = new Cache(this); }
+            : base(_nextObjectId++)
+        {
+            _cache = new Cache(this);
+        }
 
         IContextReference IContextReferenceProvider.ContextReference => ForcedReference;
 
@@ -177,13 +180,14 @@ namespace Reni.Type
         internal virtual bool IsAligningPossible => true;
 
         [DisableDump]
-        virtual internal bool IsPointerPossible => true;
+        internal virtual bool IsPointerPossible => true;
         [DisableDump]
         internal virtual Size SimpleItemSize => null;
 
         Result VoidCodeAndRefs(Category category) => RootContext.VoidType.Result(category & (Category.Code | Category.Exts));
 
-        internal ArrayType Array(int count, string options = null) => _cache.Array[count][options ?? ArrayType.Options.DefaultOptionsId];
+        internal ArrayType Array(int count, string options = null)
+            => _cache.Array[count][options ?? ArrayType.Options.DefaultOptionsId];
         internal ArrayReferenceType ArrayReference(string optionsId) => _cache.ArrayReferenceCache[optionsId];
         protected virtual TypeBase ReversePair(TypeBase first) => first._cache.Pair[this];
         internal virtual TypeBase Pair(TypeBase second) => second.ReversePair(this);
@@ -250,7 +254,7 @@ namespace Reni.Type
         [DisableDump]
         internal TypeBase FunctionInstance => _cache.FunctionInstanceType.Value;
 
-        public PointerType ForcedPointer => _cache.ForcedPointer.Value;
+        internal PointerType ForcedPointer => _cache.ForcedPointer.Value;
         [DisableDump]
         internal virtual CompoundView FindRecentCompoundView
         {
@@ -346,6 +350,13 @@ namespace Reni.Type
             Tracer.Assert(!Hllw);
             return CheckedReference ?? ForcedPointer;
         }
+
+        internal virtual PointerType ForcedPointerForCache()
+        {
+            Tracer.Assert(!Hllw);
+            return new PointerType(this);
+        }
+
 
         protected virtual ArrayType ArrayForCache(int count, string optionsId)
             => new ArrayType(this, count, optionsId);

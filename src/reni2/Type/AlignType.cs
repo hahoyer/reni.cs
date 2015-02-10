@@ -35,12 +35,15 @@ namespace Reni.Type
         internal override IReference ForcedReference => Parent.ForcedReference;
 
         protected override Result DeAlign(Category category) => Parent.Result(category, ArgResult);
+        internal override PointerType ForcedPointerForCache() => Parent.ForcedPointer;
 
         protected override IEnumerable<ISimpleFeature> RawSymmetricConversions
             => base.RawSymmetricConversions.Concat(new ISimpleFeature[] {Extension.SimpleFeature(UnalignedResult)});
 
         [DisableDump]
         internal override bool IsAligningPossible => false;
+        [DisableDump]
+        internal override bool IsPointerPossible => false;
 
         protected override Size GetSize() => Parent.Size.Align(_alignBits);
         internal override int? SmartArrayLength(TypeBase elementType) => Parent.SmartArrayLength(elementType);
