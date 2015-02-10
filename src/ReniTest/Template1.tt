@@ -5,10 +5,7 @@
 <#@ import namespace="global::Reni" #>
 // <#= DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") #> 
 <#= new T4Compiler(@"
-d: 'abcd';
+d: <<1;
 ref: d array_reference;
 (ref >> 0) dump_print;
-(ref >> 1) dump_print;
-(ref >> 2) dump_print;
-(ref >> 3) dump_print
 ").Code() #>     
