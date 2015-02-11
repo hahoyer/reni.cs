@@ -4,10 +4,12 @@ using System.Linq;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
+using Reni.ReniParser;
 using Reni.ReniSyntax;
 
 namespace Reni.TokenClasses
 {
+    [BelongsTo(typeof(MainTokenFactory))]
     sealed class ArgToken : NonSuffix, ITokenClassWithId
     {
         public const string Id = "^";

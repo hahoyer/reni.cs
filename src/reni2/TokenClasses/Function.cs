@@ -6,19 +6,25 @@ using Reni.ReniParser;
 
 namespace Reni.TokenClasses
 {
-    sealed class Function : TokenClass
+    [BelongsTo(typeof(MainTokenFactory))]
+    [Variant(false, false)]
+    [Variant(true, false)]
+    [Variant(false, true)]
+    sealed class Function : TokenClass, ITokenClassWithId
     {
+        public static string Id(bool isImplicit = false, bool isMetaFunction = false)
+            => "/" + (isImplicit ? "!" : "") + (isMetaFunction ? "\\/" : "") + "\\";
+        string ITokenClassWithId.Id => Id(_isImplicit, _isMetaFunction);
         readonly bool _isImplicit;
         readonly bool _isMetaFunction;
-        internal Function(bool isImplicit = false, bool isMetaFunction = false)
+        public Function(bool isImplicit = false, bool isMetaFunction = false)
         {
             _isImplicit = isImplicit;
             _isMetaFunction = isMetaFunction;
         }
 
         protected override Syntax Prefix(SourcePart token, Syntax right)
-        {
-            return new FunctionSyntax
+            => new FunctionSyntax
                 (
                 token,
                 null,
@@ -26,11 +32,9 @@ namespace Reni.TokenClasses
                 _isMetaFunction,
                 right.ToCompiledSyntax
                 );
-        }
 
         protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
-        {
-            return new FunctionSyntax
+            => new FunctionSyntax
                 (
                 token,
                 left.ToCompiledSyntax,
@@ -38,6 +42,5 @@ namespace Reni.TokenClasses
                 _isMetaFunction,
                 right.ToCompiledSyntax
                 );
-        }
     }
 }

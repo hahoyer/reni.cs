@@ -95,13 +95,13 @@ namespace Reni.ReniSyntax
                 .Result(context, category, _left, _right);
         }
 
-        internal override Result ObtainPendingResult(ContextBase context, Category category)
+        internal override Result PendingResultForCache(ContextBase context, Category category)
         {
             var pendingProvider = _infix as IPendingProvider;
             if(pendingProvider != null)
                 return pendingProvider
-                    .ObtainResult(context, category, _left, _right);
-            return base.ObtainPendingResult(context, category);
+                    .Result(context, category, _left, _right);
+            return base.PendingResultForCache(context, category);
         }
 
         protected override string GetNodeDump()
@@ -122,7 +122,7 @@ namespace Reni.ReniSyntax
 
     interface IPendingProvider
     {
-        Result ObtainResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right);
+        Result Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right);
     }
 
     sealed class SuffixSyntax : SpecialSyntax

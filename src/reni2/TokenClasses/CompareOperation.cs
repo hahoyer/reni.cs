@@ -4,11 +4,29 @@ using System.Linq;
 using hw.Debug;
 using Reni.Feature;
 using Reni.Numeric;
+using Reni.ReniParser;
 
 namespace Reni.TokenClasses
 {
-    sealed class CompareOperation : Operation
+    [BelongsTo(typeof(MainTokenFactory))]
+    [Variant(false, false)]
+    [Variant(false, true)]
+    [Variant(true, false)]
+    [Variant(true, true)]
+    sealed class CompareOperation : Operation, ITokenClassWithId
     {
+        public static string Id(bool isLess=true, bool canBeEqual=false) => (isLess ? "<" : ">") + (canBeEqual ? "=" : "");
+
+        public CompareOperation(bool isLess, bool canBeEqual)
+        {
+            IsLess = isLess;
+            CanBeEqual = canBeEqual;
+        }
+
+        bool IsLess { get; }
+        bool CanBeEqual { get; }
+        string ITokenClassWithId.Id => Id(IsLess, CanBeEqual);
+
         [DisableDump]
         internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
     }

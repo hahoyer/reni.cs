@@ -3,9 +3,11 @@ using System.Linq;
 using System;
 using hw.Debug;
 using Reni.Feature;
+using Reni.ReniParser;
 
 namespace Reni.TokenClasses
 {
+    [BelongsTo(typeof(MainTokenFactory))]
     sealed class TextItem : Definable, ITokenClassWithId
     {
         [DisableDump]

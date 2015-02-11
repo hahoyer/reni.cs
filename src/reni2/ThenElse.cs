@@ -114,7 +114,7 @@ namespace Reni
             return new ThenElseSyntax(Cond, Token, Then, token, elseSyntax);
         }
 
-        internal override Result ObtainPendingResult(ContextBase context, Category category)
+        internal override Result PendingResultForCache(ContextBase context, Category category)
         {
             return context
                 .RootContext.VoidType.Result(category);

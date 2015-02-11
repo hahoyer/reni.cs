@@ -6,8 +6,11 @@ using Reni.ReniParser;
 
 namespace Reni.TokenClasses
 {
-    sealed class ElseToken : TokenClass
+    [BelongsTo(typeof(MainTokenFactory))]
+    sealed class ElseToken : TokenClass, ITokenClassWithId
     {
+        public const string Id = "else";
+        string ITokenClassWithId.Id => Id;
         protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
             => left.CreateElseSyntax(token, right.ToCompiledSyntax);
     }

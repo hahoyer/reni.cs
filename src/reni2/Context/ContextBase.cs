@@ -73,7 +73,7 @@ namespace Reni.Context
             var pendingCategory = category - result.CompleteCategory;
             if(pendingCategory.HasAny)
             {
-                var pendingResult = syntax.ObtainPendingResult(this, pendingCategory);
+                var pendingResult = syntax.PendingResultForCache(this, pendingCategory);
                 Tracer.Assert(pendingCategory <= pendingResult.CompleteCategory);
                 result.Update(pendingResult);
             }

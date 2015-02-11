@@ -6,17 +6,23 @@ using Reni.ReniParser;
 
 namespace Reni.TokenClasses
 {
-    sealed class RightParenthesis : TokenClass
+    [BelongsTo(typeof(MainTokenFactory))]
+    [Variant(1)]
+    [Variant(2)]
+    [Variant(3)]
+    sealed class RightParenthesis : TokenClass, ITokenClassWithId
     {
+        public static string Id(int level) => "\0}])".Substring(level, 1);
         readonly int _level;
 
-        internal RightParenthesis(int level) { _level = level; }
+        public RightParenthesis(int level) { _level = level; }
 
-        protected override Syntax Suffix(Syntax left, SourcePart token) { return left.RightParenthesis(_level, token); }
+        string ITokenClassWithId.Id => Id(_level);
+        protected override Syntax Suffix(Syntax left, SourcePart token) => left.RightParenthesis(_level, token);
     }
 
     sealed class EndToken : TokenClass
     {
-        protected override Syntax Suffix(Syntax left, SourcePart token) { return left.ToCompiledSyntax; }
+        protected override Syntax Suffix(Syntax left, SourcePart token) => left.ToCompiledSyntax;
     }
 }

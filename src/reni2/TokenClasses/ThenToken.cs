@@ -6,8 +6,11 @@ using Reni.ReniParser;
 
 namespace Reni.TokenClasses
 {
-    sealed class ThenToken : TokenClass
+    [BelongsTo(typeof(MainTokenFactory))]
+    sealed class ThenToken : TokenClass, ITokenClassWithId
     {
+        public const string Id = "then";
+        string ITokenClassWithId.Id => Id;
         protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
             => right.CreateThenSyntax(token, left.ToCompiledSyntax);
     }

@@ -7,7 +7,7 @@ using Reni.TokenClasses;
 
 namespace Reni.ReniParser
 {
-    sealed class DeclarationTokenFactory : TokenFactory<TokenClass, Syntax>
+    sealed class DeclarationTokenFactory : TokenFactory
     {
         public static PrioTable PrioTable
         {
@@ -17,8 +17,8 @@ namespace Reni.ReniParser
                 prioTable += PrioTable.Left("converter", "mutable");
                 prioTable = prioTable.ParenthesisLevelLeft
                     (
-                        new[] {"(", "[", "{"},
-                        new[] {")", "]", "}"}
+                        new[] { LeftParenthesis.Id(1), LeftParenthesis.Id(2), LeftParenthesis.Id(3) },
+                        new[] { RightParenthesis.Id(1), RightParenthesis.Id(2), RightParenthesis.Id(3) }
                     );
                 prioTable += PrioTable.Left(PrioTable.Any);
                 prioTable.Correct(PrioTable.Any, PrioTable.BeginOfText, '=');
@@ -27,16 +27,6 @@ namespace Reni.ReniParser
                 prioTable.Correct("}", PrioTable.BeginOfText, '=');
                 return prioTable;
             }
-        }
-
-        protected override IDictionary<string, TokenClass> GetPredefinedTokenClasses()
-        {
-            return new ITokenClassWithId[]
-            {
-                new ConverterToken(),
-                new MutableDeclarationToken()
-            }
-                .ToDictionary(t => t.Id, t => (TokenClass) t);
         }
 
         protected override TokenClass GetEndOfText() { throw new NotImplementedException(); }

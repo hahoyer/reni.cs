@@ -19,7 +19,7 @@ namespace Reni.FeatureTest
             return
                 @"
 systemdata:
-{ Memory: ((0 type * ('100' to_number_of_base 256)) mutable) instance()
+{ Memory: ((0 type * ('100' to_number_of_base 64)) mutable) instance()
 . !mutable FreePointer: Memory array_reference mutable
 };
 
@@ -107,7 +107,7 @@ Text: /\
 
     [TestFixture]
     [Output("Hallo")]
-    [InstanceCode("(Text('H') << 'allo'")]
+    [InstanceCode("Text('H') << 'allo'")]
     [Text1]
     public sealed class TextConcat : TextStruct {}
 }

@@ -108,7 +108,7 @@ namespace Reni.ReniSyntax
             return result?.SmartUn<FunctionType>().LocalReferenceResult;
         }
 
-        internal virtual Result ObtainPendingResult(ContextBase context, Category category)
+        internal virtual Result PendingResultForCache(ContextBase context, Category category)
         {
             NotImplementedMethod(context, category);
             return null;

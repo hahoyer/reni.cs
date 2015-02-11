@@ -28,6 +28,9 @@ namespace Reni.TokenClasses
         internal virtual IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable();
     }
 
+    [BelongsTo(typeof(MainTokenFactory))]
+    [Variant(false)]
+    [Variant(true)]
     sealed class ConcatArrays : Definable, ITokenClassWithId
     {
         public const string Id = "<<";
@@ -42,6 +45,7 @@ namespace Reni.TokenClasses
         string ITokenClassWithId.Id => IsMutable ? MutableId : Id;
     }
 
+    [BelongsTo(typeof(MainTokenFactory))]
     sealed class ArrayAccess : Definable, ITokenClassWithId
     {
         public const string Id = ">>";
@@ -50,6 +54,7 @@ namespace Reni.TokenClasses
         string ITokenClassWithId.Id => Id;
     }
 
+    [BelongsTo(typeof(MainTokenFactory))]
     sealed class Count : Definable, ITokenClassWithId
     {
         public const string Id = "count";
@@ -58,7 +63,8 @@ namespace Reni.TokenClasses
         string ITokenClassWithId.Id => Id;
     }
 
-    sealed class Reference: Definable, ITokenClassWithId
+    [BelongsTo(typeof(MainTokenFactory))]
+    sealed class Reference : Definable, ITokenClassWithId
     {
         public const string Id = "reference";
         [DisableDump]
@@ -66,6 +72,7 @@ namespace Reni.TokenClasses
         string ITokenClassWithId.Id => Id;
     }
 
+    [BelongsTo(typeof(MainTokenFactory))]
     sealed class ArrayReference : Definable, ITokenClassWithId
     {
         public const string Id = "array_reference";

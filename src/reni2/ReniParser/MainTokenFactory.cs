@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Parser;
 using hw.Scanner;
-using Reni.Context;
-using Reni.Feature;
 using Reni.Numeric;
 using Reni.Parser;
 using Reni.Struct;
@@ -13,7 +11,7 @@ using Reni.Validation;
 
 namespace Reni.ReniParser
 {
-    sealed class MainTokenFactory : TokenFactory<TokenClass, Syntax>
+    sealed class MainTokenFactory : TokenFactory
     {
         static PrioTable PrioTable
         {
@@ -22,41 +20,39 @@ namespace Reni.ReniParser
                 var x = PrioTable.Left(PrioTable.Any);
                 x += PrioTable.Left
                     (
-                        "_A_T_",
+                        AtToken.Id,
                         "_N_E_X_T_",
-                        "to_number_of_base"
+                        ToNumberOfBase.Id
                     );
 
                 x += PrioTable.Left(ArrayAccess.Id);
                 x += PrioTable.Left(ConcatArrays.Id, ConcatArrays.MutableId);
 
-                x += PrioTable.Left("~");
-                x += PrioTable.Left("&");
-                x += PrioTable.Left("|");
+                x += PrioTable.Left(Star.Id, Slash.Id, "\\");
+                x += PrioTable.Left(Plus.Id, Minus.Id);
 
-                x += PrioTable.Left("*", "/", "\\");
-                x += PrioTable.Left("+", Minus.Id);
-
-                x += PrioTable.Left("<", ">", "<=", ">=");
-                x += PrioTable.Left("=", "<>");
-
-                x += PrioTable.Left("!~");
-                x += PrioTable.Left("!&!");
-                x += PrioTable.Left("!|!");
+                x += PrioTable.Left
+                    (
+                        CompareOperation.Id(),
+                        CompareOperation.Id(canBeEqual: true),
+                        CompareOperation.Id(false),
+                        CompareOperation.Id(false, true)
+                    );
+                x += PrioTable.Left(EqualityOperation.Id(false), EqualityOperation.Id());
 
                 x += PrioTable.Right(ReassignToken.Id);
 
-                x = x.ThenElseLevel("then", "else");
-                x += PrioTable.Right("!");
-                x += PrioTable.Left("/\\", "/!\\", "/\\/\\");
-                x += PrioTable.Right(":");
-                x += PrioTable.Right(",");
-                x += PrioTable.Right(";");
-                x += PrioTable.Right(".");
+                x = x.ThenElseLevel(ThenToken.Id, ElseToken.Id);
+                x += PrioTable.Right(Exclamation.Id);
+                x += PrioTable.Left(Function.Id(), Function.Id(true), Function.Id(isMetaFunction: true));
+                x += PrioTable.Right(Colon.Id);
+                x += PrioTable.Right(List.Id(0));
+                x += PrioTable.Right(List.Id(1));
+                x += PrioTable.Right(List.Id(2));
                 x = x.ParenthesisLevelLeft
                     (
-                        new[] {"(", "[", "{"},
-                        new[] {")", "]", "}"}
+                        new[] {LeftParenthesis.Id(1), LeftParenthesis.Id(2), LeftParenthesis.Id(3)},
+                        new[] {RightParenthesis.Id(1), RightParenthesis.Id(2), RightParenthesis.Id(3)}
                     );
                 //x.Correct("(", PrioTable.Any, '-');
                 //x.Correct("[", PrioTable.Any, '-');
@@ -99,84 +95,20 @@ namespace Reni.ReniParser
             }
         }
 
-
-        /// <summary>
-        ///     Creates the main token classes.
-        /// </summary>
-        /// <returns> </returns>
-        protected override IDictionary<string, TokenClass> GetPredefinedTokenClasses()
+        protected override ITokenClassWithId SpecialTokenClass(System.Type type)
         {
-            return TokenClassesEx
-                .ToDictionary(t => t.Id, t => (TokenClass) t)
-                .Concat(TokenClasses)
-                .ToDictionary(t => t.Key, t => t.Value);
+            if(type == typeof(Exclamation))
+                return new Exclamation(_declarationSyntaxSubParser);
+            return base.SpecialTokenClass(type);
         }
 
-        IDictionary<string, TokenClass> TokenClasses => new Dictionary<string, TokenClass>
-        {
-            {"{", new LeftParenthesis(1)},
-            {"[", new LeftParenthesis(2)},
-            {"(", new LeftParenthesis(3)},
-            {"}", new RightParenthesis(1)},
-            {"]", new RightParenthesis(2)},
-            {")", new RightParenthesis(3)},
-            {"^^", new ContextOperator()},
-            {".", new List()},
-            {",", new List()},
-            {";", new List()},
-            {"@", new AtOperator()},
-            {":", new Colon()},
-            {"=", new CompareOperation()},
-            {">", new CompareOperation()},
-            {">=", new CompareOperation()},
-            {"<", new CompareOperation()},
-            {"<=", new CompareOperation()},
-            {"<>", new CompareOperation()},
-            {"!", new Exclamation(_declarationSyntaxSubParser)},
-            {"+", new Plus()},
-            {"/", new Slash()},
-            {"/\\", new TokenClasses.Function()},
-            {"/!\\", new TokenClasses.Function(true)},
-            {"/\\/\\", new TokenClasses.Function(isMetaFunction: true)},
-            {"*", new Star()},
-            {"_A_T_", new AtToken()},
-            {"dump_print", new DumpPrintToken()},
-            {"else", new ElseToken()},
-            {"enable_cut", new EnableCut()},
-            {"function_instance", new FunctionInstanceToken()},
-            {"instance", new InstanceToken()},
-            {"new_value", new NewValueToken()},
-            {"then", new ThenToken()},
-            {"to_number_of_base", new ToNumberOfBase()},
-            {"type", new TypeOperator()}
-        };
+        static IType<Syntax> Pack(Syntax options) => new SyntaxBoxToken(options);
 
-        static IEnumerable<ITokenClassWithId> TokenClassesEx => new ITokenClassWithId[]
-        {
-            new ArrayAccess(),
-            new ArrayReference(),
-            new AlignToken(),
-            new ArgToken(),
-            new ConcatArrays(false),
-            new ConcatArrays(true),
-            new Count(),
-            new EnableReinterpretation(),
-            new ForceMutabilityToken(),
-            new Minus(),
-            new Mutable(),
-            new Negate(),
-            new ReassignToken(),
-            new Reference(),
-            new TextItem()
-        };
-
-        static IType<Syntax> Pack(Syntax options) { return new SyntaxBoxToken(options); }
-
-        protected override TokenClass GetEndOfText() { return new EndToken(); }
-        protected override TokenClass GetNumber() { return new Number(); }
-        protected override TokenClass GetTokenClass(string name) { return new UserSymbol(name); }
-        protected override TokenClass GetError(Match.IError message) { return new SyntaxError(message); }
-        protected override TokenClass GetText() { return new Text(); }
+        protected override TokenClass GetEndOfText() => new EndToken();
+        protected override TokenClass GetNumber() => new Number();
+        protected override TokenClass GetTokenClass(string name) => new UserSymbol(name);
+        protected override TokenClass GetError(Match.IError message) => new SyntaxError(message);
+        protected override TokenClass GetText() => new Text();
     }
 
 
@@ -185,7 +117,7 @@ namespace Reni.ReniParser
         readonly IssueId _issue;
         public SyntaxError(IssueId issue) { _issue = issue; }
         public SyntaxError(Match.IError message) { _issue = ReniLexer.Parse(message); }
-        protected override Syntax Terminal(SourcePart token) { return new CompileSyntaxError(_issue, token); }
-        protected override Syntax Suffix(Syntax left, SourcePart token) { return left.SyntaxError(_issue, token); }
+        protected override Syntax Terminal(SourcePart token) => new CompileSyntaxError(_issue, token);
+        protected override Syntax Suffix(Syntax left, SourcePart token) => left.SyntaxError(_issue, token);
     }
 }

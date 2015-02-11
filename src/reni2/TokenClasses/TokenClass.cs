@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
+using JetBrains.Annotations;
 using Reni.ReniParser;
 
 namespace Reni.TokenClasses
@@ -49,5 +51,32 @@ namespace Reni.TokenClasses
     interface ITokenClassWithId
     {
         string Id { get; }
+    }
+
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+    [MeansImplicitUse]
+    sealed class BelongsTo : Attribute
+    {
+        public System.Type TokenFactory { get; }
+
+        public BelongsTo(System.Type tokenFactory) { TokenFactory = tokenFactory; }
+    }
+
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+    [MeansImplicitUse]
+    sealed class Variant : Attribute
+    {
+        object[] CreationParameter { get; }
+
+        public Variant(params object[] creationParameter) { CreationParameter = creationParameter; }
+
+        internal ITokenClassWithId CreateInstance(System.Type type)
+        {
+            return (ITokenClassWithId)
+                type
+                    .GetConstructor(CreationParameter.Select(p => p.GetType()).ToArray())
+                    .AssertNotNull()
+                    .Invoke(CreationParameter);
+        }
     }
 }

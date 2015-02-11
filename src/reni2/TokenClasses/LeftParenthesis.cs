@@ -1,32 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.Debug;
 using hw.Scanner;
-using Reni.Basics;
-using Reni.Context;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
 
 namespace Reni.TokenClasses
 {
-    sealed class LeftParenthesis : TokenClass
+    [BelongsTo(typeof(MainTokenFactory))]
+    [BelongsTo(typeof(DeclarationTokenFactory))]
+    [Variant(1)]
+    [Variant(2)]
+    [Variant(3)]
+    sealed class LeftParenthesis : TokenClass, ITokenClassWithId
     {
-        readonly int _level;
+        public static string Id(int level) => "\0{[(".Substring(level, 1);
 
-        internal LeftParenthesis(int level) { _level = level; }
+        public LeftParenthesis(int level) { Level = level; }
 
-        [DisableDump]
-        internal int Level { get { return _level; } }
+        int Level { get; }
 
-        protected override Syntax Prefix(SourcePart token, Syntax right)
-        {
-            return new LeftParenthesisSyntax(_level, token, right);
-        }
+        string ITokenClassWithId.Id => Id(Level);
 
-        protected override Syntax Terminal(SourcePart token)
-        {
-            return new LeftParenthesisSyntax(_level, token, null);
-        }
+        protected override Syntax Prefix(SourcePart token, Syntax right) => new LeftParenthesisSyntax(Level, token, right);
+        protected override Syntax Terminal(SourcePart token) => new LeftParenthesisSyntax(Level, token, null);
     }
 }

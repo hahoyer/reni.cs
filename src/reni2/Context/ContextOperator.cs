@@ -3,19 +3,21 @@ using System.Linq;
 using System;
 using hw.Scanner;
 using Reni.Basics;
+using Reni.ReniParser;
 using Reni.ReniSyntax;
 using Reni.TokenClasses;
 
 namespace Reni.Context
 {
-    sealed class ContextOperator : NonPrefix
+    [BelongsTo(typeof(MainTokenFactory))]
+    sealed class ContextOperator : NonPrefix, ITokenClassWithId
     {
-        public override Result Result(ContextBase context, Category category, SourcePart token)
-        {
-            return context
-                .FindRecentCompoundView
-                .ObjectPointerViaContext(category);
-        }
+        public const string Id = "^^";
+        string ITokenClassWithId.Id => Id;
+
+        public override Result Result(ContextBase context, Category category, SourcePart token) => context
+            .FindRecentCompoundView
+            .ObjectPointerViaContext(category);
 
         public override Result Result(ContextBase context, Category category, CompileSyntax left)
         {

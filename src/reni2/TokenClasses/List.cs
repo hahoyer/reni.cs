@@ -7,8 +7,18 @@ using Reni.ReniSyntax;
 
 namespace Reni.TokenClasses
 {
-    sealed class List : TokenClass
+    [BelongsTo(typeof(MainTokenFactory))]
+    [Variant(0)]
+    [Variant(1)]
+    [Variant(2)]
+    sealed class List : TokenClass, ITokenClassWithId
     {
+        public static string Id(int level) => ",;.".Substring(level, 1);
+        readonly int _level;
+        public List(int level) { _level = level; }
+
+        string ITokenClassWithId.Id => Id(_level);
+
         protected override Syntax Prefix(SourcePart token, Syntax right)
             => ListSyntax(new EmptyList(token), token, right);
 

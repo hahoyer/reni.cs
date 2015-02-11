@@ -192,6 +192,7 @@
     <Compile Include="ReniObjectExtender.cs" />
     <Compile Include="ReniParser\ParsedSyntaxExtension.cs" />
     <Compile Include="ReniParser\SyntaxBoxToken.cs" />
+    <Compile Include="ReniParser\TokenFactory.cs" />
     <Compile Include="ReniSyntax\ListSyntax.cs" />
     <Compile Include="ResultCache.cs" />
     <Compile Include="Code\Arg.cs" />
@@ -303,11 +304,11 @@
     <Compile Include="ReniSyntax\Special.cs" />
     <Compile Include="ReniSyntax\EmptyList.cs" />
     <Compile Include="TokenClasses\ArgToken.cs" />
+    <Compile Include="TokenClasses\CompareOperation.cs" />
     <Compile Include="TokenClasses\ReassignToken.cs" />
-    <Compile Include="TokenClasses\AtOperator.cs" />
     <Compile Include="TokenClasses\Base.cs" />
     <Compile Include="TokenClasses\Colon.cs" />
-    <Compile Include="TokenClasses\CompareOperation.cs" />
+    <Compile Include="TokenClasses\EqualityOperation.cs" />
     <Compile Include="TokenClasses\DefinableTokenSyntax.cs" />
     <Compile Include="TokenClasses\Definable.cs" />
     <Compile Include="TokenClasses\ElseToken.cs" />

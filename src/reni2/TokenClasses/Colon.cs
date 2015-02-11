@@ -9,17 +9,24 @@ using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
-    sealed class Colon : TokenClass
+    [BelongsTo(typeof(MainTokenFactory))]
+    sealed class Colon : TokenClass, ITokenClassWithId
     {
+        public const string Id = ":";
+        string ITokenClassWithId.Id => Id;
         protected override Syntax Infix(Syntax left, SourcePart token, Syntax right) => left.CreateDeclarationSyntax(token, right);
     }
 
-    sealed class Exclamation : TokenClass
+    [BelongsTo(typeof(MainTokenFactory))]
+    sealed class Exclamation : TokenClass, ITokenClassWithId
     {
+        public const string Id = "!";
+        string ITokenClassWithId.Id => Id;
         public Exclamation(ISubParser<Syntax> parser) { Next = parser; }
         protected override ISubParser<Syntax> Next { get; }
     }
 
+    [BelongsTo(typeof(DeclarationTokenFactory))]
     abstract class DeclarationToken : TokenClass
     {
         protected override Syntax Terminal(SourcePart token) => new DeclarationTokenSyntax(this, token);

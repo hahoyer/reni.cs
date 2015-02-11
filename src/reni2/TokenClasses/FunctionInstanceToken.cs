@@ -7,12 +7,15 @@ using Reni.ReniSyntax;
 
 namespace Reni.TokenClasses
 {
-    sealed class FunctionInstanceToken : SuffixToken
+    sealed class FunctionInstanceToken : SuffixToken, ITokenClassWithId
     {
+        public const string Id = "function_instance";
+        string ITokenClassWithId.Id => Id;
         public override Result Result(ContextBase context, Category category, CompileSyntax left)
-        {
-            var leftResult = left.Result(context, category.Typed);
-            return leftResult.Type.FunctionInstance.Result(category, leftResult);
-        }
+            => left
+                .Result(context, category.Typed)
+                .Type
+                .FunctionInstance
+                .Result(category, left.Result(context, category.Typed));
     }
 }
