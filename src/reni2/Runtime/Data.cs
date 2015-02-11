@@ -34,6 +34,16 @@ namespace Reni.Runtime
             bytes.CopyTo(_data, StartIndex);
         }
 
+        public void SizedPush(int byteCount, params byte[] bytes)
+        {
+            StartIndex -= byteCount;
+            var i = 0;
+            for (; i < byteCount && i < bytes.Length; i++)
+                _data[StartIndex + i] = bytes[i];
+            for (; i < byteCount; i++)
+                _data[StartIndex + i] = 0;
+        }
+
         public void Push(Data data) => Push(data.GetBytes(data._length));
 
         public Data Pull(int bytes)

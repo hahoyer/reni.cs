@@ -48,7 +48,8 @@ namespace Reni.Code
         void IVisitor.Drop(Size beforeSize, Size afterSize) { throw new NotImplementedException(); }
         void IVisitor.LocalBlockEnd(Size size, Size intermediateSize) { throw new NotImplementedException(); }
 
-        void IVisitor.BitsArray(Size size, BitsConst data) => AddCode("data.Push({0})", data.ByteSequence(size));
+        void IVisitor.BitsArray(Size size, BitsConst data)
+            => AddCode("data.SizedPush({0}{1})", size.ByteCount, data.ByteSequence());
         void IVisitor.LocalVariableDefinition(string holderName, Size valueSize)
             => AddCode("var {0} = data.Pull({1})", holderName, valueSize.SaveByteCount);
         void IVisitor.LocalVariableReference(string holder, Size offset)

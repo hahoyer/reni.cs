@@ -501,13 +501,13 @@ namespace Reni.Basics
             }
         }
 
-        internal string ByteSequence(Size size)
+        internal string ByteSequence(Size size = null)
         {
+            
             var result = "";
-            for(var i = 0; i < size.ByteCount; i++)
+            for(var i = 0; i < (size??Size).ByteCount; i++)
             {
-                if(i > 0)
-                    result += ", ";
+                result += ", ";
                 result += Byte(i);
             }
             return result;
