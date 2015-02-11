@@ -60,7 +60,62 @@ ref: d array_reference;
     public sealed class ArrayReferenceCopyAssign : CompilerTest {}
 
     [TestFixture]
+    [Target(@"
+o: 
+/\
+{ 
+    data: ^ array_reference ;
+    dump_print: 
+    /!\ 
+    {
+        (data >> 0) dump_print;
+        (data >> 1) dump_print;
+        (data >> 2) dump_print;
+        (data >> 3) dump_print;
+        (data >> 4) dump_print;
+        (data >> 5) dump_print
+    }
+};
+
+o('abcdef') dump_print
+")]
+    [Output("abcdef")]
+    public sealed class ArrayReferenceDumpSimple : CompilerTest {}
+
+    [TestFixture]
+    [ArrayReferenceDumpSimple]
+    [Target(@"
+repeat: /\ ^ while() then(^ body(), repeat(^));
+
+o: 
+/\
+{ 
+    data: ^ array_reference ;
+    count: ^ count;
+    dump_print: 
+    /!\ 
+    {
+        !mutable position: count type instance (0) ;
+        repeat
+        (
+            while: /\ position < count,
+            body: /\ 
+            ( 
+                (data >> position) dump_print, 
+                position := (position + 1) enable_cut
+            ) 
+        )
+    }
+};
+
+o('abcdef') dump_print
+")]
+    [Output("abcdef")]
+    public sealed class ArrayReferenceDumpLoop : CompilerTest {}
+
+    [TestFixture]
     [ArrayReferenceCopyAssign]
     [ArrayReferenceCopy]
+    [ArrayReferenceDumpLoop]
     public sealed class ArrayReferenceAll : CompilerTest {}
 }
