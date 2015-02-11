@@ -13,11 +13,11 @@ namespace Reni.TokenClasses
     sealed class Function : TokenClass, ITokenClassWithId
     {
         public static string Id(bool isImplicit = false, bool isMetaFunction = false)
-            => "/" + (isImplicit ? "!" : "") + (isMetaFunction ? "\\/" : "") + "\\";
+            => "/" + (isImplicit ? "!" : "") + "\\" + (isMetaFunction ? "/\\" : "");
         string ITokenClassWithId.Id => Id(_isImplicit, _isMetaFunction);
         readonly bool _isImplicit;
         readonly bool _isMetaFunction;
-        public Function(bool isImplicit = false, bool isMetaFunction = false)
+        public Function(bool isImplicit, bool isMetaFunction)
         {
             _isImplicit = isImplicit;
             _isMetaFunction = isMetaFunction;
