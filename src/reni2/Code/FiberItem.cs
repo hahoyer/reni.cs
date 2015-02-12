@@ -1,26 +1,4 @@
-﻿#region Copyright (C) 2013
-
-//     Project Reni2
-//     Copyright (C) 2011 - 2013 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-#endregion
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
@@ -36,7 +14,7 @@ namespace Reni.Code
         readonly string _reason;
 
         [DisableDump]
-        internal string ReasonForCombine { get { return _reason == "" ? NodeDumpForDebug() : _reason; } }
+        string ReasonForCombine => _reason == "" ? NodeDumpForDebug() : _reason;
 
         [DisableDump]
         static string NewCombinedReason
@@ -56,7 +34,7 @@ namespace Reni.Code
 
         [EnableDumpExcept("")]
         [EnableDump]
-        internal string Reason { get { return _reason; } }
+        internal string Reason => _reason;
 
         protected FiberItem(int objectId, string reason = null)
             : base(objectId) { _reason = reason ?? NewCombinedReason; }
@@ -71,26 +49,26 @@ namespace Reni.Code
         internal abstract Size OutputSize { get; }
 
         [DisableDump]
-        internal Size DeltaSize { get { return OutputSize - InputSize; } }
+        internal Size DeltaSize => OutputSize - InputSize;
 
-        protected override string GetNodeDump() { return base.GetNodeDump() + DumpSignature; }
-
-        [DisableDump]
-        string DumpSignature { get { return "(" + InputSize + "==>" + OutputSize + ")"; } }
+        protected override string GetNodeDump() => base.GetNodeDump() + DumpSignature;
 
         [DisableDump]
-        internal CodeArgs CodeArgs { get { return GetRefsImplementation(); } }
+        string DumpSignature => "(" + InputSize + "==>" + OutputSize + ")";
 
         [DisableDump]
-        internal virtual bool HasArg { get { return false; } }
+        internal CodeArgs CodeArgs => GetRefsImplementation();
 
         [DisableDump]
-        internal Size TemporarySize { get { return OutputSize + GetAdditionalTemporarySize(); } }
+        internal virtual bool HasArg => false;
 
         [DisableDump]
-        internal virtual IEnumerable<IssueBase> Issues { get { return IssueBase.Empty; } }
+        internal Size TemporarySize => OutputSize + GetAdditionalTemporarySize();
 
-        protected virtual Size GetAdditionalTemporarySize() { return Size.Zero; }
+        [DisableDump]
+        internal virtual IEnumerable<IssueBase> Issues => IssueBase.Empty;
+
+        protected virtual Size GetAdditionalTemporarySize() => Size.Zero;
 
         internal FiberItem[] TryToCombine(FiberItem subsequentElement)
         {
@@ -100,31 +78,31 @@ namespace Reni.Code
             return result;
         }
 
-        protected virtual FiberItem[] TryToCombineImplementation(FiberItem subsequentElement) { return null; }
+        protected virtual FiberItem[] TryToCombineImplementation(FiberItem subsequentElement) => null;
 
-        internal virtual CodeBase TryToCombineBack(BitArray precedingElement) { return null; }
-        internal virtual CodeBase TryToCombineBack(TopFrameRef precedingElement) { return null; }
-        internal virtual CodeBase TryToCombineBack(TopData precedingElement) { return null; }
-        internal virtual CodeBase TryToCombineBack(TopFrameData precedingElement) { return null; }
-        internal virtual CodeBase TryToCombineBack(TopRef precedingElement) { return null; }
-        internal virtual CodeBase TryToCombineBack(LocalVariableReference precedingElement) { return null; }
-        internal virtual CodeBase TryToCombineBack(LocalVariableAccess precedingElement) { return null; }
-        internal virtual CodeBase TryToCombineBack(List precedingElement) { return null; }
-        internal virtual FiberItem[] TryToCombineBack(BitArrayBinaryOp precedingElement) { return null; }
-        internal virtual FiberItem[] TryToCombineBack(BitArrayPrefixOp precedingElement) { return null; }
-        internal virtual FiberItem[] TryToCombineBack(BitCast preceding) { return null; }
-        internal virtual FiberItem[] TryToCombineBack(DePointer preceding) { return null; }
-        internal virtual FiberItem[] TryToCombineBack(ReferencePlusConstant precedingElement) { return null; }
+        internal virtual CodeBase TryToCombineBack(BitArray precedingElement) => null;
+        internal virtual CodeBase TryToCombineBack(TopFrameRef precedingElement) => null;
+        internal virtual CodeBase TryToCombineBack(TopData precedingElement) => null;
+        internal virtual CodeBase TryToCombineBack(TopFrameData precedingElement) => null;
+        internal virtual CodeBase TryToCombineBack(TopRef precedingElement) => null;
+        internal virtual CodeBase TryToCombineBack(LocalVariableReference precedingElement) => null;
+        internal virtual CodeBase TryToCombineBack(LocalVariableAccess precedingElement) => null;
+        internal virtual CodeBase TryToCombineBack(List precedingElement) => null;
+        internal virtual FiberItem[] TryToCombineBack(BitArrayBinaryOp precedingElement) => null;
+        internal virtual FiberItem[] TryToCombineBack(BitArrayPrefixOp precedingElement) => null;
+        internal virtual FiberItem[] TryToCombineBack(BitCast preceding) => null;
+        internal virtual FiberItem[] TryToCombineBack(DePointer preceding) => null;
+        internal virtual FiberItem[] TryToCombineBack(ReferencePlusConstant precedingElement) => null;
 
-        internal FiberItem Visit<TResult>(Visitor<TResult> actual) { return VisitImplementation(actual); }
+        internal FiberItem Visit<TResult>(Visitor<TResult> actual) => VisitImplementation(actual);
 
-        protected virtual FiberItem VisitImplementation<TResult>(Visitor<TResult> actual) { return null; }
+        protected virtual FiberItem VisitImplementation<TResult>(Visitor<TResult> actual) => null;
 
         internal abstract void Visit(IVisitor visitor);
 
-        void IFormalCodeItem.Visit(IVisitor visitor) { Visit(visitor); }
+        void IFormalCodeItem.Visit(IVisitor visitor) => Visit(visitor);
 
-        protected virtual CodeArgs GetRefsImplementation() { return CodeArgs.Void(); }
+        protected virtual CodeArgs GetRefsImplementation() => CodeArgs.Void();
     }
 
     interface IFormalCodeItem
