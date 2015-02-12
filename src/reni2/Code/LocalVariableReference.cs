@@ -28,17 +28,14 @@ namespace Reni.Code
 
         [DisableDump]
         [Node]
-        internal override bool IsRelativeReference { get { return true; } }
+        internal override bool IsRelativeReference => true;
 
-        protected override string GetNodeDump()
-        {
-            return base.GetNodeDump()
-                + " Holder=" + Holder
-                + " Offset=" + Offset;
-        }
+        protected override string GetNodeDump() => base.GetNodeDump()
+            + " Holder=" + Holder
+            + " Offset=" + Offset;
 
-        protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
-        internal override void Visit(IVisitor visitor) { visitor.LocalVariableReference(Holder, Offset); }
-        protected override CodeBase TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
+        protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
+        internal override void Visit(IVisitor visitor) => visitor.LocalVariableReference(Holder, Offset);
+        protected override CodeBase TryToCombine(FiberItem subsequentElement) => subsequentElement.TryToCombineBack(this);
     }
 }

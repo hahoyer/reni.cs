@@ -19,34 +19,34 @@ namespace Reni.Code
 
         [Node]
         [DisableDump]
-        internal Size Size { get { return GetSize(); } }
+        internal Size Size => GetSize();
 
         [DisableDump]
-        internal Size TemporarySize { get { return GetTemporarySize(); } }
+        internal Size TemporarySize => GetTemporarySize();
 
         [DisableDump]
-        internal CodeArgs Exts { get { return GetRefsImplementation(); } }
+        internal CodeArgs Exts => GetRefsImplementation();
 
         [DisableDump]
-        internal virtual bool IsEmpty { get { return false; } }
+        internal virtual bool IsEmpty => false;
 
         [DisableDump]
-        internal virtual bool IsRelativeReference { get { return false; } }
+        internal virtual bool IsRelativeReference => false;
 
-        protected virtual Size GetTemporarySize() { return Size; }
+        protected virtual Size GetTemporarySize() => Size;
 
         [DisableDump]
-        internal bool HasArg { get { return Visit(new HasArgVisitor()); } }
+        internal bool HasArg => Visit(new HasArgVisitor());
 
-        internal static CodeBase Issue(IssueBase issue) { return new IssueCode(issue); }
-        internal static CodeBase BitsConst(Size size, BitsConst t) { return new BitArray(size, t); }
-        internal static CodeBase BitsConst(BitsConst t) { return BitsConst(t.Size, t); }
-        internal static CodeBase DumpPrintText(string dumpPrintText) { return new DumpPrintText(dumpPrintText); }
-        internal static CodeBase FrameRef() { return new TopFrameRef(); }
-        internal static FiberItem RecursiveCall(Size refsSize) { return new RecursiveCallCandidate(refsSize); }
-        internal static CodeBase ReferenceCode(IContextReference reference) { return new ReferenceCode(reference); }
-        internal static CodeBase Void { get { return BitArray.Void; } }
-        internal static CodeBase TopRef() { return new TopRef(); }
+        internal static CodeBase Issue(IssueBase issue) => new IssueCode(issue);
+        internal static CodeBase BitsConst(Size size, BitsConst t) => new BitArray(size, t);
+        internal static CodeBase BitsConst(BitsConst t) => BitsConst(t.Size, t);
+        internal static CodeBase DumpPrintText(string dumpPrintText) => new DumpPrintText(dumpPrintText);
+        internal static CodeBase FrameRef() => new TopFrameRef();
+        internal static FiberItem RecursiveCall(Size refsSize) => new RecursiveCallCandidate(refsSize);
+        internal static CodeBase ReferenceCode(IContextReference reference) => new ReferenceCode(reference);
+        internal static CodeBase Void => BitArray.Void;
+        internal static CodeBase TopRef() => new TopRef();
 
         internal static CodeBase List(IEnumerable<CodeBase> data)
         {
@@ -65,7 +65,7 @@ namespace Reni.Code
 
         protected abstract Size GetSize();
 
-        protected virtual CodeArgs GetRefsImplementation() { return CodeArgs.Void(); }
+        protected virtual CodeArgs GetRefsImplementation() => CodeArgs.Void();
 
         internal CodeBase Assignment(Size size)
         {
@@ -75,12 +75,9 @@ namespace Reni.Code
         }
 
 
-        internal CodeBase ThenElse(CodeBase thenCode, CodeBase elseCode) { return Add(new ThenElse(thenCode, elseCode)); }
+        internal CodeBase ThenElse(CodeBase thenCode, CodeBase elseCode) => Add(new ThenElse(thenCode, elseCode));
 
-        internal LocalReference LocalReference(TypeBase type, CodeBase destructorCode)
-        {
-            return new LocalReference(type, this, destructorCode);
-        }
+        internal LocalReference LocalReference(TypeBase type, CodeBase destructorCode) => new LocalReference(type, this, destructorCode);
 
         internal abstract CodeBase Add(FiberItem subsequentElement);
 
@@ -91,14 +88,8 @@ namespace Reni.Code
             return Add(new ReferencePlusConstant(right, CallingMethodName));
         }
 
-        internal CodeBase ArrayGetter(Size elementSize, Size indexSize)
-        {
-            return Add(new ArrayGetter(elementSize, indexSize, CallingMethodName));
-        }
-        internal CodeBase ArraySetter(Size elementSize, Size indexSize)
-        {
-            return Add(new ArraySetter(elementSize, indexSize, CallingMethodName));
-        }
+        internal CodeBase ArrayGetter(Size elementSize, Size indexSize) => Add(new ArrayGetter(elementSize, indexSize, CallingMethodName));
+        internal CodeBase ArraySetter(Size elementSize, Size indexSize) => Add(new ArraySetter(elementSize, indexSize, CallingMethodName));
 
         internal CodeBase DePointer(Size targetSize)
         {
@@ -122,18 +113,15 @@ namespace Reni.Code
             return List(extendedData);
         }
 
-        protected virtual IEnumerable<CodeBase> AsList() { return new[] {this}; }
+        protected virtual IEnumerable<CodeBase> AsList() => new[] {this};
 
-        internal CodeBase ReplaceArg(TypeBase type, CodeBase code)
-        {
-            return ReplaceArg
-                (
-                    new Result
-                    {
-                        Type = type,
-                        Code = code
-                    });
-        }
+        internal CodeBase ReplaceArg(TypeBase type, CodeBase code) => ReplaceArg
+            (
+                new Result
+                {
+                    Type = type,
+                    Code = code
+                });
 
         internal CodeBase ReplaceArg(ResultCache arg)
         {
@@ -185,9 +173,9 @@ namespace Reni.Code
             return this;
         }
 
-        internal TResult Visit<TResult>(Visitor<TResult> actual) { return VisitImplementation(actual); }
+        internal TResult Visit<TResult>(Visitor<TResult> actual) => VisitImplementation(actual);
 
-        protected virtual TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.Default(this); }
+        protected virtual TResult VisitImplementation<TResult>(Visitor<TResult> actual) => actual.Default(this);
 
         internal CodeBase Call(FunctionId index, Size resultSize)
         {
@@ -211,27 +199,24 @@ namespace Reni.Code
             return dataStack.Value;
         }
 
-        internal CodeBase Align() { return BitCast(Size.NextPacketSize(Root.DefaultRefAlignParam.AlignBits)); }
+        internal CodeBase Align() => BitCast(Size.NextPacketSize(Root.DefaultRefAlignParam.AlignBits));
 
         /// <summary>
         ///     Gets the icon key.
         /// </summary>
         /// <value> The icon key. </value>
-        string IIconKeyProvider.IconKey { get { return "Code"; } }
+        string IIconKeyProvider.IconKey => "Code";
 
-        protected override string GetNodeDump() { return base.GetNodeDump() + " Size=" + Size; }
+        protected override string GetNodeDump() => base.GetNodeDump() + " Size=" + Size;
 
         [DisableDump]
         internal abstract IEnumerable<IssueBase> Issues { get; }
 
         [DisableDump]
-        internal bool Hllw { get { return Size.IsZero; } }
+        internal bool Hllw => Size.IsZero;
 
-        internal CodeBase LocalBlock(CodeBase copier)
-        {
-            return new LocalReferenceSequenceVisitor()
-                .LocalBlock(this, copier);
-        }
+        internal CodeBase LocalBlock(CodeBase copier) => new LocalReferenceSequenceVisitor()
+            .LocalBlock(this, copier);
 
         internal CodeBase LocalBlockEnd(CodeBase copier, Size resultSize)
         {
@@ -248,22 +233,13 @@ namespace Reni.Code
             return result.Add(new Drop(Size, resultSize));
         }
 
-        internal CodeBase NumberOperation(string name, Size resultSize, Size leftSize, Size rightSize)
-        {
-            return Add(new BitArrayBinaryOp(name, resultSize, leftSize, rightSize));
-        }
-        internal CodeBase DumpPrintNumber() { return Add(new DumpPrintNumberOperation(Size, Size.Zero)); }
-        internal CodeBase DumpPrintNumber(Size leftSize) { return Add(new DumpPrintNumberOperation(leftSize, Size - leftSize)); }
-        internal CodeBase DumpPrintText(Size itemSize) { return Add(new DumpPrintTextOperation(Size, itemSize)); }
-        internal CodeBase NumberOperation(string operation, Size size)
-        {
-            return Add(new BitArrayPrefixOp(operation, size, Size));
-        }
+        internal CodeBase NumberOperation(string name, Size resultSize, Size leftSize, Size rightSize) => Add(new BitArrayBinaryOp(name, resultSize, leftSize, rightSize));
+        internal CodeBase DumpPrintNumber() => Add(new DumpPrintNumberOperation(Size, Size.Zero));
+        internal CodeBase DumpPrintNumber(Size leftSize) => Add(new DumpPrintNumberOperation(leftSize, Size - leftSize));
+        internal CodeBase DumpPrintText(Size itemSize) => Add(new DumpPrintTextOperation(Size, itemSize));
+        internal CodeBase NumberOperation(string operation, Size size) => Add(new BitArrayPrefixOp(operation, size, Size));
 
-        internal static CodeBase LocalVariableReference(string holder, Size offset = null)
-        {
-            return new LocalVariableReference(holder, offset);
-        }
+        internal static CodeBase LocalVariableReference(string holder, Size offset = null) => new LocalVariableReference(holder, offset);
 
         internal CodeBase AddRange(IEnumerable<FiberItem> subsequentElement)
         {
@@ -283,9 +259,9 @@ namespace Reni.Code
             }
         }
 
-        internal virtual void Visit(IVisitor visitor) { NotImplementedMethod(visitor); }
+        internal virtual void Visit(IVisitor visitor) => NotImplementedMethod(visitor);
 
-        void IFormalCodeItem.Visit(IVisitor visitor) { Visit(visitor); }
+        void IFormalCodeItem.Visit(IVisitor visitor) => Visit(visitor);
 
         protected static CodeArgs GetRefs(CodeBase[] codeBases)
         {
@@ -293,13 +269,10 @@ namespace Reni.Code
             return refs.Aggregate(CodeArgs.Void(), (r1, r2) => r1.Sequence(r2));
         }
 
-        internal static CodeBase Arg(TypeBase type) { return new Arg(type); }
-        internal Container Container(string description, FunctionId functionId = null)
-        {
-            return new Container(this, description, functionId);
-        }
+        internal static CodeBase Arg(TypeBase type) => new Arg(type);
+        internal Container Container(string description, FunctionId functionId = null) => new Container(this, description, functionId);
 
-        public static CodeBase operator +(CodeBase a, CodeBase b) { return a.Sequence(b); }
+        public static CodeBase operator +(CodeBase a, CodeBase b) => a.Sequence(b);
     }
 
     abstract class UnexpectedVisitOfPending : Exception {}
@@ -316,9 +289,6 @@ namespace Reni.Code
             return CodeBase.List(codeBases.Select((x, i) => LocalVariableDefinition(string.Format(holderPattern, i), x)));
         }
 
-        static CodeBase LocalVariableDefinition(string holderName, CodeBase value)
-        {
-            return value.Add(new LocalVariableDefinition(holderName, value.Size));
-        }
+        static CodeBase LocalVariableDefinition(string holderName, CodeBase value) => value.Add(new LocalVariableDefinition(holderName, value.Size));
     }
 }
