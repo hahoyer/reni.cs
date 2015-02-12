@@ -31,9 +31,7 @@ namespace Reni.Code
 
         CodeBase Convert()
         {
-            return _data
-                .Select(localReference => localReference.Code)
-                .ToLocalVariables(HolderNamePattern);
+            return ToLocalVariables(_data.Select(localReference => localReference.Code));
         }
 
         [DisableDump]
@@ -45,12 +43,10 @@ namespace Reni.Code
             {
                 var size = Size.Zero;
                 return _data
-                    .Select((localReference, i) => localReference.AccompayningDestructorCode(ref size, HolderName(i)))
+                    .Select((localReference, i) => localReference.AccompayningDestructorCode(ref size, new Holder(i,ObjectId)))
                     .ToSequence();
             }
         }
-
-        string HolderNamePattern => "h_" + ObjectId + "_{0}";
 
         internal override CodeBase LocalReference(LocalReference visitedObject)
         {
@@ -61,14 +57,13 @@ namespace Reni.Code
                 var holderIndex = _localReferences[visitedObject];
                 Dump("holderIndex", holderIndex);
                 _codeCache.IsValid = false;
-                return ReturnMethodDump(CodeBase.LocalVariableReference(HolderName(holderIndex)));
+                return ReturnMethodDump(CodeBase.LocalVariableReference(new Holder(holderIndex,ObjectId)));
             }
             finally
             {
                 EndMethodDump();
             }
         }
-        string HolderName(int holderIndex) => string.Format(HolderNamePattern, holderIndex);
 
         int ObtainHolderIndex(LocalReference visitedObject)
         {
@@ -108,5 +103,11 @@ namespace Reni.Code
                 EndMethodDump();
             }
         }
+
+        CodeBase ToLocalVariables(IEnumerable<CodeBase> codeBases)
+            => CodeBase.List(codeBases.Select(LocalVariableDefinition));
+
+        CodeBase LocalVariableDefinition(CodeBase value, int index)
+            => value.Add(new LocalVariableDefinition(new Holder(index, ObjectId), value.Size));
     }
 }

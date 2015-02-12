@@ -37,7 +37,7 @@ namespace Reni.Code
         protected override CodeArgs GetRefsImplementation() => ValueCode.Exts + DestructorCode.Exts;
         protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) => actual.LocalReference(this);
 
-        internal CodeBase AccompayningDestructorCode(ref Size size, string holder)
+        internal CodeBase AccompayningDestructorCode(ref Size size, Holder holder)
         {
             size += Code.Size;
             return DestructorCode.ReplaceArg(ValueType.Pointer, LocalVariableReference(holder));

@@ -9,6 +9,7 @@ using hw.Forms;
 using hw.Helper;
 using hw.UnitTest;
 using Reni;
+using Reni.FeatureTest;
 using Reni.FeatureTest.TypeType;
 using Reni.Parser;
 using Reni.Runtime;
@@ -27,6 +28,7 @@ namespace ReniTest
 
             if(Debugger.IsAttached)
                 TestRunner.IsModeErrorFocus = true;
+            new Text1().Run();
             Assembly.GetExecutingAssembly().RunTests();
             //InspectCompiler();
             //Reni.Proof.Main.Run();

@@ -12,7 +12,7 @@ namespace Reni.Code
         static int _nextObjectId;
         [DisableDump]
         [Node]
-        internal readonly string Holder;
+        internal readonly Holder Holder;
         [DisableDump]
         [Node]
         internal readonly Size Offset;
@@ -21,7 +21,7 @@ namespace Reni.Code
         [Node]
         internal readonly Size DataSize;
 
-        public LocalVariableAccess(string holder, Size offset, Size size, Size dataSize)
+        public LocalVariableAccess(Holder holder, Size offset, Size size, Size dataSize)
             : base(_nextObjectId++)
         {
             Holder = holder;
@@ -38,7 +38,7 @@ namespace Reni.Code
             + " DataSize=" + DataSize;
 
         protected override Size GetSize() => _size;
-        internal override void Visit(IVisitor visitor) => visitor.LocalVariableAccess(Holder, Offset, Size, DataSize);
+        internal override void Visit(IVisitor visitor) => visitor.LocalVariableAccess(Holder.Name, Offset, Size, DataSize);
         protected override CodeBase TryToCombine(FiberItem subsequentElement) => subsequentElement.TryToCombineBack(this);
     }
 }

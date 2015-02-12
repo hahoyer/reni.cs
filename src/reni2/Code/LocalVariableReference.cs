@@ -13,12 +13,12 @@ namespace Reni.Code
         static int _nextObjectId;
         [Node]
         [DisableDump]
-        internal readonly string Holder;
+        internal readonly Holder Holder;
         [Node]
         [DisableDump]
         internal readonly Size Offset;
 
-        public LocalVariableReference(string holder, Size offset)
+        public LocalVariableReference(Holder holder, Size offset)
             : base(_nextObjectId++)
         {
             Holder = holder;
@@ -35,7 +35,7 @@ namespace Reni.Code
             + " Offset=" + Offset;
 
         protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
-        internal override void Visit(IVisitor visitor) => visitor.LocalVariableReference(Holder, Offset);
+        internal override void Visit(IVisitor visitor) => visitor.LocalVariableReference(Holder.Name, Offset);
         protected override CodeBase TryToCombine(FiberItem subsequentElement) => subsequentElement.TryToCombineBack(this);
     }
 }

@@ -77,7 +77,8 @@ namespace Reni.Code
 
         internal CodeBase ThenElse(CodeBase thenCode, CodeBase elseCode) => Add(new ThenElse(thenCode, elseCode));
 
-        internal LocalReference LocalReference(TypeBase type, CodeBase destructorCode) => new LocalReference(type, this, destructorCode);
+        internal LocalReference LocalReference(TypeBase type, CodeBase destructorCode)
+            => new LocalReference(type, this, destructorCode);
 
         internal abstract CodeBase Add(FiberItem subsequentElement);
 
@@ -88,8 +89,10 @@ namespace Reni.Code
             return Add(new ReferencePlusConstant(right, CallingMethodName));
         }
 
-        internal CodeBase ArrayGetter(Size elementSize, Size indexSize) => Add(new ArrayGetter(elementSize, indexSize, CallingMethodName));
-        internal CodeBase ArraySetter(Size elementSize, Size indexSize) => Add(new ArraySetter(elementSize, indexSize, CallingMethodName));
+        internal CodeBase ArrayGetter(Size elementSize, Size indexSize)
+            => Add(new ArrayGetter(elementSize, indexSize, CallingMethodName));
+        internal CodeBase ArraySetter(Size elementSize, Size indexSize)
+            => Add(new ArraySetter(elementSize, indexSize, CallingMethodName));
 
         internal CodeBase DePointer(Size targetSize)
         {
@@ -233,13 +236,15 @@ namespace Reni.Code
             return result.Add(new Drop(Size, resultSize));
         }
 
-        internal CodeBase NumberOperation(string name, Size resultSize, Size leftSize, Size rightSize) => Add(new BitArrayBinaryOp(name, resultSize, leftSize, rightSize));
+        internal CodeBase NumberOperation(string name, Size resultSize, Size leftSize, Size rightSize)
+            => Add(new BitArrayBinaryOp(name, resultSize, leftSize, rightSize));
         internal CodeBase DumpPrintNumber() => Add(new DumpPrintNumberOperation(Size, Size.Zero));
         internal CodeBase DumpPrintNumber(Size leftSize) => Add(new DumpPrintNumberOperation(leftSize, Size - leftSize));
         internal CodeBase DumpPrintText(Size itemSize) => Add(new DumpPrintTextOperation(Size, itemSize));
         internal CodeBase NumberOperation(string operation, Size size) => Add(new BitArrayPrefixOp(operation, size, Size));
 
-        internal static CodeBase LocalVariableReference(string holder, Size offset = null) => new LocalVariableReference(holder, offset);
+        internal static CodeBase LocalVariableReference(Holder holder, Size offset = null)
+            => new LocalVariableReference(holder, offset);
 
         internal CodeBase AddRange(IEnumerable<FiberItem> subsequentElement)
         {
@@ -270,7 +275,8 @@ namespace Reni.Code
         }
 
         internal static CodeBase Arg(TypeBase type) => new Arg(type);
-        internal Container Container(string description, FunctionId functionId = null) => new Container(this, description, functionId);
+        internal Container Container(string description, FunctionId functionId = null)
+            => new Container(this, description, functionId);
 
         public static CodeBase operator +(CodeBase a, CodeBase b) => a.Sequence(b);
     }
@@ -283,12 +289,5 @@ namespace Reni.Code
         {
             return x.Aggregate(CodeBase.Void, (code, result) => code + result);
         }
-
-        internal static CodeBase ToLocalVariables(this IEnumerable<CodeBase> codeBases, string holderPattern)
-        {
-            return CodeBase.List(codeBases.Select((x, i) => LocalVariableDefinition(string.Format(holderPattern, i), x)));
-        }
-
-        static CodeBase LocalVariableDefinition(string holderName, CodeBase value) => value.Add(new LocalVariableDefinition(holderName, value.Size));
     }
 }

@@ -10,12 +10,12 @@ namespace Reni.Code
     sealed class LocalVariableDefinition : FiberItem
     {
         [Node]
-        readonly string _holderName;
+        readonly Holder _holder;
         readonly Size _valueSize;
 
-        public LocalVariableDefinition(string holderName, Size valueSize)
+        public LocalVariableDefinition(Holder holder, Size valueSize)
         {
-            _holderName = holderName;
+            _holder = holder;
             _valueSize = valueSize;
             StopByObjectId(-4);
         }
@@ -26,7 +26,7 @@ namespace Reni.Code
         [DisableDump]
         internal override Size OutputSize => Size.Zero;
 
-        protected override string GetNodeDump() => base.GetNodeDump() + " Holder=" + _holderName + " ValueSize=" + _valueSize;
-        internal override void Visit(IVisitor visitor) => visitor.LocalVariableDefinition(_holderName, _valueSize);
+        protected override string GetNodeDump() => base.GetNodeDump() + " Holder=" + _holder + " ValueSize=" + _valueSize;
+        internal override void Visit(IVisitor visitor) => visitor.LocalVariableDefinition(_holder.Name, _valueSize);
     }
 }
