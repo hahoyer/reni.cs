@@ -33,7 +33,7 @@ namespace Reni.Code
         }
 
         protected override string GetNodeDump() => base.GetNodeDump()
-            + " Holder=" + Holder
+            + " Holder=" + Holder.Name
             + " Offset=" + Offset
             + " DataSize=" + DataSize;
 

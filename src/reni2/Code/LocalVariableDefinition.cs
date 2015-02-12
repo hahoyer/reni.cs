@@ -26,7 +26,7 @@ namespace Reni.Code
         [DisableDump]
         internal override Size OutputSize => Size.Zero;
 
-        protected override string GetNodeDump() => base.GetNodeDump() + " Holder=" + _holder + " ValueSize=" + _valueSize;
+        protected override string GetNodeDump() => base.GetNodeDump() + " Holder=" + _holder.Name + " ValueSize=" + _valueSize;
         internal override void Visit(IVisitor visitor) => visitor.LocalVariableDefinition(_holder.Name, _valueSize);
     }
 }

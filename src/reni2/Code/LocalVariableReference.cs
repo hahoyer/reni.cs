@@ -31,7 +31,7 @@ namespace Reni.Code
         internal override bool IsRelativeReference => true;
 
         protected override string GetNodeDump() => base.GetNodeDump()
-            + " Holder=" + Holder
+            + " Holder=" + Holder.Name
             + " Offset=" + Offset;
 
         protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
