@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using hw.Helper;
 using System.Linq;
 using hw.Debug;
-using hw.Helper;
 using Reni.Basics;
 using Reni.Code.ReplaceVisitor;
 
@@ -68,19 +68,38 @@ namespace Reni.Code
 
         sealed class FinalReplacer : Base
         {
-            readonly CodeBase _replacement;
+            readonly LocalReference[] _references;
+            readonly Size _offset;
 
-            public FinalReplacer(Size size)
+            public FinalReplacer(LocalReference[] references, Size offset)
             {
-                _replacement = CodeBase.TopRef().ReferencePlus(size);
+                _references = references;
+                _offset = offset;
             }
-            public FinalReplacer()
-                : this(Size.Zero) {}
+            public FinalReplacer(LocalReference[] references)
+                : this(references, Size.Zero) { }
 
             internal override CodeBase LocalReference(LocalReference visitedObject)
-                => _replacement;
+            {
+                return CodeBase
+                    .TopRef()
+                    .ReferencePlus(_offset + Offset(visitedObject));
+            }
 
-            protected override Visitor<CodeBase> After(Size size) => new FinalReplacer(size);
+            Size Offset(LocalReference visitedObject)
+            {
+                var index = _references
+                    .IndexWhere(reference => reference == visitedObject)
+                    .AssertValue();
+                return _references
+                    .Skip(index+1)
+                    .Select(reference => reference.AlignedValueCode.Size)
+                    .Aggregate()
+                    ?? Size.Zero;
+            }
+
+            protected override Visitor<CodeBase> After(Size size)
+                => new FinalReplacer(_references, _offset + size);
         }
 
         static int _nextObjectId;
@@ -107,10 +126,10 @@ namespace Reni.Code
 
                 Tracer.Assert(!ReducedBody.HasArg, ReducedBody.Dump);
 
-                if (References.Count() == 1)
+                if(References.Count() == 1)
                 {
                     var initialCode = References.Single().AlignedValueCode;
-                    var bodyCode = ReducedBody.Visit(new FinalReplacer()) ?? ReducedBody;
+                    var bodyCode = ReducedBody.Visit(new FinalReplacer(References)) ?? ReducedBody;
                     var result = (initialCode + bodyCode).LocalBlockEnd(Copier, Body.Size);
                     return result;
                 }
@@ -121,10 +140,19 @@ namespace Reni.Code
                 {
                     Dump(nameof(ReducedBody), ReducedBody);
                     Dump(nameof(References), References);
-                    BreakExecution();
-                    throw new NotImplementedException();
 
-                    return ReturnMethodDump(Body);
+                    var initialCode = References
+                        .Select(reference => reference.AlignedValueCode)
+                        .Aggregate();
+                    Dump(nameof(initialCode), initialCode);
+
+                    var bodyCode = ReducedBody.Visit(new FinalReplacer(References)) ?? ReducedBody;
+                    Dump(nameof(bodyCode), bodyCode);
+
+                    BreakExecution();
+
+                    var result = (initialCode + bodyCode).LocalBlockEnd(Copier, Body.Size);
+                    return ReturnMethodDump(result);
                 }
                 finally
                 {
