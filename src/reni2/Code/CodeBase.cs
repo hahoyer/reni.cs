@@ -41,10 +41,13 @@ namespace Reni.Code
         internal static CodeBase Issue(IssueBase issue) => new IssueCode(issue);
         internal static CodeBase BitsConst(Size size, BitsConst t) => new BitArray(size, t);
         internal static CodeBase BitsConst(BitsConst t) => BitsConst(t.Size, t);
-        internal static CodeBase DumpPrintText(string dumpPrintText) => new DumpPrintText(dumpPrintText);
+        internal static CodeBase DumpPrintText(string dumpPrintText)
+            => new DumpPrintText(dumpPrintText);
         internal static CodeBase FrameRef() => new TopFrameRef();
-        internal static FiberItem RecursiveCall(Size refsSize) => new RecursiveCallCandidate(refsSize);
-        internal static CodeBase ReferenceCode(IContextReference reference) => new ReferenceCode(reference);
+        internal static FiberItem RecursiveCall(Size refsSize)
+            => new RecursiveCallCandidate(refsSize);
+        internal static CodeBase ReferenceCode(IContextReference reference)
+            => new ReferenceCode(reference);
         internal static CodeBase Void => BitArray.Void;
         internal static CodeBase TopRef() => new TopRef();
 
@@ -75,10 +78,12 @@ namespace Reni.Code
         }
 
 
-        internal CodeBase ThenElse(CodeBase thenCode, CodeBase elseCode) => Add(new ThenElse(thenCode, elseCode));
+        internal CodeBase ThenElse(CodeBase thenCode, CodeBase elseCode)
+            => Add(new ThenElse(thenCode, elseCode));
 
-        internal LocalReference LocalReference(TypeBase type, CodeBase destructorCode)
-            => new LocalReference(type, this, destructorCode);
+        internal LocalReference LocalReference
+            (TypeBase type, CodeBase destructorCode, bool isUsedOnce = false)
+            => new LocalReference(type, this, destructorCode, isUsedOnce);
 
         internal abstract CodeBase Add(FiberItem subsequentElement);
 
@@ -178,7 +183,8 @@ namespace Reni.Code
 
         internal TResult Visit<TResult>(Visitor<TResult> actual) => VisitImplementation(actual);
 
-        protected virtual TResult VisitImplementation<TResult>(Visitor<TResult> actual) => actual.Default(this);
+        protected virtual TResult VisitImplementation<TResult>(Visitor<TResult> actual)
+            => actual.Default(this);
 
         internal CodeBase Call(FunctionId index, Size resultSize)
         {
@@ -202,7 +208,8 @@ namespace Reni.Code
             return dataStack.Value;
         }
 
-        internal CodeBase Align() => BitCast(Size.NextPacketSize(Root.DefaultRefAlignParam.AlignBits));
+        internal CodeBase Align()
+            => BitCast(Size.NextPacketSize(Root.DefaultRefAlignParam.AlignBits));
 
         /// <summary>
         ///     Gets the icon key.
@@ -218,8 +225,8 @@ namespace Reni.Code
         [DisableDump]
         internal bool Hllw => Size.IsZero;
 
-        internal CodeBase LocalBlock(CodeBase copier) => new LocalReferenceSequenceVisitor()
-            .LocalBlock(this, copier);
+        internal CodeBase LocalBlock(CodeBase copier)
+            => new RemoveLocalReferences(this, copier).NewBody;
 
         internal CodeBase LocalBlockEnd(CodeBase copier, Size resultSize)
         {
@@ -236,15 +243,20 @@ namespace Reni.Code
             return result.Add(new Drop(Size, resultSize));
         }
 
-        internal CodeBase NumberOperation(string name, Size resultSize, Size leftSize, Size rightSize)
+        internal CodeBase NumberOperation
+            (string name, Size resultSize, Size leftSize, Size rightSize)
             => Add(new BitArrayBinaryOp(name, resultSize, leftSize, rightSize));
         internal CodeBase DumpPrintNumber() => Add(new DumpPrintNumberOperation(Size, Size.Zero));
-        internal CodeBase DumpPrintNumber(Size leftSize) => Add(new DumpPrintNumberOperation(leftSize, Size - leftSize));
-        internal CodeBase DumpPrintText(Size itemSize) => Add(new DumpPrintTextOperation(Size, itemSize));
-        internal CodeBase NumberOperation(string operation, Size size) => Add(new BitArrayPrefixOp(operation, size, Size));
+        internal CodeBase DumpPrintNumber(Size leftSize)
+            => Add(new DumpPrintNumberOperation(leftSize, Size - leftSize));
+        internal CodeBase DumpPrintText(Size itemSize)
+            => Add(new DumpPrintTextOperation(Size, itemSize));
+        internal CodeBase NumberOperation(string operation, Size size)
+            => Add(new BitArrayPrefixOp(operation, size, Size));
 
-        internal static CodeBase LocalVariableReference(Holder holder, Size offset = null)
-            => new LocalVariableReference(holder, offset);
+        internal static CodeBase LocalVariableReference
+            (LocalVariableDefinition definition, Size offset = null)
+            => new LocalVariableReference(definition, offset);
 
         internal CodeBase AddRange(IEnumerable<FiberItem> subsequentElement)
         {

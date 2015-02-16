@@ -36,8 +36,11 @@ namespace Reni.Code
         internal override CodeBase TryToCombineBack(TopRef precedingElement)
             => new TopData(precedingElement.Offset, OutputSize, DataSize);
 
+        internal override CodeBase TryToCombineBack(LocalReference precedingElement)
+            => precedingElement.ValueCode.BitCast(OutputSize);
+
         internal override CodeBase TryToCombineBack(LocalVariableReference precedingElement)
-            => new LocalVariableAccess(precedingElement.Holder, precedingElement.Offset, OutputSize, DataSize);
+            => new LocalVariableAccess(precedingElement.Definition, precedingElement.Offset, OutputSize, DataSize);
 
         internal override CodeBase TryToCombineBack(TopFrameRef precedingElement)
             => new TopFrameData(precedingElement.Offset, OutputSize, DataSize);

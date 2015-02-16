@@ -64,7 +64,7 @@ namespace Reni.Code
         internal override CodeBase TryToCombineBack(LocalVariableAccess precedingElement)
         {
             return new LocalVariableAccess
-                (precedingElement.Holder
+                (precedingElement.Definition
                     , precedingElement.Offset
                     , OutputSize
                     , InputDataSize.Min(precedingElement.DataSize)

@@ -13,19 +13,24 @@ namespace Reni.Code
     {
         static int _nextObjectId;
 
-        public LocalReference(TypeBase valueType, CodeBase valueCode, CodeBase destructorCode)
+        public LocalReference
+            (TypeBase valueType, CodeBase valueCode, CodeBase destructorCode, bool isUsedOnce)
             : base(_nextObjectId++)
         {
             ValueType = valueType;
             ValueCode = valueCode;
             Tracer.Assert(valueCode.Size == ValueType.Size);
             DestructorCode = destructorCode;
-            StopByObjectId(-8);
+            IsUsedOnce = isUsedOnce;
+            StopByObjectIds();
         }
 
         [Node]
         [DisableDump]
         internal CodeBase DestructorCode { get; }
+        [Node]
+        [DisableDump]
+        bool IsUsedOnce { get; }
         [Node]
         internal CodeBase ValueCode { get; }
         [Node]
@@ -35,12 +40,17 @@ namespace Reni.Code
 
         protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
         protected override CodeArgs GetRefsImplementation() => ValueCode.Exts + DestructorCode.Exts;
-        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) => actual.LocalReference(this);
+        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual)
+            => actual.LocalReference(this);
 
-        internal CodeBase AccompayningDestructorCode(ref Size size, Holder holder)
+        protected override CodeBase TryToCombine(FiberItem subsequentElement)
+            => IsUsedOnce ? subsequentElement.TryToCombineBack(this) : null;
+
+        internal CodeBase AccompayningDestructorCode
+            (ref Size size, LocalVariableDefinition definition)
         {
             size += Code.Size;
-            return DestructorCode.ReplaceArg(ValueType.Pointer, LocalVariableReference(holder));
+            return DestructorCode.ReplaceArg(ValueType.Pointer, LocalVariableReference(definition));
         }
     }
 }

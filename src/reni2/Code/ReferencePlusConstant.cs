@@ -54,6 +54,6 @@ namespace Reni.Code
         }
 
         internal override CodeBase TryToCombineBack(LocalVariableReference precedingElement) => CodeBase
-            .LocalVariableReference(precedingElement.Holder, precedingElement.Offset + _right);
+            .LocalVariableReference(precedingElement.Definition, precedingElement.Offset + _right);
     }
 }

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Helper;
-using Reni.Type;
 
 namespace Reni.Code.ReplaceVisitor
 {
@@ -19,12 +18,18 @@ namespace Reni.Code.ReplaceVisitor
             _internalRefs = new FunctionCache<LocalReference, LocalReference>(ReVisit);
         }
 
+        protected Base()
+        {
+            _internalRefs = new FunctionCache<LocalReference, LocalReference>(ReVisit);
+        }
+
         internal override CodeBase Arg(Arg visitedObject) => null;
         internal override CodeBase ContextRef(ReferenceCode visitedObject) => null;
         internal override CodeBase BitArray(BitArray visitedObject) => null;
         internal override CodeBase Default(CodeBase codeBase) => null;
 
-        internal override CodeBase LocalReference(LocalReference visitedObject) => _internalRefs[visitedObject];
+        internal override CodeBase LocalReference(LocalReference visitedObject)
+            => _internalRefs[visitedObject];
 
         protected override CodeBase List(List visitedObject, IEnumerable<CodeBase> newList)
         {
@@ -47,14 +52,16 @@ namespace Reni.Code.ReplaceVisitor
             return CodeBase.List(newListCompleted);
         }
 
-        protected override FiberItem ThenElse(ThenElse visitedObject, CodeBase newThen, CodeBase newElse)
+        protected override FiberItem ThenElse
+            (ThenElse visitedObject, CodeBase newThen, CodeBase newElse)
         {
             if(newThen == null && newElse == null)
                 return null;
             return visitedObject.ReCreate(newThen, newElse);
         }
 
-        protected override CodeBase Fiber(Fiber visitedObject, CodeBase newHead, FiberItem[] newItems)
+        protected override CodeBase Fiber
+            (Fiber visitedObject, CodeBase newHead, FiberItem[] newItems)
         {
             if(newHead == null && newItems.All(x => x == null))
                 return null;
@@ -62,7 +69,7 @@ namespace Reni.Code.ReplaceVisitor
             return visitedObject.ReCreate(newHead, newItems);
         }
 
-        internal LocalReference ReVisit(LocalReference visitedObject)
+        LocalReference ReVisit(LocalReference visitedObject)
             => visitedObject
                 .ValueCode
                 .Visit(this)
