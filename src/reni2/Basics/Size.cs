@@ -1,25 +1,3 @@
-#region Copyright (C) 2013
-
-//     Project Reni2
-//     Copyright (C) 2011 - 2013 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-#endregion
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -41,16 +19,19 @@ namespace Reni.Basics
         static int _nextObjectId;
 
         Size(int value)
-            : base(_nextObjectId++) { _value = value; }
+            : base(_nextObjectId++)
+        {
+            _value = value;
+        }
 
-        public bool IsZero { get { return _value == 0; } }
+        public bool IsZero => _value == 0;
 
-        public int SaveByteCount { get { return SaveSizeToPacketCount(BitsConst.SegmentAlignBits); } }
-        public static Size Zero { get { return Create(0); } }
-        public static Size Byte { get { return Create(1).ByteAlignedSize; } }
-        public bool IsPositive { get { return _value > 0; } }
-        public int ByteCount { get { return SizeToPacketCount(BitsConst.SegmentAlignBits); } }
-        public Size ByteAlignedSize { get { return NextPacketSize(BitsConst.SegmentAlignBits); } }
+        public int SaveByteCount => SaveSizeToPacketCount(BitsConst.SegmentAlignBits);
+        public static Size Zero => Create(0);
+        public static Size Byte => Create(1).ByteAlignedSize;
+        public bool IsPositive => _value > 0;
+        public int ByteCount => SizeToPacketCount(BitsConst.SegmentAlignBits);
+        public Size ByteAlignedSize => NextPacketSize(BitsConst.SegmentAlignBits);
 
         public static Size Create(int x)
         {
@@ -72,9 +53,9 @@ namespace Reni.Basics
             return Create(size);
         }
 
-        protected override string Dump(bool isRecursion) { return GetNodeDump(); }
+        protected override string Dump(bool isRecursion) => GetNodeDump();
 
-        protected override string GetNodeDump() { return _value.ToString(); }
+        protected override string GetNodeDump() => _value.ToString();
 
         public Size Align(int alignBits)
         {
@@ -84,9 +65,9 @@ namespace Reni.Basics
             return Create(result);
         }
 
-        public int SizeToPacketCount(int alignBits) { return ((_value - 1) >> alignBits) + 1; }
+        public int SizeToPacketCount(int alignBits) => ((_value - 1) >> alignBits) + 1;
 
-        public Size NextPacketSize(int alignBits) { return Create(SizeToPacketCount(alignBits) << alignBits); }
+        public Size NextPacketSize(int alignBits) => Create(SizeToPacketCount(alignBits) << alignBits);
 
         internal void AssertAlignedSize(int alignBits)
         {
@@ -104,63 +85,63 @@ namespace Reni.Basics
             return SizeToPacketCount(alignBits);
         }
 
-        public int ToInt() { return _value; }
+        public int ToInt() => _value;
 
-        bool LessThan(Size x) { return _value < x._value; }
+        bool LessThan(Size x) => _value < x._value;
 
-        Size Modulo(Size x) { return Create(_value % x._value); }
+        Size Modulo(Size x) => Create(_value % x._value);
 
-        public static bool operator <(Size x, Size y) { return x.LessThan(y); }
+        public static bool operator <(Size x, Size y) => x.LessThan(y);
 
-        public static bool operator >(Size x, Size y) { return y.LessThan(x); }
+        public static bool operator >(Size x, Size y) => y.LessThan(x);
 
-        public static bool operator <=(Size x, Size y) { return !(x > y); }
+        public static bool operator <=(Size x, Size y) => !(x > y);
 
-        public static bool operator >=(Size x, Size y) { return !(x < y); }
+        public static bool operator >=(Size x, Size y) => !(x < y);
 
-        public static Size operator -(Size x, Size y) { return x.Minus(y); }
+        public static Size operator -(Size x, Size y) => x.Minus(y);
 
-        public static Size operator -(Size x, int y) { return x.Minus(y); }
+        public static Size operator -(Size x, int y) => x.Minus(y);
 
-        public static Size operator +(int x, Size y) { return y.Plus(x); }
+        public static Size operator +(int x, Size y) => y.Plus(x);
 
-        public static Size Add(int x, Size y) { return y.Plus(x); }
+        public static Size Add(int x, Size y) => y.Plus(x);
 
-        public static Size operator +(Size x, int y) { return x.Plus(y); }
+        public static Size operator +(Size x, int y) => x.Plus(y);
 
-        public static Size Add(Size x, int y) { return x.Plus(y); }
+        public static Size Add(Size x, int y) => x.Plus(y);
 
-        public static Size operator +(Size x, Size y) { return x.Plus(y); }
+        public static Size operator +(Size x, Size y) => x.Plus(y);
 
-        public static Size Add(Size x, Size y) { return x.Plus(y); }
+        public static Size Add(Size x, Size y) => x.Plus(y);
 
-        public static Size operator *(Size x, int y) { return x.Times(y); }
+        public static Size operator *(Size x, int y) => x.Times(y);
 
-        public static Size operator *(int x, Size y) { return y.Times(x); }
+        public static Size operator *(int x, Size y) => y.Times(x);
 
-        public static Size operator /(Size x, int y) { return x.Divide(y); }
+        public static Size operator /(Size x, int y) => x.Divide(y);
 
-        public static int operator /(Size x, Size y) { return x.Divide(y); }
+        public static int operator /(Size x, Size y) => x.Divide(y);
 
-        public static Size operator %(Size x, Size y) { return x.Modulo(y); }
+        public static Size operator %(Size x, Size y) => x.Modulo(y);
 
-        public static Size Multiply(Size x, int y) { return x.Times(y); }
+        public static Size Multiply(Size x, int y) => x.Times(y);
 
-        public static Size Multiply(int x, Size y) { return y.Times(x); }
+        public static Size Multiply(int x, Size y) => y.Times(x);
 
-        Size Plus(int y) { return Create(_value + y); }
+        Size Plus(int y) => Create(_value + y);
 
-        Size Times(int y) { return Create(_value * y); }
+        Size Times(int y) => Create(_value * y);
 
-        Size Minus(int y) { return Create(_value - y); }
+        Size Minus(int y) => Create(_value - y);
 
-        Size Divide(int y) { return Create(_value / y); }
+        Size Divide(int y) => Create(_value / y);
 
-        Size Plus(Size y) { return Create(_value + y._value); }
+        Size Plus(Size y) => Create(_value + y._value);
 
-        int Divide(Size y) { return _value / y._value; }
+        int Divide(Size y) => _value / y._value;
 
-        Size Minus(Size y) { return Create(_value - y._value); }
+        Size Minus(Size y) => Create(_value - y._value);
 
         public Size Max(Size x)
         {
@@ -176,14 +157,14 @@ namespace Reni.Basics
             return x;
         }
 
-        public string ToCCodeByteType() { return "byte<" + ByteCount + ">"; }
+        public string ToCCodeByteType() => "byte<" + ByteCount + ">";
 
         [UsedImplicitly]
-        public string CodeDump() { return ByteCount.ToString(); }
+        public string CodeDump() => ByteCount.ToString();
 
-        public int CompareTo(Size other) { return LessThan(other) ? -1 : (other.LessThan(this) ? 1 : 0); }
+        public int CompareTo(Size other) => LessThan(other) ? -1 : (other.LessThan(this) ? 1 : 0);
 
-        public override string ToString() { return ToInt().ToString(); }
+        public override string ToString() => ToInt().ToString();
 
         [TestFixture]
         sealed class Tests
@@ -211,15 +192,15 @@ namespace Reni.Basics
             }
         }
 
-        internal string FormatForView() { return ToString() + " " + ToCCodeByteType(); }
+        internal string FormatForView() => ToString() + " " + ToCCodeByteType();
 
         /// <summary>
         ///     Gets the icon key.
         /// </summary>
         /// <value>The icon key.</value>
-        string IIconKeyProvider.IconKey { get { return "Size"; } }
+        string IIconKeyProvider.IconKey => "Size";
 
-        internal bool IsNegative { get { return !(IsPositive || IsZero); } }
+        internal bool IsNegative => !(IsPositive || IsZero);
 
         internal Size Absolute
         {
