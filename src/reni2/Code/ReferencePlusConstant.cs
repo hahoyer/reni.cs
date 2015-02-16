@@ -53,7 +53,5 @@ namespace Reni.Code
             return new FiberItem[] {new ReferencePlusConstant(newRight)};
         }
 
-        internal override CodeBase TryToCombineBack(LocalVariableReference precedingElement) => CodeBase
-            .LocalVariableReference(precedingElement.Definition, precedingElement.Offset + _right);
     }
 }

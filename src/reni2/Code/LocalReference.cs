@@ -36,7 +36,7 @@ namespace Reni.Code
         [Node]
         public TypeBase ValueType { get; }
         [DisableDump]
-        internal CodeBase Code => ValueCode.Align();
+        internal CodeBase AlignedValueCode => ValueCode.Align();
 
         protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
         protected override CodeArgs GetRefsImplementation() => ValueCode.Exts + DestructorCode.Exts;
@@ -47,10 +47,10 @@ namespace Reni.Code
             => IsUsedOnce ? subsequentElement.TryToCombineBack(this) : null;
 
         internal CodeBase AccompayningDestructorCode
-            (ref Size size, LocalVariableDefinition definition)
+            (ref Size size, LocalReference definition)
         {
-            size += Code.Size;
-            return DestructorCode.ReplaceArg(ValueType.Pointer, LocalVariableReference(definition));
+            size += AlignedValueCode.Size;
+            return DestructorCode.ReplaceArg(ValueType.Pointer, definition);
         }
     }
 }

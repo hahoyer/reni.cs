@@ -162,12 +162,6 @@ namespace Reni.Code
 
         void IVisitor.ReferenceCode(IContextReference context) { throw new UnexpectedContextReference(context); }
 
-        void IVisitor.LocalVariableDefinition(string holderName, Size valueSize)
-        {
-            Locals
-                .Add(holderName, Pull(valueSize));
-        }
-
         void SubVisit(string tag, IFormalCodeItem codeBase)
         {
             const string stars = "\n******************************\n";
@@ -195,8 +189,6 @@ namespace Reni.Code
             }
         }
 
-        void IVisitor.LocalVariableReference(string holder, Size offset) { Push(new StackDataAddress(new LocalStackReference(Locals, holder), offset, _context.OutStream)); }
-
         void IVisitor.ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode)
         {
             var bitsConst = Pull(condSize).GetBitsConst();
@@ -207,8 +199,6 @@ namespace Reni.Code
         }
 
         FunctionCache<string, StackData> Locals { get { return _localData.Frame.Locals; } }
-
-        void IVisitor.LocalVariableAccess(string holder, Size offset, Size size, Size dataSize) { Push(Locals[holder].DoPull(offset).DoGetTop(dataSize).BitCast(size)); }
 
         StackData Pull(Size size)
         {

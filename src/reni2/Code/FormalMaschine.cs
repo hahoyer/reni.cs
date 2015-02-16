@@ -1,30 +1,7 @@
-﻿#region Copyright (C) 2012
-
-//     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-#endregion
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
-using hw.Helper;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Context;
@@ -42,7 +19,8 @@ namespace Reni.Code
         readonly FormalPointer[] _points;
         FormalPointer[] _framePoints = new FormalPointer[1];
         int _nextValue;
-        internal const string Names = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
+        internal const string Names =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
         static Size RefSize { get { return Root.DefaultRefAlignParam.RefSize; } }
 
         internal FormalMachine(Size dataSize)
@@ -54,10 +32,14 @@ namespace Reni.Code
 
         internal string CreateGraph()
         {
-            return _data.Aggregate("", (current, t) => current + (t == null ? " ?" : t.Dump())) + "  |" +
-                   _frameData.Aggregate("", (current, t) => current + (t == null ? " ?" : t.Dump())) + "\n" +
-                   _points.Aggregate("", (current, t) => current + (t == null ? "  " : t.Dump())) + "|" +
-                   _framePoints.Aggregate("", (current, t) => current + (t == null ? "  " : t.Dump())) + "\n";
+            return _data.Aggregate("", (current, t) => current + (t == null ? " ?" : t.Dump()))
+                + "  |" +
+                _frameData.Aggregate("", (current, t) => current + (t == null ? " ?" : t.Dump()))
+                + "\n" +
+                _points.Aggregate("", (current, t) => current + (t == null ? "  " : t.Dump())) + "|"
+                +
+                _framePoints.Aggregate("", (current, t) => current + (t == null ? "  " : t.Dump()))
+                + "\n";
         }
 
         void IVisitor.BitsArray(Size size, BitsConst data)
@@ -87,7 +69,8 @@ namespace Reni.Code
         {
             var formalSubValue = GetInputValuesFromData(significantSize).Single();
             var startAddress = (_startAddress + targetSize - size).ToInt();
-            var element = FormalValueAccess.BitCast(formalSubValue, (size - significantSize).ToInt());
+            var element = FormalValueAccess.BitCast
+                (formalSubValue, (size - significantSize).ToInt());
             SetFormalValues(element, startAddress, size);
         }
 
@@ -100,7 +83,8 @@ namespace Reni.Code
         void IVisitor.TopFrameData(Size offset, Size size, Size dataSize)
         {
             AlignFrame(offset);
-            var access = GetInputValuesFromFrame(offset, size).Single() ?? CreateValuesInFrame(size, offset);
+            var access = GetInputValuesFromFrame(offset, size).Single()
+                ?? CreateValuesInFrame(size, offset);
             var startAddress = (_startAddress - size).ToInt();
             SetFormalValues(access, startAddress, dataSize);
         }
@@ -122,7 +106,10 @@ namespace Reni.Code
                 _data[i + (_startAddress + intermediateSize).ToInt()] = accesses[i];
         }
 
-        void IVisitor.Drop(Size beforeSize, Size afterSize) { ResetInputValuesOfData(beforeSize - afterSize); }
+        void IVisitor.Drop(Size beforeSize, Size afterSize)
+        {
+            ResetInputValuesOfData(beforeSize - afterSize);
+        }
 
         void IVisitor.ReferencePlus(Size right)
         {
@@ -145,24 +132,34 @@ namespace Reni.Code
             var formalLeftSubValue = PullInputValuesFromData(leftSize).Single();
             var formalRightSubValue = PullInputValuesFromData(leftSize, rightSize).Single();
             var startAddress = (_startAddress + leftSize + rightSize - size).ToInt();
-            var element = FormalValueAccess.BitArrayBinaryOp(opToken, formalLeftSubValue, formalRightSubValue);
+            var element = FormalValueAccess.BitArrayBinaryOp
+                (opToken, formalLeftSubValue, formalRightSubValue);
             SetFormalValues(element, startAddress, size);
         }
 
         void IVisitor.Assign(Size targetSize) { ResetInputValuesOfData(RefSize * 2); }
-        void IVisitor.BitArrayPrefixOp(string operation, Size size, Size argSize) { NotImplementedMethod(operation, size, argSize); }
+        void IVisitor.BitArrayPrefixOp(string operation, Size size, Size argSize)
+        {
+            NotImplementedMethod(operation, size, argSize);
+        }
         void IVisitor.PrintText(string dumpPrintText) { NotImplementedMethod(dumpPrintText); }
         void IVisitor.List(CodeBase[] data) { NotImplementedMethod(data); }
-        void IVisitor.Fiber(FiberHead fiberHead, FiberItem[] fiberItems) { NotImplementedMethod(fiberHead, fiberItems); }
-        void IVisitor.LocalVariableReference(string holder, Size offset) { NotImplementedMethod(holder, offset); }
+        void IVisitor.Fiber(FiberHead fiberHead, FiberItem[] fiberItems)
+        {
+            NotImplementedMethod(fiberHead, fiberItems);
+        }
         void IVisitor.RecursiveCall() { throw new NotImplementedException(); }
-        void IVisitor.ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode) { NotImplementedMethod(condSize, thenCode, elseCode); }
-        void IVisitor.LocalVariableAccess(string holder, Size offset, Size size, Size dataSize) { NotImplementedMethod(size, holder, offset); }
+        void IVisitor.ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode)
+        {
+            NotImplementedMethod(condSize, thenCode, elseCode);
+        }
         void IVisitor.ReferenceCode(IContextReference context) { NotImplementedMethod(context); }
-        void IVisitor.LocalVariableDefinition(string holderName, Size valueSize) { NotImplementedMethod(holderName, valueSize); }
         void IVisitor.TopFrameRef(Size offset) { NotImplementedMethod(offset); }
         void IVisitor.RecursiveCallCandidate() { throw new NotImplementedException(); }
-        void IVisitor.PrintText(Size leftSize, Size itemSize) { NotImplementedMethod(leftSize, itemSize); }
+        void IVisitor.PrintText(Size leftSize, Size itemSize)
+        {
+            NotImplementedMethod(leftSize, itemSize);
+        }
 
         IFormalValue CreateValuesInFrame(Size size, Size offset)
         {
@@ -215,7 +212,10 @@ namespace Reni.Code
             return FormalValueAccess.Transpose(accesses.ToArray());
         }
 
-        IFormalValue[] GetInputValuesFromData(Size inputSize) { return GetInputValuesFromData(Size.Zero, inputSize); }
+        IFormalValue[] GetInputValuesFromData(Size inputSize)
+        {
+            return GetInputValuesFromData(Size.Zero, inputSize);
+        }
 
         IFormalValue[] GetInputValuesFromData(Size offset, Size inputSize)
         {
@@ -226,7 +226,10 @@ namespace Reni.Code
             return FormalValueAccess.Transpose(accesses.ToArray());
         }
 
-        IFormalValue[] PullInputValuesFromData(Size inputSize) { return PullInputValuesFromData(Size.Zero, inputSize); }
+        IFormalValue[] PullInputValuesFromData(Size inputSize)
+        {
+            return PullInputValuesFromData(Size.Zero, inputSize);
+        }
 
         void ResetInputValuesOfData(Size inputSize)
         {

@@ -61,16 +61,6 @@ namespace Reni.Code
 
         protected override FiberItem[] TryToCombineImplementation(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
 
-        internal override CodeBase TryToCombineBack(LocalVariableAccess precedingElement)
-        {
-            return new LocalVariableAccess
-                (precedingElement.Definition
-                    , precedingElement.Offset
-                    , OutputSize
-                    , InputDataSize.Min(precedingElement.DataSize)
-                );
-        }
-
         internal override FiberItem[] TryToCombineBack(BitCast preceding)
         {
             var inputDataSize = InputDataSize.Min(preceding.InputDataSize);

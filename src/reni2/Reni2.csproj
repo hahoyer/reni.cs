@@ -223,9 +223,6 @@
     <Compile Include="Code\IContextReference.cs" />
     <Compile Include="Code\RemoveLocalReferences.cs" />
     <Compile Include="Code\LocalStackReference.cs" />
-    <Compile Include="Code\LocalVariableAccess.cs" />
-    <Compile Include="Code\LocalVariableDefinition.cs" />
-    <Compile Include="Code\LocalVariableReference.cs" />
     <Compile Include="Code\ListStack.cs" />
     <Compile Include="Code\RecursiveCall.cs" />
     <Compile Include="Code\RecursiveCallCandidate.cs" />

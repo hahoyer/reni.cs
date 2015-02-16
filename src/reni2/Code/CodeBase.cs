@@ -254,10 +254,6 @@ namespace Reni.Code
         internal CodeBase NumberOperation(string operation, Size size)
             => Add(new BitArrayPrefixOp(operation, size, Size));
 
-        internal static CodeBase LocalVariableReference
-            (LocalVariableDefinition definition, Size offset = null)
-            => new LocalVariableReference(definition, offset);
-
         internal CodeBase AddRange(IEnumerable<FiberItem> subsequentElement)
         {
             return subsequentElement
