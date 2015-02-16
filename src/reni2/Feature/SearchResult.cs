@@ -76,14 +76,28 @@ namespace Reni.Feature
         internal Result Execute(Category category, ResultCache left, ContextBase context, CompileSyntax right)
         {
             var metaFeature = Feature.Meta;
-            if(metaFeature != null)
+            if (metaFeature != null)
                 return metaFeature.Result(category, left, context, right);
 
-            var result1 = ResultForDebug(category.Typed, context, right);
-            var result = result1
-                .ReplaceAbsolute(ConverterPath.Destination.CheckedReference, ConverterPath.Execute);
-            return result
-                .ReplaceArg(left);
+            var trace = ObjectId == -69 && category.HasCode;
+            StartMethodDump(trace, category, left.Data, context, right);
+            try
+            {
+                var result1 = ResultForDebug(category.Typed, context, right);
+                var result = result1
+                    .ReplaceAbsolute(ConverterPath.Destination.CheckedReference, ConverterPath.Execute);
+
+                Dump(nameof(result1), result1);
+                Dump(nameof(result), result);
+                Dump(nameof(left), left.Code);
+                BreakExecution();
+                return ReturnMethodDump(result.ReplaceArg(left));
+            }
+            finally
+            {
+                EndMethodDump();
+
+            }
         }
 
         internal Result CallResult(Category category) => Result(category, null, null);

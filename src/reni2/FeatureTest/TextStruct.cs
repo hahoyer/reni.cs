@@ -19,8 +19,18 @@ namespace Reni.FeatureTest
             return
                 @"
 systemdata:
-{ Memory: ((0 type * ('100' to_number_of_base 64)) mutable) instance()
-. !mutable FreePointer: Memory array_reference mutable
+{ 
+    Memory: ((0 type * ('100' to_number_of_base 64)) mutable) instance();
+    !mutable FreePointer: Memory array_reference mutable;
+    FreePointer >> 0 := (-1) enable_cut;
+    FreePointer >> 1 := (-1) enable_cut;
+    FreePointer >> 2 := (-1) enable_cut;
+    FreePointer >> 3 := (-1) enable_cut;
+    FreePointer >> 4 := (-1) enable_cut;
+    FreePointer >> 5 := (-1) enable_cut;
+    FreePointer >> 6 := (-1) enable_cut;
+    FreePointer >> 7 := (-1) enable_cut;
+    FreePointer >> 64 := (-1) enable_cut
 };
 
 repeat: /\ ^ while() then(^ body(), repeat(^));
@@ -87,7 +97,7 @@ Text: /\
 
     [TestFixture]
     [Output("ab")]
-    [InstanceCode("Text('ab')")]
+    [InstanceCode("Text('abcdef')")]
     [Integer1]
     [TwoFunctions]
     [FromTypeAndFunction]

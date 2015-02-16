@@ -76,7 +76,7 @@ namespace Reni.Struct
         {
             if(category.IsNone)
                 return new Result();
-            var trace = Syntax.ObjectId == -10 && category.HasCode;
+            var trace = Syntax.ObjectId == -1 && category.HasCode;
             StartMethodDump(trace, category, fromPosition, fromNotPosition);
             try
             {
@@ -108,16 +108,29 @@ namespace Reni.Struct
 
         internal Result Result(Category category)
         {
-            var resultsOfStatements = ResultsOfStatements(category - Category.Type, 0, Syntax.EndPosition);
-            var result = Syntax
-                .EndPosition
-                .Select()
-                .Aggregate(resultsOfStatements, Combine)
-                .ReplaceRelative(this, CodeBase.TopRef, CodeArgs.Void)
-                ;
-            if(category.HasType)
-                result.Type = ToCompoundView.Type;
-            return result;
+            bool trace = Syntax.ObjectId == -10 && category.HasCode;
+            StartMethodDump(trace, category);
+            try
+            {
+                var resultsOfStatements = ResultsOfStatements(category - Category.Type, 0, Syntax.EndPosition);
+
+                Dump("resultsOfStatements", resultsOfStatements);
+                BreakExecution();
+
+                var result = Syntax
+                    .EndPosition
+                    .Select()
+                    .Aggregate(resultsOfStatements, Combine)
+                    .ReplaceRelative(this, CodeBase.TopRef, CodeArgs.Void)
+                    ;
+                if(category.HasType)
+                    result.Type = ToCompoundView.Type;
+                return ReturnMethodDump(result);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
 
         Result Combine(Result result, int position) => Parent.CompoundView(Syntax, position).ReplaceObjectPointerByContext(result);
@@ -130,7 +143,7 @@ namespace Reni.Struct
 
         Result AccessResult(Category category, int accessPosition, int position)
         {
-            var trace = Syntax.ObjectId.In(-10) && accessPosition >= 0 && position >= 0 && category.HasCode;
+            var trace = Syntax.ObjectId.In(-1) && accessPosition >= 0 && position >= 0 && category.HasCode;
             StartMethodDump(trace, category, accessPosition, position);
             try
             {
