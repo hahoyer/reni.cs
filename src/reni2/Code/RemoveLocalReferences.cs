@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Helper;
+using Reni.Basics;
 using Reni.Code.ReplaceVisitor;
 
 namespace Reni.Code
@@ -65,6 +66,23 @@ namespace Reni.Code
             }
         }
 
+        sealed class FinalReplacer : Base
+        {
+            readonly CodeBase _replacement;
+
+            public FinalReplacer(Size size)
+            {
+                _replacement = CodeBase.TopRef().ReferencePlus(size);
+            }
+            public FinalReplacer()
+                : this(Size.Zero) {}
+
+            internal override CodeBase LocalReference(LocalReference visitedObject)
+                => _replacement;
+
+            protected override Visitor<CodeBase> After(Size size) => new FinalReplacer(size);
+        }
+
         static int _nextObjectId;
 
         readonly ValueCache<CodeBase> _reducedBodyCache;
@@ -79,6 +97,7 @@ namespace Reni.Code
             _reducedBodyCache = new ValueCache<CodeBase>(GetReducedBodyForCache);
         }
 
+        [DisableDump]
         internal CodeBase NewBody
         {
             get
@@ -87,6 +106,14 @@ namespace Reni.Code
                     return ReducedBody;
 
                 Tracer.Assert(!ReducedBody.HasArg, ReducedBody.Dump);
+
+                if (References.Count() == 1)
+                {
+                    var initialCode = References.Single().AlignedValueCode;
+                    var bodyCode = ReducedBody.Visit(new FinalReplacer()) ?? ReducedBody;
+                    var result = (initialCode + bodyCode).LocalBlockEnd(Copier, Body.Size);
+                    return result;
+                }
 
                 var trace = ObjectId > -2;
                 StartMethodDump(trace);
