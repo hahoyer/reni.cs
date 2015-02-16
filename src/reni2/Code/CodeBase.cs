@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Forms;
+using hw.Helper;
 using Reni.Basics;
 using Reni.Code.ReplaceVisitor;
 using Reni.Context;
@@ -12,7 +13,7 @@ using Reni.Validation;
 
 namespace Reni.Code
 {
-    abstract class CodeBase : DumpableObject, IIconKeyProvider, IFormalCodeItem
+    abstract class CodeBase : DumpableObject, IIconKeyProvider, IFormalCodeItem, IAggregateable<CodeBase>
     {
         protected CodeBase(int objectId)
             : base(objectId) {}
@@ -285,6 +286,8 @@ namespace Reni.Code
         internal static CodeBase Arg(TypeBase type) => new Arg(type);
         internal Container Container(string description, FunctionId functionId = null)
             => new Container(this, description, functionId);
+
+        CodeBase IAggregateable<CodeBase>.Aggregate(CodeBase other) => this + other;
 
         public static CodeBase operator +(CodeBase a, CodeBase b) => a.Sequence(b);
     }
