@@ -126,15 +126,7 @@ namespace Reni.Code
 
                 Tracer.Assert(!ReducedBody.HasArg, ReducedBody.Dump);
 
-                if(References.Count() == 1)
-                {
-                    var initialCode = References.Single().AlignedValueCode;
-                    var bodyCode = ReducedBody.Visit(new FinalReplacer(References)) ?? ReducedBody;
-                    var result = (initialCode + bodyCode).LocalBlockEnd(Copier, Body.Size);
-                    return result;
-                }
-
-                var trace = ObjectId > -2;
+                var trace = ObjectId == -2;
                 StartMethodDump(trace);
                 try
                 {
