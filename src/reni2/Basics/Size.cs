@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using hw.Debug;
 using hw.Forms;
+using hw.Helper;
 using hw.UnitTest;
 using JetBrains.Annotations;
 
@@ -12,7 +13,7 @@ namespace Reni.Basics
 {
     [AdditionalNodeInfo("DebuggerDumpString")]
     [DebuggerDisplay("{NodeDump,nq}")]
-    sealed class Size : DumpableObject, IIconKeyProvider, IComparable<Size>
+    sealed class Size : DumpableObject, IIconKeyProvider, IComparable<Size>, IAggregateable<Size>
     {
         static readonly Hashtable _values = new Hashtable();
         readonly int _value;
@@ -193,6 +194,9 @@ namespace Reni.Basics
         }
 
         internal string FormatForView() => ToString() + " " + ToCCodeByteType();
+
+        Size IAggregateable<Size>.Aggregate(Size other) => this + other;
+
 
         /// <summary>
         ///     Gets the icon key.
