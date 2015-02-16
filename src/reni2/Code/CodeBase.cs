@@ -236,12 +236,7 @@ namespace Reni.Code
                 return this;
 
             Tracer.Assert(copier.IsEmpty);
-
-            var result = this;
-            if(!resultSize.IsZero)
-                result = result.Add(new LocalBlockEnd(resultSize, intermediateSize));
-
-            return result.Add(new Drop(Size, resultSize));
+            return Add(new Drop(Size, resultSize));
         }
 
         internal CodeBase NumberOperation
