@@ -234,7 +234,6 @@
     <Compile Include="Code\ReplaceVisitor\Base.cs" />
     <Compile Include="Code\ReplaceVisitor\ReplaceRelRefArg.cs" />
     <Compile Include="Code\ReplaceVisitor\ReplaceContextRefWithArg.cs" />
-    <Compile Include="Code\LocalBlockEnd.cs" />
     <Compile Include="Code\CSharpGenerator.cs" />
     <Compile Include="Code\StackData.cs" />
     <Compile Include="Code\StackDataAddress.cs" />

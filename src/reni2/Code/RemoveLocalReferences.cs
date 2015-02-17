@@ -79,12 +79,10 @@ namespace Reni.Code
             public FinalReplacer(LocalReference[] references)
                 : this(references, Size.Zero) { }
 
-            internal override CodeBase LocalReference(LocalReference visitedObject)
-            {
-                return CodeBase
-                    .TopRef()
-                    .ReferencePlus(_offset + Offset(visitedObject));
-            }
+            internal override CodeBase LocalReference(LocalReference visitedObject) 
+                => CodeBase
+                .TopRef()
+                .ReferencePlus(_offset + Offset(visitedObject));
 
             Size Offset(LocalReference visitedObject)
             {
@@ -121,15 +119,16 @@ namespace Reni.Code
         {
             get
             {
-                if(!References.Any())
-                    return ReducedBody;
-
-                Tracer.Assert(!ReducedBody.HasArg, ReducedBody.Dump);
-
-                var trace = ObjectId == -2;
+                var trace = ObjectId == 0;
                 StartMethodDump(trace);
                 try
                 {
+                    BreakExecution();
+                    if (!References.Any())
+                        return ReturnMethodDump(ReducedBody);
+
+                    Tracer.Assert(!ReducedBody.HasArg, ReducedBody.Dump);
+
                     Dump(nameof(ReducedBody), ReducedBody);
                     Dump(nameof(References), References);
 
@@ -138,12 +137,13 @@ namespace Reni.Code
                         .Aggregate();
                     Dump(nameof(initialCode), initialCode);
 
-                    var bodyCode = ReducedBody.Visit(new FinalReplacer(References)) ?? ReducedBody;
+                    var replaceTarget = initialCode + ReducedBody;
+                    var bodyCode = replaceTarget.Visit(new FinalReplacer(References)) ?? replaceTarget;
                     Dump(nameof(bodyCode), bodyCode);
 
                     BreakExecution();
 
-                    var result = (initialCode + bodyCode).LocalBlockEnd(Copier, Body.Size);
+                    var result = bodyCode.LocalBlockEnd(Copier, Body.Size);
                     return ReturnMethodDump(result);
                 }
                 finally
@@ -159,6 +159,8 @@ namespace Reni.Code
         CodeBase GetReducedBodyForCache()
             => new Reducer(new Counter(Body).SingleReferences, Body).NewBody;
 
-        LocalReference[] GetReferencesForCache() => new Counter(ReducedBody).References;
+        LocalReference[] GetReferencesForCache()
+            => new Counter(ReducedBody)
+                .References;
     }
 }

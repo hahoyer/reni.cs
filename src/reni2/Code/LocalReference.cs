@@ -29,7 +29,7 @@ namespace Reni.Code
         [DisableDump]
         internal CodeBase DestructorCode { get; }
         [Node]
-        [DisableDump]
+        [EnableDumpExcept(false)]
         bool IsUsedOnce { get; }
         [Node]
         internal CodeBase ValueCode { get; }
