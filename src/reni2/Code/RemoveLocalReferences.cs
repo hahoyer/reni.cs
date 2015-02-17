@@ -68,36 +68,23 @@ namespace Reni.Code
 
         sealed class FinalReplacer : Base
         {
-            readonly LocalReference[] _references;
             readonly Size _offset;
 
-            public FinalReplacer(LocalReference[] references, Size offset)
+            public FinalReplacer(Size offset)
             {
-                _references = references;
                 _offset = offset;
             }
-            public FinalReplacer(LocalReference[] references)
-                : this(references, Size.Zero) { }
+            public FinalReplacer(LocalReference reference)
+                : this(Size.Zero) { }
 
             internal override CodeBase LocalReference(LocalReference visitedObject) 
                 => CodeBase
                 .TopRef()
-                .ReferencePlus(_offset + Offset(visitedObject));
+                .ReferencePlus(_offset);
 
-            Size Offset(LocalReference visitedObject)
-            {
-                var index = _references
-                    .IndexWhere(reference => reference == visitedObject)
-                    .AssertValue();
-                return _references
-                    .Skip(index+1)
-                    .Select(reference => reference.AlignedValueCode.Size)
-                    .Aggregate()
-                    ?? Size.Zero;
-            }
 
             protected override Visitor<CodeBase> After(Size size)
-                => new FinalReplacer(_references, _offset + size);
+                => new FinalReplacer(_offset + size);
         }
 
         static int _nextObjectId;
@@ -119,31 +106,37 @@ namespace Reni.Code
         {
             get
             {
-                var trace = ObjectId == 0;
+                if (!References.Any())
+                    return ReducedBody;
+
+                var trace = ObjectId >= 0;
                 StartMethodDump(trace);
                 try
                 {
                     BreakExecution();
-                    if (!References.Any())
-                        return ReturnMethodDump(ReducedBody);
 
                     Tracer.Assert(!ReducedBody.HasArg, ReducedBody.Dump);
 
                     Dump(nameof(ReducedBody), ReducedBody);
                     Dump(nameof(References), References);
 
-                    var initialCode = References
-                        .Select(reference => reference.AlignedValueCode)
-                        .Aggregate();
-                    Dump(nameof(initialCode), initialCode);
+                    var body = ReducedBody;
+                    var initialSize = Size.Zero;
+                    foreach(var reference in References)
+                    {
+                        var initialCode = reference.AlignedValueCode;
+                        initialSize += initialCode.Size;
+                        Dump(nameof(initialCode), initialCode);
 
-                    var replaceTarget = initialCode + ReducedBody;
-                    var bodyCode = replaceTarget.Visit(new FinalReplacer(References)) ?? replaceTarget;
-                    Dump(nameof(bodyCode), bodyCode);
+                        var replacedBody = body.Visit(new FinalReplacer(reference)) ?? body;
+                        Dump(nameof(replacedBody), replacedBody);
+                        body = initialCode + replacedBody;
+                        Dump(nameof(body), body);
+                        BreakExecution();
+                    }
 
-                    BreakExecution();
 
-                    var result = bodyCode.LocalBlockEnd(Copier, Body.Size);
+                    var result = body.LocalBlockEnd(Copier, initialSize);
                     return ReturnMethodDump(result);
                 }
                 finally

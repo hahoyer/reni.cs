@@ -229,14 +229,13 @@ namespace Reni.Code
         internal CodeBase LocalBlock(CodeBase copier)
             => new RemoveLocalReferences(this, copier).NewBody;
 
-        internal CodeBase LocalBlockEnd(CodeBase copier, Size resultSize)
+        internal CodeBase LocalBlockEnd(CodeBase copier, Size initialSize)
         {
-            var intermediateSize = Size - resultSize;
-            if(intermediateSize.IsZero)
+            if(initialSize.IsZero)
                 return this;
 
             Tracer.Assert(copier.IsEmpty);
-            return Add(new Drop(Size, resultSize));
+            return Add(new Drop(Size , Size - initialSize));
         }
 
         internal CodeBase NumberOperation
