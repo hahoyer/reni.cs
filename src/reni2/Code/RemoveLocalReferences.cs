@@ -69,22 +69,27 @@ namespace Reni.Code
         sealed class FinalReplacer : Base
         {
             readonly Size _offset;
+            readonly LocalReference _target;
 
-            public FinalReplacer(Size offset)
+            FinalReplacer(Size offset, LocalReference target)
             {
                 _offset = offset;
+                _target = target;
             }
-            public FinalReplacer(LocalReference reference)
-                : this(Size.Zero) { }
 
-            internal override CodeBase LocalReference(LocalReference visitedObject) 
-                => CodeBase
-                .TopRef()
-                .ReferencePlus(_offset);
+            public FinalReplacer(LocalReference target)
+                : this(Size.Zero, target) { }
+
+            internal override CodeBase LocalReference(LocalReference visitedObject)
+                => visitedObject != _target
+                    ? null
+                    : CodeBase
+                        .TopRef()
+                        .ReferencePlus(_offset);
 
 
             protected override Visitor<CodeBase> After(Size size)
-                => new FinalReplacer(_offset + size);
+                => new FinalReplacer(_offset + size,_target);
         }
 
         static int _nextObjectId;
@@ -109,7 +114,7 @@ namespace Reni.Code
                 if (!References.Any())
                     return ReducedBody;
 
-                var trace = ObjectId >= 0;
+                var trace = ObjectId < 0;
                 StartMethodDump(trace);
                 try
                 {
