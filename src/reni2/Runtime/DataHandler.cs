@@ -131,15 +131,27 @@ namespace Reni.Runtime
 
         public static unsafe byte[] Dereference(this byte[] data, int dataStart, int bytes)
         {
-            Tracer.Assert(data.Length >= dataStart + RefBytes);
-            var result = new byte[bytes];
-            fixed(byte* dataPointer = &data[dataStart])
+            try
             {
-                var bytePointer = *(byte**) dataPointer;
-                for(var i = 0; i < bytes; i++)
-                    result[i] = bytePointer[i];
+                Tracer.Assert(data.Length >= dataStart + RefBytes);
+                var result = new byte[bytes];
+                fixed(byte* dataPointer = &data[dataStart])
+                {
+                    var bytePointer = *(byte**) dataPointer;
+                    for(var i = 0; i < bytes; i++)
+                        result[i] = bytePointer[i];
+                }
+                return result;
             }
-            return result;
+            catch(AccessViolationException exception)
+            {
+                throw new RuntimeException(exception);
+            }
+        }
+
+        internal class RuntimeException : Exception
+        {
+            public RuntimeException(Exception exception) :base("Runtime exception during Dereference.", exception){ }
         }
 
         internal static unsafe void DoRefPlus(this byte[] data, int dataStart, int offset)
