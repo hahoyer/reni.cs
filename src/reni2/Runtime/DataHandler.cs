@@ -1,27 +1,9 @@
-// 
-//     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-using System.Numerics;
-using hw.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using System.Numerics;
+using hw.Debug;
+using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Context;
 
@@ -41,8 +23,6 @@ namespace Reni.Runtime
             }
         }
 
-        internal static Size RefSize { get { return Root.DefaultRefAlignParam.RefSize; } }
-
         /// <summary>
         ///     Moves the bytes.
         /// </summary>
@@ -51,7 +31,8 @@ namespace Reni.Runtime
         /// <param name="destByte"> The destination byte. </param>
         /// <param name="source"> The source. </param>
         /// created 08.10.2006 17:43
-        internal static unsafe void MoveBytes(int count, byte[] destination, int destByte, Int64 source)
+        internal static unsafe void MoveBytes
+            (int count, byte[] destination, int destByte, Int64 source)
         {
             fixed(byte* destPtr = &destination[destByte])
                 MoveBytes(count, destPtr, (byte*) &source);
@@ -83,7 +64,8 @@ namespace Reni.Runtime
         /// <param name="source"> The source. </param>
         /// <param name="sourceOffset"> The source offset. </param>
         /// created 08.10.2006 20:07
-        internal static void MoveBytes(int count, byte[] destination, int destOffset, byte[] source, int sourceOffset)
+        internal static void MoveBytes
+            (int count, byte[] destination, int destOffset, byte[] source, int sourceOffset)
         {
             for(var i = 0; i < count; i++)
                 destination[i + destOffset] = source[i + sourceOffset];
@@ -110,9 +92,9 @@ namespace Reni.Runtime
                 throw new NotImplementedException();
         }
 
-        static bool IsNegative(byte x) { return x >= 0x80; }
+        static bool IsNegative(byte x) => x >= 0x80;
 
-        public static void Set(byte[] dest, int destStart, params byte[] source) { source.CopyTo(dest, destStart); }
+        public static void Set(byte[] dest, int destStart, params byte[] source) => source.CopyTo(dest, destStart);
 
         internal static unsafe byte[] Pointer(this byte[] data, int dataStart)
         {
@@ -149,9 +131,10 @@ namespace Reni.Runtime
             }
         }
 
-        internal class RuntimeException : Exception
+        internal sealed class RuntimeException : Exception
         {
-            public RuntimeException(Exception exception) :base("Runtime exception during Dereference.", exception){ }
+            public RuntimeException(Exception exception)
+                : base("Runtime exception during Dereference.", exception) {}
         }
 
         internal static unsafe void DoRefPlus(this byte[] data, int dataStart, int offset)
@@ -172,28 +155,33 @@ namespace Reni.Runtime
             return result;
         }
 
+        [UsedImplicitly]
         public static unsafe void BitCast(byte[] data, int dataStart, int bytes, int bits)
         {
             fixed(byte* dataPointer = &data[dataStart])
                 BitCast(bytes, dataPointer, bits);
         }
 
-        internal static void PrintNumber(this byte[] data) { PrintText(new BigInteger(data).ToString()); }
+        internal static void PrintNumber(this byte[] data) => PrintText(new BigInteger(data).ToString());
 
-        internal static void PrintText(this string text) { Data.OutStream.AddData(text); }
-        internal static void PrintText(this byte[] text) { new string(text.Select(x => (char) x).ToArray()).PrintText(); }
+        internal static void PrintText(this string text) => Data.OutStream.AddData(text);
+        internal static void PrintText(this byte[] text)
+        {
+            new string(text.Select(x => (char) x).ToArray()).PrintText();
+        }
 
-        internal static unsafe void AssignFromPointers(this byte[] leftData, byte[] rightData, int bytes)
+        internal static unsafe void AssignFromPointers
+            (this byte[] leftData, byte[] rightData, int bytes)
         {
             fixed(byte* leftPointer = leftData)
             fixed(byte* rightPointer = rightData)
                 MoveBytes(bytes, *(byte**) leftPointer, *(byte**) rightPointer);
         }
 
-        internal static bool IsLessEqual(byte[] left, byte[] right) { return !IsGreater(left, right); }
-        internal static bool IsGreaterEqual(byte[] left, byte[] right) { return !IsLess(left, right); }
-        internal static bool IsNotEqual(byte[] left, byte[] right) { return !IsEqual(left, right); }
-        internal static bool IsLess(byte[] left, byte[] right) { return IsGreater(right, left); }
+        internal static bool IsLessEqual(byte[] left, byte[] right) => !IsGreater(left, right);
+        internal static bool IsGreaterEqual(byte[] left, byte[] right) => !IsLess(left, right);
+        internal static bool IsNotEqual(byte[] left, byte[] right) => !IsEqual(left, right);
+        internal static bool IsLess(byte[] left, byte[] right) => IsGreater(right, left);
 
         internal static bool IsGreater(byte[] left, byte[] right)
         {
@@ -276,6 +264,7 @@ namespace Reni.Runtime
             return result;
         }
 
+        [UsedImplicitly]
         internal static byte[] PlusSimple(this byte[] left, byte[] right)
         {
             Tracer.Assert(left.Length == right.Length);
@@ -302,12 +291,9 @@ namespace Reni.Runtime
             }
         }
 
-        internal static byte[] Times(this byte[] left, byte[] right, int bytes)
-        {
-            return (new BigInteger(left) * new BigInteger(right))
-                .ToByteArray()
-                .ByteAlign(bytes);
-        }
+        internal static byte[] Times(this byte[] left, byte[] right, int bytes) => (new BigInteger(left) * new BigInteger(right))
+            .ToByteArray()
+            .ByteAlign(bytes);
 
         static byte[] ByteAlign(this byte[] data, int bytes)
         {
