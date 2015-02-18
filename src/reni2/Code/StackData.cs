@@ -62,8 +62,8 @@ namespace Reni.Code
             return null;
         }
 
-        internal void PrintNumber() { GetBitsConst().PrintNumber(OutStream); }
-        internal void PrintText(Size itemSize) { GetBitsConst().PrintText(itemSize, OutStream); }
+        internal void PrintNumber() => GetBitsConst().PrintNumber(OutStream);
+        internal void PrintText(Size itemSize) => GetBitsConst().PrintText(itemSize, OutStream);
 
         internal StackData DoGetTop(Size size)
         {
@@ -106,9 +106,9 @@ namespace Reni.Code
             return new BitsStackData(resultData, OutStream);
         }
 
-        internal StackData RefPlus(Size offset) { return GetAddress().RefPlus(offset); }
+        internal StackData RefPlus(Size offset) => GetAddress().RefPlus(offset);
 
-        internal StackData Dereference(Size size, Size dataSize) { return GetAddress().Dereference(size, dataSize); }
+        internal StackData Dereference(Size size, Size dataSize) => GetAddress().Dereference(size, dataSize);
 
         protected virtual StackDataAddress GetAddress()
         {
@@ -122,6 +122,6 @@ namespace Reni.Code
             return null;
         }
 
-        internal void Assign(Size size, StackData right) { GetAddress().Assign(size, right); }
+        internal void Assign(Size size, StackData right) => GetAddress().Assign(size, right);
     }
 }

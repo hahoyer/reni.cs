@@ -20,14 +20,14 @@ namespace Reni.ReniParser
             _tokenClass = tokenClass;
         }
 
-        public SourcePart Data { get { return _data; } }
+        public SourcePart Data => _data;
 
         [Node]
-        internal Definable TokenClass { get { return _tokenClass; } }
+        internal Definable TokenClass => _tokenClass;
 
         [DisableDump]
-        public string IconKey { get { return "Symbol"; } }
+        public string IconKey => "Symbol";
 
-        protected override string GetNodeDump() { return Data.Name.Quote(); }
+        protected override string GetNodeDump() => Data.Name.Quote();
     }
 }

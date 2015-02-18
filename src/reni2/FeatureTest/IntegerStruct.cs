@@ -13,10 +13,7 @@ namespace Reni.FeatureTest.Integer
     /// </summary>
     public class IntegerStruct : CompilerTest
     {
-        static string Definition()
-        {
-            return
-                @"
+        static string Definition() => @"
 Integer8: 
 /\{
     _data: 127 type instance(^ enable_cut);
@@ -29,10 +26,9 @@ Integer8:
     !converter: /\ _data ;
 }
 ";
-        }
 
-        protected override string Target { get { return Definition() + "; " + InstanceCode + " dump_print()"; } }
-        protected virtual string InstanceCode { get { return GetStringAttribute<InstanceCodeAttribute>(); } }
+        protected override string Target => Definition() + "; " + InstanceCode + " dump_print()";
+        protected virtual string InstanceCode => GetStringAttribute<InstanceCodeAttribute>();
     }
 
     [TestFixture]

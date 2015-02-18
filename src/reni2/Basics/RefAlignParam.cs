@@ -41,8 +41,8 @@ namespace Reni.Basics
             _refSize = refSize;
         }
 
-        public int AlignBits { get { return _alignBits; } }
-        public Size RefSize { get { return _refSize; } }
+        public int AlignBits => _alignBits;
+        public Size RefSize => _refSize;
 
         public RefAlignParam Align(int alignBits)
         {
@@ -71,9 +71,9 @@ namespace Reni.Basics
             return true;
         }
 
-        public string Dump() { return "[A:" + AlignBits + ",S:" + RefSize.Dump() + "]"; }
+        public string Dump() => "[A:" + AlignBits + ",S:" + RefSize.Dump() + "]";
 
-        internal string CodeDump { get { return AlignBits + "/" + RefSize.ToInt(); } }
+        internal string CodeDump => AlignBits + "/" + RefSize.ToInt();
 
         public override int GetHashCode()
         {
@@ -103,8 +103,8 @@ namespace Reni.Basics
             return Equals((RefAlignParam) obj);
         }
 
-        public static bool operator ==(RefAlignParam left, RefAlignParam right) { return Equals(left, right); }
+        public static bool operator ==(RefAlignParam left, RefAlignParam right) => Equals(left, right);
 
-        public static bool operator !=(RefAlignParam left, RefAlignParam right) { return !Equals(left, right); }
+        public static bool operator !=(RefAlignParam left, RefAlignParam right) => !Equals(left, right);
     }
 }

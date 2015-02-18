@@ -15,7 +15,7 @@ namespace Reni.Numeric
     {
         public const string Id = "-";
         public Minus() { Name = Id; }
-        protected override int Signature(int objSize, int argSize) { return BitsConst.PlusSize(objSize, argSize); }
+        protected override int Signature(int objSize, int argSize) => BitsConst.PlusSize(objSize, argSize);
         [DisableDump]
         internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
         string ITokenClassWithId.Id => Id;
@@ -26,7 +26,7 @@ namespace Reni.Numeric
         : TransformationOperation, ITokenClassWithId
     {
         public const string Id = "+";
-        protected override int Signature(int objSize, int argSize) { return BitsConst.PlusSize(objSize, argSize); }
+        protected override int Signature(int objSize, int argSize) => BitsConst.PlusSize(objSize, argSize);
         [DisableDump]
         internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
         string ITokenClassWithId.Id => Id;

@@ -14,6 +14,6 @@ namespace Reni.Type
 
     static class ReferenceExtension
     {
-        internal static TypeBase Type(this IReference referenceType) { return (TypeBase) referenceType; }
+        internal static TypeBase Type(this IReference referenceType) => (TypeBase) referenceType;
     }
 }

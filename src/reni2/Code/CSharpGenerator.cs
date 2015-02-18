@@ -43,7 +43,7 @@ namespace Reni.Code
             return String.Format(".BitCast({0}).BitCast({1})", dataSize.ToInt(), size.ToInt());
         }
 
-        static int RefBytes { get { return DataHandler.RefBytes; } }
+        static int RefBytes => DataHandler.RefBytes;
 
 
         void IVisitor.LocalBlockEnd(Size size, Size intermediateSize)

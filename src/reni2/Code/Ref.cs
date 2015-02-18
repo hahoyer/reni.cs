@@ -19,12 +19,12 @@ namespace Reni.Code
 
         protected Ref(Size offset) { Offset = offset; }
 
-        protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
+        protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
 
-        protected override string GetNodeDump() { return base.GetNodeDump() + " Offset=" + Offset; }
+        protected override string GetNodeDump() => base.GetNodeDump() + " Offset=" + Offset;
 
         [Node]
         [DisableDump]
-        internal override bool IsRelativeReference { get { return true; } }
+        internal override bool IsRelativeReference => true;
     }
 }

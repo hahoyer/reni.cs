@@ -90,8 +90,8 @@ namespace Reni.Code
             return Tail(i.Value);
         }
 
-        StackData Head(int value) { return SubString(0, value); }
-        StackData Tail(int value) { return SubString(value, _data.Length - value); }
+        StackData Head(int value) => SubString(0, value);
+        StackData Tail(int value) => SubString(value, _data.Length - value);
 
         StackData SubString(int start, int length)
         {
@@ -111,11 +111,11 @@ namespace Reni.Code
             }
         }
 
-        internal override StackData PushOnto(NonListStackData formerStack) { return new ListStack(_data, formerStack); }
-        internal override StackData PushOnto(ListStack formerStack) { return new ListStack(_data, formerStack); }
-        internal override BitsConst GetBitsConst() { return _data.Aggregate(BitsConst.None(), Paste); }
-        static BitsConst Paste(BitsConst bitsConst, NonListStackData data) { return bitsConst.Concat(data.GetBitsConst()); }
-        internal override StackData Push(StackData formerStack) { return formerStack.PushOnto(this); }
+        internal override StackData PushOnto(NonListStackData formerStack) => new ListStack(_data, formerStack);
+        internal override StackData PushOnto(ListStack formerStack) => new ListStack(_data, formerStack);
+        internal override BitsConst GetBitsConst() => _data.Aggregate(BitsConst.None(), Paste);
+        static BitsConst Paste(BitsConst bitsConst, NonListStackData data) => bitsConst.Concat(data.GetBitsConst());
+        internal override StackData Push(StackData formerStack) => formerStack.PushOnto(this);
         internal override Size Size { get { return _data.Aggregate(Size.Zero, (current, data) => current + data.Size); } }
     }
 
@@ -123,8 +123,8 @@ namespace Reni.Code
     {
         protected NonListStackData(IOutStream outStream)
             : base(outStream) { }
-        internal override StackData Push(StackData stackData) { return stackData.PushOnto(this); }
-        internal override StackData PushOnto(NonListStackData formerStack) { return new ListStack(this, formerStack); }
-        internal override StackData PushOnto(ListStack formerStack) { return new ListStack(this, formerStack); }
+        internal override StackData Push(StackData stackData) => stackData.PushOnto(this);
+        internal override StackData PushOnto(NonListStackData formerStack) => new ListStack(this, formerStack);
+        internal override StackData PushOnto(ListStack formerStack) => new ListStack(this, formerStack);
     }
 }

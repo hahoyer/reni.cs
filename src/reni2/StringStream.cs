@@ -32,9 +32,9 @@ namespace Reni
     {
         readonly StringBuilder _data = new StringBuilder();
         readonly StringBuilder _log = new StringBuilder();
-        internal string Data { get { return _data.ToString(); } }
-        internal string Log { get { return _log.ToString(); } }
-        void IOutStream.AddData(string text) { _data.Append(text); }
-        void IOutStream.AddLog(string text) { _log.Append(text); }
+        internal string Data => _data.ToString();
+        internal string Log => _log.ToString();
+        void IOutStream.AddData(string text) => _data.Append(text);
+        void IOutStream.AddLog(string text) => _log.Append(text);
     }
 }

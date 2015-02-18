@@ -14,10 +14,7 @@ namespace Reni.FeatureTest
 {
     public class TextStruct : CompilerTest
     {
-        static string Definition()
-        {
-            return
-                @"
+        static string Definition() => @"
 systemdata:
 { 
     Memory: ((0 type * ('100' to_number_of_base 64)) mutable) instance();
@@ -80,7 +77,6 @@ Text: /\
     }
 }
 ";
-        }
 
         protected override string Target => Definition() + "; " + InstanceCode + " dump_print";
         protected virtual string InstanceCode => GetStringAttribute<InstanceCodeAttribute>();

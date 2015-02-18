@@ -60,6 +60,6 @@ namespace Reni.Context
             return Fiber(visitedObject, null, newItems);
         }
 
-        internal override FiberItem Call(Call visitedObject) { return visitedObject.TryConvertToRecursiveCall(_functionId); }
+        internal override FiberItem Call(Call visitedObject) => visitedObject.TryConvertToRecursiveCall(_functionId);
     }
 }

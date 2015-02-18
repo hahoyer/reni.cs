@@ -82,19 +82,15 @@ namespace Reni.Type
 
         protected override Size GetSize() => Parent.Size;
 
-        Result TextItemResult(Category category)
-        {
-            return Parent
-                .TextItem
-                .Pointer
-                .Result
-                (
-                    category,
-                    Parent
-                        .Pointer
-                        .Result(category, ObjectResult(category.Typed)))
-                ;
-        }
+        Result TextItemResult(Category category) => Parent
+            .TextItem
+            .Pointer
+            .Result
+            (
+                category,
+                Parent
+                    .Pointer
+                    .Result(category, ObjectResult(category.Typed)));
 
         Result NegationResult(Category category) => ((NumberType) _zeroResult.Value.Type)
             .OperationResult(category, _minusOperation, this)

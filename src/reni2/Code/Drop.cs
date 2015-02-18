@@ -39,14 +39,14 @@ namespace Reni.Code
             _afterSize = afterSize;
         }
 
-        internal override void Visit(IVisitor visitor) { visitor.Drop(_beforeSize, _afterSize); }
+        internal override void Visit(IVisitor visitor) => visitor.Drop(_beforeSize, _afterSize);
 
         [DisableDump]
-        internal override Size InputSize { get { return _beforeSize; } }
+        internal override Size InputSize => _beforeSize;
 
         [DisableDump]
-        internal override Size OutputSize { get { return _afterSize; } }
+        internal override Size OutputSize => _afterSize;
 
-        protected override string GetNodeDump() { return base.GetNodeDump() + " BeforeSize=" + _beforeSize + " AfterSize=" + _afterSize; }
+        protected override string GetNodeDump() => base.GetNodeDump() + " BeforeSize=" + _beforeSize + " AfterSize=" + _afterSize;
     }
 }

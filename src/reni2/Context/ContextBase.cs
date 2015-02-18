@@ -81,7 +81,7 @@ namespace Reni.Context
             return result;
         }
 
-        internal ResultCache ResultCache(CompileSyntax syntax) { return _cache.ResultCache[syntax]; }
+        internal ResultCache ResultCache(CompileSyntax syntax) => _cache.ResultCache[syntax];
 
         internal TypeBase TypeIfKnown(CompileSyntax syntax) => _cache.ResultCache[syntax].Data.Type;
 

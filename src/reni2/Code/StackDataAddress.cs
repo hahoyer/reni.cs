@@ -20,11 +20,11 @@ namespace Reni.Code
             _offset = offset;
         }
 
-        internal override Size Size { get { return DataStack.RefSize; } }
+        internal override Size Size => DataStack.RefSize;
 
-        internal new StackData Dereference(Size size, Size dataSize) { return _data.GetTop(_offset, size).BitCast(dataSize).BitCast(size); }
+        internal new StackData Dereference(Size size, Size dataSize) => _data.GetTop(_offset, size).BitCast(dataSize).BitCast(size);
 
-        internal new void Assign(Size size, StackData right) { _data.SetTop(_offset, right.Dereference(size,size)); }
+        internal new void Assign(Size size, StackData right) => _data.SetTop(_offset, right.Dereference(size,size));
 
         internal new StackData RefPlus(Size offset)
         {
@@ -33,7 +33,7 @@ namespace Reni.Code
             return new StackDataAddress(_data, offset + _offset, OutStream);
         }
 
-        protected override StackDataAddress GetAddress() { return this; }
+        protected override StackDataAddress GetAddress() => this;
 
         protected override string Dump(bool isRecursion)
         {

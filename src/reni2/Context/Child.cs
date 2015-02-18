@@ -23,17 +23,14 @@ namespace Reni.Context
         internal Child(ContextBase parent) { _parent = parent; }
 
         [Node]
-        internal ContextBase Parent { get { return _parent; } }
+        internal ContextBase Parent => _parent;
 
         [DisableDump]
-        internal override Root RootContext { get { return Parent.RootContext; } }
-        public override sealed string DumpPrintText
-        {
-            get { return ChildDumpPrintText + (Parent == RootContext ? "" : " in " + _parent.DumpPrintText); }
-        }
+        internal override Root RootContext => Parent.RootContext;
+        public override sealed string DumpPrintText => ChildDumpPrintText + (Parent == RootContext ? "" : " in " + _parent.DumpPrintText);
         protected abstract string ChildDumpPrintText { get; }
-        internal override CompoundView ObtainRecentCompoundView() { return Parent.ObtainRecentCompoundView(); }
-        internal override IFunctionContext ObtainRecentFunctionContext() { return Parent.ObtainRecentFunctionContext(); }
+        internal override CompoundView ObtainRecentCompoundView() => Parent.ObtainRecentCompoundView();
+        internal override IFunctionContext ObtainRecentFunctionContext() => Parent.ObtainRecentFunctionContext();
         internal override IEnumerable<ContextSearchResult> Declarations<TDefinable>(TDefinable tokenClass)
         {
             var result = base.Declarations(tokenClass).ToArray();

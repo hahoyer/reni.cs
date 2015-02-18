@@ -41,6 +41,6 @@ namespace Reni.FeatureTest.Structure
     public sealed class Access : CompilerTest
     {
         [Test]
-        public override void Run() { BaseRun(); }
+        public override void Run() => BaseRun();
     }
 }

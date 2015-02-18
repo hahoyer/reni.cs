@@ -273,13 +273,7 @@ this.Write("\r\n            return data;\r\n\t\t}\r\n\t");
         /// <summary>
         /// Gets the current indent we use when adding lines to the output
         /// </summary>
-        public string CurrentIndent
-        {
-            get
-            {
-                return this.currentIndentField;
-            }
-        }
+        public string CurrentIndent => this.currentIndentField;
         /// <summary>
         /// Current transformation session
         /// </summary>
@@ -350,17 +344,11 @@ this.Write("\r\n            return data;\r\n\t\t}\r\n\t");
         /// <summary>
         /// Write formatted text directly into the generated output
         /// </summary>
-        public void Write(string format, params object[] args)
-        {
-            this.Write(string.Format(global::System.Globalization.CultureInfo.CurrentCulture, format, args));
-        }
+        public void Write(string format, params object[] args) => this.Write(string.Format(global::System.Globalization.CultureInfo.CurrentCulture, format, args));
         /// <summary>
         /// Write formatted text directly into the generated output
         /// </summary>
-        public void WriteLine(string format, params object[] args)
-        {
-            this.WriteLine(string.Format(global::System.Globalization.CultureInfo.CurrentCulture, format, args));
-        }
+        public void WriteLine(string format, params object[] args) => this.WriteLine(string.Format(global::System.Globalization.CultureInfo.CurrentCulture, format, args));
         /// <summary>
         /// Raise an error
         /// </summary>
@@ -470,13 +458,8 @@ this.Write("\r\n            return data;\r\n\t\t}\r\n\t");
         /// <summary>
         /// Helper to produce culture-oriented representation of an object as a string
         /// </summary>
-        public ToStringInstanceHelper ToStringHelper
-        {
-            get
-            {
-                return this.toStringHelperField;
-            }
-        }
+        public ToStringInstanceHelper ToStringHelper => this.toStringHelperField;
+
         #endregion
     }
     #endregion

@@ -40,6 +40,6 @@ namespace Reni.Code
         /// </summary>
         /// <value> The instance. </value>
         /// created 03.10.2006 01:24
-        public static None Instance { get { return _instance; } }
+        public static None Instance => _instance;
     }
 }

@@ -24,7 +24,7 @@ namespace ReniTest
             Application.SetCompatibleTextRenderingDefault(false);
 
             //if(false)
-            ExecTest();
+            //ExecTest();
 
             if(Debugger.IsAttached)
                 TestRunner.IsModeErrorFocus = true;

@@ -12,6 +12,6 @@ namespace Reni.FeatureTest.Function
     public sealed class FunctionWithRefArg : CompilerTest
     {
         [Test]
-        public override void Run() { BaseRun(); }
+        public override void Run() => BaseRun();
     }
 }

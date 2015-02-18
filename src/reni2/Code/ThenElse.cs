@@ -34,7 +34,7 @@ namespace Reni.Code
             ElseCode = elseCode;
         }
 
-        protected override CodeArgs GetRefsImplementation() { return ThenCode.Exts.Sequence(ElseCode.Exts); }
+        protected override CodeArgs GetRefsImplementation() => ThenCode.Exts.Sequence(ElseCode.Exts);
 
         internal override FiberItem[] TryToCombineBack(BitCast preceding)
         {
@@ -47,18 +47,12 @@ namespace Reni.Code
             };
         }
 
-        internal override Size InputSize { get { return _condSize; } }
-        internal override Size OutputSize { get { return ThenCode.Size; } }
-        internal override bool HasArg { get { return ThenCode.HasArg || ElseCode.HasArg; } }
-        protected override Size GetAdditionalTemporarySize()
-        {
-            return ThenCode.TemporarySize.Max(ElseCode.TemporarySize).Max(OutputSize) - OutputSize;
-        }
-        protected override FiberItem VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.ThenElse(this); }
-        internal override void Visit(IVisitor visitor) { visitor.ThenElse(_condSize, ThenCode, ElseCode); }
-        internal FiberItem ReCreate(CodeBase newThen, CodeBase newElse)
-        {
-            return new ThenElse(_condSize, newThen ?? ThenCode, newElse ?? ElseCode);
-        }
+        internal override Size InputSize => _condSize;
+        internal override Size OutputSize => ThenCode.Size;
+        internal override bool HasArg => ThenCode.HasArg || ElseCode.HasArg;
+        protected override Size GetAdditionalTemporarySize() => ThenCode.TemporarySize.Max(ElseCode.TemporarySize).Max(OutputSize) - OutputSize;
+        protected override FiberItem VisitImplementation<TResult>(Visitor<TResult> actual) => actual.ThenElse(this);
+        internal override void Visit(IVisitor visitor) => visitor.ThenElse(_condSize, ThenCode, ElseCode);
+        internal FiberItem ReCreate(CodeBase newThen, CodeBase newElse) => new ThenElse(_condSize, newThen ?? ThenCode, newElse ?? ElseCode);
     }
 }

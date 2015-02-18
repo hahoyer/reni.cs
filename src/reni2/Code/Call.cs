@@ -53,16 +53,16 @@ namespace Reni.Code
         }
 
         [DisableDump]
-        internal override Size InputSize { get { return ArgsAndRefsSize; } }
+        internal override Size InputSize => ArgsAndRefsSize;
 
         [DisableDump]
-        internal override Size OutputSize { get { return _resultSize; } }
+        internal override Size OutputSize => _resultSize;
 
-        protected override FiberItem VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.Call(this); }
+        protected override FiberItem VisitImplementation<TResult>(Visitor<TResult> actual) => actual.Call(this);
 
-        protected override string GetNodeDump() { return base.GetNodeDump() + " FunctionId=" + FunctionId + " ArgsAndRefsSize=" + ArgsAndRefsSize; }
+        protected override string GetNodeDump() => base.GetNodeDump() + " FunctionId=" + FunctionId + " ArgsAndRefsSize=" + ArgsAndRefsSize;
 
-        internal override void Visit(IVisitor visitor) { visitor.Call(OutputSize, FunctionId, ArgsAndRefsSize); }
+        internal override void Visit(IVisitor visitor) => visitor.Call(OutputSize, FunctionId, ArgsAndRefsSize);
 
         public FiberItem TryConvertToRecursiveCall(FunctionId functionId)
         {

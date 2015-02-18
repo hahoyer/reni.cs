@@ -15,8 +15,9 @@ namespace Reni.Code
 {
     abstract class CodeBase : DumpableObject, IIconKeyProvider, IFormalCodeItem, IAggregateable<CodeBase>
     {
+
         protected CodeBase(int objectId)
-            : base(objectId) {}
+            : base(objectId) { }
 
         [Node]
         [DisableDump]
@@ -35,6 +36,7 @@ namespace Reni.Code
         internal virtual bool IsRelativeReference => false;
 
         protected virtual Size GetTemporarySize() => Size;
+
 
         [DisableDump]
         internal bool HasArg => Visit(new HasArgVisitor());
@@ -70,7 +72,7 @@ namespace Reni.Code
         protected abstract Size GetSize();
 
         protected virtual CodeArgs GetRefsImplementation() => CodeArgs.Void();
-
+        
         internal CodeBase Assignment(Size size)
         {
             var refAlignParam = Root.DefaultRefAlignParam;

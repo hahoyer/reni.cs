@@ -23,9 +23,9 @@ namespace Reni.Validation
         }
 
         internal abstract string LogDump { get; }
-        internal ConsequentialError ConsequentialError(SourcePart position) { return _consequentialError[position]; }
-        protected string Tag { get { return IssueId.Tag; } }
-        internal IssueType Type(Root rootContext) { return new IssueType(this, rootContext); }
-        internal virtual CodeBase Code { get { return CodeBase.Issue(this); } }
+        internal ConsequentialError ConsequentialError(SourcePart position) => _consequentialError[position];
+        protected string Tag => IssueId.Tag;
+        internal IssueType Type(Root rootContext) => new IssueType(this, rootContext);
+        internal virtual CodeBase Code => CodeBase.Issue(this);
     }
 }

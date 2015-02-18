@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using hw.Debug;
+using hw.Forms;
+using hw.Helper;
 using JetBrains.Annotations;
 using Reni.Basics;
 
@@ -112,31 +114,64 @@ namespace Reni.Runtime
             return Create(y.ToByteArray());
         }
 
-        string Dump { get { return Pointer(0).AddressDump + ": " + DataDump; } }
+        [UsedImplicitly]
+        string Dump => Pointer(0).AddressDump + ": " + DataDump;
 
-        string DataDump
+        string DataDump => DataDumpPart();
+
+        string DataDumpPart()
         {
-            get
-            {
-                var result = "";
-                for(var i = 0; i < _data.Length; i++)
-                {
-                    if(StartIndex == i)
-                        result += "[" + _length + ":";
-
-                    result += _data[i].ToString();
-                    if(i < _data.Length - 1)
-                        result += " ";
-                }
-                if(StartIndex == _data.Length)
-                    result += " [" + _length + ":";
-                return result + "]";
-            }
+            var result = "";
+            result += DumpRange(0, StartIndex);
+            result += " ";
+            result += DumpLengthAndRange(StartIndex, _length);
+            return result;
         }
+        string DumpLengthAndRange(int startIndex, int bytes) => "[" + bytes + ": "+ DumpRange(startIndex, bytes)+ "]";
+
+        string DumpRange(int startIndex, int bytes)
+        {
+            if(bytes <= 0)
+                return "";
+            return 
+                _data
+                    .Skip(startIndex)
+                    .Take(bytes)
+                    .Select(d => d.ToString())
+                    .Stringify(" ");
+        }
+
 
         static readonly BiasCache _biasCache = new BiasCache(100);
         [UsedImplicitly]
-        string AddressDump { get { return _biasCache.AddressDump(this) + "=" + DataDump; } }
+        string AddressDump => _biasCache.AddressDump(this) + "=" + DataDump;
+
+        public IView GetCurrentView(int bytes) => new View(this, StartIndex, bytes);
+
+
+        public interface IView
+        {
+             
+        }
+
+        public sealed class View : DumpableObject, IView
+        {
+            readonly Data _parent;
+            readonly int _startIndex;
+            readonly int _bytes;
+
+            public View(Data parent, int startIndex, int bytes)
+            {
+                _parent = parent;
+                _startIndex = startIndex;
+                _bytes = bytes;
+            }
+
+            public override string ToString()
+                => Create(_parent._data.Pointer(_startIndex)).AddressDump
+                    + ": "
+                    + _parent.DumpLengthAndRange(_startIndex, _bytes);
+        }
 
         [UsedImplicitly]
         public void Equal(int sizeBytes, int leftBytes, int rightBytes)

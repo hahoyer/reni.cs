@@ -33,6 +33,6 @@ namespace Reni.ReniParser
         protected override TokenClass GetTokenClass(string name) { throw new NotImplementedException(); }
         protected override TokenClass GetNumber() { throw new NotImplementedException(); }
         protected override TokenClass GetText() { throw new NotImplementedException(); }
-        protected override TokenClass GetError(Match.IError message) { return new SyntaxError(message); }
+        protected override TokenClass GetError(Match.IError message) => new SyntaxError(message);
     }
 }

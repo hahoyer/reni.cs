@@ -44,7 +44,7 @@ namespace Reni.Code
             return fiber;
         }
 
-        internal override void Visit(IVisitor visitor) { visitor.TopData(Offset, Size, DataSize); }
+        internal override void Visit(IVisitor visitor) => visitor.TopData(Offset, Size, DataSize);
     }
 
     /// <summary>
@@ -63,6 +63,6 @@ namespace Reni.Code
             return fiber;
         }
 
-        internal override void Visit(IVisitor visitor) { visitor.TopFrameData(Offset, Size, DataSize); }
+        internal override void Visit(IVisitor visitor) => visitor.TopFrameData(Offset, Size, DataSize);
     }
 }

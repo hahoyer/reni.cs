@@ -54,12 +54,12 @@ namespace Reni.Code
         }
 
         [DisableDump]
-        internal override Size OutputSize { get { return _outputSize; } }
+        internal override Size OutputSize => _outputSize;
 
         [DisableDump]
-        internal override Size InputSize { get { return _inputSize; } }
+        internal override Size InputSize => _inputSize;
 
-        protected override FiberItem[] TryToCombineImplementation(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
+        protected override FiberItem[] TryToCombineImplementation(FiberItem subsequentElement) => subsequentElement.TryToCombineBack(this);
 
         internal override FiberItem[] TryToCombineBack(BitCast preceding)
         {
@@ -79,9 +79,9 @@ namespace Reni.Code
             return new BitArray(OutputSize, bitsConst);
         }
 
-        protected override string GetNodeDump() { return base.GetNodeDump() + " InputSize=" + InputSize + " InputDataSize=" + InputDataSize; }
+        protected override string GetNodeDump() => base.GetNodeDump() + " InputSize=" + InputSize + " InputDataSize=" + InputDataSize;
 
-        internal override void Visit(IVisitor visitor) { visitor.BitCast(OutputSize, InputSize, InputDataSize); }
+        internal override void Visit(IVisitor visitor) => visitor.BitCast(OutputSize, InputSize, InputDataSize);
 
         internal override CodeBase TryToCombineBack(TopData precedingElement)
         {

@@ -78,21 +78,21 @@ namespace Reni
         }
 
         [SmartNode]
-        public List<IContextReference> Data { get { return _data; } }
+        public List<IContextReference> Data => _data;
 
         [DisableDump]
-        SizeArray Sizes { get { return _sizesCache ?? (_sizesCache = CalculateSizes()); } }
+        SizeArray Sizes => _sizesCache ?? (_sizesCache = CalculateSizes());
 
-        internal bool HasArg { get { return Contains(CodeArg.Instance); } }
-        public int Count { get { return _data.Count; } }
+        internal bool HasArg => Contains(CodeArg.Instance);
+        public int Count => _data.Count;
 
-        public IContextReference this[int i] { get { return _data[i]; } }
-        public Size Size { get { return Sizes.Size; } }
-        public bool IsNone { get { return Count == 0; } }
-        public IContextReference[] SortedData { get { return _sortedDataCache.Value; } }
+        public IContextReference this[int i] => _data[i];
+        public Size Size => Sizes.Size;
+        public bool IsNone => Count == 0;
+        public IContextReference[] SortedData => _sortedDataCache.Value;
 
-        internal static CodeArgs Void() { return new CodeArgs(); }
-        internal static CodeArgs Arg() { return new CodeArgs(CodeArg.Instance); }
+        internal static CodeArgs Void() => new CodeArgs();
+        internal static CodeArgs Arg() => new CodeArgs(CodeArg.Instance);
 
         public CodeArgs Sequence(CodeArgs codeArgs)
         {
@@ -103,7 +103,7 @@ namespace Reni
             return new CodeArgs(_data, codeArgs._data);
         }
 
-        internal static CodeArgs Create(IContextReference contextReference) { return new CodeArgs(contextReference); }
+        internal static CodeArgs Create(IContextReference contextReference) => new CodeArgs(contextReference);
 
         protected override string GetNodeDump()
         {
@@ -142,9 +142,9 @@ namespace Reni
         }
 
         IContextReference[] ObtainSortedData() { return _data.OrderBy(codeArg => codeArg.Order).ToArray(); }
-        public CodeArgs WithoutArg() { return Without(CodeArg.Instance); }
+        public CodeArgs WithoutArg() => Without(CodeArg.Instance);
         public CodeArgs Without(CodeArgs other) { return other._data.Aggregate(this, (current, refInCode) => current.Without(refInCode)); }
-        public bool Contains(IContextReference context) { return _data.Contains(context); }
+        public bool Contains(IContextReference context) => _data.Contains(context);
         public bool Contains(CodeArgs other)
         {
             if(Count < other.Count)
@@ -209,10 +209,10 @@ namespace Reni
             }
         }
 
-        public static CodeArgs operator +(CodeArgs x, CodeArgs y) { return x.Sequence(y); }
-        public static CodeArgs operator -(CodeArgs x, CodeArgs y) { return x.Without(y); }
-        public static CodeArgs operator -(CodeArgs x, IContextReference y) { return x.Without(y); }
-        IEnumerable<TreeNode> ITreeNodeSupport.CreateNodes() { return _data.CreateNodes(); }
+        public static CodeArgs operator +(CodeArgs x, CodeArgs y) => x.Sequence(y);
+        public static CodeArgs operator -(CodeArgs x, CodeArgs y) => x.Without(y);
+        public static CodeArgs operator -(CodeArgs x, IContextReference y) => x.Without(y);
+        IEnumerable<TreeNode> ITreeNodeSupport.CreateNodes() => _data.CreateNodes();
 
         sealed class CodeArg : Singleton<CodeArg, DumpableObject>, IContextReference
         {
@@ -224,8 +224,8 @@ namespace Reni
                     return null;
                 }
             }
-            int IContextReference.Order { get { return -1; } }
-            protected override string GetNodeDump() { return "CodeArg"; }
+            int IContextReference.Order => -1;
+            protected override string GetNodeDump() => "CodeArg";
         }
     }
 }

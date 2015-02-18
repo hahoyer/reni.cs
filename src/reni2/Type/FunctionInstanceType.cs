@@ -11,8 +11,8 @@ namespace Reni.Type
         public FunctionInstanceType(TypeBase parent)
             : base(parent) { }
         [DisableDump]
-        protected override string TagTitle { get { return "function_instance"; } }
+        protected override string TagTitle => "function_instance";
         [DisableDump]
-        internal override CompoundView FindRecentCompoundView { get { return Parent.FindRecentCompoundView; } }
+        internal override CompoundView FindRecentCompoundView => Parent.FindRecentCompoundView;
     }
 }

@@ -16,7 +16,7 @@ namespace Reni.Code
         protected FiberHead()
             : base(_nextObjectId++) { }
 
-        protected virtual CodeBase TryToCombine(FiberItem subsequentElement) { return null; }
+        protected virtual CodeBase TryToCombine(FiberItem subsequentElement) => null;
 
         internal override CodeBase Add(FiberItem subsequentElement)
         {
@@ -28,9 +28,9 @@ namespace Reni.Code
         }
 
         [DisableDump]
-        internal override IEnumerable<IssueBase> Issues { get { return IssueBase.Empty; } }
+        internal override IEnumerable<IssueBase> Issues => IssueBase.Empty;
 
         [DisableDump]
-        internal virtual bool IsNonFiberHeadList { get { return false; } }
+        internal virtual bool IsNonFiberHeadList => false;
     }
 }

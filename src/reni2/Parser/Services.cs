@@ -12,7 +12,7 @@ namespace Reni.Parser
 {
     public static class Services
     {
-        public static PrioTable FormatPrioTable(this string text) { return PrioTable.FromText(text); }
+        public static PrioTable FormatPrioTable(this string text) => PrioTable.FromText(text);
 
         public static Image SyntaxGraph(this PrioTable prioTable, string code)
         {
@@ -48,11 +48,11 @@ namespace Reni.Parser
         internal abstract class TokenClass : DumpableObject, IType<Syntax>, INameProvider
         {
             string _name;
-            Syntax IType<Syntax>.Create(Syntax left, SourcePart part, Syntax right) { return Create(left, part, right); }
-            string IType<Syntax>.PrioTableName { get { return _name; } }
-            ISubParser<Syntax> IType<Syntax>.NextParser { get { return null; } }
-            IType<Syntax> IType<Syntax>.NextTypeIfMatched { get { return NextTypeIfMatched; } }
-            virtual internal IType<Syntax> NextTypeIfMatched { get { return null; } }
+            Syntax IType<Syntax>.Create(Syntax left, SourcePart part, Syntax right) => Create(left, part, right);
+            string IType<Syntax>.PrioTableName => _name;
+            ISubParser<Syntax> IType<Syntax>.NextParser => null;
+            IType<Syntax> IType<Syntax>.NextTypeIfMatched => NextTypeIfMatched;
+            virtual internal IType<Syntax> NextTypeIfMatched => null;
             protected abstract Syntax Create(Syntax left, SourcePart token, Syntax right);
             string INameProvider.Name { set { _name = value; } }
         }
@@ -65,21 +65,21 @@ namespace Reni.Parser
             protected Syntax(SourcePart token) { _token = token; }
 
             [DisableDump]
-            string IIconKeyProvider.IconKey { get { return "Syntax"; } }
+            string IIconKeyProvider.IconKey => "Syntax";
 
             [DisableDump]
-            protected virtual SourcePart FirstToken { get { return _token; } }
+            protected virtual SourcePart FirstToken => _token;
 
             [DisableDump]
-            internal virtual SourcePart LastToken { get { return _token; } }
+            internal virtual SourcePart LastToken => _token;
 
-            public string Title { get { return _token.Name; } }
+            public string Title => _token.Name;
 
             [DisableDump]
-            public IGraphTarget[] Children { get { return new[] {Left, Right}; } }
+            public IGraphTarget[] Children => new[] {Left, Right};
 
-            protected virtual IGraphTarget Right { get { return null; } }
-            protected virtual IGraphTarget Left { get { return null; } }
+            protected virtual IGraphTarget Right => null;
+            protected virtual IGraphTarget Left => null;
 
             internal static Syntax CreateSyntax(Syntax left, SourcePart token, Syntax right)
             {
@@ -105,10 +105,10 @@ namespace Reni.Parser
                     _left = left;
                     _right = right;
                 }
-                protected override SourcePart FirstToken { get { return _left.FirstToken; } }
-                internal override SourcePart LastToken { get { return _right.LastToken; } }
-                protected override IGraphTarget Right { get { return _right; } }
-                protected override IGraphTarget Left { get { return _left; } }
+                protected override SourcePart FirstToken => _left.FirstToken;
+                internal override SourcePart LastToken => _right.LastToken;
+                protected override IGraphTarget Right => _right;
+                protected override IGraphTarget Left => _left;
             }
 
             sealed class SuffixSyntax : Syntax
@@ -119,8 +119,8 @@ namespace Reni.Parser
                 {
                     _left = left;
                 }
-                protected override SourcePart FirstToken { get { return _left.FirstToken; } }
-                protected override IGraphTarget Left { get { return _left; } }
+                protected override SourcePart FirstToken => _left.FirstToken;
+                protected override IGraphTarget Left => _left;
             }
 
             sealed class PrefixSyntax : Syntax
@@ -131,8 +131,8 @@ namespace Reni.Parser
                 {
                     _right = right;
                 }
-                internal override SourcePart LastToken { get { return _right.LastToken; } }
-                protected override IGraphTarget Right { get { return _right; } }
+                internal override SourcePart LastToken => _right.LastToken;
+                protected override IGraphTarget Right => _right;
             }
 
             sealed class TerminalSyntax : Syntax
@@ -140,17 +140,11 @@ namespace Reni.Parser
                 public TerminalSyntax(SourcePart token)
                     : base(token)
                 {}
-                internal override Syntax ParenthesisMatch(SourcePart token, Syntax argument)
-                {
-                    return CreateSyntax(null, FirstToken, argument);
-                }
+                internal override Syntax ParenthesisMatch(SourcePart token, Syntax argument) => CreateSyntax(null, FirstToken, argument);
             }
 
-            internal virtual Syntax Match(int level, SourcePart token) { return new InfixSyntax(this, token, null); }
-            internal virtual Syntax ParenthesisMatch(SourcePart token, Syntax argument)
-            {
-                return CreateSyntax(this, token, argument);
-            }
+            internal virtual Syntax Match(int level, SourcePart token) => new InfixSyntax(this, token, null);
+            internal virtual Syntax ParenthesisMatch(SourcePart token, Syntax argument) => CreateSyntax(this, token, argument);
         }
     }
 }

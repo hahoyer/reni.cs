@@ -31,7 +31,7 @@ namespace Reni.Code
     {
         readonly IContextReference _container;
         protected CodeBaseException(IContextReference container) { _container = container; }
-        public override string Message { get { return _container.ToString(); } }
+        public override string Message => _container.ToString();
     }
 
     sealed class UnexpectedContextReference : CodeBaseException

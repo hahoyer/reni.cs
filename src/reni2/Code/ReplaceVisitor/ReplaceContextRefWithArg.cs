@@ -59,7 +59,7 @@ namespace Reni.Code.ReplaceVisitor
 
         protected override Visitor<CodeBase> After(Size size) { return new ReplaceRelativeContextRef<TContext>(Context, () => AfterCode(size)); }
 
-        CodeBase AfterCode(Size size) { return Replacement().ReferencePlus(size); }
+        CodeBase AfterCode(Size size) => Replacement().ReferencePlus(size);
     }
 
     sealed class ReplaceAbsoluteContextRef<TContext> : ReplaceContextRef<TContext>

@@ -41,8 +41,8 @@ namespace Reni.Struct
                 .Setter(index);
         }
 
-        protected override FunctionId FunctionId { get { return _functionId; } }
-        protected override TypeBase CallType { get { return base.CallType.Pair(Parent.ValueType.Pointer); } }
-        protected override Size RelevantValueSize { get { return Root.DefaultRefAlignParam.RefSize; } }
+        protected override FunctionId FunctionId => _functionId;
+        protected override TypeBase CallType => base.CallType.Pair(Parent.ValueType.Pointer);
+        protected override Size RelevantValueSize => Root.DefaultRefAlignParam.RefSize;
     }
 }

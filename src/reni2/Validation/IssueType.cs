@@ -23,16 +23,16 @@ namespace Reni.Validation
         }
 
         [DisableDump]
-        internal override Root RootContext { get { return _rootContext; } }
+        internal override Root RootContext => _rootContext;
 
         [DisableDump]
-        internal override bool Hllw { get { return true; } }
-        internal override string DumpPrintText { get { return _issue.IssueId.Tag; } }
+        internal override bool Hllw => true;
+        internal override string DumpPrintText => _issue.IssueId.Tag;
 
-        internal Result IssueResult(Category category) { return Result(category, Code); }
-        IssueType ConsequentialErrorType(SourcePart position) { return _issue.ConsequentialError(position).Type(RootContext); }
+        internal Result IssueResult(Category category) => Result(category, Code);
+        IssueType ConsequentialErrorType(SourcePart position) => _issue.ConsequentialError(position).Type(RootContext);
 
-        CodeBase Code() { return _issue.Code; }
+        CodeBase Code() => _issue.Code;
 
         internal sealed class ImplicitSearchResult
             : DumpableObject

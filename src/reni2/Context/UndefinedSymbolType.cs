@@ -30,14 +30,8 @@ namespace Reni.Context
             }
         }
 
-        internal static IssueType Type(SourcePart position, TypeBase target)
-        {
-            return new IssueType(new UndefinedSymbolIssue(position, "Type: "+ target.DumpPrintText), target.RootContext);
-        }
-        public static IssueType Type(SourcePart position, ContextBase target)
-        {
-            return new IssueType(new UndefinedSymbolIssue(position, "Context: "+ target.DumpPrintText), target.RootContext);
-        }
+        internal static IssueType Type(SourcePart position, TypeBase target) => new IssueType(new UndefinedSymbolIssue(position, "Type: "+ target.DumpPrintText), target.RootContext);
+        public static IssueType Type(SourcePart position, ContextBase target) => new IssueType(new UndefinedSymbolIssue(position, "Context: "+ target.DumpPrintText), target.RootContext);
     }
 
     sealed class AmbiguousSymbolIssue : SyntaxIssue
@@ -48,9 +42,6 @@ namespace Reni.Context
             StopByObjectId(266);
         }
 
-        internal static IssueType Type(SourcePart position, Root rootContext)
-        {
-            return new IssueType(new AmbiguousSymbolIssue(position), rootContext);
-        }
+        internal static IssueType Type(SourcePart position, Root rootContext) => new IssueType(new AmbiguousSymbolIssue(position), rootContext);
     }
 }

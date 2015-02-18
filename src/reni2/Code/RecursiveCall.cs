@@ -30,7 +30,7 @@ namespace Reni.Code
 {
     sealed class RecursiveCall : FiberHead
     {
-        protected override Size GetSize() { return Size.Zero; }
-        internal override void Visit(IVisitor visitor) { visitor.RecursiveCall(); }
+        protected override Size GetSize() => Size.Zero;
+        internal override void Visit(IVisitor visitor) => visitor.RecursiveCall();
     }
 }

@@ -80,110 +80,35 @@ namespace ReniTest
         //}
         //; Text('abcdef') dump_print 
 
-        static Data MainData;
-        public static void MainFunction()
+        sealed class MyClass
+        {
+            public Data.IView Memory;
+            public Data.IView FreePointer;
+            public Data.IView Arg;
+            public Data.IView Arg_Base;
+            public Data.IView Arg_Pointer;
+        }
+
+        static readonly MyClass _views = new MyClass();
+
+        unsafe static public void MainFunction()
         {
             var data = Data.Create(4115);
-            MainData = data;
             data.SizedPush(4096, 0);
+            _views.Memory = data.GetCurrentView(4096);
             data.Push(data.Pointer(0));
-            data.SizedPush(1, 0);
-            data.SizedPush(1, 1);
-            data.Minus(1, 1, 1);
-            data.Push(data.Pull(1).BitCast(3).BitCast(8));
-            data.Push(data.Get(4, 1));
-            data.SizedPush(4, 0);
-            data.Plus(4, 4, 4);
-            data.Push(data.Pointer(4));
-            data.Assign(1);
-            data.Drop(1);
-            data.SizedPush(1, 0);
-            data.SizedPush(1, 1);
-            data.Minus(1, 1, 1);
-            data.Push(data.Pull(1).BitCast(3).BitCast(8));
-            data.Push(data.Get(4, 1));
-            data.SizedPush(4, 1);
-            data.Plus(4, 4, 4);
-            data.Push(data.Pointer(4));
-            data.Assign(1);
-            data.Drop(1);
-            data.SizedPush(1, 0);
-            data.SizedPush(1, 1);
-            data.Minus(1, 1, 1);
-            data.Push(data.Pull(1).BitCast(3).BitCast(8));
-            data.Push(data.Get(4, 1));
-            data.SizedPush(4, 2);
-            data.Plus(4, 4, 4);
-            data.Push(data.Pointer(4));
-            data.Assign(1);
-            data.Drop(1);
-            data.SizedPush(1, 0);
-            data.SizedPush(1, 1);
-            data.Minus(1, 1, 1);
-            data.Push(data.Pull(1).BitCast(3).BitCast(8));
-            data.Push(data.Get(4, 1));
-            data.SizedPush(4, 3);
-            data.Plus(4, 4, 4);
-            data.Push(data.Pointer(4));
-            data.Assign(1);
-            data.Drop(1);
-            data.SizedPush(1, 0);
-            data.SizedPush(1, 1);
-            data.Minus(1, 1, 1);
-            data.Push(data.Pull(1).BitCast(3).BitCast(8));
-            data.Push(data.Get(4, 1));
-            data.SizedPush(4, 4);
-            data.Plus(4, 4, 4);
-            data.Push(data.Pointer(4));
-            data.Assign(1);
-            data.Drop(1);
-            data.SizedPush(1, 0);
-            data.SizedPush(1, 1);
-            data.Minus(1, 1, 1);
-            data.Push(data.Pull(1).BitCast(3).BitCast(8));
-            data.Push(data.Get(4, 1));
-            data.SizedPush(4, 5);
-            data.Plus(4, 4, 4);
-            data.Push(data.Pointer(4));
-            data.Assign(1);
-            data.Drop(1);
-            data.SizedPush(1, 0);
-            data.SizedPush(1, 1);
-            data.Minus(1, 1, 1);
-            data.Push(data.Pull(1).BitCast(3).BitCast(8));
-            data.Push(data.Get(4, 1));
-            data.SizedPush(4, 6);
-            data.Plus(4, 4, 4);
-            data.Push(data.Pointer(4));
-            data.Assign(1);
-            data.Drop(1);
-            data.SizedPush(1, 0);
-            data.SizedPush(1, 1);
-            data.Minus(1, 1, 1);
-            data.Push(data.Pull(1).BitCast(3).BitCast(8));
-            data.Push(data.Get(4, 1));
-            data.SizedPush(4, 7);
-            data.Plus(4, 4, 4);
-            data.Push(data.Pointer(4));
-            data.Assign(1);
-            data.Drop(1);
-            data.SizedPush(1, 0);
-            data.SizedPush(1, 1);
-            data.Minus(1, 1, 1);
-            data.Push(data.Pull(1).BitCast(3).BitCast(8));
-            data.Push(data.Get(4, 1));
-            data.SizedPush(4, 64);
-            data.Plus(4, 4, 4);
-            data.Push(data.Pointer(4));
-            data.Assign(1);
-            data.Drop(1);
+            _views.FreePointer = data.GetCurrentView(4);
             data.SizedPush(6, 97, 98, 99, 100, 101, 102);
+            _views.Arg = data.GetCurrentView(6);
             data.Push(data.Pointer(6));
+            _views.Arg_Base = data.GetCurrentView(4);
             data.Push(data.Pointer(4));
+            _views.Arg_Pointer = data.GetCurrentView(4);
             data.Push(GetFunction0(data.Pull(8)));
             data.Push(data.Pointer(0));
             data.Push(GetFunction8(data.Pull(4)));
             data.Drop(12, 1);
+
         }
 
         // { !mutable data: ^ array_reference 

@@ -12,28 +12,22 @@ namespace Reni.Parser
     sealed class SimpleTokenFactory : TokenFactory<Services.TokenClass, Services.Syntax>
     {
         protected override Services.TokenClass GetError(Match.IError message) { throw new Exception("Syntax error: " + message); }
-        protected override IDictionary<string, Services.TokenClass> GetPredefinedTokenClasses()
+        protected override IDictionary<string, Services.TokenClass> GetPredefinedTokenClasses() => new Dictionary<string, Services.TokenClass>
         {
-            return new Dictionary<string, Services.TokenClass>
-            {
-                {"{", new OpenToken(1)},
-                {"(", new OpenToken(3)},
-                {"}", new CloseToken(1)},
-                {")", new CloseToken(3)}
-            };
-        }
-        protected override Services.TokenClass GetEndOfText() { return new CloseToken(0); }
-        protected override Services.TokenClass GetTokenClass(string name) { return CommonTokenClass; }
-        protected override Services.TokenClass GetNumber() { return CommonTokenClass; }
-        protected override Services.TokenClass GetText() { return CommonTokenClass; }
-        static Services.TokenClass CommonTokenClass { get { return new AnyTokenClass(); } }
+            {"{", new OpenToken(1)},
+            {"(", new OpenToken(3)},
+            {"}", new CloseToken(1)},
+            {")", new CloseToken(3)}
+        };
+        protected override Services.TokenClass GetEndOfText() => new CloseToken(0);
+        protected override Services.TokenClass GetTokenClass(string name) => CommonTokenClass;
+        protected override Services.TokenClass GetNumber() => CommonTokenClass;
+        protected override Services.TokenClass GetText() => CommonTokenClass;
+        static Services.TokenClass CommonTokenClass => new AnyTokenClass();
 
         sealed class AnyTokenClass : Services.TokenClass
         {
-            protected override Services.Syntax Create(Services.Syntax left, SourcePart token, Services.Syntax right)
-            {
-                return Services.Syntax.CreateSyntax(left, token, right);
-            }
+            protected override Services.Syntax Create(Services.Syntax left, SourcePart token, Services.Syntax right) => Services.Syntax.CreateSyntax(left, token, right);
         }
 
         sealed class CloseToken : Services.TokenClass
@@ -53,10 +47,7 @@ namespace Reni.Parser
             [EnableDump]
             readonly int _level;
             public OpenToken(int level) { _level = level; }
-            protected override Services.Syntax Create(Services.Syntax left, SourcePart token, Services.Syntax right)
-            {
-                return new OpenSyntax(left, token, right, _level);
-            }
+            protected override Services.Syntax Create(Services.Syntax left, SourcePart token, Services.Syntax right) => new OpenSyntax(left, token, right, _level);
         }
 
         sealed class OpenSyntax : Services.Syntax
@@ -72,8 +63,8 @@ namespace Reni.Parser
                 _right = right;
                 _level = level;
             }
-            protected override IGraphTarget Left { get { return _left; } }
-            protected override IGraphTarget Right { get { return _right; } }
+            protected override IGraphTarget Left => _left;
+            protected override IGraphTarget Right => _right;
             internal override Services.Syntax Match(int level, SourcePart token)
             {
                 Tracer.Assert(_level == level);
@@ -83,7 +74,7 @@ namespace Reni.Parser
                 return _left.ParenthesisMatch(FirstToken, argument);
             }
 
-            internal override SourcePart LastToken { get { return _right.LastToken; } }
+            internal override SourcePart LastToken => _right.LastToken;
         }
 
         sealed class EmptySyntax : Services.Syntax

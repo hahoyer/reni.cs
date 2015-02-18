@@ -29,10 +29,7 @@ namespace Reni.FeatureTest
         }
 
         internal void CreateFileAndRunCompiler
-            (string name, string text, string expectedOutput = null, Action<Compiler> expectedResult = null)
-        {
-            CreateFileAndRunCompiler(name, new TargetSetData(text, expectedOutput), expectedResult);
-        }
+            (string name, string text, string expectedOutput = null, Action<Compiler> expectedResult = null) => CreateFileAndRunCompiler(name, new TargetSetData(text, expectedOutput), expectedResult);
 
         void CreateFileAndRunCompiler
             (string name, TargetSetData targetSetData, Action<Compiler> expectedResult)
@@ -44,10 +41,7 @@ namespace Reni.FeatureTest
         }
 
         void InternalRunCompiler
-            (string fileName, Action<Compiler> expectedResult, TargetSetData targetSet)
-        {
-            InternalRunCompiler(Parameters, fileName, expectedResult, targetSet);
-        }
+            (string fileName, Action<Compiler> expectedResult, TargetSetData targetSet) => InternalRunCompiler(Parameters, fileName, expectedResult, targetSet);
 
         void InternalRunCompiler
             (CompilerParameters compilerParameters, string fileName, Action<Compiler> expectedResult, TargetSetData targetSet)
@@ -90,7 +84,7 @@ namespace Reni.FeatureTest
             Run();
         }
 
-        public virtual void Run() { BaseRun(1); }
+        public virtual void Run() => BaseRun(1);
 
         protected void BaseRun(int depth = 0)
         {
@@ -136,9 +130,9 @@ namespace Reni.FeatureTest
             }
         }
 
-        protected virtual string Output { get { return GetStringAttribute<OutputAttribute>(); } }
-        protected virtual string Target { get { return GetStringAttribute<TargetAttribute>(); } }
-        protected virtual void Verify(IEnumerable<IssueBase> issues) { Tracer.Assert(!issues.Any()); }
+        protected virtual string Output => GetStringAttribute<OutputAttribute>();
+        protected virtual string Target => GetStringAttribute<TargetAttribute>();
+        protected virtual void Verify(IEnumerable<IssueBase> issues) => Tracer.Assert(!issues.Any());
 
         protected virtual IEnumerable<System.Type> DependsOn
         {

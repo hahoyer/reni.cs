@@ -16,7 +16,7 @@ namespace Reni.Parser
         {
             public readonly IssueId IssueId;
             public Error(IssueId issueId) { IssueId = issueId; }
-            public override string ToString() { return IssueId.Tag; }
+            public override string ToString() => IssueId.Tag;
         }
 
         readonly Match _whiteSpaces;
@@ -64,9 +64,9 @@ namespace Reni.Parser
             return result.Value;
         }
 
-        int? ILexer.Number(SourcePosn sourcePosn) { return sourcePosn.Match(_number); }
-        int? ILexer.Any(SourcePosn sourcePosn) { return sourcePosn.Match(_any); }
-        int? ILexer.Text(SourcePosn sourcePosn) { return sourcePosn.Match(_text); }
-        public static IssueId Parse(Match.IError error) { return ((Error) error).IssueId; }
+        int? ILexer.Number(SourcePosn sourcePosn) => sourcePosn.Match(_number);
+        int? ILexer.Any(SourcePosn sourcePosn) => sourcePosn.Match(_any);
+        int? ILexer.Text(SourcePosn sourcePosn) => sourcePosn.Match(_text);
+        public static IssueId Parse(Match.IError error) => ((Error) error).IssueId;
     }
 }

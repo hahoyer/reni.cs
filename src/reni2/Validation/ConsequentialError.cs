@@ -15,6 +15,6 @@ namespace Reni.Validation
 
         public ConsequentialError(SourcePart position, IssueBase issueBase)
             : base(position, IssueId.ConsequentialError) { _issueBase = issueBase; }
-        internal override CodeBase Code { get { return _issueBase.Code + base.Code; } }
+        internal override CodeBase Code => _issueBase.Code + base.Code;
     }
 }

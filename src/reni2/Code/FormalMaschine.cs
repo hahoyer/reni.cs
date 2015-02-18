@@ -21,7 +21,7 @@ namespace Reni.Code
         int _nextValue;
         internal const string Names =
             "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
-        static Size RefSize { get { return Root.DefaultRefAlignParam.RefSize; } }
+        static Size RefSize => Root.DefaultRefAlignParam.RefSize;
 
         internal FormalMachine(Size dataSize)
         {
@@ -106,10 +106,7 @@ namespace Reni.Code
                 _data[i + (_startAddress + intermediateSize).ToInt()] = accesses[i];
         }
 
-        void IVisitor.Drop(Size beforeSize, Size afterSize)
-        {
-            ResetInputValuesOfData(beforeSize - afterSize);
-        }
+        void IVisitor.Drop(Size beforeSize, Size afterSize) => ResetInputValuesOfData(beforeSize - afterSize);
 
         void IVisitor.ReferencePlus(Size right)
         {
@@ -137,29 +134,17 @@ namespace Reni.Code
             SetFormalValues(element, startAddress, size);
         }
 
-        void IVisitor.Assign(Size targetSize) { ResetInputValuesOfData(RefSize * 2); }
-        void IVisitor.BitArrayPrefixOp(string operation, Size size, Size argSize)
-        {
-            NotImplementedMethod(operation, size, argSize);
-        }
-        void IVisitor.PrintText(string dumpPrintText) { NotImplementedMethod(dumpPrintText); }
-        void IVisitor.List(CodeBase[] data) { NotImplementedMethod(data); }
-        void IVisitor.Fiber(FiberHead fiberHead, FiberItem[] fiberItems)
-        {
-            NotImplementedMethod(fiberHead, fiberItems);
-        }
+        void IVisitor.Assign(Size targetSize) => ResetInputValuesOfData(RefSize * 2);
+        void IVisitor.BitArrayPrefixOp(string operation, Size size, Size argSize) => NotImplementedMethod(operation, size, argSize);
+        void IVisitor.PrintText(string dumpPrintText) => NotImplementedMethod(dumpPrintText);
+        void IVisitor.List(CodeBase[] data) => NotImplementedMethod(data);
+        void IVisitor.Fiber(FiberHead fiberHead, FiberItem[] fiberItems) => NotImplementedMethod(fiberHead, fiberItems);
         void IVisitor.RecursiveCall() { throw new NotImplementedException(); }
-        void IVisitor.ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode)
-        {
-            NotImplementedMethod(condSize, thenCode, elseCode);
-        }
-        void IVisitor.ReferenceCode(IContextReference context) { NotImplementedMethod(context); }
-        void IVisitor.TopFrameRef(Size offset) { NotImplementedMethod(offset); }
+        void IVisitor.ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode) => NotImplementedMethod(condSize, thenCode, elseCode);
+        void IVisitor.ReferenceCode(IContextReference context) => NotImplementedMethod(context);
+        void IVisitor.TopFrameRef(Size offset) => NotImplementedMethod(offset);
         void IVisitor.RecursiveCallCandidate() { throw new NotImplementedException(); }
-        void IVisitor.PrintText(Size leftSize, Size itemSize)
-        {
-            NotImplementedMethod(leftSize, itemSize);
-        }
+        void IVisitor.PrintText(Size leftSize, Size itemSize) => NotImplementedMethod(leftSize, itemSize);
 
         IFormalValue CreateValuesInFrame(Size size, Size offset)
         {
@@ -212,10 +197,7 @@ namespace Reni.Code
             return FormalValueAccess.Transpose(accesses.ToArray());
         }
 
-        IFormalValue[] GetInputValuesFromData(Size inputSize)
-        {
-            return GetInputValuesFromData(Size.Zero, inputSize);
-        }
+        IFormalValue[] GetInputValuesFromData(Size inputSize) => GetInputValuesFromData(Size.Zero, inputSize);
 
         IFormalValue[] GetInputValuesFromData(Size offset, Size inputSize)
         {
@@ -226,10 +208,7 @@ namespace Reni.Code
             return FormalValueAccess.Transpose(accesses.ToArray());
         }
 
-        IFormalValue[] PullInputValuesFromData(Size inputSize)
-        {
-            return PullInputValuesFromData(Size.Zero, inputSize);
-        }
+        IFormalValue[] PullInputValuesFromData(Size inputSize) => PullInputValuesFromData(Size.Zero, inputSize);
 
         void ResetInputValuesOfData(Size inputSize)
         {

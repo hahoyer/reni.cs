@@ -23,10 +23,10 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        internal override bool Hllw { get { return _first.Hllw && _second.Hllw; } }
+        internal override bool Hllw => _first.Hllw && _second.Hllw;
         [DisableDump]
-        internal override Root RootContext { get { return _first.RootContext; } }
-        protected override Size GetSize() { return _first.Size + _second.Size; }
+        internal override Root RootContext => _first.RootContext;
+        protected override Size GetSize() => _first.Size + _second.Size;
 
         [DisableDump]
         internal override string DumpPrintText
@@ -67,6 +67,6 @@ namespace Reni.Type
             throw new NotImplementedException();
         }
 
-        protected override string GetNodeDump() { return "pair." + ObjectId; }
+        protected override string GetNodeDump() => "pair." + ObjectId;
     }
 }

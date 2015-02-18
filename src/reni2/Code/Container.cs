@@ -55,21 +55,21 @@ namespace Reni.Code
 
         [Node]
         [EnableDump]
-        internal CodeBase Data { get { return _data; } }
+        internal CodeBase Data => _data;
 
         [Node]
         [EnableDump]
-        internal string Description { get { return _description; } }
+        internal string Description => _description;
 
         [Node]
         [DisableDump]
-        public Size MaxSize { get { return _data.TemporarySize; } }
+        public Size MaxSize => _data.TemporarySize;
 
         [Node]
         [DisableDump]
-        public static Container UnexpectedVisitOfPending { get { return _unexpectedVisitOfPending; } }
+        public static Container UnexpectedVisitOfPending => _unexpectedVisitOfPending;
         [Node]
-        public IssueBase[] Issues { get { return _data.Issues.ToArray(); } }
+        public IssueBase[] Issues => _data.Issues.ToArray();
 
         public string GetCSharpStatements(int indent)
         {

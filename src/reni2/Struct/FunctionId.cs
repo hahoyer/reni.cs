@@ -29,8 +29,8 @@ namespace Reni.Struct
 {
     sealed class FunctionId : DumpableObject
     {
-        public static FunctionId Getter(int index) { return new FunctionId(index, true); }
-        public static FunctionId Setter(int index) { return new FunctionId(index, false); }
+        public static FunctionId Getter(int index) => new FunctionId(index, true);
+        public static FunctionId Setter(int index) => new FunctionId(index, false);
 
         internal readonly int Index;
         internal readonly bool IsGetter;
@@ -40,7 +40,7 @@ namespace Reni.Struct
             Index = index;
             IsGetter = isGetter;
         }
-        public override string ToString() { return Dump(); }
-        protected override string Dump(bool isRecursive) { return Index + "." + (IsGetter ? "get" : "set"); }
+        public override string ToString() => Dump();
+        protected override string Dump(bool isRecursive) => Index + "." + (IsGetter ? "get" : "set");
     }
 }

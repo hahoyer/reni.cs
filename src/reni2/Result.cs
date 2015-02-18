@@ -188,15 +188,15 @@ namespace Reni
             return null;
         }
 
-        internal bool HasSize { get { return Size != null; } }
-        internal bool HasType { get { return Type != null; } }
-        internal bool HasCode { get { return Code != null; } }
-        internal bool HasExts { get { return Exts != null; } }
-        internal bool HasHllw { get { return _hllw != null; } }
+        internal bool HasSize => Size != null;
+        internal bool HasType => Type != null;
+        internal bool HasCode => Code != null;
+        internal bool HasExts => Exts != null;
+        internal bool HasHllw => _hllw != null;
 
         [Node]
         [EnableDumpWithExceptionPredicate]
-        public Category CompleteCategory { get { return Category.CreateCategory(HasHllw, HasSize, HasType, HasCode, HasExts); } }
+        public Category CompleteCategory => Category.CreateCategory(HasHllw, HasSize, HasType, HasCode, HasExts);
 
         [Node]
         [DebuggerHidden]
@@ -521,7 +521,7 @@ namespace Reni
         }
 
         [DisableDump]
-        internal Result Clone { get { return Filter(CompleteCategory); } }
+        internal Result Clone => Filter(CompleteCategory);
 
         void AssertValid()
         {

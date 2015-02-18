@@ -16,6 +16,6 @@ namespace Reni.Parser
         internal SyntaxIssue(SourcePart position, IssueId issueId)
             : base(issueId) { _position = position; }
 
-        internal override string LogDump { get { return _position.FileErrorPosition(Tag); } }
+        internal override string LogDump => _position.FileErrorPosition(Tag);
     }
 }

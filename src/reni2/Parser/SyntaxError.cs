@@ -22,8 +22,8 @@ namespace Reni.Parser
             return null;
         }
 
-        string IType<Syntax>.PrioTableName { get { return PrioTable.Error; } }
-        ISubParser<Syntax> IType<Syntax>.NextParser { get { return null; } }
-        IType<Syntax> IType<Syntax>.NextTypeIfMatched { get { return null; } }
+        string IType<Syntax>.PrioTableName => PrioTable.Error;
+        ISubParser<Syntax> IType<Syntax>.NextParser => null;
+        IType<Syntax> IType<Syntax>.NextTypeIfMatched => null;
     }
 }

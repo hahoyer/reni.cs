@@ -69,21 +69,15 @@ namespace Reni.Code
             }
         }
 
-        Container Main { get { return _mainCache.Value; } }
+        Container Main => _mainCache.Value;
 
-        internal void Execute(IExecutionContext context) { Main.Data.Execute(context); }
+        internal void Execute(IExecutionContext context) => Main.Data.Execute(context);
 
-        internal string CreateCSharpString(string className)
-        {
-            return Generator
-                .CreateCSharpString(Main, Functions, true, className);
-        }
+        internal string CreateCSharpString(string className) => Generator
+            .CreateCSharpString(Main, Functions, true, className);
 
-        internal Assembly CreateCSharpAssembly(string className, bool generatorFilePosn)
-        {
-            return Generator
-                .CreateCSharpAssembly(Main, Functions, false, className, generatorFilePosn);
-        }
+        internal Assembly CreateCSharpAssembly(string className, bool generatorFilePosn) => Generator
+            .CreateCSharpAssembly(Main, Functions, false, className, generatorFilePosn);
 
         public CodeBase Function(FunctionId functionId)
         {

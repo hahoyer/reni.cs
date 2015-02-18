@@ -18,15 +18,15 @@ namespace Reni.Code
             Tracer.Assert(!_data.Size.IsZero);
         }
 
-        protected override string Dump(bool isRecursion) { return _data.DumpValue(); }
+        protected override string Dump(bool isRecursion) => _data.DumpValue();
 
-        internal override BitsConst GetBitsConst() { return _data; }
+        internal override BitsConst GetBitsConst() => _data;
         protected override StackData GetTop(Size size)
         {
             if (size < Size)
                 return BitCast(size);
             return base.GetTop(size);
         }
-        internal override Size Size { get { return GetBitsConst().Size; } }
+        internal override Size Size => GetBitsConst().Size;
     }
 }

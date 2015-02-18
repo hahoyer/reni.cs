@@ -13,8 +13,8 @@ namespace Reni.Runtime
         private string _data = "";
         private string _log = "";
 
-        internal string Data { get { return _data; } }
-        internal string Log { get { return _log; } }
+        internal string Data => _data;
+        internal string Log => _log;
 
         void IOutStream.AddData(string x)
         {

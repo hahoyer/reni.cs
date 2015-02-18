@@ -10,6 +10,6 @@ namespace Reni.ReniParser
     {
         readonly Syntax _value;
         public SyntaxBoxToken(Syntax value) { _value = value; }
-        protected override Syntax Terminal(SourcePart token) { return _value; }
+        protected override Syntax Terminal(SourcePart token) => _value;
     }
 }

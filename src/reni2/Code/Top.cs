@@ -24,15 +24,15 @@ namespace Reni.Code
             StopByObjectId(-945);
         }
 
-        protected override Size GetSize() { return _size; }
+        protected override Size GetSize() => _size;
 
         [DisableDump]
-        internal override bool IsRelativeReference { get { return true; } }
+        internal override bool IsRelativeReference => true;
 
         [Node]
         [DisableDump]
-        protected Size DataSize { get { return _dataSize; } }
+        protected Size DataSize => _dataSize;
 
-        protected override string GetNodeDump() { return base.GetNodeDump() + " Offset=" + Offset + " DataSize=" + _dataSize; }
+        protected override string GetNodeDump() => base.GetNodeDump() + " Offset=" + Offset + " DataSize=" + _dataSize;
     }
 }

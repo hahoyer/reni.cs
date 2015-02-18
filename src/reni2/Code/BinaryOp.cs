@@ -27,6 +27,6 @@ namespace Reni.Code
         }
 
         [DisableDump]
-        internal override Size InputSize { get { return LeftSize + RightSize; } }
+        internal override Size InputSize => LeftSize + RightSize;
     }
 }

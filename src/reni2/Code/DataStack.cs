@@ -21,9 +21,9 @@ namespace Reni.Code
             public FrameData Frame = new FrameData(null);
             public LocalData(IOutStream outStream) { Data = new EmptyStackData(outStream); }
 
-            string IStackDataAddressBase.Dump() { return "stack"; }
+            string IStackDataAddressBase.Dump() => "stack";
 
-            StackData IStackDataAddressBase.GetTop(Size offset, Size size) { return Data.DoPull(Data.Size + offset).DoGetTop(size); }
+            StackData IStackDataAddressBase.GetTop(Size offset, Size size) => Data.DoPull(Data.Size + offset).DoGetTop(size);
 
             void IStackDataAddressBase.SetTop(Size offset, StackData right)
             {
@@ -34,12 +34,12 @@ namespace Reni.Code
                     .Push(oldTop);
             }
 
-            internal StackDataAddress Address(Size offset) { return new StackDataAddress(this, offset - Data.Size, Data.OutStream); }
+            internal StackDataAddress Address(Size offset) => new StackDataAddress(this, offset - Data.Size, Data.OutStream);
 
-            internal StackData FrameAddress(Size offset) { return new StackDataAddress(Frame, offset, Data.OutStream); }
+            internal StackData FrameAddress(Size offset) => new StackDataAddress(Frame, offset, Data.OutStream);
         }
 
-        internal static Size RefSize { get { return Root.DefaultRefAlignParam.RefSize; } }
+        internal static Size RefSize => Root.DefaultRefAlignParam.RefSize;
 
         [EnableDump]
         LocalData _localData;
@@ -51,7 +51,7 @@ namespace Reni.Code
         }
 
         [DisableDump]
-        internal BitsConst Value { get { return Data.GetBitsConst(); } }
+        internal BitsConst Value => Data.GetBitsConst();
 
         void IVisitor.Call(Size size, FunctionId functionId, Size argsAndRefsSize)
         {
@@ -78,8 +78,8 @@ namespace Reni.Code
 
         void Push(StackData value) { Data = Data.Push(value); }
 
-        void IVisitor.TopRef(Size offset) { Push(_localData.Address(offset)); }
-        void IVisitor.TopFrameRef(Size offset) { Push(_localData.FrameAddress(offset)); }
+        void IVisitor.TopRef(Size offset) => Push(_localData.Address(offset));
+        void IVisitor.TopFrameRef(Size offset) => Push(_localData.FrameAddress(offset));
         void IVisitor.RecursiveCallCandidate() { throw new NotImplementedException(); }
 
         void IVisitor.TopFrameData(Size offset, Size size, Size dataSize)
@@ -114,13 +114,13 @@ namespace Reni.Code
             Pull(leftSize).PrintNumber();
         }
 
-        void IVisitor.PrintText(Size size, Size itemSize) { Pull(size).PrintText(itemSize); }
+        void IVisitor.PrintText(Size size, Size itemSize) => Pull(size).PrintText(itemSize);
 
-        void IVisitor.LocalBlockEnd(Size size, Size intermediateSize) { NotImplementedMethod(size, intermediateSize); }
+        void IVisitor.LocalBlockEnd(Size size, Size intermediateSize) => NotImplementedMethod(size, intermediateSize);
 
-        void IVisitor.Drop(Size beforeSize, Size afterSize) { NotImplementedMethod(beforeSize, afterSize); }
+        void IVisitor.Drop(Size beforeSize, Size afterSize) => NotImplementedMethod(beforeSize, afterSize);
 
-        void IVisitor.ReferencePlus(Size right) { Push(Pull(RefSize).RefPlus(right)); }
+        void IVisitor.ReferencePlus(Size right) => Push(Pull(RefSize).RefPlus(right));
 
         void IVisitor.DePointer(Size size, Size dataSize)
         {
@@ -148,7 +148,7 @@ namespace Reni.Code
             left.Assign(targetSize, right);
         }
 
-        void IVisitor.PrintText(string dumpPrintText) { _context.OutStream.AddData(dumpPrintText); }
+        void IVisitor.PrintText(string dumpPrintText) => _context.OutStream.AddData(dumpPrintText);
 
         void IVisitor.List(CodeBase[] data)
         {
@@ -176,7 +176,7 @@ namespace Reni.Code
                 Tracer.IndentEnd();
         }
 
-        bool IsTraceEnabled { get { return _context.IsTraceEnabled; } }
+        bool IsTraceEnabled => _context.IsTraceEnabled;
 
         void IVisitor.Fiber(FiberHead fiberHead, FiberItem[] fiberItems)
         {
@@ -198,7 +198,7 @@ namespace Reni.Code
                 SubVisit("then:", thenCode);
         }
 
-        FunctionCache<string, StackData> Locals { get { return _localData.Frame.Locals; } }
+        FunctionCache<string, StackData> Locals => _localData.Frame.Locals;
 
         StackData Pull(Size size)
         {

@@ -39,7 +39,7 @@ namespace Reni.Code
             _holder = holder;
         }
 
-        StackData IStackDataAddressBase.GetTop(Size offset, Size size) { return _locals[_holder].DoPull(offset).DoGetTop(size); }
+        StackData IStackDataAddressBase.GetTop(Size offset, Size size) => _locals[_holder].DoPull(offset).DoGetTop(size);
         void IStackDataAddressBase.SetTop(Size offset, StackData right)
         {
             var data = ((IStackDataAddressBase) this).GetTop(offset, right.Size);
@@ -47,6 +47,6 @@ namespace Reni.Code
             NotImplementedMethod(offset, right);
         }
 
-        string IStackDataAddressBase.Dump() { return _holder; }
+        string IStackDataAddressBase.Dump() => _holder;
     }
 }

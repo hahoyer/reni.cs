@@ -57,19 +57,19 @@ namespace Reni
 
         [Node]
         [DisableDump]
-        Source Source { get { return _source.Value; } }
+        Source Source => _source.Value;
 
         [Node]
         [DisableDump]
-        internal Syntax Syntax { get { return _syntax.Value; } }
+        internal Syntax Syntax => _syntax.Value;
 
         [Node]
         [DisableDump]
-        CodeContainer CodeContainer { get { return _codeContainer.Value; } }
+        CodeContainer CodeContainer => _codeContainer.Value;
 
         [DisableDump]
         [Node]
-        internal string CSharpCode { get { return _cSharpCode.Value; } }
+        internal string CSharpCode => _cSharpCode.Value;
 
         internal static string FormattedNow
         {
@@ -89,13 +89,13 @@ namespace Reni
             }
         }
 
-        IOutStream IExecutionContext.OutStream { get { return _parameters.OutStream; } }
-        bool IExecutionContext.IsTraceEnabled { get { return _isInExecutionPhase && _parameters.TraceOptions.Functions; } }
-        bool IExecutionContext.ProcessErrors { get { return _parameters.ProcessErrors; } }
-        CodeBase IExecutionContext.Function(FunctionId functionId) { return CodeContainer.Function(functionId); }
-        CompileSyntax IExecutionContext.Parse(string source) { return Parse(source); }
+        IOutStream IExecutionContext.OutStream => _parameters.OutStream;
+        bool IExecutionContext.IsTraceEnabled => _isInExecutionPhase && _parameters.TraceOptions.Functions;
+        bool IExecutionContext.ProcessErrors => _parameters.ProcessErrors;
+        CodeBase IExecutionContext.Function(FunctionId functionId) => CodeContainer.Function(functionId);
+        CompileSyntax IExecutionContext.Parse(string source) => Parse(source);
 
-        CompileSyntax Parse(string sourceText) { return Parse(new Source(sourceText) + 0).ToCompiledSyntax; }
+        CompileSyntax Parse(string sourceText) => Parse(new Source(sourceText) + 0).ToCompiledSyntax;
 
         /// <summary>
         ///     Performs compilation
@@ -149,11 +149,11 @@ namespace Reni
             }
         }
 
-        internal IEnumerable<IssueBase> Issues { get { return CodeContainer.Issues; } }
+        internal IEnumerable<IssueBase> Issues => CodeContainer.Issues;
 
-        internal Syntax Parse(SourcePosn source) { return _tokenFactory.Parser.Execute(source); }
+        internal Syntax Parse(SourcePosn source) => _tokenFactory.Parser.Execute(source);
 
-        void RunFromCode() { _codeContainer.Value.Execute(this); }
+        void RunFromCode() => _codeContainer.Value.Execute(this);
 
         internal void Materialize()
         {

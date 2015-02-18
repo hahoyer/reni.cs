@@ -26,7 +26,7 @@ namespace Reni.Type
         [DisableDump]
         internal abstract Root RootContext { get; }
 
-        internal TypeBase FunctionalType() { return _functionalTypesCache.Value; }
+        internal TypeBase FunctionalType() => _functionalTypesCache.Value;
         internal abstract Result ApplyResult(Category category, TypeBase argsType);
     }
 }

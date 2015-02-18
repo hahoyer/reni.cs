@@ -87,7 +87,7 @@ namespace Reni.Code
             return After(size);
         }
 
-        protected virtual Visitor<T> After(Size size) { return this; }
+        protected virtual Visitor<T> After(Size size) => this;
 
         internal virtual T List(List visitedObject)
         {
@@ -124,6 +124,6 @@ namespace Reni.Code
             return null;
         }
 
-        internal virtual FiberItem Call(Call visitedObject) { return null; }
+        internal virtual FiberItem Call(Call visitedObject) => null;
     }
 }

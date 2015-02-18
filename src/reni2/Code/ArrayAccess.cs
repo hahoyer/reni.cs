@@ -19,7 +19,7 @@ namespace Reni.Code
             IndexSize = indexSize;
             _callingMethodName = callingMethodName;
         }
-        internal override void Visit(IVisitor visitor) { NotImplementedMethod(visitor); }
+        internal override void Visit(IVisitor visitor) => NotImplementedMethod(visitor);
 
         protected CodeBase IndexCalculation(CodeBase index)
         {

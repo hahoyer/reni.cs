@@ -37,22 +37,21 @@ namespace Reni.Code
         }
 
         protected override IEnumerable<CodeBase> AsList() => Data;
-        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) => actual.List(this);
+        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual)
+            => actual.List(this);
         [DisableDump]
-        internal override IEnumerable<IssueBase> Issues { get { return Data.SelectMany(data => data.Issues); } }
+        internal override IEnumerable<IssueBase> Issues => Data.SelectMany(data => data.Issues);
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement)
         {
-            if(IsNonFiberHeadList)
-            {
-                var newData = new CodeBase[Data.Length];
-                var i = 0;
-                for(; i < Data.Length - 1; i++)
-                    newData[i] = Data[i];
-                newData[i] = Data[i].Add(subsequentElement);
-                return List(newData);
-            }
-            return subsequentElement.TryToCombineBack(this);
+            if(!IsNonFiberHeadList)
+                return subsequentElement.TryToCombineBack(this);
+            var newData = new CodeBase[Data.Length];
+            var i = 0;
+            for(; i < Data.Length - 1; i++)
+                newData[i] = Data[i];
+            newData[i] = Data[i].Add(subsequentElement);
+            return List(newData);
         }
 
         [DisableDump]
@@ -80,8 +79,9 @@ namespace Reni.Code
             return result;
         }
 
-        protected override Size GetSize() => Data
-            .Aggregate(Size.Zero, (size, codeBase) => size + codeBase.Size);
+        protected override Size GetSize()
+            => Data
+                .Aggregate(Size.Zero, (size, codeBase) => size + codeBase.Size);
 
         protected override CodeArgs GetRefsImplementation() => GetRefs(Data);
         internal override void Visit(IVisitor visitor) => visitor.List(Data);

@@ -37,9 +37,9 @@ namespace Reni.Struct
             : base(parent, body) { _functionId = FunctionId.Getter(index); }
 
         [DisableDump]
-        internal TypeBase ReturnType { get { return CallResult(Category.Type).Type; } }
+        internal TypeBase ReturnType => CallResult(Category.Type).Type;
         [DisableDump]
-        protected override Size RelevantValueSize { get { return Size.Zero; } }
-        protected override FunctionId FunctionId { get { return _functionId; } }
+        protected override Size RelevantValueSize => Size.Zero;
+        protected override FunctionId FunctionId => _functionId;
     }
 }
