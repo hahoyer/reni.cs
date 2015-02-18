@@ -11,7 +11,7 @@ namespace Reni.TokenClasses
     sealed class DefinableTokenSyntax : Syntax
     {
         internal DefinableTokenSyntax(Definable definable, SourcePart tokenData, bool isMutable)
-            : base(tokenData)
+            : base(tokenData, tokenData)
         {
             IsMutable = isMutable;
             Definable = definable;

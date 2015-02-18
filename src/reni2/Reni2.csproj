@@ -296,7 +296,6 @@
     <Compile Include="Parser\Test.cs" />
     <Compile Include="Struct\AccessFeature.cs" />
     <Compile Include="ReniSyntax\CompileSyntax.cs" />
-    <Compile Include="ReniSyntax\DeclarationSyntax.cs" />
     <Compile Include="Runtime\OutStream.cs" />
     <Compile Include="ReniSyntax\Special.cs" />
     <Compile Include="ReniSyntax\EmptyList.cs" />

@@ -19,18 +19,18 @@ namespace Reni.Validation
         readonly ValueCache<CompileSyntaxIssue> _issueCache;
 
         public CompileSyntaxError(IssueId issueId, SourcePart token)
-            : this(issueId, token, null)
-        {}
+            : this(issueId, token, null) {}
 
         CompileSyntaxError(IssueId issueId, SourcePart token, CompileSyntaxError previous)
-            : base(token)
+            : base(token, token)
         {
             _issueId = issueId;
             _previous = previous;
-            _issueCache = new ValueCache<CompileSyntaxIssue>(() => new CompileSyntaxIssue(_issueId, Token));
+            _issueCache = new ValueCache<CompileSyntaxIssue>
+                (() => new CompileSyntaxIssue(_issueId, Token));
         }
 
-        CompileSyntaxIssue Issue { get { return _issueCache.Value; } }
+        CompileSyntaxIssue Issue => _issueCache.Value;
 
         internal override Result ResultForCache(ContextBase context, Category category)
         {
@@ -39,6 +39,7 @@ namespace Reni.Validation
                 .Aggregate(context.RootContext.VoidType.Result(category), (x, y) => x + y);
             return result;
         }
+        public override CompileSyntax Sourround(SourcePart sourcePart) => this;
 
         [DisableDump]
         IEnumerable<CompileSyntaxError> Chain
@@ -54,11 +55,9 @@ namespace Reni.Validation
             }
         }
 
-        IssueType IssueType(ContextBase context) { return new IssueType(Issue, context.RootContext); }
+        IssueType IssueType(ContextBase context) => new IssueType(Issue, context.RootContext);
 
         internal override Syntax SyntaxError(IssueId issue, SourcePart token)
-        {
-            return new CompileSyntaxError(issue, token, this);
-        }
+            => new CompileSyntaxError(issue, token, this);
     }
 }

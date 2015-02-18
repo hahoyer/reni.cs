@@ -17,8 +17,13 @@ namespace Reni.ReniParser
     sealed class ExpressionSyntax : CompileSyntax
     {
         internal ExpressionSyntax
-            (Definable @operator, CompileSyntax left, SourcePart token, CompileSyntax right)
-            : base(token)
+            (
+            Definable @operator,
+            CompileSyntax left,
+            SourcePart token,
+            CompileSyntax right,
+            SourcePart sourcePart = null)
+            : base(left?.SourcePart + token + right?.SourcePart + sourcePart, token)
         {
             Operator = @operator;
             Left = left;
@@ -33,29 +38,19 @@ namespace Reni.ReniParser
         internal CompileSyntax Right { get; }
 
         [DisableDump]
-        protected override ParsedSyntax[] Children => new ParsedSyntax[] {Left, Right};
-
-        internal override string DumpPrintText
-        {
-            get
-            {
-                var result = base.GetNodeDump();
-                if(Left != null)
-                    result = "(" + Left.DumpPrintText + ")" + result;
-                if(Right != null)
-                    result += "(" + Right.DumpPrintText + ")";
-                return result;
-            }
-        }
+        protected override ParsedSyntax[] Children
+            => new ParsedSyntax[] {Left, Right}
+                .Where(child => child != null)
+                .ToArray();
 
         internal override Result ResultForCache(ContextBase context, Category category)
         {
             var @operator = Operator;
 
-            if (Left == null)
+            if(Left == null)
                 return context.PrefixResult(category, Token, @operator, Right);
 
-            var left = new ResultCache(c=> context.ResultAsReference(c, Left));
+            var left = new ResultCache(c => context.ResultAsReference(c, Left));
 
             var typeForSearch = left.Type;
             var searchResults
@@ -73,7 +68,8 @@ namespace Reni.ReniParser
                     return searchResults[0].Execute(category, left, context, Right);
 
                 default:
-                    return AmbiguousSymbolIssue.Type(Token, context.RootContext).IssueResult(category);
+                    return AmbiguousSymbolIssue.Type(Token, context.RootContext)
+                        .IssueResult(category);
             }
         }
 
@@ -85,6 +81,10 @@ namespace Reni.ReniParser
                 return this;
 
             return (CompileSyntax) Operator.CreateForVisit(left ?? Left, Token, right ?? Right);
+        }
+        public override CompileSyntax Sourround(SourcePart sourcePart)
+        {
+            return new ExpressionSyntax(Operator, Left, Token, Right, sourcePart);
         }
 
         protected override string GetNodeDump()

@@ -8,11 +8,9 @@ using hw.Parser;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
-using Reni.Feature;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
 using Reni.TokenClasses;
-using Reni.Type;
 
 namespace Reni.Struct
 {
@@ -21,22 +19,23 @@ namespace Reni.Struct
     /// </summary>
     sealed class CompoundSyntax : CompileSyntax
     {
+        readonly Syntax[] _statements;
         readonly Data[] _data;
         static readonly string _runId = Compiler.FormattedNow + "\n";
         internal static bool IsInContainerDump;
         static bool _isInsideFileDump;
         static int _nextObjectId;
 
-        internal CompoundSyntax(SourcePart token, Syntax[] statements)
-            : base(token, _nextObjectId++)
+        internal CompoundSyntax(SourcePart token, Syntax[] statements, SourcePart sourcePart = null)
+            : base(token + statements.Select(item=>item.SourcePart).Aggregate() + sourcePart, token, _nextObjectId++)
         {
+            _statements = statements;
             _data = statements
                 .Select((s, i) => new Data(s, i))
                 .ToArray();
-
         }
 
-        public string GetCompoundIdentificationDump() => "."+ ObjectId + "i";
+        public string GetCompoundIdentificationDump() => "." + ObjectId + "i";
         [Node]
         internal CompileSyntax[] Statements => _data.Select(s => s.Statement).ToArray();
         [DisableDump]
@@ -61,9 +60,14 @@ namespace Reni.Struct
         public IEnumerable<FunctionSyntax> Converters
             => _data
                 .Where(data => data.IsConverter)
-                .Select(data => (FunctionSyntax)data.Statement);
+                .Select(data => (FunctionSyntax) data.Statement);
 
-        protected override string GetNodeDump() => GetType().PrettyName() + "(" + GetCompoundIdentificationDump() + ")";
+        public override CompileSyntax Sourround(SourcePart sourcePart)
+            => new CompoundSyntax(Token, _statements, sourcePart);
+
+        protected override string GetNodeDump()
+            => GetType().PrettyName() + "(" + GetCompoundIdentificationDump() + ")";
+
         internal bool IsMutable(int position) => _data[position].IsMutable;
 
         public override string DumpData()
@@ -144,8 +148,8 @@ namespace Reni.Struct
         {
             internal int Value { get; }
             internal Position(int value) { Value = value; }
-            internal AccessFeature Convert(CompoundView accessPoint) => accessPoint.AccessFeature(Value);
+            internal AccessFeature Convert(CompoundView accessPoint)
+                => accessPoint.AccessFeature(Value);
         }
-
     }
 }

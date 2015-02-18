@@ -18,8 +18,15 @@ namespace Reni.TokenClasses
         internal CompileSyntax Setter { get; }
         internal bool IsImplicit { get; }
 
-        public FunctionSyntax(SourcePart token, CompileSyntax setter, bool isImplicit, bool isMetaFunction, CompileSyntax getter)
-            : base(token)
+        public FunctionSyntax
+            (
+            SourcePart token,
+            CompileSyntax setter,
+            bool isImplicit,
+            bool isMetaFunction,
+            CompileSyntax getter,
+            SourcePart sourcePart = null)
+            : base(setter?.SourcePart + token + getter?.SourcePart + sourcePart, token)
         {
             Getter = getter;
             Setter = setter;
@@ -28,43 +35,19 @@ namespace Reni.TokenClasses
         }
 
         string Tag
-        {
-            get
-            {
-                return (IsMetaFunction ? "{0}{0}" : "{0}")
-                    .ReplaceArgs("/{0}\\")
-                    .ReplaceArgs(IsImplicit ? "!" : "");
-            }
-        }
+            => (IsMetaFunction ? "{0}{0}" : "{0}")
+                .ReplaceArgs("/{0}\\")
+                .ReplaceArgs(IsImplicit ? "!" : "");
 
         internal override Result ResultForCache(ContextBase context, Category category)
-        {
-            return context
+            => context
                 .FindRecentCompoundView
                 .FunctionalType(this)
                 .Result(category);
-        }
 
-        protected override bool GetIsLambda() { return true; }
-
-        internal override string DumpPrintText
-        {
-            get
-            {
-                return
-                    (Setter == null ? "" : Setter.DumpPrintText)
-                        + Tag
-                        + (Getter == null ? "" : Getter.DumpPrintText)
-                    ;
-            }
-        }
-
-        protected override string GetNodeDump()
-        {
-            var getter = Getter == null ? "" : "(" + Getter.NodeDump + ")";
-            var setter = Setter == null ? "" : "(" + Setter.NodeDump + ")";
-            return setter + base.GetNodeDump() + getter;
-        }
+        protected override bool GetIsLambda() => true;
+        public override CompileSyntax Sourround(SourcePart sourcePart)
+            => new FunctionSyntax(Token, Setter, IsImplicit, IsMetaFunction, Getter, sourcePart);
 
         internal IContextMetaFunctionFeature ContextMetaFunctionFeature(CompoundView compoundView)
         {
@@ -90,4 +73,3 @@ namespace Reni.TokenClasses
         }
     }
 }
-

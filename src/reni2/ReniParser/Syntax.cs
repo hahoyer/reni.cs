@@ -13,14 +13,14 @@ namespace Reni.ReniParser
 {
     abstract class Syntax : ParsedSyntax
     {
-        protected Syntax(SourcePart token)
-            : base(token) {}
+        protected Syntax(SourcePart all, SourcePart token)
+            : base(all, token) {}
 
-        protected Syntax(SourcePart token, int nextObjectId)
-            : base(token, nextObjectId) {}
+        protected Syntax(SourcePart all, SourcePart token, int nextObjectId)
+            : base(all, token, nextObjectId) {}
 
         [DisableDump]
-        internal virtual CompileSyntax ContainerStatementToCompileSyntax { get { return ToCompiledSyntax; } }
+        internal virtual CompileSyntax ContainerStatementToCompileSyntax => ToCompiledSyntax;
 
         [DisableDump]
         internal virtual CompileSyntax ToCompiledSyntax
@@ -31,7 +31,10 @@ namespace Reni.ReniParser
                 return null;
             }
         }
-        internal virtual IEnumerable<KeyValuePair<string, int>> GetDeclarations(int index) { yield break; }
+        internal virtual IEnumerable<KeyValuePair<string, int>> GetDeclarations(int index)
+        {
+            yield break;
+        }
         internal virtual IEnumerable<string> GetDeclarations() { yield break; }
 
         internal virtual Syntax RightParenthesis(int level, SourcePart token)
@@ -41,9 +44,7 @@ namespace Reni.ReniParser
         }
 
         internal Syntax CreateThenSyntax(SourcePart token, CompileSyntax condition)
-        {
-            return new ThenSyntax(condition, token, ToCompiledSyntax);
-        }
+            => new CondSyntax(condition, token, ToCompiledSyntax);
 
         internal virtual Syntax CreateElseSyntax(SourcePart token, CompileSyntax elseSyntax)
         {

@@ -22,7 +22,9 @@ namespace Reni.TokenClasses
 
         string ITokenClassWithId.Id => Id(Level);
 
-        protected override Syntax Prefix(SourcePart token, Syntax right) => new LeftParenthesisSyntax(Level, token, right);
-        protected override Syntax Terminal(SourcePart token) => new LeftParenthesisSyntax(Level, token, null);
+        protected override Syntax Prefix(SourcePart token, Syntax right)
+            => new LeftParenthesisSyntax(Level, token, right);
+        protected override Syntax Terminal(SourcePart token)
+            => new LeftParenthesisSyntax(Level, token, null);
     }
 }

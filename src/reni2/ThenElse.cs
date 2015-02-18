@@ -5,7 +5,6 @@ using hw.Debug;
 using hw.Forms;
 using hw.Parser;
 using hw.Scanner;
-using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Context;
 using Reni.ReniParser;
@@ -14,50 +13,59 @@ using Reni.Type;
 
 namespace Reni
 {
-    abstract class CondSyntax : CompileSyntax
+    sealed class CondSyntax : CompileSyntax
     {
         [Node]
-        internal readonly CompileSyntax Cond;
+         readonly CompileSyntax Cond;
 
         [Node]
-        internal readonly CompileSyntax Then;
+        readonly CompileSyntax Then;
 
-        [NotNull]
         [Node]
-        internal readonly CompileSyntax Else;
+        readonly CompileSyntax NativeElse;
 
-        protected CondSyntax
+        readonly CompileSyntax Else;
+
+        internal CondSyntax
             (
             CompileSyntax condSyntax,
             SourcePart thenToken,
             CompileSyntax thenSyntax,
-            CompileSyntax elseSyntax)
-            : base(thenToken)
+            CompileSyntax elseSyntax = null,
+            SourcePart sourcePart = null)
+            : base(
+                condSyntax.SourcePart
+                    + thenToken
+                    + thenSyntax.SourcePart
+                    + elseSyntax?.SourcePart
+                    + sourcePart,
+                thenToken)
         {
             Cond = condSyntax;
             Then = thenSyntax;
-            Else = elseSyntax ?? new EmptyList(thenToken);
+            NativeElse = elseSyntax;
+            Else = elseSyntax ?? new EmptyList(null, thenToken);
         }
+
+        public override CompileSyntax Sourround(SourcePart sourcePart)
+            => new CondSyntax(Cond, Token, Then, NativeElse, sourcePart);
 
         internal override Result ResultForCache(ContextBase context, Category category)
-        {
-            return InternalResult(context, category);
-        }
+            => InternalResult(context, category);
 
         [DisableDump]
-        protected override ParsedSyntax[] Children { get { return new ParsedSyntax[] {Cond, Then, Else}; } }
+        protected override ParsedSyntax[] Children => new ParsedSyntax[] {Cond, Then, NativeElse};
 
-        Result CondResult(ContextBase context, Category category)
-        {
-            return Cond
-                .Result(context, category.Typed)
-                .Conversion(context.RootContext.BitType.Align)
-                .LocalBlock(category.Typed)
-                .Conversion(context.RootContext.BitType);
-        }
+        Result CondResult(ContextBase context, Category category) => Cond
+            .Result(context, category.Typed)
+            .Conversion(context.RootContext.BitType.Align)
+            .LocalBlock(category.Typed)
+            .Conversion(context.RootContext.BitType);
 
-        Result ElseResult(ContextBase context, Category category) { return BranchResult(context, category, Else); }
-        Result ThenResult(ContextBase context, Category category) { return BranchResult(context, category, Then); }
+        Result ElseResult(ContextBase context, Category category)
+            => BranchResult(context, category, Else);
+        Result ThenResult(ContextBase context, Category category)
+            => BranchResult(context, category, Then);
 
         Result BranchResult(ContextBase context, Category category, CompileSyntax syntax)
         {
@@ -92,56 +100,24 @@ namespace Reni
                 );
         }
 
-        TypeBase CommonType(ContextBase context)
-        {
-            return Then
-                .Type(context)
-                .CommonType(Else.Type(context))
-                .Align;
-        }
-
-        protected override string GetNodeDump() { return "(" + Cond.NodeDump + ")then(" + Then.NodeDump + ")"; }
-    }
-
-    sealed class ThenSyntax : CondSyntax
-    {
-        internal ThenSyntax(CompileSyntax condSyntax, SourcePart thenToken, CompileSyntax thenSyntax)
-            : base(condSyntax, thenToken, thenSyntax, null)
-        {}
+        TypeBase CommonType(ContextBase context) => Then
+            .Type(context)
+            .CommonType(Else.Type(context))
+            .Align;
 
         internal override Syntax CreateElseSyntax(SourcePart token, CompileSyntax elseSyntax)
         {
-            return new ThenElseSyntax(Cond, Token, Then, token, elseSyntax);
+            Tracer.Assert(NativeElse == null);
+            return new CondSyntax(Cond, Token, Then, elseSyntax, token);
         }
 
         internal override Result PendingResultForCache(ContextBase context, Category category)
         {
+            if(NativeElse == null)
             return context
                 .RootContext.VoidType.Result(category);
+            return base.PendingResultForCache(context, category);
         }
     }
 
-    sealed class ThenElseSyntax : CondSyntax
-    {
-        [Node]
-        readonly SourcePart _elseToken;
-
-        public ThenElseSyntax
-            (
-            CompileSyntax condSyntax,
-            SourcePart thenToken,
-            CompileSyntax thenSyntax,
-            SourcePart elseToken,
-            CompileSyntax elseSyntax)
-            : base(condSyntax, thenToken, thenSyntax, elseSyntax)
-        {
-            _elseToken = elseToken;
-        }
-
-        protected override string GetNodeDump()
-        {
-            return base.GetNodeDump() + "else(" +
-                Else.NodeDump + ")";
-        }
-    }
 }

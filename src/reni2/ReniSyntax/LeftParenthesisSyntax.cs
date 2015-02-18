@@ -4,7 +4,6 @@ using System.Linq;
 using hw.Debug;
 using hw.Scanner;
 using Reni.ReniParser;
-using Reni.TokenClasses;
 
 namespace Reni.ReniSyntax
 {
@@ -17,7 +16,7 @@ namespace Reni.ReniSyntax
 
         public LeftParenthesisSyntax
             (int parenthesis, SourcePart token, Syntax right)
-            : base(token)
+            : base(token + right?.SourcePart, token)
         {
             _parenthesis = parenthesis;
             _right = right;
@@ -27,30 +26,18 @@ namespace Reni.ReniSyntax
         {
             Tracer.Assert(level == _parenthesis);
             if(_right == null)
-                return new EmptyList(token);
-            return _right;
+                return new EmptyList(SourcePart, token);
+            return new SourroundSyntax(SourcePart + token, _right, token);
         }
     }
 
-    sealed class RightParenthesisSyntax : Syntax
+    sealed class SourroundSyntax : Syntax
     {
-        [EnableDump]
-        readonly int _rightLevel;
-        [EnableDump]
-        readonly Syntax _left;
-        [EnableDump]
-        readonly RightParenthesis _parenthesis;
-        [EnableDump]
         readonly Syntax _right;
-
-        public RightParenthesisSyntax
-            (int level, Syntax left, RightParenthesis parenthesis, SourcePart token, Syntax right)
-            : base(token)
-        {
-            _rightLevel = level;
-            _left = left;
-            _parenthesis = parenthesis;
-            _right = right;
-        }
+        public SourroundSyntax(SourcePart sourcePart, Syntax right, SourcePart token)
+            : base(sourcePart, token) { _right = right; }
+        internal override CompileSyntax ToCompiledSyntax
+            => _right.ToCompiledSyntax.Sourround(SourcePart+Token);
     }
+
 }

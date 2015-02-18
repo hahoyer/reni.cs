@@ -62,7 +62,7 @@ namespace Reni.TokenClasses
         readonly DeclarationToken _declaration;
 
         internal DeclarationTokenSyntax(DeclarationToken declaration, SourcePart token)
-            : base(token)
+            : base(token,token)
         {
             _declaration = declaration;
         }

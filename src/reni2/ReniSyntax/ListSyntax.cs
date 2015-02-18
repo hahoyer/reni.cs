@@ -13,7 +13,7 @@ namespace Reni.ReniSyntax
     sealed class ListSyntax : Syntax
     {
         public ListSyntax(List type, SourcePart token, IEnumerable<Syntax> data)
-            : base(token)
+            : base(token + data.Select(item=>item.SourcePart).Aggregate(), token)
         {
             Type = type;
             Data = data.ToArray();

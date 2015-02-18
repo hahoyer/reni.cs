@@ -20,10 +20,10 @@ namespace Reni.TokenClasses
         string ITokenClassWithId.Id => Id(_level);
 
         protected override Syntax Prefix(SourcePart token, Syntax right)
-            => ListSyntax(new EmptyList(token), token, right);
+            => ListSyntax(new EmptyList(token, token), token, right);
 
         protected override Syntax Suffix(Syntax left, SourcePart token)
-            => ListSyntax(left, token, new EmptyList(token));
+            => ListSyntax(left, token, new EmptyList(token, token));
 
         protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
             => ListSyntax(left, token, right);

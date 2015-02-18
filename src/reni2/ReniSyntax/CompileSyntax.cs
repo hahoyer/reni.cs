@@ -1,17 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using hw.Helper;
 using System.Linq;
 using hw.Debug;
 using hw.Forms;
-using hw.Helper;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.ReniParser;
 using Reni.Struct;
-using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.ReniSyntax
@@ -21,30 +20,23 @@ namespace Reni.ReniSyntax
         // Used for debug only
         [DisableDump]
         [Node("Cache")]
-        readonly FunctionCache<ContextBase, object> _resultCache = new FunctionCache<ContextBase, object>();
+        readonly FunctionCache<ContextBase, object> _resultCache =
+            new FunctionCache<ContextBase, object>();
 
-        internal CompileSyntax(SourcePart token)
-            : base(token) {}
+        internal CompileSyntax(SourcePart all, SourcePart token)
+            : base(all, token) { }
 
-        internal CompileSyntax(SourcePart token, int objectId)
-            : base(token, objectId) {}
-
-        [DisableDump]
-        internal bool IsLambda { get { return GetIsLambda(); } }
+        internal CompileSyntax(SourcePart all, SourcePart token, int objectId)
+            : base(all, token, objectId) { }
 
         [DisableDump]
-        internal virtual bool? Hllw { get { return IsLambda ? (bool?) true : null; } }
+        internal bool IsLambda => GetIsLambda();
 
         [DisableDump]
-        internal virtual string DumpPrintText
-        {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
-        }
+        internal virtual bool? Hllw => IsLambda ? (bool?) true : null;
 
+        [DisableDump]
+        internal string DumpPrintText => SourcePart.Name;
 
         //[DebuggerHidden]
         internal virtual Result ResultForCache(ContextBase context, Category category)
@@ -55,13 +47,16 @@ namespace Reni.ReniSyntax
 
         protected virtual bool GetIsLambda() => false;
 
-        internal override CompileSyntax ToCompiledSyntax { get { return this; } }
-        internal void AddToCacheForDebug(ContextBase context, object cacheItem) => _resultCache.Add(context, cacheItem);
+        internal override CompileSyntax ToCompiledSyntax => this;
+        internal void AddToCacheForDebug(ContextBase context, object cacheItem)
+            => _resultCache.Add(context, cacheItem);
         internal Result Result(ContextBase context) => Result(context, Category.All);
         //[DebuggerHidden]
-        internal Result Result(ContextBase context, Category category) => context.Result(category, this);
+        internal Result Result(ContextBase context, Category category)
+            => context.Result(category, this);
 
-        internal BitsConst Evaluate(ContextBase context) => Result(context).Evaluate(context.RootContext.ExecutionContext);
+        internal BitsConst Evaluate(ContextBase context)
+            => Result(context).Evaluate(context.RootContext.ExecutionContext);
 
         internal Result AtTokenResult(ContextBase context, Category category, CompileSyntax right)
         {
@@ -121,13 +116,14 @@ namespace Reni.ReniSyntax
             NotImplementedMethod(visitor);
             return null;
         }
+        public abstract CompileSyntax Sourround(SourcePart sourcePart);
     }
 
     sealed class ReplaceArgVisitor : DumpableObject, ISyntaxVisitor
     {
         readonly CompileSyntax _value;
         public ReplaceArgVisitor(CompileSyntax value) { _value = value; }
-        CompileSyntax ISyntaxVisitor.Arg { get { return _value; } }
+        CompileSyntax ISyntaxVisitor.Arg => _value;
     }
 
     interface ISyntaxVisitor

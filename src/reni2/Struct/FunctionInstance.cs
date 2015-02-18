@@ -35,11 +35,11 @@ namespace Reni.Struct
 
         [Node]
         [DisableDump]
-        internal CodeBase BodyCode { get { return _bodyCodeCache.Value; } }
+        internal CodeBase BodyCode => _bodyCodeCache.Value;
         [Node]
-        string Description { get { return _body.NodeDump; } }
+        string Description => _body.DumpPrintText;
         [DisableDump]
-        Size ArgsPartSize { get { return Parent.ArgsType.Size + RelevantValueSize; } }
+        Size ArgsPartSize => Parent.ArgsType.Size + RelevantValueSize;
         [DisableDump]
         protected abstract Size RelevantValueSize { get; }
         [Node]
@@ -58,10 +58,10 @@ namespace Reni.Struct
         protected abstract FunctionId FunctionId { get; }
         [Node]
         [DisableDump]
-        ContextBase Context { get { return _contextCache.Value; } }
+        ContextBase Context => _contextCache.Value;
 
         [DisableDump]
-        internal Code.Container Container
+        internal Container Container
         {
             get
             {
@@ -71,7 +71,7 @@ namespace Reni.Struct
                 }
                 catch(UnexpectedVisitOfPending)
                 {
-                    return Code.Container.UnexpectedVisitOfPending;
+                    return Container.UnexpectedVisitOfPending;
                 }
             }
         }
@@ -90,7 +90,7 @@ namespace Reni.Struct
         }
 
         [DisableDump]
-        protected virtual TypeBase CallType { get { return Parent; } }
+        protected virtual TypeBase CallType => Parent;
 
         Result ObtainResult(Category category)
         {
@@ -124,7 +124,8 @@ namespace Reni.Struct
                 BreakExecution();
 
                 var result = postProcessedResult
-                    .ReplaceAbsolute(Context.FindRecentFunctionContextObject, CreateContextRefCode, CodeArgs.Void);
+                    .ReplaceAbsolute
+                    (Context.FindRecentFunctionContextObject, CreateContextRefCode, CodeArgs.Void);
 
                 return ReturnMethodDump(result);
             }
@@ -135,11 +136,9 @@ namespace Reni.Struct
         }
 
         CodeBase CreateContextRefCode()
-        {
-            return CodeBase
+            => CodeBase
                 .FrameRef()
                 .ReferencePlus(ArgsPartSize);
-        }
 
         bool _isObtainBodyCodeActive;
 
@@ -174,7 +173,7 @@ namespace Reni.Struct
             return result;
         }
 
-        ContextBase ObtainContext() { return Parent.CreateSubContext(!IsGetter); }
-        bool IsGetter { get { return FunctionId.IsGetter; } }
+        ContextBase ObtainContext() => Parent.CreateSubContext(!IsGetter);
+        bool IsGetter => FunctionId.IsGetter;
     }
 }
