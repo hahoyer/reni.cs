@@ -97,7 +97,7 @@ namespace Reni.Struct
             if(IsStopByObjectIdActive)
                 return null;
 
-            var trace = FunctionId.Index < 0 && FunctionId.IsGetter && category.HasExts;
+            var trace = FunctionId.Index == -3 && FunctionId.IsGetter && category.HasCode;
             StartMethodDump(trace, category);
             try
             {
