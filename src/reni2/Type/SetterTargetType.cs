@@ -46,13 +46,13 @@ namespace Reni.Type
             if(category == Category.Type)
                 return RootContext.VoidType.Result(category);
 
-            var trace = ObjectId == -42 && category.HasCode;
+            var trace = ObjectId == -97 && category.HasCode;
             StartMethodDump(trace, category, right);
             try
             {
                 BreakExecution();
                 var sourceResult = right
-                    .Conversion(category.Typed, ValueType).LocalReferenceResult;
+                    .Conversion(category.Typed, ValueType.ForcedPointer);
                 Dump("sourceResult", sourceResult);
                 BreakExecution();
 
