@@ -167,7 +167,7 @@ namespace Reni.Runtime
                 _bytes = bytes;
             }
 
-            public override string ToString()
+            protected override string GetNodeDump()
                 => Create(_parent._data.Pointer(_startIndex)).AddressDump
                     + ": "
                     + _parent.DumpLengthAndRange(_startIndex, _bytes);

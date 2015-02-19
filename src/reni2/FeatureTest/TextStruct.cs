@@ -83,7 +83,7 @@ Text: /\
     }
 
     [TestFixture]
-    [Output("ab")]
+    [Output("abcdef")]
     [InstanceCode("Text('abcdef')")]
     [Integer1]
     [TwoFunctions]
