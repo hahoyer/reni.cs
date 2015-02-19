@@ -387,7 +387,20 @@ namespace Reni.Type
             return null;
         }
 
-        internal virtual Result ConstructorResult(Category category, TypeBase argsType) => argsType.Conversion(category, this);
+        internal virtual Result ConstructorResult(Category category, TypeBase argsType)
+        {
+            StartMethodDump(false,category,argsType);
+            try
+            {
+                BreakExecution();
+                var result = argsType.Conversion(category, this);
+                return ReturnMethodDump(result);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
+        }
 
         internal Result DumpPrintTypeNameResult(Category category) => VoidType
             .Result
@@ -477,7 +490,7 @@ namespace Reni.Type
             return result;
         }
 
-        internal IEnumerable<ISimpleFeature> GetForcedConversions<TDestination>(TDestination destination)
+        internal virtual IEnumerable<ISimpleFeature> GetForcedConversions<TDestination>(TDestination destination)
         {
             var provider = this as IForcedConversionProvider<TDestination>;
             if(provider != null)
@@ -506,6 +519,11 @@ namespace Reni.Type
 
 
     interface IForcedConversionProvider<in TDestination>
+    {
+        IEnumerable<ISimpleFeature> Result(TDestination destination);
+    }
+
+    interface IForcedConversionProviderForPointer<in TDestination>
     {
         IEnumerable<ISimpleFeature> Result(TDestination destination);
     }

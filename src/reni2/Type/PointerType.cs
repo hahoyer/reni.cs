@@ -24,7 +24,7 @@ namespace Reni.Type
             _order = CodeArgs.NextOrder++;
             ValueType = valueType;
             Tracer.Assert(!valueType.Hllw, valueType.Dump);
-           Tracer.Assert(valueType.IsPointerPossible, valueType.Dump);
+            Tracer.Assert(valueType.IsPointerPossible, valueType.Dump);
             StopByObjectId(-10);
         }
 
@@ -55,17 +55,34 @@ namespace Reni.Type
 
         [DisableDump]
         protected override IEnumerable<ISimpleFeature> RawSymmetricConversions
-            => base.RawSymmetricConversions.Concat(new ISimpleFeature[] {Extension.SimpleFeature(DereferenceResult)});
+            =>
+                base.RawSymmetricConversions.Concat
+                    (new ISimpleFeature[] {Extension.SimpleFeature(DereferenceResult)});
 
         protected override string GetNodeDump() => ValueType.NodeDump + "[Pointer]";
-        internal override int? SmartArrayLength(TypeBase elementType) => ValueType.SmartArrayLength(elementType);
+        internal override int? SmartArrayLength(TypeBase elementType)
+            => ValueType.SmartArrayLength(elementType);
         protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
         protected override ArrayType ArrayForCache(int count, string optionsId)
             => ValueType.Array(count, optionsId);
 
+        internal override IEnumerable<ISimpleFeature> GetForcedConversions<TDestination>
+            (TDestination destination)
+        {
+            var provider = ValueType as IForcedConversionProviderForPointer<TDestination>;
+            if(provider != null)
+                foreach(var feature in provider.Result(destination))
+                    yield return feature;
+
+            foreach(var feature in base.GetForcedConversions(destination))
+                yield return feature;
+        }
+
+
         internal override IEnumerable<SearchResult> Declarations<TDefinable>(TDefinable tokenClass)
         {
-            var feature = (ValueType as ISymbolProviderForPointer<TDefinable, IFeatureImplementation>)
+            var feature = (ValueType as
+                ISymbolProviderForPointer<TDefinable, IFeatureImplementation>)
                 ?.Feature(tokenClass);
             var result = feature.NullableToArray().Select(f => new SearchResult(f, Pointer));
             if(result.Any())

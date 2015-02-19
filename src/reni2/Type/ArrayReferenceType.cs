@@ -33,7 +33,8 @@ namespace Reni.Type
                 OptionsData = new OptionsData(optionsId);
                 IsForceMutable = new OptionsData.Option(OptionsData, "force_mutable");
                 IsMutable = new OptionsData.Option(OptionsData, "mutable");
-                IsEnableReinterpretation = new OptionsData.Option(OptionsData, "enable_reinterpretation");
+                IsEnableReinterpretation = new OptionsData.Option
+                    (OptionsData, "enable_reinterpretation");
                 OptionsData.Align();
                 Tracer.Assert(OptionsData.IsValid);
             }
@@ -43,7 +44,8 @@ namespace Reni.Type
             internal OptionsData.Option IsEnableReinterpretation { get; }
 
             internal static Options Create(string optionsId) => new Options(optionsId);
-            internal static string ForceMutable(bool value) => Create(null).IsForceMutable.SetTo(value);
+            internal static string ForceMutable(bool value)
+                => Create(null).IsForceMutable.SetTo(value);
             protected override string GetNodeDump() => DumpPrintText;
             public string DumpPrintText => OptionsData.DumpPrintText;
         }
@@ -55,7 +57,8 @@ namespace Reni.Type
         {
             _order = CodeArgs.NextOrder++;
             options = Options.Create(optionsId);
-            _repeaterAccessTypeCache = new ValueCache<RepeaterAccessType>(() => new RepeaterAccessType(this));
+            _repeaterAccessTypeCache = new ValueCache<RepeaterAccessType>
+                (() => new RepeaterAccessType(this));
             ValueType = valueType;
             Tracer.Assert(!valueType.Hllw, valueType.Dump);
             Tracer.Assert(!(valueType.CoreType is PointerType), valueType.Dump);
@@ -63,12 +66,14 @@ namespace Reni.Type
             StopByObjectId(-10);
         }
 
-        TypeBase ValueType { get; }
+        [DisableDump]
+        internal TypeBase ValueType { get; }
         Options options { get; }
 
         [DisableDump]
         internal override Root RootContext => ValueType.RootContext;
-        internal override string DumpPrintText => "(" + ValueType.DumpPrintText + ")reference" + options.DumpPrintText;
+        internal override string DumpPrintText
+            => "(" + ValueType.DumpPrintText + ")reference" + options.DumpPrintText;
         [DisableDump]
         RepeaterAccessType AccessType => _repeaterAccessTypeCache.Value;
         [DisableDump]
@@ -76,15 +81,21 @@ namespace Reni.Type
         [DisableDump]
         internal override bool IsAligningPossible => false;
         [DisableDump]
-        protected override IEnumerable<IGenericProviderForType> Genericize => this.GenericListFromType(base.Genericize);
+        protected override IEnumerable<IGenericProviderForType> Genericize
+            => this.GenericListFromType(base.Genericize);
         [DisableDump]
-        protected override IEnumerable<ISimpleFeature> RawSymmetricConversions => base.RawSymmetricConversions;
+        protected override IEnumerable<ISimpleFeature> RawSymmetricConversions
+            => base.RawSymmetricConversions;
 
-        protected override string GetNodeDump() => ValueType.NodeDump + "[reference]" + options.NodeDump;
+        protected override string GetNodeDump()
+            => ValueType.NodeDump + "[reference]" + options.NodeDump;
         protected override Size GetSize() => ValueType.Pointer.Size;
 
         [DisableDump]
-        internal ArrayReferenceType Mutable => ValueType.ArrayReference(options.IsMutable.SetTo(true));
+        internal bool IsMutable => options.IsMutable.Value;
+        [DisableDump]
+        internal ArrayReferenceType Mutable
+            => ValueType.ArrayReference(options.IsMutable.SetTo(true));
         [DisableDump]
         internal ArrayReferenceType EnableReinterpretation
             => ValueType.ArrayReference(options.IsEnableReinterpretation.SetTo(true));
@@ -101,24 +112,30 @@ namespace Reni.Type
         TypeBase ISimpleFeature.TargetType => ValueType;
         Result ISimpleFeature.Result(Category category) => DereferenceResult(category);
 
-        IEnumerable<ISimpleFeature> IForcedConversionProvider<ArrayReferenceType>.Result(ArrayReferenceType destination)
+        IEnumerable<ISimpleFeature> IForcedConversionProvider<ArrayReferenceType>.Result
+            (ArrayReferenceType destination)
             => ForcedConversion(destination).NullableToArray();
 
-        IFeatureImplementation ISymbolProvider<Mutable, IFeatureImplementation>.Feature(Mutable tokenClass)
+        IFeatureImplementation ISymbolProvider<Mutable, IFeatureImplementation>.Feature
+            (Mutable tokenClass)
             => Extension.SimpleFeature(MutableResult);
 
-        IFeatureImplementation ISymbolProvider<EnableReinterpretation, IFeatureImplementation>.Feature
+        IFeatureImplementation ISymbolProvider<EnableReinterpretation, IFeatureImplementation>.
+            Feature
             (EnableReinterpretation tokenClass)
             => Extension.SimpleFeature(EnableReinterpretationResult);
 
-        IFeatureImplementation ISymbolProvider<TokenClasses.ArrayAccess, IFeatureImplementation>.Feature
+        IFeatureImplementation ISymbolProvider<TokenClasses.ArrayAccess, IFeatureImplementation>.
+            Feature
             (TokenClasses.ArrayAccess tokenClass)
             => Extension.FunctionFeature(AccessResult);
 
-        IFeatureImplementation ISymbolProvider<Minus, IFeatureImplementation>.Feature(Minus tokenClass)
+        IFeatureImplementation ISymbolProvider<Minus, IFeatureImplementation>.Feature
+            (Minus tokenClass)
             => Extension.FunctionFeature(MinusResult);
 
-        IFeatureImplementation ISymbolProvider<Plus, IFeatureImplementation>.Feature(Plus tokenClass)
+        IFeatureImplementation ISymbolProvider<Plus, IFeatureImplementation>.Feature
+            (Plus tokenClass)
             => Extension.FunctionFeature(PlusResult);
 
 
@@ -128,12 +145,14 @@ namespace Reni.Type
             return ResultFromPointer(category, Mutable);
         }
 
-        Result EnableReinterpretationResult(Category category) => ResultFromPointer(category, EnableReinterpretation);
+        Result EnableReinterpretationResult(Category category)
+            => ResultFromPointer(category, EnableReinterpretation);
 
         ISimpleFeature ForcedConversion(ArrayReferenceType destination)
             =>
                 HasForcedConversion(destination)
-                    ? Extension.SimpleFeature(category => destination.ConversionResult(category, this), this)
+                    ? Extension.SimpleFeature
+                        (category => destination.ConversionResult(category, this), this)
                     : null;
 
         bool HasForcedConversion(ArrayReferenceType destination)
@@ -141,7 +160,7 @@ namespace Reni.Type
             if(this == destination)
                 return true;
 
-            if(destination.options.IsMutable.Value && !options.IsMutable.Value)
+            if(destination.IsMutable && !IsMutable)
                 return false;
 
             if(ValueType == destination.ValueType)
@@ -155,6 +174,20 @@ namespace Reni.Type
 
         Result ConversionResult(Category category, ArrayReferenceType source)
             => Result(category, source.ArgResult);
+
+        internal Result ConversionResult(Category category, ArrayType source)
+        {
+            var trace = ObjectId == -1 && category.HasCode;
+            StartMethodDump(trace, category,source);
+            try
+            {
+                return ReturnMethodDump(Result(category, source.Pointer.ArgResult));
+            }
+            finally
+            {
+                EndMethodDump();
+            }
+        }
 
         Result AccessResult(Category category, TypeBase right)
             => AccessType
