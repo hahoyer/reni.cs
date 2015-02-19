@@ -82,7 +82,8 @@ namespace Reni.ReniParser
 
             return (CompileSyntax) Operator.CreateForVisit(left ?? Left, Token, right ?? Right);
         }
-        public override CompileSyntax Sourround(SourcePart sourcePart) => new ExpressionSyntax(Operator, Left, Token, Right, sourcePart);
+        public override CompileSyntax Sourround(SourcePart sourcePart)
+            => new ExpressionSyntax(Operator, Left, Token, Right, sourcePart);
 
         protected override string GetNodeDump()
         {

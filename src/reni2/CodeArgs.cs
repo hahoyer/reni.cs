@@ -1,32 +1,10 @@
-#region Copyright (C) 2013
-
-//     Project Reni2
-//     Copyright (C) 2011 - 2013 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-#endregion
-
 using System;
 using System.Collections.Generic;
+using hw.Forms;
+using hw.Helper;
 using System.Linq;
 using System.Windows.Forms;
 using hw.Debug;
-using hw.Helper;
-using hw.Forms;
 using Reni.Basics;
 using Reni.Code;
 
@@ -86,10 +64,10 @@ namespace Reni
         internal bool HasArg => Contains(CodeArg.Instance);
         public int Count => _data.Count;
 
-        public IContextReference this[int i] => _data[i];
+        IContextReference this[int i] => _data[i];
         public Size Size => Sizes.Size;
         public bool IsNone => Count == 0;
-        public IContextReference[] SortedData => _sortedDataCache.Value;
+        IContextReference[] SortedData => _sortedDataCache.Value;
 
         internal static CodeArgs Void() => new CodeArgs();
         internal static CodeArgs Arg() => new CodeArgs(CodeArg.Instance);
@@ -103,13 +81,15 @@ namespace Reni
             return new CodeArgs(_data, codeArgs._data);
         }
 
-        internal static CodeArgs Create(IContextReference contextReference) => new CodeArgs(contextReference);
+        internal static CodeArgs Create(IContextReference contextReference)
+            => new CodeArgs(contextReference);
 
         protected override string GetNodeDump()
         {
             if(Count > 5)
                 return base.GetNodeDump() + " Count = " + Count;
-            return "{" + _data.Select(contextReference => contextReference.NodeDump()).Stringify(",") + "}";
+            return "{"
+                + _data.Select(contextReference => contextReference.NodeDump()).Stringify(",") + "}";
         }
 
         public override string DumpData()
@@ -141,9 +121,18 @@ namespace Reni
             return new CodeArgs(r);
         }
 
-        IContextReference[] ObtainSortedData() { return _data.OrderBy(codeArg => codeArg.Order).ToArray(); }
+        IContextReference[] ObtainSortedData()
+            => _data
+                .OrderBy(codeArg => codeArg.Order)
+                .ToArray();
+
         public CodeArgs WithoutArg() => Without(CodeArg.Instance);
-        public CodeArgs Without(CodeArgs other) { return other._data.Aggregate(this, (current, refInCode) => current.Without(refInCode)); }
+
+        CodeArgs Without(CodeArgs other)
+            => other
+                ._data
+                .Aggregate(this, (current, refInCode) => current.Without(refInCode));
+
         public bool Contains(IContextReference context) => _data.Contains(context);
         public bool Contains(CodeArgs other)
         {
@@ -179,12 +168,11 @@ namespace Reni
         }
 
         internal CodeBase ToCode()
-        {
-            return _data
+            => _data
                 .Aggregate(CodeBase.Void, (current, t) => current + CodeBase.ReferenceCode(t));
-        }
 
-        internal CodeBase ReplaceRefsForFunctionBody(CodeBase code, Size refSize, CodeBase codeArgsReference)
+        internal CodeBase ReplaceRefsForFunctionBody
+            (CodeBase code, Size refSize, CodeBase codeArgsReference)
         {
             var trace = ObjectId == -1;
             StartMethodDump(trace, code, refSize, codeArgsReference);
@@ -198,7 +186,8 @@ namespace Reni
                     BreakExecution();
                     Tracer.Assert(referenceInCode.Size == refSize);
                     reference = reference.ReferencePlus(refSize * -1);
-                    result = result.ReplaceAbsolute(referenceInCode, () => reference.DePointer(refSize));
+                    result = result.ReplaceAbsolute
+                        (referenceInCode, () => reference.DePointer(refSize));
                     Dump("result", result);
                 }
                 return ReturnMethodDump(result);

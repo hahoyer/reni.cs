@@ -38,32 +38,39 @@ namespace Reni.Type
 
         internal override string DumpPrintText => "(" + Value.DumpPrintText + "()) type";
 
-        IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
+        IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature
+            (DumpPrintToken tokenClass)
             => Extension.SimpleFeature(DumpPrintTokenResult);
 
-        IFeatureImplementation ISymbolProvider<Star, IFeatureImplementation>.Feature(Star tokenClass)
+        IFeatureImplementation ISymbolProvider<Star, IFeatureImplementation>.Feature
+            (Star tokenClass)
             => Extension.MetaFeature(StarResult);
 
-        IFeatureImplementation ISymbolProvider<Slash, IFeatureImplementation>.Feature(Slash tokenClass)
+        IFeatureImplementation ISymbolProvider<Slash, IFeatureImplementation>.Feature
+            (Slash tokenClass)
             => Extension.MetaFeature(SlashResult);
 
-        IFeatureImplementation ISymbolProvider<Mutable, IFeatureImplementation>.Feature(Mutable tokenClass)
+        IFeatureImplementation ISymbolProvider<Mutable, IFeatureImplementation>.Feature
+            (Mutable tokenClass)
             => Value is ArrayType
                 ? Extension.SimpleFeature(MutableArrayResult)
                 : Value is ArrayReferenceType
                     ? Extension.SimpleFeature(MutableReferenceResult)
                     : null;
 
-        IFeatureImplementation ISymbolProvider<ArrayReference, IFeatureImplementation>.Feature(ArrayReference tokenClass)
+        IFeatureImplementation ISymbolProvider<ArrayReference, IFeatureImplementation>.Feature
+            (ArrayReference tokenClass)
             => Value is ArrayType ? Extension.SimpleFeature(ArrayReferenceResult) : null;
 
-        IFeatureImplementation ISymbolProvider<ArrayAccess, IFeatureImplementation>.Feature(ArrayAccess tokenClass)
+        IFeatureImplementation ISymbolProvider<ArrayAccess, IFeatureImplementation>.Feature
+            (ArrayAccess tokenClass)
             => Value is ArrayType ? Extension.SimpleFeature(ArrayAccessResult) : null;
 
 
         protected override string GetNodeDump() => "(" + Value.NodeDump + ") type";
 
-        internal override Result InstanceResult(Category category, Func<Category, Result> getRightResult)
+        internal override Result InstanceResult
+            (Category category, Func<Category, Result> getRightResult)
             => RawInstanceResult(category.Typed, getRightResult).LocalReferenceResult;
 
         Result RawInstanceResult(Category category, Func<Category, Result> getRightResult)
@@ -76,9 +83,11 @@ namespace Reni.Type
                 .ReplaceArg(getRightResult);
         }
 
-        new Result DumpPrintTokenResult(Category category) => Value.DumpPrintTypeNameResult(category);
+        new Result DumpPrintTokenResult(Category category)
+            => Value.DumpPrintTypeNameResult(category);
 
-        Result StarResult(Category category, ResultCache left, ContextBase context, CompileSyntax right)
+        Result StarResult
+            (Category category, ResultCache left, ContextBase context, CompileSyntax right)
         {
             var countResult = right.Result(context).AutomaticDereferenceResult;
             var count = countResult
@@ -91,7 +100,8 @@ namespace Reni.Type
             return type.Result(category);
         }
 
-        Result SlashResult(Category category, ResultCache left, ContextBase context, CompileSyntax right)
+        Result SlashResult
+            (Category category, ResultCache left, ContextBase context, CompileSyntax right)
         {
             var rightType = right
                 .Type(context)
@@ -114,9 +124,13 @@ namespace Reni.Type
             return RootContext.BitType.Result(category, BitsConst.Convert(count.Value));
         }
 
-        Result MutableArrayResult(Category category) => ((ArrayType) Value).Mutable.TypeType.Result(category);
-        Result ArrayReferenceResult(Category category) => ((ArrayType) Value).Reference(true).TypeType.Result(category);
-        Result ArrayAccessResult(Category category) => ((ArrayType)Value).ElementType.TypeType.Result(category);
-        Result MutableReferenceResult(Category category) => ((ArrayReferenceType) Value).Mutable.TypeType.Result(category);
+        Result MutableArrayResult(Category category)
+            => ((ArrayType) Value).Mutable.TypeType.Result(category);
+        Result ArrayReferenceResult(Category category)
+            => ((ArrayType) Value).Reference(true).TypeType.Result(category);
+        Result ArrayAccessResult(Category category)
+            => ((ArrayType) Value).ElementType.TypeType.Result(category);
+        Result MutableReferenceResult(Category category)
+            => ((ArrayReferenceType) Value).Mutable.TypeType.Result(category);
     }
 }
