@@ -68,7 +68,14 @@
     <Compile Include="FeatureTest\Function\TwoFunctions.cs" />
     <Compile Include="FeatureTest\Function\TwoFunctions1.cs" />
     <Compile Include="FeatureTest\Helper\LikeSyntax.cs" />
-    <Compile Include="FeatureTest\Reference\All.cs" />
+    <Compile Include="FeatureTest\Reference\ArrayElementType.cs" />
+    <Compile Include="FeatureTest\Reference\ArrayElementType1.cs" />
+    <Compile Include="FeatureTest\Reference\ArrayReferenceAll.cs" />
+    <Compile Include="FeatureTest\Reference\ArrayReferenceByInstance.cs" />
+    <Compile Include="FeatureTest\Reference\ArrayReferenceCopy.cs" />
+    <Compile Include="FeatureTest\Reference\ArrayReferenceCopyAssign.cs" />
+    <Compile Include="FeatureTest\Reference\ArrayReferenceDumpLoop.cs" />
+    <Compile Include="FeatureTest\Reference\ArrayReferenceDumpSimple.cs" />
     <Compile Include="FeatureTest\Structure\Access.cs" />
     <Compile Include="FeatureTest\Structure\AccessAndAdd.cs" />
     <Compile Include="FeatureTest\Structure\AccessAndAddComplex.cs" />

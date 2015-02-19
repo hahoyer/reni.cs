@@ -53,8 +53,8 @@ system: /!\
 };
 
 Text: /\
-{ !mutable data: ^ array_reference 
-. _elementType: ^ type >>
+{ _elementType: ^ type >>
+. !mutable data: ((_elementType*1) array_reference) instance(^)
 . _count: ^ count
 . AfterCopy: /\ data:= system NewMemory
     ( elementType: _elementType
