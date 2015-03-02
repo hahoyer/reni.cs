@@ -25,7 +25,6 @@ namespace Reni.ReniParser
                         ToNumberOfBase.Id
                     );
 
-                x += PrioTable.Left(ArrayAccess.Id);
                 x += PrioTable.Left(ConcatArrays.Id, ConcatArrays.MutableId);
 
                 x += PrioTable.Left(Star.Id, Slash.Id, "\\");

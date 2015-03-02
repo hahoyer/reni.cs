@@ -16,7 +16,6 @@ namespace Reni.Type
         : TypeBase
             , ISymbolProvider<Mutable, IFeatureImplementation>
             , ISymbolProvider<EnableReinterpretation, IFeatureImplementation>
-            , ISymbolProvider<TokenClasses.ArrayAccess, IFeatureImplementation>
             , ISymbolProvider<Plus, IFeatureImplementation>
             , ISymbolProvider<Minus, IFeatureImplementation>
             , IForcedConversionProvider<ArrayReferenceType>
@@ -125,9 +124,8 @@ namespace Reni.Type
             (EnableReinterpretation tokenClass)
             => Extension.SimpleFeature(EnableReinterpretationResult);
 
-        IFeatureImplementation ISymbolProvider<TokenClasses.ArrayAccess, IFeatureImplementation>.
-            Feature
-            (TokenClasses.ArrayAccess tokenClass)
+        IFeatureImplementation ArrayAccessFeature
+            (TokenClass tokenClass)
             => Extension.FunctionFeature(AccessResult);
 
         IFeatureImplementation ISymbolProvider<Minus, IFeatureImplementation>.Feature

@@ -18,7 +18,6 @@ namespace Reni.Type
             , ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>
             , ISymbolProviderForPointer<ConcatArrays, IFeatureImplementation>
             , ISymbolProviderForPointer<TextItem, IFeatureImplementation>
-            , ISymbolProviderForPointer<TokenClasses.ArrayAccess, IFeatureImplementation>
             , ISymbolProviderForPointer<ToNumberOfBase, IFeatureImplementation>
             , ISymbolProviderForPointer<Mutable, IFeatureImplementation>
             , ISymbolProviderForPointer<ArrayReference, IFeatureImplementation>
@@ -138,8 +137,8 @@ namespace Reni.Type
             => Feature.Extension.SimpleFeature(MutableResult);
 
         IFeatureImplementation
-            ISymbolProviderForPointer<TokenClasses.ArrayAccess, IFeatureImplementation>.Feature
-            (TokenClasses.ArrayAccess tokenClass)
+            ArrayAccessFeature
+            (TokenClass tokenClass)
             => Feature.Extension.FunctionFeature(ElementAccessResult);
 
         IFeatureImplementation ISymbolProviderForPointer<ToNumberOfBase, IFeatureImplementation>.
