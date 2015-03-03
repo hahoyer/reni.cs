@@ -41,7 +41,7 @@ system: /!\
         while: /\ position < count,
         body: /\ 
         ( 
-            result(position) := initializer(position), 
+            result item(position) := initializer(position), 
             position := (position + 1) enable_cut
         ) 
     )
@@ -53,13 +53,13 @@ system: /!\
 };
 
 Text: /\
-{ _elementType: ^ type reference_target
+{ _elementType: ^ type item
 . !mutable data: ((_elementType*1) array_reference)instance(^)
 . _count: ^ count
 . AfterCopy: /\ data:= system NewMemory
     ( elementType: _elementType
     . count: _count
-    . initializer: /\ data(^)
+    . initializer: /\ data item(^)
     )
 . AfterCopy()
 . dump_print: /!\ 
@@ -70,7 +70,7 @@ Text: /\
             while: /\ position < _count,
             body: /\ 
             ( 
-                data(position) dump_print, 
+                data item(position) dump_print, 
                 position := (position + 1) enable_cut
             ) 
         )
