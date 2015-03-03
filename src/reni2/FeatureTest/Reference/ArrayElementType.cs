@@ -9,7 +9,7 @@ namespace Reni.FeatureTest.Reference
     [ArrayElementType1]
     [Target(@"
 a: 'Text';
-t: a type >>;
+t: a type item;
 t dump_print
 ")]
     [Output("(bit)*8[text_item]")]
