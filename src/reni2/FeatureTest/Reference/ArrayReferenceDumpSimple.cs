@@ -14,12 +14,12 @@ o:
     dump_print: 
     /!\ 
     {
-        (data >> 0) dump_print;
-        (data >> 1) dump_print;
-        (data >> 2) dump_print;
-        (data >> 3) dump_print;
-        (data >> 4) dump_print;
-        (data >> 5) dump_print
+        data item(0) dump_print;
+        data item(1) dump_print;
+        data item(2) dump_print;
+        data item(3) dump_print;
+        data item(4) dump_print;
+        data item(5) dump_print
     }
 };
 
