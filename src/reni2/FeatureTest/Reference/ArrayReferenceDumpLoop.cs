@@ -24,7 +24,7 @@ o:
             while: /\ position < count,
             body: /\ 
             ( 
-                (data >> position) dump_print, 
+                data item(position) dump_print, 
                 position := (position + 1) enable_cut
             ) 
         )
