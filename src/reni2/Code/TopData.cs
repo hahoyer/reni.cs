@@ -30,7 +30,7 @@ namespace Reni.Code
         public TopFrameData(Size offset, Size size, Size dataSize)
             : base(offset, size, dataSize)
         {
-            StopByObjectIds(202);
+            StopByObjectIds();
         }
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement)
