@@ -26,18 +26,18 @@ namespace Reni.FeatureTest.Array
     [ElementAccessVariable]
     [ArrayVariable]
     [TwoStatements]
-    [TargetSet("x:  <<:= 5; xitem0 := 2; x dump_print", "<<:=(2)")]
+    [TargetSet("x:  <<:= 5;  x item(0):= 2; x dump_print", "<<:=(2)")]
     public sealed class ElementAccessVariableSetterSimple : CompilerTest {}
 
     [TestFixture]
     [ElementAccessVariableSetterSimple]
     [TwoStatements]
-    [TargetSet("x:  <<5<<3<<5<<1<<:=3; xitem3 := 2; x dump_print", "<<:=(5, 3, 5, 2, 3)")]
+    [TargetSet("x:  <<5<<3<<5<<1<<:=3; x item(3) := 2; x dump_print", "<<:=(5, 3, 5, 2, 3)")]
     public sealed class ElementAccessVariableSetter : CompilerTest {}
 
     [TestFixture]
     [ElementAccess]
     [TwoStatements]
-    [TargetSet("x: <<5<<3<<5<<1<<3; (xitem3) dump_print", "1")]
+    [TargetSet("x: <<5<<3<<5<<1<<3;  x item(3) dump_print", "1")]
     public sealed class ElementAccessVariable : CompilerTest {}
 }
