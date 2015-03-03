@@ -46,9 +46,9 @@ namespace Reni.TokenClasses
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class ReferenceTarget : Definable, ITokenClassWithId
+    sealed class Item : Definable, ITokenClassWithId
     {
-        public const string Id = "reference_target";
+        public const string Id = "item";
         [DisableDump]
         internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
         string ITokenClassWithId.Id => Id;

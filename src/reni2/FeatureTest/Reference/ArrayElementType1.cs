@@ -16,7 +16,7 @@ NewMemory: /\
 Text: /\
 { 
     !mutable data: ^ array_reference;
-    _elementType: ^ type >>;
+    _elementType: ^ type item;
     _count: ^ count;
     AfterCopy: /\ NewMemory(elementType: _elementType, count: _count);
 };

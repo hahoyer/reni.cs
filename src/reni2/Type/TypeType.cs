@@ -19,7 +19,7 @@ namespace Reni.Type
             , ISymbolProvider<Slash, IFeatureImplementation>
             , ISymbolProvider<Mutable, IFeatureImplementation>
             , ISymbolProvider<ArrayReference, IFeatureImplementation>
-            , ISymbolProvider<ReferenceTarget, IFeatureImplementation>
+            , ISymbolProvider<Item, IFeatureImplementation>
     {
         public TypeType(TypeBase value)
         {
@@ -62,8 +62,8 @@ namespace Reni.Type
             (ArrayReference tokenClass)
             => Value is ArrayType ? Extension.SimpleFeature(ArrayReferenceResult) : null;
 
-        IFeatureImplementation ISymbolProvider<ReferenceTarget, IFeatureImplementation>.Feature
-            (ReferenceTarget tokenClass)
+        IFeatureImplementation ISymbolProvider<Item, IFeatureImplementation>.Feature
+            (Item tokenClass)
             => Value is ArrayType ? Extension.SimpleFeature(ArrayAccessResult) : null;
 
 
