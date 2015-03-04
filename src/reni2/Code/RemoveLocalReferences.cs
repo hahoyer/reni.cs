@@ -10,8 +10,8 @@ namespace Reni.Code
 {
     sealed class RemoveLocalReferences : Base
     {
-        public CodeBase Body { get; set; }
-        public CodeBase Copier { get; set; }
+        CodeBase Body { get; }
+        CodeBase Copier { get; }
 
         sealed class Counter : Base
         {
