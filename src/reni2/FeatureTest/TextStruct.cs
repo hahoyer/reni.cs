@@ -110,5 +110,6 @@ Text: /\
     [Output("Hallo")]
     [InstanceCode("Text('H') << 'allo'")]
     [Text1]
+    [UserObjects]
     public sealed class TextConcat : TextStruct {}
 }
