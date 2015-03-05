@@ -75,14 +75,14 @@ Text: /\
             ) 
         )
     }
-. << /\ 
+. << : /\ 
     {
         
     } 
 }
 ";
 
-        protected override string Target => Definition() + "; " + InstanceCode + " dump_print";
+        protected override string Target => Definition() + "; (" + InstanceCode + ") dump_print";
         protected virtual string InstanceCode => GetStringAttribute<InstanceCodeAttribute>();
     }
 
