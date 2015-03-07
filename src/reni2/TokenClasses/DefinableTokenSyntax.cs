@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
+using hw.Parser;
 using hw.Scanner;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
@@ -10,14 +11,20 @@ namespace Reni.TokenClasses
 {
     sealed class DefinableTokenSyntax : Syntax
     {
-        internal DefinableTokenSyntax(Definable definable, SourcePart tokenData, bool isMutable)
-            : base(tokenData)
+        internal DefinableTokenSyntax
+            (
+            Definable definable,
+            SourcePart tokenData,
+            DeclarationTagSyntax tag = null,
+            SourcePart additionalSourcePart = null)
+            : base(tokenData, additionalSourcePart)
         {
-            IsMutable = isMutable;
+            Tag = tag;
             Definable = definable;
         }
 
-        internal bool IsMutable { get; }
+        internal bool IsMutable => Tag?.DeclaresMutable ?? false;
+        internal DeclarationTagSyntax Tag { get; }
         internal Definable Definable { get; }
 
         internal override Syntax CreateDeclarationSyntax(SourcePart token, Syntax right)
@@ -28,9 +35,10 @@ namespace Reni.TokenClasses
         {
             get
             {
-                Tracer.Assert(!IsMutable);
+                Tracer.Assert(Tag==null);
                 return new ExpressionSyntax(Definable, null, Token, null);
             }
         }
+        protected override ParsedSyntax[] Children => new ParsedSyntax[] { Tag};
     }
 }

@@ -43,12 +43,15 @@ namespace Reni.TokenClasses
     }
 
     [BelongsTo(typeof(DeclarationTokenFactory))]
-    abstract class DeclarationToken : TokenClass
+    abstract class DeclarationTagToken : TokenClass
     {
-        protected override Syntax Terminal(SourcePart token)
-            => new DeclarationTokenSyntax(this, token);
         internal abstract Syntax DeclarationSyntax(SourcePart token, CompileSyntax body);
-        internal abstract Syntax DefinableSyntax(Definable definable, SourcePart token);
+
+        protected override Syntax Terminal(SourcePart token)
+            => new DeclarationTagSyntax(this, token);
+
+        internal abstract Syntax DefinableSyntax
+            (Definable definable, SourcePart token, DeclarationTagSyntax tag);
 
         protected override sealed Syntax Infix(Syntax left, SourcePart token, Syntax right)
         {
@@ -57,48 +60,61 @@ namespace Reni.TokenClasses
         }
     }
 
-    sealed class ConverterToken : DeclarationToken, ITokenClassWithId
+    sealed class ConverterToken : DeclarationTagToken, ITokenClassWithId
     {
         public const string Id = "converter";
         string ITokenClassWithId.Id => Id;
+
         internal override Syntax DeclarationSyntax(SourcePart token, CompileSyntax body)
             => new DeclarationSyntax(token, body, isConverter: true);
-        internal override Syntax DefinableSyntax(Definable definable, SourcePart token)
+
+        internal override Syntax DefinableSyntax
+            (Definable definable, SourcePart token, DeclarationTagSyntax sourcePart = null)
         {
             NotImplementedMethod(definable, token);
             return null;
         }
     }
 
-    sealed class MutableDeclarationToken : DeclarationToken, ITokenClassWithId
+    sealed class MutableDeclarationToken : DeclarationTagToken, ITokenClassWithId
     {
         public const string Id = "mutable";
         string ITokenClassWithId.Id => Id;
+
         internal override Syntax DeclarationSyntax(SourcePart token, CompileSyntax body)
-            => new DeclarationSyntax(token, body, DefinableTokenSyntax(null, token));
-        internal override Syntax DefinableSyntax(Definable definable, SourcePart token)
-            => DefinableTokenSyntax(definable, token);
-        static DefinableTokenSyntax DefinableTokenSyntax(Definable definable, SourcePart token)
-            => new DefinableTokenSyntax(definable, token, true);
+            =>
+                new DeclarationSyntax
+                    (
+                    token,
+                    body,
+                    new DeclarationTagSyntax(this, token).DefinableTokenSyntax(null, token)
+                    );
+
+        internal override Syntax DefinableSyntax
+            (Definable definable, SourcePart token, DeclarationTagSyntax tag)
+            =>  tag.DefinableTokenSyntax(definable, token);
     }
 
-    sealed class DeclarationTokenSyntax : Syntax
+    sealed class DeclarationTagSyntax : Syntax
     {
-        readonly DeclarationToken _declaration;
+        readonly DeclarationTagToken _tag;
 
-        internal DeclarationTokenSyntax(DeclarationToken declaration, SourcePart token)
-            : base(token)
-        {
-            _declaration = declaration;
-        }
+        internal DeclarationTagSyntax
+            (DeclarationTagToken tag, SourcePart token, SourcePart additionalSourcePart = null)
+            : base(token, additionalSourcePart) { _tag = tag; }
+        public bool DeclaresMutable => _tag is MutableDeclarationToken;
+
+        internal override bool IsKeyword => true;
 
         internal override Syntax CreateDeclarationSyntax(SourcePart token, Syntax right)
             =>
-                _declaration.DeclarationSyntax
+                _tag.DeclarationSyntax
                     (token, right.CheckedToCompiledSyntax(token, RightMustNotBeNullError));
 
+        public override Syntax Sourround(SourcePart sourcePart)
+            => new DeclarationTagSyntax(_tag, Token, sourcePart);
         internal override Syntax SuffixedBy(Definable definable, SourcePart token)
-            => _declaration.DefinableSyntax(definable, token);
+            => _tag.DefinableSyntax(definable, token, this);
 
 
         IssueId RightMustNotBeNullError()
@@ -106,5 +122,14 @@ namespace Reni.TokenClasses
             NotImplementedMethod();
             return null;
         }
+        internal DefinableTokenSyntax DefinableTokenSyntax
+            (Definable definable, SourcePart token, SourcePart additionalSourcePart = null)
+            =>
+                new DefinableTokenSyntax
+                    (
+                    definable,
+                    token,
+                    this,
+                    additionalSourcePart);
     }
 }

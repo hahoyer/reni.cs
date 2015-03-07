@@ -33,7 +33,7 @@ namespace Reni.ReniParser
         [EnableDump]
         Syntax Body { get; }
         [DisableDump]
-        internal override bool IsMutableSyntax => Target != null && Target.IsMutable;
+        internal override bool IsMutableSyntax => Target?.IsMutable??false;
         [DisableDump]
         internal override bool IsConverterSyntax => IsConverter;
         [DisableDump]
