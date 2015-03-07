@@ -10,7 +10,7 @@ namespace Reni.ReniParser
     {
         readonly Syntax _value;
         public SyntaxBoxToken(Syntax value) { _value = value; }
-        protected override Syntax Terminal(SourcePart token) => _value;
+        protected override Syntax Terminal(SourcePart token) => _value.Sourround(token);
         protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
         {
             NotImplementedMethod(left, token, right);
