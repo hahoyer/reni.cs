@@ -234,16 +234,16 @@ namespace Reni
                 return result;
 
             var kind = SpecialToken.Type.WhiteSpace;
-            var l = ReniLexer.WhiteSpaceLexerInstance.PlainWhiteSpace(sourcePosn);
+            var l = ReniLexer.LexerForUserInterfaceInstance.PlainWhiteSpace(sourcePosn);
             if(l == null)
             {
                 kind = SpecialToken.Type.LineComment;
-                l = ReniLexer.WhiteSpaceLexerInstance.LineComment(sourcePosn);
+                l = ReniLexer.LexerForUserInterfaceInstance.LineComment(sourcePosn);
             }
             if(l == null)
             {
                 kind = SpecialToken.Type.Comment;
-                l = ReniLexer.WhiteSpaceLexerInstance.Comment(sourcePosn);
+                l = ReniLexer.LexerForUserInterfaceInstance.Comment(sourcePosn);
             }
 
             if(l == null)

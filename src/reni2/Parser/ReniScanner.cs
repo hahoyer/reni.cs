@@ -8,17 +8,18 @@ using Reni.Validation;
 
 namespace Reni.Parser
 {
-    interface IWhiteSpaceLexer
+    interface ILexerForUserInterface
     {
         int? PlainWhiteSpace(SourcePosn sourcePosn);
         int? Comment(SourcePosn sourcePosn);
         int? LineComment(SourcePosn sourcePosn);
     }
 
-    sealed class ReniLexer : ILexer, IWhiteSpaceLexer
+    sealed class ReniLexer : ILexer, ILexerForUserInterface
     {
         internal static readonly ILexer Instance = new ReniLexer();
-        internal static readonly IWhiteSpaceLexer WhiteSpaceLexerInstance = (IWhiteSpaceLexer) Instance;
+        internal static readonly ILexerForUserInterface LexerForUserInterfaceInstance =
+            (ILexerForUserInterface) Instance;
 
         sealed class Error : Match.IError
         {
@@ -86,9 +87,9 @@ namespace Reni.Parser
         int? ILexer.Text(SourcePosn sourcePosn) => sourcePosn.Match(_text);
         public static IssueId Parse(Match.IError error) => ((Error) error).IssueId;
 
-        int? IWhiteSpaceLexer.PlainWhiteSpace(SourcePosn sourcePosn)
+        int? ILexerForUserInterface.PlainWhiteSpace(SourcePosn sourcePosn)
             => sourcePosn.Match(Match.WhiteSpace.Repeat(1));
-        int? IWhiteSpaceLexer.Comment(SourcePosn sourcePosn) => sourcePosn.Match(_lineComment);
-        int? IWhiteSpaceLexer.LineComment(SourcePosn sourcePosn) => sourcePosn.Match(_comment);
+        int? ILexerForUserInterface.Comment(SourcePosn sourcePosn) => sourcePosn.Match(_lineComment);
+        int? ILexerForUserInterface.LineComment(SourcePosn sourcePosn) => sourcePosn.Match(_comment);
     }
 }
