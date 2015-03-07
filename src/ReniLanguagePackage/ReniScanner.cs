@@ -15,15 +15,15 @@ namespace HoyerWare.ReniLanguagePackage
 
         public ReniScanner(IVsTextLines buffer)
         {
-            Buffer = buffer;
+            Buffer = new VsTextLinesWrapper(buffer);
             _compilerCache = new ValueCache<Compiler>(CreateCompilerForCache);
         }
 
-        Compiler CreateCompilerForCache() => new Compiler(text: All);
+        Compiler CreateCompilerForCache() => new Compiler(text: Buffer.All);
 
         readonly List<int> _lineHash = new List<int>();
 
-        IVsTextLines Buffer { get; }
+        VsTextLinesWrapper Buffer { get; }
 
         bool IScanner.ScanTokenAndProvideInfoAboutIt(TokenInfo tokenInfo, ref int lineIndex)
         {
@@ -31,20 +31,20 @@ namespace HoyerWare.ReniLanguagePackage
 
             var tokenId = "(" + tokenInfo.StartIndex + "..." + tokenInfo.EndIndex + ")."
                 + tokenInfo.Token + "i";
-            var line = lineIndex + ": " + Line(lineIndex);
+            var line = lineIndex + ": " + Buffer.Line(lineIndex);
 
             var trace = lineIndex == -3 && tokenInfo.StartIndex==4;
             StartMethodDump(trace, tokenId, line);
             try
             {
                 BreakExecution();
-                if(tokenInfo.EndIndex + 1 >= LineLength(lineIndex))
+                if(tokenInfo.EndIndex + 1 >= Buffer.LineLength(lineIndex))
                 {
                     lineIndex++;
                     return ReturnMethodDump(false, false);
                 }
 
-                var lineStart = LinePosition(lineIndex);
+                var lineStart = Buffer.LinePosition(lineIndex);
                 var position = lineStart + tokenInfo.EndIndex + 1;
                 var token = _compilerCache.Value.Token(position);
                 if(token == null)
@@ -57,7 +57,7 @@ namespace HoyerWare.ReniLanguagePackage
                 tokenInfo.StartIndex = token.StartPosition - lineStart;
                 tokenInfo.EndIndex = Math.Min
                     (
-                        LineLength(lineIndex),
+                        Buffer.LineLength(lineIndex),
                         tokenInfo.StartIndex + token.Length - 1
                     );
                 tokenInfo.Color = ConvertToTokenColor(token);
@@ -78,7 +78,7 @@ namespace HoyerWare.ReniLanguagePackage
         {
             EnsureCorrectNumberOfLines();
 
-            var hashCode = Line(index).GetHashCode();
+            var hashCode = Buffer.Line(index).GetHashCode();
             if(_lineHash[index] == hashCode)
                 return;
 
@@ -88,76 +88,19 @@ namespace HoyerWare.ReniLanguagePackage
 
         void EnsureCorrectNumberOfLines()
         {
-            var removedLines = _lineHash.Count - LineCount;
+            var removedLines = _lineHash.Count - Buffer.LineCount;
             if(removedLines > 0)
             {
-                _lineHash.RemoveRange(LineCount, removedLines);
+                _lineHash.RemoveRange(Buffer.LineCount, removedLines);
                 _compilerCache.IsValid = false;
                 return;
             }
 
-            while(_lineHash.Count < LineCount)
+            while(_lineHash.Count < Buffer.LineCount)
             {
-                _lineHash.Add(Line(_lineHash.Count).GetHashCode());
+                _lineHash.Add(Buffer.Line(_lineHash.Count).GetHashCode());
                 _compilerCache.IsValid = false;
             }
-        }
-
-        int LineCount
-        {
-            get
-            {
-                int result;
-                Buffer.GetLineCount(out result);
-                return result;
-            }
-        }
-
-        int LinePosition(int lineIndex)
-        {
-            int result;
-            Buffer.GetPositionOfLine(lineIndex, out result);
-            return result;
-        }
-
-        int LineIndex(int position)
-        {
-            int result;
-            int column;
-            Buffer.GetLineIndexOfPosition(position, out result, out column);
-            return result;
-        }
-
-        int LineLength(int lineIndex)
-        {
-            int result;
-            Buffer.GetLengthOfLine(lineIndex, out result);
-            return result;
-        }
-
-
-        [DisableDump]
-        string All
-        {
-            get
-            {
-                int lineCount;
-                Buffer.GetLineCount(out lineCount);
-                int lengthOfLastLine;
-                Buffer.GetLengthOfLine(lineCount - 1, out lengthOfLastLine);
-                string result;
-                Buffer.GetLineText(0, 0, lineCount - 1, lengthOfLastLine, out result);
-                return result;
-            }
-        }
-
-        string Line(int index)
-        {
-            int length;
-            Buffer.GetLengthOfLine(index, out length);
-            string result;
-            Buffer.GetLineText(index, 0, index, length, out result);
-            return result;
         }
 
         void IScanner.SetSource(string source, int offset)

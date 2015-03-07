@@ -15,17 +15,22 @@ namespace HoyerWare.ReniLanguagePackage
         sealed class AuthoringScopeWrapper : AuthoringScope
         {
             readonly ReniAuthoringScope _data;
+
             internal AuthoringScopeWrapper(ParseRequest request)
             {
                 _data = new ReniAuthoringScope(request);
             }
+
             public override string GetDataTipText(int line, int col, out TextSpan span)
                 => _data.GetDataTipText(line, col, out span);
+
             public override Declarations GetDeclarations
                 (IVsTextView view, int line, int col, TokenInfo info, ParseReason reason)
                 => _data.GetDeclarations(view, line, col, info, reason);
+
             public override Methods GetMethods(int line, int col, string name)
                 => _data.GetMethods(line, col, name);
+
             public override string Goto
                 (
                 VSConstants.VSStd97CmdID cmd,
@@ -45,10 +50,15 @@ namespace HoyerWare.ReniLanguagePackage
         }
 
         public override string Name => "Reni";
-        public override LanguagePreferences GetLanguagePreferences() => _preferencesCache.Value;
-        public override IScanner GetScanner(IVsTextLines buffer) => new ReniScanner(buffer);
-        public override AuthoringScope ParseSource
-            (ParseRequest request) => new AuthoringScopeWrapper(request);
+
+        public override LanguagePreferences GetLanguagePreferences() 
+            => _preferencesCache.Value;
+
+        public override IScanner GetScanner(IVsTextLines buffer) 
+            => new ReniScanner(buffer);
+
+        public override AuthoringScope ParseSource(ParseRequest request)
+            => new AuthoringScopeWrapper(request);
 
         public override string GetFormatFilterList() => "Reni files (*.reni)\n*.reni\n";
     }
