@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using hw.Debug;
 using hw.Forms;
+using hw.Parser;
 using hw.Scanner;
 using Reni.Code;
 using Reni.Context;
@@ -19,6 +20,8 @@ namespace Reni
 {
     public sealed class Compiler : DumpableObject, IExecutionContext
     {
+        static readonly IScanner<Syntax> _scanner = new Scanner<Syntax>(ReniLexer.Instance);
+
         readonly MainTokenFactory _tokenFactory;
         readonly CompilerParameters _parameters;
         readonly string _className;
@@ -51,7 +54,7 @@ namespace Reni
             _className = className ?? fileName?.Symbolize() ?? "ReniMainClass";
             _rootContext = new Root(this);
             _parameters = parameters ?? new CompilerParameters();
-            _tokenFactory = new MainTokenFactory
+            _tokenFactory = new MainTokenFactory(_scanner)
             {
                 Trace = _parameters.TraceOptions.Parser
             };
@@ -246,16 +249,12 @@ namespace Reni
                 l = ReniLexer.LexerForUserInterfaceInstance.Comment(sourcePosn);
             }
 
-            if(l == null)
-            {
-                kind = SpecialToken.Type.Error;
-                l = 1;
-            }
+            if(l!=null)
+                return new SpecialToken(SourcePart.Span(sourcePosn, l.Value), kind);
 
-            return new SpecialToken(SourcePart.Span(sourcePosn, l.Value), kind);
+            return new InnerToken(_scanner.NextToken(sourcePosn, _tokenFactory, null));
         }
     }
-
 
     public interface IOutStream
     {

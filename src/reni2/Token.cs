@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
+using hw.Parser;
 using hw.Scanner;
 using Reni.ReniParser;
+using Reni.TokenClasses;
 
 namespace Reni
 {
@@ -51,7 +53,7 @@ namespace Reni
 
     sealed class SpecialToken : Token
     {
-        sealed public class Type
+        public sealed class Type
         {
             public static readonly Type WhiteSpace = new Type();
             public static readonly Type LineComment = new Type();
@@ -71,5 +73,14 @@ namespace Reni
         public override bool IsLineComment => _type == Type.LineComment;
         public override bool IsWhiteSpace => _type == Type.WhiteSpace;
         public override bool IsError => _type == Type.Error;
+    }
+
+    sealed class InnerToken : Token
+    {
+        readonly ScannerItem<Syntax> _item;
+        public InnerToken(ScannerItem<Syntax> item) { _item = item; }
+        public override SourcePart SourcePart => _item.Part;
+        public override bool IsBraceLike
+            => _item.Type is LeftParenthesis || _item.Type is RightParenthesis;
     }
 }

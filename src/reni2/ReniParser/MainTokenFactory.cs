@@ -79,14 +79,13 @@ namespace Reni.ReniParser
         readonly ISubParser<Syntax> _declarationSyntaxSubParser;
         readonly PrioParser<Syntax> _declarationSyntaxParser;
 
-        public MainTokenFactory()
+        public MainTokenFactory(IScanner<Syntax> scanner)
         {
-            Parser = new PrioParser<Syntax>
-                (PrioTable, new Scanner<Syntax>(ReniLexer.Instance), this);
+            Parser = new PrioParser<Syntax>(PrioTable, scanner, this);
             _declarationSyntaxParser = new PrioParser<Syntax>
                 (
                 DeclarationTokenFactory.PrioTable,
-                new Scanner<Syntax>(ReniLexer.Instance),
+                scanner,
                 new DeclarationTokenFactory()
                 );
             _declarationSyntaxSubParser = new SubParser<Syntax>(_declarationSyntaxParser, Pack);
