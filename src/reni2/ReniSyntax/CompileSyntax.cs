@@ -122,7 +122,7 @@ namespace Reni.ReniSyntax
             NotImplementedMethod(visitor);
             return null;
         }
-        public abstract CompileSyntax Sourround(SourcePart sourcePart);
+        public new abstract CompileSyntax Sourround(SourcePart sourcePart);
     }
 
     sealed class ReplaceArgVisitor : DumpableObject, ISyntaxVisitor

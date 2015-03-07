@@ -95,6 +95,12 @@ namespace Reni.ReniParser
             return null;
         }
 
+        public virtual Syntax Sourround(SourcePart sourcePart)
+        {
+            NotImplementedMethod(sourcePart);
+            return null;
+        }
+
         internal virtual Syntax SuffixedBy(Definable definable, SourcePart token)
             => new ExpressionSyntax(definable, ToCompiledSyntax, token, null);
 
@@ -104,7 +110,7 @@ namespace Reni.ReniParser
             {
                 var child =
                     Children.Select(item => ((Syntax) item)?.LocateToken(sourcePosn))
-                        .FirstOrDefault();
+                        .FirstOrDefault(item => item != null);
                 if(child != null)
                     return child;
                 if(Token.Contains(sourcePosn))
