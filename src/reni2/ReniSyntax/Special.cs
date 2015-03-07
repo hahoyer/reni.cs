@@ -13,8 +13,8 @@ namespace Reni.ReniSyntax
 {
     abstract class SpecialSyntax : CompileSyntax
     {
-        protected SpecialSyntax(SourcePart all, SourcePart token)
-            : base(all, token) {}
+        protected SpecialSyntax(SourcePart token, SourcePart additionalSourcePart = null)
+            : base(token, additionalSourcePart) {}
         internal override bool IsKeyword => !IsNumber && !IsText;
     }
 
@@ -25,7 +25,7 @@ namespace Reni.ReniSyntax
         internal readonly ITerminal Terminal;
 
         public TerminalSyntax(SourcePart token, ITerminal terminal, SourcePart sourcePart = null)
-            : base(sourcePart + token, token)
+            : base(token, sourcePart)
         {
             Terminal = terminal;
         }
@@ -53,7 +53,7 @@ namespace Reni.ReniSyntax
 
         public PrefixSyntax
             (SourcePart token, IPrefix prefix, CompileSyntax right, SourcePart sourcePart = null)
-            : base(token + right.SourcePart + sourcePart, token)
+            : base(token, sourcePart)
         {
             _prefix = prefix;
             _right = right;
@@ -92,7 +92,7 @@ namespace Reni.ReniSyntax
             IInfix infix,
             CompileSyntax right,
             SourcePart sourcePart = null)
-            : base(left.SourcePart + token + right.SourcePart + sourcePart, token)
+            : base(token, sourcePart)
         {
             _left = left;
             _infix = infix;
@@ -153,7 +153,7 @@ namespace Reni.ReniSyntax
             CompileSyntax left,
             ISuffix suffix,
             SourcePart sourcePart = null)
-            : base(token + left.SourcePart+sourcePart, token)
+            : base(token, sourcePart)
         {
             _left = left;
             _suffix = suffix;

@@ -13,11 +13,11 @@ namespace Reni.ReniParser
 {
     abstract class Syntax : ParsedSyntax
     {
-        protected Syntax(SourcePart all, SourcePart token)
-            : base(all, token) {}
+        protected Syntax(SourcePart token, SourcePart additionalSourcePart = null)
+            : base(token, additionalSourcePart) {}
 
-        protected Syntax(SourcePart all, SourcePart token, int nextObjectId)
-            : base(all, token, nextObjectId) {}
+        protected Syntax(SourcePart token, int nextObjectId, SourcePart additionalSourcePart = null)
+            : base(token, nextObjectId, additionalSourcePart) {}
 
         [DisableDump]
         internal virtual CompileSyntax ContainerStatementToCompileSyntax => ToCompiledSyntax;
@@ -86,8 +86,10 @@ namespace Reni.ReniParser
         internal virtual bool IsText => false;
         internal virtual bool IsKeyword => false;
         internal virtual bool IsNumber => false;
+        internal virtual bool IsError => false;
 
-        internal virtual Syntax SyntaxError(SourcePart sourcePart, IssueId issue, SourcePart token, Syntax right = null)
+        internal virtual Syntax SyntaxError
+            (IssueId issue, SourcePart token, Syntax right = null, SourcePart sourcePart = null)
         {
             NotImplementedMethod(sourcePart, issue, token, right);
             return null;
@@ -98,13 +100,17 @@ namespace Reni.ReniParser
 
         internal Token LocateToken(SourcePosn sourcePosn)
         {
-            if(!SourcePart.Contains(sourcePosn))
-                return null;
-            var child =
-                Children.Select(item => ((Syntax) item)?.LocateToken(sourcePosn)).FirstOrDefault();
-            if(child != null)
-                return child;
-            return new Token(this);
+            if(SourcePart.Contains(sourcePosn))
+            {
+                var child =
+                    Children.Select(item => ((Syntax) item)?.LocateToken(sourcePosn))
+                        .FirstOrDefault();
+                if(child != null)
+                    return child;
+                if(Token.Contains(sourcePosn))
+                    return new SyntaxToken(this);
+            }
+            return null;
         }
     }
 }

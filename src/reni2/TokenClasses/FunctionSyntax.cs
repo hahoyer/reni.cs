@@ -1,7 +1,9 @@
 using System.Linq;
 using System.Collections.Generic;
 using System;
+using hw.Debug;
 using hw.Helper;
+using hw.Parser;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
@@ -26,7 +28,7 @@ namespace Reni.TokenClasses
             bool isMetaFunction,
             CompileSyntax getter,
             SourcePart sourcePart = null)
-            : base(setter?.SourcePart + token + getter?.SourcePart + sourcePart, token)
+            : base(token, sourcePart)
         {
             Getter = getter;
             Setter = setter;
@@ -71,5 +73,8 @@ namespace Reni.TokenClasses
                 return null;
             return new FunctionBodyType(compoundView, this);
         }
+
+        [DisableDump]
+        protected override ParsedSyntax[] Children => new ParsedSyntax[] {Setter, Getter};
     }
 }

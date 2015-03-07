@@ -25,11 +25,11 @@ namespace Reni.TokenClasses
 
         protected override Syntax Suffix(Syntax left, SourcePart token)
             => new CompileSyntaxError
-                (IssueId.UnexpectedUseAsSuffix, token, left.SourcePart);
+                (IssueId.UnexpectedUseAsSuffix, token, sourcePart: left.SourcePart);
 
         protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
             => new CompileSyntaxError
-                (IssueId.UnexpectedUseAsSuffix, token, left.SourcePart + right.SourcePart);
+                (IssueId.UnexpectedUseAsSuffix, token, sourcePart: left.SourcePart + right.SourcePart);
 
         protected override Syntax Prefix(SourcePart token, Syntax right)
             => new LeftParenthesisSyntax(Level, token, right);

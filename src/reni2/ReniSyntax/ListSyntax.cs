@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using hw.Helper;
 using System.Linq;
 using hw.Debug;
+using hw.Parser;
 using hw.Scanner;
 using Reni.ReniParser;
 using Reni.Struct;
@@ -13,7 +14,7 @@ namespace Reni.ReniSyntax
     sealed class ListSyntax : Syntax
     {
         public ListSyntax(List type, SourcePart token, IEnumerable<Syntax> data)
-            : base(token + data.Select(item=>item.SourcePart).Aggregate(), token)
+            : base(token)
         {
             Type = type;
             Data = data.ToArray();
@@ -35,5 +36,7 @@ namespace Reni.ReniSyntax
         }
 
         internal static ListSyntax Spread(Syntax statement) => new ListSyntax(null, statement.Token, statement.ToList(null));
+
+        protected override ParsedSyntax[] Children => Data.ToArray<ParsedSyntax>();
     }
 }

@@ -23,7 +23,7 @@ namespace Reni.ReniParser
             SourcePart token,
             CompileSyntax right,
             SourcePart sourcePart = null)
-            : base(left?.SourcePart + token + right?.SourcePart + sourcePart, token)
+            : base(token, sourcePart)
         {
             Operator = @operator;
             Left = left;
@@ -97,10 +97,10 @@ namespace Reni.ReniParser
         }
 
         internal override bool IsIdentifier => true;
-        internal override Syntax SyntaxError(SourcePart sourcePart, IssueId issue, SourcePart token, Syntax right = null)
+        internal override Syntax SyntaxError(IssueId issue, SourcePart token, Syntax right = null, SourcePart sourcePart = null)
         {
             if(Right == null)
-                return Left.SyntaxError(sourcePart + right?.SourcePart, issue, token);
+                return Left.SyntaxError(issue, token, sourcePart: sourcePart + right?.SourcePart);
             NotImplementedMethod(issue, token);
             return null;
         }

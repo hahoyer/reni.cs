@@ -14,7 +14,8 @@ namespace Reni.TokenClasses
     {
         public const string Id = ":";
         string ITokenClassWithId.Id => Id;
-        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right) => left.CreateDeclarationSyntax(token, right);
+        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
+            => left.CreateDeclarationSyntax(token, right);
         protected override Syntax Terminal(SourcePart token)
         {
             NotImplementedMethod(token);
@@ -31,7 +32,7 @@ namespace Reni.TokenClasses
         protected override ISubParser<Syntax> Next { get; }
         protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
         {
-            NotImplementedMethod(left,token,right);
+            NotImplementedMethod(left, token, right);
             return null;
         }
         protected override Syntax Terminal(SourcePart token)
@@ -44,15 +45,15 @@ namespace Reni.TokenClasses
     [BelongsTo(typeof(DeclarationTokenFactory))]
     abstract class DeclarationToken : TokenClass
     {
-        protected override Syntax Terminal(SourcePart token) => new DeclarationTokenSyntax(this, token);
+        protected override Syntax Terminal(SourcePart token)
+            => new DeclarationTokenSyntax(this, token);
         internal abstract Syntax DeclarationSyntax(SourcePart token, CompileSyntax body);
         internal abstract Syntax DefinableSyntax(Definable definable, SourcePart token);
 
-        sealed protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
+        protected override sealed Syntax Infix(Syntax left, SourcePart token, Syntax right)
         {
             NotImplementedMethod(left, token, right);
             return null;
-
         }
     }
 
@@ -61,7 +62,7 @@ namespace Reni.TokenClasses
         public const string Id = "converter";
         string ITokenClassWithId.Id => Id;
         internal override Syntax DeclarationSyntax(SourcePart token, CompileSyntax body)
-            => new ReniParser.DeclarationSyntax(token, body, isConverter: true);
+            => new DeclarationSyntax(token, body, isConverter: true);
         internal override Syntax DefinableSyntax(Definable definable, SourcePart token)
         {
             NotImplementedMethod(definable, token);
@@ -74,8 +75,10 @@ namespace Reni.TokenClasses
         public const string Id = "mutable";
         string ITokenClassWithId.Id => Id;
         internal override Syntax DeclarationSyntax(SourcePart token, CompileSyntax body)
-            => new ReniParser.DeclarationSyntax(token, body, isMutable: true);
+            => new DeclarationSyntax(token, body, DefinableTokenSyntax(null, token));
         internal override Syntax DefinableSyntax(Definable definable, SourcePart token)
+            => DefinableTokenSyntax(definable, token);
+        static DefinableTokenSyntax DefinableTokenSyntax(Definable definable, SourcePart token)
             => new DefinableTokenSyntax(definable, token, true);
     }
 
@@ -84,13 +87,15 @@ namespace Reni.TokenClasses
         readonly DeclarationToken _declaration;
 
         internal DeclarationTokenSyntax(DeclarationToken declaration, SourcePart token)
-            : base(token,token)
+            : base(token)
         {
             _declaration = declaration;
         }
 
         internal override Syntax CreateDeclarationSyntax(SourcePart token, Syntax right)
-            => _declaration.DeclarationSyntax(token, right.CheckedToCompiledSyntax(token, RightMustNotBeNullError));
+            =>
+                _declaration.DeclarationSyntax
+                    (token, right.CheckedToCompiledSyntax(token, RightMustNotBeNullError));
 
         internal override Syntax SuffixedBy(Definable definable, SourcePart token)
             => _declaration.DefinableSyntax(definable, token);

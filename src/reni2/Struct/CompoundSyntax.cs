@@ -27,7 +27,7 @@ namespace Reni.Struct
         static int _nextObjectId;
 
         internal CompoundSyntax(SourcePart token, Syntax[] statements, SourcePart sourcePart = null)
-            : base(token + statements.Select(item=>item.SourcePart).Aggregate() + sourcePart, token, _nextObjectId++)
+            : base(token, _nextObjectId++, token + statements.Select(item=>item.SourcePart).Aggregate() + sourcePart)
         {
             _statements = statements;
             _data = statements
@@ -47,7 +47,7 @@ namespace Reni.Struct
         [DisableDump]
         internal Size IndexSize => Size.AutoSize(Statements.Length);
         [DisableDump]
-        protected override ParsedSyntax[] Children => Statements.ToArray<ParsedSyntax>();
+        protected override ParsedSyntax[] Children => _data.Select(item=>item.RawStatement).ToArray<ParsedSyntax>();
         [DisableDump]
         internal string[] Names => _data.SelectMany(s => s.Names).ToArray();
         [DisableDump]
@@ -128,7 +128,7 @@ namespace Reni.Struct
                 NamesCache = new ValueCache<string[]>(GetNames);
             }
 
-            Syntax RawStatement { get; }
+            internal Syntax RawStatement { get; }
             public int Position { get; }
 
             ValueCache<string[]> NamesCache { get; }

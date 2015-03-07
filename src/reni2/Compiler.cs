@@ -56,7 +56,8 @@ namespace Reni
                 Trace = _parameters.TraceOptions.Parser
             };
 
-            _source = new ValueCache<Source>(() => fileName == null? new Source(text) : new Source(fileName.FileHandle()));
+            _source = new ValueCache<Source>
+                (() => fileName == null ? new Source(text) : new Source(fileName.FileHandle()));
             _tokenCache = new FunctionCache<int, Token>(GetTokenForCache);
             _syntax = new ValueCache<Syntax>(() => Parse(Source + 0));
             _codeContainer = new ValueCache<CodeContainer>
@@ -225,8 +226,36 @@ namespace Reni
 
         public Token Token(int offset) => _tokenCache[offset];
 
-        Token GetTokenForCache(int offset) => Syntax.LocateToken(Source+offset);
+        Token GetTokenForCache(int offset)
+        {
+            var sourcePosn = Source + offset;
+            var result = Syntax.LocateToken(sourcePosn);
+            if(result != null)
+                return result;
+
+            var kind = SpecialToken.Type.WhiteSpace;
+            var l = ReniLexer.WhiteSpaceLexerInstance.PlainWhiteSpace(sourcePosn);
+            if(l == null)
+            {
+                kind = SpecialToken.Type.LineComment;
+                l = ReniLexer.WhiteSpaceLexerInstance.LineComment(sourcePosn);
+            }
+            if(l == null)
+            {
+                kind = SpecialToken.Type.Comment;
+                l = ReniLexer.WhiteSpaceLexerInstance.Comment(sourcePosn);
+            }
+
+            if(l == null)
+            {
+                kind = SpecialToken.Type.Error;
+                l = 1;
+            }
+
+            return new SpecialToken(SourcePart.Span(sourcePosn, l.Value), kind);
+        }
     }
+
 
     public interface IOutStream
     {

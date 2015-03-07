@@ -127,8 +127,8 @@ namespace Reni.ReniParser
         protected override Syntax Terminal(SourcePart token)
             => new CompileSyntaxError(_issue, token, null);
         protected override Syntax Suffix(Syntax left, SourcePart token)
-            => left.SyntaxError(null, _issue, token);
+            => left.SyntaxError(_issue, token, null);
         protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
-            => left.SyntaxError(null, _issue, token, right);
+            => left.SyntaxError(_issue, token, right, null);
     }
 }

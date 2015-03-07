@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Helper;
+using hw.Parser;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
@@ -19,8 +20,8 @@ namespace Reni.Validation
         readonly ValueCache<CompileSyntaxIssue> _issueCache;
 
         public CompileSyntaxError
-            (IssueId issueId, SourcePart token, SourcePart sourcePart = null, CompileSyntaxError previous = null)
-            : base(sourcePart + token + previous?.SourcePart, token)
+            (IssueId issueId, SourcePart token, CompileSyntaxError previous = null, SourcePart sourcePart = null)
+            : base(token, sourcePart)
         {
             _issueId = issueId;
             _previous = previous;
@@ -55,7 +56,12 @@ namespace Reni.Validation
 
         IssueType IssueType(ContextBase context) => new IssueType(Issue, context.RootContext);
 
-        internal override Syntax SyntaxError(SourcePart sourcePart, IssueId issue, SourcePart token, Syntax right = null)
-            => new CompileSyntaxError(issue, token, sourcePart + right.SourcePart, this);
+        internal override bool IsError => true;
+        internal override Syntax SyntaxError
+            (IssueId issue, SourcePart token, Syntax right = null, SourcePart sourcePart = null)
+            => new CompileSyntaxError(issue, token, this, sourcePart);
+
+        [DisableDump]
+        protected override ParsedSyntax[] Children => new ParsedSyntax[] {_previous};
     }
 }

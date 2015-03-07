@@ -16,7 +16,7 @@ namespace Reni
     sealed class CondSyntax : CompileSyntax
     {
         [Node]
-         readonly CompileSyntax Cond;
+        readonly CompileSyntax Cond;
 
         [Node]
         readonly CompileSyntax Then;
@@ -33,18 +33,12 @@ namespace Reni
             CompileSyntax thenSyntax,
             CompileSyntax elseSyntax = null,
             SourcePart sourcePart = null)
-            : base(
-                condSyntax.SourcePart
-                    + thenToken
-                    + thenSyntax.SourcePart
-                    + elseSyntax?.SourcePart
-                    + sourcePart,
-                thenToken)
+            : base(thenToken, sourcePart)
         {
             Cond = condSyntax;
             Then = thenSyntax;
             NativeElse = elseSyntax;
-            Else = elseSyntax ?? new EmptyList(null, thenToken);
+            Else = elseSyntax ?? new EmptyList(thenToken);
         }
 
         public override CompileSyntax Sourround(SourcePart sourcePart)
@@ -114,10 +108,9 @@ namespace Reni
         internal override Result PendingResultForCache(ContextBase context, Category category)
         {
             if(NativeElse == null)
-            return context
-                .RootContext.VoidType.Result(category);
+                return context
+                    .RootContext.VoidType.Result(category);
             return base.PendingResultForCache(context, category);
         }
     }
-
 }

@@ -8,9 +8,17 @@ using Reni.Validation;
 
 namespace Reni.Parser
 {
-    sealed class ReniLexer : ILexer
+    interface IWhiteSpaceLexer
+    {
+        int? PlainWhiteSpace(SourcePosn sourcePosn);
+        int? Comment(SourcePosn sourcePosn);
+        int? LineComment(SourcePosn sourcePosn);
+    }
+
+    sealed class ReniLexer : ILexer, IWhiteSpaceLexer
     {
         internal static readonly ILexer Instance = new ReniLexer();
+        internal static readonly IWhiteSpaceLexer WhiteSpaceLexerInstance = (IWhiteSpaceLexer) Instance;
 
         sealed class Error : Match.IError
         {
@@ -26,6 +34,8 @@ namespace Reni.Parser
         readonly Error _invalidLineComment = new Error(IssueId.EOFInLineComment);
         readonly Error _invalidComment = new Error(IssueId.EOFInComment);
         readonly IMatch _number;
+        readonly Match _lineComment;
+        readonly Match _comment;
 
         ReniLexer()
         {
@@ -38,12 +48,17 @@ namespace Reni.Parser
 
             _any = symbol1.Else(identifier);
 
+            _lineComment = "#" + " \t".AnyChar() + Match.LineEnd.Find;
+
+            _comment = ("#(" + Match.WhiteSpace + (Match.WhiteSpace + ")#").Find)
+                .Else("#(" + _any.Value(id => (Match.WhiteSpace + id + ")#").Box().Find))
+                .Else("#(" + Match.End.Find + _invalidComment)
+                .Else("#" + Match.End.Find + _invalidLineComment);
+
             _whiteSpaces =
-                Match.WhiteSpace.Else("#" + " \t".AnyChar() + Match.LineEnd.Find)
-                    .Else("#(" + Match.WhiteSpace + (Match.WhiteSpace + ")#").Find)
-                    .Else("#(" + _any.Value(id => (Match.WhiteSpace + id + ")#").Box().Find))
-                    .Else("#(" + Match.End.Find + _invalidComment)
-                    .Else("#" + Match.End.Find + _invalidLineComment)
+                Match.WhiteSpace
+                    .Else(_lineComment)
+                    .Else(_comment)
                     .Repeat();
 
             _number = Match.Digit.Repeat(1);
@@ -57,7 +72,9 @@ namespace Reni.Parser
                     });
         }
 
-        int ILexer.WhiteSpace(SourcePosn sourcePosn)
+        int ILexer.WhiteSpace(SourcePosn sourcePosn) => WhiteSpace(sourcePosn);
+
+        int WhiteSpace(SourcePosn sourcePosn)
         {
             var result = sourcePosn.Match(_whiteSpaces);
             Tracer.Assert(result != null);
@@ -68,5 +85,10 @@ namespace Reni.Parser
         int? ILexer.Any(SourcePosn sourcePosn) => sourcePosn.Match(_any);
         int? ILexer.Text(SourcePosn sourcePosn) => sourcePosn.Match(_text);
         public static IssueId Parse(Match.IError error) => ((Error) error).IssueId;
+
+        int? IWhiteSpaceLexer.PlainWhiteSpace(SourcePosn sourcePosn)
+            => sourcePosn.Match(Match.WhiteSpace.Repeat(1));
+        int? IWhiteSpaceLexer.Comment(SourcePosn sourcePosn) => sourcePosn.Match(_lineComment);
+        int? IWhiteSpaceLexer.LineComment(SourcePosn sourcePosn) => sourcePosn.Match(_comment);
     }
 }

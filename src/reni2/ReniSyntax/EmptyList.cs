@@ -9,13 +9,13 @@ namespace Reni.ReniSyntax
 {
     sealed class EmptyList : CompileSyntax
     {
-        public EmptyList(SourcePart all, SourcePart token)
-            : base(all + token, token) {}
+        public EmptyList(SourcePart token, SourcePart all = null)
+            : base(token, all) { }
 
         protected override string GetNodeDump() => "()";
         internal override Result ResultForCache(ContextBase context, Category category)
             => context.RootContext.VoidType.Result(category);
         public override CompileSyntax Sourround(SourcePart sourcePart)
-            => new EmptyList(SourcePart + sourcePart, Token);
+            => new EmptyList(Token, SourcePart + sourcePart);
     }
 }
