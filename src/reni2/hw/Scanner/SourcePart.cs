@@ -101,6 +101,9 @@ namespace hw.Scanner
         [DisableDump]
         public SourcePosn Start { get { return Source + Position; } }
 
+        [DisableDump]
+        public SourcePosn End { get { return Source + Position + Length; } }
+
         public SourcePart Combine(SourcePart other)
         {
             Tracer.Assert(Source == other.Source);
@@ -117,6 +120,13 @@ namespace hw.Scanner
         public static SourcePart Span(SourcePosn first, int length)
         {
             return new SourcePart(first.Source, first.Position, length);
+        }
+
+        public bool Contains(SourcePosn sourcePosn)
+        {
+            return Source == sourcePosn.Source &&
+                Position <= sourcePosn.Position &&
+                Position + Length > sourcePosn.Position;
         }
     }
 }

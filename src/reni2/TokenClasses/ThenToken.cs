@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Scanner;
 using Reni.ReniParser;
+using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
@@ -13,5 +14,7 @@ namespace Reni.TokenClasses
         string ITokenClassWithId.Id => Id;
         protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
             => right.CreateThenSyntax(token, left.ToCompiledSyntax);
+        protected override Syntax Terminal(SourcePart token)
+            => new CompileSyntaxError(IssueId.UnexpectedUseAsTerminal, token, null);
     }
 }

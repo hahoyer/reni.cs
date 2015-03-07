@@ -28,6 +28,7 @@ namespace Reni.ReniParser
             Operator = @operator;
             Left = left;
             Right = right;
+            StopByObjectIds();
         }
 
         [Node]
@@ -95,10 +96,11 @@ namespace Reni.ReniParser
             return result;
         }
 
-        internal override Syntax SyntaxError(IssueId issue, SourcePart token)
+        internal override bool IsIdentifier => true;
+        internal override Syntax SyntaxError(SourcePart sourcePart, IssueId issue, SourcePart token, Syntax right = null)
         {
             if(Right == null)
-                return Left.SyntaxError(issue, token);
+                return Left.SyntaxError(sourcePart + right?.SourcePart, issue, token);
             NotImplementedMethod(issue, token);
             return null;
         }

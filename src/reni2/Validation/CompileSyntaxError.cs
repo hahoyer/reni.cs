@@ -18,11 +18,9 @@ namespace Reni.Validation
         readonly CompileSyntaxError _previous;
         readonly ValueCache<CompileSyntaxIssue> _issueCache;
 
-        public CompileSyntaxError(IssueId issueId, SourcePart token)
-            : this(issueId, token, null) {}
-
-        CompileSyntaxError(IssueId issueId, SourcePart token, CompileSyntaxError previous)
-            : base(token, token)
+        public CompileSyntaxError
+            (IssueId issueId, SourcePart token, SourcePart sourcePart = null, CompileSyntaxError previous = null)
+            : base(sourcePart + token + previous?.SourcePart, token)
         {
             _issueId = issueId;
             _previous = previous;
@@ -57,7 +55,7 @@ namespace Reni.Validation
 
         IssueType IssueType(ContextBase context) => new IssueType(Issue, context.RootContext);
 
-        internal override Syntax SyntaxError(IssueId issue, SourcePart token)
-            => new CompileSyntaxError(issue, token, this);
+        internal override Syntax SyntaxError(SourcePart sourcePart, IssueId issue, SourcePart token, Syntax right = null)
+            => new CompileSyntaxError(issue, token, sourcePart + right.SourcePart, this);
     }
 }

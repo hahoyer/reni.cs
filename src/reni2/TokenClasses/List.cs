@@ -19,6 +19,9 @@ namespace Reni.TokenClasses
 
         string ITokenClassWithId.Id => Id(_level);
 
+        protected override Syntax Terminal(SourcePart token)
+            => ListSyntax(new EmptyList(token, token), token, new EmptyList(token, token));
+
         protected override Syntax Prefix(SourcePart token, Syntax right)
             => ListSyntax(new EmptyList(token, token), token, right);
 

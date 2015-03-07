@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Scanner;
 using Reni.ReniParser;
+using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
@@ -22,6 +23,9 @@ namespace Reni.TokenClasses
             _isImplicit = isImplicit;
             _isMetaFunction = isMetaFunction;
         }
+
+        protected override Syntax Terminal(SourcePart token)
+            => new CompileSyntaxError(IssueId.MissingFunctionGetter, token, null);
 
         protected override Syntax Prefix(SourcePart token, Syntax right)
             => new FunctionSyntax

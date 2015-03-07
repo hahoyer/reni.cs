@@ -43,7 +43,8 @@ namespace Reni.ReniParser
 
                 x = x.ThenElseLevel(ThenToken.Id, ElseToken.Id);
                 x += PrioTable.Right(Exclamation.Id);
-                x += PrioTable.Left(Function.Id(), Function.Id(true), Function.Id(isMetaFunction: true));
+                x += PrioTable.Left
+                    (Function.Id(), Function.Id(true), Function.Id(isMetaFunction: true));
                 x += PrioTable.Right(Colon.Id);
                 x += PrioTable.Right(List.Id(0));
                 x += PrioTable.Right(List.Id(1));
@@ -51,7 +52,12 @@ namespace Reni.ReniParser
                 x = x.ParenthesisLevelLeft
                     (
                         new[] {LeftParenthesis.Id(1), LeftParenthesis.Id(2), LeftParenthesis.Id(3)},
-                        new[] {RightParenthesis.Id(1), RightParenthesis.Id(2), RightParenthesis.Id(3)}
+                        new[]
+                        {
+                            RightParenthesis.Id(1),
+                            RightParenthesis.Id(2),
+                            RightParenthesis.Id(3)
+                        }
                     );
                 //x.Correct("(", PrioTable.Any, '-');
                 //x.Correct("[", PrioTable.Any, '-');
@@ -59,7 +65,8 @@ namespace Reni.ReniParser
 
                 x += PrioTable.Right(PrioTable.Error);
 
-                x = x.ParenthesisLevelLeft(new[] {PrioTable.BeginOfText}, new[] {PrioTable.EndOfText});
+                x = x.ParenthesisLevelLeft
+                    (new[] {PrioTable.BeginOfText}, new[] {PrioTable.EndOfText});
 
                 //Tracer.FlaggedLine("\n"+x.ToString());
                 return x;
@@ -74,7 +81,8 @@ namespace Reni.ReniParser
 
         public MainTokenFactory()
         {
-            Parser = new PrioParser<Syntax>(PrioTable, new Scanner<Syntax>(ReniLexer.Instance), this);
+            Parser = new PrioParser<Syntax>
+                (PrioTable, new Scanner<Syntax>(ReniLexer.Instance), this);
             _declarationSyntaxParser = new PrioParser<Syntax>
                 (
                 DeclarationTokenFactory.PrioTable,
@@ -116,7 +124,11 @@ namespace Reni.ReniParser
         readonly IssueId _issue;
         public SyntaxError(IssueId issue) { _issue = issue; }
         public SyntaxError(Match.IError message) { _issue = ReniLexer.Parse(message); }
-        protected override Syntax Terminal(SourcePart token) => new CompileSyntaxError(_issue, token);
-        protected override Syntax Suffix(Syntax left, SourcePart token) => left.SyntaxError(_issue, token);
+        protected override Syntax Terminal(SourcePart token)
+            => new CompileSyntaxError(_issue, token, null);
+        protected override Syntax Suffix(Syntax left, SourcePart token)
+            => left.SyntaxError(null, _issue, token);
+        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
+            => left.SyntaxError(null, _issue, token, right);
     }
 }

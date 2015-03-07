@@ -9,17 +9,11 @@ namespace Reni.ReniParser
 {
     static class ParsedSyntaxExtension
     {
-        internal static CompileSyntax CheckedToCompiledSyntax(this Syntax parsedSyntax, SourcePart token, Func<IssueId> getError)
+        internal static CompileSyntax CheckedToCompiledSyntax
+            (this Syntax parsedSyntax, SourcePart token, Func<IssueId> getError)
         {
             if(parsedSyntax == null)
-                return new CompileSyntaxError(getError(), token);
-            return parsedSyntax.ToCompiledSyntax;
-        }
-
-        internal static CompileSyntax ToCompiledSyntaxOrNull(this Syntax parsedSyntax)
-        {
-            if(parsedSyntax == null)
-                return null;
+                return new CompileSyntaxError(getError(), token, null);
             return parsedSyntax.ToCompiledSyntax;
         }
     }

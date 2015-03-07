@@ -37,7 +37,6 @@ namespace Reni.ReniSyntax
         public SourroundSyntax(SourcePart sourcePart, Syntax right, SourcePart token)
             : base(sourcePart, token) { _right = right; }
         internal override CompileSyntax ToCompiledSyntax
-            => _right.ToCompiledSyntax.Sourround(SourcePart+Token);
+            => _right.ToCompiledSyntax.Sourround(SourcePart + Token);
     }
-
 }

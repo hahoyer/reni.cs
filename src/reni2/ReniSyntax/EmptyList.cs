@@ -10,7 +10,7 @@ namespace Reni.ReniSyntax
     sealed class EmptyList : CompileSyntax
     {
         public EmptyList(SourcePart all, SourcePart token)
-            : base(all, token) {}
+            : base(all + token, token) {}
 
         protected override string GetNodeDump() => "()";
         internal override Result ResultForCache(ContextBase context, Category category)

@@ -15,6 +15,11 @@ namespace Reni.TokenClasses
         public const string Id = ":";
         string ITokenClassWithId.Id => Id;
         protected override Syntax Infix(Syntax left, SourcePart token, Syntax right) => left.CreateDeclarationSyntax(token, right);
+        protected override Syntax Terminal(SourcePart token)
+        {
+            NotImplementedMethod(token);
+            return null;
+        }
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
@@ -24,6 +29,16 @@ namespace Reni.TokenClasses
         string ITokenClassWithId.Id => Id;
         public Exclamation(ISubParser<Syntax> parser) { Next = parser; }
         protected override ISubParser<Syntax> Next { get; }
+        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
+        {
+            NotImplementedMethod(left,token,right);
+            return null;
+        }
+        protected override Syntax Terminal(SourcePart token)
+        {
+            NotImplementedMethod(token);
+            return null;
+        }
     }
 
     [BelongsTo(typeof(DeclarationTokenFactory))]
@@ -32,6 +47,13 @@ namespace Reni.TokenClasses
         protected override Syntax Terminal(SourcePart token) => new DeclarationTokenSyntax(this, token);
         internal abstract Syntax DeclarationSyntax(SourcePart token, CompileSyntax body);
         internal abstract Syntax DefinableSyntax(Definable definable, SourcePart token);
+
+        sealed protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
+        {
+            NotImplementedMethod(left, token, right);
+            return null;
+
+        }
     }
 
     sealed class ConverterToken : DeclarationToken, ITokenClassWithId

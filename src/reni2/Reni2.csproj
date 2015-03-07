@@ -131,9 +131,7 @@
     <Compile Include="hw\Forms\NodeNameAttribute.cs" />
     <Compile Include="hw\Forms\PositionConfig.cs" />
     <Compile Include="hw\Forms\SmartNodeAttribute.cs" />
-    <Compile Include="hw\Forms\TreeForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="hw\Forms\TreeForm.cs" />
     <Compile Include="hw\Forms\TreeForm.Designer.cs" />
     <Compile Include="hw\Graphics\IGraphTarget.cs" />
     <Compile Include="hw\Graphics\SVG\Circle.cs" />
@@ -307,6 +305,7 @@
     <Compile Include="Runtime\OutStream.cs" />
     <Compile Include="ReniSyntax\Special.cs" />
     <Compile Include="ReniSyntax\EmptyList.cs" />
+    <Compile Include="Token.cs" />
     <Compile Include="TokenClasses\ArgToken.cs" />
     <Compile Include="TokenClasses\CompareOperation.cs" />
     <Compile Include="TokenClasses\ReassignToken.cs" />

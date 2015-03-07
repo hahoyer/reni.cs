@@ -4,12 +4,19 @@ using System.Linq;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
+using Reni.ReniParser;
+using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
     sealed class Number : TerminalToken
     {
-        public override Result Result(ContextBase context, Category category, SourcePart token) => context.RootContext.BitType.Result(category, BitsConst.Convert(token.Name));
+        public override Result Result(ContextBase context, Category category, SourcePart token)
+            => context.RootContext.BitType.Result(category, BitsConst.Convert(token.Name));
         public static Int64 ToInt64(SourcePart token) => BitsConst.Convert(token.Name).ToInt64();
+        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
+            =>
+                new CompileSyntaxError
+                    (IssueId.UnexpectedUseAsSuffix, token, sourcePart: left.SourcePart + right.SourcePart);
     }
 }

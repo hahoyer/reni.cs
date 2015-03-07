@@ -22,7 +22,6 @@ namespace Reni
         readonly MainTokenFactory _tokenFactory;
         readonly CompilerParameters _parameters;
         readonly string _className;
-        readonly string _fileName;
 
         readonly ValueCache<Source> _source;
         readonly ValueCache<Syntax> _syntax;
@@ -39,25 +38,37 @@ namespace Reni
         /// <param name="fileName"> Name of the file. </param>
         /// <param name="parameters"> </param>
         /// <param name="className"> </param>
-        public Compiler(string fileName, CompilerParameters parameters = null, string className = null)
+        /// <param name="text"></param>
+        public Compiler
+            (
+            string fileName = null,
+            CompilerParameters parameters = null,
+            string className = null,
+            string text = null)
         {
-            _className = className ?? fileName.Symbolize();
-            _fileName = fileName;
+            Tracer.Assert((fileName == null) != (text == null));
+
+            _className = className ?? fileName?.Symbolize() ?? "ReniMainClass";
             _rootContext = new Root(this);
             _parameters = parameters ?? new CompilerParameters();
-            _tokenFactory = new MainTokenFactory();
-            _tokenFactory.Trace = _parameters.TraceOptions.Parser;
+            _tokenFactory = new MainTokenFactory
+            {
+                Trace = _parameters.TraceOptions.Parser
+            };
 
-            _source = new ValueCache<Source>(() => new Source(_fileName.FileHandle()));
+            _source = new ValueCache<Source>(() => fileName == null? new Source(text) : new Source(fileName.FileHandle()));
+            _tokenCache = new FunctionCache<int, Token>(GetTokenForCache);
             _syntax = new ValueCache<Syntax>(() => Parse(Source + 0));
-            _codeContainer = new ValueCache<CodeContainer>(() => new CodeContainer(_rootContext, Syntax, Source.Data));
-            _cSharpCode = new ValueCache<string>(() => _codeContainer.Value.CreateCSharpString(_className));
+            _codeContainer = new ValueCache<CodeContainer>
+                (() => new CodeContainer(_rootContext, Syntax, Source.Data));
+            _cSharpCode = new ValueCache<string>
+                (() => _codeContainer.Value.CreateCSharpString(_className));
         }
 
 
         [Node]
         [DisableDump]
-        Source Source => _source.Value;
+        public Source Source => _source.Value;
 
         [Node]
         [DisableDump]
@@ -90,9 +101,11 @@ namespace Reni
         }
 
         IOutStream IExecutionContext.OutStream => _parameters.OutStream;
-        bool IExecutionContext.IsTraceEnabled => _isInExecutionPhase && _parameters.TraceOptions.Functions;
+        bool IExecutionContext.IsTraceEnabled
+            => _isInExecutionPhase && _parameters.TraceOptions.Functions;
         bool IExecutionContext.ProcessErrors => _parameters.ProcessErrors;
-        CodeBase IExecutionContext.Function(FunctionId functionId) => CodeContainer.Function(functionId);
+        CodeBase IExecutionContext.Function(FunctionId functionId)
+            => CodeContainer.Function(functionId);
         CompileSyntax IExecutionContext.Parse(string source) => Parse(source);
 
         CompileSyntax Parse(string sourceText) => Parse(new Source(sourceText) + 0).ToCompiledSyntax;
@@ -151,7 +164,7 @@ namespace Reni
 
         internal IEnumerable<IssueBase> Issues => CodeContainer.Issues;
 
-        internal Syntax Parse(SourcePosn source) => _tokenFactory.Parser.Execute(source);
+        Syntax Parse(SourcePosn source) => _tokenFactory.Parser.Execute(source);
 
         void RunFromCode() => _codeContainer.Value.Execute(this);
 
@@ -207,6 +220,12 @@ namespace Reni
 
             return result;
         }
+
+        readonly FunctionCache<int, Token> _tokenCache;
+
+        public Token Token(int offset) => _tokenCache[offset];
+
+        Token GetTokenForCache(int offset) => Syntax.LocateToken(Source+offset);
     }
 
     public interface IOutStream

@@ -24,13 +24,8 @@ namespace Reni.ReniParser
 
         [DisableDump]
         internal virtual CompileSyntax ToCompiledSyntax
-        {
-            get
-            {
-                NotImplementedMethod(); //Probably it's a missing right parenthesis
-                return null;
-            }
-        }
+            => new CompileSyntaxError(IssueId.MissingRightBracket, Token, sourcePart: SourcePart);
+
         internal virtual IEnumerable<KeyValuePair<string, int>> GetDeclarations(int index)
         {
             yield break;
@@ -87,14 +82,29 @@ namespace Reni.ReniParser
         internal virtual CompoundSyntax ToContainer => ListSyntax.Spread(this).ToContainer;
         internal virtual bool IsMutableSyntax => false;
         internal virtual bool IsConverterSyntax => false;
+        internal virtual bool IsIdentifier => false;
+        internal virtual bool IsText => false;
+        internal virtual bool IsKeyword => false;
+        internal virtual bool IsNumber => false;
 
-        internal virtual Syntax SyntaxError(IssueId issue, SourcePart token)
+        internal virtual Syntax SyntaxError(SourcePart sourcePart, IssueId issue, SourcePart token, Syntax right = null)
         {
-            NotImplementedMethod(issue, token);
+            NotImplementedMethod(sourcePart, issue, token, right);
             return null;
         }
 
         internal virtual Syntax SuffixedBy(Definable definable, SourcePart token)
             => new ExpressionSyntax(definable, ToCompiledSyntax, token, null);
+
+        internal Token LocateToken(SourcePosn sourcePosn)
+        {
+            if(!SourcePart.Contains(sourcePosn))
+                return null;
+            var child =
+                Children.Select(item => ((Syntax) item)?.LocateToken(sourcePosn)).FirstOrDefault();
+            if(child != null)
+                return child;
+            return new Token(this);
+        }
     }
 }

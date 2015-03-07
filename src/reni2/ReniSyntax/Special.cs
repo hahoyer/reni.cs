@@ -7,6 +7,7 @@ using hw.Parser;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
+using Reni.TokenClasses;
 
 namespace Reni.ReniSyntax
 {
@@ -14,6 +15,7 @@ namespace Reni.ReniSyntax
     {
         protected SpecialSyntax(SourcePart all, SourcePart token)
             : base(all, token) {}
+        internal override bool IsKeyword => !IsNumber && !IsText;
     }
 
     sealed class TerminalSyntax : SpecialSyntax
@@ -34,6 +36,9 @@ namespace Reni.ReniSyntax
         internal override CompileSyntax Visit(ISyntaxVisitor visitor) => Terminal.Visit(visitor);
         public override CompileSyntax Sourround(SourcePart sourcePart)
             => new TerminalSyntax(Token, Terminal, SourcePart + sourcePart);
+
+        internal override bool IsNumber => Terminal is Number;
+        internal override bool IsText => Terminal is Text;
     }
 
     sealed class PrefixSyntax : SpecialSyntax
