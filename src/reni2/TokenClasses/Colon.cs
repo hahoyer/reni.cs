@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using hw.Debug;
 using hw.Parser;
 using hw.Scanner;
 using Reni.ReniParser;
@@ -45,43 +46,7 @@ namespace Reni.TokenClasses
     [BelongsTo(typeof(DeclarationTokenFactory))]
     abstract class DeclarationTagToken : TokenClass
     {
-        internal abstract Syntax DeclarationSyntax(SourcePart token, CompileSyntax body);
-
-        protected override Syntax Terminal(SourcePart token)
-            => new DeclarationTagSyntax(this, token);
-
-        internal abstract Syntax DefinableSyntax
-            (Definable definable, SourcePart token, DeclarationTagSyntax tag);
-
-        protected override sealed Syntax Infix(Syntax left, SourcePart token, Syntax right)
-        {
-            NotImplementedMethod(left, token, right);
-            return null;
-        }
-    }
-
-    sealed class ConverterToken : DeclarationTagToken, ITokenClassWithId
-    {
-        public const string Id = "converter";
-        string ITokenClassWithId.Id => Id;
-
-        internal override Syntax DeclarationSyntax(SourcePart token, CompileSyntax body)
-            => new DeclarationSyntax(token, body, isConverter: true);
-
-        internal override Syntax DefinableSyntax
-            (Definable definable, SourcePart token, DeclarationTagSyntax sourcePart = null)
-        {
-            NotImplementedMethod(definable, token);
-            return null;
-        }
-    }
-
-    sealed class MutableDeclarationToken : DeclarationTagToken, ITokenClassWithId
-    {
-        public const string Id = "mutable";
-        string ITokenClassWithId.Id => Id;
-
-        internal override Syntax DeclarationSyntax(SourcePart token, CompileSyntax body)
+        internal Syntax DeclarationSyntax(SourcePart token, CompileSyntax body)
             =>
                 new DeclarationSyntax
                     (
@@ -90,9 +55,33 @@ namespace Reni.TokenClasses
                     new DeclarationTagSyntax(this, token).DefinableTokenSyntax(null, token)
                     );
 
-        internal override Syntax DefinableSyntax
-            (Definable definable, SourcePart token, DeclarationTagSyntax tag)
-            =>  tag.DefinableTokenSyntax(definable, token);
+        protected override Syntax Terminal(SourcePart token)
+            => new DeclarationTagSyntax(this, token);
+
+        protected override sealed Syntax Infix(Syntax left, SourcePart token, Syntax right)
+        {
+            NotImplementedMethod(left, token, right);
+            return null;
+        }
+
+        [DisableDump]
+        internal virtual bool IsKeyword => false;
+        [DisableDump]
+        internal virtual bool IsError => false;
+    }
+
+    sealed class ConverterToken : DeclarationTagToken, ITokenClassWithId
+    {
+        public const string Id = "converter";
+        string ITokenClassWithId.Id => Id;
+        internal override bool IsKeyword => true;
+    }
+
+    sealed class MutableDeclarationToken : DeclarationTagToken, ITokenClassWithId
+    {
+        public const string Id = "mutable";
+        string ITokenClassWithId.Id => Id;
+        internal override bool IsKeyword => true;
     }
 
     sealed class DeclarationTagSyntax : Syntax
@@ -102,19 +91,26 @@ namespace Reni.TokenClasses
         internal DeclarationTagSyntax
             (DeclarationTagToken tag, SourcePart token, SourcePart additionalSourcePart = null)
             : base(token, additionalSourcePart) { _tag = tag; }
-        public bool DeclaresMutable => _tag is MutableDeclarationToken;
 
-        internal override bool IsKeyword => true;
+        [DisableDump]
+        internal bool DeclaresMutable => _tag is MutableDeclarationToken;
+        [DisableDump]
+        internal bool DeclaresConverter => _tag is ConverterToken;
+        [DisableDump]
+        internal override bool IsKeyword => _tag.IsKeyword;
+        [DisableDump]
+        internal override bool IsError => _tag.IsError;
 
         internal override Syntax CreateDeclarationSyntax(SourcePart token, Syntax right)
             =>
                 _tag.DeclarationSyntax
                     (token, right.CheckedToCompiledSyntax(token, RightMustNotBeNullError));
 
-        public override Syntax Sourround(SourcePart sourcePart)
+        internal override Syntax Sourround(SourcePart sourcePart)
             => new DeclarationTagSyntax(_tag, Token, sourcePart);
+
         internal override Syntax SuffixedBy(Definable definable, SourcePart token)
-            => _tag.DefinableSyntax(definable, token, this);
+            => DefinableTokenSyntax(definable, token);
 
 
         IssueId RightMustNotBeNullError()

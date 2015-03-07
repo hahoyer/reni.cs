@@ -15,13 +15,11 @@ namespace Reni.ReniParser
             (
             SourcePart token,
             CompileSyntax body,
-            DefinableTokenSyntax target = null,
-            bool isConverter = false
+            DefinableTokenSyntax target = null
             )
             : base(token)
         {
             Target = target;
-            IsConverter = isConverter;
             Body = body;
         }
         protected override ParsedSyntax[] Children => new ParsedSyntax[] {Target, Body};
@@ -29,13 +27,11 @@ namespace Reni.ReniParser
         [EnableDump]
         DefinableTokenSyntax Target { get; }
         [EnableDump]
-        bool IsConverter { get; }
-        [EnableDump]
         Syntax Body { get; }
         [DisableDump]
         internal override bool IsMutableSyntax => Target?.IsMutable??false;
         [DisableDump]
-        internal override bool IsConverterSyntax => IsConverter;
+        internal override bool IsConverterSyntax => Target?.IsConverter??false;
         [DisableDump]
         internal override CompileSyntax ToCompiledSyntax => ToContainer;
         [DisableDump]

@@ -20,7 +20,11 @@ namespace Reni.Validation
         readonly ValueCache<CompileSyntaxIssue> _issueCache;
 
         public CompileSyntaxError
-            (IssueId issueId, SourcePart token, CompileSyntaxError previous = null, SourcePart sourcePart = null)
+            (
+            IssueId issueId,
+            SourcePart token,
+            CompileSyntaxError previous = null,
+            SourcePart sourcePart = null)
             : base(token, sourcePart)
         {
             _issueId = issueId;

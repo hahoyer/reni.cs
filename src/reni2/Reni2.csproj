@@ -374,6 +374,7 @@
     <Compile Include="Validation\IssueBase.cs" />
     <Compile Include="Validation\IssueId.cs" />
     <Compile Include="Validation\IssueType.cs" />
+    <Compile Include="Validation\SyntaxError.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Code\CSharp_Generated.tt">

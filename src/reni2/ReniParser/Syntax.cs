@@ -95,7 +95,7 @@ namespace Reni.ReniParser
             return null;
         }
 
-        public virtual Syntax Sourround(SourcePart sourcePart)
+        internal virtual Syntax Sourround(SourcePart sourcePart)
         {
             NotImplementedMethod(sourcePart);
             return null;

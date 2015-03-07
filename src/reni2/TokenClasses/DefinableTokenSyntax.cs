@@ -23,6 +23,7 @@ namespace Reni.TokenClasses
             Definable = definable;
         }
 
+        internal bool IsConverter => Tag?.DeclaresConverter ?? false;
         internal bool IsMutable => Tag?.DeclaresMutable ?? false;
         internal DeclarationTagSyntax Tag { get; }
         internal Definable Definable { get; }

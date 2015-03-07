@@ -6,6 +6,7 @@ using hw.Parser;
 using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.ReniParser;
+using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
@@ -20,20 +21,17 @@ namespace Reni.TokenClasses
         internal Syntax CreateForVisit(Syntax left, SourcePart token, Syntax right)
             => this.Operation(left, token, right);
 
-        Syntax IOperator<Syntax>.Terminal(SourcePart token) 
+        Syntax IOperator<Syntax>.Terminal(SourcePart token)
             => Terminal(token);
-        Syntax IOperator<Syntax>.Prefix(SourcePart token, Syntax right) 
+        Syntax IOperator<Syntax>.Prefix(SourcePart token, Syntax right)
             => Prefix(token, right);
-        Syntax IOperator<Syntax>.Suffix(Syntax left, SourcePart token) 
+        Syntax IOperator<Syntax>.Suffix(Syntax left, SourcePart token)
             => Suffix(left, token);
         Syntax IOperator<Syntax>.Infix(Syntax left, SourcePart token, Syntax right)
             => Infix(left, token, right);
 
         protected virtual Syntax Terminal(SourcePart token)
-        {
-            NotImplementedMethod(token);
-            return null;
-        }
+            => new Validation.SyntaxError(IssueId.UnexpectedSyntaxError, token);
 
         protected virtual Syntax Prefix(SourcePart token, Syntax right)
         {
