@@ -32,19 +32,4 @@ namespace Reni.TokenClasses
             return null;
         }
     }
-
-    sealed class EndToken : TokenClass
-    {
-        protected override Syntax Suffix(Syntax left, SourcePart token) => left.ToCompiledSyntax;
-        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
-        {
-            NotImplementedMethod(left, token, right);
-            return null;
-        }
-        protected override Syntax Terminal(SourcePart token)
-        {
-            NotImplementedMethod(token);
-            return null;
-        }
-    }
 }
