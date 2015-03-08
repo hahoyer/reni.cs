@@ -49,13 +49,16 @@ namespace Reni.Parser
 
             _any = symbol1.Else(identifier);
 
-            _lineComment = "#" + " \t".AnyChar() + Match.LineEnd.Find;
+            _lineComment = "#" + " \t".AnyChar() + 
+                Match.LineEnd.Find
+                    .Else(Match.End.Find + _invalidLineComment);
 
-            _comment = ("#(" + Match.WhiteSpace + (Match.WhiteSpace + ")#").Find)
-                .Else("#(" + _any.Value(id => (Match.WhiteSpace + id + ")#").Box().Find))
-                .Else("#(" + Match.End.Find + _invalidComment)
-                .Else("#" + Match.End.Find + _invalidLineComment);
-
+            _comment = "#(" 
+                + 
+                (Match.WhiteSpace + (Match.WhiteSpace + ")#").Find)
+                .Else(_any.Value(id => (Match.WhiteSpace + id + ")#").Box().Find))
+                .Else(Match.End.Find + _invalidComment)
+                ;
             _whiteSpaces =
                 Match.WhiteSpace
                     .Else(_lineComment)
@@ -89,7 +92,7 @@ namespace Reni.Parser
 
         int? ILexerForUserInterface.PlainWhiteSpace(SourcePosn sourcePosn)
             => sourcePosn.Match(Match.WhiteSpace.Repeat(1));
-        int? ILexerForUserInterface.Comment(SourcePosn sourcePosn) => sourcePosn.Match(_lineComment);
-        int? ILexerForUserInterface.LineComment(SourcePosn sourcePosn) => sourcePosn.Match(_comment);
+        int? ILexerForUserInterface.Comment(SourcePosn sourcePosn) => sourcePosn.Match(_comment);
+        int? ILexerForUserInterface.LineComment(SourcePosn sourcePosn) => sourcePosn.Match(_lineComment);
     }
 }
