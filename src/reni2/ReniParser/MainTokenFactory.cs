@@ -79,14 +79,13 @@ namespace Reni.ReniParser
         readonly ISubParser<Syntax> _declarationSyntaxSubParser;
         readonly PrioParser<Syntax> _declarationSyntaxParser;
 
-        public MainTokenFactory(IScanner<Syntax> scanner)
+        public MainTokenFactory(Func<ITokenFactory<Syntax>, IScanner<Syntax>> getScanner)
         {
-            Parser = new PrioParser<Syntax>(PrioTable, scanner, this);
+            Parser = new PrioParser<Syntax>(PrioTable, getScanner(this));
             _declarationSyntaxParser = new PrioParser<Syntax>
                 (
                 DeclarationTokenFactory.PrioTable,
-                scanner,
-                new DeclarationTokenFactory()
+                getScanner(new DeclarationTokenFactory())
                 );
             _declarationSyntaxSubParser = new SubParser<Syntax>(_declarationSyntaxParser, Pack);
         }
@@ -123,11 +122,11 @@ namespace Reni.ReniParser
         readonly IssueId _issue;
         public SyntaxError(IssueId issue) { _issue = issue; }
         public SyntaxError(Match.IError message) { _issue = ReniLexer.Parse(message); }
-        protected override Syntax Terminal(SourcePart token)
+        protected override Syntax Terminal(Token token)
             => new CompileSyntaxError(_issue, token, null);
-        protected override Syntax Suffix(Syntax left, SourcePart token)
+        protected override Syntax Suffix(Syntax left, Token token)
             => left.SyntaxError(_issue, token, null);
-        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
+        protected override Syntax Infix(Syntax left, Token token, Syntax right)
             => left.SyntaxError(_issue, token, right, null);
     }
 }

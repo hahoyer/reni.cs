@@ -14,7 +14,7 @@ namespace Reni.TokenClasses
         internal DefinableTokenSyntax
             (
             Definable definable,
-            SourcePart tokenData,
+            Token tokenData,
             DeclarationTagSyntax tag = null,
             SourcePart additionalSourcePart = null)
             : base(tokenData, additionalSourcePart)
@@ -28,7 +28,7 @@ namespace Reni.TokenClasses
         internal DeclarationTagSyntax Tag { get; }
         internal Definable Definable { get; }
 
-        internal override Syntax CreateDeclarationSyntax(SourcePart token, Syntax right)
+        internal override Syntax CreateDeclarationSyntax(Token token, Syntax right)
             => new DeclarationSyntax(token, right.ToCompiledSyntax, this);
 
         [DisableDump]
@@ -36,10 +36,10 @@ namespace Reni.TokenClasses
         {
             get
             {
-                Tracer.Assert(Tag==null);
+                Tracer.Assert(Tag == null);
                 return new ExpressionSyntax(Definable, null, Token, null);
             }
         }
-        protected override ParsedSyntax[] Children => new ParsedSyntax[] { Tag};
+        protected override ParsedSyntax[] Children => new ParsedSyntax[] {Tag};
     }
 }

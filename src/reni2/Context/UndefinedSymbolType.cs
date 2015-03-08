@@ -13,8 +13,8 @@ namespace Reni.Context
     {
         readonly string _targetIdentifier;
 
-        UndefinedSymbolIssue(SourcePart position, string targetIdentifier)
-            : base(position, IssueId.UndefinedSymbol)
+        UndefinedSymbolIssue(Token token, string targetIdentifier)
+            : base(token, IssueId.UndefinedSymbol)
         {
             _targetIdentifier = targetIdentifier;
             StopByObjectId(266);
@@ -30,18 +30,18 @@ namespace Reni.Context
             }
         }
 
-        internal static IssueType Type(SourcePart position, TypeBase target) => new IssueType(new UndefinedSymbolIssue(position, "Type: "+ target.DumpPrintText), target.RootContext);
-        public static IssueType Type(SourcePart position, ContextBase target) => new IssueType(new UndefinedSymbolIssue(position, "Context: "+ target.DumpPrintText), target.RootContext);
+        internal static IssueType Type(Token token, TypeBase target) => new IssueType(new UndefinedSymbolIssue(token, "Type: "+ target.DumpPrintText), target.RootContext);
+        public static IssueType Type(Token token, ContextBase target) => new IssueType(new UndefinedSymbolIssue(token, "Context: "+ target.DumpPrintText), target.RootContext);
     }
 
     sealed class AmbiguousSymbolIssue : SyntaxIssue
     {
-        AmbiguousSymbolIssue(SourcePart position)
-            : base(position, IssueId.UndefinedSymbol)
+        AmbiguousSymbolIssue(Token token)
+            : base(token, IssueId.UndefinedSymbol)
         {
             StopByObjectId(266);
         }
 
-        internal static IssueType Type(SourcePart position, Root rootContext) => new IssueType(new AmbiguousSymbolIssue(position), rootContext);
+        internal static IssueType Type(Token token, Root rootContext) => new IssueType(new AmbiguousSymbolIssue(token), rootContext);
     }
 }

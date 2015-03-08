@@ -15,9 +15,9 @@ namespace Reni.TokenClasses
     {
         public const string Id = ":";
         string ITokenClassWithId.Id => Id;
-        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
+        protected override Syntax Infix(Syntax left, Token token, Syntax right)
             => left.CreateDeclarationSyntax(token, right);
-        protected override Syntax Terminal(SourcePart token)
+        protected override Syntax Terminal(Token token)
         {
             NotImplementedMethod(token);
             return null;
@@ -31,12 +31,12 @@ namespace Reni.TokenClasses
         string ITokenClassWithId.Id => Id;
         public Exclamation(ISubParser<Syntax> parser) { Next = parser; }
         protected override ISubParser<Syntax> Next { get; }
-        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
+        protected override Syntax Infix(Syntax left, Token token, Syntax right)
         {
             NotImplementedMethod(left, token, right);
             return null;
         }
-        protected override Syntax Terminal(SourcePart token)
+        protected override Syntax Terminal(Token token)
         {
             NotImplementedMethod(token);
             return null;
@@ -46,7 +46,7 @@ namespace Reni.TokenClasses
     [BelongsTo(typeof(DeclarationTokenFactory))]
     abstract class DeclarationTagToken : TokenClass
     {
-        internal Syntax DeclarationSyntax(SourcePart token, CompileSyntax body)
+        internal Syntax DeclarationSyntax(Token token, CompileSyntax body)
             =>
                 new DeclarationSyntax
                     (
@@ -55,10 +55,10 @@ namespace Reni.TokenClasses
                     new DeclarationTagSyntax(this, token).DefinableTokenSyntax(null, token)
                     );
 
-        protected override Syntax Terminal(SourcePart token)
+        protected override Syntax Terminal(Token token)
             => new DeclarationTagSyntax(this, token);
 
-        protected override sealed Syntax Infix(Syntax left, SourcePart token, Syntax right)
+        protected override sealed Syntax Infix(Syntax left, Token token, Syntax right)
         {
             NotImplementedMethod(left, token, right);
             return null;
@@ -89,7 +89,7 @@ namespace Reni.TokenClasses
         readonly DeclarationTagToken _tag;
 
         internal DeclarationTagSyntax
-            (DeclarationTagToken tag, SourcePart token, SourcePart additionalSourcePart = null)
+            (DeclarationTagToken tag, Token token, SourcePart additionalSourcePart = null)
             : base(token, additionalSourcePart) { _tag = tag; }
 
         [DisableDump]
@@ -101,7 +101,7 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal override bool IsError => _tag.IsError;
 
-        internal override Syntax CreateDeclarationSyntax(SourcePart token, Syntax right)
+        internal override Syntax CreateDeclarationSyntax(Token token, Syntax right)
             =>
                 _tag.DeclarationSyntax
                     (token, right.CheckedToCompiledSyntax(token, RightMustNotBeNullError));
@@ -109,7 +109,7 @@ namespace Reni.TokenClasses
         internal override Syntax Sourround(SourcePart sourcePart)
             => new DeclarationTagSyntax(_tag, Token, sourcePart);
 
-        internal override Syntax SuffixedBy(Definable definable, SourcePart token)
+        internal override Syntax SuffixedBy(Definable definable, Token token)
             => DefinableTokenSyntax(definable, token);
 
 
@@ -119,7 +119,7 @@ namespace Reni.TokenClasses
             return null;
         }
         internal DefinableTokenSyntax DefinableTokenSyntax
-            (Definable definable, SourcePart token, SourcePart additionalSourcePart = null)
+            (Definable definable, Token token, SourcePart additionalSourcePart = null)
             =>
                 new DefinableTokenSyntax
                     (

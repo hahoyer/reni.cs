@@ -16,9 +16,9 @@ namespace Reni.Parser
 
         public SyntaxError(IssueId issueId) { _issueId = issueId; }
 
-        Syntax IType<Syntax>.Create(Syntax left, SourcePart part, Syntax right)
+        Syntax IType<Syntax>.Create(Syntax left, Token token, Syntax right)
         {
-            NotImplementedMethod(left, part, right);
+            NotImplementedMethod(left, token, right);
             return null;
         }
 

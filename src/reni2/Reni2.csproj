@@ -305,7 +305,6 @@
     <Compile Include="Runtime\OutStream.cs" />
     <Compile Include="ReniSyntax\Special.cs" />
     <Compile Include="ReniSyntax\EmptyList.cs" />
-    <Compile Include="Token.cs" />
     <Compile Include="TokenClasses\ArgToken.cs" />
     <Compile Include="TokenClasses\CompareOperation.cs" />
     <Compile Include="TokenClasses\EndToken.cs" />
@@ -368,6 +367,7 @@
     <Compile Include="Type\TypeBase.cs" />
     <Compile Include="Type\TypeType.cs" />
     <Compile Include="Type\VoidType.cs" />
+    <Compile Include="UserInterface\Token.cs" />
     <Compile Include="Validation\CompileSyntaxError.cs" />
     <Compile Include="Validation\CompileSyntaxIssue.cs" />
     <Compile Include="Validation\ConsequentialError.cs" />

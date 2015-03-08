@@ -3,7 +3,6 @@ using System.Linq;
 using System;
 using hw.Helper;
 using hw.Parser;
-using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.ReniParser;
 using Reni.Validation;
@@ -15,37 +14,37 @@ namespace Reni.TokenClasses
     /// </summary>
     abstract class TokenClass : TokenClass<Syntax>, IOperator<Syntax>
     {
-        protected override sealed Syntax Create(Syntax left, SourcePart token, Syntax right)
+        protected override sealed Syntax Create(Syntax left, Token token, Syntax right)
             => this.Operation(left, token, right);
 
-        internal Syntax CreateForVisit(Syntax left, SourcePart token, Syntax right)
+        internal Syntax CreateForVisit(Syntax left, Token token, Syntax right)
             => this.Operation(left, token, right);
 
-        Syntax IOperator<Syntax>.Terminal(SourcePart token)
+        Syntax IOperator<Syntax>.Terminal(Token token)
             => Terminal(token);
-        Syntax IOperator<Syntax>.Prefix(SourcePart token, Syntax right)
+        Syntax IOperator<Syntax>.Prefix(Token token, Syntax right)
             => Prefix(token, right);
-        Syntax IOperator<Syntax>.Suffix(Syntax left, SourcePart token)
+        Syntax IOperator<Syntax>.Suffix(Syntax left, Token token)
             => Suffix(left, token);
-        Syntax IOperator<Syntax>.Infix(Syntax left, SourcePart token, Syntax right)
+        Syntax IOperator<Syntax>.Infix(Syntax left, Token token, Syntax right)
             => Infix(left, token, right);
 
-        protected virtual Syntax Terminal(SourcePart token)
+        protected virtual Syntax Terminal(Token token)
             => new Validation.SyntaxError(IssueId.UnexpectedSyntaxError, token);
 
-        protected virtual Syntax Prefix(SourcePart token, Syntax right)
+        protected virtual Syntax Prefix(Token token, Syntax right)
         {
             NotImplementedMethod(token, right);
             return null;
         }
 
-        protected virtual Syntax Suffix(Syntax left, SourcePart token)
+        protected virtual Syntax Suffix(Syntax left, Token token)
         {
             NotImplementedMethod(left, token);
             return null;
         }
 
-        protected virtual Syntax Infix(Syntax left, SourcePart token, Syntax right)
+        protected virtual Syntax Infix(Syntax left, Token token, Syntax right)
         {
             NotImplementedMethod(left, token, right);
             return null;

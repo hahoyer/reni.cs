@@ -14,13 +14,15 @@ using Reni.ReniParser;
 using Reni.ReniSyntax;
 using Reni.Runtime;
 using Reni.Struct;
+using Reni.UserInterface;
 using Reni.Validation;
 
 namespace Reni
 {
     public sealed class Compiler : DumpableObject, IExecutionContext
     {
-        static readonly IScanner<Syntax> _scanner = new Scanner<Syntax>(ReniLexer.Instance);
+        static IScanner<Syntax> Scanner(ITokenFactory<Syntax> tokenFactory)
+            => new Scanner<Syntax>(ReniLexer.Instance, tokenFactory);
 
         readonly MainTokenFactory _tokenFactory;
         readonly CompilerParameters _parameters;
@@ -54,14 +56,14 @@ namespace Reni
             _className = className ?? fileName?.Symbolize() ?? "ReniMainClass";
             _rootContext = new Root(this);
             _parameters = parameters ?? new CompilerParameters();
-            _tokenFactory = new MainTokenFactory(_scanner)
+            _tokenFactory = new MainTokenFactory(Scanner)
             {
                 Trace = _parameters.TraceOptions.Parser
             };
 
             _source = new ValueCache<Source>
                 (() => fileName == null ? new Source(text) : new Source(fileName.FileHandle()));
-            _tokenCache = new FunctionCache<int, Token>(GetTokenForCache);
+            _tokenCache = new FunctionCache<int, UserInterface.Token>(GetTokenForCache);
             _syntax = new ValueCache<Syntax>(() => Parse(Source + 0));
             _codeContainer = new ValueCache<CodeContainer>
                 (() => new CodeContainer(_rootContext, Syntax, Source.Data));
@@ -166,6 +168,7 @@ namespace Reni
             }
         }
 
+        [DisableDump]
         internal IEnumerable<IssueBase> Issues => CodeContainer.Issues;
 
         Syntax Parse(SourcePosn source) => _tokenFactory.Parser.Execute(source);
@@ -225,34 +228,20 @@ namespace Reni
             return result;
         }
 
-        readonly FunctionCache<int, Token> _tokenCache;
+        readonly FunctionCache<int, UserInterface.Token> _tokenCache;
 
-        public Token Token(int offset) => _tokenCache[offset];
+        public UserInterface.Token Token(int offset) => _tokenCache[offset];
 
-        Token GetTokenForCache(int offset)
+        UserInterface.Token GetTokenForCache(int offset)
         {
             var sourcePosn = Source + offset;
             var result = Syntax.LocateToken(sourcePosn);
             if(result != null)
                 return result;
 
-            var kind = SpecialToken.Type.WhiteSpace;
-            var l = ReniLexer.LexerForUserInterfaceInstance.PlainWhiteSpace(sourcePosn);
-            if(l == null)
-            {
-                kind = SpecialToken.Type.LineComment;
-                l = ReniLexer.LexerForUserInterfaceInstance.LineComment(sourcePosn);
-            }
-            if(l == null)
-            {
-                kind = SpecialToken.Type.Comment;
-                l = ReniLexer.LexerForUserInterfaceInstance.Comment(sourcePosn);
-            }
+            NotImplementedMethod(offset);
+            return null;
 
-            if(l!=null)
-                return new SpecialToken(SourcePart.Span(sourcePosn, l.Value), kind);
-
-            return new InnerToken(_scanner.NextToken(sourcePosn, _tokenFactory, null));
         }
     }
 

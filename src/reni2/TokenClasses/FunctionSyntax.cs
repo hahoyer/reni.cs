@@ -22,7 +22,7 @@ namespace Reni.TokenClasses
 
         public FunctionSyntax
             (
-            SourcePart token,
+            Token token,
             CompileSyntax setter,
             bool isImplicit,
             bool isMetaFunction,

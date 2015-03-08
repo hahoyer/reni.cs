@@ -17,7 +17,7 @@ namespace Reni.Validation
         public SyntaxError
             (
             IssueId issueId,
-            SourcePart token,
+            hw.Parser.Token token,
             SyntaxError previous = null,
             SourcePart sourcePart = null)
             : base(token, sourcePart)

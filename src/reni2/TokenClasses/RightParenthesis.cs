@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using hw.Parser;
 using hw.Scanner;
 using Reni.ReniParser;
 using Reni.Validation;
@@ -19,14 +20,14 @@ namespace Reni.TokenClasses
         public RightParenthesis(int level) { _level = level; }
 
         string ITokenClassWithId.Id => Id(_level);
-        protected override Syntax Suffix(Syntax left, SourcePart token)
+        protected override Syntax Suffix(Syntax left, Token token)
             => left.RightParenthesis(_level, token);
-        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
+        protected override Syntax Infix(Syntax left, Token token, Syntax right)
         {
             NotImplementedMethod(left, token, right);
             return null;
         }
-        protected override Syntax Terminal(SourcePart token)
+        protected override Syntax Terminal(Token token)
         {
             NotImplementedMethod(token);
             return null;

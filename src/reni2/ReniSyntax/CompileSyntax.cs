@@ -5,6 +5,7 @@ using System.Linq;
 using hw.Debug;
 using hw.Forms;
 using hw.Helper;
+using hw.Parser;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
@@ -23,17 +24,11 @@ namespace Reni.ReniSyntax
         readonly FunctionCache<ContextBase, object> _resultCache =
             new FunctionCache<ContextBase, object>();
 
-        internal CompileSyntax(SourcePart token, SourcePart additionalSourcePart)
+        internal CompileSyntax(Token token, SourcePart additionalSourcePart = null)
             : base(token, additionalSourcePart) { }
 
-        internal CompileSyntax(SourcePart token)
-            : base(token) { }
-
-        internal CompileSyntax(SourcePart token, int objectId, SourcePart additionalSourcePart)
+        internal CompileSyntax(Token token, int objectId, SourcePart additionalSourcePart = null)
             : base(token, objectId, additionalSourcePart) { }
-
-        internal CompileSyntax(SourcePart token, int objectId)
-            : base(token, objectId) { }
 
         [DisableDump]
         internal bool IsLambda => GetIsLambda();

@@ -13,7 +13,7 @@ namespace Reni.ReniParser
     {
         internal DeclarationSyntax
             (
-            SourcePart token,
+            Token token,
             CompileSyntax body,
             DefinableTokenSyntax target = null
             )

@@ -16,19 +16,19 @@ namespace Reni.ReniSyntax
         readonly Syntax _right;
 
         public LeftParenthesisSyntax
-            (int parenthesis, SourcePart token, Syntax right)
+            (int parenthesis, Token token, Syntax right)
             : base(token)
         {
             _parenthesis = parenthesis;
             _right = right;
         }
 
-        internal override Syntax RightParenthesis(int level, SourcePart token)
+        internal override Syntax RightParenthesis(int level, Token token)
         {
             Tracer.Assert(level == _parenthesis);
             if(_right == null)
                 return new EmptyList(token, SourcePart);
-            return new SourroundSyntax(_right, SourcePart + token);
+            return new SourroundSyntax(_right, SourcePart + token.SourcePart);
         }
         [DisableDump]
         protected override ParsedSyntax[] Children => new ParsedSyntax[] {_right};
@@ -38,7 +38,7 @@ namespace Reni.ReniSyntax
     {
         readonly Syntax _right;
         public SourroundSyntax(Syntax right, SourcePart sourcePart)
-            : base(sourcePart) { _right = right; }
+            : base(right.Token, sourcePart) { _right = right; }
         internal override CompileSyntax ToCompiledSyntax
             => _right.ToCompiledSyntax.Sourround(SourcePart);
     }

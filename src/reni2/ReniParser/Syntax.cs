@@ -7,16 +7,17 @@ using hw.Scanner;
 using Reni.ReniSyntax;
 using Reni.Struct;
 using Reni.TokenClasses;
+using Reni.UserInterface;
 using Reni.Validation;
 
 namespace Reni.ReniParser
 {
     abstract class Syntax : ParsedSyntax
     {
-        protected Syntax(SourcePart token, SourcePart additionalSourcePart = null)
+        protected Syntax(hw.Parser.Token token, SourcePart additionalSourcePart = null)
             : base(token, additionalSourcePart) {}
 
-        protected Syntax(SourcePart token, int nextObjectId, SourcePart additionalSourcePart = null)
+        protected Syntax(hw.Parser.Token token, int nextObjectId, SourcePart additionalSourcePart = null)
             : base(token, nextObjectId, additionalSourcePart) {}
 
         [DisableDump]
@@ -32,22 +33,22 @@ namespace Reni.ReniParser
         }
         internal virtual IEnumerable<string> GetDeclarations() { yield break; }
 
-        internal virtual Syntax RightParenthesis(int level, SourcePart token)
+        internal virtual Syntax RightParenthesis(int level, hw.Parser.Token token)
         {
             NotImplementedMethod(level, token);
             return null;
         }
 
-        internal Syntax CreateThenSyntax(SourcePart token, CompileSyntax condition)
+        internal Syntax CreateThenSyntax(hw.Parser.Token token, CompileSyntax condition)
             => new CondSyntax(condition, token, ToCompiledSyntax);
 
-        internal virtual Syntax CreateElseSyntax(SourcePart token, CompileSyntax elseSyntax)
+        internal virtual Syntax CreateElseSyntax(hw.Parser.Token token, CompileSyntax elseSyntax)
         {
             NotImplementedMethod(token, elseSyntax);
             return null;
         }
 
-        internal virtual Syntax CreateDeclarationSyntax(SourcePart token, Syntax right)
+        internal virtual Syntax CreateDeclarationSyntax(hw.Parser.Token token, Syntax right)
         {
             NotImplementedMethod(token, right);
             return null;
@@ -89,7 +90,7 @@ namespace Reni.ReniParser
         internal virtual bool IsError => false;
 
         internal virtual Syntax SyntaxError
-            (IssueId issue, SourcePart token, Syntax right = null, SourcePart sourcePart = null)
+            (IssueId issue, hw.Parser.Token token, Syntax right = null, SourcePart sourcePart = null)
         {
             NotImplementedMethod(sourcePart, issue, token, right);
             return null;
@@ -101,10 +102,10 @@ namespace Reni.ReniParser
             return null;
         }
 
-        internal virtual Syntax SuffixedBy(Definable definable, SourcePart token)
+        internal virtual Syntax SuffixedBy(Definable definable, hw.Parser.Token token)
             => new ExpressionSyntax(definable, ToCompiledSyntax, token, null);
 
-        internal Token LocateToken(SourcePosn sourcePosn)
+        internal SyntaxToken LocateToken(SourcePosn sourcePosn)
         {
             if(SourcePart.Contains(sourcePosn))
             {
@@ -113,7 +114,7 @@ namespace Reni.ReniParser
                         .FirstOrDefault(item => item != null);
                 if(child != null)
                     return child;
-                if(Token.Contains(sourcePosn))
+                if(Token.SourcePart.Contains(sourcePosn))
                     return new SyntaxToken(this);
             }
             return null;

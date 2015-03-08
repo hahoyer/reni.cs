@@ -5,6 +5,7 @@ using System.Linq;
 using hw.Debug;
 using hw.Forms;
 using hw.Helper;
+using hw.Parser;
 using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Basics;
@@ -144,11 +145,11 @@ namespace Reni.Context
 
             [Node]
             [SmartNode]
-            internal readonly FunctionCache<SourcePart, IssueType> UndefinedSymbolType;
+            internal readonly FunctionCache<Token, IssueType> UndefinedSymbolType;
 
             public Cache(ContextBase target)
             {
-                UndefinedSymbolType = new FunctionCache<SourcePart, IssueType>
+                UndefinedSymbolType = new FunctionCache<Token, IssueType>
                     (tokenData => UndefinedSymbolIssue.Type(tokenData, target));
                 ResultCache = new FunctionCache<CompileSyntax, ResultCache>(target.CreateCacheElement);
                 CompoundContexts = new FunctionCache<CompoundSyntax, FunctionCache<int, ContextBase>>
@@ -211,7 +212,7 @@ namespace Reni.Context
             return null;
         }
 
-        internal Result PrefixResult(Category category, SourcePart position, Definable tokenClass, CompileSyntax right)
+        internal Result PrefixResult(Category category, Token position, Definable tokenClass, CompileSyntax right)
         {
             var searchResult = Declarations(tokenClass);
             if(searchResult == null)

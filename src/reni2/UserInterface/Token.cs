@@ -1,13 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using hw.Debug;
 using hw.Parser;
 using hw.Scanner;
 using Reni.ReniParser;
 using Reni.TokenClasses;
 
-namespace Reni
+namespace Reni.UserInterface
 {
     public abstract class Token : DumpableObject
     {
@@ -43,7 +40,7 @@ namespace Reni
         internal SyntaxToken(Syntax syntax) { Syntax = syntax; }
 
         Syntax Syntax { get; }
-        public override SourcePart SourcePart => Syntax.Token;
+        public override SourcePart SourcePart => Syntax.Token.SourcePart;
         public override bool IsKeyword => Syntax.IsKeyword;
         public override bool IsIdentifier => Syntax.IsIdentifier;
         public override bool IsText => Syntax.IsText;
@@ -79,7 +76,7 @@ namespace Reni
     {
         readonly ScannerItem<Syntax> _item;
         public InnerToken(ScannerItem<Syntax> item) { _item = item; }
-        public override SourcePart SourcePart => _item.Part;
+        public override SourcePart SourcePart => _item.Token.SourcePart;
         public override bool IsBraceLike
             => _item.Type is LeftParenthesis || _item.Type is RightParenthesis;
     }

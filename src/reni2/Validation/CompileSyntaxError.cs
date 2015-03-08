@@ -22,7 +22,7 @@ namespace Reni.Validation
         public CompileSyntaxError
             (
             IssueId issueId,
-            SourcePart token,
+            Token token,
             CompileSyntaxError previous = null,
             SourcePart sourcePart = null)
             : base(token, sourcePart)
@@ -62,7 +62,7 @@ namespace Reni.Validation
 
         internal override bool IsError => true;
         internal override Syntax SyntaxError
-            (IssueId issue, SourcePart token, Syntax right = null, SourcePart sourcePart = null)
+            (IssueId issue, Token token, Syntax right = null, SourcePart sourcePart = null)
             => new CompileSyntaxError(issue, token, this, sourcePart);
 
         [DisableDump]

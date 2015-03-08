@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
+using hw.Parser;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
@@ -30,7 +31,7 @@ namespace Reni.Validation
         internal override string DumpPrintText => _issue.IssueId.Tag;
 
         internal Result IssueResult(Category category) => Result(category, Code);
-        IssueType ConsequentialErrorType(SourcePart position) => _issue.ConsequentialError(position).Type(RootContext);
+        IssueType ConsequentialErrorType(Token position) => _issue.ConsequentialError(position).Type(RootContext);
 
         CodeBase Code() => _issue.Code;
 

@@ -9,16 +9,16 @@ namespace Reni.Validation
     sealed class CompileSyntaxIssue : IssueBase
     {
         [EnableDump]
-        readonly SourcePart _tokenData;
+        readonly hw.Parser.Token _tokenData;
 
-        internal CompileSyntaxIssue(IssueId issueId, SourcePart tokenData)
+        internal CompileSyntaxIssue(IssueId issueId, hw.Parser.Token tokenData)
             : base(issueId) { _tokenData = tokenData; }
 
         internal override string LogDump
         {
             get
             {
-                var result = _tokenData.FileErrorPosition(Tag);
+                var result = _tokenData.Part.FileErrorPosition(Tag);
                 return result;
             }
         }

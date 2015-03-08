@@ -6,6 +6,7 @@ using hw.Debug;
 using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Reni;
+using Reni.UserInterface;
 
 namespace HoyerWare.ReniLanguagePackage
 {
@@ -33,11 +34,10 @@ namespace HoyerWare.ReniLanguagePackage
                 + tokenInfo.Token + "i";
             var line = lineIndex + ": " + Buffer.Line(lineIndex);
 
-            var trace = lineIndex == -3 && tokenInfo.StartIndex==4;
+            var trace = lineIndex >= 3;
             StartMethodDump(trace, tokenId, line);
             try
             {
-                BreakExecution();
                 if(tokenInfo.EndIndex + 1 >= Buffer.LineLength(lineIndex))
                 {
                     lineIndex++;
@@ -66,6 +66,7 @@ namespace HoyerWare.ReniLanguagePackage
                 tokenInfo.Token = token.Id;
                 Dump(nameof(tokenInfo), tokenInfo);
 
+                BreakExecution();
                 return ReturnMethodDump(true, false);
             }
             finally
@@ -161,5 +162,6 @@ namespace HoyerWare.ReniLanguagePackage
                 return TokenColor.Comment;
             return TokenColor.Text;
         }
+
     }
 }

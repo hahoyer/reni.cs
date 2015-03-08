@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using System;
+using hw.Parser;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
@@ -14,12 +15,12 @@ namespace Reni.TokenClasses
     {
         public const string Id = "new_value";
         string ITokenClassWithId.Id => Id;
-        public override Result Result(ContextBase context, Category category, SourcePart token)
+        public override Result Result(ContextBase context, Category category, Token token)
             => context
                 .FindRecentFunctionContextObject
                 .CreateValueReferenceResult(category);
         public override Result Result
-            (ContextBase context, Category category, SourcePart token, CompileSyntax right)
+            (ContextBase context, Category category, Token token, CompileSyntax right)
         {
             NotImplementedMethod(context, category, token, right);
             return null;

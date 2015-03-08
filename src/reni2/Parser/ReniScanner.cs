@@ -1,25 +1,15 @@
 using System.Linq;
 using System.Collections.Generic;
 using System;
-using hw.Debug;
 using hw.Parser;
 using hw.Scanner;
 using Reni.Validation;
 
 namespace Reni.Parser
 {
-    interface ILexerForUserInterface
-    {
-        int? PlainWhiteSpace(SourcePosn sourcePosn);
-        int? Comment(SourcePosn sourcePosn);
-        int? LineComment(SourcePosn sourcePosn);
-    }
-
-    sealed class ReniLexer : ILexer, ILexerForUserInterface
+    sealed class ReniLexer : ILexer
     {
         internal static readonly ILexer Instance = new ReniLexer();
-        internal static readonly ILexerForUserInterface LexerForUserInterfaceInstance =
-            (ILexerForUserInterface) Instance;
 
         sealed class Error : Match.IError
         {
@@ -28,7 +18,6 @@ namespace Reni.Parser
             public override string ToString() => IssueId.Tag;
         }
 
-        readonly Match _whiteSpaces;
         readonly Match _any;
         readonly Match _text;
         readonly Error _invalidTextEnd = new Error(IssueId.EOLInString);
@@ -37,6 +26,7 @@ namespace Reni.Parser
         readonly IMatch _number;
         readonly Match _lineComment;
         readonly Match _comment;
+        readonly Match _whiteSpace;
 
         ReniLexer()
         {
@@ -49,21 +39,24 @@ namespace Reni.Parser
 
             _any = symbol1.Else(identifier);
 
-            _lineComment = "#" + " \t".AnyChar() + 
-                Match.LineEnd.Find
-                    .Else(Match.End.Find + _invalidLineComment);
+            _lineComment = "#"
+                +
+                Match.LineEnd
+                    .Else(Match.End)
+                    .Else
+                    (
+                        " \t".AnyChar() + Match.LineEnd.Find
+                            .Else(Match.End.Find + _invalidLineComment)
+                    );
 
-            _comment = "#(" 
-                + 
+            _whiteSpace = Match.WhiteSpace.Repeat(1);
+
+            _comment = "#("
+                +
                 (Match.WhiteSpace + (Match.WhiteSpace + ")#").Find)
-                .Else(_any.Value(id => (Match.WhiteSpace + id + ")#").Box().Find))
-                .Else(Match.End.Find + _invalidComment)
+                    .Else(_any.Value(id => (Match.WhiteSpace + id + ")#").Box().Find))
+                    .Else(Match.End.Find + _invalidComment)
                 ;
-            _whiteSpaces =
-                Match.WhiteSpace
-                    .Else(_lineComment)
-                    .Else(_comment)
-                    .Repeat();
 
             _number = Match.Digit.Repeat(1);
 
@@ -76,23 +69,20 @@ namespace Reni.Parser
                     });
         }
 
-        int ILexer.WhiteSpace(SourcePosn sourcePosn) => WhiteSpace(sourcePosn);
-
-        int WhiteSpace(SourcePosn sourcePosn)
-        {
-            var result = sourcePosn.Match(_whiteSpaces);
-            Tracer.Assert(result != null);
-            return result.Value;
-        }
-
+        Func<SourcePosn, int?>[] ILexer.WhiteSpace
+            => new Func<SourcePosn, int?>[]
+            {
+                WhiteSpace,
+                Comment,
+                LineComment
+            };
         int? ILexer.Number(SourcePosn sourcePosn) => sourcePosn.Match(_number);
         int? ILexer.Any(SourcePosn sourcePosn) => sourcePosn.Match(_any);
         int? ILexer.Text(SourcePosn sourcePosn) => sourcePosn.Match(_text);
         public static IssueId Parse(Match.IError error) => ((Error) error).IssueId;
 
-        int? ILexerForUserInterface.PlainWhiteSpace(SourcePosn sourcePosn)
-            => sourcePosn.Match(Match.WhiteSpace.Repeat(1));
-        int? ILexerForUserInterface.Comment(SourcePosn sourcePosn) => sourcePosn.Match(_comment);
-        int? ILexerForUserInterface.LineComment(SourcePosn sourcePosn) => sourcePosn.Match(_lineComment);
+        int? WhiteSpace(SourcePosn sourcePosn) => sourcePosn.Match(_whiteSpace);
+        int? Comment(SourcePosn sourcePosn) => sourcePosn.Match(_comment);
+        int? LineComment(SourcePosn sourcePosn) => sourcePosn.Match(_lineComment);
     }
 }

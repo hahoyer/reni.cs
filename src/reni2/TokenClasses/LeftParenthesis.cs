@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using hw.Parser;
 using hw.Scanner;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
@@ -23,18 +24,18 @@ namespace Reni.TokenClasses
 
         string ITokenClassWithId.Id => Id(Level);
 
-        protected override Syntax Suffix(Syntax left, SourcePart token)
+        protected override Syntax Suffix(Syntax left, Token token)
             => new CompileSyntaxError
                 (IssueId.UnexpectedUseAsSuffix, token, sourcePart: left.SourcePart);
 
-        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
+        protected override Syntax Infix(Syntax left, Token token, Syntax right)
             => new CompileSyntaxError
                 (IssueId.UnexpectedUseAsSuffix, token, sourcePart: left.SourcePart + right.SourcePart);
 
-        protected override Syntax Prefix(SourcePart token, Syntax right)
+        protected override Syntax Prefix(Token token, Syntax right)
             => new LeftParenthesisSyntax(Level, token, right);
 
-        protected override Syntax Terminal(SourcePart token)
+        protected override Syntax Terminal(Token token)
             => new LeftParenthesisSyntax(Level, token, null);
     }
 }

@@ -29,7 +29,7 @@ namespace Reni
         internal CondSyntax
             (
             CompileSyntax condSyntax,
-            SourcePart thenToken,
+            Token thenToken,
             CompileSyntax thenSyntax,
             CompileSyntax elseSyntax = null,
             SourcePart sourcePart = null)
@@ -99,10 +99,10 @@ namespace Reni
             .CommonType(Else.Type(context))
             .Align;
 
-        internal override Syntax CreateElseSyntax(SourcePart token, CompileSyntax elseSyntax)
+        internal override Syntax CreateElseSyntax(Token token, CompileSyntax elseSyntax)
         {
             Tracer.Assert(NativeElse == null);
-            return new CondSyntax(Cond, Token, Then, elseSyntax, token);
+            return new CondSyntax(Cond, Token, Then, elseSyntax, token.SourcePart);
         }
 
         internal override Result PendingResultForCache(ContextBase context, Category category)

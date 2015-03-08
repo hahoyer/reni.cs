@@ -26,8 +26,8 @@ namespace Reni.Struct
         static bool _isInsideFileDump;
         static int _nextObjectId;
 
-        internal CompoundSyntax(SourcePart token, Syntax[] statements, SourcePart sourcePart = null)
-            : base(token, _nextObjectId++, token + statements.Select(item=>item.SourcePart).Aggregate() + sourcePart)
+        internal CompoundSyntax(Token token, Syntax[] statements, SourcePart sourcePart = null)
+            : base(token, _nextObjectId++, token.SourcePart + statements.Select(item=>item.SourcePart).Aggregate() + sourcePart)
         {
             _statements = statements;
             _data = statements

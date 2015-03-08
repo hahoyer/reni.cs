@@ -11,11 +11,11 @@ namespace Reni.Parser
     abstract class SyntaxIssue : IssueBase
     {
         [EnableDump]
-        readonly SourcePart _position;
+        readonly Token _token;
 
-        internal SyntaxIssue(SourcePart position, IssueId issueId)
-            : base(issueId) { _position = position; }
+        internal SyntaxIssue(Token token, IssueId issueId)
+            : base(issueId) { _token = token; }
 
-        internal override string LogDump => _position.FileErrorPosition(Tag);
+        internal override string LogDump => _token.Part.FileErrorPosition(Tag);
     }
 }

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using hw.Parser;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.ReniParser;
@@ -16,7 +17,7 @@ namespace Reni.Context
         public const string Id = "^^";
         string ITokenClassWithId.Id => Id;
 
-        public override Result Result(ContextBase context, Category category, SourcePart token) => context
+        public override Result Result(ContextBase context, Category category, Token token) => context
             .FindRecentCompoundView
             .ObjectPointerViaContext(category);
 

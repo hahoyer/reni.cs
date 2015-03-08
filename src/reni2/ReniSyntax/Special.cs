@@ -13,7 +13,7 @@ namespace Reni.ReniSyntax
 {
     abstract class SpecialSyntax : CompileSyntax
     {
-        protected SpecialSyntax(SourcePart token, SourcePart additionalSourcePart = null)
+        protected SpecialSyntax(Token token, SourcePart additionalSourcePart = null)
             : base(token, additionalSourcePart) {}
         internal override bool IsKeyword => !IsNumber && !IsText;
     }
@@ -24,7 +24,7 @@ namespace Reni.ReniSyntax
         [EnableDump]
         internal readonly ITerminal Terminal;
 
-        public TerminalSyntax(SourcePart token, ITerminal terminal, SourcePart sourcePart = null)
+        public TerminalSyntax(Token token, ITerminal terminal, SourcePart sourcePart = null)
             : base(token, sourcePart)
         {
             Terminal = terminal;
@@ -52,7 +52,7 @@ namespace Reni.ReniSyntax
         readonly CompileSyntax _right;
 
         public PrefixSyntax
-            (SourcePart token, IPrefix prefix, CompileSyntax right, SourcePart sourcePart = null)
+            (Token token, IPrefix prefix, CompileSyntax right, SourcePart sourcePart = null)
             : base(token, sourcePart)
         {
             _prefix = prefix;
@@ -87,7 +87,7 @@ namespace Reni.ReniSyntax
 
         public InfixSyntax
             (
-            SourcePart token,
+            Token token,
             CompileSyntax left,
             IInfix infix,
             CompileSyntax right,
@@ -149,7 +149,7 @@ namespace Reni.ReniSyntax
 
         internal SuffixSyntax
             (
-            SourcePart token,
+            Token token,
             CompileSyntax left,
             ISuffix suffix,
             SourcePart sourcePart = null)
@@ -173,13 +173,13 @@ namespace Reni.ReniSyntax
 
     interface ITerminal
     {
-        Result Result(ContextBase context, Category category, SourcePart token);
+        Result Result(ContextBase context, Category category, Token token);
         CompileSyntax Visit(ISyntaxVisitor visitor);
     }
 
     interface IPrefix
     {
-        Result Result(ContextBase context, Category category, SourcePart token, CompileSyntax right);
+        Result Result(ContextBase context, Category category, Token token, CompileSyntax right);
     }
 
     interface IInfix
