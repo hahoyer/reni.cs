@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Parser;
-using hw.Scanner;
 using Reni.ReniParser;
 using Reni.Validation;
 
@@ -19,6 +18,7 @@ namespace Reni.TokenClasses
         string ITokenClassWithId.Id => Id(_isImplicit, _isMetaFunction);
         readonly bool _isImplicit;
         readonly bool _isMetaFunction;
+
         public Function(bool isImplicit, bool isMetaFunction)
         {
             _isImplicit = isImplicit;

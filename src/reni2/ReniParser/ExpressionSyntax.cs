@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.Debug;
 using hw.Forms;
 using hw.Parser;
 using hw.Scanner;
@@ -21,14 +20,21 @@ namespace Reni.ReniParser
             Definable @operator,
             CompileSyntax left,
             Token token,
-            CompileSyntax right,
-            SourcePart sourcePart = null)
-            : base(token, sourcePart)
+            CompileSyntax right)
+            : base(token)
         {
             Operator = @operator;
             Left = left;
             Right = right;
             StopByObjectIds();
+        }
+
+        ExpressionSyntax(ExpressionSyntax other, ParsedSyntax[] parts)
+            : base(other, parts)
+        {
+            Operator = other.Operator;
+            Left = other.Left;
+            Right = other.Right;
         }
 
         [Node]
@@ -37,12 +43,6 @@ namespace Reni.ReniParser
         public Definable Operator { get; }
         [Node]
         internal CompileSyntax Right { get; }
-
-        [DisableDump]
-        protected override ParsedSyntax[] Children
-            => new ParsedSyntax[] {Left, Right}
-                .Where(child => child != null)
-                .ToArray();
 
         internal override Result ResultForCache(ContextBase context, Category category)
         {
@@ -83,8 +83,8 @@ namespace Reni.ReniParser
 
             return (CompileSyntax) Operator.CreateForVisit(left ?? Left, Token, right ?? Right);
         }
-        public override CompileSyntax Sourround(SourcePart sourcePart)
-            => new ExpressionSyntax(Operator, Left, Token, Right, sourcePart);
+        internal override CompileSyntax SurroundCompileSyntax(params ParsedSyntax[] parts)
+            => new ExpressionSyntax(this, parts);
 
         protected override string GetNodeDump()
         {
@@ -97,10 +97,11 @@ namespace Reni.ReniParser
         }
 
         internal override bool IsIdentifier => true;
-        internal override Syntax SyntaxError(IssueId issue, Token token, Syntax right = null, SourcePart sourcePart = null)
+        internal override Syntax SyntaxError
+            (IssueId issue, Token token, Syntax right = null, params ParsedSyntax[] parts)
         {
             if(Right == null)
-                return Left.SyntaxError(issue, token, sourcePart: sourcePart + right?.SourcePart);
+                return Left.SyntaxError(issue, token, right, parts);
             NotImplementedMethod(issue, token);
             return null;
         }

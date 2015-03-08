@@ -20,12 +20,20 @@ namespace Reni.ReniSyntax
             Data = data.ToArray();
         }
 
+        ListSyntax(ListSyntax other, ParsedSyntax[] parts)
+            : base(other,parts)
+        {
+            Type = other.Type;
+            Data = other.Data.ToArray();
+        }
+
         [EnableDump]
         List Type { get; }
         [EnableDump]
         Syntax[] Data { get; }
         [DisableDump]
         internal override CompileSyntax ToCompiledSyntax => ToContainer;
+
         [DisableDump]
         internal override CompoundSyntax ToContainer => new CompoundSyntax(Token, Data);
 
@@ -37,6 +45,9 @@ namespace Reni.ReniSyntax
 
         internal static ListSyntax Spread(Syntax statement) => new ListSyntax(null, statement.Token, statement.ToList(null));
 
-        protected override ParsedSyntax[] Children => Data.ToArray<ParsedSyntax>();
+        protected override IEnumerable<Syntax> SyntaxChildren => Data;
+
+        internal override Syntax Surround(params ParsedSyntax[] parts)
+            => new ListSyntax(this, parts);
     }
 }

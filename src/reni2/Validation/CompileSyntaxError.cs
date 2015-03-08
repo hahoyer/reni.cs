@@ -4,7 +4,6 @@ using System.Linq;
 using hw.Debug;
 using hw.Helper;
 using hw.Parser;
-using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.ReniParser;
@@ -21,11 +20,22 @@ namespace Reni.Validation
 
         public CompileSyntaxError
             (
+            CompileSyntaxError other,
+            params ParsedSyntax[] parts)
+            : base(other, parts)
+        {
+            _issueId = other._issueId;
+            _previous = other._previous;
+            _issueCache = new ValueCache<CompileSyntaxIssue>
+                (() => new CompileSyntaxIssue(_issueId, Token));
+        }
+
+        public CompileSyntaxError
+            (
             IssueId issueId,
             Token token,
-            CompileSyntaxError previous = null,
-            SourcePart sourcePart = null)
-            : base(token, sourcePart)
+            CompileSyntaxError previous = null)
+            : base(token)
         {
             _issueId = issueId;
             _previous = previous;
@@ -42,7 +52,8 @@ namespace Reni.Validation
                 .Aggregate(context.RootContext.VoidType.Result(category), (x, y) => x + y);
             return result;
         }
-        public override CompileSyntax Sourround(SourcePart sourcePart) => this;
+        internal override CompileSyntax SurroundCompileSyntax(params ParsedSyntax[] parts)
+            => new CompileSyntaxError(this, parts);
 
         [DisableDump]
         IEnumerable<CompileSyntaxError> Chain
@@ -62,8 +73,8 @@ namespace Reni.Validation
 
         internal override bool IsError => true;
         internal override Syntax SyntaxError
-            (IssueId issue, Token token, Syntax right = null, SourcePart sourcePart = null)
-            => new CompileSyntaxError(issue, token, this, sourcePart);
+            (IssueId issue, Token token, Syntax right = null, params ParsedSyntax[] parts)
+            => new CompileSyntaxError(issue, token, this).SurroundCompileSyntax(parts);
 
         [DisableDump]
         protected override ParsedSyntax[] Children => new ParsedSyntax[] {_previous};

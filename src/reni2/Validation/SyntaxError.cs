@@ -17,17 +17,13 @@ namespace Reni.Validation
         public SyntaxError
             (
             IssueId issueId,
-            hw.Parser.Token token,
-            SyntaxError previous = null,
-            SourcePart sourcePart = null)
-            : base(token, sourcePart)
+            Token token,
+            SyntaxError previous = null)
+            : base(token)
         {
             _issueId = issueId;
             _previous = previous;
         }
-
-        internal override Syntax Sourround(SourcePart sourcePart)
-            => new SyntaxError(_issueId, Token, _previous, SourcePart + sourcePart);
 
         internal override bool IsError => true;
 

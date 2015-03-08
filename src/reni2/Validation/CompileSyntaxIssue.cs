@@ -18,7 +18,7 @@ namespace Reni.Validation
         {
             get
             {
-                var result = _tokenData.Part.FileErrorPosition(Tag);
+                var result = _tokenData.Characters.FileErrorPosition(Tag);
                 return result;
             }
         }

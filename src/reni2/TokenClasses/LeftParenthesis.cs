@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.Parser;
-using hw.Scanner;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
 using Reni.Validation;
@@ -24,18 +23,33 @@ namespace Reni.TokenClasses
 
         string ITokenClassWithId.Id => Id(Level);
 
-        protected override Syntax Suffix(Syntax left, Token token)
-            => new CompileSyntaxError
-                (IssueId.UnexpectedUseAsSuffix, token, sourcePart: left.SourcePart);
+        protected override ReniParser.Syntax Suffix(ReniParser.Syntax left, Token token)
+            => new CompileSyntaxError(IssueId.UnexpectedUseAsSuffix, token)
+                .SurroundCompileSyntax(left);
 
-        protected override Syntax Infix(Syntax left, Token token, Syntax right)
-            => new CompileSyntaxError
-                (IssueId.UnexpectedUseAsSuffix, token, sourcePart: left.SourcePart + right.SourcePart);
+        protected override ReniParser.Syntax Infix
+            (ReniParser.Syntax left, Token token, ReniParser.Syntax right)
+            => new CompileSyntaxError(IssueId.UnexpectedUseAsSuffix, token)
+                .SurroundCompileSyntax(left, right);
 
-        protected override Syntax Prefix(Token token, Syntax right)
-            => new LeftParenthesisSyntax(Level, token, right);
+        protected override ReniParser.Syntax Prefix(Token token, ReniParser.Syntax right)
+            => right.Surround(new Syntax(token));
 
-        protected override Syntax Terminal(Token token)
-            => new LeftParenthesisSyntax(Level, token, null);
+        protected override ReniParser.Syntax Terminal(Token token)
+            => new Syntax(token);
+
+        sealed class Syntax : ReniParser.Syntax
+        {
+            public Syntax(Token token)
+                : base(token) {}
+            Syntax(Syntax other, ParsedSyntax[] parts)
+                : base(other, parts) {}
+
+            internal override CompileSyntax ToCompiledSyntax
+                => new EmptyList(Token).SurroundCompileSyntax(this);
+
+            internal override ReniParser.Syntax Surround(params ParsedSyntax[] parts)
+                => new Syntax(this, parts);
+        }
     }
 }

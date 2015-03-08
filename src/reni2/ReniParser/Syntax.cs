@@ -14,18 +14,34 @@ namespace Reni.ReniParser
 {
     abstract class Syntax : ParsedSyntax
     {
-        protected Syntax(hw.Parser.Token token, SourcePart additionalSourcePart = null)
-            : base(token, additionalSourcePart) {}
+        readonly ParsedSyntax[] _parts;
 
-        protected Syntax(hw.Parser.Token token, int nextObjectId, SourcePart additionalSourcePart = null)
-            : base(token, nextObjectId, additionalSourcePart) {}
+        protected Syntax(Token token)
+            : base(token) {}
+
+        protected Syntax(Token token, int objectId)
+            : base(token, objectId) {}
+
+        protected Syntax(Syntax other, params ParsedSyntax[] parts)
+            : this(other.Token)
+        {
+            _parts = other._parts.plus(parts);
+        }
+
+        protected Syntax(Syntax other, int objectId, params ParsedSyntax[] parts)
+            : this(other.Token, objectId)
+        {
+            _parts = other._parts.plus(parts);
+        }
+
 
         [DisableDump]
         internal virtual CompileSyntax ContainerStatementToCompileSyntax => ToCompiledSyntax;
 
         [DisableDump]
         internal virtual CompileSyntax ToCompiledSyntax
-            => new CompileSyntaxError(IssueId.MissingRightBracket, Token, sourcePart: SourcePart);
+            => new CompileSyntaxError(IssueId.MissingRightBracket, Token)
+                .SurroundCompileSyntax(_parts);
 
         internal virtual IEnumerable<KeyValuePair<string, int>> GetDeclarations(int index)
         {
@@ -33,22 +49,16 @@ namespace Reni.ReniParser
         }
         internal virtual IEnumerable<string> GetDeclarations() { yield break; }
 
-        internal virtual Syntax RightParenthesis(int level, hw.Parser.Token token)
-        {
-            NotImplementedMethod(level, token);
-            return null;
-        }
+        internal Syntax CreateThenSyntax(ThenToken.Syntax thenToken, CompileSyntax condition)
+            => new CondSyntax(condition, thenToken, ToCompiledSyntax);
 
-        internal Syntax CreateThenSyntax(hw.Parser.Token token, CompileSyntax condition)
-            => new CondSyntax(condition, token, ToCompiledSyntax);
-
-        internal virtual Syntax CreateElseSyntax(hw.Parser.Token token, CompileSyntax elseSyntax)
+        internal virtual Syntax CreateElseSyntax(ElseToken.Syntax token, CompileSyntax elseSyntax)
         {
             NotImplementedMethod(token, elseSyntax);
             return null;
         }
 
-        internal virtual Syntax CreateDeclarationSyntax(hw.Parser.Token token, Syntax right)
+        internal virtual Syntax CreateDeclarationSyntax(Token token, Syntax right)
         {
             NotImplementedMethod(token, right);
             return null;
@@ -88,36 +98,69 @@ namespace Reni.ReniParser
         internal virtual bool IsKeyword => false;
         internal virtual bool IsNumber => false;
         internal virtual bool IsError => false;
+        internal virtual bool IsBraceLike => false;
 
         internal virtual Syntax SyntaxError
-            (IssueId issue, hw.Parser.Token token, Syntax right = null, SourcePart sourcePart = null)
+            (
+            IssueId issue,
+            Token token,
+            Syntax right = null,
+            params ParsedSyntax[] parts)
         {
-            NotImplementedMethod(sourcePart, issue, token, right);
+            NotImplementedMethod(issue, token, right, (object) parts);
             return null;
         }
 
-        internal virtual Syntax Sourround(SourcePart sourcePart)
+        internal virtual Syntax Surround(params ParsedSyntax[] parts)
         {
-            NotImplementedMethod(sourcePart);
+            NotImplementedMethod((object) parts);
             return null;
         }
 
-        internal virtual Syntax SuffixedBy(Definable definable, hw.Parser.Token token)
+        internal virtual Syntax SuffixedBy(Definable definable, Token token)
             => new ExpressionSyntax(definable, ToCompiledSyntax, token, null);
 
-        internal SyntaxToken LocateToken(SourcePosn sourcePosn)
+        protected override ParsedSyntax[] Children
+            => _parts.plus(SyntaxChildren.ToArray<ParsedSyntax>());
+
+        protected virtual IEnumerable<Syntax> SyntaxChildren { get { yield break; } }
+
+        internal TokenInformation LocateToken(SourcePosn sourcePosn)
         {
-            if(SourcePart.Contains(sourcePosn))
-            {
-                var child =
-                    Children.Select(item => ((Syntax) item)?.LocateToken(sourcePosn))
-                        .FirstOrDefault(item => item != null);
-                if(child != null)
-                    return child;
-                if(Token.SourcePart.Contains(sourcePosn))
-                    return new SyntaxToken(this);
-            }
-            return null;
+            if(!SourcePart.Contains(sourcePosn))
+                return null;
+
+            var child =
+                Children.Select(item => ((Syntax) item)?.LocateToken(sourcePosn))
+                    .FirstOrDefault(item => item != null);
+
+            if(child != null)
+                return child;
+
+            if(Token.Characters.Contains(sourcePosn))
+                return new SyntaxToken(this);
+
+            var whiteSpaceToken = Token.PreceededBy.First
+                (item => item.Characters.Contains(sourcePosn));
+            return new UserInterface.WhiteSpaceToken(whiteSpaceToken);
         }
+    }
+
+
+    static class Extension
+    {
+        internal static T[] plus<T>(this T x, params T[][] y)
+            => new[] {x}.Concat(y.SelectMany(item => item)).ToDisitncNotNullArray();
+
+        internal static T[] plus<T>(this T[] x, params T[] y)
+            => (x ?? new T[0])
+                .Concat(y ?? new T[0])
+                .ToDisitncNotNullArray();
+
+        internal static T[] plus<T>(this T x, params T[] y)
+            => new[] {x}.Concat(y).ToDisitncNotNullArray();
+
+        internal static T[] ToDisitncNotNullArray<T>(this IEnumerable<T> y)
+            => (y).Where(item => item != null).Distinct().ToArray();
     }
 }

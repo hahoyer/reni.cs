@@ -5,7 +5,6 @@ using System.Linq;
 using hw.Debug;
 using hw.Forms;
 using hw.Parser;
-using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.ReniParser;
@@ -26,11 +25,19 @@ namespace Reni.Struct
         static bool _isInsideFileDump;
         static int _nextObjectId;
 
-        internal CompoundSyntax(Token token, Syntax[] statements, SourcePart sourcePart = null)
-            : base(token, _nextObjectId++, token.SourcePart + statements.Select(item=>item.SourcePart).Aggregate() + sourcePart)
+        internal CompoundSyntax(Token token, Syntax[] statements)
+            : base(token, _nextObjectId++)
         {
             _statements = statements;
-            _data = statements
+            _data = _statements
+                .Select((s, i) => new Data(s, i))
+                .ToArray();
+        }
+        CompoundSyntax(CompoundSyntax other, ParsedSyntax[] parts)
+            : base(other, parts)
+        {
+            _statements = other._statements;
+            _data = _statements
                 .Select((s, i) => new Data(s, i))
                 .ToArray();
         }
@@ -47,7 +54,8 @@ namespace Reni.Struct
         [DisableDump]
         internal Size IndexSize => Size.AutoSize(Statements.Length);
         [DisableDump]
-        protected override ParsedSyntax[] Children => _data.Select(item=>item.RawStatement).ToArray<ParsedSyntax>();
+        protected override ParsedSyntax[] Children
+            => _data.Select(item => item.RawStatement).ToArray<ParsedSyntax>();
         [DisableDump]
         internal string[] Names => _data.SelectMany(s => s.Names).ToArray();
         [DisableDump]
@@ -62,8 +70,8 @@ namespace Reni.Struct
                 .Where(data => data.IsConverter)
                 .Select(data => (FunctionSyntax) data.Statement);
 
-        public override CompileSyntax Sourround(SourcePart sourcePart)
-            => new CompoundSyntax(Token, _statements, sourcePart);
+        internal override CompileSyntax SurroundCompileSyntax(params ParsedSyntax[] parts)
+            => new CompoundSyntax(this, parts);
 
         protected override string GetNodeDump()
             => GetType().PrettyName() + "(" + GetCompoundIdentificationDump() + ")";

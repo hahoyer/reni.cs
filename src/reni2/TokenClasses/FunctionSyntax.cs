@@ -4,10 +4,10 @@ using System;
 using hw.Debug;
 using hw.Helper;
 using hw.Parser;
-using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
+using Reni.ReniParser;
 using Reni.ReniSyntax;
 using Reni.Struct;
 
@@ -26,14 +26,22 @@ namespace Reni.TokenClasses
             CompileSyntax setter,
             bool isImplicit,
             bool isMetaFunction,
-            CompileSyntax getter,
-            SourcePart sourcePart = null)
-            : base(token, sourcePart)
+            CompileSyntax getter)
+            : base(token)
         {
             Getter = getter;
             Setter = setter;
             IsImplicit = isImplicit;
             IsMetaFunction = isMetaFunction;
+        }
+
+        FunctionSyntax(FunctionSyntax other, ParsedSyntax[] parts)
+            : base(other, parts)
+        {
+            Getter = other.Getter;
+            Setter = other.Setter;
+            IsImplicit = other.IsImplicit;
+            IsMetaFunction = other.IsMetaFunction;
         }
 
         string Tag
@@ -48,8 +56,8 @@ namespace Reni.TokenClasses
                 .Result(category);
 
         protected override bool GetIsLambda() => true;
-        public override CompileSyntax Sourround(SourcePart sourcePart)
-            => new FunctionSyntax(Token, Setter, IsImplicit, IsMetaFunction, Getter, sourcePart);
+        internal override CompileSyntax SurroundCompileSyntax(params ParsedSyntax[] parts)
+            => new FunctionSyntax(this, parts);
 
         internal IContextMetaFunctionFeature ContextMetaFunctionFeature(CompoundView compoundView)
         {
@@ -75,6 +83,13 @@ namespace Reni.TokenClasses
         }
 
         [DisableDump]
-        protected override ParsedSyntax[] Children => new ParsedSyntax[] {Setter, Getter};
+        protected override IEnumerable<Syntax> SyntaxChildren
+        {
+            get
+            {
+                yield return Getter;
+                yield return Setter;
+            }
+        }
     }
 }

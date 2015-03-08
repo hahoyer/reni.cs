@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Parser;
-using hw.Scanner;
 using Reni.ReniSyntax;
 using Reni.TokenClasses;
 
@@ -22,16 +21,21 @@ namespace Reni.ReniParser
             Target = target;
             Body = body;
         }
-        protected override ParsedSyntax[] Children => new ParsedSyntax[] {Target, Body};
+        DeclarationSyntax(DeclarationSyntax other, ParsedSyntax[] parts)
+            : base(other,parts)
+        {
+            Target = other.Target;
+            Body = other.Body;
+        }
 
         [EnableDump]
         DefinableTokenSyntax Target { get; }
         [EnableDump]
         Syntax Body { get; }
         [DisableDump]
-        internal override bool IsMutableSyntax => Target?.IsMutable??false;
+        internal override bool IsMutableSyntax => Target?.IsMutable ?? false;
         [DisableDump]
-        internal override bool IsConverterSyntax => Target?.IsConverter??false;
+        internal override bool IsConverterSyntax => Target?.IsConverter ?? false;
         [DisableDump]
         internal override CompileSyntax ToCompiledSyntax => ToContainer;
         [DisableDump]
@@ -55,6 +59,18 @@ namespace Reni.ReniParser
             if(Name == null)
                 yield break;
             yield return Name;
+        }
+
+        internal override Syntax Surround(params ParsedSyntax[] parts)
+            => new DeclarationSyntax(this, parts);
+
+        protected override IEnumerable<Syntax> SyntaxChildren
+        {
+            get
+            {
+                yield return Target;
+                yield return Body;
+            }
         }
     }
 }

@@ -20,17 +20,27 @@ namespace Reni.TokenClasses
         public RightParenthesis(int level) { _level = level; }
 
         string ITokenClassWithId.Id => Id(_level);
-        protected override Syntax Suffix(Syntax left, Token token)
-            => left.RightParenthesis(_level, token);
-        protected override Syntax Infix(Syntax left, Token token, Syntax right)
+
+        protected override ReniParser.Syntax Suffix(ReniParser.Syntax left, Token token)
+            => left.Surround(new Syntax(_level, token));
+
+        protected override ReniParser.Syntax Infix(ReniParser.Syntax left, Token token, ReniParser.Syntax right)
         {
             NotImplementedMethod(left, token, right);
             return null;
         }
-        protected override Syntax Terminal(Token token)
+
+        protected override ReniParser.Syntax Terminal(Token token)
         {
             NotImplementedMethod(token);
             return null;
+        }
+
+        internal sealed class Syntax :  ParsedSyntax
+        {
+            internal readonly int Level;
+            public Syntax(int level, Token token)
+                : base(token) { Level = level; }
         }
     }
 }

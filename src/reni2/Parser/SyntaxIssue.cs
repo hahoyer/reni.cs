@@ -16,6 +16,6 @@ namespace Reni.Parser
         internal SyntaxIssue(Token token, IssueId issueId)
             : base(issueId) { _token = token; }
 
-        internal override string LogDump => _token.Part.FileErrorPosition(Tag);
+        internal override string LogDump => _token.Characters.FileErrorPosition(Tag);
     }
 }

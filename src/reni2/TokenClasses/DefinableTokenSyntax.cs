@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Parser;
-using hw.Scanner;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
 
@@ -15,12 +14,17 @@ namespace Reni.TokenClasses
             (
             Definable definable,
             Token tokenData,
-            DeclarationTagSyntax tag = null,
-            SourcePart additionalSourcePart = null)
-            : base(tokenData, additionalSourcePart)
+            DeclarationTagSyntax tag = null)
+            : base(tokenData)
         {
             Tag = tag;
             Definable = definable;
+        }
+        DefinableTokenSyntax(DefinableTokenSyntax other, ParsedSyntax[] parts)
+            : base(other, parts)
+        {
+            Tag = other.Tag;
+            Definable = other.Definable;
         }
 
         internal bool IsConverter => Tag?.DeclaresConverter ?? false;
@@ -40,6 +44,8 @@ namespace Reni.TokenClasses
                 return new ExpressionSyntax(Definable, null, Token, null);
             }
         }
-        protected override ParsedSyntax[] Children => new ParsedSyntax[] {Tag};
+        protected override IEnumerable<Syntax> SyntaxChildren { get { yield return Tag; } }
+        internal override ReniParser.Syntax Surround(params ParsedSyntax[] parts)
+            => new DefinableTokenSyntax(this, parts);
     }
 }

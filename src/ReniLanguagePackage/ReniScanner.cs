@@ -121,7 +121,7 @@ namespace HoyerWare.ReniLanguagePackage
                 );
         }
 
-        static TokenTriggers ConvertToTokenTrigger(Token token)
+        static TokenTriggers ConvertToTokenTrigger(TokenInformation token)
         {
             var result = TokenTriggers.None;
             if(token.IsBraceLike)
@@ -129,7 +129,7 @@ namespace HoyerWare.ReniLanguagePackage
             return result;
         }
 
-        static TokenType ConvertToTokenType(Token token)
+        static TokenType ConvertToTokenType(TokenInformation token)
         {
             if(token.IsText)
                 return TokenType.String;
@@ -148,7 +148,7 @@ namespace HoyerWare.ReniLanguagePackage
             return TokenType.Text;
         }
 
-        static TokenColor ConvertToTokenColor(Token token)
+        static TokenColor ConvertToTokenColor(TokenInformation token)
         {
             if(token.IsText)
                 return TokenColor.String;

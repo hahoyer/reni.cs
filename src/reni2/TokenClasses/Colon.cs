@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Parser;
-using hw.Scanner;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
 using Reni.Validation;
@@ -89,8 +88,10 @@ namespace Reni.TokenClasses
         readonly DeclarationTagToken _tag;
 
         internal DeclarationTagSyntax
-            (DeclarationTagToken tag, Token token, SourcePart additionalSourcePart = null)
-            : base(token, additionalSourcePart) { _tag = tag; }
+            (DeclarationTagToken tag, Token token)
+            : base(token) { _tag = tag; }
+        DeclarationTagSyntax(DeclarationTagSyntax other, ParsedSyntax[] parts)
+            : base(other, parts) { _tag = other._tag; }
 
         [DisableDump]
         internal bool DeclaresMutable => _tag is MutableDeclarationToken;
@@ -106,26 +107,20 @@ namespace Reni.TokenClasses
                 _tag.DeclarationSyntax
                     (token, right.CheckedToCompiledSyntax(token, RightMustNotBeNullError));
 
-        internal override Syntax Sourround(SourcePart sourcePart)
-            => new DeclarationTagSyntax(_tag, Token, sourcePart);
-
         internal override Syntax SuffixedBy(Definable definable, Token token)
             => DefinableTokenSyntax(definable, token);
-
 
         IssueId RightMustNotBeNullError()
         {
             NotImplementedMethod();
             return null;
         }
+
         internal DefinableTokenSyntax DefinableTokenSyntax
-            (Definable definable, Token token, SourcePart additionalSourcePart = null)
-            =>
-                new DefinableTokenSyntax
-                    (
-                    definable,
-                    token,
-                    this,
-                    additionalSourcePart);
+            (Definable definable, Token token)
+            => new DefinableTokenSyntax(definable, token, this);
+
+        internal override Syntax Surround(params ParsedSyntax[] parts)
+            => new DeclarationTagSyntax(this, parts);
     }
 }

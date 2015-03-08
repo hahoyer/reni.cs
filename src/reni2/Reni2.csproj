@@ -291,7 +291,6 @@
     <Compile Include="Struct\CompoundView.cs" />
     <Compile Include="Struct\CompoundType.cs" />
     <Compile Include="Struct\FunctionInstance.cs" />
-    <Compile Include="ReniSyntax\LeftParenthesisSyntax.cs" />
     <Compile Include="T4Compiler.cs" />
     <Compile Include="Feature\TypeOperator.cs" />
     <Compile Include="Struct\AtToken.cs" />
@@ -367,7 +366,7 @@
     <Compile Include="Type\TypeBase.cs" />
     <Compile Include="Type\TypeType.cs" />
     <Compile Include="Type\VoidType.cs" />
-    <Compile Include="UserInterface\Token.cs" />
+    <Compile Include="UserInterface\TokenInformation.cs" />
     <Compile Include="Validation\CompileSyntaxError.cs" />
     <Compile Include="Validation\CompileSyntaxIssue.cs" />
     <Compile Include="Validation\ConsequentialError.cs" />

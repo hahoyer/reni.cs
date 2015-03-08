@@ -69,6 +69,11 @@ namespace Reni.Parser
                     });
         }
 
+
+        public static bool IsWhiteSpace(WhiteSpaceToken item) => item.Index == 0;
+        public static bool IsComment(WhiteSpaceToken item) => item.Index == 1;
+        public static bool IsLineComment(WhiteSpaceToken item) => item.Index == 2;
+
         Func<SourcePosn, int?>[] ILexer.WhiteSpace
             => new Func<SourcePosn, int?>[]
             {
@@ -76,6 +81,8 @@ namespace Reni.Parser
                 Comment,
                 LineComment
             };
+
+
         int? ILexer.Number(SourcePosn sourcePosn) => sourcePosn.Match(_number);
         int? ILexer.Any(SourcePosn sourcePosn) => sourcePosn.Match(_any);
         int? ILexer.Text(SourcePosn sourcePosn) => sourcePosn.Match(_text);

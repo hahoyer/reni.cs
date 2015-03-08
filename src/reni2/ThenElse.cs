@@ -4,11 +4,11 @@ using System.Linq;
 using hw.Debug;
 using hw.Forms;
 using hw.Parser;
-using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
+using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni
@@ -22,33 +22,54 @@ namespace Reni
         readonly CompileSyntax Then;
 
         [Node]
-        readonly CompileSyntax NativeElse;
-
         readonly CompileSyntax Else;
 
         internal CondSyntax
             (
             CompileSyntax condSyntax,
-            Token thenToken,
+            ThenToken.Syntax thenToken,
             CompileSyntax thenSyntax,
-            CompileSyntax elseSyntax = null,
-            SourcePart sourcePart = null)
-            : base(thenToken, sourcePart)
+            CompileSyntax elseSyntax = null)
+            : base(thenToken.Token)
         {
             Cond = condSyntax;
             Then = thenSyntax;
-            NativeElse = elseSyntax;
-            Else = elseSyntax ?? new EmptyList(thenToken);
+            Else = elseSyntax;
         }
 
-        public override CompileSyntax Sourround(SourcePart sourcePart)
-            => new CondSyntax(Cond, Token, Then, NativeElse, sourcePart);
+        CondSyntax(CondSyntax other, ParsedSyntax[] parts)
+            : base(other, parts)
+        {
+            Cond = other.Cond;
+            Then = other.Then;
+            Else = other.Else;
+        }
+
+        CondSyntax(CondSyntax other, CompileSyntax elseSyntax)
+            : base(other)
+        {
+            Cond = other.Cond;
+            Then = other.Then;
+            Tracer.Assert(other.Else == null);
+            Else = elseSyntax;
+        }
+
+        internal override CompileSyntax SurroundCompileSyntax(params ParsedSyntax[] parts)
+            => new CondSyntax(this, parts);
 
         internal override Result ResultForCache(ContextBase context, Category category)
             => InternalResult(context, category);
 
         [DisableDump]
-        protected override ParsedSyntax[] Children => new ParsedSyntax[] {Cond, Then, NativeElse};
+        protected override IEnumerable<Syntax> SyntaxChildren
+        {
+            get
+            {
+                yield return Cond;
+                yield return Then;
+                yield return Else;
+            }
+        }
 
         Result CondResult(ContextBase context, Category category) => Cond
             .Result(context, category.Typed)
@@ -57,7 +78,12 @@ namespace Reni
             .Conversion(context.RootContext.BitType);
 
         Result ElseResult(ContextBase context, Category category)
-            => BranchResult(context, category, Else);
+        {
+            if(Else == null)
+                return context
+                    .RootContext.VoidType.Result(category);
+            return BranchResult(context, category, Else);
+        }
         Result ThenResult(ContextBase context, Category category)
             => BranchResult(context, category, Then);
 
@@ -94,20 +120,26 @@ namespace Reni
                 );
         }
 
-        TypeBase CommonType(ContextBase context) => Then
-            .Type(context)
-            .CommonType(Else.Type(context))
-            .Align;
-
-        internal override Syntax CreateElseSyntax(Token token, CompileSyntax elseSyntax)
+        TypeBase CommonType(ContextBase context)
         {
-            Tracer.Assert(NativeElse == null);
-            return new CondSyntax(Cond, Token, Then, elseSyntax, token.SourcePart);
+            if(Else == null)
+                return context
+                    .RootContext.VoidType;
+            return Then
+                .Type(context)
+                .CommonType(Else.Type(context))
+                .Align;
+        }
+
+        internal override Syntax CreateElseSyntax(ElseToken.Syntax token, CompileSyntax elseSyntax)
+        {
+            Tracer.Assert(Else == null);
+            return new CondSyntax(this, elseSyntax);
         }
 
         internal override Result PendingResultForCache(ContextBase context, Category category)
         {
-            if(NativeElse == null)
+            if(Else == null)
                 return context
                     .RootContext.VoidType.Result(category);
             return base.PendingResultForCache(context, category);

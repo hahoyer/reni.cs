@@ -6,12 +6,12 @@ using hw.Debug;
 using hw.Forms;
 using hw.Helper;
 using hw.Parser;
-using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.ReniParser;
 using Reni.Struct;
+using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.ReniSyntax
@@ -24,11 +24,14 @@ namespace Reni.ReniSyntax
         readonly FunctionCache<ContextBase, object> _resultCache =
             new FunctionCache<ContextBase, object>();
 
-        internal CompileSyntax(Token token, SourcePart additionalSourcePart = null)
-            : base(token, additionalSourcePart) { }
+        internal CompileSyntax(Token token)
+            : base(token) { }
 
-        internal CompileSyntax(Token token, int objectId, SourcePart additionalSourcePart = null)
-            : base(token, objectId, additionalSourcePart) { }
+        internal CompileSyntax(Token token, int objectId)
+            : base(token, objectId) { }
+
+        internal CompileSyntax(CompileSyntax other, params ParsedSyntax[] parts)
+            : base(other, parts) { }
 
         [DisableDump]
         internal bool IsLambda => GetIsLambda();
@@ -49,9 +52,12 @@ namespace Reni.ReniSyntax
         protected virtual bool GetIsLambda() => false;
 
         internal override CompileSyntax ToCompiledSyntax => this;
+
         internal void AddToCacheForDebug(ContextBase context, object cacheItem)
             => _resultCache.Add(context, cacheItem);
+
         internal Result Result(ContextBase context) => Result(context, Category.All);
+
         //[DebuggerHidden]
         internal Result Result(ContextBase context, Category category)
             => context.Result(category, this);
@@ -117,7 +123,8 @@ namespace Reni.ReniSyntax
             NotImplementedMethod(visitor);
             return null;
         }
-        public new abstract CompileSyntax Sourround(SourcePart sourcePart);
+        internal abstract CompileSyntax SurroundCompileSyntax(params ParsedSyntax[] parts);
+        internal sealed override Syntax Surround(params ParsedSyntax[] parts) => SurroundCompileSyntax(parts);
     }
 
     sealed class ReplaceArgVisitor : DumpableObject, ISyntaxVisitor

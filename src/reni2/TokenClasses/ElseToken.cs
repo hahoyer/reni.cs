@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Parser;
 using hw.Scanner;
+using Reni.Parser;
 using Reni.ReniParser;
 using Reni.Validation;
 
@@ -13,9 +14,19 @@ namespace Reni.TokenClasses
     {
         public const string Id = "else";
         string ITokenClassWithId.Id => Id;
-        protected override Syntax Infix(Syntax left, Token token, Syntax right)
-            => left.CreateElseSyntax(token, right.ToCompiledSyntax);
-        protected override Syntax Terminal(Token token)
-            => new CompileSyntaxError(IssueId.UnexpectedUseAsTerminal, token, null);
+
+        protected override ReniParser.Syntax Infix(ReniParser.Syntax left, Token token, ReniParser.Syntax right)
+            => left.CreateElseSyntax(new Syntax(token), right.ToCompiledSyntax);
+
+        protected override ReniParser.Syntax Terminal(Token token)
+            => new CompileSyntaxError(IssueId.UnexpectedUseAsTerminal, token);
+
+        internal sealed class Syntax : ReniParser.Syntax
+        {
+            public Syntax(Token token)
+                : base(token)
+            { }
+        }
+
     }
 }
