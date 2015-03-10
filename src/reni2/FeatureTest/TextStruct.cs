@@ -9,6 +9,7 @@ using Reni.FeatureTest.Integer;
 using Reni.FeatureTest.Reference;
 using Reni.FeatureTest.Text;
 using Reni.FeatureTest.TypeType;
+using Reni.FeatureTest.Validation;
 
 namespace Reni.FeatureTest
 {
@@ -111,5 +112,6 @@ Text: /\
     [InstanceCode("Text('H') << 'allo'")]
     [Text1]
     [UserObjects]
+    [UnMatcheLeftParenthesis]
     public sealed class TextConcat : TextStruct {}
 }

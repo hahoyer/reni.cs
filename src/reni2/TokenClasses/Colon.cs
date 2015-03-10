@@ -51,7 +51,8 @@ namespace Reni.TokenClasses
                     (
                     token,
                     body,
-                    new DeclarationTagSyntax(this, token).DefinableTokenSyntax(null, token)
+                    new DeclarationTagSyntax(this, token)
+                        .DefinableTokenSyntax(new DefinableTokenSyntax(null, token))
                     );
 
         protected override Syntax Terminal(Token token)
@@ -107,8 +108,8 @@ namespace Reni.TokenClasses
                 _tag.DeclarationSyntax
                     (token, right.CheckedToCompiledSyntax(token, RightMustNotBeNullError));
 
-        internal override Syntax SuffixedBy(Definable definable, Token token)
-            => DefinableTokenSyntax(definable, token);
+        internal override Syntax SuffixedBy(DefinableTokenSyntax definable)
+            => new DefinableTokenSyntax(definable, this);
 
         IssueId RightMustNotBeNullError()
         {
@@ -116,9 +117,8 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        internal DefinableTokenSyntax DefinableTokenSyntax
-            (Definable definable, Token token)
-            => new DefinableTokenSyntax(definable, token, this);
+        internal DefinableTokenSyntax DefinableTokenSyntax(DefinableTokenSyntax definable)
+            => new DefinableTokenSyntax(definable, this);
 
         internal override Syntax Surround(params ParsedSyntax[] parts)
             => new DeclarationTagSyntax(this, parts);

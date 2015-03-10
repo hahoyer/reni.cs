@@ -100,7 +100,7 @@ namespace Reni.ReniSyntax
             _left = left;
             _infix = infix;
             _right = right;
-            StopByObjectId(12);
+            StopByObjectIds();
         }
         InfixSyntax(InfixSyntax other, ParsedSyntax[] parts)
             : base(other, parts)
@@ -108,6 +108,7 @@ namespace Reni.ReniSyntax
             _left = other._left;
             _infix = other._infix;
             _right = other._right;
+            StopByObjectIds();
         }
 
         internal override Result ResultForCache(ContextBase context, Category category) => _infix

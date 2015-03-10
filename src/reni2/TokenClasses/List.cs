@@ -21,13 +21,13 @@ namespace Reni.TokenClasses
         string ITokenClassWithId.Id => Id(_level);
 
         protected override Syntax Terminal(Token token)
-            => ListSyntax(new EmptyList(token), token, new EmptyList(token));
+            => ListSyntax(new EmptyList(token.SourcePart.Start), token, new EmptyList(token.SourcePart.End));
 
         protected override Syntax Prefix(Token token, Syntax right)
-            => ListSyntax(new EmptyList(token), token, right);
+            => ListSyntax(new EmptyList(token.SourcePart.Start), token, right);
 
         protected override Syntax Suffix(Syntax left, Token token)
-            => ListSyntax(left, token, new EmptyList(token));
+            => ListSyntax(left, token, new EmptyList(token.SourcePart.End));
 
         protected override Syntax Infix(Syntax left, Token token, Syntax right)
             => ListSyntax(left, token, right);

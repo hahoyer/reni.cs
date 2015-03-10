@@ -40,7 +40,7 @@ namespace Reni.ReniParser
 
         [DisableDump]
         internal virtual CompileSyntax ToCompiledSyntax
-            => new CompileSyntaxError(IssueId.MissingRightBracket, Token)
+            => new CompileSyntaxError(IssueId.CompiledSyntaxExpected, Token)
                 .SurroundCompileSyntax(_parts);
 
         internal virtual IEnumerable<KeyValuePair<string, int>> GetDeclarations(int index)
@@ -117,16 +117,24 @@ namespace Reni.ReniParser
             return null;
         }
 
-        internal virtual Syntax SuffixedBy(Definable definable, Token token)
-            => new ExpressionSyntax(definable, ToCompiledSyntax, token, null);
+        internal virtual Syntax SuffixedBy(DefinableTokenSyntax definable)
+            => new ExpressionSyntax(ToCompiledSyntax, definable, null);
 
-        protected override ParsedSyntax[] Children
+        protected override sealed ParsedSyntax[] Children
             => _parts.plus(SyntaxChildren.ToArray<ParsedSyntax>());
 
         protected virtual IEnumerable<Syntax> SyntaxChildren { get { yield break; } }
 
+        virtual internal IEnumerable<IssueBase> Issues 
+            => SyntaxChildren
+            .Where(item=>item != null)
+            .SelectMany(item => item.Issues);
+
         internal TokenInformation LocateToken(SourcePosn sourcePosn)
         {
+            if(Token.Characters.Contains(sourcePosn))
+                return new SyntaxToken(this);
+
             if(!SourcePart.Contains(sourcePosn))
                 return null;
 
@@ -137,9 +145,6 @@ namespace Reni.ReniParser
             if(child != null)
                 return child;
 
-            if(Token.Characters.Contains(sourcePosn))
-                return new SyntaxToken(this);
-
             var whiteSpaceToken = Token.PreceededBy.First
                 (item => item.Characters.Contains(sourcePosn));
             return new UserInterface.WhiteSpaceToken(whiteSpaceToken);
@@ -149,7 +154,7 @@ namespace Reni.ReniParser
 
     static class Extension
     {
-        internal static T[] plus<T>(this T x, params T[][] y)
+        internal static T[] plus<T>(this T x, params IEnumerable<T>[] y)
             => new[] {x}.Concat(y.SelectMany(item => item)).ToDisitncNotNullArray();
 
         internal static T[] plus<T>(this T[] x, params T[] y)

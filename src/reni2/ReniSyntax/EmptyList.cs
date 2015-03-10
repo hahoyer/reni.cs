@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Parser;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 
@@ -9,11 +10,17 @@ namespace Reni.ReniSyntax
 {
     sealed class EmptyList : CompileSyntax
     {
-        public EmptyList(Token token)
-            : base(token) { }
+        public EmptyList(SourcePosn posn)
+            : base(new Token(posn.Span(0),null))
+        {
+            StopByObjectIds(19, 20);
+        }
 
         public EmptyList(EmptyList other, params ParsedSyntax[] parts)
-            : base(other, parts) { }
+            : base(other, parts)
+        {
+            StopByObjectIds(19,20);
+        }
 
         protected override string GetNodeDump() => "()";
 

@@ -14,7 +14,7 @@ namespace Reni.TokenClasses
     [Variant(3)]
     sealed class RightParenthesis : TokenClass, ITokenClassWithId
     {
-        public static string Id(int level) => "\0}])".Substring(level, 1);
+        public static string Id(int level) => "\0)]}".Substring(level, 1);
         readonly int _level;
 
         public RightParenthesis(int level) { _level = level; }
@@ -22,7 +22,7 @@ namespace Reni.TokenClasses
         string ITokenClassWithId.Id => Id(_level);
 
         protected override ReniParser.Syntax Suffix(ReniParser.Syntax left, Token token)
-            => left.Surround(new Syntax(_level, token));
+            => left.Surround(new Syntax(token));
 
         protected override ReniParser.Syntax Infix(ReniParser.Syntax left, Token token, ReniParser.Syntax right)
         {
@@ -36,11 +36,13 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        internal sealed class Syntax :  ParsedSyntax
+        sealed class Syntax : ReniParser.Syntax
         {
-            internal readonly int Level;
-            public Syntax(int level, Token token)
-                : base(token) { Level = level; }
+            public Syntax(Token token)
+                : base(token) { }
+
+            internal override bool IsBraceLike => true;
+
         }
     }
 }

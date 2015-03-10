@@ -2,7 +2,6 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using hw.Parser;
-using hw.Scanner;
 using Reni.Parser;
 using Reni.Type;
 using Reni.Validation;
@@ -30,8 +29,18 @@ namespace Reni.Context
             }
         }
 
-        internal static IssueType Type(Token token, TypeBase target) => new IssueType(new UndefinedSymbolIssue(token, "Type: "+ target.DumpPrintText), target.RootContext);
-        public static IssueType Type(Token token, ContextBase target) => new IssueType(new UndefinedSymbolIssue(token, "Context: "+ target.DumpPrintText), target.RootContext);
+        internal static IssueType Type(Token token, TypeBase target)
+            =>
+                new IssueType
+                    (
+                    new UndefinedSymbolIssue(token, "Type: " + target.DumpPrintText),
+                    target.RootContext);
+        public static IssueType Type(Token token, ContextBase target)
+            =>
+                new IssueType
+                    (
+                    new UndefinedSymbolIssue(token, "Context: " + target.DumpPrintText),
+                    target.RootContext);
     }
 
     sealed class AmbiguousSymbolIssue : SyntaxIssue
@@ -42,6 +51,7 @@ namespace Reni.Context
             StopByObjectId(266);
         }
 
-        internal static IssueType Type(Token token, Root rootContext) => new IssueType(new AmbiguousSymbolIssue(token), rootContext);
+        internal static IssueType Type(Token token, Root rootContext)
+            => new IssueType(new AmbiguousSymbolIssue(token), rootContext);
     }
 }

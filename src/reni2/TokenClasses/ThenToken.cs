@@ -24,6 +24,8 @@ namespace Reni.TokenClasses
             public Syntax(Token token)
                 : base(token)
             { }
+
+            internal override bool IsBraceLike => true;
         }
     }
 }

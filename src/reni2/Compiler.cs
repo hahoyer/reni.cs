@@ -63,7 +63,7 @@ namespace Reni
 
             _source = new ValueCache<Source>
                 (() => fileName == null ? new Source(text) : new Source(fileName.FileHandle()));
-            _tokenCache = new FunctionCache<int, UserInterface.TokenInformation>(GetTokenForCache);
+            _tokenCache = new FunctionCache<int, TokenInformation>(GetTokenForCache);
             _syntax = new ValueCache<Syntax>(() => Parse(Source + 0));
             _codeContainer = new ValueCache<CodeContainer>
                 (() => new CodeContainer(_rootContext, Syntax, Source.Data));
@@ -169,7 +169,7 @@ namespace Reni
         }
 
         [DisableDump]
-        internal IEnumerable<IssueBase> Issues => CodeContainer.Issues;
+        internal IEnumerable<IssueBase> Issues => _parameters.ParseOnly ? Syntax.Issues : CodeContainer.Issues;
 
         Syntax Parse(SourcePosn source) => _tokenFactory.Parser.Execute(source);
 
@@ -228,11 +228,11 @@ namespace Reni
             return result;
         }
 
-        readonly FunctionCache<int, UserInterface.TokenInformation> _tokenCache;
+        readonly FunctionCache<int, TokenInformation> _tokenCache;
 
-        public UserInterface.TokenInformation Token(int offset) => _tokenCache[offset];
+        public TokenInformation Token(int offset) => _tokenCache[offset];
 
-        UserInterface.TokenInformation GetTokenForCache(int offset)
+        TokenInformation GetTokenForCache(int offset)
         {
             var sourcePosn = Source + offset;
             var result = Syntax.LocateToken(sourcePosn);
@@ -241,7 +241,6 @@ namespace Reni
 
             NotImplementedMethod(offset);
             return null;
-
         }
     }
 

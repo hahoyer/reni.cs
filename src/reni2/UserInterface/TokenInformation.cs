@@ -41,7 +41,7 @@ namespace Reni.UserInterface
     {
         internal SyntaxToken(Syntax syntax) { Syntax = syntax; }
 
-        Syntax Syntax { get; }
+        public Syntax Syntax { get; }
         public override SourcePart SourcePart => Syntax.Token.Characters;
         public override bool IsKeyword => Syntax.IsKeyword;
         public override bool IsIdentifier => Syntax.IsIdentifier;
@@ -62,3 +62,4 @@ namespace Reni.UserInterface
         public override bool IsWhiteSpace => ReniLexer.IsWhiteSpace(_item);
     }
 }
+

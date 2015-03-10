@@ -34,7 +34,7 @@ namespace HoyerWare.ReniLanguagePackage
                 + tokenInfo.Token + "i";
             var line = lineIndex + ": " + Buffer.Line(lineIndex);
 
-            var trace = lineIndex >= 3;
+            var trace = true;
             StartMethodDump(trace, tokenId, line);
             try
             {
@@ -46,6 +46,10 @@ namespace HoyerWare.ReniLanguagePackage
 
                 var lineStart = Buffer.LinePosition(lineIndex);
                 var position = lineStart + tokenInfo.EndIndex + 1;
+
+                if (lineIndex == 1 && tokenInfo.EndIndex == -1)
+                    BreakExecution();
+
                 var token = _compilerCache.Value.Token(position);
                 if(token == null)
                 {
@@ -66,7 +70,6 @@ namespace HoyerWare.ReniLanguagePackage
                 tokenInfo.Token = token.Id;
                 Dump(nameof(tokenInfo), tokenInfo);
 
-                BreakExecution();
                 return ReturnMethodDump(true, false);
             }
             finally
@@ -162,6 +165,5 @@ namespace HoyerWare.ReniLanguagePackage
                 return TokenColor.Comment;
             return TokenColor.Text;
         }
-
     }
 }

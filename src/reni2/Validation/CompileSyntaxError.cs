@@ -30,6 +30,8 @@ namespace Reni.Validation
                 (() => new CompileSyntaxIssue(_issueId, Token));
         }
 
+        internal override IEnumerable<IssueBase> Issues => Issue.plus(base.Issues);
+
         public CompileSyntaxError
             (
             IssueId issueId,
@@ -77,6 +79,6 @@ namespace Reni.Validation
             => new CompileSyntaxError(issue, token, this).SurroundCompileSyntax(parts);
 
         [DisableDump]
-        protected override ParsedSyntax[] Children => new ParsedSyntax[] {_previous};
+        protected override IEnumerable<Syntax> SyntaxChildren { get { yield return _previous; } }
     }
 }

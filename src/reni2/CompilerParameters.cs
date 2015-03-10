@@ -82,11 +82,5 @@ namespace Reni
                 GeneratorFilePosn = true;
             }
         }
-
-        public sealed class Trace
-        {
-            public class Parser : Attribute{ }
-        }
-
     }
 }

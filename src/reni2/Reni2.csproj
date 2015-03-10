@@ -100,6 +100,7 @@
     <Compile Include="FeatureTest\UserObjects.cs" />
     <Compile Include="FeatureTest\Validation\SyntaxError.cs" />
     <Compile Include="FeatureTest\Validation\UndefinedContextSymbol.cs" />
+    <Compile Include="FeatureTest\Validation\UnMatcheLeftParenthesis.cs" />
     <Compile Include="Feature\Extension.cs" />
     <Compile Include="Feature\Function.cs" />
     <Compile Include="Feature\SearchResult.cs" />

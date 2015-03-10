@@ -13,23 +13,33 @@ namespace Reni.TokenClasses
         internal DefinableTokenSyntax
             (
             Definable definable,
-            Token tokenData,
-            DeclarationTagSyntax tag = null)
+            Token tokenData)
             : base(tokenData)
         {
-            Tag = tag;
+            Tags = new DeclarationTagSyntax[0];
             Definable = definable;
         }
-        DefinableTokenSyntax(DefinableTokenSyntax other, ParsedSyntax[] parts)
-            : base(other, parts)
+        internal DefinableTokenSyntax
+            (
+            DefinableTokenSyntax other,
+            DeclarationTagSyntax tag)
+            : base(other.Token)
         {
-            Tag = other.Tag;
+            Tags = other.Tags.plus(tag);
             Definable = other.Definable;
         }
 
-        internal bool IsConverter => Tag?.DeclaresConverter ?? false;
-        internal bool IsMutable => Tag?.DeclaresMutable ?? false;
-        internal DeclarationTagSyntax Tag { get; }
+        DefinableTokenSyntax(DefinableTokenSyntax other, ParsedSyntax[] parts)
+            : base(other, parts)
+        {
+            Tags = other.Tags;
+            Definable = other.Definable;
+        }
+
+        internal override bool IsIdentifier => true;
+        internal bool IsConverter => Tags.Any(item => item.DeclaresConverter);
+        internal bool IsMutable => Tags.Any(item => item.DeclaresMutable);
+        internal DeclarationTagSyntax[] Tags { get; }
         internal Definable Definable { get; }
 
         internal override Syntax CreateDeclarationSyntax(Token token, Syntax right)
@@ -40,12 +50,14 @@ namespace Reni.TokenClasses
         {
             get
             {
-                Tracer.Assert(Tag == null);
-                return new ExpressionSyntax(Definable, null, Token, null);
+                Tracer.Assert(!Tags.Any());
+                return new ExpressionSyntax(null, this, null);
             }
         }
-        protected override IEnumerable<Syntax> SyntaxChildren { get { yield return Tag; } }
-        internal override ReniParser.Syntax Surround(params ParsedSyntax[] parts)
+
+        protected override IEnumerable<Syntax> SyntaxChildren => Tags;
+
+        internal override Syntax Surround(params ParsedSyntax[] parts)
             => new DefinableTokenSyntax(this, parts);
     }
 }

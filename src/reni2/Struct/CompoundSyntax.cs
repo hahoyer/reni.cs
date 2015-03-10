@@ -29,17 +29,14 @@ namespace Reni.Struct
             : base(token, _nextObjectId++)
         {
             _statements = statements;
-            _data = _statements
-                .Select((s, i) => new Data(s, i))
-                .ToArray();
+            _data = GetData;
         }
+
         CompoundSyntax(CompoundSyntax other, ParsedSyntax[] parts)
             : base(other, parts)
         {
             _statements = other._statements;
-            _data = _statements
-                .Select((s, i) => new Data(s, i))
-                .ToArray();
+            _data = GetData;
         }
 
         public string GetCompoundIdentificationDump() => "." + ObjectId + "i";
@@ -54,10 +51,12 @@ namespace Reni.Struct
         [DisableDump]
         internal Size IndexSize => Size.AutoSize(Statements.Length);
         [DisableDump]
-        protected override ParsedSyntax[] Children
-            => _data.Select(item => item.RawStatement).ToArray<ParsedSyntax>();
+        protected override IEnumerable<Syntax> SyntaxChildren
+            => _data.Select(item => item.RawStatement);
+
         [DisableDump]
         internal string[] Names => _data.SelectMany(s => s.Names).ToArray();
+
         [DisableDump]
         internal int[] ConverterStatementPositions
             => _data
@@ -69,6 +68,12 @@ namespace Reni.Struct
             => _data
                 .Where(data => data.IsConverter)
                 .Select(data => (FunctionSyntax) data.Statement);
+
+        [DisableDump]
+        Data[] GetData
+            => _statements
+                .Select((s, i) => new Data(s, i))
+                .ToArray();
 
         internal override CompileSyntax SurroundCompileSyntax(params ParsedSyntax[] parts)
             => new CompoundSyntax(this, parts);

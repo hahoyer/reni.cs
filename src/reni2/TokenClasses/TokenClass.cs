@@ -33,22 +33,16 @@ namespace Reni.TokenClasses
             => new Validation.SyntaxError(IssueId.UnexpectedSyntaxError, token);
 
         protected virtual Syntax Prefix(Token token, Syntax right)
-        {
-            NotImplementedMethod(token, right);
-            return null;
-        }
+            => new Validation.SyntaxError(IssueId.UnexpectedSyntaxError, token)
+            .Surround(right);
 
         protected virtual Syntax Suffix(Syntax left, Token token)
-        {
-            NotImplementedMethod(left, token);
-            return null;
-        }
+            => new Validation.SyntaxError(IssueId.UnexpectedSyntaxError, token)
+            .Surround(left);
 
         protected virtual Syntax Infix(Syntax left, Token token, Syntax right)
-        {
-            NotImplementedMethod(left, token, right);
-            return null;
-        }
+            => new Validation.SyntaxError(IssueId.UnexpectedSyntaxError, token)
+            .Surround(left,right);
     }
 
     interface ITokenClassWithId

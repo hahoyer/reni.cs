@@ -14,6 +14,8 @@ namespace Reni.Validation
     {
         internal static readonly IEnumerable<IssueBase> Empty = new IssueBase[0];
         readonly FunctionCache<Token, ConsequentialError> _consequentialError;
+
+        [EnableDump]
         internal readonly IssueId IssueId;
 
         internal IssueBase(IssueId issueId)
@@ -24,10 +26,14 @@ namespace Reni.Validation
         }
 
         internal abstract string LogDump { get; }
+
         internal ConsequentialError ConsequentialError(Token position)
             => _consequentialError[position];
+
         protected string Tag => IssueId.Tag;
+
         internal IssueType Type(Root rootContext) => new IssueType(this, rootContext);
+
         internal virtual CodeBase Code => CodeBase.Issue(this);
     }
 }

@@ -11,8 +11,8 @@ using Reni.Code;
 using Reni.Context;
 using Reni.ReniParser;
 using Reni.Struct;
-using Reni.TokenClasses;
 using Reni.Type;
+using Reni.Validation;
 
 namespace Reni.ReniSyntax
 {
@@ -116,15 +116,18 @@ namespace Reni.ReniSyntax
             return null;
         }
 
-        public CompileSyntax ReplaceArg(CompileSyntax value) => Visit(new ReplaceArgVisitor(value));
+        public CompileSyntax ReplaceArg(CompileSyntax value)
+            => Visit(new ReplaceArgVisitor(value)) ?? this;
 
         internal virtual CompileSyntax Visit(ISyntaxVisitor visitor)
         {
             NotImplementedMethod(visitor);
             return null;
         }
+
         internal abstract CompileSyntax SurroundCompileSyntax(params ParsedSyntax[] parts);
-        internal sealed override Syntax Surround(params ParsedSyntax[] parts) => SurroundCompileSyntax(parts);
+        internal override sealed Syntax Surround(params ParsedSyntax[] parts)
+            => SurroundCompileSyntax(parts);
     }
 
     sealed class ReplaceArgVisitor : DumpableObject, ISyntaxVisitor

@@ -24,12 +24,17 @@ namespace Reni.FeatureTest
             Parameters = new CompilerParameters();
             if(TestRunner.IsModeErrorFocus)
                 Parameters.TraceOptions.UseOnModeErrorFocus();
-            if(GetType().GetAttributes<CompilerParameters.Trace.Parser>(true).Any())
-                Parameters.TraceOptions.Parser = true;
         }
 
         internal void CreateFileAndRunCompiler
-            (string name, string text, string expectedOutput = null, Action<Compiler> expectedResult = null) => CreateFileAndRunCompiler(name, new TargetSetData(text, expectedOutput), expectedResult);
+            (
+            string name,
+            string text,
+            string expectedOutput = null,
+            Action<Compiler> expectedResult = null)
+            =>
+                CreateFileAndRunCompiler
+                    (name, new TargetSetData(text, expectedOutput), expectedResult);
 
         void CreateFileAndRunCompiler
             (string name, TargetSetData targetSetData, Action<Compiler> expectedResult)
@@ -41,10 +46,15 @@ namespace Reni.FeatureTest
         }
 
         void InternalRunCompiler
-            (string fileName, Action<Compiler> expectedResult, TargetSetData targetSet) => InternalRunCompiler(Parameters, fileName, expectedResult, targetSet);
+            (string fileName, Action<Compiler> expectedResult, TargetSetData targetSet)
+            => InternalRunCompiler(Parameters, fileName, expectedResult, targetSet);
 
         void InternalRunCompiler
-            (CompilerParameters compilerParameters, string fileName, Action<Compiler> expectedResult, TargetSetData targetSet)
+            (
+            CompilerParameters compilerParameters,
+            string fileName,
+            Action<Compiler> expectedResult,
+            TargetSetData targetSet)
         {
             var outStream = new OutStream();
             compilerParameters.OutStream = outStream;
@@ -92,7 +102,7 @@ namespace Reni.FeatureTest
                 _cache = new Dictionary<System.Type, CompilerTest>();
 
             foreach(var tuple in TargetSet)
-                CreateFileAndRunCompiler(GetType().PrettyName(), tuple, AssertValid);
+                CreateFileAndRunCompiler(name: GetType().PrettyName(), targetSetData: tuple, expectedResult: AssertValid);
         }
 
 
@@ -108,7 +118,9 @@ namespace Reni.FeatureTest
 
             _cache.Add(GetType(), this);
 
-            foreach(var dependsOnType in DependsOn.Where(dependsOnType => !_cache.ContainsKey(dependsOnType)))
+            foreach(
+                var dependsOnType in
+                    DependsOn.Where(dependsOnType => !_cache.ContainsKey(dependsOnType)))
                 ((CompilerTest) Activator.CreateInstance(dependsOnType)).RunDependant();
         }
 

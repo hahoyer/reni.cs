@@ -17,11 +17,10 @@ namespace Reni.ReniParser
     {
         internal ExpressionSyntax
             (
-            Definable @operator,
             CompileSyntax left,
-            Token token,
+            DefinableTokenSyntax @operator,
             CompileSyntax right)
-            : base(token)
+            : base(@operator.Token)
         {
             Operator = @operator;
             Left = left;
@@ -40,7 +39,7 @@ namespace Reni.ReniParser
         [Node]
         internal CompileSyntax Left { get; }
         [Node]
-        public Definable Operator { get; }
+        public DefinableTokenSyntax Operator { get; }
         [Node]
         internal CompileSyntax Right { get; }
 
@@ -49,14 +48,14 @@ namespace Reni.ReniParser
             var @operator = Operator;
 
             if(Left == null)
-                return context.PrefixResult(category, Token, @operator, Right);
+                return context.PrefixResult(category, Token, @operator.Definable, Right);
 
             var left = new ResultCache(c => context.ResultAsReference(c, Left));
 
             var typeForSearch = left.Type;
             var searchResults
                 = typeForSearch
-                    .DeclarationsForTypeAndCloseRelatives(@operator)
+                    .DeclarationsForTypeAndCloseRelatives(@operator.Definable)
                     .RemoveLowPriorityResults()
                     .ToArray();
 
@@ -79,9 +78,9 @@ namespace Reni.ReniParser
             var left = Left?.Visit(visitor);
             var right = Right?.Visit(visitor);
             if(left == null && right == null)
-                return this;
+                return null;
 
-            return (CompileSyntax) Operator.CreateForVisit(left ?? Left, Token, right ?? Right);
+            return (CompileSyntax) Operator.Definable.CreateForVisit(left ?? Left, Token, right ?? Right);
         }
         internal override CompileSyntax SurroundCompileSyntax(params ParsedSyntax[] parts)
             => new ExpressionSyntax(this, parts);
@@ -96,7 +95,6 @@ namespace Reni.ReniParser
             return result;
         }
 
-        internal override bool IsIdentifier => true;
         internal override Syntax SyntaxError
             (IssueId issue, Token token, Syntax right = null, params ParsedSyntax[] parts)
         {
@@ -105,6 +103,17 @@ namespace Reni.ReniParser
             NotImplementedMethod(issue, token);
             return null;
         }
+
+        protected override IEnumerable<Syntax> SyntaxChildren
+        {
+            get
+            {
+                yield return Left;
+                yield return Operator;
+                yield return Right;
+            }
+        }
+
     }
 
     // Lord of the weed

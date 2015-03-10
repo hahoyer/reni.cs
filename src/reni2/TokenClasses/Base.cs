@@ -101,6 +101,10 @@ namespace Reni.TokenClasses
         protected override Syntax Terminal(Token token)
             => new CompileSyntaxError(IssueId.UnexpectedUseAsTerminal, token);
 
+        protected override Syntax Suffix(Syntax left, Token token)
+            => new CompileSyntaxError(IssueId.UnexpectedUseAsSuffix, token)
+            .Surround(left);
+
         public abstract Result Result
             (ContextBase callContext, Category category, CompileSyntax left, CompileSyntax right);
     }

@@ -15,7 +15,7 @@ namespace Reni.TokenClasses
     [Variant(3)]
     sealed class LeftParenthesis : TokenClass, ITokenClassWithId
     {
-        public static string Id(int level) => "\0{[(".Substring(level, 1);
+        public static string Id(int level) => "\0([{".Substring(level, 1);
 
         public LeftParenthesis(int level) { Level = level; }
 
@@ -41,12 +41,15 @@ namespace Reni.TokenClasses
         sealed class Syntax : ReniParser.Syntax
         {
             public Syntax(Token token)
-                : base(token) {}
+                : base(token) { }
             Syntax(Syntax other, ParsedSyntax[] parts)
-                : base(other, parts) {}
+                : base(other, parts) { }
+
+            internal override bool IsBraceLike => true;
 
             internal override CompileSyntax ToCompiledSyntax
-                => new EmptyList(Token).SurroundCompileSyntax(this);
+            => new CompileSyntaxError(IssueId.MissingRightBracket, Token)
+                .SurroundCompileSyntax(this);
 
             internal override ReniParser.Syntax Surround(params ParsedSyntax[] parts)
                 => new Syntax(this, parts);
