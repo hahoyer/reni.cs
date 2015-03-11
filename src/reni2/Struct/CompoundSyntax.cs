@@ -25,11 +25,12 @@ namespace Reni.Struct
         static bool _isInsideFileDump;
         static int _nextObjectId;
 
-        internal CompoundSyntax(Token token, Syntax[] statements)
-            : base(token, _nextObjectId++)
+        internal CompoundSyntax(Token token, Syntax[] statements, ParsedSyntax[] parts)
+            : base(token, _nextObjectId++, parts)
         {
             _statements = statements;
             _data = GetData;
+            StopByObjectIds();
         }
 
         CompoundSyntax(CompoundSyntax other, ParsedSyntax[] parts)
@@ -37,6 +38,7 @@ namespace Reni.Struct
         {
             _statements = other._statements;
             _data = GetData;
+            StopByObjectIds(2);
         }
 
         public string GetCompoundIdentificationDump() => "." + ObjectId + "i";

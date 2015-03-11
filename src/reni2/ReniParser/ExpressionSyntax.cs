@@ -95,6 +95,10 @@ namespace Reni.ReniParser
             return result;
         }
 
+        internal override Syntax CreateDeclarationSyntax(Token token, Syntax right)
+            => new CompileSyntaxError(IssueId.IdentifyerExpected, Token)
+                .SurroundCompileSyntax(this, right);
+
         internal override Syntax SyntaxError
             (IssueId issue, Token token, Syntax right = null, params ParsedSyntax[] parts)
         {

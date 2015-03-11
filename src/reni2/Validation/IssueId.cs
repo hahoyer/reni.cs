@@ -17,10 +17,12 @@ namespace Reni.Validation
         public static readonly IssueId MissingLeftOperand = new IssueId();
         public static readonly IssueId UnexpectedUseAsTerminal = new IssueId();
         public static readonly IssueId UndefinedSymbol = new IssueId();
-        public static readonly IssueId UnexpectedUseAsSuffix= new IssueId();
+        public static readonly IssueId UnexpectedUseAsSuffix = new IssueId();
         public static readonly IssueId UnexpectedRightOperand = new IssueId();
         public static readonly IssueId UnexpectedSyntaxError = new IssueId();
         public static readonly IssueId UnexpectedUseAsPrefix = new IssueId();
         public static readonly IssueId CompiledSyntaxExpected = new IssueId();
+        public static readonly IssueId IdentifyerExpected = new IssueId();
+        public static readonly IssueId ExtraRightBracket = new IssueId();
     }
 }

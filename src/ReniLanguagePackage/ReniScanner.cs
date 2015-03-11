@@ -47,7 +47,7 @@ namespace HoyerWare.ReniLanguagePackage
                 var lineStart = Buffer.LinePosition(lineIndex);
                 var position = lineStart + tokenInfo.EndIndex + 1;
 
-                if (lineIndex == 1 && tokenInfo.EndIndex == -1)
+                if(lineIndex == -1 && tokenInfo.EndIndex == -1)
                     BreakExecution();
 
                 var token = _compilerCache.Value.Token(position);
@@ -59,11 +59,14 @@ namespace HoyerWare.ReniLanguagePackage
 
                 Dump(nameof(token), token);
                 tokenInfo.StartIndex = token.StartPosition - lineStart;
-                tokenInfo.EndIndex = Math.Min
-                    (
-                        Buffer.LineLength(lineIndex),
-                        tokenInfo.StartIndex + token.Length - 1
-                    );
+                tokenInfo.EndIndex = tokenInfo.StartIndex + token.Length - 1;
+
+                if(tokenInfo.StartIndex < 0)
+                    tokenInfo.StartIndex = 0;
+
+                if(tokenInfo.EndIndex > Buffer.LineLength(lineIndex))
+                    tokenInfo.EndIndex = Buffer.LineLength(lineIndex);
+
                 tokenInfo.Color = ConvertToTokenColor(token);
                 tokenInfo.Type = ConvertToTokenType(token);
                 tokenInfo.Trigger = ConvertToTokenTrigger(token);

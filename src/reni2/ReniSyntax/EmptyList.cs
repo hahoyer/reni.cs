@@ -13,7 +13,7 @@ namespace Reni.ReniSyntax
         public EmptyList(SourcePosn posn)
             : base(new Token(posn.Span(0),null))
         {
-            StopByObjectIds(19, 20);
+            StopByObjectIds();
         }
 
         public EmptyList(EmptyList other, params ParsedSyntax[] parts)

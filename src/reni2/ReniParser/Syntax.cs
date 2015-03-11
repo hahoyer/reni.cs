@@ -19,8 +19,11 @@ namespace Reni.ReniParser
         protected Syntax(Token token)
             : base(token) {}
 
-        protected Syntax(Token token, int objectId)
-            : base(token, objectId) {}
+        protected Syntax(Token token, int objectId, params ParsedSyntax[] parts)
+            : base(token, objectId)
+        {
+            _parts = parts;
+        }
 
         protected Syntax(Syntax other, params ParsedSyntax[] parts)
             : this(other.Token)
@@ -33,7 +36,6 @@ namespace Reni.ReniParser
         {
             _parts = other._parts.plus(parts);
         }
-
 
         [DisableDump]
         internal virtual CompileSyntax ContainerStatementToCompileSyntax => ToCompiledSyntax;
@@ -125,10 +127,10 @@ namespace Reni.ReniParser
 
         protected virtual IEnumerable<Syntax> SyntaxChildren { get { yield break; } }
 
-        virtual internal IEnumerable<IssueBase> Issues 
+        internal virtual IEnumerable<IssueBase> Issues
             => SyntaxChildren
-            .Where(item=>item != null)
-            .SelectMany(item => item.Issues);
+                .Where(item => item != null)
+                .SelectMany(item => item.Issues);
 
         internal TokenInformation LocateToken(SourcePosn sourcePosn)
         {
@@ -145,10 +147,14 @@ namespace Reni.ReniParser
             if(child != null)
                 return child;
 
-            var whiteSpaceToken = Token.PreceededBy.First
+            var whiteSpaceToken = Token.PrecededWith.First
                 (item => item.Characters.Contains(sourcePosn));
             return new UserInterface.WhiteSpaceToken(whiteSpaceToken);
         }
+
+        internal virtual Syntax RightParenthesis(RightParenthesis.Syntax rightBracket)
+            => new CompileSyntaxError(IssueId.ExtraRightBracket, Token)
+                .Surround(rightBracket);
     }
 
 

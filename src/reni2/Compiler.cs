@@ -239,6 +239,7 @@ namespace Reni
             if(result != null)
                 return result;
 
+            Tracer.TraceBreak();
             NotImplementedMethod(offset);
             return null;
         }

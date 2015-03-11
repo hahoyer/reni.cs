@@ -28,7 +28,6 @@ namespace ReniTest
 
             if(Debugger.IsAttached)
                 TestRunner.IsModeErrorFocus = true;
-            new UnMatcheLeftParenthesis().Run();
             Assembly.GetExecutingAssembly().RunTests();
             //InspectCompiler();
             //Reni.Proof.Main.Run();

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using hw.Debug;
 using hw.Parser;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
@@ -24,35 +25,52 @@ namespace Reni.TokenClasses
         string ITokenClassWithId.Id => Id(Level);
 
         protected override ReniParser.Syntax Suffix(ReniParser.Syntax left, Token token)
-            => new CompileSyntaxError(IssueId.UnexpectedUseAsSuffix, token)
-                .SurroundCompileSyntax(left);
+        {
+            NotImplementedMethod(left, token);
+            return null;
+        }
 
         protected override ReniParser.Syntax Infix
             (ReniParser.Syntax left, Token token, ReniParser.Syntax right)
-            => new CompileSyntaxError(IssueId.UnexpectedUseAsSuffix, token)
-                .SurroundCompileSyntax(left, right);
+        {
+            NotImplementedMethod(left, token, right);
+            return null;
+        }
 
         protected override ReniParser.Syntax Prefix(Token token, ReniParser.Syntax right)
-            => right.Surround(new Syntax(token));
+            => new Syntax(Level, token, right);
 
         protected override ReniParser.Syntax Terminal(Token token)
-            => new Syntax(token);
+            => new Syntax(Level, token, null);
 
         sealed class Syntax : ReniParser.Syntax
         {
-            public Syntax(Token token)
-                : base(token) { }
-            Syntax(Syntax other, ParsedSyntax[] parts)
-                : base(other, parts) { }
+            readonly int _level;
+            internal readonly ReniParser.Syntax Right;
 
-            internal override bool IsBraceLike => true;
+            public Syntax(int level, Token token, ReniParser.Syntax right)
+                : base(token)
+            {
+                _level = level;
+                Right = right;
+            }
+
+            Syntax(Syntax other, ParsedSyntax[] parts)
+                : base(other, parts) { Right = other.Right; }
 
             internal override CompileSyntax ToCompiledSyntax
             => new CompileSyntaxError(IssueId.MissingRightBracket, Token)
-                .SurroundCompileSyntax(this);
+                .SurroundCompileSyntax(Right);
 
-            internal override ReniParser.Syntax Surround(params ParsedSyntax[] parts)
-                => new Syntax(this, parts);
+            internal override bool IsBraceLike => true;
+
+            internal override ReniParser.Syntax RightParenthesis
+                (RightParenthesis.Syntax rightBracket)
+            {
+                Tracer.Assert(_level == rightBracket.Level);
+                return (Right?? new EmptyList(Token.SourcePart.End))
+                    .Surround(this, rightBracket);
+            }
         }
     }
 }

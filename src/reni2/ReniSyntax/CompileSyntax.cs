@@ -27,8 +27,8 @@ namespace Reni.ReniSyntax
         internal CompileSyntax(Token token)
             : base(token) { }
 
-        internal CompileSyntax(Token token, int objectId)
-            : base(token, objectId) { }
+        internal CompileSyntax(Token token, int objectId, params ParsedSyntax[] parts)
+            : base(token, objectId, parts) { }
 
         internal CompileSyntax(CompileSyntax other, params ParsedSyntax[] parts)
             : base(other, parts) { }
@@ -51,6 +51,7 @@ namespace Reni.ReniSyntax
 
         protected virtual bool GetIsLambda() => false;
 
+        [DisableDump]
         internal override CompileSyntax ToCompiledSyntax => this;
 
         internal void AddToCacheForDebug(ContextBase context, object cacheItem)
