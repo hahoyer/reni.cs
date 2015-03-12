@@ -28,6 +28,6 @@ namespace Reni.ReniParser
         [DisableDump]
         public string IconKey => "Symbol";
 
-        protected override string GetNodeDump() => Data.Name.Quote();
+        protected override string GetNodeDump() => Data.Id.Quote();
     }
 }

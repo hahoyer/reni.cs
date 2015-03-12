@@ -10,13 +10,13 @@ using Reni.Validation;
 namespace Reni.TokenClasses
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class Colon : TokenClass, ITokenClassWithId
+    sealed class Colon : TokenClass
     {
-        public const string Id = ":";
-        string ITokenClassWithId.Id => Id;
-        protected override Syntax Infix(Syntax left, Token token, Syntax right)
+        public const string TokenId = ":";
+        public override string Id => TokenId;
+        protected override Syntax Infix(Syntax left, IToken token, Syntax right)
             => left.CreateDeclarationSyntax(token, right);
-        protected override Syntax Terminal(Token token)
+        protected override Syntax Terminal(IToken token)
         {
             NotImplementedMethod(token);
             return null;
@@ -24,18 +24,18 @@ namespace Reni.TokenClasses
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class Exclamation : TokenClass, ITokenClassWithId
+    sealed class Exclamation : TokenClass
     {
-        public const string Id = "!";
-        string ITokenClassWithId.Id => Id;
+        public const string TokenId = "!";
+        public override string Id => TokenId;
         public Exclamation(ISubParser<Syntax> parser) { Next = parser; }
         protected override ISubParser<Syntax> Next { get; }
-        protected override Syntax Infix(Syntax left, Token token, Syntax right)
+        protected override Syntax Infix(Syntax left, IToken token, Syntax right)
         {
             NotImplementedMethod(left, token, right);
             return null;
         }
-        protected override Syntax Terminal(Token token)
+        protected override Syntax Terminal(IToken token)
         {
             NotImplementedMethod(token);
             return null;
@@ -45,7 +45,7 @@ namespace Reni.TokenClasses
     [BelongsTo(typeof(DeclarationTokenFactory))]
     abstract class DeclarationTagToken : TokenClass
     {
-        internal Syntax DeclarationSyntax(Token token, CompileSyntax body)
+        internal Syntax DeclarationSyntax(IToken token, CompileSyntax body)
             =>
                 new DeclarationSyntax
                     (
@@ -55,10 +55,10 @@ namespace Reni.TokenClasses
                         .DefinableTokenSyntax(new DefinableTokenSyntax(null, token))
                     );
 
-        protected override Syntax Terminal(Token token)
+        protected override Syntax Terminal(IToken token)
             => new DeclarationTagSyntax(this, token);
 
-        protected override sealed Syntax Infix(Syntax left, Token token, Syntax right)
+        protected override sealed Syntax Infix(Syntax left, IToken token, Syntax right)
         {
             NotImplementedMethod(left, token, right);
             return null;
@@ -70,17 +70,17 @@ namespace Reni.TokenClasses
         internal virtual bool IsError => false;
     }
 
-    sealed class ConverterToken : DeclarationTagToken, ITokenClassWithId
+    sealed class ConverterToken : DeclarationTagToken
     {
-        public const string Id = "converter";
-        string ITokenClassWithId.Id => Id;
+        public const string TokenId = "converter";
+        public override string Id => TokenId;
         internal override bool IsKeyword => true;
     }
 
-    sealed class MutableDeclarationToken : DeclarationTagToken, ITokenClassWithId
+    sealed class MutableDeclarationToken : DeclarationTagToken
     {
-        public const string Id = "mutable";
-        string ITokenClassWithId.Id => Id;
+        public const string TokenId = "mutable";
+        public override string Id => TokenId;
         internal override bool IsKeyword => true;
     }
 
@@ -89,10 +89,8 @@ namespace Reni.TokenClasses
         readonly DeclarationTagToken _tag;
 
         internal DeclarationTagSyntax
-            (DeclarationTagToken tag, Token token)
+            (DeclarationTagToken tag, IToken token)
             : base(token) { _tag = tag; }
-        DeclarationTagSyntax(DeclarationTagSyntax other, ParsedSyntax[] parts)
-            : base(other, parts) { _tag = other._tag; }
 
         [DisableDump]
         internal bool DeclaresMutable => _tag is MutableDeclarationToken;
@@ -103,7 +101,7 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal override bool IsError => _tag.IsError;
 
-        internal override Syntax CreateDeclarationSyntax(Token token, Syntax right)
+        internal override Syntax CreateDeclarationSyntax(IToken token, Syntax right)
             =>
                 _tag.DeclarationSyntax
                     (token, right.CheckedToCompiledSyntax(token, RightMustNotBeNullError));
@@ -120,7 +118,5 @@ namespace Reni.TokenClasses
         internal DefinableTokenSyntax DefinableTokenSyntax(DefinableTokenSyntax definable)
             => new DefinableTokenSyntax(definable, this);
 
-        internal override Syntax Surround(params ParsedSyntax[] parts)
-            => new DeclarationTagSyntax(this, parts);
     }
 }

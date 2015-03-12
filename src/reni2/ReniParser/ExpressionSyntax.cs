@@ -28,20 +28,19 @@ namespace Reni.ReniParser
             StopByObjectIds();
         }
 
-        ExpressionSyntax(ExpressionSyntax other, ParsedSyntax[] parts)
-            : base(other, parts)
-        {
-            Operator = other.Operator;
-            Left = other.Left;
-            Right = other.Right;
-        }
-
         [Node]
         internal CompileSyntax Left { get; }
         [Node]
         public DefinableTokenSyntax Operator { get; }
         [Node]
         internal CompileSyntax Right { get; }
+
+        protected override IEnumerable<Syntax> DirectChildren()
+        {
+            yield return Left;
+            yield return Operator;
+            yield return Right;
+        }
 
         internal override Result ResultForCache(ContextBase context, Category category)
         {
@@ -82,8 +81,6 @@ namespace Reni.ReniParser
 
             return (CompileSyntax) Operator.Definable.CreateForVisit(left ?? Left, Token, right ?? Right);
         }
-        internal override CompileSyntax SurroundCompileSyntax(params ParsedSyntax[] parts)
-            => new ExpressionSyntax(this, parts);
 
         protected override string GetNodeDump()
         {
@@ -95,29 +92,17 @@ namespace Reni.ReniParser
             return result;
         }
 
-        internal override Syntax CreateDeclarationSyntax(Token token, Syntax right)
-            => new CompileSyntaxError(IssueId.IdentifyerExpected, Token)
-                .SurroundCompileSyntax(this, right);
+        internal override Syntax CreateDeclarationSyntax(IToken token, Syntax right)
+            => new CompileSyntaxError(IssueId.IdentifyerExpected, Token);
 
         internal override Syntax SyntaxError
-            (IssueId issue, Token token, Syntax right = null, params ParsedSyntax[] parts)
+            (IssueId issue, IToken token, Syntax right = null)
         {
             if(Right == null)
-                return Left.SyntaxError(issue, token, right, parts);
+                return Left.SyntaxError(issue, token, right);
             NotImplementedMethod(issue, token);
             return null;
         }
-
-        protected override IEnumerable<Syntax> SyntaxChildren
-        {
-            get
-            {
-                yield return Left;
-                yield return Operator;
-                yield return Right;
-            }
-        }
-
     }
 
     // Lord of the weed

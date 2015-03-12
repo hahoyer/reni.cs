@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.Debug;
 
 namespace Reni.TokenClasses
 {
-    internal sealed class UserSymbol : Definable
+    sealed class UserSymbol : Definable
     {
-        internal UserSymbol(string name) { Name = name; }
+        internal UserSymbol(string name) { Id = name; }
+        public override string Id { get; }
     }
 }

@@ -9,9 +9,9 @@ namespace Reni.FeatureTest.Validation
 {
     [TestFixture]
     [Target(@"x:{ 1 type instance  ( }; 1 dump_print")]
-    public sealed class UnMatcheLeftParenthesis : CompilerTest
+    public sealed class UnMatchedLeftParenthesis : CompilerTest
     {
-        public UnMatcheLeftParenthesis() { Parameters.ParseOnly = true; }
+        public UnMatchedLeftParenthesis() { Parameters.ParseOnly = true; }
 
         protected override void Verify(IEnumerable<IssueBase> issues)
         {
@@ -27,9 +27,9 @@ namespace Reni.FeatureTest.Validation
 
     [TestFixture]
     [Target(@"x:{ 1 type instance  ) }; 1 dump_print")]
-    public sealed class UnMatcheRightParenthesis : CompilerTest
+    public sealed class UnMatchedRightParenthesis : CompilerTest
     {
-        public UnMatcheRightParenthesis() { Parameters.ParseOnly = true; }
+        public UnMatchedRightParenthesis() { Parameters.ParseOnly = true; }
 
         protected override void Verify(IEnumerable<IssueBase> issues)
         {

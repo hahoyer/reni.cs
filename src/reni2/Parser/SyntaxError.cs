@@ -16,13 +16,13 @@ namespace Reni.Parser
 
         public SyntaxError(IssueId issueId) { _issueId = issueId; }
 
-        Syntax IType<Syntax>.Create(Syntax left, Token token, Syntax right)
+        Syntax IType<Syntax>.Create(Syntax left, IToken token, Syntax right)
         {
             NotImplementedMethod(left, token, right);
             return null;
         }
 
-        string IType<Syntax>.PrioTableName => PrioTable.Error;
+        string IType<Syntax>.PrioTableId => PrioTable.Error;
         ISubParser<Syntax> IType<Syntax>.NextParser => null;
         IType<Syntax> IType<Syntax>.NextTypeIfMatched => null;
     }

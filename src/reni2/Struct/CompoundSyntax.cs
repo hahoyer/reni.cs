@@ -25,20 +25,12 @@ namespace Reni.Struct
         static bool _isInsideFileDump;
         static int _nextObjectId;
 
-        internal CompoundSyntax(Token token, Syntax[] statements, ParsedSyntax[] parts)
-            : base(token, _nextObjectId++, parts)
+        internal CompoundSyntax(IToken token, Syntax[] statements)
+            : base(token, _nextObjectId++)
         {
             _statements = statements;
             _data = GetData;
             StopByObjectIds();
-        }
-
-        CompoundSyntax(CompoundSyntax other, ParsedSyntax[] parts)
-            : base(other, parts)
-        {
-            _statements = other._statements;
-            _data = GetData;
-            StopByObjectIds(2);
         }
 
         public string GetCompoundIdentificationDump() => "." + ObjectId + "i";
@@ -52,9 +44,6 @@ namespace Reni.Struct
         internal override bool? Hllw => Statements.All(syntax => syntax.Hllw == true);
         [DisableDump]
         internal Size IndexSize => Size.AutoSize(Statements.Length);
-        [DisableDump]
-        protected override IEnumerable<Syntax> SyntaxChildren
-            => _data.Select(item => item.RawStatement);
 
         [DisableDump]
         internal string[] Names => _data.SelectMany(s => s.Names).ToArray();
@@ -76,9 +65,6 @@ namespace Reni.Struct
             => _statements
                 .Select((s, i) => new Data(s, i))
                 .ToArray();
-
-        internal override CompileSyntax SurroundCompileSyntax(params ParsedSyntax[] parts)
-            => new CompoundSyntax(this, parts);
 
         protected override string GetNodeDump()
             => GetType().PrettyName() + "(" + GetCompoundIdentificationDump() + ")";
@@ -166,5 +152,7 @@ namespace Reni.Struct
             internal AccessFeature Convert(CompoundView accessPoint)
                 => accessPoint.AccessFeature(Value);
         }
+
+        protected override IEnumerable<Syntax> DirectChildren() => _statements;
     }
 }

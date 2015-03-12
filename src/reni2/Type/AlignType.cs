@@ -23,7 +23,7 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        internal override string DumpPrintText => "(" + Parent.DumpPrintText + ")" + AlignToken.Id + _alignBits;
+        internal override string DumpPrintText => "(" + Parent.DumpPrintText + ")" + AlignToken.TokenId + _alignBits;
 
         [DisableDump]
         internal override IReference CheckedReference => Parent.CheckedReference;

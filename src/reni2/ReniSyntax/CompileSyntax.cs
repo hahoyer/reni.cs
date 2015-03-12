@@ -24,14 +24,12 @@ namespace Reni.ReniSyntax
         readonly FunctionCache<ContextBase, object> _resultCache =
             new FunctionCache<ContextBase, object>();
 
-        internal CompileSyntax(Token token)
+        internal CompileSyntax(IToken token)
             : base(token) { }
 
-        internal CompileSyntax(Token token, int objectId, params ParsedSyntax[] parts)
-            : base(token, objectId, parts) { }
-
-        internal CompileSyntax(CompileSyntax other, params ParsedSyntax[] parts)
-            : base(other, parts) { }
+        internal CompileSyntax(IToken token, int objectId)
+            : base(token, objectId)
+        { }
 
         [DisableDump]
         internal bool IsLambda => GetIsLambda();
@@ -40,7 +38,7 @@ namespace Reni.ReniSyntax
         internal virtual bool? Hllw => IsLambda ? (bool?) true : null;
 
         [DisableDump]
-        internal string DumpPrintText => SourcePart.Name;
+        internal string DumpPrintText => SourcePart.Id;
 
         //[DebuggerHidden]
         internal virtual Result ResultForCache(ContextBase context, Category category)
@@ -125,10 +123,6 @@ namespace Reni.ReniSyntax
             NotImplementedMethod(visitor);
             return null;
         }
-
-        internal abstract CompileSyntax SurroundCompileSyntax(params ParsedSyntax[] parts);
-        internal override sealed Syntax Surround(params ParsedSyntax[] parts)
-            => SurroundCompileSyntax(parts);
     }
 
     sealed class ReplaceArgVisitor : DumpableObject, ISyntaxVisitor

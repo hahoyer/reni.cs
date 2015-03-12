@@ -11,10 +11,10 @@ namespace Reni.ReniParser
         readonly ReniParser.Syntax _value;
         public SyntaxBoxToken(ReniParser.Syntax value) { _value = value; }
 
-        protected override ReniParser.Syntax Terminal(Token token) => _value.Surround(new Syntax(token));
+        protected override ReniParser.Syntax Terminal(IToken token) => _value;
 
         protected override ReniParser.Syntax Infix
-            (ReniParser.Syntax left, Token token, ReniParser.Syntax right)
+            (ReniParser.Syntax left, IToken token, ReniParser.Syntax right)
         {
             NotImplementedMethod(left, token, right);
             return null;
@@ -22,8 +22,10 @@ namespace Reni.ReniParser
 
         internal sealed class Syntax : ReniParser.Syntax
         {
-            public Syntax(Token token)
-                : base(token) {}
+            public Syntax(IToken token)
+                : base(token) { }
         }
+
+        public override string Id => "<box>";
     }
 }

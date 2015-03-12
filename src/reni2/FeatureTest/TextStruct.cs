@@ -112,6 +112,6 @@ Text: /\
     [InstanceCode("Text('H') << 'allo'")]
     [Text1]
     [UserObjects]
-    [UnMatcheLeftParenthesis]
+    [UnMatchedLeftParenthesis]
     public sealed class TextConcat : TextStruct {}
 }

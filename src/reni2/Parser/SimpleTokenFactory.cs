@@ -14,13 +14,13 @@ namespace Reni.Parser
         {
             throw new Exception("Syntax error: " + message);
         }
-        protected override IDictionary<string, Services.TokenClass> GetPredefinedTokenClasses()
-            => new Dictionary<string, Services.TokenClass>
+        protected override IEnumerable<Services.TokenClass> GetPredefinedTokenClasses()
+            => new Services.TokenClass[]
             {
-                {"{", new OpenToken(1)},
-                {"(", new OpenToken(3)},
-                {"}", new CloseToken(1)},
-                {")", new CloseToken(3)}
+                new OpenToken(1),
+                new OpenToken(3),
+                new CloseToken(1),
+                new CloseToken(3)
             };
         protected override Services.TokenClass GetEndOfText() => new CloseToken(0);
         protected override Services.TokenClass GetTokenClass(string name) => CommonTokenClass;
@@ -31,7 +31,7 @@ namespace Reni.Parser
         sealed class AnyTokenClass : Services.TokenClass
         {
             protected override Services.Syntax Create
-                (Services.Syntax left, Token token, Services.Syntax right)
+                (Services.Syntax left, IToken token, Services.Syntax right)
                 => Services.Syntax.CreateSyntax(left, token, right);
         }
 
@@ -41,7 +41,7 @@ namespace Reni.Parser
             readonly int _level;
             public CloseToken(int level) { _level = level; }
             protected override Services.Syntax Create
-                (Services.Syntax left, Token token, Services.Syntax right)
+                (Services.Syntax left, IToken token, Services.Syntax right)
             {
                 Tracer.Assert(right == null);
                 return left == null ? null : left.Match(_level, token);
@@ -54,7 +54,7 @@ namespace Reni.Parser
             readonly int _level;
             public OpenToken(int level) { _level = level; }
             protected override Services.Syntax Create
-                (Services.Syntax left, Token token, Services.Syntax right)
+                (Services.Syntax left, IToken token, Services.Syntax right)
                 => new OpenSyntax(left, token, right, _level);
         }
 
@@ -65,7 +65,7 @@ namespace Reni.Parser
             [EnableDump]
             readonly int _level;
             public OpenSyntax
-                (Services.Syntax left, Token token, Services.Syntax right, int level)
+                (Services.Syntax left, IToken token, Services.Syntax right, int level)
                 : base(token)
             {
                 _left = left;
@@ -74,7 +74,7 @@ namespace Reni.Parser
             }
             protected override IGraphTarget Left => _left;
             protected override IGraphTarget Right => _right;
-            internal override Services.Syntax Match(int level, Token token)
+            internal override Services.Syntax Match(int level, IToken token)
             {
                 Tracer.Assert(_level == level);
                 var argument = _right ?? new EmptySyntax(token);
@@ -86,7 +86,7 @@ namespace Reni.Parser
 
         sealed class EmptySyntax : Services.Syntax
         {
-            public EmptySyntax(Token token)
+            public EmptySyntax(IToken token)
                 : base(token) {}
         }
     }

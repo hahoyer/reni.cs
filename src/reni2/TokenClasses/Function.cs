@@ -11,11 +11,11 @@ namespace Reni.TokenClasses
     [Variant(false, false)]
     [Variant(true, false)]
     [Variant(false, true)]
-    sealed class Function : TokenClass, ITokenClassWithId
+    sealed class Function : TokenClass
     {
-        public static string Id(bool isImplicit = false, bool isMetaFunction = false)
+        public static string TokenId(bool isImplicit = false, bool isMetaFunction = false)
             => "/" + (isImplicit ? "!" : "") + "\\" + (isMetaFunction ? "/\\" : "");
-        string ITokenClassWithId.Id => Id(_isImplicit, _isMetaFunction);
+        public override string Id => TokenId(_isImplicit, _isMetaFunction);
         readonly bool _isImplicit;
         readonly bool _isMetaFunction;
 
@@ -25,10 +25,10 @@ namespace Reni.TokenClasses
             _isMetaFunction = isMetaFunction;
         }
 
-        protected override Syntax Terminal(Token token)
+        protected override Syntax Terminal(IToken token)
             => new CompileSyntaxError(IssueId.MissingFunctionGetter, token, null);
 
-        protected override Syntax Prefix(Token token, Syntax right)
+        protected override Syntax Prefix(IToken token, Syntax right)
             => new FunctionSyntax
                 (
                 token,
@@ -38,7 +38,7 @@ namespace Reni.TokenClasses
                 right.ToCompiledSyntax
                 );
 
-        protected override Syntax Infix(Syntax left, Token token, Syntax right)
+        protected override Syntax Infix(Syntax left, IToken token, Syntax right)
             => new FunctionSyntax
                 (
                 token,

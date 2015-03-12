@@ -45,30 +45,31 @@ namespace Reni.Parser
             return image;
         }
 
-        internal abstract class TokenClass : DumpableObject, IType<Syntax>, INameProvider
+        internal abstract class TokenClass
+            : DumpableObject, IType<Syntax>, IUniqueIdProvider
         {
-            string _name;
-            Syntax IType<Syntax>.Create(Syntax left, Token token, Syntax right)
+            Syntax IType<Syntax>.Create(Syntax left, IToken token, Syntax right)
                 => Create(left, token, right);
-            string IType<Syntax>.PrioTableName => _name;
+            string IType<Syntax>.PrioTableId => Id;
             ISubParser<Syntax> IType<Syntax>.NextParser => null;
             IType<Syntax> IType<Syntax>.NextTypeIfMatched => NextTypeIfMatched;
             internal virtual IType<Syntax> NextTypeIfMatched => null;
-            protected abstract Syntax Create(Syntax left, Token token, Syntax right);
-            string INameProvider.Name { set { _name = value; } }
+            protected abstract Syntax Create(Syntax left, IToken token, Syntax right);
+            public string Id { get; }
+            string IUniqueIdProvider.Value => Id;
         }
 
-        internal abstract class Syntax : DumpableObject, IGraphTarget, IIconKeyProvider
+        internal abstract class Syntax : DumpableObject, IGraphTarget, IIconKeyProvider, ISourcePart
         {
             [EnableDump]
-            protected readonly Token Token;
+            protected readonly IToken Token;
 
-            protected Syntax(Token token) { Token = token; }
+            protected Syntax(IToken token) { Token = token; }
 
             [DisableDump]
             string IIconKeyProvider.IconKey => "Syntax";
 
-            public string Title => Token.Name;
+            public string Title => Token.Id;
 
             [DisableDump]
             public IGraphTarget[] Children => new[] {Left, Right};
@@ -76,7 +77,7 @@ namespace Reni.Parser
             protected virtual IGraphTarget Right => null;
             protected virtual IGraphTarget Left => null;
 
-            internal static Syntax CreateSyntax(Syntax left, Token token, Syntax right)
+            internal static Syntax CreateSyntax(Syntax left, IToken token, Syntax right)
             {
                 if(left == null)
                 {
@@ -94,7 +95,7 @@ namespace Reni.Parser
             {
                 readonly Syntax _left;
                 readonly Syntax _right;
-                public InfixSyntax(Syntax left, Token token, Syntax right)
+                public InfixSyntax(Syntax left, IToken token, Syntax right)
                     : base(token)
                 {
                     _left = left;
@@ -107,7 +108,7 @@ namespace Reni.Parser
             sealed class SuffixSyntax : Syntax
             {
                 readonly Syntax _left;
-                public SuffixSyntax(Syntax left, Token token)
+                public SuffixSyntax(Syntax left, IToken token)
                     : base(token) { _left = left; }
                 protected override IGraphTarget Left => _left;
             }
@@ -115,23 +116,24 @@ namespace Reni.Parser
             sealed class PrefixSyntax : Syntax
             {
                 readonly Syntax _right;
-                public PrefixSyntax(Token token, Syntax right)
+                public PrefixSyntax(IToken token, Syntax right)
                     : base(token) { _right = right; }
                 protected override IGraphTarget Right => _right;
             }
 
             sealed class TerminalSyntax : Syntax
             {
-                public TerminalSyntax(Token token)
+                public TerminalSyntax(IToken token)
                     : base(token) { }
-                internal override Syntax ParenthesisMatch(Token token, Syntax argument)
+                internal override Syntax ParenthesisMatch(IToken token, Syntax argument)
                     => CreateSyntax(null, Token, argument);
             }
 
-            internal virtual Syntax Match(int level, Token token)
+            internal virtual Syntax Match(int level, IToken token)
                 => new InfixSyntax(this, token, null);
-            internal virtual Syntax ParenthesisMatch(Token token, Syntax argument)
+            internal virtual Syntax ParenthesisMatch(IToken token, Syntax argument)
                 => CreateSyntax(this, token, argument);
+            SourcePart ISourcePart.All { get { return Token.SourcePart; } }
         }
     }
 }

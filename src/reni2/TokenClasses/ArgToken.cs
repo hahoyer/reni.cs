@@ -11,17 +11,17 @@ using Reni.ReniSyntax;
 namespace Reni.TokenClasses
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class ArgToken : NonSuffix, ITokenClassWithId
+    sealed class ArgToken : NonSuffix
     {
-        public const string Id = "^";
-        string ITokenClassWithId.Id => Id;
+        public const string TokenId = "^";
+        public override string Id => TokenId;
 
-        public override Result Result(ContextBase context, Category category, Token token)
+        public override Result Result(ContextBase context, Category category, IToken token)
             => context.ArgReferenceResult(category);
 
         internal override CompileSyntax Visit(ISyntaxVisitor visitor) => visitor.Arg;
 
-        public override Result Result(ContextBase context, Category category, Token token, CompileSyntax right)
+        public override Result Result(ContextBase context, Category category, IToken token, CompileSyntax right)
             => context.FunctionalArgResult(category, right);
     }
 }

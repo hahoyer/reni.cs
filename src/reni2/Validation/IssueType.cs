@@ -15,23 +15,22 @@ namespace Reni.Validation
     {
         [EnableDump]
         readonly IssueBase _issue;
-        readonly Root _rootContext;
 
         public IssueType(IssueBase issue, Root rootContext)
         {
             _issue = issue;
-            _rootContext = rootContext;
+            RootContext = rootContext;
         }
 
         [DisableDump]
-        internal override Root RootContext => _rootContext;
+        internal override Root RootContext { get; }
 
         [DisableDump]
         internal override bool Hllw => true;
         internal override string DumpPrintText => _issue.IssueId.Tag;
 
         internal Result IssueResult(Category category) => Result(category, Code);
-        IssueType ConsequentialErrorType(Token position) => _issue.ConsequentialError(position).Type(RootContext);
+        IssueType ConsequentialErrorType(IToken position) => _issue.ConsequentialError(position).Type(RootContext);
 
         CodeBase Code() => _issue.Code;
 

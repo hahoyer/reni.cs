@@ -8,8 +8,8 @@ using hw.Scanner;
 namespace hw.Parser
 {
     abstract class TokenFactory<TTokenClass, TTreeItem> : Dumpable, ITokenFactory<TTreeItem>
-        where TTokenClass : class, IType<TTreeItem>, INameProvider
-        where TTreeItem : class
+        where TTokenClass : class, IType<TTreeItem>, IUniqueIdProvider
+        where TTreeItem : class, ISourcePart
     {
         readonly ValueCache<FunctionCache<string, TTokenClass>> _tokenClasses;
         readonly ValueCache<TTokenClass> _number;
@@ -18,56 +18,38 @@ namespace hw.Parser
 
         internal TokenFactory()
         {
-            _endOfText = new ValueCache<TTokenClass>(InternalGetEndOfText);
-            _number = new ValueCache<TTokenClass>(InternalGetNumber);
+            _endOfText = new ValueCache<TTokenClass>(GetEndOfText);
+            _number = new ValueCache<TTokenClass>(GetNumber);
             _tokenClasses = new ValueCache<FunctionCache<string, TTokenClass>>(GetTokenClasses);
-            _text = new ValueCache<TTokenClass>(InternalGetText);
+            _text = new ValueCache<TTokenClass>(GetText);
         }
-        TTokenClass InternalGetEndOfText()
-        {
-            var result = GetEndOfText();
-            result.Name = PrioTable.EndOfText;
-            return result;
-        }
-                                                                    
+
         FunctionCache<string, TTokenClass> GetTokenClasses()
         {
-            var result = new FunctionCache<string, TTokenClass>(GetPredefinedTokenClasses(), InternalGetTokenClass);
-            foreach(var pair in result)
-                pair.Value.Name = pair.Key;
-            return result;
+            return new FunctionCache<string, TTokenClass>
+                (ScanPredefinedTokenClasses(), GetTokenClass);
         }
 
-        TTokenClass InternalGetTokenClass(string name)
+        IDictionary<string, TTokenClass> ScanPredefinedTokenClasses()
         {
-            var result = GetTokenClass(name);
-            result.Name = name;
-            return result;
+            return GetPredefinedTokenClasses().ToDictionary(item => item.Value);
         }
 
-        TTokenClass InternalGetNumber()
+        IType<TTreeItem> ITokenFactory<TTreeItem>.TokenClass(string name)
         {
-            var result = GetNumber();
-            result.Name = "<number>";
-            return result;
+            return TokenClass(name);
         }
-
-        TTokenClass InternalGetText()
-        {
-            var result = GetText();
-            result.Name = "<Text>";
-            return result;
-        }
-
-        IType<TTreeItem> ITokenFactory<TTreeItem>.TokenClass(string name) { return TokenClass(name); }
 
         IType<TTreeItem> ITokenFactory<TTreeItem>.Number { get { return _number.Value; } }
         IType<TTreeItem> ITokenFactory<TTreeItem>.Text { get { return _text.Value; } }
         IType<TTreeItem> ITokenFactory<TTreeItem>.EndOfText { get { return _endOfText.Value; } }
-        IType<TTreeItem> ITokenFactory<TTreeItem>.Error(Match.IError error) { return GetError(error); }
+        IType<TTreeItem> ITokenFactory<TTreeItem>.Error(Match.IError error)
+        {
+            return GetError(error);
+        }
 
         protected abstract TTokenClass GetError(Match.IError message);
-        protected abstract IDictionary<string, TTokenClass> GetPredefinedTokenClasses();
+        protected abstract IEnumerable<TTokenClass> GetPredefinedTokenClasses();
         protected abstract TTokenClass GetEndOfText();
         protected abstract TTokenClass GetTokenClass(string name);
         protected abstract TTokenClass GetNumber();
@@ -76,5 +58,4 @@ namespace hw.Parser
         FunctionCache<string, TTokenClass> TokenClasses { get { return _tokenClasses.Value; } }
         protected IType<TTreeItem> TokenClass(string name) { return TokenClasses[name]; }
     }
-
 }

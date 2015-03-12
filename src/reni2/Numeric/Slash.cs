@@ -10,10 +10,10 @@ using Reni.TokenClasses;
 namespace Reni.Numeric
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class Slash : TransformationOperation, ITokenClassWithId
+    sealed class Slash : TransformationOperation
     {
-        public const string Id = "/";
-        string ITokenClassWithId.Id => Id;
+        public const string TokenId = "/";
+        public override string Id => TokenId;
         protected override int Signature(int objSize, int argSize) => BitsConst.DivideSize(objSize, argSize);
         [DisableDump]
         internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);

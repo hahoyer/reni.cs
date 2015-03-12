@@ -41,7 +41,7 @@ namespace Reni.Context
             _bitCache = new ValueCache<BitType>(() => new BitType(this));
             _voidCache = new ValueCache<VoidType>(() => new VoidType(this));
             _minusFeatureCache = new ValueCache<IFeatureImplementation>
-                (() => new ContextMetaFunctionFromSyntax(_metaDictionary[ArgToken.Id + " " + Negate.Id]));
+                (() => new ContextMetaFunctionFromSyntax(_metaDictionary[ArgToken.TokenId + " " + Negate.TokenId]));
             _createArrayFeatureCache = new FunctionCache<bool, IFeatureImplementation>
                 (
                 isMutable =>

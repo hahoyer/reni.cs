@@ -13,11 +13,8 @@ namespace Reni.ReniSyntax
 {
     abstract class SpecialSyntax : CompileSyntax
     {
-        protected SpecialSyntax(Token token)
+        protected SpecialSyntax(IToken token)
             : base(token) { }
-
-        protected SpecialSyntax(SpecialSyntax other, ParsedSyntax[] parts)
-            : base(other, parts) { }
 
         internal override bool IsKeyword => !IsNumber && !IsText;
     }
@@ -28,18 +25,13 @@ namespace Reni.ReniSyntax
         [EnableDump]
         internal readonly ITerminal Terminal;
 
-        public TerminalSyntax(Token token, ITerminal terminal)
+        public TerminalSyntax(IToken token, ITerminal terminal)
             : base(token) { Terminal = terminal; }
-        TerminalSyntax(TerminalSyntax other, ParsedSyntax[] parts)
-            : base(other, parts) { Terminal = other.Terminal; }
 
         internal override Result ResultForCache(ContextBase context, Category category) => Terminal
             .Result(context, category, Token);
 
         internal override CompileSyntax Visit(ISyntaxVisitor visitor) => Terminal.Visit(visitor);
-
-        internal override CompileSyntax SurroundCompileSyntax(params ParsedSyntax[] parts)
-            => new TerminalSyntax(this, parts);
 
         internal override bool IsNumber => Terminal is Number;
         internal override bool IsText => Terminal is Text;
@@ -56,28 +48,18 @@ namespace Reni.ReniSyntax
         readonly CompileSyntax _right;
 
         public PrefixSyntax
-            (Token token, IPrefix prefix, CompileSyntax right)
+            (IToken token, IPrefix prefix, CompileSyntax right)
             : base(token)
         {
             _prefix = prefix;
             _right = right;
         }
-        PrefixSyntax(PrefixSyntax other, ParsedSyntax[] parts)
-            : base(other, parts)
-        {
-            _prefix = other._prefix;
-            _right = other._right;
-        }
 
         internal override Result ResultForCache(ContextBase context, Category category) => _prefix
             .Result(context, category, Token, _right);
 
-        protected override IEnumerable<Syntax> SyntaxChildren { get { yield return _right; } }
-
         protected override string GetNodeDump() => base.GetNodeDump() + "(" + _right.NodeDump + ")";
-
-        internal override CompileSyntax SurroundCompileSyntax(params ParsedSyntax[] parts)
-            => new PrefixSyntax(this, parts);
+        protected override IEnumerable<Syntax> DirectChildren() { yield return _right; }
     }
 
     sealed class InfixSyntax : SpecialSyntax
@@ -94,20 +76,12 @@ namespace Reni.ReniSyntax
         [EnableDump]
         readonly CompileSyntax _right;
 
-        public InfixSyntax(Token token, CompileSyntax left, IInfix infix, CompileSyntax right)
+        public InfixSyntax(IToken token, CompileSyntax left, IInfix infix, CompileSyntax right)
             : base(token)
         {
             _left = left;
             _infix = infix;
             _right = right;
-            StopByObjectIds();
-        }
-        InfixSyntax(InfixSyntax other, ParsedSyntax[] parts)
-            : base(other, parts)
-        {
-            _left = other._left;
-            _infix = other._infix;
-            _right = other._right;
             StopByObjectIds();
         }
 
@@ -135,17 +109,11 @@ namespace Reni.ReniSyntax
             return result;
         }
 
-        protected override IEnumerable<Syntax> SyntaxChildren
+        protected override IEnumerable<Syntax> DirectChildren()
         {
-            get
-            {
-                yield return _left;
-                yield return _right;
-            }
+            yield return _left;
+            yield return _right;
         }
-
-        internal override CompileSyntax SurroundCompileSyntax(params ParsedSyntax[] parts)
-            => new InfixSyntax(this, parts);
     }
 
     interface IPendingProvider
@@ -164,39 +132,28 @@ namespace Reni.ReniSyntax
         [EnableDump]
         readonly ISuffix _suffix;
 
-        internal SuffixSyntax(Token token, CompileSyntax left, ISuffix suffix)
+        internal SuffixSyntax(IToken token, CompileSyntax left, ISuffix suffix)
             : base(token)
         {
             _left = left;
             _suffix = suffix;
         }
-        SuffixSyntax(SuffixSyntax other, ParsedSyntax[] parts)
-            : base(other, parts)
-        {
-            _left = other._left;
-            _suffix = other._suffix;
-        }
-
         internal override Result ResultForCache(ContextBase context, Category category) => _suffix
             .Result(context, category, _left);
 
         protected override string GetNodeDump() => "(" + _left.NodeDump + ")" + base.GetNodeDump();
-
-        internal override CompileSyntax SurroundCompileSyntax(params ParsedSyntax[] parts)
-            => new SuffixSyntax(this, parts);
-
-        protected override IEnumerable<Syntax> SyntaxChildren { get { yield return _left; } }
+        protected override IEnumerable<Syntax> DirectChildren() { yield return _left; }
     }
 
     interface ITerminal
     {
-        Result Result(ContextBase context, Category category, Token token);
+        Result Result(ContextBase context, Category category, IToken token);
         CompileSyntax Visit(ISyntaxVisitor visitor);
     }
 
     interface IPrefix
     {
-        Result Result(ContextBase context, Category category, Token token, CompileSyntax right);
+        Result Result(ContextBase context, Category category, IToken token, CompileSyntax right);
     }
 
     interface IInfix

@@ -145,11 +145,11 @@ namespace Reni.Context
 
             [Node]
             [SmartNode]
-            internal readonly FunctionCache<Token, IssueType> UndefinedSymbolType;
+            internal readonly FunctionCache<IToken, IssueType> UndefinedSymbolType;
 
             public Cache(ContextBase target)
             {
-                UndefinedSymbolType = new FunctionCache<Token, IssueType>
+                UndefinedSymbolType = new FunctionCache<IToken, IssueType>
                     (tokenData => UndefinedSymbolIssue.Type(tokenData, target));
                 ResultCache = new FunctionCache<CompileSyntax, ResultCache>(target.CreateCacheElement);
                 CompoundContexts = new FunctionCache<CompoundSyntax, FunctionCache<int, ContextBase>>
@@ -212,7 +212,7 @@ namespace Reni.Context
             return null;
         }
 
-        internal Result PrefixResult(Category category, Token position, Definable tokenClass, CompileSyntax right)
+        internal Result PrefixResult(Category category, IToken position, Definable tokenClass, CompileSyntax right)
         {
             var searchResult = Declarations(tokenClass);
             if(searchResult == null)

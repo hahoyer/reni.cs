@@ -20,43 +20,51 @@ namespace Reni.ReniParser
                 var x = PrioTable.Left(PrioTable.Any);
                 x += PrioTable.Left
                     (
-                        AtToken.Id,
+                        AtToken.TokenId,
                         "_N_E_X_T_",
-                        ToNumberOfBase.Id
+                        ToNumberOfBase.TokenId
                     );
 
-                x += PrioTable.Left(ConcatArrays.Id, ConcatArrays.MutableId);
+                x += PrioTable.Left(ConcatArrays.TokenId, ConcatArrays.MutableId);
 
-                x += PrioTable.Left(Star.Id, Slash.Id, "\\");
-                x += PrioTable.Left(Plus.Id, Minus.Id);
+                x += PrioTable.Left(Star.TokenId, Slash.TokenId, "\\");
+                x += PrioTable.Left(Plus.TokenId, Minus.TokenId);
 
                 x += PrioTable.Left
                     (
-                        CompareOperation.Id(),
-                        CompareOperation.Id(canBeEqual: true),
-                        CompareOperation.Id(false),
-                        CompareOperation.Id(false, true)
+                        CompareOperation.TokenId(),
+                        CompareOperation.TokenId(canBeEqual: true),
+                        CompareOperation.TokenId(false),
+                        CompareOperation.TokenId(false, true)
                     );
-                x += PrioTable.Left(EqualityOperation.Id(false), EqualityOperation.Id());
+                x += PrioTable.Left(EqualityOperation.TokenId(false), EqualityOperation.TokenId());
 
-                x += PrioTable.Right(ReassignToken.Id);
+                x += PrioTable.Right(ReassignToken.TokenId);
 
-                x = x.ThenElseLevel(ThenToken.Id, ElseToken.Id);
-                x += PrioTable.Right(Exclamation.Id);
+                x = x.ThenElseLevel(ThenToken.TokenId, ElseToken.TokenId);
+                x += PrioTable.Right(Exclamation.TokenId);
                 x += PrioTable.Left
-                    (Function.Id(), Function.Id(true), Function.Id(isMetaFunction: true));
-                x += PrioTable.Right(Colon.Id);
-                x += PrioTable.Right(List.Id(0));
-                x += PrioTable.Right(List.Id(1));
-                x += PrioTable.Right(List.Id(2));
+                    (
+                        Function.TokenId(),
+                        Function.TokenId(true),
+                        Function.TokenId(isMetaFunction: true));
+                x += PrioTable.Right(Colon.TokenId);
+                x += PrioTable.Right(List.TokenId(0));
+                x += PrioTable.Right(List.TokenId(1));
+                x += PrioTable.Right(List.TokenId(2));
                 x = x.ParenthesisLevelLeft
                     (
-                        new[] {LeftParenthesis.Id(1), LeftParenthesis.Id(2), LeftParenthesis.Id(3)},
                         new[]
                         {
-                            RightParenthesis.Id(1),
-                            RightParenthesis.Id(2),
-                            RightParenthesis.Id(3)
+                            LeftParenthesis.TokenId(1),
+                            LeftParenthesis.TokenId(2),
+                            LeftParenthesis.TokenId(3)
+                        },
+                        new[]
+                        {
+                            RightParenthesis.TokenId(1),
+                            RightParenthesis.TokenId(2),
+                            RightParenthesis.TokenId(3)
                         }
                     );
                 //x.Correct("(", PrioTable.Any, '-');
@@ -100,7 +108,7 @@ namespace Reni.ReniParser
             }
         }
 
-        protected override ITokenClassWithId SpecialTokenClass(System.Type type)
+        protected override TokenClass SpecialTokenClass(System.Type type)
         {
             if(type == typeof(Exclamation))
                 return new Exclamation(_declarationSyntaxSubParser);
@@ -122,11 +130,12 @@ namespace Reni.ReniParser
         readonly IssueId _issue;
         public SyntaxError(IssueId issue) { _issue = issue; }
         public SyntaxError(Match.IError message) { _issue = ReniLexer.Parse(message); }
-        protected override Syntax Terminal(Token token)
-            => new CompileSyntaxError(_issue, token, null);
-        protected override Syntax Suffix(Syntax left, Token token)
-            => left.SyntaxError(_issue, token, null);
-        protected override Syntax Infix(Syntax left, Token token, Syntax right)
-            => left.SyntaxError(_issue, token, right, null);
+        protected override Syntax Terminal(IToken token)
+            => new CompileSyntaxError(_issue, token);
+        protected override Syntax Suffix(Syntax left, IToken token)
+            => left.SyntaxError(_issue, token);
+        protected override Syntax Infix(Syntax left, IToken token, Syntax right)
+            => left.SyntaxError(_issue, token, right);
+        public override string Id => "<error>";
     }
 }

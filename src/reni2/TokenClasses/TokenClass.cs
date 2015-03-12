@@ -14,40 +14,33 @@ namespace Reni.TokenClasses
     /// </summary>
     abstract class TokenClass : TokenClass<Syntax>, IOperator<Syntax>
     {
-        protected override sealed Syntax Create(Syntax left, Token token, Syntax right)
+        protected override sealed Syntax Create(Syntax left, IToken token, Syntax right)
             => this.Operation(left, token, right);
 
-        internal Syntax CreateForVisit(Syntax left, Token token, Syntax right)
+        internal Syntax CreateForVisit(Syntax left, IToken token, Syntax right)
             => this.Operation(left, token, right);
 
-        Syntax IOperator<Syntax>.Terminal(Token token)
+        Syntax IOperator<Syntax>.Terminal(IToken token)
             => Terminal(token);
-        Syntax IOperator<Syntax>.Prefix(Token token, Syntax right)
+        Syntax IOperator<Syntax>.Prefix(IToken token, Syntax right)
             => Prefix(token, right);
-        Syntax IOperator<Syntax>.Suffix(Syntax left, Token token)
+        Syntax IOperator<Syntax>.Suffix(Syntax left, IToken token)
             => Suffix(left, token);
-        Syntax IOperator<Syntax>.Infix(Syntax left, Token token, Syntax right)
+        Syntax IOperator<Syntax>.Infix(Syntax left, IToken token, Syntax right)
             => Infix(left, token, right);
 
-        protected virtual Syntax Terminal(Token token)
+        protected virtual Syntax Terminal(IToken token)
             => new Validation.SyntaxError(IssueId.UnexpectedSyntaxError, token);
 
-        protected virtual Syntax Prefix(Token token, Syntax right)
-            => new Validation.SyntaxError(IssueId.UnexpectedSyntaxError, token)
-            .Surround(right);
+        protected virtual Syntax Prefix(IToken token, Syntax right)
+            => new Validation.SyntaxError(IssueId.UnexpectedSyntaxError, token);
 
-        protected virtual Syntax Suffix(Syntax left, Token token)
-            => new Validation.SyntaxError(IssueId.UnexpectedSyntaxError, token)
-            .Surround(left);
+        protected virtual Syntax Suffix(Syntax left, IToken token)
+            => new Validation.SyntaxError(IssueId.UnexpectedSyntaxError, token);
 
-        protected virtual Syntax Infix(Syntax left, Token token, Syntax right)
-            => new Validation.SyntaxError(IssueId.UnexpectedSyntaxError, token)
-            .Surround(left,right);
-    }
+        protected virtual Syntax Infix(Syntax left, IToken token, Syntax right)
+            => new Validation.SyntaxError(IssueId.UnexpectedSyntaxError, token);
 
-    interface ITokenClassWithId
-    {
-        string Id { get; }
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
@@ -67,9 +60,9 @@ namespace Reni.TokenClasses
 
         public Variant(params object[] creationParameter) { CreationParameter = creationParameter; }
 
-        internal ITokenClassWithId CreateInstance(System.Type type)
+        internal TokenClass CreateInstance(System.Type type)
         {
-            return (ITokenClassWithId)
+            return (TokenClass)
                 type
                     .GetConstructor(CreationParameter.Select(p => p.GetType()).ToArray())
                     .AssertNotNull()

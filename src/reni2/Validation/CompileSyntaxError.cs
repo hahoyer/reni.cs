@@ -18,24 +18,12 @@ namespace Reni.Validation
         readonly CompileSyntaxError _previous;
         readonly ValueCache<CompileSyntaxIssue> _issueCache;
 
-        public CompileSyntaxError
-            (
-            CompileSyntaxError other,
-            params ParsedSyntax[] parts)
-            : base(other, parts)
-        {
-            _issueId = other._issueId;
-            _previous = other._previous;
-            _issueCache = new ValueCache<CompileSyntaxIssue>
-                (() => new CompileSyntaxIssue(_issueId, Token));
-        }
-
-        internal override IEnumerable<IssueBase> Issues => Issue.plus(base.Issues);
+        internal override IEnumerable<IssueBase> DirectIssues => Issue.plus(base.DirectIssues);
 
         public CompileSyntaxError
             (
             IssueId issueId,
-            Token token,
+            IToken token,
             CompileSyntaxError previous = null)
             : base(token)
         {
@@ -45,6 +33,12 @@ namespace Reni.Validation
                 (() => new CompileSyntaxIssue(_issueId, Token));
         }
 
+        protected override IEnumerable<Syntax> DirectChildren()
+        {
+            yield return _previous;
+        }
+
+        [DisableDump]
         CompileSyntaxIssue Issue => _issueCache.Value;
 
         internal override Result ResultForCache(ContextBase context, Category category)
@@ -54,8 +48,6 @@ namespace Reni.Validation
                 .Aggregate(context.RootContext.VoidType.Result(category), (x, y) => x + y);
             return result;
         }
-        internal override CompileSyntax SurroundCompileSyntax(params ParsedSyntax[] parts)
-            => new CompileSyntaxError(this, parts);
 
         [DisableDump]
         IEnumerable<CompileSyntaxError> Chain
@@ -75,10 +67,7 @@ namespace Reni.Validation
 
         internal override bool IsError => true;
         internal override Syntax SyntaxError
-            (IssueId issue, Token token, Syntax right = null, params ParsedSyntax[] parts)
-            => new CompileSyntaxError(issue, token, this).SurroundCompileSyntax(parts);
-
-        [DisableDump]
-        protected override IEnumerable<Syntax> SyntaxChildren { get { yield return _previous; } }
+            (IssueId issue, IToken token, Syntax right = null)
+            => new CompileSyntaxError(issue, token, this);
     }
 }

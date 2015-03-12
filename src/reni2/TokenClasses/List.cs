@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Parser;
-using hw.Scanner;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
 
@@ -12,27 +11,32 @@ namespace Reni.TokenClasses
     [Variant(0)]
     [Variant(1)]
     [Variant(2)]
-    sealed class List : TokenClass, ITokenClassWithId
+    sealed class List : TokenClass
     {
-        public static string Id(int level) => ",;.".Substring(level, 1);
+        public static string TokenId(int level) => ",;.".Substring(level, 1);
         readonly int _level;
         public List(int level) { _level = level; }
 
-        string ITokenClassWithId.Id => Id(_level);
+        public override string Id => TokenId(_level);
 
-        protected override Syntax Terminal(Token token)
-            => ListSyntax(new EmptyList(token.SourcePart.Start), token, new EmptyList(token.SourcePart.End));
+        protected override Syntax Terminal(IToken token)
+            =>
+                ListSyntax
+                    (
+                        new EmptyList(token.SourcePart.Start),
+                        token,
+                        new EmptyList(token.SourcePart.End));
 
-        protected override Syntax Prefix(Token token, Syntax right)
+        protected override Syntax Prefix(IToken token, Syntax right)
             => ListSyntax(new EmptyList(token.SourcePart.Start), token, right);
 
-        protected override Syntax Suffix(Syntax left, Token token)
+        protected override Syntax Suffix(Syntax left, IToken token)
             => ListSyntax(left, token, new EmptyList(token.SourcePart.End));
 
-        protected override Syntax Infix(Syntax left, Token token, Syntax right)
+        protected override Syntax Infix(Syntax left, IToken token, Syntax right)
             => ListSyntax(left, token, right);
 
-        ListSyntax ListSyntax(Syntax left, Token token, Syntax right)
+        ListSyntax ListSyntax(Syntax left, IToken token, Syntax right)
             => new ListSyntax(this, token, left.ToList(this).Concat(right.ToList(this)).ToArray());
     }
 }

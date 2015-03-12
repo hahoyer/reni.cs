@@ -9,10 +9,10 @@ using Reni.ReniSyntax;
 namespace Reni.TokenClasses
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class InstanceToken : InfixToken, IPendingProvider, ITokenClassWithId
+    sealed class InstanceToken : InfixToken, IPendingProvider
     {
-        public const string Id = "instance";
-        string ITokenClassWithId.Id => Id;
+        public const string TokenId = "instance";
+        public override string Id => TokenId;
         public override Result Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
             => left
                 .Type(context)

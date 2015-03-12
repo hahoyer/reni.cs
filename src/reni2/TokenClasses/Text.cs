@@ -2,25 +2,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using hw.Parser;
-using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
-using Reni.Type;
 
 namespace Reni.TokenClasses
 {
     sealed class Text : TerminalToken
     {
-        public override Result Result(ContextBase context, Category category, Token token)
+        public override Result Result(ContextBase context, Category category, IToken token)
         {
-            var data = StripQutes(token.Name);
+            var data = StripQutes(token.Id);
             return context
                 .RootContext.BitType.Array(BitsConst.BitSize(data[0].GetType()))
                 .TextItem
                 .Array(data.Length)
                 .TextItem
-                .Result(category, () => CodeBase.BitsConst(BitsConst.ConvertAsText(data)), CodeArgs.Void);
+                .Result
+                (category, () => CodeBase.BitsConst(BitsConst.ConvertAsText(data)), CodeArgs.Void);
         }
 
         static string StripQutes(string text)
@@ -34,5 +33,6 @@ namespace Reni.TokenClasses
             }
             return result;
         }
+        public override string Id => "<text>";
     }
 }

@@ -13,7 +13,7 @@ namespace Reni.Validation
     public abstract class IssueBase : DumpableObject
     {
         internal static readonly IEnumerable<IssueBase> Empty = new IssueBase[0];
-        readonly FunctionCache<Token, ConsequentialError> _consequentialError;
+        readonly FunctionCache<IToken, ConsequentialError> _consequentialError;
 
         [EnableDump]
         internal readonly IssueId IssueId;
@@ -21,13 +21,13 @@ namespace Reni.Validation
         internal IssueBase(IssueId issueId)
         {
             IssueId = issueId;
-            _consequentialError = new FunctionCache<Token, ConsequentialError>
+            _consequentialError = new FunctionCache<IToken, ConsequentialError>
                 (token => new ConsequentialError(token, this));
         }
 
         internal abstract string LogDump { get; }
 
-        internal ConsequentialError ConsequentialError(Token position)
+        internal ConsequentialError ConsequentialError(IToken position)
             => _consequentialError[position];
 
         protected string Tag => IssueId.Tag;
@@ -35,5 +35,6 @@ namespace Reni.Validation
         internal IssueType Type(Root rootContext) => new IssueType(this, rootContext);
 
         internal virtual CodeBase Code => CodeBase.Issue(this);
+        protected override string GetNodeDump() { return base.GetNodeDump() + IssueId.NodeDump().Surround("{","}") ; }
     }
 }

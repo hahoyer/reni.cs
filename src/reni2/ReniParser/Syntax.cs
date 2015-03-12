@@ -14,36 +14,18 @@ namespace Reni.ReniParser
 {
     abstract class Syntax : ParsedSyntax
     {
-        readonly ParsedSyntax[] _parts;
-
-        protected Syntax(Token token)
+        protected Syntax(IToken token)
             : base(token) {}
 
-        protected Syntax(Token token, int objectId, params ParsedSyntax[] parts)
-            : base(token, objectId)
-        {
-            _parts = parts;
-        }
-
-        protected Syntax(Syntax other, params ParsedSyntax[] parts)
-            : this(other.Token)
-        {
-            _parts = other._parts.plus(parts);
-        }
-
-        protected Syntax(Syntax other, int objectId, params ParsedSyntax[] parts)
-            : this(other.Token, objectId)
-        {
-            _parts = other._parts.plus(parts);
-        }
+        protected Syntax(IToken token, int objectId)
+            : base(token, objectId) {}
 
         [DisableDump]
         internal virtual CompileSyntax ContainerStatementToCompileSyntax => ToCompiledSyntax;
 
         [DisableDump]
         internal virtual CompileSyntax ToCompiledSyntax
-            => new CompileSyntaxError(IssueId.CompiledSyntaxExpected, Token)
-                .SurroundCompileSyntax(_parts);
+            => new CompileSyntaxError(IssueId.CompiledSyntaxExpected, Token);
 
         internal virtual IEnumerable<KeyValuePair<string, int>> GetDeclarations(int index)
         {
@@ -60,7 +42,7 @@ namespace Reni.ReniParser
             return null;
         }
 
-        internal virtual Syntax CreateDeclarationSyntax(Token token, Syntax right)
+        internal virtual Syntax CreateDeclarationSyntax(IToken token, Syntax right)
         {
             NotImplementedMethod(token, right);
             return null;
@@ -92,6 +74,7 @@ namespace Reni.ReniParser
         }
 
         internal virtual IEnumerable<Syntax> ToList(List type) { yield return this; }
+        [DisableDump]
         internal virtual CompoundSyntax ToContainer => ListSyntax.Spread(this).ToContainer;
         internal virtual bool IsMutableSyntax => false;
         internal virtual bool IsConverterSyntax => false;
@@ -103,58 +86,55 @@ namespace Reni.ReniParser
         internal virtual bool IsBraceLike => false;
 
         internal virtual Syntax SyntaxError
-            (
-            IssueId issue,
-            Token token,
-            Syntax right = null,
-            params ParsedSyntax[] parts)
+            (IssueId issue, IToken token, Syntax right = null)
         {
-            NotImplementedMethod(issue, token, right, (object) parts);
-            return null;
-        }
-
-        internal virtual Syntax Surround(params ParsedSyntax[] parts)
-        {
-            NotImplementedMethod((object) parts);
+            NotImplementedMethod(issue, token, right);
             return null;
         }
 
         internal virtual Syntax SuffixedBy(DefinableTokenSyntax definable)
             => new ExpressionSyntax(ToCompiledSyntax, definable, null);
 
-        protected override sealed ParsedSyntax[] Children
-            => _parts.plus(SyntaxChildren.ToArray<ParsedSyntax>());
+        [DisableDump]
+        internal IEnumerable<IssueBase> Issues
+            => Parts().SelectMany(item => item.DirectIssues).ToArray();
 
-        protected virtual IEnumerable<Syntax> SyntaxChildren { get { yield break; } }
+        [DisableDump]
+        internal virtual IEnumerable<IssueBase> DirectIssues { get { yield break; } }
 
-        internal virtual IEnumerable<IssueBase> Issues
-            => SyntaxChildren
-                .Where(item => item != null)
-                .SelectMany(item => item.Issues);
 
         internal TokenInformation LocateToken(SourcePosn sourcePosn)
         {
-            if(Token.Characters.Contains(sourcePosn))
+            var token = Token;
+            if(token.Characters.Contains(sourcePosn))
                 return new SyntaxToken(this);
 
             if(!SourcePart.Contains(sourcePosn))
                 return null;
 
             var child =
-                Children.Select(item => ((Syntax) item)?.LocateToken(sourcePosn))
+                Token
+                    .OtherParts<Syntax>()
+                    .Select(item => item?.LocateToken(sourcePosn))
                     .FirstOrDefault(item => item != null);
 
             if(child != null)
                 return child;
 
-            var whiteSpaceToken = Token.PrecededWith.First
+            var whiteSpaceToken = token.PrecededWith.First
                 (item => item.Characters.Contains(sourcePosn));
             return new UserInterface.WhiteSpaceToken(whiteSpaceToken);
         }
 
         internal virtual Syntax RightParenthesis(RightParenthesis.Syntax rightBracket)
-            => new CompileSyntaxError(IssueId.ExtraRightBracket, Token)
-                .Surround(rightBracket);
+            => new CompileSyntaxError(IssueId.ExtraRightBracket, Token);
+
+        internal IEnumerable<Syntax> Parts()
+            => new[] {this}
+                .Concat
+                (DirectChildren().SelectMany(item => item == null ? new Syntax[0] : item.Parts()));
+
+        protected virtual IEnumerable<Syntax> DirectChildren() { yield break; }
     }
 
 

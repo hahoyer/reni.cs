@@ -13,7 +13,7 @@ namespace Reni.Validation
         [EnableDump]
         readonly IssueBase _issueBase;
 
-        public ConsequentialError(Token token, IssueBase issueBase)
+        public ConsequentialError(IToken token, IssueBase issueBase)
             : base(token, IssueId.ConsequentialError) { _issueBase = issueBase; }
         internal override CodeBase Code => _issueBase.Code + base.Code;
     }

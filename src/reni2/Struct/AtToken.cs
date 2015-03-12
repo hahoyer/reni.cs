@@ -10,10 +10,10 @@ using Reni.TokenClasses;
 namespace Reni.Struct
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class AtToken : InfixToken, ITokenClassWithId
+    sealed class AtToken : InfixToken
     {
-        public const string Id = "_A_T_";
-        string ITokenClassWithId.Id => Id;
+        public const string TokenId = "_A_T_";
+        public override string Id => TokenId;
         public override Result Result(ContextBase callContext, Category category, CompileSyntax left, CompileSyntax right)
             => left.AtTokenResult(callContext, category, right);
     }

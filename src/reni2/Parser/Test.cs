@@ -11,8 +11,6 @@ namespace Reni.Parser
     [FeatureTest.ConversionService.Closure]
     public sealed class ParserTest : CompilerTest
     {
-        public override void Run() { }
-
         //[Test]
         public void SimpleFunction()
         {
@@ -26,9 +24,11 @@ namespace Reni.Parser
         [FeatureTest.ConversionService.Closure]
         public void Add2Numbers()
         {
+
             var syntaxPrototype =
                 (LikeSyntax.Number(2) + LikeSyntax.Number(4)).dump_print;
             Parameters.ParseOnly = true;
+
             CreateFileAndRunCompiler
                 ("Add2Numbers", @"(2+4) dump_print", expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
         }

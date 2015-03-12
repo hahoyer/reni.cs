@@ -12,34 +12,34 @@ namespace Reni.TokenClasses
 {
     abstract class Definable : TokenClass
     {
-        protected override sealed Syntax Terminal(Token token)
+        protected override sealed Syntax Terminal(IToken token)
             => Syntax(token);
 
-        protected override sealed Syntax Prefix(Token token, Syntax right)
+        protected override sealed Syntax Prefix(IToken token, Syntax right)
             => new ExpressionSyntax(null, Syntax(token), right.ToCompiledSyntax);
 
-        protected override sealed Syntax Suffix(Syntax left, Token token)
+        protected override sealed Syntax Suffix(Syntax left, IToken token)
             => left.SuffixedBy(Syntax(token));
 
-        protected override sealed Syntax Infix(Syntax left, Token token, Syntax right)
+        protected override sealed Syntax Infix(Syntax left, IToken token, Syntax right)
             => new ExpressionSyntax(left.ToCompiledSyntax, Syntax(token), right.ToCompiledSyntax);
 
         [DisableDump]
-        protected string DataFunctionName => Name.Symbolize();
+        protected string DataFunctionName => Id.Symbolize();
 
         [DisableDump]
         internal virtual IEnumerable<IGenericProviderForDefinable> Genericize
             => this.GenericListFromDefinable();
 
-        DefinableTokenSyntax Syntax(Token token) => new DefinableTokenSyntax(this, token);
+        DefinableTokenSyntax Syntax(IToken token) => new DefinableTokenSyntax(this, token);
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
     [Variant(false)]
     [Variant(true)]
-    sealed class ConcatArrays : Definable, ITokenClassWithId
+    sealed class ConcatArrays : Definable
     {
-        public const string Id = "<<";
+        public const string TokenId = "<<";
         public const string MutableId = "<<:=";
         internal bool IsMutable { get; }
 
@@ -49,46 +49,46 @@ namespace Reni.TokenClasses
         internal override IEnumerable<IGenericProviderForDefinable> Genericize
             => this.GenericListFromDefinable(base.Genericize);
 
-        string ITokenClassWithId.Id => IsMutable ? MutableId : Id;
+        public override string Id => IsMutable ? MutableId : TokenId;
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class Item : Definable, ITokenClassWithId
+    sealed class Item : Definable
     {
-        public const string Id = "item";
+        public const string TokenId = "item";
         [DisableDump]
         internal override IEnumerable<IGenericProviderForDefinable> Genericize
             => this.GenericListFromDefinable(base.Genericize);
-        string ITokenClassWithId.Id => Id;
+        public override string Id => TokenId;
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class Count : Definable, ITokenClassWithId
+    sealed class Count : Definable
     {
-        public const string Id = "count";
+        public const string TokenId = "count";
         [DisableDump]
         internal override IEnumerable<IGenericProviderForDefinable> Genericize
             => this.GenericListFromDefinable(base.Genericize);
-        string ITokenClassWithId.Id => Id;
+        public override string Id => TokenId;
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class Reference : Definable, ITokenClassWithId
+    sealed class Reference : Definable
     {
-        public const string Id = "reference";
+        public const string TokenId = "reference";
         [DisableDump]
         internal override IEnumerable<IGenericProviderForDefinable> Genericize
             => this.GenericListFromDefinable(base.Genericize);
-        string ITokenClassWithId.Id => Id;
+        public override string Id => TokenId;
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class ArrayReference : Definable, ITokenClassWithId
+    sealed class ArrayReference : Definable
     {
-        public const string Id = "array_reference";
+        public const string TokenId = "array_reference";
         [DisableDump]
         internal override IEnumerable<IGenericProviderForDefinable> Genericize
             => this.GenericListFromDefinable(base.Genericize);
-        string ITokenClassWithId.Id => Id;
+        public override string Id => TokenId;
     }
 }

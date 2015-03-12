@@ -9,7 +9,7 @@ using JetBrains.Annotations;
 namespace hw.Scanner
 {
     [DebuggerDisplay("{NodeDump}")]
-    public sealed class SourcePart : Dumpable, IAggregateable<SourcePart>
+    public sealed class SourcePart : Dumpable, IAggregateable<SourcePart>, ISourcePart
     {
         readonly int _length;
         readonly Source _source;
@@ -31,6 +31,10 @@ namespace hw.Scanner
         [DisableDump]
         public int Length { get { return _length; } }
 
+        [DisableDump]
+        public int EndPosition { get { return Position + Length; } }
+
+
         SourcePart IAggregateable<SourcePart>.Aggregate(SourcePart other) { return Overlay(other); }
 
         public SourcePart Overlay(SourcePart other)
@@ -38,7 +42,7 @@ namespace hw.Scanner
             if(Source != other.Source)
                 return this;
             var start = Math.Min(Position, other.Position);
-            var end = Math.Max(Position + Length, other.Position + other.Length);
+            var end = Math.Max(EndPosition, other.Position + other.Length);
             return new SourcePart(Source, start, end - start);
         }
 
@@ -51,27 +55,27 @@ namespace hw.Scanner
                     : left.Overlay(right);
         }
 
-        public string Name { get { return Source.SubString(Position, Length); } }
+        public string Id { get { return Source.SubString(Position, Length); } }
 
         [DisableDump]
-        public string FilePosition { get { return "\n" + Source.FilePosn(Position, Name); } }
+        public string FilePosition { get { return "\n" + Source.FilePosn(Position, Id); } }
 
         public string FileErrorPosition(string errorTag)
         {
-            return "\n" + Source.FilePosn(Position, Name, "error " + errorTag);
+            return "\n" + Source.FilePosn(Position, Id, "error " + errorTag);
         }
 
         [UsedImplicitly]
-        string DumpCurrent { get { return Name; } }
+        string DumpCurrent { get { return Id; } }
 
         const int DumpWidth = 10;
 
         string GetDumpAfterCurrent(int dumpWidth)
         {
-            if(Source.IsEnd(Position + Length))
+            if(Source.IsEnd(EndPosition))
                 return "";
-            var length = Math.Min(dumpWidth, Source.Length - Position - Length);
-            var result = Source.SubString(Position + Length, length);
+            var length = Math.Min(dumpWidth, Source.Length - EndPosition);
+            var result = Source.SubString(EndPosition, length);
             if(length == dumpWidth)
                 result += "...";
             return result;
@@ -101,13 +105,13 @@ namespace hw.Scanner
         [DisableDump]
         public SourcePosn Start { get { return Source + Position; } }
         [DisableDump]
-        public SourcePosn End { get { return Source + Position + Length; } }
+        public SourcePosn End { get { return Source + EndPosition; } }
 
         public SourcePart Combine(SourcePart other)
         {
             Tracer.Assert(Source == other.Source);
-            Tracer.Assert(Position + Length <= other.Position);
-            return new SourcePart(Source, Position, other.Position + other.Length - Position);
+            Tracer.Assert(EndPosition <= other.Position);
+            return new SourcePart(Source, Position, other.EndPosition - Position);
         }
 
         public static SourcePart Span(SourcePosn first, SourcePosn other)
@@ -125,7 +129,9 @@ namespace hw.Scanner
         {
             return Source == sourcePosn.Source &&
                 Position <= sourcePosn.Position &&
-                Position + Length > sourcePosn.Position;
+                EndPosition > sourcePosn.Position;
         }
+
+        SourcePart ISourcePart.All { get { return this; } }
     }
 }

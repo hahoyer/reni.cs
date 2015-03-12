@@ -50,6 +50,8 @@ namespace HoyerWare.ReniLanguagePackage
                 if(lineIndex == -1 && tokenInfo.EndIndex == -1)
                     BreakExecution();
 
+                if(lineIndex == 3 && tokenInfo.EndIndex == 12)
+                    Tracer.TraceBreak();
                 var token = _compilerCache.Value.Token(position);
                 if(token == null)
                 {

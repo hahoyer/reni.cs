@@ -37,16 +37,8 @@ namespace Reni
             Else = elseSyntax;
         }
 
-        CondSyntax(CondSyntax other, ParsedSyntax[] parts)
-            : base(other, parts)
-        {
-            Cond = other.Cond;
-            Then = other.Then;
-            Else = other.Else;
-        }
-
         CondSyntax(CondSyntax other, CompileSyntax elseSyntax)
-            : base(other)
+            : base(other.Token)
         {
             Cond = other.Cond;
             Then = other.Then;
@@ -54,22 +46,15 @@ namespace Reni
             Else = elseSyntax;
         }
 
-        internal override CompileSyntax SurroundCompileSyntax(params ParsedSyntax[] parts)
-            => new CondSyntax(this, parts);
+        protected override IEnumerable<Syntax> DirectChildren()
+        {
+            yield return Cond;
+            yield return Then;
+            yield return Else;
+        }
 
         internal override Result ResultForCache(ContextBase context, Category category)
             => InternalResult(context, category);
-
-        [DisableDump]
-        protected override IEnumerable<Syntax> SyntaxChildren
-        {
-            get
-            {
-                yield return Cond;
-                yield return Then;
-                yield return Else;
-            }
-        }
 
         Result CondResult(ContextBase context, Category category) => Cond
             .Result(context, category.Typed)
@@ -144,5 +129,6 @@ namespace Reni
                     .RootContext.VoidType.Result(category);
             return base.PendingResultForCache(context, category);
         }
+
     }
 }

@@ -12,7 +12,7 @@ namespace Reni.ReniParser
     {
         internal DeclarationSyntax
             (
-            Token token,
+            IToken token,
             CompileSyntax body,
             DefinableTokenSyntax target = null
             )
@@ -20,12 +20,6 @@ namespace Reni.ReniParser
         {
             Target = target;
             Body = body;
-        }
-        DeclarationSyntax(DeclarationSyntax other, ParsedSyntax[] parts)
-            : base(other,parts)
-        {
-            Target = other.Target;
-            Body = other.Body;
         }
 
         [EnableDump]
@@ -46,7 +40,13 @@ namespace Reni.ReniParser
 
         protected override string GetNodeDump() => (Name ?? "") + ": " + Body.NodeDump;
 
-        string Name => Target?.Definable?.Name;
+        string Name => Target?.Definable?.Id;
+
+        protected override IEnumerable<Syntax> DirectChildren()
+        {
+            yield return Target;
+            yield return Body;
+        }
 
         internal override IEnumerable<KeyValuePair<string, int>> GetDeclarations(int index)
         {
@@ -61,18 +61,6 @@ namespace Reni.ReniParser
             if(Name == null)
                 yield break;
             yield return Name;
-        }
-
-        internal override Syntax Surround(params ParsedSyntax[] parts)
-            => new DeclarationSyntax(this, parts);
-
-        protected override IEnumerable<Syntax> SyntaxChildren
-        {
-            get
-            {
-                yield return Target;
-                yield return Body;
-            }
         }
     }
 }

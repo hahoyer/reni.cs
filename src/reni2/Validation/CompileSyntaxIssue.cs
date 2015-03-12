@@ -2,15 +2,16 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using hw.Debug;
+using hw.Parser;
 using hw.Scanner;
 
 namespace Reni.Validation
 {
     sealed class CompileSyntaxIssue : IssueBase
     {
-        readonly hw.Parser.Token _tokenData;
+        readonly IToken _tokenData;
 
-        internal CompileSyntaxIssue(IssueId issueId, hw.Parser.Token tokenData)
+        internal CompileSyntaxIssue(IssueId issueId, IToken tokenData)
             : base(issueId) { _tokenData = tokenData; }
 
         internal override string LogDump

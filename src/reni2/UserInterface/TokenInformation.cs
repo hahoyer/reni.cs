@@ -42,7 +42,7 @@ namespace Reni.UserInterface
         internal SyntaxToken(Syntax syntax) { Syntax = syntax; }
 
         public Syntax Syntax { get; }
-        public override SourcePart SourcePart => Syntax.Token.Characters;
+        public override SourcePart SourcePart => Syntax.Token.SourcePart;
         public override bool IsKeyword => Syntax.IsKeyword;
         public override bool IsIdentifier => Syntax.IsIdentifier;
         public override bool IsText => Syntax.IsText;

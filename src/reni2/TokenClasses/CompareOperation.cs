@@ -13,9 +13,9 @@ namespace Reni.TokenClasses
     [Variant(false, true)]
     [Variant(true, false)]
     [Variant(true, true)]
-    sealed class CompareOperation : Operation, ITokenClassWithId
+    sealed class CompareOperation : Operation
     {
-        public static string Id(bool isLess=true, bool canBeEqual=false) => (isLess ? "<" : ">") + (canBeEqual ? "=" : "");
+        public static string TokenId(bool isLess=true, bool canBeEqual=false) => (isLess ? "<" : ">") + (canBeEqual ? "=" : "");
 
         public CompareOperation(bool isLess, bool canBeEqual)
         {
@@ -25,7 +25,7 @@ namespace Reni.TokenClasses
 
         bool IsLess { get; }
         bool CanBeEqual { get; }
-        string ITokenClassWithId.Id => Id(IsLess, CanBeEqual);
+        public override string Id => TokenId(IsLess, CanBeEqual);
 
         [DisableDump]
         internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);

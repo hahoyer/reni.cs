@@ -13,17 +13,17 @@ namespace Reni.ReniParser
         ///     Creates the main token classes.
         /// </summary>
         /// <returns> </returns>
-        protected override IDictionary<string, TokenClass> GetPredefinedTokenClasses()
-            => TokenClasses.ToDictionary(t => t.Id, t => (TokenClass) t);
+        protected override IEnumerable<TokenClass> GetPredefinedTokenClasses()
+            => TokenClasses;
 
-        IEnumerable<ITokenClassWithId> TokenClasses
+        IEnumerable<TokenClass> TokenClasses
             => GetType()
                 .Assembly
                 .GetTypes()
                 .Where(BelongsToFactory)
                 .SelectMany(CreateInstance);
 
-        IEnumerable<ITokenClassWithId> CreateInstance(System.Type type)
+        IEnumerable<TokenClass> CreateInstance(System.Type type)
         {
             var variants = type.GetAttributes<Variant>(false).ToArray();
             if(variants.Any())
@@ -32,16 +32,14 @@ namespace Reni.ReniParser
             return new[] {SpecialTokenClass(type)};
         }
 
-        protected virtual ITokenClassWithId SpecialTokenClass(System.Type type)
-            => (ITokenClassWithId) Activator.CreateInstance(type);
+        protected virtual TokenClass SpecialTokenClass(System.Type type)
+            => (TokenClass) Activator.CreateInstance(type);
 
         bool BelongsToFactory(System.Type type)
         {
-            if(type.Is<ITokenClassWithId>())
-                return type
-                    .GetAttributes<BelongsTo>(true)
-                    .Any(attr => GetType().Is(attr.TokenFactory));
-            return false;
+            return type.Is<TokenClass>() && !type.IsAbstract && type
+                .GetAttributes<BelongsTo>(true)
+                .Any(attr => GetType().Is(attr.TokenFactory));
         }
     }
 }

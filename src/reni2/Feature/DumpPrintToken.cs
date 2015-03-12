@@ -8,10 +8,10 @@ using Reni.TokenClasses;
 namespace Reni.Feature
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class DumpPrintToken : Definable, ITokenClassWithId
+    sealed class DumpPrintToken : Definable
     {
-        public const string Id = "dump_print";
-        string ITokenClassWithId.Id => Id;
+        public const string TokenId = "dump_print";
+        public override string Id => TokenId;
         [DisableDump]
         internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
     }

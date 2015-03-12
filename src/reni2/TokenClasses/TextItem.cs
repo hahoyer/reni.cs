@@ -8,11 +8,11 @@ using Reni.ReniParser;
 namespace Reni.TokenClasses
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class TextItem : Definable, ITokenClassWithId
+    sealed class TextItem : Definable
     {
         [DisableDump]
         internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
-        public const string Id = "text_item";
-        string ITokenClassWithId.Id => Id;
+        public const string TokenId = "text_item";
+        public override string Id => TokenId;
     }
 }

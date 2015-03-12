@@ -8,37 +8,37 @@ using Reni.ReniParser;
 namespace Reni.TokenClasses
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class ReassignToken : Definable, ITokenClassWithId
+    sealed class ReassignToken : Definable
     {
-        public const string Id = ":=";
-        string ITokenClassWithId.Id => Id;
+        public const string TokenId = ":=";
+        public override string Id => TokenId;
         [DisableDump]
         internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class ForceMutabilityToken : Definable, ITokenClassWithId
+    sealed class ForceMutabilityToken : Definable
     {
-        public const string Id = "force_mutability";
-        string ITokenClassWithId.Id => Id;
+        public const string TokenId = "force_mutability";
+        public override string Id => TokenId;
         [DisableDump]
         internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class Mutable : Definable, ITokenClassWithId
+    sealed class Mutable : Definable
     {
-        public const string Id = "mutable";
-        string ITokenClassWithId.Id => Id;
+        public const string TokenId = "mutable";
+        public override string Id => TokenId;
         [DisableDump]
         internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class EnableReinterpretation : Definable, ITokenClassWithId
+    sealed class EnableReinterpretation : Definable
     {
-        public const string Id = "enable_reinterpretation";
-        string ITokenClassWithId.Id => Id;
+        public const string TokenId = "enable_reinterpretation";
+        public override string Id => TokenId;
         [DisableDump]
         internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
     }

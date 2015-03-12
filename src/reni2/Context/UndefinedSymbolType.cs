@@ -12,7 +12,7 @@ namespace Reni.Context
     {
         readonly string _targetIdentifier;
 
-        UndefinedSymbolIssue(Token token, string targetIdentifier)
+        UndefinedSymbolIssue(IToken token, string targetIdentifier)
             : base(token, IssueId.UndefinedSymbol)
         {
             _targetIdentifier = targetIdentifier;
@@ -29,13 +29,13 @@ namespace Reni.Context
             }
         }
 
-        internal static IssueType Type(Token token, TypeBase target)
+        internal static IssueType Type(IToken token, TypeBase target)
             =>
                 new IssueType
                     (
                     new UndefinedSymbolIssue(token, "Type: " + target.DumpPrintText),
                     target.RootContext);
-        public static IssueType Type(Token token, ContextBase target)
+        public static IssueType Type(IToken token, ContextBase target)
             =>
                 new IssueType
                     (
@@ -45,13 +45,13 @@ namespace Reni.Context
 
     sealed class AmbiguousSymbolIssue : SyntaxIssue
     {
-        AmbiguousSymbolIssue(Token token)
+        AmbiguousSymbolIssue(IToken token)
             : base(token, IssueId.UndefinedSymbol)
         {
             StopByObjectId(266);
         }
 
-        internal static IssueType Type(Token token, Root rootContext)
+        internal static IssueType Type(IToken token, Root rootContext)
             => new IssueType(new AmbiguousSymbolIssue(token), rootContext);
     }
 }

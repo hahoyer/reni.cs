@@ -6,10 +6,10 @@ using hw.Scanner;
 namespace hw.Parser
 {
     public interface IType<TTreeItem>
-        where TTreeItem : class
+        where TTreeItem : class, ISourcePart
     {
-        TTreeItem Create(TTreeItem left, Token part, TTreeItem right);
-        string PrioTableName { get; }
+        TTreeItem Create(TTreeItem left, IToken token, TTreeItem right);
+        string PrioTableId { get; }
         ISubParser<TTreeItem> NextParser { get; }
         IType<TTreeItem> NextTypeIfMatched { get; }
     }

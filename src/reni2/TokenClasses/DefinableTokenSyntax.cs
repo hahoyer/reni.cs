@@ -13,7 +13,7 @@ namespace Reni.TokenClasses
         internal DefinableTokenSyntax
             (
             Definable definable,
-            Token tokenData)
+            IToken tokenData)
             : base(tokenData)
         {
             Tags = new DeclarationTagSyntax[0];
@@ -29,20 +29,13 @@ namespace Reni.TokenClasses
             Definable = other.Definable;
         }
 
-        DefinableTokenSyntax(DefinableTokenSyntax other, ParsedSyntax[] parts)
-            : base(other, parts)
-        {
-            Tags = other.Tags;
-            Definable = other.Definable;
-        }
-
         internal override bool IsIdentifier => true;
         internal bool IsConverter => Tags.Any(item => item.DeclaresConverter);
         internal bool IsMutable => Tags.Any(item => item.DeclaresMutable);
         internal DeclarationTagSyntax[] Tags { get; }
         internal Definable Definable { get; }
 
-        internal override Syntax CreateDeclarationSyntax(Token token, Syntax right)
+        internal override Syntax CreateDeclarationSyntax(IToken token, Syntax right)
             => new DeclarationSyntax(token, right.ToCompiledSyntax, this);
 
         [DisableDump]
@@ -54,10 +47,6 @@ namespace Reni.TokenClasses
                 return new ExpressionSyntax(null, this, null);
             }
         }
-
-        protected override IEnumerable<Syntax> SyntaxChildren => Tags;
-
-        internal override Syntax Surround(params ParsedSyntax[] parts)
-            => new DefinableTokenSyntax(this, parts);
+        protected override IEnumerable<Syntax> DirectChildren() => Tags;
     }
 }

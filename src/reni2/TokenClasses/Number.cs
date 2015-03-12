@@ -11,14 +11,13 @@ namespace Reni.TokenClasses
 {
     sealed class Number : TerminalToken
     {
-        public override Result Result(ContextBase context, Category category, Token token)
-            => context.RootContext.BitType.Result(category, BitsConst.Convert(token.Name));
+        public override Result Result(ContextBase context, Category category, IToken token)
+            => context.RootContext.BitType.Result(category, BitsConst.Convert(token.Id));
 
-        public static Int64 ToInt64(Token token) => BitsConst.Convert(token.Name).ToInt64();
+        public static Int64 ToInt64(IToken token) => BitsConst.Convert(token.Id).ToInt64();
 
-        protected override Syntax Infix(Syntax left, Token token, Syntax right)
-            =>
-                new CompileSyntaxError(IssueId.UnexpectedUseAsSuffix, token)
-                    .SurroundCompileSyntax(left, right);
+        protected override Syntax Infix(Syntax left, IToken token, Syntax right)
+            => new CompileSyntaxError(IssueId.UnexpectedUseAsSuffix, token);
+        public override string Id => "<number>";
     }
 }

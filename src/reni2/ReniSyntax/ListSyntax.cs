@@ -13,18 +13,11 @@ namespace Reni.ReniSyntax
 {
     sealed class ListSyntax : Syntax
     {
-        public ListSyntax(List type, Token token, IEnumerable<Syntax> data)
+        public ListSyntax(List type, IToken token, IEnumerable<Syntax> data)
             : base(token)
         {
             Type = type;
             Data = data.ToArray();
-        }
-
-        ListSyntax(ListSyntax other, ParsedSyntax[] parts)
-            : base(other,parts)
-        {
-            Type = other.Type;
-            Data = other.Data.ToArray();
         }
 
         [EnableDump]
@@ -36,19 +29,15 @@ namespace Reni.ReniSyntax
 
         [DisableDump]
         internal override CompoundSyntax ToContainer 
-            => new CompoundSyntax(Token, Data, Children);
+            => new CompoundSyntax(Token, Data);
 
         internal override IEnumerable<Syntax> ToList(List type)
         {
-            Tracer.Assert(Type == null || type == null || Type == type, () => Type.Name.Quote() + " != " + type?.Name.Quote());
+            Tracer.Assert(Type == null || type == null || Type == type, () => Type.Id.Quote() + " != " + type?.Id.Quote());
             return Data;
         }
 
         internal static ListSyntax Spread(Syntax statement) => new ListSyntax(null, statement.Token, statement.ToList(null));
-
-        protected override IEnumerable<Syntax> SyntaxChildren => Data;
-
-        internal override Syntax Surround(params ParsedSyntax[] parts)
-            => new ListSyntax(this, parts);
+        protected override IEnumerable<ReniParser.Syntax> DirectChildren() => Data;
     }
 }

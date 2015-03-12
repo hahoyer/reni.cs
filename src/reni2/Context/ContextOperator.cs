@@ -2,24 +2,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using hw.Parser;
-using hw.Scanner;
 using Reni.Basics;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
 using Reni.TokenClasses;
-using Reni.Validation;
 
 namespace Reni.Context
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class ContextOperator : NonPrefix, ITokenClassWithId
+    sealed class ContextOperator : NonPrefix
     {
-        public const string Id = "^^";
-        string ITokenClassWithId.Id => Id;
+        public const string TokenId = "^^";
+        public override string Id => TokenId;
 
-        public override Result Result(ContextBase context, Category category, Token token) => context
-            .FindRecentCompoundView
-            .ObjectPointerViaContext(category);
+        public override Result Result(ContextBase context, Category category, IToken token)
+            => context
+                .FindRecentCompoundView
+                .ObjectPointerViaContext(category);
 
         public override Result Result(ContextBase context, Category category, CompileSyntax left)
         {
@@ -47,6 +46,5 @@ namespace Reni.Context
                 EndMethodDump();
             }
         }
-
     }
 }

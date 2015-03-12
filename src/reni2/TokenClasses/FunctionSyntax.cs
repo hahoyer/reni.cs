@@ -1,7 +1,6 @@
 using System.Linq;
 using System.Collections.Generic;
 using System;
-using hw.Debug;
 using hw.Helper;
 using hw.Parser;
 using Reni.Basics;
@@ -22,7 +21,7 @@ namespace Reni.TokenClasses
 
         public FunctionSyntax
             (
-            Token token,
+            IToken token,
             CompileSyntax setter,
             bool isImplicit,
             bool isMetaFunction,
@@ -35,13 +34,10 @@ namespace Reni.TokenClasses
             IsMetaFunction = isMetaFunction;
         }
 
-        FunctionSyntax(FunctionSyntax other, ParsedSyntax[] parts)
-            : base(other, parts)
+        protected override IEnumerable<Syntax> DirectChildren()
         {
-            Getter = other.Getter;
-            Setter = other.Setter;
-            IsImplicit = other.IsImplicit;
-            IsMetaFunction = other.IsMetaFunction;
+            yield return Setter;
+            yield return Getter;
         }
 
         string Tag
@@ -56,8 +52,6 @@ namespace Reni.TokenClasses
                 .Result(category);
 
         protected override bool GetIsLambda() => true;
-        internal override CompileSyntax SurroundCompileSyntax(params ParsedSyntax[] parts)
-            => new FunctionSyntax(this, parts);
 
         internal IContextMetaFunctionFeature ContextMetaFunctionFeature(CompoundView compoundView)
         {
@@ -80,16 +74,6 @@ namespace Reni.TokenClasses
             if(IsMetaFunction)
                 return null;
             return new FunctionBodyType(compoundView, this);
-        }
-
-        [DisableDump]
-        protected override IEnumerable<Syntax> SyntaxChildren
-        {
-            get
-            {
-                yield return Getter;
-                yield return Setter;
-            }
         }
     }
 }

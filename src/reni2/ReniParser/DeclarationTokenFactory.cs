@@ -17,12 +17,17 @@ namespace Reni.ReniParser
                 prioTable += PrioTable.Left("converter", "mutable");
                 prioTable = prioTable.ParenthesisLevelLeft
                     (
-                        new[] {LeftParenthesis.Id(1), LeftParenthesis.Id(2), LeftParenthesis.Id(3)},
                         new[]
                         {
-                            RightParenthesis.Id(1),
-                            RightParenthesis.Id(2),
-                            RightParenthesis.Id(3)
+                            LeftParenthesis.TokenId(1),
+                            LeftParenthesis.TokenId(2),
+                            LeftParenthesis.TokenId(3)
+                        },
+                        new[]
+                        {
+                            RightParenthesis.TokenId(1),
+                            RightParenthesis.TokenId(2),
+                            RightParenthesis.TokenId(3)
                         }
                     );
                 prioTable += PrioTable.Left(PrioTable.Any);
@@ -37,6 +42,7 @@ namespace Reni.ReniParser
         sealed class Unexpected : DeclarationTagToken
         {
             internal override bool IsError => true;
+            public override string Id => "<unexpected>";
         }
 
         protected override TokenClass GetEndOfText() { throw new NotImplementedException(); }

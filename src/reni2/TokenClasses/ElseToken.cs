@@ -10,20 +10,20 @@ using Reni.Validation;
 namespace Reni.TokenClasses
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class ElseToken : TokenClass, ITokenClassWithId
+    sealed class ElseToken : TokenClass
     {
-        public const string Id = "else";
-        string ITokenClassWithId.Id => Id;
+        public const string TokenId = "else";
+        public override string Id => TokenId;
 
-        protected override ReniParser.Syntax Infix(ReniParser.Syntax left, Token token, ReniParser.Syntax right)
+        protected override ReniParser.Syntax Infix(ReniParser.Syntax left, IToken token, ReniParser.Syntax right)
             => left.CreateElseSyntax(new Syntax(token), right.ToCompiledSyntax);
 
-        protected override ReniParser.Syntax Terminal(Token token)
+        protected override ReniParser.Syntax Terminal(IToken token)
             => new CompileSyntaxError(IssueId.UnexpectedUseAsTerminal, token);
 
         internal sealed class Syntax : ReniParser.Syntax
         {
-            public Syntax(Token token)
+            public Syntax(IToken token)
                 : base(token)
             { }
 

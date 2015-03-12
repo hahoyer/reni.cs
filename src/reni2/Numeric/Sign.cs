@@ -11,42 +11,41 @@ namespace Reni.Numeric
 {
     [BelongsTo(typeof(MainTokenFactory))]
     sealed class Minus
-        : TransformationOperation, ITokenClassWithId
+        : TransformationOperation
     {
-        public const string Id = "-";
-        public Minus() { Name = Id; }
+        public const string TokenId = "-";
         protected override int Signature(int objSize, int argSize) => BitsConst.PlusSize(objSize, argSize);
         [DisableDump]
         internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
-        string ITokenClassWithId.Id => Id;
+        public override string Id => TokenId;
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
     sealed class Plus
-        : TransformationOperation, ITokenClassWithId
+        : TransformationOperation
     {
-        public const string Id = "+";
+        public const string TokenId = "+";
         protected override int Signature(int objSize, int argSize) => BitsConst.PlusSize(objSize, argSize);
         [DisableDump]
         internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
-        string ITokenClassWithId.Id => Id;
+        public override string Id => TokenId;
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class Negate : Definable, ITokenClassWithId
+    sealed class Negate : Definable
     {
-        public const string Id = "negate";
+        public const string TokenId = "negate";
         [DisableDump]
         internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
-        string ITokenClassWithId.Id => Id;
+        public override string Id => TokenId;
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class AlignToken : Definable, ITokenClassWithId
+    sealed class AlignToken : Definable
     {
-        public const string Id = "!!!";
+        public const string TokenId = "!!!";
         [DisableDump]
         internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
-        string ITokenClassWithId.Id => Id;
+        public override string Id => TokenId;
     }
 }

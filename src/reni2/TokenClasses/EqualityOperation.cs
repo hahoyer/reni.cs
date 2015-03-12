@@ -11,15 +11,16 @@ namespace Reni.TokenClasses
     [BelongsTo(typeof(MainTokenFactory))]
     [Variant(false)]
     [Variant(true)]
-    sealed class EqualityOperation : Operation, ITokenClassWithId
+    sealed class EqualityOperation : Operation
     {
-        public static string Id(bool isEqual=true) => isEqual ? "=" : "<>";
+        public static string TokenId(bool isEqual = true) => isEqual ? "=" : "<>";
 
         public EqualityOperation(bool isEqual) { IsEqual = isEqual; }
         bool IsEqual { get; }
-        string ITokenClassWithId.Id => Id(IsEqual);
+        public override string Id => TokenId(IsEqual);
 
         [DisableDump]
-        internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
+        internal override IEnumerable<IGenericProviderForDefinable> Genericize
+            => this.GenericListFromDefinable(base.Genericize);
     }
 }

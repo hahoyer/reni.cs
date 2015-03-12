@@ -18,31 +18,24 @@ namespace Reni.Validation
         public SyntaxError
             (
             IssueId issueId,
-            Token token,
+            IToken token,
             SyntaxError previous = null)
             : base(token)
         {
             _issueId = issueId;
             _previous = previous;
-        }
-
-        SyntaxError(SyntaxError other, ParsedSyntax[] parts)
-            : base(other, parts)
-        {
-            _issueId = other._issueId;
-            _previous = other._previous;
             _issueCache = new ValueCache<CompileSyntaxIssue>
-                (() => new CompileSyntaxIssue(_issueId, Token));
+                 (() => new CompileSyntaxIssue(_issueId, Token));
         }
 
-        internal override IEnumerable<IssueBase> Issues => _issueCache.Value.plus(base.Issues);
-
-        internal override bool IsError => true;
-
-        internal override Syntax Surround(params ParsedSyntax[] parts)
-            => new SyntaxError(this, parts);
+        protected override IEnumerable<Syntax> DirectChildren()
+        {
+            yield return _previous;
+        }
 
         [DisableDump]
-        protected override IEnumerable<Syntax> SyntaxChildren { get { yield return _previous; } }
+        internal override IEnumerable<IssueBase> DirectIssues => _issueCache.Value.plus(base.DirectIssues);
+
+        internal override bool IsError => true;
     }
 }
