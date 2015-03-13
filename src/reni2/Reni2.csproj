@@ -67,7 +67,9 @@
     <Compile Include="FeatureTest\Function\SimpleFunctionWithNonLocal.cs" />
     <Compile Include="FeatureTest\Function\TwoFunctions.cs" />
     <Compile Include="FeatureTest\Function\TwoFunctions1.cs" />
+    <Compile Include="FeatureTest\Helper\CompilerTest.cs" />
     <Compile Include="FeatureTest\Helper\LikeSyntax.cs" />
+    <Compile Include="FeatureTest\Helper\TargetSetData.cs" />
     <Compile Include="FeatureTest\Reference\ArrayElementType.cs" />
     <Compile Include="FeatureTest\Reference\ArrayElementType1.cs" />
     <Compile Include="FeatureTest\Reference\ArrayReferenceAll.cs" />
@@ -92,7 +94,6 @@
     <Compile Include="FeatureTest\Structure\SomeVariables.cs" />
     <Compile Include="FeatureTest\Structure\StrangeStructs.cs" />
     <Compile Include="FeatureTest\Structure\AccessMember.cs" />
-    <Compile Include="FeatureTest\TargetSetData.cs" />
     <Compile Include="FeatureTest\TypeType\ApplyTypeOperator.cs" />
     <Compile Include="FeatureTest\TypeType\ApplyTypeOperatorWithCut.cs" />
     <Compile Include="FeatureTest\TypeType\TypeOperator.cs" />
@@ -100,7 +101,7 @@
     <Compile Include="FeatureTest\UserObjects.cs" />
     <Compile Include="FeatureTest\Validation\SyntaxError.cs" />
     <Compile Include="FeatureTest\Validation\UndefinedContextSymbol.cs" />
-    <Compile Include="FeatureTest\Validation\UnMatchedLeftParenthesis.cs" />
+    <Compile Include="FeatureTest\Validation\UnMatchedBrackets.cs" />
     <Compile Include="Feature\Extension.cs" />
     <Compile Include="Feature\Function.cs" />
     <Compile Include="Feature\SearchResult.cs" />
@@ -263,7 +264,6 @@
     <Compile Include="Context\ReplacePrimitiveRecursivity.cs" />
     <Compile Include="ExpectedCompilationResult.cs" />
     <Compile Include="FeatureTest\BitArrayOp.cs" />
-    <Compile Include="FeatureTest\CompilerTest.cs" />
     <Compile Include="Context\Function.cs" />
     <Compile Include="Context\Root.cs" />
     <Compile Include="FeatureTest\TextStruct.cs" />

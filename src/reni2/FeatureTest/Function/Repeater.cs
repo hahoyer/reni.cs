@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 using hw.UnitTest;
 using Reni.FeatureTest.DefaultOperations;
+using Reni.FeatureTest.Helper;
 using Reni.FeatureTest.Structure;
 using Reni.FeatureTest.ThenElse;
 using Reni.FeatureTest.TypeType;

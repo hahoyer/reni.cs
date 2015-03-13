@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.UnitTest;
+using Reni.FeatureTest.Helper;
 
 namespace Reni.FeatureTest
 {

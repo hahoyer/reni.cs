@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using hw.Debug;
 using hw.Helper;
 using hw.UnitTest;
+using Reni.FeatureTest.Helper;
 using Reni.Validation;
 
 namespace Reni.FeatureTest.Validation

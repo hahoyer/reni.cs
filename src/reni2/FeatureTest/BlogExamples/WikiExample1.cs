@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.UnitTest;
+using Reni.FeatureTest.Helper;
 using Reni.FeatureTest.Structure;
 
 namespace Reni.FeatureTest.BlogExamples

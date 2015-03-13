@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.UnitTest;
+using Reni.FeatureTest.Helper;
 
 namespace Reni.FeatureTest
 {
@@ -40,4 +41,8 @@ complex FromReal(2) dump_print;
 ", 
         "2+0i -1+0i")]
     public sealed class UserObjects : CompilerTest {}
+
+    [TestFixture]
+    public sealed class UserI{ }
+
 }

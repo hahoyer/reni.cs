@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System;
 using hw.Debug;
 using hw.UnitTest;
+using Reni.FeatureTest.Helper;
 
 namespace Reni.FeatureTest.Structure
 {

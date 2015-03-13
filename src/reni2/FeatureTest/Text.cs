@@ -4,7 +4,7 @@ using System;
 using hw.Parser;
 using hw.UnitTest;
 using Reni.FeatureTest.Array;
-using Reni.FeatureTest.BitArrayOp;
+using Reni.FeatureTest.Helper;
 
 namespace Reni.FeatureTest.Text
 {
@@ -70,7 +70,7 @@ x item(4) dump_print;
 
     [TestFixture]
     [Hallo]
-    [Number]
+    [BitArrayOp.Number]
     [ConvertFromNumber]
     [ConversionService.Closure]
     [TargetSet("('80' to_number_of_base 16) dump_print", "128")]

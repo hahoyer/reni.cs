@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.UnitTest;
 using Reni.FeatureTest.BitArrayOp;
+using Reni.FeatureTest.Helper;
 
 namespace Reni.FeatureTest.DefaultOperations
 {

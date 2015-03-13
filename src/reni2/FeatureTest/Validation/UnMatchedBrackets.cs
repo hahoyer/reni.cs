@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.UnitTest;
+using Reni.FeatureTest.Helper;
 using Reni.Validation;
 
 namespace Reni.FeatureTest.Validation
@@ -42,4 +43,10 @@ namespace Reni.FeatureTest.Validation
             Tracer.Assert(i == issueArray.Length);
         }
     }
+
+
+    [TestFixture]
+    [UnMatchedLeftParenthesis]
+    [UnMatchedRightParenthesis]
+    public sealed class UnMatchedBrackets : CompilerTest {}
 }

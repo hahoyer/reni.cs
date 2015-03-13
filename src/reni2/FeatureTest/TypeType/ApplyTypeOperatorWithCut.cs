@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 using hw.UnitTest;
 using Reni.FeatureTest.ConversionService;
+using Reni.FeatureTest.Helper;
 
 namespace Reni.FeatureTest.TypeType
 {
