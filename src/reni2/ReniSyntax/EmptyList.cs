@@ -10,8 +10,8 @@ namespace Reni.ReniSyntax
 {
     sealed class EmptyList : CompileSyntax
     {
-        public EmptyList(SourcePosn posn)
-            : base(new Token<ParsedSyntax>(null, posn.Span(0)))
+        public EmptyList(IToken token)
+            : base(token)
         {
             StopByObjectIds();
         }

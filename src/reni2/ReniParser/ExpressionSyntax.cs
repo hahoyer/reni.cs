@@ -38,7 +38,6 @@ namespace Reni.ReniParser
         protected override IEnumerable<Syntax> DirectChildren()
         {
             yield return Left;
-            yield return Operator;
             yield return Right;
         }
 

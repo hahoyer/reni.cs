@@ -31,6 +31,8 @@ namespace Reni.Validation
             _previous = previous;
             _issueCache = new ValueCache<CompileSyntaxIssue>
                 (() => new CompileSyntaxIssue(_issueId, Token));
+
+            StopByObjectIds();
         }
 
         protected override IEnumerable<Syntax> DirectChildren()

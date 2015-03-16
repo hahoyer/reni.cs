@@ -24,5 +24,6 @@ namespace Reni.Validation
         public static readonly IssueId CompiledSyntaxExpected = new IssueId();
         public static readonly IssueId IdentifyerExpected = new IssueId();
         public static readonly IssueId ExtraRightBracket = new IssueId();
+        public static readonly IssueId MissingValueInDeclaration = new IssueId();
     }
 }

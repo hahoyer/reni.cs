@@ -14,8 +14,15 @@ namespace Reni.TokenClasses
     {
         public const string TokenId = ":";
         public override string Id => TokenId;
+
+        protected override Syntax Suffix(Syntax left, IToken token)
+            =>
+                left.CreateDeclarationSyntax
+                    (token, new CompileSyntaxError(IssueId.MissingValueInDeclaration, token));
+
         protected override Syntax Infix(Syntax left, IToken token, Syntax right)
             => left.CreateDeclarationSyntax(token, right);
+
         protected override Syntax Terminal(IToken token)
         {
             NotImplementedMethod(token);
@@ -90,7 +97,10 @@ namespace Reni.TokenClasses
 
         internal DeclarationTagSyntax
             (DeclarationTagToken tag, IToken token)
-            : base(token) { _tag = tag; }
+            : base(token)
+        {
+            _tag = tag;
+        }
 
         [DisableDump]
         internal bool DeclaresMutable => _tag is MutableDeclarationToken;
@@ -102,9 +112,8 @@ namespace Reni.TokenClasses
         internal override bool IsError => _tag.IsError;
 
         internal override Syntax CreateDeclarationSyntax(IToken token, Syntax right)
-            =>
-                _tag.DeclarationSyntax
-                    (token, right.CheckedToCompiledSyntax(token, RightMustNotBeNullError));
+            => _tag.DeclarationSyntax
+                (token, right.CheckedToCompiledSyntax(token, RightMustNotBeNullError));
 
         internal override Syntax SuffixedBy(DefinableTokenSyntax definable)
             => new DefinableTokenSyntax(definable, this);
@@ -117,6 +126,5 @@ namespace Reni.TokenClasses
 
         internal DefinableTokenSyntax DefinableTokenSyntax(DefinableTokenSyntax definable)
             => new DefinableTokenSyntax(definable, this);
-
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using hw.Helper;
 using System.Linq;
 using hw.Debug;
 using hw.Parser;
@@ -62,7 +63,7 @@ namespace Reni.ReniParser
             var result = GetNodeDump();
             if(!IsDetailedDumpRequired)
                 return result;
-            if(!isInDump)
+            if(!isInDump && SourcePart.Source.IsPersistent)
                 result += FilePosition();
             if(isInContainerDump)
                 result += " ObjectId=" + ObjectId;
@@ -72,6 +73,8 @@ namespace Reni.ReniParser
             _isInDump = isInDump;
             return result;
         }
+
+        protected override string GetNodeDump() => GetType().PrettyName();
 
         internal virtual IEnumerable<Syntax> ToList(List type) { yield return this; }
         [DisableDump]
@@ -97,7 +100,7 @@ namespace Reni.ReniParser
 
         [DisableDump]
         internal IEnumerable<IssueBase> Issues
-            => Parts().SelectMany(item => item.DirectIssues).ToArray();
+            => Parts.SelectMany(item => item.DirectIssues).ToArray();
 
         [DisableDump]
         internal virtual IEnumerable<IssueBase> DirectIssues { get { yield break; } }
@@ -129,29 +132,59 @@ namespace Reni.ReniParser
         internal virtual Syntax RightParenthesis(RightParenthesis.Syntax rightBracket)
             => new CompileSyntaxError(IssueId.ExtraRightBracket, Token);
 
-        internal IEnumerable<Syntax> Parts()
-            => new[] {this}
-                .Concat
-                (DirectChildren().SelectMany(item => item == null ? new Syntax[0] : item.Parts()));
+        [DisableDump]
+        internal IEnumerable<Syntax> Parts => DirectChildren()
+            .Where(item => item != null)
+            .SelectMany(item => item.Parts)
+            .Concat(new[] {this});
 
         protected virtual IEnumerable<Syntax> DirectChildren() { yield break; }
+
+        internal SourcePart[] SourceParts()
+            => Parts
+                .SelectMany(item => item.Token.Parts())
+                .Aggregate(new SourcePart[0], Extension.Combine);
+
+        internal void AssertValid()
+        {
+            Tracer.Assert(SourceParts().Count() == 1, () => Tracer.Dump(Parts.ToArray()));
+            Tracer.Assert
+                (SourceParts().Single().Id == Token.SourcePart.Id, Tracer.Dump(Parts.ToArray()));
+        }
     }
 
 
     static class Extension
     {
         internal static T[] plus<T>(this T x, params IEnumerable<T>[] y)
-            => new[] {x}.Concat(y.SelectMany(item => item)).ToDisitncNotNullArray();
+            => new[] {x}.Concat(y.SelectMany(item => item)).ToDistinctNotNullArray();
 
         internal static T[] plus<T>(this T[] x, params T[] y)
             => (x ?? new T[0])
                 .Concat(y ?? new T[0])
-                .ToDisitncNotNullArray();
+                .ToDistinctNotNullArray();
 
         internal static T[] plus<T>(this T x, params T[] y)
-            => new[] {x}.Concat(y).ToDisitncNotNullArray();
+            => new[] {x}.Concat(y).ToDistinctNotNullArray();
 
-        internal static T[] ToDisitncNotNullArray<T>(this IEnumerable<T> y)
+        internal static T[] ToDistinctNotNullArray<T>(this IEnumerable<T> y)
             => (y).Where(item => item != null).Distinct().ToArray();
+
+        internal static SourcePart[] Combine(SourcePart[] current, SourcePart next)
+            => SourcePart
+                .SaveCombine(current.plus(next))
+                .ToArray();
+
+        internal static IEnumerable<SourcePart> Parts(this IToken token)
+        {
+            foreach(var whiteSpaceToken in token.PrecededWith)
+                yield return whiteSpaceToken.Characters;
+            yield return token.Characters;
+        }
+
+        internal static CompileSyntax CheckedToCompiledSyntax
+            (this Syntax target, IToken token, Func<IssueId> getError)
+            => target?.ToCompiledSyntax
+                ?? new CompileSyntaxError(getError(), token);
     }
 }

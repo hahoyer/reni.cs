@@ -70,7 +70,7 @@ namespace Reni.TokenClasses
                 (RightParenthesis.Syntax rightBracket)
             {
                 Tracer.Assert(_level == rightBracket.Level);
-                return (Right ?? new EmptyList(Token.SourcePart.End));
+                return (Right ?? new EmptyList(Token));
             }
         }
     }

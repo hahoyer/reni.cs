@@ -29,18 +29,25 @@ namespace Reni.TokenClasses
         Syntax IOperator<Syntax>.Infix(Syntax left, IToken token, Syntax right)
             => Infix(left, token, right);
 
-        protected virtual Syntax Terminal(IToken token)
-            => new Validation.SyntaxError(IssueId.UnexpectedSyntaxError, token);
+        protected abstract Syntax Terminal(IToken token);
 
         protected virtual Syntax Prefix(IToken token, Syntax right)
-            => new Validation.SyntaxError(IssueId.UnexpectedSyntaxError, token);
+        {
+            NotImplementedMethod(token, right);
+            return null;
+        }
 
         protected virtual Syntax Suffix(Syntax left, IToken token)
-            => new Validation.SyntaxError(IssueId.UnexpectedSyntaxError, token);
+        {
+            NotImplementedMethod(left, token);
+            return null;
+        }
 
         protected virtual Syntax Infix(Syntax left, IToken token, Syntax right)
-            => new Validation.SyntaxError(IssueId.UnexpectedSyntaxError, token);
-
+        {
+            NotImplementedMethod(left, token, right);
+            return null;
+        }
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]

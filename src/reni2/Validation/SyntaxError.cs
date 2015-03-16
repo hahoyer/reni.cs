@@ -5,6 +5,7 @@ using hw.Debug;
 using hw.Helper;
 using hw.Parser;
 using Reni.ReniParser;
+using Reni.ReniSyntax;
 
 namespace Reni.Validation
 {
@@ -15,7 +16,7 @@ namespace Reni.Validation
         readonly SyntaxError _previous;
         readonly ValueCache<CompileSyntaxIssue> _issueCache;
 
-        public SyntaxError
+        SyntaxError
             (
             IssueId issueId,
             IToken token,
@@ -25,16 +26,14 @@ namespace Reni.Validation
             _issueId = issueId;
             _previous = previous;
             _issueCache = new ValueCache<CompileSyntaxIssue>
-                 (() => new CompileSyntaxIssue(_issueId, Token));
+                (() => new CompileSyntaxIssue(_issueId, Token));
         }
 
-        protected override IEnumerable<Syntax> DirectChildren()
-        {
-            yield return _previous;
-        }
+        protected override IEnumerable<Syntax> DirectChildren() { yield return _previous; }
 
         [DisableDump]
-        internal override IEnumerable<IssueBase> DirectIssues => _issueCache.Value.plus(base.DirectIssues);
+        internal override IEnumerable<IssueBase> DirectIssues
+            => _issueCache.Value.plus(base.DirectIssues);
 
         internal override bool IsError => true;
     }
