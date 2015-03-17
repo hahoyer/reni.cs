@@ -46,11 +46,14 @@ namespace Reni
             Else = elseSyntax;
         }
 
-        protected override IEnumerable<Syntax> DirectChildren()
+        protected override IEnumerable<Syntax> DirectChildren
         {
-            yield return Cond;
-            yield return Then;
-            yield return Else;
+            get
+            {
+                yield return Cond;
+                yield return Then;
+                yield return Else;
+            }
         }
 
         internal override Result ResultForCache(ContextBase context, Category category)

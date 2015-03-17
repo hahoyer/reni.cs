@@ -79,13 +79,21 @@ namespace Reni.ReniParser
         internal virtual IEnumerable<Syntax> ToList(List type) { yield return this; }
         [DisableDump]
         internal virtual CompoundSyntax ToContainer => ListSyntax.Spread(this).ToContainer;
+        [DisableDump]
         internal virtual bool IsMutableSyntax => false;
+        [DisableDump]
         internal virtual bool IsConverterSyntax => false;
+        [DisableDump]
         internal virtual bool IsIdentifier => false;
+        [DisableDump]
         internal virtual bool IsText => false;
+        [DisableDump]
         internal virtual bool IsKeyword => false;
+        [DisableDump]
         internal virtual bool IsNumber => false;
+        [DisableDump]
         internal virtual bool IsError => false;
+        [DisableDump]
         internal virtual bool IsBraceLike => false;
 
         internal virtual Syntax SyntaxError
@@ -133,12 +141,13 @@ namespace Reni.ReniParser
             => new CompileSyntaxError(IssueId.ExtraRightBracket, Token);
 
         [DisableDump]
-        internal IEnumerable<Syntax> Parts => DirectChildren()
+        internal IEnumerable<Syntax> Parts => DirectChildren
             .Where(item => item != null)
             .SelectMany(item => item.Parts)
-            .Concat(new[] {this});
+            .plus(this);
 
-        protected virtual IEnumerable<Syntax> DirectChildren() { yield break; }
+        [DisableDump]
+        protected virtual IEnumerable<Syntax> DirectChildren { get { yield break; } }
 
         internal SourcePart[] SourceParts()
             => Parts
@@ -147,10 +156,25 @@ namespace Reni.ReniParser
 
         internal void AssertValid()
         {
-            Tracer.Assert(SourceParts().Count() == 1, () => Tracer.Dump(Parts.ToArray()));
+            Tracer.Assert(SourceParts().Count() == 1, TraceParts);
             Tracer.Assert
-                (SourceParts().Single().Id == Token.SourcePart.Id, Tracer.Dump(Parts.ToArray()));
+                (SourceParts().Single().Id == Token.SourcePart.Id, TraceParts);
         }
+
+        string TraceParts()
+            => Tracer.Dump
+                (
+                    Parts
+                        .Select
+                        (
+                            item => new
+                            {
+                                SourcePart = item.Token.SourcePart.NodeDump,
+                                item
+                            }
+                        )
+                        .ToArray()
+                );
     }
 
 
@@ -159,7 +183,7 @@ namespace Reni.ReniParser
         internal static T[] plus<T>(this T x, params IEnumerable<T>[] y)
             => new[] {x}.Concat(y.SelectMany(item => item)).ToDistinctNotNullArray();
 
-        internal static T[] plus<T>(this T[] x, params T[] y)
+        internal static T[] plus<T>(this IEnumerable<T> x, params T[] y)
             => (x ?? new T[0])
                 .Concat(y ?? new T[0])
                 .ToDistinctNotNullArray();
@@ -177,6 +201,8 @@ namespace Reni.ReniParser
 
         internal static IEnumerable<SourcePart> Parts(this IToken token)
         {
+            if(token == null)
+                yield break;
             foreach(var whiteSpaceToken in token.PrecededWith)
                 yield return whiteSpaceToken.Characters;
             yield return token.Characters;
@@ -186,5 +212,8 @@ namespace Reni.ReniParser
             (this Syntax target, IToken token, Func<IssueId> getError)
             => target?.ToCompiledSyntax
                 ?? new CompileSyntaxError(getError(), token);
+
+        internal static Token<Syntax> Token(this SourcePosn sourcePosn)
+            => new Token<Syntax>(null, sourcePosn.Span(0));
     }
 }

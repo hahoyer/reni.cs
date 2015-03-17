@@ -29,7 +29,7 @@ namespace Reni.Validation
                 (() => new CompileSyntaxIssue(_issueId, Token));
         }
 
-        protected override IEnumerable<Syntax> DirectChildren() { yield return _previous; }
+        protected override IEnumerable<Syntax> DirectChildren { get { yield return _previous; } }
 
         [DisableDump]
         internal override IEnumerable<IssueBase> DirectIssues

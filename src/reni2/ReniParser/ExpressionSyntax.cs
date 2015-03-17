@@ -35,10 +35,13 @@ namespace Reni.ReniParser
         [Node]
         internal CompileSyntax Right { get; }
 
-        protected override IEnumerable<Syntax> DirectChildren()
+        protected override IEnumerable<Syntax> DirectChildren
         {
-            yield return Left;
-            yield return Right;
+            get
+            {
+                yield return Left;
+                yield return Right;
+            }
         }
 
         internal override Result ResultForCache(ContextBase context, Category category)

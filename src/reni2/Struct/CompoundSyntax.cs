@@ -154,6 +154,6 @@ namespace Reni.Struct
                 => accessPoint.AccessFeature(Value);
         }
 
-        protected override IEnumerable<Syntax> DirectChildren() => _statements;
+        protected override IEnumerable<Syntax> DirectChildren => _statements;
     }
 }

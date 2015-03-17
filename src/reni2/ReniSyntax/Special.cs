@@ -59,7 +59,7 @@ namespace Reni.ReniSyntax
             .Result(context, category, Token, _right);
 
         protected override string GetNodeDump() => base.GetNodeDump() + "(" + _right.NodeDump + ")";
-        protected override IEnumerable<Syntax> DirectChildren() { yield return _right; }
+        protected override IEnumerable<Syntax> DirectChildren { get { yield return _right; } }
     }
 
     sealed class InfixSyntax : SpecialSyntax
@@ -109,10 +109,13 @@ namespace Reni.ReniSyntax
             return result;
         }
 
-        protected override IEnumerable<Syntax> DirectChildren()
+        protected override IEnumerable<Syntax> DirectChildren
         {
-            yield return _left;
-            yield return _right;
+            get
+            {
+                yield return _left;
+                yield return _right;
+            }
         }
     }
 
@@ -142,7 +145,7 @@ namespace Reni.ReniSyntax
             .Result(context, category, _left);
 
         protected override string GetNodeDump() => "(" + _left.NodeDump + ")" + base.GetNodeDump();
-        protected override IEnumerable<Syntax> DirectChildren() { yield return _left; }
+        protected override IEnumerable<Syntax> DirectChildren { get { yield return _left; } }
     }
 
     interface ITerminal

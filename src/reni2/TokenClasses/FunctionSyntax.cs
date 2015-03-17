@@ -34,10 +34,13 @@ namespace Reni.TokenClasses
             IsMetaFunction = isMetaFunction;
         }
 
-        protected override IEnumerable<Syntax> DirectChildren()
+        protected override IEnumerable<Syntax> DirectChildren
         {
-            yield return Setter;
-            yield return Getter;
+            get
+            {
+                yield return Setter;
+                yield return Getter;
+            }
         }
 
         string Tag

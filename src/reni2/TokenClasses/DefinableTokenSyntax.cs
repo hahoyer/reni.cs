@@ -30,7 +30,9 @@ namespace Reni.TokenClasses
         }
 
         internal override bool IsIdentifier => true;
+        [DisableDumpExcept(true)]
         internal bool IsConverter => Tags.Any(item => item.DeclaresConverter);
+        [DisableDumpExcept(true)]
         internal bool IsMutable => Tags.Any(item => item.DeclaresMutable);
         internal DeclarationTagSyntax[] Tags { get; }
         internal Definable Definable { get; }
@@ -47,6 +49,8 @@ namespace Reni.TokenClasses
                 return new ExpressionSyntax(null, this, null);
             }
         }
-        protected override IEnumerable<Syntax> DirectChildren() => Tags;
+
+        [DisableDump]
+        protected override IEnumerable<Syntax> DirectChildren => Tags;
     }
 }

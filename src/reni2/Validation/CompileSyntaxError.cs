@@ -18,8 +18,6 @@ namespace Reni.Validation
         readonly CompileSyntaxError _previous;
         readonly ValueCache<CompileSyntaxIssue> _issueCache;
 
-        internal override IEnumerable<IssueBase> DirectIssues => Issue.plus(base.DirectIssues);
-
         public CompileSyntaxError
             (
             IssueId issueId,
@@ -33,23 +31,16 @@ namespace Reni.Validation
                 (() => new CompileSyntaxIssue(_issueId, Token));
 
             StopByObjectIds();
+            AssertValid();
         }
 
-        protected override IEnumerable<Syntax> DirectChildren()
-        {
-            yield return _previous;
-        }
-
+        internal override bool IsError => true;
+        [DisableDump]
+        internal override IEnumerable<IssueBase> DirectIssues => Issue.plus(base.DirectIssues);
+        [DisableDump]
+        protected override IEnumerable<Syntax> DirectChildren { get { yield return _previous; } }
         [DisableDump]
         CompileSyntaxIssue Issue => _issueCache.Value;
-
-        internal override Result ResultForCache(ContextBase context, Category category)
-        {
-            var result = Chain
-                .Select(error => error.IssueType(context).IssueResult(category))
-                .Aggregate(context.RootContext.VoidType.Result(category), (x, y) => x + y);
-            return result;
-        }
 
         [DisableDump]
         IEnumerable<CompileSyntaxError> Chain
@@ -65,9 +56,16 @@ namespace Reni.Validation
             }
         }
 
+        internal override Result ResultForCache(ContextBase context, Category category)
+        {
+            var result = Chain
+                .Select(error => error.IssueType(context).IssueResult(category))
+                .Aggregate(context.RootContext.VoidType.Result(category), (x, y) => x + y);
+            return result;
+        }
+
         IssueType IssueType(ContextBase context) => new IssueType(Issue, context.RootContext);
 
-        internal override bool IsError => true;
         internal override Syntax SyntaxError
             (IssueId issue, IToken token, Syntax right = null)
             => new CompileSyntaxError(issue, token, this);

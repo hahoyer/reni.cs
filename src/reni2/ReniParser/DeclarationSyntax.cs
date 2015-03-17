@@ -20,13 +20,16 @@ namespace Reni.ReniParser
         {
             Target = target;
             Body = body;
+            StopByObjectIds();
+            AssertValid();
         }
 
         [EnableDump]
         DefinableTokenSyntax Target { get; }
         [EnableDump]
         Syntax Body { get; }
-        [DisableDump]
+
+        string Name => Target?.Definable?.Id;
         internal override bool IsKeyword => true;
         [DisableDump]
         internal override bool IsMutableSyntax => Target?.IsMutable ?? false;
@@ -38,15 +41,20 @@ namespace Reni.ReniParser
         internal override CompileSyntax ContainerStatementToCompileSyntax
             => Body.ContainerStatementToCompileSyntax;
 
-        protected override string GetNodeDump() => (Name ?? "") + ": " + Body.NodeDump;
-
-        string Name => Target?.Definable?.Id;
-
-        protected override IEnumerable<Syntax> DirectChildren()
+        [DisableDump]
+        protected override IEnumerable<Syntax> DirectChildren
         {
-            yield return Target;
-            yield return Body;
+            get
+            {
+                yield return Target;
+                yield return Body;
+            }
         }
+
+        protected override string GetNodeDump()
+            => base.GetNodeDump() + 
+            (Name == null ? "" : "(" + Name + ")");
+
 
         internal override IEnumerable<KeyValuePair<string, int>> GetDeclarations(int index)
         {

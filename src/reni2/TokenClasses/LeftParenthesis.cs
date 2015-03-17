@@ -55,10 +55,7 @@ namespace Reni.TokenClasses
                 Right = right;
             }
 
-            protected override IEnumerable<ReniParser.Syntax> DirectChildren()
-            {
-                yield return Right;
-            }
+            protected override IEnumerable<ReniParser.Syntax> DirectChildren { get { yield return Right; } }
 
             [DisableDump]
             internal override CompileSyntax ToCompiledSyntax
