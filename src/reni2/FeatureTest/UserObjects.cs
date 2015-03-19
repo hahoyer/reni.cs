@@ -90,10 +90,9 @@ complex FromReal(2) dump_print;
             {
                 var textFragement = text.Substring(0, i);
                 var compiler = new Compiler(text: textFragement);
-                var s = compiler.Syntax.SourceParts();
+                var syntax = compiler.Syntax;
 
-                Tracer.Assert(s.Length == 1);
-                var span = s.First();
+                var span = syntax.SourcePart;
                 Tracer.Assert(span.Id == textFragement, () => span.NodeDump);
             }
 

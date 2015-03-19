@@ -13,7 +13,7 @@ using Reni.Validation;
 
 namespace Reni.ReniParser
 {
-    abstract class Syntax : ParsedSyntax
+    abstract class Syntax : ParsedSyntax, IPropertyProvider
     {
         protected Syntax(IToken token)
             : base(token) {}
@@ -48,6 +48,23 @@ namespace Reni.ReniParser
             NotImplementedMethod(token, right);
             return null;
         }
+
+        protected virtual Syntax Surround(PropertyProvider other) => new ProxySyntax(this, other);
+
+        internal Syntax CheckedSurround(IPropertyProvider provider, SourcePart sourcePart)
+        {
+            if(provider == null || SourceParts.Contain(sourcePart))
+                return this;
+
+            return Surround(new PropertyProvider(provider, sourcePart));
+        }
+
+        internal new virtual SourcePart SourcePart
+            => base.SourcePart +
+                DirectChildren
+                    .Where(item => item != null)
+                    .Select(item => item.SourcePart)
+                    .Aggregate();
 
         static bool _isInDump;
 
@@ -123,14 +140,7 @@ namespace Reni.ReniParser
             if(!SourcePart.Contains(sourcePosn))
                 return null;
 
-            var child =
-                Token
-                    .OtherParts<Syntax>()
-                    .Select(item => item?.LocateToken(sourcePosn))
-                    .FirstOrDefault(item => item != null);
-
-            if(child != null)
-                return child;
+            NotImplementedMethod(sourcePosn);
 
             var whiteSpaceToken = token.PrecededWith.First
                 (item => item.Characters.Contains(sourcePosn));
@@ -149,33 +159,39 @@ namespace Reni.ReniParser
         [DisableDump]
         protected virtual IEnumerable<Syntax> DirectChildren { get { yield break; } }
 
-        internal SourcePart[] SourceParts()
-            => Parts
-                .SelectMany(item => item.Token.Parts())
-                .Aggregate(new SourcePart[0], Extension.Combine);
+        [DisableDump]
+        internal SourcePart[] SourceParts => Parts
+            .SelectMany(item => item.Token.Parts())
+            .Aggregate(new[] {SourcePart}, Extension.Combine)
+            .ToArray();
 
-        internal void AssertValid()
+        sealed class ProxySyntax : Syntax
         {
-            Tracer.Assert(SourceParts().Count() == 1, TraceParts);
-            Tracer.Assert
-                (SourceParts().Single().Id == Token.SourcePart.Id, TraceParts);
-        }
+            public ProxySyntax(Syntax value, PropertyProvider other)
+                : base(value.Token)
+            {
+                Value = value;
+                Other = other;
+            }
 
-        string TraceParts()
-            => Tracer.Dump
-                (
-                    Parts
-                        .Select
-                        (
-                            item => new
-                            {
-                                SourcePart = item.Token.SourcePart.NodeDump,
-                                item
-                            }
-                        )
-                        .ToArray()
-                );
+            Syntax Value { get; }
+            public PropertyProvider Other { get; }
+            internal override SourcePart SourcePart => base.SourcePart + Other.SourcePart.All;
+        }
     }
+
+    sealed class PropertyProvider : DumpableObject
+    {
+        public IPropertyProvider Provider { get; set; }
+        public ISourcePart SourcePart { get; set; }
+        public PropertyProvider(IPropertyProvider provider, ISourcePart sourcePart)
+        {
+            Provider = provider;
+            SourcePart = sourcePart;
+        }
+    }
+
+    interface IPropertyProvider {}
 
 
     static class Extension
@@ -215,5 +231,32 @@ namespace Reni.ReniParser
 
         internal static Token<Syntax> Token(this SourcePosn sourcePosn)
             => new Token<Syntax>(null, sourcePosn.Span(0));
+
+        public static bool Contain
+            (this IEnumerable<SourcePart> source, IEnumerable<SourcePart> value)
+            => value.All(source.Contain);
+
+        public static bool Contain(this IEnumerable<SourcePart> source, SourcePart value)
+        {
+            foreach(var sourcePart in source
+                .Where(item => item.Source == value.Source)
+                .OrderBy(item => item.Position)
+                .Where(item => value.Start < item.End)
+                .Where(item => item.Start < value.End))
+            {
+                if(value.Start < sourcePart.Start)
+                    return false;
+
+                if(value.Start >= sourcePart.End)
+                    continue;
+
+                if(value.End <= sourcePart.End)
+                    return true;
+
+                value = sourcePart.End.Span(value.End);
+            }
+
+            return false;
+        }
     }
 }

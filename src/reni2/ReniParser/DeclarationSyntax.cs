@@ -21,7 +21,6 @@ namespace Reni.ReniParser
             Target = target;
             Body = body;
             StopByObjectIds();
-            AssertValid();
         }
 
         [EnableDump]

@@ -150,7 +150,17 @@ namespace hw.Scanner
 
         static IEnumerable<SourcePart> SaveCombineForSource(IEnumerable<SourcePart> values)
         {
-            var sortedValues = values.OrderBy(item => item.Position).ToArray();
+            var sortedValues = values
+                .Where(item => item.Length > 0)
+                .OrderBy(item => item.Position)
+                .ToArray();
+
+            if(!sortedValues.Any())
+            {
+                yield return values.First();
+                yield break;
+            }
+
             var currentValue = sortedValues[0];
 
             foreach(var value in sortedValues.Skip(1))
@@ -168,7 +178,7 @@ namespace hw.Scanner
 
         public static bool operator !=(SourcePart left, SourcePart right)
         {
-            return !(left== right);
+            return !(left == right);
         }
         public static bool operator >(SourcePart left, SourcePosn right) { return right < left; }
         public static bool operator >(SourcePosn left, SourcePart right) { return right < left; }
@@ -195,7 +205,7 @@ namespace hw.Scanner
                 return ((object) right == null);
             if((object) right == null)
                 return false;
-                return left.Start == right.Start &&
+            return left.Start == right.Start &&
                 left.Length == right.Length;
         }
     }

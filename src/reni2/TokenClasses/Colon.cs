@@ -18,7 +18,7 @@ namespace Reni.TokenClasses
         protected override Syntax Suffix(Syntax left, IToken token)
             =>
                 left.CreateDeclarationSyntax
-                    (token, new CompileSyntaxError(IssueId.MissingValueInDeclaration, token));
+                    (token, new CompileSyntaxError(IssueId.MissingValueInDeclaration, token.Characters.End.Token()));
 
         protected override Syntax Infix(Syntax left, IToken token, Syntax right)
             => left.CreateDeclarationSyntax(token, right);

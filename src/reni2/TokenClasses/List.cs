@@ -23,15 +23,15 @@ namespace Reni.TokenClasses
             =>
                 ListSyntax
                     (
-                        new EmptyList(token),
+                        new EmptyList(token.Characters.End),
                         token,
-                        new EmptyList(token));
+                        new EmptyList(token.Characters.Start));
 
         protected override Syntax Prefix(IToken token, Syntax right)
-            => ListSyntax(new EmptyList(token), token, right);
+            => ListSyntax(new EmptyList(token.Characters.End), token, right);
 
         protected override Syntax Suffix(Syntax left, IToken token)
-            => ListSyntax(left, token, new EmptyList(token));
+            => ListSyntax(left, token, new EmptyList(token.Characters.Start));
 
         protected override Syntax Infix(Syntax left, IToken token, Syntax right)
             => ListSyntax(left, token, right);

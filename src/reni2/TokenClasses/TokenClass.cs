@@ -1,21 +1,51 @@
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using hw.Debug;
 using hw.Helper;
 using hw.Parser;
+using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.ReniParser;
-using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
     /// <summary>
     ///     Base class for compiler tokens
     /// </summary>
-    abstract class TokenClass : TokenClass<Syntax>, IOperator<Syntax>
+    abstract class TokenClass : TokenClass<Syntax>, IOperator<Syntax>, IPropertyProvider
     {
         protected override sealed Syntax Create(Syntax left, IToken token, Syntax right)
-            => this.Operation(left, token, right);
+        {
+            var tokenSourcePart = token.SourcePart;
+            if(left != null)
+                Tracer.Assert
+                    (
+                        left.SourcePart < tokenSourcePart,
+                        left.SourcePart.NodeDump + " < " + tokenSourcePart.NodeDump
+                    );
+            if(right != null)
+                Tracer.Assert(tokenSourcePart < right.SourcePart);
+
+            var result = this.Operation(left, token, right)
+                .CheckedSurround(left, left?.SourcePart)
+                .CheckedSurround(this, tokenSourcePart)
+                .CheckedSurround(right, right?.SourcePart)
+                ;
+
+            var resultSourcePart = result.SourcePart;
+            var leftSourcePart = (left?.SourcePart ?? tokenSourcePart);
+            var isLeftAligned = leftSourcePart.Start == resultSourcePart.Start;
+            var rightSourcePart = (right?.SourcePart ?? tokenSourcePart);
+            var isRightAligned = rightSourcePart.End == resultSourcePart.End;
+
+            if(isLeftAligned && isRightAligned)
+                return result;
+
+            NotImplementedMethod(left, token, right, nameof(result), result);
+            var pp = result.SourceParts;
+            return result;
+        }
 
         internal Syntax CreateForVisit(Syntax left, IToken token, Syntax right)
             => this.Operation(left, token, right);

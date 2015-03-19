@@ -31,7 +31,6 @@ namespace Reni.Validation
                 (() => new CompileSyntaxIssue(_issueId, Token));
 
             StopByObjectIds();
-            AssertValid();
         }
 
         internal override bool IsError => true;

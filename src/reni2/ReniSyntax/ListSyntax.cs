@@ -48,6 +48,7 @@ namespace Reni.ReniSyntax
                 statement.ToList(null)
                 );
 
+        [DisableDump]
         protected override IEnumerable<Syntax> DirectChildren => Data;
     }
 }

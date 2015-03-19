@@ -11,6 +11,10 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <NoWarn>660;661</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <NoWarn>660;661</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Basics\BitsConst.cs" />
@@ -167,6 +171,7 @@
     <Compile Include="hw\Parser\IOperator.cs" />
     <Compile Include="hw\Parser\IParser.cs" />
     <Compile Include="hw\Parser\IScanner.cs" />
+    <Compile Include="hw\Parser\IToken.cs" />
     <Compile Include="hw\Parser\ITokenClass.cs" />
     <Compile Include="hw\Parser\ITokenFactory.cs" />
     <Compile Include="hw\Parser\IType.cs" />

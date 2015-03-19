@@ -6,13 +6,13 @@ using hw.Debug;
 using hw.Forms;
 using hw.Helper;
 using hw.Parser;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.ReniParser;
 using Reni.Struct;
 using Reni.Type;
-using Reni.Validation;
 
 namespace Reni.ReniSyntax
 {
@@ -28,8 +28,7 @@ namespace Reni.ReniSyntax
             : base(token) { }
 
         internal CompileSyntax(IToken token, int objectId)
-            : base(token, objectId)
-        { }
+            : base(token, objectId) { }
 
         [DisableDump]
         internal bool IsLambda => GetIsLambda();
@@ -51,6 +50,7 @@ namespace Reni.ReniSyntax
 
         [DisableDump]
         internal override CompileSyntax ToCompiledSyntax => this;
+        protected override Syntax Surround(PropertyProvider other) => new ProxySyntax(this, other);
 
         internal void AddToCacheForDebug(ContextBase context, object cacheItem)
             => _resultCache.Add(context, cacheItem);
@@ -122,6 +122,20 @@ namespace Reni.ReniSyntax
         {
             NotImplementedMethod(visitor);
             return null;
+        }
+
+        sealed class ProxySyntax : CompileSyntax
+        {
+            public ProxySyntax(CompileSyntax value, PropertyProvider other)
+                : base(value.Token)
+            {
+                Value = value;
+                Other = other;
+            }
+
+            CompileSyntax Value { get; }
+            public PropertyProvider Other { get; set; }
+            internal override SourcePart SourcePart => base.SourcePart + Other.SourcePart.All;
         }
     }
 
