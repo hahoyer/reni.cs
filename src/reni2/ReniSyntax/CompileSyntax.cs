@@ -132,6 +132,7 @@ namespace Reni.ReniSyntax
             {
                 Value = value;
                 Other = other;
+                StopByObjectIds();
             }
 
             CompileSyntax Value { get; }

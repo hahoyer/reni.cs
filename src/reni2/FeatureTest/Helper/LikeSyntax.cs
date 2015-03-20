@@ -19,7 +19,7 @@ namespace Reni.FeatureTest.Helper
 
         public LikeSyntax Expression(string s2) => new Expression(this, s2, null);
 
-        public static LikeSyntax Struct
+        public static LikeSyntax Compound
             (LikeSyntax[] list, Declaration[] declarations, int[] converters)
             => new Struct(list, declarations, converters);
 

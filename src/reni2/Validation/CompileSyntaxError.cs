@@ -30,7 +30,7 @@ namespace Reni.Validation
             _issueCache = new ValueCache<CompileSyntaxIssue>
                 (() => new CompileSyntaxIssue(_issueId, Token));
 
-            StopByObjectIds();
+            StopByObjectIds(22);
         }
 
         internal override bool IsError => true;

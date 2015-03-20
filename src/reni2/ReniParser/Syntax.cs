@@ -176,12 +176,17 @@ namespace Reni.ReniParser
 
             Syntax Value { get; }
             public PropertyProvider Other { get; }
-            internal override CompileSyntax ToCompiledSyntax 
+
+            internal override SourcePart SourcePart => Value.SourcePart + Other.SourcePart.All;
+            internal override bool IsConverterSyntax => Value.IsConverterSyntax;
+            internal override Syntax UnProxy() => Value.UnProxy();
+
+            internal override CompileSyntax ToCompiledSyntax
                 => Value.ToCompiledSyntax.SurroundCompileSyntax(Other);
             internal override Syntax CreateDeclarationSyntax(IToken token, Syntax right)
                 => Value.CreateDeclarationSyntax(token, right);
-            internal override SourcePart SourcePart => Value.SourcePart + Other.SourcePart.All;
-            internal override Syntax UnProxy() => Value.UnProxy();
+            internal override CompileSyntax ContainerStatementToCompileSyntax
+                => Value.ContainerStatementToCompileSyntax;
         }
 
         internal ListSyntax ToListSyntax => new ListSyntax

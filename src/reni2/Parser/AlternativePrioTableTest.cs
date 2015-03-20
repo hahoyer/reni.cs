@@ -15,7 +15,7 @@ namespace Reni.Parser
         [Test]
         public void Converter()
         {
-            var syntaxPrototype = LikeSyntax.Struct
+            var syntaxPrototype = LikeSyntax.Compound
                 (
                     new[] {LikeSyntax.Number(3)},
                     new Declaration[] {},
@@ -29,7 +29,7 @@ namespace Reni.Parser
         [Test]
         public void ConverterAndProperty()
         {
-            var syntaxPrototype = LikeSyntax.Struct
+            var syntaxPrototype = LikeSyntax.Compound
                 (                              
                     new[] {LikeSyntax.Number(3), LikeSyntax.Number(4)},
                     new Declaration[] {},
