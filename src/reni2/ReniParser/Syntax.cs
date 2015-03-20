@@ -176,6 +176,10 @@ namespace Reni.ReniParser
 
             Syntax Value { get; }
             public PropertyProvider Other { get; }
+            internal override CompileSyntax ToCompiledSyntax 
+                => Value.ToCompiledSyntax.SurroundCompileSyntax(Other);
+            internal override Syntax CreateDeclarationSyntax(IToken token, Syntax right)
+                => Value.CreateDeclarationSyntax(token, right);
             internal override SourcePart SourcePart => Value.SourcePart + Other.SourcePart.All;
             internal override Syntax UnProxy() => Value.UnProxy();
         }
@@ -187,7 +191,7 @@ namespace Reni.ReniParser
             ToList(null)
             );
 
-        virtual internal Syntax UnProxy() => this;
+        internal virtual Syntax UnProxy() => this;
     }
 
     sealed class PropertyProvider : DumpableObject

@@ -50,7 +50,8 @@ namespace Reni.ReniSyntax
 
         [DisableDump]
         internal override CompileSyntax ToCompiledSyntax => this;
-        protected override Syntax Surround(PropertyProvider other) => new ProxySyntax(this, other);
+        protected sealed override Syntax Surround(PropertyProvider other) => SurroundCompileSyntax(other);
+        internal virtual CompileSyntax SurroundCompileSyntax(PropertyProvider other) => new ProxySyntax(this, other);
 
         internal void AddToCacheForDebug(ContextBase context, object cacheItem)
             => _resultCache.Add(context, cacheItem);
