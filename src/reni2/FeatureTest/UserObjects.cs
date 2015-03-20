@@ -95,8 +95,6 @@ complex FromReal(2) dump_print;
                 var span = syntax.SourcePart;
                 Tracer.Assert(span.Id == textFragement, () => span.NodeDump);
             }
-
-            throw new Exception();
         }
     }
 }

@@ -95,7 +95,7 @@ namespace Reni.ReniParser
 
         internal virtual IEnumerable<Syntax> ToList(List type) { yield return this; }
         [DisableDump]
-        internal virtual CompoundSyntax ToContainer => ListSyntax.Spread(this).ToContainer;
+        internal virtual CompoundSyntax ToContainer => ToListSyntax.ToContainer;
         [DisableDump]
         internal virtual bool IsMutableSyntax => false;
         [DisableDump]
@@ -176,8 +176,15 @@ namespace Reni.ReniParser
 
             Syntax Value { get; }
             public PropertyProvider Other { get; }
-            internal override SourcePart SourcePart => base.SourcePart + Other.SourcePart.All;
+            internal override SourcePart SourcePart => Value.SourcePart + Other.SourcePart.All;
         }
+
+        internal ListSyntax ToListSyntax => new ListSyntax
+            (
+            null,
+            SourcePart.End.Token(),
+            ToList(null)
+            );
     }
 
     sealed class PropertyProvider : DumpableObject

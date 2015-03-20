@@ -40,14 +40,6 @@ namespace Reni.ReniSyntax
             return Data;
         }
 
-        internal static ListSyntax Spread(Syntax statement)
-            => new ListSyntax
-                (
-                null,
-                statement.SourcePart.End.Token(),
-                statement.ToList(null)
-                );
-
         [DisableDump]
         protected override IEnumerable<Syntax> DirectChildren => Data;
     }

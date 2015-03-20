@@ -4,7 +4,6 @@ using System;
 using hw.Debug;
 using hw.Helper;
 using hw.Parser;
-using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.ReniParser;
 
@@ -18,26 +17,33 @@ namespace Reni.TokenClasses
         protected override sealed Syntax Create(Syntax left, IToken token, Syntax right)
         {
             var tokenSourcePart = token.SourcePart;
-            if(left != null)
+
+            var leftSourcePart = left?.SourcePart;
+            var rightSourcePart = right?.SourcePart;
+
+            var checkedLeftSourcePart = (leftSourcePart ?? tokenSourcePart);
+            var checkedRightSourcePart = (rightSourcePart ?? tokenSourcePart);
+
+            if(leftSourcePart != null)
                 Tracer.Assert
                     (
-                        left.SourcePart < tokenSourcePart,
-                        left.SourcePart.NodeDump + " < " + tokenSourcePart.NodeDump
+                        leftSourcePart < tokenSourcePart,
+                        leftSourcePart.NodeDump + " < " + tokenSourcePart.NodeDump
                     );
-            if(right != null)
-                Tracer.Assert(tokenSourcePart < right.SourcePart);
+            if(rightSourcePart != null)
+                Tracer.Assert(tokenSourcePart < rightSourcePart);
 
-            var result = this.Operation(left, token, right)
-                .CheckedSurround(left, left?.SourcePart)
+            var rawResult = this.Operation(left, token, right);
+            var result = rawResult
+                .CheckedSurround(left, leftSourcePart)
                 .CheckedSurround(this, tokenSourcePart)
-                .CheckedSurround(right, right?.SourcePart)
+                .CheckedSurround(right, rightSourcePart)
                 ;
 
             var resultSourcePart = result.SourcePart;
-            var leftSourcePart = (left?.SourcePart ?? tokenSourcePart);
-            var isLeftAligned = leftSourcePart.Start == resultSourcePart.Start;
-            var rightSourcePart = (right?.SourcePart ?? tokenSourcePart);
-            var isRightAligned = rightSourcePart.End == resultSourcePart.End;
+
+            var isLeftAligned = checkedLeftSourcePart.Start == resultSourcePart.Start;
+            var isRightAligned = checkedRightSourcePart.End == resultSourcePart.End;
 
             if(isLeftAligned && isRightAligned)
                 return result;

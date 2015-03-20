@@ -134,8 +134,8 @@ namespace Reni.ReniSyntax
             }
 
             CompileSyntax Value { get; }
-            public PropertyProvider Other { get; set; }
-            internal override SourcePart SourcePart => base.SourcePart + Other.SourcePart.All;
+            public PropertyProvider Other { get; }
+            internal override SourcePart SourcePart => Value.SourcePart + Other.SourcePart.All;
         }
     }
 
