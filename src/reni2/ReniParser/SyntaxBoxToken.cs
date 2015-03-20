@@ -8,10 +8,10 @@ namespace Reni.ReniParser
 {
     sealed class SyntaxBoxToken : TokenClass
     {
-        readonly ReniParser.Syntax _value;
-        public SyntaxBoxToken(ReniParser.Syntax value) { _value = value; }
+        readonly SourceSyntax _value;
+        public SyntaxBoxToken(SourceSyntax value) { _value = value; }
 
-        protected override ReniParser.Syntax Terminal(IToken token) => _value;
+        protected override ReniParser.Syntax Terminal(IToken token) => _value.Syntax;
 
         protected override ReniParser.Syntax Infix
             (ReniParser.Syntax left, IToken token, ReniParser.Syntax right)

@@ -7,7 +7,7 @@ using Reni.TokenClasses;
 
 namespace Reni.ReniParser
 {
-    abstract class TokenFactory : TokenFactory<TokenClass, Syntax>
+    abstract class TokenFactory : TokenFactory<TokenClass, SourceSyntax>
     {
         /// <summary>
         ///     Creates the main token classes.

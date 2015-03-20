@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using hw.Debug;
 using hw.Helper;
 using hw.Parser;
 using JetBrains.Annotations;
@@ -12,45 +11,13 @@ namespace Reni.TokenClasses
     /// <summary>
     ///     Base class for compiler tokens
     /// </summary>
-    abstract class TokenClass : TokenClass<Syntax>, IOperator<Syntax>, IPropertyProvider
+    abstract class TokenClass : TokenClass<SourceSyntax>, IOperator<Syntax>, IPropertyProvider
     {
-        protected override sealed Syntax Create(Syntax left, IToken token, Syntax right)
+        protected override sealed SourceSyntax Create
+            (SourceSyntax left, IToken token, SourceSyntax right)
         {
-            var tokenSourcePart = token.SourcePart;
-
-            var leftSourcePart = left?.SourcePart;
-            var rightSourcePart = right?.SourcePart;
-
-            var checkedLeftSourcePart = (leftSourcePart ?? tokenSourcePart);
-            var checkedRightSourcePart = (rightSourcePart ?? tokenSourcePart);
-
-            if(leftSourcePart != null)
-                Tracer.Assert
-                    (
-                        leftSourcePart < tokenSourcePart,
-                        leftSourcePart.NodeDump + " < " + tokenSourcePart.NodeDump
-                    );
-            if(rightSourcePart != null)
-                Tracer.Assert(tokenSourcePart < rightSourcePart);
-
-            var rawResult = this.Operation(left, token, right);
-            var result = rawResult
-                .CheckedSurround(left, leftSourcePart)
-                .CheckedSurround(this, tokenSourcePart)
-                .CheckedSurround(right, rightSourcePart)
-                ;
-
-            var resultSourcePart = result.SourcePart;
-
-            var isLeftAligned = checkedLeftSourcePart.Start == resultSourcePart.Start;
-            var isRightAligned = checkedRightSourcePart.End == resultSourcePart.End;
-
-            if(isLeftAligned && isRightAligned)
-                return result;
-
-            NotImplementedMethod(left, token, right, nameof(result), result);
-            var pp = result.SourceParts;
-            return result;
+            var syntax = this.Operation(left?.Syntax, token, right?.Syntax);
+            return new SourceSyntax(syntax, token);
         }
 
         internal Syntax CreateForVisit(Syntax left, IToken token, Syntax right)

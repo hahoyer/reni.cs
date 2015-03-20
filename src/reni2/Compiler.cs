@@ -14,6 +14,7 @@ using Reni.ReniParser;
 using Reni.ReniSyntax;
 using Reni.Runtime;
 using Reni.Struct;
+using Reni.TokenClasses;
 using Reni.UserInterface;
 using Reni.Validation;
 
@@ -21,14 +22,15 @@ namespace Reni
 {
     public sealed class Compiler : DumpableObject, IExecutionContext
     {
-        static IScanner<Syntax> Scanner(ITokenFactory<Syntax> tokenFactory)
-            => new Scanner<Syntax>(ReniLexer.Instance, tokenFactory);
+        static IScanner<SourceSyntax> Scanner(ITokenFactory<SourceSyntax> tokenFactory)
+            => new Scanner<SourceSyntax>(ReniLexer.Instance, tokenFactory);
 
         readonly MainTokenFactory _tokenFactory;
         readonly CompilerParameters _parameters;
         readonly string _className;
 
         readonly ValueCache<Source> _source;
+        readonly ValueCache<SourceSyntax> _sourceSyntax;
         readonly ValueCache<Syntax> _syntax;
         readonly ValueCache<CodeContainer> _codeContainer;
         readonly ValueCache<string> _cSharpCode;
@@ -64,7 +66,8 @@ namespace Reni
             _source = new ValueCache<Source>
                 (() => fileName == null ? new Source(text) : new Source(fileName.FileHandle()));
             _tokenCache = new FunctionCache<int, TokenInformation>(GetTokenForCache);
-            _syntax = new ValueCache<Syntax>(() => Parse(Source + 0));
+            _sourceSyntax = new ValueCache<SourceSyntax>(() => Parse(Source + 0));
+            _syntax = new ValueCache<Syntax>(() => _sourceSyntax.Value.Syntax);
             _codeContainer = new ValueCache<CodeContainer>
                 (() => new CodeContainer(_rootContext, Syntax, Source.Data));
             _cSharpCode = new ValueCache<string>
@@ -114,7 +117,8 @@ namespace Reni
             => CodeContainer.Function(functionId);
         CompileSyntax IExecutionContext.Parse(string source) => Parse(source);
 
-        CompileSyntax Parse(string sourceText) => Parse(new Source(sourceText) + 0).ToCompiledSyntax;
+        CompileSyntax Parse(string sourceText)
+            => Parse(new Source(sourceText) + 0).Syntax.ToCompiledSyntax;
 
         /// <summary>
         ///     Performs compilation
@@ -169,9 +173,10 @@ namespace Reni
         }
 
         [DisableDump]
-        internal IEnumerable<IssueBase> Issues => _parameters.ParseOnly ? Syntax.Issues : CodeContainer.Issues;
+        internal IEnumerable<IssueBase> Issues
+            => _parameters.ParseOnly ? Syntax.Issues : CodeContainer.Issues;
 
-        Syntax Parse(SourcePosn source) => _tokenFactory.Parser.Execute(source);
+        SourceSyntax Parse(SourcePosn source) => _tokenFactory.Parser.Execute(source);
 
         void RunFromCode() => _codeContainer.Value.Execute(this);
 

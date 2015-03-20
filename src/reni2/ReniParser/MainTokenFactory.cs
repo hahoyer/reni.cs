@@ -82,20 +82,22 @@ namespace Reni.ReniParser
         }
 
 
-        public readonly IParser<Syntax> Parser;
+        public readonly IParser<SourceSyntax> Parser;
 
-        readonly ISubParser<Syntax> _declarationSyntaxSubParser;
-        readonly PrioParser<Syntax> _declarationSyntaxParser;
+        readonly ISubParser<SourceSyntax> _declarationSyntaxSubParser;
+        readonly PrioParser<SourceSyntax> _declarationSyntaxParser;
 
-        public MainTokenFactory(Func<ITokenFactory<Syntax>, IScanner<Syntax>> getScanner)
+        public MainTokenFactory
+            (Func<ITokenFactory<SourceSyntax>, IScanner<SourceSyntax>> getScanner)
         {
-            Parser = new PrioParser<Syntax>(PrioTable, getScanner(this));
-            _declarationSyntaxParser = new PrioParser<Syntax>
+            Parser = new PrioParser<SourceSyntax>(PrioTable, getScanner(this));
+            _declarationSyntaxParser = new PrioParser<SourceSyntax>
                 (
                 DeclarationTokenFactory.PrioTable,
                 getScanner(new DeclarationTokenFactory())
                 );
-            _declarationSyntaxSubParser = new SubParser<Syntax>(_declarationSyntaxParser, Pack);
+            _declarationSyntaxSubParser = new SubParser<SourceSyntax>
+                (_declarationSyntaxParser, Pack);
         }
 
         public bool Trace
@@ -115,7 +117,7 @@ namespace Reni.ReniParser
             return base.SpecialTokenClass(type);
         }
 
-        static IType<Syntax> Pack(Syntax options) => new SyntaxBoxToken(options);
+        static IType<SourceSyntax> Pack(SourceSyntax options) => new SyntaxBoxToken(options);
 
         protected override TokenClass GetEndOfText() => new EndToken();
         protected override TokenClass GetNumber() => new Number();

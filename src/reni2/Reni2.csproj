@@ -328,6 +328,7 @@
     <Compile Include="TokenClasses\FunctionInstanceToken.cs" />
     <Compile Include="TokenClasses\FunctionSyntax.cs" />
     <Compile Include="TokenClasses\InstanceToken.cs" />
+    <Compile Include="TokenClasses\SourceSyntax.cs" />
     <Compile Include="TokenClasses\TokenClass.cs" />
     <Compile Include="TokenClasses\ToNumberOfBase.cs" />
     <Compile Include="TokenClasses\LeftParenthesis.cs" />

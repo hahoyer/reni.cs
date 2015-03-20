@@ -35,8 +35,8 @@ namespace Reni.TokenClasses
     {
         public const string TokenId = "!";
         public override string Id => TokenId;
-        public Exclamation(ISubParser<Syntax> parser) { Next = parser; }
-        protected override ISubParser<Syntax> Next { get; }
+        public Exclamation(ISubParser<SourceSyntax> parser) { Next = parser; }
+        protected override ISubParser<SourceSyntax> Next { get; }
         protected override Syntax Infix(Syntax left, IToken token, Syntax right)
         {
             NotImplementedMethod(left, token, right);

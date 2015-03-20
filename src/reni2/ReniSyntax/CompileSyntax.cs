@@ -13,6 +13,7 @@ using Reni.Context;
 using Reni.ReniParser;
 using Reni.Struct;
 using Reni.Type;
+using Reni.Validation;
 
 namespace Reni.ReniSyntax
 {
@@ -137,10 +138,12 @@ namespace Reni.ReniSyntax
                 StopByObjectIds();
             }
 
+            [EnableDump]
             CompileSyntax Value { get; }
             public PropertyProvider Other { get; }
             internal override SourcePart SourcePart => Value.SourcePart + Other.SourcePart.All;
             internal override Syntax UnProxy() => Value.UnProxy();
+            internal override IEnumerable<IssueBase> Issues => Value.Issues;
 
             internal override Result ResultForCache(ContextBase context, Category category)
                 => Value.ResultForCache(context, category);

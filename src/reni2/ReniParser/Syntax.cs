@@ -124,7 +124,7 @@ namespace Reni.ReniParser
             => new ExpressionSyntax(ToCompiledSyntax, definable, null);
 
         [DisableDump]
-        internal IEnumerable<IssueBase> Issues
+        internal virtual IEnumerable<IssueBase> Issues
             => Parts.SelectMany(item => item.DirectIssues).ToArray();
 
         [DisableDump]
@@ -174,19 +174,37 @@ namespace Reni.ReniParser
                 Other = other;
             }
 
+            [EnableDump]
             Syntax Value { get; }
             public PropertyProvider Other { get; }
 
+            [DisableDump]
             internal override SourcePart SourcePart => Value.SourcePart + Other.SourcePart.All;
+            [DisableDump]
             internal override bool IsConverterSyntax => Value.IsConverterSyntax;
-            internal override Syntax UnProxy() => Value.UnProxy();
+            [DisableDump]
+            internal override IEnumerable<IssueBase> Issues => Value.Issues;
+            [DisableDump]
+            internal override bool IsMutableSyntax => Value.IsMutableSyntax;
 
+            [DisableDump]
             internal override CompileSyntax ToCompiledSyntax
                 => Value.ToCompiledSyntax.SurroundCompileSyntax(Other);
-            internal override Syntax CreateDeclarationSyntax(IToken token, Syntax right)
-                => Value.CreateDeclarationSyntax(token, right);
+
+            [DisableDump]
             internal override CompileSyntax ContainerStatementToCompileSyntax
                 => Value.ContainerStatementToCompileSyntax;
+
+            internal override Syntax UnProxy() => Value.UnProxy();
+
+            internal override Syntax CreateDeclarationSyntax(IToken token, Syntax right)
+                => Value.CreateDeclarationSyntax(token, right);
+
+            internal override IEnumerable<KeyValuePair<string, int>> GetDeclarations(int index)
+                => Value.GetDeclarations(index);
+
+            internal override IEnumerable<string> GetDeclarations()
+                => Value.GetDeclarations();
         }
 
         internal ListSyntax ToListSyntax => new ListSyntax
