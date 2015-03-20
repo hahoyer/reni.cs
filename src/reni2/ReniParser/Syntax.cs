@@ -177,6 +177,7 @@ namespace Reni.ReniParser
             Syntax Value { get; }
             public PropertyProvider Other { get; }
             internal override SourcePart SourcePart => Value.SourcePart + Other.SourcePart.All;
+            internal override Syntax UnProxy() => Value.UnProxy();
         }
 
         internal ListSyntax ToListSyntax => new ListSyntax
@@ -185,6 +186,8 @@ namespace Reni.ReniParser
             SourcePart.End.Token(),
             ToList(null)
             );
+
+        virtual internal Syntax UnProxy() => this;
     }
 
     sealed class PropertyProvider : DumpableObject

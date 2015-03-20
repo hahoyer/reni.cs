@@ -25,10 +25,10 @@ namespace Reni.ReniSyntax
             new FunctionCache<ContextBase, object>();
 
         internal CompileSyntax(IToken token)
-            : base(token) { }
+            : base(token) {}
 
         internal CompileSyntax(IToken token, int objectId)
-            : base(token, objectId) { }
+            : base(token, objectId) {}
 
         [DisableDump]
         internal bool IsLambda => GetIsLambda();
@@ -136,6 +136,9 @@ namespace Reni.ReniSyntax
             CompileSyntax Value { get; }
             public PropertyProvider Other { get; }
             internal override SourcePart SourcePart => Value.SourcePart + Other.SourcePart.All;
+            internal override Syntax UnProxy() => Value.UnProxy();
+            internal override Result ResultForCache(ContextBase context, Category category)
+                => Value.ResultForCache(context, category);
         }
     }
 

@@ -107,7 +107,7 @@ namespace Reni.FeatureTest.Helper
 
         public override void AssertLike(Syntax syntax)
         {
-            var ex = (ExpressionSyntax) syntax;
+            var ex = (ExpressionSyntax) syntax.UnProxy();
             AssertLike(_s1, ex.Left);
             Tracer.Assert(ex.Token.Id == _s2);
             AssertLike(_s3, ex.Right);
