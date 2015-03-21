@@ -107,7 +107,7 @@ namespace Reni.Code
 
         protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual)
             => actual.Fiber(this);
-        internal override IEnumerable<IssueBase> Issues
+        internal override IEnumerable<Issue> Issues
             => _fiberHead
                 .Issues
                 .Union(_fiberItems.SelectMany(item => item.Issues));

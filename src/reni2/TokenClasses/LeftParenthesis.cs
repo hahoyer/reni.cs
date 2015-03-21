@@ -49,7 +49,7 @@ namespace Reni.TokenClasses
             internal readonly ReniParser.Syntax Right;
 
             public Syntax(int level, IToken token, ReniParser.Syntax right)
-                : base(token)
+                : base()
             {
                 _level = level;
                 Right = right;
@@ -59,7 +59,7 @@ namespace Reni.TokenClasses
 
             [DisableDump]
             internal override CompileSyntax ToCompiledSyntax
-                => new CompileSyntaxError(IssueId.MissingRightBracket, Token);
+                => new CompileSyntaxError(IssueId.MissingRightBracket);
 
             internal override bool IsBraceLike => true;
 
@@ -67,7 +67,7 @@ namespace Reni.TokenClasses
                 (RightParenthesis.Syntax rightBracket)
             {
                 Tracer.Assert(_level == rightBracket.Level);
-                return (Right ?? new EmptyList(Token.SourcePart.End));
+                return (Right ?? new EmptyList());
             }
         }
     }

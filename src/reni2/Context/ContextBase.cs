@@ -10,6 +10,8 @@ using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Feature;
+using Reni.Parser;
+using Reni.ReniParser;
 using Reni.ReniSyntax;
 using Reni.Struct;
 using Reni.TokenClasses;
@@ -50,8 +52,6 @@ namespace Reni.Context
 
         [DisableDump]
         internal IFunctionContext FindRecentFunctionContextObject => _cache.RecentFunctionContextObject.Value;
-
-        public abstract string DumpPrintText { get; }
 
         [UsedImplicitly]
         internal int SizeToPacketCount(Size size) => size.SizeToPacketCount(Root.DefaultRefAlignParam.AlignBits);
@@ -143,14 +143,8 @@ namespace Reni.Context
             [SmartNode]
             internal readonly FunctionCache<CompileSyntax, ResultCache> ResultCache;
 
-            [Node]
-            [SmartNode]
-            internal readonly FunctionCache<IToken, IssueType> UndefinedSymbolType;
-
             public Cache(ContextBase target)
             {
-                UndefinedSymbolType = new FunctionCache<IToken, IssueType>
-                    (tokenData => UndefinedSymbolIssue.Type(tokenData, target));
                 ResultCache = new FunctionCache<CompileSyntax, ResultCache>(target.CreateCacheElement);
                 CompoundContexts = new FunctionCache<CompoundSyntax, FunctionCache<int, ContextBase>>
                     (
@@ -212,13 +206,13 @@ namespace Reni.Context
             return null;
         }
 
-        internal Result PrefixResult(Category category, IToken position, Definable tokenClass, CompileSyntax right)
+        internal Result PrefixResult(Category category, Definable definable, ExpressionSyntax expression)
         {
-            var searchResult = Declarations(tokenClass);
+            var searchResult = Declarations(definable);
             if(searchResult == null)
-                return UndefinedSymbolIssue.Type(position, RootContext).IssueResult(category);
+                return RootContext.UndefinedSymbol(expression).Result(category);
 
-            var result = searchResult.Execute(category, FindRecentCompoundView.ObjectPointerViaContext, this, right);
+            var result = searchResult.Execute(category, FindRecentCompoundView.ObjectPointerViaContext, this, expression.Right);
             Tracer.Assert(category <= result.CompleteCategory);
             return result;
         }
@@ -232,5 +226,11 @@ namespace Reni.Context
                 yield return new 
                     ContextSearchResult(feature, RootContext);
         }
+        public IssueType UndefinedSymbol(ExpressionSyntax source)
+            =>
+                new IssueType
+                    (
+                    new Issue(IssueId.UndefinedSymbol, source, "Context: " + Dump()),
+                    RootContext);
     }
 }

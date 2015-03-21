@@ -18,16 +18,15 @@ namespace Reni.TokenClasses
         protected override Syntax Suffix(Syntax left, IToken token)
             =>
                 left.CreateDeclarationSyntax
-                    (token, new CompileSyntaxError(IssueId.MissingValueInDeclaration, token.Characters.End.Token()));
+                    (token, new CompileSyntaxError(IssueId.MissingValueInDeclaration));
 
         protected override Syntax Infix(Syntax left, IToken token, Syntax right)
             => left.CreateDeclarationSyntax(token, right);
 
         protected override Syntax Terminal(IToken token)
-        {
-            NotImplementedMethod(token);
-            return null;
-        }
+            =>
+                new DeclarationSyntax
+                    (token, new CompileSyntaxError(IssueId.MissingValueInDeclaration));
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
@@ -58,12 +57,11 @@ namespace Reni.TokenClasses
                     (
                     token,
                     body,
-                    new DeclarationTagSyntax(this, token)
-                        .DefinableTokenSyntax(new DefinableTokenSyntax(null, token))
+                    new DefinableTokenSyntax(new DeclarationTagSyntax(this))
                     );
 
         protected override Syntax Terminal(IToken token)
-            => new DeclarationTagSyntax(this, token);
+            => new DeclarationTagSyntax(this);
 
         protected override sealed Syntax Infix(Syntax left, IToken token, Syntax right)
         {
@@ -79,14 +77,14 @@ namespace Reni.TokenClasses
 
     sealed class ConverterToken : DeclarationTagToken
     {
-        public const string TokenId = "converter";
+        const string TokenId = "converter";
         public override string Id => TokenId;
         internal override bool IsKeyword => true;
     }
 
     sealed class MutableDeclarationToken : DeclarationTagToken
     {
-        public const string TokenId = "mutable";
+        const string TokenId = "mutable";
         public override string Id => TokenId;
         internal override bool IsKeyword => true;
     }
@@ -95,12 +93,7 @@ namespace Reni.TokenClasses
     {
         readonly DeclarationTagToken _tag;
 
-        internal DeclarationTagSyntax
-            (DeclarationTagToken tag, IToken token)
-            : base(token)
-        {
-            _tag = tag;
-        }
+        internal DeclarationTagSyntax(DeclarationTagToken tag) { _tag = tag; }
 
         [DisableDump]
         internal bool DeclaresMutable => _tag is MutableDeclarationToken;
@@ -115,7 +108,7 @@ namespace Reni.TokenClasses
             => _tag.DeclarationSyntax
                 (token, right.CheckedToCompiledSyntax(token, RightMustNotBeNullError));
 
-        internal override Syntax SuffixedBy(DefinableTokenSyntax definable)
+        internal override Syntax SuffixedBy(Definable definable)
             => new DefinableTokenSyntax(definable, this);
 
         IssueId RightMustNotBeNullError()
@@ -123,8 +116,5 @@ namespace Reni.TokenClasses
             NotImplementedMethod();
             return null;
         }
-
-        internal DefinableTokenSyntax DefinableTokenSyntax(DefinableTokenSyntax definable)
-            => new DefinableTokenSyntax(definable, this);
     }
 }

@@ -67,7 +67,7 @@ namespace Reni
                 (() => fileName == null ? new Source(text) : new Source(fileName.FileHandle()));
             _tokenCache = new FunctionCache<int, TokenInformation>(GetTokenForCache);
             _sourceSyntax = new ValueCache<SourceSyntax>(() => Parse(Source + 0));
-            _syntax = new ValueCache<Syntax>(() => _sourceSyntax.Value.Syntax);
+            _syntax = new ValueCache<Syntax>(() => SourceSyntax.Syntax);
             _codeContainer = new ValueCache<CodeContainer>
                 (() => new CodeContainer(_rootContext, Syntax, Source.Data));
             _cSharpCode = new ValueCache<string>
@@ -82,6 +82,10 @@ namespace Reni
         [Node]
         [DisableDump]
         internal Syntax Syntax => _syntax.Value;
+
+        [Node]
+        [DisableDump]
+        internal SourceSyntax SourceSyntax => _sourceSyntax.Value;
 
         [Node]
         [DisableDump]
@@ -147,7 +151,7 @@ namespace Reni
                 Tracer.FlaggedLine(CSharpCode);
 
             foreach(var t in Issues)
-                _parameters.OutStream.AddLog(t.LogDump + "\n");
+                _parameters.OutStream.AddLog(t.GetLogDump + "\n");
 
             Data.OutStream = _parameters.OutStream;
             try
@@ -173,8 +177,9 @@ namespace Reni
         }
 
         [DisableDump]
-        internal IEnumerable<IssueBase> Issues
-            => _parameters.ParseOnly ? Syntax.Issues : CodeContainer.Issues;
+        internal IEnumerable<SourceIssue> Issues
+            => (_parameters.ParseOnly ? Syntax.Issues : CodeContainer.Issues)
+            .Select(item=>SourceSyntax.Issue(item));
 
         SourceSyntax Parse(SourcePosn source) => _tokenFactory.Parser.Execute(source);
 
@@ -240,7 +245,7 @@ namespace Reni
         TokenInformation GetTokenForCache(int offset)
         {
             var sourcePosn = Source + offset;
-            var result = Syntax.LocateToken(sourcePosn);
+            var result = SourceSyntax.LocateToken(sourcePosn);
             if(result != null)
                 return result;
 

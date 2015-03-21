@@ -28,7 +28,7 @@ namespace Reni.Code
         }
 
         [DisableDump]
-        internal override IEnumerable<IssueBase> Issues => IssueBase.Empty;
+        internal override IEnumerable<Issue> Issues => Validation.Issue.Empty;
 
         [DisableDump]
         internal virtual bool IsNonFiberHeadList => false;

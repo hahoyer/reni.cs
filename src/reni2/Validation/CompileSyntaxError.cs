@@ -6,8 +6,11 @@ using hw.Helper;
 using hw.Parser;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Parser;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
+using Reni.Struct;
+using Reni.TokenClasses;
 
 namespace Reni.Validation
 {
@@ -16,30 +19,28 @@ namespace Reni.Validation
         [EnableDump]
         readonly IssueId _issueId;
         readonly CompileSyntaxError _previous;
-        readonly ValueCache<CompileSyntaxIssue> _issueCache;
+        readonly ValueCache<Issue> _issueCache;
 
-        public CompileSyntaxError
-            (
-            IssueId issueId,
-            IToken token,
-            CompileSyntaxError previous = null)
-            : base(token)
+        public CompileSyntaxError(IssueId issueId, CompileSyntaxError previous)
         {
             _issueId = issueId;
             _previous = previous;
-            _issueCache = new ValueCache<CompileSyntaxIssue>
-                (() => new CompileSyntaxIssue(_issueId, Token));
+            _issueCache = new ValueCache<Issue>(() => new Issue(_issueId, this, ""));
 
             StopByObjectIds(22);
         }
 
+        public CompileSyntaxError(IssueId issueId)
+            : this(issueId, null) { }
+
         internal override bool IsError => true;
         [DisableDump]
-        internal override IEnumerable<IssueBase> DirectIssues => Issue.plus(base.DirectIssues);
+        internal override IEnumerable<Issue> DirectIssues => Issue.plus(base.DirectIssues);
         [DisableDump]
         protected override IEnumerable<Syntax> DirectChildren { get { yield return _previous; } }
+
         [DisableDump]
-        CompileSyntaxIssue Issue => _issueCache.Value;
+        Issue Issue => _issueCache.Value;
 
         [DisableDump]
         IEnumerable<CompileSyntaxError> Chain
@@ -58,15 +59,52 @@ namespace Reni.Validation
         internal override Result ResultForCache(ContextBase context, Category category)
         {
             var result = Chain
-                .Select(error => error.IssueType(context).IssueResult(category))
+                .Select(error => error.IssueType(context).Result(category))
                 .Aggregate(context.RootContext.VoidType.Result(category), (x, y) => x + y);
             return result;
         }
 
+        internal override Syntax End => new ListSyntax(null, new[] {this});
+
+        internal override Syntax RightParenthesis(RightParenthesis.Syntax rightBracket)
+        {
+            NotImplementedMethod(rightBracket);
+            return null;
+        }
+
+        internal override Syntax CreateElseSyntax(ElseToken.Syntax token, CompileSyntax elseSyntax)
+        {
+            NotImplementedMethod(token, elseSyntax);
+            return null;
+        }
+        internal override Syntax CreateDeclarationSyntax(IToken token, Syntax right)
+        {
+            NotImplementedMethod(token, right);
+            return null;
+        }
+        internal override IEnumerable<Syntax> ToList(List type)
+        {
+            NotImplementedMethod(type);
+            return null;
+        }
+        [DisableDump]
+        internal override CompoundSyntax ToContainer
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
+
         IssueType IssueType(ContextBase context) => new IssueType(Issue, context.RootContext);
 
-        internal override Syntax SyntaxError
-            (IssueId issue, IToken token, Syntax right = null)
-            => new CompileSyntaxError(issue, token, this);
+        internal override Syntax SyntaxError(IssueId issue, IToken token, Syntax right = null)
+        {
+            if(right == null)
+                return new CompileSyntaxError(issue, this);
+            NotImplementedMethod(issue, token, right);
+            return null;
+        }
     }
 }

@@ -66,7 +66,7 @@ namespace Reni.Code
         internal Size TemporarySize => OutputSize + GetAdditionalTemporarySize();
 
         [DisableDump]
-        internal virtual IEnumerable<IssueBase> Issues => IssueBase.Empty;
+        internal virtual IEnumerable<Issue> Issues => Issue.Empty;
 
         protected virtual Size GetAdditionalTemporarySize() => Size.Zero;
 

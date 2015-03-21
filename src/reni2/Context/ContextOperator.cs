@@ -15,7 +15,7 @@ namespace Reni.Context
         public const string TokenId = "^^";
         public override string Id => TokenId;
 
-        public override Result Result(ContextBase context, Category category, IToken token)
+        public override Result Result(ContextBase context, Category category, TerminalSyntax token)
             => context
                 .FindRecentCompoundView
                 .ObjectPointerViaContext(category);

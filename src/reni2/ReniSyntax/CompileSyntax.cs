@@ -5,15 +5,12 @@ using System.Linq;
 using hw.Debug;
 using hw.Forms;
 using hw.Helper;
-using hw.Parser;
-using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.ReniParser;
 using Reni.Struct;
 using Reni.Type;
-using Reni.Validation;
 
 namespace Reni.ReniSyntax
 {
@@ -25,20 +22,16 @@ namespace Reni.ReniSyntax
         readonly FunctionCache<ContextBase, object> _resultCache =
             new FunctionCache<ContextBase, object>();
 
-        internal CompileSyntax(IToken token)
-            : base(token) {}
+        internal CompileSyntax() { }
 
-        internal CompileSyntax(IToken token, int objectId)
-            : base(token, objectId) {}
+        internal CompileSyntax(int objectId)
+            : base(objectId) { }
 
         [DisableDump]
         internal bool IsLambda => GetIsLambda();
 
         [DisableDump]
         internal virtual bool? Hllw => IsLambda ? (bool?) true : null;
-
-        [DisableDump]
-        internal string DumpPrintText => SourcePart.Id;
 
         //[DebuggerHidden]
         internal virtual Result ResultForCache(ContextBase context, Category category)
@@ -51,10 +44,7 @@ namespace Reni.ReniSyntax
 
         [DisableDump]
         internal override CompileSyntax ToCompiledSyntax => this;
-        protected override sealed Syntax Surround(PropertyProvider other)
-            => SurroundCompileSyntax(other);
-        internal virtual CompileSyntax SurroundCompileSyntax(PropertyProvider other)
-            => new ProxySyntax(this, other);
+        virtual  internal Syntax End => this;
 
         internal void AddToCacheForDebug(ContextBase context, object cacheItem)
             => _resultCache.Add(context, cacheItem);
@@ -126,28 +116,6 @@ namespace Reni.ReniSyntax
         {
             NotImplementedMethod(visitor);
             return null;
-        }
-
-        sealed class ProxySyntax : CompileSyntax
-        {
-            public ProxySyntax(CompileSyntax value, PropertyProvider other)
-                : base(value.Token)
-            {
-                Value = value;
-                Other = other;
-                StopByObjectIds();
-            }
-
-            [EnableDump]
-            CompileSyntax Value { get; }
-            public PropertyProvider Other { get; }
-            internal override SourcePart SourcePart => Value.SourcePart + Other.SourcePart.All;
-            internal override Syntax UnProxy() => Value.UnProxy();
-            internal override IEnumerable<IssueBase> Issues => Value.Issues;
-
-            internal override Result ResultForCache(ContextBase context, Category category)
-                => Value.ResultForCache(context, category);
-            internal override CompileSyntax Visit(ISyntaxVisitor visitor) => Value.Visit(visitor);
         }
     }
 

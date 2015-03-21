@@ -9,9 +9,9 @@ namespace Reni.Code
     sealed class IssueCode : CodeBase
     {
         static int _nextObjectId;
-        readonly IssueBase[] _issue;
+        readonly Issue[] _issue;
 
-        internal IssueCode(IssueBase issue)
+        internal IssueCode(Issue issue)
             : base(_nextObjectId++)
         {
             _issue = new[] {issue};
@@ -21,7 +21,7 @@ namespace Reni.Code
         {
             throw new NotImplementedException();
         }
-        internal override IEnumerable<IssueBase> Issues => _issue;
+        internal override IEnumerable<Issue> Issues => _issue;
         internal override void Visit(IVisitor visitor) { }
     }
 }

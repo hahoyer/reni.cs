@@ -36,8 +36,6 @@ namespace Reni.Struct
         [Node]
         [DisableDump]
         internal CodeBase BodyCode => _bodyCodeCache.Value;
-        [Node]
-        string Description => _body.DumpPrintText;
         [DisableDump]
         Size ArgsPartSize => Parent.ArgsType.Size + RelevantValueSize;
         [DisableDump]
@@ -67,7 +65,7 @@ namespace Reni.Struct
             {
                 try
                 {
-                    return BodyCode.Container(Description, FunctionId);
+                    return BodyCode.Container("Description", FunctionId);
                 }
                 catch(UnexpectedVisitOfPending)
                 {

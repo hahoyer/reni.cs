@@ -8,25 +8,23 @@ using hw.Scanner;
 using Reni.ReniSyntax;
 using Reni.Struct;
 using Reni.TokenClasses;
-using Reni.UserInterface;
 using Reni.Validation;
 
 namespace Reni.ReniParser
 {
-    abstract class Syntax : ParsedSyntax, IPropertyProvider
+    abstract class Syntax : DumpableObject
     {
-        protected Syntax(IToken token)
-            : base(token) {}
+        protected Syntax() { }
 
-        protected Syntax(IToken token, int objectId)
-            : base(token, objectId) {}
+        protected Syntax(int objectId)
+            : base(objectId) {}
 
         [DisableDump]
         internal virtual CompileSyntax ContainerStatementToCompileSyntax => ToCompiledSyntax;
 
         [DisableDump]
         internal virtual CompileSyntax ToCompiledSyntax
-            => new CompileSyntaxError(IssueId.CompiledSyntaxExpected, Token);
+            => new CompileSyntaxError(IssueId.CompiledSyntaxExpected);
 
         internal virtual IEnumerable<KeyValuePair<string, int>> GetDeclarations(int index)
         {
@@ -34,8 +32,8 @@ namespace Reni.ReniParser
         }
         internal virtual IEnumerable<string> GetDeclarations() { yield break; }
 
-        internal Syntax CreateThenSyntax(ThenToken.Syntax thenToken, CompileSyntax condition)
-            => new CondSyntax(condition, thenToken, ToCompiledSyntax);
+        internal Syntax CreateThenSyntax(CompileSyntax condition)
+            => new CondSyntax(condition, ToCompiledSyntax);
 
         internal virtual Syntax CreateElseSyntax(ElseToken.Syntax token, CompileSyntax elseSyntax)
         {
@@ -49,23 +47,6 @@ namespace Reni.ReniParser
             return null;
         }
 
-        protected virtual Syntax Surround(PropertyProvider other) => new ProxySyntax(this, other);
-
-        internal Syntax CheckedSurround(IPropertyProvider provider, SourcePart sourcePart)
-        {
-            if(provider == null || SourceParts.Contain(sourcePart))
-                return this;
-
-            return Surround(new PropertyProvider(provider, sourcePart));
-        }
-
-        internal new virtual SourcePart SourcePart
-            => base.SourcePart +
-                DirectChildren
-                    .Where(item => item != null)
-                    .Select(item => item.SourcePart)
-                    .Aggregate();
-
         static bool _isInDump;
 
         protected override sealed string Dump(bool isRecursion)
@@ -78,10 +59,8 @@ namespace Reni.ReniParser
             var isInDump = _isInDump;
             _isInDump = true;
             var result = GetNodeDump();
-            if(!IsDetailedDumpRequired)
+            if(!ParsedSyntax.IsDetailedDumpRequired)
                 return result;
-            if(!isInDump && SourcePart.Source.IsPersistent)
-                result += FilePosition();
             if(isInContainerDump)
                 result += " ObjectId=" + ObjectId;
             else
@@ -120,35 +99,19 @@ namespace Reni.ReniParser
             return null;
         }
 
-        internal virtual Syntax SuffixedBy(DefinableTokenSyntax definable)
+        internal virtual Syntax SuffixedBy(Definable definable)
             => new ExpressionSyntax(ToCompiledSyntax, definable, null);
 
         [DisableDump]
-        internal virtual IEnumerable<IssueBase> Issues
+        internal virtual IEnumerable<Issue> Issues
             => Parts.SelectMany(item => item.DirectIssues).ToArray();
 
         [DisableDump]
-        internal virtual IEnumerable<IssueBase> DirectIssues { get { yield break; } }
+        internal virtual IEnumerable<Issue> DirectIssues { get { yield break; } }
 
-
-        internal TokenInformation LocateToken(SourcePosn sourcePosn)
-        {
-            var token = Token;
-            if(token.Characters.Contains(sourcePosn))
-                return new SyntaxToken(this);
-
-            if(!SourcePart.Contains(sourcePosn))
-                return null;
-
-            NotImplementedMethod(sourcePosn);
-
-            var whiteSpaceToken = token.PrecededWith.First
-                (item => item.Characters.Contains(sourcePosn));
-            return new UserInterface.WhiteSpaceToken(whiteSpaceToken);
-        }
 
         internal virtual Syntax RightParenthesis(RightParenthesis.Syntax rightBracket)
-            => new CompileSyntaxError(IssueId.ExtraRightBracket, Token);
+            => new CompileSyntaxError(IssueId.ExtraRightBracket);
 
         [DisableDump]
         internal IEnumerable<Syntax> Parts => DirectChildren
@@ -159,76 +122,14 @@ namespace Reni.ReniParser
         [DisableDump]
         protected virtual IEnumerable<Syntax> DirectChildren { get { yield break; } }
 
-        [DisableDump]
-        internal SourcePart[] SourceParts => Parts
-            .SelectMany(item => item.Token.Parts())
-            .Aggregate(new[] {SourcePart}, Extension.Combine)
-            .ToArray();
-
-        sealed class ProxySyntax : Syntax
-        {
-            public ProxySyntax(Syntax value, PropertyProvider other)
-                : base(value.Token)
-            {
-                Value = value;
-                Other = other;
-            }
-
-            [EnableDump]
-            Syntax Value { get; }
-            public PropertyProvider Other { get; }
-
-            [DisableDump]
-            internal override SourcePart SourcePart => Value.SourcePart + Other.SourcePart.All;
-            [DisableDump]
-            internal override bool IsConverterSyntax => Value.IsConverterSyntax;
-            [DisableDump]
-            internal override IEnumerable<IssueBase> Issues => Value.Issues;
-            [DisableDump]
-            internal override bool IsMutableSyntax => Value.IsMutableSyntax;
-
-            [DisableDump]
-            internal override CompileSyntax ToCompiledSyntax
-                => Value.ToCompiledSyntax.SurroundCompileSyntax(Other);
-
-            [DisableDump]
-            internal override CompileSyntax ContainerStatementToCompileSyntax
-                => Value.ContainerStatementToCompileSyntax;
-
-            internal override Syntax UnProxy() => Value.UnProxy();
-
-            internal override Syntax CreateDeclarationSyntax(IToken token, Syntax right)
-                => Value.CreateDeclarationSyntax(token, right);
-
-            internal override IEnumerable<KeyValuePair<string, int>> GetDeclarations(int index)
-                => Value.GetDeclarations(index);
-
-            internal override IEnumerable<string> GetDeclarations()
-                => Value.GetDeclarations();
-        }
-
         internal ListSyntax ToListSyntax => new ListSyntax
             (
             null,
-            SourcePart.End.Token(),
             ToList(null)
             );
 
-        internal virtual Syntax UnProxy() => this;
+        virtual public bool Find(Issue issue) => issue.Source==this;
     }
-
-    sealed class PropertyProvider : DumpableObject
-    {
-        public IPropertyProvider Provider { get; set; }
-        public ISourcePart SourcePart { get; set; }
-        public PropertyProvider(IPropertyProvider provider, ISourcePart sourcePart)
-        {
-            Provider = provider;
-            SourcePart = sourcePart;
-        }
-    }
-
-    interface IPropertyProvider {}
 
 
     static class Extension
@@ -236,9 +137,15 @@ namespace Reni.ReniParser
         internal static T[] plus<T>(this T x, params IEnumerable<T>[] y)
             => new[] {x}.Concat(y.SelectMany(item => item)).ToDistinctNotNullArray();
 
-        internal static T[] plus<T>(this IEnumerable<T> x, params T[] y)
+        internal static T[] plus<T>(this IEnumerable<T> x, IEnumerable<T> y)
             => (x ?? new T[0])
                 .Concat(y ?? new T[0])
+                .ToDistinctNotNullArray();
+
+        internal static T[] plus<T>(this IEnumerable<T> x, T y) 
+            where T : class 
+            => (x ?? new T[0])
+                .Concat(y.NullableToArray())
                 .ToDistinctNotNullArray();
 
         internal static T[] plus<T>(this T x, params T[] y)
@@ -264,10 +171,10 @@ namespace Reni.ReniParser
         internal static CompileSyntax CheckedToCompiledSyntax
             (this Syntax target, IToken token, Func<IssueId> getError)
             => target?.ToCompiledSyntax
-                ?? new CompileSyntaxError(getError(), token);
+                ?? new CompileSyntaxError(getError());
 
-        internal static Token<Syntax> Token(this SourcePosn sourcePosn)
-            => new Token<Syntax>(null, sourcePosn.Span(0));
+        internal static Token<SourceSyntax> Token(this SourcePosn sourcePosn)
+            => new Token<SourceSyntax>(null, sourcePosn.Span(0));
 
         public static bool Contain
             (this IEnumerable<SourcePart> source, IEnumerable<SourcePart> value)

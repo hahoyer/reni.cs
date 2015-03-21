@@ -26,7 +26,7 @@ namespace Reni.TokenClasses
         }
 
         protected override Syntax Terminal(IToken token)
-            => new CompileSyntaxError(IssueId.MissingFunctionGetter, token, null);
+            => new CompileSyntaxError(IssueId.MissingFunctionGetter);
 
         protected override Syntax Prefix(IToken token, Syntax right)
             => new FunctionSyntax

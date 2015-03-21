@@ -23,7 +23,7 @@ namespace Reni.ReniParser
         internal sealed class Syntax : ReniParser.Syntax
         {
             public Syntax(IToken token)
-                : base(token) { }
+                : base() { }
         }
 
         public override string Id => "<box>";

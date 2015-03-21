@@ -13,16 +13,16 @@ namespace Reni.TokenClasses
     abstract class Definable : TokenClass
     {
         protected override sealed Syntax Terminal(IToken token)
-            => Syntax(token);
+            => new DefinableTokenSyntax(this);
 
         protected override sealed Syntax Prefix(IToken token, Syntax right)
-            => new ExpressionSyntax(null, Syntax(token), right.ToCompiledSyntax);
+            => new ExpressionSyntax(null, this, right.ToCompiledSyntax);
 
         protected override sealed Syntax Suffix(Syntax left, IToken token)
-            => left.SuffixedBy(Syntax(token));
+            => left.SuffixedBy(this);
 
         protected override sealed Syntax Infix(Syntax left, IToken token, Syntax right)
-            => new ExpressionSyntax(left.ToCompiledSyntax, Syntax(token), right.ToCompiledSyntax);
+            => new ExpressionSyntax(left.ToCompiledSyntax, this, right.ToCompiledSyntax);
 
         [DisableDump]
         protected string DataFunctionName => Id.Symbolize();
@@ -30,8 +30,6 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal virtual IEnumerable<IGenericProviderForDefinable> Genericize
             => this.GenericListFromDefinable();
-
-        DefinableTokenSyntax Syntax(IToken token) => new DefinableTokenSyntax(this, token);
     }
 
     [BelongsTo(typeof(MainTokenFactory))]

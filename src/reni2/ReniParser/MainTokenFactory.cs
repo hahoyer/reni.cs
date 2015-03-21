@@ -133,7 +133,7 @@ namespace Reni.ReniParser
         public SyntaxError(IssueId issue) { _issue = issue; }
         public SyntaxError(Match.IError message) { _issue = ReniLexer.Parse(message); }
         protected override Syntax Terminal(IToken token)
-            => new CompileSyntaxError(_issue, token);
+            => new CompileSyntaxError(_issue);
         protected override Syntax Suffix(Syntax left, IToken token)
             => left.SyntaxError(_issue, token);
         protected override Syntax Infix(Syntax left, IToken token, Syntax right)

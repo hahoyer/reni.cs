@@ -4,6 +4,7 @@ using System.Linq;
 using hw.Debug;
 using hw.UnitTest;
 using Reni.FeatureTest.Helper;
+using Reni.Parser;
 using Reni.Validation;
 
 namespace Reni.FeatureTest.Validation
@@ -14,12 +15,12 @@ namespace Reni.FeatureTest.Validation
     {
         public UnMatchedLeftParenthesis() { Parameters.ParseOnly = true; }
 
-        protected override void Verify(IEnumerable<IssueBase> issues)
+        protected override void Verify(IEnumerable<SourceIssue> issues)
         {
             var issueArray = issues.ToArray();
             var i = 0;
             var issueBase = issueArray[i];
-            Tracer.Assert(issueBase is CompileSyntaxIssue, issueBase.Dump);
+            Tracer.Assert(issueBase.Issue is Issue, issueBase.Dump);
             Tracer.Assert(issueBase.IssueId == IssueId.MissingRightBracket, issueBase.Dump);
             i++;
             Tracer.Assert(i == issueArray.Length);
@@ -32,12 +33,12 @@ namespace Reni.FeatureTest.Validation
     {
         public UnMatchedRightParenthesis() { Parameters.ParseOnly = true; }
 
-        protected override void Verify(IEnumerable<IssueBase> issues)
+        protected override void Verify(IEnumerable<SourceIssue> issues)
         {
             var issueArray = issues.ToArray();
             var i = 0;
             var issueBase = issueArray[i];
-            Tracer.Assert(issueBase is CompileSyntaxIssue, issueBase.Dump);
+            Tracer.Assert(issueBase.Issue is Issue, issueBase.Dump);
             Tracer.Assert(issueBase.IssueId == IssueId.ExtraRightBracket, issueBase.Dump);
             i++;
             Tracer.Assert(i == issueArray.Length);

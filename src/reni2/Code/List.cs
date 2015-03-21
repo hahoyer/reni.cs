@@ -40,7 +40,7 @@ namespace Reni.Code
         protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual)
             => actual.List(this);
         [DisableDump]
-        internal override IEnumerable<IssueBase> Issues => Data.SelectMany(data => data.Issues);
+        internal override IEnumerable<Issue> Issues => Data.SelectMany(data => data.Issues);
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement)
         {

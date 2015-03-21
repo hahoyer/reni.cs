@@ -16,7 +16,7 @@ namespace Reni.ReniParser
             CompileSyntax body,
             DefinableTokenSyntax target = null
             )
-            : base(token)
+            : base()
         {
             Target = target;
             Body = body;

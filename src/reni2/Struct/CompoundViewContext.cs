@@ -24,8 +24,6 @@ namespace Reni.Struct
         string GetCompoundIdentificationDump() => View.GetCompoundIdentificationDump();
 
         protected override string GetContextChildIdentificationDump() => GetCompoundIdentificationDump();
-        [DisableDump]
-        protected override string ChildDumpPrintText => View.Compound.Syntax.DumpPrintText;
 
         IFeatureImplementation ISymbolProviderForPointer<Definable, IFeatureImplementation>.Feature(Definable tokenClass)
             => View.Find(tokenClass);

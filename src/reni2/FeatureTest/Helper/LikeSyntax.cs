@@ -79,7 +79,7 @@ namespace Reni.FeatureTest.Helper
 
         public override void AssertLike(Syntax syntax)
         {
-            var co = (CompoundSyntax) syntax.UnProxy();
+            var co = (CompoundSyntax) syntax;
             Tracer.Assert(_list.Length == co.Statements.Length);
             for(var i = 0; i < _list.Length; i++)
                 _list[i].AssertLike(co.Statements[i]);
@@ -107,9 +107,9 @@ namespace Reni.FeatureTest.Helper
 
         public override void AssertLike(Syntax syntax)
         {
-            var ex = (ExpressionSyntax) syntax.UnProxy();
+            var ex = (ExpressionSyntax) syntax;
             AssertLike(_s1, ex.Left);
-            Tracer.Assert(ex.Token.Id == _s2);
+            Tracer.Assert(ex.Definable.Id == _s2);
             AssertLike(_s3, ex.Right);
         }
 
@@ -130,9 +130,9 @@ namespace Reni.FeatureTest.Helper
 
         public override void AssertLike(Syntax syntax)
         {
-            var terminalSyntax = (TerminalSyntax) syntax.UnProxy();
+            var terminalSyntax = (TerminalSyntax) syntax;
             Tracer.Assert(terminalSyntax.Terminal is TokenClasses.Number);
-            Tracer.Assert(TokenClasses.Number.ToInt64(terminalSyntax.Token) == _i);
+            Tracer.Assert(terminalSyntax.ToNumber == _i);
         }
     }
 }

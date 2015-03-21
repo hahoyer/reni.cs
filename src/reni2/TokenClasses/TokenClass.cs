@@ -11,17 +11,17 @@ namespace Reni.TokenClasses
     /// <summary>
     ///     Base class for compiler tokens
     /// </summary>
-    abstract class TokenClass : TokenClass<SourceSyntax>, IOperator<Syntax>, IPropertyProvider
+    abstract class TokenClass : TokenClass<SourceSyntax>, IOperator<Syntax>
     {
         protected override sealed SourceSyntax Create
             (SourceSyntax left, IToken token, SourceSyntax right)
         {
             var syntax = this.Operation(left?.Syntax, token, right?.Syntax);
-            return new SourceSyntax(syntax, token);
+            return new SourceSyntax(syntax, left, token, right);
         }
 
-        internal Syntax CreateForVisit(Syntax left, IToken token, Syntax right)
-            => this.Operation(left, token, right);
+        internal Syntax CreateForVisit(Syntax left, Syntax right)
+            => this.Operation(left, null, right);
 
         Syntax IOperator<Syntax>.Terminal(IToken token)
             => Terminal(token);

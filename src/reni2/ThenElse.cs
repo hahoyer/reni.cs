@@ -27,10 +27,9 @@ namespace Reni
         internal CondSyntax
             (
             CompileSyntax condSyntax,
-            ThenToken.Syntax thenToken,
             CompileSyntax thenSyntax,
             CompileSyntax elseSyntax = null)
-            : base(thenToken.Token)
+            : base()
         {
             Cond = condSyntax;
             Then = thenSyntax;
@@ -38,7 +37,7 @@ namespace Reni
         }
 
         CondSyntax(CondSyntax other, CompileSyntax elseSyntax)
-            : base(other.Token)
+            : base()
         {
             Cond = other.Cond;
             Then = other.Then;

@@ -45,7 +45,7 @@ namespace Reni.TokenClasses
         {
             internal readonly int Level;
             public Syntax(int level, IToken token)
-                : base(token) { Level = level; }
+                : base() { Level = level; }
 
             internal override bool IsBraceLike => true;
         }

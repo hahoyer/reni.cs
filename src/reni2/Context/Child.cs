@@ -27,8 +27,6 @@ namespace Reni.Context
 
         [DisableDump]
         internal override Root RootContext => Parent.RootContext;
-        public override sealed string DumpPrintText => ChildDumpPrintText + (Parent == RootContext ? "" : " in " + _parent.DumpPrintText);
-        protected abstract string ChildDumpPrintText { get; }
         internal override CompoundView ObtainRecentCompoundView() => Parent.ObtainRecentCompoundView();
         internal override IFunctionContext ObtainRecentFunctionContext() => Parent.ObtainRecentFunctionContext();
         internal override IEnumerable<ContextSearchResult> Declarations<TDefinable>(TDefinable tokenClass)

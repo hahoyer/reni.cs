@@ -41,7 +41,7 @@ namespace Reni.Code
         [DisableDump]
         internal bool HasArg => Visit(new HasArgVisitor());
 
-        internal static CodeBase Issue(IssueBase issue) => new IssueCode(issue);
+        internal static CodeBase Issue(Issue issue) => new IssueCode(issue);
         internal static CodeBase BitsConst(Size size, BitsConst t) => new BitArray(size, t);
         internal static CodeBase BitsConst(BitsConst t) => BitsConst(t.Size, t);
         internal static CodeBase DumpPrintText(string dumpPrintText)
@@ -223,7 +223,7 @@ namespace Reni.Code
         protected override string GetNodeDump() => base.GetNodeDump() + " Size=" + Size;
 
         [DisableDump]
-        internal abstract IEnumerable<IssueBase> Issues { get; }
+        internal abstract IEnumerable<Issue> Issues { get; }
 
         [DisableDump]
         internal bool Hllw => Size.IsZero;

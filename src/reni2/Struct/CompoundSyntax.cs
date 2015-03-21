@@ -4,7 +4,6 @@ using hw.Helper;
 using System.Linq;
 using hw.Debug;
 using hw.Forms;
-using hw.Parser;
 using Reni.Basics;
 using Reni.Context;
 using Reni.ReniParser;
@@ -25,8 +24,8 @@ namespace Reni.Struct
         static bool _isInsideFileDump;
         static int _nextObjectId;
 
-        internal CompoundSyntax(IToken token, Syntax[] statements)
-            : base(token, _nextObjectId++)
+        internal CompoundSyntax(Syntax[] statements)
+            : base(_nextObjectId++)
         {
             _statements = statements;
             _data = GetData;

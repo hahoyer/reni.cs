@@ -4,7 +4,6 @@ using System.Linq;
 using hw.Forms;
 using Reni.Basics;
 using Reni.Code;
-using Reni.Struct;
 using Reni.Type;
 
 namespace Reni.Context
@@ -29,8 +28,8 @@ namespace Reni.Context
         Size IContextReference.Size => Root.DefaultRefAlignParam.RefSize;
         int IContextReference.Order => _order;
 
-        protected override string GetContextChildIdentificationDump() => ArgsType.ObjectId.ToString();
-        protected override string ChildDumpPrintText => ValueType.DumpPrintText + "(" + ArgsType.DumpPrintText + ")";
+        protected override string GetContextChildIdentificationDump()
+            => ArgsType.ObjectId.ToString();
 
         internal override IFunctionContext ObtainRecentFunctionContext() => this;
 
@@ -48,7 +47,11 @@ namespace Reni.Context
             if(ValueType == null)
                 throw new ValueCannotBeUsedHereException();
             return ValueType.Pointer
-                .ContextAccessResult(category.Typed, this, () => (ArgsType.Size + Root.DefaultRefAlignParam.RefSize) * -1)
+                .ContextAccessResult
+                (
+                    category.Typed,
+                    this,
+                    () => (ArgsType.Size + Root.DefaultRefAlignParam.RefSize) * -1)
                 & category;
         }
     }

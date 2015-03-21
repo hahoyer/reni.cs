@@ -13,12 +13,12 @@ namespace Reni.TokenClasses
     abstract class TerminalToken : TokenClass, ITerminal
     {
         protected override sealed Syntax Terminal(IToken token)
-            => new TerminalSyntax(token, this);
+            => new TerminalSyntax(token.Id, this);
 
         protected override Syntax Infix(Syntax left, IToken token, Syntax right)
-            => new CompileSyntaxError(IssueId.UnexpectedUseAsSuffix, token);
+            => new CompileSyntaxError(IssueId.UnexpectedUseAsSuffix);
 
-        public abstract Result Result(ContextBase context, Category category, IToken token);
+        public abstract Result Result(ContextBase context, Category category, TerminalSyntax token);
 
         CompileSyntax ITerminal.Visit(ISyntaxVisitor visitor) => Visit(visitor);
 
@@ -32,12 +32,12 @@ namespace Reni.TokenClasses
     abstract class NonPrefix : TokenClass, ITerminal, ISuffix
     {
         protected override sealed Syntax Terminal(IToken token)
-            => new TerminalSyntax(token, this);
+            => new TerminalSyntax(token.Id, this);
 
         protected override Syntax Infix(Syntax left, IToken token, Syntax right)
-            => new CompileSyntaxError(IssueId.UnexpectedUseAsPrefix, token);
+            => new CompileSyntaxError(IssueId.UnexpectedUseAsPrefix);
 
-        public abstract Result Result(ContextBase context, Category category, IToken token);
+        public abstract Result Result(ContextBase context, Category category, TerminalSyntax token);
 
         public abstract Result Result(ContextBase context, Category category, CompileSyntax left);
 
@@ -52,18 +52,18 @@ namespace Reni.TokenClasses
 
     abstract class NonSuffix : TokenClass, ITerminal, IPrefix
     {
-        protected override Syntax Terminal(IToken token) => new TerminalSyntax(token, this);
+        protected override Syntax Terminal(IToken token) => new TerminalSyntax(token.Id, this);
 
         protected override Syntax Prefix(IToken token, Syntax right)
             => new PrefixSyntax(token, this, right.ToCompiledSyntax);
 
         protected override Syntax Infix(Syntax left, IToken token, Syntax right)
-            => new CompileSyntaxError(IssueId.UnexpectedUseAsSuffix, token);
+            => new CompileSyntaxError(IssueId.UnexpectedUseAsSuffix);
 
-        public abstract Result Result(ContextBase context, Category category, IToken token);
+        public abstract Result Result(ContextBase context, Category category, TerminalSyntax token);
 
         public abstract Result Result
-            (ContextBase context, Category category, IToken token, CompileSyntax right);
+            (ContextBase context, Category category, PrefixSyntax token, CompileSyntax right);
 
         CompileSyntax ITerminal.Visit(ISyntaxVisitor visitor) => Visit(visitor);
 
@@ -81,10 +81,10 @@ namespace Reni.TokenClasses
 
         protected override Syntax Infix(Syntax left, IToken token, Syntax right)
             =>
-                new CompileSyntaxError(IssueId.UnexpectedUseAsPrefix, token);
+                new CompileSyntaxError(IssueId.UnexpectedUseAsPrefix);
 
         protected override Syntax Terminal(IToken token)
-            => new CompileSyntaxError(IssueId.UnexpectedUseAsTerminal, token);
+            => new CompileSyntaxError(IssueId.UnexpectedUseAsTerminal);
 
         public abstract Result Result(ContextBase context, Category category, CompileSyntax left);
     }
@@ -95,10 +95,10 @@ namespace Reni.TokenClasses
             => new InfixSyntax(token, left.ToCompiledSyntax, this, right.ToCompiledSyntax);
 
         protected override Syntax Terminal(IToken token)
-            => new CompileSyntaxError(IssueId.UnexpectedUseAsTerminal, token);
+            => new CompileSyntaxError(IssueId.UnexpectedUseAsTerminal);
 
         protected override Syntax Suffix(Syntax left, IToken token)
-            => new CompileSyntaxError(IssueId.UnexpectedUseAsSuffix, token);
+            => new CompileSyntaxError(IssueId.UnexpectedUseAsSuffix);
 
         public abstract Result Result
             (ContextBase callContext, Category category, CompileSyntax left, CompileSyntax right);

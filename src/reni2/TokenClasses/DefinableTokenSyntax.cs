@@ -10,24 +10,17 @@ namespace Reni.TokenClasses
 {
     sealed class DefinableTokenSyntax : Syntax
     {
-        internal DefinableTokenSyntax
-            (
-            Definable definable,
-            IToken tokenData)
-            : base(tokenData)
+        internal DefinableTokenSyntax(Definable definable, params DeclarationTagSyntax[] tags)
         {
-            Tags = new DeclarationTagSyntax[0];
+            Tags = tags;
             Definable = definable;
+            StopByObjectIds(51);
         }
-        internal DefinableTokenSyntax
-            (
-            DefinableTokenSyntax other,
-            DeclarationTagSyntax tag)
-            : base(other.Token)
-        {
-            Tags = other.Tags.plus(tag);
-            Definable = other.Definable;
-        }
+
+        internal DefinableTokenSyntax(DefinableTokenSyntax other, DeclarationTagSyntax tag)
+            : this(other.Definable, other.Tags.plus(tag)) { }
+        public DefinableTokenSyntax(DeclarationTagSyntax definable)
+            : this((Definable) null, definable) { }
 
         internal override bool IsIdentifier => true;
         [DisableDumpExcept(true)]
@@ -46,7 +39,7 @@ namespace Reni.TokenClasses
             get
             {
                 Tracer.Assert(!Tags.Any());
-                return new ExpressionSyntax(null, this, null);
+                return new ExpressionSyntax(null, Definable, null);
             }
         }
 

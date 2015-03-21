@@ -16,7 +16,7 @@ namespace Reni.FeatureTest.Validation
     [UseOfUndefinedContextSymbol]
     public sealed class SyntaxErrorComment : CompilerTest
     {
-        protected override void Verify(IEnumerable<IssueBase> issues)
+        protected override void Verify(IEnumerable<SourceIssue> issues)
         {
             var issueArray = issues.ToArray();
             var i = 0;
@@ -36,7 +36,11 @@ world'
     [Output("")]
     public sealed class SyntaxErrorString : CompilerTest
     {
-        protected override void Verify(IEnumerable<IssueBase> issues)
+        public SyntaxErrorString()
+        {
+            //Parameters.TraceOptions.Parser = true;
+        }
+        protected override void Verify(IEnumerable<SourceIssue> issues)
         {
             var issueArray = issues.ToArray();
             var i = 0;
@@ -51,14 +55,15 @@ world'
         const string Pattern = ".*\\.reni\\({0},{1}\\): error {2}: (.*)";
 
         internal static bool IsLogdumpLike
-            (this IssueBase target, int line, int column, IssueId issueId, string text)
+            (this SourceIssue target, int line, int column, IssueId issueId, string text)
         {
-            if(target.IssueId != issueId)
+            if(target.Issue.IssueId != issueId)
                 return false;
 
+            var logDump = target.GetLogDump;
             var value =
                 new Regex(Pattern.ReplaceArgs(line, column, issueId)).Match
-                    (target.LogDump.Replace("\r", "")).Groups[1]
+                    (logDump.Replace("\r", "")).Groups[1]
                     .Value;
             if(value != text)
                 return false;

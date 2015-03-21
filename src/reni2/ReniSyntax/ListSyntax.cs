@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using hw.Helper;
 using System.Linq;
 using hw.Debug;
-using hw.Parser;
 using Reni.ReniParser;
 using Reni.Struct;
 using Reni.TokenClasses;
@@ -12,8 +11,7 @@ namespace Reni.ReniSyntax
 {
     sealed class ListSyntax : Syntax
     {
-        public ListSyntax(List type, IToken token, IEnumerable<Syntax> data)
-            : base(token)
+        public ListSyntax(List type, IEnumerable<Syntax> data)
         {
             Type = type;
             Data = data.ToArray();
@@ -29,7 +27,7 @@ namespace Reni.ReniSyntax
 
         [DisableDump]
         internal override CompoundSyntax ToContainer
-            => new CompoundSyntax(Token, Data);
+            => new CompoundSyntax(Data);
 
         internal override IEnumerable<Syntax> ToList(List type)
         {

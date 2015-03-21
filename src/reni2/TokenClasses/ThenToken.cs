@@ -14,15 +14,15 @@ namespace Reni.TokenClasses
         public override string Id => TokenId;
 
         protected override ReniParser.Syntax Infix(ReniParser.Syntax left, IToken token, ReniParser.Syntax right)
-            => right.CreateThenSyntax(new Syntax(token), left.ToCompiledSyntax);
+            => right.CreateThenSyntax(left.ToCompiledSyntax);
 
         protected override ReniParser.Syntax Terminal(IToken token)
-            => new CompileSyntaxError(IssueId.UnexpectedUseAsTerminal, token);
+            => new CompileSyntaxError(IssueId.UnexpectedUseAsTerminal);
 
         internal sealed class Syntax : ReniParser.Syntax
         {
             public Syntax(IToken token)
-                : base(token)
+                : base()
             { }
 
             internal override bool IsBraceLike => true;

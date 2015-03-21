@@ -5,12 +5,13 @@ using hw.Parser;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
+using Reni.ReniSyntax;
 
 namespace Reni.TokenClasses
 {
     sealed class Text : TerminalToken
     {
-        public override Result Result(ContextBase context, Category category, IToken token)
+        public override Result Result(ContextBase context, Category category, TerminalSyntax token)
         {
             var data = StripQutes(token.Id);
             return context

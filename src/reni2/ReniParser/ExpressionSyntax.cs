@@ -6,6 +6,7 @@ using hw.Parser;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Parser;
 using Reni.ReniSyntax;
 using Reni.TokenClasses;
 using Reni.Type;
@@ -18,12 +19,11 @@ namespace Reni.ReniParser
         internal ExpressionSyntax
             (
             CompileSyntax left,
-            DefinableTokenSyntax @operator,
+            Definable definable,
             CompileSyntax right)
-            : base(@operator.Token)
         {
-            Operator = @operator;
             Left = left;
+            Definable = definable;
             Right = right;
             StopByObjectIds();
         }
@@ -31,7 +31,7 @@ namespace Reni.ReniParser
         [Node]
         internal CompileSyntax Left { get; }
         [Node]
-        public DefinableTokenSyntax Operator { get; }
+        public Definable Definable { get; }
         [Node]
         internal CompileSyntax Right { get; }
 
@@ -46,31 +46,29 @@ namespace Reni.ReniParser
 
         internal override Result ResultForCache(ContextBase context, Category category)
         {
-            var @operator = Operator;
-
             if(Left == null)
-                return context.PrefixResult(category, Token, @operator.Definable, Right);
+                return context.PrefixResult(category, Definable, this);
 
             var left = new ResultCache(c => context.ResultAsReference(c, Left));
 
             var typeForSearch = left.Type;
             var searchResults
                 = typeForSearch
-                    .DeclarationsForTypeAndCloseRelatives(@operator.Definable)
+                    .DeclarationsForTypeAndCloseRelatives(Definable)
                     .RemoveLowPriorityResults()
                     .ToArray();
 
             switch(searchResults.Length)
             {
                 case 0:
-                    return UndefinedSymbolIssue.Type(Token, typeForSearch).IssueResult(category);
+                    return typeForSearch.UndefinedSymbol(this).Result(category);
 
                 case 1:
                     return searchResults[0].Execute(category, left, context, Right);
 
                 default:
-                    return AmbiguousSymbolIssue.Type(Token, context.RootContext)
-                        .IssueResult(category);
+                    return context.RootContext.UndefinedSymbol(this)
+                        .Result(category);
             }
         }
 
@@ -81,7 +79,7 @@ namespace Reni.ReniParser
             if(left == null && right == null)
                 return null;
 
-            return (CompileSyntax) Operator.Definable.CreateForVisit(left ?? Left, Token, right ?? Right);
+            return (CompileSyntax) Definable.CreateForVisit(left ?? Left, right ?? Right);
         }
 
         protected override string GetNodeDump()
@@ -95,7 +93,7 @@ namespace Reni.ReniParser
         }
 
         internal override Syntax CreateDeclarationSyntax(IToken token, Syntax right)
-            => new CompileSyntaxError(IssueId.IdentifyerExpected, Token);
+            => new CompileSyntaxError(IssueId.IdentifyerExpected);
 
         internal override Syntax SyntaxError
             (IssueId issue, IToken token, Syntax right = null)

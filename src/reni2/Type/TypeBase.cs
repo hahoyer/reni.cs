@@ -9,8 +9,11 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Parser;
+using Reni.ReniParser;
 using Reni.Struct;
 using Reni.TokenClasses;
+using Reni.Validation;
 
 namespace Reni.Type
 {
@@ -515,6 +518,12 @@ namespace Reni.Type
             NotImplementedMethod();
             return null;
         }
+        internal IssueType UndefinedSymbol(ExpressionSyntax source)
+            =>
+                new IssueType
+                    (
+                    new Issue(IssueId.UndefinedSymbol, source, "Type: " + DumpPrintText),
+                    RootContext);
     }
 
 

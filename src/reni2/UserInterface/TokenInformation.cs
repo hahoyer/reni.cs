@@ -5,6 +5,7 @@ using hw.Debug;
 using hw.Scanner;
 using Reni.Parser;
 using Reni.ReniParser;
+using Reni.TokenClasses;
 
 namespace Reni.UserInterface
 {
@@ -39,9 +40,9 @@ namespace Reni.UserInterface
 
     sealed class SyntaxToken : TokenInformation
     {
-        internal SyntaxToken(Syntax syntax) { Syntax = syntax; }
+        internal SyntaxToken(SourceSyntax syntax) { Syntax = syntax; }
 
-        public Syntax Syntax { get; }
+        public SourceSyntax Syntax { get; }
         public override SourcePart SourcePart => Syntax.Token.SourcePart;
         public override bool IsKeyword => Syntax.IsKeyword;
         public override bool IsIdentifier => Syntax.IsIdentifier;

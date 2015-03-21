@@ -34,7 +34,6 @@
     <Compile Include="Code\IVisitor.cs" />
     <Compile Include="Code\None.cs" />
     <Compile Include="Code\ArrayAccess.cs" />
-    <Compile Include="Context\UndefinedSymbolType.cs" />
     <Compile Include="FeatureTest\Array\ArrayFromPieces.cs" />
     <Compile Include="FeatureTest\Array\CombineArraysFromPieces.cs" />
     <Compile Include="FeatureTest\Array\DefaultInitialized.cs" />
@@ -206,7 +205,6 @@
     <Compile Include="Parser\PrioTableTest.cs" />
     <Compile Include="Parser\ReniScanner.cs" />
     <Compile Include="Parser\Services.cs" />
-    <Compile Include="Parser\SyntaxIssue.cs" />
     <Compile Include="ReniObjectExtender.cs" />
     <Compile Include="ReniParser\SyntaxBoxToken.cs" />
     <Compile Include="ReniParser\TokenFactory.cs" />
@@ -274,7 +272,6 @@
     <Compile Include="FeatureTest\Text.cs" />
     <Compile Include="Feature\DumpPrintToken.cs" />
     <Compile Include="Feature\Interfaces.cs" />
-    <Compile Include="Parser\SyntaxError.cs" />
     <Compile Include="Parser\TokenClassExtender.cs" />
     <Compile Include="ReniParser\DeclarationSyntax.cs" />
     <Compile Include="ReniParser\DeclarationTokenFactory.cs" />
@@ -377,11 +374,10 @@
     <Compile Include="Type\VoidType.cs" />
     <Compile Include="UserInterface\TokenInformation.cs" />
     <Compile Include="Validation\CompileSyntaxError.cs" />
-    <Compile Include="Validation\CompileSyntaxIssue.cs" />
-    <Compile Include="Validation\ConsequentialError.cs" />
-    <Compile Include="Validation\IssueBase.cs" />
+    <Compile Include="Validation\Issue.cs" />
     <Compile Include="Validation\IssueId.cs" />
     <Compile Include="Validation\IssueType.cs" />
+    <Compile Include="Validation\SourceIssue.cs" />
     <Compile Include="Validation\SyntaxError.cs" />
   </ItemGroup>
   <ItemGroup>

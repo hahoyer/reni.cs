@@ -58,10 +58,6 @@ namespace Reni.Struct
         internal override Root RootContext => _compoundView.RootContext;
         [DisableDump]
         internal override bool Hllw => true;
-        [DisableDump]
-        internal override string DumpPrintText => _syntax.DumpPrintText;
-
-        internal new Result DumpPrintTokenResult(Category category) => DumpPrintTypeNameResult(category);
 
         [DisableDump]
         IContextReference ObjectReference => _objectReferenceCache.Value;

@@ -1,32 +1,10 @@
-#region Copyright (C) 2013
-
-//     Project Reni2
-//     Copyright (C) 2012 - 2013 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-#endregion
-
 using System.Linq;
 using System.Collections.Generic;
 using System;
 using System.Reflection;
 using hw.Debug;
-using hw.Helper;
 using hw.Forms;
+using hw.Helper;
 using Reni.Context;
 using Reni.ReniParser;
 using Reni.Struct;
@@ -42,14 +20,15 @@ namespace Reni.Code
         [Node]
         readonly FunctionCache<int, FunctionContainer> _functions;
 
-        public CodeContainer(Root rootContext, ReniParser.Syntax syntax, string description)
+        public CodeContainer(Root rootContext, Syntax syntax, string description)
         {
             _rootContext = rootContext;
-            _mainCache = new ValueCache<Container>(() => rootContext.MainContainer(syntax, description));
+            _mainCache = new ValueCache<Container>
+                (() => rootContext.MainContainer(syntax, description));
             _functions = new FunctionCache<int, FunctionContainer>(_rootContext.FunctionContainer);
         }
 
-        internal IEnumerable<IssueBase> Issues
+        internal IEnumerable<Issue> Issues
         {
             get
             {
@@ -76,8 +55,9 @@ namespace Reni.Code
         internal string CreateCSharpString(string className) => Generator
             .CreateCSharpString(Main, Functions, true, className);
 
-        internal Assembly CreateCSharpAssembly(string className, bool generatorFilePosn) => Generator
-            .CreateCSharpAssembly(Main, Functions, false, className, generatorFilePosn);
+        internal Assembly CreateCSharpAssembly(string className, bool generatorFilePosn)
+            => Generator
+                .CreateCSharpAssembly(Main, Functions, false, className, generatorFilePosn);
 
         public CodeBase Function(FunctionId functionId)
         {
