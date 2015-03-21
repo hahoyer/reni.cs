@@ -16,7 +16,7 @@ namespace Reni.TokenClasses
             => context.RootContext.BitType.Result(category, BitsConst.Convert(token.Id));
 
         protected override Syntax Infix(Syntax left, IToken token, Syntax right)
-            => new CompileSyntaxError(IssueId.UnexpectedUseAsSuffix);
+            => new CompileSyntaxError(IssueId.UnexpectedUseAsSuffix, token.Characters);
         public override string Id => "<number>";
     }
 }

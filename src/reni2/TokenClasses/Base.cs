@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.Parser;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.ReniParser;
@@ -16,7 +17,7 @@ namespace Reni.TokenClasses
             => new TerminalSyntax(token.Id, this);
 
         protected override Syntax Infix(Syntax left, IToken token, Syntax right)
-            => new CompileSyntaxError(IssueId.UnexpectedUseAsSuffix);
+            => new CompileSyntaxError(IssueId.UnexpectedUseAsSuffix,token.Characters);
 
         public abstract Result Result(ContextBase context, Category category, TerminalSyntax token);
 
@@ -35,7 +36,7 @@ namespace Reni.TokenClasses
             => new TerminalSyntax(token.Id, this);
 
         protected override Syntax Infix(Syntax left, IToken token, Syntax right)
-            => new CompileSyntaxError(IssueId.UnexpectedUseAsPrefix);
+            => new CompileSyntaxError(IssueId.UnexpectedUseAsPrefix, token.Characters);
 
         public abstract Result Result(ContextBase context, Category category, TerminalSyntax token);
 
@@ -58,7 +59,7 @@ namespace Reni.TokenClasses
             => new PrefixSyntax(token, this, right.ToCompiledSyntax);
 
         protected override Syntax Infix(Syntax left, IToken token, Syntax right)
-            => new CompileSyntaxError(IssueId.UnexpectedUseAsSuffix);
+            => new CompileSyntaxError(IssueId.UnexpectedUseAsSuffix, token.Characters);
 
         public abstract Result Result(ContextBase context, Category category, TerminalSyntax token);
 
@@ -80,11 +81,10 @@ namespace Reni.TokenClasses
             => new SuffixSyntax(token, left.ToCompiledSyntax, this);
 
         protected override Syntax Infix(Syntax left, IToken token, Syntax right)
-            =>
-                new CompileSyntaxError(IssueId.UnexpectedUseAsPrefix);
+            =>  new CompileSyntaxError(IssueId.UnexpectedUseAsPrefix, token.Characters);
 
         protected override Syntax Terminal(IToken token)
-            => new CompileSyntaxError(IssueId.UnexpectedUseAsTerminal);
+            => new CompileSyntaxError(IssueId.UnexpectedUseAsTerminal, token.Characters);
 
         public abstract Result Result(ContextBase context, Category category, CompileSyntax left);
     }
@@ -95,10 +95,10 @@ namespace Reni.TokenClasses
             => new InfixSyntax(token, left.ToCompiledSyntax, this, right.ToCompiledSyntax);
 
         protected override Syntax Terminal(IToken token)
-            => new CompileSyntaxError(IssueId.UnexpectedUseAsTerminal);
+            => new CompileSyntaxError(IssueId.UnexpectedUseAsTerminal, token.Characters);
 
         protected override Syntax Suffix(Syntax left, IToken token)
-            => new CompileSyntaxError(IssueId.UnexpectedUseAsSuffix);
+            => new CompileSyntaxError(IssueId.UnexpectedUseAsSuffix, token.Characters);
 
         public abstract Result Result
             (ContextBase callContext, Category category, CompileSyntax left, CompileSyntax right);

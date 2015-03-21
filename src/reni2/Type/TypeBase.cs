@@ -4,6 +4,7 @@ using hw.Helper;
 using System.Linq;
 using hw.Debug;
 using hw.Forms;
+using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
@@ -518,7 +519,7 @@ namespace Reni.Type
             NotImplementedMethod();
             return null;
         }
-        internal IssueType UndefinedSymbol(ExpressionSyntax source)
+        internal IssueType UndefinedSymbol(SourcePart source)
             =>
                 new IssueType
                     (

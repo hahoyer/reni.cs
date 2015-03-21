@@ -151,7 +151,7 @@ namespace Reni
                 Tracer.FlaggedLine(CSharpCode);
 
             foreach(var t in Issues)
-                _parameters.OutStream.AddLog(t.GetLogDump + "\n");
+                _parameters.OutStream.AddLog(t.LogDump + "\n");
 
             Data.OutStream = _parameters.OutStream;
             try
@@ -177,9 +177,8 @@ namespace Reni
         }
 
         [DisableDump]
-        internal IEnumerable<SourceIssue> Issues
-            => (_parameters.ParseOnly ? Syntax.Issues : CodeContainer.Issues)
-            .Select(item=>SourceSyntax.Issue(item));
+        internal IEnumerable<Issue> Issues
+            => (_parameters.ParseOnly ? Syntax.Issues : CodeContainer.Issues);
 
         SourceSyntax Parse(SourcePosn source) => _tokenFactory.Parser.Execute(source);
 

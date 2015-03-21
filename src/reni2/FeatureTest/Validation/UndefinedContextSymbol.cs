@@ -16,7 +16,7 @@ namespace Reni.FeatureTest.Validation
     public sealed class UndefinedContextSymbol : CompilerTest
     {
         public UndefinedContextSymbol() { Parameters.ProcessErrors = true; }
-        protected override void Verify(IEnumerable<SourceIssue> issues)
+        protected override void Verify(IEnumerable<Issue> issues)
         {
             var issueArray = issues.ToArray();
             var i = 0;
@@ -33,7 +33,7 @@ namespace Reni.FeatureTest.Validation
     public sealed class UndefinedSymbol : CompilerTest
     {
         public UndefinedSymbol() { Parameters.ProcessErrors = true; }
-        protected override void Verify(IEnumerable<SourceIssue> issues)
+        protected override void Verify(IEnumerable<Issue> issues)
         {
             var issueArray = issues.ToArray();
             var i = 0;
@@ -51,7 +51,7 @@ namespace Reni.FeatureTest.Validation
     public sealed class UseOfUndefinedContextSymbol : CompilerTest
     {
         public UseOfUndefinedContextSymbol() { Parameters.ProcessErrors = true; }
-        protected override void Verify(IEnumerable<SourceIssue> issues)
+        protected override void Verify(IEnumerable<Issue> issues)
         {
             var issueArray = issues.ToArray();
             var i = 0;
@@ -70,7 +70,7 @@ namespace Reni.FeatureTest.Validation
     public sealed class IndirectUseOfUndefinedContextSymbol : CompilerTest
     {
         public IndirectUseOfUndefinedContextSymbol() { Parameters.ProcessErrors = true; }
-        protected override void Verify(IEnumerable<SourceIssue> issues)
+        protected override void Verify(IEnumerable<Issue> issues)
         {
             var issueArray = issues.ToArray();
             var i = 0;

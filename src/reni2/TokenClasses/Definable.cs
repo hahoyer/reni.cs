@@ -13,16 +13,16 @@ namespace Reni.TokenClasses
     abstract class Definable : TokenClass
     {
         protected override sealed Syntax Terminal(IToken token)
-            => new DefinableTokenSyntax(this);
+            => new DefinableTokenSyntax(this,token.Characters);
 
         protected override sealed Syntax Prefix(IToken token, Syntax right)
-            => new ExpressionSyntax(null, this, right.ToCompiledSyntax);
+            => new ExpressionSyntax(null, this, right.ToCompiledSyntax, token.Characters);
 
         protected override sealed Syntax Suffix(Syntax left, IToken token)
-            => left.SuffixedBy(this);
+            => left.SuffixedBy(this, token.Characters);
 
         protected override sealed Syntax Infix(Syntax left, IToken token, Syntax right)
-            => new ExpressionSyntax(left.ToCompiledSyntax, this, right.ToCompiledSyntax);
+            => new ExpressionSyntax(left.ToCompiledSyntax, this, right.ToCompiledSyntax, token.Characters);
 
         [DisableDump]
         protected string DataFunctionName => Id.Symbolize();

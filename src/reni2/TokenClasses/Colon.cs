@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Parser;
+using hw.Scanner;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
 using Reni.Validation;
@@ -17,14 +18,14 @@ namespace Reni.TokenClasses
 
         protected override Syntax Suffix(Syntax left, IToken token)
             => left.CreateDeclarationSyntax
-                (token, new CompileSyntaxError(IssueId.MissingValueInDeclaration));
+                (token, new CompileSyntaxError(IssueId.MissingValueInDeclaration, token.Characters));
 
         protected override Syntax Infix(Syntax left, IToken token, Syntax right)
             => left.CreateDeclarationSyntax(token, right);
 
         protected override Syntax Terminal(IToken token)
             => new DeclarationSyntax
-                (token, new CompileSyntaxError(IssueId.MissingValueInDeclaration));
+                (token, new CompileSyntaxError(IssueId.MissingValueInDeclaration, token.Characters));
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
@@ -55,7 +56,7 @@ namespace Reni.TokenClasses
                     (
                     token,
                     body,
-                    new DefinableTokenSyntax(new DeclarationTagSyntax(this))
+                    new DefinableTokenSyntax(new DeclarationTagSyntax(this), token.Characters)
                     );
 
         protected override Syntax Terminal(IToken token)
@@ -102,17 +103,19 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal override bool IsError => _tag.IsError;
 
-        internal override Syntax CreateDeclarationSyntax(IToken token, Syntax right)
-            => _tag.DeclarationSyntax
-                (token, right.CheckedToCompiledSyntax(RightMustNotBeNullError));
-
-        internal override Syntax SuffixedBy(Definable definable)
-            => new DefinableTokenSyntax(definable, this);
-
-        IssueId RightMustNotBeNullError()
+        internal override CompileSyntax ToCompiledSyntax
         {
-            NotImplementedMethod();
-            return null;
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
         }
+
+        internal override Syntax CreateDeclarationSyntax(IToken token, Syntax right)
+            => _tag.DeclarationSyntax(token, right.ToCompiledSyntax);
+
+        internal override Syntax SuffixedBy(Definable definable, SourcePart token)
+            => new DefinableTokenSyntax(definable, token, this);
     }
 }

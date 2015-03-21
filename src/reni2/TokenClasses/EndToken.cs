@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.Parser;
+using hw.Scanner;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
 

@@ -6,7 +6,6 @@ using hw.Parser;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
-using Reni.Parser;
 using Reni.ReniSyntax;
 using Reni.TokenClasses;
 using Reni.Type;
@@ -20,11 +19,13 @@ namespace Reni.ReniParser
             (
             CompileSyntax left,
             Definable definable,
-            CompileSyntax right)
+            CompileSyntax right,
+            SourcePart token)
         {
             Left = left;
             Definable = definable;
             Right = right;
+            Token = token;
             StopByObjectIds();
         }
 
@@ -32,6 +33,7 @@ namespace Reni.ReniParser
         internal CompileSyntax Left { get; }
         [Node]
         public Definable Definable { get; }
+        public SourcePart Token { get; }
         [Node]
         internal CompileSyntax Right { get; }
 
@@ -47,7 +49,7 @@ namespace Reni.ReniParser
         internal override Result ResultForCache(ContextBase context, Category category)
         {
             if(Left == null)
-                return context.PrefixResult(category, Definable, this);
+                return context.PrefixResult(category, Definable, Token, Right);
 
             var left = new ResultCache(c => context.ResultAsReference(c, Left));
 
@@ -61,13 +63,13 @@ namespace Reni.ReniParser
             switch(searchResults.Length)
             {
                 case 0:
-                    return typeForSearch.UndefinedSymbol(this).Result(category);
+                    return typeForSearch.UndefinedSymbol(Token).Result(category);
 
                 case 1:
                     return searchResults[0].Execute(category, left, context, Right);
 
                 default:
-                    return context.RootContext.UndefinedSymbol(this)
+                    return context.RootContext.UndefinedSymbol(Token)
                         .Result(category);
             }
         }
@@ -93,7 +95,7 @@ namespace Reni.ReniParser
         }
 
         internal override Syntax CreateDeclarationSyntax(IToken token, Syntax right)
-            => new CompileSyntaxError(IssueId.IdentifyerExpected);
+            => new CompileSyntaxError(IssueId.IdentifierExpected, token.Characters);
 
         internal override Syntax SyntaxError
             (IssueId issue, IToken token, Syntax right = null)

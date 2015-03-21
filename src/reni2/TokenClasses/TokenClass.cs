@@ -3,6 +3,7 @@ using System.Linq;
 using System;
 using hw.Helper;
 using hw.Parser;
+using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.ReniParser;
 

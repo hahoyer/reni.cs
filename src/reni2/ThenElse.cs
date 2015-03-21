@@ -8,7 +8,6 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
-using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni
@@ -118,7 +117,7 @@ namespace Reni
                 .Align;
         }
 
-        internal override Syntax CreateElseSyntax(ElseToken.Syntax token, CompileSyntax elseSyntax)
+        internal override Syntax CreateElseSyntax(CompileSyntax elseSyntax)
         {
             Tracer.Assert(Else == null);
             return new CondSyntax(this, elseSyntax);

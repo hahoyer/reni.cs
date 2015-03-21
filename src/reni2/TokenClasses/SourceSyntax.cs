@@ -152,21 +152,6 @@ namespace Reni.TokenClasses
             return new UserInterface.WhiteSpaceToken(whiteSpaceToken);
         }
 
-        public SourceIssue Issue(Issue issue)
-        {
-            var sourceSyntax = Find(issue);
-            return new SourceIssue(issue, sourceSyntax.AssertNotNull().Token.Characters);
-        }
-
-        SourceSyntax Find(Issue issue)
-        {
-            if(Syntax.Find(issue))
-                return this;
-            return Left?.Find(issue)
-                ??
-                Right?.Find(issue);
-        }
-
         [DisableDump]
         internal string DumpPrintText => SourcePart.Id;
     }

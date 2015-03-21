@@ -20,7 +20,7 @@ namespace Reni.TokenClasses
         public override string Id => TokenId(_level);
 
         protected override ReniParser.Syntax Suffix(ReniParser.Syntax left, IToken token)
-            => left.Match(new Syntax(_level));
+            => left.Match(_level, token.Characters);
 
         protected override ReniParser.Syntax Infix
             (ReniParser.Syntax left, IToken token, ReniParser.Syntax right)
@@ -39,18 +39,6 @@ namespace Reni.TokenClasses
         {
             NotImplementedMethod(token);
             return null;
-        }
-
-        internal sealed class Syntax : ReniParser.Syntax
-        {
-            internal readonly int Level;
-            public Syntax(int level)
-            {
-                Level = level;
-                StopByObjectIds();
-            }
-
-            internal override bool IsBraceLike => true;
         }
     }
 }

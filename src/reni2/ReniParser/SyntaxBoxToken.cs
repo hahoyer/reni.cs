@@ -20,12 +20,6 @@ namespace Reni.ReniParser
             return null;
         }
 
-        internal sealed class Syntax : ReniParser.Syntax
-        {
-            public Syntax(IToken token)
-                : base() { }
-        }
-
         public override string Id => "<box>";
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using hw.Debug;
 using hw.Helper;
 using hw.Parser;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.ReniParser;
@@ -21,11 +22,11 @@ namespace Reni.Validation
         readonly ValueCache<Issue> _issueCache;
 
         public CompileSyntaxError
-            (IssueId issueId, Syntax source = null, CompileSyntaxError previous = null)
+            (IssueId issueId, SourcePart source, CompileSyntaxError previous = null)
         {
             _issueId = issueId;
             _previous = previous;
-            _issueCache = new ValueCache<Issue>(() => new Issue(_issueId, source ?? this, ""));
+            _issueCache = new ValueCache<Issue>(() => new Issue(_issueId, source, ""));
 
             StopByObjectIds(67);
         }
@@ -63,15 +64,9 @@ namespace Reni.Validation
 
         internal override Syntax End => new ListSyntax(null, new[] {this});
 
-        internal override Syntax Match(RightParenthesis.Syntax rightBracket)
+        internal override Syntax CreateElseSyntax(CompileSyntax elseSyntax)
         {
-            NotImplementedMethod(rightBracket);
-            return null;
-        }
-
-        internal override Syntax CreateElseSyntax(ElseToken.Syntax token, CompileSyntax elseSyntax)
-        {
-            NotImplementedMethod(token, elseSyntax);
+            NotImplementedMethod(elseSyntax);
             return null;
         }
         internal override Syntax CreateDeclarationSyntax(IToken token, Syntax right)
@@ -99,7 +94,7 @@ namespace Reni.Validation
         internal override Syntax SyntaxError(IssueId issue, IToken token, Syntax right = null)
         {
             if(right == null)
-                return new CompileSyntaxError(issue, this);
+                return new CompileSyntaxError(issue, token.Characters, this);
             NotImplementedMethod(issue, token, right);
             return null;
         }

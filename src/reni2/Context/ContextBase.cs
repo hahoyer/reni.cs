@@ -206,13 +206,13 @@ namespace Reni.Context
             return null;
         }
 
-        internal Result PrefixResult(Category category, Definable definable, ExpressionSyntax expression)
+        internal Result PrefixResult(Category category, Definable definable, SourcePart source, CompileSyntax right)
         {
             var searchResult = Declarations(definable);
             if(searchResult == null)
-                return RootContext.UndefinedSymbol(expression).Result(category);
+                return RootContext.UndefinedSymbol(source).Result(category);
 
-            var result = searchResult.Execute(category, FindRecentCompoundView.ObjectPointerViaContext, this, expression.Right);
+            var result = searchResult.Execute(category, FindRecentCompoundView.ObjectPointerViaContext, this, right);
             Tracer.Assert(category <= result.CompleteCategory);
             return result;
         }
@@ -226,7 +226,7 @@ namespace Reni.Context
                 yield return new 
                     ContextSearchResult(feature, RootContext);
         }
-        public IssueType UndefinedSymbol(ExpressionSyntax source)
+        public IssueType UndefinedSymbol(SourcePart source)
             =>
                 new IssueType
                     (

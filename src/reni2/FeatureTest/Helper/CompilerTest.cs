@@ -144,7 +144,7 @@ namespace Reni.FeatureTest.Helper
 
         protected virtual string Output => GetStringAttribute<OutputAttribute>();
         protected virtual string Target => GetStringAttribute<TargetAttribute>();
-        protected virtual void Verify(IEnumerable<SourceIssue> issues) => Tracer.Assert(!issues.Any());
+        protected virtual void Verify(IEnumerable<Issue> issues) => Tracer.Assert(!issues.Any());
 
         protected virtual IEnumerable<System.Type> DependsOn
         {

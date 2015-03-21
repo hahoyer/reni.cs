@@ -23,8 +23,7 @@ namespace Reni.ReniParser
         internal virtual CompileSyntax ContainerStatementToCompileSyntax => ToCompiledSyntax;
 
         [DisableDump]
-        internal virtual CompileSyntax ToCompiledSyntax
-            => new CompileSyntaxError(IssueId.CompiledSyntaxExpected);
+        internal abstract CompileSyntax ToCompiledSyntax { get; }
 
         internal virtual IEnumerable<KeyValuePair<string, int>> GetDeclarations(int index)
         {
@@ -35,9 +34,9 @@ namespace Reni.ReniParser
         internal Syntax CreateThenSyntax(CompileSyntax condition)
             => new CondSyntax(condition, ToCompiledSyntax);
 
-        internal virtual Syntax CreateElseSyntax(ElseToken.Syntax token, CompileSyntax elseSyntax)
+        internal virtual Syntax CreateElseSyntax(CompileSyntax elseSyntax)
         {
-            NotImplementedMethod(token, elseSyntax);
+            NotImplementedMethod(elseSyntax);
             return null;
         }
 
@@ -99,8 +98,8 @@ namespace Reni.ReniParser
             return null;
         }
 
-        internal virtual Syntax SuffixedBy(Definable definable)
-            => new ExpressionSyntax(ToCompiledSyntax, definable, null);
+        internal virtual Syntax SuffixedBy(Definable definable, SourcePart token)
+            => new ExpressionSyntax(ToCompiledSyntax, definable, null, token);
 
         [DisableDump]
         internal virtual IEnumerable<Issue> Issues
@@ -110,8 +109,8 @@ namespace Reni.ReniParser
         internal virtual IEnumerable<Issue> DirectIssues { get { yield break; } }
 
 
-        internal virtual Syntax Match(RightParenthesis.Syntax rightBracket)
-            => new CompileSyntaxError(IssueId.ExtraRightBracket);
+        internal virtual Syntax Match(int level, SourcePart token)
+            => new CompileSyntaxError(IssueId.ExtraRightBracket, token);
 
         [DisableDump]
         internal IEnumerable<Syntax> Parts => DirectChildren
@@ -127,8 +126,6 @@ namespace Reni.ReniParser
             null,
             ToList(null)
             );
-
-        public virtual bool Find(Issue issue) => issue.Source == this;
     }
 
 
@@ -169,9 +166,9 @@ namespace Reni.ReniParser
         }
 
         internal static CompileSyntax CheckedToCompiledSyntax
-            (this Syntax target, Func<IssueId> getError)
+            (this Syntax target, Func<IssueId> getError, SourcePart source)
             => target?.ToCompiledSyntax
-                ?? new CompileSyntaxError(getError(), target);
+                ?? new CompileSyntaxError(getError(), source);
 
         internal static Token<SourceSyntax> Token(this SourcePosn sourcePosn)
             => new Token<SourceSyntax>(null, sourcePosn.Span(0));

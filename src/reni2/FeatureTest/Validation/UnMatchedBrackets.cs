@@ -15,7 +15,7 @@ namespace Reni.FeatureTest.Validation
     {
         public UnMatchedLeftParenthesis() { Parameters.ParseOnly = true; }
 
-        protected override void Verify(IEnumerable<SourceIssue> issues)
+        protected override void Verify(IEnumerable<Issue> issues)
         {
             var issueArray = issues.ToArray();
             var i = 0;
@@ -32,7 +32,7 @@ namespace Reni.FeatureTest.Validation
     {
         public UnMatchedRightParenthesis() { Parameters.ParseOnly = true; }
 
-        protected override void Verify(IEnumerable<SourceIssue> issues)
+        protected override void Verify(IEnumerable<Issue> issues)
         {
             var issueArray = issues.ToArray();
             var i = 0;

@@ -13,11 +13,11 @@ namespace Reni.TokenClasses
         public const string TokenId = "then";
         public override string Id => TokenId;
 
-        protected override ReniParser.Syntax Infix
-            (ReniParser.Syntax left, IToken token, ReniParser.Syntax right)
+        protected override Syntax Infix
+            (Syntax left, IToken token, Syntax right)
             => right.CreateThenSyntax(left.ToCompiledSyntax);
 
-        protected override ReniParser.Syntax Terminal(IToken token)
-            => new CompileSyntaxError(IssueId.UnexpectedUseAsTerminal);
+        protected override Syntax Terminal(IToken token)
+            => new CompileSyntaxError(IssueId.UnexpectedUseAsTerminal, token.Characters);
     }
 }

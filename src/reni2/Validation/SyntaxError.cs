@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Helper;
-using hw.Parser;
-using Reni.Parser;
+using hw.Scanner;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
 
@@ -20,9 +19,8 @@ namespace Reni.Validation
         SyntaxError
             (
             IssueId issueId,
-            Syntax source, 
+            SourcePart source,
             SyntaxError previous = null)
-            : base()
         {
             Source = source;
             _issueId = issueId;
@@ -32,7 +30,7 @@ namespace Reni.Validation
         }
 
         [EnableDump]
-        public Syntax Source { get; set; }
+        public SourcePart Source { get; set; }
 
         protected override IEnumerable<Syntax> DirectChildren { get { yield return _previous; } }
 
@@ -40,6 +38,14 @@ namespace Reni.Validation
         internal override IEnumerable<Issue> DirectIssues
             => _issueCache.Value.plus(base.DirectIssues);
 
+        internal override CompileSyntax ToCompiledSyntax
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
         internal override bool IsError => true;
     }
 }

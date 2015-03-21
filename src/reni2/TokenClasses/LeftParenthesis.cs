@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Parser;
+using hw.Scanner;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
 using Reni.Validation;
@@ -45,11 +46,13 @@ namespace Reni.TokenClasses
 
         sealed class Syntax : ReniParser.Syntax
         {
+            SourcePart Token { get; }
             readonly int _level;
             internal readonly ReniParser.Syntax Right;
 
             public Syntax(int level, IToken token, ReniParser.Syntax right)
             {
+                Token = token.Characters;
                 _level = level;
                 Right = right;
             }
@@ -61,14 +64,13 @@ namespace Reni.TokenClasses
 
             [DisableDump]
             internal override CompileSyntax ToCompiledSyntax
-                => new CompileSyntaxError(IssueId.MissingRightBracket, this);
+                => new CompileSyntaxError(IssueId.MissingRightBracket, Token);
 
             internal override bool IsBraceLike => true;
 
-            internal override ReniParser.Syntax Match
-                (RightParenthesis.Syntax rightBracket)
+            internal override ReniParser.Syntax Match(int level, SourcePart token)
             {
-                Tracer.Assert(_level == rightBracket.Level);
+                Tracer.Assert(_level == level);
                 return (Right ?? new EmptyList());
             }
         }
