@@ -41,8 +41,8 @@ namespace Reni.ReniSyntax
 
         internal override bool IsNumber => Terminal is Number;
         internal override bool IsText => Terminal is Text;
-
-        public long ToNumber => BitsConst.Convert(Id).ToInt64();
+        [DisableDump]
+        internal long ToNumber => BitsConst.Convert(Id).ToInt64();
     }
 
     sealed class PrefixSyntax : SpecialSyntax
