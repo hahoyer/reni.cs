@@ -7,17 +7,18 @@ using hw.Helper;
 using Reni.Basics;
 using Reni.Code.ReplaceVisitor;
 using Reni.Context;
+using Reni.ReniParser;
 using Reni.Struct;
 using Reni.Type;
 using Reni.Validation;
 
 namespace Reni.Code
 {
-    abstract class CodeBase : DumpableObject, IIconKeyProvider, IFormalCodeItem, IAggregateable<CodeBase>
+    abstract class CodeBase
+        : DumpableObject, IIconKeyProvider, IFormalCodeItem, IAggregateable<CodeBase>
     {
-
         protected CodeBase(int objectId)
-            : base(objectId) { }
+            : base(objectId) {}
 
         [Node]
         [DisableDump]
@@ -56,23 +57,20 @@ namespace Reni.Code
 
         internal static CodeBase List(IEnumerable<CodeBase> data)
         {
-            var resultData = new List<CodeBase>();
-            foreach(var codeBase in data)
-                resultData.AddRange(codeBase.AsList());
-            switch(resultData.Count)
-            {
-                case 0:
-                    return Void;
-                case 1:
-                    return resultData[0];
-            }
-            return Code.List.Create(resultData);
+            var allData = data
+                .SelectMany(item => item.AsList())
+                .ToArray();
+
+            var nonIssues = Code.List.CheckedCreate(allData.Where(item => !(item is IssueCode)));
+            var issues = IssueCode.CheckedCreate(allData.Where(item => item is IssueCode));
+
+            return Code.List.Create(issues, nonIssues);
         }
 
         protected abstract Size GetSize();
 
         protected virtual CodeArgs GetRefsImplementation() => CodeArgs.Void();
-        
+
         internal CodeBase Assignment(Size size)
         {
             var refAlignParam = Root.DefaultRefAlignParam;
@@ -116,13 +114,7 @@ namespace Reni.Code
             return Add(new BitCast(size, Size, Size));
         }
 
-        CodeBase Sequence(params CodeBase[] data)
-        {
-            var extendedData = new CodeBase[data.Length + 1];
-            extendedData[0] = this;
-            data.CopyTo(extendedData, 1);
-            return List(extendedData);
-        }
+        CodeBase Sequence(params CodeBase[] data) => List(this.plus(data));
 
         protected virtual IEnumerable<CodeBase> AsList() => new[] {this};
 
@@ -237,7 +229,7 @@ namespace Reni.Code
                 return this;
 
             Tracer.Assert(copier.IsEmpty);
-            return Add(new Drop(Size , Size - initialSize));
+            return Add(new Drop(Size, Size - initialSize));
         }
 
         internal CodeBase NumberOperation

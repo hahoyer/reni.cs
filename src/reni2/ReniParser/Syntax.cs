@@ -5,6 +5,8 @@ using System.Linq;
 using hw.Debug;
 using hw.Parser;
 using hw.Scanner;
+using Reni.Basics;
+using Reni.Context;
 using Reni.ReniSyntax;
 using Reni.Struct;
 using Reni.TokenClasses;
@@ -94,6 +96,11 @@ namespace Reni.ReniParser
         internal virtual Syntax SyntaxError
             (IssueId issue, IToken token, Syntax right = null)
         {
+            if(right == null)
+            {
+                var e = new CompileSyntaxError(issue, token.Characters);
+                return new ProxySyntax(this, e);
+            }
             NotImplementedMethod(issue, token, right);
             return null;
         }
@@ -126,6 +133,33 @@ namespace Reni.ReniParser
             null,
             ToList(null)
             );
+    }
+
+    sealed class ProxySyntax : Syntax
+    {
+        readonly Syntax _value;
+        readonly CompileSyntaxError _issue;
+        public ProxySyntax(Syntax value, CompileSyntaxError issue)
+        {
+            _value = value;
+            _issue = issue;
+        }
+        internal override CompileSyntax ToCompiledSyntax
+            => new ProxyCompileSyntax(_value.ToCompiledSyntax, _issue);
+    }
+
+    sealed class ProxyCompileSyntax : CompileSyntax
+    {
+        readonly CompileSyntax _value;
+        readonly CompileSyntaxError _issue;
+        public ProxyCompileSyntax(CompileSyntax value, CompileSyntaxError issue)
+        {
+            _value = value;
+            _issue = issue;
+        }
+
+        internal override Result ResultForCache(ContextBase context, Category category)
+            => _value.Result(context, category) + _issue.Result(context, category);
     }
 
 

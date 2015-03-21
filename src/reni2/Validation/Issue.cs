@@ -22,14 +22,19 @@ namespace Reni.Validation
             AssertValid();
             StopByObjectIds(69);
         }
-        void AssertValid() { Tracer.Assert(Position != null); }
 
+        void AssertValid() => Tracer.Assert(Position != null);
+
+        [DisableDump]
         internal IssueId IssueId { get; }
-        SourcePart Position { get; set; }
+        [EnableDump]
+        SourcePart Position { get; }
+
         string Message { get; }
 
         string Tag => IssueId.Tag;
 
+        [DisableDump]
         internal CodeBase Code => CodeBase.Issue(this);
 
         protected override string GetNodeDump()

@@ -23,7 +23,10 @@ namespace hw.Debug
             if(_activeObjects.TryGetValue(x, out key))
             {
                 if(key == -1)
-                    _activeObjects[x] = _nextObjectId++;
+                {
+                    key = _nextObjectId++;
+                    _activeObjects[x] = key;
+                }
                 return "[see{" + key + "#}]";
             }
 

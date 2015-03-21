@@ -15,8 +15,35 @@ namespace Reni.Code
         [Node]
         internal CodeBase[] Data { get; }
 
-        internal static List Create(params CodeBase[] data) => new List(data);
-        internal static List Create(IEnumerable<CodeBase> data) => new List(data);
+        internal static CodeBase Create(params CodeBase[] data)
+        {
+            var d = data.Where(item => item != null).ToArray();
+            switch(d.Length)
+            {
+                case 0:
+                    return Void;
+                case 1:
+                    return d.First();
+                default:
+                    return new List(d);
+            }
+        }
+
+        internal static CodeBase CheckedCreate(IEnumerable<CodeBase> data)
+        {
+            if(data == null)
+                return null;
+
+            var dataArray = data.ToArray();
+
+            Tracer.Assert(!dataArray.Any(item => item is IssueCode));
+
+            if(!dataArray.Any())
+                return null;
+            if(dataArray.Length == 1)
+                return dataArray[0];
+            return new List(dataArray);
+        }
 
         void AssertValid()
         {
@@ -33,7 +60,7 @@ namespace Reni.Code
         {
             Data = data.ToArray();
             AssertValid();
-            StopByObjectIds();
+            StopByObjectIds(0);
         }
 
         protected override IEnumerable<CodeBase> AsList() => Data;

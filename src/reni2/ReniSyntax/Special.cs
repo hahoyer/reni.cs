@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using hw.Debug;
 using hw.Forms;
 using hw.Parser;
@@ -9,13 +8,13 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.ReniParser;
 using Reni.TokenClasses;
+using Reni.Validation;
 
 namespace Reni.ReniSyntax
 {
     abstract class SpecialSyntax : CompileSyntax
     {
-        protected SpecialSyntax(IToken token)
-            : base() { }
+        protected SpecialSyntax(IToken token) { }
         protected SpecialSyntax() { }
 
         internal override bool IsKeyword => !IsNumber && !IsText;
@@ -40,6 +39,7 @@ namespace Reni.ReniSyntax
         internal override CompileSyntax Visit(ISyntaxVisitor visitor) => Terminal.Visit(visitor);
 
         internal override bool IsNumber => Terminal is Number;
+
         internal override bool IsText => Terminal is Text;
         [DisableDump]
         internal long ToNumber => BitsConst.Convert(Id).ToInt64();
