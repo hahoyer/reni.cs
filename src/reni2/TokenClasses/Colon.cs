@@ -20,6 +20,9 @@ namespace Reni.TokenClasses
             => left.CreateDeclarationSyntax
                 (token, new CompileSyntaxError(IssueId.MissingValueInDeclaration, token));
 
+        protected override Syntax Prefix(SourcePart token, Syntax right)
+            => new CompileSyntaxError(IssueId.UnexpectedUseAsPrefix, token);
+
         protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
             => left.CreateDeclarationSyntax(token, right);
 
@@ -35,6 +38,12 @@ namespace Reni.TokenClasses
         public override string Id => TokenId;
         public Exclamation(ISubParser<SourceSyntax> parser) { Next = parser; }
         protected override ISubParser<SourceSyntax> Next { get; }
+
+        protected override Syntax Suffix(Syntax left, SourcePart token)
+        {
+            NotImplementedMethod(left, token);
+            return null;
+        }
         protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
         {
             NotImplementedMethod(left, token, right);
@@ -45,10 +54,15 @@ namespace Reni.TokenClasses
             NotImplementedMethod(token);
             return null;
         }
+        protected override Syntax Prefix(SourcePart token, Syntax right)
+        {
+            NotImplementedMethod(token, right);
+            return null;
+        }
     }
 
     [BelongsTo(typeof(DeclarationTokenFactory))]
-    abstract class DeclarationTagToken : TokenClass
+    abstract class DeclarationTagToken : TerminalToken
     {
         internal Syntax DeclarationSyntax(SourcePart token, CompileSyntax body)
             =>
@@ -61,12 +75,6 @@ namespace Reni.TokenClasses
 
         protected override Syntax Terminal(SourcePart token)
             => new DeclarationTagSyntax(this);
-
-        protected override sealed Syntax Infix(Syntax left, SourcePart token, Syntax right)
-        {
-            NotImplementedMethod(left, token, right);
-            return null;
-        }
 
         [DisableDump]
         internal virtual bool IsKeyword => false;

@@ -10,7 +10,7 @@ using Reni.TokenClasses;
 namespace Reni.Feature
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class TypeOperator : SuffixToken
+    sealed class TypeOperator : SuffixSyntaxToken
     {
         public const string TokenId = "type";
         public override string Id => TokenId;

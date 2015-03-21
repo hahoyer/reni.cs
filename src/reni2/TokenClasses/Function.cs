@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.Parser;
 using hw.Scanner;
 using Reni.ReniParser;
 using Reni.Validation;
@@ -28,10 +27,13 @@ namespace Reni.TokenClasses
 
         protected override Syntax Terminal(SourcePart token)
             => new CompileSyntaxError(IssueId.MissingFunctionGetter, token);
+        protected override Syntax Suffix(Syntax left, SourcePart token)
+            => new CompileSyntaxError(IssueId.MissingFunctionGetter, token);
 
         protected override Syntax Prefix(SourcePart token, Syntax right)
             => new FunctionSyntax
-                (null,
+                (
+                null,
                 _isImplicit,
                 _isMetaFunction,
                 right.ToCompiledSyntax
@@ -39,7 +41,8 @@ namespace Reni.TokenClasses
 
         protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
             => new FunctionSyntax
-                (left.ToCompiledSyntax,
+                (
+                left.ToCompiledSyntax,
                 _isImplicit,
                 _isMetaFunction,
                 right.ToCompiledSyntax

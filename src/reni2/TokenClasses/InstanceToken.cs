@@ -9,7 +9,7 @@ using Reni.ReniSyntax;
 namespace Reni.TokenClasses
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class InstanceToken : InfixToken, IPendingProvider
+    sealed class InstanceToken : InfixSyntaxToken, IPendingProvider
     {
         public const string TokenId = "instance";
         public override string Id => TokenId;

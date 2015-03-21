@@ -7,7 +7,7 @@ using Reni.ReniSyntax;
 
 namespace Reni.TokenClasses
 {
-    sealed class FunctionInstanceToken : SuffixToken
+    sealed class FunctionInstanceToken : SuffixSyntaxToken
     {
         public const string TokenId = "function_instance";
         public override string Id => TokenId;

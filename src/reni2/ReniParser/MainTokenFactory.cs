@@ -133,11 +133,17 @@ namespace Reni.ReniParser
         public SyntaxError(IssueId issue) { _issue = issue; }
         public SyntaxError(Match.IError message) { _issue = ReniLexer.Parse(message); }
         protected override Syntax Terminal(SourcePart token)
-            => new CompileSyntaxError(_issue,token);
+            => new CompileSyntaxError(_issue, token);
         protected override Syntax Suffix(Syntax left, SourcePart token)
             => left.SyntaxError(_issue, token);
         protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
             => left.SyntaxError(_issue, token, right);
         public override string Id => "<error>";
+
+        protected override Syntax Prefix(SourcePart token, Syntax right)
+        {
+            NotImplementedMethod(token, right);
+            return null;
+        }
     }
 }

@@ -11,7 +11,7 @@ using Reni.ReniSyntax;
 namespace Reni.TokenClasses
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class NewValueToken : NonSuffix
+    sealed class NewValueToken : NonSuffixSyntaxToken
     {
         public const string TokenId = "new_value";
         public override string Id => TokenId;

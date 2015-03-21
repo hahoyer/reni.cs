@@ -10,7 +10,7 @@ using Reni.TokenClasses;
 namespace Reni.Struct
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class AtToken : InfixToken
+    sealed class AtToken : InfixSyntaxToken
     {
         public const string TokenId = "_A_T_";
         public override string Id => TokenId;

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using hw.Parser;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
@@ -10,7 +11,7 @@ using Reni.TokenClasses;
 namespace Reni.Context
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class ContextOperator : NonPrefix
+    sealed class ContextOperator : NonPrefixSyntaxToken
     {
         public const string TokenId = "^^";
         public override string Id => TokenId;

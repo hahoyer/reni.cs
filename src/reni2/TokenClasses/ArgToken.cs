@@ -11,7 +11,7 @@ using Reni.ReniSyntax;
 namespace Reni.TokenClasses
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class ArgToken : NonSuffix
+    sealed class ArgToken : NonSuffixSyntaxToken
     {
         public const string TokenId = "^";
         public override string Id => TokenId;

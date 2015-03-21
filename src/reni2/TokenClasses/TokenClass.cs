@@ -34,24 +34,9 @@ namespace Reni.TokenClasses
             => Infix(left, token?.Characters, right);
 
         protected abstract Syntax Terminal(SourcePart token);
-
-        protected virtual Syntax Prefix(SourcePart token, Syntax right)
-        {
-            NotImplementedMethod(token, right);
-            return null;
-        }
-
-        protected virtual Syntax Suffix(Syntax left, SourcePart token)
-        {
-            NotImplementedMethod(left, token);
-            return null;
-        }
-
-        protected virtual Syntax Infix(Syntax left, SourcePart token, Syntax right)
-        {
-            NotImplementedMethod(left, token, right);
-            return null;
-        }
+        protected abstract Syntax Prefix(SourcePart token, Syntax right);
+        protected abstract Syntax Suffix(Syntax left, SourcePart token);
+        protected abstract Syntax Infix(Syntax left, SourcePart token, Syntax right);
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]

@@ -9,7 +9,7 @@ using Reni.ReniSyntax;
 
 namespace Reni.TokenClasses
 {
-    sealed class Text : TerminalToken
+    sealed class Text : TerminalSyntaxToken
     {
         public override Result Result(ContextBase context, Category category, TerminalSyntax token)
         {
