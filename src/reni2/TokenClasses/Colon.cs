@@ -16,17 +16,15 @@ namespace Reni.TokenClasses
         public override string Id => TokenId;
 
         protected override Syntax Suffix(Syntax left, IToken token)
-            =>
-                left.CreateDeclarationSyntax
-                    (token, new CompileSyntaxError(IssueId.MissingValueInDeclaration));
+            => left.CreateDeclarationSyntax
+                (token, new CompileSyntaxError(IssueId.MissingValueInDeclaration));
 
         protected override Syntax Infix(Syntax left, IToken token, Syntax right)
             => left.CreateDeclarationSyntax(token, right);
 
         protected override Syntax Terminal(IToken token)
-            =>
-                new DeclarationSyntax
-                    (token, new CompileSyntaxError(IssueId.MissingValueInDeclaration));
+            => new DeclarationSyntax
+                (token, new CompileSyntaxError(IssueId.MissingValueInDeclaration));
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
@@ -106,7 +104,7 @@ namespace Reni.TokenClasses
 
         internal override Syntax CreateDeclarationSyntax(IToken token, Syntax right)
             => _tag.DeclarationSyntax
-                (token, right.CheckedToCompiledSyntax(token, RightMustNotBeNullError));
+                (token, right.CheckedToCompiledSyntax(RightMustNotBeNullError));
 
         internal override Syntax SuffixedBy(Definable definable)
             => new DefinableTokenSyntax(definable, this);

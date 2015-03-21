@@ -110,7 +110,7 @@ namespace Reni.ReniParser
         internal virtual IEnumerable<Issue> DirectIssues { get { yield break; } }
 
 
-        internal virtual Syntax RightParenthesis(RightParenthesis.Syntax rightBracket)
+        internal virtual Syntax Match(RightParenthesis.Syntax rightBracket)
             => new CompileSyntaxError(IssueId.ExtraRightBracket);
 
         [DisableDump]
@@ -128,7 +128,7 @@ namespace Reni.ReniParser
             ToList(null)
             );
 
-        virtual public bool Find(Issue issue) => issue.Source==this;
+        public virtual bool Find(Issue issue) => issue.Source == this;
     }
 
 
@@ -142,8 +142,8 @@ namespace Reni.ReniParser
                 .Concat(y ?? new T[0])
                 .ToDistinctNotNullArray();
 
-        internal static T[] plus<T>(this IEnumerable<T> x, T y) 
-            where T : class 
+        internal static T[] plus<T>(this IEnumerable<T> x, T y)
+            where T : class
             => (x ?? new T[0])
                 .Concat(y.NullableToArray())
                 .ToDistinctNotNullArray();
@@ -169,9 +169,9 @@ namespace Reni.ReniParser
         }
 
         internal static CompileSyntax CheckedToCompiledSyntax
-            (this Syntax target, IToken token, Func<IssueId> getError)
+            (this Syntax target, Func<IssueId> getError)
             => target?.ToCompiledSyntax
-                ?? new CompileSyntaxError(getError());
+                ?? new CompileSyntaxError(getError(), target);
 
         internal static Token<SourceSyntax> Token(this SourcePosn sourcePosn)
             => new Token<SourceSyntax>(null, sourcePosn.Span(0));

@@ -6,7 +6,6 @@ using hw.Helper;
 using hw.Parser;
 using Reni.Basics;
 using Reni.Context;
-using Reni.Parser;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
 using Reni.Struct;
@@ -21,17 +20,15 @@ namespace Reni.Validation
         readonly CompileSyntaxError _previous;
         readonly ValueCache<Issue> _issueCache;
 
-        public CompileSyntaxError(IssueId issueId, CompileSyntaxError previous)
+        public CompileSyntaxError
+            (IssueId issueId, Syntax source = null, CompileSyntaxError previous = null)
         {
             _issueId = issueId;
             _previous = previous;
-            _issueCache = new ValueCache<Issue>(() => new Issue(_issueId, this, ""));
+            _issueCache = new ValueCache<Issue>(() => new Issue(_issueId, source ?? this, ""));
 
-            StopByObjectIds(22);
+            StopByObjectIds(67);
         }
-
-        public CompileSyntaxError(IssueId issueId)
-            : this(issueId, null) { }
 
         internal override bool IsError => true;
         [DisableDump]
@@ -66,7 +63,7 @@ namespace Reni.Validation
 
         internal override Syntax End => new ListSyntax(null, new[] {this});
 
-        internal override Syntax RightParenthesis(RightParenthesis.Syntax rightBracket)
+        internal override Syntax Match(RightParenthesis.Syntax rightBracket)
         {
             NotImplementedMethod(rightBracket);
             return null;

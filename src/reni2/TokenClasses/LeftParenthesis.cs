@@ -49,21 +49,23 @@ namespace Reni.TokenClasses
             internal readonly ReniParser.Syntax Right;
 
             public Syntax(int level, IToken token, ReniParser.Syntax right)
-                : base()
             {
                 _level = level;
                 Right = right;
             }
 
-            protected override IEnumerable<ReniParser.Syntax> DirectChildren { get { yield return Right; } }
+            protected override IEnumerable<ReniParser.Syntax> DirectChildren
+            {
+                get { yield return Right; }
+            }
 
             [DisableDump]
             internal override CompileSyntax ToCompiledSyntax
-                => new CompileSyntaxError(IssueId.MissingRightBracket);
+                => new CompileSyntaxError(IssueId.MissingRightBracket, this);
 
             internal override bool IsBraceLike => true;
 
-            internal override ReniParser.Syntax RightParenthesis
+            internal override ReniParser.Syntax Match
                 (RightParenthesis.Syntax rightBracket)
             {
                 Tracer.Assert(_level == rightBracket.Level);

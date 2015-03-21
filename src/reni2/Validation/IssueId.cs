@@ -22,7 +22,7 @@ namespace Reni.Validation
         public static readonly IssueId UnexpectedSyntaxError = new IssueId();
         public static readonly IssueId UnexpectedUseAsPrefix = new IssueId();
         public static readonly IssueId CompiledSyntaxExpected = new IssueId();
-        public static readonly IssueId IdentifyerExpected = new IssueId();
+        public static readonly IssueId IdentifierExpected = new IssueId();
         public static readonly IssueId ExtraRightBracket = new IssueId();
         public static readonly IssueId MissingValueInDeclaration = new IssueId();
     }
