@@ -60,7 +60,7 @@ namespace Reni.Code
         {
             Data = data.ToArray();
             AssertValid();
-            StopByObjectIds(0);
+            StopByObjectIds();
         }
 
         protected override IEnumerable<CodeBase> AsList() => Data;

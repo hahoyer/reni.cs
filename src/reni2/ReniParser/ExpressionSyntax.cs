@@ -96,11 +96,11 @@ namespace Reni.ReniParser
             return result;
         }
 
-        internal override Syntax CreateDeclarationSyntax(IToken token, Syntax right)
-            => new CompileSyntaxError(IssueId.IdentifierExpected, token.Characters);
+        internal override Syntax CreateDeclarationSyntax(SourcePart token, Syntax right)
+            => new CompileSyntaxError(IssueId.IdentifierExpected, token);
 
         internal override Syntax SyntaxError
-            (IssueId issue, IToken token, Syntax right = null)
+            (IssueId issue, SourcePart token, Syntax right = null)
         {
             if(Right == null)
                 return Left.SyntaxError(issue, token, right);

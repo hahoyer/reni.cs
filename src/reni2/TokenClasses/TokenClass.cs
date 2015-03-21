@@ -25,29 +25,29 @@ namespace Reni.TokenClasses
             => this.Operation(left, null, right);
 
         Syntax IOperator<Syntax>.Terminal(IToken token)
-            => Terminal(token);
+            => Terminal(token?.Characters);
         Syntax IOperator<Syntax>.Prefix(IToken token, Syntax right)
-            => Prefix(token, right);
+            => Prefix(token?.Characters, right);
         Syntax IOperator<Syntax>.Suffix(Syntax left, IToken token)
-            => Suffix(left, token);
+            => Suffix(left, token?.Characters);
         Syntax IOperator<Syntax>.Infix(Syntax left, IToken token, Syntax right)
-            => Infix(left, token, right);
+            => Infix(left, token?.Characters, right);
 
-        protected abstract Syntax Terminal(IToken token);
+        protected abstract Syntax Terminal(SourcePart token);
 
-        protected virtual Syntax Prefix(IToken token, Syntax right)
+        protected virtual Syntax Prefix(SourcePart token, Syntax right)
         {
             NotImplementedMethod(token, right);
             return null;
         }
 
-        protected virtual Syntax Suffix(Syntax left, IToken token)
+        protected virtual Syntax Suffix(Syntax left, SourcePart token)
         {
             NotImplementedMethod(left, token);
             return null;
         }
 
-        protected virtual Syntax Infix(Syntax left, IToken token, Syntax right)
+        protected virtual Syntax Infix(Syntax left, SourcePart token, Syntax right)
         {
             NotImplementedMethod(left, token, right);
             return null;

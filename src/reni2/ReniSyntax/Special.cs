@@ -8,7 +8,6 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.ReniParser;
 using Reni.TokenClasses;
-using Reni.Validation;
 
 namespace Reni.ReniSyntax
 {
@@ -55,9 +54,7 @@ namespace Reni.ReniSyntax
         [EnableDump]
         readonly CompileSyntax _right;
 
-        public PrefixSyntax
-            (IToken token, IPrefix prefix, CompileSyntax right)
-            : base(token)
+        public PrefixSyntax(IPrefix prefix, CompileSyntax right)
         {
             _prefix = prefix;
             _right = right;
@@ -84,8 +81,7 @@ namespace Reni.ReniSyntax
         [EnableDump]
         readonly CompileSyntax _right;
 
-        public InfixSyntax(IToken token, CompileSyntax left, IInfix infix, CompileSyntax right)
-            : base(token)
+        public InfixSyntax(CompileSyntax left, IInfix infix, CompileSyntax right)
         {
             _left = left;
             _infix = infix;
@@ -143,8 +139,7 @@ namespace Reni.ReniSyntax
         [EnableDump]
         readonly ISuffix _suffix;
 
-        internal SuffixSyntax(IToken token, CompileSyntax left, ISuffix suffix)
-            : base(token)
+        internal SuffixSyntax(CompileSyntax left, ISuffix suffix)
         {
             _left = left;
             _suffix = suffix;

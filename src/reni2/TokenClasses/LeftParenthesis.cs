@@ -25,23 +25,23 @@ namespace Reni.TokenClasses
 
         public override string Id => TokenId(Level);
 
-        protected override ReniParser.Syntax Suffix(ReniParser.Syntax left, IToken token)
+        protected override ReniParser.Syntax Suffix(ReniParser.Syntax left, SourcePart token)
         {
             NotImplementedMethod(left, token);
             return null;
         }
 
         protected override ReniParser.Syntax Infix
-            (ReniParser.Syntax left, IToken token, ReniParser.Syntax right)
+            (ReniParser.Syntax left, SourcePart token, ReniParser.Syntax right)
         {
             NotImplementedMethod(left, token, right);
             return null;
         }
 
-        protected override ReniParser.Syntax Prefix(IToken token, ReniParser.Syntax right)
+        protected override ReniParser.Syntax Prefix(SourcePart token, ReniParser.Syntax right)
             => new Syntax(Level, token, right);
 
-        protected override ReniParser.Syntax Terminal(IToken token)
+        protected override ReniParser.Syntax Terminal(SourcePart token)
             => new Syntax(Level, token, null);
 
         sealed class Syntax : ReniParser.Syntax
@@ -50,9 +50,9 @@ namespace Reni.TokenClasses
             readonly int _level;
             internal readonly ReniParser.Syntax Right;
 
-            public Syntax(int level, IToken token, ReniParser.Syntax right)
+            public Syntax(int level, SourcePart token, ReniParser.Syntax right)
             {
-                Token = token.Characters;
+                Token = token;
                 _level = level;
                 Right = right;
             }

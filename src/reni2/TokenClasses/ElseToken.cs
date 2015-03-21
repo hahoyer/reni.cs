@@ -15,10 +15,10 @@ namespace Reni.TokenClasses
         public const string TokenId = "else";
         public override string Id => TokenId;
 
-        protected override ReniParser.Syntax Infix(ReniParser.Syntax left, IToken token, ReniParser.Syntax right)
+        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
             => left.CreateElseSyntax(right.ToCompiledSyntax);
 
-        protected override ReniParser.Syntax Terminal(IToken token)
-            => new CompileSyntaxError(IssueId.UnexpectedUseAsTerminal, token.Characters);
+        protected override Syntax Terminal(SourcePart token)
+            => new CompileSyntaxError(IssueId.UnexpectedUseAsTerminal, token);
     }
 }

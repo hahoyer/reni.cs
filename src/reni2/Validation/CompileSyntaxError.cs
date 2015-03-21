@@ -69,7 +69,7 @@ namespace Reni.Validation
             NotImplementedMethod(elseSyntax);
             return null;
         }
-        internal override Syntax CreateDeclarationSyntax(IToken token, Syntax right)
+        internal override Syntax CreateDeclarationSyntax(SourcePart token, Syntax right)
         {
             NotImplementedMethod(token, right);
             return null;
@@ -91,10 +91,10 @@ namespace Reni.Validation
 
         IssueType IssueType(ContextBase context) => new RootIssueType(Issue, context.RootContext);
 
-        internal override Syntax SyntaxError(IssueId issue, IToken token, Syntax right = null)
+        internal override Syntax SyntaxError(IssueId issue, SourcePart token, Syntax right = null)
         {
             if(right == null)
-                return new CompileSyntaxError(issue, token.Characters, this);
+                return new CompileSyntaxError(issue, token, this);
             NotImplementedMethod(issue, token, right);
             return null;
         }

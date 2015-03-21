@@ -42,7 +42,7 @@ namespace Reni.ReniParser
             return null;
         }
 
-        internal virtual Syntax CreateDeclarationSyntax(IToken token, Syntax right)
+        internal virtual Syntax CreateDeclarationSyntax(SourcePart token, Syntax right)
         {
             NotImplementedMethod(token, right);
             return null;
@@ -94,11 +94,11 @@ namespace Reni.ReniParser
         internal virtual bool IsBraceLike => false;
 
         internal virtual Syntax SyntaxError
-            (IssueId issue, IToken token, Syntax right = null)
+            (IssueId issue, SourcePart token, Syntax right = null)
         {
             if(right == null)
             {
-                var e = new CompileSyntaxError(issue, token.Characters);
+                var e = new CompileSyntaxError(issue, token);
                 return new ProxySyntax(this, e);
             }
             NotImplementedMethod(issue, token, right);

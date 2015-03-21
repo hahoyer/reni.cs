@@ -20,24 +20,23 @@ namespace Reni.TokenClasses
 
         public override string Id => TokenId(_level);
 
-        protected override Syntax Terminal(IToken token)
+        protected override Syntax Terminal(SourcePart token)
             =>
                 ListSyntax
                     (
                         new EmptyList(),
-                        token,
                         new EmptyList());
 
-        protected override Syntax Prefix(IToken token, Syntax right)
-            => ListSyntax(new EmptyList(), token, right);
+        protected override Syntax Prefix(SourcePart token, Syntax right)
+            => ListSyntax(new EmptyList(), right);
 
-        protected override Syntax Suffix(Syntax left, IToken token)
-            => ListSyntax(left, token, new EmptyList());
+        protected override Syntax Suffix(Syntax left, SourcePart token)
+            => ListSyntax(left, new EmptyList());
 
-        protected override Syntax Infix(Syntax left, IToken token, Syntax right)
-            => ListSyntax(left, token, right);
+        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
+            => ListSyntax(left, right);
 
-        ListSyntax ListSyntax(Syntax left, IToken token, Syntax right)
+        ListSyntax ListSyntax(Syntax left, Syntax right)
             => new ListSyntax(this, left.ToList(this).Concat(right.ToList(this)).ToArray());
     }
 }

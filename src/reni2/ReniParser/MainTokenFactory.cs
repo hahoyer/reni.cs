@@ -132,11 +132,11 @@ namespace Reni.ReniParser
         readonly IssueId _issue;
         public SyntaxError(IssueId issue) { _issue = issue; }
         public SyntaxError(Match.IError message) { _issue = ReniLexer.Parse(message); }
-        protected override Syntax Terminal(IToken token)
-            => new CompileSyntaxError(_issue,token.Characters);
-        protected override Syntax Suffix(Syntax left, IToken token)
+        protected override Syntax Terminal(SourcePart token)
+            => new CompileSyntaxError(_issue,token);
+        protected override Syntax Suffix(Syntax left, SourcePart token)
             => left.SyntaxError(_issue, token);
-        protected override Syntax Infix(Syntax left, IToken token, Syntax right)
+        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
             => left.SyntaxError(_issue, token, right);
         public override string Id => "<error>";
     }

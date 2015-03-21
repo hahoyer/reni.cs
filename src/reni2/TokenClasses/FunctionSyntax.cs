@@ -2,7 +2,6 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using hw.Helper;
-using hw.Parser;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
@@ -21,12 +20,10 @@ namespace Reni.TokenClasses
 
         public FunctionSyntax
             (
-            IToken token,
             CompileSyntax setter,
             bool isImplicit,
             bool isMetaFunction,
             CompileSyntax getter)
-            : base(token)
         {
             Getter = getter;
             Setter = setter;

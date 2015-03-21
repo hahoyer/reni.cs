@@ -16,16 +16,16 @@ namespace Reni.TokenClasses
         public const string TokenId = ":";
         public override string Id => TokenId;
 
-        protected override Syntax Suffix(Syntax left, IToken token)
+        protected override Syntax Suffix(Syntax left, SourcePart token)
             => left.CreateDeclarationSyntax
-                (token, new CompileSyntaxError(IssueId.MissingValueInDeclaration, token.Characters));
+                (token, new CompileSyntaxError(IssueId.MissingValueInDeclaration, token));
 
-        protected override Syntax Infix(Syntax left, IToken token, Syntax right)
+        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
             => left.CreateDeclarationSyntax(token, right);
 
-        protected override Syntax Terminal(IToken token)
+        protected override Syntax Terminal(SourcePart token)
             => new DeclarationSyntax
-                (token, new CompileSyntaxError(IssueId.MissingValueInDeclaration, token.Characters));
+                (token, new CompileSyntaxError(IssueId.MissingValueInDeclaration, token));
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
@@ -35,12 +35,12 @@ namespace Reni.TokenClasses
         public override string Id => TokenId;
         public Exclamation(ISubParser<SourceSyntax> parser) { Next = parser; }
         protected override ISubParser<SourceSyntax> Next { get; }
-        protected override Syntax Infix(Syntax left, IToken token, Syntax right)
+        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
         {
             NotImplementedMethod(left, token, right);
             return null;
         }
-        protected override Syntax Terminal(IToken token)
+        protected override Syntax Terminal(SourcePart token)
         {
             NotImplementedMethod(token);
             return null;
@@ -50,19 +50,19 @@ namespace Reni.TokenClasses
     [BelongsTo(typeof(DeclarationTokenFactory))]
     abstract class DeclarationTagToken : TokenClass
     {
-        internal Syntax DeclarationSyntax(IToken token, CompileSyntax body)
+        internal Syntax DeclarationSyntax(SourcePart token, CompileSyntax body)
             =>
                 new DeclarationSyntax
                     (
                     token,
                     body,
-                    new DefinableTokenSyntax(new DeclarationTagSyntax(this), token.Characters)
+                    new DefinableTokenSyntax(new DeclarationTagSyntax(this), token)
                     );
 
-        protected override Syntax Terminal(IToken token)
+        protected override Syntax Terminal(SourcePart token)
             => new DeclarationTagSyntax(this);
 
-        protected override sealed Syntax Infix(Syntax left, IToken token, Syntax right)
+        protected override sealed Syntax Infix(Syntax left, SourcePart token, Syntax right)
         {
             NotImplementedMethod(left, token, right);
             return null;
@@ -112,7 +112,7 @@ namespace Reni.TokenClasses
             }
         }
 
-        internal override Syntax CreateDeclarationSyntax(IToken token, Syntax right)
+        internal override Syntax CreateDeclarationSyntax(SourcePart token, Syntax right)
             => _tag.DeclarationSyntax(token, right.ToCompiledSyntax);
 
         internal override Syntax SuffixedBy(Definable definable, SourcePart token)

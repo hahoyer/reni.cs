@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Parser;
+using hw.Scanner;
 using Reni.ReniParser;
 using Reni.Validation;
 
@@ -14,10 +15,10 @@ namespace Reni.TokenClasses
         public override string Id => TokenId;
 
         protected override Syntax Infix
-            (Syntax left, IToken token, Syntax right)
+            (Syntax left, SourcePart token, Syntax right)
             => right.CreateThenSyntax(left.ToCompiledSyntax);
 
-        protected override Syntax Terminal(IToken token)
-            => new CompileSyntaxError(IssueId.UnexpectedUseAsTerminal, token.Characters);
+        protected override Syntax Terminal(SourcePart token)
+            => new CompileSyntaxError(IssueId.UnexpectedUseAsTerminal, token);
     }
 }

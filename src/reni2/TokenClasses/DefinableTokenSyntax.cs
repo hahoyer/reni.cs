@@ -34,7 +34,7 @@ namespace Reni.TokenClasses
         [DisableDumpExcept(true)]
         internal bool IsMutable => Tags.Any(item => item.DeclaresMutable);
 
-        internal override Syntax CreateDeclarationSyntax(IToken token, Syntax right)
+        internal override Syntax CreateDeclarationSyntax(SourcePart token, Syntax right)
             => new DeclarationSyntax(token, right.ToCompiledSyntax, this);
 
         [DisableDump]

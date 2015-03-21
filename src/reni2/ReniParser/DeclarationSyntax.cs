@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Parser;
+using hw.Scanner;
 using Reni.ReniSyntax;
 using Reni.TokenClasses;
 
@@ -12,7 +13,7 @@ namespace Reni.ReniParser
     {
         internal DeclarationSyntax
             (
-            IToken token,
+            SourcePart token,
             CompileSyntax body,
             DefinableTokenSyntax target = null
             )

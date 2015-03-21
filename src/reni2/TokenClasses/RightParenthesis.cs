@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.Parser;
+using hw.Scanner;
 using Reni.ReniParser;
 
 namespace Reni.TokenClasses
@@ -19,23 +20,23 @@ namespace Reni.TokenClasses
 
         public override string Id => TokenId(_level);
 
-        protected override ReniParser.Syntax Suffix(ReniParser.Syntax left, IToken token)
-            => left.Match(_level, token.Characters);
+        protected override Syntax Suffix(Syntax left, SourcePart token)
+            => left.Match(_level, token);
 
-        protected override ReniParser.Syntax Infix
-            (ReniParser.Syntax left, IToken token, ReniParser.Syntax right)
+        protected override Syntax Infix
+            (Syntax left, SourcePart token, Syntax right)
         {
             NotImplementedMethod(left, token, right);
             return null;
         }
 
-        protected override ReniParser.Syntax Prefix(IToken token, ReniParser.Syntax right)
+        protected override Syntax Prefix(SourcePart token, Syntax right)
         {
             NotImplementedMethod(token, right);
             return null;
         }
 
-        protected override ReniParser.Syntax Terminal(IToken token)
+        protected override Syntax Terminal(SourcePart token)
         {
             NotImplementedMethod(token);
             return null;

@@ -10,9 +10,9 @@ namespace Reni.TokenClasses
 {
     sealed class EndToken : TokenClass
     {
-        protected override Syntax Suffix(Syntax left, IToken token) 
+        protected override Syntax Suffix(Syntax left, SourcePart token) 
             => left.ToCompiledSyntax.End;
-        protected override Syntax Terminal(IToken token) => new EmptyList();
+        protected override Syntax Terminal(SourcePart token) => new EmptyList();
         public override string Id => PrioTable.EndOfText;
     }
 }

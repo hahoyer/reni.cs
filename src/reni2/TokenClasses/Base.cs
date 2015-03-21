@@ -13,11 +13,11 @@ namespace Reni.TokenClasses
 {
     abstract class TerminalToken : TokenClass, ITerminal
     {
-        protected override sealed Syntax Terminal(IToken token)
+        protected override sealed Syntax Terminal(SourcePart token)
             => new TerminalSyntax(token.Id, this);
 
-        protected override Syntax Infix(Syntax left, IToken token, Syntax right)
-            => new CompileSyntaxError(IssueId.UnexpectedUseAsSuffix,token.Characters);
+        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
+            => new CompileSyntaxError(IssueId.UnexpectedUseAsSuffix,token);
 
         public abstract Result Result(ContextBase context, Category category, TerminalSyntax token);
 
@@ -32,11 +32,11 @@ namespace Reni.TokenClasses
 
     abstract class NonPrefix : TokenClass, ITerminal, ISuffix
     {
-        protected override sealed Syntax Terminal(IToken token)
+        protected override sealed Syntax Terminal(SourcePart token)
             => new TerminalSyntax(token.Id, this);
 
-        protected override Syntax Infix(Syntax left, IToken token, Syntax right)
-            => new CompileSyntaxError(IssueId.UnexpectedUseAsPrefix, token.Characters);
+        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
+            => new CompileSyntaxError(IssueId.UnexpectedUseAsPrefix, token);
 
         public abstract Result Result(ContextBase context, Category category, TerminalSyntax token);
 
@@ -53,13 +53,13 @@ namespace Reni.TokenClasses
 
     abstract class NonSuffix : TokenClass, ITerminal, IPrefix
     {
-        protected override Syntax Terminal(IToken token) => new TerminalSyntax(token.Id, this);
+        protected override Syntax Terminal(SourcePart token) => new TerminalSyntax(token.Id, this);
 
-        protected override Syntax Prefix(IToken token, Syntax right)
-            => new PrefixSyntax(token, this, right.ToCompiledSyntax);
+        protected override Syntax Prefix(SourcePart token, Syntax right)
+            => new PrefixSyntax(this, right.ToCompiledSyntax);
 
-        protected override Syntax Infix(Syntax left, IToken token, Syntax right)
-            => new CompileSyntaxError(IssueId.UnexpectedUseAsSuffix, token.Characters);
+        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
+            => new CompileSyntaxError(IssueId.UnexpectedUseAsSuffix, token);
 
         public abstract Result Result(ContextBase context, Category category, TerminalSyntax token);
 
@@ -77,28 +77,28 @@ namespace Reni.TokenClasses
 
     abstract class SuffixToken : TokenClass, ISuffix
     {
-        protected override sealed Syntax Suffix(Syntax left, IToken token)
-            => new SuffixSyntax(token, left.ToCompiledSyntax, this);
+        protected override sealed Syntax Suffix(Syntax left, SourcePart token)
+            => new SuffixSyntax(left.ToCompiledSyntax, this);
 
-        protected override Syntax Infix(Syntax left, IToken token, Syntax right)
-            =>  new CompileSyntaxError(IssueId.UnexpectedUseAsPrefix, token.Characters);
+        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
+            =>  new CompileSyntaxError(IssueId.UnexpectedUseAsPrefix, token);
 
-        protected override Syntax Terminal(IToken token)
-            => new CompileSyntaxError(IssueId.UnexpectedUseAsTerminal, token.Characters);
+        protected override Syntax Terminal(SourcePart token)
+            => new CompileSyntaxError(IssueId.UnexpectedUseAsTerminal, token);
 
         public abstract Result Result(ContextBase context, Category category, CompileSyntax left);
     }
 
     abstract class InfixToken : TokenClass, IInfix
     {
-        protected override sealed Syntax Infix(Syntax left, IToken token, Syntax right)
-            => new InfixSyntax(token, left.ToCompiledSyntax, this, right.ToCompiledSyntax);
+        protected override sealed Syntax Infix(Syntax left, SourcePart token, Syntax right)
+            => new InfixSyntax(left.ToCompiledSyntax, this, right.ToCompiledSyntax);
 
-        protected override Syntax Terminal(IToken token)
-            => new CompileSyntaxError(IssueId.UnexpectedUseAsTerminal, token.Characters);
+        protected override Syntax Terminal(SourcePart token)
+            => new CompileSyntaxError(IssueId.UnexpectedUseAsTerminal, token);
 
-        protected override Syntax Suffix(Syntax left, IToken token)
-            => new CompileSyntaxError(IssueId.UnexpectedUseAsSuffix, token.Characters);
+        protected override Syntax Suffix(Syntax left, SourcePart token)
+            => new CompileSyntaxError(IssueId.UnexpectedUseAsSuffix, token);
 
         public abstract Result Result
             (ContextBase callContext, Category category, CompileSyntax left, CompileSyntax right);
