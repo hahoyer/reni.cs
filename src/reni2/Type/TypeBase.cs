@@ -519,9 +519,10 @@ namespace Reni.Type
             NotImplementedMethod();
             return null;
         }
-        internal IssueType UndefinedSymbol(SourcePart source)
+
+        virtual internal IssueType UndefinedSymbol(SourcePart source)
             =>
-                new IssueType
+                new RootIssueType
                     (
                     new Issue(IssueId.UndefinedSymbol, source, "Type: " + DumpPrintText),
                     RootContext);

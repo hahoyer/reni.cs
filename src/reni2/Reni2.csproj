@@ -374,9 +374,11 @@
     <Compile Include="Type\VoidType.cs" />
     <Compile Include="UserInterface\TokenInformation.cs" />
     <Compile Include="Validation\CompileSyntaxError.cs" />
+    <Compile Include="Validation\ConsequentialIssueType.cs" />
     <Compile Include="Validation\Issue.cs" />
     <Compile Include="Validation\IssueId.cs" />
     <Compile Include="Validation\IssueType.cs" />
+    <Compile Include="Validation\RootIssueType.cs" />
     <Compile Include="Validation\SourceIssue.cs" />
     <Compile Include="Validation\SyntaxError.cs" />
   </ItemGroup>

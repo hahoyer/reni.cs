@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using hw.Debug;
 using hw.Forms;
 using hw.Parser;
 using hw.Scanner;
@@ -37,6 +38,7 @@ namespace Reni.ReniParser
         [Node]
         internal CompileSyntax Right { get; }
 
+        [DisableDump]
         protected override IEnumerable<Syntax> DirectChildren
         {
             get

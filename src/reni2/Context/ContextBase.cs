@@ -228,7 +228,7 @@ namespace Reni.Context
         }
         public IssueType UndefinedSymbol(SourcePart source)
             =>
-                new IssueType
+                new RootIssueType
                     (
                     new Issue(IssueId.UndefinedSymbol, source, "Context: " + Dump()),
                     RootContext);

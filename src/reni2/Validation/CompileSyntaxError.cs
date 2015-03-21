@@ -89,7 +89,7 @@ namespace Reni.Validation
             }
         }
 
-        IssueType IssueType(ContextBase context) => new IssueType(Issue, context.RootContext);
+        IssueType IssueType(ContextBase context) => new RootIssueType(Issue, context.RootContext);
 
         internal override Syntax SyntaxError(IssueId issue, IToken token, Syntax right = null)
         {
