@@ -56,83 +56,21 @@ namespace Reni.TokenClasses
         [DisableDump]
         string FilePosition => Token.Characters.FilePosition;
 
-        [DisableDump]
-        public bool IsKeyword
-        {
-            get
-            {
-                NotImplementedMethod();
-                return false;
-            }
-        }
-
-        [DisableDump]
-        public bool IsIdentifier
-        {
-            get
-            {
-                NotImplementedMethod();
-                return false;
-            }
-        }
-
-        [DisableDump]
-        public bool IsText
-        {
-            get
-            {
-                NotImplementedMethod();
-                return false;
-            }
-        }
-
-        [DisableDump]
-        public bool IsNumber
-        {
-            get
-            {
-                NotImplementedMethod();
-                return false;
-            }
-        }
-
-        [DisableDump]
-        public bool IsError
-        {
-            get
-            {
-                NotImplementedMethod();
-                return false;
-            }
-        }
-
-        [DisableDump]
-        public bool IsBraceLike
-        {
-            get
-            {
-                NotImplementedMethod();
-                return false;
-            }
-        }
-
-
         protected override string GetNodeDump() => base.GetNodeDump() + " " + SourcePart.Id.Quote();
 
         internal TokenInformation LocateToken(SourcePosn sourcePosn)
         {
-            var token = Token;
-            if(token.Characters.Contains(sourcePosn))
+            if (sourcePosn < Token.SourcePart)
+                return Left?.LocateToken(sourcePosn);
+
+            if(sourcePosn < Token.Characters)
+                return new UserInterface.WhiteSpaceToken
+                    (Token.PrecededWith.Single(item => item.Characters.Contains(sourcePosn)));
+
+            if (Token.Characters.Contains(sourcePosn))
                 return new SyntaxToken(this);
 
-            if(!SourcePart.Contains(sourcePosn))
-                return null;
-
-            NotImplementedMethod(sourcePosn);
-
-            var whiteSpaceToken = token.PrecededWith.First
-                (item => item.Characters.Contains(sourcePosn));
-            return new UserInterface.WhiteSpaceToken(whiteSpaceToken);
+            return Right?.LocateToken(sourcePosn);
         }
     }
 }

@@ -40,10 +40,14 @@ namespace Reni.UserInterface
 
     sealed class SyntaxToken : TokenInformation
     {
-        internal SyntaxToken(SourceSyntax syntax) { Syntax = syntax; }
+        internal SyntaxToken(SourceSyntax sourceSyntax)
+        {
+            SourceSyntax = sourceSyntax;
+        }
 
-        public SourceSyntax Syntax { get; }
-        public override SourcePart SourcePart => Syntax.Token.SourcePart;
+        public SourceSyntax SourceSyntax { get; }
+        public Syntax Syntax => SourceSyntax.Syntax;
+        public override SourcePart SourcePart => SourceSyntax.Token.SourcePart;
         public override bool IsKeyword => Syntax.IsKeyword;
         public override bool IsIdentifier => Syntax.IsIdentifier;
         public override bool IsText => Syntax.IsText;

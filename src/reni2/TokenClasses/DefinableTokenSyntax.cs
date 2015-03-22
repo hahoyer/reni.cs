@@ -16,7 +16,7 @@ namespace Reni.TokenClasses
             Tags = tags;
             Definable = definable;
             Token = token;
-            StopByObjectIds(51);
+            StopByObjectIds();
         }
 
         internal DefinableTokenSyntax(DefinableTokenSyntax other, DeclarationTagSyntax tag, SourcePart token)

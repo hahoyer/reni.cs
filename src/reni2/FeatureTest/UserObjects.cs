@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
+using hw.Scanner;
 using hw.UnitTest;
 using Reni.FeatureTest.Helper;
 
@@ -45,13 +46,9 @@ complex FromReal(2) dump_print;
 
 
     [TestFixture]
-    [LowPriority]
     public sealed class UserInterAction : DependantAttribute
     {
-        [Test]
-        public void TypingAProgram()
-        {
-            const string text = @"
+        const string text = @"
 system: /!\
 { MaxNumber8: /!\ '7f' to_number_of_base 16 
 . MaxNumber16: /!\ '7fff' to_number_of_base 16 
@@ -84,6 +81,10 @@ complex FromReal(2) dump_print;
 (complex Create(0,1) * complex Create(0,1)) dump_print
 ";
 
+
+        //[Test]
+        public void TypingAProgram()
+        {
             for(var i = 0; i < text.Length; i++)
             {
                 var textFragement = text.Substring(0, i);
@@ -93,5 +94,17 @@ complex FromReal(2) dump_print;
                 Tracer.Assert(span.Id == textFragement, () => span.NodeDump);
             }
         }
+
+        [Test]
+        public void GetTokenForPosition()
+        {
+            var compiler = new Compiler(text:  text);
+            for (var i = 0; i < text.Length; i++)
+            {
+                var t = compiler.Token(i);
+                Tracer.Assert(t != null, () => (new Source(text) + i).Dump());
+            }
+        }
     }
+
 }
