@@ -73,7 +73,7 @@ namespace Reni.TokenClasses
                     if(Right == null)
                         return issue;
 
-                    return new ProxyCompileSyntax(Right.ToCompiledSyntax, issue);
+                    return new ProxyCompileSyntax(issue, Right.ToCompiledSyntax);
                 }
             }
 

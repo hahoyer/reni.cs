@@ -69,5 +69,6 @@ namespace HoyerWare.ReniLanguagePackage
             return result;
         }
 
+        internal int LineEnd(int line) => LinePosition(line) + LineLength(line);
     }
 }

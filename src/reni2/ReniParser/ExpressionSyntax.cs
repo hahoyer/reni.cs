@@ -27,7 +27,7 @@ namespace Reni.ReniParser
             Definable = definable;
             Right = right;
             Token = token;
-            StopByObjectIds();
+            StopByObjectIds(61,62);
         }
 
         [Node]
@@ -97,7 +97,7 @@ namespace Reni.ReniParser
         }
 
         internal override Syntax CreateDeclarationSyntax(SourcePart token, Syntax right)
-            => new Validation.SyntaxError(IssueId.IdentifierExpected, token);
+            => IssueId.IdentifierExpected.Syntax(token, this, right);
 
         internal override Syntax Error
             (IssueId issue, SourcePart token, Syntax right = null)

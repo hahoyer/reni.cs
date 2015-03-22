@@ -110,7 +110,7 @@ namespace Reni.ReniParser
             }
         }
 
-        protected override TokenClass SpecialTokenClass(System.Type type)
+        protected override ScannerTokenClass SpecialTokenClass(System.Type type)
         {
             if(type == typeof(Exclamation))
                 return new Exclamation(_declarationSyntaxSubParser);
@@ -119,28 +119,32 @@ namespace Reni.ReniParser
 
         static IType<SourceSyntax> Pack(SourceSyntax options) => new SyntaxBoxToken(options);
 
-        protected override TokenClass GetEndOfText() => new EndToken();
-        protected override TokenClass GetNumber() => new Number();
-        protected override TokenClass GetTokenClass(string name) => new UserSymbol(name);
-        protected override TokenClass GetError(Match.IError message) => new SyntaxError(message);
-        protected override TokenClass GetText() => new Text();
+        protected override ScannerTokenClass GetEndOfText() => new EndToken();
+        protected override ScannerTokenClass GetNumber() => new Number();
+        protected override ScannerTokenClass GetTokenClass(string name) => new UserSymbol(name);
+        protected override ScannerTokenClass GetError(Match.IError message) => new SyntaxError(message);
+        protected override ScannerTokenClass GetText() => new Text();
     }
 
 
-    sealed class SyntaxError : TokenClass
+    sealed class SyntaxError : ScannerTokenClass, IOperator<Syntax>
     {
         readonly IssueId _issue;
-        public SyntaxError(IssueId issue) { _issue = issue; }
+
         public SyntaxError(Match.IError message) { _issue = ReniLexer.Parse(message); }
-        protected override Syntax Terminal(SourcePart token)
-            => new Validation.SyntaxError(_issue, token);
-        protected override Syntax Suffix(Syntax left, SourcePart token)
-            => left.Error(_issue, token);
-        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
-            => left.Error(_issue, token, right);
+
+        Syntax IOperator<Syntax>.Terminal(IToken token)
+            => new Validation.SyntaxError(_issue, token.Characters);
+
+        Syntax IOperator<Syntax>.Suffix(Syntax left, IToken token)
+            => left.Error(_issue, token.Characters);
+
+        Syntax IOperator<Syntax>.Infix(Syntax left, IToken token, Syntax right)
+            => left.Error(_issue, token.Characters, right);
+
         public override string Id => "<error>";
 
-        protected override Syntax Prefix(SourcePart token, Syntax right)
+        Syntax IOperator<Syntax>.Prefix(IToken token, Syntax right)
         {
             NotImplementedMethod(token, right);
             return null;

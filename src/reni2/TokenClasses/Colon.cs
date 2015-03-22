@@ -32,33 +32,19 @@ namespace Reni.TokenClasses
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class Exclamation : TokenClass
+    sealed class Exclamation : ScannerTokenClass, ISubParser<SourceSyntax>
     {
         public const string TokenId = "!";
-        public override string Id => TokenId;
-        public Exclamation(ISubParser<SourceSyntax> parser) { Next = parser; }
-        protected override ISubParser<SourceSyntax> Next { get; }
 
-        protected override Syntax Suffix(Syntax left, SourcePart token)
-        {
-            NotImplementedMethod(left, token);
-            return null;
-        }
-        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
-        {
-            NotImplementedMethod(left, token, right);
-            return null;
-        }
-        protected override Syntax Terminal(SourcePart token)
-        {
-            NotImplementedMethod(token);
-            return null;
-        }
-        protected override Syntax Prefix(SourcePart token, Syntax right)
-        {
-            NotImplementedMethod(token, right);
-            return null;
-        }
+        readonly ISubParser<SourceSyntax> _parser;
+
+        public Exclamation(ISubParser<SourceSyntax> parser) { _parser = parser; }
+
+        IType<SourceSyntax> ISubParser<SourceSyntax>.Execute
+            (SourcePosn sourcePosn, Stack<OpenItem<SourceSyntax>> stack)
+            => _parser.Execute(sourcePosn, stack);
+
+        public override string Id => TokenId;
     }
 
     [BelongsTo(typeof(DeclarationTokenFactory))]
@@ -111,6 +97,7 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal override bool IsError => _tag.IsError;
 
+        [DisableDump]
         internal override CompileSyntax ToCompiledSyntax
         {
             get

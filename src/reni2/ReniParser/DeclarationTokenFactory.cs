@@ -45,10 +45,10 @@ namespace Reni.ReniParser
             public override string Id => "<unexpected>";
         }
 
-        protected override TokenClass GetEndOfText() { throw new NotImplementedException(); }
-        protected override TokenClass GetTokenClass(string name) => new Unexpected();
-        protected override TokenClass GetNumber() { throw new NotImplementedException(); }
-        protected override TokenClass GetText() { throw new NotImplementedException(); }
-        protected override TokenClass GetError(Match.IError message) => new SyntaxError(message);
+        protected override ScannerTokenClass GetEndOfText() { throw new NotImplementedException(); }
+        protected override ScannerTokenClass GetTokenClass(string name) => new Unexpected();
+        protected override ScannerTokenClass GetNumber() { throw new NotImplementedException(); }
+        protected override ScannerTokenClass GetText() { throw new NotImplementedException(); }
+        protected override ScannerTokenClass GetError(Match.IError message) => new SyntaxError(message);
     }
 }

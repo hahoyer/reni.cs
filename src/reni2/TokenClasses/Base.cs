@@ -13,40 +13,40 @@ namespace Reni.TokenClasses
     abstract class TerminalToken : TokenClass
     {
         protected override sealed Syntax Prefix(SourcePart token, Syntax right)
-            => new Validation.SyntaxError(IssueId.UnexpectedUseAsPrefix, token);
+            => IssueId.UnexpectedUseAsPrefix.Syntax(token, right);
 
         protected override sealed Syntax Infix(Syntax left, SourcePart token, Syntax right)
-            => new Validation.SyntaxError(IssueId.UnexpectedUseAsSuffix, token);
+            => IssueId.UnexpectedUseAsInfix.Syntax(token, left, right);
 
         protected override sealed Syntax Suffix(Syntax left, SourcePart token)
-            => new Validation.SyntaxError(IssueId.UnexpectedUseAsSuffix, token);
+            => IssueId.UnexpectedUseAsSuffix.Syntax(token, left);
     }
 
     abstract class NonPrefixToken : TokenClass
     {
         protected override sealed Syntax Prefix(SourcePart token, Syntax right)
-            => new Validation.SyntaxError(IssueId.UnexpectedUseAsPrefix, token);
+            => IssueId.UnexpectedUseAsPrefix.Syntax(token, right);
 
         protected override sealed Syntax Infix(Syntax left, SourcePart token, Syntax right)
-            => new Validation.SyntaxError(IssueId.UnexpectedUseAsPrefix, token);
+            => IssueId.UnexpectedUseAsInfix.Syntax(token, left, right);
     }
 
     abstract class NonSuffixToken : TokenClass
     {
         protected override sealed Syntax Infix(Syntax left, SourcePart token, Syntax right)
-            => new Validation.SyntaxError(IssueId.UnexpectedUseAsSuffix, token);
+            => IssueId.UnexpectedUseAsInfix.Syntax(token, left, right);
 
         protected override sealed Syntax Suffix(Syntax left, SourcePart token)
-            => new Validation.SyntaxError(IssueId.UnexpectedUseAsSuffix, token);
+            => IssueId.UnexpectedUseAsSuffix.Syntax(token, left);
     }
 
     abstract class SuffixToken : TokenClass
     {
         protected override sealed Syntax Prefix(SourcePart token, Syntax right)
-            => new Validation.SyntaxError(IssueId.UnexpectedUseAsPrefix, token);
+            => IssueId.UnexpectedUseAsPrefix.Syntax(token, right);
 
         protected override sealed Syntax Infix(Syntax left, SourcePart token, Syntax right)
-            => new Validation.SyntaxError(IssueId.UnexpectedUseAsPrefix, token);
+            => IssueId.UnexpectedUseAsInfix.Syntax(token, left, right);
 
         protected override sealed Syntax Terminal(SourcePart token)
             => new Validation.SyntaxError(IssueId.UnexpectedUseAsTerminal, token);
@@ -55,14 +55,13 @@ namespace Reni.TokenClasses
     abstract class InfixToken : TokenClass
     {
         protected override sealed Syntax Prefix(SourcePart token, Syntax right)
-            => new Validation.SyntaxError(IssueId.UnexpectedUseAsPrefix, token);
+            => IssueId.UnexpectedUseAsPrefix.Syntax(token, right);
 
         protected override sealed Syntax Terminal(SourcePart token)
-            => new Validation.SyntaxError(IssueId.UnexpectedUseAsTerminal, token);
+            => IssueId.UnexpectedUseAsTerminal.Syntax(token);
 
         protected override sealed Syntax Suffix(Syntax left, SourcePart token)
-            => new Validation.SyntaxError(IssueId.UnexpectedUseAsSuffix, token);
-
+            => IssueId.UnexpectedUseAsSuffix.Syntax(token, left);
     }
 
     abstract class TerminalSyntaxToken : TerminalToken, ITerminal
@@ -139,5 +138,4 @@ namespace Reni.TokenClasses
         public abstract Result Result
             (ContextBase callContext, Category category, CompileSyntax left, CompileSyntax right);
     }
-
 }

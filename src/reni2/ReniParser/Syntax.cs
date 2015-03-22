@@ -5,8 +5,6 @@ using System.Linq;
 using hw.Debug;
 using hw.Parser;
 using hw.Scanner;
-using Reni.Basics;
-using Reni.Context;
 using Reni.ReniSyntax;
 using Reni.Struct;
 using Reni.TokenClasses;
@@ -99,7 +97,7 @@ namespace Reni.ReniParser
             if(right == null)
             {
                 var e = new Validation.SyntaxError(issue, token);
-                return new ProxySyntax(this, e);
+                return new ProxySyntax(e, this);
             }
             NotImplementedMethod(issue, token, right);
             return null;
@@ -117,7 +115,7 @@ namespace Reni.ReniParser
 
 
         internal virtual Syntax Match(int level, SourcePart token)
-            => new Validation.SyntaxError(IssueId.ExtraRightBracket, token);
+            => IssueId.ExtraRightBracket.Syntax(token, this);
 
         [DisableDump]
         internal IEnumerable<Syntax> Parts => DirectChildren

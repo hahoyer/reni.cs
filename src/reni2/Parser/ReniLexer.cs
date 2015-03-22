@@ -9,7 +9,7 @@ namespace Reni.Parser
 {
     sealed class ReniLexer : ILexer
     {
-        internal static readonly ILexer Instance = new ReniLexer();
+        internal static readonly ReniLexer Instance = new ReniLexer();
 
         sealed class Error : Match.IError
         {
@@ -27,6 +27,7 @@ namespace Reni.Parser
         readonly Match _lineComment;
         readonly Match _comment;
         readonly Match _whiteSpace;
+        readonly Match _commentHead;
 
         ReniLexer()
         {
@@ -45,7 +46,7 @@ namespace Reni.Parser
                     .Else(Match.End)
                     .Else
                     (
-                        " \t".AnyChar() + Match.LineEnd.Find
+                        "(".AnyChar().Not + Match.LineEnd.Find
                             .Else(Match.End.Find + _invalidLineComment)
                     );
 
@@ -57,6 +58,8 @@ namespace Reni.Parser
                     .Else(_any.Value(id => (Match.WhiteSpace + id + ")#").Box().Find))
                     .Else(Match.End.Find + _invalidComment)
                 ;
+
+            _commentHead = "#(" + Match.WhiteSpace.Else(_any);
 
             _number = Match.Digit.Repeat(1);
 
@@ -91,5 +94,17 @@ namespace Reni.Parser
         int? WhiteSpace(SourcePosn sourcePosn) => sourcePosn.Match(_whiteSpace);
         int? Comment(SourcePosn sourcePosn) => sourcePosn.Match(_comment);
         int? LineComment(SourcePosn sourcePosn) => sourcePosn.Match(_lineComment);
+
+        public string WhiteSpaceId(WhiteSpaceToken item)
+        {
+            if(!IsComment(item))
+                return null;
+
+            var headEnd = item.Characters.Start.Match(_commentHead);
+            if(headEnd == null)
+                return null;
+
+            return item.Characters.Start.Span(headEnd.Value).Id;
+        }
     }
 }

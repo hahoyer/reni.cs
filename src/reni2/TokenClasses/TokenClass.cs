@@ -9,13 +9,20 @@ using Reni.ReniParser;
 
 namespace Reni.TokenClasses
 {
-    /// <summary>
-    ///     Base class for compiler tokens
-    /// </summary>
-    abstract class TokenClass : TokenClass<SourceSyntax>, IOperator<Syntax>
+    abstract class TokenClass
+        : ScannerTokenClass,
+            IOperator<Syntax>,
+            IType<SourceSyntax>
     {
-        protected override sealed SourceSyntax Create
-            (SourceSyntax left, IToken token, SourceSyntax right)
+        SourceSyntax IType<SourceSyntax>.Create(SourceSyntax left, IToken token, SourceSyntax right)
+            => Create(left, token, right);
+
+        string IType<SourceSyntax>.PrioTableId => Id;
+        IType<SourceSyntax> IType<SourceSyntax>.NextTypeIfMatched => NextTypeIfMatched;
+
+        protected virtual IType<SourceSyntax> NextTypeIfMatched => null;
+
+        SourceSyntax Create(SourceSyntax left, IToken token, SourceSyntax right)
         {
             var trace = token.GetObjectId() == -115;
             StartMethodDump(trace, left, token, right);

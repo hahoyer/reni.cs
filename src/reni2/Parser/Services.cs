@@ -46,17 +46,19 @@ namespace Reni.Parser
         }
 
         internal abstract class TokenClass
-            : DumpableObject, IType<Syntax>, IUniqueIdProvider
+            : DumpableObject, IType<Syntax>, IUniqueIdProvider, Scanner<Syntax>.IType
         {
             Syntax IType<Syntax>.Create(Syntax left, IToken token, Syntax right)
                 => Create(left, token, right);
             string IType<Syntax>.PrioTableId => Id;
-            ISubParser<Syntax> IType<Syntax>.NextParser => null;
             IType<Syntax> IType<Syntax>.NextTypeIfMatched => NextTypeIfMatched;
             internal virtual IType<Syntax> NextTypeIfMatched => null;
             protected abstract Syntax Create(Syntax left, IToken token, Syntax right);
             public string Id { get; }
             string IUniqueIdProvider.Value => Id;
+
+            ISubParser<Syntax> Scanner<Syntax>.IType.NextParser => null;
+            IType<Syntax> Scanner<Syntax>.IType.Type => this;
         }
 
         internal abstract class Syntax : DumpableObject, IGraphTarget, IIconKeyProvider, ISourcePart

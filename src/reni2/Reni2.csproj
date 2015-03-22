@@ -101,6 +101,7 @@
     <Compile Include="FeatureTest\TypeType\ApplyTypeOperatorWithCut.cs" />
     <Compile Include="FeatureTest\TypeType\TypeOperator.cs" />
     <Compile Include="FeatureTest\TypeType\TypeOperatorWithVariable.cs" />
+    <Compile Include="FeatureTest\UserInterAction.cs" />
     <Compile Include="FeatureTest\UserObjects.cs" />
     <Compile Include="FeatureTest\Validation\SyntaxError.cs" />
     <Compile Include="FeatureTest\Validation\UndefinedContextSymbol.cs" />
@@ -170,6 +171,7 @@
     <Compile Include="hw\Parser\IOperator.cs" />
     <Compile Include="hw\Parser\IParser.cs" />
     <Compile Include="hw\Parser\IScanner.cs" />
+    <Compile Include="hw\Parser\Item.cs" />
     <Compile Include="hw\Parser\IToken.cs" />
     <Compile Include="hw\Parser\ITokenFactory.cs" />
     <Compile Include="hw\Parser\IType.cs" />
@@ -178,7 +180,6 @@
     <Compile Include="hw\Parser\PrioParser.cs" />
     <Compile Include="hw\Parser\PrioTable.cs" />
     <Compile Include="hw\Parser\Scanner.cs" />
-    <Compile Include="hw\Parser\ScannerItem.cs" />
     <Compile Include="hw\Parser\ScannerToken.cs" />
     <Compile Include="hw\Parser\SubParser.cs" />
     <Compile Include="hw\Parser\Token.cs" />
@@ -202,7 +203,7 @@
     <Compile Include="Parser\AlternativePrioTableTest.cs" />
     <Compile Include="Parser\SimpleTokenFactory.cs" />
     <Compile Include="Parser\PrioTableTest.cs" />
-    <Compile Include="Parser\ReniScanner.cs" />
+    <Compile Include="Parser\ReniLexer.cs" />
     <Compile Include="Parser\Services.cs" />
     <Compile Include="ReniObjectExtender.cs" />
     <Compile Include="ReniParser\Extension.cs" />
@@ -326,6 +327,7 @@
     <Compile Include="TokenClasses\FunctionInstanceToken.cs" />
     <Compile Include="TokenClasses\FunctionSyntax.cs" />
     <Compile Include="TokenClasses\InstanceToken.cs" />
+    <Compile Include="TokenClasses\ScannerTokenClass.cs" />
     <Compile Include="TokenClasses\SourceSyntax.cs" />
     <Compile Include="TokenClasses\TokenClass.cs" />
     <Compile Include="TokenClasses\ToNumberOfBase.cs" />

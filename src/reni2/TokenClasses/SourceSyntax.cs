@@ -60,6 +60,9 @@ namespace Reni.TokenClasses
 
         internal TokenInformation LocateToken(SourcePosn sourcePosn)
         {
+            if(sourcePosn.IsEnd)
+                return new SyntaxToken(this);
+
             if (sourcePosn < Token.SourcePart)
                 return Left?.LocateToken(sourcePosn);
 

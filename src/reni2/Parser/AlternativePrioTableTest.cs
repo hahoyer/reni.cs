@@ -9,7 +9,6 @@ namespace Reni.Parser
 {
     [TestFixture]
     [ParserTest]
-    //[CompilerParameters.Trace.Parser]
     public sealed class AlternativePrioTableTest : CompilerTest
     {
         [Test]
