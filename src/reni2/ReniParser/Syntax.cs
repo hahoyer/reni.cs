@@ -91,23 +91,11 @@ namespace Reni.ReniParser
         [DisableDump]
         internal virtual bool IsBraceLike => false;
 
-        internal virtual Syntax Error
-            (IssueId issue, SourcePart token, Syntax right = null)
-        {
-            if(right == null)
-            {
-                var e = new Validation.SyntaxError(issue, token);
-                return new ProxySyntax(e, this);
-            }
-            NotImplementedMethod(issue, token, right);
-            return null;
-        }
-
         internal virtual Syntax SuffixedBy(Definable definable, SourcePart token)
             => new ExpressionSyntax(ToCompiledSyntax, definable, null, token);
 
         [DisableDump]
-        internal virtual IEnumerable<Issue> Issues
+        internal IEnumerable<Issue> Issues
             => Parts.SelectMany(item => item.DirectIssues).ToArray();
 
         [DisableDump]
@@ -118,7 +106,7 @@ namespace Reni.ReniParser
             => IssueId.ExtraRightBracket.Syntax(token, this);
 
         [DisableDump]
-        internal IEnumerable<Syntax> Parts => DirectChildren
+        IEnumerable<Syntax> Parts => DirectChildren
             .Where(item => item != null)
             .SelectMany(item => item.Parts)
             .plus(this);

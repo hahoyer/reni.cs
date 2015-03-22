@@ -98,15 +98,6 @@ namespace Reni.ReniParser
 
         internal override Syntax CreateDeclarationSyntax(SourcePart token, Syntax right)
             => IssueId.IdentifierExpected.Syntax(token, this, right);
-
-        internal override Syntax Error
-            (IssueId issue, SourcePart token, Syntax right = null)
-        {
-            if(Right == null)
-                return Left.Error(issue, token, right);
-            NotImplementedMethod(issue, token);
-            return null;
-        }
     }
 
     // Lord of the weed

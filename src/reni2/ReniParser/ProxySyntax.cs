@@ -5,15 +5,14 @@ using hw.Debug;
 using Reni.Basics;
 using Reni.Context;
 using Reni.ReniSyntax;
-using Reni.Validation;
 
 namespace Reni.ReniParser
 {
     sealed class ProxySyntax : Syntax
     {
-        public ProxySyntax(Validation.SyntaxError issue,params Syntax[] value)
+        public ProxySyntax(Validation.SyntaxError issue, params Syntax[] value)
         {
-            Value = value;
+            Value = value.Where(item => item != null).ToArray();
             Issue = issue;
             StopByObjectIds(71);
         }
@@ -35,14 +34,14 @@ namespace Reni.ReniParser
         }
 
         internal override CompileSyntax ToCompiledSyntax
-            => new ProxyCompileSyntax(Issue, Value.Select(item=>item.ToCompiledSyntax).ToArray());
+            => new ProxyCompileSyntax(Issue, Value.Select(item => item.ToCompiledSyntax).ToArray());
     }
 
     sealed class ProxyCompileSyntax : CompileSyntax
     {
         public ProxyCompileSyntax(Validation.SyntaxError issue, params CompileSyntax[] value)
         {
-            Value = value;
+            Value = value.Where(item => item != null).ToArray();
             Issue = issue;
             StopByObjectIds(74);
         }
@@ -57,17 +56,14 @@ namespace Reni.ReniParser
         {
             get
             {
-                foreach (var syntax in Value)
+                foreach(var syntax in Value)
                     yield return syntax;
                 yield return Issue;
             }
         }
 
         internal override Result ResultForCache(ContextBase context, Category category)
-            => Value.Select(item=>item.Result(context, category))
-            .Aggregate(Issue.Result(context, category), (c,n)=>c+n);
-
+            => Value.Select(item => item.Result(context, category))
+                .Aggregate(Issue.Result(context, category), (c, n) => c + n);
     }
-
-
 }

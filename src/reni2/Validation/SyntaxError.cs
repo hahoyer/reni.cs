@@ -84,13 +84,5 @@ namespace Reni.Validation
         }
 
         IssueType IssueType(ContextBase context) => new RootIssueType(Issue, context.RootContext);
-
-        internal override Syntax Error(IssueId issue, SourcePart token, Syntax right = null)
-        {
-            if(right == null)
-                return new SyntaxError(issue, token, this);
-            NotImplementedMethod(issue, token, right);
-            return null;
-        }
     }
 }

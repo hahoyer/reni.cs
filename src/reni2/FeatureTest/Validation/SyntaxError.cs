@@ -46,6 +46,7 @@ world'
             var i = 0;
             Tracer.Assert(issueArray[i++].IsLogdumpLike(3, 6, IssueId.EOLInString, "'"));
             Tracer.Assert(issueArray[i++].IsLogdumpLike(2, 1, IssueId.EOLInString, "' hallo"));
+            Tracer.Assert(issueArray[i++].IsLogdumpLike(3, 1, IssueId.ConsequentialError, "world"));
             Tracer.Assert(issueArray.Length == i);
         }
     }

@@ -122,32 +122,32 @@ namespace Reni.ReniParser
         protected override ScannerTokenClass GetEndOfText() => new EndToken();
         protected override ScannerTokenClass GetNumber() => new Number();
         protected override ScannerTokenClass GetTokenClass(string name) => new UserSymbol(name);
-        protected override ScannerTokenClass GetError(Match.IError message) => new SyntaxError(message);
+        protected override ScannerTokenClass GetError(Match.IError message)
+            => new SyntaxError(message);
         protected override ScannerTokenClass GetText() => new Text();
     }
 
 
-    sealed class SyntaxError : ScannerTokenClass, IOperator<Syntax>
+    sealed class SyntaxError : ScannerTokenClass, IType<SourceSyntax>
     {
         readonly IssueId _issue;
 
         public SyntaxError(Match.IError message) { _issue = ReniLexer.Parse(message); }
 
-        Syntax IOperator<Syntax>.Terminal(IToken token)
-            => new Validation.SyntaxError(_issue, token.Characters);
-
-        Syntax IOperator<Syntax>.Suffix(Syntax left, IToken token)
-            => left.Error(_issue, token.Characters);
-
-        Syntax IOperator<Syntax>.Infix(Syntax left, IToken token, Syntax right)
-            => left.Error(_issue, token.Characters, right);
+        string IType<SourceSyntax>.PrioTableId => Id;
 
         public override string Id => "<error>";
 
-        Syntax IOperator<Syntax>.Prefix(IToken token, Syntax right)
-        {
-            NotImplementedMethod(token, right);
-            return null;
-        }
+        SourceSyntax IType<SourceSyntax>.Create(SourceSyntax left, IToken token, SourceSyntax right)
+            =>
+                new SourceSyntax
+                    (
+                    _issue.Syntax(token.Characters, left?.Syntax, right?.Syntax),
+                    left,
+                    token,
+                    right
+                    );
+
+        IType<SourceSyntax> IType<SourceSyntax>.NextTypeIfMatched => null;
     }
 }
