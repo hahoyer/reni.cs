@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
-using hw.Parser;
 using hw.Scanner;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
@@ -48,7 +47,9 @@ namespace Reni.TokenClasses
         {
             SourcePart Token { get; }
             readonly int _level;
-            internal readonly ReniParser.Syntax Right;
+
+            [EnableDump]
+            ReniParser.Syntax Right { get; }
 
             public Syntax(int level, SourcePart token, ReniParser.Syntax right)
             {
@@ -57,6 +58,7 @@ namespace Reni.TokenClasses
                 Right = right;
             }
 
+            [DisableDump]
             protected override IEnumerable<ReniParser.Syntax> DirectChildren
             {
                 get { yield return Right; }
@@ -64,7 +66,16 @@ namespace Reni.TokenClasses
 
             [DisableDump]
             internal override CompileSyntax ToCompiledSyntax
-                => new CompileSyntaxError(IssueId.MissingRightBracket, Token);
+            {
+                get
+                {
+                    var issue = new Validation.SyntaxError(IssueId.MissingRightBracket, Token);
+                    if(Right == null)
+                        return issue;
+
+                    return new ProxyCompileSyntax(Right.ToCompiledSyntax, issue);
+                }
+            }
 
             internal override bool IsBraceLike => true;
 

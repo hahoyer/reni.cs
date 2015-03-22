@@ -97,13 +97,13 @@ namespace Reni.ReniParser
         }
 
         internal override Syntax CreateDeclarationSyntax(SourcePart token, Syntax right)
-            => new CompileSyntaxError(IssueId.IdentifierExpected, token);
+            => new Validation.SyntaxError(IssueId.IdentifierExpected, token);
 
-        internal override Syntax SyntaxError
+        internal override Syntax Error
             (IssueId issue, SourcePart token, Syntax right = null)
         {
             if(Right == null)
-                return Left.SyntaxError(issue, token, right);
+                return Left.Error(issue, token, right);
             NotImplementedMethod(issue, token);
             return null;
         }

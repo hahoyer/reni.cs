@@ -18,17 +18,17 @@ namespace Reni.TokenClasses
 
         protected override Syntax Suffix(Syntax left, SourcePart token)
             => left.CreateDeclarationSyntax
-                (token, new CompileSyntaxError(IssueId.MissingValueInDeclaration, token));
+                (token, new Validation.SyntaxError(IssueId.MissingValueInDeclaration, token));
 
         protected override Syntax Prefix(SourcePart token, Syntax right)
-            => new CompileSyntaxError(IssueId.UnexpectedUseAsPrefix, token);
+            => new Validation.SyntaxError(IssueId.UnexpectedUseAsPrefix, token);
 
         protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
             => left.CreateDeclarationSyntax(token, right);
 
         protected override Syntax Terminal(SourcePart token)
             => new DeclarationSyntax
-                (token, new CompileSyntaxError(IssueId.MissingValueInDeclaration, token));
+                (token, new Validation.SyntaxError(IssueId.MissingValueInDeclaration, token));
     }
 
     [BelongsTo(typeof(MainTokenFactory))]

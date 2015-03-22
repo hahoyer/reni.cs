@@ -65,7 +65,7 @@ namespace Reni.ReniParser
             if(isInContainerDump)
                 result += " ObjectId=" + ObjectId;
             else
-                result += "\n" + base.Dump(false);
+                result = "\n" + base.Dump(false);
             CompoundSyntax.IsInContainerDump = isInContainerDump;
             _isInDump = isInDump;
             return result;
@@ -93,12 +93,12 @@ namespace Reni.ReniParser
         [DisableDump]
         internal virtual bool IsBraceLike => false;
 
-        internal virtual Syntax SyntaxError
+        internal virtual Syntax Error
             (IssueId issue, SourcePart token, Syntax right = null)
         {
             if(right == null)
             {
-                var e = new CompileSyntaxError(issue, token);
+                var e = new Validation.SyntaxError(issue, token);
                 return new ProxySyntax(this, e);
             }
             NotImplementedMethod(issue, token, right);
@@ -117,7 +117,7 @@ namespace Reni.ReniParser
 
 
         internal virtual Syntax Match(int level, SourcePart token)
-            => new CompileSyntaxError(IssueId.ExtraRightBracket, token);
+            => new Validation.SyntaxError(IssueId.ExtraRightBracket, token);
 
         [DisableDump]
         internal IEnumerable<Syntax> Parts => DirectChildren
@@ -128,110 +128,6 @@ namespace Reni.ReniParser
         [DisableDump]
         protected virtual IEnumerable<Syntax> DirectChildren { get { yield break; } }
 
-        internal ListSyntax ToListSyntax => new ListSyntax
-            (
-            null,
-            ToList(null)
-            );
-    }
-
-    sealed class ProxySyntax : Syntax
-    {
-        readonly Syntax _value;
-        readonly CompileSyntaxError _issue;
-        public ProxySyntax(Syntax value, CompileSyntaxError issue)
-        {
-            _value = value;
-            _issue = issue;
-        }
-        internal override CompileSyntax ToCompiledSyntax
-            => new ProxyCompileSyntax(_value.ToCompiledSyntax, _issue);
-    }
-
-    sealed class ProxyCompileSyntax : CompileSyntax
-    {
-        readonly CompileSyntax _value;
-        readonly CompileSyntaxError _issue;
-        public ProxyCompileSyntax(CompileSyntax value, CompileSyntaxError issue)
-        {
-            _value = value;
-            _issue = issue;
-        }
-
-        internal override Result ResultForCache(ContextBase context, Category category)
-            => _value.Result(context, category) + _issue.Result(context, category);
-    }
-
-
-    static class Extension
-    {
-        internal static T[] plus<T>(this T x, params IEnumerable<T>[] y)
-            => new[] {x}.Concat(y.SelectMany(item => item)).ToDistinctNotNullArray();
-
-        internal static T[] plus<T>(this IEnumerable<T> x, IEnumerable<T> y)
-            => (x ?? new T[0])
-                .Concat(y ?? new T[0])
-                .ToDistinctNotNullArray();
-
-        internal static T[] plus<T>(this IEnumerable<T> x, T y)
-            where T : class
-            => (x ?? new T[0])
-                .Concat(y.NullableToArray())
-                .ToDistinctNotNullArray();
-
-        internal static T[] plus<T>(this T x, params T[] y)
-            => new[] {x}.Concat(y).ToDistinctNotNullArray();
-
-        internal static T[] ToDistinctNotNullArray<T>(this IEnumerable<T> y)
-            => (y).Where(item => item != null).Distinct().ToArray();
-
-        internal static SourcePart[] Combine(SourcePart[] current, SourcePart next)
-            => SourcePart
-                .SaveCombine(current.plus(next))
-                .ToArray();
-
-        internal static IEnumerable<SourcePart> Parts(this IToken token)
-        {
-            if(token == null)
-                yield break;
-            foreach(var whiteSpaceToken in token.PrecededWith)
-                yield return whiteSpaceToken.Characters;
-            yield return token.Characters;
-        }
-
-        internal static CompileSyntax CheckedToCompiledSyntax
-            (this Syntax target, Func<IssueId> getError, SourcePart source)
-            => target?.ToCompiledSyntax
-                ?? new CompileSyntaxError(getError(), source);
-
-        internal static Token<SourceSyntax> Token(this SourcePosn sourcePosn)
-            => new Token<SourceSyntax>(null, sourcePosn.Span(0));
-
-        public static bool Contain
-            (this IEnumerable<SourcePart> source, IEnumerable<SourcePart> value)
-            => value.All(source.Contain);
-
-        public static bool Contain(this IEnumerable<SourcePart> source, SourcePart value)
-        {
-            foreach(var sourcePart in source
-                .Where(item => item.Source == value.Source)
-                .OrderBy(item => item.Position)
-                .Where(item => value.Start < item.End)
-                .Where(item => item.Start < value.End))
-            {
-                if(value.Start < sourcePart.Start)
-                    return false;
-
-                if(value.Start >= sourcePart.End)
-                    continue;
-
-                if(value.End <= sourcePart.End)
-                    return true;
-
-                value = sourcePart.End.Span(value.End);
-            }
-
-            return false;
-        }
+        internal ListSyntax ToListSyntax => new ListSyntax(null, ToList(null));
     }
 }

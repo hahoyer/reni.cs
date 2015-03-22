@@ -4,9 +4,7 @@ using System;
 using hw.Debug;
 using hw.Helper;
 using hw.Scanner;
-using JetBrains.Annotations;
 using Reni.Code;
-using Reni.ReniParser;
 
 namespace Reni.Validation
 {
@@ -28,7 +26,7 @@ namespace Reni.Validation
         [DisableDump]
         internal IssueId IssueId { get; }
         [EnableDump]
-        SourcePart Position { get; }
+        internal SourcePart Position { get; }
 
         string Message { get; }
 

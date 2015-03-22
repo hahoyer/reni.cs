@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using System;
+using hw.Debug;
 using hw.Helper;
 using Reni.Basics;
 using Reni.Context;
@@ -14,8 +15,10 @@ namespace Reni.TokenClasses
     sealed class FunctionSyntax : SpecialSyntax
     {
         internal CompileSyntax Getter { get; }
-        bool IsMetaFunction { get; }
+
         internal CompileSyntax Setter { get; }
+
+        bool IsMetaFunction { get; }
         internal bool IsImplicit { get; }
 
         public FunctionSyntax
@@ -31,6 +34,7 @@ namespace Reni.TokenClasses
             IsMetaFunction = isMetaFunction;
         }
 
+        [DisableDump]
         protected override IEnumerable<Syntax> DirectChildren
         {
             get

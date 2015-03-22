@@ -17,8 +17,18 @@ namespace Reni.TokenClasses
         protected override sealed SourceSyntax Create
             (SourceSyntax left, IToken token, SourceSyntax right)
         {
-            var syntax = this.Operation(left?.Syntax, token, right?.Syntax);
-            return new SourceSyntax(syntax, left, token, right);
+            var trace = token.GetObjectId() == -115;
+            StartMethodDump(trace, left, token, right);
+            try
+            {
+                BreakExecution();
+                var syntax = this.Operation(left?.Syntax, token, right?.Syntax);
+                return ReturnMethodDump(new SourceSyntax(syntax, left, token, right));
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
 
         internal Syntax CreateForVisit(Syntax left, Syntax right)

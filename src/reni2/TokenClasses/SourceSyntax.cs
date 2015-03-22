@@ -6,7 +6,6 @@ using hw.Debug;
 using hw.Parser;
 using hw.Scanner;
 using Reni.ReniParser;
-using Reni.Struct;
 using Reni.UserInterface;
 using Reni.Validation;
 
@@ -21,27 +20,36 @@ namespace Reni.TokenClasses
             Token = token;
             Right = right;
             AssertValid();
-
         }
+
         void AssertValid()
         {
-            var s = Syntax.Issues;
-            var a = (Left?.Syntax?.Issues).plus(Right?.Syntax?.Issues);
-            Tracer.Assert(a != null);
-            var x = s.Merge(a, item => item);
-            var n = x.Where(item => item.Item3 == null).ToArray();
-            var lost = x.Where(item => item.Item2 == null).ToArray();
-            Tracer.Assert(n.Length <= 1);
-            Tracer.Assert(!lost.Any());
+            var currentIssues = Syntax.Issues;
+            var formerIssues = (Left?.Syntax?.Issues).plus(Right?.Syntax?.Issues);
+            Tracer.Assert(formerIssues != null);
+            var combinations = currentIssues.Merge(formerIssues, item => item).ToArray();
+            var newIssues = combinations.Where(item => item.Item3 == null).ToArray();
+            var lostIssues = combinations.Where(item => item.Item2 == null).ToArray();
+            Tracer.Assert
+                (
+                    !lostIssues.Any(),
+                    () =>
+                        "\n" +
+                            Tracer.Dump(lostIssues.Select(item => item.Item3).ToArray()) +
+                            "\n" +
+                            Syntax.Dump()
+                );
         }
 
-
-        public Syntax Syntax { get; }
+        internal Syntax Syntax { get; }
         SourceSyntax Left { get; }
         internal IToken Token { get; }
         SourceSyntax Right { get; }
 
         SourcePart ISourcePart.All => SourcePart;
+
+        [EnableDump]
+        Issue[] Issues => Syntax.Issues.ToArray();
 
         [DisableDump]
         internal SourcePart SourcePart => Left?.SourcePart + Token.SourcePart + Right?.SourcePart;
@@ -109,32 +117,7 @@ namespace Reni.TokenClasses
         }
 
 
-        protected override string GetNodeDump() => SourcePart.Id;
-
-        static bool _isInDump;
-
-        protected override string Dump(bool isRecursion)
-        {
-            if(isRecursion)
-                return "ObjectId=" + ObjectId;
-
-            var isInContainerDump = CompoundSyntax.IsInContainerDump;
-            CompoundSyntax.IsInContainerDump = false;
-            var isInDump = _isInDump;
-            _isInDump = true;
-            var result = GetNodeDump();
-            if(!ParsedSyntax.IsDetailedDumpRequired)
-                return result;
-            if(!isInDump && SourcePart.Source.IsPersistent)
-                result += FilePosition;
-            if(isInContainerDump)
-                result += " ObjectId=" + ObjectId;
-            else
-                result += "\n" + base.Dump(false);
-            CompoundSyntax.IsInContainerDump = isInContainerDump;
-            _isInDump = isInDump;
-            return result;
-        }
+        protected override string GetNodeDump() => base.GetNodeDump() + " " + SourcePart.Id.Quote();
 
         internal TokenInformation LocateToken(SourcePosn sourcePosn)
         {
@@ -151,8 +134,5 @@ namespace Reni.TokenClasses
                 (item => item.Characters.Contains(sourcePosn));
             return new UserInterface.WhiteSpaceToken(whiteSpaceToken);
         }
-
-        [DisableDump]
-        internal string DumpPrintText => SourcePart.Id;
     }
 }
