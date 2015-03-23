@@ -29,6 +29,8 @@ namespace Reni.ReniSyntax
         internal override CompoundSyntax ToContainer
             => new CompoundSyntax(Data);
 
+        internal override bool IsKeyword => true;
+
         internal override IEnumerable<Syntax> ToList(List type)
         {
             Tracer.Assert

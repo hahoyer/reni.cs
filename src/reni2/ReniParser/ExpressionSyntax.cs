@@ -38,6 +38,8 @@ namespace Reni.ReniParser
         [Node]
         internal CompileSyntax Right { get; }
 
+        internal override bool IsIdentifier => true;
+
         [DisableDump]
         protected override IEnumerable<Syntax> DirectChildren
         {

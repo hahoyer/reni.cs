@@ -73,27 +73,53 @@ complex FromReal(2) dump_print;
     [TestFixture] 
     public sealed class UserInterAction2 : DependantAttribute
     {
-        const string text = @"#(aa comment aa)# !mutable name: 3";
-        const string type = @"cccccccccccccccccwkkkkkkkkwiiiikwn";
+        const string Text = @"#(aa comment aa)# !mutable name: 3";
+        const string Type = @"cccccccccccccccccwkkkkkkkkwiiiikwn";
 
         [Test]
         public void GetTokenForPosition()
         {
-            var compiler = new Compiler(text: text);
+            var compiler = new Compiler(text: Text);
 
             var typeCharacters = new string
                 (
-                text
+                Text
                     .Length
                     .Select(item => compiler.Token(item).TypeCharacter)
                     .ToArray());
             Tracer.Assert
                 (
-                    type == typeCharacters,
+                    Type == typeCharacters,
                     () =>
-                        "\nXpctd: " + type +
+                        "\nXpctd: " + Type +
                             "\nFound: " + typeCharacters +
-                            "\nText : " + text);
+                            "\nText : " + Text);
+        }
+    }
+    [TestFixture]
+    public sealed class UserInterAction3 : DependantAttribute
+    {
+        const string Text = @"   !mutable FreePointer: Memory array_reference mutable;";
+        const string Type = @"wwwkkkkkkkkwiiiiiiiiiiikwiiiiiiwiiiiiiiiiiiiiiiwiiiiiiik";
+
+        [Test]
+        public void GetTokenForPosition()
+        {
+            var compiler = new Compiler(text: Text);
+
+            var typeCharacters = new string
+                (
+                Text
+                    .Length
+                    .Select(item => compiler.Token(item).TypeCharacter)
+                    .ToArray());
+            Tracer.Assert
+                (
+                    Type == typeCharacters,
+                    () =>
+                        "\nXpctd: " + Type +
+                            "\nFound: " + typeCharacters +
+                            "\nText : " + Text);
         }
     }
 }
