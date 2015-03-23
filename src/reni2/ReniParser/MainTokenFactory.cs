@@ -117,7 +117,7 @@ namespace Reni.ReniParser
             return base.SpecialTokenClass(type);
         }
 
-        static IType<SourceSyntax> Pack(SourceSyntax options) => new SyntaxBoxToken(options);
+        static IType<SourceSyntax> Pack(SourceSyntax options) => new ExclamationBoxToken(options);
 
         protected override ScannerTokenClass GetEndOfText() => new EndToken();
         protected override ScannerTokenClass GetNumber() => new Number();
@@ -132,7 +132,7 @@ namespace Reni.ReniParser
     {
         readonly IssueId _issue;
 
-        public SyntaxError(Match.IError message) { _issue = ReniLexer.Parse(message); }
+        public SyntaxError(Match.IError message) { _issue = ReniLexer.Parse(message); StopByObjectIds(81);}
 
         string IType<SourceSyntax>.PrioTableId => Id;
 

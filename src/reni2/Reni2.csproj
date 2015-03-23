@@ -207,8 +207,7 @@
     <Compile Include="Parser\Services.cs" />
     <Compile Include="ReniObjectExtender.cs" />
     <Compile Include="ReniParser\Extension.cs" />
-    <Compile Include="ReniParser\ProxySyntax.cs" />
-    <Compile Include="ReniParser\SyntaxBoxToken.cs" />
+    <Compile Include="ReniParser\ExclamationBoxToken.cs" />
     <Compile Include="ReniParser\TokenFactory.cs" />
     <Compile Include="ReniSyntax\ListSyntax.cs" />
     <Compile Include="ResultCache.cs" />
@@ -319,7 +318,7 @@
     <Compile Include="TokenClasses\Base.cs" />
     <Compile Include="TokenClasses\Colon.cs" />
     <Compile Include="TokenClasses\EqualityOperation.cs" />
-    <Compile Include="TokenClasses\DefinableTokenSyntax.cs" />
+    <Compile Include="TokenClasses\DefinableSyntax.cs" />
     <Compile Include="TokenClasses\Definable.cs" />
     <Compile Include="TokenClasses\ElseToken.cs" />
     <Compile Include="TokenClasses\EnableCut.cs" />

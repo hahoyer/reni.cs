@@ -14,49 +14,40 @@ namespace Reni.Validation
 {
     sealed class SyntaxError : CompileSyntax
     {
+        static int _nextObjectId;
         [EnableDump]
         readonly IssueId _issueId;
-        readonly SyntaxError _previous;
+        readonly Syntax[] _others;
         readonly ValueCache<Issue> _issueCache;
 
         public SyntaxError
-            (IssueId issueId, SourcePart source, SyntaxError previous = null)
+            (IssueId issueId, SourcePart source, params Syntax[] others)
+            :base(_nextObjectId++)
         {
             _issueId = issueId;
-            _previous = previous;
+            _others = others;
             _issueCache = new ValueCache<Issue>(() => new Issue(_issueId, source, ""));
 
-            StopByObjectIds(67);
+            StopByObjectIds();
         }
 
         internal override bool IsError => true;
         [DisableDump]
         internal override IEnumerable<Issue> DirectIssues => Issue.plus(base.DirectIssues);
         [DisableDump]
-        protected override IEnumerable<Syntax> DirectChildren { get { yield return _previous; } }
+        protected override IEnumerable<Syntax> DirectChildren => _others;
 
         [DisableDump]
         Issue Issue => _issueCache.Value;
 
-        [DisableDump]
-        IEnumerable<SyntaxError> Chain
-        {
-            get
-            {
-                var current = this;
-                do
-                {
-                    yield return current;
-                    current = current._previous;
-                } while(current != null);
-            }
-        }
-
         internal override Result ResultForCache(ContextBase context, Category category)
         {
-            var result = Chain
-                .Select(error => error.IssueType(context).Result(category))
-                .Aggregate(context.RootContext.VoidType.Result(category), (x, y) => x + y);
+            var seed = IssueType(context).Result(category);
+            var result = _others
+                .Select(item=>item as CompileSyntax)
+                .Where(item=> item != null)
+                .Select(item => item.Result(context,category))
+                .Aggregate(seed, (x, y) => x + y);
             return result;
         }
 

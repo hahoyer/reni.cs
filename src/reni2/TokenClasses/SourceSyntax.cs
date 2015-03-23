@@ -24,6 +24,26 @@ namespace Reni.TokenClasses
 
         void AssertValid()
         {
+            AssertValidSourceQueue();
+            AssertValidIssues();
+        }
+        void AssertValidSourceQueue()
+        {
+            if(Left != null)
+                Tracer.Assert
+                    (
+                        Left.SourcePart.End == Token.SourcePart.Start,
+                        () => Left.SourcePart.End.Span(Token.SourcePart.Start).NodeDump
+                    );
+            if (Right!= null)
+                Tracer.Assert
+                    (
+                        Token.SourcePart.End == Right.SourcePart.Start,
+                        () => Token.SourcePart.End.Span(Right.SourcePart.Start).NodeDump
+                    );
+        }
+        void AssertValidIssues()
+        {
             var currentIssues = Syntax.Issues;
             var formerIssues = (Left?.Syntax?.Issues).plus(Right?.Syntax?.Issues);
             Tracer.Assert(formerIssues != null);
@@ -63,14 +83,14 @@ namespace Reni.TokenClasses
             if(sourcePosn.IsEnd)
                 return new SyntaxToken(this);
 
-            if (sourcePosn < Token.SourcePart)
+            if(sourcePosn < Token.SourcePart)
                 return Left?.LocateToken(sourcePosn);
 
             if(sourcePosn < Token.Characters)
                 return new UserInterface.WhiteSpaceToken
                     (Token.PrecededWith.Single(item => item.Characters.Contains(sourcePosn)));
 
-            if (Token.Characters.Contains(sourcePosn))
+            if(Token.Characters.Contains(sourcePosn))
                 return new SyntaxToken(this);
 
             return Right?.LocateToken(sourcePosn);

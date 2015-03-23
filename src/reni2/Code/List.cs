@@ -49,7 +49,7 @@ namespace Reni.Code
         {
             foreach(var codeBase in Data)
             {
-                Tracer.Assert(!(codeBase is List));
+                Tracer.Assert(!(codeBase is List), ()=> codeBase.Dump());
                 Tracer.Assert(!(codeBase.IsEmpty));
             }
             Tracer.Assert(Data.Length > 1);

@@ -27,7 +27,11 @@ namespace HoyerWare.ReniLanguagePackage
         internal static InnerTokenStateAtLineEnd StartState => InnerTokenStateAtLineEnd.None;
 
 
-        Compiler CreateCompilerForCache() => new Compiler(text: Buffer.All);
+        Compiler CreateCompilerForCache() => new Compiler
+            (
+            text: Buffer.All,
+            parameters: new CompilerParameters{ TraceOptions = { Parser = true}}
+            ) ;
 
         Compiler Compiler
         {
@@ -75,12 +79,18 @@ namespace HoyerWare.ReniLanguagePackage
             var start = Buffer.LinePosition(lineIndex);
             var end = Buffer.LineEnd(lineIndex);
             var index = start;
+            var i = 0;
             while(index < end)
             {
                 var token = Compiler.Token(index).AssertNotNull().Trim(start, end);
-                Tracer.Line(token.SourcePart.NodeDump.Quote() + " " + ConvertToTokenType(token.Token));
+                Tracer.IndentStart();
+                Tracer.Line("\n" + i + ": " + ConvertToTokenColor(token.Token));
+                Tracer.Line(token.SourcePart.NodeDump.Quote());
+                Tracer.Line("-----------------");
+                Tracer.IndentEnd();
                 yield return token;
                 index += token.SourcePart.Length;
+                i++;
             }
         }
 
@@ -103,8 +113,10 @@ namespace HoyerWare.ReniLanguagePackage
             if(token.IsIdentifier)
                 return TokenType.Identifier;
             if(token.IsComment)
-                return token.IsLineComment ? TokenType.LineComment : TokenType.Comment;
-            if(token.IsWhiteSpace)
+                return TokenType.Comment;
+            if (token.IsLineComment)
+                return TokenType.LineComment;
+            if (token.IsWhiteSpace)
                 return TokenType.WhiteSpace;
             if(token.IsError)
                 return TokenType.Unknown;
@@ -121,8 +133,11 @@ namespace HoyerWare.ReniLanguagePackage
                 return TokenColor.Keyword;
             if(token.IsIdentifier)
                 return TokenColor.Identifier;
-            if(token.IsComment)
+            if(token.IsComment || token.IsLineComment || token.IsWhiteSpace)
                 return TokenColor.Comment;
+            if (token.IsError)
+                return TokenColor.Text;
+
             return TokenColor.Text;
         }
 

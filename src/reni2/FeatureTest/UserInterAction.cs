@@ -70,7 +70,7 @@ complex FromReal(2) dump_print;
         }
     }
 
-    [TestFixture] 
+    [TestFixture, UserInterAction]
     public sealed class UserInterAction2 : DependantAttribute
     {
         const string Text = @"#(aa comment aa)# !mutable name: 3";
@@ -96,7 +96,8 @@ complex FromReal(2) dump_print;
                             "\nText : " + Text);
         }
     }
-    [TestFixture]
+
+    [TestFixture, UserInterAction]
     public sealed class UserInterAction3 : DependantAttribute
     {
         const string Text = @"   !mutable FreePointer: Memory array_reference mutable;";

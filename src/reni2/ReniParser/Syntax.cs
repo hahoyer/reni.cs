@@ -115,5 +115,11 @@ namespace Reni.ReniParser
         protected virtual IEnumerable<Syntax> DirectChildren { get { yield break; } }
 
         internal ListSyntax ToListSyntax => new ListSyntax(null, ToList(null));
+
+        internal virtual Syntax ExclamationSyntax(SourcePart token)
+        {
+            NotImplementedMethod(token);
+            return null;
+        }
     }
 }

@@ -50,68 +50,87 @@ namespace Reni.TokenClasses
     [BelongsTo(typeof(DeclarationTokenFactory))]
     abstract class DeclarationTagToken : TerminalToken
     {
-        internal Syntax DeclarationSyntax(SourcePart token, CompileSyntax body)
-            =>
-                new DeclarationSyntax
-                    (
-                    token,
-                    body,
-                    new DefinableTokenSyntax(new DeclarationTagSyntax(this), token)
-                    );
-
-        protected override Syntax Terminal(SourcePart token)
-            => new DeclarationTagSyntax(this);
+        protected override ReniParser.Syntax Terminal(SourcePart token)
+            => new Syntax(this);
 
         [DisableDump]
-        internal virtual bool IsKeyword => false;
+        internal virtual bool IsKeyword => true;
         [DisableDump]
         internal virtual bool IsError => false;
+        [DisableDump]
+        internal virtual bool DeclaresMutable => false;
+        [DisableDump]
+        internal virtual bool DeclaresConverter => false;
+
+        internal sealed class Syntax : ReniParser.Syntax
+        {
+            [EnableDump]
+            internal readonly DeclarationTagToken Tag;
+
+            internal Syntax(DeclarationTagToken tag) { Tag = tag; }
+
+            [DisableDump]
+            internal override bool IsKeyword => Tag.IsKeyword;
+            [DisableDump]
+            internal override bool IsError => Tag.IsError;
+
+            [DisableDump]
+            internal override CompileSyntax ToCompiledSyntax
+            {
+                get
+                {
+                    NotImplementedMethod();
+                    return null;
+                }
+            }
+
+            internal override ReniParser.Syntax ExclamationSyntax(SourcePart token)
+                => new DeclarationTagSyntax(this, token);
+
+            internal ReniParser.Syntax DeclarationSyntax(SourcePart token, CompileSyntax body)
+                => new DeclarationSyntax(token, body, DefinableSyntax(token, null));
+
+            internal DefinableSyntax DefinableSyntax(SourcePart token, Definable definable)
+                => new DefinableSyntax(token, definable, Tag);
+        }
+    }
+
+    sealed class DeclarationTagSyntax : Syntax
+    {
+        [EnableDump]
+        DeclarationTagToken.Syntax Tag { get; }
+        SourcePart Token { get; }
+
+        public DeclarationTagSyntax(DeclarationTagToken.Syntax tag, SourcePart token)
+        {
+            Tag = tag;
+            Token = token;
+        }
+
+        [DisableDump]
+        internal override CompileSyntax ToCompiledSyntax
+            => IssueId.UnexpectedDeclarationTag.Syntax(Token, Tag).ToCompiledSyntax;
+
+        internal override Syntax CreateDeclarationSyntax(SourcePart token, Syntax right)
+            => Tag.DeclarationSyntax(token, right.ToCompiledSyntax);
+
+        internal override Syntax SuffixedBy(Definable definable, SourcePart token)
+            => Tag.DefinableSyntax(token, definable);
     }
 
     sealed class ConverterToken : DeclarationTagToken
     {
         const string TokenId = "converter";
         public override string Id => TokenId;
-        internal override bool IsKeyword => true;
+        [DisableDump]
+        internal override bool DeclaresConverter => true;
     }
 
     sealed class MutableDeclarationToken : DeclarationTagToken
     {
         const string TokenId = "mutable";
         public override string Id => TokenId;
-        internal override bool IsKeyword => true;
-    }
-
-    sealed class DeclarationTagSyntax : Syntax
-    {
-        [EnableDump]
-        readonly DeclarationTagToken _tag;
-
-        internal DeclarationTagSyntax(DeclarationTagToken tag) { _tag = tag; }
-
         [DisableDump]
-        internal bool DeclaresMutable => _tag is MutableDeclarationToken;
-        [DisableDump]
-        internal bool DeclaresConverter => _tag is ConverterToken;
-        [DisableDump]
-        internal override bool IsKeyword => _tag.IsKeyword;
-        [DisableDump]
-        internal override bool IsError => _tag.IsError;
-
-        [DisableDump]
-        internal override CompileSyntax ToCompiledSyntax
-        {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
-        }
-
-        internal override Syntax CreateDeclarationSyntax(SourcePart token, Syntax right)
-            => _tag.DeclarationSyntax(token, right.ToCompiledSyntax);
-
-        internal override Syntax SuffixedBy(Definable definable, SourcePart token)
-            => new DefinableTokenSyntax(definable, token, this);
+        internal override bool DeclaresMutable => true;
     }
 }

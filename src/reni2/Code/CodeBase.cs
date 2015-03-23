@@ -61,10 +61,9 @@ namespace Reni.Code
                 .SelectMany(item => item.AsList())
                 .ToArray();
 
-            var nonIssues = Code.List.CheckedCreate(allData.Where(item => !(item is IssueCode)));
             var issues = IssueCode.CheckedCreate(allData.Where(item => item is IssueCode));
-
-            return Code.List.Create(issues, nonIssues);
+            var nonIssues = allData.Where(item => !(item is IssueCode));
+            return Code.List.Create(issues.plus(nonIssues));
         }
 
         protected abstract Size GetSize();

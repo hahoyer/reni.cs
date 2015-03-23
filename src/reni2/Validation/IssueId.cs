@@ -21,12 +21,13 @@ namespace Reni.Validation
         public static readonly IssueId MissingElseBody = new IssueId();
         public static readonly IssueId MissingValueInDeclaration = new IssueId();
         public static readonly IssueId UndefinedSymbol = new IssueId();
+        public static readonly IssueId UnexpectedDeclarationTag = new IssueId();
         public static readonly IssueId UnexpectedUseAsInfix = new IssueId();
         public static readonly IssueId UnexpectedUseAsPrefix = new IssueId();
         public static readonly IssueId UnexpectedUseAsSuffix = new IssueId();
         public static readonly IssueId UnexpectedUseAsTerminal = new IssueId();
 
-        internal ProxySyntax Syntax(SourcePart token, params Syntax[] value)
-            => new ProxySyntax(new SyntaxError(this, token), value);
+        internal SyntaxError Syntax(SourcePart token, params Syntax[] value)
+            => new SyntaxError(this, token, value);
     }
 }

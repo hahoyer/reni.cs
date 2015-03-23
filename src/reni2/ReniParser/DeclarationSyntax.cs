@@ -15,7 +15,7 @@ namespace Reni.ReniParser
             (
             SourcePart token,
             CompileSyntax body,
-            DefinableTokenSyntax target = null
+            DefinableSyntax target = null
             )
             : base()
         {
@@ -25,7 +25,7 @@ namespace Reni.ReniParser
         }
 
         [EnableDump]
-        DefinableTokenSyntax Target { get; }
+        DefinableSyntax Target { get; }
         [EnableDump]
         Syntax Body { get; }
 

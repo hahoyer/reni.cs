@@ -89,7 +89,7 @@ namespace Reni.UserInterface
         SourceSyntax SourceSyntax { get; }
         Syntax Syntax => SourceSyntax.Syntax;
 
-        protected override SourcePart SourcePart => SourceSyntax.Token.SourcePart;
+        protected override SourcePart SourcePart => SourceSyntax.Token.Characters;
         public override bool IsKeyword => Syntax.IsKeyword;
         public override bool IsIdentifier => Syntax.IsIdentifier;
         public override bool IsText => Syntax.IsText;

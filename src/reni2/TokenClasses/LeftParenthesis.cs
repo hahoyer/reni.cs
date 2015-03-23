@@ -66,18 +66,10 @@ namespace Reni.TokenClasses
 
             [DisableDump]
             internal override CompileSyntax ToCompiledSyntax
-            {
-                get
-                {
-                    var issue = new Validation.SyntaxError(IssueId.MissingRightBracket, Token);
-                    if(Right == null)
-                        return issue;
-
-                    return new ProxyCompileSyntax(issue, Right.ToCompiledSyntax);
-                }
-            }
+                => IssueId.MissingRightBracket.Syntax(Token, Right);
 
             internal override bool IsBraceLike => true;
+            internal override bool IsKeyword => true;
 
             internal override ReniParser.Syntax Match(int level, SourcePart token)
             {
