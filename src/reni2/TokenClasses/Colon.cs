@@ -84,6 +84,7 @@ namespace Reni.TokenClasses
 
     sealed class DeclarationTagSyntax : Syntax
     {
+        [EnableDump]
         readonly DeclarationTagToken _tag;
 
         internal DeclarationTagSyntax(DeclarationTagToken tag) { _tag = tag; }

@@ -70,11 +70,11 @@ complex FromReal(2) dump_print;
         }
     }
 
-    [TestFixture] [LowPriority]
+    [TestFixture] 
     public sealed class UserInterAction2 : DependantAttribute
     {
         const string text = @"#(aa comment aa)# !mutable name: 3";
-        const string type = @"lllllllllllllllllwkkkkkkkkwiiiikwn";
+        const string type = @"cccccccccccccccccwkkkkkkkkwiiiikwn";
 
         [Test]
         public void GetTokenForPosition()
