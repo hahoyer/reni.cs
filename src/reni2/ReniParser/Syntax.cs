@@ -128,4 +128,16 @@ namespace Reni.ReniParser
             return null;
         }
     }
+
+    abstract class NonCompileSyntax : Syntax
+    {
+        protected readonly SourcePart Token;
+        protected NonCompileSyntax(SourcePart token) { Token = token; }
+        [DisableDump]
+        internal override CompileSyntax ToCompiledSyntax
+        {
+            get { return IssueId.InvalidExpression.Syntax(Token, this); }
+        }
+
+    }
 }

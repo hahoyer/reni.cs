@@ -314,6 +314,7 @@
     <Compile Include="TokenClasses\ArgToken.cs" />
     <Compile Include="TokenClasses\CompareOperation.cs" />
     <Compile Include="TokenClasses\EndToken.cs" />
+    <Compile Include="TokenClasses\ExclamationSyntaxList.cs" />
     <Compile Include="TokenClasses\ReassignToken.cs" />
     <Compile Include="TokenClasses\Base.cs" />
     <Compile Include="TokenClasses\Colon.cs" />

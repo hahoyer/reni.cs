@@ -15,6 +15,7 @@ namespace Reni.Validation
         public static readonly IssueId EOLInString = new IssueId();
         public static readonly IssueId ExtraRightBracket = new IssueId();
         public static readonly IssueId IdentifierExpected = new IssueId();
+        public static readonly IssueId InvalidExpression = new IssueId();
         public static readonly IssueId MissingFunctionGetter = new IssueId();
         public static readonly IssueId MissingRightBracket = new IssueId();
         public static readonly IssueId MissingThen = new IssueId();

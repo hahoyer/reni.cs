@@ -4,38 +4,45 @@ using System.Linq;
 using hw.Debug;
 using Reni.ReniSyntax;
 using Reni.TokenClasses;
+using Reni.Validation;
 
 namespace Reni.ReniParser
 {
     sealed class DeclarationSyntax : Syntax
     {
+        readonly SyntaxError[] _issues;
         internal DeclarationSyntax
-            (CompileSyntax body, DefinableSyntax target, DeclarationTagToken tag = null)
+            (
+            SyntaxError[] issues,
+            CompileSyntax body,
+            Definable target,
+            params DeclarationTagToken[] tags)
         {
+            _issues = issues;
             Target = target;
             Body = body;
-            Tag = tag;
+            Tags = tags;
             StopByObjectIds();
         }
 
         [EnableDump]
-        DeclarationTagToken Tag { get; }
+        DeclarationTagToken[] Tags { get; }
         [EnableDump]
-        DefinableSyntax Target { get; }
+        Definable Target { get; }
         [EnableDump]
         Syntax Body { get; }
 
-        string Name => Target?.Definable?.Id;
+        string Name => Target?.Id;
 
         internal override bool IsKeyword => true;
 
         [DisableDump]
         internal override bool IsMutableSyntax
-            => Tag?.DeclaresMutable ?? base.IsMutableSyntax;
+            => Tags.Any(item => item.DeclaresMutable);
 
         [DisableDump]
         internal override bool IsConverterSyntax
-            => Tag?.DeclaresConverter ?? base.IsConverterSyntax;
+            => Tags.Any(item => item.DeclaresConverter);
 
         [DisableDump]
         internal override CompileSyntax ToCompiledSyntax => ToContainer;
@@ -49,8 +56,11 @@ namespace Reni.ReniParser
         {
             get
             {
-                yield return Target;
                 yield return Body;
+                if(_issues == null)
+                    yield break;
+                foreach(var issue in _issues)
+                    yield return issue;
             }
         }
 

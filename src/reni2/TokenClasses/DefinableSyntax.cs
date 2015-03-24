@@ -25,7 +25,7 @@ namespace Reni.TokenClasses
 
         internal override Syntax CreateDeclarationSyntax
             (SourcePart token, Syntax right)
-            => new DeclarationSyntax(right.ToCompiledSyntax, this);
+            => new DeclarationSyntax(null, right.ToCompiledSyntax, Definable);
 
         [DisableDump]
         internal override CompileSyntax ToCompiledSyntax
