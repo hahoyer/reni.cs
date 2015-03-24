@@ -49,6 +49,6 @@ namespace Reni.ReniParser
         protected override ScannerTokenClass GetTokenClass(string name) => new Unexpected();
         protected override ScannerTokenClass GetNumber() { throw new NotImplementedException(); }
         protected override ScannerTokenClass GetText() { throw new NotImplementedException(); }
-        protected override ScannerTokenClass GetError(Match.IError message) => new SyntaxError(message);
+        protected override ScannerTokenClass GetError(Match.IError message) => new ScannerSyntaxError(message);
     }
 }

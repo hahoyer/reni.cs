@@ -49,7 +49,7 @@ namespace Reni.TokenClasses
             => IssueId.UnexpectedUseAsInfix.Syntax(token, left, right);
 
         protected override sealed Syntax Terminal(SourcePart token)
-            => new Validation.SyntaxError(IssueId.UnexpectedUseAsTerminal, token);
+            => IssueId.UnexpectedUseAsTerminal.Syntax(token);
     }
 
     abstract class InfixToken : TokenClass

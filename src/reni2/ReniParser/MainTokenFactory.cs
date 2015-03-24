@@ -123,16 +123,16 @@ namespace Reni.ReniParser
         protected override ScannerTokenClass GetNumber() => new Number();
         protected override ScannerTokenClass GetTokenClass(string name) => new UserSymbol(name);
         protected override ScannerTokenClass GetError(Match.IError message)
-            => new SyntaxError(message);
+            => new ScannerSyntaxError(message);
         protected override ScannerTokenClass GetText() => new Text();
     }
 
 
-    sealed class SyntaxError : ScannerTokenClass, IType<SourceSyntax>
+    sealed class ScannerSyntaxError : ScannerTokenClass, IType<SourceSyntax>
     {
         readonly IssueId _issue;
 
-        public SyntaxError(Match.IError message) { _issue = ReniLexer.Parse(message); StopByObjectIds(81);}
+        public ScannerSyntaxError(Match.IError message) { _issue = ReniLexer.Parse(message); StopByObjectIds(81);}
 
         string IType<SourceSyntax>.PrioTableId => Id;
 

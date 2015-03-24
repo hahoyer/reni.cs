@@ -28,6 +28,6 @@ namespace Reni.Validation
         public static readonly IssueId UnexpectedUseAsTerminal = new IssueId();
 
         internal SyntaxError Syntax(SourcePart token, params Syntax[] value)
-            => new SyntaxError(this, token, value);
+            => new SyntaxError(new Issue(this, token, ""), value);
     }
 }

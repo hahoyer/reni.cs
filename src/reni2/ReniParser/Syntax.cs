@@ -116,9 +116,15 @@ namespace Reni.ReniParser
 
         internal ListSyntax ToListSyntax => new ListSyntax(null, ToList(null));
 
-        internal virtual Syntax ExclamationSyntax(SourcePart token)
+        internal virtual ExclamationSyntaxList ExclamationSyntax(SourcePart token)
         {
             NotImplementedMethod(token);
+            return null;
+        }
+
+        internal virtual ExclamationSyntaxList ExclamationSyntax(ExclamationSyntaxList syntax)
+        {
+            NotImplementedMethod(syntax);
             return null;
         }
     }

@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
-using hw.Parser;
-using hw.Scanner;
 using Reni.ReniSyntax;
 using Reni.TokenClasses;
 
@@ -12,31 +10,36 @@ namespace Reni.ReniParser
     sealed class DeclarationSyntax : Syntax
     {
         internal DeclarationSyntax
-            (
-            SourcePart token,
-            CompileSyntax body,
-            DefinableSyntax target = null
-            )
-            : base()
+            (CompileSyntax body, DefinableSyntax target, DeclarationTagToken tag = null)
         {
             Target = target;
             Body = body;
+            Tag = tag;
             StopByObjectIds();
         }
 
+        [EnableDump]
+        DeclarationTagToken Tag { get; }
         [EnableDump]
         DefinableSyntax Target { get; }
         [EnableDump]
         Syntax Body { get; }
 
         string Name => Target?.Definable?.Id;
+
         internal override bool IsKeyword => true;
+
         [DisableDump]
-        internal override bool IsMutableSyntax => Target?.IsMutable ?? false;
+        internal override bool IsMutableSyntax
+            => Tag?.DeclaresMutable ?? base.IsMutableSyntax;
+
         [DisableDump]
-        internal override bool IsConverterSyntax => Target?.IsConverter ?? false;
+        internal override bool IsConverterSyntax
+            => Tag?.DeclaresConverter ?? base.IsConverterSyntax;
+
         [DisableDump]
         internal override CompileSyntax ToCompiledSyntax => ToContainer;
+
         [DisableDump]
         internal override CompileSyntax ContainerStatementToCompileSyntax
             => Body.ContainerStatementToCompileSyntax;
@@ -52,8 +55,8 @@ namespace Reni.ReniParser
         }
 
         protected override string GetNodeDump()
-            => base.GetNodeDump() + 
-            (Name == null ? "" : "(" + Name + ")");
+            => base.GetNodeDump() +
+                (Name == null ? "" : "(" + Name + ")");
 
 
         internal override IEnumerable<KeyValuePair<string, int>> GetDeclarations(int index)

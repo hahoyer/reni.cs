@@ -16,15 +16,15 @@ namespace Reni.TokenClasses
         public override string Id => TokenId;
 
         protected override Syntax Suffix(Syntax left, SourcePart token)
-            => new Validation.SyntaxError(IssueId.MissingElseBody, token);
+            => IssueId.MissingElseBody.Syntax(token);
 
         protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
             => left.CreateElseSyntax(right.ToCompiledSyntax);
 
         protected override Syntax Terminal(SourcePart token)
-            => new Validation.SyntaxError(IssueId.MissingThen, token);
+            => IssueId.MissingThen.Syntax(token);
 
         protected override Syntax Prefix(SourcePart token, Syntax right)
-            => new Validation.SyntaxError(IssueId.MissingThen, token);
+            => IssueId.MissingThen.Syntax(token);
     }
 }

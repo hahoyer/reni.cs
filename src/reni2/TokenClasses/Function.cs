@@ -26,9 +26,9 @@ namespace Reni.TokenClasses
         }
 
         protected override Syntax Terminal(SourcePart token)
-            => new Validation.SyntaxError(IssueId.MissingFunctionGetter, token);
+            => IssueId.MissingFunctionGetter.Syntax(token);
         protected override Syntax Suffix(Syntax left, SourcePart token)
-            => new Validation.SyntaxError(IssueId.MissingFunctionGetter, token);
+            => IssueId.MissingFunctionGetter.Syntax(token);
 
         protected override Syntax Prefix(SourcePart token, Syntax right)
             => new FunctionSyntax

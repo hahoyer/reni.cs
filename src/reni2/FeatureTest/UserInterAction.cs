@@ -9,6 +9,36 @@ using hw.UnitTest;
 namespace Reni.FeatureTest
 {
     [TestFixture]
+    public sealed class BadUserInterAction : DependantAttribute
+    {
+        const string text = @"systemdata:
+{ 1 type instance
+
+#  #(aa  Memory: ((0 type * ('100' to_number_of_base 64)) mutable) instance();
+   
+   !mutable FreePointer: Memory array_reference mutable;
+repeat: /\ ^ while() then(^ body(), repeat(^));
+
+  aa)#
+
+}; 
+
+
+(Text('H') << 'allo') dump_print";
+
+        [Test]
+        public void GetTokenForPosition()
+        {
+            var compiler = new Compiler(text: text);
+            for(var i = 0; i < text.Length; i++)
+            {
+                var t = compiler.Token(i);
+                Tracer.Assert(t != null, () => (new Source(text) + i).Dump());
+            }
+        }
+    }
+
+    [TestFixture]
     public sealed class UserInterAction : DependantAttribute
     {
         const string text = @"
@@ -48,7 +78,7 @@ complex FromReal(2) dump_print;
         [Test]
         public void TypingAProgram()
         {
-            for(var i = 0; i < text.Length; i++)
+            for (var i = 0; i < text.Length; i++)
             {
                 var textFragement = text.Substring(0, i);
                 var compiler = new Compiler(text: textFragement);
@@ -62,7 +92,7 @@ complex FromReal(2) dump_print;
         public void GetTokenForPosition()
         {
             var compiler = new Compiler(text: text);
-            for(var i = 0; i < text.Length; i++)
+            for (var i = 0; i < text.Length; i++)
             {
                 var t = compiler.Token(i);
                 Tracer.Assert(t != null, () => (new Source(text) + i).Dump());
