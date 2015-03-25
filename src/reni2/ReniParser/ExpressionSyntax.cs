@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Forms;
-using hw.Parser;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
@@ -16,6 +15,15 @@ namespace Reni.ReniParser
 {
     sealed class ExpressionSyntax : CompileSyntax
     {
+        public static Checked<Syntax> Create
+            (
+            Checked<CompileSyntax> left,
+            Definable definable,
+            Checked<CompileSyntax> right,
+            SourcePart token)
+            => new ExpressionSyntax(left?.Value, definable, right?.Value, token)
+                .Issues(left?.Issues.plus(right?.Issues));
+
         internal ExpressionSyntax
             (
             CompileSyntax left,
@@ -27,7 +35,7 @@ namespace Reni.ReniParser
             Definable = definable;
             Right = right;
             Token = token;
-            StopByObjectIds(61,62);
+            StopByObjectIds(61, 62);
         }
 
         [Node]
@@ -85,7 +93,9 @@ namespace Reni.ReniParser
             if(left == null && right == null)
                 return null;
 
-            return (CompileSyntax) Definable.CreateForVisit(left ?? Left, right ?? Right);
+            var result = Definable.CreateForVisit(left ?? Left, right ?? Right);
+            Tracer.Assert(!result.Issues.Any());
+            return (CompileSyntax) result.Value;
         }
 
         protected override string GetNodeDump()
@@ -98,7 +108,7 @@ namespace Reni.ReniParser
             return result;
         }
 
-        internal override Syntax CreateDeclarationSyntax(SourcePart token, Syntax right)
+        internal override Checked<Syntax> CreateDeclarationSyntax(SourcePart token, Syntax right)
             => IssueId.IdentifierExpected.Syntax(token, this, right);
     }
 

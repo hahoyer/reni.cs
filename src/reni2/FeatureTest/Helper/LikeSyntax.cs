@@ -5,6 +5,7 @@ using hw.Debug;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
 using Reni.Struct;
+using Reni.TokenClasses;
 
 namespace Reni.FeatureTest.Helper
 {
@@ -24,6 +25,7 @@ namespace Reni.FeatureTest.Helper
             => new Struct(list, declarations, converters);
 
         public abstract void AssertLike(Syntax syntax);
+        public void AssertLike(SourceSyntax syntax) => AssertLike(syntax.Syntax);
 
         public static LikeSyntax operator +(LikeSyntax x, LikeSyntax y) => x.Expression("+", y);
         public static LikeSyntax operator -(LikeSyntax x, LikeSyntax y) => x.Expression("-", y);

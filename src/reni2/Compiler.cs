@@ -119,9 +119,9 @@ namespace Reni
         bool IExecutionContext.ProcessErrors => _parameters.ProcessErrors;
         CodeBase IExecutionContext.Function(FunctionId functionId)
             => CodeContainer.Function(functionId);
-        CompileSyntax IExecutionContext.Parse(string source) => Parse(source);
+        Checked<CompileSyntax> IExecutionContext.Parse(string source) => Parse(source);
 
-        CompileSyntax Parse(string sourceText)
+        Checked<CompileSyntax> Parse(string sourceText)
             => Parse(new Source(sourceText) + 0).Syntax.ToCompiledSyntax;
 
         /// <summary>
@@ -178,7 +178,7 @@ namespace Reni
 
         [DisableDump]
         internal IEnumerable<Issue> Issues
-            => (_parameters.ParseOnly ? Syntax.Issues : CodeContainer.Issues);
+            => (_parameters.ParseOnly ? SourceSyntax.Issues : CodeContainer.Issues);
 
         SourceSyntax Parse(SourcePosn source) => _tokenFactory.Parser.Execute(source);
 

@@ -13,20 +13,19 @@ namespace Reni.TokenClasses
 {
     sealed class SourceSyntax : DumpableObject, ISourcePart
     {
-        public SourceSyntax(Syntax syntax, SourceSyntax left, IToken token, SourceSyntax right)
+        public SourceSyntax
+            (SourceSyntax left, IToken token, SourceSyntax right, Syntax syntax, Issue[] issues)
         {
             Syntax = syntax;
+            Issues = issues;
             Left = left;
             Token = token;
             Right = right;
             AssertValid();
         }
 
-        void AssertValid()
-        {
-            AssertValidSourceQueue();
-            AssertValidIssues();
-        }
+        void AssertValid() => AssertValidSourceQueue();
+
         void AssertValidSourceQueue()
         {
             if(Left != null)
@@ -35,41 +34,21 @@ namespace Reni.TokenClasses
                         Left.SourcePart.End == Token.SourcePart.Start,
                         () => Left.SourcePart.End.Span(Token.SourcePart.Start).NodeDump
                     );
-            if (Right!= null)
+            if(Right != null)
                 Tracer.Assert
                     (
                         Token.SourcePart.End == Right.SourcePart.Start,
                         () => Token.SourcePart.End.Span(Right.SourcePart.Start).NodeDump
                     );
         }
-        void AssertValidIssues()
-        {
-            var currentIssues = Syntax.Issues;
-            var formerIssues = (Left?.Syntax?.Issues).plus(Right?.Syntax?.Issues);
-            Tracer.Assert(formerIssues != null);
-            var combinations = currentIssues.Merge(formerIssues, item => item).ToArray();
-            var newIssues = combinations.Where(item => item.Item3 == null).ToArray();
-            var lostIssues = combinations.Where(item => item.Item2 == null).ToArray();
-            Tracer.Assert
-                (
-                    !lostIssues.Any(),
-                    () =>
-                        "\n" +
-                            Tracer.Dump(lostIssues.Select(item => item.Item3).ToArray()) +
-                            "\n" +
-                            Syntax.Dump()
-                );
-        }
 
+        internal Issue[] Issues { get; }
         internal Syntax Syntax { get; }
         SourceSyntax Left { get; }
         internal IToken Token { get; }
         SourceSyntax Right { get; }
 
         SourcePart ISourcePart.All => SourcePart;
-
-        [EnableDump]
-        Issue[] Issues => Syntax.Issues.ToArray();
 
         [DisableDump]
         internal SourcePart SourcePart => Left?.SourcePart + Token.SourcePart + Right?.SourcePart;

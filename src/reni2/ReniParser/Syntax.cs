@@ -20,10 +20,11 @@ namespace Reni.ReniParser
             : base(objectId) {}
 
         [DisableDump]
-        internal virtual CompileSyntax ContainerStatementToCompileSyntax => ToCompiledSyntax;
+        internal virtual Checked<CompileSyntax> ContainerStatementToCompileSyntax
+            => ToCompiledSyntax;
 
         [DisableDump]
-        internal abstract CompileSyntax ToCompiledSyntax { get; }
+        internal abstract Checked<CompileSyntax> ToCompiledSyntax { get; }
 
         internal virtual IEnumerable<KeyValuePair<string, int>> GetDeclarations(int index)
         {
@@ -31,8 +32,11 @@ namespace Reni.ReniParser
         }
         internal virtual IEnumerable<string> GetDeclarations() { yield break; }
 
-        internal Syntax CreateThenSyntax(CompileSyntax condition)
-            => new CondSyntax(condition, ToCompiledSyntax);
+        internal Checked<Syntax> CreateThenSyntax(CompileSyntax condition)
+        {
+            var syntax = ToCompiledSyntax;
+            return new Checked<Syntax>(new CondSyntax(condition, syntax.Value), syntax.Issues);
+        }
 
         internal virtual Syntax CreateElseSyntax(CompileSyntax elseSyntax)
         {
@@ -40,10 +44,20 @@ namespace Reni.ReniParser
             return null;
         }
 
-        internal virtual Syntax CreateDeclarationSyntax(SourcePart token, Syntax right)
+        public Checked<Syntax> CreateElseSyntax(Checked<CompileSyntax> right)
+            => CreateElseSyntax(right.Value).Issues(right.Issues);
+
+        internal virtual Checked<Syntax> CreateDeclarationSyntax(SourcePart token, Syntax right)
         {
             NotImplementedMethod(token, right);
             return null;
+        }
+
+        internal Checked<Syntax> CreateDeclarationSyntax
+            (SourcePart token, EmptyList right, Issue issue)
+        {
+            var result = CreateDeclarationSyntax(token, right);
+            return result.Value.Issues(issue.plus(result.Issues));
         }
 
         static bool _isInDump;
@@ -87,23 +101,17 @@ namespace Reni.ReniParser
         [DisableDump]
         internal virtual bool IsNumber => false;
         [DisableDump]
-        internal virtual bool IsError => false;
-        [DisableDump]
         internal virtual bool IsBraceLike => false;
 
-        internal virtual Syntax SuffixedBy(Definable definable, SourcePart token)
-            => new ExpressionSyntax(ToCompiledSyntax, definable, null, token);
+        internal virtual Checked<Syntax> SuffixedBy(Definable definable, SourcePart token)
+        {
+            var left = ToCompiledSyntax;
+            return new Checked<Syntax>
+                (new ExpressionSyntax(left.Value, definable, null, token), left.Issues);
+        }
 
-        [DisableDump]
-        internal IEnumerable<Issue> Issues
-            => Parts.SelectMany(item => item.DirectIssues).ToArray();
-
-        [DisableDump]
-        internal virtual IEnumerable<Issue> DirectIssues { get { yield break; } }
-
-
-        internal virtual Syntax Match(int level, SourcePart token)
-            => IssueId.ExtraRightBracket.Syntax(token, this);
+        internal virtual Checked<Syntax> Match(int level, SourcePart token)
+            => new Checked<Syntax>(this, IssueId.ExtraRightBracket.CreateIssue(token));
 
         [DisableDump]
         IEnumerable<Syntax> Parts => DirectChildren
@@ -116,17 +124,19 @@ namespace Reni.ReniParser
 
         internal ListSyntax ToListSyntax => new ListSyntax(null, ToList(null));
 
-        internal virtual ExclamationSyntaxList ExclamationSyntax(SourcePart token)
+        internal virtual Checked<ExclamationSyntaxList> ExclamationSyntax(SourcePart token)
         {
             NotImplementedMethod(token);
             return null;
         }
 
-        internal virtual ExclamationSyntaxList ExclamationSyntax(ExclamationSyntaxList syntax)
+        internal virtual Checked<ExclamationSyntaxList> Combine(ExclamationSyntaxList syntax)
         {
             NotImplementedMethod(syntax);
             return null;
         }
+
+        internal Checked<Syntax> Issues(params Issue[] issues) => new Checked<Syntax>(this, issues);
     }
 
     abstract class NonCompileSyntax : Syntax
@@ -134,10 +144,9 @@ namespace Reni.ReniParser
         protected readonly SourcePart Token;
         protected NonCompileSyntax(SourcePart token) { Token = token; }
         [DisableDump]
-        internal override CompileSyntax ToCompiledSyntax
-        {
-            get { return IssueId.InvalidExpression.Syntax(Token, this); }
-        }
-
+        internal override Checked<CompileSyntax> ToCompiledSyntax
+            =>
+                new Checked<CompileSyntax>
+                    (new EmptyList(), IssueId.InvalidExpression.CreateIssue(Token));
     }
 }

@@ -214,6 +214,6 @@ namespace Reni.Code
         bool IsTraceEnabled { get; }
         bool ProcessErrors { get; }
         CodeBase Function(FunctionId functionId);
-        CompileSyntax Parse(string source);
+        Checked<CompileSyntax> Parse(string source);
     }
 }

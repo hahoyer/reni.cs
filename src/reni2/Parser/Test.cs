@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.UnitTest;
-using Reni.FeatureTest;
+using Reni.FeatureTest.ConversionService;
 using Reni.FeatureTest.Helper;
 
 namespace Reni.Parser
 {
     [TestFixture]
-    [FeatureTest.ConversionService.Closure]
+    [Closure]
     public sealed class ParserTest : CompilerTest
     {
         //[Test]
@@ -17,20 +17,26 @@ namespace Reni.Parser
             var syntaxPrototype = LikeSyntax.Expression(null, "f", LikeSyntax.Null);
             Parameters.TraceOptions.Source = true;
             Parameters.ParseOnly = true;
-            CreateFileAndRunCompiler("SimpleFunction", @"f()", expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
+            CreateFileAndRunCompiler
+                (
+                    "SimpleFunction",
+                    @"f()",
+                    expectedResult: c => syntaxPrototype.AssertLike(c.SourceSyntax));
         }
 
         [Test]
-        [FeatureTest.ConversionService.Closure]
+        [Closure]
         public void Add2Numbers()
         {
-
             var syntaxPrototype =
                 (LikeSyntax.Number(2) + LikeSyntax.Number(4)).dump_print;
             Parameters.ParseOnly = true;
 
             CreateFileAndRunCompiler
-                ("Add2Numbers", @"(2+4) dump_print", expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
+                (
+                    "Add2Numbers",
+                    @"(2+4) dump_print",
+                    expectedResult: c => syntaxPrototype.AssertLike(c.SourceSyntax));
         }
 
         [Test]
@@ -42,7 +48,7 @@ namespace Reni.Parser
             CreateFileAndRunCompiler("Add2Numbers", @"
 (2+4) # ssssss
 dump_print
-", expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
+", expectedResult: c => syntaxPrototype.AssertLike(c.SourceSyntax));
         }
 
         [Test]
@@ -54,7 +60,7 @@ dump_print
             CreateFileAndRunCompiler("Add2Numbers", @"
 (2+4) #(aa ssssss
 aa)#dump_print
-", expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
+", expectedResult: c => syntaxPrototype.AssertLike(c.SourceSyntax));
         }
     }
 }

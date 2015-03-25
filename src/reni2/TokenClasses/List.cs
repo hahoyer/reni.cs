@@ -20,20 +20,20 @@ namespace Reni.TokenClasses
 
         public override string Id => TokenId(_level);
 
-        protected override Syntax Terminal(SourcePart token)
+        protected override Checked<Syntax> Terminal(SourcePart token)
             =>
                 ListSyntax
                     (
                         new EmptyList(),
                         new EmptyList());
 
-        protected override Syntax Prefix(SourcePart token, Syntax right)
+        protected override Checked<Syntax> Prefix(SourcePart token, Syntax right)
             => ListSyntax(new EmptyList(), right);
 
-        protected override Syntax Suffix(Syntax left, SourcePart token)
+        protected override Checked<Syntax> Suffix(Syntax left, SourcePart token)
             => ListSyntax(left, new EmptyList());
 
-        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
+        protected override Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
             => ListSyntax(left, right);
 
         ListSyntax ListSyntax(Syntax left, Syntax right)

@@ -5,43 +5,33 @@ using hw.Debug;
 using hw.Scanner;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
-using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
     sealed class ExclamationSyntaxList : NonCompileSyntax
     {
         internal readonly Exclamation.Syntax[] Tags;
-        internal new readonly SyntaxError[] Issues;
 
-        ExclamationSyntaxList(Exclamation.Syntax[] tags, SyntaxError[] issues, SourcePart token)
+        internal ExclamationSyntaxList(Exclamation.Syntax[] tags, SourcePart token)
             : base(token)
         {
             Tags = tags;
-            Issues = issues;
         }
 
         internal ExclamationSyntaxList(Exclamation.Syntax item, SourcePart token)
-            : this(new[] {item}, new SyntaxError[0], token) {}
+            : this(new[] {item}, token) {}
 
-        [DisableDump]
         internal override bool IsKeyword => true;
 
-        internal override Syntax SuffixedBy(Definable definable, SourcePart token)
+        [DisableDump]
+        protected override IEnumerable<Syntax> DirectChildren => Tags;
+
+        internal override Checked<Syntax> SuffixedBy(Definable definable, SourcePart token)
             => new DeclaratorSyntax(definable, this);
 
-        internal ExclamationSyntaxList AddError(SyntaxError syntaxError)
-            => new ExclamationSyntaxList(Tags, Issues.plus(syntaxError), Token);
+        internal override Checked<Syntax> CreateDeclarationSyntax(SourcePart token, Syntax right)
+            => DeclarationSyntax.Create(right, null, Tags);
 
-        internal override Syntax CreateDeclarationSyntax(SourcePart token, Syntax right)
-            => new DeclarationSyntax
-                (
-                Issues,
-                right.ToCompiledSyntax,
-                null,
-                Tags.Select(item => item.Tag.Tag).ToArray());
-
-        protected override IEnumerable<Syntax> DirectChildren => Tags.plus<Syntax>(Issues);
     }
 
     sealed class DeclaratorSyntax : CompileSyntax
@@ -57,13 +47,12 @@ namespace Reni.TokenClasses
 
         internal override bool IsIdentifier => true;
 
-        internal override Syntax CreateDeclarationSyntax(SourcePart token, Syntax right)
-            => new DeclarationSyntax
+        internal override Checked<Syntax> CreateDeclarationSyntax(SourcePart token, Syntax right)
+            => DeclarationSyntax.Create
                 (
-                _exclamationSyntaxList.Issues,
-                right.ToCompiledSyntax,
+                right,
                 _definable,
-                _exclamationSyntaxList.Tags.Select(item => item.Tag.Tag).ToArray()
+                _exclamationSyntaxList.Tags
                 );
 
         protected override IEnumerable<Syntax> DirectChildren

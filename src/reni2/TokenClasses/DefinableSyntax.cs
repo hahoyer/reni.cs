@@ -23,12 +23,15 @@ namespace Reni.TokenClasses
 
         internal override bool IsIdentifier => true;
 
-        internal override Syntax CreateDeclarationSyntax
+        internal override Checked<Syntax> CreateDeclarationSyntax
             (SourcePart token, Syntax right)
-            => new DeclarationSyntax(null, right.ToCompiledSyntax, Definable);
+        {
+            var rightResult = right.ToCompiledSyntax;
+            return new DeclarationSyntax(rightResult.Value, Definable).Issues(rightResult.Issues);
+        }
 
         [DisableDump]
-        internal override CompileSyntax ToCompiledSyntax
+        internal override Checked<CompileSyntax> ToCompiledSyntax
             => new ExpressionSyntax(null, Definable, null, Token);
     }
 }

@@ -11,6 +11,8 @@ namespace Reni.ReniSyntax
 {
     sealed class ListSyntax : Syntax
     {
+        public static Syntax Create(params Syntax[] values) => new ListSyntax(null, values);
+
         public ListSyntax(List type, IEnumerable<Syntax> data)
         {
             Type = type;
@@ -23,7 +25,7 @@ namespace Reni.ReniSyntax
         [EnableDump]
         Syntax[] Data { get; }
         [DisableDump]
-        internal override CompileSyntax ToCompiledSyntax => ToContainer;
+        internal override Checked<CompileSyntax> ToCompiledSyntax => ToContainer;
 
         [DisableDump]
         internal override CompoundSyntax ToContainer
@@ -42,5 +44,6 @@ namespace Reni.ReniSyntax
 
         [DisableDump]
         protected override IEnumerable<Syntax> DirectChildren => Data;
+
     }
 }

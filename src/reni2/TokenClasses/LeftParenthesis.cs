@@ -24,23 +24,25 @@ namespace Reni.TokenClasses
 
         public override string Id => TokenId(Level);
 
-        protected override ReniParser.Syntax Suffix(ReniParser.Syntax left, SourcePart token)
+        protected override Checked<ReniParser.Syntax> Suffix
+            (ReniParser.Syntax left, SourcePart token)
         {
             NotImplementedMethod(left, token);
             return null;
         }
 
-        protected override ReniParser.Syntax Infix
+        protected override Checked<ReniParser.Syntax> Infix
             (ReniParser.Syntax left, SourcePart token, ReniParser.Syntax right)
         {
             NotImplementedMethod(left, token, right);
             return null;
         }
 
-        protected override ReniParser.Syntax Prefix(SourcePart token, ReniParser.Syntax right)
+        protected override Checked<ReniParser.Syntax> Prefix
+            (SourcePart token, ReniParser.Syntax right)
             => new Syntax(Level, token, right);
 
-        protected override ReniParser.Syntax Terminal(SourcePart token)
+        protected override Checked<ReniParser.Syntax> Terminal(SourcePart token)
             => new Syntax(Level, token, null);
 
         sealed class Syntax : ReniParser.Syntax
@@ -65,13 +67,23 @@ namespace Reni.TokenClasses
             }
 
             [DisableDump]
-            internal override CompileSyntax ToCompiledSyntax
-                => IssueId.MissingRightBracket.Syntax(Token, Right);
+            internal override Checked<CompileSyntax> ToCompiledSyntax
+            {
+                get
+                {
+                    var right = (Right??new EmptyList()).ToCompiledSyntax;
+                    return new Checked<CompileSyntax>
+                        (
+                        right.Value,
+                        IssueId.MissingRightBracket.CreateIssue(Token).plus(right.Issues)
+                        );
+                }
+            }
 
             internal override bool IsBraceLike => true;
             internal override bool IsKeyword => true;
 
-            internal override ReniParser.Syntax Match(int level, SourcePart token)
+            internal override Checked<ReniParser.Syntax> Match(int level, SourcePart token)
             {
                 Tracer.Assert(_level == level);
                 return (Right ?? new EmptyList());

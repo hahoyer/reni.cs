@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.UnitTest;
-using Reni.FeatureTest;
 using Reni.FeatureTest.Helper;
 
 namespace Reni.Parser
@@ -22,14 +21,17 @@ namespace Reni.Parser
                 );
             Parameters.ParseOnly = true;
             CreateFileAndRunCompiler
-                ("UseAlternativePrioTable", @"!converter: 3", expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
+                (
+                    "UseAlternativePrioTable",
+                    @"!converter: 3",
+                    expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
         }
 
         [Test]
         public void ConverterAndProperty()
         {
             var syntaxPrototype = LikeSyntax.Compound
-                (                              
+                (
                     new[] {LikeSyntax.Number(3), LikeSyntax.Number(4)},
                     new Declaration[] {},
                     new[] {0, 1}
@@ -41,6 +43,5 @@ namespace Reni.Parser
                     @"!converter: 3; !converter: 4",
                     expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
         }
-
     }
 }

@@ -20,23 +20,23 @@ namespace Reni.TokenClasses
 
         public override string Id => TokenId(_level);
 
-        protected override Syntax Suffix(Syntax left, SourcePart token)
+        protected override Checked<Syntax> Suffix(Syntax left, SourcePart token)
             => left.Match(_level, token);
 
-        protected override Syntax Infix
+        protected override Checked<Syntax> Infix
             (Syntax left, SourcePart token, Syntax right)
         {
             NotImplementedMethod(left, token, right);
             return null;
         }
 
-        protected override Syntax Prefix(SourcePart token, Syntax right)
+        protected override Checked<Syntax> Prefix(SourcePart token, Syntax right)
         {
             NotImplementedMethod(token, right);
             return null;
         }
 
-        protected override Syntax Terminal(SourcePart token)
+        protected override Checked<Syntax> Terminal(SourcePart token)
         {
             NotImplementedMethod(token);
             return null;

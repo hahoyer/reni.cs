@@ -9,6 +9,7 @@ using Reni.Context;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
 using Reni.TokenClasses;
+using Reni.Validation;
 
 namespace Reni.Struct
 {
@@ -38,7 +39,7 @@ namespace Reni.Struct
         [DisableDump]
         internal int EndPosition => Statements.Length;
         [DisableDump]
-        internal override CompileSyntax ToCompiledSyntax => this;
+        internal override Checked<CompileSyntax> ToCompiledSyntax => this;
         [DisableDump]
         internal override bool? Hllw => Statements.All(syntax => syntax.Hllw == true);
         [DisableDump]
@@ -124,7 +125,7 @@ namespace Reni.Struct
             {
                 RawStatement = rawStatement;
                 Position = position;
-                StatementCache = new ValueCache<CompileSyntax>(GetStatement);
+                StatementCache = new ValueCache<Checked<CompileSyntax>>(GetStatement);
                 NamesCache = new ValueCache<string[]>(GetNames);
             }
 
@@ -132,15 +133,17 @@ namespace Reni.Struct
             public int Position { get; }
 
             ValueCache<string[]> NamesCache { get; }
-            ValueCache<CompileSyntax> StatementCache { get; }
+            ValueCache<Checked<CompileSyntax>> StatementCache { get; }
 
-            public CompileSyntax Statement => StatementCache.Value;
+            public CompileSyntax Statement => StatementCache.Value.Value;
+            public Issue[] Issues => StatementCache.Value.Issues;
             public bool Defines(string name) => Names.Contains(name);
             public bool IsConverter => RawStatement.IsConverterSyntax;
             public IEnumerable<string> Names => NamesCache.Value;
             public bool IsMutable => RawStatement.IsMutableSyntax;
 
-            CompileSyntax GetStatement() => RawStatement.ContainerStatementToCompileSyntax;
+            Checked<CompileSyntax> GetStatement()
+                => RawStatement.ContainerStatementToCompileSyntax;
             string[] GetNames() => RawStatement.GetDeclarations().ToArray();
         }
 

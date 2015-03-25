@@ -329,6 +329,7 @@
     <Compile Include="TokenClasses\InstanceToken.cs" />
     <Compile Include="TokenClasses\ScannerTokenClass.cs" />
     <Compile Include="TokenClasses\SourceSyntax.cs" />
+    <Compile Include="TokenClasses\Checked.cs" />
     <Compile Include="TokenClasses\TokenClass.cs" />
     <Compile Include="TokenClasses\ToNumberOfBase.cs" />
     <Compile Include="TokenClasses\LeftParenthesis.cs" />
@@ -376,7 +377,6 @@
     <Compile Include="Type\TypeType.cs" />
     <Compile Include="Type\VoidType.cs" />
     <Compile Include="UserInterface\TokenInformation.cs" />
-    <Compile Include="Validation\SyntaxError.cs" />
     <Compile Include="Validation\ConsequentialIssueType.cs" />
     <Compile Include="Validation\Issue.cs" />
     <Compile Include="Validation\IssueId.cs" />

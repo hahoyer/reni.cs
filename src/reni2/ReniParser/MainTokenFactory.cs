@@ -139,14 +139,15 @@ namespace Reni.ReniParser
         public override string Id => "<error>";
 
         SourceSyntax IType<SourceSyntax>.Create(SourceSyntax left, IToken token, SourceSyntax right)
-            =>
-                new SourceSyntax
-                    (
-                    _issue.Syntax(token.Characters, left?.Syntax, right?.Syntax),
-                    left,
-                    token,
-                    right
-                    );
+        {
+            var syntaxWithIssues = _issue.Syntax(token.Characters, left?.Syntax, right?.Syntax);
+            return new SourceSyntax
+                (left,
+                token,
+                right,
+                syntaxWithIssues.Value,
+                syntaxWithIssues.Issues);
+        }
 
         IType<SourceSyntax> IType<SourceSyntax>.NextTypeIfMatched => null;
     }

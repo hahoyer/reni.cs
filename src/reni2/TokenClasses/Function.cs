@@ -25,27 +25,25 @@ namespace Reni.TokenClasses
             _isMetaFunction = isMetaFunction;
         }
 
-        protected override Syntax Terminal(SourcePart token)
+        protected override Checked<Syntax> Terminal(SourcePart token)
             => IssueId.MissingFunctionGetter.Syntax(token);
-        protected override Syntax Suffix(Syntax left, SourcePart token)
-            => IssueId.MissingFunctionGetter.Syntax(token);
+        protected override Checked<Syntax> Suffix(Syntax left, SourcePart token)
+            => IssueId.MissingFunctionGetter.Syntax(token, left);
 
-        protected override Syntax Prefix(SourcePart token, Syntax right)
-            => new FunctionSyntax
+        protected override Checked<Syntax> Prefix(SourcePart token, Syntax right)
+            => FunctionSyntax.Create
                 (
-                null,
-                _isImplicit,
-                _isMetaFunction,
-                right.ToCompiledSyntax
-                );
+                    null,
+                    _isImplicit,
+                    _isMetaFunction,
+                    right.ToCompiledSyntax);
 
-        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
-            => new FunctionSyntax
+        protected override Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
+            => FunctionSyntax.Create
                 (
-                left.ToCompiledSyntax,
-                _isImplicit,
-                _isMetaFunction,
-                right.ToCompiledSyntax
-                );
+                    left.ToCompiledSyntax,
+                    _isImplicit,
+                    _isMetaFunction,
+                    right.ToCompiledSyntax);
     }
 }

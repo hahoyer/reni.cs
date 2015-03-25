@@ -12,17 +12,17 @@ namespace Reni.TokenClasses
 {
     abstract class Definable : TokenClass
     {
-        protected override sealed Syntax Terminal(SourcePart token)
+        protected override sealed Checked<Syntax> Terminal(SourcePart token)
             => new DefinableSyntax(token, this);
 
-        protected override sealed Syntax Prefix(SourcePart token, Syntax right)
-            => new ExpressionSyntax(null, this, right.ToCompiledSyntax, token);
+        protected override sealed Checked<Syntax> Prefix(SourcePart token, Syntax right)
+            => ExpressionSyntax.Create(null, this, right.ToCompiledSyntax, token);
 
-        protected override sealed Syntax Suffix(Syntax left, SourcePart token)
+        protected override sealed Checked<Syntax> Suffix(Syntax left, SourcePart token)
             => left.SuffixedBy(this, token);
 
-        protected override sealed Syntax Infix(Syntax left, SourcePart token, Syntax right)
-            => new ExpressionSyntax(left.ToCompiledSyntax, this, right.ToCompiledSyntax, token);
+        protected override sealed Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
+            => ExpressionSyntax.Create(left.ToCompiledSyntax, this, right.ToCompiledSyntax, token);
 
         [DisableDump]
         protected string DataFunctionName => Id.Symbolize();

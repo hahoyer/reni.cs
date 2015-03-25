@@ -4,6 +4,8 @@ using System.Linq;
 using hw.Helper;
 using hw.Scanner;
 using Reni.ReniParser;
+using Reni.ReniSyntax;
+using Reni.TokenClasses;
 
 namespace Reni.Validation
 {
@@ -28,7 +30,14 @@ namespace Reni.Validation
         public static readonly IssueId UnexpectedUseAsSuffix = new IssueId();
         public static readonly IssueId UnexpectedUseAsTerminal = new IssueId();
 
-        internal SyntaxError Syntax(SourcePart token, params Syntax[] value)
-            => new SyntaxError(new Issue(this, token, ""), value);
+        internal Issue CreateIssue(SourcePart token) => new Issue(this, token, "");
+        internal Checked<Syntax> Syntax(SourcePart token)
+            => new Checked<Syntax>(new EmptyList(), new Issue(this, token, ""));
+
+        internal Checked<Syntax> Syntax(SourcePart token, Syntax value)
+            => new Checked<Syntax>(value, new Issue(this, token, ""));
+
+        internal Checked<Syntax> Syntax(SourcePart token, Syntax value1, Syntax value2)
+            => new Checked<Syntax>(ListSyntax.Create(value1, value2), new Issue(this, token, ""));
     }
 }

@@ -4,10 +4,12 @@ using System.Linq;
 using hw.Debug;
 using hw.Forms;
 using hw.Parser;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.ReniParser;
 using Reni.TokenClasses;
+using Reni.Validation;
 
 namespace Reni.ReniSyntax
 {
@@ -46,6 +48,9 @@ namespace Reni.ReniSyntax
 
     sealed class PrefixSyntax : SpecialSyntax
     {
+        public static Checked<Syntax> Create(IPrefix prefix, Checked<CompileSyntax> right)
+            => new PrefixSyntax(prefix, right.Value).Issues(right.Issues);
+
         [Node]
         [EnableDump]
         readonly IPrefix _prefix;
@@ -69,6 +74,11 @@ namespace Reni.ReniSyntax
 
     sealed class InfixSyntax : SpecialSyntax
     {
+        public static Checked<Syntax> Create
+            (Checked<CompileSyntax> left, IInfix infix, Checked<CompileSyntax> right)
+            => new InfixSyntax(left.Value, infix, right.Value)
+                .Issues(left.Issues.plus(right.Issues));
+
         [Node]
         [EnableDump]
         readonly CompileSyntax _left;
@@ -113,6 +123,7 @@ namespace Reni.ReniSyntax
             return result;
         }
 
+        [DisableDump]
         protected override IEnumerable<Syntax> DirectChildren
         {
             get
@@ -131,6 +142,10 @@ namespace Reni.ReniSyntax
 
     sealed class SuffixSyntax : SpecialSyntax
     {
+        public static Checked<Syntax> Create
+            (Checked<CompileSyntax> left, ISuffix suffix, SourcePart token)
+            => new SuffixSyntax(left.Value, suffix, token).Issues(left.Issues);
+
         [Node]
         [EnableDump]
         readonly CompileSyntax _left;
@@ -139,16 +154,27 @@ namespace Reni.ReniSyntax
         [EnableDump]
         readonly ISuffix _suffix;
 
-        internal SuffixSyntax(CompileSyntax left, ISuffix suffix)
+        internal SuffixSyntax(CompileSyntax left, ISuffix suffix, SourcePart token)
         {
             _left = left;
             _suffix = suffix;
+            Token = token;
         }
+
+        SourcePart Token { get; }
+
         internal override Result ResultForCache(ContextBase context, Category category) => _suffix
             .Result(context, category, _left);
 
         protected override string GetNodeDump() => "(" + _left.NodeDump + ")" + base.GetNodeDump();
+
+        [DisableDump]
         protected override IEnumerable<Syntax> DirectChildren { get { yield return _left; } }
+
+        internal override Checked<ExclamationSyntaxList> Combine
+            (ExclamationSyntaxList syntax)
+            => new Checked<ExclamationSyntaxList>
+                (syntax, IssueId.UnexpectedDeclarationTag.CreateIssue(Token));
     }
 
     interface ITerminal

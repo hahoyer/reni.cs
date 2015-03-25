@@ -94,7 +94,7 @@ namespace Reni.UserInterface
         public override bool IsIdentifier => Syntax.IsIdentifier;
         public override bool IsText => Syntax.IsText;
         public override bool IsNumber => Syntax.IsNumber;
-        public override bool IsError => Syntax.IsError;
+        public override bool IsError => SourceSyntax.Issues.Any();
         public override bool IsBraceLike => Syntax.IsBraceLike;
     }
 

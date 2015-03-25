@@ -4,21 +4,26 @@ using System.Linq;
 using hw.Debug;
 using Reni.ReniSyntax;
 using Reni.TokenClasses;
-using Reni.Validation;
 
 namespace Reni.ReniParser
 {
     sealed class DeclarationSyntax : Syntax
     {
-        readonly SyntaxError[] _issues;
+        internal static Checked<Syntax> Create
+            (Syntax body, Definable target, Exclamation.Syntax[] tags)
+        {
+            var rightResult = body.ToCompiledSyntax;
+            return new DeclarationSyntax
+                (rightResult.Value, target, tags.Select(item => item.Tag.Tag).ToArray())
+                .Issues(rightResult.Issues);
+        }
+
         internal DeclarationSyntax
             (
-            SyntaxError[] issues,
             CompileSyntax body,
             Definable target,
             params DeclarationTagToken[] tags)
         {
-            _issues = issues;
             Target = target;
             Body = body;
             Tags = tags;
@@ -45,24 +50,14 @@ namespace Reni.ReniParser
             => Tags.Any(item => item.DeclaresConverter);
 
         [DisableDump]
-        internal override CompileSyntax ToCompiledSyntax => ToContainer;
+        internal override Checked<CompileSyntax> ToCompiledSyntax => ToContainer;
 
         [DisableDump]
-        internal override CompileSyntax ContainerStatementToCompileSyntax
+        internal override Checked<CompileSyntax> ContainerStatementToCompileSyntax
             => Body.ContainerStatementToCompileSyntax;
 
         [DisableDump]
-        protected override IEnumerable<Syntax> DirectChildren
-        {
-            get
-            {
-                yield return Body;
-                if(_issues == null)
-                    yield break;
-                foreach(var issue in _issues)
-                    yield return issue;
-            }
-        }
+        protected override IEnumerable<Syntax> DirectChildren { get { yield return Body; } }
 
         protected override string GetNodeDump()
             => base.GetNodeDump() +

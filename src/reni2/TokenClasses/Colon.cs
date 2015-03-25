@@ -4,7 +4,6 @@ using System.Linq;
 using hw.Debug;
 using hw.Parser;
 using hw.Scanner;
-using JetBrains.Annotations;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
 using Reni.Validation;
@@ -17,17 +16,21 @@ namespace Reni.TokenClasses
         public const string TokenId = ":";
         public override string Id => TokenId;
 
-        protected override Syntax Suffix(Syntax left, SourcePart token)
-            => left.CreateDeclarationSyntax(token, IssueId.MissingValueInDeclaration.Syntax(token));
+        protected override Checked<Syntax> Suffix(Syntax left, SourcePart token)
+            =>
+                left.CreateDeclarationSyntax
+                    (token, new EmptyList(), IssueId.MissingValueInDeclaration.CreateIssue(token));
 
-        protected override Syntax Prefix(SourcePart token, Syntax right)
+        protected override Checked<Syntax> Prefix(SourcePart token, Syntax right)
             => IssueId.UnexpectedUseAsPrefix.Syntax(token);
 
-        protected override Syntax Infix(Syntax left, SourcePart token, Syntax right)
+        protected override Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
             => left.CreateDeclarationSyntax(token, right);
 
-        protected override Syntax Terminal(SourcePart token)
-            => new DeclarationSyntax(null,IssueId.MissingValueInDeclaration.Syntax(token), null);
+        protected override Checked<Syntax> Terminal(SourcePart token)
+            =>
+                new DeclarationSyntax(new EmptyList(), null).Issues
+                    (IssueId.MissingValueInDeclaration.CreateIssue(token));
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
@@ -58,11 +61,15 @@ namespace Reni.TokenClasses
             }
 
             [DisableDump]
-            internal override CompileSyntax ToCompiledSyntax
-                => IssueId.UnexpectedDeclarationTag.Syntax(Token, Tag).ToCompiledSyntax;
-
-            internal ReniParser.Syntax CreateDeclarationSyntax
-                (ReniParser.Syntax right) => Tag.DeclarationSyntax(right.ToCompiledSyntax);
+            internal override Checked<CompileSyntax> ToCompiledSyntax
+            {
+                get
+                {
+                    var result = IssueId.UnexpectedDeclarationTag.Syntax(Token, Tag);
+                    var value = result.Value.ToCompiledSyntax;
+                    return new Checked<CompileSyntax>(value.Value, result.Issues.plus<Issue>(value.Issues));
+                }
+            }
         }
     }
 
@@ -70,7 +77,7 @@ namespace Reni.TokenClasses
     [BelongsTo(typeof(DeclarationTokenFactory))]
     abstract class DeclarationTagToken : TerminalToken
     {
-        protected override ReniParser.Syntax Terminal(SourcePart token)
+        protected override Checked<ReniParser.Syntax> Terminal(SourcePart token)
             => new Syntax(this);
 
         [DisableDump]
@@ -90,7 +97,7 @@ namespace Reni.TokenClasses
             internal override bool IsKeyword => true;
 
             [DisableDump]
-            internal override CompileSyntax ToCompiledSyntax
+            internal override Checked<CompileSyntax> ToCompiledSyntax
             {
                 get
                 {
@@ -99,11 +106,8 @@ namespace Reni.TokenClasses
                 }
             }
 
-            internal override ExclamationSyntaxList ExclamationSyntax(SourcePart token)
+            internal override Checked<ExclamationSyntaxList> ExclamationSyntax(SourcePart token)
                 => new ExclamationSyntaxList(new Exclamation.Syntax(this, token), token);
-
-            internal ReniParser.Syntax DeclarationSyntax(CompileSyntax body)
-                => new DeclarationSyntax(null, body, null, Tag);
         }
     }
 

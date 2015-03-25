@@ -44,17 +44,26 @@ namespace Reni.Context
                 (
                 () =>
                     new ContextMetaFunctionFromSyntax
-                        (_metaDictionary[ArgToken.TokenId + " " + Negate.TokenId]));
+                        (_metaDictionary[ArgToken.TokenId + " " + Negate.TokenId])
+                );
             _createArrayFeatureCache = new FunctionCache<bool, IFeatureImplementation>
                 (
                 isMutable =>
                     new ContextMetaFunction
                         (
                         (context, category, argsType) =>
-                            CreateArrayResult(context, category, argsType, isMutable)));
+                            CreateArrayResult
+                                (context, category, argsType, isMutable)
+                        )
+                );
         }
 
-        CompileSyntax CreateMetaDictionary(string source) => ExecutionContext.Parse(source);
+        CompileSyntax CreateMetaDictionary(string source)
+        {
+            var result = ExecutionContext.Parse(source);
+            Tracer.Assert(!result.Issues.Any());
+            return result.Value;
+        }
 
         public override string GetContextIdentificationDump() => "r";
         [DisableDump]

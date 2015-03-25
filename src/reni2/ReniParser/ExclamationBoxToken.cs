@@ -4,6 +4,7 @@ using System.Linq;
 using hw.Debug;
 using hw.Parser;
 using Reni.TokenClasses;
+using Reni.Validation;
 
 namespace Reni.ReniParser
 {
@@ -16,10 +17,19 @@ namespace Reni.ReniParser
         SourceSyntax IType<SourceSyntax>.Create(SourceSyntax left, IToken token, SourceSyntax right)
         {
             Tracer.Assert(right == null);
-            ExclamationSyntaxList syntax = Value.Syntax.ExclamationSyntax(token.Characters);
+            var syntax = Value.Syntax.ExclamationSyntax(token.Characters);
             if(left != null)
-                syntax = left.Syntax.ExclamationSyntax(syntax);
-            return new SourceSyntax(syntax, left, token, Value);
+            {
+                var leftResult = left.Syntax.Combine(syntax.Value);
+                syntax = new Checked<ExclamationSyntaxList>
+                    (leftResult.Value, leftResult.Issues.plus<Issue>(syntax.Issues));
+            }
+            return new SourceSyntax
+                (left,
+                token,
+                Value,
+                syntax.Value,
+                syntax.Issues);
         }
 
         string IType<SourceSyntax>.PrioTableId => PrioTable.Any;

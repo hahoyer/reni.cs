@@ -11,7 +11,7 @@ namespace Reni.TokenClasses
 {
     abstract class TokenClass
         : ScannerTokenClass,
-            IOperator<Syntax>,
+            IOperator<Syntax, Checked<Syntax>>,
             IType<SourceSyntax>
     {
         SourceSyntax IType<SourceSyntax>.Create(SourceSyntax left, IToken token, SourceSyntax right)
@@ -30,7 +30,7 @@ namespace Reni.TokenClasses
             {
                 BreakExecution();
                 var syntax = this.Operation(left?.Syntax, token, right?.Syntax);
-                return ReturnMethodDump(new SourceSyntax(syntax, left, token, right));
+                return ReturnMethodDump(new SourceSyntax(left, token, right, syntax.Value, syntax.Issues));
             }
             finally
             {
@@ -38,22 +38,22 @@ namespace Reni.TokenClasses
             }
         }
 
-        internal Syntax CreateForVisit(Syntax left, Syntax right)
+        internal Checked<Syntax> CreateForVisit(Syntax left, Syntax right)
             => this.Operation(left, null, right);
 
-        Syntax IOperator<Syntax>.Terminal(IToken token)
+        Checked<Syntax> IOperator<Syntax, Checked<Syntax>>.Terminal(IToken token)
             => Terminal(token?.Characters);
-        Syntax IOperator<Syntax>.Prefix(IToken token, Syntax right)
+        Checked<Syntax> IOperator<Syntax, Checked<Syntax>>.Prefix(IToken token, Syntax right)
             => Prefix(token?.Characters, right);
-        Syntax IOperator<Syntax>.Suffix(Syntax left, IToken token)
+        Checked<Syntax> IOperator<Syntax, Checked<Syntax>>.Suffix(Syntax left, IToken token)
             => Suffix(left, token?.Characters);
-        Syntax IOperator<Syntax>.Infix(Syntax left, IToken token, Syntax right)
+        Checked<Syntax> IOperator<Syntax, Checked<Syntax>>.Infix(Syntax left, IToken token, Syntax right)
             => Infix(left, token?.Characters, right);
 
-        protected abstract Syntax Terminal(SourcePart token);
-        protected abstract Syntax Prefix(SourcePart token, Syntax right);
-        protected abstract Syntax Suffix(Syntax left, SourcePart token);
-        protected abstract Syntax Infix(Syntax left, SourcePart token, Syntax right);
+        protected abstract Checked<Syntax> Terminal(SourcePart token);
+        protected abstract Checked<Syntax> Prefix(SourcePart token, Syntax right);
+        protected abstract Checked<Syntax> Suffix(Syntax left, SourcePart token);
+        protected abstract Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right);
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
