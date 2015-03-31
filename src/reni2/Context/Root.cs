@@ -160,11 +160,12 @@ namespace Reni.Context
 
         internal FunctionContainer FunctionContainer(int index) => _functions.Container(index);
 
-        internal Container MainContainer(Syntax syntax, string description)
+        internal Container MainContainer(Syntax syntax, string description) 
             => syntax
-                .ToListSyntax
-                .ToContainer
-                .Code(this)
-                .Container(description);
+            .ToListSyntax
+            .ToContainer
+            .SaveValue
+            .Code(this)
+            .Container(description);
     }
 }

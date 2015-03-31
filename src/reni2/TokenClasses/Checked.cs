@@ -18,7 +18,21 @@ namespace Reni.TokenClasses
         internal T Value { get; }
         internal Issue[] Issues { get; }
 
+        [DisableDump]
+        internal T SaveValue
+        {
+            get
+            {
+                Tracer.Assert(!Issues.Any());
+                return Value;
+            }
+        }
+
         public static implicit operator Checked<T>(T value)
             => new Checked<T>(value);
+
+        public static Checked<T> From<TIn>(Checked<TIn> x)
+            where TIn : T
+            => new Checked<T>(x.Value, x.Issues);
     }
 }

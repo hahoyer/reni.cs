@@ -11,7 +11,7 @@ namespace Reni.ReniSyntax
 {
     sealed class ListSyntax : Syntax
     {
-        public static Syntax Create(params Syntax[] values) => new ListSyntax(null, values);
+        public static Syntax Create(params Syntax[] values) => new ListSyntax(null, values.Where(item=>item != null));
 
         public ListSyntax(List type, IEnumerable<Syntax> data)
         {
@@ -24,11 +24,19 @@ namespace Reni.ReniSyntax
         List Type { get; }
         [EnableDump]
         Syntax[] Data { get; }
-        [DisableDump]
-        internal override Checked<CompileSyntax> ToCompiledSyntax => ToContainer;
 
         [DisableDump]
-        internal override CompoundSyntax ToContainer
+        internal override Checked<CompileSyntax> ToCompiledSyntax
+        {
+            get
+            {
+                var result = ToContainer;
+                return new Checked<CompileSyntax>(result.Value, result.Issues);
+            }
+        }
+
+        [DisableDump]
+        internal override Checked<CompoundSyntax> ToContainer
             => new CompoundSyntax(Data);
 
         internal override bool IsKeyword => true;
@@ -44,6 +52,5 @@ namespace Reni.ReniSyntax
 
         [DisableDump]
         protected override IEnumerable<Syntax> DirectChildren => Data;
-
     }
 }

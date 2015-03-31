@@ -50,7 +50,8 @@ namespace Reni.ReniParser
             => Tags.Any(item => item.DeclaresConverter);
 
         [DisableDump]
-        internal override Checked<CompileSyntax> ToCompiledSyntax => ToContainer;
+        internal override Checked<CompileSyntax> ToCompiledSyntax
+            => Checked<CompileSyntax>.From(ToContainer);
 
         [DisableDump]
         internal override Checked<CompileSyntax> ContainerStatementToCompileSyntax

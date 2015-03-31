@@ -87,7 +87,7 @@ namespace Reni.ReniParser
 
         internal virtual IEnumerable<Syntax> ToList(List type) { yield return this; }
         [DisableDump]
-        internal virtual CompoundSyntax ToContainer => ToListSyntax.ToContainer;
+        internal virtual Checked<CompoundSyntax> ToContainer => ToListSyntax.ToContainer;
         [DisableDump]
         internal virtual bool IsMutableSyntax => false;
         [DisableDump]
