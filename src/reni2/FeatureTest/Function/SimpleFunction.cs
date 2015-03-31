@@ -8,7 +8,7 @@ using Reni.FeatureTest.Structure;
 
 namespace Reni.FeatureTest.Function
 {
-    [TestFixture]
+    [UnitTest]
     [TargetSet(@"f: /\ ^ + 1;f(2) dump_print;", "3")]
     [InnerAccess]
     [Add2Numbers]

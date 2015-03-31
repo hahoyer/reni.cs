@@ -6,7 +6,7 @@ using Reni.FeatureTest.Helper;
 
 namespace Reni.FeatureTest.Function
 {
-    [TestFixture]
+    [UnitTest]
     [Target(@"
 f1: /\((
   y: 3;

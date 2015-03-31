@@ -7,7 +7,7 @@ using Reni.FeatureTest.Structure;
 
 namespace Reni.FeatureTest.Function
 {
-    [TestFixture]
+    [UnitTest]
     [Target(@"f: /\ ^;f(2) dump_print;")]
     [Output("2")]
     [InnerAccess]

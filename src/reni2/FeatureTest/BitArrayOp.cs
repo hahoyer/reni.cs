@@ -9,7 +9,7 @@ namespace Reni.FeatureTest.BitArrayOp
     /// <summary>
     ///     Operations on bitarrays
     /// </summary>
-    [TestFixture]
+    [UnitTest]
     [Number]
     [Negate]
     public sealed class BitArrayOp : CompilerTest
@@ -18,7 +18,7 @@ namespace Reni.FeatureTest.BitArrayOp
         ///     Compares the operators.
         /// </summary>
         /// created 08.01.2007 00:05
-        [Test]
+        [UnitTest]
         public void NegativeNumber()
         {
             CreateFileAndRunCompiler("Negative number", @"(-1)dump_print", "-1");
@@ -34,7 +34,7 @@ namespace Reni.FeatureTest.BitArrayOp
         }
     }
 
-    [TestFixture]
+    [UnitTest]
     [Target(@"(1 negate)dump_print")]
     [Output("-1")]
     [Number]
@@ -42,7 +42,7 @@ namespace Reni.FeatureTest.BitArrayOp
     public sealed class Negate : CompilerTest
     {}
 
-    [TestFixture]
+    [UnitTest]
     [Target(@"(1, 12)dump_print")]
     [Output("(1, 12)")]
     [Number]
@@ -50,34 +50,34 @@ namespace Reni.FeatureTest.BitArrayOp
     public sealed class TwoPositiveNumbers : CompilerTest
     {}
 
-    [TestFixture]
+    [UnitTest]
     [TwoPositiveNumbers]
     [Target(@"(1, 12, 123, 1234, 12345, 123456, 1234567, 12345678, 123456789, 1234567890)dump_print")]
     [Output("(1, 12, 123, 1234, 12345, 123456, 1234567, 12345678, 123456789, 1234567890)")]
     public sealed class PositiveNumbers : CompilerTest
     {}
 
-    [TestFixture]
+    [UnitTest]
     [TwoPositiveNumbers]
     [Target(@"(-1, -12)dump_print")]
     [Output("(-1, -12)")]
     public sealed class TwoNegativeNumbers : CompilerTest
     {}
 
-    [TestFixture]
+    [UnitTest]
     [TwoNegativeNumbers]
     [Target(@"(-1, -12, -123, -1234, -12345, -123456, -1234567, -12345678, -123456789, -1234567890)dump_print")]
     [Output("(-1, -12, -123, -1234, -12345, -123456, -1234567, -12345678, -123456789, -1234567890)")]
     public sealed class NegativeNumbers : CompilerTest
     {}
 
-    [TestFixture]
+    [UnitTest]
     [Target(@"3 dump_print")]
     [Output("3")]
     public sealed class Number : CompilerTest
     {}
 
-    [TestFixture]
+    [UnitTest]
     [Target(@"(2+4) dump_print")]
     [Output("6")]
     [Number]
@@ -85,7 +85,7 @@ namespace Reni.FeatureTest.BitArrayOp
     public sealed class Add2Numbers : CompilerTest
     {}
 
-    [TestFixture]
+    [UnitTest]
     [Target(@"(40000 - 1  )dump_print")]
     [Output("39999")]
     [Number]
@@ -93,7 +93,7 @@ namespace Reni.FeatureTest.BitArrayOp
     public sealed class SubtractOddSizedNumber : CompilerTest
     {}
 
-    [TestFixture]
+    [UnitTest]
     [Target(@"(40000 + 1  )dump_print")]
     [Output("40001")]
     [Number]
@@ -101,7 +101,7 @@ namespace Reni.FeatureTest.BitArrayOp
     public sealed class AddOddSizedNumber : CompilerTest
     {}
 
-    [TestFixture]
+    [UnitTest]
     [Target(@"(40000 - 43210)dump_print")]
     [Output("-3210")]
     [Number]
@@ -109,7 +109,7 @@ namespace Reni.FeatureTest.BitArrayOp
     public sealed class SubtractLargeEqualSizedNumber : CompilerTest
     {}
 
-    [TestFixture]
+    [UnitTest]
     [Target(@"(400 - 43210)dump_print")]
     [Output("-42810")]
     [Number]

@@ -7,7 +7,7 @@ using Reni.FeatureTest.Helper;
 
 namespace Reni.FeatureTest.DefaultOperations
 {
-    [TestFixture]
+    [UnitTest]
     [ConversionService.Closure]
     public abstract class ApplyCompareOperator : CompilerTest
     {

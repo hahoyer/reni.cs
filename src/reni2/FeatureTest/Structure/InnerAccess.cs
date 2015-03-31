@@ -6,7 +6,7 @@ using Reni.FeatureTest.Helper;
 
 namespace Reni.FeatureTest.Structure
 {
-    [TestFixture]
+    [UnitTest]
     [BitArrayOp.Number]
     [AccessSimple1]
     [TargetSet("5, (^^ _A_T_ 0) dump_print, 66", "5")]

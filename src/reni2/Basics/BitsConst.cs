@@ -439,10 +439,10 @@ namespace Reni.Basics
 
         public string CodeDump() => ToInt64().ToString();
 
-        [TestFixture]
+        [UnitTest]
         public sealed class Test
         {
-            [Test]
+            [UnitTest]
             public void All()
             {
                 Tracer.FlaggedLine("Position of method tested", FilePositionTag.Test);
@@ -473,7 +473,7 @@ namespace Reni.Basics
                 Tracer.Assert(Convert("-654321").ToString(10) == "-654321");
             }
 
-            [Test]
+            [UnitTest]
             public void Resize()
             {
                 Tracer.FlaggedLine("Position of method tested", FilePositionTag.Test);

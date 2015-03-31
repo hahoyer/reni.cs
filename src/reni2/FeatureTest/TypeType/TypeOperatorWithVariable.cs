@@ -7,7 +7,7 @@ using Reni.FeatureTest.Structure;
 
 namespace Reni.FeatureTest.TypeType
 {
-    [TestFixture]
+    [UnitTest]
     [InnerAccess]
     [SomeVariables]
     [TypeOperator]

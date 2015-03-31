@@ -6,7 +6,7 @@ using Reni.FeatureTest.Helper;
 
 namespace Reni.FeatureTest.Function
 {
-    [TestFixture]
+    [UnitTest]
     [ObjectFunction1]
     [ObjectFunction2]
     [Target(@"f: /\(value: ^, x: /\ ^ + value);f(2) x(100) dump_print")]

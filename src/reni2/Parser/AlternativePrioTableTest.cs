@@ -6,11 +6,11 @@ using Reni.FeatureTest.Helper;
 
 namespace Reni.Parser
 {
-    [TestFixture]
+    [UnitTest]
     [ParserTest]
     public sealed class AlternativePrioTableTest : CompilerTest
     {
-        [Test]
+        [UnitTest]
         public void Converter()
         {
             var syntaxPrototype = LikeSyntax.Compound
@@ -27,7 +27,7 @@ namespace Reni.Parser
                     expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
         }
 
-        [Test]
+        [UnitTest]
         public void ConverterAndProperty()
         {
             var syntaxPrototype = LikeSyntax.Compound

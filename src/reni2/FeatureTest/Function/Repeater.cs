@@ -10,7 +10,7 @@ using Reni.FeatureTest.TypeType;
 
 namespace Reni.FeatureTest.Function
 {
-    [TestFixture]
+    [UnitTest]
     [Target(@"
 repeat: /\ ^() while then repeat(^);
 
@@ -37,7 +37,7 @@ repeat
     public sealed class SimpleRepeater : CompilerTest
     {}
 
-    [TestFixture]
+    [UnitTest]
     [Target(@"
 repeat: /\ ^ while() then(^ body(), repeat(^));
 

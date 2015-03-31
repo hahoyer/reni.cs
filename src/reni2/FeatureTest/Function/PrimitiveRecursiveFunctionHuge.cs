@@ -6,7 +6,7 @@ using Reni.FeatureTest.Helper;
 
 namespace Reni.FeatureTest.Function
 {
-    [TestFixture]
+    [UnitTest]
     [Target(@"!mutable i: 400000; f: /\i > 0 then (i := (i - 1)enable_cut; f());f()")]
     [Output("")]
     [PrimitiveRecursiveFunctionSmall]

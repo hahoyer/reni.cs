@@ -88,7 +88,7 @@ Text: /\
         protected virtual string InstanceCode => GetStringAttribute<InstanceCodeAttribute>();
     }
 
-    [TestFixture]
+    [UnitTest]
     [Output("abcdef")]
     [InstanceCode("Text('abcdef')")]
     [Integer1]
@@ -108,7 +108,7 @@ Text: /\
     [ArrayReferenceAll]
     public sealed class Text1 : TextStruct {}
 
-    [TestFixture]
+    [UnitTest]
     [Output("Hallo")]
     [InstanceCode("Text('H') << 'allo'")]
     [Text1]

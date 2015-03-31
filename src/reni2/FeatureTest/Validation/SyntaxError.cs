@@ -10,7 +10,7 @@ using Reni.Validation;
 
 namespace Reni.FeatureTest.Validation
 {
-    [TestFixture]
+    [UnitTest]
     [Target(@"1 #(x asdf y)# dump_print")]
     [Output("")]
     [UseOfUndefinedContextSymbol]
@@ -28,7 +28,7 @@ namespace Reni.FeatureTest.Validation
         }
     }
 
-    [TestFixture]
+    [UnitTest]
     [Target(@"
 ' hallo
 world'

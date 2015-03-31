@@ -6,7 +6,7 @@ using Reni.FeatureTest.Helper;
 
 namespace Reni.FeatureTest.Function
 {
-    [TestFixture]
+    [UnitTest]
     [SimpleFunctionWithNonLocal]
     [TwoFunctions1]
     public sealed class TwoFunctions : CompilerTest

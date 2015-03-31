@@ -8,12 +8,12 @@ using Reni.FeatureTest.Helper;
 
 namespace Reni.FeatureTest.Text
 {
-    [TestFixture]
+    [UnitTest]
     [TargetSet(@"'Hallo' dump_print", "Hallo")]
     public sealed class Hallo : CompilerTest
     {}
 
-    [TestFixture]
+    [UnitTest]
     [TargetSet(@"
 x: 'Hallo';
 x item(0) dump_print;
@@ -28,38 +28,38 @@ x item(4) dump_print;
     public sealed class Hallo01234 : CompilerTest
     {}
 
-    [TestFixture]
+    [UnitTest]
     [TargetSet("'Hal''lo' dump_print", "Hal'lo")]
     [Hallo]
     public sealed class HalloApo : CompilerTest
     {}
 
-    [TestFixture]
+    [UnitTest]
     [TargetSet("\"Hal''lo\" dump_print", "Hal''lo")]
     [HalloApo]
     public sealed class HalloApoApo : CompilerTest
     {}
 
-    [TestFixture]
+    [UnitTest]
     [TargetSet("\"Hal'\"\"'lo\" dump_print", "Hal'\"'lo")]
     [HalloApoApo]
     public sealed class HalloApoQuoApo : CompilerTest
     {}
 
-    [TestFixture]
+    [UnitTest]
     [TargetSet("('Hallo' << ' Welt!') dump_print", "Hallo Welt!")]
     [Hallo]
     [CombineArraysFromPieces]
     public sealed class HalloWelt : CompilerTest
     {}
 
-    [TestFixture]
+    [UnitTest]
     [Hallo]
     [TargetSet("108 text_item dump_print", "l")]
     public sealed class ConvertFromNumber : CompilerTest
     {}
 
-    [TestFixture]
+    [UnitTest]
     [ConvertFromNumber]
     //[CompilerParameters.Trace.Parser]
     [TargetSet("(<< (108)text_item<< (109)text_item)text_item dump_print", "lm")]
@@ -68,7 +68,7 @@ x item(4) dump_print;
     public sealed class ConvertFromNumbers : CompilerTest
     {}
 
-    [TestFixture]
+    [UnitTest]
     [Hallo]
     [BitArrayOp.Number]
     [ConvertFromNumber]

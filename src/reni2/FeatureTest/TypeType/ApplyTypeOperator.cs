@@ -7,7 +7,7 @@ using Reni.Parser;
 
 namespace Reni.FeatureTest.TypeType
 {
-    [TestFixture]
+    [UnitTest]
     [PrioTableTest]
     [ConversionService.Closure]
     public sealed class ApplyTypeOperator : CompilerTest

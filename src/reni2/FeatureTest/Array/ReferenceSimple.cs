@@ -6,7 +6,7 @@ using Reni.FeatureTest.Helper;
 
 namespace Reni.FeatureTest.Reference
 {
-    [TestFixture]
+    [UnitTest]
     [Target("(<<5) type dump_print")]
     [Output("((number(bits:4))!!!3)*1")]
     public sealed class ReferenceSimple : CompilerTest

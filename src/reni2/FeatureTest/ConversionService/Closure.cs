@@ -10,10 +10,10 @@ using Reni.Type;
 
 namespace Reni.FeatureTest.ConversionService
 {
-    [TestFixture]
+    [UnitTest]
     public sealed class Closure : DependantAttribute
     {
-        [Test]
+        [UnitTest]
         public void OfNumber()
         {
             var number = new Root(null).BitType.Number(1);
@@ -25,7 +25,7 @@ namespace Reni.FeatureTest.ConversionService
             Tracer.Assert(types.Length == 3, ()=>"\n"+types.Stringify("\n"));
         }
 
-        [Test]
+        [UnitTest]
         public void ClosureServiceOfAlignedNumber()
         {
             var source= new Root(null).BitType.Number(8);
@@ -39,7 +39,7 @@ namespace Reni.FeatureTest.ConversionService
             Tracer.Assert(destinations.Length == 2);
         }
 
-        [Test]
+        [UnitTest]
         public void ClosureServiceOfAlignedNumberBackwards()
         {
             var source = new Root(null).BitType.Number(8);
@@ -53,7 +53,7 @@ namespace Reni.FeatureTest.ConversionService
             Tracer.Assert(destinations.Length == 2);
         }
 
-        [Test]
+        [UnitTest]
         public void ClosureServiceOfNumber()
         {
             var source = new Root(null).BitType.Number(1);
@@ -66,7 +66,7 @@ namespace Reni.FeatureTest.ConversionService
             Tracer.Assert(destinations.Length == 3);
         }
 
-        [Test]
+        [UnitTest]
         public void OfNumberPointer()
         {
             var number = new Root(null).BitType.Number(4);

@@ -29,7 +29,7 @@ using Reni.FeatureTest.Helper;
 
 namespace Reni.FeatureTest.Structure
 {
-    [TestFixture]
+    [UnitTest]
     [AccessSimple]
     [AccessSimple1]
     [Target(@"
@@ -41,7 +41,7 @@ namespace Reni.FeatureTest.Structure
     [Output("012300")]
     public sealed class Access : CompilerTest
     {
-        [Test]
+        [UnitTest]
         public override void Run() => BaseRun();
     }
 }

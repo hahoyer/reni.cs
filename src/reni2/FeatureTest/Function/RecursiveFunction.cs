@@ -11,7 +11,7 @@ using Reni.FeatureTest.TypeType;
 
 namespace Reni.FeatureTest.Function
 {
-    [TestFixture]
+    [UnitTest]
     [InnerAccess]
     [Add2Numbers]
     [UseThen]

@@ -8,7 +8,7 @@ using Reni.Parser;
 
 namespace Reni.FeatureTest.Array
 {
-    [TestFixture]
+    [UnitTest]
     [Target("(<<5) type dump_print")]
     [Output("((number(bits:4))!!!3)*1")]
     [ParserTest]

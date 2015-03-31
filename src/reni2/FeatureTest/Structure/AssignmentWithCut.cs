@@ -7,7 +7,7 @@ using Reni.FeatureTest.TypeType;
 
 namespace Reni.FeatureTest.Structure
 {
-    [TestFixture]
+    [UnitTest]
     [TargetSet(@"( !mutable:3, (^^ _A_T_ 0) := 5 enable_cut) dump_print", "(-3, )")]
     [Assignments]
     [ApplyTypeOperatorWithCut]

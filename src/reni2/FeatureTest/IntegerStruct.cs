@@ -32,14 +32,14 @@ Integer8:
         protected virtual string InstanceCode => GetStringAttribute<InstanceCodeAttribute>();
     }
 
-    [TestFixture]
+    [UnitTest]
     [Output("3")]
     [InstanceCode("(Integer8(1)+Integer8(2))")]
     [IntegerPlusNumber]
     [ConversionService.Closure]
     public sealed class IntegerPlusInteger : IntegerStruct {}
 
-    [TestFixture]
+    [UnitTest]
     [Output("3")]
     [InstanceCode("(Integer8(1)+2)")]
     [Create]
@@ -48,14 +48,14 @@ Integer8:
     //[LowPriority]
     public sealed class IntegerPlusNumber : IntegerStruct {}
 
-    [TestFixture]
+    [UnitTest]
     [Output("23")]
     [InstanceCode("Integer8(23) clone")]
     [Create]
     [TwoFunctions1]
     public sealed class Clone : IntegerStruct {}
 
-    [TestFixture]
+    [UnitTest]
     [Output("23")]
     [InstanceCode("Integer8(0) create(23)")]
     [Integer1]
@@ -63,7 +63,7 @@ Integer8:
     [Integer127]
     public sealed class Create : IntegerStruct {}
 
-    [TestFixture]
+    [UnitTest]
     [PropertyVariable]
     [ApplyTypeOperatorWithCut]
     [SimpleFunctionWithNonLocal]
@@ -72,13 +72,13 @@ Integer8:
     [InstanceCode("Integer8(1)")]
     public sealed class Integer1 : IntegerStruct {}
 
-    [TestFixture]
+    [UnitTest]
     [Output("2")]
     [Integer1]
     [InstanceCode("Integer8(2)")]
     public sealed class Integer2 : IntegerStruct {}
 
-    [TestFixture]
+    [UnitTest]
     [Integer2]
     [Output("127")]
     [InstanceCode("Integer8(127)")]

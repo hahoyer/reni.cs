@@ -86,10 +86,10 @@ ParLevel ( { ) }
             Data.OutStream = null;
         }
 
-        [TestFixture]
+        [UnitTest]
         public sealed class TypeNameExtenderTest
         {
-            [Test]
+            [UnitTest]
             public void TestMethod()
             {
                 InternalTest(typeof(int), "int");

@@ -7,7 +7,7 @@ using Reni.Parser;
 
 namespace Reni.FeatureTest.BlogExamples
 {
-    [TestFixture]
+    [UnitTest]
     [ParserTest]
     [TargetSet("\"Hello world\"#(* Das ist ein Kommentar *)#dump_print", "Hello world")]
     [TargetSet("\"Hello world\"#(ignorieren Das ist ein Kommentar\n ignorieren)#dump_print", "Hello world")]

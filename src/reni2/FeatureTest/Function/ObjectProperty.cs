@@ -7,7 +7,7 @@ using Reni.FeatureTest.Structure;
 
 namespace Reni.FeatureTest.Function
 {
-    [TestFixture]
+    [UnitTest]
     [FunctionWithNonLocal]
     [PropertyVariable]
     [Target(@"f: /\(value: ^, x: /!\value);f(2) x dump_print")]

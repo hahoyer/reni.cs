@@ -30,7 +30,7 @@ using Reni.FeatureTest.Helper;
 
 namespace Reni.FeatureTest.Structure
 {
-    [TestFixture]
+    [UnitTest]
     [InnerAccess]
     [Function.Function]
     [SimpleFunctionWithNonLocal]
@@ -40,7 +40,7 @@ namespace Reni.FeatureTest.Structure
         protected override string Target => @"x: /!\11; x dump_print";
         protected override string Output => "11";
 
-        [Test]
+        [UnitTest]
         public override void Run() => BaseRun();
     }
 }

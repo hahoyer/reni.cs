@@ -7,7 +7,7 @@ using Reni.FeatureTest.Helper;
 
 namespace Reni.FeatureTest.TypeType
 {
-    [TestFixture]
+    [UnitTest]
     [ApplyTypeOperator]
     [NumberPointerCutConversion]
     public sealed class ApplyTypeOperatorWithCut : CompilerTest

@@ -9,7 +9,7 @@ using Reni.Validation;
 
 namespace Reni.FeatureTest.Validation
 {
-    [TestFixture]
+    [UnitTest]
     [Target(@"x")]
     [Output("")]
     [PrioTableTest]
@@ -26,7 +26,7 @@ namespace Reni.FeatureTest.Validation
         }
     }
 
-    [TestFixture]
+    [UnitTest]
     [PrioTableTest]
     [Target(@"x: 3; x x")]
     [Output("")]
@@ -43,7 +43,7 @@ namespace Reni.FeatureTest.Validation
         }
     }
 
-    [TestFixture]
+    [UnitTest]
     [Target(@"x dump_print")]
     [Output("")]
     [UndefinedContextSymbol]
@@ -62,7 +62,7 @@ namespace Reni.FeatureTest.Validation
         }
     }
 
-    [TestFixture]
+    [UnitTest]
     [Target(@"x x dump_print")]
     [Output("")]
     [UseOfUndefinedContextSymbol]

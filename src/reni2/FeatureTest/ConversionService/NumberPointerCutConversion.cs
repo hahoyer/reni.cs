@@ -8,10 +8,10 @@ using Reni.Context;
 
 namespace Reni.FeatureTest.ConversionService
 {
-    [TestFixture]
+    [UnitTest]
     public sealed class NumberPointerCutConversion : DependantAttribute
     {
-        [Test]
+        [UnitTest]
         public void Run()
         {
             var source = new Root(null).BitType.Number(8).EnableCut.Pointer;

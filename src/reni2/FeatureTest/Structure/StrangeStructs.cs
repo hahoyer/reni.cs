@@ -6,7 +6,7 @@ using Reni.FeatureTest.Helper;
 
 namespace Reni.FeatureTest.Structure
 {
-    [TestFixture]
+    [UnitTest]
     [AccessSimple1]
     [InnerAccess]
     [AccessAndAdd]

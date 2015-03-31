@@ -8,10 +8,10 @@ using Reni.Type;
 
 namespace Reni.FeatureTest.ConversionService
 {
-    [TestFixture]
+    [UnitTest]
     public sealed class NumberExtensionConversion : DependantAttribute
     {
-        [Test]
+        [UnitTest]
         public void Run4to8Forced()
         {
             var numberSmall = new Root(null).BitType.Number(4);
@@ -20,7 +20,7 @@ namespace Reni.FeatureTest.ConversionService
 
             Tracer.Assert(paths.Length == 1);
         }
-        [Test]
+        [UnitTest]
         public void Run1to3Forced()
         {
             var numberSmall = new Root(null).BitType.Number(1);
@@ -30,7 +30,7 @@ namespace Reni.FeatureTest.ConversionService
             Tracer.Assert(paths.Length == 1);
         }
 
-        [Test]
+        [UnitTest]
         [Closure]
         public void Run1to3()
         {

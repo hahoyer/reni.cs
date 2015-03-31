@@ -7,36 +7,36 @@ using Reni.FeatureTest.Structure;
 
 namespace Reni.FeatureTest.Array
 {
-    [TestFixture]
+    [UnitTest]
     [ArrayFromPieces]
     [TargetSet("((<<5)item (0)) dump_print", "5")]
     public sealed class ElementAccessSimple : CompilerTest {}
 
-    [TestFixture]
+    [UnitTest]
     [ElementAccessSimple]
     [TargetSet("((<<5<<3<<5<<1<<3)item (3)) dump_print", "1")]
     public sealed class ElementAccess : CompilerTest {}
 
-    [TestFixture]
+    [UnitTest]
     [ArrayFromPieces]
     [TwoStatements]
     [TargetSet("x: <<5<<3; x dump_print", "<<(5, 3)")]
     public sealed class ArrayVariable : CompilerTest {}
 
-    [TestFixture]
+    [UnitTest]
     [ElementAccessVariable]
     [ArrayVariable]
     [TwoStatements]
     [TargetSet("x:  <<:= 5;  x item(0):= 2; x dump_print", "<<:=(2)")]
     public sealed class ElementAccessVariableSetterSimple : CompilerTest {}
 
-    [TestFixture]
+    [UnitTest]
     [ElementAccessVariableSetterSimple]
     [TwoStatements]
     [TargetSet("x:  <<5<<3<<5<<1<<:=3; x item(3) := 2; x dump_print", "<<:=(5, 3, 5, 2, 3)")]
     public sealed class ElementAccessVariableSetter : CompilerTest {}
 
-    [TestFixture]
+    [UnitTest]
     [ElementAccess]
     [TwoStatements]
     [TargetSet("x: <<5<<3<<5<<1<<3;  x item(3) dump_print", "1")]

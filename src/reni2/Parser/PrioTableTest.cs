@@ -7,10 +7,10 @@ using hw.UnitTest;
 
 namespace Reni.Parser
 {
-    [TestFixture]
+    [UnitTest]
     sealed class PrioTableTest : DependantAttribute
     {
-        [Test]
+        [UnitTest]
         public void FromText()
         {
             var text = @"

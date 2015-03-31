@@ -7,7 +7,7 @@ using Reni.Parser;
 
 namespace Reni.FeatureTest.Array
 {
-    [TestFixture]
+    [UnitTest]
     [Target("(<<5) dump_print")]
     [Output("<<(5)")]
     [ParserTest]

@@ -167,7 +167,7 @@ namespace Reni.Basics
 
         public override string ToString() => ToInt().ToString();
 
-        [TestFixture]
+        [UnitTest]
         sealed class Tests
         {
             static void TestNextPacketSize(int x, int b)
@@ -176,7 +176,7 @@ namespace Reni.Basics
                 Tracer.Assert(xs.NextPacketSize(BitsConst.SegmentAlignBits) == Create(b));
             }
 
-            [Test]
+            [UnitTest]
             public void NextPacketSize()
             {
                 TestNextPacketSize(0, 0);

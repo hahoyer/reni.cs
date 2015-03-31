@@ -6,13 +6,13 @@ using Reni.FeatureTest.Helper;
 
 namespace Reni.FeatureTest.Function
 {
-    [TestFixture]
+    [UnitTest]
     [Target(@"f: /\ ^;g: /\f(^);x:4; g(x)dump_print")]
     [Output("4")]
     [SimpleFunction]
     public sealed class FunctionWithRefArg : CompilerTest
     {
-        [Test]
+        [UnitTest]
         public override void Run() => BaseRun();
     }
 }

@@ -9,7 +9,7 @@ using Reni.FeatureTest.ThenElse;
 
 namespace Reni.FeatureTest.Function
 {
-    [TestFixture]
+    [UnitTest]
     [InnerAccess]
     [Add2Numbers]
     [UseThen]

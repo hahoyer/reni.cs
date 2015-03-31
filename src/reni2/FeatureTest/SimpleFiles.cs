@@ -26,7 +26,7 @@ using Reni.FeatureTest.Helper;
 
 namespace Reni.FeatureTest
 {
-    [TestFixture]
+    [UnitTest]
     public sealed class SimpleFiles : CompilerTest
     {
         public override void Run() { }

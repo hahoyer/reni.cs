@@ -35,6 +35,7 @@ namespace Reni.Struct
 
         public string GetCompoundIdentificationDump() => "." + ObjectId + "i";
         [Node]
+        [DisableDump]
         internal CompileSyntax[] Statements => _data.Select(s => s.Statement).ToArray();
         [DisableDump]
         internal int EndPosition => Statements.Length;
@@ -127,6 +128,7 @@ namespace Reni.Struct
                 Position = position;
                 StatementCache = new ValueCache<Checked<CompileSyntax>>(GetStatement);
                 NamesCache = new ValueCache<string[]>(GetNames);
+                Tracer.Assert(RawStatement != null);
             }
 
             internal Syntax RawStatement { get; }
@@ -155,6 +157,7 @@ namespace Reni.Struct
                 => accessPoint.AccessFeature(Value);
         }
 
+        [DisableDump]
         protected override IEnumerable<Syntax> DirectChildren => _statements;
     }
 }

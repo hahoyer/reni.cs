@@ -6,7 +6,7 @@ using Reni.FeatureTest.Helper;
 
 namespace Reni.FeatureTest
 {
-    [TestFixture]
+    [UnitTest]
     [TargetSet(@"
 system: /!\
 { MaxNumber8: /!\ '7f' to_number_of_base 16 

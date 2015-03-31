@@ -7,7 +7,7 @@ using Reni.Parser;
 
 namespace Reni.FeatureTest.TypeType
 {
-    [TestFixture]
+    [UnitTest]
     [PrioTableTest]
     [Target("31 type dump_print")]
     [Output("number(bits:6)")]

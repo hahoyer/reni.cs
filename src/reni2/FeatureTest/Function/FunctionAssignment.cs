@@ -6,7 +6,7 @@ using Reni.FeatureTest.Helper;
 
 namespace Reni.FeatureTest.Function
 {
-    [TestFixture]
+    [UnitTest]
     [SimpleFunctionWithNonLocal]
     [TargetSet(@"f: (^ + new_value)dump_print/\ ^; f(100) := 2;", "102")]
     public sealed class FunctionAssignment : CompilerTest {}

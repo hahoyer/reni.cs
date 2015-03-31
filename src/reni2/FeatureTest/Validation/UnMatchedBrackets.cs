@@ -9,7 +9,7 @@ using Reni.Validation;
 
 namespace Reni.FeatureTest.Validation
 {
-    [TestFixture]
+    [UnitTest]
     [Target(@"x:{ 1 x ( }; 1 dump_print")]
     public sealed class UnMatchedLeftParenthesis : CompilerTest
     {
@@ -26,7 +26,7 @@ namespace Reni.FeatureTest.Validation
         }
     }
 
-    [TestFixture]
+    [UnitTest]
     [Target(@"x:{ 1 x ) }; 1 dump_print")]
     public sealed class UnMatchedRightParenthesis : CompilerTest
     {
@@ -44,7 +44,7 @@ namespace Reni.FeatureTest.Validation
     }
 
 
-    [TestFixture]
+    [UnitTest]
     [UnMatchedLeftParenthesis]
     [UnMatchedRightParenthesis]
     public sealed class UnMatchedBrackets : CompilerTest {}

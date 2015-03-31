@@ -7,7 +7,7 @@ using Reni.Parser;
 
 namespace Reni.FeatureTest.Structure
 {
-    [TestFixture]
+    [UnitTest]
     [Target(@"(1, 2, 3, 4, 5, 6) dump_print")]
     [Output("(1, 2, 3, 4, 5, 6)")]
     [PrioTableTest]

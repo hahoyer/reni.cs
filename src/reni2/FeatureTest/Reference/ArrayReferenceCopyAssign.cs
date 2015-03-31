@@ -6,7 +6,7 @@ using Reni.FeatureTest.Helper;
 
 namespace Reni.FeatureTest.Reference
 {
-    [TestFixture]
+    [UnitTest]
     [Target(@"
 d: <<5<<2<<:=3;
 ref: d array_reference;

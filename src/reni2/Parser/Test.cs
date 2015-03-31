@@ -7,11 +7,11 @@ using Reni.FeatureTest.Helper;
 
 namespace Reni.Parser
 {
-    [TestFixture]
+    [UnitTest]
     [Closure]
     public sealed class ParserTest : CompilerTest
     {
-        //[Test]
+        //[UnitTest]
         public void SimpleFunction()
         {
             var syntaxPrototype = LikeSyntax.Expression(null, "f", LikeSyntax.Null);
@@ -24,7 +24,7 @@ namespace Reni.Parser
                     expectedResult: c => syntaxPrototype.AssertLike(c.SourceSyntax));
         }
 
-        [Test]
+        [UnitTest]
         [Closure]
         public void Add2Numbers()
         {
@@ -39,7 +39,7 @@ namespace Reni.Parser
                     expectedResult: c => syntaxPrototype.AssertLike(c.SourceSyntax));
         }
 
-        [Test]
+        [UnitTest]
         public void LineComment()
         {
             var syntaxPrototype =
@@ -51,7 +51,7 @@ dump_print
 ", expectedResult: c => syntaxPrototype.AssertLike(c.SourceSyntax));
         }
 
-        [Test]
+        [UnitTest]
         public void BlockComment()
         {
             var syntaxPrototype =

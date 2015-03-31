@@ -6,7 +6,7 @@ using Reni.FeatureTest.Helper;
 
 namespace Reni.FeatureTest.Structure
 {
-    [TestFixture]
+    [UnitTest]
     [InnerAccess]
     [TargetSet(@"(!mutable: 10, (^^ _A_T_ 0) := 4) dump_print", "(4, )")]
     public sealed class SimpleAssignment : CompilerTest

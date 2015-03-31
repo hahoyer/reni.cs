@@ -6,7 +6,7 @@ using Reni.FeatureTest.Helper;
 
 namespace Reni.FeatureTest.Structure
 {
-    [TestFixture]
+    [UnitTest]
     [TargetSet(@"(!mutable:10, !mutable:20, (^^ _A_T_ 0) := 4) dump_print", "(4, 20, )")]
     [TargetSet(@"(!mutable:10, !mutable:20, !mutable:30, (^^ _A_T_ 0) := 4) dump_print", "(4, 20, 30, )")]
     [TargetSet(@"(!mutable:10, !mutable:20, (^^ _A_T_ 1) := 4) dump_print", "(10, 4, )")]

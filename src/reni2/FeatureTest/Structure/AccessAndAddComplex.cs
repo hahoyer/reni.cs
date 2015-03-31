@@ -7,7 +7,7 @@ using Reni.FeatureTest.Helper;
 
 namespace Reni.FeatureTest.Structure
 {
-    [TestFixture]
+    [UnitTest]
     [AccessAndAdd]
     [BitArrayOp.BitArrayOp]
     [SubtractOddSizedNumber]

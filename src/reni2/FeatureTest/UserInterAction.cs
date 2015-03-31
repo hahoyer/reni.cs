@@ -8,7 +8,7 @@ using hw.UnitTest;
 
 namespace Reni.FeatureTest
 {
-    [TestFixture]
+    [UnitTest]
     public sealed class BadUserInterAction : DependantAttribute
     {
         const string text = @"systemdata:
@@ -26,7 +26,7 @@ repeat: /\ ^ while() then(^ body(), repeat(^));
 
 (Text('H') << 'allo') dump_print";
 
-        [Test]
+        [UnitTest]
         public void GetTokenForPosition()
         {
             var compiler = new Compiler(text: text);
@@ -38,7 +38,7 @@ repeat: /\ ^ while() then(^ body(), repeat(^));
         }
     }
 
-    [TestFixture]
+    [UnitTest]
     public sealed class UserInterAction : DependantAttribute
     {
         const string text = @"
@@ -75,10 +75,10 @@ complex FromReal(2) dump_print;
 ";
 
 
-        [Test]
+        [UnitTest]
         public void TypingAProgram()
         {
-            for (var i = 0; i < text.Length; i++)
+            for(var i = 0; i < text.Length; i++)
             {
                 var textFragement = text.Substring(0, i);
                 var compiler = new Compiler(text: textFragement);
@@ -88,11 +88,11 @@ complex FromReal(2) dump_print;
             }
         }
 
-        [Test]
+        [UnitTest]
         public void GetTokenForPosition()
         {
             var compiler = new Compiler(text: text);
-            for (var i = 0; i < text.Length; i++)
+            for(var i = 0; i < text.Length; i++)
             {
                 var t = compiler.Token(i);
                 Tracer.Assert(t != null, () => (new Source(text) + i).Dump());
@@ -100,13 +100,14 @@ complex FromReal(2) dump_print;
         }
     }
 
-    [TestFixture, UserInterAction]
+    [UnitTest]
+    [UserInterAction]
     public sealed class UserInterAction2 : DependantAttribute
     {
         const string Text = @"#(aa comment aa)# !mutable name: 3";
         const string Type = @"cccccccccccccccccwkkkkkkkkwiiiikwn";
 
-        [Test]
+        [UnitTest]
         public void GetTokenForPosition()
         {
             var compiler = new Compiler(text: Text);
@@ -127,13 +128,14 @@ complex FromReal(2) dump_print;
         }
     }
 
-    [TestFixture, UserInterAction]
+    [UnitTest]
+    [UserInterAction]
     public sealed class UserInterAction3 : DependantAttribute
     {
         const string Text = @"   !mutable FreePointer: Memory array_reference mutable;";
         const string Type = @"wwwkkkkkkkkwiiiiiiiiiiikwiiiiiiwiiiiiiiiiiiiiiiwiiiiiiik";
 
-        [Test]
+        [UnitTest]
         public void GetTokenForPosition()
         {
             var compiler = new Compiler(text: Text);
