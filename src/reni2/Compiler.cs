@@ -34,6 +34,7 @@ namespace Reni
         readonly ValueCache<Syntax> _syntax;
         readonly ValueCache<CodeContainer> _codeContainer;
         readonly ValueCache<string> _cSharpCode;
+        readonly FunctionCache<int, TokenInformation> _tokenCache;
 
         [Node]
         readonly Root _rootContext;
@@ -114,11 +115,15 @@ namespace Reni
         }
 
         IOutStream IExecutionContext.OutStream => _parameters.OutStream;
+
         bool IExecutionContext.IsTraceEnabled
             => _isInExecutionPhase && _parameters.TraceOptions.Functions;
+
         bool IExecutionContext.ProcessErrors => _parameters.ProcessErrors;
+
         CodeBase IExecutionContext.Function(FunctionId functionId)
             => CodeContainer.Function(functionId);
+
         Checked<CompileSyntax> IExecutionContext.Parse(string source) => Parse(source);
 
         Checked<CompileSyntax> Parse(string sourceText)
@@ -178,7 +183,9 @@ namespace Reni
 
         [DisableDump]
         internal IEnumerable<Issue> Issues
-            => (_parameters.ParseOnly ? SourceSyntax.Issues : CodeContainer.Issues);
+            => SourceSyntax.Issues
+            .plus(_parameters.ParseOnly ? new Issue[0] : CodeContainer.Issues)
+            ;
 
         SourceSyntax Parse(SourcePosn source) => _tokenFactory.Parser.Execute(source);
 
@@ -236,8 +243,6 @@ namespace Reni
 
             return result;
         }
-
-        readonly FunctionCache<int, TokenInformation> _tokenCache;
 
         public TokenInformation Token(int offset) => _tokenCache[offset];
 

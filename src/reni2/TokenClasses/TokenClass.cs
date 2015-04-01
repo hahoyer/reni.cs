@@ -30,7 +30,9 @@ namespace Reni.TokenClasses
             {
                 BreakExecution();
                 var syntax = this.Operation(left?.Syntax, token, right?.Syntax);
-                return ReturnMethodDump(new SourceSyntax(left, token, right, syntax.Value, syntax.Issues));
+                var issues = left?.Issues.plus(syntax.Issues).plus(right?.Issues);
+                var result = new SourceSyntax(left, token, right, syntax.Value, issues);
+                return ReturnMethodDump(result);
             }
             finally
             {
@@ -47,7 +49,8 @@ namespace Reni.TokenClasses
             => Prefix(token?.Characters, right);
         Checked<Syntax> IOperator<Syntax, Checked<Syntax>>.Suffix(Syntax left, IToken token)
             => Suffix(left, token?.Characters);
-        Checked<Syntax> IOperator<Syntax, Checked<Syntax>>.Infix(Syntax left, IToken token, Syntax right)
+        Checked<Syntax> IOperator<Syntax, Checked<Syntax>>.Infix
+            (Syntax left, IToken token, Syntax right)
             => Infix(left, token?.Characters, right);
 
         protected abstract Checked<Syntax> Terminal(SourcePart token);

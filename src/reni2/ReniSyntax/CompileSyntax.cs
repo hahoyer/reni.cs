@@ -12,7 +12,6 @@ using Reni.ReniParser;
 using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Type;
-using Reni.Validation;
 
 namespace Reni.ReniSyntax
 {
@@ -46,7 +45,6 @@ namespace Reni.ReniSyntax
 
         [DisableDump]
         internal override Checked<CompileSyntax> ToCompiledSyntax => this;
-        virtual  internal Syntax End => this;
 
         internal void AddToCacheForDebug(ContextBase context, object cacheItem)
             => _resultCache.Add(context, cacheItem);
