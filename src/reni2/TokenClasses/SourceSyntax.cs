@@ -13,18 +13,25 @@ namespace Reni.TokenClasses
 {
     sealed class SourceSyntax : DumpableObject, ISourcePart
     {
+        static int _nextObjectId;
+        readonly Issue[] _issues;
+
         public SourceSyntax
             (SourceSyntax left, IToken token, SourceSyntax right, Syntax syntax, Issue[] issues)
+            : base(_nextObjectId++)
         {
             Syntax = syntax;
-            Issues = issues;
+            _issues = issues ?? new Issue[0];
             Left = left;
             Token = token;
             Right = right;
             AssertValid();
         }
 
-        void AssertValid() => AssertValidSourceQueue();
+        void AssertValid()
+        {
+            AssertValidSourceQueue();
+        }
 
         void AssertValidSourceQueue()
         {
@@ -42,7 +49,7 @@ namespace Reni.TokenClasses
                     );
         }
 
-        internal Issue[] Issues { get; }
+        internal Issue[] Issues => (Left?.Issues).plus(_issues).plus(Right?.Issues);
         internal Syntax Syntax { get; }
         SourceSyntax Left { get; }
         internal IToken Token { get; }

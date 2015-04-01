@@ -20,7 +20,7 @@ namespace Reni.Validation
             Position = position;
             Message = message;
             AssertValid();
-            StopByObjectIds(69);
+            StopByObjectIds();
         }
 
         void AssertValid() => Tracer.Assert(Position != null);

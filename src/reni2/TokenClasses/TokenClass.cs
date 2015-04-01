@@ -30,8 +30,7 @@ namespace Reni.TokenClasses
             {
                 BreakExecution();
                 var syntax = this.Operation(left?.Syntax, token, right?.Syntax);
-                var issues = left?.Issues.plus(syntax.Issues).plus(right?.Issues);
-                var result = new SourceSyntax(left, token, right, syntax.Value, issues);
+                var result = new SourceSyntax(left, token, right, syntax.Value, syntax.Issues);
                 return ReturnMethodDump(result);
             }
             finally

@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
+using hw.Helper;
 using System.Linq;
 using hw.Debug;
 using hw.Forms;
-using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -101,6 +101,14 @@ namespace Reni.Struct
                 .Syntax
                 .Converters
                 .Select(body => Function(body, RootContext.VoidType));
+
+        public string DumpPrintTextOfType
+            => Compound
+                .Syntax
+                .EndPosition
+                .Select(position => Compound.AccessType(ViewPosition, position).DumpPrintText)
+                .Stringify(", ")
+                .Surround("(", ")");
 
         sealed class RecursionWhileObtainingCompoundSizeException : Exception
         {

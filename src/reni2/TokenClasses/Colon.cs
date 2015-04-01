@@ -67,7 +67,7 @@ namespace Reni.TokenClasses
                 {
                     var result = IssueId.UnexpectedDeclarationTag.Syntax(Token, Tag);
                     var value = result.Value.ToCompiledSyntax;
-                    return new Checked<CompileSyntax>(value.Value, result.Issues.plus<Issue>(value.Issues));
+                    return new Checked<CompileSyntax>(value.Value, result.Issues.plus(value.Issues));
                 }
             }
         }

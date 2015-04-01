@@ -38,15 +38,15 @@ world'
     {
         public SyntaxErrorString()
         {
-            //Parameters.TraceOptions.Parser = true;
+            // Parameters.TraceOptions.Parser = true;
         }
         protected override void Verify(IEnumerable<Issue> issues)
         {
             var issueArray = issues.ToArray();
             var i = 0;
-            Tracer.Assert(issueArray[i++].IsLogdumpLike(3, 6, IssueId.EOLInString, "'"));
             Tracer.Assert(issueArray[i++].IsLogdumpLike(2, 1, IssueId.EOLInString, "' hallo"));
-            Tracer.Assert(issueArray[i++].IsLogdumpLike(3, 1, IssueId.ConsequentialError, "world"));
+            Tracer.Assert(issueArray[i++].IsLogdumpLike(3, 6, IssueId.EOLInString, "'"));
+            Tracer.Assert(issueArray[i++].IsLogdumpLike(3, 1, IssueId.UndefinedSymbol, "world Type: ()"));
             Tracer.Assert(issueArray.Length == i);
         }
     }

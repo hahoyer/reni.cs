@@ -17,7 +17,7 @@ namespace Reni.TokenClasses
         {
             var condition = left.ToCompiledSyntax;
             var result = right.CreateThenSyntax(condition.Value);
-            return new Checked<Syntax>(result.Value, condition.Issues.plus<Issue>(result.Issues));
+            return new Checked<Syntax>(result.Value, condition.Issues.plus(result.Issues));
         }
     }
 }

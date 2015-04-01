@@ -27,6 +27,7 @@ namespace Reni.Struct
         internal override CompoundView FindRecentCompoundView => View;
         [DisableDump]
         internal override bool Hllw => View.Hllw;
+        internal override string DumpPrintText => View.DumpPrintTextOfType;
         [DisableDump]
         internal override bool HasQuickSize => false;
 

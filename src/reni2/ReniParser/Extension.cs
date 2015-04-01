@@ -22,6 +22,6 @@ namespace Reni.ReniParser
             => new[] {x}.Concat(y).ToDistinctNotNullArray();
 
         internal static T[] ToDistinctNotNullArray<T>(this IEnumerable<T> y)
-            => (y).Where(item => item != null).Distinct().ToArray();
+            => (y ?? new T[0]).Where(item => item != null).Distinct().ToArray();
     }
 }

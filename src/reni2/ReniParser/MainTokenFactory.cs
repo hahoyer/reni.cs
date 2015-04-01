@@ -5,6 +5,7 @@ using hw.Parser;
 using hw.Scanner;
 using Reni.Numeric;
 using Reni.Parser;
+using Reni.ReniSyntax;
 using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Validation;
@@ -132,7 +133,11 @@ namespace Reni.ReniParser
     {
         readonly IssueId _issue;
 
-        public ScannerSyntaxError(Match.IError message) { _issue = ReniLexer.Parse(message); StopByObjectIds(81);}
+        public ScannerSyntaxError(Match.IError message)
+        {
+            _issue = ReniLexer.Parse(message);
+            StopByObjectIds(81);
+        }
 
         string IType<SourceSyntax>.PrioTableId => Id;
 
@@ -140,13 +145,14 @@ namespace Reni.ReniParser
 
         SourceSyntax IType<SourceSyntax>.Create(SourceSyntax left, IToken token, SourceSyntax right)
         {
-            var syntaxWithIssues = _issue.Syntax(token.Characters, left?.Syntax, right?.Syntax);
+            var resultIssues = _issue.CreateIssue(token.Characters);
             return new SourceSyntax
-                (left,
+                (
+                left,
                 token,
                 right,
-                syntaxWithIssues.Value,
-                syntaxWithIssues.Issues);
+                ListSyntax.Create(left?.Syntax,right?.Syntax), 
+                new[] {resultIssues});
         }
 
         IType<SourceSyntax> IType<SourceSyntax>.NextTypeIfMatched => null;
