@@ -2,12 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
-using hw.Helper;
 using hw.Scanner;
-using JetBrains.Annotations;
 using Reni.Parser;
 using Reni.ReniParser;
 using Reni.TokenClasses;
+using Reni.Validation;
 
 namespace Reni.UserInterface
 {
@@ -34,7 +33,7 @@ namespace Reni.UserInterface
         [DisableDump]
         public virtual bool IsError => false;
         [DisableDump]
-        public virtual InnerTokenStateAtLineEnd State => InnerTokenStateAtLineEnd.None;
+        public virtual string State => "";
         public char TypeCharacter
         {
             get
@@ -45,9 +44,9 @@ namespace Reni.UserInterface
                     return 'c';
                 if(IsLineComment)
                     return 'l';
-                if (IsWhiteSpace)
+                if(IsWhiteSpace)
                     return 'w';
-                if (IsNumber)
+                if(IsNumber)
                     return 'n';
                 if(IsText)
                     return 't';
@@ -96,6 +95,14 @@ namespace Reni.UserInterface
         public override bool IsNumber => Syntax.IsNumber;
         public override bool IsError => SourceSyntax.Issues.Any();
         public override bool IsBraceLike => Syntax.IsBraceLike;
+
+        public override bool IsComment
+            => SourceSyntax.Issues.Any(item => item.IssueId == IssueId.EOFInComment);
+
+        public override bool IsLineComment
+            => SourceSyntax.Issues.Any(item => item.IssueId == IssueId.EOFInLineComment);
+
+        public override string State => SourceSyntax.Token.Id ?? "";
     }
 
     sealed class WhiteSpaceToken : TokenInformation
@@ -107,25 +114,6 @@ namespace Reni.UserInterface
         public override bool IsComment => ReniLexer.IsComment(_item);
         public override bool IsLineComment => ReniLexer.IsLineComment(_item);
         public override bool IsWhiteSpace => ReniLexer.IsWhiteSpace(_item);
-        public override InnerTokenStateAtLineEnd State
-            => InnerTokenStateAtLineEnd.Id(ReniLexer.Instance.WhiteSpaceId(_item));
-    }
-
-    public sealed class InnerTokenStateAtLineEnd : DumpableObject
-    {
-        static int _nextObjectId;
-        static readonly FunctionCache<string, InnerTokenStateAtLineEnd> _idCache =
-            new FunctionCache<string, InnerTokenStateAtLineEnd>
-                (id => new InnerTokenStateAtLineEnd(id));
-
-        [UsedImplicitly]
-        string _id;
-        public new int ObjectId => base.ObjectId;
-        InnerTokenStateAtLineEnd(string id = null)
-            : base(_nextObjectId++) { _id = id; }
-        protected override string GetNodeDump() => _id;
-        public static readonly InnerTokenStateAtLineEnd None = new InnerTokenStateAtLineEnd();
-
-        internal static InnerTokenStateAtLineEnd Id(string id) => id == null ? None : _idCache[id];
+        public override string State => ReniLexer.Instance.WhiteSpaceId(_item) ?? "";
     }
 }

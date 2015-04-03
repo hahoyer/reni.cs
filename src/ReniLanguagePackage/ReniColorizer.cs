@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using hw.Helper;
 using System.Linq;
@@ -14,7 +13,6 @@ namespace HoyerWare.ReniLanguagePackage
     sealed class ReniColorizer : DumpableObject
     {
         readonly ValueCache<Compiler> _compilerCache;
-        TokenInfo[] cachedLineInfo;
 
         public ReniColorizer(IVsTextLines buffer)
         {
@@ -24,14 +22,20 @@ namespace HoyerWare.ReniLanguagePackage
 
         VsTextLinesWrapper Buffer { get; }
 
-        internal static InnerTokenStateAtLineEnd StartState => InnerTokenStateAtLineEnd.None;
+        internal static string StartState => "";
 
 
         Compiler CreateCompilerForCache() => new Compiler
             (
             text: Buffer.All,
-            parameters: new CompilerParameters{ TraceOptions = { Parser = true}}
-            ) ;
+            parameters: new CompilerParameters
+            {
+                TraceOptions =
+                {
+                    Parser = false
+                }
+            }
+            );
 
         Compiler Compiler
         {
@@ -43,13 +47,14 @@ namespace HoyerWare.ReniLanguagePackage
             }
         }
 
-        public InnerTokenStateAtLineEnd StateAtEndOfLine(int line)
+        public string  StateAtEndOfLine(int line)
         {
-            var trace = line > -3;
+            var trace = line == -3;
             StartMethodDump(trace, line);
             try
             {
-                var token = Compiler.Token(Buffer.LineEnd(line));
+                var lineEnd = Buffer.LineEnd(line);
+                var token = Compiler.Token(lineEnd);
                 Tracer.Assert(token != null);
                 var result = token.State;
                 return ReturnMethodDump(result, false);
@@ -62,7 +67,7 @@ namespace HoyerWare.ReniLanguagePackage
 
         public void ColorizeLine(int line, uint[] attrs)
         {
-            TokensForLine(line)
+            TokensForLine(line, trace:false)
                 .SelectMany(item => SelectColors(item.GetCharArray(), item.Token))
                 .ToArray()
                 .CopyTo(attrs, 0);
@@ -74,7 +79,7 @@ namespace HoyerWare.ReniLanguagePackage
                 .Select(c => (uint) ConvertToTokenColor(token));
         }
 
-        IEnumerable<TokenInformation.Trimmed> TokensForLine(int lineIndex)
+        IEnumerable<TokenInformation.Trimmed> TokensForLine(int lineIndex, bool trace)
         {
             var start = Buffer.LinePosition(lineIndex);
             var end = Buffer.LineEnd(lineIndex);
@@ -83,11 +88,11 @@ namespace HoyerWare.ReniLanguagePackage
             while(index < end)
             {
                 var token = Compiler.Token(index).AssertNotNull().Trim(start, end);
-                Tracer.IndentStart();
-                Tracer.Line("\n" + i + ": " + ConvertToTokenColor(token.Token));
-                Tracer.Line(token.SourcePart.NodeDump.Quote());
-                Tracer.Line("-----------------");
-                Tracer.IndentEnd();
+                if(trace)Tracer.IndentStart();
+                if (trace) Tracer.Line("\n" + i + ": " + ConvertToTokenColor(token.Token));
+                if (trace) Tracer.Line(token.SourcePart.NodeDump.Quote());
+                if (trace) Tracer.Line("-----------------");
+                if (trace) Tracer.IndentEnd();
                 yield return token;
                 index += token.SourcePart.Length;
                 i++;
@@ -104,6 +109,14 @@ namespace HoyerWare.ReniLanguagePackage
 
         static TokenType ConvertToTokenType(TokenInformation token)
         {
+            if(token.IsComment)
+                return TokenType.Comment;
+            if(token.IsLineComment)
+                return TokenType.LineComment;
+            if(token.IsWhiteSpace)
+                return TokenType.WhiteSpace;
+            if(token.IsError)
+                return TokenType.Unknown;
             if(token.IsText)
                 return TokenType.String;
             if(token.IsNumber)
@@ -112,19 +125,15 @@ namespace HoyerWare.ReniLanguagePackage
                 return TokenType.Keyword;
             if(token.IsIdentifier)
                 return TokenType.Identifier;
-            if(token.IsComment)
-                return TokenType.Comment;
-            if (token.IsLineComment)
-                return TokenType.LineComment;
-            if (token.IsWhiteSpace)
-                return TokenType.WhiteSpace;
-            if(token.IsError)
-                return TokenType.Unknown;
             return TokenType.Text;
         }
 
         static TokenColor ConvertToTokenColor(TokenInformation token)
         {
+            if(token.IsComment || token.IsLineComment)
+                return TokenColor.Comment;
+            if(token.IsError)
+                return TokenColor.Text;
             if(token.IsText)
                 return TokenColor.String;
             if(token.IsNumber)
@@ -133,13 +142,8 @@ namespace HoyerWare.ReniLanguagePackage
                 return TokenColor.Keyword;
             if(token.IsIdentifier)
                 return TokenColor.Identifier;
-            if(token.IsComment || token.IsLineComment || token.IsWhiteSpace)
-                return TokenColor.Comment;
-            if (token.IsError)
-                return TokenColor.Text;
 
             return TokenColor.Text;
         }
-
     }
 }

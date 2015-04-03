@@ -61,18 +61,18 @@ namespace HoyerWare.ReniLanguagePackage
 
             public override int GetStartState(out int start)
             {
-                start = ReniColorizer.StartState.ObjectId;
+                start = ReniColorizer.StartState.GetHashCode();
                 return VSConstants.S_OK;
             }
 
             public override int GetStateAtEndOfLine(int line, int length, IntPtr ptr, int state)
-                => _data.StateAtEndOfLine(line).ObjectId;
+                => _data.StateAtEndOfLine(line).GetHashCode();
 
             public override int ColorizeLine
                 (int line, int length, IntPtr ptr, int state, uint[] attrs)
             {
                 _data.ColorizeLine(line, attrs);
-                return _data.StateAtEndOfLine(line).ObjectId;
+                return _data.StateAtEndOfLine(line).GetHashCode();
             }
 
             public override int GetColorInfo(string line, int length, int state)
@@ -83,7 +83,11 @@ namespace HoyerWare.ReniLanguagePackage
             }
 
             public override TokenInfo[] GetLineInfo
-                (IVsTextLines buffer, int line, IVsTextColorState colorState) => null;
+                (IVsTextLines buffer, int line, IVsTextColorState colorState)
+            {
+                Tracer.TraceBreak();
+                return null;
+            }
         }
 
         readonly ValueCache<LanguagePreferences> _preferencesCache;
