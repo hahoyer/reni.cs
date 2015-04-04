@@ -33,7 +33,7 @@ namespace Reni.Type
         [DisableDump]
         internal override IEnumerable<ISimpleFeature> StripConversions
         {
-            get { yield return Extension.SimpleFeature(ParentConversionResult); }
+            get { yield return Feature.Extension.SimpleFeature(ParentConversionResult); }
         }
     }
 }

@@ -53,30 +53,30 @@ namespace Reni.Type
 
         internal override IEnumerable<ISimpleFeature> CutEnabledConversion(NumberType destination)
         {
-            yield return Extension.SimpleFeature(category => CutEnabledBitCountConversion(category, destination), EnableCut);
+            yield return Feature.Extension.SimpleFeature(category => CutEnabledBitCountConversion(category, destination), EnableCut);
         }
 
         IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>.Feature
             (DumpPrintToken tokenClass)
-            => Extension.SimpleFeature(DumpPrintTokenResult, this);
+            => Feature.Extension.SimpleFeature(DumpPrintTokenResult, this);
 
         IFeatureImplementation ISymbolProviderForPointer<Operation, IFeatureImplementation>.Feature(Operation tokenClass)
-            => Extension.FunctionFeature(OperationResult, tokenClass);
+            => Feature.Extension.FunctionFeature(OperationResult, tokenClass);
 
         IFeatureImplementation ISymbolProviderForPointer<TokenClasses.EnableCut, IFeatureImplementation>.Feature
-            (TokenClasses.EnableCut tokenClass) => Extension.SimpleFeature(EnableCutTokenResult);
+            (TokenClasses.EnableCut tokenClass) => Feature.Extension.SimpleFeature(EnableCutTokenResult);
 
         IEnumerable<ISimpleFeature> IForcedConversionProvider<NumberType>.Result(NumberType destination)
         {
             if(Bits <= destination.Bits)
-                yield return Extension.SimpleFeature(category => destination.FlatConversion(category, this), this);
+                yield return Feature.Extension.SimpleFeature(category => destination.FlatConversion(category, this), this);
         }
 
         IFeatureImplementation ISymbolProviderForPointer<Negate, IFeatureImplementation>.Feature(Negate tokenClass)
-            => Extension.SimpleFeature(NegationResult);
+            => Feature.Extension.SimpleFeature(NegationResult);
 
         IFeatureImplementation ISymbolProviderForPointer<TextItem, IFeatureImplementation>.Feature(TextItem tokenClass)
-            => Extension.SimpleFeature(TextItemResult);
+            => Feature.Extension.SimpleFeature(TextItemResult);
 
         protected override Result ParentConversionResult(Category category) => Parent.Result(category, ArgResult);
 

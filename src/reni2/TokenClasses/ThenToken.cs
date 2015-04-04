@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Scanner;
 using Reni.ReniParser;
-using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class ThenToken : InfixToken
+    sealed class ThenToken : InfixToken, IBelongingsMatcher
     {
         public const string TokenId = "then";
         public override string Id => TokenId;
@@ -19,5 +18,8 @@ namespace Reni.TokenClasses
             var result = right.CreateThenSyntax(condition.Value);
             return new Checked<Syntax>(result.Value, condition.Issues.plus(result.Issues));
         }
+
+        bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
+            => otherMatcher is ElseToken;
     }
 }

@@ -21,8 +21,6 @@ namespace Reni.TokenClasses
         internal ExclamationSyntaxList(Exclamation.Syntax item, SourcePart token)
             : this(new[] {item}, token) {}
 
-        internal override bool IsKeyword => true;
-
         [DisableDump]
         protected override IEnumerable<Syntax> DirectChildren => Tags;
 
@@ -44,8 +42,6 @@ namespace Reni.TokenClasses
             _definable = definable;
             _exclamationSyntaxList = exclamationSyntaxList;
         }
-
-        internal override bool IsIdentifier => true;
 
         internal override Checked<Syntax> CreateDeclarationSyntax(SourcePart token, Syntax right)
             => DeclarationSyntax.Create

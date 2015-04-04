@@ -12,7 +12,8 @@ namespace Reni.TokenClasses
     abstract class TokenClass
         : ScannerTokenClass,
             IOperator<Syntax, Checked<Syntax>>,
-            IType<SourceSyntax>
+            IType<SourceSyntax>,
+            ITokenClass
     {
         SourceSyntax IType<SourceSyntax>.Create(SourceSyntax left, IToken token, SourceSyntax right)
             => Create(left, token, right);
@@ -30,7 +31,7 @@ namespace Reni.TokenClasses
             {
                 BreakExecution();
                 var syntax = this.Operation(left?.Syntax, token, right?.Syntax);
-                var result = new SourceSyntax(left, token, right, syntax.Value, syntax.Issues);
+                var result = new SourceSyntax(left, this, token, right, syntax.Value, syntax.Issues);
                 return ReturnMethodDump(result);
             }
             finally
@@ -56,6 +57,12 @@ namespace Reni.TokenClasses
         protected abstract Checked<Syntax> Prefix(SourcePart token, Syntax right);
         protected abstract Checked<Syntax> Suffix(Syntax left, SourcePart token);
         protected abstract Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right);
+
+        internal IEnumerable<SourceSyntax> Belongings(SourceSyntax root)
+        {
+            NotImplementedMethod(root);
+            return null;
+        }
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]

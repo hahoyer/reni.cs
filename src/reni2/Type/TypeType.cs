@@ -40,31 +40,31 @@ namespace Reni.Type
 
         IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature
             (DumpPrintToken tokenClass)
-            => Extension.SimpleFeature(DumpPrintTokenResult);
+            => Feature.Extension.SimpleFeature(DumpPrintTokenResult);
 
         IFeatureImplementation ISymbolProvider<Star, IFeatureImplementation>.Feature
             (Star tokenClass)
-            => Extension.MetaFeature(StarResult);
+            => Feature.Extension.MetaFeature(StarResult);
 
         IFeatureImplementation ISymbolProvider<Slash, IFeatureImplementation>.Feature
             (Slash tokenClass)
-            => Extension.MetaFeature(SlashResult);
+            => Feature.Extension.MetaFeature(SlashResult);
 
         IFeatureImplementation ISymbolProvider<Mutable, IFeatureImplementation>.Feature
             (Mutable tokenClass)
             => Value is ArrayType
-                ? Extension.SimpleFeature(MutableArrayResult)
+                ? Feature.Extension.SimpleFeature(MutableArrayResult)
                 : Value is ArrayReferenceType
-                    ? Extension.SimpleFeature(MutableReferenceResult)
+                    ? Feature.Extension.SimpleFeature(MutableReferenceResult)
                     : null;
 
         IFeatureImplementation ISymbolProvider<ArrayReference, IFeatureImplementation>.Feature
             (ArrayReference tokenClass)
-            => Value is ArrayType ? Extension.SimpleFeature(ArrayReferenceResult) : null;
+            => Value is ArrayType ? Feature.Extension.SimpleFeature(ArrayReferenceResult) : null;
 
         IFeatureImplementation ISymbolProvider<Item, IFeatureImplementation>.Feature
             (Item tokenClass)
-            => Value is ArrayType ? Extension.SimpleFeature(ArrayAccessResult) : null;
+            => Value is ArrayType ? Feature.Extension.SimpleFeature(ArrayAccessResult) : null;
 
 
         protected override string GetNodeDump() => "(" + Value.NodeDump + ") type";

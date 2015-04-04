@@ -129,7 +129,7 @@ namespace Reni.ReniParser
     }
 
 
-    sealed class ScannerSyntaxError : ScannerTokenClass, IType<SourceSyntax>
+    sealed class ScannerSyntaxError : ScannerTokenClass, IType<SourceSyntax>, ITokenClass
     {
         readonly IssueId _issue;
 
@@ -149,6 +149,7 @@ namespace Reni.ReniParser
             return new SourceSyntax
                 (
                 left,
+                this,
                 token,
                 right,
                 ListSyntax.Create(left?.Syntax,right?.Syntax), 

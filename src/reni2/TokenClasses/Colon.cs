@@ -84,17 +84,12 @@ namespace Reni.TokenClasses
         internal virtual bool DeclaresMutable => false;
         [DisableDump]
         internal virtual bool DeclaresConverter => false;
-        [DisableDump]
-        internal virtual bool IsError => false;
 
         internal sealed class Syntax : ReniParser.Syntax
         {
             internal readonly DeclarationTagToken Tag;
 
             internal Syntax(DeclarationTagToken tag) { Tag = tag; }
-
-            [DisableDump]
-            internal override bool IsKeyword => true;
 
             [DisableDump]
             internal override Checked<CompileSyntax> ToCompiledSyntax

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.Parser;
 using hw.Scanner;
 using Reni.ReniParser;
 using Reni.ReniSyntax;
@@ -12,7 +11,7 @@ namespace Reni.TokenClasses
     [Variant(0)]
     [Variant(1)]
     [Variant(2)]
-    sealed class List : TokenClass
+    sealed class List : TokenClass, IBelongingsMatcher
     {
         public static string TokenId(int level) => ",;.".Substring(level, 1);
         readonly int _level;
@@ -38,5 +37,8 @@ namespace Reni.TokenClasses
 
         ListSyntax ListSyntax(Syntax left, Syntax right)
             => new ListSyntax(this, left.ToList(this).Concat(right.ToList(this)).ToArray());
+
+        bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
+            => (otherMatcher as List)?._level == _level;
     }
 }

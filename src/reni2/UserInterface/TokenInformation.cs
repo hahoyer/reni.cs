@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
+using hw.Parser;
 using hw.Scanner;
 using Reni.Parser;
-using Reni.ReniParser;
 using Reni.TokenClasses;
 using Reni.Validation;
 
@@ -13,7 +13,7 @@ namespace Reni.UserInterface
     public abstract class TokenInformation : DumpableObject
     {
         [DisableDump]
-        protected abstract SourcePart SourcePart { get; }
+        public abstract SourcePart SourcePart { get; }
         [DisableDump]
         public virtual bool IsKeyword => false;
         [DisableDump]
@@ -59,6 +59,9 @@ namespace Reni.UserInterface
             }
         }
 
+        public int StartPosition => SourcePart.Position;
+        public int EndPosition => SourcePart.EndPosition;
+
         public Trimmed Trim(int start, int end) => new Trimmed(this, start, end);
 
         public sealed class Trimmed
@@ -79,22 +82,28 @@ namespace Reni.UserInterface
                     .Id
                     .ToCharArray();
         }
+
+        public abstract IEnumerable<SourcePart> FindAllBelongings(Compiler compiler);
     }
 
     sealed class SyntaxToken : TokenInformation
     {
-        internal SyntaxToken(SourceSyntax sourceSyntax) { SourceSyntax = sourceSyntax; }
+        TokenClass TokenClass => SourceSyntax.TokenClass as TokenClass;
+
+        internal SyntaxToken(SourceSyntax sourceSyntax)
+        {
+            SourceSyntax = sourceSyntax;
+        }
 
         SourceSyntax SourceSyntax { get; }
-        Syntax Syntax => SourceSyntax.Syntax;
 
-        protected override SourcePart SourcePart => SourceSyntax.Token.Characters;
-        public override bool IsKeyword => Syntax.IsKeyword;
-        public override bool IsIdentifier => Syntax.IsIdentifier;
-        public override bool IsText => Syntax.IsText;
-        public override bool IsNumber => Syntax.IsNumber;
+        public override SourcePart SourcePart => SourceSyntax.Token.Characters;
+        public override bool IsKeyword => !IsIdentifier && !IsNumber && !IsText;
+        public override bool IsIdentifier => TokenClass is Definable;
+        public override bool IsText => TokenClass is Text;
+        public override bool IsNumber => TokenClass is Number;
         public override bool IsError => SourceSyntax.Issues.Any();
-        public override bool IsBraceLike => Syntax.IsBraceLike;
+        public override bool IsBraceLike => TokenClass is IBelongingsMatcher;
 
         public override bool IsComment
             => SourceSyntax.Issues.Any(item => item.IssueId == IssueId.EOFInComment);
@@ -103,6 +112,9 @@ namespace Reni.UserInterface
             => SourceSyntax.Issues.Any(item => item.IssueId == IssueId.EOFInLineComment);
 
         public override string State => SourceSyntax.Token.Id ?? "";
+
+        public override IEnumerable<SourcePart> FindAllBelongings(Compiler compiler)
+            => compiler.FindAllBelongings(SourceSyntax)?.Select(item => item.Token.Characters);
     }
 
     sealed class WhiteSpaceToken : TokenInformation
@@ -110,10 +122,12 @@ namespace Reni.UserInterface
         readonly hw.Parser.WhiteSpaceToken _item;
         public WhiteSpaceToken(hw.Parser.WhiteSpaceToken item) { _item = item; }
 
-        protected override SourcePart SourcePart => _item.Characters;
+        public override SourcePart SourcePart => _item.Characters;
         public override bool IsComment => ReniLexer.IsComment(_item);
         public override bool IsLineComment => ReniLexer.IsLineComment(_item);
         public override bool IsWhiteSpace => ReniLexer.IsWhiteSpace(_item);
         public override string State => ReniLexer.Instance.WhiteSpaceId(_item) ?? "";
+
+        public override IEnumerable<SourcePart> FindAllBelongings(Compiler compiler) { yield break; }
     }
 }

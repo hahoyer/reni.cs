@@ -34,7 +34,7 @@ namespace Reni.Type
         internal override bool IsPointerPossible => false;
 
         IFeatureImplementation ISymbolProvider<ReassignToken, IFeatureImplementation>.Feature(ReassignToken tokenClass)
-            => IsMutable ? Extension.FunctionFeature(ReassignResult) : null;
+            => IsMutable ? Feature.Extension.FunctionFeature(ReassignResult) : null;
 
         [EnableDumpExcept(false)]
         protected abstract bool IsMutable { get; }
@@ -95,7 +95,7 @@ namespace Reni.Type
         [DisableDump]
         internal override IEnumerable<ISimpleFeature> StripConversions
         {
-            get { yield return Extension.SimpleFeature(GetterResult); }
+            get { yield return Feature.Extension.SimpleFeature(GetterResult); }
         }
     }
 }

@@ -40,7 +40,7 @@ namespace Reni.Struct
                     yield return converter;
 
                 if(Hllw)
-                    yield return Extension.SimpleFeature(VoidConversion);
+                    yield return Feature.Extension.SimpleFeature(VoidConversion);
             }
         }
 
@@ -48,13 +48,13 @@ namespace Reni.Struct
 
         IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>.Feature
             (DumpPrintToken tokenClass)
-            => Extension.SimpleFeature(DumpPrintTokenResult);
+            => Feature.Extension.SimpleFeature(DumpPrintTokenResult);
 
         IFeatureImplementation ISymbolProviderForPointer<Definable, IFeatureImplementation>.Feature(Definable tokenClass)
             => View.Find(tokenClass);
 
         IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
-            => Extension.SimpleFeature(DumpPrintTokenResult);
+            => Feature.Extension.SimpleFeature(DumpPrintTokenResult);
 
         IFeatureImplementation ISymbolProvider<Definable, IFeatureImplementation>.Feature(Definable tokenClass)
             => View.Find(tokenClass);

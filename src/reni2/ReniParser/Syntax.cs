@@ -92,16 +92,6 @@ namespace Reni.ReniParser
         internal virtual bool IsMutableSyntax => false;
         [DisableDump]
         internal virtual bool IsConverterSyntax => false;
-        [DisableDump]
-        internal virtual bool IsIdentifier => false;
-        [DisableDump]
-        internal virtual bool IsText => false;
-        [DisableDump]
-        internal virtual bool IsKeyword => false;
-        [DisableDump]
-        internal virtual bool IsNumber => false;
-        [DisableDump]
-        internal virtual bool IsBraceLike => false;
 
         internal virtual Checked<Syntax> SuffixedBy(Definable definable, SourcePart token)
         {

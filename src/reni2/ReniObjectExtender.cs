@@ -1,31 +1,13 @@
-// 
-//     Project Reni2
-//     Copyright (C) 2012 - 2012 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-using System.Diagnostics;
 using System.Linq;
 using System.Collections.Generic;
 using System;
+using System.Diagnostics;
 using hw.Debug;
+using Reni.TokenClasses;
 
 namespace Reni
 {
-    static class ReniObjectExtension
+    static class Extension
     {
         [DebuggerHidden]
         public static void StopByObjectId(this object t, int objectId)
@@ -37,12 +19,13 @@ namespace Reni
         }
 
         // will throw an exception if not a ReniObject
-        internal static int GetObjectId(this object reniObject) => ((DumpableObject) reniObject).ObjectId;
+        internal static int GetObjectId(this object reniObject)
+            => ((DumpableObject) reniObject).ObjectId;
         // will throw an exception if not a ReniObject
         internal static int? GetObjectId<T>(this object reniObject)
         {
             if(reniObject is T)
-                return ((DumpableObject)reniObject).ObjectId;
+                return ((DumpableObject) reniObject).ObjectId;
             return null;
         }
         internal static string NodeDump(this object o)
@@ -51,6 +34,23 @@ namespace Reni
             if(r != null)
                 return r.NodeDump;
             return o.ToString();
+        }
+
+        internal static bool IsBelongingTo(this IBelongingsMatcher current, ITokenClass other)
+        {
+            var otherMatcher = other as IBelongingsMatcher;
+            return otherMatcher != null && current.IsBelongingTo(otherMatcher);
+        }
+
+        internal static bool IsBelongingTo(this ITokenClass current, ITokenClass other)
+            => (current as IBelongingsMatcher)?.IsBelongingTo(other) ?? false;
+
+        internal static IEnumerable<SourceSyntax> CheckedItemsAsLongAs
+            (this SourceSyntax target, Func<SourceSyntax, bool> condition)
+        {
+            if(target != null && condition(target))
+                foreach(var result in target.ItemsAsLongAs(condition))
+                    yield return result;
         }
     }
 }

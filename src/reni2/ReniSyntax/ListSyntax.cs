@@ -11,7 +11,8 @@ namespace Reni.ReniSyntax
 {
     sealed class ListSyntax : Syntax
     {
-        public static Syntax Create(params Syntax[] values) => new ListSyntax(null, values.Where(item=>item != null));
+        public static Syntax Create(params Syntax[] values)
+            => new ListSyntax(null, values.Where(item => item != null));
 
         public ListSyntax(List type, IEnumerable<Syntax> data)
         {
@@ -39,15 +40,12 @@ namespace Reni.ReniSyntax
         internal override Checked<CompoundSyntax> ToContainer
             => new CompoundSyntax(Data);
 
-        internal override bool IsKeyword => true;
-
         internal override IEnumerable<Syntax> ToList(List type)
         {
-            Tracer.Assert
-                (
-                    Type == null || type == null || Type == type,
-                    () => Type.Id.Quote() + " != " + type?.Id.Quote());
-            return Data;
+            if(Type == null || type == null || Type == type)
+                return Data;
+
+            return new[] {ToContainer.SaveValue};
         }
 
         [DisableDump]

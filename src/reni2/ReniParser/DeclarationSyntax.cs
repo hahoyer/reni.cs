@@ -39,8 +39,6 @@ namespace Reni.ReniParser
 
         string Name => Target?.Id;
 
-        internal override bool IsKeyword => true;
-
         [DisableDump]
         internal override bool IsMutableSyntax
             => Tags.Any(item => item.DeclaresMutable);

@@ -41,7 +41,6 @@ namespace Reni.ReniParser
 
         sealed class Unexpected : DeclarationTagToken
         {
-            internal override bool IsError => true;
             public override string Id => "<unexpected>";
         }
 

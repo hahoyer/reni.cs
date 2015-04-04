@@ -123,10 +123,14 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ReniColorizer.cs" />
+    <Compile Include="AuthoringScopeWrapper.cs" />
+    <Compile Include="ColorizerWrapper.cs" />
+    <Compile Include="Extension.cs" />
     <Compile Include="Guids.cs" />
-    <Compile Include="ReniAuthoringScope.cs" />
+    <Compile Include="AuthoringScope.cs" />
+    <Compile Include="ParseRequestWrapper.cs" />
     <Compile Include="ReniService.cs" />
+    <Compile Include="Source.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -135,7 +139,8 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReniLanguagePackage.cs" />
-    <Compile Include="VsTextLinesWrapper.cs" />
+    <Compile Include="ScannerWrapper.cs" />
+    <Compile Include="SourceWrapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">

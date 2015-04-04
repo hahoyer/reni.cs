@@ -17,8 +17,6 @@ namespace Reni.ReniSyntax
     {
         protected SpecialSyntax(IToken token) { }
         protected SpecialSyntax() { }
-
-        internal override bool IsKeyword => !IsNumber && !IsText;
     }
 
     sealed class TerminalSyntax : SpecialSyntax
@@ -39,9 +37,6 @@ namespace Reni.ReniSyntax
 
         internal override CompileSyntax Visit(ISyntaxVisitor visitor) => Terminal.Visit(visitor);
 
-        internal override bool IsNumber => Terminal is Number;
-
-        internal override bool IsText => Terminal is Text;
         [DisableDump]
         internal long ToNumber => BitsConst.Convert(Id).ToInt64();
     }

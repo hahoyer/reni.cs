@@ -47,30 +47,49 @@ namespace Reni
         /// <param name="parameters"> </param>
         /// <param name="className"> </param>
         /// <param name="text"></param>
+        /// <param name="source"></param>
         public Compiler
             (
             string fileName = null,
             CompilerParameters parameters = null,
             string className = null,
-            string text = null)
+            string text = null,
+            Source source = null)
         {
-            Tracer.Assert((fileName == null) != (text == null));
+            Tracer.Assert
+                (
+                    (fileName == null ? 0 : 1) +
+                        (text == null ? 0 : 1) +
+                        (source == null ? 0 : 1)
+                        == 1
+                );
 
             _className = className ?? fileName?.Symbolize() ?? "ReniMainClass";
             _rootContext = new Root(this);
             _parameters = parameters ?? new CompilerParameters();
+
             _tokenFactory = new MainTokenFactory(Scanner)
             {
                 Trace = _parameters.TraceOptions.Parser
             };
 
             _source = new ValueCache<Source>
-                (() => fileName == null ? new Source(text) : new Source(fileName.FileHandle()));
+                (
+                () => source
+                    ?? (fileName == null
+                        ? new Source(text)
+                        : new Source(fileName.FileHandle()))
+                );
+
             _tokenCache = new FunctionCache<int, TokenInformation>(GetTokenForCache);
+
             _sourceSyntax = new ValueCache<SourceSyntax>(() => Parse(Source + 0));
+
             _syntax = new ValueCache<Syntax>(() => SourceSyntax.Syntax);
+
             _codeContainer = new ValueCache<CodeContainer>
                 (() => new CodeContainer(_rootContext, Syntax, Source.Data));
+
             _cSharpCode = new ValueCache<string>
                 (() => _codeContainer.Value.CreateCSharpString(_className));
         }
@@ -184,7 +203,7 @@ namespace Reni
         [DisableDump]
         internal IEnumerable<Issue> Issues
             => SourceSyntax.Issues
-            .plus(_parameters.ParseOnly ? new Issue[0] : CodeContainer.Issues)
+                .plus(_parameters.ParseOnly ? new Issue[0] : CodeContainer.Issues)
             ;
 
         SourceSyntax Parse(SourcePosn source) => _tokenFactory.Parser.Execute(source);
@@ -257,6 +276,9 @@ namespace Reni
             NotImplementedMethod(offset);
             return null;
         }
+
+        internal IEnumerable<SourceSyntax> FindAllBelongings(SourceSyntax current)
+            => SourceSyntax.Belongings(current);
     }
 
     public interface IOutStream

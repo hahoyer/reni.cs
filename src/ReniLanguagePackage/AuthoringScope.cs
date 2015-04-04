@@ -8,10 +8,14 @@ using Microsoft.VisualStudio.TextManager.Interop;
 
 namespace HoyerWare.ReniLanguagePackage
 {
-    sealed class ReniAuthoringScope : DumpableObject
+    sealed class AuthoringScope : DumpableObject
     {
-        ParseRequest Request { get; set; }
-        internal ReniAuthoringScope(ParseRequest request) { Request = request; }
+        ParseRequestWrapper Request { get; }
+
+        internal AuthoringScope(ParseRequestWrapper request)
+        {
+            Request = request;
+        }
 
         public string GetDataTipText(int line, int col, out TextSpan span)
         {

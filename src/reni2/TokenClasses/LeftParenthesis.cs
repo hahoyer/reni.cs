@@ -14,29 +14,25 @@ namespace Reni.TokenClasses
     [Variant(1)]
     [Variant(2)]
     [Variant(3)]
-    sealed class LeftParenthesis : TokenClass
+    sealed class LeftParenthesis : TokenClass, IBelongingsMatcher
     {
         public static string TokenId(int level) => "\0([{".Substring(level, 1);
 
         public LeftParenthesis(int level) { Level = level; }
-
-        int Level { get; }
+        [DisableDump]
+        internal int Level { get; }
 
         public override string Id => TokenId(Level);
 
         protected override Checked<ReniParser.Syntax> Suffix
             (ReniParser.Syntax left, SourcePart token)
-        {
-            NotImplementedMethod(left, token);
-            return null;
-        }
+            => new Syntax(Level, token, null)
+                .Issues(IssueId.UnexpectedUseAsSuffix.CreateIssue(token));
 
         protected override Checked<ReniParser.Syntax> Infix
             (ReniParser.Syntax left, SourcePart token, ReniParser.Syntax right)
-        {
-            NotImplementedMethod(left, token, right);
-            return null;
-        }
+            => new Syntax(Level, token, right)
+                .Issues(IssueId.UnexpectedUseAsInfix.CreateIssue(token));
 
         protected override Checked<ReniParser.Syntax> Prefix
             (SourcePart token, ReniParser.Syntax right)
@@ -71,7 +67,7 @@ namespace Reni.TokenClasses
             {
                 get
                 {
-                    var right = (Right??new EmptyList()).ToCompiledSyntax;
+                    var right = (Right ?? new EmptyList()).ToCompiledSyntax;
                     return new Checked<CompileSyntax>
                         (
                         right.Value,
@@ -80,14 +76,14 @@ namespace Reni.TokenClasses
                 }
             }
 
-            internal override bool IsBraceLike => true;
-            internal override bool IsKeyword => true;
-
             internal override Checked<ReniParser.Syntax> Match(int level, SourcePart token)
             {
                 Tracer.Assert(_level == level);
                 return (Right ?? new EmptyList());
             }
         }
+
+        bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
+            => (otherMatcher as RightParenthesis)?.Level == Level;
     }
 }

@@ -39,7 +39,7 @@ namespace Reni.Type
 
         IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>.Feature
             (DumpPrintToken tokenClass)
-            => Extension.SimpleFeature(DumpPrintTokenResult, this);
+            => Feature.Extension.SimpleFeature(DumpPrintTokenResult, this);
 
         protected override CodeBase DumpPrintCode()
             => Align.ArgCode.DumpPrintNumber();

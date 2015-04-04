@@ -21,8 +21,6 @@ namespace Reni.TokenClasses
         internal Definable Definable { get; }
         SourcePart Token { get; }
 
-        internal override bool IsIdentifier => true;
-
         internal override Checked<Syntax> CreateDeclarationSyntax
             (SourcePart token, Syntax right)
         {

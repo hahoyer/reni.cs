@@ -7,7 +7,7 @@ using Reni.TokenClasses;
 
 namespace Reni.ReniParser
 {
-    sealed class ExclamationBoxToken : DumpableObject, IType<SourceSyntax>
+    sealed class ExclamationBoxToken : DumpableObject, IType<SourceSyntax>, ITokenClass
     {
         SourceSyntax Value { get; }
 
@@ -19,20 +19,14 @@ namespace Reni.ReniParser
 
             var result = Value.Syntax.ExclamationSyntax(token.Characters);
 
-            if (left != null)
+            if(left != null)
             {
                 var leftResult = left.Syntax.Combine(result.Value);
                 result = new Checked<ExclamationSyntaxList>
                     (leftResult.Value, leftResult.Issues.plus(result.Issues));
             }
 
-            return new SourceSyntax
-                (
-                left,
-                token,
-                Value,
-                result.Value,
-                result.Issues);
+            return new SourceSyntax(left, this, token, Value, result.Value, result.Issues);
         }
 
         string IType<SourceSyntax>.PrioTableId => PrioTable.Any;

@@ -101,7 +101,13 @@
     <Compile Include="FeatureTest\TypeType\ApplyTypeOperatorWithCut.cs" />
     <Compile Include="FeatureTest\TypeType\TypeOperator.cs" />
     <Compile Include="FeatureTest\TypeType\TypeOperatorWithVariable.cs" />
-    <Compile Include="FeatureTest\UserInterAction.cs" />
+    <Compile Include="FeatureTest\UserInterface\BadUserInterAction.cs" />
+    <Compile Include="FeatureTest\UserInterface\BraceMatching.cs" />
+    <Compile Include="FeatureTest\UserInterface\ListMatching.cs" />
+    <Compile Include="FeatureTest\UserInterface\ThenElseMatching.cs" />
+    <Compile Include="FeatureTest\UserInterface\UserInterAction.cs" />
+    <Compile Include="FeatureTest\UserInterface\UserInterAction2.cs" />
+    <Compile Include="FeatureTest\UserInterface\UserInterAction3.cs" />
     <Compile Include="FeatureTest\UserObjects.cs" />
     <Compile Include="FeatureTest\Validation\SyntaxError.cs" />
     <Compile Include="FeatureTest\Validation\UndefinedContextSymbol.cs" />
@@ -312,6 +318,7 @@
     <Compile Include="ReniSyntax\Special.cs" />
     <Compile Include="ReniSyntax\EmptyList.cs" />
     <Compile Include="TokenClasses\ArgToken.cs" />
+    <Compile Include="TokenClasses\BraceMatchDumper.cs" />
     <Compile Include="TokenClasses\CompareOperation.cs" />
     <Compile Include="TokenClasses\EndToken.cs" />
     <Compile Include="TokenClasses\ExclamationSyntaxList.cs" />

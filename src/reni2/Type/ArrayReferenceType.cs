@@ -118,24 +118,24 @@ namespace Reni.Type
 
         IFeatureImplementation ISymbolProvider<Mutable, IFeatureImplementation>.Feature
             (Mutable tokenClass)
-            => Extension.SimpleFeature(MutableResult);
+            => Feature.Extension.SimpleFeature(MutableResult);
 
         IFeatureImplementation ISymbolProvider<EnableReinterpretation, IFeatureImplementation>.
             Feature
             (EnableReinterpretation tokenClass)
-            => Extension.SimpleFeature(EnableReinterpretationResult);
+            => Feature.Extension.SimpleFeature(EnableReinterpretationResult);
 
         IFeatureImplementation ISymbolProvider<Item, IFeatureImplementation>.Feature
             (Item tokenClass)
-            => Extension.FunctionFeature(AccessResult);
+            => Feature.Extension.FunctionFeature(AccessResult);
 
         IFeatureImplementation ISymbolProvider<Minus, IFeatureImplementation>.Feature
             (Minus tokenClass)
-            => Extension.FunctionFeature(MinusResult);
+            => Feature.Extension.FunctionFeature(MinusResult);
 
         IFeatureImplementation ISymbolProvider<Plus, IFeatureImplementation>.Feature
             (Plus tokenClass)
-            => Extension.FunctionFeature(PlusResult);
+            => Feature.Extension.FunctionFeature(PlusResult);
 
 
         Result MutableResult(Category category)
@@ -150,7 +150,7 @@ namespace Reni.Type
         ISimpleFeature ForcedConversion(ArrayReferenceType destination)
             =>
                 HasForcedConversion(destination)
-                    ? Extension.SimpleFeature
+                    ? Feature.Extension.SimpleFeature
                         (category => destination.ConversionResult(category, this), this)
                     : null;
 
