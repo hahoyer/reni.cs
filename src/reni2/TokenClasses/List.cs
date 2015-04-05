@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using hw.Debug;
+using hw.Parser;
 using hw.Scanner;
 using Reni.ReniParser;
-using Reni.ReniSyntax;
 
 namespace Reni.TokenClasses
 {
@@ -35,10 +36,34 @@ namespace Reni.TokenClasses
         protected override Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
             => ListSyntax(left, right);
 
+        internal override string Reformat
+            (SourceSyntax target, IFormattingConfiguration configuration)
+            => configuration.List(Id, CollectTokens(target), CollectItems(target, configuration));
+
+        IEnumerable<string> CollectItems
+            (SourceSyntax target, IFormattingConfiguration configuration)
+        {
+            do
+            {
+                yield return target.Left?.Reformat(configuration);
+                target = target.Right;
+            } while(target != null && target.TokenClass == this);
+            yield return target?.Reformat(configuration);
+        }
+
+        IEnumerable<WhiteSpaceToken[]> CollectTokens(SourceSyntax target)
+        {
+            do
+            {
+                yield return target.Token.PrecededWith;
+                target = target.Right;
+            } while (target != null && target.TokenClass == this);
+        }
+
         ListSyntax ListSyntax(Syntax left, Syntax right)
             => new ListSyntax(this, left.ToList(this).Concat(right.ToList(this)).ToArray());
 
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
-            => (otherMatcher as List)?._level == _level;
+            => otherMatcher == this;
     }
 }

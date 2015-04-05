@@ -31,6 +31,19 @@ namespace Reni.TokenClasses
             return null;
         }
 
+        internal override string Reformat
+            (SourceSyntax target, IFormattingConfiguration configuration)
+        {
+            Tracer.Assert(target.Right == null);
+            Tracer.Assert(target.Left != null);
+            var subTarget = target.Left;
+            Tracer.Assert(((LeftParenthesis) subTarget.TokenClass).Level == Level);
+            Tracer.Assert(subTarget.Right != null);
+            Tracer.Assert(subTarget.Left == null);
+            var content = subTarget.Right.Reformat(configuration);
+            return configuration.Parenthesis(subTarget.Token, content, target.Token);
+        }
+
         protected override Checked<Syntax> Prefix(SourcePart token, Syntax right)
         {
             NotImplementedMethod(token, right);

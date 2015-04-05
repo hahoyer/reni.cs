@@ -11,7 +11,6 @@ using Reni.Code;
 using Reni.Context;
 using Reni.Parser;
 using Reni.ReniParser;
-using Reni.ReniSyntax;
 using Reni.Runtime;
 using Reni.Struct;
 using Reni.TokenClasses;
@@ -265,20 +264,37 @@ namespace Reni
 
         public TokenInformation Token(int offset) => _tokenCache[offset];
 
-        TokenInformation GetTokenForCache(int offset)
+        TokenInformation GetTokenForCache(int offset) => Token(Source + offset);
+
+        internal IEnumerable<SourceSyntax> FindAllBelongings(SourceSyntax current)
+            => SourceSyntax.Belongings(current);
+
+        public TokenInformation Token(SourcePosn posn)
         {
-            var sourcePosn = Source + offset;
-            var result = SourceSyntax.LocateToken(sourcePosn);
+            var result = SourceSyntax.LocateToken(posn);
             if(result != null)
                 return result;
 
             Tracer.TraceBreak();
-            NotImplementedMethod(offset);
+            NotImplementedMethod(posn);
             return null;
         }
 
-        internal IEnumerable<SourceSyntax> FindAllBelongings(SourceSyntax current)
-            => SourceSyntax.Belongings(current);
+        public TokenInformation Token(SourcePart part)
+        {
+            var left = SourceSyntax.LocateToken(part.Start);
+            var right = SourceSyntax.LocateToken(part.End + -1);
+            if(left.Equals(right))
+                return left;
+
+            var result = SourceSyntax.LocateToken(part);
+            if(result != null)
+                return new SyntaxToken(result);
+
+            Tracer.TraceBreak();
+            NotImplementedMethod(part);
+            return null;
+        }
     }
 
     public interface IOutStream

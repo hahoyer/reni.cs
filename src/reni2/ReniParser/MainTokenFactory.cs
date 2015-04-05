@@ -5,7 +5,6 @@ using hw.Parser;
 using hw.Scanner;
 using Reni.Numeric;
 using Reni.Parser;
-using Reni.ReniSyntax;
 using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Validation;
@@ -157,5 +156,11 @@ namespace Reni.ReniParser
         }
 
         IType<SourceSyntax> IType<SourceSyntax>.NextTypeIfMatched => null;
+
+        string ITokenClass.Reformat(SourceSyntax target, IFormattingConfiguration configuration)
+        {
+            NotImplementedMethod(target, configuration);
+            return null;
+        }
     }
 }

@@ -5,7 +5,7 @@ using hw.Debug;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
-using Reni.ReniSyntax;
+using Reni.ReniParser;
 using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Type;

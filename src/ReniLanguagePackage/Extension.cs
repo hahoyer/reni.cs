@@ -140,7 +140,7 @@ namespace HoyerWare.ReniLanguagePackage
                 EndIndex = token.EndPosition
             };
 
-        internal static TextSpan Span(this SourcePart current)
+        internal static TextSpan ToTextSpan(this SourcePart current)
             => new TextSpan
             {
                 iStartLine = current.Start.LineIndex,
@@ -151,5 +151,9 @@ namespace HoyerWare.ReniLanguagePackage
 
         internal static Source CreateReniSource(this IVsTextLines buffer)
             => new Source(buffer.GetAll());
+
+        internal static SourcePart ToSourcePart(this hw.Scanner.Source data, TextSpan span)
+            => data.FromLineAndColumn(span.iStartLine, span.iStartIndex)
+                .Span(data.FromLineAndColumn(span.iEndLine, span.iEndIndex));
     }
 }

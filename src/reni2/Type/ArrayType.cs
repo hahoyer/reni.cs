@@ -8,7 +8,7 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
-using Reni.ReniSyntax;
+using Reni.ReniParser;
 using Reni.TokenClasses;
 
 namespace Reni.Type

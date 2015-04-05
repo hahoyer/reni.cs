@@ -5,7 +5,6 @@ using hw.Debug;
 using hw.Parser;
 using hw.Scanner;
 using Reni.ReniParser;
-using Reni.ReniSyntax;
 using Reni.Validation;
 
 namespace Reni.TokenClasses

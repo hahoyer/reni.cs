@@ -7,7 +7,6 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
 using Reni.ReniParser;
-using Reni.ReniSyntax;
 using Reni.Struct;
 
 namespace Reni.TokenClasses

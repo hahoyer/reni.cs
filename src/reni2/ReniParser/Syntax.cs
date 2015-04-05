@@ -5,7 +5,6 @@ using System.Linq;
 using hw.Debug;
 using hw.Parser;
 using hw.Scanner;
-using Reni.ReniSyntax;
 using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Validation;

@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using hw.Parser;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
-using Reni.ReniSyntax;
+using Reni.ReniParser;
 
 namespace Reni.TokenClasses
 {

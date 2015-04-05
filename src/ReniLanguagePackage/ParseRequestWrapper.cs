@@ -20,7 +20,6 @@ namespace HoyerWare.ReniLanguagePackage
             _parent = parent;
             _source = new Source(_parent.Text ?? "");
             _currenCache = new ValueCache<TokenInformation>(GetCurrentForCache);
-            BraceScanning();
         }
 
         TokenInformation GetCurrentForCache()
@@ -29,12 +28,17 @@ namespace HoyerWare.ReniLanguagePackage
 
         TokenInformation Current => _currenCache.Value;
 
-        internal void BraceScanning()
+        internal void Scanning()
+        {
+            ScanBraces();
+        }
+
+        void ScanBraces()
         {
             if(!_parent.Sink.BraceMatching)
                 return;
 
-            var result = Braces.Select(part => part.Span()).ToArray();
+            var result = Braces.Select(part => part.ToTextSpan()).ToArray();
             if(result.Length > 1)
                 _parent.Sink.MatchMultiple(result, 0);
         }

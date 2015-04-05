@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
-using hw.Parser;
 using hw.Scanner;
 using Reni.Parser;
 using Reni.TokenClasses;
@@ -64,6 +63,21 @@ namespace Reni.UserInterface
 
         public Trimmed Trim(int start, int end) => new Trimmed(this, start, end);
 
+        bool Equals(TokenInformation other) => SourcePart == other.SourcePart;
+
+        public override bool Equals(object obj)
+        {
+            if(ReferenceEquals(null, obj))
+                return false;
+            if(ReferenceEquals(this, obj))
+                return true;
+            if(obj.GetType() != GetType())
+                return false;
+            return Equals((TokenInformation) obj);
+        }
+
+        public override int GetHashCode() => SourcePart.GetHashCode();
+
         public sealed class Trimmed
         {
             public readonly TokenInformation Token;
@@ -88,14 +102,11 @@ namespace Reni.UserInterface
 
     sealed class SyntaxToken : TokenInformation
     {
+        internal SyntaxToken(SourceSyntax sourceSyntax) { SourceSyntax = sourceSyntax; }
+
+        internal SourceSyntax SourceSyntax { get; }
+
         TokenClass TokenClass => SourceSyntax.TokenClass as TokenClass;
-
-        internal SyntaxToken(SourceSyntax sourceSyntax)
-        {
-            SourceSyntax = sourceSyntax;
-        }
-
-        SourceSyntax SourceSyntax { get; }
 
         public override SourcePart SourcePart => SourceSyntax.Token.Characters;
         public override bool IsKeyword => !IsIdentifier && !IsNumber && !IsText;
@@ -128,6 +139,9 @@ namespace Reni.UserInterface
         public override bool IsWhiteSpace => ReniLexer.IsWhiteSpace(_item);
         public override string State => ReniLexer.Instance.WhiteSpaceId(_item) ?? "";
 
-        public override IEnumerable<SourcePart> FindAllBelongings(Compiler compiler) { yield break; }
+        public override IEnumerable<SourcePart> FindAllBelongings(Compiler compiler)
+        {
+            yield break;
+        }
     }
 }

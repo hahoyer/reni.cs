@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Forms;
 using hw.Helper;
 using JetBrains.Annotations;
 using Microsoft.VisualStudio.Package;
@@ -26,7 +27,9 @@ namespace HoyerWare.ReniLanguagePackage
                 EnableMatchBracesAtCaret = true,
                 EnableShowMatchingBrace = true,
                 EnableCommenting = true,
-                EnableCodeSense = true
+                EnableCodeSense = true,
+                AutoOutlining = true,
+                EnableFormatSelection = true
             };
 
         public override string Name => "Reni";
@@ -37,11 +40,16 @@ namespace HoyerWare.ReniLanguagePackage
         public override Colorizer GetColorizer(IVsTextLines buffer)
             => new ColorizerWrapper(this, buffer);
 
-        public override IScanner GetScanner(IVsTextLines buffer) => new ScannerWrapper(buffer);
+        public override IScanner GetScanner(IVsTextLines buffer) => new DummyScanner();
 
         public override Microsoft.VisualStudio.Package.AuthoringScope ParseSource
             (ParseRequest request)
-            => new AuthoringScopeWrapper(new ParseRequestWrapper(request));
+        {
+            var wrapper = new ParseRequestWrapper(request);
+            wrapper.Scanning();
+            return new AuthoringScopeWrapper();
+        }
+
 
         public override string GetFormatFilterList() => "Reni files (*.reni)\n*.reni\n";
 

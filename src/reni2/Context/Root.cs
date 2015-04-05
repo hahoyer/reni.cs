@@ -9,7 +9,6 @@ using Reni.Code;
 using Reni.Feature;
 using Reni.Numeric;
 using Reni.ReniParser;
-using Reni.ReniSyntax;
 using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Type;

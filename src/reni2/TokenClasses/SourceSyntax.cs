@@ -86,6 +86,14 @@ namespace Reni.TokenClasses
             return Right?.LocateToken(sourcePosn);
         }
 
+        internal SourceSyntax LocateToken(SourcePart part)
+            => Left?.CheckedLocateToken(part) ??
+                Right?.CheckedLocateToken(part) ??
+                    this;
+
+        SourceSyntax CheckedLocateToken(SourcePart part)
+            => SourcePart.Contains(part) ? LocateToken(part) : null;
+
         internal IEnumerable<SourceSyntax> Belongings(SourceSyntax recent)
         {
             var root = RootOfBelongings(recent);
@@ -97,11 +105,11 @@ namespace Reni.TokenClasses
                     .ItemsAsLongAs(item => matcher.IsBelongingTo(item.TokenClass))
                     .ToArray();
         }
-                          
-        internal IEnumerable<SourceSyntax> ItemsAsLongAs(Func<SourceSyntax, bool> condition) 
+
+        internal IEnumerable<SourceSyntax> ItemsAsLongAs(Func<SourceSyntax, bool> condition)
             => new[] {this}
-            .Concat(Left.CheckedItemsAsLongAs(condition))
-            .Concat(Right.CheckedItemsAsLongAs(condition));
+                .Concat(Left.CheckedItemsAsLongAs(condition))
+                .Concat(Right.CheckedItemsAsLongAs(condition));
 
 
         internal SourceSyntax RootOfBelongings(SourceSyntax recent)
@@ -169,12 +177,27 @@ namespace Reni.TokenClasses
         }
 
         public string BraceMatchDump => new BraceMatchDumper(this, 3).Dump();
+
+        public string Reformat(IFormattingConfiguration configuration)
+            => TokenClass.Reformat(this, configuration);
     }
 
-    interface ITokenClass {}
+    interface ITokenClass
+    {
+        string Reformat(SourceSyntax target, IFormattingConfiguration configuration);
+    }
 
     interface IBelongingsMatcher
     {
         bool IsBelongingTo(IBelongingsMatcher otherMatcher);
+    }
+
+    interface IFormattingConfiguration
+    {
+        string Parenthesis(IToken left, string content, IToken right);
+        string Terminal(IToken token);
+        string List(string id
+            , IEnumerable<hw.Parser.WhiteSpaceToken[]> whiteSpaces
+            , IEnumerable<string> content);
     }
 }

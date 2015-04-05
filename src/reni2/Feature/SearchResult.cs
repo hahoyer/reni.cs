@@ -4,7 +4,7 @@ using System.Linq;
 using hw.Debug;
 using Reni.Basics;
 using Reni.Context;
-using Reni.ReniSyntax;
+using Reni.ReniParser;
 using Reni.Struct;
 using Reni.Type;
 

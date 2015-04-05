@@ -103,8 +103,10 @@
     <Compile Include="FeatureTest\TypeType\TypeOperatorWithVariable.cs" />
     <Compile Include="FeatureTest\UserInterface\BadUserInterAction.cs" />
     <Compile Include="FeatureTest\UserInterface\BraceMatching.cs" />
+    <Compile Include="FeatureTest\UserInterface\ExpressionFormatting.cs" />
     <Compile Include="FeatureTest\UserInterface\ListMatching.cs" />
     <Compile Include="FeatureTest\UserInterface\ThenElseMatching.cs" />
+    <Compile Include="FeatureTest\UserInterface\TokenLocating.cs" />
     <Compile Include="FeatureTest\UserInterface\UserInterAction.cs" />
     <Compile Include="FeatureTest\UserInterface\UserInterAction2.cs" />
     <Compile Include="FeatureTest\UserInterface\UserInterAction3.cs" />
@@ -215,7 +217,7 @@
     <Compile Include="ReniParser\Extension.cs" />
     <Compile Include="ReniParser\ExclamationBoxToken.cs" />
     <Compile Include="ReniParser\TokenFactory.cs" />
-    <Compile Include="ReniSyntax\ListSyntax.cs" />
+    <Compile Include="ReniParser\ListSyntax.cs" />
     <Compile Include="ResultCache.cs" />
     <Compile Include="Code\Arg.cs" />
     <Compile Include="Code\Assign.cs" />
@@ -313,13 +315,14 @@
     <Compile Include="FeatureTest\ThenElse.cs" />
     <Compile Include="Parser\Test.cs" />
     <Compile Include="Struct\AccessFeature.cs" />
-    <Compile Include="ReniSyntax\CompileSyntax.cs" />
+    <Compile Include="ReniParser\CompileSyntax.cs" />
     <Compile Include="Runtime\OutStream.cs" />
-    <Compile Include="ReniSyntax\Special.cs" />
-    <Compile Include="ReniSyntax\EmptyList.cs" />
+    <Compile Include="ReniParser\Special.cs" />
+    <Compile Include="ReniParser\EmptyList.cs" />
     <Compile Include="TokenClasses\ArgToken.cs" />
     <Compile Include="TokenClasses\BraceMatchDumper.cs" />
     <Compile Include="TokenClasses\CompareOperation.cs" />
+    <Compile Include="TokenClasses\DefaultFormat.cs" />
     <Compile Include="TokenClasses\EndToken.cs" />
     <Compile Include="TokenClasses\ExclamationSyntaxList.cs" />
     <Compile Include="TokenClasses\ReassignToken.cs" />

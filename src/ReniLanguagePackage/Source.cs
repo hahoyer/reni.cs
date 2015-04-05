@@ -5,6 +5,7 @@ using System.Linq;
 using hw.Debug;
 using hw.Scanner;
 using Microsoft.VisualStudio.Package;
+using Microsoft.VisualStudio.TextManager.Interop;
 using Reni;
 using Reni.UserInterface;
 
@@ -56,7 +57,7 @@ namespace HoyerWare.ReniLanguagePackage
         IEnumerable<TokenInformation.Trimmed> TokensForLine(int lineIndex, bool trace)
         {
             var start = Data.FromLineAndColumn(lineIndex, 0).Position;
-            var end = LineEndPosition(lineIndex);
+            var end = Data.FromLineAndColumn(lineIndex, null).Position;
 
             var index = start;
             var i = 0;
@@ -79,21 +80,13 @@ namespace HoyerWare.ReniLanguagePackage
             }
         }
 
-        int LineEndPosition(int lineIndex)
-        {
-            var lineLength
-                = Data.FromLineAndColumn(lineIndex + 1, 0)
-                    - Data.FromLineAndColumn(lineIndex, 0);
-            return Data.FromLineAndColumn(lineIndex, lineLength).Position;
-        }
-
         internal string StateAtEndOfLine(int line, bool trace)
         {
             StartMethodDump(trace, line, trace);
             try
             {
-                var lineEnd = LineEndPosition(line);
-                var token = Compiler.Token(lineEnd);
+                var lineEndPosition = Data.FromLineAndColumn(line, null).Position;
+                var token = Compiler.Token(lineEndPosition);
                 Tracer.Assert(token != null);
                 var result = token.State;
                 return ReturnMethodDump(result, false);
@@ -123,7 +116,18 @@ namespace HoyerWare.ReniLanguagePackage
             var start = Data.FromLineAndColumn(lineIndex, columIndex).Position - 1;
             return Compiler.Token(Math.Max(0, start));
         }
-        public IEnumerable<SourcePart> BracesLike(TokenInformation current)
+
+        internal IEnumerable<SourcePart> BracesLike(TokenInformation current)
             => current.FindAllBelongings(Compiler);
+
+        internal void ReformatSpan(EditArray mgr, TextSpan span)
+        {
+            var sourcePart = Data.ToSourcePart(span);
+            var start = Compiler.Token(sourcePart.Position);
+            var end = Compiler.Token(sourcePart.EndPosition - 1);
+            var common = Compiler.Token(start.SourcePart + end.SourcePart);
+            mgr.Add(new EditSpan(common.SourcePart.ToTextSpan(), common.SourcePart.Id));
+            mgr.ApplyEdits();
+        }
     }
 }

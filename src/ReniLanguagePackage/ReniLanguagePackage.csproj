@@ -139,7 +139,7 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReniLanguagePackage.cs" />
-    <Compile Include="ScannerWrapper.cs" />
+    <Compile Include="DummyScanner.cs" />
     <Compile Include="SourceWrapper.cs" />
   </ItemGroup>
   <ItemGroup>

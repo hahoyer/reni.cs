@@ -5,7 +5,6 @@ using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.ReniParser;
-using Reni.ReniSyntax;
 using Reni.Validation;
 
 namespace Reni.TokenClasses
@@ -68,6 +67,10 @@ namespace Reni.TokenClasses
     {
         protected override sealed Checked<Syntax> Terminal(SourcePart token)
             => new TerminalSyntax(token.Id, this);
+
+        internal override string Reformat
+            (SourceSyntax target, IFormattingConfiguration configuration)
+            => configuration.Terminal(target.Token);
 
         public abstract Result Result(ContextBase context, Category category, TerminalSyntax token);
 

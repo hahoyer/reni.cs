@@ -7,7 +7,6 @@ using hw.Parser;
 using Reni.Basics;
 using Reni.Context;
 using Reni.ReniParser;
-using Reni.ReniSyntax;
 using Reni.Type;
 
 namespace Reni

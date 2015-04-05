@@ -11,11 +11,7 @@ namespace HoyerWare.ReniLanguagePackage
     {
         readonly AuthoringScope _data;
 
-        internal AuthoringScopeWrapper(ParseRequestWrapper parseRequestWrapper)
-        {
-            _data = new AuthoringScope(parseRequestWrapper);
-
-        }
+        internal AuthoringScopeWrapper() { _data = new AuthoringScope(); }
 
         public override string GetDataTipText(int line, int col, out TextSpan span)
             => _data.GetDataTipText(line, col, out span);

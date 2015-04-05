@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using hw.Debug;
 using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
@@ -61,6 +62,16 @@ namespace Reni.TokenClasses
         internal IEnumerable<SourceSyntax> Belongings(SourceSyntax root)
         {
             NotImplementedMethod(root);
+            return null;
+        }
+
+        string ITokenClass.Reformat(SourceSyntax target, IFormattingConfiguration configuration)
+            => target.Issues.Any() ? target.SourcePart.Id : Reformat(target, configuration);
+
+        internal virtual string Reformat
+            (SourceSyntax target, IFormattingConfiguration configuration)
+        {
+            NotImplementedMethod(target, configuration);
             return null;
         }
     }

@@ -10,13 +10,6 @@ namespace HoyerWare.ReniLanguagePackage
 {
     sealed class AuthoringScope : DumpableObject
     {
-        ParseRequestWrapper Request { get; }
-
-        internal AuthoringScope(ParseRequestWrapper request)
-        {
-            Request = request;
-        }
-
         public string GetDataTipText(int line, int col, out TextSpan span)
         {
             span = new TextSpan();
