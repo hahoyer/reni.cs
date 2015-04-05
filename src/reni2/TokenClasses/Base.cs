@@ -133,7 +133,7 @@ namespace Reni.TokenClasses
     abstract class InfixSyntaxToken : InfixToken, IInfix
     {
         protected override sealed Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
-            => InfixSyntax.Create(left.ToCompiledSyntax, this, right.ToCompiledSyntax);
+            => InfixSyntax.Create(left.ToCompiledSyntax, this, token, right.ToCompiledSyntax);
 
         public abstract Result Result
             (ContextBase callContext, Category category, CompileSyntax left, CompileSyntax right);

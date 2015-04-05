@@ -8,14 +8,19 @@ namespace HoyerWare.ReniLanguagePackage
 {
     sealed class SourceWrapper : Microsoft.VisualStudio.Package.Source
     {
-        readonly Source _data;
+        internal Source Data;
 
-        public SourceWrapper(IVsTextLines buffer, ReniService parent, Source source)
-            : base(parent, buffer, null)
+        public SourceWrapper(LanguageService parent, IVsTextLines buffer)
+            : base(parent, buffer, null) { OnChange(); }
+
+        void OnChange() { Data = GetTextLines().CreateReniSource(); }
+
+        public override void OnChangeLineText(TextLineChange[] lineChange, int last)
         {
-            _data = source;
+            base.OnChangeLineText(lineChange, last);
+            OnChange();
         }
 
-        public override TokenInfo GetTokenInfo(int line, int col) => _data.GetTokenInfo(line, col);
+        public override TokenInfo GetTokenInfo(int line, int col) => Data.GetTokenInfo(line, col);
     }
 }

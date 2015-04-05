@@ -35,9 +35,7 @@ namespace HoyerWare.ReniLanguagePackage
             => _preferencesCache.Value;
 
         public override Colorizer GetColorizer(IVsTextLines buffer)
-            => new ColorizerWrapper(this, buffer, CreateReniSource(buffer));
-
-        static Source CreateReniSource(IVsTextLines buffer) => new Source(buffer.GetAll());
+            => new ColorizerWrapper(this, buffer);
 
         public override IScanner GetScanner(IVsTextLines buffer) => new ScannerWrapper(buffer);
 
@@ -48,6 +46,6 @@ namespace HoyerWare.ReniLanguagePackage
         public override string GetFormatFilterList() => "Reni files (*.reni)\n*.reni\n";
 
         public override Microsoft.VisualStudio.Package.Source CreateSource(IVsTextLines buffer)
-            => new SourceWrapper(buffer, this, CreateReniSource(buffer));
+            => new SourceWrapper(this, buffer);
     }
 }

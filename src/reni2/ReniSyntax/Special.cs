@@ -70,8 +70,8 @@ namespace Reni.ReniSyntax
     sealed class InfixSyntax : SpecialSyntax
     {
         public static Checked<Syntax> Create
-            (Checked<CompileSyntax> left, IInfix infix, Checked<CompileSyntax> right)
-            => new InfixSyntax(left.Value, infix, right.Value)
+            (Checked<CompileSyntax> left, IInfix infix, SourcePart token, Checked<CompileSyntax> right)
+            => new InfixSyntax(left.Value, infix, token, right.Value)
                 .Issues(left.Issues.plus(right.Issues));
 
         [Node]
@@ -86,11 +86,14 @@ namespace Reni.ReniSyntax
         [EnableDump]
         readonly CompileSyntax _right;
 
-        public InfixSyntax(CompileSyntax left, IInfix infix, CompileSyntax right)
+        SourcePart Token { get; }
+
+        public InfixSyntax(CompileSyntax left, IInfix infix, SourcePart token, CompileSyntax right)
         {
             _left = left;
             _infix = infix;
             _right = right;
+            Token = token;
             StopByObjectIds();
         }
 
@@ -127,6 +130,11 @@ namespace Reni.ReniSyntax
                 yield return _right;
             }
         }
+
+        internal override Checked<ExclamationSyntaxList> Combine
+            (ExclamationSyntaxList syntax)
+            => new Checked<ExclamationSyntaxList>
+                (syntax, IssueId.UnexpectedDeclarationTag.CreateIssue(Token));
     }
 
     interface IPendingProvider

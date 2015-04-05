@@ -13,18 +13,16 @@ namespace HoyerWare.ReniLanguagePackage
     sealed class Source : DumpableObject
     {
         readonly ValueCache<Compiler> _compilerCache;
-        readonly hw.Scanner.Source _source;
 
         public Source(string text)
         {
-            _source = new hw.Scanner.Source(text);
-            _compilerCache = new ValueCache<Compiler>(CreateCompilerForCache);
+            _compilerCache = new ValueCache<Compiler>(() => CreateCompilerForCache(text));
         }
 
-        Compiler CreateCompilerForCache()
+        static Compiler CreateCompilerForCache(string text)
             => new Compiler
                 (
-                source: _source,
+                text: text,
                 parameters: new CompilerParameters
                 {
                     TraceOptions =
@@ -40,7 +38,7 @@ namespace HoyerWare.ReniLanguagePackage
             StartMethodDump(trace, line, column);
             try
             {
-                var offset = _source.FromLineAndColumn(line, column).Position;
+                var offset = Data.FromLineAndColumn(line, column).Position;
                 var token = Compiler.Token(offset);
                 Dump(nameof(token), token);
                 var result = token.ToTokenInfo();
@@ -53,10 +51,11 @@ namespace HoyerWare.ReniLanguagePackage
         }
 
         Compiler Compiler => _compilerCache.Value;
+        hw.Scanner.Source Data => Compiler.Source;
 
         IEnumerable<TokenInformation.Trimmed> TokensForLine(int lineIndex, bool trace)
         {
-            var start = _source.FromLineAndColumn(lineIndex, 0).Position;
+            var start = Data.FromLineAndColumn(lineIndex, 0).Position;
             var end = LineEndPosition(lineIndex);
 
             var index = start;
@@ -83,9 +82,9 @@ namespace HoyerWare.ReniLanguagePackage
         int LineEndPosition(int lineIndex)
         {
             var lineLength
-                = _source.FromLineAndColumn(lineIndex + 1, 0)
-                    - _source.FromLineAndColumn(lineIndex, 0);
-            return _source.FromLineAndColumn(lineIndex, lineLength).Position;
+                = Data.FromLineAndColumn(lineIndex + 1, 0)
+                    - Data.FromLineAndColumn(lineIndex, 0);
+            return Data.FromLineAndColumn(lineIndex, lineLength).Position;
         }
 
         internal string StateAtEndOfLine(int line, bool trace)
@@ -115,13 +114,13 @@ namespace HoyerWare.ReniLanguagePackage
 
         internal TokenInformation FromLineAndColumn(int lineIndex, int columIndex)
         {
-            var start = _source.FromLineAndColumn(lineIndex, columIndex).Position;
+            var start = Data.FromLineAndColumn(lineIndex, columIndex).Position;
             return Compiler.Token(start);
         }
 
         internal TokenInformation FromLineAndColumnBackwards(int lineIndex, int columIndex)
         {
-            var start = _source.FromLineAndColumn(lineIndex, columIndex).Position - 1;
+            var start = Data.FromLineAndColumn(lineIndex, columIndex).Position - 1;
             return Compiler.Token(Math.Max(0, start));
         }
         public IEnumerable<SourcePart> BracesLike(TokenInformation current)

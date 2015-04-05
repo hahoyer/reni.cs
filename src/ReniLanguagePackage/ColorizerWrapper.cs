@@ -10,12 +10,16 @@ namespace HoyerWare.ReniLanguagePackage
 {
     sealed class ColorizerWrapper : Colorizer
     {
+        readonly LanguageService _parent;
+        readonly IVsTextLines _buffer;
         const bool Trace = true;
 
-        readonly Source _source;
-
-        public ColorizerWrapper(LanguageService svc, IVsTextLines buffer, Source source)
-            : base(svc, buffer, null) { _source = source; }
+        public ColorizerWrapper(LanguageService parent, IVsTextLines buffer)
+            : base(parent, buffer, null)
+        {
+            _parent = parent;
+            _buffer = buffer;
+        }
 
         public override int GetStateMaintenanceFlag(out int value)
         {
@@ -30,13 +34,15 @@ namespace HoyerWare.ReniLanguagePackage
         }
 
         public override int GetStateAtEndOfLine(int line, int length, IntPtr ptr, int state)
-            => _source.StateAtEndOfLine(line, Trace).GetHashCode();
+            => Source.StateAtEndOfLine(line, Trace).GetHashCode();
+
+        Source Source => ((SourceWrapper) _parent.GetOrCreateSource(_buffer)).Data;
 
         public override int ColorizeLine
             (int line, int length, IntPtr ptr, int state, uint[] attrs)
         {
-            _source.ColorizeLine(line, attrs, Trace);
-            return _source.StateAtEndOfLine(line, Trace).GetHashCode();
+            Source.ColorizeLine(line, attrs, Trace);
+            return Source.StateAtEndOfLine(line, Trace).GetHashCode();
         }
 
         public override int GetColorInfo(string line, int length, int state)

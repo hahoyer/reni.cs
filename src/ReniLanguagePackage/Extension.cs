@@ -135,9 +135,9 @@ namespace HoyerWare.ReniLanguagePackage
             {
                 Color = token.ConvertToTokenColor(),
                 Trigger = token.ConvertToTokenTrigger(),
-                Type = token.ConvertToTokenType()    ,
-                StartIndex = token.StartPosition ,
-                EndIndex = token.EndPosition,
+                Type = token.ConvertToTokenType(),
+                StartIndex = token.StartPosition,
+                EndIndex = token.EndPosition
             };
 
         internal static TextSpan Span(this SourcePart current)
@@ -148,5 +148,8 @@ namespace HoyerWare.ReniLanguagePackage
                 iEndLine = current.End.LineIndex,
                 iEndIndex = current.End.ColumnIndex
             };
+
+        internal static Source CreateReniSource(this IVsTextLines buffer)
+            => new Source(buffer.GetAll());
     }
 }
