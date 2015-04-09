@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using hw.Debug;
 using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
 using JetBrains.Annotations;
+using Reni.Formatting;
 using Reni.ReniParser;
 
 namespace Reni.TokenClasses
@@ -59,21 +59,23 @@ namespace Reni.TokenClasses
         protected abstract Checked<Syntax> Suffix(Syntax left, SourcePart token);
         protected abstract Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right);
 
-        internal IEnumerable<SourceSyntax> Belongings(SourceSyntax root)
-        {
-            NotImplementedMethod(root);
-            return null;
-        }
-
-        string ITokenClass.Reformat(SourceSyntax target, IFormattingConfiguration configuration)
-            => target.Issues.Any() ? target.SourcePart.Id : Reformat(target, configuration);
+        string ITokenClass.Reformat
+            (
+            SourceSyntax target,
+            IEnumerable<WhiteSpaceToken> tail,
+            IConfiguration configuration
+            )
+            => target.Issues.Any()
+                ? (target.SourcePart + tail.SourcePart()).Id
+                : Reformat(target, tail, configuration);
 
         internal virtual string Reformat
-            (SourceSyntax target, IFormattingConfiguration configuration)
-        {
-            NotImplementedMethod(target, configuration);
-            return null;
-        }
+            (
+            SourceSyntax target,
+            IEnumerable<WhiteSpaceToken> tail,
+            IConfiguration configuration
+            )
+            => Formatting.Extension.TokenClass(target, tail, configuration);
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]

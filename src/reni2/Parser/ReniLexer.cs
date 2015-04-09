@@ -28,6 +28,7 @@ namespace Reni.Parser
         readonly Match _comment;
         readonly Match _whiteSpace;
         readonly Match _commentHead;
+        readonly Match _lineEnd;
 
         ReniLexer()
         {
@@ -50,7 +51,9 @@ namespace Reni.Parser
                             .Else(Match.End.Find + _invalidLineComment)
                     );
 
-            _whiteSpace = Match.WhiteSpace.Repeat(1);
+            _whiteSpace = " \t\r".AnyChar().Repeat(1);
+
+            _lineEnd = "\n".Box();
 
             _comment = "#("
                 +
@@ -76,13 +79,15 @@ namespace Reni.Parser
         public static bool IsWhiteSpace(WhiteSpaceToken item) => item.Index == 0;
         public static bool IsComment(WhiteSpaceToken item) => item.Index == 1;
         public static bool IsLineComment(WhiteSpaceToken item) => item.Index == 2;
+        public static bool IsLineEnd(WhiteSpaceToken item) => item.Index == 3;
 
         Func<SourcePosn, int?>[] ILexer.WhiteSpace
             => new Func<SourcePosn, int?>[]
             {
                 WhiteSpace,
                 Comment,
-                LineComment
+                LineComment,
+                LineEnd
             };
 
 
@@ -92,6 +97,7 @@ namespace Reni.Parser
         public static IssueId Parse(Match.IError error) => ((Error) error).IssueId;
 
         int? WhiteSpace(SourcePosn sourcePosn) => sourcePosn.Match(_whiteSpace);
+        int? LineEnd(SourcePosn sourcePosn) => sourcePosn.Match(_lineEnd);
         int? Comment(SourcePosn sourcePosn) => sourcePosn.Match(_comment);
         int? LineComment(SourcePosn sourcePosn) => sourcePosn.Match(_lineComment);
 

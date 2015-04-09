@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
+using hw.Parser;
 using hw.Scanner;
+using Reni.Formatting;
 using Reni.ReniParser;
 
 namespace Reni.TokenClasses
@@ -32,17 +34,12 @@ namespace Reni.TokenClasses
         }
 
         internal override string Reformat
-            (SourceSyntax target, IFormattingConfiguration configuration)
-        {
-            Tracer.Assert(target.Right == null);
-            Tracer.Assert(target.Left != null);
-            var subTarget = target.Left;
-            Tracer.Assert(((LeftParenthesis) subTarget.TokenClass).Level == Level);
-            Tracer.Assert(subTarget.Right != null);
-            Tracer.Assert(subTarget.Left == null);
-            var content = subTarget.Right.Reformat(configuration);
-            return configuration.Parenthesis(subTarget.Token, content, target.Token);
-        }
+            (
+            SourceSyntax target,
+            IEnumerable<WhiteSpaceToken> tail,
+            IConfiguration configuration
+            )
+            => Formatting.Extension.Parenthesis(target, tail, configuration);
 
         protected override Checked<Syntax> Prefix(SourcePart token, Syntax right)
         {

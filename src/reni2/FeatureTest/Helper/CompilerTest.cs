@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
+using hw.Helper;
 using System.Linq;
 using hw.Debug;
-using hw.Helper;
+using hw.Parser;
 using hw.UnitTest;
+using Reni.Formatting;
 using Reni.Runtime;
+using Reni.TokenClasses;
 using Reni.Validation;
 
 namespace Reni.FeatureTest.Helper
@@ -66,6 +69,7 @@ namespace Reni.FeatureTest.Helper
                 expectedResult(c);
             }
 
+            Tracer.Line(c.SourceSyntax.Reformat(new WhiteSpaceToken[0], DefaultFormat.Instance));
             c.Exececute();
 
             if(outStream.Data != targetSet.Output)
@@ -102,7 +106,7 @@ namespace Reni.FeatureTest.Helper
                 _cache = new Dictionary<System.Type, CompilerTest>();
 
             foreach(var tuple in TargetSet)
-                CreateFileAndRunCompiler(name: GetType().PrettyName(), targetSetData: tuple, expectedResult: AssertValid);
+                CreateFileAndRunCompiler(GetType().PrettyName(), tuple, AssertValid);
         }
 
 

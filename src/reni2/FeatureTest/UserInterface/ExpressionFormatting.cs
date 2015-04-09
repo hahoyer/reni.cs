@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.UnitTest;
+using Reni.Formatting;
 using Reni.TokenClasses;
 
 namespace Reni.FeatureTest.UserInterface
@@ -16,7 +17,7 @@ namespace Reni.FeatureTest.UserInterface
             const string Text = @"(1,3,4,6)";
             var compiler = new Compiler(text: Text);
             var x = compiler.SourceSyntax.
-                Reformat(DefaultFormat.Instance);
+                Reformat(null,DefaultFormat.Instance);
             Tracer.Assert(x == "(1, 3, 4, 6)", x);
         }
 

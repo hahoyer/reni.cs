@@ -30,6 +30,8 @@ namespace Reni.UserInterface
         [DisableDump]
         public virtual bool IsBraceLike => false;
         [DisableDump]
+        public virtual bool IsLineEnd => false;
+        [DisableDump]
         public virtual bool IsError => false;
         [DisableDump]
         public virtual string State => "";
@@ -45,7 +47,9 @@ namespace Reni.UserInterface
                     return 'l';
                 if(IsWhiteSpace)
                     return 'w';
-                if(IsNumber)
+                if (IsLineEnd)
+                    return '$';
+                if (IsNumber)
                     return 'n';
                 if(IsText)
                     return 't';
@@ -137,6 +141,7 @@ namespace Reni.UserInterface
         public override bool IsComment => ReniLexer.IsComment(_item);
         public override bool IsLineComment => ReniLexer.IsLineComment(_item);
         public override bool IsWhiteSpace => ReniLexer.IsWhiteSpace(_item);
+        public override bool IsLineEnd => ReniLexer.IsLineEnd(_item);
         public override string State => ReniLexer.Instance.WhiteSpaceId(_item) ?? "";
 
         public override IEnumerable<SourcePart> FindAllBelongings(Compiler compiler)

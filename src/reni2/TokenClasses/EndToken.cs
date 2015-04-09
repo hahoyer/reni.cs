@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Parser;
 using hw.Scanner;
+using Reni.Formatting;
 using Reni.ReniParser;
 
 namespace Reni.TokenClasses
@@ -16,12 +17,7 @@ namespace Reni.TokenClasses
         public override string Id => PrioTable.EndOfText;
 
         internal override string Reformat
-            (SourceSyntax target, IFormattingConfiguration configuration)
-        {
-            if(target.Left != null && target.Right == null)
-                return target.Left.Reformat(configuration);
-
-            return base.Reformat(target, configuration);
-        }
+            (SourceSyntax target, IEnumerable<WhiteSpaceToken> tail, IConfiguration configuration)
+            => Formatting.Extension.EndToken(target, tail, configuration);
     }
 }

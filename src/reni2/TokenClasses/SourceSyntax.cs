@@ -4,6 +4,7 @@ using System.Linq;
 using hw.Debug;
 using hw.Parser;
 using hw.Scanner;
+using Reni.Formatting;
 using Reni.ReniParser;
 using Reni.UserInterface;
 using Reni.Validation;
@@ -67,6 +68,7 @@ namespace Reni.TokenClasses
         internal SourcePart SourcePart => Left?.SourcePart + Token.SourcePart + Right?.SourcePart;
         [DisableDump]
         string FilePosition => Token.Characters.FilePosition;
+
 
         internal TokenInformation LocateToken(SourcePosn sourcePosn)
         {
@@ -178,26 +180,25 @@ namespace Reni.TokenClasses
 
         public string BraceMatchDump => new BraceMatchDumper(this, 3).Dump();
 
-        public string Reformat(IFormattingConfiguration configuration)
-            => TokenClass.Reformat(this, configuration);
+        internal string Reformat
+            (IEnumerable<hw.Parser.WhiteSpaceToken> tail, IConfiguration configuration)
+            => TokenClass.Reformat(this, tail, configuration);
+
+        [DisableDump]
+        internal IEnumerable<hw.Parser.WhiteSpaceToken> LeadingWhiteSpaceTokens
+            => Left != null
+                ? Left.LeadingWhiteSpaceTokens
+                : Token.PrecededWith.FilterLeftPart();
     }
 
     interface ITokenClass
     {
-        string Reformat(SourceSyntax target, IFormattingConfiguration configuration);
+        string Reformat
+            (SourceSyntax target, IEnumerable<hw.Parser.WhiteSpaceToken> followedBy, IConfiguration configuration);
     }
 
     interface IBelongingsMatcher
     {
         bool IsBelongingTo(IBelongingsMatcher otherMatcher);
-    }
-
-    interface IFormattingConfiguration
-    {
-        string Parenthesis(IToken left, string content, IToken right);
-        string Terminal(IToken token);
-        string List(string id
-            , IEnumerable<hw.Parser.WhiteSpaceToken[]> whiteSpaces
-            , IEnumerable<string> content);
     }
 }

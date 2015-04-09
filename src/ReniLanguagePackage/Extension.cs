@@ -90,7 +90,7 @@ namespace HoyerWare.ReniLanguagePackage
                 return TokenType.Comment;
             if(token.IsLineComment)
                 return TokenType.LineComment;
-            if(token.IsWhiteSpace)
+            if(token.IsWhiteSpace || token.IsLineEnd)
                 return TokenType.WhiteSpace;
             if(token.IsError)
                 return TokenType.Unknown;

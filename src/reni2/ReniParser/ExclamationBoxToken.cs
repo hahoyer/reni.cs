@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Parser;
+using Reni.Formatting;
 using Reni.TokenClasses;
 
 namespace Reni.ReniParser
@@ -33,10 +34,11 @@ namespace Reni.ReniParser
 
         IType<SourceSyntax> IType<SourceSyntax>.NextTypeIfMatched => null;
 
-        string ITokenClass.Reformat(SourceSyntax target, IFormattingConfiguration configuration)
-        {
-            NotImplementedMethod(target, configuration);
-            return null;
-        }
+        string ITokenClass.Reformat
+            (
+            SourceSyntax target,
+            IEnumerable<WhiteSpaceToken> followedBy,
+            IConfiguration configuration)
+            => Formatting.Extension.Exclamation(target, followedBy, configuration);
     }
 }

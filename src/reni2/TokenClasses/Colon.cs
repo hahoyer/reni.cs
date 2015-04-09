@@ -27,9 +27,8 @@ namespace Reni.TokenClasses
             => left.CreateDeclarationSyntax(token, right);
 
         protected override Checked<Syntax> Terminal(SourcePart token)
-            =>
-                new DeclarationSyntax(new EmptyList(), null).Issues
-                    (IssueId.MissingValueInDeclaration.CreateIssue(token));
+            => new DeclarationSyntax(new EmptyList(), null).Issues
+                (IssueId.MissingValueInDeclaration.CreateIssue(token));
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
