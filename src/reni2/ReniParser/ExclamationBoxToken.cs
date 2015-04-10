@@ -33,12 +33,5 @@ namespace Reni.ReniParser
         string IType<SourceSyntax>.PrioTableId => PrioTable.Any;
 
         IType<SourceSyntax> IType<SourceSyntax>.NextTypeIfMatched => null;
-
-        string ITokenClass.Reformat
-            (
-            SourceSyntax target,
-            IEnumerable<WhiteSpaceToken> followedBy,
-            IConfiguration configuration)
-            => Formatting.Extension.Exclamation(target, followedBy, configuration);
     }
 }

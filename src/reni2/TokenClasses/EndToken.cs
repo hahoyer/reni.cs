@@ -16,8 +16,5 @@ namespace Reni.TokenClasses
         protected override Checked<Syntax> Terminal(SourcePart token) => new EmptyList();
         public override string Id => PrioTable.EndOfText;
 
-        internal override string Reformat
-            (SourceSyntax target, IEnumerable<WhiteSpaceToken> tail, IConfiguration configuration)
-            => Formatting.Extension.EndToken(target, tail, configuration);
     }
 }

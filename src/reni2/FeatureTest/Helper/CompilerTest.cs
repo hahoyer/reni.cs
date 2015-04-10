@@ -70,12 +70,13 @@ namespace Reni.FeatureTest.Helper
             }
 
             Tracer.Line(c.SourceSyntax.Reformat(new WhiteSpaceToken[0], DefaultFormat.Instance));
+            Tracer.ConditionalBreak(true);
             c.Exececute();
 
             if(outStream.Data != targetSet.Output)
             {
                 Tracer.Line("---------------------\n" + outStream.Data + "\n---------------------");
-                Tracer.ThrowAssertionFailed
+                    Tracer.ThrowAssertionFailed
                     (
                         "outStream.Data != targetSet.Output",
                         () => "outStream.Data:" + outStream.Data + " expected: " + targetSet.Output);

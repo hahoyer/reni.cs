@@ -46,10 +46,13 @@ namespace Reni.TokenClasses
 
         Checked<Syntax> IOperator<Syntax, Checked<Syntax>>.Terminal(IToken token)
             => Terminal(token?.Characters);
+
         Checked<Syntax> IOperator<Syntax, Checked<Syntax>>.Prefix(IToken token, Syntax right)
             => Prefix(token?.Characters, right);
+
         Checked<Syntax> IOperator<Syntax, Checked<Syntax>>.Suffix(Syntax left, IToken token)
             => Suffix(left, token?.Characters);
+
         Checked<Syntax> IOperator<Syntax, Checked<Syntax>>.Infix
             (Syntax left, IToken token, Syntax right)
             => Infix(left, token?.Characters, right);
@@ -59,23 +62,6 @@ namespace Reni.TokenClasses
         protected abstract Checked<Syntax> Suffix(Syntax left, SourcePart token);
         protected abstract Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right);
 
-        string ITokenClass.Reformat
-            (
-            SourceSyntax target,
-            IEnumerable<WhiteSpaceToken> tail,
-            IConfiguration configuration
-            )
-            => target.Issues.Any()
-                ? (target.SourcePart + tail.SourcePart()).Id
-                : Reformat(target, tail, configuration);
-
-        internal virtual string Reformat
-            (
-            SourceSyntax target,
-            IEnumerable<WhiteSpaceToken> tail,
-            IConfiguration configuration
-            )
-            => Formatting.Extension.TokenClass(target, tail, configuration);
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]

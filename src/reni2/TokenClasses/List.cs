@@ -36,13 +36,6 @@ namespace Reni.TokenClasses
         protected override Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
             => ListSyntax(left, right);
 
-        internal override string Reformat
-            (
-            SourceSyntax target,
-            IEnumerable<WhiteSpaceToken> tail,
-            IConfiguration configuration
-            ) => Formatting.Extension.List(target, configuration);
-
         ListSyntax ListSyntax(Syntax left, Syntax right)
             => new ListSyntax(this, left.ToList(this).Concat(right.ToList(this)).ToArray());
 

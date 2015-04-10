@@ -33,14 +33,6 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        internal override string Reformat
-            (
-            SourceSyntax target,
-            IEnumerable<WhiteSpaceToken> tail,
-            IConfiguration configuration
-            )
-            => Formatting.Extension.Parenthesis(target, tail, configuration);
-
         protected override Checked<Syntax> Prefix(SourcePart token, Syntax right)
         {
             NotImplementedMethod(token, right);

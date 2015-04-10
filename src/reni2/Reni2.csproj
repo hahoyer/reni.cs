@@ -118,10 +118,11 @@
     <Compile Include="Feature\Function.cs" />
     <Compile Include="Feature\SearchResult.cs" />
     <Compile Include="Feature\Simple.cs" />
+    <Compile Include="Formatting\BinaryTree.cs" />
     <Compile Include="Formatting\DefaultFormat.cs" />
-    <Compile Include="Formatting\Extension.cs" />
+    <Compile Include="Formatting\DefaultSubFormat.cs" />
     <Compile Include="Formatting\IConfiguration.cs" />
-    <Compile Include="Formatting\MultilineConfiguraton.cs" />
+    <Compile Include="Formatting\ITokenClass.cs" />
     <Compile Include="hw\Debug\Configuration.cs" />
     <Compile Include="hw\Debug\DebugTextWriter.cs" />
     <Compile Include="hw\Debug\DisableDumpAttribute.cs" />

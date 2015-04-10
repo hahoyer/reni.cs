@@ -123,8 +123,10 @@ namespace Reni.ReniParser
         protected override ScannerTokenClass GetEndOfText() => new EndToken();
         protected override ScannerTokenClass GetNumber() => new Number();
         protected override ScannerTokenClass GetTokenClass(string name) => new UserSymbol(name);
+
         protected override ScannerTokenClass GetError(Match.IError message)
             => new ScannerSyntaxError(message);
+
         protected override ScannerTokenClass GetText() => new Text();
     }
 
@@ -152,16 +154,10 @@ namespace Reni.ReniParser
                 this,
                 token,
                 right,
-                ListSyntax.Create(left?.Syntax,right?.Syntax), 
+                ListSyntax.Create(left?.Syntax, right?.Syntax),
                 new[] {resultIssues});
         }
 
         IType<SourceSyntax> IType<SourceSyntax>.NextTypeIfMatched => null;
-
-        string ITokenClass.Reformat(SourceSyntax target, IEnumerable<WhiteSpaceToken> followedBy, IConfiguration configuration)
-        {
-            NotImplementedMethod(target, followedBy, configuration);
-            return null;
-        }
     }
 }

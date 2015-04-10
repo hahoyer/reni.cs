@@ -42,11 +42,11 @@ namespace Reni.ReniParser
             => whiteSpaces.Where(item => ReniLexer.IsLineComment(item) || ReniLexer.IsComment(item));
 
 
-        internal static IEnumerable<WhiteSpaceToken> FilterLeftPart
+        internal static IEnumerable<WhiteSpaceToken> OnlyLeftPart
             (this IEnumerable<WhiteSpaceToken> whiteSpaces)
             => whiteSpaces.Take(ThisLineIndex(whiteSpaces));
 
-        internal static IEnumerable<WhiteSpaceToken> FilterRightPart
+        internal static IEnumerable<WhiteSpaceToken> OnlyRightPart
             (this IEnumerable<WhiteSpaceToken> whiteSpaces)
             => whiteSpaces.Skip(ThisLineIndex(whiteSpaces));
 

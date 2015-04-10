@@ -6,6 +6,11 @@ namespace Reni.Formatting
 {
     interface IConfiguration
     {
+        ISubConfiguration Assess(BinaryTree binaryTree);
+    }
+
+    interface ISubConfiguration
+    {
         string Parenthesis
             (
             IEnumerable<WhiteSpaceToken> leftHead,
@@ -16,8 +21,6 @@ namespace Reni.Formatting
             string right,
             IEnumerable<WhiteSpaceToken> rightTail);
 
-        string DeclarationItem(SourceSyntax item, IEnumerable<WhiteSpaceToken> tail);
-
         string Default
             (
             string left,
@@ -27,10 +30,10 @@ namespace Reni.Formatting
             string right
             );
 
-        string Exclamation(IToken token, string right);
         bool IsMultiline { get; }
-        IConfiguration SingleLine { get; }
         int? MaxListItemLength(List list);
         int? MaxListLength(List list);
+
+        string Reformat(BinaryTree target, IConfiguration configuration);
     }
 }

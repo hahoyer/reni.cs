@@ -182,19 +182,22 @@ namespace Reni.TokenClasses
 
         internal string Reformat
             (IEnumerable<hw.Parser.WhiteSpaceToken> tail, IConfiguration configuration)
-            => TokenClass.Reformat(this, tail, configuration);
+            => ReArrange(tail).Reformat(configuration);
 
         [DisableDump]
         internal IEnumerable<hw.Parser.WhiteSpaceToken> LeadingWhiteSpaceTokens
             => Left != null
                 ? Left.LeadingWhiteSpaceTokens
-                : Token.PrecededWith.FilterLeftPart();
-    }
+                : Token.PrecededWith.OnlyLeftPart();
 
-    interface ITokenClass
-    {
-        string Reformat
-            (SourceSyntax target, IEnumerable<hw.Parser.WhiteSpaceToken> followedBy, IConfiguration configuration);
+        BinaryTree ReArrange(IEnumerable<hw.Parser.WhiteSpaceToken> tail)
+        {
+            var left = Left?.ReArrange(Token.PrecededWith.OnlyLeftPart());
+            var tokenHead = Token.PrecededWith.OnlyRightPart();
+            var tokenTail = Right?.LeadingWhiteSpaceTokens ?? tail;
+            var right = Right?.ReArrange(tail);
+            return new BinaryTree(TokenClass, left, tokenHead, Token.Id, tokenTail, right);
+        }
     }
 
     interface IBelongingsMatcher

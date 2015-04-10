@@ -84,6 +84,7 @@ namespace HoyerWare.ReniLanguagePackage
                 result |= TokenTriggers.MatchBraces;
             return result;
         }
+
         internal static TokenType ConvertToTokenType(this TokenInformation token)
         {
             if(token.IsComment)
