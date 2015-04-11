@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using Microsoft.VisualStudio.Package;
-using Microsoft.VisualStudio.TextManager.Interop;
 
 namespace HoyerWare.ReniLanguagePackage
 {

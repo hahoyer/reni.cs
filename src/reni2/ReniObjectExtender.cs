@@ -1,7 +1,7 @@
-using System.Linq;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using hw.Debug;
 using Reni.Formatting;
 using Reni.TokenClasses;
@@ -22,6 +22,7 @@ namespace Reni
         // will throw an exception if not a ReniObject
         internal static int GetObjectId(this object reniObject)
             => ((DumpableObject) reniObject).ObjectId;
+
         // will throw an exception if not a ReniObject
         internal static int? GetObjectId<T>(this object reniObject)
         {
@@ -29,6 +30,7 @@ namespace Reni
                 return ((DumpableObject) reniObject).ObjectId;
             return null;
         }
+
         internal static string NodeDump(this object o)
         {
             var r = o as DumpableObject;
@@ -49,9 +51,11 @@ namespace Reni
         internal static IEnumerable<SourceSyntax> CheckedItemsAsLongAs
             (this SourceSyntax target, Func<SourceSyntax, bool> condition)
         {
-            if(target != null && condition(target))
-                foreach(var result in target.ItemsAsLongAs(condition))
-                    yield return result;
+            if(target == null || !condition(target))
+                yield break;
+
+            foreach(var result in target.ItemsAsLongAs(condition))
+                yield return result;
         }
     }
 }

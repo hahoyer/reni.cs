@@ -25,7 +25,8 @@ namespace Reni.ReniParser
                         },
                         new[]
                         {
-                            RightParenthesis.TokenId(1),
+                            RightParenthesis.
+                            TokenId(1),
                             RightParenthesis.TokenId(2),
                             RightParenthesis.TokenId(3)
                         }

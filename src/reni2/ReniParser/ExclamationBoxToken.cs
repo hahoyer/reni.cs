@@ -31,7 +31,9 @@ namespace Reni.ReniParser
         }
 
         string IType<SourceSyntax>.PrioTableId => PrioTable.Any;
-
         IType<SourceSyntax> IType<SourceSyntax>.NextTypeIfMatched => null;
+
+        ITreeItemFactory ITokenClass.TreeItemFactory => BinaryTree.FactoryInstance;
+        string ITokenClass.Id => PrioTable.Any;
     }
 }

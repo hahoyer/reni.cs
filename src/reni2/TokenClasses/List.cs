@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.Parser;
 using hw.Scanner;
 using Reni.Formatting;
 using Reni.ReniParser;
@@ -15,10 +14,12 @@ namespace Reni.TokenClasses
     sealed class List : TokenClass, IBelongingsMatcher
     {
         public static string TokenId(int level) => ",;.".Substring(level, 1);
-        readonly int _level;
-        public List(int level) { _level = level; }
 
-        public override string Id => TokenId(_level);
+        internal readonly int Level;
+
+        public List(int level) { Level = level; }
+
+        public override string Id => TokenId(Level);
 
         protected override Checked<Syntax> Terminal(SourcePart token)
             =>
@@ -35,6 +36,8 @@ namespace Reni.TokenClasses
 
         protected override Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
             => ListSyntax(left, right);
+
+        protected override ITreeItemFactory TreeItemFactory => ListTree.FactoryInstance;
 
         ListSyntax ListSyntax(Syntax left, Syntax right)
             => new ListSyntax(this, left.ToList(this).Concat(right.ToList(this)).ToArray());

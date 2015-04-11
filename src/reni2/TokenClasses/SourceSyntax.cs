@@ -181,8 +181,8 @@ namespace Reni.TokenClasses
         public string BraceMatchDump => new BraceMatchDumper(this, 3).Dump();
 
         internal string Reformat
-            (IEnumerable<hw.Parser.WhiteSpaceToken> tail, IConfiguration configuration)
-            => ReArrange(tail).Reformat(configuration);
+            (hw.Parser.WhiteSpaceToken[] tail, IConfiguration configuration)
+            => configuration.Reformat(ReArrange(tail));
 
         [DisableDump]
         internal IEnumerable<hw.Parser.WhiteSpaceToken> LeadingWhiteSpaceTokens
@@ -190,13 +190,18 @@ namespace Reni.TokenClasses
                 ? Left.LeadingWhiteSpaceTokens
                 : Token.PrecededWith.OnlyLeftPart();
 
-        BinaryTree ReArrange(IEnumerable<hw.Parser.WhiteSpaceToken> tail)
+        ITreeItem ReArrange(hw.Parser.WhiteSpaceToken[] tail)
         {
-            var left = Left?.ReArrange(Token.PrecededWith.OnlyLeftPart());
-            var tokenHead = Token.PrecededWith.OnlyRightPart();
-            var tokenTail = Right?.LeadingWhiteSpaceTokens ?? tail;
+            var left = Left?.ReArrange(Token.PrecededWith.OnlyLeftPart().ToArray());
+            var tokenHead = Token.PrecededWith.OnlyRightPart().ToArray();
+            var tokenTail = Right?.LeadingWhiteSpaceTokens.ToArray() ?? tail;
+
+            var token = new TokenItem(TokenClass, tokenHead, Token.Id, tokenTail);
             var right = Right?.ReArrange(tail);
-            return new BinaryTree(TokenClass, left, tokenHead, Token.Id, tokenTail, right);
+
+            var factory = TokenClass.TreeItemFactory;
+
+            return factory.Create(left, token, right);
         }
     }
 

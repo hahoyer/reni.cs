@@ -41,6 +41,11 @@ namespace Reni.ReniParser
             (this IEnumerable<WhiteSpaceToken> whiteSpaces)
             => whiteSpaces.Where(item => ReniLexer.IsLineComment(item) || ReniLexer.IsComment(item));
 
+        public static int Length(this IEnumerable<WhiteSpaceToken> whiteSpaceTokens)
+            => whiteSpaceTokens.Sum(item => item.Characters.Id.Length);
+
+        public static string Id(this IEnumerable<WhiteSpaceToken> whiteSpaceTokens)
+            => whiteSpaceTokens.Select(item => item.Characters.Id).Stringify("");
 
         internal static IEnumerable<WhiteSpaceToken> OnlyLeftPart
             (this IEnumerable<WhiteSpaceToken> whiteSpaces)

@@ -2,39 +2,59 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
-using hw.Parser;
+using hw.Helper;
+using Reni.TokenClasses;
 
 namespace Reni.Formatting
 {
-    sealed class BinaryTree : DumpableObject
+    sealed class BinaryTree : DumpableObject, ITreeItem
     {
-        [EnableDump]
-        readonly ITokenClass _tokenClass;
+        internal readonly ITreeItem Left;
+        internal readonly TokenItem Token;
+        internal readonly ITreeItem Right;
 
-        internal readonly BinaryTree Left;
-        internal WhiteSpaceToken[] TokenHead;
-        internal string Token;
-        internal WhiteSpaceToken[] TokenTail;
-        internal readonly BinaryTree Right;
+        readonly ValueCache<int> _lengthCache;
 
-        public BinaryTree
-            (
-            ITokenClass tokenClass,
-            BinaryTree left,
-            IEnumerable<WhiteSpaceToken> tokenHead,
-            string token,
-            IEnumerable<WhiteSpaceToken> tokenTail,
-            BinaryTree right)
+        public static readonly ITreeItemFactory FactoryInstance = new Factory();
+
+        sealed class Factory : ITreeItemFactory
         {
-            _tokenClass = tokenClass;
-            Left = left;
-            TokenHead = tokenHead.ToArray();
-            Token = token;
-            TokenTail = tokenTail.ToArray();
-            Right = right;
+            ITreeItem ITreeItemFactory.Create(ITreeItem left, TokenItem token, ITreeItem right)
+                => new BinaryTree(left, token, right);
         }
 
-        public string Reformat(IConfiguration configuration)
-            => configuration.Assess(this).Reformat(this, configuration);
+        BinaryTree(ITreeItem left, TokenItem token, ITreeItem right)
+        {
+            Left = left;
+            Token = token;
+            Right = right;
+            _lengthCache = new ValueCache<int>(GetLength);
+            Tracer.Assert(Token != null);
+        }
+
+        ITreeItem ITreeItem.List(List level, ListItem left)
+            => new ListTree(level, new[] {left, new ListItem(this, null)});
+
+        IAssessment ITreeItem.Assess(IAssessor assessor)
+        {
+            var assessment = assessor.Assess(Token);
+            if(!assessment.IsMaximal)
+                assessment = assessment.Combine(Left?.Assess(assessor));
+            if(!assessment.IsMaximal)
+                assessment = assessment.Combine(Right?.Assess(assessor));
+            return assessment;
+        }
+
+        string ITreeItem.Reformat(ISubConfiguration configuration)
+        {
+            var left = configuration.Parent.Reformat(Left);
+            var token = configuration.Reformat(Token);
+            var right = configuration.Parent.Reformat(Right);
+            return left + token + right;
+        }
+
+        int ITreeItem.Length => _lengthCache.Value;
+
+        int GetLength() => (Left?.Length ?? 0) + Token.Length + (Right?.Length ?? 0);
     }
 }

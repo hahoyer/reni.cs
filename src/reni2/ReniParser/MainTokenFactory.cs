@@ -159,5 +159,6 @@ namespace Reni.ReniParser
         }
 
         IType<SourceSyntax> IType<SourceSyntax>.NextTypeIfMatched => null;
+        ITreeItemFactory ITokenClass.TreeItemFactory => BinaryTree.FactoryInstance;
     }
 }
