@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Helper;
-using Reni.ReniParser;
 using Reni.TokenClasses;
 
 namespace Reni.Formatting
@@ -22,17 +21,7 @@ namespace Reni.Formatting
         }
 
         sealed class Factory : DumpableObject, ITreeItemFactory
-        {
-            ITreeItem ITreeItemFactory.Create(ITreeItem left, TokenItem token, ITreeItem right)
-            {
-                var listItem = new ListItem(left, token);
-                var level = (List) token.Class;
-                return right?.List(level, listItem) ?? new ListTree(level, new[] {listItem});
-            }
-        }
-
-        ITreeItem ITreeItem.List(List level, ListItem left)
-            => new ListTree(level, left.plus(Items));
+        {}
 
         IAssessment ITreeItem.Assess(IAssessor assessor)
         {
@@ -42,7 +31,7 @@ namespace Reni.Formatting
             {
                 if(result.IsMaximal)
                     return result;
-                result = result.Combine(item.Assess(assessor));
+                result = result.plus(item.Assess(assessor));
             }
 
             return result;

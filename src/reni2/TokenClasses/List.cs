@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using hw.Debug;
 using hw.Scanner;
 using Reni.Formatting;
 using Reni.ReniParser;
@@ -15,6 +16,7 @@ namespace Reni.TokenClasses
     {
         public static string TokenId(int level) => ",;.".Substring(level, 1);
 
+        [DisableDump]
         internal readonly int Level;
 
         public List(int level) { Level = level; }
@@ -37,6 +39,7 @@ namespace Reni.TokenClasses
         protected override Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
             => ListSyntax(left, right);
 
+        [DisableDump]
         protected override ITreeItemFactory TreeItemFactory => ListTree.FactoryInstance;
 
         ListSyntax ListSyntax(Syntax left, Syntax right)

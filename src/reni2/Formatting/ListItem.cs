@@ -23,7 +23,7 @@ namespace Reni.Formatting
             if(Token == null)
                 return Target.Assess(assessor);
             var result = assessor.Assess(Token);
-            return result.IsMaximal ? result : result.Combine(Target.Assess(assessor));
+            return result.IsMaximal ? result : Target.Assess(assessor).plus(result);
         }
 
         internal string Reformat(ISubConfiguration configuration)

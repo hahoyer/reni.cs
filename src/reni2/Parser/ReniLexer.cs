@@ -1,6 +1,6 @@
-using System.Linq;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using hw.Parser;
 using hw.Scanner;
 using Reni.Validation;
@@ -9,6 +9,8 @@ namespace Reni.Parser
 {
     sealed class ReniLexer : ILexer
     {
+        const string Symbols = "°^!²§³$%&/=?\\@€*+~><|:.-";
+        const string SingleCharSymbol = "({[)}];,";
         internal static readonly ReniLexer Instance = new ReniLexer();
 
         sealed class Error : Match.IError
@@ -33,9 +35,9 @@ namespace Reni.Parser
         ReniLexer()
         {
             var alpha = Match.Letter.Else("_");
-            var symbol1 = "({[)}];,".AnyChar();
+            var symbol1 = SingleCharSymbol.AnyChar();
             var textFrame = "'\"".AnyChar();
-            var symbol = "°^!²§³$%&/=?\\@€*+~><|:.-".AnyChar();
+            var symbol = Symbols.AnyChar();
 
             var identifier = (alpha + (alpha.Else(Match.Digit)).Repeat()).Else(symbol.Repeat(1));
 
@@ -111,6 +113,17 @@ namespace Reni.Parser
                 return null;
 
             return item.Characters.Start.Span(headEnd.Value).Id;
+        }
+
+        public static bool IsSymbolLike(string id)
+            => id.Length > 0 && Symbols.Contains(id[0]);
+
+        public static bool IsAlphaLike(string id)
+        {
+            if(id=="")
+                return false;
+
+            return char.IsLetter(id[0]) || id[0] == '_';
         }
     }
 }

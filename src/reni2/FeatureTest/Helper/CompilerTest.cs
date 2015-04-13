@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using hw.Helper;
 using System.Linq;
 using hw.Debug;
-using hw.Parser;
 using hw.UnitTest;
 using Reni.Formatting;
 using Reni.Runtime;
@@ -69,7 +68,7 @@ namespace Reni.FeatureTest.Helper
                 expectedResult(c);
             }
 
-            Tracer.Line(c.SourceSyntax.Reformat(new WhiteSpaceToken[0], DefaultFormat.Instance));
+            Tracer.Line(c.SourceSyntax.Reformat());
             Tracer.ConditionalBreak(true);
             c.Exececute();
 

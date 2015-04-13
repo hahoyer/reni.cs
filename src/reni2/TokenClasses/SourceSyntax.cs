@@ -180,9 +180,8 @@ namespace Reni.TokenClasses
 
         public string BraceMatchDump => new BraceMatchDumper(this, 3).Dump();
 
-        internal string Reformat
-            (hw.Parser.WhiteSpaceToken[] tail, IConfiguration configuration)
-            => configuration.Reformat(ReArrange(tail));
+        internal string Reformat(IConfiguration configuration = null)
+            => (configuration ?? DefaultFormat.Instance).Reformat(this);
 
         [DisableDump]
         internal IEnumerable<hw.Parser.WhiteSpaceToken> LeadingWhiteSpaceTokens
@@ -190,19 +189,13 @@ namespace Reni.TokenClasses
                 ? Left.LeadingWhiteSpaceTokens
                 : Token.PrecededWith.OnlyLeftPart();
 
-        ITreeItem ReArrange(hw.Parser.WhiteSpaceToken[] tail)
-        {
-            var left = Left?.ReArrange(Token.PrecededWith.OnlyLeftPart().ToArray());
-            var tokenHead = Token.PrecededWith.OnlyRightPart().ToArray();
-            var tokenTail = Right?.LeadingWhiteSpaceTokens.ToArray() ?? tail;
+        [DisableDump]
+        internal ITokenClass LeftMostTokenClass
+            => Left == null ? TokenClass : Left.LeftMostTokenClass;
 
-            var token = new TokenItem(TokenClass, tokenHead, Token.Id, tokenTail);
-            var right = Right?.ReArrange(tail);
-
-            var factory = TokenClass.TreeItemFactory;
-
-            return factory.Create(left, token, right);
-        }
+        [DisableDump]
+        internal ITokenClass RightMostTokenClass
+            => Right == null ? TokenClass : Right.RightMostTokenClass;
     }
 
     interface IBelongingsMatcher

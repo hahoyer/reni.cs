@@ -128,7 +128,6 @@
     <Compile Include="Formatting\Main.cs" />
     <Compile Include="Formatting\MultiLineAssessment.cs" />
     <Compile Include="Formatting\MultiLineFormat.cs" />
-    <Compile Include="Formatting\NoReformat.cs" />
     <Compile Include="Formatting\IConfiguration.cs" />
     <Compile Include="Formatting\ITokenClass.cs" />
     <Compile Include="Formatting\ITreeItem.cs" />

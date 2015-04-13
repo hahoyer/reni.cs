@@ -13,8 +13,6 @@ namespace Reni.Formatting
 
         IAssessment IAssessment.Combine(IAssessment other)
         {
-            if(other == null || this == other)
-                return this;
             if(other.IsMaximal)
                 return other;
 

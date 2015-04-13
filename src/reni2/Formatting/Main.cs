@@ -4,7 +4,6 @@ using System.Linq;
 using hw.Parser;
 using hw.Debug;
 using Reni.ReniParser;
-using Reni.TokenClasses;
 
 namespace Reni.Formatting
 {
@@ -22,20 +21,7 @@ namespace Reni.Formatting
         }
 
         sealed class Factory : DumpableObject, ITreeItemFactory
-        {
-            ITreeItem ITreeItemFactory.Create(ITreeItem left, TokenItem token, ITreeItem right)
-            {
-                Tracer.Assert(right == null);
-                Tracer.Assert(token.Tail.SourcePart() == null);
-                return new Main(left, token.Head);
-            }
-        }
-
-        ITreeItem ITreeItem.List(List level, ListItem left)
-        {
-            NotImplementedMethod(left, left);
-            return null;
-        }
+        {}
 
         IAssessment ITreeItem.Assess(IAssessor assessor)
             => assessor.Length(Target.Length + (Tail.SourcePart()?.Length ?? 0));

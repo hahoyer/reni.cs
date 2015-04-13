@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Helper;
-using Reni.TokenClasses;
 
 namespace Reni.Formatting
 {
@@ -18,10 +17,7 @@ namespace Reni.Formatting
         public static readonly ITreeItemFactory FactoryInstance = new Factory();
 
         sealed class Factory : ITreeItemFactory
-        {
-            ITreeItem ITreeItemFactory.Create(ITreeItem left, TokenItem token, ITreeItem right)
-                => new BinaryTree(left, token, right);
-        }
+        {}
 
         BinaryTree(ITreeItem left, TokenItem token, ITreeItem right)
         {
@@ -32,25 +28,20 @@ namespace Reni.Formatting
             Tracer.Assert(Token != null);
         }
 
-        ITreeItem ITreeItem.List(List level, ListItem left)
-            => new ListTree(level, new[] {left, new ListItem(this, null)});
+        string ITreeItem.Reformat(ISubConfiguration configuration)
+        {
+            NotImplementedMethod(configuration);
+            return null;
+        }
 
         IAssessment ITreeItem.Assess(IAssessor assessor)
         {
             var assessment = assessor.Assess(Token);
             if(!assessment.IsMaximal)
-                assessment = assessment.Combine(Left?.Assess(assessor));
+                assessment = (Left?.Assess(assessor)).plus(assessment);
             if(!assessment.IsMaximal)
-                assessment = assessment.Combine(Right?.Assess(assessor));
+                assessment = assessment.plus(Right?.Assess(assessor));
             return assessment;
-        }
-
-        string ITreeItem.Reformat(ISubConfiguration configuration)
-        {
-            var left = configuration.Parent.Reformat(Left);
-            var token = configuration.Reformat(Token);
-            var right = configuration.Parent.Reformat(Right);
-            return left + token + right;
         }
 
         int ITreeItem.Length => _lengthCache.Value;

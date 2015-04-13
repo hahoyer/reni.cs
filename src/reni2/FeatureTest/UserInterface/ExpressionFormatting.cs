@@ -16,8 +16,7 @@ namespace Reni.FeatureTest.UserInterface
         {
             const string Text = @"(1,3,4,6)";
             var compiler = new Compiler(text: Text);
-            var x = compiler.SourceSyntax.
-                Reformat(null,DefaultFormat.Instance);
+            var x = compiler.SourceSyntax.Reformat();
             Tracer.Assert(x == "(1, 3, 4, 6)", x);
         }
 
