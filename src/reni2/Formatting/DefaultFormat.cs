@@ -52,39 +52,56 @@ namespace Reni.Formatting
         {
             var list = target.TokenClass as List;
             if(list != null)
-                return ReformatList(target, list);
+                return Reformat(target, list);
+
+            var rightParenthesis = target.TokenClass as RightParenthesis;
+            if(rightParenthesis != null)
+                return Reformat(target, rightParenthesis);
 
             var left = target.Left?.Reformat(this);
             var token = Format(target.Token) ?? "";
             var right = target.Right?.Reformat(this);
 
-            return LeftDelimiter(target.Left, target.TokenClass).After(left) +
+            return LeftSeparator(target.Left, target.TokenClass).After(left) +
                 token +
-                RightDelimiter(target).Before(right);
+                RightSeparator(target).Before(right);
         }
 
-        string ReformatList(SourceSyntax target, List list)
+        string Reformat(SourceSyntax target, RightParenthesis rightParenthesis)
         {
-            var items = RearrangeAsList(target, list);
-            IDelimiterType separator = Delimiter(list, null);
-            if(separator != DelimiterType.MultiLine)
-                return items.Stringify("");
+            var left = target.Left;
+            Tracer.Assert(left != null);
+            Tracer.Assert(target.Right == null);
+            Tracer.Assert(left.Left == null);
+            var leftParenthesis = ((LeftParenthesis) left.TokenClass);
+            Tracer.Assert(leftParenthesis.Level == rightParenthesis.Level);
 
-            return Grouped(items, separator.Text).Stringify("");
+            var lefttoken = Format(left.Token);
+            var rightToken = Format(target.Token);
+            var innerTarget = left.Right?.Reformat(this);
+
+            var separator = Separator(leftParenthesis, null)
+                .Escalate(() => AssessSeparator(innerTarget));
+
+            return separator.Text + 
+                lefttoken +
+                separator.Before(innerTarget) +
+                separator.Text +
+                rightToken;
         }
 
-        static IEnumerable<string> Grouped(IEnumerable<string> items, string separator)
+        static ISeparatorType AssessSeparator(string target)
+            => (target?.Any(item => item == '\n') ?? false)
+                ? SeparatorType.Multiline
+                : SeparatorType.Contact;
+
+        string Reformat(SourceSyntax target, List token)
         {
-            var lastWasMultilline = false;
-            foreach(var item in items)
-            {
-                var isMultiline = item.Contains(separator);
-                if(lastWasMultilline || isMultiline)
-                    yield return separator;
-                yield return item;
-                yield return separator;
-                lastWasMultilline = isMultiline;
-            }
+            var items = RearrangeAsList(target, token);
+            var separator = Separator(token, null);
+            return separator
+                .Grouped(items)
+                .Stringify(separator.Text);
         }
 
         IEnumerable<string> RearrangeAsList(SourceSyntax target, List list)
@@ -109,61 +126,53 @@ namespace Reni.Formatting
         string ListLine(SourceSyntax target, IToken token, ITokenClass list)
         {
             var text = target?.Reformat(this);
-            return LeftDelimiter(target, list).After(text) +
-                (Format(token) ?? "");
+            return LeftSeparator(target, list).After(text) + (Format(token) ?? "");
         }
 
-        static IDelimiterType RightDelimiter(SourceSyntax target)
+        static ISeparatorType RightSeparator(SourceSyntax target)
             => target.Right == null
-                ? DelimiterType.None
-                : Delimiter(target.TokenClass, target.Right.LeftMostTokenClass);
+                ? SeparatorType.None
+                : Separator(target.TokenClass, target.Right.LeftMostTokenClass);
 
-        static IDelimiterType LeftDelimiter(SourceSyntax left, ITokenClass tokenClass)
+        static ISeparatorType LeftSeparator(SourceSyntax left, ITokenClass tokenClass)
             => left == null
-                ? DelimiterType.None
-                : Delimiter(left.RightMostTokenClass, tokenClass);
+                ? SeparatorType.None
+                : Separator(left.RightMostTokenClass, tokenClass);
 
-        static IDelimiterType Delimiter(ITokenClass left, ITokenClass right)
-            => PrettyDelimiter(left, right) ??
-                BaseDelimiterType(left, right);
+        static ISeparatorType Separator(ITokenClass left, ITokenClass right)
+            => PrettySeparatorType(left, right) ??
+                BaseSeparatorType(left, right);
 
-        static IDelimiterType BaseDelimiterType(ITokenClass left, ITokenClass right)
+        static ISeparatorType BaseSeparatorType(ITokenClass left, ITokenClass right)
             => ContactClass(left).IsCompatible(ContactClass(right))
-                ? DelimiterType.Contact
-                : DelimiterType.Close;
+                ? SeparatorType.Contact
+                : SeparatorType.Close;
 
-        static IDelimiterType PrettyDelimiter(ITokenClass left, ITokenClass right)
+        static ISeparatorType PrettySeparatorType(ITokenClass left, ITokenClass right)
         {
-            if(left.Id == "{" && ((right == null) || right.Id != "}"))
-                return DelimiterType.Indent;
-
-            if(right != null &&
-                (
-                    right.Id == "{" || left.Id != "{" && right.Id == "}")
-                )
-                return DelimiterType.MultiLine;
-
             if(left is RightParenthesis && !(right is List))
-                return DelimiterType.Close;
+                return SeparatorType.Close;
 
             var leftList = left as List;
             if(leftList != null)
-                return leftList.Level > 0 ? DelimiterType.MultiLine : DelimiterType.Close;
+                return leftList.Level > 0 ? SeparatorType.ClusteredMultiLine : SeparatorType.Close;
 
             if(left is Colon)
-                return DelimiterType.Close;
+                return SeparatorType.Close;
 
             return null;
         }
 
         static ContactType ContactClass(ITokenClass target)
-            => ReniLexer.IsAlphaLike(target.Id) || target is Number
-                ? ContactType.AlphaNum
-                : target is Text
-                    ? ContactType.Text
-                    : (ReniLexer.IsSymbolLike(target.Id)
-                        ? ContactType.Symbol
-                        : ContactType.SingleChar);
+            => target == null
+                ? ContactType.Compatible
+                : ReniLexer.IsAlphaLike(target.Id) || target is Number
+                    ? ContactType.AlphaNum
+                    : target is Text
+                        ? ContactType.Text
+                        : (ReniLexer.IsSymbolLike(target.Id)
+                            ? ContactType.Symbol
+                            : ContactType.Compatible);
 
         string Format(IToken token)
         {
@@ -175,73 +184,18 @@ namespace Reni.Formatting
         }
     }
 
-    interface IDelimiterType
-    {
-        string After(string target);
-        string Before(string target);
-        string Text { get; }
-    }
-
-    static class DelimiterType
-    {
-        internal static readonly IDelimiterType None = new NoneType();
-        internal static readonly IDelimiterType Contact = new ConcatType("");
-        internal static readonly IDelimiterType Close = new ConcatType(" ");
-        internal static readonly IDelimiterType MultiLine = new ConcatType("\n");
-        internal static readonly IDelimiterType Indent = new IndentType();
-
-        sealed class IndentType : DumpableObject, IDelimiterType
-        {
-            string IDelimiterType.After(string target)
-            {
-                NotImplementedMethod(target);
-                return null;
-            }
-
-            string IDelimiterType.Before(string target) => ("\n" + target).Indent();
-            string IDelimiterType.Text => "\n";
-        }
-
-        sealed class NoneType : DumpableObject, IDelimiterType
-        {
-            string IDelimiterType.After(string target)
-            {
-                Tracer.Assert(target == null);
-                return "";
-            }
-
-            string IDelimiterType.Before(string target)
-            {
-                Tracer.Assert(target == null);
-                return "";
-            }
-
-            string IDelimiterType.Text => null;
-        }
-
-        sealed class ConcatType : DumpableObject, IDelimiterType
-        {
-            readonly string _delimiter;
-            internal ConcatType(string delimiter) { _delimiter = delimiter; }
-
-            string IDelimiterType.After(string target) => target + _delimiter;
-            string IDelimiterType.Before(string target) => _delimiter + target;
-            string IDelimiterType.Text => _delimiter;
-        }
-    }
-
     sealed class ContactType
     {
         internal static readonly ContactType AlphaNum = new ContactType();
         internal static readonly ContactType Symbol = new ContactType();
         internal static readonly ContactType Text = new ContactType();
-        internal static readonly ContactType SingleChar = new ContactType();
+        internal static readonly ContactType Compatible = new ContactType();
 
         public bool IsCompatible(ContactType other)
         {
-            if(this == SingleChar)
+            if(this == Compatible)
                 return true;
-            if(other == SingleChar)
+            if(other == Compatible)
                 return true;
             return this != other;
         }

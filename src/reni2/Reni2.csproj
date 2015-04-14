@@ -133,6 +133,7 @@
     <Compile Include="Formatting\ITreeItem.cs" />
     <Compile Include="Formatting\ListItem.cs" />
     <Compile Include="Formatting\ListTree.cs" />
+    <Compile Include="Formatting\SeparatorType.cs" />
     <Compile Include="Formatting\TokenItem.cs" />
     <Compile Include="hw\Debug\Configuration.cs" />
     <Compile Include="hw\Debug\DebugTextWriter.cs" />

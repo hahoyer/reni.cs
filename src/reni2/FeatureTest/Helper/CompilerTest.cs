@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using hw.Helper;
 using System.Linq;
 using hw.Debug;
+using hw.Helper;
 using hw.UnitTest;
-using Reni.Formatting;
 using Reni.Runtime;
-using Reni.TokenClasses;
 using Reni.Validation;
 
 namespace Reni.FeatureTest.Helper
@@ -75,7 +73,7 @@ namespace Reni.FeatureTest.Helper
             if(outStream.Data != targetSet.Output)
             {
                 Tracer.Line("---------------------\n" + outStream.Data + "\n---------------------");
-                    Tracer.ThrowAssertionFailed
+                Tracer.ThrowAssertionFailed
                     (
                         "outStream.Data != targetSet.Output",
                         () => "outStream.Data:" + outStream.Data + " expected: " + targetSet.Output);
