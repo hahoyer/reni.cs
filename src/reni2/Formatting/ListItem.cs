@@ -2,36 +2,74 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
+using hw.Helper;
+using hw.Parser;
+using Reni.TokenClasses;
 
 namespace Reni.Formatting
 {
     sealed class ListItem : DumpableObject
     {
-        internal readonly ITreeItem Target;
-        internal readonly TokenItem Token;
+        readonly List _token;
+        readonly Item[] _data;
 
-        internal ListItem(ITreeItem target, TokenItem token)
+        ListItem(List token, IEnumerable<Item> data)
         {
-            Target = target;
-            Token = token;
+            _token = token;
+            _data = data.ToArray();
         }
 
-        internal int Length => (Target?.Length ?? 0) + (Token?.Length ?? 0);
-
-        public IAssessment Assess(IAssessor assessor)
+        public static ListItem CheckedCreate(SourceSyntax target)
         {
-            if(Token == null)
-                return Target.Assess(assessor);
-            var result = assessor.Assess(Token);
-            return result.IsMaximal ? result : Target.Assess(assessor).plus(result);
+            var list = target.TokenClass as List;
+            return list == null ? null : new ListItem(list, Rearrange(target, list));
         }
 
-        internal string Reformat(ISubConfiguration configuration)
+        sealed class Item : DumpableObject
         {
-            var head = configuration.ListItemHead;
-            var target = configuration.Parent.Reformat(Target);
-            var token = Token == null ? "" : configuration.Reformat(Token);
-            return head + target + token;
+            internal readonly SourceSyntax Left;
+            internal readonly IToken Token;
+
+            internal Item(SourceSyntax left, IToken token)
+            {
+                Left = left;
+                Token = token;
+            }
+        }
+
+        static IEnumerable<Item> Rearrange(SourceSyntax target, List list)
+        {
+            do
+            {
+                yield return new Item(target.Left, target.Token);
+
+                target = target.Right;
+
+                if(target == null)
+                    yield break;
+
+                if(target.TokenClass != list)
+                {
+                    yield return new Item(target, null);
+                    yield break;
+                }
+            } while(true);
+        }
+
+        internal string Reformat(DefaultFormat defaultFormat)
+        {
+            var items = _data.Select(item => ListLine(defaultFormat, item.Left, item.Token));
+            var separator = DefaultFormat.ListSeparator(_token.Level);
+            return DefaultFormat.Grouped(items, separator.Text)
+                .Stringify(separator.Text);
+        }
+
+        string ListLine
+            (DefaultFormat defaultFormat, SourceSyntax target, IToken token)
+        {
+            var text = target?.Reformat(defaultFormat);
+            return text + defaultFormat.Separator(target?.RightMostTokenClass, _token).Text +
+                (defaultFormat.Format(token) ?? "");
         }
     }
 }

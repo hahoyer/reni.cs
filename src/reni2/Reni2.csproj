@@ -120,6 +120,8 @@
     <Compile Include="Feature\Simple.cs" />
     <Compile Include="Formatting\BinaryTree.cs" />
     <Compile Include="Formatting\Brace.cs" />
+    <Compile Include="Formatting\BraceItem.cs" />
+    <Compile Include="Formatting\ContactType.cs" />
     <Compile Include="Formatting\DefaultAssessment.cs" />
     <Compile Include="Formatting\DefaultFormat.cs" />
     <Compile Include="Formatting\DefaultSubFormat.cs" />
@@ -132,7 +134,6 @@
     <Compile Include="Formatting\ITokenClass.cs" />
     <Compile Include="Formatting\ITreeItem.cs" />
     <Compile Include="Formatting\ListItem.cs" />
-    <Compile Include="Formatting\ListTree.cs" />
     <Compile Include="Formatting\SeparatorType.cs" />
     <Compile Include="Formatting\TokenItem.cs" />
     <Compile Include="hw\Debug\Configuration.cs" />
