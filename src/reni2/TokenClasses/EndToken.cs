@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using hw.Debug;
 using hw.Parser;
 using hw.Scanner;
 using Reni.Formatting;
@@ -15,6 +16,5 @@ namespace Reni.TokenClasses
 
         protected override Checked<Syntax> Terminal(SourcePart token) => new EmptyList();
         public override string Id => PrioTable.EndOfText;
-
     }
 }

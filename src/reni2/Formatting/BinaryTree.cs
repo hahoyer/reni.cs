@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
-using hw.Helper;
 using Reni.TokenClasses;
 
 namespace Reni.Formatting
@@ -12,8 +11,6 @@ namespace Reni.Formatting
         internal readonly ITreeItem Left;
         internal readonly TokenItem Token;
         internal readonly ITreeItem Right;
-
-        readonly ValueCache<int> _lengthCache;
 
         public static readonly ITreeItemFactory FactoryInstance = new Factory();
 
@@ -28,14 +25,11 @@ namespace Reni.Formatting
             Left = left;
             Token = token;
             Right = right;
-            _lengthCache = new ValueCache<int>(GetLength);
             Tracer.Assert(Token != null);
         }
 
         ITreeItem ITreeItem.List(List level, ListTree.Item left)
             => new ListTree(level, new[] {left, new ListTree.Item(this, null)});
-
-        int ITreeItem.Length => _lengthCache.Value;
 
         int ITreeItem.UseLength(int length)
         {
@@ -52,8 +46,6 @@ namespace Reni.Formatting
 
         ITokenClass ITreeItem.RightMostTokenClass
             => Right == null ? Token.Class : Right.RightMostTokenClass;
-
-        int GetLength() => (Left?.Length ?? 0) + Token.Length + (Right?.Length ?? 0);
 
         string ITreeItem.Reformat(IConfiguration configuration, ISeparatorType separator)
             => configuration.Reformat(this, separator);
@@ -85,5 +77,7 @@ namespace Reni.Formatting
 
             return DefaultFormat.Separator(Token.Class, other);
         }
+
+        string ITreeItem.DefaultReformat => DefaultFormat.Instance.Reformat(this);
     }
 }

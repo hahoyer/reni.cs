@@ -18,8 +18,7 @@ namespace Reni.Formatting
         string IConfiguration.Reformat(ITreeItem target)
             => Reformat(target);
 
-
-        string Reformat(ITreeItem target)
+        internal string Reformat(ITreeItem target)
         {
             if(target == null)
                 return null;
@@ -65,7 +64,6 @@ namespace Reni.Formatting
             }
         }
 
-
         string IConfiguration.Reformat(BinaryTree target, ISeparatorType separator)
         {
             var left = Reformat(target.Left);
@@ -90,6 +88,9 @@ namespace Reni.Formatting
 
         static ISeparatorType PrettySeparatorType(ITokenClass left, ITokenClass right)
         {
+            if (right is Colon || right is EndToken)
+                return null;
+
             if (left is List)
                 return SeparatorType.Close;
 

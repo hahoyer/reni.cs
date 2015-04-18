@@ -20,7 +20,8 @@ namespace Reni.Formatting
 
                 var leftTree = (BinaryTree) left;
 
-                Tracer.Assert(leftTree.Left == null);
+                if(leftTree.Left != null)
+                    return BinaryTree.FactoryInstance.Create(left, token, right);
 
                 var rightParenthesis = (RightParenthesis) token.Class;
                 var leftParenthesis = leftTree.Token.Class as LeftParenthesis;
@@ -64,8 +65,6 @@ namespace Reni.Formatting
             return null;
         }
 
-        int ITreeItem.Length => _left.Length + (_target?.Length ?? 0) + _right.Length;
-
         int ITreeItem.UseLength(int length)
         {
             var result = length - _left.Length - _right.Length;
@@ -80,5 +79,7 @@ namespace Reni.Formatting
             var lines = (separator.Text + inner).Indent();
             return _left.Id + lines + separator.Text + _right.Id;
         }
+
+        string ITreeItem.DefaultReformat => DefaultFormat.Instance.Reformat(this);
     }
 }

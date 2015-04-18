@@ -200,9 +200,7 @@ namespace Reni.TokenClasses
             var token = new TokenItem(TokenClass, tokenHead, Token.Id, tokenTail);
             var right = Right?.ReArrange(tail);
 
-            var factory = TokenClass.TreeItemFactory;
-
-            return factory.Create(left, token, right);
+            return TokenClass.TreeItemFactory.Create(left, token, right);
         }
     }
 

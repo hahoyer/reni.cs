@@ -9,9 +9,9 @@ namespace Reni.Formatting
     {
         string Reformat(IConfiguration configuration, ISeparatorType separator);
         ITreeItem List(List level, ListTree.Item left);
-        int Length { get; }
         int UseLength(int length);
         ITokenClass RightMostTokenClass { get; }
         ITokenClass LeftMostTokenClass { get; }
+        string DefaultReformat { get; }
     }
 }

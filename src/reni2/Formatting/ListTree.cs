@@ -31,7 +31,6 @@ namespace Reni.Formatting
                 _token = token;
             }
 
-            internal int Length => _left.Length + (_token?.Length ?? 0);
             public ITokenClass LeftMostTokenClass => _left?.LeftMostTokenClass ?? _token?.Class;
             public ITokenClass RightMostTokenClass => _token?.Class ?? _left?.RightMostTokenClass;
 
@@ -55,8 +54,6 @@ namespace Reni.Formatting
         ITreeItem ITreeItem.List(List level, Item left)
             => new ListTree(level, left.plus(Items));
 
-        int ITreeItem.Length => Items.Sum(item => item.Length);
-
         string ITreeItem.Reformat(IConfiguration configuration, ISeparatorType separator)
             => configuration.Reformat(this, separator);
 
@@ -73,5 +70,7 @@ namespace Reni.Formatting
 
         ITokenClass ITreeItem.LeftMostTokenClass
             => Items.FirstOrDefault()?.LeftMostTokenClass ?? _tokenClass;
+
+        string ITreeItem.DefaultReformat => DefaultFormat.Instance.Reformat(this);
     }
 }
