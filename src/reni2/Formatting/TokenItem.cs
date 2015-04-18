@@ -21,6 +21,8 @@ namespace Reni.Formatting
             Head = head;
             Id = id;
             Tail = tail;
+            Tracer.Assert(Head != null);
+            Tracer.Assert(Tail != null);
         }
 
         [DisableDump]

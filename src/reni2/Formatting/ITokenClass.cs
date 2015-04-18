@@ -6,9 +6,12 @@ namespace Reni.Formatting
 {
     interface ITokenClass
     {
+        ITreeItemFactory TreeItemFactory { get; }
         string Id { get; }
     }
 
     interface ITreeItemFactory
-    {}
+    {
+        ITreeItem Create(ITreeItem left, TokenItem token, ITreeItem right);
+    }
 }

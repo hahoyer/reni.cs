@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Helper;
+using Reni.TokenClasses;
 
 namespace Reni.Formatting
 {
@@ -17,7 +18,10 @@ namespace Reni.Formatting
         public static readonly ITreeItemFactory FactoryInstance = new Factory();
 
         sealed class Factory : ITreeItemFactory
-        {}
+        {
+            ITreeItem ITreeItemFactory.Create(ITreeItem left, TokenItem token, ITreeItem right)
+                => new BinaryTree(left, token, right);
+        }
 
         BinaryTree(ITreeItem left, TokenItem token, ITreeItem right)
         {
@@ -28,24 +32,58 @@ namespace Reni.Formatting
             Tracer.Assert(Token != null);
         }
 
-        string ITreeItem.Reformat(ISubConfiguration configuration)
-        {
-            NotImplementedMethod(configuration);
-            return null;
-        }
-
-        IAssessment ITreeItem.Assess(IAssessor assessor)
-        {
-            var assessment = assessor.Assess(Token);
-            if(!assessment.IsMaximal)
-                assessment = (Left?.Assess(assessor)).plus(assessment);
-            if(!assessment.IsMaximal)
-                assessment = assessment.plus(Right?.Assess(assessor));
-            return assessment;
-        }
+        ITreeItem ITreeItem.List(List level, ListTree.Item left)
+            => new ListTree(level, new[] {left, new ListTree.Item(this, null)});
 
         int ITreeItem.Length => _lengthCache.Value;
 
+        int ITreeItem.UseLength(int length)
+        {
+            var result = length - Token.Length;
+            if(Left != null)
+                result = result <= 0 ? result : Left.UseLength(result);
+            if(Right != null)
+                result = result <= 0 ? result : Right.UseLength(result);
+            return result;
+        }
+
+        ITokenClass ITreeItem.LeftMostTokenClass
+            => Left == null ? Token.Class : Left.LeftMostTokenClass;
+
+        ITokenClass ITreeItem.RightMostTokenClass
+            => Right == null ? Token.Class : Right.RightMostTokenClass;
+
         int GetLength() => (Left?.Length ?? 0) + Token.Length + (Right?.Length ?? 0);
+
+        string ITreeItem.Reformat(IConfiguration configuration, ISeparatorType separator)
+            => configuration.Reformat(this, separator);
+
+        internal ISeparatorType LeftInnerSeparator()
+        {
+            if(Left == null)
+                return null;
+
+            var other = Left?.RightMostTokenClass;
+
+            if(other is RightParenthesis &&
+                Left.UseLength(DefaultFormat.MaxLineLength) < 0)
+                return SeparatorType.Multiline;
+
+            return DefaultFormat.Separator(other, Token.Class);
+        }
+
+        internal ISeparatorType RightInnerSeparator()
+        {
+            if(Right == null)
+                return null;
+
+            var other = Right.LeftMostTokenClass;
+
+            if(other is LeftParenthesis &&
+                Right.UseLength(DefaultFormat.MaxLineLength) < 0)
+                return SeparatorType.Multiline;
+
+            return DefaultFormat.Separator(Token.Class, other);
+        }
     }
 }

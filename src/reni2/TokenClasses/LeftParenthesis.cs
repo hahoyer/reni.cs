@@ -85,5 +85,6 @@ namespace Reni.TokenClasses
 
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => (otherMatcher as RightParenthesis)?.Level == Level;
+
     }
 }
