@@ -50,7 +50,6 @@ namespace HoyerWare.ReniLanguagePackage
             return new AuthoringScopeWrapper();
         }
 
-
         public override string GetFormatFilterList() => "Reni files (*.reni)\n*.reni\n";
 
         public override Microsoft.VisualStudio.Package.Source CreateSource(IVsTextLines buffer)

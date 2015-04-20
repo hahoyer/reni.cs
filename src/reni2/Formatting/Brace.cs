@@ -34,10 +34,15 @@ namespace Reni.Formatting
             }
         }
 
+        [EnableDump]
         readonly LeftParenthesis _leftClass;
+        [EnableDump]
         readonly TokenItem _left;
+        [EnableDump]
         readonly ITreeItem _target;
+        [EnableDump]
         readonly TokenItem _right;
+        [EnableDump]
         readonly RightParenthesis _rightClass;
 
         Brace
@@ -59,27 +64,43 @@ namespace Reni.Formatting
         ITokenClass ITreeItem.LeftMostTokenClass => _leftClass;
         ITokenClass ITreeItem.RightMostTokenClass => _rightClass;
 
+        int ITreeItem.UseLength(int length)
+        {
+            var result = length - _left.Length - _right.Length;
+            if (_target != null)
+                result = result <= 0 ? result : _target.UseLength(result);
+            return result;
+        }
+
+        string ITreeItem.DefaultReformat => DefaultFormat.Instance.Reformat(this);
+
         ITreeItem ITreeItem.List(List level, ListTree.Item left)
         {
             NotImplementedMethod(level, left);
             return null;
         }
 
-        int ITreeItem.UseLength(int length)
+        string ITreeItem.Reformat(IConfiguration configuration)
         {
-            var result = length - _left.Length - _right.Length;
-            if(_target != null)
-                result = result <= 0 ? result : _target.UseLength(result);
+            NotImplementedMethod(configuration);
+
+            var separator = UseLength(DefaultFormat.MaxLineLength) > 0
+                ? SeparatorType.Contact
+                : SeparatorType.Multiline;
+
+            var inner = _target?.Reformat(configuration) ?? "";
+            var lines = (separator.Text + inner).Indent();
+            var result = _left.Id + lines + separator.Text + _right.Id;
+            Tracer.ConditionalBreak(_leftClass.Level == 1);
             return result;
         }
 
-        string ITreeItem.Reformat(IConfiguration configuration, ISeparatorType separator)
+        int UseLength(int length)
         {
-            var inner = _target?.Reformat(configuration, separator) ?? "";
-            var lines = (separator.Text + inner).Indent();
-            return _left.Id + lines + separator.Text + _right.Id;
+            var result = length - _left.RightLength - _right.LeftLength;
+            if (_target != null)
+                result = result <= 0 ? result : _target.UseLength(result);
+            return result;
         }
-
-        string ITreeItem.DefaultReformat => DefaultFormat.Instance.Reformat(this);
     }
 }

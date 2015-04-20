@@ -18,17 +18,7 @@ namespace Reni.Formatting
         string IConfiguration.Reformat(ITreeItem target)
             => Reformat(target);
 
-        internal string Reformat(ITreeItem target)
-        {
-            if(target == null)
-                return null;
-
-            var separator = target.UseLength(MaxLineLength) > 0
-                ? SeparatorType.Contact
-                : SeparatorType.Multiline;
-
-            return target.Reformat(this, separator);
-        }
+        internal string Reformat(ITreeItem target) => target?.Reformat(this);
 
         string IConfiguration.Reformat(ListTree target, ISeparatorType separator)
         {
@@ -64,7 +54,7 @@ namespace Reni.Formatting
             }
         }
 
-        string IConfiguration.Reformat(BinaryTree target, ISeparatorType separator)
+        string IConfiguration.Reformat(BinaryTree target)
         {
             var left = Reformat(target.Left);
             var leftSeparator = target.LeftInnerSeparator();
@@ -88,13 +78,13 @@ namespace Reni.Formatting
 
         static ISeparatorType PrettySeparatorType(ITokenClass left, ITokenClass right)
         {
-            if (right is Colon || right is EndToken)
+            if(right is Colon || right is EndToken)
                 return null;
 
-            if (left is List)
+            if(left is List)
                 return SeparatorType.Close;
 
-            if (left is Colon && right is LeftParenthesis)
+            if(left is Colon && right is LeftParenthesis)
                 return SeparatorType.Close;
 
             if(left is LeftParenthesis || right is RightParenthesis)

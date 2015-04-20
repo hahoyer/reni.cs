@@ -9,6 +9,6 @@ namespace Reni.Formatting
     {
         string Reformat(ITreeItem target);
         string Reformat(ListTree target, ISeparatorType separator);
-        string Reformat(BinaryTree target, ISeparatorType separator);
+        string Reformat(BinaryTree target);
     }
 }

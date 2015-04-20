@@ -47,8 +47,7 @@ namespace Reni.Formatting
         ITokenClass ITreeItem.RightMostTokenClass
             => Right == null ? Token.Class : Right.RightMostTokenClass;
 
-        string ITreeItem.Reformat(IConfiguration configuration, ISeparatorType separator)
-            => configuration.Reformat(this, separator);
+        string ITreeItem.Reformat(IConfiguration configuration) => configuration.Reformat(this);
 
         internal ISeparatorType LeftInnerSeparator()
         {

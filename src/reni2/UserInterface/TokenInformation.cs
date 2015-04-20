@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Scanner;
-using Reni.Parser;
-using Reni.TokenClasses;
-using Reni.Validation;
 
 namespace Reni.UserInterface
 {
@@ -65,6 +62,8 @@ namespace Reni.UserInterface
         public int StartPosition => SourcePart.Position;
         public int EndPosition => SourcePart.EndPosition;
 
+        public virtual string Reformat => SourcePart.Id;
+
         public Trimmed Trim(int start, int end) => new Trimmed(this, start, end);
 
         bool Equals(TokenInformation other) => SourcePart == other.SourcePart;
@@ -102,51 +101,5 @@ namespace Reni.UserInterface
         }
 
         public abstract IEnumerable<SourcePart> FindAllBelongings(Compiler compiler);
-    }
-
-    sealed class SyntaxToken : TokenInformation
-    {
-        internal SyntaxToken(SourceSyntax sourceSyntax) { SourceSyntax = sourceSyntax; }
-
-        internal SourceSyntax SourceSyntax { get; }
-
-        TokenClass TokenClass => SourceSyntax.TokenClass as TokenClass;
-
-        public override SourcePart SourcePart => SourceSyntax.Token.Characters;
-        public override bool IsKeyword => !IsIdentifier && !IsNumber && !IsText;
-        public override bool IsIdentifier => TokenClass is Definable;
-        public override bool IsText => TokenClass is Text;
-        public override bool IsNumber => TokenClass is Number;
-        public override bool IsError => SourceSyntax.Issues.Any();
-        public override bool IsBraceLike => TokenClass is IBelongingsMatcher;
-
-        public override bool IsComment
-            => SourceSyntax.Issues.Any(item => item.IssueId == IssueId.EOFInComment);
-
-        public override bool IsLineComment
-            => SourceSyntax.Issues.Any(item => item.IssueId == IssueId.EOFInLineComment);
-
-        public override string State => SourceSyntax.Token.Id ?? "";
-
-        public override IEnumerable<SourcePart> FindAllBelongings(Compiler compiler)
-            => compiler.FindAllBelongings(SourceSyntax)?.Select(item => item.Token.Characters);
-    }
-
-    sealed class WhiteSpaceToken : TokenInformation
-    {
-        readonly hw.Parser.WhiteSpaceToken _item;
-        public WhiteSpaceToken(hw.Parser.WhiteSpaceToken item) { _item = item; }
-
-        public override SourcePart SourcePart => _item.Characters;
-        public override bool IsComment => ReniLexer.IsComment(_item);
-        public override bool IsLineComment => ReniLexer.IsLineComment(_item);
-        public override bool IsWhiteSpace => ReniLexer.IsWhiteSpace(_item);
-        public override bool IsLineEnd => ReniLexer.IsLineEnd(_item);
-        public override string State => ReniLexer.Instance.WhiteSpaceId(_item) ?? "";
-
-        public override IEnumerable<SourcePart> FindAllBelongings(Compiler compiler)
-        {
-            yield break;
-        }
     }
 }

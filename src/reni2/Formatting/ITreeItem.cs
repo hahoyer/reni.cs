@@ -7,7 +7,7 @@ namespace Reni.Formatting
 {
     interface ITreeItem
     {
-        string Reformat(IConfiguration configuration, ISeparatorType separator);
+        string Reformat(IConfiguration configuration);
         ITreeItem List(List level, ListTree.Item left);
         int UseLength(int length);
         ITokenClass RightMostTokenClass { get; }

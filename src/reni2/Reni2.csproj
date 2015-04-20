@@ -395,7 +395,9 @@
     <Compile Include="Type\TypeBase.cs" />
     <Compile Include="Type\TypeType.cs" />
     <Compile Include="Type\VoidType.cs" />
+    <Compile Include="UserInterface\SyntaxToken.cs" />
     <Compile Include="UserInterface\TokenInformation.cs" />
+    <Compile Include="UserInterface\WhiteSpaceToken.cs" />
     <Compile Include="Validation\ConsequentialIssueType.cs" />
     <Compile Include="Validation\Issue.cs" />
     <Compile Include="Validation\IssueId.cs" />

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
-using hw.Helper;
+using System.Diagnostics;
 using System.Linq;
+using hw.Debug;
+using hw.Helper;
 using hw.Parser;
 using Reni.Parser;
 
@@ -39,7 +41,13 @@ namespace Reni.ReniParser
 
         internal static IEnumerable<WhiteSpaceToken> OnlyComments
             (this IEnumerable<WhiteSpaceToken> whiteSpaces)
-            => whiteSpaces.Where(item => ReniLexer.IsLineComment(item) || ReniLexer.IsComment(item));
+        {
+            Tracer.ConditionalBreak(whiteSpaces.Any());
+
+            return whiteSpaces
+                .Where
+                (item => ReniLexer.IsLineComment(item) || ReniLexer.IsComment(item));
+        }
 
         public static int Length(this IEnumerable<WhiteSpaceToken> whiteSpaceTokens)
             => whiteSpaceTokens.Sum(item => item.Characters.Id.Length);

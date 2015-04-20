@@ -11,18 +11,11 @@ namespace Reni.Formatting
     {
         public static readonly ITreeItemFactory FactoryInstance = new Factory();
 
-        readonly List _tokenClass;
-        internal readonly Item[] Items;
-
-        internal ListTree(List tokenClass, Item[] items)
-        {
-            _tokenClass = tokenClass;
-            Items = items;
-        }
-
         internal sealed class Item : DumpableObject
         {
+            [EnableDump]
             readonly ITreeItem _left;
+            [EnableDump]
             readonly TokenItem _token;
 
             internal Item(ITreeItem left, TokenItem token)
@@ -31,8 +24,10 @@ namespace Reni.Formatting
                 _token = token;
             }
 
-            public ITokenClass LeftMostTokenClass => _left?.LeftMostTokenClass ?? _token?.Class;
-            public ITokenClass RightMostTokenClass => _token?.Class ?? _left?.RightMostTokenClass;
+            [DisableDump]
+            internal ITokenClass LeftMostTokenClass => _left?.LeftMostTokenClass ?? _token?.Class;
+            [DisableDump]
+            internal ITokenClass RightMostTokenClass => _token?.Class ?? _left?.RightMostTokenClass;
 
             internal string Reformat(IConfiguration configuration)
                 => configuration.Reformat(_left) + (_token?.Id ?? "");
@@ -46,23 +41,33 @@ namespace Reni.Formatting
             ITreeItem ITreeItemFactory.Create(ITreeItem left, TokenItem token, ITreeItem right)
             {
                 var listItem = new Item(left, token);
-                var level = (List) token.Class;
-                return right?.List(level, listItem) ?? new ListTree(level, new[] {listItem});
+                var level = (List)token.Class;
+                return right?.List(level, listItem) ?? new ListTree(level, new[] { listItem });
             }
         }
+
+        readonly List _tokenClass;
+        internal readonly Item[] Items;
+
+        internal ListTree(List tokenClass, Item[] items)
+        {
+            _tokenClass = tokenClass;
+            Items = items;
+        }
+
+        int ITreeItem.UseLength(int length) => UseLength(length);
+        string ITreeItem.DefaultReformat => DefaultFormat.Instance.Reformat(this);
 
         ITreeItem ITreeItem.List(List level, Item left)
             => new ListTree(level, left.plus(Items));
 
-        string ITreeItem.Reformat(IConfiguration configuration, ISeparatorType separator)
-            => configuration.Reformat(this, separator);
-
-        int ITreeItem.UseLength(int length)
+        string ITreeItem.Reformat(IConfiguration configuration)
         {
-            var result = length - Items.Length;
-            foreach(var item in Items.Where(item => result > 0))
-                result = item.UseLength(result);
-            return result;
+            var separator = UseLength(DefaultFormat.MaxLineLength) > 0
+                ? SeparatorType.Contact
+                : SeparatorType.Multiline;
+
+            return configuration.Reformat(this, separator);
         }
 
         ITokenClass ITreeItem.RightMostTokenClass
@@ -71,6 +76,13 @@ namespace Reni.Formatting
         ITokenClass ITreeItem.LeftMostTokenClass
             => Items.FirstOrDefault()?.LeftMostTokenClass ?? _tokenClass;
 
-        string ITreeItem.DefaultReformat => DefaultFormat.Instance.Reformat(this);
+        int UseLength(int length)
+        {
+            var result = length - Items.Length;
+            foreach(var item in Items.Where(item => result > 0))
+                result = item.UseLength(result);
+            return result;
+        }
+
     }
 }

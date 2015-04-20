@@ -23,6 +23,9 @@ namespace Reni.TokenClasses
         internal int Level { get; }
         public override string Id => TokenId(Level);
 
+        [DisableDump]
+        protected override ITreeItemFactory TreeItemFactory => Brace.FactoryInstance;
+
         protected override Checked<Syntax> Suffix(Syntax left, SourcePart token)
             => left.Match(Level, token);
 
@@ -47,8 +50,6 @@ namespace Reni.TokenClasses
 
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => (otherMatcher as LeftParenthesis)?.Level == Level;
-
-        protected override ITreeItemFactory TreeItemFactory => Brace.FactoryInstance;
 
     }
 }

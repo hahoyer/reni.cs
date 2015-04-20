@@ -126,7 +126,7 @@ namespace HoyerWare.ReniLanguagePackage
             var start = Compiler.Token(sourcePart.Position);
             var end = Compiler.Token(sourcePart.EndPosition - 1);
             var common = Compiler.Token(start.SourcePart + end.SourcePart);
-            mgr.Add(new EditSpan(common.SourcePart.ToTextSpan(), common.SourcePart.Id));
+            mgr.Add(new EditSpan(common.SourcePart.ToTextSpan(), common.Reformat));
             mgr.ApplyEdits();
         }
     }
