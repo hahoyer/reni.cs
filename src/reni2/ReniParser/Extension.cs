@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using hw.Debug;
 using hw.Helper;
@@ -42,11 +41,14 @@ namespace Reni.ReniParser
         internal static IEnumerable<WhiteSpaceToken> OnlyComments
             (this IEnumerable<WhiteSpaceToken> whiteSpaces)
         {
-            Tracer.ConditionalBreak(whiteSpaces.Any());
+            if
+                (
+                    whiteSpaces
+                        .Any(item => ReniLexer.IsLineComment(item) || ReniLexer.IsComment(item))
+                )
+                return whiteSpaces;
 
-            return whiteSpaces
-                .Where
-                (item => ReniLexer.IsLineComment(item) || ReniLexer.IsComment(item));
+            return new WhiteSpaceToken[0];
         }
 
         public static int Length(this IEnumerable<WhiteSpaceToken> whiteSpaceTokens)

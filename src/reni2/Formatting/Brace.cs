@@ -82,8 +82,6 @@ namespace Reni.Formatting
 
         string ITreeItem.Reformat(IConfiguration configuration)
         {
-            NotImplementedMethod(configuration);
-
             var separator = UseLength(DefaultFormat.MaxLineLength) > 0
                 ? SeparatorType.Contact
                 : SeparatorType.Multiline;
@@ -91,7 +89,6 @@ namespace Reni.Formatting
             var inner = _target?.Reformat(configuration) ?? "";
             var lines = (separator.Text + inner).Indent();
             var result = _left.Id + lines + separator.Text + _right.Id;
-            Tracer.ConditionalBreak(_leftClass.Level == 1);
             return result;
         }
 

@@ -13,7 +13,7 @@ namespace Reni.FeatureTest.UserInterface
         public void WithComments()
         {
             const string Text = @"systemdata: 
-{ 1 type instance
+{ 1 type instance     # comment
 (
 )
 
@@ -32,7 +32,30 @@ namespace Reni.FeatureTest.UserInterface
 (Text('H') << 'allo') dump_print";
             var compiler = new Compiler(text: Text);
             var x = compiler.SourceSyntax.Reformat();
-            Tracer.Assert(x == "(1, 3, 4, 6)", x);
+            var expected = @"systemdata:
+{
+    1 type instance     # comment
+    
+    ()
+    
+         #(aa  Memory: ((0 type * ('100' to_number_of_base 64)) mutable) instance();
+       
+        ! mutable FreePointer: Memory array_reference mutable;
+     repeat: /\ ^ while() then(^ body(), repeat(^));
+    
+      aa)#
+    
+    
+};
+
+1 = 1 then 2 else 4;
+3;
+(Text ('H') << 'allo') dump_print";
+            x = x.Replace("\r", "");
+            expected= expected.Replace("\r", "");
+
+            Tracer.Assert(x == expected, "\n" + Tracer.Dump(x) + "\n" + expected.NodeDump());
+            Tracer.Assert(false);
         }
 
         [UnitTest]
@@ -65,6 +88,5 @@ namespace Reni.FeatureTest.UserInterface
 
             Tracer.Assert(x.SourcePart.Id == "# Comment\r", x.Dump);
         }
-
     }
 }

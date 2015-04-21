@@ -53,9 +53,9 @@ namespace Reni.Parser
                             .Else(Match.End.Find + _invalidLineComment)
                     );
 
-            _whiteSpace = " \t\r".AnyChar().Repeat(1);
+            _whiteSpace = " \t".AnyChar().Repeat(1);
 
-            _lineEnd = "\n".Box();
+            _lineEnd = "\r".Box().Repeat(maxCount:1) + "\n".Box();
 
             _comment = "#("
                 +
