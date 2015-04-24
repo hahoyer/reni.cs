@@ -99,9 +99,12 @@ namespace HoyerWare.ReniLanguagePackage
 
         internal void ColorizeLine(int line, uint[] attrs, bool trace)
         {
-            TokensForLine(line, trace)
+            var array = TokensForLine(line, trace)
                 .SelectMany(item => item.Token.SelectColors(item.GetCharArray()))
-                .ToArray()
+                .ToArray();
+
+            Tracer.Assert(array.Length <= attrs.Length);
+            array
                 .CopyTo(attrs, 0);
         }
 

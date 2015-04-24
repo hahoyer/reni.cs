@@ -15,7 +15,9 @@ namespace Reni.UserInterface
 
         TokenClass TokenClass => SourceSyntax.TokenClass as TokenClass;
 
-        public override SourcePart SourcePart => SourceSyntax.Token.Characters;
+        public override SourcePart TokenSourcePart => SourceSyntax.Token.Characters;
+        public override SourcePart SourcePart => SourceSyntax.SourcePart;
+
         public override bool IsKeyword => !IsIdentifier && !IsNumber && !IsText;
         public override bool IsIdentifier => TokenClass is Definable;
         public override bool IsText => TokenClass is Text;

@@ -46,7 +46,7 @@ namespace HoyerWare.ReniLanguagePackage
             (ParseRequest request)
         {
             var wrapper = new ParseRequestWrapper(request);
-            wrapper.Scanning();
+            wrapper.Execute();
             return new AuthoringScopeWrapper();
         }
 

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="c5d6fc9a-13f2-4379-b811-3393a68442bf" Version="1.0" Language="en-US" Publisher="HoyerWare" />
-    <DisplayName>ReniLanguagePackage</DisplayName>
-    <Description>Information about my package</Description>
+    <Identity Id="c5d6fc9a-13f2-4379-b811-3393a68442bf" Version="15.0" Language="en-US" Publisher="HoyerWare" />
+    <DisplayName>hw.Reni</DisplayName>
+    <Description xml:space="preserve">Support for programming language Reni</Description >
+    <MoreInfo>https://github.com/hahoyer/reni.cpp/wiki/Die-Programmiersprache-Reni</MoreInfo>
   </Metadata>
   <Installation InstalledByMsi="false">
     <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[14.0]" />

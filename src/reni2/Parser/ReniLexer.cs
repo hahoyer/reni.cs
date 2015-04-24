@@ -43,25 +43,24 @@ namespace Reni.Parser
 
             _any = symbol1.Else(identifier);
 
-            _lineComment = "#"
-                +
+            _lineComment = "#" +
                 Match.LineEnd
-                    .Else(Match.End)
+                    .Else(Match.End + _invalidLineComment)
                     .Else
                     (
-                        "(".AnyChar().Not + Match.LineEnd.Find
-                            .Else(Match.End.Find + _invalidLineComment)
+                        "(".AnyChar().Not +
+                            (Match.LineEnd.Find + Match.LineEnd)
+                                .Else(Match.End.Find + _invalidLineComment)
                     );
 
             _whiteSpace = " \t".AnyChar().Repeat(1);
 
-            _lineEnd = "\r".Box().Repeat(maxCount:1) + "\n".Box();
+            _lineEnd = "\r".Box().Repeat(maxCount: 1) + "\n".Box();
 
-            _comment = "#("
-                +
+            _comment = "#(" +
                 (Match.WhiteSpace + (Match.WhiteSpace + ")#").Find)
                     .Else(_any.Value(id => (Match.WhiteSpace + id + ")#").Box().Find))
-                    .Else(Match.End.Find + _invalidComment)
+                     .Else(Match.End.Find + _invalidComment)
                 ;
 
             _commentHead = "#(" + Match.WhiteSpace.Else(_any);
@@ -74,7 +73,8 @@ namespace Reni.Parser
                     {
                         var textEnd = head.Else(Match.LineEnd + _invalidTextEnd);
                         return textEnd.Find + (head + textEnd.Find).Repeat();
-                    });
+                    }
+                );
         }
 
 
@@ -120,7 +120,7 @@ namespace Reni.Parser
 
         public static bool IsAlphaLike(string id)
         {
-            if(id=="")
+            if(id == "")
                 return false;
 
             return char.IsLetter(id[0]) || id[0] == '_';

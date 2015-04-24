@@ -11,7 +11,9 @@ namespace Reni.UserInterface
         readonly hw.Parser.WhiteSpaceToken _item;
         public WhiteSpaceToken(hw.Parser.WhiteSpaceToken item) { _item = item; }
 
+        public override SourcePart TokenSourcePart => _item.Characters;
         public override SourcePart SourcePart => _item.Characters;
+
         public override bool IsComment => ReniLexer.IsComment(_item);
         public override bool IsLineComment => ReniLexer.IsLineComment(_item);
         public override bool IsWhiteSpace => ReniLexer.IsWhiteSpace(_item);

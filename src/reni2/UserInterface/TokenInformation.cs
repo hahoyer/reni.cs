@@ -9,6 +9,8 @@ namespace Reni.UserInterface
     public abstract class TokenInformation : DumpableObject
     {
         [DisableDump]
+        public abstract SourcePart TokenSourcePart { get; }
+        [DisableDump]
         public abstract SourcePart SourcePart { get; }
         [DisableDump]
         public virtual bool IsKeyword => false;
@@ -66,7 +68,7 @@ namespace Reni.UserInterface
 
         public Trimmed Trim(int start, int end) => new Trimmed(this, start, end);
 
-        bool Equals(TokenInformation other) => SourcePart == other.SourcePart;
+        bool Equals(TokenInformation other) => TokenSourcePart == other.TokenSourcePart;
 
         public override bool Equals(object obj)
         {
@@ -79,7 +81,7 @@ namespace Reni.UserInterface
             return Equals((TokenInformation) obj);
         }
 
-        public override int GetHashCode() => SourcePart.GetHashCode();
+        public override int GetHashCode() => TokenSourcePart.GetHashCode();
 
         public sealed class Trimmed
         {
@@ -89,7 +91,7 @@ namespace Reni.UserInterface
             internal Trimmed(TokenInformation token, int start, int end)
             {
                 Token = token;
-                var sourcePart = token.SourcePart;
+                var sourcePart = token.TokenSourcePart;
                 SourcePart = (sourcePart.Source + (Math.Max(sourcePart.Position, start)))
                     .Span(sourcePart.Source + Math.Min(sourcePart.EndPosition, end));
             }
