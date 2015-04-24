@@ -5,7 +5,7 @@ using hw.Debug;
 using hw.Parser;
 using hw.Scanner;
 using Reni.Formatting;
-using Reni.ReniParser;
+using Reni.Parser;
 using Reni.UserInterface;
 using Reni.Validation;
 
@@ -180,9 +180,8 @@ namespace Reni.TokenClasses
 
         public string BraceMatchDump => new BraceMatchDumper(this, 3).Dump();
 
-        internal string Reformat
-            (IConfiguration configuration = null)
-            => (configuration ?? DefaultFormat.Instance).Reformat(ReArrange());
+        internal string Reformat(IConfiguration configuration = null)
+            => (configuration ?? DefaultFormat.Instance).Reformat(this);
 
         [DisableDump]
         internal IEnumerable<hw.Parser.WhiteSpaceToken> LeadingWhiteSpaceTokens
@@ -190,18 +189,13 @@ namespace Reni.TokenClasses
                 ? Left.LeadingWhiteSpaceTokens
                 : Token.PrecededWith.OnlyLeftPart();
 
-        ITreeItem ReArrange(hw.Parser.WhiteSpaceToken[] tailOrNull = null)
-        {
-            var tail = tailOrNull ?? new hw.Parser.WhiteSpaceToken[0];
-            var left = Left?.ReArrange(Token.PrecededWith.OnlyLeftPart().ToArray());
-            var tokenHead = Token.PrecededWith.OnlyRightPart().ToArray();
-            var tokenTail = Right?.LeadingWhiteSpaceTokens.ToArray() ?? tail;
+        [DisableDump]
+        internal ITokenClass LeftMostTokenClass
+            => Left == null ? TokenClass : Left.LeftMostTokenClass;
 
-            var token = new TokenItem(TokenClass, tokenHead, Token.Id, tokenTail);
-            var right = Right?.ReArrange(tail);
-
-            return TokenClass.TreeItemFactory.Create(left, token, right);
-        }
+        [DisableDump]
+        internal ITokenClass RightMostTokenClass
+            => Right == null ? TokenClass : Right.RightMostTokenClass;
     }
 
     interface IBelongingsMatcher

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Helper;
-using Reni.TokenClasses;
 
 namespace Reni.Formatting
 {
@@ -12,92 +11,38 @@ namespace Reni.Formatting
         public static readonly ITreeItemFactory FactoryInstance = new Factory();
 
         sealed class Factory : DumpableObject, ITreeItemFactory
+        {}
+
+        readonly int _level;
+        internal TokenItem Left;
+        internal ITreeItem Target;
+        internal TokenItem Right;
+
+        Brace(int level, TokenItem left, ITreeItem target, TokenItem right)
         {
-            ITreeItem ITreeItemFactory.Create(ITreeItem left, TokenItem token, ITreeItem right)
-            {
-                Tracer.Assert(right == null);
-                Tracer.Assert(left != null);
-
-                var leftTree = (BinaryTree) left;
-
-                if(leftTree.Left != null)
-                    return BinaryTree.FactoryInstance.Create(left, token, right);
-
-                var rightParenthesis = (RightParenthesis) token.Class;
-                var leftParenthesis = leftTree.Token.Class as LeftParenthesis;
-
-                Tracer.Assert(leftParenthesis != null);
-                Tracer.Assert(leftParenthesis.Level == rightParenthesis.Level);
-
-                return new Brace
-                    (leftParenthesis, leftTree.Token, leftTree.Right, token, rightParenthesis);
-            }
+            _level = level;
+            Left = left;
+            Target = target;
+            Right = right;
         }
 
-        [EnableDump]
-        readonly LeftParenthesis _leftClass;
-        [EnableDump]
-        readonly TokenItem _left;
-        [EnableDump]
-        readonly ITreeItem _target;
-        [EnableDump]
-        readonly TokenItem _right;
-        [EnableDump]
-        readonly RightParenthesis _rightClass;
-
-        Brace
-            (
-            LeftParenthesis leftClass,
-            TokenItem left,
-            ITreeItem target,
-            TokenItem right,
-            RightParenthesis rightClass)
+        IAssessment ITreeItem.Assess(IAssessor assessor)
         {
-            _leftClass = leftClass;
-            _left = left;
-            _target = target;
-            _right = right;
-            _rightClass = rightClass;
-            Tracer.Assert(_rightClass.Level == _leftClass.Level);
-        }
+            var result = assessor.Brace(_level);
+            if(!result.IsMaximal && Target != null)
+                result = result.plus(Target.Assess(assessor));
 
-        ITokenClass ITreeItem.LeftMostTokenClass => _leftClass;
-        ITokenClass ITreeItem.RightMostTokenClass => _rightClass;
-
-        int ITreeItem.UseLength(int length)
-        {
-            var result = length - _left.Length - _right.Length;
-            if (_target != null)
-                result = result <= 0 ? result : _target.UseLength(result);
             return result;
         }
 
-        string ITreeItem.DefaultReformat => DefaultFormat.Instance.Reformat(this);
-
-        ITreeItem ITreeItem.List(List level, ListTree.Item left)
+        string ITreeItem.Reformat(ISubConfiguration configuration)
         {
-            NotImplementedMethod(level, left);
-            return null;
+            var left = configuration.Reformat(Left);
+            var target = Target?.Reformat(configuration).Indent() ?? "";
+            var right = configuration.Reformat(Right);
+            return left + target + right;
         }
 
-        string ITreeItem.Reformat(IConfiguration configuration)
-        {
-            var separator = UseLength(DefaultFormat.MaxLineLength) > 0
-                ? SeparatorType.Contact
-                : SeparatorType.Multiline;
-
-            var inner = _target?.Reformat(configuration) ?? "";
-            var lines = (separator.Text + inner).Indent();
-            var result = _left.Id + lines + separator.Text + _right.Id;
-            return result;
-        }
-
-        int UseLength(int length)
-        {
-            var result = length - _left.RightLength - _right.LeftLength;
-            if (_target != null)
-                result = result <= 0 ? result : _target.UseLength(result);
-            return result;
-        }
+        int ITreeItem.Length => Left.Length + (Target?.Length ?? 0) + Right.Length;
     }
 }

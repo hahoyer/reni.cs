@@ -4,7 +4,7 @@ using System.Linq;
 using hw.Debug;
 using hw.Scanner;
 using Reni.Formatting;
-using Reni.ReniParser;
+using Reni.Parser;
 
 namespace Reni.TokenClasses
 {
@@ -16,16 +16,19 @@ namespace Reni.TokenClasses
     {
         public static string TokenId(int level) => ",;.".Substring(level, 1);
 
-        readonly int _level;
-
-        public List(int level) { _level = level; }
-
-        public override string Id => TokenId(_level);
         [DisableDump]
-        protected override ITreeItemFactory TreeItemFactory => ListTree.FactoryInstance;
+        internal readonly int Level;
+
+        public List(int level) { Level = level; }
+
+        public override string Id => TokenId(Level);
 
         protected override Checked<Syntax> Terminal(SourcePart token)
-            => ListSyntax(new EmptyList(), new EmptyList());
+            =>
+                ListSyntax
+                    (
+                        new EmptyList(),
+                        new EmptyList());
 
         protected override Checked<Syntax> Prefix(SourcePart token, Syntax right)
             => ListSyntax(new EmptyList(), right);
@@ -36,10 +39,13 @@ namespace Reni.TokenClasses
         protected override Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
             => ListSyntax(left, right);
 
-        bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
-            => otherMatcher == this;
+        [DisableDump]
+        protected override ITreeItemFactory TreeItemFactory => ListTree.FactoryInstance;
 
         ListSyntax ListSyntax(Syntax left, Syntax right)
             => new ListSyntax(this, left.ToList(this).Concat(right.ToList(this)).ToArray());
+
+        bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
+            => otherMatcher == this;
     }
 }

@@ -4,7 +4,7 @@ using System.Linq;
 using hw.Debug;
 using Reni.TokenClasses;
 
-namespace Reni.ReniParser
+namespace Reni.Parser
 {
     sealed class DeclarationSyntax : Syntax
     {

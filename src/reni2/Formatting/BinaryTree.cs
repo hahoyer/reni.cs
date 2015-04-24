@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
-using Reni.TokenClasses;
+using hw.Helper;
 
 namespace Reni.Formatting
 {
@@ -12,71 +12,40 @@ namespace Reni.Formatting
         internal readonly TokenItem Token;
         internal readonly ITreeItem Right;
 
+        readonly ValueCache<int> _lengthCache;
+
         public static readonly ITreeItemFactory FactoryInstance = new Factory();
 
         sealed class Factory : ITreeItemFactory
-        {
-            ITreeItem ITreeItemFactory.Create(ITreeItem left, TokenItem token, ITreeItem right)
-                => new BinaryTree(left, token, right);
-        }
+        {}
 
         BinaryTree(ITreeItem left, TokenItem token, ITreeItem right)
         {
             Left = left;
             Token = token;
             Right = right;
+            _lengthCache = new ValueCache<int>(GetLength);
             Tracer.Assert(Token != null);
         }
 
-        ITreeItem ITreeItem.List(List level, ListTree.Item left)
-            => new ListTree(level, new[] {left, new ListTree.Item(this, null)});
-
-        int ITreeItem.UseLength(int length)
+        string ITreeItem.Reformat(ISubConfiguration configuration)
         {
-            var result = length - Token.Length;
-            if(Left != null)
-                result = result <= 0 ? result : Left.UseLength(result);
-            if(Right != null)
-                result = result <= 0 ? result : Right.UseLength(result);
-            return result;
+            NotImplementedMethod(configuration);
+            return null;
         }
 
-        ITokenClass ITreeItem.LeftMostTokenClass
-            => Left == null ? Token.Class : Left.LeftMostTokenClass;
-
-        ITokenClass ITreeItem.RightMostTokenClass
-            => Right == null ? Token.Class : Right.RightMostTokenClass;
-
-        string ITreeItem.Reformat(IConfiguration configuration) => configuration.Reformat(this);
-
-        internal ISeparatorType LeftInnerSeparator()
+        IAssessment ITreeItem.Assess(IAssessor assessor)
         {
-            if(Left == null)
-                return null;
-
-            var other = Left?.RightMostTokenClass;
-
-            if(other is RightParenthesis &&
-                Left.UseLength(DefaultFormat.MaxLineLength) < 0)
-                return SeparatorType.Multiline;
-
-            return DefaultFormat.Separator(other, Token.Class);
+            var assessment = assessor.Assess(Token);
+            if(!assessment.IsMaximal)
+                assessment = (Left?.Assess(assessor)).plus(assessment);
+            if(!assessment.IsMaximal)
+                assessment = assessment.plus(Right?.Assess(assessor));
+            return assessment;
         }
 
-        internal ISeparatorType RightInnerSeparator()
-        {
-            if(Right == null)
-                return null;
+        int ITreeItem.Length => _lengthCache.Value;
 
-            var other = Right.LeftMostTokenClass;
-
-            if(other is LeftParenthesis &&
-                Right.UseLength(DefaultFormat.MaxLineLength) < 0)
-                return SeparatorType.Multiline;
-
-            return DefaultFormat.Separator(Token.Class, other);
-        }
-
-        string ITreeItem.DefaultReformat => DefaultFormat.Instance.Reformat(this);
+        int GetLength() => (Left?.Length ?? 0) + Token.Length + (Right?.Length ?? 0);
     }
 }

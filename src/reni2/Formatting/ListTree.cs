@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
-using Reni.ReniParser;
+using hw.Helper;
 using Reni.TokenClasses;
 
 namespace Reni.Formatting
@@ -11,78 +11,54 @@ namespace Reni.Formatting
     {
         public static readonly ITreeItemFactory FactoryInstance = new Factory();
 
-        internal sealed class Item : DumpableObject
+        internal readonly List TokenClass;
+        internal readonly ListItem[] Items;
+
+        internal ListTree(List tokenClass, ListItem[] items)
         {
-            [EnableDump]
-            readonly ITreeItem _left;
-            [EnableDump]
-            readonly TokenItem _token;
-
-            internal Item(ITreeItem left, TokenItem token)
-            {
-                _left = left;
-                _token = token;
-            }
-
-            [DisableDump]
-            internal ITokenClass LeftMostTokenClass => _left?.LeftMostTokenClass ?? _token?.Class;
-            [DisableDump]
-            internal ITokenClass RightMostTokenClass => _token?.Class ?? _left?.RightMostTokenClass;
-
-            internal string Reformat(IConfiguration configuration)
-                => configuration.Reformat(_left) + (_token?.Id ?? "");
-
-            internal int UseLength(int length)
-                => (_left?.UseLength(length) ?? length) - (_token?.Length ?? 0);
-        }
-
-        sealed class Factory : DumpableObject, ITreeItemFactory
-        {
-            ITreeItem ITreeItemFactory.Create(ITreeItem left, TokenItem token, ITreeItem right)
-            {
-                var listItem = new Item(left, token);
-                var level = (List)token.Class;
-                return right?.List(level, listItem) ?? new ListTree(level, new[] { listItem });
-            }
-        }
-
-        readonly List _tokenClass;
-        internal readonly Item[] Items;
-
-        internal ListTree(List tokenClass, Item[] items)
-        {
-            _tokenClass = tokenClass;
+            TokenClass = tokenClass;
             Items = items;
         }
 
-        int ITreeItem.UseLength(int length) => UseLength(length);
-        string ITreeItem.DefaultReformat => DefaultFormat.Instance.Reformat(this);
+        sealed class Factory : DumpableObject, ITreeItemFactory
+        {}
 
-        ITreeItem ITreeItem.List(List level, Item left)
-            => new ListTree(level, left.plus(Items));
-
-        string ITreeItem.Reformat(IConfiguration configuration)
+        IAssessment ITreeItem.Assess(IAssessor assessor)
         {
-            var separator = UseLength(DefaultFormat.MaxLineLength) > 0
-                ? SeparatorType.Contact
-                : SeparatorType.Multiline;
+            var result = assessor.List(TokenClass);
 
-            return configuration.Reformat(this, separator);
-        }
+            foreach(var item in Items)
+            {
+                if(result.IsMaximal)
+                    return result;
+                result = result.plus(item.Assess(assessor));
+            }
 
-        ITokenClass ITreeItem.RightMostTokenClass
-            => Items.LastOrDefault()?.RightMostTokenClass ?? _tokenClass;
-
-        ITokenClass ITreeItem.LeftMostTokenClass
-            => Items.FirstOrDefault()?.LeftMostTokenClass ?? _tokenClass;
-
-        int UseLength(int length)
-        {
-            var result = length - Items.Length;
-            foreach(var item in Items.Where(item => result > 0))
-                result = item.UseLength(result);
             return result;
         }
 
+        int ITreeItem.Length => Items.Sum(item => item.Length);
+
+        string ITreeItem.Reformat(ISubConfiguration configuration)
+        {
+            var lines = Items.Select(item => item.Reformat(configuration));
+            return PrettyLines(lines).Stringify("");
+        }
+
+        static IEnumerable<string> PrettyLines(IEnumerable<string> lines)
+        {
+            var wasMultiline = false;
+            var addNewLine = false;
+
+            foreach(var line in lines)
+            {
+                var isMultiline = line.Where(item => item == '\n').Skip(1).Any();
+                if(addNewLine && (wasMultiline || isMultiline))
+                    yield return "\n";
+                yield return line;
+                wasMultiline = isMultiline;
+                addNewLine = true;
+            }
+        }
     }
 }

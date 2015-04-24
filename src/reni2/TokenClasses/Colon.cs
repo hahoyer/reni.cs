@@ -4,7 +4,7 @@ using System.Linq;
 using hw.Debug;
 using hw.Parser;
 using hw.Scanner;
-using Reni.ReniParser;
+using Reni.Parser;
 using Reni.Validation;
 
 namespace Reni.TokenClasses
@@ -46,7 +46,7 @@ namespace Reni.TokenClasses
 
         public override string Id => TokenId;
 
-        internal sealed class Syntax : ReniParser.Syntax
+        internal sealed class Syntax : Parser.Syntax
         {
             [EnableDump]
             internal DeclarationTagToken.Syntax Tag { get; }
@@ -75,7 +75,7 @@ namespace Reni.TokenClasses
     [BelongsTo(typeof(DeclarationTokenFactory))]
     abstract class DeclarationTagToken : TerminalToken
     {
-        protected override Checked<ReniParser.Syntax> Terminal(SourcePart token)
+        protected override Checked<Parser.Syntax> Terminal(SourcePart token)
             => new Syntax(this);
 
         [DisableDump]
@@ -83,7 +83,7 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal virtual bool DeclaresConverter => false;
 
-        internal sealed class Syntax : ReniParser.Syntax
+        internal sealed class Syntax : Parser.Syntax
         {
             internal readonly DeclarationTagToken Tag;
 

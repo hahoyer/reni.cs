@@ -28,10 +28,9 @@ namespace HoyerWare.ReniLanguagePackage
 
         TokenInformation Current => _currenCache.Value;
 
-        internal void Execute()
+        internal void Scanning()
         {
             ScanBraces();
-            //ScanErrors();
         }
 
         void ScanBraces()
@@ -42,15 +41,6 @@ namespace HoyerWare.ReniLanguagePackage
             var result = Braces.Select(part => part.ToTextSpan()).ToArray();
             if(result.Length > 1)
                 _parent.Sink.MatchMultiple(result, 0);
-        }
-
-        void ScanErrors()
-        {
-            if (!_parent.Reason.In( ParseReason.HighlightBraces,ParseReason.MatchBraces,ParseReason.MemberSelectAndHighlightBraces))
-                return;
-
-            NotImplementedMethod();
-            
         }
 
         IEnumerable<SourcePart> Braces => _source.BracesLike(Current);

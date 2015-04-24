@@ -10,7 +10,6 @@ using hw.Scanner;
 using Reni.Code;
 using Reni.Context;
 using Reni.Parser;
-using Reni.ReniParser;
 using Reni.Runtime;
 using Reni.Struct;
 using Reni.TokenClasses;
@@ -22,7 +21,7 @@ namespace Reni
     public sealed class Compiler : DumpableObject, IExecutionContext
     {
         static IScanner<SourceSyntax> Scanner(ITokenFactory<SourceSyntax> tokenFactory)
-            => new Scanner<SourceSyntax>(ReniLexer.Instance, tokenFactory);
+            => new Scanner<SourceSyntax>(Lexer.Instance, tokenFactory);
 
         readonly MainTokenFactory _tokenFactory;
         readonly CompilerParameters _parameters;

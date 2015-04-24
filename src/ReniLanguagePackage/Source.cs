@@ -99,12 +99,9 @@ namespace HoyerWare.ReniLanguagePackage
 
         internal void ColorizeLine(int line, uint[] attrs, bool trace)
         {
-            var array = TokensForLine(line, trace)
+            TokensForLine(line, trace)
                 .SelectMany(item => item.Token.SelectColors(item.GetCharArray()))
-                .ToArray();
-
-            Tracer.Assert(array.Length <= attrs.Length);
-            array
+                .ToArray()
                 .CopyTo(attrs, 0);
         }
 
@@ -129,7 +126,7 @@ namespace HoyerWare.ReniLanguagePackage
             var start = Compiler.Token(sourcePart.Position);
             var end = Compiler.Token(sourcePart.EndPosition - 1);
             var common = Compiler.Token(start.SourcePart + end.SourcePart);
-            mgr.Add(new EditSpan(common.SourcePart.ToTextSpan(), common.Reformat));
+            mgr.Add(new EditSpan(common.SourcePart.ToTextSpan(), common.SourcePart.Id));
             mgr.ApplyEdits();
         }
     }

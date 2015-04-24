@@ -4,7 +4,7 @@ using System;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
-using Reni.ReniParser;
+using Reni.Parser;
 
 namespace Reni.TokenClasses
 {

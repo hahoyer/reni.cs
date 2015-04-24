@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.Debug;
 using hw.Helper;
 using hw.Parser;
-using Reni.Parser;
+using JetBrains.Annotations;
 
-namespace Reni.ReniParser
+namespace Reni.Parser
 {
     static class Extension
     {
@@ -28,11 +27,11 @@ namespace Reni.ReniParser
             => (y ?? new T[0]).Where(item => item != null).Distinct().ToArray();
 
         internal static bool IsRelevantWhitespace(this IEnumerable<WhiteSpaceToken> whiteSpaces)
-            => whiteSpaces?.Any(item => !ReniLexer.IsWhiteSpace(item)) ?? false;
+            => whiteSpaces?.Any(item => !Lexer.IsWhiteSpace(item)) ?? false;
 
         internal static bool HasComment(this IEnumerable<WhiteSpaceToken> whiteSpaces)
             =>
-                whiteSpaces?.Any(item => ReniLexer.IsLineComment(item) || ReniLexer.IsComment(item))
+                whiteSpaces?.Any(item => Lexer.IsLineComment(item) || Lexer.IsComment(item))
                     ?? false;
 
         internal static bool HasLines(this IEnumerable<WhiteSpaceToken> whiteSpaces)
@@ -40,16 +39,7 @@ namespace Reni.ReniParser
 
         internal static IEnumerable<WhiteSpaceToken> OnlyComments
             (this IEnumerable<WhiteSpaceToken> whiteSpaces)
-        {
-            if
-                (
-                    whiteSpaces
-                        .Any(item => ReniLexer.IsLineComment(item) || ReniLexer.IsComment(item))
-                )
-                return whiteSpaces;
-
-            return new WhiteSpaceToken[0];
-        }
+            => whiteSpaces.Where(item => Lexer.IsLineComment(item) || Lexer.IsComment(item));
 
         public static int Length(this IEnumerable<WhiteSpaceToken> whiteSpaceTokens)
             => whiteSpaceTokens.Sum(item => item.Characters.Id.Length);
@@ -73,6 +63,53 @@ namespace Reni.ReniParser
                 if(data[i].Characters.Id.Contains("\n"))
                     result = i + 1;
             return result;
+        }
+        [UsedImplicitly]
+        internal static string Symbolize(this string token)
+        {
+            return token.Aggregate("", (current, tokenChar) => current + SymbolizeChar(tokenChar));
+        }
+        static string SymbolizeChar(Char @char)
+        {
+            switch(@char)
+            {
+                case '&':
+                    return "And";
+                case '\\':
+                    return "Backslash";
+                case ':':
+                    return "Colon";
+                case '.':
+                    return "Dot";
+                case '=':
+                    return "Equal";
+                case '>':
+                    return "Greater";
+                case '<':
+                    return "Less";
+                case '-':
+                    return "Minus";
+                case '!':
+                    return "Not";
+                case '|':
+                    return "Or";
+                case '+':
+                    return "Plus";
+                case '/':
+                    return "Slash";
+                case '*':
+                    return "Star";
+                case '~':
+                    return "Tilde";
+                case '_':
+                    return "__";
+                default:
+                    if(Char.IsLetter(@char))
+                        return "_" + @char;
+                    if(Char.IsDigit(@char))
+                        return @char.ToString();
+                    throw new NotImplementedException("Symbolize(" + @char + ")");
+            }
         }
     }
 }

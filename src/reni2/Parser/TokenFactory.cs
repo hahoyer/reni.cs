@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using hw.Helper;
 using System.Linq;
+using hw.Helper;
 using hw.Parser;
 using Reni.TokenClasses;
 
-namespace Reni.ReniParser
+namespace Reni.Parser
 {
     abstract class TokenFactory : TokenFactory<ScannerTokenClass, SourceSyntax>
     {

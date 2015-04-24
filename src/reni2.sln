@@ -22,6 +22,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Resources\Ok.bmp = Resources\Ok.bmp
 		Resources\OnOff.ico = Resources\OnOff.ico
 		..\README = ..\README
+		Resources\reni.ico = Resources\reni.ico
 		Resources\Size.ico = Resources\Size.ico
 		Resources\Stack.Push.ico = Resources\Stack.Push.ico
 		Resources\String.ico = Resources\String.ico

@@ -11,7 +11,7 @@ using hw.Forms;
 using Reni;
 using Reni.FeatureTest.TypeType;
 using Reni.FeatureTest.Validation;
-using Reni.Parser;
+using Reni.ParserTest;
 using Reni.Runtime;
 
 namespace ReniTest

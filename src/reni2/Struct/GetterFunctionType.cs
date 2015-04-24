@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using System;
 using hw.Debug;
 using Reni.Basics;
-using Reni.ReniParser;
+using Reni.Parser;
 using Reni.Type;
 
 namespace Reni.Struct

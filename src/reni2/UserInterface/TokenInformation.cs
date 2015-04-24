@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Scanner;
+using Reni.Parser;
+using Reni.TokenClasses;
+using Reni.Validation;
 
 namespace Reni.UserInterface
 {
     public abstract class TokenInformation : DumpableObject
     {
-        [DisableDump]
-        public abstract SourcePart TokenSourcePart { get; }
         [DisableDump]
         public abstract SourcePart SourcePart { get; }
         [DisableDump]
@@ -46,9 +47,9 @@ namespace Reni.UserInterface
                     return 'l';
                 if(IsWhiteSpace)
                     return 'w';
-                if (IsLineEnd)
+                if(IsLineEnd)
                     return '$';
-                if (IsNumber)
+                if(IsNumber)
                     return 'n';
                 if(IsText)
                     return 't';
@@ -64,11 +65,9 @@ namespace Reni.UserInterface
         public int StartPosition => SourcePart.Position;
         public int EndPosition => SourcePart.EndPosition;
 
-        public virtual string Reformat => SourcePart.Id;
-
         public Trimmed Trim(int start, int end) => new Trimmed(this, start, end);
 
-        bool Equals(TokenInformation other) => TokenSourcePart == other.TokenSourcePart;
+        bool Equals(TokenInformation other) => SourcePart == other.SourcePart;
 
         public override bool Equals(object obj)
         {
@@ -81,7 +80,7 @@ namespace Reni.UserInterface
             return Equals((TokenInformation) obj);
         }
 
-        public override int GetHashCode() => TokenSourcePart.GetHashCode();
+        public override int GetHashCode() => SourcePart.GetHashCode();
 
         public sealed class Trimmed
         {
@@ -91,7 +90,7 @@ namespace Reni.UserInterface
             internal Trimmed(TokenInformation token, int start, int end)
             {
                 Token = token;
-                var sourcePart = token.TokenSourcePart;
+                var sourcePart = token.SourcePart;
                 SourcePart = (sourcePart.Source + (Math.Max(sourcePart.Position, start)))
                     .Span(sourcePart.Source + Math.Min(sourcePart.EndPosition, end));
             }
@@ -103,5 +102,48 @@ namespace Reni.UserInterface
         }
 
         public abstract IEnumerable<SourcePart> FindAllBelongings(Compiler compiler);
+    }
+
+    sealed class SyntaxToken : TokenInformation
+    {
+        internal SyntaxToken(SourceSyntax sourceSyntax) { SourceSyntax = sourceSyntax; }
+
+        internal SourceSyntax SourceSyntax { get; }
+
+        TokenClass TokenClass => SourceSyntax.TokenClass as TokenClass;
+
+        public override SourcePart SourcePart => SourceSyntax.Token.Characters;
+        public override bool IsKeyword => !IsIdentifier && !IsNumber && !IsText;
+        public override bool IsIdentifier => TokenClass is Definable;
+        public override bool IsText => TokenClass is Text;
+        public override bool IsNumber => TokenClass is Number;
+        public override bool IsError => SourceSyntax.Issues.Any();
+        public override bool IsBraceLike => TokenClass is IBelongingsMatcher;
+
+        public override bool IsComment
+            => SourceSyntax.Issues.Any(item => item.IssueId == IssueId.EOFInComment);
+
+        public override bool IsLineComment
+            => SourceSyntax.Issues.Any(item => item.IssueId == IssueId.EOFInLineComment);
+
+        public override string State => SourceSyntax.Token.Id ?? "";
+
+        public override IEnumerable<SourcePart> FindAllBelongings(Compiler compiler)
+            => compiler.FindAllBelongings(SourceSyntax)?.Select(item => item.Token.Characters);
+    }
+
+    sealed class WhiteSpaceToken : TokenInformation
+    {
+        readonly hw.Parser.WhiteSpaceToken _item;
+        public WhiteSpaceToken(hw.Parser.WhiteSpaceToken item) { _item = item; }
+
+        public override SourcePart SourcePart => _item.Characters;
+        public override bool IsComment => Lexer.IsComment(_item);
+        public override bool IsLineComment => Lexer.IsLineComment(_item);
+        public override bool IsWhiteSpace => Lexer.IsWhiteSpace(_item);
+        public override bool IsLineEnd => Lexer.IsLineEnd(_item);
+        public override string State => Lexer.Instance.WhiteSpaceId(_item) ?? "";
+
+        public override IEnumerable<SourcePart> FindAllBelongings(Compiler compiler) { yield break; }
     }
 }

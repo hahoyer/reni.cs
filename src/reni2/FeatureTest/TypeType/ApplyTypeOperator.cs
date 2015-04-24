@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System;
 using hw.UnitTest;
 using Reni.FeatureTest.Helper;
-using Reni.Parser;
+using Reni.ParserTest;
 
 namespace Reni.FeatureTest.TypeType
 {

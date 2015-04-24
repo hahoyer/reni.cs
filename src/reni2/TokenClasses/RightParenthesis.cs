@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
-using hw.Parser;
 using hw.Scanner;
 using Reni.Formatting;
-using Reni.ReniParser;
+using Reni.Parser;
 
 namespace Reni.TokenClasses
 {
@@ -22,9 +21,6 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal int Level { get; }
         public override string Id => TokenId(Level);
-
-        [DisableDump]
-        protected override ITreeItemFactory TreeItemFactory => Brace.FactoryInstance;
 
         protected override Checked<Syntax> Suffix(Syntax left, SourcePart token)
             => left.Match(Level, token);
@@ -51,5 +47,7 @@ namespace Reni.TokenClasses
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => (otherMatcher as LeftParenthesis)?.Level == Level;
 
+        [DisableDump]
+        protected override ITreeItemFactory TreeItemFactory => Brace.FactoryInstance;
     }
 }

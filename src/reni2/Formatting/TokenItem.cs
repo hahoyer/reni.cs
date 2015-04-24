@@ -1,40 +1,41 @@
 using System;
 using System.Collections.Generic;
+using hw.Parser;
 using System.Linq;
 using hw.Debug;
-using hw.Parser;
-using Reni.ReniParser;
+using Reni.Parser;
 
 namespace Reni.Formatting
 {
     sealed class TokenItem : DumpableObject
     {
         internal readonly ITokenClass Class;
-        readonly WhiteSpaceToken[] _head;
-        readonly string _id;
-        readonly WhiteSpaceToken[] _tail;
+        internal readonly WhiteSpaceToken[] Head;
+        internal readonly string Id;
+        internal readonly WhiteSpaceToken[] Tail;
 
         public TokenItem
             (ITokenClass @class, WhiteSpaceToken[] head, string id, WhiteSpaceToken[] tail)
         {
             Class = @class;
-            _head = head;
-            _id = id;
-            _tail = tail;
-            Tracer.Assert(_head != null);
-            Tracer.Assert(_tail != null);
+            Head = head;
+            Id = id;
+            Tail = tail;
         }
 
         [DisableDump]
-        internal int Length => Id.Length;
-        [DisableDump]
-        internal string Id => Head + _id + Tail;
-        [DisableDump]
-        internal int LeftLength => Head.Length + _id.Length;
-        [DisableDump]
-        internal int RightLength => _id.Length + Tail.Length;
+        internal string FullText
+            => (Head.SourcePart()?.Id ?? "") +
+                Id +
+                (Tail.SourcePart()?.Id ?? "");
 
-        string Head => _head.OnlyComments().Id();
-        string Tail => _tail.OnlyComments().Id();
+        [DisableDump]
+        internal int Length => Head.Length() + Id.Length + Tail.Length();
+
+        [DisableDump]
+        internal string HeadComments => Head.OnlyComments().Id();
+
+        [DisableDump]
+        internal string TailComments => Tail.OnlyComments().Id();
     }
 }

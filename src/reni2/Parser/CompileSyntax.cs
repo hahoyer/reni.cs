@@ -12,7 +12,7 @@ using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Type;
 
-namespace Reni.ReniParser
+namespace Reni.Parser
 {
     abstract class CompileSyntax : Syntax
     {

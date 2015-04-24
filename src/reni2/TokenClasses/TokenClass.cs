@@ -6,7 +6,7 @@ using hw.Parser;
 using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Formatting;
-using Reni.ReniParser;
+using Reni.Parser;
 
 namespace Reni.TokenClasses
 {
@@ -62,7 +62,6 @@ namespace Reni.TokenClasses
         protected abstract Checked<Syntax> Suffix(Syntax left, SourcePart token);
         protected abstract Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right);
 
-        ITreeItemFactory ITokenClass.TreeItemFactory => TreeItemFactory;
         protected virtual ITreeItemFactory TreeItemFactory => BinaryTree.FactoryInstance;
     }
 

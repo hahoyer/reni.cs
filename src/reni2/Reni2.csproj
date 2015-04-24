@@ -12,11 +12,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <NoWarn>660;661</NoWarn>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <NoWarn>660;661</NoWarn>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Basics\BitsConst.cs" />
@@ -122,12 +120,19 @@
     <Compile Include="Feature\Simple.cs" />
     <Compile Include="Formatting\BinaryTree.cs" />
     <Compile Include="Formatting\Brace.cs" />
-    <Compile Include="Formatting\ContactType.cs" />
+    <Compile Include="Formatting\DefaultAssessment.cs" />
     <Compile Include="Formatting\DefaultFormat.cs" />
-    <Compile Include="Formatting\ListTree.cs" />
+    <Compile Include="Formatting\DefaultSubFormat.cs" />
+    <Compile Include="Formatting\IAssessment.cs" />
+    <Compile Include="Formatting\IAssessor.cs" />
+    <Compile Include="Formatting\Main.cs" />
+    <Compile Include="Formatting\MultiLineAssessment.cs" />
+    <Compile Include="Formatting\MultiLineFormat.cs" />
     <Compile Include="Formatting\IConfiguration.cs" />
     <Compile Include="Formatting\ITokenClass.cs" />
     <Compile Include="Formatting\ITreeItem.cs" />
+    <Compile Include="Formatting\ListItem.cs" />
+    <Compile Include="Formatting\ListTree.cs" />
     <Compile Include="Formatting\SeparatorType.cs" />
     <Compile Include="Formatting\TokenItem.cs" />
     <Compile Include="hw\Debug\Configuration.cs" />
@@ -220,16 +225,16 @@
     <Compile Include="hw\UnitTest\TestRunner.cs" />
     <Compile Include="hw\UnitTest\TestType.cs" />
     <Compile Include="IProxyType.cs" />
-    <Compile Include="Parser\AlternativePrioTableTest.cs" />
-    <Compile Include="Parser\SimpleTokenFactory.cs" />
-    <Compile Include="Parser\PrioTableTest.cs" />
-    <Compile Include="Parser\ReniLexer.cs" />
-    <Compile Include="Parser\Services.cs" />
+    <Compile Include="ParserTest\AlternativePrioTableTest.cs" />
+    <Compile Include="ParserTest\SimpleTokenFactory.cs" />
+    <Compile Include="ParserTest\PrioTableTest.cs" />
+    <Compile Include="ParserTest\Services.cs" />
     <Compile Include="ReniObjectExtender.cs" />
-    <Compile Include="ReniParser\Extension.cs" />
-    <Compile Include="ReniParser\ExclamationBoxToken.cs" />
-    <Compile Include="ReniParser\TokenFactory.cs" />
-    <Compile Include="ReniParser\ListSyntax.cs" />
+    <Compile Include="Parser\Extension.cs" />
+    <Compile Include="Parser\ExclamationBoxToken.cs" />
+    <Compile Include="Parser\Lexer.cs" />
+    <Compile Include="Parser\TokenFactory.cs" />
+    <Compile Include="Parser\ListSyntax.cs" />
     <Compile Include="ResultCache.cs" />
     <Compile Include="Code\Arg.cs" />
     <Compile Include="Code\Assign.cs" />
@@ -293,13 +298,12 @@
     <Compile Include="FeatureTest\Text.cs" />
     <Compile Include="Feature\DumpPrintToken.cs" />
     <Compile Include="Feature\Interfaces.cs" />
-    <Compile Include="Parser\TokenClassExtender.cs" />
-    <Compile Include="ReniParser\DeclarationSyntax.cs" />
-    <Compile Include="ReniParser\DeclarationTokenFactory.cs" />
-    <Compile Include="ReniParser\DefinableToken.cs" />
-    <Compile Include="ReniParser\ExpressionSyntax.cs" />
-    <Compile Include="ReniParser\MainTokenFactory.cs" />
-    <Compile Include="ReniParser\Syntax.cs" />
+    <Compile Include="Parser\DeclarationSyntax.cs" />
+    <Compile Include="Parser\DeclarationTokenFactory.cs" />
+    <Compile Include="Parser\DefinableToken.cs" />
+    <Compile Include="Parser\ExpressionSyntax.cs" />
+    <Compile Include="Parser\MainTokenFactory.cs" />
+    <Compile Include="Parser\Syntax.cs" />
     <Compile Include="Runtime\BiasCache.cs" />
     <Compile Include="Runtime\DataHandler.cs" />
     <Compile Include="Numeric\Operation.cs" />
@@ -325,12 +329,12 @@
     <Compile Include="FeatureTest\IntegerStruct.cs" />
     <Compile Include="FeatureTest\SimpleFiles.cs" />
     <Compile Include="FeatureTest\ThenElse.cs" />
-    <Compile Include="Parser\Test.cs" />
+    <Compile Include="ParserTest\Test.cs" />
     <Compile Include="Struct\AccessFeature.cs" />
-    <Compile Include="ReniParser\CompileSyntax.cs" />
+    <Compile Include="Parser\CompileSyntax.cs" />
     <Compile Include="Runtime\OutStream.cs" />
-    <Compile Include="ReniParser\Special.cs" />
-    <Compile Include="ReniParser\EmptyList.cs" />
+    <Compile Include="Parser\Special.cs" />
+    <Compile Include="Parser\EmptyList.cs" />
     <Compile Include="TokenClasses\ArgToken.cs" />
     <Compile Include="TokenClasses\BraceMatchDumper.cs" />
     <Compile Include="TokenClasses\CompareOperation.cs" />
@@ -397,9 +401,7 @@
     <Compile Include="Type\TypeBase.cs" />
     <Compile Include="Type\TypeType.cs" />
     <Compile Include="Type\VoidType.cs" />
-    <Compile Include="UserInterface\SyntaxToken.cs" />
     <Compile Include="UserInterface\TokenInformation.cs" />
-    <Compile Include="UserInterface\WhiteSpaceToken.cs" />
     <Compile Include="Validation\ConsequentialIssueType.cs" />
     <Compile Include="Validation\Issue.cs" />
     <Compile Include="Validation\IssueId.cs" />

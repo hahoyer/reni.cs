@@ -1,14 +1,15 @@
-using System.Linq;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using hw.Debug;
 using hw.Forms;
 using hw.Graphics;
 using hw.Parser;
 using hw.Scanner;
+using Reni.Parser;
 
-namespace Reni.Parser
+namespace Reni.ParserTest
 {
     public static class Services
     {
@@ -26,7 +27,7 @@ namespace Reni.Parser
                 return null;
 
             IParser<Syntax> parser = new PrioParser<Syntax>
-                (prioTable, new Scanner<Syntax>(ReniLexer.Instance, new SimpleTokenFactory()));
+                (prioTable, new Scanner<Syntax>(Lexer.Instance, new SimpleTokenFactory()));
             return parser.Execute(new Source(code) + 0);
         }
 

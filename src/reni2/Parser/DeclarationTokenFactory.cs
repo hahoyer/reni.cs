@@ -5,7 +5,7 @@ using hw.Parser;
 using hw.Scanner;
 using Reni.TokenClasses;
 
-namespace Reni.ReniParser
+namespace Reni.Parser
 {
     sealed class DeclarationTokenFactory : TokenFactory
     {

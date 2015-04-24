@@ -46,9 +46,10 @@ namespace HoyerWare.ReniLanguagePackage
             (ParseRequest request)
         {
             var wrapper = new ParseRequestWrapper(request);
-            wrapper.Execute();
+            wrapper.Scanning();
             return new AuthoringScopeWrapper();
         }
+
 
         public override string GetFormatFilterList() => "Reni files (*.reni)\n*.reni\n";
 

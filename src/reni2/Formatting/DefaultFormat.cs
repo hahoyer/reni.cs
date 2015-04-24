@@ -3,71 +3,142 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Helper;
+using hw.Parser;
 using Reni.Parser;
 using Reni.TokenClasses;
 
 namespace Reni.Formatting
 {
-    sealed class DefaultFormat : DumpableObject, IConfiguration
+    sealed class DefaultFormat : DumpableObject, IConfiguration, IAssessor
     {
-        internal const int MaxLineLength = 100;
         public static readonly DefaultFormat Instance = new DefaultFormat();
 
-        DefaultFormat() { }
+        [DisableDump]
+        internal readonly ISubConfiguration MultiLineInstance;
+        [DisableDump]
+        internal readonly ISubConfiguration DefaultInstance;
+
+        DefaultFormat()
+        {
+            DefaultInstance = new DefaultSubFormat(this);
+            MultiLineInstance = new MultiLineFormat(this);
+        }
 
         string IConfiguration.Reformat(ITreeItem target)
-            => Reformat(target);
+            => target?.Reformat(target.Assess(this).Configuration) ?? "";
 
-        internal string Reformat(ITreeItem target) => target?.Reformat(this);
+        IAssessment IAssessor.Assess(TokenItem token)
+            => !token.FullText.Contains("\n")
+                ? DefaultAssessment.Instance
+                : MultiLineAssessment.Instance;
 
-        string IConfiguration.Reformat(ListTree target, ISeparatorType separator)
+        IAssessment IAssessor.List(List target)
+            => target.Level == 0
+                ? DefaultAssessment.Instance
+                : MultiLineAssessment.Instance;
+
+        IAssessment IAssessor.Length(int target)
+            => target < 100
+                ? DefaultAssessment.Instance
+                : MultiLineAssessment.Instance;
+
+        public IAssessment Brace(int level)
+            => level < 3
+                ? DefaultAssessment.Instance
+                : MultiLineAssessment.Instance;
+
+        string IConfiguration.Reformat(SourceSyntax target)
         {
-            var targets =
-                target
-                    .Items
-                    .Select(item => item.Reformat(this) ?? "")
-                    .ToArray();
+            var list = target.TokenClass as List;
+            if(list != null)
+                return Reformat(target, list);
 
-            var listSeparator = separator == SeparatorType.Multiline
-                ? separator
-                : SeparatorType.Close;
+            var rightParenthesis = target.TokenClass as RightParenthesis;
+            if(rightParenthesis != null)
+                return Reformat(target, rightParenthesis);
 
-            return PrettyLines(targets).Stringify(listSeparator.Text);
-        }
+            var left = target.Left?.Reformat(this);
+            var token = Format(target.Token) ?? "";
+            var right = target.Right?.Reformat(this);
 
-        static IEnumerable<string> PrettyLines(IEnumerable<string> lines)
-        {
-            bool? formerIsMultiline = null;
-
-            foreach(var line in lines)
-            {
-                var isMultiline = line.Any(item => item == '\n');
-
-                if(formerIsMultiline == null)
-                    yield return line;
-                else if(formerIsMultiline.Value || isMultiline)
-                    yield return "\n" + line;
-                else
-                    yield return line;
-
-                formerIsMultiline = isMultiline;
-            }
-        }
-
-        string IConfiguration.Reformat(BinaryTree target)
-        {
-            var left = Reformat(target.Left);
-            var leftSeparator = target.LeftInnerSeparator();
-            var token = target.Token.Id;
-            var rightSeparator = target.RightInnerSeparator();
-            var right = Reformat(target.Right);
-
-            return (left == null ? "" : (left + leftSeparator.Text)) +
+            return LeftSeparator(target.Left, target.TokenClass).After(left) +
                 token +
-                (right == null ? "" : (rightSeparator.Text + right));
+                RightSeparator(target).Before(right);
         }
 
-        internal static ISeparatorType Separator(ITokenClass left, ITokenClass right)
+        string Reformat(SourceSyntax target, RightParenthesis rightParenthesis)
+        {
+            var left = target.Left;
+            Tracer.Assert(left != null);
+            Tracer.Assert(target.Right == null);
+            Tracer.Assert(left.Left == null);
+            var leftParenthesis = ((LeftParenthesis) left.TokenClass);
+            Tracer.Assert(leftParenthesis.Level == rightParenthesis.Level);
+
+            var lefttoken = Format(left.Token);
+            var rightToken = Format(target.Token);
+            var innerTarget = left.Right?.Reformat(this);
+
+            var separator = Separator(leftParenthesis, null)
+                .Escalate(() => AssessSeparator(innerTarget));
+
+            return separator.Text + 
+                lefttoken +
+                separator.Before(innerTarget) +
+                separator.Text +
+                rightToken;
+        }
+
+        static ISeparatorType AssessSeparator(string target)
+            => (target?.Any(item => item == '\n') ?? false)
+                ? SeparatorType.Multiline
+                : SeparatorType.Contact;
+
+        string Reformat(SourceSyntax target, List token)
+        {
+            var items = RearrangeAsList(target, token);
+            var separator = Separator(token, null);
+            return separator
+                .Grouped(items)
+                .Stringify(separator.Text);
+        }
+
+        IEnumerable<string> RearrangeAsList(SourceSyntax target, List list)
+        {
+            do
+            {
+                yield return ListLine(target.Left, target.Token, list);
+
+                target = target.Right;
+
+                if(target == null)
+                    yield break;
+
+                if(target.TokenClass != list)
+                {
+                    yield return ListLine(target, null, list);
+                    yield break;
+                }
+            } while(true);
+        }
+
+        string ListLine(SourceSyntax target, IToken token, ITokenClass list)
+        {
+            var text = target?.Reformat(this);
+            return LeftSeparator(target, list).After(text) + (Format(token) ?? "");
+        }
+
+        static ISeparatorType RightSeparator(SourceSyntax target)
+            => target.Right == null
+                ? SeparatorType.None
+                : Separator(target.TokenClass, target.Right.LeftMostTokenClass);
+
+        static ISeparatorType LeftSeparator(SourceSyntax left, ITokenClass tokenClass)
+            => left == null
+                ? SeparatorType.None
+                : Separator(left.RightMostTokenClass, tokenClass);
+
+        static ISeparatorType Separator(ITokenClass left, ITokenClass right)
             => PrettySeparatorType(left, right) ??
                 BaseSeparatorType(left, right);
 
@@ -78,30 +149,54 @@ namespace Reni.Formatting
 
         static ISeparatorType PrettySeparatorType(ITokenClass left, ITokenClass right)
         {
-            if(right is Colon || right is EndToken)
-                return null;
-
-            if(left is List)
+            if(left is RightParenthesis && !(right is List))
                 return SeparatorType.Close;
 
-            if(left is Colon && right is LeftParenthesis)
+            var leftList = left as List;
+            if(leftList != null)
+                return leftList.Level > 0 ? SeparatorType.ClusteredMultiLine : SeparatorType.Close;
+
+            if(left is Colon)
                 return SeparatorType.Close;
 
-            if(left is LeftParenthesis || right is RightParenthesis)
-                return SeparatorType.Contact;
-
-            return SeparatorType.Close;
+            return null;
         }
 
         static ContactType ContactClass(ITokenClass target)
             => target == null
                 ? ContactType.Compatible
-                : ReniLexer.IsAlphaLike(target.Id) || target is Number
+                : Lexer.IsAlphaLike(target.Id) || target is Number
                     ? ContactType.AlphaNum
                     : target is Text
                         ? ContactType.Text
-                        : (ReniLexer.IsSymbolLike(target.Id)
+                        : (Lexer.IsSymbolLike(target.Id)
                             ? ContactType.Symbol
                             : ContactType.Compatible);
+
+        string Format(IToken token)
+        {
+            if(token == null)
+                return "";
+            if(token.PrecededWith.OnlyComments().Id() != "")
+                NotImplementedMethod(token);
+            return token.Id;
+        }
+    }
+
+    sealed class ContactType
+    {
+        internal static readonly ContactType AlphaNum = new ContactType();
+        internal static readonly ContactType Symbol = new ContactType();
+        internal static readonly ContactType Text = new ContactType();
+        internal static readonly ContactType Compatible = new ContactType();
+
+        public bool IsCompatible(ContactType other)
+        {
+            if(this == Compatible)
+                return true;
+            if(other == Compatible)
+                return true;
+            return this != other;
+        }
     }
 }
