@@ -5,7 +5,6 @@ using hw.Debug;
 using hw.Helper;
 using hw.Parser;
 using Reni.Parser;
-using Reni.ReniParser;
 using Reni.TokenClasses;
 
 namespace Reni.Formatting
@@ -166,11 +165,11 @@ namespace Reni.Formatting
         static ContactType ContactClass(ITokenClass target)
             => target == null
                 ? ContactType.Compatible
-                : ReniLexer.IsAlphaLike(target.Id) || target is Number
+                : Lexer.IsAlphaLike(target.Id) || target is Number
                     ? ContactType.AlphaNum
                     : target is Text
                         ? ContactType.Text
-                        : (ReniLexer.IsSymbolLike(target.Id)
+                        : (Lexer.IsSymbolLike(target.Id)
                             ? ContactType.Symbol
                             : ContactType.Compatible);
 

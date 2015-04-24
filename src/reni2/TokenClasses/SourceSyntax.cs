@@ -5,7 +5,7 @@ using hw.Debug;
 using hw.Parser;
 using hw.Scanner;
 using Reni.Formatting;
-using Reni.ReniParser;
+using Reni.Parser;
 using Reni.UserInterface;
 using Reni.Validation;
 

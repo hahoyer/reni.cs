@@ -5,7 +5,7 @@ using hw.UnitTest;
 using Reni.FeatureTest.ConversionService;
 using Reni.FeatureTest.Helper;
 
-namespace Reni.Parser
+namespace Reni.ParserTest
 {
     [UnitTest]
     [Closure]

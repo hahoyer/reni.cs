@@ -4,7 +4,7 @@ using System.Linq;
 using hw.Debug;
 using Reni.Feature;
 using Reni.Numeric;
-using Reni.ReniParser;
+using Reni.Parser;
 
 namespace Reni.TokenClasses
 {

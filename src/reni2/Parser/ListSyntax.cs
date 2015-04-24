@@ -5,7 +5,7 @@ using hw.Debug;
 using Reni.Struct;
 using Reni.TokenClasses;
 
-namespace Reni.ReniParser
+namespace Reni.Parser
 {
     sealed class ListSyntax : Syntax
     {

@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
-using hw.Helper;
 using System.Linq;
 using hw.Debug;
 using hw.Forms;
+using hw.Helper;
 using hw.Scanner;
 using Reni.TokenClasses;
 
-namespace Reni.ReniParser
+namespace Reni.Parser
 {
     sealed class DefinableToken : DumpableObject, IIconKeyProvider
     {

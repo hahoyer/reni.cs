@@ -4,7 +4,7 @@ using System.Linq;
 using hw.UnitTest;
 using Reni.FeatureTest.Helper;
 
-namespace Reni.Parser
+namespace Reni.ParserTest
 {
     [UnitTest]
     [ParserTest]

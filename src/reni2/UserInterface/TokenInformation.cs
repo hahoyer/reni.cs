@@ -47,9 +47,9 @@ namespace Reni.UserInterface
                     return 'l';
                 if(IsWhiteSpace)
                     return 'w';
-                if (IsLineEnd)
+                if(IsLineEnd)
                     return '$';
-                if (IsNumber)
+                if(IsNumber)
                     return 'n';
                 if(IsText)
                     return 't';
@@ -138,15 +138,12 @@ namespace Reni.UserInterface
         public WhiteSpaceToken(hw.Parser.WhiteSpaceToken item) { _item = item; }
 
         public override SourcePart SourcePart => _item.Characters;
-        public override bool IsComment => ReniLexer.IsComment(_item);
-        public override bool IsLineComment => ReniLexer.IsLineComment(_item);
-        public override bool IsWhiteSpace => ReniLexer.IsWhiteSpace(_item);
-        public override bool IsLineEnd => ReniLexer.IsLineEnd(_item);
-        public override string State => ReniLexer.Instance.WhiteSpaceId(_item) ?? "";
+        public override bool IsComment => Lexer.IsComment(_item);
+        public override bool IsLineComment => Lexer.IsLineComment(_item);
+        public override bool IsWhiteSpace => Lexer.IsWhiteSpace(_item);
+        public override bool IsLineEnd => Lexer.IsLineEnd(_item);
+        public override string State => Lexer.Instance.WhiteSpaceId(_item) ?? "";
 
-        public override IEnumerable<SourcePart> FindAllBelongings(Compiler compiler)
-        {
-            yield break;
-        }
+        public override IEnumerable<SourcePart> FindAllBelongings(Compiler compiler) { yield break; }
     }
 }

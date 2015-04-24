@@ -4,7 +4,7 @@ using System.Linq;
 using hw.Debug;
 using hw.Scanner;
 using Reni.Formatting;
-using Reni.ReniParser;
+using Reni.Parser;
 using Reni.Validation;
 
 namespace Reni.TokenClasses
@@ -24,32 +24,32 @@ namespace Reni.TokenClasses
 
         public override string Id => TokenId(Level);
 
-        protected override Checked<ReniParser.Syntax> Suffix
-            (ReniParser.Syntax left, SourcePart token)
+        protected override Checked<Parser.Syntax> Suffix
+            (Parser.Syntax left, SourcePart token)
             => new Syntax(Level, token, null)
                 .Issues(IssueId.UnexpectedUseAsSuffix.CreateIssue(token));
 
-        protected override Checked<ReniParser.Syntax> Infix
-            (ReniParser.Syntax left, SourcePart token, ReniParser.Syntax right)
+        protected override Checked<Parser.Syntax> Infix
+            (Parser.Syntax left, SourcePart token, Parser.Syntax right)
             => new Syntax(Level, token, right)
                 .Issues(IssueId.UnexpectedUseAsInfix.CreateIssue(token));
 
-        protected override Checked<ReniParser.Syntax> Prefix
-            (SourcePart token, ReniParser.Syntax right)
+        protected override Checked<Parser.Syntax> Prefix
+            (SourcePart token, Parser.Syntax right)
             => new Syntax(Level, token, right);
 
-        protected override Checked<ReniParser.Syntax> Terminal(SourcePart token)
+        protected override Checked<Parser.Syntax> Terminal(SourcePart token)
             => new Syntax(Level, token, null);
 
-        sealed class Syntax : ReniParser.Syntax
+        sealed class Syntax : Parser.Syntax
         {
             SourcePart Token { get; }
             readonly int _level;
 
             [EnableDump]
-            ReniParser.Syntax Right { get; }
+            Parser.Syntax Right { get; }
 
-            public Syntax(int level, SourcePart token, ReniParser.Syntax right)
+            public Syntax(int level, SourcePart token, Parser.Syntax right)
             {
                 Token = token;
                 _level = level;
@@ -57,7 +57,7 @@ namespace Reni.TokenClasses
             }
 
             [DisableDump]
-            protected override IEnumerable<ReniParser.Syntax> DirectChildren
+            protected override IEnumerable<Parser.Syntax> DirectChildren
             {
                 get { yield return Right; }
             }
@@ -76,7 +76,7 @@ namespace Reni.TokenClasses
                 }
             }
 
-            internal override Checked<ReniParser.Syntax> Match(int level, SourcePart token)
+            internal override Checked<Parser.Syntax> Match(int level, SourcePart token)
             {
                 Tracer.Assert(_level == level);
                 return (Right ?? new EmptyList());

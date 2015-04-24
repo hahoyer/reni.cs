@@ -5,12 +5,11 @@ using hw.Parser;
 using hw.Scanner;
 using Reni.Formatting;
 using Reni.Numeric;
-using Reni.Parser;
 using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Validation;
 
-namespace Reni.ReniParser
+namespace Reni.Parser
 {
     sealed class MainTokenFactory : TokenFactory
     {
@@ -137,7 +136,7 @@ namespace Reni.ReniParser
 
         public ScannerSyntaxError(Match.IError message)
         {
-            _issue = ReniLexer.Parse(message);
+            _issue = Lexer.Parse(message);
             StopByObjectIds(81);
         }
 

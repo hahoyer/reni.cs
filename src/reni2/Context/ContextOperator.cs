@@ -4,7 +4,7 @@ using System;
 using hw.Parser;
 using hw.Scanner;
 using Reni.Basics;
-using Reni.ReniParser;
+using Reni.Parser;
 using Reni.TokenClasses;
 
 namespace Reni.Context

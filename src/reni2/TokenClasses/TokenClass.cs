@@ -6,7 +6,7 @@ using hw.Parser;
 using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Formatting;
-using Reni.ReniParser;
+using Reni.Parser;
 
 namespace Reni.TokenClasses
 {

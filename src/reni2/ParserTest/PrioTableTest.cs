@@ -1,11 +1,11 @@
-using System.Linq;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using hw.Debug;
 using hw.Parser;
 using hw.UnitTest;
 
-namespace Reni.Parser
+namespace Reni.ParserTest
 {
     [UnitTest]
     sealed class PrioTableTest : DependantAttribute

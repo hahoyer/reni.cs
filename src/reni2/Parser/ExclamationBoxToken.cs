@@ -6,7 +6,7 @@ using hw.Parser;
 using Reni.Formatting;
 using Reni.TokenClasses;
 
-namespace Reni.ReniParser
+namespace Reni.Parser
 {
     sealed class ExclamationBoxToken : DumpableObject, IType<SourceSyntax>, ITokenClass
     {

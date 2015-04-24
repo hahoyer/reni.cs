@@ -10,7 +10,7 @@ using Reni.Context;
 using Reni.TokenClasses;
 using Reni.Validation;
 
-namespace Reni.ReniParser
+namespace Reni.Parser
 {
     abstract class SpecialSyntax : CompileSyntax
     {

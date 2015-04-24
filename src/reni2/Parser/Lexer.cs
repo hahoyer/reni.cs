@@ -7,11 +7,11 @@ using Reni.Validation;
 
 namespace Reni.Parser
 {
-    sealed class ReniLexer : ILexer
+    sealed class Lexer : ILexer
     {
         const string Symbols = "°^!²§³$%&/=?\\@€*+~><|:.-";
         const string SingleCharSymbol = "({[)}];,";
-        internal static readonly ReniLexer Instance = new ReniLexer();
+        internal static readonly Lexer Instance = new Lexer();
 
         sealed class Error : Match.IError
         {
@@ -32,7 +32,7 @@ namespace Reni.Parser
         readonly Match _commentHead;
         readonly Match _lineEnd;
 
-        ReniLexer()
+        Lexer()
         {
             var alpha = Match.Letter.Else("_");
             var symbol1 = SingleCharSymbol.AnyChar();

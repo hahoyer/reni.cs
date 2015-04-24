@@ -6,7 +6,7 @@ using hw.Forms;
 using hw.Parser;
 using Reni.Basics;
 using Reni.Context;
-using Reni.ReniParser;
+using Reni.Parser;
 using Reni.Type;
 
 namespace Reni

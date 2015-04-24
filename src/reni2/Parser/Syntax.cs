@@ -1,15 +1,15 @@
 using System;
 using System.Collections.Generic;
-using hw.Helper;
 using System.Linq;
 using hw.Debug;
+using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
 using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Validation;
 
-namespace Reni.ReniParser
+namespace Reni.Parser
 {
     abstract class Syntax : DumpableObject
     {

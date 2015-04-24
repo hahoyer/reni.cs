@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Helper;
 using hw.Scanner;
-using Reni.ReniParser;
+using Reni.Parser;
 using Reni.TokenClasses;
 
 namespace Reni.Validation

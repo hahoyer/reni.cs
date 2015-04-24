@@ -6,7 +6,7 @@ using hw.Debug;
 using hw.Forms;
 using Reni.Basics;
 using Reni.Context;
-using Reni.ReniParser;
+using Reni.Parser;
 using Reni.TokenClasses;
 using Reni.Validation;
 

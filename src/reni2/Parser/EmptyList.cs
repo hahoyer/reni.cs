@@ -4,7 +4,7 @@ using System.Linq;
 using Reni.Basics;
 using Reni.Context;
 
-namespace Reni.ReniParser
+namespace Reni.Parser
 {
     sealed class EmptyList : CompileSyntax
     {

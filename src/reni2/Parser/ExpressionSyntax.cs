@@ -10,7 +10,7 @@ using Reni.TokenClasses;
 using Reni.Type;
 using Reni.Validation;
 
-namespace Reni.ReniParser
+namespace Reni.Parser
 {
     sealed class ExpressionSyntax : CompileSyntax
     {

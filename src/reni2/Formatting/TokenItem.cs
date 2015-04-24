@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using hw.Parser;
 using System.Linq;
 using hw.Debug;
-using Reni.ReniParser;
+using Reni.Parser;
 
 namespace Reni.Formatting
 {

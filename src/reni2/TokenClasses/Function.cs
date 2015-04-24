@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Scanner;
-using Reni.ReniParser;
+using Reni.Parser;
 using Reni.Validation;
 
 namespace Reni.TokenClasses

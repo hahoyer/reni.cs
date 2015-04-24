@@ -1,12 +1,12 @@
-using System.Linq;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using hw.Debug;
 using hw.Graphics;
 using hw.Parser;
 using hw.Scanner;
 
-namespace Reni.Parser
+namespace Reni.ParserTest
 {
     sealed class SimpleTokenFactory : TokenFactory<Services.TokenClass, Services.Syntax>
     {
