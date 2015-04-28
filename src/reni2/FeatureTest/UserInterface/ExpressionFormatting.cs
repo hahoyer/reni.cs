@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.UnitTest;
-using Reni.Formatting;
-using Reni.TokenClasses;
 
 namespace Reni.FeatureTest.UserInterface
 {
@@ -16,7 +14,8 @@ namespace Reni.FeatureTest.UserInterface
         {
             const string Text = @"(1,3,4,6)";
             var compiler = new Compiler(text: Text);
-            var x = compiler.SourceSyntax.Reformat();
+            var span = (compiler.Source + 0).Span(Text.Length);
+            var x = compiler.Containing(span).Trim(span).Reformat;
             Tracer.Assert(x == "(1, 3, 4, 6)", x);
         }
 
@@ -27,9 +26,9 @@ namespace Reni.FeatureTest.UserInterface
 1,3,4,6)";
             var compiler = new Compiler(text: Text);
             var span = (compiler.Source + 2).Span(3);
-            var x = compiler.Token(span);
+            var x = compiler.Containing(span).Trim(span).Reformat;
 
-            Tracer.Assert(x.SourcePart.Id == "# Comment\r", x.Dump);
+            Tracer.Assert(x == "# C", x);
         }
     }
 }

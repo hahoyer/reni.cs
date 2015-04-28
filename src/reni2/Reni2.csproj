@@ -12,9 +12,11 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <NoWarn>660;661</NoWarn>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <NoWarn>660;661</NoWarn>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Basics\BitsConst.cs" />
@@ -104,6 +106,7 @@
     <Compile Include="FeatureTest\UserInterface\BadUserInterAction.cs" />
     <Compile Include="FeatureTest\UserInterface\BraceMatching.cs" />
     <Compile Include="FeatureTest\UserInterface\ExpressionFormatting.cs" />
+    <Compile Include="FeatureTest\UserInterface\Formatting.cs" />
     <Compile Include="FeatureTest\UserInterface\ListMatching.cs" />
     <Compile Include="FeatureTest\UserInterface\ThenElseMatching.cs" />
     <Compile Include="FeatureTest\UserInterface\TokenLocating.cs" />
@@ -120,6 +123,7 @@
     <Compile Include="Feature\Simple.cs" />
     <Compile Include="Formatting\BinaryTree.cs" />
     <Compile Include="Formatting\Brace.cs" />
+    <Compile Include="Formatting\ContactType.cs" />
     <Compile Include="Formatting\DefaultAssessment.cs" />
     <Compile Include="Formatting\DefaultFormat.cs" />
     <Compile Include="Formatting\DefaultSubFormat.cs" />
@@ -134,6 +138,7 @@
     <Compile Include="Formatting\ListItem.cs" />
     <Compile Include="Formatting\ListTree.cs" />
     <Compile Include="Formatting\SeparatorType.cs" />
+    <Compile Include="Formatting\SmartFormat.cs" />
     <Compile Include="Formatting\TokenItem.cs" />
     <Compile Include="hw\Debug\Configuration.cs" />
     <Compile Include="hw\Debug\DebugTextWriter.cs" />
@@ -401,7 +406,9 @@
     <Compile Include="Type\TypeBase.cs" />
     <Compile Include="Type\TypeType.cs" />
     <Compile Include="Type\VoidType.cs" />
+    <Compile Include="UserInterface\SyntaxToken.cs" />
     <Compile Include="UserInterface\TokenInformation.cs" />
+    <Compile Include="UserInterface\WhiteSpaceToken.cs" />
     <Compile Include="Validation\ConsequentialIssueType.cs" />
     <Compile Include="Validation\Issue.cs" />
     <Compile Include="Validation\IssueId.cs" />
@@ -414,6 +421,7 @@
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>CSharp_Generated.cs</LastGenOutput>
     </None>
+    <None Include="FeatureTest\Text.reni" />
     <None Include="hw\CSharp.Exe.targets" />
     <None Include="packages.config" />
     <None Include="sys.targets" />
@@ -423,6 +431,10 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.TextTemplating, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <HintPath>A:\develop\Reni\dev\src\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>

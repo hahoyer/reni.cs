@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Helper;
+using Reni.TokenClasses;
 
 namespace Reni.Formatting
 {
@@ -106,6 +107,29 @@ namespace Reni.Formatting
                 NotImplementedMethod(func());
                 return null;
             }
+        }
+
+        internal static ISeparatorType Get(ITokenClass left, ITokenClass right)
+            => PrettySeparatorType(left, right) ?? BaseSeparatorType(left, right);
+
+        static ISeparatorType BaseSeparatorType(ITokenClass left, ITokenClass right)
+            => ContactType.Get(left).IsCompatible(ContactType.Get(right))
+                ? Contact
+                : Close;
+
+        static ISeparatorType PrettySeparatorType(ITokenClass left, ITokenClass right)
+        {
+            if(left is RightParenthesis && !(right is List))
+                return Close;
+
+            var leftList = left as List;
+            if(leftList != null)
+                return leftList.Level > 0 ? ClusteredMultiLine : Close;
+
+            if(left is Colon)
+                return Close;
+
+            return null;
         }
     }
 }

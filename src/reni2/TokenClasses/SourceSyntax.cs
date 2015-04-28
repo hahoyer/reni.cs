@@ -70,13 +70,13 @@ namespace Reni.TokenClasses
         string FilePosition => Token.Characters.FilePosition;
 
 
-        internal TokenInformation LocateToken(SourcePosn sourcePosn)
+        internal TokenInformation Locate(SourcePosn sourcePosn)
         {
             if(sourcePosn.IsEnd)
                 return new SyntaxToken(this);
 
             if(sourcePosn < Token.SourcePart)
-                return Left?.LocateToken(sourcePosn);
+                return Left?.Locate(sourcePosn);
 
             if(sourcePosn < Token.Characters)
                 return new UserInterface.WhiteSpaceToken
@@ -85,16 +85,16 @@ namespace Reni.TokenClasses
             if(Token.Characters.Contains(sourcePosn))
                 return new SyntaxToken(this);
 
-            return Right?.LocateToken(sourcePosn);
+            return Right?.Locate(sourcePosn);
         }
 
-        internal SourceSyntax LocateToken(SourcePart part)
-            => Left?.CheckedLocateToken(part) ??
-                Right?.CheckedLocateToken(part) ??
+        internal SourceSyntax Locate(SourcePart part)
+            => Left?.CheckedLocate(part) ??
+                Right?.CheckedLocate(part) ??
                     this;
 
-        SourceSyntax CheckedLocateToken(SourcePart part)
-            => SourcePart.Contains(part) ? LocateToken(part) : null;
+        SourceSyntax CheckedLocate(SourcePart part)
+            => SourcePart.Contains(part) ? Locate(part) : null;
 
         internal IEnumerable<SourceSyntax> Belongings(SourceSyntax recent)
         {

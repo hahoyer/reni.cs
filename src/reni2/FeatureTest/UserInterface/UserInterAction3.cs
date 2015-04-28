@@ -23,7 +23,7 @@ namespace Reni.FeatureTest.UserInterface
                 (
                 Text
                     .Length
-                    .Select(item => compiler.Token(item).TypeCharacter)
+                    .Select(item => compiler.Containing(item).TypeCharacter)
                     .ToArray());
             Tracer.Assert
                 (

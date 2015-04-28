@@ -42,8 +42,17 @@ namespace hw.Scanner
             if(Source != other.Source)
                 return this;
             var start = Math.Min(Position, other.Position);
-            var end = Math.Max(EndPosition, other.Position + other.Length);
+            var end = Math.Max(EndPosition, other.EndPosition);
             return new SourcePart(Source, start, end - start);
+        }
+
+        public SourcePart Intersect(SourcePart other)
+        {
+            Tracer.Assert(Source == other.Source);
+            var start = Math.Max(Position, other.Position);
+            var end = Math.Min(EndPosition, other.EndPosition);
+            var length = Math.Max(0, end - start);
+            return new SourcePart(Source, start, length);
         }
 
         public static SourcePart operator +(SourcePart left, SourcePart right)

@@ -67,7 +67,7 @@ namespace Reni.FeatureTest.Helper
             }
 
             Tracer.Line(c.SourceSyntax.Reformat());
-            Tracer.ConditionalBreak(true);
+            //Tracer.ConditionalBreak(true);
             c.Exececute();
 
             if(outStream.Data != targetSet.Output)

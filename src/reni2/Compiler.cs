@@ -32,7 +32,7 @@ namespace Reni
         readonly ValueCache<Syntax> _syntax;
         readonly ValueCache<CodeContainer> _codeContainer;
         readonly ValueCache<string> _cSharpCode;
-        readonly FunctionCache<int, TokenInformation> _tokenCache;
+        readonly FunctionCache<int, TokenInformation> _containingCache;
 
         [Node]
         readonly Root _rootContext;
@@ -79,7 +79,7 @@ namespace Reni
                         : new Source(fileName.FileHandle()))
                 );
 
-            _tokenCache = new FunctionCache<int, TokenInformation>(GetTokenForCache);
+            _containingCache = new FunctionCache<int, TokenInformation>(GetContainingForCache);
 
             _sourceSyntax = new ValueCache<SourceSyntax>(() => Parse(Source + 0));
 
@@ -261,16 +261,16 @@ namespace Reni
             return result;
         }
 
-        public TokenInformation Token(int offset) => _tokenCache[offset];
+        public TokenInformation Containing(int offset) => _containingCache[offset];
 
-        TokenInformation GetTokenForCache(int offset) => Token(Source + offset);
+        TokenInformation GetContainingForCache(int offset) => Containing(Source + offset);
 
         internal IEnumerable<SourceSyntax> FindAllBelongings(SourceSyntax current)
             => SourceSyntax.Belongings(current);
 
-        public TokenInformation Token(SourcePosn posn)
+        public TokenInformation Containing(SourcePosn posn)
         {
-            var result = SourceSyntax.LocateToken(posn);
+            var result = SourceSyntax.Locate(posn);
             if(result != null)
                 return result;
 
@@ -279,14 +279,14 @@ namespace Reni
             return null;
         }
 
-        public TokenInformation Token(SourcePart part)
+        public TokenInformation Containing(SourcePart part)
         {
-            var left = SourceSyntax.LocateToken(part.Start);
-            var right = SourceSyntax.LocateToken(part.End + -1);
+            var left = SourceSyntax.Locate(part.Start);
+            var right = SourceSyntax.Locate(part.End + -1);
             if(left.Equals(right))
                 return left;
 
-            var result = SourceSyntax.LocateToken(part);
+            var result = SourceSyntax.Locate(part);
             if(result != null)
                 return new SyntaxToken(result);
 

@@ -61,7 +61,7 @@ complex FromReal(2) dump_print;
             var compiler = new Compiler(text: text);
             for(var i = 0; i < text.Length; i++)
             {
-                var t = compiler.Token(i);
+                var t = compiler.Containing(i);
                 Tracer.Assert(t != null, () => (new Source(text) + i).Dump());
             }
         }

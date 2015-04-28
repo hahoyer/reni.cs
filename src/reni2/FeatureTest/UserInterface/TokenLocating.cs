@@ -17,7 +17,7 @@ namespace Reni.FeatureTest.UserInterface
             const string Text = @"(1,3,4,6)";
             var compiler = new Compiler(text: Text);
             var span = (compiler.Source + 2).Span(3);
-            var x = ((SyntaxToken)compiler.Token(span)).SourceSyntax.SourcePart;
+            var x = ((SyntaxToken)compiler.Containing(span)).SourceSyntax.SourcePart;
 
             Tracer.Assert(x.Id == "1,3,4,6", x.Dump);
 
@@ -30,9 +30,9 @@ namespace Reni.FeatureTest.UserInterface
 1,3,4,6)";
             var compiler = new Compiler(text: Text);
             var span = (compiler.Source + 2).Span(3);
-            var x = compiler.Token(span);
+            var x = compiler.Containing(span);
 
-            Tracer.Assert(x.SourcePart.Id == "# Comment\r", x.Dump);
+            Tracer.Assert(x.SourcePart.Id == "# Comment\r\n", x.Dump);
 
         }
 

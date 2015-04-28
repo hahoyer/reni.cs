@@ -49,8 +49,9 @@ namespace Reni.Parser
                     .Else(Match.End)
                     .Else
                     (
-                        "(".AnyChar().Not + Match.LineEnd.Find
-                            .Else(Match.End.Find + _invalidLineComment)
+                        "(".AnyChar().Not +
+                            (Match.LineEnd.Find + Match.LineEnd)
+                                .Else(Match.End.Find + _invalidLineComment)
                     );
 
             _whiteSpace = " \t\r".AnyChar().Repeat(1);
@@ -120,7 +121,7 @@ namespace Reni.Parser
 
         public static bool IsAlphaLike(string id)
         {
-            if(id=="")
+            if(id == "")
                 return false;
 
             return char.IsLetter(id[0]) || id[0] == '_';

@@ -82,5 +82,11 @@ namespace hw.Scanner
         {
             return FromLineAndColumn(lineIndex + 1, 0) - FromLineAndColumn(lineIndex, 0);
         }
+
+        public SourcePart Line(int lineIndex)
+        {
+            return FromLineAndColumn(lineIndex, 0).Span(FromLineAndColumn(lineIndex, null));
+        }
+
     }
 }

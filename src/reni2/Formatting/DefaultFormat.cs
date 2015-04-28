@@ -55,7 +55,7 @@ namespace Reni.Formatting
 
             var rightParenthesis = target.TokenClass as RightParenthesis;
             if(rightParenthesis != null)
-                return Reformat(target, rightParenthesis);
+                return Reformat(target, rightParenthesis) + Format(target.Token);
 
             var left = target.Left?.Reformat(this);
             var token = Format(target.Token) ?? "";
@@ -68,25 +68,36 @@ namespace Reni.Formatting
 
         string Reformat(SourceSyntax target, RightParenthesis rightParenthesis)
         {
+            Tracer.Assert(target.Right == null);
+
             var left = target.Left;
             Tracer.Assert(left != null);
-            Tracer.Assert(target.Right == null);
+
+            var leftParenthesis = left.TokenClass as LeftParenthesis;
+            return leftParenthesis != null
+                ? Reformat(leftParenthesis, left, rightParenthesis)
+                : left.Reformat(this);
+        }
+
+        string Reformat
+            (
+            LeftParenthesis leftParenthesis,
+            SourceSyntax left,
+            RightParenthesis rightParenthesis)
+        {
             Tracer.Assert(left.Left == null);
-            var leftParenthesis = ((LeftParenthesis) left.TokenClass);
             Tracer.Assert(leftParenthesis.Level == rightParenthesis.Level);
 
             var lefttoken = Format(left.Token);
-            var rightToken = Format(target.Token);
             var innerTarget = left.Right?.Reformat(this);
 
-            var separator = Separator(leftParenthesis, null)
+            var separator = SeparatorType.Get(leftParenthesis, null)
                 .Escalate(() => AssessSeparator(innerTarget));
 
-            return separator.Text + 
+            return separator.Text +
                 lefttoken +
                 separator.Before(innerTarget) +
-                separator.Text +
-                rightToken;
+                separator.Text;
         }
 
         static ISeparatorType AssessSeparator(string target)
@@ -97,7 +108,7 @@ namespace Reni.Formatting
         string Reformat(SourceSyntax target, List token)
         {
             var items = RearrangeAsList(target, token);
-            var separator = Separator(token, null);
+            var separator = SeparatorType.Get(token, null);
             return separator
                 .Grouped(items)
                 .Stringify(separator.Text);
@@ -131,47 +142,12 @@ namespace Reni.Formatting
         static ISeparatorType RightSeparator(SourceSyntax target)
             => target.Right == null
                 ? SeparatorType.None
-                : Separator(target.TokenClass, target.Right.LeftMostTokenClass);
+                : SeparatorType.Get(target.TokenClass, target.Right.LeftMostTokenClass);
 
         static ISeparatorType LeftSeparator(SourceSyntax left, ITokenClass tokenClass)
             => left == null
                 ? SeparatorType.None
-                : Separator(left.RightMostTokenClass, tokenClass);
-
-        static ISeparatorType Separator(ITokenClass left, ITokenClass right)
-            => PrettySeparatorType(left, right) ??
-                BaseSeparatorType(left, right);
-
-        static ISeparatorType BaseSeparatorType(ITokenClass left, ITokenClass right)
-            => ContactClass(left).IsCompatible(ContactClass(right))
-                ? SeparatorType.Contact
-                : SeparatorType.Close;
-
-        static ISeparatorType PrettySeparatorType(ITokenClass left, ITokenClass right)
-        {
-            if(left is RightParenthesis && !(right is List))
-                return SeparatorType.Close;
-
-            var leftList = left as List;
-            if(leftList != null)
-                return leftList.Level > 0 ? SeparatorType.ClusteredMultiLine : SeparatorType.Close;
-
-            if(left is Colon)
-                return SeparatorType.Close;
-
-            return null;
-        }
-
-        static ContactType ContactClass(ITokenClass target)
-            => target == null
-                ? ContactType.Compatible
-                : Lexer.IsAlphaLike(target.Id) || target is Number
-                    ? ContactType.AlphaNum
-                    : target is Text
-                        ? ContactType.Text
-                        : (Lexer.IsSymbolLike(target.Id)
-                            ? ContactType.Symbol
-                            : ContactType.Compatible);
+                : SeparatorType.Get(left.RightMostTokenClass, tokenClass);
 
         string Format(IToken token)
         {
@@ -180,23 +156,6 @@ namespace Reni.Formatting
             if(token.PrecededWith.OnlyComments().Id() != "")
                 NotImplementedMethod(token);
             return token.Id;
-        }
-    }
-
-    sealed class ContactType
-    {
-        internal static readonly ContactType AlphaNum = new ContactType();
-        internal static readonly ContactType Symbol = new ContactType();
-        internal static readonly ContactType Text = new ContactType();
-        internal static readonly ContactType Compatible = new ContactType();
-
-        public bool IsCompatible(ContactType other)
-        {
-            if(this == Compatible)
-                return true;
-            if(other == Compatible)
-                return true;
-            return this != other;
         }
     }
 }

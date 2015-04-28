@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using hw.Helper;
 using System.Linq;
 using hw.Debug;
+using hw.Helper;
 using hw.Scanner;
 using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
@@ -40,7 +40,7 @@ namespace HoyerWare.ReniLanguagePackage
             try
             {
                 var offset = Data.FromLineAndColumn(line, column).Position;
-                var token = Compiler.Token(offset);
+                var token = Compiler.Containing(offset);
                 Dump(nameof(token), token);
                 var result = token.ToTokenInfo();
                 return ReturnMethodDump(result, false);
@@ -56,14 +56,13 @@ namespace HoyerWare.ReniLanguagePackage
 
         IEnumerable<TokenInformation.Trimmed> TokensForLine(int lineIndex, bool trace)
         {
-            var start = Data.FromLineAndColumn(lineIndex, 0).Position;
-            var end = Data.FromLineAndColumn(lineIndex, null).Position;
+            var line = Data.Line(lineIndex);
 
-            var index = start;
+            var index = line.Position;
             var i = 0;
-            while(index < end)
+            while(index < line.EndPosition)
             {
-                var token = Compiler.Token(index).AssertNotNull().Trim(start, end);
+                var token = Compiler.Containing(index).AssertNotNull().Trim(line);
                 if(trace)
                     Tracer.IndentStart();
                 if(trace)
@@ -86,7 +85,7 @@ namespace HoyerWare.ReniLanguagePackage
             try
             {
                 var lineEndPosition = Data.FromLineAndColumn(line, null).Position;
-                var token = Compiler.Token(lineEndPosition);
+                var token = Compiler.Containing(lineEndPosition);
                 Tracer.Assert(token != null);
                 var result = token.State;
                 return ReturnMethodDump(result, false);
@@ -108,13 +107,13 @@ namespace HoyerWare.ReniLanguagePackage
         internal TokenInformation FromLineAndColumn(int lineIndex, int columIndex)
         {
             var start = Data.FromLineAndColumn(lineIndex, columIndex).Position;
-            return Compiler.Token(start);
+            return Compiler.Containing(start);
         }
 
         internal TokenInformation FromLineAndColumnBackwards(int lineIndex, int columIndex)
         {
             var start = Data.FromLineAndColumn(lineIndex, columIndex).Position - 1;
-            return Compiler.Token(Math.Max(0, start));
+            return Compiler.Containing(Math.Max(0, start));
         }
 
         internal IEnumerable<SourcePart> BracesLike(TokenInformation current)
@@ -123,10 +122,9 @@ namespace HoyerWare.ReniLanguagePackage
         internal void ReformatSpan(EditArray mgr, TextSpan span)
         {
             var sourcePart = Data.ToSourcePart(span);
-            var start = Compiler.Token(sourcePart.Position);
-            var end = Compiler.Token(sourcePart.EndPosition - 1);
-            var common = Compiler.Token(start.SourcePart + end.SourcePart);
-            mgr.Add(new EditSpan(common.SourcePart.ToTextSpan(), common.SourcePart.Id));
+            var common = Compiler.Containing(sourcePart)
+                .Trim(sourcePart);
+            mgr.Add(new EditSpan(span, common.Reformat));
             mgr.ApplyEdits();
         }
     }
