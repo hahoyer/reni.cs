@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Helper;
+using Reni.Parser;
 using Reni.TokenClasses;
 
 namespace Reni.Formatting
@@ -112,24 +113,26 @@ namespace Reni.Formatting
         internal static ISeparatorType Get(ITokenClass left, ITokenClass right)
             => PrettySeparatorType(left, right) ?? BaseSeparatorType(left, right);
 
-        static ISeparatorType BaseSeparatorType(ITokenClass left, ITokenClass right)
+        internal static ISeparatorType BaseSeparatorType(ITokenClass left, ITokenClass right)
             => ContactType.Get(left).IsCompatible(ContactType.Get(right))
                 ? Contact
                 : Close;
 
         static ISeparatorType PrettySeparatorType(ITokenClass left, ITokenClass right)
         {
-            if(left is RightParenthesis && !(right is List))
+            if (left is List && right is LeftParenthesis)
                 return Close;
 
-            var leftList = left as List;
-            if(leftList != null)
-                return leftList.Level > 0 ? ClusteredMultiLine : Close;
+            if (right is RightParenthesis || 
+                right is LeftParenthesis || 
+                right is List ||
+                left is LeftParenthesis)
+                return Contact;
 
-            if(left is Colon)
+            if(right is Colon || left is ExclamationBoxToken)
+                return null;
+
                 return Close;
-
-            return null;
         }
     }
 }

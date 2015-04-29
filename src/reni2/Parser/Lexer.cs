@@ -50,8 +50,8 @@ namespace Reni.Parser
                     .Else
                     (
                         "(".AnyChar().Not +
-                            (Match.LineEnd.Find + Match.LineEnd)
-                                .Else(Match.End.Find + _invalidLineComment)
+                            "\n".AnyChar().Find 
+                                .Else(Match.End.Find)
                     );
 
             _whiteSpace = " \t\r".AnyChar().Repeat(1);

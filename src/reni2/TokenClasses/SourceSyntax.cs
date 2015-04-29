@@ -180,8 +180,11 @@ namespace Reni.TokenClasses
 
         public string BraceMatchDump => new BraceMatchDumper(this, 3).Dump();
 
-        internal string Reformat(IConfiguration configuration = null)
+        internal string Reformat(IConfiguration configuration)
             => (configuration ?? DefaultFormat.Instance).Reformat(this);
+
+        internal string Reformat()
+            => SmartFormat.Reformat(this, SourcePart);
 
         [DisableDump]
         internal IEnumerable<hw.Parser.WhiteSpaceToken> LeadingWhiteSpaceTokens

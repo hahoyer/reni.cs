@@ -9,8 +9,67 @@ using Reni.TokenClasses;
 
 namespace Reni.Formatting
 {
-    static class SmartFormat
+    sealed class SmartFormat : DumpableObject
     {
+        readonly SourcePart _targetPart;
+        readonly IConfiguration _configuration;
+
+        SmartFormat(SourcePart targetPart, IConfiguration configuration)
+        {
+            _targetPart = targetPart;
+            _configuration = configuration;
+        }
+
+        internal interface IConfiguration
+        {
+            string StartGap(WhiteSpaceToken[] rightWhiteSpaces, ITokenClass right);
+            string Gap(ITokenClass left, ITokenClass rightTokenClass);
+            string Gap(ITokenClass left, WhiteSpaceToken[] rightWhiteSpaces, ITokenClass right);
+        }
+
+        internal static string Reformat(SourceSyntax target, SourcePart targetPart)
+            =>
+                new SmartFormat(targetPart, new SmartConfiguration()).Reformat
+                    (null, target, null, null);
+
+        string Reformat
+            (
+            ITokenClass leftTokenClass,
+            SourceSyntax target,
+            WhiteSpaceToken[] rightWhiteSpaces,
+            ITokenClass rightTokenClass)
+        {
+            if(target == null)
+                return Gap(leftTokenClass, rightWhiteSpaces, rightTokenClass);
+
+            var leftResult = Reformat
+                (leftTokenClass, target.Left, target.Token.PrecededWith, target.TokenClass);
+            var rightResult = Reformat
+                (target.TokenClass, target.Right, rightWhiteSpaces, rightTokenClass);
+
+            return leftResult + target.Token.Characters.Id + rightResult;
+        }
+
+        string Gap
+            (
+            ITokenClass leftTokenClass,
+            WhiteSpaceToken[] rightWhiteSpaces,
+            ITokenClass rightTokenClass)
+        {
+            if(leftTokenClass == null)
+                return _configuration.StartGap(rightWhiteSpaces, rightTokenClass);
+
+            if(rightTokenClass == null)
+            {
+                Tracer.Assert(rightWhiteSpaces == null);
+                return "";
+            }
+
+            return !rightWhiteSpaces.Any()
+                ? _configuration.Gap(leftTokenClass, rightTokenClass)
+                : _configuration.Gap(leftTokenClass, rightWhiteSpaces, rightTokenClass);
+        }
+
         internal interface ITree
         {
             string Format(SourcePart targetPart);
@@ -297,113 +356,5 @@ namespace Reni.Formatting
                 : Brace.Create(target)
                     ?? (ITree) List.Create(target)
                         ?? Chain.Create(target);
-
-        internal static string Reformat(SourceSyntax target, SourcePart targetPart)
-        {
-            return Reformat(null, target, null, null);
-        }
-
-        static string Reformat
-            (
-            ITokenClass leftTokenClass,
-            SourceSyntax target,
-            WhiteSpaceToken[] rightWhiteSpaces,
-            ITokenClass rightTokenClass)
-        {
-            if(target == null)
-            {
-                if(leftTokenClass == null || rightTokenClass == null)
-                    return "";
-                if(rightWhiteSpaces.Any())
-                    Dumpable.NotImplementedFunction
-                        (
-                            leftTokenClass,
-                            target,
-                            rightWhiteSpaces,
-                            rightTokenClass
-                        );
-
-                return SeparatorType.Get(leftTokenClass, rightTokenClass).Text;
-            }
-
-            var leftResult = Reformat
-                (leftTokenClass, target.Left, target.Token.PrecededWith, target.TokenClass);
-            var rightResult = Reformat
-                (target.TokenClass, target.Right, rightWhiteSpaces, rightTokenClass);
-
-            if(!target.Token.PrecededWith.Any())
-                return leftResult + target.Token.Characters.Id + rightResult;
-
-            Dumpable.NotImplementedFunction
-                (
-                    leftTokenClass,
-                    target,
-                    rightWhiteSpaces,
-                    rightTokenClass,
-                    nameof(leftResult),
-                    leftResult,
-                    nameof(rightResult),
-                    rightResult
-                );
-
-            return null;
-        }
-
-        static IEnumerable<ContactItem> Combine(IReadOnlyList<SourceSyntax> items)
-        {
-            yield return new ContactItem(null, items[0]);
-            for(var i = 1; i < items.Count; i++)
-                yield return new ContactItem(items[i - 1].TokenClass, items[i]);
-        }
-
-        static IEnumerable<SourceSyntax> Flatten(SourceSyntax target)
-        {
-            while(true)
-            {
-                if(target.Left != null)
-                    foreach(var result in Flatten(target.Left))
-                        yield return result;
-                yield return target;
-                if(target.Right == null)
-                    yield break;
-                target = target.Right;
-            }
-        }
-    }
-
-    sealed class ContactItem : DumpableObject
-    {
-        [EnableDump]
-        readonly ITokenClass _leftTokenClass;
-        readonly SourceSyntax _right;
-
-        internal ContactItem(ITokenClass leftTokenClass, SourceSyntax right)
-        {
-            _leftTokenClass = leftTokenClass;
-            _right = right;
-        }
-
-        [DisableDump]
-        internal ISeparatorType SeparatorType
-        {
-            get
-            {
-                if(_leftTokenClass == null)
-                    return Formatting.SeparatorType.None;
-                if(RightTokenClass is List)
-                    return Formatting.SeparatorType.Contact;
-
-                return null;
-            }
-        }
-
-        [EnableDump]
-        ITokenClass RightTokenClass => _right.TokenClass;
-
-        internal string Format(SourcePart targetPart)
-        {
-            NotImplementedMethod(targetPart);
-            return null;
-        }
     }
 }

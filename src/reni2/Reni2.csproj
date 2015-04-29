@@ -13,6 +13,7 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <NoWarn>660;661</NoWarn>
     <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <RegisterForComInterop>false</RegisterForComInterop>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <NoWarn>660;661</NoWarn>
@@ -123,6 +124,8 @@
     <Compile Include="Feature\Simple.cs" />
     <Compile Include="Formatting\BinaryTree.cs" />
     <Compile Include="Formatting\Brace.cs" />
+    <Compile Include="Formatting\Configuration.cs" />
+    <Compile Include="Formatting\ContactItem.cs" />
     <Compile Include="Formatting\ContactType.cs" />
     <Compile Include="Formatting\DefaultAssessment.cs" />
     <Compile Include="Formatting\DefaultFormat.cs" />

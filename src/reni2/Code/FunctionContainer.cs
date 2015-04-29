@@ -19,7 +19,9 @@ namespace Reni.Code
             Getter = getter;
             Setter = setter;
         }
-        public IEnumerable<Issue> Issues
+
+        [DisableDump]
+        internal IEnumerable<Issue> Issues
             => Getter.Issues.Union(Setter?.Issues ?? new Issue[0]);
     }
 }

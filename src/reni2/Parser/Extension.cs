@@ -34,6 +34,9 @@ namespace Reni.Parser
                 whiteSpaces?.Any(item => Lexer.IsLineComment(item) || Lexer.IsComment(item))
                     ?? false;
 
+        internal static bool HasWhiteSpaces(this IEnumerable<WhiteSpaceToken> whiteSpaces)
+            => whiteSpaces?.Any(Lexer.IsWhiteSpace) ?? false;
+
         internal static bool HasLines(this IEnumerable<WhiteSpaceToken> whiteSpaces)
             => whiteSpaces?.Any(item => item.Characters.Id.Contains("\n")) ?? false;
 
@@ -64,11 +67,13 @@ namespace Reni.Parser
                     result = i + 1;
             return result;
         }
+
         [UsedImplicitly]
         internal static string Symbolize(this string token)
         {
             return token.Aggregate("", (current, tokenChar) => current + SymbolizeChar(tokenChar));
         }
+
         static string SymbolizeChar(Char @char)
         {
             switch(@char)
