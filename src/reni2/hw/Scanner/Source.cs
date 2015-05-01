@@ -87,6 +87,5 @@ namespace hw.Scanner
         {
             return FromLineAndColumn(lineIndex, 0).Span(FromLineAndColumn(lineIndex, null));
         }
-
     }
 }

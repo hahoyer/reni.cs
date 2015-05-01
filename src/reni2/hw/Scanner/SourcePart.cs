@@ -113,6 +113,7 @@ namespace hw.Scanner
 
         [DisableDump]
         public SourcePosn Start { get { return Source + Position; } }
+
         [DisableDump]
         public SourcePosn End { get { return Source + EndPosition; } }
 
@@ -196,6 +197,7 @@ namespace hw.Scanner
         {
             return !(left == right);
         }
+
         public static bool operator >(SourcePart left, SourcePosn right) { return right < left; }
         public static bool operator >(SourcePosn left, SourcePart right) { return right < left; }
         public static bool operator >(SourcePart left, SourcePart right) { return right < left; }
