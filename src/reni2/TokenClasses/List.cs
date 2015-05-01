@@ -39,9 +39,6 @@ namespace Reni.TokenClasses
         protected override Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
             => ListSyntax(left, right);
 
-        [DisableDump]
-        protected override ITreeItemFactory TreeItemFactory => ListTree.FactoryInstance;
-
         ListSyntax ListSyntax(Syntax left, Syntax right)
             => new ListSyntax(this, left.ToList(this).Concat(right.ToList(this)).ToArray());
 

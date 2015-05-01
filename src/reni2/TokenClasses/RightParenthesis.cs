@@ -47,7 +47,5 @@ namespace Reni.TokenClasses
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => (otherMatcher as LeftParenthesis)?.Level == Level;
 
-        [DisableDump]
-        protected override ITreeItemFactory TreeItemFactory => Brace.FactoryInstance;
     }
 }

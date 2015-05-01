@@ -61,8 +61,6 @@ namespace Reni.TokenClasses
         protected abstract Checked<Syntax> Prefix(SourcePart token, Syntax right);
         protected abstract Checked<Syntax> Suffix(Syntax left, SourcePart token);
         protected abstract Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right);
-
-        protected virtual ITreeItemFactory TreeItemFactory => BinaryTree.FactoryInstance;
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]

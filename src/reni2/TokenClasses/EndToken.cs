@@ -13,8 +13,6 @@ namespace Reni.TokenClasses
         protected override Checked<Syntax> Suffix(Syntax left, SourcePart token)
             => Checked<Syntax>.From(left.ToCompiledSyntax);
 
-        protected override ITreeItemFactory TreeItemFactory => Main.FactoryInstance;
-
         protected override Checked<Syntax> Terminal(SourcePart token) => new EmptyList();
         public override string Id => PrioTable.EndOfText;
 

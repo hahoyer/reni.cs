@@ -34,5 +34,6 @@ namespace Reni.Parser
         IType<SourceSyntax> IType<SourceSyntax>.NextTypeIfMatched => null;
 
         string ITokenClass.Id => "!";
+
     }
 }

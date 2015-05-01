@@ -6,57 +6,62 @@ using hw.Parser;
 
 namespace Reni.Formatting
 {
-    sealed class Configuration : DumpableObject, SmartFormat.IConfiguration
+    sealed class Configuration : DumpableObject, SmartFormat.IGapHandler, SmartFormat.IGapHandlerWithWhiteSpaces
     {
-        string SmartFormat.IConfiguration.StartGap
-            (WhiteSpaceToken[] whiteSpaces, ITokenClass right)
+        string SmartFormat.IGapHandlerWithWhiteSpaces.StartGap
+            (IEnumerable<WhiteSpaceToken> whiteSpaces, ITokenClass right)
             => whiteSpaces.SourcePart().Id;
 
-        string SmartFormat.IConfiguration.Gap(ITokenClass left, ITokenClass right)
+        string SmartFormat.IGapHandler.StartGap(ITokenClass right) => "";
+
+        string SmartFormat.IGapHandler.Gap(ITokenClass left, ITokenClass right)
             => SeparatorType.Get(left, right).Text;
 
-        string SmartFormat.IConfiguration.Gap
+        string SmartFormat.IGapHandlerWithWhiteSpaces.Gap
             (
             ITokenClass left,
-            WhiteSpaceToken[] rightWhiteSpaces,
+            IEnumerable<WhiteSpaceToken> rightWhiteSpaces,
             ITokenClass right
             )
             => rightWhiteSpaces.SourcePart().Id;
     }
 
-    sealed class SmartConfiguration : DumpableObject, SmartFormat.IConfiguration
+    sealed class SmartConfiguration : DumpableObject, SmartFormat.IGapHandler
     {
-        string SmartFormat.IConfiguration.StartGap
-            (WhiteSpaceToken[] whiteSpaces, ITokenClass right)
-            => "";
+        internal static readonly SmartFormat.IGapHandler Instance = new SmartConfiguration();
 
-        string SmartFormat.IConfiguration.Gap(ITokenClass left, ITokenClass right)
-            => SeparatorType.Get(left, right).Text;
+        SmartConfiguration() { }
 
-        string SmartFormat.IConfiguration.Gap
-            (
-            ITokenClass left,
-            WhiteSpaceToken[] rightWhiteSpaces,
-            ITokenClass right
-            )
+        string SmartFormat.IGapHandler.StartGap(ITokenClass right) => "";
+
+        string SmartFormat.IGapHandler.Gap(ITokenClass left, ITokenClass right)
             => SeparatorType.Get(left, right).Text;
     }
 
-    sealed class MinimalConfiguration : DumpableObject, SmartFormat.IConfiguration
+    sealed class IgnoreWhiteSpaceConfiguration
+        : DumpableObject, SmartFormat.IGapHandlerWithWhiteSpaces
     {
-        string SmartFormat.IConfiguration.StartGap
-            (WhiteSpaceToken[] whiteSpaces, ITokenClass right)
-            => "";
+        readonly SmartFormat.IGapHandler _parent;
 
-        string SmartFormat.IConfiguration.Gap(ITokenClass left, ITokenClass right)
-            => SeparatorType.BaseSeparatorType(left, right).Text;
+        internal IgnoreWhiteSpaceConfiguration(SmartFormat.IGapHandler parent) { _parent = parent; }
 
-        string SmartFormat.IConfiguration.Gap
+        string SmartFormat.IGapHandlerWithWhiteSpaces.StartGap
+            (IEnumerable<WhiteSpaceToken> whiteSpaces, ITokenClass right) => _parent.StartGap(right);
+
+        string SmartFormat.IGapHandlerWithWhiteSpaces.Gap
             (
             ITokenClass left,
-            WhiteSpaceToken[] rightWhiteSpaces,
+            IEnumerable<WhiteSpaceToken> rightWhiteSpaces,
             ITokenClass right
             )
+            => _parent.Gap(left, right);
+    }
+                       
+    sealed class MinimalConfiguration : DumpableObject, SmartFormat.IGapHandler
+    {
+        string SmartFormat.IGapHandler.StartGap(ITokenClass right) => "";
+
+        string SmartFormat.IGapHandler.Gap(ITokenClass left, ITokenClass right)
             => SeparatorType.BaseSeparatorType(left, right).Text;
     }
 }

@@ -5,273 +5,318 @@ using hw.Debug;
 using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
+using Reni.Parser;
 using Reni.TokenClasses;
 
 namespace Reni.Formatting
 {
     sealed class SmartFormat : DumpableObject
     {
-        readonly SourcePart _targetPart;
-        readonly IConfiguration _configuration;
+        readonly IGapHandler _gapHandler;
+        readonly IGapHandlerWithWhiteSpaces _gapHandlerWithWhiteSpaces;
+        readonly ILineLengthLimiter _lineLengthLimiter;
 
-        SmartFormat(SourcePart targetPart, IConfiguration configuration)
+        SmartFormat
+            (
+            IGapHandler gapHandler,
+            IGapHandlerWithWhiteSpaces gapHandlerWithWhiteSpaces,
+            ILineLengthLimiter lineLengthLimiter
+            )
         {
-            _targetPart = targetPart;
-            _configuration = configuration;
+            _gapHandler = gapHandler;
+            _gapHandlerWithWhiteSpaces = gapHandlerWithWhiteSpaces;
+            _lineLengthLimiter = lineLengthLimiter;
         }
 
-        internal interface IConfiguration
+        internal interface IGapHandler
         {
-            string StartGap(WhiteSpaceToken[] rightWhiteSpaces, ITokenClass right);
             string Gap(ITokenClass left, ITokenClass rightTokenClass);
-            string Gap(ITokenClass left, WhiteSpaceToken[] rightWhiteSpaces, ITokenClass right);
+            string StartGap(ITokenClass right);
+        }
+
+        internal interface IGapHandlerWithWhiteSpaces
+        {
+            string StartGap(IEnumerable<WhiteSpaceToken> rightWhiteSpaces, ITokenClass right);
+
+            string Gap
+                (ITokenClass left, IEnumerable<WhiteSpaceToken> rightWhiteSpaces, ITokenClass right);
+        }
+
+        internal interface ILineLengthLimiter
+        {
+            int MaxLineLength { get; }
         }
 
         internal static string Reformat(SourceSyntax target, SourcePart targetPart)
-            =>
-                new SmartFormat(targetPart, new SmartConfiguration()).Reformat
-                    (null, target, null, null);
+        {
+            var smartFormat = new SmartFormat
+                (
+                SmartConfiguration.Instance,
+                new IgnoreWhiteSpaceConfiguration(SmartConfiguration.Instance),
+                new LineLengthLimiter(100)
+                );
+            return smartFormat.Reformat(target, 0, targetPart);
+        }
 
-        string Reformat
+        string Reformat(SourceSyntax target, int indentLevel, SourcePart targetPart)
+            => Reformat(null, target, null, null, indentLevel)
+                .Combine()
+                .Filter(targetPart);
+
+
+        IEnumerable<Item> Reformat
             (
             ITokenClass leftTokenClass,
             SourceSyntax target,
             WhiteSpaceToken[] rightWhiteSpaces,
-            ITokenClass rightTokenClass)
+            ITokenClass rightTokenClass,
+            int indentLevel
+            )
         {
             if(target == null)
                 return Gap(leftTokenClass, rightWhiteSpaces, rightTokenClass);
 
-            var leftResult = Reformat
-                (leftTokenClass, target.Left, target.Token.PrecededWith, target.TokenClass);
-            var rightResult = Reformat
-                (target.TokenClass, target.Right, rightWhiteSpaces, rightTokenClass);
+            if(IsLineMode(target))
+            {
+                var result = LineModeReformat(target, indentLevel);
+                if(result != null)
+                    return result;
 
-            return leftResult + target.Token.Characters.Id + rightResult;
+                if(target.IsChain())
+                    return LineModeReformatOfChain(leftTokenClass, target, indentLevel);
+            }
+
+            return UncheckedReformat
+                (leftTokenClass, target, rightWhiteSpaces, rightTokenClass, indentLevel);
         }
 
-        string Gap
+        IEnumerable<Item> UncheckedReformat
             (
             ITokenClass leftTokenClass,
+            SourceSyntax target,
             WhiteSpaceToken[] rightWhiteSpaces,
-            ITokenClass rightTokenClass)
+            ITokenClass rightTokenClass,
+            int indentLevel)
         {
-            if(leftTokenClass == null)
-                return _configuration.StartGap(rightWhiteSpaces, rightTokenClass);
+            foreach(var item in Reformat
+                (
+                    leftTokenClass,
+                    target.Left,
+                    target.Token.PrecededWith,
+                    target.TokenClass,
+                    indentLevel
+                ))
+                yield return item;
 
-            if(rightTokenClass == null)
-            {
-                Tracer.Assert(rightWhiteSpaces == null);
-                return "";
-            }
+            yield return new Item(target.Token, "");
 
-            return !rightWhiteSpaces.Any()
-                ? _configuration.Gap(leftTokenClass, rightTokenClass)
-                : _configuration.Gap(leftTokenClass, rightWhiteSpaces, rightTokenClass);
+            foreach(var item in Reformat
+                (
+                    target.TokenClass,
+                    target.Right,
+                    rightWhiteSpaces,
+                    rightTokenClass,
+                    indentLevel
+                ))
+                yield return item;
         }
 
-        internal interface ITree
+        IEnumerable<Item> LineModeReformat(SourceSyntax target, int indentLevel)
         {
-            string Format(SourcePart targetPart);
-            WhiteSpaceToken[] PrecededWith { get; }
+            var main = MainInformation.Create(target, this);
+            if(main != null)
+                return main.LineModeReformat(indentLevel);
+
+            var brace = BraceInformation.Create(target, this);
+            if(brace != null)
+                return brace.LineModeReformat(indentLevel);
+
+            return null;
         }
 
-        sealed class Chain : DumpableObject, ITree
+        internal IEnumerable<Item> LineModeReformatOfChain
+            (ITokenClass leftTokenClass, SourceSyntax target, int indentLevel)
         {
-            internal sealed class Item : DumpableObject
+            if(!target.IsChain())
             {
-                internal readonly ITokenClass _tokenClass;
-                [EnableDump]
-                internal readonly IToken _token;
-                [EnableDump]
-                internal readonly ITree _item;
-
-                internal Item(ITokenClass tokenClass, IToken token, SourceSyntax item)
-                {
-                    _item = SmartFormat.Create(item);
-                    _token = token;
-                    _tokenClass = tokenClass;
-                }
-
-                public WhiteSpaceToken[] PrecededWith => _token?.PrecededWith ?? _item.PrecededWith;
-
-                internal string Format(SourcePart targetPart)
-                    => TokenFormat(_token, targetPart) +
-                        (_item?.Format(targetPart) ?? "");
-
-                string TokenFormat(IToken token, SourcePart targetPart)
-                {
-                    if(token == null)
-                        return "";
-
-                    if(targetPart.Contains(token.Characters))
-                        return token.Characters.Id;
-
-                    NotImplementedMethod(token, targetPart);
-                    return null;
-                }
+                foreach(var item in Reformat(leftTokenClass, target, null, null, indentLevel))
+                    yield return item;
+                yield break;
             }
 
-            internal static Chain Create(SourceSyntax target)
-                => new Chain(CreateReverseChainItems(target).Reverse());
+            foreach(var item in LineModeReformatOfChain(leftTokenClass, target.Left, indentLevel))
+                yield return item;
 
-            [EnableDump]
-            readonly Item[] _items;
 
-            Chain(IEnumerable<Item> items) { _items = items.ToArray(); }
-
-            public string Format(SourcePart targetPart)
-                => _items
-                    .Select((item, index) => Contact(index) + item.Format(targetPart))
-                    .Stringify("");
-
-            WhiteSpaceToken[] ITree.PrecededWith => _items.First().PrecededWith;
-
-            string Contact(int index)
-            {
-                if(index == 0)
-                    return "";
-
-                var formerItem = _items[index - 1];
-                var thisItem = _items[index];
-                if(formerItem._item == null && !thisItem._token.PrecededWith.Any())
-                    return
-                        SeparatorType
-                            .Get(formerItem._tokenClass, thisItem._tokenClass)
-                            .Text;
-
-                NotImplementedMethod(index);
-                return null;
-            }
-
-            static IEnumerable<Item> CreateReverseChainItems(SourceSyntax target)
-            {
-                do
-                {
-                    yield return new Item(target.TokenClass, target.Token, target.Right);
-                    target = target.Left;
-
-                    if(target == null)
-                        yield break;
-                } while(true);
-            }
-        }
-
-        sealed class List : DumpableObject, ITree
-        {
-            internal sealed class Item : DumpableObject
-            {
-                [EnableDump]
-                readonly ITree _item;
-                [EnableDump]
-                readonly IToken _token;
-
-                internal Item(SourceSyntax item, IToken token)
-                {
-                    _item = SmartFormat.Create(item);
-                    _token = token;
-                }
-
-                public WhiteSpaceToken[] PrecededWith
-                {
-                    get
-                    {
-                        if(_item == null)
-                            return new WhiteSpaceToken[0];
-                        return _item.PrecededWith;
-                    }
-                }
-
-                public string Format(SourcePart targetPart)
-                    => _item.Format(targetPart) + TokenFormat(_token, targetPart);
-
-                string TokenFormat(IToken token, SourcePart targetPart)
-                {
-                    if(token == null)
-                        return "";
-
-                    if(targetPart.Contains(token.Characters) && !token.PrecededWith.Any())
-                        return token.Characters.Id;
-
-                    NotImplementedMethod(token, targetPart);
-                    return null;
-                }
-            }
-
-            internal static List Create(SourceSyntax target)
-            {
-                var l = target?.TokenClass as TokenClasses.List;
-                return l == null ? null : new List(l, CreateListItems(l, target));
-            }
-
-            internal ITree Create(Brace.Head head)
-                => new BracedList(head, _list, _items);
-
-            static IEnumerable<Item> CreateListItems(TokenClasses.List list, SourceSyntax target)
-            {
-                do
-                {
-                    yield return new Item(target.Left, target.Token);
-                    target = target.Right;
-
-                    if(target == null)
-                        yield break;
-
-                    if(target.TokenClass == list)
-                        continue;
-
-                    yield return new Item(target, null);
-                    yield break;
-                } while(true);
-            }
-
-            readonly TokenClasses.List _list;
-            [EnableDump]
-            readonly Item[] _items;
-
-            List(TokenClasses.List list, IEnumerable<Item> items)
-            {
-                _list = list;
-                _items = items.ToArray();
-            }
-
-            WhiteSpaceToken[] ITree.PrecededWith => _items.First().PrecededWith;
-
-            string ITree.Format(SourcePart targetPart)
-            {
-                NotImplementedMethod(targetPart);
-                return null;
-            }
-        }
-
-        sealed class Brace : DumpableObject, ITree
-        {
-            internal sealed class Head
-            {
-                public Head
+            yield return
+                new Item
                     (
-                    LeftParenthesis leftParenthesis,
-                    IToken leftToken,
-                    IToken rightToken,
-                    RightParenthesis rightParenthesis)
-                {
-                    LeftParenthesis = leftParenthesis;
-                    LeftToken = leftToken;
-                    RightToken = rightToken;
-                    RightParenthesis = rightParenthesis;
-                }
+                    target.Token,
+                    (target.Left == null ? "" : "\n" + " ".Repeat(indentLevel * 4))
+                        + _gapHandlerWithWhiteSpaces.StartGap
+                            (target.Token.PrecededWith, target.TokenClass));
 
-                LeftParenthesis LeftParenthesis { get; }
-                IToken LeftToken { get; }
-                IToken RightToken { get; }
-                RightParenthesis RightParenthesis { get; }
-                public WhiteSpaceToken[] PrecededWith => LeftToken.PrecededWith;
+            foreach(var item in Reformat(target.TokenClass, target.Right, null, null, indentLevel))
+                yield return item;
+        }
+
+        IEnumerable<Item> IndentedReformatLineMode
+            (
+            SourceSyntax target,
+            WhiteSpaceToken[] rightWhiteSpaces,
+            ITokenClass rightTokenClass,
+            int indentLevel
+            )
+        {
+            if(target == null)
+                return Gap(null, rightWhiteSpaces, rightTokenClass);
+
+            var indent = " ".Repeat(indentLevel * 4);
+
+            return
+                ReformatLineMode(target, indentLevel)
+                    .Select(item => new Item(null, indent).plus(item))
+                    .PrettyLines();
+        }
+
+        IEnumerable<IEnumerable<Item>> ReformatLineMode(SourceSyntax target, int indent)
+        {
+            if(target.TokenClass is List)
+                return ReformatListLines(target, indent);
+            NotImplementedFunction(target, indent);
+            return null;
+        }
+
+        IEnumerable<IEnumerable<Item>> ReformatListLines(SourceSyntax target, int indentLevel)
+        {
+            var separator = target.TokenClass;
+            do
+            {
+                yield return
+                    Reformat
+                        (
+                            null,
+                            target.Left,
+                            target.Token.PrecededWith,
+                            target.TokenClass,
+                            indentLevel
+                        ).plus(new Item(target.Token, ""));
+                target = target.Right;
+            } while(target != null && target.TokenClass == separator);
+
+            if(target != null)
+                yield return Reformat(null, target, null, null, indentLevel);
+        }
+
+        bool IsLineMode(SourceSyntax target)
+        {
+            var braceInformation = BraceInformation.Create(target, this);
+            if(braceInformation != null)
+                return braceInformation.IsLineMode;
+
+            return GetLineLengthInformation
+                (null, target, null, null, _lineLengthLimiter.MaxLineLength) <= 0;
+        }
+
+        sealed class MainInformation : DumpableObject
+        {
+            readonly SmartFormat _parent;
+            readonly SourceSyntax _body;
+            readonly WhiteSpaceToken[] _whiteSpaces;
+            readonly EndToken _end;
+
+            MainInformation
+                (SmartFormat parent, SourceSyntax body, WhiteSpaceToken[] whiteSpaces, EndToken end)
+            {
+                _parent = parent;
+                _body = body;
+                _whiteSpaces = whiteSpaces;
+                _end = end;
             }
 
-            internal static ITree Create(SourceSyntax target)
+            internal static MainInformation Create(SourceSyntax target, SmartFormat parent)
             {
-                var rightParenthesis = target?.TokenClass as RightParenthesis;
+                var end = target.TokenClass as EndToken;
+                if(end == null)
+                    return null;
 
+                Tracer.Assert(target.Right == null);
+                return new MainInformation(parent, target.Left, target.Token.PrecededWith, end);
+            }
+
+            public IEnumerable<Item> LineModeReformat(int indentLevel)
+                => _parent
+                    .IndentedReformatLineMode(_body, _whiteSpaces, _end, indentLevel);
+        }
+
+        sealed class BraceInformation : DumpableObject
+        {
+            readonly SourceSyntax _body;
+            readonly SmartFormat _parent;
+            readonly LeftParenthesis _leftToken;
+            readonly RightParenthesis _rightToken;
+            readonly IToken _right;
+            readonly IToken _left;
+
+            BraceInformation
+                (
+                SmartFormat parent,
+                IToken left,
+                LeftParenthesis leftToken,
+                SourceSyntax body,
+                IToken right,
+                RightParenthesis rightToken)
+            {
+                _parent = parent;
+                _leftToken = leftToken;
+                _body = body;
+                _rightToken = rightToken;
+                _right = right;
+                _left = left;
+                Tracer.Assert(_left != null);
+                Tracer.Assert(_right != null);
+            }
+
+            internal bool IsLineMode
+            {
+                get
+                {
+                    if(LeftIsLineMode && RightIsLineMode)
+                        return true;
+                    return 0 >=
+                        _parent
+                            .GetLineLengthInformation
+                            (
+                                _leftToken,
+                                _body,
+                                _right.PrecededWith,
+                                _rightToken,
+                                _parent._lineLengthLimiter.MaxLineLength
+                            );
+                }
+            }
+
+            bool RightIsLineMode => _parent.Contains(_right.PrecededWith, _rightToken);
+            bool LeftIsLineMode => _parent.Contains(_left.PrecededWith, _leftToken);
+
+            internal IEnumerable<Item> LineModeReformat(int indentLevel)
+            {
+                var indent = " ".Repeat(indentLevel * 4);
+
+                yield return new Item(_left, "\n" + indent);
+                yield return new Item(null, "\n");
+
+                foreach(var item in _parent.
+                    IndentedReformatLineMode
+                    (_body, _right.PrecededWith, _rightToken, indentLevel + 1))
+                    yield return item;
+
+                yield return new Item(_right, "\n" + indent);
+            }
+
+            internal static BraceInformation Create(SourceSyntax target, SmartFormat parent)
+            {
+                var rightParenthesis = target.TokenClass as RightParenthesis;
                 if(rightParenthesis == null)
                     return null;
 
@@ -279,82 +324,130 @@ namespace Reni.Formatting
                     return null;
 
                 var left = target.Left;
-                var leftParenthesis = left?.TokenClass as LeftParenthesis;
+                Tracer.Assert(left != null, "left != null");
+
+                var leftParenthesis = left.TokenClass as LeftParenthesis;
 
                 if(leftParenthesis?.Level != rightParenthesis.Level || left.Left != null)
                     return null;
 
-                var braceHead
-                    = new Head(leftParenthesis, left.Token, target.Token, rightParenthesis);
-
-                return List
-                    .Create(left.Right)
-                    ?.Create(braceHead)
-                    ?? new Brace(braceHead, left.Right);
-            }
-
-            readonly Head _head;
-            [EnableDump]
-            readonly ITree _target;
-
-            Brace(Head head, SourceSyntax target)
-            {
-                _head = head;
-                _target = SmartFormat.Create(target);
-            }
-
-            WhiteSpaceToken[] ITree.PrecededWith => _head.PrecededWith;
-
-            string ITree.Format(SourcePart targetPart)
-            {
-                NotImplementedMethod(targetPart);
-                return null;
+                var rightToken = target.Token;
+                var leftToken = left.Token;
+                return new BraceInformation
+                    (
+                    parent,
+                    leftToken,
+                    leftParenthesis,
+                    left.Right,
+                    rightToken,
+                    rightParenthesis);
             }
         }
 
-        sealed class BracedList : DumpableObject, ITree
+        bool Contains(WhiteSpaceToken[] whiteSpaces, ITokenClass tokenClass)
+            => _gapHandlerWithWhiteSpaces
+                .StartGap(whiteSpaces, tokenClass)
+                .Contains("\n");
+
+        int GetLineLengthInformation
+            (
+            ITokenClass leftTokenClass,
+            SourceSyntax target,
+            WhiteSpaceToken[] rightWhiteSpaces,
+            ITokenClass rightTokenClass,
+            int lengthRemaining)
         {
-            readonly Brace.Head _head;
-            readonly TokenClasses.List _list;
-            [EnableDump]
-            readonly List.Item[] _items;
-
-            internal BracedList(Brace.Head head, TokenClasses.List list, List.Item[] items)
+            if(target == null)
             {
-                _list = list;
-                _head = head;
-                _items = items;
+                var gap = Gap(leftTokenClass, rightWhiteSpaces, rightTokenClass);
+                if(gap.Any(item => item.WhiteSpaces.Contains("\n")))
+                    return 0;
+                return lengthRemaining - gap.Sum(item => item.Length);
             }
 
-            WhiteSpaceToken[] ITree.PrecededWith => _head.PrecededWith;
+            lengthRemaining = GetLineLengthInformation
+                (
+                    leftTokenClass,
+                    target.Left,
+                    target.Token.PrecededWith,
+                    target.TokenClass,
+                    lengthRemaining
+                );
+            if(lengthRemaining <= 0)
+                return 0;
 
-            string ITree.Format(SourcePart targetPart)
-            {
-                var items =
-                    _items.Select((item, index) => Contact(index) + item.Format(targetPart))
-                        .ToArray();
+            lengthRemaining = lengthRemaining - target.Token.Characters.Length;
+            if(lengthRemaining <= 0)
+                return 0;
 
+            lengthRemaining = GetLineLengthInformation
+                (
+                    target.TokenClass,
+                    target.Right,
+                    rightWhiteSpaces,
+                    rightTokenClass,
+                    lengthRemaining
+                );
 
-                NotImplementedMethod(targetPart, nameof(items), items);
-                return null;
-            }
-
-            string Contact(int index)
-            {
-                var thisItem = _items[index];
-                if(!thisItem.PrecededWith.Any())
-                    return "";
-
-                NotImplementedMethod(index);
-                return null;
-            }
+            return lengthRemaining;
         }
 
-        static ITree Create(SourceSyntax target)
-            => target == null
-                ? null
-                : Brace.Create(target)
-                    ?? (ITree) List.Create(target)
-                        ?? Chain.Create(target);
+        IEnumerable<Item> Gap
+            (
+            ITokenClass leftTokenClass,
+            WhiteSpaceToken[] rightWhiteSpaces,
+            ITokenClass rightTokenClass
+            )
+        {
+            if(rightTokenClass == null)
+            {
+                Tracer.Assert(rightWhiteSpaces == null);
+                yield break;
+            }
+
+            yield return
+                new Item(null, UnfilteredGap(leftTokenClass, rightWhiteSpaces, rightTokenClass));
+        }
+
+        string UnfilteredGap
+            (
+            ITokenClass leftTokenClass,
+            WhiteSpaceToken[] rightWhiteSpaces,
+            ITokenClass rightTokenClass)
+        {
+            if(leftTokenClass == null)
+                return !rightWhiteSpaces.Any()
+                    ? _gapHandler.StartGap(rightTokenClass)
+                    : _gapHandlerWithWhiteSpaces.StartGap(rightWhiteSpaces, rightTokenClass);
+
+            return !rightWhiteSpaces.Any()
+                ? _gapHandler.Gap(leftTokenClass, rightTokenClass)
+                : _gapHandlerWithWhiteSpaces.Gap(leftTokenClass, rightWhiteSpaces, rightTokenClass);
+        }
+
+        internal sealed class Item : DumpableObject
+        {
+            internal readonly string WhiteSpaces;
+            internal readonly IToken Token;
+
+            internal Item(IToken token, string whiteSpaces)
+            {
+                Token = token;
+                WhiteSpaces = whiteSpaces;
+                //Tracer.ConditionalBreak(Id == ";");
+            }
+
+            string Id => WhiteSpaces + (Token?.Id ?? "");
+            internal int Length => Id.Length;
+            protected override string GetNodeDump() => base.GetNodeDump() + " " + Id.Quote();
+        }
+    }
+
+
+    sealed class LineLengthLimiter : SmartFormat.ILineLengthLimiter
+    {
+        readonly int _maxLineLength;
+        public LineLengthLimiter(int maxLineLength) { _maxLineLength = maxLineLength; }
+        int SmartFormat.ILineLengthLimiter.MaxLineLength => _maxLineLength;
     }
 }
