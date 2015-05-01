@@ -72,7 +72,7 @@ namespace Reni.FeatureTest.Helper
                         c.SourceSyntax.Reformat() +
                         "\n---------------------"
                 );
-            Tracer.ConditionalBreak(true);
+            Tracer.ConditionalBreak(false);
             c.Exececute();
 
             if(outStream.Data != targetSet.Output)

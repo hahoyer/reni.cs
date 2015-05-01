@@ -120,11 +120,11 @@ namespace Reni.Formatting
 
         static ISeparatorType PrettySeparatorType(ITokenClass left, ITokenClass right)
         {
-            if (left is List && right is LeftParenthesis)
+            if(left is List && right is LeftParenthesis)
                 return Close;
 
-            if (right is RightParenthesis || 
-                right is LeftParenthesis || 
+            if(right is RightParenthesis ||
+                right is LeftParenthesis ||
                 right is List ||
                 left is LeftParenthesis)
                 return Contact;
@@ -132,7 +132,7 @@ namespace Reni.Formatting
             if(right is Colon || left is ExclamationBoxToken)
                 return null;
 
-                return Close;
+            return Close;
         }
     }
 }

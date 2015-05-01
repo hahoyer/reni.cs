@@ -134,7 +134,7 @@ namespace Reni.Formatting
             return null;
         }
 
-        internal IEnumerable<Item> LineModeReformatOfChain
+        IEnumerable<Item> LineModeReformatOfChain
             (ITokenClass leftTokenClass, SourceSyntax target, int indentLevel)
         {
             if(!target.IsChain())
@@ -179,12 +179,12 @@ namespace Reni.Formatting
                     .PrettyLines();
         }
 
-        IEnumerable<IEnumerable<Item>> ReformatLineMode(SourceSyntax target, int indent)
+        IEnumerable<IEnumerable<Item>> ReformatLineMode(SourceSyntax target, int indentLevel)
         {
             if(target.TokenClass is List)
-                return ReformatListLines(target, indent);
-            NotImplementedFunction(target, indent);
-            return null;
+                return ReformatListLines(target, indentLevel);
+
+            return new[] {Reformat(null, target, null, null, indentLevel)};
         }
 
         IEnumerable<IEnumerable<Item>> ReformatListLines(SourceSyntax target, int indentLevel)
