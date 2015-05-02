@@ -62,7 +62,7 @@ namespace HoyerWare.ReniLanguagePackage
             var i = 0;
             while(index < line.EndPosition)
             {
-                var token = Compiler.Containing(index).AssertNotNull().Trim(line);
+                var token = Compiler.Containing(index).AssertNotNull().TrimLine(line);
                 if(trace)
                     Tracer.IndentStart();
                 if(trace)
@@ -73,6 +73,7 @@ namespace HoyerWare.ReniLanguagePackage
                     Tracer.Line("-----------------");
                 if(trace)
                     Tracer.IndentEnd();
+
                 yield return token;
                 index += token.SourcePart.Length;
                 i++;
@@ -122,9 +123,8 @@ namespace HoyerWare.ReniLanguagePackage
         internal void ReformatSpan(EditArray mgr, TextSpan span)
         {
             var sourcePart = Data.ToSourcePart(span);
-            var common = Compiler.Containing(sourcePart)
-                .Trim(sourcePart);
-            mgr.Add(new EditSpan(span, common.Reformat));
+            var common = Compiler.Containing(sourcePart);
+            mgr.Add(new EditSpan(span, common.Reformat(sourcePart)));
             mgr.ApplyEdits();
         }
     }

@@ -60,7 +60,7 @@ namespace Reni.Formatting
             var tokenClass = target.TokenClass;
 
             if(tokenClass is ReassignToken || tokenClass is Colon || tokenClass is Function
-                || tokenClass is RightParenthesis)
+                || tokenClass is RightParenthesis || tokenClass is List)
                 return false;
 
             if(tokenClass is Definable || tokenClass is InstanceToken)
@@ -84,7 +84,7 @@ namespace Reni.Formatting
                     result += item.WhiteSpaces + item.Token.Id;
                 else
                 {
-                    Dumpable.NotImplementedFunction(items, targetPart);
+                    Dumpable.NotImplementedFunction(items.ToArray(), targetPart);
                     return null;
                 }
             }

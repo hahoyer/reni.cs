@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.Debug;
 using hw.Scanner;
 using Reni.Parser;
 
@@ -24,9 +23,7 @@ namespace Reni.UserInterface
             yield break;
         }
 
-        protected override string Reformat(SourcePart targetPart)
-        {
-            return SourcePart.Intersect(targetPart).Id;
-        }
+        public override string Reformat(SourcePart targetPart)
+            => SourcePart.Intersect(targetPart).Id;
     }
 }

@@ -64,7 +64,7 @@ namespace Reni.UserInterface
         public int StartPosition => SourcePart.Position;
         public int EndPosition => SourcePart.EndPosition;
 
-        public Trimmed Trim(SourcePart span) => new Trimmed(this, span);
+        public Trimmed TrimLine(SourcePart span) => new Trimmed(this, span);
 
         bool Equals(TokenInformation other) => SourcePart == other.SourcePart;
 
@@ -89,10 +89,8 @@ namespace Reni.UserInterface
             internal Trimmed(TokenInformation token, SourcePart sourcePart)
             {
                 Token = token;
-                SourcePart = sourcePart;
+                SourcePart = sourcePart.Intersect(Token.SourcePart);
             }
-
-            public string Reformat => Token.Reformat(SourcePart);
 
             public IEnumerable<char> GetCharArray()
                 => SourcePart
@@ -100,7 +98,7 @@ namespace Reni.UserInterface
                     .ToCharArray();
         }
 
-        protected abstract string Reformat(SourcePart targetPart);
+        public abstract string Reformat(SourcePart targetPart);
 
         public abstract IEnumerable<SourcePart> FindAllBelongings(Compiler compiler);
     }

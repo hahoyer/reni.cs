@@ -110,16 +110,14 @@ namespace HoyerWare.ReniLanguagePackage
         {
             if(token.IsComment || token.IsLineComment)
                 return TokenColor.Comment;
-            if(token.IsError)
-                return TokenColor.Text;
-            if(token.IsText)
-                return TokenColor.String;
-            if(token.IsNumber)
-                return TokenColor.Number;
             if(token.IsKeyword)
                 return TokenColor.Keyword;
             if(token.IsIdentifier)
                 return TokenColor.Identifier;
+            if(token.IsText)
+                return TokenColor.String;
+            if(token.IsNumber)
+                return TokenColor.Number;
 
             return TokenColor.Text;
         }

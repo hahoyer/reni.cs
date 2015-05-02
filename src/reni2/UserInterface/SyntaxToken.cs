@@ -43,7 +43,7 @@ namespace Reni.UserInterface
         [DisableDump]
         public override string State => SourceSyntax.Token.Id ?? "";
 
-        protected override string Reformat(SourcePart targetPart)
+        public override string Reformat(SourcePart targetPart)
             => SmartFormat.Reformat(SourceSyntax, targetPart);
 
         public override IEnumerable<SourcePart> FindAllBelongings(Compiler compiler)
