@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
+using hw.Helper;
+using hw.Parser;
 using hw.Scanner;
 using Reni.TokenClasses;
 
@@ -73,23 +75,9 @@ namespace Reni.Formatting
         internal static string Filter
             (this IEnumerable<SmartFormat.Item> items, SourcePart targetPart)
         {
-            var result = "";
-            foreach(var item in items)
-            {
-                var sourcePart = item.Token.SourcePart;
-                if(targetPart < sourcePart)
-                    return result;
-
-                if(targetPart.Contains(sourcePart))
-                    result += item.WhiteSpaces + item.Token.Id;
-                else
-                {
-                    Dumpable.NotImplementedFunction(items.ToArray(), targetPart);
-                    return null;
-                }
-            }
-
-            return result;
+            return items
+                .Select(item => item.Filter(targetPart))
+                .Stringify("");
         }
     }
 }

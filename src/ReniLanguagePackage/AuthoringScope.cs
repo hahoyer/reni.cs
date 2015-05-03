@@ -19,7 +19,7 @@ namespace HoyerWare.ReniLanguagePackage
         public Declarations GetDeclarations
             (IVsTextView view, int line, int col, TokenInfo info, ParseReason reason)
         {
-            NotImplementedMethod(view, line, col, info, reason);
+            NotImplementedMethod("view", line, col, info, reason);
             return null;
         }
         public Methods GetMethods(int line, int col, string name)

@@ -24,6 +24,6 @@ namespace Reni.UserInterface
         }
 
         public override string Reformat(SourcePart targetPart)
-            => SourcePart.Intersect(targetPart).Id;
+            => SourcePart.Intersect(targetPart)?.Id ?? "";
     }
 }

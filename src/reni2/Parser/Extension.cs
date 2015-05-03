@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Helper;
 using hw.Parser;
+using hw.Scanner;
 using JetBrains.Annotations;
 
 namespace Reni.Parser
@@ -33,6 +34,9 @@ namespace Reni.Parser
             =>
                 whiteSpaces?.Any(item => Lexer.IsLineComment(item) || Lexer.IsComment(item))
                     ?? false;
+
+        internal static SourcePart PrefixCharacters(this IToken token)
+            => token.PrecededWith.SourcePart() ?? token.Characters.Start.Span(0);
 
         internal static bool HasWhiteSpaces(this IEnumerable<WhiteSpaceToken> whiteSpaces)
             => whiteSpaces?.Any(Lexer.IsWhiteSpace) ?? false;

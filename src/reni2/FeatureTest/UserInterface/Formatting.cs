@@ -4,7 +4,6 @@ using System.Linq;
 using hw.Debug;
 using hw.UnitTest;
 using NUnit.Framework;
-using Reni.UserInterface;
 
 namespace Reni.FeatureTest.UserInterface
 {
@@ -35,6 +34,53 @@ namespace Reni.FeatureTest.UserInterface
             var span = (compiler.Source + 2).Span(3);
             var reformat = compiler.Containing(span).Reformat(span);
             Tracer.Assert(reformat == "#(a", reformat);
+        }
+
+        [Test]
+        [UnitTest]
+        public void ReformatPart()
+        {
+            const string Text = @"systemdata:
+{
+    1 type instance () Memory: ((0 type * ('100' to_number_of_base 64)) mutable) instance ();
+    ! mutable FreePointer: Memory array_reference mutable;
+    repeat: /\ ^ while () then (^ body (), repeat (^));
+};
+
+1 = 1 then 2 else 4;
+3;
+(Text ('H') << 'allo') dump_print";
+
+            var compiler = new Compiler(text: Text);
+
+            for(var start = 0; start < compiler.Source.Length; start++)
+                for(var end = start; end < compiler.Source.Length; end++)
+                {
+                    var span = (compiler.Source + start).Span(end - start);
+                    var reformat = compiler.SourceSyntax.Reformat(span);
+                }
+        }
+
+
+        [Test]
+        [UnitTest]
+        public void Reformat()
+        {
+            const string Text = @"systemdata:
+{
+    1 type instance () Memory: ((0 type * ('100' to_number_of_base 64)) mutable) instance ();
+    ! mutable FreePointer: Memory array_reference mutable;
+    repeat: /\ ^ while () then (^ body (), repeat (^));
+};
+
+1 = 1 then 2 else 4;
+3;
+(Text ('H') << 'allo') dump_print";
+
+            var compiler = new Compiler(text: Text);
+            var reformat = compiler.SourceSyntax.Reformat();
+
+            Tracer.Assert(reformat == "", "\n"+ reformat);
         }
     }
 }

@@ -89,7 +89,8 @@ namespace Reni.UserInterface
             internal Trimmed(TokenInformation token, SourcePart sourcePart)
             {
                 Token = token;
-                SourcePart = sourcePart.Intersect(Token.SourcePart);
+                SourcePart = sourcePart.Intersect(Token.SourcePart)
+                    ?? Token.SourcePart.Start.Span(0);
             }
 
             public IEnumerable<char> GetCharArray()

@@ -123,8 +123,8 @@ namespace HoyerWare.ReniLanguagePackage
         internal void ReformatSpan(EditArray mgr, TextSpan span)
         {
             var sourcePart = Data.ToSourcePart(span);
-            var common = Compiler.Containing(sourcePart);
-            mgr.Add(new EditSpan(span, common.Reformat(sourcePart)));
+            var reformat = Compiler.Reformat(sourcePart);
+            mgr.Add(new EditSpan(span, reformat));
             mgr.ApplyEdits();
         }
     }

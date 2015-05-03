@@ -44,7 +44,7 @@ namespace Reni.UserInterface
         public override string State => SourceSyntax.Token.Id ?? "";
 
         public override string Reformat(SourcePart targetPart)
-            => SmartFormat.Reformat(SourceSyntax, targetPart);
+            => SourceSyntax.Reformat(targetPart);
 
         public override IEnumerable<SourcePart> FindAllBelongings(Compiler compiler)
             => compiler.FindAllBelongings(SourceSyntax)?.Select(item => item.Token.Characters);

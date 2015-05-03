@@ -294,6 +294,8 @@ namespace Reni
             NotImplementedMethod(part);
             return null;
         }
+
+        public string Reformat(SourcePart sourcePart) => SourceSyntax.Reformat(sourcePart);
     }
 
     public interface IOutStream
