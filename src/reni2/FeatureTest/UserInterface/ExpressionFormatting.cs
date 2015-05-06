@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.UnitTest;
+using NUnit.Framework;
 
 namespace Reni.FeatureTest.UserInterface
 {
     [UnitTest]
+    [TestFixture]
     public sealed class ExpressionFormatting : DependantAttribute
     {
         [UnitTest]
@@ -29,6 +31,18 @@ namespace Reni.FeatureTest.UserInterface
             var x = compiler.Containing(span).Reformat(span);
 
             Tracer.Assert(x == "# C", x);
+        }
+
+        [UnitTest]
+        [Test]
+        public void BadArgDeclaration()
+        {
+            const string Text = @"{^ : ^}";
+            var compiler = new Compiler(text: Text);
+            var span = (compiler.Source + 0).Span(Text.Length);
+            var x = compiler.Containing(span).Reformat(span);
+
+            Tracer.Assert(x == "{^ : ^}", x);
         }
     }
 }

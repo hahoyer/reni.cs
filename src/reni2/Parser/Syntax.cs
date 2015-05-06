@@ -47,10 +47,7 @@ namespace Reni.Parser
             => CreateElseSyntax(right.Value).Issues(right.Issues);
 
         internal virtual Checked<Syntax> CreateDeclarationSyntax(SourcePart token, Syntax right)
-        {
-            NotImplementedMethod(token, right);
-            return null;
-        }
+            => IssueId.IdentifierExpected.Syntax(token, this, right);
 
         internal Checked<Syntax> CreateDeclarationSyntax
             (SourcePart token, EmptyList right, Issue issue)

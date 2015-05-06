@@ -105,8 +105,6 @@ namespace Reni.Parser
             return result;
         }
 
-        internal override Checked<Syntax> CreateDeclarationSyntax(SourcePart token, Syntax right)
-            => IssueId.IdentifierExpected.Syntax(token, this, right);
     }
 
     // Lord of the weed
