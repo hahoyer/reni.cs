@@ -3,70 +3,68 @@
 ################################################################
 
 
-void: function object
+void: /\
 (
-	constructor void;
-    converter function ();
+    !!converter:: /\ ();
 );
 
 
-bool: function object
+bool: /\
 {
-	constructor bool;
-    value: data arg bit_cast(1);
-    converter function value;
-    =  : function bool(value = bool(arg) value);
-    <> : function bool(value <> bool(arg) value);
-    &  : function bool(value & bool(arg) value);
-    |  : function bool(value | bool(arg) value);
-	dump: function (value then string("true") else string("false"));
+    value:  ^  bit_cast(1);
+    !!converter:: /\ value;
+    =  : /\ bool(value = bool(^ ) value);
+    <> : /\ bool(value <> bool(^ ) value);
+    &  : /\ bool(value & bool(^ ) value);
+    |  : /\ bool(value | bool(^ ) value);
+	dump: /\ (value then string("true") else string("false"));
 };
 
 
-~ : function (false = arg);
+~ : /\ (false = ^ );
 
 
-false: data bool(0);
-true:  data ~false;
+false:  bool(0);
+true:   ~false;
 
 
-repeat: function (arg() then repeat(arg) else ());
+repeat: /\ (^ () then repeat(^ ) else ());
 
 
-integer: function object
+integer: /\
 {
 	constructor integer;
-    value: data arg bit_cast(32);
-    converter function value;
-    + : function integer([value + integer(arg)value] bit_cast(32));
-    - : function integer((value - integer(arg)value) bit_cast(32));
-    * : function integer((value * integer(arg)value) bit_cast(32));
-    / : function integer((value / integer(arg)value) bit_cast(32));
-    \ : function integer((value \ integer(arg)value) bit_cast(32));
-    = : function bool(value = integer(arg) value);
-    < : function bool(value < integer(arg) value);
-    > : function bool(value > integer(arg) value);
-    print: function value printnum ();
+    value:  ^  bit_cast(32);
+    !converter: /\ value;
+    + : /\ integer([value + integer(^ )value] bit_cast(32));
+    - : /\ integer((value - integer(^ )value) bit_cast(32));
+    * : /\ integer((value * integer(^ )value) bit_cast(32));
+    / : /\ integer((value / integer(^ )value) bit_cast(32));
+    \ : /\ integer((value \ integer(^ )value) bit_cast(32));
+    = : /\ bool(value = integer(^ ) value);
+    < : /\ bool(value < integer(^ ) value);
+    > : /\ bool(value > integer(^ ) value);
+    print: /\ value printnum ();
 
-	:+ : function{this := this + arg;this;};
-	:* : function{this := this * arg;this;};
+	:+ : /\{this := this + ^ ;this;};
+	:* : /\{this := this * ^ ;this;};
 
-    dump: function
+    dump: /\
     [
         this = 0
         then string("0")
         else scope
         (
-            x: data (this > 0 then this else integer(0)-this);
-            Return: data string("");
+            x:  (this > 0 then this else integer(0)-this);
+            Return:  string("");
 
-            repeat(function scope
+            repeat(/\ scope
             (
-                Digit: data integer(x \ 10);
+                Digit:  integer(x \ 10);
 
-                DigitChar: data ("0123456789" at Digit)bit_cast(8);
-                DigitStr: data string((0 bit_cast(8) type)array(DigitChar,0));
-                xx: data Return;
+                DigitChar:  ("0123456789" at Digit)bit_cast(8);
+                DigitStr:  string((0 bit_cast(8) type)array(DigitChar,0));
+                xx:  Return;
                 Return := DigitStr * xx;
                 x:= x / 10;
                 return x > 0
@@ -79,78 +77,78 @@ integer: function object
 };
 
                                                                                
-- : function integer(0) - arg;
+- : /\ integer(0) - ^ ;
 
 
-_CR_: data 10 bit_cast(8);
-_LF_: data 13 bit_cast(8);
+_CR_:  10 bit_cast(8);
+_LF_:  13 bit_cast(8);
 
 
-CBasicHeap: function object
+CBasicHeap: /\
 (
-	CBlock: function scope
+	CBlock: /\ scope
 	(
-		ThisRef: data this explicit_ref;
+		ThisRef:  this explicit_ref;
 		return object
 		(
-			constructor function CBlock(arg);
-			Heap: data ThisRef;
-			Size: data arg;
+			constructor /\ CBlock(^ );
+			Heap:  ThisRef;
+			Size:  ^ ;
 		);
 	);
 
-	GetBlockAndAdvance: function scope
+	GetBlockAndAdvance: /\ scope
 	(
-		Block: data (arg AT 0) raw_convert (CBlock(arg NEXT 1) explicit_ref type);
-		Block()construct(arg NEXT 1);
-		Return: data (Block+1) raw_convert (1 bits() explicit_ref type);
-		(arg AT 0) := (Return+(arg NEXT 1)) raw_convert ((arg AT 0) type);
+		Block:  (^  AT 0) raw_convert (CBlock(^  NEXT 1) explicit_ref type);
+		Block()construct(^  NEXT 1);
+		Return:  (Block+1) raw_convert (1 bits() explicit_ref type);
+		(^  AT 0) := (Return+(^  NEXT 1)) raw_convert ((^  AT 0) type);
 		return Return;
 
 	);
 
-	FreeArrayHandler: data prototype( function() );
+	FreeArrayHandler:  prototype( /\() );
 
-	FreeArray: function scope
+	FreeArray: /\ scope
 	(
-		Block: data ((arg explicit_ref) raw_convert (CBlock() explicit_ref type)) - 1;
+		Block:  ((^  explicit_ref) raw_convert (CBlock() explicit_ref type)) - 1;
 		Block()Heap()FreeArrayHandler
 		(
 			Block()Size, 
-			(arg explicit_ref) raw_convert(1 bits()explicit_ref type)
+			(^  explicit_ref) raw_convert(1 bits()explicit_ref type)
 		);
 		return;
 	)
 );
 
 
-HeapData: data (100000 bits 0);
+HeapData:  (100000 bits 0);
 
 
-Heap: data object
+Heap:  object
 {
 	inherit CBasicHeap();
 
-	Data: data (HeapData explicit_ref) raw_convert (1 bits()explicit_ref type);
+	Data:  (HeapData explicit_ref) raw_convert (1 bits()explicit_ref type);
 
-	Allocate: function {scope
+	Allocate: /\ {scope
 	{
-		New: data GetBlockAndAdvance(Data, arg type size) raw_convert(arg explicit_ref type );
-		New()construct(arg);
+		New:  GetBlockAndAdvance(Data, ^  type size) raw_convert(^  explicit_ref type );
+		New()construct(^ );
 		return New()stable_ref;
 	}} stable_ref;
 
-	AllocateArray: function scope
+	AllocateArray: /\ scope
 	{
-		count: data arg AT 0;
-		rtype: data arg AT 1;
-		initfunction: data arg NEXT 2;
-		New: data GetBlockAndAdvance(Data, count * rtype size) raw_convert(rtype() explicit_ref type);
+		count:  ^  AT 0;
+		rtype:  ^  AT 1;
+		init/\:  ^  NEXT 2;
+		New:  GetBlockAndAdvance(Data, count * rtype size) raw_convert(rtype() explicit_ref type);
 
-		repeat(function(
+		repeat(/\(
 			count > 0 then(
 				count:=count-1;
-				(New at count) construct (initfunction(count));
+				(New at count) construct (init/\(count));
 				true												 
 			) else false
 		));
@@ -158,86 +156,86 @@ Heap: data object
 		return New
 	}; 
 
-	FreeArrayHandler:= function
+	FreeArrayHandler:= /\
 	(
-		vardump(arg)println();
+		vardump(^ )println();
 	)	
 };
 
 
-new : function Heap Allocate(arg) stable_ref;
-new_array: function Heap AllocateArray(arg);
+new : /\ Heap Allocate(^ ) stable_ref;
+new_array: /\ Heap AllocateArray(^ );
 
-free_array: function CBasicHeap()FreeArray(arg);
+free_array: /\ CBasicHeap()FreeArray(^ );
 	
 
-string: function object
+string: /\
 (
 	constructor string;
-    value: data (8 bits() explicit_ref type) ();
+    value:  (8 bits() explicit_ref type) ();
 
     value :=                                                             
     (
-        arg type = this type THEN scope 
+        ^  type = this type THEN scope 
         {
-            ArgData : data arg value;
+            ^^ Data :  ^  value;
             return new_array
             (
-                arg length()+1,
+                ^  length()+1,
                 8 bits () type,
-                function ArgData at arg
+                /\ ^ Data at ^ 
             )
         } 
-		ELSE arg type = value type THEN scope
+		ELSE ^  type = value type THEN scope
         {
-            ArgData : data arg;
+            ^ Data :  ^ ;
 
-            ArgLength: data integer(0);
+            ^ Length:  integer(0);
             repeat
-            (function(
-                ArgData at ArgLength <> 0
-                then (ArgLength := ArgLength+1; true)
+            (/\(
+                ^ Data at ^ Length <> 0
+                then (^ Length := ^ Length+1; true)
                 else false
             ));
 
             return new_array
             (
-                ArgLength+1,
+                ^ Length+1,
                 8 bits () type,
-                function ArgData at arg
+                /\ ^ Data at ^ 
             )
         } 
-		ELSE arg type = () type THEN new(8 bits 0)
-        ELSE new(arg)
+		ELSE ^  type = () type THEN new(8 bits 0)
+        ELSE new(^ )
     );
 
-    at: function (value at arg);
+    at: /\ (value at ^ );
     
-    * : function scope
+    * : /\ scope
     {
-        that  : data string(arg);
-        thisL : data length(); 
-        thatL : data that length();
-        newL  : data thisL + thatL;
-		newD  : data new_array
-            (newL+1, 8 bits () type, function (
-                arg < thisL then this at arg else
-                arg < newL  then that at (arg-thisL) else
+        that  :  string(^ );
+        thisL :  length(); 
+        thatL :  that length();
+        newL  :  thisL + thatL;
+		newD  :  new_array
+            (newL+1, 8 bits () type, /\ (
+                ^  < thisL then this at ^  else
+                ^  < newL  then that at (^ -thisL) else
                 0
             ))
         ; 
-		Return : data string(newD);
+		Return :  string(newD);
 		free_array(newD);
 		return Return;
     };
 
-	:* : function {this := this * arg;	this;};
+	:* : /\ {this := this * ^ ;	this;};
 
-    length: function scope
+    length: /\ scope
     (
-        i: data integer(0);
+        i:  integer(0);
         repeat
-        (function(
+        (/\(
             value at i <> 0
             then (i := i+1; true)
             else false
@@ -245,13 +243,13 @@ string: function object
         return i
     );
 
-	dump: function this;
+	dump: /\ this;
 
-    print: function scope
+    print: /\ scope
     (
-        i: data integer(0);
+        i:  integer(0);
         repeat
-        (function(
+        (/\(
             value at i <> 0
             then
             (
@@ -267,47 +265,47 @@ string: function object
 		return
     );
 
-    println: function (print();_CR_ printchar();_LF_ printchar())
+    println: /\ (print();_CR_ printchar();_LF_ printchar())
 );
 
 
-dump: function 
+dump: /\ 
 {
-    (arg type) is_explicit_ref() 
-        THEN integer(arg raw_convert(arg type size bits()type))dump() ELSE
-    arg dump()
+    (^  type) is_explicit_ref() 
+        THEN integer(^  raw_convert(^  type size bits()type))dump() ELSE
+    ^  dump()
 };
 
-vardump: FUNCTION( (string(ARG TEXT) * ":=" * dump(ARG) * ";") );
+vardump: /\( (string(^  TEXT) * ":=" * dump(^ ) * ";") );
 
 
-println: function(_CR_ printchar();_LF_ printchar());
+println: /\(_CR_ printchar();_LF_ printchar());
 
 
-Array: function scope
+Array: /\ scope
 {
-	ElemType: data arg;
-	return (function object
+	ElemType:  ^ ;
+	return (/\
 	{
-		mData: data (ElemType() explicit_ref type)();
-		mCount: data integer(0);
+		mData:  (ElemType() explicit_ref type)();
+		mCount:  integer(0);
 		
-		(arg type) = (this type) THEN 
+		(^  type) = (this type) THEN 
 		{
-			mCount:= arg mCount;
-			mData := data arg mData;
+			mCount:= ^  mCount;
+			mData :=  ^  mData;
 		} 
-		ELSE arg type = ElemType THEN 
+		ELSE ^  type = ElemType THEN 
 		{
 			mCount:= 1;
-			mData := data arg explicit_ref;
+			mData :=  ^  explicit_ref;
 		}
-		ELSE arg type = () type THEN ()
+		ELSE ^  type = () type THEN ()
 		ELSE scope
 		{
-			ArgsData : data (ElemType)array(arg);
-			mData := ArgsData;
-			mCount:= (ArgsData type size) / (ElemType size);
+			^ sData :  (ElemType)array(^ );
+			mData := ^ sData;
+			mCount:= (^ sData type size) / (ElemType size);
 			return;
 		};
 
@@ -316,36 +314,36 @@ Array: function scope
 		(
 			mCount,
 			ElemType,
-			function mData at arg
+			/\ mData at ^ 
 		);
 
-		at: function mData at arg;
-		count: function mCount;
+		at: /\ mData at ^ ;
+		count: /\ mCount;
 
-		* : function scope
+		* : /\ scope
 		{
-			that  : data Array(ElemType)(arg);
-			thisL : data count(); 
-			thatL : data that count();
-			Return : data Array(ElemType)();
+			that  :  Array(ElemType)(^ );
+			thisL :  count(); 
+			thatL :  that count();
+			Return :  Array(ElemType)();
 			Return mCount := mCount + thatL;
 			Return mData  := 
 			new_array(
 				mCount, 
 				ElemType, 
-				function (arg < thisL then this at arg else that at (arg-thisL))
+				/\ (^  < thisL then this at ^  else that at (^ -thisL))
 			); 
 			return Return;
 		};
 
-		:* : function{this := this * arg; this stable_ref} stable_ref;
+		:* : /\{this := this * ^ ; this stable_ref} stable_ref;
 
-		dump: function scope
+		dump: /\ scope
 		(
 			Return: string("mCount=");
 			Return :* mCount dump() * "; ";
 			i: integer(0);
-			repeat(function
+			repeat(/\
 			(
 				i < mCount then scope
 				(
@@ -365,17 +363,17 @@ Array: function scope
 };
 
 
-system: data object 
+system:  object 
 {
-	compiler: function object
+	compiler: /\
 	{
-		CBuildRule: function object
+		CBuildRule: /\
 		{
-			CodeFile: data string(arg AT 0);
-			SourceFile: data string(arg AT 1);
-			DefsFileList: data Array(string()type)(arg NEXT 2);
+			CodeFile:  string(^  AT 0);
+			SourceFile:  string(^  AT 1);
+			DefsFileList:  Array(string()type)(^  NEXT 2);
 
-			dump: function
+			dump: /\
 			{
 				string("CBuildRule(")
 				*vardump(CodeFile)
@@ -385,11 +383,11 @@ system: data object
 			};
 		};
 
-		BuildRule: data Array(CBuildRule()type)();
+		BuildRule:  Array(CBuildRule()type)();
 
-		buildrule: function {BuildRule :* (CBuildRule(arg));};
+		buildrule: /\ {BuildRule :* (CBuildRule(^ ));};
 
-		exec: function
+		exec: /\
 		{
 			string("exec;") println();
 			BuildRule dump() println();

@@ -5,19 +5,6 @@
     <AssemblyName>Reni</AssemblyName>
     <TargetTypeEx>CSharp.Library</TargetTypeEx>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-    <NoWarn>660;661</NoWarn>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <RegisterForComInterop>false</RegisterForComInterop>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <NoWarn>660;661</NoWarn>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Basics\BitsConst.cs" />
@@ -122,11 +109,18 @@
     <Compile Include="Feature\Function.cs" />
     <Compile Include="Feature\SearchResult.cs" />
     <Compile Include="Feature\Simple.cs" />
-    <Compile Include="Formatting\Configuration.cs" />
+    <Compile Include="Formatting\BraceInformation.cs" />
+    <Compile Include="Formatting\AsIsConfiguration.cs" />
     <Compile Include="Formatting\ContactItem.cs" />
     <Compile Include="Formatting\ContactType.cs" />
     <Compile Include="Formatting\Extension.cs" />
+    <Compile Include="Formatting\IGapHandler.cs" />
+    <Compile Include="Formatting\IGapHandlerWithWhiteSpaces.cs" />
+    <Compile Include="Formatting\ILineLengthLimiter.cs" />
+    <Compile Include="Formatting\Item.cs" />
     <Compile Include="Formatting\ITokenClass.cs" />
+    <Compile Include="Formatting\LineLengthLimiter.cs" />
+    <Compile Include="Formatting\MainInformation.cs" />
     <Compile Include="Formatting\SeparatorType.cs" />
     <Compile Include="Formatting\SmartFormat.cs" />
     <Compile Include="Formatting\TokenItem.cs" />
@@ -157,7 +151,9 @@
     <Compile Include="hw\Forms\NodeNameAttribute.cs" />
     <Compile Include="hw\Forms\PositionConfig.cs" />
     <Compile Include="hw\Forms\SmartNodeAttribute.cs" />
-    <Compile Include="hw\Forms\TreeForm.cs" />
+    <Compile Include="hw\Forms\TreeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="hw\Forms\TreeForm.Designer.cs" />
     <Compile Include="hw\Graphics\IGraphTarget.cs" />
     <Compile Include="hw\Graphics\SVG\Circle.cs" />

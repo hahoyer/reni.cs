@@ -11,8 +11,8 @@ namespace Reni.Formatting
 {
     static class Extension
     {
-        internal static IEnumerable<SmartFormat.Item> PrettyLines
-            (this IEnumerable<IEnumerable<SmartFormat.Item>> lines)
+        internal static IEnumerable<Item> PrettyLines
+            (this IEnumerable<IEnumerable<Item>> lines)
         {
             var wasMultiline = false;
             var addNewLine = false;
@@ -20,14 +20,14 @@ namespace Reni.Formatting
             foreach(var line in lines)
             {
                 if(addNewLine)
-                    yield return new SmartFormat.Item(null, "\n");
+                    yield return new Item(null, "\n");
 
 
                 var isMultiline =
                     line.SelectMany(item => item.WhiteSpaces.Where(c => c == '\n')).Any();
 
                 if(addNewLine && (wasMultiline || isMultiline))
-                    yield return new SmartFormat.Item(null, "\n");
+                    yield return new Item(null, "\n");
 
                 foreach(var item in line)
                     yield return item;
@@ -37,8 +37,8 @@ namespace Reni.Formatting
             }
         }
 
-        internal static IEnumerable<SmartFormat.Item> Combine
-            (this IEnumerable<SmartFormat.Item> items)
+        internal static IEnumerable<Item> Combine
+            (this IEnumerable<Item> items)
         {
             var itemPart = "";
             foreach(var item in items)
@@ -46,7 +46,7 @@ namespace Reni.Formatting
                 itemPart += item.WhiteSpaces;
                 if(item.Token != null)
                 {
-                    yield return new SmartFormat.Item(item.Token, itemPart);
+                    yield return new Item(item.Token, itemPart);
                     itemPart = "";
                 }
             }
@@ -73,7 +73,7 @@ namespace Reni.Formatting
         }
 
         internal static string Filter
-            (this IEnumerable<SmartFormat.Item> items, SourcePart targetPart)
+            (this IEnumerable<Item> items, SourcePart targetPart)
         {
             return items
                 .Select(item => item.Filter(targetPart))
