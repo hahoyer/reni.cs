@@ -9,12 +9,12 @@ using Reni.Parser;
 
 namespace Reni.Formatting
 {
-    internal sealed class Item : DumpableObject
+    sealed class Item : DumpableObject
     {
         internal readonly string WhiteSpaces;
         internal readonly IToken Token;
 
-        internal Item(IToken token, string whiteSpaces)
+        internal Item(string whiteSpaces, IToken token = null)
         {
             Token = token;
             WhiteSpaces = whiteSpaces;

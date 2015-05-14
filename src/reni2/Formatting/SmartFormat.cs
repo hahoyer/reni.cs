@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
-using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
 using Reni.Parser;
@@ -12,31 +11,23 @@ namespace Reni.Formatting
 {
     sealed class SmartFormat : DumpableObject
     {
-        readonly IGapHandler _gapHandler;
-        readonly IGapHandlerWithWhiteSpaces _gapHandlerWithWhiteSpaces;
+        internal readonly IGapHandler GapHandler;
         internal readonly ILineLengthLimiter LineLengthLimiter;
 
-        SmartFormat
-            (
-            IGapHandler gapHandler,
-            IGapHandlerWithWhiteSpaces gapHandlerWithWhiteSpaces,
-            ILineLengthLimiter lineLengthLimiter
-            )
+        SmartFormat(IGapHandler gapHandler, ILineLengthLimiter lineLengthLimiter)
         {
-            _gapHandler = gapHandler;
-            _gapHandlerWithWhiteSpaces = gapHandlerWithWhiteSpaces;
+            GapHandler = gapHandler;
             LineLengthLimiter = lineLengthLimiter;
         }
 
         internal static string Reformat(SourceSyntax target, SourcePart targetPart)
+            => Create().Reformat(target, 0, targetPart);
+
+        static SmartFormat Create()
         {
-            var smartFormat = new SmartFormat
-                (
-                SmartConfiguration.Instance,
-                new IgnoreWhiteSpaceConfiguration(SmartConfiguration.Instance),
-                new LineLengthLimiter(100)
-                );
-            return smartFormat.Reformat(target, 0, targetPart);
+            var whitespacelessGapHandler = SmartConfiguration.Instance;
+            var gapHandler = new KeepCommentConfiguration(whitespacelessGapHandler);
+            return new SmartFormat(gapHandler, new LineLengthLimiter(100));
         }
 
         string Reformat(SourceSyntax target, int indentLevel, SourcePart targetPart)
@@ -54,18 +45,21 @@ namespace Reni.Formatting
             int indentLevel
             )
         {
+            //Tracer.ConditionalBreak(indentLevel > 0 && rightWhiteSpaces.HasComment());
+
             if(target == null)
-                return Gap(leftTokenClass, rightWhiteSpaces, rightTokenClass);
+                return Gap(leftTokenClass, rightWhiteSpaces, rightTokenClass, indentLevel);
 
-            if(IsLineMode(target))
-            {
-                var result = LineModeReformat(target, indentLevel);
-                if(result != null)
-                    return result;
+            if(!IsLineMode(target, indentLevel))
+                return UncheckedReformat
+                    (leftTokenClass, target, rightWhiteSpaces, rightTokenClass, indentLevel);
 
-                if(target.IsChain())
-                    return LineModeReformatOfChain(leftTokenClass, target, indentLevel);
-            }
+            var result = LineModeReformat(target, indentLevel);
+            if(result != null)
+                return result;
+
+            if(target.IsChain())
+                return LineModeReformatOfChain(leftTokenClass, target, indentLevel);
 
             return UncheckedReformat
                 (leftTokenClass, target, rightWhiteSpaces, rightTokenClass, indentLevel);
@@ -89,7 +83,7 @@ namespace Reni.Formatting
                 ))
                 yield return item;
 
-            yield return new Item(target.Token, "");
+            yield return new Item("", target.Token);
 
             foreach(var item in Reformat
                 (
@@ -103,17 +97,8 @@ namespace Reni.Formatting
         }
 
         IEnumerable<Item> LineModeReformat(SourceSyntax target, int indentLevel)
-        {
-            var main = MainInformation.Create(target, this);
-            if(main != null)
-                return main.LineModeReformat(indentLevel);
-
-            var brace = BraceInformation.Create(target, this);
-            if(brace != null)
-                return brace.LineModeReformat(indentLevel);
-
-            return null;
-        }
+            => MainInformation.Create(target, this)?.LineModeReformat(indentLevel)
+                ?? BraceInformation.Create(target, this)?.LineModeReformat(indentLevel);
 
         IEnumerable<Item> LineModeReformatOfChain
             (ITokenClass leftTokenClass, SourceSyntax target, int indentLevel)
@@ -128,14 +113,9 @@ namespace Reni.Formatting
             foreach(var item in LineModeReformatOfChain(leftTokenClass, target.Left, indentLevel))
                 yield return item;
 
-
-            yield return
-                new Item
-                    (
-                    target.Token,
-                    (target.Left == null ? "" : "\n" + " ".Repeat(indentLevel * 4))
-                        + _gapHandlerWithWhiteSpaces.StartGap
-                            (target.Token.PrecededWith, target.TokenClass));
+            var whiteSpaces = GapHandler.StartGap
+                (target.Left == null, indentLevel, target.Token.PrecededWith, target.TokenClass);
+            yield return new Item(whiteSpaces, target.Token);
 
             foreach(var item in Reformat(target.TokenClass, target.Right, null, null, indentLevel))
                 yield return item;
@@ -148,17 +128,10 @@ namespace Reni.Formatting
             ITokenClass rightTokenClass,
             int indentLevel
             )
-        {
-            if(target == null)
-                return Gap(null, rightWhiteSpaces, rightTokenClass);
-
-            var indent = " ".Repeat(indentLevel * 4);
-
-            return
-                ReformatLineMode(target, indentLevel)
-                    .Select(item => new Item(null, indent).plus(item))
-                    .PrettyLines();
-        }
+            =>
+                target == null
+                    ? Gap(null, rightWhiteSpaces, rightTokenClass, indentLevel)
+                    : ReformatLineMode(target, indentLevel).PrettyLines();
 
         IEnumerable<IEnumerable<Item>> ReformatLineMode(SourceSyntax target, int indentLevel)
         {
@@ -181,7 +154,7 @@ namespace Reni.Formatting
                             target.Token.PrecededWith,
                             target.TokenClass,
                             indentLevel
-                        ).plus(new Item(target.Token, ""));
+                        ).plus(new Item("", target.Token));
                 target = target.Right;
             } while(target != null && target.TokenClass == separator);
 
@@ -189,19 +162,19 @@ namespace Reni.Formatting
                 yield return Reformat(null, target, null, null, indentLevel);
         }
 
-        bool IsLineMode(SourceSyntax target)
+        bool IsLineMode(SourceSyntax target, int indentLevel)
         {
             var braceInformation = BraceInformation.Create(target, this);
             if(braceInformation != null)
-                return braceInformation.IsLineMode;
+                return braceInformation.GetIsLineMode(indentLevel);
 
             return GetLineLengthInformation
-                (null, target, null, null, LineLengthLimiter.MaxLineLength) <= 0;
+                (null, target, null, null, LineLengthLimiter.MaxLineLength, indentLevel) <= 0;
         }
 
         internal bool Contains(WhiteSpaceToken[] whiteSpaces, ITokenClass tokenClass)
-            => _gapHandlerWithWhiteSpaces
-                .StartGap(whiteSpaces, tokenClass)
+            => GapHandler
+                .StartGap(false, 0, whiteSpaces, tokenClass)
                 .Contains("\n");
 
         internal int GetLineLengthInformation
@@ -210,11 +183,12 @@ namespace Reni.Formatting
             SourceSyntax target,
             WhiteSpaceToken[] rightWhiteSpaces,
             ITokenClass rightTokenClass,
-            int lengthRemaining)
+            int lengthRemaining,
+            int indentLevel)
         {
             if(target == null)
             {
-                var gap = Gap(leftTokenClass, rightWhiteSpaces, rightTokenClass);
+                var gap = Gap(leftTokenClass, rightWhiteSpaces, rightTokenClass, indentLevel);
                 if(gap.Any(item => item.WhiteSpaces.Contains("\n")))
                     return 0;
                 return lengthRemaining - gap.Sum(item => item.Length);
@@ -226,8 +200,8 @@ namespace Reni.Formatting
                     target.Left,
                     target.Token.PrecededWith,
                     target.TokenClass,
-                    lengthRemaining
-                );
+                    lengthRemaining,
+                    indentLevel);
             if(lengthRemaining <= 0)
                 return 0;
 
@@ -241,8 +215,8 @@ namespace Reni.Formatting
                     target.Right,
                     rightWhiteSpaces,
                     rightTokenClass,
-                    lengthRemaining
-                );
+                    lengthRemaining,
+                    indentLevel);
 
             return lengthRemaining;
         }
@@ -251,8 +225,8 @@ namespace Reni.Formatting
             (
             ITokenClass leftTokenClass,
             WhiteSpaceToken[] rightWhiteSpaces,
-            ITokenClass rightTokenClass
-            )
+            ITokenClass rightTokenClass,
+            int indentLevel)
         {
             if(rightTokenClass == null)
             {
@@ -261,23 +235,22 @@ namespace Reni.Formatting
             }
 
             yield return
-                new Item(null, UnfilteredGap(leftTokenClass, rightWhiteSpaces, rightTokenClass));
+                new Item
+                    (UnfilteredGap(leftTokenClass, rightWhiteSpaces, rightTokenClass, indentLevel));
         }
 
         string UnfilteredGap
             (
             ITokenClass leftTokenClass,
             WhiteSpaceToken[] rightWhiteSpaces,
-            ITokenClass rightTokenClass)
+            ITokenClass rightTokenClass,
+            int indentLevel)
         {
             if(leftTokenClass == null)
-                return !rightWhiteSpaces.Any()
-                    ? _gapHandler.StartGap(rightTokenClass)
-                    : _gapHandlerWithWhiteSpaces.StartGap(rightWhiteSpaces, rightTokenClass);
+                GapHandler.StartGap(false, indentLevel, rightWhiteSpaces, rightTokenClass);
 
-            return !rightWhiteSpaces.Any()
-                ? _gapHandler.Gap(leftTokenClass, rightTokenClass)
-                : _gapHandlerWithWhiteSpaces.Gap(leftTokenClass, rightWhiteSpaces, rightTokenClass);
+            return GapHandler.Gap
+                (indentLevel, leftTokenClass, rightWhiteSpaces, rightTokenClass);
         }
     }
 }

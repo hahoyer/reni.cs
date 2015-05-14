@@ -114,8 +114,8 @@
     <Compile Include="Formatting\ContactItem.cs" />
     <Compile Include="Formatting\ContactType.cs" />
     <Compile Include="Formatting\Extension.cs" />
+    <Compile Include="Formatting\IWhitespacelessGapHandler.cs" />
     <Compile Include="Formatting\IGapHandler.cs" />
-    <Compile Include="Formatting\IGapHandlerWithWhiteSpaces.cs" />
     <Compile Include="Formatting\ILineLengthLimiter.cs" />
     <Compile Include="Formatting\Item.cs" />
     <Compile Include="Formatting\ITokenClass.cs" />
@@ -123,7 +123,6 @@
     <Compile Include="Formatting\MainInformation.cs" />
     <Compile Include="Formatting\SeparatorType.cs" />
     <Compile Include="Formatting\SmartFormat.cs" />
-    <Compile Include="Formatting\TokenItem.cs" />
     <Compile Include="hw\Debug\Configuration.cs" />
     <Compile Include="hw\Debug\DebugTextWriter.cs" />
     <Compile Include="hw\Debug\DisableDumpAttribute.cs" />

@@ -36,23 +36,20 @@ namespace Reni.Formatting
             Tracer.Assert(_right != null);
         }
 
-        internal bool IsLineMode
+        internal bool GetIsLineMode(int indentLevel)
         {
-            get
-            {
-                if(LeftIsLineMode && RightIsLineMode)
-                    return true;
-                return 0 >=
-                    _parent
-                        .GetLineLengthInformation
-                        (
-                            _leftToken,
-                            _body,
-                            _right.PrecededWith,
-                            _rightToken,
-                            _parent.LineLengthLimiter.MaxLineLength
-                        );
-            }
+            if(LeftIsLineMode && RightIsLineMode)
+                return true;
+            return 0 >=
+                _parent
+                    .GetLineLengthInformation
+                    (
+                        _leftToken,
+                        _body,
+                        _right.PrecededWith,
+                        _rightToken,
+                        _parent.LineLengthLimiter.MaxLineLength,
+                        indentLevel);
         }
 
         bool RightIsLineMode => _parent.Contains(_right.PrecededWith, _rightToken);
@@ -60,17 +57,19 @@ namespace Reni.Formatting
 
         internal IEnumerable<Item> LineModeReformat(int indentLevel)
         {
-            var indent = " ".Repeat(indentLevel * 4);
+            var indent = "\n" + " ".Repeat(indentLevel * 4);
 
-            yield return new Item(_left, "\n" + indent);
-            yield return new Item(null, "\n");
+            yield return
+                new Item(_parent.GapHandler.Indent(indent, _left.PrecededWith), _left);
+            yield return new Item("\n");
 
             foreach(var item in _parent.
                 IndentedReformatLineMode
                 (_body, _right.PrecededWith, _rightToken, indentLevel + 1))
                 yield return item;
 
-            yield return new Item(_right, "\n" + indent);
+            yield return
+                new Item(_parent.GapHandler.Indent(indent, _right.PrecededWith), _right);
         }
 
         internal static BraceInformation Create(SourceSyntax target, SmartFormat parent)

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Helper;
-using hw.Parser;
 using hw.Scanner;
+using Reni.Feature;
 using Reni.TokenClasses;
 
 namespace Reni.Formatting
@@ -20,14 +20,15 @@ namespace Reni.Formatting
             foreach(var line in lines)
             {
                 if(addNewLine)
-                    yield return new Item(null, "\n");
-
+                    yield return new Item("\n");
 
                 var isMultiline =
-                    line.SelectMany(item => item.WhiteSpaces.Where(c => c == '\n')).Any();
+                    line
+                        .SelectMany(item => item.WhiteSpaces.Where(c => c == '\n'))
+                        .Any();
 
                 if(addNewLine && (wasMultiline || isMultiline))
-                    yield return new Item(null, "\n");
+                    yield return new Item("\n");
 
                 foreach(var item in line)
                     yield return item;
@@ -46,7 +47,7 @@ namespace Reni.Formatting
                 itemPart += item.WhiteSpaces;
                 if(item.Token != null)
                 {
-                    yield return new Item(item.Token, itemPart);
+                    yield return new Item(itemPart, item.Token);
                     itemPart = "";
                 }
             }
@@ -61,11 +62,13 @@ namespace Reni.Formatting
 
             var tokenClass = target.TokenClass;
 
-            if(tokenClass is ReassignToken || tokenClass is Colon || tokenClass is Function
-                || tokenClass is RightParenthesis || tokenClass is List)
+            if(tokenClass is ReassignToken || tokenClass is Colon
+                || tokenClass is TokenClasses.Function
+                || tokenClass is RightParenthesis || tokenClass is List || tokenClass is ElseToken
+                || tokenClass is ArgToken || tokenClass is ThenToken)
                 return false;
 
-            if(tokenClass is Definable || tokenClass is InstanceToken)
+            if(tokenClass is Definable || tokenClass is InstanceToken || tokenClass is TypeOperator)
                 return true;
 
             Dumpable.NotImplementedFunction(target);

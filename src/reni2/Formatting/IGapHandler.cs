@@ -1,12 +1,29 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using hw.Parser;
 
 namespace Reni.Formatting
 {
-    internal interface IGapHandler
+    interface IGapHandler
     {
-        string Gap(ITokenClass left, ITokenClass rightTokenClass);
-        string StartGap(ITokenClass right);
+        string StartGap
+            (
+            bool level,
+            int indentLevel,
+            IEnumerable<WhiteSpaceToken> rightWhiteSpaces,
+            ITokenClass right
+            );
+
+        string Gap
+            (
+            int indentLevel,
+            ITokenClass left,
+            IEnumerable<WhiteSpaceToken> rightWhiteSpaces,
+            ITokenClass right
+            );
+
+        string Indent(string tag, WhiteSpaceToken[] precededWith);
+
     }
 }

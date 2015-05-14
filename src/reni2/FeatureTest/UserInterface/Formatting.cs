@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using hw.Debug;
+using hw.Helper;
 using hw.UnitTest;
 using NUnit.Framework;
 
@@ -80,7 +82,25 @@ namespace Reni.FeatureTest.UserInterface
             var compiler = new Compiler(text: Text);
             var reformat = compiler.SourceSyntax.Reformat();
 
-            Tracer.Assert(reformat == "", "\n"+ reformat);
+            Tracer.Assert(reformat == "", "\n" + reformat);
+        }
+
+        [UnitTest]
+        [Test]
+        public void LegacySystem()
+        {
+            var srcDir = new StackTrace(true)
+                .GetFrame(0)
+                .GetFileName()
+                .FileHandle()
+                .DirectoryName
+                + @"\..\..\..";
+            var fileName = srcDir + @"\renisource\test.reni";
+            var file = fileName.FileHandle();
+            var compiler = new Compiler(fileName);
+            var source = compiler.Source.All;
+            var newSource = compiler.Containing(source).Reformat(source);
+            Tracer.Assert(newSource == "{^ : ^}", newSource);
         }
     }
 }

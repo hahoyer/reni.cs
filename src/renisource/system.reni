@@ -5,14 +5,14 @@
 
 void: /\
 (
-    !!converter:: /\ ();
+    !converter: /\ ();
 );
 
 
 bool: /\
 {
     value:  ^  bit_cast(1);
-    !!converter:: /\ value;
+    !converter: /\ value;
     =  : /\ bool(value = bool(^ ) value);
     <> : /\ bool(value <> bool(^ ) value);
     &  : /\ bool(value & bool(^ ) value);
@@ -53,10 +53,10 @@ integer: /\
     [
         this = 0
         then string("0")
-        else scope
+        else 
         (
-            x:  (this > 0 then this else integer(0)-this);
-            Return:  string("");
+            !mutable x:  (this > 0 then this else integer(0)-this);
+            !mutable return:  string("");
 
             repeat(/\ scope
             (
@@ -64,15 +64,14 @@ integer: /\
 
                 DigitChar:  ("0123456789" at Digit)bit_cast(8);
                 DigitStr:  string((0 bit_cast(8) type)array(DigitChar,0));
-                xx:  Return;
-                Return := DigitStr * xx;
+                xx:  return;
+                return := DigitStr * xx;
                 x:= x / 10;
-                return x > 0
-            ));
+                while: x > 0
+            )while);
 
-            this < 0 then Return:= string("-") * Return;
-            return Return
-        )
+            this < 0 then return:= string("-") * return;
+                    )	  return
     ]
 };
 

@@ -31,9 +31,7 @@ namespace Reni.Parser
             => whiteSpaces?.Any(item => !Lexer.IsWhiteSpace(item)) ?? false;
 
         internal static bool HasComment(this IEnumerable<WhiteSpaceToken> whiteSpaces)
-            =>
-                whiteSpaces?.Any(item => Lexer.IsLineComment(item) || Lexer.IsComment(item))
-                    ?? false;
+            => whiteSpaces?.Any(IsComment) ?? false;
 
         internal static SourcePart PrefixCharacters(this IToken token)
             => token.PrecededWith.SourcePart() ?? token.Characters.Start.Span(0);
@@ -46,7 +44,30 @@ namespace Reni.Parser
 
         internal static IEnumerable<WhiteSpaceToken> OnlyComments
             (this IEnumerable<WhiteSpaceToken> whiteSpaces)
-            => whiteSpaces.Where(item => Lexer.IsLineComment(item) || Lexer.IsComment(item));
+            => whiteSpaces.Where(IsComment);
+
+        internal static IEnumerable<WhiteSpaceToken> Trim
+            (this IEnumerable<WhiteSpaceToken> whiteSpaces)
+        {
+            var buffer = new List<WhiteSpaceToken>();
+
+            foreach(var whiteSpace in whiteSpaces.SkipWhile(IsNonComment))
+                if(IsNonComment(whiteSpace))
+                    buffer.Add(whiteSpace);
+                else
+                {
+                    foreach(var item in buffer)
+                        yield return item;
+                    buffer = new List<WhiteSpaceToken>();
+                    yield return whiteSpace;
+                }
+        }
+
+        static bool IsNonComment(WhiteSpaceToken item)
+            => !IsComment(item);
+
+        static bool IsComment(WhiteSpaceToken item)
+            => Lexer.IsComment(item) || Lexer.IsLineComment(item);
 
         public static int Length(this IEnumerable<WhiteSpaceToken> whiteSpaceTokens)
             => whiteSpaceTokens.Sum(item => item.Characters.Id.Length);

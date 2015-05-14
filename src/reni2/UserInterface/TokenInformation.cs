@@ -100,6 +100,7 @@ namespace Reni.UserInterface
         }
 
         public abstract string Reformat(SourcePart targetPart);
+        public string Reformat() => Reformat(SourcePart);
 
         public abstract IEnumerable<SourcePart> FindAllBelongings(Compiler compiler);
     }
