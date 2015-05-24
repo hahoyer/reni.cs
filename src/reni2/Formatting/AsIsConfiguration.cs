@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
+using hw.Helper;
 using hw.Parser;
 using Reni.Parser;
 
@@ -11,7 +12,7 @@ namespace Reni.Formatting
     {
         string IGapHandler.StartGap
             (
-            bool level,
+            bool topOfChain,
             int indentLevel,
             IEnumerable<WhiteSpaceToken> whiteSpaces,
             ITokenClass right)
@@ -30,11 +31,11 @@ namespace Reni.Formatting
             ITokenClass right)
             => rightWhiteSpaces.SourcePart().Id;
 
-        string IGapHandler.Indent(string tag, WhiteSpaceToken[] precededWith)
+        string IGapHandler.Indent(int indentLevel, WhiteSpaceToken[] precededWith)
         {
             if(precededWith.HasComment())
-                NotImplementedMethod(tag, precededWith.ToArray());
-            return tag;
+                NotImplementedMethod(indentLevel, precededWith.ToArray());
+            return "\n" + " ".Repeat(indentLevel * 4);
         }
     }
 
@@ -61,7 +62,7 @@ namespace Reni.Formatting
 
         string IGapHandler.StartGap
             (
-            bool level,
+            bool topOfChain,
             int indentLevel,
             IEnumerable<WhiteSpaceToken> whiteSpaces,
             ITokenClass right)
@@ -75,11 +76,11 @@ namespace Reni.Formatting
             ITokenClass right)
             => _parent.Gap(indentLevel, left, right);
 
-        string IGapHandler.Indent(string tag, WhiteSpaceToken[] precededWith)
+        string IGapHandler.Indent(int indentLevel, WhiteSpaceToken[] precededWith)
         {
             if(precededWith.HasComment())
-                NotImplementedMethod(tag, precededWith.ToArray());
-            return tag;
+                NotImplementedMethod(indentLevel, precededWith.ToArray());
+            return "\n" + " ".Repeat(indentLevel * 4);
         }
     }
 
@@ -110,16 +111,17 @@ namespace Reni.Formatting
             ITokenClass right)
         {
             NotImplementedMethod(indentLevel, left, rightWhiteSpaces.ToArray(), right);
+
             var c = rightWhiteSpaces.Trim().Id();
             return c == "" ? _parent.Gap(indentLevel, left, right) : c;
         }
 
-        string IGapHandler.Indent(string tag, WhiteSpaceToken[] precededWith)
+        string IGapHandler.Indent(int indentLevel, WhiteSpaceToken[] precededWith)
         {
-            NotImplementedMethod(tag, precededWith.ToArray());
+            NotImplementedMethod(indentLevel, precededWith.ToArray());
             if (precededWith.HasComment())
-                NotImplementedMethod(tag, precededWith.ToArray());
-            return tag;
+                NotImplementedMethod(indentLevel, precededWith.ToArray());
+            return "\n" + " ".Repeat(indentLevel * 4);
         }
     }
 

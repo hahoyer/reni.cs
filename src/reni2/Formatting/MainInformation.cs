@@ -33,8 +33,10 @@ namespace Reni.Formatting
             return new MainInformation(parent, target.Left, target.Token.PrecededWith, end);
         }
 
-        public IEnumerable<Item> LineModeReformat(int indentLevel)
-            => _parent
-                .IndentedReformatLineMode(_body, _whiteSpaces, _end, indentLevel);
+        /*
+                public IEnumerable<Item> LineModeReformat(int indentLevel)
+                    => _parent
+                        .IndentedReformatLineMode(_body, _whiteSpaces, _end, indentLevel);
+          */
     }
 }

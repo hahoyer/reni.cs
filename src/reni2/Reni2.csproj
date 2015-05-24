@@ -114,12 +114,11 @@
     <Compile Include="Formatting\ContactItem.cs" />
     <Compile Include="Formatting\ContactType.cs" />
     <Compile Include="Formatting\Extension.cs" />
+    <Compile Include="Formatting\Frame.cs" />
     <Compile Include="Formatting\IWhitespacelessGapHandler.cs" />
     <Compile Include="Formatting\IGapHandler.cs" />
-    <Compile Include="Formatting\ILineLengthLimiter.cs" />
     <Compile Include="Formatting\Item.cs" />
     <Compile Include="Formatting\ITokenClass.cs" />
-    <Compile Include="Formatting\LineLengthLimiter.cs" />
     <Compile Include="Formatting\MainInformation.cs" />
     <Compile Include="Formatting\SeparatorType.cs" />
     <Compile Include="Formatting\SmartFormat.cs" />

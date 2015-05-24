@@ -21,7 +21,7 @@ namespace Reni.Formatting
             //Tracer.ConditionalBreak(Id == ";");
         }
 
-        string Id => WhiteSpaces + (Token?.Id ?? "");
+        internal string Id => WhiteSpaces + (Token?.Id ?? "");
         internal int Length => Id.Length;
         protected override string GetNodeDump() => base.GetNodeDump() + " " + Id.Quote();
 

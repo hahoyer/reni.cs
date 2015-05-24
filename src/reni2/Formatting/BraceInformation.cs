@@ -35,7 +35,7 @@ namespace Reni.Formatting
             Tracer.Assert(_left != null);
             Tracer.Assert(_right != null);
         }
-
+/*
         internal bool GetIsLineMode(int indentLevel)
         {
             if(LeftIsLineMode && RightIsLineMode)
@@ -48,7 +48,7 @@ namespace Reni.Formatting
                         _body,
                         _right.PrecededWith,
                         _rightToken,
-                        _parent.LineLengthLimiter.MaxLineLength,
+                        _parent.MaxLineLength,
                         indentLevel);
         }
 
@@ -57,10 +57,8 @@ namespace Reni.Formatting
 
         internal IEnumerable<Item> LineModeReformat(int indentLevel)
         {
-            var indent = "\n" + " ".Repeat(indentLevel * 4);
-
             yield return
-                new Item(_parent.GapHandler.Indent(indent, _left.PrecededWith), _left);
+                new Item(_parent.GapHandler.Indent(indentLevel, _left.PrecededWith), _left);
             yield return new Item("\n");
 
             foreach(var item in _parent.
@@ -69,9 +67,9 @@ namespace Reni.Formatting
                 yield return item;
 
             yield return
-                new Item(_parent.GapHandler.Indent(indent, _right.PrecededWith), _right);
+                new Item(_parent.GapHandler.Indent(indentLevel, _right.PrecededWith), _right);
         }
-
+*/
         internal static BraceInformation Create(SourceSyntax target, SmartFormat parent)
         {
             var rightParenthesis = target.TokenClass as RightParenthesis;

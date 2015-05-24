@@ -38,8 +38,7 @@ namespace Reni.Formatting
             }
         }
 
-        internal static IEnumerable<Item> Combine
-            (this IEnumerable<Item> items)
+        internal static IEnumerable<Item> Combine(this IEnumerable<Item> items)
         {
             var itemPart = "";
             foreach(var item in items)
@@ -76,8 +75,13 @@ namespace Reni.Formatting
         }
 
         internal static string Filter
-            (this IEnumerable<Item> items, SourcePart targetPart)
+            (this IEnumerable<Item> items, SourcePart targetPart = null)
         {
+            if(targetPart == null)
+                return items
+                    .Select(item => item.Id)
+                    .Stringify("");
+
             return items
                 .Select(item => item.Filter(targetPart))
                 .Stringify("");

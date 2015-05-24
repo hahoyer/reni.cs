@@ -9,7 +9,7 @@ namespace Reni.Formatting
     {
         string StartGap
             (
-            bool level,
+            bool topOfChain,
             int indentLevel,
             IEnumerable<WhiteSpaceToken> rightWhiteSpaces,
             ITokenClass right
@@ -23,7 +23,6 @@ namespace Reni.Formatting
             ITokenClass right
             );
 
-        string Indent(string tag, WhiteSpaceToken[] precededWith);
-
+        string Indent(int indentLevel, WhiteSpaceToken[] precededWith);
     }
 }

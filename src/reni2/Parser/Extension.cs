@@ -63,7 +63,7 @@ namespace Reni.Parser
                 }
         }
 
-        static bool IsNonComment(WhiteSpaceToken item)
+        internal static bool IsNonComment(this WhiteSpaceToken item)
             => !IsComment(item);
 
         static bool IsComment(WhiteSpaceToken item)

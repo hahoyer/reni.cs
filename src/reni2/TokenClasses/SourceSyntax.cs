@@ -196,6 +196,7 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal ITokenClass RightMostTokenClass
             => Right == null ? TokenClass : Right.RightMostTokenClass;
+
     }
 
     interface IBelongingsMatcher
