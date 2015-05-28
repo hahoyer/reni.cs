@@ -120,6 +120,8 @@ namespace Reni.Formatting
 
         static ISeparatorType PrettySeparatorType(ITokenClass left, ITokenClass right)
         {
+            if(left == null || right == null)
+                return null;
             if(left is List && right is LeftParenthesis)
                 return Close;
 

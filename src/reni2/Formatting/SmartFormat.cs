@@ -9,10 +9,13 @@ namespace Reni.Formatting
 {
     sealed class SmartFormat : DumpableObject
     {
-        internal readonly int MaxLineLength;
+        internal readonly int? MaxLineLength;
         internal readonly int? EmptyLineLimit;
 
-        internal interface IMode {}
+        internal interface IMode
+        {
+            int LeadingLineBreaks { get; }
+        }
 
         SmartFormat(int maxLineLength, int emptyLineLimit)
         {
@@ -21,11 +24,11 @@ namespace Reni.Formatting
         }
 
         internal static string Reformat(SourceSyntax target, SourcePart targetPart)
-            => new Frame(Create(), target).Items
-                .Combine()
+            => Frame.CreateFrame(target, Create())
+                .GetItems()
                 .Filter(targetPart);
 
-        static SmartFormat Create() => new SmartFormat(100, 1);
+        static SmartFormat Create() => new SmartFormat(100, 0);
 
         internal bool IsRelevantLineBreak(int emptyLines, ITokenClass tokenClass)
         {
@@ -33,10 +36,31 @@ namespace Reni.Formatting
                 return true;
             if(tokenClass is RightParenthesis)
                 return false;
-            if (tokenClass is LeftParenthesis)
+            if(tokenClass is LeftParenthesis)
+                return false;
+            if(tokenClass is List)
                 return false;
 
-            return emptyLines <= EmptyLineLimit.Value;
+            return emptyLines < EmptyLineLimit.Value;
         }
+
+        public interface IRightBraceMode
+        {
+            IMode Mode { get; }
+        }
+
+        public interface IBraceMode
+        {
+            IRightBraceMode RightMode { get; }
+            IMode Mode { get; }
+        }
+
+        internal interface IListMode
+        {
+            IBraceMode BraceMode { get; }
+            IMode Combine(IMode previous, IMode current);
+        }
+
+        internal interface IListItemMode {}
     }
 }

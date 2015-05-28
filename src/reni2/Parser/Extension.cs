@@ -33,6 +33,9 @@ namespace Reni.Parser
         internal static bool HasComment(this IEnumerable<WhiteSpaceToken> whiteSpaces)
             => whiteSpaces?.Any(IsComment) ?? false;
 
+        internal static bool HasLineComment(this IEnumerable<WhiteSpaceToken> whiteSpaces)
+            => whiteSpaces?.Any(Lexer.IsLineComment) ?? false;
+
         internal static SourcePart PrefixCharacters(this IToken token)
             => token.PrecededWith.SourcePart() ?? token.Characters.Start.Span(0);
 
