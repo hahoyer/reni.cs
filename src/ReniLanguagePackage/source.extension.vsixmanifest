@@ -1,19 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="c5d6fc9a-13f2-4379-b811-3393a68442bf" Version="15.0.2" Language="en-US" Publisher="HoyerWare" />
+    <Identity Id="c5d6fc9a-13f2-4379-b811-3393a68442bf" Version="15.0.3" Language="en-US" Publisher="HoyerWare" />
     <DisplayName>hw.Reni</DisplayName>
     <Description xml:space="preserve">Support for programming language Reni</Description >
     <MoreInfo>https://github.com/hahoyer/reni.cpp/wiki/Die-Programmiersprache-Reni</MoreInfo>
     <Icon>Resources\Package.bmp</Icon>
   </Metadata>
-  <Installation InstalledByMsi="false">
-    <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[14.0]" />
-  </Installation>
-  <Dependencies>
-    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
-    <Dependency Id="Microsoft.VisualStudio.MPF.14.0" DisplayName="Visual Studio MPF 14.0" d:Source="Installed" Version="[14.0]" />
-  </Dependencies>
   <Assets>
     <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
   </Assets>
