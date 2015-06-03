@@ -95,6 +95,7 @@
     <Compile Include="FeatureTest\UserInterface\BraceMatching.cs" />
     <Compile Include="FeatureTest\UserInterface\ExpressionFormatting.cs" />
     <Compile Include="FeatureTest\UserInterface\Formatting.cs" />
+    <Compile Include="FeatureTest\UserInterface\FormattingLong.cs" />
     <Compile Include="FeatureTest\UserInterface\ListMatching.cs" />
     <Compile Include="FeatureTest\UserInterface\ThenElseMatching.cs" />
     <Compile Include="FeatureTest\UserInterface\TokenLocating.cs" />
@@ -110,7 +111,6 @@
     <Compile Include="Feature\SearchResult.cs" />
     <Compile Include="Feature\Simple.cs" />
     <Compile Include="Formatting\BraceInformation.cs" />
-    <Compile Include="Formatting\AsIsConfiguration.cs" />
     <Compile Include="Formatting\ContactItem.cs" />
     <Compile Include="Formatting\ContactType.cs" />
     <Compile Include="Formatting\Extension.cs" />
@@ -119,9 +119,15 @@
     <Compile Include="Formatting\IGapHandler.cs" />
     <Compile Include="Formatting\Item.cs" />
     <Compile Include="Formatting\ITokenClass.cs" />
+    <Compile Include="Formatting\Lengths.cs" />
     <Compile Include="Formatting\MainInformation.cs" />
+    <Compile Include="Formatting\MultiLineOption.cs" />
+    <Compile Include="Formatting\Ruler.cs" />
+    <Compile Include="Formatting\Rulers.cs" />
     <Compile Include="Formatting\SeparatorType.cs" />
+    <Compile Include="Formatting\Situation.cs" />
     <Compile Include="Formatting\SmartFormat.cs" />
+    <Compile Include="Formatting\Variants.cs" />
     <Compile Include="hw\Debug\Configuration.cs" />
     <Compile Include="hw\Debug\DebugTextWriter.cs" />
     <Compile Include="hw\Debug\DisableDumpAttribute.cs" />

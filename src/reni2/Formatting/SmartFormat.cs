@@ -11,24 +11,27 @@ namespace Reni.Formatting
     {
         internal readonly int? MaxLineLength;
         internal readonly int? EmptyLineLimit;
+        internal readonly int MinImprovementOfLineBreak;
 
         internal interface IMode
         {
             int LeadingLineBreaks { get; }
         }
 
-        SmartFormat(int maxLineLength, int emptyLineLimit)
+        SmartFormat(int maxLineLength, int emptyLineLimit, int minImprovementOfLineBreak)
         {
             MaxLineLength = maxLineLength;
             EmptyLineLimit = emptyLineLimit;
+            MinImprovementOfLineBreak = minImprovementOfLineBreak;
         }
+
 
         internal static string Reformat(SourceSyntax target, SourcePart targetPart)
             => Frame.CreateFrame(target, Create())
                 .GetItems()
                 .Filter(targetPart);
 
-        static SmartFormat Create() => new SmartFormat(100, 0);
+        static SmartFormat Create() => new SmartFormat(100, 0, 10);
 
         internal bool IsRelevantLineBreak(int emptyLines, ITokenClass tokenClass)
         {
