@@ -10,13 +10,8 @@ namespace Reni.Formatting
     sealed class SmartFormat : DumpableObject
     {
         internal readonly int? MaxLineLength;
-        internal readonly int? EmptyLineLimit;
+        readonly int? EmptyLineLimit;
         internal readonly int MinImprovementOfLineBreak;
-
-        internal interface IMode
-        {
-            int LeadingLineBreaks { get; }
-        }
 
         SmartFormat(int maxLineLength, int emptyLineLimit, int minImprovementOfLineBreak)
         {
@@ -24,7 +19,6 @@ namespace Reni.Formatting
             EmptyLineLimit = emptyLineLimit;
             MinImprovementOfLineBreak = minImprovementOfLineBreak;
         }
-
 
         internal static string Reformat(SourceSyntax target, SourcePart targetPart)
             => Frame.CreateFrame(target, Create())
@@ -46,24 +40,5 @@ namespace Reni.Formatting
 
             return emptyLines < EmptyLineLimit.Value;
         }
-
-        public interface IRightBraceMode
-        {
-            IMode Mode { get; }
-        }
-
-        public interface IBraceMode
-        {
-            IRightBraceMode RightMode { get; }
-            IMode Mode { get; }
-        }
-
-        internal interface IListMode
-        {
-            IBraceMode BraceMode { get; }
-            IMode Combine(IMode previous, IMode current);
-        }
-
-        internal interface IListItemMode {}
     }
 }

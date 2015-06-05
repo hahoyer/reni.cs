@@ -22,10 +22,10 @@ namespace Reni.Formatting
         public Rulers Concat(Frame other, bool isMultiline)
             => new Rulers(_data, other, isMultiline);
 
-        public bool IsMultiLine(Frame frame)
+        public bool IsMultiLine(Frame lineBreakRuler)
         {
             bool result;
-            return _data.TryGetValue(frame.LineBreakRuler, out result) && result;
+            return _data.TryGetValue(lineBreakRuler, out result) && result;
         }
     }
 }

@@ -54,9 +54,11 @@ namespace Reni.FeatureTest.UserInterface
 (Text ('H') << 'allo') dump_print";
 
             var compiler = new Compiler(text: Text);
-            var reformat = compiler.SourceSyntax.Reformat();
+            var newSource = compiler.SourceSyntax.Reformat();
 
-            //Tracer.Assert(reformat == "", "\n" + reformat);
+            var lineCount = newSource.Count(item => item == '\n');
+            Tracer.Assert(lineCount == 9, "\n" + newSource);
+            
         }
 
         [UnitTest]
@@ -74,7 +76,8 @@ namespace Reni.FeatureTest.UserInterface
             var compiler = new Compiler(fileName);
             var source = compiler.Source.All;
             var newSource = compiler.SourceSyntax.Reformat();
-            Tracer.Assert(newSource == "{^ : ^}", newSource);
+            var lineCount = newSource.Count(item=>item == '\n');
+            Tracer.Assert(lineCount == 62, newSource);
         }
     }
 }

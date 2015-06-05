@@ -7,26 +7,35 @@ namespace Reni.Formatting
 {
     sealed class Variants : DumpableObject, Situation.IData
     {
+        public static Variants Create
+            (Frame frame, Situation.IData multiline, Situation.IData singleline)
+            => new Variants(frame, multiline, singleline);
+
         [EnableDump]
-        readonly Lengths _multiline;
+        readonly Situation.IData _multiline;
         [EnableDump]
-        readonly Lengths _singleline;
-        [EnableDump]
+        readonly Situation.IData _singleline;
         readonly Frame _frame;
 
-        public Variants(Frame frame, Lengths multiline, Lengths singleline)
+        Variants(Frame frame, Situation.IData multiline, Situation.IData singleline)
         {
             _frame = frame;
             _multiline = multiline;
             _singleline = singleline;
         }
 
-        Situation.IData Situation.IData.Add(Situation.IData right)
-        {
-            NotImplementedMethod(right);
-            return null;
+        [EnableDump]
+        string Id => _frame.NodeDump;
 
-        }
+        int Situation.IData.LineCount
+            => _multiline.Max < _singleline.Max
+                ? _multiline.LineCount
+                : _singleline.LineCount;
+
+        int Situation.IData.Max => Math.Min(_multiline.Max, _singleline.Max);
+
+        Situation.IData Situation.IData.Add(Situation.IData right)
+            => Create(_frame, _multiline.Add(right), _singleline.Add(right));
 
         Situation.IData Situation.IData.Add(int right)
         {
@@ -34,22 +43,38 @@ namespace Reni.Formatting
             return null;
         }
 
-        Situation.IData Situation.IData.Combine(Frame frame, Situation.IData singleline)
+        bool? Situation.IData.PreferMultiline => PreferMultiline;
+
+        bool PreferMultiline
         {
-            NotImplementedMethod(frame, singleline);
-            return null;
+            get
+            {
+                if(_multiline.PreferMultiline == true)
+                    return true;
+                var maxLineLength = _frame.Formatter.MaxLineLength;
+                return maxLineLength != null && _singleline.Max > maxLineLength.Value;
+            }
         }
 
+        Rulers Situation.IData.Rulers
+            =>
+                PreferMultiline
+                    ? _multiline.Rulers.Concat(_frame, true)
+                    : _singleline.Rulers.Concat(_frame, false);
+
+        Situation.IData Situation.IData.Combine(Frame frame, Situation.IData singleline)
+            => singleline.ReverseCombine(frame, this);
+
         Situation.IData Situation.IData.ReverseAdd(Lengths left)
-        {
-            NotImplementedMethod(left);
-            return null;
-        }
+            => Create(_frame, _multiline.ReverseAdd(left), _singleline.ReverseAdd(left));
 
         Situation.IData Situation.IData.ReverseCombine(Frame frame, Lengths multiline)
         {
-            NotImplementedMethod(frame,multiline);
+            NotImplementedMethod(frame, multiline);
             return null;
         }
+
+        Situation.IData Situation.IData.ReverseCombine(Frame frame, Variants multiline)
+            => Create(frame, multiline, this);
     }
 }
