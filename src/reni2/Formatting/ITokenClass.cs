@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.Parser;
 
 namespace Reni.Formatting
 {
@@ -9,7 +8,4 @@ namespace Reni.Formatting
     {
         string Id { get; }
     }
-
-    interface ITreeItemFactory
-    {}
 }

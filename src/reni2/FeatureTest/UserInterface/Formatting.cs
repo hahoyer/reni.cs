@@ -6,6 +6,7 @@ using hw.Debug;
 using hw.Helper;
 using hw.UnitTest;
 using NUnit.Framework;
+using Reni.Formatting;
 
 namespace Reni.FeatureTest.UserInterface
 {
@@ -42,23 +43,28 @@ namespace Reni.FeatureTest.UserInterface
         [UnitTest]
         public void Reformat()
         {
-            const string Text = @"systemdata:
-{
-    1 type instance () Memory: ((0 type * ('100' to_number_of_base 64)) mutable) instance ();
-    ! mutable FreePointer: Memory array_reference mutable;
-    repeat: /\ ^ while () then (^ body (), repeat (^));
-};
-
-1 = 1 then 2 else 4;
-3;
-(Text ('H') << 'allo') dump_print";
+            const string Text =
+                @"systemdata:{1 type instance() Memory:((0 type *('100' to_number_of_base 64)) mutable) instance(); !mutable FreePointer: Memory array_reference mutable; repeat: /\ ^ while() then
+    (
+        ^ body(),
+        repeat(^)
+    );}; 1 = 1 then 2 else 4; 3; (Text('H') << 'allo') dump_print ";
 
             var compiler = new Compiler(text: Text);
-            var newSource = compiler.SourceSyntax.Reformat();
+            var newSource = compiler.SourceSyntax.Reformat
+                (
+                    provider:
+                        Provider.Create
+                            (
+                                minImprovementOfLineBreak: 3,
+                                maxLineLength: 200,
+                                emptyLineLimit: 0,
+                                indentItem: "   "
+                            )
+                );
 
             var lineCount = newSource.Count(item => item == '\n');
             Tracer.Assert(lineCount == 9, "\n" + newSource);
-            
         }
 
         [UnitTest]
@@ -76,7 +82,7 @@ namespace Reni.FeatureTest.UserInterface
             var compiler = new Compiler(fileName);
             var source = compiler.Source.All;
             var newSource = compiler.SourceSyntax.Reformat();
-            var lineCount = newSource.Count(item=>item == '\n');
+            var lineCount = newSource.Count(item => item == '\n');
             Tracer.Assert(lineCount == 62, newSource);
         }
     }

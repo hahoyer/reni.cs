@@ -8,10 +8,15 @@ namespace HoyerWare.ReniLanguagePackage
 {
     sealed class SourceWrapper : Microsoft.VisualStudio.Package.Source
     {
+        readonly ReniService _parent;
         internal Source Data;
 
-        public SourceWrapper(LanguageService parent, IVsTextLines buffer)
-            : base(parent, buffer, null) { OnChange(); }
+        public SourceWrapper(ReniService parent, IVsTextLines buffer)
+            : base(parent, buffer, null)
+        {
+            _parent = parent;
+            OnChange();
+        }
 
         void OnChange() { Data = GetTextLines().CreateReniSource(); }
 
@@ -27,7 +32,7 @@ namespace HoyerWare.ReniLanguagePackage
             using(ca)
             {
                 ca.FlushEditActions();
-                Data.ReformatSpan(mgr, span);
+                Data.ReformatSpan(mgr, span, _parent.Package.CreateFormattingProvider());
             }
         }
 

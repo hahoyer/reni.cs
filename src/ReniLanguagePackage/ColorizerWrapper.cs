@@ -12,7 +12,7 @@ namespace HoyerWare.ReniLanguagePackage
     {
         readonly LanguageService _parent;
         readonly IVsTextLines _buffer;
-        const bool Trace = true;
+        const bool Trace = false;
 
         public ColorizerWrapper(LanguageService parent, IVsTextLines buffer)
             : base(parent, buffer, null)

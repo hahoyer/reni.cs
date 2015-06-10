@@ -6,16 +6,20 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using JetBrains.Annotations;
 using Microsoft.VisualStudio.Shell;
+using Reni.Formatting;
 
 namespace HoyerWare.ReniLanguagePackage
 {
     [ProvideService(typeof(ReniService), ServiceName = "Reni Language Service")]
-    [ProvideLanguageService(typeof(ReniService), "Reni", 106)]
+    [ProvideLanguageService(typeof(ReniService), Name, 106)]
     [ProvideLanguageExtension(typeof(ReniService), ".reni")]
     [Guid("F4FB62CF-3E45-4920-9721-89099113477E")]
+    [ProvideLanguageEditorOptionPage(typeof(Properties), Name, "Advanced", "", "100")]
     [UsedImplicitly]
     public sealed class ReniLanguagePackage : Package
     {
+        const string Name = "Reni";
+
         protected override void Initialize()
         {
             base.Initialize();
@@ -29,5 +33,17 @@ namespace HoyerWare.ReniLanguagePackage
 
         void OnIdle(object sender, EventArgs e)
             => (GetService(typeof(ReniService)) as ReniService)?.OnIdle(true);
+
+        internal Provider CreateFormattingProvider()
+        {
+            var pd = (Properties) GetDialogPage(typeof(Properties));
+            return Provider.Create
+                (
+                    pd.MaxLineLength,
+                    pd.EmptyLineLimit,
+                    pd.MinImprovementOfLineBreak,
+                    "    "
+                );
+        }
     }
 }

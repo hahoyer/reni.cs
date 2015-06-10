@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
+using Reni.TokenClasses;
 
 namespace Reni.Formatting
 {
@@ -9,12 +10,12 @@ namespace Reni.Formatting
     {
         internal interface IData
         {
-            IData Add(int right);
-            IData Add(IData right);
-            IData ReverseAdd(Lengths left);
-            IData Combine(Frame frame, IData singleline);
-            IData ReverseCombine(Frame frame, Lengths multiline);
-            IData ReverseCombine(Frame frame, Variants multiline);
+            IData Plus(int right);
+            IData Plus(IData right);
+            IData ReversePlus(Lengths left);
+            IData Combine(SourceSyntax frame, IData singleline, Provider formatter);
+            IData ReverseCombine(SourceSyntax frame, Lengths multiline, Provider formatter);
+            IData ReverseCombine(SourceSyntax frame, Variants multiline, Provider formatter);
             int LineCount { get; }
             int Max { get; }
             bool? PreferMultiline { get; }
@@ -41,14 +42,14 @@ namespace Reni.Formatting
         protected override string GetNodeDump()
             => base.GetNodeDump() + "[" + Max + "*" + LineCount + "]";
 
-        Situation Add(int right) => new Situation(_data.Add(right));
-        Situation Add(Situation right) => new Situation(_data.Add(right._data));
+        Situation Add(int right) => new Situation(_data.Plus(right));
+        Situation Add(Situation right) => new Situation(_data.Plus(right._data));
 
         internal int Max => _data.Max;
         internal int LineCount => _data.LineCount;
 
-        internal Situation Combine(Frame frame, Situation singleLine)
-            => new Situation(_data.Combine(frame, singleLine._data));
+        internal Situation Combine(SourceSyntax frame, Situation singleLine, Provider formatter)
+            => new Situation(_data.Combine(frame, singleLine._data,formatter));
 
         internal Rulers Rulers => _data.Rulers;
     }

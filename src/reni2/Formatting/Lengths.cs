@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
+using Reni.TokenClasses;
 
 namespace Reni.Formatting
 {
@@ -31,6 +32,7 @@ namespace Reni.Formatting
         internal Lengths(IEnumerable<int> lengths = null)
         {
             _lengths = lengths?.ToArray() ?? new[] {0};
+            //Tracer.ConditionalBreak(LineCount == 4 && _lengths[2] == 9 && _lengths[3] == 9, Dump);
         }
 
         protected override string GetNodeDump()
@@ -39,26 +41,26 @@ namespace Reni.Formatting
         int Situation.IData.Max => Max;
         int Situation.IData.LineCount => LineCount;
 
-        Situation.IData Situation.IData.Add(int right) 
-            => Add(new[] {right});
+        Situation.IData Situation.IData.Plus(int right)
+            => Plus(new[] {right});
 
-        Situation.IData Situation.IData.Add(Situation.IData right)
-            => IsEmpty ? right : right.ReverseAdd(this);
+        Situation.IData Situation.IData.Plus(Situation.IData right)
+            => IsEmpty ? right : right.ReversePlus(this);
 
-        Situation.IData Situation.IData.ReverseAdd(Lengths left) 
-            => IsEmpty ? left : left.Add(this);
+        Situation.IData Situation.IData.ReversePlus(Lengths left)
+            => IsEmpty ? left : left.Plus(this);
 
-        Situation.IData Situation.IData.Combine(Frame frame, Situation.IData singleline)
-            => singleline.ReverseCombine(frame, this);
+        Situation.IData Situation.IData.Combine(SourceSyntax frame, Situation.IData singleline, Provider formatter)
+            => singleline.ReverseCombine(frame, this,formatter);
 
-        Situation.IData Situation.IData.ReverseCombine(Frame frame, Lengths multiline)
+        Situation.IData Situation.IData.ReverseCombine(SourceSyntax frame, Lengths multiline, Provider formatter)
         {
-            if(frame.Formatter.MinImprovementOfLineBreak > Max - multiline.Max)
+            if(formatter.MinImprovementOfLineBreak > Max - multiline.Max)
                 return this;
-            return Variants.Create(frame, multiline, this);
+            return Variants.Create(frame, multiline, this, formatter.MaxLineLength);
         }
 
-        Situation.IData Situation.IData.ReverseCombine(Frame frame, Variants multiline)
+        Situation.IData Situation.IData.ReverseCombine(SourceSyntax frame, Variants multiline, Provider formatter)
         {
             NotImplementedMethod(frame, multiline);
             return null;
@@ -72,7 +74,7 @@ namespace Reni.Formatting
         int LineCount => _lengths.Length - 1;
 
 
-        Situation.IData Add(Lengths right) => Add(right._lengths);
-        Situation.IData Add(IEnumerable<int> right) => new Lengths(OverlappingAdd(_lengths, right));
+        Situation.IData Plus(Lengths right) => Plus(right._lengths);
+        Situation.IData Plus(IEnumerable<int> right) => new Lengths(OverlappingAdd(_lengths, right));
     }
 }

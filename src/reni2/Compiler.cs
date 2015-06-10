@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using hw.Helper;
 using System.Linq;
 using System.Threading;
 using hw.Debug;
 using hw.Forms;
+using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
 using Reni.Code;
 using Reni.Context;
+using Reni.Formatting;
 using Reni.Parser;
 using Reni.Runtime;
 using Reni.Struct;
@@ -38,6 +39,7 @@ namespace Reni
         readonly Root _rootContext;
 
         bool _isInExecutionPhase;
+
         /// <summary>
         ///     ctor from file
         /// </summary>
@@ -295,7 +297,8 @@ namespace Reni
             return null;
         }
 
-        public string Reformat(SourcePart sourcePart) => SourceSyntax.Reformat(sourcePart);
+        public string Reformat(SourcePart sourcePart, Provider provider) => SourceSyntax.
+            Reformat(sourcePart, provider);
     }
 
     public interface IOutStream

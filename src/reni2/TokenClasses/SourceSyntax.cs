@@ -180,8 +180,9 @@ namespace Reni.TokenClasses
 
         public string BraceMatchDump => new BraceMatchDumper(this, 3).Dump();
 
-        internal string Reformat(SourcePart targetPart = null)
-            => SmartFormat.Reformat(this, targetPart ?? SourcePart);
+        internal string Reformat(SourcePart targetPart = null, Provider provider = null)
+            => (provider ?? Provider.Create())
+                .Reformat(this, targetPart ?? SourcePart);
 
         [DisableDump]
         internal IEnumerable<hw.Parser.WhiteSpaceToken> LeadingWhiteSpaceTokens
@@ -196,11 +197,10 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal ITokenClass RightMostTokenClass
             => Right == null ? TokenClass : Right.RightMostTokenClass;
-
     }
 
     interface IBelongingsMatcher
     {
         bool IsBelongingTo(IBelongingsMatcher otherMatcher);
     }
-}                                   
+}

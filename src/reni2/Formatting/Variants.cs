@@ -2,42 +2,55 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
+using Reni.TokenClasses;
 
 namespace Reni.Formatting
 {
     sealed class Variants : DumpableObject, Situation.IData
     {
         public static Variants Create
-            (Frame frame, Situation.IData multiline, Situation.IData singleline)
-            => new Variants(frame, multiline, singleline);
+            (
+            SourceSyntax frame,
+            Situation.IData multiline,
+            Situation.IData singleline,
+            int? maxLineLength
+            )
+            => new Variants(frame, multiline, singleline, maxLineLength);
 
         [EnableDump]
-        readonly Situation.IData _multiline;
+        readonly Situation.IData Multiline;
         [EnableDump]
-        readonly Situation.IData _singleline;
-        readonly Frame _frame;
+        readonly Situation.IData Singleline;
+        readonly SourceSyntax Frame;
+        readonly int? MaxLineLength;
 
-        Variants(Frame frame, Situation.IData multiline, Situation.IData singleline)
+        Variants
+            (
+            SourceSyntax frame,
+            Situation.IData multiline,
+            Situation.IData singleline,
+            int? maxLineLength)
         {
-            _frame = frame;
-            _multiline = multiline;
-            _singleline = singleline;
+            Frame = frame;
+            Multiline = multiline;
+            Singleline = singleline;
+            MaxLineLength = maxLineLength;
         }
 
         [EnableDump]
-        string Id => _frame.NodeDump;
+        string Id => Frame.NodeDump;
 
         int Situation.IData.LineCount
-            => _multiline.Max < _singleline.Max
-                ? _multiline.LineCount
-                : _singleline.LineCount;
+            => Multiline.Max < Singleline.Max
+                ? Multiline.LineCount
+                : Singleline.LineCount;
 
-        int Situation.IData.Max => Math.Min(_multiline.Max, _singleline.Max);
+        int Situation.IData.Max => Math.Min(Multiline.Max, Singleline.Max);
 
-        Situation.IData Situation.IData.Add(Situation.IData right)
-            => Create(_frame, _multiline.Add(right), _singleline.Add(right));
+        Situation.IData Situation.IData.Plus(Situation.IData right)
+            => Create(Frame, Multiline.Plus(right), Singleline.Plus(right), MaxLineLength);
 
-        Situation.IData Situation.IData.Add(int right)
+        Situation.IData Situation.IData.Plus(int right)
         {
             NotImplementedMethod(right);
             return null;
@@ -49,32 +62,40 @@ namespace Reni.Formatting
         {
             get
             {
-                if(_multiline.PreferMultiline == true)
+                if(Multiline.PreferMultiline == true)
                     return true;
-                var maxLineLength = _frame.Formatter.MaxLineLength;
-                return maxLineLength != null && _singleline.Max > maxLineLength.Value;
+                return MaxLineLength != null && Singleline.Max > MaxLineLength.Value;
             }
         }
 
         Rulers Situation.IData.Rulers
             =>
                 PreferMultiline
-                    ? _multiline.Rulers.Concat(_frame, true)
-                    : _singleline.Rulers.Concat(_frame, false);
+                    ? Multiline.Rulers.Concat(Frame, true)
+                    : Singleline.Rulers.Concat(Frame, false);
 
-        Situation.IData Situation.IData.Combine(Frame frame, Situation.IData singleline)
-            => singleline.ReverseCombine(frame, this);
+        Situation.IData Situation.IData.Combine
+            (SourceSyntax frame, Situation.IData singleline, Provider formatter)
+            => singleline.ReverseCombine(frame, this, formatter);
 
-        Situation.IData Situation.IData.ReverseAdd(Lengths left)
-            => Create(_frame, _multiline.ReverseAdd(left), _singleline.ReverseAdd(left));
+        Situation.IData Situation.IData.ReversePlus(Lengths left)
+            =>
+                Create
+                    (
+                        Frame,
+                        Multiline.ReversePlus(left),
+                        Singleline.ReversePlus(left),
+                        MaxLineLength);
 
-        Situation.IData Situation.IData.ReverseCombine(Frame frame, Lengths multiline)
+        Situation.IData Situation.IData.ReverseCombine
+            (SourceSyntax frame, Lengths multiline, Provider formatter)
         {
-            NotImplementedMethod(frame, multiline);
+            NotImplementedMethod(frame, multiline, formatter);
             return null;
         }
 
-        Situation.IData Situation.IData.ReverseCombine(Frame frame, Variants multiline)
-            => Create(frame, multiline, this);
+        Situation.IData Situation.IData.ReverseCombine
+            (SourceSyntax frame, Variants multiline, Provider formatter)
+            => Create(frame, multiline, this, MaxLineLength);
     }
 }

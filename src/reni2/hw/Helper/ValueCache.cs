@@ -26,7 +26,7 @@ namespace hw.Helper
 
         void Ensure()
         {
-            Tracer.Assert(!_isBusy);
+            Tracer.Assert(!_isBusy, _createValue.ToString());
             if(_isValid)
                 return;
 

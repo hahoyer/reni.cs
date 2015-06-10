@@ -130,6 +130,9 @@
     <Compile Include="Guids.cs" />
     <Compile Include="AuthoringScope.cs" />
     <Compile Include="ParseRequestWrapper.cs" />
+    <Compile Include="Properties.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ReniService.cs" />
     <Compile Include="Source.cs" />
     <Compile Include="Resources.Designer.cs">

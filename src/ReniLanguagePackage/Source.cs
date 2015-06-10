@@ -7,6 +7,7 @@ using hw.Scanner;
 using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Reni;
+using Reni.Formatting;
 using Reni.UserInterface;
 
 namespace HoyerWare.ReniLanguagePackage
@@ -35,7 +36,7 @@ namespace HoyerWare.ReniLanguagePackage
 
         public TokenInfo GetTokenInfo(int line, int column)
         {
-            var trace = true;
+            var trace = false;
             StartMethodDump(trace, line, column);
             try
             {
@@ -120,10 +121,10 @@ namespace HoyerWare.ReniLanguagePackage
         internal IEnumerable<SourcePart> BracesLike(TokenInformation current)
             => current.FindAllBelongings(Compiler);
 
-        internal void ReformatSpan(EditArray mgr, TextSpan span)
+        internal void ReformatSpan(EditArray mgr, TextSpan span, Provider provider)
         {
             var sourcePart = Data.ToSourcePart(span);
-            var reformat = Compiler.Reformat(sourcePart);
+            var reformat = Compiler.Reformat(sourcePart, provider);
             mgr.Add(new EditSpan(span, reformat));
             mgr.ApplyEdits();
         }

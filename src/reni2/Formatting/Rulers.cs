@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
+using Reni.TokenClasses;
 
 namespace Reni.Formatting
 {
@@ -9,23 +10,23 @@ namespace Reni.Formatting
     {
         internal static readonly Rulers Empty = new Rulers();
 
-        readonly Dictionary<Frame, bool> _data;
+        internal readonly Dictionary<SourceSyntax, bool> Data;
 
-        Rulers() { _data = new Dictionary<Frame, bool>(); }
+        Rulers() { Data = new Dictionary<SourceSyntax, bool>(); }
 
-        Rulers(Dictionary<Frame, bool> data, Frame other, bool isMultiline)
+        Rulers(Dictionary<SourceSyntax, bool> data, SourceSyntax other, bool isMultiline)
         {
-            _data = data.ToDictionary(item => item.Key, item => item.Value);
-            _data[other] = isMultiline;
+            Data = data.ToDictionary(item => item.Key, item => item.Value);
+            Data[other] = isMultiline;
         }
 
-        public Rulers Concat(Frame other, bool isMultiline)
-            => new Rulers(_data, other, isMultiline);
+        public Rulers Concat(SourceSyntax other, bool isMultiline)
+            => new Rulers(Data, other, isMultiline);
 
-        public bool IsMultiLine(Frame lineBreakRuler)
+        public bool IsMultiLine(SourceSyntax lineBreakRuler)
         {
             bool result;
-            return _data.TryGetValue(lineBreakRuler, out result) && result;
+            return Data.TryGetValue(lineBreakRuler, out result) && result;
         }
     }
 }

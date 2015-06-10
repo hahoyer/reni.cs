@@ -43,6 +43,8 @@ namespace Reni.Formatting
             return length <= 0
                 ? ""
                 : result.Substring(toUse.Position - sourcePart.Position, length);
+
         }
+
     }
 }

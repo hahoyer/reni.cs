@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Forms;
 using hw.Helper;
 using JetBrains.Annotations;
 using Microsoft.VisualStudio.Package;
@@ -33,6 +32,8 @@ namespace HoyerWare.ReniLanguagePackage
             };
 
         public override string Name => "Reni";
+        public ReniLanguagePackage Package
+            => (ReniLanguagePackage) GetLanguagePreferences().GetSite();
 
         public override LanguagePreferences GetLanguagePreferences()
             => _preferencesCache.Value;
@@ -49,7 +50,6 @@ namespace HoyerWare.ReniLanguagePackage
             wrapper.Scanning();
             return new AuthoringScopeWrapper();
         }
-
 
         public override string GetFormatFilterList() => "Reni files (*.reni)\n*.reni\n";
 
