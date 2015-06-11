@@ -10,35 +10,35 @@ namespace Reni.Formatting
     {
         public static Variants Create
             (
-            SourceSyntax frame,
+            SourceSyntax ruler,
             Situation.IData multiline,
             Situation.IData singleline,
             int? maxLineLength
             )
-            => new Variants(frame, multiline, singleline, maxLineLength);
+            => new Variants(ruler, multiline, singleline, maxLineLength);
 
         [EnableDump]
         readonly Situation.IData Multiline;
         [EnableDump]
         readonly Situation.IData Singleline;
-        readonly SourceSyntax Frame;
+        readonly SourceSyntax Ruler;
         readonly int? MaxLineLength;
 
         Variants
             (
-            SourceSyntax frame,
+            SourceSyntax ruler,
             Situation.IData multiline,
             Situation.IData singleline,
             int? maxLineLength)
         {
-            Frame = frame;
+            Ruler = ruler;
             Multiline = multiline;
             Singleline = singleline;
             MaxLineLength = maxLineLength;
         }
 
         [EnableDump]
-        string Id => Frame.NodeDump;
+        string Id => Ruler.NodeDump;
 
         int Situation.IData.LineCount
             => Multiline.Max < Singleline.Max
@@ -48,7 +48,7 @@ namespace Reni.Formatting
         int Situation.IData.Max => Math.Min(Multiline.Max, Singleline.Max);
 
         Situation.IData Situation.IData.Plus(Situation.IData right)
-            => Create(Frame, Multiline.Plus(right), Singleline.Plus(right), MaxLineLength);
+            => Create(Ruler, Multiline.Plus(right), Singleline.Plus(right), MaxLineLength);
 
         Situation.IData Situation.IData.Plus(int right)
         {
@@ -71,8 +71,8 @@ namespace Reni.Formatting
         Rulers Situation.IData.Rulers
             =>
                 PreferMultiline
-                    ? Multiline.Rulers.Concat(Frame, true)
-                    : Singleline.Rulers.Concat(Frame, false);
+                    ? Multiline.Rulers.Concat(Ruler, true)
+                    : Singleline.Rulers.Concat(Ruler, false);
 
         Situation.IData Situation.IData.Combine
             (SourceSyntax frame, Situation.IData singleline, Provider formatter)
@@ -82,7 +82,7 @@ namespace Reni.Formatting
             =>
                 Create
                     (
-                        Frame,
+                        Ruler,
                         Multiline.ReversePlus(left),
                         Singleline.ReversePlus(left),
                         MaxLineLength);

@@ -13,9 +13,9 @@ namespace Reni.Formatting
             IData Plus(int right);
             IData Plus(IData right);
             IData ReversePlus(Lengths left);
-            IData Combine(SourceSyntax frame, IData singleline, Provider formatter);
-            IData ReverseCombine(SourceSyntax frame, Lengths multiline, Provider formatter);
-            IData ReverseCombine(SourceSyntax frame, Variants multiline, Provider formatter);
+            IData Combine(SourceSyntax ruler, IData singleline, Provider formatter);
+            IData ReverseCombine(SourceSyntax ruler, Lengths multiline, Provider formatter);
+            IData ReverseCombine(SourceSyntax ruler, Variants multiline, Provider formatter);
             int LineCount { get; }
             int Max { get; }
             bool? PreferMultiline { get; }
@@ -23,7 +23,6 @@ namespace Reni.Formatting
         }
 
         public static Situation Empty => new Situation();
-
         public static Situation Create(IEnumerable<int> lengths)
             => new Situation(lengths);
 
@@ -32,25 +31,25 @@ namespace Reni.Formatting
         public static Situation operator +(Situation left, Situation right) => left.Add(right);
 
         [EnableDump]
-        readonly IData _data;
+        readonly IData Data;
 
         Situation(IEnumerable<int> lengths = null)
-            : this(new Lengths(lengths)) {}
+            : this(new Lengths(lengths)) { }
 
-        Situation(IData data) { _data = data; }
+        Situation(IData data) { Data = data; }
 
         protected override string GetNodeDump()
             => base.GetNodeDump() + "[" + Max + "*" + LineCount + "]";
 
-        Situation Add(int right) => new Situation(_data.Plus(right));
-        Situation Add(Situation right) => new Situation(_data.Plus(right._data));
+        Situation Add(int right) => new Situation(Data.Plus(right));
+        Situation Add(Situation right) => new Situation(Data.Plus(right.Data));
 
-        internal int Max => _data.Max;
-        internal int LineCount => _data.LineCount;
+        internal int Max => Data.Max;
+        internal int LineCount => Data.LineCount;
 
-        internal Situation Combine(SourceSyntax frame, Situation singleLine, Provider formatter)
-            => new Situation(_data.Combine(frame, singleLine._data,formatter));
+        internal Situation Combine(SourceSyntax ruler, Situation singleLine, Provider formatter)
+            => new Situation(Data.Combine(ruler, singleLine.Data, formatter));
 
-        internal Rulers Rulers => _data.Rulers;
+        internal Rulers Rulers => Data.Rulers;
     }
 }

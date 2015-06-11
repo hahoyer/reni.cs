@@ -20,6 +20,9 @@ namespace Reni.Formatting
             Data[other] = isMultiline;
         }
 
+        public bool HasMultiLine => Data.Any(item => item.Value);
+        public bool HasSingleLine => Data.Any(item => !item.Value);
+
         public Rulers Concat(SourceSyntax other, bool isMultiline)
             => new Rulers(Data, other, isMultiline);
 

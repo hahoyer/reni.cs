@@ -181,7 +181,7 @@ namespace Reni.TokenClasses
         public string BraceMatchDump => new BraceMatchDumper(this, 3).Dump();
 
         internal string Reformat(SourcePart targetPart = null, Provider provider = null)
-            => (provider ?? Provider.Create())
+            => (provider ?? new Provider())
                 .Reformat(this, targetPart ?? SourcePart);
 
         [DisableDump]

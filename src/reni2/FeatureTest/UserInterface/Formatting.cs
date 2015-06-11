@@ -54,13 +54,12 @@ namespace Reni.FeatureTest.UserInterface
             var newSource = compiler.SourceSyntax.Reformat
                 (
                     provider:
-                        Provider.Create
-                            (
-                                minImprovementOfLineBreak: 3,
-                                maxLineLength: 200,
-                                emptyLineLimit: 0,
-                                indentItem: "   "
-                            )
+                        new Provider
+                        {
+                            MinImprovementOfLineBreak = 3,
+                            MaxLineLength = 200,
+                            EmptyLineLimit = 0
+                        }
                 );
 
             var lineCount = newSource.Count(item => item == '\n');
@@ -81,9 +80,17 @@ namespace Reni.FeatureTest.UserInterface
             var file = fileName.FileHandle();
             var compiler = new Compiler(fileName);
             var source = compiler.Source.All;
-            var newSource = compiler.SourceSyntax.Reformat();
+            var newSource = compiler.SourceSyntax.Reformat
+                (
+                    provider:
+                        new Provider
+                        {
+                            MinImprovementOfLineBreak = 3,
+                            EmptyLineLimit = 1
+                        }
+                );
             var lineCount = newSource.Count(item => item == '\n');
-            Tracer.Assert(lineCount == 62, newSource);
+            Tracer.Assert(lineCount == 62, nameof(lineCount) + "=" + lineCount + "\n" + newSource);
         }
     }
 }

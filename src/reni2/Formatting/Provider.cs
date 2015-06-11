@@ -12,35 +12,10 @@ namespace Reni.Formatting
 {
     public sealed class Provider : DumpableObject
     {
-        internal static Provider Create() => new Provider(100, 0, 10, "    ");
-
-        public static Provider Create
-            (
-            int? maxLineLength,
-            int? emptyLineLimit,
-            int minImprovementOfLineBreak,
-            string indentItem
-            )
-            => new Provider(maxLineLength, emptyLineLimit, minImprovementOfLineBreak, indentItem);
-
-        internal readonly int? MaxLineLength;
-        readonly int? EmptyLineLimit;
-        internal readonly int MinImprovementOfLineBreak;
-        internal readonly string IndentItem;
-
-        Provider
-            (
-            int? maxLineLength,
-            int? emptyLineLimit,
-            int minImprovementOfLineBreak,
-            string indentItem
-            )
-        {
-            MaxLineLength = maxLineLength;
-            EmptyLineLimit = emptyLineLimit;
-            MinImprovementOfLineBreak = minImprovementOfLineBreak;
-            IndentItem = indentItem;
-        }
+        public int? MaxLineLength = 100;
+        public int? EmptyLineLimit = 1;
+        public int MinImprovementOfLineBreak = 10;
+        public string IndentItem = "    ";
 
         internal string Reformat(SourceSyntax target, SourcePart targetPart)
             => Frame.CreateFrame(target, this)

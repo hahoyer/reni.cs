@@ -37,13 +37,12 @@ namespace HoyerWare.ReniLanguagePackage
         internal Provider CreateFormattingProvider()
         {
             var pd = (Properties) GetDialogPage(typeof(Properties));
-            return Provider.Create
-                (
-                    pd.MaxLineLength,
-                    pd.EmptyLineLimit,
-                    pd.MinImprovementOfLineBreak,
-                    "    "
-                );
+            return new Provider
+            {
+                MaxLineLength = pd.MaxLineLength,
+                EmptyLineLimit = pd.EmptyLineLimit,
+                MinImprovementOfLineBreak = pd.MinImprovementOfLineBreak
+            };
         }
     }
 }
