@@ -65,7 +65,7 @@ namespace Reni.Formatting
         [DisableDump]
         string Whitespaces => Formatter.InternalGetWhitespaces
             (
-                () => LeftTokenClass,
+                LeftTokenClass,
                 LeadingLineBreaks,
                 IndentLevel,
                 Target.Token.PrecededWith,
@@ -238,14 +238,10 @@ namespace Reni.Formatting
 
             return Target.Left != null && Left.HasLineBreaks(ignoreLeadingLineBreak)
                 || (Target.Left != null || !ignoreLeadingLineBreak) && LeadingLineBreaks > 0
-                || Formatter.InternalGetWhitespaces
-                    (
-                        () => LeftTokenClass,
-                        0,
-                        0,
-                        Target.Token.PrecededWith,
-                        Target.TokenClass
-                    ).Contains("\n")
+                || Formatter
+                    .InternalGetWhitespaces
+                    (LeftTokenClass, 0, 0, Target.Token.PrecededWith, Target.TokenClass)
+                    .Contains("\n")
                 || Target.Right != null && Right.HasLineBreaks(false);
         }
 
@@ -257,11 +253,11 @@ namespace Reni.Formatting
             if(!IsLineBreakRuler)
                 return PairSituation(rulers);
 
-            var singleLine = GetRulerSituation(rulers, false);
             if(rulers.HasSingleLine)
-                return singleLine;
+                return GetRulerSituation(rulers, false);
+
             return GetRulerSituation(rulers, true)
-                .Combine(Target, singleLine, Formatter);
+                .Combine(Target, GetRulerSituation(rulers, false), Formatter);
         }
 
         Situation PairSituation(Rulers rulers)
@@ -273,15 +269,15 @@ namespace Reni.Formatting
         }
 
         Situation GetRulerSituation(Rulers rulers, bool isMultiLine)
-        {
-            return PairSituation(rulers.Concat(Target, isMultiLine));
-        }
+            => PairSituation(rulers.Concat(Target, isMultiLine));
 
         Situation GetTokenSituation(Rulers rulers)
         {
             var lengths = GetWhitespaceSituationString(rulers)
                 .Split('\n')
                 .Select(item => item.Length);
+            if(lengths.Count() > 1 && !rulers.LastIsMultiLine)
+                return null;
             return Situation
                 .Create(lengths)
                 + Target.Token.Characters.Length;
@@ -299,7 +295,7 @@ namespace Reni.Formatting
         string GetWhitespaceSituationString(Rulers rulers)
             => Formatter.InternalGetWhitespaces
                 (
-                    () => LeftTokenClass,
+                    LeftTokenClass,
                     HasLeadingLineBreaks(rulers) ? 1 : 0,
                     0,
                     Target.Token.PrecededWith,

@@ -7,17 +7,17 @@ namespace Reni.Formatting
 {
     sealed class Ruler : DumpableObject
     {
-        readonly Frame _frame;
+        readonly Frame Frame;
         [EnableDump]
-        readonly bool _isMultiLine;
+        readonly bool IsMultiLine;
 
         public Ruler(Frame frame, bool isMultiLine)
         {
-            _frame = frame;
-            _isMultiLine = isMultiLine;
+            Frame = frame;
+            IsMultiLine = isMultiLine;
         }
 
         [EnableDump]
-        string Id => _frame.Target.TokenClass.NodeDump();
+        string Id => Frame.Target.TokenClass.NodeDump();
     }
 }

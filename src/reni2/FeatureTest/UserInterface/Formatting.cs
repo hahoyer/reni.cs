@@ -66,6 +66,36 @@ namespace Reni.FeatureTest.UserInterface
             Tracer.Assert(lineCount == 9, "\n" + newSource);
         }
 
+        [Test]
+        [UnitTest]
+        public void ReformatWithComments()
+        {
+            const string Text = @"
+    X1_node: function object(
+        # Base object. It defines two function prototypes 'X1_dump' and 'X1_IsTerminal'.
+        # 'dump' should convert the data into human readable string. A level is
+        #   used to protect agains recursive strutures
+        # For 'IsTerminal' a default implementation is priovided
+        X1_dump: data prototype(function integer(arg + 1) dump());
+            X1_IsTerminal: data prototype(function false);
+            X1_IsTerminal:= (function false););
+            ";
+
+            var compiler = new Compiler(text: Text);
+            var newSource = compiler.SourceSyntax.Reformat
+                (
+                    provider:
+                        new Provider
+                        {
+                            MinImprovementOfLineBreak = 3,
+                            EmptyLineLimit = 1
+                        }
+                );
+
+            var lineCount = newSource.Count(item => item == '\n');
+            Tracer.Assert(lineCount == 11, "\n" + newSource);
+        }
+
         [UnitTest]
         [Test]
         public void LegacySystem()

@@ -10,26 +10,25 @@ namespace Reni.Formatting
     {
         internal static readonly Rulers Empty = new Rulers();
 
-        internal readonly Dictionary<SourceSyntax, bool> Data;
+        internal readonly Tuple<SourceSyntax, bool>[] Data;
 
-        Rulers() { Data = new Dictionary<SourceSyntax, bool>(); }
+        Rulers() { Data = new Tuple<SourceSyntax, bool>[] {}; }
 
-        Rulers(Dictionary<SourceSyntax, bool> data, SourceSyntax other, bool isMultiline)
+        Rulers(IEnumerable<Tuple<SourceSyntax, bool>> data, SourceSyntax other, bool isMultiline)
         {
-            Data = data.ToDictionary(item => item.Key, item => item.Value);
-            Data[other] = isMultiline;
+            Data = data
+                .Concat(new[] {new Tuple<SourceSyntax, bool>(other, isMultiline)})
+                .ToArray();
         }
 
-        public bool HasMultiLine => Data.Any(item => item.Value);
-        public bool HasSingleLine => Data.Any(item => !item.Value);
+        public bool HasMultiLine => Data.Any(item => item.Item2);
+        public bool HasSingleLine => Data.Any(item => !item.Item2);
+        public bool LastIsMultiLine => Data.Last()?.Item2 ?? false;
 
         public Rulers Concat(SourceSyntax other, bool isMultiline)
             => new Rulers(Data, other, isMultiline);
 
         public bool IsMultiLine(SourceSyntax lineBreakRuler)
-        {
-            bool result;
-            return Data.TryGetValue(lineBreakRuler, out result) && result;
-        }
+            => Data.FirstOrDefault(item => item.Item1 == lineBreakRuler)?.Item2 ?? false;
     }
 }

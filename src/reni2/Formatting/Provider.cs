@@ -38,7 +38,7 @@ namespace Reni.Formatting
 
         internal string InternalGetWhitespaces
             (
-            Func<ITokenClass> leftTokenClass,
+            ITokenClass leftTokenClass,
             int leadingLineBreaks,
             int indentLevel,
             IEnumerable<WhiteSpaceToken> whiteSpaces,
@@ -46,7 +46,10 @@ namespace Reni.Formatting
             )
         {
             var indent = IndentItem.Repeat(indentLevel);
-            var result = "\n".Repeat(leadingLineBreaks);
+            var result = leadingLineBreaks > 0
+                ? "\n".Repeat(leadingLineBreaks)
+                : leftTokenClass == null ? "" : " ";
+
             var emptyLines = leadingLineBreaks;
             var isBeginOfLine = leadingLineBreaks > 0;
             foreach
@@ -75,7 +78,7 @@ namespace Reni.Formatting
                 result += indent;
 
             return result == ""
-                ? SeparatorType.Get(leftTokenClass(), rightTokenClass).Text
+                ? SeparatorType.Get(leftTokenClass, rightTokenClass).Text
                 : result;
         }
     }

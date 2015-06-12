@@ -48,7 +48,7 @@ namespace Reni.Formatting
         int Situation.IData.Max => Math.Min(Multiline.Max, Singleline.Max);
 
         Situation.IData Situation.IData.Plus(Situation.IData right)
-            => Create(Ruler, Multiline.Plus(right), Singleline.Plus(right), MaxLineLength);
+            => Create(Ruler, Multiline.Plus(right), Singleline?.Plus(right), MaxLineLength);
 
         Situation.IData Situation.IData.Plus(int right)
         {
@@ -62,40 +62,28 @@ namespace Reni.Formatting
         {
             get
             {
-                if(Multiline.PreferMultiline == true)
+                if(Multiline.PreferMultiline == true || Singleline == null)
                     return true;
                 return MaxLineLength != null && Singleline.Max > MaxLineLength.Value;
             }
         }
 
         Rulers Situation.IData.Rulers
-            =>
-                PreferMultiline
-                    ? Multiline.Rulers.Concat(Ruler, true)
-                    : Singleline.Rulers.Concat(Ruler, false);
+            => PreferMultiline
+                ? Multiline.Rulers.Concat(Ruler, true)
+                : Singleline.Rulers.Concat(Ruler, false);
 
         Situation.IData Situation.IData.Combine
             (SourceSyntax frame, Situation.IData singleline, Provider formatter)
-            => singleline.ReverseCombine(frame, this, formatter);
+            => Create(frame, this, singleline, MaxLineLength);
 
         Situation.IData Situation.IData.ReversePlus(Lengths left)
-            =>
-                Create
-                    (
-                        Ruler,
-                        Multiline.ReversePlus(left),
-                        Singleline.ReversePlus(left),
-                        MaxLineLength);
-
-        Situation.IData Situation.IData.ReverseCombine
-            (SourceSyntax frame, Lengths multiline, Provider formatter)
-        {
-            NotImplementedMethod(frame, multiline, formatter);
-            return null;
-        }
-
-        Situation.IData Situation.IData.ReverseCombine
-            (SourceSyntax frame, Variants multiline, Provider formatter)
-            => Create(frame, multiline, this, MaxLineLength);
+            => Create
+                (
+                    Ruler,
+                    Multiline.ReversePlus(left),
+                    Singleline?.ReversePlus(left),
+                    MaxLineLength
+                );
     }
 }

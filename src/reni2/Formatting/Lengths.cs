@@ -48,19 +48,7 @@ namespace Reni.Formatting
 
         Situation.IData Situation.IData.Combine
             (SourceSyntax frame, Situation.IData singleline, Provider formatter)
-            => singleline.ReverseCombine(frame, this, formatter);
-
-        Situation.IData Situation.IData.ReverseCombine
-            (SourceSyntax frame, Lengths multiline, Provider formatter)
-        {
-            if(formatter.MinImprovementOfLineBreak > Max - multiline.Max)
-                return this;
-            return Variants.Create(frame, multiline, this, formatter.MaxLineLength);
-        }
-
-        Situation.IData Situation.IData.ReverseCombine
-            (SourceSyntax frame, Variants multiline, Provider formatter)
-            => Variants.Create(frame, multiline, this, formatter.MaxLineLength);
+            => Variants.Create(frame, this, singleline, formatter.MaxLineLength);
 
         bool? Situation.IData.PreferMultiline => null;
         Rulers Situation.IData.Rulers => Rulers.Empty;

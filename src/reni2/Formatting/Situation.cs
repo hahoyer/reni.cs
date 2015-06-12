@@ -14,8 +14,6 @@ namespace Reni.Formatting
             IData Plus(IData right);
             IData ReversePlus(Lengths left);
             IData Combine(SourceSyntax ruler, IData singleline, Provider formatter);
-            IData ReverseCombine(SourceSyntax ruler, Lengths multiline, Provider formatter);
-            IData ReverseCombine(SourceSyntax ruler, Variants multiline, Provider formatter);
             int LineCount { get; }
             int Max { get; }
             bool? PreferMultiline { get; }
@@ -23,12 +21,13 @@ namespace Reni.Formatting
         }
 
         public static Situation Empty => new Situation();
+
         public static Situation Create(IEnumerable<int> lengths)
             => new Situation(lengths);
 
         public static Situation operator +(Situation left, int right) => left.Add(right);
 
-        public static Situation operator +(Situation left, Situation right) => left.Add(right);
+        public static Situation operator +(Situation left, Situation right) => left?.Add(right);
 
         [EnableDump]
         readonly IData Data;
@@ -42,13 +41,15 @@ namespace Reni.Formatting
             => base.GetNodeDump() + "[" + Max + "*" + LineCount + "]";
 
         Situation Add(int right) => new Situation(Data.Plus(right));
-        Situation Add(Situation right) => new Situation(Data.Plus(right.Data));
+
+        Situation Add(Situation right)
+            => right == null ? null : new Situation(Data.Plus(right.Data));
 
         internal int Max => Data.Max;
         internal int LineCount => Data.LineCount;
 
         internal Situation Combine(SourceSyntax ruler, Situation singleLine, Provider formatter)
-            => new Situation(Data.Combine(ruler, singleLine.Data, formatter));
+            => new Situation(Data.Combine(ruler, singleLine?.Data, formatter));
 
         internal Rulers Rulers => Data.Rulers;
     }
