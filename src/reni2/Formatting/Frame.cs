@@ -3,23 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Helper;
-using JetBrains.Annotations;
 using Reni.TokenClasses;
 
 namespace Reni.Formatting
 {
     sealed class Frame : DumpableObject
     {
+        internal static Frame Create(SourceSyntax target, Provider formatter)
+        {
+            var result = new Frame(target, formatter: formatter);
+            return result;
+        }
+
         readonly ValueCache<Frame> LeftCache;
         readonly ValueCache<Frame> RightCache;
-        readonly ValueCache<Frame> LeftNeighborCache;
-        readonly ValueCache<Frame> LineBreakRulerForCache;
-
-        readonly ValueCache<bool> HasInnerLineBreaksCache;
-        readonly ValueCache<int> LeadingLineBreaksCache;
-        readonly ValueCache<Situation> SituationOfRootCache;
         readonly ValueCache<Item> ItemCache;
         readonly ValueCache<IEnumerable<Item>> ItemsCache;
+        readonly ValueCache<bool> HasInnerLineBreaksCache;
+        readonly ValueCache<int> LeadingLineBreaksCache;
 
         [DisableDump]
         readonly Provider Formatter;
@@ -27,87 +28,109 @@ namespace Reni.Formatting
         readonly Frame Parent;
         internal readonly SourceSyntax Target;
 
-        internal Frame(SourceSyntax target, Frame parent = null, Provider formatter = null)
+        Frame(SourceSyntax target, Frame parent = null, Provider formatter = null)
         {
             Parent = parent;
             Formatter = parent?.Formatter ?? formatter;
             Target = target;
             LeftCache = new ValueCache<Frame>(() => new Frame(Target.Left, this));
             RightCache = new ValueCache<Frame>(() => new Frame(Target.Right, this));
-            LeftNeighborCache = new ValueCache<Frame>
-                (() => Left.RightMostTokenClassFrame ?? LeftTokenClassFrame);
             ItemsCache = new ValueCache<IEnumerable<Item>>(GetItems);
-            ItemCache = new ValueCache<Item>(() => new Item(Whitespaces, Target.Token));
+            ItemCache = new ValueCache<Item>(() => Formatter.Item(this));
             LeadingLineBreaksCache = new ValueCache<int>(GetLeadingLineBreaksForCache);
-            SituationOfRootCache = new ValueCache<Situation>(GetSituationOfRootForCache);
-            LineBreakRulerForCache = new ValueCache<Frame>(GetLineBreakRulerForCache);
-            HasInnerLineBreaksCache = new ValueCache<bool>(() => HasLineBreaks(true));
+            HasInnerLineBreaksCache = new ValueCache<bool>(GetHasInnerLineBreaksForCache);
         }
 
         protected override string GetNodeDump()
             => base.GetNodeDump() + "(" + Target?.TokenClass.GetType().PrettyName() + ")";
 
         [DisableDump]
+        internal IEnumerable<Item> ItemsForResult
+        {
+            get
+            {
+                if(Target == null)
+                    yield break;
+                foreach(var item in Left.ItemsForResult)
+                    yield return item;
+                yield return Formatter.Item(this, LeadingLineBreaks);
+                foreach(var item in Right.ItemsForResult)
+                    yield return item;
+            }
+        }
+
         Frame Left => LeftCache.Value;
-
-        [DisableDump]
         Frame Right => RightCache.Value;
-
-        [DisableDump]
         Item Item => ItemCache.Value;
-
-        [DisableDump]
         IEnumerable<Item> Items => ItemsCache.Value;
+        bool HasInnerLineBreaks => HasInnerLineBreaksCache.Value;
+        int LeadingLineBreaks => LeadingLineBreaksCache.Value;
+        [DisableDump]
+        internal Frame LeftNeighbor => Left.RightMostTokenClassFrame ?? LeftTokenClassFrame;
 
         [DisableDump]
-        Frame LeftNeighbor => LeftNeighborCache.Value;
+        internal int IndentLevel => (Parent?.IndentLevel ?? 0) + (HasIndent ? 1 : 0);
 
-        [DisableDump]
-        string Whitespaces => Formatter.InternalGetWhitespaces
-            (
-                LeftTokenClass,
-                LeadingLineBreaks,
-                IndentLevel,
-                Target.Token.PrecededWith,
-                Target.TokenClass
-            );
+        bool HasIndent
+        {
+            get
+            {
+                var tokenClass = Target.TokenClass;
+                if(tokenClass is List)
+                    return false;
 
-        [DisableDump]
-        ITokenClass LeftTokenClass => LeftNeighbor?.Target.TokenClass;
+                var parentClass = Parent?.Target.TokenClass;
+                if(parentClass is List)
+                    return ParentChain.Any(item => item.Target.TokenClass is RightParenthesis);
 
-        [DisableDump]
+                if (tokenClass is LeftParenthesis)
+                    return false;
+
+                return parentClass is LeftParenthesis || parentClass is RightParenthesis;
+            }
+        }
+
+        Frame LeftNeighborOfTarget => Parent?.Left == this ? Parent.LeftNeighborOfTarget : Parent;
+        bool RequiresLineBreak
+            =>
+                IsLineBreakRuler
+                    ? Formatter.RequiresLineBreak(Items.Filter())
+                    : Parent?.RequiresLineBreak ?? false;
+
+        bool IsLineBreakRuler
+            => Target.TokenClass is RightParenthesis
+                || Target.TokenClass is EndToken;
+
         Frame RightMostTokenClassFrame
             => Target == null
                 ? null
                 : Target.Right == null ? this : Right.RightMostTokenClassFrame;
 
-        [DisableDump]
         Frame LeftTokenClassFrame
             => Parent == null || Target == Parent.Target.Right
                 ? Parent
                 : Parent.LeftTokenClassFrame;
 
-        [DisableDump]
-        int LeadingLineBreaks => LeadingLineBreaksCache.Value;
-
-        Situation SituationOfRoot => SituationOfRootCache.Value;
-
-        bool HasNeverLeadingLineBreaks
+        bool IsLineBreakCandidate
         {
             get
             {
                 var rightToken = Target.TokenClass;
 
                 if(rightToken is List)
-                    return true;
-
-                if(rightToken is RightParenthesis)
                     return false;
+
+                if(rightToken is RightParenthesis
+                    || rightToken is LeftParenthesis
+                    || rightToken is EndToken
+                    )
+                    return true;
 
                 var leftToken = LeftNeighbor?.Target.TokenClass;
 
-                return !(leftToken is List) && !(leftToken is RightParenthesis)
-                    && !(rightToken is LeftParenthesis) && !(leftToken is LeftParenthesis);
+                return leftToken is List
+                    || leftToken is RightParenthesis
+                    || leftToken is LeftParenthesis;
             }
         }
 
@@ -125,19 +148,6 @@ namespace Reni.Formatting
             }
         }
 
-        [DisableDump]
-        Frame LineBreakRuler => LineBreakRulerForCache.Value;
-
-        [DisableDump]
-        bool IsLineBreakRuler
-            => Target.TokenClass is EndToken || Target.TokenClass is RightParenthesis;
-
-        [DisableDump]
-        bool HasInnerLineBreaks => HasInnerLineBreaksCache.Value;
-
-        bool IsMultiLineSituation => SituationOfRoot.Rulers.IsMultiLine(LineBreakRuler.Target);
-
-        [DisableDump]
         IEnumerable<Frame> ParentChain
         {
             get
@@ -148,69 +158,6 @@ namespace Reni.Formatting
                     foreach(var frame in Parent.ParentChain)
                         yield return frame;
                 }
-            }
-        }
-
-        [DisableDump]
-        int IndentLevel => ParentChain.Count(item => item.HasIndent) + (HasIndent ? 1 : 0);
-
-        [DisableDump]
-        bool HasIndent
-        {
-            get
-            {
-                if(Target.TokenClass is List)
-                    return false;
-
-                return RootListFrameOfItem?.IsBraced ?? false;
-            }
-        }
-
-        [DisableDump]
-        Frame RootListFrameOfItem => Target.TokenClass is List ? null : Parent?.RootListFrame;
-
-        [DisableDump]
-        Frame RootListFrame
-        {
-            get
-            {
-                if(!(Target.TokenClass is List))
-                    return null;
-
-                if(Parent?.Target.TokenClass is List)
-                    return Parent.RootListFrame;
-
-                return this;
-            }
-        }
-
-        [DisableDump]
-        bool IsBraced
-            => Parent != null
-                && Target == Parent.Target.Right
-                && Parent.IsBraceConstructAtLeftBrace;
-
-        [DisableDump]
-        bool IsBraceConstructAtLeftBrace
-            => Parent != null
-                && Target == Parent.Target.Left
-                && Parent.IsBraceConstruct;
-
-        [DisableDump]
-        bool IsBraceConstruct
-        {
-            get
-            {
-                var rightBrace = Target?.TokenClass as RightParenthesis;
-                if(rightBrace == null)
-                    return false;
-
-                var leftBraceItem = Left?.Target;
-                if(leftBraceItem == null || leftBraceItem != Target.Left)
-                    return false;
-
-                var leftBrace = leftBraceItem.TokenClass as LeftParenthesis;
-                return leftBrace?.Level == rightBrace.Level;
             }
         }
 
@@ -231,97 +178,27 @@ namespace Reni.Formatting
             }
         }
 
-        bool HasLineBreaks(bool ignoreLeadingLineBreak)
-        {
-            if(Target == null)
-                return false;
-
-            return Target.Left != null && Left.HasLineBreaks(ignoreLeadingLineBreak)
-                || (Target.Left != null || !ignoreLeadingLineBreak) && LeadingLineBreaks > 0
-                || Formatter
-                    .InternalGetWhitespaces
-                    (LeftTokenClass, 0, 0, Target.Token.PrecededWith, Target.TokenClass)
-                    .Contains("\n")
-                || Target.Right != null && Right.HasLineBreaks(false);
-        }
-
-        Situation GetSituation(Rulers rulers)
-        {
-            if(Target == null)
-                return Situation.Empty;
-
-            if(!IsLineBreakRuler)
-                return PairSituation(rulers);
-
-            if(rulers.HasSingleLine)
-                return GetRulerSituation(rulers, false);
-
-            return GetRulerSituation(rulers, true)
-                .Combine(Target, GetRulerSituation(rulers, false), Formatter);
-        }
-
-        Situation PairSituation(Rulers rulers)
-        {
-            var left = Left.GetSituation(rulers);
-            var token = GetTokenSituation(rulers);
-            var right = Right.GetSituation(rulers);
-            return left + (token + right);
-        }
-
-        Situation GetRulerSituation(Rulers rulers, bool isMultiLine)
-            => PairSituation(rulers.Concat(Target, isMultiLine));
-
-        Situation GetTokenSituation(Rulers rulers)
-        {
-            var lengths = GetWhitespaceSituationString(rulers)
-                .Split('\n')
-                .Select(item => item.Length);
-            if(lengths.Count() > 1 && !rulers.LastIsMultiLine)
-                return null;
-            return Situation
-                .Create(lengths)
-                + Target.Token.Characters.Length;
-        }
-
-        bool HasLeadingLineBreaks(Rulers rulers)
-            => !HasNeverLeadingLineBreaks
-                && rulers.IsMultiLine
-                    (
-                        (LeadingLineBreaksDependsOnLeftSite ? LeftNeighbor : this)
-                            .LineBreakRuler
-                            .Target
-                    );
-
-        string GetWhitespaceSituationString(Rulers rulers)
-            => Formatter.InternalGetWhitespaces
-                (
-                    LeftTokenClass,
-                    HasLeadingLineBreaks(rulers) ? 1 : 0,
-                    0,
-                    Target.Token.PrecededWith,
-                    Target.TokenClass
-                );
-
         int GetLeadingLineBreaksForCache()
         {
-            if(HasNeverLeadingLineBreaks)
+            if(!IsLineBreakCandidate)
                 return 0;
 
             if(!LeadingLineBreaksDependsOnLeftSite)
-                return IsMultiLineSituation ? 1 : 0;
+                return RequiresLineBreak ? 1 : 0;
 
-            if(!LeftNeighbor.IsMultiLineSituation)
+            if(!LeftNeighbor.RequiresLineBreak)
                 return 0;
 
-            return LeftNeighbor.RequiresAdditionalLineBreak ? 2 : 1;
+            var leftNeighborOfTarget = LeftNeighborOfTarget;
+            if(leftNeighborOfTarget == null)
+                return 1;
+            return leftNeighborOfTarget.RequiresAdditionalLineBreak ? 2 : 1;
         }
 
-        Frame GetLineBreakRulerForCache() => IsLineBreakRuler ? this : Parent?.LineBreakRuler;
+        bool GetHasInnerLineBreaksForCache()
+            => ItemsCache.Value.Skip(1).Any(item => item.Id.Contains("\n"));
 
-        Situation GetSituationOfRootForCache()
-            => Parent == null ? GetSituation(Rulers.Empty) : Parent.SituationOfRoot;
-
-        internal IEnumerable<Item> GetItems()
+        IEnumerable<Item> GetItems()
         {
             if(Target == null)
                 yield break;
@@ -330,16 +207,6 @@ namespace Reni.Formatting
             yield return Item;
             foreach(var item in Right.Items)
                 yield return item;
-        }
-
-        [DisableDump]
-        [UsedImplicitly]
-        internal string Reformat => Items.Combine().Filter();
-
-        internal static Frame CreateFrame(SourceSyntax target, Provider formatter)
-        {
-            var frame = new Frame(target, formatter: formatter);
-            return frame;
         }
     }
 }

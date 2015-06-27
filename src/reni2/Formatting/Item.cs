@@ -23,6 +23,7 @@ namespace Reni.Formatting
 
         internal string Id => WhiteSpaces + (Token?.Id ?? "");
         internal int Length => Id.Length;
+
         protected override string GetNodeDump() => base.GetNodeDump() + " " + Id.Quote();
 
         internal string Filter(SourcePart targetPart)

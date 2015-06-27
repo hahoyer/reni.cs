@@ -41,7 +41,6 @@ namespace HoyerWare.ReniLanguagePackage
             {
                 MaxLineLength = pd.MaxLineLength,
                 EmptyLineLimit = pd.EmptyLineLimit,
-                MinImprovementOfLineBreak = pd.MinImprovementOfLineBreak
             };
         }
     }

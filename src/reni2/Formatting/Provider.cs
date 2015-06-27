@@ -7,6 +7,7 @@ using hw.Parser;
 using hw.Scanner;
 using Reni.Parser;
 using Reni.TokenClasses;
+using static hw.Debug.Tracer;
 
 namespace Reni.Formatting
 {
@@ -14,23 +15,19 @@ namespace Reni.Formatting
     {
         public int? MaxLineLength = 100;
         public int? EmptyLineLimit = 1;
-        public int MinImprovementOfLineBreak = 10;
         public string IndentItem = "    ";
 
         internal string Reformat(SourceSyntax target, SourcePart targetPart)
-            => Frame.CreateFrame(target, this)
-                .GetItems()
-                .Filter(targetPart);
+            => Frame.Create(target, this).ItemsForResult.Filter(targetPart);
 
-        internal bool IsRelevantLineBreak(int emptyLines, ITokenClass tokenClass)
+        bool IsRelevantLineBreak(int emptyLines, ITokenClass tokenClass)
         {
             if(EmptyLineLimit == null)
                 return true;
-            if(tokenClass is RightParenthesis)
-                return false;
-            if(tokenClass is LeftParenthesis)
-                return false;
-            if(tokenClass is List)
+
+            if(tokenClass is RightParenthesis
+                || tokenClass is LeftParenthesis
+                || tokenClass is List)
                 return false;
 
             return emptyLines < EmptyLineLimit.Value;
@@ -48,7 +45,7 @@ namespace Reni.Formatting
             var indent = IndentItem.Repeat(indentLevel);
             var result = leadingLineBreaks > 0
                 ? "\n".Repeat(leadingLineBreaks)
-                : leftTokenClass == null ? "" : " ";
+                : "";
 
             var emptyLines = leadingLineBreaks;
             var isBeginOfLine = leadingLineBreaks > 0;
@@ -77,9 +74,51 @@ namespace Reni.Formatting
             if(isBeginOfLine)
                 result += indent;
 
-            return result == ""
-                ? SeparatorType.Get(leftTokenClass, rightTokenClass).Text
-                : result;
+            if(result != "")
+                return result;
+
+            return SeparatorType.Get(leftTokenClass, rightTokenClass).Text;
+        }
+
+        internal Item Item
+            (
+            ITokenClass leftTokenClass,
+            int leadingLineBreaks,
+            int indentLevel,
+            IToken token,
+            ITokenClass tokenClass)
+        {
+            var whiteSpaces = InternalGetWhitespaces
+                (
+                    leftTokenClass,
+                    leadingLineBreaks,
+                    indentLevel,
+                    token.PrecededWith,
+                    tokenClass
+                );
+            return new Item(whiteSpaces, token);
+        }
+
+        internal Item Item(Frame target, int leadingLineBreaks = 0)
+        {
+            var leftTokenClass = target.LeftNeighbor?.Target.TokenClass;
+            var indentLevel = target.IndentLevel;
+            var token = target.Target.Token;
+            var tokenClass = target.Target.TokenClass;
+            return Item
+                (
+                    leftTokenClass,
+                    leadingLineBreaks,
+                    indentLevel,
+                    token,
+                    tokenClass
+                );
+        }
+
+        internal bool RequiresLineBreak(string flatText)
+        {
+            return flatText.Any(item => item == '\n')
+                || flatText.Length > MaxLineLength;
         }
     }
 }

@@ -56,8 +56,7 @@ namespace Reni.FeatureTest.UserInterface
                     provider:
                         new Provider
                         {
-                            MinImprovementOfLineBreak = 3,
-                            MaxLineLength = 200,
+                            MaxLineLength = 100,
                             EmptyLineLimit = 0
                         }
                 );
@@ -71,14 +70,25 @@ namespace Reni.FeatureTest.UserInterface
         public void ReformatWithComments()
         {
             const string Text = @"
-    X1_node: function object(
-        # Base object. It defines two function prototypes 'X1_dump' and 'X1_IsTerminal'.
-        # 'dump' should convert the data into human readable string. A level is
-        #   used to protect agains recursive strutures
-        # For 'IsTerminal' a default implementation is priovided
-        X1_dump: data prototype(function integer(arg + 1) dump());
-            X1_IsTerminal: data prototype(function false);
-            X1_IsTerminal:= (function false););
+    X1_fork: object
+    (
+
+            X1_FullDump:
+            (
+            function
+            (
+                string('(') * X1_L X1_dump(arg) * ',' * X1_R X1_dump(arg) * ')';
+        )
+        );
+
+            X1_dump:=
+           (
+           function
+           (
+           arg = 0 then string('...') else X1_FullDump(integer(arg - 1))
+           )
+           )
+    );
             ";
 
             var compiler = new Compiler(text: Text);
@@ -87,13 +97,12 @@ namespace Reni.FeatureTest.UserInterface
                     provider:
                         new Provider
                         {
-                            MinImprovementOfLineBreak = 3,
                             EmptyLineLimit = 1
                         }
                 );
 
             var lineCount = newSource.Count(item => item == '\n');
-            Tracer.Assert(lineCount == 11, "\n" + newSource);
+            Tracer.Assert(lineCount == 19, "\n" + newSource);
         }
 
         [UnitTest]
@@ -115,12 +124,11 @@ namespace Reni.FeatureTest.UserInterface
                     provider:
                         new Provider
                         {
-                            MinImprovementOfLineBreak = 3,
                             EmptyLineLimit = 1
                         }
                 );
             var lineCount = newSource.Count(item => item == '\n');
-            Tracer.Assert(lineCount == 62, nameof(lineCount) + "=" + lineCount + "\n" + newSource);
+            Tracer.Assert(lineCount == 71, nameof(lineCount) + "=" + lineCount + "\n" + newSource);
         }
     }
 }

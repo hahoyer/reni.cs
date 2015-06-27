@@ -4,8 +4,6 @@ using System.Linq;
 using hw.Debug;
 using hw.Helper;
 using hw.Scanner;
-using Reni.Feature;
-using Reni.TokenClasses;
 
 namespace Reni.Formatting
 {
@@ -52,26 +50,6 @@ namespace Reni.Formatting
             }
 
             Tracer.Assert(itemPart == "");
-        }
-
-        internal static bool IsChain(this SourceSyntax target)
-        {
-            if(target?.Left == null)
-                return false;
-
-            var tokenClass = target.TokenClass;
-
-            if(tokenClass is ReassignToken || tokenClass is Colon
-                || tokenClass is TokenClasses.Function
-                || tokenClass is RightParenthesis || tokenClass is List || tokenClass is ElseToken
-                || tokenClass is ArgToken || tokenClass is ThenToken)
-                return false;
-
-            if(tokenClass is Definable || tokenClass is InstanceToken || tokenClass is TypeOperator)
-                return true;
-
-            Dumpable.NotImplementedFunction(target);
-            return false;
         }
 
         internal static string Filter

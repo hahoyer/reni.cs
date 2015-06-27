@@ -5,11 +5,12 @@ using hw.Debug;
 using hw.Parser;
 using hw.Scanner;
 using Reni.Feature;
+using Reni.Formatting;
 using Reni.Parser;
 
 namespace Reni.TokenClasses
 {
-    abstract class Definable : TokenClass
+    abstract class Definable : TokenClass, IChainLink
     {
         protected override sealed Checked<Syntax> Terminal(SourcePart token)
             => new DefinableSyntax(token, this);
