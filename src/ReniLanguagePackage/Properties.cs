@@ -14,12 +14,12 @@ namespace HoyerWare.ReniLanguagePackage
             "If set, tries to constraint line length until this value by inserting"
                 + " line breaks at suitable positions.")]
         [UsedImplicitly]
-        public int? MaxLineLength;
+        public int? MaxLineLength { get; set; }
 
         [Category("Formatting")]
         [Description(
             "If set, delimits the number of consecutive line breaks to this value.")]
         [UsedImplicitly]
-        public int? EmptyLineLimit;
+        public int? EmptyLineLimit { get; set; }
     }
 }

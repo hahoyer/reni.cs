@@ -133,6 +133,6 @@ namespace Reni.Parser
         internal override Checked<CompileSyntax> ToCompiledSyntax
             =>
                 new Checked<CompileSyntax>
-                    (new EmptyList(), IssueId.InvalidExpression.CreateIssue(Token));
+                    (new EmptyList(Token), IssueId.InvalidExpression.CreateIssue(Token));
     }
 }

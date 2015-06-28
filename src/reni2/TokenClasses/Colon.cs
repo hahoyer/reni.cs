@@ -4,7 +4,6 @@ using System.Linq;
 using hw.Debug;
 using hw.Parser;
 using hw.Scanner;
-using Reni.Formatting;
 using Reni.Parser;
 using Reni.Validation;
 
@@ -19,7 +18,11 @@ namespace Reni.TokenClasses
         protected override Checked<Syntax> Suffix(Syntax left, SourcePart token)
             =>
                 left.CreateDeclarationSyntax
-                    (token, new EmptyList(), IssueId.MissingValueInDeclaration.CreateIssue(token));
+                    (
+                        token,
+                        new EmptyList(token),
+                        IssueId.MissingValueInDeclaration.CreateIssue(token)
+                    );
 
         protected override Checked<Syntax> Prefix(SourcePart token, Syntax right)
             => IssueId.UnexpectedUseAsPrefix.Syntax(token);
@@ -28,8 +31,8 @@ namespace Reni.TokenClasses
             => left.CreateDeclarationSyntax(token, right);
 
         protected override Checked<Syntax> Terminal(SourcePart token)
-            => new DeclarationSyntax(new EmptyList(), null).Issues
-                (IssueId.MissingValueInDeclaration.CreateIssue(token));
+            => new DeclarationSyntax(new EmptyList(token), null)
+                .Issues(IssueId.MissingValueInDeclaration.CreateIssue(token));
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
@@ -37,13 +40,13 @@ namespace Reni.TokenClasses
     {
         public const string TokenId = "!";
 
-        readonly ISubParser<SourceSyntax> _parser;
+        readonly ISubParser<SourceSyntax> Parser;
 
-        public Exclamation(ISubParser<SourceSyntax> parser) { _parser = parser; }
+        public Exclamation(ISubParser<SourceSyntax> parser) { Parser = parser; }
 
         IType<SourceSyntax> ISubParser<SourceSyntax>.Execute
             (SourcePosn sourcePosn, Stack<OpenItem<SourceSyntax>> stack)
-            => _parser.Execute(sourcePosn, stack);
+            => Parser.Execute(sourcePosn, stack);
 
         public override string Id => TokenId;
 

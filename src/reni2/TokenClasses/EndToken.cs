@@ -13,7 +13,7 @@ namespace Reni.TokenClasses
         protected override Checked<Syntax> Suffix(Syntax left, SourcePart token)
             => Checked<Syntax>.From(left.ToCompiledSyntax);
 
-        protected override Checked<Syntax> Terminal(SourcePart token) => new EmptyList();
+        protected override Checked<Syntax> Terminal(SourcePart token) => new EmptyList(token);
         public override string Id => PrioTable.EndOfText;
 
     }

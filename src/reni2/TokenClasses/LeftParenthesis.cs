@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Scanner;
-using Reni.Formatting;
 using Reni.Parser;
 using Reni.Validation;
 
@@ -44,7 +43,7 @@ namespace Reni.TokenClasses
         sealed class Syntax : Parser.Syntax
         {
             SourcePart Token { get; }
-            readonly int _level;
+            readonly int Level;
 
             [EnableDump]
             Parser.Syntax Right { get; }
@@ -52,7 +51,7 @@ namespace Reni.TokenClasses
             public Syntax(int level, SourcePart token, Parser.Syntax right)
             {
                 Token = token;
-                _level = level;
+                Level = level;
                 Right = right;
             }
 
@@ -62,12 +61,20 @@ namespace Reni.TokenClasses
                 get { yield return Right; }
             }
 
+            internal override Checked<ExclamationSyntaxList> ExclamationSyntax(SourcePart token)
+                => new Checked<ExclamationSyntaxList>
+                    (
+                    ExclamationSyntaxList.Create(token),
+                    IssueId.UnexpectedDeclarationTag.CreateIssue(Token)
+                    );
+
+
             [DisableDump]
             internal override Checked<CompileSyntax> ToCompiledSyntax
             {
                 get
                 {
-                    var right = (Right ?? new EmptyList()).ToCompiledSyntax;
+                    var right = (Right ?? new EmptyList(Token)).ToCompiledSyntax;
                     return new Checked<CompileSyntax>
                         (
                         right.Value,
@@ -78,8 +85,8 @@ namespace Reni.TokenClasses
 
             internal override Checked<Parser.Syntax> Match(int level, SourcePart token)
             {
-                Tracer.Assert(_level == level);
-                return (Right ?? new EmptyList());
+                Tracer.Assert(Level == level);
+                return (Right ?? new EmptyList(Token));
             }
         }
 

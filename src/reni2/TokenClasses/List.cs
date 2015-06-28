@@ -27,14 +27,14 @@ namespace Reni.TokenClasses
             =>
                 ListSyntax
                     (
-                        new EmptyList(),
-                        new EmptyList());
+                        new EmptyList(token),
+                        new EmptyList(token));
 
         protected override Checked<Syntax> Prefix(SourcePart token, Syntax right)
-            => ListSyntax(new EmptyList(), right);
+            => ListSyntax(new EmptyList(token), right);
 
         protected override Checked<Syntax> Suffix(Syntax left, SourcePart token)
-            => ListSyntax(left, new EmptyList());
+            => ListSyntax(left, new EmptyList(token));
 
         protected override Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
             => ListSyntax(left, right);

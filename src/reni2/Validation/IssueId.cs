@@ -31,7 +31,7 @@ namespace Reni.Validation
 
         internal Issue CreateIssue(SourcePart token) => new Issue(this, token, "");
         internal Checked<Syntax> Syntax(SourcePart token)
-            => new Checked<Syntax>(new EmptyList(), new Issue(this, token, ""));
+            => new Checked<Syntax>(new EmptyList(token), new Issue(this, token, ""));
 
         internal Checked<Syntax> Syntax(SourcePart token, Syntax value)
             => new Checked<Syntax>(value, new Issue(this, token, ""));

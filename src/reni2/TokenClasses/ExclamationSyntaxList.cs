@@ -9,9 +9,12 @@ namespace Reni.TokenClasses
 {
     sealed class ExclamationSyntaxList : NonCompileSyntax
     {
+        internal static ExclamationSyntaxList Create(SourcePart token)
+            => new ExclamationSyntaxList(new Exclamation.Syntax[0], token);
+
         internal readonly Exclamation.Syntax[] Tags;
 
-        internal ExclamationSyntaxList(Exclamation.Syntax[] tags, SourcePart token)
+        ExclamationSyntaxList(Exclamation.Syntax[] tags, SourcePart token)
             : base(token)
         {
             Tags = tags;
@@ -33,26 +36,26 @@ namespace Reni.TokenClasses
 
     sealed class DeclaratorSyntax : CompileSyntax
     {
-        readonly Definable _definable;
-        readonly ExclamationSyntaxList _exclamationSyntaxList;
+        readonly Definable Definable;
+        readonly ExclamationSyntaxList ExclamationSyntaxList;
 
         internal DeclaratorSyntax(Definable definable, ExclamationSyntaxList exclamationSyntaxList)
         {
-            _definable = definable;
-            _exclamationSyntaxList = exclamationSyntaxList;
+            Definable = definable;
+            ExclamationSyntaxList = exclamationSyntaxList;
         }
 
         internal override Checked<Syntax> CreateDeclarationSyntax(SourcePart token, Syntax right)
             => DeclarationSyntax.Create
                 (
-                right,
-                _definable,
-                _exclamationSyntaxList.Tags
+                    right,
+                    Definable,
+                    ExclamationSyntaxList.Tags
                 );
 
         protected override IEnumerable<Syntax> DirectChildren
         {
-            get { yield return _exclamationSyntaxList; }
+            get { yield return ExclamationSyntaxList; }
         }
     }
 }
