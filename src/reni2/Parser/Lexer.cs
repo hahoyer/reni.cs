@@ -9,8 +9,8 @@ namespace Reni.Parser
 {
     sealed class Lexer : ILexer
     {
-        const string Symbols = "°^!²§³$%&/=?\\@€*+~><|:.-";
-        const string SingleCharSymbol = "({[)}];,";
+        const string Symbols = "°^!²§³$%&/=?\\@€*+~><|:-";
+        const string SingleCharSymbol = "({[)}];,.";
         internal static readonly Lexer Instance = new Lexer();
 
         sealed class Error : Match.IError
