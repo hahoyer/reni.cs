@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
-using Reni.Feature;
 using Reni.Parser;
 using Reni.TokenClasses;
 
@@ -52,47 +51,5 @@ namespace Reni.Formatting
 
             return Close;
         }
-
-        internal static bool IsLinebreakCandidate(ITokenClass left, ITokenClass right)
-        {
-            if(left == null
-                || right is Colon
-                || right is List
-                || right is TokenClasses.Function
-                || right is EndToken
-                )
-                return false;
-
-            if(right is LeftParenthesis
-                || right is RightParenthesis
-                || left is LeftParenthesis
-                || left is RightParenthesis
-                )
-                return true;
-
-            if(left is List)
-                return true;
-
-            if(IsOperator(right))
-                if(IsOperator(left)
-                    || left is Colon
-                    || left is TokenClasses.Function
-                    )
-                    return false;
-
-            Dumpable.NotImplementedFunction(left, right);
-
-            return false;
-        }
-
-        static bool IsOperator(ITokenClass tokenClass)
-            => tokenClass is Number
-                || tokenClass is Text
-                || tokenClass is TypeOperator
-                || tokenClass is Definable
-                || tokenClass is ExclamationBoxToken
-                || tokenClass is MutableDeclarationToken
-                || tokenClass is ArgToken
-                || tokenClass is InstanceToken;
     }
 }

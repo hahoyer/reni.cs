@@ -50,7 +50,7 @@ namespace Reni.Parser
                     .Else
                     (
                         "(".AnyChar().Not +
-                            "\n".AnyChar().Find 
+                            "\n".AnyChar().Find
                                 .Else(Match.End.Find)
                     );
 

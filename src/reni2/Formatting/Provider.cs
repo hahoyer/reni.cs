@@ -7,7 +7,6 @@ using hw.Parser;
 using hw.Scanner;
 using Reni.Parser;
 using Reni.TokenClasses;
-using static hw.Debug.Tracer;
 
 namespace Reni.Formatting
 {
