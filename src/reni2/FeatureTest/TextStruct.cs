@@ -18,71 +18,70 @@ namespace Reni.FeatureTest
     {
         static string Definition() => @"
 systemdata:
-{ 
-    Memory: ((0 type * ('100' to_number_of_base 64)) mutable) instance();
+{
+    Memory:((0 type *('100' to_number_of_base 64)) mutable) instance();
     !mutable FreePointer: Memory array_reference mutable;
 };
 
 repeat: /\ ^ while() then(^ body(), repeat(^));
 
+system:
+{
+    MaxNumber8: /!\ '7f' to_number_of_base 16.
+    MaxNumber16: /!\ '7fff' to_number_of_base 16.
+    MaxNumber32: /!\ '7fffffff' to_number_of_base 16.
+    MaxNumber64: /!\ '7fffffffffffffff' to_number_of_base 16.
+    TextItemType: /!\ MaxNumber8 text_item type.
 
+    NewMemory: /\
+    {
+        result:(((^ elementType) * 1) array_reference mutable) instance(systemdata FreePointer enable_reinterpretation).
+        initializer: ^ initializer.
+        count: ^ count.
+        !mutable position: count type instance(0).
 
-system: 
-{ MaxNumber8: /!\ '7f' to_number_of_base 16 
-. MaxNumber16: /!\ '7fff' to_number_of_base 16 
-. MaxNumber32: /!\ '7fffffff' to_number_of_base 16 
-. MaxNumber64: /!\ '7fffffffffffffff' to_number_of_base 16 
+        repeat
+        (
+            while: /\ position < count,
 
-. TextItemType: /!\ MaxNumber8 text_item type 
+            body: /\
+            (
+                result item(position) := initializer(position),
+                position :=(position + 1) enable_cut
+            )
+        ).
 
-. NewMemory: /\ 
-    { result: (((^ elementType) * 1) array_reference mutable) instance (systemdata FreePointer enable_reinterpretation) 
-    . initializer: ^ initializer
-    . count: ^ count
-    . !mutable position: count type instance (0) 
-    . repeat
-    (
-        while: /\ position < count,
-        body: /\ 
-        ( 
-            result item(position) := initializer(position), 
-            position := (position + 1) enable_cut
-        ) 
-    )
-    . systemdata FreePointer :=
-        (systemdata FreePointer type) 
-        instance 
-        ((result + count) mutable enable_reinterpretation) 
-    } result 
+        systemdata FreePointer :=(systemdata FreePointer type)
+        instance((result + count) mutable enable_reinterpretation)
+    }
+    result
 };
 
 Text: /\
-{ _elementType: ^ type item
-. !mutable data: ((_elementType*1) array_reference)instance(^)
-. _count: ^ count
-. AfterCopy: /\ data:= system NewMemory
-    ( elementType: _elementType
-    . count: _count
-    . initializer: /\ data item(^)
-    )
-. AfterCopy()
-. dump_print: /!\ 
+{
+    _elementType: ^ type item.
+    !mutable data:((_elementType * 1) array_reference) instance(^).
+    _count: ^ count.
+    AfterCopy: /\ data := system NewMemory(elementType: _elementType. count: _count. initializer: /\ data item(^)).
+    AfterCopy().
+
+    dump_print: /!\
     {
-        !mutable position: _count type instance(0) ;
+        !mutable position: _count type instance(0);
+
         repeat
         (
             while: /\ position < _count,
-            body: /\ 
-            ( 
-                data item(position) dump_print, 
-                position := (position + 1) enable_cut
-            ) 
+
+            body: /\
+            (
+                data item(position) dump_print,
+                position :=(position + 1) enable_cut
+            )
         )
-    }
-. << : /\ 
-    {
-        
-    } 
+    }.
+
+    << : /\{}
 }
 ";
 
@@ -92,7 +91,7 @@ Text: /\
 
     [UnitTest]
     [Output("abcdef")]
-    [InstanceCode("Text('abcdef')")]
+    [InstanceCode("Text Create('abcdef')")]
     [Integer1]
     [TwoFunctions]
     [FromTypeAndFunction]
@@ -112,7 +111,7 @@ Text: /\
 
     [UnitTest]
     [Output("Hallo")]
-    [InstanceCode("Text('H') << 'allo'")]
+    [InstanceCode("Text Create('H') << 'allo'")]
     [Text1]
     [UserObjects]
     [UnMatchedBrackets]
