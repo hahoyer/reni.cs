@@ -86,6 +86,8 @@ namespace Reni.TokenClasses
         internal virtual bool DeclaresMutable => false;
         [DisableDump]
         internal virtual bool DeclaresConverter => false;
+        [DisableDump]
+        internal virtual bool DeclaresMixIn => false;
 
         internal sealed class Syntax : Parser.Syntax
         {
@@ -122,5 +124,13 @@ namespace Reni.TokenClasses
         public override string Id => TokenId;
         [DisableDump]
         internal override bool DeclaresMutable => true;
+    }
+
+    sealed class MixInDeclarationToken : DeclarationTagToken
+    {
+        const string TokenId = "mix_in";
+        public override string Id => TokenId;
+        [DisableDump]
+        internal override bool DeclaresMixIn => true;
     }
 }

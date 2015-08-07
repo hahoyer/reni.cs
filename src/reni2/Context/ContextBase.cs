@@ -5,7 +5,6 @@ using System.Linq;
 using hw.Debug;
 using hw.Forms;
 using hw.Helper;
-using hw.Parser;
 using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Basics;
@@ -16,7 +15,6 @@ using Reni.TokenClasses;
 using Reni.Type;
 using Reni.Validation;
 
-
 namespace Reni.Context
 {
     /// <summary>
@@ -26,7 +24,8 @@ namespace Reni.Context
         : DumpableObject
             , IIconKeyProvider
     {
-        protected override string GetNodeDump() => base.GetNodeDump() + "(" + GetContextIdentificationDump() + ")";
+        protected override string GetNodeDump()
+            => base.GetNodeDump() + "(" + GetContextIdentificationDump() + ")";
 
         static int _nextId;
 
@@ -49,10 +48,15 @@ namespace Reni.Context
         internal CompoundView FindRecentCompoundView => _cache.RecentStructure.Value;
 
         [DisableDump]
-        internal IFunctionContext FindRecentFunctionContextObject => _cache.RecentFunctionContextObject.Value;
+        internal IFunctionContext FindRecentFunctionContextObject
+            => _cache.RecentFunctionContextObject.Value;
+
+        [DisableDump]
+        internal abstract bool IsRecursionMode { get; }
 
         [UsedImplicitly]
-        internal int SizeToPacketCount(Size size) => size.SizeToPacketCount(Root.DefaultRefAlignParam.AlignBits);
+        internal int SizeToPacketCount(Size size)
+            => size.SizeToPacketCount(Root.DefaultRefAlignParam.AlignBits);
 
         internal ContextBase CompoundPositionContext(CompoundSyntax container, int position)
             => _cache.CompoundContexts[container][position];
@@ -62,38 +66,28 @@ namespace Reni.Context
 
         internal Compound Compound(CompoundSyntax context) => _cache.Compounds[context];
 
-        [DebuggerHidden]
+        //[DebuggerHidden]
         internal Result Result(Category category, CompileSyntax syntax)
-        {
-            var cacheItem = ResultCache(syntax);
-            cacheItem.Update(category);
-            var result = cacheItem.Data & category;
+            => ResultCache(syntax).GetCategories(category);
 
-            var pendingCategory = category - result.CompleteCategory;
-            if(pendingCategory.HasAny)
-            {
-                var pendingResult = syntax.PendingResultForCache(this, pendingCategory);
-                Tracer.Assert(pendingCategory <= pendingResult.CompleteCategory);
-                result.Update(pendingResult);
-            }
-            Tracer.Assert(category == result.CompleteCategory);
-            return result;
-        }
+        ResultCache ResultCache(CompileSyntax syntax) => _cache.ResultCache[syntax];
 
-        internal ResultCache ResultCache(CompileSyntax syntax) => _cache.ResultCache[syntax];
+        internal ResultCache ResultAsReferenceCache(CompileSyntax syntax)
+            => _cache.ResultAsReferenceCache[syntax];
+
 
         internal TypeBase TypeIfKnown(CompileSyntax syntax) => _cache.ResultCache[syntax].Data.Type;
 
-        [DebuggerHidden]
+        //[DebuggerHidden]
         Result ResultForCache(Category category, CompileSyntax syntax)
         {
-            var trace = syntax.ObjectId == -23 && ObjectId == 1 && category.HasCode;
+            var trace = syntax.ObjectId == -959 && ObjectId == 39 && category.HasType;
             StartMethodDump(trace, category, syntax);
             try
             {
                 BreakExecution();
                 var result = syntax.ResultForCache(this, category.Replenished);
-                Tracer.Assert(category <= result.CompleteCategory);
+                Tracer.Assert(result == null || category <= result.CompleteCategory);
                 return ReturnMethodDump(result);
             }
             finally
@@ -103,17 +97,73 @@ namespace Reni.Context
         }
 
         [DebuggerHidden]
-        ResultCache CreateCacheElement(CompileSyntax syntax)
+        ResultCache GetResultCacheForCache(CompileSyntax syntax)
         {
-            var result = new ResultCache(category => ResultForCache(category, syntax));
+            var result = new ResultCache
+                (new ResultProvider(this, syntax, (co, ca, sy) => co.ResultForCache(ca, sy), ""));
             syntax.AddToCacheForDebug(this, result);
             return result;
         }
 
-        internal TypeBase Type(CompileSyntax syntax) => Result(Category.Type, syntax).Type;
+        sealed class ResultProvider : ResultCache.IResultProvider
+        {
+            [EnableDump]
+            string Title { get; }
 
-        internal virtual CompoundView ObtainRecentCompoundView() => null;
-        internal virtual IFunctionContext ObtainRecentFunctionContext() => null;
+            [EnableDump]
+            string ContextId => Context.NodeDump;
+
+            [EnableDump]
+            string SyntaxId => Syntax.NodeDump;
+
+            ContextBase Context { get; }
+            CompileSyntax Syntax { get; }
+
+            Func<ContextBase, Category, CompileSyntax, Result> ResultFunc { get; }
+
+            internal ResultProvider
+                (
+                ContextBase context,
+                CompileSyntax syntax,
+                Func<ContextBase, Category, CompileSyntax, Result> resultFunc,
+                string title
+                )
+            {
+                Context = context;
+                Syntax = syntax;
+                ResultFunc = resultFunc;
+                Title = title;
+            }
+
+            Result ResultCache.IResultProvider.Execute(Category category)
+                => ResultFunc(Context, category, Syntax);
+
+            object ResultCache.IResultProvider.Target => this;
+        }
+
+        ResultCache GetResultAsReferenceCacheForCache(CompileSyntax syntax)
+            => new ResultCache
+                (
+                new ResultProvider
+                    (
+                    this,
+                    syntax,
+                    (co, ca, sy) => co.ResultAsReference(ca, sy),
+                    "as Reference"
+                    )
+                );
+
+        internal virtual CompoundView ObtainRecentCompoundView()
+        {
+            NotImplementedMethod();
+            return null;
+        }
+
+        internal virtual IFunctionContext ObtainRecentFunctionContext()
+        {
+            NotImplementedMethod();
+            return null;
+        }
 
         sealed class Cache : DumpableObject, IIconKeyProvider
         {
@@ -127,11 +177,13 @@ namespace Reni.Context
 
             [Node]
             [SmartNode]
-            internal readonly FunctionCache<CompoundSyntax, FunctionCache<int, ContextBase>> CompoundContexts;
+            internal readonly FunctionCache<CompoundSyntax, FunctionCache<int, ContextBase>>
+                CompoundContexts;
 
             [Node]
             [SmartNode]
-            internal readonly FunctionCache<CompoundSyntax, FunctionCache<int, CompoundView>> CompoundViews;
+            internal readonly FunctionCache<CompoundSyntax, FunctionCache<int, CompoundView>>
+                CompoundViews;
 
             [Node]
             [SmartNode]
@@ -141,17 +193,33 @@ namespace Reni.Context
             [SmartNode]
             internal readonly FunctionCache<CompileSyntax, ResultCache> ResultCache;
 
+            [Node]
+            [SmartNode]
+            internal readonly FunctionCache<CompileSyntax, ResultCache> ResultAsReferenceCache;
+
+            [Node]
+            [SmartNode]
+            internal readonly ValueCache<RecursionContext> RecursionContext;
+
             public Cache(ContextBase target)
             {
-                ResultCache = new FunctionCache<CompileSyntax, ResultCache>(target.CreateCacheElement);
-                CompoundContexts = new FunctionCache<CompoundSyntax, FunctionCache<int, ContextBase>>
+                ResultCache = new FunctionCache<CompileSyntax, ResultCache>
+                    (target.GetResultCacheForCache);
+                ResultAsReferenceCache = new FunctionCache<CompileSyntax, ResultCache>
+                    (target.GetResultAsReferenceCacheForCache);
+                CompoundContexts = new FunctionCache
+                    <CompoundSyntax, FunctionCache<int, ContextBase>>
                     (
                     container =>
                         new FunctionCache<int, ContextBase>
-                            (position => new CompoundViewContext(target, target.CompoundView(container, position)))
+                            (
+                            position =>
+                                new CompoundViewContext
+                                    (target, target.CompoundView(container, position)))
                     );
                 RecentStructure = new ValueCache<CompoundView>(target.ObtainRecentCompoundView);
-                RecentFunctionContextObject = new ValueCache<IFunctionContext>(target.ObtainRecentFunctionContext);
+                RecentFunctionContextObject = new ValueCache<IFunctionContext>
+                    (target.ObtainRecentFunctionContext);
                 CompoundViews = new FunctionCache<CompoundSyntax, FunctionCache<int, CompoundView>>
                     (
                     container =>
@@ -174,11 +242,6 @@ namespace Reni.Context
             => FindRecentFunctionContextObject
                 .CreateArgReferenceResult(category);
 
-        internal Result ArgsResult(Category category, [CanBeNull] CompileSyntax right)
-            => right == null
-                ? RootContext.VoidType.Result(category.Typed)
-                : right.SmartUnFunctionedReferenceResult(this, category);
-
         /// <summary>
         ///     Obtains the feature result of a functional argument object.
         ///     Actual arguments, if provided, as well as object reference are replaced.
@@ -189,8 +252,10 @@ namespace Reni.Context
         internal Result FunctionalArgResult(Category category, CompileSyntax right)
         {
             var argsType = FindRecentFunctionContextObject.ArgsType;
-            var functionalArgDescriptor = new ContextSearchResult(argsType.CheckedFeature, RootContext);
-            return functionalArgDescriptor.Execute(category, argsType.FindRecentCompoundView.ObjectPointerViaContext, this, right);
+            var functionalArgDescriptor = new ContextSearchResult
+                (argsType.CheckedFeature, RootContext);
+            return functionalArgDescriptor.Execute
+                (category, argsType.FindRecentCompoundView.ObjectPointerViaContext, this, right);
         }
 
         ContextSearchResult Declarations(Definable tokenClass)
@@ -204,31 +269,46 @@ namespace Reni.Context
             return null;
         }
 
-        internal Result PrefixResult(Category category, Definable definable, SourcePart source, CompileSyntax right)
+        internal Result PrefixResult
+            (Category category, Definable definable, SourcePart source, CompileSyntax right)
         {
             var searchResult = Declarations(definable);
             if(searchResult == null)
                 return RootContext.UndefinedSymbol(source).Result(category);
 
-            var result = searchResult.Execute(category, FindRecentCompoundView.ObjectPointerViaContext, this, right);
+            var result = searchResult.Execute
+                (category, FindRecentCompoundView.ObjectPointerViaContext, this, right);
             Tracer.Assert(category <= result.CompleteCategory);
             return result;
         }
 
-        internal virtual IEnumerable<ContextSearchResult> Declarations<TDefinable>(TDefinable tokenClass)
+        internal virtual IEnumerable<ContextSearchResult> Declarations<TDefinable>
+            (TDefinable tokenClass)
             where TDefinable : Definable
         {
             var provider = this as ISymbolProviderForPointer<TDefinable, IFeatureImplementation>;
             var feature = provider?.Feature(tokenClass);
             if(feature != null)
-                yield return new 
+                yield return new
                     ContextSearchResult(feature, RootContext);
         }
+
         public IssueType UndefinedSymbol(SourcePart source)
             =>
                 new RootIssueType
                     (
                     new Issue(IssueId.UndefinedSymbol, source, "Context: " + Dump()),
                     RootContext);
+    }
+
+    sealed class RecursionContext : Child
+    {
+        internal RecursionContext(ContextBase parent)
+            : base(parent) { }
+
+        protected override string GetContextChildIdentificationDump() => "recursion";
+
+        [DisableDump]
+        internal override bool IsRecursionMode => true;
     }
 }

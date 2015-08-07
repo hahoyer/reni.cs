@@ -48,11 +48,7 @@ namespace Reni.Parser
         internal void AddToCacheForDebug(ContextBase context, object cacheItem)
             => _resultCache.Add(context, cacheItem);
 
-        internal Result Result(ContextBase context) => Result(context, Category.All);
-
-        //[DebuggerHidden]
-        internal Result Result(ContextBase context, Category category)
-            => context.Result(category, this);
+        internal Result Result(ContextBase context) => context.Result(Category.All, this);
 
         internal BitsConst Evaluate(ContextBase context)
             => Result(context).Evaluate(context.RootContext.ExecutionContext);
@@ -70,18 +66,13 @@ namespace Reni.Parser
 
         internal CodeBase Code(ContextBase context)
         {
-            var result = Result(context, Category.Code).Code;
+            var result = context.Result(Category.Code, this).Code;
             Tracer.Assert(result != null);
             return result;
         }
 
-        [DebuggerHidden]
-        internal TypeBase Type(ContextBase context)
-        {
-            var result = Result(context, Category.Type).Type;
-            Tracer.Assert(result != null);
-            return result;
-        }
+        //[DebuggerHidden]
+        internal TypeBase Type(ContextBase context) => context.Result(Category.Type, this)?.Type;
 
         internal bool HllwStructureElement(ContextBase context)
         {
@@ -96,14 +87,9 @@ namespace Reni.Parser
             return Type(context).SmartUn<FunctionType>().Hllw;
         }
 
-        internal Result SmartUnFunctionedReferenceResult(ContextBase context, Category category)
-        {
-            var result = Result(context, category.Typed);
-            return result?.SmartUn<FunctionType>().LocalReferenceResult;
-        }
-
         internal virtual Result PendingResultForCache(ContextBase context, Category category)
         {
+
             NotImplementedMethod(context, category);
             return null;
         }

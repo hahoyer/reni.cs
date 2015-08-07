@@ -27,15 +27,15 @@ namespace Reni.Feature
             if(simpleFeature != null && right == null)
                 return simpleFeature.Result(category);
 
-            var rightResult = new ResultCache
-                (
-                c => right == null
-                    ? RootContext.VoidType.Result(c)
-                    : context.ResultAsReference(c, right));
+            var rightResult =right == null
+                ? RootContext.VoidType.Result(Category.All)
+                :context.ResultAsReferenceCache(right);
 
-            return Feature
+            var applyResult = Feature
                 .Function
-                .ApplyResult(category, rightResult.Type)
+                .ApplyResult(category, rightResult.Type);
+
+            return applyResult
                 .ReplaceArg(rightResult);
         }
 
@@ -84,6 +84,9 @@ namespace Reni.Feature
             try
             {
                 var result1 = ResultForDebug(category.Typed, context, right);
+                if(result1 == null)
+                    return ReturnMethodDump<Result>(null);
+
                 var result = result1
                     .ReplaceAbsolute(ConverterPath.Destination.CheckedReference, ConverterPath.Execute);
 
@@ -125,5 +128,7 @@ namespace Reni.Feature
             return Result(category, context, right)
                 .ReplaceArg(objectReference);
         }
+
+        public TypeBase PrudentExecute(TypeBase objectPointerViaContext, ContextBase contextBase, CompileSyntax right) { throw new NotImplementedException(); }
     }
 }

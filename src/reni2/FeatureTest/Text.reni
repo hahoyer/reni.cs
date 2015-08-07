@@ -40,54 +40,51 @@ system:
     result
 };
 
-Text:
+Text: /\
 {
-    Create: /\
+    value: ^.
+
+    result:
     {
-        elementTypeOfArg: ^ type item.
+        item : data (^) := new_value /\ data (^).
+        this: ^^.
+        count: ^ count.
 
-        result:
+        data: system NewMemory
+        (
+            elementType: value type item.
+            count: value count.
+            initializer: /\ value item(^)
+        ).
+
+        dump_print: /!\
         {
-            ! mix_in : data item(^) := new_value /\ data item(^).
-            this: ^^.
-            count: ^ count.
+            !mutable position: count type instance(0);
 
-            data: system NewMemory
+            repeat
             (
-                elementType: elementTypeOfArg.
-                count: this count.
-                initializer: /\ data item(^)
-            ).
+                while: /\ position < count,
 
-            dump_print: /!\
-            {
-                !mutable position: count type instance(0);
-
-                repeat
+                body: /\
                 (
-                    while: /\ position < count,
-
-                    body: /\
-                    (
-                        data(position) dump_print,
-                        position :=(position + 1) enable_cut
-                    )
+                    data(position) dump_print,
+                    position :=(position + 1) enable_cut
                 )
-            }.
+            )
+        }.
 
-            << : /\ concat(count: ^ count, data: ^ data).
+        << : /\ concat(count: ^ count, data: ^ data).
 
-            concat: /\
-            Create
-            {
-                other: ^;
-                count: this count + other count;
+        concat: /\
+        Text
+        {
+            other: ^;
+            count: this count + other count;
 
-                data: /\ ^ < this count
-                then this data(^)
-                else other data(^ - this count);
-            }
+            ! mix_in : /\ ^ < this count
+            then this data item(^)
+            else other data item(^ - this count);
         }
     }
-    result
 }
+result

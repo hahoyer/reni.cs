@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using hw.Helper;
 using System.Linq;
 using hw.Debug;
 using hw.Forms;
+using hw.Helper;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
@@ -34,8 +34,39 @@ namespace Reni.Struct
 
         public string GetCompoundIdentificationDump() => "." + ObjectId + "i";
         [Node]
-        [DisableDump]
+        [EnableDump]
         internal CompileSyntax[] Statements => _data.Select(s => s.Statement).ToArray();
+
+        [EnableDump]
+        internal IDictionary<string, int> NameIndex
+            => _data
+                .SelectMany
+                (
+                    (statement, index) => statement.Names.Select
+                        (
+                            name => new
+                            {
+                                Key = name,
+                                Value = index
+                            }
+                        )
+                )
+                .ToDictionary(item => item.Key, item => item.Value);
+
+        [EnableDump]
+        internal int[] Mutables => IndexList(item => item.IsMutable).ToArray();
+        [EnableDump]
+        internal int[] Converters => IndexList(item=>item.IsConverter).ToArray();
+        [EnableDump]
+        internal int[] MixIns => IndexList(item => item.IsMixIn).ToArray();
+
+        IEnumerable<int> IndexList(Func<Data,bool> selector )
+        {
+            for(var index = 0; index < _data.Length; index++)
+                if(selector(_data[index]))
+                    yield return index;
+        }
+
         [DisableDump]
         internal int EndPosition => Statements.Length;
         [DisableDump]
@@ -55,7 +86,7 @@ namespace Reni.Struct
                 .ToArray();
 
         [DisableDump]
-        public IEnumerable<FunctionSyntax> Converters
+        public IEnumerable<FunctionSyntax> ConverterFunctions
             => _data
                 .Where(data => data.IsConverter)
                 .Select(data => (FunctionSyntax) data.Statement);
@@ -108,7 +139,7 @@ namespace Reni.Struct
         {
             if(name == null)
                 return null;
-            var result = _data.SingleOrDefault(s => s.Defines(name));
+            var result = _data.SingleOrDefault(s => s.IsDefining(name));
             if(result == null)
                 return null;
 
@@ -138,13 +169,15 @@ namespace Reni.Struct
 
             public CompileSyntax Statement => StatementCache.Value.Value;
             public Issue[] Issues => StatementCache.Value.Issues;
-            public bool Defines(string name) => Names.Contains(name);
+            public bool IsDefining(string name) => Names.Contains(name);
             public bool IsConverter => RawStatement.IsConverterSyntax;
+            public bool IsMixIn => RawStatement.IsMixInSyntax;
             public IEnumerable<string> Names => NamesCache.Value;
             public bool IsMutable => RawStatement.IsMutableSyntax;
 
             Checked<CompileSyntax> GetStatement()
                 => RawStatement.ContainerStatementToCompileSyntax;
+
             string[] GetNames() => RawStatement.GetDeclarations().ToArray();
         }
 
@@ -152,6 +185,7 @@ namespace Reni.Struct
         {
             internal int Value { get; }
             internal Position(int value) { Value = value; }
+
             internal AccessFeature Convert(CompoundView accessPoint)
                 => accessPoint.AccessFeature(Value);
         }

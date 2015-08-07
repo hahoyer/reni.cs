@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 using hw.Debug;
 using hw.Helper;
+using hw.Parser;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
@@ -87,5 +88,7 @@ namespace Reni.TokenClasses
                 return null;
             return new FunctionBodyType(compoundView, this);
         }
+
+        protected override string GetNodeDump() => Setter?.NodeDump ?? "" + Tag + Getter.NodeDump;
     }
 }

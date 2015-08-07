@@ -14,12 +14,15 @@ namespace Reni
     sealed class CondSyntax : CompileSyntax
     {
         [Node]
+        [EnableDump]
         readonly CompileSyntax Cond;
 
         [Node]
+        [EnableDump]
         readonly CompileSyntax Then;
 
         [Node]
+        [EnableDump]
         readonly CompileSyntax Else;
 
         internal CondSyntax
@@ -43,6 +46,7 @@ namespace Reni
             Else = elseSyntax;
         }
 
+        [DisableDump]
         protected override IEnumerable<Syntax> DirectChildren
         {
             get
@@ -56,8 +60,7 @@ namespace Reni
         internal override Result ResultForCache(ContextBase context, Category category)
             => InternalResult(context, category);
 
-        Result CondResult(ContextBase context, Category category) => Cond
-            .Result(context, category.Typed)
+        Result CondResult(ContextBase context, Category category) => context.Result(category.Typed, Cond)
             .Conversion(context.RootContext.BitType.Align)
             .LocalBlock(category.Typed)
             .Conversion(context.RootContext.BitType);
@@ -74,8 +77,11 @@ namespace Reni
 
         Result BranchResult(ContextBase context, Category category, CompileSyntax syntax)
         {
-            var branchResult = syntax
-                .Result(context, category.Typed).AutomaticDereferenceResult;
+            var result = context.Result(category.Typed, syntax);
+            if(result == null)
+                return null;
+
+            var branchResult = result.AutomaticDereferenceResult;
 
             var commonType = CommonType(context);
             return branchResult.Type
@@ -96,6 +102,7 @@ namespace Reni
             var condResult = CondResult(context, category);
             var thenResult = ThenResult(context, branchCategory);
             var elseResult = ElseResult(context, branchCategory);
+            Tracer.ConditionalBreak(elseResult == null);
             return commonType
                 .Result
                 (
@@ -110,10 +117,13 @@ namespace Reni
             if(Else == null)
                 return context
                     .RootContext.VoidType;
-            return Then
-                .Type(context)
-                .CommonType(Else.Type(context))
-                .Align;
+            var thenType = Then.Type(context);
+            var elseType = Else.Type(context);
+            if(thenType == null)
+                return elseType.Align;
+            if(elseType == null)
+                return thenType.Align;
+            return thenType.CommonType(elseType).Align;
         }
 
         internal override Syntax CreateElseSyntax(CompileSyntax elseSyntax)

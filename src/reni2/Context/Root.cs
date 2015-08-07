@@ -27,6 +27,7 @@ namespace Reni.Context
         [Node]
         internal readonly IExecutionContext ExecutionContext;
 
+        readonly ValueCache<RecursionType> _recursionTypeCache;
         readonly ValueCache<BitType> _bitCache;
         readonly ValueCache<VoidType> _voidCache;
         readonly ValueCache<IFeatureImplementation> _minusFeatureCache;
@@ -35,6 +36,7 @@ namespace Reni.Context
 
         internal Root(IExecutionContext executionContext)
         {
+            _recursionTypeCache = new ValueCache<RecursionType>(()=>new RecursionType(this));
             _metaDictionary = new FunctionCache<string, CompileSyntax>(CreateMetaDictionary);
             ExecutionContext = executionContext;
             _bitCache = new ValueCache<BitType>(() => new BitType(this));
@@ -69,8 +71,15 @@ namespace Reni.Context
         internal override Root RootContext => this;
 
         [DisableDump]
+        internal override bool IsRecursionMode => false;
+
+        [DisableDump]
         [Node]
         internal BitType BitType => _bitCache.Value;
+
+        [DisableDump]
+        [Node]
+        internal RecursionType RecursionType => _recursionTypeCache.Value;
 
         [DisableDump]
         [Node]
@@ -82,6 +91,7 @@ namespace Reni.Context
         internal static RefAlignParam DefaultRefAlignParam
             => new RefAlignParam(BitsConst.SegmentAlignBits, Size.Create(32));
 
+        [DisableDump]
         public bool ProcessErrors => ExecutionContext.ProcessErrors;
 
         IFeatureImplementation ISymbolProviderForPointer<Minus, IFeatureImplementation>.Feature

@@ -12,7 +12,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    abstract class FunctionInstance : DumpableObject
+    abstract class FunctionInstance : DumpableObject, ResultCache.IResultProvider
     {
         [DisableDump]
         protected readonly FunctionType Parent;
@@ -30,7 +30,7 @@ namespace Reni.Struct
             Parent = parent;
             _bodyCodeCache = new ValueCache<CodeBase>(ObtainBodyCode);
             _contextCache = new ValueCache<ContextBase>(ObtainContext);
-            _resultCache = new ResultCache(ObtainResult);
+            _resultCache = new ResultCache(this);
         }
 
         [Node]
@@ -46,7 +46,7 @@ namespace Reni.Struct
         {
             get
             {
-                var result = _resultCache.CodeArgs;
+                var result = _resultCache.Exts;
                 if(result == null) // Recursive call 
                     return CodeArgs.Void(); // So, that nothing will be added from this site
                 Tracer.Assert(result != null);
@@ -77,6 +77,8 @@ namespace Reni.Struct
         internal Result CallResult(Category category)
         {
             var result = _resultCache & category.FunctionCall;
+            if(result == null)
+                return null;
 
             if(category.HasExts)
                 result.Exts = CodeArgs.Arg();
@@ -95,14 +97,13 @@ namespace Reni.Struct
             if(IsStopByObjectIdActive)
                 return null;
 
-            var trace = FunctionId.Index == -3 && FunctionId.IsGetter && category.HasCode;
+            var trace = FunctionId.Index == -2 && FunctionId.IsGetter && category.HasType;
             StartMethodDump(trace, category);
             try
             {
-                if(trace)
-                    category = category | Category.Code;
                 BreakExecution();
                 var rawResult = Context.Result(category.Typed, _body);
+
                 Tracer.Assert(rawResult.CompleteCategory == category.Typed);
                 if(rawResult.FindArgs != null)
                     Tracer.Assert(!rawResult.SmartArgs.Contains(CodeArgs.Arg()), rawResult.Dump);
@@ -173,5 +174,8 @@ namespace Reni.Struct
 
         ContextBase ObtainContext() => Parent.CreateSubContext(!IsGetter);
         bool IsGetter => FunctionId.IsGetter;
+
+        Result ResultCache.IResultProvider.Execute(Category category) => ObtainResult(category);
+        object ResultCache.IResultProvider.Target => this;
     }
 }

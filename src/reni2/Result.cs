@@ -10,7 +10,6 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Struct;
 using Reni.Type;
 
 namespace Reni
@@ -196,7 +195,8 @@ namespace Reni
 
         [Node]
         [EnableDumpWithExceptionPredicate]
-        public Category CompleteCategory => Category.CreateCategory(HasHllw, HasSize, HasType, HasCode, HasExts);
+        public Category CompleteCategory
+            => Category.CreateCategory(HasHllw, HasSize, HasType, HasCode, HasExts);
 
         [Node]
         [DebuggerHidden]
@@ -237,7 +237,11 @@ namespace Reni
         [Node]
         internal CodeBase Code
         {
-            [DebuggerHidden] get { return _code; }
+            [DebuggerHidden]
+            get
+            {
+                return _code;
+            }
             [DebuggerHidden]
             set
             {
@@ -429,6 +433,7 @@ namespace Reni
                 return false;
             }
         }
+
         public Category PendingCategory
         {
             get { return _pendingCategory; }
@@ -487,7 +492,14 @@ namespace Reni
 
         Result Filter(Category category)
         {
-            return new Result(CompleteCategory & category, () => Hllw.Value, () => Size, () => Type, () => Code, () => Exts)
+            return new Result
+                (
+                CompleteCategory & category,
+                () => Hllw.Value,
+                () => Size,
+                () => Type,
+                () => Code,
+                () => Exts)
             {
                 _pendingCategory = _pendingCategory & category
             };
@@ -570,6 +582,20 @@ namespace Reni
             IsDirty = false;
         }
 
+        internal void Reset(Category category)
+        {
+            if(category.HasHllw)
+                Hllw = null;
+            if(category.HasSize)
+                Size = null;
+            if(category.HasType)
+                Type = null;
+            if(category.HasCode)
+                Code = null;
+            if(category.HasExts)
+                Exts = null;
+        }
+
         Result Sequence(Result second)
         {
             var result = Clone;
@@ -577,8 +603,11 @@ namespace Reni
             return result;
         }
 
-        internal Result ReplaceArg(ResultCache resultCache) => HasArg ? InternalReplaceArg(resultCache) : this;
-        internal Result ReplaceArg(Func<Category, Result> getArgs) => HasArg ? InternalReplaceArg(new ResultCache(getArgs)) : this;
+        internal Result ReplaceArg(ResultCache resultCache)
+            => HasArg ? InternalReplaceArg(resultCache) : this;
+
+        internal Result ReplaceArg(Func<Category, Result> getArgs)
+            => HasArg ? InternalReplaceArg(new ResultCache(getArgs)) : this;
 
         Result InternalReplaceArg(ResultCache getResultForArg)
         {
@@ -616,7 +645,7 @@ namespace Reni
             if(HasExts && !Exts.Contains(refInCode))
                 return this;
 
-            if (!HasCode && !HasExts)
+            if(!HasCode && !HasExts)
                 return this;
 
             var result = new Result
@@ -667,10 +696,15 @@ namespace Reni
             if(HasExts && !Exts.Contains(refInCode))
                 return this;
 
-            if (!HasCode && !HasExts)
+            if(!HasCode && !HasExts)
                 return this;
 
-            var result = new Result {Hllw = Hllw, Size = Size, Type = Type};
+            var result = new Result
+            {
+                Hllw = Hllw,
+                Size = Size,
+                Type = Type
+            };
             if(HasCode)
                 result.Code = Code.ReplaceRelative(refInCode, replacementCode);
             if(HasExts)
@@ -781,7 +815,7 @@ namespace Reni
             {
                 if(!HasCode && !HasType && !HasSize)
                     return this;
-                if (Type.Hllw)
+                if(Type.Hllw)
                     return this;
                 if(Type is IReference)
                     return this;
@@ -790,9 +824,6 @@ namespace Reni
                     .ReplaceArg(this);
             }
         }
-
-        internal Result ContextViaObjectPointer(CompoundView accessPoint) => accessPoint
-            .ContextViaObjectPointer(this);
 
         [DebuggerHidden]
         internal void AssertVoidOrValidReference()
@@ -846,7 +877,10 @@ namespace Reni
                 Tracer.Assert(Type is PointerType, () => "Expected type: PointerType\n" + Dump());
         }
 
-        internal Result AddToReference(Func<Size> func) { return Change(code => code.ReferencePlus(func())); }
+        internal Result AddToReference(Func<Size> func)
+        {
+            return Change(code => code.ReferencePlus(func()));
+        }
 
         Result Change(Func<CodeBase, CodeBase> func)
         {

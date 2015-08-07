@@ -8,7 +8,6 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.TokenClasses;
 using Reni.Type;
-using Reni.Validation;
 
 namespace Reni.Parser
 {
@@ -60,7 +59,7 @@ namespace Reni.Parser
             if(Left == null)
                 return context.PrefixResult(category, Definable, Token, Right);
 
-            var left = new ResultCache(c => context.ResultAsReference(c, Left));
+            var left = context.ResultAsReferenceCache(Left);
 
             var typeForSearch = left.Type;
             var searchResults
@@ -97,14 +96,13 @@ namespace Reni.Parser
 
         protected override string GetNodeDump()
         {
-            var result = base.GetNodeDump();
+            var result = Token.Id;
             if(Left != null)
                 result = "(" + Left.NodeDump + ")" + result;
             if(Right != null)
                 result += "(" + Right.NodeDump + ")";
             return result;
         }
-
     }
 
     // Lord of the weed

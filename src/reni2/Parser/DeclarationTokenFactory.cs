@@ -14,7 +14,7 @@ namespace Reni.Parser
             get
             {
                 var prioTable = PrioTable.Left(PrioTable.BeginOfText);
-                prioTable += PrioTable.Left("converter", "mutable");
+                prioTable += PrioTable.Left("converter", "mutable", "mix_in");
                 prioTable = prioTable.ParenthesisLevelLeft
                     (
                         new[]

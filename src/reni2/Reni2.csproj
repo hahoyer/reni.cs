@@ -214,6 +214,7 @@
     <Compile Include="ParserTest\SimpleTokenFactory.cs" />
     <Compile Include="ParserTest\PrioTableTest.cs" />
     <Compile Include="ParserTest\Services.cs" />
+    <Compile Include="Parser\RecursionType.cs" />
     <Compile Include="ReniObjectExtender.cs" />
     <Compile Include="Parser\Extension.cs" />
     <Compile Include="Parser\ExclamationBoxToken.cs" />
@@ -401,7 +402,9 @@
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>CSharp_Generated.cs</LastGenOutput>
     </None>
-    <None Include="FeatureTest\Text.reni" />
+    <None Include="FeatureTest\Text.reni">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="hw\CSharp.Exe.targets" />
     <None Include="packages.config" />
     <None Include="sys.targets" />

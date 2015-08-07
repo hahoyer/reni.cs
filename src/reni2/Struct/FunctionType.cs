@@ -70,7 +70,8 @@ namespace Reni.Struct
         {
             get
             {
-                var result = ValueType.DumpPrintText;
+                var valueType = ValueType;
+                var result = valueType?.DumpPrintText??"<unknown>";
                 result += " /\\(";
                 result += ArgsType.DumpPrintText;
                 result += ")";

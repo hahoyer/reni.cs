@@ -88,6 +88,8 @@ namespace Reni.Parser
         internal virtual bool IsMutableSyntax => false;
         [DisableDump]
         internal virtual bool IsConverterSyntax => false;
+        [DisableDump]
+        internal virtual bool IsMixInSyntax => false;
 
         internal virtual Checked<Syntax> SuffixedBy(Definable definable, SourcePart token)
         {

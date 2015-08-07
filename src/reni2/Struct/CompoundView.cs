@@ -99,7 +99,7 @@ namespace Reni.Struct
         internal IEnumerable<ISimpleFeature> ConverterFeatures
             => Compound
                 .Syntax
-                .Converters
+                .ConverterFunctions
                 .Select(body => Function(body, RootContext.VoidType));
 
         public string DumpPrintTextOfType

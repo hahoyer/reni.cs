@@ -106,13 +106,14 @@ namespace Reni.Type
 
         Result OperationResult(Category category, TypeBase right, IOperation operation)
         {
-            var destination = ConversionService.FindPathDestination<NumberType>(right);
+            var enumerable = ConversionService.FindPathDestination<NumberType>(right);
+            if(enumerable == null)
+                return null;
+
+            var destination = enumerable.SingleOrDefault();
             if(destination != null)
-            {
-                var conversion = right.Conversion(Category.Code, destination).Code;
                 return OperationResult(category, operation, destination)
                     .ReplaceArg(c => right.Conversion(c, destination.Pointer));
-            }
 
             NotImplementedMethod(category, right, operation);
             return null;
@@ -152,11 +153,6 @@ namespace Reni.Type
                 .NumberOperation(token, resultSize, Align.Size, right.Align.Size);
         }
 
-        Result ConversionAsReference(Category category, NumberType destination) => destination
-            .FlatConversion(category, this)
-            .ReplaceArg(UnalignedDereferencePointerResult)
-            .LocalReferenceResult;
-
         Result FlatConversion(Category category, NumberType source)
         {
             if(Bits == source.Bits)
@@ -183,9 +179,6 @@ namespace Reni.Type
                     CodeArgs.Arg
                 );
         }
-
-        Result UnalignedDereferencePointerResult(Category category)
-            => SmartPointer.ArgResult(category.Typed).DereferenceResult & category;
 
         internal interface IOperation
         {

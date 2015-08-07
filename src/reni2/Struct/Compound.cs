@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
-using hw.Helper;
 using System.Linq;
 using hw.Debug;
 using hw.Forms;
+using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Type;
-
 
 namespace Reni.Struct
 {
@@ -31,7 +30,9 @@ namespace Reni.Struct
         }
 
         public string GetCompoundIdentificationDump() => Syntax.GetCompoundIdentificationDump();
-        protected override string GetNodeDump() => base.GetNodeDump() + "(" + GetCompoundIdentificationDump() + ")";
+
+        protected override string GetNodeDump()
+            => base.GetNodeDump() + "(" + GetCompoundIdentificationDump() + ")";
 
         int IContextReference.Order => _order;
         Size IContextReference.Size => Root.DefaultRefAlignParam.RefSize;
@@ -57,9 +58,12 @@ namespace Reni.Struct
         internal bool Hllw(int accessPosition) => ObtainHllw(accessPosition);
 
         internal Result ContextViaObjectPointer(int position, Result result)
-            => result.ReplaceAbsolute(this, () => ContextViaObjectPointerCode(position), CodeArgs.Arg);
+            =>
+                result.ReplaceAbsolute
+                    (this, () => ContextViaObjectPointerCode(position), CodeArgs.Arg);
 
-        internal Size SizeUntil(int position) => ResultsOfStatements(Category.Size, 0, position).Size;
+        internal Size SizeUntil(int position)
+            => ResultsOfStatements(Category.Size, 0, position).Size;
 
         CodeBase ContextViaObjectPointerCode(int accessPosition)
             => Parent
@@ -97,7 +101,10 @@ namespace Reni.Struct
                 Dump("results", results);
                 BreakExecution();
                 var result = results
-                    .Aggregate(Parent.RootContext.VoidType.Result(category), (current, next) => current + next);
+                    .Aggregate
+                    (
+                        Parent.RootContext.VoidType.Result(category),
+                        (current, next) => current + next);
                 return ReturnMethodDump(result);
             }
             finally
@@ -108,11 +115,12 @@ namespace Reni.Struct
 
         internal Result Result(Category category)
         {
-            bool trace = Syntax.ObjectId == -10 && category.HasCode;
+            var trace = Syntax.ObjectId == -10 && category.HasCode;
             StartMethodDump(trace, category);
             try
             {
-                var resultsOfStatements = ResultsOfStatements(category - Category.Type, 0, Syntax.EndPosition);
+                var resultsOfStatements = ResultsOfStatements
+                    (category - Category.Type, 0, Syntax.EndPosition);
 
                 Dump("resultsOfStatements", resultsOfStatements);
                 BreakExecution();
@@ -133,7 +141,8 @@ namespace Reni.Struct
             }
         }
 
-        Result Combine(Result result, int position) => Parent.CompoundView(Syntax, position).ReplaceObjectPointerByContext(result);
+        Result Combine(Result result, int position)
+            => Parent.CompoundView(Syntax, position).ReplaceObjectPointerByContext(result);
 
         Result AccessResult(Category category, int position)
         {
@@ -143,22 +152,22 @@ namespace Reni.Struct
 
         Result AccessResult(Category category, int accessPosition, int position)
         {
-            var trace = Syntax.ObjectId.In(-1) && accessPosition >= 0 && position >= 0 && category.HasCode;
+            var trace = Syntax.ObjectId.In()
+                && accessPosition == 3
+                && position == 3
+                && category == Category.Type;
             StartMethodDump(trace, category, accessPosition, position);
             try
             {
-                var uniqueChildContext = Parent
-                    .CompoundPositionContext(Syntax, accessPosition);
-                Dump("Statements[position]", Syntax.Statements[position]);
+                var uniqueChildContext = Parent.CompoundPositionContext(Syntax, accessPosition);
+                Dump(nameof(Syntax.Statements), Syntax.Statements[position]);
                 BreakExecution();
-                var result1 = Syntax.Statements[position]
-                    .Result(uniqueChildContext, category.Typed);
-                Dump("result1", result1);
+                var rawResult = uniqueChildContext.Result
+                    (category.Typed, Syntax.Statements[position]);
+                Dump(nameof(rawResult), rawResult);
                 BreakExecution();
-                var result = result1
-                    .SmartUn<FunctionType>();
-                Dump("result", result);
-                return ReturnMethodDump(result.AutomaticDereferenceResult);
+                var result = rawResult.SmartUn<FunctionType>().AutomaticDereferenceResult;
+                return ReturnMethodDump(result);
             }
             finally
             {
@@ -187,7 +196,8 @@ namespace Reni.Struct
                 BreakExecution();
                 if(quickNonDataLess.Length == 0)
                     return ReturnMethodDump(true);
-                if(quickNonDataLess.Any(position => InternalInnerHllwStructureElement(position) == false))
+                if(quickNonDataLess.Any
+                    (position => InternalInnerHllwStructureElement(position) == false))
                     return ReturnMethodDump(false);
                 return ReturnMethodDump(true);
             }

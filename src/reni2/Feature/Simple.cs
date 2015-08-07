@@ -27,11 +27,13 @@ namespace Reni.Feature
         TypeBase ISimpleFeature.TargetType => Target;
 
         protected override string GetNodeDump()
-            => Target.DumpPrintText
+        {
+            return Target.DumpPrintText
                 + "-->"
-                + Function(Category.Type).Type.DumpPrintText
+                + (Function(Category.Type).Type?.DumpPrintText ?? "<unknown>" )
                 + " MethodName="
                 + Function.Method.Name;
+        }
     }
 
     sealed class Simple : SimpleBase, IFeatureImplementation

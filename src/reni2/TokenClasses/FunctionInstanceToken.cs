@@ -12,10 +12,9 @@ namespace Reni.TokenClasses
         public const string TokenId = "function_instance";
         public override string Id => TokenId;
         public override Result Result(ContextBase context, Category category, CompileSyntax left)
-            => left
-                .Result(context, category.Typed)
+            => context.Result(category.Typed, left)
                 .Type
                 .FunctionInstance
-                .Result(category, left.Result(context, category.Typed));
+                .Result(category, context.Result(category.Typed, left));
     }
 }

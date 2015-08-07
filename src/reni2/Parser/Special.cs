@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Forms;
-using hw.Parser;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
@@ -12,11 +11,7 @@ using Reni.Validation;
 
 namespace Reni.Parser
 {
-    abstract class SpecialSyntax : CompileSyntax
-    {
-        protected SpecialSyntax(IToken token) { }
-        protected SpecialSyntax() { }
-    }
+    abstract class SpecialSyntax : CompileSyntax {}
 
     sealed class TerminalSyntax : SpecialSyntax
     {
@@ -38,6 +33,8 @@ namespace Reni.Parser
 
         [DisableDump]
         internal long ToNumber => BitsConst.Convert(Id).ToInt64();
+
+        protected override string GetNodeDump() => Terminal.NodeDump();
     }
 
     sealed class PrefixSyntax : SpecialSyntax
@@ -62,7 +59,7 @@ namespace Reni.Parser
         internal override Result ResultForCache(ContextBase context, Category category) => _prefix
             .Result(context, category, this, _right);
 
-        protected override string GetNodeDump() => base.GetNodeDump() + "(" + _right.NodeDump + ")";
+        protected override string GetNodeDump() => _prefix.NodeDump() + "(" + _right.NodeDump + ")";
         protected override IEnumerable<Syntax> DirectChildren { get { yield return _right; } }
     }
 
@@ -117,7 +114,7 @@ namespace Reni.Parser
             var result = "(";
             result += _left.NodeDump;
             result += ")";
-            result += base.GetNodeDump();
+            result += _infix.NodeDump();
             result += "(";
             result += _right.NodeDump;
             result += ")";
@@ -172,7 +169,7 @@ namespace Reni.Parser
         internal override Result ResultForCache(ContextBase context, Category category) => _suffix
             .Result(context, category, _left);
 
-        protected override string GetNodeDump() => "(" + _left.NodeDump + ")" + base.GetNodeDump();
+        protected override string GetNodeDump() => "(" + _left.NodeDump + ")" + _suffix;
 
         [DisableDump]
         protected override IEnumerable<Syntax> DirectChildren { get { yield return _left; } }

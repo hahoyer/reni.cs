@@ -53,7 +53,7 @@ namespace Reni.Feature
         internal static MetaFunction MetaFeature(Func<Category, ResultCache, ContextBase, CompileSyntax, Result> function)
             => _metaFunctionCache[function];
 
-        internal static TypeBase ResultType(this ISimpleFeature f) => f.Result(Category.Type).Type;
+        internal static TypeBase ResultType(this ISimpleFeature f) => f.Result(Category.Type)?.Type;
 
         internal static bool IsCloseRelative(ISimpleFeature feature) => !(feature is IStepRelative);
 

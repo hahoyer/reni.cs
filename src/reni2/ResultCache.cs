@@ -12,29 +12,62 @@ namespace Reni
 {
     sealed class ResultCache : DumpableObject, ITreeNodeSupport
     {
-        Func<Category, Result> ObtainResult { get; }
+        internal interface IResultProvider
+        {
+            Result Execute(Category category);
+            object Target { get; }
+        }
+
+        sealed class ResultNotSupported : DumpableObject, IResultProvider
+        {
+            Result IResultProvider.Execute(Category category)
+            {
+                NotImplementedMethod(category);
+                return null;
+            }
+
+            object IResultProvider.Target => null;
+        }
+
+        sealed class SimpleProvider : DumpableObject, IResultProvider
+        {
+            readonly Func<Category, Result> ObtainResult;
+
+            public SimpleProvider(Func<Category, Result> obtainResult)
+            {
+                ObtainResult = obtainResult;
+            }
+
+            Result IResultProvider.Execute(Category category) => ObtainResult(category);
+            object IResultProvider.Target => null;
+        }
+
+        static readonly IResultProvider NotSupported = new ResultNotSupported();
+        IResultProvider Provider { get; }
         internal string FunctionDump = "";
 
-        public ResultCache(Func<Category, Result> obtainResult) { ObtainResult = obtainResult ?? NotSupported; }
+        internal ResultCache(IResultProvider obtainResult)
+        {
+            Provider = obtainResult ?? NotSupported;
+        }
+
+        internal ResultCache(Func<Category, Result> obtainResult)
+        {
+            Provider = new SimpleProvider(obtainResult);
+        }
 
         ResultCache(Result data)
         {
             Data = data;
-            ObtainResult = NotSupported;
+            Provider = NotSupported;
         }
 
         public static implicit operator ResultCache(Result x) => new ResultCache(x);
 
-        Result NotSupported(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
-        }
-
         internal Result Data { get; } = new Result();
 
         //[DebuggerHidden]
-        internal void Update(Category category)
+        void Update(Category category)
         {
             var localCategory = category - Data.CompleteCategory - Data.PendingCategory;
 
@@ -56,137 +89,55 @@ namespace Reni
                 localCategory -= Category.Exts;
             }
 
-            if(localCategory.HasAny)
+            if(!localCategory.HasAny)
+                return;
+
+            var oldPendingCategory = Data.PendingCategory;
+            try
             {
-                var oldPendingCategory = Data.PendingCategory;
-                try
-                {
-                    Data.PendingCategory |= localCategory;
-                    var result = ObtainResult(localCategory);
-                    Tracer.Assert(localCategory <= result.CompleteCategory);
-                    Data.Update(result);
-                }
-                finally
-                {
-                    Data.PendingCategory = oldPendingCategory;
-                }
+                Data.PendingCategory |= localCategory;
+                var result = Provider.Execute(localCategory);
+                Tracer.Assert(localCategory <= result.CompleteCategory);
+                Data.Update(result);
+            }
+            finally
+            {
+                Data.PendingCategory = oldPendingCategory;
             }
         }
 
-        public static Result operator &(ResultCache resultCache, Category category) => resultCache.GetCategories(category);
+        public static Result operator &(ResultCache resultCache, Category category)
+            => resultCache.GetCategories(category);
 
-        Result GetCategories(Category category)
+        internal Result GetCategories(Category category)
         {
-            Update(category);
-            Tracer.Assert(category <= Data.CompleteCategory);
-            return Data & category;
-        }
-
-        bool HasHllw
-        {
-            get { return Data.HasHllw; }
-            set
+            var trace = true;
+            StartMethodDump(trace, category, nameof(Provider), Provider);
+            try
             {
-                if(value)
-                    Update(Category.Hllw);
-                else
-                    Data.Hllw = null;
+                Update(category);
+                return ReturnMethodDump(Data & category);
             }
-        }
-
-        bool HasSize
-        {
-            get { return Data.HasSize; }
-            set
+            finally
             {
-                if(value)
-                    Update(Category.Size);
-                else
-                    Data.Size = null;
-            }
-        }
-
-        bool HasType
-        {
-            get { return Data.HasType; }
-            set
-            {
-                if(value)
-                    Update(Category.Type);
-                else
-                    Data.Type = null;
-            }
-        }
-
-        internal bool HasCode
-        {
-            get { return Data.HasCode; }
-            set
-            {
-                if(value)
-                    Update(Category.Code);
-                else
-                    Data.Code = null;
-            }
-        }
-
-        bool HasCodeArgs
-        {
-            get { return Data.HasExts; }
-            set
-            {
-                if(value)
-                    Update(Category.Exts);
-                else
-                    Data.Exts = null;
+                EndMethodDump();
             }
         }
 
         [DisableDump]
-        internal TypeBase Type
-        {
-            get
-            {
-                Update(Category.Type);
-                return Data.Type;
-            }
-        }
+        internal TypeBase Type => GetCategories(Category.Type).Type;
+
         [DisableDump]
-        internal CodeBase Code
-        {
-            get
-            {
-                Update(Category.Code);
-                return Data.Code;
-            }
-        }
+        internal CodeBase Code => GetCategories(Category.Code).Code;
+
         [DisableDump]
-        internal CodeArgs CodeArgs
-        {
-            get
-            {
-                Update(Category.Exts);
-                return Data.Exts;
-            }
-        }
+        internal CodeArgs Exts => GetCategories(Category.Exts).Exts;
+
         [DisableDump]
-        internal Size Size
-        {
-            get
-            {
-                Update(Category.Size);
-                return Data.Size;
-            }
-        }
+        internal Size Size => GetCategories(Category.Size).Size;
+
         [DisableDump]
-        internal bool? Hllw
-        {
-            get
-            {
-                Update(Category.Hllw);
-                return Data.Hllw;
-            }
-        }
+        internal bool? Hllw => GetCategories(Category.Hllw).Hllw;
 
         public override string DumpData()
         {

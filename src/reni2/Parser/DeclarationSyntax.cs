@@ -47,6 +47,10 @@ namespace Reni.Parser
             => Tags.Any(item => item.DeclaresConverter);
 
         [DisableDump]
+        internal override bool IsMixInSyntax
+            => Tags.Any(item => item.DeclaresMixIn);
+
+        [DisableDump]
         internal override Checked<CompileSyntax> ToCompiledSyntax
             => Checked<CompileSyntax>.From(ToContainer);
 

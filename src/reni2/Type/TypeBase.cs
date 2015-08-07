@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using hw.Helper;
 using System.Linq;
 using hw.Debug;
 using hw.Forms;
+using hw.Helper;
 using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Basics;
@@ -74,12 +74,16 @@ namespace Reni.Type
                             )
                     );
 
-                Aligner = new FunctionCache<int, AlignType>(alignBits => new AlignType(parent, alignBits));
-                FunctionInstanceType = new ValueCache<FunctionInstanceType>(() => new FunctionInstanceType(parent));
+                Aligner = new FunctionCache<int, AlignType>
+                    (alignBits => new AlignType(parent, alignBits));
+                FunctionInstanceType = new ValueCache<FunctionInstanceType>
+                    (() => new FunctionInstanceType(parent));
                 TypeType = new ValueCache<TypeType>(() => new TypeType(parent));
                 Size = new ValueCache<Size>(parent.GetSizeForCache);
-                SymmetricConversions = new ValueCache<IEnumerable<ISimpleFeature>>(parent.GetSymmetricConversionsForCache);
-                ArrayReferenceCache = new FunctionCache<string, ArrayReferenceType>(id => new ArrayReferenceType(parent, id));
+                SymmetricConversions = new ValueCache<IEnumerable<ISimpleFeature>>
+                    (parent.GetSymmetricConversionsForCache);
+                ArrayReferenceCache = new FunctionCache<string, ArrayReferenceType>
+                    (id => new ArrayReferenceType(parent, id));
             }
         }
 
@@ -158,7 +162,10 @@ namespace Reni.Type
 
         [DisableDump]
         internal TypeBase AutomaticDereferenceType
-            => IsWeakReference ? CheckedReference.Converter.TargetType.AutomaticDereferenceType : this;
+            =>
+                IsWeakReference
+                    ? CheckedReference.Converter.TargetType.AutomaticDereferenceType
+                    : this;
 
         [DisableDump]
         internal TypeBase SmartPointer => Hllw ? this : Pointer;
@@ -186,20 +193,35 @@ namespace Reni.Type
         [DisableDump]
         internal virtual Size SimpleItemSize => null;
 
-        Result VoidCodeAndRefs(Category category) => RootContext.VoidType.Result(category & (Category.Code | Category.Exts));
+        Result VoidCodeAndRefs(Category category)
+            => RootContext.VoidType.Result(category & (Category.Code | Category.Exts));
 
         internal ArrayType Array(int count, string options = null)
             => _cache.Array[count][options ?? ArrayType.Options.DefaultOptionsId];
-        internal ArrayReferenceType ArrayReference(string optionsId) => _cache.ArrayReferenceCache[optionsId];
+
+        internal ArrayReferenceType ArrayReference(string optionsId)
+            => _cache.ArrayReferenceCache[optionsId];
+
         protected virtual TypeBase ReversePair(TypeBase first) => first._cache.Pair[this];
         internal virtual TypeBase Pair(TypeBase second) => second.ReversePair(this);
         internal virtual Result Destructor(Category category) => VoidCodeAndRefs(category);
-        internal virtual Result ArrayDestructor(Category category, int count) => VoidCodeAndRefs(category);
+
+        internal virtual Result ArrayDestructor(Category category, int count)
+            => VoidCodeAndRefs(category);
+
         internal virtual Result Copier(Category category) => VoidCodeAndRefs(category);
-        internal virtual Result ArrayCopier(Category category, int count) => VoidCodeAndRefs(category);
+
+        internal virtual Result ArrayCopier(Category category, int count)
+            => VoidCodeAndRefs(category);
+
         internal virtual Result ApplyTypeOperator(Result argResult)
             => argResult.Type.Conversion(argResult.CompleteCategory, this).ReplaceArg(argResult);
-        internal Result ArgResult(Category category) { return Result(category, () => ArgCode, CodeArgs.Arg); }
+
+        internal Result ArgResult(Category category)
+        {
+            return Result(category, () => ArgCode, CodeArgs.Arg);
+        }
+
         Result PointerArgResult(Category category) => Pointer.ArgResult(category);
 
         internal Result Result(Category category, IContextReference target)
@@ -234,15 +256,18 @@ namespace Reni.Type
                 );
         }
 
-        internal Result Result(Category category, Func<CodeBase> getCode = null, Func<CodeArgs> getArgs = null) => new Result
-            (
-            category,
-            getType: () => this,
-            getCode: getCode,
-            getExts: getArgs
-            );
+        internal Result Result
+            (Category category, Func<CodeBase> getCode = null, Func<CodeArgs> getArgs = null)
+            => new Result
+                (
+                category,
+                getType: () => this,
+                getCode: getCode,
+                getExts: getArgs
+                );
 
-        internal TypeBase CommonType(TypeBase elseType) => elseType.IsConvertable(this) ? this : elseType;
+        internal TypeBase CommonType(TypeBase elseType)
+            => elseType.IsConvertable(this) ? this : elseType;
 
         /// <summary>
         ///     Gets the icon key.
@@ -257,6 +282,7 @@ namespace Reni.Type
         internal TypeBase FunctionInstance => _cache.FunctionInstanceType.Value;
 
         internal PointerType ForcedPointer => _cache.ForcedPointer.Value;
+
         [DisableDump]
         internal virtual CompoundView FindRecentCompoundView
         {
@@ -296,8 +322,7 @@ namespace Reni.Type
 
         [DisableDump]
         internal virtual TypeBase TypeForTypeOperator
-            => DePointer(Category.Type).Type
-                .DeAlign(Category.Type).Type;
+            => DePointer(Category.Type).Type.DeAlign(Category.Type).Type;
 
         [DisableDump]
         internal virtual TypeBase ElementTypeForReference
@@ -335,7 +360,8 @@ namespace Reni.Type
             => ArgCode
                 .LocalReference(this, Destructor(Category.Code).Code);
 
-        internal Result ContextAccessResult(Category category, IContextReference target, Func<Size> getOffset)
+        internal Result ContextAccessResult
+            (Category category, IContextReference target, Func<Size> getOffset)
         {
             if(Hllw)
                 return Result(category);
@@ -343,7 +369,8 @@ namespace Reni.Type
                 (
                 category,
                 getType: () => this,
-                getCode: () => CodeBase.ReferenceCode(target).ReferencePlus(getOffset()).DePointer(Size)
+                getCode:
+                    () => CodeBase.ReferenceCode(target).ReferencePlus(getOffset()).DePointer(Size)
                 );
         }
 
@@ -374,7 +401,8 @@ namespace Reni.Type
             .Array(1, optionsId).Pointer
             .Result(category, PointerArgResult(category));
 
-        internal bool IsConvertable(TypeBase destination) => ConversionService.FindPath(this, destination) != null;
+        internal bool IsConvertable(TypeBase destination)
+            => ConversionService.FindPath(this, destination) != null;
 
         internal Result Conversion(Category category, TypeBase destination)
         {
@@ -391,7 +419,7 @@ namespace Reni.Type
 
         internal virtual Result ConstructorResult(Category category, TypeBase argsType)
         {
-            StartMethodDump(false,category,argsType);
+            StartMethodDump(false, category, argsType);
             try
             {
                 BreakExecution();
@@ -413,13 +441,15 @@ namespace Reni.Type
             );
 
         internal TypeBase SmartUn<T>()
-            where T : ISimpleFeature => this is T ? ((ISimpleFeature) this).Result(Category.Type).Type : this;
+            where T : ISimpleFeature
+            => this is T ? ((ISimpleFeature) this).Result(Category.Type).Type : this;
 
         internal Result ResultFromPointer(Category category, TypeBase resultType) => resultType
             .Pointer
             .Result(category, ObjectResult);
 
-        internal virtual Result InstanceResult(Category category, Func<Category, Result> getRightResult)
+        internal virtual Result InstanceResult
+            (Category category, Func<Category, Result> getRightResult)
         {
             NotImplementedMethod(category, getRightResult(Category.All));
             return null;
@@ -428,7 +458,8 @@ namespace Reni.Type
         internal IEnumerable<SearchResult> DeclarationsForType(Definable definable)
             => definable.Genericize.SelectMany(g => g.Declarations(this));
 
-        internal IEnumerable<SearchResult> DeclarationsForTypeAndCloseRelatives(Definable tokenClass)
+        internal IEnumerable<SearchResult> DeclarationsForTypeAndCloseRelatives
+            (Definable tokenClass)
         {
             var result = DeclarationsForType(tokenClass).ToArray();
             if(result.Any())
@@ -442,7 +473,8 @@ namespace Reni.Type
                 .ToArray();
         }
 
-        internal virtual IEnumerable<SearchResult> Declarations<TDefinable>(TDefinable tokenClass) where TDefinable : Definable
+        internal virtual IEnumerable<SearchResult> Declarations<TDefinable>(TDefinable tokenClass)
+            where TDefinable : Definable
         {
             var feature = (this as ISymbolProvider<TDefinable, IFeatureImplementation>)
                 ?.Feature(tokenClass);
@@ -450,12 +482,17 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        protected virtual IEnumerable<IGenericProviderForType> Genericize => this.GenericListFromType();
+        protected virtual IEnumerable<IGenericProviderForType> Genericize
+            => this.GenericListFromType();
         [DisableDump]
         [NotNull]
-        public IEnumerable<ISimpleFeature> SymmetricConversions => _cache.SymmetricConversions.Value;
+        public IEnumerable<ISimpleFeature> SymmetricConversions => _cache.SymmetricConversions.Value
+            ;
 
-        Result AlignResult(Category category) { return Align.Result(category, () => ArgCode.Align(), CodeArgs.Arg); }
+        Result AlignResult(Category category)
+        {
+            return Align.Result(category, () => ArgCode.Align(), CodeArgs.Arg);
+        }
 
         IEnumerable<ISimpleFeature> GetSymmetricConversionsForCache()
             => RawSymmetricConversions
@@ -492,7 +529,8 @@ namespace Reni.Type
             return result;
         }
 
-        internal virtual IEnumerable<ISimpleFeature> GetForcedConversions<TDestination>(TDestination destination)
+        internal virtual IEnumerable<ISimpleFeature> GetForcedConversions<TDestination>
+            (TDestination destination)
         {
             var provider = this as IForcedConversionProvider<TDestination>;
             if(provider != null)
@@ -502,7 +540,11 @@ namespace Reni.Type
 
         [DisableDump]
         internal virtual IEnumerable<ISimpleFeature> StripConversions { get { yield break; } }
-        internal virtual IEnumerable<ISimpleFeature> CutEnabledConversion(NumberType destination) { yield break; }
+
+        internal virtual IEnumerable<ISimpleFeature> CutEnabledConversion(NumberType destination)
+        {
+            yield break;
+        }
 
         protected Result DumpPrintTokenResult(Category category)
             => VoidType
@@ -518,7 +560,7 @@ namespace Reni.Type
             return null;
         }
 
-        virtual internal IssueType UndefinedSymbol(SourcePart source)
+        internal virtual IssueType UndefinedSymbol(SourcePart source)
             =>
                 new RootIssueType
                     (

@@ -24,6 +24,7 @@ namespace Reni.Struct
             View = compoundView;
             Position = position;
             FunctionFeature = new ValueCache<IFunctionFeature>(ObtainFunctionFeature);
+            StopByObjectIds();
         }
 
         [EnableDump]
@@ -62,11 +63,14 @@ namespace Reni.Struct
 
         IFunctionFeature ObtainFunctionFeature()
         {
+
             var functionSyntax = Statement as FunctionSyntax;
             if(functionSyntax != null)
                 return functionSyntax.FunctionFeature(View);
 
-            return View.ValueType(Position).CheckedFeature?.Function;
+            var valueType = View.ValueType(Position);
+            StopByObjectIds();
+            return valueType.CheckedFeature?.Function;
         }
     }
 }
