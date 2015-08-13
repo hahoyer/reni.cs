@@ -31,9 +31,9 @@ namespace Reni.Type
         protected override Result ParentConversionResult(Category category) => Parent.Result(category, ArgResult);
 
         [DisableDump]
-        internal override IEnumerable<ISimpleFeature> StripConversions
+        internal override IEnumerable<IValueFeature> StripConversions
         {
-            get { yield return Feature.Extension.SimpleFeature(ParentConversionResult); }
+            get { yield return Feature.Extension.Value(ParentConversionResult); }
         }
     }
 }

@@ -26,7 +26,7 @@ namespace Reni.Type
         protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
         protected override string GetNodeDump() => base.GetNodeDump() + "(" + _functionalFeature.NodeDump + ")";
 
-        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
+        Result IFunctionFeature.Result(Category category, TypeBase argsType)
             => _functionalFeature.ApplyResult(category, argsType);
     }
 }

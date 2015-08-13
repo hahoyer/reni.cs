@@ -47,8 +47,6 @@ namespace Reni.Struct
             get
             {
                 var result = _resultCache.Exts;
-                if(result == null) // Recursive call 
-                    return CodeArgs.Void(); // So, that nothing will be added from this site
                 Tracer.Assert(result != null);
                 return result;
             }
@@ -76,7 +74,7 @@ namespace Reni.Struct
 
         internal Result CallResult(Category category)
         {
-            var result = _resultCache & category.FunctionCall;
+            var result = _resultCache & category.FunctionCall;      
             if(result == null)
                 return null;
 
@@ -175,7 +173,16 @@ namespace Reni.Struct
         ContextBase ObtainContext() => Parent.CreateSubContext(!IsGetter);
         bool IsGetter => FunctionId.IsGetter;
 
-        Result ResultCache.IResultProvider.Execute(Category category) => ObtainResult(category);
+        Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
+        {
+            if(category.IsNone && pendingCategory == Category.Exts)
+                return new Result(Category.Exts, getExts: CodeArgs.Void);
+
+
+            Tracer.Assert(pendingCategory.IsNone);
+            return ObtainResult(category);
+        }
+
         object ResultCache.IResultProvider.Target => this;
     }
 }

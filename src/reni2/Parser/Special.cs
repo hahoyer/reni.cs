@@ -97,6 +97,8 @@ namespace Reni.Parser
             StopByObjectIds();
         }
 
+        public override IRecursionHandler RecursionHandler => _infix as IRecursionHandler;
+
         internal override Result ResultForCache(ContextBase context, Category category) => _infix
             .Result(context, category, _left, _right);
 
@@ -196,6 +198,7 @@ namespace Reni.Parser
     {
         Result Result
             (ContextBase context, Category category, CompileSyntax left, CompileSyntax right);
+
     }
 
     interface ISuffix

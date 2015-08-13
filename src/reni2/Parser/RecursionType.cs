@@ -13,7 +13,7 @@ namespace Reni.Parser
         : TypeBase
             , IFeatureImplementation
             , IFunctionFeature
-            , ISimpleFeature
+            , IValueFeature
             , IContextMetaFunctionFeature
             , IMetaFunctionFeature
             , IContextReference
@@ -23,20 +23,20 @@ namespace Reni.Parser
 
         IMetaFunctionFeature IFeatureImplementation.Meta => this;
         IFunctionFeature IFeatureImplementation.Function => this;
-        ISimpleFeature IFeatureImplementation.Simple => this;
+        IValueFeature IFeatureImplementation.Value => this;
         IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => this;
         bool IFunctionFeature.IsImplicit => false;
         IContextReference IFunctionFeature.ObjectReference => this;
-        TypeBase ISimpleFeature.TargetType => this;
+        TypeBase IValueFeature.TargetType => this;
         int IContextReference.Order => ObjectId;
 
-        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
+        Result IFunctionFeature.Result(Category category, TypeBase argsType)
         {
             NotImplementedMethod(category, argsType);
             return null;
         }
 
-        Result ISimpleFeature.Result(Category category)
+        Result IValueFeature.Result(Category category)
         {
             NotImplementedMethod(category);
             return null;

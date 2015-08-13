@@ -32,7 +32,7 @@ namespace Reni.Struct
         internal override bool HasQuickSize => false;
 
         [DisableDump]
-        internal override IEnumerable<ISimpleFeature> StripConversions
+        internal override IEnumerable<IValueFeature> StripConversions
         {
             get
             {
@@ -40,7 +40,7 @@ namespace Reni.Struct
                     yield return converter;
 
                 if(Hllw)
-                    yield return Feature.Extension.SimpleFeature(VoidConversion);
+                    yield return Feature.Extension.Value(VoidConversion);
             }
         }
 
@@ -48,13 +48,13 @@ namespace Reni.Struct
 
         IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>.Feature
             (DumpPrintToken tokenClass)
-            => Feature.Extension.SimpleFeature(DumpPrintTokenResult);
+            => Feature.Extension.Value(DumpPrintTokenResult);
 
         IFeatureImplementation ISymbolProviderForPointer<Definable, IFeatureImplementation>.Feature(Definable tokenClass)
             => View.Find(tokenClass);
 
         IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
-            => Feature.Extension.SimpleFeature(DumpPrintTokenResult);
+            => Feature.Extension.Value(DumpPrintTokenResult);
 
         IFeatureImplementation ISymbolProvider<Definable, IFeatureImplementation>.Feature(Definable tokenClass)
             => View.Find(tokenClass);

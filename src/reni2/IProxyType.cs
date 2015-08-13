@@ -7,6 +7,6 @@ namespace Reni
 {
     interface IProxyType
     {
-        ISimpleFeature Converter { get; }
+        IValueFeature Converter { get; }
     }
 }

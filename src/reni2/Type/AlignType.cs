@@ -37,8 +37,8 @@ namespace Reni.Type
         protected override Result DeAlign(Category category) => Parent.Result(category, ArgResult);
         internal override PointerType ForcedPointerForCache() => Parent.ForcedPointer;
 
-        protected override IEnumerable<ISimpleFeature> RawSymmetricConversions
-            => base.RawSymmetricConversions.Concat(new ISimpleFeature[] {Feature.Extension.SimpleFeature(UnalignedResult)});
+        protected override IEnumerable<IValueFeature> RawSymmetricConversions
+            => base.RawSymmetricConversions.Concat(new IValueFeature[] {Feature.Extension.Value(UnalignedResult)});
 
         [DisableDump]
         internal override bool IsAligningPossible => false;

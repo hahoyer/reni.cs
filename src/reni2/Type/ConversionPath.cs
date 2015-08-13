@@ -17,7 +17,7 @@ namespace Reni.Type
         static int _nextObjectId;
 
         internal readonly TypeBase Source;
-        internal readonly ISimpleFeature[] Elements;
+        internal readonly IValueFeature[] Elements;
 
         internal ConversionPath()
             : base(_nextObjectId++) { }
@@ -26,13 +26,13 @@ namespace Reni.Type
             : this()
         {
             Source = source;
-            Elements = new ISimpleFeature[0];
+            Elements = new IValueFeature[0];
             Tracer.Assert(IsValid);
         }
 
         internal bool IsValid => Source != null;
 
-        internal ConversionPath(params ISimpleFeature[] rawElements)
+        internal ConversionPath(params IValueFeature[] rawElements)
             : this()
         {
             Tracer.Assert(rawElements.Any());
@@ -86,13 +86,13 @@ namespace Reni.Type
 
         public static IEnumerable<ConversionPath> operator +(
             ConversionPath a,
-            IEnumerable<ISimpleFeature> b)
+            IEnumerable<IValueFeature> b)
             => b.Select(right => a + right);
 
-        public static ConversionPath operator +(ISimpleFeature a, ConversionPath b)
+        public static ConversionPath operator +(IValueFeature a, ConversionPath b)
             => new ConversionPath(new[] {a}.Concat(b.Elements).ToArray());
 
-        public static ConversionPath operator +(ConversionPath a, ISimpleFeature b)
+        public static ConversionPath operator +(ConversionPath a, IValueFeature b)
             => new ConversionPath(a.Elements.Concat(new[] {b}).ToArray());
 
         internal Result Execute(Category category)
@@ -141,6 +141,10 @@ namespace Reni.Type
             return true;
         }
 
-        Result ResultCache.IResultProvider.Execute(Category category) => Source.ArgResult(category);
+        Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
+        {
+            Tracer.Assert(pendingCategory.IsNone);
+            return Source.ArgResult(category);
+        }
     }
 }

@@ -28,14 +28,9 @@ f: /\
     1000 type instance
     (
         {
-            ^ = 1 then 1 
-            else 
-            (
-                ^ * f
-                [
-                    ^ type instance((^ - 1)enable_cut)
-                ]
-            )
+            ^ = 1 
+            then 1 
+            else ^ * f[^ type instance((^ - 1)enable_cut)]
         }
         enable_cut
     )

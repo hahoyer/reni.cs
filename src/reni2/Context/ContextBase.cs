@@ -96,62 +96,56 @@ namespace Reni.Context
             }
         }
 
-        [DebuggerHidden]
-        ResultCache GetResultCacheForCache(CompileSyntax syntax)
-        {
-            var result = new ResultCache
-                (new ResultProvider(this, syntax, (co, ca, sy) => co.ResultForCache(ca, sy), ""));
-            syntax.AddToCacheForDebug(this, result);
-            return result;
-        }
-
         sealed class ResultProvider : ResultCache.IResultProvider
         {
-            [EnableDump]
-            string Title { get; }
+            [EnableDumpExcept(false)]
+            readonly bool AsReference;
+            readonly ContextBase Context;
+            readonly CompileSyntax Syntax;
+
+            internal ResultProvider
+                (ContextBase context, CompileSyntax syntax, bool asReference = false)
+            {
+                Context = context;
+                Syntax = syntax;
+                AsReference = asReference;
+            }
+
+            Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
+            {
+                if(pendingCategory.IsNone)
+                    return AsReference
+                        ? Context.ResultAsReference(category, Syntax)
+                        : Context.ResultForCache(category, Syntax);
+
+                var recursionHandler = Syntax.RecursionHandler;
+                Tracer.Assert(recursionHandler != null);
+                return recursionHandler.Execute(Context, category, pendingCategory, Syntax, AsReference);
+            }
+
 
             [EnableDump]
             string ContextId => Context.NodeDump;
 
             [EnableDump]
-            string SyntaxId => Syntax.NodeDump;
+            int SyntaxObjectId => Syntax.ObjectId;
 
-            ContextBase Context { get; }
-            CompileSyntax Syntax { get; }
-
-            Func<ContextBase, Category, CompileSyntax, Result> ResultFunc { get; }
-
-            internal ResultProvider
-                (
-                ContextBase context,
-                CompileSyntax syntax,
-                Func<ContextBase, Category, CompileSyntax, Result> resultFunc,
-                string title
-                )
-            {
-                Context = context;
-                Syntax = syntax;
-                ResultFunc = resultFunc;
-                Title = title;
-            }
-
-            Result ResultCache.IResultProvider.Execute(Category category)
-                => ResultFunc(Context, category, Syntax);
+            [EnableDump]
+            string SyntaxText => Syntax.SourcePart.Id;
 
             object ResultCache.IResultProvider.Target => this;
         }
 
+        [DebuggerHidden]
+        ResultCache ResultCacheForCache(CompileSyntax syntax)
+        {
+            var result = new ResultCache(new ResultProvider(this, syntax));
+            syntax.AddToCacheForDebug(this, result);
+            return result;
+        }
+
         ResultCache GetResultAsReferenceCacheForCache(CompileSyntax syntax)
-            => new ResultCache
-                (
-                new ResultProvider
-                    (
-                    this,
-                    syntax,
-                    (co, ca, sy) => co.ResultAsReference(ca, sy),
-                    "as Reference"
-                    )
-                );
+            => new ResultCache(new ResultProvider(this, syntax, true));
 
         internal virtual CompoundView ObtainRecentCompoundView()
         {
@@ -204,7 +198,7 @@ namespace Reni.Context
             public Cache(ContextBase target)
             {
                 ResultCache = new FunctionCache<CompileSyntax, ResultCache>
-                    (target.GetResultCacheForCache);
+                    (target.ResultCacheForCache);
                 ResultAsReferenceCache = new FunctionCache<CompileSyntax, ResultCache>
                     (target.GetResultAsReferenceCacheForCache);
                 CompoundContexts = new FunctionCache

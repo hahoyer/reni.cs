@@ -12,7 +12,7 @@ namespace Reni.Type
     abstract class Child<TParent>
         : TypeBase
             , IProxyType
-            , ISimpleFeature
+            , IValueFeature
         where TParent : TypeBase
     {
         protected Child(TParent parent) { Parent = parent; }
@@ -23,9 +23,9 @@ namespace Reni.Type
         [DisableDump]
         internal override Root RootContext => Parent.RootContext;
 
-        ISimpleFeature IProxyType.Converter => this;
-        TypeBase ISimpleFeature.TargetType => Parent;
-        Result ISimpleFeature.Result(Category category) => ParentConversionResult(category);
+        IValueFeature IProxyType.Converter => this;
+        TypeBase IValueFeature.TargetType => Parent;
+        Result IValueFeature.Result(Category category) => ParentConversionResult(category);
 
         protected abstract Result ParentConversionResult(Category category);
     }

@@ -13,7 +13,7 @@ namespace Reni.Type
     abstract class SetterTargetType
         : TypeBase
             , IProxyType
-            , ISimpleFeature
+            , IValueFeature
             , IReference
             , ISymbolProvider<ReassignToken, IFeatureImplementation>
     {
@@ -23,11 +23,11 @@ namespace Reni.Type
 
         Size IContextReference.Size => Size;
         int IContextReference.Order => _order;
-        ISimpleFeature IProxyType.Converter => this;
+        IValueFeature IProxyType.Converter => this;
         bool IReference.IsWeak => true;
-        ISimpleFeature IReference.Converter => this;
-        TypeBase ISimpleFeature.TargetType => TargetType;
-        Result ISimpleFeature.Result(Category category) => GetterResult(category);
+        IValueFeature IReference.Converter => this;
+        TypeBase IValueFeature.TargetType => TargetType;
+        Result IValueFeature.Result(Category category) => GetterResult(category);
         [DisableDump]
         internal override bool IsAligningPossible => false;
         [DisableDump]
@@ -90,12 +90,12 @@ namespace Reni.Type
         [DisableDump]
         internal override TypeBase ElementTypeForReference => ValueType.ElementTypeForReference;
 
-        protected override IEnumerable<ISimpleFeature> RawSymmetricConversions { get { yield break; } }
+        protected override IEnumerable<IValueFeature> RawSymmetricConversions { get { yield break; } }
 
         [DisableDump]
-        internal override IEnumerable<ISimpleFeature> StripConversions
+        internal override IEnumerable<IValueFeature> StripConversions
         {
-            get { yield return Feature.Extension.SimpleFeature(GetterResult); }
+            get { yield return Feature.Extension.Value(GetterResult); }
         }
     }
 }

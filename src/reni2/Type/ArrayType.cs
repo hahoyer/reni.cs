@@ -112,8 +112,8 @@ namespace Reni.Type
             (DumpPrintToken tokenClass)
             =>
                 options.IsTextItem.Value
-                    ? Feature.Extension.SimpleFeature(DumpPrintTokenResult)
-                    : Feature.Extension.SimpleFeature(DumpPrintTokenArrayResult);
+                    ? Feature.Extension.Value(DumpPrintTokenResult)
+                    : Feature.Extension.Value(DumpPrintTokenArrayResult);
 
         IFeatureImplementation ISymbolProviderForPointer<ConcatArrays, IFeatureImplementation>.
             Feature(ConcatArrays tokenClass)
@@ -131,11 +131,11 @@ namespace Reni.Type
 
         IFeatureImplementation ISymbolProviderForPointer<TextItem, IFeatureImplementation>.Feature
             (TextItem tokenClass)
-            => Feature.Extension.SimpleFeature(TextItemResult);
+            => Feature.Extension.Value(TextItemResult);
 
         IFeatureImplementation ISymbolProviderForPointer<Mutable, IFeatureImplementation>.Feature
             (Mutable tokenClass)
-            => Feature.Extension.SimpleFeature(MutableResult);
+            => Feature.Extension.Value(MutableResult);
 
         IFeatureImplementation ISymbolProviderForPointer<Item, IFeatureImplementation>.Feature
             (Item tokenClass)
@@ -149,7 +149,7 @@ namespace Reni.Type
         IFeatureImplementation ISymbolProviderForPointer<ArrayReference, IFeatureImplementation>.
             Feature
             (ArrayReference tokenClass)
-            => Feature.Extension.SimpleFeature(ReferenceResult);
+            => Feature.Extension.Value(ReferenceResult);
 
         internal override int? SmartArrayLength(TypeBase elementType)
             => ElementType.IsConvertable(elementType) ? Count : base.SmartArrayLength(elementType);
@@ -158,7 +158,7 @@ namespace Reni.Type
             (Count tokenClass)
             => Feature.Extension.MetaFeature(CountResult);
 
-        IEnumerable<ISimpleFeature> IForcedConversionProviderForPointer<ArrayReferenceType>.Result
+        IEnumerable<IValueFeature> IForcedConversionProviderForPointer<ArrayReferenceType>.Result
             (ArrayReferenceType destination) 
             => ForcedConversion(destination).NullableToArray();
 
@@ -170,9 +170,9 @@ namespace Reni.Type
             => ElementType.ArrayCopier(category, Count);
 
         [DisableDump]
-        internal override IEnumerable<ISimpleFeature> StripConversions
+        internal override IEnumerable<IValueFeature> StripConversions
         {
-            get { yield return Feature.Extension.SimpleFeature(NoTextItemResult); }
+            get { yield return Feature.Extension.Value(NoTextItemResult); }
         }
 
         Result NoTextItemResult(Category category) => ResultFromPointer(category, NoTextItem);
@@ -201,7 +201,7 @@ namespace Reni.Type
             var indexType = BitType
                 .Number(BitsConst.Convert(Count).Size.ToInt())
                 .Align;
-            var constructorResult = function.ApplyResult(category.Typed, indexType);
+            var constructorResult = function.Result(category.Typed, indexType);
             var elements = Count
                 .Select(i => ElementConstructorResult(category, constructorResult, i, indexType))
                 .Aggregate((c, n) => n + c)
@@ -306,12 +306,12 @@ namespace Reni.Type
                 (category, () => CodeBase.BitsConst(IndexSize, BitsConst.Convert(Count)));
         }
 
-        ISimpleFeature ForcedConversion(ArrayReferenceType destination)
+        IValueFeature ForcedConversion(ArrayReferenceType destination)
         {
             if(!HasForcedConversion(destination))
                 return null;
 
-            return Feature.Extension.SimpleFeature
+            return Feature.Extension.Value
                 (category => destination.ConversionResult(category, this), SmartPointer);
         }
 

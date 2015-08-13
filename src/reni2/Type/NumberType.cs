@@ -51,32 +51,32 @@ namespace Reni.Type
         [DisableDump]
         protected override IEnumerable<IGenericProviderForType> Genericize => this.GenericListFromType(base.Genericize);
 
-        internal override IEnumerable<ISimpleFeature> CutEnabledConversion(NumberType destination)
+        internal override IEnumerable<IValueFeature> CutEnabledConversion(NumberType destination)
         {
-            yield return Feature.Extension.SimpleFeature(category => CutEnabledBitCountConversion(category, destination), EnableCut);
+            yield return Feature.Extension.Value(category => CutEnabledBitCountConversion(category, destination), EnableCut);
         }
 
         IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>.Feature
             (DumpPrintToken tokenClass)
-            => Feature.Extension.SimpleFeature(DumpPrintTokenResult, this);
+            => Feature.Extension.Value(DumpPrintTokenResult, this);
 
         IFeatureImplementation ISymbolProviderForPointer<Operation, IFeatureImplementation>.Feature(Operation tokenClass)
             => Feature.Extension.FunctionFeature(OperationResult, tokenClass);
 
         IFeatureImplementation ISymbolProviderForPointer<TokenClasses.EnableCut, IFeatureImplementation>.Feature
-            (TokenClasses.EnableCut tokenClass) => Feature.Extension.SimpleFeature(EnableCutTokenResult);
+            (TokenClasses.EnableCut tokenClass) => Feature.Extension.Value(EnableCutTokenResult);
 
-        IEnumerable<ISimpleFeature> IForcedConversionProvider<NumberType>.Result(NumberType destination)
+        IEnumerable<IValueFeature> IForcedConversionProvider<NumberType>.Result(NumberType destination)
         {
             if(Bits <= destination.Bits)
-                yield return Feature.Extension.SimpleFeature(category => destination.FlatConversion(category, this), this);
+                yield return Feature.Extension.Value(category => destination.FlatConversion(category, this), this);
         }
 
         IFeatureImplementation ISymbolProviderForPointer<Negate, IFeatureImplementation>.Feature(Negate tokenClass)
-            => Feature.Extension.SimpleFeature(NegationResult);
+            => Feature.Extension.Value(NegationResult);
 
         IFeatureImplementation ISymbolProviderForPointer<TextItem, IFeatureImplementation>.Feature(TextItem tokenClass)
-            => Feature.Extension.SimpleFeature(TextItemResult);
+            => Feature.Extension.Value(TextItemResult);
 
         protected override Result ParentConversionResult(Category category) => Parent.Result(category, ArgResult);
 

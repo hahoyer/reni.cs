@@ -40,7 +40,7 @@ namespace Reni.Type
 
         IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature
             (DumpPrintToken tokenClass)
-            => Feature.Extension.SimpleFeature(DumpPrintTokenResult);
+            => Feature.Extension.Value(DumpPrintTokenResult);
 
         IFeatureImplementation ISymbolProvider<Star, IFeatureImplementation>.Feature
             (Star tokenClass)
@@ -53,18 +53,18 @@ namespace Reni.Type
         IFeatureImplementation ISymbolProvider<Mutable, IFeatureImplementation>.Feature
             (Mutable tokenClass)
             => Value is ArrayType
-                ? Feature.Extension.SimpleFeature(MutableArrayResult)
+                ? Feature.Extension.Value(MutableArrayResult)
                 : Value is ArrayReferenceType
-                    ? Feature.Extension.SimpleFeature(MutableReferenceResult)
+                    ? Feature.Extension.Value(MutableReferenceResult)
                     : null;
 
         IFeatureImplementation ISymbolProvider<ArrayReference, IFeatureImplementation>.Feature
             (ArrayReference tokenClass)
-            => Value is ArrayType ? Feature.Extension.SimpleFeature(ArrayReferenceResult) : null;
+            => Value is ArrayType ? Feature.Extension.Value(ArrayReferenceResult) : null;
 
         IFeatureImplementation ISymbolProvider<Item, IFeatureImplementation>.Feature
             (Item tokenClass)
-            => Value is ArrayType ? Feature.Extension.SimpleFeature(ArrayAccessResult) : null;
+            => Value is ArrayType ? Feature.Extension.Value(ArrayAccessResult) : null;
 
 
         protected override string GetNodeDump() => "(" + Value.NodeDump + ") type";

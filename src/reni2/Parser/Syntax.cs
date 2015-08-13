@@ -13,6 +13,11 @@ namespace Reni.Parser
 {
     abstract class Syntax : DumpableObject
     {
+        static bool _isInDump;
+
+        [DisableDump]
+        internal SourcePart SourcePart;
+
         protected Syntax() { }
 
         protected Syntax(int objectId)
@@ -55,8 +60,6 @@ namespace Reni.Parser
             var result = CreateDeclarationSyntax(token, right);
             return result.Value.Issues(issue.plus(result.Issues));
         }
-
-        static bool _isInDump;
 
         protected override sealed string Dump(bool isRecursion)
         {

@@ -7,11 +7,11 @@ using Reni.Type;
 
 namespace Reni.Feature
 {
-    abstract class SimpleBase : DumpableObject, ISimpleFeature
+    abstract class ValueBase : DumpableObject, IValueFeature
     {
         static int _nextObjectId;
 
-        protected SimpleBase(Func<Category, Result> function, TypeBase target)
+        protected ValueBase(Func<Category, Result> function, TypeBase target)
             : base(_nextObjectId++)
         {
             Function = function;
@@ -23,8 +23,8 @@ namespace Reni.Feature
         internal Func<Category, Result> Function { get; }
         TypeBase Target { get; }
 
-        Result ISimpleFeature.Result(Category category) => Function(category);
-        TypeBase ISimpleFeature.TargetType => Target;
+        Result IValueFeature.Result(Category category) => Function(category);
+        TypeBase IValueFeature.TargetType => Target;
 
         protected override string GetNodeDump()
         {
@@ -36,23 +36,23 @@ namespace Reni.Feature
         }
     }
 
-    sealed class Simple : SimpleBase, IFeatureImplementation
+    sealed class Value : ValueBase, IFeatureImplementation
     {
-        public Simple(Func<Category, Result> function, TypeBase type)
+        public Value(Func<Category, Result> function, TypeBase type)
             : base(function, type) { }
 
         IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
         IMetaFunctionFeature IFeatureImplementation.Meta => null;
         IFunctionFeature IFeatureImplementation.Function => null;
-        ISimpleFeature IFeatureImplementation.Simple => this;
+        IValueFeature IFeatureImplementation.Value => this;
     }
 
-    sealed class Combination : DumpableObject, ISimpleFeature, IEquatable<ISimpleFeature>
+    sealed class Combination : DumpableObject, IValueFeature, IEquatable<IValueFeature>
     {
-        ISimpleFeature Left { get; }
-        ISimpleFeature Right { get; }
+        IValueFeature Left { get; }
+        IValueFeature Right { get; }
 
-        public static ISimpleFeature CheckedCreate(ISimpleFeature left, ISimpleFeature right)
+        public static IValueFeature CheckedCreate(IValueFeature left, IValueFeature right)
         {
             if(left == null)
                 return right;
@@ -65,15 +65,15 @@ namespace Reni.Feature
             return new Combination(left, right);
         }
 
-        Combination(ISimpleFeature left, ISimpleFeature right)
+        Combination(IValueFeature left, IValueFeature right)
         {
             Left = left;
             Right = right;
         }
-        Result ISimpleFeature.Result(Category category) => Right.Result(category).ReplaceArg(Left.Result);
-        TypeBase ISimpleFeature.TargetType => Left.TargetType;
+        Result IValueFeature.Result(Category category) => Right.Result(category).ReplaceArg(Left.Result);
+        TypeBase IValueFeature.TargetType => Left.TargetType;
 
-        bool IEquatable<ISimpleFeature>.Equals(ISimpleFeature other)
+        bool IEquatable<IValueFeature>.Equals(IValueFeature other)
         {
             var typedOther = other as Combination;
             if(typedOther == null)

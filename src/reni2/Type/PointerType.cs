@@ -14,7 +14,7 @@ namespace Reni.Type
     sealed class PointerType
         : TypeBase
             , IProxyType
-            , ISimpleFeature
+            , IValueFeature
             , IReference
     {
         readonly int _order;
@@ -47,17 +47,17 @@ namespace Reni.Type
 
         Size IContextReference.Size => Size;
         int IContextReference.Order => _order;
-        ISimpleFeature IReference.Converter => this;
+        IValueFeature IReference.Converter => this;
         bool IReference.IsWeak => true;
-        ISimpleFeature IProxyType.Converter => this;
-        TypeBase ISimpleFeature.TargetType => ValueType;
-        Result ISimpleFeature.Result(Category category) => DereferenceResult(category);
+        IValueFeature IProxyType.Converter => this;
+        TypeBase IValueFeature.TargetType => ValueType;
+        Result IValueFeature.Result(Category category) => DereferenceResult(category);
 
         [DisableDump]
-        protected override IEnumerable<ISimpleFeature> RawSymmetricConversions
+        protected override IEnumerable<IValueFeature> RawSymmetricConversions
             =>
                 base.RawSymmetricConversions.Concat
-                    (new ISimpleFeature[] {Feature.Extension.SimpleFeature(DereferenceResult)});
+                    (new IValueFeature[] {Feature.Extension.Value(DereferenceResult)});
 
         protected override string GetNodeDump() => ValueType.NodeDump + "[Pointer]";
         internal override int? SmartArrayLength(TypeBase elementType)
@@ -66,7 +66,7 @@ namespace Reni.Type
         protected override ArrayType ArrayForCache(int count, string optionsId)
             => ValueType.Array(count, optionsId);
 
-        internal override IEnumerable<ISimpleFeature> GetForcedConversions<TDestination>
+        internal override IEnumerable<IValueFeature> GetForcedConversions<TDestination>
             (TDestination destination)
         {
             var provider = ValueType as IForcedConversionProviderForPointer<TDestination>;

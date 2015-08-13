@@ -6,7 +6,6 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Parser;
-using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -16,93 +15,109 @@ namespace Reni.Feature
     {
         IMetaFunctionFeature Meta { get; }
         IFunctionFeature Function { get; }
-        ISimpleFeature Simple { get; }
+        IValueFeature Value { get; }
         IContextMetaFunctionFeature ContextMeta { get; }
     }
 
     sealed class EmptyFeatureImplementation : DumpableObject, IFeatureImplementation
     {
         internal EmptyFeatureImplementation(int? nextObjectId)
-            : base(nextObjectId) { }
+            : base(nextObjectId) {}
+
         internal EmptyFeatureImplementation() { }
 
         IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
         IMetaFunctionFeature IFeatureImplementation.Meta => null;
         IFunctionFeature IFeatureImplementation.Function => null;
-        ISimpleFeature IFeatureImplementation.Simple => null;
+        IValueFeature IFeatureImplementation.Value => null;
     }
 
-    abstract class SimpleFeatureImplementation : DumpableObject, IFeatureImplementation, ISimpleFeature
+    abstract class ValueFeatureImplementation
+        : DumpableObject, IFeatureImplementation, IValueFeature
     {
-        protected SimpleFeatureImplementation(int? nextObjectId)
-            : base(nextObjectId) { }
-        protected SimpleFeatureImplementation() { }
+        protected ValueFeatureImplementation(int? nextObjectId)
+            : base(nextObjectId) {}
+
+        protected ValueFeatureImplementation() { }
 
         IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
         IMetaFunctionFeature IFeatureImplementation.Meta => null;
         IFunctionFeature IFeatureImplementation.Function => null;
-        ISimpleFeature IFeatureImplementation.Simple => this;
-        Result ISimpleFeature.Result(Category category) => Result(category);
-        TypeBase ISimpleFeature.TargetType => TargetType;
+        IValueFeature IFeatureImplementation.Value => this;
+        Result IValueFeature.Result(Category category) => Result(category);
+        TypeBase IValueFeature.TargetType => TargetType;
 
         protected abstract Result Result(Category category);
         protected abstract TypeBase TargetType { get; }
     }
 
-    abstract class MetaFeatureImplementation : DumpableObject, IFeatureImplementation, IMetaFunctionFeature
+    abstract class MetaFeatureImplementation
+        : DumpableObject, IFeatureImplementation, IMetaFunctionFeature
     {
         protected MetaFeatureImplementation(int? nextObjectId)
-            : base(nextObjectId)
-        { }
+            : base(nextObjectId) {}
+
         protected MetaFeatureImplementation() { }
 
         IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
         IMetaFunctionFeature IFeatureImplementation.Meta => this;
         IFunctionFeature IFeatureImplementation.Function => null;
-        ISimpleFeature IFeatureImplementation.Simple => null;
-        Result IMetaFunctionFeature.Result(Category category, ResultCache left, ContextBase contextBase, CompileSyntax right)
+        IValueFeature IFeatureImplementation.Value => null;
+
+        Result IMetaFunctionFeature.Result
+            (Category category, ResultCache left, ContextBase contextBase, CompileSyntax right)
             => Result(category, left, contextBase, right);
-        protected abstract Result Result(Category category, ResultCache left, ContextBase contextBase, CompileSyntax right);
+
+        protected abstract Result Result
+            (Category category, ResultCache left, ContextBase contextBase, CompileSyntax right);
     }
 
-    abstract class FunctionFeatureImplementation : DumpableObject, IFeatureImplementation, IFunctionFeature
+    abstract class FunctionFeatureImplementation
+        : DumpableObject, IFeatureImplementation, IFunctionFeature
     {
         protected FunctionFeatureImplementation(int? nextObjectId)
-            : base(nextObjectId)
-        { }
+            : base(nextObjectId) {}
+
         protected FunctionFeatureImplementation() { }
 
         IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
         IMetaFunctionFeature IFeatureImplementation.Meta => null;
         IFunctionFeature IFeatureImplementation.Function => this;
-        ISimpleFeature IFeatureImplementation.Simple => null;
-        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
-            => ApplyResult(category, argsType);
+        IValueFeature IFeatureImplementation.Value => null;
+
+        Result IFunctionFeature.Result(Category category, TypeBase argsType)
+            => Result(category, argsType);
+
         bool IFunctionFeature.IsImplicit => IsImplicit;
         IContextReference IFunctionFeature.ObjectReference => ObjectReference;
 
-        protected abstract Result ApplyResult(Category category, TypeBase argsType);
+        protected abstract Result Result(Category category, TypeBase argsType);
         protected abstract bool IsImplicit { get; }
         protected abstract IContextReference ObjectReference { get; }
     }
 
-    abstract class ContextMetaFeatureImplementation : DumpableObject, IFeatureImplementation, IContextMetaFunctionFeature
+    abstract class ContextMetaFeatureImplementation
+        : DumpableObject, IFeatureImplementation, IContextMetaFunctionFeature
     {
         protected ContextMetaFeatureImplementation(int? nextObjectId)
-            : base(nextObjectId)
-        { }
+            : base(nextObjectId) {}
+
         protected ContextMetaFeatureImplementation() { }
 
         IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => this;
         IMetaFunctionFeature IFeatureImplementation.Meta => null;
         IFunctionFeature IFeatureImplementation.Function => null;
-        ISimpleFeature IFeatureImplementation.Simple => null;
-        Result IContextMetaFunctionFeature.Result(ContextBase contextBase, Category category, CompileSyntax right)
+        IValueFeature IFeatureImplementation.Value => null;
+
+        Result IContextMetaFunctionFeature.Result
+            (ContextBase contextBase, Category category, CompileSyntax right)
             => Result(contextBase, category, right);
-        protected abstract Result Result(ContextBase contextBase, Category category, CompileSyntax right);
+
+        protected abstract Result Result
+            (ContextBase contextBase, Category category, CompileSyntax right);
     }
 
-    interface ISimpleFeature
+    interface IValueFeature
     {
         Result Result(Category category);
         TypeBase TargetType { get; }
@@ -116,7 +131,7 @@ namespace Reni.Feature
         /// <param name="category"> </param>
         /// <param name="argsType"> </param>
         /// <returns> </returns>
-        Result ApplyResult(Category category, TypeBase argsType);
+        Result Result(Category category, TypeBase argsType);
 
         /// <summary>
         ///     Gets a value indicating whether this function requires implicit call (i. e. call without argument list).
@@ -133,7 +148,8 @@ namespace Reni.Feature
 
     interface IMetaFunctionFeature
     {
-        Result Result(Category category, ResultCache left, ContextBase contextBase, CompileSyntax right);
+        Result Result
+            (Category category, ResultCache left, ContextBase contextBase, CompileSyntax right);
     }
 
     interface IContextMetaFunctionFeature
@@ -159,7 +175,7 @@ namespace Reni.Feature
 
     interface IGenericProviderForType
     {
-        IEnumerable<ISimpleFeature> GetForcedConversions(TypeBase typeBase);
+        IEnumerable<IValueFeature> GetForcedConversions(TypeBase typeBase);
     }
 
     interface IGenericProviderForDefinable
@@ -173,7 +189,7 @@ namespace Reni.Feature
         readonly T _target;
         public GenericProviderForType(T target) { _target = target; }
 
-        IEnumerable<ISimpleFeature> IGenericProviderForType.GetForcedConversions(TypeBase source)
+        IEnumerable<IValueFeature> IGenericProviderForType.GetForcedConversions(TypeBase source)
             => source.GetForcedConversions(_target);
     }
 
@@ -183,35 +199,50 @@ namespace Reni.Feature
         readonly T _target;
         public GenericProviderForDefinable(T target) { _target = target; }
 
-        IEnumerable<SearchResult> IGenericProviderForDefinable.Declarations(TypeBase source) => source.Declarations(_target);
-        IEnumerable<ContextSearchResult> IGenericProviderForDefinable.Declarations(ContextBase source)
+        IEnumerable<SearchResult> IGenericProviderForDefinable.Declarations(TypeBase source)
+            => source.Declarations(_target);
+
+        IEnumerable<ContextSearchResult> IGenericProviderForDefinable.Declarations
+            (ContextBase source)
             => source.Declarations(_target);
     }
 
     sealed class MetaFunction : DumpableObject, IFeatureImplementation, IMetaFunctionFeature
     {
         readonly Func<Category, ResultCache, ContextBase, CompileSyntax, Result> _function;
-        public MetaFunction(Func<Category, ResultCache, ContextBase, CompileSyntax, Result> function) { _function = function; }
+
+        public MetaFunction
+            (Func<Category, ResultCache, ContextBase, CompileSyntax, Result> function)
+        {
+            _function = function;
+        }
 
         IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
         IMetaFunctionFeature IFeatureImplementation.Meta => this;
         IFunctionFeature IFeatureImplementation.Function => null;
-        ISimpleFeature IFeatureImplementation.Simple => null;
+        IValueFeature IFeatureImplementation.Value => null;
 
-        Result IMetaFunctionFeature.Result(Category category, ResultCache left, ContextBase contextBase, CompileSyntax right)
+        Result IMetaFunctionFeature.Result
+            (Category category, ResultCache left, ContextBase contextBase, CompileSyntax right)
             => _function(category, left, contextBase, right);
     }
 
     sealed class ContextMetaFunction : ContextMetaFeatureImplementation
     {
         readonly Func<ContextBase, Category, CompileSyntax, Result> _function;
-        public ContextMetaFunction(Func<ContextBase, Category, CompileSyntax, Result> function) { _function = function; }
 
-        protected override Result Result(ContextBase contextBase, Category category, CompileSyntax right)
+        public ContextMetaFunction(Func<ContextBase, Category, CompileSyntax, Result> function)
+        {
+            _function = function;
+        }
+
+        protected override Result Result
+            (ContextBase contextBase, Category category, CompileSyntax right)
             => _function(contextBase, category, right);
     }
 
-    sealed class ContextMetaFunctionFromSyntax : DumpableObject, IFeatureImplementation, IContextMetaFunctionFeature
+    sealed class ContextMetaFunctionFromSyntax
+        : DumpableObject, IFeatureImplementation, IContextMetaFunctionFeature
     {
         [EnableDump]
         readonly CompileSyntax _definition;
@@ -220,9 +251,10 @@ namespace Reni.Feature
         IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => this;
         IMetaFunctionFeature IFeatureImplementation.Meta => null;
         IFunctionFeature IFeatureImplementation.Function => null;
-        ISimpleFeature IFeatureImplementation.Simple => null;
+        IValueFeature IFeatureImplementation.Value => null;
 
-        Result IContextMetaFunctionFeature.Result(ContextBase callContext, Category category, CompileSyntax right)
+        Result IContextMetaFunctionFeature.Result
+            (ContextBase callContext, Category category, CompileSyntax right)
             => callContext.Result(category, _definition.ReplaceArg(right));
     }
 

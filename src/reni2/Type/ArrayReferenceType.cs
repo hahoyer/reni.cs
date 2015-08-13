@@ -22,7 +22,7 @@ namespace Reni.Type
             , IForcedConversionProvider<ArrayReferenceType>
             , IRepeaterType
             , IReference
-            , ISimpleFeature
+            , IValueFeature
     {
         internal sealed class Options : DumpableObject
         {
@@ -84,7 +84,7 @@ namespace Reni.Type
         protected override IEnumerable<IGenericProviderForType> Genericize
             => this.GenericListFromType(base.Genericize);
         [DisableDump]
-        protected override IEnumerable<ISimpleFeature> RawSymmetricConversions
+        protected override IEnumerable<IValueFeature> RawSymmetricConversions
             => base.RawSymmetricConversions;
 
         protected override string GetNodeDump()
@@ -104,26 +104,26 @@ namespace Reni.Type
         TypeBase IRepeaterType.IndexType => RootContext.BitType.Number(Size.ToInt());
         bool IRepeaterType.IsMutable => options.IsForceMutable.Value;
 
-        ISimpleFeature IReference.Converter => this;
+        IValueFeature IReference.Converter => this;
         bool IReference.IsWeak => false;
         Size IContextReference.Size => Size;
         int IContextReference.Order => _order;
 
-        TypeBase ISimpleFeature.TargetType => ValueType;
-        Result ISimpleFeature.Result(Category category) => DereferenceResult(category);
+        TypeBase IValueFeature.TargetType => ValueType;
+        Result IValueFeature.Result(Category category) => DereferenceResult(category);
 
-        IEnumerable<ISimpleFeature> IForcedConversionProvider<ArrayReferenceType>.Result
+        IEnumerable<IValueFeature> IForcedConversionProvider<ArrayReferenceType>.Result
             (ArrayReferenceType destination)
             => ForcedConversion(destination).NullableToArray();
 
         IFeatureImplementation ISymbolProvider<Mutable, IFeatureImplementation>.Feature
             (Mutable tokenClass)
-            => Feature.Extension.SimpleFeature(MutableResult);
+            => Feature.Extension.Value(MutableResult);
 
         IFeatureImplementation ISymbolProvider<EnableReinterpretation, IFeatureImplementation>.
             Feature
             (EnableReinterpretation tokenClass)
-            => Feature.Extension.SimpleFeature(EnableReinterpretationResult);
+            => Feature.Extension.Value(EnableReinterpretationResult);
 
         IFeatureImplementation ISymbolProvider<Item, IFeatureImplementation>.Feature
             (Item tokenClass)
@@ -147,10 +147,10 @@ namespace Reni.Type
         Result EnableReinterpretationResult(Category category)
             => ResultFromPointer(category, EnableReinterpretation);
 
-        ISimpleFeature ForcedConversion(ArrayReferenceType destination)
+        IValueFeature ForcedConversion(ArrayReferenceType destination)
             =>
                 HasForcedConversion(destination)
-                    ? Feature.Extension.SimpleFeature
+                    ? Feature.Extension.Value
                         (category => destination.ConversionResult(category, this), this)
                     : null;
 

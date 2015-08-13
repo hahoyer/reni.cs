@@ -96,7 +96,7 @@ namespace Reni.Struct
         internal Root RootContext => Compound.RootContext;
 
         [DisableDump]
-        internal IEnumerable<ISimpleFeature> ConverterFeatures
+        internal IEnumerable<IValueFeature> ConverterFeatures
             => Compound
                 .Syntax
                 .ConverterFunctions

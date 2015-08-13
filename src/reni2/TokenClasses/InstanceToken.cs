@@ -9,7 +9,7 @@ using Reni.Parser;
 namespace Reni.TokenClasses
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class InstanceToken : InfixSyntaxToken, IPendingProvider, IChainLink
+    sealed class InstanceToken : InfixSyntaxToken, IPendingProvider, IChainLink,IRecursionHandler
     {
         public const string TokenId = "instance";
         public override string Id => TokenId;
@@ -24,6 +24,22 @@ namespace Reni.TokenClasses
                 return Result(context, category, left, right);
             NotImplementedMethod(context, category, left, right);
             return null;
+        }
+
+        Result IRecursionHandler.Execute
+            (
+            ContextBase context,
+            Category category,
+            Category pendingCategory,
+            CompileSyntax syntax,
+            bool asReference)
+        {
+            if(!asReference && (category | pendingCategory) <= Category.Type)
+                return syntax.ResultForCache(context, Category.Type);
+
+            NotImplementedMethod(context,category,pendingCategory,syntax,asReference);
+            return null;
+
         }
     }
 }

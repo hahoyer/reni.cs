@@ -14,15 +14,15 @@ namespace Reni
     {
         internal interface IResultProvider
         {
-            Result Execute(Category category);
+            Result Execute(Category category, Category pendingCategory);
             object Target { get; }
         }
 
         sealed class ResultNotSupported : DumpableObject, IResultProvider
         {
-            Result IResultProvider.Execute(Category category)
+            Result IResultProvider.Execute(Category category, Category pendingCategory)
             {
-                NotImplementedMethod(category);
+                NotImplementedMethod(category, pendingCategory);
                 return null;
             }
 
@@ -38,33 +38,86 @@ namespace Reni
                 ObtainResult = obtainResult;
             }
 
-            Result IResultProvider.Execute(Category category) => ObtainResult(category);
+            Result IResultProvider.Execute(Category category, Category pendingCategory)
+            {
+                Tracer.Assert(pendingCategory.IsNone);
+                return ObtainResult(category);
+            }
+
             object IResultProvider.Target => null;
         }
 
+        sealed class CallStack : DumpableObject
+        {
+            internal CallStack Former;
+            internal Call Item;
+
+            internal IEnumerable<Call> ToEnumerable
+            {
+                get
+                {
+                    yield return Item;
+                    if(Former != null)
+                        foreach(var call in Former.ToEnumerable)
+                            yield return call;
+                }
+            }
+        }
+
+        sealed class Call : DumpableObject
+        {
+            internal ResultCache Item;
+            internal Category Category;
+
+            protected override string Dump(bool isRecursion)
+            {
+                var result = Item.NodeDump + " ";
+                result += Category.Dump();
+                if(Category != Item.Data.PendingCategory)
+                    result += "(Pending=" + Item.Data.PendingCategory.Dump() + ")";
+                result += "\n";
+                result += Tracer.Dump(Item.Provider);
+                return result;
+            }
+        }
+
+        [DisableDump]
+        static CallStack Current;
+        [DisableDump]
         static readonly IResultProvider NotSupported = new ResultNotSupported();
+        [DisableDump]
+        static int NextObjectId;
+        [DisableDump]
         IResultProvider Provider { get; }
+        [DisableDump]
         internal string FunctionDump = "";
 
+        [DisableDump]
+        static Call[] Calls => Current?.ToEnumerable.ToArray() ?? new Call[0];
+
+        [DisableDump]
+        internal Result Data { get; } = new Result();
+
         internal ResultCache(IResultProvider obtainResult)
+            : base(NextObjectId++)
         {
             Provider = obtainResult ?? NotSupported;
         }
 
         internal ResultCache(Func<Category, Result> obtainResult)
+            : base(NextObjectId++)
         {
             Provider = new SimpleProvider(obtainResult);
         }
 
         ResultCache(Result data)
+            : base(NextObjectId++)
         {
             Data = data;
             Provider = NotSupported;
         }
 
         public static implicit operator ResultCache(Result x) => new ResultCache(x);
-
-        internal Result Data { get; } = new Result();
 
         //[DebuggerHidden]
         void Update(Category category)
@@ -89,38 +142,62 @@ namespace Reni
                 localCategory -= Category.Exts;
             }
 
-            if(!localCategory.HasAny)
+            if(!localCategory.HasAny && !(category & Data.PendingCategory).HasAny)
                 return;
 
             var oldPendingCategory = Data.PendingCategory;
             try
             {
                 Data.PendingCategory |= localCategory;
-                var result = Provider.Execute(localCategory);
+                var result = Provider.Execute(localCategory, oldPendingCategory & category );
                 Tracer.Assert(localCategory <= result.CompleteCategory);
                 Data.Update(result);
             }
             finally
             {
-                Data.PendingCategory = oldPendingCategory;
+                Data.PendingCategory = oldPendingCategory - Data.CompleteCategory;
             }
         }
 
         public static Result operator &(ResultCache resultCache, Category category)
             => resultCache.GetCategories(category);
 
+
         internal Result GetCategories(Category category)
         {
-            var trace = true;
-            StartMethodDump(trace, category, nameof(Provider), Provider);
+            var trace = ObjectId == -1;
+            StartMethodDump(trace, category, nameof(Calls), Calls);
             try
             {
-                Update(category);
+                GuardedUpdate(category);
+                Dump(nameof(Provider), Provider);
                 return ReturnMethodDump(Data & category);
             }
             finally
             {
                 EndMethodDump();
+            }
+        }
+
+        void GuardedUpdate(Category category)
+        {
+            try
+            {
+                Current = new CallStack
+                {
+                    Former = Current,
+                    Item = new Call
+                    {
+                        Category = category,
+                        Item = this
+                    }
+                };
+
+                Update(category);
+            }
+            finally
+            {
+                Current = Current.Former;
             }
         }
 

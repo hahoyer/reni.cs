@@ -12,6 +12,6 @@ namespace Reni.Type
         IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
         IMetaFunctionFeature IFeatureImplementation.Meta => null;
         IFunctionFeature IFeatureImplementation.Function => null;
-        ISimpleFeature IFeatureImplementation.Simple => null;
+        IValueFeature IFeatureImplementation.Value => null;
     }
 }

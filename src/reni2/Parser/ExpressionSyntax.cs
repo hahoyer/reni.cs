@@ -71,13 +71,18 @@ namespace Reni.Parser
             switch(searchResults.Length)
             {
                 case 0:
-                    return typeForSearch.UndefinedSymbol(Token).Result(category);
+                    return typeForSearch
+                        .UndefinedSymbol(Token)
+                        .Result(category);
 
                 case 1:
-                    return searchResults[0].Execute(category, left, context, Right);
+                    return searchResults[0]
+                        .Execute(category, left, context, Right);
 
                 default:
-                    return context.RootContext.UndefinedSymbol(Token)
+                    return context
+                        .RootContext
+                        .UndefinedSymbol(Token)
                         .Result(category);
             }
         }

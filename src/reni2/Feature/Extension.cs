@@ -18,11 +18,11 @@ namespace Reni.Feature
                 = new FunctionCache<Func<Category, ResultCache, ContextBase, CompileSyntax, Result>, MetaFunction>
                     (function => new MetaFunction(function));
 
-        static readonly FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Simple>> _simpleCache
-            = new FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Simple>>
-                (function => new FunctionCache<TypeBase, Simple>(type => new Simple(function, type)));
+        static readonly FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Value>> _simpleCache
+            = new FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Value>>
+                (function => new FunctionCache<TypeBase, Value>(type => new Value(function, type)));
 
-        internal static Simple SimpleFeature(Func<Category, Result> function, TypeBase target = null)
+        internal static Value Value(Func<Category, Result> function, TypeBase target = null)
             => _simpleCache[function][(target ?? function.Target as TypeBase).AssertNotNull()];
 
         internal static ObjectFunction FunctionFeature
@@ -41,21 +41,21 @@ namespace Reni.Feature
             => new ExtendedFunction<T>(function, arg);
 
 
-        internal static ISimpleFeature SimpleFeature(this IFeatureImplementation feature)
+        internal static IValueFeature ExtendedValue(this IFeatureImplementation feature)
         {
             var function = feature.Function;
             if(function != null && function.IsImplicit)
                 return null;
 
-            return feature.Simple;
+            return feature.Value;
         }
 
         internal static MetaFunction MetaFeature(Func<Category, ResultCache, ContextBase, CompileSyntax, Result> function)
             => _metaFunctionCache[function];
 
-        internal static TypeBase ResultType(this ISimpleFeature f) => f.Result(Category.Type)?.Type;
+        internal static TypeBase ResultType(this IValueFeature f) => f.Result(Category.Type)?.Type;
 
-        internal static bool IsCloseRelative(ISimpleFeature feature) => !(feature is IStepRelative);
+        internal static bool IsCloseRelative(IValueFeature feature) => !(feature is IStepRelative);
 
         public static IEnumerable<IGenericProviderForType> GenericListFromType<T>
             (this T target, IEnumerable<IGenericProviderForType> baseList = null)

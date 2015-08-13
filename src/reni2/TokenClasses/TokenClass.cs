@@ -33,6 +33,7 @@ namespace Reni.TokenClasses
                 BreakExecution();
                 var syntax = this.Operation(left?.Syntax, token, right?.Syntax);
                 var result = new SourceSyntax(left, this, token, right, syntax.Value, syntax.Issues);
+                syntax.Value.SourcePart = result.SourcePart;
                 return ReturnMethodDump(result);
             }
             finally

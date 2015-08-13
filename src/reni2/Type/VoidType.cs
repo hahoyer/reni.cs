@@ -22,7 +22,7 @@ namespace Reni.Type
         internal override bool Hllw => true;
 
         IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
-            => Feature.Extension.SimpleFeature(DumpPrintTokenResult);
+            => Feature.Extension.Value(DumpPrintTokenResult);
 
         internal override TypeBase Pair(TypeBase second) => second;
         new Result DumpPrintTokenResult(Category category) => Result(category);

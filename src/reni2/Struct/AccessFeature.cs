@@ -14,7 +14,7 @@ namespace Reni.Struct
     sealed class AccessFeature
         : DumpableObject
             , IFeatureImplementation
-            , ISimpleFeature
+            , IValueFeature
     {
         static int _nextObjectId;
 
@@ -41,7 +41,7 @@ namespace Reni.Struct
 
         IFunctionFeature IFeatureImplementation.Function => FunctionFeature.Value;
 
-        ISimpleFeature IFeatureImplementation.Simple
+        IValueFeature IFeatureImplementation.Value
         {
             get
             {
@@ -52,9 +52,9 @@ namespace Reni.Struct
             }
         }
 
-        Result ISimpleFeature.Result(Category category) => View.AccessViaObject(category, Position);
+        Result IValueFeature.Result(Category category) => View.AccessViaObject(category, Position);
 
-        TypeBase ISimpleFeature.TargetType => View.Type;
+        TypeBase IValueFeature.TargetType => View.Type;
 
         CompileSyntax Statement => View
             .Compound

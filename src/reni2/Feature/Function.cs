@@ -26,7 +26,7 @@ namespace Reni.Feature
             _target = target;
         }
 
-        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
+        Result IFunctionFeature.Result(Category category, TypeBase argsType)
             => _function(category, ObjectReference, argsType);
 
         bool IFunctionFeature.IsImplicit => false;
@@ -42,7 +42,7 @@ namespace Reni.Feature
         IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
         IMetaFunctionFeature IFeatureImplementation.Meta => null;
         IFunctionFeature IFeatureImplementation.Function => this;
-        ISimpleFeature IFeatureImplementation.Simple => null;
+        IValueFeature IFeatureImplementation.Value => null;
     }
 
     sealed class Function : FunctionFeatureImplementation
@@ -51,7 +51,7 @@ namespace Reni.Feature
 
         internal Function(Func<Category, TypeBase, Result> function) { _function = function; }
 
-        protected override Result ApplyResult(Category category, TypeBase argsType) => _function(category, argsType);
+        protected override Result Result(Category category, TypeBase argsType) => _function(category, argsType);
         protected override bool IsImplicit => false;
         protected override IContextReference ObjectReference => null;
     }
@@ -74,7 +74,7 @@ namespace Reni.Feature
             Tracer.Assert(_function.Target is IContextReferenceProvider);
         }
 
-        protected override Result ApplyResult(Category category, TypeBase argsType) => _function(category, argsType, _arg);
+        protected override Result Result(Category category, TypeBase argsType) => _function(category, argsType, _arg);
         protected override bool IsImplicit => false;
         protected override IContextReference ObjectReference => ((IContextReferenceProvider) _function.Target).ContextReference;
     }

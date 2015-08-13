@@ -51,7 +51,7 @@ namespace Reni.Type
             public readonly ValueCache<Size> Size;
             [Node]
             [SmartNode]
-            public readonly ValueCache<IEnumerable<ISimpleFeature>> SymmetricConversions;
+            public readonly ValueCache<IEnumerable<IValueFeature>> SymmetricConversions;
             [Node]
             [SmartNode]
             internal readonly FunctionCache<string, ArrayReferenceType> ArrayReferenceCache;
@@ -80,7 +80,7 @@ namespace Reni.Type
                     (() => new FunctionInstanceType(parent));
                 TypeType = new ValueCache<TypeType>(() => new TypeType(parent));
                 Size = new ValueCache<Size>(parent.GetSizeForCache);
-                SymmetricConversions = new ValueCache<IEnumerable<ISimpleFeature>>
+                SymmetricConversions = new ValueCache<IEnumerable<IValueFeature>>
                     (parent.GetSymmetricConversionsForCache);
                 ArrayReferenceCache = new FunctionCache<string, ArrayReferenceType>
                     (id => new ArrayReferenceType(parent, id));
@@ -441,8 +441,8 @@ namespace Reni.Type
             );
 
         internal TypeBase SmartUn<T>()
-            where T : ISimpleFeature
-            => this is T ? ((ISimpleFeature) this).Result(Category.Type).Type : this;
+            where T : IValueFeature
+            => this is T ? ((IValueFeature) this).Result(Category.Type).Type : this;
 
         internal Result ResultFromPointer(Category category, TypeBase resultType) => resultType
             .Pointer
@@ -486,7 +486,7 @@ namespace Reni.Type
             => this.GenericListFromType();
         [DisableDump]
         [NotNull]
-        public IEnumerable<ISimpleFeature> SymmetricConversions => _cache.SymmetricConversions.Value
+        public IEnumerable<IValueFeature> SymmetricConversions => _cache.SymmetricConversions.Value
             ;
 
         Result AlignResult(Category category)
@@ -494,26 +494,26 @@ namespace Reni.Type
             return Align.Result(category, () => ArgCode.Align(), CodeArgs.Arg);
         }
 
-        IEnumerable<ISimpleFeature> GetSymmetricConversionsForCache()
+        IEnumerable<IValueFeature> GetSymmetricConversionsForCache()
             => RawSymmetricConversions
                 .ToDictionary(x => x.ResultType())
                 .Values;
 
         [DisableDump]
-        protected virtual IEnumerable<ISimpleFeature> RawSymmetricConversions
+        protected virtual IEnumerable<IValueFeature> RawSymmetricConversions
         {
             get
             {
                 if(Hllw)
                     yield break;
                 if(IsAligningPossible && Align.Size != Size)
-                    yield return Feature.Extension.SimpleFeature(AlignResult);
+                    yield return Feature.Extension.Value(AlignResult);
                 if(IsPointerPossible)
-                    yield return Feature.Extension.SimpleFeature(LocalReferenceResult);
+                    yield return Feature.Extension.Value(LocalReferenceResult);
             }
         }
 
-        internal IEnumerable<ISimpleFeature> GetForcedConversions(TypeBase destination)
+        internal IEnumerable<IValueFeature> GetForcedConversions(TypeBase destination)
         {
             var genericProviderForTypes = destination
                 .Genericize
@@ -529,19 +529,19 @@ namespace Reni.Type
             return result;
         }
 
-        internal virtual IEnumerable<ISimpleFeature> GetForcedConversions<TDestination>
+        internal virtual IEnumerable<IValueFeature> GetForcedConversions<TDestination>
             (TDestination destination)
         {
             var provider = this as IForcedConversionProvider<TDestination>;
             if(provider != null)
                 return provider.Result(destination);
-            return new ISimpleFeature[0];
+            return new IValueFeature[0];
         }
 
         [DisableDump]
-        internal virtual IEnumerable<ISimpleFeature> StripConversions { get { yield break; } }
+        internal virtual IEnumerable<IValueFeature> StripConversions { get { yield break; } }
 
-        internal virtual IEnumerable<ISimpleFeature> CutEnabledConversion(NumberType destination)
+        internal virtual IEnumerable<IValueFeature> CutEnabledConversion(NumberType destination)
         {
             yield break;
         }
@@ -571,12 +571,12 @@ namespace Reni.Type
 
     interface IForcedConversionProvider<in TDestination>
     {
-        IEnumerable<ISimpleFeature> Result(TDestination destination);
+        IEnumerable<IValueFeature> Result(TDestination destination);
     }
 
     interface IForcedConversionProviderForPointer<in TDestination>
     {
-        IEnumerable<ISimpleFeature> Result(TDestination destination);
+        IEnumerable<IValueFeature> Result(TDestination destination);
     }
 
     // Krautpuster

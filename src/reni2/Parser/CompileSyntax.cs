@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using hw.Debug;
 using hw.Forms;
@@ -25,7 +24,7 @@ namespace Reni.Parser
         internal CompileSyntax() { }
 
         internal CompileSyntax(int objectId)
-            : base(objectId) { }
+            : base(objectId) {}
 
         [DisableDump]
         internal bool IsLambda => GetIsLambda();
@@ -44,6 +43,8 @@ namespace Reni.Parser
 
         [DisableDump]
         internal override Checked<CompileSyntax> ToCompiledSyntax => this;
+
+        public virtual IRecursionHandler RecursionHandler => null;
 
         internal void AddToCacheForDebug(ContextBase context, object cacheItem)
             => _resultCache.Add(context, cacheItem);
@@ -89,7 +90,6 @@ namespace Reni.Parser
 
         internal virtual Result PendingResultForCache(ContextBase context, Category category)
         {
-
             NotImplementedMethod(context, category);
             return null;
         }
@@ -102,6 +102,17 @@ namespace Reni.Parser
             NotImplementedMethod(visitor);
             return null;
         }
+    }
+
+    interface IRecursionHandler
+    {
+        Result Execute
+            (
+            ContextBase context,
+            Category category,
+            Category pendingCategory,
+            CompileSyntax syntax,
+            bool asReference);
     }
 
     sealed class ReplaceArgVisitor : DumpableObject, ISyntaxVisitor

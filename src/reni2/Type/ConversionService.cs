@@ -99,7 +99,7 @@ namespace Reni.Type
             return path.IsValid ? new[] {(TDestination) path.Destination} : null;
         }
 
-        internal static IEnumerable<ISimpleFeature> ForcedConversions
+        internal static IEnumerable<IValueFeature> ForcedConversions
             (ConversionPath source, ConversionPath destination)
             => source.Destination
                 .GetForcedConversions(destination.Source);
@@ -109,7 +109,7 @@ namespace Reni.Type
                 .Result(source)
                 .Where(path => path.IsCloseRelativeConversion);
 
-        internal static IEnumerable<ISimpleFeature> SymmetricFeatureClosure(this TypeBase source)
+        internal static IEnumerable<IValueFeature> SymmetricFeatureClosure(this TypeBase source)
         {
             var result = RawSymmetricFeatureClosure(source).ToArray();
             Tracer.Assert
@@ -128,7 +128,7 @@ namespace Reni.Type
             return result;
         }
 
-        static bool IsSymmetric(this ISimpleFeature[] list)
+        static bool IsSymmetric(this IValueFeature[] list)
         {
             if(!list.Any())
                 return true;
@@ -141,14 +141,14 @@ namespace Reni.Type
             return y.Length == 1 && x.Length == y.Single();
         }
 
-        internal static IEnumerable<TypeBase> Types(this IEnumerable<ISimpleFeature> list)
+        internal static IEnumerable<TypeBase> Types(this IEnumerable<IValueFeature> list)
         {
             return list
                 .SelectMany(i => new[] {i.TargetType, i.ResultType()})
                 .Distinct();
         }
 
-        static void AssertPath(this IReadOnlyList<ISimpleFeature> elements)
+        static void AssertPath(this IReadOnlyList<IValueFeature> elements)
         {
             var features = elements
                 .Skip(1)
@@ -165,16 +165,16 @@ namespace Reni.Type
             //Tracer.Assert(!features.Any(), features.Stringify("\n"));
         }
 
-        internal static IEnumerable<ISimpleFeature> RemoveCircles
-            (this IEnumerable<ISimpleFeature> list)
+        internal static IEnumerable<IValueFeature> RemoveCircles
+            (this IEnumerable<IValueFeature> list)
         {
-            var result = new List<ISimpleFeature>(list);
+            var result = new List<IValueFeature>(list);
             result.AssertPath();
             if(!result.Any())
                 return list;
             var source = result.First().TargetType;
             if(source == result.Last().ResultType())
-                return new ISimpleFeature[0];
+                return new IValueFeature[0];
 
             for(var i = 0; i < result.Count; i++)
             {
@@ -193,7 +193,7 @@ namespace Reni.Type
             return result;
         }
 
-        static IEnumerable<ISimpleFeature> RawSymmetricFeatureClosure(this TypeBase source)
+        static IEnumerable<IValueFeature> RawSymmetricFeatureClosure(this TypeBase source)
         {
             var types = new TypeBase[0];
             var newTypes = new[] {source};
@@ -240,7 +240,7 @@ namespace Reni.Type
             internal static IEnumerable<ConversionPath> Result(TypeBase source)
                 => new ClosureService(source).Result();
 
-            static IEnumerable<ISimpleFeature> NextConversionStep(TypeBase source)
+            static IEnumerable<IValueFeature> NextConversionStep(TypeBase source)
                 => SymmetricClosureService.From(source).Union(source.StripConversions);
 
             TypeBase Source { get; }

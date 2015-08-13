@@ -23,17 +23,17 @@ namespace Reni.Feature
 
         protected Result Result(Category category, ContextBase context, CompileSyntax right)
         {
-            var simpleFeature = Feature.SimpleFeature();
+            var simpleFeature = Feature.ExtendedValue();
             if(simpleFeature != null && right == null)
                 return simpleFeature.Result(category);
 
-            var rightResult =right == null
+            var rightResult = right == null
                 ? RootContext.VoidType.Result(Category.All)
-                :context.ResultAsReferenceCache(right);
+                : context.ResultAsReferenceCache(right);
 
             var applyResult = Feature
                 .Function
-                .ApplyResult(category, rightResult.Type);
+                .Result(category, rightResult.Type);
 
             return applyResult
                 .ReplaceArg(rightResult);
@@ -46,7 +46,7 @@ namespace Reni.Feature
             try
             {
                 BreakExecution();
-                var result = Result(category,context,right);
+                var result = Result(category, context, right);
                 return ReturnMethodDump(result);
             }
             finally
@@ -73,10 +73,11 @@ namespace Reni.Feature
 
         ConversionPath ConverterPath { get; }
 
-        internal Result Execute(Category category, ResultCache left, ContextBase context, CompileSyntax right)
+        internal Result Execute
+            (Category category, ResultCache left, ContextBase context, CompileSyntax right)
         {
             var metaFeature = Feature.Meta;
-            if (metaFeature != null)
+            if(metaFeature != null)
                 return metaFeature.Result(category, left, context, right);
 
             var trace = ObjectId == -69 && category.HasCode;
@@ -88,7 +89,8 @@ namespace Reni.Feature
                     return ReturnMethodDump<Result>(null);
 
                 var result = result1
-                    .ReplaceAbsolute(ConverterPath.Destination.CheckedReference, ConverterPath.Execute);
+                    .ReplaceAbsolute
+                    (ConverterPath.Destination.CheckedReference, ConverterPath.Execute);
 
                 Dump(nameof(result1), result1);
                 Dump(nameof(result), result);
@@ -99,7 +101,6 @@ namespace Reni.Feature
             finally
             {
                 EndMethodDump();
-
             }
         }
 
@@ -119,7 +120,12 @@ namespace Reni.Feature
             Tracer.Assert(feature != null);
         }
 
-        public Result Execute(Category category, Func<Category, Result> objectReference, ContextBase context, CompileSyntax right)
+        public Result Execute
+            (
+            Category category,
+            Func<Category, Result> objectReference,
+            ContextBase context,
+            CompileSyntax right)
         {
             var metaFeature = Feature.ContextMeta;
             if(metaFeature != null)
@@ -129,6 +135,10 @@ namespace Reni.Feature
                 .ReplaceArg(objectReference);
         }
 
-        public TypeBase PrudentExecute(TypeBase objectPointerViaContext, ContextBase contextBase, CompileSyntax right) { throw new NotImplementedException(); }
+        public TypeBase PrudentExecute
+            (TypeBase objectPointerViaContext, ContextBase contextBase, CompileSyntax right)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

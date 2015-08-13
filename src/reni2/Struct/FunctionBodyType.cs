@@ -16,7 +16,7 @@ namespace Reni.Struct
     sealed class FunctionBodyType
         : TypeBase
             , IFunctionFeature
-            , ISimpleFeature
+            , IValueFeature
             , IFeatureImplementation
     {
         [EnableDump]
@@ -64,9 +64,9 @@ namespace Reni.Struct
 
         IContextReference IFunctionFeature.ObjectReference => ObjectReference;
         bool IFunctionFeature.IsImplicit => _syntax.IsImplicit;
-        TypeBase ISimpleFeature.TargetType => this;
+        TypeBase IValueFeature.TargetType => this;
 
-        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
+        Result IFunctionFeature.Result(Category category, TypeBase argsType)
         {
             var trace = ObjectId == -30 && (category.HasCode);
             StartMethodDump(trace, category, argsType);
@@ -93,8 +93,8 @@ namespace Reni.Struct
         IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
         IMetaFunctionFeature IFeatureImplementation.Meta => null;
         IFunctionFeature IFeatureImplementation.Function => this;
-        ISimpleFeature IFeatureImplementation.Simple => this;
-        Result ISimpleFeature.Result(Category category)
+        IValueFeature IFeatureImplementation.Value => this;
+        Result IValueFeature.Result(Category category)
         {
             NotImplementedMethod(category);
             return null;

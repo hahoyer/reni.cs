@@ -892,13 +892,13 @@ namespace Reni
         }
 
         Result Un<T>()
-            where T : ISimpleFeature
+            where T : IValueFeature
         {
-            var result = ((ISimpleFeature) Type).Result(CompleteCategory);
+            var result = ((IValueFeature) Type).Result(CompleteCategory);
             return result.ReplaceArg(this);
         }
 
-        internal Result SmartUn<T>() where T : ISimpleFeature => Type is T ? Un<T>() : this;
+        internal Result SmartUn<T>() where T : IValueFeature => Type is T ? Un<T>() : this;
 
         internal Result DereferencedAlignedResult()
         {
