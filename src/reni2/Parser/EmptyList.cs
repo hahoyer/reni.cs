@@ -16,6 +16,7 @@ namespace Reni.Parser
         public EmptyList(SourcePart token)
         {
             Token = token;
+            SourcePart = Token;
             StopByObjectIds();
         }
 
