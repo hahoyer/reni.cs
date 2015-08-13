@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
-using hw.Scanner;
 using hw.UnitTest;
 using Reni.UserInterface;
 
@@ -14,27 +13,24 @@ namespace Reni.FeatureTest.UserInterface
         [UnitTest]
         public void FromSourcePart()
         {
-            const string Text = @"(1,3,4,6)";
-            var compiler = new Compiler(text: Text);
+            const string text = @"(1,3,4,6)";
+            var compiler = new Compiler(text: text);
             var span = (compiler.Source + 2).Span(3);
-            var x = ((SyntaxToken)compiler.Containing(span)).SourceSyntax.SourcePart;
+            var x = ((SyntaxToken) compiler.Containing(span)).SourceSyntax.SourcePart;
 
             Tracer.Assert(x.Id == "1,3,4,6", x.Dump);
-
         }
 
         [UnitTest]
         public void CommentFromSourcePart()
         {
-            const string Text = @"( # Comment
+            const string text = @"( # Comment
 1,3,4,6)";
-            var compiler = new Compiler(text: Text);
+            var compiler = new Compiler(text: text);
             var span = (compiler.Source + 2).Span(3);
             var x = compiler.Containing(span);
 
-            Tracer.Assert(x.SourcePart.Id == "# Comment\r\n", x.Dump);
-
+            Tracer.Assert(x.SourcePart.Id.Replace("\r", "") == "# Comment\n", x.Dump);
         }
-
     }
 }
