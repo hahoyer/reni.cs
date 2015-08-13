@@ -191,10 +191,6 @@ namespace Reni.Context
             [SmartNode]
             internal readonly FunctionCache<CompileSyntax, ResultCache> ResultAsReferenceCache;
 
-            [Node]
-            [SmartNode]
-            internal readonly ValueCache<RecursionContext> RecursionContext;
-
             public Cache(ContextBase target)
             {
                 ResultCache = new FunctionCache<CompileSyntax, ResultCache>
@@ -293,16 +289,5 @@ namespace Reni.Context
                     (
                     new Issue(IssueId.UndefinedSymbol, source, "Context: " + Dump()),
                     RootContext);
-    }
-
-    sealed class RecursionContext : Child
-    {
-        internal RecursionContext(ContextBase parent)
-            : base(parent) { }
-
-        protected override string GetContextChildIdentificationDump() => "recursion";
-
-        [DisableDump]
-        internal override bool IsRecursionMode => true;
     }
 }

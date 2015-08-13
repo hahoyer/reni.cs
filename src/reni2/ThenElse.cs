@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Forms;
-using hw.Parser;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
@@ -11,7 +10,7 @@ using Reni.Type;
 
 namespace Reni
 {
-    sealed class CondSyntax : CompileSyntax
+    sealed class CondSyntax : CompileSyntax, IRecursionHandler
     {
         [Node]
         [EnableDump]
@@ -60,6 +59,8 @@ namespace Reni
         internal override Result ResultForCache(ContextBase context, Category category)
             => InternalResult(context, category);
 
+        public override IRecursionHandler RecursionHandler => this;
+
         Result CondResult(ContextBase context, Category category) => context.Result(category.Typed, Cond)
             .Conversion(context.RootContext.BitType.Align)
             .LocalBlock(category.Typed)
@@ -68,8 +69,10 @@ namespace Reni
         Result ElseResult(ContextBase context, Category category)
         {
             if(Else == null)
+            {
                 return context
                     .RootContext.VoidType.Result(category);
+            }
             return BranchResult(context, category, Else);
         }
         Result ThenResult(ContextBase context, Category category)
@@ -89,7 +92,7 @@ namespace Reni
                 .ReplaceArg(branchResult)
                 .LocalBlock(category.Typed)
                 .Conversion(commonType)
-                & category;
+                   & category;
         }
 
         Result InternalResult(ContextBase context, Category category)
@@ -115,8 +118,10 @@ namespace Reni
         TypeBase CommonType(ContextBase context)
         {
             if(Else == null)
+            {
                 return context
                     .RootContext.VoidType;
+            }
             var thenType = Then.Type(context);
             var elseType = Else.Type(context);
             if(thenType == null)
@@ -135,10 +140,23 @@ namespace Reni
         internal override Result PendingResultForCache(ContextBase context, Category category)
         {
             if(Else == null)
+            {
                 return context
                     .RootContext.VoidType.Result(category);
+            }
             return base.PendingResultForCache(context, category);
         }
 
+        Result IRecursionHandler.Execute
+            (ContextBase context, Category category, Category pendingCategory, CompileSyntax syntax, bool asReference)
+        {
+            Tracer.Assert(syntax == this);
+
+            if(!asReference && (category | pendingCategory) <= Category.Type && Else == null)
+                return context.RootContext.VoidType.Result(Category.Type);
+
+            NotImplementedMethod(context, category, pendingCategory, syntax, asReference);
+            return null;
+        }
     }
 }
