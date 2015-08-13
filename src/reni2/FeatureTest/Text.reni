@@ -46,7 +46,7 @@ Text: /\
 
     result:
     {
-        item : data (^) := new_value /\ data (^).
+        item : data item(^) := new_value /\ data item(^).
         this: ^^.
         count: ^ count.
 
@@ -67,7 +67,7 @@ Text: /\
 
                 body: /\
                 (
-                    data(position) dump_print,
+                    data item(position) dump_print,
                     position :=(position + 1) enable_cut
                 )
             )
@@ -81,7 +81,7 @@ Text: /\
             other: ^;
             count: this count + other count;
 
-            ! mix_in : /\ ^ < this count
+            item : /\ ^ < this count
             then this data item(^)
             else other data item(^ - this count);
         }
