@@ -12,19 +12,20 @@ namespace Reni.Validation
     abstract class IssueType : TypeBase
     {
         [EnableDump]
-        readonly Issue _issue;
+        internal readonly Issue Issue;
 
-        protected IssueType(Issue issue) { _issue = issue; }
+        protected IssueType(Issue issue) { Issue = issue; }
 
         [DisableDump]
         internal override bool Hllw => true;
-        internal override string DumpPrintText => _issue.IssueId.Tag;
+        internal override string DumpPrintText => Issue.IssueId.Tag;
+        protected override string GetNodeDump() => base.GetNodeDump() + " " + DumpPrintText;
 
         internal override IssueType UndefinedSymbol(SourcePart source)
             => new ConsequentialIssueType(this, source);
 
-        internal Result Result(Category category) => Result(category, Code);
+        internal Result Result(Category category) => Result(category, () => Code);
 
-        internal virtual CodeBase Code() => _issue.Code;
+        internal virtual CodeBase Code => Issue.Code;
     }
 }

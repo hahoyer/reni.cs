@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using hw.Debug;
 using hw.Scanner;
 using Reni.Code;
 using Reni.Context;
@@ -12,13 +13,15 @@ namespace Reni.Validation
         readonly IssueType _issueType;
 
         public ConsequentialIssueType(IssueType issueType, SourcePart source)
-            : base(new Issue(IssueId.ConsequentialError, source)) { _issueType = issueType; }
+            : base(new Issue(IssueId.ConsequentialError, source))
+        {
+            _issueType = issueType;
+            StopByObjectIds(302);
+        }
 
+        [DisableDump]
         internal override Root RootContext => _issueType.RootContext;
 
-        internal override string DumpPrintText
-            => _issueType.DumpPrintText + "," + base.DumpPrintText;
-
-        internal override CodeBase Code() => _issueType.Code() + base.Code();
+        internal override CodeBase Code => _issueType.Code + base.Code;
     }
 }
