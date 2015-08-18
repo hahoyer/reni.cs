@@ -77,6 +77,22 @@ namespace hw.Debug
         }
 
         /// <summary>
+        ///     Method start dump,
+        /// </summary>
+        /// <param name="name"> </param>
+        /// <param name="getValue"> </param>
+        /// <returns> </returns>
+        [DebuggerHidden]
+        public static void Dump(string name, Func<object> getValue)
+        {
+            if (IsMethodDumpTraceActive)
+            {
+                var os = Tracer.DumpData("", new[] { name, getValue() }, 1);
+                Tracer.Line(os);
+            }
+        }
+
+        /// <summary>
         ///     Method dump,
         /// </summary>
         /// <param name="rv"> </param>
