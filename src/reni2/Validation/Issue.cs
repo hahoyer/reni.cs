@@ -28,7 +28,7 @@ namespace Reni.Validation
         internal IssueId IssueId { get; }
         [EnableDump]
         internal SourcePart Position { get; }
-
+        [EnableDump]
         string Message { get; }
 
         string Tag => IssueId.Tag;
