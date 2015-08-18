@@ -283,11 +283,12 @@ namespace Reni.Context
                     ContextSearchResult(feature, RootContext);
         }
 
-        public IssueType UndefinedSymbol(SourcePart source)
+        internal IssueType UndefinedSymbol(SourcePart source)
             =>
                 new RootIssueType
                     (
                     new Issue(IssueId.UndefinedSymbol, source, "Context: " + Dump()),
                     RootContext);
+
     }
 }
