@@ -20,7 +20,7 @@ namespace Reni.TokenClasses
         public override string Id => TokenId(IsEqual);
 
         [DisableDump]
-        internal override IEnumerable<IGenericProviderForDefinable> Genericize
+        internal override IEnumerable<IDeclarationProvider> Genericize
             => this.GenericListFromDefinable(base.Genericize);
     }
 }

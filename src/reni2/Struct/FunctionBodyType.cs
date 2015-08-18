@@ -89,11 +89,14 @@ namespace Reni.Struct
                 EndMethodDump();
             }
         }
+
         FunctionType Function(TypeBase argsType) => _compoundView.Function(_syntax, argsType);
+
         IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
         IMetaFunctionFeature IFeatureImplementation.Meta => null;
         IFunctionFeature IFeatureImplementation.Function => this;
         IValueFeature IFeatureImplementation.Value => this;
+
         Result IValueFeature.Result(Category category)
         {
             NotImplementedMethod(category);

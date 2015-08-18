@@ -16,6 +16,6 @@ namespace Reni.Numeric
         public override string Id => TokenId;
         protected override int Signature(int objSize, int argSize) => BitsConst.DivideSize(objSize, argSize);
         [DisableDump]
-        internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
+        internal override IEnumerable<IDeclarationProvider> Genericize => this.GenericListFromDefinable(base.Genericize);
     }
 }

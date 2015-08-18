@@ -178,7 +178,7 @@ namespace Reni.Feature
         IEnumerable<IValueFeature> GetForcedConversions(TypeBase typeBase);
     }
 
-    interface IGenericProviderForDefinable
+    interface IDeclarationProvider
     {
         IEnumerable<SearchResult> Declarations(TypeBase source);
         IEnumerable<ContextSearchResult> Declarations(ContextBase source);
@@ -193,16 +193,16 @@ namespace Reni.Feature
             => source.GetForcedConversions(_target);
     }
 
-    sealed class GenericProviderForDefinable<T> : DumpableObject, IGenericProviderForDefinable
+    sealed class GenericProviderForDefinable<T> : DumpableObject, IDeclarationProvider
         where T : Definable
     {
         readonly T _target;
         public GenericProviderForDefinable(T target) { _target = target; }
 
-        IEnumerable<SearchResult> IGenericProviderForDefinable.Declarations(TypeBase source)
+        IEnumerable<SearchResult> IDeclarationProvider.Declarations(TypeBase source)
             => source.Declarations(_target);
 
-        IEnumerable<ContextSearchResult> IGenericProviderForDefinable.Declarations
+        IEnumerable<ContextSearchResult> IDeclarationProvider.Declarations
             (ContextBase source)
             => source.Declarations(_target);
     }

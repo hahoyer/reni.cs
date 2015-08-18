@@ -14,7 +14,7 @@ namespace Reni.Numeric
     {
         string NumberType.IOperation.Name => DataFunctionName;
         [DisableDump]
-        internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
+        internal override IEnumerable<IDeclarationProvider> Genericize => this.GenericListFromDefinable(base.Genericize);
     }
 
     abstract class TransformationOperation
@@ -24,6 +24,6 @@ namespace Reni.Numeric
         int NumberType.ITransformation.Signature(int objectBitCount, int argsBitCount) => Signature(objectBitCount, argsBitCount);
         protected abstract int Signature(int objSize, int argSize);
         [DisableDump]
-        internal override IEnumerable<IGenericProviderForDefinable> Genericize => this.GenericListFromDefinable(base.Genericize);
+        internal override IEnumerable<IDeclarationProvider> Genericize => this.GenericListFromDefinable(base.Genericize);
     }
 }

@@ -106,7 +106,9 @@
     <Compile Include="FeatureTest\Validation\SyntaxError.cs" />
     <Compile Include="FeatureTest\Validation\UndefinedContextSymbol.cs" />
     <Compile Include="FeatureTest\Validation\UnMatchedBrackets.cs" />
+    <Compile Include="Feature\ContextSearchResult.cs" />
     <Compile Include="Feature\Extension.cs" />
+    <Compile Include="Feature\FeatureContainer.cs" />
     <Compile Include="Feature\Function.cs" />
     <Compile Include="Feature\SearchResult.cs" />
     <Compile Include="Feature\Simple.cs" />
