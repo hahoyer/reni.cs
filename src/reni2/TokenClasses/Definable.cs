@@ -28,7 +28,7 @@ namespace Reni.TokenClasses
         protected string DataFunctionName => Id.Symbolize();
 
         [DisableDump]
-        internal virtual IEnumerable<IGenericProviderForDefinable> Genericize
+        internal virtual IEnumerable<IDeclarationProvider> Genericize
             => this.GenericListFromDefinable();
     }
 
@@ -44,20 +44,10 @@ namespace Reni.TokenClasses
         public ConcatArrays(bool isMutable) { IsMutable = isMutable; }
 
         [DisableDump]
-        internal override IEnumerable<IGenericProviderForDefinable> Genericize
+        internal override IEnumerable<IDeclarationProvider> Genericize
             => this.GenericListFromDefinable(base.Genericize);
 
         public override string Id => IsMutable ? MutableId : TokenId;
-    }
-
-    [BelongsTo(typeof(MainTokenFactory))]
-    sealed class Item : Definable
-    {
-        public const string TokenId = "item";
-        [DisableDump]
-        internal override IEnumerable<IGenericProviderForDefinable> Genericize
-            => this.GenericListFromDefinable(base.Genericize);
-        public override string Id => TokenId;
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
@@ -65,7 +55,7 @@ namespace Reni.TokenClasses
     {
         public const string TokenId = "count";
         [DisableDump]
-        internal override IEnumerable<IGenericProviderForDefinable> Genericize
+        internal override IEnumerable<IDeclarationProvider> Genericize
             => this.GenericListFromDefinable(base.Genericize);
         public override string Id => TokenId;
     }
@@ -75,7 +65,7 @@ namespace Reni.TokenClasses
     {
         public const string TokenId = "reference";
         [DisableDump]
-        internal override IEnumerable<IGenericProviderForDefinable> Genericize
+        internal override IEnumerable<IDeclarationProvider> Genericize
             => this.GenericListFromDefinable(base.Genericize);
         public override string Id => TokenId;
     }
@@ -85,7 +75,7 @@ namespace Reni.TokenClasses
     {
         public const string TokenId = "array_reference";
         [DisableDump]
-        internal override IEnumerable<IGenericProviderForDefinable> Genericize
+        internal override IEnumerable<IDeclarationProvider> Genericize
             => this.GenericListFromDefinable(base.Genericize);
         public override string Id => TokenId;
     }

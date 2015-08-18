@@ -392,10 +392,10 @@ namespace Reni.Type
 
         [NotNull]
         internal Result GenericDumpPrintResult(Category category)
-        {
-            var searchResults = SmartPointer.Declarations<DumpPrintToken>(null);
-            return searchResults.Single().CallResult(category);
-        }
+            => SmartPointer
+                .Declarations<DumpPrintToken>(null)
+                .Single()
+                .SpecialExecute(category);
 
         internal Result CreateArray(Category category, string optionsId = null) => Align
             .Array(1, optionsId).Pointer
@@ -455,13 +455,38 @@ namespace Reni.Type
             return null;
         }
 
+        internal virtual SearchResult FuncionDeclarationForType => null;
+        internal virtual SearchResult FuncionDeclarationFoPointerrType => null;
+
+        internal SearchResult FuncionDeclarationForTypeAndCloseRelatives
+            =>
+                DeclarationsForTypeAndCloseRelatives
+                    (item => item.FuncionDeclarationForType.NullableToArray())
+                    .SingleOrDefault();
+
+        /// <summary>
+        ///     Call this function to get declarations of definable for this type for definable.
+        /// </summary>
+        /// <param name="definable"></param>
+        /// <returns></returns>
         internal IEnumerable<SearchResult> DeclarationsForType(Definable definable)
             => definable.Genericize.SelectMany(g => g.Declarations(this));
 
+        /// <summary>
+        ///     Call this function to get declarations of definable for this type
+        ///     and its close relatives (see <see cref="ConversionService.CloseRelativeConversions" />).
+        /// </summary>
+        /// <param name="tokenClass"></param>
+        /// <returns></returns>
         internal IEnumerable<SearchResult> DeclarationsForTypeAndCloseRelatives
             (Definable tokenClass)
+            => DeclarationsForTypeAndCloseRelatives
+                (item => item.DeclarationsForType(tokenClass).ToArray());
+
+        IEnumerable<SearchResult> DeclarationsForTypeAndCloseRelatives
+            (Func<TypeBase, IEnumerable<SearchResult>> declarationForType)
         {
-            var result = DeclarationsForType(tokenClass).ToArray();
+            var result = declarationForType(this).ToArray();
             if(result.Any())
                 return result;
 
@@ -469,10 +494,22 @@ namespace Reni.Type
                 .CloseRelativeConversions()
                 .ToArray();
             return closeRelativeConversions
-                .SelectMany(path => path.CloseRelativeSearchResults(tokenClass).ToArray())
+                .SelectMany(path => path.CloseRelativeSearchResults(declarationForType))
                 .ToArray();
         }
 
+        /// <summary>
+        ///     Override this function to provide declarations of a definable for this type.
+        ///     Only declaration, that are made exactly for type <see cref="TDefinable" />
+        ///     should be considered.
+        ///     This implementation checks if this type is symbol provider for definable.
+        ///     Dont call this except in overriden versions.
+        ///     Always call <see cref="DeclarationsForType" /> or
+        ///     <see cref="DeclarationsForTypeAndCloseRelatives" /> instead.
+        /// </summary>
+        /// <typeparam name="TDefinable"></typeparam>
+        /// <param name="tokenClass"></param>
+        /// <returns></returns>
         internal virtual IEnumerable<SearchResult> Declarations<TDefinable>(TDefinable tokenClass)
             where TDefinable : Definable
         {
@@ -541,6 +578,7 @@ namespace Reni.Type
         [DisableDump]
         internal virtual IEnumerable<IValueFeature> StripConversions { get { yield break; } }
 
+
         internal virtual IEnumerable<IValueFeature> CutEnabledConversion(NumberType destination)
         {
             yield break;
@@ -565,6 +603,13 @@ namespace Reni.Type
                 new RootIssueType
                     (
                     new Issue(IssueId.UndefinedSymbol, source, "Type: " + DumpPrintText),
+                    RootContext);
+
+        internal IssueType AmbigousSymbol(SourcePart source)
+            =>
+                new RootIssueType
+                    (
+                    new Issue(IssueId.AmbigousSymbol, source, "Type: " + DumpPrintText),
                     RootContext);
     }
 

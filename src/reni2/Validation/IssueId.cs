@@ -10,6 +10,7 @@ namespace Reni.Validation
 {
     sealed class IssueId : EnumEx
     {
+        public static readonly IssueId AmbigousSymbol = new IssueId();
         public static readonly IssueId ConsequentialError = new IssueId();
         public static readonly IssueId EOFInComment = new IssueId();
         public static readonly IssueId EOFInLineComment = new IssueId();

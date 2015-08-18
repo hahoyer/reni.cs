@@ -14,4 +14,11 @@ namespace Reni.FeatureTest.Array
     [TypeOperator]
     public sealed class TypeOfSimpleArrayFromPiece : CompilerTest
     {}
+
+    [UnitTest]
+    [Target("(<<5)() type dump_print")]
+    [Output("number(bits:4)")]
+    [TypeOfSimpleArrayFromPiece]
+    public sealed class TypeOfElementOfSimpleArrayFromPiece : CompilerTest
+    { }
 }

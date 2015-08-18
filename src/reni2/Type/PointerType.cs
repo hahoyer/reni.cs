@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using hw.Helper;
 using System.Linq;
 using hw.Debug;
+using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -60,9 +60,12 @@ namespace Reni.Type
                     (new IValueFeature[] {Feature.Extension.Value(DereferenceResult)});
 
         protected override string GetNodeDump() => ValueType.NodeDump + "[Pointer]";
+
         internal override int? SmartArrayLength(TypeBase elementType)
             => ValueType.SmartArrayLength(elementType);
+
         protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
+
         protected override ArrayType ArrayForCache(int count, string optionsId)
             => ValueType.Array(count, optionsId);
 
@@ -78,6 +81,9 @@ namespace Reni.Type
                 yield return feature;
         }
 
+        internal override SearchResult FuncionDeclarationForType
+            => ValueType.FuncionDeclarationFoPointerrType
+                ?? base.FuncionDeclarationForType;
 
         internal override IEnumerable<SearchResult> Declarations<TDefinable>(TDefinable tokenClass)
         {

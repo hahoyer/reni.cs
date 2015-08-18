@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using hw.Helper;
 using System.Linq;
 using hw.Debug;
+using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -18,7 +18,6 @@ namespace Reni.Type
             , ISymbolProvider<EnableReinterpretation, IFeatureImplementation>
             , ISymbolProvider<Plus, IFeatureImplementation>
             , ISymbolProvider<Minus, IFeatureImplementation>
-            , ISymbolProvider<Item, IFeatureImplementation>
             , IForcedConversionProvider<ArrayReferenceType>
             , IRepeaterType
             , IReference
@@ -44,8 +43,10 @@ namespace Reni.Type
             internal OptionsData.Option IsEnableReinterpretation { get; }
 
             internal static Options Create(string optionsId) => new Options(optionsId);
+
             internal static string ForceMutable(bool value)
                 => Create(null).IsForceMutable.SetTo(value);
+
             protected override string GetNodeDump() => DumpPrintText;
             public string DumpPrintText => OptionsData.DumpPrintText;
         }
@@ -88,7 +89,8 @@ namespace Reni.Type
             => base.RawSymmetricConversions;
 
         protected override string GetNodeDump()
-            => ValueType.NodeDump + "[reference]" + options.NodeDump;
+            => ValueType.NodeDump + "[array_reference]" + options.NodeDump;
+
         protected override Size GetSize() => ValueType.Pointer.Size;
 
         [DisableDump]
@@ -125,9 +127,8 @@ namespace Reni.Type
             (EnableReinterpretation tokenClass)
             => Feature.Extension.Value(EnableReinterpretationResult);
 
-        IFeatureImplementation ISymbolProvider<Item, IFeatureImplementation>.Feature
-            (Item tokenClass)
-            => Feature.Extension.FunctionFeature(AccessResult);
+        internal override SearchResult FuncionDeclarationForType
+            => new SearchResult(Feature.Extension.FunctionFeature(AccessResult), this);
 
         IFeatureImplementation ISymbolProvider<Minus, IFeatureImplementation>.Feature
             (Minus tokenClass)
@@ -177,7 +178,7 @@ namespace Reni.Type
         internal Result ConversionResult(Category category, ArrayType source)
         {
             var trace = ObjectId == -1 && category.HasCode;
-            StartMethodDump(trace, category,source);
+            StartMethodDump(trace, category, source);
             try
             {
                 return ReturnMethodDump(Result(category, source.Pointer.ArgResult));

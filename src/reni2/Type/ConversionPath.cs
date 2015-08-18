@@ -5,7 +5,6 @@ using hw.Debug;
 using hw.Helper;
 using Reni.Basics;
 using Reni.Feature;
-using Reni.TokenClasses;
 
 namespace Reni.Type
 {
@@ -115,13 +114,10 @@ namespace Reni.Type
             return !Elements.Where((element, index) => element != Elements[index]).Any();
         }
 
-        internal IEnumerable<SearchResult> CloseRelativeSearchResults(Definable definable)
-        {
-            var declarationsForType = Destination
-                .DeclarationsForType(definable);
-            return declarationsForType
+        internal IEnumerable<SearchResult> CloseRelativeSearchResults
+            (Func<TypeBase, IEnumerable<SearchResult>> getDeclarationForType)
+            => getDeclarationForType(Destination)
                 .Select(result => new SearchResult(result, this));
-        }
 
         internal bool HasHigherPriority(ConversionPath other)
         {

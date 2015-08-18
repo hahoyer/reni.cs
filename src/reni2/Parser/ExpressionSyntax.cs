@@ -80,9 +80,8 @@ namespace Reni.Parser
                         .Execute(category, left, context, Right);
 
                 default:
-                    return context
-                        .RootContext
-                        .UndefinedSymbol(Token)
+                    return typeForSearch
+                        .AmbigousSymbol(Token)
                         .Result(category);
             }
         }
