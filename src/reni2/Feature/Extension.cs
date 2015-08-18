@@ -62,8 +62,8 @@ namespace Reni.Feature
             where T : TypeBase
             => CreateList(baseList, () => new GenericProviderForType<T>(target));
 
-        public static IEnumerable<IGenericProviderForDefinable> GenericListFromDefinable<T>
-            (this T target, IEnumerable<IGenericProviderForDefinable> baseList = null)
+        public static IEnumerable<IDeclarationProvider> GenericListFromDefinable<T>
+            (this T target, IEnumerable<IDeclarationProvider> baseList = null)
             where T : Definable
             => CreateList(baseList, () => new GenericProviderForDefinable<T>(target));
 

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.Debug;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
@@ -10,52 +9,6 @@ using Reni.Type;
 
 namespace Reni.Feature
 {
-    abstract class FeatureContainer : DumpableObject
-    {
-        protected FeatureContainer(IFeatureImplementation feature, Root rootContext)
-        {
-            RootContext = rootContext;
-            Feature = feature;
-        }
-
-        protected Root RootContext { get; }
-        protected IFeatureImplementation Feature { get; }
-
-        protected Result Result(Category category, ContextBase context, CompileSyntax right)
-        {
-            var simpleFeature = Feature.ExtendedValue();
-            if(simpleFeature != null && right == null)
-                return simpleFeature.Result(category);
-
-            var rightResult = right == null
-                ? RootContext.VoidType.Result(Category.All)
-                : context.ResultAsReferenceCache(right);
-
-            var applyResult = Feature
-                .Function
-                .Result(category, rightResult.Type);
-
-            return applyResult
-                .ReplaceArg(rightResult);
-        }
-
-        protected Result ResultForDebug(Category category, ContextBase context, CompileSyntax right)
-        {
-            var trace = ObjectId == -1032;
-            StartMethodDump(trace, category, context, right);
-            try
-            {
-                BreakExecution();
-                var result = Result(category, context, right);
-                return ReturnMethodDump(result);
-            }
-            finally
-            {
-                EndMethodDump();
-            }
-        }
-    }
-
     sealed class SearchResult : FeatureContainer
     {
         internal SearchResult(SearchResult result, ConversionPath relativeConversion)
@@ -94,7 +47,7 @@ namespace Reni.Feature
 
                 Dump(nameof(result1), result1);
                 Dump(nameof(result), result);
-                Dump(nameof(left), left.Code);
+                Dump(nameof(left), ()=>left.Code);
                 BreakExecution();
                 return ReturnMethodDump(result.ReplaceArg(left));
             }
@@ -104,41 +57,11 @@ namespace Reni.Feature
             }
         }
 
-        internal Result CallResult(Category category) => Result(category, null, null);
+        internal Result SpecialExecute(Category category) => Result(category, null, null);
 
         internal bool HasHigherPriority(SearchResult other)
             => (Feature is AccessFeature) == (other.Feature is AccessFeature)
                 ? ConverterPath.HasHigherPriority(other.ConverterPath)
                 : Feature is AccessFeature;
-    }
-
-    sealed class ContextSearchResult : FeatureContainer
-    {
-        internal ContextSearchResult(IFeatureImplementation feature, Root rootContext)
-            : base(feature, rootContext)
-        {
-            Tracer.Assert(feature != null);
-        }
-
-        public Result Execute
-            (
-            Category category,
-            Func<Category, Result> objectReference,
-            ContextBase context,
-            CompileSyntax right)
-        {
-            var metaFeature = Feature.ContextMeta;
-            if(metaFeature != null)
-                return metaFeature.Result(context, category, right);
-
-            return Result(category, context, right)
-                .ReplaceArg(objectReference);
-        }
-
-        public TypeBase PrudentExecute
-            (TypeBase objectPointerViaContext, ContextBase contextBase, CompileSyntax right)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
