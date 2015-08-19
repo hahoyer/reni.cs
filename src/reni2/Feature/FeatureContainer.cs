@@ -21,7 +21,7 @@ namespace Reni.Feature
         protected Root RootContext { get; }
         protected IFeatureImplementation Feature { get; }
         bool IsImplicit => Feature.Function != null && Feature.Function.IsImplicit;
-        bool IsValue => Feature.Value != null;
+        bool IsValue => Feature.Function == null && Feature.Value != null;
 
         protected Result Result(Category category, ContextBase context, CompileSyntax right)
         {
@@ -32,7 +32,10 @@ namespace Reni.Feature
             var valueResult = IsValue
                 ? Feature.Value.Result(valueCategory)
                 : IsImplicit
-                    ? Feature.Function.Result(valueCategory, RootContext.VoidType)
+                    ? Feature
+                    .Function
+                    .Result(valueCategory, RootContext.VoidType)
+                    .ReplaceArg(RootContext.VoidType.Result(valueCategory))
                     : null;
 
             if(right == null)
