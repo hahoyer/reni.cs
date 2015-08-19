@@ -35,7 +35,7 @@ namespace Reni.Feature
                     ? Feature
                     .Function
                     .Result(valueCategory, RootContext.VoidType)
-                    .ReplaceArg(RootContext.VoidType.Result(valueCategory))
+                    .ReplaceArg(RootContext.VoidType.Result(Category.All))
                     : null;
 
             if(right == null)
