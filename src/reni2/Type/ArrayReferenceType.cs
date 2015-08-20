@@ -127,8 +127,8 @@ namespace Reni.Type
             (EnableReinterpretation tokenClass)
             => Feature.Extension.Value(EnableReinterpretationResult);
 
-        internal override SearchResult FuncionDeclarationForType
-            => new SearchResult(Feature.Extension.FunctionFeature(AccessResult), this);
+        internal override IFeatureImplementation FuncionDeclarationForType
+            => Feature.Extension.FunctionFeature(AccessResult);
 
         IFeatureImplementation ISymbolProvider<Minus, IFeatureImplementation>.Feature
             (Minus tokenClass)

@@ -136,6 +136,9 @@ namespace Reni.Type
             (Mutable tokenClass)
             => Feature.Extension.Value(MutableResult);
 
+        internal override IFeatureImplementation FuncionDeclarationForType
+            => Feature.Extension.FunctionFeature(ElementAccessResult);
+
         IFeatureImplementation ISymbolProviderForPointer<ToNumberOfBase, IFeatureImplementation>.
             Feature
             (ToNumberOfBase tokenClass)
@@ -156,7 +159,6 @@ namespace Reni.Type
         IEnumerable<IValueFeature> IForcedConversionProviderForPointer<ArrayReferenceType>.Result
             (ArrayReferenceType destination) 
             => ForcedConversion(destination).NullableToArray();
-
 
         protected override Size GetSize() => ElementType.Size * Count;
         internal override Result Destructor(Category category)

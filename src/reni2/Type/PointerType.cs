@@ -81,7 +81,7 @@ namespace Reni.Type
                 yield return feature;
         }
 
-        internal override SearchResult FuncionDeclarationForType
+        internal override IFeatureImplementation FuncionDeclarationForType
             => ValueType.FuncionDeclarationFoPointerrType
                 ?? base.FuncionDeclarationForType;
 

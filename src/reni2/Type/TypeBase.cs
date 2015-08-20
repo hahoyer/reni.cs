@@ -455,13 +455,23 @@ namespace Reni.Type
             return null;
         }
 
-        internal virtual SearchResult FuncionDeclarationForType => null;
-        internal virtual SearchResult FuncionDeclarationFoPointerrType => null;
+        internal IEnumerable<SearchResult> FuncionDeclarationsForType
+        {
+            get
+            {
+                var result = FuncionDeclarationForType;
+                if(result != null)
+                    yield return new SearchResult(result, this);
+            }
+        }
+
+        internal virtual IFeatureImplementation FuncionDeclarationForType => null;
+        internal virtual IFeatureImplementation FuncionDeclarationFoPointerrType => null;
 
         internal SearchResult FuncionDeclarationForTypeAndCloseRelatives
             =>
                 DeclarationsForTypeAndCloseRelatives
-                    (item => item.FuncionDeclarationForType.NullableToArray())
+                    (item => item.FuncionDeclarationsForType)
                     .SingleOrDefault();
 
         /// <summary>
