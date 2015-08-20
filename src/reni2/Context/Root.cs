@@ -17,8 +17,8 @@ namespace Reni.Context
 {
     sealed class Root
         : ContextBase
-            , ISymbolProviderForPointer<Minus, IFeatureImplementation>
-            , ISymbolProviderForPointer<ConcatArrays, IFeatureImplementation>
+            , ISymbolProviderForPointer<Minus>
+            , ISymbolProviderForPointer<ConcatArrays>
     {
         [DisableDump]
         [Node]
@@ -94,10 +94,10 @@ namespace Reni.Context
         [DisableDump]
         public bool ProcessErrors => ExecutionContext.ProcessErrors;
 
-        IFeatureImplementation ISymbolProviderForPointer<Minus, IFeatureImplementation>.Feature
+        IFeatureImplementation ISymbolProviderForPointer<Minus>.Feature
             (Minus tokenClass) => _minusFeatureCache.Value;
 
-        IFeatureImplementation ISymbolProviderForPointer<ConcatArrays, IFeatureImplementation>.
+        IFeatureImplementation ISymbolProviderForPointer<ConcatArrays>.
             Feature(ConcatArrays tokenClass)
             => _createArrayFeatureCache[tokenClass.IsMutable];
 

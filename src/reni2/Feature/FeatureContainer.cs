@@ -45,20 +45,40 @@ namespace Reni.Feature
 
             if(valueResult == null)
             {
-                if (Feature.Function == null)
+                if(Feature.Function == null)
                     NotImplementedMethod(category, context, right);
                 Tracer.Assert(Feature.Function != null);
                 return Feature
                     .Function
                     .Result(category, context.ResultAsReferenceCache(right).Type)
-                    .ReplaceArg(context.ResultAsReferenceCache(right));}
+                    .ReplaceArg(context.ResultAsReferenceCache(right));
+            }
 
-            var searchResult = valueResult.Type.FuncionDeclarationForTypeAndCloseRelatives;
-            if(searchResult != null)
-                return searchResult.Execute(category, valueResult, context, right);
+            var searchResults = valueResult
+                .Type
+                .DeclarationsForTypeAndCloseRelatives(null)
+                .ToArray();
 
-            NotImplementedMethod(category, context, right, nameof(valueResult), valueResult);
-            return null;
+            switch(searchResults.Length)
+            {
+                case 0:
+                    NotImplementedMethod(category, context, right, nameof(valueResult), valueResult);
+                    return null;
+                case 1:
+                    return searchResults.Single().Execute(category, valueResult, context, right);
+                default:
+                    NotImplementedMethod
+                        (
+                            category,
+                            context,
+                            right,
+                            nameof(valueResult),
+                            valueResult,
+                            nameof(searchResults),
+                            searchResults
+                        );
+                    return null;
+            }
         }
 
         protected Result ResultForDebug(Category category, ContextBase context, CompileSyntax right)

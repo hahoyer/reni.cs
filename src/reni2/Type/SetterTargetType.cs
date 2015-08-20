@@ -15,7 +15,7 @@ namespace Reni.Type
             , IProxyType
             , IValueFeature
             , IReference
-            , ISymbolProvider<ReassignToken, IFeatureImplementation>
+            , ISymbolProvider<ReassignToken>
     {
         readonly int _order;
 
@@ -33,7 +33,7 @@ namespace Reni.Type
         [DisableDump]
         internal override bool IsPointerPossible => false;
 
-        IFeatureImplementation ISymbolProvider<ReassignToken, IFeatureImplementation>.Feature(ReassignToken tokenClass)
+        IFeatureImplementation ISymbolProvider<ReassignToken>.Feature(ReassignToken tokenClass)
             => IsMutable ? Feature.Extension.FunctionFeature(ReassignResult) : null;
 
         [EnableDumpExcept(false)]

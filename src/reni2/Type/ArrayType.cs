@@ -15,13 +15,13 @@ namespace Reni.Type
 {
     sealed class ArrayType
         : TypeBase
-            , ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>
-            , ISymbolProviderForPointer<ConcatArrays, IFeatureImplementation>
-            , ISymbolProviderForPointer<TextItem, IFeatureImplementation>
-            , ISymbolProviderForPointer<ToNumberOfBase, IFeatureImplementation>
-            , ISymbolProviderForPointer<Mutable, IFeatureImplementation>
-            , ISymbolProviderForPointer<ArrayReference, IFeatureImplementation>
-            , ISymbolProviderForPointer<Count, IFeatureImplementation>
+            , ISymbolProviderForPointer<DumpPrintToken>
+            , ISymbolProviderForPointer<ConcatArrays>
+            , ISymbolProviderForPointer<TextItem>
+            , ISymbolProviderForPointer<ToNumberOfBase>
+            , ISymbolProviderForPointer<Mutable>
+            , ISymbolProviderForPointer<ArrayReference>
+            , ISymbolProviderForPointer<Count>
             , IForcedConversionProviderForPointer<ArrayReferenceType>
             , IRepeaterType
     {
@@ -103,7 +103,7 @@ namespace Reni.Type
             => OptionsValue.IsTextItem.Value ? (ElementType.SimpleItemSize ?? Size) : base.SimpleItemSize
             ;
 
-        IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>.
+        IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken>.
             Feature
             (DumpPrintToken tokenClass)
             =>
@@ -111,7 +111,7 @@ namespace Reni.Type
                     ? Feature.Extension.Value(DumpPrintTokenResult)
                     : Feature.Extension.Value(DumpPrintTokenArrayResult);
 
-        IFeatureImplementation ISymbolProviderForPointer<ConcatArrays, IFeatureImplementation>.
+        IFeatureImplementation ISymbolProviderForPointer<ConcatArrays>.
             Feature(ConcatArrays tokenClass)
             =>
                 Feature.Extension.FunctionFeature
@@ -125,23 +125,23 @@ namespace Reni.Type
                                     OptionsValue.IsMutable.SetTo(tokenClass.IsMutable)),
                         this);
 
-        IFeatureImplementation ISymbolProviderForPointer<TextItem, IFeatureImplementation>.Feature
+        IFeatureImplementation ISymbolProviderForPointer<TextItem>.Feature
             (TextItem tokenClass)
             => Feature.Extension.Value(TextItemResult);
 
-        IFeatureImplementation ISymbolProviderForPointer<Mutable, IFeatureImplementation>.Feature
+        IFeatureImplementation ISymbolProviderForPointer<Mutable>.Feature
             (Mutable tokenClass)
             => Feature.Extension.Value(MutableResult);
 
         internal override IFeatureImplementation FunctionDeclarationForPointerType 
             => Feature.Extension.FunctionFeature(ElementAccessResult);
 
-        IFeatureImplementation ISymbolProviderForPointer<ToNumberOfBase, IFeatureImplementation>.
+        IFeatureImplementation ISymbolProviderForPointer<ToNumberOfBase>.
             Feature
             (ToNumberOfBase tokenClass)
             => OptionsValue.IsTextItem.Value ? Feature.Extension.MetaFeature(ToNumberOfBaseResult) : null;
 
-        IFeatureImplementation ISymbolProviderForPointer<ArrayReference, IFeatureImplementation>.
+        IFeatureImplementation ISymbolProviderForPointer<ArrayReference>.
             Feature
             (ArrayReference tokenClass)
             => Feature.Extension.Value(ReferenceResult);
@@ -149,7 +149,7 @@ namespace Reni.Type
         internal override int? SmartArrayLength(TypeBase elementType)
             => ElementType.IsConvertable(elementType) ? Count : base.SmartArrayLength(elementType);
 
-        IFeatureImplementation ISymbolProviderForPointer<Count, IFeatureImplementation>.Feature
+        IFeatureImplementation ISymbolProviderForPointer<Count>.Feature
             (Count tokenClass)
             => Feature.Extension.MetaFeature(CountResult);
 

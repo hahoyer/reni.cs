@@ -276,7 +276,7 @@ namespace Reni.Context
             (TDefinable tokenClass)
             where TDefinable : Definable
         {
-            var provider = this as ISymbolProviderForPointer<TDefinable, IFeatureImplementation>;
+            var provider = this as ISymbolProviderForPointer<TDefinable>;
             var feature = provider?.Feature(tokenClass);
             if(feature != null)
                 yield return new

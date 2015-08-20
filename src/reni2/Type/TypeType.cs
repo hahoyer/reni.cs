@@ -14,11 +14,11 @@ namespace Reni.Type
 {
     sealed class TypeType
         : TypeBase
-            , ISymbolProvider<DumpPrintToken, IFeatureImplementation>
-            , ISymbolProvider<Star, IFeatureImplementation>
-            , ISymbolProvider<Slash, IFeatureImplementation>
-            , ISymbolProvider<Mutable, IFeatureImplementation>
-            , ISymbolProvider<ArrayReference, IFeatureImplementation>
+            , ISymbolProvider<DumpPrintToken>
+            , ISymbolProvider<Star>
+            , ISymbolProvider<Slash>
+            , ISymbolProvider<Mutable>
+            , ISymbolProvider<ArrayReference>
     {
         public TypeType(TypeBase value)
         {
@@ -37,19 +37,19 @@ namespace Reni.Type
 
         internal override string DumpPrintText => "(" + Value.DumpPrintText + "()) type";
 
-        IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature
+        IFeatureImplementation ISymbolProvider<DumpPrintToken>.Feature
             (DumpPrintToken tokenClass)
             => Feature.Extension.Value(DumpPrintTokenResult);
 
-        IFeatureImplementation ISymbolProvider<Star, IFeatureImplementation>.Feature
+        IFeatureImplementation ISymbolProvider<Star>.Feature
             (Star tokenClass)
             => Feature.Extension.MetaFeature(StarResult);
 
-        IFeatureImplementation ISymbolProvider<Slash, IFeatureImplementation>.Feature
+        IFeatureImplementation ISymbolProvider<Slash>.Feature
             (Slash tokenClass)
             => Feature.Extension.MetaFeature(SlashResult);
 
-        IFeatureImplementation ISymbolProvider<Mutable, IFeatureImplementation>.Feature
+        IFeatureImplementation ISymbolProvider<Mutable>.Feature
             (Mutable tokenClass)
             => Value is ArrayType
                 ? Feature.Extension.Value(MutableArrayResult)
@@ -57,7 +57,7 @@ namespace Reni.Type
                     ? Feature.Extension.Value(MutableReferenceResult)
                     : null;
 
-        IFeatureImplementation ISymbolProvider<ArrayReference, IFeatureImplementation>.Feature
+        IFeatureImplementation ISymbolProvider<ArrayReference>.Feature
             (ArrayReference tokenClass)
             => Value is ArrayType ? Feature.Extension.Value(ArrayReferenceResult) : null;
 

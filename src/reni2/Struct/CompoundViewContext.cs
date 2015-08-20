@@ -12,7 +12,7 @@ namespace Reni.Struct
 {
     sealed class CompoundViewContext
         : Child
-            , ISymbolProviderForPointer<Definable, IFeatureImplementation>
+            , ISymbolProviderForPointer<Definable>
     {
         internal CompoundViewContext(ContextBase parent, CompoundView view)
             : base(parent) { View = view; }
@@ -25,7 +25,7 @@ namespace Reni.Struct
 
         protected override string GetContextChildIdentificationDump() => GetCompoundIdentificationDump();
 
-        IFeatureImplementation ISymbolProviderForPointer<Definable, IFeatureImplementation>.Feature(Definable tokenClass)
+        IFeatureImplementation ISymbolProviderForPointer<Definable>.Feature(Definable tokenClass)
             => View.Find(tokenClass);
 
         internal Result ObjectResult(Category category) => View.ObjectPointerViaContext(category);

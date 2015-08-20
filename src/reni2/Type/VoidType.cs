@@ -9,7 +9,7 @@ using Reni.Feature;
 
 namespace Reni.Type
 {
-    sealed class VoidType : TypeBase, ISymbolProvider<DumpPrintToken, IFeatureImplementation>
+    sealed class VoidType : TypeBase, ISymbolProvider<DumpPrintToken>
     {
         public VoidType(Root rootContext) { RootContext = rootContext; }
 
@@ -21,7 +21,7 @@ namespace Reni.Type
         [DisableDump]
         internal override bool Hllw => true;
 
-        IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
+        IFeatureImplementation ISymbolProvider<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
             => Feature.Extension.Value(DumpPrintTokenResult);
 
         internal override TypeBase Pair(TypeBase second) => second;

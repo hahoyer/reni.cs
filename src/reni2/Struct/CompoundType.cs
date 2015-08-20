@@ -12,10 +12,10 @@ namespace Reni.Struct
 {
     sealed class CompoundType
         : TypeBase
-            , ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>
-            , ISymbolProviderForPointer<Definable, IFeatureImplementation>
-            , ISymbolProvider<DumpPrintToken, IFeatureImplementation>
-            , ISymbolProvider<Definable, IFeatureImplementation>
+            , ISymbolProviderForPointer<DumpPrintToken>
+            , ISymbolProviderForPointer<Definable>
+            , ISymbolProvider<DumpPrintToken>
+            , ISymbolProvider<Definable>
     {
         internal CompoundType(CompoundView view) { View = view; }
 
@@ -46,17 +46,17 @@ namespace Reni.Struct
 
         Result VoidConversion(Category category) => RootContext.VoidType.Result(category, ArgResult);
 
-        IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>.Feature
+        IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature
             (DumpPrintToken tokenClass)
             => Feature.Extension.Value(DumpPrintTokenResult);
 
-        IFeatureImplementation ISymbolProviderForPointer<Definable, IFeatureImplementation>.Feature(Definable tokenClass)
+        IFeatureImplementation ISymbolProviderForPointer<Definable>.Feature(Definable tokenClass)
             => View.Find(tokenClass);
 
-        IFeatureImplementation ISymbolProvider<DumpPrintToken, IFeatureImplementation>.Feature(DumpPrintToken tokenClass)
+        IFeatureImplementation ISymbolProvider<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
             => Feature.Extension.Value(DumpPrintTokenResult);
 
-        IFeatureImplementation ISymbolProvider<Definable, IFeatureImplementation>.Feature(Definable tokenClass)
+        IFeatureImplementation ISymbolProvider<Definable>.Feature(Definable tokenClass)
             => View.Find(tokenClass);
 
         protected override Size GetSize() => View.CompoundViewSize;

@@ -88,7 +88,7 @@ namespace Reni.Type
         internal override IEnumerable<SearchResult> Declarations<TDefinable>(TDefinable tokenClass)
         {
             var feature = (ValueType as
-                ISymbolProviderForPointer<TDefinable, IFeatureImplementation>)
+                ISymbolProviderForPointer<TDefinable>)
                 ?.Feature(tokenClass);
             var result = feature.NullableToArray().Select(f => new SearchResult(f, Pointer));
             if(result.Any())
