@@ -5,7 +5,6 @@ using hw.Debug;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
-using Reni.Type;
 
 namespace Reni.Feature
 {
@@ -15,13 +14,12 @@ namespace Reni.Feature
         {
             RootContext = rootContext;
             Feature = feature;
-            Tracer.Assert(!(IsImplicit && IsValue));
+            Tracer.Assert(!(IsImplicit && Feature.Value != null));
         }
 
         protected Root RootContext { get; }
         protected IFeatureImplementation Feature { get; }
         bool IsImplicit => Feature.Function != null && Feature.Function.IsImplicit;
-        bool IsValue => Feature.Function == null && Feature.Value != null;
 
         protected Result Result(Category category, ContextBase context, CompileSyntax right)
         {
@@ -29,17 +27,21 @@ namespace Reni.Feature
             if(right != null)
                 valueCategory = category.Typed;
 
-            var valueResult = IsValue
-                ? Feature.Value.Result(valueCategory)
-                : IsImplicit
-                    ? Feature
+            var valueResult = IsImplicit
+                ? Feature
                     .Function
                     .Result(valueCategory, RootContext.VoidType)
                     .ReplaceArg(RootContext.VoidType.Result(Category.All))
+                : right == null || Feature.Function == null
+                    ? Feature.Value?.Result(valueCategory)
                     : null;
 
             if(right == null)
+            {
+                if(valueResult == null)
+                    NotImplementedMethod(category, context, right);
                 return valueResult;
+            }
 
             if(valueResult == null)
                 return Feature

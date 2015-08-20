@@ -60,6 +60,9 @@ namespace Reni.Struct
         internal override bool Hllw => true;
 
         [DisableDump]
+        internal override SearchResult FuncionDeclarationForType => new SearchResult(this,this);
+
+        [DisableDump]
         IContextReference ObjectReference => _objectReferenceCache.Value;
 
         IContextReference IFunctionFeature.ObjectReference => ObjectReference;
