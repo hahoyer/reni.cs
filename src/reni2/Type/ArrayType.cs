@@ -133,7 +133,7 @@ namespace Reni.Type
             (Mutable tokenClass)
             => Feature.Extension.Value(MutableResult);
 
-        internal override IFeatureImplementation FuncionDeclarationForType
+        internal override IFeatureImplementation FunctionDeclarationForPointerType 
             => Feature.Extension.FunctionFeature(ElementAccessResult);
 
         IFeatureImplementation ISymbolProviderForPointer<ToNumberOfBase, IFeatureImplementation>.
