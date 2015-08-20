@@ -9,12 +9,12 @@ namespace Reni.FeatureTest.Array
 {
     [UnitTest]
     [ArrayFromPieces]
-    [TargetSet("((<<5)item (0)) dump_print", "5")]
+    [TargetSet("((<<5)(0)) dump_print", "5")]
     public sealed class ElementAccessSimple : CompilerTest {}
 
     [UnitTest]
     [ElementAccessSimple]
-    [TargetSet("((<<5<<3<<5<<1<<3)item (3)) dump_print", "1")]
+    [TargetSet("((<<5<<3<<5<<1<<3)(3)) dump_print", "1")]
     public sealed class ElementAccess : CompilerTest {}
 
     [UnitTest]
@@ -27,18 +27,18 @@ namespace Reni.FeatureTest.Array
     [ElementAccessVariable]
     [ArrayVariable]
     [TwoStatements]
-    [TargetSet("x:  <<:= 5;  x item(0):= 2; x dump_print", "<<:=(2)")]
+    [TargetSet("x:  <<:= 5;  x (0):= 2; x dump_print", "<<:=(2)")]
     public sealed class ElementAccessVariableSetterSimple : CompilerTest {}
 
     [UnitTest]
     [ElementAccessVariableSetterSimple]
     [TwoStatements]
-    [TargetSet("x:  <<5<<3<<5<<1<<:=3; x item(3) := 2; x dump_print", "<<:=(5, 3, 5, 2, 3)")]
+    [TargetSet("x:  <<5<<3<<5<<1<<:=3; x (3) := 2; x dump_print", "<<:=(5, 3, 5, 2, 3)")]
     public sealed class ElementAccessVariableSetter : CompilerTest {}
 
     [UnitTest]
     [ElementAccess]
     [TwoStatements]
-    [TargetSet("x: <<5<<3<<5<<1<<3;  x item(3) dump_print", "1")]
+    [TargetSet("x: <<5<<3<<5<<1<<3;  x (3) dump_print", "1")]
     public sealed class ElementAccessVariable : CompilerTest {}
 }
