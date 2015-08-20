@@ -468,19 +468,21 @@ namespace Reni.Type
         internal virtual IFeatureImplementation FuncionDeclarationForType => null;
         internal virtual IFeatureImplementation FunctionDeclarationForPointerType => null;
 
-        internal SearchResult FuncionDeclarationForTypeAndCloseRelatives
-            =>
-                DeclarationsForTypeAndCloseRelatives
-                    (item => item.FuncionDeclarationsForType)
-                    .SingleOrDefault();
-
         /// <summary>
-        ///     Call this function to get declarations of definable for this type for definable.
+        ///     Call this function to get declarations of definable for this type.
         /// </summary>
         /// <param name="definable"></param>
         /// <returns></returns>
-        IEnumerable<SearchResult> DeclarationsForType(Definable definable)
-            => definable.Genericize.SelectMany(g => g.Declarations(this));
+        internal IEnumerable<SearchResult> DeclarationsForType(Definable definable)
+        {
+            if(definable == null)
+                return FuncionDeclarationsForType;
+
+            return definable
+                .Genericize
+                .SelectMany(g => g.Declarations(this))
+                .ToArray();
+        }
 
         /// <summary>
         ///     Call this function to get declarations of definable for this type
@@ -490,13 +492,8 @@ namespace Reni.Type
         /// <returns></returns>
         internal IEnumerable<SearchResult> DeclarationsForTypeAndCloseRelatives
             (Definable tokenClass)
-            => DeclarationsForTypeAndCloseRelatives
-                (item => item.DeclarationsForType(tokenClass).ToArray());
-
-        IEnumerable<SearchResult> DeclarationsForTypeAndCloseRelatives
-            (Func<TypeBase, IEnumerable<SearchResult>> declarationForType)
         {
-            var result = declarationForType(this).ToArray();
+            var result = DeclarationsForType(tokenClass).ToArray();
             if(result.Any())
                 return result;
 
@@ -504,7 +501,7 @@ namespace Reni.Type
                 .CloseRelativeConversions()
                 .ToArray();
             return closeRelativeConversions
-                .SelectMany(path => path.CloseRelativeSearchResults(declarationForType))
+                .SelectMany(path => path.CloseRelativeSearchResults(tokenClass))
                 .ToArray();
         }
 
@@ -521,7 +518,7 @@ namespace Reni.Type
         internal virtual IEnumerable<SearchResult> Declarations<TDefinable>(TDefinable tokenClass)
             where TDefinable : Definable
         {
-            var feature = (this as ISymbolProvider<TDefinable, IFeatureImplementation>)
+            var feature = (this as ISymbolProvider<TDefinable>)
                 ?.Feature(tokenClass);
             return feature.NullableToArray().Select(f => new SearchResult(f, this));
         }
