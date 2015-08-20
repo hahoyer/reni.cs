@@ -106,7 +106,7 @@ namespace Reni.Type
                     CodeArgs.Arg
                 );
 
-        internal override ResultCache DePointer(Category category)
+        protected override ResultCache DePointer(Category category)
             => ValueType
                 .Result
                 (

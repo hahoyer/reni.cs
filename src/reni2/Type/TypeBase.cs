@@ -206,12 +206,12 @@ namespace Reni.Type
         internal virtual TypeBase Pair(TypeBase second) => second.ReversePair(this);
         internal virtual Result Destructor(Category category) => VoidCodeAndRefs(category);
 
-        internal virtual Result ArrayDestructor(Category category, int count)
+        internal virtual Result ArrayDestructor(Category category)
             => VoidCodeAndRefs(category);
 
         internal virtual Result Copier(Category category) => VoidCodeAndRefs(category);
 
-        internal virtual Result ArrayCopier(Category category, int count)
+        internal virtual Result ArrayCopier(Category category)
             => VoidCodeAndRefs(category);
 
         internal virtual Result ApplyTypeOperator(Result argResult)
@@ -330,7 +330,7 @@ namespace Reni.Type
                 .DeAlign(Category.Type).Type;
 
         protected virtual Result DeAlign(Category category) => ArgResult(category);
-        internal virtual ResultCache DePointer(Category category) => ArgResult(category);
+        protected virtual ResultCache DePointer(Category category) => ArgResult(category);
 
         internal int ArrayLength(TypeBase elementType)
         {
@@ -380,7 +380,7 @@ namespace Reni.Type
             return CheckedReference ?? ForcedPointer;
         }
 
-        internal virtual PointerType ForcedPointerForCache()
+        protected virtual PointerType ForcedPointerForCache()
         {
             Tracer.Assert(!Hllw);
             return new PointerType(this);
@@ -455,7 +455,7 @@ namespace Reni.Type
             return null;
         }
 
-        internal IEnumerable<SearchResult> FuncionDeclarationsForType
+        IEnumerable<SearchResult> FuncionDeclarationsForType
         {
             get
             {
@@ -479,7 +479,7 @@ namespace Reni.Type
         /// </summary>
         /// <param name="definable"></param>
         /// <returns></returns>
-        internal IEnumerable<SearchResult> DeclarationsForType(Definable definable)
+        IEnumerable<SearchResult> DeclarationsForType(Definable definable)
             => definable.Genericize.SelectMany(g => g.Declarations(this));
 
         /// <summary>
@@ -514,8 +514,6 @@ namespace Reni.Type
         ///     should be considered.
         ///     This implementation checks if this type is symbol provider for definable.
         ///     Dont call this except in overriden versions.
-        ///     Always call <see cref="DeclarationsForType" /> or
-        ///     <see cref="DeclarationsForTypeAndCloseRelatives" /> instead.
         /// </summary>
         /// <typeparam name="TDefinable"></typeparam>
         /// <param name="tokenClass"></param>
@@ -571,7 +569,7 @@ namespace Reni.Type
 
             Tracer.Assert(result.All(f => f.TargetType == this));
             Tracer.Assert(result.All(f => f.ResultType() == destination));
-            Tracer.Assert(result.Count() <= 1);
+            Tracer.Assert(result.Length <= 1);
 
             return result;
         }

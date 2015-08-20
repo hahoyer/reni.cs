@@ -35,7 +35,7 @@ namespace Reni.Type
         internal override IReference ForcedReference => Parent.ForcedReference;
 
         protected override Result DeAlign(Category category) => Parent.Result(category, ArgResult);
-        internal override PointerType ForcedPointerForCache() => Parent.ForcedPointer;
+        protected override PointerType ForcedPointerForCache() => Parent.ForcedPointer;
 
         protected override IEnumerable<IValueFeature> RawSymmetricConversions
             => base.RawSymmetricConversions.Concat(new IValueFeature[] {Feature.Extension.Value(UnalignedResult)});

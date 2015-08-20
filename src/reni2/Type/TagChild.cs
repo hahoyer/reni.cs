@@ -24,9 +24,9 @@ namespace Reni.Type
         protected override sealed Size GetSize() => Parent.Size;
         protected override string GetNodeDump() => Parent.NodeDump + "[" + TagTitle + "]";
         internal override sealed Result Destructor(Category category) => Parent.Destructor(category);
-        internal override sealed Result ArrayDestructor(Category category, int count) => Parent.ArrayDestructor(category, count);
+        internal override sealed Result ArrayDestructor(Category category) => Parent.ArrayDestructor(category);
         internal override sealed Result Copier(Category category) => Parent.Copier(category);
-        internal override sealed Result ArrayCopier(Category category, int count) => Parent.ArrayCopier(category, count);
+        internal override sealed Result ArrayCopier(Category category) => Parent.ArrayCopier(category);
 
         protected override Result ParentConversionResult(Category category) => Parent.Result(category, ArgResult);
 
