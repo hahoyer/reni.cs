@@ -59,7 +59,7 @@ namespace Reni.Type
         {
             ElementType = elementType;
             Count = count;
-            options = Options.Create(optionsId);
+            OptionsValue = Options.Create(optionsId);
             Tracer.Assert(count > 0);
             Tracer.Assert(elementType.CheckedReference == null);
             Tracer.Assert(!elementType.Hllw);
@@ -71,26 +71,23 @@ namespace Reni.Type
         [DisableDump]
         internal TypeBase ElementType { get; }
         int Count { get; }
-        Options options { get; }
+        Options OptionsValue { get; }
 
         TypeBase IRepeaterType.ElementType => ElementType;
         TypeBase IRepeaterType.IndexType => RootContext.BitType.Number(IndexSize.ToInt());
         bool IRepeaterType.IsMutable => IsMutable;
         [DisableDump]
         RepeaterAccessType AccessType => _repeaterAccessTypeCache.Value;
-
         [DisableDump]
-        internal bool IsMutable => options.IsMutable.Value;
-
+        bool IsMutable => OptionsValue.IsMutable.Value;
         [DisableDump]
-        public NumberType Number => _numberCache.Value;
-
+        internal NumberType Number => _numberCache.Value;
         [DisableDump]
-        internal ArrayType NoTextItem => ElementType.Array(Count, options.IsTextItem.SetTo(false));
+        ArrayType NoTextItem => ElementType.Array(Count, OptionsValue.IsTextItem.SetTo(false));
         [DisableDump]
-        internal ArrayType TextItem => ElementType.Array(Count, options.IsTextItem.SetTo(true));
+        internal ArrayType TextItem => ElementType.Array(Count, OptionsValue.IsTextItem.SetTo(true));
         [DisableDump]
-        internal ArrayType Mutable => ElementType.Array(Count, options.IsMutable.SetTo(true));
+        internal ArrayType Mutable => ElementType.Array(Count, OptionsValue.IsMutable.SetTo(true));
 
         internal ArrayReferenceType Reference(bool isForceMutable)
             => ElementType.ArrayReference(ArrayReferenceType.Options.ForceMutable(isForceMutable));
@@ -99,18 +96,18 @@ namespace Reni.Type
         internal override bool Hllw => Count == 0 || ElementType.Hllw;
 
         internal override string DumpPrintText
-            => "(" + ElementType.DumpPrintText + ")*" + Count + options.DumpPrintText;
+            => "(" + ElementType.DumpPrintText + ")*" + Count + OptionsValue.DumpPrintText;
 
         [DisableDump]
         internal override Size SimpleItemSize
-            => options.IsTextItem.Value ? (ElementType.SimpleItemSize ?? Size) : base.SimpleItemSize
+            => OptionsValue.IsTextItem.Value ? (ElementType.SimpleItemSize ?? Size) : base.SimpleItemSize
             ;
 
         IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken, IFeatureImplementation>.
             Feature
             (DumpPrintToken tokenClass)
             =>
-                options.IsTextItem.Value
+                OptionsValue.IsTextItem.Value
                     ? Feature.Extension.Value(DumpPrintTokenResult)
                     : Feature.Extension.Value(DumpPrintTokenArrayResult);
 
@@ -125,7 +122,7 @@ namespace Reni.Type
                                     category,
                                     objectReference,
                                     argsType,
-                                    options.IsMutable.SetTo(tokenClass.IsMutable)),
+                                    OptionsValue.IsMutable.SetTo(tokenClass.IsMutable)),
                         this);
 
         IFeatureImplementation ISymbolProviderForPointer<TextItem, IFeatureImplementation>.Feature
@@ -142,7 +139,7 @@ namespace Reni.Type
         IFeatureImplementation ISymbolProviderForPointer<ToNumberOfBase, IFeatureImplementation>.
             Feature
             (ToNumberOfBase tokenClass)
-            => options.IsTextItem.Value ? Feature.Extension.MetaFeature(ToNumberOfBaseResult) : null;
+            => OptionsValue.IsTextItem.Value ? Feature.Extension.MetaFeature(ToNumberOfBaseResult) : null;
 
         IFeatureImplementation ISymbolProviderForPointer<ArrayReference, IFeatureImplementation>.
             Feature
@@ -230,7 +227,7 @@ namespace Reni.Type
         Size IndexSize => Size.AutoSize(Count).Align(Root.DefaultRefAlignParam.AlignBits);
 
         protected override string GetNodeDump()
-            => ElementType.NodeDump + "*" + Count + options.NodeDump;
+            => ElementType.NodeDump + "*" + Count + OptionsValue.NodeDump;
 
         Result ConcatArraysResult
             (
@@ -262,7 +259,7 @@ namespace Reni.Type
         {
             var result = RootContext.ConcatPrintResult(category, Count, DumpPrintResult);
             if(category.HasCode)
-                result.Code = CodeBase.DumpPrintText("<<" + (options.IsMutable.Value ? ":=" : ""))
+                result.Code = CodeBase.DumpPrintText("<<" + (OptionsValue.IsMutable.Value ? ":=" : ""))
                     + result.Code;
             return result;
         }
@@ -314,7 +311,7 @@ namespace Reni.Type
 
         bool HasForcedConversion(ArrayReferenceType destination)
         {
-            if(destination.IsMutable && !options.IsMutable.Value)
+            if(destination.IsMutable && !OptionsValue.IsMutable.Value)
                 return false;
 
             if(ElementType == destination.ValueType)
