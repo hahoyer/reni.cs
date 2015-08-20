@@ -110,7 +110,7 @@ namespace Reni.FeatureTest.Helper
         {
             var ex = (ExpressionSyntax) syntax;
             AssertLike(_s1, ex.Left);
-            Tracer.Assert(ex.Definable.Id == _s2);
+            Tracer.Assert(ex.Definable?.Id == _s2);
             AssertLike(_s3, ex.Right);
         }
 

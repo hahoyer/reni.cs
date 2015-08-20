@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.UnitTest;
-using Reni.FeatureTest.ConversionService;
+using NUnit.Framework;
 using Reni.FeatureTest.Helper;
 
 namespace Reni.ParserTest
 {
     [UnitTest]
-    [Closure]
+    [TestFixture]
     public sealed class ParserTest : CompilerTest
     {
         //[UnitTest]
@@ -25,7 +25,6 @@ namespace Reni.ParserTest
         }
 
         [UnitTest]
-        [Closure]
         public void Add2Numbers()
         {
             var syntaxPrototype =
@@ -61,6 +60,24 @@ dump_print
 (2+4) #(aa ssssss
 aa)#dump_print
 ", expectedResult: c => syntaxPrototype.AssertLike(c.SourceSyntax));
+        }
+
+        [UnitTest]
+        [Test]
+        public void LotsOfBrackets()
+        {
+            var syntaxPrototype =
+                LikeSyntax
+                    .Expression(null, "<<", LikeSyntax.Number(5))
+                    .Expression(null, LikeSyntax.Number(3))
+                    .dump_print;
+            Parameters.ParseOnly = true;
+            Parameters.TraceOptions.Parser = false;
+            CreateFileAndRunCompiler
+                (
+                    "Add2Numbers",
+                    @"((<< 5)(3)) dump_print",
+                    expectedResult: c => syntaxPrototype.AssertLike(c.SourceSyntax));
         }
     }
 }

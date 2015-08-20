@@ -25,20 +25,18 @@ namespace Reni.TokenClasses
 
         protected override Checked<Parser.Syntax> Suffix
             (Parser.Syntax left, SourcePart token)
-            => new Syntax(Level, token, null)
-                .Issues(IssueId.UnexpectedUseAsSuffix.CreateIssue(token));
+            => new Syntax(left, Level, token, null);
 
         protected override Checked<Parser.Syntax> Infix
             (Parser.Syntax left, SourcePart token, Parser.Syntax right)
-            => new Syntax(Level, token, right)
-                .Issues(IssueId.UnexpectedUseAsInfix.CreateIssue(token));
+            => new Syntax(left, Level, token, right);
 
         protected override Checked<Parser.Syntax> Prefix
             (SourcePart token, Parser.Syntax right)
-            => new Syntax(Level, token, right);
+            => new Syntax(null, Level, token, right);
 
         protected override Checked<Parser.Syntax> Terminal(SourcePart token)
-            => new Syntax(Level, token, null);
+            => new Syntax(null, Level, token, null);
 
         sealed class Syntax : Parser.Syntax
         {
@@ -47,9 +45,12 @@ namespace Reni.TokenClasses
 
             [EnableDump]
             Parser.Syntax Right { get; }
+            [EnableDump]
+            Parser.Syntax Left { get; }
 
-            public Syntax(int level, SourcePart token, Parser.Syntax right)
+            public Syntax(Parser.Syntax left, int level, SourcePart token, Parser.Syntax right)
             {
+                Left = left;
                 Token = token;
                 Level = level;
                 Right = right;
@@ -58,7 +59,11 @@ namespace Reni.TokenClasses
             [DisableDump]
             protected override IEnumerable<Parser.Syntax> DirectChildren
             {
-                get { yield return Right; }
+                get
+                {
+                    yield return Left;
+                    yield return Right;
+                }
             }
 
             internal override Checked<ExclamationSyntaxList> ExclamationSyntax(SourcePart token)
@@ -74,6 +79,9 @@ namespace Reni.TokenClasses
             {
                 get
                 {
+                    if(Left != null)
+                        NotImplementedMethod();
+
                     var right = (Right ?? new EmptyList(Token)).ToCompiledSyntax;
                     return new Checked<CompileSyntax>
                         (
@@ -86,11 +94,21 @@ namespace Reni.TokenClasses
             internal override Checked<Parser.Syntax> Match(int level, SourcePart token)
             {
                 Tracer.Assert(Level == level);
-                return (Right ?? new EmptyList(Token));
+                var innerPart = Right ?? new EmptyList(Token);
+                if(Left == null)
+                    return innerPart;
+                var left = Left.ToCompiledSyntax;
+                var right = innerPart.ToCompiledSyntax;
+                return new Checked<Parser.Syntax>
+                    (
+                    new ExpressionSyntax(left.Value, null, right.Value, token),
+                    left.Issues.plus(right.Issues)
+                    );
             }
         }
 
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => (otherMatcher as RightParenthesis)?.Level == Level;
     }
+
 }

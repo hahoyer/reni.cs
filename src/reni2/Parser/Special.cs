@@ -24,6 +24,7 @@ namespace Reni.Parser
         {
             Id = id;
             Terminal = terminal;
+            StopByObjectIds();
         }
 
         internal override Result ResultForCache(ContextBase context, Category category)
