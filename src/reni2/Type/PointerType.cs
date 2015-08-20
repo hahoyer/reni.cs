@@ -82,7 +82,7 @@ namespace Reni.Type
         }
 
         internal override IFeatureImplementation FuncionDeclarationForType
-            => ValueType.FuncionDeclarationFoPointerrType
+            => ValueType.FunctionDeclarationForPointerType
                 ?? base.FuncionDeclarationForType;
 
         internal override IEnumerable<SearchResult> Declarations<TDefinable>(TDefinable tokenClass)

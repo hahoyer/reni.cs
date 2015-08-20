@@ -466,7 +466,7 @@ namespace Reni.Type
         }
 
         internal virtual IFeatureImplementation FuncionDeclarationForType => null;
-        internal virtual IFeatureImplementation FuncionDeclarationFoPointerrType => null;
+        internal virtual IFeatureImplementation FunctionDeclarationForPointerType => null;
 
         internal SearchResult FuncionDeclarationForTypeAndCloseRelatives
             =>
