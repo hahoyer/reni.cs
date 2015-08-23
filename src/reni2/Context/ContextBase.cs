@@ -243,10 +243,22 @@ namespace Reni.Context
         internal Result FunctionalArgResult(Category category, CompileSyntax right, SourcePart token)
         {
             var argsType = FindRecentFunctionContextObject.ArgsType;
-            var functionalArgDescriptor = new ContextSearchResult
-                (argsType.CheckedFeature, RootContext);
-            return functionalArgDescriptor.Execute
-                (category, argsType.FindRecentCompoundView.ObjectPointerViaContext, this, right, token);
+            return argsType
+                .Execute
+                (
+                    category,
+                    new ResultCache(FuncionalArgObjectResult),
+                    token,
+                    null,
+                    this,
+                    right
+                );
+        }
+
+        Result FuncionalArgObjectResult(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
         }
 
         ContextSearchResult Declarations(Definable tokenClass)
