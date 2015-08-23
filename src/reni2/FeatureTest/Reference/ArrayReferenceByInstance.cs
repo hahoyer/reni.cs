@@ -10,12 +10,12 @@ namespace Reni.FeatureTest.Reference
     [ArrayElementType]
     [TargetSet(@"
 text: 'abcdefghijklmnopqrstuvwxyz';
-pointer: ((text type item)*1) array_reference instance (text);
-pointer item(7) dump_print;
-pointer item(0) dump_print;
-pointer item(11) dump_print;
-pointer item(11) dump_print;
-pointer item(14) dump_print;
+pointer: ((text() type)*1) array_reference instance (text);
+pointer(7) dump_print;
+pointer(0) dump_print;
+pointer(11) dump_print;
+pointer(11) dump_print;
+pointer(14) dump_print;
 ", "hallo")]
     public sealed class ArrayReferenceByInstance : CompilerTest {}
 }
