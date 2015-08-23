@@ -238,14 +238,15 @@ namespace Reni.Context
         /// </summary>
         /// <param name="category"> the categories in result </param>
         /// <param name="right"> the expression of the argument of the call. Must not be null </param>
+        /// <param name="token"></param>
         /// <returns> </returns>
-        internal Result FunctionalArgResult(Category category, CompileSyntax right)
+        internal Result FunctionalArgResult(Category category, CompileSyntax right, SourcePart token)
         {
             var argsType = FindRecentFunctionContextObject.ArgsType;
             var functionalArgDescriptor = new ContextSearchResult
                 (argsType.CheckedFeature, RootContext);
             return functionalArgDescriptor.Execute
-                (category, argsType.FindRecentCompoundView.ObjectPointerViaContext, this, right);
+                (category, argsType.FindRecentCompoundView.ObjectPointerViaContext, this, right, token);
         }
 
         ContextSearchResult Declarations(Definable tokenClass)
@@ -267,7 +268,7 @@ namespace Reni.Context
                 return RootContext.UndefinedSymbol(source).Result(category);
 
             var result = searchResult.Execute
-                (category, FindRecentCompoundView.ObjectPointerViaContext, this, right);
+                (category, FindRecentCompoundView.ObjectPointerViaContext, this, right, source);
             Tracer.Assert(category <= result.CompleteCategory);
             return result;
         }

@@ -10,6 +10,7 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Parser;
 using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Validation;
@@ -616,6 +617,29 @@ namespace Reni.Type
                     (
                     new Issue(IssueId.AmbigousSymbol, source, "Type: " + DumpPrintText),
                     RootContext);
+
+        internal Result Execute(Category category, ResultCache left, SourcePart token, Definable definable, ContextBase context, CompileSyntax right)
+        {
+            var searchResults
+                = DeclarationsForTypeAndCloseRelatives(definable)
+                    .RemoveLowPriorityResults()
+                    .ToArray();
+
+            switch(searchResults.Length)
+            {
+                case 0:
+                    return UndefinedSymbol(token)
+                        .Result(category);
+
+                case 1:
+                    return searchResults[0]
+                        .Execute(category, left, context, right, token);
+
+                default:
+                    return AmbigousSymbol(token)
+                        .Result(category);
+            }
+        }
     }
 
 

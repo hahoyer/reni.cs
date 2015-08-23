@@ -21,6 +21,6 @@ namespace Reni.TokenClasses
 
         public override Result Result
             (ContextBase context, Category category, PrefixSyntax token, CompileSyntax right)
-            => context.FunctionalArgResult(category, right);
+            => context.FunctionalArgResult(category, right,token.SourcePart);
     }
 }

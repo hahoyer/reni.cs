@@ -2,9 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
+using Reni.Type;
+
 
 namespace Reni.Feature
 {
@@ -21,7 +24,7 @@ namespace Reni.Feature
         protected IFeatureImplementation Feature { get; }
         bool IsImplicit => Feature.Function != null && Feature.Function.IsImplicit;
 
-        protected Result Result(Category category, ContextBase context, CompileSyntax right)
+        protected Result Result(Category category, ContextBase context, CompileSyntax right, SourcePart token)
         {
             var valueCategory = category;
             if(right != null)
@@ -54,41 +57,18 @@ namespace Reni.Feature
                     .ReplaceArg(context.ResultAsReferenceCache(right));
             }
 
-            var searchResults = valueResult
-                .Type
-                .DeclarationsForTypeAndCloseRelatives(null)
-                .ToArray();
-
-            switch(searchResults.Length)
-            {
-                case 0:
-                    NotImplementedMethod(category, context, right, nameof(valueResult), valueResult);
-                    return null;
-                case 1:
-                    return searchResults.Single().Execute(category, valueResult, context, right);
-                default:
-                    NotImplementedMethod
-                        (
-                            category,
-                            context,
-                            right,
-                            nameof(valueResult),
-                            valueResult,
-                            nameof(searchResults),
-                            searchResults
-                        );
-                    return null;
-            }
+            return valueResult
+                .Type.Execute(category,valueResult,token,null,context,right);
         }
 
-        protected Result ResultForDebug(Category category, ContextBase context, CompileSyntax right)
+        protected Result ResultForDebug(Category category, ContextBase context, CompileSyntax right, SourcePart token)
         {
             var trace = ObjectId == -1032;
             StartMethodDump(trace, category, context, right);
             try
             {
                 BreakExecution();
-                var result = Result(category, context, right);
+                var result = Result(category, context, right, token);
                 return ReturnMethodDump(result);
             }
             finally

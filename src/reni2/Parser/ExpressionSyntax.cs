@@ -61,29 +61,7 @@ namespace Reni.Parser
 
             var left = context.ResultAsReferenceCache(Left);
 
-            var typeForSearch = left.Type;
-            var searchResults
-                = typeForSearch
-                    .DeclarationsForTypeAndCloseRelatives(Definable)
-                    .RemoveLowPriorityResults()
-                    .ToArray();
-
-            switch(searchResults.Length)
-            {
-                case 0:
-                    return typeForSearch
-                        .UndefinedSymbol(Token)
-                        .Result(category);
-
-                case 1:
-                    return searchResults[0]
-                        .Execute(category, left, context, Right);
-
-                default:
-                    return typeForSearch
-                        .AmbigousSymbol(Token)
-                        .Result(category);
-            }
+            return left.Type.Execute(category, left, Token, Definable, context, Right);
         }
 
         internal override CompileSyntax Visit(ISyntaxVisitor visitor)

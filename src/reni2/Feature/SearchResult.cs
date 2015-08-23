@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
@@ -27,7 +28,7 @@ namespace Reni.Feature
         ConversionPath ConverterPath { get; }
 
         internal Result Execute
-            (Category category, ResultCache left, ContextBase context, CompileSyntax right)
+            (Category category, ResultCache left, ContextBase context, CompileSyntax right, SourcePart token)
         {
             var metaFeature = Feature.Meta;
             if(metaFeature != null)
@@ -37,7 +38,7 @@ namespace Reni.Feature
             StartMethodDump(trace, category, left.Data, context, right);
             try
             {
-                var result1 = ResultForDebug(category.Typed, context, right);
+                var result1 = ResultForDebug(category.Typed, context, right, token);
                 if(result1 == null)
                     return ReturnMethodDump<Result>(null);
 
@@ -57,7 +58,7 @@ namespace Reni.Feature
             }
         }
 
-        internal Result SpecialExecute(Category category) => Result(category, null, null);
+        internal Result SpecialExecute(Category category) => Result(category, null, null, null);
 
         internal bool HasHigherPriority(SearchResult other)
             => (Feature is AccessFeature) == (other.Feature is AccessFeature)
