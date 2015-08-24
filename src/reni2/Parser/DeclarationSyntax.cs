@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
+using Reni.Basics;
+using Reni.Context;
 using Reni.TokenClasses;
 
 namespace Reni.Parser
@@ -63,7 +65,7 @@ namespace Reni.Parser
 
         protected override string GetNodeDump()
             => base.GetNodeDump() +
-                (Name == null ? "" : "(" + Name + ")");
+               (Name == null ? "" : "(" + Name + ")");
 
 
         internal override IEnumerable<KeyValuePair<string, int>> GetDeclarations(int index)
@@ -80,5 +82,10 @@ namespace Reni.Parser
                 yield break;
             yield return Name;
         }
+        internal override IEnumerable<Syntax> GetMixins(ContextBase context)
+            =>
+                IsMixInSyntax
+                    ? context.Result(Category.Type, ToCompiledSyntax.Value).Type.GetMixins()
+                    : base.GetMixins(context);
     }
 }

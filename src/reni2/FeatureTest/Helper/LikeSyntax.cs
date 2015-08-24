@@ -58,7 +58,7 @@ namespace Reni.FeatureTest.Helper
 
         public void AssertContains(CompoundSyntax container)
         {
-            var s = container.Find(_name);
+            var s = container.Find(_name, null);
 
             Tracer.Assert(s != null);
             Tracer.Assert(_position == s.Value);

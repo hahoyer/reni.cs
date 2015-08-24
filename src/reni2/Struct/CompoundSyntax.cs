@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
+using hw.Helper;
 using System.Linq;
 using hw.Debug;
 using hw.Forms;
-using hw.Helper;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
@@ -57,15 +57,17 @@ namespace Reni.Struct
         [EnableDump]
         internal int[] Mutables => IndexList(item => item.IsMutable).ToArray();
         [EnableDump]
-        internal int[] Converters => IndexList(item=>item.IsConverter).ToArray();
+        internal int[] Converters => IndexList(item => item.IsConverter).ToArray();
         [EnableDump]
         internal int[] MixIns => IndexList(item => item.IsMixIn).ToArray();
 
-        IEnumerable<int> IndexList(Func<Data,bool> selector )
+        IEnumerable<int> IndexList(Func<Data, bool> selector)
         {
             for(var index = 0; index < _data.Length; index++)
+            {
                 if(selector(_data[index]))
                     yield return index;
+            }
         }
 
         [DisableDump]
@@ -136,15 +138,18 @@ namespace Reni.Struct
             return result;
         }
 
-        internal Position Find(string name)
+        internal Position Find(string name, ContextBase context)
         {
             if(name == null)
                 return null;
-            var result = _data.SingleOrDefault(s => s.IsDefining(name));
+            var result = _data.SingleOrDefault(s => s.IsDefining(name) || s.IsInheriting(name, context));
             if(result == null)
                 return null;
-
-            return new Position(result.Position);
+            if(result.IsDefining(name))
+                return new Position(result.Position);
+            Tracer.Assert(result.IsInheriting(name, context));
+            NotImplementedMethod(name, nameof(result), result);
+            return null;
         }
 
         internal override Result ResultForCache(ContextBase context, Category category) => context
@@ -159,6 +164,7 @@ namespace Reni.Struct
                 Position = position;
                 StatementCache = new ValueCache<Checked<CompileSyntax>>(GetStatement);
                 NamesCache = new ValueCache<string[]>(GetNames);
+                InheritedNamesCache = new FunctionCache<ContextBase, string[]>(GetInheritedNames);
                 Tracer.Assert(RawStatement != null);
             }
 
@@ -166,20 +172,35 @@ namespace Reni.Struct
             public int Position { get; }
 
             ValueCache<string[]> NamesCache { get; }
+            FunctionCache<ContextBase, string[]> InheritedNamesCache { get; }
             ValueCache<Checked<CompileSyntax>> StatementCache { get; }
 
             public CompileSyntax Statement => StatementCache.Value.Value;
             public Issue[] Issues => StatementCache.Value.Issues;
             public bool IsDefining(string name) => Names.Contains(name);
+            public bool IsInheriting(string name, ContextBase context)
+                => IsMixIn && (InheritedNames(context).Contains(name));
             public bool IsConverter => RawStatement.IsConverterSyntax;
             public bool IsMixIn => RawStatement.IsMixInSyntax;
             public IEnumerable<string> Names => NamesCache.Value;
+            public IEnumerable<string> InheritedNames(ContextBase context) => InheritedNamesCache[context];
             public bool IsMutable => RawStatement.IsMutableSyntax;
 
             Checked<CompileSyntax> GetStatement()
                 => RawStatement.ContainerStatementToCompileSyntax;
 
             string[] GetNames() => RawStatement.GetDeclarations().ToArray();
+
+            string[] GetInheritedNames(ContextBase context)
+                => GetMixins(context)
+                    .SelectMany(item => item.GetDeclarations())
+                    .Distinct()
+                    .ToArray();
+
+            public IEnumerable<Syntax> GetMixins(ContextBase context)
+                => IsMixIn
+                    ? RawStatement.GetMixins(context).Distinct()
+                    : Enumerable.Empty<Syntax>();
         }
 
         internal sealed class Position : DumpableObject
@@ -193,5 +214,8 @@ namespace Reni.Struct
 
         [DisableDump]
         protected override IEnumerable<Syntax> DirectChildren => _statements;
+
+        internal new IEnumerable<Syntax> GetMixins(ContextBase context)
+            => _data.SelectMany(item => item.GetMixins(context).Concat(new[] {item.RawStatement}));
     }
 }

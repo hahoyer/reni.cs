@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
+using hw.Helper;
 using System.Linq;
 using hw.Debug;
-using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
+using Reni.Context;
 using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Validation;
@@ -21,7 +22,7 @@ namespace Reni.Parser
         protected Syntax() { }
 
         protected Syntax(int objectId)
-            : base(objectId) {}
+            : base(objectId) { }
 
         [DisableDump]
         internal virtual Checked<CompileSyntax> ContainerStatementToCompileSyntax
@@ -30,11 +31,9 @@ namespace Reni.Parser
         [DisableDump]
         internal abstract Checked<CompileSyntax> ToCompiledSyntax { get; }
 
-        internal virtual IEnumerable<KeyValuePair<string, int>> GetDeclarations(int index)
-        {
-            yield break;
-        }
+        internal virtual IEnumerable<KeyValuePair<string, int>> GetDeclarations(int index) { yield break; }
         internal virtual IEnumerable<string> GetDeclarations() { yield break; }
+        internal virtual IEnumerable<Syntax> GetMixins(ContextBase context) { yield break; }
 
         internal Checked<Syntax> CreateThenSyntax(CompileSyntax condition)
         {
@@ -128,6 +127,12 @@ namespace Reni.Parser
         }
 
         internal Checked<Syntax> Issues(params Issue[] issues) => new Checked<Syntax>(this, issues);
+
+        internal virtual IEnumerable<Syntax> GetMixinsFromBody()
+        {
+            NotImplementedMethod();
+            return null;
+        }
     }
 
     abstract class NonCompileSyntax : Syntax

@@ -13,49 +13,47 @@ namespace Reni.Code
     sealed class Container : DumpableObject
     {
         static int _nextObjectId;
-        static readonly Container _unexpectedVisitOfPending = new Container
-            ("UnexpectedVisitOfPending");
 
-        readonly string _description;
-        readonly CodeBase _data;
         [Node]
         internal readonly FunctionId FunctionId;
 
         public Container(CodeBase data, string description, FunctionId functionId = null)
             : base(_nextObjectId++)
         {
-            _description = description;
+            Description = description;
             FunctionId = functionId;
-            _data = data;
+            Data = data;
             StopByObjectId(-10);
         }
 
-        Container(string errorText) { _description = errorText; }
+        Container(string errorText) { Description = errorText; }
 
         [Node]
         [EnableDump]
-        internal CodeBase Data => _data;
+        internal CodeBase Data { get; }
 
         [Node]
         [EnableDump]
-        internal string Description => _description;
+        internal string Description { get; }
 
         [Node]
         [DisableDump]
-        public Size MaxSize => _data.TemporarySize;
+        public Size MaxSize => Data.TemporarySize;
 
         [Node]
         [DisableDump]
-        public static Container UnexpectedVisitOfPending => _unexpectedVisitOfPending;
+        public static Container UnexpectedVisitOfPending { get; }
+            = new Container("UnexpectedVisitOfPending");
+
         [Node]
-        public Issue[] Issues => _data.Issues.ToArray();
+        public Issue[] Issues => Data.Issues.ToArray();
 
         public string GetCSharpStatements(int indent)
         {
-            var generator = new CSharpGenerator(_data.TemporarySize.SaveByteCount);
+            var generator = new CSharpGenerator(Data.TemporarySize.SaveByteCount);
             try
             {
-                _data.Visit(generator);
+                Data.Visit(generator);
             }
             catch(UnexpectedContextReference e)
             {

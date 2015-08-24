@@ -8,6 +8,7 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Parser;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -19,10 +20,10 @@ namespace Reni.Struct
         static int _nextObjectId;
         [EnableDump]
         [Node]
-        internal Compound Compound;
+        internal readonly Compound Compound;
         [EnableDump]
         [Node]
-        internal int ViewPosition;
+        internal readonly int ViewPosition;
         [Node]
         readonly ValueCache<CompoundType> _typeCache;
         [Node]
@@ -35,16 +36,20 @@ namespace Reni.Struct
         internal CompoundView(Compound compound, int viewPosition)
             : base(_nextObjectId++)
         {
-            _fieldAccessTypeCache =
-                new FunctionCache<int, FieldAccessType>
-                    (position => new FieldAccessType(this, position));
-            _functionBodyTypeCache = new FunctionCache<FunctionSyntax, FunctionBodyType>
-                (syntax => new FunctionBodyType(this, syntax));
             Compound = compound;
             ViewPosition = viewPosition;
+
             _typeCache = new ValueCache<CompoundType>(() => new CompoundType(this));
-            _accessFeaturesCache = new FunctionCache<int, AccessFeature>
-                (position => new AccessFeature(this, position));
+
+            _accessFeaturesCache
+                = new FunctionCache<int, AccessFeature>(position => new AccessFeature(this, position));
+
+            _fieldAccessTypeCache
+                = new FunctionCache<int, FieldAccessType>(position => new FieldAccessType(this, position));
+
+            _functionBodyTypeCache
+                = new FunctionCache<FunctionSyntax, FunctionBodyType>(syntax => new FunctionBodyType(this, syntax));
+
             StopByObjectId(-313);
         }
 
@@ -230,9 +235,6 @@ namespace Reni.Struct
             }
         }
 
-        internal Result ContextViaObjectPointer(Result result)
-            => Compound.ContextViaObjectPointer(ViewPosition, result);
-
         CodeBase ObjectPointerViaContext()
             => CodeBase.ReferenceCode(Compound).ReferencePlus(CompoundViewSize * -1);
 
@@ -242,6 +244,8 @@ namespace Reni.Struct
                 .TypeForStructureElement;
 
         internal IFeatureImplementation Find(Definable definable)
-            => Compound.Syntax.Find(definable.Id)?.Convert(this);
+            => Compound.Syntax.Find(definable.Id, Context)?.Convert(this);
+
+        internal IEnumerable<Syntax> GetMixins() => Compound.Syntax.GetMixins(Context);
     }
 }

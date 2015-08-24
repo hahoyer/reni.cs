@@ -5,6 +5,7 @@ using hw.Debug;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Parser;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -64,5 +65,10 @@ namespace Reni.Struct
         protected override string GetNodeDump() => base.GetNodeDump() + "(" + View.GetCompoundIdentificationDump() + ")";
 
         new Result DumpPrintTokenResult(Category category) => View.DumpPrintResultViaObject(category);
+
+        internal override IEnumerable<Syntax> GetMixins()
+        {
+            return View.GetMixins();
+        }
     }
 }

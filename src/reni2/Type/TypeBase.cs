@@ -640,6 +640,13 @@ namespace Reni.Type
                         .Result(category);
             }
         }
+
+        virtual internal IEnumerable<Syntax> GetMixins()
+        {
+            NotImplementedMethod();
+            return null;
+
+        }
     }
 
 
