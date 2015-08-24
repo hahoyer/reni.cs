@@ -63,6 +63,7 @@
     <Compile Include="FeatureTest\Helper\CompilerTest.cs" />
     <Compile Include="FeatureTest\Helper\LikeSyntax.cs" />
     <Compile Include="FeatureTest\Helper\TargetSetData.cs" />
+    <Compile Include="FeatureTest\MixIn\Simple.cs" />
     <Compile Include="FeatureTest\Reference\ArrayElementType.cs" />
     <Compile Include="FeatureTest\Reference\ArrayElementType1.cs" />
     <Compile Include="FeatureTest\Reference\ArrayReferenceAll.cs" />

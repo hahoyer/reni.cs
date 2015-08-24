@@ -71,10 +71,10 @@ namespace Reni.Struct
             get
             {
                 var valueType = ValueType;
-                var result = valueType?.DumpPrintText??"<unknown>";
-                result += " /\\(";
+                var result = "/\\(";
                 result += ArgsType.DumpPrintText;
-                result += ")";
+                result += ")=>";
+                result += valueType?.DumpPrintText ?? "<unknown>";
                 return result;
             }
         }
