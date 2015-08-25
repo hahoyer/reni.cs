@@ -62,13 +62,12 @@ namespace Reni.Struct
 
         protected override Size GetSize() => View.CompoundViewSize;
 
-        protected override string GetNodeDump() => base.GetNodeDump() + "(" + View.GetCompoundIdentificationDump() + ")";
+        protected override string GetNodeDump()
+            => base.GetNodeDump() + "(" + View.GetCompoundIdentificationDump() + ")";
 
-        new Result DumpPrintTokenResult(Category category) => View.DumpPrintResultViaObject(category);
+        new Result DumpPrintTokenResult(Category category)
+            => View.DumpPrintResultViaObject(category);
 
-        internal override IEnumerable<Syntax> GetMixins()
-        {
-            return View.GetMixins();
-        }
+        internal override IEnumerable<Syntax> GetMixins() => View.GetMixins();
     }
 }

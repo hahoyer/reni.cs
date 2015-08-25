@@ -228,5 +228,6 @@ namespace Reni.Struct
                 .Select(i => i.ToString() + "=" + AccessResult(Category.Size, i).Size.ToString())
                 .ToArray();
 
+        internal IEnumerable<Syntax> GetMixins() => Syntax.GetMixins(Parent);
     }
 }

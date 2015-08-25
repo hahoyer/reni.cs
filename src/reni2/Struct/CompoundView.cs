@@ -246,6 +246,20 @@ namespace Reni.Struct
         internal IFeatureImplementation Find(Definable definable)
             => Compound.Syntax.Find(definable.Id, Context)?.Convert(this);
 
-        internal IEnumerable<Syntax> GetMixins() => Compound.Syntax.GetMixins(Context);
+        internal IEnumerable<Syntax> GetMixins()
+        {
+            var trace = true;
+            StartMethodDump(trace);
+            try
+            {
+                BreakExecution();
+                var result = Compound.GetMixins().ToArray();
+                return ReturnMethodDump(result);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
+        }
     }
 }

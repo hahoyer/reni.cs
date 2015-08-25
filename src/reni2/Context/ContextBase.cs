@@ -96,7 +96,7 @@ namespace Reni.Context
             }
         }
 
-        sealed class ResultProvider : ResultCache.IResultProvider
+        sealed class ResultProvider : DumpableObject, ResultCache.IResultProvider
         {
             [EnableDumpExcept(false)]
             readonly bool AsReference;
