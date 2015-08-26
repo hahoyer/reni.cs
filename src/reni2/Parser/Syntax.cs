@@ -33,7 +33,7 @@ namespace Reni.Parser
 
         internal virtual IEnumerable<KeyValuePair<string, int>> GetDeclarations(int index) { yield break; }
         internal virtual IEnumerable<string> GetDeclarations() { yield break; }
-        internal virtual IEnumerable<Syntax> GetMixins(ContextBase context) { yield break; }
+        internal virtual IEnumerable<Syntax> GetMixins(CompoundView context, int position) { yield break; }
 
         internal Checked<Syntax> CreateThenSyntax(CompileSyntax condition)
         {

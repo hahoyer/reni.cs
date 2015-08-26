@@ -2,8 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
-using Reni.Basics;
-using Reni.Context;
+using Reni.Struct;
 using Reni.TokenClasses;
 
 namespace Reni.Parser
@@ -83,9 +82,9 @@ namespace Reni.Parser
             yield return Name;
         }
 
-        internal override IEnumerable<Syntax> GetMixins(ContextBase context)
+        internal override IEnumerable<Syntax> GetMixins(CompoundView context, int position)
             => IsMixInSyntax
-                ? context.Result(Category.Type, Body.ToCompiledSyntax.Value).Type.GetMixins()
-                : base.GetMixins(context);
+                ? context.AccessType(position).GetMixins()
+                : base.GetMixins(context, position);
     }
 }

@@ -122,8 +122,7 @@ namespace Reni.Context
                 Tracer.Assert(recursionHandler != null);
                 return recursionHandler.Execute(Context, category, pendingCategory, Syntax, AsReference);
             }
-
-
+                
             [EnableDump]
             string ContextId => Context.NodeDump;
 

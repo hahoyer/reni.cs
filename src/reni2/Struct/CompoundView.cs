@@ -130,7 +130,7 @@ namespace Reni.Struct
 
         internal AccessFeature AccessFeature(int position) => _accessFeaturesCache[position];
 
-        TypeBase AccessType(int position)
+        internal TypeBase AccessType(int position)
         {
             var result = Compound.AccessType(ViewPosition, position);
             if(result.Hllw)
@@ -244,7 +244,7 @@ namespace Reni.Struct
                 .TypeForStructureElement;
 
         internal IFeatureImplementation Find(Definable definable)
-            => Compound.Syntax.Find(definable.Id, Context)?.Convert(this);
+            => Compound.Syntax.Find(definable.Id, this)?.Convert(this);
 
         internal IEnumerable<Syntax> GetMixins()
         {

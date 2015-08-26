@@ -138,7 +138,7 @@ namespace Reni.Struct
             return result;
         }
 
-        internal Position Find(string name, ContextBase context)
+        internal Position Find(string name, CompoundView context)
         {
             if(name == null)
                 return null;
@@ -164,7 +164,7 @@ namespace Reni.Struct
                 Position = position;
                 StatementCache = new ValueCache<Checked<CompileSyntax>>(GetStatement);
                 NamesCache = new ValueCache<string[]>(GetNames);
-                InheritedNamesCache = new FunctionCache<ContextBase, string[]>(GetInheritedNames);
+                InheritedNamesCache = new FunctionCache<CompoundView, string[]>(GetInheritedNames);
                 Tracer.Assert(RawStatement != null);
             }
 
@@ -172,18 +172,18 @@ namespace Reni.Struct
             public int Position { get; }
 
             ValueCache<string[]> NamesCache { get; }
-            FunctionCache<ContextBase, string[]> InheritedNamesCache { get; }
+            FunctionCache<CompoundView, string[]> InheritedNamesCache { get; }
             ValueCache<Checked<CompileSyntax>> StatementCache { get; }
 
             public CompileSyntax Statement => StatementCache.Value.Value;
             public Issue[] Issues => StatementCache.Value.Issues;
             public bool IsDefining(string name) => Names.Contains(name);
-            public bool IsInheriting(string name, ContextBase context)
+            public bool IsInheriting(string name, CompoundView context)
                 => IsMixIn && (InheritedNames(context).Contains(name));
             public bool IsConverter => RawStatement.IsConverterSyntax;
             public bool IsMixIn => RawStatement.IsMixInSyntax;
             public IEnumerable<string> Names => NamesCache.Value;
-            public IEnumerable<string> InheritedNames(ContextBase context) => InheritedNamesCache[context];
+            public IEnumerable<string> InheritedNames(CompoundView context) => InheritedNamesCache[context];
             public bool IsMutable => RawStatement.IsMutableSyntax;
 
             Checked<CompileSyntax> GetStatement()
@@ -191,15 +191,15 @@ namespace Reni.Struct
 
             string[] GetNames() => RawStatement.GetDeclarations().ToArray();
 
-            string[] GetInheritedNames(ContextBase context)
+            string[] GetInheritedNames(CompoundView context)
                 => GetMixins(context)
                     .SelectMany(item => item.GetDeclarations())
                     .Distinct()
                     .ToArray();
 
-            public IEnumerable<Syntax> GetMixins(ContextBase context)
+            public IEnumerable<Syntax> GetMixins(CompoundView context)
                 => IsMixIn
-                    ? RawStatement.GetMixins(context).Distinct()
+                    ? RawStatement.GetMixins(context, Position).Distinct()
                     : Enumerable.Empty<Syntax>();
         }
 
@@ -215,7 +215,7 @@ namespace Reni.Struct
         [DisableDump]
         protected override IEnumerable<Syntax> DirectChildren => _statements;
 
-        internal new IEnumerable<Syntax> GetMixins(ContextBase context)
+        internal new IEnumerable<Syntax> GetMixins(CompoundView context)
             => _data.SelectMany(item => item.GetMixins(context).Concat(new[] {item.RawStatement}));
     }
 }
