@@ -8,6 +8,7 @@ using Reni.FeatureTest.BlogExamples;
 using Reni.FeatureTest.Function;
 using Reni.FeatureTest.Helper;
 using Reni.FeatureTest.Integer;
+using Reni.FeatureTest.MixIn;
 using Reni.FeatureTest.Reference;
 using Reni.FeatureTest.Text;
 using Reni.FeatureTest.TypeType;
@@ -40,6 +41,7 @@ namespace Reni.FeatureTest
     [PrimitiveRecursiveFunctionHuge]
     [ArrayElementType]
     [ArrayReferenceAll]
+    [Simple]
     public sealed class Text1 : TextStruct {}
 
     [UnitTest]
