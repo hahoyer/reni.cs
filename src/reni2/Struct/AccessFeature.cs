@@ -34,14 +34,14 @@ namespace Reni.Struct
 
         ValueCache<IFunctionFeature> FunctionFeature { get; }
 
-        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta
+        IContextMetaFunctionFeature IContextMetaFeatureImplementation.ContextMeta
             => (Statement as FunctionSyntax)?.ContextMetaFunctionFeature(View);
 
-        IMetaFunctionFeature IFeatureImplementation.Meta => (Statement as FunctionSyntax)?.MetaFunctionFeature(View);
+        IMetaFunctionFeature IMetaFeatureImplementation.Meta => (Statement as FunctionSyntax)?.MetaFunctionFeature(View);
 
-        IFunctionFeature IFeatureImplementation.Function => FunctionFeature.Value;
+        IFunctionFeature ITypedFeatureImplementation.Function => FunctionFeature.Value;
 
-        IValueFeature IFeatureImplementation.Value
+        IValueFeature ITypedFeatureImplementation.Value
         {
             get
             {

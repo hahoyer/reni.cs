@@ -41,10 +41,10 @@ namespace Reni.Feature
         public Value(Func<Category, Result> function, TypeBase type)
             : base(function, type) { }
 
-        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
-        IMetaFunctionFeature IFeatureImplementation.Meta => null;
-        IFunctionFeature IFeatureImplementation.Function => null;
-        IValueFeature IFeatureImplementation.Value => this;
+        IContextMetaFunctionFeature IContextMetaFeatureImplementation.ContextMeta => null;
+        IMetaFunctionFeature IMetaFeatureImplementation.Meta => null;
+        IFunctionFeature ITypedFeatureImplementation.Function => null;
+        IValueFeature ITypedFeatureImplementation.Value => this;
     }
 
     sealed class Combination : DumpableObject, IValueFeature, IEquatable<IValueFeature>

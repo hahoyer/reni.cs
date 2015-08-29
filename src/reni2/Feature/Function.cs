@@ -38,10 +38,10 @@ namespace Reni.Feature
         public ObjectFunction(Func<Category, IContextReference, TypeBase, Result> function, IContextReferenceProvider target)
             : base(function, target) {}
 
-        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
-        IMetaFunctionFeature IFeatureImplementation.Meta => null;
-        IFunctionFeature IFeatureImplementation.Function => this;
-        IValueFeature IFeatureImplementation.Value => null;
+        IContextMetaFunctionFeature IContextMetaFeatureImplementation.ContextMeta => null;
+        IMetaFunctionFeature IMetaFeatureImplementation.Meta => null;
+        IFunctionFeature ITypedFeatureImplementation.Function => this;
+        IValueFeature ITypedFeatureImplementation.Value => null;
     }
 
     sealed class Function : FunctionFeatureImplementation

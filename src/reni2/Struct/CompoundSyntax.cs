@@ -256,7 +256,7 @@ namespace Reni.Struct
             Definable = definable;
         }
 
-        IMetaFunctionFeature IFeatureImplementation.Meta
+        IMetaFunctionFeature IMetaFeatureImplementation.Meta
         {
             get
             {
@@ -265,7 +265,7 @@ namespace Reni.Struct
             }
         }
 
-        IFunctionFeature IFeatureImplementation.Function
+        IFunctionFeature ITypedFeatureImplementation.Function
         {
             get
             {
@@ -274,7 +274,7 @@ namespace Reni.Struct
             }
         }
 
-        IValueFeature IFeatureImplementation.Value
+        IValueFeature ITypedFeatureImplementation.Value
         {
             get
             {
@@ -283,7 +283,7 @@ namespace Reni.Struct
             }
         }
 
-        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta
+        IContextMetaFunctionFeature IContextMetaFeatureImplementation.ContextMeta
         {
             get
             {

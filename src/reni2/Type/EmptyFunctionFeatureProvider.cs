@@ -9,9 +9,9 @@ namespace Reni.Type
     sealed class EmptyFeature : DumpableObject, IFeatureImplementation
     {
         internal static readonly IFeatureImplementation Instance = new EmptyFeature();
-        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
-        IMetaFunctionFeature IFeatureImplementation.Meta => null;
-        IFunctionFeature IFeatureImplementation.Function => null;
-        IValueFeature IFeatureImplementation.Value => null;
+        IContextMetaFunctionFeature IContextMetaFeatureImplementation.ContextMeta => null;
+        IMetaFunctionFeature IMetaFeatureImplementation.Meta => null;
+        IFunctionFeature ITypedFeatureImplementation.Function => null;
+        IValueFeature ITypedFeatureImplementation.Value => null;
     }
 }

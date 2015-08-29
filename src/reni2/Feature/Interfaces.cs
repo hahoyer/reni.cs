@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using Reni.Basics;
-using Reni.Code;
 using Reni.Context;
 using Reni.Parser;
 using Reni.TokenClasses;
@@ -11,66 +10,26 @@ using Reni.Type;
 
 namespace Reni.Feature
 {
-    interface IFeatureImplementation
+    interface ITypedFeatureImplementation
     {
-        IMetaFunctionFeature Meta { get; }
         IFunctionFeature Function { get; }
         IValueFeature Value { get; }
+    }
+
+    interface IMetaFeatureImplementation
+    {
+        IMetaFunctionFeature Meta { get; }
+    }
+
+    interface IContextMetaFeatureImplementation
+    {
         IContextMetaFunctionFeature ContextMeta { get; }
     }
 
-    sealed class EmptyFeatureImplementation : DumpableObject, IFeatureImplementation
-    {
-        internal EmptyFeatureImplementation(int? nextObjectId)
-            : base(nextObjectId) {}
-
-        internal EmptyFeatureImplementation() { }
-
-        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
-        IMetaFunctionFeature IFeatureImplementation.Meta => null;
-        IFunctionFeature IFeatureImplementation.Function => null;
-        IValueFeature IFeatureImplementation.Value => null;
-    }
-
-    abstract class ValueFeatureImplementation
-        : DumpableObject, IFeatureImplementation, IValueFeature
-    {
-        protected ValueFeatureImplementation(int? nextObjectId)
-            : base(nextObjectId) {}
-
-        protected ValueFeatureImplementation() { }
-
-        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
-        IMetaFunctionFeature IFeatureImplementation.Meta => null;
-        IFunctionFeature IFeatureImplementation.Function => null;
-        IValueFeature IFeatureImplementation.Value => this;
-        Result IValueFeature.Result(Category category) => Result(category);
-        TypeBase IValueFeature.TargetType => TargetType;
-
-        protected abstract Result Result(Category category);
-        protected abstract TypeBase TargetType { get; }
-    }
-
-    abstract class MetaFeatureImplementation
-        : DumpableObject, IFeatureImplementation, IMetaFunctionFeature
-    {
-        protected MetaFeatureImplementation(int? nextObjectId)
-            : base(nextObjectId) {}
-
-        protected MetaFeatureImplementation() { }
-
-        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
-        IMetaFunctionFeature IFeatureImplementation.Meta => this;
-        IFunctionFeature IFeatureImplementation.Function => null;
-        IValueFeature IFeatureImplementation.Value => null;
-
-        Result IMetaFunctionFeature.Result
-            (Category category, ResultCache left, ContextBase contextBase, CompileSyntax right)
-            => Result(category, left, contextBase, right);
-
-        protected abstract Result Result
-            (Category category, ResultCache left, ContextBase contextBase, CompileSyntax right);
-    }
+    interface IFeatureImplementation
+        : ITypedFeatureImplementation
+            , IMetaFeatureImplementation
+            , IContextMetaFeatureImplementation {}
 
     abstract class FunctionFeatureImplementation
         : DumpableObject, IFeatureImplementation, IFunctionFeature
@@ -80,10 +39,10 @@ namespace Reni.Feature
 
         protected FunctionFeatureImplementation() { }
 
-        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
-        IMetaFunctionFeature IFeatureImplementation.Meta => null;
-        IFunctionFeature IFeatureImplementation.Function => this;
-        IValueFeature IFeatureImplementation.Value => null;
+        IContextMetaFunctionFeature IContextMetaFeatureImplementation.ContextMeta => null;
+        IMetaFunctionFeature IMetaFeatureImplementation.Meta => null;
+        IFunctionFeature ITypedFeatureImplementation.Function => this;
+        IValueFeature ITypedFeatureImplementation.Value => null;
 
         Result IFunctionFeature.Result(Category category, TypeBase argsType)
             => Result(category, argsType);
@@ -97,15 +56,10 @@ namespace Reni.Feature
     abstract class ContextMetaFeatureImplementation
         : DumpableObject, IFeatureImplementation, IContextMetaFunctionFeature
     {
-        protected ContextMetaFeatureImplementation(int? nextObjectId)
-            : base(nextObjectId) {}
-
-        protected ContextMetaFeatureImplementation() { }
-
-        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => this;
-        IMetaFunctionFeature IFeatureImplementation.Meta => null;
-        IFunctionFeature IFeatureImplementation.Function => null;
-        IValueFeature IFeatureImplementation.Value => null;
+        IContextMetaFunctionFeature IContextMetaFeatureImplementation.ContextMeta => this;
+        IMetaFunctionFeature IMetaFeatureImplementation.Meta => null;
+        IFunctionFeature ITypedFeatureImplementation.Function => null;
+        IValueFeature ITypedFeatureImplementation.Value => null;
 
         Result IContextMetaFunctionFeature.Result
             (ContextBase contextBase, Category category, CompileSyntax right)
@@ -214,10 +168,10 @@ namespace Reni.Feature
             _function = function;
         }
 
-        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => null;
-        IMetaFunctionFeature IFeatureImplementation.Meta => this;
-        IFunctionFeature IFeatureImplementation.Function => null;
-        IValueFeature IFeatureImplementation.Value => null;
+        IContextMetaFunctionFeature IContextMetaFeatureImplementation.ContextMeta => null;
+        IMetaFunctionFeature IMetaFeatureImplementation.Meta => this;
+        IFunctionFeature ITypedFeatureImplementation.Function => null;
+        IValueFeature ITypedFeatureImplementation.Value => null;
 
         Result IMetaFunctionFeature.Result
             (Category category, ResultCache left, ContextBase contextBase, CompileSyntax right)
@@ -245,10 +199,10 @@ namespace Reni.Feature
         readonly CompileSyntax _definition;
         public ContextMetaFunctionFromSyntax(CompileSyntax definition) { _definition = definition; }
 
-        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => this;
-        IMetaFunctionFeature IFeatureImplementation.Meta => null;
-        IFunctionFeature IFeatureImplementation.Function => null;
-        IValueFeature IFeatureImplementation.Value => null;
+        IContextMetaFunctionFeature IContextMetaFeatureImplementation.ContextMeta => this;
+        IMetaFunctionFeature IMetaFeatureImplementation.Meta => null;
+        IFunctionFeature ITypedFeatureImplementation.Function => null;
+        IValueFeature ITypedFeatureImplementation.Value => null;
 
         Result IContextMetaFunctionFeature.Result
             (ContextBase callContext, Category category, CompileSyntax right)
