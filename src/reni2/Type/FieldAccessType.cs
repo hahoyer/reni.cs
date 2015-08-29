@@ -5,6 +5,7 @@ using hw.Debug;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
+using Reni.Parser;
 using Reni.Struct;
 
 namespace Reni.Type
@@ -46,5 +47,7 @@ namespace Reni.Type
         }
 
         internal override int? SmartArrayLength(TypeBase elementType) => ValueType.SmartArrayLength(elementType);
+
+        internal override IEnumerable<Syntax> GetMixins() => ValueType.GetMixins();
     }
 }
