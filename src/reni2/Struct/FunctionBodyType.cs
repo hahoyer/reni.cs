@@ -62,10 +62,6 @@ namespace Reni.Struct
         [DisableDump]
         internal override IFeatureImplementation FuncionDeclarationForType => this;
 
-        [DisableDump]
-        IContextReference ObjectReference => _objectReferenceCache.Value;
-
-        IContextReference IFunctionFeature.ObjectReference => ObjectReference;
         bool IFunctionFeature.IsImplicit => _syntax.IsImplicit;
         TypeBase IValueFeature.TargetType => this;
 

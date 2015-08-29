@@ -26,7 +26,6 @@ namespace Reni.Parser
         IValueFeature IFeatureImplementation.Value => this;
         IContextMetaFunctionFeature IFeatureImplementation.ContextMeta => this;
         bool IFunctionFeature.IsImplicit => false;
-        IContextReference IFunctionFeature.ObjectReference => this;
         TypeBase IValueFeature.TargetType => this;
         int IContextReference.Order => ObjectId;
 

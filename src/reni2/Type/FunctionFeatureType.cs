@@ -20,8 +20,6 @@ namespace Reni.Type
         [DisableDump]
         bool IFunctionFeature.IsImplicit => false;
         [DisableDump]
-        IContextReference IFunctionFeature.ObjectReference => _functionalFeature.ObjectReference;
-        [DisableDump]
         internal override Root RootContext => _functionalFeature.RootContext;
         protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
         protected override string GetNodeDump() => base.GetNodeDump() + "(" + _functionalFeature.NodeDump + ")";

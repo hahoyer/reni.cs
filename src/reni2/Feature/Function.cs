@@ -30,7 +30,6 @@ namespace Reni.Feature
             => _function(category, ObjectReference, argsType);
 
         bool IFunctionFeature.IsImplicit => false;
-        IContextReference IFunctionFeature.ObjectReference => ObjectReference;
         IContextReference ObjectReference => _target.ContextReference;
     }
 
@@ -53,7 +52,6 @@ namespace Reni.Feature
 
         protected override Result Result(Category category, TypeBase argsType) => _function(category, argsType);
         protected override bool IsImplicit => false;
-        protected override IContextReference ObjectReference => null;
     }
 
     sealed class ExtendedFunction<T> : FunctionFeatureImplementation
@@ -76,6 +74,5 @@ namespace Reni.Feature
 
         protected override Result Result(Category category, TypeBase argsType) => _function(category, argsType, _arg);
         protected override bool IsImplicit => false;
-        protected override IContextReference ObjectReference => ((IContextReferenceProvider) _function.Target).ContextReference;
     }
 }

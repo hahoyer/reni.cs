@@ -89,11 +89,9 @@ namespace Reni.Feature
             => Result(category, argsType);
 
         bool IFunctionFeature.IsImplicit => IsImplicit;
-        IContextReference IFunctionFeature.ObjectReference => ObjectReference;
 
         protected abstract Result Result(Category category, TypeBase argsType);
         protected abstract bool IsImplicit { get; }
-        protected abstract IContextReference ObjectReference { get; }
     }
 
     abstract class ContextMetaFeatureImplementation
@@ -141,9 +139,6 @@ namespace Reni.Feature
         /// </value>
         [DisableDump]
         bool IsImplicit { get; }
-
-        [DisableDump]
-        IContextReference ObjectReference { get; }
     }
 
     interface IMetaFunctionFeature
