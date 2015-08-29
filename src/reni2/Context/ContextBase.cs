@@ -268,7 +268,7 @@ namespace Reni.Context
             return null;
         }
 
-        ContextSearchResult Declarations(Definable tokenClass)
+        IFeatureImplementation Declarations(Definable tokenClass)
         {
             var genericize = tokenClass.Genericize.ToArray();
             var results = genericize.SelectMany(g => g.Declarations(this));
@@ -286,21 +286,22 @@ namespace Reni.Context
             if(searchResult == null)
                 return RootContext.UndefinedSymbol(source).Result(category);
 
-            var result = searchResult.Execute(category, FindRecentCompoundView.ObjectPointerViaContext, source, this, right);
+            var result = searchResult
+                .Result
+                (category, FindRecentCompoundView.ObjectPointerViaContext, source, this, right);
 
             Tracer.Assert(category <= result.CompleteCategory);
             return result;
         }
 
-        internal virtual IEnumerable<ContextSearchResult> Declarations<TDefinable>
+        internal virtual IEnumerable<IFeatureImplementation> Declarations<TDefinable>
             (TDefinable tokenClass)
             where TDefinable : Definable
         {
             var provider = this as ISymbolProviderForPointer<TDefinable>;
             var feature = provider?.Feature(tokenClass);
             if(feature != null)
-                yield return new
-                    ContextSearchResult(feature);
+                yield return feature;
         }
 
         internal IssueType UndefinedSymbol(SourcePart source)

@@ -139,5 +139,23 @@ namespace Reni.Feature
             return valueResult
                 .Type.Execute(category, valueResult, token, null, context, right);
         }
+
+        internal static Result Result
+            (
+            this IFeatureImplementation feature,
+            Category category,
+            Func<Category, Result> objectReference,
+            SourcePart token,
+            ContextBase context,
+            CompileSyntax right)
+        {
+            var metaFeature = feature.ContextMeta;
+            if(metaFeature != null)
+                return metaFeature.Result(context, category, right);
+
+            return feature
+                .Result(category, token, context, right)
+                .ReplaceArg(objectReference);
+        }
     }
 }
