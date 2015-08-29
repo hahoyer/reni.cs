@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Forms;
+using hw.Helper;
 using hw.Parser;
 
 namespace Reni.TokenClasses
@@ -17,5 +18,7 @@ namespace Reni.TokenClasses
         IType<SourceSyntax> Scanner<SourceSyntax>.IType.Type => this as IType<SourceSyntax>;
         string IUniqueIdProvider.Value => Id;
         public abstract string Id { get; }
+
+        protected override string GetNodeDump() => Id;
     }
 }
