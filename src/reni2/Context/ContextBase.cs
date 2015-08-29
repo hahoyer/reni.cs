@@ -34,7 +34,10 @@ namespace Reni.Context
         readonly Cache _cache;
 
         protected ContextBase()
-            : base(_nextId++) { _cache = new Cache(this); }
+            : base(_nextId++)
+        {
+            _cache = new Cache(this);
+        }
 
         public abstract string GetContextIdentificationDump();
 
@@ -66,7 +69,7 @@ namespace Reni.Context
 
         internal Compound Compound(CompoundSyntax context) => _cache.Compounds[context];
 
-        //[DebuggerHidden]
+        [DebuggerHidden]
         internal Result Result(Category category, CompileSyntax syntax)
             => ResultCache(syntax).GetCategories(category);
 
@@ -78,7 +81,7 @@ namespace Reni.Context
 
         internal TypeBase TypeIfKnown(CompileSyntax syntax) => _cache.ResultCache[syntax].Data.Type;
 
-        //[DebuggerHidden]
+        [DebuggerHidden]
         Result ResultForCache(Category category, CompileSyntax syntax)
         {
             var trace = syntax.ObjectId == -959 && ObjectId == 39 && category.HasType;
@@ -119,10 +122,14 @@ namespace Reni.Context
                         : Context.ResultForCache(category, Syntax);
 
                 var recursionHandler = Syntax.RecursionHandler;
-                Tracer.Assert(recursionHandler != null);
-                return recursionHandler.Execute(Context, category, pendingCategory, Syntax, AsReference);
+                if(recursionHandler != null)
+                    return recursionHandler
+                        .Execute(Context, category, pendingCategory, Syntax, AsReference);
+
+                NotImplementedMethod(category, pendingCategory);
+                return null;
             }
-                
+
             [EnableDump]
             string ContextId => Context.NodeDump;
 
@@ -239,7 +246,8 @@ namespace Reni.Context
         /// <param name="right"> the expression of the argument of the call. Must not be null </param>
         /// <param name="token"></param>
         /// <returns> </returns>
-        internal Result FunctionalArgResult(Category category, CompileSyntax right, SourcePart token)
+        internal Result FunctionalArgResult
+            (Category category, CompileSyntax right, SourcePart token)
         {
             var argsType = FindRecentFunctionContextObject.ArgsType;
             return argsType
@@ -278,8 +286,8 @@ namespace Reni.Context
             if(searchResult == null)
                 return RootContext.UndefinedSymbol(source).Result(category);
 
-            var result = searchResult.Execute
-                (category, FindRecentCompoundView.ObjectPointerViaContext, this, right, source);
+            var result = searchResult.Execute(category, FindRecentCompoundView.ObjectPointerViaContext, source, this, right);
+
             Tracer.Assert(category <= result.CompleteCategory);
             return result;
         }
@@ -292,7 +300,7 @@ namespace Reni.Context
             var feature = provider?.Feature(tokenClass);
             if(feature != null)
                 yield return new
-                    ContextSearchResult(feature, RootContext);
+                    ContextSearchResult(feature);
         }
 
         internal IssueType UndefinedSymbol(SourcePart source)
@@ -301,6 +309,5 @@ namespace Reni.Context
                     (
                     new Issue(IssueId.UndefinedSymbol, source, "Context: " + Dump()),
                     RootContext);
-
     }
 }

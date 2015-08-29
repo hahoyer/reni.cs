@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
-using hw.Helper;
 using System.Linq;
 using hw.Debug;
 using hw.Forms;
+using hw.Helper;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Feature;
 using Reni.Parser;
 using Reni.TokenClasses;
 using Reni.Validation;
@@ -64,10 +65,8 @@ namespace Reni.Struct
         IEnumerable<int> IndexList(Func<Data, bool> selector)
         {
             for(var index = 0; index < _data.Length; index++)
-            {
                 if(selector(_data[index]))
                     yield return index;
-            }
         }
 
         [DisableDump]
@@ -138,18 +137,34 @@ namespace Reni.Struct
             return result;
         }
 
-        internal Position Find(string name, CompoundView context)
+        internal int? Find(string name)
         {
             if(name == null)
                 return null;
-            var result = _data.SingleOrDefault(s => s.IsDefining(name) || s.IsInheriting(name, context));
-            if(result == null)
+            return _data
+                .SingleOrDefault(s => s.IsDefining(name))
+                ?.Position;
+        }
+
+        internal IFeatureImplementation Find(Definable definable, CompoundView accessPoint)
+        {
+            Tracer.Assert(accessPoint.Compound.Syntax == this);
+
+            if(definable == null)
                 return null;
-            if(result.IsDefining(name))
-                return new Position(result.Position);
-            Tracer.Assert(result.IsInheriting(name, context));
-            NotImplementedMethod(name, nameof(result), result);
-            return null;
+
+            var name = definable.Id;
+            var definingStatement = _data
+                .Take(accessPoint.ViewPosition)
+                .SingleOrDefault(s => s.IsDefining(name) || s.IsInheriting(name, accessPoint));
+            if(definingStatement == null)
+                return null;
+
+            var result = accessPoint.AccessFeature(definingStatement.Position);
+            if(definingStatement.IsDefining(name))
+                return result;
+
+            return new InheritedAccessFeature(result, definable);
         }
 
         internal override Result ResultForCache(ContextBase context, Category category) => context
@@ -178,12 +193,15 @@ namespace Reni.Struct
             public CompileSyntax Statement => StatementCache.Value.Value;
             public Issue[] Issues => StatementCache.Value.Issues;
             public bool IsDefining(string name) => Names.Contains(name);
+
             public bool IsInheriting(string name, CompoundView context)
-                => IsMixIn && (InheritedNames(context).Contains(name));
+                => IsMixIn
+                    && (InheritedNamesCache[context]?.Contains(name) ?? false);
+
             public bool IsConverter => RawStatement.IsConverterSyntax;
             public bool IsMixIn => RawStatement.IsMixInSyntax;
             public IEnumerable<string> Names => NamesCache.Value;
-            public IEnumerable<string> InheritedNames(CompoundView context) => InheritedNamesCache[context];
+
             public bool IsMutable => RawStatement.IsMutableSyntax;
 
             Checked<CompileSyntax> GetStatement()
@@ -203,19 +221,75 @@ namespace Reni.Struct
                     : Enumerable.Empty<Syntax>();
         }
 
-        internal sealed class Position : DumpableObject
+        internal interface IFindResult
         {
-            internal int Value { get; }
-            internal Position(int value) { Value = value; }
+            IFeatureImplementation Convert(CompoundView accessPoint);
+        }
 
-            internal AccessFeature Convert(CompoundView accessPoint)
-                => accessPoint.AccessFeature(Value);
+        internal sealed class Position : DumpableObject, IFindResult
+        {
+            internal readonly int ValueForTest;
+            internal Position(int valueForTest) { ValueForTest = valueForTest; }
+
+            IFeatureImplementation IFindResult.Convert(CompoundView accessPoint)
+                => accessPoint.AccessFeature(ValueForTest);
         }
 
         [DisableDump]
         protected override IEnumerable<Syntax> DirectChildren => _statements;
 
-        internal new IEnumerable<Syntax> GetMixins(CompoundView context)
+        internal IEnumerable<Syntax> GetMixins(CompoundView context)
             => _data.SelectMany(item => item.GetMixins(context).Concat(new[] {item.RawStatement}));
+    }
+
+
+    sealed class InheritedAccessFeature : DumpableObject, IFeatureImplementation
+    {
+        [EnableDump]
+        readonly IFeatureImplementation Target;
+        [EnableDump]
+        readonly Definable Definable;
+
+        public InheritedAccessFeature(IFeatureImplementation target, Definable definable)
+        {
+            Target = target;
+            Definable = definable;
+        }
+
+        IMetaFunctionFeature IFeatureImplementation.Meta
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
+
+        IFunctionFeature IFeatureImplementation.Function
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
+
+        IValueFeature IFeatureImplementation.Value
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
+
+        IContextMetaFunctionFeature IFeatureImplementation.ContextMeta
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
     }
 }

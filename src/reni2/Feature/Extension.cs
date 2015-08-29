@@ -1,7 +1,9 @@
-using System.Linq;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using hw.Debug;
 using hw.Helper;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -13,14 +15,21 @@ namespace Reni.Feature
 {
     static class Extension
     {
-        static readonly FunctionCache<Func<Category, ResultCache, ContextBase, CompileSyntax, Result>, MetaFunction>
+        static readonly
+            FunctionCache
+                <Func<Category, ResultCache, ContextBase, CompileSyntax, Result>, MetaFunction>
             _metaFunctionCache
-                = new FunctionCache<Func<Category, ResultCache, ContextBase, CompileSyntax, Result>, MetaFunction>
+                =
+                new FunctionCache
+                    <Func<Category, ResultCache, ContextBase, CompileSyntax, Result>, MetaFunction>
                     (function => new MetaFunction(function));
 
-        static readonly FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Value>> _simpleCache
-            = new FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Value>>
-                (function => new FunctionCache<TypeBase, Value>(type => new Value(function, type)));
+        static readonly FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Value>>
+            _simpleCache
+                = new FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Value>>
+                    (
+                    function =>
+                        new FunctionCache<TypeBase, Value>(type => new Value(function, type)));
 
         internal static Value Value(Func<Category, Result> function, TypeBase target = null)
             => _simpleCache[function][(target ?? function.Target as TypeBase).AssertNotNull()];
@@ -35,9 +44,11 @@ namespace Reni.Feature
             return new ObjectFunction(function, context);
         }
 
-        internal static Function FunctionFeature(Func<Category, TypeBase, Result> function) => new Function(function);
+        internal static Function FunctionFeature(Func<Category, TypeBase, Result> function)
+            => new Function(function);
 
-        internal static IFeatureImplementation FunctionFeature<T>(Func<Category, TypeBase, T, Result> function, T arg)
+        internal static IFeatureImplementation FunctionFeature<T>
+            (Func<Category, TypeBase, T, Result> function, T arg)
             => new ExtendedFunction<T>(function, arg);
 
 
@@ -50,7 +61,8 @@ namespace Reni.Feature
             return feature.Value;
         }
 
-        internal static MetaFunction MetaFeature(Func<Category, ResultCache, ContextBase, CompileSyntax, Result> function)
+        internal static MetaFunction MetaFeature
+            (Func<Category, ResultCache, ContextBase, CompileSyntax, Result> function)
             => _metaFunctionCache[function];
 
         internal static TypeBase ResultType(this IValueFeature f) => f.Result(Category.Type)?.Type;
@@ -67,7 +79,8 @@ namespace Reni.Feature
             where T : Definable
             => CreateList(baseList, () => new GenericProviderForDefinable<T>(target));
 
-        static IEnumerable<TGeneric> CreateList<TGeneric>(IEnumerable<TGeneric> baseList, Func<TGeneric> creator)
+        static IEnumerable<TGeneric> CreateList<TGeneric>
+            (IEnumerable<TGeneric> baseList, Func<TGeneric> creator)
         {
             yield return creator();
             if(baseList == null)
@@ -75,6 +88,56 @@ namespace Reni.Feature
 
             foreach(var item in baseList)
                 yield return item;
+        }
+
+        internal static Result Result
+            (
+            this IFeatureImplementation feature,
+            Category category,
+            SourcePart token,
+            ContextBase context,
+            CompileSyntax right)
+        {
+            Tracer.Assert
+                (
+                    feature.Function == null
+                        || !feature.Function.IsImplicit
+                        || feature.Value == null
+                );
+
+            var valueCategory = category;
+            if(right != null)
+                valueCategory = category.Typed;
+
+            var valueResult = feature.Function != null && feature.Function.IsImplicit
+                ? feature
+                    .Function
+                    .Result(valueCategory, context.RootContext.VoidType)
+                    .ReplaceArg(context.RootContext.VoidType.Result(Category.All))
+                : right == null || feature.Function == null
+                    ? feature.Value?.Result(valueCategory)
+                    : null;
+
+            if(right == null)
+            {
+                if(valueResult == null)
+                    Dumpable.NotImplementedFunction(feature, category, token, context, right);
+                return valueResult;
+            }
+
+            if(valueResult == null)
+            {
+                if(feature.Function == null)
+                    Dumpable.NotImplementedFunction(feature, category, token, context, right);
+                Tracer.Assert(feature.Function != null);
+                return feature
+                    .Function
+                    .Result(category, context.ResultAsReferenceCache(right).Type)
+                    .ReplaceArg(context.ResultAsReferenceCache(right));
+            }
+
+            return valueResult
+                .Type.Execute(category, valueResult, token, null, context, right);
         }
     }
 }

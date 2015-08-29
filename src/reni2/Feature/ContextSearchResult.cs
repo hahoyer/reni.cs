@@ -11,17 +11,22 @@ namespace Reni.Feature
 {
     sealed class ContextSearchResult : FeatureContainer
     {
-        internal ContextSearchResult(IFeatureImplementation feature, Root rootContext)
-            : base(feature, rootContext) { Tracer.Assert(feature != null); }
+        internal ContextSearchResult(IFeatureImplementation feature)
+            : base(feature) { Tracer.Assert(feature != null); }
 
-        public Result Execute
-            (Category category, Func<Category, Result> objectReference, ContextBase context, CompileSyntax right, SourcePart token)
+        internal Result Execute
+            (Category category,
+            Func<Category, Result> objectReference,
+            SourcePart token,
+            ContextBase context,
+            CompileSyntax right)
         {
             var metaFeature = Feature.ContextMeta;
             if(metaFeature != null)
                 return metaFeature.Result(context, category, right);
 
-            return Result(category, context, right, token)
+            return Feature
+                .Result(category, token, context, right)
                 .ReplaceArg(objectReference);
         }
     }

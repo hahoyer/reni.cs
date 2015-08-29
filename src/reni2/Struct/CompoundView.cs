@@ -244,11 +244,11 @@ namespace Reni.Struct
                 .TypeForStructureElement;
 
         internal IFeatureImplementation Find(Definable definable)
-            => Compound.Syntax.Find(definable.Id, this)?.Convert(this);
+            => Compound.Syntax.Find(definable, this);
 
         internal IEnumerable<Syntax> GetMixins()
         {
-            var trace = true;
+            var trace = false;
             StartMethodDump(trace);
             try
             {
