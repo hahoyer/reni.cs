@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using hw.Debug;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
@@ -10,23 +11,23 @@ using Reni.Type;
 
 namespace Reni.Feature
 {
-    sealed class SearchResult : FeatureContainer
+    sealed class SearchResult : DumpableObject
     {
+        IFeatureImplementation Feature { get; }
+        ConversionPath ConverterPath { get; }
+
         internal SearchResult(SearchResult result, ConversionPath relativeConversion)
-            : base(result.Feature)
         {
+            Feature = result.Feature;
             ConverterPath = result.ConverterPath + relativeConversion;
         }
 
         internal SearchResult(IFeatureImplementation feature, TypeBase definingItem)
-            : base(feature)
         {
+            Feature = feature;
             ConverterPath = new ConversionPath(definingItem);
-            StopByObjectId(-37);
         }
-
-        ConversionPath ConverterPath { get; }
-
+        
         internal Result Execute
             (
             Category category,
