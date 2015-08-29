@@ -62,21 +62,6 @@ namespace Reni.TokenClasses
         protected abstract Checked<Syntax> Prefix(SourcePart token, Syntax right);
         protected abstract Checked<Syntax> Suffix(Syntax left, SourcePart token);
         protected abstract Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right);
-
-        internal Formatting.Item ItemFromToken
-            (Provider provider, int leadingLineBreaks, int indentLevel, ITokenClass rightTokenClass, IToken token)
-        {
-            var whiteSpaces = provider.InternalGetWhitespaces
-                (
-                    rightTokenClass,
-                    leadingLineBreaks,
-                    indentLevel,
-                    token.PrecededWith,
-                    this
-                );
-            var item = new Formatting.Item(whiteSpaces, token);
-            return item;
-        }
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
