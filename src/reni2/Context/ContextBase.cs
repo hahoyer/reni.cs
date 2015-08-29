@@ -268,7 +268,7 @@ namespace Reni.Context
             return null;
         }
 
-        IFeatureImplementation Declarations(Definable tokenClass)
+        IContextFeatureImplementation Declarations(Definable tokenClass)
         {
             var genericize = tokenClass.Genericize.ToArray();
             var results = genericize.SelectMany(g => g.Declarations(this));
@@ -294,11 +294,11 @@ namespace Reni.Context
             return result;
         }
 
-        internal virtual IEnumerable<IFeatureImplementation> Declarations<TDefinable>
+        internal virtual IEnumerable<IContextFeatureImplementation> Declarations<TDefinable>
             (TDefinable tokenClass)
             where TDefinable : Definable
         {
-            var provider = this as ISymbolProviderForPointer<TDefinable>;
+            var provider = this as ISymbolProviderForContext<TDefinable>;
             var feature = provider?.Feature(tokenClass);
             if(feature != null)
                 yield return feature;

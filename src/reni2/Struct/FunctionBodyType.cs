@@ -91,7 +91,6 @@ namespace Reni.Struct
 
         FunctionType Function(TypeBase argsType) => _compoundView.Function(_syntax, argsType);
 
-        IContextMetaFunctionFeature IContextMetaFeatureImplementation.ContextMeta => null;
         IMetaFunctionFeature IMetaFeatureImplementation.Meta => null;
         IFunctionFeature ITypedFeatureImplementation.Function => this;
         IValueFeature ITypedFeatureImplementation.Value => this;

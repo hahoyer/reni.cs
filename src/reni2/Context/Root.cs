@@ -17,8 +17,8 @@ namespace Reni.Context
 {
     sealed class Root
         : ContextBase
-            , ISymbolProviderForPointer<Minus>
-            , ISymbolProviderForPointer<ConcatArrays>
+            , ISymbolProviderForContext<Minus>
+            , ISymbolProviderForContext<ConcatArrays>
     {
         [DisableDump]
         [Node]
@@ -30,9 +30,9 @@ namespace Reni.Context
         readonly ValueCache<RecursionType> _recursionTypeCache;
         readonly ValueCache<BitType> _bitCache;
         readonly ValueCache<VoidType> _voidCache;
-        readonly ValueCache<IFeatureImplementation> _minusFeatureCache;
+        readonly ValueCache<IContextFeatureImplementation> _minusFeatureCache;
         readonly FunctionCache<string, CompileSyntax> _metaDictionary;
-        readonly FunctionCache<bool, IFeatureImplementation> _createArrayFeatureCache;
+        readonly FunctionCache<bool, IContextFeatureImplementation> _createArrayFeatureCache;
 
         internal Root(IExecutionContext executionContext)
         {
@@ -41,13 +41,13 @@ namespace Reni.Context
             ExecutionContext = executionContext;
             _bitCache = new ValueCache<BitType>(() => new BitType(this));
             _voidCache = new ValueCache<VoidType>(() => new VoidType(this));
-            _minusFeatureCache = new ValueCache<IFeatureImplementation>
+            _minusFeatureCache = new ValueCache<IContextFeatureImplementation>
                 (
                 () =>
                     new ContextMetaFunctionFromSyntax
                         (_metaDictionary[ArgToken.TokenId + " " + Negate.TokenId])
                 );
-            _createArrayFeatureCache = new FunctionCache<bool, IFeatureImplementation>
+            _createArrayFeatureCache = new FunctionCache<bool, IContextFeatureImplementation>
                 (
                 isMutable =>
                     new ContextMetaFunction
@@ -94,10 +94,10 @@ namespace Reni.Context
         [DisableDump]
         public bool ProcessErrors => ExecutionContext.ProcessErrors;
 
-        IFeatureImplementation ISymbolProviderForPointer<Minus>.Feature
+        IContextFeatureImplementation ISymbolProviderForContext<Minus>.Feature
             (Minus tokenClass) => _minusFeatureCache.Value;
 
-        IFeatureImplementation ISymbolProviderForPointer<ConcatArrays>.
+        IContextFeatureImplementation ISymbolProviderForContext<ConcatArrays>.
             Feature(ConcatArrays tokenClass)
             => _createArrayFeatureCache[tokenClass.IsMutable];
 

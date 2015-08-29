@@ -243,7 +243,7 @@ namespace Reni.Struct
                 .AccessType(ViewPosition, position)
                 .TypeForStructureElement;
 
-        internal IFeatureImplementation Find(Definable definable)
+        internal ICommonFeatureImplementation Find(Definable definable)
             => Compound.Syntax.Find(definable, this);
 
         internal IEnumerable<Syntax> GetMixins()

@@ -12,6 +12,7 @@ namespace Reni.Parser
     sealed class RecursionType
         : TypeBase
             , IFeatureImplementation
+            , IContextFeatureImplementation
             , IFunctionFeature
             , IValueFeature
             , IContextMetaFunctionFeature

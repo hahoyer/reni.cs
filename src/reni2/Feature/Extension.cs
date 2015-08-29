@@ -92,7 +92,7 @@ namespace Reni.Feature
 
         internal static Result Result
             (
-            this IFeatureImplementation feature,
+            this ITypedFeatureImplementation feature,
             Category category,
             SourcePart token,
             ContextBase context,
@@ -142,7 +142,7 @@ namespace Reni.Feature
 
         internal static Result Result
             (
-            this IFeatureImplementation feature,
+            this IContextFeatureImplementation feature,
             Category category,
             Func<Category, Result> objectReference,
             SourcePart token,

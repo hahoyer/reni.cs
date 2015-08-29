@@ -41,7 +41,6 @@ namespace Reni.Feature
         public Value(Func<Category, Result> function, TypeBase type)
             : base(function, type) { }
 
-        IContextMetaFunctionFeature IContextMetaFeatureImplementation.ContextMeta => null;
         IMetaFunctionFeature IMetaFeatureImplementation.Meta => null;
         IFunctionFeature ITypedFeatureImplementation.Function => null;
         IValueFeature ITypedFeatureImplementation.Value => this;

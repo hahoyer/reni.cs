@@ -28,8 +28,15 @@ namespace Reni.Feature
 
     interface IFeatureImplementation
         : ITypedFeatureImplementation
-            , IMetaFeatureImplementation
+            , IMetaFeatureImplementation {}
+
+    interface IContextFeatureImplementation
+        : ITypedFeatureImplementation
             , IContextMetaFeatureImplementation {}
+
+    interface ICommonFeatureImplementation
+        : IContextFeatureImplementation
+            , IFeatureImplementation {}
 
     abstract class FunctionFeatureImplementation
         : DumpableObject, IFeatureImplementation, IFunctionFeature
@@ -39,7 +46,6 @@ namespace Reni.Feature
 
         protected FunctionFeatureImplementation() { }
 
-        IContextMetaFunctionFeature IContextMetaFeatureImplementation.ContextMeta => null;
         IMetaFunctionFeature IMetaFeatureImplementation.Meta => null;
         IFunctionFeature ITypedFeatureImplementation.Function => this;
         IValueFeature ITypedFeatureImplementation.Value => null;
@@ -54,10 +60,9 @@ namespace Reni.Feature
     }
 
     abstract class ContextMetaFeatureImplementation
-        : DumpableObject, IFeatureImplementation, IContextMetaFunctionFeature
+        : DumpableObject, IContextFeatureImplementation, IContextMetaFunctionFeature
     {
         IContextMetaFunctionFeature IContextMetaFeatureImplementation.ContextMeta => this;
-        IMetaFunctionFeature IMetaFeatureImplementation.Meta => null;
         IFunctionFeature ITypedFeatureImplementation.Function => null;
         IValueFeature ITypedFeatureImplementation.Value => null;
 
@@ -110,6 +115,14 @@ namespace Reni.Feature
 
     // ReSharper disable once TypeParameterCanBeVariant
     // Exact match for TDefinable is required here.
+    interface ISymbolProviderForContext<TDefinable>
+        where TDefinable : Definable
+    {
+        IContextFeatureImplementation Feature(TDefinable tokenClass);
+    }
+
+    // ReSharper disable once TypeParameterCanBeVariant
+    // Exact match for TDefinable is required here.
     interface ISymbolProviderForPointer<TDefinable>
         where TDefinable : Definable
     {
@@ -132,7 +145,7 @@ namespace Reni.Feature
     interface IDeclarationProvider
     {
         IEnumerable<SearchResult> Declarations(TypeBase source);
-        IEnumerable<IFeatureImplementation> Declarations(ContextBase source);
+        IEnumerable<IContextFeatureImplementation> Declarations(ContextBase source);
     }
 
     sealed class GenericProviderForType<T> : DumpableObject, IGenericProviderForType
@@ -153,7 +166,7 @@ namespace Reni.Feature
         IEnumerable<SearchResult> IDeclarationProvider.Declarations(TypeBase source)
             => source.Declarations(_target);
 
-        IEnumerable<IFeatureImplementation> IDeclarationProvider.Declarations
+        IEnumerable<IContextFeatureImplementation> IDeclarationProvider.Declarations
             (ContextBase source)
             => source.Declarations(_target);
     }
@@ -168,7 +181,6 @@ namespace Reni.Feature
             _function = function;
         }
 
-        IContextMetaFunctionFeature IContextMetaFeatureImplementation.ContextMeta => null;
         IMetaFunctionFeature IMetaFeatureImplementation.Meta => this;
         IFunctionFeature ITypedFeatureImplementation.Function => null;
         IValueFeature ITypedFeatureImplementation.Value => null;
@@ -193,14 +205,13 @@ namespace Reni.Feature
     }
 
     sealed class ContextMetaFunctionFromSyntax
-        : DumpableObject, IFeatureImplementation, IContextMetaFunctionFeature
+        : DumpableObject, IContextFeatureImplementation, IContextMetaFunctionFeature
     {
         [EnableDump]
         readonly CompileSyntax _definition;
         public ContextMetaFunctionFromSyntax(CompileSyntax definition) { _definition = definition; }
 
         IContextMetaFunctionFeature IContextMetaFeatureImplementation.ContextMeta => this;
-        IMetaFunctionFeature IMetaFeatureImplementation.Meta => null;
         IFunctionFeature ITypedFeatureImplementation.Function => null;
         IValueFeature ITypedFeatureImplementation.Value => null;
 

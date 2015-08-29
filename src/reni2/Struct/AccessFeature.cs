@@ -13,7 +13,7 @@ namespace Reni.Struct
 {
     sealed class AccessFeature
         : DumpableObject
-            , IFeatureImplementation
+            , ICommonFeatureImplementation
             , IValueFeature
     {
         static int _nextObjectId;
@@ -37,7 +37,8 @@ namespace Reni.Struct
         IContextMetaFunctionFeature IContextMetaFeatureImplementation.ContextMeta
             => (Statement as FunctionSyntax)?.ContextMetaFunctionFeature(View);
 
-        IMetaFunctionFeature IMetaFeatureImplementation.Meta => (Statement as FunctionSyntax)?.MetaFunctionFeature(View);
+        IMetaFunctionFeature IMetaFeatureImplementation.Meta
+            => (Statement as FunctionSyntax)?.MetaFunctionFeature(View);
 
         IFunctionFeature ITypedFeatureImplementation.Function => FunctionFeature.Value;
 
@@ -63,7 +64,6 @@ namespace Reni.Struct
 
         IFunctionFeature ObtainFunctionFeature()
         {
-
             var functionSyntax = Statement as FunctionSyntax;
             if(functionSyntax != null)
                 return functionSyntax.FunctionFeature(View);

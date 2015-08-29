@@ -146,7 +146,7 @@ namespace Reni.Struct
                 ?.Position;
         }
 
-        internal IFeatureImplementation Find(Definable definable, CompoundView accessPoint)
+        internal ICommonFeatureImplementation Find(Definable definable, CompoundView accessPoint)
         {
             Tracer.Assert(accessPoint.Compound.Syntax == this);
 
@@ -243,7 +243,7 @@ namespace Reni.Struct
     }
 
 
-    sealed class InheritedAccessFeature : DumpableObject, IFeatureImplementation
+    sealed class InheritedAccessFeature : DumpableObject, ICommonFeatureImplementation
     {
         [EnableDump]
         readonly IFeatureImplementation Target;

@@ -15,6 +15,7 @@ namespace Reni.Struct
         : TypeBase
             , ISymbolProviderForPointer<DumpPrintToken>
             , ISymbolProviderForPointer<Definable>
+            , ISymbolProviderForContext<Definable>
             , ISymbolProvider<DumpPrintToken>
             , ISymbolProvider<Definable>
     {
@@ -52,6 +53,9 @@ namespace Reni.Struct
             => Feature.Extension.Value(DumpPrintTokenResult);
 
         IFeatureImplementation ISymbolProviderForPointer<Definable>.Feature(Definable tokenClass)
+            => View.Find(tokenClass);
+
+        IContextFeatureImplementation ISymbolProviderForContext<Definable>.Feature(Definable tokenClass)
             => View.Find(tokenClass);
 
         IFeatureImplementation ISymbolProvider<DumpPrintToken>.Feature(DumpPrintToken tokenClass)

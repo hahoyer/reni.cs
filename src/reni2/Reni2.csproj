@@ -363,7 +363,6 @@
     <Compile Include="Type\RepeaterAccessType.cs" />
     <Compile Include="Type\Child.cs" />
     <Compile Include="Type\CreateArrayFromReferenceFeature.cs" />
-    <Compile Include="Type\EmptyFunctionFeatureProvider.cs" />
     <Compile Include="Type\EnableCut.cs" />
     <Compile Include="Type\FieldAccessType.cs" />
     <Compile Include="Type\FunctionalFeature.cs" />
