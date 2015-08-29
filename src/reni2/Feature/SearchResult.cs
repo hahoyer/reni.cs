@@ -36,7 +36,7 @@ namespace Reni.Feature
             CompileSyntax right,
             SourcePart token)
         {
-            var metaFeature = Feature.Meta;
+            var metaFeature = ((IMetaFeatureImplementation) Feature).Function;
             if(metaFeature != null)
                 return metaFeature.Result(category, left, context, right);
 

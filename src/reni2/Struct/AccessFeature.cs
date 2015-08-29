@@ -34,10 +34,10 @@ namespace Reni.Struct
 
         ValueCache<IFunctionFeature> FunctionFeature { get; }
 
-        IContextMetaFunctionFeature IContextMetaFeatureImplementation.ContextMeta
+        IContextMetaFunctionFeature IContextMetaFeatureImplementation.Function
             => (Statement as FunctionSyntax)?.ContextMetaFunctionFeature(View);
 
-        IMetaFunctionFeature IMetaFeatureImplementation.Meta
+        IMetaFunctionFeature IMetaFeatureImplementation.Function
             => (Statement as FunctionSyntax)?.MetaFunctionFeature(View);
 
         IFunctionFeature ITypedFeatureImplementation.Function => FunctionFeature.Value;
@@ -70,7 +70,7 @@ namespace Reni.Struct
 
             var valueType = View.ValueType(Position);
             StopByObjectIds();
-            return valueType.CheckedFeature?.Function;
+            return ((ITypedFeatureImplementation) valueType.CheckedFeature)?.Function;
         }
     }
 }

@@ -246,17 +246,17 @@ namespace Reni.Struct
     sealed class InheritedAccessFeature : DumpableObject, ICommonFeatureImplementation
     {
         [EnableDump]
-        readonly IFeatureImplementation Target;
+        readonly ICommonFeatureImplementation Target;
         [EnableDump]
         readonly Definable Definable;
 
-        public InheritedAccessFeature(IFeatureImplementation target, Definable definable)
+        public InheritedAccessFeature(ICommonFeatureImplementation target, Definable definable)
         {
             Target = target;
             Definable = definable;
         }
 
-        IMetaFunctionFeature IMetaFeatureImplementation.Meta
+        IMetaFunctionFeature IMetaFeatureImplementation.Function
         {
             get
             {
@@ -283,7 +283,7 @@ namespace Reni.Struct
             }
         }
 
-        IContextMetaFunctionFeature IContextMetaFeatureImplementation.ContextMeta
+        IContextMetaFunctionFeature IContextMetaFeatureImplementation.Function
         {
             get
             {

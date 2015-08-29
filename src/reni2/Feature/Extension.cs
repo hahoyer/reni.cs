@@ -54,7 +54,7 @@ namespace Reni.Feature
 
         internal static IValueFeature ExtendedValue(this IFeatureImplementation feature)
         {
-            var function = feature.Function;
+            var function = ((ITypedFeatureImplementation) feature).Function;
             if(function != null && function.IsImplicit)
                 return null;
 
@@ -149,7 +149,7 @@ namespace Reni.Feature
             ContextBase context,
             CompileSyntax right)
         {
-            var metaFeature = feature.ContextMeta;
+            var metaFeature = ((IContextMetaFeatureImplementation) feature).Function;
             if(metaFeature != null)
                 return metaFeature.Result(context, category, right);
 

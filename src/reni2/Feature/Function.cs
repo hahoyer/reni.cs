@@ -38,7 +38,7 @@ namespace Reni.Feature
         public ObjectFunction(Func<Category, IContextReference, TypeBase, Result> function, IContextReferenceProvider target)
             : base(function, target) {}
 
-        IMetaFunctionFeature IMetaFeatureImplementation.Meta => null;
+        IMetaFunctionFeature IMetaFeatureImplementation.Function => null;
         IFunctionFeature ITypedFeatureImplementation.Function => this;
         IValueFeature ITypedFeatureImplementation.Value => null;
     }

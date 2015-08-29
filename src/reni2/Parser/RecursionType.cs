@@ -22,10 +22,10 @@ namespace Reni.Parser
         public RecursionType(Root rootContext) { RootContext = rootContext; }
         internal override Root RootContext { get; }
 
-        IMetaFunctionFeature IMetaFeatureImplementation.Meta => this;
+        IMetaFunctionFeature IMetaFeatureImplementation.Function => this;
         IFunctionFeature ITypedFeatureImplementation.Function => this;
         IValueFeature ITypedFeatureImplementation.Value => this;
-        IContextMetaFunctionFeature IContextMetaFeatureImplementation.ContextMeta => this;
+        IContextMetaFunctionFeature IContextMetaFeatureImplementation.Function => this;
         bool IFunctionFeature.IsImplicit => false;
         TypeBase IValueFeature.TargetType => this;
         int IContextReference.Order => ObjectId;

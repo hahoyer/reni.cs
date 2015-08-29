@@ -18,12 +18,12 @@ namespace Reni.Feature
 
     interface IMetaFeatureImplementation
     {
-        IMetaFunctionFeature Meta { get; }
+        IMetaFunctionFeature Function { get; }
     }
 
     interface IContextMetaFeatureImplementation
     {
-        IContextMetaFunctionFeature ContextMeta { get; }
+        IContextMetaFunctionFeature Function { get; }
     }
 
     interface IFeatureImplementation
@@ -46,7 +46,7 @@ namespace Reni.Feature
 
         protected FunctionFeatureImplementation() { }
 
-        IMetaFunctionFeature IMetaFeatureImplementation.Meta => null;
+        IMetaFunctionFeature IMetaFeatureImplementation.Function => null;
         IFunctionFeature ITypedFeatureImplementation.Function => this;
         IValueFeature ITypedFeatureImplementation.Value => null;
 
@@ -62,7 +62,7 @@ namespace Reni.Feature
     abstract class ContextMetaFeatureImplementation
         : DumpableObject, IContextFeatureImplementation, IContextMetaFunctionFeature
     {
-        IContextMetaFunctionFeature IContextMetaFeatureImplementation.ContextMeta => this;
+        IContextMetaFunctionFeature IContextMetaFeatureImplementation.Function => this;
         IFunctionFeature ITypedFeatureImplementation.Function => null;
         IValueFeature ITypedFeatureImplementation.Value => null;
 
@@ -181,7 +181,7 @@ namespace Reni.Feature
             _function = function;
         }
 
-        IMetaFunctionFeature IMetaFeatureImplementation.Meta => this;
+        IMetaFunctionFeature IMetaFeatureImplementation.Function => this;
         IFunctionFeature ITypedFeatureImplementation.Function => null;
         IValueFeature ITypedFeatureImplementation.Value => null;
 
@@ -211,7 +211,7 @@ namespace Reni.Feature
         readonly CompileSyntax _definition;
         public ContextMetaFunctionFromSyntax(CompileSyntax definition) { _definition = definition; }
 
-        IContextMetaFunctionFeature IContextMetaFeatureImplementation.ContextMeta => this;
+        IContextMetaFunctionFeature IContextMetaFeatureImplementation.Function => this;
         IFunctionFeature ITypedFeatureImplementation.Function => null;
         IValueFeature ITypedFeatureImplementation.Value => null;
 
