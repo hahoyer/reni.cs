@@ -25,7 +25,7 @@ namespace Reni.Struct
 
         protected override string GetContextChildIdentificationDump() => GetCompoundIdentificationDump();
 
-        IContextFeatureImplementation ISymbolProviderForContext<Definable>.Feature(Definable tokenClass)
+        IContextImplementation ISymbolProviderForContext<Definable>.Feature(Definable tokenClass)
             => View.Find(tokenClass);
 
         internal Result ObjectResult(Category category) => View.ObjectPointerViaContext(category);

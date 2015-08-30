@@ -30,9 +30,9 @@ namespace Reni.Context
         readonly ValueCache<RecursionType> _recursionTypeCache;
         readonly ValueCache<BitType> _bitCache;
         readonly ValueCache<VoidType> _voidCache;
-        readonly ValueCache<IContextFeatureImplementation> _minusFeatureCache;
+        readonly ValueCache<IContextImplementation> _minusFeatureCache;
         readonly FunctionCache<string, CompileSyntax> _metaDictionary;
-        readonly FunctionCache<bool, IContextFeatureImplementation> _createArrayFeatureCache;
+        readonly FunctionCache<bool, IContextImplementation> _createArrayFeatureCache;
 
         internal Root(IExecutionContext executionContext)
         {
@@ -41,13 +41,13 @@ namespace Reni.Context
             ExecutionContext = executionContext;
             _bitCache = new ValueCache<BitType>(() => new BitType(this));
             _voidCache = new ValueCache<VoidType>(() => new VoidType(this));
-            _minusFeatureCache = new ValueCache<IContextFeatureImplementation>
+            _minusFeatureCache = new ValueCache<IContextImplementation>
                 (
                 () =>
                     new ContextMetaFunctionFromSyntax
                         (_metaDictionary[ArgToken.TokenId + " " + Negate.TokenId])
                 );
-            _createArrayFeatureCache = new FunctionCache<bool, IContextFeatureImplementation>
+            _createArrayFeatureCache = new FunctionCache<bool, IContextImplementation>
                 (
                 isMutable =>
                     new ContextMetaFunction
@@ -94,10 +94,10 @@ namespace Reni.Context
         [DisableDump]
         public bool ProcessErrors => ExecutionContext.ProcessErrors;
 
-        IContextFeatureImplementation ISymbolProviderForContext<Minus>.Feature
+        IContextImplementation ISymbolProviderForContext<Minus>.Feature
             (Minus tokenClass) => _minusFeatureCache.Value;
 
-        IContextFeatureImplementation ISymbolProviderForContext<ConcatArrays>.
+        IContextImplementation ISymbolProviderForContext<ConcatArrays>.
             Feature(ConcatArrays tokenClass)
             => _createArrayFeatureCache[tokenClass.IsMutable];
 

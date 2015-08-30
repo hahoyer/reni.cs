@@ -101,7 +101,7 @@ namespace Reni.Struct
         internal Root RootContext => Compound.RootContext;
 
         [DisableDump]
-        internal IEnumerable<IValueFeature> ConverterFeatures
+        internal IEnumerable<IValue> ConverterFeatures
             => Compound
                 .Syntax
                 .ConverterFunctions
@@ -243,7 +243,7 @@ namespace Reni.Struct
                 .AccessType(ViewPosition, position)
                 .TypeForStructureElement;
 
-        internal ICommonFeatureImplementation Find(Definable definable)
+        internal ICommonImplementation Find(Definable definable)
             => Compound.Syntax.Find(definable, this);
 
         internal IEnumerable<Syntax> GetMixins()

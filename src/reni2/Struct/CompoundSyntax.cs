@@ -9,6 +9,7 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.Parser;
 using Reni.TokenClasses;
+using Reni.Type;
 using Reni.Validation;
 
 namespace Reni.Struct
@@ -146,7 +147,7 @@ namespace Reni.Struct
                 ?.Position;
         }
 
-        internal ICommonFeatureImplementation Find(Definable definable, CompoundView accessPoint)
+        internal ICommonImplementation Find(Definable definable, CompoundView accessPoint)
         {
             Tracer.Assert(accessPoint.Compound.Syntax == this);
 
@@ -164,7 +165,22 @@ namespace Reni.Struct
             if(definingStatement.IsDefining(name))
                 return result;
 
-            return new InheritedAccessFeature(result, definable);
+            var targetResult = new ResultCache(result);
+
+            return targetResult.Type.ExecuteDeclaration
+                (
+                    definable,
+                    searchResult => new InheritedAccessFeature(searchResult, targetResult),
+                    OnInheritedDeclarationError
+                );
+        }
+
+        ICommonImplementation OnInheritedDeclarationError(IssueId issueId)
+        {
+            if(issueId == IssueId.UndefinedSymbol)
+                return null;
+            NotImplementedMethod(issueId);
+            return null;
         }
 
         internal override Result ResultForCache(ContextBase context, Category category) => context
@@ -221,20 +237,6 @@ namespace Reni.Struct
                     : Enumerable.Empty<Syntax>();
         }
 
-        internal interface IFindResult
-        {
-            IFeatureImplementation Convert(CompoundView accessPoint);
-        }
-
-        internal sealed class Position : DumpableObject, IFindResult
-        {
-            internal readonly int ValueForTest;
-            internal Position(int valueForTest) { ValueForTest = valueForTest; }
-
-            IFeatureImplementation IFindResult.Convert(CompoundView accessPoint)
-                => accessPoint.AccessFeature(ValueForTest);
-        }
-
         [DisableDump]
         protected override IEnumerable<Syntax> DirectChildren => _statements;
 
@@ -243,53 +245,59 @@ namespace Reni.Struct
     }
 
 
-    sealed class InheritedAccessFeature : DumpableObject, ICommonFeatureImplementation
+    sealed class InheritedAccessFeature
+        : DumpableObject, ICommonImplementation, IValue
     {
         [EnableDump]
-        readonly ICommonFeatureImplementation Target;
-        [EnableDump]
-        readonly Definable Definable;
+        readonly SearchResult SearchResult;
+        readonly ResultCache TargetResult;
 
-        public InheritedAccessFeature(ICommonFeatureImplementation target, Definable definable)
+        public InheritedAccessFeature(SearchResult searchResult, ResultCache targetResult)
         {
-            Target = target;
-            Definable = definable;
+            SearchResult = searchResult;
+            TargetResult = targetResult;
         }
 
-        IMetaFunctionFeature IMetaFeatureImplementation.Function
+        IMeta IMetaImplementation.Function
         {
             get
             {
-                NotImplementedMethod();
+                if(((IMetaImplementation) SearchResult.Feature).Function != null)
+                    NotImplementedMethod();
                 return null;
             }
         }
 
-        IFunctionFeature ITypedFeatureImplementation.Function
+        IFunction IImplementation.Function
         {
             get
             {
-                NotImplementedMethod();
+                if(((IImplementation) SearchResult.Feature).Function != null)
+                    NotImplementedMethod();
                 return null;
             }
         }
 
-        IValueFeature ITypedFeatureImplementation.Value
+        IValue IImplementation.Value => SearchResult.Feature.Value == null ? null : this;
+
+        IContextMeta IContextMetaImplementation.Function
         {
             get
             {
-                NotImplementedMethod();
+                if(((IContextMetaImplementation) SearchResult.Feature).Function != null)
+                    NotImplementedMethod();
                 return null;
             }
         }
 
-        IContextMetaFunctionFeature IContextMetaFeatureImplementation.Function
+        Result IValue.Result(Category category)
         {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
+            var result = SearchResult.Feature.Value.Result(category);
+            if(category.HasCode || category.HasExts)
+                NotImplementedMethod(category, nameof(result), result);
+            return result;
         }
+
+        TypeBase IValue.TargetType => SearchResult.Feature.Value.TargetType;
     }
 }

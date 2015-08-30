@@ -34,7 +34,7 @@ namespace Reni.Struct
         internal override bool HasQuickSize => false;
 
         [DisableDump]
-        internal override IEnumerable<IValueFeature> StripConversions
+        internal override IEnumerable<IValue> StripConversions
         {
             get
             {
@@ -48,20 +48,21 @@ namespace Reni.Struct
 
         Result VoidConversion(Category category) => RootContext.VoidType.Result(category, ArgResult);
 
-        IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature
+        ITypeImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature
             (DumpPrintToken tokenClass)
             => Feature.Extension.Value(DumpPrintTokenResult);
 
-        IFeatureImplementation ISymbolProviderForPointer<Definable>.Feature(Definable tokenClass)
+        ITypeImplementation ISymbolProviderForPointer<Definable>.Feature(Definable tokenClass)
             => View.Find(tokenClass);
 
-        IContextFeatureImplementation ISymbolProviderForContext<Definable>.Feature(Definable tokenClass)
+        IContextImplementation ISymbolProviderForContext<Definable>.Feature
+            (Definable tokenClass)
             => View.Find(tokenClass);
 
-        IFeatureImplementation ISymbolProvider<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
+        ITypeImplementation ISymbolProvider<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
             => Feature.Extension.Value(DumpPrintTokenResult);
 
-        IFeatureImplementation ISymbolProvider<Definable>.Feature(Definable tokenClass)
+        ITypeImplementation ISymbolProvider<Definable>.Feature(Definable tokenClass)
             => View.Find(tokenClass);
 
         protected override Size GetSize() => View.CompoundViewSize;
@@ -72,6 +73,9 @@ namespace Reni.Struct
         new Result DumpPrintTokenResult(Category category)
             => View.DumpPrintResultViaObject(category);
 
-        internal override IEnumerable<Syntax> GetMixins() => View.GetMixins();
+        [DisableDump]
+        internal override IEnumerable<Syntax> Mixins => View.GetMixins();
+        [DisableDump]
+        internal override ContextBase ToContext => View.Context;
     }
 }

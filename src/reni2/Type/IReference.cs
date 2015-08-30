@@ -8,7 +8,7 @@ namespace Reni.Type
 {
     interface IReference : IContextReference
     {
-        IValueFeature Converter { get; }
+        IValue Converter { get; }
         bool IsWeak { get; }
     }
 

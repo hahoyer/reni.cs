@@ -7,7 +7,7 @@ using Reni.Type;
 
 namespace Reni.Feature
 {
-    abstract class ValueBase : DumpableObject, IValueFeature
+    abstract class ValueBase : DumpableObject, IValue
     {
         static int _nextObjectId;
 
@@ -23,8 +23,8 @@ namespace Reni.Feature
         internal Func<Category, Result> Function { get; }
         TypeBase Target { get; }
 
-        Result IValueFeature.Result(Category category) => Function(category);
-        TypeBase IValueFeature.TargetType => Target;
+        Result IValue.Result(Category category) => Function(category);
+        TypeBase IValue.TargetType => Target;
 
         protected override string GetNodeDump()
         {
@@ -36,22 +36,22 @@ namespace Reni.Feature
         }
     }
 
-    sealed class Value : ValueBase, IFeatureImplementation
+    sealed class Value : ValueBase, ITypeImplementation
     {
         public Value(Func<Category, Result> function, TypeBase type)
             : base(function, type) { }
 
-        IMetaFunctionFeature IMetaFeatureImplementation.Function => null;
-        IFunctionFeature ITypedFeatureImplementation.Function => null;
-        IValueFeature ITypedFeatureImplementation.Value => this;
+        IMeta IMetaImplementation.Function => null;
+        IFunction IImplementation.Function => null;
+        IValue IImplementation.Value => this;
     }
 
-    sealed class Combination : DumpableObject, IValueFeature, IEquatable<IValueFeature>
+    sealed class Combination : DumpableObject, IValue, IEquatable<IValue>
     {
-        IValueFeature Left { get; }
-        IValueFeature Right { get; }
+        IValue Left { get; }
+        IValue Right { get; }
 
-        public static IValueFeature CheckedCreate(IValueFeature left, IValueFeature right)
+        public static IValue CheckedCreate(IValue left, IValue right)
         {
             if(left == null)
                 return right;
@@ -64,15 +64,15 @@ namespace Reni.Feature
             return new Combination(left, right);
         }
 
-        Combination(IValueFeature left, IValueFeature right)
+        Combination(IValue left, IValue right)
         {
             Left = left;
             Right = right;
         }
-        Result IValueFeature.Result(Category category) => Right.Result(category).ReplaceArg(Left.Result);
-        TypeBase IValueFeature.TargetType => Left.TargetType;
+        Result IValue.Result(Category category) => Right.Result(category).ReplaceArg(Left.Result);
+        TypeBase IValue.TargetType => Left.TargetType;
 
-        bool IEquatable<IValueFeature>.Equals(IValueFeature other)
+        bool IEquatable<IValue>.Equals(IValue other)
         {
             var typedOther = other as Combination;
             if(typedOther == null)

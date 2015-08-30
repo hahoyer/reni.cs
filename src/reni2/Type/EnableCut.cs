@@ -19,7 +19,7 @@ namespace Reni.Type
         [DisableDump]
         protected override string TagTitle => "enable_cut";
 
-        IEnumerable<IValueFeature> IForcedConversionProvider<NumberType>.Result(NumberType destination)
+        IEnumerable<IValue> IForcedConversionProvider<NumberType>.Result(NumberType destination)
             => Parent.CutEnabledConversion(destination);
     }
 }

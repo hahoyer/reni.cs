@@ -15,9 +15,9 @@ namespace Reni.Struct
 {
     sealed class FunctionBodyType
         : TypeBase
-            , IFunctionFeature
-            , IValueFeature
-            , IFeatureImplementation
+            , IFunction
+            , IValue
+            , ITypeImplementation
     {
         [EnableDump]
         [Node]
@@ -60,12 +60,12 @@ namespace Reni.Struct
         internal override bool Hllw => true;
 
         [DisableDump]
-        internal override IFeatureImplementation FuncionDeclarationForType => this;
+        internal override ITypeImplementation FuncionDeclarationForType => this;
 
-        bool IFunctionFeature.IsImplicit => _syntax.IsImplicit;
-        TypeBase IValueFeature.TargetType => this;
+        bool IFunction.IsImplicit => _syntax.IsImplicit;
+        TypeBase IValue.TargetType => this;
 
-        Result IFunctionFeature.Result(Category category, TypeBase argsType)
+        Result IFunction.Result(Category category, TypeBase argsType)
         {
             var trace = ObjectId == -30 && (category.HasCode);
             StartMethodDump(trace, category, argsType);
@@ -91,11 +91,11 @@ namespace Reni.Struct
 
         FunctionType Function(TypeBase argsType) => _compoundView.Function(_syntax, argsType);
 
-        IMetaFunctionFeature IMetaFeatureImplementation.Function => null;
-        IFunctionFeature ITypedFeatureImplementation.Function => this;
-        IValueFeature ITypedFeatureImplementation.Value => this;
+        IMeta IMetaImplementation.Function => null;
+        IFunction IImplementation.Function => this;
+        IValue IImplementation.Value => this;
 
-        Result IValueFeature.Result(Category category)
+        Result IValue.Result(Category category)
         {
             NotImplementedMethod(category);
             return null;

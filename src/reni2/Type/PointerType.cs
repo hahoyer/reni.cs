@@ -14,7 +14,7 @@ namespace Reni.Type
     sealed class PointerType
         : TypeBase
             , IProxyType
-            , IValueFeature
+            , IValue
             , IReference
     {
         readonly int _order;
@@ -37,7 +37,7 @@ namespace Reni.Type
         [DisableDump]
         internal override CompoundView FindRecentCompoundView => ValueType.FindRecentCompoundView;
         [DisableDump]
-        internal override IFeatureImplementation CheckedFeature => ValueType.CheckedFeature;
+        internal override ITypeImplementation CheckedFeature => ValueType.CheckedFeature;
         [DisableDump]
         internal override bool Hllw => false;
         [DisableDump]
@@ -47,17 +47,17 @@ namespace Reni.Type
 
         Size IContextReference.Size => Size;
         int IContextReference.Order => _order;
-        IValueFeature IReference.Converter => this;
+        IValue IReference.Converter => this;
         bool IReference.IsWeak => true;
-        IValueFeature IProxyType.Converter => this;
-        TypeBase IValueFeature.TargetType => ValueType;
-        Result IValueFeature.Result(Category category) => DereferenceResult(category);
+        IValue IProxyType.Converter => this;
+        TypeBase IValue.TargetType => ValueType;
+        Result IValue.Result(Category category) => DereferenceResult(category);
 
         [DisableDump]
-        protected override IEnumerable<IValueFeature> RawSymmetricConversions
+        protected override IEnumerable<IValue> RawSymmetricConversions
             =>
                 base.RawSymmetricConversions.Concat
-                    (new IValueFeature[] {Feature.Extension.Value(DereferenceResult)});
+                    (new IValue[] {Feature.Extension.Value(DereferenceResult)});
 
         protected override string GetNodeDump() => ValueType.NodeDump + "[Pointer]";
 
@@ -69,7 +69,7 @@ namespace Reni.Type
         protected override ArrayType ArrayForCache(int count, string optionsId)
             => ValueType.Array(count, optionsId);
 
-        internal override IEnumerable<IValueFeature> GetForcedConversions<TDestination>
+        internal override IEnumerable<IValue> GetForcedConversions<TDestination>
             (TDestination destination)
         {
             var provider = ValueType as IForcedConversionProviderForPointer<TDestination>;
@@ -81,7 +81,8 @@ namespace Reni.Type
                 yield return feature;
         }
 
-        internal override IFeatureImplementation FuncionDeclarationForType
+        [DisableDump]
+        internal override ITypeImplementation FuncionDeclarationForType
             => ValueType.FunctionDeclarationForPointerType
                 ?? base.FuncionDeclarationForType;
 

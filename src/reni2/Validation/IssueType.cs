@@ -21,7 +21,7 @@ namespace Reni.Validation
         internal override string DumpPrintText => Issue.IssueId.Tag;
         protected override string GetNodeDump() => base.GetNodeDump() + " " + DumpPrintText;
 
-        internal override IssueType UndefinedSymbol(SourcePart source)
+        protected override IssueType CreateIssue(SourcePart source, IssueId issueId)
             => new ConsequentialIssueType(this, source);
 
         internal Result Result(Category category) => Result(category, () => Code);

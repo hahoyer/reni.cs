@@ -21,7 +21,7 @@ namespace Reni.Type
             , IForcedConversionProvider<ArrayReferenceType>
             , IRepeaterType
             , IReference
-            , IValueFeature
+            , IValue
     {
         internal sealed class Options : DumpableObject
         {
@@ -85,7 +85,7 @@ namespace Reni.Type
         protected override IEnumerable<IGenericProviderForType> Genericize
             => this.GenericListFromType(base.Genericize);
         [DisableDump]
-        protected override IEnumerable<IValueFeature> RawSymmetricConversions
+        protected override IEnumerable<IValue> RawSymmetricConversions
             => base.RawSymmetricConversions;
 
         protected override string GetNodeDump()
@@ -106,35 +106,36 @@ namespace Reni.Type
         TypeBase IRepeaterType.IndexType => RootContext.BitType.Number(Size.ToInt());
         bool IRepeaterType.IsMutable => options.IsForceMutable.Value;
 
-        IValueFeature IReference.Converter => this;
+        IValue IReference.Converter => this;
         bool IReference.IsWeak => false;
         Size IContextReference.Size => Size;
         int IContextReference.Order => _order;
 
-        TypeBase IValueFeature.TargetType => ValueType;
-        Result IValueFeature.Result(Category category) => DereferenceResult(category);
+        TypeBase IValue.TargetType => ValueType;
+        Result IValue.Result(Category category) => DereferenceResult(category);
 
-        IEnumerable<IValueFeature> IForcedConversionProvider<ArrayReferenceType>.Result
+        IEnumerable<IValue> IForcedConversionProvider<ArrayReferenceType>.Result
             (ArrayReferenceType destination)
             => ForcedConversion(destination).NullableToArray();
 
-        IFeatureImplementation ISymbolProvider<Mutable>.Feature
+        ITypeImplementation ISymbolProvider<Mutable>.Feature
             (Mutable tokenClass)
             => Feature.Extension.Value(MutableResult);
 
-        IFeatureImplementation ISymbolProvider<EnableReinterpretation>.
+        ITypeImplementation ISymbolProvider<EnableReinterpretation>.
             Feature
             (EnableReinterpretation tokenClass)
             => Feature.Extension.Value(EnableReinterpretationResult);
 
-        internal override IFeatureImplementation FuncionDeclarationForType
+        [DisableDump]
+        internal override ITypeImplementation FuncionDeclarationForType
             => Feature.Extension.FunctionFeature(AccessResult);
 
-        IFeatureImplementation ISymbolProvider<Minus>.Feature
+        ITypeImplementation ISymbolProvider<Minus>.Feature
             (Minus tokenClass)
             => Feature.Extension.FunctionFeature(MinusResult);
 
-        IFeatureImplementation ISymbolProvider<Plus>.Feature
+        ITypeImplementation ISymbolProvider<Plus>.Feature
             (Plus tokenClass)
             => Feature.Extension.FunctionFeature(PlusResult);
 
@@ -148,7 +149,7 @@ namespace Reni.Type
         Result EnableReinterpretationResult(Category category)
             => ResultFromPointer(category, EnableReinterpretation);
 
-        IValueFeature ForcedConversion(ArrayReferenceType destination)
+        IValue ForcedConversion(ArrayReferenceType destination)
             =>
                 HasForcedConversion(destination)
                     ? Feature.Extension.Value

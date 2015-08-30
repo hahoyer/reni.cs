@@ -51,31 +51,31 @@ namespace Reni.Type
         [DisableDump]
         protected override IEnumerable<IGenericProviderForType> Genericize => this.GenericListFromType(base.Genericize);
 
-        internal override IEnumerable<IValueFeature> CutEnabledConversion(NumberType destination)
+        internal override IEnumerable<IValue> CutEnabledConversion(NumberType destination)
         {
             yield return Feature.Extension.Value(category => CutEnabledBitCountConversion(category, destination), EnableCut);
         }
 
-        IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature
+        ITypeImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature
             (DumpPrintToken tokenClass)
             => Feature.Extension.Value(DumpPrintTokenResult, this);
 
-        IFeatureImplementation ISymbolProviderForPointer<Operation>.Feature(Operation tokenClass)
+        ITypeImplementation ISymbolProviderForPointer<Operation>.Feature(Operation tokenClass)
             => Feature.Extension.FunctionFeature(OperationResult, tokenClass);
 
-        IFeatureImplementation ISymbolProviderForPointer<TokenClasses.EnableCut>.Feature
+        ITypeImplementation ISymbolProviderForPointer<TokenClasses.EnableCut>.Feature
             (TokenClasses.EnableCut tokenClass) => Feature.Extension.Value(EnableCutTokenResult);
 
-        IEnumerable<IValueFeature> IForcedConversionProvider<NumberType>.Result(NumberType destination)
+        IEnumerable<IValue> IForcedConversionProvider<NumberType>.Result(NumberType destination)
         {
             if(Bits <= destination.Bits)
                 yield return Feature.Extension.Value(category => destination.FlatConversion(category, this), this);
         }
 
-        IFeatureImplementation ISymbolProviderForPointer<Negate>.Feature(Negate tokenClass)
+        ITypeImplementation ISymbolProviderForPointer<Negate>.Feature(Negate tokenClass)
             => Feature.Extension.Value(NegationResult);
 
-        IFeatureImplementation ISymbolProviderForPointer<TextItem>.Feature(TextItem tokenClass)
+        ITypeImplementation ISymbolProviderForPointer<TextItem>.Feature(TextItem tokenClass)
             => Feature.Extension.Value(TextItemResult);
 
         protected override Result ParentConversionResult(Category category) => Parent.Result(category, ArgResult);

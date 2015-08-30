@@ -66,7 +66,7 @@ namespace Reni.TokenClasses
 
         protected override bool GetIsLambda() => true;
 
-        internal IContextMetaFunctionFeature ContextMetaFunctionFeature(CompoundView compoundView)
+        internal IContextMeta ContextMetaFunctionFeature(CompoundView compoundView)
         {
             if(!IsMetaFunction)
                 return null;
@@ -74,7 +74,7 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        internal IMetaFunctionFeature MetaFunctionFeature(CompoundView compoundView)
+        internal IMeta MetaFunctionFeature(CompoundView compoundView)
         {
             if(!IsMetaFunction)
                 return null;
@@ -82,7 +82,7 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        internal IFunctionFeature FunctionFeature(CompoundView compoundView)
+        internal IFunction FunctionFeature(CompoundView compoundView)
         {
             if(IsMetaFunction)
                 return null;

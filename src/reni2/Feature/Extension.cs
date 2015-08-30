@@ -47,14 +47,14 @@ namespace Reni.Feature
         internal static Function FunctionFeature(Func<Category, TypeBase, Result> function)
             => new Function(function);
 
-        internal static IFeatureImplementation FunctionFeature<T>
+        internal static ITypeImplementation FunctionFeature<T>
             (Func<Category, TypeBase, T, Result> function, T arg)
             => new ExtendedFunction<T>(function, arg);
 
 
-        internal static IValueFeature ExtendedValue(this IFeatureImplementation feature)
+        internal static IValue ExtendedValue(this ITypeImplementation feature)
         {
-            var function = ((ITypedFeatureImplementation) feature).Function;
+            var function = ((IImplementation) feature).Function;
             if(function != null && function.IsImplicit)
                 return null;
 
@@ -65,9 +65,9 @@ namespace Reni.Feature
             (Func<Category, ResultCache, ContextBase, CompileSyntax, Result> function)
             => _metaFunctionCache[function];
 
-        internal static TypeBase ResultType(this IValueFeature f) => f.Result(Category.Type)?.Type;
+        internal static TypeBase ResultType(this IValue f) => f.Result(Category.Type)?.Type;
 
-        internal static bool IsCloseRelative(IValueFeature feature) => !(feature is IStepRelative);
+        internal static bool IsCloseRelative(IValue feature) => !(feature is IStepRelative);
 
         public static IEnumerable<IGenericProviderForType> GenericListFromType<T>
             (this T target, IEnumerable<IGenericProviderForType> baseList = null)
@@ -92,7 +92,7 @@ namespace Reni.Feature
 
         internal static Result Result
             (
-            this ITypedFeatureImplementation feature,
+            this IImplementation feature,
             Category category,
             SourcePart token,
             ContextBase context,
@@ -142,14 +142,14 @@ namespace Reni.Feature
 
         internal static Result Result
             (
-            this IContextFeatureImplementation feature,
+            this IContextImplementation feature,
             Category category,
             Func<Category, Result> objectReference,
             SourcePart token,
             ContextBase context,
             CompileSyntax right)
         {
-            var metaFeature = ((IContextMetaFeatureImplementation) feature).Function;
+            var metaFeature = ((IContextMetaImplementation) feature).Function;
             if(metaFeature != null)
                 return metaFeature.Result(context, category, right);
 

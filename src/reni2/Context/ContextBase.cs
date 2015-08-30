@@ -268,7 +268,7 @@ namespace Reni.Context
             return null;
         }
 
-        IContextFeatureImplementation Declarations(Definable tokenClass)
+        internal IContextImplementation Declaration(Definable tokenClass)
         {
             var genericize = tokenClass.Genericize.ToArray();
             var results = genericize.SelectMany(g => g.Declarations(this));
@@ -282,7 +282,7 @@ namespace Reni.Context
         internal Result PrefixResult
             (Category category, Definable definable, SourcePart source, CompileSyntax right)
         {
-            var searchResult = Declarations(definable);
+            var searchResult = Declaration(definable);
             if(searchResult == null)
                 return RootContext.UndefinedSymbol(source).Result(category);
 
@@ -294,7 +294,7 @@ namespace Reni.Context
             return result;
         }
 
-        internal virtual IEnumerable<IContextFeatureImplementation> Declarations<TDefinable>
+        internal virtual IEnumerable<IContextImplementation> Declarations<TDefinable>
             (TDefinable tokenClass)
             where TDefinable : Definable
         {

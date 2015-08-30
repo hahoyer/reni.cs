@@ -84,7 +84,7 @@ namespace Reni.Parser
 
         internal override IEnumerable<Syntax> GetMixins(CompoundView context, int position)
             => IsMixInSyntax
-                ? context.AccessType(position).GetMixins()
+                ? context.AccessType(position).Mixins
                 : base.GetMixins(context, position);
     }
 }

@@ -52,7 +52,7 @@ namespace Reni.Type
             public readonly ValueCache<Size> Size;
             [Node]
             [SmartNode]
-            public readonly ValueCache<IEnumerable<IValueFeature>> SymmetricConversions;
+            public readonly ValueCache<IEnumerable<IValue>> SymmetricConversions;
             [Node]
             [SmartNode]
             internal readonly FunctionCache<string, ArrayReferenceType> ArrayReferenceCache;
@@ -81,7 +81,7 @@ namespace Reni.Type
                     (() => new FunctionInstanceType(parent));
                 TypeType = new ValueCache<TypeType>(() => new TypeType(parent));
                 Size = new ValueCache<Size>(parent.GetSizeForCache);
-                SymmetricConversions = new ValueCache<IEnumerable<IValueFeature>>
+                SymmetricConversions = new ValueCache<IEnumerable<IValue>>
                     (parent.GetSymmetricConversionsForCache);
                 ArrayReferenceCache = new FunctionCache<string, ArrayReferenceType>
                     (id => new ArrayReferenceType(parent, id));
@@ -301,7 +301,7 @@ namespace Reni.Type
         internal bool IsWeakReference => CheckedReference != null && CheckedReference.IsWeak;
 
         [DisableDump]
-        internal virtual IFeatureImplementation CheckedFeature => this as IFeatureImplementation;
+        internal virtual ITypeImplementation CheckedFeature => this as ITypeImplementation;
 
         [DisableDump]
         internal virtual bool HasQuickSize => true;
@@ -442,8 +442,8 @@ namespace Reni.Type
             );
 
         internal TypeBase SmartUn<T>()
-            where T : IValueFeature
-            => this is T ? ((IValueFeature) this).Result(Category.Type).Type : this;
+            where T : IValue
+            => this is T ? ((IValue) this).Result(Category.Type).Type : this;
 
         internal Result ResultFromPointer(Category category, TypeBase resultType) => resultType
             .Pointer
@@ -456,6 +456,7 @@ namespace Reni.Type
             return null;
         }
 
+        [DisableDump]
         IEnumerable<SearchResult> FuncionDeclarationsForType
         {
             get
@@ -466,8 +467,10 @@ namespace Reni.Type
             }
         }
 
-        internal virtual IFeatureImplementation FuncionDeclarationForType => null;
-        internal virtual IFeatureImplementation FunctionDeclarationForPointerType => null;
+        [DisableDump]
+        internal virtual ITypeImplementation FuncionDeclarationForType => null;
+        [DisableDump]
+        internal virtual ITypeImplementation FunctionDeclarationForPointerType => null;
 
         /// <summary>
         ///     Call this function to get declarations of definable for this type.
@@ -491,7 +494,7 @@ namespace Reni.Type
         /// </summary>
         /// <param name="tokenClass"></param>
         /// <returns></returns>
-        internal IEnumerable<SearchResult> DeclarationsForTypeAndCloseRelatives
+        IEnumerable<SearchResult> DeclarationsForTypeAndCloseRelatives
             (Definable tokenClass)
         {
             var result = DeclarationsForType(tokenClass).ToArray();
@@ -529,7 +532,7 @@ namespace Reni.Type
             => this.GenericListFromType();
         [DisableDump]
         [NotNull]
-        public IEnumerable<IValueFeature> SymmetricConversions => _cache.SymmetricConversions.Value
+        public IEnumerable<IValue> SymmetricConversions => _cache.SymmetricConversions.Value
             ;
 
         Result AlignResult(Category category)
@@ -537,13 +540,13 @@ namespace Reni.Type
             return Align.Result(category, () => ArgCode.Align(), CodeArgs.Arg);
         }
 
-        IEnumerable<IValueFeature> GetSymmetricConversionsForCache()
+        IEnumerable<IValue> GetSymmetricConversionsForCache()
             => RawSymmetricConversions
                 .ToDictionary(x => x.ResultType())
                 .Values;
 
         [DisableDump]
-        protected virtual IEnumerable<IValueFeature> RawSymmetricConversions
+        protected virtual IEnumerable<IValue> RawSymmetricConversions
         {
             get
             {
@@ -556,7 +559,7 @@ namespace Reni.Type
             }
         }
 
-        internal IEnumerable<IValueFeature> GetForcedConversions(TypeBase destination)
+        internal IEnumerable<IValue> GetForcedConversions(TypeBase destination)
         {
             var genericProviderForTypes = destination
                 .Genericize
@@ -572,20 +575,20 @@ namespace Reni.Type
             return result;
         }
 
-        internal virtual IEnumerable<IValueFeature> GetForcedConversions<TDestination>
+        internal virtual IEnumerable<IValue> GetForcedConversions<TDestination>
             (TDestination destination)
         {
             var provider = this as IForcedConversionProvider<TDestination>;
             if(provider != null)
                 return provider.Result(destination);
-            return new IValueFeature[0];
+            return new IValue[0];
         }
 
         [DisableDump]
-        internal virtual IEnumerable<IValueFeature> StripConversions { get { yield break; } }
+        internal virtual IEnumerable<IValue> StripConversions { get { yield break; } }
 
 
-        internal virtual IEnumerable<IValueFeature> CutEnabledConversion(NumberType destination)
+        internal virtual IEnumerable<IValue> CutEnabledConversion(NumberType destination)
         {
             yield break;
         }
@@ -604,21 +607,34 @@ namespace Reni.Type
             return null;
         }
 
-        internal virtual IssueType UndefinedSymbol(SourcePart source)
-            =>
-                new RootIssueType
-                    (
-                    new Issue(IssueId.UndefinedSymbol, source, "Type: " + DumpPrintText),
-                    RootContext);
+        internal Result IssueResult(SourcePart source, IssueId issueId, Category category)
+            => CreateIssue(source, issueId).Result(category);
 
-        internal IssueType AmbigousSymbol(SourcePart source)
-            =>
-                new RootIssueType
-                    (
-                    new Issue(IssueId.AmbigousSymbol, source, "Type: " + DumpPrintText),
-                    RootContext);
+        protected virtual IssueType CreateIssue(SourcePart source, IssueId issueId)
+            => new RootIssueType
+                (
+                new Issue(issueId, source, "Type: " + DumpPrintText),
+                RootContext
+                );
 
-        internal Result Execute(Category category, ResultCache left, SourcePart token, Definable definable, ContextBase context, CompileSyntax right)
+        internal Result Execute
+            (
+            Category category,
+            ResultCache left,
+            SourcePart token,
+            Definable definable,
+            ContextBase context,
+            CompileSyntax right
+            )
+            => ExecuteDeclaration
+                (
+                    definable,
+                    result => result.Execute(category, left, context, right, token),
+                    issueId => IssueResult(token, issueId, category)
+                );
+
+        internal TResult ExecuteDeclaration<TResult>
+            (Definable definable, Func<SearchResult, TResult> execute, Func<IssueId, TResult> onError)
         {
             var searchResults
                 = DeclarationsForTypeAndCloseRelatives(definable)
@@ -628,36 +644,44 @@ namespace Reni.Type
             switch(searchResults.Length)
             {
                 case 0:
-                    return UndefinedSymbol(token)
-                        .Result(category);
-
+                    return onError(IssueId.UndefinedSymbol);
                 case 1:
-                    return searchResults[0]
-                        .Execute(category, left, context, right, token);
-
+                    return execute(searchResults.First());
                 default:
-                    return AmbigousSymbol(token)
-                        .Result(category);
+                    return onError(IssueId.AmbigousSymbol);
             }
         }
 
-        virtual internal IEnumerable<Syntax> GetMixins()
+        [DisableDump]
+        internal virtual IEnumerable<Syntax> Mixins
         {
-            NotImplementedMethod();
-            return null;
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
 
+        [DisableDump]
+        internal virtual ContextBase ToContext
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
         }
     }
 
 
     interface IForcedConversionProvider<in TDestination>
     {
-        IEnumerable<IValueFeature> Result(TDestination destination);
+        IEnumerable<IValue> Result(TDestination destination);
     }
 
     interface IForcedConversionProviderForPointer<in TDestination>
     {
-        IEnumerable<IValueFeature> Result(TDestination destination);
+        IEnumerable<IValue> Result(TDestination destination);
     }
 
     // Krautpuster

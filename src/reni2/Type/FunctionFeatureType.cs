@@ -9,7 +9,7 @@ using Reni.Feature;
 
 namespace Reni.Type
 {
-    sealed class FunctionFeatureType : TypeBase, IFunctionFeature
+    sealed class FunctionFeatureType : TypeBase, IFunction
     {
         readonly FunctionalFeature _functionalFeature;
 
@@ -18,13 +18,13 @@ namespace Reni.Type
         [DisableDump]
         internal override bool Hllw => false;
         [DisableDump]
-        bool IFunctionFeature.IsImplicit => false;
+        bool IFunction.IsImplicit => false;
         [DisableDump]
         internal override Root RootContext => _functionalFeature.RootContext;
         protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
         protected override string GetNodeDump() => base.GetNodeDump() + "(" + _functionalFeature.NodeDump + ")";
 
-        Result IFunctionFeature.Result(Category category, TypeBase argsType)
+        Result IFunction.Result(Category category, TypeBase argsType)
             => _functionalFeature.ApplyResult(category, argsType);
     }
 }

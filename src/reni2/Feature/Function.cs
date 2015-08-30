@@ -9,7 +9,7 @@ using Reni.Type;
 
 namespace Reni.Feature
 {
-    abstract class ObjectFunctionBase : DumpableObject, IFunctionFeature
+    abstract class ObjectFunctionBase : DumpableObject, IFunction
     {
         readonly Func<Category, IContextReference, TypeBase, Result> _function;
         readonly IContextReferenceProvider _target;
@@ -26,21 +26,21 @@ namespace Reni.Feature
             _target = target;
         }
 
-        Result IFunctionFeature.Result(Category category, TypeBase argsType)
+        Result IFunction.Result(Category category, TypeBase argsType)
             => _function(category, ObjectReference, argsType);
 
-        bool IFunctionFeature.IsImplicit => false;
+        bool IFunction.IsImplicit => false;
         IContextReference ObjectReference => _target.ContextReference;
     }
 
-    sealed class ObjectFunction : ObjectFunctionBase, IFeatureImplementation
+    sealed class ObjectFunction : ObjectFunctionBase, ITypeImplementation
     {
         public ObjectFunction(Func<Category, IContextReference, TypeBase, Result> function, IContextReferenceProvider target)
             : base(function, target) {}
 
-        IMetaFunctionFeature IMetaFeatureImplementation.Function => null;
-        IFunctionFeature ITypedFeatureImplementation.Function => this;
-        IValueFeature ITypedFeatureImplementation.Value => null;
+        IMeta IMetaImplementation.Function => null;
+        IFunction IImplementation.Function => this;
+        IValue IImplementation.Value => null;
     }
 
     sealed class Function : FunctionFeatureImplementation

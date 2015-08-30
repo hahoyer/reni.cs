@@ -13,8 +13,9 @@ namespace Reni.Struct
 {
     sealed class AccessFeature
         : DumpableObject
-            , ICommonFeatureImplementation
-            , IValueFeature
+            , ICommonImplementation
+            , IValue
+            , ResultCache.IResultProvider
     {
         static int _nextObjectId;
 
@@ -23,7 +24,7 @@ namespace Reni.Struct
         {
             View = compoundView;
             Position = position;
-            FunctionFeature = new ValueCache<IFunctionFeature>(ObtainFunctionFeature);
+            FunctionFeature = new ValueCache<IFunction>(ObtainFunctionFeature);
             StopByObjectIds();
         }
 
@@ -32,17 +33,17 @@ namespace Reni.Struct
         [EnableDump]
         public int Position { get; }
 
-        ValueCache<IFunctionFeature> FunctionFeature { get; }
+        ValueCache<IFunction> FunctionFeature { get; }
 
-        IContextMetaFunctionFeature IContextMetaFeatureImplementation.Function
+        IContextMeta IContextMetaImplementation.Function
             => (Statement as FunctionSyntax)?.ContextMetaFunctionFeature(View);
 
-        IMetaFunctionFeature IMetaFeatureImplementation.Function
+        IMeta IMetaImplementation.Function
             => (Statement as FunctionSyntax)?.MetaFunctionFeature(View);
 
-        IFunctionFeature ITypedFeatureImplementation.Function => FunctionFeature.Value;
+        IFunction IImplementation.Function => FunctionFeature.Value;
 
-        IValueFeature ITypedFeatureImplementation.Value
+        IValue IImplementation.Value
         {
             get
             {
@@ -53,16 +54,28 @@ namespace Reni.Struct
             }
         }
 
-        Result IValueFeature.Result(Category category) => View.AccessViaObject(category, Position);
+        Result IValue.Result(Category category) => Result(category);
 
-        TypeBase IValueFeature.TargetType => View.Type;
+        Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
+        {
+            if(pendingCategory == Category.None)
+                return Result(category);
+            NotImplementedMethod(category, pendingCategory);
+            return null;
+        }
+
+        object ResultCache.IResultProvider.Target => this;
+
+        Result Result(Category category) => View.AccessViaObject(category, Position);
+
+        TypeBase IValue.TargetType => View.Type;
 
         CompileSyntax Statement => View
             .Compound
             .Syntax
             .Statements[Position];
 
-        IFunctionFeature ObtainFunctionFeature()
+        IFunction ObtainFunctionFeature()
         {
             var functionSyntax = Statement as FunctionSyntax;
             if(functionSyntax != null)
@@ -70,7 +83,7 @@ namespace Reni.Struct
 
             var valueType = View.ValueType(Position);
             StopByObjectIds();
-            return ((ITypedFeatureImplementation) valueType.CheckedFeature)?.Function;
+            return ((IImplementation) valueType.CheckedFeature)?.Function;
         }
     }
 }

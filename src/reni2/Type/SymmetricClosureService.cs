@@ -7,25 +7,25 @@ namespace Reni.Type
 {
     sealed class SymmetricClosureService
     {
-        internal static IEnumerable<IValueFeature> From(TypeBase source)
+        internal static IEnumerable<IValue> From(TypeBase source)
             => new SymmetricClosureService(source).Execute(_forward);
-        internal static IEnumerable<IValueFeature> To(TypeBase source)
+        internal static IEnumerable<IValue> To(TypeBase source)
             => new SymmetricClosureService(source).Execute(_backward);
 
         interface INavigator
         {
-            TypeBase Start(IValueFeature feature);
-            TypeBase End(IValueFeature feature);
-            IValueFeature Combine(IValueFeature startFeature, IValueFeature feature);
+            TypeBase Start(IValue feature);
+            TypeBase End(IValue feature);
+            IValue Combine(IValue startFeature, IValue feature);
         }
 
         static readonly INavigator _forward = new ForwardNavigator();
         static readonly INavigator _backward = new BackwardNavigator();
 
         TypeBase Source { get; }
-        IEnumerable<IValueFeature> AllFeatures { get; }
+        IEnumerable<IValue> AllFeatures { get; }
         List<TypeBase> _foundTypes;
-        List<IValueFeature> _newFeatures;
+        List<IValue> _newFeatures;
 
         SymmetricClosureService(TypeBase source)
         {
@@ -35,7 +35,7 @@ namespace Reni.Type
                 .ToArray();
         }
 
-        IEnumerable<IValueFeature> Combination(INavigator navigator, IValueFeature startFeature = null)
+        IEnumerable<IValue> Combination(INavigator navigator, IValue startFeature = null)
         {
             var startType = Source;
             if(startFeature != null)
@@ -55,10 +55,10 @@ namespace Reni.Type
             }
         }
 
-        IEnumerable<IValueFeature> Execute(INavigator navigator)
+        IEnumerable<IValue> Execute(INavigator navigator)
         {
             _foundTypes = new List<TypeBase>();
-            _newFeatures = new List<IValueFeature>();
+            _newFeatures = new List<IValue>();
 
             foreach(var feature in Combination(navigator))
                 yield return feature;
@@ -66,7 +66,7 @@ namespace Reni.Type
             while(_newFeatures.Any())
             {
                 var features = _newFeatures;
-                _newFeatures = new List<IValueFeature>();
+                _newFeatures = new List<IValue>();
                 foreach(var feature in features.SelectMany(f => Combination(navigator, f)))
                     yield return feature;
             }
@@ -74,19 +74,19 @@ namespace Reni.Type
 
         sealed class ForwardNavigator : INavigator
         {
-            TypeBase INavigator.Start(IValueFeature feature) => feature.TargetType;
-            TypeBase INavigator.End(IValueFeature feature) => feature.ResultType();
+            TypeBase INavigator.Start(IValue feature) => feature.TargetType;
+            TypeBase INavigator.End(IValue feature) => feature.ResultType();
 
-            IValueFeature INavigator.Combine(IValueFeature start, IValueFeature end)
+            IValue INavigator.Combine(IValue start, IValue end)
                 => Feature.Combination.CheckedCreate(start, end);
         }
 
         sealed class BackwardNavigator : INavigator
         {
-            TypeBase INavigator.Start(IValueFeature feature) => feature.ResultType();
-            TypeBase INavigator.End(IValueFeature feature) => feature.TargetType;
+            TypeBase INavigator.Start(IValue feature) => feature.ResultType();
+            TypeBase INavigator.End(IValue feature) => feature.TargetType;
 
-            IValueFeature INavigator.Combine(IValueFeature start, IValueFeature end)
+            IValue INavigator.Combine(IValue start, IValue end)
                 => Feature.Combination.CheckedCreate(end, start);
         }
     }

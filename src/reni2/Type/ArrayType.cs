@@ -103,7 +103,7 @@ namespace Reni.Type
             => OptionsValue.IsTextItem.Value ? (ElementType.SimpleItemSize ?? Size) : base.SimpleItemSize
             ;
 
-        IFeatureImplementation ISymbolProviderForPointer<DumpPrintToken>.
+        ITypeImplementation ISymbolProviderForPointer<DumpPrintToken>.
             Feature
             (DumpPrintToken tokenClass)
             =>
@@ -111,7 +111,7 @@ namespace Reni.Type
                     ? Feature.Extension.Value(DumpPrintTokenResult)
                     : Feature.Extension.Value(DumpPrintTokenArrayResult);
 
-        IFeatureImplementation ISymbolProviderForPointer<ConcatArrays>.
+        ITypeImplementation ISymbolProviderForPointer<ConcatArrays>.
             Feature(ConcatArrays tokenClass)
             =>
                 Feature.Extension.FunctionFeature
@@ -125,23 +125,23 @@ namespace Reni.Type
                                     OptionsValue.IsMutable.SetTo(tokenClass.IsMutable)),
                         this);
 
-        IFeatureImplementation ISymbolProviderForPointer<TextItem>.Feature
+        ITypeImplementation ISymbolProviderForPointer<TextItem>.Feature
             (TextItem tokenClass)
             => Feature.Extension.Value(TextItemResult);
 
-        IFeatureImplementation ISymbolProviderForPointer<Mutable>.Feature
+        ITypeImplementation ISymbolProviderForPointer<Mutable>.Feature
             (Mutable tokenClass)
             => Feature.Extension.Value(MutableResult);
 
-        internal override IFeatureImplementation FunctionDeclarationForPointerType 
+        internal override ITypeImplementation FunctionDeclarationForPointerType 
             => Feature.Extension.FunctionFeature(ElementAccessResult);
 
-        IFeatureImplementation ISymbolProviderForPointer<ToNumberOfBase>.
+        ITypeImplementation ISymbolProviderForPointer<ToNumberOfBase>.
             Feature
             (ToNumberOfBase tokenClass)
             => OptionsValue.IsTextItem.Value ? Feature.Extension.MetaFeature(ToNumberOfBaseResult) : null;
 
-        IFeatureImplementation ISymbolProviderForPointer<ArrayReference>.
+        ITypeImplementation ISymbolProviderForPointer<ArrayReference>.
             Feature
             (ArrayReference tokenClass)
             => Feature.Extension.Value(ReferenceResult);
@@ -149,11 +149,11 @@ namespace Reni.Type
         internal override int? SmartArrayLength(TypeBase elementType)
             => ElementType.IsConvertable(elementType) ? Count : base.SmartArrayLength(elementType);
 
-        IFeatureImplementation ISymbolProviderForPointer<Count>.Feature
+        ITypeImplementation ISymbolProviderForPointer<Count>.Feature
             (Count tokenClass)
             => Feature.Extension.MetaFeature(CountResult);
 
-        IEnumerable<IValueFeature> IForcedConversionProviderForPointer<ArrayReferenceType>.Result
+        IEnumerable<IValue> IForcedConversionProviderForPointer<ArrayReferenceType>.Result
             (ArrayReferenceType destination) 
             => ForcedConversion(destination).NullableToArray();
 
@@ -164,7 +164,7 @@ namespace Reni.Type
             => ElementType.ArrayCopier(category);
 
         [DisableDump]
-        internal override IEnumerable<IValueFeature> StripConversions
+        internal override IEnumerable<IValue> StripConversions
         {
             get { yield return Feature.Extension.Value(NoTextItemResult); }
         }
@@ -183,14 +183,14 @@ namespace Reni.Type
             if(argsType == VoidType)
                 return Result(category, () => CodeBase.BitsConst(Size, BitsConst.Convert(0)));
 
-            var function = argsType as IFunctionFeature;
+            var function = argsType as IFunction;
             if(function != null)
                 return ConstructorResult(category, function);
 
             return base.ConstructorResult(category, argsType);
         }
 
-        Result ConstructorResult(Category category, IFunctionFeature function)
+        Result ConstructorResult(Category category, IFunction function)
         {
             var indexType = BitType
                 .Number(BitsConst.Convert(Count).Size.ToInt())
@@ -300,7 +300,7 @@ namespace Reni.Type
                 (category, () => CodeBase.BitsConst(IndexSize, BitsConst.Convert(Count)));
         }
 
-        IValueFeature ForcedConversion(ArrayReferenceType destination)
+        IValue ForcedConversion(ArrayReferenceType destination)
         {
             if(!HasForcedConversion(destination))
                 return null;
