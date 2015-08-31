@@ -13,7 +13,7 @@ namespace Reni.Struct
 {
     sealed class AccessFeature
         : DumpableObject
-            , ICommonImplementation
+            , ITypeImplementation
             , IValue
             , ResultCache.IResultProvider
     {
@@ -34,9 +34,6 @@ namespace Reni.Struct
         public int Position { get; }
 
         ValueCache<IFunction> FunctionFeature { get; }
-
-        IContextMeta IContextMetaImplementation.Function
-            => (Statement as FunctionSyntax)?.ContextMetaFunctionFeature(View);
 
         IMeta IMetaImplementation.Function
             => (Statement as FunctionSyntax)?.MetaFunctionFeature(View);

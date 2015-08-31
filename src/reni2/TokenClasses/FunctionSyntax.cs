@@ -66,14 +66,6 @@ namespace Reni.TokenClasses
 
         protected override bool GetIsLambda() => true;
 
-        internal IContextMeta ContextMetaFunctionFeature(CompoundView compoundView)
-        {
-            if(!IsMetaFunction)
-                return null;
-            NotImplementedMethod(compoundView);
-            return null;
-        }
-
         internal IMeta MetaFunctionFeature(CompoundView compoundView)
         {
             if(!IsMetaFunction)

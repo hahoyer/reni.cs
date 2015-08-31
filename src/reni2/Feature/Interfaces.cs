@@ -21,22 +21,9 @@ namespace Reni.Feature
         IMeta Function { get; }
     }
 
-    interface IContextMetaImplementation
-    {
-        IContextMeta Function { get; }
-    }
-
     interface ITypeImplementation
         : IImplementation
             , IMetaImplementation {}
-
-    interface IContextImplementation
-        : IImplementation
-            , IContextMetaImplementation {}
-
-    interface ICommonImplementation
-        : IContextImplementation
-            , ITypeImplementation {}
 
     abstract class FunctionFeatureImplementation
         : DumpableObject, ITypeImplementation, IFunction
@@ -60,14 +47,16 @@ namespace Reni.Feature
     }
 
     abstract class ContextMetaFeatureImplementation
-        : DumpableObject, IContextImplementation, IContextMeta
+        : DumpableObject
+            , ITypeImplementation
+            , IMeta
     {
-        IContextMeta IContextMetaImplementation.Function => this;
+        IMeta IMetaImplementation.Function => this;
         IFunction IImplementation.Function => null;
         IValue IImplementation.Value => null;
 
-        Result IContextMeta.Result
-            (ContextBase contextBase, Category category, CompileSyntax right)
+        Result IMeta.Result
+            (Category category, ResultCache left, ContextBase contextBase, CompileSyntax right)
             => Result(contextBase, category, right);
 
         protected abstract Result Result
@@ -106,20 +95,7 @@ namespace Reni.Feature
             (Category category, ResultCache left, ContextBase contextBase, CompileSyntax right);
     }
 
-    interface IContextMeta
-    {
-        Result Result(ContextBase contextBase, Category category, CompileSyntax right);
-    }
-
     interface ISearchTarget {}
-
-    // ReSharper disable once TypeParameterCanBeVariant
-    // Exact match for TDefinable is required here.
-    interface ISymbolProviderForContext<TDefinable>
-        where TDefinable : Definable
-    {
-        IContextImplementation Feature(TDefinable tokenClass);
-    }
 
     // ReSharper disable once TypeParameterCanBeVariant
     // Exact match for TDefinable is required here.
@@ -145,7 +121,7 @@ namespace Reni.Feature
     interface IDeclarationProvider
     {
         IEnumerable<SearchResult> Declarations(TypeBase source);
-        IEnumerable<IContextImplementation> Declarations(ContextBase source);
+        IEnumerable<ITypeImplementation> Declarations(ContextBase source);
     }
 
     sealed class GenericProviderForType<T> : DumpableObject, IGenericProviderForType
@@ -166,7 +142,7 @@ namespace Reni.Feature
         IEnumerable<SearchResult> IDeclarationProvider.Declarations(TypeBase source)
             => source.Declarations(_target);
 
-        IEnumerable<IContextImplementation> IDeclarationProvider.Declarations
+        IEnumerable<ITypeImplementation> IDeclarationProvider.Declarations
             (ContextBase source)
             => source.Declarations(_target);
     }
@@ -205,18 +181,18 @@ namespace Reni.Feature
     }
 
     sealed class ContextMetaFunctionFromSyntax
-        : DumpableObject, IContextImplementation, IContextMeta
+        : DumpableObject, ITypeImplementation, IMeta
     {
         [EnableDump]
         readonly CompileSyntax _definition;
         public ContextMetaFunctionFromSyntax(CompileSyntax definition) { _definition = definition; }
 
-        IContextMeta IContextMetaImplementation.Function => this;
+        IMeta IMetaImplementation.Function => this;
         IFunction IImplementation.Function => null;
         IValue IImplementation.Value => null;
 
-        Result IContextMeta.Result
-            (ContextBase callContext, Category category, CompileSyntax right)
+        Result IMeta.Result
+            (Category category, ResultCache left, ContextBase callContext, CompileSyntax right)
             => callContext.Result(category, _definition.ReplaceArg(right));
     }
 

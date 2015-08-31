@@ -33,7 +33,7 @@ namespace Reni.Parser
             Definable = definable;
             Right = right;
             Token = token;
-            StopByObjectIds(61, 62);
+            StopByObjectIds();
         }
 
         [Node]

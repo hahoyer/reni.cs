@@ -142,16 +142,16 @@ namespace Reni.Feature
 
         internal static Result Result
             (
-            this IContextImplementation feature,
+            this ITypeImplementation feature,
             Category category,
             Func<Category, Result> objectReference,
             SourcePart token,
             ContextBase context,
             CompileSyntax right)
         {
-            var metaFeature = ((IContextMetaImplementation) feature).Function;
+            var metaFeature = ((IMetaImplementation) feature).Function;
             if(metaFeature != null)
-                return metaFeature.Result(context, category, right);
+                return metaFeature.Result(category, new ResultCache(objectReference), context, right);
 
             return feature
                 .Result(category, token, context, right)
