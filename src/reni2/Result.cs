@@ -606,6 +606,9 @@ namespace Reni
         internal Result ReplaceArg(ResultCache resultCache)
             => HasArg ? InternalReplaceArg(resultCache) : this;
 
+        internal Result ReplaceArg(ResultCache.IResultProvider provider)
+            => HasArg ? InternalReplaceArg(new ResultCache(provider)) : this;
+
         internal Result ReplaceArg(Func<Category, Result> getArgs)
             => HasArg ? InternalReplaceArg(new ResultCache(getArgs)) : this;
 

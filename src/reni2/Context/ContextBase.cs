@@ -22,6 +22,7 @@ namespace Reni.Context
     /// </summary>
     abstract class ContextBase
         : DumpableObject
+            , ResultCache.IResultProvider
             , IIconKeyProvider
     {
         protected override string GetNodeDump()
@@ -34,10 +35,7 @@ namespace Reni.Context
         readonly Cache _cache;
 
         protected ContextBase()
-            : base(_nextId++)
-        {
-            _cache = new Cache(this);
-        }
+            : base(_nextId++) { _cache = new Cache(this); }
 
         public abstract string GetContextIdentificationDump();
 
@@ -197,6 +195,10 @@ namespace Reni.Context
             [SmartNode]
             internal readonly FunctionCache<CompileSyntax, ResultCache> ResultAsReferenceCache;
 
+            [Node]
+            [SmartNode]
+            internal readonly ResultCache AsObject;
+
             public Cache(ContextBase target)
             {
                 ResultCache = new FunctionCache<CompileSyntax, ResultCache>
@@ -224,6 +226,8 @@ namespace Reni.Context
                     );
                 Compounds = new FunctionCache<CompoundSyntax, Compound>
                     (container => new Compound(container, target));
+
+                AsObject = new ResultCache(target);
             }
 
             [DisableDump]
@@ -268,7 +272,7 @@ namespace Reni.Context
             return null;
         }
 
-        internal ITypeImplementation Declaration(Definable tokenClass)
+        internal IImplementation Declaration(Definable tokenClass)
         {
             var genericize = tokenClass.Genericize.ToArray();
             var results = genericize.SelectMany(g => g.Declarations(this));
@@ -286,15 +290,13 @@ namespace Reni.Context
             if(searchResult == null)
                 return RootContext.UndefinedSymbol(source).Result(category);
 
-            var result = searchResult
-                .Result
-                (category, FindRecentCompoundView.ObjectPointerViaContext, source, this, right);
+            var result = searchResult.Result(category, _cache.AsObject, source, this, right);
 
             Tracer.Assert(category <= result.CompleteCategory);
             return result;
         }
 
-        internal virtual IEnumerable<ITypeImplementation> Declarations<TDefinable>
+        internal virtual IEnumerable<IImplementation> Declarations<TDefinable>
             (TDefinable tokenClass)
             where TDefinable : Definable
         {
@@ -304,11 +306,21 @@ namespace Reni.Context
                 yield return feature;
         }
 
-        internal IssueType UndefinedSymbol(SourcePart source)
+        IssueType UndefinedSymbol(SourcePart source)
             =>
                 new RootIssueType
                     (
                     new Issue(IssueId.UndefinedSymbol, source, "Context: " + Dump()),
                     RootContext);
+
+        Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
+        {
+            if(pendingCategory == Category.None)
+                return FindRecentCompoundView.ObjectPointerViaContext(category);
+            NotImplementedMethod(category, pendingCategory);
+            return null;
+        }
+
+        object ResultCache.IResultProvider.Target => this;
     }
 }

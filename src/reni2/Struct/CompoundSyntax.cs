@@ -147,7 +147,7 @@ namespace Reni.Struct
                 ?.Position;
         }
 
-        internal ITypeImplementation Find(Definable definable, CompoundView accessPoint)
+        internal IImplementation Find(Definable definable, CompoundView accessPoint)
         {
             Tracer.Assert(accessPoint.Compound.Syntax == this);
 
@@ -175,7 +175,7 @@ namespace Reni.Struct
                 );
         }
 
-        ITypeImplementation OnInheritedDeclarationError(IssueId issueId)
+        IImplementation OnInheritedDeclarationError(IssueId issueId)
         {
             if(issueId == IssueId.UndefinedSymbol)
                 return null;
@@ -246,7 +246,7 @@ namespace Reni.Struct
 
 
     sealed class InheritedAccessFeature
-        : DumpableObject, ITypeImplementation, IValue
+        : DumpableObject, IImplementation, IValue
     {
         [EnableDump]
         readonly SearchResult SearchResult;
@@ -268,17 +268,17 @@ namespace Reni.Struct
             }
         }
 
-        IFunction IImplementation.Function
+        IFunction IEvalImplementation.Function
         {
             get
             {
-                if(((IImplementation) SearchResult.Feature).Function != null)
+                if(((IEvalImplementation) SearchResult.Feature).Function != null)
                     NotImplementedMethod();
                 return null;
             }
         }
 
-        IValue IImplementation.Value => SearchResult.Feature.Value == null ? null : this;
+        IValue IEvalImplementation.Value => SearchResult.Feature.Value == null ? null : this;
 
         Result IValue.Result(Category category)
         {

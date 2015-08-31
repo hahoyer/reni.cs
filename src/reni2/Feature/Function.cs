@@ -33,14 +33,14 @@ namespace Reni.Feature
         IContextReference ObjectReference => _target.ContextReference;
     }
 
-    sealed class ObjectFunction : ObjectFunctionBase, ITypeImplementation
+    sealed class ObjectFunction : ObjectFunctionBase, IImplementation
     {
         public ObjectFunction(Func<Category, IContextReference, TypeBase, Result> function, IContextReferenceProvider target)
             : base(function, target) {}
 
         IMeta IMetaImplementation.Function => null;
-        IFunction IImplementation.Function => this;
-        IValue IImplementation.Value => null;
+        IFunction IEvalImplementation.Function => this;
+        IValue IEvalImplementation.Value => null;
     }
 
     sealed class Function : FunctionFeatureImplementation

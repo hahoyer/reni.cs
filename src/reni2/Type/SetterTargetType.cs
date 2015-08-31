@@ -33,7 +33,7 @@ namespace Reni.Type
         [DisableDump]
         internal override bool IsPointerPossible => false;
 
-        ITypeImplementation ISymbolProvider<ReassignToken>.Feature(ReassignToken tokenClass)
+        IImplementation ISymbolProvider<ReassignToken>.Feature(ReassignToken tokenClass)
             => IsMutable ? Feature.Extension.FunctionFeature(ReassignResult) : null;
 
         [EnableDumpExcept(false)]

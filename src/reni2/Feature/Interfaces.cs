@@ -10,7 +10,7 @@ using Reni.Type;
 
 namespace Reni.Feature
 {
-    interface IImplementation
+    interface IEvalImplementation
     {
         IFunction Function { get; }
         IValue Value { get; }
@@ -21,12 +21,10 @@ namespace Reni.Feature
         IMeta Function { get; }
     }
 
-    interface ITypeImplementation
-        : IImplementation
-            , IMetaImplementation {}
+    interface IImplementation : IEvalImplementation, IMetaImplementation {}
 
     abstract class FunctionFeatureImplementation
-        : DumpableObject, ITypeImplementation, IFunction
+        : DumpableObject, IImplementation, IFunction
     {
         protected FunctionFeatureImplementation(int? nextObjectId)
             : base(nextObjectId) {}
@@ -34,8 +32,8 @@ namespace Reni.Feature
         protected FunctionFeatureImplementation() { }
 
         IMeta IMetaImplementation.Function => null;
-        IFunction IImplementation.Function => this;
-        IValue IImplementation.Value => null;
+        IFunction IEvalImplementation.Function => this;
+        IValue IEvalImplementation.Value => null;
 
         Result IFunction.Result(Category category, TypeBase argsType)
             => Result(category, argsType);
@@ -48,12 +46,12 @@ namespace Reni.Feature
 
     abstract class ContextMetaFeatureImplementation
         : DumpableObject
-            , ITypeImplementation
+            , IImplementation
             , IMeta
     {
         IMeta IMetaImplementation.Function => this;
-        IFunction IImplementation.Function => null;
-        IValue IImplementation.Value => null;
+        IFunction IEvalImplementation.Function => null;
+        IValue IEvalImplementation.Value => null;
 
         Result IMeta.Result
             (Category category, ResultCache left, ContextBase contextBase, CompileSyntax right)
@@ -102,7 +100,7 @@ namespace Reni.Feature
     interface ISymbolProviderForPointer<TDefinable>
         where TDefinable : Definable
     {
-        ITypeImplementation Feature(TDefinable tokenClass);
+        IImplementation Feature(TDefinable tokenClass);
     }
 
     // ReSharper disable once TypeParameterCanBeVariant
@@ -110,7 +108,7 @@ namespace Reni.Feature
     interface ISymbolProvider<TDefinable>
         where TDefinable : Definable
     {
-        ITypeImplementation Feature(TDefinable tokenClass);
+        IImplementation Feature(TDefinable tokenClass);
     }
 
     interface IGenericProviderForType
@@ -121,7 +119,7 @@ namespace Reni.Feature
     interface IDeclarationProvider
     {
         IEnumerable<SearchResult> Declarations(TypeBase source);
-        IEnumerable<ITypeImplementation> Declarations(ContextBase source);
+        IEnumerable<IImplementation> Declarations(ContextBase source);
     }
 
     sealed class GenericProviderForType<T> : DumpableObject, IGenericProviderForType
@@ -142,12 +140,12 @@ namespace Reni.Feature
         IEnumerable<SearchResult> IDeclarationProvider.Declarations(TypeBase source)
             => source.Declarations(_target);
 
-        IEnumerable<ITypeImplementation> IDeclarationProvider.Declarations
+        IEnumerable<IImplementation> IDeclarationProvider.Declarations
             (ContextBase source)
             => source.Declarations(_target);
     }
 
-    sealed class MetaFunction : DumpableObject, ITypeImplementation, IMeta
+    sealed class MetaFunction : DumpableObject, IImplementation, IMeta
     {
         readonly Func<Category, ResultCache, ContextBase, CompileSyntax, Result> _function;
 
@@ -158,8 +156,8 @@ namespace Reni.Feature
         }
 
         IMeta IMetaImplementation.Function => this;
-        IFunction IImplementation.Function => null;
-        IValue IImplementation.Value => null;
+        IFunction IEvalImplementation.Function => null;
+        IValue IEvalImplementation.Value => null;
 
         Result IMeta.Result
             (Category category, ResultCache left, ContextBase contextBase, CompileSyntax right)
@@ -181,15 +179,15 @@ namespace Reni.Feature
     }
 
     sealed class ContextMetaFunctionFromSyntax
-        : DumpableObject, ITypeImplementation, IMeta
+        : DumpableObject, IImplementation, IMeta
     {
         [EnableDump]
         readonly CompileSyntax _definition;
         public ContextMetaFunctionFromSyntax(CompileSyntax definition) { _definition = definition; }
 
         IMeta IMetaImplementation.Function => this;
-        IFunction IImplementation.Function => null;
-        IValue IImplementation.Value => null;
+        IFunction IEvalImplementation.Function => null;
+        IValue IEvalImplementation.Value => null;
 
         Result IMeta.Result
             (Category category, ResultCache left, ContextBase callContext, CompileSyntax right)

@@ -17,7 +17,7 @@ namespace Reni.Struct
         : TypeBase
             , IFunction
             , IValue
-            , ITypeImplementation
+            , IImplementation
     {
         [EnableDump]
         [Node]
@@ -60,7 +60,7 @@ namespace Reni.Struct
         internal override bool Hllw => true;
 
         [DisableDump]
-        internal override ITypeImplementation FuncionDeclarationForType => this;
+        internal override IImplementation FuncionDeclarationForType => this;
 
         bool IFunction.IsImplicit => _syntax.IsImplicit;
         TypeBase IValue.TargetType => this;
@@ -92,8 +92,8 @@ namespace Reni.Struct
         FunctionType Function(TypeBase argsType) => _compoundView.Function(_syntax, argsType);
 
         IMeta IMetaImplementation.Function => null;
-        IFunction IImplementation.Function => this;
-        IValue IImplementation.Value => this;
+        IFunction IEvalImplementation.Function => this;
+        IValue IEvalImplementation.Value => this;
 
         Result IValue.Result(Category category)
         {

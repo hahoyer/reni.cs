@@ -13,7 +13,7 @@ namespace Reni.Feature
 {
     sealed class SearchResult : DumpableObject
     {
-        internal ITypeImplementation Feature { get; }
+        internal IImplementation Feature { get; }
         ConversionPath ConverterPath { get; }
 
         internal SearchResult(SearchResult result, ConversionPath relativeConversion)
@@ -22,7 +22,7 @@ namespace Reni.Feature
             ConverterPath = result.ConverterPath + relativeConversion;
         }
 
-        internal SearchResult(ITypeImplementation feature, TypeBase definingItem)
+        internal SearchResult(IImplementation feature, TypeBase definingItem)
         {
             Feature = feature;
             ConverterPath = new ConversionPath(definingItem);

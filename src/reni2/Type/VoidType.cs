@@ -22,7 +22,7 @@ namespace Reni.Type
         [DisableDump]
         internal override bool Hllw => true;
 
-        ITypeImplementation ISymbolProvider<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
+        IImplementation ISymbolProvider<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
             => Feature.Extension.Value(DumpPrintTokenResult);
 
         protected override TypeBase ReversePair(TypeBase first) => first;

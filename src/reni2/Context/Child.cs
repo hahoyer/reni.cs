@@ -37,7 +37,7 @@ namespace Reni.Context
         internal override IFunctionContext ObtainRecentFunctionContext()
             => Parent.ObtainRecentFunctionContext();
 
-        internal override IEnumerable<ITypeImplementation> Declarations<TDefinable>
+        internal override IEnumerable<IImplementation> Declarations<TDefinable>
             (TDefinable tokenClass)
         {
             var result = base.Declarations(tokenClass).ToArray();

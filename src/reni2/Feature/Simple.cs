@@ -36,14 +36,14 @@ namespace Reni.Feature
         }
     }
 
-    sealed class Value : ValueBase, ITypeImplementation
+    sealed class Value : ValueBase, IImplementation
     {
         public Value(Func<Category, Result> function, TypeBase type)
             : base(function, type) { }
 
         IMeta IMetaImplementation.Function => null;
-        IFunction IImplementation.Function => null;
-        IValue IImplementation.Value => this;
+        IFunction IEvalImplementation.Function => null;
+        IValue IEvalImplementation.Value => this;
     }
 
     sealed class Combination : DumpableObject, IValue, IEquatable<IValue>

@@ -118,24 +118,24 @@ namespace Reni.Type
             (ArrayReferenceType destination)
             => ForcedConversion(destination).NullableToArray();
 
-        ITypeImplementation ISymbolProvider<Mutable>.Feature
+        IImplementation ISymbolProvider<Mutable>.Feature
             (Mutable tokenClass)
             => Feature.Extension.Value(MutableResult);
 
-        ITypeImplementation ISymbolProvider<EnableReinterpretation>.
+        IImplementation ISymbolProvider<EnableReinterpretation>.
             Feature
             (EnableReinterpretation tokenClass)
             => Feature.Extension.Value(EnableReinterpretationResult);
 
         [DisableDump]
-        internal override ITypeImplementation FuncionDeclarationForType
+        internal override IImplementation FuncionDeclarationForType
             => Feature.Extension.FunctionFeature(AccessResult);
 
-        ITypeImplementation ISymbolProvider<Minus>.Feature
+        IImplementation ISymbolProvider<Minus>.Feature
             (Minus tokenClass)
             => Feature.Extension.FunctionFeature(MinusResult);
 
-        ITypeImplementation ISymbolProvider<Plus>.Feature
+        IImplementation ISymbolProvider<Plus>.Feature
             (Plus tokenClass)
             => Feature.Extension.FunctionFeature(PlusResult);
 

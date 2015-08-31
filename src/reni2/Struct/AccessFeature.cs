@@ -13,7 +13,7 @@ namespace Reni.Struct
 {
     sealed class AccessFeature
         : DumpableObject
-            , ITypeImplementation
+            , IImplementation
             , IValue
             , ResultCache.IResultProvider
     {
@@ -38,9 +38,9 @@ namespace Reni.Struct
         IMeta IMetaImplementation.Function
             => (Statement as FunctionSyntax)?.MetaFunctionFeature(View);
 
-        IFunction IImplementation.Function => FunctionFeature.Value;
+        IFunction IEvalImplementation.Function => FunctionFeature.Value;
 
-        IValue IImplementation.Value
+        IValue IEvalImplementation.Value
         {
             get
             {
@@ -80,7 +80,7 @@ namespace Reni.Struct
 
             var valueType = View.ValueType(Position);
             StopByObjectIds();
-            return ((IImplementation) valueType.CheckedFeature)?.Function;
+            return ((IEvalImplementation) valueType.CheckedFeature)?.Function;
         }
     }
 }

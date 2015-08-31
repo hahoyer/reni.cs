@@ -56,14 +56,14 @@ namespace Reni.Type
             yield return Feature.Extension.Value(category => CutEnabledBitCountConversion(category, destination), EnableCut);
         }
 
-        ITypeImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature
+        IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature
             (DumpPrintToken tokenClass)
             => Feature.Extension.Value(DumpPrintTokenResult, this);
 
-        ITypeImplementation ISymbolProviderForPointer<Operation>.Feature(Operation tokenClass)
+        IImplementation ISymbolProviderForPointer<Operation>.Feature(Operation tokenClass)
             => Feature.Extension.FunctionFeature(OperationResult, tokenClass);
 
-        ITypeImplementation ISymbolProviderForPointer<TokenClasses.EnableCut>.Feature
+        IImplementation ISymbolProviderForPointer<TokenClasses.EnableCut>.Feature
             (TokenClasses.EnableCut tokenClass) => Feature.Extension.Value(EnableCutTokenResult);
 
         IEnumerable<IValue> IForcedConversionProvider<NumberType>.Result(NumberType destination)
@@ -72,10 +72,10 @@ namespace Reni.Type
                 yield return Feature.Extension.Value(category => destination.FlatConversion(category, this), this);
         }
 
-        ITypeImplementation ISymbolProviderForPointer<Negate>.Feature(Negate tokenClass)
+        IImplementation ISymbolProviderForPointer<Negate>.Feature(Negate tokenClass)
             => Feature.Extension.Value(NegationResult);
 
-        ITypeImplementation ISymbolProviderForPointer<TextItem>.Feature(TextItem tokenClass)
+        IImplementation ISymbolProviderForPointer<TextItem>.Feature(TextItem tokenClass)
             => Feature.Extension.Value(TextItemResult);
 
         protected override Result ParentConversionResult(Category category) => Parent.Result(category, ArgResult);

@@ -301,7 +301,7 @@ namespace Reni.Type
         internal bool IsWeakReference => CheckedReference != null && CheckedReference.IsWeak;
 
         [DisableDump]
-        internal virtual ITypeImplementation CheckedFeature => this as ITypeImplementation;
+        internal virtual IImplementation CheckedFeature => this as IImplementation;
 
         [DisableDump]
         internal virtual bool HasQuickSize => true;
@@ -468,9 +468,9 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        internal virtual ITypeImplementation FuncionDeclarationForType => null;
+        internal virtual IImplementation FuncionDeclarationForType => null;
         [DisableDump]
-        internal virtual ITypeImplementation FunctionDeclarationForPointerType => null;
+        internal virtual IImplementation FunctionDeclarationForPointerType => null;
 
         /// <summary>
         ///     Call this function to get declarations of definable for this type.

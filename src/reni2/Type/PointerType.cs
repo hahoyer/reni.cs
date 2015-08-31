@@ -37,7 +37,7 @@ namespace Reni.Type
         [DisableDump]
         internal override CompoundView FindRecentCompoundView => ValueType.FindRecentCompoundView;
         [DisableDump]
-        internal override ITypeImplementation CheckedFeature => ValueType.CheckedFeature;
+        internal override IImplementation CheckedFeature => ValueType.CheckedFeature;
         [DisableDump]
         internal override bool Hllw => false;
         [DisableDump]
@@ -82,7 +82,7 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        internal override ITypeImplementation FuncionDeclarationForType
+        internal override IImplementation FuncionDeclarationForType
             => ValueType.FunctionDeclarationForPointerType
                 ?? base.FuncionDeclarationForType;
 

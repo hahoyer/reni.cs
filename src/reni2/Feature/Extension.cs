@@ -47,14 +47,14 @@ namespace Reni.Feature
         internal static Function FunctionFeature(Func<Category, TypeBase, Result> function)
             => new Function(function);
 
-        internal static ITypeImplementation FunctionFeature<T>
+        internal static IImplementation FunctionFeature<T>
             (Func<Category, TypeBase, T, Result> function, T arg)
             => new ExtendedFunction<T>(function, arg);
 
 
-        internal static IValue ExtendedValue(this ITypeImplementation feature)
+        internal static IValue ExtendedValue(this IImplementation feature)
         {
-            var function = ((IImplementation) feature).Function;
+            var function = ((IEvalImplementation) feature).Function;
             if(function != null && function.IsImplicit)
                 return null;
 
@@ -92,7 +92,7 @@ namespace Reni.Feature
 
         internal static Result Result
             (
-            this IImplementation feature,
+            this IEvalImplementation feature,
             Category category,
             SourcePart token,
             ContextBase context,
@@ -142,20 +142,20 @@ namespace Reni.Feature
 
         internal static Result Result
             (
-            this ITypeImplementation feature,
+            this IImplementation feature,
             Category category,
-            Func<Category, Result> objectReference,
+            ResultCache left,
             SourcePart token,
             ContextBase context,
             CompileSyntax right)
         {
             var metaFeature = ((IMetaImplementation) feature).Function;
             if(metaFeature != null)
-                return metaFeature.Result(category, new ResultCache(objectReference), context, right);
+                return metaFeature.Result(category, left, context, right);
 
             return feature
                 .Result(category, token, context, right)
-                .ReplaceArg(objectReference);
+                .ReplaceArg(left);
         }
     }
 }

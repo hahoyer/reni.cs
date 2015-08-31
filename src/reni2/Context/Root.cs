@@ -30,9 +30,9 @@ namespace Reni.Context
         readonly ValueCache<RecursionType> _recursionTypeCache;
         readonly ValueCache<BitType> _bitCache;
         readonly ValueCache<VoidType> _voidCache;
-        readonly ValueCache<ITypeImplementation> _minusFeatureCache;
+        readonly ValueCache<IImplementation> _minusFeatureCache;
         readonly FunctionCache<string, CompileSyntax> _metaDictionary;
-        readonly FunctionCache<bool, ITypeImplementation> _createArrayFeatureCache;
+        readonly FunctionCache<bool, IImplementation> _createArrayFeatureCache;
 
         internal Root(IExecutionContext executionContext)
         {
@@ -41,13 +41,13 @@ namespace Reni.Context
             ExecutionContext = executionContext;
             _bitCache = new ValueCache<BitType>(() => new BitType(this));
             _voidCache = new ValueCache<VoidType>(() => new VoidType(this));
-            _minusFeatureCache = new ValueCache<ITypeImplementation>
+            _minusFeatureCache = new ValueCache<IImplementation>
                 (
                 () =>
                     new ContextMetaFunctionFromSyntax
                         (_metaDictionary[ArgToken.TokenId + " " + Negate.TokenId])
                 );
-            _createArrayFeatureCache = new FunctionCache<bool, ITypeImplementation>
+            _createArrayFeatureCache = new FunctionCache<bool, IImplementation>
                 (
                 isMutable =>
                     new ContextMetaFunction
@@ -94,10 +94,10 @@ namespace Reni.Context
         [DisableDump]
         public bool ProcessErrors => ExecutionContext.ProcessErrors;
 
-        ITypeImplementation ISymbolProviderForPointer<Minus>.Feature
+        IImplementation ISymbolProviderForPointer<Minus>.Feature
             (Minus tokenClass) => _minusFeatureCache.Value;
 
-        ITypeImplementation ISymbolProviderForPointer<ConcatArrays>.
+        IImplementation ISymbolProviderForPointer<ConcatArrays>.
             Feature(ConcatArrays tokenClass)
             => _createArrayFeatureCache[tokenClass.IsMutable];
 

@@ -25,7 +25,7 @@ namespace Reni.Type
         internal override bool Hllw => false;
         protected override Size GetSize() => Size.Create(1);
 
-        ITypeImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature
+        IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature
             (DumpPrintToken tokenClass)
             => Feature.Extension.Value(DumpPrintTokenResult, this);
 

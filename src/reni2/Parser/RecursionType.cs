@@ -11,7 +11,7 @@ namespace Reni.Parser
 {
     sealed class RecursionType
         : TypeBase
-            , ITypeImplementation
+            , IImplementation
             , IFunction
             , IValue
             , IMeta
@@ -21,8 +21,8 @@ namespace Reni.Parser
         internal override Root RootContext { get; }
 
         IMeta IMetaImplementation.Function => this;
-        IFunction IImplementation.Function => this;
-        IValue IImplementation.Value => this;
+        IFunction IEvalImplementation.Function => this;
+        IValue IEvalImplementation.Value => this;
         bool IFunction.IsImplicit => false;
         TypeBase IValue.TargetType => this;
         int IContextReference.Order => ObjectId;

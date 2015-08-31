@@ -47,17 +47,17 @@ namespace Reni.Struct
 
         Result VoidConversion(Category category) => RootContext.VoidType.Result(category, ArgResult);
 
-        ITypeImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature
+        IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature
             (DumpPrintToken tokenClass)
             => Feature.Extension.Value(DumpPrintTokenResult);
 
-        ITypeImplementation ISymbolProviderForPointer<Definable>.Feature(Definable tokenClass)
+        IImplementation ISymbolProviderForPointer<Definable>.Feature(Definable tokenClass)
             => View.Find(tokenClass);
 
-        ITypeImplementation ISymbolProvider<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
+        IImplementation ISymbolProvider<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
             => Feature.Extension.Value(DumpPrintTokenResult);
 
-        ITypeImplementation ISymbolProvider<Definable>.Feature(Definable tokenClass)
+        IImplementation ISymbolProvider<Definable>.Feature(Definable tokenClass)
             => View.Find(tokenClass);
 
         protected override Size GetSize() => View.CompoundViewSize;

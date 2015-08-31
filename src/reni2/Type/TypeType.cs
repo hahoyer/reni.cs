@@ -37,19 +37,19 @@ namespace Reni.Type
 
         internal override string DumpPrintText => "(" + Value.DumpPrintText + "()) type";
 
-        ITypeImplementation ISymbolProvider<DumpPrintToken>.Feature
+        IImplementation ISymbolProvider<DumpPrintToken>.Feature
             (DumpPrintToken tokenClass)
             => Feature.Extension.Value(DumpPrintTokenResult);
 
-        ITypeImplementation ISymbolProvider<Star>.Feature
+        IImplementation ISymbolProvider<Star>.Feature
             (Star tokenClass)
             => Feature.Extension.MetaFeature(StarResult);
 
-        ITypeImplementation ISymbolProvider<Slash>.Feature
+        IImplementation ISymbolProvider<Slash>.Feature
             (Slash tokenClass)
             => Feature.Extension.MetaFeature(SlashResult);
 
-        ITypeImplementation ISymbolProvider<Mutable>.Feature
+        IImplementation ISymbolProvider<Mutable>.Feature
             (Mutable tokenClass)
             => Value is ArrayType
                 ? Feature.Extension.Value(MutableArrayResult)
@@ -57,7 +57,7 @@ namespace Reni.Type
                     ? Feature.Extension.Value(MutableReferenceResult)
                     : null;
 
-        ITypeImplementation ISymbolProvider<ArrayReference>.Feature
+        IImplementation ISymbolProvider<ArrayReference>.Feature
             (ArrayReference tokenClass)
             => Value is ArrayType ? Feature.Extension.Value(ArrayReferenceResult) : null;
 
