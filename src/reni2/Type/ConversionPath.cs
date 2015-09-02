@@ -43,7 +43,7 @@ namespace Reni.Type
             if(Elements.Any())
                 Tracer.Assert(Source == Elements.First().TargetType);
 
-            if(false)
+            //if(false)
                 Tracer.Assert
                     (
                         Types.Count() == Elements.Count() + 1,

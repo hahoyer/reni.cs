@@ -147,30 +147,29 @@ namespace Reni.Struct
                 ?.Position;
         }
 
-        internal IImplementation Find(Definable definable, CompoundView accessPoint)
+        internal IImplementation Find(Definable definable, CompoundView view)
         {
-            Tracer.Assert(accessPoint.Compound.Syntax == this);
+            Tracer.Assert(view.Compound.Syntax == this);
 
             if(definable == null)
                 return null;
 
             var name = definable.Id;
             var definingStatement = _data
-                .Take(accessPoint.ViewPosition)
-                .SingleOrDefault(s => s.IsDefining(name) || s.IsInheriting(name, accessPoint));
+                .Take(view.ViewPosition)
+                .SingleOrDefault(s => s.IsDefining(name) || s.IsInheriting(name, view));
             if(definingStatement == null)
                 return null;
 
-            var result = accessPoint.AccessFeature(definingStatement.Position);
             if(definingStatement.IsDefining(name))
-                return result;
+                return view.AccessFeature(definingStatement.Position);
 
-            var targetResult = new ResultCache(result);
+            var conversion = new ConversionPath(view.AccessFeature(definingStatement.Position));
 
-            return targetResult.Type.ExecuteDeclaration
+            return conversion.Destination.ExecuteDeclaration
                 (
                     definable,
-                    searchResult => new InheritedAccessFeature(searchResult, targetResult),
+                    searchResult => new SearchResult(searchResult, conversion), 
                     OnInheritedDeclarationError
                 );
         }
@@ -244,50 +243,4 @@ namespace Reni.Struct
             => _data.SelectMany(item => item.GetMixins(context).Concat(new[] {item.RawStatement}));
     }
 
-
-    sealed class InheritedAccessFeature
-        : DumpableObject, IImplementation, IValue
-    {
-        [EnableDump]
-        readonly SearchResult SearchResult;
-        readonly ResultCache TargetResult;
-
-        public InheritedAccessFeature(SearchResult searchResult, ResultCache targetResult)
-        {
-            SearchResult = searchResult;
-            TargetResult = targetResult;
-        }
-
-        IMeta IMetaImplementation.Function
-        {
-            get
-            {
-                if(((IMetaImplementation) SearchResult.Feature).Function != null)
-                    NotImplementedMethod();
-                return null;
-            }
-        }
-
-        IFunction IEvalImplementation.Function
-        {
-            get
-            {
-                if(((IEvalImplementation) SearchResult.Feature).Function != null)
-                    NotImplementedMethod();
-                return null;
-            }
-        }
-
-        IValue IEvalImplementation.Value => SearchResult.Feature.Value == null ? null : this;
-
-        Result IValue.Result(Category category)
-        {
-            var result = SearchResult.Feature.Value.Result(category);
-            if(category.HasCode || category.HasExts)
-                NotImplementedMethod(category, nameof(result), result);
-            return result;
-        }
-
-        TypeBase IValue.TargetType => SearchResult.Feature.Value.TargetType;
-    }
 }

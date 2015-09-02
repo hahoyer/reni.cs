@@ -11,23 +11,33 @@ using Reni.Type;
 
 namespace Reni.Feature
 {
-    sealed class SearchResult : DumpableObject
+    sealed class SearchResult : DumpableObject, IImplementation
     {
-        internal IImplementation Feature { get; }
-        ConversionPath ConverterPath { get; }
-
-        internal SearchResult(SearchResult result, ConversionPath relativeConversion)
+        public static SearchResult Create(IImplementation feature, TypeBase definingItem)
         {
-            Feature = result.Feature;
-            ConverterPath = result.ConverterPath + relativeConversion;
+            var searchResult = feature as SearchResult;
+            if(searchResult == null)
+                return new SearchResult(feature, definingItem);
+            Tracer.Assert(searchResult.ConverterPath.Source == definingItem);
+            return searchResult;
         }
 
-        internal SearchResult(IImplementation feature, TypeBase definingItem)
+        IImplementation Feature { get; }
+        ConversionPath ConverterPath { get; }
+
+        internal SearchResult(SearchResult searchResult, ConversionPath relativeConversion)
+        {
+            Feature = searchResult.Feature;
+            Tracer.Assert(searchResult.ConverterPath.Source == relativeConversion.Destination);
+            ConverterPath = searchResult.ConverterPath + relativeConversion;
+        }
+
+        SearchResult(IImplementation feature, TypeBase definingItem)
         {
             Feature = feature;
             ConverterPath = new ConversionPath(definingItem);
         }
-        
+
         internal Result Execute
             (
             Category category,
@@ -53,5 +63,32 @@ namespace Reni.Feature
             => (Feature is AccessFeature) == (other.Feature is AccessFeature)
                 ? ConverterPath.HasHigherPriority(other.ConverterPath)
                 : Feature is AccessFeature;
+
+        IFunction IEvalImplementation.Function
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
+
+        IValue IEvalImplementation.Value
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
+
+        IMeta IMetaImplementation.Function
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
     }
 }

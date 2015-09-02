@@ -91,7 +91,7 @@ namespace Reni.Type
             var feature = (ValueType as
                 ISymbolProviderForPointer<TDefinable>)
                 ?.Feature(tokenClass);
-            var result = feature.NullableToArray().Select(f => new SearchResult(f, Pointer));
+            var result = feature.NullableToArray().Select(f => SearchResult.Create(f, Pointer));
             if(result.Any())
                 return result;
             return base.Declarations(tokenClass);

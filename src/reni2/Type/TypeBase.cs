@@ -463,7 +463,7 @@ namespace Reni.Type
             {
                 var result = FuncionDeclarationForType;
                 if(result != null)
-                    yield return new SearchResult(result, this);
+                    yield return SearchResult.Create(result, this);
             }
         }
 
@@ -522,9 +522,13 @@ namespace Reni.Type
         internal virtual IEnumerable<SearchResult> Declarations<TDefinable>(TDefinable tokenClass)
             where TDefinable : Definable
         {
-            var feature = (this as ISymbolProvider<TDefinable>)
-                ?.Feature(tokenClass);
-            return feature.NullableToArray().Select(f => new SearchResult(f, this));
+            var provider = this as ISymbolProvider<TDefinable>;
+            if(provider == null)
+                yield break;
+            var feature = provider.Feature(tokenClass);
+            if(feature == null)
+                yield break;
+            yield return SearchResult.Create(feature, this);
         }
 
         [DisableDump]
