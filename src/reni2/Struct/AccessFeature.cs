@@ -65,7 +65,7 @@ namespace Reni.Struct
 
         Result Result(Category category) => View.AccessViaObject(category, Position);
 
-        TypeBase IValue.TargetType => View.Type;
+        TypeBase IValue.Source => View.Type;
 
         CompileSyntax Statement => View
             .Compound

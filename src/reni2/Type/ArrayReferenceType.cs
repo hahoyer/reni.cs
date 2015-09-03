@@ -111,7 +111,7 @@ namespace Reni.Type
         Size IContextReference.Size => Size;
         int IContextReference.Order => _order;
 
-        TypeBase IValue.TargetType => ValueType;
+        TypeBase IValue.Source => ValueType;
         Result IValue.Result(Category category) => DereferenceResult(category);
 
         IEnumerable<IValue> IForcedConversionProvider<ArrayReferenceType>.Result

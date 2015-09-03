@@ -165,7 +165,7 @@ namespace Reni.Type
         internal TypeBase AutomaticDereferenceType
             =>
                 IsWeakReference
-                    ? CheckedReference.Converter.TargetType.AutomaticDereferenceType
+                    ? CheckedReference.Converter.Source.AutomaticDereferenceType
                     : this;
 
         [DisableDump]
@@ -526,9 +526,8 @@ namespace Reni.Type
             if(provider == null)
                 yield break;
             var feature = provider.Feature(tokenClass);
-            if(feature == null)
-                yield break;
-            yield return SearchResult.Create(feature, this);
+            if(feature != null)
+                yield return SearchResult.Create(feature, this);
         }
 
         [DisableDump]
@@ -572,7 +571,7 @@ namespace Reni.Type
                 .SelectMany(g => g.GetForcedConversions(this).ToArray())
                 .ToArray();
 
-            Tracer.Assert(result.All(f => f.TargetType == this));
+            Tracer.Assert(result.All(f => f.Source == this));
             Tracer.Assert(result.All(f => f.ResultType() == destination));
             Tracer.Assert(result.Length <= 1);
 

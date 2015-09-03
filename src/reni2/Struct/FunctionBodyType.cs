@@ -63,7 +63,7 @@ namespace Reni.Struct
         internal override IImplementation FuncionDeclarationForType => this;
 
         bool IFunction.IsImplicit => _syntax.IsImplicit;
-        TypeBase IValue.TargetType => this;
+        TypeBase IValue.Source => this;
 
         Result IFunction.Result(Category category, TypeBase argsType)
         {

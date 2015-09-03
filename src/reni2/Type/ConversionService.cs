@@ -119,7 +119,7 @@ namespace Reni.Type
                         (
                             path => new
                             {
-                                source = path.TargetType.DumpPrintText,
+                                source = path.Source.DumpPrintText,
                                 destination = path.ResultType().DumpPrintText
                             }
                         )
@@ -144,7 +144,7 @@ namespace Reni.Type
         internal static IEnumerable<TypeBase> Types(this IEnumerable<IValue> list)
         {
             return list
-                .SelectMany(i => new[] {i.TargetType, i.ResultType()})
+                .SelectMany(i => new[] {i.Source, i.ResultType()})
                 .Distinct();
         }
 
@@ -158,7 +158,7 @@ namespace Reni.Type
                     {
                         i,
                         result = elements[i].ResultType(),
-                        next = element.TargetType
+                        next = element.Source
                     })
                 .Where(item => item.result != item.next)
                 .ToArray();
@@ -172,22 +172,22 @@ namespace Reni.Type
             result.AssertPath();
             if(!result.Any())
                 return list;
-            var source = result.First().TargetType;
+            var source = result.First().Source;
             if(source == result.Last().ResultType())
                 return new IValue[0];
 
             for(var i = 0; i < result.Count; i++)
             {
-                var s = result[i].TargetType;
+                var s = result[i].Source;
                 var simpleFeatures =
                     result.Skip(i + 1)
                         .Reverse()
-                        .SkipWhile(element => element.TargetType != s)
+                        .SkipWhile(element => element.Source != s)
                         .ToArray();
                 var tailLength = simpleFeatures.Count();
                 if(tailLength != 0)
                     result.RemoveRange(i, result.Count - i - tailLength);
-                Tracer.Assert(source == result.First().TargetType);
+                Tracer.Assert(source == result.First().Source);
             }
 
             return result;

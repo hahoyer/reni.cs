@@ -26,7 +26,7 @@ namespace Reni.Type
         IValue IProxyType.Converter => this;
         bool IReference.IsWeak => true;
         IValue IReference.Converter => this;
-        TypeBase IValue.TargetType => TargetType;
+        TypeBase IValue.Source => TargetType;
         Result IValue.Result(Category category) => GetterResult(category);
         [DisableDump]
         internal override bool IsAligningPossible => false;

@@ -13,6 +13,8 @@ namespace Reni.Feature
 {
     sealed class SearchResult : DumpableObject, IImplementation
     {
+        static int _nextObjectId;
+
         public static SearchResult Create(IImplementation feature, TypeBase definingItem)
         {
             var searchResult = feature as SearchResult;
@@ -26,16 +28,20 @@ namespace Reni.Feature
         ConversionPath ConverterPath { get; }
 
         internal SearchResult(SearchResult searchResult, ConversionPath relativeConversion)
+            : this(searchResult.Feature, searchResult.ConverterPath + relativeConversion)
         {
-            Feature = searchResult.Feature;
             Tracer.Assert(searchResult.ConverterPath.Source == relativeConversion.Destination);
-            ConverterPath = searchResult.ConverterPath + relativeConversion;
         }
 
         SearchResult(IImplementation feature, TypeBase definingItem)
+            : this(feature, new ConversionPath(definingItem)) {}
+
+        SearchResult(IImplementation feature, ConversionPath converterPath)
+            : base(_nextObjectId++)
         {
             Feature = feature;
-            ConverterPath = new ConversionPath(definingItem);
+            ConverterPath = converterPath;
+            StopByObjectIds();
         }
 
         internal Result Execute

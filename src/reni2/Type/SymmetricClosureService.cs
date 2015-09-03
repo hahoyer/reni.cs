@@ -74,7 +74,7 @@ namespace Reni.Type
 
         sealed class ForwardNavigator : INavigator
         {
-            TypeBase INavigator.Start(IValue feature) => feature.TargetType;
+            TypeBase INavigator.Start(IValue feature) => feature.Source;
             TypeBase INavigator.End(IValue feature) => feature.ResultType();
 
             IValue INavigator.Combine(IValue start, IValue end)
@@ -84,7 +84,7 @@ namespace Reni.Type
         sealed class BackwardNavigator : INavigator
         {
             TypeBase INavigator.Start(IValue feature) => feature.ResultType();
-            TypeBase INavigator.End(IValue feature) => feature.TargetType;
+            TypeBase INavigator.End(IValue feature) => feature.Source;
 
             IValue INavigator.Combine(IValue start, IValue end)
                 => Feature.Combination.CheckedCreate(end, start);

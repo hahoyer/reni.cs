@@ -161,10 +161,11 @@ namespace Reni.Struct
             if(definingStatement == null)
                 return null;
 
+            var accessFeature = view.AccessFeature(definingStatement.Position);
             if(definingStatement.IsDefining(name))
-                return view.AccessFeature(definingStatement.Position);
+                return accessFeature;
 
-            var conversion = new ConversionPath(view.AccessFeature(definingStatement.Position));
+            var conversion = new ConversionPath(accessFeature);
 
             return conversion.Destination.ExecuteDeclaration
                 (

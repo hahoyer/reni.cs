@@ -24,7 +24,7 @@ namespace Reni.Type
         internal override Root RootContext => Parent.RootContext;
 
         IValue IProxyType.Converter => this;
-        TypeBase IValue.TargetType => Parent;
+        TypeBase IValue.Source => Parent;
         Result IValue.Result(Category category) => ParentConversionResult(category);
 
         protected abstract Result ParentConversionResult(Category category);

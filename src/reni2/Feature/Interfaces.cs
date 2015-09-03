@@ -64,7 +64,7 @@ namespace Reni.Feature
     interface IValue
     {
         Result Result(Category category);
-        TypeBase TargetType { get; }
+        TypeBase Source { get; }
     }
 
     interface IFunction

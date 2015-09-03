@@ -50,7 +50,7 @@ namespace Reni.Type
         IValue IReference.Converter => this;
         bool IReference.IsWeak => true;
         IValue IProxyType.Converter => this;
-        TypeBase IValue.TargetType => ValueType;
+        TypeBase IValue.Source => ValueType;
         Result IValue.Result(Category category) => DereferenceResult(category);
 
         [DisableDump]

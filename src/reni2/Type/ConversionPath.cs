@@ -20,7 +20,7 @@ namespace Reni.Type
         internal readonly IValue[] Elements;
 
         internal ConversionPath()
-            : base(_nextObjectId++) { }
+            : base(_nextObjectId++) {}
 
         internal ConversionPath(TypeBase source)
             : this()
@@ -36,28 +36,40 @@ namespace Reni.Type
             : this()
         {
             Tracer.Assert(rawElements.Any());
-            Source = rawElements.First().TargetType;
+            Source = rawElements.First().Source;
             Tracer.Assert(IsValid);
             Elements = rawElements.RemoveCircles().ToArray();
 
             if(Elements.Any())
-                Tracer.Assert(Source == Elements.First().TargetType);
+                Tracer.Assert(Source == Elements.First().Source);
 
+            Tracer.Assert
+                (
+                    Types.Merge(TypesByDestination, item => item)
+                        .All(item => item.Item2 == item.Item3));
             //if(false)
-                Tracer.Assert
-                    (
-                        Types.Count() == Elements.Count() + 1,
-                        () =>
-                            "\n" + Types.Select(t => t.DumpPrintText).Stringify("\n") + "\n****\n"
-                                + Dump()
-                    );
+            Tracer.Assert
+                (
+                    Types.Count() == Elements.Count() + 1,
+                    () =>
+                        "\n" + Types.Select(t => t.DumpPrintText).Stringify("\n") + "\n****\n"
+                            + Dump()
+                );
+
+
             StopByObjectId(-284);
         }
 
         IEnumerable<TypeBase> Types
             => Elements
-                .Select(element => element.TargetType)
+                .Select(element => element.Source)
                 .Concat(new[] {Destination})
+                .Distinct();
+
+        IEnumerable<TypeBase> TypesByDestination
+            => new[] {Source}
+                .Concat
+                (Elements.Select(element => element.ResultType()))
                 .Distinct();
 
         IEnumerable<string> DumpConversions

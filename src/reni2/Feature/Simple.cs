@@ -24,7 +24,7 @@ namespace Reni.Feature
         TypeBase Target { get; }
 
         Result IValue.Result(Category category) => Function(category);
-        TypeBase IValue.TargetType => Target;
+        TypeBase IValue.Source => Target;
 
         protected override string GetNodeDump()
         {
@@ -57,8 +57,8 @@ namespace Reni.Feature
                 return right;
             if(right == null)
                 return left;
-            Tracer.Assert(left.ResultType() == right.TargetType);
-            if(right.ResultType() == left.TargetType)
+            Tracer.Assert(left.ResultType() == right.Source);
+            if(right.ResultType() == left.Source)
                 return null;
 
             return new Combination(left, right);
@@ -70,7 +70,7 @@ namespace Reni.Feature
             Right = right;
         }
         Result IValue.Result(Category category) => Right.Result(category).ReplaceArg(Left.Result);
-        TypeBase IValue.TargetType => Left.TargetType;
+        TypeBase IValue.Source => Left.Source;
 
         bool IEquatable<IValue>.Equals(IValue other)
         {
