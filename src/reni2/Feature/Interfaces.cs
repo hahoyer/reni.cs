@@ -13,7 +13,7 @@ namespace Reni.Feature
     interface IEvalImplementation
     {
         IFunction Function { get; }
-        IValue Value { get; }
+        IConversion Conversion { get; }
     }
 
     interface IMetaImplementation
@@ -33,7 +33,7 @@ namespace Reni.Feature
 
         IMeta IMetaImplementation.Function => null;
         IFunction IEvalImplementation.Function => this;
-        IValue IEvalImplementation.Value => null;
+        IConversion IEvalImplementation.Conversion => null;
 
         Result IFunction.Result(Category category, TypeBase argsType)
             => Result(category, argsType);
@@ -51,7 +51,7 @@ namespace Reni.Feature
     {
         IMeta IMetaImplementation.Function => this;
         IFunction IEvalImplementation.Function => null;
-        IValue IEvalImplementation.Value => null;
+        IConversion IEvalImplementation.Conversion => null;
 
         Result IMeta.Result
             (Category category, ResultCache left, ContextBase contextBase, CompileSyntax right)
@@ -61,7 +61,7 @@ namespace Reni.Feature
             (ContextBase contextBase, Category category, CompileSyntax right);
     }
 
-    interface IValue
+    interface IConversion
     {
         Result Result(Category category);
         TypeBase Source { get; }
@@ -113,7 +113,7 @@ namespace Reni.Feature
 
     interface IGenericProviderForType
     {
-        IEnumerable<IValue> GetForcedConversions(TypeBase typeBase);
+        IEnumerable<IConversion> GetForcedConversions(TypeBase typeBase);
     }
 
     interface IDeclarationProvider
@@ -127,7 +127,7 @@ namespace Reni.Feature
         readonly T _target;
         public GenericProviderForType(T target) { _target = target; }
 
-        IEnumerable<IValue> IGenericProviderForType.GetForcedConversions(TypeBase source)
+        IEnumerable<IConversion> IGenericProviderForType.GetForcedConversions(TypeBase source)
             => source.GetForcedConversions(_target);
     }
 
@@ -157,7 +157,7 @@ namespace Reni.Feature
 
         IMeta IMetaImplementation.Function => this;
         IFunction IEvalImplementation.Function => null;
-        IValue IEvalImplementation.Value => null;
+        IConversion IEvalImplementation.Conversion => null;
 
         Result IMeta.Result
             (Category category, ResultCache left, ContextBase contextBase, CompileSyntax right)
@@ -187,7 +187,7 @@ namespace Reni.Feature
 
         IMeta IMetaImplementation.Function => this;
         IFunction IEvalImplementation.Function => null;
-        IValue IEvalImplementation.Value => null;
+        IConversion IEvalImplementation.Conversion => null;
 
         Result IMeta.Result
             (Category category, ResultCache left, ContextBase callContext, CompileSyntax right)

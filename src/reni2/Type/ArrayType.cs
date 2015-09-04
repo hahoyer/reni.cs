@@ -153,7 +153,7 @@ namespace Reni.Type
             (Count tokenClass)
             => Feature.Extension.MetaFeature(CountResult);
 
-        IEnumerable<IValue> IForcedConversionProviderForPointer<ArrayReferenceType>.Result
+        IEnumerable<IConversion> IForcedConversionProviderForPointer<ArrayReferenceType>.Result
             (ArrayReferenceType destination) 
             => ForcedConversion(destination).NullableToArray();
 
@@ -164,7 +164,7 @@ namespace Reni.Type
             => ElementType.ArrayCopier(category);
 
         [DisableDump]
-        internal override IEnumerable<IValue> StripConversions
+        internal override IEnumerable<IConversion> StripConversions
         {
             get { yield return Feature.Extension.Value(NoTextItemResult); }
         }
@@ -300,7 +300,7 @@ namespace Reni.Type
                 (category, () => CodeBase.BitsConst(IndexSize, BitsConst.Convert(Count)));
         }
 
-        IValue ForcedConversion(ArrayReferenceType destination)
+        IConversion ForcedConversion(ArrayReferenceType destination)
         {
             if(!HasForcedConversion(destination))
                 return null;

@@ -7,28 +7,28 @@ using Reni.Type;
 
 namespace Reni.Feature
 {
-    abstract class ValueBase : DumpableObject, IValue
+    abstract class ConversionBase : DumpableObject, IConversion
     {
         static int _nextObjectId;
 
-        protected ValueBase(Func<Category, Result> function, TypeBase target)
+        protected ConversionBase(Func<Category, Result> function, TypeBase source)
             : base(_nextObjectId++)
         {
             Function = function;
-            Target = target;
-            Tracer.Assert(Target != null);
+            Source = source;
+            Tracer.Assert(Source != null);
         }
 
         [EnableDump]
         internal Func<Category, Result> Function { get; }
-        TypeBase Target { get; }
+        TypeBase Source { get; }
 
-        Result IValue.Result(Category category) => Function(category);
-        TypeBase IValue.Source => Target;
+        Result IConversion.Result(Category category) => Function(category);
+        TypeBase IConversion.Source => Source;
 
         protected override string GetNodeDump()
         {
-            return Target.DumpPrintText
+            return Source.DumpPrintText
                 + "-->"
                 + (Function(Category.Type).Type?.DumpPrintText ?? "<unknown>" )
                 + " MethodName="
@@ -36,22 +36,22 @@ namespace Reni.Feature
         }
     }
 
-    sealed class Value : ValueBase, IImplementation
+    sealed class Conversion : ConversionBase, IImplementation
     {
-        public Value(Func<Category, Result> function, TypeBase type)
-            : base(function, type) { }
+        public Conversion(Func<Category, Result> function, TypeBase source)
+            : base(function, source) { }
 
         IMeta IMetaImplementation.Function => null;
         IFunction IEvalImplementation.Function => null;
-        IValue IEvalImplementation.Value => this;
+        IConversion IEvalImplementation.Conversion => this;
     }
 
-    sealed class Combination : DumpableObject, IValue, IEquatable<IValue>
+    sealed class Combination : DumpableObject, IConversion, IEquatable<IConversion>
     {
-        IValue Left { get; }
-        IValue Right { get; }
+        IConversion Left { get; }
+        IConversion Right { get; }
 
-        public static IValue CheckedCreate(IValue left, IValue right)
+        public static IConversion CheckedCreate(IConversion left, IConversion right)
         {
             if(left == null)
                 return right;
@@ -64,15 +64,15 @@ namespace Reni.Feature
             return new Combination(left, right);
         }
 
-        Combination(IValue left, IValue right)
+        Combination(IConversion left, IConversion right)
         {
             Left = left;
             Right = right;
         }
-        Result IValue.Result(Category category) => Right.Result(category).ReplaceArg(Left.Result);
-        TypeBase IValue.Source => Left.Source;
+        Result IConversion.Result(Category category) => Right.Result(category).ReplaceArg(Left.Result);
+        TypeBase IConversion.Source => Left.Source;
 
-        bool IEquatable<IValue>.Equals(IValue other)
+        bool IEquatable<IConversion>.Equals(IConversion other)
         {
             var typedOther = other as Combination;
             if(typedOther == null)

@@ -9,6 +9,7 @@ namespace Reni.FeatureTest.MixIn
 {
     [UnitTest]
     [ReferenceSimple]
+    [ArrayReferenceAll]
     [TargetSet(@"
 Base: /\ 
 {

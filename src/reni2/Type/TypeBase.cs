@@ -52,7 +52,7 @@ namespace Reni.Type
             public readonly ValueCache<Size> Size;
             [Node]
             [SmartNode]
-            public readonly ValueCache<IEnumerable<IValue>> SymmetricConversions;
+            public readonly ValueCache<IEnumerable<IConversion>> SymmetricConversions;
             [Node]
             [SmartNode]
             internal readonly FunctionCache<string, ArrayReferenceType> ArrayReferenceCache;
@@ -81,7 +81,7 @@ namespace Reni.Type
                     (() => new FunctionInstanceType(parent));
                 TypeType = new ValueCache<TypeType>(() => new TypeType(parent));
                 Size = new ValueCache<Size>(parent.GetSizeForCache);
-                SymmetricConversions = new ValueCache<IEnumerable<IValue>>
+                SymmetricConversions = new ValueCache<IEnumerable<IConversion>>
                     (parent.GetSymmetricConversionsForCache);
                 ArrayReferenceCache = new FunctionCache<string, ArrayReferenceType>
                     (id => new ArrayReferenceType(parent, id));
@@ -165,7 +165,7 @@ namespace Reni.Type
         internal TypeBase AutomaticDereferenceType
             =>
                 IsWeakReference
-                    ? CheckedReference.Converter.Source.AutomaticDereferenceType
+                    ? CheckedReference.Converter.ResultType().AutomaticDereferenceType
                     : this;
 
         [DisableDump]
@@ -442,8 +442,8 @@ namespace Reni.Type
             );
 
         internal TypeBase SmartUn<T>()
-            where T : IValue
-            => this is T ? ((IValue) this).Result(Category.Type).Type : this;
+            where T : IConversion
+            => this is T ? ((IConversion) this).Result(Category.Type).Type : this;
 
         internal Result ResultFromPointer(Category category, TypeBase resultType) => resultType
             .Pointer
@@ -535,7 +535,7 @@ namespace Reni.Type
             => this.GenericListFromType();
         [DisableDump]
         [NotNull]
-        public IEnumerable<IValue> SymmetricConversions => _cache.SymmetricConversions.Value
+        public IEnumerable<IConversion> SymmetricConversions => _cache.SymmetricConversions.Value
             ;
 
         Result AlignResult(Category category)
@@ -543,13 +543,13 @@ namespace Reni.Type
             return Align.Result(category, () => ArgCode.Align(), CodeArgs.Arg);
         }
 
-        IEnumerable<IValue> GetSymmetricConversionsForCache()
+        IEnumerable<IConversion> GetSymmetricConversionsForCache()
             => RawSymmetricConversions
                 .ToDictionary(x => x.ResultType())
                 .Values;
 
         [DisableDump]
-        protected virtual IEnumerable<IValue> RawSymmetricConversions
+        protected virtual IEnumerable<IConversion> RawSymmetricConversions
         {
             get
             {
@@ -562,7 +562,7 @@ namespace Reni.Type
             }
         }
 
-        internal IEnumerable<IValue> GetForcedConversions(TypeBase destination)
+        internal IEnumerable<IConversion> GetForcedConversions(TypeBase destination)
         {
             var genericProviderForTypes = destination
                 .Genericize
@@ -578,20 +578,20 @@ namespace Reni.Type
             return result;
         }
 
-        internal virtual IEnumerable<IValue> GetForcedConversions<TDestination>
+        internal virtual IEnumerable<IConversion> GetForcedConversions<TDestination>
             (TDestination destination)
         {
             var provider = this as IForcedConversionProvider<TDestination>;
             if(provider != null)
                 return provider.Result(destination);
-            return new IValue[0];
+            return new IConversion[0];
         }
 
         [DisableDump]
-        internal virtual IEnumerable<IValue> StripConversions { get { yield break; } }
+        internal virtual IEnumerable<IConversion> StripConversions { get { yield break; } }
 
 
-        internal virtual IEnumerable<IValue> CutEnabledConversion(NumberType destination)
+        internal virtual IEnumerable<IConversion> CutEnabledConversion(NumberType destination)
         {
             yield break;
         }
@@ -679,12 +679,12 @@ namespace Reni.Type
 
     interface IForcedConversionProvider<in TDestination>
     {
-        IEnumerable<IValue> Result(TDestination destination);
+        IEnumerable<IConversion> Result(TDestination destination);
     }
 
     interface IForcedConversionProviderForPointer<in TDestination>
     {
-        IEnumerable<IValue> Result(TDestination destination);
+        IEnumerable<IConversion> Result(TDestination destination);
     }
 
     // Krautpuster

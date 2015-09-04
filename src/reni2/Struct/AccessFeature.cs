@@ -14,7 +14,7 @@ namespace Reni.Struct
     sealed class AccessFeature
         : DumpableObject
             , IImplementation
-            , IValue
+            , IConversion
             , ResultCache.IResultProvider
     {
         static int _nextObjectId;
@@ -40,7 +40,7 @@ namespace Reni.Struct
 
         IFunction IEvalImplementation.Function => FunctionFeature.Value;
 
-        IValue IEvalImplementation.Value
+        IConversion IEvalImplementation.Conversion
         {
             get
             {
@@ -51,7 +51,8 @@ namespace Reni.Struct
             }
         }
 
-        Result IValue.Result(Category category) => Result(category);
+        Result IConversion.Result(Category category) => Result(category);
+        TypeBase IConversion.Source => View.Type;
 
         Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
         {
@@ -65,7 +66,6 @@ namespace Reni.Struct
 
         Result Result(Category category) => View.AccessViaObject(category, Position);
 
-        TypeBase IValue.Source => View.Type;
 
         CompileSyntax Statement => View
             .Compound

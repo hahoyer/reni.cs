@@ -14,7 +14,7 @@ namespace Reni.Type
     sealed class PointerType
         : TypeBase
             , IProxyType
-            , IValue
+            , IConversion
             , IReference
     {
         readonly int _order;
@@ -47,17 +47,17 @@ namespace Reni.Type
 
         Size IContextReference.Size => Size;
         int IContextReference.Order => _order;
-        IValue IReference.Converter => this;
+        IConversion IReference.Converter => this;
         bool IReference.IsWeak => true;
-        IValue IProxyType.Converter => this;
-        TypeBase IValue.Source => ValueType;
-        Result IValue.Result(Category category) => DereferenceResult(category);
+        IConversion IProxyType.Converter => this;
+        TypeBase IConversion.Source => this;
+        Result IConversion.Result(Category category) => DereferenceResult(category);
 
         [DisableDump]
-        protected override IEnumerable<IValue> RawSymmetricConversions
+        protected override IEnumerable<IConversion> RawSymmetricConversions
             =>
                 base.RawSymmetricConversions.Concat
-                    (new IValue[] {Feature.Extension.Value(DereferenceResult)});
+                    (new IConversion[] {Feature.Extension.Value(DereferenceResult)});
 
         protected override string GetNodeDump() => ValueType.NodeDump + "[Pointer]";
 
@@ -69,7 +69,7 @@ namespace Reni.Type
         protected override ArrayType ArrayForCache(int count, string optionsId)
             => ValueType.Array(count, optionsId);
 
-        internal override IEnumerable<IValue> GetForcedConversions<TDestination>
+        internal override IEnumerable<IConversion> GetForcedConversions<TDestination>
             (TDestination destination)
         {
             var provider = ValueType as IForcedConversionProviderForPointer<TDestination>;

@@ -895,13 +895,13 @@ namespace Reni
         }
 
         Result Un<T>()
-            where T : IValue
+            where T : IConversion
         {
-            var result = ((IValue) Type).Result(CompleteCategory);
+            var result = ((IConversion) Type).Result(CompleteCategory);
             return result.ReplaceArg(this);
         }
 
-        internal Result SmartUn<T>() where T : IValue => Type is T ? Un<T>() : this;
+        internal Result SmartUn<T>() where T : IConversion => Type is T ? Un<T>() : this;
 
         internal Result DereferencedAlignedResult()
         {

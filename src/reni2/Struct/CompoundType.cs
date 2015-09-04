@@ -33,7 +33,7 @@ namespace Reni.Struct
         internal override bool HasQuickSize => false;
 
         [DisableDump]
-        internal override IEnumerable<IValue> StripConversions
+        internal override IEnumerable<IConversion> StripConversions
         {
             get
             {

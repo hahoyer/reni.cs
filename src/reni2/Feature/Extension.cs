@@ -24,14 +24,14 @@ namespace Reni.Feature
                     <Func<Category, ResultCache, ContextBase, CompileSyntax, Result>, MetaFunction>
                     (function => new MetaFunction(function));
 
-        static readonly FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Value>>
+        static readonly FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Conversion>>
             _simpleCache
-                = new FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Value>>
+                = new FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Conversion>>
                     (
                     function =>
-                        new FunctionCache<TypeBase, Value>(type => new Value(function, type)));
+                        new FunctionCache<TypeBase, Conversion>(type => new Conversion(function, type)));
 
-        internal static Value Value(Func<Category, Result> function, TypeBase target = null)
+        internal static Conversion Value(Func<Category, Result> function, TypeBase target = null)
             => _simpleCache[function][(target ?? function.Target as TypeBase).AssertNotNull()];
 
         internal static ObjectFunction FunctionFeature
@@ -52,22 +52,22 @@ namespace Reni.Feature
             => new ExtendedFunction<T>(function, arg);
 
 
-        internal static IValue ExtendedValue(this IImplementation feature)
+        internal static IConversion ExtendedValue(this IImplementation feature)
         {
             var function = ((IEvalImplementation) feature).Function;
             if(function != null && function.IsImplicit)
                 return null;
 
-            return feature.Value;
+            return feature.Conversion;
         }
 
         internal static MetaFunction MetaFeature
             (Func<Category, ResultCache, ContextBase, CompileSyntax, Result> function)
             => _metaFunctionCache[function];
 
-        internal static TypeBase ResultType(this IValue f) => f.Result(Category.Type)?.Type;
+        internal static TypeBase ResultType(this IConversion f) => f.Result(Category.Type)?.Type;
 
-        internal static bool IsCloseRelative(IValue feature) => !(feature is IStepRelative);
+        internal static bool IsCloseRelative(IConversion feature) => !(feature is IStepRelative);
 
         public static IEnumerable<IGenericProviderForType> GenericListFromType<T>
             (this T target, IEnumerable<IGenericProviderForType> baseList = null)
@@ -102,7 +102,7 @@ namespace Reni.Feature
                 (
                     feature.Function == null
                         || !feature.Function.IsImplicit
-                        || feature.Value == null
+                        || feature.Conversion == null
                 );
 
             var valueCategory = category;
@@ -115,7 +115,7 @@ namespace Reni.Feature
                     .Result(valueCategory, context.RootContext.VoidType)
                     .ReplaceArg(context.RootContext.VoidType.Result(Category.All))
                 : right == null || feature.Function == null
-                    ? feature.Value?.Result(valueCategory)
+                    ? feature.Conversion?.Result(valueCategory)
                     : null;
 
             if(right == null)

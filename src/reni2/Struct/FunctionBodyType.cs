@@ -1,9 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
 using hw.Debug;
 using hw.Forms;
-using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -16,7 +15,7 @@ namespace Reni.Struct
     sealed class FunctionBodyType
         : TypeBase
             , IFunction
-            , IValue
+            , IConversion
             , IImplementation
     {
         [EnableDump]
@@ -25,13 +24,11 @@ namespace Reni.Struct
         [EnableDump]
         [Node]
         readonly FunctionSyntax _syntax;
-        readonly ValueCache<IContextReference> _objectReferenceCache;
 
         public FunctionBodyType(CompoundView compoundView, FunctionSyntax syntax)
         {
             _compoundView = compoundView;
             _syntax = syntax;
-            _objectReferenceCache = new ValueCache<IContextReference>(() => new ContextReference(this));
         }
 
         sealed class ContextReference : DumpableObject, IContextReference
@@ -39,6 +36,7 @@ namespace Reni.Struct
             [Node]
             readonly FunctionBodyType _parent;
             readonly int _order;
+
             public ContextReference(FunctionBodyType parent)
                 : base(parent.ObjectId)
             {
@@ -46,6 +44,7 @@ namespace Reni.Struct
                 _parent = parent;
                 StopByObjectId(-5);
             }
+
             int IContextReference.Order => _order;
             Size IContextReference.Size => Root.DefaultRefAlignParam.RefSize;
             [EnableDump]
@@ -63,7 +62,6 @@ namespace Reni.Struct
         internal override IImplementation FuncionDeclarationForType => this;
 
         bool IFunction.IsImplicit => _syntax.IsImplicit;
-        TypeBase IValue.Source => this;
 
         Result IFunction.Result(Category category, TypeBase argsType)
         {
@@ -93,9 +91,10 @@ namespace Reni.Struct
 
         IMeta IMetaImplementation.Function => null;
         IFunction IEvalImplementation.Function => this;
-        IValue IEvalImplementation.Value => this;
+        IConversion IEvalImplementation.Conversion => this;
 
-        Result IValue.Result(Category category)
+        TypeBase IConversion.Source => this;
+        Result IConversion.Result(Category category)
         {
             NotImplementedMethod(category);
             return null;

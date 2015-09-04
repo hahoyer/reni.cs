@@ -13,7 +13,7 @@ namespace Reni.Parser
         : TypeBase
             , IImplementation
             , IFunction
-            , IValue
+            , IConversion
             , IMeta
             , IContextReference
     {
@@ -22,9 +22,9 @@ namespace Reni.Parser
 
         IMeta IMetaImplementation.Function => this;
         IFunction IEvalImplementation.Function => this;
-        IValue IEvalImplementation.Value => this;
+        IConversion IEvalImplementation.Conversion => this;
         bool IFunction.IsImplicit => false;
-        TypeBase IValue.Source => this;
+        TypeBase IConversion.Source => this;
         int IContextReference.Order => ObjectId;
 
         Result IFunction.Result(Category category, TypeBase argsType)
@@ -33,7 +33,7 @@ namespace Reni.Parser
             return null;
         }
 
-        Result IValue.Result(Category category)
+        Result IConversion.Result(Category category)
         {
             NotImplementedMethod(category);
             return null;

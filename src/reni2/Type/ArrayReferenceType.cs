@@ -21,7 +21,7 @@ namespace Reni.Type
             , IForcedConversionProvider<ArrayReferenceType>
             , IRepeaterType
             , IReference
-            , IValue
+            , IConversion
     {
         internal sealed class Options : DumpableObject
         {
@@ -85,7 +85,7 @@ namespace Reni.Type
         protected override IEnumerable<IGenericProviderForType> Genericize
             => this.GenericListFromType(base.Genericize);
         [DisableDump]
-        protected override IEnumerable<IValue> RawSymmetricConversions
+        protected override IEnumerable<IConversion> RawSymmetricConversions
             => base.RawSymmetricConversions;
 
         protected override string GetNodeDump()
@@ -106,15 +106,15 @@ namespace Reni.Type
         TypeBase IRepeaterType.IndexType => RootContext.BitType.Number(Size.ToInt());
         bool IRepeaterType.IsMutable => options.IsForceMutable.Value;
 
-        IValue IReference.Converter => this;
+        IConversion IReference.Converter => this;
         bool IReference.IsWeak => false;
         Size IContextReference.Size => Size;
         int IContextReference.Order => _order;
 
-        TypeBase IValue.Source => ValueType;
-        Result IValue.Result(Category category) => DereferenceResult(category);
+        TypeBase IConversion.Source => this;
+        Result IConversion.Result(Category category) => DereferenceResult(category);
 
-        IEnumerable<IValue> IForcedConversionProvider<ArrayReferenceType>.Result
+        IEnumerable<IConversion> IForcedConversionProvider<ArrayReferenceType>.Result
             (ArrayReferenceType destination)
             => ForcedConversion(destination).NullableToArray();
 
@@ -149,7 +149,7 @@ namespace Reni.Type
         Result EnableReinterpretationResult(Category category)
             => ResultFromPointer(category, EnableReinterpretation);
 
-        IValue ForcedConversion(ArrayReferenceType destination)
+        IConversion ForcedConversion(ArrayReferenceType destination)
             =>
                 HasForcedConversion(destination)
                     ? Feature.Extension.Value

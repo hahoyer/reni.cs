@@ -51,7 +51,7 @@ namespace Reni.Type
         [DisableDump]
         protected override IEnumerable<IGenericProviderForType> Genericize => this.GenericListFromType(base.Genericize);
 
-        internal override IEnumerable<IValue> CutEnabledConversion(NumberType destination)
+        internal override IEnumerable<IConversion> CutEnabledConversion(NumberType destination)
         {
             yield return Feature.Extension.Value(category => CutEnabledBitCountConversion(category, destination), EnableCut);
         }
@@ -66,7 +66,7 @@ namespace Reni.Type
         IImplementation ISymbolProviderForPointer<TokenClasses.EnableCut>.Feature
             (TokenClasses.EnableCut tokenClass) => Feature.Extension.Value(EnableCutTokenResult);
 
-        IEnumerable<IValue> IForcedConversionProvider<NumberType>.Result(NumberType destination)
+        IEnumerable<IConversion> IForcedConversionProvider<NumberType>.Result(NumberType destination)
         {
             if(Bits <= destination.Bits)
                 yield return Feature.Extension.Value(category => destination.FlatConversion(category, this), this);

@@ -79,7 +79,7 @@ namespace Reni.Feature
             }
         }
 
-        IValue IEvalImplementation.Value
+        IConversion IEvalImplementation.Conversion
         {
             get
             {

@@ -12,7 +12,7 @@ namespace Reni.Type
     abstract class Child<TParent>
         : TypeBase
             , IProxyType
-            , IValue
+            , IConversion
         where TParent : TypeBase
     {
         protected Child(TParent parent) { Parent = parent; }
@@ -23,9 +23,9 @@ namespace Reni.Type
         [DisableDump]
         internal override Root RootContext => Parent.RootContext;
 
-        IValue IProxyType.Converter => this;
-        TypeBase IValue.Source => Parent;
-        Result IValue.Result(Category category) => ParentConversionResult(category);
+        IConversion IProxyType.Converter => this;
+        TypeBase IConversion.Source => this;
+        Result IConversion.Result(Category category) => ParentConversionResult(category);
 
         protected abstract Result ParentConversionResult(Category category);
     }
