@@ -25,7 +25,7 @@ namespace Reni.Type
         protected override bool IsMutable { get; }
 
         [DisableDump]
-        protected override TypeBase TargetType
+        protected override TypeBase ConversionSource
         {
             get
             {

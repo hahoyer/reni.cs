@@ -24,7 +24,7 @@ namespace Reni.Type
         int Position { get; }
 
         protected override bool IsMutable => View.Compound.Syntax.IsMutable(Position);
-        protected override TypeBase TargetType => View.Type;
+        protected override TypeBase ConversionSource => View.Type;
         internal override TypeBase ValueType => View.ValueType(Position);
         [DisableDump]
         internal override bool Hllw => false;

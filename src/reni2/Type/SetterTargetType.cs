@@ -13,7 +13,7 @@ namespace Reni.Type
     abstract class SetterTargetType
         : TypeBase
             , IProxyType
-            , IValue
+            , IConversion
             , IReference
             , ISymbolProvider<ReassignToken>
     {
@@ -23,11 +23,11 @@ namespace Reni.Type
 
         Size IContextReference.Size => Size;
         int IContextReference.Order => _order;
-        IValue IProxyType.Converter => this;
+        IConversion IProxyType.Converter => this;
         bool IReference.IsWeak => true;
-        IValue IReference.Converter => this;
-        TypeBase IValue.Source => TargetType;
-        Result IValue.Result(Category category) => GetterResult(category);
+        IConversion IReference.Converter => this;
+        TypeBase IConversion.Source => ConversionSource;
+        Result IConversion.Result(Category category) => GetterResult(category);
         [DisableDump]
         internal override bool IsAligningPossible => false;
         [DisableDump]
@@ -39,7 +39,7 @@ namespace Reni.Type
         [EnableDumpExcept(false)]
         protected abstract bool IsMutable { get; }
 
-        protected abstract TypeBase TargetType { get; }
+        protected abstract TypeBase ConversionSource { get; }
 
         Result ReassignResult(Category category, TypeBase right)
         {
@@ -90,10 +90,10 @@ namespace Reni.Type
         [DisableDump]
         internal override TypeBase ElementTypeForReference => ValueType.ElementTypeForReference;
 
-        protected override IEnumerable<IValue> RawSymmetricConversions { get { yield break; } }
+        protected override IEnumerable<IConversion> RawSymmetricConversions { get { yield break; } }
 
         [DisableDump]
-        internal override IEnumerable<IValue> StripConversions
+        internal override IEnumerable<IConversion> StripConversions
         {
             get { yield return Feature.Extension.Value(GetterResult); }
         }

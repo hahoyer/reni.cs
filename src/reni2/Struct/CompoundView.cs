@@ -101,7 +101,7 @@ namespace Reni.Struct
         internal Root RootContext => Compound.RootContext;
 
         [DisableDump]
-        internal IEnumerable<IValue> ConverterFeatures
+        internal IEnumerable<IConversion> ConverterFeatures
             => Compound
                 .Syntax
                 .ConverterFunctions
@@ -196,9 +196,10 @@ namespace Reni.Struct
         }
 
 
-        internal FunctionType Function(FunctionSyntax body, TypeBase argsType) => Compound
-            .RootContext
-            .FunctionInstance(this, body, argsType);
+        internal FunctionType Function(FunctionSyntax body, TypeBase argsType)
+            => Compound
+                .RootContext
+                .FunctionInstance(this, body, argsType);
 
         internal Result ObjectPointerViaContext(Category category)
         {

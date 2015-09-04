@@ -17,22 +17,22 @@ namespace Reni.Type
         static int _nextObjectId;
 
         internal readonly TypeBase Source;
-        internal readonly IValue[] Elements;
+        internal readonly IConversion[] Elements;
 
         internal ConversionPath()
-            : base(_nextObjectId++) {}
+            : base(_nextObjectId++) { }
 
         internal ConversionPath(TypeBase source)
             : this()
         {
             Source = source;
-            Elements = new IValue[0];
+            Elements = new IConversion[0];
             Tracer.Assert(IsValid);
         }
 
         internal bool IsValid => Source != null;
 
-        internal ConversionPath(params IValue[] rawElements)
+        internal ConversionPath(params IConversion[] rawElements)
             : this()
         {
             Tracer.Assert(rawElements.Any());
@@ -52,7 +52,9 @@ namespace Reni.Type
                 (
                     Types.Count() == Elements.Count() + 1,
                     () =>
-                        "\n" + Types.Select(t => t.DumpPrintText).Stringify("\n") + "\n****\n"
+                        "\n"
+                            + Types.Select(t => t.DumpPrintText).Stringify("\n")
+                            + "\n****\n"
                             + Dump()
                 );
 
@@ -64,13 +66,12 @@ namespace Reni.Type
             => Elements
                 .Select(element => element.Source)
                 .Concat(new[] {Destination})
-                .Distinct();
+                .ToArray();
 
         IEnumerable<TypeBase> TypesByDestination
             => new[] {Source}
-                .Concat
-                (Elements.Select(element => element.ResultType()))
-                .Distinct();
+                .Concat(Elements.Select(element => element.ResultType()))
+                .ToArray();
 
         IEnumerable<string> DumpConversions
             => Elements
@@ -86,9 +87,11 @@ namespace Reni.Type
         public static ConversionPath operator +(ConversionPath a, ConversionPath b)
             => new ConversionPath(a.Elements.Concat(b.Elements).ToArray());
 
-        public static IEnumerable<ConversionPath> operator +(
+        public static IEnumerable<ConversionPath> operator +
+            (
             IEnumerable<ConversionPath> a,
-            ConversionPath b)
+            ConversionPath b
+            )
             => a.Select(left => left + b);
 
         public static IEnumerable<ConversionPath> operator +(
@@ -98,13 +101,13 @@ namespace Reni.Type
 
         public static IEnumerable<ConversionPath> operator +(
             ConversionPath a,
-            IEnumerable<IValue> b)
+            IEnumerable<IConversion> b)
             => b.Select(right => a + right);
 
-        public static ConversionPath operator +(IValue a, ConversionPath b)
+        public static ConversionPath operator +(IConversion a, ConversionPath b)
             => new ConversionPath(new[] {a}.Concat(b.Elements).ToArray());
 
-        public static ConversionPath operator +(ConversionPath a, IValue b)
+        public static ConversionPath operator +(ConversionPath a, IConversion b)
             => new ConversionPath(a.Elements.Concat(new[] {b}).ToArray());
 
         internal Result Execute(Category category)
