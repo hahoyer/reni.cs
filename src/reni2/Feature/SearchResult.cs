@@ -20,7 +20,7 @@ namespace Reni.Feature
             var searchResult = feature as SearchResult;
             if(searchResult == null)
                 return new SearchResult(feature, definingItem);
-            Tracer.Assert(searchResult.ConverterPath.Source == definingItem);
+            Tracer.Assert(searchResult.Source == definingItem);
             return searchResult;
         }
 
@@ -28,9 +28,9 @@ namespace Reni.Feature
         ConversionPath ConverterPath { get; }
 
         internal SearchResult(SearchResult searchResult, ConversionPath relativeConversion)
-            : this(searchResult.Feature, searchResult.ConverterPath + relativeConversion)
+            : this(searchResult.Feature, relativeConversion + searchResult.ConverterPath)
         {
-            Tracer.Assert(searchResult.ConverterPath.Source == relativeConversion.Destination);
+            Tracer.Assert(searchResult.Source == relativeConversion.Destination);
         }
 
         SearchResult(IImplementation feature, TypeBase definingItem)
@@ -43,6 +43,9 @@ namespace Reni.Feature
             ConverterPath = converterPath;
             StopByObjectIds();
         }
+
+        [DisableDump]
+        internal TypeBase Source => ConverterPath.Source;
 
         internal Result Execute
             (
