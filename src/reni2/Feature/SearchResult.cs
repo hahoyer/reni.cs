@@ -20,7 +20,8 @@ namespace Reni.Feature
             var searchResult = feature as SearchResult;
             if(searchResult == null)
                 return new SearchResult(feature, definingItem);
-            Tracer.Assert(searchResult.Source == definingItem);
+            var source = searchResult.Source;
+            Tracer.Assert(source == definingItem);
             return searchResult;
         }
 

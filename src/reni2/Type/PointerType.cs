@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
-using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -88,13 +87,14 @@ namespace Reni.Type
 
         internal override IEnumerable<SearchResult> Declarations<TDefinable>(TDefinable tokenClass)
         {
-            var feature = (ValueType as
-                ISymbolProviderForPointer<TDefinable>)
-                ?.Feature(tokenClass);
-            var result = feature.NullableToArray().Select(f => SearchResult.Create(f, Pointer));
-            if(result.Any())
-                return result;
-            return base.Declarations(tokenClass);
+            var feature = (ValueType as ISymbolProviderForPointer<TDefinable>)?.Feature(tokenClass);
+            if(feature == null)
+                return base.Declarations(tokenClass);
+
+            return new[]
+            {
+                SearchResult.Create(feature, this)
+            };
         }
 
         Result DereferenceResult(Category category)

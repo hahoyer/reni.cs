@@ -167,12 +167,14 @@ namespace Reni.Struct
 
             var conversion = new ConversionPath(accessFeature);
 
-            return conversion.Destination.ExecuteDeclaration
+            var result = conversion.Destination.ExecuteDeclaration
                 (
                     definable,
                     searchResult => new SearchResult(searchResult, conversion), 
                     OnInheritedDeclarationError
                 );
+            Tracer.Assert(((SearchResult)result).Source == view.Type);
+            return result;
         }
 
         IImplementation OnInheritedDeclarationError(IssueId issueId)
