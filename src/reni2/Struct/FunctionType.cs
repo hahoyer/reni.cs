@@ -40,6 +40,7 @@ namespace Reni.Struct
         }
 
         protected override bool IsMutable => _setter != null;
+        [DisableDump]
         protected override TypeBase ConversionSource => _compoundView.Type;
 
         [DisableDump]

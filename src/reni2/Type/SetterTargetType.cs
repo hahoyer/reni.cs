@@ -39,6 +39,7 @@ namespace Reni.Type
         [EnableDumpExcept(false)]
         protected abstract bool IsMutable { get; }
 
+        [DisableDump]
         protected abstract TypeBase ConversionSource { get; }
 
         Result ReassignResult(Category category, TypeBase right)
