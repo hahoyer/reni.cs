@@ -173,7 +173,7 @@ namespace Reni.Struct
                     searchResult => new SearchResult(searchResult, conversion), 
                     OnInheritedDeclarationError
                 );
-            Tracer.Assert(((SearchResult)result).Source == view.Type);
+            Tracer.Assert(((SearchResult)result).Source == view.Type.Pointer);
             return result;
         }
 

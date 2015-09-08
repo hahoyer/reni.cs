@@ -52,7 +52,7 @@ namespace Reni.Struct
         }
 
         Result IConversion.Result(Category category) => Result(category);
-        TypeBase IConversion.Source => View.Type;
+        TypeBase IConversion.Source => View.Type.Pointer;
 
         Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
         {
