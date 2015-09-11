@@ -154,9 +154,9 @@ namespace Reni.Struct
         Result AccessResult(Category category, int accessPosition, int position)
         {
             var trace = Syntax.ObjectId.In()
-                && accessPosition == 3
-                && position == 3
-                && category == Category.Type;
+                && accessPosition == 2
+                && position == 2
+                && category.HasCode;
             StartMethodDump(trace, category, accessPosition, position);
             try
             {
@@ -167,7 +167,10 @@ namespace Reni.Struct
                     (category.Typed, Syntax.Statements[position]);
                 Dump(nameof(rawResult), rawResult);
                 BreakExecution();
-                var result = rawResult.SmartUn<FunctionType>().AutomaticDereferenceResult;
+                var unFunction = rawResult.SmartUn<FunctionType>();
+                Dump(nameof(unFunction), unFunction); 
+                BreakExecution();
+                var result = unFunction.AutomaticDereferenceResult;
                 return ReturnMethodDump(result);
             }
             finally

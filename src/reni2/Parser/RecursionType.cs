@@ -24,7 +24,6 @@ namespace Reni.Parser
         IFunction IEvalImplementation.Function => this;
         IValue IEvalImplementation.Value => this;
         bool IFunction.IsImplicit => false;
-        TypeBase IValue.Source => this;
         int IContextReference.Order => ObjectId;
 
         Result IFunction.Result(Category category, TypeBase argsType)

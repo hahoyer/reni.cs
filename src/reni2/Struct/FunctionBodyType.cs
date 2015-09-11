@@ -102,8 +102,6 @@ namespace Reni.Struct
             return null;
         }
 
-        TypeBase IValue.Source => this;
-
         Result IValue.Execute(Category category)
         {
             NotImplementedMethod(category);

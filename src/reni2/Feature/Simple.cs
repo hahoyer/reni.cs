@@ -25,8 +25,6 @@ namespace Reni.Feature
 
         Result IValue.Execute(Category category) => Function(category);
 
-        TypeBase IValue.Source => Source;
-
         protected override string GetNodeDump()
             => Source.DumpPrintText
                 + "-->"

@@ -52,12 +52,12 @@ namespace Reni.Struct
             }
         }
 
-        Result IConversion.Execute(Category category) => Result(category).Convert(this);
+        Result IConversion.Execute(Category category)
+            => Result(category).ConvertToConverter(View.Type.Pointer);
+
         TypeBase IConversion.Source => View.Type.Pointer;
 
         Result IValue.Execute(Category category) => Result(category);
-
-        TypeBase IValue.Source => View.Type.Pointer;
 
         Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
         {
@@ -70,7 +70,6 @@ namespace Reni.Struct
         object ResultCache.IResultProvider.Target => this;
 
         Result Result(Category category) => View.AccessViaObject(category, Position);
-
 
         CompileSyntax Statement => View
             .Compound

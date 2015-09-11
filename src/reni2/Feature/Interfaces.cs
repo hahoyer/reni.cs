@@ -73,7 +73,6 @@ namespace Reni.Feature
     interface IValue
     {
         Result Execute(Category category);
-        TypeBase Source { get; }
     }
 
     interface IFunction

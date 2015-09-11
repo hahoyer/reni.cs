@@ -27,11 +27,12 @@ namespace Reni.Type
         IConversion IProxyType.Converter => this;
         bool IReference.IsWeak => true;
         IConversion IReference.Converter => this;
-        TypeBase IValue.Source => Source;
         Result IValue.Execute(Category category) => GetterResult(category);
 
         TypeBase IConversion.Source => Source;
-        Result IConversion.Execute(Category category) => GetterResult(category).Convert(this);
+
+        Result IConversion.Execute(Category category)
+            => GetterResult(category).ConvertToConverter(Source);
 
         [DisableDump]
         internal override bool IsAligningPossible => false;

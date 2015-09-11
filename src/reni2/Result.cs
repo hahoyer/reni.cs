@@ -912,9 +912,9 @@ namespace Reni
                 .ReplaceArg(this);
         }
 
-        internal Result Convert(IValue value)
-            => (Hllw ?? false) || (!HasExts && !HasCode)
+        internal Result ConvertToConverter(TypeBase source)
+            => source.Hllw || (!HasExts && !HasCode)
                 ? this
-                : ReplaceAbsolute(value.Source.CheckedReference, value.Source.ArgResult);
+                : ReplaceAbsolute(source.CheckedReference, source.ArgResult);
     }
 }
