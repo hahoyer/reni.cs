@@ -15,6 +15,7 @@ namespace Reni.Struct
     sealed class FunctionBodyType
         : TypeBase
             , IFunction
+            , IValue
             , IConversion
             , IImplementation
     {
@@ -91,10 +92,19 @@ namespace Reni.Struct
 
         IMeta IMetaImplementation.Function => null;
         IFunction IEvalImplementation.Function => this;
-        IConversion IEvalImplementation.Conversion => this;
+        IValue IEvalImplementation.Value => this;
 
         TypeBase IConversion.Source => this;
-        Result IConversion.Result(Category category)
+
+        Result IConversion.Execute(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
+        }
+
+        TypeBase IValue.Source => this;
+
+        Result IValue.Execute(Category category)
         {
             NotImplementedMethod(category);
             return null;

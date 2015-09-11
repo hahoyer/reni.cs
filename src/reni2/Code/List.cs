@@ -4,6 +4,8 @@ using System.Linq;
 using hw.Debug;
 using hw.Forms;
 using Reni.Basics;
+using Reni.Feature;
+using Reni.Type;
 using Reni.Validation;
 
 namespace Reni.Code
@@ -49,7 +51,7 @@ namespace Reni.Code
         {
             foreach(var codeBase in Data)
             {
-                Tracer.Assert(!(codeBase is List), ()=> codeBase.Dump());
+                Tracer.Assert(!(codeBase is List), () => codeBase.Dump());
                 Tracer.Assert(!(codeBase.IsEmpty));
             }
             Tracer.Assert(Data.Length > 1);
@@ -64,8 +66,10 @@ namespace Reni.Code
         }
 
         protected override IEnumerable<CodeBase> AsList() => Data;
-        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual)
+
+        protected override TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
             => actual.List(this);
+
         [DisableDump]
         internal override IEnumerable<Issue> Issues => Data.SelectMany(data => data.Issues);
 
@@ -132,5 +136,10 @@ namespace Reni.Code
 
             return size.IsZero;
         }
+
+        internal TypeBase Visit(Visitor<TypeBase, TypeBase> argTypeVisitor)
+            => Data
+                .Select(x => x.Visit(argTypeVisitor))
+                .DistinctNotNull();
     }
 }

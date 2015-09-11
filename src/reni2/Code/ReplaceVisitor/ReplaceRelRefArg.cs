@@ -16,14 +16,16 @@ namespace Reni.Code.ReplaceVisitor
         }
 
         internal ReplaceRelRefArg(ResultCache actualArg)
-            : this(actualArg, Size.Create(0)) { }
+            : this(actualArg, Size.Create(0)) {}
 
         [EnableDump]
         Size Offset { get; }
 
         [DisableDump]
-        protected override CodeBase ActualCode => Offset.IsZero ? ActualArg.Code : ActualArg.Code.ReferencePlus(Offset);
+        protected override CodeBase ActualCode
+            => Offset.IsZero ? ActualArg.Code : ActualArg.Code.ReferencePlus(Offset);
 
-        protected override Visitor<CodeBase> After(Size size) => new ReplaceRelRefArg(ActualArg, Offset + size);
+        protected override Visitor<CodeBase, FiberItem> After(Size size)
+            => new ReplaceRelRefArg(ActualArg, Offset + size);
     }
 }

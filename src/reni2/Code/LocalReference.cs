@@ -40,7 +40,7 @@ namespace Reni.Code
 
         protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
         protected override CodeArgs GetRefsImplementation() => ValueCode.Exts + DestructorCode.Exts;
-        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual)
+        protected override TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
             => actual.LocalReference(this);
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement)

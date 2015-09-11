@@ -33,7 +33,7 @@ namespace Reni.Type
         [DisableDump]
         internal override IEnumerable<IConversion> StripConversions
         {
-            get { yield return Feature.Extension.Value(ParentConversionResult); }
+            get { yield return Feature.Extension.Conversion(ParentConversionResult); }
         }
     }
 }

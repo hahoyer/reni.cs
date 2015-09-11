@@ -40,7 +40,7 @@ namespace Reni.Feature
 
         IMeta IMetaImplementation.Function => null;
         IFunction IEvalImplementation.Function => this;
-        IConversion IEvalImplementation.Conversion => null;
+        IValue IEvalImplementation.Value => null;
     }
 
     sealed class Function : FunctionFeatureImplementation

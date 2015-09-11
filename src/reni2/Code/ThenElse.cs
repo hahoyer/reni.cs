@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Forms;
 using Reni.Basics;
+using Reni.Feature;
+using Reni.Type;
 
 namespace Reni.Code
 {
@@ -23,8 +25,7 @@ namespace Reni.Code
         internal readonly CodeBase ElseCode;
 
         internal ThenElse(CodeBase thenCode, CodeBase elseCode)
-            : this(Size.Create(1), thenCode, elseCode)
-        {}
+            : this(Size.Create(1), thenCode, elseCode) {}
 
         ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode)
             : base(_nextId++)
@@ -50,9 +51,26 @@ namespace Reni.Code
         internal override Size InputSize => _condSize;
         internal override Size OutputSize => ThenCode.Size;
         internal override bool HasArg => ThenCode.HasArg || ElseCode.HasArg;
-        protected override Size GetAdditionalTemporarySize() => ThenCode.TemporarySize.Max(ElseCode.TemporarySize).Max(OutputSize) - OutputSize;
-        protected override FiberItem VisitImplementation<TResult>(Visitor<TResult> actual) => actual.ThenElse(this);
-        internal override void Visit(IVisitor visitor) => visitor.ThenElse(_condSize, ThenCode, ElseCode);
-        internal FiberItem ReCreate(CodeBase newThen, CodeBase newElse) => new ThenElse(_condSize, newThen ?? ThenCode, newElse ?? ElseCode);
+
+        protected override Size GetAdditionalTemporarySize()
+            => ThenCode.TemporarySize.Max(ElseCode.TemporarySize).Max(OutputSize) - OutputSize;
+
+        protected override TFiber VisitImplementation<TResult, TFiber>
+            (Visitor<TResult, TFiber> actual) => actual.ThenElse(this);
+
+        internal override void Visit(IVisitor visitor)
+            => visitor.ThenElse(_condSize, ThenCode, ElseCode);
+
+        internal FiberItem ReCreate(CodeBase newThen, CodeBase newElse)
+            => new ThenElse(_condSize, newThen ?? ThenCode, newElse ?? ElseCode);
+
+        internal TypeBase Visit(Visitor<TypeBase, TypeBase> actual)
+            => new[]
+            {
+                ThenCode,
+                ElseCode
+            }
+                .Select(item => item?.Visit(actual))
+                .DistinctNotNull();
     }
 }

@@ -556,9 +556,9 @@ namespace Reni.Type
                 if(Hllw)
                     yield break;
                 if(IsAligningPossible && Align.Size != Size)
-                    yield return Feature.Extension.Value(AlignResult);
+                    yield return Feature.Extension.Conversion(AlignResult);
                 if(IsPointerPossible)
-                    yield return Feature.Extension.Value(LocalReferenceResult);
+                    yield return Feature.Extension.Conversion(LocalReferenceResult);
             }
         }
 
@@ -632,7 +632,7 @@ namespace Reni.Type
             => ExecuteDeclaration
                 (
                     definable,
-                    result => result.Execute(category, left, context, right, token),
+                    result => result.Execute(category, left, token, context, right),
                     issueId => IssueResult(token, issueId, category)
                 );
 

@@ -111,11 +111,18 @@ namespace Reni.Type
             => new ConversionPath(a.Elements.Concat(new[] {b}).ToArray());
 
         internal Result Execute(Category category)
-            =>
-                Elements.Aggregate
-                    (
-                        new ResultCache(this),
-                        (c, n) => n.Result(category.Typed).ReplaceArg(c)) & category;
+        {
+            var results = Elements
+                .Select(item => item.Result(category.Typed))
+              //  .ToArray()
+                ;
+            //Tracer.FlaggedLine("\n"+Tracer.Dump(results));
+            var result = results
+                .Aggregate(new ResultCache(this), (c, n) => n.ReplaceArg(c))
+                & category;
+            //Tracer.FlaggedLine("\n"+Tracer.Dump(results));
+            return result;
+        }
 
         object ResultCache.IResultProvider.Target => this;
 

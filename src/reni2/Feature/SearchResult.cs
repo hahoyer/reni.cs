@@ -52,9 +52,9 @@ namespace Reni.Feature
             (
             Category category,
             ResultCache left,
+            SourcePart token,
             ContextBase context,
-            CompileSyntax right,
-            SourcePart token)
+            CompileSyntax right)
         {
             var metaFeature = ((IMetaImplementation) Feature).Function;
             if(metaFeature != null)
@@ -83,7 +83,7 @@ namespace Reni.Feature
             }
         }
 
-        IConversion IEvalImplementation.Conversion
+        IValue IEvalImplementation.Value
         {
             get
             {

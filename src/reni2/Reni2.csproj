@@ -11,6 +11,7 @@
     <Compile Include="Basics\Category.cs" />
     <Compile Include="Basics\RefAlignParam.cs" />
     <Compile Include="Basics\Size.cs" />
+    <Compile Include="Code\ArgTypeVisitor.cs" />
     <Compile Include="Code\CodeContainer.cs" />
     <Compile Include="Code\CSharp_Generated.cs">
       <AutoGen>True</AutoGen>
@@ -107,6 +108,8 @@
     <Compile Include="FeatureTest\Validation\SyntaxError.cs" />
     <Compile Include="FeatureTest\Validation\UndefinedContextSymbol.cs" />
     <Compile Include="FeatureTest\Validation\UnMatchedBrackets.cs" />
+    <Compile Include="Feature\Combination.cs" />
+    <Compile Include="Feature\Conversion.cs" />
     <Compile Include="Feature\Extension.cs" />
     <Compile Include="Feature\Function.cs" />
     <Compile Include="Feature\SearchResult.cs" />

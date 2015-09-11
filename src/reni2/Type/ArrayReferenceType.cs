@@ -112,7 +112,7 @@ namespace Reni.Type
         int IContextReference.Order => _order;
 
         TypeBase IConversion.Source => this;
-        Result IConversion.Result(Category category) => DereferenceResult(category);
+        Result IConversion.Execute(Category category) => DereferenceResult(category);
 
         IEnumerable<IConversion> IForcedConversionProvider<ArrayReferenceType>.Result
             (ArrayReferenceType destination)
@@ -152,7 +152,7 @@ namespace Reni.Type
         IConversion ForcedConversion(ArrayReferenceType destination)
             =>
                 HasForcedConversion(destination)
-                    ? Feature.Extension.Value
+                    ? Feature.Extension.Conversion
                         (category => destination.ConversionResult(category, this), this)
                     : null;
 

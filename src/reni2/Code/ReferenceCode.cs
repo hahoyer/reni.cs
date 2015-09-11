@@ -18,6 +18,7 @@ namespace Reni.Code
             : base(_nextObjectId++)
         {
             _context = context;
+
             StopByObjectIds();
         }
 
@@ -27,7 +28,7 @@ namespace Reni.Code
         protected override CodeArgs GetRefsImplementation() => CodeArgs.Create(_context);
 
         protected override Size GetSize() => _context.Size;
-        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual)
+        protected override TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
             => actual.ContextRef(this);
         internal override void Visit(IVisitor visitor) => visitor.ReferenceCode(Context);
 

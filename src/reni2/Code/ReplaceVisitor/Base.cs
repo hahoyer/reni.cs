@@ -8,7 +8,7 @@ namespace Reni.Code.ReplaceVisitor
     /// <summary>
     ///     Base class for code replacements
     /// </summary>
-    abstract class Base : Visitor<CodeBase>
+    abstract class Base : Visitor<CodeBase, FiberItem>
     {
         readonly FunctionCache<LocalReference, LocalReference> _internalRefs;
 

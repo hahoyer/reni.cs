@@ -88,7 +88,7 @@ namespace Reni.Code
                         .ReferencePlus(_offset);
 
 
-            protected override Visitor<CodeBase> After(Size size)
+            protected override Visitor<CodeBase,FiberItem> After(Size size)
                 => new FinalReplacer(_offset + size,_target);
         }
 

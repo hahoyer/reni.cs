@@ -49,11 +49,14 @@ namespace Reni.Type
         [EnableDump]
         internal int Bits => Size.ToInt();
         [DisableDump]
-        protected override IEnumerable<IGenericProviderForType> Genericize => this.GenericListFromType(base.Genericize);
+        protected override IEnumerable<IGenericProviderForType> Genericize
+            => this.GenericListFromType(base.Genericize);
 
         internal override IEnumerable<IConversion> CutEnabledConversion(NumberType destination)
         {
-            yield return Feature.Extension.Value(category => CutEnabledBitCountConversion(category, destination), EnableCut);
+            yield return
+                Feature.Extension.Conversion
+                    (category => CutEnabledBitCountConversion(category, destination), EnableCut);
         }
 
         IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature
@@ -66,10 +69,13 @@ namespace Reni.Type
         IImplementation ISymbolProviderForPointer<TokenClasses.EnableCut>.Feature
             (TokenClasses.EnableCut tokenClass) => Feature.Extension.Value(EnableCutTokenResult);
 
-        IEnumerable<IConversion> IForcedConversionProvider<NumberType>.Result(NumberType destination)
+        IEnumerable<IConversion> IForcedConversionProvider<NumberType>.Result
+            (NumberType destination)
         {
             if(Bits <= destination.Bits)
-                yield return Feature.Extension.Value(category => destination.FlatConversion(category, this), this);
+                yield return
+                    Feature.Extension.Conversion
+                        (category => destination.FlatConversion(category, this), this);
         }
 
         IImplementation ISymbolProviderForPointer<Negate>.Feature(Negate tokenClass)
@@ -78,7 +84,8 @@ namespace Reni.Type
         IImplementation ISymbolProviderForPointer<TextItem>.Feature(TextItem tokenClass)
             => Feature.Extension.Value(TextItemResult);
 
-        protected override Result ParentConversionResult(Category category) => Parent.Result(category, ArgResult);
+        protected override Result ParentConversionResult(Category category)
+            => Parent.Result(category, ArgResult);
 
         protected override Size GetSize() => Parent.Size;
 
@@ -94,7 +101,10 @@ namespace Reni.Type
 
         Result NegationResult(Category category) => ((NumberType) _zeroResult.Value.Type)
             .OperationResult(category, _minusOperation, this)
-            .ReplaceAbsolute(_zeroResult.Value.Type.ForcedReference, c => _zeroResult.Value.LocalReferenceResult & (c))
+            .ReplaceAbsolute
+            (
+                _zeroResult.Value.Type.ForcedReference,
+                c => _zeroResult.Value.LocalReferenceResult & (c))
             .ReplaceArg(ObjectResult);
 
         protected override CodeBase DumpPrintCode() => Align.ArgCode.DumpPrintNumber(Align.Size);
@@ -128,7 +138,8 @@ namespace Reni.Type
             return OperationResult(category, resultType, operation.Name, right);
         }
 
-        Result OperationResult(Category category, TypeBase resultType, string operationName, NumberType right)
+        Result OperationResult
+            (Category category, TypeBase resultType, string operationName, NumberType right)
         {
             var result = resultType.Result
                 (

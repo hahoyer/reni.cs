@@ -24,15 +24,26 @@ namespace Reni.Feature
                     <Func<Category, ResultCache, ContextBase, CompileSyntax, Result>, MetaFunction>
                     (function => new MetaFunction(function));
 
+        static readonly FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Value>>
+            ValueCache
+                = new FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Value>>
+                    (
+                    function =>
+                        new FunctionCache<TypeBase, Value>(type => new Value(function, type)));
+
         static readonly FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Conversion>>
-            _simpleCache
+            ConversionCache
                 = new FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Conversion>>
                     (
                     function =>
-                        new FunctionCache<TypeBase, Conversion>(type => new Conversion(function, type)));
+                        new FunctionCache<TypeBase, Conversion>
+                            (type => new Conversion(function, type)));
 
-        internal static Conversion Value(Func<Category, Result> function, TypeBase target = null)
-            => _simpleCache[function][(target ?? function.Target as TypeBase).AssertNotNull()];
+        internal static Value Value(Func<Category, Result> function, TypeBase target = null)
+            => ValueCache[function][(target ?? function.Target as TypeBase).AssertNotNull()];
+
+        internal static Conversion Conversion(Func<Category, Result> function, TypeBase target = null)
+            => ConversionCache[function][(target ?? function.Target as TypeBase).AssertNotNull()];
 
         internal static ObjectFunction FunctionFeature
             (
@@ -52,20 +63,30 @@ namespace Reni.Feature
             => new ExtendedFunction<T>(function, arg);
 
 
-        internal static IConversion ExtendedValue(this IImplementation feature)
+        internal static IValue ExtendedValue(this IImplementation feature)
         {
             var function = ((IEvalImplementation) feature).Function;
             if(function != null && function.IsImplicit)
                 return null;
 
-            return feature.Conversion;
+            return feature.Value;
         }
 
         internal static MetaFunction MetaFeature
             (Func<Category, ResultCache, ContextBase, CompileSyntax, Result> function)
             => _metaFunctionCache[function];
 
-        internal static TypeBase ResultType(this IConversion f) => f.Result(Category.Type)?.Type;
+        internal static TypeBase ResultType(this IConversion conversion)
+            => conversion.Result(Category.Type)?.Type;
+
+        internal static Result Result(this IConversion conversion, Category category)
+        {
+            var result = conversion.Execute(category);
+            if(category.HasCode)
+                Tracer.Assert
+                    (result.Code.ArgType == conversion.Source, () => result.DebuggerDumpString);
+            return result;
+        }
 
         internal static bool IsCloseRelative(IConversion feature) => !(feature is IStepRelative);
 
@@ -102,7 +123,7 @@ namespace Reni.Feature
                 (
                     feature.Function == null
                         || !feature.Function.IsImplicit
-                        || feature.Conversion == null
+                        || feature.Value == null
                 );
 
             var valueCategory = category;
@@ -115,7 +136,7 @@ namespace Reni.Feature
                     .Result(valueCategory, context.RootContext.VoidType)
                     .ReplaceArg(context.RootContext.VoidType.Result(Category.All))
                 : right == null || feature.Function == null
-                    ? feature.Conversion?.Result(valueCategory)
+                    ? feature.Value?.Execute(valueCategory)
                     : null;
 
             if(right == null)
@@ -156,6 +177,15 @@ namespace Reni.Feature
             return feature
                 .Result(category, token, context, right)
                 .ReplaceArg(left);
+        }
+
+        internal static T DistinctNotNull<T>(this IEnumerable<T> enumerable)
+            where T : class
+        {
+            return enumerable
+                .Where(x => x != null)
+                .Distinct()
+                .SingleOrDefault();
         }
     }
 }

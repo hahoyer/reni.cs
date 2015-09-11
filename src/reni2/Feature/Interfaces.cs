@@ -13,7 +13,7 @@ namespace Reni.Feature
     interface IEvalImplementation
     {
         IFunction Function { get; }
-        IConversion Conversion { get; }
+        IValue Value { get; }
     }
 
     interface IMetaImplementation
@@ -33,7 +33,7 @@ namespace Reni.Feature
 
         IMeta IMetaImplementation.Function => null;
         IFunction IEvalImplementation.Function => this;
-        IConversion IEvalImplementation.Conversion => null;
+        IValue IEvalImplementation.Value => null;
 
         Result IFunction.Result(Category category, TypeBase argsType)
             => Result(category, argsType);
@@ -51,7 +51,7 @@ namespace Reni.Feature
     {
         IMeta IMetaImplementation.Function => this;
         IFunction IEvalImplementation.Function => null;
-        IConversion IEvalImplementation.Conversion => null;
+        IValue IEvalImplementation.Value => null;
 
         Result IMeta.Result
             (Category category, ResultCache left, ContextBase contextBase, CompileSyntax right)
@@ -61,9 +61,18 @@ namespace Reni.Feature
             (ContextBase contextBase, Category category, CompileSyntax right);
     }
 
+    /// <summary>
+    /// Provide the result as a transformation from arg of type Source
+    /// </summary>
     interface IConversion
     {
-        Result Result(Category category);
+        Result Execute(Category category);
+        TypeBase Source { get; }
+    }
+
+    interface IValue
+    {
+        Result Execute(Category category);
         TypeBase Source { get; }
     }
 
@@ -157,7 +166,7 @@ namespace Reni.Feature
 
         IMeta IMetaImplementation.Function => this;
         IFunction IEvalImplementation.Function => null;
-        IConversion IEvalImplementation.Conversion => null;
+        IValue IEvalImplementation.Value => null;
 
         Result IMeta.Result
             (Category category, ResultCache left, ContextBase contextBase, CompileSyntax right)
@@ -187,7 +196,7 @@ namespace Reni.Feature
 
         IMeta IMetaImplementation.Function => this;
         IFunction IEvalImplementation.Function => null;
-        IConversion IEvalImplementation.Conversion => null;
+        IValue IEvalImplementation.Value => null;
 
         Result IMeta.Result
             (Category category, ResultCache left, ContextBase callContext, CompileSyntax right)

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using hw.Helper;
 using System.Linq;
 using hw.Debug;
 using hw.Forms;
+using hw.Helper;
 using Reni.Basics;
+using Reni.Feature;
+using Reni.Type;
 using Reni.Validation;
 
 namespace Reni.Code
@@ -43,7 +45,7 @@ namespace Reni.Code
         }
 
         internal Fiber(FiberHead fiberHead, FiberItem fiberItem)
-            : this(fiberHead, null, fiberItem) { }
+            : this(fiberHead, null, fiberItem) {}
 
         [Node]
         internal FiberHead FiberHead => _fiberHead;
@@ -105,8 +107,9 @@ namespace Reni.Code
             return new Fiber(_fiberHead, fiberItems, null);
         }
 
-        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual)
+        protected override TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
             => actual.Fiber(this);
+
         internal override IEnumerable<Issue> Issues
             => _fiberHead
                 .Issues
@@ -129,5 +132,10 @@ namespace Reni.Code
         internal CodeBase ReCreate(CodeBase newHead, FiberItem[] newItems)
             => (newHead ?? FiberHead)
                 .AddRange(newItems.Select((x, i) => x ?? FiberItems[i]));
+
+        internal TypeBase Visit(Visitor<TypeBase, TypeBase> argTypeVisitor)
+            => new[] {FiberHead.Visit(argTypeVisitor)}
+                .Concat(FiberItems.Select(x => x.Visit(argTypeVisitor)))
+                .DistinctNotNull();
     }
 }

@@ -41,6 +41,8 @@ namespace Reni.Code
 
         [DisableDump]
         internal bool HasArg => Visit(new HasArgVisitor());
+        [DisableDump]
+        internal TypeBase ArgType => Visit(new ArgTypeVisitor());
 
         internal static CodeBase Issue(Issue issue) => new IssueCode(issue);
         internal static CodeBase BitsConst(Size size, BitsConst t) => new BitArray(size, t);
@@ -175,9 +177,9 @@ namespace Reni.Code
             return this;
         }
 
-        internal TResult Visit<TResult>(Visitor<TResult> actual) => VisitImplementation(actual);
+        internal TCode Visit<TCode,TFiber>(Visitor<TCode, TFiber> actual) => VisitImplementation(actual);
 
-        protected virtual TResult VisitImplementation<TResult>(Visitor<TResult> actual)
+        protected virtual TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
             => actual.Default(this);
 
         internal CodeBase Call(FunctionId index, Size resultSize)

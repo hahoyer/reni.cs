@@ -1,6 +1,6 @@
-using System.Linq;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using hw.Debug;
 using Reni.Basics;
 using Reni.Code;
@@ -14,6 +14,7 @@ namespace Reni.Type
         : TypeBase
             , IProxyType
             , IConversion
+            , IValue
             , IReference
             , ISymbolProvider<ReassignToken>
     {
@@ -26,8 +27,12 @@ namespace Reni.Type
         IConversion IProxyType.Converter => this;
         bool IReference.IsWeak => true;
         IConversion IReference.Converter => this;
-        TypeBase IConversion.Source => ConversionSource;
-        Result IConversion.Result(Category category) => GetterResult(category);
+        TypeBase IValue.Source => Source;
+        Result IValue.Execute(Category category) => GetterResult(category);
+
+        TypeBase IConversion.Source => Source;
+        Result IConversion.Execute(Category category) => GetterResult(category).Convert(this);
+
         [DisableDump]
         internal override bool IsAligningPossible => false;
         [DisableDump]
@@ -40,7 +45,7 @@ namespace Reni.Type
         protected abstract bool IsMutable { get; }
 
         [DisableDump]
-        protected abstract TypeBase ConversionSource { get; }
+        protected abstract TypeBase Source { get; }
 
         Result ReassignResult(Category category, TypeBase right)
         {
@@ -96,7 +101,7 @@ namespace Reni.Type
         [DisableDump]
         internal override IEnumerable<IConversion> StripConversions
         {
-            get { yield return Feature.Extension.Value(GetterResult); }
+            get { yield return Feature.Extension.Conversion(GetterResult); }
         }
     }
 }

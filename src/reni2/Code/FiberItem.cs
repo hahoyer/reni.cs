@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using Reni.Basics;
+using Reni.Type;
 using Reni.Validation;
 
 namespace Reni.Code
@@ -78,7 +79,8 @@ namespace Reni.Code
             return result;
         }
 
-        protected virtual FiberItem[] TryToCombineImplementation(FiberItem subsequentElement) => null;
+        protected virtual FiberItem[] TryToCombineImplementation(FiberItem subsequentElement)
+            => null;
 
         internal virtual CodeBase TryToCombineBack(BitArray precedingElement) => null;
         internal virtual CodeBase TryToCombineBack(TopFrameRef precedingElement) => null;
@@ -91,17 +93,22 @@ namespace Reni.Code
         internal virtual FiberItem[] TryToCombineBack(BitArrayPrefixOp precedingElement) => null;
         internal virtual FiberItem[] TryToCombineBack(BitCast preceding) => null;
         internal virtual FiberItem[] TryToCombineBack(DePointer preceding) => null;
-        internal virtual FiberItem[] TryToCombineBack(ReferencePlusConstant precedingElement) => null;
 
-        internal FiberItem Visit<TResult>(Visitor<TResult> actual) => VisitImplementation(actual);
+        internal virtual FiberItem[] TryToCombineBack(ReferencePlusConstant precedingElement)
+            => null;
 
-        protected virtual FiberItem VisitImplementation<TResult>(Visitor<TResult> actual) => null;
+        internal TFiber Visit<TCode, TFiber>(Visitor<TCode, TFiber> actual)
+            => VisitImplementation(actual);
+
+        protected virtual TFiber VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
+            => default(TFiber);
 
         internal abstract void Visit(IVisitor visitor);
 
         void IFormalCodeItem.Visit(IVisitor visitor) => Visit(visitor);
 
         protected virtual CodeArgs GetRefsImplementation() => CodeArgs.Void();
+
     }
 
     interface IFormalCodeItem

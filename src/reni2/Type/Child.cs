@@ -25,7 +25,7 @@ namespace Reni.Type
 
         IConversion IProxyType.Converter => this;
         TypeBase IConversion.Source => this;
-        Result IConversion.Result(Category category) => ParentConversionResult(category);
+        Result IConversion.Execute(Category category) => ParentConversionResult(category);
 
         protected abstract Result ParentConversionResult(Category category);
     }

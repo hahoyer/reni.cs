@@ -911,5 +911,10 @@ namespace Reni
                 .Conversion(CompleteCategory, destinationType)
                 .ReplaceArg(this);
         }
+
+        internal Result Convert(IValue value)
+            => (Hllw ?? false) || (!HasExts && !HasCode)
+                ? this
+                : ReplaceAbsolute(value.Source.CheckedReference, value.Source.ArgResult);
     }
 }

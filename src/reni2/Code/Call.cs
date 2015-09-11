@@ -58,7 +58,7 @@ namespace Reni.Code
         [DisableDump]
         internal override Size OutputSize => _resultSize;
 
-        protected override FiberItem VisitImplementation<TResult>(Visitor<TResult> actual) => actual.Call(this);
+        protected override TFiber VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual) => actual.Call(this);
 
         protected override string GetNodeDump() => base.GetNodeDump() + " FunctionId=" + FunctionId + " ArgsAndRefsSize=" + ArgsAndRefsSize;
 

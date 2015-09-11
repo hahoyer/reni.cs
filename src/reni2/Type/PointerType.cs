@@ -50,13 +50,13 @@ namespace Reni.Type
         bool IReference.IsWeak => true;
         IConversion IProxyType.Converter => this;
         TypeBase IConversion.Source => this;
-        Result IConversion.Result(Category category) => DereferenceResult(category);
+        Result IConversion.Execute(Category category) => DereferenceResult(category);
 
         [DisableDump]
         protected override IEnumerable<IConversion> RawSymmetricConversions
             =>
                 base.RawSymmetricConversions.Concat
-                    (new IConversion[] {Feature.Extension.Value(DereferenceResult)});
+                    (new IConversion[] {Feature.Extension.Conversion(DereferenceResult)});
 
         protected override string GetNodeDump() => ValueType.NodeDump + "[Pointer]";
 

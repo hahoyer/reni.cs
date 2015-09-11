@@ -41,7 +41,7 @@ namespace Reni.Struct
                     yield return converter;
 
                 if(Hllw)
-                    yield return Feature.Extension.Value(VoidConversion);
+                    yield return Feature.Extension.Conversion(VoidConversion);
             }
         }
 

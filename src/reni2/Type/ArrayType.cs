@@ -166,7 +166,7 @@ namespace Reni.Type
         [DisableDump]
         internal override IEnumerable<IConversion> StripConversions
         {
-            get { yield return Feature.Extension.Value(NoTextItemResult); }
+            get { yield return Feature.Extension.Conversion(NoTextItemResult); }
         }
 
         Result NoTextItemResult(Category category) => ResultFromPointer(category, NoTextItem);
@@ -305,7 +305,7 @@ namespace Reni.Type
             if(!HasForcedConversion(destination))
                 return null;
 
-            return Feature.Extension.Value
+            return Feature.Extension.Conversion
                 (category => destination.ConversionResult(category, this), SmartPointer);
         }
 

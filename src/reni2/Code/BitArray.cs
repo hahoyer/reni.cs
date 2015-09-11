@@ -24,7 +24,7 @@ namespace Reni.Code
         }
 
         public BitArray()
-            : this(Size.Zero, Basics.BitsConst.None()) { }
+            : this(Size.Zero, Basics.BitsConst.None()) {}
 
         protected override Size GetSize() => _size;
 
@@ -34,12 +34,15 @@ namespace Reni.Code
                 return new CodeBase[0];
             return new[] {this};
         }
-        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) => actual.BitArray(this);
+
+        protected override TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
+            => actual.BitArray(this);
 
         [DisableDump]
         internal override bool IsEmpty => Hllw;
 
-        protected override CodeBase TryToCombine(FiberItem subsequentElement) => subsequentElement.TryToCombineBack(this);
+        protected override CodeBase TryToCombine(FiberItem subsequentElement)
+            => subsequentElement.TryToCombineBack(this);
 
         internal override void Visit(IVisitor visitor) => visitor.BitsArray(Size, Data);
 
