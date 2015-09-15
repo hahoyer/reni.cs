@@ -216,7 +216,7 @@ namespace Reni.Type
         internal static IEnumerable<ConversionPath> SymmetricPathsClosure(this TypeBase source)
             =>
                 new[] {new ConversionPath(source)}.Concat
-                    (SymmetricClosureService.From(source).Select(f => new ConversionPath(f)));
+                    (source.SymmetricClosureConversions.Select(f => new ConversionPath(f)));
 
         internal static IEnumerable<ConversionPath> SymmetricPathsClosureBackwards
             (this TypeBase destination)
@@ -240,9 +240,6 @@ namespace Reni.Type
             internal static IEnumerable<ConversionPath> Result(TypeBase source)
                 => new ClosureService(source).Result();
 
-            static IEnumerable<IConversion> NextConversionStep(TypeBase source)
-                => SymmetricClosureService.From(source).Union(source.StripConversions);
-
             TypeBase Source { get; }
             List<TypeBase> _foundTypes;
             List<ConversionPath> _newPaths;
@@ -255,7 +252,7 @@ namespace Reni.Type
                 if(startFeature != null)
                     startType = startFeature.Destination;
 
-                var nextConversionStep = NextConversionStep(startType).ToArray();
+                var nextConversionStep = startType.NextConversionStep.ToArray();
                 if(nextConversionStep.Any(item => item.ResultType() == null))
                     return null;
 

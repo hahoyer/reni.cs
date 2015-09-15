@@ -7,20 +7,17 @@ namespace Reni.Type
 {
     sealed class SymmetricClosureService
     {
-        internal static IEnumerable<IConversion> From(TypeBase source)
-            => new SymmetricClosureService(source).Execute(_forward);
-
         internal static IEnumerable<IConversion> To(TypeBase source)
             => new SymmetricClosureService(source).Execute(_backward);
 
-        interface INavigator
+        internal interface INavigator
         {
             TypeBase Start(IConversion feature);
             TypeBase End(IConversion feature);
             IConversion Combine(IConversion startFeature, IConversion feature);
         }
 
-        static readonly INavigator _forward = new ForwardNavigator();
+        internal static readonly INavigator Forward = new ForwardNavigator();
         static readonly INavigator _backward = new BackwardNavigator();
 
         TypeBase Source { get; }
@@ -28,7 +25,7 @@ namespace Reni.Type
         List<TypeBase> _foundTypes;
         List<IConversion> _newFeatures;
 
-        SymmetricClosureService(TypeBase source)
+        internal SymmetricClosureService(TypeBase source)
         {
             Source = source;
             AllFeatures = source
@@ -56,7 +53,7 @@ namespace Reni.Type
             }
         }
 
-        IEnumerable<IConversion> Execute(INavigator navigator)
+        internal IEnumerable<IConversion> Execute(INavigator navigator)
         {
             _foundTypes = new List<TypeBase>();
             _newFeatures = new List<IConversion>();
