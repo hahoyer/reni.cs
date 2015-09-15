@@ -40,26 +40,65 @@ namespace Reni.Type
             Tracer.Assert(IsValid);
             Elements = rawElements.RemoveCircles().ToArray();
 
+            AssertValid();
+            StopByObjectId(-284);
+        }
+
+        void AssertValid()
+        {
             if(Elements.Any())
-                Tracer.Assert(Source == Elements.First().Source);
+                Tracer.Assert
+                    (
+                        Source == Elements.First().Source,
+                        () =>
+                            "Wrong source type: "
+                                + Source
+                                + " should be: "
+                                + Elements.First().Source);
 
             Tracer.Assert
                 (
-                    Types.Merge(TypesByDestination, item => item)
-                        .All(item => item.Item2 == item.Item3));
-            //if(false)
-            Tracer.Assert
-                (
-                    Types.Count() == Elements.Count() + 1,
-                    () =>
-                        "\n"
-                            + Types.Select(t => t.DumpPrintText).Stringify("\n")
-                            + "\n****\n"
-                            + Dump()
+                    Types.Count() == Types.Distinct().Count(),
+                    () => "Cyclic conversion:\n"
+                        + Types.Select(t => t.DumpPrintText).Stringify("\n")
+                        + "\n****\n"
+                        + Dump()
                 );
 
+            var typesByDestination = TypesByDestination.ToArray();
 
-            StopByObjectId(-284);
+            var merge = Types.Select
+                (
+                    (item, index) => new
+                    {
+                        index,
+                        type = item,
+                        typeDestination = typesByDestination[index]
+                    }
+                )
+                .Where(item => item.type != item.typeDestination)
+                .ToArray();
+
+            Tracer.Assert
+                (
+                    !merge.Any(),
+                    () =>
+                        "Inconsistent path:\n"
+                            + Source.Dump()
+                            + "\n"
+                            + Tracer.Dump
+                                (
+                                    Elements.Select
+                                        (
+                                            item => new
+                                            {
+                                                item.Source,
+                                                Destination = item.ResultType()
+                                            }
+                                        )
+                                        .ToArray()
+                                )
+                );
         }
 
         IEnumerable<TypeBase> Types
@@ -114,7 +153,7 @@ namespace Reni.Type
         {
             var results = Elements
                 .Select(item => item.Result(category.Typed))
-              //  .ToArray()
+                //  .ToArray()
                 ;
             //Tracer.FlaggedLine("\n"+Tracer.Dump(results));
             var result = results

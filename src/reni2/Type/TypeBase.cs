@@ -674,6 +674,14 @@ namespace Reni.Type
                 return null;
             }
         }
+
+        [DisableDump]
+        internal IEnumerable<IConversion> NextConversionStep
+            => SymmetricClosureConversions.Union(StripConversions);
+
+        [DisableDump]
+        internal IEnumerable<IConversion> SymmetricClosureConversions
+            => new SymmetricClosureService(this).Execute(SymmetricClosureService.Forward);
     }
 
 

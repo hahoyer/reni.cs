@@ -18,7 +18,6 @@ namespace Reni.Code
             : base(_nextObjectId++)
         {
             _context = context;
-
             StopByObjectIds();
         }
 

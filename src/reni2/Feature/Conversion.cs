@@ -19,8 +19,9 @@ namespace Reni.Feature
             Tracer.Assert(Source != null);
         }
 
+        Func<Category, Result> Function { get; }
+
         [EnableDump]
-        internal Func<Category, Result> Function { get; }
         TypeBase Source { get; }
 
         Result IConversion.Execute(Category category) => Function(category);
