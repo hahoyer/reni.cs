@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using hw.Helper;
 using System.Linq;
 using hw.Debug;
 using hw.Forms;
+using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -11,7 +11,6 @@ using Reni.Feature;
 using Reni.Parser;
 using Reni.TokenClasses;
 using Reni.Type;
-
 
 namespace Reni.Struct
 {
@@ -42,13 +41,16 @@ namespace Reni.Struct
             _typeCache = new ValueCache<CompoundType>(() => new CompoundType(this));
 
             _accessFeaturesCache
-                = new FunctionCache<int, AccessFeature>(position => new AccessFeature(this, position));
+                = new FunctionCache<int, AccessFeature>
+                    (position => new AccessFeature(this, position));
 
             _fieldAccessTypeCache
-                = new FunctionCache<int, FieldAccessType>(position => new FieldAccessType(this, position));
+                = new FunctionCache<int, FieldAccessType>
+                    (position => new FieldAccessType(this, position));
 
             _functionBodyTypeCache
-                = new FunctionCache<FunctionSyntax, FunctionBodyType>(syntax => new FunctionBodyType(this, syntax));
+                = new FunctionCache<FunctionSyntax, FunctionBodyType>
+                    (syntax => new FunctionBodyType(this, syntax));
 
             StopByObjectId(-313);
         }
@@ -105,7 +107,7 @@ namespace Reni.Struct
             => Compound
                 .Syntax
                 .ConverterFunctions
-                .Select(body => Function(body, RootContext.VoidType));
+                .Select(ConversionFunction);
 
         public string DumpPrintTextOfType
             => Compound
@@ -195,6 +197,15 @@ namespace Reni.Struct
             return target.ReplaceAbsolute(reference, ObjectPointerViaContext);
         }
 
+        FunctionType ConversionFunction(FunctionSyntax body)
+        {
+            var result = Function(body, RootContext.VoidType);
+            var conversion = ((IConversion) result);
+            var source = conversion.Source;
+            Tracer.Assert(source == Type, source.Dump);
+            Tracer.Assert(source == conversion.Result(Category.Code).Code.ArgType);
+            return result;
+        }
 
         internal FunctionType Function(FunctionSyntax body, TypeBase argsType)
             => Compound
