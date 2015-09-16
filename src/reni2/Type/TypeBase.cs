@@ -589,7 +589,8 @@ namespace Reni.Type
 
         [DisableDump]
         internal virtual IEnumerable<IConversion> StripConversions { get { yield break; } }
-
+        [DisableDump]
+        internal virtual IEnumerable<IConversion> StripConversionsFromPointer { get { yield break; } }
 
         internal virtual IEnumerable<IConversion> CutEnabledConversion(NumberType destination)
         {
@@ -682,6 +683,7 @@ namespace Reni.Type
         [DisableDump]
         internal IEnumerable<IConversion> SymmetricClosureConversions
             => new SymmetricClosureService(this).Execute(SymmetricClosureService.Forward);
+
     }
 
 
