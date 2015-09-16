@@ -39,8 +39,15 @@ namespace Reni.Struct
             {
                 foreach(var converter in View.ConverterFeatures)
                     yield return converter;
+            }
+        }
 
-                if(Hllw)
+        [DisableDump]
+        internal override IEnumerable<IConversion> StripConversions
+        {
+            get
+            {
+                if (Hllw)
                     yield return Feature.Extension.Conversion(VoidConversion);
             }
         }
