@@ -418,6 +418,9 @@ namespace Reni.Type
             return null;
         }
 
+        internal Result Mutation(Category category, TypeBase destination) 
+            => destination.Result(category, ArgResult);
+
         internal virtual Result ConstructorResult(Category category, TypeBase argsType)
         {
             StartMethodDump(false, category, argsType);

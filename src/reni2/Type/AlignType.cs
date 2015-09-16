@@ -34,7 +34,7 @@ namespace Reni.Type
         [DisableDump]
         internal override IReference ForcedReference => Parent.ForcedReference;
 
-        protected override Result DeAlign(Category category) => Parent.Result(category, ArgResult);
+        protected override Result DeAlign(Category category) => Mutation(category, Parent);
         protected override PointerType ForcedPointerForCache() => Parent.ForcedPointer;
 
         protected override IEnumerable<IConversion> RawSymmetricConversions
