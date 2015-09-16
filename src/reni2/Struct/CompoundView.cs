@@ -197,14 +197,37 @@ namespace Reni.Struct
             return target.ReplaceAbsolute(reference, ObjectPointerViaContext);
         }
 
-        FunctionType ConversionFunction(FunctionSyntax body)
+        IConversion ConversionFunction(FunctionSyntax body)
         {
-            var result = Function(body, RootContext.VoidType);
-            var conversion = ((IConversion) result);
-            var source = conversion.Source;
-            Tracer.Assert(source == Type, source.Dump);
-            Tracer.Assert(source == conversion.Result(Category.Code).Code.ArgType);
+            IConversion result = new ConverterAccess(Function(body, RootContext.VoidType), Type);
+            var source = result.Source;
+            Tracer.Assert(source == Type.Pointer, source.Dump);
+            Tracer.Assert(source == result.Result(Category.Code).Code.ArgType);
             return result;
+        }
+
+        sealed class ConverterAccess : DumpableObject, IConversion
+        {
+            [EnableDump]
+            readonly FunctionType Parent;
+            [EnableDump]
+            readonly CompoundType Type;
+
+            public ConverterAccess(FunctionType parent, CompoundType type)
+            {
+                Parent = parent;
+                Type = type;
+            }
+
+            Result IConversion.Execute(Category category)
+            {
+                var innerResult = ((IConversion) Parent).Execute(category);
+                var conversion = Parent.Result(category.Typed, Type.Pointer.ArgResult);
+                var result = innerResult.ReplaceArg(conversion);
+                return result;
+            }
+
+            TypeBase IConversion.Source => Type.Pointer;
         }
 
         internal FunctionType Function(FunctionSyntax body, TypeBase argsType)
