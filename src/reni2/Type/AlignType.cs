@@ -23,7 +23,8 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        internal override string DumpPrintText => "(" + Parent.DumpPrintText + ")" + AlignToken.TokenId + _alignBits;
+        internal override string DumpPrintText
+            => "(" + Parent.DumpPrintText + ")" + AlignToken.TokenId + _alignBits;
 
         [DisableDump]
         internal override IReference CheckedReference => Parent.CheckedReference;
@@ -34,11 +35,13 @@ namespace Reni.Type
         [DisableDump]
         internal override IReference ForcedReference => Parent.ForcedReference;
 
-        protected override Result DeAlign(Category category) => Mutation(category, Parent);
+        protected override Result DeAlign(Category category) => Mutation(Parent) & category;
         protected override PointerType ForcedPointerForCache() => Parent.ForcedPointer;
 
         protected override IEnumerable<IConversion> RawSymmetricConversions
-            => base.RawSymmetricConversions.Concat(new IConversion[] {Feature.Extension.Conversion(UnalignedResult)});
+            =>
+                base.RawSymmetricConversions.Concat
+                    (new IConversion[] {Feature.Extension.Conversion(UnalignedResult)});
 
         [DisableDump]
         internal override bool IsAligningPossible => false;
@@ -46,14 +49,24 @@ namespace Reni.Type
         internal override bool IsPointerPossible => false;
 
         protected override Size GetSize() => Parent.Size.Align(_alignBits);
-        internal override int? SmartArrayLength(TypeBase elementType) => Parent.SmartArrayLength(elementType);
+
+        internal override int? SmartArrayLength(TypeBase elementType)
+            => Parent.SmartArrayLength(elementType);
+
         internal override Result Destructor(Category category) => Parent.Destructor(category);
         internal override Result Copier(Category category) => Parent.Copier(category);
-        internal override Result ApplyTypeOperator(Result argResult) => Parent.ApplyTypeOperator(argResult);
+
+        internal override Result ApplyTypeOperator(Result argResult)
+            => Parent.ApplyTypeOperator(argResult);
+
         protected override string GetNodeDump() => base.GetNodeDump() + "(" + Parent.NodeDump + ")";
 
-        protected override Result ParentConversionResult(Category category) => UnalignedResult(category);
+        protected override Result ParentConversionResult(Category category)
+            => UnalignedResult(category);
 
-        public Result UnalignedResult(Category category) { return Parent.Result(category, () => ArgCode.BitCast(Parent.Size)); }
+        public Result UnalignedResult(Category category)
+        {
+            return Parent.Result(category, () => ArgCode.BitCast(Parent.Size));
+        }
     }
 }

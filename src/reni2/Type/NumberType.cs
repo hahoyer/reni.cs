@@ -85,7 +85,7 @@ namespace Reni.Type
             => Feature.Extension.Value(TextItemResult);
 
         protected override Result ParentConversionResult(Category category)
-            => Mutation(category, Parent);
+            => Mutation(Parent) & category;
 
         protected override Size GetSize() => Parent.Size;
 
@@ -180,7 +180,7 @@ namespace Reni.Type
         Result CutEnabledBitCountConversion(Category category, NumberType destination)
         {
             if(Bits == destination.Bits)
-                return EnableCut.Mutation(category, this);
+                return EnableCut.Mutation(this) & category;
 
             return destination
                 .Result

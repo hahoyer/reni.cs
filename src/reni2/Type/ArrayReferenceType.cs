@@ -174,7 +174,7 @@ namespace Reni.Type
         }
 
         Result ConversionResult(Category category, ArrayReferenceType source)
-            => source.Mutation(category, this);
+            => source.Mutation(this) & category;
 
         internal Result ConversionResult(Category category, ArrayType source)
         {
@@ -182,7 +182,7 @@ namespace Reni.Type
             StartMethodDump(trace, category, source);
             try
             {
-                return ReturnMethodDump(source.Pointer.Mutation(category, this));
+                return ReturnMethodDump(source.Pointer.Mutation(this) & category);
             }
             finally
             {

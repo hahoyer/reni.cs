@@ -167,7 +167,7 @@ namespace Reni.Struct
             if(resultType.Hllw)
                 return resultType.Result(category);
 
-            return Type.SmartPointer.Mutation(category, resultType);
+            return Type.SmartPointer.Mutation(resultType) & category;
         }
 
         internal Result AccessViaObject(Category category, int position)
@@ -221,7 +221,7 @@ namespace Reni.Struct
             Result IConversion.Execute(Category category)
             {
                 var innerResult = ((IConversion) Parent).Execute(category);
-                var conversion = Type.Pointer.Mutation(category, Parent);
+                var conversion = Type.Pointer.Mutation(Parent);
                 var result = innerResult.ReplaceArg(conversion);
                 return result;
             }

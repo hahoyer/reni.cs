@@ -36,6 +36,9 @@ namespace Reni.Type
             public readonly FunctionCache<TypeBase, Pair> Pair;
             [Node]
             [SmartNode]
+            public readonly FunctionCache<TypeBase, ResultCache> Mutation;
+            [Node]
+            [SmartNode]
             public readonly ValueCache<IReference> ForcedReference;
             [Node]
             [SmartNode]
@@ -60,6 +63,11 @@ namespace Reni.Type
             public Cache(TypeBase parent)
             {
                 EnableCut = new ValueCache<EnableCut>(() => new EnableCut(parent));
+                Mutation = new FunctionCache<TypeBase, ResultCache>
+                    (
+                    destination =>
+                        new ResultCache(category => parent.Mutation(category, destination))
+                    );
                 ForcedReference = new ValueCache<IReference>(parent.ForcedReferenceForCache);
                 ForcedPointer = new ValueCache<PointerType>(parent.ForcedPointerForCache);
                 Pair = new FunctionCache<TypeBase, Pair>(first => new Pair(first, parent));
@@ -418,8 +426,11 @@ namespace Reni.Type
             return null;
         }
 
-        internal Result Mutation(Category category, TypeBase destination) 
+        Result Mutation(Category category, TypeBase destination)
             => destination.Result(category, ArgResult);
+
+        internal ResultCache Mutation(TypeBase destination)
+            => _cache.Mutation[destination];
 
         internal virtual Result ConstructorResult(Category category, TypeBase argsType)
         {
@@ -592,8 +603,12 @@ namespace Reni.Type
 
         [DisableDump]
         internal virtual IEnumerable<IConversion> StripConversions { get { yield break; } }
+
         [DisableDump]
-        internal virtual IEnumerable<IConversion> StripConversionsFromPointer { get { yield break; } }
+        internal virtual IEnumerable<IConversion> StripConversionsFromPointer
+        {
+            get { yield break; }
+        }
 
         internal virtual IEnumerable<IConversion> CutEnabledConversion(NumberType destination)
         {
@@ -641,7 +656,10 @@ namespace Reni.Type
                 );
 
         internal TResult ExecuteDeclaration<TResult>
-            (Definable definable, Func<SearchResult, TResult> execute, Func<IssueId, TResult> onError)
+            (
+            Definable definable,
+            Func<SearchResult, TResult> execute,
+            Func<IssueId, TResult> onError)
         {
             var searchResults
                 = DeclarationsForTypeAndCloseRelatives(definable)
@@ -686,7 +704,6 @@ namespace Reni.Type
         [DisableDump]
         internal IEnumerable<IConversion> SymmetricClosureConversions
             => new SymmetricClosureService(this).Execute(SymmetricClosureService.Forward);
-
     }
 
 

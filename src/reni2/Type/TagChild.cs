@@ -29,7 +29,7 @@ namespace Reni.Type
         internal override sealed Result ArrayCopier(Category category) => Parent.ArrayCopier(category);
 
          protected override Result ParentConversionResult(Category category)
-            => Mutation(category, Parent);
+            => Mutation(Parent) & category;
 
         [DisableDump]
         internal override IEnumerable<IConversion> StripConversions

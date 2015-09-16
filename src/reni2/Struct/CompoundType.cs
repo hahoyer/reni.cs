@@ -45,7 +45,7 @@ namespace Reni.Struct
             }
         }
 
-        Result VoidConversion(Category category) => Mutation(category,RootContext.VoidType);
+        Result VoidConversion(Category category) => Mutation(RootContext.VoidType) & category;
 
         IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature
             (DumpPrintToken tokenClass)
