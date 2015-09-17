@@ -42,6 +42,7 @@ namespace Reni.FeatureTest
     [ArrayElementType]
     [ArrayReferenceAll]
     [Simple]
+    [MixIn.Function]
     public sealed class Text1 : TextStruct {}
 
     [UnitTest]
