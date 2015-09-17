@@ -28,6 +28,7 @@ namespace Reni.ParserTest
 
             IParser<Syntax> parser = new PrioParser<Syntax>
                 (prioTable, new Scanner<Syntax>(Lexer.Instance, new SimpleTokenFactory()));
+            parser.Trace = true;
             return parser.Execute(new Source(code) + 0);
         }
 
@@ -49,13 +50,17 @@ namespace Reni.ParserTest
         internal abstract class TokenClass
             : DumpableObject, IType<Syntax>, IUniqueIdProvider, Scanner<Syntax>.IType
         {
+            readonly string Id;
+
+            protected TokenClass(string id) { Id = id; }
+
             Syntax IType<Syntax>.Create(Syntax left, IToken token, Syntax right)
                 => Create(left, token, right);
+
             string IType<Syntax>.PrioTableId => Id;
             IType<Syntax> IType<Syntax>.NextTypeIfMatched => NextTypeIfMatched;
-            internal virtual IType<Syntax> NextTypeIfMatched => null;
+            protected virtual IType<Syntax> NextTypeIfMatched => null;
             protected abstract Syntax Create(Syntax left, IToken token, Syntax right);
-            public string Id { get; }
             string IUniqueIdProvider.Value => Id;
 
             ISubParser<Syntax> Scanner<Syntax>.IType.NextParser => null;
@@ -98,12 +103,14 @@ namespace Reni.ParserTest
             {
                 readonly Syntax _left;
                 readonly Syntax _right;
+
                 public InfixSyntax(Syntax left, IToken token, Syntax right)
                     : base(token)
                 {
                     _left = left;
                     _right = right;
                 }
+
                 protected override IGraphTarget Right => _right;
                 protected override IGraphTarget Left => _left;
             }
@@ -111,16 +118,20 @@ namespace Reni.ParserTest
             sealed class SuffixSyntax : Syntax
             {
                 readonly Syntax _left;
+
                 public SuffixSyntax(Syntax left, IToken token)
                     : base(token) { _left = left; }
+
                 protected override IGraphTarget Left => _left;
             }
 
             sealed class PrefixSyntax : Syntax
             {
                 readonly Syntax _right;
+
                 public PrefixSyntax(IToken token, Syntax right)
                     : base(token) { _right = right; }
+
                 protected override IGraphTarget Right => _right;
             }
 
@@ -128,14 +139,17 @@ namespace Reni.ParserTest
             {
                 public TerminalSyntax(IToken token)
                     : base(token) { }
+
                 internal override Syntax ParenthesisMatch(IToken token, Syntax argument)
                     => CreateSyntax(null, Token, argument);
             }
 
             internal virtual Syntax Match(int level, IToken token)
                 => new InfixSyntax(this, token, null);
+
             internal virtual Syntax ParenthesisMatch(IToken token, Syntax argument)
                 => CreateSyntax(this, token, argument);
+
             SourcePart ISourcePart.All { get { return Token.SourcePart; } }
         }
     }

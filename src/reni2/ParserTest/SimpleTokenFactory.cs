@@ -14,15 +14,19 @@ namespace Reni.ParserTest
         {
             throw new Exception("Syntax error: " + message);
         }
+
         protected override IEnumerable<Services.TokenClass> GetPredefinedTokenClasses()
             => new Services.TokenClass[]
             {
-                new OpenToken(1),
-                new OpenToken(3),
-                new CloseToken(1),
-                new CloseToken(3)
+                new OpenToken("{", 1),
+                new OpenToken("(", 3),
+                new CloseToken("}", 1),
+                new CloseToken(")", 3)
             };
-        protected override Services.TokenClass GetEndOfText() => new CloseToken(0);
+
+        protected override Services.TokenClass GetEndOfText()
+            => new CloseToken(PrioTable.EndOfText, 0);
+
         protected override Services.TokenClass GetTokenClass(string name) => CommonTokenClass;
         protected override Services.TokenClass GetNumber() => CommonTokenClass;
         protected override Services.TokenClass GetText() => CommonTokenClass;
@@ -33,13 +37,22 @@ namespace Reni.ParserTest
             protected override Services.Syntax Create
                 (Services.Syntax left, IToken token, Services.Syntax right)
                 => Services.Syntax.CreateSyntax(left, token, right);
+
+            public AnyTokenClass()
+                : base(PrioTable.Any) {}
         }
 
         sealed class CloseToken : Services.TokenClass
         {
             [EnableDump]
             readonly int _level;
-            public CloseToken(int level) { _level = level; }
+
+            public CloseToken(string id, int level)
+                : base(id)
+            {
+                _level = level;
+            }
+
             protected override Services.Syntax Create
                 (Services.Syntax left, IToken token, Services.Syntax right)
             {
@@ -52,7 +65,13 @@ namespace Reni.ParserTest
         {
             [EnableDump]
             readonly int _level;
-            public OpenToken(int level) { _level = level; }
+
+            public OpenToken(string id, int level)
+                : base(id)
+            {
+                _level = level;
+            }
+
             protected override Services.Syntax Create
                 (Services.Syntax left, IToken token, Services.Syntax right)
                 => new OpenSyntax(left, token, right, _level);
@@ -64,6 +83,7 @@ namespace Reni.ParserTest
             readonly Services.Syntax _right;
             [EnableDump]
             readonly int _level;
+
             public OpenSyntax
                 (Services.Syntax left, IToken token, Services.Syntax right, int level)
                 : base(token)
@@ -72,8 +92,10 @@ namespace Reni.ParserTest
                 _right = right;
                 _level = level;
             }
+
             protected override IGraphTarget Left => _left;
             protected override IGraphTarget Right => _right;
+
             internal override Services.Syntax Match(int level, IToken token)
             {
                 Tracer.Assert(_level == level);
