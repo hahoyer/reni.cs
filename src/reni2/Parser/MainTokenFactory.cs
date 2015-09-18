@@ -17,42 +17,42 @@ namespace Reni.Parser
         {
             get
             {
-                var x = PrioTable.Left(PrioTable.Any);
-                x += PrioTable.Left
+                var result = PrioTable.Left(PrioTable.Any);
+                result += PrioTable.Left
                     (
                         AtToken.TokenId,
                         "_N_E_X_T_",
                         ToNumberOfBase.TokenId
                     );
 
-                x += PrioTable.Left(ConcatArrays.TokenId, ConcatArrays.MutableId);
+                result += PrioTable.Left(ConcatArrays.TokenId, ConcatArrays.MutableId);
 
-                x += PrioTable.Left(Star.TokenId, Slash.TokenId, "\\");
-                x += PrioTable.Left(Plus.TokenId, Minus.TokenId);
+                result += PrioTable.Left(Star.TokenId, Slash.TokenId, "\\");
+                result += PrioTable.Left(Plus.TokenId, Minus.TokenId);
 
-                x += PrioTable.Left
+                result += PrioTable.Left
                     (
                         CompareOperation.TokenId(),
                         CompareOperation.TokenId(canBeEqual: true),
                         CompareOperation.TokenId(false),
                         CompareOperation.TokenId(false, true)
                     );
-                x += PrioTable.Left(EqualityOperation.TokenId(false), EqualityOperation.TokenId());
+                result += PrioTable.Left(EqualityOperation.TokenId(false), EqualityOperation.TokenId());
 
-                x += PrioTable.Right(ReassignToken.TokenId);
+                result += PrioTable.Right(ReassignToken.TokenId);
 
-                x = x.ThenElseLevel(ThenToken.TokenId, ElseToken.TokenId);
-                x += PrioTable.Right(Exclamation.TokenId);
-                x += PrioTable.Left
+                result = result.ThenElseLevel(ThenToken.TokenId, ElseToken.TokenId);
+                result += PrioTable.Right(Exclamation.TokenId);
+                result += PrioTable.Left
                     (
                         Function.TokenId(),
                         Function.TokenId(true),
                         Function.TokenId(isMetaFunction: true));
-                x += PrioTable.Right(Colon.TokenId);
-                x += PrioTable.Right(List.TokenId(0));
-                x += PrioTable.Right(List.TokenId(1));
-                x += PrioTable.Right(List.TokenId(2));
-                x = x.ParenthesisLevelLeft
+                result += PrioTable.Right(Colon.TokenId);
+                result += PrioTable.Right(List.TokenId(0));
+                result += PrioTable.Right(List.TokenId(1));
+                result += PrioTable.Right(List.TokenId(2));
+                result = result.ParenthesisLevelLeft
                     (
                         new[]
                         {
@@ -67,17 +67,17 @@ namespace Reni.Parser
                             RightParenthesis.TokenId(3)
                         }
                     );
-                x.Correct("(", PrioTable.Any, '-');
-                x.Correct("[", PrioTable.Any, '-');
-                x.Correct("{", PrioTable.Any, '-');
+                result.Correct("(", PrioTable.Any, '-');
+                result.Correct("[", PrioTable.Any, '-');
+                result.Correct("{", PrioTable.Any, '-');
 
-                x += PrioTable.Right(PrioTable.Error);
+                result += PrioTable.Right(PrioTable.Error);
 
-                x = x.ParenthesisLevelLeft
+                result = result.ParenthesisLevelLeft
                     (new[] {PrioTable.BeginOfText}, new[] {PrioTable.EndOfText});
 
                 //Tracer.FlaggedLine("\n"+x.ToString());
-                return x;
+                return result;
             }
         }
 
