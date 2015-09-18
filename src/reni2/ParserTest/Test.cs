@@ -79,5 +79,23 @@ aa)#dump_print
                     @"((<< 5)(3)) dump_print",
                     expectedResult: c => syntaxPrototype.AssertLike(c.SourceSyntax));
         }
+
+        [UnitTest]
+        [Test]
+        public void MoreBrackets()
+        {
+            var syntaxPrototype =
+                LikeSyntax
+                    .Expression(null, "this", LikeSyntax.Null)
+                    .Expression(null, LikeSyntax.Number(3))
+                    .dump_print;
+            Parameters.ParseOnly = true;
+            Parameters.TraceOptions.Parser = false;
+            CreateFileAndRunCompiler
+                (
+                    "MoreBrackets",
+                    @"this()(3) dump_print",
+                    expectedResult: c => syntaxPrototype.AssertLike(c.SourceSyntax));
+        }
     }
 }
