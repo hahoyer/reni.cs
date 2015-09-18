@@ -27,19 +27,18 @@ namespace Reni.ParserTest
         protected override Services.TokenClass GetEndOfText()
             => new CloseToken(PrioTable.EndOfText, 0);
 
-        protected override Services.TokenClass GetTokenClass(string name) => CommonTokenClass;
+        protected override Services.TokenClass GetTokenClass(string name) => new AnyTokenClass(name);
         protected override Services.TokenClass GetNumber() => CommonTokenClass;
         protected override Services.TokenClass GetText() => CommonTokenClass;
         static Services.TokenClass CommonTokenClass => new AnyTokenClass();
 
         sealed class AnyTokenClass : Services.TokenClass
         {
-            protected override Services.Syntax Create
-                (Services.Syntax left, IToken token, Services.Syntax right)
-                => Services.Syntax.CreateSyntax(left, token, right);
-
             public AnyTokenClass()
                 : base(PrioTable.Any) {}
+
+            public AnyTokenClass(string id)
+                : base(id) {}
         }
 
         sealed class CloseToken : Services.TokenClass
@@ -53,11 +52,11 @@ namespace Reni.ParserTest
                 _level = level;
             }
 
-            protected override Services.Syntax Create
+            protected Services.Syntax CreateX
                 (Services.Syntax left, IToken token, Services.Syntax right)
             {
                 Tracer.Assert(right == null);
-                return left == null ? null : left.Match(_level, token);
+                return left?.Match(_level, token);
             }
         }
 
@@ -72,7 +71,7 @@ namespace Reni.ParserTest
                 _level = level;
             }
 
-            protected override Services.Syntax Create
+            protected Services.Syntax CreateX
                 (Services.Syntax left, IToken token, Services.Syntax right)
                 => new OpenSyntax(left, token, right, _level);
         }
