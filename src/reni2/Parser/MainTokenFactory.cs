@@ -67,9 +67,9 @@ namespace Reni.Parser
                             RightParenthesis.TokenId(3)
                         }
                     );
-                //x.Correct("(", PrioTable.Any, '-');
-                //x.Correct("[", PrioTable.Any, '-');
-                //x.Correct("{", PrioTable.Any, '-');
+                x.Correct("(", PrioTable.Any, '-');
+                x.Correct("[", PrioTable.Any, '-');
+                x.Correct("{", PrioTable.Any, '-');
 
                 x += PrioTable.Right(PrioTable.Error);
 
