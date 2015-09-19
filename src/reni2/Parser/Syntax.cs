@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
-using hw.Helper;
 using System.Linq;
 using hw.Debug;
+using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
-using Reni.Context;
 using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Validation;
@@ -22,7 +21,7 @@ namespace Reni.Parser
         protected Syntax() { }
 
         protected Syntax(int objectId)
-            : base(objectId) { }
+            : base(objectId) {}
 
         [DisableDump]
         internal virtual Checked<CompileSyntax> ContainerStatementToCompileSyntax
@@ -31,9 +30,17 @@ namespace Reni.Parser
         [DisableDump]
         internal abstract Checked<CompileSyntax> ToCompiledSyntax { get; }
 
-        internal virtual IEnumerable<KeyValuePair<string, int>> GetDeclarations(int index) { yield break; }
+        internal virtual IEnumerable<KeyValuePair<string, int>> GetDeclarations(int index)
+        {
+            yield break;
+        }
+
         internal virtual IEnumerable<string> GetDeclarations() { yield break; }
-        internal virtual IEnumerable<Syntax> GetMixins(CompoundView context, int position) { yield break; }
+
+        internal virtual IEnumerable<Syntax> GetMixins(CompoundView context, int position)
+        {
+            yield break;
+        }
 
         internal Checked<Syntax> CreateThenSyntax(CompileSyntax condition)
         {
@@ -94,13 +101,13 @@ namespace Reni.Parser
         internal virtual bool IsMixInSyntax => false;
 
         internal virtual Checked<Syntax> SuffixedBy(Definable definable, SourcePart token)
-        {
-            var left = ToCompiledSyntax;
-            return new Checked<Syntax>
-                (new ExpressionSyntax(left.Value, definable, null, token), left.Issues);
-        }
+            => Checked<Syntax>
+                .From(ExpressionSyntax.Create(this, definable, null, token));
 
         internal virtual Checked<Syntax> Match(int level, SourcePart token)
+            => new Checked<Syntax>(this, IssueId.ExtraRightBracket.CreateIssue(token));
+
+        internal virtual Checked<Syntax> Match(int level, SourcePart token, Syntax right)
             => new Checked<Syntax>(this, IssueId.ExtraRightBracket.CreateIssue(token));
 
         [DisableDump]
@@ -131,6 +138,12 @@ namespace Reni.Parser
         internal virtual IEnumerable<Syntax> GetMixinsFromBody()
         {
             NotImplementedMethod();
+            return null;
+        }
+
+        internal virtual Checked<Syntax> RightSyntax(Syntax right, SourcePart token)
+        {
+            NotImplementedMethod(right, token);
             return null;
         }
     }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.Parser;
+using hw.Debug;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
@@ -60,8 +60,37 @@ namespace Reni.TokenClasses
         protected override sealed Checked<Syntax> Terminal(SourcePart token)
             => IssueId.UnexpectedUseAsTerminal.Syntax(token);
 
-        protected override sealed Checked<Syntax> Suffix(Syntax left, SourcePart token)
-            => IssueId.UnexpectedUseAsSuffix.Syntax(token, left);
+        protected override Checked<Syntax> Suffix(Syntax left, SourcePart token)
+            => new InfixSyntaxCandidate(left, this, token);
+
+        public Checked<Syntax> LateInfix(Syntax left, SourcePart token, Syntax right)
+            => Infix(left, token, right);
+    }
+
+    sealed class InfixSyntaxCandidate : Syntax
+    {
+        readonly Syntax Left;
+        readonly InfixToken Class;
+
+        public InfixSyntaxCandidate(Syntax left, InfixToken @class, SourcePart token)
+        {
+            Left = left;
+            Class = @class;
+            SourcePart = token;
+        }
+
+        [DisableDump]
+        internal override Checked<CompileSyntax> ToCompiledSyntax
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
+
+        internal override Checked<Syntax> RightSyntax(Syntax right, SourcePart token)
+            => Class.LateInfix(Left, SourcePart, right);
     }
 
     abstract class TerminalSyntaxToken : TerminalToken, ITerminal
@@ -84,6 +113,7 @@ namespace Reni.TokenClasses
     {
         protected override sealed Checked<Syntax> Terminal(SourcePart token)
             => new TerminalSyntax(token.Id, this);
+
         protected override Checked<Syntax> Suffix(Syntax left, SourcePart token)
             => SuffixSyntax.Create(left.ToCompiledSyntax, this, token);
 
@@ -137,5 +167,8 @@ namespace Reni.TokenClasses
 
         public abstract Result Result
             (ContextBase callContext, Category category, CompileSyntax left, CompileSyntax right);
+
+        protected override sealed Checked<Syntax> Suffix(Syntax left, SourcePart token)
+            => new InfixSyntaxCandidate(left, this, token);
     }
 }

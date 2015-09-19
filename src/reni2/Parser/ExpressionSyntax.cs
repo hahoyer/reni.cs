@@ -7,22 +7,24 @@ using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.TokenClasses;
-using Reni.Type;
 
 namespace Reni.Parser
 {
     sealed class ExpressionSyntax : CompileSyntax
     {
-        public static Checked<Syntax> Create
-            (
-            Checked<CompileSyntax> left,
-            Definable definable,
-            Checked<CompileSyntax> right,
-            SourcePart token)
-            => new ExpressionSyntax(left?.Value, definable, right?.Value, token)
-                .Issues(left?.Issues.plus(right?.Issues));
+        internal static Checked<CompileSyntax> Create
+            (Syntax left, Definable definable, Syntax right, SourcePart token)
+        {
+            var left1 = left?.ToCompiledSyntax;
+            var right1 = right?.ToCompiledSyntax;
+            return new Checked<CompileSyntax>
+                (
+                new ExpressionSyntax(left1?.Value, definable, right1?.Value, token),
+                left1?.Issues.plus(right1?.Issues)
+                );
+        }
 
-        internal ExpressionSyntax
+        ExpressionSyntax
             (
             CompileSyntax left,
             Definable definable,
@@ -53,6 +55,19 @@ namespace Reni.Parser
                 yield return Right;
             }
         }
+
+        internal override Checked<Syntax> RightSyntax(Syntax right, SourcePart token)
+            => Checked<Syntax>
+                .From
+                (
+                    Create
+                        (
+                            Right == null ? Left : this,
+                            Right == null ? Definable : null,
+                            right,
+                            token
+                        )
+                );
 
         internal override Result ResultForCache(ContextBase context, Category category)
         {

@@ -27,10 +27,7 @@ namespace Reni.TokenClasses
 
         protected override Checked<Syntax> Infix
             (Syntax left, SourcePart token, Syntax right)
-        {
-            NotImplementedMethod(left, token, right);
-            return null;
-        }
+            => left.Match(Level, token, right);
 
         protected override Checked<Syntax> Prefix(SourcePart token, Syntax right)
         {

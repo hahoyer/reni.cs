@@ -27,8 +27,12 @@ namespace Reni.TokenClasses
             return new DeclarationSyntax(rightResult.Value, Definable).Issues(rightResult.Issues);
         }
 
+        internal override Checked<Syntax> RightSyntax(Syntax right, SourcePart token)
+            => Checked<Syntax>.From(ExpressionSyntax.Create(null, Definable, right, token));
+
         [DisableDump]
         internal override Checked<CompileSyntax> ToCompiledSyntax
-            => new ExpressionSyntax(null, Definable, null, Token);
+            => Checked<CompileSyntax>
+                .From(ExpressionSyntax.Create(null, Definable, null, Token));
     }
 }

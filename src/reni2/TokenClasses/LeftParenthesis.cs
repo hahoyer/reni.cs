@@ -94,21 +94,23 @@ namespace Reni.TokenClasses
             internal override Checked<Parser.Syntax> Match(int level, SourcePart token)
             {
                 Tracer.Assert(Level == level);
-                var innerPart = Right ?? new EmptyList(Token);
+                var innerPart = Right ?? new EmptyList(token);
                 if(Left == null)
                     return innerPart;
-                var left = Left.ToCompiledSyntax;
-                var right = innerPart.ToCompiledSyntax;
-                return new Checked<Parser.Syntax>
-                    (
-                    new ExpressionSyntax(left.Value, null, right.Value, token),
-                    left.Issues.plus(right.Issues)
-                    );
+
+                return Checked<Parser.Syntax>.From(Left.RightSyntax(innerPart, Token));
+            }
+
+            internal override Checked<Parser.Syntax> Match
+                (int level, SourcePart token, Parser.Syntax right)
+            {
+                var inner = Match(level, token);
+                NotImplementedMethod(level, token, right, nameof(inner), inner);
+                return null;
             }
         }
 
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => (otherMatcher as RightParenthesis)?.Level == Level;
     }
-
 }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
-using hw.Parser;
 using hw.Scanner;
 using Reni.Feature;
 using Reni.Formatting;
@@ -16,13 +15,15 @@ namespace Reni.TokenClasses
             => new DefinableSyntax(token, this);
 
         protected override sealed Checked<Syntax> Prefix(SourcePart token, Syntax right)
-            => ExpressionSyntax.Create(null, this, right.ToCompiledSyntax, token);
+            => Checked<Syntax>
+                .From(ExpressionSyntax.Create(null, this, right, token));
 
         protected override sealed Checked<Syntax> Suffix(Syntax left, SourcePart token)
             => left.SuffixedBy(this, token);
 
         protected override sealed Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
-            => ExpressionSyntax.Create(left.ToCompiledSyntax, this, right.ToCompiledSyntax, token);
+            => Checked<Syntax>
+                .From(ExpressionSyntax.Create(left, this, right, token));
 
         [DisableDump]
         protected string DataFunctionName => Id.Symbolize();

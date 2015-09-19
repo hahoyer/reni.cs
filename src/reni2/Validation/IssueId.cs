@@ -37,6 +37,9 @@ namespace Reni.Validation
         internal Checked<Syntax> Syntax(SourcePart token, Syntax value)
             => new Checked<Syntax>(value, new Issue(this, token, ""));
 
+        internal Checked<CompileSyntax> Syntax(SourcePart token, CompileSyntax value)
+            => new Checked<CompileSyntax>(value, new Issue(this, token, ""));
+
         internal Checked<Syntax> Syntax(SourcePart token, Syntax value1, Syntax value2)
             => new Checked<Syntax>(ListSyntax.Create(value1, value2), new Issue(this, token, ""));
     }
