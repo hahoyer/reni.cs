@@ -12,6 +12,7 @@ namespace Reni.FeatureTest.UserInterface
 {
     [UnitTest]
     [TestFixture]
+    [LowPriority]
     public sealed class Formatting : DependantAttribute
     {
         [Test]
@@ -102,7 +103,7 @@ namespace Reni.FeatureTest.UserInterface
                 );
 
             var lineCount = newSource.Count(item => item == '\n');
-            Tracer.Assert(lineCount == 19, "\n" + newSource);
+            Tracer.Assert(lineCount == 23, "\n" + newSource);
         }
 
         [UnitTest]
