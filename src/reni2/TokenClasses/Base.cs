@@ -103,11 +103,14 @@ namespace Reni.TokenClasses
     abstract class TerminalSyntaxToken : TerminalToken, ITerminal
     {
         protected override sealed Checked<Syntax> Terminal(SourcePart token)
-            => new TerminalSyntax(token.Id, this);
+            => new TerminalSyntax(token, this);
 
         public abstract Result Result(ContextBase context, Category category, TerminalSyntax token);
 
         CompileSyntax ITerminal.Visit(ISyntaxVisitor visitor) => Visit(visitor);
+
+        Checked<Syntax> ITerminal.LatePrefix(SourcePart token, Syntax right)
+            => Prefix(token, right);
 
         internal virtual CompileSyntax Visit(ISyntaxVisitor visitor)
         {
@@ -118,8 +121,11 @@ namespace Reni.TokenClasses
 
     abstract class NonPrefixSyntaxToken : NonPrefixToken, ITerminal, ISuffix
     {
+        Checked<Syntax> ITerminal.LatePrefix(SourcePart token, Syntax right)
+            => Prefix(token, right);
+
         protected override sealed Checked<Syntax> Terminal(SourcePart token)
-            => new TerminalSyntax(token.Id, this);
+            => new TerminalSyntax(token, this);
 
         protected override Checked<Syntax> Suffix(Syntax left, SourcePart token)
             => SuffixSyntax.Create(left.ToCompiledSyntax, this, token);
@@ -139,8 +145,11 @@ namespace Reni.TokenClasses
 
     abstract class NonSuffixSyntaxToken : NonSuffixToken, ITerminal, IPrefix
     {
+        Checked<Syntax> ITerminal.LatePrefix(SourcePart token, Syntax right)
+            => Prefix(token, right);
+
         protected override sealed Checked<Syntax> Terminal(SourcePart token)
-            => new TerminalSyntax(token.Id, this);
+            => new TerminalSyntax(token, this);
 
         protected override sealed Checked<Syntax> Prefix(SourcePart token, Syntax right)
             => PrefixSyntax.Create(this, right.ToCompiledSyntax);

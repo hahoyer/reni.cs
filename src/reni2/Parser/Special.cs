@@ -15,14 +15,16 @@ namespace Reni.Parser
 
     sealed class TerminalSyntax : SpecialSyntax
     {
-        public string Id { get; }
+        internal string Id => Token.Id;
+        SourcePart Token => SourcePart;
+
         [Node]
         [EnableDump]
         internal readonly ITerminal Terminal;
 
-        public TerminalSyntax(string id, ITerminal terminal)
+        internal TerminalSyntax(SourcePart token, ITerminal terminal)
         {
-            Id = id;
+            SourcePart = token;
             Terminal = terminal;
             StopByObjectIds();
         }
@@ -36,6 +38,9 @@ namespace Reni.Parser
         internal long ToNumber => BitsConst.Convert(Id).ToInt64();
 
         protected override string GetNodeDump() => Terminal.NodeDump();
+
+        internal override Checked<Syntax> RightSyntax(Syntax right, SourcePart token)
+            => Terminal.LatePrefix(Token, right);
     }
 
     sealed class PrefixSyntax : SpecialSyntax
@@ -169,8 +174,8 @@ namespace Reni.Parser
 
         SourcePart Token { get; }
 
-        internal override Result ResultForCache(ContextBase context, Category category) => _suffix
-            .Result(context, category, _left);
+        internal override Result ResultForCache(ContextBase context, Category category)
+            => _suffix.Result(context, category, _left);
 
         protected override string GetNodeDump() => "(" + _left.NodeDump + ")" + _suffix;
 
@@ -187,6 +192,7 @@ namespace Reni.Parser
     {
         Result Result(ContextBase context, Category category, TerminalSyntax token);
         CompileSyntax Visit(ISyntaxVisitor visitor);
+        Checked<Syntax> LatePrefix(SourcePart token, Syntax right);
     }
 
     interface IPrefix
@@ -199,7 +205,6 @@ namespace Reni.Parser
     {
         Result Result
             (ContextBase context, Category category, CompileSyntax left, CompileSyntax right);
-
     }
 
     interface ISuffix
