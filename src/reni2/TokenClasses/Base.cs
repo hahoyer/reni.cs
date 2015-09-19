@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
+using hw.Parser;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
@@ -69,8 +70,9 @@ namespace Reni.TokenClasses
 
     sealed class InfixSyntaxCandidate : Syntax
     {
-        readonly Syntax Left;
-        readonly InfixToken Class;
+        internal readonly Syntax Left;
+        internal readonly InfixToken Class;
+        internal SourcePart Token => SourcePart;
 
         public InfixSyntaxCandidate(Syntax left, InfixToken @class, SourcePart token)
         {
@@ -89,8 +91,13 @@ namespace Reni.TokenClasses
             }
         }
 
+        internal override Checked<ExclamationSyntaxList> Combine
+            (ExclamationSyntaxList syntax)
+            => new Checked<ExclamationSyntaxList>
+                (syntax, IssueId.UnexpectedDeclarationTag.CreateIssue(Token));
+
         internal override Checked<Syntax> RightSyntax(Syntax right, SourcePart token)
-            => Class.LateInfix(Left, SourcePart, right);
+            => Class.LateInfix(Left, Token, right);
     }
 
     abstract class TerminalSyntaxToken : TerminalToken, ITerminal
