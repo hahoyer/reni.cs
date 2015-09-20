@@ -16,7 +16,7 @@ namespace Reni.Parser
     sealed class TerminalSyntax : SpecialSyntax
     {
         internal string Id => Token.Id;
-        SourcePart Token => SourcePart;
+        readonly SourcePart Token ;
 
         [Node]
         [EnableDump]
@@ -24,7 +24,7 @@ namespace Reni.Parser
 
         internal TerminalSyntax(SourcePart token, ITerminal terminal)
         {
-            SourcePart = token;
+            Token = token;
             Terminal = terminal;
             StopByObjectIds();
         }

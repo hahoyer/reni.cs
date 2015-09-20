@@ -72,13 +72,13 @@ namespace Reni.TokenClasses
     {
         internal readonly Syntax Left;
         internal readonly InfixToken Class;
-        internal SourcePart Token => SourcePart;
+        internal readonly SourcePart Token;
 
         public InfixSyntaxCandidate(Syntax left, InfixToken @class, SourcePart token)
         {
             Left = left;
             Class = @class;
-            SourcePart = token;
+            Token = token;
         }
 
         [DisableDump]

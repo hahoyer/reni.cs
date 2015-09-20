@@ -56,18 +56,14 @@ namespace Reni.Parser
             }
         }
 
-        internal override Checked<Syntax> RightSyntax(Syntax right, SourcePart token)
+        internal override Checked<Syntax> RightSyntax(Syntax right, SourcePart token) 
             => Checked<Syntax>
-                .From
-                (
-                    Create
-                        (
-                            Right == null ? Left : this,
-                            Right == null ? Definable : null,
-                            right,
-                            token
-                        )
-                );
+            .From
+            (
+                Right == null
+                    ? Create(Left, Definable, right, Token)
+                    : Create(this, null, right, token)
+            );
 
         internal override Result ResultForCache(ContextBase context, Category category)
         {
