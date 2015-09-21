@@ -310,7 +310,7 @@ namespace Reni.Context
             =>
                 new RootIssueType
                     (
-                    new Issue(IssueId.UndefinedSymbol, source, "Context: " + Dump()),
+                    new Issue(IssueId.MissingDeclaration, source, "Context: " + Dump()),
                     RootContext);
 
         Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)

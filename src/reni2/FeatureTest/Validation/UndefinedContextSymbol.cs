@@ -20,7 +20,7 @@ namespace Reni.FeatureTest.Validation
         {
             var issueArray = issues.ToArray();
             var i = 0;
-            Tracer.Assert(issueArray[i] .IssueId == IssueId.UndefinedSymbol, issueArray[i].Dump);
+            Tracer.Assert(issueArray[i] .IssueId == IssueId.MissingDeclaration, issueArray[i].Dump);
             i++;
             Tracer.Assert(i == issueArray.Length);
         }
@@ -37,7 +37,7 @@ namespace Reni.FeatureTest.Validation
         {
             var issueArray = issues.ToArray();
             var i = 0;
-            Tracer.Assert(issueArray[i].IssueId == IssueId.UndefinedSymbol, issueArray[i].Dump);
+            Tracer.Assert(issueArray[i].IssueId == IssueId.MissingDeclaration, issueArray[i].Dump);
             i++;
             Tracer.Assert(i == issueArray.Length);
         }
@@ -54,7 +54,7 @@ namespace Reni.FeatureTest.Validation
         {
             var issueArray = issues.ToArray();
             var i = 0;
-            Tracer.Assert(issueArray[i].IssueId == IssueId.UndefinedSymbol, issueArray[i].Dump);
+            Tracer.Assert(issueArray[i].IssueId == IssueId.MissingDeclaration, issueArray[i].Dump);
             i++;
             Tracer.Assert(issueArray[i].IssueId == IssueId.ConsequentialError, issueArray[i].Dump);
             i++;
@@ -73,7 +73,7 @@ namespace Reni.FeatureTest.Validation
         {
             var issueArray = issues.ToArray();
             var i = 0;
-            Tracer.Assert(issueArray[i].IssueId == IssueId.UndefinedSymbol, issueArray[i].Dump);
+            Tracer.Assert(issueArray[i].IssueId == IssueId.MissingDeclaration, issueArray[i].Dump);
             i++;
             Tracer.Assert(issueArray[i].IssueId == IssueId.ConsequentialError, issueArray[i].Dump);
             i++;

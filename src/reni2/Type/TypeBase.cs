@@ -669,7 +669,7 @@ namespace Reni.Type
             switch(searchResults.Length)
             {
                 case 0:
-                    return onError(IssueId.UndefinedSymbol);
+                    return onError(IssueId.MissingDeclaration);
                 case 1:
                     return execute(searchResults.First());
                 default:

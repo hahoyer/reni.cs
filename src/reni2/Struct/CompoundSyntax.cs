@@ -179,7 +179,7 @@ namespace Reni.Struct
 
         IImplementation OnInheritedDeclarationError(IssueId issueId)
         {
-            if(issueId == IssueId.UndefinedSymbol)
+            if(issueId == IssueId.MissingDeclaration)
                 return null;
             NotImplementedMethod(issueId);
             return null;
