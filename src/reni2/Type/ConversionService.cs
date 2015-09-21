@@ -241,10 +241,15 @@ namespace Reni.Type
                 => new ClosureService(source).Result();
 
             TypeBase Source { get; }
-            List<TypeBase> _foundTypes;
-            List<ConversionPath> _newPaths;
+            readonly List<TypeBase> _foundTypes = new List<TypeBase>();
+            readonly ValueCache<List<ConversionPath>> _newPathsCache;
 
-            ClosureService(TypeBase source) { Source = source; }
+            ClosureService(TypeBase source)
+            {
+                Source = source;
+                _newPathsCache = new ValueCache<List<ConversionPath>>
+                    (() => new List<ConversionPath>());
+            }
 
             IEnumerable<ConversionPath> Combination(ConversionPath startFeature = null)
             {
@@ -263,43 +268,34 @@ namespace Reni.Type
                         feature =>
                             startFeature == null
                                 ? new ConversionPath(feature)
-                                : startFeature + feature);
-                var result = new List<ConversionPath>();
-                foreach(var newPath in newFeatures)
-                {
-                    Tracer.Assert(newPath.Source == Source);
-                    AddPath(newPath);
-                    result.Add(newPath);
-                }
-                return result;
-            }
+                                : startFeature + feature
+                    )
+                    .ToArray();
 
-            void AddPath(ConversionPath newPath)
-            {
-                if(_newPaths == null)
-                    _newPaths = new List<ConversionPath>();
-                _newPaths.Add(newPath);
+                Tracer.Assert(newFeatures.All(item => item.Source == Source));
 
-                if(_foundTypes == null)
-                    _foundTypes = new List<TypeBase>();
-                _foundTypes.Add(newPath.Destination);
+                _newPathsCache.Value.AddRange(newFeatures);
+                _foundTypes.AddRange(newFeatures.Select(item => item.Destination));
+
+                return newFeatures;
             }
 
             IEnumerable<ConversionPath> Result()
             {
-                _newPaths = null;
+                _newPathsCache.IsValid = false;
                 var singularPath = new ConversionPath(Source);
-                AddPath(singularPath);
+                _newPathsCache.Value.Add(singularPath);
+                _foundTypes.Add(singularPath.Destination);
                 Tracer.Assert(singularPath.Source == Source);
                 var result = new List<ConversionPath>
                 {
                     singularPath
                 };
 
-                while(_newPaths != null && _newPaths.Any())
+                while(_newPathsCache.IsValid && _newPathsCache.Value.Any())
                 {
-                    var features = _newPaths;
-                    _newPaths = null;
+                    var features = _newPathsCache.Value;
+                    _newPathsCache.IsValid = false;
 
                     foreach(var newPaths in features.Select(Combination))
                     {
