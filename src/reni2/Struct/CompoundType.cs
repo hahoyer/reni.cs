@@ -33,14 +33,8 @@ namespace Reni.Struct
         internal override bool HasQuickSize => false;
 
         [DisableDump]
-        internal override IEnumerable<IConversion> StripConversionsFromPointer
-        {
-            get
-            {
-                foreach(var converter in View.ConverterFeatures)
-                    yield return converter;
-            }
-        }
+        internal override IEnumerable<IConversion> StripConversionsFromPointer 
+            => View.ConverterFeatures;
 
         [DisableDump]
         internal override IEnumerable<IConversion> StripConversions
