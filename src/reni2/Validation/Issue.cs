@@ -1,11 +1,10 @@
-using System.Linq;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using hw.Debug;
 using hw.Helper;
 using hw.Scanner;
 using Reni.Code;
-using Reni.TokenClasses;
 
 namespace Reni.Validation
 {
@@ -43,7 +42,9 @@ namespace Reni.Validation
         {
             get
             {
-                var result = Position.FileErrorPosition(Tag);
+                var result = Position.Id == "("
+                    ? Position.Start.FilePosn(Tag) + " Functional"
+                    : Position.FileErrorPosition(Tag);
                 if(string.IsNullOrWhiteSpace(Message))
                     return result;
                 return result + " " + Message;
