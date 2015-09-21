@@ -36,7 +36,9 @@ namespace Reni.TokenClasses
 
     sealed class DeclaratorSyntax : CompileSyntax
     {
+        [EnableDump]
         readonly Definable Definable;
+        [EnableDump]
         readonly ExclamationSyntaxList ExclamationSyntaxList;
 
         internal DeclaratorSyntax(Definable definable, ExclamationSyntaxList exclamationSyntaxList)
@@ -53,6 +55,7 @@ namespace Reni.TokenClasses
                     ExclamationSyntaxList.Tags
                 );
 
+        [DisableDump]
         protected override IEnumerable<Syntax> DirectChildren
         {
             get { yield return ExclamationSyntaxList; }
