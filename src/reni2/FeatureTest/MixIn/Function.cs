@@ -9,6 +9,7 @@ namespace Reni.FeatureTest.MixIn
 {
     [UnitTest]
     [ReferenceSimple]
+    [Simple]
     [ArrayReferenceAll]
     [TargetSet(@"
 This: /\ 
@@ -19,5 +20,5 @@ This: /\
 
 This() (1) := 3
 ", "3")]
-    public sealed class Function : CompilerTest { }
+    public sealed class Function : CompilerTest {}
 }
