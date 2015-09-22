@@ -73,7 +73,7 @@ Text: /\
             )
         }.
 
-        << : /\ concat(count: ^ count, data: ^ data).
+        << : /\ concat(count: ^ count, data: ^).
 
         concat: /\
         Text
