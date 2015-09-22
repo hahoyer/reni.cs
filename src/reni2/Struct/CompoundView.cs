@@ -8,7 +8,6 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Parser;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -116,6 +115,12 @@ namespace Reni.Struct
                 .Select(position => Compound.AccessType(ViewPosition, position).DumpPrintText)
                 .Stringify(", ")
                 .Surround("(", ")");
+
+        public IEnumerable<IConversion> MixinConversions
+            => Compound
+                .Syntax
+                .MixIns
+                .Select(AccessFeature);
 
         sealed class RecursionWhileObtainingCompoundSizeException : Exception
         {
@@ -279,21 +284,5 @@ namespace Reni.Struct
 
         internal IImplementation Find(Definable definable)
             => Compound.Syntax.Find(definable, this);
-
-        internal IEnumerable<Syntax> GetMixins()
-        {
-            var trace = false;
-            StartMethodDump(trace);
-            try
-            {
-                BreakExecution();
-                var result = Compound.GetMixins().ToArray();
-                return ReturnMethodDump(result);
-            }
-            finally
-            {
-                EndMethodDump();
-            }
-        }
     }
 }

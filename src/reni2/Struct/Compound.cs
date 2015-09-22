@@ -7,7 +7,6 @@ using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
-using Reni.Parser;
 using Reni.Type;
 
 namespace Reni.Struct
@@ -230,7 +229,5 @@ namespace Reni.Struct
                 .Where(i => !InternalInnerHllwStructureElement(i))
                 .Select(i => i.ToString() + "=" + AccessResult(Category.Size, i).Size.ToString())
                 .ToArray();
-
-        internal IEnumerable<Syntax> GetMixins() => Syntax.GetMixins(ToCompoundView);
     }
 }

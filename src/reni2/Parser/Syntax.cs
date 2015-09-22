@@ -37,11 +37,6 @@ namespace Reni.Parser
 
         internal virtual IEnumerable<string> GetDeclarations() { yield break; }
 
-        internal virtual IEnumerable<Syntax> GetMixins(CompoundView context, int position)
-        {
-            yield break;
-        }
-
         internal Checked<Syntax> CreateThenSyntax(CompileSyntax condition)
         {
             var syntax = ToCompiledSyntax;

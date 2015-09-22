@@ -50,8 +50,6 @@ namespace Reni.Type
         internal override int? SmartArrayLength(TypeBase elementType) => ValueType.SmartArrayLength(elementType);
 
         [DisableDump]
-        internal override IEnumerable<Syntax> Mixins => ValueType.Mixins;
-        [DisableDump]
         internal override ContextBase ToContext => ValueType.ToContext;
     }
 }

@@ -9,7 +9,6 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.Parser;
 using Reni.TokenClasses;
-using Reni.Type;
 using Reni.Validation;
 
 namespace Reni.Struct
@@ -157,32 +156,8 @@ namespace Reni.Struct
             var name = definable.Id;
             var definingStatement = _data
                 .Take(view.ViewPosition)
-                .SingleOrDefault(s => s.IsDefining(name) || s.IsInheriting(name, view));
-            if(definingStatement == null)
-                return null;
-
-            var accessFeature = view.AccessFeature(definingStatement.Position);
-            if(definingStatement.IsDefining(name))
-                return accessFeature;
-
-            var conversion = new ConversionPath(accessFeature);
-
-            var result = conversion.Destination.ExecuteDeclaration
-                (
-                    definable,
-                    searchResult => new SearchResult(searchResult, conversion), 
-                    OnInheritedDeclarationError
-                );
-            Tracer.Assert(((SearchResult)result).Source == view.Type.Pointer);
-            return result;
-        }
-
-        IImplementation OnInheritedDeclarationError(IssueId issueId)
-        {
-            if(issueId == IssueId.MissingDeclaration)
-                return null;
-            NotImplementedMethod(issueId);
-            return null;
+                .SingleOrDefault(s => s.IsDefining(name));
+            return definingStatement == null ? null : view.AccessFeature(definingStatement.Position);
         }
 
         internal override Result ResultForCache(ContextBase context, Category category) => context
@@ -197,7 +172,6 @@ namespace Reni.Struct
                 Position = position;
                 StatementCache = new ValueCache<Checked<CompileSyntax>>(GetStatement);
                 NamesCache = new ValueCache<string[]>(GetNames);
-                InheritedNamesCache = new FunctionCache<CompoundView, string[]>(GetInheritedNames);
                 Tracer.Assert(RawStatement != null);
             }
 
@@ -205,17 +179,11 @@ namespace Reni.Struct
             public int Position { get; }
 
             ValueCache<string[]> NamesCache { get; }
-            FunctionCache<CompoundView, string[]> InheritedNamesCache { get; }
             ValueCache<Checked<CompileSyntax>> StatementCache { get; }
 
             public CompileSyntax Statement => StatementCache.Value.Value;
             public Issue[] Issues => StatementCache.Value.Issues;
             public bool IsDefining(string name) => Names.Contains(name);
-
-            public bool IsInheriting(string name, CompoundView context)
-                => IsMixIn
-                    && (InheritedNamesCache[context]?.Contains(name) ?? false);
-
             public bool IsConverter => RawStatement.IsConverterSyntax;
             public bool IsMixIn => RawStatement.IsMixInSyntax;
             public IEnumerable<string> Names => NamesCache.Value;
@@ -226,24 +194,9 @@ namespace Reni.Struct
                 => RawStatement.ContainerStatementToCompileSyntax;
 
             string[] GetNames() => RawStatement.GetDeclarations().ToArray();
-
-            string[] GetInheritedNames(CompoundView context)
-                => GetMixins(context)
-                    .SelectMany(item => item.GetDeclarations())
-                    .Distinct()
-                    .ToArray();
-
-            public IEnumerable<Syntax> GetMixins(CompoundView context)
-                => IsMixIn
-                    ? RawStatement.GetMixins(context, Position).Distinct()
-                    : Enumerable.Empty<Syntax>();
         }
 
         [DisableDump]
         protected override IEnumerable<Syntax> DirectChildren => _statements;
-
-        internal IEnumerable<Syntax> GetMixins(CompoundView context)
-            => _data.SelectMany(item => item.GetMixins(context).Concat(new[] {item.RawStatement}));
     }
-
 }

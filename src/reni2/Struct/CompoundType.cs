@@ -34,7 +34,7 @@ namespace Reni.Struct
 
         [DisableDump]
         internal override IEnumerable<IConversion> StripConversionsFromPointer 
-            => View.ConverterFeatures;
+            => View.ConverterFeatures.Union(View.MixinConversions);
 
         [DisableDump]
         internal override IEnumerable<IConversion> StripConversions
@@ -69,8 +69,6 @@ namespace Reni.Struct
         new Result DumpPrintTokenResult(Category category)
             => View.DumpPrintResultViaObject(category);
 
-        [DisableDump]
-        internal override IEnumerable<Syntax> Mixins => View.GetMixins();
         [DisableDump]
         internal override ContextBase ToContext => View.Context;
     }
