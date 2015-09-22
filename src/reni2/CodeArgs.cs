@@ -26,7 +26,7 @@ namespace Reni
         {
             _data = new List<IContextReference>();
             _sortedDataCache = new ValueCache<IContextReference[]>(ObtainSortedData);
-            StopByObjectId(-10);
+            StopByObjectIds(-10);
         }
 
         CodeArgs(IContextReference context)

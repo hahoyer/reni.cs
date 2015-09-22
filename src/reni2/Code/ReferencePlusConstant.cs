@@ -20,7 +20,7 @@ namespace Reni.Code
         {
             _right = right;
             AssertValid();
-            StopByObjectId(-4);
+            StopByObjectIds(-4);
         }
 
         void AssertValid()

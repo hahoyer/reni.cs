@@ -21,7 +21,7 @@ namespace Reni.Code
             Offset = offset;
             _size = size;
             _dataSize = dataSize;
-            StopByObjectId(-945);
+            StopByObjectIds(-945);
         }
 
         protected override Size GetSize() => _size;

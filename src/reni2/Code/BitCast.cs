@@ -49,8 +49,8 @@ namespace Reni.Code
             _outputSize = outputSize;
             _inputSize = inputSize;
             InputDataSize = inputDataSize;
-            StopByObjectId(-35);
-            StopByObjectId(-32);
+            StopByObjectIds(-35);
+            StopByObjectIds(-32);
         }
 
         [DisableDump]

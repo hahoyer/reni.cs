@@ -16,7 +16,6 @@ namespace Reni.Validation
             : base(new Issue(IssueId.ConsequentialError, source))
         {
             _issueType = issueType;
-            StopByObjectIds(302);
         }
 
         [DisableDump]

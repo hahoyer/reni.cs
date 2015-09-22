@@ -16,7 +16,6 @@ namespace Reni.Code
         {
             OutputSize = outputSize;
             DataSize = dataSize;
-            StopByObjectId(-6);
         }
 
         [DisableDump]

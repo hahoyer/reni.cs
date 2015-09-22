@@ -23,7 +23,7 @@ namespace Reni.Code
             Description = description;
             FunctionId = functionId;
             Data = data;
-            StopByObjectId(-10);
+            StopByObjectIds(-10);
         }
 
         Container(string errorText) { Description = errorText; }

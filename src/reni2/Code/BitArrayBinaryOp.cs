@@ -22,7 +22,7 @@ namespace Reni.Code
         {
             OpToken = opToken;
             OutputSize = size;
-            StopByObjectId(-3);
+            StopByObjectIds(-3);
         }
 
         protected override FiberItem[] TryToCombineImplementation(FiberItem subsequentElement)
@@ -78,7 +78,7 @@ namespace Reni.Code
         internal DumpPrintNumberOperation(Size leftSize, Size rightSize)
             : base(leftSize, rightSize)
         {
-            StopByObjectId(-10);
+            StopByObjectIds(-10);
         }
 
         [DisableDump]
