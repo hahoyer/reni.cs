@@ -50,7 +50,7 @@ namespace Reni.Basics
             _size = size;
             _data = CreateDataArray();
             _dataCache = new ValueCache<BigInteger>(() => new BigInteger(_data));
-            StopByObjectId(-7);
+            StopByObjectIds(-7);
         }
 
         BitsConst(Int64 value, Size size)

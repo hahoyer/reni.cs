@@ -64,7 +64,7 @@ namespace Reni.Type
             Tracer.Assert(!valueType.Hllw, valueType.Dump);
             Tracer.Assert(!(valueType.CoreType is PointerType), valueType.Dump);
 
-            StopByObjectId(-10);
+            StopByObjectIds(-10);
         }
 
         [DisableDump]

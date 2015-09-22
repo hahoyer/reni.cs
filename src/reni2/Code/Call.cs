@@ -49,7 +49,7 @@ namespace Reni.Code
             FunctionId = functionId;
             _resultSize = resultSize;
             ArgsAndRefsSize = argsAndRefsSize;
-            StopByObjectId(-1);
+            StopByObjectIds(-1);
         }
 
         [DisableDump]

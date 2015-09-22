@@ -23,7 +23,7 @@ namespace Reni.Type
         public TypeType(TypeBase value)
         {
             Value = value;
-            StopByObjectId(-61);
+            StopByObjectIds(-61);
         }
 
         [DisableDump]

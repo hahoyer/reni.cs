@@ -13,7 +13,7 @@ namespace Reni.Code
         public TopData(Size offset, Size size, Size dataSize)
             : base(offset, size, dataSize)
         {
-            StopByObjectId(-110);
+            StopByObjectIds(-110);
         }
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement)

@@ -29,7 +29,7 @@ namespace Reni
             : base(_nextObjectId++)
         {
             _pendingCategory = Category.None;
-            StopByObjectId(-88);
+            StopByObjectIds(-88);
         }
 
         internal Result

@@ -51,7 +51,7 @@ namespace Reni.Struct
                 = new FunctionCache<FunctionSyntax, FunctionBodyType>
                     (syntax => new FunctionBodyType(this, syntax));
 
-            StopByObjectId(-313);
+            StopByObjectIds(-313);
         }
 
         public string GetCompoundIdentificationDump()

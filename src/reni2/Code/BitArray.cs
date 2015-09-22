@@ -20,7 +20,7 @@ namespace Reni.Code
             //Tracer.Assert(size.IsPositive);
             _size = size;
             Data = data;
-            StopByObjectId(-21);
+            StopByObjectIds(-21);
         }
 
         public BitArray()

@@ -43,7 +43,7 @@ namespace Reni.Struct
             {
                 _order = CodeArgs.NextOrder++;
                 _parent = parent;
-                StopByObjectId(-5);
+                StopByObjectIds(-5);
             }
 
             int IContextReference.Order => _order;

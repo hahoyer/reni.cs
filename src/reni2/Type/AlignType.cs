@@ -18,7 +18,7 @@ namespace Reni.Type
             : base(target)
         {
             _alignBits = alignBits;
-            StopByObjectId(-9);
+            StopByObjectIds(-9);
             Tracer.Assert(Parent.IsAligningPossible, Parent.Dump);
         }
 

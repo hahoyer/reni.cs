@@ -41,7 +41,7 @@ namespace Reni.Type
             Elements = rawElements.RemoveCircles().ToArray();
 
             AssertValid();
-            StopByObjectId(-284);
+            StopByObjectIds(-284);
         }
 
         void AssertValid()

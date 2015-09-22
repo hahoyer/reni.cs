@@ -24,7 +24,7 @@ namespace Reni.Type
             ValueType = valueType;
             Tracer.Assert(!valueType.Hllw, valueType.Dump);
             Tracer.Assert(valueType.IsPointerPossible, valueType.Dump);
-            StopByObjectId(-10);
+            StopByObjectIds(-10);
         }
 
         [DisableDump]
