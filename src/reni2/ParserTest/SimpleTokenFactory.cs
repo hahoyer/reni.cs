@@ -51,13 +51,6 @@ namespace Reni.ParserTest
             {
                 _level = level;
             }
-
-            protected Services.Syntax CreateX
-                (Services.Syntax left, IToken token, Services.Syntax right)
-            {
-                Tracer.Assert(right == null);
-                return left?.Match(_level, token);
-            }
         }
 
         sealed class OpenToken : Services.TokenClass
@@ -70,10 +63,6 @@ namespace Reni.ParserTest
             {
                 _level = level;
             }
-
-            protected Services.Syntax CreateX
-                (Services.Syntax left, IToken token, Services.Syntax right)
-                => new OpenSyntax(left, token, right, _level);
         }
 
         sealed class OpenSyntax : Services.Syntax
