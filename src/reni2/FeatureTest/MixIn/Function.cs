@@ -14,11 +14,11 @@ namespace Reni.FeatureTest.MixIn
     [TargetSet(@"
 This: /\ 
 {
-    !mix_in: (dump_print(^),dump_print(new_value))/\ 100 type instance(^ enable_cut);
+    !mix_in: (^ dump_print, new_value dump_print)/\ 100 type instance(^ enable_cut);
     aa: 2;
 }; 
 
 This() (1) := 3
-", "3")]
+", "13")]
     public sealed class Function : CompilerTest {}
 }
