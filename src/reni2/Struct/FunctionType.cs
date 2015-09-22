@@ -40,8 +40,6 @@ namespace Reni.Struct
         }
 
         protected override bool IsMutable => _setter != null;
-        [DisableDump]
-        protected override TypeBase Source => this;
 
         [DisableDump]
         internal override TypeBase ValueType => _getter.ReturnType;

@@ -25,16 +25,6 @@ namespace Reni.Type
         protected override bool IsMutable { get; }
 
         [DisableDump]
-        protected override TypeBase Source
-        {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
-        }
-
-        [DisableDump]
         internal override TypeBase ValueType { get; }
 
         [DisableDump]

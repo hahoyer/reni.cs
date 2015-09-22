@@ -29,10 +29,10 @@ namespace Reni.Type
         IConversion IReference.Converter => this;
         Result IValue.Execute(Category category) => GetterResult(category);
 
-        TypeBase IConversion.Source => Source;
+        TypeBase IConversion.Source => (TypeBase) this;
 
         Result IConversion.Execute(Category category)
-            => GetterResult(category).ConvertToConverter(Source);
+            => GetterResult(category).ConvertToConverter(this);
 
         [DisableDump]
         internal override bool IsAligningPossible => false;
@@ -44,9 +44,6 @@ namespace Reni.Type
 
         [EnableDumpExcept(false)]
         protected abstract bool IsMutable { get; }
-
-        [DisableDump]
-        protected abstract TypeBase Source { get; }
 
         Result ReassignResult(Category category, TypeBase right)
         {
