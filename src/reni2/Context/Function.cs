@@ -19,7 +19,7 @@ namespace Reni.Context
             _order = CodeArgs.NextOrder++;
             ArgsType = argsType;
             ValueType = valueType;
-            StopByObjectIds(83);
+            StopByObjectIds();
         }
 
         [Node]
