@@ -89,7 +89,7 @@ namespace Reni.Parser
 
         protected override string GetNodeDump()
         {
-            var result = Token.Id;
+            var result = Definable.Id;
             if(Left != null)
                 result = "(" + Left.NodeDump + ")" + result;
             if(Right != null)
