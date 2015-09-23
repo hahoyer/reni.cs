@@ -103,13 +103,16 @@ namespace Reni.Context
             readonly bool AsReference;
             readonly ContextBase Context;
             readonly CompileSyntax Syntax;
+            static int _nextObjectId;
 
             internal ResultProvider
                 (ContextBase context, CompileSyntax syntax, bool asReference = false)
+                : base(_nextObjectId++)
             {
                 Context = context;
                 Syntax = syntax;
                 AsReference = asReference;
+                StopByObjectIds(497);
             }
 
             Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)

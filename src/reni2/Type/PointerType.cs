@@ -80,7 +80,9 @@ namespace Reni.Type
                 yield return feature;
         }
 
-        internal override IEnumerable<IConversion> StripConversions { get { return ValueType.StripConversionsFromPointer; } }
+        [DisableDump]
+        internal override IEnumerable<IConversion> StripConversions
+            => ValueType.StripConversionsFromPointer;
 
         [DisableDump]
         internal override IImplementation FuncionDeclarationForType

@@ -108,7 +108,7 @@ namespace Reni.Struct
                 .ConverterFunctions
                 .Select(ConversionFunction);
 
-        public string DumpPrintTextOfType
+        internal string DumpPrintTextOfType
             => Compound
                 .Syntax
                 .EndPosition
@@ -116,7 +116,8 @@ namespace Reni.Struct
                 .Stringify(", ")
                 .Surround("(", ")");
 
-        public IEnumerable<IConversion> MixinConversions
+        [DisableDump]
+        internal IEnumerable<IConversion> MixinConversions
             => Compound
                 .Syntax
                 .MixIns
