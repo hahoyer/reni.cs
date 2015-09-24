@@ -276,7 +276,34 @@ namespace Reni.Type
                 );
 
         internal TypeBase CommonType(TypeBase elseType)
-            => elseType.IsConvertable(this) ? this : elseType;
+        {
+            if(elseType.IsConvertable(this))
+                return this;
+            if(IsConvertable(elseType))
+                return elseType;
+
+            var thenConversions = ConversionService.ClosureService.Result(this);
+            var elseConversions = ConversionService.ClosureService.Result(elseType);
+
+            var combination = thenConversions
+                .Merge(elseConversions, item => item.Destination)
+                .Where(item => item.Item2 != null && item.Item3 != null)
+                .GroupBy(item => item.Item2.Elements.Length + item.Item3.Elements.Length)
+                .OrderBy(item=>item.Key)
+                .First()
+                .ToArray();
+
+            if (combination.Length == 1)
+                return combination.Single().Item1;
+
+            NotImplementedMethod
+                (
+                    elseType,
+                    nameof(combination),
+                    combination
+                );
+            return null;
+        }
 
         /// <summary>
         ///     Gets the icon key.
