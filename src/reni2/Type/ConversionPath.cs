@@ -30,6 +30,7 @@ namespace Reni.Type
             Tracer.Assert(IsValid);
         }
 
+        [DisableDump]
         internal bool IsValid => Source != null;
 
         internal ConversionPath(params IConversion[] rawElements)

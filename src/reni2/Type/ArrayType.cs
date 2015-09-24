@@ -133,6 +133,7 @@ namespace Reni.Type
             (Mutable tokenClass)
             => Feature.Extension.Value(MutableResult);
 
+        [DisableDump]
         internal override IImplementation FunctionDeclarationForPointerType 
             => Feature.Extension.FunctionFeature(ElementAccessResult);
 
