@@ -52,7 +52,7 @@ Text: /\
 
         data: system NewMemory
         (
-            elementType: value() type.
+            elementType: value(0) type.
             count: value count.
             initializer: /\ value(^)
         ).
