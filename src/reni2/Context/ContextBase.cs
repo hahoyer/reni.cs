@@ -112,7 +112,7 @@ namespace Reni.Context
                 Context = context;
                 Syntax = syntax;
                 AsReference = asReference;
-                StopByObjectIds(497);
+                StopByObjectIds();
             }
 
             Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)

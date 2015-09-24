@@ -36,7 +36,7 @@ namespace Reni.Struct
             _index = index;
             _compoundView = compoundView;
             ArgsType = argsType;
-            StopByObjectIds(288);
+            StopByObjectIds();
         }
 
         protected override bool IsMutable => _setter != null;
