@@ -185,7 +185,7 @@ namespace Reni.Struct
             return resultType.Result(category, Type.ObjectResult);
         }
 
-        Result AccessValueViaObject(Category category, int position)
+        internal Result AccessValueViaObject(Category category, int position)
         {
             var resultType = ValueType(position);
             if(resultType.Hllw)
