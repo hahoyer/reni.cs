@@ -31,7 +31,7 @@ repeat: /\ ^ while() then(^ body(), repeat(^));
             var compiler = new Compiler(text: text);
             for(var i = 0; i < text.Length; i++)
             {
-                var t = compiler.Containing(i);
+                var t = compiler.ContainingTokens(i);
                 Tracer.Assert(t != null, () => (new Source(text) + i).Dump());
             }
         }

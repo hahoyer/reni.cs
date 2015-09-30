@@ -41,7 +41,7 @@ namespace HoyerWare.ReniLanguagePackage
             try
             {
                 var offset = Data.FromLineAndColumn(line, column).Position;
-                var token = Compiler.Containing(offset);
+                var token = Compiler.ContainingTokens(offset);
                 Dump(nameof(token), token);
                 var result = token.ToTokenInfo();
                 return ReturnMethodDump(result, false);
@@ -63,7 +63,7 @@ namespace HoyerWare.ReniLanguagePackage
             var i = 0;
             while(index < line.EndPosition)
             {
-                var token = Compiler.Containing(index).AssertNotNull().TrimLine(line);
+                var token = Compiler.ContainingTokens(index).AssertNotNull().TrimLine(line);
                 if(trace)
                     Tracer.IndentStart();
                 if(trace)
@@ -87,7 +87,7 @@ namespace HoyerWare.ReniLanguagePackage
             try
             {
                 var lineEndPosition = Data.FromLineAndColumn(line, null).Position;
-                var token = Compiler.Containing(lineEndPosition);
+                var token = Compiler.ContainingTokens(lineEndPosition);
                 Tracer.Assert(token != null);
                 var result = token.State;
                 return ReturnMethodDump(result, false);
@@ -109,13 +109,13 @@ namespace HoyerWare.ReniLanguagePackage
         internal TokenInformation FromLineAndColumn(int lineIndex, int columIndex)
         {
             var start = Data.FromLineAndColumn(lineIndex, columIndex).Position;
-            return Compiler.Containing(start);
+            return Compiler.ContainingTokens(start);
         }
 
         internal TokenInformation FromLineAndColumnBackwards(int lineIndex, int columIndex)
         {
             var start = Data.FromLineAndColumn(lineIndex, columIndex).Position - 1;
-            return Compiler.Containing(Math.Max(0, start));
+            return Compiler.ContainingTokens(Math.Max(0, start));
         }
 
         internal IEnumerable<SourcePart> BracesLike(TokenInformation current)

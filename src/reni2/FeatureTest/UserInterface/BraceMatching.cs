@@ -17,8 +17,8 @@ namespace Reni.FeatureTest.UserInterface
 
             var compiler = new Compiler(text: Text);
 
-            var open = compiler.Containing(0);
-            var close = compiler.Containing(Text.IndexOf(")"));
+            var open = compiler.ContainingTokens(0);
+            var close = compiler.ContainingTokens(Text.IndexOf(")"));
 
             var matchOpen = open.FindAllBelongings(compiler);
             var matchClose = close.FindAllBelongings(compiler);
@@ -35,8 +35,8 @@ namespace Reni.FeatureTest.UserInterface
 
             var compiler = new Compiler(text: Text);
 
-            var open = compiler.Containing(0);
-            var close = compiler.Containing(Text.IndexOf(")"));
+            var open = compiler.ContainingTokens(0);
+            var close = compiler.ContainingTokens(Text.IndexOf(")"));
 
             var matchOpen = open.FindAllBelongings(compiler);
             var matchClose = close.FindAllBelongings(compiler);
@@ -53,7 +53,7 @@ namespace Reni.FeatureTest.UserInterface
 
             var compiler = new Compiler(text: Text);
 
-            var close = compiler.Containing(Text.IndexOf(")", Text.IndexOf(")")+1));
+            var close = compiler.ContainingTokens(Text.IndexOf(")", Text.IndexOf(")")+1));
 
             var matchClose = close.FindAllBelongings(compiler);
 

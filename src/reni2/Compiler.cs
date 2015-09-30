@@ -28,12 +28,12 @@ namespace Reni
         readonly CompilerParameters _parameters;
         readonly string _className;
 
-        readonly ValueCache<Source> _source;
-        readonly ValueCache<SourceSyntax> _sourceSyntax;
-        readonly ValueCache<Syntax> _syntax;
-        readonly ValueCache<CodeContainer> _codeContainer;
-        readonly ValueCache<string> _cSharpCode;
-        readonly FunctionCache<int, TokenInformation> _containingCache;
+        readonly ValueCache<Source> SourceCache;
+        readonly ValueCache<SourceSyntax> SourceSyntaxCache;
+        readonly ValueCache<Syntax> SyntaxCache;
+        readonly ValueCache<CodeContainer> CodeContainerCache;
+        readonly ValueCache<string> CSharpCodeCache;
+        readonly FunctionCache<int, TokenInformation> ContainingTokensCache;
 
         [Node]
         readonly Root _rootContext;
@@ -73,7 +73,7 @@ namespace Reni
                 Trace = _parameters.TraceOptions.Parser
             };
 
-            _source = new ValueCache<Source>
+            SourceCache = new ValueCache<Source>
                 (
                 () => source
                     ?? (fileName == null
@@ -81,39 +81,39 @@ namespace Reni
                         : new Source(fileName.FileHandle()))
                 );
 
-            _containingCache = new FunctionCache<int, TokenInformation>(GetContainingForCache);
+            ContainingTokensCache = new FunctionCache<int, TokenInformation>(GetContainingTokensForCache);
 
-            _sourceSyntax = new ValueCache<SourceSyntax>(() => Parse(Source + 0));
+            SourceSyntaxCache = new ValueCache<SourceSyntax>(() => Parse(Source + 0));
 
-            _syntax = new ValueCache<Syntax>(() => SourceSyntax.Syntax);
+            SyntaxCache = new ValueCache<Syntax>(() => SourceSyntax.Syntax);
 
-            _codeContainer = new ValueCache<CodeContainer>
+            CodeContainerCache = new ValueCache<CodeContainer>
                 (() => new CodeContainer(_rootContext, Syntax, Source.Data));
 
-            _cSharpCode = new ValueCache<string>
-                (() => _codeContainer.Value.CreateCSharpString(_className));
+            CSharpCodeCache = new ValueCache<string>
+                (() => CodeContainerCache.Value.CreateCSharpString(_className));
         }
 
 
         [Node]
         [DisableDump]
-        public Source Source => _source.Value;
+        public Source Source => SourceCache.Value;
 
         [Node]
         [DisableDump]
-        internal Syntax Syntax => _syntax.Value;
+        internal Syntax Syntax => SyntaxCache.Value;
 
         [Node]
         [DisableDump]
-        internal SourceSyntax SourceSyntax => _sourceSyntax.Value;
+        internal SourceSyntax SourceSyntax => SourceSyntaxCache.Value;
 
         [Node]
         [DisableDump]
-        CodeContainer CodeContainer => _codeContainer.Value;
+        CodeContainer CodeContainer => CodeContainerCache.Value;
 
         [DisableDump]
         [Node]
-        internal string CSharpCode => _cSharpCode.Value;
+        internal string CSharpCode => CSharpCodeCache.Value;
 
         internal static string FormattedNow
         {
@@ -208,12 +208,12 @@ namespace Reni
 
         SourceSyntax Parse(SourcePosn source) => _tokenFactory.Parser.Execute(source);
 
-        void RunFromCode() => _codeContainer.Value.Execute(this);
+        void RunFromCode() => CodeContainerCache.Value.Execute(this);
 
         internal void Materialize()
         {
             if(!_parameters.ParseOnly)
-                _codeContainer.IsValid = true;
+                CodeContainerCache.IsValid = true;
         }
 
         public static string FlatExecute(string text, bool isFakedName = false)
@@ -263,15 +263,11 @@ namespace Reni
             return result;
         }
 
-        public TokenInformation Containing(int offset) => _containingCache[offset];
+        public TokenInformation ContainingTokens(int offset) => ContainingTokensCache[offset];
 
-        TokenInformation GetContainingForCache(int offset) => Containing(Source + offset);
-
-        internal IEnumerable<SourceSyntax> FindAllBelongings(SourceSyntax current)
-            => SourceSyntax.Belongings(current);
-
-        public TokenInformation Containing(SourcePosn posn)
+        TokenInformation GetContainingTokensForCache(int offset)
         {
+            SourcePosn posn = Source + offset;
             var result = SourceSyntax.Locate(posn);
             if(result != null)
                 return result;
@@ -281,7 +277,10 @@ namespace Reni
             return null;
         }
 
-        public TokenInformation Containing(SourcePart part)
+        internal IEnumerable<SourceSyntax> FindAllBelongings(SourceSyntax current)
+            => SourceSyntax.Belongings(current);
+
+        internal TokenInformation ContainingTokens(SourcePart part)
         {
             var left = SourceSyntax.Locate(part.Start);
             var right = SourceSyntax.Locate(part.End + -1);

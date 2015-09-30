@@ -15,7 +15,7 @@ namespace Reni.FeatureTest.UserInterface
         {
             const string Text = @"(1,3,4,6)";
             var compiler = new Compiler(text: Text);
-            var comma = compiler.Containing(2);
+            var comma = compiler.ContainingTokens(2);
             var commas = comma.FindAllBelongings(compiler).ToArray();
             Tracer.Assert(commas.Length == 3);
         }
@@ -35,7 +35,7 @@ namespace Reni.FeatureTest.UserInterface
                         index
                     })
                 .Where(item => item.item == ',')
-                .Select(item => compiler.Containing(item.index).FindAllBelongings(compiler).ToArray())
+                .Select(item => compiler.ContainingTokens(item.index).FindAllBelongings(compiler).ToArray())
                 .ToArray();
 
             Tracer.Assert(commas.Length == 3);
@@ -63,7 +63,7 @@ namespace Reni.FeatureTest.UserInterface
                         index
                     })
                 .Where(item => item.item == ',')
-                .Select(item => compiler.Containing(item.index).FindAllBelongings(compiler).ToArray())
+                .Select(item => compiler.ContainingTokens(item.index).FindAllBelongings(compiler).ToArray())
                 .ToArray();
 
             Tracer.Assert(commas.Length == 3);

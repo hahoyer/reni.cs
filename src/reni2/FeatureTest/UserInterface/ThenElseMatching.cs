@@ -15,8 +15,8 @@ namespace Reni.FeatureTest.UserInterface
         {
             const string Text = @"1 then 2 else 3";
             var compiler = new Compiler(text: Text);
-            var thenToken = compiler.Containing(2);
-            var elseToken = compiler.Containing(Text.IndexOf("else"));
+            var thenToken = compiler.ContainingTokens(2);
+            var elseToken = compiler.ContainingTokens(Text.IndexOf("else"));
 
             var thenMatches = thenToken.FindAllBelongings(compiler).ToArray();
             var elseMatches = elseToken.FindAllBelongings(compiler).ToArray();
@@ -31,8 +31,8 @@ namespace Reni.FeatureTest.UserInterface
         {
             const string Text = @"1 then 2 then 333 else 3";
             var compiler = new Compiler(text: Text);
-            var thenToken = compiler.Containing(2);
-            var elseToken = compiler.Containing(Text.IndexOf("else"));
+            var thenToken = compiler.ContainingTokens(2);
+            var elseToken = compiler.ContainingTokens(Text.IndexOf("else"));
 
             var thenMatches = thenToken.FindAllBelongings(compiler).ToArray();
             var elseMatches = elseToken.FindAllBelongings(compiler).ToArray();
