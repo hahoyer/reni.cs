@@ -160,8 +160,6 @@ namespace Reni.Code
             }
         }
 
-        void IVisitor.ReferenceCode(IContextReference context) { throw new UnexpectedContextReference(context); }
-
         void SubVisit(string tag, IFormalCodeItem codeBase)
         {
             const string stars = "\n******************************\n";

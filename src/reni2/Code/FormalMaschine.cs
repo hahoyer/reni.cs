@@ -141,7 +141,6 @@ namespace Reni.Code
         void IVisitor.Fiber(FiberHead fiberHead, FiberItem[] fiberItems) => NotImplementedMethod(fiberHead, fiberItems);
         void IVisitor.RecursiveCall() { throw new NotImplementedException(); }
         void IVisitor.ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode) => NotImplementedMethod(condSize, thenCode, elseCode);
-        void IVisitor.ReferenceCode(IContextReference context) => NotImplementedMethod(context);
         void IVisitor.TopFrameRef(Size offset) => NotImplementedMethod(offset);
         void IVisitor.RecursiveCallCandidate() { throw new NotImplementedException(); }
         void IVisitor.PrintText(Size leftSize, Size itemSize) => NotImplementedMethod(leftSize, itemSize);

@@ -25,7 +25,7 @@ namespace Reni.Code
                 ?.ValueType as CompoundType)
                 ?.View;
             Tracer.ConditionalBreak
-                (compoundView?.Compound.Syntax.ObjectId == 11 && compoundView.ViewPosition == 4);
+                (compoundView?.Compound.Syntax.ObjectId == -11 && compoundView.ViewPosition == 4);
         }
 
         [Node]
@@ -38,7 +38,10 @@ namespace Reni.Code
         protected override TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
             => actual.ContextRef(this);
 
-        internal override void Visit(IVisitor visitor) => visitor.ReferenceCode(Context);
+        internal override void Visit(IVisitor visitor)
+        {
+            throw new UnexpectedContextReference(_context);
+        }
 
         public override string DumpData() => _context.NodeDump();
     }

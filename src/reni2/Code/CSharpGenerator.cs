@@ -89,11 +89,6 @@ namespace Reni.Code
                     itemSize.SaveByteCount
                 );
         void IVisitor.RecursiveCall() => AddCode("goto Start");
-        void IVisitor.ReferenceCode(IContextReference context)
-        {
-            AddCode("data.Push({0})", context.NodeDump());
-            return;
-        }
         void IVisitor.RecursiveCallCandidate() { throw new UnexpectedRecursiveCallCandidate(); }
 
         void IVisitor.Call(Size size, FunctionId functionId, Size argsAndRefsSize) 

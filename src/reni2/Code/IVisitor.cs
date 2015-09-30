@@ -24,7 +24,6 @@ namespace Reni.Code
         void LocalBlockEnd(Size size, Size intermediateSize);
         void RecursiveCall();
         void RecursiveCallCandidate();
-        void ReferenceCode(IContextReference context);
         void ReferencePlus(Size right);
         void ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode);
         void TopData(Size offset, Size size, Size dataSize);
