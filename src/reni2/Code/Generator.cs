@@ -59,7 +59,7 @@ namespace Reni.Code
                 Environment.GetEnvironmentVariable("temp")
                 + "\\reni.compiler\\"
                 + Thread.CurrentThread.ManagedThreadId
-                + ".reni";
+                + ".reni.cs";
             var fileHandle = name.FileHandle();
             fileHandle.AssumeDirectoryOfFileExists();
 
