@@ -69,7 +69,7 @@ namespace Reni.Type
                         new ResultCache(category => parent.Mutation(category, destination))
                     );
                 ForcedReference = new ValueCache<IReference>(parent.ForcedReferenceForCache);
-                ForcedPointer = new ValueCache<PointerType>(parent.ForcedPointerForCache);
+                ForcedPointer = new ValueCache<PointerType>(parent.GetForcedPointerForCache);
                 Pair = new FunctionCache<TypeBase, Pair>(first => new Pair(first, parent));
                 Array = new FunctionCache<int, FunctionCache<string, ArrayType>>
                     (
@@ -416,7 +416,7 @@ namespace Reni.Type
             return CheckedReference ?? ForcedPointer;
         }
 
-        protected virtual PointerType ForcedPointerForCache()
+        protected virtual PointerType GetForcedPointerForCache()
         {
             Tracer.Assert(!Hllw);
             return new PointerType(this);

@@ -36,8 +36,9 @@ namespace Reni.Type
         internal override IReference ForcedReference => Parent.ForcedReference;
 
         protected override Result DeAlign(Category category) => Mutation(Parent) & category;
-        protected override PointerType ForcedPointerForCache() => Parent.ForcedPointer;
+        protected override PointerType GetForcedPointerForCache() => Parent.ForcedPointer;
 
+        [DisableDump]
         protected override IEnumerable<IConversion> RawSymmetricConversions
             =>
                 base.RawSymmetricConversions.Concat
@@ -65,8 +66,6 @@ namespace Reni.Type
             => UnalignedResult(category);
 
         public Result UnalignedResult(Category category)
-        {
-            return Parent.Result(category, () => ArgCode.BitCast(Parent.Size));
-        }
+            => Parent.Result(category, () => ArgCode.BitCast(Parent.Size));
     }
 }
