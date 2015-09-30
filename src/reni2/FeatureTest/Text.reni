@@ -82,8 +82,8 @@ Text: /\
             count: this count + other count;
 
             !mix_in: /\ ^ < this count
-            then this data(^)
-            else other data(^ - this count);
+            then this data(^ enable_cut)
+            else other data((^ - this count)enable_cut);
         }
     }
 }
