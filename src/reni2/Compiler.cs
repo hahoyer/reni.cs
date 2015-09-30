@@ -58,9 +58,8 @@ namespace Reni
         {
             Tracer.Assert
                 (
-                    (fileName == null ? 0 : 1) +
-                        (text == null ? 0 : 1) +
-                        (source == null ? 0 : 1)
+                    new object[] {fileName, text, source}
+                        .Count(item => item != null)
                         == 1
                 );
 
@@ -81,7 +80,8 @@ namespace Reni
                         : new Source(fileName.FileHandle()))
                 );
 
-            ContainingTokensCache = new FunctionCache<int, TokenInformation>(GetContainingTokensForCache);
+            ContainingTokensCache = new FunctionCache<int, TokenInformation>
+                (GetContainingTokensForCache);
 
             SourceSyntaxCache = new ValueCache<SourceSyntax>(() => Parse(Source + 0));
 
@@ -267,7 +267,7 @@ namespace Reni
 
         TokenInformation GetContainingTokensForCache(int offset)
         {
-            SourcePosn posn = Source + offset;
+            var posn = Source + offset;
             var result = SourceSyntax.Locate(posn);
             if(result != null)
                 return result;
