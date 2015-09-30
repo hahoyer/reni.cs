@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using hw.Debug;
 using hw.Forms;
 using Reni.Basics;
+using Reni.Struct;
+using Reni.Type;
 
 namespace Reni.Code
 {
@@ -18,7 +21,11 @@ namespace Reni.Code
             : base(_nextObjectId++)
         {
             _context = context;
-            StopByObjectIds();
+            var compoundView = ((context as PointerType)
+                ?.ValueType as CompoundType)
+                ?.View;
+            Tracer.ConditionalBreak
+                (compoundView?.Compound.Syntax.ObjectId == 11 && compoundView.ViewPosition == 4);
         }
 
         [Node]
@@ -27,8 +34,10 @@ namespace Reni.Code
         protected override CodeArgs GetRefsImplementation() => CodeArgs.Create(_context);
 
         protected override Size GetSize() => _context.Size;
+
         protected override TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
             => actual.ContextRef(this);
+
         internal override void Visit(IVisitor visitor) => visitor.ReferenceCode(Context);
 
         public override string DumpData() => _context.NodeDump();

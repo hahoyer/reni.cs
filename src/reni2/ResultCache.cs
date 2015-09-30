@@ -120,7 +120,7 @@ namespace Reni
 
         public static implicit operator ResultCache(Result x) => new ResultCache(x);
 
-        [DebuggerHidden]
+        //[DebuggerHidden]
         void Update(Category category)
         {
             var localCategory = category - Data.CompleteCategory - Data.PendingCategory;
@@ -151,6 +151,7 @@ namespace Reni
             {
                 Data.PendingCategory |= localCategory;
                 var result = Provider.Execute(localCategory, oldPendingCategory & category );
+                Tracer.Assert(result != null);
                 Tracer.Assert(localCategory <= result.CompleteCategory);
                 Data.Update(result);
             }
@@ -181,7 +182,7 @@ namespace Reni
             }
         }
 
-        [DebuggerHidden]
+        //[DebuggerHidden]
         void GuardedUpdate(Category category)
         {
             try

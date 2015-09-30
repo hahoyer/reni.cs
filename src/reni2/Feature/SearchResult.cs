@@ -60,10 +60,11 @@ namespace Reni.Feature
             if(metaFeature != null)
                 return metaFeature.Result(category, left, context, right);
 
-            return Feature
-                .Result(category.Typed, token, context, right)
-                .ReplaceAbsolute(ConverterPath.Destination.CheckedReference, ConverterPath.Execute)
-                .ReplaceArg(left);
+            var result = Feature.Result(category.Typed, token, context, right);
+            var replaceAbsolute = result
+                .ReplaceAbsolute(ConverterPath.Destination.CheckedReference, ConverterPath.Execute);
+            var replaceArg = replaceAbsolute.ReplaceArg(left);
+            return replaceArg;
         }
 
         internal Result SpecialExecute(Category category)

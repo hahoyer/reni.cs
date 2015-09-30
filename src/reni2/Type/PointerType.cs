@@ -28,7 +28,7 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        TypeBase ValueType { get; }
+        internal TypeBase ValueType { get; }
 
         [DisableDump]
         internal override Root RootContext => ValueType.RootContext;
