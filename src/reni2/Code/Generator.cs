@@ -1,25 +1,3 @@
-#region Copyright (C) 2012
-
-//     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-#endregion
-
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
@@ -39,16 +17,35 @@ namespace Reni.Code
         static readonly CSharpCodeProvider _provider = new CSharpCodeProvider();
 
         internal static string MainFunctionName => "MainFunction";
-        internal static string FunctionName(FunctionId functionId) => (functionId.IsGetter ? "GetFunction" : "SetFunction") + functionId.Index;
 
-        internal static string CreateCSharpString(Container main, FunctionCache<int, FunctionContainer> functions, bool useStatementAligner, string className) => new CSharp_Generated(className, main, functions).TransformText(useStatementAligner);
-        internal static Assembly CreateCSharpAssembly(Container main, FunctionCache<int, FunctionContainer> functions, bool align, string className, bool traceFilePosn) => CodeToAssembly(CreateCSharpString(main, functions, align, className), traceFilePosn);
+        internal static string FunctionName(FunctionId functionId)
+            => (functionId.IsGetter ? "GetFunction" : "SetFunction") + functionId.Index;
+
+        internal static string CreateCSharpString
+            (
+            Container main,
+            FunctionCache<int, FunctionContainer> functions,
+            bool useStatementAligner,
+            string className
+            )
+            => new CSharp_Generated(className, main, functions).TransformText(useStatementAligner);
+
+        internal static Assembly CreateCSharpAssembly
+            (
+            Container main,
+            FunctionCache<int, FunctionContainer> functions,
+            bool align,
+            string className,
+            bool traceFilePosn
+            )
+            => CodeToAssembly(CreateCSharpString(main, functions, align, className), traceFilePosn);
 
         static void CodeToFile(string name, string result, bool traceFilePosn)
         {
             var streamWriter = new StreamWriter(name);
             if(traceFilePosn)
-                Tracer.Line(Tracer.FilePosn(name.FileHandle().FullName, 0, 0, FilePositionTag.Debug));
+                Tracer.Line
+                    (Tracer.FilePosn(name.FileHandle().FullName, 0, 0, FilePositionTag.Debug));
             streamWriter.Write(result);
             streamWriter.Close();
         }
@@ -57,9 +54,9 @@ namespace Reni.Code
         {
             var name =
                 Environment.GetEnvironmentVariable("temp")
-                + "\\reni.compiler\\"
-                + Thread.CurrentThread.ManagedThreadId
-                + ".reni.cs";
+                    + "\\reni.compiler\\"
+                    + Thread.CurrentThread.ManagedThreadId
+                    + ".reni.cs";
             var fileHandle = name.FileHandle();
             fileHandle.AssumeDirectoryOfFileExists();
 
@@ -77,7 +74,7 @@ namespace Reni.Code
                 = new[]
                 {
                     Assembly.GetAssembly(typeof(Generator)).Location,
-                    Assembly.GetAssembly(typeof(hw.Helper.File)).Location,
+                    Assembly.GetAssembly(typeof(hw.Helper.File)).Location
                 };
             cp.ReferencedAssemblies.AddRange(referencedAssemblies);
             var cr = _provider.CompileAssemblyFromFile(cp, name);
@@ -99,11 +96,12 @@ namespace Reni.Code
 
     sealed class CSharpCompilerErrorException : Exception
     {
-        readonly CompilerErrorCollection _compilerErrorCollection;
+        public CompilerErrorCollection CompilerErrorCollection { get; }
 
-        public CompilerErrorCollection CompilerErrorCollection => _compilerErrorCollection;
-
-        public CSharpCompilerErrorException(CompilerErrorCollection cr) { _compilerErrorCollection = cr; }
+        public CSharpCompilerErrorException(CompilerErrorCollection cr)
+        {
+            CompilerErrorCollection = cr;
+        }
     }
 
 // ReSharper disable InconsistentNaming
@@ -113,7 +111,9 @@ namespace Reni.Code
         readonly string _className;
         readonly Container _main;
         readonly FunctionCache<int, FunctionContainer> _functions;
-        internal CSharp_Generated(string className, Container main, FunctionCache<int, FunctionContainer> functions)
+
+        internal CSharp_Generated
+            (string className, Container main, FunctionCache<int, FunctionContainer> functions)
         {
             _className = className;
             _main = main;
