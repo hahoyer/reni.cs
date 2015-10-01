@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using hw.Debug;
 using hw.Forms;
@@ -26,13 +27,13 @@ namespace Reni
 
         readonly MainTokenFactory _tokenFactory;
         readonly CompilerParameters _parameters;
-        readonly string _className;
+        readonly string ModuleName;
 
         readonly ValueCache<Source> SourceCache;
         readonly ValueCache<SourceSyntax> SourceSyntaxCache;
         readonly ValueCache<Syntax> SyntaxCache;
         readonly ValueCache<CodeContainer> CodeContainerCache;
-        readonly ValueCache<string> CSharpCodeCache;
+        readonly ValueCache<string> CSharpStringCache;
         readonly FunctionCache<int, TokenInformation> ContainingTokensCache;
 
         [Node]
@@ -45,14 +46,14 @@ namespace Reni
         /// </summary>
         /// <param name="fileName"> Name of the file. </param>
         /// <param name="parameters"> </param>
-        /// <param name="className"> </param>
+        /// <param name="moduleName"> </param>
         /// <param name="text"></param>
         /// <param name="source"></param>
         public Compiler
             (
             string fileName = null,
             CompilerParameters parameters = null,
-            string className = null,
+            string moduleName = null,
             string text = null,
             Source source = null)
         {
@@ -63,7 +64,7 @@ namespace Reni
                         == 1
                 );
 
-            _className = className ?? fileName?.Symbolize() ?? "ReniMainClass";
+            ModuleName = moduleName ?? fileName?.Symbolize() ?? "ReniModule";
             _rootContext = new Root(this);
             _parameters = parameters ?? new CompilerParameters();
 
@@ -88,10 +89,10 @@ namespace Reni
             SyntaxCache = new ValueCache<Syntax>(() => SourceSyntax.Syntax);
 
             CodeContainerCache = new ValueCache<CodeContainer>
-                (() => new CodeContainer(_rootContext, Syntax, Source.Data));
+                (() => new CodeContainer(ModuleName, _rootContext, Syntax, Source.Data));
 
-            CSharpCodeCache = new ValueCache<string>
-                (() => CodeContainerCache.Value.CreateCSharpString(_className));
+            CSharpStringCache = new ValueCache<string>
+                (() => CodeContainerCache.Value.CSharpString);
         }
 
 
@@ -113,7 +114,7 @@ namespace Reni
 
         [DisableDump]
         [Node]
-        internal string CSharpCode => CSharpCodeCache.Value;
+        internal string CSharpString => CSharpStringCache.Value;
 
         internal static string FormattedNow
         {
@@ -172,7 +173,7 @@ namespace Reni
                 Tracer.FlaggedLine("Code\n" + CodeContainer.Dump());
 
             if(_parameters.TraceOptions.ExecutedCode)
-                Tracer.FlaggedLine(CSharpCode);
+                Tracer.FlaggedLine(CSharpString);
 
             foreach(var t in Issues)
                 _parameters.OutStream.AddLog(t.LogDump + "\n");
@@ -180,8 +181,8 @@ namespace Reni
             Data.OutStream = _parameters.OutStream;
             try
             {
-                var method = CodeContainer
-                    .CreateCSharpAssembly(_className, _parameters.TraceOptions.GeneratorFilePosn)
+                var method = CSharpString
+                    .CodeToAssembly(_parameters.TraceOptions.GeneratorFilePosn)
                     .GetExportedTypes()[0]
                     .GetMethod(Generator.MainFunctionName);
 

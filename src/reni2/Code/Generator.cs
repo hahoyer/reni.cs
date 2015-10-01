@@ -14,7 +14,7 @@ namespace Reni.Code
 {
     static class Generator
     {
-        static readonly CSharpCodeProvider _provider = new CSharpCodeProvider();
+        internal static readonly CSharpCodeProvider _provider = new CSharpCodeProvider();
 
         internal static string MainFunctionName => "MainFunction";
 
@@ -23,24 +23,12 @@ namespace Reni.Code
 
         internal static string CreateCSharpString
             (
+            this string moduleName,
             Container main,
-            FunctionCache<int, FunctionContainer> functions,
-            bool useStatementAligner,
-            string className
-            )
-            => new CSharp_Generated(className, main, functions).TransformText(useStatementAligner);
+            FunctionCache<int, FunctionContainer> functions)
+            => new CSharp_Generated(moduleName, main, functions).TransformText();
 
-        internal static Assembly CreateCSharpAssembly
-            (
-            Container main,
-            FunctionCache<int, FunctionContainer> functions,
-            bool align,
-            string className,
-            bool traceFilePosn
-            )
-            => CodeToAssembly(CreateCSharpString(main, functions, align, className), traceFilePosn);
-
-        static void CodeToFile(string name, string result, bool traceFilePosn)
+        internal static void CodeToFile(string name, string result, bool traceFilePosn)
         {
             var streamWriter = new StreamWriter(name);
             if(traceFilePosn)
@@ -50,7 +38,7 @@ namespace Reni.Code
             streamWriter.Close();
         }
 
-        static Assembly CodeToAssembly(string codeToString, bool traceFilePosn)
+        internal static Assembly CodeToAssembly(this string codeToString, bool traceFilePosn)
         {
             var name =
                 Environment.GetEnvironmentVariable("temp")
@@ -85,7 +73,7 @@ namespace Reni.Code
             return cr.CompiledAssembly;
         }
 
-        static void HandleErrors(CompilerErrorCollection cr)
+        internal static void HandleErrors(CompilerErrorCollection cr)
         {
             for(var i = 0; i < cr.Count; i++)
                 Tracer.Line(cr[i].ToString());
@@ -108,18 +96,17 @@ namespace Reni.Code
     partial class CSharp_Generated
 // ReSharper restore InconsistentNaming
     {
-        readonly string _className;
+        readonly string ModuleName;
         readonly Container _main;
         readonly FunctionCache<int, FunctionContainer> _functions;
 
         internal CSharp_Generated
-            (string className, Container main, FunctionCache<int, FunctionContainer> functions)
+            (string moduleName, Container main, FunctionCache<int, FunctionContainer> functions)
         {
-            _className = className;
+            ModuleName = moduleName;
             _main = main;
             _functions = functions;
         }
 
-        internal string TransformText(bool useStatementAligner) => TransformText();
     }
 }

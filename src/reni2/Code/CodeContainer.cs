@@ -1,6 +1,6 @@
-using System.Linq;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using hw.Debug;
 using hw.Forms;
@@ -14,18 +14,22 @@ namespace Reni.Code
 {
     sealed class CodeContainer : DumpableObject
     {
-        readonly Root _rootContext;
+        readonly string ModuleName;
+        readonly Root RootContext;
         [Node]
-        readonly ValueCache<Container> _mainCache;
+        readonly ValueCache<Container> MainCache;
         [Node]
         readonly FunctionCache<int, FunctionContainer> _functions;
+        readonly ValueCache<string> CSharpStringCache;
 
-        public CodeContainer(Root rootContext, Syntax syntax, string description)
+        public CodeContainer(string moduleName, Root rootContext, Syntax syntax, string description)
         {
-            _rootContext = rootContext;
-            _mainCache = new ValueCache<Container>
+            ModuleName = moduleName;
+            RootContext = rootContext;
+            MainCache = new ValueCache<Container>
                 (() => rootContext.MainContainer(syntax, description));
-            _functions = new FunctionCache<int, FunctionContainer>(_rootContext.FunctionContainer);
+            CSharpStringCache = new ValueCache<string>(GetCSharpStringForCache);
+            _functions = new FunctionCache<int, FunctionContainer>(RootContext.FunctionContainer);
         }
 
         internal IEnumerable<Issue> Issues
@@ -42,22 +46,21 @@ namespace Reni.Code
         {
             get
             {
-                for(var i = 0; i < _rootContext.FunctionCount; i++)
+                for(var i = 0; i < RootContext.FunctionCount; i++)
                     _functions.IsValid(i, true);
                 return _functions;
             }
         }
 
-        Container Main => _mainCache.Value;
+        Container Main => MainCache.Value;
 
         internal void Execute(IExecutionContext context) => Main.Data.Execute(context);
 
-        internal string CreateCSharpString(string className) => Generator
-            .CreateCSharpString(Main, Functions, true, className);
+        string GetCSharpStringForCache()
+            => ModuleName.CreateCSharpString(Main, Functions);
 
-        internal Assembly CreateCSharpAssembly(string className, bool generatorFilePosn)
-            => Generator
-                .CreateCSharpAssembly(Main, Functions, false, className, generatorFilePosn);
+        [DisableDump]
+        internal string CSharpString => CSharpStringCache.Value;
 
         public CodeBase Function(FunctionId functionId)
         {
@@ -69,7 +72,7 @@ namespace Reni.Code
         public override string DumpData()
         {
             var result = "main\n" + Main.Dump() + "\n";
-            for(var i = 0; i < _rootContext.FunctionCount; i++)
+            for(var i = 0; i < RootContext.FunctionCount; i++)
                 result += "function index=" + i + "\n" + _functions[i].Dump() + "\n";
             return result;
         }
