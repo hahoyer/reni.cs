@@ -150,7 +150,7 @@ namespace Reni.Struct
                 var foreignRefsRef = CreateContextRefCode();
                 var visitResult = _resultCache & (Category.Code | Category.Exts);
                 var result = visitResult
-                    .ReplaceRefsForFunctionBody(Root.DefaultRefAlignParam.RefSize, foreignRefsRef)
+                    .ReplaceRefsForFunctionBody(foreignRefsRef)
                     .Code;
                 if(Parent.ArgsType.Hllw)
                     return result.TryReplacePrimitiveRecursivity(FunctionId);

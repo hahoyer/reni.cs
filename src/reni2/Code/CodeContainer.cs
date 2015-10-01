@@ -32,14 +32,9 @@ namespace Reni.Code
         }
 
         internal IEnumerable<Issue> Issues
-        {
-            get
-            {
-                return Main
-                    .Issues
-                    .Union(Functions.SelectMany(f => f.Value.Issues));
-            }
-        }
+            => Main
+                .Issues
+                .Union(Functions.SelectMany(f => f.Value.Issues));
 
         FunctionCache<int, FunctionContainer> Functions
         {

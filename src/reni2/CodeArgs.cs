@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using hw.Debug;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Context;
 
 namespace Reni
 {
@@ -171,13 +172,13 @@ namespace Reni
             => _data
                 .Aggregate(CodeBase.Void, (current, t) => current + CodeBase.ReferenceCode(t));
 
-        internal CodeBase ReplaceRefsForFunctionBody
-            (CodeBase code, Size refSize, CodeBase codeArgsReference)
+        internal CodeBase ReplaceRefsForFunctionBody(CodeBase code, CodeBase codeArgsReference)
         {
             var trace = ObjectId == -1;
-            StartMethodDump(trace, code, refSize, codeArgsReference);
+            StartMethodDump(trace, code, codeArgsReference);
             try
             {
+                var refSize = Root.DefaultRefAlignParam.RefSize;
                 var reference = codeArgsReference.ReferencePlus(refSize * _data.Count);
                 var result = code;
                 foreach(var referenceInCode in _data)

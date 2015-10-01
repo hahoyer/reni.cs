@@ -556,8 +556,11 @@ namespace Reni
             if(HasType && HasCode && Type.HasQuickSize)
                 Tracer.Assert(Code.Size == Type.Size, () => "Code and Type differ: " + Dump());
             if(HasExts && HasCode)
+            {
+                if(!(Code.Exts.IsEqual(Exts)))
+                    Tracer.Line(Tracer.StackTrace(FilePositionTag.Debug));
                 Tracer.Assert
-                    (Code.Exts.IsEqual(Exts), () => "Code and Exts differ: " + Dump());
+                    (Code.Exts.IsEqual(Exts), () => "Code and Exts differ: " + Dump());}
 
             Tracer.Assert((CompleteCategory & PendingCategory) == Category.None);
         }
@@ -715,15 +718,15 @@ namespace Reni
             return result;
         }
 
-        internal Result ReplaceRefsForFunctionBody(Size refSize, CodeBase replacement)
+        internal Result ReplaceRefsForFunctionBody(CodeBase replacement)
         {
-            if(!HasCode)
+            if (!HasCode)
                 return this;
             if(SmartArgs.Count == 0)
                 return this;
             var result = Clone;
             result.IsDirty = true;
-            result.Code = SmartArgs.ReplaceRefsForFunctionBody(Code, refSize, replacement);
+            result.Code = SmartArgs.ReplaceRefsForFunctionBody(Code, replacement);
             result.Exts = replacement.Exts;
             result.IsDirty = false;
             return result;
