@@ -51,14 +51,7 @@ namespace Reni.Code
         public string GetCSharpStatements(int indent)
         {
             var generator = new CSharpGenerator(Data.TemporarySize.SaveByteCount);
-            try
-            {
-                Data.Visit(generator);
-            }
-            catch(UnexpectedContextReference e)
-            {
-                Tracer.AssertionFailed("", () => e.Message);
-            }
+            Data.Visit(generator);
             return generator.Data.Indent(indent);
         }
     }
