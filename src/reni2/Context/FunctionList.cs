@@ -29,7 +29,6 @@ namespace Reni.Context
                         (-1, args => CreateFunctionInstance(args, syntax, structure))));
         }
 
-        internal FunctionType this[int i] => _list[i];
         internal int Count => _list.Count;
 
         internal FunctionType Find(FunctionSyntax syntax, CompoundView compoundView, TypeBase argsType)
