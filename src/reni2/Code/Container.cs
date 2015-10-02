@@ -23,6 +23,7 @@ namespace Reni.Code
             Description = description;
             FunctionId = functionId;
             Data = data;
+            Tracer.Assert(Data.Exts.IsNone);
             StopByObjectIds(-10);
         }
 

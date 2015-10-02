@@ -36,7 +36,7 @@ namespace Reni.Context
 
         internal Root(IExecutionContext executionContext)
         {
-            _recursionTypeCache = new ValueCache<RecursionType>(()=>new RecursionType(this));
+            _recursionTypeCache = new ValueCache<RecursionType>(() => new RecursionType(this));
             _metaDictionary = new FunctionCache<string, CompileSyntax>(CreateMetaDictionary);
             ExecutionContext = executionContext;
             _bitCache = new ValueCache<BitType>(() => new BitType(this));
@@ -169,12 +169,25 @@ namespace Reni.Context
 
         internal FunctionContainer FunctionContainer(int index) => _functions.Container(index);
 
-        internal Container MainContainer(Syntax syntax, string description) 
-            => syntax
-            .ToListSyntax
-            .ToContainer
-            .SaveValue
-            .Code(this)
-            .Container(description);
+        internal Container MainContainer(Syntax syntax, string description)
+        {
+            var compoundSyntax = syntax
+                .ToListSyntax
+                .ToContainer
+                .SaveValue;
+
+            var exts = Result(Category.Exts, compoundSyntax).Exts;
+            if(exts.IsNone)
+            {
+                var codeBase = compoundSyntax
+                    .Code(this);
+
+                return codeBase
+                    .Container(description);
+            }
+
+            NotImplementedMethod(syntax, description, nameof(exts), exts);
+            return null;
+        }
     }
 }
