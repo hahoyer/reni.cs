@@ -59,7 +59,7 @@ namespace Reni
         internal override Result ResultForCache(ContextBase context, Category category)
             => InternalResult(context, category);
 
-        public override IRecursionHandler RecursionHandler => this;
+        internal override IRecursionHandler RecursionHandler => this;
 
         Result CondResult(ContextBase context, Category category) => context.Result(category.Typed, Cond)
             .Conversion(context.RootContext.BitType.Align)

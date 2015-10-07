@@ -21,7 +21,7 @@ namespace Reni.Code
         readonly FunctionCache<int, FunctionContainer> _functions;
         readonly ValueCache<string> CSharpStringCache;
 
-        public CodeContainer(string moduleName, Root rootContext, Syntax syntax, string description)
+        internal CodeContainer(string moduleName, Root rootContext, Syntax syntax, string description)
         {
             ModuleName = moduleName;
             RootContext = rootContext;
@@ -56,7 +56,7 @@ namespace Reni.Code
         [DisableDump]
         internal string CSharpString => CSharpStringCache.Value;
 
-        public CodeBase Function(FunctionId functionId)
+        internal CodeBase Function(FunctionId functionId)
         {
             var item = _functions[functionId.Index];
             var container = functionId.IsGetter ? item.Getter : item.Setter;

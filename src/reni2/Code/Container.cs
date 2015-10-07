@@ -17,13 +17,12 @@ namespace Reni.Code
         [Node]
         internal readonly FunctionId FunctionId;
 
-        public Container(CodeBase data, string description, FunctionId functionId = null)
+        internal Container(CodeBase data, string description, FunctionId functionId = null)
             : base(_nextObjectId++)
         {
             Description = description;
             FunctionId = functionId;
             Data = data;
-            Tracer.Assert(Data.Exts.IsNone);
             StopByObjectIds(-10);
         }
 

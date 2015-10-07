@@ -224,7 +224,7 @@ namespace Reni
 
         [Node]
         [DebuggerHidden]
-        public TypeBase Type
+        internal TypeBase Type
         {
             get { return _type; }
             set
@@ -252,7 +252,7 @@ namespace Reni
 
         [Node]
         [DebuggerHidden]
-        public CodeArgs Exts
+        internal CodeArgs Exts
         {
             get { return _exts; }
             set

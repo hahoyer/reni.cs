@@ -103,7 +103,7 @@ namespace Reni.Parser
             StopByObjectIds();
         }
 
-        public override IRecursionHandler RecursionHandler => _infix as IRecursionHandler;
+        internal override IRecursionHandler RecursionHandler => _infix as IRecursionHandler;
 
         internal override Result ResultForCache(ContextBase context, Category category) => _infix
             .Result(context, category, _left, _right);
