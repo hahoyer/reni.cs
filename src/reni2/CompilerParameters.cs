@@ -62,6 +62,10 @@ namespace Reni
             [EnableDump]
             public bool GeneratorFilePosn;
 
+            [Node]
+            [EnableDump]
+            public bool ReformatedSource;
+
             public void None()
             {
                 Source = false;
