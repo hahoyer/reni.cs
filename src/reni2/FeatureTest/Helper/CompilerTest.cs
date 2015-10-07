@@ -66,14 +66,18 @@ namespace Reni.FeatureTest.Helper
                 expectedResult(c);
             }
 
-            Tracer.Line
-                (
-                    "---------------------\n" +
-                        c.SourceSyntax.Reformat() +
-                        "\n---------------------"
-                );
-            Tracer.ConditionalBreak(false);
-            c.Exececute();
+            if(Parameters.TraceOptions.ReformatedSource)
+            {
+                Tracer.Line
+                    (
+                        "---------------------\n" +
+                            c.SourceSyntax.Reformat() +
+                            "\n---------------------"
+                    );
+                Tracer.ConditionalBreak(true);
+            }
+
+            c.Execute();
 
             if(outStream.Data != targetSet.Output)
             {
