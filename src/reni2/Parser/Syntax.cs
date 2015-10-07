@@ -49,7 +49,7 @@ namespace Reni.Parser
             return null;
         }
 
-        public Checked<Syntax> CreateElseSyntax(Checked<CompileSyntax> right)
+        internal Checked<Syntax> CreateElseSyntax(Checked<CompileSyntax> right)
             => CreateElseSyntax(right.Value).Issues(right.Issues);
 
         internal virtual Checked<Syntax> CreateDeclarationSyntax(SourcePart token, Syntax right)
@@ -106,15 +106,16 @@ namespace Reni.Parser
             => new Checked<Syntax>(this, IssueId.ExtraRightBracket.CreateIssue(token));
 
         [DisableDump]
-        IEnumerable<Syntax> Parts => DirectChildren
-            .Where(item => item != null)
-            .SelectMany(item => item.Parts)
-            .plus(this);
-
-        [DisableDump]
         protected virtual IEnumerable<Syntax> DirectChildren { get { yield break; } }
 
         internal ListSyntax ToListSyntax => new ListSyntax(null, ToList(null));
+
+        [DisableDump]
+        public IEnumerable<Syntax> Closure
+            => DirectChildren
+                .Where(item => item != null)
+                .SelectMany(item => item.Closure)
+                .plus(this);
 
         internal virtual Checked<ExclamationSyntaxList> ExclamationSyntax(SourcePart token)
         {

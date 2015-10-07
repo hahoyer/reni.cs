@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using hw.Debug;
 using hw.Forms;
@@ -176,18 +177,23 @@ namespace Reni.Context
                 .ToContainer
                 .SaveValue;
 
-            var exts = Result(Category.Exts, compoundSyntax).Exts;
-            if(exts.IsNone)
+            if(Debugger.IsAttached)
             {
-                var codeBase = compoundSyntax
-                    .Code(this);
+                var exts = Result(Category.Exts, compoundSyntax).Exts;
+                if(!exts.IsNone)
+                {
+                    var s = syntax
+                        .Closure
+                        .OfType<CompileSyntax>()
+                        .Where(item=> item.ResultCache.Any(r=>r.Value.Exts.Data.Intersect(exts.Data).Any()));
 
-                return codeBase
-                    .Container(description);
+                    NotImplementedMethod(syntax, description, nameof(exts), exts);
+                }
             }
 
-            NotImplementedMethod(syntax, description, nameof(exts), exts);
-            return null;
+            return compoundSyntax
+                .Code(this)
+                .Container(description);
         }
     }
 }

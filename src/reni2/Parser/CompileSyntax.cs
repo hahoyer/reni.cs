@@ -18,8 +18,8 @@ namespace Reni.Parser
         // Used for debug only
         [DisableDump]
         [Node("Cache")]
-        readonly FunctionCache<ContextBase, object> _resultCache =
-            new FunctionCache<ContextBase, object>();
+        internal readonly FunctionCache<ContextBase, ResultCache> ResultCache =
+            new FunctionCache<ContextBase, ResultCache>();
 
         internal CompileSyntax() { }
 
@@ -44,10 +44,10 @@ namespace Reni.Parser
         [DisableDump]
         internal override Checked<CompileSyntax> ToCompiledSyntax => this;
 
-        public virtual IRecursionHandler RecursionHandler => null;
+        internal virtual IRecursionHandler RecursionHandler => null;
 
-        internal void AddToCacheForDebug(ContextBase context, object cacheItem)
-            => _resultCache.Add(context, cacheItem);
+        internal void AddToCacheForDebug(ContextBase context, ResultCache cacheItem)
+            => ResultCache.Add(context, cacheItem);
 
         internal Result Result(ContextBase context) => context.Result(Category.All, this);
 
@@ -94,7 +94,7 @@ namespace Reni.Parser
             return null;
         }
 
-        public CompileSyntax ReplaceArg(CompileSyntax value)
+        internal CompileSyntax ReplaceArg(CompileSyntax value)
             => Visit(new ReplaceArgVisitor(value)) ?? this;
 
         internal virtual CompileSyntax Visit(ISyntaxVisitor visitor)

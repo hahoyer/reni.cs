@@ -32,10 +32,10 @@ namespace Reni.Context
 
         [DisableDump]
         [Node]
-        readonly Cache _cache;
+        internal readonly Cache CacheObject;
 
         protected ContextBase()
-            : base(_nextId++) { _cache = new Cache(this); }
+            : base(_nextId++) { CacheObject = new Cache(this); }
 
         public abstract string GetContextIdentificationDump();
 
@@ -46,11 +46,11 @@ namespace Reni.Context
         internal abstract Root RootContext { get; }
 
         [DisableDump]
-        internal CompoundView FindRecentCompoundView => _cache.RecentStructure.Value;
+        internal CompoundView FindRecentCompoundView => CacheObject.RecentStructure.Value;
 
         [DisableDump]
         internal IFunctionContext FindRecentFunctionContextObject
-            => _cache.RecentFunctionContextObject.Value;
+            => CacheObject.RecentFunctionContextObject.Value;
 
         [DisableDump]
         internal abstract bool IsRecursionMode { get; }
@@ -60,24 +60,24 @@ namespace Reni.Context
             => size.SizeToPacketCount(Root.DefaultRefAlignParam.AlignBits);
 
         internal ContextBase CompoundPositionContext(CompoundSyntax container, int position)
-            => _cache.CompoundContexts[container][position];
+            => CacheObject.CompoundContexts[container][position];
 
         internal CompoundView CompoundView(CompoundSyntax syntax, int? accessPosition = null)
-            => _cache.CompoundViews[syntax][accessPosition ?? syntax.EndPosition];
+            => CacheObject.CompoundViews[syntax][accessPosition ?? syntax.EndPosition];
 
-        internal Compound Compound(CompoundSyntax context) => _cache.Compounds[context];
+        internal Compound Compound(CompoundSyntax context) => CacheObject.Compounds[context];
 
         //[DebuggerHidden]
         internal Result Result(Category category, CompileSyntax syntax)
             => ResultCache(syntax).GetCategories(category);
 
-        ResultCache ResultCache(CompileSyntax syntax) => _cache.ResultCache[syntax];
+        ResultCache ResultCache(CompileSyntax syntax) => CacheObject.ResultCache[syntax];
 
         internal ResultCache ResultAsReferenceCache(CompileSyntax syntax)
-            => _cache.ResultAsReferenceCache[syntax];
+            => CacheObject.ResultAsReferenceCache[syntax];
 
 
-        internal TypeBase TypeIfKnown(CompileSyntax syntax) => _cache.ResultCache[syntax].Data.Type;
+        internal TypeBase TypeIfKnown(CompileSyntax syntax) => CacheObject.ResultCache[syntax].Data.Type;
 
         [DebuggerHidden]
         Result ResultForCache(Category category, CompileSyntax syntax)
@@ -166,7 +166,7 @@ namespace Reni.Context
             return null;
         }
 
-        sealed class Cache : DumpableObject, IIconKeyProvider
+        public sealed class Cache : DumpableObject, IIconKeyProvider
         {
             [Node]
             [DisableDump]
@@ -293,7 +293,7 @@ namespace Reni.Context
             if(searchResult == null)
                 return RootContext.UndefinedSymbol(source).Result(category);
 
-            var result = searchResult.Result(category, _cache.AsObject, source, this, right);
+            var result = searchResult.Result(category, CacheObject.AsObject, source, this, right);
 
             Tracer.Assert(category <= result.CompleteCategory);
             return result;
