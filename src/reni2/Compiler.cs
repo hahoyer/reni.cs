@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using hw.Debug;
 using hw.Forms;
 using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
+using JetBrains.Annotations;
 using Reni.Code;
 using Reni.Context;
 using Reni.Formatting;
@@ -40,6 +41,7 @@ namespace Reni
         readonly Root _rootContext;
 
         bool _isInExecutionPhase;
+        public Exception Exception;
 
         /// <summary>
         ///     ctor from file
@@ -64,7 +66,7 @@ namespace Reni
                         == 1
                 );
 
-            ModuleName = moduleName ?? fileName?.Symbolize() ?? "ReniModule";
+            ModuleName = moduleName ?? ModuleNameFromFileName(fileName) ?? "ReniModule";
             _rootContext = new Root(this);
             _parameters = parameters ?? new CompilerParameters();
 
@@ -94,6 +96,9 @@ namespace Reni
             CSharpStringCache = new ValueCache<string>
                 (() => CodeContainerCache.Value.CSharpString);
         }
+
+        static string ModuleNameFromFileName(string fileName)
+            => fileName == null ? null : Path.GetFileName(fileName).Symbolize();
 
 
         [Node]
@@ -149,10 +154,24 @@ namespace Reni
         Checked<CompileSyntax> Parse(string sourceText)
             => Parse(new Source(sourceText) + 0).Syntax.ToCompiledSyntax;
 
+        [UsedImplicitly]
+        public Compiler Empower()
+        {
+            try
+            {
+                Execute();
+            }
+            catch(Exception exception)
+            {
+                Exception = exception;
+            }
+            return this;
+        }
+
         /// <summary>
         ///     Performs compilation
         /// </summary>
-        public void Exececute()
+        public void Execute()
         {
             if(_parameters.TraceOptions.Source)
                 Tracer.Line("Dump Source\n" + Source.Dump());
@@ -237,7 +256,7 @@ namespace Reni
             var exceptionText = "";
             try
             {
-                c.Exececute();
+                c.Execute();
             }
             catch(Exception exception)
             {
