@@ -11,12 +11,11 @@ namespace Reni.Parser
 {
     sealed class EmptyList : CompileSyntax
     {
-        readonly SourcePart Token;
+        internal override SourcePart Token { get; }
 
         public EmptyList(SourcePart token)
         {
             Token = token;
-            SourcePart = Token;
             StopByObjectIds();
         }
 

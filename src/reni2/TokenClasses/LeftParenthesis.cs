@@ -40,7 +40,7 @@ namespace Reni.TokenClasses
 
         sealed class Syntax : Parser.Syntax
         {
-            SourcePart Token { get; }
+            internal override SourcePart Token { get; }
             readonly int Level;
 
             [EnableDump]

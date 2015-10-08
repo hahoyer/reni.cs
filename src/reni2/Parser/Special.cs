@@ -16,7 +16,7 @@ namespace Reni.Parser
     sealed class TerminalSyntax : SpecialSyntax
     {
         internal string Id => Token.Id;
-        readonly SourcePart Token ;
+        internal override SourcePart Token { get; }
 
         [Node]
         [EnableDump]
@@ -92,7 +92,7 @@ namespace Reni.Parser
         [EnableDump]
         readonly CompileSyntax _right;
 
-        SourcePart Token { get; }
+        internal override SourcePart Token { get; }
 
         public InfixSyntax(CompileSyntax left, IInfix infix, SourcePart token, CompileSyntax right)
         {
@@ -172,7 +172,7 @@ namespace Reni.Parser
             Token = token;
         }
 
-        SourcePart Token { get; }
+        internal override SourcePart Token { get; }
 
         internal override Result ResultForCache(ContextBase context, Category category)
             => _suffix.Result(context, category, _left);

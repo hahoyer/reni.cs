@@ -18,7 +18,7 @@ namespace Reni.TokenClasses
         }
 
         internal Definable Definable { get; }
-        SourcePart Token { get; }
+        internal override SourcePart Token { get; }
 
         internal override Checked<Syntax> CreateDeclarationSyntax
             (SourcePart token, Syntax right)

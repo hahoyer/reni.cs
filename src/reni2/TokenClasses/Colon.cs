@@ -54,7 +54,7 @@ namespace Reni.TokenClasses
         {
             [EnableDump]
             internal DeclarationTagToken.Syntax Tag { get; }
-            SourcePart Token { get; }
+            internal override SourcePart Token { get; }
 
             public Syntax(DeclarationTagToken.Syntax tag, SourcePart token)
             {

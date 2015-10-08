@@ -42,7 +42,7 @@ namespace Reni.Parser
         internal CompileSyntax Left { get; }
         [Node]
         public Definable Definable { get; }
-        public SourcePart Token { get; }
+        internal override SourcePart Token { get; }
         [Node]
         internal CompileSyntax Right { get; }
 
@@ -89,7 +89,7 @@ namespace Reni.Parser
 
         protected override string GetNodeDump()
         {
-            var result = Definable.Id;
+            var result = Definable?.Id ?? "";
             if(Left != null)
                 result = "(" + Left.NodeDump + ")" + result;
             if(Right != null)

@@ -30,7 +30,6 @@ namespace Reni.Struct
         {
             _statements = statements;
             _data = GetData;
-            SourcePart = _statements.Select(item => item.SourcePart).Aggregate();
             StopByObjectIds();
         }
 

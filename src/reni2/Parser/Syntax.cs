@@ -15,8 +15,12 @@ namespace Reni.Parser
     {
         static bool _isInDump;
 
-        [DisableDump]
-        internal SourcePart SourcePart;
+        virtual internal SourcePart Token => null;
+
+        internal SourcePart SourcePart => DirectChildren
+            .Select(item => item?.SourcePart)
+            .Where(item => item != null)
+            .Aggregate() + Token;
 
         protected Syntax() { }
 
@@ -146,7 +150,7 @@ namespace Reni.Parser
 
     abstract class NonCompileSyntax : Syntax
     {
-        protected readonly SourcePart Token;
+        internal override SourcePart Token { get; }
         protected NonCompileSyntax(SourcePart token) { Token = token; }
         [DisableDump]
         internal override Checked<CompileSyntax> ToCompiledSyntax
