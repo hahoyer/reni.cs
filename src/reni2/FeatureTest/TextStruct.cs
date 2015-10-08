@@ -51,6 +51,5 @@ namespace Reni.FeatureTest
     [Text1]
     [UserObjects]
     [UnMatchedBrackets]
-    [LowPriority]
     public sealed class TextConcat : TextStruct {}
 }

@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
+using hw.Helper;
 using System.Linq;
 using hw.Debug;
-using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
 using Reni.Struct;
@@ -14,18 +14,22 @@ namespace Reni.Parser
     abstract class Syntax : DumpableObject
     {
         static bool _isInDump;
+        SourcePart SourcePartCache;
 
-        virtual internal SourcePart Token => null;
-
-        internal SourcePart SourcePart => DirectChildren
-            .Select(item => item?.SourcePart)
-            .Where(item => item != null)
-            .Aggregate() + Token;
+        internal virtual SourcePart Token => null;
 
         protected Syntax() { }
 
         protected Syntax(int objectId)
-            : base(objectId) {}
+            : base(objectId)
+        {}
+
+        [DisableDump]
+        internal SourcePart SourcePart
+        {
+            get { return SourcePartCache ?? (SourcePartCache = GetSourcePartForCache()); }
+            set { SourcePartCache = value; }
+        }
 
         [DisableDump]
         internal virtual Checked<CompileSyntax> ContainerStatementToCompileSyntax
@@ -34,10 +38,7 @@ namespace Reni.Parser
         [DisableDump]
         internal abstract Checked<CompileSyntax> ToCompiledSyntax { get; }
 
-        internal virtual IEnumerable<KeyValuePair<string, int>> GetDeclarations(int index)
-        {
-            yield break;
-        }
+        internal virtual IEnumerable<KeyValuePair<string, int>> GetDeclarations(int index) { yield break; }
 
         internal virtual IEnumerable<string> GetDeclarations() { yield break; }
 
@@ -145,6 +146,14 @@ namespace Reni.Parser
         {
             NotImplementedMethod(right, token);
             return null;
+        }
+
+        SourcePart GetSourcePartForCache()
+        {
+            return DirectChildren
+                .Select(item => item?.SourcePart)
+                .Where(item => item != null)
+                .Aggregate() + Token;
         }
     }
 

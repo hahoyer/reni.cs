@@ -111,7 +111,7 @@ namespace Reni.Context
                 .Array(1, ArrayType.Options.Create().IsMutable.SetTo(isMutable))
                 .Result(category.Typed, target)
                 .LocalReferenceResult
-                & category;
+                   & category;
         }
 
         internal FunctionType FunctionInstance
@@ -192,11 +192,13 @@ namespace Reni.Context
                                     (
                                         r => new
                                         {
+                                            id = r.Value.ObjectId,
                                             syntax = item,
                                             context = r.Key,
                                             exts = r.Value.Exts.Data
                                         }))
                         .Where(item => item.exts.Intersect(exts.Data).Any())
+                        .OrderBy(item => item.id)
                         .ToArray();
 
                     var ss = s.GroupBy(item => item.syntax, item => item.context)
@@ -206,7 +208,10 @@ namespace Reni.Context
                             {
                                 syntax = item.Key,
                                 context = item.ToArray()
-                            })
+                            }
+                        )
+                        .OrderBy(item => item.syntax.SourcePart.Position)
+                        .ThenByDescending(item => item.syntax.SourcePart.EndPosition)
                         .ToArray();
                     var sc = s.GroupBy(item => item.context, item => item.syntax)
                         .Select
@@ -215,21 +220,26 @@ namespace Reni.Context
                             {
                                 context = item.Key,
                                 syntax = item.ToArray()
-                            })
+                            }
+                        )
+                        .OrderBy(item => item.context.ObjectId)
                         .ToArray();
 
-                    var syntaxData=
+                    var syntaxData =
                         ss.Select
-                        (
-                            item =>
-                                "==== "
+                            (
+                                item =>
+                                    "==== "
                                     + item.syntax.NodeDump
                                     + " ====\n"
+                                    + item.context.Select(item1=>item1.NodeDump).Stringify("\n")
+                                    + "\n-------------------\n"
                                     + item.syntax.SourcePart.Id
-                        )
-                        .Stringify("\n-------------------\n\n\n");
+                                    + "\n-------------------\n\n\n"
+                            )
+                            .Stringify("");
 
-                    Trace.Write(syntaxData);
+                    Trace.WriteLine(syntaxData);
                     NotImplementedMethod(syntax, description, nameof(exts), exts);
                 }
             }
