@@ -145,20 +145,6 @@ namespace Reni.Struct
                 ?.Position;
         }
 
-        internal IImplementation Find(Definable definable, CompoundView view)
-        {
-            Tracer.Assert(view.Compound.Syntax == this);
-
-            if(definable == null)
-                return null;
-
-            var name = definable.Id;
-            var definingStatement = _data
-                .Take(view.ViewPosition)
-                .SingleOrDefault(s => s.IsDefining(name));
-            return definingStatement == null ? null : view.AccessFeature(definingStatement.Position);
-        }
-
         internal override Result ResultForCache(ContextBase context, Category category) => context
             .Compound(this)
             .Result(category);

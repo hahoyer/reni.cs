@@ -30,12 +30,16 @@ namespace Reni.Struct
         readonly FunctionCache<int, FieldAccessType> _fieldAccessTypeCache;
         [Node]
         readonly FunctionCache<FunctionSyntax, FunctionBodyType> _functionBodyTypeCache;
+        [Node]
+        readonly ValueCache<CompoundContext> CompoundContextCache;
 
         internal CompoundView(Compound compound, int viewPosition)
             : base(_nextObjectId++)
         {
             Compound = compound;
             ViewPosition = viewPosition;
+            CompoundContextCache = new ValueCache<CompoundContext>
+                (() => new CompoundContext(this));
 
             _typeCache = new ValueCache<CompoundType>(() => new CompoundType(this));
 
@@ -65,12 +69,17 @@ namespace Reni.Struct
         internal CompoundType Type => _typeCache.Value;
 
         protected override string GetNodeDump()
-            => base.GetNodeDump() + "(" + GetCompoundIdentificationDump() + ")";
+            =>
+                base.GetNodeDump() + "(" + Context.GetContextIdentificationDump() + "<o>"
+                    + GetCompoundIdentificationDump() + ")";
 
         [DisableDump]
         TypeBase IndexType => Compound.IndexType;
 
         bool _isObtainCompoundSizeActive;
+
+        [DisableDump]
+        internal CompoundContext CompoundContext => CompoundContextCache.Value;
 
         [DisableDump]
         internal Size CompoundViewSize
@@ -284,6 +293,9 @@ namespace Reni.Struct
                 .TypeForStructureElement;
 
         internal IImplementation Find(Definable definable)
-            => Compound.Syntax.Find(definable, this);
+        {
+            var position = Compound.Syntax.Find(definable?.Id);
+            return position == null ? null : AccessFeature(position.Value);
+        }
     }
 }

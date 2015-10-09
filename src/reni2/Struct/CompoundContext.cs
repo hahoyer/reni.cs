@@ -3,19 +3,18 @@ using System.Linq;
 using System;
 using hw.Debug;
 using hw.Forms;
-using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
 using Reni.TokenClasses;
 
 namespace Reni.Struct
 {
-    sealed class CompoundViewContext
+    sealed class CompoundContext
         : Child
             , ISymbolProviderForPointer<Definable>
     {
-        internal CompoundViewContext(ContextBase parent, CompoundView view)
-            : base(parent) { View = view; }
+        internal CompoundContext(CompoundView view)
+            : base(view.Compound.Parent) { View = view; }
 
         [Node]
         [EnableDump]
@@ -27,8 +26,6 @@ namespace Reni.Struct
 
         IImplementation ISymbolProviderForPointer<Definable>.Feature(Definable tokenClass)
             => View.Find(tokenClass);
-
-        internal Result ObjectResult(Category category) => View.ObjectPointerViaContext(category);
 
         internal override CompoundView ObtainRecentCompoundView() => View;
     }

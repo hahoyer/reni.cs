@@ -304,7 +304,7 @@
     <Compile Include="Singleton.cs" />
     <Compile Include="StringStream.cs" />
     <Compile Include="Struct\Compound.cs" />
-    <Compile Include="Struct\CompoundViewContext.cs" />
+    <Compile Include="Struct\CompoundContext.cs" />
     <Compile Include="Struct\FunctionBodyType.cs" />
     <Compile Include="Struct\FunctionId.cs" />
     <Compile Include="Struct\FunctionType.cs" />

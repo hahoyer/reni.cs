@@ -705,16 +705,6 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        internal virtual IEnumerable<Syntax> Mixins
-        {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
-        }
-
-        [DisableDump]
         internal virtual ContextBase ToContext
         {
             get

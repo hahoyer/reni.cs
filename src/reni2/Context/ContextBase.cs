@@ -60,10 +60,10 @@ namespace Reni.Context
             => size.SizeToPacketCount(Root.DefaultRefAlignParam.AlignBits);
 
         internal ContextBase CompoundPositionContext(CompoundSyntax container, int position)
-            => CacheObject.CompoundContexts[container][position];
+            => CompoundView(container, position).CompoundContext;
 
         internal CompoundView CompoundView(CompoundSyntax syntax, int? accessPosition = null)
-            => CacheObject.CompoundViews[syntax][accessPosition ?? syntax.EndPosition];
+            => CacheObject.Compounds[syntax].View[accessPosition ?? syntax.EndPosition];
 
         internal Compound Compound(CompoundSyntax context) => CacheObject.Compounds[context];
 
@@ -178,16 +178,6 @@ namespace Reni.Context
 
             [Node]
             [SmartNode]
-            internal readonly FunctionCache<CompoundSyntax, FunctionCache<int, ContextBase>>
-                CompoundContexts;
-
-            [Node]
-            [SmartNode]
-            internal readonly FunctionCache<CompoundSyntax, FunctionCache<int, CompoundView>>
-                CompoundViews;
-
-            [Node]
-            [SmartNode]
             internal readonly FunctionCache<CompoundSyntax, Compound> Compounds;
 
             [Node]
@@ -208,25 +198,9 @@ namespace Reni.Context
                     (target.ResultCacheForCache);
                 ResultAsReferenceCache = new FunctionCache<CompileSyntax, ResultCache>
                     (target.GetResultAsReferenceCacheForCache);
-                CompoundContexts = new FunctionCache
-                    <CompoundSyntax, FunctionCache<int, ContextBase>>
-                    (
-                    container =>
-                        new FunctionCache<int, ContextBase>
-                            (
-                            position =>
-                                new CompoundViewContext
-                                    (target, target.CompoundView(container, position)))
-                    );
                 RecentStructure = new ValueCache<CompoundView>(target.ObtainRecentCompoundView);
                 RecentFunctionContextObject = new ValueCache<IFunctionContext>
                     (target.ObtainRecentFunctionContext);
-                CompoundViews = new FunctionCache<CompoundSyntax, FunctionCache<int, CompoundView>>
-                    (
-                    container =>
-                        new FunctionCache<int, CompoundView>
-                            (position => new CompoundView(Compounds[container], position))
-                    );
                 Compounds = new FunctionCache<CompoundSyntax, Compound>
                     (container => new Compound(container, target));
 
@@ -325,5 +299,10 @@ namespace Reni.Context
         }
 
         object ResultCache.IResultProvider.Target => this;
+
+        virtual internal IEnumerable<ContextBase> ParentChain
+        {
+            get { yield return this; }
+        }
     }
 }

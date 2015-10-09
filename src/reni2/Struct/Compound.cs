@@ -20,6 +20,7 @@ namespace Reni.Struct
         internal readonly ContextBase Parent;
 
         readonly int _order;
+        internal readonly FunctionCache<int, CompoundView> View;
 
         internal Compound(CompoundSyntax syntax, ContextBase parent)
             : base(_nextObjectId++)
@@ -27,6 +28,7 @@ namespace Reni.Struct
             _order = CodeArgs.NextOrder++;
             Syntax = syntax;
             Parent = parent;
+            View = new FunctionCache<int, CompoundView>(position=> new CompoundView(this, position));
         }
 
         public string GetCompoundIdentificationDump() => Syntax.GetCompoundIdentificationDump();

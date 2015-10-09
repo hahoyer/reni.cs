@@ -43,5 +43,8 @@ namespace Reni.Context
             var result = base.Declarations(tokenClass).ToArray();
             return result.Any() ? result : Parent.Declarations(tokenClass);
         }
+
+        internal override IEnumerable<ContextBase> ParentChain
+            => _parent.ParentChain.Concat(base.ParentChain);
     }
 }

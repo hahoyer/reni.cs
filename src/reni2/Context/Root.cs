@@ -225,6 +225,21 @@ namespace Reni.Context
                         .OrderBy(item => item.context.ObjectId)
                         .ToArray();
 
+                    var argTypes = sc
+                        .Select(item => item.context)
+                        .SelectMany(item => item.ParentChain)
+                        .OfType<Function>()
+                        .Select(item => item.ArgsType)
+                        .Distinct()
+                        .OrderBy(item => item.ObjectId);
+
+                    var argTypesData = argTypes
+                        .Select(item=>item.ObjectId + ":  " + item.NodeDump)
+                        .Stringify("\n")
+                        .Format(2.StringAligner())
+                        ;
+                    Trace.WriteLine(argTypesData);
+
                     var syntaxData =
                         ss.Select
                             (
@@ -240,7 +255,7 @@ namespace Reni.Context
                             .Stringify("");
 
                     Trace.WriteLine(syntaxData);
-                    NotImplementedMethod(syntax, description, nameof(exts), exts);
+                    NotImplementedMethod("syntax", "description", nameof(exts), exts);
                 }
             }
 
