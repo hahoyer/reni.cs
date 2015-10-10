@@ -58,8 +58,11 @@ namespace Reni.Struct
             StopByObjectIds(-313);
         }
 
-        public string GetCompoundIdentificationDump()
+        public string GetCompoundChildDump()
             => Compound.GetCompoundIdentificationDump() + "@" + ViewPosition;
+
+        public string GetCompoundIdentificationDump()
+            => Context.GetContextIdentificationDump();
 
         [DisableDump]
         internal ContextBase Context
@@ -70,8 +73,7 @@ namespace Reni.Struct
 
         protected override string GetNodeDump()
             =>
-                base.GetNodeDump() + "(" + Context.GetContextIdentificationDump() + "<o>"
-                    + GetCompoundIdentificationDump() + ")";
+                base.GetNodeDump() + "(" + Context.GetContextIdentificationDump()+ ")";
 
         [DisableDump]
         TypeBase IndexType => Compound.IndexType;

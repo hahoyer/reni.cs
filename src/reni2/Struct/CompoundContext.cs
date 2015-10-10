@@ -20,7 +20,7 @@ namespace Reni.Struct
         [EnableDump]
         CompoundView View { get; }
 
-        string GetCompoundIdentificationDump() => View.GetCompoundIdentificationDump();
+        string GetCompoundIdentificationDump() => View.GetCompoundChildDump();
 
         protected override string GetContextChildIdentificationDump() => GetCompoundIdentificationDump();
 

@@ -12,7 +12,6 @@ namespace Reni.Context
     {
         public override sealed string GetContextIdentificationDump()
             => Parent.GetContextIdentificationDump()
-                + "->"
                 + GetContextChildIdentificationDump();
 
         protected abstract string GetContextChildIdentificationDump();
