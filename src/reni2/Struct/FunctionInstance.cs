@@ -103,8 +103,8 @@ namespace Reni.Struct
                 var rawResult = Context.Result(category.Typed, _body);
 
                 Tracer.Assert(rawResult.CompleteCategory == category.Typed);
-                if(rawResult.FindArgs != null)
-                    Tracer.Assert(!rawResult.SmartArgs.Contains(CodeArgs.Arg()), rawResult.Dump);
+                if(rawResult.FindExts != null)
+                    Tracer.Assert(!rawResult.SmartExts.Contains(CodeArgs.Arg()), rawResult.Dump);
 
                 Dump("rawResult", rawResult);
                 BreakExecution();

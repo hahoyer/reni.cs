@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 using hw.Debug;
 using hw.Forms;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Context;
+using Reni.Parser;
 using Reni.Type;
 
 namespace Reni
@@ -92,6 +93,8 @@ namespace Reni
         IResultProvider Provider { get; }
         [DisableDump]
         internal string FunctionDump = "";
+        [DisableDump]
+        internal Syntax Syntax => (Provider.Target as ContextBase.ResultProvider)?.Syntax;
 
         [DisableDump]
         static Call[] Calls => Current?.ToEnumerable.ToArray() ?? new Call[0];
@@ -137,9 +140,9 @@ namespace Reni
                 localCategory -= Category.Size;
             }
 
-            if(localCategory.HasExts && Data.FindArgs != null)
+            if(localCategory.HasExts && Data.FindExts != null)
             {
-                Data.Exts = Data.FindArgs;
+                Data.Exts = Data.FindExts;
                 localCategory -= Category.Exts;
             }
 
@@ -150,7 +153,7 @@ namespace Reni
             try
             {
                 Data.PendingCategory |= localCategory;
-                var result = Provider.Execute(localCategory, oldPendingCategory & category );
+                var result = Provider.Execute(localCategory, oldPendingCategory & category);
                 Tracer.Assert(result != null);
                 Tracer.Assert(localCategory <= result.CompleteCategory);
                 Data.Update(result);

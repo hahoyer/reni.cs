@@ -367,7 +367,7 @@ namespace Reni
             }
         }
 
-        internal CodeArgs FindArgs
+        internal CodeArgs FindExts
         {
             get
             {
@@ -380,11 +380,11 @@ namespace Reni
         }
 
         [DisableDump]
-        internal CodeArgs SmartArgs
+        internal CodeArgs SmartExts
         {
             get
             {
-                var result = FindArgs;
+                var result = FindExts;
                 if(result == null)
                 {
                     DumpMethodWithBreak("No approriate result property defined");
@@ -722,11 +722,11 @@ namespace Reni
         {
             if (!HasCode)
                 return this;
-            if(SmartArgs.Count == 0)
+            if(SmartExts.Count == 0)
                 return this;
             var result = Clone;
             result.IsDirty = true;
-            result.Code = SmartArgs.ReplaceRefsForFunctionBody(Code, replacement);
+            result.Code = SmartExts.ReplaceRefsForFunctionBody(Code, replacement);
             result.Exts = replacement.Exts;
             result.IsDirty = false;
             return result;
