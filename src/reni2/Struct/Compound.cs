@@ -59,22 +59,6 @@ namespace Reni.Struct
 
         internal bool Hllw(int accessPosition) => ObtainHllw(accessPosition);
 
-        internal Result ContextViaObjectPointer(int position, Result result)
-            =>
-                result.ReplaceAbsolute
-                    (this, () => ContextViaObjectPointerCode(position), CodeArgs.Arg);
-
-        internal Size SizeUntil(int position)
-            => ResultsOfStatements(Category.Size, 0, position).Size;
-
-        CodeBase ContextViaObjectPointerCode(int accessPosition)
-            => Parent
-                .CompoundView(Syntax, accessPosition)
-                .Type
-                .SmartPointer
-                .ArgCode
-                .ReferencePlus(SizeUntil(accessPosition));
-
         internal Size FieldOffsetFromAccessPoint(int accessPosition, int fieldPosition)
             => ResultsOfStatements(Category.Size, fieldPosition + 1, accessPosition).Size;
 
