@@ -137,16 +137,6 @@ namespace Reni
             return new CondSyntax(this, elseSyntax);
         }
 
-        internal override Result PendingResultForCache(ContextBase context, Category category)
-        {
-            if(Else == null)
-            {
-                return context
-                    .RootContext.VoidType.Result(category);
-            }
-            return base.PendingResultForCache(context, category);
-        }
-
         Result IRecursionHandler.Execute
             (ContextBase context, Category category, Category pendingCategory, CompileSyntax syntax, bool asReference)
         {

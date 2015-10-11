@@ -108,15 +108,6 @@ namespace Reni.Parser
         internal override Result ResultForCache(ContextBase context, Category category) => _infix
             .Result(context, category, _left, _right);
 
-        internal override Result PendingResultForCache(ContextBase context, Category category)
-        {
-            var pendingProvider = _infix as IPendingProvider;
-            if(pendingProvider != null)
-                return pendingProvider
-                    .Result(context, category, _left, _right);
-            return base.PendingResultForCache(context, category);
-        }
-
         protected override string GetNodeDump()
         {
             var result = "(";
