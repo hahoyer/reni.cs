@@ -4,6 +4,7 @@ using System.Linq;
 using hw.Debug;
 using hw.Helper;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Feature;
 using Reni.Parser;
 using Reni.TokenClasses;
@@ -67,7 +68,11 @@ namespace Reni.Struct
             return null;
         }
 
-        object ResultCache.IResultProvider.Target => this;
+        ResultCache.IResultProvider ResultCache.IResultProvider.FindSource(IContextReference ext)
+        {
+            NotImplementedMethod(ext);
+            return null;
+        }
 
         Result Result(Category category) => View.AccessViaObject(category, Position);
 

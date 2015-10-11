@@ -5,8 +5,8 @@ using hw.Debug;
 using hw.Forms;
 using hw.Helper;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Context;
-using Reni.Feature;
 using Reni.Parser;
 using Reni.TokenClasses;
 using Reni.Validation;
@@ -72,6 +72,30 @@ namespace Reni.Struct
         internal int EndPosition => Statements.Length;
         [DisableDump]
         internal override Checked<CompileSyntax> ToCompiledSyntax => this;
+
+        internal override ResultCache.IResultProvider FindSource(IContextReference ext, ContextBase context)
+        {
+            var result = _data
+                .SelectMany(item => item.Statement.ResultCache)
+                .Where(item => item.Value.Exts.Contains(ext))
+                .Where(item => (item.Key as CompoundContext)?.View.Compound.Syntax == this)
+                .Where(item => (item.Key as Child)?.Parent == context)
+                .ToArray();
+
+            switch(result.Length)
+            {
+                case 0:
+                    NotImplementedMethod(ext, context);
+                    return null;
+                case 1:
+                    return result.First().Value.Provider;
+                default:
+                    NotImplementedMethod(ext, context);
+                    return null;
+            }
+        }
+
+
         [DisableDump]
         internal override bool? Hllw => Statements.All(syntax => syntax.Hllw == true);
         [DisableDump]

@@ -4,6 +4,7 @@ using System.Linq;
 using hw.Debug;
 using hw.Helper;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Feature;
 using Reni.TokenClasses;
 
@@ -164,8 +165,6 @@ namespace Reni.Type
             return result;
         }
 
-        object ResultCache.IResultProvider.Target => this;
-
         bool IEquatable<ConversionPath>.Equals(ConversionPath other)
         {
             if(this == other)
@@ -204,6 +203,12 @@ namespace Reni.Type
         {
             Tracer.Assert(pendingCategory.IsNone);
             return Source.ArgResult(category);
+        }
+
+        ResultCache.IResultProvider ResultCache.IResultProvider.FindSource(IContextReference ext)
+        {
+            NotImplementedMethod(ext);
+            return null;
         }
     }
 }

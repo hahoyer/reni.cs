@@ -6,8 +6,6 @@ using hw.Debug;
 using hw.Forms;
 using Reni.Basics;
 using Reni.Code;
-using Reni.Context;
-using Reni.Parser;
 using Reni.Type;
 
 namespace Reni
@@ -17,7 +15,7 @@ namespace Reni
         internal interface IResultProvider
         {
             Result Execute(Category category, Category pendingCategory);
-            object Target { get; }
+            IResultProvider FindSource(IContextReference ext);
         }
 
         sealed class ResultNotSupported : DumpableObject, IResultProvider
@@ -28,7 +26,11 @@ namespace Reni
                 return null;
             }
 
-            object IResultProvider.Target => null;
+            IResultProvider IResultProvider.FindSource(IContextReference ext)
+            {
+                NotImplementedMethod(ext);
+                return null;
+            }
         }
 
         sealed class SimpleProvider : DumpableObject, IResultProvider
@@ -45,8 +47,11 @@ namespace Reni
                 Tracer.Assert(pendingCategory.IsNone);
                 return ObtainResult(category);
             }
-
-            object IResultProvider.Target => null;
+            IResultProvider IResultProvider.FindSource(IContextReference ext)
+            {
+                NotImplementedMethod(ext);
+                return null;
+            }
         }
 
         sealed class CallStack : DumpableObject
@@ -90,12 +95,9 @@ namespace Reni
         [DisableDump]
         static int NextObjectId;
         [DisableDump]
-        IResultProvider Provider { get; }
+        internal IResultProvider Provider { get; }
         [DisableDump]
         internal string FunctionDump = "";
-        [DisableDump]
-        internal Syntax Syntax => (Provider.Target as ContextBase.ResultProvider)?.Syntax;
-
         [DisableDump]
         static Call[] Calls => Current?.ToEnumerable.ToArray() ?? new Call[0];
 

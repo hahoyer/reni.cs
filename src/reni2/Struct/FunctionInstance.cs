@@ -1,6 +1,6 @@
-using System.Linq;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using hw.Debug;
 using hw.Forms;
 using hw.Helper;
@@ -40,6 +40,7 @@ namespace Reni.Struct
         Size ArgsPartSize => Parent.ArgsType.Size + RelevantValueSize;
         [DisableDump]
         protected abstract Size RelevantValueSize { get; }
+
         [Node]
         [DisableDump]
         internal CodeArgs Exts
@@ -51,6 +52,7 @@ namespace Reni.Struct
                 return result;
             }
         }
+
         protected abstract FunctionId FunctionId { get; }
         [Node]
         [DisableDump]
@@ -74,7 +76,7 @@ namespace Reni.Struct
 
         internal Result CallResult(Category category)
         {
-            var result = _resultCache & category.FunctionCall;      
+            var result = _resultCache & category.FunctionCall;
             if(result == null)
                 return null;
 
@@ -183,6 +185,10 @@ namespace Reni.Struct
             return ObtainResult(category);
         }
 
-        object ResultCache.IResultProvider.Target => this;
+        ResultCache.IResultProvider ResultCache.IResultProvider.FindSource(IContextReference ext)
+        {
+            NotImplementedMethod(ext);
+            return null;
+        }
     }
 }

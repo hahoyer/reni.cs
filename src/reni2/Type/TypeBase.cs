@@ -289,11 +289,11 @@ namespace Reni.Type
                 .Merge(elseConversions, item => item.Destination)
                 .Where(item => item.Item2 != null && item.Item3 != null)
                 .GroupBy(item => item.Item2.Elements.Length + item.Item3.Elements.Length)
-                .OrderBy(item=>item.Key)
+                .OrderBy(item => item.Key)
                 .First()
                 .ToArray();
 
-            if (combination.Length == 1)
+            if(combination.Length == 1)
                 return combination.Single().Item1;
 
             NotImplementedMethod
@@ -564,9 +564,7 @@ namespace Reni.Type
             where TDefinable : Definable
         {
             var provider = this as ISymbolProvider<TDefinable>;
-            if(provider == null)
-                yield break;
-            var feature = provider.Feature(tokenClass);
+            var feature = provider?.Feature(tokenClass);
             if(feature != null)
                 yield return SearchResult.Create(feature, this);
         }
@@ -629,7 +627,7 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        internal virtual IEnumerable<IConversion> StripConversions { get { yield break; } }
+        protected virtual IEnumerable<IConversion> StripConversions { get { yield break; } }
 
         [DisableDump]
         internal virtual IEnumerable<IConversion> StripConversionsFromPointer
@@ -656,7 +654,7 @@ namespace Reni.Type
             return null;
         }
 
-        internal Result IssueResult(SourcePart source, IssueId issueId, Category category)
+        Result IssueResult(SourcePart source, IssueId issueId, Category category)
             => CreateIssue(source, issueId).Result(category);
 
         protected virtual IssueType CreateIssue(SourcePart source, IssueId issueId)
@@ -682,7 +680,7 @@ namespace Reni.Type
                     issueId => IssueResult(token, issueId, category)
                 );
 
-        internal TResult ExecuteDeclaration<TResult>
+        TResult ExecuteDeclaration<TResult>
             (
             Definable definable,
             Func<SearchResult, TResult> execute,
@@ -721,6 +719,13 @@ namespace Reni.Type
         [DisableDump]
         internal IEnumerable<IConversion> SymmetricClosureConversions
             => new SymmetricClosureService(this).Execute(SymmetricClosureService.Forward);
+
+        public IEnumerable<ResultCache> GetDefinableResults
+            (IContextReference ext, Definable definable, ContextBase context, CompileSyntax right)
+            => DeclarationsForTypeAndCloseRelatives(definable)
+                .RemoveLowPriorityResults()
+                .Single()
+                .GetDefinableResults(ext, context, right);
     }
 
 

@@ -4,6 +4,7 @@ using System.Linq;
 using hw.Debug;
 using hw.Scanner;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Context;
 using Reni.Parser;
 using Reni.Struct;
@@ -100,6 +101,20 @@ namespace Reni.Feature
                 NotImplementedMethod();
                 return null;
             }
+        }
+
+        internal IEnumerable<ResultCache> GetDefinableResults
+            (IContextReference ext, ContextBase context, CompileSyntax right)
+        {
+            var metaFeature = ((IMetaImplementation)Feature).Function;
+            if(metaFeature != null)
+            {
+                NotImplementedMethod(ext, context, right);
+                return null;
+            }
+
+            NotImplementedMethod(ext, context, right);
+            return null;
         }
     }
 }

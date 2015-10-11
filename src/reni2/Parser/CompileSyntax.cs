@@ -88,12 +88,6 @@ namespace Reni.Parser
             return Type(context).SmartUn<FunctionType>().Hllw;
         }
 
-        internal virtual Result PendingResultForCache(ContextBase context, Category category)
-        {
-            NotImplementedMethod(context, category);
-            return null;
-        }
-
         internal CompileSyntax ReplaceArg(CompileSyntax value)
             => Visit(new ReplaceArgVisitor(value)) ?? this;
 
@@ -101,6 +95,13 @@ namespace Reni.Parser
         {
             NotImplementedMethod(visitor);
             return null;
+        }
+
+        virtual internal ResultCache.IResultProvider FindSource(IContextReference ext, ContextBase context)
+        {
+            NotImplementedMethod(ext,context);
+            return null;
+
         }
     }
 

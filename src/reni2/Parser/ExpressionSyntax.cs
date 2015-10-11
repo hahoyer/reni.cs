@@ -5,6 +5,7 @@ using hw.Debug;
 using hw.Forms;
 using hw.Scanner;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Context;
 using Reni.TokenClasses;
 
@@ -56,14 +57,14 @@ namespace Reni.Parser
             }
         }
 
-        internal override Checked<Syntax> RightSyntax(Syntax right, SourcePart token) 
+        internal override Checked<Syntax> RightSyntax(Syntax right, SourcePart token)
             => Checked<Syntax>
-            .From
-            (
-                Right == null
-                    ? Create(Left, Definable, right, Token)
-                    : Create(this, null, right, token)
-            );
+                .From
+                (
+                    Right == null
+                        ? Create(Left, Definable, right, Token)
+                        : Create(this, null, right, token)
+                );
 
         internal override Result ResultForCache(ContextBase context, Category category)
         {
@@ -85,6 +86,34 @@ namespace Reni.Parser
             var result = Definable.CreateForVisit(left ?? Left, right ?? Right);
             Tracer.Assert(!result.Issues.Any());
             return (CompileSyntax) result.Value;
+        }
+
+        internal override ResultCache.IResultProvider FindSource
+            (IContextReference ext, ContextBase context)
+        {
+            var result = DirectChildren
+                .OfType<CompileSyntax>()
+                .SelectMany(item => item.ResultCache)
+                .Where(item => item.Key == context)
+                .Select(item => item.Value)
+                .FirstOrDefault(item => item.Exts.Contains(ext));
+
+            if (result != null)
+                return result.Provider;
+
+            return GetDefinableResults(ext, context)
+                .FirstOrDefault(item => item.Exts.Contains(ext))
+                ?.Provider;
+        }
+
+        IEnumerable<ResultCache> GetDefinableResults(IContextReference ext, ContextBase context)
+        {
+            if(Left == null)
+                return context.GetDefinableResults(ext, Definable, Right);
+
+            var left = context.ResultAsReferenceCache(Left);
+
+            return left.Type.GetDefinableResults(ext, Definable, context, Right);
         }
 
         protected override string GetNodeDump()

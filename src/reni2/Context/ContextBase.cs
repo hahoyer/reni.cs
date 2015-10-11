@@ -8,6 +8,7 @@ using hw.Helper;
 using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Feature;
 using Reni.Parser;
 using Reni.Struct;
@@ -35,7 +36,10 @@ namespace Reni.Context
         internal readonly Cache CacheObject;
 
         protected ContextBase()
-            : base(_nextId++) { CacheObject = new Cache(this); }
+            : base(_nextId++)
+        {
+            CacheObject = new Cache(this);
+        }
 
         public abstract string GetContextIdentificationDump();
 
@@ -77,7 +81,8 @@ namespace Reni.Context
             => CacheObject.ResultAsReferenceCache[syntax];
 
 
-        internal TypeBase TypeIfKnown(CompileSyntax syntax) => CacheObject.ResultCache[syntax].Data.Type;
+        internal TypeBase TypeIfKnown(CompileSyntax syntax)
+            => CacheObject.ResultCache[syntax].Data.Type;
 
         [DebuggerHidden]
         Result ResultForCache(Category category, CompileSyntax syntax)
@@ -97,7 +102,7 @@ namespace Reni.Context
             }
         }
 
-        sealed class ResultProvider : DumpableObject, ResultCache.IResultProvider
+        internal sealed class ResultProvider : DumpableObject, ResultCache.IResultProvider
         {
             [EnableDumpExcept(false)]
             readonly bool AsReference;
@@ -131,6 +136,10 @@ namespace Reni.Context
                 return null;
             }
 
+            ResultCache.IResultProvider ResultCache.IResultProvider.FindSource
+                (IContextReference ext)
+                => Context.FindSource(Syntax, ext);
+
             [EnableDump]
             string ContextId => Context.NodeDump;
 
@@ -139,8 +148,6 @@ namespace Reni.Context
 
             [EnableDump]
             string SyntaxText => Syntax.SourcePart.Id;
-
-            object ResultCache.IResultProvider.Target => this;
         }
 
         [DebuggerHidden]
@@ -249,7 +256,7 @@ namespace Reni.Context
             return null;
         }
 
-        internal IImplementation Declaration(Definable tokenClass)
+        IImplementation Declaration(Definable tokenClass)
         {
             var genericize = tokenClass.Genericize.ToArray();
             var results = genericize.SelectMany(g => g.Declarations(this));
@@ -298,11 +305,36 @@ namespace Reni.Context
             return null;
         }
 
-        object ResultCache.IResultProvider.Target => this;
-
-        virtual internal IEnumerable<ContextBase> ParentChain
+        ResultCache.IResultProvider ResultCache.IResultProvider.FindSource(IContextReference ext)
         {
-            get { yield return this; }
+            NotImplementedMethod(ext);
+            return null;
+        }
+
+        virtual internal IEnumerable<ContextBase> ParentChain { get { yield return this; } }
+
+        ResultCache.IResultProvider FindSource(CompileSyntax syntax, IContextReference ext)
+        {
+            Tracer.Assert(syntax.ResultCache[this].Exts.Contains(ext));
+            return syntax.FindSource(ext, this);
+        }
+
+        internal IEnumerable<ResultCache.IResultProvider> FindSourceChain
+            (CompileSyntax syntax, IContextReference ext)
+        {
+            var current = FindSource(syntax, ext);
+            while(current != null)
+            {
+                yield return current;
+                current = current.FindSource(ext);
+            }
+        }
+
+        internal IEnumerable<ResultCache> GetDefinableResults
+            (IContextReference ext, Definable definable, CompileSyntax right)
+        {
+            NotImplementedMethod(ext, definable, right);
+            return null;
         }
     }
 }
