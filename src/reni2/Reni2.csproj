@@ -369,7 +369,6 @@
     <Compile Include="Type\CreateArrayFromReferenceFeature.cs" />
     <Compile Include="Type\EnableCut.cs" />
     <Compile Include="Type\FieldAccessType.cs" />
-    <Compile Include="Type\FunctionalFeature.cs" />
     <Compile Include="Type\FunctionInstanceType.cs" />
     <Compile Include="CodeArgs.cs" />
     <Compile Include="ReniException.cs" />
@@ -380,7 +379,6 @@
     <Compile Include="Type\AlignType.cs" />
     <Compile Include="Type\ArrayType.cs" />
     <Compile Include="Type\BitType.cs" />
-    <Compile Include="Type\FunctionFeatureType.cs" />
     <Compile Include="Type\IReference.cs" />
     <Compile Include="Type\Pair.cs" />
     <Compile Include="Type\PointerType.cs" />
