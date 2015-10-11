@@ -17,8 +17,8 @@ namespace Reni.Struct
             : base(view.Compound.Parent) { View = view; }
 
         [Node]
-        [EnableDump]
-        CompoundView View { get; }
+        [DisableDump]
+        internal CompoundView View { get; }
 
         string GetCompoundIdentificationDump() => View.GetCompoundChildDump();
 

@@ -14,12 +14,18 @@ namespace Reni.Struct
     sealed class Compound : DumpableObject, IContextReference
     {
         static int _nextObjectId;
+
         [Node]
+        [DisableDump]
         internal readonly CompoundSyntax Syntax;
+
         [Node]
+        [DisableDump]
         internal readonly ContextBase Parent;
 
         readonly int _order;
+
+        [DisableDump]
         internal readonly FunctionCache<int, CompoundView> View;
 
         internal Compound(CompoundSyntax syntax, ContextBase parent)
