@@ -32,7 +32,7 @@ namespace Reni.Type
             => Mutation(Parent) & category;
 
         [DisableDump]
-        internal override IEnumerable<IConversion> StripConversions
+        protected override IEnumerable<IConversion> StripConversions
         {
             get { yield return Feature.Extension.Conversion(ParentConversionResult); }
         }

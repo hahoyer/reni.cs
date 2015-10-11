@@ -37,7 +37,7 @@ namespace Reni.Struct
             => View.ConverterFeatures.Union(View.MixinConversions);
 
         [DisableDump]
-        internal override IEnumerable<IConversion> StripConversions
+        protected override IEnumerable<IConversion> StripConversions
         {
             get
             {

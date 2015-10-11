@@ -81,7 +81,7 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        internal override IEnumerable<IConversion> StripConversions
+        protected override IEnumerable<IConversion> StripConversions
             => ValueType.StripConversionsFromPointer;
 
         [DisableDump]
