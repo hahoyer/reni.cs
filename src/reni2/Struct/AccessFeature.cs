@@ -60,6 +60,12 @@ namespace Reni.Struct
 
         Result IValue.Execute(Category category) => Result(category);
 
+        ResultCache.IResultProvider IValue.FindSource(IContextReference ext)
+        {
+            NotImplementedMethod(ext);
+            return null;
+        }
+
         Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
         {
             if(pendingCategory == Category.None)

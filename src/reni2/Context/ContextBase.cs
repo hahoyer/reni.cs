@@ -330,7 +330,7 @@ namespace Reni.Context
             }
         }
 
-        internal IEnumerable<ResultCache> GetDefinableResults
+        internal IEnumerable<ResultCache.IResultProvider> GetDefinableResults
             (IContextReference ext, Definable definable, CompileSyntax right)
         {
             NotImplementedMethod(ext, definable, right);

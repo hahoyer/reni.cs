@@ -720,7 +720,7 @@ namespace Reni.Type
         internal IEnumerable<IConversion> SymmetricClosureConversions
             => new SymmetricClosureService(this).Execute(SymmetricClosureService.Forward);
 
-        public IEnumerable<ResultCache> GetDefinableResults
+        public IEnumerable<ResultCache.IResultProvider> GetDefinableResults
             (IContextReference ext, Definable definable, ContextBase context, CompileSyntax right)
             => DeclarationsForTypeAndCloseRelatives(definable)
                 .RemoveLowPriorityResults()

@@ -102,11 +102,10 @@ namespace Reni.Parser
                 return result.Provider;
 
             return GetDefinableResults(ext, context)
-                .FirstOrDefault(item => item.Exts.Contains(ext))
-                ?.Provider;
+                .FirstOrDefault();
         }
 
-        IEnumerable<ResultCache> GetDefinableResults(IContextReference ext, ContextBase context)
+        IEnumerable<ResultCache.IResultProvider> GetDefinableResults(IContextReference ext, ContextBase context)
         {
             if(Left == null)
                 return context.GetDefinableResults(ext, Definable, Right);

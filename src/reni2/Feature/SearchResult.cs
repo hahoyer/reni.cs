@@ -103,18 +103,21 @@ namespace Reni.Feature
             }
         }
 
-        internal IEnumerable<ResultCache> GetDefinableResults
+        internal IEnumerable<ResultCache.IResultProvider> GetDefinableResults
             (IContextReference ext, ContextBase context, CompileSyntax right)
         {
-            var metaFeature = ((IMetaImplementation)Feature).Function;
+            var metaFeature = ((IMetaImplementation) Feature).Function;
             if(metaFeature != null)
             {
                 NotImplementedMethod(ext, context, right);
-                return null;
+                yield break;
             }
 
-            NotImplementedMethod(ext, context, right);
-            return null;
+            var e = ((IEvalImplementation) Feature);
+
+            var result = e.Function.FindSource(ext) ?? e.Value.FindSource(ext);
+            if(result != null)
+                yield return result;
         }
     }
 }

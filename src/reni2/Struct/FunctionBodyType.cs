@@ -107,5 +107,14 @@ namespace Reni.Struct
             NotImplementedMethod(category);
             return null;
         }
+
+        ResultCache.IResultProvider IFunction.FindSource(IContextReference ext)
+            => _syntax.FindSource(ext, _compoundView.Context);
+
+        ResultCache.IResultProvider IValue.FindSource(IContextReference ext)
+        {
+            NotImplementedMethod(ext);
+            return null;
+        }
     }
 }

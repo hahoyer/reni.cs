@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Type;
 
 namespace Reni.Feature
@@ -24,6 +25,12 @@ namespace Reni.Feature
         TypeBase Source { get; }
 
         Result IValue.Execute(Category category) => Function(category);
+
+        ResultCache.IResultProvider IValue.FindSource(IContextReference ext)
+        {
+            NotImplementedMethod(ext);
+            return null;
+        }
 
         protected override string GetNodeDump()
             => Source.DumpPrintText

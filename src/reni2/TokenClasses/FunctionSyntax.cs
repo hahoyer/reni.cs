@@ -5,6 +5,7 @@ using hw.Debug;
 using hw.Helper;
 using hw.Parser;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Parser;
@@ -65,6 +66,23 @@ namespace Reni.TokenClasses
                 .Result(category);
 
         protected override bool GetIsLambda() => true;
+
+        internal override ResultCache.IResultProvider FindSource
+            (IContextReference ext, ContextBase context)
+        {
+            var result = Getter.ResultCache
+                .Where(item => item.Value.Exts.Contains(ext))
+                .Where(item => (item.Key as Child)?.Parent == context)
+                .ToArray();
+            if(result.Any())
+                return result.First().Value.Provider;
+
+            result = Setter.ResultCache
+                .Where(item => item.Value.Exts.Contains(ext))
+                .Where(item => (item.Key as Child)?.Parent == context)
+                .ToArray();
+            return result.Any() ? result.First().Value.Provider : null;
+        }
 
         internal IMeta MetaFunctionFeature(CompoundView compoundView)
         {
