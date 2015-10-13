@@ -203,7 +203,7 @@ namespace Reni.Feature
                 yield break;
             }
 
-            var result = ((IEvalImplementation) implementation).Function.FindSource(ext)
+            var result = ((IEvalImplementation) implementation).Function?.FindSource(ext)
                 ?? implementation.Value.FindSource(ext);
             if(result != null)
                 yield return result;

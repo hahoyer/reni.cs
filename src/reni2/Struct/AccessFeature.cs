@@ -62,8 +62,11 @@ namespace Reni.Struct
 
         ResultCache.IResultProvider IValue.FindSource(IContextReference ext)
         {
-            NotImplementedMethod(ext);
-            return null;
+            var result = Statement.ResultCache
+                .Where(item => item.Value.Exts.Contains(ext))
+                ;
+
+            return result.FirstOrDefault().Value?.Provider;
         }
 
         Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)

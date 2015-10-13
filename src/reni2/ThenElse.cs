@@ -4,6 +4,7 @@ using System.Linq;
 using hw.Debug;
 using hw.Forms;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Context;
 using Reni.Parser;
 using Reni.Type;
@@ -60,6 +61,20 @@ namespace Reni
             => InternalResult(context, category);
 
         internal override IRecursionHandler RecursionHandler => this;
+
+        internal override ResultCache.IResultProvider FindSource
+            (IContextReference ext, ContextBase context)
+        {
+            var result = DirectChildren
+                .Cast<CompileSyntax>()
+                .SelectMany(item => item.ResultCache)
+                .Where(item => item.Value.Exts.Contains(ext))
+                .Where(item => item.Key == context)
+                ;
+
+            return result.FirstOrDefault().Value?.Provider;
+
+        }
 
         Result CondResult(ContextBase context, Category category) => context.Result(category.Typed, Cond)
             .Conversion(context.RootContext.BitType.Align)

@@ -80,19 +80,9 @@ namespace Reni.Struct
                 .Where(item => item.Value.Exts.Contains(ext))
                 .Where(item => (item.Key as CompoundContext)?.View.Compound.Syntax == this)
                 .Where(item => (item.Key as Child)?.Parent == context)
-                .ToArray();
+                ;
 
-            switch(result.Length)
-            {
-                case 0:
-                    NotImplementedMethod(ext, context);
-                    return null;
-                case 1:
-                    return result.First().Value.Provider;
-                default:
-                    NotImplementedMethod(ext, context);
-                    return null;
-            }
+            return result.FirstOrDefault().Value?.Provider;
         }
 
 
