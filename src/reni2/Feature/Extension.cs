@@ -42,7 +42,8 @@ namespace Reni.Feature
         internal static Value Value(Func<Category, Result> function, TypeBase target = null)
             => ValueCache[function][(target ?? function.Target as TypeBase).AssertNotNull()];
 
-        internal static Conversion Conversion(Func<Category, Result> function, TypeBase target = null)
+        internal static Conversion Conversion
+            (Func<Category, Result> function, TypeBase target = null)
             => ConversionCache[function][(target ?? function.Target as TypeBase).AssertNotNull()];
 
         internal static ObjectFunction FunctionFeature
@@ -186,6 +187,26 @@ namespace Reni.Feature
                 .Where(x => x != null)
                 .Distinct()
                 .SingleOrDefault();
+        }
+
+        internal static IEnumerable<ResultCache.IResultProvider> GetDefinableResults
+            (
+            this IImplementation implementation,
+            IContextReference ext,
+            ContextBase context,
+            CompileSyntax right)
+        {
+            var metaFeature = ((IMetaImplementation) implementation).Function;
+            if(metaFeature != null)
+            {
+                Dumpable.NotImplementedFunction(implementation, ext, context, right);
+                yield break;
+            }
+
+            var result = ((IEvalImplementation) implementation).Function.FindSource(ext)
+                ?? implementation.Value.FindSource(ext);
+            if(result != null)
+                yield return result;
         }
     }
 }

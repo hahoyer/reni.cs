@@ -173,7 +173,7 @@ namespace Reni.Context
             return null;
         }
 
-        public sealed class Cache : DumpableObject, IIconKeyProvider
+        internal sealed class Cache : DumpableObject, IIconKeyProvider
         {
             [Node]
             [DisableDump]
@@ -332,9 +332,6 @@ namespace Reni.Context
 
         internal IEnumerable<ResultCache.IResultProvider> GetDefinableResults
             (IContextReference ext, Definable definable, CompileSyntax right)
-        {
-            NotImplementedMethod(ext, definable, right);
-            return null;
-        }
+            => Declaration(definable).GetDefinableResults(ext, this, right);
     }
 }
