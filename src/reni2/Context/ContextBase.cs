@@ -36,10 +36,7 @@ namespace Reni.Context
         internal readonly Cache CacheObject;
 
         protected ContextBase()
-            : base(_nextId++)
-        {
-            CacheObject = new Cache(this);
-        }
+            : base(_nextId++) { CacheObject = new Cache(this); }
 
         public abstract string GetContextIdentificationDump();
 
@@ -106,8 +103,8 @@ namespace Reni.Context
         {
             [EnableDumpExcept(false)]
             readonly bool AsReference;
-            readonly ContextBase Context;
-            readonly CompileSyntax Syntax;
+            internal readonly ContextBase Context;
+            internal readonly CompileSyntax Syntax;
             static int _nextObjectId;
 
             internal ResultProvider
