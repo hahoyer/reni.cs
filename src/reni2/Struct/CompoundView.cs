@@ -59,7 +59,11 @@ namespace Reni.Struct
         }
 
         public string GetCompoundChildDump()
-            => Compound.GetCompoundIdentificationDump() + "@" + ViewPosition;
+            =>
+                Compound.GetCompoundIdentificationDump() + "@"
+                    + (IsEndPosition ? "" : ViewPosition.ToString());
+
+        bool IsEndPosition => ViewPosition == Compound.Syntax.EndPosition;
 
         public string GetCompoundIdentificationDump()
             => Context.GetContextIdentificationDump();
@@ -73,7 +77,7 @@ namespace Reni.Struct
 
         protected override string GetNodeDump()
             =>
-                base.GetNodeDump() + "(" + Context.GetContextIdentificationDump()+ ")";
+                base.GetNodeDump() + "(" + Context.GetContextIdentificationDump() + ")";
 
         [DisableDump]
         TypeBase IndexType => Compound.IndexType;
