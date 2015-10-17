@@ -29,13 +29,13 @@ namespace Reni.Parser
         {
             get
             {
-                var result = ToContainer;
+                var result = ToCompound;
                 return new Checked<CompileSyntax>(result.Value, result.Issues);
             }
         }
 
         [DisableDump]
-        internal override Checked<CompoundSyntax> ToContainer
+        internal override Checked<CompoundSyntax> ToCompound
             => new CompoundSyntax(Data);
 
         internal override IEnumerable<Syntax> ToList(List type)
@@ -43,7 +43,7 @@ namespace Reni.Parser
             if(Type == null || type == null || Type == type)
                 return Data;
 
-            return new[] {ToContainer.SaveValue};
+            return new[] {ToCompound.SaveValue};
         }
 
         [DisableDump]

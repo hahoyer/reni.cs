@@ -52,7 +52,7 @@ namespace Reni.Parser
 
         [DisableDump]
         internal override Checked<CompileSyntax> ToCompiledSyntax
-            => Checked<CompileSyntax>.From(ToContainer);
+            => Checked<CompileSyntax>.From(ToCompound);
 
         [DisableDump]
         internal override Checked<CompileSyntax> ContainerStatementToCompileSyntax

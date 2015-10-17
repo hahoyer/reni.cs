@@ -174,11 +174,10 @@ namespace Reni.Context
         internal Container MainContainer(Syntax syntax, string description)
         {
             var compoundSyntax = syntax
-                .ToListSyntax
-                .ToContainer
+                .ToCompound
                 .SaveValue;
 
-            if(Debugger.IsAttached)
+            if(false && Debugger.IsAttached)
                 foreach(var ext in Result(Category.Exts, compoundSyntax).Exts.Data)
                     AnalyseUnresolvedReference(compoundSyntax, ext);
 
@@ -189,9 +188,128 @@ namespace Reni.Context
 
         void AnalyseUnresolvedReference(CompileSyntax syntax, IContextReference ext)
         {
+            DumpTypes(syntax, ext);
+
             var x = FindSourceChain(syntax, ext).ToArray();
+            var xx = Collect(x.Cast<ResultProvider>())
+                .Select
+                (
+                    item =>
+                        item.Context.NodeDump
+                            + "\n"
+                            + item.Syntax.NodeDump
+                            + "\n-----------------\n"
+                            + Combine(item.All, item.Atom)
+                            + "\n-----------------\n"
+                );
+
+            Tracer.Line(xx.Stringify("\n"));
 
             NotImplementedMethod(syntax, ext);
+        }
+
+        static IEnumerable<ResultGroup> Collect(IEnumerable<ResultProvider> list)
+        {
+            var result = (ResultGroup) null;
+
+            foreach(var item in list)
+            {
+                if(result != null && item.Context != result.Context)
+                {
+                    yield return result;
+                    result = null;
+                }
+
+                if(result == null)
+                    result = new ResultGroup
+                    {
+                        Context = item.Context,
+                        Syntax = item.Syntax,
+                        All = item.Syntax.SourcePart
+                    };
+
+                result.Atom = item.Syntax.SourcePart;
+            }
+
+            if(result != null)
+                yield return result;
+        }
+
+        sealed class ResultGroup
+        {
+            internal ContextBase Context;
+            internal Syntax Syntax;
+            internal SourcePart All;
+            internal SourcePart Atom;
+        }
+
+        private static void DumpTypes(CompileSyntax syntax, IContextReference ext)
+        {
+            var s = syntax
+                .Closure
+                .OfType<CompileSyntax>()
+                .SelectMany
+                (
+                    item =>
+                        item.ResultCache.Select
+                            (
+                                r => new
+                                {
+                                    id = r.Value.ObjectId,
+                                    syntax = item,
+                                    context = r.Key,
+                                    exts = r.Value.Exts.Data
+                                }
+                            )
+                )
+                .Where(item => item.exts.Contains(ext))
+                .OrderBy(item => item.id)
+                .ToArray();
+
+            var sc = s.GroupBy(item => item.context, item => item.syntax)
+                .Select
+                (
+                    item => new
+                    {
+                        context = item.Key,
+                        syntax = item
+                            .OrderBy(item1 => item1.SourcePart.Position)
+                            .ThenByDescending(item1 => item1.SourcePart.EndPosition)
+                            .ToArray()
+                    }
+                )
+                .Select
+                (
+                    item => new
+                    {
+                        item.context,
+                        fullSyntax = item.syntax.First(),
+                        syntax = item.syntax.Last()
+                    }
+                )
+                .OrderBy(item => item.context.GetContextIdentificationDump())
+                .ToArray();
+
+            var argTypes = sc
+                .Select(item => item.context)
+                .SelectMany(item => item.ParentChain)
+                .OfType<Function>()
+                .Select(item => item.ArgsType)
+                .Distinct()
+                .OrderBy(item => item.ObjectId);
+
+            var argTypesData = argTypes
+                .Select(item => item.ObjectId + ":  " + item.NodeDump)
+                .Stringify("\n")
+                .Format(2.StringAligner())
+                ;
+            Trace.WriteLine
+                (
+                    nameof(argTypes)
+                        + ":\n"
+                        + argTypesData
+                        + "\n-------------------\n\n\n"
+                );
         }
 
         private static void Analyse1(CompileSyntax syntax, IContextReference ext)
