@@ -30,7 +30,6 @@ namespace Reni
             CompileSyntax condSyntax,
             CompileSyntax thenSyntax,
             CompileSyntax elseSyntax = null)
-            : base()
         {
             Cond = condSyntax;
             Then = thenSyntax;
@@ -38,7 +37,6 @@ namespace Reni
         }
 
         CondSyntax(CondSyntax other, CompileSyntax elseSyntax)
-            : base()
         {
             Cond = other.Cond;
             Then = other.Then;
@@ -73,23 +71,22 @@ namespace Reni
                 ;
 
             return result.FirstOrDefault().Value?.Provider;
-
         }
 
-        Result CondResult(ContextBase context, Category category) => context.Result(category.Typed, Cond)
-            .Conversion(context.RootContext.BitType.Align)
-            .LocalBlock(category.Typed)
-            .Conversion(context.RootContext.BitType);
+        Result CondResult(ContextBase context, Category category)
+            => context.Result(category.Typed, Cond)
+                .Conversion(context.RootContext.BitType.Align)
+                .LocalBlock(category.Typed)
+                .Conversion(context.RootContext.BitType);
 
         Result ElseResult(ContextBase context, Category category)
         {
             if(Else == null)
-            {
                 return context
                     .RootContext.VoidType.Result(category);
-            }
             return BranchResult(context, category, Else);
         }
+
         Result ThenResult(ContextBase context, Category category)
             => BranchResult(context, category, Then);
 
@@ -107,7 +104,7 @@ namespace Reni
                 .ReplaceArg(branchResult)
                 .LocalBlock(category.Typed)
                 .Conversion(commonType)
-                   & category;
+                & category;
         }
 
         Result InternalResult(ContextBase context, Category category)
@@ -133,10 +130,8 @@ namespace Reni
         TypeBase CommonType(ContextBase context)
         {
             if(Else == null)
-            {
                 return context
                     .RootContext.VoidType;
-            }
             var thenType = Then.Type(context);
             var elseType = Else.Type(context);
             if(thenType == null)
@@ -153,7 +148,12 @@ namespace Reni
         }
 
         Result IRecursionHandler.Execute
-            (ContextBase context, Category category, Category pendingCategory, CompileSyntax syntax, bool asReference)
+            (
+            ContextBase context,
+            Category category,
+            Category pendingCategory,
+            CompileSyntax syntax,
+            bool asReference)
         {
             Tracer.Assert(syntax == this);
 
