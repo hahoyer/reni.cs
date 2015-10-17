@@ -30,7 +30,7 @@ namespace Reni.Struct
         {
             _statements = statements;
             _data = GetData;
-            StopByObjectIds();
+            StopByObjectIds(15);
         }
 
         public string GetCompoundIdentificationDump() => "." + ObjectId + "i";
@@ -73,7 +73,8 @@ namespace Reni.Struct
         [DisableDump]
         internal override Checked<CompileSyntax> ToCompiledSyntax => this;
 
-        internal override ResultCache.IResultProvider FindSource(IContextReference ext, ContextBase context)
+        internal override ResultCache.IResultProvider FindSource
+            (IContextReference ext, ContextBase context)
         {
             var result = _data
                 .SelectMany(item => item.Statement.ResultCache)
@@ -114,6 +115,8 @@ namespace Reni.Struct
 
         protected override string GetNodeDump()
             => GetType().PrettyName() + "(" + GetCompoundIdentificationDump() + ")";
+
+        internal override Checked<CompoundSyntax> ToCompound => this;
 
         internal bool IsMutable(int position) => _data[position].IsMutable;
 
@@ -159,7 +162,8 @@ namespace Reni.Struct
                 ?.Position;
         }
 
-        internal override Result ResultForCache(ContextBase context, Category category) => context
+        internal override Result ResultForCache(ContextBase context, Category category) 
+            => context
             .Compound(this)
             .Result(category);
 
