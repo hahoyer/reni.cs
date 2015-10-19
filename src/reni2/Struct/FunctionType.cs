@@ -109,14 +109,25 @@ namespace Reni.Struct
         // This may hinder the recursive call detection, located at result cache of context. 
         public Result ApplyResult(Category category)
         {
-            var result = Result
-                (
-                    category,
-                    () => Exts.ToCode() + ArgsType.ArgCode,
-                    () => Exts + CodeArgs.Arg()
-                );
-            Tracer.Assert(category == result.CompleteCategory);
-            return result;
+            var trace = ObjectId==-240;
+            StartMethodDump(trace, category);
+            try
+            {
+                BreakExecution();
+                var result = Result
+                    (
+                        category,
+                        () => Exts.ToCode() + ArgsType.ArgCode,
+                        () => Exts + CodeArgs.Arg()
+                    );
+                Tracer.Assert(category == result.CompleteCategory);
+                return ReturnMethodDump(result);
+
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
 
         CodeArgs GetExts()

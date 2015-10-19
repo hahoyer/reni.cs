@@ -81,10 +81,10 @@ namespace Reni.Context
         internal TypeBase TypeIfKnown(CompileSyntax syntax)
             => CacheObject.ResultCache[syntax].Data.Type;
 
-        [DebuggerHidden]
+       // [DebuggerHidden]
         Result ResultForCache(Category category, CompileSyntax syntax)
         {
-            var trace = syntax.ObjectId == -959 && ObjectId == 39 && category.HasType;
+            var trace = syntax.ObjectId == 10 && ObjectId == 1769 && category.HasType;
             StartMethodDump(trace, category, syntax);
             try
             {

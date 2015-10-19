@@ -172,8 +172,8 @@ namespace Reni
 
         internal Result GetCategories(Category category)
         {
-            var trace = ObjectId == -11;
-            StartMethodDump(trace, category, nameof(Calls), Calls);
+            var trace = ObjectId == 1768;
+            StartMethodDump(trace, category);
             try
             {
                 BreakExecution();

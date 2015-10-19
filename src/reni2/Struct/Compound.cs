@@ -72,7 +72,7 @@ namespace Reni.Struct
         {
             if(category.IsNone)
                 return new Result();
-            var trace = Syntax.ObjectId == -1 && category.HasCode;
+            var trace = Syntax.ObjectId == -14 && category.HasCode;
             StartMethodDump(trace, category, fromPosition, fromNotPosition);
             try
             {
@@ -107,7 +107,7 @@ namespace Reni.Struct
 
         internal Result Result(Category category)
         {
-            var trace = Syntax.ObjectId == -10 && category.HasCode;
+            var trace = Syntax.ObjectId == -14 && (category.HasCode||category.HasExts);
             StartMethodDump(trace, category);
             try
             {
