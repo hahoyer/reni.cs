@@ -1,16 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using hw.Helper;
-using hw.UnitTest;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using hw.Debug;
 using hw.Forms;
+using hw.Helper;
+using hw.UnitTest;
 using Reni;
+using Reni.FeatureTest;
+using Reni.FeatureTest.Helper;
 using Reni.FeatureTest.TypeType;
-using Reni.FeatureTest.Validation;
 using Reni.ParserTest;
 using Reni.Runtime;
 
@@ -28,19 +29,33 @@ namespace ReniTest
 
             if(Debugger.IsAttached)
                 TestRunner.IsModeErrorFocus = true;
-            Assembly.GetExecutingAssembly().RunTests();
-            //InspectCompiler();
+            //Assembly.GetExecutingAssembly().RunTests();
+            InspectCompiler(new TextConcat());
             //Reni.Proof.Main.Run();
         }
 
         const string Target = @"f: /\ ^(); x: 1; f(/\x) dump_print";
         const string Output = "1";
-        static void InspectCompiler() => Application.Run
-            (
-                new TreeForm
-                {
-                    Target = CreateCompiler(Target)
-                });
+
+        static void InspectCompiler(CompilerTest compiler)
+        {
+            object target = null;
+            try
+            {
+                target = compiler.Inspect();
+            }
+            catch(Exception exception)
+            {
+                target = exception;
+            }
+            Application.Run
+                (
+                    new TreeForm
+                    {
+                        Target = target
+                    });
+        }
+
         static void ShowSyntaxTree()
         {
             var prioTable = @"Left not

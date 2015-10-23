@@ -15,7 +15,7 @@ namespace Reni.FeatureTest.DefaultOperations
         protected abstract string Operator { get; }
         protected abstract bool Result { get; }
         protected override string Output => Result ? "-1" : "0";
-        protected override IEnumerable<System.Type> DependsOn => new[] {typeof(Add2Numbers)};
+        protected virtual IEnumerable<System.Type> DependsOn => new[] {typeof(Add2Numbers)};
     }
 
     public sealed class Equal : ApplyCompareOperator

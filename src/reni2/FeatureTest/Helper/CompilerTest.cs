@@ -16,17 +16,15 @@ namespace Reni.FeatureTest.Helper
     public abstract class CompilerTest : DependantAttribute, ITestFixture
     {
         internal readonly CompilerParameters Parameters;
-        static Dictionary<System.Type, CompilerTest> _cache;
-        bool _needToRunDependants = true;
 
-        public CompilerTest()
+        protected CompilerTest()
         {
             Parameters = new CompilerParameters();
             if(TestRunner.IsModeErrorFocus)
                 Parameters.TraceOptions.UseOnModeErrorFocus();
         }
 
-        internal void CreateFileAndRunCompiler
+        internal Compiler CreateFileAndRunCompiler
             (
             string name,
             string text,
@@ -36,20 +34,20 @@ namespace Reni.FeatureTest.Helper
                 CreateFileAndRunCompiler
                     (name, new TargetSetData(text, expectedOutput), expectedResult);
 
-        void CreateFileAndRunCompiler
+        Compiler CreateFileAndRunCompiler
             (string name, TargetSetData targetSetData, Action<Compiler> expectedResult)
         {
             var fileName = name + ".reni";
             var f = fileName.FileHandle();
             f.String = targetSetData.Target;
-            InternalRunCompiler(fileName, expectedResult, targetSetData);
+            return InternalRunCompiler(fileName, expectedResult, targetSetData);
         }
 
-        void InternalRunCompiler
+        Compiler InternalRunCompiler
             (string fileName, Action<Compiler> expectedResult, TargetSetData targetSet)
             => InternalRunCompiler(Parameters, fileName, expectedResult, targetSet);
 
-        void InternalRunCompiler
+        Compiler InternalRunCompiler
             (
             CompilerParameters compilerParameters,
             string fileName,
@@ -58,82 +56,91 @@ namespace Reni.FeatureTest.Helper
         {
             var outStream = new OutStream();
             compilerParameters.OutStream = outStream;
-            var c = new Compiler(fileName, compilerParameters, "Reni");
-
-            if(expectedResult != null)
-            {
-                c.Materialize();
-                expectedResult(c);
-            }
-
-            if(Parameters.TraceOptions.ReformatedSource)
-            {
-                Tracer.Line
-                    (
-                        "---------------------\n" +
-                            c.SourceSyntax.Reformat() +
-                            "\n---------------------"
-                    );
-                Tracer.ConditionalBreak(true);
-            }
-
-            c.Execute();
-
-            if(outStream.Data != targetSet.Output)
-            {
-                Tracer.Line("---------------------\n" + outStream.Data + "\n---------------------");
-                Tracer.ThrowAssertionFailed
-                    (
-                        "outStream.Data != targetSet.Output",
-                        () => "outStream.Data:" + outStream.Data + " expected: " + targetSet.Output);
-            }
+            var compiler = new Compiler(fileName, compilerParameters, "Reni");
 
             try
             {
-                Verify(c.Issues);
+                if(expectedResult != null)
+                {
+                    compiler.Materialize();
+                    expectedResult(compiler);
+                }
+
+                if(Parameters.TraceOptions.ReformatedSource)
+                {
+                    Tracer.Line
+                        (
+                            "---------------------\n" +
+                                compiler.SourceSyntax.Reformat() +
+                                "\n---------------------"
+                        );
+                    Tracer.ConditionalBreak(true);
+                }
+
+                compiler.Execute();
+
+                if(outStream.Data != targetSet.Output)
+                {
+                    Tracer.Line
+                        ("---------------------\n" + outStream.Data + "\n---------------------");
+                    Tracer.ThrowAssertionFailed
+                        (
+                            "outStream.Data != targetSet.Output",
+                            () =>
+                                "outStream.Data:" + outStream.Data + " expected: "
+                                    + targetSet.Output);
+                }
+
+                try
+                {
+                    Verify(compiler.Issues);
+                }
+                catch(Exception)
+                {
+                    Tracer.Line
+                        ("---------------------\n" + compiler.Issues + "\n---------------------");
+                    throw;
+                }
+
+                return compiler;
             }
-            catch(Exception)
+            catch(Exception exception)
             {
-                Tracer.Line("---------------------\n" + c.Issues + "\n---------------------");
-                throw;
+                throw new RunException(exception, compiler);
             }
         }
 
-        void RunDependant()
+        sealed class RunException : Exception
         {
-            RunDependants();
-            Run();
+            internal readonly Exception Exception;
+            readonly Compiler Compiler;
+
+            public RunException(Exception exception, Compiler compiler)
+            {
+                Exception = exception;
+                Compiler = compiler;
+            }
         }
 
-        public virtual void Run() => BaseRun(1);
-
-        protected void BaseRun(int depth = 0)
+        public virtual void Run()
         {
-            if(_cache == null)
-                _cache = new Dictionary<System.Type, CompilerTest>();
+            try
+            {
+                BaseRun().ToArray();
+            }
+            catch(RunException runException)
+            {
+                throw runException.Exception;
+            }
+        }
 
+        protected IEnumerable<Compiler> BaseRun()
+        {
             foreach(var tuple in TargetSet)
-                CreateFileAndRunCompiler(GetType().PrettyName(), tuple, AssertValid);
+                yield return CreateFileAndRunCompiler(GetType().PrettyName(), tuple, AssertValid);
         }
 
-
-        void RunDependants()
-        {
-            if(!_needToRunDependants)
-                return;
-
-            _needToRunDependants = false;
-
-            if(_cache.ContainsKey(GetType()))
-                return;
-
-            _cache.Add(GetType(), this);
-
-            foreach(
-                var dependsOnType in
-                    DependsOn.Where(dependsOnType => !_cache.ContainsKey(dependsOnType)))
-                ((CompilerTest) Activator.CreateInstance(dependsOnType)).RunDependant();
-        }
+        public IEnumerable<Compiler> Inspect() => BaseRun();
 
         TargetSetData[] TargetSet
         {
@@ -156,16 +163,6 @@ namespace Reni.FeatureTest.Helper
         protected virtual string Output => GetStringAttribute<OutputAttribute>();
         protected virtual string Target => GetStringAttribute<TargetAttribute>();
         protected virtual void Verify(IEnumerable<Issue> issues) => Tracer.Assert(!issues.Any());
-
-        protected virtual IEnumerable<System.Type> DependsOn
-        {
-            get
-            {
-                return GetType()
-                    .GetCustomAttributes(typeof(CompilerTest), true)
-                    .Select(o => o.GetType());
-            }
-        }
 
         internal string GetStringAttribute<T>() where T : StringAttribute
         {

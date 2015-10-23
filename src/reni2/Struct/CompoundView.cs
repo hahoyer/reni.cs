@@ -60,8 +60,26 @@ namespace Reni.Struct
 
         public string GetCompoundChildDump()
             =>
-                Compound.GetCompoundIdentificationDump() + "@"
-                    + (IsEndPosition ? "" : ViewPosition.ToString());
+                Compound.GetCompoundIdentificationDump() + PositionDump();
+
+        string PositionDump()
+        {
+            if(IsEndPosition)
+                return "{}";
+
+            var names =
+                Compound
+                    .Syntax
+                    .NameIndex
+                    .Where(item => item.Value == ViewPosition)
+                    .Select(item => item.Key)
+                    .Stringify("/");
+
+            if(names == "")
+                return "@" + ViewPosition;
+
+            return ":" + names;
+        }
 
         bool IsEndPosition => ViewPosition == Compound.Syntax.EndPosition;
 
