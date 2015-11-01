@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
+using hw.Forms;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Parser;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -20,6 +20,7 @@ namespace Reni.Struct
     {
         internal CompoundType(CompoundView view) { View = view; }
 
+        [Node]
         [DisableDump]
         internal CompoundView View { get; }
         [DisableDump]
@@ -33,7 +34,7 @@ namespace Reni.Struct
         internal override bool HasQuickSize => false;
 
         [DisableDump]
-        internal override IEnumerable<IConversion> StripConversionsFromPointer 
+        internal override IEnumerable<IConversion> StripConversionsFromPointer
             => View.ConverterFeatures.Union(View.MixinConversions);
 
         [DisableDump]
@@ -41,7 +42,7 @@ namespace Reni.Struct
         {
             get
             {
-                if (Hllw)
+                if(Hllw)
                     yield return Feature.Extension.Conversion(VoidConversion);
             }
         }

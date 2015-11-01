@@ -77,7 +77,7 @@ namespace HoyerWare.ReniLanguagePackage
         internal static int LineEnd(this IVsTextLines vsTextLines, int line)
             => LinePosition(vsTextLines, line) + LineLength(vsTextLines, line);
 
-        internal static TokenTriggers ConvertToTokenTrigger(this TokenInformation token)
+        internal static TokenTriggers ConvertToTokenTrigger(this Token token)
         {
             var result = TokenTriggers.None;
             if(token.IsBraceLike)
@@ -85,7 +85,7 @@ namespace HoyerWare.ReniLanguagePackage
             return result;
         }
 
-        internal static TokenType ConvertToTokenType(this TokenInformation token)
+        internal static TokenType ConvertToTokenType(this Token token)
         {
             if(token.IsComment)
                 return TokenType.Comment;
@@ -106,7 +106,7 @@ namespace HoyerWare.ReniLanguagePackage
             return TokenType.Text;
         }
 
-        internal static TokenColor ConvertToTokenColor(this TokenInformation token)
+        internal static TokenColor ConvertToTokenColor(this Token token)
         {
             if(token.IsComment || token.IsLineComment)
                 return TokenColor.Comment;
@@ -123,13 +123,13 @@ namespace HoyerWare.ReniLanguagePackage
         }
 
         internal static IEnumerable<uint> SelectColors
-            (this TokenInformation token, IEnumerable<char> toCharArray)
+            (this Token token, IEnumerable<char> toCharArray)
         {
             return toCharArray
                 .Select(c => (uint) token.ConvertToTokenColor());
         }
 
-        internal static TokenInfo ToTokenInfo(this TokenInformation token)
+        internal static TokenInfo ToTokenInfo(this Token token)
             => new TokenInfo
             {
                 Color = token.ConvertToTokenColor(),

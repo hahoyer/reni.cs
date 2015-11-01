@@ -11,12 +11,13 @@ using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
-    sealed class SourceSyntax : DumpableObject, ISourcePart
+    public sealed class SourceSyntax : DumpableObject, ISourcePart
     {
         static int _nextObjectId;
         readonly Issue[] _issues;
+        SourceSyntax _parent;
 
-        public SourceSyntax
+        internal SourceSyntax
             (
             SourceSyntax left,
             ITokenClass tokenClass,
@@ -32,6 +33,13 @@ namespace Reni.TokenClasses
             TokenClass = tokenClass;
             Token = token;
             Right = right;
+
+            if(Left != null)
+                Left.Parent = this;
+
+            if(Right != null)
+                Right.Parent = this;
+
             AssertValid();
         }
 
@@ -54,6 +62,18 @@ namespace Reni.TokenClasses
         }
 
         internal Issue[] Issues => (Left?.Issues).plus(_issues).plus(Right?.Issues);
+
+        [DisableDump]
+        internal SourceSyntax Parent
+        {
+            get { return _parent; }
+            set
+            {
+                Tracer.Assert(value == null || _parent == null);
+                _parent = value;
+            }
+        }
+
         [DisableDump]
         internal Syntax Syntax { get; }
         internal SourceSyntax Left { get; }
@@ -68,25 +88,6 @@ namespace Reni.TokenClasses
         internal SourcePart SourcePart => Left?.SourcePart + Token.SourcePart + Right?.SourcePart;
         [DisableDump]
         string FilePosition => Token.Characters.FilePosition;
-
-
-        internal TokenInformation Locate(SourcePosn sourcePosn)
-        {
-            if(sourcePosn.IsEnd)
-                return new SyntaxToken(this);
-
-            if(sourcePosn < Token.SourcePart)
-                return Left?.Locate(sourcePosn);
-
-            if(sourcePosn < Token.Characters)
-                return new UserInterface.WhiteSpaceToken
-                    (Token.PrecededWith.Single(item => item.Characters.Contains(sourcePosn)));
-
-            if(Token.Characters.Contains(sourcePosn))
-                return new SyntaxToken(this);
-
-            return Right?.Locate(sourcePosn);
-        }
 
         internal SourceSyntax Locate(SourcePart part)
             => Left?.CheckedLocate(part) ??

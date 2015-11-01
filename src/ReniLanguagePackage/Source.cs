@@ -41,7 +41,7 @@ namespace HoyerWare.ReniLanguagePackage
             try
             {
                 var offset = Data.FromLineAndColumn(line, column).Position;
-                var token = Compiler.ContainingTokens(offset);
+                var token = Compiler.Locate(offset);
                 Dump(nameof(token), token);
                 var result = token.ToTokenInfo();
                 return ReturnMethodDump(result, false);
@@ -55,7 +55,7 @@ namespace HoyerWare.ReniLanguagePackage
         Compiler Compiler => _compilerCache.Value;
         hw.Scanner.Source Data => Compiler.Source;
 
-        IEnumerable<TokenInformation.Trimmed> TokensForLine(int lineIndex, bool trace)
+        IEnumerable<Token.Trimmed> TokensForLine(int lineIndex, bool trace)
         {
             var line = Data.Line(lineIndex);
 
@@ -63,7 +63,7 @@ namespace HoyerWare.ReniLanguagePackage
             var i = 0;
             while(index < line.EndPosition)
             {
-                var token = Compiler.ContainingTokens(index).AssertNotNull().TrimLine(line);
+                var token = Compiler.Locate(index).AssertNotNull().TrimLine(line);
                 if(trace)
                     Tracer.IndentStart();
                 if(trace)
@@ -87,7 +87,7 @@ namespace HoyerWare.ReniLanguagePackage
             try
             {
                 var lineEndPosition = Data.FromLineAndColumn(line, null).Position;
-                var token = Compiler.ContainingTokens(lineEndPosition);
+                var token = Compiler.Locate(lineEndPosition);
                 Tracer.Assert(token != null);
                 var result = token.State;
                 return ReturnMethodDump(result, false);
@@ -106,19 +106,19 @@ namespace HoyerWare.ReniLanguagePackage
                 .CopyTo(attrs, 0);
         }
 
-        internal TokenInformation FromLineAndColumn(int lineIndex, int columIndex)
+        internal Token FromLineAndColumn(int lineIndex, int columIndex)
         {
             var start = Data.FromLineAndColumn(lineIndex, columIndex).Position;
-            return Compiler.ContainingTokens(start);
+            return Compiler.Locate(start);
         }
 
-        internal TokenInformation FromLineAndColumnBackwards(int lineIndex, int columIndex)
+        internal Token FromLineAndColumnBackwards(int lineIndex, int columIndex)
         {
             var start = Data.FromLineAndColumn(lineIndex, columIndex).Position - 1;
-            return Compiler.ContainingTokens(Math.Max(0, start));
+            return Compiler.Locate(Math.Max(0, start));
         }
 
-        internal IEnumerable<SourcePart> BracesLike(TokenInformation current)
+        internal IEnumerable<SourcePart> BracesLike(Token current)
             => current.FindAllBelongings(Compiler);
 
         internal void ReformatSpan(EditArray mgr, TextSpan span, Provider provider)

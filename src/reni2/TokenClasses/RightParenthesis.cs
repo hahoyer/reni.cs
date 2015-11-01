@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Scanner;
-using Reni.Formatting;
 using Reni.Parser;
+using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
@@ -36,13 +36,9 @@ namespace Reni.TokenClasses
         }
 
         protected override Checked<Syntax> Terminal(SourcePart token)
-        {
-            NotImplementedMethod(token);
-            return null;
-        }
+            => new EmptyList(token).Issues(IssueId.ExtraRightBracket.CreateIssue(token));
 
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => (otherMatcher as LeftParenthesis)?.Level == Level;
-
     }
 }

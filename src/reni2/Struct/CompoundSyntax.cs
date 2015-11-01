@@ -30,7 +30,7 @@ namespace Reni.Struct
         {
             _statements = statements;
             _data = GetData;
-            StopByObjectIds(15);
+            StopByObjectIds();
         }
 
         public string GetCompoundIdentificationDump() => "." + ObjectId + "i";

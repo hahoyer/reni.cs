@@ -172,7 +172,7 @@ namespace Reni
 
         internal Result GetCategories(Category category)
         {
-            var trace = ObjectId == 1768;
+            var trace = ObjectId == -1768;
             StartMethodDump(trace, category);
             try
             {

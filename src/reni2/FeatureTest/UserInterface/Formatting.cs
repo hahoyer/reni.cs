@@ -23,7 +23,7 @@ namespace Reni.FeatureTest.UserInterface
 1,3,4,6)";
             var compiler = new Compiler(text: Text);
             var span = (compiler.Source + 2).Span(3);
-            var trimmed = compiler.ContainingTokens(span).Reformat(span);
+            var trimmed = compiler.Locate(span).Reformat(span);
 
             Tracer.Assert(trimmed == "# C", trimmed);
         }
@@ -36,7 +36,7 @@ namespace Reni.FeatureTest.UserInterface
 1,3,4,6)";
             var compiler = new Compiler(text: Text);
             var span = (compiler.Source + 2).Span(3);
-            var reformat = compiler.ContainingTokens(span).Reformat(span);
+            var reformat = compiler.Locate(span).Reformat(span);
             Tracer.Assert(reformat == "#(a", reformat);
         }
 

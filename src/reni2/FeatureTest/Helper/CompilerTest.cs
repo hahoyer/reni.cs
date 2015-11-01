@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
+using hw.Forms;
 using hw.Helper;
 using hw.UnitTest;
 using Reni.Runtime;
@@ -112,7 +113,9 @@ namespace Reni.FeatureTest.Helper
 
         sealed class RunException : Exception
         {
+            [Node]
             internal readonly Exception Exception;
+            [Node]
             readonly Compiler Compiler;
 
             public RunException(Exception exception, Compiler compiler)
@@ -136,8 +139,9 @@ namespace Reni.FeatureTest.Helper
 
         protected IEnumerable<Compiler> BaseRun()
         {
-            foreach(var tuple in TargetSet)
-                yield return CreateFileAndRunCompiler(GetType().PrettyName(), tuple, AssertValid);
+            return TargetSet
+                .Select
+                (tuple => CreateFileAndRunCompiler(GetType().PrettyName(), tuple, AssertValid));
         }
 
         public IEnumerable<Compiler> Inspect() => BaseRun();
@@ -162,6 +166,9 @@ namespace Reni.FeatureTest.Helper
 
         protected virtual string Output => GetStringAttribute<OutputAttribute>();
         protected virtual string Target => GetStringAttribute<TargetAttribute>();
+
+        public string[] Targets => TargetSet.Select(item => item.Target).ToArray();
+
         protected virtual void Verify(IEnumerable<Issue> issues) => Tracer.Assert(!issues.Any());
 
         internal string GetStringAttribute<T>() where T : StringAttribute

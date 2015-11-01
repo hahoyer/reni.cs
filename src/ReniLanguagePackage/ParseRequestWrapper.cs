@@ -13,20 +13,20 @@ namespace HoyerWare.ReniLanguagePackage
     {
         readonly ParseRequest _parent;
         readonly Source _source;
-        readonly ValueCache<TokenInformation> _currenCache;
+        readonly ValueCache<Token> _currenCache;
 
         internal ParseRequestWrapper(ParseRequest parent)
         {
             _parent = parent;
             _source = new Source(_parent.Text ?? "");
-            _currenCache = new ValueCache<TokenInformation>(GetCurrentForCache);
+            _currenCache = new ValueCache<Token>(GetCurrentForCache);
         }
 
-        TokenInformation GetCurrentForCache()
+        Token GetCurrentForCache()
             => _source
                 .FromLineAndColumn(_parent.Line, _parent.Col);
 
-        TokenInformation Current => _currenCache.Value;
+        Token Current => _currenCache.Value;
 
         internal void Scanning()
         {

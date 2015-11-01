@@ -390,7 +390,7 @@
     <Compile Include="Type\TypeType.cs" />
     <Compile Include="Type\VoidType.cs" />
     <Compile Include="UserInterface\SyntaxToken.cs" />
-    <Compile Include="UserInterface\TokenInformation.cs" />
+    <Compile Include="UserInterface\Token.cs" />
     <Compile Include="UserInterface\WhiteSpaceToken.cs" />
     <Compile Include="Validation\ConsequentialIssueType.cs" />
     <Compile Include="Validation\Issue.cs" />
@@ -429,7 +429,9 @@
     <Folder Include="FeatureTest\Enumeration\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="hw\Forms\TreeForm.resx" />
+    <EmbeddedResource Include="hw\Forms\TreeForm.resx">
+      <DependentUpon>TreeForm.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />

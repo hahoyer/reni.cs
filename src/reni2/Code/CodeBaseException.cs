@@ -24,11 +24,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
+using hw.Forms;
 
 namespace Reni.Code
 {
     abstract class CodeBaseException : Exception
     {
+        [Node]
         readonly IContextReference _container;
         protected CodeBaseException(IContextReference container) { _container = container; }
         public override string Message => _container.ToString();

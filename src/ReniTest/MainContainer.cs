@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using System.Windows.Forms;
 using hw.Debug;
 using hw.Forms;
@@ -30,8 +29,10 @@ namespace ReniTest
             if(Debugger.IsAttached)
                 TestRunner.IsModeErrorFocus = true;
             //Assembly.GetExecutingAssembly().RunTests();
-            InspectCompiler(new TextConcat());
+            //InspectCompiler(new TextConcat());
             //Reni.Proof.Main.Run();
+
+            new CompilationView.View(new TextConcat().Targets.First()).Run();
         }
 
         const string Target = @"f: /\ ^(); x: 1; f(/\x) dump_print";
@@ -42,12 +43,13 @@ namespace ReniTest
             object target = null;
             try
             {
-                target = compiler.Inspect();
+                target = compiler.Inspect().ToArray();
             }
             catch(Exception exception)
             {
                 target = exception;
             }
+
             Application.Run
                 (
                     new TreeForm

@@ -17,7 +17,7 @@ namespace Reni.FeatureTest.UserInterface
             const string Text = @"(1,3,4,6)";
             var compiler = new Compiler(text: Text);
             var span = (compiler.Source + 0).Span(Text.Length);
-            var x = compiler.ContainingTokens(span).Reformat(span);
+            var x = compiler.Locate(span).Reformat(span);
             Tracer.Assert(x == "(1, 3, 4, 6)", x);
         }
 
@@ -28,7 +28,7 @@ namespace Reni.FeatureTest.UserInterface
 1,3,4,6)";
             var compiler = new Compiler(text: Text);
             var span = (compiler.Source + 2).Span(3);
-            var x = compiler.ContainingTokens(span).Reformat(span);
+            var x = compiler.Locate(span).Reformat(span);
 
             Tracer.Assert(x == "# C", x);
         }
@@ -40,7 +40,7 @@ namespace Reni.FeatureTest.UserInterface
             const string Text = @"{^ : ^}";
             var compiler = new Compiler(text: Text);
             var span = (compiler.Source + 0).Span(Text.Length);
-            var x = compiler.ContainingTokens(span).Reformat(span);
+            var x = compiler.Locate(span).Reformat(span);
 
             Tracer.Assert(x == "{^ : ^}", x);
         }

@@ -3,13 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Scanner;
 using Reni.Parser;
+using Reni.TokenClasses;
 
 namespace Reni.UserInterface
 {
-    sealed class WhiteSpaceToken : TokenInformation
+    sealed class WhiteSpaceToken : Token
     {
         readonly hw.Parser.WhiteSpaceToken _item;
-        public WhiteSpaceToken(hw.Parser.WhiteSpaceToken item) { _item = item; }
+
+        public WhiteSpaceToken(hw.Parser.WhiteSpaceToken item, SourceSyntax parent)
+        {
+            _item = item;
+            SourceSyntax = parent;
+        }
 
         public override SourcePart SourcePart => _item.Characters;
         public override bool IsComment => Lexer.IsComment(_item);
@@ -22,6 +28,8 @@ namespace Reni.UserInterface
         {
             yield break;
         }
+
+        internal override SourceSyntax SourceSyntax { get; }
 
         public override string Reformat(SourcePart targetPart)
             => SourcePart.Intersect(targetPart)?.Id ?? "";

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
+using hw.Forms;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -27,6 +28,7 @@ namespace Reni.Type
             StopByObjectIds(-10);
         }
 
+        [Node]
         [DisableDump]
         internal TypeBase ValueType { get; }
 

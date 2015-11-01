@@ -11,7 +11,7 @@ using Reni.Validation;
 
 namespace Reni.Code
 {
-    sealed class CodeContainer : DumpableObject
+    public sealed class CodeContainer : DumpableObject
     {
         readonly string ModuleName;
         readonly Root RootContext;

@@ -39,6 +39,10 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ScintillaNET, Version=3.5.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\jacobslusser.ScintillaNET.3.5.4\lib\net40\ScintillaNET.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Drawing" />
     <ProjectReference Include="..\reni2\Reni2.csproj">
       <Project>{EBB73C84-6622-4183-A28F-B0DFF606006B}</Project>
@@ -46,6 +50,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CompilationView\PersistenceController.cs" />
+    <Compile Include="CompilationView\GeneratorExtension.cs" />
+    <Compile Include="CompilationView\TextStyle.cs" />
+    <Compile Include="CompilationView\View.cs" />
     <Compile Include="MainContainer.cs" />
     <Compile Include="Template1.cs">
       <AutoGen>True</AutoGen>
@@ -55,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="packages.config" />
     <None Include="sys.targets" />
     <None Include="Template1.tt">
       <Generator>TextTemplatingFileGenerator</Generator>

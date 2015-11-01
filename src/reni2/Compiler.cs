@@ -35,7 +35,7 @@ namespace Reni
         readonly ValueCache<Syntax> SyntaxCache;
         readonly ValueCache<CodeContainer> CodeContainerCache;
         readonly ValueCache<string> CSharpStringCache;
-        readonly FunctionCache<int, TokenInformation> ContainingTokensCache;
+        readonly FunctionCache<int, UserInterface.Token> LocateCache;
 
         [Node]
         readonly Root _rootContext;
@@ -75,26 +75,22 @@ namespace Reni
                 Trace = _parameters.TraceOptions.Parser
             };
 
-            SourceCache = new ValueCache<Source>
-                (
+            SourceCache = new ValueCache<Source>(
                 () => source
                     ?? (fileName == null
                         ? new Source(text)
                         : new Source(fileName.FileHandle()))
                 );
 
-            ContainingTokensCache = new FunctionCache<int, TokenInformation>
-                (GetContainingTokensForCache);
+            LocateCache = new FunctionCache<int, UserInterface.Token>(GetLocateForCache);
 
             SourceSyntaxCache = new ValueCache<SourceSyntax>(() => Parse(Source + 0));
 
             SyntaxCache = new ValueCache<Syntax>(() => SourceSyntax.Syntax);
 
-            CodeContainerCache = new ValueCache<CodeContainer>
-                (() => new CodeContainer(ModuleName, _rootContext, Syntax, Source.Data));
+            CodeContainerCache = new ValueCache<CodeContainer>(() => new CodeContainer(ModuleName, _rootContext, Syntax, Source.Data));
 
-            CSharpStringCache = new ValueCache<string>
-                (() => CodeContainerCache.Value.CSharpString);
+            CSharpStringCache = new ValueCache<string>(() => CodeContainerCache.Value.CSharpString);
         }
 
         static string ModuleNameFromFileName(string fileName)
@@ -115,7 +111,7 @@ namespace Reni
 
         [Node]
         [DisableDump]
-        CodeContainer CodeContainer => CodeContainerCache.Value;
+        public CodeContainer CodeContainer => CodeContainerCache.Value;
 
         [DisableDump]
         [Node]
@@ -283,33 +279,31 @@ namespace Reni
             return result;
         }
 
-        public TokenInformation ContainingTokens(int offset) => ContainingTokensCache[offset];
+        public UserInterface.Token Locate(int offset) => LocateCache[offset];
 
-        TokenInformation GetContainingTokensForCache(int offset)
+        UserInterface.Token GetLocateForCache(int offset)
         {
-            var posn = Source + offset;
-            var result = SourceSyntax.Locate(posn);
-            if(result != null)
-                return result;
+            var posn = Source+offset;
+            var sourceSyntax = SourceSyntax.Locate(posn.Span(0));
 
-            Tracer.TraceBreak();
-            NotImplementedMethod(posn);
-            return null;
+            if (posn < sourceSyntax.Token.Characters)
+                return new UserInterface.WhiteSpaceToken
+                    (
+                    sourceSyntax.Token.PrecededWith.Single(item => item.Characters.Contains(posn)),
+                    sourceSyntax
+                    );
+
+            return new SyntaxToken(sourceSyntax);
         }
 
         internal IEnumerable<SourceSyntax> FindAllBelongings(SourceSyntax current)
             => SourceSyntax.Belongings(current);
 
-        internal TokenInformation ContainingTokens(SourcePart part)
+        internal SourceSyntax Locate(SourcePart part)
         {
-            var left = SourceSyntax.Locate(part.Start);
-            var right = SourceSyntax.Locate(part.End + -1);
-            if(left.Equals(right))
-                return left;
-
-            var result = SourceSyntax.Locate(part);
+            SourceSyntax result = SourceSyntax.Locate(part);
             if(result != null)
-                return new SyntaxToken(result);
+                return result;
 
             Tracer.TraceBreak();
             NotImplementedMethod(part);
@@ -318,6 +312,7 @@ namespace Reni
 
         public string Reformat(SourcePart sourcePart, Provider provider) => SourceSyntax.
             Reformat(sourcePart, provider);
+
     }
 
     public interface IOutStream

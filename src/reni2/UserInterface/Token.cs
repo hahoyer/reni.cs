@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Debug;
 using hw.Scanner;
+using Reni.TokenClasses;
 
 namespace Reni.UserInterface
 {
-    public abstract class TokenInformation : DumpableObject
+    public abstract class Token : DumpableObject
     {
         [DisableDump]
         public abstract SourcePart SourcePart { get; }
@@ -30,6 +31,8 @@ namespace Reni.UserInterface
         public virtual bool IsLineEnd => false;
         [DisableDump]
         public virtual bool IsError => false;
+        [DisableDump]
+        public virtual bool IsBrace => false;
         [DisableDump]
         public virtual string State => "";
 
@@ -63,10 +66,11 @@ namespace Reni.UserInterface
 
         public int StartPosition => SourcePart.Position;
         public int EndPosition => SourcePart.EndPosition;
+        internal abstract SourceSyntax SourceSyntax { get; }
 
         public Trimmed TrimLine(SourcePart span) => new Trimmed(this, span);
 
-        bool Equals(TokenInformation other) => SourcePart == other.SourcePart;
+        bool Equals(Token other) => SourcePart == other.SourcePart;
 
         public override bool Equals(object obj)
         {
@@ -76,17 +80,17 @@ namespace Reni.UserInterface
                 return true;
             if(obj.GetType() != GetType())
                 return false;
-            return Equals((TokenInformation) obj);
+            return Equals((Token) obj);
         }
 
         public override int GetHashCode() => SourcePart.GetHashCode();
 
         public sealed class Trimmed : DumpableObject
         {
-            public readonly TokenInformation Token;
+            public readonly Token Token;
             public readonly SourcePart SourcePart;
 
-            internal Trimmed(TokenInformation token, SourcePart sourcePart)
+            internal Trimmed(Token token, SourcePart sourcePart)
             {
                 Token = token;
                 SourcePart = sourcePart.Intersect(Token.SourcePart)

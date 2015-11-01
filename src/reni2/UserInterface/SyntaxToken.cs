@@ -9,18 +9,18 @@ using Reni.Validation;
 
 namespace Reni.UserInterface
 {
-    sealed class SyntaxToken : TokenInformation
+    sealed class SyntaxToken : Token
     {
         internal SyntaxToken(SourceSyntax sourceSyntax) { SourceSyntax = sourceSyntax; }
 
-        internal SourceSyntax SourceSyntax { get; }
+        internal override SourceSyntax SourceSyntax { get; }
 
         TokenClass TokenClass => SourceSyntax.TokenClass as TokenClass;
 
         public override SourcePart SourcePart => SourceSyntax.Token.Characters;
 
         [EnableDumpExcept(false)]
-        public override bool IsKeyword => !IsIdentifier && !IsNumber && !IsText;
+        public override bool IsKeyword => !IsIdentifier && !IsNumber && !IsText && !IsBrace;
         [EnableDumpExcept(false)]
         public override bool IsIdentifier => TokenClass is Definable;
         [EnableDumpExcept(false)]
@@ -31,6 +31,8 @@ namespace Reni.UserInterface
         public override bool IsError => SourceSyntax.Issues.Any();
         [EnableDumpExcept(false)]
         public override bool IsBraceLike => TokenClass is IBelongingsMatcher;
+        [EnableDumpExcept(false)]
+        public override bool IsBrace => TokenClass is LeftParenthesis || TokenClass is RightParenthesis;
 
         [EnableDumpExcept(false)]
         public override bool IsComment
