@@ -158,20 +158,5 @@ namespace Reni.Parser
         }
 
         IType<SourceSyntax> IType<SourceSyntax>.NextTypeIfMatched => null;
-
-        internal Formatting.Item ItemFromToken
-            (Provider provider, int leadingLineBreaks, int indentLevel, ITokenClass rightTokenClass, IToken token)
-        {
-            var whiteSpaces = provider.InternalGetWhitespaces
-                (
-                    rightTokenClass,
-                    leadingLineBreaks,
-                    indentLevel,
-                    token.PrecededWith,
-                    this
-                );
-            var item = new Formatting.Item(whiteSpaces, token);
-            return item;
-        }
     }
 }

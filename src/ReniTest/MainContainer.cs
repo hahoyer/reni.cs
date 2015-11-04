@@ -13,6 +13,7 @@ using Reni.FeatureTest.Helper;
 using Reni.FeatureTest.TypeType;
 using Reni.ParserTest;
 using Reni.Runtime;
+using ReniTest.CompilationView;
 
 namespace ReniTest
 {
@@ -32,7 +33,8 @@ namespace ReniTest
             //InspectCompiler(new TextConcat());
             //Reni.Proof.Main.Run();
 
-            new CompilationView.View(new TextConcat().Targets.First()).Run();
+            var view = new SourceView(new TextConcat().Targets.First());
+            view.Run();
         }
 
         const string Target = @"f: /\ ^(); x: 1; f(/\x) dump_print";

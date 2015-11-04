@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using hw.Debug;
 using hw.Forms;
@@ -18,6 +19,8 @@ using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.UserInterface;
 using Reni.Validation;
+
+[assembly:InternalsVisibleTo("ReniTest")]
 
 namespace Reni
 {
@@ -284,7 +287,8 @@ namespace Reni
         UserInterface.Token GetLocateForCache(int offset)
         {
             var posn = Source+offset;
-            var sourceSyntax = SourceSyntax.Locate(posn.Span(0));
+            var sourcePart = posn.Span(posn.IsEnd?0:1);
+            var sourceSyntax = SourceSyntax.Locate(sourcePart);
 
             if (posn < sourceSyntax.Token.Characters)
                 return new UserInterface.WhiteSpaceToken

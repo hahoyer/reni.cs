@@ -198,6 +198,19 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal ITokenClass RightMostTokenClass
             => Right == null ? TokenClass : Right.RightMostTokenClass;
+
+        [DisableDump]
+        public IEnumerable<SourceSyntax> ParentChainIncludingThis
+        {
+            get
+            {
+                yield return this;
+                if (Parent == null)
+                    yield break;
+                foreach(var other in Parent.ParentChainIncludingThis)
+                    yield return other;
+            }
+        }
     }
 
     interface IBelongingsMatcher

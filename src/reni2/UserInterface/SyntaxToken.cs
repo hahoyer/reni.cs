@@ -13,7 +13,7 @@ namespace Reni.UserInterface
     {
         internal SyntaxToken(SourceSyntax sourceSyntax) { SourceSyntax = sourceSyntax; }
 
-        internal override SourceSyntax SourceSyntax { get; }
+        public override SourceSyntax SourceSyntax { get; }
 
         TokenClass TokenClass => SourceSyntax.TokenClass as TokenClass;
 

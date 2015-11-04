@@ -29,7 +29,7 @@ namespace Reni.UserInterface
             yield break;
         }
 
-        internal override SourceSyntax SourceSyntax { get; }
+        public override SourceSyntax SourceSyntax { get; }
 
         public override string Reformat(SourcePart targetPart)
             => SourcePart.Intersect(targetPart)?.Id ?? "";

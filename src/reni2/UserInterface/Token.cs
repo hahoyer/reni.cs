@@ -66,7 +66,7 @@ namespace Reni.UserInterface
 
         public int StartPosition => SourcePart.Position;
         public int EndPosition => SourcePart.EndPosition;
-        internal abstract SourceSyntax SourceSyntax { get; }
+        public abstract SourceSyntax SourceSyntax { get; }
 
         public Trimmed TrimLine(SourcePart span) => new Trimmed(this, span);
 

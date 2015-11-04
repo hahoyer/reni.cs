@@ -18,9 +18,9 @@ namespace ReniTest.CompilationView
         [UsedImplicitly]
         public static readonly TextStyle KeyWord = new TextStyle(Color.Blue);
         [UsedImplicitly]
-        public static readonly TextStyle BraceLikeKeyWord = new TextStyle(Color.Blue, true);
+        public static readonly TextStyle BraceLikeKeyWord = new TextStyle(Color.Blue, isBold: true);
         [UsedImplicitly]
-        public static readonly TextStyle Brace = new TextStyle(Color.Black, true);
+        public static readonly TextStyle Brace = new TextStyle(Color.Black, isBold: true);
         [UsedImplicitly]
         public static readonly TextStyle Comment = new TextStyle(Color.Green);
         [UsedImplicitly]
@@ -29,6 +29,7 @@ namespace ReniTest.CompilationView
         public static readonly TextStyle Text = new TextStyle(Color.Red);
         [UsedImplicitly]
         public static readonly TextStyle Error = new TextStyle(Color.Gray, isItalic: true);
+        [UsedImplicitly]
 
         static public TextStyle From(Token token, Compiler compiler)
         {
@@ -54,10 +55,16 @@ namespace ReniTest.CompilationView
         readonly Color ForeColor;
         readonly bool IsItalic;
         readonly bool IsBold;
+        readonly Color? BackColor;
 
-        TextStyle(Color foreColor, bool isBold = false, bool isItalic = false)
+        TextStyle
+            (Color foreColor, 
+            Color? backColor = null, 
+            bool isBold = false, 
+            bool isItalic = false)
         {
             ForeColor = foreColor;
+            BackColor = backColor;
             IsBold = isBold;
             IsItalic = isItalic;
             Id = _nextId++;
@@ -68,6 +75,8 @@ namespace ReniTest.CompilationView
             style.Font = "Lucida Console";
             style.Size = 10;
             style.ForeColor = ForeColor;
+            if(BackColor != null)
+                style.BackColor = BackColor.Value;
             style.Italic = IsItalic;
             style.Bold = IsBold;
         }

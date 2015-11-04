@@ -46,7 +46,7 @@ namespace Reni.Code
             }
         }
 
-        Container Main => MainCache.Value;
+        internal Container Main => MainCache.Value;
 
         internal void Execute(IExecutionContext context) => Main.Data.Execute(context);
 
