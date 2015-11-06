@@ -53,8 +53,10 @@
     <Compile Include="CompilationView\DetailView.cs" />
     <Compile Include="CompilationView\PersistenceController.cs" />
     <Compile Include="CompilationView\GeneratorExtension.cs" />
+    <Compile Include="CompilationView\ResultCacheView.cs" />
     <Compile Include="CompilationView\TextStyle.cs" />
     <Compile Include="CompilationView\SourceView.cs" />
+    <Compile Include="CompilationView\View.cs" />
     <Compile Include="MainContainer.cs" />
     <Compile Include="Template1.cs">
       <AutoGen>True</AutoGen>

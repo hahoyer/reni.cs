@@ -2,52 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using hw.Debug;
-using hw.Forms;
 using hw.Helper;
-using JetBrains.Annotations;
 using Reni;
 using Reni.Parser;
 using ScintillaNET;
 
 namespace ReniTest.CompilationView
 {
-    class View : DumpableObject
-    {
-        static bool IsActive;
-        protected readonly Form Frame;
-        [UsedImplicitly]
-        PositionConfig PositionConfig;
-
-        internal View(string name)
-        {
-            Frame = new Form
-            {
-                Name = name       ,
-                Text = name
-            };
-
-
-            PositionConfig = new PositionConfig
-            {
-                Target = Frame
-            };
-        }
-
-        internal void Run()
-        {
-            if(IsActive)
-                Frame.Show();
-            else
-            {
-                IsActive = true;
-                Application.Run(Frame);
-            }
-        }
-
-        internal void Close() => Frame.Close();
-    }
-
     sealed class SourceView : View
     {
         int _lineNumberMarginLength;
@@ -59,7 +20,6 @@ namespace ReniTest.CompilationView
         {
             TextBox = new Scintilla
             {
-                Dock = DockStyle.Fill,
                 Lexer = ScintillaNET.Lexer.Container,
                 VirtualSpaceOptions = VirtualSpace.UserAccessible
             };
@@ -75,7 +35,7 @@ namespace ReniTest.CompilationView
 
             CompilerCache = new ValueCache<Compiler>(GetCompiler);
 
-            Frame.Controls.Add(TextBox);
+            Client = TextBox;
 
             TextBox.Text = text;
         }
@@ -126,8 +86,10 @@ namespace ReniTest.CompilationView
 
         void OnContextMenu(CompileSyntax syntax)
         {
-            var detail = new DetailView(syntax);
-            Frame.Closing += (a, s) => detail.Close();
+            var detail = new DetailView(syntax)
+            {
+                Master = this
+            };
             detail.Run();
         }
 
