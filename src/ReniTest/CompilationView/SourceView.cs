@@ -58,11 +58,14 @@ namespace ReniTest.CompilationView
             var p = TextBox.CurrentPosition;
             var c = Compiler.CodeContainer.Issues.ToArray();
 
-            var items = Compiler
+            var enumerable = Compiler
                 .Locate(p)
                 .SourceSyntax
                 .ParentChainIncludingThis
                 .Select(item => item.Syntax)
+                .ToArray();
+
+            var items = enumerable
                 .OfType<CompileSyntax>()
                 .Where(item => item.ResultCache.Any())
                 .Select(CreateMenuItem)
@@ -102,7 +105,7 @@ namespace ReniTest.CompilationView
 
         void OnStyleNeeded(int position)
         {
-            var trace = true;
+            var trace = false;
             StartMethodDump(trace, position);
             try
             {
