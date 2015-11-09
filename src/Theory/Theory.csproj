@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{9C9C2707-F251-4376-8940-A96A0E1688C2}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Theory</RootNamespace>
+    <AssemblyName>Theory</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="hw\Debug\Configuration.cs" />
+    <Compile Include="hw\Debug\DebugTextWriter.cs" />
+    <Compile Include="hw\Debug\DisableDumpAttribute.cs" />
+    <Compile Include="hw\Debug\Dumpable.cs" />
+    <Compile Include="hw\Debug\DumpableObject.cs" />
+    <Compile Include="hw\Debug\DumpAttribute.cs" />
+    <Compile Include="hw\Debug\DumpClassAttribute.cs" />
+    <Compile Include="hw\Debug\DumpDataClassAttribute.cs" />
+    <Compile Include="hw\Debug\DumpEnabledAttribute.cs" />
+    <Compile Include="hw\Debug\Dumper.cs" />
+    <Compile Include="hw\Debug\DumpToStringAttribute.cs" />
+    <Compile Include="hw\Debug\EnableDumpAttribute.cs" />
+    <Compile Include="hw\Debug\EnableDumpExceptAttribute.cs" />
+    <Compile Include="hw\Debug\EnableDumpWithExceptionPredicateAttribute.cs" />
+    <Compile Include="hw\Debug\Profiler.cs" />
+    <Compile Include="hw\Debug\TextWriters.cs" />
+    <Compile Include="hw\Debug\Tracer.cs" />
+    <Compile Include="hw\Debug\Writer.cs" />
+    <Compile Include="hw\Helper\Box.cs" />
+    <Compile Include="hw\Helper\DateRange.cs" />
+    <Compile Include="hw\Helper\DateTimeExtender.cs" />
+    <Compile Include="hw\Helper\EnumEx.cs" />
+    <Compile Include="hw\Helper\File.cs" />
+    <Compile Include="hw\Helper\FunctionCache.cs" />
+    <Compile Include="hw\Helper\LinqExtension.cs" />
+    <Compile Include="hw\Helper\LongExtender.cs" />
+    <Compile Include="hw\Helper\ReflectionExtender.cs" />
+    <Compile Include="hw\Helper\StringAligner.cs" />
+    <Compile Include="hw\Helper\StringExtender.cs" />
+    <Compile Include="hw\Helper\TypeLibrary.cs" />
+    <Compile Include="hw\Helper\TypeNameExtender.cs" />
+    <Compile Include="hw\Helper\ValueCache.cs" />
+    <Compile Include="hw\JetBrainsAnnotations.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
