@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DominatorRelation.cs" />
     <Compile Include="hw\Debug\Configuration.cs" />
     <Compile Include="hw\Debug\DebugTextWriter.cs" />
     <Compile Include="hw\Debug\DisableDumpAttribute.cs" />
