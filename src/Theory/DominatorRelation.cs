@@ -8,21 +8,19 @@ namespace Theory
 {
     sealed class DominatorRelation : DumpableObject
     {
-        readonly string[] Characters;
+        readonly string Characters;
         readonly string[] Data;
 
-        readonly FunctionCache<string, string[]> Cache;
+        readonly FunctionCache<string, int[]> Cache;
 
-        public DominatorRelation(string characters0, string characters1, params string[] data)
+        public DominatorRelation(string characters, params string[] data)
         {
-            Characters = characters0
-                .Select((item, index) => ("" + item + characters1[index]).Trim())
-                .ToArray();
+            Characters = characters;
             Data = data;
-            Cache = new FunctionCache<string, string[]>(GetDominators);
+            Cache = new FunctionCache<string, int[]>(GetDominators);
         }
 
-        bool IsLeftDominator(string left, string right)
+        bool IsLeftDominator(char left, char right)
         {
             var c = DominatorChar(left, right);
             switch(c)
@@ -37,43 +35,30 @@ namespace Theory
             }
         }
 
-        bool IsLeftDominator(char left, string right) => IsLeftDominator("" + left, right);
-        bool IsLeftDominator(string left, char right) => IsLeftDominator(left, "" + right);
-
-        char DominatorChar(string left, string right)
+        char DominatorChar(char left, char right)
         {
-            var leftIndex = Characters.IndexWhere(item => item == left).AssertValue();
-            var rightIndex = Characters.IndexWhere(item => item == right).AssertValue();
+            var leftIndex = Characters.IndexWhere(x => x == left) ?? Characters.Length;
+            var rightIndex = Characters.IndexWhere(x => x == right) ?? Characters.Length;
             return Data[leftIndex][rightIndex];
         }
 
-        Tuple<bool,bool> IsDominator(int position, string data)
+        bool IsDominator(int position, string data)
         {
             var left = Dominators(data.LeftWord(position)).ToArray();
-            if(left.Any(item => IsLeftDominator(item, data[position])))
+            if(left.Any(item => IsLeftDominator(data[item], data[position])))
                 return false;
 
             var right = Dominators(data.RightWord(position)).ToArray();
-            return right.All(item => IsLeftDominator(data[position], item));
+            return right.All(item => IsLeftDominator(data[position], data[position + 1 + item]));
         }
 
-        internal string[] Dominators(string data) => Cache[data];
+        internal int[] Dominators(string data) => Cache[data];
 
-        internal string[] GetDominators(string data)
+        internal int[] GetDominators(string data)
             => data
                 .Length
                 .Select()
-                .Select
-                (
-                    position => new
-                    {
-                        position,
-                        isDominator = IsDominator(position, data),
-                        isMatch= IsMatch(position, data)
-                    }
-                )
-                .Where(item => IsDominator(position, data))
-                .Select(item => (item.isDominator == true ? "" : "=") + data[item.position])
+                .Where(position => IsDominator(position, data))
                 .ToArray();
     }
 }

@@ -33,22 +33,22 @@ namespace ReniTest.CompilationView
 
         static public TextStyle From(Token token, Compiler compiler)
         {
-            if(token.IsError)
+            if (token.IsError)
                 return Error;
-            if(token.IsBraceLike && token.FindAllBelongings(compiler).Skip(1).Any())
+            if (token.IsBraceLike && token.FindAllBelongings(compiler).Skip(1).Any())
                 return token.IsBrace ? Brace : BraceLikeKeyWord;
-            if(token.IsKeyword)
+            if (token.IsKeyword)
                 return KeyWord;
-            if(token.IsComment || token.IsLineComment)
+            if (token.IsComment || token.IsLineComment)
                 return Comment;
-            if(token.IsNumber)
+            if (token.IsNumber)
                 return Number;
-            if(token.IsText)
+            if (token.IsText)
                 return Text;
             return Default;
         }
 
-        public static implicit operator int(TextStyle v) => v.Id;
+        public static implicit operator int (TextStyle v) => v.Id;
         public static IEnumerable<TextStyle> All => AllInstances<TextStyle>();
 
         readonly int Id;
@@ -58,9 +58,9 @@ namespace ReniTest.CompilationView
         readonly Color? BackColor;
 
         TextStyle
-            (Color foreColor, 
-            Color? backColor = null, 
-            bool isBold = false, 
+            (Color foreColor,
+            Color? backColor = null,
+            bool isBold = false,
             bool isItalic = false)
         {
             ForeColor = foreColor;
@@ -75,7 +75,7 @@ namespace ReniTest.CompilationView
             style.Font = "Lucida Console";
             style.Size = 10;
             style.ForeColor = ForeColor;
-            if(BackColor != null)
+            if (BackColor != null)
                 style.BackColor = BackColor.Value;
             style.Italic = IsItalic;
             style.Bold = IsBold;

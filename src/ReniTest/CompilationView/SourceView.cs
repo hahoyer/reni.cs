@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using hw.Helper;
+using hw.Scanner;
 using Reni;
 using Reni.Parser;
 using ScintillaNET;
@@ -140,6 +141,11 @@ namespace ReniTest.CompilationView
                     = TextBox.TextWidth(Style.LineNumber, new string('9', value + 1))
                         + Padding;
             }
+        }
+
+        void Bold(SourcePart region)
+        {
+            
         }
     }
 }

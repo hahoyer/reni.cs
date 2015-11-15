@@ -37,4 +37,4 @@ namespace ReniTest.CompilationView
             Client = client;
         }
     }
-}
+}                                                           

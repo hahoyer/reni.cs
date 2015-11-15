@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
+using hw.Helper;
 
 namespace Theory
 {
@@ -9,21 +9,33 @@ namespace Theory
     {
         static void Main(string[] args)
         {
+            var a = "ab";
             var r = new DominatorRelation
                 (
-                "     ==",
-                "a*+()()",
-                "---+-++",
-                "+--+-++",
-                "++-+-++",
-                "++++-??",
-                "----???",
-                "---????",
-                "---????"
+                a,
+                "-+",
+                "+-"
                 );
-            var x = "a*(a+a)*a";
-            var dd = r.Dominators(x);
-            var d = dd.FirstOrDefault();
+
+            var allWords = 10.Select(x => x).SelectMany(i => AllWords(a, i)).ToArray();
+            var dd = allWords.Select
+                (
+                    c => new
+                    {
+                        x = c,
+                        d = r.Dominators(c)
+                    }).ToArray();
+            var d0 = dd.Where(x => x.d.Length == 0).ToArray();
+            var d1 = dd.Where(x => x.d.Length == 1).ToArray();
+            var d2 = dd.Where(x => x.d.Length > 1).ToArray();
+        }
+
+        static IEnumerable<string> AllWords(string a, int length)
+        {
+            if(length == 0)
+                return new[] {""};
+            return AllWords(a, length - 1)
+                .SelectMany(x => a.Select(c => x + c));
         }
     }
 
