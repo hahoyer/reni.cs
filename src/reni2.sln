@@ -4,6 +4,7 @@ VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{71905A24-D1C7-468D-8E25-553FA67DA2D9}"
 	ProjectSection(SolutionItems) = preProject
+		..\.travis.yml = ..\.travis.yml
 		Resources\Bool.ico = Resources\Bool.ico
 		Resources\Cache.bmp = Resources\Cache.bmp
 		Resources\Chip.ico = Resources\Chip.ico
