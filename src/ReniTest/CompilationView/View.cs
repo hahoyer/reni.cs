@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
 using hw.Debug;
@@ -8,14 +9,13 @@ using JetBrains.Annotations;
 
 namespace ReniTest.CompilationView
 {
-    class View : DumpableObject
+    abstract class View : DumpableObject
     {
-        static bool IsActive;
-        readonly Form Frame;
+        protected readonly Form Frame;
         [UsedImplicitly]
         PositionConfig PositionConfig;
 
-        internal View(string name)
+        protected View(string name)
         {
             Frame = new Form
             {
@@ -23,6 +23,7 @@ namespace ReniTest.CompilationView
                 Text = name
             };
 
+            Frame.Closing += OnClosing;
 
             PositionConfig = new PositionConfig
             {
@@ -30,15 +31,10 @@ namespace ReniTest.CompilationView
             };
         }
 
-        internal void Run()
+        void OnClosing(object sender, CancelEventArgs e)
         {
-            if(IsActive)
-                Frame.Show();
-            else
-            {
-                IsActive = true;
-                Application.Run(Frame);
-            }
+            e.Cancel = true;
+            Frame.Visible = false;
         }
 
         internal Control Client
@@ -52,6 +48,5 @@ namespace ReniTest.CompilationView
             }
         }
 
-        public View Master { set { value.Frame.Closing += (a, s) => Frame.Close(); } }
     }
 }

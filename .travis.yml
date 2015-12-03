@@ -1,3 +1,2 @@
 language: csharp
 solution: src/reni2.sln
-script: xbuild /p:Configuration=Release src/reni2.sln /p:TargetFrameworkVersion="v4.6"

@@ -10,11 +10,12 @@ using ScintillaNET;
 
 namespace ReniTest.CompilationView
 {
-    sealed class SourceView : View
+    sealed class SourceView : MainView
     {
         int _lineNumberMarginLength;
         readonly Scintilla TextBox;
         readonly ValueCache<Compiler> CompilerCache;
+        readonly FunctionCache<CompileSyntax, ResultCachesView> DetailViews;
 
         internal SourceView(string text)
             : base("SourceView")
@@ -24,6 +25,7 @@ namespace ReniTest.CompilationView
                 Lexer = ScintillaNET.Lexer.Container,
                 VirtualSpaceOptions = VirtualSpace.UserAccessible
             };
+
 
             foreach(var id in TextStyle.All)
                 StyleConfig(id);
@@ -35,11 +37,15 @@ namespace ReniTest.CompilationView
             TextBox.ContextMenu.Popup += (s, args) => OnContextMenuPopup();
 
             CompilerCache = new ValueCache<Compiler>(GetCompiler);
+            DetailViews = new FunctionCache<CompileSyntax, ResultCachesView>(CreateDetailView);
 
             Client = TextBox;
 
             TextBox.Text = text;
         }
+
+        ResultCachesView CreateDetailView(CompileSyntax syntax)
+            => new ResultCachesView(syntax, this);
 
         Compiler Compiler => CompilerCache.Value;
 
@@ -83,18 +89,9 @@ namespace ReniTest.CompilationView
                 text += " (" + syntax.ResultCache.Count + ")";
 
             var menuItem = new MenuItem
-                (text, (s, a) => OnContextMenu(syntax));
+                (text, (s, a) => DetailViews[syntax].Run());
             menuItem.Select += (s, a) => OnContextMenuSelect(syntax);
             return menuItem;
-        }
-
-        void OnContextMenu(CompileSyntax syntax)
-        {
-            var detail = new DetailView(syntax)
-            {
-                Master = this
-            };
-            detail.Run();
         }
 
         void OnContextMenuSelect(Syntax syntax)
@@ -143,9 +140,6 @@ namespace ReniTest.CompilationView
             }
         }
 
-        void Bold(SourcePart region)
-        {
-            
-        }
+        void Bold(SourcePart region) { }
     }
 }

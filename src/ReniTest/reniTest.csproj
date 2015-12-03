@@ -50,10 +50,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CompilationView\DetailView.cs" />
+    <Compile Include="CompilationView\ChildView.cs" />
+    <Compile Include="CompilationView\MainView.cs" />
+    <Compile Include="CompilationView\ResultCachesView.cs" />
     <Compile Include="CompilationView\PersistenceController.cs" />
     <Compile Include="CompilationView\GeneratorExtension.cs" />
-    <Compile Include="CompilationView\ResultCacheView.cs" />
     <Compile Include="CompilationView\TextStyle.cs" />
     <Compile Include="CompilationView\SourceView.cs" />
     <Compile Include="CompilationView\View.cs" />

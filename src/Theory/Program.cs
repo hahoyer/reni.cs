@@ -9,12 +9,13 @@ namespace Theory
     {
         static void Main(string[] args)
         {
-            var a = "ab";
+            var a = "abc";
             var r = new DominatorRelation
                 (
                 a,
-                "-+",
-                "+-"
+                "-+-",
+                "--+",
+                "+--"
                 );
 
             var allWords = 10.Select(x => x).SelectMany(i => AllWords(a, i)).ToArray();
@@ -28,6 +29,7 @@ namespace Theory
             var d0 = dd.Where(x => x.d.Length == 0).ToArray();
             var d1 = dd.Where(x => x.d.Length == 1).ToArray();
             var d2 = dd.Where(x => x.d.Length > 1).ToArray();
+            var d21 = d2.FirstOrDefault();
         }
 
         static IEnumerable<string> AllWords(string a, int length)
@@ -44,4 +46,7 @@ namespace Theory
         internal static string LeftWord(this string data, int item) => data.Substring(0, item);
         internal static string RightWord(this string data, int item) => data.Substring(item + 1);
     }
+
+
+
 }
