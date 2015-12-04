@@ -220,6 +220,7 @@
     <Compile Include="ParserTest\PrioTableTest.cs" />
     <Compile Include="ParserTest\Services.cs" />
     <Compile Include="Parser\RecursionType.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReniObjectExtender.cs" />
     <Compile Include="Parser\Extension.cs" />
     <Compile Include="Parser\ExclamationBoxToken.cs" />

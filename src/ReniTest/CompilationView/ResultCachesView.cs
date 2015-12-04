@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using hw.Debug;
 using hw.Helper;
 using Reni;
 using Reni.Code;
 using Reni.Context;
 using Reni.Parser;
+using Reni.Struct;
 using Reni.Type;
 
 namespace ReniTest.CompilationView
@@ -51,6 +51,11 @@ namespace ReniTest.CompilationView
             return client;
         }
 
+        void OnClicked(FunctionId functionId)
+        {
+            NotImplementedMethod(functionId);
+        }
+
         Control ResultCacheView(KeyValuePair<ContextBase, ResultCache> item)
         {
             var control = new TableLayoutPanel
@@ -58,11 +63,11 @@ namespace ReniTest.CompilationView
                 Dock = DockStyle.Fill,
                 ColumnCount = 1,
                 RowCount = 2,
-                CellBorderStyle = TableLayoutPanelCellBorderStyle.Single
+                CellBorderStyle = TableLayoutPanelCellBorderStyle.OutsetPartial
             };
 
             control.Controls.Add(ContextView(item.Key));
-            control.Controls.Add(ResultView(item.Value.Data));
+            control.Controls.Add(CreateResultView(item.Value.Data));
 
             foreach(RowStyle rowStyle in control.RowStyles)
                 rowStyle.SizeType = SizeType.AutoSize;
@@ -70,23 +75,40 @@ namespace ReniTest.CompilationView
             return control;
         }
 
-        Control ResultView(Result result)
+        Control CreateResultView(Result result)
         {
-            if(result.HasType && result.HasCode && result.HasExts)
+            var clients = new List<Control>();
+            if(result.HasType)
+                clients.Add(CreateTypeView(result.Type));
+            else if(result.HasSize)
+            {
+                var control = result.Size.IsZero
+                    ? "Hollow".CreateView()
+                    : result.Size.ToString().CreateView().CreateGroup("Size");
+                clients.Add(control);
+            }
+            else if(result.HasHllw)
+                clients.Add((result.HasHllw ? "Hollow" : "Unknown size").CreateView());
+
+            if(result.HasExts)
+                clients.Add(result.Exts.CreateView());
+
+            if(result.HasCode)
+                clients.Add(result.Code.CreateView(this));
+
+            if(clients.Any())
             {
                 var resultView = new TableLayoutPanel
                 {
                     Dock = DockStyle.Fill,
                     ColumnCount = 1,
-                    RowCount = 3,
-                    CellBorderStyle = TableLayoutPanelCellBorderStyle.Single
+                    RowCount = clients.Count
                 };
 
-                resultView.Controls.Add(TypeView(result.Type));
-                resultView.Controls.Add(CodeView(result.Code));
-                resultView.Controls.Add(ExtsView(result.Exts));
+                resultView.Controls.AddRange(clients.ToArray());
                 return resultView;
             }
+
 
             NotImplementedFunction(result);
 
@@ -98,45 +120,38 @@ namespace ReniTest.CompilationView
             };
         }
 
-        Control TypeView(TypeBase type)
+        Control CreateTypeView(TypeBase type)
         {
-            var result = TextView(type.NodeDump);
-            result.Click += (s, a) => OnTypeClicked();
-            return result;
+            var text = type.NodeDump.CreateView();
+            text.Click += (s, a) => OnClicked(type);
+            return text.CreateGroup("Type");
         }
 
-        void OnTypeClicked()
-        {
-            NotImplementedMethod();
-        }
-
-        static Control CodeView(CodeBase code)
-            => DumpableView(code);
-
-        static Control ExtsView(CodeArgs exts)
-            => DumpableView(exts);
+        void OnClicked(TypeBase target) => NotImplementedMethod(target);
 
         Control ContextView(ContextBase context)
         {
-            var result = TextView(context.NodeDump);
-            result.Click += (s, a) => OnContextClicked();
+            var result = context.NodeDump.CreateView();
+            result.Click += (s, a) => OnClicked(context);
             return result;
         }
 
-        void OnContextClicked()
+        void OnClicked(ContextBase target) => NotImplementedMethod(target);
+
+        internal Control CreateFunctionCallView(Call visitedObject)
         {
-            NotImplementedMethod();
-        }
-
-        static Label DumpableView(Dumpable dumpable)
-            => TextView(dumpable.Dump());
-
-        static Label TextView(string text)
-            => new Label
+            var functionId = visitedObject.FunctionId;
+            var name = functionId.ToString();
+            var result = name.CreateView();
+            var menuItem = new MenuItem
             {
-                Font = new Font("Lucida Console", 10),
-                AutoSize = true,
-                Text = text
+                Name = name
             };
+            menuItem.Click += (a, b) => OnClicked(functionId);
+            var contextMenu = new ContextMenu();
+            contextMenu.MenuItems.Add(menuItem);
+            result.ContextMenu = contextMenu;
+            return result;
+        }
     }
 }

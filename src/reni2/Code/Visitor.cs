@@ -100,5 +100,8 @@ namespace Reni.Code
         }
 
         internal virtual TFiber Call(Call visitedObject) => default(TFiber);
+
+        internal virtual TCode TopRef(TopRef visitedObject) => default(TCode);
+        
     }
 }

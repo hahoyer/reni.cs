@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using hw.Debug;
 using hw.Forms;
@@ -19,8 +18,6 @@ using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.UserInterface;
 using Reni.Validation;
-
-[assembly:InternalsVisibleTo("ReniTest")]
 
 namespace Reni
 {
@@ -78,7 +75,8 @@ namespace Reni
                 Trace = _parameters.TraceOptions.Parser
             };
 
-            SourceCache = new ValueCache<Source>(
+            SourceCache = new ValueCache<Source>
+                (
                 () => source
                     ?? (fileName == null
                         ? new Source(text)
@@ -91,7 +89,8 @@ namespace Reni
 
             SyntaxCache = new ValueCache<Syntax>(() => SourceSyntax.Syntax);
 
-            CodeContainerCache = new ValueCache<CodeContainer>(() => new CodeContainer(ModuleName, _rootContext, Syntax, Source.Data));
+            CodeContainerCache = new ValueCache<CodeContainer>
+                (() => new CodeContainer(ModuleName, _rootContext, Syntax, Source.Data));
 
             CSharpStringCache = new ValueCache<string>(() => CodeContainerCache.Value.CSharpString);
         }
@@ -286,11 +285,11 @@ namespace Reni
 
         UserInterface.Token GetLocateForCache(int offset)
         {
-            var posn = Source+offset;
-            var sourcePart = posn.Span(posn.IsEnd?0:1);
+            var posn = Source + offset;
+            var sourcePart = posn.Span(posn.IsEnd ? 0 : 1);
             var sourceSyntax = SourceSyntax.Locate(sourcePart);
 
-            if (posn < sourceSyntax.Token.Characters)
+            if(posn < sourceSyntax.Token.Characters)
                 return new UserInterface.WhiteSpaceToken
                     (
                     sourceSyntax.Token.PrecededWith.Single(item => item.Characters.Contains(posn)),
@@ -305,7 +304,7 @@ namespace Reni
 
         internal SourceSyntax Locate(SourcePart part)
         {
-            SourceSyntax result = SourceSyntax.Locate(part);
+            var result = SourceSyntax.Locate(part);
             if(result != null)
                 return result;
 
@@ -316,7 +315,6 @@ namespace Reni
 
         public string Reformat(SourcePart sourcePart, Provider provider) => SourceSyntax.
             Reformat(sourcePart, provider);
-
     }
 
     public interface IOutStream
