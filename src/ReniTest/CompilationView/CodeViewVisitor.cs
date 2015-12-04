@@ -18,7 +18,7 @@ namespace ReniTest.CompilationView
             => visitedObject.Context.NodeDump().CreateView();
 
         internal override Control BitArray(BitArray visitedObject)
-            => visitedObject.Data.NodeDump.CreateView();
+            => visitedObject.Data.ToString().CreateView();
 
         internal override Control Call(Call visitedObject) 
             => Parent.CreateFunctionCallView(visitedObject);

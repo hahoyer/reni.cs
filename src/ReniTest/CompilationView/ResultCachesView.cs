@@ -143,11 +143,7 @@ namespace ReniTest.CompilationView
             var functionId = visitedObject.FunctionId;
             var name = functionId.ToString();
             var result = name.CreateView();
-            var menuItem = new MenuItem
-            {
-                Name = name
-            };
-            menuItem.Click += (a, b) => OnClicked(functionId);
+            var menuItem = new MenuItem(name, (a, b) => OnClicked(functionId));
             var contextMenu = new ContextMenu();
             contextMenu.MenuItems.Add(menuItem);
             result.ContextMenu = contextMenu;
