@@ -16,7 +16,6 @@ using Reni.Parser;
 using Reni.Runtime;
 using Reni.Struct;
 using Reni.TokenClasses;
-using Reni.UserInterface;
 using Reni.Validation;
 
 namespace Reni
@@ -25,6 +24,19 @@ namespace Reni
     {
         static IScanner<SourceSyntax> Scanner(ITokenFactory<SourceSyntax> tokenFactory)
             => new Scanner<SourceSyntax>(Lexer.Instance, tokenFactory);
+
+        public static CompilerBrowser BrowserFromText
+            (string text, CompilerParameters parameters = null)
+            => new CompilerBrowser(new Compiler(text: text, parameters: parameters));
+
+        public static Compiler FromFile(string fileName, CompilerParameters parameters)
+            => new Compiler(fileName, parameters);
+
+        internal static Compiler FromFile
+            (string fileName, string moduleName, CompilerParameters parameters = null)
+            => new Compiler(fileName, parameters, moduleName);
+
+        internal static Compiler FromText(string text) => new Compiler(text: text);
 
         readonly MainTokenFactory _tokenFactory;
         readonly CompilerParameters _parameters;
@@ -35,23 +47,16 @@ namespace Reni
         readonly ValueCache<Syntax> SyntaxCache;
         readonly ValueCache<CodeContainer> CodeContainerCache;
         readonly ValueCache<string> CSharpStringCache;
-        readonly FunctionCache<int, UserInterface.Token> LocateCache;
 
         [Node]
-        readonly Root _rootContext;
+        internal readonly Root RootContext;
 
         bool _isInExecutionPhase;
+
+        [UsedImplicitly]
         public Exception Exception;
 
-        /// <summary>
-        ///     ctor from file
-        /// </summary>
-        /// <param name="fileName"> Name of the file. </param>
-        /// <param name="parameters"> </param>
-        /// <param name="moduleName"> </param>
-        /// <param name="text"></param>
-        /// <param name="source"></param>
-        public Compiler
+        Compiler
             (
             string fileName = null,
             CompilerParameters parameters = null,
@@ -67,7 +72,7 @@ namespace Reni
                 );
 
             ModuleName = moduleName ?? ModuleNameFromFileName(fileName) ?? "ReniModule";
-            _rootContext = new Root(this);
+            RootContext = new Root(this);
             _parameters = parameters ?? new CompilerParameters();
 
             _tokenFactory = new MainTokenFactory(Scanner)
@@ -83,14 +88,13 @@ namespace Reni
                         : new Source(fileName.FileHandle()))
                 );
 
-            LocateCache = new FunctionCache<int, UserInterface.Token>(GetLocateForCache);
 
             SourceSyntaxCache = new ValueCache<SourceSyntax>(() => Parse(Source + 0));
 
             SyntaxCache = new ValueCache<Syntax>(() => SourceSyntax.Syntax);
 
             CodeContainerCache = new ValueCache<CodeContainer>
-                (() => new CodeContainer(ModuleName, _rootContext, Syntax, Source.Data));
+                (() => new CodeContainer(ModuleName, RootContext, Syntax, Source.Data));
 
             CSharpStringCache = new ValueCache<string>(() => CodeContainerCache.Value.CSharpString);
         }
@@ -224,6 +228,7 @@ namespace Reni
                 .plus(_parameters.ParseOnly ? new Issue[0] : CodeContainer.Issues)
             ;
 
+
         SourceSyntax Parse(SourcePosn source) => _tokenFactory.Parser.Execute(source);
 
         void RunFromCode() => CodeContainerCache.Value.Execute(this);
@@ -279,24 +284,6 @@ namespace Reni
                 result += "Exception: \n" + exceptionText;
 
             return result;
-        }
-
-        public UserInterface.Token Locate(int offset) => LocateCache[offset];
-
-        UserInterface.Token GetLocateForCache(int offset)
-        {
-            var posn = Source + offset;
-            var sourcePart = posn.Span(posn.IsEnd ? 0 : 1);
-            var sourceSyntax = SourceSyntax.Locate(sourcePart);
-
-            if(posn < sourceSyntax.Token.Characters)
-                return new UserInterface.WhiteSpaceToken
-                    (
-                    sourceSyntax.Token.PrecededWith.Single(item => item.Characters.Contains(posn)),
-                    sourceSyntax
-                    );
-
-            return new SyntaxToken(sourceSyntax);
         }
 
         internal IEnumerable<SourceSyntax> FindAllBelongings(SourceSyntax current)

@@ -8,7 +8,7 @@ namespace ReniExe
 {
     static class MainContainer
     {
-        public static void Main(String[] args)
+        public static void Main(string[] args)
         {
             if(args.Length != 1)
             {
@@ -16,8 +16,11 @@ namespace ReniExe
                 return;
             }
 
-            var p = new CompilerParameters {OutStream = new ConsoleStream()};
-            var c = new Compiler(args[0], p);
+            var p = new CompilerParameters
+            {
+                OutStream = new ConsoleStream()
+            };
+            var c = Compiler.FromFile(args[0], p);
             try
             {
                 c.Execute();

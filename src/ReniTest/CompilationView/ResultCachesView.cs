@@ -51,10 +51,7 @@ namespace ReniTest.CompilationView
             return client;
         }
 
-        void OnClicked(FunctionId functionId)
-        {
-            NotImplementedMethod(functionId);
-        }
+        void SignalClicked(FunctionId functionId) => Master.SignalClicked(functionId);
 
         Control ResultCacheView(KeyValuePair<ContextBase, ResultCache> item)
         {
@@ -123,27 +120,27 @@ namespace ReniTest.CompilationView
         Control CreateTypeView(TypeBase type)
         {
             var text = type.NodeDump.CreateView();
-            text.Click += (s, a) => OnClicked(type);
+            text.Click += (s, a) => SignalClicked(type);
             return text.CreateGroup("Type");
         }
 
-        void OnClicked(TypeBase target) => NotImplementedMethod(target);
+        void SignalClicked(TypeBase target) => NotImplementedMethod(target);
 
         Control ContextView(ContextBase context)
         {
             var result = context.NodeDump.CreateView();
-            result.Click += (s, a) => OnClicked(context);
+            result.Click += (s, a) => SignalClicked(context);
             return result;
         }
 
-        void OnClicked(ContextBase target) => NotImplementedMethod(target);
+        void SignalClicked(ContextBase target) => NotImplementedMethod(target);
 
         internal Control CreateFunctionCallView(Call visitedObject)
         {
             var functionId = visitedObject.FunctionId;
             var name = functionId.ToString();
             var result = name.CreateView();
-            var menuItem = new MenuItem(name, (a, b) => OnClicked(functionId));
+            var menuItem = new MenuItem(name, (a, b) => SignalClicked(functionId));
             var contextMenu = new ContextMenu();
             contextMenu.MenuItems.Add(menuItem);
             result.ContextMenu = contextMenu;

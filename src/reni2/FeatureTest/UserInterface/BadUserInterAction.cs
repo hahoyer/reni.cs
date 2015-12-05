@@ -28,10 +28,10 @@ repeat: /\ ^ while() then(^ body(), repeat(^));
         [UnitTest]
         public void GetTokenForPosition()
         {
-            var compiler = new Compiler(text: text);
+            var compiler = Compiler.BrowserFromText(text: text);
             for(var i = 0; i < text.Length; i++)
             {
-                var t = compiler.Locate(i);
+                var t = compiler.LocatePosition(i);
                 Tracer.Assert(t != null, () => (new Source(text) + i).Dump());
             }
         }

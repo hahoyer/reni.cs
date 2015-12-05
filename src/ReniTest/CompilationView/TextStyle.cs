@@ -31,7 +31,7 @@ namespace ReniTest.CompilationView
         public static readonly TextStyle Error = new TextStyle(Color.Gray, isItalic: true);
         [UsedImplicitly]
 
-        static public TextStyle From(Token token, Compiler compiler)
+        static public TextStyle From(Token token, CompilerBrowser compiler)
         {
             if (token.IsError)
                 return Error;

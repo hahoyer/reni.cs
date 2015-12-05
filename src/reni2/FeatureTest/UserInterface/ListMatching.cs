@@ -14,8 +14,8 @@ namespace Reni.FeatureTest.UserInterface
         public void Matching()
         {
             const string Text = @"(1,3,4,6)";
-            var compiler = new Compiler(text: Text);
-            var comma = compiler.Locate(2);
+            var compiler = Compiler.BrowserFromText(text: Text);
+            var comma = compiler.LocatePosition(2);
             var commas = comma.FindAllBelongings(compiler).ToArray();
             Tracer.Assert(commas.Length == 3);
         }
@@ -24,7 +24,7 @@ namespace Reni.FeatureTest.UserInterface
         public void CombinationsOfMatching()
         {
             const string Text = @"(1,3,4,6)";
-            var compiler = new Compiler(text: Text);
+            var compiler = Compiler.BrowserFromText(text: Text);
 
             var commas = Text
                 .Select
@@ -35,7 +35,7 @@ namespace Reni.FeatureTest.UserInterface
                         index
                     })
                 .Where(item => item.item == ',')
-                .Select(item => compiler.Locate(item.index).FindAllBelongings(compiler).ToArray())
+                .Select(item => compiler.LocatePosition(item.index).FindAllBelongings(compiler).ToArray())
                 .ToArray();
 
             Tracer.Assert(commas.Length == 3);
@@ -52,7 +52,7 @@ namespace Reni.FeatureTest.UserInterface
         public void MixedMatching()
         {
             const string Text = @"(1,3,4;2,6)";
-            var compiler = new Compiler(text: Text);
+            var compiler = Compiler.BrowserFromText(text: Text);
 
             var commas = Text
                 .Select
@@ -63,7 +63,7 @@ namespace Reni.FeatureTest.UserInterface
                         index
                     })
                 .Where(item => item.item == ',')
-                .Select(item => compiler.Locate(item.index).FindAllBelongings(compiler).ToArray())
+                .Select(item => compiler.LocatePosition(item.index).FindAllBelongings(compiler).ToArray())
                 .ToArray();
 
             Tracer.Assert(commas.Length == 3);

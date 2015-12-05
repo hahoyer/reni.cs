@@ -24,7 +24,7 @@ namespace Reni.UserInterface
         public override bool IsLineEnd => Lexer.IsLineEnd(_item);
         public override string State => Lexer.Instance.WhiteSpaceId(_item) ?? "";
 
-        public override IEnumerable<SourcePart> FindAllBelongings(Compiler compiler)
+        public override IEnumerable<SourcePart> FindAllBelongings(CompilerBrowser compiler)
         {
             yield break;
         }

@@ -14,7 +14,7 @@ namespace Reni.FeatureTest.UserInterface
         public void FromSourcePart()
         {
             const string text = @"(1,3,4,6)";
-            var compiler = new Compiler(text: text);
+            var compiler = Compiler.FromText(text: text);
             var span = (compiler.Source + 2).Span(3);
             var x = compiler.Locate(span).SourcePart;
 
@@ -26,7 +26,7 @@ namespace Reni.FeatureTest.UserInterface
         {
             const string text = @"( # Comment
 1,3,4,6)";
-            var compiler = new Compiler(text: text);
+            var compiler = Compiler.FromText(text: text);
             var span = (compiler.Source + 2).Span(3);
             var x = compiler.Locate(span);
 

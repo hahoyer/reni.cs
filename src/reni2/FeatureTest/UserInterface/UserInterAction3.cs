@@ -17,13 +17,13 @@ namespace Reni.FeatureTest.UserInterface
         [UnitTest]
         public void GetTokenForPosition()
         {
-            var compiler = new Compiler(text: Text);
+            var compiler = Compiler.BrowserFromText(text: Text);
 
             var typeCharacters = new string
                 (
                 Text
                     .Length
-                    .Select(item => compiler.Locate(item).TypeCharacter)
+                    .Select(item => compiler.LocatePosition(item).TypeCharacter)
                     .ToArray());
             Tracer.Assert
                 (

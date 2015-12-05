@@ -14,9 +14,9 @@ namespace Reni.FeatureTest.UserInterface
         public void Matching()
         {
             const string Text = @"1 then 2 else 3";
-            var compiler = new Compiler(text: Text);
-            var thenToken = compiler.Locate(2);
-            var elseToken = compiler.Locate(Text.IndexOf("else"));
+            var compiler = Compiler.BrowserFromText(text: Text);
+            var thenToken = compiler.LocatePosition(2);
+            var elseToken = compiler.LocatePosition(Text.IndexOf("else"));
 
             var thenMatches = thenToken.FindAllBelongings(compiler).ToArray();
             var elseMatches = elseToken.FindAllBelongings(compiler).ToArray();
@@ -30,9 +30,9 @@ namespace Reni.FeatureTest.UserInterface
         public void NestedMatching()
         {
             const string Text = @"1 then 2 then 333 else 3";
-            var compiler = new Compiler(text: Text);
-            var thenToken = compiler.Locate(2);
-            var elseToken = compiler.Locate(Text.IndexOf("else"));
+            var compiler = Compiler.BrowserFromText(text: Text);
+            var thenToken = compiler.LocatePosition(2);
+            var elseToken = compiler.LocatePosition(Text.IndexOf("else"));
 
             var thenMatches = thenToken.FindAllBelongings(compiler).ToArray();
             var elseMatches = elseToken.FindAllBelongings(compiler).ToArray();

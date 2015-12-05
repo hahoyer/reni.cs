@@ -6,6 +6,7 @@ using hw.Helper;
 using hw.Scanner;
 using Reni;
 using Reni.Parser;
+using Reni.Struct;
 using ScintillaNET;
 
 namespace ReniTest.CompilationView
@@ -14,7 +15,7 @@ namespace ReniTest.CompilationView
     {
         int _lineNumberMarginLength;
         readonly Scintilla TextBox;
-        readonly ValueCache<Compiler> CompilerCache;
+        readonly ValueCache<CompilerBrowser> CompilerCache;
         readonly FunctionCache<CompileSyntax, ResultCachesView> DetailViews;
 
         internal SourceView(string text)
@@ -30,13 +31,14 @@ namespace ReniTest.CompilationView
             foreach(var id in TextStyle.All)
                 StyleConfig(id);
 
-            TextBox.StyleNeeded += (s, args) => OnStyleNeeded(args.Position);
+            TextBox.StyleNeeded += (s, args) => SignalStyleNeeded(args.Position);
             TextBox.TextChanged += (s, args) => OnTextChanged();
 
             TextBox.ContextMenu = new ContextMenu();
             TextBox.ContextMenu.Popup += (s, args) => OnContextMenuPopup();
 
-            CompilerCache = new ValueCache<Compiler>(GetCompiler);
+            CompilerCache = new ValueCache<CompilerBrowser>
+                (() => Reni.Compiler.BrowserFromText(TextBox.Text));
             DetailViews = new FunctionCache<CompileSyntax, ResultCachesView>(CreateDetailView);
 
             Client = TextBox;
@@ -47,7 +49,7 @@ namespace ReniTest.CompilationView
         ResultCachesView CreateDetailView(CompileSyntax syntax)
             => new ResultCachesView(syntax, this);
 
-        Compiler Compiler => CompilerCache.Value;
+        CompilerBrowser Compiler => CompilerCache.Value;
 
         void OnTextChanged()
         {
@@ -63,18 +65,9 @@ namespace ReniTest.CompilationView
                 menuItems.RemoveAt(0);
 
             var p = TextBox.CurrentPosition;
-            var c = Compiler.CodeContainer.Issues.ToArray();
 
-            var enumerable = Compiler
-                .Locate(p)
-                .SourceSyntax
-                .ParentChainIncludingThis
-                .Select(item => item.Syntax)
-                .ToArray();
-
-            var items = enumerable
-                .OfType<CompileSyntax>()
-                .Where(item => item.ResultCache.Any())
+            var compileSyntaxs = Compiler.FindPosition(p);
+            var items = compileSyntaxs
                 .Select(CreateMenuItem)
                 .ToArray();
 
@@ -90,18 +83,16 @@ namespace ReniTest.CompilationView
 
             var menuItem = new MenuItem
                 (text, (s, a) => DetailViews[syntax].Run());
-            menuItem.Select += (s, a) => OnContextMenuSelect(syntax);
+            menuItem.Select += (s, a) => SignalContextMenuSelect(syntax);
             return menuItem;
         }
 
-        void OnContextMenuSelect(Syntax syntax)
+        void SignalContextMenuSelect(Syntax syntax)
             => TextBox.SetSelection(syntax.SourcePart.Position, syntax.SourcePart.EndPosition);
-
-        Compiler GetCompiler() => new Compiler(text: TextBox.Text);
 
         void StyleConfig(TextStyle id) => id.Config(TextBox.Styles[id]);
 
-        void OnStyleNeeded(int position)
+        void SignalStyleNeeded(int position)
         {
             var trace = false;
             StartMethodDump(trace, position);
@@ -110,7 +101,7 @@ namespace ReniTest.CompilationView
                 while(TextBox.GetEndStyled() < position)
                 {
                     var current = TextBox.GetEndStyled();
-                    var tokens = Compiler.Locate(current);
+                    var tokens = Compiler.LocatePosition(current);
                     var style = TextStyle.From(tokens, Compiler);
                     TextBox.StartStyling(tokens.StartPosition);
                     TextBox.SetStyling(tokens.SourcePart.Length, style);
@@ -141,5 +132,11 @@ namespace ReniTest.CompilationView
         }
 
         void Bold(SourcePart region) { }
+
+        protected override void HandleClicked(FunctionId functionId)
+        {
+            var function = Compiler.Find(functionId);
+            base.HandleClicked(functionId);
+        }
     }
 }

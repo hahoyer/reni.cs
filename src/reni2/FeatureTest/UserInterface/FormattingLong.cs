@@ -26,7 +26,7 @@ namespace Reni.FeatureTest.UserInterface
 3;
 (Text ('H') << 'allo') dump_print";
 
-            var compiler = new Compiler(text: Text);
+            var compiler = Compiler.FromText(text: Text);
 
             for(var start = 0; start < compiler.Source.Length; start++)
                 for(var end = start; end < compiler.Source.Length; end++)

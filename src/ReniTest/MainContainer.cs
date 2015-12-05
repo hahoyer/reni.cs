@@ -92,7 +92,7 @@ ParLevel ( { ) }
             const string fileName = "temptest.reni";
             var f = fileName.FileHandle();
             f.String = text;
-            var compiler = new Compiler(fileName);
+            var compiler = Compiler.FromText(fileName);
             //Profiler.Measure(()=>compiler.Exec());
             //Tracer.FlaggedLine(Profiler.Format(10,0.0));
             return compiler;
@@ -101,7 +101,7 @@ ParLevel ( { ) }
         static void ExecTest()
         {
             Data.OutStream = new OutStream();
-            Reni.MainFunction();
+            T4CompilerGenerated.MainFunction();
             Data.OutStream = null;
         }
 

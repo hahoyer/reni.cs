@@ -5,7 +5,7 @@ using Reni.Runtime;
 
 namespace ReniTest
 {
-    public static class Reni
+    public static class T4CompilerGenerated
     {
         // 
         //systemdata:

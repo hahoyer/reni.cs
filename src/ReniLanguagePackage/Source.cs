@@ -14,15 +14,15 @@ namespace HoyerWare.ReniLanguagePackage
 {
     sealed class Source : DumpableObject
     {
-        readonly ValueCache<Compiler> _compilerCache;
+        readonly ValueCache<CompilerBrowser> _compilerCache;
 
         public Source(string text)
         {
-            _compilerCache = new ValueCache<Compiler>(() => CreateCompilerForCache(text));
+            _compilerCache = new ValueCache<CompilerBrowser>(() => CreateCompilerForCache(text));
         }
 
-        static Compiler CreateCompilerForCache(string text)
-            => new Compiler
+        static CompilerBrowser CreateCompilerForCache(string text)
+            => Reni.Compiler.BrowserFromText
                 (
                 text: text,
                 parameters: new CompilerParameters
@@ -41,7 +41,7 @@ namespace HoyerWare.ReniLanguagePackage
             try
             {
                 var offset = Data.FromLineAndColumn(line, column).Position;
-                var token = Compiler.Locate(offset);
+                var token = Compiler.LocatePosition(offset);
                 Dump(nameof(token), token);
                 var result = token.ToTokenInfo();
                 return ReturnMethodDump(result, false);
@@ -52,7 +52,7 @@ namespace HoyerWare.ReniLanguagePackage
             }
         }
 
-        Compiler Compiler => _compilerCache.Value;
+        CompilerBrowser Compiler => _compilerCache.Value;
         hw.Scanner.Source Data => Compiler.Source;
 
         IEnumerable<Token.Trimmed> TokensForLine(int lineIndex, bool trace)
@@ -61,18 +61,18 @@ namespace HoyerWare.ReniLanguagePackage
 
             var index = line.Position;
             var i = 0;
-            while(index < line.EndPosition)
+            while (index < line.EndPosition)
             {
-                var token = Compiler.Locate(index).AssertNotNull().TrimLine(line);
-                if(trace)
+                var token = Compiler.LocatePosition(index).AssertNotNull().TrimLine(line);
+                if (trace)
                     Tracer.IndentStart();
-                if(trace)
+                if (trace)
                     Tracer.Line("\n" + i + ": " + token.Token.ConvertToTokenColor());
-                if(trace)
+                if (trace)
                     Tracer.Line(token.SourcePart.NodeDump.Quote());
-                if(trace)
+                if (trace)
                     Tracer.Line("-----------------");
-                if(trace)
+                if (trace)
                     Tracer.IndentEnd();
 
                 yield return token;
@@ -87,7 +87,7 @@ namespace HoyerWare.ReniLanguagePackage
             try
             {
                 var lineEndPosition = Data.FromLineAndColumn(line, null).Position;
-                var token = Compiler.Locate(lineEndPosition);
+                var token = Compiler.LocatePosition(lineEndPosition);
                 Tracer.Assert(token != null);
                 var result = token.State;
                 return ReturnMethodDump(result, false);
@@ -109,13 +109,13 @@ namespace HoyerWare.ReniLanguagePackage
         internal Token FromLineAndColumn(int lineIndex, int columIndex)
         {
             var start = Data.FromLineAndColumn(lineIndex, columIndex).Position;
-            return Compiler.Locate(start);
+            return Compiler.LocatePosition(start);
         }
 
         internal Token FromLineAndColumnBackwards(int lineIndex, int columIndex)
         {
             var start = Data.FromLineAndColumn(lineIndex, columIndex).Position - 1;
-            return Compiler.Locate(Math.Max(0, start));
+            return Compiler.LocatePosition(Math.Max(0, start));
         }
 
         internal IEnumerable<SourcePart> BracesLike(Token current)

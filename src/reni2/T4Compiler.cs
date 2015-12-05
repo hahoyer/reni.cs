@@ -8,13 +8,8 @@ namespace Reni
     public sealed class T4Compiler
     {
         readonly string _text;
-        readonly string ModuleName;
 
-        public T4Compiler(string text, string moduleName = "Reni")
-        {
-            _text = text;
-            ModuleName = moduleName;
-        }
+        public T4Compiler(string text) { _text = text; }
 
         public string Code()
         {
@@ -22,7 +17,7 @@ namespace Reni
             var f = fileName.FileHandle();
             f.AssumeDirectoryOfFileExists();
             f.String = _text;
-            var compiler = new Compiler(fileName, moduleName: ModuleName);
+            var compiler = Compiler.FromFile(fileName, "T4Compiler");
             return compiler.CSharpString;
         }
     }

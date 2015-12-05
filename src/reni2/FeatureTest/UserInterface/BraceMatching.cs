@@ -15,10 +15,10 @@ namespace Reni.FeatureTest.UserInterface
         {
             const string Text = @"(1,3,4,6)";
 
-            var compiler = new Compiler(text: Text);
+            var compiler = Compiler.BrowserFromText(Text);
 
-            var open = compiler.Locate(0);
-            var close = compiler.Locate(Text.IndexOf(")"));
+            var open = compiler.LocatePosition(0);
+            var close = compiler.LocatePosition(Text.IndexOf(")"));
 
             var matchOpen = open.FindAllBelongings(compiler);
             var matchClose = close.FindAllBelongings(compiler);
@@ -33,10 +33,10 @@ namespace Reni.FeatureTest.UserInterface
         {
             const string Text = @"(1,3),4,6)";
 
-            var compiler = new Compiler(text: Text);
+            var compiler = Compiler.BrowserFromText(Text);
 
-            var open = compiler.Locate(0);
-            var close = compiler.Locate(Text.IndexOf(")"));
+            var open = compiler.LocatePosition(0);
+            var close = compiler.LocatePosition(Text.IndexOf(")"));
 
             var matchOpen = open.FindAllBelongings(compiler);
             var matchClose = close.FindAllBelongings(compiler);
@@ -51,9 +51,9 @@ namespace Reni.FeatureTest.UserInterface
         {
             const string Text = @"(1,3),4,6)";
 
-            var compiler = new Compiler(text: Text);
+            var compiler = Compiler.BrowserFromText(Text);
 
-            var close = compiler.Locate(Text.IndexOf(")", Text.IndexOf(")")+1));
+            var close = compiler.LocatePosition(Text.IndexOf(")", Text.IndexOf(")")+1));
 
             var matchClose = close.FindAllBelongings(compiler);
 

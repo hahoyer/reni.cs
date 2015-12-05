@@ -170,6 +170,11 @@ namespace Reni.Context
         }
 
         internal FunctionContainer FunctionContainer(int index) => _functions.Container(index);
+        internal Container FunctionContainer(FunctionId id)
+        {
+            var f = FunctionContainer(id.Index);
+            return id.IsGetter ? f.Getter : f.Setter;
+        }
 
         internal Container MainContainer(Syntax syntax, string description)
         {

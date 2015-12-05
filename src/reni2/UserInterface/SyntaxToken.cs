@@ -48,7 +48,7 @@ namespace Reni.UserInterface
         public override string Reformat(SourcePart targetPart)
             => SourceSyntax.Reformat(targetPart);
 
-        public override IEnumerable<SourcePart> FindAllBelongings(Compiler compiler)
+        public override IEnumerable<SourcePart> FindAllBelongings(CompilerBrowser compiler)
             => compiler.FindAllBelongings(SourceSyntax)?.Select(item => item.Token.Characters);
     }
 }

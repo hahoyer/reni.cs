@@ -21,7 +21,7 @@ namespace Reni.FeatureTest.UserInterface
         {
             const string Text = @"( # Comment
 1,3,4,6)";
-            var compiler = new Compiler(text: Text);
+            var compiler = Compiler.FromText(text: Text);
             var span = (compiler.Source + 2).Span(3);
             var trimmed = compiler.Locate(span).Reformat(span);
 
@@ -34,7 +34,7 @@ namespace Reni.FeatureTest.UserInterface
         {
             const string Text = @"( #(aa Comment aa)#
 1,3,4,6)";
-            var compiler = new Compiler(text: Text);
+            var compiler = Compiler.FromText(text: Text);
             var span = (compiler.Source + 2).Span(3);
             var reformat = compiler.Locate(span).Reformat(span);
             Tracer.Assert(reformat == "#(a", reformat);
@@ -51,7 +51,7 @@ namespace Reni.FeatureTest.UserInterface
         repeat(^)
     );}; 1 = 1 then 2 else 4; 3; (Text('H') << 'allo') dump_print ";
 
-            var compiler = new Compiler(text: Text);
+            var compiler = Compiler.FromText(text: Text);
             var newSource = compiler.SourceSyntax.Reformat
                 (
                     provider:
@@ -92,7 +92,7 @@ namespace Reni.FeatureTest.UserInterface
     );
             ";
 
-            var compiler = new Compiler(text: Text);
+            var compiler = Compiler.FromText(text: Text);
             var newSource = compiler.SourceSyntax.Reformat
                 (
                     provider:
@@ -118,7 +118,7 @@ namespace Reni.FeatureTest.UserInterface
                 + @"\..\..\..";
             var fileName = srcDir + @"\renisource\test.reni";
             var file = fileName.FileHandle();
-            var compiler = new Compiler(fileName);
+            var compiler = Compiler.FromText(fileName);
             var source = compiler.Source.All;
             var newSource = compiler.SourceSyntax.Reformat
                 (
