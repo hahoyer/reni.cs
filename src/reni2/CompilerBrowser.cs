@@ -46,25 +46,39 @@ namespace Reni
             => Parent.RootContext.FunctionContainer(functionId);
 
         internal IEnumerable<SourceSyntax> FindAllBelongings(SourceSyntax sourceSyntax)
-            => Parent.FindAllBelongings(sourceSyntax);
+            => Parent.SourceSyntax.Belongings(sourceSyntax);
 
         public string Reformat(SourcePart sourcePart, Provider provider)
-            => Parent.Reformat(sourcePart, provider);
+            => Parent.SourceSyntax.Reformat(sourcePart, provider);
 
-        UserInterface.Token GetLocateForCache(int offset)
+        Token GetLocateForCache(int offset)
         {
             var posn = Source + offset;
             var sourcePart = posn.Span(posn.IsEnd ? 0 : 1);
             var sourceSyntax = Parent.SourceSyntax.Locate(sourcePart);
 
-            if (posn < sourceSyntax.Token.Characters)
-                return new UserInterface.WhiteSpaceToken
+            if(posn < sourceSyntax.Token.Characters)
+                return new WhiteSpaceToken
                     (
                     sourceSyntax.Token.PrecededWith.Single(item => item.Characters.Contains(posn)),
                     sourceSyntax
                     );
 
             return new SyntaxToken(sourceSyntax);
+        }
+
+        internal string Reformat(Provider provider)
+            => Parent.SourceSyntax.Reformat(provider: provider);
+
+        internal SourceSyntax Locate(SourcePart span)
+        {
+            var result = Parent.SourceSyntax.Locate(span);
+            if(result != null)
+                return result;
+
+            Tracer.TraceBreak();
+            NotImplementedMethod(span);
+            return null;
         }
     }
 }

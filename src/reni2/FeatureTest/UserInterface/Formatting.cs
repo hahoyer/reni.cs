@@ -21,7 +21,7 @@ namespace Reni.FeatureTest.UserInterface
         {
             const string Text = @"( # Comment
 1,3,4,6)";
-            var compiler = Compiler.FromText(text: Text);
+            var compiler = Compiler.BrowserFromText(Text);
             var span = (compiler.Source + 2).Span(3);
             var trimmed = compiler.Locate(span).Reformat(span);
 
@@ -34,7 +34,7 @@ namespace Reni.FeatureTest.UserInterface
         {
             const string Text = @"( #(aa Comment aa)#
 1,3,4,6)";
-            var compiler = Compiler.FromText(text: Text);
+            var compiler = Compiler.BrowserFromText(Text);
             var span = (compiler.Source + 2).Span(3);
             var reformat = compiler.Locate(span).Reformat(span);
             Tracer.Assert(reformat == "#(a", reformat);
@@ -51,15 +51,14 @@ namespace Reni.FeatureTest.UserInterface
         repeat(^)
     );}; 1 = 1 then 2 else 4; 3; (Text('H') << 'allo') dump_print ";
 
-            var compiler = Compiler.FromText(text: Text);
-            var newSource = compiler.SourceSyntax.Reformat
+            var compiler = Compiler.BrowserFromText(Text);
+            var newSource = compiler.Reformat
                 (
-                    provider:
-                        new Provider
-                        {
-                            MaxLineLength = 100,
-                            EmptyLineLimit = 0
-                        }
+                    new Provider
+                    {
+                        MaxLineLength = 100,
+                        EmptyLineLimit = 0
+                    }
                 );
 
             var lineCount = newSource.Count(item => item == '\n');
@@ -92,14 +91,13 @@ namespace Reni.FeatureTest.UserInterface
     );
             ";
 
-            var compiler = Compiler.FromText(text: Text);
-            var newSource = compiler.SourceSyntax.Reformat
+            var compiler = Compiler.BrowserFromText(Text);
+            var newSource = compiler.Reformat
                 (
-                    provider:
-                        new Provider
-                        {
-                            EmptyLineLimit = 1
-                        }
+                    new Provider
+                    {
+                        EmptyLineLimit = 1
+                    }
                 );
 
             var lineCount = newSource.Count(item => item == '\n');
@@ -118,15 +116,14 @@ namespace Reni.FeatureTest.UserInterface
                 + @"\..\..\..";
             var fileName = srcDir + @"\renisource\test.reni";
             var file = fileName.FileHandle();
-            var compiler = Compiler.FromText(fileName);
+            var compiler = Compiler.BrowserFromText(fileName);
             var source = compiler.Source.All;
-            var newSource = compiler.SourceSyntax.Reformat
+            var newSource = compiler.Reformat
                 (
-                    provider:
-                        new Provider
-                        {
-                            EmptyLineLimit = 1
-                        }
+                    new Provider
+                    {
+                        EmptyLineLimit = 1
+                    }
                 );
             var lineCount = newSource.Count(item => item == '\n');
             Tracer.Assert(lineCount == 71, nameof(lineCount) + "=" + lineCount + "\n" + newSource);

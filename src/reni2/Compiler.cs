@@ -11,7 +11,6 @@ using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Code;
 using Reni.Context;
-using Reni.Formatting;
 using Reni.Parser;
 using Reni.Runtime;
 using Reni.Struct;
@@ -27,7 +26,7 @@ namespace Reni
 
         public static CompilerBrowser BrowserFromText
             (string text, CompilerParameters parameters = null)
-            => new CompilerBrowser(new Compiler(text: text, parameters: parameters));
+            => new Compiler(text: text, parameters: parameters).BrowserCache.Value;
 
         public static Compiler FromFile(string fileName, CompilerParameters parameters)
             => new Compiler(fileName, parameters);
@@ -47,6 +46,7 @@ namespace Reni
         readonly ValueCache<Syntax> SyntaxCache;
         readonly ValueCache<CodeContainer> CodeContainerCache;
         readonly ValueCache<string> CSharpStringCache;
+        readonly ValueCache<CompilerBrowser> BrowserCache;
 
         [Node]
         internal readonly Root RootContext;
@@ -97,6 +97,8 @@ namespace Reni
                 (() => new CodeContainer(ModuleName, RootContext, Syntax, Source.Data));
 
             CSharpStringCache = new ValueCache<string>(() => CodeContainerCache.Value.CSharpString);
+
+            BrowserCache = new ValueCache<CompilerBrowser>(() => new CompilerBrowser(this));
         }
 
         static string ModuleNameFromFileName(string fileName)
@@ -285,23 +287,6 @@ namespace Reni
 
             return result;
         }
-
-        internal IEnumerable<SourceSyntax> FindAllBelongings(SourceSyntax current)
-            => SourceSyntax.Belongings(current);
-
-        internal SourceSyntax Locate(SourcePart part)
-        {
-            var result = SourceSyntax.Locate(part);
-            if(result != null)
-                return result;
-
-            Tracer.TraceBreak();
-            NotImplementedMethod(part);
-            return null;
-        }
-
-        public string Reformat(SourcePart sourcePart, Provider provider) => SourceSyntax.
-            Reformat(sourcePart, provider);
     }
 
     public interface IOutStream
