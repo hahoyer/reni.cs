@@ -102,7 +102,7 @@ namespace Reni.Parser
             return token.Aggregate("", (current, tokenChar) => current + SymbolizeChar(tokenChar));
         }
 
-        static string SymbolizeChar(Char @char)
+        static string SymbolizeChar(char @char)
         {
             switch(@char)
             {
@@ -134,12 +134,14 @@ namespace Reni.Parser
                     return "Star";
                 case '~':
                     return "Tilde";
+                case ' ':
+                    return "Space";
                 case '_':
                     return "__";
                 default:
-                    if(Char.IsLetter(@char))
+                    if(char.IsLetter(@char))
                         return "_" + @char;
-                    if(Char.IsDigit(@char))
+                    if(char.IsDigit(@char))
                         return @char.ToString();
                     throw new NotImplementedException("Symbolize(" + @char + ")");
             }

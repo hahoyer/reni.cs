@@ -28,7 +28,8 @@ namespace Reni.FeatureTest.UserInterface
 1,3,4,6)";
             var compiler = Compiler.BrowserFromText(text: Text);
             var span = (compiler.Source + 2).Span(3);
-            var x = compiler.Locate(span).Reformat(span);
+            var locate = compiler.Locate(span);
+            var x = locate.Reformat(span);
 
             Tracer.Assert(x == "# C", x);
         }

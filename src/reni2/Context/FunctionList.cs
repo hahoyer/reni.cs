@@ -38,6 +38,7 @@ namespace Reni.Context
         }
 
         internal FunctionContainer Container(int index) => _list[index].Container;
+        internal FunctionType Item(int index) => _list[index];
 
         int CreateFunctionInstance(TypeBase args, FunctionSyntax syntax, CompoundView compoundView)
         {

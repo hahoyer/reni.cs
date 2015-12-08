@@ -22,7 +22,7 @@ namespace Reni.Struct
 
         readonly ValueCache<CodeBase> _bodyCodeCache;
         readonly ValueCache<ContextBase> _contextCache;
-        readonly ResultCache _resultCache;
+        internal readonly ResultCache ResultCache;
 
         protected FunctionInstance(FunctionType parent, CompileSyntax body)
         {
@@ -30,7 +30,7 @@ namespace Reni.Struct
             Parent = parent;
             _bodyCodeCache = new ValueCache<CodeBase>(ObtainBodyCode);
             _contextCache = new ValueCache<ContextBase>(ObtainContext);
-            _resultCache = new ResultCache(this);
+            ResultCache = new ResultCache(this);
         }
 
         [Node]
@@ -47,7 +47,7 @@ namespace Reni.Struct
         {
             get
             {
-                var result = _resultCache.Exts;
+                var result = ResultCache.Exts;
                 Tracer.Assert(result != null);
                 return result;
             }
@@ -76,7 +76,7 @@ namespace Reni.Struct
 
         internal Result CallResult(Category category)
         {
-            var result = _resultCache & category.FunctionCall;
+            var result = ResultCache & category.FunctionCall;
             if(result == null)
                 return null;
 
@@ -152,7 +152,7 @@ namespace Reni.Struct
             {
                 _isObtainBodyCodeActive = true;
                 var foreignRefsRef = CreateContextRefCode();
-                var visitResult = _resultCache & (Category.Code | Category.Exts);
+                var visitResult = ResultCache & (Category.Code | Category.Exts);
                 var result = visitResult
                     .ReplaceRefsForFunctionBody(foreignRefsRef)
                     .Code;

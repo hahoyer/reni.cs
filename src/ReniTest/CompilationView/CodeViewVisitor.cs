@@ -10,21 +10,84 @@ namespace ReniTest.CompilationView
 {
     sealed class CodeViewVisitor : Visitor<Control, Control>
     {
-        readonly ResultCachesView Parent;
+        readonly SourceView Master;
 
-        internal CodeViewVisitor(ResultCachesView parent) { Parent = parent; }
+        internal CodeViewVisitor(SourceView master) { Master = master; }
 
         internal override Control ContextRef(ReferenceCode visitedObject)
             => visitedObject.Context.NodeDump().CreateView();
 
+        internal override Control LocalReference(LocalReference target)
+        {
+            Control destructor = null;
+            if(!target.DestructorCode.IsEmpty)
+            {
+                destructor = target.DestructorCode.CreateView(Master);
+                destructor.Text = "Destructor";
+            }
+
+            var result = new[]
+            {
+                target.ValueType.CreateTypeLineView(Master).CreateGroup("Type"),
+                target.AlignedValueCode.CreateView(Master),
+                destructor
+            };
+
+            return result.CreateRowView();
+        }
+
         internal override Control BitArray(BitArray visitedObject)
             => visitedObject.Data.ToString().CreateView();
 
-        internal override Control Call(Call visitedObject) 
-            => Parent.CreateFunctionCallView(visitedObject);
+        internal override Control Call(Call visitedObject)
+            => visitedObject.CreateView(Master);
 
         internal override Control TopRef(TopRef visitedObject)
             => ("Offset=" + visitedObject.Offset.ToInt()).CreateView();
+
+        internal override Control TopFrameData(TopFrameData visitedObject)
+        {
+            var text = "Offset=" + visitedObject.Offset.ToInt();
+            if(visitedObject.Size != visitedObject.DataSize)
+                text += " DataSize=" + visitedObject.DataSize.ToInt();
+            return text.CreateView();
+        }
+
+        internal override Control TopData(TopData visitedObject)
+        {
+            var text = "Offset=" + visitedObject.Offset.ToInt();
+            if(visitedObject.Size != visitedObject.DataSize)
+                text += " DataSize=" + visitedObject.DataSize.ToInt();
+            return text.CreateView();
+        }
+
+        internal override Control DePointer(DePointer visitedObject)
+        {
+            var text = "";
+            if(visitedObject.OutputSize != visitedObject.DataSize)
+                text += "DataSize=" + visitedObject.DataSize.ToInt();
+            return text.CreateView();
+        }
+
+        internal override Control BitCast(BitCast visitedObject)
+        {
+            var text = "";
+            if(visitedObject.InputSize != visitedObject.InputDataSize)
+                text += "InputDataSize=" + visitedObject.InputDataSize.ToInt();
+            return text.CreateView();
+        }
+
+        internal override Control ReferencePlusConstant(ReferencePlusConstant visitedObject)
+            => ("Right=" + visitedObject.Right.ToInt()).CreateView();
+
+        internal override Control BitArrayBinaryOp(BitArrayBinaryOp visitedObject)
+            => (
+                "OpToken=" + visitedObject.OpToken +
+                    " LeftSize=" + visitedObject.LeftSize.ToInt() +
+                    " RightSize=" + visitedObject.RightSize.ToInt()
+                ).CreateView();
+
+        internal override Control Drop(Drop visitedObject) => "".CreateView();
 
         protected override Control Fiber(Fiber visitedObject, Control newHead, Control[] newItems)
         {

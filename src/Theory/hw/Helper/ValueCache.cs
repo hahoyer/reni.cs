@@ -68,5 +68,7 @@ namespace hw.Helper
 
         [EnableDumpExcept(false)]
         public bool IsBusy { get { return _isBusy; } }
+
+        internal static ValueCache<T> NewCache<T>(Func<T> func) => new ValueCache<T>(func);
     }
 }

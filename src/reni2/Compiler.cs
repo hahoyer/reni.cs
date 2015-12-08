@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -16,37 +17,34 @@ using Reni.Runtime;
 using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Validation;
+using static Reni.ValueCacheExtension;
 
 namespace Reni
 {
-    public sealed class Compiler : DumpableObject, IExecutionContext
+    public sealed class Compiler : DumpableObject, IExecutionContext, IContainer
     {
         static IScanner<SourceSyntax> Scanner(ITokenFactory<SourceSyntax> tokenFactory)
             => new Scanner<SourceSyntax>(Lexer.Instance, tokenFactory);
 
         public static CompilerBrowser BrowserFromText
             (string text, CompilerParameters parameters = null)
-            => new Compiler(text: text, parameters: parameters).BrowserCache.Value;
+            => new CompilerBrowser(new Compiler(text: text, parameters: parameters));
 
         public static Compiler FromFile(string fileName, CompilerParameters parameters)
             => new Compiler(fileName, parameters);
 
-        internal static Compiler FromFile
-            (string fileName, string moduleName, CompilerParameters parameters = null)
-            => new Compiler(fileName, parameters, moduleName);
-
+        internal static Compiler FromFile(string fileName) => new Compiler(fileName);
         internal static Compiler FromText(string text) => new Compiler(text: text);
 
         readonly MainTokenFactory _tokenFactory;
         readonly CompilerParameters _parameters;
         readonly string ModuleName;
 
-        readonly ValueCache<Source> SourceCache;
-        readonly ValueCache<SourceSyntax> SourceSyntaxCache;
-        readonly ValueCache<Syntax> SyntaxCache;
-        readonly ValueCache<CodeContainer> CodeContainerCache;
-        readonly ValueCache<string> CSharpStringCache;
-        readonly ValueCache<CompilerBrowser> BrowserCache;
+        ValueCacheExtension.Container IContainer.Cache { get; } = new ValueCacheExtension.Container
+            ();
+        [Node]
+        [DisableDump]
+        internal readonly Source Source;
 
         [Node]
         internal readonly Root RootContext;
@@ -55,6 +53,7 @@ namespace Reni
 
         [UsedImplicitly]
         public Exception Exception;
+        readonly ValueCache<CodeContainer> CodeContainerCache;
 
         Compiler
             (
@@ -80,42 +79,25 @@ namespace Reni
                 Trace = _parameters.TraceOptions.Parser
             };
 
-            SourceCache = new ValueCache<Source>
-                (
-                () => source
-                    ?? (fileName == null
-                        ? new Source(text)
-                        : new Source(fileName.FileHandle()))
-                );
+            Source = source
+                ?? (fileName == null
+                    ? new Source(text)
+                    : new Source(fileName.FileHandle()));
 
-
-            SourceSyntaxCache = new ValueCache<SourceSyntax>(() => Parse(Source + 0));
-
-            SyntaxCache = new ValueCache<Syntax>(() => SourceSyntax.Syntax);
-
-            CodeContainerCache = new ValueCache<CodeContainer>
+            CodeContainerCache = NewCache
                 (() => new CodeContainer(ModuleName, RootContext, Syntax, Source.Data));
-
-            CSharpStringCache = new ValueCache<string>(() => CodeContainerCache.Value.CSharpString);
-
-            BrowserCache = new ValueCache<CompilerBrowser>(() => new CompilerBrowser(this));
         }
 
         static string ModuleNameFromFileName(string fileName)
             => fileName == null ? null : Path.GetFileName(fileName).Symbolize();
 
+        [Node]
+        [DisableDump]
+        internal Syntax Syntax => CachedValue(this, () => SourceSyntax.Syntax);
 
         [Node]
         [DisableDump]
-        public Source Source => SourceCache.Value;
-
-        [Node]
-        [DisableDump]
-        internal Syntax Syntax => SyntaxCache.Value;
-
-        [Node]
-        [DisableDump]
-        internal SourceSyntax SourceSyntax => SourceSyntaxCache.Value;
+        internal SourceSyntax SourceSyntax => CachedValue(this, () => Parse(Source + 0));
 
         [Node]
         [DisableDump]
@@ -123,7 +105,7 @@ namespace Reni
 
         [DisableDump]
         [Node]
-        internal string CSharpString => CSharpStringCache.Value;
+        internal string CSharpString => CachedValue(this, () => CodeContainer.CSharpString);
 
         internal static string FormattedNow
         {
@@ -233,7 +215,7 @@ namespace Reni
 
         SourceSyntax Parse(SourcePosn source) => _tokenFactory.Parser.Execute(source);
 
-        void RunFromCode() => CodeContainerCache.Value.Execute(this);
+        void RunFromCode() => CodeContainer.Execute(this);
 
         internal void Materialize()
         {

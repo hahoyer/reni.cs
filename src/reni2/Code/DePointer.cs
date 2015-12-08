@@ -42,5 +42,8 @@ namespace Reni.Code
             => new TopFrameData(precedingElement.Offset, OutputSize, DataSize);
 
         internal override void Visit(IVisitor visitor) => visitor.DePointer(OutputSize, DataSize);
+
+        protected override TFiber VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
+            => actual.DePointer(this);
     }
 }

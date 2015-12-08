@@ -1,25 +1,3 @@
-#region Copyright (C) 2013
-
-//     Project Reni2
-//     Copyright (C) 2011 - 2013 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-#endregion
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,8 +13,6 @@ namespace Reni.Code
     sealed class BitCast : FiberItem
     {
         static int _nextId;
-        readonly Size _outputSize;
-        readonly Size _inputSize;
 
         [Node]
         [DisableDump]
@@ -46,20 +22,21 @@ namespace Reni.Code
             : base(_nextId++)
         {
             Tracer.Assert(outputSize != inputSize || inputSize != inputDataSize);
-            _outputSize = outputSize;
-            _inputSize = inputSize;
+            OutputSize = outputSize;
+            InputSize = inputSize;
             InputDataSize = inputDataSize;
             StopByObjectIds(-35);
             StopByObjectIds(-32);
         }
 
         [DisableDump]
-        internal override Size OutputSize => _outputSize;
+        internal override Size OutputSize { get; }
 
         [DisableDump]
-        internal override Size InputSize => _inputSize;
+        internal override Size InputSize { get; }
 
-        protected override FiberItem[] TryToCombineImplementation(FiberItem subsequentElement) => subsequentElement.TryToCombineBack(this);
+        protected override FiberItem[] TryToCombineImplementation(FiberItem subsequentElement)
+            => subsequentElement.TryToCombineBack(this);
 
         internal override FiberItem[] TryToCombineBack(BitCast preceding)
         {
@@ -79,13 +56,16 @@ namespace Reni.Code
             return new BitArray(OutputSize, bitsConst);
         }
 
-        protected override string GetNodeDump() => base.GetNodeDump() + " InputSize=" + InputSize + " InputDataSize=" + InputDataSize;
+        protected override string GetNodeDump()
+            => base.GetNodeDump() + " InputSize=" + InputSize + " InputDataSize=" + InputDataSize;
 
-        internal override void Visit(IVisitor visitor) => visitor.BitCast(OutputSize, InputSize, InputDataSize);
+        internal override void Visit(IVisitor visitor)
+            => visitor.BitCast(OutputSize, InputSize, InputDataSize);
 
         internal override CodeBase TryToCombineBack(TopData precedingElement)
         {
-            if(precedingElement.Size == InputSize && OutputSize >= InputDataSize && OutputSize > InputSize)
+            if(precedingElement.Size == InputSize && OutputSize >= InputDataSize
+                && OutputSize > InputSize)
             {
                 var result = new TopData(precedingElement.Offset, OutputSize, InputDataSize);
                 return result
@@ -96,7 +76,8 @@ namespace Reni.Code
 
         internal override CodeBase TryToCombineBack(TopFrameData precedingElement)
         {
-            if(precedingElement.Size == InputSize && OutputSize >= InputDataSize && OutputSize > InputSize)
+            if(precedingElement.Size == InputSize && OutputSize >= InputDataSize
+                && OutputSize > InputSize)
                 return new TopFrameData(precedingElement.Offset, OutputSize, InputDataSize)
                     .Add(new BitCast(OutputSize, OutputSize, InputDataSize));
             return null;
@@ -107,7 +88,8 @@ namespace Reni.Code
             if(InputSize == OutputSize)
                 return null;
 
-            FiberItem bitArrayOp = new BitArrayBinaryOp(
+            FiberItem bitArrayOp = new BitArrayBinaryOp
+                (
                 precedingElement.OpToken,
                 precedingElement.OutputSize + OutputSize - InputSize,
                 precedingElement.LeftSize,
@@ -124,7 +106,11 @@ namespace Reni.Code
             if(InputSize == OutputSize)
                 return null;
 
-            var bitArrayOp = new BitArrayPrefixOp(precedingElement.Operation, precedingElement.OutputSize + OutputSize - InputSize, precedingElement.ArgSize);
+            var bitArrayOp = new BitArrayPrefixOp
+                (
+                precedingElement.Operation,
+                precedingElement.OutputSize + OutputSize - InputSize,
+                precedingElement.ArgSize);
 
             if(InputDataSize == OutputSize)
                 return new FiberItem[] {bitArrayOp};
@@ -145,9 +131,16 @@ namespace Reni.Code
                 var dereference = new DePointer(OutputSize, preceding.DataSize);
                 if(OutputSize == InputDataSize)
                     return new FiberItem[] {dereference};
-                return new FiberItem[] {dereference, new BitCast(OutputSize, OutputSize, InputDataSize)};
+                return new FiberItem[]
+                {
+                    dereference,
+                    new BitCast(OutputSize, OutputSize, InputDataSize)
+                };
             }
             return null;
         }
+
+        protected override TFiber VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
+            => actual.BitCast(this);
     }
 }

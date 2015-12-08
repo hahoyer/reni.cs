@@ -57,7 +57,7 @@ namespace Reni.FeatureTest.Helper
         {
             var outStream = new OutStream();
             compilerParameters.OutStream = outStream;
-            var compiler = Compiler.FromFile(fileName, "CompilerTest", compilerParameters);
+            var compiler = Compiler.FromFile(fileName, compilerParameters);
 
             try
             {

@@ -5,8 +5,10 @@ using System.Windows.Forms;
 using hw.Helper;
 using hw.Scanner;
 using Reni;
+using Reni.Context;
 using Reni.Parser;
 using Reni.Struct;
+using Reni.Type;
 using ScintillaNET;
 
 namespace ReniTest.CompilationView
@@ -16,7 +18,8 @@ namespace ReniTest.CompilationView
         int _lineNumberMarginLength;
         readonly Scintilla TextBox;
         readonly ValueCache<CompilerBrowser> CompilerCache;
-        readonly FunctionCache<CompileSyntax, ResultCachesView> DetailViews;
+        readonly FunctionCache<CompileSyntax, ResultCachesView> ResultCachesViews;
+        readonly FunctionCache<FunctionType, FunctionView> FunctionViews;
 
         internal SourceView(string text)
             : base("SourceView")
@@ -39,15 +42,16 @@ namespace ReniTest.CompilationView
 
             CompilerCache = new ValueCache<CompilerBrowser>
                 (() => Reni.Compiler.BrowserFromText(TextBox.Text));
-            DetailViews = new FunctionCache<CompileSyntax, ResultCachesView>(CreateDetailView);
+
+            ResultCachesViews = new FunctionCache<CompileSyntax, ResultCachesView>
+                (item => new ResultCachesView(item, this));
+            FunctionViews = new FunctionCache<FunctionType, FunctionView>
+                (item => new FunctionView(item, this));
 
             Client = TextBox;
 
             TextBox.Text = text;
         }
-
-        ResultCachesView CreateDetailView(CompileSyntax syntax)
-            => new ResultCachesView(syntax, this);
 
         CompilerBrowser Compiler => CompilerCache.Value;
 
@@ -63,6 +67,8 @@ namespace ReniTest.CompilationView
 
             while(menuItems.Count > 0)
                 menuItems.RemoveAt(0);
+
+            Compiler.Ensure();
 
             var p = TextBox.CurrentPosition;
 
@@ -82,7 +88,7 @@ namespace ReniTest.CompilationView
                 text += " (" + syntax.ResultCache.Count + ")";
 
             var menuItem = new MenuItem
-                (text, (s, a) => DetailViews[syntax].Run());
+                (text, (s, a) => ResultCachesViews[syntax].Run());
             menuItem.Select += (s, a) => SignalContextMenuSelect(syntax);
             return menuItem;
         }
@@ -131,12 +137,17 @@ namespace ReniTest.CompilationView
             }
         }
 
-        void Bold(SourcePart region) { }
+        internal void SignalClicked(TypeBase target) => NotImplementedMethod(target);
 
-        protected override void HandleClicked(FunctionId functionId)
+        internal void SignalClicked(ContextBase target) => NotImplementedMethod(target);
+
+        internal void SignalClicked(FunctionId functionId)
         {
             var function = Compiler.Find(functionId);
-            base.HandleClicked(functionId);
+            FunctionViews[function].Run();
         }
+
+        internal void SelectSource(SourcePart source)
+            => TextBox.SetSelection(source.Position, source.EndPosition);
     }
 }

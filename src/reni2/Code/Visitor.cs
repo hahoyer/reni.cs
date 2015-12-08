@@ -9,8 +9,7 @@ namespace Reni.Code
     abstract class Visitor<TCode, TFiber> : DumpableObject
     {
         protected Visitor(int objectId)
-            : base(objectId)
-        { }
+            : base(objectId) {}
 
         protected Visitor() { }
 
@@ -43,7 +42,7 @@ namespace Reni.Code
             var newHead = visitedObject.FiberHead.Visit(this);
             var data = visitedObject.FiberItems;
             var newItems = new TFiber[data.Length];
-            for (var index = 0; index < data.Length; index++)
+            for(var index = 0; index < data.Length; index++)
                 newItems[index] = data[index].Visit(this);
             return Fiber(visitedObject, newHead, newItems);
         }
@@ -55,21 +54,21 @@ namespace Reni.Code
         }
 
 
-        Visitor<TCode,TFiber> AfterAny(Size size)
+        Visitor<TCode, TFiber> AfterAny(Size size)
         {
-            if (size.IsZero)
+            if(size.IsZero)
                 return this;
             return After(size);
         }
 
-        protected virtual Visitor<TCode,TFiber> After(Size size) => this;
+        protected virtual Visitor<TCode, TFiber> After(Size size) => this;
 
         internal virtual TCode List(List visitedObject)
         {
             var visitor = this;
             var data = visitedObject.Data;
             var newList = new TCode[data.Length];
-            for (var index = 0; index < data.Length; index++)
+            for(var index = 0; index < data.Length; index++)
             {
                 var codeBase = data[index];
                 newList[index] = codeBase.Visit(visitor);
@@ -100,8 +99,17 @@ namespace Reni.Code
         }
 
         internal virtual TFiber Call(Call visitedObject) => default(TFiber);
-
         internal virtual TCode TopRef(TopRef visitedObject) => default(TCode);
-        
+        internal virtual TCode TopFrameData(TopFrameData visitedObject) => default(TCode);
+        internal virtual TCode TopData(TopData visitedObject) => default(TCode);
+        internal virtual TFiber DePointer(DePointer visitedObject) => default(TFiber);
+        internal virtual TFiber Drop(Drop visitedObject) => default(TFiber);
+        internal virtual TFiber BitCast(BitCast visitedObject) => default(TFiber);
+
+        internal virtual TFiber ReferencePlusConstant(ReferencePlusConstant visitedObject)
+            => default(TFiber);
+
+        internal virtual TFiber BitArrayBinaryOp(BitArrayBinaryOp visitedObject)
+            => default(TFiber);
     }
 }

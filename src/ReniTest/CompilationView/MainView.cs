@@ -14,8 +14,5 @@ namespace ReniTest.CompilationView
         internal void Register(Form child) { Frame.Closing += (a, s) => child.Close(); }
         internal void Run() => Application.Run(Frame);
 
-        public void SignalClicked(FunctionId functionId) => HandleClicked(functionId);
-
-        protected virtual void HandleClicked(FunctionId functionId) { }
     }
 }

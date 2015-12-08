@@ -17,7 +17,7 @@ namespace Reni
             var f = fileName.FileHandle();
             f.AssumeDirectoryOfFileExists();
             f.String = _text;
-            var compiler = Compiler.FromFile(fileName, "T4Compiler");
+            var compiler = Compiler.FromFile(fileName);
             return compiler.CSharpString;
         }
     }

@@ -34,6 +34,9 @@ namespace Reni.Code
         internal override void Visit(IVisitor visitor) => visitor.BitArrayBinaryOp(OpToken, OutputSize, LeftSize, RightSize);
 
         protected override string GetNodeDump() => base.GetNodeDump() + " <" + LeftSize + "> " + OpToken + " <" + RightSize + ">";
+
+        protected override TFiber VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
+            => actual.BitArrayBinaryOp(this);
     }
 
     /// <summary>

@@ -42,8 +42,8 @@ namespace Reni
 
         public Token LocatePosition(int current) => LocateCache[current];
 
-        internal Container Find(FunctionId functionId)
-            => Parent.RootContext.FunctionContainer(functionId);
+        internal FunctionType Find(FunctionId functionId)
+            => Parent.RootContext.Function(functionId.Index);
 
         internal IEnumerable<SourceSyntax> FindAllBelongings(SourceSyntax sourceSyntax)
             => Parent.SourceSyntax.Belongings(sourceSyntax);
@@ -80,5 +80,7 @@ namespace Reni
             NotImplementedMethod(span);
             return null;
         }
+
+        public void Ensure() => Parent.Issues.ToArray();
     }
 }

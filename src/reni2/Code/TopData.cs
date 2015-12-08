@@ -20,6 +20,9 @@ namespace Reni.Code
             => subsequentElement.TryToCombineBack(this);
 
         internal override void Visit(IVisitor visitor) => visitor.TopData(Offset, Size, DataSize);
+
+        protected override TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
+            => actual.TopData(this);
     }
 
     /// <summary>
@@ -37,5 +40,8 @@ namespace Reni.Code
 
         internal override void Visit(IVisitor visitor)
             => visitor.TopFrameData(Offset, Size, DataSize);
+
+        protected override TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
+            => actual.TopFrameData(this);
     }
 }

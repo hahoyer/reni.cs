@@ -56,6 +56,7 @@
   <ItemGroup>
     <Compile Include="CompilationView\ChildView.cs" />
     <Compile Include="CompilationView\CodeViewVisitor.cs" />
+    <Compile Include="CompilationView\FunctionView.cs" />
     <Compile Include="CompilationView\MainView.cs" />
     <Compile Include="CompilationView\ResultCachesView.cs" />
     <Compile Include="CompilationView\PersistenceController.cs" />

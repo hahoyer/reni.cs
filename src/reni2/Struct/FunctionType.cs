@@ -15,7 +15,9 @@ namespace Reni.Struct
     sealed class FunctionType : SetterTargetType
     {
         [EnableDump]
-        readonly int _index;
+        internal readonly int Index;
+        [DisableDump]
+        internal readonly FunctionSyntax Body;
         [Node]
         [EnableDump]
         readonly CompoundView _compoundView;
@@ -23,26 +25,27 @@ namespace Reni.Struct
         internal readonly TypeBase ArgsType;
         [Node]
         [EnableDump]
-        readonly SetterFunction _setter;
+        internal readonly SetterFunction Setter;
         [NotNull]
         [Node]
         [EnableDump]
-        readonly GetterFunction _getter;
+        internal readonly GetterFunction Getter;
 
         internal FunctionType(int index, FunctionSyntax body, CompoundView compoundView, TypeBase argsType)
         {
-            _getter = new GetterFunction(this, index, body.Getter);
-            _setter = body.Setter == null ? null : new SetterFunction(this, index, body.Setter);
-            _index = index;
+            Getter = new GetterFunction(this, index, body.Getter);
+            Setter = body.Setter == null ? null : new SetterFunction(this, index, body.Setter);
+            Index = index;
+            Body = body;
             _compoundView = compoundView;
             ArgsType = argsType;
             StopByObjectIds();
         }
 
-        protected override bool IsMutable => _setter != null;
+        protected override bool IsMutable => Setter != null;
 
         [DisableDump]
-        internal override TypeBase ValueType => _getter.ReturnType;
+        internal override TypeBase ValueType => Getter.ReturnType;
         [DisableDump]
         internal override bool Hllw => Exts.IsNone && ArgsType.Hllw;
         [DisableDump]
@@ -59,8 +62,8 @@ namespace Reni.Struct
         {
             get
             {
-                var getter = _getter.Container;
-                var setter = _setter?.Container;
+                var getter = Getter.Container;
+                var setter = Setter?.Container;
                 return new FunctionContainer(getter, setter);
             }
         }
@@ -77,8 +80,8 @@ namespace Reni.Struct
                 return result;
             }
         }
-        protected override Result SetterResult(Category category) => _setter.CallResult(category);
-        protected override Result GetterResult(Category category) => _getter.CallResult(category);
+        protected override Result SetterResult(Category category) => Setter.CallResult(category);
+        protected override Result GetterResult(Category category) => Getter.CallResult(category);
         protected override Size GetSize() => ArgsType.Size + Exts.Size;
 
         internal ContextBase CreateSubContext(bool useValue)
@@ -87,17 +90,17 @@ namespace Reni.Struct
         public string DumpFunction()
         {
             var result = "\n";
-            result += "index=" + _index;
+            result += "index=" + Index;
             result += "\n";
             result += "argsType=" + ArgsType.Dump();
             result += "\n";
             result += "context=" + _compoundView.Dump();
             result += "\n";
-            result += "Getter=" + _getter.DumpFunction();
+            result += "Getter=" + Getter.DumpFunction();
             result += "\n";
-            if(_setter != null)
+            if(Setter != null)
             {
-                result += "Setter=" + _setter.DumpFunction();
+                result += "Setter=" + Setter.DumpFunction();
                 result += "\n";
             }
             result += "type=" + ValueType.Dump();
@@ -132,10 +135,10 @@ namespace Reni.Struct
 
         CodeArgs GetExts()
         {
-            var result = _getter.Exts;
+            var result = Getter.Exts;
             Tracer.Assert(result != null);
-            if(_setter != null)
-                result += _setter.Exts;
+            if(Setter != null)
+                result += Setter.Exts;
             return result;
         }
     }
