@@ -14,8 +14,8 @@ namespace ReniTest.CompilationView
 
         internal CodeViewVisitor(SourceView master) { Master = master; }
 
-        internal override Control ContextRef(ReferenceCode visitedObject)
-            => visitedObject.Context.NodeDump().CreateView();
+        internal override Control ContextRef(ReferenceCode visitedObject) 
+            => visitedObject.Context.CreateView(Master);
 
         internal override Control LocalReference(LocalReference target)
         {
@@ -35,9 +35,6 @@ namespace ReniTest.CompilationView
 
             return result.CreateRowView();
         }
-
-        internal override Control BitArray(BitArray visitedObject)
-            => visitedObject.Data.ToString().CreateView();
 
         internal override Control Call(Call visitedObject)
             => visitedObject.CreateView(Master);
@@ -88,6 +85,17 @@ namespace ReniTest.CompilationView
                 ).CreateView();
 
         internal override Control Drop(Drop visitedObject) => "".CreateView();
+
+        internal override Control BitArray(BitArray visitedObject)
+            => visitedObject.Data.ToString().CreateView();
+
+        protected override Control ThenElse
+            (ThenElse visitedObject, Control newThen, Control newElse)
+        {
+            var thenView = newThen ?? Default(visitedObject.ThenCode);
+            var elseView = newElse?? Default(visitedObject.ElseCode);
+            return true.CreateLineupView(thenView, elseView);
+        }
 
         protected override Control Fiber(Fiber visitedObject, Control newHead, Control[] newItems)
         {

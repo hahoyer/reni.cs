@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using System.Windows.Forms;
 using hw.Scanner;
+using Reni.Context;
 using Reni.Struct;
+using Reni.Type;
 
 namespace ReniTest.CompilationView
 {
@@ -15,6 +15,30 @@ namespace ReniTest.CompilationView
         {
             Client = item.CreateView(Master);
             Source = item.Body.SourcePart;
+        }
+
+        protected override SourcePart Source { get; }
+    }
+
+    sealed class ContextView : ChildView
+    {
+        public ContextView(ContextBase item, SourceView master)
+            : base(master, item.NodeDump)
+        {
+            Client = item.CreateView(Master);
+            Source = null;
+        }
+
+        protected override SourcePart Source { get; }
+    }
+
+    sealed class TypeView : ChildView
+    {
+        public TypeView(TypeBase item, SourceView master)
+            : base(master, item.NodeDump)
+        {
+            Client = item.CreateView(Master);
+            Source = null;
         }
 
         protected override SourcePart Source { get; }

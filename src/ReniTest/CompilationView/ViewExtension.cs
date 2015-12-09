@@ -39,12 +39,12 @@ namespace ReniTest.CompilationView
             return CreateGroup(control, "Code");
         }
 
-        internal static Control CreateView(this CodeArgs exts)
+        internal static Control CreateView(this CodeArgs exts, SourceView master)
             => false.CreateLineupView
                 (
                     exts
                         .Data
-                        .Select(item => CreateView(item.NodeDump()))
+                        .Select(item => item.CreateView(master))
                         .Cast<Control>()
                         .ToArray());
 
@@ -128,7 +128,7 @@ namespace ReniTest.CompilationView
             {
                 Font = new Font("Lucida Console", 20),
                 AutoSize = true,
-                Text = item.Index.ToString()  ,
+                Text = item.Index.ToString(),
                 TextAlign = ContentAlignment.MiddleCenter
             };
 
@@ -151,7 +151,14 @@ namespace ReniTest.CompilationView
 
         internal static Control CreateView(this ContextBase context, SourceView master)
         {
-            var result = context.NodeDump.CreateView();
+            var result = (context.GetType().PrettyName() + " " + context.GetObjectId()).CreateView();
+            result.Click += (s, a) => master.SignalClicked(context);
+            return result;
+        }
+
+        internal static Control CreateView(this IContextReference context, SourceView master)
+        {
+            var result = (context.GetType().PrettyName() + " " + context.GetObjectId()).CreateView();
             result.Click += (s, a) => master.SignalClicked(context);
             return result;
         }
@@ -161,10 +168,9 @@ namespace ReniTest.CompilationView
             var functionId = visitedObject.FunctionId;
             var name = functionId.ToString();
             var result = name.CreateView();
-            var menuItem = new MenuItem(name, (a, b) => master.SignalClicked(functionId));
-            var contextMenu = new ContextMenu();
-            contextMenu.MenuItems.Add(menuItem);
-            result.ContextMenu = contextMenu;
+            result.Click +=
+                (a, b) => master.SignalClickedFunction(functionId.Index)
+            ;
             return result;
         }
 
@@ -180,7 +186,7 @@ namespace ReniTest.CompilationView
             => true.CreateLineupView(target.Size.CreateView(), target.CreateView(master));
 
         internal static TableLayoutPanel CreateClient(this CompileSyntax syntax, SourceView master)
-        {                                 
+        {
             var resultCacheViews =
                 syntax
                     .ResultCache
@@ -227,9 +233,9 @@ namespace ReniTest.CompilationView
             var clients = new List<Control>();
             if(result.HasType || result.HasSize || result.HasHllw)
                 clients.Add(result.CreateTypeLineView(master));
-            clients.Add(result.Exts?.CreateView());
+            clients.Add(result.Exts?.CreateView(master));
             clients.Add(result.Code?.CreateView(master));
             return clients.CreateRowView();
         }
     }
-}
+}                                                

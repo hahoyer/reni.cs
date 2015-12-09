@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using hw.Helper;
 using hw.Scanner;
 using Reni;
+using Reni.Code;
 using Reni.Context;
 using Reni.Parser;
 using Reni.Struct;
@@ -19,7 +20,7 @@ namespace ReniTest.CompilationView
         readonly Scintilla TextBox;
         readonly ValueCache<CompilerBrowser> CompilerCache;
         readonly FunctionCache<CompileSyntax, ResultCachesView> ResultCachesViews;
-        readonly FunctionCache<FunctionType, FunctionView> FunctionViews;
+        readonly FunctionCache<object, ChildView> ChildViews;
 
         internal SourceView(string text)
             : base("SourceView")
@@ -45,15 +46,34 @@ namespace ReniTest.CompilationView
 
             ResultCachesViews = new FunctionCache<CompileSyntax, ResultCachesView>
                 (item => new ResultCachesView(item, this));
-            FunctionViews = new FunctionCache<FunctionType, FunctionView>
-                (item => new FunctionView(item, this));
+            ChildViews = new FunctionCache<object, ChildView>(CreateView);
 
             Client = TextBox;
 
             TextBox.Text = text;
         }
 
-        CompilerBrowser Compiler => CompilerCache.Value;
+        FunctionView CreateView(FunctionType target)
+            => target == null ? null : new FunctionView(target, this);
+
+        ContextView CreateView(ContextBase target)
+            => target == null ? null : new ContextView(target, this);
+
+        TypeView CreateView(TypeBase target)
+            => target == null ? null : new TypeView(target, this);
+
+        ChildView CreateView(object target) => CreateView(target as FunctionType)
+            ?? CreateView(target as ContextBase)
+                ?? CreateView(target as TypeBase)
+                    ?? UnexpectedTarget(target);
+
+        ChildView UnexpectedTarget(object item)
+        {
+            NotImplementedMethod(item);
+            return null;
+        }
+
+        internal CompilerBrowser Compiler => CompilerCache.Value;
 
         void OnTextChanged()
         {
@@ -137,17 +157,19 @@ namespace ReniTest.CompilationView
             }
         }
 
-        internal void SignalClicked(TypeBase target) => NotImplementedMethod(target);
+        void SignalClickedObject(object target) => ChildViews[target].Run();
 
-        internal void SignalClicked(ContextBase target) => NotImplementedMethod(target);
-
-        internal void SignalClicked(FunctionId functionId)
-        {
-            var function = Compiler.Find(functionId);
-            FunctionViews[function].Run();
-        }
+        internal void SignalClicked(TypeBase target) => SignalClickedObject(target);
+        internal void SignalClicked(ContextBase target) => SignalClickedObject(target);
+        internal void SignalClicked(IContextReference target) => SignalClickedObject(target);
+        internal void SignalClickedFunction(int index)
+            => SignalClickedObject(Compiler.FindFunction(index));
 
         internal void SelectSource(SourcePart source)
-            => TextBox.SetSelection(source.Position, source.EndPosition);
+        {
+            if(source == null)
+                return;
+            TextBox.SetSelection(source.Position, source.EndPosition);
+        }
     }
 }
