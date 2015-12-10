@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.Debug;
 using hw.Forms;
 using Reni.Basics;
 using Reni.Code;
@@ -31,7 +30,7 @@ namespace Reni.Context
         int IContextReference.Order => _order;
 
         protected override string GetContextChildIdentificationDump()
-            => "/\\(."+ArgsType.ObjectId+"i)";
+            => "/\\(." + ArgsType.ObjectId + "i)";
 
         internal override IFunctionContext ObtainRecentFunctionContext() => this;
 

@@ -56,6 +56,7 @@
   <ItemGroup>
     <Compile Include="CompilationView\ChildView.cs" />
     <Compile Include="CompilationView\CodeViewVisitor.cs" />
+    <Compile Include="CompilationView\ContextView.cs" />
     <Compile Include="CompilationView\FunctionView.cs" />
     <Compile Include="CompilationView\MainView.cs" />
     <Compile Include="CompilationView\ResultCachesView.cs" />
@@ -63,6 +64,7 @@
     <Compile Include="CompilationView\GeneratorExtension.cs" />
     <Compile Include="CompilationView\TextStyle.cs" />
     <Compile Include="CompilationView\SourceView.cs" />
+    <Compile Include="CompilationView\TypeView.cs" />
     <Compile Include="CompilationView\View.cs" />
     <Compile Include="CompilationView\ViewExtension.cs" />
     <Compile Include="MainContainer.cs" />

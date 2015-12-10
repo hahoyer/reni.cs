@@ -16,6 +16,7 @@ namespace Reni.Type
             , IProxyType
             , IConversion
             , IReference
+            , IHollowChild<TypeBase>
     {
         readonly int _order;
 
@@ -53,6 +54,7 @@ namespace Reni.Type
         IConversion IProxyType.Converter => this;
         TypeBase IConversion.Source => this;
         Result IConversion.Execute(Category category) => DereferenceResult(category);
+        TypeBase IHollowChild<TypeBase>.Parent => ValueType;
 
         [DisableDump]
         protected override IEnumerable<IConversion> RawSymmetricConversions
@@ -121,5 +123,6 @@ namespace Reni.Type
                     () => ArgCode.DePointer(ValueType.Size),
                     CodeArgs.Arg
                 );
+
     }
 }

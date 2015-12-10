@@ -15,7 +15,7 @@ namespace ReniTest.CompilationView
         internal CodeViewVisitor(SourceView master) { Master = master; }
 
         internal override Control ContextRef(ReferenceCode visitedObject) 
-            => visitedObject.Context.CreateView(Master);
+            => visitedObject.Context.CreateLink(Master);
 
         internal override Control LocalReference(LocalReference target)
         {

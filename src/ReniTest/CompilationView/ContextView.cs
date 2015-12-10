@@ -1,18 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Forms;
 using hw.Scanner;
+using Reni.Context;
 using Reni.Struct;
 
 namespace ReniTest.CompilationView
 {
-    sealed class FunctionView : ChildView
+    sealed class ContextView : ChildView
     {
-        public FunctionView(FunctionType item, SourceView master)
+        public ContextView(ContextBase item, SourceView master)
             : base(master, item.NodeDump)
         {
             Client = item.CreateView(Master);
-            Source = item.Body.SourcePart;
+            Source = item.GetSource();
         }
 
         protected override SourcePart Source { get; }

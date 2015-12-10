@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows.Forms;
 using hw.Debug;
 using hw.Helper;
+using hw.Scanner;
 using Reni;
 using Reni.Code;
 using Reni.Context;
@@ -44,8 +45,7 @@ namespace ReniTest.CompilationView
                 (
                     exts
                         .Data
-                        .Select(item => item.CreateView(master))
-                        .Cast<Control>()
+                        .Select(item => item.CreateLink(master))
                         .ToArray());
 
         internal static TableLayoutPanel CreateColumnView(this IEnumerable<Control> controls)
@@ -113,77 +113,43 @@ namespace ReniTest.CompilationView
             return size.CreateView();
         }
 
-        internal static Control CreateView(this TypeBase type, SourceView master)
+        internal static Control CheckedCreateView(this TypeBase type, SourceView master)
         {
             if(type == null)
                 return "".CreateView();
-            var text = type.NodeDump.CreateView();
-            text.Click += (s, a) => master.SignalClicked(type);
-            return text;
+            return type.CreateLink(master);
         }
 
-        internal static Control CreateView(this FunctionType item, SourceView master)
+        internal static Control CreateLink(this object target, SourceView master)
         {
-            var indexView = new Label
-            {
-                Font = new Font("Lucida Console", 20),
-                AutoSize = true,
-                Text = item.Index.ToString(),
-                TextAlign = ContentAlignment.MiddleCenter
-            };
-
-            var compoundView = item.FindRecentCompoundView.CompoundContext.CreateView(master);
-            var argsTypeView = item.ArgsType.CreateView(master);
-
-            var header = true
-                .CreateLineupView(indexView, false.CreateLineupView(compoundView, argsTypeView));
-
-            var setterView = item.Setter?.CreateView(master);
-            var getterView = item.Getter?.CreateView(master);
-
-            return false.CreateLineupView
-                (
-                    header,
-                    setterView?.CreateGroup("Set"),
-                    getterView?.CreateGroup("Get")
-                );
-        }
-
-        internal static Control CreateView(this ContextBase context, SourceView master)
-        {
-            var result = (context.GetType().PrettyName() + " " + context.GetObjectId()).CreateView();
-            result.Click += (s, a) => master.SignalClicked(context);
+            var text = target.GetType().PrettyName() + "." + target.GetObjectId() + "i";
+            var result = text.CreateView();
+            result.Click += (s, a) => master.SignalClicked(target);
             return result;
         }
 
-        internal static Control CreateView(this IContextReference context, SourceView master)
+        internal static Control CreateView(this Call target, SourceView master)
         {
-            var result = (context.GetType().PrettyName() + " " + context.GetObjectId()).CreateView();
-            result.Click += (s, a) => master.SignalClicked(context);
-            return result;
-        }
-
-        internal static Control CreateView(this Call visitedObject, SourceView master)
-        {
-            var functionId = visitedObject.FunctionId;
+            var functionId = target.FunctionId;
             var name = functionId.ToString();
             var result = name.CreateView();
             result.Click +=
                 (a, b) => master.SignalClickedFunction(functionId.Index)
-            ;
+                ;
             return result;
         }
 
-        internal static Control CreateTypeLineView(this Result result, SourceView master)
+        internal static Control CreateTypeLineView(this Result target, SourceView master)
         {
-            if(!result.HasType && !result.HasSize && !result.HasHllw)
+            if(!target.HasType && !target.HasSize && !target.HasHllw)
                 return null;
 
-            return true.CreateLineupView(result.CreateSizeView(), result.Type.CreateView(master));
+            return true.CreateLineupView
+                (target.CreateSizeView(), target.Type.CheckedCreateView(master));
         }
 
         internal static Control CreateTypeLineView(this TypeBase target, SourceView master)
-            => true.CreateLineupView(target.Size.CreateView(), target.CreateView(master));
+            => true.CreateLineupView(target.Size.CreateView(), target.CheckedCreateView(master));
 
         internal static TableLayoutPanel CreateClient(this CompileSyntax syntax, SourceView master)
         {
@@ -220,7 +186,7 @@ namespace ReniTest.CompilationView
         {
             var control = false.CreateLineupView
                 (
-                    item.Key.CreateView(master),
+                    item.Key.CreateLink(master),
                     item.Value.Data.CreateView(master)
                 )
                 ;
@@ -237,5 +203,135 @@ namespace ReniTest.CompilationView
             clients.Add(result.Code?.CreateView(master));
             return clients.CreateRowView();
         }
+
+        internal static SourcePart GetSource(this object item)
+        {
+            var target = item as ISourceProvider;
+            if(target != null)
+                return target.Value;
+
+            var chidType = item as IHollowChild<TypeBase>;
+            if(chidType != null)
+                return GetSource(chidType.Parent);
+
+            var hollowChildContext = item as IHollowChild<ContextBase>;
+            if(hollowChildContext != null)
+                return GetSource(hollowChildContext.Parent);
+
+            var childContext = item as Child;
+            if(childContext != null)
+                return GetSource(childContext.Parent);
+
+            return null;
+        }
+
+        static IEnumerable<object> ParentChain(this object target)
+        {
+            var current = target;
+            do
+            {
+                yield return current;
+                current = ObtainParent(current);
+            } while(current != null);
+        }
+
+        static object ObtainParent(object target)
+            => (target as Child)?.Parent
+                ?? (target as IHollowChild<TypeBase>)?.Parent
+                    ?? (object) (target as IHollowChild<ContextBase>)?.Parent;
+
+        internal static Control CreateView(this object target, SourceView master)
+            => target
+                .ParentChain()
+                .Select(item => item.CreateChildView(master))
+                .CreateRowView();
+
+        static Control CreateChildView(this object target, SourceView master)
+        {
+            var childView = CreateChildView(target as FunctionType, master)
+                ?? CreateChildView(target as CompoundContext)
+                    ?? CreateChildView(target as PointerType, master)
+                        ?? CreateChildView(target as Function, master)
+                            ?? CreateChildView(target as Root)
+                                ?? NotImplemented(target);
+            return false.CreateLineupView(target.CreateLink(master), childView);
+        }
+
+        static Control CreateChildView(this FunctionType target, SourceView master)
+        {
+            if(target == null)
+                return null;
+
+            var indexView = new Label
+            {
+                Font = new Font("Lucida Console", 20),
+                AutoSize = true,
+                Text = target.Index.ToString(),
+                TextAlign = ContentAlignment.MiddleCenter
+            };
+
+            var argsTypeView = target.ArgsType.CreateLink(master);
+            var setterView = target.Setter?.CreateView(master);
+            var getterView = target.Getter.CreateView(master);
+
+            return false.CreateLineupView
+                (
+                    true.CreateLineupView(indexView, argsTypeView),
+                    setterView?.CreateGroup("Set"),
+                    getterView?.CreateGroup("Get")
+                );
+        }
+
+        static Control CreateChildView(this IHollowChild<ContextBase> target, SourceView master)
+        {
+            if(target == null)
+                return null;
+
+            return true.CreateLineupView
+                (
+                    target.GetType().PrettyName().CreateView(),
+                    target.Parent.CreateLink(master)
+                );
+        }
+
+        static Control CreateChildView(this IHollowChild<TypeBase> target, SourceView master)
+        {
+            if(target == null)
+                return null;
+
+            return true.CreateLineupView
+                (
+                    ((TypeBase) target).Size.CreateView(),
+                    target.GetType().PrettyName().CreateView(),
+                    target.Parent.CreateLink(master)
+                );
+        }
+
+        static Control CreateChildView(this PointerType target, SourceView master)
+        {
+            if(target == null)
+                return null;
+
+            return true.CreateLineupView
+                (
+                    target.Size.CreateView(),
+                    target.CreateLink(master)
+                );
+        }
+
+        static Control CreateChildView(this Root target)
+            => target == null ? null : "Root".CreateView();
+
+        static Control CreateChildView(this Function target, SourceView master)
+            => target?.ArgsType.CreateLink(master).CreateGroup("Args");
+
+        static Control CreateChildView(this CompoundContext target)
+            => target?.View.CreateView();
+
+        static Control NotImplemented(this object item)
+        {
+            Dumpable.NotImplementedFunction(item);
+            return null;
+        }
     }
-}                                                
+}

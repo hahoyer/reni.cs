@@ -62,10 +62,11 @@ namespace ReniTest.CompilationView
         TypeView CreateView(TypeBase target)
             => target == null ? null : new TypeView(target, this);
 
-        ChildView CreateView(object target) => CreateView(target as FunctionType)
-            ?? CreateView(target as ContextBase)
-                ?? CreateView(target as TypeBase)
-                    ?? UnexpectedTarget(target);
+        ChildView CreateView(object target)
+            => CreateView(target as FunctionType)
+                ?? CreateView(target as ContextBase)
+                    ?? CreateView(target as TypeBase)
+                        ?? UnexpectedTarget(target);
 
         ChildView UnexpectedTarget(object item)
         {
@@ -159,9 +160,7 @@ namespace ReniTest.CompilationView
 
         void SignalClickedObject(object target) => ChildViews[target].Run();
 
-        internal void SignalClicked(TypeBase target) => SignalClickedObject(target);
-        internal void SignalClicked(ContextBase target) => SignalClickedObject(target);
-        internal void SignalClicked(IContextReference target) => SignalClickedObject(target);
+        internal void SignalClicked(object target) => SignalClickedObject(target);
         internal void SignalClickedFunction(int index)
             => SignalClickedObject(Compiler.FindFunction(index));
 

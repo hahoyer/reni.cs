@@ -4,6 +4,7 @@ using System.Linq;
 using hw.Debug;
 using hw.Forms;
 using hw.Helper;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -162,10 +163,10 @@ namespace Reni.Struct
                 ?.Position;
         }
 
-        internal override Result ResultForCache(ContextBase context, Category category) 
+        internal override Result ResultForCache(ContextBase context, Category category)
             => context
-            .Compound(this)
-            .Result(category);
+                .Compound(this)
+                .Result(category);
 
         sealed class Data : DumpableObject
         {
@@ -201,5 +202,9 @@ namespace Reni.Struct
 
         [DisableDump]
         protected override IEnumerable<Syntax> DirectChildren => _statements;
+
+        [DisableDump]
+        internal IEnumerable<SourcePart> SourceParts
+            => Statements.Select(item => item.SourcePart);
     }
 }

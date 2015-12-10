@@ -17,6 +17,7 @@ namespace Reni.Struct
             , ISymbolProviderForPointer<Definable>
             , ISymbolProvider<DumpPrintToken>
             , ISymbolProvider<Definable>
+            , IHollowChild<ContextBase>
     {
         internal CompoundType(CompoundView view) { View = view; }
 
@@ -72,5 +73,7 @@ namespace Reni.Struct
 
         [DisableDump]
         internal override ContextBase ToContext => View.Context;
+
+        ContextBase IHollowChild<ContextBase>.Parent => View.CompoundContext;
     }
 }

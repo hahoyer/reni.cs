@@ -442,7 +442,7 @@ namespace Reni.Type
 
         internal Result Conversion(Category category, TypeBase destination)
         {
-            if(category <= (Category.Type.Replenished))
+            if(category <= Category.Type.Replenished)
                 return destination.SmartPointer.Result(category);
 
             var path = ConversionService.FindPath(this, destination);
@@ -737,6 +737,16 @@ namespace Reni.Type
     interface IForcedConversionProviderForPointer<in TDestination>
     {
         IEnumerable<IConversion> Result(TDestination destination);
+    }
+
+    interface IHollowChild<out TParent>
+    {
+        TParent Parent { get; }
+    }
+
+    interface ISourceProvider
+    {
+        SourcePart Value{ get; }
     }
 
     // Krautpuster
