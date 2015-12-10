@@ -24,6 +24,7 @@ namespace Reni.Type
             , ISymbolProviderForPointer<Count>
             , IForcedConversionProviderForPointer<ArrayReferenceType>
             , IRepeaterType
+        ,IHollowChild<TypeBase>
     {
         [Node]
         [SmartNode]
@@ -70,7 +71,7 @@ namespace Reni.Type
 
         [DisableDump]
         internal TypeBase ElementType { get; }
-        int Count { get; }
+        internal int Count { get; }
         Options OptionsValue { get; }
 
         TypeBase IRepeaterType.ElementType => ElementType;
@@ -79,7 +80,9 @@ namespace Reni.Type
         [DisableDump]
         RepeaterAccessType AccessType => _repeaterAccessTypeCache.Value;
         [DisableDump]
-        bool IsMutable => OptionsValue.IsMutable.Value;
+        internal bool IsMutable => OptionsValue.IsMutable.Value;
+        [DisableDump]
+        internal bool IsTextItem => OptionsValue.IsTextItem.Value;
         [DisableDump]
         internal NumberType Number => _numberCache.Value;
         [DisableDump]
@@ -321,5 +324,7 @@ namespace Reni.Type
             NotImplementedMethod(destination);
             return false;
         }
+
+        TypeBase IHollowChild<TypeBase>.Parent => ElementType;
     }
 }

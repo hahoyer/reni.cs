@@ -250,9 +250,12 @@ namespace ReniTest.CompilationView
         {
             var childView = CreateChildView(target as FunctionType, master)
                 ?? CreateChildView(target as CompoundContext)
+                ?? CreateChildView(target as CompoundType)
+                ?? CreateChildView(target as ArrayType)
                     ?? CreateChildView(target as PointerType, master)
                         ?? CreateChildView(target as Function, master)
                             ?? CreateChildView(target as Root)
+                            ?? CreateChildView(target as BitType)
                                 ?? NotImplemented(target);
             return false.CreateLineupView(target.CreateLink(master), childView);
         }
@@ -301,7 +304,7 @@ namespace ReniTest.CompilationView
 
             return true.CreateLineupView
                 (
-                    ((TypeBase) target).Size.CreateView(),
+                    (target as TypeBase)?.Size.CreateView(),
                     target.GetType().PrettyName().CreateView(),
                     target.Parent.CreateLink(master)
                 );
@@ -322,11 +325,32 @@ namespace ReniTest.CompilationView
         static Control CreateChildView(this Root target)
             => target == null ? null : "Root".CreateView();
 
+        static Control CreateChildView(this BitType target)
+            => target == null ? null : "bit".CreateView();
+
         static Control CreateChildView(this Function target, SourceView master)
             => target?.ArgsType.CreateLink(master).CreateGroup("Args");
 
+        static Control CreateChildView(CompoundType target)
+            => target?.FindRecentCompoundView.CreateView();
+
         static Control CreateChildView(this CompoundContext target)
             => target?.View.CreateView();
+
+        static Control CreateChildView(this ArrayType target)
+        {
+            if(target == null)
+                return null;
+
+            var c = target.Count.CreateView();
+            var m = target.IsMutable? "mutable".CreateView() : null;
+            var t = target.IsTextItem ? "text_item".CreateView() : null;
+
+            return true.CreateLineupView(c,m,t);
+        }
+
+        static Control CreateView(this CompoundView target)
+            => ((Dumpable)target).CreateView();
 
         static Control NotImplemented(this object item)
         {
