@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using hw.Debug;
+using hw.DebugFormatter;
 using hw.Forms;
 using hw.Helper;
 using hw.Parser;
@@ -17,11 +16,11 @@ using Reni.Runtime;
 using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Validation;
-using static Reni.ValueCacheExtension;
+using static hw.Helper.ValueCacheExtension;
 
 namespace Reni
 {
-    public sealed class Compiler : DumpableObject, IExecutionContext, IContainer
+    public sealed class Compiler : DumpableObject, IExecutionContext, ValueCache.IContainer
     {
         static IScanner<SourceSyntax> Scanner(ITokenFactory<SourceSyntax> tokenFactory)
             => new Scanner<SourceSyntax>(Lexer.Instance, tokenFactory);
@@ -40,8 +39,7 @@ namespace Reni
         readonly CompilerParameters _parameters;
         readonly string ModuleName;
 
-        ValueCacheExtension.Container IContainer.Cache { get; } = new ValueCacheExtension.Container
-            ();
+        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
         [Node]
         [DisableDump]
         internal readonly Source Source;
@@ -84,7 +82,7 @@ namespace Reni
                     ? new Source(text)
                     : new Source(fileName.FileHandle()));
 
-            CodeContainerCache = NewCache
+            CodeContainerCache = NewValueCache
                 (() => new CodeContainer(ModuleName, RootContext, Syntax, Source.Data));
         }
 
@@ -93,11 +91,11 @@ namespace Reni
 
         [Node]
         [DisableDump]
-        internal Syntax Syntax => CachedValue(this, () => SourceSyntax.Syntax);
+        internal Syntax Syntax => this.CachedValue(() => SourceSyntax.Syntax);
 
         [Node]
         [DisableDump]
-        internal SourceSyntax SourceSyntax => CachedValue(this, () => Parse(Source + 0));
+        internal SourceSyntax SourceSyntax => this.CachedValue(() => Parse(Source + 0));
 
         [Node]
         [DisableDump]
@@ -105,7 +103,7 @@ namespace Reni
 
         [DisableDump]
         [Node]
-        internal string CSharpString => CachedValue(this, () => CodeContainer.CSharpString);
+        internal string CSharpString => this.CachedValue(() => CodeContainer.CSharpString);
 
         internal static string FormattedNow
         {

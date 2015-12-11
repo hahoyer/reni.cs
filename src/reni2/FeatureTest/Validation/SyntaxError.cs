@@ -2,7 +2,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using System.Text.RegularExpressions;
-using hw.Debug;
+using hw.DebugFormatter;
 using hw.Helper;
 using hw.UnitTest;
 using Reni.FeatureTest.Helper;

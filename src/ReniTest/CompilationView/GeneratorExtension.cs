@@ -3,7 +3,7 @@ using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using hw.Debug;
+using hw.DebugFormatter;
 using hw.Helper;
 using Microsoft.CSharp;
 

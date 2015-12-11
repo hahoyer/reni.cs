@@ -1,31 +1,9 @@
-#region Copyright (C) 2013
-
-//     Project Reni2
-//     Copyright (C) 2011 - 2013 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-#endregion
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using hw.Debug;
+using hw.DebugFormatter;
 using hw.Helper;
 using hw.UnitTest;
 using JetBrains.Annotations;
@@ -40,37 +18,46 @@ namespace Reni.Basics
         internal const int SegmentAlignBits = 3;
         static int _nextObjectId;
 
-        readonly Size _size;
         readonly byte[] _data;
         readonly ValueCache<BigInteger> _dataCache;
 
         BitsConst(Size size)
             : base(_nextObjectId++)
         {
-            _size = size;
+            Size = size;
             _data = CreateDataArray();
             _dataCache = new ValueCache<BigInteger>(() => new BigInteger(_data));
             StopByObjectIds(-7);
         }
 
-        BitsConst(Int64 value, Size size)
-            : this(new BitsConst(value), size) { }
+        BitsConst(long value, Size size)
+            : this(new BitsConst(value), size) {}
 
-        BitsConst(Int64 value)
-            : this(Size.AutoSize(value)) { DataHandler.MoveBytes(DataSize(_size), _data, 0, value); }
+        BitsConst(long value)
+            : this(Size.AutoSize(value))
+        {
+            DataHandler.MoveBytes(DataSize(Size), _data, 0, value);
+        }
 
         BitsConst(BitsConst value, Size size)
-            : this(size) { MoveData(_data, Size, value._data, value.Size); }
+            : this(size)
+        {
+            MoveData(_data, Size, value._data, value.Size);
+        }
 
         BitsConst(int bytes, byte[] value, int start)
-            : this(Size.Create(bytes * 8)) { DataHandler.MoveBytes(DataSize(_size), _data, 0, value, start); }
+            : this(Size.Create(bytes * 8))
+        {
+            DataHandler.MoveBytes(DataSize(Size), _data, 0, value, start);
+        }
 
         static Size SegmentBits => Size.Create(1 << SegmentAlignBits);
         static int SegmentValues => 1 << SegmentBits.ToInt();
         static int MaxSegmentValue => SegmentValues - 1;
         public static int BitSize(System.Type t) => Marshal.SizeOf(t) << SegmentAlignBits;
         public bool IsEmpty => Size.IsZero;
-        public Size Size => _size;
+        public Size Size { get; }
+
         public int ByteCount => DataSize(Size);
         public bool IsZero { get { return _data.All(t => t == 0); } }
 
@@ -88,7 +75,7 @@ namespace Reni.Basics
 
         static Size SlagBits(Size size) => SegmentBits * DataSize(size) - size;
 
-        byte[] CreateDataArray() => new byte[DataSize(_size)];
+        byte[] CreateDataArray() => new byte[DataSize(Size)];
 
         static void MoveData(byte[] data, Size size, byte[] source, Size sourceSize)
         {
@@ -135,7 +122,8 @@ namespace Reni.Basics
         [DisableDump]
         BigInteger AsInteger => _dataCache.Value;
 
-        public static BitsConst Convert(int bytes, byte[] data, int position) => new BitsConst(bytes, data, position);
+        public static BitsConst Convert(int bytes, byte[] data, int position)
+            => new BitsConst(bytes, data, position);
 
         static int DataSize(Size size)
         {
@@ -146,9 +134,10 @@ namespace Reni.Basics
 
         public static BitsConst None() => new BitsConst(Size.Zero);
 
-        public static BitsConst Convert(Int64 value) => new BitsConst(value);
+        public static BitsConst Convert(long value) => new BitsConst(value);
 
-        public static BitsConst Convert(string value) => new BitsConst(System.Convert.ToInt64(value));
+        public static BitsConst Convert(string value)
+            => new BitsConst(System.Convert.ToInt64(value));
 
         public static BitsConst ConvertAsText(string value)
         {
@@ -158,10 +147,11 @@ namespace Reni.Basics
 
         public static BitsConst Convert(string target, int @base)
         {
-            Int64 result = 0;
+            long result = 0;
             for(var i = 0; i < target.Length; i++)
             {
-                var digit = Digits.IndexOf(target.Substring(i, 1), StringComparison.InvariantCultureIgnoreCase);
+                var digit = Digits.IndexOf
+                    (target.Substring(i, 1), StringComparison.InvariantCultureIgnoreCase);
                 Tracer.Assert(digit >= 0 && digit < @base);
                 result = result * @base + digit;
             }
@@ -180,7 +170,7 @@ namespace Reni.Basics
 
         public BitsConst Multiply(BitsConst right, Size size)
         {
-            if(!(Marshal.SizeOf(typeof(Int64)) * 8 >= size.ToInt()))
+            if(!(Marshal.SizeOf(typeof(long)) * 8 >= size.ToInt()))
                 Tracer.AssertionFailed
                     (
                         @"sizeof(Int64)*8 >= size.ToInt()",
@@ -198,7 +188,7 @@ namespace Reni.Basics
 
         public BitsConst Divide(BitsConst right, Size size)
         {
-            if(!(Marshal.SizeOf(typeof(Int64)) * 8 >= size.ToInt()))
+            if(!(Marshal.SizeOf(typeof(long)) * 8 >= size.ToInt()))
                 Tracer.AssertionFailed
                     (
                         @"sizeof(Int64)*8 >= size.ToInt()",
@@ -220,22 +210,28 @@ namespace Reni.Basics
         public BitsConst Minus(BitsConst right, Size size) => Plus(right * -1, size);
 
         [UsedImplicitly]
-        public BitsConst Equal(BitsConst right, Size size) => ToBitsConst(AsInteger == right.AsInteger, size);
+        public BitsConst Equal(BitsConst right, Size size)
+            => ToBitsConst(AsInteger == right.AsInteger, size);
 
         [UsedImplicitly]
-        public BitsConst Greater(BitsConst right, Size size) => ToBitsConst(AsInteger > right.AsInteger, size);
+        public BitsConst Greater(BitsConst right, Size size)
+            => ToBitsConst(AsInteger > right.AsInteger, size);
 
         [UsedImplicitly]
-        public BitsConst GreaterEqual(BitsConst right, Size size) => ToBitsConst(AsInteger >= right.AsInteger, size);
+        public BitsConst GreaterEqual(BitsConst right, Size size)
+            => ToBitsConst(AsInteger >= right.AsInteger, size);
 
         [UsedImplicitly]
-        public BitsConst Less(BitsConst right, Size size) => ToBitsConst(AsInteger < right.AsInteger, size);
+        public BitsConst Less(BitsConst right, Size size)
+            => ToBitsConst(AsInteger < right.AsInteger, size);
 
         [UsedImplicitly]
-        public BitsConst LessEqual(BitsConst right, Size size) => ToBitsConst(AsInteger <= right.AsInteger, size);
+        public BitsConst LessEqual(BitsConst right, Size size)
+            => ToBitsConst(AsInteger <= right.AsInteger, size);
 
         [UsedImplicitly]
-        public BitsConst LessGreater(BitsConst right, Size size) => ToBitsConst(AsInteger != right.AsInteger, size);
+        public BitsConst LessGreater(BitsConst right, Size size)
+            => ToBitsConst(AsInteger != right.AsInteger, size);
 
         [UsedImplicitly]
         public BitsConst MinusPrefix(Size size) => Multiply(-1, size);
@@ -247,7 +243,8 @@ namespace Reni.Basics
             Size.AssertAlignedSize(SegmentAlignBits);
             var result = new BitsConst(Size + other.Size);
             DataHandler.MoveBytes(DataSize(Size), result._data, 0, _data, 0);
-            DataHandler.MoveBytes(DataSize(other.Size), result._data, DataSize(Size), other._data, 0);
+            DataHandler.MoveBytes
+                (DataSize(other.Size), result._data, DataSize(Size), other._data, 0);
             return result;
         }
 
@@ -262,7 +259,9 @@ namespace Reni.Basics
         }
 
         public void PrintNumber(IOutStream outStream) => PrintNumber(None(), outStream);
-        public void PrintText(Size itemSize, IOutStream outStream) => outStream.AddData(ToString(itemSize));
+
+        public void PrintText(Size itemSize, IOutStream outStream)
+            => outStream.AddData(ToString(itemSize));
 
         public string ToString(Size itemSize)
         {
@@ -282,7 +281,7 @@ namespace Reni.Basics
 
             var left = this / radix;
             var right = this - left * radix;
-            var digit = (Digits[(int) right.ToInt64()]).ToString();
+            var digit = Digits[(int) right.ToInt64()].ToString();
             if(left.IsZero)
                 return digit;
             return left.ToString(radix) + digit;
@@ -291,35 +290,35 @@ namespace Reni.Basics
         public override string ToString() => DumpValue();
         protected override string GetNodeDump() => base.GetNodeDump() + " " + ToString();
 
-        public unsafe Int64 ToInt64()
+        public unsafe long ToInt64()
         {
-            var sizeInt64 = Marshal.SizeOf(typeof(Int64));
-            if(!(64 >= _size.ToInt()))
-                Tracer.AssertionFailed(@"64 >= _size.ToInt()", () => "size=" + _size.Dump());
+            var sizeInt64 = Marshal.SizeOf(typeof(long));
+            if(!(64 >= Size.ToInt()))
+                Tracer.AssertionFailed(@"64 >= _size.ToInt()", () => "size=" + Size.Dump());
 
             var x64 = ByteResize(sizeInt64);
             fixed(byte* dataPtr = &x64._data[0])
-                return *((Int64*) dataPtr);
+                return *(long*) dataPtr;
         }
 
         public unsafe int ToInt32()
         {
-            var sizeInt32 = Marshal.SizeOf(typeof(Int32));
-            if(!(64 >= _size.ToInt()))
-                Tracer.AssertionFailed(@"64 >= _size.ToInt()", () => "size=" + _size.Dump());
+            var sizeInt32 = Marshal.SizeOf(typeof(int));
+            if(!(64 >= Size.ToInt()))
+                Tracer.AssertionFailed(@"64 >= _size.ToInt()", () => "size=" + Size.Dump());
 
             var x32 = ByteResize(sizeInt32);
             fixed(byte* dataPtr = &x32._data[0])
-                return *((Int32*) dataPtr);
+                return *(int*) dataPtr;
         }
 
         public string DumpValue()
         {
-            if(_size.IsZero)
+            if(Size.IsZero)
                 return "0[0]";
-            var digits = _size.ToInt() < 8 ? ToBitString() : ToHexString();
+            var digits = Size.ToInt() < 8 ? ToBitString() : ToHexString();
             var result = digits.Quote() + "[";
-            result += _size.Dump();
+            result += Size.Dump();
             result += "]";
             return result;
         }
@@ -347,7 +346,7 @@ namespace Reni.Basics
         string ToBitString()
         {
             var result = "";
-            for(var i = Size.Create(0); i < _size; i += 1)
+            for(var i = Size.Create(0); i < Size; i += 1)
                 result = "01"[GetBit(i)] + result;
             return result;
         }
@@ -359,37 +358,48 @@ namespace Reni.Basics
             return (_data[b] >> p) & 1;
         }
 
-        public static BitsConst operator +(BitsConst left, BitsConst right) => left.Plus(right, PlusSize(left.Size, right.Size));
+        public static BitsConst operator +(BitsConst left, BitsConst right)
+            => left.Plus(right, PlusSize(left.Size, right.Size));
 
-        static Size PlusSize(Size size, Size size1) => Size.Create(PlusSize(size.ToInt(), size1.ToInt()));
+        static Size PlusSize(Size size, Size size1)
+            => Size.Create(PlusSize(size.ToInt(), size1.ToInt()));
 
-        public static BitsConst Add(BitsConst left, BitsConst right) => left.Plus(right, PlusSize(left.Size, right.Size));
+        public static BitsConst Add(BitsConst left, BitsConst right)
+            => left.Plus(right, PlusSize(left.Size, right.Size));
 
-        public static BitsConst operator -(BitsConst left, BitsConst right) => left.Plus(right * -1, PlusSize(left.Size, right.Size));
+        public static BitsConst operator -(BitsConst left, BitsConst right)
+            => left.Plus(right * -1, PlusSize(left.Size, right.Size));
 
         public static BitsConst operator -(int left, BitsConst right) => Convert(left) - right;
 
-        public static BitsConst Subtract(BitsConst left, BitsConst right) => left.Plus(right * -1, PlusSize(left.Size, right.Size));
+        public static BitsConst Subtract(BitsConst left, BitsConst right)
+            => left.Plus(right * -1, PlusSize(left.Size, right.Size));
 
         public static BitsConst Subtract(int left, BitsConst right) => Convert(left) - right;
 
-        public static BitsConst operator *(BitsConst left, BitsConst right) => left.Multiply(right, MultiplySize(left.Size, right.Size));
+        public static BitsConst operator *(BitsConst left, BitsConst right)
+            => left.Multiply(right, MultiplySize(left.Size, right.Size));
 
-        static Size MultiplySize(Size left, Size right) => Size.Create(MultiplySize(left.ToInt(), right.ToInt()));
+        static Size MultiplySize(Size left, Size right)
+            => Size.Create(MultiplySize(left.ToInt(), right.ToInt()));
 
-        static Size DivideSize(Size left, Size right) => Size.Create(DivideSize(left.ToInt(), right.ToInt()));
+        static Size DivideSize(Size left, Size right)
+            => Size.Create(DivideSize(left.ToInt(), right.ToInt()));
 
         public static BitsConst operator *(BitsConst left, int right) => left * Convert(right);
 
-        public static BitsConst Multiply(BitsConst left, BitsConst right) => left.Multiply(right, MultiplySize(left.Size, right.Size));
+        public static BitsConst Multiply(BitsConst left, BitsConst right)
+            => left.Multiply(right, MultiplySize(left.Size, right.Size));
 
         public static BitsConst Multiply(BitsConst left, int right) => left * Convert(right);
 
-        public static BitsConst operator /(BitsConst left, BitsConst right) => left.Divide(right, DivideSize(left.Size, right.Size));
+        public static BitsConst operator /(BitsConst left, BitsConst right)
+            => left.Divide(right, DivideSize(left.Size, right.Size));
 
         public static BitsConst operator /(BitsConst left, int right) => left / Convert(right);
 
-        public static BitsConst Divide(BitsConst left, BitsConst right) => left.Divide(right, DivideSize(left.Size, right.Size));
+        public static BitsConst Divide(BitsConst left, BitsConst right)
+            => left.Divide(right, DivideSize(left.Size, right.Size));
 
         public static BitsConst Divide(BitsConst left, int right) => left / Convert(right);
 
@@ -426,13 +436,13 @@ namespace Reni.Basics
 
         void AddAndKeepSize(BitsConst left)
         {
-            Int16 carry = 0;
+            short carry = 0;
             for(var i = 0; i < _data.Length; i++)
             {
                 carry += _data[i];
                 carry += left._data[i];
                 _data[i] = (byte) carry;
-                carry /= (Int16) SegmentValues;
+                carry /= (short) SegmentValues;
             }
             return;
         }
@@ -503,9 +513,8 @@ namespace Reni.Basics
 
         internal string ByteSequence(Size size = null)
         {
-            
             var result = "";
-            for(var i = 0; i < (size??Size).ByteCount; i++)
+            for(var i = 0; i < (size ?? Size).ByteCount; i++)
             {
                 result += ", ";
                 result += Byte(i);
@@ -537,7 +546,7 @@ namespace Reni.Basics
             public MissingMethodException(string operation)
             {
                 _operation = operation;
-                Tracer.ThrowAssertionFailed( "", () => Tracer.Dump(this),stackFrameDepth:1);
+                Tracer.ThrowAssertionFailed("", () => Tracer.Dump(this), stackFrameDepth: 1);
             }
         }
     }

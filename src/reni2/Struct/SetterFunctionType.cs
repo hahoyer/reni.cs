@@ -23,7 +23,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using System;
-using hw.Debug;
+using hw.DebugFormatter;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;

@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using hw.Debug;
+using hw.DebugFormatter;
 using hw.Forms;
 using hw.Helper;
 using JetBrains.Annotations;

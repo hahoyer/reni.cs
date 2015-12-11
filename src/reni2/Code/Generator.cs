@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using hw.Debug;
+using hw.DebugFormatter;
 using hw.Helper;
 using Microsoft.CSharp;
 using Reni.Struct;

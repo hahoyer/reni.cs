@@ -4,7 +4,7 @@ using hw.Forms;
 using hw.Helper;
 using System.Linq;
 using System.Windows.Forms;
-using hw.Debug;
+using hw.DebugFormatter;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;

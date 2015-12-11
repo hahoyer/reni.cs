@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using hw.Debug;
+using hw.DebugFormatter;
 using hw.Forms;
 using hw.Graphics;
 using hw.Parser;

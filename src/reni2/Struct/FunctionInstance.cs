@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.Debug;
+using hw.DebugFormatter;
 using hw.Forms;
 using hw.Helper;
 using Reni.Basics;
@@ -97,7 +97,7 @@ namespace Reni.Struct
             if(IsStopByObjectIdActive)
                 return null;
 
-            var trace = FunctionId.Index == -13 && (category.HasCode ||category.HasExts);
+            var trace = FunctionId.Index == 13 && (category.HasCode );
             StartMethodDump(trace, category);
             try
             {

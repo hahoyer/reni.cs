@@ -1,20 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.Debug;
+using hw.DebugFormatter;
 using hw.UnitTest;
-using Reni.UserInterface;
 
 namespace Reni.FeatureTest.UserInterface
 {
     [UnitTest]
+    [LowPriority]
     public sealed class TokenLocating : DependantAttribute
     {
         [UnitTest]
         public void FromSourcePart()
         {
             const string text = @"(1,3,4,6)";
-            var compiler = Compiler.BrowserFromText(text: text);
+            var compiler = Compiler.BrowserFromText(text);
             var span = (compiler.Source + 2).Span(3);
             var x = compiler.Locate(span).SourcePart;
 
@@ -26,7 +26,7 @@ namespace Reni.FeatureTest.UserInterface
         {
             const string text = @"( # Comment
 1,3,4,6)";
-            var compiler = Compiler.BrowserFromText(text: text);
+            var compiler = Compiler.BrowserFromText(text);
             var span = (compiler.Source + 2).Span(3);
             var x = compiler.Locate(span);
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using hw.Helper;
 using System.Linq;
-using hw.Debug;
+using hw.DebugFormatter;
 using Reni.Basics;
 using Reni.Code.ReplaceVisitor;
 

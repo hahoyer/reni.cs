@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using hw.Debug;
+using hw.DebugFormatter;
 using hw.Forms;
 using Reni.Basics;
 
