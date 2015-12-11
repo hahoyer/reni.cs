@@ -97,7 +97,7 @@ namespace Reni.Struct
             if(IsStopByObjectIdActive)
                 return null;
 
-            var trace = FunctionId.Index == -11 && FunctionId.IsGetter && category.HasCode;
+            var trace = FunctionId.Index == -13 && (category.HasCode ||category.HasExts);
             StartMethodDump(trace, category);
             try
             {
@@ -124,7 +124,9 @@ namespace Reni.Struct
                 Dump("postProcessedResult", postProcessedResult);
                 BreakExecution();
 
-                var result = postProcessedResult
+                var argReferenceReplaced = ReplaceArgsReference(postProcessedResult);
+
+                var result = argReferenceReplaced
                     .ReplaceAbsolute
                     (Context.FindRecentFunctionContextObject, CreateContextRefCode, CodeArgs.Void);
 
@@ -134,6 +136,17 @@ namespace Reni.Struct
             {
                 EndMethodDump();
             }
+        }
+
+        Result ReplaceArgsReference(Result result)
+        {
+            var reference = Parent.ArgsType as IContextReference;
+            if(reference == null)
+                return result;
+
+            return result
+                .ReplaceAbsolute
+                (reference, CreateContextRefCode, CodeArgs.Void);
         }
 
         CodeBase CreateContextRefCode()
