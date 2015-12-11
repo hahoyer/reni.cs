@@ -34,7 +34,7 @@ namespace ReniTest
             //InspectCompiler(new TextConcat());
             //Reni.Proof.Main.Run();
 
-            new SourceView(new TextConcat().Targets.First()).Run();
+            //new SourceView(new TextConcat().Targets.First()).Run();
         }
 
         const string Target = @"f: /\ ^(); x: 1; f(/\x) dump_print";
