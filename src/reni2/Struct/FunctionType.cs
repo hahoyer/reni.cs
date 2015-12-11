@@ -141,7 +141,7 @@ namespace Reni.Struct
                 result += Setter.Exts;
             var argsExt = ArgsType as IContextReference;
             if(argsExt != null)
-                result -= argsExt;
+                Tracer.Assert(!result.Contains(argsExt));
             return result ;
         }
     }
