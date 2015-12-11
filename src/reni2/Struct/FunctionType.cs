@@ -112,7 +112,7 @@ namespace Reni.Struct
         // This may hinder the recursive call detection, located at result cache of context. 
         public Result ApplyResult(Category category)
         {
-            var trace = ObjectId==-240;
+            var trace = Index == -13;
             StartMethodDump(trace, category);
             try
             {
@@ -139,7 +139,10 @@ namespace Reni.Struct
             Tracer.Assert(result != null);
             if(Setter != null)
                 result += Setter.Exts;
-            return result;
+            var argsExt = ArgsType as IContextReference;
+            if(argsExt != null)
+                result -= argsExt;
+            return result ;
         }
     }
 }
