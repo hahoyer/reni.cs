@@ -132,10 +132,10 @@ namespace Reni
             if(Else == null)
                 return context
                     .RootContext.VoidType;
-            var thenType = Then.Type(context);
-            var elseType = Else.Type(context);
+            var thenType = Then.Type(context)?.AutomaticDereferenceType;
+            var elseType = Else.Type(context)?.AutomaticDereferenceType;
             if(thenType == null)
-                return elseType.Align;
+                return elseType?.Align;
             if(elseType == null)
                 return thenType.Align;
             return thenType.CommonType(elseType).Align;

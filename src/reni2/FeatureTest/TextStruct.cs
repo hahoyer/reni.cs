@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using hw.Helper;
+using System.Linq;
 using hw.UnitTest;
 using Reni.FeatureTest.Array;
 using Reni.FeatureTest.BlogExamples;
@@ -11,6 +11,7 @@ using Reni.FeatureTest.Integer;
 using Reni.FeatureTest.MixIn;
 using Reni.FeatureTest.Reference;
 using Reni.FeatureTest.Text;
+using Reni.FeatureTest.ThenElse;
 using Reni.FeatureTest.TypeType;
 using Reni.FeatureTest.Validation;
 
@@ -43,7 +44,8 @@ namespace Reni.FeatureTest
     [ArrayReferenceAll]
     [Simple]
     [MixIn.Function]
-    public sealed class Text1 : TextStruct {}
+    public sealed class Text1 : TextStruct
+    {}
 
     [UnitTest]
     [Output("Hallo")]
@@ -51,5 +53,7 @@ namespace Reni.FeatureTest
     [Text1]
     [UserObjects]
     [UnMatchedBrackets]
-    public sealed class TextConcat : TextStruct {}
+    [AutomaticDereferencing]
+    public sealed class TextConcat : TextStruct
+    {}
 }
