@@ -142,6 +142,9 @@ namespace Reni.Code
         void IVisitor.RecursiveCall() { throw new NotImplementedException(); }
         void IVisitor.ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode) => NotImplementedMethod(condSize, thenCode, elseCode);
         void IVisitor.TopFrameRef(Size offset) => NotImplementedMethod(offset);
+        void IVisitor.ArrayGetter(Size elementSize, Size indexSize)
+            => NotImplementedMethod(elementSize, indexSize);
+
         void IVisitor.RecursiveCallCandidate() { throw new NotImplementedException(); }
         void IVisitor.PrintText(Size leftSize, Size itemSize) => NotImplementedMethod(leftSize, itemSize);
 

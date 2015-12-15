@@ -59,8 +59,7 @@ namespace Reni.Struct
         }
 
         public string GetCompoundChildDump()
-            =>
-                Compound.GetCompoundIdentificationDump() + PositionDump();
+            => Compound.GetCompoundIdentificationDump() + PositionDump();
 
         string PositionDump()
         {

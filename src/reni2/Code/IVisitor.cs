@@ -1,6 +1,6 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
 using Reni.Basics;
 using Reni.Struct;
 
@@ -30,5 +30,6 @@ namespace Reni.Code
         void TopFrameData(Size offset, Size size, Size dataSize);
         void TopRef(Size offset);
         void TopFrameRef(Size offset);
+        void ArrayGetter(Size elementSize, Size indexSize);
     }
 }

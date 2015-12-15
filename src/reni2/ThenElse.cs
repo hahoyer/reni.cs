@@ -96,14 +96,12 @@ namespace Reni
             if(result == null)
                 return null;
 
-            var branchResult = result.AutomaticDereferenceResult;
+            var branchResult = result;
 
             var commonType = CommonType(context);
             return branchResult.Type
                 .Conversion(category.Typed, commonType)
                 .ReplaceArg(branchResult)
-                .LocalBlock(category.Typed)
-                .Conversion(commonType)
                 & category;
         }
 
@@ -117,7 +115,6 @@ namespace Reni
             var condResult = CondResult(context, category);
             var thenResult = ThenResult(context, branchCategory);
             var elseResult = ElseResult(context, branchCategory);
-            Tracer.ConditionalBreak(elseResult == null);
             return commonType
                 .Result
                 (
@@ -132,8 +129,8 @@ namespace Reni
             if(Else == null)
                 return context
                     .RootContext.VoidType;
-            var thenType = Then.Type(context)?.AutomaticDereferenceType;
-            var elseType = Else.Type(context)?.AutomaticDereferenceType;
+            var thenType = Then.Type(context);
+            var elseType = Else.Type(context);
             if(thenType == null)
                 return elseType?.Align;
             if(elseType == null)

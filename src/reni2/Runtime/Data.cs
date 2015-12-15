@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using hw.DebugFormatter;
-using hw.Forms;
 using hw.Helper;
 using JetBrains.Annotations;
 using Reni.Basics;
@@ -19,6 +19,7 @@ namespace Reni.Runtime
         public static IOutStream OutStream { internal get; set; }
 
         public static Data Create(int bytes) => new Data(new byte[bytes]);
+
         public static Data Create(byte[] bytes) => new Data(bytes)
         {
             StartIndex = 0
@@ -84,20 +85,25 @@ namespace Reni.Runtime
                 EnsureLength();
             }
         }
+
         void EnsureLength() => Tracer.Assert(StartIndex >= 0);
 
         public Data Pointer(int offset) => Create(_data.Pointer(StartIndex + offset));
         public void PointerPlus(int offset) => _data.DoRefPlus(StartIndex, offset);
         public Data DePointer(int bytes) => Create(_data.Dereference(StartIndex, bytes));
         public Data Get(int bytes, int offset) => Create(_data.Get(StartIndex + offset, bytes));
+
         public Data GetFromBack(int bytes, int offset)
             => Create(_data.Get(_data.Length + offset, bytes));
+
         public void PrintNumber() => GetBytes().PrintNumber();
+
         public void PrintText(int itemBytes)
         {
             Tracer.Assert(itemBytes == 1);
             GetBytes(_length).PrintText();
         }
+
         public static void PrintText(string data) => data.PrintText();
 
         public void Assign(int bytes)
@@ -105,6 +111,13 @@ namespace Reni.Runtime
             var right = Pull(DataHandler.RefBytes);
             var left = Pull(DataHandler.RefBytes);
             left._data.AssignFromPointers(right._data, bytes);
+        }
+
+        public void ArrayGetter(int elementBytes, int indexBytes)
+        {
+            var offset = Pull(indexBytes).GetBytes().Times(elementBytes, DataHandler.RefBytes);
+            var baseAddress = Pull(DataHandler.RefBytes);
+            Push(baseAddress.GetBytes().Plus(offset, DataHandler.RefBytes));
         }
 
         public Data BitCast(int bits)
@@ -127,20 +140,24 @@ namespace Reni.Runtime
             result += DumpLengthAndRange(StartIndex, _length);
             return result;
         }
-        string DumpLengthAndRange(int startIndex, int bytes) => "[" + bytes + ": "+ DumpRange(startIndex, bytes)+ "]";
+
+        string DumpLengthAndRange(int startIndex, int bytes)
+            => "[" + bytes + ": " + DumpRange(startIndex, bytes) + "]";
 
         string DumpRange(int startIndex, int bytes)
         {
             if(bytes <= 0)
                 return "";
+
             return 
-                _data
-                    .Skip(startIndex)
-                    .Take(bytes)
-                    .Select(d => d.ToString())
+                bytes
+                .Select(i => startIndex + i)
+                .Where(i => i + DataHandler.RefBytes < _length)
+                .Select(i => _biasCache.Dump(Get(DataHandler.RefBytes, i)))
                     .Stringify(" ");
         }
 
+        IEnumerable<byte> Range(int startIndex, int bytes) => _data.Skip(startIndex).Take(bytes);
 
         static readonly BiasCache _biasCache = new BiasCache(100);
         [UsedImplicitly]
@@ -149,10 +166,7 @@ namespace Reni.Runtime
         public IView GetCurrentView(int bytes) => new View(this, StartIndex, bytes);
 
 
-        public interface IView
-        {
-             
-        }
+        public interface IView {}
 
         public sealed class View : DumpableObject, IView
         {
@@ -176,18 +190,23 @@ namespace Reni.Runtime
         [UsedImplicitly]
         public void Equal(int sizeBytes, int leftBytes, int rightBytes)
             => Compare(sizeBytes, leftBytes, rightBytes, DataHandler.IsEqual);
+
         [UsedImplicitly]
         public void LessGreater(int sizeBytes, int leftBytes, int rightBytes)
             => Compare(sizeBytes, leftBytes, rightBytes, DataHandler.IsNotEqual);
+
         [UsedImplicitly]
         public void Less(int sizeBytes, int leftBytes, int rightBytes)
             => Compare(sizeBytes, leftBytes, rightBytes, DataHandler.IsLess);
+
         [UsedImplicitly]
         public void Greater(int sizeBytes, int leftBytes, int rightBytes)
             => Compare(sizeBytes, leftBytes, rightBytes, DataHandler.IsGreater);
+
         [UsedImplicitly]
         public void LessEqual(int sizeBytes, int leftBytes, int rightBytes)
             => Compare(sizeBytes, leftBytes, rightBytes, DataHandler.IsLessEqual);
+
         [UsedImplicitly]
         public void GreaterEqual(int sizeBytes, int leftBytes, int rightBytes)
             => Compare(sizeBytes, leftBytes, rightBytes, DataHandler.IsGreaterEqual);

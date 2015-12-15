@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using System;
+using hw.DebugFormatter;
 using Reni.Basics;
 using Reni.Context;
 
@@ -8,7 +9,9 @@ namespace Reni.Code
 {
     abstract class ArrayAccess : FiberItem
     {
+        [EnableDump]
         internal readonly Size ElementSize;
+        [EnableDump]
         internal readonly Size IndexSize;
         readonly string _callingMethodName;
         protected static readonly BitArrayBinaryOp AddressPlus = new BitArrayBinaryOp("Plus", Root.DefaultRefAlignParam.RefSize, Root.DefaultRefAlignParam.RefSize, Root.DefaultRefAlignParam.RefSize);
@@ -19,14 +22,12 @@ namespace Reni.Code
             IndexSize = indexSize;
             _callingMethodName = callingMethodName;
         }
-        internal override void Visit(IVisitor visitor) => NotImplementedMethod(visitor);
 
         protected CodeBase IndexCalculation(CodeBase index)
         {
             var elementSize = BitsConst
                 .Convert(ElementSize.SizeToPacketCount(Root.DefaultRefAlignParam.AlignBits))
                 .Resize(Root.DefaultRefAlignParam.RefSize);
-
 
             var castedIndex = index.BitCast(Root.DefaultRefAlignParam.RefSize);
             if(elementSize.ToInt64() == 1)
@@ -58,15 +59,8 @@ namespace Reni.Code
 
         internal override Size InputSize => Root.DefaultRefAlignParam.RefSize + IndexSize;
         internal override Size OutputSize => Root.DefaultRefAlignParam.RefSize;
-
-        internal override CodeBase TryToCombineBack(List precedingElement)
-        {
-            var list = precedingElement.Data;
-            if (list.Length != 2)
-                return null;
-
-            return AddressCalculation(list);
-        }
+        internal override void Visit(IVisitor visitor)
+            => visitor.ArrayGetter(ElementSize, IndexSize);
     }
 
     sealed class ArraySetter : ArrayAccess
@@ -90,5 +84,7 @@ namespace Reni.Code
             return (AddressCalculation(list) + value)
                 .Assignment(ElementSize);
         }
+
+        internal override void Visit(IVisitor visitor) => NotImplementedMethod(visitor);
     }
 }

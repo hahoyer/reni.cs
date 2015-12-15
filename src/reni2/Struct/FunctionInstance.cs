@@ -41,6 +41,8 @@ namespace Reni.Struct
         [DisableDump]
         protected abstract Size RelevantValueSize { get; }
 
+        string Description => _body.SourcePart.Id;
+
         [Node]
         [DisableDump]
         internal CodeArgs Exts
@@ -65,7 +67,7 @@ namespace Reni.Struct
             {
                 try
                 {
-                    return BodyCode.Container("Description", FunctionId);
+                    return BodyCode.Container(Description, FunctionId);
                 }
                 catch(UnexpectedVisitOfPending)
                 {
@@ -97,7 +99,7 @@ namespace Reni.Struct
             if(IsStopByObjectIdActive)
                 return null;
 
-            var trace = FunctionId.Index == 13 && (category.HasCode );
+            var trace = FunctionId.Index == -13 && (category.HasCode );
             StartMethodDump(trace, category);
             try
             {

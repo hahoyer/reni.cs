@@ -557,10 +557,11 @@ namespace Reni
                 Tracer.Assert(Code.Size == Type.Size, () => "Code and Type differ: " + Dump());
             if(HasExts && HasCode)
             {
-                if(!(Code.Exts.IsEqual(Exts)))
+                if(!Code.Exts.IsEqual(Exts))
                     Tracer.Line(Tracer.StackTrace(FilePositionTag.Debug));
                 Tracer.Assert
-                    (Code.Exts.IsEqual(Exts), () => "Code and Exts differ: " + Dump());}
+                    (Code.Exts.IsEqual(Exts), () => "Code and Exts differ: " + Dump());
+            }
 
             Tracer.Assert((CompleteCategory & PendingCategory) == Category.None);
         }
@@ -627,7 +628,7 @@ namespace Reni
                 IsDirty = true
             };
 
-            var categoryForArg = (CompleteCategory & Category.Code.CodeExtsed);
+            var categoryForArg = CompleteCategory & Category.Code.CodeExtsed;
             if(HasCode)
                 categoryForArg |= Category.Type;
 
@@ -720,7 +721,7 @@ namespace Reni
 
         internal Result ReplaceRefsForFunctionBody(CodeBase replacement)
         {
-            if (!HasCode)
+            if(!HasCode)
                 return this;
             if(SmartExts.Count == 0)
                 return this;
@@ -733,6 +734,9 @@ namespace Reni
         }
 
         internal Result LocalBlock(Category category)
+            => AutomaticDereferenceResult.InternalLocalBlock(category);
+
+        internal Result InternalLocalBlock(Category category)
         {
             if(!category.HasCode && !category.HasExts)
                 return this;

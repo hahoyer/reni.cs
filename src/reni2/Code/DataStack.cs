@@ -13,7 +13,7 @@ namespace Reni.Code
 {
     sealed class DataStack : DumpableObject, IVisitor
     {
-        private readonly IExecutionContext _context;
+        readonly IExecutionContext _context;
 
         sealed class LocalData : DumpableObject, IStackDataAddressBase
         {
@@ -23,7 +23,8 @@ namespace Reni.Code
 
             string IStackDataAddressBase.Dump() => "stack";
 
-            StackData IStackDataAddressBase.GetTop(Size offset, Size size) => Data.DoPull(Data.Size + offset).DoGetTop(size);
+            StackData IStackDataAddressBase.GetTop(Size offset, Size size)
+                => Data.DoPull(Data.Size + offset).DoGetTop(size);
 
             void IStackDataAddressBase.SetTop(Size offset, StackData right)
             {
@@ -34,9 +35,11 @@ namespace Reni.Code
                     .Push(oldTop);
             }
 
-            internal StackDataAddress Address(Size offset) => new StackDataAddress(this, offset - Data.Size, Data.OutStream);
+            internal StackDataAddress Address(Size offset)
+                => new StackDataAddress(this, offset - Data.Size, Data.OutStream);
 
-            internal StackData FrameAddress(Size offset) => new StackDataAddress(Frame, offset, Data.OutStream);
+            internal StackData FrameAddress(Size offset)
+                => new StackDataAddress(Frame, offset, Data.OutStream);
         }
 
         internal static Size RefSize => Root.DefaultRefAlignParam.RefSize;
@@ -80,6 +83,10 @@ namespace Reni.Code
 
         void IVisitor.TopRef(Size offset) => Push(_localData.Address(offset));
         void IVisitor.TopFrameRef(Size offset) => Push(_localData.FrameAddress(offset));
+
+        void IVisitor.ArrayGetter(Size elementSize, Size indexSize)
+            => NotImplementedMethod(elementSize, indexSize);
+
         void IVisitor.RecursiveCallCandidate() { throw new NotImplementedException(); }
 
         void IVisitor.TopFrameData(Size offset, Size size, Size dataSize)
@@ -116,9 +123,11 @@ namespace Reni.Code
 
         void IVisitor.PrintText(Size size, Size itemSize) => Pull(size).PrintText(itemSize);
 
-        void IVisitor.LocalBlockEnd(Size size, Size intermediateSize) => NotImplementedMethod(size, intermediateSize);
+        void IVisitor.LocalBlockEnd(Size size, Size intermediateSize)
+            => NotImplementedMethod(size, intermediateSize);
 
-        void IVisitor.Drop(Size beforeSize, Size afterSize) => NotImplementedMethod(beforeSize, afterSize);
+        void IVisitor.Drop(Size beforeSize, Size afterSize)
+            => NotImplementedMethod(beforeSize, afterSize);
 
         void IVisitor.ReferencePlus(Size right) => Push(Pull(RefSize).RefPlus(right));
 
@@ -206,7 +215,7 @@ namespace Reni.Code
         }
     }
 
-    internal interface IExecutionContext
+    interface IExecutionContext
     {
         IOutStream OutStream { get; }
         bool IsTraceEnabled { get; }

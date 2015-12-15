@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using hw.Helper;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Helper;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Runtime;
@@ -22,7 +22,7 @@ namespace Reni.Code
         {
             get
             {
-                var start = String.Format("\nvar data = Data.Create({0})", _temporaryByteCount);
+                var start = $"\nvar data = Data.Create({_temporaryByteCount})";
                 return _data
                     .Aggregate(start, (x, y) => x + ";\n" + y)
                     + ";\n";
@@ -32,7 +32,7 @@ namespace Reni.Code
         [StringFormatMethod("pattern")]
         void AddCode(string pattern, params object[] data)
         {
-            var c = String.Format(pattern, data);
+            var c = string.Format(pattern, data);
             _data.Add("    ".Repeat(_indent) + c);
         }
 
@@ -40,7 +40,7 @@ namespace Reni.Code
         {
             if(size == dataSize)
                 return "";
-            return String.Format(".BitCast({0}).BitCast({1})", dataSize.ToInt(), size.ToInt());
+            return $".BitCast({dataSize.ToInt()}).BitCast({size.ToInt()})";
         }
 
         static int RefBytes => DataHandler.RefBytes;
@@ -59,20 +59,28 @@ namespace Reni.Code
             else
                 AddCode("data.Drop({0}, {1})", beforeSize.ByteCount, afterSize.ByteCount);
         }
+
         void IVisitor.BitsArray(Size size, BitsConst data)
             => AddCode("data.SizedPush({0}{1})", size.ByteCount, data.ByteSequence());
+
         void IVisitor.ReferencePlus(Size size)
             => AddCode("data.PointerPlus({0})", size.SaveByteCount);
+
         void IVisitor.PrintNumber(Size leftSize, Size rightSize)
             => AddCode("data.Pull({0}).PrintNumber()", leftSize.SaveByteCount);
+
         void IVisitor.PrintText(string dumpPrintText)
             => AddCode("Data.PrintText({0})", dumpPrintText.Quote());
+
         void IVisitor.TopRef(Size offset)
             => AddCode("data.Push(data.Pointer({0}))", offset.SaveByteCount);
+
         void IVisitor.TopFrameRef(Size offset)
             => AddCode("data.Push(frame.Pointer({0}))", offset.SaveByteCount);
+
         void IVisitor.Assign(Size targetSize)
             => AddCode("data.Assign({0})", targetSize.SaveByteCount);
+
         void IVisitor.BitCast(Size size, Size targetSize, Size significantSize)
             => AddCode
                 (
@@ -81,6 +89,7 @@ namespace Reni.Code
                     significantSize.ToInt(),
                     size.ToInt()
                 );
+
         void IVisitor.PrintText(Size leftSize, Size itemSize)
             => AddCode
                 (
@@ -88,43 +97,53 @@ namespace Reni.Code
                     leftSize.SaveByteCount,
                     itemSize.SaveByteCount
                 );
+
         void IVisitor.RecursiveCall() => AddCode("goto Start");
         void IVisitor.RecursiveCallCandidate() { throw new UnexpectedRecursiveCallCandidate(); }
 
-        void IVisitor.Call(Size size, FunctionId functionId, Size argsAndRefsSize) 
-            => AddCode
-            (
-                "data.Push({0}(data.Pull({1})))",
-                Generator.FunctionName(functionId),
-                argsAndRefsSize.SaveByteCount
-            );
+        void IVisitor.ArrayGetter(Size elementSize, Size indexSize)
+            =>
+                AddCode
+                    (
+                        "data.ArrayGetter({0},{1})",
+                        elementSize.SaveByteCount,
+                        indexSize.SaveByteCount
+                    );
 
-        void IVisitor.TopData(Size offset, Size size, Size dataSize) 
+        void IVisitor.Call(Size size, FunctionId functionId, Size argsAndRefsSize)
             => AddCode
-            (
-                "data.Push(data.Get({0}, {1}){2})",
-                dataSize.ByteCount,
-                offset.SaveByteCount,
-                BitCast(size, dataSize)
-            );
+                (
+                    "data.Push({0}(data.Pull({1})))",
+                    Generator.FunctionName(functionId),
+                    argsAndRefsSize.SaveByteCount
+                );
 
-        void IVisitor.TopFrameData(Size offset, Size size, Size dataSize) 
+        void IVisitor.TopData(Size offset, Size size, Size dataSize)
             => AddCode
-            (
-                "data.Push(frame.Get({0}, {1}){2})",
-                dataSize.ByteCount,
-                offset.SaveByteCount,
-                BitCast(size, dataSize)
-            );
+                (
+                    "data.Push(data.Get({0}, {1}){2})",
+                    dataSize.ByteCount,
+                    offset.SaveByteCount,
+                    BitCast(size, dataSize)
+                );
 
-        void IVisitor.DePointer(Size size, Size dataSize) 
+        void IVisitor.TopFrameData(Size offset, Size size, Size dataSize)
             => AddCode
-            (
-                "data.Push(data.Pull({0}).DePointer({1}){2})",
-                RefBytes,
-                dataSize.ByteCount,
-                BitCast(size, dataSize)
-            );
+                (
+                    "data.Push(frame.Get({0}, {1}){2})",
+                    dataSize.ByteCount,
+                    offset.SaveByteCount,
+                    BitCast(size, dataSize)
+                );
+
+        void IVisitor.DePointer(Size size, Size dataSize)
+            => AddCode
+                (
+                    "data.Push(data.Pull({0}).DePointer({1}){2})",
+                    RefBytes,
+                    dataSize.ByteCount,
+                    BitCast(size, dataSize)
+                );
 
         void IVisitor.BitArrayPrefixOp(string operation, Size size, Size argSize)
         {

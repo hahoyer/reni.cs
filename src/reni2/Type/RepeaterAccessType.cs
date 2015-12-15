@@ -37,8 +37,8 @@ namespace Reni.Type
                 .ArgCode
                 .ArraySetter(ValueType.Size, IndexType.Size);
 
-        protected override CodeBase GetterCode() => ArrayGetter;
-        CodeBase ArrayGetter => ArgCode.ArrayGetter(ValueType.Size, IndexType.Size);
+        protected override CodeBase GetterCode()
+            => ArgCode.ArrayGetter(ValueType.Size, IndexType.Size);
 
         internal Result Result(Category category, Result leftResult, TypeBase right)
         {

@@ -291,7 +291,8 @@ namespace Reni.Runtime
             }
         }
 
-        internal static byte[] Times(this byte[] left, byte[] right, int bytes) => (new BigInteger(left) * new BigInteger(right))
+        internal static byte[] Times(this byte[] left, byte[] right, int bytes) 
+            => (new BigInteger(left) * new BigInteger(right))
             .ToByteArray()
             .ByteAlign(bytes);
 
@@ -312,5 +313,10 @@ namespace Reni.Runtime
 
             return result;
         }
+
+        internal static byte[] Times(this byte[] left, int right, int bytes)
+            => (new BigInteger(left) * new BigInteger(right))
+            .ToByteArray()
+            .ByteAlign(bytes);
     }
 }
