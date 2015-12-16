@@ -31,5 +31,6 @@ namespace Reni.Code
         void TopRef(Size offset);
         void TopFrameRef(Size offset);
         void ArrayGetter(Size elementSize, Size indexSize);
+        void ArraySetter(Size elementSize, Size indexSize);
     }
 }

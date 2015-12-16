@@ -6,12 +6,12 @@ using Reni.Basics;
 
 namespace Reni.Code
 {
-    internal sealed class StackDataAddress : NonListStackData
+    sealed class StackDataAddress : NonListStackData
     {
         [EnableDump]
-        private readonly IStackDataAddressBase _data;
+        readonly IStackDataAddressBase _data;
         [EnableDump]
-        private readonly Size _offset;
+        readonly Size _offset;
 
         public StackDataAddress(IStackDataAddressBase data, Size offset, IOutStream outStream)
             : base(outStream)
@@ -22,9 +22,21 @@ namespace Reni.Code
 
         internal override Size Size => DataStack.RefSize;
 
-        internal new StackData Dereference(Size size, Size dataSize) => _data.GetTop(_offset, size).BitCast(dataSize).BitCast(size);
+        internal new StackData Dereference(Size size, Size dataSize)
+            => _data.GetTop(_offset, size).BitCast(dataSize).BitCast(size);
 
-        internal new void Assign(Size size, StackData right) => _data.SetTop(_offset, right.Dereference(size,size));
+        internal new void Assign(Size size, StackData right)
+            => _data.SetTop(_offset, right.Dereference(size, size));
+
+        internal override StackData BitArrayBinaryOp(string opToken, Size size, StackData right)
+        {
+            if(size == DataStack.RefSize && opToken == "Plus")
+                return RefPlus(Size.Create(right.GetBitsConst().ToInt32()));
+
+
+            NotImplementedMethod(opToken, size, right);
+            return null;
+        }
 
         internal new StackData RefPlus(Size offset)
         {
@@ -43,7 +55,7 @@ namespace Reni.Code
         }
     }
 
-    internal interface IStackDataAddressBase
+    interface IStackDataAddressBase
     {
         StackData GetTop(Size offset, Size size);
         string Dump();

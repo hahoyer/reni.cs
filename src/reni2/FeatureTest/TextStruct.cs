@@ -55,5 +55,11 @@ namespace Reni.FeatureTest
     [UnMatchedBrackets]
     [AutomaticDereferencing]
     public sealed class TextConcat : TextStruct
-    {}
+    {
+        public TextConcat()
+        {
+            Parameters.RunFromCode = true;
+            Parameters.TraceOptions.Functions = true;
+        }
+    }
 }

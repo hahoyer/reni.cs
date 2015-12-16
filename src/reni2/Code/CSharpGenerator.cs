@@ -110,6 +110,9 @@ namespace Reni.Code
                         indexSize.SaveByteCount
                     );
 
+        void IVisitor.ArraySetter(Size elementSize, Size indexSize)
+            => NotImplementedMethod(elementSize, indexSize);
+
         void IVisitor.Call(Size size, FunctionId functionId, Size argsAndRefsSize)
             => AddCode
                 (

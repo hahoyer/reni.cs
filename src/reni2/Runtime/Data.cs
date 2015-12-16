@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Numerics;
 using hw.DebugFormatter;
 using hw.Helper;
 using JetBrains.Annotations;
@@ -145,26 +144,33 @@ namespace Reni.Runtime
             => "[" + bytes + ": " + DumpRange(startIndex, bytes) + "]";
 
         string DumpRange(int startIndex, int bytes)
+            => bytes <= 0 ? "" : DumpRangeGenerator(startIndex, bytes).Stringify(" ");
+
+        IEnumerable<string> DumpRangeGenerator(int startIndex, int bytes)
         {
-            if(bytes <= 0)
-                return "";
-
-            return 
-                bytes
-                .Select(i => startIndex + i)
-                .Where(i => i + DataHandler.RefBytes < _length)
-                .Select(i => _biasCache.Dump(Get(DataHandler.RefBytes, i)))
-                    .Stringify(" ");
+            for(var i = 0; i < bytes;)
+            {
+                var address = _biasCache.Dump(_data, startIndex + i);
+                if(address == null)
+                {
+                    yield return _data[startIndex + i].ToString();
+                    i++;
+                }
+                else
+                {
+                    yield return address;
+                    i += DataHandler.RefBytes;
+                }
+            }
         }
-
-        IEnumerable<byte> Range(int startIndex, int bytes) => _data.Skip(startIndex).Take(bytes);
 
         static readonly BiasCache _biasCache = new BiasCache(100);
         [UsedImplicitly]
-        string AddressDump => _biasCache.AddressDump(this) + "=" + DataDump;
+        string AddressDump => _biasCache.AddressDump(this) + "=" + FlatDump;
+
+        string FlatDump => GetBytes().Select(i => i.ToString()).Stringify(" ");
 
         public IView GetCurrentView(int bytes) => new View(this, StartIndex, bytes);
-
 
         public interface IView {}
 

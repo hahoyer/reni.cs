@@ -168,7 +168,9 @@ namespace Reni
 
             if(_parameters.RunFromCode)
             {
+                _isInExecutionPhase = true;
                 RunFromCode();
+                _isInExecutionPhase = false;
                 return;
             }
 

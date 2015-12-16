@@ -6,6 +6,7 @@ using hw.Helper;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
+using Reni.Runtime;
 using Reni.Struct;
 using Reni.TokenClasses;
 
@@ -85,7 +86,20 @@ namespace Reni.Code
         void IVisitor.TopFrameRef(Size offset) => Push(_localData.FrameAddress(offset));
 
         void IVisitor.ArrayGetter(Size elementSize, Size indexSize)
-            => NotImplementedMethod(elementSize, indexSize);
+        {
+            var offset = elementSize * Pull(indexSize).GetBitsConst().ToInt32();
+            var baseAddress = Pull(RefSize);
+            Push(baseAddress.RefPlus(offset));
+        }
+
+        void IVisitor.ArraySetter(Size elementSize, Size indexSize)
+        {
+            var right = Pull(RefSize);
+            var offset = elementSize * Pull(indexSize).GetBitsConst().ToInt32();
+            var baseAddress = Pull(RefSize);
+            var left = baseAddress.RefPlus(offset);
+            left.Assign(elementSize, right);
+        }
 
         void IVisitor.RecursiveCallCandidate() { throw new NotImplementedException(); }
 
@@ -93,7 +107,7 @@ namespace Reni.Code
         {
             var frame = _localData.Frame.Data;
             var value = frame
-                .DoPull(frame.Size + offset)
+                .DoPull(offset)
                 .DoGetTop(size)
                 .BitCast(dataSize)
                 .BitCast(size);
@@ -134,7 +148,7 @@ namespace Reni.Code
         void IVisitor.DePointer(Size size, Size dataSize)
         {
             var value = Pull(RefSize);
-            Push(value.Dereference(size, dataSize));
+            Push(value.Dereference(dataSize, dataSize).BitCast(size));
         }
 
         void IVisitor.BitArrayBinaryOp(string opToken, Size size, Size leftSize, Size rightSize)

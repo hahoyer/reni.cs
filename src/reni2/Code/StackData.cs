@@ -1,22 +1,4 @@
-﻿//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
@@ -24,12 +6,12 @@ using Reni.Basics;
 
 namespace Reni.Code
 {
-    internal abstract class StackData : DumpableObject
+    abstract class StackData : DumpableObject
     {
         internal readonly IOutStream OutStream;
-        
+
         protected StackData(IOutStream outStream) { OutStream = outStream; }
-        
+
         internal virtual StackData Push(StackData stackData)
         {
             NotImplementedMethod(stackData);
@@ -88,10 +70,10 @@ namespace Reni.Code
             if(Size == dataSize)
                 return this;
 
-            return new BitsStackData(GetBitsConst().Resize(dataSize),OutStream);
+            return new BitsStackData(GetBitsConst().Resize(dataSize), OutStream);
         }
 
-        internal StackData BitArrayBinaryOp(string opToken, Size size, StackData right)
+        internal virtual StackData BitArrayBinaryOp(string opToken, Size size, StackData right)
         {
             var leftData = GetBitsConst();
             var rightData = right.GetBitsConst();
@@ -108,7 +90,8 @@ namespace Reni.Code
 
         internal StackData RefPlus(Size offset) => GetAddress().RefPlus(offset);
 
-        internal StackData Dereference(Size size, Size dataSize) => GetAddress().Dereference(size, dataSize);
+        internal StackData Dereference(Size size, Size dataSize)
+            => GetAddress().Dereference(size, dataSize);
 
         protected virtual StackDataAddress GetAddress()
         {

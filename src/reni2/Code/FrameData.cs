@@ -1,22 +1,3 @@
-// 
-//     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,16 +9,24 @@ namespace Reni.Code
 {
     sealed class FrameData : DumpableObject, IStackDataAddressBase
     {
-        readonly StackData _data;
-        internal readonly FunctionCache<string, StackData> Locals = new FunctionCache<string, StackData>();
+        [DisableDump]
+        internal readonly FunctionCache<string, StackData> Locals =
+            new FunctionCache<string, StackData>();
+
+        [EnableDumpExcept(false)]
         internal bool IsRepeatRequired;
 
-        public FrameData(StackData data) { _data = data; }
+        public FrameData(StackData data) { Data = data; }
 
-        StackData IStackDataAddressBase.GetTop(Size offset, Size size) => _data.DoPull(_data.Size + offset).DoGetTop(size);
-        void IStackDataAddressBase.SetTop(Size offset, StackData right) => NotImplementedMethod(offset, right);
-        string IStackDataAddressBase.Dump() => "frame{" + _data.Dump() + "}";
+        StackData IStackDataAddressBase.GetTop(Size offset, Size size)
+            => Data.DoPull(Data.Size + offset).DoGetTop(size);
 
-        public StackData Data => _data;
+        void IStackDataAddressBase.SetTop(Size offset, StackData right)
+            => NotImplementedMethod(offset, right);
+
+        string IStackDataAddressBase.Dump() => "frame{" + Data.Dump() + "}";
+
+        [EnableDumpExcept(null)]
+        public StackData Data { get; }
     }
 }

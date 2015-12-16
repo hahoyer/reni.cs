@@ -145,6 +145,9 @@ namespace Reni.Code
         void IVisitor.ArrayGetter(Size elementSize, Size indexSize)
             => NotImplementedMethod(elementSize, indexSize);
 
+        void IVisitor.ArraySetter(Size elementSize, Size indexSize)
+            => NotImplementedMethod(elementSize, indexSize);
+
         void IVisitor.RecursiveCallCandidate() { throw new NotImplementedException(); }
         void IVisitor.PrintText(Size leftSize, Size itemSize) => NotImplementedMethod(leftSize, itemSize);
 

@@ -1,6 +1,6 @@
-using System.Linq;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using hw.DebugFormatter;
 using Reni.Basics;
 using Reni.Context;
@@ -14,8 +14,19 @@ namespace Reni.Code
         [EnableDump]
         internal readonly Size IndexSize;
         readonly string _callingMethodName;
-        protected static readonly BitArrayBinaryOp AddressPlus = new BitArrayBinaryOp("Plus", Root.DefaultRefAlignParam.RefSize, Root.DefaultRefAlignParam.RefSize, Root.DefaultRefAlignParam.RefSize);
-        static readonly BitArrayBinaryOp AddressMultiply = new BitArrayBinaryOp("Star", Root.DefaultRefAlignParam.RefSize, Root.DefaultRefAlignParam.RefSize, Root.DefaultRefAlignParam.RefSize);
+        protected static readonly BitArrayBinaryOp AddressPlus = new BitArrayBinaryOp
+            (
+            "Plus",
+            Root.DefaultRefAlignParam.RefSize,
+            Root.DefaultRefAlignParam.RefSize,
+            Root.DefaultRefAlignParam.RefSize);
+        static readonly BitArrayBinaryOp AddressMultiply = new BitArrayBinaryOp
+            (
+            "Star",
+            Root.DefaultRefAlignParam.RefSize,
+            Root.DefaultRefAlignParam.RefSize,
+            Root.DefaultRefAlignParam.RefSize);
+
         protected ArrayAccess(Size elementSize, Size indexSize, string callingMethodName)
         {
             ElementSize = elementSize;
@@ -54,11 +65,13 @@ namespace Reni.Code
     sealed class ArrayGetter : ArrayAccess
     {
         public ArrayGetter(Size elementSize, Size indexSize, string callingMethodName)
-            : base(elementSize, indexSize, callingMethodName)
-        { }
+            : base(elementSize, indexSize, callingMethodName) {}
 
+        [DisableDump]
         internal override Size InputSize => Root.DefaultRefAlignParam.RefSize + IndexSize;
+        [DisableDump]
         internal override Size OutputSize => Root.DefaultRefAlignParam.RefSize;
+
         internal override void Visit(IVisitor visitor)
             => visitor.ArrayGetter(ElementSize, IndexSize);
     }
@@ -66,25 +79,14 @@ namespace Reni.Code
     sealed class ArraySetter : ArrayAccess
     {
         public ArraySetter(Size elementSize, Size indexSize, string callingMethodName)
-            : base(elementSize, indexSize, callingMethodName) { }
+            : base(elementSize, indexSize, callingMethodName) {}
 
+        [DisableDump]
         internal override Size InputSize => Root.DefaultRefAlignParam.RefSize * 2 + IndexSize;
+        [DisableDump]
         internal override Size OutputSize => Size.Zero;
 
-        internal override CodeBase TryToCombineBack(List precedingElement)
-        {
-            var list = precedingElement.Data;
-            if(list.Length != 3)
-                return null;
-
-            var value = list[2];
-            if(value.Size != Root.DefaultRefAlignParam.RefSize)
-                return null;
-
-            return (AddressCalculation(list) + value)
-                .Assignment(ElementSize);
-        }
-
-        internal override void Visit(IVisitor visitor) => NotImplementedMethod(visitor);
+        internal override void Visit(IVisitor visitor)
+            => visitor.ArraySetter(ElementSize, IndexSize);
     }
 }
