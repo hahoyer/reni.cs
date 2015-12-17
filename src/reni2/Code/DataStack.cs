@@ -141,7 +141,11 @@ namespace Reni.Code
             => NotImplementedMethod(size, intermediateSize);
 
         void IVisitor.Drop(Size beforeSize, Size afterSize)
-            => NotImplementedMethod(beforeSize, afterSize);
+        {
+            var top = Data.DoGetTop(afterSize);
+            Pull(beforeSize);
+            Push(top);
+        }
 
         void IVisitor.ReferencePlus(Size right) => Push(Pull(RefSize).RefPlus(right));
 
