@@ -168,6 +168,17 @@ namespace Reni.Basics
 
         public BitsConst ByteResize(int size) => Resize(SegmentBits * size);
 
+        public BitsConst ShiftDown(Size size)
+        {
+            Tracer.Assert
+                (SlagBits(Size).IsZero, () => "Size of object is not byte aligned: " + Dump());
+            Tracer.Assert
+                (SlagBits(size).IsZero, () => "Target size is not byte aligned: " + size.Dump());
+
+            var bytes = size.ByteCount;
+            return Convert(_data.Length - bytes, _data, bytes);
+        }
+
         public BitsConst Multiply(BitsConst right, Size size)
         {
             if(!(Marshal.SizeOf(typeof(long)) * 8 >= size.ToInt()))
@@ -546,7 +557,7 @@ namespace Reni.Basics
             public MissingMethodException(string operation)
             {
                 _operation = operation;
-                Tracer.ThrowAssertionFailed("", () => Tracer.Dump(this), stackFrameDepth: 1);
+                Tracer.ThrowAssertionFailed("", () => Tracer.Dump(this), 1);
             }
         }
     }

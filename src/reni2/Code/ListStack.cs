@@ -72,11 +72,22 @@ namespace Reni.Code
 
         protected override StackData Pull(Size size)
         {
-            var i = Index(size);
-            if(i == null)
-                return base.Pull(size);
-            return Tail(i.Value);
+            var sizeRemaining = size;
+            var start = 0;
+            while(start < _data.Length && sizeRemaining.IsPositive)
+            {
+                sizeRemaining -= _data[start].Size;
+                start++;
+            }
+
+            var result = Tail(start);
+            if(sizeRemaining.IsZero)
+                return result;
+
+            var subStack = _data[start - 1].DoPull(_data[start - 1].Size + sizeRemaining);
+            return result.Push(subStack);
         }
+
 
         StackData Head(int value) => SubString(0, value);
         StackData Tail(int value) => SubString(value, _data.Length - value);

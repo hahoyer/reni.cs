@@ -62,7 +62,9 @@ namespace Reni.Code
                 return this;
             if(size == Size)
                 return new EmptyStackData(OutStream);
-            return Pull(size);
+            var result = Pull(size);
+            Tracer.Assert(result.Size + size == Size);
+            return result;
         }
 
         internal StackData BitCast(Size dataSize)

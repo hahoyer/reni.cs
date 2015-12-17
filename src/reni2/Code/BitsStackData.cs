@@ -27,6 +27,13 @@ namespace Reni.Code
                 return BitCast(size);
             return base.GetTop(size);
         }
+
+        protected override StackData Pull(Size size)
+        {
+            if(size <= Size)
+                return new BitsStackData(_data.ShiftDown(size),OutStream);
+            return base.Pull(size);
+        }
         internal override Size Size => GetBitsConst().Size;
     }
 }
