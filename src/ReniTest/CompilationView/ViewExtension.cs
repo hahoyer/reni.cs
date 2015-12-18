@@ -149,7 +149,12 @@ namespace ReniTest.CompilationView
         }
 
         static string GetIdText(this object target)
-            => target.GetType().PrettyName() + "." + target.GetObjectId() + "i";
+        {
+            var result = target.GetType().PrettyName();
+            if(target is Dumpable)
+                return result + "." + target.GetObjectId() + "i";
+            return result;
+        }
 
         internal static Control CreateView(this Call target, SourceView master)
         {
