@@ -34,7 +34,8 @@ namespace Reni.Struct
             _order = CodeArgs.NextOrder++;
             Syntax = syntax;
             Parent = parent;
-            View = new FunctionCache<int, CompoundView>(position=> new CompoundView(this, position));
+            View = new FunctionCache<int, CompoundView>
+                (position => new CompoundView(this, position));
         }
 
         public string GetCompoundIdentificationDump() => Syntax.GetCompoundIdentificationDump();
@@ -55,6 +56,14 @@ namespace Reni.Struct
         CompoundView ToCompoundView => Parent.CompoundView(Syntax);
 
         Size IndexSize => Syntax.IndexSize;
+
+        [DisableDump]
+        internal IEnumerable<ResultCache> CachedResults => Syntax.EndPosition.Select(CachedResult);
+
+        ResultCache CachedResult(int position)
+            => Parent
+                .CompoundPositionContext(Syntax, position)
+                .ResultCache(Syntax.Statements[position]);
 
         internal Size Size(int position)
         {
@@ -83,16 +92,11 @@ namespace Reni.Struct
                     .Select(i => fromPosition + i)
                     .Where(position => !Syntax.Statements[position].IsLambda)
                     .Select(position => AccessResult(category, position))
-                    .Select(r => r.Align)
+                    .Select(r => r.Align.LocalBlock(category))
                     .ToArray();
                 Dump("Statements", statements);
                 BreakExecution();
-                var results = statements
-                    .Select(r => r.LocalBlock(category))
-                    .ToArray();
-                Dump("results", results);
-                BreakExecution();
-                var result = results
+                var result = statements
                     .Aggregate
                     (
                         Parent.RootContext.VoidType.Result(category),
@@ -107,7 +111,7 @@ namespace Reni.Struct
 
         internal Result Result(Category category)
         {
-            var trace = Syntax.ObjectId == -14 && (category.HasCode||category.HasExts);
+            var trace = Syntax.ObjectId == -14 && (category.HasCode || category.HasExts);
             StartMethodDump(trace, category);
             try
             {
@@ -159,7 +163,7 @@ namespace Reni.Struct
                 Dump(nameof(rawResult), rawResult);
                 BreakExecution();
                 var unFunction = rawResult.SmartUn<FunctionType>();
-                Dump(nameof(unFunction), unFunction); 
+                Dump(nameof(unFunction), unFunction);
                 BreakExecution();
                 var result = unFunction.AutomaticDereferenceResult;
                 return ReturnMethodDump(result);
@@ -212,14 +216,5 @@ namespace Reni.Struct
         }
 
         bool? InnerHllwStatic(int position) => Syntax.Statements[position].Hllw;
-
-        internal string[] DataIndexList()
-            => Syntax
-                .Statements
-                .Length
-                .Select()
-                .Where(i => !InternalInnerHllwStructureElement(i))
-                .Select(i => i.ToString() + "=" + AccessResult(Category.Size, i).Size.ToString())
-                .ToArray();
     }
 }

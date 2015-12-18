@@ -14,7 +14,7 @@ using ScintillaNET;
 
 namespace ReniTest.CompilationView
 {
-    sealed class SourceView : MainView
+    sealed class SourceView : MainView, ViewExtension.IClickHandler
     {
         int _lineNumberMarginLength;
         readonly Scintilla TextBox;
@@ -160,7 +160,7 @@ namespace ReniTest.CompilationView
 
         void SignalClickedObject(object target) => ChildViews[target].Run();
 
-        internal void SignalClicked(object target) => SignalClickedObject(target);
+        void ViewExtension.IClickHandler.Signal(object target) => SignalClickedObject(target);
         internal void SignalClickedFunction(int index)
             => SignalClickedObject(Compiler.FindFunction(index));
 

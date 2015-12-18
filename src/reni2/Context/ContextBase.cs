@@ -72,7 +72,7 @@ namespace Reni.Context
         internal Result Result(Category category, CompileSyntax syntax)
             => ResultCache(syntax).GetCategories(category);
 
-        ResultCache ResultCache(CompileSyntax syntax) => CacheObject.ResultCache[syntax];
+        internal ResultCache ResultCache(CompileSyntax syntax) => CacheObject.ResultCache[syntax];
 
         internal ResultCache ResultAsReferenceCache(CompileSyntax syntax)
             => CacheObject.ResultAsReferenceCache[syntax];
@@ -330,5 +330,6 @@ namespace Reni.Context
         internal IEnumerable<ResultCache.IResultProvider> GetDefinableResults
             (IContextReference ext, Definable definable, CompileSyntax right)
             => Declaration(definable).GetDefinableResults(ext, this, right);
+
     }
 }

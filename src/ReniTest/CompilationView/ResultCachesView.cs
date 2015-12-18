@@ -13,9 +13,9 @@ namespace ReniTest.CompilationView
     sealed class ResultCachesView : ChildView
     {
         public ResultCachesView(CompileSyntax syntax, SourceView master)
-            : base(master, syntax.GetType().PrettyName() + "-" + syntax.ObjectId)
+            : base(master, "ResultCaches: " + syntax.GetType().PrettyName() + "-" + syntax.ObjectId)
         {
-            Client = syntax.CreateClient(Master);
+            Client = syntax.ResultCache.CreateClient(Master);
             Source = syntax.SourcePart;
         }
 

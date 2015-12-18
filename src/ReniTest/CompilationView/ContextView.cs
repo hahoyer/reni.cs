@@ -11,7 +11,7 @@ namespace ReniTest.CompilationView
     sealed class ContextView : ChildView
     {
         public ContextView(ContextBase item, SourceView master)
-            : base(master, item.NodeDump)
+            : base(master, "Context: "+ item.NodeDump)
         {
             Client = item.CreateView(Master);
             Source = item.GetSource();

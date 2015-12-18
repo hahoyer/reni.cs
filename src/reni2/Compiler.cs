@@ -166,7 +166,10 @@ namespace Reni
             if(_parameters.ParseOnly)
                 return;
 
-            if(_parameters.RunFromCode)
+            if(_parameters.TraceOptions.CodeSequence)
+                Tracer.FlaggedLine("Code\n" + CodeContainer.Dump());
+
+            if (_parameters.RunFromCode)
             {
                 _isInExecutionPhase = true;
                 RunFromCode();
@@ -174,10 +177,7 @@ namespace Reni
                 return;
             }
 
-            if(_parameters.TraceOptions.CodeSequence)
-                Tracer.FlaggedLine("Code\n" + CodeContainer.Dump());
-
-            if(_parameters.TraceOptions.ExecutedCode)
+            if (_parameters.TraceOptions.ExecutedCode)
                 Tracer.FlaggedLine(CSharpString);
 
             foreach(var t in Issues)

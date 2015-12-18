@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <ProjectGuid>{A639A515-D066-4C12-A4C5-07DA91C19A2C}</ProjectGuid>
@@ -29,6 +29,7 @@
     <Compile Include="CompilationView\ResultCachesView.cs" />
     <Compile Include="CompilationView\PersistenceController.cs" />
     <Compile Include="CompilationView\GeneratorExtension.cs" />
+    <Compile Include="CompilationView\ResultCachesViewsPanel.cs" />
     <Compile Include="CompilationView\TextStyle.cs" />
     <Compile Include="CompilationView\SourceView.cs" />
     <Compile Include="CompilationView\TypeView.cs" />

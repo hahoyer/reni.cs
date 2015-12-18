@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Forms;
+using hw.Helper;
 using hw.Scanner;
 
 namespace ReniTest.CompilationView
@@ -15,6 +17,9 @@ namespace ReniTest.CompilationView
             Master = master;
             Master.Register(Frame);
             Frame.Activated += (a, b) => Master.SelectSource(Source);
+            Frame.FormBorderStyle = FormBorderStyle.SizableToolWindow;
+            Frame.MaximizeBox = false;
+            Frame.MinimizeBox = false;
         }
 
         protected abstract SourcePart Source { get; }

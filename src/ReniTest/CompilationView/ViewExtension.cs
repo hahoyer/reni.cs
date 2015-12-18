@@ -9,7 +9,6 @@ using hw.Scanner;
 using Reni;
 using Reni.Code;
 using Reni.Context;
-using Reni.Parser;
 using Reni.Struct;
 using Reni.Type;
 
@@ -17,6 +16,9 @@ namespace ReniTest.CompilationView
 {
     static class ViewExtension
     {
+        const int DefaultTextSize = 10;
+        static readonly Control _dummy = new Control();
+
         internal static Control CreateGroup(this Control client, string title)
         {
             var result = new GroupBox
@@ -35,9 +37,8 @@ namespace ReniTest.CompilationView
         internal static Control CreateView(this CodeBase code, SourceView master)
         {
             var control = code.Visit(new CodeViewVisitor(master));
-            if(!(control is TableLayoutPanel))
-                control = true.CreateLineupView(code.GetType().PrettyName().CreateView(), control);
-            return CreateGroup(control, "Code");
+            var title = code.Size.ToInt() + " " + code.GetType().GetIdText();
+            return CreateGroup(control, title);
         }
 
         internal static Control CreateView(this CodeArgs exts, SourceView master)
@@ -48,52 +49,68 @@ namespace ReniTest.CompilationView
                         .Select(item => item.CreateLink(master))
                         .ToArray());
 
-        internal static TableLayoutPanel CreateColumnView(this IEnumerable<Control> controls)
+        internal static Control CreateColumnView(this IEnumerable<Control> controls)
             => InternalCreateLineupView(true, controls);
 
-        internal static TableLayoutPanel CreateRowView(this IEnumerable<Control> controls)
+        internal static Control CreateRowView(this IEnumerable<Control> controls)
             => InternalCreateLineupView(false, controls);
 
-        internal static TableLayoutPanel CreateLineupView
+        internal static Control CreateLineupView
             (this bool inColumns, params Control[] controls)
             => InternalCreateLineupView(inColumns, controls);
 
-        static TableLayoutPanel InternalCreateLineupView
-            (bool inColumns, IEnumerable<Control> controls)
-        {
-            var effectiveControls = controls.Where(item => item != null).ToArray();
+        internal static TableLayoutPanel ForceLineupView
+            (this bool inColumns, params Control[] controls)
+            => CreateTableLayoutPanel(inColumns, controls);
 
+        static Control InternalCreateLineupView
+            (bool useColumns, IEnumerable<Control> controls)
+        {
+            var effectiveControls = controls.Where(item => item != null && item != _dummy).ToArray();
+            return effectiveControls.Length == 1
+                ? effectiveControls[0]
+                : CreateTableLayoutPanel(useColumns, effectiveControls);
+        }
+
+        static TableLayoutPanel CreateTableLayoutPanel(bool inColumns, Control[] controls)
+        {
             var result = new TableLayoutPanel
             {
                 AutoSize = true,
                 AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                ColumnCount = inColumns ? effectiveControls.Length : 1,
-                RowCount = inColumns ? 1 : effectiveControls.Length,
+                ColumnCount = inColumns ? controls.Length : 1,
+                RowCount = inColumns ? 1 : controls.Length,
                 CellBorderStyle = TableLayoutPanelCellBorderStyle.Single
             };
 
-            result.Controls.AddRange(effectiveControls);
+            result.Controls.AddRange(controls);
             return result;
         }
 
         internal static Control CreateView(this Dumpable dumpable)
             => CreateView(dumpable.Dump());
 
+        internal static Control CreateView(this Type target)
+            => target.PrettyName().CreateView();
+
         internal static Control CreateView(this FunctionInstance target, SourceView master)
             => target.ResultCache.Data.CreateView(master);
 
-        internal static Label CreateView(this string text)
+        internal static Label CreateView(this string text, double factor = 1)
             => new Label
             {
-                Font = new Font("Lucida Console", 10),
+                Font = CreateFont(factor),
                 AutoSize = true,
                 Text = text
             };
 
-        internal static Label CreateView(this int value)
+        static Font CreateFont(double factor)
+            => new Font("Lucida Console", (int) (DefaultTextSize * factor));
+
+        internal static Label CreateView(this int value, double factor = 1)
             => new Label
             {
-                Font = new Font("Lucida Console", 10),
+                Font = CreateFont(factor),
                 AutoSize = true,
                 Text = value.ToString(),
                 TextAlign = ContentAlignment.MiddleRight
@@ -102,9 +119,7 @@ namespace ReniTest.CompilationView
         internal static Label CreateView(this Reni.Basics.Size size)
             => size == null
                 ? "unknown size".CreateView()
-                : size.IsZero
-                    ? "hollow".CreateView()
-                    : size.ToInt().CreateView();
+                : size.ToInt().CreateView();
 
         internal static Control CreateSizeView(this Result result)
         {
@@ -120,13 +135,21 @@ namespace ReniTest.CompilationView
             return type.CreateLink(master);
         }
 
-        internal static Control CreateLink(this object target, SourceView master)
+        public interface IClickHandler
         {
-            var text = target.GetType().PrettyName() + "." + target.GetObjectId() + "i";
-            var result = text.CreateView();
-            result.Click += (s, a) => master.SignalClicked(target);
+            void Signal(object target);
+        }
+
+
+        internal static Control CreateLink(this object target, IClickHandler master)
+        {
+            var result = target.GetIdText().CreateView();
+            result.Click += (s, a) => master.Signal(target);
             return result;
         }
+
+        static string GetIdText(this object target)
+            => target.GetType().PrettyName() + "." + target.GetObjectId() + "i";
 
         internal static Control CreateView(this Call target, SourceView master)
         {
@@ -151,40 +174,17 @@ namespace ReniTest.CompilationView
         internal static Control CreateTypeLineView(this TypeBase target, SourceView master)
             => true.CreateLineupView(target.Size.CreateView(), target.CheckedCreateView(master));
 
-        internal static TableLayoutPanel CreateClient(this CompileSyntax syntax, SourceView master)
-        {
-            var resultCacheViews =
-                syntax
-                    .ResultCache
-                    .Select(item => CreateView(item, master))
-                    .ToArray();
+        internal static Control CreateClient
+            (this FunctionCache<ContextBase, ResultCache> target, SourceView master)
+            =>
+                target.Count == 1
+                    ? target.First().CreateView(master)
+                    : new ResultCachesViewsPanel(target, master).Client;
 
-            var client = new TableLayoutPanel
-            {
-                ColumnCount = resultCacheViews.Length,
-                RowCount = 1
-            };
-
-            var styles = resultCacheViews
-                .Select
-                (
-                    item => new ColumnStyle(SizeType.Percent)
-                    {
-                        Width = 100 / resultCacheViews.Length
-                    }
-                );
-
-            foreach(var item in styles)
-                client.ColumnStyles.Add(item);
-
-            client.Controls.AddRange(resultCacheViews);
-            return client;
-        }
-
-        internal static Control CreateView
+        internal static TableLayoutPanel CreateView
             (this KeyValuePair<ContextBase, ResultCache> item, SourceView master)
         {
-            var control = false.CreateLineupView
+            var control = false.ForceLineupView
                 (
                     item.Key.CreateLink(master),
                     item.Value.Data.CreateView(master)
@@ -248,31 +248,29 @@ namespace ReniTest.CompilationView
 
         static Control CreateChildView(this object target, SourceView master)
         {
+            var head = true.CreateLineupView
+                (GetSize(target)?.CreateView(), target.CreateLink(master));
+
             var childView = CreateChildView(target as FunctionType, master)
-                ?? CreateChildView(target as CompoundContext)
-                ?? CreateChildView(target as CompoundType)
-                ?? CreateChildView(target as ArrayType)
-                    ?? CreateChildView(target as PointerType, master)
-                        ?? CreateChildView(target as Function, master)
-                            ?? CreateChildView(target as Root)
-                            ?? CreateChildView(target as BitType)
-                                ?? NotImplemented(target);
-            return false.CreateLineupView(target.CreateLink(master), childView);
+                ?? CreateChildView(target as CompoundContext, master)
+                    ?? CreateChildView(target as CompoundType)
+                        ?? CreateChildView(target as ArrayType)
+                            ?? CreateChildView(target as PointerType)
+                                ?? CreateChildView(target as Function, master)
+                                    ?? CreateChildView(target as Root)
+                                        ?? CreateChildView(target as BitType)
+                                            ?? NotImplemented(target);
+            return false.CreateLineupView(head, childView);
         }
+
+        static Reni.Basics.Size GetSize(object target) => (target as TypeBase)?.Size;
 
         static Control CreateChildView(this FunctionType target, SourceView master)
         {
             if(target == null)
                 return null;
 
-            var indexView = new Label
-            {
-                Font = new Font("Lucida Console", 20),
-                AutoSize = true,
-                Text = target.Index.ToString(),
-                TextAlign = ContentAlignment.MiddleCenter
-            };
-
+            var indexView = target.Index.CreateView(2);
             var argsTypeView = target.ArgsType.CreateLink(master);
             var setterView = target.Setter?.CreateView(master);
             var getterView = target.Getter.CreateView(master);
@@ -285,72 +283,68 @@ namespace ReniTest.CompilationView
                 );
         }
 
-        static Control CreateChildView(this IHollowChild<ContextBase> target, SourceView master)
-        {
-            if(target == null)
-                return null;
-
-            return true.CreateLineupView
-                (
-                    target.GetType().PrettyName().CreateView(),
-                    target.Parent.CreateLink(master)
-                );
-        }
-
-        static Control CreateChildView(this IHollowChild<TypeBase> target, SourceView master)
-        {
-            if(target == null)
-                return null;
-
-            return true.CreateLineupView
-                (
-                    (target as TypeBase)?.Size.CreateView(),
-                    target.GetType().PrettyName().CreateView(),
-                    target.Parent.CreateLink(master)
-                );
-        }
-
-        static Control CreateChildView(this PointerType target, SourceView master)
-        {
-            if(target == null)
-                return null;
-
-            return true.CreateLineupView
-                (
-                    target.Size.CreateView(),
-                    target.CreateLink(master)
-                );
-        }
+        static Control CreateChildView(this PointerType target)
+            => target == null ? null : _dummy;
 
         static Control CreateChildView(this Root target)
-            => target == null ? null : "Root".CreateView();
+            => target == null ? null : _dummy;
 
         static Control CreateChildView(this BitType target)
-            => target == null ? null : "bit".CreateView();
+            => target == null ? null : _dummy;
 
         static Control CreateChildView(this Function target, SourceView master)
             => target?.ArgsType.CreateLink(master).CreateGroup("Args");
 
         static Control CreateChildView(CompoundType target)
-            => target?.FindRecentCompoundView.CreateView();
+            => target == null ? null : _dummy;
 
-        static Control CreateChildView(this CompoundContext target)
-            => target?.View.CreateView();
+        static Control CreateChildView(this CompoundContext target, SourceView master)
+            => target?.View.CreateView(master);
 
         static Control CreateChildView(this ArrayType target)
         {
             if(target == null)
                 return null;
 
-            var c = target.Count.CreateView();
-            var m = target.IsMutable? "mutable".CreateView() : null;
+            var c = ("count=" + target.Count).CreateView();
+            var m = target.IsMutable ? "mutable".CreateView() : null;
             var t = target.IsTextItem ? "text_item".CreateView() : null;
 
-            return true.CreateLineupView(c,m,t);
+            var result = true.ForceLineupView(c, m, t);
+            result.CellBorderStyle = TableLayoutPanelCellBorderStyle.None;
+            return result;
         }
 
-        static Control CreateView(this CompoundView target)
-            => ((Dumpable)target).CreateView();
+        static Control CreateView(this CompoundView target, SourceView master)
+            => target.Compound.CreateView(target.ViewPosition, master);
+
+        static Control CreateView(this Compound compound, int viewPosition, SourceView master)
+        {
+            var x = compound
+                .CachedResults
+                .Select(i => i.Data.CreateView(master))
+                .ToArray();
+
+            var result = new TableLayoutPanel
+            {
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                ColumnCount = 2,
+                RowCount = x.Length,
+                CellBorderStyle = TableLayoutPanelCellBorderStyle.Single
+            };
+
+            for(var i = 0; i < x.Length; i++)
+            {
+                var control = ((i < viewPosition ? "" : "?") + i).CreateView(1.5);
+                var sourcePart = compound.Syntax.Statements[i].SourcePart;
+                control.Click += (a, b) => master.SelectSource(sourcePart);
+                result.Controls.Add(control, 0, i);
+                result.Controls.Add(x[i], 1, i);
+            }
+
+            return result;
+        }
 
         static Control NotImplemented(this object item)
         {

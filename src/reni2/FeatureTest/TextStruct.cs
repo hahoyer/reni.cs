@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using hw.Helper;
 using System.Linq;
+using hw.Helper;
 using hw.UnitTest;
 using Reni.FeatureTest.Array;
 using Reni.FeatureTest.BlogExamples;
@@ -44,8 +44,7 @@ namespace Reni.FeatureTest
     [ArrayReferenceAll]
     [Simple]
     [MixIn.Function]
-    public sealed class Text1 : TextStruct
-    {}
+    public sealed class Text1 : TextStruct {}
 
     [UnitTest]
     [Output("Hallo")]
@@ -60,6 +59,9 @@ namespace Reni.FeatureTest
         {
             Parameters.RunFromCode = true;
             Parameters.TraceOptions.Functions = true;
+            Parameters.TraceOptions.CodeSequence = true;
         }
+
+        public TextConcat(bool isExplicit) { }
     }
 }
