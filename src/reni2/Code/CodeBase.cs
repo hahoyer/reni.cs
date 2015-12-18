@@ -76,7 +76,7 @@ namespace Reni.Code
         {
             var refAlignParam = Root.DefaultRefAlignParam;
             var alignedSize = size.ByteAlignedSize;
-            return Add(new Assign(refAlignParam, alignedSize));
+            return Add(new Assign(alignedSize));
         }
 
 

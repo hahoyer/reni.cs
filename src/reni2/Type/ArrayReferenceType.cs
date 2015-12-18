@@ -22,6 +22,7 @@ namespace Reni.Type
             , IRepeaterType
             , IReference
             , IConversion
+            , IChild<TypeBase>
     {
         internal sealed class Options : DumpableObject
         {
@@ -75,6 +76,9 @@ namespace Reni.Type
         internal override Root RootContext => ValueType.RootContext;
         internal override string DumpPrintText
             => "(" + ValueType.DumpPrintText + ")reference" + options.DumpPrintText;
+
+        internal string DumpOptions => options.DumpPrintText;
+
         [DisableDump]
         RepeaterAccessType AccessType => _repeaterAccessTypeCache.Value;
         [DisableDump]
@@ -215,5 +219,7 @@ namespace Reni.Type
                     () => ArgCode.DePointer(ValueType.Size).Align(),
                     CodeArgs.Arg
                 );
+
+        TypeBase IChild<TypeBase>.Parent => ValueType;
     }
 }

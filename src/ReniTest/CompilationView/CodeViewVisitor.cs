@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using hw.Helper;
-using Reni;
 using Reni.Code;
 
 namespace ReniTest.CompilationView
@@ -14,7 +12,7 @@ namespace ReniTest.CompilationView
 
         internal CodeViewVisitor(SourceView master) { Master = master; }
 
-        internal override Control ContextRef(ReferenceCode visitedObject) 
+        internal override Control ContextRef(ReferenceCode visitedObject)
             => visitedObject.Context.CreateLink(Master);
 
         internal override Control LocalReference(LocalReference target)
@@ -84,6 +82,21 @@ namespace ReniTest.CompilationView
                     " RightSize=" + visitedObject.RightSize.ToInt()
                 ).CreateView();
 
+        internal override Control ArraySetter(ArraySetter visitedObject)
+            => ArrayAccess(visitedObject);
+
+        internal override Control ArrayGetter(ArrayGetter visitedObject)
+            => ArrayAccess(visitedObject);
+
+        internal override Control Assign(Assign visitedObject)
+            => ("TargetSize=" + visitedObject.TargetSize).CreateView();
+
+        static Control ArrayAccess(ArrayAccess visitedObject)
+            => (
+                "ElementSize=" + visitedObject.ElementSize +
+                    " IndexSize=" + visitedObject.IndexSize
+                ).CreateView();
+
         internal override Control Drop(Drop visitedObject) => "".CreateView();
 
         internal override Control BitArray(BitArray visitedObject)
@@ -93,7 +106,7 @@ namespace ReniTest.CompilationView
             (ThenElse visitedObject, Control newThen, Control newElse)
         {
             var thenView = newThen ?? Default(visitedObject.ThenCode);
-            var elseView = newElse?? Default(visitedObject.ElseCode);
+            var elseView = newElse ?? Default(visitedObject.ElseCode);
             return true.CreateLineupView(thenView, elseView);
         }
 

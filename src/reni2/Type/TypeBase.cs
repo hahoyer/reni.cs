@@ -729,26 +729,6 @@ namespace Reni.Type
     }
 
 
-    interface IForcedConversionProvider<in TDestination>
-    {
-        IEnumerable<IConversion> Result(TDestination destination);
-    }
-
-    interface IForcedConversionProviderForPointer<in TDestination>
-    {
-        IEnumerable<IConversion> Result(TDestination destination);
-    }
-
-    interface IHollowChild<out TParent>
-    {
-        TParent Parent { get; }
-    }
-
-    interface ISourceProvider
-    {
-        SourcePart Value{ get; }
-    }
-
     // Krautpuster
     // Gurkennudler
 }

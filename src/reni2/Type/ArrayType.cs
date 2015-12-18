@@ -24,7 +24,7 @@ namespace Reni.Type
             , ISymbolProviderForPointer<Count>
             , IForcedConversionProviderForPointer<ArrayReferenceType>
             , IRepeaterType
-        ,IHollowChild<TypeBase>
+        ,IChild<TypeBase>
     {
         [Node]
         [SmartNode]
@@ -325,6 +325,6 @@ namespace Reni.Type
             return false;
         }
 
-        TypeBase IHollowChild<TypeBase>.Parent => ElementType;
+        TypeBase IChild<TypeBase>.Parent => ElementType;
     }
 }

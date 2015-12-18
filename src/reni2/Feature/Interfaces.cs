@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -212,4 +213,24 @@ namespace Reni.Feature
     }
 
     interface IStepRelative {}
+
+    interface IForcedConversionProvider<in TDestination>
+    {
+        IEnumerable<IConversion> Result(TDestination destination);
+    }
+
+    interface IForcedConversionProviderForPointer<in TDestination>
+    {
+        IEnumerable<IConversion> Result(TDestination destination);
+    }
+
+    interface IChild<out TParent>
+    {
+        TParent Parent { get; }
+    }
+
+    interface ISourceProvider
+    {
+        SourcePart Value { get; }
+    }
 }

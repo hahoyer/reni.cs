@@ -9,6 +9,7 @@ using hw.Scanner;
 using Reni;
 using Reni.Code;
 using Reni.Context;
+using Reni.Feature;
 using Reni.Struct;
 using Reni.Type;
 
@@ -37,7 +38,7 @@ namespace ReniTest.CompilationView
         internal static Control CreateView(this CodeBase code, SourceView master)
         {
             var control = code.Visit(new CodeViewVisitor(master));
-            var title = code.Size.ToInt() + " " + code.GetType().GetIdText();
+            var title = code.Size.ToInt() + " " + code.GetIdText();
             return CreateGroup(control, title);
         }
 
@@ -215,11 +216,11 @@ namespace ReniTest.CompilationView
             if(target != null)
                 return target.Value;
 
-            var chidType = item as IHollowChild<TypeBase>;
+            var chidType = item as IChild<TypeBase>;
             if(chidType != null)
                 return GetSource(chidType.Parent);
 
-            var hollowChildContext = item as IHollowChild<ContextBase>;
+            var hollowChildContext = item as IChild<ContextBase>;
             if(hollowChildContext != null)
                 return GetSource(hollowChildContext.Parent);
 
@@ -242,8 +243,8 @@ namespace ReniTest.CompilationView
 
         static object ObtainParent(object target)
             => (target as Child)?.Parent
-                ?? (target as IHollowChild<TypeBase>)?.Parent
-                    ?? (object) (target as IHollowChild<ContextBase>)?.Parent;
+                ?? (target as IChild<TypeBase>)?.Parent
+                    ?? (object) (target as IChild<ContextBase>)?.Parent;
 
         internal static Control CreateView(this object target, SourceView master)
             => target
@@ -260,11 +261,12 @@ namespace ReniTest.CompilationView
                 ?? CreateChildView(target as CompoundContext, master)
                     ?? CreateChildView(target as CompoundType)
                         ?? CreateChildView(target as ArrayType)
-                            ?? CreateChildView(target as PointerType)
-                                ?? CreateChildView(target as Function, master)
-                                    ?? CreateChildView(target as Root)
-                                        ?? CreateChildView(target as BitType)
-                                            ?? NotImplemented(target);
+                            ?? CreateChildView(target as ArrayReferenceType)
+                                ?? CreateChildView(target as PointerType)
+                                    ?? CreateChildView(target as Reni.Context.Function, master)
+                                        ?? CreateChildView(target as Root)
+                                            ?? CreateChildView(target as BitType)
+                                                ?? NotImplemented(target);
             return false.CreateLineupView(head, childView);
         }
 
@@ -297,7 +299,7 @@ namespace ReniTest.CompilationView
         static Control CreateChildView(this BitType target)
             => target == null ? null : _dummy;
 
-        static Control CreateChildView(this Function target, SourceView master)
+        static Control CreateChildView(this Reni.Context.Function target, SourceView master)
             => target?.ArgsType.CreateLink(master).CreateGroup("Args");
 
         static Control CreateChildView(CompoundType target)
@@ -319,6 +321,9 @@ namespace ReniTest.CompilationView
             result.CellBorderStyle = TableLayoutPanelCellBorderStyle.None;
             return result;
         }
+
+        static Control CreateChildView(this ArrayReferenceType target)
+            => target?.DumpOptions.CreateView();
 
         static Control CreateView(this CompoundView target, SourceView master)
             => target.Compound.CreateView(target.ViewPosition, master);

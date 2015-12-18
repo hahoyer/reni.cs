@@ -111,5 +111,14 @@ namespace Reni.Code
 
         internal virtual TFiber BitArrayBinaryOp(BitArrayBinaryOp visitedObject)
             => default(TFiber);
+
+        internal virtual TFiber ArraySetter(ArraySetter visitedObject)
+            => default(TFiber);
+
+        internal virtual TFiber ArrayGetter(ArrayGetter visitedObject)
+            => default(TFiber);
+
+        internal virtual TFiber Assign(Assign visitedObject)
+            => default(TFiber);
     }
 }
