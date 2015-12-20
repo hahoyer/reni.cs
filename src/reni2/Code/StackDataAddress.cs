@@ -20,6 +20,14 @@ namespace Reni.Code
             _offset = offset;
         }
 
+        protected override StackData Pull(Size size) { throw new PullException(size); }
+
+        internal sealed class PullException : Exception
+        {
+            public PullException(Size size)
+                : base("Pull failed for size = " + size.Dump()) { }
+        }
+
         internal override Size Size => DataStack.RefSize;
 
         internal new StackData Dereference(Size size, Size dataSize)

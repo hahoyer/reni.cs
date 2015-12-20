@@ -48,7 +48,7 @@ namespace Reni.Code
 
         internal Container Main => MainCache.Value;
 
-        internal void Execute(IExecutionContext context) => Main.Data.Execute(context);
+        internal void Execute(IExecutionContext context, ITraceCollector traceCollector) => Main.Data.Execute(context, traceCollector);
 
         string GetCSharpStringForCache()
             => ModuleName.CreateCSharpString(Main, Functions);

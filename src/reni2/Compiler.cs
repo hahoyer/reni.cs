@@ -20,7 +20,8 @@ using static hw.Helper.ValueCacheExtension;
 
 namespace Reni
 {
-    public sealed class Compiler : DumpableObject, IExecutionContext, ValueCache.IContainer
+    public sealed class Compiler
+        : DumpableObject, ValueCache.IContainer, Root.IParent, IExecutionContext
     {
         static IScanner<SourceSyntax> Scanner(ITokenFactory<SourceSyntax> tokenFactory)
             => new Scanner<SourceSyntax>(Lexer.Instance, tokenFactory);
@@ -95,7 +96,14 @@ namespace Reni
 
         [Node]
         [DisableDump]
-        internal SourceSyntax SourceSyntax => this.CachedValue(() => Parse(Source + 0));
+        internal SourceSyntax SourceSyntax
+        {
+            get
+            {
+                lock(this)
+                    return this.CachedValue(() => Parse(Source + 0));
+            }
+        }
 
         [Node]
         [DisableDump]
@@ -123,17 +131,14 @@ namespace Reni
             }
         }
 
-        IOutStream IExecutionContext.OutStream => _parameters.OutStream;
-
-        bool IExecutionContext.IsTraceEnabled
+        bool IsTraceEnabled
             => _isInExecutionPhase && _parameters.TraceOptions.Functions;
 
-        bool IExecutionContext.ProcessErrors => _parameters.ProcessErrors;
+        bool Root.IParent.ProcessErrors => _parameters.ProcessErrors;
 
-        CodeBase IExecutionContext.Function(FunctionId functionId)
-            => CodeContainer.Function(functionId);
+        IExecutionContext Root.IParent.ExecutionContext => this;
 
-        Checked<CompileSyntax> IExecutionContext.Parse(string source) => Parse(source);
+        Checked<CompileSyntax> Root.IParent.Parse(string source) => Parse(source);
 
         Checked<CompileSyntax> Parse(string sourceText)
             => Parse(new Source(sourceText) + 0).Syntax.ToCompiledSyntax;
@@ -169,7 +174,7 @@ namespace Reni
             if(_parameters.TraceOptions.CodeSequence)
                 Tracer.FlaggedLine("Code\n" + CodeContainer.Dump());
 
-            if (_parameters.RunFromCode)
+            if(_parameters.RunFromCode)
             {
                 _isInExecutionPhase = true;
                 RunFromCode();
@@ -177,7 +182,7 @@ namespace Reni
                 return;
             }
 
-            if (_parameters.TraceOptions.ExecutedCode)
+            if(_parameters.TraceOptions.ExecutedCode)
                 Tracer.FlaggedLine(CSharpString);
 
             foreach(var t in Issues)
@@ -206,6 +211,13 @@ namespace Reni
             }
         }
 
+        internal void ExecuteFromCode(DataStack dataStack)
+        {
+            _isInExecutionPhase = true;
+            CodeContainer.Main.Data.Visit(dataStack);
+            _isInExecutionPhase = false;
+        }
+
         [DisableDump]
         internal IEnumerable<Issue> Issues
             => SourceSyntax.Issues
@@ -215,7 +227,7 @@ namespace Reni
 
         SourceSyntax Parse(SourcePosn source) => _tokenFactory.Parser.Execute(source);
 
-        void RunFromCode() => CodeContainer.Execute(this);
+        void RunFromCode() => CodeContainer.Execute(this, TraceCollector.Instance);
 
         internal void Materialize()
         {
@@ -268,6 +280,30 @@ namespace Reni
                 result += "Exception: \n" + exceptionText;
 
             return result;
+        }
+
+        IOutStream IExecutionContext.OutStream => _parameters.OutStream;
+
+        CodeBase IExecutionContext.Function(FunctionId functionId)
+            => CodeContainer.Function(functionId);
+    }
+
+    public sealed class TraceCollector : DumpableObject, ITraceCollector
+    {
+        internal static readonly ITraceCollector Instance = new TraceCollector();
+
+        void ITraceCollector.AssertionFailed(Func<string> dumper, int depth) 
+            => Tracer.Assert(false, dumper, depth + 1);
+
+        void ITraceCollector.Run(DataStack dataStack, IFormalCodeItem codeBase)
+        {
+            const string Stars = "\n******************************\n";
+            Tracer.Line(Stars + dataStack.Dump() + Stars);
+            Tracer.Line(codeBase.Dump());
+            Tracer.IndentStart();
+            codeBase.Visit(dataStack);
+            Tracer.IndentEnd();
+
         }
     }
 

@@ -105,6 +105,8 @@ namespace Reni.Code
 
         internal abstract void Visit(IVisitor visitor);
 
+        Size IFormalCodeItem.Size => DeltaSize;
+
         void IFormalCodeItem.Visit(IVisitor visitor) => Visit(visitor);
 
         protected virtual CodeArgs GetRefsImplementation() => CodeArgs.Void();
@@ -115,5 +117,6 @@ namespace Reni.Code
     {
         void Visit(IVisitor visitor);
         string Dump();
+        Size Size { get; }
     }
 }

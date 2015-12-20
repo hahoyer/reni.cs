@@ -2,20 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Helper;
 using Reni.Basics;
 using Reni.Context;
-using Reni.Parser;
-using Reni.Runtime;
 using Reni.Struct;
-using Reni.TokenClasses;
 
 namespace Reni.Code
 {
     sealed class DataStack : DumpableObject, IVisitor
     {
-        readonly IExecutionContext _context;
-
         sealed class LocalData : DumpableObject, IStackDataAddressBase
         {
             public StackData Data;
@@ -45,6 +39,8 @@ namespace Reni.Code
 
         internal static Size RefSize => Root.DefaultRefAlignParam.RefSize;
 
+        readonly IExecutionContext _context;
+        internal ITraceCollector TraceCollector;
         [EnableDump]
         LocalData _localData;
 
@@ -64,7 +60,7 @@ namespace Reni.Code
             do
             {
                 _localData.Frame = new FrameData(argsAndRefs);
-                SubVisit("call " + functionId, _context.Function(functionId));
+                SubVisit(_context.Function(functionId));
             } while(_localData.Frame.IsRepeatRequired);
             _localData.Frame = oldFrame;
         }
@@ -72,6 +68,20 @@ namespace Reni.Code
         void IVisitor.RecursiveCall() { _localData.Frame.IsRepeatRequired = true; }
 
         StackData Data { get { return _localData.Data; } set { _localData.Data = value; } }
+
+        internal Size Size
+        {
+            get { return Data.Size; }
+            set
+            {
+                if(Size == value)
+                    return;
+                if (Size < value)
+                    Push(new UnknownStackData(value - Size, Data.OutStream));
+                else
+                    Data = Data.ForcedPull(Size-value);
+            }
+        }
 
         void IVisitor.BitsArray(Size size, BitsConst data)
         {
@@ -125,20 +135,37 @@ namespace Reni.Code
 
         void IVisitor.BitCast(Size size, Size targetSize, Size significantSize)
         {
-            Tracer.Assert(size == targetSize);
+            TracerAssert
+                (
+                    size == targetSize,
+                    () =>
+                        nameof(size) + " == " + nameof(targetSize) +
+                            " " + nameof(size) + "=" + size +
+                            " " + nameof(targetSize) + "=" + targetSize);
             Push(Pull(targetSize).BitCast(significantSize).BitCast(size));
+        }
+
+        void TracerAssert(bool condition, Func<string> dumper)
+        {
+            if(TraceCollector == null)
+            {
+                Tracer.Assert(condition, dumper, 1);
+                return;
+            }
+
+            if(condition)
+                return;
+
+            TraceCollector.AssertionFailed(dumper, 1);
         }
 
         void IVisitor.PrintNumber(Size leftSize, Size rightSize)
         {
-            Tracer.Assert(rightSize.IsZero);
+            TracerAssert(rightSize.IsZero, () => "rightSize.IsZero");
             Pull(leftSize).PrintNumber();
         }
 
         void IVisitor.PrintText(Size size, Size itemSize) => Pull(size).PrintText(itemSize);
-
-        void IVisitor.LocalBlockEnd(Size size, Size intermediateSize)
-            => NotImplementedMethod(size, intermediateSize);
 
         void IVisitor.Drop(Size beforeSize, Size afterSize)
         {
@@ -179,51 +206,30 @@ namespace Reni.Code
 
         void IVisitor.List(CodeBase[] data)
         {
-            var index = 0;
             foreach(var codeBase in data)
-            {
-                SubVisit("[" + index + "]", codeBase);
-                index++;
-            }
+                SubVisit(codeBase);
         }
 
-        void SubVisit(string tag, IFormalCodeItem codeBase)
+        void SubVisit(IFormalCodeItem codeBase)
         {
-            const string stars = "\n******************************\n";
-            if(IsTraceEnabled)
-            {
-                Tracer.Line(stars + Dump() + stars);
-                Tracer.Line(tag + " " + codeBase.Dump());
-                Tracer.IndentStart();
-            }
-            codeBase.Visit(this);
-            if(IsTraceEnabled)
-                Tracer.IndentEnd();
+            if(TraceCollector == null)
+                codeBase.Visit(this);
+            else
+                TraceCollector.Run(this, codeBase);
         }
-
-        bool IsTraceEnabled => _context.IsTraceEnabled;
 
         void IVisitor.Fiber(FiberHead fiberHead, FiberItem[] fiberItems)
         {
-            SubVisit("[*]", fiberHead);
-            var index = 0;
+            SubVisit(fiberHead);
             foreach(var codeBase in fiberItems)
-            {
-                SubVisit("[" + index + "]", codeBase);
-                index++;
-            }
+                SubVisit(codeBase);
         }
 
         void IVisitor.ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode)
         {
             var bitsConst = Pull(condSize).GetBitsConst();
-            if(bitsConst.IsZero)
-                SubVisit("else:", elseCode);
-            else
-                SubVisit("then:", thenCode);
+            SubVisit(bitsConst.IsZero ? elseCode : thenCode);
         }
-
-        FunctionCache<string, StackData> Locals => _localData.Frame.Locals;
 
         StackData Pull(Size size)
         {
@@ -236,9 +242,12 @@ namespace Reni.Code
     interface IExecutionContext
     {
         IOutStream OutStream { get; }
-        bool IsTraceEnabled { get; }
-        bool ProcessErrors { get; }
         CodeBase Function(FunctionId functionId);
-        Checked<CompileSyntax> Parse(string source);
+    }
+
+    interface ITraceCollector
+    {
+        void AssertionFailed(Func<string> dumper, int depth);
+        void Run(DataStack dataStack, IFormalCodeItem codeBase);
     }
 }

@@ -22,7 +22,9 @@ namespace hw.Helper
             return new TypeLibrary(assembly.GetReferencedTypes());
         }
 
-        static TypeLibrary ReferencedTypes { get { return _referencedTypesCache.Value; } }
+        static TypeLibrary ReferencedTypes { get {
+                lock (_referencedTypesCache)
+                    return _referencedTypesCache.Value; } }
 
         public static string NullableName(this Type type)
         {

@@ -46,12 +46,6 @@ namespace Reni.Code
         static int RefBytes => DataHandler.RefBytes;
 
 
-        void IVisitor.LocalBlockEnd(Size size, Size intermediateSize)
-        {
-            NotImplementedMethod(size, intermediateSize);
-            throw new NotImplementedException();
-        }
-
         void IVisitor.Drop(Size beforeSize, Size afterSize)
         {
             if(afterSize.IsZero)

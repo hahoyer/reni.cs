@@ -108,5 +108,11 @@ namespace Reni.Code
         }
 
         internal void Assign(Size size, StackData right) => GetAddress().Assign(size, right);
+
+        virtual internal StackData ForcedPull(Size size)
+        {
+            NotImplementedMethod(size);
+            return null;
+        }
     }
 }

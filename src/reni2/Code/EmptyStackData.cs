@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.DebugFormatter;
 using Reni.Basics;
 
 namespace Reni.Code
 {
-    internal sealed class EmptyStackData : StackData
+    sealed class EmptyStackData : StackData
     {
         internal EmptyStackData(IOutStream outStream)
-            : base(outStream) {}
+            : base(outStream) { }
+
         internal override StackData Push(StackData stackData) => stackData;
         internal override StackData PushOnto(NonListStackData formerStack) => formerStack;
         internal override StackData PushOnto(ListStack formerStack) => formerStack;

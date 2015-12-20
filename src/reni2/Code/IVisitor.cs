@@ -21,7 +21,6 @@ namespace Reni.Code
         void PrintText(string dumpPrintText);
         void Fiber(FiberHead fiberHead, FiberItem[] fiberItems);
         void List(CodeBase[] data);
-        void LocalBlockEnd(Size size, Size intermediateSize);
         void RecursiveCall();
         void RecursiveCallCandidate();
         void ReferencePlus(Size right);

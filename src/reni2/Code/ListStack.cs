@@ -54,9 +54,15 @@ namespace Reni.Code
                 return _data[0].DoGetTop(size);
             var i = Index(size);
             if(i == null)
-                return base.GetTop(size);
+                throw new GetTopException(size);
 
             return Head(i.Value);
+        }
+
+        sealed class GetTopException : Exception
+        {
+            public GetTopException(Size size)
+                : base("GetTop failed for size = " + size.Dump()) {}
         }
 
         int? Index(Size size)
@@ -70,7 +76,9 @@ namespace Reni.Code
             return i;
         }
 
-        protected override StackData Pull(Size size)
+        protected override StackData Pull(Size size) => Pull(size, false);
+
+        StackData Pull(Size size, bool forced)
         {
             var sizeRemaining = size;
             var start = 0;
@@ -84,9 +92,16 @@ namespace Reni.Code
             if(sizeRemaining.IsZero)
                 return result;
 
-            var subStack = _data[start - 1].DoPull(_data[start - 1].Size + sizeRemaining);
-            return result.Push(subStack);
+            var headSize = _data[start - 1].Size + sizeRemaining;
+
+            var headStack = forced
+                ? new UnknownStackData(headSize, OutStream)
+                : _data[start - 1].DoPull(headSize);
+
+            return result.Push(headStack);
         }
+
+        internal override StackData ForcedPull(Size size) => Pull(size, true);
 
 
         StackData Head(int value) => SubString(0, value);

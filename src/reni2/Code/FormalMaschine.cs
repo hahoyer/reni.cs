@@ -96,16 +96,6 @@ namespace Reni.Code
             SetFormalValues(source, startAddress, dataSize);
         }
 
-        void IVisitor.LocalBlockEnd(Size size, Size intermediateSize)
-        {
-            var dataSize = (size - intermediateSize).ToInt();
-            var accesses = new FormalValueAccess[dataSize];
-            for(var i = 0; i < dataSize; i++)
-                accesses[i] = _data[i + _startAddress.ToInt()];
-            for(var i = 0; i < dataSize; i++)
-                _data[i + (_startAddress + intermediateSize).ToInt()] = accesses[i];
-        }
-
         void IVisitor.Drop(Size beforeSize, Size afterSize) => ResetInputValuesOfData(beforeSize - afterSize);
 
         void IVisitor.ReferencePlus(Size right)

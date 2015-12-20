@@ -27,7 +27,7 @@ namespace Reni.Context
         readonly FunctionList _functions = new FunctionList();
         [DisableDump]
         [Node]
-        internal readonly IExecutionContext ExecutionContext;
+        readonly IParent Parent;
 
         readonly ValueCache<RecursionType> _recursionTypeCache;
         readonly ValueCache<BitType> _bitCache;
@@ -35,12 +35,13 @@ namespace Reni.Context
         readonly ValueCache<IImplementation> _minusFeatureCache;
         readonly FunctionCache<string, CompileSyntax> _metaDictionary;
         readonly FunctionCache<bool, IImplementation> _createArrayFeatureCache;
+        public IExecutionContext ExecutionContext => Parent.ExecutionContext;
 
-        internal Root(IExecutionContext executionContext)
+        internal Root(IParent parent)
         {
+            Parent = parent;
             _recursionTypeCache = new ValueCache<RecursionType>(() => new RecursionType(this));
             _metaDictionary = new FunctionCache<string, CompileSyntax>(CreateMetaDictionary);
-            ExecutionContext = executionContext;
             _bitCache = new ValueCache<BitType>(() => new BitType(this));
             _voidCache = new ValueCache<VoidType>(() => new VoidType(this));
             _minusFeatureCache = new ValueCache<IImplementation>
@@ -63,7 +64,7 @@ namespace Reni.Context
 
         CompileSyntax CreateMetaDictionary(string source)
         {
-            var result = ExecutionContext.Parse(source);
+            var result = Parent.Parse(source);
             Tracer.Assert(!result.Issues.Any());
             return result.Value;
         }
@@ -94,7 +95,7 @@ namespace Reni.Context
             => new RefAlignParam(BitsConst.SegmentAlignBits, Size.Create(32));
 
         [DisableDump]
-        public bool ProcessErrors => ExecutionContext.ProcessErrors;
+        public bool ProcessErrors => Parent.ProcessErrors;
 
         IImplementation ISymbolProviderForPointer<Minus>.Feature
             (Minus tokenClass) => _minusFeatureCache.Value;
@@ -453,5 +454,11 @@ namespace Reni.Context
                 + source.End.Span(fullSource.End).Id;
         }
 
+        internal interface IParent
+        {
+            Checked<CompileSyntax> Parse(string source);
+            bool ProcessErrors { get; }
+            IExecutionContext ExecutionContext { get; }
+        }
     }
 }

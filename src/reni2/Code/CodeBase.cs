@@ -250,11 +250,11 @@ namespace Reni.Code
                 .Aggregate(this, (current, fiberItem) => current.Add(fiberItem));
         }
 
-        internal void Execute(IExecutionContext context)
+        internal void Execute(IExecutionContext context, ITraceCollector traceCollector)
         {
             try
             {
-                Visit(new DataStack(context));
+                Visit(new DataStack(context) {TraceCollector = traceCollector});
             }
             catch(UnexpectedContextReference e)
             {
@@ -265,6 +265,7 @@ namespace Reni.Code
         internal virtual void Visit(IVisitor visitor) => NotImplementedMethod(visitor);
 
         void IFormalCodeItem.Visit(IVisitor visitor) => Visit(visitor);
+        Size IFormalCodeItem.Size => Size;
 
         protected static CodeArgs GetRefs(CodeBase[] codeBases)
         {

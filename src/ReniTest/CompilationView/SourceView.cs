@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 using Reni;
@@ -51,6 +53,12 @@ namespace ReniTest.CompilationView
             Client = TextBox;
 
             TextBox.Text = text;
+        }
+
+        internal new void Run()
+        {
+            Task.Factory.StartNew(Compiler.Execute);
+            base.Run();
         }
 
         FunctionView CreateView(FunctionType target)
