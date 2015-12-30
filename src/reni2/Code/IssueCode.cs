@@ -1,8 +1,9 @@
-using System.Linq;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Reni.Basics;
 using Reni.Validation;
+
 
 namespace Reni.Code
 {
@@ -12,15 +13,10 @@ namespace Reni.Code
         readonly Issue[] _issues;
 
         internal IssueCode(params Issue[] issues)
-            : base(_nextObjectId++)
-        {
-            _issues = issues;
-        }
+            : base(_nextObjectId++) { _issues = issues; }
+
         protected override Size GetSize() => Size.Zero;
-        internal override CodeBase Add(FiberItem subsequentElement)
-        {
-            throw new NotImplementedException();
-        }
+        internal override CodeBase Add(FiberItem subsequentElement) { throw new NotImplementedException(); }
         internal override IEnumerable<Issue> Issues => _issues;
         internal override void Visit(IVisitor visitor) { }
 

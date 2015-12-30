@@ -67,7 +67,9 @@ namespace ReniTest.CompilationView
         static Control InternalCreateLineupView
             (bool useColumns, IEnumerable<Control> controls)
         {
-            var effectiveControls = controls.Where(item => item != null && item != _dummy).ToArray();
+            var effectiveControls = controls
+                .Where(item => item != null && item != _dummy)
+                .ToArray();
             return effectiveControls.Length == 1
                 ? effectiveControls[0]
                 : CreateTableLayoutPanel(useColumns, effectiveControls);
@@ -162,9 +164,7 @@ namespace ReniTest.CompilationView
             var functionId = target.FunctionId;
             var name = functionId.ToString();
             var result = name.CreateView();
-            result.Click +=
-                (a, b) => master.SignalClickedFunction(functionId.Index)
-                ;
+            result.Click += (a, b) => master.SignalClickedFunction(functionId.Index);
             return result;
         }
 
@@ -361,5 +361,6 @@ namespace ReniTest.CompilationView
             Dumpable.NotImplementedFunction(item);
             return null;
         }
+
     }
 }

@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 using Reni;
@@ -13,6 +9,8 @@ using Reni.Parser;
 using Reni.Struct;
 using Reni.Type;
 using ScintillaNET;
+using Lexer = ScintillaNET.Lexer;
+
 
 namespace ReniTest.CompilationView
 {
@@ -23,16 +21,16 @@ namespace ReniTest.CompilationView
         readonly ValueCache<CompilerBrowser> CompilerCache;
         readonly FunctionCache<CompileSyntax, ResultCachesView> ResultCachesViews;
         readonly FunctionCache<object, ChildView> ChildViews;
+        readonly BrowseTraceCollector TraceLog = new BrowseTraceCollector();
 
         internal SourceView(string text)
             : base("SourceView")
         {
             TextBox = new Scintilla
             {
-                Lexer = ScintillaNET.Lexer.Container,
+                Lexer = Lexer.Container,
                 VirtualSpaceOptions = VirtualSpace.UserAccessible
             };
-
 
             foreach(var id in TextStyle.All)
                 StyleConfig(id);
@@ -55,9 +53,9 @@ namespace ReniTest.CompilationView
             TextBox.Text = text;
         }
 
-        internal new void Run()
+        internal void Run()
         {
-            Task.Factory.StartNew(Compiler.Execute);
+            new TraceLogView(this).Run();
             base.Run();
         }
 
@@ -72,9 +70,9 @@ namespace ReniTest.CompilationView
 
         ChildView CreateView(object target)
             => CreateView(target as FunctionType)
-                ?? CreateView(target as ContextBase)
-                    ?? CreateView(target as TypeBase)
-                        ?? UnexpectedTarget(target);
+               ?? CreateView(target as ContextBase)
+               ?? CreateView(target as TypeBase)
+               ?? UnexpectedTarget(target);
 
         ChildView UnexpectedTarget(object item)
         {
@@ -162,13 +160,14 @@ namespace ReniTest.CompilationView
                 const int Padding = 2;
                 TextBox.Margins[0].Width
                     = TextBox.TextWidth(Style.LineNumber, new string('9', value + 1))
-                        + Padding;
+                      + Padding;
             }
         }
 
         void SignalClickedObject(object target) => ChildViews[target].Run();
 
         void ViewExtension.IClickHandler.Signal(object target) => SignalClickedObject(target);
+
         internal void SignalClickedFunction(int index)
             => SignalClickedObject(Compiler.FindFunction(index));
 
@@ -178,5 +177,25 @@ namespace ReniTest.CompilationView
                 return;
             TextBox.SetSelection(source.Position, source.EndPosition);
         }
+
+        internal ITraceLogItem TraceLogItem(IFormalCodeItem target) => TraceLog.GetItems(target);
+
+        internal void RunCode()
+        {
+            var parent = Compiler.ExecutionContext;
+            var dataStack = new DataStack(parent)
+            {
+                TraceCollector = TraceLog
+            };
+
+            Compiler.Execute(dataStack);
+        }
+
+        public Control CreateTraceLogView() => TraceLog.CreateView(this);
+    }
+
+    interface ITraceLogItem
+    {
+        Control CreateLink();
     }
 }

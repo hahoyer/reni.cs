@@ -1,13 +1,11 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using hw.DebugFormatter;
 using hw.Forms;
-using hw.Helper;
 using JetBrains.Annotations;
+
 
 namespace ReniTest.CompilationView
 {
@@ -33,15 +31,12 @@ namespace ReniTest.CompilationView
             };
         }
 
-        string GetFileName()
-        {
-            return Frame.Text.Select(ToValidFileChar).Aggregate("", (c, n) => c + n);
-        }
+        string GetFileName() { return Frame.Text.Select(ToValidFileChar).Aggregate("", (c, n) => c + n); }
 
         static string ToValidFileChar(char c)
         {
             if(Path.GetInvalidFileNameChars().Contains(c))
-                return "%" + (int)c;
+                return "%" + (int) c;
             return "" + c;
         }
 

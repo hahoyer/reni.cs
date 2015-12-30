@@ -116,7 +116,7 @@ namespace ReniTest.CompilationView
             {
                 AutoSize = true,
                 AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                ColumnCount = 4,
+                ColumnCount = 5,
                 RowCount = visitedObject.FiberItems.Length + 1,
                 CellBorderStyle = TableLayoutPanelCellBorderStyle.Single
             };
@@ -125,14 +125,16 @@ namespace ReniTest.CompilationView
             result.Controls.Add(fiberHead.Size.CreateView(), 1, 0);
             result.Controls.Add(fiberHead.GetType().CreateView(), 2, 0);
             result.Controls.Add(newHead ?? Default(fiberHead), 3, 0);
+            result.Controls.Add(Master.TraceLogItem(visitedObject).CreateLink(), 4, 0);
 
-            for(var i = 0; i < visitedObject.FiberItems.Length; i++)
+            for (var i = 0; i < visitedObject.FiberItems.Length; i++)
             {
                 var item = visitedObject.FiberItems[i];
                 result.Controls.Add(item.InputSize.CreateView(), 0, i + 1);
                 result.Controls.Add(item.OutputSize.CreateView(), 1, i + 1);
                 result.Controls.Add(item.GetType().CreateView(), 2, i + 1);
                 result.Controls.Add(newItems[i] ?? item.CreateView(), 3, i + 1);
+                result.Controls.Add(Master.TraceLogItem(item).CreateLink(), 4, i + 1);
             }
 
             return result;
@@ -144,7 +146,7 @@ namespace ReniTest.CompilationView
             {
                 AutoSize = true,
                 AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                ColumnCount = 3,
+                ColumnCount = 4,
                 RowCount = visitedObject.Data.Length,
                 CellBorderStyle = TableLayoutPanelCellBorderStyle.Single
             };
@@ -156,6 +158,7 @@ namespace ReniTest.CompilationView
                 result.Controls.Add(item.Size.CreateView(), 0, i);
                 result.Controls.Add(item.GetType().CreateView(), 1, i);
                 result.Controls.Add(enumerable[i] ?? Default(item), 2, i);
+                result.Controls.Add(Master.TraceLogItem(item).CreateLink(), 4, i + 1);
             }
 
             return result;
