@@ -1,14 +1,14 @@
-﻿@using hw.Helper
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="de-de">
     <head>
         <meta charset="utf-8" />
         <title>@Page.Title</title>
         <link href="~/Content/themes/base/jquery.ui.all.css" rel="stylesheet" type="text/css" />
         <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
-        <script src="~/Scripts/jquery-1.7.1.min.js"></script>
-        <script src="~/Scripts/jquery-ui-1.8.20.js"></script>
-        <script src="~/Scripts/modernizr-2.5.3.js"></script>
+        <link href="~/Resources/reni.ico" rel="shortcut icon" type="image/x-icon" />
+        <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+        <script src="~/Scripts/jquery-ui-1.10.3.js"></script>
+        <script src="~/Scripts/modernizr-2.6.2.js"></script>
         <meta name="viewport" content="width=device-width" />
     </head>
     <body>
@@ -40,7 +40,7 @@
                     <p>&copy; @DateTime.Now.Year - hahoyer HoyerWare</p>
                 </div>
                 <div class="float-right">
-                    <p>@DateTime.Now.Format()</p>
+                    <p>@DateTime.Now.ToString()</p>
                 </div>
             </div>
         </footer>
