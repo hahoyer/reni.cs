@@ -103,8 +103,7 @@ namespace Reni.Struct
             StartMethodDump(trace, category);
             try
             {
-
-                Dump(nameof(_body), _body.SourcePart); 
+                Dump(nameof(_body), _body.SourcePart);
                 BreakExecution();
                 var rawResult = Context.Result(category.Typed, _body);
 
@@ -207,5 +206,7 @@ namespace Reni.Struct
             NotImplementedMethod(ext);
             return null;
         }
+
+        internal IEnumerable<IFormalCodeItem> CodeItems => BodyCode.Visit(new ItemCollector());
     }
 }

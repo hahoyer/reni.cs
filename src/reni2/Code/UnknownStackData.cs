@@ -40,6 +40,15 @@ namespace Reni.Code
             { }
         }
 
+
+        internal sealed class StackDataAddressException : Exception
+        {
+            public StackDataAddressException()
+                : base("StackDataAddress failed")
+            { }
+        }
+
+        protected override StackDataAddress GetAddress() { throw new StackDataAddressException(); }
         internal override BitsConst GetBitsConst() { throw new GetBitsConstException(); }
         protected override StackData GetTop(Size size) { throw new GetTopException(size); }
         protected override StackData Pull(Size size) { throw new PullException(size); }

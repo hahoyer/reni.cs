@@ -23,7 +23,9 @@
   <ItemGroup>
     <Compile Include="CompilationView\BrowseTraceCollector.cs" />
     <Compile Include="CompilationView\ChildView.cs" />
+    <Compile Include="CompilationView\CodeView.cs" />
     <Compile Include="CompilationView\CodeViewVisitor.cs" />
+    <Compile Include="CompilationView\CompoundView.cs" />
     <Compile Include="CompilationView\ContextView.cs" />
     <Compile Include="CompilationView\FunctionView.cs" />
     <Compile Include="CompilationView\MainView.cs" />
@@ -31,6 +33,7 @@
     <Compile Include="CompilationView\PersistenceController.cs" />
     <Compile Include="CompilationView\GeneratorExtension.cs" />
     <Compile Include="CompilationView\ResultCachesViewsPanel.cs" />
+    <Compile Include="CompilationView\StepView.cs" />
     <Compile Include="CompilationView\TextStyle.cs" />
     <Compile Include="CompilationView\SourceView.cs" />
     <Compile Include="CompilationView\TraceLogView.cs" />

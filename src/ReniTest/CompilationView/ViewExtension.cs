@@ -26,7 +26,7 @@ namespace ReniTest.CompilationView
             {
                 Text = title,
                 AutoSize = true,
-                Dock = DockStyle.Top,
+                Dock = DockStyle.Fill,
                 AutoSizeMode = AutoSizeMode.GrowAndShrink
             };
             client.Location = result.DisplayRectangle.Location;
@@ -48,7 +48,8 @@ namespace ReniTest.CompilationView
                     exts
                         .Data
                         .Select(item => item.CreateLink(master))
-                        .ToArray());
+                        .ToArray()
+                );
 
         internal static Control CreateColumnView(this IEnumerable<Control> controls)
             => InternalCreateLineupView(true, controls);
@@ -97,7 +98,7 @@ namespace ReniTest.CompilationView
             => target.PrettyName().CreateView();
 
         internal static Control CreateView(this FunctionInstance target, SourceView master)
-            => target.ResultCache.Data.CreateView(master);
+            => target.BodyCode.CreateView(master);
 
         internal static Label CreateView(this string text, double factor = 1)
             => new Label
@@ -151,7 +152,7 @@ namespace ReniTest.CompilationView
             return result;
         }
 
-        static string GetIdText(this object target)
+        internal static string GetIdText(this object target)
         {
             var result = target.GetType().PrettyName();
             if(target is Dumpable)
@@ -259,14 +260,15 @@ namespace ReniTest.CompilationView
 
             var childView = CreateChildView(target as FunctionType, master)
                 ?? CreateChildView(target as CompoundContext, master)
-                    ?? CreateChildView(target as CompoundType)
-                        ?? CreateChildView(target as ArrayType)
-                            ?? CreateChildView(target as ArrayReferenceType)
-                                ?? CreateChildView(target as PointerType)
-                                    ?? CreateChildView(target as Reni.Context.Function, master)
-                                        ?? CreateChildView(target as Root)
-                                            ?? CreateChildView(target as BitType)
-                                                ?? NotImplemented(target);
+                    ?? CreateChildView(target as Compound, master)
+                        ?? CreateChildView(target as CompoundType)
+                            ?? CreateChildView(target as ArrayType)
+                                ?? CreateChildView(target as ArrayReferenceType)
+                                    ?? CreateChildView(target as PointerType)
+                                        ?? CreateChildView(target as Reni.Context.Function, master)
+                                            ?? CreateChildView(target as Root)
+                                                ?? CreateChildView(target as BitType)
+                                                    ?? NotImplemented(target);
             return false.CreateLineupView(head, childView);
         }
 
@@ -308,6 +310,9 @@ namespace ReniTest.CompilationView
         static Control CreateChildView(this CompoundContext target, SourceView master)
             => target?.View.CreateView(master);
 
+        static Control CreateChildView(this Compound target, SourceView master)
+            => target?.CompoundView.CreateView(master);
+
         static Control CreateChildView(this ArrayType target)
         {
             if(target == null)
@@ -325,7 +330,7 @@ namespace ReniTest.CompilationView
         static Control CreateChildView(this ArrayReferenceType target)
             => target?.DumpOptions.CreateView();
 
-        static Control CreateView(this CompoundView target, SourceView master)
+        static Control CreateView(this Reni.Struct.CompoundView target, SourceView master)
             => target.Compound.CreateView(target.ViewPosition, master);
 
         static Control CreateView(this Compound compound, int viewPosition, SourceView master)
@@ -361,6 +366,5 @@ namespace ReniTest.CompilationView
             Dumpable.NotImplementedFunction(item);
             return null;
         }
-
     }
 }

@@ -8,7 +8,7 @@ namespace ReniTest.CompilationView
 {
     sealed class TypeView : ChildView
     {
-        public TypeView(TypeBase item, SourceView master)
+        internal TypeView(TypeBase item, SourceView master)
             : base(master, "Type: " + item.NodeDump)
         {
             Client = item.CreateView(Master);

@@ -31,7 +31,8 @@ namespace Reni.Struct
         [EnableDump]
         internal readonly GetterFunction Getter;
 
-        internal FunctionType(int index, FunctionSyntax body, CompoundView compoundView, TypeBase argsType)
+        internal FunctionType
+            (int index, FunctionSyntax body, CompoundView compoundView, TypeBase argsType)
         {
             Getter = new GetterFunction(this, index, body.Getter);
             Setter = body.Setter == null ? null : new SetterFunction(this, index, body.Setter);
@@ -80,6 +81,17 @@ namespace Reni.Struct
                 return result;
             }
         }
+
+        internal IEnumerable<IFormalCodeItem> CodeItems
+        {
+            get
+            {
+                var getter = Getter.CodeItems;
+                var setter = Setter?.CodeItems;
+                return setter == null ? getter : getter.Concat(setter);
+            }
+        }
+
         protected override Result SetterResult(Category category) => Setter.CallResult(category);
         protected override Result GetterResult(Category category) => Getter.CallResult(category);
         protected override Size GetSize() => ArgsType.Size + Exts.Size;
@@ -125,7 +137,6 @@ namespace Reni.Struct
                     );
                 Tracer.Assert(category == result.CompleteCategory);
                 return ReturnMethodDump(result);
-
             }
             finally
             {
@@ -142,7 +153,7 @@ namespace Reni.Struct
             var argsExt = ArgsType as IContextReference;
             if(argsExt != null)
                 Tracer.Assert(!result.Contains(argsExt));
-            return result ;
+            return result;
         }
     }
 }

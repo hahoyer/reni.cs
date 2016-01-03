@@ -7,11 +7,12 @@ using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
+using Reni.Feature;
 using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class Compound : DumpableObject, IContextReference
+    sealed class Compound : DumpableObject, IContextReference,IChild<ContextBase>
     {
         static int _nextObjectId;
 
@@ -53,7 +54,7 @@ namespace Reni.Struct
         internal Root RootContext => Parent.RootContext;
 
         [DisableDump]
-        CompoundView ToCompoundView => Parent.CompoundView(Syntax);
+        internal CompoundView CompoundView => Parent.CompoundView(Syntax);
 
         Size IndexSize => Syntax.IndexSize;
 
@@ -128,7 +129,7 @@ namespace Reni.Struct
                     .ReplaceRelative(this, CodeBase.TopRef, CodeArgs.Void)
                     ;
                 if(category.HasType)
-                    result.Type = ToCompoundView.Type;
+                    result.Type = CompoundView.Type;
                 return ReturnMethodDump(result);
             }
             finally
@@ -216,5 +217,7 @@ namespace Reni.Struct
         }
 
         bool? InnerHllwStatic(int position) => Syntax.Statements[position].Hllw;
+
+        ContextBase IChild<ContextBase>.Parent => Parent;
     }
 }

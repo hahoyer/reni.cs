@@ -1,16 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Forms;
 using hw.Scanner;
-using Reni.Context;
+using Reni.Struct;
 
 namespace ReniTest.CompilationView
 {
-    sealed class ContextView : ChildView
+    sealed class CompoundView : ChildView
     {
-        public ContextView(ContextBase item, SourceView master)
-            : base(master, "Context: "+ item.NodeDump)
+        public CompoundView(Compound item, SourceView master)
+            : base(master, "Compound: " + item.NodeDump)
         {
             Client = item.CreateView(Master);
             Source = item.GetSource();

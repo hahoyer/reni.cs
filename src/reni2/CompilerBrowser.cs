@@ -4,7 +4,6 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
-using JetBrains.Annotations;
 using Reni.Code;
 using Reni.Formatting;
 using Reni.Parser;
@@ -12,11 +11,12 @@ using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.UserInterface;
 
-
 namespace Reni
 {
     public sealed class CompilerBrowser : DumpableObject
     {
+        readonly IDictionary<IFormalCodeItem, int> CodeToFunctionIndexCache =
+            new Dictionary<IFormalCodeItem, int>();
         readonly FunctionCache<int, Token> LocateCache;
         readonly Compiler Parent;
 
@@ -45,8 +45,41 @@ namespace Reni
 
         public Token LocatePosition(int current) => LocateCache[current];
 
-        internal FunctionType FindFunction(int index)
+        internal FunctionType Function(int index)
             => Parent.RootContext.Function(index);
+
+
+        internal object FindFunction(IFormalCodeItem codeBase)
+        {
+            var result = FindFunctionIndex(codeBase);
+            return result == null
+                ? (object) Parent.CodeContainer.Main.Data
+                : Function(result.Value);
+        }
+
+        internal int? FindFunctionIndex(IFormalCodeItem codeBase)
+        {
+            int result;
+            if(CodeToFunctionIndexCache.TryGetValue(codeBase, out result))
+                return result;
+
+            var results = Parent
+                .RootContext
+                .FunctionCount
+                .Select()
+                .Where(item => !CodeToFunctionIndexCache.Values.Contains(item));
+
+            foreach(var index in results)
+            {
+                var codeItems = Function(index).CodeItems;
+                foreach(var item in codeItems)
+                    CodeToFunctionIndexCache.Add(item, index);
+                if(codeItems.Contains(codeBase))
+                    return index;
+            }
+
+            return null;
+        }
 
         internal IEnumerable<SourceSyntax> FindAllBelongings(SourceSyntax sourceSyntax)
             => Parent.SourceSyntax.Belongings(sourceSyntax);
@@ -88,6 +121,4 @@ namespace Reni
 
         internal void Execute(DataStack dataStack) => Parent.ExecuteFromCode(dataStack);
     }
-
-
 }

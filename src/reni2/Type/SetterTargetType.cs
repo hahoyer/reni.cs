@@ -80,6 +80,7 @@ namespace Reni.Type
             }
         }
 
+        [DisableDump]
         internal abstract TypeBase ValueType { get; }
         internal virtual Result DestinationResult(Category category) => ArgResult(category);
         protected abstract Result SetterResult(Category category);

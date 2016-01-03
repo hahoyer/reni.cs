@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using hw.Helper;
@@ -9,8 +11,6 @@ using Reni.Parser;
 using Reni.Struct;
 using Reni.Type;
 using ScintillaNET;
-using Lexer = ScintillaNET.Lexer;
-
 
 namespace ReniTest.CompilationView
 {
@@ -22,13 +22,14 @@ namespace ReniTest.CompilationView
         readonly FunctionCache<CompileSyntax, ResultCachesView> ResultCachesViews;
         readonly FunctionCache<object, ChildView> ChildViews;
         readonly BrowseTraceCollector TraceLog = new BrowseTraceCollector();
+        readonly TraceLogView LogView;
 
         internal SourceView(string text)
             : base("SourceView")
         {
             TextBox = new Scintilla
             {
-                Lexer = Lexer.Container,
+                Lexer = ScintillaNET.Lexer.Container,
                 VirtualSpaceOptions = VirtualSpace.UserAccessible
             };
 
@@ -51,11 +52,13 @@ namespace ReniTest.CompilationView
             Client = TextBox;
 
             TextBox.Text = text;
+
+            LogView = new TraceLogView(this);
         }
 
-        internal void Run()
+        internal new void Run()
         {
-            new TraceLogView(this).Run();
+            LogView.Run();
             base.Run();
         }
 
@@ -68,11 +71,23 @@ namespace ReniTest.CompilationView
         TypeView CreateView(TypeBase target)
             => target == null ? null : new TypeView(target, this);
 
+        CodeView CreateView(CodeBase target)
+            => target == null ? null : new CodeView(target, this);
+
+        CompoundView CreateView(Compound target)
+            => target == null ? null : new CompoundView(target, this);
+
+        StepView CreateView(BrowseTraceCollector.Step target)
+            => target == null ? null : new StepView(target, this);
+
         ChildView CreateView(object target)
             => CreateView(target as FunctionType)
-               ?? CreateView(target as ContextBase)
-               ?? CreateView(target as TypeBase)
-               ?? UnexpectedTarget(target);
+                ?? CreateView(target as ContextBase)
+                    ?? CreateView(target as TypeBase)
+                        ?? CreateView(target as CodeBase)
+                            ?? CreateView(target as BrowseTraceCollector.Step)
+                                ?? CreateView(target as Compound)
+                                    ?? UnexpectedTarget(target);
 
         ChildView UnexpectedTarget(object item)
         {
@@ -160,7 +175,7 @@ namespace ReniTest.CompilationView
                 const int Padding = 2;
                 TextBox.Margins[0].Width
                     = TextBox.TextWidth(Style.LineNumber, new string('9', value + 1))
-                      + Padding;
+                        + Padding;
             }
         }
 
@@ -169,7 +184,7 @@ namespace ReniTest.CompilationView
         void ViewExtension.IClickHandler.Signal(object target) => SignalClickedObject(target);
 
         internal void SignalClickedFunction(int index)
-            => SignalClickedObject(Compiler.FindFunction(index));
+            => SignalClickedObject(Compiler.Function(index));
 
         internal void SelectSource(SourcePart source)
         {
@@ -178,10 +193,12 @@ namespace ReniTest.CompilationView
             TextBox.SetSelection(source.Position, source.EndPosition);
         }
 
-        internal ITraceLogItem TraceLogItem(IFormalCodeItem target) => TraceLog.GetItems(target);
+        internal ITraceLogItem TraceLogItem(IFormalCodeItem target, SourceView master)
+            => TraceLog.GetItems(target, master);
 
         internal void RunCode()
         {
+            Compiler.Ensure();
             var parent = Compiler.ExecutionContext;
             var dataStack = new DataStack(parent)
             {
@@ -191,7 +208,15 @@ namespace ReniTest.CompilationView
             Compiler.Execute(dataStack);
         }
 
-        public Control CreateTraceLogView() => TraceLog.CreateView(this);
+        internal DataGridView CreateTraceLogView() => TraceLog.CreateView(this);
+
+        internal void SignalClickedCode(IFormalCodeItem codeBase)
+            => SignalClickedObject(Compiler.FindFunction(codeBase));
+
+        internal void SignalClickedSteps(BrowseTraceCollector.Step[] target)
+            => LogView.SignalClickedObject(target);
+        internal void SignalClickedStep(BrowseTraceCollector.Step target)
+            => SignalClickedObject(target);
     }
 
     interface ITraceLogItem

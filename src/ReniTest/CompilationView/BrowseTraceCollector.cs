@@ -4,11 +4,8 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using hw.DebugFormatter;
-using hw.Helper;
-using JetBrains.Annotations;
 using Reni;
 using Reni.Code;
-
 
 namespace ReniTest.CompilationView
 {
@@ -16,35 +13,39 @@ namespace ReniTest.CompilationView
     {
         internal sealed class Step : DumpableObject
         {
-            [UsedImplicitly]
-            internal int Index;
+            internal readonly int Index;
             internal readonly IFormalCodeItem CodeBase;
-            readonly DataStackMemento Before;
-            internal readonly Exception Exception;
-            readonly DataStackMemento After;
+            internal readonly DataStackMemento Before;
+            internal Exception Exception;
+            internal DataStackMemento After;
 
-            public Step
-                (
-                IFormalCodeItem codeBase,
-                DataStackMemento before,
-                Exception exception,
-                DataStackMemento after,
-                int index)
+            internal Step(IFormalCodeItem codeBase, DataStackMemento before, int index)
             {
                 CodeBase = codeBase;
                 Before = before;
-                Exception = exception;
-                After = after;
                 Index = index;
             }
 
             internal DataGridViewRow CreateRowForStep()
             {
                 var result = new DataGridViewRow();
-                result.Cells.Add(new DataGridViewTextBoxCell {Value = Index});
-                result.Cells.Add(new DataGridViewTextBoxCell {Value = CodeBase.NodeDump()});
+                result.Cells.Add
+                    (
+                        new DataGridViewTextBoxCell
+                        {
+                            Value = Index
+                        });
+                result.Cells.Add
+                    (
+                        new DataGridViewTextBoxCell
+                        {
+                            Value = CodeBase.NodeDump()
+                        });
                 if(Exception != null)
-                    result.DefaultCellStyle = new DataGridViewCellStyle {BackColor = Color.Red};
+                    result.DefaultCellStyle = new DataGridViewCellStyle
+                    {
+                        BackColor = Color.Red
+                    };
                 return result;
             }
 
@@ -66,47 +67,39 @@ namespace ReniTest.CompilationView
                 };
             }
 
-            internal void OnEnter(int columnIndex, SourceView master)
-            {
-                switch (columnIndex)
-                {
-                case 0:
-                    CreateView(Before);
-                    return;
-                case 1:
-                    if (Exception == null)
-                        CreateView(After);
-                    else
-                        CreateView(Exception);
-                    return;
-                }
-            }
-
             internal void OnSelect(int columnIndex, SourceView master)
             {
-                switch (columnIndex)
-                {
-                case 0:
-                    return;
-                case 1:
-                    master.    CreateView(Exception);
-                    return;
-                }
+                if(columnIndex == 0)
+                    master.SignalClickedStep(this);
+
+                if(columnIndex == 1)
+                    master.SignalClickedCode(CodeBase);
             }
 
-            void CreateView(Exception target) { NotImplementedMethod(target); }
-
-            void CreateView(DataStackMemento taget) { NotImplementedMethod(taget); }
+            internal Control CreateView(SourceView master)
+                => false.CreateLineupView
+                    (
+                        Exception?.ToString().CreateView(),
+                        true.CreateLineupView
+                            (
+                                Before.CreateView(master),
+                                After.CreateView(master)
+                            )
+                    );
         }
 
         internal sealed class DataStackMemento : DumpableObject
         {
             readonly string Text;
-            public DataStackMemento(DataStack dataStack) { Text = dataStack.Dump(); }
+
+            internal DataStackMemento(DataStack dataStack) { Text = dataStack.Dump(); }
+
+            internal Control CreateView(SourceView master) => Text.CreateView();
         }
 
         readonly IList<Step> Steps = new List<Step>();
-        readonly IDictionary<IFormalCodeItem, int[]> StepsForCode = new Dictionary<IFormalCodeItem, int[]>();
+        readonly IDictionary<IFormalCodeItem, int[]> StepsForCode =
+            new Dictionary<IFormalCodeItem, int[]>();
 
         void ITraceCollector.AssertionFailed(Func<string> dumper, int depth)
         {
@@ -115,24 +108,23 @@ namespace ReniTest.CompilationView
 
         void ITraceCollector.Run(DataStack dataStack, IFormalCodeItem codeBase)
         {
-            var before = new DataStackMemento(dataStack);
-            Exception runException = null;
             var beforeSize = dataStack.Size;
+            var index = Steps.Count;
+            var item = new Step(codeBase, new DataStackMemento(dataStack), index);
+            Steps.Add(item);
+            AssumeStepsForCode(item.CodeBase, index);
+
             try
             {
                 codeBase.Visit(dataStack);
             }
             catch(Exception exception)
             {
-                runException = exception;
+                item.Exception = exception;
                 dataStack.Size = beforeSize + codeBase.Size;
             }
 
-            var index = Steps.Count;
-            var item = new Step(codeBase, before, runException, new DataStackMemento(dataStack), index);
-            AssumeStepsForCode(item.CodeBase, index);
-
-            Steps.Add(item);
+            item.After = new DataStackMemento(dataStack);
         }
 
         void AssumeStepsForCode(IFormalCodeItem item, int index)
@@ -154,47 +146,68 @@ namespace ReniTest.CompilationView
                 : base(message) {}
         }
 
-        internal ITraceLogItem GetItems(IFormalCodeItem target)
+        internal ITraceLogItem GetItems(IFormalCodeItem target, SourceView master)
         {
             if(!StepsForCode.ContainsKey(target))
                 return EmptyItem;
             var data = StepsForCode[target].Select(item => Steps[item]);
-            return new TraceLogItem(data);
+            return new TraceLogItem(data, master);
         }
 
         static readonly ITraceLogItem EmptyItem = new EmptyTraceLogItem();
 
-        internal Control CreateView(SourceView master)
+        internal DataGridView CreateView(SourceView master)
         {
-            var result = new DataGridView {RowHeadersVisible = false};
+            var result = new DataGridView
+            {
+                RowHeadersVisible = false,
+                SelectionMode = DataGridViewSelectionMode.RowHeaderSelect,
+                MultiSelect = true
+            };
             result.Columns.AddRange(Step.DataGridViewColumns().ToArray());
             result.Rows.AddRange(Steps.Select(item => item.CreateRowForStep()).ToArray());
             result.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
-            result.CellDoubleClick += (a, b) => Steps[b.RowIndex].OnEnter(b.ColumnIndex, master);
+            result.CellClick += (a, b) => Steps[b.RowIndex].OnSelect(b.ColumnIndex, master);
             return result;
         }
     }
 
-    class EmptyTraceLogItem : DumpableObject, ITraceLogItem
+    sealed class EmptyTraceLogItem : DumpableObject, ITraceLogItem
     {
         Control ITraceLogItem.CreateLink() => "".CreateView();
     }
 
-    class TraceLogItem : DumpableObject, ITraceLogItem
+    sealed class TraceLogItem : DumpableObject, ITraceLogItem
     {
+        readonly SourceView Master;
         readonly BrowseTraceCollector.Step[] Data;
-        public TraceLogItem(IEnumerable<BrowseTraceCollector.Step> data) { Data = data.ToArray(); }
+
+        public TraceLogItem(IEnumerable<BrowseTraceCollector.Step> data, SourceView master)
+        {
+            Master = master;
+            Data = data.ToArray();
+        }
 
         Control ITraceLogItem.CreateLink()
         {
-            var result = Data
-                .Select(item => item.Index + (item.Exception == null ? "" : "?"))
-                .Stringify(", ")
-                .CreateView();
+            if(!Data.Any())
+                return new Control();
+
+            var text = Data.First().Index.ToString();
+            if(Data.Skip(1).Any())
+                text += " ...";
+            var result = text.CreateView();
             result.Click += (a, b) => OnClick();
             return result;
         }
 
-        void OnClick() { NotImplementedMethod(); }
+        void OnClick()
+        {
+            if(Data.Length == 1)
+                Master.SignalClickedStep(Data[0]);
+            else
+                Master.SignalClickedSteps(Data);
+        }
+
     }
 }
