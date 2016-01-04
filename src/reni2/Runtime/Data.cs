@@ -10,7 +10,7 @@ using Reni.Basics;
 namespace Reni.Runtime
 {
     [DebuggerDisplay("{Dump}")]
-    public sealed class Data
+    public sealed class Data: DumpableObject
     {
         readonly byte[] _data;
         int _length;
@@ -117,6 +117,15 @@ namespace Reni.Runtime
             var offset = Pull(indexBytes).GetBytes().Times(elementBytes, DataHandler.RefBytes);
             var baseAddress = Pull(DataHandler.RefBytes);
             Push(baseAddress.GetBytes().Plus(offset, DataHandler.RefBytes));
+        }
+
+        public void ArraySetter(int elementBytes, int indexBytes)
+        {
+            var right = Pull(DataHandler.RefBytes);
+            var offset = Pull(indexBytes).GetBytes().Times(elementBytes, DataHandler.RefBytes);
+            var baseAddress = Pull(DataHandler.RefBytes);
+            var left = baseAddress.GetBytes().Plus(offset, DataHandler.RefBytes);
+            left.AssignFromPointers(right._data, elementBytes);
         }
 
         public Data BitCast(int bits)
