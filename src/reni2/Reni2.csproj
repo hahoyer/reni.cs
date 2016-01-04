@@ -92,6 +92,7 @@
     <Compile Include="FeatureTest\Structure\SomeVariables.cs" />
     <Compile Include="FeatureTest\Structure\StrangeStructs.cs" />
     <Compile Include="FeatureTest\Structure\AccessMember.cs" />
+    <Compile Include="FeatureTest\Structure\ThisVariable.cs" />
     <Compile Include="FeatureTest\TypeType\ApplyTypeOperator.cs" />
     <Compile Include="FeatureTest\TypeType\ApplyTypeOperatorWithCut.cs" />
     <Compile Include="FeatureTest\TypeType\TypeOperator.cs" />

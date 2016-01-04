@@ -10,6 +10,7 @@ using Reni.FeatureTest.Helper;
 using Reni.FeatureTest.Integer;
 using Reni.FeatureTest.MixIn;
 using Reni.FeatureTest.Reference;
+using Reni.FeatureTest.Structure;
 using Reni.FeatureTest.Text;
 using Reni.FeatureTest.ThenElse;
 using Reni.FeatureTest.TypeType;
@@ -53,6 +54,7 @@ namespace Reni.FeatureTest
     [UserObjects]
     [UnMatchedBrackets]
     [AutomaticDereferencing]
+    [ThisVariable]
     public sealed class TextConcat : TextStruct
     {
         public TextConcat()

@@ -25,9 +25,9 @@ namespace ReniTest
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            //RunAllTests();
+            RunAllTests();
             //ExecT4CompilerGeneratedTest();
-            BrowseTestResult<TextConcat>();
+            //BrowseTestResult<TextConcat>();
         }
 
         static void BrowseTestResult<T>()
