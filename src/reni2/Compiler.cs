@@ -88,7 +88,7 @@ namespace Reni
         }
 
         static string ModuleNameFromFileName(string fileName)
-            => fileName == null ? null : Path.GetFileName(fileName).Symbolize();
+            => fileName == null ? null : "_" + Path.GetFileName(fileName).Symbolize();
 
         [Node]
         [DisableDump]
@@ -292,7 +292,7 @@ namespace Reni
     {
         internal static readonly ITraceCollector Instance = new TraceCollector();
 
-        void ITraceCollector.AssertionFailed(Func<string> dumper, int depth) 
+        void ITraceCollector.AssertionFailed(Func<string> dumper, int depth)
             => Tracer.Assert(false, dumper, depth + 1);
 
         void ITraceCollector.Run(DataStack dataStack, IFormalCodeItem codeBase)
@@ -303,7 +303,6 @@ namespace Reni
             Tracer.IndentStart();
             codeBase.Visit(dataStack);
             Tracer.IndentEnd();
-
         }
     }
 
