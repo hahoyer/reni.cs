@@ -10,7 +10,7 @@ using Reni.Basics;
 namespace Reni.Runtime
 {
     [DebuggerDisplay("{Dump}")]
-    public sealed class Data: DumpableObject
+    public sealed class Data
     {
         readonly byte[] _data;
         int _length;
@@ -135,7 +135,6 @@ namespace Reni.Runtime
             return Create(y.ToByteArray());
         }
 
-        [UsedImplicitly]
         string Dump => Pointer(0).AddressDump + ": " + DataDump;
 
         string DataDump => DataDumpPart();
