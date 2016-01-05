@@ -11,7 +11,7 @@ namespace Reni.FeatureTest.Structure
     [TargetSet(@"
 x: /\ 
 {
-  this: /!\ ^^;
+  this: /!\ ^^ reference;
   xxx: 12;
   result: this xxx; 
 },
