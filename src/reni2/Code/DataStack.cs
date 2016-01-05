@@ -40,6 +40,7 @@ namespace Reni.Code
         internal static Size RefSize => Root.DefaultRefAlignParam.RefSize;
 
         readonly IExecutionContext _context;
+        [DisableDump]
         internal ITraceCollector TraceCollector;
         [EnableDump]
         LocalData _localData;
