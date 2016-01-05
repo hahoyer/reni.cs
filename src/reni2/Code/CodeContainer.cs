@@ -21,7 +21,8 @@ namespace Reni.Code
         readonly FunctionCache<int, FunctionContainer> _functions;
         readonly ValueCache<string> CSharpStringCache;
 
-        internal CodeContainer(string moduleName, Root rootContext, Syntax syntax, string description)
+        internal CodeContainer
+            (string moduleName, Root rootContext, Syntax syntax, string description)
         {
             ModuleName = moduleName;
             RootContext = rootContext;
@@ -48,7 +49,8 @@ namespace Reni.Code
 
         internal Container Main => MainCache.Value;
 
-        internal void Execute(IExecutionContext context, ITraceCollector traceCollector) => Main.Data.Execute(context, traceCollector);
+        internal void Execute(IExecutionContext context, ITraceCollector traceCollector)
+            => Main.Data.Execute(context, traceCollector);
 
         string GetCSharpStringForCache()
             => ModuleName.CreateCSharpString(Main, Functions);
