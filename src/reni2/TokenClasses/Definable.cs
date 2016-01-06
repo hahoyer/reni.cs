@@ -62,9 +62,9 @@ namespace Reni.TokenClasses
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class Reference : Definable
+    sealed class StableReference : Definable
     {
-        public const string TokenId = "reference";
+        public const string TokenId = "stable_reference";
         [DisableDump]
         internal override IEnumerable<IDeclarationProvider> Genericize
             => this.GenericListFromDefinable(base.Genericize);

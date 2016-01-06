@@ -367,7 +367,7 @@
     <Compile Include="Type\DataSetterTargetType.cs" />
     <Compile Include="Type\FeaturePathBridge.cs" />
     <Compile Include="Type\NumberType.cs" />
-    <Compile Include="Type\Options.cs" />
+    <Compile Include="Type\Flags.cs" />
     <Compile Include="Type\ArrayReferenceType.cs" />
     <Compile Include="Type\RepeaterAccessType.cs" />
     <Compile Include="Type\Child.cs" />

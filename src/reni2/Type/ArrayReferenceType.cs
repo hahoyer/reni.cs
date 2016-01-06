@@ -26,22 +26,21 @@ namespace Reni.Type
     {
         internal sealed class Options : DumpableObject
         {
-            OptionsData OptionsData { get; }
+            Flags Data { get; }
 
             Options(string optionsId)
             {
-                OptionsData = new OptionsData(optionsId);
-                IsForceMutable = new OptionsData.Option(OptionsData, "force_mutable");
-                IsMutable = new OptionsData.Option(OptionsData, "mutable");
-                IsEnableReinterpretation = new OptionsData.Option
-                    (OptionsData, "enable_reinterpretation");
-                OptionsData.Align();
-                Tracer.Assert(OptionsData.IsValid);
+                Data = new Flags(optionsId);
+                IsForceMutable = Data.Register("force_mutable");
+                IsMutable = Data.Register("mutable");
+                IsEnableReinterpretation = Data.Register("enable_reinterpretation");
+                Data.Align();
+                Tracer.Assert(Data.IsValid);
             }
 
-            internal OptionsData.Option IsMutable { get; }
-            internal OptionsData.Option IsForceMutable { get; }
-            internal OptionsData.Option IsEnableReinterpretation { get; }
+            internal Flag IsMutable { get; }
+            internal Flag IsForceMutable { get; }
+            internal Flag IsEnableReinterpretation { get; }
 
             internal static Options Create(string optionsId) => new Options(optionsId);
 
@@ -49,7 +48,7 @@ namespace Reni.Type
                 => Create(null).IsForceMutable.SetTo(value);
 
             protected override string GetNodeDump() => DumpPrintText;
-            public string DumpPrintText => OptionsData.DumpPrintText;
+            public string DumpPrintText => Data.DumpPrintText;
         }
 
         readonly int _order;
@@ -58,7 +57,7 @@ namespace Reni.Type
         internal ArrayReferenceType(TypeBase valueType, string optionsId)
         {
             _order = CodeArgs.NextOrder++;
-            options = Options.Create(optionsId);
+            OptionsValue = Options.Create(optionsId);
             _repeaterAccessTypeCache = new ValueCache<RepeaterAccessType>
                 (() => new RepeaterAccessType(this));
             ValueType = valueType;
@@ -70,14 +69,14 @@ namespace Reni.Type
 
         [DisableDump]
         internal TypeBase ValueType { get; }
-        Options options { get; }
+        Options OptionsValue { get; }
 
         [DisableDump]
         internal override Root RootContext => ValueType.RootContext;
         internal override string DumpPrintText
-            => "(" + ValueType.DumpPrintText + ")reference" + options.DumpPrintText;
+            => "(" + ValueType.DumpPrintText + ")reference" + OptionsValue.DumpPrintText;
 
-        internal string DumpOptions => options.DumpPrintText;
+        internal string DumpOptions => OptionsValue.DumpPrintText;
 
         [DisableDump]
         RepeaterAccessType AccessType => _repeaterAccessTypeCache.Value;
@@ -93,22 +92,22 @@ namespace Reni.Type
             => base.RawSymmetricConversions;
 
         protected override string GetNodeDump()
-            => ValueType.NodeDump + "[array_reference]" + options.NodeDump;
+            => ValueType.NodeDump + "[array_reference]" + OptionsValue.NodeDump;
 
         protected override Size GetSize() => ValueType.Pointer.Size;
 
         [DisableDump]
-        internal bool IsMutable => options.IsMutable.Value;
+        internal bool IsMutable => OptionsValue.IsMutable.Value;
         [DisableDump]
         internal ArrayReferenceType Mutable
-            => ValueType.ArrayReference(options.IsMutable.SetTo(true));
+            => ValueType.ArrayReference(OptionsValue.IsMutable.SetTo(true));
         [DisableDump]
         internal ArrayReferenceType EnableReinterpretation
-            => ValueType.ArrayReference(options.IsEnableReinterpretation.SetTo(true));
+            => ValueType.ArrayReference(OptionsValue.IsEnableReinterpretation.SetTo(true));
 
         TypeBase IRepeaterType.ElementType => ValueType;
         TypeBase IRepeaterType.IndexType => RootContext.BitType.Number(Size.ToInt());
-        bool IRepeaterType.IsMutable => options.IsForceMutable.Value;
+        bool IRepeaterType.IsMutable => OptionsValue.IsForceMutable.Value;
 
         IConversion IReference.Converter => this;
         bool IReference.IsWeak => false;
@@ -146,7 +145,7 @@ namespace Reni.Type
 
         Result MutableResult(Category category)
         {
-            Tracer.Assert(options.IsForceMutable.Value);
+            Tracer.Assert(OptionsValue.IsForceMutable.Value);
             return ResultFromPointer(category, Mutable);
         }
 
@@ -174,7 +173,7 @@ namespace Reni.Type
             if(ValueType == destination.ValueType)
                 NotImplementedMethod(destination);
 
-            return options.IsEnableReinterpretation.Value;
+            return OptionsValue.IsEnableReinterpretation.Value;
         }
 
         Result ConversionResult(Category category, ArrayReferenceType source)
