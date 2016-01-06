@@ -42,7 +42,7 @@ namespace Reni.Type
             public readonly ValueCache<IReference> ForcedReference;
             [Node]
             [SmartNode]
-            public readonly ValueCache<PointerType> ForcedPointer;
+            public readonly FunctionCache<string, PointerType> Pointer;
             [Node]
             [SmartNode]
             public readonly ValueCache<TypeType> TypeType;
@@ -69,7 +69,7 @@ namespace Reni.Type
                         new ResultCache(category => parent.Mutation(category, destination))
                     );
                 ForcedReference = new ValueCache<IReference>(parent.ForcedReferenceForCache);
-                ForcedPointer = new ValueCache<PointerType>(parent.GetForcedPointerForCache);
+                Pointer = new FunctionCache<string, PointerType>(parent.GetForcedPointerForCache);
                 Pair = new FunctionCache<TypeBase, Pair>(first => new Pair(first, parent));
                 Array = new FunctionCache<int, FunctionCache<string, ArrayType>>
                     (
@@ -317,7 +317,8 @@ namespace Reni.Type
         [DisableDump]
         internal TypeBase FunctionInstance => _cache.FunctionInstanceType.Value;
 
-        internal PointerType ForcedPointer => _cache.ForcedPointer.Value;
+        internal PointerType ForcedPointer => PointerType(Type.PointerType.Options.Stable(false));
+        internal PointerType PointerType(string key) => _cache.Pointer[key];
 
         [DisableDump]
         internal virtual CompoundView FindRecentCompoundView
@@ -416,10 +417,10 @@ namespace Reni.Type
             return CheckedReference ?? ForcedPointer;
         }
 
-        protected virtual PointerType GetForcedPointerForCache()
+        protected virtual PointerType GetForcedPointerForCache(string optionsId)
         {
             Tracer.Assert(!Hllw);
-            return new PointerType(this);
+            return new PointerType(this, optionsId);
         }
 
 
