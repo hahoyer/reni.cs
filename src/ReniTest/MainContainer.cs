@@ -11,6 +11,7 @@ using hw.UnitTest;
 using Reni;
 using Reni.FeatureTest;
 using Reni.FeatureTest.Helper;
+using Reni.FeatureTest.Structure;
 using Reni.FeatureTest.TypeType;
 using Reni.ParserTest;
 using Reni.Runtime;
@@ -25,9 +26,9 @@ namespace ReniTest
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            RunAllTests();
+            //RunAllTests();
             //ExecT4CompilerGeneratedTest();
-            //BrowseTestResult<TextConcat>();
+            BrowseTestResult<ThisVariable1>();
         }
 
         static void BrowseTestResult<T>()
