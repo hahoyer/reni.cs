@@ -27,14 +27,12 @@ x()result dump_print
 x: /\ 
 {
   this: /!\ ^^ stable_reference;
-  !mutable xxx: 12;
-  result: this xxx; 
+  !mutable xxx: 12 
 };
 
 xx : x();
 xx this xxx := 2;
-
-x()result dump_print
+xx xxx dump_print
 
 ", "2")]
     public sealed class ThisVariable1 : CompilerTest { }

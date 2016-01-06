@@ -118,8 +118,10 @@ namespace Reni.Type
         {
             var provider = ValueType as IForcedConversionProviderForPointer<TDestination>;
             if(provider != null)
+            {
                 foreach(var feature in provider.Result(destination))
                     yield return feature;
+            }
 
             foreach(var feature in base.GetForcedConversions(destination))
                 yield return feature;
@@ -130,13 +132,23 @@ namespace Reni.Type
             => Feature.Extension.Value(StableReferenceResult);
 
         [DisableDump]
-        protected override IEnumerable<IConversion> StripConversions
-            => ValueType.StripConversionsFromPointer;
+        protected override IEnumerable<IConversion> StripConversions 
+            => ValueType.StripConversionsFromPointer.Concat(InternalStripConversions);
+
+        [DisableDump]
+        IEnumerable<IConversion> InternalStripConversions
+        {
+            get
+            {
+                if(IsStableReference)
+                    yield return ValueType.PointerType(OptionsValue.IsStable.SetTo(false));
+            }
+        }
 
         [DisableDump]
         internal override IImplementation FuncionDeclarationForType
             => ValueType.FunctionDeclarationForPointerType
-                ?? base.FuncionDeclarationForType;
+               ?? base.FuncionDeclarationForType;
 
         internal override IEnumerable<SearchResult> Declarations<TDefinable>(TDefinable tokenClass)
         {
