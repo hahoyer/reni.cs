@@ -42,8 +42,7 @@ namespace ReniTest.CompilationView
             TextBox.ContextMenu = new ContextMenu();
             TextBox.ContextMenu.Popup += (s, args) => OnContextMenuPopup();
 
-            CompilerCache = new ValueCache<CompilerBrowser>
-                (() => Reni.Compiler.BrowserFromText(TextBox.Text));
+            CompilerCache = new ValueCache<CompilerBrowser>(CreateCompilerBrowser);
 
             ResultCachesViews = new FunctionCache<CompileSyntax, ResultCachesView>
                 (item => new ResultCachesView(item, this));
@@ -55,6 +54,16 @@ namespace ReniTest.CompilationView
 
             LogView = new TraceLogView(this);
         }
+
+        CompilerBrowser CreateCompilerBrowser()
+            => Reni.Compiler.BrowserFromText
+                (
+                    TextBox.Text,
+                    new CompilerParameters
+                    {
+                        OutStream = new StringStream()
+                    }
+                );
 
         internal new void Run()
         {
@@ -215,6 +224,7 @@ namespace ReniTest.CompilationView
 
         internal void SignalClickedSteps(BrowseTraceCollector.Step[] target)
             => LogView.SignalClickedObject(target);
+
         internal void SignalClickedStep(BrowseTraceCollector.Step target)
             => SignalClickedObject(target);
     }
