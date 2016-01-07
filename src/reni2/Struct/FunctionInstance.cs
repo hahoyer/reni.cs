@@ -206,7 +206,7 @@ namespace Reni.Struct
             NotImplementedMethod(ext);
             return null;
         }
-
+        [DisableDump]
         internal IEnumerable<IFormalCodeItem> CodeItems => BodyCode.Visit(new ItemCollector());
     }
 }

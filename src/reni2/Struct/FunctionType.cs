@@ -82,6 +82,7 @@ namespace Reni.Struct
             }
         }
 
+        [DisableDump]
         internal IEnumerable<IFormalCodeItem> CodeItems
         {
             get

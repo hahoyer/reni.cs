@@ -17,6 +17,7 @@ namespace Reni.Feature
             Function = function;
             Source = source;
             Tracer.Assert(Source != null);
+            StopByObjectId(5);
         }
 
         Func<Category, Result> Function { get; }
