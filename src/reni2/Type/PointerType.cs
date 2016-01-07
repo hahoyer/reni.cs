@@ -72,11 +72,11 @@ namespace Reni.Type
         [DisableDump]
         internal override bool Hllw => false;
         [DisableDump]
-        internal override bool IsAligningPossible => IsStableReference;
+        internal override bool IsAligningPossible => false;
         [DisableDump]
-        internal override bool IsPointerPossible => IsStableReference;
+        internal override bool IsPointerPossible => false;
         [DisableDump]
-        internal bool IsStableReference => OptionsValue.IsStable.Value;
+        internal bool IsStable => OptionsValue.IsStable.Value;
         [DisableDump]
         internal PointerType StableReference
             => ValueType.PointerType(OptionsValue.IsStable.SetTo(true));
@@ -84,7 +84,7 @@ namespace Reni.Type
         Size IContextReference.Size => Size;
         int IContextReference.Order => _order;
         IConversion IReference.Converter => this;
-        bool IReference.IsWeak => !IsStableReference;
+        bool IReference.IsWeak => !IsStable;
         IConversion IProxyType.Converter => this;
         TypeBase IConversion.Source => this;
         Result IConversion.Execute(Category category) => DereferenceResult(category);
@@ -98,12 +98,20 @@ namespace Reni.Type
                 foreach(var conversion in base.RawSymmetricConversions)
                     yield return conversion;
 
-                if(!IsStableReference)
+                if(!IsStable)
                     yield return Feature.Extension.Conversion(DereferenceResult);
+
+                yield return Feature.Extension.Conversion(ToggleStableConversion);
             }
         }
 
-        protected override string GetNodeDump() => ValueType.NodeDump + "[Pointer]" + OptionsValue.DumpPrintText;
+        Result ToggleStableConversion(Category category) => Mutation(ToggleStable) & category;
+
+        [DisableDump]
+        TypeBase ToggleStable => ValueType.PointerType(OptionsValue.IsStable.SetTo(!IsStable));
+
+        protected override string GetNodeDump()
+            => ValueType.NodeDump + "[Pointer]" + OptionsValue.DumpPrintText;
 
         internal override int? SmartArrayLength(TypeBase elementType)
             => ValueType.SmartArrayLength(elementType);
@@ -118,10 +126,8 @@ namespace Reni.Type
         {
             var provider = ValueType as IForcedConversionProviderForPointer<TDestination>;
             if(provider != null)
-            {
                 foreach(var feature in provider.Result(destination))
                     yield return feature;
-            }
 
             foreach(var feature in base.GetForcedConversions(destination))
                 yield return feature;
@@ -132,23 +138,9 @@ namespace Reni.Type
             => Feature.Extension.Value(StableReferenceResult);
 
         [DisableDump]
-        protected override IEnumerable<IConversion> StripConversions 
-            => ValueType.StripConversionsFromPointer.Concat(InternalStripConversions);
-
-        [DisableDump]
-        IEnumerable<IConversion> InternalStripConversions
-        {
-            get
-            {
-                if(IsStableReference)
-                    yield return ValueType.PointerType(OptionsValue.IsStable.SetTo(false));
-            }
-        }
-
-        [DisableDump]
         internal override IImplementation FuncionDeclarationForType
             => ValueType.FunctionDeclarationForPointerType
-               ?? base.FuncionDeclarationForType;
+                ?? base.FuncionDeclarationForType;
 
         internal override IEnumerable<SearchResult> Declarations<TDefinable>(TDefinable tokenClass)
         {
