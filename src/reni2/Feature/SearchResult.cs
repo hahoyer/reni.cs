@@ -26,7 +26,9 @@ namespace Reni.Feature
             return searchResult;
         }
 
+        [EnableDump]
         IImplementation Feature { get; }
+        [EnableDump]
         ConversionPath ConverterPath { get; }
 
         internal SearchResult(SearchResult searchResult, ConversionPath relativeConversion)
@@ -57,15 +59,32 @@ namespace Reni.Feature
             ContextBase context,
             CompileSyntax right)
         {
-            var metaFeature = ((IMetaImplementation) Feature).Function;
-            if(metaFeature != null)
-                return metaFeature.Result(category, left, context, right);
+            var trace = ObjectId == 9 && category.HasCode;
+            StartMethodDump(trace, category, left, token, context, right);
+            try
+            {
+                var metaFeature = ((IMetaImplementation) Feature).Function;
+                if(metaFeature != null)
+                    return metaFeature.Result(category, left, context, right);
 
-            var result = Feature.Result(category.Typed, token, context, right);
-            var replaceAbsolute = result
-                .ReplaceAbsolute(ConverterPath.Destination.CheckedReference, ConverterPath.Execute);
-            var replaceArg = replaceAbsolute.ReplaceArg(left);
-            return replaceArg;
+                var result = Feature.Result(category.Typed, token, context, right);
+                Dump(nameof(result), result);
+                Dump(nameof(ConverterPath.Destination.CheckedReference), ConverterPath.Destination.CheckedReference); 
+                BreakExecution();
+
+                var replaceAbsolute = result
+                    .ReplaceAbsolute
+                    (ConverterPath.Destination.CheckedReference, ConverterPath.Execute);
+                Dump(nameof(replaceAbsolute), replaceAbsolute); 
+                BreakExecution();
+
+                return ReturnMethodDump(replaceAbsolute.ReplaceArg(left));
+
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
 
         internal Result SpecialExecute(Category category)

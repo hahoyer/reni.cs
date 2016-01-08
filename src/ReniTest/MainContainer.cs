@@ -26,7 +26,7 @@ namespace ReniTest
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            //RunAllTests();
+           // RunAllTests();
             //ExecT4CompilerGeneratedTest();
             BrowseTestResult<ThisVariable1>();
         }

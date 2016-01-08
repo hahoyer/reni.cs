@@ -17,13 +17,15 @@ namespace Reni.Feature
             Function = function;
             Source = source;
             Tracer.Assert(Source != null);
-            StopByObjectId(5);
+            StopByObjectIds();
         }
 
         Func<Category, Result> Function { get; }
 
         [EnableDump]
         TypeBase Source { get; }
+        [EnableDump]
+        TypeBase Destination => Function(Category.Type).Type;
 
         Result IConversion.Execute(Category category) => Function(category);
         TypeBase IConversion.Source => Source;
@@ -31,7 +33,7 @@ namespace Reni.Feature
         protected override string GetNodeDump()
             => Source.DumpPrintText
                 + "-->"
-                + (Function(Category.Type).Type?.DumpPrintText ?? "<unknown>")
+                + (Destination?.DumpPrintText ?? "<unknown>")
                 + " MethodName="
                 + Function.Method.Name;
     }

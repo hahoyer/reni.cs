@@ -369,6 +369,7 @@
     <Compile Include="Type\NumberType.cs" />
     <Compile Include="Type\Flags.cs" />
     <Compile Include="Type\ArrayReferenceType.cs" />
+    <Compile Include="Type\StableReferenceType.cs" />
     <Compile Include="Type\RepeaterAccessType.cs" />
     <Compile Include="Type\Child.cs" />
     <Compile Include="Type\CreateArrayFromReferenceFeature.cs" />

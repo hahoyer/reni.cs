@@ -66,7 +66,7 @@ namespace Reni.Struct
 
         Result IFunction.Result(Category category, TypeBase argsType)
         {
-            var trace = ObjectId == -241 && (category.Replenished.HasExts);
+            var trace = ObjectId == 19 && (category.Replenished.HasExts);
             StartMethodDump(trace, category, argsType);
             try
             {

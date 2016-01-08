@@ -114,12 +114,15 @@ namespace Reni.Struct
                 Dump("rawResult", rawResult);
                 BreakExecution();
 
-                var automaticDereferenceResult = rawResult.AutomaticDereferenceResult;
+                var adjustedResult = rawResult
+                    .AutomaticDereferenceResult
+                    .Align
+                    .Weaken;
 
-                Dump("automaticDereferenceResult", automaticDereferenceResult);
+                Dump(nameof(adjustedResult), adjustedResult);
                 BreakExecution();
 
-                var postProcessedResult = automaticDereferenceResult.Align
+                var postProcessedResult = adjustedResult
                     .LocalBlock(category);
 
                 Dump("postProcessedResult", postProcessedResult);

@@ -22,6 +22,7 @@ namespace Reni.Type
             , IContextReferenceProvider
             , IIconKeyProvider
             , ISearchTarget
+        , ValueCache.IContainer
     {
         sealed class Cache
         {
@@ -42,7 +43,7 @@ namespace Reni.Type
             public readonly ValueCache<IReference> ForcedReference;
             [Node]
             [SmartNode]
-            public readonly FunctionCache<string, PointerType> Pointer;
+            public readonly ValueCache<PointerType> Pointer;
             [Node]
             [SmartNode]
             public readonly ValueCache<TypeType> TypeType;
@@ -69,7 +70,7 @@ namespace Reni.Type
                         new ResultCache(category => parent.Mutation(category, destination))
                     );
                 ForcedReference = new ValueCache<IReference>(parent.ForcedReferenceForCache);
-                Pointer = new FunctionCache<string, PointerType>(parent.GetForcedPointerForCache);
+                Pointer = new ValueCache<PointerType>(parent.GetForcedPointerForCache);
                 Pair = new FunctionCache<TypeBase, Pair>(first => new Pair(first, parent));
                 Array = new FunctionCache<int, FunctionCache<string, ArrayType>>
                     (
@@ -317,8 +318,8 @@ namespace Reni.Type
         [DisableDump]
         internal TypeBase FunctionInstance => _cache.FunctionInstanceType.Value;
 
-        internal PointerType ForcedPointer => PointerType(Type.PointerType.Options.Stable(false));
-        internal PointerType PointerType(string key) => _cache.Pointer[key];
+        [DisableDump]
+        internal PointerType ForcedPointer => _cache.Pointer.Value;
 
         [DisableDump]
         internal virtual CompoundView FindRecentCompoundView
@@ -417,12 +418,11 @@ namespace Reni.Type
             return CheckedReference ?? ForcedPointer;
         }
 
-        protected virtual PointerType GetForcedPointerForCache(string optionsId)
+        protected virtual PointerType GetForcedPointerForCache()
         {
             Tracer.Assert(!Hllw);
-            return new PointerType(this, optionsId);
+            return new PointerType(this);
         }
-
 
         protected virtual ArrayType ArrayForCache(int count, string optionsId)
             => new ArrayType(this, count, optionsId);
@@ -727,6 +727,11 @@ namespace Reni.Type
                 .RemoveLowPriorityResults()
                 .Single()
                 .GetDefinableResults(ext, context, right);
+
+        ValueCache ValueCache.IContainer.Cache { get; }=new ValueCache();
+
+        [DisableDump]
+        virtual internal TypeBase Weaken => null; 
     }
 
 

@@ -533,6 +533,18 @@ namespace Reni
         }
 
         [DisableDump]
+        internal Result Weaken
+        {
+            get
+            {
+                var weakType = Type?.Weaken;
+                return weakType == null
+                    ? this
+                    : (Type.Mutation(weakType) & CompleteCategory).ReplaceArg(this);
+            }
+        }
+
+        [DisableDump]
         internal Result Clone => Filter(CompleteCategory);
 
         void AssertValid()
