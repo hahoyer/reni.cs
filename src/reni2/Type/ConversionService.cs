@@ -107,7 +107,7 @@ namespace Reni.Type
         internal static IEnumerable<ConversionPath> CloseRelativeConversions(this TypeBase source)
             => ClosureService
                 .Result(source)
-                .Where(path => path.IsCloseRelativeConversion);
+                .Where(path => path.Elements.Any());
 
         internal static IEnumerable<IConversion> SymmetricFeatureClosure(this TypeBase source)
         {

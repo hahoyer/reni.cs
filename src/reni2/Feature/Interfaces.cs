@@ -212,8 +212,6 @@ namespace Reni.Feature
             => callContext.Result(category, _definition.ReplaceArg(right));
     }
 
-    interface IStepRelative {}
-
     interface IForcedConversionProvider<in TDestination>
     {
         IEnumerable<IConversion> Result(TDestination destination);

@@ -121,10 +121,6 @@ namespace Reni.Type
 
         internal TypeBase Destination => Elements.LastOrDefault()?.ResultType() ?? Source;
 
-        [DisableDump]
-        internal bool IsCloseRelativeConversion
-            => Elements.Any() && Elements.All(Feature.Extension.IsCloseRelative);
-
         public static ConversionPath operator +(ConversionPath a, ConversionPath b)
             => new ConversionPath(a.Elements.Concat(b.Elements).ToArray());
 

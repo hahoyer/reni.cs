@@ -89,8 +89,6 @@ namespace Reni.Feature
             return result;
         }
 
-        internal static bool IsCloseRelative(IConversion feature) => !(feature is IStepRelative);
-
         public static IEnumerable<IGenericProviderForType> GenericListFromType<T>
             (this T target, IEnumerable<IGenericProviderForType> baseList = null)
             where T : TypeBase
