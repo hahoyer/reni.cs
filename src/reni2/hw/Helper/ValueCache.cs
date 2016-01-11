@@ -26,7 +26,7 @@ namespace hw.Helper
         void Ensure()
         {
             Tracer.Assert(!IsBusy, "Recursive attemt to get value.");
-            if(_isValid)
+            if (_isValid)
                 return;
 
             IsBusy = true;

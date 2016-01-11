@@ -34,7 +34,7 @@ namespace Reni
             => new Compiler(fileName, parameters);
 
         internal static Compiler FromFile(string fileName) => new Compiler(fileName);
-        internal static Compiler FromText(string text) => new Compiler(text: text);
+        public static Compiler FromText(string text) => new Compiler(text: text);
 
         readonly MainTokenFactory _tokenFactory;
         readonly CompilerParameters _parameters;

@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <ProjectGuid>{B639A515-D066-4C12-A4C5-07DA91C19A2C}</ProjectGuid>
+    <AssemblyName>reniBrowser</AssemblyName>
+    <TargetTypeEx>CSharp.WinExe</TargetTypeEx>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="nunit.framework, Version=3.0.5813.39031, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.3.0.1\lib\net45\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ScintillaNET, Version=3.5.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\jacobslusser.ScintillaNET.3.5.4\lib\net40\ScintillaNET.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <ProjectReference Include="..\reni2\Reni2.csproj">
+      <Project>{EBB73C84-6622-4183-A28F-B0DFF606006B}</Project>
+      <Name>Reni2</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CompilationView\BrowseTraceCollector.cs" />
+    <Compile Include="CompilationView\ChildView.cs" />
+    <Compile Include="CompilationView\CodeView.cs" />
+    <Compile Include="CompilationView\CodeViewVisitor.cs" />
+    <Compile Include="CompilationView\CompoundView.cs" />
+    <Compile Include="CompilationView\ContextView.cs" />
+    <Compile Include="CompilationView\FunctionView.cs" />
+    <Compile Include="CompilationView\GeneratorExtension.cs" />
+    <Compile Include="CompilationView\MainView.cs" />
+    <Compile Include="CompilationView\PersistenceController.cs" />
+    <Compile Include="CompilationView\ResultCachesView.cs" />
+    <Compile Include="CompilationView\ResultCachesViewsPanel.cs" />
+    <Compile Include="CompilationView\SourceView.cs" />
+    <Compile Include="CompilationView\StepView.cs" />
+    <Compile Include="CompilationView\TextStyle.cs" />
+    <Compile Include="CompilationView\TraceLogView.cs" />
+    <Compile Include="CompilationView\TypeView.cs" />
+    <Compile Include="CompilationView\View.cs" />
+    <Compile Include="CompilationView\ViewExtension.cs" />
+    <Compile Include="MainContainer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="sys.targets" />
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <Import Project="sys.targets" />
+</Project>

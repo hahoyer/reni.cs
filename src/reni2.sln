@@ -40,29 +40,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "reniTest", "ReniTest\reniTe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReniExe", "ReniExe\ReniExe.csproj", "{54D4A90B-C3CF-4F72-B447-CBC08B6EF5AB}"
 EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "RootSite", "RootSite\", "{B69EC56C-1A72-4996-9F3F-0F984B175B45}"
-	ProjectSection(WebsiteProperties) = preProject
-		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5"
-		ProjectReferences = "{ebb73c84-6622-4183-a28f-b0dff606006b}|Reni.dll;"
-		Debug.AspNetCompiler.VirtualPath = "/localhost_55591"
-		Debug.AspNetCompiler.PhysicalPath = "RootSite\"
-		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_55591\"
-		Debug.AspNetCompiler.Updateable = "true"
-		Debug.AspNetCompiler.ForceOverwrite = "true"
-		Debug.AspNetCompiler.FixedNames = "false"
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.VirtualPath = "/localhost_55591"
-		Release.AspNetCompiler.PhysicalPath = "RootSite\"
-		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_55591\"
-		Release.AspNetCompiler.Updateable = "true"
-		Release.AspNetCompiler.ForceOverwrite = "true"
-		Release.AspNetCompiler.FixedNames = "false"
-		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "55591"
-		SlnRelativePath = "RootSite\"
-		DefaultWebSiteLanguage = "Visual C#"
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{42AF6999-EE7E-46AC-BF8E-14F2F567ECF1}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\NuGet.Config = .nuget\NuGet.Config
@@ -87,6 +64,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReniLanguagePackage", "Reni
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Theory", "Theory\Theory.csproj", "{9C9C2707-F251-4376-8940-A96A0E1688C2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "reniBrowser", "ReniBrowser\reniBrowser.csproj", "{B639A515-D066-4C12-A4C5-07DA91C19A2C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -105,10 +84,6 @@ Global
 		{54D4A90B-C3CF-4F72-B447-CBC08B6EF5AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{54D4A90B-C3CF-4F72-B447-CBC08B6EF5AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{54D4A90B-C3CF-4F72-B447-CBC08B6EF5AB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B69EC56C-1A72-4996-9F3F-0F984B175B45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B69EC56C-1A72-4996-9F3F-0F984B175B45}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B69EC56C-1A72-4996-9F3F-0F984B175B45}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{B69EC56C-1A72-4996-9F3F-0F984B175B45}.Release|Any CPU.Build.0 = Debug|Any CPU
 		{E7CC94D4-F817-4A63-9848-C3D141133343}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E7CC94D4-F817-4A63-9848-C3D141133343}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E7CC94D4-F817-4A63-9848-C3D141133343}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -117,6 +92,10 @@ Global
 		{9C9C2707-F251-4376-8940-A96A0E1688C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C9C2707-F251-4376-8940-A96A0E1688C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C9C2707-F251-4376-8940-A96A0E1688C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B639A515-D066-4C12-A4C5-07DA91C19A2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B639A515-D066-4C12-A4C5-07DA91C19A2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B639A515-D066-4C12-A4C5-07DA91C19A2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B639A515-D066-4C12-A4C5-07DA91C19A2C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

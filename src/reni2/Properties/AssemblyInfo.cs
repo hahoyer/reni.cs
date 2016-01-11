@@ -13,4 +13,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright("Copyright © Harald Hoyer 2015")]
 [assembly: ComVisible(false)]
 
-[assembly: InternalsVisibleTo("ReniTest")]
+[assembly: InternalsVisibleTo("ReniBrowser")]

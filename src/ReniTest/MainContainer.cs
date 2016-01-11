@@ -9,13 +9,10 @@ using hw.Forms;
 using hw.Helper;
 using hw.UnitTest;
 using Reni;
-using Reni.FeatureTest;
 using Reni.FeatureTest.Helper;
-using Reni.FeatureTest.Structure;
 using Reni.FeatureTest.TypeType;
 using Reni.ParserTest;
 using Reni.Runtime;
-using ReniTest.CompilationView;
 
 namespace ReniTest
 {
@@ -26,14 +23,9 @@ namespace ReniTest
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-           // RunAllTests();
+            RunAllTests();
             //ExecT4CompilerGeneratedTest();
-            BrowseTestResult<ThisVariable1>();
         }
-
-        static void BrowseTestResult<T>()
-            where T : CompilerTest, new()
-            => new SourceView(new T().Targets.First()).Run();
 
         static void RunAllTests()
         {
