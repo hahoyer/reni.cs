@@ -26,7 +26,7 @@ namespace Reni.Code
                 ?.View;
             Tracer.ConditionalBreak
                 (compoundView?.Compound.Syntax.ObjectId == -11 && compoundView.ViewPosition == 4);
-            StopByObjectIds(2);
+            StopByObjectIds();
         }
 
         [Node]

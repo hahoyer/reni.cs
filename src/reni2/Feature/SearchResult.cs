@@ -45,7 +45,7 @@ namespace Reni.Feature
         {
             Feature = feature;
             ConverterPath = converterPath;
-            StopByObjectIds(9);
+            StopByObjectIds();
         }
 
         [DisableDump]
@@ -59,7 +59,7 @@ namespace Reni.Feature
             ContextBase context,
             CompileSyntax right)
         {
-            var trace = ObjectId == 9 && category.HasCode;
+            var trace = ObjectId == -9 && category.HasCode;
             StartMethodDump(trace, category, left, token, context, right);
             try
             {
