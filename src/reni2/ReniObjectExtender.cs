@@ -10,15 +10,6 @@ namespace Reni
 {
     static class Extension
     {
-        [DebuggerHidden]
-        public static void StopByObjectId(this object t, int objectId)
-        {
-            var reniObject = t as DumpableObject;
-            if(reniObject == null)
-                return;
-            reniObject.StopByObjectId(1, objectId);
-        }
-
         // will throw an exception if not a ReniObject
         internal static int GetObjectId(this object reniObject)
             => ((DumpableObject) reniObject).ObjectId;
