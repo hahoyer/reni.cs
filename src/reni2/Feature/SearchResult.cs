@@ -45,7 +45,7 @@ namespace Reni.Feature
         {
             Feature = feature;
             ConverterPath = converterPath;
-            StopByObjectIds();
+            StopByObjectIds(9);
         }
 
         [DisableDump]

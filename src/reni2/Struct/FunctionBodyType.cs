@@ -18,18 +18,19 @@ namespace Reni.Struct
             , IValue
             , IConversion
             , IImplementation
+        ,IChild<CompoundView>
     {
         [EnableDump]
         [Node]
-        readonly CompoundView _compoundView;
+        readonly CompoundView CompoundView;
         [EnableDump]
         [Node]
-        readonly FunctionSyntax _syntax;
+        internal readonly FunctionSyntax Syntax;
 
         public FunctionBodyType(CompoundView compoundView, FunctionSyntax syntax)
         {
-            _compoundView = compoundView;
-            _syntax = syntax;
+            CompoundView = compoundView;
+            Syntax = syntax;
         }
 
         sealed class ContextReference : DumpableObject, IContextReference
@@ -49,24 +50,24 @@ namespace Reni.Struct
             int IContextReference.Order => _order;
             Size IContextReference.Size => Root.DefaultRefAlignParam.RefSize;
             [EnableDump]
-            FunctionSyntax Syntax => _parent._syntax;
+            FunctionSyntax Syntax => _parent.Syntax;
         }
 
         [DisableDump]
-        internal override CompoundView FindRecentCompoundView => _compoundView;
+        internal override CompoundView FindRecentCompoundView => CompoundView;
         [DisableDump]
-        internal override Root RootContext => _compoundView.RootContext;
+        internal override Root RootContext => CompoundView.RootContext;
         [DisableDump]
         internal override bool Hllw => true;
 
         [DisableDump]
         internal override IImplementation FuncionDeclarationForType => this;
 
-        bool IFunction.IsImplicit => _syntax.IsImplicit;
+        bool IFunction.IsImplicit => Syntax.IsImplicit;
 
         Result IFunction.Result(Category category, TypeBase argsType)
         {
-            var trace = ObjectId == 19 && (category.Replenished.HasExts);
+            var trace = ObjectId == -19 && (category.Replenished.HasExts);
             StartMethodDump(trace, category, argsType);
             try
             {
@@ -88,7 +89,7 @@ namespace Reni.Struct
             }
         }
 
-        FunctionType Function(TypeBase argsType) => _compoundView.Function(_syntax, argsType);
+        FunctionType Function(TypeBase argsType) => CompoundView.Function(Syntax, argsType);
 
         IMeta IMetaImplementation.Function => null;
         IFunction IEvalImplementation.Function => this;
@@ -109,12 +110,14 @@ namespace Reni.Struct
         }
 
         ResultCache.IResultProvider IFunction.FindSource(IContextReference ext)
-            => _syntax.FindSource(ext, _compoundView.Context);
+            => Syntax.FindSource(ext, CompoundView.Context);
 
         ResultCache.IResultProvider IValue.FindSource(IContextReference ext)
         {
             NotImplementedMethod(ext);
             return null;
         }
+
+        CompoundView IChild<CompoundView>.Parent => CompoundView;
     }
 }
