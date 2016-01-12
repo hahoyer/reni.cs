@@ -99,7 +99,7 @@ namespace Reni.Struct
             if(IsStopByObjectIdActive)
                 return null;
 
-            var trace = FunctionId.Index == -10 && category.HasCode;
+            var trace = FunctionId.Index == 2 && category.HasCode;
             StartMethodDump(trace, category);
             try
             {
@@ -116,8 +116,7 @@ namespace Reni.Struct
 
                 var adjustedResult = rawResult
                     .AutomaticDereferenceResult
-                    .Align
-                    .Weaken;
+                    .Align;
 
                 Dump(nameof(adjustedResult), adjustedResult);
                 BreakExecution();
@@ -132,7 +131,8 @@ namespace Reni.Struct
 
                 var result = argReferenceReplaced
                     .ReplaceAbsolute
-                    (Context.FindRecentFunctionContextObject, CreateContextRefCode, CodeArgs.Void);
+                    (Context.FindRecentFunctionContextObject, CreateContextRefCode, CodeArgs.Void)
+                    .Weaken;
 
                 return ReturnMethodDump(result);
             }
