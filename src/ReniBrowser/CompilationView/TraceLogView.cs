@@ -1,10 +1,10 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using hw.Helper;
 using hw.Scanner;
 
-
-namespace ReniTest.CompilationView
+namespace ReniBrowser.CompilationView
 {
     sealed class TraceLogView : ChildView
     {

@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Forms;
 using hw.Scanner;
 using Reni.Context;
 
-namespace ReniTest.CompilationView
+namespace ReniBrowser.CompilationView
 {
     sealed class ContextView : ChildView
     {

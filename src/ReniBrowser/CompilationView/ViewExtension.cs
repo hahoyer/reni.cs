@@ -13,7 +13,7 @@ using Reni.Feature;
 using Reni.Struct;
 using Reni.Type;
 
-namespace ReniTest.CompilationView
+namespace ReniBrowser.CompilationView
 {
     static class ViewExtension
     {

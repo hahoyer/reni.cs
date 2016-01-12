@@ -12,7 +12,7 @@ using Reni.Struct;
 using Reni.Type;
 using ScintillaNET;
 
-namespace ReniTest.CompilationView
+namespace ReniBrowser.CompilationView
 {
     sealed class SourceView : MainView, ViewExtension.IClickHandler
     {

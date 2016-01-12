@@ -4,7 +4,7 @@ using System.Linq;
 using System.Windows.Forms;
 using Reni.FeatureTest.Helper;
 using Reni.FeatureTest.Structure;
-using ReniTest.CompilationView;
+using ReniBrowser.CompilationView;
 
 namespace reniBrowser
 {

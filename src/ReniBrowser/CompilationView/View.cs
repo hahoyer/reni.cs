@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -6,8 +8,7 @@ using hw.DebugFormatter;
 using hw.Forms;
 using JetBrains.Annotations;
 
-
-namespace ReniTest.CompilationView
+namespace ReniBrowser.CompilationView
 {
     abstract class View : DumpableObject
     {

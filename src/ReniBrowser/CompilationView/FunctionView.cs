@@ -4,7 +4,7 @@ using System.Linq;
 using hw.Scanner;
 using Reni.Struct;
 
-namespace ReniTest.CompilationView
+namespace ReniBrowser.CompilationView
 {
     sealed class FunctionView : ChildView
     {

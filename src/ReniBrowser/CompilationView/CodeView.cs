@@ -4,7 +4,7 @@ using System.Linq;
 using hw.Scanner;
 using Reni.Code;
 
-namespace ReniTest.CompilationView
+namespace ReniBrowser.CompilationView
 {
     sealed class CodeView : ChildView
     {

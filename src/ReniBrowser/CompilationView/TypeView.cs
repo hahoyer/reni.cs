@@ -4,7 +4,7 @@ using System.Linq;
 using hw.Scanner;
 using Reni.Type;
 
-namespace ReniTest.CompilationView
+namespace ReniBrowser.CompilationView
 {
     sealed class TypeView : ChildView
     {

@@ -2,8 +2,11 @@
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <ProjectGuid>{B639A515-D066-4C12-A4C5-07DA91C19A2C}</ProjectGuid>
-    <AssemblyName>reniBrowser</AssemblyName>
+    <AssemblyName>ReniBrowser</AssemblyName>
     <TargetTypeEx>CSharp.WinExe</TargetTypeEx>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>ReniBrowser</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="nunit.framework, Version=3.0.5813.39031, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">

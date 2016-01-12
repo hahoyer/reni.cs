@@ -1,14 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Forms;
 using hw.Helper;
 using hw.Scanner;
-using Reni;
-using Reni.Context;
 using Reni.Parser;
 
-namespace ReniTest.CompilationView
+namespace ReniBrowser.CompilationView
 {
     sealed class ResultCachesView : ChildView
     {

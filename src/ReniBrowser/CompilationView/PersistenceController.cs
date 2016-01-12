@@ -4,7 +4,7 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 
-namespace ReniTest.CompilationView
+namespace ReniBrowser.CompilationView
 {
     abstract class PersistenceController<T> : DumpableObject
     {
