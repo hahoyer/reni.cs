@@ -11,7 +11,8 @@ namespace Reni.TokenClasses
     {
         public const string TokenId = "function_instance";
         public override string Id => TokenId;
-        public override Result Result(ContextBase context, Category category, CompileSyntax left)
+
+        protected override Result Result(ContextBase context, Category category, CompileSyntax left)
             => context.Result(category.Typed, left)
                 .Type
                 .FunctionInstance

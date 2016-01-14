@@ -14,12 +14,12 @@ namespace Reni.TokenClasses
         public const string TokenId = "^";
         public override string Id => TokenId;
 
-        public override Result Result(ContextBase context, Category category, TerminalSyntax token)
+        protected override Result Result(ContextBase context, Category category, TerminalSyntax token)
             => context.ArgReferenceResult(category);
 
         internal override CompileSyntax Visit(ISyntaxVisitor visitor) => visitor.Arg;
 
-        public override Result Result
+        protected override Result Result
             (ContextBase context, Category category, PrefixSyntax token, CompileSyntax right)
             => context.FunctionalArgResult(category, right,token.SourcePart);
     }

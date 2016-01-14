@@ -11,7 +11,7 @@ namespace Reni.TokenClasses
 {
     sealed class Text : TerminalSyntaxToken, IChainLink
     {
-        public override Result Result(ContextBase context, Category category, TerminalSyntax token)
+        protected override Result Result(ContextBase context, Category category, TerminalSyntax token)
         {
             var data = StripQutes(token.Id);
             return context

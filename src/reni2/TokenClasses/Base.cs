@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Parser;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
@@ -105,7 +104,11 @@ namespace Reni.TokenClasses
         protected override sealed Checked<Syntax> Terminal(SourcePart token)
             => new TerminalSyntax(token, this);
 
-        public abstract Result Result(ContextBase context, Category category, TerminalSyntax token);
+        Result ITerminal.Result(ContextBase context, Category category, TerminalSyntax token)
+            => Result(context, category, token);
+
+        protected abstract Result Result
+            (ContextBase context, Category category, TerminalSyntax token);
 
         CompileSyntax ITerminal.Visit(ISyntaxVisitor visitor) => Visit(visitor);
 
@@ -130,9 +133,16 @@ namespace Reni.TokenClasses
         protected override Checked<Syntax> Suffix(Syntax left, SourcePart token)
             => SuffixSyntax.Create(left.ToCompiledSyntax, this, token);
 
-        public abstract Result Result(ContextBase context, Category category, TerminalSyntax token);
+        Result ITerminal.Result(ContextBase context, Category category, TerminalSyntax token)
+            => Result(context, category, token);
 
-        public abstract Result Result(ContextBase context, Category category, CompileSyntax left);
+        protected abstract Result Result
+            (ContextBase context, Category category, TerminalSyntax token);
+
+        Result ISuffix.Result(ContextBase context, Category category, CompileSyntax left)
+            => Result(context, category, left);
+
+        protected abstract Result Result(ContextBase context, Category category, CompileSyntax left);
 
         CompileSyntax ITerminal.Visit(ISyntaxVisitor visitor) => Visit(visitor);
 
@@ -154,10 +164,18 @@ namespace Reni.TokenClasses
         protected override sealed Checked<Syntax> Prefix(SourcePart token, Syntax right)
             => PrefixSyntax.Create(this, right.ToCompiledSyntax);
 
-        public abstract Result Result(ContextBase context, Category category, TerminalSyntax token);
+        Result ITerminal.Result(ContextBase context, Category category, TerminalSyntax token)
+            => Result(context, category, token);
 
-        public abstract Result Result
-            (ContextBase context, Category category, PrefixSyntax token, CompileSyntax right);
+        protected abstract Result Result
+            (ContextBase context, Category category, TerminalSyntax token);
+
+        Result IPrefix.Result
+            (ContextBase context, Category category, PrefixSyntax token, CompileSyntax right)
+            => Result(context, category, token, right);
+
+        protected abstract Result Result
+            (ContextBase callContext, Category category, PrefixSyntax token, CompileSyntax right);
 
         CompileSyntax ITerminal.Visit(ISyntaxVisitor visitor) => Visit(visitor);
 
@@ -173,7 +191,10 @@ namespace Reni.TokenClasses
         protected override sealed Checked<Syntax> Suffix(Syntax left, SourcePart token)
             => SuffixSyntax.Create(left.ToCompiledSyntax, this, token);
 
-        public abstract Result Result(ContextBase context, Category category, CompileSyntax left);
+        Result ISuffix.Result(ContextBase context, Category category, CompileSyntax left)
+            => Result(context, category, left);
+
+        protected abstract Result Result(ContextBase context, Category category, CompileSyntax left);
     }
 
     abstract class InfixSyntaxToken : InfixToken, IInfix
@@ -181,8 +202,13 @@ namespace Reni.TokenClasses
         protected override sealed Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
             => InfixSyntax.Create(left.ToCompiledSyntax, this, token, right.ToCompiledSyntax);
 
-        public abstract Result Result
+        Result IInfix.Result
+            (ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
+            => Result(context, category, left, right);
+
+        protected abstract Result Result
             (ContextBase callContext, Category category, CompileSyntax left, CompileSyntax right);
+
 
         protected override sealed Checked<Syntax> Suffix(Syntax left, SourcePart token)
             => new InfixSyntaxCandidate(left, this, token);

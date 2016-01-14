@@ -15,7 +15,7 @@ namespace Reni.Feature
         public const string TokenId = "type";
         public override string Id => TokenId;
 
-        public override Result Result(ContextBase context, Category category, CompileSyntax left)
+        protected override Result Result(ContextBase context, Category category, CompileSyntax left)
         {
             if(category.HasType)
                 return left

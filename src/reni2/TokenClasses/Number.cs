@@ -10,7 +10,7 @@ namespace Reni.TokenClasses
 {
     sealed class Number : TerminalSyntaxToken, IChainLink
     {
-        public override Result Result(ContextBase context, Category category, TerminalSyntax token)
+        protected override Result Result(ContextBase context, Category category, TerminalSyntax token)
             => context.RootContext.BitType.Result(category, BitsConst.Convert(token.Id));
 
         public override string Id => "<number>";

@@ -14,7 +14,7 @@ namespace Reni.TokenClasses
         public const string TokenId = "instance";
         public override string Id => TokenId;
 
-        public override Result Result
+        protected override Result Result
             (ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
             => left
                 .Type(context)
