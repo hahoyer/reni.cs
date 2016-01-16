@@ -11,36 +11,38 @@ namespace Reni.FeatureTest.Structure
     [TargetSet(@"
 x: /\ 
 {
-  this: /!\ ^^ stable_reference;
-  xxx: 12;
-  result: this xxx; 
+  256;
+  this: ^^;
+  xxx: 257;
+  258
 },
 
-x()result dump_print
+x() dump_print
 
 ", "12")]
-    public sealed class ThisVariable0 : CompilerTest {}
+    public sealed class ContextOperator0 : CompilerTest {}
 
     [UnitTest]
     [Access]
+    [NamedSimpleAssignment]
     [TargetSet(@"
 x: /\ 
 {
-  this: /!\ ^^ stable_reference;
+  this: ^^ ;
   !mutable xxx: 12 
 };
 
 xx : x();
 xx this xxx := 2;
-xx xxx dump_print
+xx dump_print
 
 ", "2")]
-    public sealed class ThisVariable1 : CompilerTest { }
+    public sealed class ContextOperator1 : CompilerTest { }
 
 
     [UnitTest]
-    [ThisVariable0]
-    [ThisVariable1]
+    [ContextOperator0]
+    [ContextOperator1]
     [TargetSet(@"
 x: /\ 
 {
@@ -52,5 +54,5 @@ x: /\
 x() dump_print
 
 ", "12")]
-    public sealed class ThisVariable : CompilerTest { }
+    public sealed class ContextOperator : CompilerTest { }
 }
