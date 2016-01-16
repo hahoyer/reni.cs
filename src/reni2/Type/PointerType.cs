@@ -73,7 +73,7 @@ namespace Reni.Type
 
         protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
 
-        protected override ArrayType ArrayForCache(int count, string optionsId)
+        protected override ArrayType GetArrayForCache(int count, string optionsId)
             => ValueType.Array(count, optionsId);
 
         internal override IEnumerable<IConversion> GetForcedConversions<TDestination>
@@ -94,7 +94,7 @@ namespace Reni.Type
 
         IImplementation ISymbolProvider<StableReference>.Feature
             (StableReference tokenClass)
-            => Feature.Extension.Value(ConvertToReference);
+            => Feature.Extension.Value(ConvertToStableReference);
 
         [DisableDump]
         internal override IImplementation FuncionDeclarationForType
@@ -132,7 +132,7 @@ namespace Reni.Type
                     CodeArgs.Arg
                 );
 
-        Result ConvertToReference(Category category)
+        internal override Result ConvertToStableReference(Category category)
             => Mutation(StableReferenceType) & category;
 
         StableReferenceType StableReferenceType

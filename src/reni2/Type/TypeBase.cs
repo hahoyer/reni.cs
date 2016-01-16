@@ -69,8 +69,8 @@ namespace Reni.Type
                     destination =>
                         new ResultCache(category => parent.Mutation(category, destination))
                     );
-                ForcedReference = new ValueCache<IReference>(parent.ForcedReferenceForCache);
-                Pointer = new ValueCache<PointerType>(parent.GetForcedPointerForCache);
+                ForcedReference = new ValueCache<IReference>(parent.GetForcedReferenceForCache);
+                Pointer = new ValueCache<PointerType>(parent.GetPointerForCache);
                 Pair = new FunctionCache<TypeBase, Pair>(first => new Pair(first, parent));
                 Array = new FunctionCache<int, FunctionCache<string, ArrayType>>
                     (
@@ -80,7 +80,7 @@ namespace Reni.Type
                             (
                             optionsId
                                 =>
-                                parent.ArrayForCache(count, optionsId)
+                                parent.GetArrayForCache(count, optionsId)
                             )
                     );
 
@@ -165,7 +165,7 @@ namespace Reni.Type
         internal TypeBase Pointer => ForcedReference.Type();
 
         [DisableDump]
-        internal virtual IReference ForcedReference => _cache.ForcedReference.Value;
+        internal IReference ForcedReference => _cache.ForcedReference.Value;
 
         [DisableDump]
         internal CodeBase ArgCode => CodeBase.Arg(this);
@@ -179,6 +179,9 @@ namespace Reni.Type
 
         [DisableDump]
         internal TypeBase SmartPointer => Hllw ? this : Pointer;
+
+        virtual internal Result ConvertToStableReference(Category category)
+            => ArgResult(category);
 
         [DisableDump]
         internal TypeBase Align
@@ -332,7 +335,7 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        internal virtual IReference CheckedReference => this as IReference;
+        internal IReference CheckedReference => this as IReference;
 
         [DisableDump]
         internal bool IsWeakReference => CheckedReference != null && CheckedReference.IsWeak;
@@ -412,19 +415,19 @@ namespace Reni.Type
                 );
         }
 
-        IReference ForcedReferenceForCache()
+        protected virtual IReference GetForcedReferenceForCache()
         {
             Tracer.Assert(!Hllw);
             return CheckedReference ?? ForcedPointer;
         }
 
-        protected virtual PointerType GetForcedPointerForCache()
+        protected virtual PointerType GetPointerForCache()
         {
             Tracer.Assert(!Hllw);
             return new PointerType(this);
         }
 
-        protected virtual ArrayType ArrayForCache(int count, string optionsId)
+        protected virtual ArrayType GetArrayForCache(int count, string optionsId)
             => new ArrayType(this, count, optionsId);
 
         [NotNull]

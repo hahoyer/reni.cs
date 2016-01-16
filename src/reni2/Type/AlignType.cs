@@ -27,16 +27,12 @@ namespace Reni.Type
             => "(" + Parent.DumpPrintText + ")" + AlignToken.TokenId + _alignBits;
 
         [DisableDump]
-        internal override IReference CheckedReference => Parent.CheckedReference;
-
-        [DisableDump]
         internal override bool Hllw => Parent.Hllw;
 
-        [DisableDump]
-        internal override IReference ForcedReference => Parent.ForcedReference;
+        protected override IReference GetForcedReferenceForCache() => Parent.ForcedReference;
 
         protected override Result DeAlign(Category category) => Mutation(Parent) & category;
-        protected override PointerType GetForcedPointerForCache() => Parent.ForcedPointer;
+        protected override PointerType GetPointerForCache() => Parent.ForcedPointer;
 
         [DisableDump]
         protected override IEnumerable<IConversion> RawSymmetricConversions
