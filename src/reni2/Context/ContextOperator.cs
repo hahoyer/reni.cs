@@ -13,21 +13,27 @@ namespace Reni.Context
         public const string TokenId = "^^";
         public override string Id => TokenId;
 
-        protected override Result Result(ContextBase context, Category category, TerminalSyntax token)
+        protected override Result Result
+            (ContextBase context, Category category, TerminalSyntax token)
         {
-            var trace = true;
-            StartMethodDump(trace, context,category,token);
+            var trace = false;
+            StartMethodDump(trace, context, category, token);
             try
             {
-                return ReturnMethodDump(context
+                var result = context
                     .FindRecentCompoundView
-                    .ObjectPointerViaContext(category));
+                    .ObjectPointerViaContext(category)
+                    ;
+
+                if(category.HasType)
+                    result = result.Type.ConvertToStableReference(category).ReplaceArg(result);
+
+                return ReturnMethodDump(result);
             }
             finally
             {
                 EndMethodDump();
             }
         }
-
     }
 }
