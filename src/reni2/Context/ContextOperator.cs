@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using hw.DebugFormatter;
 using Reni.Basics;
 using Reni.Parser;
 using Reni.TokenClasses;
@@ -16,24 +17,9 @@ namespace Reni.Context
         protected override Result Result
             (ContextBase context, Category category, TerminalSyntax token)
         {
-            var trace = false;
-            StartMethodDump(trace, context, category, token);
-            try
-            {
-                var result = context
-                    .FindRecentCompoundView
-                    .ObjectPointerViaContext(category)
-                    ;
-
-                if(category.HasType)
-                    result = result.Type.ConvertToStableReference(category).ReplaceArg(result);
-
-                return ReturnMethodDump(result);
-            }
-            finally
-            {
-                EndMethodDump();
-            }
+            Tracer.Assert(!category.HasCode);
+            Tracer.Assert(!category.HasExts);
+            return context.Type.Result(category);
         }
     }
 }

@@ -25,6 +25,7 @@ namespace Reni.Context
         : DumpableObject
             , ResultCache.IResultProvider
             , IIconKeyProvider
+        , ValueCache.IContainer
     {
         protected override string GetNodeDump()
             => base.GetNodeDump() + "(" + GetContextIdentificationDump() + ")";
@@ -310,6 +311,8 @@ namespace Reni.Context
 
         virtual internal IEnumerable<ContextBase> ParentChain { get { yield return this; } }
 
+        internal TypeBase Type => this.CachedValue(() => new ContextReferenceType(this));
+
         ResultCache.IResultProvider FindSource(CompileSyntax syntax, IContextReference ext)
         {
             Tracer.Assert(syntax.ResultCache[this].Exts.Contains(ext));
@@ -331,5 +334,17 @@ namespace Reni.Context
             (IContextReference ext, Definable definable, CompileSyntax right)
             => Declaration(definable).GetDefinableResults(ext, this, right);
 
+        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
+    }
+
+    sealed class ContextReferenceType : TypeBase
+    {
+        readonly ContextBase Parent;
+
+        public ContextReferenceType(ContextBase parent) {
+            Parent = parent;
+        }
+
+        internal override Root RootContext => Parent.RootContext;
     }
 }
