@@ -191,13 +191,22 @@ namespace Reni.Struct
         internal Size FieldOffset(int position)
             => Compound.FieldOffsetFromAccessPoint(ViewPosition, position);
 
+        bool IsDumpPrintResultViaObjectActive;
         internal Result DumpPrintResultViaObject(Category category)
-            => RootContext.ConcatPrintResult
+        {
+            if(IsDumpPrintResultViaObjectActive)
+                return RootContext.VoidType.Result(category, () => CodeBase.DumpPrintText("?"));
+
+            IsDumpPrintResultViaObjectActive = true;
+            var result = RootContext.ConcatPrintResult
                 (
                     category,
                     ViewPosition,
                     DumpPrintResultViaObject
                 );
+            IsDumpPrintResultViaObjectActive = false;
+            return result;
+        }
 
         Result AccessViaObjectPointer(Category category, int position)
         {
@@ -288,10 +297,11 @@ namespace Reni.Struct
 
         Result DumpPrintResultViaObject(Category category, int position)
         {
-            var trace = ObjectId == -10 && position == 0;
+            var trace = ObjectId == -5 && position == 1;
             StartMethodDump(trace, category, position);
             try
             {
+                BreakExecution();
                 var accessType = ValueType(position).SmartPointer;
                 var genericDumpPrintResult = accessType.GenericDumpPrintResult(category);
                 Dump("genericDumpPrintResult", genericDumpPrintResult);
