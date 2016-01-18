@@ -7,7 +7,7 @@ using Reni.FeatureTest.Helper;
 namespace Reni.FeatureTest.Structure
 {
     [UnitTest]
-    [Access]
+    [InnerAccess]
     [TargetSet(@"
 x: /\ 
 {

@@ -54,7 +54,7 @@ namespace Reni.FeatureTest
     [UserObjects]
     [UnMatchedBrackets]
     [AutomaticDereferencing]
-    [ThisVariable]
+    [ContextOperator]
     public sealed class TextConcat : TextStruct
     {
         public TextConcat()
