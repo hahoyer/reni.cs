@@ -25,7 +25,7 @@ namespace Reni.Context
         : DumpableObject
             , ResultCache.IResultProvider
             , IIconKeyProvider
-        , ValueCache.IContainer
+            , ValueCache.IContainer
     {
         protected override string GetNodeDump()
             => base.GetNodeDump() + "(" + GetContextIdentificationDump() + ")";
@@ -335,16 +335,26 @@ namespace Reni.Context
             => Declaration(definable).GetDefinableResults(ext, this, right);
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
+
+        virtual internal Result ContextOperatorResult(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
+
+        }
     }
 
     sealed class ContextReferenceType : TypeBase
     {
         readonly ContextBase Parent;
 
-        public ContextReferenceType(ContextBase parent) {
-            Parent = parent;
-        }
+        public ContextReferenceType(ContextBase parent) { Parent = parent; }
 
+        [DisableDump]
         internal override Root RootContext => Parent.RootContext;
+        [DisableDump]
+        internal override bool Hllw => true;
+        [DisableDump]
+        internal override CompoundView FindRecentCompoundView => Parent.FindRecentCompoundView;
     }
 }

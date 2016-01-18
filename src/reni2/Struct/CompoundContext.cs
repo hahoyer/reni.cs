@@ -5,6 +5,8 @@ using hw.DebugFormatter;
 using hw.Forms;
 using hw.Helper;
 using hw.Scanner;
+using Reni.Basics;
+using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.TokenClasses;
@@ -16,10 +18,14 @@ namespace Reni.Struct
         : Child
             , ISymbolProviderForPointer<Definable>
             , ISourceProvider
+        , IContextReference
     {
+        readonly int _order;
+
         internal CompoundContext(CompoundView view)
             : base(view.Compound.Parent)
         {
+            _order = CodeArgs.NextOrder++;
             View = view;
         }
 
@@ -36,6 +42,13 @@ namespace Reni.Struct
             => View.Find(tokenClass);
 
         internal override CompoundView ObtainRecentCompoundView() => View;
+
+        internal override Result ContextOperatorResult(Category category)
+        {
+            return Type.Result(category, ()=>CodeBase.ReferenceCode(this));
+        }
+
+        int IContextReference.Order => _order;
 
         SourcePart ISourceProvider.Value
             => View
