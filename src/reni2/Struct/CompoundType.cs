@@ -30,7 +30,20 @@ namespace Reni.Struct
         internal override CompoundView FindRecentCompoundView => View;
         [DisableDump]
         internal override bool Hllw => View.Hllw;
-        internal override string DumpPrintText => View.DumpPrintTextOfType;
+
+        bool IsDumpPrintTextActive; 
+        internal override string DumpPrintText
+        {
+            get
+            {
+                if(IsDumpPrintTextActive)
+                    return "?";
+                IsDumpPrintTextActive = true;
+                var result = View.DumpPrintTextOfType;
+                IsDumpPrintTextActive = false;
+                return result;
+            } }
+
         [DisableDump]
         internal override bool HasQuickSize => false;
 

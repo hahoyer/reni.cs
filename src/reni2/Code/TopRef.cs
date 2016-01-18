@@ -8,10 +8,10 @@ namespace Reni.Code
     sealed class TopRef : Ref
     {
         public TopRef(Size offset)
-            : base(offset) {}
+            : base(offset) { StopByObjectIds(); }
 
         public TopRef()
-            : this(Size.Zero) {}
+            : this(Size.Zero) { }
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement)
             => subsequentElement.TryToCombineBack(this);
@@ -25,10 +25,10 @@ namespace Reni.Code
     sealed class TopFrameRef : Ref
     {
         public TopFrameRef()
-            : this(Size.Zero) {}
+            : this(Size.Zero) { }
 
         public TopFrameRef(Size offset)
-            : base(offset) {}
+            : base(offset) { }
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement)
             => subsequentElement.TryToCombineBack(this);
