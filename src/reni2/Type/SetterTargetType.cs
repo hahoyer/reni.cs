@@ -22,7 +22,6 @@ namespace Reni.Type
 
         protected SetterTargetType() { _order = CodeArgs.NextOrder++; }
 
-        Size IContextReference.Size => Size;
         int IContextReference.Order => _order;
         IConversion IProxyType.Converter => this;
         bool IReference.IsWeak => true;

@@ -111,7 +111,6 @@ namespace Reni.Type
 
         IConversion IReference.Converter => this;
         bool IReference.IsWeak => false;
-        Size IContextReference.Size => Size;
         int IContextReference.Order => _order;
 
         TypeBase IConversion.Source => this;

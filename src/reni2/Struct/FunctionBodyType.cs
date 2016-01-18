@@ -48,7 +48,6 @@ namespace Reni.Struct
             }
 
             int IContextReference.Order => _order;
-            Size IContextReference.Size => Root.DefaultRefAlignParam.RefSize;
             [EnableDump]
             FunctionSyntax Syntax => _parent.Syntax;
         }

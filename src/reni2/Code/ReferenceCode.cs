@@ -4,6 +4,7 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Forms;
 using Reni.Basics;
+using Reni.Context;
 using Reni.Struct;
 using Reni.Type;
 
@@ -34,7 +35,7 @@ namespace Reni.Code
 
         protected override CodeArgs GetRefsImplementation() => CodeArgs.Create(_context);
 
-        protected override Size GetSize() => _context.Size;
+        protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
 
         protected override TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
             => actual.ContextRef(this);

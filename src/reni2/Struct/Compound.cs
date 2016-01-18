@@ -12,7 +12,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class Compound : DumpableObject, IContextReference,IChild<ContextBase>
+    sealed class Compound : DumpableObject, IContextReference, IChild<ContextBase>
     {
         static int _nextObjectId;
 
@@ -45,7 +45,6 @@ namespace Reni.Struct
             => base.GetNodeDump() + "(" + GetCompoundIdentificationDump() + ")";
 
         int IContextReference.Order => _order;
-        Size IContextReference.Size => Root.DefaultRefAlignParam.RefSize;
 
         [DisableDump]
         internal TypeBase IndexType => Parent.RootContext.BitType.Number(IndexSize.ToInt());
@@ -112,7 +111,7 @@ namespace Reni.Struct
 
         internal Result Result(Category category)
         {
-            var trace = Syntax.ObjectId == -14 && (category.HasCode || category.HasExts);
+            var trace = Syntax.ObjectId == -1 && (category.HasCode || category.HasExts);
             StartMethodDump(trace, category);
             try
             {
@@ -122,10 +121,15 @@ namespace Reni.Struct
                 Dump("resultsOfStatements", resultsOfStatements);
                 BreakExecution();
 
-                var result = Syntax
+                var aggregate = Syntax
                     .EndPosition
                     .Select()
-                    .Aggregate(resultsOfStatements, Combine)
+                    .Aggregate(resultsOfStatements, Combine);
+
+                Dump(nameof(aggregate), aggregate);
+                BreakExecution();
+
+                var result = aggregate
                     .ReplaceRelative(this, CodeBase.TopRef, CodeArgs.Void)
                     ;
                 if(category.HasType)
@@ -150,9 +154,10 @@ namespace Reni.Struct
         Result AccessResult(Category category, int accessPosition, int position)
         {
             var trace = Syntax.ObjectId.In()
-                && accessPosition == 2
-                && position == 2
-                && category.HasCode;
+                && accessPosition == 4
+                && position == 1
+                //&& category.HasCode
+                ;
             StartMethodDump(trace, category, accessPosition, position);
             try
             {

@@ -51,7 +51,6 @@ namespace Reni.Type
         [DisableDump]
         internal override bool IsPointerPossible => false;
 
-        Size IContextReference.Size => Size;
         int IContextReference.Order => _order;
         IConversion IReference.Converter => this;
         bool IReference.IsWeak => true;

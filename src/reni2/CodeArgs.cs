@@ -109,7 +109,7 @@ namespace Reni
         {
             var result = new SizeArray();
             for(var i = 0; i < Count; i++)
-                result.Add((this)[i].Size);
+                result.Add(Root.DefaultRefAlignParam.RefSize);
             return result;
         }
 
@@ -185,7 +185,6 @@ namespace Reni
                 {
                     Dump("reference", reference);
                     BreakExecution();
-                    Tracer.Assert(referenceInCode.Size == refSize);
                     reference = reference.ReferencePlus(refSize * -1);
                     result = result.ReplaceAbsolute
                         (referenceInCode, () => reference.DePointer(refSize));
@@ -206,14 +205,6 @@ namespace Reni
 
         sealed class CodeArg : Singleton<CodeArg, DumpableObject>, IContextReference
         {
-            Size IContextReference.Size
-            {
-                get
-                {
-                    NotImplementedMethod();
-                    return null;
-                }
-            }
             int IContextReference.Order => -1;
             protected override string GetNodeDump() => "CodeArg";
         }

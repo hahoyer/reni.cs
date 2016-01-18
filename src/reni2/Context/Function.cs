@@ -26,7 +26,6 @@ namespace Reni.Context
         [Node]
         TypeBase ValueType { get; }
 
-        Size IContextReference.Size => Root.DefaultRefAlignParam.RefSize;
         int IContextReference.Order => _order;
 
         protected override string GetContextChildIdentificationDump()

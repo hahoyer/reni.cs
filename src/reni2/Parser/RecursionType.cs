@@ -57,14 +57,6 @@ namespace Reni.Parser
             return null;
         }
 
-        Size IContextReference.Size
-        {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
-        }
 
     }
 }
