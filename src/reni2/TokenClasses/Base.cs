@@ -31,6 +31,15 @@ namespace Reni.TokenClasses
             => IssueId.UnexpectedUseAsInfix.Syntax(token, left, right);
     }
 
+    abstract class InfixPrefixToken : TokenClass
+    {
+        protected override sealed Checked<Syntax> Suffix(Syntax left, SourcePart token)
+            => IssueId.UnexpectedUseAsSuffix.Syntax(token, left);
+
+        protected override sealed Checked<Syntax> Terminal(SourcePart token)
+            => IssueId.UnexpectedUseAsTerminal.Syntax(token);
+    }
+
     abstract class NonSuffixToken : TokenClass
     {
         protected override sealed Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
@@ -151,6 +160,27 @@ namespace Reni.TokenClasses
             NotImplementedMethod(visitor);
             return null;
         }
+    }
+
+    abstract class InfixPrefixSyntaxToken : InfixPrefixToken, IInfix,IPrefix
+    {
+        protected override sealed Checked<Syntax> Prefix(SourcePart token, Syntax right)
+            => PrefixSyntax.Create(this, right.ToCompiledSyntax);
+
+        protected override sealed Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
+            => InfixSyntax.Create(left.ToCompiledSyntax, this, token, right.ToCompiledSyntax);
+
+        Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
+            => Result(context, category, left, right);
+
+        Result IPrefix.Result(ContextBase context, Category category, PrefixSyntax token, CompileSyntax right)
+            => Result(context, category, right);
+
+        protected abstract Result Result
+            (ContextBase context, Category category, CompileSyntax left, CompileSyntax right);
+
+        protected abstract Result Result
+            (ContextBase context, Category category, CompileSyntax right);
     }
 
     abstract class NonSuffixSyntaxToken : NonSuffixToken, ITerminal, IPrefix
