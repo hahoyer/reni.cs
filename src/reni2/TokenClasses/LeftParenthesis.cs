@@ -79,10 +79,19 @@ namespace Reni.TokenClasses
             {
                 get
                 {
-                    if(Left != null)
-                        NotImplementedMethod();
+                    if (Left != null)
+                    {
+                        if(Right !=null)
+                            NotImplementedFunction();
+
+                        return new Checked<CompileSyntax>
+                            (
+                            Left.ToCompiledSyntax.Value,
+                            IssueId.MissingRightBracket.CreateIssue(Token)
+                            );}
 
                     var right = (Right ?? new EmptyList(Token)).ToCompiledSyntax;
+
                     return new Checked<CompileSyntax>
                         (
                         right.Value,
