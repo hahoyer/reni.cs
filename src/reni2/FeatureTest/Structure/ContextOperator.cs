@@ -19,7 +19,7 @@ x: /\
 
 x() dump_print
 
-", "12")]
+", "(256, ^^, 257, 258)")]
     public sealed class ContextOperator0 : CompilerTest {}
 
     [UnitTest]
