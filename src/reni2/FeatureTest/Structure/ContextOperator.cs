@@ -28,13 +28,13 @@ x() dump_print
     [TargetSet(@"
 x: /\ 
 {
+  !mutable xxx: 12; 
   this: ^^ ;
-  !mutable xxx: 12 
 };
 
 xx : x();
 xx this xxx := 2;
-xx dump_print
+xx xxx dump_print
 
 ", "2")]
     public sealed class ContextOperator1 : CompilerTest { }
@@ -46,7 +46,7 @@ xx dump_print
     [TargetSet(@"
 x: /\ 
 {
-  this: /!\ ^^ stable_reference;
+  this: /!\ ^^ ;
   xxx: 12;
   result: this xxx; 
 } result ,
