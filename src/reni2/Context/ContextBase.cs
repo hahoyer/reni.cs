@@ -340,8 +340,12 @@ namespace Reni.Context
         {
             NotImplementedMethod(category);
             return null;
-
         }
+
+        internal Result AtTokenResult(Category category, CompileSyntax right)
+            => FindRecentCompoundView
+                .AccessViaPositionExpression(category, right.Result(this))
+            .ReplaceArg(FindRecentCompoundView.ObjectPointerViaContext);
     }
 
     sealed class ContextReferenceType : TypeBase
