@@ -646,7 +646,7 @@ namespace Reni.Type
 
         protected Result DumpPrintTokenResult(Category category)
             => VoidType
-                .Result(category, DumpPrintCode, CodeArgs.Arg)
+                .Result(category, DumpPrintCode)
                 .ReplaceArg(ObjectResult(category).DereferenceResult);
 
         internal Result ObjectResult(Category category)
