@@ -10,15 +10,19 @@ using Reni.Type;
 
 namespace Reni.Context
 {
-    sealed class ContextReferenceType 
+    sealed class ContextReferenceType
         : TypeBase
-        , IReference
-        , ISymbolProvider<DumpPrintToken>
+            , IReference
+            , ISymbolProvider<DumpPrintToken>
     {
         readonly int Order;
         readonly ContextBase Parent;
 
-        public ContextReferenceType(ContextBase parent) { Parent = parent; Order = CodeArgs.NextOrder++; }
+        public ContextReferenceType(ContextBase parent)
+        {
+            Parent = parent;
+            Order = CodeArgs.NextOrder++;
+        }
 
         [DisableDump]
         internal override Root RootContext => Parent.RootContext;
@@ -51,5 +55,8 @@ namespace Reni.Context
         protected override CodeBase DumpPrintCode()
             => CodeBase.DumpPrintText(ContextOperator.TokenId);
 
+        new Result DumpPrintTokenResult(Category category)
+            => VoidType
+                .Result(category, DumpPrintCode);
     }
 }
