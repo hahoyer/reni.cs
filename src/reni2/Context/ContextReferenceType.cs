@@ -6,16 +6,14 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
 using Reni.Struct;
-using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Context
 {
     sealed class ContextReferenceType
         : TypeBase
-           , IReference
+            , IReference
             , ISymbolProvider<DumpPrintToken>
-            , ISymbolProvider<Definable>
     {
         readonly int Order;
         readonly CompoundView Parent;
@@ -61,8 +59,10 @@ namespace Reni.Context
             => VoidType
                 .Result(category, DumpPrintCode);
 
-        IImplementation ISymbolProvider<Definable>.Feature(Definable tokenClass)
-            => Parent.Find(tokenClass);
+        protected override IEnumerable<IConversion> StripConversions
+            => base.StripConversions
+                .Concat(new[] {Feature.Extension.Conversion(PointerConversion)});
 
+        Result PointerConversion(Category category) => Mutation(Parent.Type.Pointer) & category;
     }
 }
