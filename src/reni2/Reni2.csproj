@@ -27,6 +27,7 @@
     <Compile Include="Code\ArrayAccess.cs" />
     <Compile Include="Code\UnknownStackData.cs" />
     <Compile Include="CompilerBrowser.cs" />
+    <Compile Include="Context\ContextReferenceType.cs" />
     <Compile Include="FeatureTest\Array\ArrayFromPieces.cs" />
     <Compile Include="FeatureTest\Array\CombineArraysFromPieces.cs" />
     <Compile Include="FeatureTest\Array\DefaultInitialized.cs" />

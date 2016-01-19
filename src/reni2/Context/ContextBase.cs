@@ -347,18 +347,4 @@ namespace Reni.Context
                 .AccessViaPositionExpression(category, right.Result(this))
             .ReplaceArg(FindRecentCompoundView.ObjectPointerViaContext);
     }
-
-    sealed class ContextReferenceType : TypeBase
-    {
-        readonly ContextBase Parent;
-
-        public ContextReferenceType(ContextBase parent) { Parent = parent; }
-
-        [DisableDump]
-        internal override Root RootContext => Parent.RootContext;
-        [DisableDump]
-        internal override bool Hllw => true;
-        [DisableDump]
-        internal override CompoundView FindRecentCompoundView => Parent.FindRecentCompoundView;
-    }
 }
