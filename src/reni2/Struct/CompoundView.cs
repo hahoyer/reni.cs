@@ -344,7 +344,8 @@ namespace Reni.Struct
             return ContextReferenceType.Result(category, () => CodeBase.ReferenceCode(Compound));
         }
 
-        internal ContextReferenceType ContextReferenceType => this.CachedValue(() => new ContextReferenceType(this));
+        [DisableDump]
+        ContextReferenceType ContextReferenceType => this.CachedValue(() => new ContextReferenceType(this));
 
     }
 }
