@@ -26,7 +26,6 @@ namespace Reni.Feature
             return searchResult;
         }
 
-        [EnableDump]
         IImplementation Feature { get; }
         [EnableDump]
         ConversionPath ConverterPath { get; }
@@ -59,7 +58,7 @@ namespace Reni.Feature
             ContextBase context,
             CompileSyntax right)
         {
-            var trace = ObjectId == 6 && category.HasCode;
+            var trace = ObjectId == -6 && category.HasCode;
             StartMethodDump(trace, category, left, token, context, right);
             try
             {
