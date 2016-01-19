@@ -13,7 +13,9 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class CompoundView : DumpableObject
+    sealed class CompoundView 
+        : DumpableObject
+            , ValueCache.IContainer
     {
         static int _nextObjectId;
         [EnableDump]
@@ -57,6 +59,8 @@ namespace Reni.Struct
 
             StopByObjectIds(-313);
         }
+
+        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
         public string GetCompoundChildDump()
             => Compound.GetCompoundIdentificationDump() + PositionDump();
@@ -330,5 +334,17 @@ namespace Reni.Struct
             var position = Compound.Syntax.Find(definable?.Id);
             return position == null ? null : AccessFeature(position.Value);
         }
+
+        internal Result AtTokenResult(Category category, Result rightResult)
+            => AccessViaPositionExpression(category, rightResult)
+            .ReplaceArg(ObjectPointerViaContext);
+
+        internal Result ContextOperatorResult(Category category)
+        {
+            return ContextReferenceType.Result(category, () => CodeBase.ReferenceCode(Compound));
+        }
+
+        internal ContextReferenceType ContextReferenceType => this.CachedValue(() => new ContextReferenceType(this));
+
     }
 }

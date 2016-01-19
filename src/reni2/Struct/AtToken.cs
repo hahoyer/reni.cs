@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
 using Reni.TokenClasses;
-using Reni.Validation;
 
 namespace Reni.Struct
 {
@@ -16,10 +14,18 @@ namespace Reni.Struct
         public const string TokenId = "_A_T_";
         public override string Id => TokenId;
 
-        protected override Result Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
-            => left.AtTokenResult(context, category, right);
+        protected override Result Result
+            (ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
+        {
+            var target = context.ResultAsReference(category.Typed, left);
+            return target
+                .Type
+                .FindRecentCompoundView
+                .AccessViaPositionExpression(category, right.Result(context))
+                .ReplaceArg(target);
+        }
 
         protected override Result Result(ContextBase context, Category category, CompileSyntax right)
-            => context.AtTokenResult(category, right);
+            => context.FindRecentCompoundView.AtTokenResult(category, right.Result(context));
     }
 }

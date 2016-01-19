@@ -6,19 +6,21 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
 using Reni.Struct;
+using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Context
 {
     sealed class ContextReferenceType
         : TypeBase
-            , IReference
+           , IReference
             , ISymbolProvider<DumpPrintToken>
+            , ISymbolProvider<Definable>
     {
         readonly int Order;
-        readonly ContextBase Parent;
+        readonly CompoundView Parent;
 
-        public ContextReferenceType(ContextBase parent)
+        public ContextReferenceType(CompoundView parent)
         {
             Parent = parent;
             Order = CodeArgs.NextOrder++;
@@ -27,7 +29,7 @@ namespace Reni.Context
         [DisableDump]
         internal override Root RootContext => Parent.RootContext;
         [DisableDump]
-        internal override CompoundView FindRecentCompoundView => Parent.FindRecentCompoundView;
+        internal override CompoundView FindRecentCompoundView => Parent;
 
         [DisableDump]
         internal override bool Hllw => false;
@@ -58,5 +60,9 @@ namespace Reni.Context
         new Result DumpPrintTokenResult(Category category)
             => VoidType
                 .Result(category, DumpPrintCode);
+
+        IImplementation ISymbolProvider<Definable>.Feature(Definable tokenClass)
+            => Parent.Find(tokenClass);
+
     }
 }

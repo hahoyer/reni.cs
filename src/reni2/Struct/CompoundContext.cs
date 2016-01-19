@@ -1,16 +1,15 @@
 using System;
 using System.Collections.Generic;
+using hw.Helper;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Forms;
-using hw.Helper;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.TokenClasses;
-using Reni.Type;
 
 namespace Reni.Struct
 {
@@ -18,7 +17,7 @@ namespace Reni.Struct
         : Child
             , ISymbolProviderForPointer<Definable>
             , ISourceProvider
-        , IContextReference
+            , IContextReference
     {
         readonly int _order;
 
@@ -42,11 +41,6 @@ namespace Reni.Struct
             => View.Find(tokenClass);
 
         internal override CompoundView ObtainRecentCompoundView() => View;
-
-        internal override Result ContextOperatorResult(Category category)
-        {
-            return Type.Result(category, ()=>CodeBase.ReferenceCode(this));
-        }
 
         int IContextReference.Order => _order;
 

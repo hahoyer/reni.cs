@@ -54,16 +54,6 @@ namespace Reni.Parser
         internal BitsConst Evaluate(ContextBase context)
             => Result(context).Evaluate(context.RootContext.ExecutionContext);
 
-        internal Result AtTokenResult(ContextBase context, Category category, CompileSyntax right)
-        {
-            var leftResultAsRef = context.ResultAsReference(category.Typed, this);
-            return leftResultAsRef
-                .Type
-                .FindRecentCompoundView
-                .AccessViaPositionExpression(category, right.Result(context))
-                .ReplaceArg(leftResultAsRef);
-        }
-
         internal CodeBase Code(ContextBase context)
         {
             var result = context.Result(Category.Code, this).Code;

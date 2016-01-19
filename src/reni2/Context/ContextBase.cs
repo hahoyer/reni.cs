@@ -311,8 +311,6 @@ namespace Reni.Context
 
         virtual internal IEnumerable<ContextBase> ParentChain { get { yield return this; } }
 
-        internal TypeBase Type => this.CachedValue(() => new ContextReferenceType(this));
-
         ResultCache.IResultProvider FindSource(CompileSyntax syntax, IContextReference ext)
         {
             Tracer.Assert(syntax.ResultCache[this].Exts.Contains(ext));
@@ -336,15 +334,5 @@ namespace Reni.Context
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
-        virtual internal Result ContextOperatorResult(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
-        }
-
-        internal Result AtTokenResult(Category category, CompileSyntax right)
-            => FindRecentCompoundView
-                .AccessViaPositionExpression(category, right.Result(this))
-            .ReplaceArg(FindRecentCompoundView.ObjectPointerViaContext);
     }
 }
