@@ -178,9 +178,9 @@ namespace Reni.Struct
             return _fieldAccessTypeCache[position];
         }
 
-        internal Result AccessViaObjectPointer(Category category, Result rightResult)
+        internal Result AccessViaPositionExpression(Category category, Result rightResult)
         {
-            var position = rightResult
+            var position = rightResult  
                 .Conversion(IndexType)
                 .SmartUn<PointerType>()
                 .Evaluate(Compound.RootContext.ExecutionContext)

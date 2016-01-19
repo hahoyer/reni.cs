@@ -57,11 +57,10 @@ namespace Reni.Parser
         internal Result AtTokenResult(ContextBase context, Category category, CompileSyntax right)
         {
             var leftResultAsRef = context.ResultAsReference(category.Typed, this);
-            var rightResult = right.Result(context);
             return leftResultAsRef
                 .Type
                 .FindRecentCompoundView
-                .AccessViaObjectPointer(category, rightResult)
+                .AccessViaPositionExpression(category, right.Result(context))
                 .ReplaceArg(leftResultAsRef);
         }
 
