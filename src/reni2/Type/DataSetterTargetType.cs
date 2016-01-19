@@ -13,7 +13,8 @@ namespace Reni.Type
 
         protected override Result GetterResult(Category category)
             => ValueType
-                .ForcedPointer
+                .ForcedReference
+                .Type()
                 .Result(category, GetterCode);
 
         protected abstract CodeBase SetterCode();
