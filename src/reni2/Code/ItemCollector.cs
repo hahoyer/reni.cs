@@ -43,6 +43,11 @@ namespace Reni.Code
                 yield return item;
         }
 
+        internal override IEnumerable<IFormalCodeItem> TopFrameData(TopFrameData visitedObject)
+        {
+            yield return visitedObject;
+        }
+
         internal override IEnumerable<IFormalCodeItem> Default(CodeBase codeBase)
         {
             yield return codeBase;
