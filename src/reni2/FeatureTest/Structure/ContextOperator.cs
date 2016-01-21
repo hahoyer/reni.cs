@@ -20,7 +20,7 @@ x: /\
 x() dump_print
 
 ", "(256, ^^, 257, 258)")]
-    public sealed class ContextOperator0 : CompilerTest {}
+    public sealed class ContextOperatorPrint : CompilerTest {}
 
     [UnitTest]
     [Access]
@@ -28,31 +28,53 @@ x() dump_print
     [TargetSet(@"
 x: /\ 
 {
-  !mutable xxx: 12; 
-  this: ^^ ;
+  256;
+  this: ^^;
+  xxx: 257;
+  258
+};
+
+xx : x();
+xx this xxx dump_print
+
+", "257")]
+    public sealed class ContextOperatorAccess : CompilerTest { }
+
+    [UnitTest]
+    [Access]
+    [NamedSimpleAssignment, ContextOperatorAccess]
+    [TargetSet(@"
+x: /\ 
+{
+  256;
+  this: ^^;
+  !mutable xxx: 257;
+  258
 };
 
 xx : x();
 xx this xxx := 2;
-xx xxx dump_print
+xx dump_print
 
-", "2")]
-    public sealed class ContextOperator1 : CompilerTest { }
+", "(256, ^^, 2, 258)")]
+    public sealed class ContextOperatorAssign : CompilerTest { }
 
 
     [UnitTest]
-    [ContextOperator0]
-    [ContextOperator1]
+    [ContextOperatorPrint, ContextOperatorAssign]
+    [ContextOperatorAccess]
     [TargetSet(@"
 x: /\ 
 {
-  this: /!\ ^^ ;
-  xxx: 12;
+  256;
+  this: /!\ ^^;
+  !mutable xxx: 257;
+  258
   result: this xxx; 
 } result ,
 
 x() dump_print
 
-", "12")]
+", "257")]
     public sealed class ContextOperator : CompilerTest { }
 }
