@@ -63,6 +63,10 @@ namespace Reni.Context
             => base.StripConversions
                 .Concat(new[] {Feature.Extension.Conversion(PointerConversion)});
 
-        Result PointerConversion(Category category) => Mutation(Parent.Type.Pointer) & category;
+        Result PointerConversion(Category category) 
+            => Parent
+            .Type
+            .Pointer
+            .Result(category, c=>ArgResult(c).AddToReference(()=>Parent.CompoundViewSize*-1));
     }
 }
