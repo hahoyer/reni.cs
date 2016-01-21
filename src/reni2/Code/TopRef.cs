@@ -8,7 +8,7 @@ namespace Reni.Code
     sealed class TopRef : Ref
     {
         public TopRef(Size offset)
-            : base(offset) { StopByObjectIds(20); }
+            : base(offset) { StopByObjectIds(); }
 
         public TopRef()
             : this(Size.Zero) { }

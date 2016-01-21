@@ -58,7 +58,7 @@ namespace Reni.Feature
             ContextBase context,
             CompileSyntax right)
         {
-            var trace = ObjectId == -6 && category.HasCode;
+            var trace = ObjectId == 5 && category.HasCode;
             StartMethodDump(trace, category, left, token, context, right);
             try
             {
@@ -74,8 +74,11 @@ namespace Reni.Feature
                 var replaceAbsolute = result
                     .ReplaceAbsolute
                     (ConverterPath.Destination.CheckedReference, ConverterPath.Execute);
-                Dump(nameof(replaceAbsolute), replaceAbsolute); 
+                Dump(nameof(replaceAbsolute), replaceAbsolute);
+                if(trace)
+                    Dump(nameof(left), left.Code);
                 BreakExecution();
+
 
                 return ReturnMethodDump(replaceAbsolute.ReplaceArg(left));
 

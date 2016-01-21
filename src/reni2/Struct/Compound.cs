@@ -111,7 +111,7 @@ namespace Reni.Struct
 
         internal Result Result(Category category)
         {
-            var trace = Syntax.ObjectId == -1 && (category.HasCode || category.HasExts);
+            var trace = Syntax.ObjectId == 1 && (category.HasCode );
             StartMethodDump(trace, category);
             try
             {
