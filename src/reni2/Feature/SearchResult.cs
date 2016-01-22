@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Helper;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
@@ -58,7 +59,7 @@ namespace Reni.Feature
             ContextBase context,
             CompileSyntax right)
         {
-            var trace = ObjectId == 5 && category.HasCode;
+            var trace = ObjectId.In()  && category.HasCode;
             StartMethodDump(trace, category, left, token, context, right);
             try
             {
@@ -78,7 +79,6 @@ namespace Reni.Feature
                 if(trace)
                     Dump(nameof(left), left.Code);
                 BreakExecution();
-
 
                 return ReturnMethodDump(replaceAbsolute.ReplaceArg(left));
 
