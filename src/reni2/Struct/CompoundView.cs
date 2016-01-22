@@ -339,13 +339,5 @@ namespace Reni.Struct
             => AccessViaPositionExpression(category, rightResult)
             .ReplaceArg(ObjectPointerViaContext);
 
-        internal Result ContextOperatorResult(Category category)
-        {
-            return ContextReferenceType.Result(category, () => CodeBase.ReferenceCode(Compound));
-        }
-
-        [DisableDump]
-        ContextReferenceType ContextReferenceType => this.CachedValue(() => new ContextReferenceType(this));
-
     }
 }

@@ -12,13 +12,12 @@ namespace Reni.Context
 {
     sealed class ContextReferenceType
         : TypeBase
-            , IReference
             , ISymbolProvider<DumpPrintToken>
     {
         readonly int Order;
-        readonly CompoundView Parent;
+        readonly Compound Parent;
 
-        public ContextReferenceType(CompoundView parent)
+        public ContextReferenceType(Compound parent)
         {
             Parent = parent;
             Order = CodeArgs.NextOrder++;
@@ -27,27 +26,14 @@ namespace Reni.Context
         [DisableDump]
         internal override Root RootContext => Parent.RootContext;
         [DisableDump]
-        internal override CompoundView FindRecentCompoundView => Parent;
+        internal override CompoundView FindRecentCompoundView => Parent.CompoundView;
 
         [DisableDump]
         internal override bool Hllw => false;
         [DisableDump]
-        internal override bool IsPointerPossible => false;
+        internal override bool IsPointerPossible => true;
 
         protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
-
-        int IContextReference.Order => Order;
-
-        IConversion IReference.Converter
-        {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
-        }
-
-        bool IReference.IsWeak => false;
 
         IImplementation ISymbolProvider<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
             => Feature.Extension.Value(DumpPrintTokenResult, this);
@@ -65,8 +51,9 @@ namespace Reni.Context
 
         Result PointerConversion(Category category) 
             => Parent
+            .CompoundView
             .Type
             .Pointer
-            .Result(category, c=>ArgResult(c).AddToReference(()=>Parent.CompoundViewSize*-1));
+            .Result(category, c=>ArgResult(c).AddToReference(()=>Parent.Size()*-1));
     }
 }

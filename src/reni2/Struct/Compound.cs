@@ -13,6 +13,7 @@ using Reni.Type;
 namespace Reni.Struct
 {
     sealed class Compound : DumpableObject, IContextReference, IChild<ContextBase>
+            , ValueCache.IContainer
     {
         static int _nextObjectId;
 
@@ -38,6 +39,8 @@ namespace Reni.Struct
             View = new FunctionCache<int, CompoundView>
                 (position => new CompoundView(this, position));
         }
+
+        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
         public string GetCompoundIdentificationDump() => Syntax.GetCompoundIdentificationDump();
 
@@ -65,19 +68,19 @@ namespace Reni.Struct
                 .CompoundPositionContext(Syntax, position)
                 .ResultCache(Syntax.Statements[position]);
 
-        internal Size Size(int position)
+        internal Size Size(int? position= null)
         {
             if(Hllw(position))
                 return Basics.Size.Zero;
             return ResultsOfStatements(Category.Size, 0, position).Size;
         }
 
-        internal bool Hllw(int accessPosition) => ObtainHllw(accessPosition);
+        internal bool Hllw(int? accessPosition) => ObtainHllw(accessPosition);
 
         internal Size FieldOffsetFromAccessPoint(int accessPosition, int fieldPosition)
             => ResultsOfStatements(Category.Size, fieldPosition + 1, accessPosition).Size;
 
-        Result ResultsOfStatements(Category category, int fromPosition, int fromNotPosition)
+        Result ResultsOfStatements(Category category, int fromPosition, int? fromNotPosition)
         {
             if(category.IsNone)
                 return new Result();
@@ -88,7 +91,7 @@ namespace Reni.Struct
                 Dump("Statements", Syntax.Statements);
                 BreakExecution();
 
-                var statements = (fromNotPosition - fromPosition)
+                var statements = ((fromNotPosition??EndPosition) - fromPosition)
                     .Select(i => fromPosition + i)
                     .Where(position => !Syntax.Statements[position].IsLambda)
                     .Select(position => AccessResult(category, position))
@@ -109,9 +112,11 @@ namespace Reni.Struct
             }
         }
 
+        int EndPosition => Syntax.EndPosition;
+
         internal Result Result(Category category)
         {
-            var trace = Syntax.ObjectId == 1 && (category.HasCode );
+            var trace = Syntax.ObjectId == -1 && (category.HasCode );
             StartMethodDump(trace, category);
             try
             {
@@ -183,13 +188,13 @@ namespace Reni.Struct
         internal TypeBase AccessType(int accessPosition, int position)
             => AccessResult(Category.Type, accessPosition, position).Type;
 
-        bool ObtainHllw(int accessPosition)
+        bool ObtainHllw(int? accessPosition)
         {
             var trace = ObjectId == -10 && accessPosition == 3 && Parent.ObjectId == 4;
             StartMethodDump(trace, accessPosition);
             try
             {
-                var subStatementIds = accessPosition.Select().ToArray();
+                var subStatementIds = (accessPosition??EndPosition).Select().ToArray();
                 Dump("subStatementIds", subStatementIds);
                 BreakExecution();
                 if(subStatementIds.Any(position => InnerHllwStatic(position) == false))
@@ -224,5 +229,14 @@ namespace Reni.Struct
         bool? InnerHllwStatic(int position) => Syntax.Statements[position].Hllw;
 
         ContextBase IChild<ContextBase>.Parent => Parent;
+
+        internal Result ContextOperatorResult(Category category)
+        {
+            return ContextReferenceType.Result(category, () => CodeBase.ReferenceCode(this));
+        }
+
+        [DisableDump]
+        ContextReferenceType ContextReferenceType => this.CachedValue(() => new ContextReferenceType(this));
+
     }
 }

@@ -16,6 +16,9 @@ namespace Reni.Context
 
         protected override Result Result
             (ContextBase context, Category category, TerminalSyntax token)
-            => context.FindRecentCompoundView.ContextOperatorResult(category);
+            => context
+            .FindRecentCompoundView
+            .Compound
+            .ContextOperatorResult(category);
     }
 }
