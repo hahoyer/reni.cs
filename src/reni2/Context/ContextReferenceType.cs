@@ -12,7 +12,7 @@ namespace Reni.Context
 {
     sealed class ContextReferenceType
         : TypeBase
-            , ISymbolProvider<DumpPrintToken>
+            , ISymbolProviderForPointer<DumpPrintToken>
     {
         readonly int Order;
         readonly Compound Parent;
@@ -35,7 +35,7 @@ namespace Reni.Context
 
         protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
 
-        IImplementation ISymbolProvider<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
+        IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
             => Feature.Extension.Value(DumpPrintTokenResult, this);
 
         protected override CodeBase DumpPrintCode()
