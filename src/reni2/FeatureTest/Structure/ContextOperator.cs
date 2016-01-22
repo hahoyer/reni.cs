@@ -28,15 +28,16 @@ x() dump_print
     [TargetSet(@"
 x: /\ 
 {
-  256;
+  '12345';
   this: ^^;
+  '12345678901';
   xxx: 257;
-  258
+  '12345678901234567890123456789';
 };
 
 xx : x();
-xx this xxx dump_print
-
+xxx : xx this;
+xxx xxx dump_print
 ", "257")]
     public sealed class ContextOperatorAccess : CompilerTest { }
 
@@ -46,10 +47,11 @@ xx this xxx dump_print
     [TargetSet(@"
 x: /\ 
 {
-  256;
+  '12345';
   this: ^^;
+  '12345678901';
   !mutable xxx: 257;
-  258
+  '12345678901234567890123456789';
 };
 
 xx : x();
