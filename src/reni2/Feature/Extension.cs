@@ -129,14 +129,7 @@ namespace Reni.Feature
             if(right != null)
                 valueCategory = category.Typed;
 
-            var valueResult = feature.Function != null && feature.Function.IsImplicit
-                ? feature
-                    .Function
-                    .Result(valueCategory, context.RootContext.VoidType)
-                    .ReplaceArg(context.RootContext.VoidType.Result(Category.All))
-                : right == null || feature.Function == null
-                    ? feature.Value?.Execute(valueCategory)
-                    : null;
+            var valueResult = feature.ValueResult(context, right, valueCategory);
 
             if(right == null)
             {
@@ -149,15 +142,42 @@ namespace Reni.Feature
             {
                 if(feature.Function == null)
                     Dumpable.NotImplementedFunction(feature, category, token, context, right);
+
                 Tracer.Assert(feature.Function != null);
-                return feature
+
+                var result = feature
                     .Function
-                    .Result(category, context.ResultAsReferenceCache(right).Type)
+                    .Result(category, context.ResultAsReferenceCache(right).Type);
+
+                return result
                     .ReplaceArg(context.ResultAsReferenceCache(right));
             }
 
             return valueResult
                 .Type.Execute(category, valueResult, token, null, context, right);
+        }
+
+        static Result ValueResult
+            (
+            this IEvalImplementation feature,
+            ContextBase context,
+            CompileSyntax right,
+            Category valueCategory)
+        {
+            if(feature.Function != null && feature.Function.IsImplicit)
+            {
+                var result = feature
+                    .Function
+                    .Result(valueCategory, context.RootContext.VoidType);
+
+                return result
+                    .ReplaceArg(context.RootContext.VoidType.Result(Category.All));
+            }
+
+            if(right != null && feature.Function != null)
+                return null;
+
+            return feature.Value?.Execute(valueCategory);
         }
 
         internal static Result Result
