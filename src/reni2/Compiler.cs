@@ -46,7 +46,7 @@ namespace Reni
         internal readonly Source Source;
 
         [Node]
-        internal readonly Root RootContext;
+        internal readonly Root Root;
 
         bool _isInExecutionPhase;
 
@@ -70,7 +70,7 @@ namespace Reni
                 );
 
             ModuleName = moduleName ?? ModuleNameFromFileName(fileName) ?? "ReniModule";
-            RootContext = new Root(this);
+            Root = new Root(this);
             _parameters = parameters ?? new CompilerParameters();
 
             _tokenFactory = new MainTokenFactory(Scanner)
@@ -84,7 +84,7 @@ namespace Reni
                     : new Source(fileName.FileHandle()));
 
             CodeContainerCache = NewValueCache
-                (() => new CodeContainer(ModuleName, RootContext, Syntax, Source.Data));
+                (() => new CodeContainer(ModuleName, Root, Syntax, Source.Data));
         }
 
         static string ModuleNameFromFileName(string fileName)

@@ -14,7 +14,7 @@ namespace Reni.Code
     public sealed class CodeContainer : DumpableObject
     {
         readonly string ModuleName;
-        readonly Root RootContext;
+        readonly Root Root;
         [Node]
         readonly ValueCache<Container> MainCache;
         [Node]
@@ -22,14 +22,14 @@ namespace Reni.Code
         readonly ValueCache<string> CSharpStringCache;
 
         internal CodeContainer
-            (string moduleName, Root rootContext, Syntax syntax, string description)
+            (string moduleName, Root root, Syntax syntax, string description)
         {
             ModuleName = moduleName;
-            RootContext = rootContext;
+            Root = root;
             MainCache = new ValueCache<Container>
-                (() => rootContext.MainContainer(syntax, description));
+                (() => root.MainContainer(syntax, description));
             CSharpStringCache = new ValueCache<string>(GetCSharpStringForCache);
-            _functions = new FunctionCache<int, FunctionContainer>(RootContext.FunctionContainer);
+            _functions = new FunctionCache<int, FunctionContainer>(Root.FunctionContainer);
         }
 
         internal IEnumerable<Issue> Issues
@@ -41,7 +41,7 @@ namespace Reni.Code
         {
             get
             {
-                for(var i = 0; i < RootContext.FunctionCount; i++)
+                for(var i = 0; i < Root.FunctionCount; i++)
                     _functions.IsValid(i, true);
                 return _functions;
             }
@@ -68,7 +68,7 @@ namespace Reni.Code
         public override string DumpData()
         {
             var result = "main\n" + Main.Dump() + "\n";
-            for(var i = 0; i < RootContext.FunctionCount; i++)
+            for(var i = 0; i < Root.FunctionCount; i++)
                 result += "function index=" + i + "\n" + _functions[i].Dump() + "\n";
             return result;
         }

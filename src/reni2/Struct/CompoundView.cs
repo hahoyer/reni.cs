@@ -135,7 +135,7 @@ namespace Reni.Struct
         internal bool Hllw => Compound.Hllw(ViewPosition);
 
         [DisableDump]
-        internal Root RootContext => Compound.RootContext;
+        internal Root Root => Compound.Root;
 
         [DisableDump]
         internal IEnumerable<IConversion> ConverterFeatures
@@ -187,7 +187,7 @@ namespace Reni.Struct
             var position = rightResult
                 .Conversion(IndexType)
                 .SmartUn<PointerType>()
-                .Evaluate(Compound.RootContext.ExecutionContext)
+                .Evaluate(Compound.Root.ExecutionContext)
                 .ToInt32();
             return AccessViaObjectPointer(category, position);
         }
@@ -200,10 +200,10 @@ namespace Reni.Struct
         internal Result DumpPrintResultViaObject(Category category)
         {
             if(IsDumpPrintResultViaObjectActive)
-                return RootContext.VoidType.Result(category, () => CodeBase.DumpPrintText("?"));
+                return Root.VoidType.Result(category, () => CodeBase.DumpPrintText("?"));
 
             IsDumpPrintResultViaObjectActive = true;
-            var result = RootContext.ConcatPrintResult
+            var result = Root.ConcatPrintResult
                 (
                     category,
                     ViewPosition,
@@ -250,7 +250,7 @@ namespace Reni.Struct
 
         IConversion ConversionFunction(FunctionSyntax body)
         {
-            IConversion result = new ConverterAccess(Function(body, RootContext.VoidType), Type);
+            IConversion result = new ConverterAccess(Function(body, Root.VoidType), Type);
             var source = result.Source;
             Tracer.Assert(source == Type.Pointer, source.Dump);
             Tracer.Assert(source == result.Result(Category.Code).Code.ArgType);
@@ -283,7 +283,7 @@ namespace Reni.Struct
 
         internal FunctionType Function(FunctionSyntax body, TypeBase argsType)
             => Compound
-                .RootContext
+                .Root
                 .FunctionInstance(this, body, argsType);
 
         internal Result ObjectPointerViaContext(Category category)

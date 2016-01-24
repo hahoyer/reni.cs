@@ -46,7 +46,7 @@ namespace Reni
         public Token LocatePosition(int current) => LocateCache[current];
 
         internal FunctionType Function(int index)
-            => Parent.RootContext.Function(index);
+            => Parent.Root.Function(index);
 
 
         internal object FindFunction(IFormalCodeItem codeBase)
@@ -64,7 +64,7 @@ namespace Reni
                 return result;
 
             var results = Parent
-                .RootContext
+                .Root
                 .FunctionCount
                 .Select()
                 .Where(item => !CodeToFunctionIndexCache.Values.Contains(item));

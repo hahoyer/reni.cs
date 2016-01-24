@@ -25,7 +25,7 @@ namespace Reni.Struct
         [DisableDump]
         internal CompoundView View { get; }
         [DisableDump]
-        internal override Root Root => View.RootContext;
+        internal override Root Root => View.Root;
         [DisableDump]
         internal override CompoundView FindRecentCompoundView => View;
         [DisableDump]

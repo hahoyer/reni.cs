@@ -43,7 +43,7 @@ namespace Reni.Struct
                 (position => new CompoundView(this, position));
         }
 
-        Root IRootProvider.Value => RootContext;
+        Root IRootProvider.Value => Root;
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
@@ -58,7 +58,7 @@ namespace Reni.Struct
         internal TypeBase IndexType => Parent.RootContext.BitType.Number(IndexSize.ToInt());
 
         [DisableDump]
-        internal Root RootContext => Parent.RootContext;
+        internal Root Root => Parent.RootContext;
 
         [DisableDump]
         internal CompoundView CompoundView => Parent.CompoundView(Syntax);
