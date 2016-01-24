@@ -21,7 +21,7 @@ namespace Reni.Code.ReplaceVisitor
 
         internal override CodeBase ContextRef(ReferenceCode visitedObject)
         {
-            if(visitedObject.Context == (IContextReference) Context)
+            if(visitedObject.Target == (IContextReference) Context)
                 return Replacement();
             return null;
         }

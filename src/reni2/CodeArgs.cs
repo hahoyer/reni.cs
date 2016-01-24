@@ -8,6 +8,7 @@ using hw.DebugFormatter;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
+using Reni.Type;
 
 namespace Reni
 {
@@ -109,7 +110,7 @@ namespace Reni
         {
             var result = new SizeArray();
             for(var i = 0; i < Count; i++)
-                result.Add(Root.DefaultRefAlignParam.RefSize);
+                result.Add(_data[i].Size());
             return result;
         }
 

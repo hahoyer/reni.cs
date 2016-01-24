@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.DebugFormatter;
 using hw.Forms;
 using Reni.Basics;
-using Reni.Context;
-using Reni.Struct;
 using Reni.Type;
 
 namespace Reni.Code
@@ -15,34 +12,31 @@ namespace Reni.Code
     /// </summary>
     sealed class ReferenceCode : FiberHead
     {
-        readonly IContextReference _context;
         static int _nextObjectId;
 
-        internal ReferenceCode(IContextReference context)
+        [Node]
+        internal readonly IContextReference Target;
+
+        internal ReferenceCode(IContextReference target)
             : base(_nextObjectId++)
         {
-            _context = context;
-            var compoundView = ((context as PointerType)
-                ?.ValueType as CompoundType)
-                ?.View;
+            Target = target;
             StopByObjectIds();
         }
 
-        [Node]
-        internal IContextReference Context => _context;
 
-        protected override CodeArgs GetRefsImplementation() => CodeArgs.Create(_context);
+        protected override CodeArgs GetRefsImplementation() => CodeArgs.Create(Target);
 
-        protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
+        protected override Size GetSize() => Target.Size();
 
         protected override TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
             => actual.ContextRef(this);
 
         internal override void Visit(IVisitor visitor)
         {
-            throw new UnexpectedContextReference(_context);
+            throw new UnexpectedContextReference(Target);
         }
 
-        public override string DumpData() => _context.NodeDump();
+        public override string DumpData() => Target.NodeDump();
     }
-}                                    
+}

@@ -14,7 +14,7 @@ namespace ReniBrowser.CompilationView
         internal CodeViewVisitor(SourceView master) { Master = master; }
 
         internal override Control ContextRef(ReferenceCode visitedObject)
-            => visitedObject.Context.CreateLink(Master);
+            => visitedObject.Target.CreateLink(Master);
 
         internal override Control LocalReference(LocalReference target)
         {
