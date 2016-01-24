@@ -2,6 +2,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using Reni.Code;
+using Reni.Context;
 using Reni.Feature;
 
 namespace Reni.Type
@@ -10,10 +11,5 @@ namespace Reni.Type
     {
         IConversion Converter { get; }
         bool IsWeak { get; }
-    }
-
-    static class ReferenceExtension
-    {
-        internal static TypeBase Type(this IReference referenceType) => (TypeBase) referenceType;
     }
 }

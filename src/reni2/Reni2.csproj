@@ -28,6 +28,7 @@
     <Compile Include="Code\UnknownStackData.cs" />
     <Compile Include="CompilerBrowser.cs" />
     <Compile Include="Context\ContextReferenceType.cs" />
+    <Compile Include="Context\IRootProvider.cs" />
     <Compile Include="FeatureTest\Array\ArrayFromPieces.cs" />
     <Compile Include="FeatureTest\Array\CombineArraysFromPieces.cs" />
     <Compile Include="FeatureTest\Array\DefaultInitialized.cs" />
@@ -370,6 +371,7 @@
     <Compile Include="Type\NumberType.cs" />
     <Compile Include="Type\Flags.cs" />
     <Compile Include="Type\ArrayReferenceType.cs" />
+    <Compile Include="Type\ReferenceExtension.cs" />
     <Compile Include="Type\StableReferenceType.cs" />
     <Compile Include="Type\RepeaterAccessType.cs" />
     <Compile Include="Type\Child.cs" />
