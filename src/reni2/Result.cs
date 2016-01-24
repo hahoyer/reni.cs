@@ -926,6 +926,10 @@ namespace Reni
         {
             var destinationType = Type
                 .AutomaticDereferenceType.Align;
+
+            if (destinationType == Type)
+                return this;
+
             return Type
                 .Conversion(CompleteCategory, destinationType)
                 .ReplaceArg(this);
