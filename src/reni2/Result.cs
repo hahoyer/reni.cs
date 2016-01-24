@@ -935,8 +935,10 @@ namespace Reni
                 .ReplaceArg(this);
         }
 
-        internal Result DereferencedAlignedResult(Size size)
-            => new Result(CompleteCategory - Category.Type, getCode: () => Code.DePointer(size));
+        internal Result DereferencedAlignedResult(Size size) 
+            => HasCode
+            ? new Result(CompleteCategory - Category.Type, getCode: () => Code.DePointer(size))
+            : this;
 
         internal Result ConvertToConverter(TypeBase source)
             => source.Hllw || (!HasExts && !HasCode)
