@@ -59,7 +59,7 @@ namespace Reni.Feature
             ContextBase context,
             CompileSyntax right)
         {
-            var trace = ObjectId.In()  && category.HasCode;
+            var trace = ObjectId.In(331)  && category.HasCode;
             StartMethodDump(trace, category, left, token, context, right);
             try
             {
