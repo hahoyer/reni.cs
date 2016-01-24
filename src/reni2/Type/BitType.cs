@@ -12,10 +12,10 @@ namespace Reni.Type
 {
     sealed class BitType : TypeBase, ISymbolProviderForPointer<DumpPrintToken>
     {
-        internal BitType(Root rootContext) { RootContext = rootContext; }
+        internal BitType(Root root) { Root = root; }
 
         [DisableDump]
-        internal override Root RootContext { get; }
+        internal override Root Root { get; }
 
         [DisableDump]
         internal override string DumpPrintText => "bit";

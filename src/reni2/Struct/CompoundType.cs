@@ -25,7 +25,7 @@ namespace Reni.Struct
         [DisableDump]
         internal CompoundView View { get; }
         [DisableDump]
-        internal override Root RootContext => View.RootContext;
+        internal override Root Root => View.RootContext;
         [DisableDump]
         internal override CompoundView FindRecentCompoundView => View;
         [DisableDump]
@@ -61,7 +61,7 @@ namespace Reni.Struct
             }
         }
 
-        Result VoidConversion(Category category) => Mutation(RootContext.VoidType) & category;
+        Result VoidConversion(Category category) => Mutation(Root.VoidType) & category;
 
         IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature
             (DumpPrintToken tokenClass)

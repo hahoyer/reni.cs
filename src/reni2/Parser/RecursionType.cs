@@ -17,8 +17,8 @@ namespace Reni.Parser
             , IMeta
             , IContextReference
     {
-        public RecursionType(Root rootContext) { RootContext = rootContext; }
-        internal override Root RootContext { get; }
+        public RecursionType(Root root) { Root = root; }
+        internal override Root Root { get; }
 
         IMeta IMetaImplementation.Function => this;
         IFunction IEvalImplementation.Function => this;

@@ -19,7 +19,7 @@ namespace Reni.Validation
         }
 
         [DisableDump]
-        internal override Root RootContext => _issueType.RootContext;
+        internal override Root Root => _issueType.Root;
 
         internal override CodeBase Code => _issueType.Code + base.Code;
     }

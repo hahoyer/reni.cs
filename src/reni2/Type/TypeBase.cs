@@ -23,6 +23,7 @@ namespace Reni.Type
             , IIconKeyProvider
             , ISearchTarget
         , ValueCache.IContainer
+        ,IRootProvider
     {
         sealed class Cache
         {
@@ -102,9 +103,11 @@ namespace Reni.Type
         [SmartNode]
         readonly Cache _cache;
 
+        Root IRootProvider.Value => Root;
+
         [DisableDump]
         [Node]
-        internal abstract Root RootContext { get; }
+        internal abstract Root Root { get; }
 
         protected TypeBase()
             : base(_nextObjectId++)
@@ -207,7 +210,7 @@ namespace Reni.Type
         internal virtual Size SimpleItemSize => null;
 
         Result VoidCodeAndRefs(Category category)
-            => RootContext.VoidType.Result(category & (Category.Code | Category.Exts));
+            => Root.VoidType.Result(category & (Category.Code | Category.Exts));
 
         internal ArrayType Array(int count, string options = null)
             => _cache.Array[count][options ?? ArrayType.Options.DefaultOptionsId];
@@ -347,10 +350,10 @@ namespace Reni.Type
         internal virtual bool HasQuickSize => true;
 
         [DisableDump]
-        internal VoidType VoidType => RootContext.VoidType;
+        internal VoidType VoidType => Root.VoidType;
 
         [DisableDump]
-        internal BitType BitType => RootContext.BitType;
+        internal BitType BitType => Root.BitType;
 
         [DisableDump]
         internal virtual TypeBase CoreType => this;
@@ -665,7 +668,7 @@ namespace Reni.Type
             => new RootIssueType
                 (
                 new Issue(issueId, source, "Type: " + DumpPrintText),
-                RootContext
+                Root
                 );
 
         internal Result Execute

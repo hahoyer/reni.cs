@@ -37,7 +37,7 @@ namespace Reni.Type
         internal TypeBase ValueType { get; }
 
         [DisableDump]
-        internal override Root RootContext => ValueType.RootContext;
+        internal override Root Root => ValueType.Root;
         internal override string DumpPrintText => "(" + ValueType.DumpPrintText + ")~~~";
 
         [DisableDump]

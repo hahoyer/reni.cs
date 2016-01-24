@@ -25,7 +25,8 @@ namespace Reni.Context
         : DumpableObject
             , ResultCache.IResultProvider
             , IIconKeyProvider
-            , ValueCache.IContainer
+            , ValueCache.IContainer          
+        ,IRootProvider
     {
         protected override string GetNodeDump()
             => base.GetNodeDump() + "(" + GetContextIdentificationDump() + ")";
@@ -42,6 +43,8 @@ namespace Reni.Context
         public abstract string GetContextIdentificationDump();
 
         string IIconKeyProvider.IconKey => "Context";
+
+        Root IRootProvider.Value => RootContext;
 
         [DisableDump]
         [Node]

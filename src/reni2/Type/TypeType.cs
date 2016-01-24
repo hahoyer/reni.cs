@@ -27,7 +27,7 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        internal override Root RootContext => Value.RootContext;
+        internal override Root Root => Value.Root;
 
         [DisableDump]
         internal override bool Hllw => true;
@@ -115,7 +115,7 @@ namespace Reni.Type
                 return null;
             }
 
-            return RootContext.BitType.Result(category, BitsConst.Convert(count.Value));
+            return Root.BitType.Result(category, BitsConst.Convert(count.Value));
         }
 
         Result MutableArrayResult(Category category)

@@ -9,7 +9,7 @@ namespace Reni.Type
     abstract class DataSetterTargetType : SetterTargetType
     {
         protected override Result SetterResult(Category category)
-            => RootContext.VoidType.Result(category, SetterCode);
+            => Root.VoidType.Result(category, SetterCode);
 
         protected override Result GetterResult(Category category)
             => ValueType

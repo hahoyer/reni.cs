@@ -72,7 +72,7 @@ namespace Reni.Type
         Options OptionsValue { get; }
 
         [DisableDump]
-        internal override Root RootContext => ValueType.RootContext;
+        internal override Root Root => ValueType.Root;
         internal override string DumpPrintText
             => "(" + ValueType.DumpPrintText + ")reference" + OptionsValue.DumpPrintText;
 
@@ -106,7 +106,7 @@ namespace Reni.Type
             => ValueType.ArrayReference(OptionsValue.IsEnableReinterpretation.SetTo(true));
 
         TypeBase IRepeaterType.ElementType => ValueType;
-        TypeBase IRepeaterType.IndexType => RootContext.BitType.Number(Size.ToInt());
+        TypeBase IRepeaterType.IndexType => Root.BitType.Number(Size.ToInt());
         bool IRepeaterType.IsMutable => OptionsValue.IsForceMutable.Value;
 
         IConversion IReference.Converter => this;

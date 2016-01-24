@@ -19,7 +19,7 @@ namespace Reni.Context
         internal ContextReferenceType(CompoundView parent) { Parent = parent; }
 
         [DisableDump]
-        internal override Root RootContext => Parent.RootContext;
+        internal override Root Root => Parent.RootContext;
         [DisableDump]
         internal override CompoundView FindRecentCompoundView => Parent;
         [DisableDump]

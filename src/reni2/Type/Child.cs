@@ -21,7 +21,7 @@ namespace Reni.Type
         [DisableDump]
         public TParent Parent { get; }
         [DisableDump]
-        internal override Root RootContext => Parent.RootContext;
+        internal override Root Root => Parent.Root;
 
         IConversion IProxyType.Converter => this;
         TypeBase IConversion.Source => this;

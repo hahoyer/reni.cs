@@ -32,14 +32,14 @@ namespace Reni.Type
 
         Result GetZeroResult()
         {
-            return RootContext
+            return Root
                 .BitType
                 .Number(1)
                 .Result(Category.All, () => CodeBase.BitsConst(BitsConst.Convert(0)));
         }
 
         [DisableDump]
-        internal override Root RootContext => Parent.RootContext;
+        internal override Root Root => Parent.Root;
         [DisableDump]
         internal override bool Hllw => Parent.Hllw;
         [DisableDump]
@@ -133,8 +133,8 @@ namespace Reni.Type
         {
             var transformation = operation as ITransformation;
             var resultType = transformation == null
-                ? (TypeBase) RootContext.BitType
-                : RootContext.BitType.Number(transformation.Signature(Bits, right.Bits));
+                ? (TypeBase) Root.BitType
+                : Root.BitType.Number(transformation.Signature(Bits, right.Bits));
             return OperationResult(category, resultType, operation.Name, right);
         }
 

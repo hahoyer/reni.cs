@@ -75,7 +75,7 @@ namespace Reni.Type
         Options OptionsValue { get; }
 
         TypeBase IRepeaterType.ElementType => ElementType;
-        TypeBase IRepeaterType.IndexType => RootContext.BitType.Number(IndexSize.ToInt());
+        TypeBase IRepeaterType.IndexType => Root.BitType.Number(IndexSize.ToInt());
         bool IRepeaterType.IsMutable => IsMutable;
         [DisableDump]
         RepeaterAccessType AccessType => _repeaterAccessTypeCache.Value;
@@ -233,10 +233,10 @@ namespace Reni.Type
         TypeBase ElementAccessType => ElementType.TypeForArrayElement;
 
         [DisableDump]
-        internal override Root RootContext => ElementType.RootContext;
+        internal override Root Root => ElementType.Root;
 
         [DisableDump]
-        TypeBase IndexType => RootContext.BitType.Number(IndexSize.ToInt());
+        TypeBase IndexType => Root.BitType.Number(IndexSize.ToInt());
 
         Size IndexSize => Size.AutoSize(Count).Align(Root.DefaultRefAlignParam.AlignBits);
 
@@ -271,7 +271,7 @@ namespace Reni.Type
 
         Result DumpPrintTokenArrayResult(Category category)
         {
-            var result = RootContext.ConcatPrintResult(category, Count, DumpPrintResult);
+            var result = Root.ConcatPrintResult(category, Count, DumpPrintResult);
             if(category.HasCode)
                 result.Code = CodeBase.DumpPrintText
                     ("<<" + (OptionsValue.IsMutable.Value ? ":=" : ""))
@@ -304,7 +304,7 @@ namespace Reni.Type
             var conversionBase = right.Evaluate(context).ToInt32();
             Tracer.Assert(conversionBase >= 2, conversionBase.ToString);
             var result = BitsConst.Convert(target, conversionBase);
-            return RootContext.BitType.Result(category, result).Align;
+            return Root.BitType.Result(category, result).Align;
         }
 
         Result CountResult

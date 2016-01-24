@@ -15,6 +15,8 @@ namespace Reni.Struct
     sealed class Compound
         : DumpableObject, IContextReference, IChild<ContextBase>
             , ValueCache.IContainer
+            , IRootProvider
+
     {
         static int _nextObjectId;
 
@@ -40,6 +42,8 @@ namespace Reni.Struct
             View = new FunctionCache<int, CompoundView>
                 (position => new CompoundView(this, position));
         }
+
+        Root IRootProvider.Value => RootContext;
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
@@ -160,7 +164,7 @@ namespace Reni.Struct
         Result AccessResult(Category category, int accessPosition, int position)
         {
             var trace = Syntax.ObjectId.In()
-                && accessPosition >0
+                && accessPosition > 0
                 && position == 2
                 //&& category.HasCode
                 ;

@@ -10,10 +10,10 @@ namespace Reni.Type
 {
     sealed class VoidType : TypeBase, ISymbolProvider<DumpPrintToken>
     {
-        internal VoidType(Root rootContext) { RootContext = rootContext; }
+        internal VoidType(Root root) { Root = root; }
 
         [DisableDump]
-        internal override Root RootContext { get; }
+        internal override Root Root { get; }
 
         [DisableDump]
         internal override string DumpPrintText => "void";

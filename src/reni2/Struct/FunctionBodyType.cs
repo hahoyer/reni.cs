@@ -56,7 +56,7 @@ namespace Reni.Struct
         [DisableDump]
         internal override CompoundView FindRecentCompoundView => CompoundView;
         [DisableDump]
-        internal override Root RootContext => CompoundView.RootContext;
+        internal override Root Root => CompoundView.RootContext;
         [DisableDump]
         internal override bool Hllw => true;
 

@@ -47,7 +47,7 @@ namespace Reni.Type
         Result ReassignResult(Category category, TypeBase right)
         {
             if(category == Category.Type)
-                return RootContext.VoidType.Result(category);
+                return Root.VoidType.Result(category);
 
             var trace = ObjectId == -97 && category.HasCode;
             StartMethodDump(trace, category, right);
@@ -86,7 +86,7 @@ namespace Reni.Type
         protected abstract Result GetterResult(Category category);
 
         [DisableDump]
-        internal override Root RootContext => ValueType.RootContext;
+        internal override Root Root => ValueType.Root;
 
         [DisableDump]
         internal override TypeBase TypeForTypeOperator => ValueType.TypeForTypeOperator;

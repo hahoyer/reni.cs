@@ -17,7 +17,7 @@ namespace Reni.Type
 
         internal Pair(TypeBase first, TypeBase second)
         {
-            Tracer.Assert(first.RootContext == second.RootContext);
+            Tracer.Assert(first.Root == second.Root);
             _first = first;
             _second = second;
         }
@@ -25,7 +25,7 @@ namespace Reni.Type
         [DisableDump]
         internal override bool Hllw => _first.Hllw && _second.Hllw;
         [DisableDump]
-        internal override Root RootContext => _first.RootContext;
+        internal override Root Root => _first.Root;
         protected override Size GetSize() => _first.Size + _second.Size;
 
         [DisableDump]
