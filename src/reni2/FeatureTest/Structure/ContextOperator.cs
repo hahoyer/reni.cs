@@ -39,11 +39,12 @@ xx : x();
 xxx : xx this;
 xxx xxx dump_print
 ", "257")]
-    public sealed class ContextOperatorAccess : CompilerTest { }
+    public sealed class ContextOperatorAccess : CompilerTest {}
 
     [UnitTest]
     [Access]
-    [NamedSimpleAssignment, ContextOperatorAccess]
+    [NamedSimpleAssignment]
+    [ContextOperatorAccess]
     [TargetSet(@"
 x: /\ 
 {
@@ -58,43 +59,55 @@ xx : x();
 xx this() xxx dump_print
 
 ", "257")]
-    public sealed class ContextOperatorFunctionAccess : CompilerTest { }
+    public sealed class ContextOperatorFunctionAccess : CompilerTest {}
 
     [UnitTest]
     [Access]
-    [NamedSimpleAssignment, ContextOperatorFunctionAccess]
+    [NamedSimpleAssignment]
+    [ContextOperatorFunctionAccess]
+    [ContextOperatorAccess]
     [TargetSet(@"
 x: /\ 
 {
   '12345';
-  this: /\ ^^;
+  this: /!\ ^^;
   '12345678901';
   !mutable xxx: 257;
   '12345678901234567890123456789';
 };
 
 xx : x();
-xx this() xxx := 2;
-xx dump_print
+xx this xxx dump_print
 
-", "(12345, , 12345678901, 2, 12345678901234567890123456789, )")]
-    public sealed class ContextOperatorAssign : CompilerTest { }
+", "257")]
+    public sealed class ContextOperatorPropertyAccess : CompilerTest {}
 
     [UnitTest]
-    [ContextOperatorPrint, ContextOperatorAssign]
-    [ContextOperatorAccess]
+    [Access]
+    [NamedSimpleAssignment]
+    [ContextOperatorPropertyAccess]
     [TargetSet(@"
 x: /\ 
 {
-  256;
+  '12345';
   this: /!\ ^^;
+  '12345678901';
   !mutable xxx: 257;
-  258
-  result: this xxx; 
-} result ,
+  '12345678901234567890123456789';
+};
 
-x() dump_print
+xx : x();
+xx this xxx := 2;
+xx dump_print
 
-", "257")]
-    public sealed class ContextOperator : CompilerTest { }
+", "(12345, /!\\, 12345678901, 2, 12345678901234567890123456789, )")]
+    public sealed class ContextOperatorAssign : CompilerTest {}
+
+    [UnitTest]
+    [ContextOperatorPrint]
+    [ContextOperatorAccess]
+    [ContextOperatorAssign]
+    [ContextOperatorPropertyAccess]
+    [ContextOperatorFunctionAccess]
+    public sealed class ContextOperator : CompilerTest {}
 }
