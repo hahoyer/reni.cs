@@ -1,6 +1,7 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -43,7 +44,8 @@ namespace Reni.Code
             var name =
                 Environment.GetEnvironmentVariable("temp")
                     + "\\reni.compiler\\"
-                    + Thread.CurrentThread.ManagedThreadId
+                    + Process.GetCurrentProcess().Id
+                    + "." + Thread.CurrentThread.ManagedThreadId
                     + ".reni.cs";
             var fileHandle = name.FileHandle();
             fileHandle.AssumeDirectoryOfFileExists();
@@ -107,6 +109,5 @@ namespace Reni.Code
             _main = main;
             _functions = functions;
         }
-
     }
 }
