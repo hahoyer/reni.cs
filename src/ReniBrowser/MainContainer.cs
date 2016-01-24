@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using Reni.FeatureTest.Helper;
-using Reni.FeatureTest.Structure;
+using Reni.FeatureTest.Reference;
 using ReniBrowser.CompilationView;
 
 namespace reniBrowser
@@ -14,7 +14,7 @@ namespace reniBrowser
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            BrowseTestResult<ContextOperatorFunctionAccess>();
+            BrowseTestResult<ArrayReferenceByInstance>();
         }
 
         static void BrowseTestResult<T>()
