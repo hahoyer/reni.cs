@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using hw.Helper;
 using Reni.Code;
 
 namespace ReniBrowser.CompilationView
@@ -73,13 +74,21 @@ namespace ReniBrowser.CompilationView
         }
 
         internal override Control ReferencePlusConstant(ReferencePlusConstant visitedObject)
-            => ("Right=" + visitedObject.Right.ToInt()).CreateView();
+            => visitedObject.Right.CreateView();
 
         internal override Control BitArrayBinaryOp(BitArrayBinaryOp visitedObject)
             => (
                 "OpToken=" + visitedObject.OpToken +
                     " LeftSize=" + visitedObject.LeftSize.ToInt() +
                     " RightSize=" + visitedObject.RightSize.ToInt()
+                ).CreateView();
+
+        internal override Control DumpPrintNumberOperation(DumpPrintNumberOperation visitedObject)
+            => (
+                visitedObject.RightSize.IsZero
+                    ? ""
+                    : " LeftSize=" + visitedObject.LeftSize.ToInt() +
+                        " RightSize=" + visitedObject.RightSize.ToInt()
                 ).CreateView();
 
         internal override Control ArraySetter(ArraySetter visitedObject)
@@ -90,6 +99,15 @@ namespace ReniBrowser.CompilationView
 
         internal override Control Assign(Assign visitedObject)
             => ("TargetSize=" + visitedObject.TargetSize).CreateView();
+
+        internal override Control DumpPrintText(DumpPrintText visitedObject)
+            => visitedObject.Value.Quote().CreateView();
+
+        internal override Control DumpPrintTextOperation(DumpPrintTextOperation visitedObject)
+            => (
+            "ItemSize=" + visitedObject.ItemSize +
+            " Count=" + visitedObject.InputSize / visitedObject.ItemSize
+            ).CreateView();
 
         static Control ArrayAccess(ArrayAccess visitedObject)
             => (
@@ -123,16 +141,16 @@ namespace ReniBrowser.CompilationView
 
             var fiberHead = visitedObject.FiberHead;
             result.Controls.Add(fiberHead.Size.CreateView(), 1, 0);
-            result.Controls.Add(fiberHead.GetType().CreateView(), 2, 0);
+            result.Controls.Add(fiberHead.GetType().Name.CreateView(), 2, 0);
             result.Controls.Add(newHead ?? Default(fiberHead), 3, 0);
             result.Controls.Add(Master.TraceLogItem(fiberHead, Master).CreateLink(), 4, 0);
 
-            for (var i = 0; i < visitedObject.FiberItems.Length; i++)
+            for(var i = 0; i < visitedObject.FiberItems.Length; i++)
             {
                 var item = visitedObject.FiberItems[i];
                 result.Controls.Add(item.InputSize.CreateView(), 0, i + 1);
                 result.Controls.Add(item.OutputSize.CreateView(), 1, i + 1);
-                result.Controls.Add(item.GetType().CreateView(), 2, i + 1);
+                result.Controls.Add(item.GetType().Name.CreateView(), 2, i + 1);
                 result.Controls.Add(newItems[i] ?? item.CreateView(), 3, i + 1);
                 result.Controls.Add(Master.TraceLogItem(item, Master).CreateLink(), 4, i + 1);
             }
@@ -156,7 +174,7 @@ namespace ReniBrowser.CompilationView
             {
                 var item = visitedObject.Data[i];
                 result.Controls.Add(item.Size.CreateView(), 0, i);
-                result.Controls.Add(item.GetType().CreateView(), 1, i);
+                result.Controls.Add(item.GetType().Name.CreateView(), 1, i);
                 result.Controls.Add(enumerable[i] ?? Default(item), 2, i);
                 result.Controls.Add(Master.TraceLogItem(item, Master).CreateLink(), 3, i);
             }

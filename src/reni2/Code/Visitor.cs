@@ -9,7 +9,7 @@ namespace Reni.Code
     abstract class Visitor<TCode, TFiber> : DumpableObject
     {
         protected Visitor(int objectId)
-            : base(objectId) {}
+            : base(objectId) { }
 
         protected Visitor() { }
 
@@ -105,20 +105,19 @@ namespace Reni.Code
         internal virtual TFiber DePointer(DePointer visitedObject) => default(TFiber);
         internal virtual TFiber Drop(Drop visitedObject) => default(TFiber);
         internal virtual TFiber BitCast(BitCast visitedObject) => default(TFiber);
+        internal virtual TFiber BitArrayBinaryOp(BitArrayBinaryOp visitedObject) => default(TFiber);
+        internal virtual TFiber ArraySetter(ArraySetter visitedObject) => default(TFiber);
+        internal virtual TFiber ArrayGetter(ArrayGetter visitedObject) => default(TFiber);
+        internal virtual TFiber Assign(Assign visitedObject) => default(TFiber);
+        internal virtual TCode DumpPrintText(DumpPrintText visitedObject) => default(TCode);
 
         internal virtual TFiber ReferencePlusConstant(ReferencePlusConstant visitedObject)
             => default(TFiber);
 
-        internal virtual TFiber BitArrayBinaryOp(BitArrayBinaryOp visitedObject)
+        internal virtual TFiber DumpPrintTextOperation(DumpPrintTextOperation visitedObject)
             => default(TFiber);
 
-        internal virtual TFiber ArraySetter(ArraySetter visitedObject)
-            => default(TFiber);
-
-        internal virtual TFiber ArrayGetter(ArrayGetter visitedObject)
-            => default(TFiber);
-
-        internal virtual TFiber Assign(Assign visitedObject)
+        internal virtual TFiber DumpPrintNumberOperation(DumpPrintNumberOperation visitedObject)
             => default(TFiber);
     }
 }

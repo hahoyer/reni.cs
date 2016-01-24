@@ -90,35 +90,44 @@ namespace Reni.Code
         protected override string GetNodeDump() => base.GetNodeDump() + " <" + LeftSize + "> dump_print <" + RightSize + ">";
 
         internal override void Visit(IVisitor visitor) => visitor.PrintNumber(LeftSize, RightSize);
+
+        protected override TFiber VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
+            => actual.DumpPrintNumberOperation(this);
     }
 
     sealed class DumpPrintTextOperation : FiberItem
     {
-        readonly Size _itemSize;
+        internal readonly Size ItemSize;
         internal DumpPrintTextOperation(Size leftSize, Size itemSize)
         {
             InputSize = leftSize;
-            _itemSize = itemSize;
+            ItemSize = itemSize;
         }
 
         internal override Size InputSize { get; }
         [DisableDump]
         internal override Size OutputSize => Size.Zero;
-        protected override string GetNodeDump() => base.GetNodeDump() + " <" + InputSize + "> dump_print_text(" + _itemSize + ")";
-        internal override void Visit(IVisitor visitor) => visitor.PrintText(InputSize, _itemSize);
+        protected override string GetNodeDump() => base.GetNodeDump() + " <" + InputSize + "> dump_print_text(" + ItemSize + ")";
+        internal override void Visit(IVisitor visitor) => visitor.PrintText(InputSize, ItemSize);
+
+        protected override TFiber VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
+            => actual.DumpPrintTextOperation(this);
     }
 
     sealed class DumpPrintText : FiberHead
     {
         [Node]
         [EnableDump]
-        readonly string _dumpPrintText;
+        internal readonly string Value;
 
-        internal DumpPrintText(string dumpPrintText) { _dumpPrintText = dumpPrintText; }
+        internal DumpPrintText(string value) { Value = value; }
 
         protected override Size GetSize() => Size.Zero;
-        internal override void Visit(IVisitor visitor) => visitor.PrintText(_dumpPrintText);
+        internal override void Visit(IVisitor visitor) => visitor.PrintText(Value);
 
-        protected override string GetNodeDump() => base.GetNodeDump() + " dump_print " + _dumpPrintText.Quote();
+        protected override string GetNodeDump() => base.GetNodeDump() + " dump_print " + Value.Quote();
+
+        protected override TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
+            => actual.DumpPrintText(this);
     }
 }

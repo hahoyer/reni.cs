@@ -38,7 +38,7 @@ namespace ReniBrowser.CompilationView
         internal static Control CreateView(this CodeBase code, SourceView master)
         {
             var control = code.Visit(new CodeViewVisitor(master));
-            var title = code.Size.ToInt() + " " + code.GetIdText();
+            var title = code.Size.ToInt() + " " + code.GetType().Name + "." + code.ObjectId + "i";
             return CreateGroup(control, title);
         }
 

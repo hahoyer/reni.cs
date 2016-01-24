@@ -54,7 +54,7 @@ namespace Reni.TokenClasses
             }
         }
 
-        string Tag
+        internal string Tag
             => (IsMetaFunction ? "{0}{0}" : "{0}")
                 .ReplaceArgs("/{0}\\")
                 .ReplaceArgs(IsImplicit ? "!" : "");
