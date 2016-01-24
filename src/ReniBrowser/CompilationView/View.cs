@@ -32,7 +32,7 @@ namespace ReniBrowser.CompilationView
             };
         }
 
-        string GetFileName() { return Frame.Text.Select(ToValidFileChar).Aggregate("", (c, n) => c + n); }
+        protected virtual string GetFileName() { return Frame.Text.Select(ToValidFileChar).Aggregate("", (c, n) => c + n); }
 
         static string ToValidFileChar(char c)
         {
