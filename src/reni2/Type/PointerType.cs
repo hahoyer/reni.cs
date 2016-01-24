@@ -96,9 +96,9 @@ namespace Reni.Type
             => Feature.Extension.Value(ConvertToStableReference);
 
         [DisableDump]
-        internal override IImplementation FuncionDeclarationForType
+        internal override IImplementation FunctionDeclarationForType
             => ValueType.FunctionDeclarationForPointerType
-                ?? base.FuncionDeclarationForType;
+                ?? base.FunctionDeclarationForType;
 
         internal override IEnumerable<SearchResult> Declarations<TDefinable>(TDefinable tokenClass)
         {

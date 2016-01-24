@@ -61,7 +61,7 @@ namespace Reni.Struct
         internal override bool Hllw => true;
 
         [DisableDump]
-        internal override IImplementation FuncionDeclarationForType => this;
+        internal override IImplementation FunctionDeclarationForType => this;
 
         bool IFunction.IsImplicit => Syntax.IsImplicit;
 

@@ -505,18 +505,18 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        IEnumerable<SearchResult> FuncionDeclarationsForType
+        IEnumerable<SearchResult> FunctionDeclarationsForType
         {
             get
             {
-                var result = FuncionDeclarationForType;
+                var result = FunctionDeclarationForType;
                 if(result != null)
                     yield return SearchResult.Create(result, this);
             }
         }
 
         [DisableDump]
-        internal virtual IImplementation FuncionDeclarationForType => null;
+        internal virtual IImplementation FunctionDeclarationForType => null;
         [DisableDump]
         internal virtual IImplementation FunctionDeclarationForPointerType => null;
 
@@ -528,7 +528,7 @@ namespace Reni.Type
         internal IEnumerable<SearchResult> DeclarationsForType(Definable definable)
         {
             if(definable == null)
-                return FuncionDeclarationsForType;
+                return FunctionDeclarationsForType;
 
             return definable
                 .Genericize

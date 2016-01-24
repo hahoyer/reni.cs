@@ -130,7 +130,7 @@ namespace Reni.Type
             => Feature.Extension.Value(EnableReinterpretationResult);
 
         [DisableDump]
-        internal override IImplementation FuncionDeclarationForType
+        internal override IImplementation FunctionDeclarationForType
             => Feature.Extension.FunctionFeature(AccessResult);
 
         IImplementation ISymbolProvider<Minus>.Feature

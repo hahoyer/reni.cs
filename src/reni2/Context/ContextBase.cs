@@ -243,7 +243,7 @@ namespace Reni.Context
                 .Execute
                 (
                     category,
-                    new ResultCache(FuncionalArgObjectResult),
+                    new ResultCache(FunctionalArgObjectResult),
                     token,
                     null,
                     this,
@@ -251,7 +251,7 @@ namespace Reni.Context
                 );
         }
 
-        Result FuncionalArgObjectResult(Category category)
+        Result FunctionalArgObjectResult(Category category)
         {
             NotImplementedMethod(category);
             return null;
