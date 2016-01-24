@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.UnitTest;
+using Reni.FeatureTest.Array;
 using Reni.FeatureTest.Helper;
 
 namespace Reni.FeatureTest.Reference
 {
     [UnitTest]
+    [ElementAccessVariableSetterSimple]
     [Target(@"
 d: << 5 << 2 <<:= 3;
 ref: d array_reference;
