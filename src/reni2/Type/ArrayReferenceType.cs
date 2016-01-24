@@ -195,7 +195,7 @@ namespace Reni.Type
         Result AccessResult(Category category, TypeBase right)
         {
             var leftResult = ObjectResult(category)
-                .ForcedDereferencedAlignedResult(Root.DefaultRefAlignParam.RefSize);
+                .DereferencedAlignedResult(Root.DefaultRefAlignParam.RefSize);
             return AccessType
                 .Result(category, leftResult, right);
         }

@@ -922,7 +922,7 @@ namespace Reni
 
         internal Result SmartUn<T>() where T : IConversion => Type is T ? Un<T>() : this;
 
-        internal Result DereferencedAlignedResult()
+        internal Result AutomaticDereferencedAlignedResult()
         {
             var destinationType = Type
                 .AutomaticDereferenceType.Align;
@@ -935,7 +935,7 @@ namespace Reni
                 .ReplaceArg(this);
         }
 
-        internal Result ForcedDereferencedAlignedResult(Size size)
+        internal Result DereferencedAlignedResult(Size size)
             => new Result(CompleteCategory - Category.Type, getCode: () => Code.DePointer(size));
 
         internal Result ConvertToConverter(TypeBase source)

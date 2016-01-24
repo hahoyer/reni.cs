@@ -260,7 +260,7 @@ namespace Reni.Type
                     ? argsType.Conversion(category.Typed, ElementAccessType)
                     : argsType.Conversion(category.Typed, ElementType.Array(newCount, argsOptions));
 
-            var newElementsResult = newElementsResultRaw.DereferencedAlignedResult();
+            var newElementsResult = newElementsResultRaw.AutomaticDereferencedAlignedResult();
             var result = ElementType
                 .Array(Count + newCount, argsOptions)
                 .Result(category, newElementsResult + oldElementsResult);
@@ -298,7 +298,7 @@ namespace Reni.Type
             (Category category, ResultCache left, ContextBase context, CompileSyntax right)
         {
             var target = (left & Category.All)
-                .DereferencedAlignedResult()
+                .AutomaticDereferencedAlignedResult()
                 .Evaluate(context.RootContext.ExecutionContext)
                 .ToString(ElementType.Size);
             var conversionBase = right.Evaluate(context).ToInt32();
