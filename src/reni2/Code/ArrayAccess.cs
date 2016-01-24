@@ -26,7 +26,7 @@ namespace Reni.Code
     sealed class ArrayGetter : ArrayAccess
     {
         public ArrayGetter(Size elementSize, Size indexSize, string callingMethodName)
-            : base(elementSize, indexSize, callingMethodName) { StopByObjectIds(1);}
+            : base(elementSize, indexSize, callingMethodName) { StopByObjectIds();}
 
         [DisableDump]
         internal override Size InputSize => Root.DefaultRefAlignParam.RefSize + IndexSize;
