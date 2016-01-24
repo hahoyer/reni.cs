@@ -41,7 +41,9 @@ namespace Reni.Parser
 
                 result += PrioTable.Right(ReassignToken.TokenId);
 
-                result = result.ThenElseLevel(ThenToken.TokenId, ElseToken.TokenId);
+                result += PrioTable.Right(ThenToken.TokenId);
+                result += PrioTable.Right(ElseToken.TokenId);
+
                 result += PrioTable.Right(Exclamation.TokenId);
                 result += PrioTable.Left
                     (

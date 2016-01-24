@@ -7,7 +7,7 @@ using Reni.Parser;
 namespace Reni.TokenClasses
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class ThenToken : InfixToken, IBelongingsMatcher
+    sealed class ThenToken : InfixToken
     {
         public const string TokenId = "then";
         public override string Id => TokenId;
@@ -18,8 +18,5 @@ namespace Reni.TokenClasses
             var result = right.CreateThenSyntax(condition.Value);
             return new Checked<Syntax>(result.Value, condition.Issues.plus(result.Issues));
         }
-
-        bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
-            => otherMatcher is ElseToken;
     }
 }

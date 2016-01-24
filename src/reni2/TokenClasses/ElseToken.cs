@@ -8,7 +8,7 @@ using Reni.Validation;
 namespace Reni.TokenClasses
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class ElseToken : TokenClass, IBelongingsMatcher
+    sealed class ElseToken : TokenClass
     {
         public const string TokenId = "else";
         public override string Id => TokenId;
@@ -25,7 +25,5 @@ namespace Reni.TokenClasses
         protected override Checked<Syntax> Prefix(SourcePart token, Syntax right)
             => IssueId.MissingThen.Syntax(token, right);
 
-        bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
-            => otherMatcher is ThenToken;
     }
 }
