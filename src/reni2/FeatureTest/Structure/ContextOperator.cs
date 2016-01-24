@@ -48,19 +48,37 @@ xxx xxx dump_print
 x: /\ 
 {
   '12345';
-  this: ^^;
+  this: /\ ^^;
   '12345678901';
   !mutable xxx: 257;
   '12345678901234567890123456789';
 };
 
 xx : x();
-xx this xxx := 2;
+xx this() xxx dump_print
+
+", "257")]
+    public sealed class ContextOperatorFunctionAccess : CompilerTest { }
+
+    [UnitTest]
+    [Access]
+    [NamedSimpleAssignment, ContextOperatorFunctionAccess]
+    [TargetSet(@"
+x: /\ 
+{
+  '12345';
+  this: /\ ^^;
+  '12345678901';
+  !mutable xxx: 257;
+  '12345678901234567890123456789';
+};
+
+xx : x();
+xx this() xxx := 2;
 xx dump_print
 
-", "(256, ^^, 2, 258)")]
+", "(12345, , 12345678901, 2, 12345678901234567890123456789, )")]
     public sealed class ContextOperatorAssign : CompilerTest { }
-
 
     [UnitTest]
     [ContextOperatorPrint, ContextOperatorAssign]
