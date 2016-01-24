@@ -15,15 +15,9 @@ namespace Reni.FeatureTest.UserInterface
         {
             const string Text = @"1 then 2 else 3";
             var compiler = Compiler.BrowserFromText(text: Text);
-            var thenToken = compiler.LocatePosition(2);
+            var thenToken = compiler.LocatePosition(Text.IndexOf("then"));
             var elseToken = compiler.LocatePosition(Text.IndexOf("else"));
-
-            var thenMatches = thenToken.FindAllBelongings(compiler).ToArray();
-            var elseMatches = elseToken.FindAllBelongings(compiler).ToArray();
-
-            Tracer.Assert(elseMatches.Length == 2);
-            Tracer.Assert(thenMatches.Length == 2);
-            Tracer.Assert(thenMatches.Merge(elseMatches, i => i).ToArray().Length == 2);
+            Tracer.Assert(elseToken.SourceSyntax.Left == thenToken.SourceSyntax);
         }
 
         [UnitTest]
@@ -31,15 +25,9 @@ namespace Reni.FeatureTest.UserInterface
         {
             const string Text = @"1 then 2 then 333 else 3";
             var compiler = Compiler.BrowserFromText(text: Text);
-            var thenToken = compiler.LocatePosition(2);
+            var thenToken = compiler.LocatePosition(Text.IndexOf("then"));
             var elseToken = compiler.LocatePosition(Text.IndexOf("else"));
-
-            var thenMatches = thenToken.FindAllBelongings(compiler).ToArray();
-            var elseMatches = elseToken.FindAllBelongings(compiler).ToArray();
-
-            Tracer.Assert(elseMatches.Length == 2);
-            Tracer.Assert(thenMatches.Length == 2);
-            Tracer.Assert(thenMatches.Merge(elseMatches, i => i).ToArray().Length == 2);
+            Tracer.Assert(elseToken.SourceSyntax.Left == thenToken.SourceSyntax);
         }
     }
 }
