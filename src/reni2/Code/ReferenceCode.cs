@@ -25,8 +25,6 @@ namespace Reni.Code
             var compoundView = ((context as PointerType)
                 ?.ValueType as CompoundType)
                 ?.View;
-            Tracer.ConditionalBreak
-                (compoundView?.Compound.Syntax.ObjectId == -11 && compoundView.ViewPosition == 4);
             StopByObjectIds();
         }
 
@@ -47,4 +45,4 @@ namespace Reni.Code
 
         public override string DumpData() => _context.NodeDump();
     }
-}
+}                                    

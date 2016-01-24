@@ -14,7 +14,7 @@ namespace reniBrowser
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            BrowseTestResult<ContextOperatorAccess>();
+            BrowseTestResult<ContextOperatorFunctionAccess>();
         }
 
         static void BrowseTestResult<T>()
