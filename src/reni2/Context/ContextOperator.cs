@@ -18,7 +18,6 @@ namespace Reni.Context
             (ContextBase context, Category category, TerminalSyntax token)
             => context
             .FindRecentCompoundView
-            .Compound
             .ContextOperatorResult(category);
     }
 }

@@ -13,7 +13,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class CompoundView 
+    sealed class CompoundView
         : DumpableObject
             , ValueCache.IContainer
     {
@@ -184,7 +184,7 @@ namespace Reni.Struct
 
         internal Result AccessViaPositionExpression(Category category, Result rightResult)
         {
-            var position = rightResult  
+            var position = rightResult
                 .Conversion(IndexType)
                 .SmartUn<PointerType>()
                 .Evaluate(Compound.RootContext.ExecutionContext)
@@ -196,6 +196,7 @@ namespace Reni.Struct
             => Compound.FieldOffsetFromAccessPoint(ViewPosition, position);
 
         bool IsDumpPrintResultViaObjectActive;
+
         internal Result DumpPrintResultViaObject(Category category)
         {
             if(IsDumpPrintResultViaObjectActive)
@@ -337,7 +338,20 @@ namespace Reni.Struct
 
         internal Result AtTokenResult(Category category, Result rightResult)
             => AccessViaPositionExpression(category, rightResult)
-            .ReplaceArg(ObjectPointerViaContext);
+                .ReplaceArg(ObjectPointerViaContext);
 
+        internal Result ContextOperatorResult(Category category)
+            => ContextReferenceType.Result(category, ContextOperatorCode);
+
+        CodeBase ContextOperatorCode()
+            => Hllw
+                ? CodeBase.Void
+                : CodeBase
+                    .ReferenceCode(Type.ForcedReference)
+                    .ReferencePlus(CompoundViewSize);
+
+        [DisableDump]
+        ContextReferenceType ContextReferenceType
+            => this.CachedValue(() => new ContextReferenceType(this));
     }
 }

@@ -14,20 +14,14 @@ namespace Reni.Context
         : TypeBase
             , ISymbolProviderForPointer<DumpPrintToken>
     {
-        readonly int Order;
-        readonly Compound Parent;
+        readonly CompoundView Parent;
 
-        public ContextReferenceType(Compound parent)
-        {
-            Parent = parent;
-            Order = CodeArgs.NextOrder++;
-        }
+        internal ContextReferenceType(CompoundView parent) { Parent = parent; }
 
         [DisableDump]
         internal override Root RootContext => Parent.RootContext;
         [DisableDump]
-        internal override CompoundView FindRecentCompoundView => Parent.CompoundView;
-
+        internal override CompoundView FindRecentCompoundView => Parent;
         [DisableDump]
         internal override bool Hllw => false;
         [DisableDump]
@@ -49,11 +43,11 @@ namespace Reni.Context
             => base.StripConversions
                 .Concat(new[] {Feature.Extension.Conversion(PointerConversion)});
 
-        Result PointerConversion(Category category) 
+        Result PointerConversion(Category category)
             => Parent
-            .CompoundView
-            .Type
-            .Pointer
-            .Result(category, c=>ArgResult(c).AddToReference(()=>Parent.Size()*-1));
+                .Type
+                .Pointer
+                .Result
+                (category, c => ArgResult(c).AddToReference(() => Parent.CompoundViewSize * -1));
     }
 }
