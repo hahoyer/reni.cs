@@ -927,13 +927,16 @@ namespace Reni
             var destinationType = Type
                 .AutomaticDereferenceType.Align;
 
-            if (destinationType == Type)
+            if(destinationType == Type)
                 return this;
 
             return Type
                 .Conversion(CompleteCategory, destinationType)
                 .ReplaceArg(this);
         }
+
+        internal Result ForcedDereferencedAlignedResult(Size size)
+            => new Result(CompleteCategory - Category.Type, getCode: () => Code.DePointer(size));
 
         internal Result ConvertToConverter(TypeBase source)
             => source.Hllw || (!HasExts && !HasCode)
