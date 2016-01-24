@@ -18,7 +18,8 @@ namespace Reni.Struct
             , IValue
             , IConversion
             , IImplementation
-        ,IChild<CompoundView>
+            , IChild<CompoundView>
+        , ISymbolProvider<DumpPrintToken>
     {
         [EnableDump]
         [Node]
@@ -66,7 +67,7 @@ namespace Reni.Struct
 
         Result IFunction.Result(Category category, TypeBase argsType)
         {
-            var trace = ObjectId == -19 && (category.Replenished.HasExts);
+            var trace = ObjectId == -49 && category.Replenished.HasExts;
             StartMethodDump(trace, category, argsType);
             try
             {
@@ -87,6 +88,17 @@ namespace Reni.Struct
                 EndMethodDump();
             }
         }
+
+        IImplementation ISymbolProvider<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
+            => Feature.Extension.Value(DumpPrintTokenResult, this);
+
+        protected override CodeBase DumpPrintCode()
+            => CodeBase.DumpPrintText(Syntax.Tag);
+
+        new Result DumpPrintTokenResult(Category category)
+            => VoidType
+                .Result(category, DumpPrintCode);
+
 
         FunctionType Function(TypeBase argsType) => CompoundView.Function(Syntax, argsType);
 
