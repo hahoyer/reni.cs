@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Forms;
+using hw.Helper;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
@@ -125,7 +126,7 @@ namespace Reni.Struct
         // This may hinder the recursive call detection, located at result cache of context. 
         public Result ApplyResult(Category category)
         {
-            var trace = Index == -2;
+            var trace = Index.In();
             StartMethodDump(trace, category);
             try
             {

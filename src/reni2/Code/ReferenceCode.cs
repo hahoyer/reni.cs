@@ -21,7 +21,7 @@ namespace Reni.Code
             : base(_nextObjectId++)
         {
             Target = target;
-            StopByObjectIds();
+            StopByObjectIds(16);
         }
 
 
