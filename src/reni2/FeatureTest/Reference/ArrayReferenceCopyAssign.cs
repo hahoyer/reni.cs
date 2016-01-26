@@ -9,6 +9,7 @@ namespace Reni.FeatureTest.Reference
 {
     [UnitTest]
     [ElementAccessVariableSetterSimple]
+    [ArrayReferenceDumpSimple]
     [Target(@"
 d: << 5 << 2 <<:= 3;
 ref: d array_reference;

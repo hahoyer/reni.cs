@@ -7,6 +7,7 @@ using Reni.FeatureTest.Helper;
 namespace Reni.FeatureTest.Reference
 {
     [UnitTest]
+    [ArrayReferenceDumpSimple]
     [Target(@"
 d: <<5<<2<<3;
 ref: d array_reference;

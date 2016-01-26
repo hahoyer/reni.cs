@@ -11,8 +11,8 @@ namespace Reni.FeatureTest.Reference
 o: 
 /\
 { 
-    data: ^ array_reference ;
-    dump_print: 
+    data: ^ ;
+    dump_print1: 
     /!\ 
     {
         data (0) dump_print;
@@ -24,8 +24,29 @@ o:
     }
 };
 
-o('abcdef') dump_print
+o('abcdef') dump_print1
 ")]
     [Output("abcdef")]
+    public sealed class FunctionalDumpSimple : CompilerTest {}
+
+    [UnitTest]
+    [FunctionalDumpSimple]
+    [Target(@"
+o: 
+/\
+{ 
+    data: ^ array_reference ;
+    dump_print1: 
+    /!\ 
+    {
+        data (0) dump_print;
+        data (3) dump_print;
+        data (5) dump_print
+    }
+};
+
+o('abcdef') dump_print1
+")]
+    [Output("adf")]
     public sealed class ArrayReferenceDumpSimple : CompilerTest {}
 }

@@ -8,6 +8,7 @@ namespace Reni.FeatureTest.Reference
 {
     [UnitTest]
     [ArrayElementType]
+    [ArrayReferenceDumpSimple]
     [TargetSet(@"
 text: 'abcdefghijklmnopqrstuvwxyz';
 pointer: ((text() type)*1) array_reference instance (text);
