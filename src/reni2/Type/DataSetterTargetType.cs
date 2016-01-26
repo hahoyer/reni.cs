@@ -1,6 +1,6 @@
-using System.Linq;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Reni.Basics;
 using Reni.Code;
 
@@ -13,8 +13,7 @@ namespace Reni.Type
 
         protected override Result GetterResult(Category category)
             => ValueType
-                .ForcedReference
-                .Type()
+                .ForcedPointer
                 .Result(category, GetterCode);
 
         protected abstract CodeBase SetterCode();
