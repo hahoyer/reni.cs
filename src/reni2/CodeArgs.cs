@@ -58,6 +58,7 @@ namespace Reni
         }
 
         [SmartNode]
+        [DisableDump]
         public List<IContextReference> Data => _data;
 
         [DisableDump]
@@ -86,13 +87,7 @@ namespace Reni
         internal static CodeArgs Create(IContextReference contextReference)
             => new CodeArgs(contextReference);
 
-        protected override string GetNodeDump()
-        {
-            if(Count > 5)
-                return base.GetNodeDump() + " Count = " + Count;
-            return "{"
-                + _data.Select(contextReference => contextReference.NodeDump()).Stringify(",") + "}";
-        }
+        protected override string GetNodeDump() => base.GetNodeDump() + "#" + Count;
 
         public override string DumpData()
         {
