@@ -5,7 +5,6 @@ using hw.DebugFormatter;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
-using Reni.Parser;
 using Reni.Struct;
 
 namespace Reni.Type
@@ -28,16 +27,24 @@ namespace Reni.Type
         internal override TypeBase ValueType => View.ValueType(Position);
         [DisableDump]
         internal override bool Hllw => false;
+        [DisableDump]
         Size FieldOffset => View.FieldOffset(Position);
 
-        string GetCompoundIdentificationDump() => View.GetCompoundIdentificationDump() + ":" + Position;
-        protected override string GetNodeDump() => base.GetNodeDump() + "(" + GetCompoundIdentificationDump() + ")";
+        string GetCompoundIdentificationDump()
+            => View.GetCompoundIdentificationDump() + ":" + Position;
+
+        protected override string GetNodeDump()
+            => base.GetNodeDump() + "(" + GetCompoundIdentificationDump() + ")";
 
         protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize;
-        protected override CodeBase GetterCode() => ArgCode.ReferencePlus(FieldOffset);
-        protected override CodeBase SetterCode() => Pair(ValueType.ForcedPointer)
-            .ArgCode
-            .Assignment(ValueType.Size);
+
+        protected override CodeBase GetterCode()
+            => ArgCode.ReferencePlus(FieldOffset);
+
+        protected override CodeBase SetterCode()
+            => Pair(ValueType.ForcedPointer)
+                .ArgCode
+                .Assignment(ValueType.Size);
 
         internal override Result DestinationResult(Category category)
         {
@@ -46,7 +53,8 @@ namespace Reni.Type
                 .AddToReference(() => FieldOffset);
         }
 
-        internal override int? SmartArrayLength(TypeBase elementType) => ValueType.SmartArrayLength(elementType);
+        internal override int? SmartArrayLength(TypeBase elementType)
+            => ValueType.SmartArrayLength(elementType);
 
         [DisableDump]
         internal override ContextBase ToContext => ValueType.ToContext;
