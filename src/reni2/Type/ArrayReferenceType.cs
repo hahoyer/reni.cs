@@ -20,8 +20,6 @@ namespace Reni.Type
             , ISymbolProvider<Minus>
             , IForcedConversionProvider<ArrayReferenceType>
             , IRepeaterType
-            , IReference
-            , IConversion
             , IChild<TypeBase>
     {
         internal sealed class Options : DumpableObject
@@ -108,13 +106,6 @@ namespace Reni.Type
         TypeBase IRepeaterType.ElementType => ValueType;
         TypeBase IRepeaterType.IndexType => Root.BitType.Number(Size.ToInt());
         bool IRepeaterType.IsMutable => OptionsValue.IsForceMutable.Value;
-
-        IConversion IReference.Converter => this;
-        bool IReference.IsWeak => false;
-        int IContextReference.Order => _order;
-
-        TypeBase IConversion.Source => this;
-        Result IConversion.Execute(Category category) => DereferenceResult(category);
 
         IEnumerable<IConversion> IForcedConversionProvider<ArrayReferenceType>.Result
             (ArrayReferenceType destination)
