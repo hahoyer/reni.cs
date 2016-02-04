@@ -29,7 +29,7 @@ namespace Reni.Code
             _fiberItems = l.ToArray();
             AssertValid();
 
-            StopByObjectIds(21);
+            StopByObjectIds();
         }
 
         void AssertValid()

@@ -164,9 +164,9 @@ namespace Reni.Struct
         Result AccessResult(Category category, int accessPosition, int position)
         {
             var trace = Syntax.ObjectId.In()
-                && accessPosition > 0
-                && position == 2
-                //&& category.HasCode
+                && accessPosition == 0
+                && position == 0
+                && category.HasCode
                 ;
             StartMethodDump(trace, category, accessPosition, position);
             try

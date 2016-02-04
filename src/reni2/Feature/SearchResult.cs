@@ -59,7 +59,7 @@ namespace Reni.Feature
             ContextBase context,
             CompileSyntax right)
         {
-            var trace = ObjectId.In(2)  && category.HasCode;
+            var trace = ObjectId.In(34) && category.HasCode;
             StartMethodDump(trace, category, left, token, context, right);
             try
             {
@@ -67,9 +67,11 @@ namespace Reni.Feature
                 if(metaFeature != null)
                     return metaFeature.Result(category, left, context, right);
 
+                BreakExecution();
                 var result = Feature.Result(category.Typed, token, context, right);
                 Dump(nameof(result), result);
-                Dump(nameof(ConverterPath.Destination.CheckedReference), ConverterPath.Destination.CheckedReference); 
+                Dump(nameof(ConverterPath.Destination.CheckedReference), ConverterPath.Destination.CheckedReference);
+                Dump(nameof(ConverterPath.Execute), ConverterPath.Execute(Category.Code));
                 BreakExecution();
 
                 var replaceAbsolute = result
