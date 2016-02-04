@@ -83,7 +83,7 @@ namespace Reni.Feature
         internal static Result Result(this IConversion conversion, Category category)
         {
             var result = conversion.Execute(category);
-            if(category.HasCode)
+            if(category.HasCode && result.Code.ArgType != null)
                 Tracer.Assert
                     (result.Code.ArgType == conversion.Source, () => result.DebuggerDumpString);
             return result;
