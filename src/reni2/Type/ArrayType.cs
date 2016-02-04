@@ -187,7 +187,7 @@ namespace Reni.Type
         Result MutableResult(Category category) => ResultFromPointer(category, Mutable);
 
         Result ReferenceResult(Category category)
-            => ResultFromPointer(category, Reference(IsMutable));
+            => Reference(IsMutable).Result(category, ObjectResult);
 
         internal override Result ConstructorResult(Category category, TypeBase argsType)
         {

@@ -121,7 +121,7 @@ namespace Reni.Type
             => Feature.Extension.Value(EnableReinterpretationResult);
 
         [DisableDump]
-        internal override IImplementation FunctionDeclarationForType
+        internal override IImplementation FunctionDeclarationForPointerType
             => Feature.Extension.FunctionFeature(AccessResult);
 
         IImplementation ISymbolProvider<Minus>.Feature
@@ -185,8 +185,7 @@ namespace Reni.Type
 
         Result AccessResult(Category category, TypeBase right)
         {
-            var leftResult = ObjectResult(category)
-                .DereferencedAlignedResult(Root.DefaultRefAlignParam.RefSize);
+            var leftResult = ObjectResult(category).DereferenceResult;
             return AccessType
                 .Result(category, leftResult, right);
         }
