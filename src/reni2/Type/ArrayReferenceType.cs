@@ -14,10 +14,10 @@ namespace Reni.Type
 {
     sealed class ArrayReferenceType
         : TypeBase
-            , ISymbolProvider<Mutable>
-            , ISymbolProvider<EnableReinterpretation>
-            , ISymbolProvider<Plus>
-            , ISymbolProvider<Minus>
+            , ISymbolProviderForPointer<Mutable>
+            , ISymbolProviderForPointer<EnableReinterpretation>
+            , ISymbolProviderForPointer<Plus>
+            , ISymbolProviderForPointer<Minus>
             , IForcedConversionProvider<ArrayReferenceType>
             , IRepeaterType
             , IChild<TypeBase>
@@ -111,11 +111,11 @@ namespace Reni.Type
             (ArrayReferenceType destination)
             => ForcedConversion(destination).NullableToArray();
 
-        IImplementation ISymbolProvider<Mutable>.Feature
+        IImplementation ISymbolProviderForPointer<Mutable>.Feature
             (Mutable tokenClass)
             => Feature.Extension.Value(MutableResult);
 
-        IImplementation ISymbolProvider<EnableReinterpretation>.
+        IImplementation ISymbolProviderForPointer<EnableReinterpretation>.
             Feature
             (EnableReinterpretation tokenClass)
             => Feature.Extension.Value(EnableReinterpretationResult);
@@ -124,11 +124,11 @@ namespace Reni.Type
         internal override IImplementation FunctionDeclarationForPointerType
             => Feature.Extension.FunctionFeature(AccessResult);
 
-        IImplementation ISymbolProvider<Minus>.Feature
+        IImplementation ISymbolProviderForPointer<Minus>.Feature
             (Minus tokenClass)
             => Feature.Extension.FunctionFeature(MinusResult);
 
-        IImplementation ISymbolProvider<Plus>.Feature
+        IImplementation ISymbolProviderForPointer<Plus>.Feature
             (Plus tokenClass)
             => Feature.Extension.FunctionFeature(PlusResult);
 
