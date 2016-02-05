@@ -12,36 +12,37 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    abstract class FunctionInstance : DumpableObject, ResultCache.IResultProvider
+    abstract class FunctionInstance
+        : DumpableObject
+            , ResultCache.IResultProvider
+            , ValueCache.IContainer
     {
         [DisableDump]
         protected readonly FunctionType Parent;
         [Node]
         [EnableDump]
-        readonly CompileSyntax _body;
+        readonly CompileSyntax Body;
 
-        readonly ValueCache<CodeBase> _bodyCodeCache;
-        readonly ValueCache<ContextBase> _contextCache;
         internal readonly ResultCache ResultCache;
 
         protected FunctionInstance(FunctionType parent, CompileSyntax body)
         {
-            _body = body;
+            Body = body;
             Parent = parent;
-            _bodyCodeCache = new ValueCache<CodeBase>(GetBodyCode);
-            _contextCache = new ValueCache<ContextBase>(GetContext);
             ResultCache = new ResultCache(this);
         }
 
+        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
+
         [Node]
         [DisableDump]
-        internal CodeBase BodyCode => _bodyCodeCache.Value;
+        internal CodeBase BodyCode => this.CachedValue(GetBodyCode);
         [DisableDump]
         Size ArgsPartSize => Parent.ArgsType.Size + RelevantValueSize;
         [DisableDump]
         protected abstract Size RelevantValueSize { get; }
 
-        string Description => _body.SourcePart.Id;
+        string Description => Body.SourcePart.Id;
 
         [Node]
         [DisableDump]
@@ -58,7 +59,7 @@ namespace Reni.Struct
         protected abstract FunctionId FunctionId { get; }
         [Node]
         [DisableDump]
-        ContextBase Context => _contextCache.Value;
+        ContextBase Context => this.CachedValue(GetContext);
 
         [DisableDump]
         internal Container Container
@@ -103,9 +104,9 @@ namespace Reni.Struct
             StartMethodDump(trace, category);
             try
             {
-                Dump(nameof(_body), _body.SourcePart);
+                Dump(nameof(Body), Body.SourcePart);
                 BreakExecution();
-                var rawResult = Context.Result(category.Typed, _body);
+                var rawResult = Context.Result(category.Typed, Body);
 
                 Tracer.Assert(rawResult.CompleteCategory == category.Typed);
                 if(rawResult.FindExts != null)
@@ -186,7 +187,7 @@ namespace Reni.Struct
         public string DumpFunction()
         {
             var result = "\n";
-            result += "body=" + _body.NodeDump;
+            result += "body=" + Body.NodeDump;
             result += "\n";
             return result;
         }
