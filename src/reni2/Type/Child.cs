@@ -1,6 +1,6 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
 using hw.DebugFormatter;
 using hw.Forms;
 using Reni.Basics;
@@ -13,16 +13,19 @@ namespace Reni.Type
         : TypeBase
             , IProxyType
             , IConversion
+            , IChild<TParent>
         where TParent : TypeBase
     {
         protected Child(TParent parent) { Parent = parent; }
 
         [Node]
         [DisableDump]
-        public TParent Parent { get; }
+        internal readonly TParent Parent;
+
         [DisableDump]
         internal override Root Root => Parent.Root;
 
+        TParent IChild<TParent>.Parent => Parent;
         IConversion IProxyType.Converter => this;
         TypeBase IConversion.Source => this;
         Result IConversion.Execute(Category category) => ParentConversionResult(category);
