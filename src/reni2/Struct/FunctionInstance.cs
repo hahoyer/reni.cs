@@ -28,8 +28,8 @@ namespace Reni.Struct
         {
             _body = body;
             Parent = parent;
-            _bodyCodeCache = new ValueCache<CodeBase>(ObtainBodyCode);
-            _contextCache = new ValueCache<ContextBase>(ObtainContext);
+            _bodyCodeCache = new ValueCache<CodeBase>(GetBodyCode);
+            _contextCache = new ValueCache<ContextBase>(GetContext);
             ResultCache = new ResultCache(this);
         }
 
@@ -76,7 +76,7 @@ namespace Reni.Struct
             }
         }
 
-        internal Result CallResult(Category category)
+        internal Result GetCallResult(Category category)
         {
             var result = ResultCache & category.FunctionCall;
             if(result == null)
@@ -94,12 +94,12 @@ namespace Reni.Struct
         [DisableDump]
         protected virtual TypeBase CallType => Parent;
 
-        Result ObtainResult(Category category)
+        Result GetResult(Category category)
         {
             if(IsStopByObjectIdActive)
                 return null;
 
-            var trace = FunctionId.Index.In() && category.HasCode;
+            var trace = FunctionId.Index.In(13) && category.HasCode;
             StartMethodDump(trace, category);
             try
             {
@@ -160,7 +160,7 @@ namespace Reni.Struct
 
         bool _isObtainBodyCodeActive;
 
-        CodeBase ObtainBodyCode()
+        CodeBase GetBodyCode()
         {
             if(_isObtainBodyCodeActive || IsStopByObjectIdActive)
                 return null;
@@ -191,7 +191,7 @@ namespace Reni.Struct
             return result;
         }
 
-        ContextBase ObtainContext() => Parent.CreateSubContext(!IsGetter);
+        ContextBase GetContext() => Parent.CreateSubContext(!IsGetter);
         bool IsGetter => FunctionId.IsGetter;
 
         Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
@@ -201,7 +201,7 @@ namespace Reni.Struct
 
 
             Tracer.Assert(pendingCategory.IsNone);
-            return ObtainResult(category);
+            return GetResult(category);
         }
 
         ResultCache.IResultProvider ResultCache.IResultProvider.FindSource(IContextReference ext)
@@ -209,6 +209,7 @@ namespace Reni.Struct
             NotImplementedMethod(ext);
             return null;
         }
+
         [DisableDump]
         internal IEnumerable<IFormalCodeItem> CodeItems => BodyCode.Visit(new ItemCollector());
     }

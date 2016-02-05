@@ -94,8 +94,8 @@ namespace Reni.Struct
             }
         }
 
-        protected override Result SetterResult(Category category) => Setter.CallResult(category);
-        protected override Result GetterResult(Category category) => Getter.CallResult(category);
+        protected override Result SetterResult(Category category) => Setter.GetCallResult(category);
+        protected override Result GetterResult(Category category) => Getter.GetCallResult(category);
         protected override Size GetSize() => ArgsType.Size + Exts.Size;
 
         internal ContextBase CreateSubContext(bool useValue)
