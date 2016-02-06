@@ -287,13 +287,14 @@ namespace ReniBrowser.CompilationView
                 return null;
 
             var indexView = target.Index.CreateView(2);
-            var argsTypeView = target.ArgsType.CreateLink(master);
+            var argsTypeView = target.ArgsType.CreateLink(master).CreateGroup("args");
+            var valueTypeView = target.ValueType.CreateLink(master).CreateGroup("value");
             var setterView = target.Setter?.CreateView(master);
             var getterView = target.Getter.CreateView(master);
 
             return false.CreateLineupView
                 (
-                    true.CreateLineupView(indexView, argsTypeView),
+                    true.CreateLineupView(indexView, argsTypeView,valueTypeView),
                     setterView?.CreateGroup("Set"),
                     getterView?.CreateGroup("Get")
                 );
