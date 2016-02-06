@@ -40,6 +40,7 @@
     <Compile Include="FeatureTest\BlogExamples\Post120109.cs" />
     <Compile Include="FeatureTest\BlogExamples\Post120617.cs" />
     <Compile Include="FeatureTest\BlogExamples\WikiExample1.cs" />
+    <Compile Include="FeatureTest\ComplexContext.cs" />
     <Compile Include="FeatureTest\ConversionService\Closure.cs" />
     <Compile Include="FeatureTest\ConversionService\NumberExtensionConversion.cs" />
     <Compile Include="FeatureTest\ConversionService\NumberPointerCutConversion.cs" />
@@ -413,6 +414,9 @@
     <None Include="Code\CSharp_Generated.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>CSharp_Generated.cs</LastGenOutput>
+    </None>
+    <None Include="FeatureTest\ComplexContext.reni">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="FeatureTest\Text.reni">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

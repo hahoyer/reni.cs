@@ -18,7 +18,7 @@ using Reni.FeatureTest.Validation;
 
 namespace Reni.FeatureTest
 {
-    public class TextStruct : CompilerTest
+    abstract public class TextStruct : CompilerTest
     {
         static string Definition() => "FeatureTest\\Text.reni".FileHandle().String;
         protected override string Target => Definition() + "; (" + InstanceCode + ") dump_print";
@@ -55,15 +55,6 @@ namespace Reni.FeatureTest
     [UnMatchedBrackets]
     [AutomaticDereferencing]
     [ContextOperator]
-    public sealed class TextConcat : TextStruct
-    {
-        public TextConcat()
-        {
-            Parameters.RunFromCode = true;
-            Parameters.TraceOptions.Functions = true;
-            Parameters.TraceOptions.CodeSequence = true;
-        }
-
-        public TextConcat(bool isExplicit) { }
-    }
+    [ComplexContext]
+    public sealed class TextConcat : TextStruct {}
 }
