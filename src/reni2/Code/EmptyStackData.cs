@@ -10,6 +10,7 @@ namespace Reni.Code
         internal EmptyStackData(IOutStream outStream)
             : base(outStream) { }
 
+        internal override IEnumerable<string> GetItemDump() { yield return Dump(); }
         internal override StackData Push(StackData stackData) => stackData;
         internal override StackData PushOnto(NonListStackData formerStack) => formerStack;
         internal override StackData PushOnto(ListStack formerStack) => formerStack;

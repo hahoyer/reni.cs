@@ -114,5 +114,7 @@ namespace Reni.Code
             NotImplementedMethod(size);
             return null;
         }
+
+        internal abstract IEnumerable<string> GetItemDump();
     }
 }

@@ -36,6 +36,8 @@ namespace Reni.Code
         internal new void Assign(Size size, StackData right)
             => _data.SetTop(_offset, right.Dereference(size, size));
 
+        internal override IEnumerable<string> GetItemDump() { yield return Dump(); }
+
         internal override StackData BitArrayBinaryOp(string opToken, Size size, StackData right)
         {
             if(size == DataStack.RefSize && opToken == "Plus")

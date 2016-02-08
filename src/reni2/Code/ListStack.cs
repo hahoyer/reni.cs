@@ -48,6 +48,9 @@ namespace Reni.Code
             formerStack._data.CopyTo(_data, 1);
         }
 
+        internal override IEnumerable<string> GetItemDump()
+            => _data.SelectMany(item => item.GetItemDump());
+
         protected override StackData GetTop(Size size)
         {
             if(_data.Length > 0 && _data[0].Size >= size)

@@ -13,11 +13,19 @@ namespace ReniBrowser.CompilationView
     {
         internal sealed class Step : DumpableObject
         {
+            internal class StackItem
+            {
+                public int FunctionIndex;
+                public int ReturnStepIndex;
+                public string Frame;
+            }
+
             internal readonly int Index;
             internal readonly IFormalCodeItem CodeBase;
             internal readonly DataStackMemento Before;
             internal Exception Exception;
             internal DataStackMemento After;
+            internal StackItem[] Stack;
 
             internal Step(IFormalCodeItem codeBase, DataStackMemento before, int index)
             {
@@ -84,17 +92,47 @@ namespace ReniBrowser.CompilationView
                             (
                                 Before.CreateView(master),
                                 After.CreateView(master)
-                            )
+                            ),
+                        CreateStackView(master)
                     );
+
+            Control CreateStackView(SourceView master)
+            {
+                if(Stack == null)
+                    return null;
+
+                var result = new TableLayoutPanel
+                {
+                    AutoSize = true,
+                    AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                    ColumnCount = 3,
+                    RowCount = Stack.Length,
+                    CellBorderStyle = TableLayoutPanelCellBorderStyle.Single
+                };
+
+                for(var i = 0; i < Stack.Length; i++)
+                {
+                    var item = Stack[i];
+                    result.Controls.Add(item.FunctionIndex.CreateView(), 0, i);
+                    result.Controls.Add(item.ReturnStepIndex.CreateView(), 1, i);
+                    result.Controls.Add(item.Frame.CreateView(), 2, i);
+                }
+
+                return result;
+            }
         }
 
         internal sealed class DataStackMemento : DumpableObject
         {
-            readonly string Text;
+            readonly string[] Items;
 
-            internal DataStackMemento(DataStack dataStack) { Text = dataStack.Dump(); }
+            internal DataStackMemento(DataStack dataStack)
+            {
+                Items = dataStack.GetLocalItemDump().ToArray();
+            }
 
-            internal Control CreateView(SourceView master) => Text.CreateView();
+            internal Control CreateView(SourceView master) 
+                => Items.Select(item=>item.CreateView()).CreateRowView();
         }
 
         readonly IList<Step> Steps = new List<Step>();
@@ -208,6 +246,5 @@ namespace ReniBrowser.CompilationView
             else
                 Master.SignalClickedSteps(Data);
         }
-
     }
 }

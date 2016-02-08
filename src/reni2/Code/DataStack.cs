@@ -35,6 +35,7 @@ namespace Reni.Code
 
             internal StackData FrameAddress(Size offset)
                 => new StackDataAddress(Frame, offset, Data.OutStream);
+
         }
 
         internal static Size RefSize => Root.DefaultRefAlignParam.RefSize;
@@ -50,6 +51,8 @@ namespace Reni.Code
             _context = context;
             _localData = new LocalData(_context.OutStream);
         }
+
+        internal IEnumerable<string> GetLocalItemDump() => Data.GetItemDump();
 
         [DisableDump]
         internal BitsConst Value => Data.GetBitsConst();
@@ -238,6 +241,7 @@ namespace Reni.Code
             Data = Data.DoPull(size);
             return result;
         }
+
     }
 
     interface IExecutionContext

@@ -260,25 +260,25 @@ namespace ReniBrowser.CompilationView
 
             var childView = CreateChildView(target as FunctionBodyType)
                 ?? CreateChildView(target as AlignType)
-                ?? CreateChildView(target as NumberType)
-                ?? CreateChildView(target as FunctionType, master)
-                    ?? CreateChildView(target as CompoundContext, master)
-                        ?? CreateChildView(target as Compound, master)
-                            ?? CreateChildView(target as CompoundType)
-                                ?? CreateChildView(target as ArrayType)
-                                    ?? CreateChildView(target as ArrayReferenceType)
-                                        ?? CreateChildView(target as PointerType)
-                                            ?? CreateChildView
-                                                (target as Reni.Context.Function, master)
-                                                ?? CreateChildView(target as Root)
-                                                    ?? CreateChildView(target as BitType)
-                                                        ?? NotImplemented(target);
+                    ?? CreateChildView(target as NumberType)
+                        ?? CreateChildView(target as FunctionType, master)
+                            ?? CreateChildView(target as CompoundContext, master)
+                                ?? CreateChildView(target as Compound, master)
+                                    ?? CreateChildView(target as CompoundType)
+                                        ?? CreateChildView(target as ArrayType)
+                                            ?? CreateChildView(target as ArrayReferenceType)
+                                                ?? CreateChildView(target as PointerType)
+                                                    ?? CreateChildView
+                                                        (target as Reni.Context.Function, master)
+                                                        ?? CreateChildView(target as Root)
+                                                            ?? CreateChildView(target as BitType)
+                                                                ?? NotImplemented(target);
             return false.CreateLineupView(head, childView);
         }
 
         static Reni.Basics.Size GetSize(object target) => (target as TypeBase)?.Size;
 
-        static Control CreateChildView(this FunctionBodyType target) 
+        static Control CreateChildView(this FunctionBodyType target)
             => target?.Syntax.CreateView();
 
         static Control CreateChildView(this FunctionType target, SourceView master)
@@ -288,13 +288,13 @@ namespace ReniBrowser.CompilationView
 
             var indexView = target.Index.CreateView(2);
             var argsTypeView = target.ArgsType.CreateLink(master).CreateGroup("args");
-            var valueTypeView = target.ValueType.CreateLink(master).CreateGroup("value");
+            var  valueTypeView = target.ValueType.CreateLink(master).CreateGroup("value");
             var setterView = target.Setter?.CreateView(master);
             var getterView = target.Getter.CreateView(master);
 
             return false.CreateLineupView
                 (
-                    true.CreateLineupView(indexView, argsTypeView,valueTypeView),
+                    true.CreateLineupView(indexView, argsTypeView, valueTypeView),
                     setterView?.CreateGroup("Set"),
                     getterView?.CreateGroup("Get")
                 );
