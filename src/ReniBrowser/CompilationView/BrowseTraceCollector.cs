@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using hw.DebugFormatter;
+using hw.Helper;
 using Reni;
 using Reni.Code;
 
@@ -88,17 +89,53 @@ namespace ReniBrowser.CompilationView
                 => false.CreateLineupView
                     (
                         Exception?.ToString().CreateView(),
-                        true.CreateLineupView
-                            (
-                                Before.CreateView(master),
-                                After.CreateView(master)
-                            ),
+                        CreateDataStackView(),
                         CreateStackView(master)
                     );
 
+            Control CreateDataStackView()
+            {
+                var data = Before
+                    .Items
+                    .Merge(After.Items, item => item.Offset)
+                    .OrderByDescending(item=>item.Item1)
+                    .ToArray();
+
+                var result = new TableLayoutPanel
+                {
+                    AutoSize = true,
+                    AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                    ColumnCount = 5,
+                    RowCount = data.Length,
+                    CellBorderStyle = TableLayoutPanelCellBorderStyle.Single
+                };
+
+                for(var i = 0; i < data.Length; i++)
+                {
+                    var item = data[i];
+                    var isChange = item.Item2?.ValueDump != item.Item3?.ValueDump;
+
+                    if(item.Item2 != null)
+                    {
+                        result.Controls.Add(item.Item2.Size.CreateView(isBold: isChange), 0, i);
+                        result.Controls.Add(item.Item2.ValueDump.CreateView(isBold: isChange), 1, i);
+                    }
+
+                    result.Controls.Add(item.Item1.CreateView(isBold: isChange), 2, i);
+
+                    if (item.Item3 != null)
+                    {
+                        result.Controls.Add(item.Item3.Size.CreateView(isBold: isChange), 3, i);
+                        result.Controls.Add(item.Item3.ValueDump.CreateView(isBold: isChange), 4, i);
+
+                    }
+                }
+
+                return result;
+            }
             Control CreateStackView(SourceView master)
             {
-                if(Stack == null)
+                if (Stack == null)
                     return null;
 
                 var result = new TableLayoutPanel
@@ -110,7 +147,7 @@ namespace ReniBrowser.CompilationView
                     CellBorderStyle = TableLayoutPanelCellBorderStyle.Single
                 };
 
-                for(var i = 0; i < Stack.Length; i++)
+                for (var i = 0; i < Stack.Length; i++)
                 {
                     var item = Stack[i];
                     result.Controls.Add(item.FunctionIndex.CreateView(), 0, i);
@@ -124,15 +161,12 @@ namespace ReniBrowser.CompilationView
 
         internal sealed class DataStackMemento : DumpableObject
         {
-            readonly string[] Items;
+            internal readonly DataStack.ItemMemento[] Items;
 
             internal DataStackMemento(DataStack dataStack)
             {
-                Items = dataStack.GetLocalItemDump().ToArray();
+                Items = dataStack.GetLocalItemMemento().ToArray();
             }
-
-            internal Control CreateView(SourceView master) 
-                => Items.Select(item=>item.CreateView()).CreateRowView();
         }
 
         readonly IList<Step> Steps = new List<Step>();

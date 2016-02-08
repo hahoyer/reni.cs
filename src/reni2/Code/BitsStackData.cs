@@ -18,7 +18,6 @@ namespace Reni.Code
             Tracer.Assert(!_data.Size.IsZero);
         }
 
-        internal override IEnumerable<string> GetItemDump() { yield return Dump(); }
         protected override string Dump(bool isRecursion) => _data.DumpValue();
 
         internal override BitsConst GetBitsConst() => _data;

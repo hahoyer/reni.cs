@@ -48,9 +48,6 @@ namespace Reni.Code
             formerStack._data.CopyTo(_data, 1);
         }
 
-        internal override IEnumerable<string> GetItemDump()
-            => _data.SelectMany(item => item.GetItemDump());
-
         protected override StackData GetTop(Size size)
         {
             if(_data.Length > 0 && _data[0].Size >= size)
@@ -106,7 +103,6 @@ namespace Reni.Code
 
         internal override StackData ForcedPull(Size size) => Pull(size, true);
 
-
         StackData Head(int value) => SubString(0, value);
         StackData Tail(int value) => SubString(value, _data.Length - value);
 
@@ -147,6 +143,20 @@ namespace Reni.Code
         }
 
         public override string DumpData() => _data.Select(DumpItem).Stringify("\n");
+
+        internal override IEnumerable<DataStack.ItemMemento> GetItemMemento()
+            => _data
+            .Select(GetItemMemento)
+            .OrderByDescending(item=>item.Offset);
+
+        DataStack.ItemMemento GetItemMemento(NonListStackData item, int index)
+        {
+            return new DataStack.ItemMemento(item.Dump())
+            {
+                Size = item.Size.ToInt(),
+                Offset = _data.Skip(index).Sum(item1 => item1.Size.ToInt())
+            };
+        }
 
         string DumpItem(NonListStackData item, int index)
         {

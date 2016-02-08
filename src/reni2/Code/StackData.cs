@@ -115,6 +115,12 @@ namespace Reni.Code
             return null;
         }
 
-        internal abstract IEnumerable<string> GetItemDump();
+        internal virtual IEnumerable<DataStack.ItemMemento> GetItemMemento()
+        {
+            yield return new DataStack.ItemMemento(Dump())
+            {
+                Size = Size.ToInt()
+            };
+        }
     }
 }

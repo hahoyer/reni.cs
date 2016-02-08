@@ -100,21 +100,27 @@ namespace ReniBrowser.CompilationView
         internal static Control CreateView(this FunctionInstance target, SourceView master)
             => target.BodyCode.CreateView(master);
 
-        internal static Label CreateView(this string text, double factor = 1)
+        internal static Label CreateView(this string text, double factor = 1, bool isBold = false)
             => new Label
             {
-                Font = CreateFont(factor),
+                Font = CreateFont(factor, isBold),
                 AutoSize = true,
                 Text = text
             };
 
-        static Font CreateFont(double factor)
-            => new Font("Lucida Console", (int) (DefaultTextSize * factor));
+        static Font CreateFont(double factor, bool isBold = false)
+            =>
+                new Font
+                    (
+                    "Lucida Console",
+                    (int) (DefaultTextSize * factor),
+                    isBold ? FontStyle.Bold : FontStyle.Regular
+                    );
 
-        internal static Label CreateView(this int value, double factor = 1)
+        internal static Label CreateView(this int value, double factor = 1, bool isBold = false)
             => new Label
             {
-                Font = CreateFont(factor),
+                Font = CreateFont(factor, isBold),
                 AutoSize = true,
                 Text = value.ToString(),
                 TextAlign = ContentAlignment.MiddleRight
@@ -288,7 +294,7 @@ namespace ReniBrowser.CompilationView
 
             var indexView = target.Index.CreateView(2);
             var argsTypeView = target.ArgsType.CreateLink(master).CreateGroup("args");
-            var  valueTypeView = target.ValueType.CreateLink(master).CreateGroup("value");
+            var valueTypeView = target.ValueType.CreateLink(master).CreateGroup("value");
             var setterView = target.Setter?.CreateView(master);
             var getterView = target.Getter.CreateView(master);
 

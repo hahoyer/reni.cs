@@ -13,8 +13,6 @@ namespace Reni.Code
             Size = size;
         }
 
-        internal override IEnumerable<string> GetItemDump() { yield return Dump(); }
-
         internal override Size Size { get; }
 
         internal override StackData PushOnto(ListStack formerStack)
