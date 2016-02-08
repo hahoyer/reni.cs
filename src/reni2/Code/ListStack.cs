@@ -144,7 +144,7 @@ namespace Reni.Code
 
         public override string DumpData() => _data.Select(DumpItem).Stringify("\n");
 
-        internal override IEnumerable<DataStack.ItemMemento> GetItemMemento()
+        internal override IEnumerable<DataStack.ItemMemento> GetItemMementos()
             => _data
             .Select(GetItemMemento)
             .OrderByDescending(item=>item.Offset);

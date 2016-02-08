@@ -23,12 +23,12 @@ namespace ReniBrowser.CompilationView
 
             internal readonly int Index;
             internal readonly IFormalCodeItem CodeBase;
-            internal readonly DataStackMemento Before;
+            internal readonly DataStack.ItemMemento[] Before;
             internal Exception Exception;
-            internal DataStackMemento After;
+            internal DataStack.ItemMemento[] After;
             internal StackItem[] Stack;
 
-            internal Step(IFormalCodeItem codeBase, DataStackMemento before, int index)
+            internal Step(IFormalCodeItem codeBase, DataStack.ItemMemento[] before, int index)
             {
                 CodeBase = codeBase;
                 Before = before;
@@ -96,8 +96,7 @@ namespace ReniBrowser.CompilationView
             Control CreateDataStackView()
             {
                 var data = Before
-                    .Items
-                    .Merge(After.Items, item => item.Offset)
+                    .Merge(After, item => item.Offset)
                     .OrderByDescending(item=>item.Item1)
                     .ToArray();
 
@@ -159,16 +158,6 @@ namespace ReniBrowser.CompilationView
             }
         }
 
-        internal sealed class DataStackMemento : DumpableObject
-        {
-            internal readonly DataStack.ItemMemento[] Items;
-
-            internal DataStackMemento(DataStack dataStack)
-            {
-                Items = dataStack.GetLocalItemMemento().ToArray();
-            }
-        }
-
         readonly IList<Step> Steps = new List<Step>();
         readonly IDictionary<IFormalCodeItem, int[]> StepsForCode =
             new Dictionary<IFormalCodeItem, int[]>();
@@ -182,7 +171,7 @@ namespace ReniBrowser.CompilationView
         {
             var beforeSize = dataStack.Size;
             var index = Steps.Count;
-            var item = new Step(codeBase, new DataStackMemento(dataStack), index);
+            var item = new Step(codeBase, dataStack.GetLocalItemMementos().ToArray(), index);
             Steps.Add(item);
             AssumeStepsForCode(item.CodeBase, index);
 
@@ -196,7 +185,7 @@ namespace ReniBrowser.CompilationView
                 dataStack.Size = beforeSize + codeBase.Size;
             }
 
-            item.After = new DataStackMemento(dataStack);
+            item.After = dataStack.GetLocalItemMementos().ToArray();
         }
 
         void AssumeStepsForCode(IFormalCodeItem item, int index)

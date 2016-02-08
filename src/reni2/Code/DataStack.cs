@@ -52,7 +52,7 @@ namespace Reni.Code
             _localData = new LocalData(_context.OutStream);
         }
 
-        internal IEnumerable<ItemMemento> GetLocalItemMemento() => Data.GetItemMemento();
+        internal IEnumerable<ItemMemento> GetLocalItemMementos() => Data.GetItemMementos();
 
         [DisableDump]
         internal BitsConst Value => Data.GetBitsConst();
