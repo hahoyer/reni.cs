@@ -166,12 +166,14 @@ namespace ReniBrowser.CompilationView
             return result;
         }
 
-        internal static Control CreateView(this Call target, SourceView master)
+        internal static Control CreateView(this Call target, SourceView master) 
+            => target.FunctionId.CreateView(master);
+
+        internal static Control CreateView(this FunctionId target, SourceView master)
         {
-            var functionId = target.FunctionId;
-            var name = functionId.ToString();
+            var name = target.ToString();
             var result = name.CreateView();
-            result.Click += (a, b) => master.SignalClickedFunction(functionId.Index);
+            result.Click += (a, b) => master.SignalClickedFunction(target.Index);
             return result;
         }
 

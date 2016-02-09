@@ -7,32 +7,40 @@ using hw.DebugFormatter;
 using hw.Helper;
 using Reni;
 using Reni.Code;
+using Reni.Struct;
 
 namespace ReniBrowser.CompilationView
 {
     sealed class BrowseTraceCollector : DumpableObject, ITraceCollector
     {
+        internal sealed class FrameItem : DumpableObject
+        {
+            public FunctionId FunctionId;
+            public int CallStepIndex;
+            public string Text;
+        }
+
         internal sealed class Step : DumpableObject
         {
-            internal class StackItem
-            {
-                public int FunctionIndex;
-                public int ReturnStepIndex;
-                public string Frame;
-            }
-
             internal readonly int Index;
             internal readonly IFormalCodeItem CodeBase;
-            internal readonly DataStack.ItemMemento[] Before;
+            readonly DataStack.DataMemento[] Before;
             internal Exception Exception;
-            internal DataStack.ItemMemento[] After;
-            internal StackItem[] Stack;
+            DataStack.DataMemento[] After { get; set; }
+            readonly FrameItem[] Frames;
 
-            internal Step(IFormalCodeItem codeBase, DataStack.ItemMemento[] before, int index)
+            internal Step
+                (IFormalCodeItem codeBase, DataStack dataStack, int index, FrameItem[] frames)
             {
                 CodeBase = codeBase;
-                Before = before;
+                Before = dataStack.GetLocalItemMementos().ToArray();
                 Index = index;
+                Frames = frames;
+            }
+
+            internal DataStack AfterStack
+            {
+                set { After = value.GetLocalItemMementos().ToArray(); }
             }
 
             internal DataGridViewRow CreateRowForStep()
@@ -43,6 +51,12 @@ namespace ReniBrowser.CompilationView
                         new DataGridViewTextBoxCell
                         {
                             Value = Index
+                        });
+                result.Cells.Add
+                    (
+                        new DataGridViewTextBoxCell
+                        {
+                            Value = Frames.Length
                         });
                 result.Cells.Add
                     (
@@ -71,6 +85,15 @@ namespace ReniBrowser.CompilationView
                 };
                 yield return new DataGridViewTextBoxColumn
                 {
+                    Name = "Depth",
+                    AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
+                    DefaultCellStyle = new DataGridViewCellStyle
+                    {
+                        Alignment = DataGridViewContentAlignment.MiddleRight
+                    }
+                };
+                yield return new DataGridViewTextBoxColumn
+                {
                     Name = "Code",
                     AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
                 };
@@ -81,7 +104,7 @@ namespace ReniBrowser.CompilationView
                 if(columnIndex == 0)
                     master.SignalClickedStep(this);
 
-                if(columnIndex == 1)
+                if(columnIndex == 2)
                     master.SignalClickedCode(CodeBase);
             }
 
@@ -97,7 +120,7 @@ namespace ReniBrowser.CompilationView
             {
                 var data = Before
                     .Merge(After, item => item.Offset)
-                    .OrderByDescending(item=>item.Item1)
+                    .OrderByDescending(item => item.Item1)
                     .ToArray();
 
                 var result = new TableLayoutPanel
@@ -122,36 +145,35 @@ namespace ReniBrowser.CompilationView
 
                     result.Controls.Add(item.Item1.CreateView(isBold: isChange), 2, i);
 
-                    if (item.Item3 != null)
+                    if(item.Item3 != null)
                     {
                         result.Controls.Add(item.Item3.Size.CreateView(isBold: isChange), 3, i);
                         result.Controls.Add(item.Item3.ValueDump.CreateView(isBold: isChange), 4, i);
-
                     }
                 }
 
                 return result;
             }
+
             Control CreateStackView(SourceView master)
             {
-                if (Stack == null)
-                    return null;
-
                 var result = new TableLayoutPanel
                 {
                     AutoSize = true,
                     AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                    ColumnCount = 3,
-                    RowCount = Stack.Length,
+                    ColumnCount = 4,
+                    RowCount = Frames.Length,
                     CellBorderStyle = TableLayoutPanelCellBorderStyle.Single
                 };
 
-                for (var i = 0; i < Stack.Length; i++)
+                for(var rowIndex = 0; rowIndex < Frames.Length; rowIndex++)
                 {
-                    var item = Stack[i];
-                    result.Controls.Add(item.FunctionIndex.CreateView(), 0, i);
-                    result.Controls.Add(item.ReturnStepIndex.CreateView(), 1, i);
-                    result.Controls.Add(item.Frame.CreateView(), 2, i);
+                    var item = Frames[rowIndex];
+                    var columnIndex = 0;
+                    result.Controls.Add((Frames.Length - rowIndex).CreateView(), columnIndex++, rowIndex);
+                    result.Controls.Add(item.FunctionId.CreateView(master), columnIndex++, rowIndex);
+                    result.Controls.Add(item.CallStepIndex.CreateView(), columnIndex++, rowIndex);
+                    result.Controls.Add(item.Text.CreateView(), columnIndex++, rowIndex);
                 }
 
                 return result;
@@ -159,6 +181,8 @@ namespace ReniBrowser.CompilationView
         }
 
         readonly IList<Step> Steps = new List<Step>();
+        readonly IList<FrameItem> Frames = new List<FrameItem>();
+
         readonly IDictionary<IFormalCodeItem, int[]> StepsForCode =
             new Dictionary<IFormalCodeItem, int[]>();
 
@@ -171,7 +195,7 @@ namespace ReniBrowser.CompilationView
         {
             var beforeSize = dataStack.Size;
             var index = Steps.Count;
-            var item = new Step(codeBase, dataStack.GetLocalItemMementos().ToArray(), index);
+            var item = new Step(codeBase, dataStack, index, Frames.ToArray());
             Steps.Add(item);
             AssumeStepsForCode(item.CodeBase, index);
 
@@ -185,8 +209,21 @@ namespace ReniBrowser.CompilationView
                 dataStack.Size = beforeSize + codeBase.Size;
             }
 
-            item.After = dataStack.GetLocalItemMementos().ToArray();
+            item.AfterStack = dataStack;
         }
+
+        void ITraceCollector.Call(StackData argsAndRefs, FunctionId functionId)
+            => Frames.Insert
+                (
+                    0,
+                    new FrameItem
+                    {
+                        Text = argsAndRefs.Dump(),
+                        FunctionId = functionId,
+                        CallStepIndex = Steps.Count
+                    });
+
+        void ITraceCollector.Return() => Frames.RemoveAt(0);
 
         void AssumeStepsForCode(IFormalCodeItem item, int index)
         {

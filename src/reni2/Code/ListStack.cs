@@ -144,14 +144,14 @@ namespace Reni.Code
 
         public override string DumpData() => _data.Select(DumpItem).Stringify("\n");
 
-        internal override IEnumerable<DataStack.ItemMemento> GetItemMementos()
+        internal override IEnumerable<DataStack.DataMemento> GetItemMementos()
             => _data
             .Select(GetItemMemento)
             .OrderByDescending(item=>item.Offset);
 
-        DataStack.ItemMemento GetItemMemento(NonListStackData item, int index)
+        DataStack.DataMemento GetItemMemento(NonListStackData item, int index)
         {
-            return new DataStack.ItemMemento(item.Dump())
+            return new DataStack.DataMemento(item.Dump())
             {
                 Size = item.Size.ToInt(),
                 Offset = _data.Skip(index).Sum(item1 => item1.Size.ToInt())

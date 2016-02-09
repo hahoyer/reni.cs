@@ -304,6 +304,18 @@ namespace Reni
             codeBase.Visit(dataStack);
             Tracer.IndentEnd();
         }
+
+        void ITraceCollector.Call(StackData argsAndRefs, FunctionId functionId)
+        {
+            Tracer.Line("\n>>>>>> Call"+ functionId.NodeDump +"\n");
+            Tracer.IndentStart();
+        }
+
+        void ITraceCollector.Return()
+        {
+            Tracer.IndentEnd();
+            Tracer.Line("\n<<<<<< Return\n");
+        }
     }
 
     public interface IOutStream

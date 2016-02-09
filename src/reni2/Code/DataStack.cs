@@ -35,7 +35,6 @@ namespace Reni.Code
 
             internal StackData FrameAddress(Size offset)
                 => new StackDataAddress(Frame, offset, Data.OutStream);
-
         }
 
         internal static Size RefSize => Root.DefaultRefAlignParam.RefSize;
@@ -52,7 +51,7 @@ namespace Reni.Code
             _localData = new LocalData(_context.OutStream);
         }
 
-        internal IEnumerable<ItemMemento> GetLocalItemMementos() => Data.GetItemMementos();
+        internal IEnumerable<DataMemento> GetLocalItemMementos() => Data.GetItemMementos();
 
         [DisableDump]
         internal BitsConst Value => Data.GetBitsConst();
@@ -61,11 +60,13 @@ namespace Reni.Code
         {
             var oldFrame = _localData.Frame;
             var argsAndRefs = Pull(argsAndRefsSize);
+            TraceCollector.Call(argsAndRefs, functionId);
             do
             {
                 _localData.Frame = new FrameData(argsAndRefs);
                 SubVisit(_context.Function(functionId));
             } while(_localData.Frame.IsRepeatRequired);
+            TraceCollector.Return();
             _localData.Frame = oldFrame;
         }
 
@@ -242,9 +243,9 @@ namespace Reni.Code
             return result;
         }
 
-        internal sealed class ItemMemento
+        internal sealed class DataMemento
         {
-            internal ItemMemento(string valueDump) { ValueDump = valueDump; }
+            internal DataMemento(string valueDump) { ValueDump = valueDump; }
             internal int Offset;
             internal int Size;
             readonly internal string ValueDump;
@@ -261,5 +262,7 @@ namespace Reni.Code
     {
         void AssertionFailed(Func<string> dumper, int depth);
         void Run(DataStack dataStack, IFormalCodeItem codeBase);
+        void Return();
+        void Call(StackData argsAndRefs, FunctionId functionId);
     }
 }
