@@ -143,7 +143,7 @@ namespace ReniBrowser.CompilationView
             result.Controls.Add(fiberHead.Size.CreateView(), 1, 0);
             result.Controls.Add(fiberHead.GetType().Name.CreateView(), 2, 0);
             result.Controls.Add(newHead ?? Default(fiberHead), 3, 0);
-            result.Controls.Add(Master.TraceLogItem(fiberHead, Master).CreateLink(), 4, 0);
+            result.Controls.Add(Master.TraceLogItem(fiberHead).CreateLink(), 4, 0);
 
             for(var i = 0; i < visitedObject.FiberItems.Length; i++)
             {
@@ -152,7 +152,7 @@ namespace ReniBrowser.CompilationView
                 result.Controls.Add(item.OutputSize.CreateView(), 1, i + 1);
                 result.Controls.Add(item.GetType().Name.CreateView(), 2, i + 1);
                 result.Controls.Add(newItems[i] ?? item.CreateView(), 3, i + 1);
-                result.Controls.Add(Master.TraceLogItem(item, Master).CreateLink(), 4, i + 1);
+                result.Controls.Add(Master.TraceLogItem(item).CreateLink(), 4, i + 1);
             }
 
             return result;
@@ -176,7 +176,7 @@ namespace ReniBrowser.CompilationView
                 result.Controls.Add(item.Size.CreateView(), 0, i);
                 result.Controls.Add(item.GetType().Name.CreateView(), 1, i);
                 result.Controls.Add(enumerable[i] ?? Default(item), 2, i);
-                result.Controls.Add(Master.TraceLogItem(item, Master).CreateLink(), 3, i);
+                result.Controls.Add(Master.TraceLogItem(item).CreateLink(), 3, i);
             }
 
             return result;

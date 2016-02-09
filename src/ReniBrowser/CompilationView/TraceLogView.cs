@@ -20,10 +20,12 @@ namespace ReniBrowser.CompilationView
 
         protected override SourcePart Source => null;
 
-        public void SignalClickedObject(BrowseTraceCollector.Step[] target)
+        public void SignalClickedObject(Step[] target)
         {
             foreach(var item in target)
                 LogView.Rows[item.Index].Selected = true;
+            if(target.Any())
+                LogView.Rows[target.First().Index].Visible = true;
         }
     }
 }

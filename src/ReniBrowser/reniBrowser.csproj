@@ -30,6 +30,8 @@
     <Compile Include="CompilationView\CodeViewVisitor.cs" />
     <Compile Include="CompilationView\CompoundView.cs" />
     <Compile Include="CompilationView\ContextView.cs" />
+    <Compile Include="CompilationView\EmptyTraceLogItem.cs" />
+    <Compile Include="CompilationView\FrameItem.cs" />
     <Compile Include="CompilationView\FunctionView.cs" />
     <Compile Include="CompilationView\GeneratorExtension.cs" />
     <Compile Include="CompilationView\MainView.cs" />
@@ -37,8 +39,10 @@
     <Compile Include="CompilationView\ResultCachesView.cs" />
     <Compile Include="CompilationView\ResultCachesViewsPanel.cs" />
     <Compile Include="CompilationView\SourceView.cs" />
+    <Compile Include="CompilationView\Step.cs" />
     <Compile Include="CompilationView\StepView.cs" />
     <Compile Include="CompilationView\TextStyle.cs" />
+    <Compile Include="CompilationView\TraceLogItem.cs" />
     <Compile Include="CompilationView\TraceLogView.cs" />
     <Compile Include="CompilationView\TypeView.cs" />
     <Compile Include="CompilationView\View.cs" />

@@ -21,7 +21,7 @@ namespace ReniBrowser.CompilationView
         readonly ValueCache<CompilerBrowser> CompilerCache;
         readonly FunctionCache<CompileSyntax, ResultCachesView> ResultCachesViews;
         readonly FunctionCache<object, ChildView> ChildViews;
-        readonly BrowseTraceCollector TraceLog = new BrowseTraceCollector();
+        readonly BrowseTraceCollector TraceLog;
         readonly TraceLogView LogView;
 
         internal SourceView(string text)
@@ -52,6 +52,7 @@ namespace ReniBrowser.CompilationView
 
             TextBox.Text = text;
 
+            TraceLog = new BrowseTraceCollector(this);
             LogView = new TraceLogView(this);
         }
 
@@ -86,7 +87,7 @@ namespace ReniBrowser.CompilationView
         CompoundView CreateView(Compound target)
             => target == null ? null : new CompoundView(target, this);
 
-        StepView CreateView(BrowseTraceCollector.Step target)
+        StepView CreateView(Step target)
             => target == null ? null : new StepView(target, this);
 
         ChildView CreateView(object target)
@@ -94,7 +95,7 @@ namespace ReniBrowser.CompilationView
                 ?? CreateView(target as ContextBase)
                     ?? CreateView(target as TypeBase)
                         ?? CreateView(target as CodeBase)
-                            ?? CreateView(target as BrowseTraceCollector.Step)
+                            ?? CreateView(target as Step)
                                 ?? CreateView(target as Compound)
                                     ?? UnexpectedTarget(target);
 
@@ -202,8 +203,8 @@ namespace ReniBrowser.CompilationView
             TextBox.SetSelection(source.Position, source.EndPosition);
         }
 
-        internal ITraceLogItem TraceLogItem(IFormalCodeItem target, SourceView master)
-            => TraceLog.GetItems(target, master);
+        internal ITraceLogItem TraceLogItem(IFormalCodeItem target)
+            => TraceLog.GetItems(target);
 
         internal void RunCode()
         {
@@ -217,15 +218,15 @@ namespace ReniBrowser.CompilationView
             Compiler.Execute(dataStack);
         }
 
-        internal DataGridView CreateTraceLogView() => TraceLog.CreateView(this);
+        internal DataGridView CreateTraceLogView() => TraceLog.CreateView();
 
         internal void SignalClickedCode(IFormalCodeItem codeBase)
             => SignalClickedObject(Compiler.FindFunction(codeBase));
 
-        internal void SignalClickedSteps(BrowseTraceCollector.Step[] target)
+        internal void SignalClickedSteps(Step[] target)
             => LogView.SignalClickedObject(target);
 
-        internal void SignalClickedStep(BrowseTraceCollector.Step target)
+        internal void SignalClickedStep(Step target)
             => SignalClickedObject(target);
     }
 

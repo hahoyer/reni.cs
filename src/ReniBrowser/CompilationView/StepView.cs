@@ -9,7 +9,7 @@ namespace ReniBrowser.CompilationView
     {
         readonly int Index;
 
-        internal StepView(BrowseTraceCollector.Step item, SourceView master)
+        internal StepView(Step item, SourceView master)
             : base(master, "Step " + item.Index + ": "+ item.CodeBase.GetIdText())
         {
             Index = item.Index;
