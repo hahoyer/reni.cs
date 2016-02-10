@@ -20,7 +20,15 @@ namespace Reni.Code
             _offset = offset;
         }
 
+        protected override StackData GetTop(Size size) { throw new GetTopException(size); }
         protected override StackData Pull(Size size) { throw new PullException(size); }
+
+        internal sealed class GetTopException : Exception
+        {
+            public GetTopException(Size size)
+                : base("GetTop failed for size = " + size.Dump())
+            { }
+        }
 
         internal sealed class PullException : Exception
         {

@@ -53,7 +53,9 @@ namespace Reni.Code
                 return this;
             if(size.IsZero)
                 return new EmptyStackData(OutStream);
-            return GetTop(size);
+            var result = GetTop(size);
+            Tracer.Assert(result.Size == size);
+            return result;
         }
 
         internal StackData DoPull(Size size)

@@ -50,13 +50,12 @@ namespace Reni.Code
 
         protected override StackData GetTop(Size size)
         {
-            if(_data.Length > 0 && _data[0].Size >= size)
-                return _data[0].DoGetTop(size);
             var i = Index(size);
-            if(i == null)
-                throw new GetTopException(size);
+            var result = Head(i);
+            if(result.Size == size)
+                return result;
 
-            return Head(i.Value);
+            return _data[i].DoGetTop(size - result.Size).Push(result);
         }
 
         sealed class GetTopException : Exception
@@ -65,15 +64,13 @@ namespace Reni.Code
                 : base("GetTop failed for size = " + size.Dump()) {}
         }
 
-        int? Index(Size size)
+        int Index(Size size)
         {
             var sizeSoFar = Size.Zero;
             var i = 0;
-            for(; i < _data.Length && sizeSoFar < size; i++)
+            for(; i < _data.Length && sizeSoFar <= size; i++)
                 sizeSoFar += _data[i].Size;
-            if(sizeSoFar > size)
-                return null;
-            return i;
+            return i-1;
         }
 
         protected override StackData Pull(Size size) => Pull(size, false);

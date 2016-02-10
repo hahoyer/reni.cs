@@ -24,10 +24,10 @@ namespace Reni.Code
             void IStackDataAddressBase.SetTop(Size offset, StackData right)
             {
                 var oldTop = Data.DoGetTop(Data.Size + offset);
-                Data = Data
-                    .DoPull(Data.Size + offset + right.Size)
-                    .Push(right)
-                    .Push(oldTop);
+                var tail = Data.DoPull(Data.Size + offset + right.Size);
+                var newDataTail = tail.Push(right);
+                var newData = newDataTail.Push(oldTop);
+                Data = newData;
             }
 
             internal StackDataAddress Address(Size offset)
