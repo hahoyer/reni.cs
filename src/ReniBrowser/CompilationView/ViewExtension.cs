@@ -166,7 +166,7 @@ namespace ReniBrowser.CompilationView
             return result;
         }
 
-        internal static Control CreateView(this Call target, SourceView master) 
+        internal static Control CreateView(this Call target, SourceView master)
             => target.FunctionId.CreateView(master);
 
         internal static Control CreateView(this FunctionId target, SourceView master)
@@ -296,13 +296,14 @@ namespace ReniBrowser.CompilationView
 
             var indexView = target.Index.CreateView(2);
             var argsTypeView = target.ArgsType.CreateLink(master).CreateGroup("args");
+            var extsView = target.Exts.CreateView(master).CreateGroup("exts");
             var valueTypeView = target.ValueType.CreateLink(master).CreateGroup("value");
             var setterView = target.Setter?.CreateView(master);
             var getterView = target.Getter.CreateView(master);
 
             return false.CreateLineupView
                 (
-                    true.CreateLineupView(indexView, argsTypeView, valueTypeView),
+                    true.CreateLineupView(indexView, argsTypeView, extsView, valueTypeView),
                     setterView?.CreateGroup("Set"),
                     getterView?.CreateGroup("Get")
                 );

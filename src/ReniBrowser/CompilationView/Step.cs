@@ -134,7 +134,7 @@ namespace ReniBrowser.CompilationView
                     result.Controls.Add(item.Item2.ValueDump.CreateView(isBold: isChange), 1, i);
                 }
 
-                result.Controls.Add(item.Item1.CreateView(isBold: isChange), 2, i);
+                result.Controls.Add((-item.Item1).CreateView(isBold: isChange), 2, i);
 
                 if(item.Item3 != null)
                 {

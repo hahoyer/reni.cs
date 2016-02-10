@@ -57,7 +57,7 @@ namespace Reni.Struct
 
         [Node]
         [DisableDump]
-        CodeArgs Exts => GetExts();
+        internal CodeArgs Exts => GetExts();
 
         [DisableDump]
         internal FunctionContainer Container
