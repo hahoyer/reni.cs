@@ -151,7 +151,7 @@ namespace Reni.Struct
 
             return result
                 .ReplaceAbsolute
-                (reference, CreateContextRefCode, CodeArgs.Void);
+                (reference, () => CodeBase.FrameRef().DePointer(reference.Size()), CodeArgs.Void);
         }
 
         CodeBase CreateContextRefCode()
