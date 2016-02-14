@@ -64,7 +64,7 @@ namespace hw.Helper
 
         void Ensure(TKey key)
         {
-            if(base.ContainsKey(key))
+            if(ContainsKey(key))
                 return;
             base[key] = DefaultValue;
             base[key] = _createValue(key);
@@ -72,13 +72,13 @@ namespace hw.Helper
 
         public readonly TValue DefaultValue;
 
-        public bool IsValid(TKey key) { return base.ContainsKey(key); }
+        public bool IsValid(TKey key) { return ContainsKey(key); }
 
         public void IsValid(TKey key, bool value)
         {
             if(value)
                 Ensure(key);
-            else if(base.ContainsKey(key))
+            else if(ContainsKey(key))
                 Remove(key);
         }
 
@@ -142,7 +142,5 @@ namespace hw.Helper
                 get { return _default ?? (_default = new NoCaseComparer()); }
             }
         }
-
     }
-
 }

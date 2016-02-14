@@ -104,17 +104,18 @@ namespace Reni.TokenClasses
             {
                 Tracer.Assert(Level == level);
                 var innerPart = Right ?? new EmptyList(token);
-                if(Left == null)
+
+                if (Left == null)
                     return innerPart;
 
-                return Checked<Parser.Syntax>.From(Left.RightSyntax(innerPart, Token));
+                NotImplementedMethod(level, token);
+                return null;
             }
 
             internal override Checked<Parser.Syntax> Match
                 (int level, SourcePart token, Parser.Syntax right)
             {
-                var inner = Match(level, token);
-                NotImplementedMethod(level, token, right, nameof(inner), inner);
+                NotImplementedMethod(level, token, right);
                 return null;
             }
         }

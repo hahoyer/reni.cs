@@ -37,7 +37,8 @@ namespace Reni.Parser
                         CompareOperation.TokenId(false),
                         CompareOperation.TokenId(false, true)
                     );
-                result += PrioTable.Left(EqualityOperation.TokenId(false), EqualityOperation.TokenId());
+                result += PrioTable.Left
+                    (EqualityOperation.TokenId(false), EqualityOperation.TokenId());
 
                 result += PrioTable.Right(ReassignToken.TokenId);
 
@@ -54,29 +55,25 @@ namespace Reni.Parser
                 result += PrioTable.Right(List.TokenId(0));
                 result += PrioTable.Right(List.TokenId(1));
                 result += PrioTable.Right(List.TokenId(2));
-                result = result.ParenthesisLevelLeft
+                result += PrioTable.Right(PrioTable.Error);
+
+                result += PrioTable.BracketParallels
                     (
                         new[]
                         {
                             LeftParenthesis.TokenId(1),
                             LeftParenthesis.TokenId(2),
-                            LeftParenthesis.TokenId(3)
+                            LeftParenthesis.TokenId(3),
+                            PrioTable.BeginOfText
                         },
                         new[]
                         {
                             RightParenthesis.TokenId(1),
                             RightParenthesis.TokenId(2),
-                            RightParenthesis.TokenId(3)
+                            RightParenthesis.TokenId(3),
+                            PrioTable.EndOfText
                         }
                     );
-                result.Correct("(", PrioTable.Any, '-');
-                result.Correct("[", PrioTable.Any, '-');
-                result.Correct("{", PrioTable.Any, '-');
-
-                result += PrioTable.Right(PrioTable.Error);
-
-                result = result.ParenthesisLevelLeft
-                    (new[] {PrioTable.BeginOfText}, new[] {PrioTable.EndOfText});
 
                 //Tracer.FlaggedLine("\n"+x.ToString());
                 return result;
@@ -159,6 +156,5 @@ namespace Reni.Parser
                 new[] {resultIssues});
         }
 
-        IType<SourceSyntax> IType<SourceSyntax>.NextTypeIfMatched => null;
     }
 }

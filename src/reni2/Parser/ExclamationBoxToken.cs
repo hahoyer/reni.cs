@@ -31,8 +31,6 @@ namespace Reni.Parser
         }
 
         string IType<SourceSyntax>.PrioTableId => PrioTable.Any;
-        IType<SourceSyntax> IType<SourceSyntax>.NextTypeIfMatched => null;
-
         string ITokenClass.Id => "!";
 
     }

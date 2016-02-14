@@ -13,9 +13,8 @@ namespace Reni.Parser
         {
             get
             {
-                var prioTable = PrioTable.Left(PrioTable.BeginOfText);
-                prioTable += PrioTable.Left("converter", "mutable", "mix_in");
-                prioTable = prioTable.ParenthesisLevelLeft
+                var prioTable = PrioTable.Left(PrioTable.Any);
+                prioTable += PrioTable.BracketParallels
                     (
                         new[]
                         {
@@ -25,17 +24,11 @@ namespace Reni.Parser
                         },
                         new[]
                         {
-                            RightParenthesis.
-                            TokenId(1),
+                            RightParenthesis.TokenId(1),
                             RightParenthesis.TokenId(2),
                             RightParenthesis.TokenId(3)
                         }
                     );
-                prioTable += PrioTable.Left(PrioTable.Any);
-                prioTable.Correct(PrioTable.Any, PrioTable.BeginOfText, '=');
-                prioTable.Correct(")", PrioTable.BeginOfText, '=');
-                prioTable.Correct("]", PrioTable.BeginOfText, '=');
-                prioTable.Correct("}", PrioTable.BeginOfText, '=');
                 return prioTable;
             }
         }

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Parser;
 using hw.Scanner;
 using Reni.Parser;
-using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
@@ -12,8 +12,33 @@ namespace Reni.TokenClasses
     [Variant(1)]
     [Variant(2)]
     [Variant(3)]
-    sealed class RightParenthesis : TokenClass, IBelongingsMatcher
+    sealed class RightParenthesis
+        : TokenClass
+            , IBelongingsMatcher
+            , IBracketMatch<SourceSyntax>
     {
+        sealed class Matched : TokenClass
+        {
+            protected override Checked<Syntax> Terminal(SourcePart token)
+            {
+                NotImplementedMethod(token);
+                return null;
+            }
+
+            protected override Checked<Syntax> Prefix(SourcePart token, Syntax right)
+            {
+                NotImplementedMethod(token, right);
+                return null;
+            }
+
+            protected override Checked<Syntax> Suffix(Syntax left, SourcePart token) => left;
+
+            protected override Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
+                => left.InfixOfMatched(token, right);
+
+            public override string Id => "()";
+        }
+
         public static string TokenId(int level) => "\0)]}".Substring(level, 1);
 
         public RightParenthesis(int level) { Level = level; }
@@ -25,9 +50,11 @@ namespace Reni.TokenClasses
         protected override Checked<Syntax> Suffix(Syntax left, SourcePart token)
             => left.Match(Level, token);
 
-        protected override Checked<Syntax> Infix
-            (Syntax left, SourcePart token, Syntax right)
-            => left.Match(Level, token, right);
+        protected override Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
+        {
+            NotImplementedMethod(left, token, right);
+            return null;
+        }
 
         protected override Checked<Syntax> Prefix(SourcePart token, Syntax right)
         {
@@ -36,9 +63,14 @@ namespace Reni.TokenClasses
         }
 
         protected override Checked<Syntax> Terminal(SourcePart token)
-            => new EmptyList(token).Issues(IssueId.ExtraRightBracket.CreateIssue(token));
+        {
+            NotImplementedMethod(token);
+            return null;
+        }
 
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => (otherMatcher as LeftParenthesis)?.Level == Level;
+
+        IType<SourceSyntax> IBracketMatch<SourceSyntax>.Value { get; } = new Matched();
     }
 }

@@ -155,6 +155,12 @@ namespace Reni.Parser
                 .Where(item => item != null)
                 .Aggregate() + Token;
         }
+
+        internal virtual Checked<Syntax> InfixOfMatched(SourcePart token, Syntax right)
+        {
+            NotImplementedMethod(token, right);
+            return null;
+        }
     }
 
     abstract class NonCompileSyntax : Syntax

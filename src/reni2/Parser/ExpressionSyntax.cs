@@ -66,6 +66,9 @@ namespace Reni.Parser
                         : Create(this, null, right, token)
                 );
 
+        internal override Checked<Syntax> InfixOfMatched(SourcePart token, Syntax right)
+            => Checked<Syntax>.From(Create(this, null, right, token));
+
         internal override Result ResultForCache(ContextBase context, Category category)
         {
             if(Left == null)
@@ -98,14 +101,15 @@ namespace Reni.Parser
                 .Select(item => item.Value)
                 .FirstOrDefault(item => item.Exts.Contains(ext));
 
-            if (result != null)
+            if(result != null)
                 return result.Provider;
 
             return GetDefinableResults(ext, context)
                 .FirstOrDefault();
         }
 
-        IEnumerable<ResultCache.IResultProvider> GetDefinableResults(IContextReference ext, ContextBase context)
+        IEnumerable<ResultCache.IResultProvider> GetDefinableResults
+            (IContextReference ext, ContextBase context)
         {
             if(Left == null)
                 return context.GetDefinableResults(ext, Definable, Right);

@@ -10,15 +10,13 @@ namespace Reni.ParserTest
     [UnitTest]
     sealed class PrioTableTest : DependantAttribute
     {
-        [UnitTest]
+        //[UnitTest]
         public void FromText()
         {
-            var text = @"
-Right **
+            var text = @"Right **
 Left * /
-Left + -
-";
-            var prioTable = PrioTable.FromText(text);
+Left + -";
+            var prioTable = PrioTable.FromText(text.Replace("\r\n", "\n"));
             var dump = prioTable.ToString();
             Tracer.FlaggedLine("\n" + dump);
             var expected = @"         00000000

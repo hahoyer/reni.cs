@@ -26,12 +26,6 @@ namespace Reni.ParserTest
             if(string.IsNullOrEmpty(code))
                 return null;
 
-            if(prioTable.Token.Contains("("))
-                prioTable.Correct("(", PrioTable.Any, '-');
-            if (prioTable.Token.Contains("["))
-                prioTable.Correct("[", PrioTable.Any, '-');
-            if (prioTable.Token.Contains("{"))
-                prioTable.Correct("{", PrioTable.Any, '-');
             IParser<Syntax> parser = new PrioParser<Syntax>
                 (prioTable, new Scanner<Syntax>(Lexer.Instance, new SimpleTokenFactory()));
             parser.Trace = true;
@@ -64,8 +58,6 @@ namespace Reni.ParserTest
                 => Create(left, token, right);
 
             string IType<Syntax>.PrioTableId => Id;
-            IType<Syntax> IType<Syntax>.NextTypeIfMatched => NextTypeIfMatched;
-            protected virtual IType<Syntax> NextTypeIfMatched => null;
 
             protected virtual Syntax Create(Syntax left, IToken token, Syntax right)
                 => Syntax.CreateSyntax(left, token, right);

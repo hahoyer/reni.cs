@@ -20,9 +20,6 @@ namespace Reni.TokenClasses
             => Create(left, token, right);
 
         string IType<SourceSyntax>.PrioTableId => Id;
-        IType<SourceSyntax> IType<SourceSyntax>.NextTypeIfMatched => NextTypeIfMatched;
-
-        protected virtual IType<SourceSyntax> NextTypeIfMatched => null;
 
         SourceSyntax Create(SourceSyntax left, IToken token, SourceSyntax right)
         {

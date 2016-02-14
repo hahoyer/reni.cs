@@ -187,6 +187,7 @@
     <Compile Include="hw\Helper\ValueCache.cs" />
     <Compile Include="hw\Helper\ValueCacheExtension.cs" />
     <Compile Include="hw\JetBrainsAnnotations.cs" />
+    <Compile Include="hw\Parser\BracketContext.cs" />
     <Compile Include="hw\Parser\Extension.cs" />
     <Compile Include="hw\Parser\IBinaryTreeItem.cs" />
     <Compile Include="hw\Parser\ILexer.cs" />
