@@ -36,7 +36,7 @@ namespace Reni.TokenClasses
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class Exclamation : ScannerTokenClass, ISubParser<SourceSyntax>
+    sealed class Exclamation : ScannerTokenClass, ISubParser<SourceSyntax> , IType<SourceSyntax>
     {
         public const string TokenId = "!";
 
@@ -73,6 +73,15 @@ namespace Reni.TokenClasses
                 }
             }
         }
+
+        SourceSyntax IType<SourceSyntax>.Create(SourceSyntax left, IToken token, SourceSyntax right)
+        {
+            NotImplementedMethod(left, token, right);
+            return null;
+
+        }
+
+        string IType<SourceSyntax>.PrioTableId => TokenId;
     }
 
 
