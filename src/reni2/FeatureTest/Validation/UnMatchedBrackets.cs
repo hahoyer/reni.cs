@@ -12,16 +12,20 @@ namespace Reni.FeatureTest.Validation
     [Target(@"x:{ 1 x ( }; 1 dump_print")]
     public sealed class UnMatchedLeftParenthesis : CompilerTest
     {
-        public UnMatchedLeftParenthesis() { Parameters.ParseOnly = true; }
+        public UnMatchedLeftParenthesis()
+        {
+            Parameters.TraceOptions.Parser = true;
+            Parameters.ParseOnly = true;
+        }
 
         protected override void Verify(IEnumerable<Issue> issues)
         {
             var issueArray = issues.ToArray();
             var i = 0;
             var issueBase = issueArray[i];
-            Tracer.Assert(issueBase.IssueId == IssueId.MissingRightBracket, issueBase.Dump);
+            Tracer.Assert(issueBase.IssueId == IssueId.ExtraLeftBracket, issueBase.Dump);
             i++;
-            Tracer.Assert(i == issueArray.Length);
+            Tracer.Assert(i == issueArray.Length, ()=>Tracer.Dump(issueArray));
         }
     }
 

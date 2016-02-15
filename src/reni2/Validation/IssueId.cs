@@ -15,6 +15,7 @@ namespace Reni.Validation
         public static readonly IssueId EOFInComment = new IssueId();
         public static readonly IssueId EOFInLineComment = new IssueId();
         public static readonly IssueId EOLInString = new IssueId();
+        public static readonly IssueId ExtraLeftBracket = new IssueId();
         public static readonly IssueId ExtraRightBracket = new IssueId();
         public static readonly IssueId IdentifierExpected = new IssueId();
         public static readonly IssueId InvalidExpression = new IssueId();
@@ -29,6 +30,8 @@ namespace Reni.Validation
         public static readonly IssueId UnexpectedUseAsPrefix = new IssueId();
         public static readonly IssueId UnexpectedUseAsSuffix = new IssueId();
         public static readonly IssueId UnexpectedUseAsTerminal = new IssueId();
+
+        public static IEnumerable<IssueId> All => AllInstances<IssueId>();
 
         internal Issue CreateIssue(SourcePart token) => new Issue(this, token, "");
         internal Checked<Syntax> Syntax(SourcePart token)

@@ -48,12 +48,19 @@ namespace Reni.TokenClasses
         void AssertValidSourceQueue()
         {
             if(Left != null)
+            {
                 Tracer.Assert
                     (
-                        Left.SourcePart.End == Token.SourcePart.Start,
+                        Left.SourcePart.End >= Token.SourcePart.Start,
                         () => Left.SourcePart.End.Span(Token.SourcePart.Start).NodeDump
                     );
-            if(Right != null)
+                Tracer.Assert
+                    (
+                        Left.SourcePart.End <= Token.SourcePart.Start,
+                        () => Left.SourcePart.NodeDump + " <> " + Token.SourcePart.NodeDump
+                    );
+            }
+            if (Right != null)
                 Tracer.Assert
                     (
                         Token.SourcePart.End == Right.SourcePart.Start,

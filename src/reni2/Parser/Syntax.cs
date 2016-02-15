@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using hw.Helper;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
 using Reni.Struct;
@@ -21,8 +21,7 @@ namespace Reni.Parser
         protected Syntax() { }
 
         protected Syntax(int objectId)
-            : base(objectId)
-        {}
+            : base(objectId) {}
 
         [DisableDump]
         internal SourcePart SourcePart
@@ -38,7 +37,10 @@ namespace Reni.Parser
         [DisableDump]
         internal abstract Checked<CompileSyntax> ToCompiledSyntax { get; }
 
-        internal virtual IEnumerable<KeyValuePair<string, int>> GetDeclarations(int index) { yield break; }
+        internal virtual IEnumerable<KeyValuePair<string, int>> GetDeclarations(int index)
+        {
+            yield break;
+        }
 
         internal virtual IEnumerable<string> GetDeclarations() { yield break; }
 
@@ -67,7 +69,7 @@ namespace Reni.Parser
             return result.Value.Issues(issue.plus(result.Issues));
         }
 
-        protected override sealed string Dump(bool isRecursion)
+        protected sealed override string Dump(bool isRecursion)
         {
             if(isRecursion)
                 return "ObjectId=" + ObjectId;
@@ -105,9 +107,6 @@ namespace Reni.Parser
                 .From(ExpressionSyntax.Create(this, definable, null, token));
 
         internal virtual Checked<Syntax> Match(int level, SourcePart token)
-            => new Checked<Syntax>(this, IssueId.ExtraRightBracket.CreateIssue(token));
-
-        internal virtual Checked<Syntax> Match(int level, SourcePart token, Syntax right)
             => new Checked<Syntax>(this, IssueId.ExtraRightBracket.CreateIssue(token));
 
         [DisableDump]

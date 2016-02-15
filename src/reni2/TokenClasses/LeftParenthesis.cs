@@ -79,43 +79,28 @@ namespace Reni.TokenClasses
             {
                 get
                 {
-                    if (Left != null)
-                    {
-                        if(Right !=null)
-                            NotImplementedFunction();
+                    if(Left == null)
+                        return (Right ?? new EmptyList(Token)).ToCompiledSyntax;
 
-                        return new Checked<CompileSyntax>
-                            (
-                            Left.ToCompiledSyntax.Value,
-                            IssueId.MissingRightBracket.CreateIssue(Token)
-                            );}
+                    if (Right != null)
+                        NotImplementedFunction();
 
-                    var right = (Right ?? new EmptyList(Token)).ToCompiledSyntax;
-
-                    return new Checked<CompileSyntax>
-                        (
-                        right.Value,
-                        IssueId.MissingRightBracket.CreateIssue(Token).plus(right.Issues)
-                        );
+                    return Left.ToCompiledSyntax;
                 }
             }
 
             internal override Checked<Parser.Syntax> Match(int level, SourcePart token)
             {
-                Tracer.Assert(Level == level);
+                if(Level != level)
+                    return new Checked<Parser.Syntax>
+                        (this,IssueId.ExtraLeftBracket.CreateIssue(Token));
+
                 var innerPart = Right ?? new EmptyList(token);
 
                 if (Left == null)
                     return innerPart;
 
                 NotImplementedMethod(level, token);
-                return null;
-            }
-
-            internal override Checked<Parser.Syntax> Match
-                (int level, SourcePart token, Parser.Syntax right)
-            {
-                NotImplementedMethod(level, token, right);
                 return null;
             }
         }
