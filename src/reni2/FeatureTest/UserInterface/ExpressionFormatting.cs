@@ -9,7 +9,6 @@ namespace Reni.FeatureTest.UserInterface
 {
     [UnitTest]
     [TestFixture]
-    [LowPriority]
     public sealed class ExpressionFormatting : DependantAttribute
     {
         [UnitTest]
@@ -20,19 +19,6 @@ namespace Reni.FeatureTest.UserInterface
             var span = (compiler.Source + 0).Span(Text.Length);
             var x = compiler.Locate(span).Reformat(span);
             Tracer.Assert(x == "(1, 3, 4, 6)", x);
-        }
-
-        [UnitTest]
-        public void CommentFromSourcePart()
-        {
-            const string Text = @"( # Comment
-1,3,4,6)";
-            var compiler = Compiler.BrowserFromText(Text);
-            var span = (compiler.Source + 2).Span(3);
-            var locate = compiler.Locate(span);
-            var x = locate.Reformat(span);
-
-            Tracer.Assert(x == "# C", x);
         }
 
         [UnitTest]
