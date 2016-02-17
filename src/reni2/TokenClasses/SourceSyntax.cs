@@ -6,7 +6,6 @@ using hw.Parser;
 using hw.Scanner;
 using Reni.Formatting;
 using Reni.Parser;
-using Reni.UserInterface;
 using Reni.Validation;
 
 namespace Reni.TokenClasses
@@ -54,13 +53,14 @@ namespace Reni.TokenClasses
                         Left.SourcePart.End >= Token.SourcePart.Start,
                         () => Left.SourcePart.End.Span(Token.SourcePart.Start).NodeDump
                     );
-                Tracer.Assert
-                    (
-                        Left.SourcePart.End <= Token.SourcePart.Start,
-                        () => Left.SourcePart.NodeDump + " <> " + Token.SourcePart.NodeDump
-                    );
+                if(!Issues.Any())
+                    Tracer.Assert
+                        (
+                            Left.SourcePart.End <= Token.SourcePart.Start,
+                            () => Left.SourcePart.NodeDump + " <> " + Token.SourcePart.NodeDump
+                        );
             }
-            if (Right != null)
+            if(Right != null)
                 Tracer.Assert
                     (
                         Token.SourcePart.End == Right.SourcePart.Start,
@@ -188,12 +188,12 @@ namespace Reni.TokenClasses
 
         public string BraceMatchDump => new BraceMatchDumper(this, 3).Dump();
 
-        internal string Reformat(SourcePart targetPart = null, Provider provider = null)
-            => (provider ?? new Provider())
+        internal string Reformat(SourcePart targetPart = null, IFormatter provider = null)
+            => (provider ?? new HierachicalFormatter())
                 .Reformat(this, targetPart ?? SourcePart);
 
         [DisableDump]
-        internal IEnumerable<hw.Parser.WhiteSpaceToken> LeadingWhiteSpaceTokens
+        internal IEnumerable<WhiteSpaceToken> LeadingWhiteSpaceTokens
             => Left != null
                 ? Left.LeadingWhiteSpaceTokens
                 : Token.PrecededWith.OnlyLeftPart();
@@ -212,7 +212,7 @@ namespace Reni.TokenClasses
             get
             {
                 yield return this;
-                if (Parent == null)
+                if(Parent == null)
                     yield break;
                 foreach(var other in Parent.ParentChainIncludingThis)
                     yield return other;

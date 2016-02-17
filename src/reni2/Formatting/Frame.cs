@@ -9,7 +9,7 @@ namespace Reni.Formatting
 {
     sealed class Frame : DumpableObject
     {
-        internal static Frame Create(SourceSyntax target, Provider formatter)
+        internal static Frame Create(SourceSyntax target, HierachicalFormatter formatter)
         {
             var result = new Frame(target, formatter: formatter);
             return result;
@@ -23,12 +23,12 @@ namespace Reni.Formatting
         readonly ValueCache<int> LeadingLineBreaksCache;
 
         [DisableDump]
-        readonly Provider Formatter;
+        readonly HierachicalFormatter Formatter;
         [DisableDump]
         readonly Frame Parent;
         internal readonly SourceSyntax Target;
 
-        Frame(SourceSyntax target, Frame parent = null, Provider formatter = null)
+        Frame(SourceSyntax target, Frame parent = null, HierachicalFormatter formatter = null)
         {
             Parent = parent;
             Formatter = parent?.Formatter ?? formatter;

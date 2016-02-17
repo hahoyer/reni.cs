@@ -17,7 +17,7 @@ namespace Reni.TokenClasses
             , IBelongingsMatcher
             , IBracketMatch<SourceSyntax>
     {
-        sealed class Matched : TokenClass
+        internal sealed class Matched : TokenClass
         {
             protected override Checked<Syntax> Terminal(SourcePart token)
             {

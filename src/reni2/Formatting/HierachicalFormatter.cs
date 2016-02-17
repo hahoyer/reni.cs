@@ -10,13 +10,13 @@ using Reni.TokenClasses;
 
 namespace Reni.Formatting
 {
-    public sealed class Provider : DumpableObject
+    public sealed class HierachicalFormatter : DumpableObject, IFormatter
     {
         public int? MaxLineLength = 100;
         public int? EmptyLineLimit = 1;
         public string IndentItem = "    ";
 
-        internal string Reformat(SourceSyntax target, SourcePart targetPart)
+        string IFormatter.Reformat(SourceSyntax target, SourcePart targetPart)
             => Frame.Create(target, this).ItemsForResult.Filter(targetPart);
 
         bool IsRelevantLineBreak(int emptyLines, ITokenClass tokenClass)

@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Parser;
 using hw.Scanner;
-using Reni.Formatting;
 using Reni.Parser;
 
 namespace Reni.TokenClasses
 {
-    sealed class EndToken : NonPrefixToken
+    sealed class EndToken : NonPrefixToken, IBracketMatch<SourceSyntax>
     {
         protected override Checked<Syntax> Suffix(Syntax left, SourcePart token)
             => Checked<Syntax>.From(left.ToCompiledSyntax);
@@ -16,5 +15,7 @@ namespace Reni.TokenClasses
         protected override Checked<Syntax> Terminal(SourcePart token) => new EmptyList(token);
         public override string Id => PrioTable.EndOfText;
 
+        IType<SourceSyntax> IBracketMatch<SourceSyntax>.Value { get; }
+            = new RightParenthesis.Matched();
     }
 }

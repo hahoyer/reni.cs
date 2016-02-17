@@ -89,12 +89,12 @@ namespace Reni.Parser
         public MainTokenFactory
             (Func<ITokenFactory<SourceSyntax>, IScanner<SourceSyntax>> getScanner)
         {
-            Parser = new PrioParser<SourceSyntax>(PrioTable, getScanner(this));
+            Parser = new PrioParser<SourceSyntax>(PrioTable, getScanner(this), new BeginToken());
             _declarationSyntaxParser = new PrioParser<SourceSyntax>
                 (
                 DeclarationTokenFactory.PrioTable,
                 getScanner(new DeclarationTokenFactory())
-                );
+                , null);
             _declarationSyntaxSubParser = new SubParser<SourceSyntax>
                 (_declarationSyntaxParser, Pack);
         }

@@ -64,5 +64,6 @@ namespace Reni.Formatting
                 .Select(item => item.Filter(targetPart))
                 .Stringify("");
         }
+
     }
 }

@@ -27,7 +27,7 @@ namespace Reni.ParserTest
                 return null;
 
             IParser<Syntax> parser = new PrioParser<Syntax>
-                (prioTable, new Scanner<Syntax>(Lexer.Instance, new SimpleTokenFactory()));
+                (prioTable, new Scanner<Syntax>(Lexer.Instance, new SimpleTokenFactory()), null);
             parser.Trace = true;
             return parser.Execute(new Source(code) + 0);
         }
