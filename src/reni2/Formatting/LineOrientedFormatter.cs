@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using hw.Parser;
 using hw.Scanner;
 using Reni.TokenClasses;
 
@@ -11,24 +10,37 @@ namespace Reni.Formatting
 {
     public sealed class LineOrientedFormatter : DumpableObject, IFormatter
     {
+        public int? MaxLineLength = 100;
+        public int? EmptyLineLimit = 1;
+        public string IndentItem = "    ";
+
         interface IItem
         {
+            SourcePart Part { get; }
         }
 
         string IFormatter.Reformat(SourceSyntax target, SourcePart part)
         {
-            var lines = target
-                .Chain(item=>item.Parent)
+            var rawLines = target
+                .Chain(item => item.Parent)
                 .Last()
                 .Items
-                .OrderBy(item=>item.Token.SourcePart.Position)
+                .OrderBy(item => item.Token.SourcePart.Position)
                 .SelectMany(GetItems)
-                .Split(item => item == null)
-                .ToArray();
+                .Split(item => item == null);
 
+            if(rawLines.Any(IsTooLongLine))
+                NotImplementedMethod(target, part);
 
             NotImplementedMethod(target, part);
             return null;
+        }
+
+        bool IsTooLongLine(IEnumerable<IItem> line)
+        {
+            if(MaxLineLength == null)
+                return false;
+            return line.Last().Part.EndPosition - line.First().Part.Position > MaxLineLength.Value;
         }
 
         static IEnumerable<IItem> GetItems(SourceSyntax target)
@@ -40,9 +52,9 @@ namespace Reni.Formatting
                     .PrecededWith[index]
                     .Characters
                     .Id
-                    .Count(c=>c=='\n');
+                    .Count(c => c == '\n');
 
-                for (var lineIndex = 0; lineIndex < lines; lineIndex++)
+                for(var lineIndex = 0; lineIndex < lines; lineIndex++)
                 {
                     yield return new WhiteSpaceItem(index, 0, target);
                     yield return null;
@@ -61,6 +73,8 @@ namespace Reni.Formatting
 
             internal string Id => Target.Token.Characters.Id;
             protected override string GetNodeDump() => Id.Quote();
+
+            SourcePart IItem.Part => Target.Token.Characters;
         }
 
         sealed class WhiteSpaceItem : DumpableObject, IItem
@@ -78,7 +92,18 @@ namespace Reni.Formatting
 
             internal string Id
                 => Target.Token.PrecededWith[Index].Characters.Id.Split('\n')[LineIndex];
-            protected override string GetNodeDump() => Index+"/"+LineIndex+"/"+Id.Quote();
+            protected override string GetNodeDump() => Index + "/" + LineIndex + "/" + Id.Quote();
+
+            public SourcePart Part
+            {
+                get
+                {
+                    var p = Target.Token.PrecededWith[Index].Characters;
+                    var lineLengths = p.Id.Split('\n').Select(item => item.Length + 1);
+                    var start = lineLengths.Take(LineIndex).Sum();
+                    return (p.Start + start).Span(Id.Length);
+                }
+            }
         }
     }
 }
