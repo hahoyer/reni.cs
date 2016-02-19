@@ -38,9 +38,6 @@ namespace Reni.Parser
         internal long ToNumber => BitsConst.Convert(Id).ToInt64();
 
         protected override string GetNodeDump() => Terminal.NodeDump();
-
-        internal override Checked<Syntax> RightSyntax(Syntax right, SourcePart token)
-            => Terminal.LatePrefix(Token, right);
     }
 
     sealed class PrefixSyntax : SpecialSyntax

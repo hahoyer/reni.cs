@@ -23,7 +23,7 @@ namespace Reni.FeatureTest.UserInterface
 1,3,4,6)";
             var compiler = Compiler.BrowserFromText(Text);
             var span = (compiler.Source + 2).Span(3);
-            var trimmed = compiler.Locate(span).Reformat(span, new LineOrientedFormatter());
+            var trimmed = compiler.Locate(span).Reformat(span);
 
             Tracer.Assert(trimmed == "# C", trimmed);
         }
@@ -54,7 +54,7 @@ namespace Reni.FeatureTest.UserInterface
             var compiler = Compiler.BrowserFromText(Text);
             var newSource = compiler.Reformat
                 (
-                    new HierachicalFormatter
+                    new LineOrientedFormatter
                     {
                         MaxLineLength = 100,
                         EmptyLineLimit = 0
@@ -94,7 +94,7 @@ namespace Reni.FeatureTest.UserInterface
             var compiler = Compiler.BrowserFromText(Text);
             var newSource = compiler.Reformat
                 (
-                    new HierachicalFormatter
+                    new LineOrientedFormatter
                     {
                         EmptyLineLimit = 1
                     }
@@ -120,7 +120,7 @@ namespace Reni.FeatureTest.UserInterface
             var source = compiler.Source.All;
             var newSource = compiler.Reformat
                 (
-                    new HierachicalFormatter
+                    new LineOrientedFormatter
                     {
                         EmptyLineLimit = 1
                     }

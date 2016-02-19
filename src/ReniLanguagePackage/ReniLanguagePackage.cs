@@ -34,14 +34,15 @@ namespace HoyerWare.ReniLanguagePackage
         void OnIdle(object sender, EventArgs e)
             => (GetService(typeof(ReniService)) as ReniService)?.OnIdle(true);
 
-        internal HierachicalFormatter CreateFormattingProvider()
+        internal IFormatter CreateFormattingProvider()
         {
             var pd = (Properties) GetDialogPage(typeof(Properties));
-            return new HierachicalFormatter
+            return new LineOrientedFormatter
             {
                 MaxLineLength = pd.MaxLineLength,
                 EmptyLineLimit = pd.EmptyLineLimit,
             };
         }
     }
+
 }

@@ -6,7 +6,7 @@ using Reni.TokenClasses;
 
 namespace Reni.Formatting
 {
-    interface IFormatter
+    public interface IFormatter
     {
         string Reformat(SourceSyntax target, SourcePart part);
     }

@@ -84,8 +84,8 @@ namespace Reni
         internal IEnumerable<SourceSyntax> FindAllBelongings(SourceSyntax sourceSyntax)
             => Parent.SourceSyntax.Belongings(sourceSyntax);
 
-        public string Reformat(SourcePart sourcePart, HierachicalFormatter hierachicalFormatter)
-            => Parent.SourceSyntax.Reformat(sourcePart, hierachicalFormatter);
+        public string Reformat(SourcePart sourcePart, IFormatter formatter)
+            => Parent.SourceSyntax.Reformat(sourcePart, formatter);
 
         Token GetLocateForCache(int offset)
         {
@@ -103,8 +103,8 @@ namespace Reni
             return new SyntaxToken(sourceSyntax);
         }
 
-        internal string Reformat(HierachicalFormatter hierachicalFormatter)
-            => Parent.SourceSyntax.Reformat(provider: hierachicalFormatter);
+        internal string Reformat(IFormatter formatter)
+            => Parent.SourceSyntax.Reformat(provider: formatter);
 
         internal SourceSyntax Locate(SourcePart span)
         {

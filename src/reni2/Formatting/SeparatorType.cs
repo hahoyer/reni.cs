@@ -37,13 +37,16 @@ namespace Reni.Formatting
         {
             if(left == null || right == null)
                 return null;
-            if(left is List && right is LeftParenthesis)
+            if((left is List || left is Colon) && right is LeftParenthesis)
                 return Close;
 
             if(right is RightParenthesis ||
                 right is LeftParenthesis ||
                 right is List ||
-                left is LeftParenthesis)
+                right is EndToken ||
+                left is LeftParenthesis ||
+                left is BeginToken
+                )
                 return Contact;
 
             if(right is Colon || left is ExclamationBoxToken)

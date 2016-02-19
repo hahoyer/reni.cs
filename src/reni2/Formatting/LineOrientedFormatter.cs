@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using hw.Parser;
 using hw.Scanner;
+using Reni.Parser;
 using Reni.TokenClasses;
 
 namespace Reni.Formatting
@@ -14,11 +16,6 @@ namespace Reni.Formatting
         public int? EmptyLineLimit = 1;
         public string IndentItem = "    ";
 
-        interface IItem
-        {
-            SourcePart Part { get; }
-        }
-
         string IFormatter.Reformat(SourceSyntax target, SourcePart part)
         {
             var rawLines = target
@@ -27,23 +24,23 @@ namespace Reni.Formatting
                 .Items
                 .OrderBy(item => item.Token.SourcePart.Position)
                 .SelectMany(GetItems)
-                .Split(item => item == null);
+                .Split(item => item == null)
+                .Select(CreateLine)
+                ;
+
+            var result = rawLines.Filter(part);
 
             if(rawLines.Any(IsTooLongLine))
-                NotImplementedMethod(target, part);
+                NotImplementedMethod(result, part);
 
-            NotImplementedMethod(target, part);
-            return null;
+            return result;
         }
 
-        bool IsTooLongLine(IEnumerable<IItem> line)
-        {
-            if(MaxLineLength == null)
-                return false;
-            return line.Last().Part.EndPosition - line.First().Part.Position > MaxLineLength.Value;
-        }
+        bool IsTooLongLine(Line line)
+            => MaxLineLength != null && line.Lengh > MaxLineLength.Value;
 
-        static IEnumerable<IItem> GetItems(SourceSyntax target)
+        static IEnumerable<IItem1> GetItems
+            (SourceSyntax target)
         {
             for(var index = 0; index < target.Token.PrecededWith.Length; index++)
             {
@@ -56,54 +53,111 @@ namespace Reni.Formatting
 
                 for(var lineIndex = 0; lineIndex < lines; lineIndex++)
                 {
-                    yield return new WhiteSpaceItem(index, 0, target);
-                    yield return null;
+                    IItem1 item = new WhiteSpaceItem(index, 0, target);
+                    yield return item;
+                    if(item.IsRelevant)
+                        yield return null;
                 }
                 yield return new WhiteSpaceItem(index, lines, target);
             }
             yield return new TokenItem(target);
         }
 
+        static Line CreateLine(IEnumerable<IItem1> item) => new Line(item);
 
-        sealed class TokenItem : DumpableObject, IItem
+        internal interface IItem1
+        {
+            SourcePart Part { get; }
+            bool IsRelevant { get; }
+            ITokenClass TokenClass { get; }
+        }
+
+        internal sealed class Item2
+        {
+            internal readonly SourcePart Part;
+            internal readonly string NewHeader;
+            internal readonly bool IsRelevant;
+
+            public Item2(SourcePart part, string newHeader, bool isRelevant)
+            {
+                Part = part;
+                NewHeader = newHeader;
+                IsRelevant = isRelevant;
+            }
+        }
+
+        internal sealed class Line
+        {
+            internal readonly Item2[] Data;
+
+            internal Line(IEnumerable<IItem1> data) { Data = AddSepearators(data).ToArray(); }
+
+            static IEnumerable<Item2> AddSepearators(IEnumerable<IItem1> data)
+            {
+                ITokenClass last = null;
+                foreach(var item in data)
+                    if(item.IsRelevant)
+                    {
+                        var current = item.TokenClass;
+                        var x = SeparatorType.Get(last, current);
+                        yield return new Item2(item.Part, x.Text, true);
+
+                        last = current;
+                    }
+                    else
+                        yield return new Item2(item.Part, "", false);
+            }
+
+            internal int StartPosition => Data.First().Part.Position;
+            internal int EndPosition => Data.Last().Part.EndPosition;
+            internal int Lengh => Data.Sum(item => item.Length());
+        }
+
+        internal sealed class TokenItem : DumpableObject, IItem1
         {
             readonly SourceSyntax Target;
 
             internal TokenItem(SourceSyntax target) { Target = target; }
 
-            internal string Id => Target.Token.Characters.Id;
+            string Id => Target.Token.Characters.Id;
             protected override string GetNodeDump() => Id.Quote();
 
-            SourcePart IItem.Part => Target.Token.Characters;
+            SourcePart IItem1.Part => Target.Token.Characters;
+            bool IItem1.IsRelevant => Target.TokenClass.Id != "()";
+
+            ITokenClass IItem1.TokenClass => Target.TokenClass;
         }
 
-        sealed class WhiteSpaceItem : DumpableObject, IItem
+        internal sealed class WhiteSpaceItem : DumpableObject, IItem1
         {
-            internal readonly int Index;
-            internal readonly int LineIndex;
-            readonly SourceSyntax Target;
+            readonly int LineIndex;
+            readonly WhiteSpaceToken WhiteSpaceToken;
+            readonly bool IsRelevant;
 
             internal WhiteSpaceItem(int index, int lineIndex, SourceSyntax target)
             {
-                Index = index;
                 LineIndex = lineIndex;
-                Target = target;
+                WhiteSpaceToken = target.Token.PrecededWith[index];
+                IsRelevant = Lexer.IsComment(WhiteSpaceToken)
+                    || Lexer.IsLineComment(WhiteSpaceToken);
             }
 
-            internal string Id
-                => Target.Token.PrecededWith[Index].Characters.Id.Split('\n')[LineIndex];
-            protected override string GetNodeDump() => Index + "/" + LineIndex + "/" + Id.Quote();
+            string Id => WhiteSpaceToken.Characters.Id.Split('\n')[LineIndex];
+            protected override string GetNodeDump() => Id.Quote() + "(=" + LineIndex + ")";
 
-            public SourcePart Part
+            SourcePart IItem1.Part
             {
                 get
                 {
-                    var p = Target.Token.PrecededWith[Index].Characters;
-                    var lineLengths = p.Id.Split('\n').Select(item => item.Length + 1);
+                    var part = WhiteSpaceToken.Characters;
+                    var lineLengths = part.Id.Split('\n').Select(item => item.Length + 1);
                     var start = lineLengths.Take(LineIndex).Sum();
-                    return (p.Start + start).Span(Id.Length);
+                    return (part.Start + start).Span(Id.Length);
                 }
             }
+
+            bool IItem1.IsRelevant => IsRelevant;
+            ITokenClass IItem1.TokenClass => null;
         }
     }
 }

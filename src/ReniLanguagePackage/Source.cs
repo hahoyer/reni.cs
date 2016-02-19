@@ -121,10 +121,10 @@ namespace HoyerWare.ReniLanguagePackage
         internal IEnumerable<SourcePart> BracesLike(Token current)
             => current.FindAllBelongings(Compiler);
 
-        internal void ReformatSpan(EditArray mgr, TextSpan span, HierachicalFormatter hierachicalFormatter)
+        internal void ReformatSpan(EditArray mgr, TextSpan span, IFormatter provider)
         {
             var sourcePart = Data.ToSourcePart(span);
-            var reformat = Compiler.Reformat(sourcePart, hierachicalFormatter);
+            var reformat = Compiler.Reformat(sourcePart, provider);
             mgr.Add(new EditSpan(span, reformat));
             mgr.ApplyEdits();
         }

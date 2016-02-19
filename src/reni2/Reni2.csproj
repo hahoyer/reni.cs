@@ -129,6 +129,7 @@
     <Compile Include="Formatting\Item.cs" />
     <Compile Include="Formatting\ITokenClass.cs" />
     <Compile Include="Formatting\LineOrientedFormatter.cs" />
+    <Compile Include="Formatting\LineOrientedFormatterExtension.cs" />
     <Compile Include="Formatting\SeparatorType.cs" />
     <Compile Include="Formatting\HierachicalFormatter.cs" />
     <Compile Include="hw\DebugFormatter\Configuration.cs" />
