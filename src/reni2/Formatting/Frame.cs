@@ -37,7 +37,8 @@ namespace Reni.Formatting
             Target = target;
             LeftCache = new ValueCache<Frame>(() => new Frame(Target.Left, this));
             RightCache = new ValueCache<Frame>(() => new Frame(Target.Right, this));
-            ItemsWithoutLeadingBreaksCache = new ValueCache<ResultItems>(GetItemsWithoutLeadingBreaks);
+            ItemsWithoutLeadingBreaksCache = new ValueCache<ResultItems>
+                (GetItemsWithoutLeadingBreaks);
             LeadingLineBreaksCache = new ValueCache<int>(GetLeadingLineBreaksForCache);
             HasInnerLineBreaksCache = new ValueCache<bool>(GetHasInnerLineBreaksForCache);
         }
@@ -52,19 +53,6 @@ namespace Reni.Formatting
         int LeadingLineBreaks => LeadingLineBreaksCache.Value;
         [DisableDump]
         internal Frame LeftNeighbor => Left.RightMostTokenClassFrame ?? LeftTokenClassFrame;
-
-        internal IEnumerable<Frame> GetLeftNeighborChain()
-        {
-            var current = this;
-            do
-            {
-                current = current.LeftNeighbor;
-                if(current == null)
-                    yield break;
-                yield return current;
-            } while(true);
-        }
-
 
         [DisableDump]
         internal int IndentLevel => (Parent?.IndentLevel ?? 0) + (HasIndent ? 1 : 0);
@@ -193,7 +181,8 @@ namespace Reni.Formatting
             return leftNeighborOfTarget.RequiresAdditionalLineBreak ? 2 : 1;
         }
 
-        bool GetHasInnerLineBreaksForCache() => ItemsWithoutLeadingBreaksCache.Value.HasInnerLineBreaks();
+        bool GetHasInnerLineBreaksForCache()
+            => ItemsWithoutLeadingBreaksCache.Value.HasInnerLineBreaks();
 
         ResultItems GetItemsWithoutLeadingBreaks()
         {
@@ -201,7 +190,8 @@ namespace Reni.Formatting
             StartMethodDump(trace);
             try
             {
-                var result = CollectItemsWithoutLeadingBreaks().Aggregate(new ResultItems(), (c, n) => c.Combine(n));
+                var result = CollectItemsWithoutLeadingBreaks()
+                    .Aggregate(new ResultItems(), (c, n) => c.Combine(n));
                 return ReturnMethodDump(result);
             }
             finally
@@ -212,15 +202,8 @@ namespace Reni.Formatting
 
         [DisableDump]
         internal ResultItems ItemsForResult
-        {
-            get
-            {
-                var result = CollectItemsForResult()
-                    .Aggregate(new ResultItems(), (c, n) => c.Combine(n));
-                Tracer.ConditionalBreak(result.Format().Contains("        "), ()=>TargetString);
-                return result;
-            }
-        }
+            => CollectItemsForResult()
+                .Aggregate(new ResultItems(), (c, n) => c.Combine(n));
 
         IEnumerable<ResultItems> CollectItemsForResult()
         {

@@ -30,6 +30,10 @@ namespace Reni
             (string text, CompilerParameters parameters = null)
             => new CompilerBrowser(new Compiler(text: text, parameters: parameters));
 
+        public static CompilerBrowser BrowserFromFile
+            (string fileName, CompilerParameters parameters = null)
+            => new CompilerBrowser(FromFile(fileName, parameters));
+
         public static Compiler FromFile(string fileName, CompilerParameters parameters)
             => new Compiler(fileName, parameters);
 

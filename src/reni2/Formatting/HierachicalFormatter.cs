@@ -124,7 +124,11 @@ namespace Reni.Formatting
             if(tokenClass is RightParenthesis.Matched)
                 return new ResultItems();
 
-            var leftNeighbor = target.GetLeftNeighborChain().FirstOrDefault(item=> !(item.Target.TokenClass is RightParenthesis.Matched));
+            var leftNeighbor = target
+                .LeftNeighbor?
+                .Chain(item => item.LeftNeighbor)
+                .FirstOrDefault(item => !(item.Target.TokenClass is RightParenthesis.Matched));
+
             var leftTokenClass = leftNeighbor?.Target.TokenClass;
             var indentLevel = target.IndentLevel;
             var token = target.Target.Token;

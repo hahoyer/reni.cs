@@ -80,7 +80,11 @@ namespace Reni.Formatting
 
         IEnumerable<IResultItem> IResultItem.CombineBack(string left)
         {
-            if(left.EndsWith(Data.Id))
+            if (left == Data.Id)
+                return new[] { new SourceItem(Data) };
+
+
+            if (left.EndsWith(Data.Id))
                 return new IResultItem[]
                 {
                     new TextItem(left.Substring(0, left.Length - Data.Length)),

@@ -14,47 +14,6 @@ namespace Reni.FeatureTest.UserInterface
     [TestFixture]
     public sealed class FormattingSimple : DependantAttribute
     {
-        [Test]
-        [UnitTest]
-        public void Reformat()
-        {
-            const string Text =
-                @"systemdata:{1 type instance(); Memory:((0 type *('100' to_number_of_base 64)) mutable) instance(); !mutable FreePointer: Memory array_reference mutable; repeat: /\ ^ while() then
-    (
-        ^ body(),
-        repeat(^)
-    );}; 1 = 1 then 2 else 4; 3; (Text('H') << 'allo') dump_print ";
-
-            const string ExpectedText =
-                @"systemdata:
-{
-    1 type instance();
-    Memory: ((0 type *('100' to_number_of_base 64)) mutable) instance();
-    !mutable FreePointer: Memory array_reference mutable;
-    repeat: /\ ^ while() then(^ body(), repeat(^));
-};
-1 = 1 then 2 else 4;
-3;
-(Text('H') << 'allo') dump_print
-";
-
-
-            var compiler = Compiler.BrowserFromText(Text);
-            var newSource = compiler.Reformat
-                (
-                    FormatterExtension.Create
-                        (
-                            new Reni.Formatting.Configuration
-                            {
-                                MaxLineLength = 100,
-                                EmptyLineLimit = 0
-                            }
-                        ));
-
-            var lineCount = newSource.Count(item => item == '\n');
-
-            Tracer.Assert(newSource == ExpectedText.Replace("\r\n","\n"), "\n\"" + newSource + "\"");
-        }
     }
 
     [UnitTest]
@@ -101,6 +60,48 @@ namespace Reni.FeatureTest.UserInterface
 
         [Test]
         [UnitTest]
+        public void Reformat()
+        {
+            const string Text =
+                @"systemdata:{1 type instance(); Memory:((0 type *('100' to_number_of_base 64)) mutable) instance(); !mutable FreePointer: Memory array_reference mutable; repeat: /\ ^ while() then
+    (
+        ^ body(),
+        repeat(^)
+    );}; 1 = 1 then 2 else 4; 3; (Text('H') << 'allo') dump_print ";
+
+            const string ExpectedText =
+                @"systemdata:
+{
+    1 type instance();
+    Memory: ((0 type *('100' to_number_of_base 64)) mutable) instance();
+    !mutable FreePointer: Memory array_reference mutable;
+    repeat: /\ ^ while() then(^ body(), repeat(^));
+};
+1 = 1 then 2 else 4;
+3;
+(Text('H') << 'allo') dump_print
+";
+
+
+            var compiler = Compiler.BrowserFromText(Text);
+            var newSource = compiler.Reformat
+                (
+                    FormatterExtension.Create
+                        (
+                            new Reni.Formatting.Configuration
+                            {
+                                MaxLineLength = 100,
+                                EmptyLineLimit = 0
+                            }
+                        ));
+
+            var lineCount = newSource.Count(item => item == '\n');
+
+            Tracer.Assert(newSource == ExpectedText.Replace("\r\n", "\n"), "\n\"" + newSource + "\"");
+        }
+
+        [Test]
+        [UnitTest]
         public void ReformatWithComments()
         {
             const string Text = @"
@@ -137,7 +138,7 @@ namespace Reni.FeatureTest.UserInterface
                         ));
 
             var lineCount = newSource.Count(item => item == '\n');
-            Tracer.Assert(lineCount == 23, "\n" + newSource);
+            Tracer.Assert(lineCount == 19, "\n\"" + newSource + "\"");
         }
 
         [UnitTest]
@@ -152,7 +153,7 @@ namespace Reni.FeatureTest.UserInterface
                 + @"\..\..\..";
             var fileName = srcDir + @"\renisource\test.reni";
             var file = fileName.FileHandle();
-            var compiler = Compiler.BrowserFromText(fileName);
+            var compiler = Compiler.BrowserFromFile(fileName);
             var source = compiler.Source.All;
             var newSource = compiler.Reformat
                 (
