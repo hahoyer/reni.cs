@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
 using Reni.Parser;
@@ -17,6 +18,7 @@ namespace Reni.Formatting
         static readonly ISeparatorType Contact = new ConcatType("");
         static readonly ISeparatorType Close = new ConcatType(" ");
 
+        [DebuggerDisplay("{Separator}")]
         sealed class ConcatType : DumpableObject, ISeparatorType
         {
             readonly string Separator;
@@ -37,15 +39,17 @@ namespace Reni.Formatting
         {
             if(left == null || right == null)
                 return null;
-            if((left is List || left is Colon) && right is LeftParenthesis)
+            if((left is List || left is Colon) && !(right is RightParenthesis))
                 return Close;
 
             if(right is RightParenthesis ||
                 right is LeftParenthesis ||
+                right is RightParenthesis.Matched ||
                 right is List ||
                 right is EndToken ||
                 left is LeftParenthesis ||
-                left is BeginToken
+                left is BeginToken ||
+                left is RightParenthesis.Matched
                 )
                 return Contact;
 

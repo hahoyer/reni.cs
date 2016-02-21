@@ -10,4 +10,10 @@ namespace Reni.Formatting
     {
         string Reformat(SourceSyntax target, SourcePart part);
     }
+
+    public static class FormatterExtension
+    {
+        public static IFormatter Create(Configuration configuration = null)
+            => new HierachicalFormatter(configuration ?? new Configuration());
+    }
 }

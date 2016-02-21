@@ -12,9 +12,68 @@ namespace Reni.FeatureTest.UserInterface
 {
     [UnitTest]
     [TestFixture]
-    [LowPriority]
+    public sealed class FormattingSimple : DependantAttribute
+    {
+        [Test]
+        [UnitTest]
+        public void Reformat()
+        {
+            const string Text =
+                @"systemdata:{1 type instance(); Memory:((0 type *('100' to_number_of_base 64)) mutable) instance(); !mutable FreePointer: Memory array_reference mutable; repeat: /\ ^ while() then
+    (
+        ^ body(),
+        repeat(^)
+    );}; 1 = 1 then 2 else 4; 3; (Text('H') << 'allo') dump_print ";
+
+            const string ExpectedText =
+                @"systemdata:
+{
+    1 type instance();
+    Memory: ((0 type *('100' to_number_of_base 64)) mutable) instance();
+    !mutable FreePointer: Memory array_reference mutable;
+    repeat: /\ ^ while() then(^ body(), repeat(^));
+};
+1 = 1 then 2 else 4;
+3;
+(Text('H') << 'allo') dump_print
+";
+
+
+            var compiler = Compiler.BrowserFromText(Text);
+            var newSource = compiler.Reformat
+                (
+                    FormatterExtension.Create
+                        (
+                            new Reni.Formatting.Configuration
+                            {
+                                MaxLineLength = 100,
+                                EmptyLineLimit = 0
+                            }
+                        ));
+
+            var lineCount = newSource.Count(item => item == '\n');
+
+            Tracer.Assert(newSource == ExpectedText.Replace("\r\n","\n"), "\n\"" + newSource + "\"");
+        }
+    }
+
+    [UnitTest]
+    [TestFixture]
+    [FormattingSimple]
     public sealed class Formatting : DependantAttribute
     {
+        [Test]
+        [UnitTest]
+        public void SimpleLineCommentFromSourcePart()
+        {
+            const string Text = @"(1,3,4,6)";
+            var compiler = Compiler.BrowserFromText(Text);
+            var span = compiler.Source.All;
+            var trimmed = compiler.Locate(span).Reformat(span);
+
+            Tracer.Assert(trimmed == "(1, 3, 4, 6)", trimmed);
+        }
+
         [Test]
         [UnitTest]
         public void LineCommentFromSourcePart()
@@ -38,31 +97,6 @@ namespace Reni.FeatureTest.UserInterface
             var span = (compiler.Source + 2).Span(3);
             var reformat = compiler.Locate(span).Reformat(span);
             Tracer.Assert(reformat == "#(a", reformat);
-        }
-
-        [Test]
-        [UnitTest]
-        public void Reformat()
-        {
-            const string Text =
-                @"systemdata:{1 type instance() Memory:((0 type *('100' to_number_of_base 64)) mutable) instance(); !mutable FreePointer: Memory array_reference mutable; repeat: /\ ^ while() then
-    (
-        ^ body(),
-        repeat(^)
-    );}; 1 = 1 then 2 else 4; 3; (Text('H') << 'allo') dump_print ";
-
-            var compiler = Compiler.BrowserFromText(Text);
-            var newSource = compiler.Reformat
-                (
-                    new LineOrientedFormatter
-                    {
-                        MaxLineLength = 100,
-                        EmptyLineLimit = 0
-                    }
-                );
-
-            var lineCount = newSource.Count(item => item == '\n');
-            Tracer.Assert(lineCount == 9, "\n" + newSource);
         }
 
         [Test]
@@ -94,11 +128,13 @@ namespace Reni.FeatureTest.UserInterface
             var compiler = Compiler.BrowserFromText(Text);
             var newSource = compiler.Reformat
                 (
-                    new LineOrientedFormatter
-                    {
-                        EmptyLineLimit = 1
-                    }
-                );
+                    FormatterExtension.Create
+                        (
+                            new Reni.Formatting.Configuration
+                            {
+                                EmptyLineLimit = 1
+                            }
+                        ));
 
             var lineCount = newSource.Count(item => item == '\n');
             Tracer.Assert(lineCount == 23, "\n" + newSource);
@@ -120,13 +156,16 @@ namespace Reni.FeatureTest.UserInterface
             var source = compiler.Source.All;
             var newSource = compiler.Reformat
                 (
-                    new LineOrientedFormatter
-                    {
-                        EmptyLineLimit = 1
-                    }
+                    FormatterExtension.Create
+                        (
+                            new Reni.Formatting.Configuration
+                            {
+                                EmptyLineLimit = 1
+                            })
                 );
             var lineCount = newSource.Count(item => item == '\n');
-            Tracer.Assert(lineCount == 71, nameof(lineCount) + "=" + lineCount + "\n" + newSource);
+            Tracer.Assert
+                (lineCount == 71, nameof(lineCount) + "=" + lineCount + "\n" + newSource);
         }
     }
 }

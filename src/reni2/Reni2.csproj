@@ -121,6 +121,7 @@
     <Compile Include="Feature\Function.cs" />
     <Compile Include="Feature\SearchResult.cs" />
     <Compile Include="Feature\Simple.cs" />
+    <Compile Include="Formatting\Configuration.cs" />
     <Compile Include="Formatting\ContactType.cs" />
     <Compile Include="Formatting\Extension.cs" />
     <Compile Include="Formatting\Frame.cs" />

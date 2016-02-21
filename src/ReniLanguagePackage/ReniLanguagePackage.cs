@@ -37,12 +37,14 @@ namespace HoyerWare.ReniLanguagePackage
         internal IFormatter CreateFormattingProvider()
         {
             var pd = (Properties) GetDialogPage(typeof(Properties));
-            return new LineOrientedFormatter
-            {
-                MaxLineLength = pd.MaxLineLength,
-                EmptyLineLimit = pd.EmptyLineLimit,
-            };
+            return FormatterExtension.Create
+                (
+                    new Configuration
+                    {
+                        MaxLineLength = pd.MaxLineLength,
+                        EmptyLineLimit = pd.EmptyLineLimit
+                    }
+                );
         }
     }
-
 }

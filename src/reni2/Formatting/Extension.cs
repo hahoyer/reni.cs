@@ -51,19 +51,5 @@ namespace Reni.Formatting
 
             Tracer.Assert(itemPart == "");
         }
-
-        internal static string Filter
-            (this IEnumerable<Item> items, SourcePart targetPart = null)
-        {
-            if(targetPart == null)
-                return items
-                    .Select(item => item.Id)
-                    .Stringify("");
-
-            return items
-                .Select(item => item.Filter(targetPart))
-                .Stringify("");
-        }
-
     }
 }

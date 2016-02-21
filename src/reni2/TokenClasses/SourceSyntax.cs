@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
 using Reni.Formatting;
@@ -10,11 +11,12 @@ using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
-    public sealed class SourceSyntax : DumpableObject, ISourcePart
+    public sealed class SourceSyntax : DumpableObject, ISourcePart, ValueCache.IContainer
     {
         static int _nextObjectId;
         readonly Issue[] _issues;
         SourceSyntax _parent;
+        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
         internal SourceSyntax
             (
@@ -172,24 +174,23 @@ namespace Reni.TokenClasses
         }
 
         [DisableDump]
-        internal IEnumerable<SourceSyntax> Items
+        internal IEnumerable<SourceSyntax> Items => this.CachedValue(GetItems);
+
+        IEnumerable<SourceSyntax> GetItems()
         {
-            get
-            {
-                yield return this;
-                if(Left != null)
-                    foreach(var sourceSyntax in Left.Items)
-                        yield return sourceSyntax;
-                if(Right != null)
-                    foreach(var sourceSyntax in Right.Items)
-                        yield return sourceSyntax;
-            }
+            yield return this;
+            if(Left != null)
+                foreach(var sourceSyntax in Left.Items)
+                    yield return sourceSyntax;
+            if(Right != null)
+                foreach(var sourceSyntax in Right.Items)
+                    yield return sourceSyntax;
         }
 
         public string BraceMatchDump => new BraceMatchDumper(this, 3).Dump();
 
         internal string Reformat(SourcePart targetPart = null, IFormatter provider = null)
-            => (provider ?? new LineOrientedFormatter())
+            => (provider ?? FormatterExtension.Create())
                 .Reformat(this, targetPart ?? SourcePart);
 
         [DisableDump]
@@ -218,6 +219,7 @@ namespace Reni.TokenClasses
                     yield return other;
             }
         }
+
     }
 
     interface IBelongingsMatcher

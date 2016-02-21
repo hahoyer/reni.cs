@@ -16,6 +16,8 @@ namespace Reni.Formatting
         public int? EmptyLineLimit = 1;
         public string IndentItem = "    ";
 
+        LineOrientedFormatter() { }
+
         string IFormatter.Reformat(SourceSyntax target, SourcePart part)
         {
             var rawLines = target
@@ -24,9 +26,12 @@ namespace Reni.Formatting
                 .Items
                 .OrderBy(item => item.Token.SourcePart.Position)
                 .SelectMany(GetItems)
-                .Split(item => item == null)
+                .NullableToArray()
                 .Select(CreateLine)
                 ;
+
+            while(rawLines.Any(IsTooLongLine))
+                rawLines = rawLines.SelectMany(LineBreaker);
 
             var result = rawLines.Filter(part);
 
@@ -34,6 +39,13 @@ namespace Reni.Formatting
                 NotImplementedMethod(result, part);
 
             return result;
+        }
+
+        IEnumerable<Line> LineBreaker(Line arg)
+        {
+            NotImplementedMethod();
+            return null;
+
         }
 
         bool IsTooLongLine(Line line)
@@ -53,10 +65,8 @@ namespace Reni.Formatting
 
                 for(var lineIndex = 0; lineIndex < lines; lineIndex++)
                 {
-                    IItem1 item = new WhiteSpaceItem(index, 0, target);
+                    IItem1 item = new WhiteSpaceItem(index, lineIndex, target);
                     yield return item;
-                    if(item.IsRelevant)
-                        yield return null;
                 }
                 yield return new WhiteSpaceItem(index, lines, target);
             }

@@ -12,16 +12,17 @@ namespace Reni.Formatting
 {
     public sealed class HierachicalFormatter : DumpableObject, IFormatter
     {
-        public int? MaxLineLength = 100;
-        public int? EmptyLineLimit = 1;
+        readonly Configuration Configuration;
         public string IndentItem = "    ";
 
+        public HierachicalFormatter(Configuration configuration) { Configuration = configuration; }
+
         string IFormatter.Reformat(SourceSyntax target, SourcePart targetPart)
-            => Frame.Create(target, this).ItemsForResult.Filter(targetPart);
+            => Frame.Create(target, this).ItemsForResult.Format(targetPart);
 
         bool IsRelevantLineBreak(int emptyLines, ITokenClass tokenClass)
         {
-            if(EmptyLineLimit == null)
+            if(Configuration.EmptyLineLimit == null)
                 return true;
 
             if(tokenClass is RightParenthesis
@@ -29,10 +30,10 @@ namespace Reni.Formatting
                 || tokenClass is List)
                 return false;
 
-            return emptyLines < EmptyLineLimit.Value;
+            return emptyLines < Configuration.EmptyLineLimit.Value;
         }
 
-        internal string InternalGetWhitespaces
+        internal ResultItems InternalGetWhitespaces
             (
             ITokenClass leftTokenClass,
             int leadingLineBreaks,
@@ -42,44 +43,46 @@ namespace Reni.Formatting
             )
         {
             var indent = IndentItem.Repeat(indentLevel);
-            var result = leadingLineBreaks > 0
-                ? "\n".Repeat(leadingLineBreaks)
-                : "";
+            var result = new ResultItems();
+            if(leadingLineBreaks > 0)
+                result.Add("\n".Repeat(leadingLineBreaks));
 
             var emptyLines = leadingLineBreaks;
             var isBeginOfLine = leadingLineBreaks > 0;
-            foreach
-                (
-                var token in
-                    whiteSpaces.Where(token => !Lexer.IsWhiteSpace(token)))
+            foreach(var token in whiteSpaces)
             {
-                if(Lexer.IsLineEnd(token)
-                    && !IsRelevantLineBreak(emptyLines, rightTokenClass))
-                    continue;
-
                 if(isBeginOfLine && !Lexer.IsLineEnd(token))
-                    result += indent;
+                {
+                    result.Add(indent);
+                    isBeginOfLine = false;
+                }
 
-                result += token.Characters.Id;
-
-                if(Lexer.IsLineEnd(token))
-                    emptyLines++;
+                if(Lexer.IsWhiteSpace(token)
+                    || (Lexer.IsLineEnd(token) && !IsRelevantLineBreak(emptyLines, rightTokenClass)))
+                    result.AddHidden(token.Characters);
                 else
-                    emptyLines = Lexer.IsLineComment(token) ? 1 : 0;
+                {
+                    result.Add(token.Characters);
 
-                isBeginOfLine = !Lexer.IsComment(token);
+                    if(Lexer.IsLineEnd(token))
+                        emptyLines++;
+                    else
+                        emptyLines = Lexer.IsLineComment(token) ? 1 : 0;
+
+                    isBeginOfLine = !Lexer.IsComment(token);
+                }
             }
 
             if(isBeginOfLine)
-                result += indent;
+                result.Add(indent);
 
-            if(result != "")
-                return result;
+            if(result.IsEmpty)
+                result.Add(SeparatorType.Get(leftTokenClass, rightTokenClass).Text);
 
-            return SeparatorType.Get(leftTokenClass, rightTokenClass).Text;
+            return result;
         }
 
-        internal Item Item
+        internal ResultItems Item
             (
             ITokenClass leftTokenClass,
             int leadingLineBreaks,
@@ -87,23 +90,44 @@ namespace Reni.Formatting
             IToken token,
             ITokenClass tokenClass)
         {
-            var whiteSpaces = InternalGetWhitespaces
-                (
-                    leftTokenClass,
-                    leadingLineBreaks,
-                    indentLevel,
-                    token.PrecededWith,
-                    tokenClass
-                );
-            return new Item(whiteSpaces, token);
+            Tracer.Assert(!(tokenClass is RightParenthesis.Matched));
+            Tracer.Assert(!(leftTokenClass is RightParenthesis.Matched));
+
+            var trace = tokenClass.Id == " ;";
+            StartMethodDump
+                (trace, leftTokenClass, leadingLineBreaks, indentLevel, token, tokenClass);
+            try
+            {
+                BreakExecution();
+                var result = InternalGetWhitespaces
+                    (
+                        leftTokenClass,
+                        leadingLineBreaks,
+                        indentLevel,
+                        token.PrecededWith,
+                        tokenClass
+                    );
+
+                result.Add(token.Characters);
+
+                return ReturnMethodDump(result);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
 
-        internal Item Item(Frame target, int leadingLineBreaks = 0)
+        internal ResultItems Item(Frame target, int leadingLineBreaks = 0)
         {
-            var leftTokenClass = target.LeftNeighbor?.Target.TokenClass;
+            var tokenClass = target.Target.TokenClass;
+            if(tokenClass is RightParenthesis.Matched)
+                return new ResultItems();
+
+            var leftNeighbor = target.GetLeftNeighborChain().FirstOrDefault(item=> !(item.Target.TokenClass is RightParenthesis.Matched));
+            var leftTokenClass = leftNeighbor?.Target.TokenClass;
             var indentLevel = target.IndentLevel;
             var token = target.Target.Token;
-            var tokenClass = target.Target.TokenClass;
             return Item
                 (
                     leftTokenClass,
@@ -117,7 +141,7 @@ namespace Reni.Formatting
         internal bool RequiresLineBreak(string flatText)
         {
             return flatText.Any(item => item == '\n')
-                || flatText.Length > MaxLineLength;
+                || flatText.Length > Configuration.MaxLineLength;
         }
     }
 }

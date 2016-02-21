@@ -17,8 +17,7 @@ namespace Reni.Formatting
 
         readonly ValueCache<Frame> LeftCache;
         readonly ValueCache<Frame> RightCache;
-        readonly ValueCache<Item> ItemCache;
-        readonly ValueCache<IEnumerable<Item>> ItemsCache;
+        readonly ValueCache<ResultItems> ItemsWithoutLeadingBreaksCache;
         readonly ValueCache<bool> HasInnerLineBreaksCache;
         readonly ValueCache<int> LeadingLineBreaksCache;
 
@@ -26,7 +25,10 @@ namespace Reni.Formatting
         readonly HierachicalFormatter Formatter;
         [DisableDump]
         readonly Frame Parent;
+        [DisableDump]
         internal readonly SourceSyntax Target;
+        internal string TargetString => Target.SourcePart.NodeDump;
+
 
         Frame(SourceSyntax target, Frame parent = null, HierachicalFormatter formatter = null)
         {
@@ -35,8 +37,7 @@ namespace Reni.Formatting
             Target = target;
             LeftCache = new ValueCache<Frame>(() => new Frame(Target.Left, this));
             RightCache = new ValueCache<Frame>(() => new Frame(Target.Right, this));
-            ItemsCache = new ValueCache<IEnumerable<Item>>(GetItems);
-            ItemCache = new ValueCache<Item>(() => Formatter.Item(this));
+            ItemsWithoutLeadingBreaksCache = new ValueCache<ResultItems>(GetItemsWithoutLeadingBreaks);
             LeadingLineBreaksCache = new ValueCache<int>(GetLeadingLineBreaksForCache);
             HasInnerLineBreaksCache = new ValueCache<bool>(GetHasInnerLineBreaksForCache);
         }
@@ -44,29 +45,26 @@ namespace Reni.Formatting
         protected override string GetNodeDump()
             => base.GetNodeDump() + "(" + Target?.TokenClass.GetType().PrettyName() + ")";
 
-        [DisableDump]
-        internal IEnumerable<Item> ItemsForResult
-        {
-            get
-            {
-                if(Target == null)
-                    yield break;
-                foreach(var item in Left.ItemsForResult)
-                    yield return item;
-                yield return Formatter.Item(this, LeadingLineBreaks);
-                foreach(var item in Right.ItemsForResult)
-                    yield return item;
-            }
-        }
-
         Frame Left => LeftCache.Value;
         Frame Right => RightCache.Value;
-        Item Item => ItemCache.Value;
-        IEnumerable<Item> Items => ItemsCache.Value;
+        ResultItems ItemsWithoutLeadingBreaks => ItemsWithoutLeadingBreaksCache.Value;
         bool HasInnerLineBreaks => HasInnerLineBreaksCache.Value;
         int LeadingLineBreaks => LeadingLineBreaksCache.Value;
         [DisableDump]
         internal Frame LeftNeighbor => Left.RightMostTokenClassFrame ?? LeftTokenClassFrame;
+
+        internal IEnumerable<Frame> GetLeftNeighborChain()
+        {
+            var current = this;
+            do
+            {
+                current = current.LeftNeighbor;
+                if(current == null)
+                    yield break;
+                yield return current;
+            } while(true);
+        }
+
 
         [DisableDump]
         internal int IndentLevel => (Parent?.IndentLevel ?? 0) + (HasIndent ? 1 : 0);
@@ -83,7 +81,7 @@ namespace Reni.Formatting
                 if(parentClass is List)
                     return ParentChain.Any(item => item.Target.TokenClass is RightParenthesis);
 
-                if (tokenClass is LeftParenthesis)
+                if(tokenClass is LeftParenthesis)
                     return false;
 
                 return parentClass is LeftParenthesis || parentClass is RightParenthesis;
@@ -94,7 +92,7 @@ namespace Reni.Formatting
         bool RequiresLineBreak
             =>
                 IsLineBreakRuler
-                    ? Formatter.RequiresLineBreak(Items.Filter())
+                    ? Formatter.RequiresLineBreak(ItemsWithoutLeadingBreaks.Format())
                     : Parent?.RequiresLineBreak ?? false;
 
         bool IsLineBreakRuler
@@ -195,18 +193,51 @@ namespace Reni.Formatting
             return leftNeighborOfTarget.RequiresAdditionalLineBreak ? 2 : 1;
         }
 
-        bool GetHasInnerLineBreaksForCache()
-            => ItemsCache.Value.Skip(1).Any(item => item.Id.Contains("\n"));
+        bool GetHasInnerLineBreaksForCache() => ItemsWithoutLeadingBreaksCache.Value.HasInnerLineBreaks();
 
-        IEnumerable<Item> GetItems()
+        ResultItems GetItemsWithoutLeadingBreaks()
+        {
+            var trace = false;
+            StartMethodDump(trace);
+            try
+            {
+                var result = CollectItemsWithoutLeadingBreaks().Aggregate(new ResultItems(), (c, n) => c.Combine(n));
+                return ReturnMethodDump(result);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
+        }
+
+        [DisableDump]
+        internal ResultItems ItemsForResult
+        {
+            get
+            {
+                var result = CollectItemsForResult()
+                    .Aggregate(new ResultItems(), (c, n) => c.Combine(n));
+                Tracer.ConditionalBreak(result.Format().Contains("        "), ()=>TargetString);
+                return result;
+            }
+        }
+
+        IEnumerable<ResultItems> CollectItemsForResult()
         {
             if(Target == null)
                 yield break;
-            foreach(var item in Left.Items)
-                yield return item;
-            yield return Item;
-            foreach(var item in Right.Items)
-                yield return item;
+            yield return Left.ItemsForResult;
+            yield return Formatter.Item(this, LeadingLineBreaks);
+            yield return Right.ItemsForResult;
+        }
+
+        IEnumerable<ResultItems> CollectItemsWithoutLeadingBreaks()
+        {
+            if(Target == null)
+                yield break;
+            yield return Left.ItemsWithoutLeadingBreaks;
+            yield return Formatter.Item(this);
+            yield return Right.ItemsWithoutLeadingBreaks;
         }
     }
 }
