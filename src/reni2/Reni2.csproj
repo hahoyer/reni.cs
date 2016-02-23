@@ -46,7 +46,6 @@
     <Compile Include="FeatureTest\ConversionService\NumberPointerCutConversion.cs" />
     <Compile Include="FeatureTest\Function\ConstantFunction.cs" />
     <Compile Include="FeatureTest\Function\Function.cs" />
-    <Compile Include="FeatureTest\Function\FunctionInstanceContext.cs" />
     <Compile Include="FeatureTest\Function\FunctionOfFunction.cs" />
     <Compile Include="FeatureTest\Function\FunctionVariable.cs" />
     <Compile Include="FeatureTest\Function\FunctionWithNonLocal.cs" />
