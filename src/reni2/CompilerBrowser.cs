@@ -43,6 +43,12 @@ namespace Reni
             return compileSyntaxs;
         }
 
+        public Token LocatePosition(SourcePosn current)
+        {
+            Tracer.Assert(current.Source == Source);
+            return LocateCache[current.Position];
+        }
+
         public Token LocatePosition(int current) => LocateCache[current];
 
         internal FunctionType Function(int index)
