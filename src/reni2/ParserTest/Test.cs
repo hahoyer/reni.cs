@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using hw.UnitTest;
@@ -11,7 +12,7 @@ namespace Reni.ParserTest
     [TestFixture]
     public sealed class ParserTest : CompilerTest
     {
-        //[UnitTest]
+        [UnitTest]
         public void SimpleFunction()
         {
             var syntaxPrototype = LikeSyntax.Expression(null, "f", LikeSyntax.Null);

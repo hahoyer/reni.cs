@@ -230,6 +230,7 @@
     <Compile Include="ParserTest\SimpleTokenFactory.cs" />
     <Compile Include="ParserTest\PrioTableTest.cs" />
     <Compile Include="ParserTest\Services.cs" />
+    <Compile Include="ParserTest\StrangeDeclarationSyntax.cs" />
     <Compile Include="Parser\RecursionType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReniObjectExtender.cs" />
