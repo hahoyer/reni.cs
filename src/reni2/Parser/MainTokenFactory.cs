@@ -61,16 +61,16 @@ namespace Reni.Parser
                     (
                         new[]
                         {
-                            LeftParenthesis.TokenId(1),
-                            LeftParenthesis.TokenId(2),
                             LeftParenthesis.TokenId(3),
+                            LeftParenthesis.TokenId(2),
+                            LeftParenthesis.TokenId(1),
                             PrioTable.BeginOfText
                         },
                         new[]
                         {
-                            RightParenthesis.TokenId(1),
-                            RightParenthesis.TokenId(2),
                             RightParenthesis.TokenId(3),
+                            RightParenthesis.TokenId(2),
+                            RightParenthesis.TokenId(1),
                             PrioTable.EndOfText
                         }
                     );
@@ -89,7 +89,7 @@ namespace Reni.Parser
         public MainTokenFactory
             (Func<ITokenFactory<SourceSyntax>, IScanner<SourceSyntax>> getScanner)
         {
-            Parser = new PrioParser<SourceSyntax>(PrioTable, getScanner(this), new BeginToken());
+            Parser = new PrioParser<SourceSyntax>(PrioTable, getScanner(this), new LeftParenthesis(0));
             _declarationSyntaxParser = new PrioParser<SourceSyntax>
                 (
                 DeclarationTokenFactory.PrioTable,
@@ -118,7 +118,7 @@ namespace Reni.Parser
 
         static IType<SourceSyntax> Pack(SourceSyntax options) => new ExclamationBoxToken(options);
 
-        protected override ScannerTokenClass GetEndOfText() => new EndToken();
+        protected override ScannerTokenClass GetEndOfText() => new RightParenthesis(0);
         protected override ScannerTokenClass GetNumber() => new Number();
         protected override ScannerTokenClass GetTokenClass(string name) => new UserSymbol(name);
 

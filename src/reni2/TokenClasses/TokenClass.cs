@@ -23,7 +23,7 @@ namespace Reni.TokenClasses
 
         SourceSyntax Create(SourceSyntax left, IToken token, SourceSyntax right)
         {
-            var trace = token.Characters.Id == "!";
+            var trace = left?.ObjectId == -108;
             StartMethodDump(trace, left, token, right);
             try
             {
@@ -59,6 +59,8 @@ namespace Reni.TokenClasses
         protected abstract Checked<Syntax> Prefix(SourcePart token, Syntax right);
         protected abstract Checked<Syntax> Suffix(Syntax left, SourcePart token);
         protected abstract Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right);
+
+        internal virtual bool IsVisible => true;
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]

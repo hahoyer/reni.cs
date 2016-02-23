@@ -123,7 +123,6 @@
     <Compile Include="Feature\Simple.cs" />
     <Compile Include="Formatting\Configuration.cs" />
     <Compile Include="Formatting\ContactType.cs" />
-    <Compile Include="Formatting\Extension.cs" />
     <Compile Include="Formatting\Frame.cs" />
     <Compile Include="Formatting\IChainLink.cs" />
     <Compile Include="Formatting\IFormatter.cs" />
@@ -341,10 +340,8 @@
     <Compile Include="Parser\Special.cs" />
     <Compile Include="Parser\EmptyList.cs" />
     <Compile Include="TokenClasses\ArgToken.cs" />
-    <Compile Include="TokenClasses\BeginToken.cs" />
     <Compile Include="TokenClasses\BraceMatchDumper.cs" />
     <Compile Include="TokenClasses\CompareOperation.cs" />
-    <Compile Include="TokenClasses\EndToken.cs" />
     <Compile Include="TokenClasses\ExclamationSyntaxList.cs" />
     <Compile Include="TokenClasses\ReassignToken.cs" />
     <Compile Include="TokenClasses\Base.cs" />

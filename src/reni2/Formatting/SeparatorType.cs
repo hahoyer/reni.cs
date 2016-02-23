@@ -45,9 +45,7 @@ namespace Reni.Formatting
             if(right is RightParenthesis ||
                 right is LeftParenthesis ||
                 right is List ||
-                right is EndToken ||
-                left is LeftParenthesis ||
-                left is BeginToken 
+                left is LeftParenthesis
                 )
                 return Contact;
 

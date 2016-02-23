@@ -55,7 +55,7 @@ namespace Reni.Formatting
         internal Frame LeftNeighbor => Left.RightMostTokenClassFrame ?? LeftTokenClassFrame;
 
         [DisableDump]
-        internal int IndentLevel => (Parent?.IndentLevel ?? 0) + (HasIndent ? 1 : 0);
+        internal int IndentLevel => (Parent?.IndentLevel ?? -1) + (HasIndent ? 1 : 0);
 
         bool HasIndent
         {
@@ -84,8 +84,7 @@ namespace Reni.Formatting
                     : Parent?.RequiresLineBreak ?? false;
 
         bool IsLineBreakRuler
-            => Target.TokenClass is RightParenthesis
-                || Target.TokenClass is EndToken;
+            => Target.TokenClass is RightParenthesis;
 
         Frame RightMostTokenClassFrame
             => Target == null
@@ -108,7 +107,6 @@ namespace Reni.Formatting
 
                 if(rightToken is RightParenthesis
                     || rightToken is LeftParenthesis
-                    || rightToken is EndToken
                     )
                     return true;
 
@@ -185,20 +183,8 @@ namespace Reni.Formatting
             => ItemsWithoutLeadingBreaksCache.Value.HasInnerLineBreaks();
 
         ResultItems GetItemsWithoutLeadingBreaks()
-        {
-            var trace = false;
-            StartMethodDump(trace);
-            try
-            {
-                var result = CollectItemsWithoutLeadingBreaks()
-                    .Aggregate(new ResultItems(), (c, n) => c.Combine(n));
-                return ReturnMethodDump(result);
-            }
-            finally
-            {
-                EndMethodDump();
-            }
-        }
+            => CollectItemsWithoutLeadingBreaks()
+                .Aggregate(new ResultItems(), (c, n) => c.Combine(n));
 
         [DisableDump]
         internal ResultItems ItemsForResult

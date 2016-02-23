@@ -90,8 +90,8 @@ namespace Reni.Formatting
             IToken token,
             ITokenClass tokenClass)
         {
-            Tracer.Assert(!(tokenClass is RightParenthesis.Matched));
-            Tracer.Assert(!(leftTokenClass is RightParenthesis.Matched));
+            Tracer.Assert(IsRelevant(tokenClass));
+            Tracer.Assert(IsRelevant(leftTokenClass));
 
             var trace = tokenClass.Id == " ;";
             StartMethodDump
@@ -121,13 +121,13 @@ namespace Reni.Formatting
         internal ResultItems Item(Frame target, int leadingLineBreaks = 0)
         {
             var tokenClass = target.Target.TokenClass;
-            if(tokenClass is RightParenthesis.Matched)
+            if(!IsRelevant(tokenClass))
                 return new ResultItems();
 
             var leftNeighbor = target
                 .LeftNeighbor?
                 .Chain(item => item.LeftNeighbor)
-                .FirstOrDefault(item => !(item.Target.TokenClass is RightParenthesis.Matched));
+                .FirstOrDefault(item => IsRelevant(item.Target.TokenClass));
 
             var leftTokenClass = leftNeighbor?.Target.TokenClass;
             var indentLevel = target.IndentLevel;
@@ -141,6 +141,9 @@ namespace Reni.Formatting
                     tokenClass
                 );
         }
+
+        static bool IsRelevant(ITokenClass tokenClass)
+            => (tokenClass as TokenClass)?.IsVisible ?? true;
 
         internal bool RequiresLineBreak(string flatText)
         {
