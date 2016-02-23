@@ -79,8 +79,7 @@ namespace Reni.FeatureTest.UserInterface
 };
 1 = 1 then 2 else 4;
 3;
-(Text('H') << 'allo') dump_print
-";
+(Text('H') << 'allo') dump_print";
 
 
             var compiler = Compiler.BrowserFromText(Text);
@@ -138,7 +137,7 @@ namespace Reni.FeatureTest.UserInterface
                         ));
 
             var lineCount = newSource.Count(item => item == '\n');
-            Tracer.Assert(lineCount == 19, "\n\"" + newSource + "\"");
+            Tracer.Assert(lineCount == 18, "\n\"" + newSource + "\"");
         }
 
         [UnitTest]
@@ -153,6 +152,7 @@ namespace Reni.FeatureTest.UserInterface
                 + @"\..\..\..";
             var fileName = srcDir + @"\renisource\test.reni";
             var file = fileName.FileHandle();
+            Tracer.Line(Tracer.FilePosn(fileName, 0, 0, "see there"));
             var compiler = Compiler.BrowserFromFile(fileName);
             var source = compiler.Source.All;
             var newSource = compiler.Reformat
@@ -161,12 +161,12 @@ namespace Reni.FeatureTest.UserInterface
                         (
                             new Reni.Formatting.Configuration
                             {
-                                EmptyLineLimit = 1
+                                EmptyLineLimit = 0
                             })
                 );
             var lineCount = newSource.Count(item => item == '\n');
             Tracer.Assert
-                (lineCount == 71, nameof(lineCount) + "=" + lineCount + "\n" + newSource);
+                (lineCount == 57, nameof(lineCount) + "=" + lineCount + "\n" + newSource);
         }
     }
 }

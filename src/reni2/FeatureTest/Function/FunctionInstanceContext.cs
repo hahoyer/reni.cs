@@ -8,7 +8,6 @@ using Reni.FeatureTest.Structure;
 
 namespace Reni.FeatureTest.Function
 {
-    [LowPriority]
     [UnitTest]
     [TargetSet(@"a:(x: 100;f: /\ ^ + x); a f(1) function_instance ^^ dump_print;", @"(100, /\(^)+(x))")]
     [SomeVariables]

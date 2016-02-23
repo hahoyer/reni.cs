@@ -8,7 +8,6 @@ using hw.UnitTest;
 namespace Reni.FeatureTest.UserInterface
 {
     [UnitTest]
-    [LowPriority]
     public sealed class UserInterAction : DependantAttribute
     {
         const string text = @"
