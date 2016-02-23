@@ -180,7 +180,6 @@ namespace Reni.Parser
     {
         Result Result(ContextBase context, Category category, TerminalSyntax token);
         CompileSyntax Visit(ISyntaxVisitor visitor);
-        Checked<Syntax> LatePrefix(SourcePart token, Syntax right);
     }
 
     interface IPrefix

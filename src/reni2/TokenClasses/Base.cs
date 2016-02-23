@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
@@ -12,105 +11,71 @@ namespace Reni.TokenClasses
 {
     abstract class TerminalToken : TokenClass
     {
-        protected override sealed Checked<Syntax> Prefix(SourcePart token, Syntax right)
+        protected sealed override Checked<Syntax> Prefix(SourcePart token, Syntax right)
             => IssueId.UnexpectedUseAsPrefix.Syntax(token, right);
 
-        protected override sealed Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
+        protected sealed override Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
             => IssueId.UnexpectedUseAsInfix.Syntax(token, left, right);
 
-        protected override sealed Checked<Syntax> Suffix(Syntax left, SourcePart token)
+        protected sealed override Checked<Syntax> Suffix(Syntax left, SourcePart token)
             => IssueId.UnexpectedUseAsSuffix.Syntax(token, left);
     }
 
     abstract class NonPrefixToken : TokenClass
     {
-        protected override sealed Checked<Syntax> Prefix(SourcePart token, Syntax right)
+        protected sealed override Checked<Syntax> Prefix(SourcePart token, Syntax right)
             => IssueId.UnexpectedUseAsPrefix.Syntax(token, right);
 
-        protected override sealed Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
+        protected sealed override Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
             => IssueId.UnexpectedUseAsInfix.Syntax(token, left, right);
     }
 
     abstract class InfixPrefixToken : TokenClass
     {
-        protected override sealed Checked<Syntax> Suffix(Syntax left, SourcePart token)
+        protected sealed override Checked<Syntax> Suffix(Syntax left, SourcePart token)
             => IssueId.UnexpectedUseAsSuffix.Syntax(token, left);
 
-        protected override sealed Checked<Syntax> Terminal(SourcePart token)
+        protected sealed override Checked<Syntax> Terminal(SourcePart token)
             => IssueId.UnexpectedUseAsTerminal.Syntax(token);
     }
 
     abstract class NonSuffixToken : TokenClass
     {
-        protected override sealed Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
+        protected sealed override Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
             => IssueId.UnexpectedUseAsInfix.Syntax(token, left, right);
 
-        protected override sealed Checked<Syntax> Suffix(Syntax left, SourcePart token)
+        protected sealed override Checked<Syntax> Suffix(Syntax left, SourcePart token)
             => IssueId.UnexpectedUseAsSuffix.Syntax(token, left);
     }
 
     abstract class SuffixToken : TokenClass
     {
-        protected override sealed Checked<Syntax> Prefix(SourcePart token, Syntax right)
+        protected sealed override Checked<Syntax> Prefix(SourcePart token, Syntax right)
             => IssueId.UnexpectedUseAsPrefix.Syntax(token, right);
 
-        protected override sealed Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
+        protected sealed override Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
             => IssueId.UnexpectedUseAsInfix.Syntax(token, left, right);
 
-        protected override sealed Checked<Syntax> Terminal(SourcePart token)
+        protected sealed override Checked<Syntax> Terminal(SourcePart token)
             => IssueId.UnexpectedUseAsTerminal.Syntax(token);
     }
 
     abstract class InfixToken : TokenClass
     {
-        protected override sealed Checked<Syntax> Prefix(SourcePart token, Syntax right)
+        protected sealed override Checked<Syntax> Prefix(SourcePart token, Syntax right)
             => IssueId.UnexpectedUseAsPrefix.Syntax(token, right);
 
-        protected override sealed Checked<Syntax> Terminal(SourcePart token)
+        protected sealed override Checked<Syntax> Terminal(SourcePart token)
             => IssueId.UnexpectedUseAsTerminal.Syntax(token);
 
-        protected override Checked<Syntax> Suffix(Syntax left, SourcePart token)
-            => new InfixSyntaxCandidate(left, this, token);
+        protected sealed override Checked<Syntax> Suffix(Syntax left, SourcePart token)
+            => IssueId.UnexpectedUseAsSuffix.Syntax(token,left);
 
-        public Checked<Syntax> LateInfix(Syntax left, SourcePart token, Syntax right)
-            => Infix(left, token, right);
-    }
-
-    sealed class InfixSyntaxCandidate : Syntax
-    {
-        internal readonly Syntax Left;
-        internal readonly InfixToken Class;
-        internal override SourcePart Token { get; }
-
-        public InfixSyntaxCandidate(Syntax left, InfixToken @class, SourcePart token)
-        {
-            Left = left;
-            Class = @class;
-            Token = token;
-        }
-
-        [DisableDump]
-        internal override Checked<CompileSyntax> ToCompiledSyntax
-        {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
-        }
-
-        internal override Checked<ExclamationSyntaxList> Combine
-            (ExclamationSyntaxList syntax)
-            => new Checked<ExclamationSyntaxList>
-                (syntax, IssueId.UnexpectedDeclarationTag.CreateIssue(Token));
-
-        internal override Checked<Syntax> RightSyntax(Syntax right, SourcePart token)
-            => Class.LateInfix(Left, Token, right);
     }
 
     abstract class TerminalSyntaxToken : TerminalToken, ITerminal
     {
-        protected override sealed Checked<Syntax> Terminal(SourcePart token)
+        protected sealed override Checked<Syntax> Terminal(SourcePart token)
             => new TerminalSyntax(token, this);
 
         Result ITerminal.Result(ContextBase context, Category category, TerminalSyntax token)
@@ -121,9 +86,6 @@ namespace Reni.TokenClasses
 
         CompileSyntax ITerminal.Visit(ISyntaxVisitor visitor) => Visit(visitor);
 
-        Checked<Syntax> ITerminal.LatePrefix(SourcePart token, Syntax right)
-            => Prefix(token, right);
-
         internal virtual CompileSyntax Visit(ISyntaxVisitor visitor)
         {
             NotImplementedMethod(visitor);
@@ -133,10 +95,7 @@ namespace Reni.TokenClasses
 
     abstract class NonPrefixSyntaxToken : NonPrefixToken, ITerminal, ISuffix
     {
-        Checked<Syntax> ITerminal.LatePrefix(SourcePart token, Syntax right)
-            => Prefix(token, right);
-
-        protected override sealed Checked<Syntax> Terminal(SourcePart token)
+        protected sealed override Checked<Syntax> Terminal(SourcePart token)
             => new TerminalSyntax(token, this);
 
         protected override Checked<Syntax> Suffix(Syntax left, SourcePart token)
@@ -162,18 +121,20 @@ namespace Reni.TokenClasses
         }
     }
 
-    abstract class InfixPrefixSyntaxToken : InfixPrefixToken, IInfix,IPrefix
+    abstract class InfixPrefixSyntaxToken : InfixPrefixToken, IInfix, IPrefix
     {
-        protected override sealed Checked<Syntax> Prefix(SourcePart token, Syntax right)
+        protected sealed override Checked<Syntax> Prefix(SourcePart token, Syntax right)
             => PrefixSyntax.Create(this, right.ToCompiledSyntax);
 
-        protected override sealed Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
+        protected sealed override Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
             => InfixSyntax.Create(left.ToCompiledSyntax, this, token, right.ToCompiledSyntax);
 
-        Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
+        Result IInfix.Result
+            (ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
             => Result(context, category, left, right);
 
-        Result IPrefix.Result(ContextBase context, Category category, PrefixSyntax token, CompileSyntax right)
+        Result IPrefix.Result
+            (ContextBase context, Category category, PrefixSyntax token, CompileSyntax right)
             => Result(context, category, right);
 
         protected abstract Result Result
@@ -185,13 +146,10 @@ namespace Reni.TokenClasses
 
     abstract class NonSuffixSyntaxToken : NonSuffixToken, ITerminal, IPrefix
     {
-        Checked<Syntax> ITerminal.LatePrefix(SourcePart token, Syntax right)
-            => Prefix(token, right);
-
-        protected override sealed Checked<Syntax> Terminal(SourcePart token)
+        protected sealed override Checked<Syntax> Terminal(SourcePart token)
             => new TerminalSyntax(token, this);
 
-        protected override sealed Checked<Syntax> Prefix(SourcePart token, Syntax right)
+        protected sealed override Checked<Syntax> Prefix(SourcePart token, Syntax right)
             => PrefixSyntax.Create(this, right.ToCompiledSyntax);
 
         Result ITerminal.Result(ContextBase context, Category category, TerminalSyntax token)
@@ -218,7 +176,7 @@ namespace Reni.TokenClasses
 
     abstract class SuffixSyntaxToken : SuffixToken, ISuffix
     {
-        protected override sealed Checked<Syntax> Suffix(Syntax left, SourcePart token)
+        protected sealed override Checked<Syntax> Suffix(Syntax left, SourcePart token)
             => SuffixSyntax.Create(left.ToCompiledSyntax, this, token);
 
         Result ISuffix.Result(ContextBase context, Category category, CompileSyntax left)
@@ -229,7 +187,7 @@ namespace Reni.TokenClasses
 
     abstract class InfixSyntaxToken : InfixToken, IInfix
     {
-        protected override sealed Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
+        protected sealed override Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
             => InfixSyntax.Create(left.ToCompiledSyntax, this, token, right.ToCompiledSyntax);
 
         Result IInfix.Result
@@ -239,8 +197,5 @@ namespace Reni.TokenClasses
         protected abstract Result Result
             (ContextBase callContext, Category category, CompileSyntax left, CompileSyntax right);
 
-
-        protected override sealed Checked<Syntax> Suffix(Syntax left, SourcePart token)
-            => new InfixSyntaxCandidate(left, this, token);
     }
 }
