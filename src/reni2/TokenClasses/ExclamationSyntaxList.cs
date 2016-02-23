@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Helper;
 using hw.Scanner;
 using Reni.Parser;
 
@@ -21,7 +22,7 @@ namespace Reni.TokenClasses
         }
 
         internal ExclamationSyntaxList(Exclamation.Syntax item, SourcePart token)
-            : this(new[] {item}, token) {}
+            : this(item.NullableToArray().ToArray(), token) {}
 
         [DisableDump]
         protected override IEnumerable<Syntax> DirectChildren => Tags;
