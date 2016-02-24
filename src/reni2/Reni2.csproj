@@ -40,6 +40,8 @@
     <Compile Include="FeatureTest\BlogExamples\Post120109.cs" />
     <Compile Include="FeatureTest\BlogExamples\Post120617.cs" />
     <Compile Include="FeatureTest\BlogExamples\WikiExample1.cs" />
+    <Compile Include="FeatureTest\CleanupSection\Basic.cs" />
+    <Compile Include="FeatureTest\CleanupSection\Simple.cs" />
     <Compile Include="FeatureTest\ComplexContext.cs" />
     <Compile Include="FeatureTest\ConversionService\Closure.cs" />
     <Compile Include="FeatureTest\ConversionService\NumberExtensionConversion.cs" />
@@ -341,6 +343,7 @@
     <Compile Include="Parser\EmptyList.cs" />
     <Compile Include="TokenClasses\ArgToken.cs" />
     <Compile Include="TokenClasses\BraceMatchDumper.cs" />
+    <Compile Include="TokenClasses\Cleanup.cs" />
     <Compile Include="TokenClasses\CompareOperation.cs" />
     <Compile Include="TokenClasses\ExclamationSyntaxList.cs" />
     <Compile Include="TokenClasses\ReassignToken.cs" />

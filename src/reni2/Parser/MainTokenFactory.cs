@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using hw.Parser;
 using hw.Scanner;
 using Reni.Formatting;
@@ -55,6 +56,7 @@ namespace Reni.Parser
                 result += PrioTable.Right(List.TokenId(0));
                 result += PrioTable.Right(List.TokenId(1));
                 result += PrioTable.Right(List.TokenId(2));
+                result += PrioTable.Right(Cleanup.TokenId);
                 result += PrioTable.Right(PrioTable.Error);
 
                 result += PrioTable.BracketParallels

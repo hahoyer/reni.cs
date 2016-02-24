@@ -160,6 +160,16 @@ namespace Reni.Parser
             NotImplementedMethod(token, right);
             return null;
         }
+
+        internal Checked<Syntax> Cleanup(SourcePart token, Syntax rawCleanupSection)
+        {
+            var currentCompound = ToCompound;
+            var cleanupSection = rawCleanupSection.ToCompiledSyntax;
+            var result = currentCompound
+                .SaveValue
+                .AddCleanupSection(token, cleanupSection.SaveValue);
+            return new Checked<Syntax>(result, currentCompound.Issues.plus(cleanupSection.Issues));
+        }
     }
 
     abstract class NonCompileSyntax : Syntax

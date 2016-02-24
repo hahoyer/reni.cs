@@ -21,17 +21,21 @@ namespace Reni.Struct
     {
         readonly Syntax[] _statements;
         readonly Data[] _data;
+        readonly CompileSyntax CleanupSection;
         static readonly string _runId = Compiler.FormattedNow + "\n";
         internal static bool IsInContainerDump;
         static bool _isInsideFileDump;
         static int _nextObjectId;
 
         internal CompoundSyntax(Syntax[] statements)
+            : this(statements, null) { }
+
+        CompoundSyntax(Syntax[] statements, CompileSyntax cleanupSection)
             : base(_nextObjectId++)
         {
             _statements = statements;
             _data = GetData;
-            StopByObjectIds();
+            CleanupSection = cleanupSection;
         }
 
         public string GetCompoundIdentificationDump() => "." + ObjectId + "i";
@@ -206,5 +210,16 @@ namespace Reni.Struct
         [DisableDump]
         internal IEnumerable<SourcePart> SourceParts
             => Statements.Select(item => item.SourcePart);
+
+        internal CompoundSyntax AddCleanupSection(SourcePart token, CompileSyntax newCleanupSection)
+        {
+            if(CleanupSection != null)
+            {
+                NotImplementedMethod(token, newCleanupSection);
+                return null;
+            }
+
+            return new CompoundSyntax(_statements, newCleanupSection);
+        }
     }
 }
