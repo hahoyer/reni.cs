@@ -9,7 +9,7 @@ namespace Reni.Parser
 {
     sealed class Lexer : ILexer
     {
-        const string Symbols = "°^!²§³$%&/=?\\@€*+~><|:-";
+        const string Symbols = "^!%&/=?\\*+~><|:-";
         const string SingleCharSymbol = "({[)}];,.";
         internal static readonly Lexer Instance = new Lexer();
 
@@ -31,6 +31,7 @@ namespace Reni.Parser
         readonly Match _whiteSpace;
         readonly Match _commentHead;
         readonly Match _lineEnd;
+        readonly Match _varbatimTextHead;
 
         Lexer()
         {
@@ -39,7 +40,7 @@ namespace Reni.Parser
             var textFrame = "'\"".AnyChar();
             var symbol = Symbols.AnyChar();
 
-            var identifier = (alpha + (alpha.Else(Match.Digit)).Repeat()).Else(symbol.Repeat(1));
+            var identifier = (alpha + alpha.Else(Match.Digit).Repeat()).Else(symbol.Repeat(1));
 
             _any = symbol1.Else(identifier);
 
@@ -61,21 +62,30 @@ namespace Reni.Parser
             _comment = "#("
                 +
                 (Match.WhiteSpace + (Match.WhiteSpace + ")#").Find)
-                    .Else(_any.Value(id => (Match.WhiteSpace + id + ")#").Box().Find))
+                    .Else(identifier.Value(id => (Match.WhiteSpace + id + ")#").Box().Find))
                     .Else(Match.End.Find + _invalidComment)
                 ;
 
-            _commentHead = "#(" + Match.WhiteSpace.Else(_any);
+            _commentHead = "#(" + Match.WhiteSpace.Else(identifier);
 
             _number = Match.Digit.Repeat(1);
 
+            var varbatimText = "@("
+                +
+                (Match.WhiteSpace + (Match.WhiteSpace + ")@").Find)
+                    .Else(identifier.Value(id => (Match.WhiteSpace + id + ")@").Box().Find))
+                    .Else(Match.End.Find + _invalidTextEnd)
+                ;
+
+            _varbatimTextHead = "@(" + Match.WhiteSpace.Else(identifier);
             _text = textFrame.Value
                 (
                     head =>
                     {
                         var textEnd = head.Else(Match.LineEnd + _invalidTextEnd);
                         return textEnd.Find + (head + textEnd.Find).Repeat();
-                    });
+                    })
+                .Else(varbatimText);
         }
 
 
@@ -125,6 +135,22 @@ namespace Reni.Parser
                 return false;
 
             return char.IsLetter(id[0]) || id[0] == '_';
+        }
+
+        internal string ExtractText(SourcePart token)
+        {
+            var headLength = token.Start.Match(_varbatimTextHead);
+            if(headLength != null)
+                return (token.Start + headLength.Value).Span(token.End + -headLength.Value).Id;
+
+            var result = "";
+            for(var i = 1; i < token.Length - 1; i++)
+            {
+                result += (token.Start + i).Current;
+                if((token.Start + i).Current == token.Start.Current)
+                    i++;
+            }
+            return result;
         }
     }
 }

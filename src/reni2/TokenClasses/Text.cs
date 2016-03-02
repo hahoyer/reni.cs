@@ -13,7 +13,7 @@ namespace Reni.TokenClasses
     {
         protected override Result Result(ContextBase context, Category category, TerminalSyntax token)
         {
-            var data = StripQutes(token.Id);
+            var data = Lexer.Instance.ExtractText(token.Token);
             return context
                 .RootContext.BitType.Array(BitsConst.BitSize(data[0].GetType()))
                 .TextItem
@@ -23,17 +23,6 @@ namespace Reni.TokenClasses
                 (category, () => CodeBase.BitsConst(BitsConst.ConvertAsText(data)), CodeArgs.Void);
         }
 
-        static string StripQutes(string text)
-        {
-            var result = "";
-            for(var i = 1; i < text.Length - 1; i++)
-            {
-                result += text[i];
-                if(text[i] == text[0])
-                    i++;
-            }
-            return result;
-        }
         public override string Id => "<text>";
     }
 }

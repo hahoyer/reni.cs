@@ -41,6 +41,7 @@
     <Compile Include="FeatureTest\BlogExamples\Post120617.cs" />
     <Compile Include="FeatureTest\BlogExamples\WikiExample1.cs" />
     <Compile Include="FeatureTest\CleanupSection\Basic.cs" />
+    <Compile Include="FeatureTest\CleanupSection\Nested.cs" />
     <Compile Include="FeatureTest\CleanupSection\Simple.cs" />
     <Compile Include="FeatureTest\ComplexContext.cs" />
     <Compile Include="FeatureTest\ConversionService\Closure.cs" />
@@ -230,7 +231,7 @@
     <Compile Include="IProxyType.cs" />
     <Compile Include="ParserTest\AlternativePrioTableTest.cs" />
     <Compile Include="ParserTest\SimpleTokenFactory.cs" />
-    <Compile Include="ParserTest\PrioTableTest.cs" />
+    <Compile Include="ParserTest\VerbatimText.cs" />
     <Compile Include="ParserTest\Services.cs" />
     <Compile Include="ParserTest\StrangeDeclarationSyntax.cs" />
     <Compile Include="Parser\RecursionType.cs" />
