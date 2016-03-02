@@ -54,19 +54,6 @@ namespace Reni.Type
             }
         }
 
-        internal override Result Destructor(Category category)
-        {
-            var firstHandler = _first.Destructor(category);
-            var secondHandler = _second.Destructor(category);
-            if(firstHandler.IsEmpty)
-                return secondHandler;
-            if(secondHandler.IsEmpty)
-                return firstHandler;
-
-            NotImplementedMethod(category);
-            throw new NotImplementedException();
-        }
-
         protected override string GetNodeDump() => "pair." + ObjectId;
     }
 }

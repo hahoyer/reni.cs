@@ -170,9 +170,6 @@ namespace Reni.Type
 
         protected override Size GetSize() => ElementType.Size * Count;
 
-        internal override Result Destructor(Category category)
-            => ElementType.ArrayDestructor(category);
-
         internal override Result Copier(Category category)
             => ElementType.ArrayCopier(category);
 

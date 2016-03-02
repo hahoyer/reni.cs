@@ -220,7 +220,6 @@ namespace Reni.Type
 
         protected virtual TypeBase ReversePair(TypeBase first) => first._cache.Pair[this];
         internal virtual TypeBase Pair(TypeBase second) => second.ReversePair(this);
-        internal virtual Result Destructor(Category category) => VoidCodeAndRefs(category);
 
         internal virtual Result ArrayDestructor(Category category)
             => VoidCodeAndRefs(category);
@@ -396,13 +395,13 @@ namespace Reni.Type
                 (
                     category,
                     LocalReferenceCode,
-                    () => Destructor(Category.Exts).Exts + CodeArgs.Arg()
+                    CodeArgs.Arg
                 );
         }
 
         CodeBase LocalReferenceCode()
             => ArgCode
-                .LocalReference(this, Destructor(Category.Code).Code);
+                .LocalReference(this);
 
         internal Result ContextAccessResult
             (Category category, IContextReference target, Func<Size> getOffset)

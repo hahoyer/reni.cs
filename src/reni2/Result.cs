@@ -935,14 +935,29 @@ namespace Reni
                 .ReplaceArg(this);
         }
 
-        internal Result DereferencedAlignedResult(Size size) 
+        internal Result DereferencedAlignedResult(Size size)
             => HasCode
-            ? new Result(CompleteCategory - Category.Type, getCode: () => Code.DePointer(size))
-            : this;
+                ? new Result(CompleteCategory - Category.Type, getCode: () => Code.DePointer(size))
+                : this;
 
         internal Result ConvertToConverter(TypeBase source)
             => source.Hllw || (!HasExts && !HasCode)
                 ? this
                 : ReplaceAbsolute(source.CheckedReference, source.ArgResult);
+
+        internal Result AddCleanup(Result cleanup)
+        {
+            if(!HasCode || !HasExts || cleanup.IsEmpty)
+                return this;
+
+            if(HasExts && !cleanup.Exts.IsNone)
+                NotImplementedMethod(cleanup);
+
+            var result = Clone;
+            if(HasCode)
+                result.Code = result.Code.AddCleanup(cleanup.Code);
+            return result;
+
+        }
     }
 }

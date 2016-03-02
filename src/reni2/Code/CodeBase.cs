@@ -47,13 +47,18 @@ namespace Reni.Code
         internal static CodeBase Issue(Issue issue) => new IssueCode(issue);
         internal static CodeBase BitsConst(Size size, BitsConst t) => new BitArray(size, t);
         internal static CodeBase BitsConst(BitsConst t) => BitsConst(t.Size, t);
+
         internal static CodeBase DumpPrintText(string dumpPrintText)
             => new DumpPrintText(dumpPrintText);
+
         internal static CodeBase FrameRef() => new TopFrameRef();
+
         internal static FiberItem RecursiveCall(Size refsSize)
             => new RecursiveCallCandidate(refsSize);
+
         internal static CodeBase ReferenceCode(IContextReference reference)
             => new ReferenceCode(reference);
+
         internal static CodeBase Void => BitArray.Void;
         internal static CodeBase TopRef() => new TopRef();
 
@@ -83,9 +88,8 @@ namespace Reni.Code
         internal CodeBase ThenElse(CodeBase thenCode, CodeBase elseCode)
             => Add(new ThenElse(thenCode, elseCode));
 
-        internal LocalReference LocalReference
-            (TypeBase type, CodeBase destructorCode, bool isUsedOnce = false)
-            => new LocalReference(type, this, destructorCode, isUsedOnce);
+        internal LocalReference LocalReference(TypeBase type, bool isUsedOnce = false)
+            => new LocalReference(type, this, isUsedOnce);
 
         internal abstract CodeBase Add(FiberItem subsequentElement);
 
@@ -98,6 +102,7 @@ namespace Reni.Code
 
         internal CodeBase ArrayGetter(Size elementSize, Size indexSize)
             => Add(new ArrayGetter(elementSize, indexSize, CallingMethodName));
+
         internal CodeBase ArraySetter(Size elementSize, Size indexSize)
             => Add(new ArraySetter(elementSize, indexSize, CallingMethodName));
 
@@ -177,7 +182,8 @@ namespace Reni.Code
             return this;
         }
 
-        internal TCode Visit<TCode,TFiber>(Visitor<TCode, TFiber> actual) => VisitImplementation(actual);
+        internal TCode Visit<TCode, TFiber>(Visitor<TCode, TFiber> actual)
+            => VisitImplementation(actual);
 
         protected virtual TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
             => actual.Default(this);
@@ -236,11 +242,15 @@ namespace Reni.Code
         internal CodeBase NumberOperation
             (string name, Size resultSize, Size leftSize, Size rightSize)
             => Add(new BitArrayBinaryOp(name, resultSize, leftSize, rightSize));
+
         internal CodeBase DumpPrintNumber() => Add(new DumpPrintNumberOperation(Size, Size.Zero));
+
         internal CodeBase DumpPrintNumber(Size leftSize)
             => Add(new DumpPrintNumberOperation(leftSize, Size - leftSize));
+
         internal CodeBase DumpPrintText(Size itemSize)
             => Add(new DumpPrintTextOperation(Size, itemSize));
+
         internal CodeBase NumberOperation(string operation, Size size)
             => Add(new BitArrayPrefixOp(operation, size, Size));
 
@@ -254,7 +264,12 @@ namespace Reni.Code
         {
             try
             {
-                Visit(new DataStack(context) {TraceCollector = traceCollector});
+                Visit
+                    (
+                        new DataStack(context)
+                        {
+                            TraceCollector = traceCollector
+                        });
             }
             catch(UnexpectedContextReference e)
             {
@@ -274,12 +289,15 @@ namespace Reni.Code
         }
 
         internal static CodeBase Arg(TypeBase type) => new Arg(type);
+
         internal Container Container(string description, FunctionId functionId = null)
             => new Container(this, description, functionId);
 
         CodeBase IAggregateable<CodeBase>.Aggregate(CodeBase other) => this + other;
 
         public static CodeBase operator +(CodeBase a, CodeBase b) => a.Sequence(b);
+
+        internal CodeBase AddCleanup(CodeBase cleanupCode) => new CodeWithCleanup(this, cleanupCode);
     }
 
     abstract class UnexpectedVisitOfPending : Exception {}

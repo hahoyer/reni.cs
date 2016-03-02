@@ -50,7 +50,6 @@ namespace Reni.Type
         internal override int? SmartArrayLength(TypeBase elementType)
             => Parent.SmartArrayLength(elementType);
 
-        internal override Result Destructor(Category category) => Parent.Destructor(category);
         internal override Result Copier(Category category) => Parent.Copier(category);
 
         internal override Result ApplyTypeOperator(Result argResult)

@@ -9,7 +9,6 @@ using Reni.ParserTest;
 namespace Reni.FeatureTest.TypeType
 {
     [UnitTest]
-    [PrioTableTest]
     [Closure, TypeOperator]
     public sealed class ApplyTypeOperator : CompilerTest
     {

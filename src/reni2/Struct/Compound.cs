@@ -142,7 +142,9 @@ namespace Reni.Struct
                 var result = aggregate
                     .ReplaceRelative(this, CodeBase.TopRef, CodeArgs.Void)
                     ;
-                if(category.HasType)
+                result = result.AddCleanup(Cleanup(EndPosition, category));
+
+                if (category.HasType)
                     result.Type = CompoundView.Type;
                 return ReturnMethodDump(result);
             }
@@ -234,5 +236,11 @@ namespace Reni.Struct
         bool? InnerHllwStatic(int position) => Syntax.Statements[position].Hllw;
 
         ContextBase IChild<ContextBase>.Parent => Parent;
+
+        internal Result Cleanup(int accessPosition, Category category)
+        {
+            var uniqueChildContext = Parent.CompoundPositionContext(Syntax, accessPosition);
+            return Syntax.Cleanup(uniqueChildContext, category);
+        }
     }
 }

@@ -23,7 +23,6 @@ namespace Reni.Type
         internal override sealed TypeBase CoreType => Parent.CoreType;
         protected override sealed Size GetSize() => Parent.Size;
         protected override string GetNodeDump() => Parent.NodeDump + "[" + TagTitle + "]";
-        internal override sealed Result Destructor(Category category) => Parent.Destructor(category);
         internal override sealed Result ArrayDestructor(Category category) => Parent.ArrayDestructor(category);
         internal override sealed Result Copier(Category category) => Parent.Copier(category);
         internal override sealed Result ArrayCopier(Category category) => Parent.ArrayCopier(category);

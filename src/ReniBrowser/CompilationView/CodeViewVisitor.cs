@@ -18,18 +18,10 @@ namespace ReniBrowser.CompilationView
 
         internal override Control LocalReference(LocalReference target)
         {
-            Control destructor = null;
-            if(!target.DestructorCode.IsEmpty)
-            {
-                destructor = target.DestructorCode.CreateView(Master);
-                destructor.Text = "Destructor";
-            }
-
             var result = new[]
             {
                 target.ValueType.CreateTypeLineView(Master).CreateGroup("Type"),
-                target.AlignedValueCode.CreateView(Master),
-                destructor
+                target.AlignedValueCode.CreateView(Master)
             };
 
             return result.CreateRowView();

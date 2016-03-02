@@ -73,6 +73,6 @@ namespace Reni.Code.ReplaceVisitor
             => visitedObject
                 .ValueCode
                 .Visit(this)
-                ?.LocalReference(visitedObject.ValueType, visitedObject.DestructorCode);
+                ?.LocalReference(visitedObject.ValueType);
     }
 }

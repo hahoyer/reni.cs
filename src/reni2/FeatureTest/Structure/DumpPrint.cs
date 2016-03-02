@@ -1,16 +1,15 @@
-using System.Linq;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using hw.UnitTest;
+using Reni.FeatureTest.ConversionService;
 using Reni.FeatureTest.Helper;
-using Reni.ParserTest;
 
 namespace Reni.FeatureTest.Structure
 {
     [UnitTest]
-    [Target(@"(1, 2, 3, 4, 5, 6) dump_print")]
+    [Target("(1, 2, 3, 4, 5, 6) dump_print")]
     [Output("(1, 2, 3, 4, 5, 6)")]
-    [PrioTableTest]
-    [ConversionService.Closure]
+    [Closure]
     public sealed class DumpPrint : CompilerTest {}
 }

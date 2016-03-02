@@ -221,5 +221,16 @@ namespace Reni.Struct
 
             return new CompoundSyntax(_statements, newCleanupSection);
         }
+
+        internal Result Cleanup(ContextBase context, Category category)
+        {
+            if(CleanupSection != null && (category.HasCode || category.HasExts))
+                return context
+                    .Result(category.Typed, CleanupSection)
+                    .Conversion(context.RootContext.VoidType)
+                    .LocalBlock(category);
+
+            return context.RootContext.VoidType.Result(category);
+        }
     }
 }

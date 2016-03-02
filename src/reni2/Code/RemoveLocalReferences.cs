@@ -62,7 +62,7 @@ namespace Reni.Code
             {
                 var valueCode = reference.ValueCode;
                 return (valueCode.Visit(this) ?? valueCode)
-                    .LocalReference(reference.ValueType, reference.DestructorCode, true);
+                    .LocalReference(reference.ValueType, true);
             }
         }
 
@@ -114,7 +114,7 @@ namespace Reni.Code
                 if (!References.Any())
                     return ReducedBody;
 
-                var trace = ObjectId < 0;
+                var trace = ObjectId == 0;
                 StartMethodDump(trace);
                 try
                 {

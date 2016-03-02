@@ -15,6 +15,7 @@ namespace Reni.Code
         {
             _beforeSize = beforeSize;
             _afterSize = afterSize;
+            StopByObjectIds(6);
         }
 
         internal override void Visit(IVisitor visitor) => visitor.Drop(_beforeSize, _afterSize);
