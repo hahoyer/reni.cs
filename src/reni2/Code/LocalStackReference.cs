@@ -25,8 +25,7 @@ namespace Reni.Code
 
         void IStackDataAddressBase.SetTop(Size offset, StackData right)
         {
-            var data = ((IStackDataAddressBase) this).GetTop(offset, right.Size);
-            var trace = data.DebuggerDumpString;
+            var dataForTrace = ((IStackDataAddressBase) this).GetTop(offset, right.Size);
             NotImplementedMethod(offset, right);
         }
 

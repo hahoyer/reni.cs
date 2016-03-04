@@ -27,7 +27,9 @@ namespace hw.DebugFormatter
         /// </summary>
         [DisableDump]
         [UsedImplicitly]
-        public string DebuggerDumpString { get { return DebuggerDump().Replace("\n", "\r\n"); } }
+        public string d { get { return DebuggerDump().Replace("\n", "\r\n"); } }
+        [UsedImplicitly]
+        public void t() { Tracer.Line(d);}
 
         /// <summary>
         ///     Method dump with break,

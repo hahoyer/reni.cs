@@ -88,5 +88,7 @@ namespace Reni.Struct
         internal override ContextBase ToContext => View.Context;
 
         ContextBase IChild<ContextBase>.Parent => View.CompoundContext;
+
+        internal override Result Cleanup(Category category) => View.Compound.Cleanup(category);
     }
 }

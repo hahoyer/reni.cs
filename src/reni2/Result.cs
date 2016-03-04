@@ -746,7 +746,7 @@ namespace Reni
         }
 
         internal Result LocalBlock(Category category)
-            => AutomaticDereferenceResult.InternalLocalBlock(category);
+            => AutomaticDereferenceResult.InternalLocalBlock(category.Typed);
 
         internal Result InternalLocalBlock(Category category)
         {
@@ -957,7 +957,20 @@ namespace Reni
             if(HasCode)
                 result.Code = result.Code.AddCleanup(cleanup.Code);
             return result;
+        }
 
+        internal Result ArrangeCleanupCode()
+        {
+            if(!HasCode)
+                return this;
+
+            var newCode = Code.ArrangeCleanupCode();
+            if(newCode == null)
+                return this;
+
+            var result = Clone;
+            result.Code = newCode;
+            return result;
         }
     }
 }

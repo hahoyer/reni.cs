@@ -10,9 +10,6 @@ namespace Reni.Code
 {
     sealed class RemoveLocalReferences : Base
     {
-        CodeBase Body { get; }
-        CodeBase Copier { get; }
-
         sealed class Counter : Base
         {
             readonly Dictionary<LocalReference, int> _references =
@@ -94,6 +91,8 @@ namespace Reni.Code
 
         static int _nextObjectId;
 
+        CodeBase Body { get; }
+        CodeBase Copier { get; }
         readonly ValueCache<CodeBase> _reducedBodyCache;
         readonly ValueCache<LocalReference[]> _referencesCache;
 
@@ -114,7 +113,7 @@ namespace Reni.Code
                 if (!References.Any())
                     return ReducedBody;
 
-                var trace = ObjectId == 0;
+                var trace = ObjectId == -1;
                 StartMethodDump(trace);
                 try
                 {
@@ -127,6 +126,9 @@ namespace Reni.Code
 
                     var body = ReducedBody;
                     var initialSize = Size.Zero;
+
+                    var cleanup = CodeBase.Void;
+
                     foreach(var reference in References)
                     {
                         var initialCode = reference.AlignedValueCode;
@@ -138,10 +140,13 @@ namespace Reni.Code
                         body = initialCode + replacedBody;
                         Dump(nameof(body), body);
                         BreakExecution();
+
+                        Tracer.Assert(reference.ValueType.Cleanup(Category.Exts).Exts.IsNone);
+
+                        cleanup = reference.ValueType.Cleanup(Category.Code).Code + cleanup;
                     }
 
-
-                    var result = body.LocalBlockEnd(Copier, initialSize);
+                    var result = (body + cleanup).LocalBlockEnd(Copier, initialSize) ;
                     return ReturnMethodDump(result);
                 }
                 finally

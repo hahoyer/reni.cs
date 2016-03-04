@@ -183,8 +183,10 @@ namespace Reni.Context
                 foreach(var ext in Result(Category.Exts, compoundSyntax).Exts.Data)
                     AnalyseUnresolvedReference(compoundSyntax, ext);
 
-            return compoundSyntax
-                .Code(this)
+            var rawResult = compoundSyntax.Result(this);
+            return rawResult
+                .Code
+                .LocalBlock(rawResult.Type.Copier(Category.Code).Code )
                 .Container(description);
         }
 

@@ -298,6 +298,8 @@ namespace Reni.Code
         public static CodeBase operator +(CodeBase a, CodeBase b) => a.Sequence(b);
 
         internal CodeBase AddCleanup(CodeBase cleanupCode) => new CodeWithCleanup(this, cleanupCode);
+
+        virtual internal CodeBase ArrangeCleanupCode() => null;
     }
 
     abstract class UnexpectedVisitOfPending : Exception {}

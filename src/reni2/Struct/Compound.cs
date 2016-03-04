@@ -107,7 +107,7 @@ namespace Reni.Struct
                 var result = statements
                     .Aggregate
                     (
-                        Parent.RootContext.VoidType.Result(category),
+                        Parent.RootContext.VoidType.Result(category.Typed),
                         (current, next) => current + next);
                 return ReturnMethodDump(result);
             }
@@ -139,12 +139,15 @@ namespace Reni.Struct
                 Dump(nameof(aggregate), aggregate);
                 BreakExecution();
 
-                var result = aggregate
-                    .ReplaceRelative(this, CodeBase.TopRef, CodeArgs.Void)
-                    ;
-                result = result.AddCleanup(Cleanup(EndPosition, category));
+                var resultWithCleanup = aggregate.ArrangeCleanupCode();
+                Dump(nameof(resultWithCleanup), resultWithCleanup);
+                BreakExecution();
 
-                if (category.HasType)
+                var result = resultWithCleanup
+                    .ReplaceRelative(this, CodeBase.TopRef, CodeArgs.Void)
+                    & category;
+
+                if(category.HasType)
                     result.Type = CompoundView.Type;
                 return ReturnMethodDump(result);
             }
@@ -237,9 +240,9 @@ namespace Reni.Struct
 
         ContextBase IChild<ContextBase>.Parent => Parent;
 
-        internal Result Cleanup(int accessPosition, Category category)
+        internal Result Cleanup(Category category)
         {
-            var uniqueChildContext = Parent.CompoundPositionContext(Syntax, accessPosition);
+            var uniqueChildContext = Parent.CompoundPositionContext(Syntax);
             return Syntax.Cleanup(uniqueChildContext, category);
         }
     }

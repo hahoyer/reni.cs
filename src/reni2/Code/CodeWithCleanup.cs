@@ -17,7 +17,7 @@ namespace Reni.Code
         readonly CodeBase CleanupCode;
 
         internal CodeWithCleanup(CodeBase initialisation, CodeBase cleanupCode)
-            :base(_nextObjectId++)
+            : base(_nextObjectId++)
         {
             Initialisation = initialisation;
             CleanupCode = cleanupCode;
@@ -33,5 +33,11 @@ namespace Reni.Code
 
         [DisableDump]
         internal override IEnumerable<Issue> Issues => Validation.Issue.Empty;
+
+        internal override CodeBase ArrangeCleanupCode()
+        {
+            NotImplementedMethod();
+            return null;
+        }
     }
 }

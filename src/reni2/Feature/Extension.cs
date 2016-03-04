@@ -85,7 +85,7 @@ namespace Reni.Feature
             var result = conversion.Execute(category);
             if(category.HasCode && result.Code.ArgType != null)
                 Tracer.Assert
-                    (result.Code.ArgType == conversion.Source, () => result.DebuggerDumpString);
+                    (result.Code.ArgType == conversion.Source, () => result.DebuggerDump());
             return result;
         }
 

@@ -221,13 +221,22 @@ namespace Reni.Type
         protected virtual TypeBase ReversePair(TypeBase first) => first._cache.Pair[this];
         internal virtual TypeBase Pair(TypeBase second) => second.ReversePair(this);
 
-        internal virtual Result ArrayDestructor(Category category)
+        internal virtual Result Cleanup(Category category)
             => VoidCodeAndRefs(category);
 
         internal virtual Result Copier(Category category) => VoidCodeAndRefs(category);
 
-        internal virtual Result ArrayCopier(Category category)
-            => VoidCodeAndRefs(category);
+        internal Result ArrayCopier(Category category)
+        {
+            Tracer.Assert(Copier(category).IsEmpty);
+            return VoidCodeAndRefs(category);
+        }
+
+        internal Result ArrayCleanup(Category category)
+        {
+            Tracer.Assert(Cleanup(category).IsEmpty);
+            return VoidCodeAndRefs(category);
+        }
 
         internal virtual Result ApplyTypeOperator(Result argResult)
             => argResult.Type.Conversion(argResult.CompleteCategory, this).ReplaceArg(argResult);

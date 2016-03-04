@@ -173,6 +173,9 @@ namespace Reni.Type
         internal override Result Copier(Category category)
             => ElementType.ArrayCopier(category);
 
+        internal override Result Cleanup(Category category)
+            => ElementType.ArrayCleanup(category);
+
         [DisableDump]
         protected override IEnumerable<IConversion> StripConversions
         {

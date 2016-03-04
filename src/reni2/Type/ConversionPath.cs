@@ -116,7 +116,7 @@ namespace Reni.Type
 
         IEnumerable<string> DumpConversions
             => Elements
-                .Select(element => element.Result(Category.Code).Code.DebuggerDumpString)
+                .Select(element => element.Result(Category.Code).Code.DebuggerDump())
                 .ToArray();
 
         internal TypeBase Destination => Elements.LastOrDefault()?.ResultType() ?? Source;

@@ -6,7 +6,8 @@ using Reni.FeatureTest.Helper;
 
 namespace Reni.FeatureTest.CleanupSection
 {
-    [UnitTest][Basic]
-    [TargetSet(@"This: {~~~'end' dump_print}; This dump_print ", "()end")]
-    public sealed class Simple: CompilerTest { }
-}
+    [UnitTest]
+    [Basic]
+    [TargetSet(@"This: {(a:1;b:3) a; 5 ~~~'end' dump_print} dump_print ", "(1, 5)end")]
+    public sealed class Simple : CompilerTest {}
+}             
