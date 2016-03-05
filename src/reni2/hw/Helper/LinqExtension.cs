@@ -426,7 +426,7 @@ namespace hw.Helper
         {
             using(var enumerator = source.GetEnumerator())
                 while(enumerator.MoveNext())
-                    yield return GetInnerSequence(enumerator, splitter).ToArray();
+                    yield return GetInnerSequence(enumerator, splitter).ToList();
         }
 
         // taken from http://dotnet-snippets.de/snippet/linq-erweiterung-split/4893

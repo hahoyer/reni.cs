@@ -568,12 +568,8 @@ namespace Reni
             if(HasType && HasCode && Type.HasQuickSize)
                 Tracer.Assert(Code.Size == Type.Size, () => "Code and Type differ: " + Dump());
             if(HasExts && HasCode)
-            {
-                if(!Code.Exts.IsEqual(Exts))
-                    Tracer.Line(Tracer.StackTrace(FilePositionTag.Debug));
                 Tracer.Assert
                     (Code.Exts.IsEqual(Exts), () => "Code and Exts differ: " + Dump());
-            }
 
             Tracer.Assert((CompleteCategory & PendingCategory) == Category.None);
         }

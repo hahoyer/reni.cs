@@ -228,7 +228,7 @@ namespace Reni.Struct
                 return context
                     .Result(category.Typed, CleanupSection)
                     .Conversion(context.RootContext.VoidType)
-                    .LocalBlock(category);
+                    .LocalBlock(category) & category;
 
             return context.RootContext.VoidType.Result(category);
         }

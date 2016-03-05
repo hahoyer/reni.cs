@@ -25,6 +25,7 @@ This: /\
 }; 
 
 This() dump_print
-", "((1, ), 3,  )(this cleanup)(base cleanup)")]
+", "((1, ), 3, )(this cleanup)(base cleanup)")]
     public sealed class Nested : CompilerTest {}
+
 }

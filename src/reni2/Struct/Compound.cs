@@ -243,7 +243,20 @@ namespace Reni.Struct
         internal Result Cleanup(Category category)
         {
             var uniqueChildContext = Parent.CompoundPositionContext(Syntax);
-            return Syntax.Cleanup(uniqueChildContext, category);
+            var cleanup = Syntax.Cleanup(uniqueChildContext, category);
+            var aggregate = EndPosition
+                .Select()
+                .Reverse()
+                .Select(index => GetCleanup(category, index))
+                .Aggregate();
+            return cleanup + aggregate;
+        }
+
+        Result GetCleanup(Category category, int index)
+        {
+            var result = AccessType(EndPosition, index).Cleanup(category);
+            Tracer.Assert(result.CompleteCategory == category);
+            return result;
         }
     }
 }

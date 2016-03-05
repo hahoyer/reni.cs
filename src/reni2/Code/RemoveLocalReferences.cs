@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using hw.Helper;
 using System.Linq;
+using System.Net;
 using hw.DebugFormatter;
 using Reni.Basics;
 using Reni.Code.ReplaceVisitor;
@@ -113,7 +114,7 @@ namespace Reni.Code
                 if (!References.Any())
                     return ReducedBody;
 
-                var trace = ObjectId == -1;
+                var trace = ObjectId == 0;
                 StartMethodDump(trace);
                 try
                 {
@@ -127,10 +128,11 @@ namespace Reni.Code
                     var body = ReducedBody;
                     var initialSize = Size.Zero;
 
-                    var cleanup = CodeBase.Void;
+                    var cleanup = new Result(Category.Code|Category.Exts, ()=>true);
 
                     foreach(var reference in References)
                     {
+                        Dump(nameof(reference), reference);
                         var initialCode = reference.AlignedValueCode;
                         initialSize += initialCode.Size;
                         Dump(nameof(initialCode), initialCode);
@@ -141,12 +143,17 @@ namespace Reni.Code
                         Dump(nameof(body), body);
                         BreakExecution();
 
-                        Tracer.Assert(reference.ValueType.Cleanup(Category.Exts).Exts.IsNone);
-
-                        cleanup = reference.ValueType.Cleanup(Category.Code).Code + cleanup;
+                        var cleanup1 = reference
+                            .ValueType
+                            .Cleanup(Category.Code|Category.Exts)
+                            .ReplaceAbsolute(reference.ValueType.ForcedPointer, CodeBase.
+                            TopRef, CodeArgs.Void);
+                        cleanup = cleanup1 + cleanup;
+                        Dump(nameof(cleanup), cleanup);
+                        BreakExecution();
                     }
 
-                    var result = (body + cleanup).LocalBlockEnd(Copier, initialSize) ;
+                    var result = (body + cleanup.Code).LocalBlockEnd(Copier, initialSize) ;
                     return ReturnMethodDump(result);
                 }
                 finally
