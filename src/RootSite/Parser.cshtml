@@ -61,58 +61,6 @@ ParLevel ( { ) }
     </div>     
     <div class="float-left">
         <table id="PrioTable" class="white_table" >
-            <tr >
-                <th/>
-                @foreach(var recentTokenName in prioTable.RecentToken)
-                {
-                    <th>@recentTokenName</th>
-                }
-            </tr>
-            
-            @foreach(var newTokenName in prioTable.NewToken)
-            {
-                <tr>
-                    <th>@newTokenName</th>
-                    @foreach(var recentTokenName in prioTable.RecentToken)
-                    {
-                        <td>
-                            @switch(prioTable.Relation(newTokenName, recentTokenName))
-                            {
-                                case '+':
-                                    if(useImages)
-                                    {
-                                        <img src="~/Resources/Stack.Push.bmp" alt="<-"/>
-                                    }
-                                    else
-                                    {
-                                        @left
-                                    }
-                                    break;
-                                case '-':
-                                    if(useImages)
-                                    {
-                                        <img src="~/Resources/Stack.Pull.bmp" alt="^^"/>
-                                    }
-                                    else
-                                    {
-                                        @up
-                                    }
-                                    break;
-                                default:
-                                    if(useImages)
-                                    {
-                                        <img src="~/Resources/Stack.Match.bmp" alt="="/>
-                                    }
-                                    else
-                                    {
-                                        @match
-                                    }
-                                    break;
-                            }
-                        </td>
-                    }
-                </tr>
-            }
         </table>
     </div>     
     <div class="float-left">
