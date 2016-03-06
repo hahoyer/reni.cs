@@ -61,7 +61,6 @@
     <Compile Include="Formatting\IFormatter.cs" />
     <Compile Include="Formatting\Item.cs" />
     <Compile Include="Formatting\LineOrientedFormatter.cs" />
-    <Compile Include="Formatting\LineOrientedFormatterExtension.cs" />
     <Compile Include="Formatting\SeparatorType.cs" />
     <Compile Include="Test\BadUserInterAction.cs" />
     <Compile Include="Test\BraceMatching.cs" />
