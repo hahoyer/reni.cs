@@ -1,6 +1,4 @@
 ﻿<#@ template language="C#" #>
-<#@ import namespace="global::hw.Helper" #>
-<#@ import namespace="global::Reni.Basics" #>
 
 using System;
 using Reni;

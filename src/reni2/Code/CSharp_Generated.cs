@@ -9,8 +9,6 @@
 // ------------------------------------------------------------------------------
 namespace Reni.Code
 {
-    using global::hw.Helper;
-    using global::Reni.Basics;
     using System;
     
     /// <summary>
@@ -30,14 +28,14 @@ namespace Reni.Code
             this.Write("\r\nusing System;\r\nusing Reni;\r\nusing Reni.Runtime;\r\n\r\nnamespace ReniTest\r\n{\r\n\tunsa" +
                     "fe static public class ");
             
-            #line 11 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+            #line 9 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(ModuleName));
             
             #line default
             #line hidden
             this.Write("\r\n\t{");
             
-            #line 12 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+            #line 10 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
 
         GenerateCSharpCode(_main);
         for (var i = 0; i < _functions.Count; i++)
@@ -55,7 +53,7 @@ namespace Reni.Code
             return this.GenerationEnvironment.ToString();
         }
         
-        #line 24 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+        #line 22 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
  
 	void GenerateCSharpCode(Container container)
 	{
@@ -63,56 +61,56 @@ namespace Reni.Code
         #line default
         #line hidden
         
-        #line 26 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+        #line 24 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
 this.Write("\t    \r\n        // ");
 
         
         #line default
         #line hidden
         
-        #line 28 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+        #line 26 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
 this.Write(this.ToStringHelper.ToStringWithCulture(container.Description.Replace("\n", "\n//")));
 
         
         #line default
         #line hidden
         
-        #line 28 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+        #line 26 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
 this.Write(" \r\n\t\tunsafe static public void ");
 
         
         #line default
         #line hidden
         
-        #line 29 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+        #line 27 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
 this.Write(this.ToStringHelper.ToStringWithCulture(Generator.MainFunctionName));
 
         
         #line default
         #line hidden
         
-        #line 29 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+        #line 27 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
 this.Write("()\r\n\t\t{\r\n\t    \t");
 
         
         #line default
         #line hidden
         
-        #line 31 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+        #line 29 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
 this.Write(this.ToStringHelper.ToStringWithCulture(container.GetCSharpStatements(3)));
 
         
         #line default
         #line hidden
         
-        #line 31 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+        #line 29 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
 this.Write("\r\n        }\r\n\t");
 
         
         #line default
         #line hidden
         
-        #line 33 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+        #line 31 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
 }
 	
     void GenerateCSharpFunctionCode(Container container)
@@ -121,56 +119,56 @@ this.Write("\r\n        }\r\n\t");
         #line default
         #line hidden
         
-        #line 36 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+        #line 34 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
 this.Write("\r\n\t    // ");
 
         
         #line default
         #line hidden
         
-        #line 38 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+        #line 36 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
 this.Write(this.ToStringHelper.ToStringWithCulture(container.Description.Replace("\n", "\n//")));
 
         
         #line default
         #line hidden
         
-        #line 38 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+        #line 36 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
 this.Write(" \r\n\t\tunsafe static Data ");
 
         
         #line default
         #line hidden
         
-        #line 39 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+        #line 37 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
 this.Write(this.ToStringHelper.ToStringWithCulture(Generator.FunctionName(container.FunctionId)));
 
         
         #line default
         #line hidden
         
-        #line 39 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+        #line 37 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
 this.Write("(Data frame)\r\n\t\t{\r\n\t\tStart:\r\n            ");
 
         
         #line default
         #line hidden
         
-        #line 42 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+        #line 40 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
 this.Write(this.ToStringHelper.ToStringWithCulture(container.GetCSharpStatements(3)));
 
         
         #line default
         #line hidden
         
-        #line 42 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+        #line 40 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
 this.Write("\r\n            return data;\r\n\t\t}\r\n\t");
 
         
         #line default
         #line hidden
         
-        #line 45 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+        #line 43 "A:\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
 }
 
         // ReSharper disable FieldCanBeMadeReadOnly.Local
