@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Reni.Basics;
 using Reni.Context;
-using Reni.Formatting;
 using Reni.Parser;
 
 namespace Reni.TokenClasses
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class InstanceToken : InfixSyntaxToken, IPendingProvider, IChainLink, IRecursionHandler
+    sealed class InstanceToken : InfixSyntaxToken, IPendingProvider, IRecursionHandler
     {
         public const string TokenId = "instance";
         public override string Id => TokenId;

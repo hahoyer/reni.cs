@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Reni.Basics;
 using Reni.Context;
-using Reni.Formatting;
 using Reni.Parser;
 
 namespace Reni.TokenClasses
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class ArgToken : NonSuffixSyntaxToken, IChainLink
+    sealed class ArgToken : NonSuffixSyntaxToken
     {
         public const string TokenId = "^";
         public override string Id => TokenId;

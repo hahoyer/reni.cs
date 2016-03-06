@@ -5,7 +5,6 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
-using Reni.Formatting;
 using Reni.Parser;
 using Reni.TokenClasses;
 
@@ -46,7 +45,6 @@ namespace ReniUI.Formatting
         {
             NotImplementedMethod();
             return null;
-
         }
 
         bool IsTooLongLine(Line line)

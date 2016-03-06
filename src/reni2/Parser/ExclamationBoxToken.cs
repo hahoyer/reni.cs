@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
-using Reni.Formatting;
 using Reni.TokenClasses;
 
 namespace Reni.Parser
@@ -33,6 +32,5 @@ namespace Reni.Parser
 
         string IType<SourceSyntax>.PrioTableId => PrioTable.Any;
         string ITokenClass.Id => "!";
-
     }
 }

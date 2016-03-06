@@ -118,8 +118,6 @@
     <Compile Include="Feature\Function.cs" />
     <Compile Include="Feature\SearchResult.cs" />
     <Compile Include="Feature\Simple.cs" />
-    <Compile Include="Formatting\IChainLink.cs" />
-    <Compile Include="Formatting\ITokenClass.cs" />
     <Compile Include="hw\DebugFormatter\Configuration.cs" />
     <Compile Include="hw\DebugFormatter\DebugTextWriter.cs" />
     <Compile Include="hw\DebugFormatter\DisableDumpAttribute.cs" />
@@ -220,6 +218,7 @@
     <Compile Include="ParserTest\VerbatimText.cs" />
     <Compile Include="ParserTest\Services.cs" />
     <Compile Include="ParserTest\StrangeDeclarationSyntax.cs" />
+    <Compile Include="Parser\ITokenClass.cs" />
     <Compile Include="Parser\RecursionType.cs" />
     <Compile Include="ReniObjectExtender.cs" />
     <Compile Include="Parser\Extension.cs" />

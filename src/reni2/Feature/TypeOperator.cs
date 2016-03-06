@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Reni.Basics;
 using Reni.Context;
-using Reni.Formatting;
 using Reni.Parser;
 using Reni.TokenClasses;
 
 namespace Reni.Feature
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class TypeOperator : SuffixSyntaxToken, IChainLink
+    sealed class TypeOperator : SuffixSyntaxToken
     {
         public const string TokenId = "type";
         public override string Id => TokenId;

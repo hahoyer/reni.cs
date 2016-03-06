@@ -4,12 +4,11 @@ using System;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
-using Reni.Formatting;
 using Reni.Parser;
 
 namespace Reni.TokenClasses
 {
-    sealed class Text : TerminalSyntaxToken, IChainLink
+    sealed class Text : TerminalSyntaxToken
     {
         protected override Result Result(ContextBase context, Category category, TerminalSyntax token)
         {
