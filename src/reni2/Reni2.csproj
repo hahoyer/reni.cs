@@ -118,17 +118,8 @@
     <Compile Include="Feature\Function.cs" />
     <Compile Include="Feature\SearchResult.cs" />
     <Compile Include="Feature\Simple.cs" />
-    <Compile Include="Formatting\Configuration.cs" />
-    <Compile Include="Formatting\ContactType.cs" />
-    <Compile Include="Formatting\Frame.cs" />
     <Compile Include="Formatting\IChainLink.cs" />
-    <Compile Include="Formatting\IFormatter.cs" />
-    <Compile Include="Formatting\Item.cs" />
     <Compile Include="Formatting\ITokenClass.cs" />
-    <Compile Include="Formatting\LineOrientedFormatter.cs" />
-    <Compile Include="Formatting\LineOrientedFormatterExtension.cs" />
-    <Compile Include="Formatting\SeparatorType.cs" />
-    <Compile Include="Formatting\HierachicalFormatter.cs" />
     <Compile Include="hw\DebugFormatter\Configuration.cs" />
     <Compile Include="hw\DebugFormatter\DebugTextWriter.cs" />
     <Compile Include="hw\DebugFormatter\DisableDumpAttribute.cs" />

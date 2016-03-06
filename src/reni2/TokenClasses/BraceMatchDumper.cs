@@ -10,6 +10,7 @@ namespace Reni.TokenClasses
     {
         readonly SourceSyntax _parent;
         readonly int _depth;
+
         public BraceMatchDumper(SourceSyntax parent, int depth)
             : base(null)
         {

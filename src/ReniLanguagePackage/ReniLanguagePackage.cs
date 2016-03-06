@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using JetBrains.Annotations;
 using Microsoft.VisualStudio.Shell;
-using Reni.Formatting;
+using ReniUI.Formatting;
 
 namespace HoyerWare.ReniLanguagePackage
 {

@@ -5,10 +5,11 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
+using Reni.Formatting;
 using Reni.Parser;
 using Reni.TokenClasses;
 
-namespace Reni.Formatting
+namespace ReniUI.Formatting
 {
     public sealed class HierachicalFormatter : DumpableObject, IFormatter
     {

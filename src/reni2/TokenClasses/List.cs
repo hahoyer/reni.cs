@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Scanner;
-using Reni.Formatting;
 using Reni.Parser;
 
 namespace Reni.TokenClasses

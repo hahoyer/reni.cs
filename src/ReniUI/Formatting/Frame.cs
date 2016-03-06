@@ -5,7 +5,7 @@ using hw.DebugFormatter;
 using hw.Helper;
 using Reni.TokenClasses;
 
-namespace Reni.Formatting
+namespace ReniUI.Formatting
 {
     sealed class Frame : DumpableObject
     {

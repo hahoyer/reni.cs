@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Reni.Formatting
+namespace ReniUI.Formatting
 {
     public sealed class Configuration
     {

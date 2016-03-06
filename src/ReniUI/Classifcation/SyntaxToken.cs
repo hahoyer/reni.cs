@@ -5,6 +5,7 @@ using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.TokenClasses;
 using Reni.Validation;
+using ReniUI.Formatting;
 
 namespace ReniUI.Classifcation
 {
@@ -46,7 +47,7 @@ namespace ReniUI.Classifcation
         public override string State => SourceSyntax.Token.Id ?? "";
 
         public override string Reformat(SourcePart targetPart)
-            => SourceSyntax.Reformat(targetPart);
+            => new Formatting.Configuration().Create().Reformat(SourceSyntax, targetPart);
 
         public override IEnumerable<SourcePart> FindAllBelongings(CompilerBrowser compiler)
             => compiler.FindAllBelongings(SourceSyntax)?.Select(item => item.Token.Characters);

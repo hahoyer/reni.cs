@@ -6,11 +6,11 @@ using hw.Helper;
 using hw.Scanner;
 using Reni;
 using Reni.Code;
-using Reni.Formatting;
 using Reni.Parser;
 using Reni.Struct;
 using Reni.TokenClasses;
 using ReniUI.Classifcation;
+using ReniUI.Formatting;
 
 namespace ReniUI
 {
@@ -99,9 +99,6 @@ namespace ReniUI
         internal IEnumerable<SourceSyntax> FindAllBelongings(SourceSyntax sourceSyntax)
             => Parent.SourceSyntax.Belongings(sourceSyntax);
 
-        public string Reformat(SourcePart sourcePart, IFormatter formatter)
-            => Parent.SourceSyntax.Reformat(sourcePart, formatter);
-
         Token GetLocateForCache(int offset)
         {
             var posn = Source + offset;
@@ -119,9 +116,9 @@ namespace ReniUI
         }
 
         internal string Reformat(IFormatter formatter)
-            => Parent.SourceSyntax.Reformat(provider: formatter);
+            => formatter.Reformat(Parent.SourceSyntax, Parent.SourceSyntax.SourcePart);
 
-        internal SourceSyntax Locate(SourcePart span)
+        public SourceSyntax Locate(SourcePart span)
         {
             var result = Parent.SourceSyntax.Locate(span);
             if(result != null)

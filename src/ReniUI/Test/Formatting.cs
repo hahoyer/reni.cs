@@ -7,7 +7,7 @@ using hw.Helper;
 using hw.UnitTest;
 using NUnit.Framework;
 using Reni;
-using Reni.Formatting;
+using ReniUI.Formatting;
 
 namespace ReniUI.Test
 {
@@ -88,7 +88,7 @@ namespace ReniUI.Test
                 (
                     FormatterExtension.Create
                         (
-                            new Reni.Formatting.Configuration
+                            new ReniUI.Formatting.Configuration
                             {
                                 MaxLineLength = 100,
                                 EmptyLineLimit = 0
@@ -131,7 +131,7 @@ namespace ReniUI.Test
                 (
                     FormatterExtension.Create
                         (
-                            new Reni.Formatting.Configuration
+                            new ReniUI.Formatting.Configuration
                             {
                                 EmptyLineLimit = 1
                             }
@@ -160,7 +160,7 @@ namespace ReniUI.Test
                 (
                     FormatterExtension.Create
                         (
-                            new Reni.Formatting.Configuration
+                            new ReniUI.Formatting.Configuration
                             {
                                 EmptyLineLimit = 0
                             })

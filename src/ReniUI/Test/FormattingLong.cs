@@ -4,6 +4,7 @@ using System.Linq;
 using hw.UnitTest;
 using NUnit.Framework;
 using Reni;
+using ReniUI.Formatting;
 
 namespace ReniUI.Test
 {

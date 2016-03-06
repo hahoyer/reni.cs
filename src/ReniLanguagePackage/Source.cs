@@ -6,9 +6,10 @@ using hw.Helper;
 using hw.Scanner;
 using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
-using Reni.Formatting;
+using Reni;
 using ReniUI;
 using ReniUI.Classifcation;
+using ReniUI.Formatting;
 
 namespace HoyerWare.ReniLanguagePackage
 {
@@ -24,14 +25,14 @@ namespace HoyerWare.ReniLanguagePackage
         static CompilerBrowser CreateCompilerForCache(string text)
             => CompilerBrowser.FromText
                 (
-                text: text,
-                parameters: new Reni.CompilerParameters
-                {
-                    TraceOptions =
+                    text,
+                    new CompilerParameters
                     {
-                        Parser = false
+                        TraceOptions =
+                        {
+                            Parser = false
+                        }
                     }
-                }
                 );
 
         public TokenInfo GetTokenInfo(int line, int column)
@@ -61,18 +62,18 @@ namespace HoyerWare.ReniLanguagePackage
 
             var index = line.Position;
             var i = 0;
-            while (index < line.EndPosition)
+            while(index < line.EndPosition)
             {
                 var token = Compiler.LocatePosition(index).AssertNotNull().TrimLine(line);
-                if (trace)
+                if(trace)
                     Tracer.IndentStart();
-                if (trace)
+                if(trace)
                     Tracer.Line("\n" + i + ": " + token.Token.ConvertToTokenColor());
-                if (trace)
+                if(trace)
                     Tracer.Line(token.SourcePart.NodeDump.Quote());
-                if (trace)
+                if(trace)
                     Tracer.Line("-----------------");
-                if (trace)
+                if(trace)
                     Tracer.IndentEnd();
 
                 yield return token;
@@ -124,7 +125,7 @@ namespace HoyerWare.ReniLanguagePackage
         internal void ReformatSpan(EditArray mgr, TextSpan span, IFormatter provider)
         {
             var sourcePart = Data.ToSourcePart(span);
-            var reformat = Compiler.Reformat(sourcePart, provider);
+            var reformat = Compiler.Locate(sourcePart).Reformat(sourcePart, provider);
             mgr.Add(new EditSpan(span, reformat));
             mgr.ApplyEdits();
         }

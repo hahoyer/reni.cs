@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Scanner;
 
-namespace Reni.Formatting
+namespace ReniUI.Formatting
 {
     static class LineOrientedFormatterExtension
     {

@@ -7,7 +7,7 @@ using hw.Parser;
 using hw.Scanner;
 using Reni.Parser;
 
-namespace Reni.Formatting
+namespace ReniUI.Formatting
 {
     interface IResultItem
     {

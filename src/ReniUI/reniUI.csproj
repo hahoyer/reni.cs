@@ -53,6 +53,16 @@
     <Compile Include="CompilationView\View.cs" />
     <Compile Include="CompilationView\ViewExtension.cs" />
     <Compile Include="CompilerBrowser.cs" />
+    <Compile Include="Formatting\Configuration.cs" />
+    <Compile Include="Formatting\ContactType.cs" />
+    <Compile Include="Formatting\Frame.cs" />
+    <Compile Include="Formatting\HierachicalFormatter.cs" />
+    <Compile Include="Formatting\IChainLink.cs" />
+    <Compile Include="Formatting\IFormatter.cs" />
+    <Compile Include="Formatting\Item.cs" />
+    <Compile Include="Formatting\LineOrientedFormatter.cs" />
+    <Compile Include="Formatting\LineOrientedFormatterExtension.cs" />
+    <Compile Include="Formatting\SeparatorType.cs" />
     <Compile Include="Test\BadUserInterAction.cs" />
     <Compile Include="Test\BraceMatching.cs" />
     <Compile Include="Test\ExpressionFormatting.cs" />
