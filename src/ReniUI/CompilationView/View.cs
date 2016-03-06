@@ -8,9 +8,9 @@ using hw.DebugFormatter;
 using hw.Forms;
 using JetBrains.Annotations;
 
-namespace ReniBrowser.CompilationView
+namespace ReniUI.CompilationView
 {
-    abstract class View : DumpableObject
+    public abstract class View : DumpableObject
     {
         protected readonly Form Frame;
         [UsedImplicitly]

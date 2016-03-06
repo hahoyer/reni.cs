@@ -7,7 +7,7 @@ using hw.DebugFormatter;
 using hw.Helper;
 using Microsoft.CSharp;
 
-namespace ReniBrowser.CompilationView
+namespace ReniUI.CompilationView
 {
     static class GeneratorExtension
     {

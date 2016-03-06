@@ -12,9 +12,9 @@ using Reni.Struct;
 using Reni.Type;
 using ScintillaNET;
 
-namespace ReniBrowser.CompilationView
+namespace ReniUI.CompilationView
 {
-    sealed class SourceView : MainView, ViewExtension.IClickHandler
+    public sealed class SourceView : MainView, ViewExtension.IClickHandler
     {
         int _lineNumberMarginLength;
         readonly Scintilla TextBox;
@@ -24,7 +24,7 @@ namespace ReniBrowser.CompilationView
         readonly BrowseTraceCollector TraceLog;
         readonly TraceLogView LogView;
 
-        internal SourceView(string text)
+        public SourceView(string text)
             : base("SourceView")
         {
             TextBox = new Scintilla
@@ -66,7 +66,7 @@ namespace ReniBrowser.CompilationView
                     }
                 );
 
-        internal new void Run()
+        public new void Run()
         {
             LogView.Run();
             base.Run();

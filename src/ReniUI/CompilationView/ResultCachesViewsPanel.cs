@@ -6,7 +6,7 @@ using hw.DebugFormatter;
 using Reni;
 using Reni.Context;
 
-namespace ReniBrowser.CompilationView
+namespace ReniUI.CompilationView
 {
     sealed class ResultCachesViewsPanel : DumpableObject, ViewExtension.IClickHandler
     {

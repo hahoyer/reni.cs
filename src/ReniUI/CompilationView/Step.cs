@@ -8,7 +8,7 @@ using hw.Helper;
 using Reni;
 using Reni.Code;
 
-namespace ReniBrowser.CompilationView
+namespace ReniUI.CompilationView
 {
     sealed class Step : DumpableObject
     {

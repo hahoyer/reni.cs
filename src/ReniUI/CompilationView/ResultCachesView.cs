@@ -5,7 +5,7 @@ using hw.Helper;
 using hw.Scanner;
 using Reni.Parser;
 
-namespace ReniBrowser.CompilationView
+namespace ReniUI.CompilationView
 {
     sealed class ResultCachesView : ChildView
     {

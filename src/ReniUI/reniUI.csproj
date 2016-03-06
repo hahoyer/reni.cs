@@ -1,18 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
-    <ProjectGuid>{B639A515-D066-4C12-A4C5-07DA91C19A2C}</ProjectGuid>
-    <AssemblyName>ReniBrowser</AssemblyName>
-    <TargetTypeEx>CSharp.WinExe</TargetTypeEx>
+    <ProjectGuid>{C339A515-D066-4C12-A4C5-07DA91C19A2C}</ProjectGuid>
+    <AssemblyName>ReniUI</AssemblyName>
+    <TargetTypeEx>CSharp.Library</TargetTypeEx>
   </PropertyGroup>
   <PropertyGroup>
-    <RootNamespace>ReniBrowser</RootNamespace>
+    <RootNamespace>ReniUI</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ReniUI\reniUI.csproj">
-      <Project>{C339A515-D066-4C12-A4C5-07DA91C19A2C}</Project>
-      <Name>reniUI</Name>
-    </ProjectReference>
     <Reference Include="nunit.framework, Version=3.0.5813.39031, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>..\packages\NUnit.3.0.1\lib\net45\nunit.framework.dll</HintPath>
       <Private>True</Private>
@@ -33,7 +29,29 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="MainContainer.cs" />
+    <Compile Include="CompilationView\BrowseTraceCollector.cs" />
+    <Compile Include="CompilationView\ChildView.cs" />
+    <Compile Include="CompilationView\CodeView.cs" />
+    <Compile Include="CompilationView\CodeViewVisitor.cs" />
+    <Compile Include="CompilationView\CompoundView.cs" />
+    <Compile Include="CompilationView\ContextView.cs" />
+    <Compile Include="CompilationView\EmptyTraceLogItem.cs" />
+    <Compile Include="CompilationView\FrameItem.cs" />
+    <Compile Include="CompilationView\FunctionView.cs" />
+    <Compile Include="CompilationView\GeneratorExtension.cs" />
+    <Compile Include="CompilationView\MainView.cs" />
+    <Compile Include="CompilationView\PersistenceController.cs" />
+    <Compile Include="CompilationView\ResultCachesView.cs" />
+    <Compile Include="CompilationView\ResultCachesViewsPanel.cs" />
+    <Compile Include="CompilationView\SourceView.cs" />
+    <Compile Include="CompilationView\Step.cs" />
+    <Compile Include="CompilationView\StepView.cs" />
+    <Compile Include="CompilationView\TextStyle.cs" />
+    <Compile Include="CompilationView\TraceLogItem.cs" />
+    <Compile Include="CompilationView\TraceLogView.cs" />
+    <Compile Include="CompilationView\TypeView.cs" />
+    <Compile Include="CompilationView\View.cs" />
+    <Compile Include="CompilationView\ViewExtension.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

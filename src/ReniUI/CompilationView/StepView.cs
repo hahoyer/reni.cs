@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Scanner;
 
-namespace ReniBrowser.CompilationView
+namespace ReniUI.CompilationView
 {
     sealed class StepView : ChildView
     {

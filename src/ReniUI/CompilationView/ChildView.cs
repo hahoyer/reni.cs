@@ -4,7 +4,7 @@ using System.Linq;
 using System.Windows.Forms;
 using hw.Scanner;
 
-namespace ReniBrowser.CompilationView
+namespace ReniUI.CompilationView
 {
     abstract class ChildView : View
     {

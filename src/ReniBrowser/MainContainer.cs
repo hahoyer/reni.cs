@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using Reni.FeatureTest;
-using Reni.FeatureTest.Array;
 using Reni.FeatureTest.Helper;
-using Reni.FeatureTest.Reference;
-using ReniBrowser.CompilationView;
+using ReniUI.CompilationView;
 
 namespace reniBrowser
 {

@@ -5,7 +5,7 @@ using System.Windows.Forms;
 using hw.Helper;
 using Reni.Code;
 
-namespace ReniBrowser.CompilationView
+namespace ReniUI.CompilationView
 {
     sealed class CodeViewVisitor : Visitor<Control, Control>
     {

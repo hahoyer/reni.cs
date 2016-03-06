@@ -4,7 +4,7 @@ using System.Linq;
 using hw.Scanner;
 using Reni.Context;
 
-namespace ReniBrowser.CompilationView
+namespace ReniUI.CompilationView
 {
     sealed class ContextView : ChildView
     {

@@ -6,7 +6,7 @@ using hw.DebugFormatter;
 using Reni.Code;
 using Reni.Struct;
 
-namespace ReniBrowser.CompilationView
+namespace ReniUI.CompilationView
 {
     sealed class BrowseTraceCollector : DumpableObject, ITraceCollector
     {

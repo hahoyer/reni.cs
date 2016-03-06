@@ -4,7 +4,7 @@ using System.Linq;
 using System.Windows.Forms;
 using hw.DebugFormatter;
 
-namespace ReniBrowser.CompilationView
+namespace ReniUI.CompilationView
 {
     sealed class EmptyTraceLogItem : DumpableObject, ITraceLogItem
     {

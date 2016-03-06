@@ -4,7 +4,7 @@ using System.Linq;
 using hw.DebugFormatter;
 using Reni.Struct;
 
-namespace ReniBrowser.CompilationView
+namespace ReniUI.CompilationView
 {
     sealed class FrameItem : DumpableObject
     {

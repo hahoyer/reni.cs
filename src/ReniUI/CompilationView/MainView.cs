@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace ReniBrowser.CompilationView
+namespace ReniUI.CompilationView
 {
-    abstract class MainView : View
+    public abstract class MainView : View
     {
         protected MainView(string name)
             : base(name) { Frame.FormClosing += (a, b) => Application.Exit(); }

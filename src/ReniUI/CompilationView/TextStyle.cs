@@ -8,7 +8,7 @@ using Reni;
 using Reni.UserInterface;
 using ScintillaNET;
 
-namespace ReniBrowser.CompilationView
+namespace ReniUI.CompilationView
 {
     sealed class TextStyle : EnumEx
     {

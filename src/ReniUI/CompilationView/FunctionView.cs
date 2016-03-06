@@ -4,15 +4,15 @@ using System.Linq;
 using hw.Scanner;
 using Reni.Struct;
 
-namespace ReniBrowser.CompilationView
+namespace ReniUI.CompilationView
 {
-    sealed class CompoundView : ChildView
+    sealed class FunctionView : ChildView
     {
-        public CompoundView(Compound item, SourceView master)
-            : base(master, "Compound: " + item.NodeDump)
+        public FunctionView(FunctionType item, SourceView master)
+            : base(master, "Function: " + item.NodeDump)
         {
             Client = item.CreateView(Master);
-            Source = item.GetSource();
+            Source = item.Body.SourcePart;
         }
 
         protected override SourcePart Source { get; }
