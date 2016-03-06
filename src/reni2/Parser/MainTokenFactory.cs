@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using hw.Parser;
 using hw.Scanner;
 using Reni.Formatting;
@@ -91,12 +90,14 @@ namespace Reni.Parser
         public MainTokenFactory
             (Func<ITokenFactory<SourceSyntax>, IScanner<SourceSyntax>> getScanner)
         {
-            Parser = new PrioParser<SourceSyntax>(PrioTable, getScanner(this), new LeftParenthesis(0));
+            Parser = new PrioParser<SourceSyntax>
+                (PrioTable, getScanner(this), new LeftParenthesis(0));
             _declarationSyntaxParser = new PrioParser<SourceSyntax>
                 (
                 DeclarationTokenFactory.PrioTable,
                 getScanner(new DeclarationTokenFactory())
-                , null);
+                ,
+                null);
             _declarationSyntaxSubParser = new SubParser<SourceSyntax>
                 (_declarationSyntaxParser, Pack);
         }
@@ -146,17 +147,11 @@ namespace Reni.Parser
         public override string Id => "<error>";
 
         SourceSyntax IType<SourceSyntax>.Create(SourceSyntax left, IToken token, SourceSyntax right)
-        {
-            var resultIssues = _issue.CreateIssue(token.Characters);
-            return new SourceSyntax
-                (
-                left,
-                this,
-                token,
-                right,
-                ListSyntax.Create(left?.Syntax, right?.Syntax),
-                new[] {resultIssues});
-        }
+            => new SourceSyntax(left, this, token, right, GetResult);
 
+        Checked<Syntax> GetResult(Syntax left, IToken token, Syntax right)
+            =>
+                new Checked<Syntax>
+                    (ListSyntax.Create(left, right), _issue.CreateIssue(token.Characters));
     }
 }

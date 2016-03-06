@@ -17,17 +17,18 @@ namespace Reni.Parser
         SourceSyntax IType<SourceSyntax>.Create(SourceSyntax left, IToken token, SourceSyntax right)
         {
             Tracer.Assert(right == null);
+            return new SourceSyntax(left, this, token, Value, GetResult);
+        }
 
-            var result = Value.Syntax.ExclamationSyntax(token.Characters);
+        static Checked<ExclamationSyntaxList> GetResult(Syntax left, IToken token, Syntax right)
+        {
+            var result = right.ExclamationSyntax(token.Characters);
+            if(left == null)
+                return result;
 
-            if(left != null)
-            {
-                var leftResult = left.Syntax.Combine(result.Value);
-                result = new Checked<ExclamationSyntaxList>
-                    (leftResult.Value, leftResult.Issues.plus(result.Issues));
-            }
-
-            return new SourceSyntax(left, this, token, Value, result.Value, result.Issues);
+            var leftResult = left.Combine(result.Value);
+            return new Checked<ExclamationSyntaxList>
+                (leftResult.Value, leftResult.Issues.plus(result.Issues));
         }
 
         string IType<SourceSyntax>.PrioTableId => PrioTable.Any;

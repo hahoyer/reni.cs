@@ -1,6 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
+using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
@@ -28,9 +29,7 @@ namespace Reni.TokenClasses
             try
             {
                 BreakExecution();
-                var syntax = this.Operation(left?.Syntax, token, right?.Syntax);
-                var result = new SourceSyntax(left, this, token, right, syntax.Value, syntax.Issues);
-                result.Syntax.SourcePart += result.SourcePart;
+                var result = new SourceSyntax(left, this, token, right, this.Operation);
                 return ReturnMethodDump(result);
             }
             finally

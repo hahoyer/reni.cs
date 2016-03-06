@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
+using Reni.Parser;
 using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
-    sealed class Checked<T> : DumpableObject
+    sealed class Checked<T> : DumpableObject, ISyntaxProvider
+        where T : Syntax
     {
         public Checked(T value, params Issue[] issues)
         {
@@ -27,6 +29,10 @@ namespace Reni.TokenClasses
                 return Value;
             }
         }
+
+        IEnumerable<Issue> ISyntaxProvider.Issues => Issues;
+
+        Syntax ISyntaxProvider.Value => Value;
 
         public static implicit operator Checked<T>(T value)
             => new Checked<T>(value);

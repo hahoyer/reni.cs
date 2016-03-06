@@ -14,8 +14,15 @@ namespace Reni.TokenClasses
     public sealed class SourceSyntax : DumpableObject, ISourcePart, ValueCache.IContainer
     {
         static int _nextObjectId;
-        readonly Issue[] _issues;
         SourceSyntax _parent;
+        [DisableDump]
+        readonly ISyntaxProvider SyntaxProvider;
+        internal SourceSyntax Left { get; }
+        internal ITokenClass TokenClass { get; }
+        [DisableDump]
+        internal IToken Token { get; }
+        internal SourceSyntax Right { get; }
+
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
         internal SourceSyntax
@@ -24,16 +31,14 @@ namespace Reni.TokenClasses
             ITokenClass tokenClass,
             IToken token,
             SourceSyntax right,
-            Syntax syntax,
-            Issue[] issues)
+            Func<Syntax, IToken, Syntax, ISyntaxProvider> getSyntax)
             : base(_nextObjectId++)
         {
-            Syntax = syntax;
-            _issues = issues ?? new Issue[0];
             Left = left;
             TokenClass = tokenClass;
             Token = token;
             Right = right;
+            SyntaxProvider = this.CachedValue(() => getSyntax(Left?.Syntax, Token, Right?.Syntax));
 
             if(Left != null)
                 Left.Parent = this;
@@ -43,6 +48,8 @@ namespace Reni.TokenClasses
 
             AssertValid();
         }
+
+        internal Syntax Syntax => SyntaxProvider.Value;
 
         void AssertValid() { AssertValidSourceQueue(); }
 
@@ -70,7 +77,7 @@ namespace Reni.TokenClasses
                     );
         }
 
-        internal Issue[] Issues => (Left?.Issues).plus(_issues).plus(Right?.Issues);
+        internal Issue[] Issues => (Left?.Issues).plus(SyntaxProvider.Issues).plus(Right?.Issues);
 
         [DisableDump]
         internal SourceSyntax Parent
@@ -82,14 +89,6 @@ namespace Reni.TokenClasses
                 _parent = value;
             }
         }
-
-        [DisableDump]
-        internal Syntax Syntax { get; }
-        internal SourceSyntax Left { get; }
-        internal ITokenClass TokenClass { get; }
-        [DisableDump]
-        internal IToken Token { get; }
-        internal SourceSyntax Right { get; }
 
         SourcePart ISourcePart.All => SourcePart;
 
@@ -219,7 +218,12 @@ namespace Reni.TokenClasses
                     yield return other;
             }
         }
+    }
 
+    interface ISyntaxProvider
+    {
+        IEnumerable<Issue> Issues { get; }
+        Syntax Value { get; }
     }
 
     interface IBelongingsMatcher
