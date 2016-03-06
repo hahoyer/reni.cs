@@ -114,7 +114,7 @@ namespace Reni.Code
                 if (!References.Any())
                     return ReducedBody;
 
-                var trace = ObjectId == 0;
+                var trace = ObjectId == -10;
                 StartMethodDump(trace);
                 try
                 {
