@@ -5,7 +5,7 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.UnitTest;
 
-namespace Reni.FeatureTest.UserInterface
+namespace ReniUI.Test
 {
     [UnitTest]
     public sealed class BraceMatching : DependantAttribute
@@ -15,13 +15,13 @@ namespace Reni.FeatureTest.UserInterface
         {
             const string Text = @"(1,3,4,6)";
 
-            var compiler = Compiler.BrowserFromText(Text);
+            var compiler = CompilerBrowser.FromText(Text);
 
             var open = compiler.LocatePosition(0);
             var close = compiler.LocatePosition(Text.IndexOf(")"));
 
-            var matchOpen = open.FindAllBelongings(compiler);
-            var matchClose = close.FindAllBelongings(compiler);
+            var matchOpen = compiler.FindAllBelongings(open);
+            var matchClose = compiler.FindAllBelongings(close);
 
             var pairs = matchOpen.Merge(matchClose, item => item).ToArray();
 
@@ -33,13 +33,13 @@ namespace Reni.FeatureTest.UserInterface
         {
             const string Text = @"(1,3),4,6)";
 
-            var compiler = Compiler.BrowserFromText(Text);
+            var compiler = CompilerBrowser.FromText(Text);
 
             var open = compiler.LocatePosition(0);
             var close = compiler.LocatePosition(Text.IndexOf(")"));
 
-            var matchOpen = open.FindAllBelongings(compiler);
-            var matchClose = close.FindAllBelongings(compiler);
+            var matchOpen = compiler.FindAllBelongings(open);
+            var matchClose = compiler.FindAllBelongings(close);
 
             var pairs = matchOpen.Merge(matchClose, item => item).ToArray();
 
@@ -51,13 +51,13 @@ namespace Reni.FeatureTest.UserInterface
         {
             const string Text = @"(1,3),4,6)";
 
-            var compiler = Compiler.BrowserFromText(Text);
+            var compiler = CompilerBrowser.FromText(Text);
 
-            var close = compiler.LocatePosition(Text.IndexOf(")", Text.IndexOf(")")+1));
+            var close = compiler.LocatePosition(Text.IndexOf(")", Text.IndexOf(")") + 1));
 
-            var matchClose = close.FindAllBelongings(compiler);
+            var matchClose = compiler.FindAllBelongings(close);
 
-            Tracer.Assert(matchClose.Count()==1);
+            Tracer.Assert(matchClose.Count() == 1);
         }
     }
 }

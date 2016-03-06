@@ -32,7 +32,7 @@
     <Compile Include="Code\None.cs" />
     <Compile Include="Code\ArrayAccess.cs" />
     <Compile Include="Code\UnknownStackData.cs" />
-    <Compile Include="CompilerBrowser.cs" />
+    <Compile Include="CompilerParameters.cs" />
     <Compile Include="Context\ContextReferenceType.cs" />
     <Compile Include="Context\IRootProvider.cs" />
     <Compile Include="FeatureTest\Array\ArrayFromPieces.cs" />
@@ -108,17 +108,6 @@
     <Compile Include="FeatureTest\TypeType\ApplyTypeOperatorWithCut.cs" />
     <Compile Include="FeatureTest\TypeType\TypeOperator.cs" />
     <Compile Include="FeatureTest\TypeType\TypeOperatorWithVariable.cs" />
-    <Compile Include="FeatureTest\UserInterface\BadUserInterAction.cs" />
-    <Compile Include="FeatureTest\UserInterface\BraceMatching.cs" />
-    <Compile Include="FeatureTest\UserInterface\ExpressionFormatting.cs" />
-    <Compile Include="FeatureTest\UserInterface\Formatting.cs" />
-    <Compile Include="FeatureTest\UserInterface\FormattingLong.cs" />
-    <Compile Include="FeatureTest\UserInterface\ListMatching.cs" />
-    <Compile Include="FeatureTest\UserInterface\ThenElseMatching.cs" />
-    <Compile Include="FeatureTest\UserInterface\TokenLocating.cs" />
-    <Compile Include="FeatureTest\UserInterface\UserInterAction.cs" />
-    <Compile Include="FeatureTest\UserInterface\UserInterAction2.cs" />
-    <Compile Include="FeatureTest\UserInterface\UserInterAction3.cs" />
     <Compile Include="FeatureTest\UserObjects.cs" />
     <Compile Include="FeatureTest\Validation\SyntaxError.cs" />
     <Compile Include="FeatureTest\Validation\UndefinedContextSymbol.cs" />
@@ -296,7 +285,6 @@
     <Compile Include="Code\DePointer.cs" />
     <Compile Include="Code\Visitor.cs" />
     <Compile Include="Compiler.cs" />
-    <Compile Include="CompilerParameters.cs" />
     <Compile Include="Context\Child.cs" />
     <Compile Include="Context\ContextBase.cs" />
     <Compile Include="Context\ContextOperator.cs" />
@@ -412,9 +400,6 @@
     <Compile Include="Type\TypeBase.cs" />
     <Compile Include="Type\TypeType.cs" />
     <Compile Include="Type\VoidType.cs" />
-    <Compile Include="UserInterface\SyntaxToken.cs" />
-    <Compile Include="UserInterface\Token.cs" />
-    <Compile Include="UserInterface\WhiteSpaceToken.cs" />
     <Compile Include="Validation\ConsequentialIssueType.cs" />
     <Compile Include="Validation\Issue.cs" />
     <Compile Include="Validation\IssueId.cs" />
@@ -439,8 +424,8 @@
     <None Include="sys.targets" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework, Version=3.0.5813.39031, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.3.0.1\lib\net45\nunit.framework.dll</HintPath>
+    <Reference Include="nunit.framework, Version=3.2.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.3.2.0\lib\net45\nunit.framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Core">

@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Scanner;
-using Reni.Formatting;
 using Reni.TokenClasses;
 using Reni.Validation;
 
-namespace Reni.UserInterface
+namespace ReniUI.Classifcation
 {
     sealed class SyntaxToken : Token
     {
@@ -32,7 +31,8 @@ namespace Reni.UserInterface
         [EnableDumpExcept(false)]
         public override bool IsBraceLike => TokenClass is IBelongingsMatcher;
         [EnableDumpExcept(false)]
-        public override bool IsBrace => TokenClass is LeftParenthesis || TokenClass is RightParenthesis;
+        public override bool IsBrace
+            => TokenClass is LeftParenthesis || TokenClass is RightParenthesis;
 
         [EnableDumpExcept(false)]
         public override bool IsComment

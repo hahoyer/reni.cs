@@ -4,8 +4,7 @@ using System.Drawing;
 using System.Linq;
 using hw.Helper;
 using JetBrains.Annotations;
-using Reni;
-using Reni.UserInterface;
+using ReniUI.Classifcation;
 using ScintillaNET;
 
 namespace ReniUI.CompilationView
@@ -29,26 +28,26 @@ namespace ReniUI.CompilationView
         public static readonly TextStyle Text = new TextStyle(Color.Red);
         [UsedImplicitly]
         public static readonly TextStyle Error = new TextStyle(Color.Gray, isItalic: true);
-        [UsedImplicitly]
 
-        static public TextStyle From(Token token, CompilerBrowser compiler)
+        [UsedImplicitly]
+        public static TextStyle From(Token token, CompilerBrowser compiler)
         {
-            if (token.IsError)
+            if(token.IsError)
                 return Error;
-            if (token.IsBraceLike && token.FindAllBelongings(compiler).Skip(1).Any())
+            if(token.IsBraceLike && compiler.FindAllBelongings(token).Skip(1).Any())
                 return token.IsBrace ? Brace : BraceLikeKeyWord;
-            if (token.IsKeyword)
+            if(token.IsKeyword)
                 return KeyWord;
-            if (token.IsComment || token.IsLineComment)
+            if(token.IsComment || token.IsLineComment)
                 return Comment;
-            if (token.IsNumber)
+            if(token.IsNumber)
                 return Number;
-            if (token.IsText)
+            if(token.IsText)
                 return Text;
             return Default;
         }
 
-        public static implicit operator int (TextStyle v) => v.Id;
+        public static implicit operator int(TextStyle v) => v.Id;
         public static IEnumerable<TextStyle> All => AllInstances<TextStyle>();
 
         readonly int Id;
@@ -58,7 +57,8 @@ namespace ReniUI.CompilationView
         readonly Color? BackColor;
 
         TextStyle
-            (Color foreColor,
+            (
+            Color foreColor,
             Color? backColor = null,
             bool isBold = false,
             bool isItalic = false)
@@ -75,7 +75,7 @@ namespace ReniUI.CompilationView
             style.Font = "Lucida Console";
             style.Size = 10;
             style.ForeColor = ForeColor;
-            if (BackColor != null)
+            if(BackColor != null)
                 style.BackColor = BackColor.Value;
             style.Italic = IsItalic;
             style.Bold = IsBold;

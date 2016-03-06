@@ -4,21 +4,30 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
+using Reni;
 using Reni.Code;
 using Reni.Formatting;
 using Reni.Parser;
 using Reni.Struct;
 using Reni.TokenClasses;
-using Reni.UserInterface;
+using ReniUI.Classifcation;
 
-namespace Reni
+namespace ReniUI
 {
     public sealed class CompilerBrowser : DumpableObject
     {
+        public static CompilerBrowser FromText
+            (string text, CompilerParameters parameters = null)
+            => new CompilerBrowser(Compiler.FromText(text, parameters));
+
+        public static CompilerBrowser FromFile
+            (string fileName, CompilerParameters parameters = null)
+            => new CompilerBrowser(Compiler.FromFile(fileName, parameters));
+
         readonly IDictionary<IFormalCodeItem, int> CodeToFunctionIndexCache =
             new Dictionary<IFormalCodeItem, int>();
         readonly FunctionCache<int, Token> LocateCache;
-        readonly Compiler Parent;
+        internal readonly Compiler Parent;
 
         internal CompilerBrowser(Compiler parent)
         {
@@ -126,5 +135,7 @@ namespace Reni
         internal void Ensure() => Parent.Issues.ToArray();
 
         internal void Execute(DataStack dataStack) => Parent.ExecuteFromCode(dataStack);
+
+        public IEnumerable<SourcePart> FindAllBelongings(Token open) => open.FindAllBelongings(this);
     }
 }

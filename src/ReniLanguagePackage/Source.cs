@@ -6,9 +6,9 @@ using hw.Helper;
 using hw.Scanner;
 using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
-using Reni;
 using Reni.Formatting;
-using Reni.UserInterface;
+using ReniUI;
+using ReniUI.Classifcation;
 
 namespace HoyerWare.ReniLanguagePackage
 {
@@ -22,10 +22,10 @@ namespace HoyerWare.ReniLanguagePackage
         }
 
         static CompilerBrowser CreateCompilerForCache(string text)
-            => Reni.Compiler.BrowserFromText
+            => CompilerBrowser.FromText
                 (
                 text: text,
-                parameters: new CompilerParameters
+                parameters: new Reni.CompilerParameters
                 {
                     TraceOptions =
                     {
@@ -119,7 +119,7 @@ namespace HoyerWare.ReniLanguagePackage
         }
 
         internal IEnumerable<SourcePart> BracesLike(Token current)
-            => current.FindAllBelongings(Compiler);
+            => Compiler.FindAllBelongings(current);
 
         internal void ReformatSpan(EditArray mgr, TextSpan span, IFormatter provider)
         {

@@ -5,7 +5,7 @@ using hw.Scanner;
 using Reni.Parser;
 using Reni.TokenClasses;
 
-namespace Reni.UserInterface
+namespace ReniUI.Classifcation
 {
     sealed class WhiteSpaceToken : Token
     {

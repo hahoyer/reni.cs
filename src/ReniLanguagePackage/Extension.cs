@@ -6,7 +6,7 @@ using hw.Scanner;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
-using Reni.UserInterface;
+using ReniUI.Classifcation;
 
 namespace HoyerWare.ReniLanguagePackage
 {

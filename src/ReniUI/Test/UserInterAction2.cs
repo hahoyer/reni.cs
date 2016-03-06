@@ -4,8 +4,9 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.UnitTest;
+using Reni;
 
-namespace Reni.FeatureTest.UserInterface
+namespace ReniUI.Test
 {
     [UnitTest]
     [UserInterAction]
@@ -17,7 +18,7 @@ namespace Reni.FeatureTest.UserInterface
         [UnitTest]
         public void GetTokenForPosition()
         {
-            var compiler = Compiler.BrowserFromText(text: Text);
+            var compiler = CompilerBrowser.FromText(text: Text);
 
             var typeCharacters = new string
                 (

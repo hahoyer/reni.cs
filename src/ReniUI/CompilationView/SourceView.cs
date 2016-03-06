@@ -57,7 +57,7 @@ namespace ReniUI.CompilationView
         }
 
         CompilerBrowser CreateCompilerBrowser()
-            => Reni.Compiler.BrowserFromText
+            => CompilerBrowser.FromText
                 (
                     TextBox.Text,
                     new CompilerParameters

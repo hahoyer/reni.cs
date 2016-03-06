@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using hw.Helper;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.UnitTest;
+using Reni;
 
-namespace Reni.FeatureTest.UserInterface
+namespace ReniUI.Test
 {
     [UnitTest]
     public sealed class ThenElseMatching : DependantAttribute
@@ -14,7 +14,7 @@ namespace Reni.FeatureTest.UserInterface
         public void Matching()
         {
             const string Text = @"1 then 2 else 3";
-            var compiler = Compiler.BrowserFromText(text: Text);
+            var compiler = CompilerBrowser.FromText(text: Text);
             var thenToken = compiler.LocatePosition(Text.IndexOf("then"));
             var elseToken = compiler.LocatePosition(Text.IndexOf("else"));
             Tracer.Assert(elseToken.SourceSyntax.Left == thenToken.SourceSyntax);
@@ -24,7 +24,7 @@ namespace Reni.FeatureTest.UserInterface
         public void NestedMatching()
         {
             const string Text = @"1 then 2 then 333 else 3";
-            var compiler = Compiler.BrowserFromText(text: Text);
+            var compiler = CompilerBrowser.FromText(text: Text);
             var thenToken = compiler.LocatePosition(Text.IndexOf("then"));
             var elseToken = compiler.LocatePosition(Text.IndexOf("else"));
             Tracer.Assert(elseToken.SourceSyntax.Left == thenToken.SourceSyntax);

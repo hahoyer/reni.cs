@@ -4,8 +4,9 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Scanner;
 using hw.UnitTest;
+using Reni;
 
-namespace Reni.FeatureTest.UserInterface
+namespace ReniUI.Test
 {
     [UnitTest]
     public sealed class UserInterAction : DependantAttribute
@@ -60,7 +61,7 @@ complex FromReal(2) dump_print;
         [UnitTest]
         public void GetTokenForPosition()
         {
-            var compiler = Compiler.BrowserFromText(text: text);
+            var compiler = CompilerBrowser.FromText(text: text);
             for(var i = 0; i < text.Length; i++)
             {
                 var t = compiler.LocatePosition(i);

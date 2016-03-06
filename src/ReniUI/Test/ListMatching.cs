@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using hw.Helper;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Helper;
 using hw.UnitTest;
 
-namespace Reni.FeatureTest.UserInterface
+namespace ReniUI.Test
 {
     [UnitTest]
     public sealed class ListMatching : DependantAttribute
@@ -14,9 +14,9 @@ namespace Reni.FeatureTest.UserInterface
         public void Matching()
         {
             const string Text = @"(1,3,4,6)";
-            var compiler = Compiler.BrowserFromText(text: Text);
+            var compiler = CompilerBrowser.FromText(Text);
             var comma = compiler.LocatePosition(2);
-            var commas = comma.FindAllBelongings(compiler).ToArray();
+            var commas = compiler.FindAllBelongings(comma).ToArray();
             Tracer.Assert(commas.Length == 3);
         }
 
@@ -24,7 +24,7 @@ namespace Reni.FeatureTest.UserInterface
         public void CombinationsOfMatching()
         {
             const string Text = @"(1,3,4,6)";
-            var compiler = Compiler.BrowserFromText(text: Text);
+            var compiler = CompilerBrowser.FromText(Text);
 
             var commas = Text
                 .Select
@@ -35,7 +35,8 @@ namespace Reni.FeatureTest.UserInterface
                         index
                     })
                 .Where(item => item.item == ',')
-                .Select(item => compiler.LocatePosition(item.index).FindAllBelongings(compiler).ToArray())
+                .Select
+                (item => compiler.FindAllBelongings(compiler.LocatePosition(item.index)).ToArray())
                 .ToArray();
 
             Tracer.Assert(commas.Length == 3);
@@ -52,7 +53,7 @@ namespace Reni.FeatureTest.UserInterface
         public void MixedMatching()
         {
             const string Text = @"(1,3,4;2,6)";
-            var compiler = Compiler.BrowserFromText(text: Text);
+            var compiler = CompilerBrowser.FromText(Text);
 
             var commas = Text
                 .Select
@@ -63,7 +64,8 @@ namespace Reni.FeatureTest.UserInterface
                         index
                     })
                 .Where(item => item.item == ',')
-                .Select(item => compiler.LocatePosition(item.index).FindAllBelongings(compiler).ToArray())
+                .Select
+                (item => compiler.FindAllBelongings(compiler.LocatePosition(item.index)).ToArray())
                 .ToArray();
 
             Tracer.Assert(commas.Length == 3);

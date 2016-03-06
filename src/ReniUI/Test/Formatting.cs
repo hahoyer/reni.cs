@@ -6,9 +6,10 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.UnitTest;
 using NUnit.Framework;
+using Reni;
 using Reni.Formatting;
 
-namespace Reni.FeatureTest.UserInterface
+namespace ReniUI.Test
 {
     [UnitTest]
     [TestFixture]
@@ -26,7 +27,7 @@ namespace Reni.FeatureTest.UserInterface
         public void SimpleLineCommentFromSourcePart()
         {
             const string Text = @"(1,3,4,6)";
-            var compiler = Compiler.BrowserFromText(Text);
+            var compiler = CompilerBrowser.FromText(Text);
             var span = compiler.Source.All;
             var trimmed = compiler.Locate(span).Reformat(span);
 
@@ -39,7 +40,7 @@ namespace Reni.FeatureTest.UserInterface
         {
             const string Text = @"( # Comment
 1,3,4,6)";
-            var compiler = Compiler.BrowserFromText(Text);
+            var compiler = CompilerBrowser.FromText(Text);
             var span = (compiler.Source + 2).Span(3);
             var trimmed = compiler.Locate(span).Reformat(span);
 
@@ -52,7 +53,7 @@ namespace Reni.FeatureTest.UserInterface
         {
             const string Text = @"( #(aa Comment aa)#
 1,3,4,6)";
-            var compiler = Compiler.BrowserFromText(Text);
+            var compiler = CompilerBrowser.FromText(Text);
             var span = (compiler.Source + 2).Span(3);
             var reformat = compiler.Locate(span).Reformat(span);
             Tracer.Assert(reformat == "#(a", reformat);
@@ -82,7 +83,7 @@ namespace Reni.FeatureTest.UserInterface
 (Text('H') << 'allo') dump_print";
 
 
-            var compiler = Compiler.BrowserFromText(Text);
+            var compiler = CompilerBrowser.FromText(Text);
             var newSource = compiler.Reformat
                 (
                     FormatterExtension.Create
@@ -125,7 +126,7 @@ namespace Reni.FeatureTest.UserInterface
     );
             ";
 
-            var compiler = Compiler.BrowserFromText(Text);
+            var compiler = CompilerBrowser.FromText(Text);
             var newSource = compiler.Reformat
                 (
                     FormatterExtension.Create
@@ -149,11 +150,11 @@ namespace Reni.FeatureTest.UserInterface
                 .GetFileName()
                 .FileHandle()
                 .DirectoryName
-                + @"\..\..\..";
+                + @"\..\..";
             var fileName = srcDir + @"\renisource\test.reni";
             var file = fileName.FileHandle();
             Tracer.Line(Tracer.FilePosn(fileName, 0, 0, "see there"));
-            var compiler = Compiler.BrowserFromFile(fileName);
+            var compiler = CompilerBrowser.FromFile(fileName);
             var source = compiler.Source.All;
             var newSource = compiler.Reformat
                 (

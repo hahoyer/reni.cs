@@ -26,19 +26,11 @@ namespace Reni
         static IScanner<SourceSyntax> Scanner(ITokenFactory<SourceSyntax> tokenFactory)
             => new Scanner<SourceSyntax>(Lexer.Instance, tokenFactory);
 
-        public static CompilerBrowser BrowserFromText
-            (string text, CompilerParameters parameters = null)
-            => new CompilerBrowser(new Compiler(text: text, parameters: parameters));
-
-        public static CompilerBrowser BrowserFromFile
-            (string fileName, CompilerParameters parameters = null)
-            => new CompilerBrowser(FromFile(fileName, parameters));
-
-        public static Compiler FromFile(string fileName, CompilerParameters parameters)
+        public static Compiler FromFile(string fileName, CompilerParameters parameters = null)
             => new Compiler(fileName, parameters);
 
-        internal static Compiler FromFile(string fileName) => new Compiler(fileName);
-        public static Compiler FromText(string text) => new Compiler(text: text);
+        public static Compiler FromText(string text, CompilerParameters parameters = null)
+            => new Compiler(text: text, parameters: parameters);
 
         readonly MainTokenFactory _tokenFactory;
         readonly CompilerParameters _parameters;
@@ -290,6 +282,10 @@ namespace Reni
 
         CodeBase IExecutionContext.Function(FunctionId functionId)
             => CodeContainer.Function(functionId);
+
+        internal IEnumerable<SourceSyntax> FindAllBelongings(SourceSyntax sourceSyntax)
+            => SourceSyntax.Belongings(sourceSyntax);
+
     }
 
     public sealed class TraceCollector : DumpableObject, ITraceCollector
@@ -311,7 +307,7 @@ namespace Reni
 
         void ITraceCollector.Call(StackData argsAndRefs, FunctionId functionId)
         {
-            Tracer.Line("\n>>>>>> Call"+ functionId.NodeDump +"\n");
+            Tracer.Line("\n>>>>>> Call" + functionId.NodeDump + "\n");
             Tracer.IndentStart();
         }
 

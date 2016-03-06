@@ -5,7 +5,7 @@ using hw.DebugFormatter;
 using hw.Scanner;
 using hw.UnitTest;
 
-namespace Reni.FeatureTest.UserInterface
+namespace ReniUI.Test
 {
     [UnitTest]
     public sealed class BadUserInterAction : DependantAttribute
@@ -28,7 +28,7 @@ repeat: /\ ^ while() then(^ body(), repeat(^));
         [UnitTest]
         public void GetTokenForPosition()
         {
-            var compiler = Compiler.BrowserFromText(text: text);
+            var compiler = CompilerBrowser.FromText(text);
             for(var i = 0; i < text.Length; i++)
             {
                 var t = compiler.LocatePosition(i);

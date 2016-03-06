@@ -13,6 +13,7 @@ using Reni.FeatureTest.Helper;
 using Reni.FeatureTest.TypeType;
 using Reni.ParserTest;
 using Reni.Runtime;
+using ReniUI;
 
 namespace ReniTest
 {
@@ -36,6 +37,9 @@ namespace ReniTest
 
         const string Target = @"f: /\ ^(); x: 1; f(/\x) dump_print";
         const string Output = "1";
+
+        // Keep this to ensure reference to ReniUI
+        static void BrowseCompiler(CompilerBrowser compiler) { }
 
         static void InspectCompiler(CompilerTest compiler)
         {

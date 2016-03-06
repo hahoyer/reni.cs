@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.UnitTest;
 using NUnit.Framework;
+using Reni;
 
-namespace Reni.FeatureTest.UserInterface
+namespace ReniUI.Test
 {
     [UnitTest]
     [TestFixture]

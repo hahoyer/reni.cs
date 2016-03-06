@@ -5,7 +5,7 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 using Microsoft.VisualStudio.Package;
-using Reni.UserInterface;
+using ReniUI.Classifcation;
 
 namespace HoyerWare.ReniLanguagePackage
 {
@@ -28,10 +28,7 @@ namespace HoyerWare.ReniLanguagePackage
 
         Token Current => _currenCache.Value;
 
-        internal void Scanning()
-        {
-            ScanBraces();
-        }
+        internal void Scanning() { ScanBraces(); }
 
         void ScanBraces()
         {
