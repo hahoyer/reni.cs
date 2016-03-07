@@ -8,7 +8,7 @@ using hw.DebugFormatter;
 using hw.Forms;
 using JetBrains.Annotations;
 
-namespace ReniUI.CompilationView
+namespace ReniUI
 {
     public abstract class View : DumpableObject
     {
@@ -32,7 +32,10 @@ namespace ReniUI.CompilationView
             };
         }
 
-        protected virtual string GetFileName() { return Frame.Text.Select(ToValidFileChar).Aggregate("", (c, n) => c + n); }
+        protected virtual string GetFileName()
+        {
+            return Frame.Text.Select(ToValidFileChar).Aggregate("", (c, n) => c + n);
+        }
 
         static string ToValidFileChar(char c)
         {

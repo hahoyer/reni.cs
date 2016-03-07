@@ -33,7 +33,7 @@ namespace ReniUI.CompilationView
                 VirtualSpaceOptions = VirtualSpace.UserAccessible
             };
 
-            foreach(var id in TextStyle.All)
+            foreach (var id in TextStyle.All)
                 StyleConfig(id);
 
             TextBox.StyleNeeded += (s, args) => SignalStyleNeeded(args.Position);
@@ -117,7 +117,7 @@ namespace ReniUI.CompilationView
         {
             var menuItems = TextBox.ContextMenu.MenuItems;
 
-            while(menuItems.Count > 0)
+            while (menuItems.Count > 0)
                 menuItems.RemoveAt(0);
 
             Compiler.Ensure();
@@ -136,7 +136,7 @@ namespace ReniUI.CompilationView
         {
             var text = syntax.GetType().PrettyName() + " " + syntax.ObjectId;
 
-            if(syntax.ResultCache.Count > 1)
+            if (syntax.ResultCache.Count > 1)
                 text += " (" + syntax.ResultCache.Count + ")";
 
             var menuItem = new MenuItem
@@ -156,7 +156,7 @@ namespace ReniUI.CompilationView
             StartMethodDump(trace, position);
             try
             {
-                while(TextBox.GetEndStyled() < position)
+                while (TextBox.GetEndStyled() < position)
                 {
                     var current = TextBox.GetEndStyled();
                     var tokens = Compiler.LocatePosition(current);
@@ -178,7 +178,7 @@ namespace ReniUI.CompilationView
             get { return _lineNumberMarginLength; }
             set
             {
-                if(_lineNumberMarginLength == value)
+                if (_lineNumberMarginLength == value)
                     return;
 
                 _lineNumberMarginLength = value;
@@ -198,7 +198,7 @@ namespace ReniUI.CompilationView
 
         internal void SelectSource(SourcePart source)
         {
-            if(source == null)
+            if (source == null)
                 return;
             TextBox.SetSelection(source.Position, source.EndPosition);
         }
@@ -229,7 +229,6 @@ namespace ReniUI.CompilationView
         internal void SignalClickedStep(Step target)
             => SignalClickedObject(target);
     }
-
     interface ITraceLogItem
     {
         Control CreateLink();

@@ -39,7 +39,6 @@
     <Compile Include="CompilationView\FrameItem.cs" />
     <Compile Include="CompilationView\FunctionView.cs" />
     <Compile Include="CompilationView\GeneratorExtension.cs" />
-    <Compile Include="CompilationView\MainView.cs" />
     <Compile Include="CompilationView\PersistenceController.cs" />
     <Compile Include="CompilationView\ResultCachesView.cs" />
     <Compile Include="CompilationView\ResultCachesViewsPanel.cs" />
@@ -50,9 +49,9 @@
     <Compile Include="CompilationView\TraceLogItem.cs" />
     <Compile Include="CompilationView\TraceLogView.cs" />
     <Compile Include="CompilationView\TypeView.cs" />
-    <Compile Include="CompilationView\View.cs" />
     <Compile Include="CompilationView\ViewExtension.cs" />
     <Compile Include="CompilerBrowser.cs" />
+    <Compile Include="EditorView.cs" />
     <Compile Include="Formatting\Configuration.cs" />
     <Compile Include="Formatting\ContactType.cs" />
     <Compile Include="Formatting\Frame.cs" />
@@ -62,6 +61,7 @@
     <Compile Include="Formatting\Item.cs" />
     <Compile Include="Formatting\LineOrientedFormatter.cs" />
     <Compile Include="Formatting\SeparatorType.cs" />
+    <Compile Include="MainView.cs" />
     <Compile Include="Test\BadUserInterAction.cs" />
     <Compile Include="Test\BraceMatching.cs" />
     <Compile Include="Test\ExpressionFormatting.cs" />
@@ -76,6 +76,7 @@
     <Compile Include="Classifcation\SyntaxToken.cs" />
     <Compile Include="Classifcation\Token.cs" />
     <Compile Include="Classifcation\WhiteSpaceToken.cs" />
+    <Compile Include="View.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

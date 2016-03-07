@@ -1,0 +1,25 @@
+﻿<#@ template debug="true" hostSpecific="true" #>
+<#@ output extension=".cs" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#
+    const string Title = "Developer Studio";
+    const string Description = Title;
+    const string Product = "Reni Compiler";
+    const string Company = "HoyerWare";
+    var major = DateTime.Today.ToString("yy");
+    const int Minor = 0;
+    const int Build = 0;
+    const int Revision = 0;
+    var versionString = major + "." + Minor + "." + Build + "." + Revision;
+    #>
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+
+[assembly: AssemblyVersion("<#=versionString #>")]
+[assembly: AssemblyDescription("<#=Description #>")]
+[assembly: AssemblyFileVersion("<#=versionString #>")]
+[assembly: AssemblyTitle("<#=Product #>: <#=Title #>")]
+[assembly: AssemblyCompany("<#=Company #>")]
+[assembly: AssemblyProduct("<#=Product #>")]
+[assembly: AssemblyCopyright("Copyright © Harald Hoyer <#=DateTime.Today.ToString("yyyy") #>")]

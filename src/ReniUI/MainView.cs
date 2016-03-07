@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace ReniUI.CompilationView
+namespace ReniUI
 {
     public abstract class MainView : View
     {
