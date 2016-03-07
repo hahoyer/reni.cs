@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using hw.Helper;
@@ -18,7 +19,7 @@ namespace ReniUI
         readonly string FileName;
 
         public EditorView(string fileName)
-            : base(fileName)
+            : base(fileName, Path.Combine("StudioConfig", fileName, "Editor", "Position"))
         {
             FileName = fileName;
             TextBox = new Scintilla
@@ -67,7 +68,7 @@ namespace ReniUI
         {
             var menuItems = TextBox.ContextMenu.MenuItems;
 
-            while (menuItems.Count > 0)
+            while(menuItems.Count > 0)
                 menuItems.RemoveAt(0);
 
             Compiler.Ensure();
@@ -75,7 +76,6 @@ namespace ReniUI
             var p = TextBox.CurrentPosition;
 
             var compileSyntaxs = Compiler.FindPosition(p);
-        
         }
 
         void SignalContextMenuSelect(Syntax syntax)
@@ -89,7 +89,7 @@ namespace ReniUI
             StartMethodDump(trace, position);
             try
             {
-                while (TextBox.GetEndStyled() < position)
+                while(TextBox.GetEndStyled() < position)
                 {
                     var current = TextBox.GetEndStyled();
                     var tokens = Compiler.LocatePosition(current);
@@ -111,7 +111,7 @@ namespace ReniUI
             get { return _lineNumberMarginLength; }
             set
             {
-                if (_lineNumberMarginLength == value)
+                if(_lineNumberMarginLength == value)
                     return;
 
                 _lineNumberMarginLength = value;
@@ -121,6 +121,5 @@ namespace ReniUI
                         + Padding;
             }
         }
-
     }
 }

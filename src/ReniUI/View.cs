@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows.Forms;
 using hw.DebugFormatter;
 using hw.Forms;
+using hw.Helper;
 using JetBrains.Annotations;
 
 namespace ReniUI
@@ -16,7 +17,7 @@ namespace ReniUI
         [UsedImplicitly]
         PositionConfig PositionConfig;
 
-        protected View(string name)
+        protected View(string name, string configFileName = null)
         {
             Frame = new Form
             {
@@ -26,16 +27,17 @@ namespace ReniUI
 
             Frame.Closing += OnClosing;
 
-            PositionConfig = new PositionConfig(GetFileName)
+            if(configFileName == null)
+                configFileName = GetFileName();
+            configFileName.FileHandle().AssumeDirectoryOfFileExists();
+
+            PositionConfig = new PositionConfig(()=> configFileName)
             {
                 Target = Frame
             };
         }
 
-        protected virtual string GetFileName()
-        {
-            return Frame.Text.Select(ToValidFileChar).Aggregate("", (c, n) => c + n);
-        }
+        string GetFileName() => Frame.Text.Select(ToValidFileChar).Aggregate("", (c, n) => c + n);
 
         static string ToValidFileChar(char c)
         {

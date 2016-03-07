@@ -10,8 +10,8 @@ namespace ReniUI.CompilationView
     {
         protected readonly SourceView Master;
 
-        protected ChildView(SourceView master, string name)
-            : base(name)
+        protected ChildView(SourceView master, string name, string configFileName = null)
+            : base(name, configFileName)
         {
             Master = master;
             Master.Register(Frame);
