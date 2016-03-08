@@ -29,6 +29,11 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
+    <Compile Include="ChildView.cs" />
+    <Compile Include="Commands\Extension.cs" />
+    <Compile Include="Commands\Menu.cs" />
+    <Compile Include="Commands\MenuEntry.cs" />
+    <Compile Include="Commands\MenuItem.cs" />
     <Compile Include="CompilationView\BrowseTraceCollector.cs" />
     <Compile Include="CompilationView\ChildView.cs" />
     <Compile Include="CompilationView\CodeView.cs" />
@@ -84,6 +89,7 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include=".gitignore" />
     <Content Include="AssemblyInfo.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>AssemblyInfo.cs</LastGenOutput>

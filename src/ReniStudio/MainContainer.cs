@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using hw.DebugFormatter;
 using ReniUI;
 
 namespace ReniStudio
@@ -11,9 +10,12 @@ namespace ReniStudio
     {
         public static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            new EditorView("test.reni").Run();
+            System.Windows.Forms.Application.EnableVisualStyles();
+            System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
+            var master = new Application();
+
+            new EditorView("test.reni", master).Run();
+            System.Windows.Forms.Application.Run(master);
         }
     }
 }

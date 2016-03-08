@@ -73,7 +73,7 @@ namespace ReniUI.CompilationView
         internal void Config(Style style)
         {
             style.Font = "Lucida Console";
-            style.Size = 10;
+            style.SizeF = 8;
             style.ForeColor = ForeColor;
             if(BackColor != null)
                 style.BackColor = BackColor.Value;

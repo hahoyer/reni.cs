@@ -6,22 +6,33 @@ using System.Windows.Forms;
 using hw.Helper;
 using Reni;
 using Reni.Parser;
+using ReniUI.Commands;
 using ReniUI.CompilationView;
 using ScintillaNET;
 
 namespace ReniUI
 {
-    public sealed class EditorView : MainView
+    public sealed class EditorView : ChildView
     {
+        const string ConfigRoot = "StudioConfig";
+        static readonly TimeSpan DelayForSave = TimeSpan.FromSeconds(1);
+        static readonly TimeSpan NoPeriodicalActivation = TimeSpan.FromMilliseconds(-1);
+
         int _lineNumberMarginLength;
         readonly Scintilla TextBox;
         readonly ValueCache<CompilerBrowser> CompilerCache;
         readonly string FileName;
+        internal readonly IStudioApplication Master;
+        SaveManager _saveManager;
 
-        public EditorView(string fileName)
-            : base(fileName, Path.Combine("StudioConfig", fileName, "Editor", "Position"))
+        public EditorView(string fileName, IStudioApplication master)
+            : base(
+                master,
+                Path.Combine(ConfigRoot, "EditorFiles", fileName, "Editor", "Position")
+                )
         {
             FileName = fileName;
+            Master = master;
             TextBox = new Scintilla
             {
                 Lexer = ScintillaNET.Lexer.Container,
@@ -42,6 +53,45 @@ namespace ReniUI
             Client = TextBox;
 
             TextBox.Text = FileName.FileHandle().String;
+            TextBox.SetSavePoint();
+            AlignTitle();
+            TextBox.TextChanged += (s, args) => RunSaveManager();
+
+            Frame.Menu = this.CreateMainMenu();
+        }
+
+        void RunSaveManager()
+        {
+            AlignTitle();
+            if(_saveManager == null)
+                _saveManager = new SaveManager(this);
+            _saveManager.Start();
+        }
+
+        sealed class SaveManager
+        {
+            readonly EditorView Parent;
+            readonly System.Threading.Timer Timer;
+
+            public SaveManager(EditorView parent)
+            {
+                Parent = parent;
+                Timer = new System.Threading.Timer(Execute);
+            }
+
+            void Execute(object state) => InvokeAsynchron(Parent.SaveFile) ;
+
+            void InvokeAsynchron(Action action) => Parent.Frame.InvokeAsynchron(action);
+
+            public void Start() => Timer.Change(DelayForSave, NoPeriodicalActivation);
+        }
+
+        void SaveFile()
+        {
+            _saveManager = null;
+            FileName.FileHandle().String = TextBox.Text;
+            TextBox.SetSavePoint();
+            AlignTitle();
         }
 
         CompilerBrowser CreateCompilerBrowser()
@@ -63,6 +113,8 @@ namespace ReniUI
             LinenumberMarginLength = TextBox.Lines.Count.ToString().Length;
             CompilerCache.IsValid = false;
         }
+
+        void AlignTitle() { Title = FileName + (TextBox.Modified ? "*" : ""); }
 
         void OnContextMenuPopup()
         {
@@ -121,5 +173,7 @@ namespace ReniUI
                         + Padding;
             }
         }
+
+        public void Open() { NotImplementedMethod(); }
     }
 }

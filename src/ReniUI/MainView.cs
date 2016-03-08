@@ -5,12 +5,32 @@ using System.Windows.Forms;
 
 namespace ReniUI
 {
-    public abstract class MainView : View
+    public abstract class MainView : View, IApplication
     {
-        protected MainView(string name, string configFileName = null)
-            : base(name, configFileName) { Frame.FormClosing += (a, b) => Application.Exit(); }
+        readonly ApplicationContext Context;
 
-        internal void Register(Form child) { Frame.Closing += (a, s) => child.Close(); }
-        internal void Run() => Application.Run(Frame);
+        protected MainView(string name, string configFileName = null)
+            : base(configFileName)
+        {
+            Context = new ApplicationContext(Frame);
+            Title = name;
+            Frame.FormClosing += (a, b) => Application.Exit();
+        }
+
+        void IApplication.Register(Form child) { Frame.Closing += (a, s) => child.Close(); }
+
+        internal void Run() => Application.Run(Context);
+
+    }
+
+    public interface IApplication
+    {
+        void Register(Form frame);
+    }
+
+    public interface IStudioApplication: IApplication
+    {
+        void Exit();
+        void New();
     }
 }

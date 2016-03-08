@@ -17,12 +17,12 @@ namespace ReniUI
         [UsedImplicitly]
         PositionConfig PositionConfig;
 
-        protected View(string name, string configFileName = null)
+        protected View(string configFileName = null)
         {
             Frame = new Form
             {
-                Name = name,
-                Text = name
+                Name = "Frame",
+                Text = "?"
             };
 
             Frame.Closing += OnClosing;
@@ -36,6 +36,8 @@ namespace ReniUI
                 Target = Frame
             };
         }
+
+        internal string Title { get { return Frame.Text; } set { Frame.Text = value; } }
 
         string GetFileName() => Frame.Text.Select(ToValidFileChar).Aggregate("", (c, n) => c + n);
 
