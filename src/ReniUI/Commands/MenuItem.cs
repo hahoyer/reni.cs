@@ -23,6 +23,12 @@ namespace ReniUI.Commands
             = new CommandHandler<IStudioApplication>(s => s.Exit(), s => true, "Exit");
         public static ICommandHandler<EditorView> Open { get; }
             = new CommandHandler<EditorView>(s => s.Open(), s => true, "Open");
+
+        public static ICommandHandler<EditorView> FormatAll { get; }
+            = new CommandHandler<EditorView>(s => s.FormatAll(), s => true, "FormatAll");
+        public static ICommandHandler<EditorView> FormatSelection { get; }
+            = new CommandHandler<EditorView>
+                (s => s.FormatSelection(), s => s.HasSelection(), "FormatSelection");
     }
 
     sealed class CommandHandler<T> : DumpableObject, ICommandHandler<T>

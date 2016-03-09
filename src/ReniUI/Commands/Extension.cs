@@ -23,7 +23,17 @@ namespace ReniUI.Commands
                         Command.New.MenuItem(target.Master),
                         Command.Exit.MenuItem(target.Master)
                     }
+                }       ,
+                new Menu("Edit")
+                {
+                    Entries = new[]
+                    {
+                        Command.FormatAll.MenuItem(target),
+                        Command.FormatSelection.MenuItem(target),
+                        Command.Exit.MenuItem(target.Master)
+                    }
                 }
+
             };
 
             var menuStrip = new MainMenu();

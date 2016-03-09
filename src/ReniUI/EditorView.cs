@@ -8,6 +8,7 @@ using Reni;
 using Reni.Parser;
 using ReniUI.Commands;
 using ReniUI.CompilationView;
+using ReniUI.Formatting;
 using ScintillaNET;
 
 namespace ReniUI
@@ -36,8 +37,10 @@ namespace ReniUI
             TextBox = new Scintilla
             {
                 Lexer = ScintillaNET.Lexer.Container,
-                VirtualSpaceOptions = VirtualSpace.UserAccessible
+                VirtualSpaceOptions = VirtualSpace.UserAccessible,
             };
+
+            TextBox.ClearCmdKey(Keys.Insert);
 
             foreach(var id in TextStyle.All)
                 StyleConfig(id);
@@ -175,5 +178,20 @@ namespace ReniUI
         }
 
         public void Open() { NotImplementedMethod(); }
+
+        public void FormatAll()
+        {
+            var sourcePart = Compiler.Source.All;
+            var reformat = Compiler.Locate(sourcePart).GetEditPieces(sourcePart).ToArray();
+            NotImplementedMethod();
+        }
+
+        public void FormatSelection()
+        {
+            NotImplementedMethod();
+
+        }
+
+        public bool HasSelection() => TextBox.SelectedText != "";
     }
 }

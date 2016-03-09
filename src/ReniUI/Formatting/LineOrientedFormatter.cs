@@ -41,6 +41,12 @@ namespace ReniUI.Formatting
             return result;
         }
 
+        IEnumerable<EditPiece> IFormatter.GetEditPieces(SourceSyntax target, SourcePart targetPart)
+        {
+            NotImplementedMethod(target, targetPart);
+            return null;
+        }
+
         IEnumerable<Line> LineBreaker(Line arg)
         {
             NotImplementedMethod();

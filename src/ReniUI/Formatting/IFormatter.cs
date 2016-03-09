@@ -9,6 +9,7 @@ namespace ReniUI.Formatting
     public interface IFormatter
     {
         string Reformat(SourceSyntax target, SourcePart part);
+        IEnumerable<EditPiece> GetEditPieces(SourceSyntax target, SourcePart targetPart);
     }
 
     public static class FormatterExtension
@@ -19,6 +20,11 @@ namespace ReniUI.Formatting
         public static string Reformat(this SourceSyntax syntax, SourcePart sourcePart, IFormatter formatter = null)
             =>
                 (formatter ?? new Configuration().Create()).Reformat
+                    (syntax, sourcePart);
+
+        internal static IEnumerable<EditPiece> GetEditPieces(this SourceSyntax syntax, SourcePart sourcePart, IFormatter formatter = null)
+            =>
+                (formatter ?? new Configuration().Create()).GetEditPieces
                     (syntax, sourcePart);
 
         internal static int Length(this LineOrientedFormatter.Item2 item)

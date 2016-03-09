@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using hw.Parser;
 using hw.Scanner;
-using Reni.Parser;
 
 namespace ReniUI.Formatting
 {
@@ -80,11 +78,11 @@ namespace ReniUI.Formatting
 
         IEnumerable<IResultItem> IResultItem.CombineBack(string left)
         {
-            if (left == Data.Id)
-                return new[] { new SourceItem(Data) };
+            if(left == Data.Id)
+                return new[] {new SourceItem(Data)};
 
 
-            if (left.EndsWith(Data.Id))
+            if(left.EndsWith(Data.Id))
                 return new IResultItem[]
                 {
                     new TextItem(left.Substring(0, left.Length - Data.Length)),
@@ -207,6 +205,68 @@ namespace ReniUI.Formatting
             return result;
         }
 
+        internal IEnumerable<EditPiece> GetEditPieces(SourcePart targetPart = null)
+        {
+            if(targetPart == null)
+                yield break;
+
+            IEnumerable<IResultItem> data = Data;
+
+            var start = Data.IndexWhere(item => item is SourceItem && item.Overlapps(targetPart));
+            if(start != null)
+                data = Data.Skip(start.Value);
+
+            var f = (SourceItem) data.FirstOrDefault();
+            if(f == null)
+                yield break;
+
+            var newText = "";
+            var removeCount = 0;
+
+            foreach(var item in data)
+            {
+                var t = item as TextItem;
+                if(t != null)
+                    newText += item.Text;
+
+                var s = item as SourceItem;
+                if(s != null)
+                {
+                    if(newText != "" || removeCount > 0)
+                    {
+                        yield return new EditPiece
+                        {
+                            NewText = newText,
+                            RemoveCount = removeCount,
+                            Position = s.Data.Position
+                        };
+                        newText = "";
+                        removeCount = 0;
+                    }
+
+                    if(targetPart.EndPosition <= s.Data.Position)
+                        yield break;
+                }
+
+                var h = item as HiddenSourceItem;
+                if(h != null && h.Data.Id != "\r")
+                {
+                    removeCount += h.Data.Length;
+                    if(newText != "" || removeCount > 0)
+                    {
+                        yield return new EditPiece
+                        {
+                            NewText = newText,
+                            RemoveCount = removeCount,
+                            Position = h.Data.Position
+                        };
+                        newText = "";
+                        removeCount = 0;
+                    }
+                }
+            }
+        }
+
         string Text { get { return Data.Aggregate("", (c, n) => c + n.Text); } }
 
         protected override string GetNodeDump() => Data.Count + "->" + Text + "<-";
@@ -219,42 +279,10 @@ namespace ReniUI.Formatting
         public override string ToString() => Text;
     }
 
-
-    sealed class Item : DumpableObject
+    public sealed class EditPiece: DumpableObject
     {
-        internal readonly string WhiteSpaces;
-        internal readonly IToken Token;
-
-        internal Item(string whiteSpaces, IToken token = null)
-        {
-            Token = token;
-            WhiteSpaces = whiteSpaces;
-            //Tracer.ConditionalBreak(Id == ";");
-        }
-
-        internal string Id => WhiteSpaces + (Token?.Id ?? "");
-        internal int Length => Id.Length;
-
-        protected override string GetNodeDump() => base.GetNodeDump() + " " + Id.Quote();
-
-        internal string Filter(SourcePart targetPart)
-            => FilterPrefix(targetPart) + FilterToken(targetPart);
-
-        string FilterToken(SourcePart targetPart)
-            => Token.Characters.Intersect(targetPart)?.Id ?? "";
-
-        string FilterPrefix(SourcePart targetPart)
-        {
-            var sourcePart = Token.PrefixCharacters();
-            var toUse = targetPart.Intersect(sourcePart);
-            if(toUse == null)
-                return "";
-
-            var result = WhiteSpaces;
-            var length = result.Length + toUse.Length - sourcePart.Length;
-            return length <= 0
-                ? ""
-                : result.Substring(toUse.Position - sourcePart.Position, length);
-        }
+        internal int Position;
+        internal int RemoveCount;
+        internal string NewText;
     }
 }

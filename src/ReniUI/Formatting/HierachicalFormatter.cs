@@ -20,6 +20,9 @@ namespace ReniUI.Formatting
         string IFormatter.Reformat(SourceSyntax target, SourcePart targetPart)
             => Frame.Create(target, this).ItemsForResult.Format(targetPart);
 
+        IEnumerable<EditPiece> IFormatter.GetEditPieces(SourceSyntax target, SourcePart targetPart)
+            => Frame.Create(target, this).ItemsForResult.GetEditPieces(targetPart);
+
         bool IsRelevantLineBreak(int emptyLines, ITokenClass tokenClass)
         {
             if(Configuration.EmptyLineLimit == null)
