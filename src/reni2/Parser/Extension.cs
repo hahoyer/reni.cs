@@ -69,8 +69,11 @@ namespace Reni.Parser
         internal static bool IsNonComment(this WhiteSpaceToken item)
             => !IsComment(item);
 
-        static bool IsComment(WhiteSpaceToken item)
+        internal static bool IsComment(this WhiteSpaceToken item)
             => Lexer.IsComment(item) || Lexer.IsLineComment(item);
+
+        internal static bool IsLineBreak(this WhiteSpaceToken item)
+            => Lexer.IsLineEnd(item) ;
 
         public static int Length(this IEnumerable<WhiteSpaceToken> whiteSpaceTokens)
             => whiteSpaceTokens.Sum(item => item.Characters.Id.Length);

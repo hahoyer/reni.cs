@@ -16,7 +16,7 @@ namespace ReniUI.Formatting
     static class SeparatorType
     {
         static readonly ISeparatorType Contact = new ConcatType("");
-        static readonly ISeparatorType Close = new ConcatType(" ");
+        internal static readonly ISeparatorType Close = new ConcatType(" ");
 
         [DebuggerDisplay("{Separator}")]
         sealed class ConcatType : DumpableObject, ISeparatorType

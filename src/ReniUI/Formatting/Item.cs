@@ -1,99 +1,167 @@
 using System;
 using System.Collections.Generic;
+using hw.Helper;
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Helper;
+using hw.Parser;
 using hw.Scanner;
+using Reni.Parser;
 
 namespace ReniUI.Formatting
 {
+    interface ISourceItem
+    {
+        [DisableDump]
+        SourcePart Data { get; }
+    }
+
     interface IResultItem
     {
+        [DisableDump]
         string Text { get; }
         IEnumerable<IResultItem> Combine(IResultItem right);
-        IEnumerable<IResultItem> CombineBack(string left);
-        IEnumerable<IResultItem> CombineBack(HiddenSourceItem left);
-        bool Overlapps(SourcePart targetPart);
+        IEnumerable<IResultItem> CombineBack(SpaceTextItem left);
+        IEnumerable<IResultItem> CombineBack(WhiteSpaceTokenItem left);
+        IEnumerable<IResultItem> CombineBack(LineBreakTextItem left);
     }
 
-    sealed class TextItem : DumpableObject, IResultItem
+    sealed class SpaceTextItem : DumpableObject, IResultItem
     {
-        readonly string Data;
+        internal readonly int Count;
 
-        public TextItem(string data)
+        internal SpaceTextItem(int count)
         {
-            Tracer.Assert(data != "");
-            Data = data;
+            Count = count;
+            Tracer.Assert(Count > 0);
         }
 
-        string IResultItem.Text => Data;
-
-        IEnumerable<IResultItem> IResultItem.Combine(IResultItem right) => right.CombineBack(Data);
-
-        IEnumerable<IResultItem> IResultItem.CombineBack(string left)
-        {
-            yield return new TextItem(left + Data);
-        }
-
-        IEnumerable<IResultItem> IResultItem.CombineBack(HiddenSourceItem left)
-        {
-            if(Data == left.Data.Id)
-                return new[] {new SourceItem(left.Data)};
-
-            if(Data.StartsWith(left.Data.Id))
-                return new IResultItem[]
-                {
-                    new SourceItem(left.Data),
-                    new TextItem(Data.Substring(left.Data.Length))
-                };
-
-            return null;
-        }
-
-        bool IResultItem.Overlapps(SourcePart targetPart) => false;
-        protected override string GetNodeDump() => Data;
-    }
-
-    sealed class SourceItem : DumpableObject, IResultItem
-    {
-        internal readonly SourcePart Data;
-        public SourceItem(SourcePart data) { Data = data; }
-        string IResultItem.Text => Data.Id;
-
-        IEnumerable<IResultItem> IResultItem.Combine(IResultItem right) => null;
-        IEnumerable<IResultItem> IResultItem.CombineBack(string left) => null;
-        IEnumerable<IResultItem> IResultItem.CombineBack(HiddenSourceItem left) => null;
-        bool IResultItem.Overlapps(SourcePart targetPart) => Data.Intersect(targetPart) != null;
-        protected override string GetNodeDump() => Data.Id;
-    }
-
-    sealed class HiddenSourceItem : DumpableObject, IResultItem
-    {
-        internal readonly SourcePart Data;
-        public HiddenSourceItem(SourcePart data) { Data = data; }
-        string IResultItem.Text => "";
+        string IResultItem.Text { get { return " ".Repeat(Count); } }
 
         IEnumerable<IResultItem> IResultItem.Combine(IResultItem right) => right.CombineBack(this);
-        IEnumerable<IResultItem> IResultItem.CombineBack(HiddenSourceItem left) => null;
 
-        IEnumerable<IResultItem> IResultItem.CombineBack(string left)
+        IEnumerable<IResultItem> IResultItem.CombineBack(SpaceTextItem left)
         {
-            if(left == Data.Id)
-                return new[] {new SourceItem(Data)};
-
-
-            if(left.EndsWith(Data.Id))
-                return new IResultItem[]
-                {
-                    new TextItem(left.Substring(0, left.Length - Data.Length)),
-                    new SourceItem(Data)
-                };
+            NotImplementedMethod(left);
             return null;
         }
 
-        bool IResultItem.Overlapps(SourcePart targetPart) => Data.Intersect(targetPart) != null;
-        protected override string GetNodeDump() => "[" + Data.Id + "]";
+        IEnumerable<IResultItem> IResultItem.CombineBack(LineBreakTextItem left) => null;
+
+        IEnumerable<IResultItem> IResultItem.CombineBack(WhiteSpaceTokenItem left)
+        {
+            if(!left.IsSpace)
+                return null;
+
+            return left.IsVisible
+                ? new IResultItem[] {this, left}
+                : Count == 1
+                    ? new[] {left.VisibleVersion}
+                    : new[] {new SpaceTextItem(Count - 1), left.VisibleVersion};
+        }
     }
+
+    sealed class LineBreakTextItem : DumpableObject, IResultItem
+    {
+        internal readonly int Count;
+
+        public LineBreakTextItem(int count)
+        {
+            Count = count;
+            Tracer.Assert(Count > 0);
+        }
+
+        string IResultItem.Text { get { return "\n".Repeat(Count); } }
+
+        IEnumerable<IResultItem> IResultItem.Combine(IResultItem right) => right.CombineBack(this);
+
+        IEnumerable<IResultItem> IResultItem.CombineBack(LineBreakTextItem left)
+        {
+            NotImplementedMethod(left);
+            return null;
+        }
+
+        IEnumerable<IResultItem> IResultItem.CombineBack(SpaceTextItem left)
+        {
+            NotImplementedMethod(left);
+            return null;
+        }
+
+        IEnumerable<IResultItem> IResultItem.CombineBack(WhiteSpaceTokenItem left)
+        {
+            NotImplementedMethod(left);
+            return null;
+        }
+    }
+
+    sealed class WhiteSpaceTokenItem : DumpableObject, IResultItem, ISourceItem
+    {
+        readonly WhiteSpaceToken Token;
+
+        internal readonly bool IsVisible;
+        internal bool IsSpace => Token.Characters.Id == " ";
+        internal bool IsLineBreak => Token.IsLineBreak();
+
+        public WhiteSpaceTokenItem(WhiteSpaceToken token, bool isVisible)
+        {
+            Token = token;
+            IsVisible = isVisible;
+        }
+
+        SourcePart ISourceItem.Data => IsVisible ? Token.Characters : null;
+        string IResultItem.Text => IsVisible ? Token.Characters.Id : "";
+
+        IEnumerable<IResultItem> IResultItem.Combine(IResultItem right) => right.CombineBack(this);
+        IEnumerable<IResultItem> IResultItem.CombineBack(WhiteSpaceTokenItem left)
+        {
+            if(IsSpace && left.IsSpace || IsLineBreak && left.IsLineBreak)
+            {
+                if(!IsVisible && left.IsVisible)
+                    return new IResultItem[] {this, left};
+            }
+
+            return null;
+        }
+
+        IEnumerable<IResultItem> IResultItem.CombineBack(LineBreakTextItem left)
+        {
+            if (!IsLineBreak|| IsVisible)
+                return null;
+
+            return left.Count == 1
+                ? new[] { VisibleVersion }
+                : new[] { VisibleVersion, new SpaceTextItem(left.Count - 1) };
+        }
+
+        IEnumerable<IResultItem> IResultItem.CombineBack(SpaceTextItem left)
+        {
+            if(!IsSpace || IsVisible)
+                return null;
+
+            return left.Count == 1
+                ? new[] {VisibleVersion}
+                : new[] {VisibleVersion, new LineBreakTextItem(left.Count - 1), };
+        }
+
+        protected override string GetNodeDump() { return (IsVisible ? "" : "In") + "Visible " + Token.NodeDump; }
+
+        [DisableDump]
+        internal IResultItem VisibleVersion => IsVisible ? this : new WhiteSpaceTokenItem(Token, true);
+    }
+
+    sealed class TokenItem : DumpableObject, IResultItem, ISourceItem
+    {
+        readonly IToken Token;
+        public TokenItem(IToken token) { Token = token; }
+
+        SourcePart ISourceItem.Data => Token.Characters;
+        string IResultItem.Text => Token.Id;
+        IEnumerable<IResultItem> IResultItem.Combine(IResultItem right) => null;
+        IEnumerable<IResultItem> IResultItem.CombineBack(SpaceTextItem left) => null;
+        IEnumerable<IResultItem> IResultItem.CombineBack(WhiteSpaceTokenItem left) => null;
+        IEnumerable<IResultItem> IResultItem.CombineBack(LineBreakTextItem left) => null;
+        protected override string GetNodeDump() { return Token.Id; }
+    }
+
 
     sealed class ResultItems : DumpableObject
     {
@@ -104,22 +172,31 @@ namespace ReniUI.Formatting
 
         public bool IsEmpty => Data.All(item => item.Text == "");
 
-        public void Add(string text)
-        {
-            if(text == "")
-                return;
-            Add(new TextItem(text));
-        }
-
-        public void AddHidden(SourcePart sourcePart) => Add(new HiddenSourceItem(sourcePart));
-        public void Add(SourcePart sourcePart) => Add(new SourceItem(sourcePart));
-
         public ResultItems Combine(ResultItems other)
         {
             var result = new ResultItems(Data);
             foreach(var item in other.Data)
                 result.Add(item);
             return result;
+        }
+
+        internal void Add(WhiteSpaceToken token, bool isVisible)
+        {
+            Add(new WhiteSpaceTokenItem(token, isVisible));
+        }
+
+        internal void Add(IToken token) { Add(new TokenItem(token)); }
+
+        internal void AddLineBreak(int count)
+        {
+            if (count > 0)
+                Add(new LineBreakTextItem(count));
+        }
+
+        internal void AddSpaces(int count)
+        {
+            if(count > 0)
+                Add(new SpaceTextItem(count));
         }
 
         void Add(IResultItem item)
@@ -166,33 +243,32 @@ namespace ReniUI.Formatting
             var result = "";
             IEnumerable<IResultItem> data = Data;
 
-            var start = Data.IndexWhere(item => item is SourceItem && item.Overlapps(targetPart));
+            var start = Data.IndexWhere(item => (item as ISourceItem)?.Data?.Intersect(targetPart) != null);
             if(start != null)
                 data = Data.Skip(start.Value);
 
-            var f = (SourceItem) data.FirstOrDefault();
+            var f = (ISourceItem) data.FirstOrDefault();
             if(f == null)
                 return result;
 
             var start1 = targetPart.Position - f.Data.Position;
             foreach(var item in data)
             {
-                var t = item as TextItem;
-                if(t != null)
+                var s = item as ISourceItem;
+                if(s == null)
                 {
                     Tracer.Assert(start1 == 0);
                     result += item.Text;
                 }
 
-                var s = item as SourceItem;
-                if(s != null)
+                else if(s.Data != null)
                 {
                     if(targetPart.EndPosition < s.Data.Position)
                         return result;
 
                     var length = Math.Min(s.Data.EndPosition, targetPart.EndPosition)
-                        - start1
-                        - s.Data.Position;
+                                 - start1
+                                 - s.Data.Position;
 
                     result += item.Text.Substring(start1, length);
 
@@ -212,11 +288,11 @@ namespace ReniUI.Formatting
 
             IEnumerable<IResultItem> data = Data;
 
-            var start = Data.IndexWhere(item => item is SourceItem && item.Overlapps(targetPart));
+            var start = Data.IndexWhere(item => (item as ISourceItem)?.Data.Intersect(targetPart) != null);
             if(start != null)
                 data = Data.Skip(start.Value);
 
-            var f = (SourceItem) data.FirstOrDefault();
+            var f = (ISourceItem) data.FirstOrDefault();
             if(f == null)
                 yield break;
 
@@ -225,12 +301,10 @@ namespace ReniUI.Formatting
 
             foreach(var item in data)
             {
-                var t = item as TextItem;
-                if(t != null)
+                var s = item as ISourceItem;
+                if(s == null)
                     newText += item.Text;
-
-                var s = item as SourceItem;
-                if(s != null)
+                else
                 {
                     if(newText != "" || removeCount > 0)
                     {
@@ -247,23 +321,6 @@ namespace ReniUI.Formatting
                     if(targetPart.EndPosition <= s.Data.Position)
                         yield break;
                 }
-
-                var h = item as HiddenSourceItem;
-                if(h != null && h.Data.Id != "\r")
-                {
-                    removeCount += h.Data.Length;
-                    if(newText != "" || removeCount > 0)
-                    {
-                        yield return new EditPiece
-                        {
-                            NewText = newText,
-                            RemoveCount = removeCount,
-                            Position = h.Data.Position
-                        };
-                        newText = "";
-                        removeCount = 0;
-                    }
-                }
             }
         }
 
@@ -271,15 +328,12 @@ namespace ReniUI.Formatting
 
         protected override string GetNodeDump() => Data.Count + "->" + Text + "<-";
 
-        internal bool HasInnerLineBreaks()
-        {
-            return Data.Skip(1).Any(item => item.Text.Contains("\n"));
-        }
+        internal bool HasInnerLineBreaks() { return Data.Skip(1).Any(item => item.Text.Contains("\n")); }
 
         public override string ToString() => Text;
     }
 
-    public sealed class EditPiece: DumpableObject
+    public sealed class EditPiece : DumpableObject
     {
         internal int Position;
         internal int RemoveCount;
