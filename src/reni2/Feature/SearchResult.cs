@@ -70,8 +70,8 @@ namespace Reni.Feature
                 BreakExecution();
                 var result = Feature.Result(category.Typed, token, context, right);
                 Dump(nameof(result), result);
-                Dump(nameof(ConverterPath.Destination.CheckedReference), ConverterPath.Destination.CheckedReference);
-                Dump(nameof(ConverterPath.Execute), ConverterPath.Execute(Category.Code));
+                Dump("ConverterPath.Destination.CheckedReference", ConverterPath.Destination.CheckedReference);
+                Dump("ConverterPath.Execute", ConverterPath.Execute(Category.Code));
                 BreakExecution();
 
                 var replaceAbsolute = result

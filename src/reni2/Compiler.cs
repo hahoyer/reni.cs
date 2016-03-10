@@ -88,7 +88,7 @@ namespace Reni
 
         [Node]
         [DisableDump]
-        internal Syntax Syntax => this.CachedValue(() => SourceSyntax.Syntax);
+        internal Syntax Syntax => this.CachedValue<Syntax>(() => SourceSyntax.Syntax);
 
         [Node]
         [DisableDump]
