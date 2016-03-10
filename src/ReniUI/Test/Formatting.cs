@@ -12,7 +12,36 @@ namespace ReniUI.Test
 {
     [UnitTest]
     [TestFixture]
-    public sealed class FormattingSimple : DependantAttribute {}
+    public sealed class FormattingSimple : DependantAttribute
+    {
+        [Test]
+        [UnitTest]
+        public void ReformatComments()
+        {
+            const string Text =
+                @"137;
+
+################################################################
+                    3
+";
+
+            const string ExpectedText =
+                @"systemdata:
+{
+    Memory: ((0 type *(125)) mutable) instance();
+    !mutable FreePointer: Memory array_reference mutable;
+};";
+            var compiler = CompilerBrowser.FromText(Text);
+            var newSource = compiler.Reformat(new ReniUI.Formatting.Configuration() {EmptyLineLimit = 0}.Create());
+
+            var lineCount = newSource.Count(item => item == '\n');
+
+            Tracer.Assert
+                (
+                    newSource.Replace("\r\n", "\n") == ExpectedText.Replace("\r\n", "\n"),
+                    "\n\"" + newSource + "\"");
+        }
+    }
 
     [UnitTest]
     [TestFixture]
@@ -93,7 +122,9 @@ namespace ReniUI.Test
             var lineCount = newSource.Count(item => item == '\n');
 
             Tracer.Assert
-                (newSource.Replace("\r\n", "\n") == ExpectedText.Replace("\r\n", "\n"), "\n\"" + newSource + "\"");
+                (
+                    newSource.Replace("\r\n", "\n") == ExpectedText.Replace("\r\n", "\n"),
+                    "\n\"" + newSource + "\"");
         }
 
         [Test]
@@ -121,7 +152,9 @@ namespace ReniUI.Test
             var lineCount = newSource.Count(item => item == '\n');
 
             Tracer.Assert
-                (newSource.Replace("\r\n", "\n") == ExpectedText.Replace("\r\n", "\n"), "\n\"" + newSource + "\"");
+                (
+                    newSource.Replace("\r\n", "\n") == ExpectedText.Replace("\r\n", "\n"),
+                    "\n\"" + newSource + "\"");
         }
 
         [Test]
@@ -164,6 +197,7 @@ namespace ReniUI.Test
         }
 
         [UnitTest]
+        [Formatting]
         [Test]
         public void LegacySystem()
         {
