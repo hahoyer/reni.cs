@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
+using hw.Helper;
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
 using Reni.Parser;
@@ -13,7 +13,6 @@ namespace ReniUI.Formatting
     public sealed class HierachicalFormatter : DumpableObject, IFormatter
     {
         readonly Configuration Configuration;
-        public string IndentItem = "    ";
 
         public HierachicalFormatter(Configuration configuration) { Configuration = configuration; }
 
@@ -29,8 +28,8 @@ namespace ReniUI.Formatting
                 return true;
 
             if(tokenClass is RightParenthesis
-                || tokenClass is LeftParenthesis
-                || tokenClass is List)
+               || tokenClass is LeftParenthesis
+               || tokenClass is List)
                 return false;
 
             return emptyLines < Configuration.EmptyLineLimit.Value;
@@ -45,7 +44,6 @@ namespace ReniUI.Formatting
             ITokenClass rightTokenClass
             )
         {
-            var indent = IndentItem.Repeat(indentLevel);
             var result = new ResultItems();
             var emptyLines = 0;
             var isBeginOfLine = leadingLineBreaks > 0;
@@ -53,22 +51,18 @@ namespace ReniUI.Formatting
             {
                 if(isBeginOfLine && !Lexer.IsLineEnd(token))
                 {
-                    while(emptyLines < leadingLineBreaks)
-                    {
-                        result.Add("\n");
-                        emptyLines++;
-                    }
-
-                    result.Add(indent);
+                    result.AddLineBreak(leadingLineBreaks - emptyLines);
+                    result.AddSpaces(indentLevel * Configuration.IndentCount);
+                    emptyLines = leadingLineBreaks;
                     isBeginOfLine = false;
                 }
 
                 if(Lexer.IsWhiteSpace(token)
-                    || (Lexer.IsLineEnd(token) && !IsRelevantLineBreak(emptyLines, rightTokenClass)))
-                    result.AddHidden(token.Characters);
+                   || (Lexer.IsLineEnd(token) && !IsRelevantLineBreak(emptyLines, rightTokenClass)))
+                    result.Add(token, false);
                 else
                 {
-                    result.Add(token.Characters);
+                    result.Add(token, true);
 
                     if(Lexer.IsLineEnd(token))
                         emptyLines++;
@@ -81,18 +75,12 @@ namespace ReniUI.Formatting
 
             if(isBeginOfLine)
             {
-                while (emptyLines < leadingLineBreaks)
-                {
-                    result.Add("\n");
-                    emptyLines++;
-                }
-
-                result.Add(indent);
-                isBeginOfLine = false;
+                result.AddLineBreak(leadingLineBreaks - emptyLines);
+                result.AddSpaces(indentLevel * Configuration.IndentCount);
             }
 
-            if (result.IsEmpty)
-                result.Add(SeparatorType.Get(leftTokenClass, rightTokenClass).Text);
+            if(result.IsEmpty && SeparatorType.Get(leftTokenClass, rightTokenClass) == SeparatorType.Close)
+                result.AddSpaces(1);
 
             return result;
         }
@@ -123,7 +111,7 @@ namespace ReniUI.Formatting
                         tokenClass
                     );
 
-                result.Add(token.Characters);
+                result.Add(token);
 
                 return ReturnMethodDump(result);
             }
@@ -163,7 +151,7 @@ namespace ReniUI.Formatting
         internal bool RequiresLineBreak(string flatText)
         {
             return flatText.Any(item => item == '\n')
-                || flatText.Length > Configuration.MaxLineLength;
+                   || flatText.Length > Configuration.MaxLineLength;
         }
     }
 }
