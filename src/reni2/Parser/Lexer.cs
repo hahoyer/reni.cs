@@ -32,6 +32,7 @@ namespace Reni.Parser
         readonly Match _commentHead;
         readonly Match _lineEnd;
         readonly Match _varbatimTextHead;
+        readonly Match _lineEndOrEnd;
 
         Lexer()
         {
@@ -44,20 +45,20 @@ namespace Reni.Parser
 
             _any = symbol1.Else(identifier);
 
+            _lineEnd = "\r\n".Box().Else("\n".Box()).Else("\r" + Match.End);
+            _lineEndOrEnd = _lineEnd.Else(Match.End);
+
             _lineComment = "#"
                 +
-                Match.LineEnd
-                    .Else(Match.End)
+                _lineEndOrEnd
                     .Else
                     (
                         "(".AnyChar().Not +
-                            "\n".AnyChar().Find
+                            _lineEnd.Find
                                 .Else(Match.End.Find)
                     );
 
-            _whiteSpace = " \t\r".AnyChar().Repeat(1);
-
-            _lineEnd = "\n".Box();
+            _whiteSpace = " \t".AnyChar().Repeat(1);
 
             _comment = "#("
                 +
@@ -82,7 +83,7 @@ namespace Reni.Parser
                 (
                     head =>
                     {
-                        var textEnd = head.Else(Match.LineEnd + _invalidTextEnd);
+                        var textEnd = head.Else(_lineEndOrEnd + _invalidTextEnd);
                         return textEnd.Find + (head + textEnd.Find).Repeat();
                     })
                 .Else(varbatimText);
