@@ -63,16 +63,29 @@ namespace ReniUI.Formatting
 
         string Text => (IsLineBreak ? "\n" : " ").Repeat(Count);
 
-        protected override string GetNodeDump() => "new("+(IsLineBreak ? "\\n" : "_") + ")";
+        protected override string GetNodeDump() => "new(" + (IsLineBreak ? "\\n" : "_") + ")";
     }
 
     sealed class WhiteSpace : DumpableObject, IResultItem
     {
+        public static WhiteSpace Create(WhiteSpaceToken token, bool isVisible)
+        {
+            var isLineBreak = token.IsLineBreak();
+            var sourcePart = token.Characters;
+
+            if(isLineBreak || sourcePart.Id != "\t")
+                return new WhiteSpace(sourcePart, isLineBreak, isVisible);
+
+            NotImplementedFunction(token, isLineBreak);
+            return null;
+        }
+
+
         readonly SourcePart Token;
         internal readonly bool IsLineBreak;
         internal readonly bool IsVisible;
 
-        internal WhiteSpace(SourcePart token, bool isLineBreak, bool isVisible)
+        WhiteSpace(SourcePart token, bool isLineBreak, bool isVisible)
         {
             Token = token;
             IsLineBreak = isLineBreak;
@@ -102,11 +115,14 @@ namespace ReniUI.Formatting
                 : new[] {MakeVisible};
 
         [DisableDump]
-        IResultItem MakeInvisible => new WhiteSpace(Token, IsLineBreak, false);
+        IResultItem MakeInvisible => Create(false);
         [DisableDump]
-        internal IResultItem MakeVisible => new WhiteSpace(Token, IsLineBreak, true);
+        internal IResultItem MakeVisible => Create(true);
 
-        protected override string GetNodeDump() => (IsVisible ? "" : "in")+"visible("+(IsLineBreak?"\\n":"_")+")";
+        WhiteSpace Create(bool isVisible) => new WhiteSpace(Token, IsLineBreak, isVisible);
+
+        protected override string GetNodeDump()
+            => (IsVisible ? "" : "in") + "visible(" + (IsLineBreak ? "\\n" : "_") + ")";
     }
 
     sealed class Skeleton : DumpableObject, IResultItem
@@ -162,13 +178,13 @@ namespace ReniUI.Formatting
                 (
                     token.IsComment()
                         ? (IResultItem) new Skeleton(token.Characters)
-                        : new WhiteSpace(token.Characters, token.IsLineBreak(), true)
+                        : WhiteSpace.Create(token, true)
                 );
 
         internal void AddHidden(WhiteSpaceToken token)
         {
             Tracer.Assert(token.IsNonComment());
-            Add(new WhiteSpace(token.Characters, token.IsLineBreak(), false));
+            Add(WhiteSpace.Create(token, false));
         }
 
         internal void Add(IToken token) => Add(new Skeleton(token.Characters));
