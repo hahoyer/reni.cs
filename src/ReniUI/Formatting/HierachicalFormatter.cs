@@ -54,15 +54,16 @@ namespace ReniUI.Formatting
                     result.AddLineBreak(leadingLineBreaks - emptyLines);
                     result.AddSpaces(indentLevel * Configuration.IndentCount);
                     emptyLines = leadingLineBreaks;
+                    leadingLineBreaks = 0;
                     isBeginOfLine = false;
                 }
 
                 if(Lexer.IsWhiteSpace(token)
                    || (Lexer.IsLineEnd(token) && !IsRelevantLineBreak(emptyLines, rightTokenClass)))
-                    result.Add(token, false);
+                    result.AddHidden(token);
                 else
                 {
-                    result.Add(token, true);
+                    result.Add(token);
 
                     if(Lexer.IsLineEnd(token))
                         emptyLines++;
@@ -77,10 +78,13 @@ namespace ReniUI.Formatting
             {
                 result.AddLineBreak(leadingLineBreaks - emptyLines);
                 result.AddSpaces(indentLevel * Configuration.IndentCount);
+                leadingLineBreaks = 0;
             }
 
-            if(result.IsEmpty && SeparatorType.Get(leftTokenClass, rightTokenClass) == SeparatorType.Close)
+            if (result.IsEmpty && SeparatorType.Get(leftTokenClass, rightTokenClass) == SeparatorType.Close)
                 result.AddSpaces(1);
+
+            Tracer.Assert(leadingLineBreaks == 0);
 
             return result;
         }
@@ -96,7 +100,7 @@ namespace ReniUI.Formatting
             Tracer.Assert(IsRelevant(tokenClass));
             Tracer.Assert(IsRelevant(leftTokenClass));
 
-            var trace = tokenClass.Id == " ;";
+            var trace = tokenClass.Id == "repeat";
             StartMethodDump
                 (trace, leftTokenClass, leadingLineBreaks, indentLevel, token, tokenClass);
             try

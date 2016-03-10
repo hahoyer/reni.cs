@@ -1,165 +1,130 @@
 using System;
 using System.Collections.Generic;
-using hw.Helper;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
 using Reni.Parser;
 
 namespace ReniUI.Formatting
 {
-    interface ISourceItem
-    {
-        [DisableDump]
-        SourcePart Data { get; }
-    }
-
     interface IResultItem
     {
-        [DisableDump]
-        string Text { get; }
         IEnumerable<IResultItem> Combine(IResultItem right);
-        IEnumerable<IResultItem> CombineBack(SpaceTextItem left);
-        IEnumerable<IResultItem> CombineBack(WhiteSpaceTokenItem left);
-        IEnumerable<IResultItem> CombineBack(LineBreakTextItem left);
+        IEnumerable<IResultItem> CombineBack(WhiteSpace left);
+        IEnumerable<IResultItem> CombineBack(NewWhiteSpace left);
+
+        [DisableDump]
+        SourcePart SourcePart { get; }
+
+        [DisableDump]
+        string VisibleText { get; }
+        [DisableDump]
+        string NewText { get; }
+        [DisableDump]
+        int RemoveCount { get; }
     }
 
-    sealed class SpaceTextItem : DumpableObject, IResultItem
+    sealed class NewWhiteSpace : DumpableObject, IResultItem
     {
         internal readonly int Count;
+        internal readonly bool IsLineBreak;
 
-        internal SpaceTextItem(int count)
+        internal NewWhiteSpace(int count, bool isLineBreak)
         {
             Count = count;
+            IsLineBreak = isLineBreak;
             Tracer.Assert(Count > 0);
         }
 
-        string IResultItem.Text { get { return " ".Repeat(Count); } }
+        SourcePart IResultItem.SourcePart => null;
+        string IResultItem.VisibleText => Text;
+        string IResultItem.NewText => Text;
+        int IResultItem.RemoveCount => 0;
 
         IEnumerable<IResultItem> IResultItem.Combine(IResultItem right) => right.CombineBack(this);
 
-        IEnumerable<IResultItem> IResultItem.CombineBack(SpaceTextItem left)
-        {
-            NotImplementedMethod(left);
-            return null;
-        }
+        IEnumerable<IResultItem> IResultItem.CombineBack(WhiteSpace left)
+            => IsLineBreak == left.IsLineBreak
+                ? left.IsVisible
+                    ? new IResultItem[] {this, left}
+                    : left.Preceed(Count - 1)
+                : null;
 
-        IEnumerable<IResultItem> IResultItem.CombineBack(LineBreakTextItem left) => null;
-
-        IEnumerable<IResultItem> IResultItem.CombineBack(WhiteSpaceTokenItem left)
+        IEnumerable<IResultItem> IResultItem.CombineBack(NewWhiteSpace left)
         {
-            if(!left.IsSpace)
+            if(IsLineBreak != left.IsLineBreak)
                 return null;
 
-            return left.IsVisible
-                ? new IResultItem[] {this, left}
-                : Count == 1
-                    ? new[] {left.VisibleVersion}
-                    : new[] {new SpaceTextItem(Count - 1), left.VisibleVersion};
+            NotImplementedMethod(left);
+            return null;
         }
+
+        string Text => (IsLineBreak ? "\n" : " ").Repeat(Count);
+
+        protected override string GetNodeDump() => "new("+(IsLineBreak ? "\\n" : "_") + ")";
     }
 
-    sealed class LineBreakTextItem : DumpableObject, IResultItem
+    sealed class WhiteSpace : DumpableObject, IResultItem
     {
-        internal readonly int Count;
-
-        public LineBreakTextItem(int count)
-        {
-            Count = count;
-            Tracer.Assert(Count > 0);
-        }
-
-        string IResultItem.Text { get { return "\n".Repeat(Count); } }
-
-        IEnumerable<IResultItem> IResultItem.Combine(IResultItem right) => right.CombineBack(this);
-
-        IEnumerable<IResultItem> IResultItem.CombineBack(LineBreakTextItem left)
-        {
-            NotImplementedMethod(left);
-            return null;
-        }
-
-        IEnumerable<IResultItem> IResultItem.CombineBack(SpaceTextItem left)
-        {
-            NotImplementedMethod(left);
-            return null;
-        }
-
-        IEnumerable<IResultItem> IResultItem.CombineBack(WhiteSpaceTokenItem left)
-        {
-            NotImplementedMethod(left);
-            return null;
-        }
-    }
-
-    sealed class WhiteSpaceTokenItem : DumpableObject, IResultItem, ISourceItem
-    {
-        readonly WhiteSpaceToken Token;
-
+        readonly SourcePart Token;
+        internal readonly bool IsLineBreak;
         internal readonly bool IsVisible;
-        internal bool IsSpace => Token.Characters.Id == " ";
-        internal bool IsLineBreak => Token.IsLineBreak();
 
-        public WhiteSpaceTokenItem(WhiteSpaceToken token, bool isVisible)
+        internal WhiteSpace(SourcePart token, bool isLineBreak, bool isVisible)
         {
             Token = token;
+            IsLineBreak = isLineBreak;
             IsVisible = isVisible;
         }
 
-        SourcePart ISourceItem.Data => IsVisible ? Token.Characters : null;
-        string IResultItem.Text => IsVisible ? Token.Characters.Id : "";
+        SourcePart IResultItem.SourcePart => IsVisible ? Token : null;
+        string IResultItem.VisibleText => IsVisible ? Token.Id : "";
+        string IResultItem.NewText => "";
+        int IResultItem.RemoveCount => IsVisible ? 0 : Token.Length;
 
         IEnumerable<IResultItem> IResultItem.Combine(IResultItem right) => right.CombineBack(this);
-        IEnumerable<IResultItem> IResultItem.CombineBack(WhiteSpaceTokenItem left)
-        {
-            if(IsSpace && left.IsSpace || IsLineBreak && left.IsLineBreak)
-            {
-                if(!IsVisible && left.IsVisible)
-                    return new IResultItem[] {this, left};
-            }
 
-            return null;
-        }
+        IEnumerable<IResultItem> IResultItem.CombineBack(WhiteSpace left)
+            => IsLineBreak == left.IsLineBreak && !IsVisible && left.IsVisible
+                ? new[] {left.MakeInvisible, MakeVisible}
+                : null;
 
-        IEnumerable<IResultItem> IResultItem.CombineBack(LineBreakTextItem left)
-        {
-            if (!IsLineBreak|| IsVisible)
-                return null;
+        IEnumerable<IResultItem> IResultItem.CombineBack(NewWhiteSpace left)
+            => IsLineBreak == left.IsLineBreak && !IsVisible
+                ? Preceed(left.Count - 1)
+                : null;
 
-            return left.Count == 1
-                ? new[] { VisibleVersion }
-                : new[] { VisibleVersion, new SpaceTextItem(left.Count - 1) };
-        }
-
-        IEnumerable<IResultItem> IResultItem.CombineBack(SpaceTextItem left)
-        {
-            if(!IsSpace || IsVisible)
-                return null;
-
-            return left.Count == 1
-                ? new[] {VisibleVersion}
-                : new[] {VisibleVersion, new LineBreakTextItem(left.Count - 1), };
-        }
-
-        protected override string GetNodeDump() { return (IsVisible ? "" : "In") + "Visible " + Token.NodeDump; }
+        internal IEnumerable<IResultItem> Preceed(int count)
+            => count > 0
+                ? new[] {new NewWhiteSpace(count, IsLineBreak), MakeVisible}
+                : new[] {MakeVisible};
 
         [DisableDump]
-        internal IResultItem VisibleVersion => IsVisible ? this : new WhiteSpaceTokenItem(Token, true);
+        IResultItem MakeInvisible => new WhiteSpace(Token, IsLineBreak, false);
+        [DisableDump]
+        internal IResultItem MakeVisible => new WhiteSpace(Token, IsLineBreak, true);
+
+        protected override string GetNodeDump() => (IsVisible ? "" : "in")+"visible("+(IsLineBreak?"\\n":"_")+")";
     }
 
-    sealed class TokenItem : DumpableObject, IResultItem, ISourceItem
+    sealed class Skeleton : DumpableObject, IResultItem
     {
-        readonly IToken Token;
-        public TokenItem(IToken token) { Token = token; }
+        readonly SourcePart Token;
 
-        SourcePart ISourceItem.Data => Token.Characters;
-        string IResultItem.Text => Token.Id;
+        internal Skeleton(SourcePart token) { Token = token; }
+
+        SourcePart IResultItem.SourcePart => Token;
+        string IResultItem.VisibleText => Token.Id;
+        string IResultItem.NewText => "";
+        int IResultItem.RemoveCount => 0;
+
         IEnumerable<IResultItem> IResultItem.Combine(IResultItem right) => null;
-        IEnumerable<IResultItem> IResultItem.CombineBack(SpaceTextItem left) => null;
-        IEnumerable<IResultItem> IResultItem.CombineBack(WhiteSpaceTokenItem left) => null;
-        IEnumerable<IResultItem> IResultItem.CombineBack(LineBreakTextItem left) => null;
-        protected override string GetNodeDump() { return Token.Id; }
+        IEnumerable<IResultItem> IResultItem.CombineBack(WhiteSpace left) => null;
+        IEnumerable<IResultItem> IResultItem.CombineBack(NewWhiteSpace left) => null;
+
+        protected override string GetNodeDump() => Token.Id;
     }
 
 
@@ -170,7 +135,7 @@ namespace ReniUI.Formatting
         public ResultItems() { Data = new List<IResultItem>(); }
         public ResultItems(IEnumerable<IResultItem> data) { Data = new List<IResultItem>(data); }
 
-        public bool IsEmpty => Data.All(item => item.Text == "");
+        public bool IsEmpty => Data.All(item => item.VisibleText == "");
 
         public ResultItems Combine(ResultItems other)
         {
@@ -180,24 +145,33 @@ namespace ReniUI.Formatting
             return result;
         }
 
-        internal void Add(WhiteSpaceToken token, bool isVisible)
-        {
-            Add(new WhiteSpaceTokenItem(token, isVisible));
-        }
-
-        internal void Add(IToken token) { Add(new TokenItem(token)); }
-
         internal void AddLineBreak(int count)
         {
-            if (count > 0)
-                Add(new LineBreakTextItem(count));
+            if(count > 0)
+                Add(new NewWhiteSpace(count, true));
         }
 
         internal void AddSpaces(int count)
         {
             if(count > 0)
-                Add(new SpaceTextItem(count));
+                Add(new NewWhiteSpace(count, false));
         }
+
+        internal void Add(WhiteSpaceToken token)
+            => Add
+                (
+                    token.IsComment()
+                        ? (IResultItem) new Skeleton(token.Characters)
+                        : new WhiteSpace(token.Characters, token.IsLineBreak(), true)
+                );
+
+        internal void AddHidden(WhiteSpaceToken token)
+        {
+            Tracer.Assert(token.IsNonComment());
+            Add(new WhiteSpace(token.Characters, token.IsLineBreak(), false));
+        }
+
+        internal void Add(IToken token) => Add(new Skeleton(token.Characters));
 
         void Add(IResultItem item)
         {
@@ -217,7 +191,7 @@ namespace ReniUI.Formatting
 
         IEnumerable<IResultItem> GetNewItems(IResultItem left, IResultItem right)
         {
-            var trace = false && HasOnlySpaces(left) && HasOnlySpaces(right);
+            var trace = false;
             StartMethodDump(trace, left, right);
             try
             {
@@ -230,11 +204,6 @@ namespace ReniUI.Formatting
             }
         }
 
-        static bool HasOnlySpaces(IResultItem left)
-        {
-            return left != null && left.Text != "" && left.Text.All(c => c == ' ');
-        }
-
         internal string Format(SourcePart targetPart = null)
         {
             if(targetPart == null)
@@ -243,36 +212,35 @@ namespace ReniUI.Formatting
             var result = "";
             IEnumerable<IResultItem> data = Data;
 
-            var start = Data.IndexWhere(item => (item as ISourceItem)?.Data?.Intersect(targetPart) != null);
+            var start = Data.IndexWhere
+                (item => item.SourcePart?.Intersect(targetPart) != null);
             if(start != null)
                 data = Data.Skip(start.Value);
 
-            var f = (ISourceItem) data.FirstOrDefault();
-            if(f == null)
+            if(!data.Any())
                 return result;
 
-            var start1 = targetPart.Position - f.Data.Position;
+            var start1 = targetPart.Position - data.First().SourcePart.Position;
             foreach(var item in data)
             {
-                var s = item as ISourceItem;
+                var s = item.SourcePart;
                 if(s == null)
                 {
                     Tracer.Assert(start1 == 0);
-                    result += item.Text;
+                    result += item.VisibleText;
                 }
-
-                else if(s.Data != null)
+                else
                 {
-                    if(targetPart.EndPosition < s.Data.Position)
+                    if(targetPart.EndPosition < s.Position)
                         return result;
 
-                    var length = Math.Min(s.Data.EndPosition, targetPart.EndPosition)
-                                 - start1
-                                 - s.Data.Position;
+                    var length = Math.Min(s.EndPosition, targetPart.EndPosition)
+                        - start1
+                        - s.Position;
 
-                    result += item.Text.Substring(start1, length);
+                    result += item.VisibleText.Substring(start1, length);
 
-                    if(targetPart.EndPosition == s.Data.EndPosition)
+                    if(targetPart.EndPosition == s.EndPosition)
                         return result;
                 }
                 start1 = 0;
@@ -288,12 +256,12 @@ namespace ReniUI.Formatting
 
             IEnumerable<IResultItem> data = Data;
 
-            var start = Data.IndexWhere(item => (item as ISourceItem)?.Data.Intersect(targetPart) != null);
+            var start = Data.IndexWhere
+                (item => item.SourcePart?.Intersect(targetPart) != null);
             if(start != null)
                 data = Data.Skip(start.Value);
 
-            var f = (ISourceItem) data.FirstOrDefault();
-            if(f == null)
+            if(!data.Any())
                 yield break;
 
             var newText = "";
@@ -301,34 +269,38 @@ namespace ReniUI.Formatting
 
             foreach(var item in data)
             {
-                var s = item as ISourceItem;
-                if(s == null)
-                    newText += item.Text;
-                else
-                {
-                    if(newText != "" || removeCount > 0)
-                    {
-                        yield return new EditPiece
-                        {
-                            NewText = newText,
-                            RemoveCount = removeCount,
-                            Position = s.Data.Position
-                        };
-                        newText = "";
-                        removeCount = 0;
-                    }
+                newText += item.NewText;
+                removeCount += item.RemoveCount;
 
-                    if(targetPart.EndPosition <= s.Data.Position)
-                        yield break;
+                var sourcePart = item.SourcePart;
+                if(sourcePart == null)
+                    continue;
+
+                if(newText != "" || removeCount > 0)
+                {
+                    yield return new EditPiece
+                    {
+                        NewText = newText,
+                        RemoveCount = removeCount,
+                        Position = sourcePart.Position
+                    };
+                    newText = "";
+                    removeCount = 0;
                 }
+
+                if(targetPart.EndPosition <= sourcePart.Position)
+                    yield break;
             }
         }
 
-        string Text { get { return Data.Aggregate("", (c, n) => c + n.Text); } }
+        string Text { get { return Data.Aggregate("", (c, n) => c + n.VisibleText); } }
 
         protected override string GetNodeDump() => Data.Count + "->" + Text + "<-";
 
-        internal bool HasInnerLineBreaks() { return Data.Skip(1).Any(item => item.Text.Contains("\n")); }
+        internal bool HasInnerLineBreaks()
+        {
+            return Data.Skip(1).Any(item => item.VisibleText.Contains("\n"));
+        }
 
         public override string ToString() => Text;
     }

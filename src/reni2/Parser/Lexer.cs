@@ -58,7 +58,7 @@ namespace Reni.Parser
                                 .Else(Match.End.Find)
                     );
 
-            _whiteSpace = " \t".AnyChar().Repeat(1);
+            _whiteSpace = " \t".AnyChar();
 
             _comment = "#("
                 +

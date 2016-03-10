@@ -22,17 +22,27 @@ namespace ReniUI.Test
                 @"137;
 
 ################################################################
-                    3
+# Test
+################################################################
+                   3
 ";
 
             const string ExpectedText =
-                @"systemdata:
-{
-    Memory: ((0 type *(125)) mutable) instance();
-    !mutable FreePointer: Memory array_reference mutable;
-};";
+                @"137;
+
+################################################################
+# Test
+################################################################
+3";
             var compiler = CompilerBrowser.FromText(Text);
-            var newSource = compiler.Reformat(new ReniUI.Formatting.Configuration() {EmptyLineLimit = 0}.Create());
+            var newSource = compiler.Reformat
+                (
+                    new ReniUI.Formatting.Configuration
+                    {
+                        EmptyLineLimit = 0
+                    }
+                        .Create()
+                );
 
             var lineCount = newSource.Count(item => item == '\n');
 
@@ -96,7 +106,7 @@ namespace ReniUI.Test
         repeat(^)
     );}; 1 = 1 then 2 else 4; 3; (Text('H') << 'allo') dump_print ";
 
-            const string ExpectedText =
+            var expectedText =
                 @"systemdata:
 {
     1 type instance();
@@ -106,7 +116,8 @@ namespace ReniUI.Test
 };
 1 = 1 then 2 else 4;
 3;
-(Text('H') << 'allo') dump_print";
+(Text('H') << 'allo') dump_print"
+                    .Replace("\r\n", "\n");
 
 
             var compiler = CompilerBrowser.FromText(Text);
@@ -117,14 +128,12 @@ namespace ReniUI.Test
                         MaxLineLength = 100,
                         EmptyLineLimit = 0
                     }.Create()
-                );
+                )
+                .Replace("\r\n", "\n");
 
             var lineCount = newSource.Count(item => item == '\n');
 
-            Tracer.Assert
-                (
-                    newSource.Replace("\r\n", "\n") == ExpectedText.Replace("\r\n", "\n"),
-                    "\n\"" + newSource + "\"");
+            Tracer.Assert(newSource == expectedText, "\n\"" + newSource + "\"");
         }
 
         [Test]
