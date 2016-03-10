@@ -47,15 +47,18 @@ namespace ReniUI.Formatting
         {
             var indent = IndentItem.Repeat(indentLevel);
             var result = new ResultItems();
-            if(leadingLineBreaks > 0)
-                result.Add("\n".Repeat(leadingLineBreaks));
-
-            var emptyLines = leadingLineBreaks;
+            var emptyLines = 0;
             var isBeginOfLine = leadingLineBreaks > 0;
             foreach(var token in whiteSpaces)
             {
                 if(isBeginOfLine && !Lexer.IsLineEnd(token))
                 {
+                    while(emptyLines < leadingLineBreaks)
+                    {
+                        result.Add("\n");
+                        emptyLines++;
+                    }
+
                     result.Add(indent);
                     isBeginOfLine = false;
                 }
@@ -77,9 +80,18 @@ namespace ReniUI.Formatting
             }
 
             if(isBeginOfLine)
-                result.Add(indent);
+            {
+                while (emptyLines < leadingLineBreaks)
+                {
+                    result.Add("\n");
+                    emptyLines++;
+                }
 
-            if(result.IsEmpty)
+                result.Add(indent);
+                isBeginOfLine = false;
+            }
+
+            if (result.IsEmpty)
                 result.Add(SeparatorType.Get(leftTokenClass, rightTokenClass).Text);
 
             return result;

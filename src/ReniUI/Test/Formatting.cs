@@ -6,16 +6,13 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.UnitTest;
 using NUnit.Framework;
-using Reni;
 using ReniUI.Formatting;
 
 namespace ReniUI.Test
 {
     [UnitTest]
     [TestFixture]
-    public sealed class FormattingSimple : DependantAttribute
-    {
-    }
+    public sealed class FormattingSimple : DependantAttribute {}
 
     [UnitTest]
     [TestFixture]
@@ -86,18 +83,45 @@ namespace ReniUI.Test
             var compiler = CompilerBrowser.FromText(Text);
             var newSource = compiler.Reformat
                 (
-                    FormatterExtension.Create
-                        (
-                            new ReniUI.Formatting.Configuration
-                            {
-                                MaxLineLength = 100,
-                                EmptyLineLimit = 0
-                            }
-                        ));
+                    new ReniUI.Formatting.Configuration
+                    {
+                        MaxLineLength = 100,
+                        EmptyLineLimit = 0
+                    }.Create()
+                );
 
             var lineCount = newSource.Count(item => item == '\n');
 
-            Tracer.Assert(newSource == ExpectedText.Replace("\r\n", "\n"), "\n\"" + newSource + "\"");
+            Tracer.Assert
+                (newSource.Replace("\r\n", "\n") == ExpectedText.Replace("\r\n", "\n"), "\n\"" + newSource + "\"");
+        }
+
+        [Test]
+        [UnitTest]
+        public void Reformat2()
+        {
+            const string Text =
+                @"systemdata:
+{
+    Memory:((0 type *(125)) mutable) instance();
+    !mutable FreePointer: Memory array_reference mutable;
+};
+
+";
+
+            const string ExpectedText =
+                @"systemdata:
+{
+    Memory: ((0 type *(125)) mutable) instance();
+    !mutable FreePointer: Memory array_reference mutable;
+};";
+            var compiler = CompilerBrowser.FromText(Text);
+            var newSource = compiler.Reformat(new ReniUI.Formatting.Configuration().Create());
+
+            var lineCount = newSource.Count(item => item == '\n');
+
+            Tracer.Assert
+                (newSource.Replace("\r\n", "\n") == ExpectedText.Replace("\r\n", "\n"), "\n\"" + newSource + "\"");
         }
 
         [Test]
@@ -129,13 +153,11 @@ namespace ReniUI.Test
             var compiler = CompilerBrowser.FromText(Text);
             var newSource = compiler.Reformat
                 (
-                    FormatterExtension.Create
-                        (
-                            new ReniUI.Formatting.Configuration
-                            {
-                                EmptyLineLimit = 1
-                            }
-                        ));
+                    new ReniUI.Formatting.Configuration
+                    {
+                        EmptyLineLimit = 1
+                    }.Create
+                        ());
 
             var lineCount = newSource.Count(item => item == '\n');
             Tracer.Assert(lineCount == 18, "\n\"" + newSource + "\"");
@@ -158,12 +180,11 @@ namespace ReniUI.Test
             var source = compiler.Source.All;
             var newSource = compiler.Reformat
                 (
-                    FormatterExtension.Create
-                        (
-                            new ReniUI.Formatting.Configuration
-                            {
-                                EmptyLineLimit = 0
-                            })
+                    new ReniUI.Formatting.Configuration
+                    {
+                        EmptyLineLimit = 0
+                    }.Create
+                        ()
                 );
             var lineCount = newSource.Count(item => item == '\n');
             Tracer.Assert
