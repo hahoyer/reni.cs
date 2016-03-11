@@ -12,7 +12,7 @@ namespace hw.Helper
         }
 
         public static TValueType CachedValue<TValueType>
-            (ValueCache.IContainer container, Func<TValueType> func)
+            (this ValueCache.IContainer container, Func<TValueType> func)
         {
             return GetCache(container, func).Value;
         }

@@ -100,7 +100,7 @@ namespace ReniUI.Formatting
             Tracer.Assert(IsRelevant(tokenClass));
             Tracer.Assert(IsRelevant(leftTokenClass));
 
-            var trace = tokenClass.Id == "repeat";
+            var trace = tokenClass.Id == " repeat";
             StartMethodDump
                 (trace, leftTokenClass, leadingLineBreaks, indentLevel, token, tokenClass);
             try

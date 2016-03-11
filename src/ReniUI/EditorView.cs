@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using hw.Helper;
+using hw.Scanner;
 using Reni;
 using Reni.Parser;
 using ReniUI.Commands;
@@ -37,7 +38,7 @@ namespace ReniUI
             TextBox = new Scintilla
             {
                 Lexer = ScintillaNET.Lexer.Container,
-                VirtualSpaceOptions = VirtualSpace.UserAccessible,
+                VirtualSpaceOptions = VirtualSpace.UserAccessible
             };
 
             TextBox.ClearCmdKey(Keys.Insert);
@@ -82,7 +83,7 @@ namespace ReniUI
                 Timer = new System.Threading.Timer(Execute);
             }
 
-            void Execute(object state) => InvokeAsynchron(Parent.SaveFile) ;
+            void Execute(object state) => InvokeAsynchron(Parent.SaveFile);
 
             void InvokeAsynchron(Action action) => Parent.Frame.InvokeAsynchron(action);
 
@@ -179,17 +180,37 @@ namespace ReniUI
 
         public void Open() { NotImplementedMethod(); }
 
-        public void FormatAll()
+        public void FormatAll() => Format(Compiler.Source.All);
+
+        void Format(SourcePart sourcePart)
         {
-            var sourcePart = Compiler.Source.All;
-            var reformat = Compiler.Locate(sourcePart).GetEditPieces(sourcePart).ToArray();
-            NotImplementedMethod();
+            var reformat = Compiler
+                .Locate(sourcePart)
+                .GetEditPieces
+                (
+                    sourcePart,
+                    new Configuration
+                    {
+                        EmptyLineLimit = 1,
+                        MaxLineLength = 120
+                    }
+                        .Create()
+                )
+                .Reverse();
+
+            foreach(var piece in reformat)
+            {
+                TextBox.TargetStart = piece.Position;
+                TextBox.TargetEnd = piece.Position + piece.RemoveCount;
+                TextBox.ReplaceTarget(piece.NewText);
+            }
         }
 
         public void FormatSelection()
         {
-            NotImplementedMethod();
-
+            var sourcePart = (Compiler.Source + TextBox.SelectionStart).Span
+                (TextBox.SelectionEnd - TextBox.SelectionEnd);
+            Format(sourcePart);
         }
 
         public bool HasSelection() => TextBox.SelectedText != "";
