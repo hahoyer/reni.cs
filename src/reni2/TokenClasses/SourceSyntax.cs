@@ -37,7 +37,7 @@ namespace Reni.TokenClasses
             TokenClass = tokenClass;
             Token = token;
             Right = right;
-            SyntaxProvider = this.CachedValue(() => getSyntax(Left?.Syntax, Token, Right?.Syntax));
+            SyntaxProvider = ValueCacheExtension.CachedValue(this, () => getSyntax(Left?.Syntax, Token, Right?.Syntax));
 
             if(Left != null)
                 Left.Parent = this;
@@ -172,7 +172,7 @@ namespace Reni.TokenClasses
         }
 
         [DisableDump]
-        internal IEnumerable<SourceSyntax> Items => this.CachedValue(GetItems);
+        internal IEnumerable<SourceSyntax> Items => ValueCacheExtension.CachedValue(this, GetItems);
 
         IEnumerable<SourceSyntax> GetItems()
         {

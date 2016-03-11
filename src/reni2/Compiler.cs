@@ -97,7 +97,7 @@ namespace Reni
             get
             {
                 lock(this)
-                    return this.CachedValue(() => Parse(Source + 0));
+                    return ValueCacheExtension.CachedValue(this, () => Parse(Source + 0));
             }
         }
 
@@ -107,7 +107,7 @@ namespace Reni
 
         [DisableDump]
         [Node]
-        internal string CSharpString => this.CachedValue(() => CodeContainer.CSharpString);
+        internal string CSharpString => ValueCacheExtension.CachedValue(this, () => CodeContainer.CSharpString);
 
         internal static string FormattedNow
         {

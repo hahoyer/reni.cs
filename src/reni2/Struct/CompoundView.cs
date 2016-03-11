@@ -352,6 +352,6 @@ namespace Reni.Struct
 
         [DisableDump]
         ContextReferenceType ContextReferenceType
-            => this.CachedValue(() => new ContextReferenceType(this));
+            => ValueCacheExtension.CachedValue(this, () => new ContextReferenceType(this));
     }
 }

@@ -135,6 +135,6 @@ namespace Reni.Type
             => Mutation(StableReferenceType) & category;
 
         StableReferenceType StableReferenceType
-            => this.CachedValue(() => new StableReferenceType(this));
+            => ValueCacheExtension.CachedValue(this, () => new StableReferenceType(this));
     }
 }

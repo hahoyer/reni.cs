@@ -36,7 +36,7 @@ namespace Reni.Struct
 
         [Node]
         [DisableDump]
-        internal CodeBase BodyCode => this.CachedValue(GetBodyCode);
+        internal CodeBase BodyCode => ValueCacheExtension.CachedValue(this, GetBodyCode);
         [DisableDump]
         Size ArgsPartSize => Parent.ArgsType.Size + RelevantValueSize;
         [DisableDump]
@@ -59,7 +59,7 @@ namespace Reni.Struct
         protected abstract FunctionId FunctionId { get; }
         [Node]
         [DisableDump]
-        ContextBase Context => this.CachedValue(GetContext);
+        ContextBase Context => ValueCacheExtension.CachedValue(this, GetContext);
 
         [DisableDump]
         internal Container Container
