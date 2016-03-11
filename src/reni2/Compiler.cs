@@ -88,7 +88,7 @@ namespace Reni
 
         [Node]
         [DisableDump]
-        internal Syntax Syntax => ValueCacheExtension.CachedValue<Syntax>(this,(System.Func<Reni.Parser.Syntax>)(() => SourceSyntax.Syntax));
+        internal Syntax Syntax => ValueCacheExtension.CachedValue(this,() => SourceSyntax.Syntax);
 
         [Node]
         [DisableDump]
