@@ -7,6 +7,7 @@
 @functions {
     IEnumerable<string> ResultText => Code == null ? new string[0] : Compiler.FlatExecute(Code, true).Split('\n');
     string Code => Request.Form["Code"];
+
     static string Version
     {
         get
@@ -14,7 +15,8 @@
             var a = Assembly.GetAssembly(typeof(Compiler));
             var f = FileVersionInfo.GetVersionInfo(a.Location);
             return f.ProductVersion;
-        } }
+        }
+    }
 
 }
 @{
@@ -28,7 +30,7 @@
             <hgroup class="title">
                 <h1>@Page.Title.</h1>
                 <h2>Der Compiler-Tester.</h2>
-                
+
             </hgroup>
             <p>
                 Gib das Programm ein und drücke die Tab-Taste.
@@ -39,11 +41,24 @@
         </div>
     </section>
 }
+<script src="Scripts/codemirror-2.37/lib/codemirror.js"></script>
+<link rel="stylesheet" href="Scripts/codemirror-2.37/lib/codemirror.css" >
+<script src="Scripts/codemirror-2.37/mode/javascript/javascript.js"></script>
+
 <form method="POST">
     <div>
-        <textarea name="Code" rows="5" cols="80" onchange="submit()">@Code</textarea>
+        <textarea name="Code" id="Code" rows="5" cols="80" onchange="submit()">@Code</textarea>
+        <input type="Submit" name="Submit" value="Submit" />
     </div>
 </form>
+<script>
+    var editor = CodeMirror.fromTextArea(document.getElementById("Code"), {
+     lineNumbers: true,
+     mode: "javascript",
+     matchBrackets: true
+ });
+    </script>
+
 <br />
 
 <div>
