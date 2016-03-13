@@ -218,7 +218,7 @@ namespace ReniUI.Test
                 + @"\..\..";
             var fileName = srcDir + @"\renisource\test.reni";
             var file = fileName.FileHandle();
-            Tracer.Line(Tracer.FilePosn(fileName, 0, 0, "see there"));
+            Tracer.Line(Tracer.FilePosn(fileName, 0, 0, 0, 0, "see there"));
             var compiler = CompilerBrowser.FromFile(fileName);
             var source = compiler.Source.All;
             var newSource = compiler.Reformat
