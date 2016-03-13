@@ -9,3 +9,4 @@ obj/
 *.pdb
 /src/packages/**
 *.sln.ide
+/src/artifacts/bin
