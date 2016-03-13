@@ -220,6 +220,7 @@
     <Compile Include="ParserTest\StrangeDeclarationSyntax.cs" />
     <Compile Include="Parser\ITokenClass.cs" />
     <Compile Include="Parser\RecursionType.cs" />
+    <Compile Include="Parser\SavePartMatch.cs" />
     <Compile Include="ReniObjectExtender.cs" />
     <Compile Include="Parser\Extension.cs" />
     <Compile Include="Parser\ExclamationBoxToken.cs" />

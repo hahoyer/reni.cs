@@ -73,7 +73,7 @@ namespace Reni.Parser
             => Lexer.IsComment(item) || Lexer.IsLineComment(item);
 
         internal static bool IsLineBreak(this WhiteSpaceToken item)
-            => Lexer.IsLineEnd(item) ;
+            => Lexer.IsLineEnd(item);
 
         public static int Length(this IEnumerable<WhiteSpaceToken> whiteSpaceTokens)
             => whiteSpaceTokens.Sum(item => item.Characters.Id.Length);
@@ -109,45 +109,52 @@ namespace Reni.Parser
         {
             switch(@char)
             {
-                case '&':
-                    return "And";
-                case '\\':
-                    return "Backslash";
-                case ':':
-                    return "Colon";
-                case '.':
-                    return "Dot";
-                case '=':
-                    return "Equal";
-                case '>':
-                    return "Greater";
-                case '<':
-                    return "Less";
-                case '-':
-                    return "Minus";
-                case '!':
-                    return "Not";
-                case '|':
-                    return "Or";
-                case '+':
-                    return "Plus";
-                case '/':
-                    return "Slash";
-                case '*':
-                    return "Star";
-                case '~':
-                    return "Tilde";
-                case ' ':
-                    return "Space";
-                case '_':
-                    return "__";
-                default:
-                    if(char.IsLetter(@char))
-                        return "_" + @char;
-                    if(char.IsDigit(@char))
-                        return @char.ToString();
-                    throw new NotImplementedException("Symbolize(" + @char + ")");
+            case '&':
+                return "And";
+            case '\\':
+                return "Backslash";
+            case ':':
+                return "Colon";
+            case '.':
+                return "Dot";
+            case '=':
+                return "Equal";
+            case '>':
+                return "Greater";
+            case '<':
+                return "Less";
+            case '-':
+                return "Minus";
+            case '!':
+                return "Not";
+            case '|':
+                return "Or";
+            case '+':
+                return "Plus";
+            case '/':
+                return "Slash";
+            case '*':
+                return "Star";
+            case '~':
+                return "Tilde";
+            case ' ':
+                return "Space";
+            case '_':
+                return "__";
+            default:
+                if(char.IsLetter(@char))
+                    return "_" + @char;
+                if(char.IsDigit(@char))
+                    return @char.ToString();
+                throw new NotImplementedException("Symbolize(" + @char + ")");
             }
         }
+
+        internal static IMatch SavePart
+            (this IMatch target, Action<string> onMatch, Action onMismatch = null)
+            => new SavePartMatch(target, onMatch, onMismatch);
+
+        internal static int? Apply(this IMatch pattern, string target)
+            => (new Source(target) + 0).Match(pattern);
     }
 }
