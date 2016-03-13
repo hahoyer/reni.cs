@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using hw.DebugFormatter;
 using hw.Forms;
 using hw.Helper;
@@ -23,14 +22,24 @@ namespace Reni
     public sealed class Compiler
         : DumpableObject, ValueCache.IContainer, Root.IParent, IExecutionContext
     {
+        const string DefaultSourceIdentifier = "source";
+        const string DefaultModuleName = "ReniModule";
+
         static IScanner<SourceSyntax> Scanner(ITokenFactory<SourceSyntax> tokenFactory)
             => new Scanner<SourceSyntax>(Lexer.Instance, tokenFactory);
 
         public static Compiler FromFile(string fileName, CompilerParameters parameters = null)
-            => new Compiler(fileName, parameters);
+        {
+            Tracer.Assert(fileName != null);
+            var moduleName = ModuleNameFromFileName(fileName);
+            return new Compiler(new Source(fileName.FileHandle()), moduleName, parameters);
+        }
 
-        public static Compiler FromText(string text, CompilerParameters parameters = null, string id = null)
-            => new Compiler(text: text, parameters: parameters, id:id);
+        public static Compiler FromText(string text, CompilerParameters parameters = null)
+        {
+            Tracer.Assert(text != null);
+            return new Compiler(new Source(text, DefaultSourceIdentifier), DefaultModuleName, parameters);
+        }
 
         readonly MainTokenFactory _tokenFactory;
         internal readonly CompilerParameters Parameters;
@@ -50,45 +59,28 @@ namespace Reni
         public Exception Exception;
         readonly ValueCache<CodeContainer> CodeContainerCache;
 
-        Compiler
-            (
-            string fileName = null,
-            CompilerParameters parameters = null,
-            string moduleName = null,
-            string text = null,
-            
-            string id = null)
+        Compiler(Source source, string modulName, CompilerParameters parameters)
         {
-            Tracer.Assert
-                (
-                    new object[] {fileName, text}
-                        .Count(item => item != null)
-                        == 1
-                );
-
-            ModuleName = moduleName ?? ModuleNameFromFileName(fileName) ?? "ReniModule";
-            Root = new Root(this);
+            Source = source;
             Parameters = parameters ?? new CompilerParameters();
+            ModuleName = modulName;
 
+            Root = new Root(this);
             _tokenFactory = new MainTokenFactory(Scanner)
             {
                 Trace = Parameters.TraceOptions.Parser
             };
-
-            Source = (fileName == null
-                    ? new Source(text,id)
-                    : new Source(fileName.FileHandle()));
 
             CodeContainerCache = NewValueCache
                 (() => new CodeContainer(ModuleName, Root, Syntax, Source.Data));
         }
 
         static string ModuleNameFromFileName(string fileName)
-            => fileName == null ? null : "_" + Path.GetFileName(fileName).Symbolize();
+            => "_" + Path.GetFileName(fileName).Symbolize();
 
         [Node]
         [DisableDump]
-        internal Syntax Syntax => ValueCacheExtension.CachedValue(this,() => SourceSyntax.Syntax);
+        internal Syntax Syntax => this.CachedValue(() => SourceSyntax.Syntax);
 
         [Node]
         [DisableDump]
@@ -97,7 +89,7 @@ namespace Reni
             get
             {
                 lock(this)
-                    return ValueCacheExtension.CachedValue(this, () => Parse(Source + 0));
+                    return this.CachedValue(() => Parse(Source + 0));
             }
         }
 
@@ -107,7 +99,7 @@ namespace Reni
 
         [DisableDump]
         [Node]
-        internal string CSharpString => ValueCacheExtension.CachedValue(this, () => CodeContainer.CSharpString);
+        internal string CSharpString => this.CachedValue(() => CodeContainer.CSharpString);
 
         internal static string FormattedNow
         {
