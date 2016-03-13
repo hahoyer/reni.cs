@@ -29,11 +29,11 @@ namespace Reni
         public static Compiler FromFile(string fileName, CompilerParameters parameters = null)
             => new Compiler(fileName, parameters);
 
-        public static Compiler FromText(string text, CompilerParameters parameters = null)
-            => new Compiler(text: text, parameters: parameters);
+        public static Compiler FromText(string text, CompilerParameters parameters = null, string id = null)
+            => new Compiler(text: text, parameters: parameters, id:id);
 
         readonly MainTokenFactory _tokenFactory;
-        readonly CompilerParameters _parameters;
+        internal readonly CompilerParameters Parameters;
         readonly string ModuleName;
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
@@ -56,27 +56,27 @@ namespace Reni
             CompilerParameters parameters = null,
             string moduleName = null,
             string text = null,
-            Source source = null)
+            
+            string id = null)
         {
             Tracer.Assert
                 (
-                    new object[] {fileName, text, source}
+                    new object[] {fileName, text}
                         .Count(item => item != null)
                         == 1
                 );
 
             ModuleName = moduleName ?? ModuleNameFromFileName(fileName) ?? "ReniModule";
             Root = new Root(this);
-            _parameters = parameters ?? new CompilerParameters();
+            Parameters = parameters ?? new CompilerParameters();
 
             _tokenFactory = new MainTokenFactory(Scanner)
             {
-                Trace = _parameters.TraceOptions.Parser
+                Trace = Parameters.TraceOptions.Parser
             };
 
-            Source = source
-                ?? (fileName == null
-                    ? new Source(text)
+            Source = (fileName == null
+                    ? new Source(text,id)
                     : new Source(fileName.FileHandle()));
 
             CodeContainerCache = NewValueCache
@@ -128,9 +128,9 @@ namespace Reni
         }
 
         bool IsTraceEnabled
-            => _isInExecutionPhase && _parameters.TraceOptions.Functions;
+            => _isInExecutionPhase && Parameters.TraceOptions.Functions;
 
-        bool Root.IParent.ProcessErrors => _parameters.ProcessErrors;
+        bool Root.IParent.ProcessErrors => Parameters.ProcessErrors;
 
         IExecutionContext Root.IParent.ExecutionContext => this;
 
@@ -158,19 +158,19 @@ namespace Reni
         /// </summary>
         public void Execute()
         {
-            if(_parameters.TraceOptions.Source)
+            if(Parameters.TraceOptions.Source)
                 Tracer.Line("Dump Source\n" + Source.Dump());
 
-            if(_parameters.TraceOptions.Syntax)
+            if(Parameters.TraceOptions.Syntax)
                 Tracer.FlaggedLine("Syntax\n" + Syntax.Dump());
 
-            if(_parameters.ParseOnly)
+            if(Parameters.ParseOnly)
                 return;
 
-            if(_parameters.TraceOptions.CodeSequence)
+            if(Parameters.TraceOptions.CodeSequence)
                 Tracer.FlaggedLine("Code\n" + CodeContainer.Dump());
 
-            if(_parameters.RunFromCode)
+            if(Parameters.RunFromCode)
             {
                 _isInExecutionPhase = true;
                 RunFromCode();
@@ -178,17 +178,18 @@ namespace Reni
                 return;
             }
 
-            if(_parameters.TraceOptions.ExecutedCode)
+            if(Parameters.TraceOptions.ExecutedCode)
                 Tracer.FlaggedLine(CSharpString);
 
             foreach(var t in Issues)
-                _parameters.OutStream.AddLog(t.LogDump + "\n");
+                Parameters.OutStream.AddLog(t.LogDump + "\n");
 
-            Data.OutStream = _parameters.OutStream;
+            Data.OutStream = Parameters.OutStream;
+
             try
             {
                 var method = CSharpString
-                    .CodeToAssembly(_parameters.TraceOptions.GeneratorFilePosn)
+                    .CodeToAssembly(Parameters.TraceOptions.GeneratorFilePosn)
                     .GetExportedTypes()[0]
                     .GetMethod(Generator.MainFunctionName);
 
@@ -198,7 +199,7 @@ namespace Reni
             catch(CSharpCompilerErrorException e)
             {
                 for(var i = 0; i < e.CompilerErrorCollection.Count; i++)
-                    _parameters.OutStream.AddLog(e.CompilerErrorCollection[i] + "\n");
+                    Parameters.OutStream.AddLog(e.CompilerErrorCollection[i] + "\n");
             }
             finally
             {
@@ -217,7 +218,7 @@ namespace Reni
         [DisableDump]
         internal IEnumerable<Issue> Issues
             => SourceSyntax.Issues
-                .plus(_parameters.ParseOnly ? new Issue[0] : CodeContainer.Issues)
+                .plus(Parameters.ParseOnly ? new Issue[0] : CodeContainer.Issues)
             ;
 
 
@@ -227,58 +228,11 @@ namespace Reni
 
         internal void Materialize()
         {
-            if(!_parameters.ParseOnly)
+            if(!Parameters.ParseOnly)
                 CodeContainerCache.IsValid = true;
         }
 
-        public static string FlatExecute(string text, bool isFakedName = false)
-        {
-            var fileName =
-                Environment.GetEnvironmentVariable("temp")
-                    + "\\reni.server\\"
-                    + Thread.CurrentThread.ManagedThreadId
-                    + ".reni";
-            var fileHandle = fileName.FileHandle();
-            fileHandle.AssumeDirectoryOfFileExists();
-            fileHandle.String = text;
-            var stringStream = new StringStream();
-            var parameters = new CompilerParameters
-            {
-                OutStream = stringStream
-            };
-            var c = new Compiler(fileName, parameters);
-
-            var exceptionText = "";
-            try
-            {
-                c.Execute();
-            }
-            catch(Exception exception)
-            {
-                exceptionText = exception.Message;
-            }
-
-            var result = "";
-
-            var log = stringStream.Log;
-            if(log != "")
-            {
-                if(isFakedName)
-                    log = log.Replace(fileName, "source");
-                result += "Log: \n" + log + "\n";
-            }
-
-            var data = stringStream.Data;
-            if(data != "")
-                result += "Data: \n" + data + "\n";
-
-            if(exceptionText != "")
-                result += "Exception: \n" + exceptionText;
-
-            return result;
-        }
-
-        IOutStream IExecutionContext.OutStream => _parameters.OutStream;
+        IOutStream IExecutionContext.OutStream => Parameters.OutStream;
 
         CodeBase IExecutionContext.Function(FunctionId functionId)
             => CodeContainer.Function(functionId);
@@ -286,6 +240,7 @@ namespace Reni
         internal IEnumerable<SourceSyntax> FindAllBelongings(SourceSyntax sourceSyntax)
             => SourceSyntax.Belongings(sourceSyntax);
 
+        public static string FlatExecute(string code, bool b) => "";
     }
 
     public sealed class TraceCollector : DumpableObject, ITraceCollector

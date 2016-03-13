@@ -22,6 +22,7 @@
       <Project>{EBB73C84-6622-4183-A28F-B0DFF606006B}</Project>
       <Name>Reni2</Name>
     </ProjectReference>
+    <Reference Include="System.Web.Extensions" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs">
@@ -67,6 +68,9 @@
     <Compile Include="Formatting\LineOrientedFormatter.cs" />
     <Compile Include="Formatting\SeparatorType.cs" />
     <Compile Include="MainView.cs" />
+    <Compile Include="RestFul\Channel.cs" />
+    <Compile Include="RestFul\ChannelRepo.cs" />
+    <Compile Include="RestFul\IChannelRepo.cs" />
     <Compile Include="Test\BadUserInterAction.cs" />
     <Compile Include="Test\BraceMatching.cs" />
     <Compile Include="Test\ExpressionFormatting.cs" />

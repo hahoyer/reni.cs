@@ -17,25 +17,28 @@ namespace ReniUI
     public sealed class CompilerBrowser : DumpableObject
     {
         public static CompilerBrowser FromText
-            (string text, CompilerParameters parameters = null)
-            => new CompilerBrowser(Compiler.FromText(text, parameters));
+            (string text, CompilerParameters parameters = null, string id = null)
+            => new CompilerBrowser(() => Compiler.FromText(text, parameters));
 
         public static CompilerBrowser FromFile
             (string fileName, CompilerParameters parameters = null)
-            => new CompilerBrowser(Compiler.FromFile(fileName, parameters));
+            => new CompilerBrowser(() => Compiler.FromFile(fileName, parameters));
 
         readonly IDictionary<IFormalCodeItem, int> CodeToFunctionIndexCache =
             new Dictionary<IFormalCodeItem, int>();
         readonly FunctionCache<int, Token> LocateCache;
-        internal readonly Compiler Parent;
+        readonly ValueCache<Compiler> ParentCache;
 
-        internal CompilerBrowser(Compiler parent)
+        internal CompilerBrowser(Func<Compiler> parent)
         {
-            Parent = parent;
+            ParentCache = new ValueCache<Compiler>(parent);
             LocateCache = new FunctionCache<int, Token>(GetLocateForCache);
         }
 
         public Source Source => Parent.Source;
+
+        Compiler Parent => ParentCache.Value;
+
         internal IExecutionContext ExecutionContext => Parent;
 
         internal IEnumerable<CompileSyntax> FindPosition(int p)
@@ -134,5 +137,40 @@ namespace ReniUI
         internal void Execute(DataStack dataStack) => Parent.ExecuteFromCode(dataStack);
 
         public IEnumerable<SourcePart> FindAllBelongings(Token open) => open.FindAllBelongings(this);
+
+        public string FlatExecute(string id)
+        {
+            var exceptionText = "";
+
+            var stringStream = new StringStream();
+
+            Parent.Parameters.OutStream = stringStream;
+            try
+            {
+                Parent.Execute();
+            }
+            catch(Exception exception)
+            {
+                exceptionText = exception.Message;
+            }
+
+            var result = "";
+
+            var log = stringStream.Log;
+            if(log != "")
+            {
+                log = log.Replace(id, "source");
+                result += "Log: \n" + log + "\n";
+            }
+
+            var data = stringStream.Data;
+            if(data != "")
+                result += "Data: \n" + data + "\n";
+
+            if(exceptionText != "")
+                result += "Exception: \n" + exceptionText;
+
+            return result;
+        }
     }
 }
