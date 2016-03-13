@@ -12,10 +12,8 @@ namespace ReniUI.RestFul
 
         string IChannelRepo.AddAndGetNewId()
         {
-            var channel = new Channel();
             var result = CreateNewKey();
-            channel.Id = result;
-            Data.Add(result, channel);
+            Data.Add(result, new Channel());
             return result;
         }
         Channel IChannelRepo.Find(string key) => Data.ContainsKey(key) ? Data[key] : null;

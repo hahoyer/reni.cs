@@ -2,15 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Script.Serialization;
+using System.Xml.Serialization;
+using hw.Helper;
 
 namespace ReniUI.RestFul
 {
     public sealed class Channel
     {
-        CompilerBrowser Compiler;
+        readonly ValueCache<CompilerBrowser> Compiler;
         string _text;
 
-        public string Id;
+        public Channel() { Compiler = new ValueCache<CompilerBrowser>(CreateCompiler); }
+
+        CompilerBrowser CreateCompiler() 
+            => CompilerBrowser.FromText(_text);
 
         public string Text
         {
@@ -21,12 +26,10 @@ namespace ReniUI.RestFul
                     return;
 
                 _text = value;
-
-                Compiler = CompilerBrowser.FromText(_text, id: Id);
+                Compiler.IsValid = false;
             }
         }
 
-        [ScriptIgnore]
-        public string Result => Compiler.FlatExecute(Id);
+        public string GetResult() => Compiler.Value.FlatExecute();
     }
 }

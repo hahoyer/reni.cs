@@ -17,7 +17,7 @@ namespace ReniUI
     public sealed class CompilerBrowser : DumpableObject
     {
         public static CompilerBrowser FromText
-            (string text, CompilerParameters parameters = null, string id = null)
+            (string text, CompilerParameters parameters = null)
             => new CompilerBrowser(() => Compiler.FromText(text, parameters));
 
         public static CompilerBrowser FromFile
@@ -138,7 +138,7 @@ namespace ReniUI
 
         public IEnumerable<SourcePart> FindAllBelongings(Token open) => open.FindAllBelongings(this);
 
-        public string FlatExecute(string id)
+        public string FlatExecute()
         {
             var exceptionText = "";
 
@@ -158,10 +158,7 @@ namespace ReniUI
 
             var log = stringStream.Log;
             if(log != "")
-            {
-                log = log.Replace(id, "source");
                 result += "Log: \n" + log + "\n";
-            }
 
             var data = stringStream.Data;
             if(data != "")
