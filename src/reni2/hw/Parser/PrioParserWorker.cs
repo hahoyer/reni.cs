@@ -114,12 +114,12 @@ namespace hw.Parser
                 Tracer.Assert(other != null);
                 var newType = Current.Type;
 
-                if(relation.IsMatch)
-                    newType = ((IBracketMatch<TTreeItem>) newType).Value;
+                if (relation.IsMatch)
+                    newType = ((IBracketMatch<TTreeItem>)newType).Value;
 
                 var token = Current.Token;
                 if (relation.IsMatch)
-                    token = Token.Create(new ScannerToken(token.SourcePart.End.Span(0), null),Current.RightCOntext());
+                    token = Token.Create(new ScannerToken(token.SourcePart.End.Span(0), null), Current.RightCOntext());
 
                 Current = Item<TTreeItem>
                     .Create(newType, token, other.BracketItem.LeftContext);
