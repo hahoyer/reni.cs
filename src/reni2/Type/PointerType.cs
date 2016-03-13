@@ -38,7 +38,7 @@ namespace Reni.Type
 
         [DisableDump]
         internal override Root Root => ValueType.Root;
-        internal override string DumpPrintText => "(" + ValueType.DumpPrintText + ")~~~";
+        internal override string DumpPrintText => "(" + ValueType.DumpPrintText + ")[Pointer]";
 
         [DisableDump]
         internal override CompoundView FindRecentCompoundView => ValueType.FindRecentCompoundView;
