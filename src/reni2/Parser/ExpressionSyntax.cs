@@ -69,14 +69,44 @@ namespace Reni.Parser
         internal override Checked<Syntax> InfixOfMatched(SourcePart token, Syntax right)
             => Checked<Syntax>.From(Create(this, null, right, token));
 
+        int CurrentResultDepth = 0;
         internal override Result ResultForCache(ContextBase context, Category category)
         {
-            if(Left == null)
-                return context.PrefixResult(category, Definable, Token, Right);
+            if(CurrentResultDepth > 20)
+                throw new EvaluationDepthExhaustedException(this, context, CurrentResultDepth);
+            try
+            {
+                CurrentResultDepth++;
+                if (Left == null)
+                    return context.PrefixResult(category, Definable, Token, Right);
 
-            var left = context.ResultAsReferenceCache(Left);
+                var left = context.ResultAsReferenceCache(Left);
 
-            return left.Type.Execute(category, left, Token, Definable, context, Right);
+                return left.Type.Execute(category, left, Token, Definable, context, Right);
+            }
+            finally
+            {
+                CurrentResultDepth--;
+            }
+        }
+
+        internal sealed class EvaluationDepthExhaustedException : Exception
+        {
+            readonly ExpressionSyntax Target;
+            readonly ContextBase Context;
+            readonly int Depth;
+
+            public EvaluationDepthExhaustedException(ExpressionSyntax target, ContextBase context, int depth)
+            {
+                Target = target;
+                Context = context;
+                Depth = depth;
+            }
+
+            public override string Message 
+                => "Depth of " + Depth + " exhausted when evaluation expression.\n" +
+                "Expression: " + Target.SourcePart.GetDumpAroundCurrent(10) +"\n" +
+                "Context: " + Context.NodeDump;
         }
 
         internal override CompileSyntax Visit(ISyntaxVisitor visitor)
