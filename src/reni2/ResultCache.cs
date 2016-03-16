@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using hw.DebugFormatter;
-using hw.Forms;
+
 using Reni.Basics;
 using Reni.Code;
 using Reni.Type;
 
 namespace Reni
 {
-    sealed class ResultCache : DumpableObject, ITreeNodeSupport
+    sealed class ResultCache : DumpableObject
     {
         internal interface IResultProvider
         {
@@ -234,6 +234,5 @@ namespace Reni
             return result;
         }
 
-        IEnumerable<TreeNode> ITreeNodeSupport.CreateNodes() => Data.TreeNodes;
     }
 }

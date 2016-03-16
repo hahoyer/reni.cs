@@ -1,20 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.Script.Serialization;
-using System.Xml.Serialization;
 using hw.Helper;
+using Reni;
+using Reni.Validation;
 
 namespace ReniUI.RestFul
 {
     public sealed class Channel
     {
-        readonly ValueCache<CompilerBrowser> Compiler;
+        readonly ValueCache<CompilerBrowser> CompilerCache;
+        readonly ValueCache<StringStream> ResultCache;
         string _text;
 
-        public Channel() { Compiler = new ValueCache<CompilerBrowser>(CreateCompiler); }
+        public Channel()
+        {
+            ResultCache = new ValueCache<StringStream>(GetResult);
+            CompilerCache = new ValueCache<CompilerBrowser>(CreateCompiler);
+        }
 
-        CompilerBrowser CreateCompiler() 
+        CompilerBrowser CreateCompiler()
             => CompilerBrowser.FromText(_text);
 
         public string Text
@@ -26,10 +31,31 @@ namespace ReniUI.RestFul
                     return;
 
                 _text = value;
-                Compiler.IsValid = false;
+                CompilerCache.IsValid = false;
+                ResultCache.IsValid = false;
             }
         }
 
-        public string GetResult() => Compiler.Value.FlatExecute();
+        StringStream GetResult() => CompilerCache.Value.Result;
+
+        public Issue[] GetIssues() => CompilerCache.Value.Issues.Select(Issue.Create).ToArray();
+
+        public void ResetResult() { ResultCache.IsValid = false; }
+
+        public string GetOutput()
+        {
+            if(GetIssues().Any())
+                throw new ExecutionProhibitedException();
+            return ResultCache.Value.Data;
+        }
+
+        sealed class ExecutionProhibitedException : Exception {}
+
+        public string GetUnexpectedErrors()
+        {
+            if (GetIssues().Any())
+                return "";
+            return ResultCache.Value.Log;
+        }
     }
 }

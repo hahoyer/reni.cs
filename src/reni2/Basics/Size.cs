@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Forms;
 using hw.Helper;
 using hw.UnitTest;
 using JetBrains.Annotations;
@@ -49,7 +48,7 @@ namespace Reni.Basics
         {
             var size = 1;
             var xn = value >= 0 ? value : -value;
-            for(Int64 upper = 1; xn >= upper; size++, upper *= 2)
+            for(long upper = 1; xn >= upper; size++, upper *= 2)
                 continue;
             return Create(size);
         }
@@ -68,12 +67,13 @@ namespace Reni.Basics
 
         public int SizeToPacketCount(int alignBits) => ((_value - 1) >> alignBits) + 1;
 
-        public Size NextPacketSize(int alignBits) => Create(SizeToPacketCount(alignBits) << alignBits);
+        public Size NextPacketSize(int alignBits)
+            => Create(SizeToPacketCount(alignBits) << alignBits);
 
         internal void AssertAlignedSize(int alignBits)
         {
             var result = SizeToPacketCount(alignBits);
-            if((result << alignBits) == _value)
+            if(result << alignBits == _value)
                 return;
             NotImplementedMethod(alignBits);
 
@@ -215,6 +215,11 @@ namespace Reni.Basics
                 return this * -1;
             }
         }
+    }
+
+    interface IIconKeyProvider
+    {
+        string IconKey { get; }
     }
 
     sealed class NotAlignableException : Exception

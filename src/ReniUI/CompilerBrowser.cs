@@ -9,6 +9,7 @@ using Reni.Code;
 using Reni.Parser;
 using Reni.Struct;
 using Reni.TokenClasses;
+using Reni.Validation;
 using ReniUI.Classifcation;
 using ReniUI.Formatting;
 
@@ -40,6 +41,8 @@ namespace ReniUI
         Compiler Parent => ParentCache.Value;
 
         internal IExecutionContext ExecutionContext => Parent;
+
+        internal IEnumerable<Issue> Issues => Parent.Issues;
 
         internal IEnumerable<CompileSyntax> FindPosition(int p)
         {
@@ -138,36 +141,15 @@ namespace ReniUI
 
         public IEnumerable<SourcePart> FindAllBelongings(Token open) => open.FindAllBelongings(this);
 
-        public string FlatExecute()
+        public StringStream Result
         {
-            var exceptionText = "";
-
-            var stringStream = new StringStream();
-
-            Parent.Parameters.OutStream = stringStream;
-            try
+            get
             {
+                var result = new StringStream();
+                Parent.Parameters.OutStream = result;
                 Parent.Execute();
+                return result;
             }
-            catch(Exception exception)
-            {
-                exceptionText = exception.Message;
-            }
-
-            var result = "";
-
-            var log = stringStream.Log;
-            if(log != "")
-                result += "Log: \n" + log + "\n";
-
-            var data = stringStream.Data;
-            if(data != "")
-                result += "Data: \n" + data + "\n";
-
-            if(exceptionText != "")
-                result += "Exception: \n" + exceptionText;
-
-            return result;
         }
     }
 }

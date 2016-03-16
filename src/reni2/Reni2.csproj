@@ -136,30 +136,6 @@
     <Compile Include="hw\DebugFormatter\TextWriters.cs" />
     <Compile Include="hw\DebugFormatter\Tracer.cs" />
     <Compile Include="hw\DebugFormatter\Writer.cs" />
-    <Compile Include="hw\Forms\CursorUtil.cs" />
-    <Compile Include="hw\Forms\Extender.cs" />
-    <Compile Include="hw\Forms\IAdditionalNodeInfoProvider.cs" />
-    <Compile Include="hw\Forms\IIconKeyProvider.cs" />
-    <Compile Include="hw\Forms\ITreeNodeSupport.cs" />
-    <Compile Include="hw\Forms\NodeAttribute.cs" />
-    <Compile Include="hw\Forms\NodeNameAttribute.cs" />
-    <Compile Include="hw\Forms\PositionConfig.cs" />
-    <Compile Include="hw\Forms\SmartNodeAttribute.cs" />
-    <Compile Include="hw\Forms\TreeForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="hw\Forms\TreeForm.Designer.cs" />
-    <Compile Include="hw\Graphics\IGraphTarget.cs" />
-    <Compile Include="hw\Graphics\SVG\Circle.cs" />
-    <Compile Include="hw\Graphics\SVG\Content.cs" />
-    <Compile Include="hw\Graphics\SVG\Path.cs" />
-    <Compile Include="hw\Graphics\SVG\Rect.cs" />
-    <Compile Include="hw\Graphics\SVG\Root.cs" />
-    <Compile Include="hw\Graphics\SVG\SVG.cs" />
-    <Compile Include="hw\Graphics\SVG\SyntaxDrawer.cs" />
-    <Compile Include="hw\Graphics\SVG\Text.cs" />
-    <Compile Include="hw\Graphics\Syntax.cs" />
-    <Compile Include="hw\Graphics\SyntaxDrawer.cs" />
     <Compile Include="hw\Helper\Box.cs" />
     <Compile Include="hw\Helper\DateRange.cs" />
     <Compile Include="hw\Helper\DateTimeExtender.cs" />
@@ -214,9 +190,7 @@
     <Compile Include="hw\UnitTest\TestType.cs" />
     <Compile Include="IProxyType.cs" />
     <Compile Include="ParserTest\AlternativePrioTableTest.cs" />
-    <Compile Include="ParserTest\SimpleTokenFactory.cs" />
     <Compile Include="ParserTest\VerbatimText.cs" />
-    <Compile Include="ParserTest\Services.cs" />
     <Compile Include="ParserTest\StrangeDeclarationSyntax.cs" />
     <Compile Include="Parser\ITokenClass.cs" />
     <Compile Include="Parser\RecursionType.cs" />
@@ -415,14 +389,9 @@
     <None Include="sys.targets" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework, Version=3.2.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.3.2.0\lib\net45\nunit.framework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
@@ -434,9 +403,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="hw\Forms\TreeForm.resx" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="AssemblyInfo.tt">

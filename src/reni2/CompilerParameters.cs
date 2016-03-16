@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Forms;
+
 
 namespace Reni
 {
@@ -81,6 +81,16 @@ namespace Reni
                 Functions = true;
                 GeneratorFilePosn = true;
             }
+        }
+    }
+
+    public class NodeAttribute : Attribute
+    {
+        private string v;
+
+        public NodeAttribute(string v=null)
+        {
+            this.v = v;
         }
     }
 }

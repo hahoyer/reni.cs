@@ -22,7 +22,6 @@
       <Project>{EBB73C84-6622-4183-A28F-B0DFF606006B}</Project>
       <Name>Reni2</Name>
     </ProjectReference>
-    <Reference Include="System.Web.Extensions" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs">
@@ -67,10 +66,35 @@
     <Compile Include="Formatting\Item.cs" />
     <Compile Include="Formatting\LineOrientedFormatter.cs" />
     <Compile Include="Formatting\SeparatorType.cs" />
+    <Compile Include="hw\Forms\CursorUtil.cs" />
+    <Compile Include="hw\Forms\Extender.cs" />
+    <Compile Include="hw\Forms\IAdditionalNodeInfoProvider.cs" />
+    <Compile Include="hw\Forms\IIconKeyProvider.cs" />
+    <Compile Include="hw\Forms\ITreeNodeSupport.cs" />
+    <Compile Include="hw\Forms\NodeAttribute.cs" />
+    <Compile Include="hw\Forms\NodeNameAttribute.cs" />
+    <Compile Include="hw\Forms\PositionConfig.cs" />
+    <Compile Include="hw\Forms\SmartNodeAttribute.cs" />
+    <Compile Include="hw\Forms\TreeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="hw\Forms\TreeForm.Designer.cs" />
+    <Compile Include="hw\Graphics\IGraphTarget.cs" />
+    <Compile Include="hw\Graphics\SVG\Circle.cs" />
+    <Compile Include="hw\Graphics\SVG\Content.cs" />
+    <Compile Include="hw\Graphics\SVG\Path.cs" />
+    <Compile Include="hw\Graphics\SVG\Rect.cs" />
+    <Compile Include="hw\Graphics\SVG\Root.cs" />
+    <Compile Include="hw\Graphics\SVG\SVG.cs" />
+    <Compile Include="hw\Graphics\SVG\SyntaxDrawer.cs" />
+    <Compile Include="hw\Graphics\SVG\Text.cs" />
+    <Compile Include="hw\Graphics\Syntax.cs" />
+    <Compile Include="hw\Graphics\SyntaxDrawer.cs" />
     <Compile Include="MainView.cs" />
     <Compile Include="RestFul\Channel.cs" />
     <Compile Include="RestFul\ChannelRepo.cs" />
     <Compile Include="RestFul\IChannelRepo.cs" />
+    <Compile Include="RestFul\Issue.cs" />
     <Compile Include="Test\BadUserInterAction.cs" />
     <Compile Include="Test\BraceMatching.cs" />
     <Compile Include="Test\ExpressionFormatting.cs" />
@@ -101,6 +125,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="hw\Forms\TreeForm.resx" />
   </ItemGroup>
   <Import Project="sys.targets" />
 </Project>

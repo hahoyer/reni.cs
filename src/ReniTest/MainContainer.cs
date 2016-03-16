@@ -5,13 +5,10 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using hw.DebugFormatter;
-using hw.Forms;
 using hw.Helper;
 using hw.UnitTest;
 using Reni;
-using Reni.FeatureTest.Helper;
 using Reni.FeatureTest.TypeType;
-using Reni.ParserTest;
 using Reni.Runtime;
 using ReniUI;
 
@@ -40,52 +37,6 @@ namespace ReniTest
 
         // Keep this to ensure reference to ReniUI
         static void BrowseCompiler(CompilerBrowser compiler) { }
-
-        static void InspectCompiler(CompilerTest compiler)
-        {
-            object target = null;
-            try
-            {
-                target = compiler.Inspect().ToArray();
-            }
-            catch(Exception exception)
-            {
-                target = exception;
-            }
-
-            Application.Run
-                (
-                    new TreeForm
-                    {
-                        Target = target
-                    });
-        }
-
-        static void ShowSyntaxTree()
-        {
-            var prioTable = @"Left not
-Left and
-Left or
-Left * /
-Left + -
-Left = <>
-Right :=
-TELevel then else
-Left function
-Right :
-Right , ;
-ParLevel ( { ) }
-".FormatPrioTable();
-            var image = prioTable.SyntaxGraph("(x a)(b)");
-            var mainForm = new Form
-            {
-                ClientSize = image.Size,
-                BackgroundImage = image,
-                BackgroundImageLayout = ImageLayout.Stretch
-            };
-
-            Application.Run(mainForm);
-        }
 
         static Compiler CreateCompiler(string text)
         {

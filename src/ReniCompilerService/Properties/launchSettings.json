@@ -18,6 +18,8 @@
     },
     "web": {
       "commandName": "web",
+      "launchBrowser": true,
+      "launchUrl": "Channel",
       "environmentVariables": {
         "Hosting:Environment": "Development"
       }

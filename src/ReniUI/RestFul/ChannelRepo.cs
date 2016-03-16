@@ -10,14 +10,20 @@ namespace ReniUI.RestFul
 
         readonly IDictionary<string, Channel> Data = new Dictionary<string, Channel>();
 
-        string IChannelRepo.AddAndGetNewId()
-        {
-            var result = CreateNewKey();
-            Data.Add(result, new Channel());
-            return result;
-        }
         Channel IChannelRepo.Find(string key) => Data.ContainsKey(key) ? Data[key] : null;
         void IChannelRepo.Remove(string key) => Data.Remove(key);
         void IChannelRepo.Update(string key, Channel value) { Data[key].Text = value.Text; }
+
+        string IChannelRepo.Create(Channel value)
+        {
+            var result = CreateNewKey();
+            var channel = new Channel
+            {
+                Text = value.Text
+            };
+
+            Data.Add(result, channel);
+            return result;
+        }
     }
 }

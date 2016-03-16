@@ -3,13 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using hw.UnitTest;
-using NUnit.Framework;
 using Reni.FeatureTest.Helper;
 
 namespace Reni.ParserTest
 {
     [UnitTest]
-    [TestFixture]
     public sealed class ParserTest : CompilerTest
     {
         [UnitTest]
@@ -64,7 +62,6 @@ aa)#dump_print
         }
 
         [UnitTest]
-        [Test]
         public void LotsOfBrackets()
         {
             var syntaxPrototype =
@@ -82,7 +79,6 @@ aa)#dump_print
         }
 
         [UnitTest]
-        [Test]
         public void MoreBrackets()
         {
             var syntaxPrototype =

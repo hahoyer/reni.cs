@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 using hw.DebugFormatter;
-using hw.Forms;
+
 using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
@@ -14,7 +14,7 @@ using Reni.Type;
 
 namespace Reni
 {
-    sealed class Result : DumpableObject, ITreeNodeSupport, IAggregateable<Result>
+    sealed class Result : DumpableObject, IAggregateable<Result>
     {
         static int _nextObjectId = 1;
         bool _isDirty;
@@ -259,28 +259,6 @@ namespace Reni
             {
                 _exts = value;
                 AssertValid();
-            }
-        }
-
-        IEnumerable<TreeNode> ITreeNodeSupport.CreateNodes() => TreeNodes;
-
-        [DisableDump]
-        internal IEnumerable<TreeNode> TreeNodes
-        {
-            get
-            {
-                if(_pendingCategory.HasAny)
-                    yield return Dump().CreateNamedNode("Pending", "Pending");
-                if(HasHllw)
-                    yield return Hllw.CreateNamedNode("Hllw", "Logical");
-                if(HasSize)
-                    yield return Size.FormatForView().CreateNamedNode("Size", "Number");
-                if(HasType)
-                    yield return Type.CreateNamedNode("Type", "Type");
-                if(HasCode)
-                    yield return Code.CreateNamedNode("Code", "Code");
-                if(HasExts)
-                    yield return Exts.Data.CreateNamedNode("Exts", "Exts");
             }
         }
 

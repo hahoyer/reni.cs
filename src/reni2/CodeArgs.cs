@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using hw.Forms;
+
 using hw.Helper;
 using System.Linq;
 using System.Windows.Forms;
@@ -15,7 +15,7 @@ namespace Reni
     /// <summary>
     ///     Contains list of references to compiler environemnts.
     /// </summary>
-    sealed class CodeArgs : DumpableObject, ITreeNodeSupport
+    sealed class CodeArgs : DumpableObject
     {
         static int _nextId;
         readonly List<IContextReference> _data;
@@ -197,7 +197,6 @@ namespace Reni
         public static CodeArgs operator +(CodeArgs x, CodeArgs y) => x.Sequence(y);
         public static CodeArgs operator -(CodeArgs x, CodeArgs y) => x.Without(y);
         public static CodeArgs operator -(CodeArgs x, IContextReference y) => x.Without(y);
-        IEnumerable<TreeNode> ITreeNodeSupport.CreateNodes() => _data.CreateNodes();
 
         sealed class CodeArg : Singleton<CodeArg, DumpableObject>, IContextReference
         {

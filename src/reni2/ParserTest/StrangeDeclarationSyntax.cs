@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.UnitTest;
-using NUnit.Framework;
 using Reni.FeatureTest.Helper;
 using Reni.Validation;
 
 namespace Reni.ParserTest
 {
     [UnitTest]
-    [TestFixture]
     [Target(@"{!()}")]
     [Output("")]
     public sealed class StrangeDeclarationSyntax : CompilerTest

@@ -28,9 +28,9 @@ namespace Reni.Validation
         [EnableDump]
         internal SourcePart Position { get; }
         [EnableDump]
-        string Message { get; }
-
-        string Tag => IssueId.Tag;
+        internal string Message { get; }
+        [DisableDump]
+        internal string Tag => IssueId.Tag;
 
         [DisableDump]
         internal CodeBase Code => CodeBase.Issue(this);
