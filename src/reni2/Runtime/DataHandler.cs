@@ -187,8 +187,8 @@ namespace Reni.Runtime
         {
             var leftBytes = left.Length;
             var rightBytes = right.Length;
-            var isLeftNegative = left[leftBytes - 1] < 0;
-            var isRightNegative = right[rightBytes - 1] < 0;
+            var isLeftNegative = left[leftBytes - 1] > 127;
+            var isRightNegative = right[rightBytes - 1] > 127;
             if(isLeftNegative != isRightNegative)
                 return isRightNegative;
 
