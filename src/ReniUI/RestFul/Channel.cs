@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Helper;
 using Reni;
-using Reni.Validation;
 
 namespace ReniUI.RestFul
 {
@@ -53,7 +52,7 @@ namespace ReniUI.RestFul
 
         public string GetUnexpectedErrors()
         {
-            if (GetIssues().Any())
+            if(GetIssues().Any())
                 return "";
             return ResultCache.Value.Log;
         }

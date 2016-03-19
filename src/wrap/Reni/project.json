@@ -8,9 +8,9 @@
         "pdb": "../../../intermediate/Reni/{configuration}/Reni.pdb"
       },
       "dependencies": {
-        "hw.CompilerTools": "16.5.2",
+        "hw.CompilerTools": "16.7.1",
         "hw.Forms": "15.1",
-        "hw.Helper.Core": "15.2.6",
+        "hw.Helper.Core": "16.0",
         "hw.UnitTest": "15.1",
         "NUnit": "3.2.0"
       }

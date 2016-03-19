@@ -3,10 +3,10 @@
   "version": 2,
   "targets": {
     "DNX,Version=v4.5.1": {
-      "hw.CompilerTools/16.5.2": {
+      "hw.CompilerTools/16.7.1": {
         "type": "package",
         "dependencies": {
-          "hw.Helper.Core": "15.2.0"
+          "hw.Helper.Core": "16.0.0"
         }
       },
       "hw.Forms/15.1.0": {
@@ -18,7 +18,7 @@
           "System.Drawing"
         ]
       },
-      "hw.Helper.Core/15.2.6": {
+      "hw.Helper.Core/16.0.0": {
         "type": "package"
       },
       "hw.UnitTest/15.1.0": {
@@ -1394,9 +1394,9 @@
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
-          "hw.CompilerTools": "16.5.2",
+          "hw.CompilerTools": "16.7.1",
           "hw.Forms": "15.1.0",
-          "hw.Helper.Core": "15.2.6",
+          "hw.Helper.Core": "16.0.0",
           "hw.UnitTest": "15.1.0",
           "NUnit": "3.2.0"
         }
@@ -1623,10 +1623,10 @@
       }
     },
     "DNX,Version=v4.5.1/win7-x86": {
-      "hw.CompilerTools/16.5.2": {
+      "hw.CompilerTools/16.7.1": {
         "type": "package",
         "dependencies": {
-          "hw.Helper.Core": "15.2.0"
+          "hw.Helper.Core": "16.0.0"
         }
       },
       "hw.Forms/15.1.0": {
@@ -1638,7 +1638,7 @@
           "System.Drawing"
         ]
       },
-      "hw.Helper.Core/15.2.6": {
+      "hw.Helper.Core/16.0.0": {
         "type": "package"
       },
       "hw.UnitTest/15.1.0": {
@@ -3017,9 +3017,9 @@
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
-          "hw.CompilerTools": "16.5.2",
+          "hw.CompilerTools": "16.7.1",
           "hw.Forms": "15.1.0",
-          "hw.Helper.Core": "15.2.6",
+          "hw.Helper.Core": "16.0.0",
           "hw.UnitTest": "15.1.0",
           "NUnit": "3.2.0"
         }
@@ -3246,10 +3246,10 @@
       }
     },
     "DNX,Version=v4.5.1/win7-x64": {
-      "hw.CompilerTools/16.5.2": {
+      "hw.CompilerTools/16.7.1": {
         "type": "package",
         "dependencies": {
-          "hw.Helper.Core": "15.2.0"
+          "hw.Helper.Core": "16.0.0"
         }
       },
       "hw.Forms/15.1.0": {
@@ -3261,7 +3261,7 @@
           "System.Drawing"
         ]
       },
-      "hw.Helper.Core/15.2.6": {
+      "hw.Helper.Core/16.0.0": {
         "type": "package"
       },
       "hw.UnitTest/15.1.0": {
@@ -4640,9 +4640,9 @@
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
-          "hw.CompilerTools": "16.5.2",
+          "hw.CompilerTools": "16.7.1",
           "hw.Forms": "15.1.0",
-          "hw.Helper.Core": "15.2.6",
+          "hw.Helper.Core": "16.0.0",
           "hw.UnitTest": "15.1.0",
           "NUnit": "3.2.0"
         }
@@ -4878,9 +4878,9 @@
       "type": "project",
       "path": "../wrap/ReniUI/project.json"
     },
-    "hw.CompilerTools/16.5.2": {
+    "hw.CompilerTools/16.7.1": {
       "type": "package",
-      "sha512": "d+GnsA1u8LOA+XPT6M4oFegVtZvUQrGsiw3ejgIFYQJnWG3usyjauwW4YKiDNxFp1RhFAzgeJ84ipSd1muouvA==",
+      "sha512": "vZGMrqFvff15JTEE0Suxbrnb6JR6iD83cx4OLXb579Ge/3cZxK3LCZuiaFpOWoUTeq7CJjnSD2ojaxVRoUo0Hw==",
       "files": [
         "content/hw/Graphics/IGraphTarget.cs",
         "content/hw/Graphics/SVG/Circle.cs",
@@ -4922,8 +4922,8 @@
         "content/hw/Scanner/Source.cs",
         "content/hw/Scanner/SourcePart.cs",
         "content/hw/Scanner/SourcePosn.cs",
-        "hw.CompilerTools.16.5.2.nupkg",
-        "hw.CompilerTools.16.5.2.nupkg.sha512",
+        "hw.CompilerTools.16.7.1.nupkg",
+        "hw.CompilerTools.16.7.1.nupkg.sha512",
         "hw.CompilerTools.nuspec"
       ]
     },
@@ -4948,9 +4948,9 @@
         "hw.Forms.nuspec"
       ]
     },
-    "hw.Helper.Core/15.2.6": {
+    "hw.Helper.Core/16.0.0": {
       "type": "package",
-      "sha512": "fEHf+pe3ckMoWXFh9QxZV9/8vSNClO9NLmXi8Qk9B85u8fERMfo0afRIU2C6KjPhbaoRYqdHyjesiXrKos90Lw==",
+      "sha512": "ajaXJM2RXCOFCza3Rp79ju+pd8SxEAkXl3Xr1lsyw1c4ct7sZgGHwvANuli6NcBJYAoluXf655zMgFn2S+f4wA==",
       "files": [
         "content/hw/DebugFormatter/Configuration.cs",
         "content/hw/DebugFormatter/DebugTextWriter.cs",
@@ -4986,8 +4986,8 @@
         "content/hw/Helper/ValueCache.cs",
         "content/hw/Helper/ValueCacheExtension.cs",
         "content/hw/JetBrainsAnnotations.cs",
-        "hw.Helper.Core.15.2.6.nupkg",
-        "hw.Helper.Core.15.2.6.nupkg.sha512",
+        "hw.Helper.Core.16.0.0.nupkg",
+        "hw.Helper.Core.16.0.0.nupkg.sha512",
         "hw.Helper.Core.nuspec"
       ]
     },
