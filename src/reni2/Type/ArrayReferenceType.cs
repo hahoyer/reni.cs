@@ -14,6 +14,7 @@ namespace Reni.Type
 {
     sealed class ArrayReferenceType
         : TypeBase
+            , ISymbolProviderForPointer<DumpPrintToken>
             , ISymbolProviderForPointer<Mutable>
             , ISymbolProviderForPointer<EnableReinterpretation>
             , ISymbolProviderForPointer<Plus>
@@ -89,6 +90,8 @@ namespace Reni.Type
         protected override IEnumerable<IConversion> RawSymmetricConversions
             => base.RawSymmetricConversions;
 
+        protected override CodeBase DumpPrintCode() => ArgCode.DumpPrintText(SimpleItemSize);
+
         protected override string GetNodeDump()
             => ValueType.NodeDump + "[array_reference]" + OptionsValue.NodeDump;
 
@@ -106,6 +109,9 @@ namespace Reni.Type
         TypeBase IRepeaterType.ElementType => ValueType;
         TypeBase IRepeaterType.IndexType => Root.BitType.Number(Size.ToInt());
         bool IRepeaterType.IsMutable => OptionsValue.IsForceMutable.Value;
+
+        IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
+            => Feature.Extension.Value(DumpPrintTokenResult);
 
         IEnumerable<IConversion> IForcedConversionProvider<ArrayReferenceType>.Result
             (ArrayReferenceType destination)
@@ -213,5 +219,6 @@ namespace Reni.Type
                 );
 
         TypeBase IChild<TypeBase>.Parent => ValueType;
+
     }
 }

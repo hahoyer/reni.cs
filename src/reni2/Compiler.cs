@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using hw.DebugFormatter;
-
 using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
@@ -35,10 +34,15 @@ namespace Reni
             return new Compiler(new Source(fileName.FileHandle()), moduleName, parameters);
         }
 
-        public static Compiler FromText(string text, CompilerParameters parameters = null)
+        public static Compiler FromText
+            (string text, CompilerParameters parameters = null, string sourceIdentifier = null)
         {
             Tracer.Assert(text != null);
-            return new Compiler(new Source(text, DefaultSourceIdentifier), DefaultModuleName, parameters);
+            return new Compiler
+                (
+                new Source(text, sourceIdentifier ?? DefaultSourceIdentifier),
+                DefaultModuleName,
+                parameters);
         }
 
         readonly MainTokenFactory _tokenFactory;

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-
 using hw.Helper;
 using hw.Scanner;
 using JetBrains.Annotations;
@@ -22,8 +21,8 @@ namespace Reni.Type
             , IContextReferenceProvider
             , IIconKeyProvider
             , ISearchTarget
-        , ValueCache.IContainer
-        ,IRootProvider
+            , ValueCache.IContainer
+            , IRootProvider
     {
         sealed class Cache
         {
@@ -183,7 +182,7 @@ namespace Reni.Type
         [DisableDump]
         internal TypeBase SmartPointer => Hllw ? this : Pointer;
 
-        virtual internal Result ConvertToStableReference(Category category)
+        internal virtual Result ConvertToStableReference(Category category)
             => ArgResult(category);
 
         [DisableDump]
@@ -441,12 +440,18 @@ namespace Reni.Type
         protected virtual ArrayType GetArrayForCache(int count, string optionsId)
             => new ArrayType(this, count, optionsId);
 
-        [NotNull]
         internal Result GenericDumpPrintResult(Category category)
-            => SmartPointer
-                .Declarations<DumpPrintToken>(null)
-                .Single()
-                .SpecialExecute(category);
+        {
+            var searchResults = SmartPointer
+                .Declarations<DumpPrintToken>(null);
+            if(searchResults.Any())
+                return searchResults
+                    .Single()
+                    .SpecialExecute(category);
+
+            NotImplementedMethod(category);
+            return null;
+        }
 
         internal Result CreateArray(Category category, string optionsId = null) => Align
             .Array(1, optionsId).Pointer
@@ -656,9 +661,14 @@ namespace Reni.Type
         }
 
         protected Result DumpPrintTokenResult(Category category)
-            => VoidType
-                .Result(category, DumpPrintCode)
-                .ReplaceArg(ObjectResult(category).DereferenceResult);
+            => VoidType.Result(category, DumpPrintCode)
+                .ReplaceArg(DereferencesObjectResult(category));
+
+        Result DereferencesObjectResult(Category category)
+            =>
+                Hllw
+                    ? Result(category)
+                    : Pointer.Result(category.Typed, ForcedReference).DereferenceResult;
 
         internal Result ObjectResult(Category category)
             => Hllw ? Result(category) : Pointer.Result(category.Typed, ForcedReference);
@@ -708,12 +718,12 @@ namespace Reni.Type
 
             switch(searchResults.Length)
             {
-                case 0:
-                    return onError(IssueId.MissingDeclaration);
-                case 1:
-                    return execute(searchResults.First());
-                default:
-                    return onError(IssueId.AmbigousSymbol);
+            case 0:
+                return onError(IssueId.MissingDeclaration);
+            case 1:
+                return execute(searchResults.First());
+            default:
+                return onError(IssueId.AmbigousSymbol);
             }
         }
 
@@ -742,10 +752,10 @@ namespace Reni.Type
                 .Single()
                 .GetDefinableResults(ext, context, right);
 
-        ValueCache ValueCache.IContainer.Cache { get; }=new ValueCache();
+        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
         [DisableDump]
-        virtual internal TypeBase Weaken => null; 
+        internal virtual TypeBase Weaken => null;
     }
 
 
