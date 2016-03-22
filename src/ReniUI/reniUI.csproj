@@ -9,6 +9,9 @@
     <RootNamespace>ReniUI</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="JetBrains.Annotations">
+      <HintPath>..\packages\JetBrains.Annotations.10.0.0\lib\net20\JetBrains.Annotations.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.framework, Version=3.2.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>..\packages\NUnit.3.2.0\lib\net45\nunit.framework.dll</HintPath>
       <Private>True</Private>
@@ -57,6 +60,7 @@
     <Compile Include="CompilationView\ViewExtension.cs" />
     <Compile Include="CompilerBrowser.cs" />
     <Compile Include="EditorView.cs" />
+    <Compile Include="Extension.cs" />
     <Compile Include="Formatting\Configuration.cs" />
     <Compile Include="Formatting\ContactType.cs" />
     <Compile Include="Formatting\Frame.cs" />
@@ -90,6 +94,9 @@
     <Compile Include="hw\Graphics\SVG\Text.cs" />
     <Compile Include="hw\Graphics\Syntax.cs" />
     <Compile Include="hw\Graphics\SyntaxDrawer.cs" />
+    <Compile Include="IApplication.cs" />
+    <Compile Include="IssuesView.cs" />
+    <Compile Include="IStudioApplication.cs" />
     <Compile Include="MainView.cs" />
     <Compile Include="RestFul\Channel.cs" />
     <Compile Include="RestFul\ChannelRepo.cs" />

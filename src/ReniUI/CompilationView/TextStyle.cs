@@ -27,7 +27,11 @@ namespace ReniUI.CompilationView
         [UsedImplicitly]
         public static readonly TextStyle Text = new TextStyle(Color.Red);
         [UsedImplicitly]
-        public static readonly TextStyle Error = new TextStyle(Color.Gray, isItalic: true);
+        public static readonly TextStyle Error = new TextStyle
+            (
+            Color.Red,
+            isItalic: true,
+            isUnderlined: true);
 
         [UsedImplicitly]
         public static TextStyle From(Token token, CompilerBrowser compiler)
@@ -55,18 +59,21 @@ namespace ReniUI.CompilationView
         readonly bool IsItalic;
         readonly bool IsBold;
         readonly Color? BackColor;
+        readonly bool IsUnderlined;
 
         TextStyle
             (
             Color foreColor,
             Color? backColor = null,
             bool isBold = false,
-            bool isItalic = false)
+            bool isItalic = false,
+            bool isUnderlined = false)
         {
             ForeColor = foreColor;
             BackColor = backColor;
             IsBold = isBold;
             IsItalic = isItalic;
+            IsUnderlined = isUnderlined;
             Id = _nextId++;
         }
 
@@ -79,6 +86,7 @@ namespace ReniUI.CompilationView
                 style.BackColor = BackColor.Value;
             style.Italic = IsItalic;
             style.Bold = IsBold;
+            style.Underline = IsUnderlined;
         }
     }
 }

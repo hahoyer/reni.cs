@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 using Reni;
+using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
@@ -17,29 +17,13 @@ namespace ReniUI.CompilationView
 {
     static class ViewExtension
     {
-        const int DefaultTextSize = 10;
         static readonly Control _dummy = new Control();
-
-        internal static Control CreateGroup(this Control client, string title)
-        {
-            var result = new GroupBox
-            {
-                Text = title,
-                AutoSize = true,
-                Dock = DockStyle.Fill,
-                AutoSizeMode = AutoSizeMode.GrowAndShrink
-            };
-            client.Location = result.DisplayRectangle.Location;
-
-            result.Controls.Add(client);
-            return result;
-        }
 
         internal static Control CreateView(this CodeBase code, SourceView master)
         {
             var control = code.Visit(new CodeViewVisitor(master));
             var title = code.Size.ToInt() + " " + code.GetType().Name + "." + code.ObjectId + "i";
-            return CreateGroup(control, title);
+            return control.CreateGroup(title);
         }
 
         internal static Control CreateView(this CodeArgs exts, SourceView master)
@@ -51,90 +35,16 @@ namespace ReniUI.CompilationView
                         .ToArray()
                 );
 
-        internal static Control CreateColumnView(this IEnumerable<Control> controls)
-            => InternalCreateLineupView(true, controls);
-
-        internal static Control CreateRowView(this IEnumerable<Control> controls)
-            => InternalCreateLineupView(false, controls);
-
-        internal static Control CreateLineupView
-            (this bool inColumns, params Control[] controls)
-            => InternalCreateLineupView(inColumns, controls);
-
-        internal static TableLayoutPanel ForceLineupView
-            (this bool inColumns, params Control[] controls)
-            => CreateTableLayoutPanel(inColumns, controls);
-
-        static Control InternalCreateLineupView
-            (bool useColumns, IEnumerable<Control> controls)
-        {
-            var effectiveControls = controls
-                .Where(item => item != null && item != _dummy)
-                .ToArray();
-            return effectiveControls.Length == 1
-                ? effectiveControls[0]
-                : CreateTableLayoutPanel(useColumns, effectiveControls);
-        }
-
-        static TableLayoutPanel CreateTableLayoutPanel(bool inColumns, Control[] controls)
-        {
-            var result = new TableLayoutPanel
-            {
-                AutoSize = true,
-                AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                ColumnCount = inColumns ? controls.Length : 1,
-                RowCount = inColumns ? 1 : controls.Length,
-                CellBorderStyle = TableLayoutPanelCellBorderStyle.Single
-            };
-
-            result.Controls.AddRange(controls);
-            return result;
-        }
-
-        internal static Control CreateView(this Dumpable dumpable)
-            => CreateView(dumpable.Dump());
-
         internal static Control CreateView(this Type target)
             => target.PrettyName().CreateView();
 
         internal static Control CreateView(this FunctionInstance target, SourceView master)
             => target.BodyCode.CreateView(master);
 
-        internal static Label CreateView(this string text, double factor = 1, bool isBold = false)
-            => new Label
-            {
-                Font = CreateFont(factor, isBold),
-                AutoSize = true,
-                Text = text
-            };
-
-        static Font CreateFont(double factor, bool isBold = false)
-            =>
-                new Font
-                    (
-                    "Lucida Console",
-                    (int) (DefaultTextSize * factor),
-                    isBold ? FontStyle.Bold : FontStyle.Regular
-                    );
-
-        internal static Label CreateView(this int value, double factor = 1, bool isBold = false)
-            => new Label
-            {
-                Font = CreateFont(factor, isBold),
-                AutoSize = true,
-                Text = value.ToString(),
-                TextAlign = ContentAlignment.MiddleRight
-            };
-
-        internal static Label CreateView(this Reni.Basics.Size size)
-            => size == null
-                ? "unknown size".CreateView()
-                : size.ToInt().CreateView();
-
         internal static Control CreateSizeView(this Result result)
         {
             var size = result.Type?.Size
-                ?? result.Size ?? (result.HasHllw ? Reni.Basics.Size.Zero : null);
+                ?? result.Size ?? (result.HasHllw ? Size.Zero : null);
             return size.CreateView();
         }
 
@@ -145,18 +55,6 @@ namespace ReniUI.CompilationView
             return type.CreateLink(master);
         }
 
-        public interface IClickHandler
-        {
-            void Signal(object target);
-        }
-
-
-        internal static Control CreateLink(this object target, IClickHandler master)
-        {
-            var result = target.GetIdText().CreateView();
-            result.Click += (s, a) => master.Signal(target);
-            return result;
-        }
 
         internal static string GetIdText(this object target)
         {
@@ -284,7 +182,7 @@ namespace ReniUI.CompilationView
             return false.CreateLineupView(head, childView);
         }
 
-        static Reni.Basics.Size GetSize(object target) => (target as TypeBase)?.Size;
+        static Size GetSize(object target) => (target as TypeBase)?.Size;
 
         static Control CreateChildView(this FunctionBodyType target)
             => target?.Syntax.CreateView();

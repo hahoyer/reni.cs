@@ -14,7 +14,7 @@ using ScintillaNET;
 
 namespace ReniUI.CompilationView
 {
-    public sealed class SourceView : MainView, ViewExtension.IClickHandler
+    public sealed class SourceView : MainView, Extension.IClickHandler
     {
         int _lineNumberMarginLength;
         readonly Scintilla TextBox;
@@ -191,7 +191,7 @@ namespace ReniUI.CompilationView
 
         void SignalClickedObject(object target) => ChildViews[target].Run();
 
-        void ViewExtension.IClickHandler.Signal(object target) => SignalClickedObject(target);
+        void Extension.IClickHandler.Signal(object target) => SignalClickedObject(target);
 
         internal void SignalClickedFunction(int index)
             => SignalClickedObject(Compiler.Function(index));

@@ -22,15 +22,4 @@ namespace ReniUI
         internal void Run() => Application.Run(Context);
 
     }
-
-    public interface IApplication
-    {
-        void Register(Form frame);
-    }
-
-    public interface IStudioApplication: IApplication
-    {
-        void Exit();
-        void New();
-    }
 }

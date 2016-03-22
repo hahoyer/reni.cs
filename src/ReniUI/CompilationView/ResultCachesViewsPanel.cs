@@ -8,7 +8,7 @@ using Reni.Context;
 
 namespace ReniUI.CompilationView
 {
-    sealed class ResultCachesViewsPanel : DumpableObject, ViewExtension.IClickHandler
+    sealed class ResultCachesViewsPanel : DumpableObject, Extension.IClickHandler
     {
         readonly IDictionary<ContextBase, ResultCache> Target;
         readonly SourceView Master;
@@ -24,7 +24,7 @@ namespace ReniUI.CompilationView
             Client = false.CreateLineupView(selector, Target.First().CreateView(Master));
         }
 
-        void ViewExtension.IClickHandler.Signal(object target)
+        void Extension.IClickHandler.Signal(object target)
         {
             Client.SuspendLayout();
             var item = Target.Single(i => i.Key == target);

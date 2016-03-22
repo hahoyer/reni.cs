@@ -6,7 +6,7 @@ using System.Windows.Forms;
 using hw.Helper;
 using hw.Scanner;
 using Reni;
-using Reni.Parser;
+using Reni.Validation;
 using ReniUI.Commands;
 using ReniUI.CompilationView;
 using ReniUI.Formatting;
@@ -14,63 +14,11 @@ using ScintillaNET;
 
 namespace ReniUI
 {
-    public sealed class EditorView : ChildView
+    public sealed class EditorView : ChildView, IssuesView.IDataProvider
     {
         const string ConfigRoot = "StudioConfig";
         static readonly TimeSpan DelayForSave = TimeSpan.FromSeconds(1);
         static readonly TimeSpan NoPeriodicalActivation = TimeSpan.FromMilliseconds(-1);
-
-        int _lineNumberMarginLength;
-        readonly Scintilla TextBox;
-        readonly ValueCache<CompilerBrowser> CompilerCache;
-        readonly string FileName;
-        internal readonly IStudioApplication Master;
-        SaveManager _saveManager;
-
-        public EditorView(string fileName, IStudioApplication master)
-            : base(
-                master,
-                Path.Combine(ConfigRoot, "EditorFiles", fileName, "Editor", "Position")
-                )
-        {
-            FileName = fileName;
-            Master = master;
-            TextBox = new Scintilla
-            {
-                Lexer = ScintillaNET.Lexer.Container,
-                VirtualSpaceOptions = VirtualSpace.UserAccessible
-            };
-
-            TextBox.ClearCmdKey(Keys.Insert);
-
-            foreach(var id in TextStyle.All)
-                StyleConfig(id);
-
-            TextBox.StyleNeeded += (s, args) => SignalStyleNeeded(args.Position);
-            TextBox.TextChanged += (s, args) => OnTextChanged();
-
-            TextBox.ContextMenu = new ContextMenu();
-            TextBox.ContextMenu.Popup += (s, args) => OnContextMenuPopup();
-
-            CompilerCache = new ValueCache<CompilerBrowser>(CreateCompilerBrowser);
-
-            Client = TextBox;
-
-            TextBox.Text = FileName.FileHandle().String;
-            TextBox.SetSavePoint();
-            AlignTitle();
-            TextBox.TextChanged += (s, args) => RunSaveManager();
-
-            Frame.Menu = this.CreateMainMenu();
-        }
-
-        void RunSaveManager()
-        {
-            AlignTitle();
-            if(_saveManager == null)
-                _saveManager = new SaveManager(this);
-            _saveManager.Start();
-        }
 
         sealed class SaveManager
         {
@@ -90,6 +38,60 @@ namespace ReniUI
             public void Start() => Timer.Change(DelayForSave, NoPeriodicalActivation);
         }
 
+        int _lineNumberMarginLength;
+        readonly Scintilla TextBox;
+        readonly ValueCache<CompilerBrowser> CompilerCache;
+        readonly string FileName;
+        internal readonly IStudioApplication Master;
+        SaveManager _saveManager;
+        readonly IssuesView IssuesView;
+
+        public EditorView(string fileName, IStudioApplication master)
+            : base(
+                master,
+                Path.Combine(ConfigRoot, "EditorFiles", fileName, "Editor", "Position")
+                )
+        {
+            FileName = fileName;
+            Master = master;
+            TextBox = new Scintilla
+            {
+                Lexer = Lexer.Container,
+                VirtualSpaceOptions = VirtualSpace.UserAccessible
+            };
+
+            TextBox.ClearCmdKey(Keys.Insert);
+
+            foreach(var id in TextStyle.All)
+                StyleConfig(id);
+
+            TextBox.StyleNeeded += (s, args) => SignalStyleNeeded(args.Position);
+            TextBox.TextChanged += (s, args) => OnTextChanged();
+
+            CompilerCache = new ValueCache<CompilerBrowser>(CreateCompilerBrowser);
+
+            Client = TextBox;
+
+            TextBox.Text = FileName.FileHandle().String;
+            TextBox.SetSavePoint();
+            AlignTitle();
+            TextBox.TextChanged += (s, args) => RunSaveManager();
+
+            var result = new MainMenu();
+            result.MenuItems.AddRange(this.Menus().Select(item => item.CreateMenuItem()).ToArray());
+            Frame.Menu = result;
+
+            IssuesView = new IssuesView(this);
+        }
+
+        void RunSaveManager()
+        {
+            AlignTitle();
+            if(_saveManager == null)
+                _saveManager = new SaveManager(this);
+            _saveManager.Start();
+        }
+
         void SaveFile()
         {
             _saveManager = null;
@@ -102,15 +104,31 @@ namespace ReniUI
             => CompilerBrowser.FromText
                 (
                     TextBox.Text,
-                    new CompilerParameters
+                    parameters: new CompilerParameters
                     {
                         OutStream = new StringStream()
-                    }
+                    },
+                    sourceIdentifier: FileName
                 );
 
         public new void Run() => base.Run();
 
-        internal CompilerBrowser Compiler => CompilerCache.Value;
+        CompilerBrowser Compiler => CompilerCache.Value;
+
+        internal void Open() => NotImplementedMethod();
+
+        internal void FormatAll() => Format(Compiler.Source.All);
+
+        internal void FormatSelection()
+        {
+            var sourcePart = (Compiler.Source + TextBox.SelectionStart).Span
+                (TextBox.SelectionEnd - TextBox.SelectionEnd);
+            Format(sourcePart);
+        }
+
+        internal bool HasSelection() => TextBox.SelectedText != "";
+
+        internal void Issues() => IssuesView.Run();
 
         void OnTextChanged()
         {
@@ -119,23 +137,6 @@ namespace ReniUI
         }
 
         void AlignTitle() { Title = FileName + (TextBox.Modified ? "*" : ""); }
-
-        void OnContextMenuPopup()
-        {
-            var menuItems = TextBox.ContextMenu.MenuItems;
-
-            while(menuItems.Count > 0)
-                menuItems.RemoveAt(0);
-
-            Compiler.Ensure();
-
-            var p = TextBox.CurrentPosition;
-
-            var compileSyntaxs = Compiler.FindPosition(p);
-        }
-
-        void SignalContextMenuSelect(Syntax syntax)
-            => TextBox.SetSelection(syntax.SourcePart.Position, syntax.SourcePart.EndPosition);
 
         void StyleConfig(TextStyle id) => id.Config(TextBox.Styles[id]);
 
@@ -178,10 +179,6 @@ namespace ReniUI
             }
         }
 
-        public void Open() { NotImplementedMethod(); }
-
-        public void FormatAll() => Format(Compiler.Source.All);
-
         void Format(SourcePart sourcePart)
         {
             var reformat = Compiler
@@ -206,13 +203,15 @@ namespace ReniUI
             }
         }
 
-        public void FormatSelection()
-        {
-            var sourcePart = (Compiler.Source + TextBox.SelectionStart).Span
-                (TextBox.SelectionEnd - TextBox.SelectionEnd);
-            Format(sourcePart);
-        }
+        IEnumerable<Issue> IssuesView.IDataProvider.Data => Compiler.Issues;
 
-        public bool HasSelection() => TextBox.SelectedText != "";
+        IApplication IssuesView.IDataProvider.Master => Master;
+
+        void IssuesView.IDataProvider.SignalClicked(SourcePart part)
+        {
+            TextBox.SetSelection(part.Position, part.EndPosition);
+            TextBox.FirstVisibleLine = part.Source.LineIndex(part.Position);
+            TextBox.FirstVisibleLine = part.Source.LineIndex(part.EndPosition);
+        }
     }
 }

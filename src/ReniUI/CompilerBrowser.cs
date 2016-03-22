@@ -18,8 +18,8 @@ namespace ReniUI
     public sealed class CompilerBrowser : DumpableObject
     {
         public static CompilerBrowser FromText
-            (string text, CompilerParameters parameters = null)
-            => new CompilerBrowser(() => Compiler.FromText(text, parameters));
+            (string text, CompilerParameters parameters = null, string sourceIdentifier = null)
+            => new CompilerBrowser(() => Compiler.FromText(text, parameters, sourceIdentifier));
 
         public static CompilerBrowser FromFile
             (string fileName, CompilerParameters parameters = null)

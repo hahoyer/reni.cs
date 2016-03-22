@@ -17,6 +17,8 @@ namespace ReniUI.Commands
 
     static class Command
     {
+        public static ICommandHandler<EditorView> IssuesView { get; }
+            = new CommandHandler<EditorView>(s => s.Issues(), s => true, "Issues");
         public static ICommandHandler<IStudioApplication> New { get; }
             = new CommandHandler<IStudioApplication>(s => s.New(), s => false, "New");
         public static ICommandHandler<IStudioApplication> Exit { get; }
@@ -33,8 +35,8 @@ namespace ReniUI.Commands
 
     sealed class CommandHandler<T> : DumpableObject, ICommandHandler<T>
     {
-        readonly Action<T> Click;
-        readonly Func<T, bool> IsValid;
+        Action<T> Click { get; }
+        Func<T, bool> IsValid { get; }
         string Title { get; }
 
         public CommandHandler(Action<T> click, Func<T, bool> isValid, string title)
