@@ -104,7 +104,7 @@ namespace ReniUI
             => CompilerBrowser.FromText
                 (
                     TextBox.Text,
-                    parameters: new CompilerParameters
+                    new CompilerParameters
                     {
                         OutStream = new StringStream()
                     },
@@ -119,12 +119,11 @@ namespace ReniUI
 
         internal void FormatAll() => Format(Compiler.Source.All);
 
-        internal void FormatSelection()
-        {
-            var sourcePart = (Compiler.Source + TextBox.SelectionStart).Span
-                (TextBox.SelectionEnd - TextBox.SelectionEnd);
-            Format(sourcePart);
-        }
+        internal void FormatSelection() => Format(SourcePart);
+
+        SourcePart SourcePart
+            => (Compiler.Source + TextBox.SelectionStart)
+                .Span(TextBox.SelectionEnd - TextBox.SelectionEnd);
 
         internal bool HasSelection() => TextBox.SelectedText != "";
 
