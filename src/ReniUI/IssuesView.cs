@@ -87,10 +87,6 @@ namespace ReniUI
             {
                 Name = "Position",
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells,
-                DefaultCellStyle = new DataGridViewCellStyle
-                {
-                    Alignment = DataGridViewContentAlignment.MiddleRight
-                }
             };
 
             yield return new DataGridViewTextBoxColumn
