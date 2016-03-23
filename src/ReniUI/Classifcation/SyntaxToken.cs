@@ -28,7 +28,8 @@ namespace ReniUI.Classifcation
         [EnableDumpExcept(false)]
         public override bool IsNumber => TokenClass is Number;
         [EnableDumpExcept(false)]
-        public override bool IsError => SourceSyntax.Issues.Any();
+        public override bool IsError 
+            => SourceSyntax.Issues.Any(item => item.Position == SourcePart);
         [EnableDumpExcept(false)]
         public override bool IsBraceLike => TokenClass is IBelongingsMatcher;
         [EnableDumpExcept(false)]
