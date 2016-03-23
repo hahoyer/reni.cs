@@ -70,7 +70,7 @@ namespace ReniUI
         }
 
         internal static Control CreateView(this Dumpable dumpable)
-            => CreateView(text: dumpable.Dump());
+            => CreateView(dumpable.Dump());
 
         internal static Label CreateView(this string text, double factor = 1, bool isBold = false)
             => new Label
@@ -85,8 +85,8 @@ namespace ReniUI
                 new Font
                     (
                     "Lucida Console",
-                    emSize: (int) (DefaultTextSize * factor),
-                    style: isBold ? FontStyle.Bold : FontStyle.Regular
+                    (int) (DefaultTextSize * factor),
+                    isBold ? FontStyle.Bold : FontStyle.Regular
                     );
 
         internal static Label CreateView(this int value, double factor = 1, bool isBold = false)
@@ -120,11 +120,11 @@ namespace ReniUI
             var source = sourcePart.Source;
             var position = sourcePart.Position;
             var positionEnd = sourcePart.EndPosition;
-            return source.Identifier +"("+
-                    source.LineIndex(position)+","+
-                    source.ColumnIndex(position) + 1 + "," +
-                    source.LineIndex(positionEnd) + "," +
-                    source.ColumnIndex(positionEnd) + 1 + ")";
+            return source.Identifier + "(" +
+                (source.LineIndex(position) + 1) + "," +
+                (source.ColumnIndex(position) + 1) + "," +
+                (source.LineIndex(positionEnd) + 1) + "," +
+                (source.ColumnIndex(positionEnd) + 1) + ")";
         }
     }
 }
