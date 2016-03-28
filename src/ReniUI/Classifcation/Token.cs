@@ -103,9 +103,23 @@ namespace ReniUI.Classifcation
                     .ToCharArray();
         }
 
-        public abstract string Reformat(SourcePart targetPart);
         public string Reformat() => Reformat(SourcePart);
 
+        public abstract string Reformat(SourcePart targetPart);
         public abstract IEnumerable<SourcePart> FindAllBelongings(CompilerBrowser compiler);
+        public abstract Token LocatePosition(int current);
+
+        internal static Token LocatePosition(SourceSyntax start, int offset)
+        {
+            var result = start.LocatePosition(offset);
+            if (offset < result.Token.Characters.Position)
+                return new WhiteSpaceToken
+                    (
+                    result.Token.PrecededWith.First(item => offset <= item.Characters.Position),
+                    result
+                    );
+
+            return new SyntaxToken(result);
+        }
     }
 }

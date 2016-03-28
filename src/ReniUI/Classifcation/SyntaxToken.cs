@@ -52,5 +52,7 @@ namespace ReniUI.Classifcation
 
         public override IEnumerable<SourcePart> FindAllBelongings(CompilerBrowser compiler)
             => compiler.FindAllBelongings(SourceSyntax)?.Select(item => item.Token.Characters);
+
+        public override Token LocatePosition(int current) => LocatePosition(SourceSyntax, current);
     }
 }

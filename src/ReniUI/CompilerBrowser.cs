@@ -27,26 +27,26 @@ namespace ReniUI
 
         readonly IDictionary<IFormalCodeItem, int> CodeToFunctionIndexCache =
             new Dictionary<IFormalCodeItem, int>();
-        readonly FunctionCache<int, Token> LocateCache;
         readonly ValueCache<Compiler> ParentCache;
 
         internal CompilerBrowser(Func<Compiler> parent)
         {
             ParentCache = new ValueCache<Compiler>(parent);
-            LocateCache = new FunctionCache<int, Token>(GetLocateForCache);
         }
 
-        public Source Source => Parent.Source;
+        public Source Source => Compiler.Source;
 
-        Compiler Parent => ParentCache.Value;
+        Compiler Compiler => ParentCache.Value;
 
-        internal IExecutionContext ExecutionContext => Parent;
+        internal IExecutionContext ExecutionContext => Compiler;
 
-        internal IEnumerable<Issue> Issues => Parent.Issues;
+        internal IEnumerable<Issue> Issues => Compiler.Issues;
 
-        internal IEnumerable<CompileSyntax> FindPosition(int p)
+        public Token LocatePosition(int offset) => Token.LocatePosition(Compiler.SourceSyntax, offset);
+
+        internal IEnumerable<CompileSyntax> FindPosition(int offset)
         {
-            var enumerable = LocateCache[p]
+            var enumerable = LocatePosition(offset)
                 .SourceSyntax
                 .ParentChainIncludingThis
                 .Select(item => item.Syntax)
@@ -61,20 +61,18 @@ namespace ReniUI
         public Token LocatePosition(SourcePosn current)
         {
             Tracer.Assert(current.Source == Source);
-            return LocateCache[current.Position];
+            return LocatePosition(current.Position);
         }
 
-        public Token LocatePosition(int current) => LocateCache[current];
-
         internal FunctionType Function(int index)
-            => Parent.Root.Function(index);
+            => Compiler.Root.Function(index);
 
 
         internal object FindFunction(IFormalCodeItem codeBase)
         {
             var result = FindFunctionIndex(codeBase);
             return result == null
-                ? (object) Parent.CodeContainer.Main.Data
+                ? (object) Compiler.CodeContainer.Main.Data
                 : Function(result.Value);
         }
 
@@ -84,7 +82,7 @@ namespace ReniUI
             if(CodeToFunctionIndexCache.TryGetValue(codeBase, out result))
                 return result;
 
-            var results = Parent
+            var results = Compiler
                 .Root
                 .FunctionCount
                 .Select()
@@ -103,30 +101,14 @@ namespace ReniUI
         }
 
         internal IEnumerable<SourceSyntax> FindAllBelongings(SourceSyntax sourceSyntax)
-            => Parent.SourceSyntax.Belongings(sourceSyntax);
-
-        Token GetLocateForCache(int offset)
-        {
-            var posn = Source + offset;
-            var sourcePart = posn.Span(posn.IsEnd ? 0 : 1);
-            var sourceSyntax = Parent.SourceSyntax.Locate(sourcePart);
-
-            if(posn < sourceSyntax.Token.Characters)
-                return new WhiteSpaceToken
-                    (
-                    sourceSyntax.Token.PrecededWith.Single(item => item.Characters.Contains(posn)),
-                    sourceSyntax
-                    );
-
-            return new SyntaxToken(sourceSyntax);
-        }
+            => Compiler.SourceSyntax.Belongings(sourceSyntax);
 
         internal string Reformat(IFormatter formatter)
-            => formatter.Reformat(Parent.SourceSyntax, Parent.SourceSyntax.SourcePart);
+            => formatter.Reformat(Compiler.SourceSyntax, Compiler.SourceSyntax.SourcePart);
 
         public SourceSyntax Locate(SourcePart span)
         {
-            var result = Parent.SourceSyntax.Locate(span);
+            var result = Compiler.SourceSyntax.Locate(span);
             if(result != null)
                 return result;
 
@@ -135,9 +117,9 @@ namespace ReniUI
             return null;
         }
 
-        internal void Ensure() => Parent.Issues.ToArray();
+        internal void Ensure() => Compiler.Issues.ToArray();
 
-        internal void Execute(DataStack dataStack) => Parent.ExecuteFromCode(dataStack);
+        internal void Execute(DataStack dataStack) => Compiler.ExecuteFromCode(dataStack);
 
         public IEnumerable<SourcePart> FindAllBelongings(Token open) => open.FindAllBelongings(this);
 
@@ -146,10 +128,12 @@ namespace ReniUI
             get
             {
                 var result = new StringStream();
-                Parent.Parameters.OutStream = result;
-                Parent.Execute();
+                Compiler.Parameters.OutStream = result;
+                Compiler.Execute();
                 return result;
             }
         }
+
+        internal SourceSyntax SourceSyntax => Compiler.SourceSyntax;
     }
 }

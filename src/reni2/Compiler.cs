@@ -88,7 +88,7 @@ namespace Reni
 
         [Node]
         [DisableDump]
-        internal SourceSyntax SourceSyntax
+        public SourceSyntax SourceSyntax
         {
             get
             {

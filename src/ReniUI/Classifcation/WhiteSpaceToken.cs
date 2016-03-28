@@ -11,7 +11,7 @@ namespace ReniUI.Classifcation
     {
         readonly hw.Parser.WhiteSpaceToken _item;
 
-        public WhiteSpaceToken(hw.Parser.WhiteSpaceToken item, SourceSyntax parent)
+        internal WhiteSpaceToken(hw.Parser.WhiteSpaceToken item, SourceSyntax parent)
         {
             _item = item;
             SourceSyntax = parent;
@@ -27,6 +27,12 @@ namespace ReniUI.Classifcation
         public override IEnumerable<SourcePart> FindAllBelongings(CompilerBrowser compiler)
         {
             yield break;
+        }
+
+        public override Token LocatePosition(int current)
+        {
+            NotImplementedMethod(current);
+            return null;
         }
 
         public override SourceSyntax SourceSyntax { get; }

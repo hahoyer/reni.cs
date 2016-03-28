@@ -7,6 +7,7 @@ using hw.Helper;
 using hw.Scanner;
 using Reni;
 using Reni.Validation;
+using ReniUI.Classifcation;
 using ReniUI.Commands;
 using ReniUI.CompilationView;
 using ReniUI.Formatting;
@@ -145,13 +146,15 @@ namespace ReniUI
             StartMethodDump(trace, position);
             try
             {
-                while(TextBox.GetEndStyled() < position)
+                var sourceSyntax = Compiler.SourceSyntax;
+                while (TextBox.GetEndStyled() < position)
                 {
                     var current = TextBox.GetEndStyled();
-                    var tokens = Compiler.LocatePosition(current);
-                    var style = TextStyle.From(tokens, Compiler);
-                    TextBox.StartStyling(tokens.StartPosition);
-                    TextBox.SetStyling(tokens.SourcePart.Length, style);
+                    var token = Token.LocatePosition(sourceSyntax, current);
+                    var style = TextStyle.From(token, Compiler);
+                    TextBox.StartStyling(token.StartPosition);
+                    TextBox.SetStyling(token.SourcePart.Length, style);
+                    sourceSyntax = token.SourceSyntax;
                 }
 
                 ReturnVoidMethodDump(false);

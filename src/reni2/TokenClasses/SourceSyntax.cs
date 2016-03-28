@@ -21,7 +21,7 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal IToken Token { get; }
         internal SourceSyntax Right { get; }
-
+        FunctionCache<int, SourceSyntax> LocatePositionCache { get; }
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
         internal SourceSyntax
@@ -37,7 +37,8 @@ namespace Reni.TokenClasses
             TokenClass = tokenClass;
             Token = token;
             Right = right;
-            SyntaxProvider = ValueCacheExtension.CachedValue(this, () => getSyntax(Left?.Syntax, Token, Right?.Syntax));
+            LocatePositionCache = new FunctionCache<int, SourceSyntax>(LocatePositionForCache);
+            SyntaxProvider = this.CachedValue(() => getSyntax(Left?.Syntax, Token, Right?.Syntax));
 
             if(Left != null)
                 Left.Parent = this;
@@ -95,6 +96,24 @@ namespace Reni.TokenClasses
         internal SourcePart SourcePart => Left?.SourcePart + Token.SourcePart + Right?.SourcePart;
         [DisableDump]
         string FilePosition => Token.Characters.FilePosition;
+
+        public SourceSyntax LocatePosition(int current) => LocatePositionCache[current];
+
+        SourceSyntax LocatePositionForCache(int current)
+        {
+            if(current < SourcePart.Position || current >= SourcePart.EndPosition)
+                return Parent?.LocatePosition(current);
+
+            return Left?.CheckedLocatePosition(current) ??
+                Right?.CheckedLocatePosition(current) ??
+                    this;
+        }
+
+        SourceSyntax CheckedLocatePosition(int current)
+            =>
+                SourcePart.Position <= current && current < SourcePart.EndPosition
+                    ? LocatePosition(current)
+                    : null;
 
         internal SourceSyntax Locate(SourcePart part)
             => Left?.CheckedLocate(part) ??
@@ -172,7 +191,7 @@ namespace Reni.TokenClasses
         }
 
         [DisableDump]
-        internal IEnumerable<SourceSyntax> Items => ValueCacheExtension.CachedValue(this, GetItems);
+        internal IEnumerable<SourceSyntax> Items => this.CachedValue(GetItems);
 
         IEnumerable<SourceSyntax> GetItems()
         {
