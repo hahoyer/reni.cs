@@ -10,7 +10,7 @@ using Reni.Parser;
 using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Validation;
-using ReniUI.Classifcation;
+using ReniUI.Classification;
 using ReniUI.Formatting;
 
 namespace ReniUI

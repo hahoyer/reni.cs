@@ -8,7 +8,7 @@ using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Reni;
 using ReniUI;
-using ReniUI.Classifcation;
+using ReniUI.Classification;
 using ReniUI.Formatting;
 
 namespace HoyerWare.ReniLanguagePackage

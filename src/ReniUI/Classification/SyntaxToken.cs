@@ -7,7 +7,7 @@ using Reni.TokenClasses;
 using Reni.Validation;
 using ReniUI.Formatting;
 
-namespace ReniUI.Classifcation
+namespace ReniUI.Classification
 {
     sealed class SyntaxToken : Token
     {
