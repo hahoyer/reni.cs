@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 using Reni;
+using Reni.TokenClasses;
 using Reni.Validation;
-using ReniUI.Classifcation;
+using ReniUI.Classification;
 using ReniUI.Commands;
 using ReniUI.CompilationView;
 using ReniUI.Formatting;
@@ -68,6 +70,7 @@ namespace ReniUI
 
             TextBox.StyleNeeded += (s, args) => SignalStyleNeeded(args.Position);
             TextBox.TextChanged += (s, args) => OnTextChanged();
+            TextBox.CharAdded += (s, arg) => OnCharAdded(arg.Char);
 
             CompilerCache = new ValueCache<CompilerBrowser>(CreateCompilerBrowser);
 
@@ -83,6 +86,42 @@ namespace ReniUI
             Frame.Menu = result;
 
             IssuesView = new IssuesView(this);
+        }
+
+        void OnCharAdded(int character)
+        {
+            if(character > 255)
+                NotImplementedMethod(character);
+
+            switch((char) character)
+            {
+            case ' ':
+                var p = ActiveSyntaxItem?
+                    .DeclarationOptions
+                    .Select(item=>item ?? "(");
+                if(p == null)
+                    return;
+
+                NotImplementedMethod(character);
+                return;
+            case '\n':
+            case '\r':
+                return;
+            }
+            NotImplementedMethod(character);
+        }
+
+        [DisableDump]
+        SourceSyntax ActiveSyntaxItem
+        {
+            get
+            {
+                var x = Compiler.Issues;
+                var token = Token.LocatePosition(Compiler.SourceSyntax, TextBox.SelectionStart);
+                if(token.IsComment || token.IsLineComment || token.IsText)
+                    return null;
+                return token.SourceSyntax.LocatePosition(token.SourceSyntax.SourcePart.Position - 1);
+            }
         }
 
         void RunSaveManager()
@@ -142,26 +181,15 @@ namespace ReniUI
 
         void SignalStyleNeeded(int position)
         {
-            var trace = false;
-            StartMethodDump(trace, position);
-            try
+            var sourceSyntax = Compiler.SourceSyntax;
+            while(TextBox.GetEndStyled() < position)
             {
-                var sourceSyntax = Compiler.SourceSyntax;
-                while (TextBox.GetEndStyled() < position)
-                {
-                    var current = TextBox.GetEndStyled();
-                    var token = Token.LocatePosition(sourceSyntax, current);
-                    var style = TextStyle.From(token, Compiler);
-                    TextBox.StartStyling(token.StartPosition);
-                    TextBox.SetStyling(token.SourcePart.Length, style);
-                    sourceSyntax = token.SourceSyntax;
-                }
-
-                ReturnVoidMethodDump(false);
-            }
-            finally
-            {
-                EndMethodDump();
+                var current = TextBox.GetEndStyled();
+                var token = Token.LocatePosition(sourceSyntax, current);
+                var style = TextStyle.From(token, Compiler);
+                TextBox.StartStyling(token.StartPosition);
+                TextBox.SetStyling(token.SourcePart.Length, style);
+                sourceSyntax = token.SourceSyntax;
             }
         }
 
@@ -188,7 +216,7 @@ namespace ReniUI
                 .GetEditPieces
                 (
                     sourcePart,
-                    new Configuration
+                    new Formatting.Configuration
                     {
                         EmptyLineLimit = 1,
                         MaxLineLength = 120
@@ -215,5 +243,7 @@ namespace ReniUI
             TextBox.FirstVisibleLine = part.Source.LineIndex(part.Position);
             TextBox.FirstVisibleLine = part.Source.LineIndex(part.EndPosition);
         }
+
+        internal void ListMembers() => TextBox.AutoCComplete();
     }
 }
