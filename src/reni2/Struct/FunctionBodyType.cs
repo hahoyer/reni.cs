@@ -62,6 +62,18 @@ namespace Reni.Struct
 
         [DisableDump]
         internal override IImplementation FunctionDeclarationForType => this;
+        internal override IEnumerable<string> DeclarationOptions
+            => base.DeclarationOptions.Concat(InternalDeclarationOptions);
+
+        IEnumerable<string> InternalDeclarationOptions
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
+
 
         bool IFunction.IsImplicit => Syntax.IsImplicit;
 

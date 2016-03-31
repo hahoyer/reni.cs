@@ -83,6 +83,22 @@ namespace Reni.Type
         internal override bool Hllw => false;
         [DisableDump]
         internal override bool IsAligningPossible => false;
+
+        internal override IEnumerable<string> DeclarationOptions
+            => base.DeclarationOptions.Concat(InternalDeclarationOptions);
+
+        static IEnumerable<string> InternalDeclarationOptions
+        {
+            get
+            {
+                yield return DumpPrintToken.TokenId;
+                yield return TokenClasses.Mutable.TokenId;
+                yield return TokenClasses.EnableReinterpretation.TokenId;
+                yield return Plus.TokenId;
+                yield return Minus.TokenId;
+            }
+        }
+
         [DisableDump]
         protected override IEnumerable<IGenericProviderForType> Genericize
             => this.GenericListFromType(base.Genericize);

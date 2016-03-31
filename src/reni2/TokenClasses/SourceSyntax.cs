@@ -232,6 +232,17 @@ namespace Reni.TokenClasses
                     yield return other;
             }
         }
+
+        [DisableDump]
+        public string[] DeclarationOptions
+            => Syntax
+                .ToCompiledSyntax
+                .Value
+                .ResultCache
+                .Select(item => item.Value.Type)
+                .SelectMany(item => item.DeclarationOptions)
+                .Distinct()
+                .ToArray();
     }
 
     interface ISyntaxProvider

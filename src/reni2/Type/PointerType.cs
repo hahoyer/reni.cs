@@ -112,6 +112,19 @@ namespace Reni.Type
             };
         }
 
+        internal override IEnumerable<string> DeclarationOptions
+            => base.DeclarationOptions.Concat(InternalDeclarationOptions);
+
+        IEnumerable<string> InternalDeclarationOptions
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
+
+
         Result DereferenceResult(Category category)
             => ValueType
                 .Align

@@ -27,6 +27,19 @@ namespace Reni.Type
 
         protected override TypeBase ReversePair(TypeBase first) => first;
         internal override TypeBase Pair(TypeBase second) => second;
+        internal override IEnumerable<string> DeclarationOptions
+            => base.DeclarationOptions.Concat(InternalDeclarationOptions);
+
+        IEnumerable<string> InternalDeclarationOptions
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
+
+
         new Result DumpPrintTokenResult(Category category) => Result(category);
     }
 }

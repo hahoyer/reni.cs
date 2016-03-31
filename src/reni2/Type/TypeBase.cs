@@ -589,6 +589,8 @@ namespace Reni.Type
                 yield return SearchResult.Create(feature, this);
         }
 
+        internal virtual IEnumerable<string> DeclarationOptions { get { yield break; } }
+
         [DisableDump]
         protected virtual IEnumerable<IGenericProviderForType> Genericize
             => this.GenericListFromType();

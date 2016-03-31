@@ -94,6 +94,19 @@ namespace Reni.Type
         [DisableDump]
         internal override TypeBase ElementTypeForReference => ValueType.ElementTypeForReference;
 
+        internal override IEnumerable<string> DeclarationOptions
+            => base.DeclarationOptions.Concat(InternalDeclarationOptions);
+
+        IEnumerable<string> InternalDeclarationOptions
+        {
+            get
+            {
+                if(IsMutable)
+                    yield return ReassignToken.TokenId;
+            }
+        }
+
+
         protected override IEnumerable<IConversion> RawSymmetricConversions { get { yield break; } }
 
         [DisableDump]
@@ -107,6 +120,5 @@ namespace Reni.Type
             NotImplementedMethod(ext);
             return null;
         }
-
     }
 }

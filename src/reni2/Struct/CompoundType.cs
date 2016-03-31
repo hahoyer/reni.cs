@@ -51,6 +51,19 @@ namespace Reni.Struct
         internal override IEnumerable<IConversion> StripConversionsFromPointer
             => View.ConverterFeatures.Union(View.MixinConversions);
 
+        internal override IEnumerable<string> DeclarationOptions
+            => base.DeclarationOptions.Concat(InternalDeclarationOptions);
+
+        IEnumerable<string> InternalDeclarationOptions
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
+
+
         [DisableDump]
         protected override IEnumerable<IConversion> StripConversions
         {

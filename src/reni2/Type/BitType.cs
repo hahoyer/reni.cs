@@ -39,6 +39,19 @@ namespace Reni.Type
                 .Result(category, () => CodeBase.BitsConst(bitsConst));
         }
 
+        internal override IEnumerable<string> DeclarationOptions
+            => base.DeclarationOptions.Concat(InternalDeclarationOptions);
+
+        IEnumerable<string> InternalDeclarationOptions
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
+
+
         protected override CodeBase DumpPrintCode() => Align.ArgCode.DumpPrintNumber();
     }
 }
