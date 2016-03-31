@@ -17,6 +17,8 @@ namespace ReniUI.Commands
 
     static class Command
     {
+        public static ICommandHandler<EditorView> ListMembers { get; }
+            = new CommandHandler<EditorView>(s => s.ListMembers(), s => true, "ListMembers");
         public static ICommandHandler<EditorView> IssuesView { get; }
             = new CommandHandler<EditorView>(s => s.Issues(), s => true, "Issues");
         public static ICommandHandler<IStudioApplication> New { get; }
