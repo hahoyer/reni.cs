@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -50,6 +51,7 @@ namespace ReniUI
         internal readonly IStudioApplication Master;
         SaveManager _saveManager;
         readonly IssuesView IssuesView;
+        readonly AutocompleteMenu AutocompleteMenu;
 
         public EditorView(string fileName, IStudioApplication master)
             : base(
@@ -72,7 +74,7 @@ namespace ReniUI
 
             TextBox.StyleNeeded += (s, args) => SignalStyleNeeded(args.Position);
             TextBox.TextChanged += (s, args) => OnTextChanged();
-            TextBox.CharAdded += (s, arg) => OnCharAdded(arg.Char);
+            TextBox.KeyDown += (s, args) => OnKeyDown(args);
 
             CompilerCache = new ValueCache<CompilerBrowser>(CreateCompilerBrowser);
 
@@ -89,7 +91,7 @@ namespace ReniUI
 
             IssuesView = new IssuesView(this);
 
-            var autocompleteMenu = new AutocompleteMenu
+            AutocompleteMenu = new AutocompleteMenu
             {
                 Font =
                     new Font
@@ -111,40 +113,22 @@ namespace ReniUI
                 TargetControlWrapper = null
             };
 
-            autocompleteMenu.WrapperNeeded += (s, a) => a.Wrapper = new ScintillaWrapper((Scintilla)a.TargetControl);
-            autocompleteMenu.SetAutocompleteMenu(TextBox, autocompleteMenu);
+            AutocompleteMenu.WrapperNeeded +=
+                (s, a) => a.Wrapper = new ScintillaWrapper((Scintilla) a.TargetControl);
+            AutocompleteMenu.SetAutocompleteItems(GetOptions());
         }
 
-        void OnCharAdded(int character)
-        {
-            return;
-            if(character > 255)
-                NotImplementedMethod(character);
-
-            var c = (char) character;
-
-            switch(c)
-            {
-            case ' ':
-                OnSpaceCharAdded();
-                return;
-            case '\n':
-            case '\r':
-                return;
-            }
-
-            NotImplementedMethod(c);
-        }
-
-        void OnSpaceCharAdded()
-        {
-            var p = ActiveSyntaxItem?
+        IEnumerable<AutocompleteItem> GetOptions()
+            => (ActiveSyntaxItem?
                 .DeclarationOptions
-                .Select(item => item ?? "(");
-            if(!p.Any())
-                return;
+                .Select(item => item ?? "(")
+                ?? new string[0])
+                .Select(item => new AutocompleteItem(item));
 
-            TextBox.AutoCShow(0, p.Stringify(TextBox.AutoCSeparator.ToString()));
+        void OnKeyDown(KeyEventArgs e)
+        {
+            if(e.Control && e.KeyCode == Keys.Space)
+                AutocompleteMenu.Show(TextBox, true);
         }
 
         [DisableDump]
