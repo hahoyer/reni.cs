@@ -9,6 +9,10 @@
     <RootNamespace>ReniUI</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AutocompleteMenu, Version=1.3.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\bin\AutocompleteMenu\AutocompleteMenu.dll</HintPath>
+    </Reference>
     <Reference Include="JetBrains.Annotations">
       <HintPath>..\packages\JetBrains.Annotations.10.0.0\lib\net20\JetBrains.Annotations.dll</HintPath>
     </Reference>

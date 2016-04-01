@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using AutocompleteMenuNS;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
@@ -86,29 +88,63 @@ namespace ReniUI
             Frame.Menu = result;
 
             IssuesView = new IssuesView(this);
+
+            var autocompleteMenu = new AutocompleteMenu
+            {
+                Font =
+                    new Font
+                        (
+                        "Microsoft Sans Serif",
+                        9F,
+                        FontStyle.Regular,
+                        GraphicsUnit.Point,
+                        204),
+                ImageList = null,
+                Items = new[]
+                {
+                    "abc",
+                    "abcd",
+                    "abcde",
+                    "abcdef"
+                },
+                LeftPadding = 0,
+                TargetControlWrapper = null
+            };
+
+            autocompleteMenu.WrapperNeeded += (s, a) => a.Wrapper = new ScintillaWrapper((Scintilla)a.TargetControl);
+            autocompleteMenu.SetAutocompleteMenu(TextBox, autocompleteMenu);
         }
 
         void OnCharAdded(int character)
         {
+            return;
             if(character > 255)
                 NotImplementedMethod(character);
 
-            switch((char) character)
+            var c = (char) character;
+
+            switch(c)
             {
             case ' ':
-                var p = ActiveSyntaxItem?
-                    .DeclarationOptions
-                    .Select(item=>item ?? "(");
-                if(p == null)
-                    return;
-
-                NotImplementedMethod(character);
+                OnSpaceCharAdded();
                 return;
             case '\n':
             case '\r':
                 return;
             }
-            NotImplementedMethod(character);
+
+            NotImplementedMethod(c);
+        }
+
+        void OnSpaceCharAdded()
+        {
+            var p = ActiveSyntaxItem?
+                .DeclarationOptions
+                .Select(item => item ?? "(");
+            if(!p.Any())
+                return;
+
+            TextBox.AutoCShow(0, p.Stringify(TextBox.AutoCSeparator.ToString()));
         }
 
         [DisableDump]
@@ -146,7 +182,8 @@ namespace ReniUI
                     TextBox.Text,
                     new CompilerParameters
                     {
-                        OutStream = new StringStream()
+                        OutStream = new StringStream(),
+                        ProcessErrors = true
                     },
                     sourceIdentifier: FileName
                 );
