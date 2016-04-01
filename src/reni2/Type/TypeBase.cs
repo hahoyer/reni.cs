@@ -469,8 +469,7 @@ namespace Reni.Type
             if(path != null)
                 return path.Execute(category.Typed);
 
-            NotImplementedMethod(category, destination);
-            return null;
+            return ArgResult(category).InvalidConversion(destination);
         }
 
         Result Mutation(Category category, TypeBase destination)
