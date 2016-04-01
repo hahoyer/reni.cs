@@ -31,7 +31,8 @@ namespace HoyerWare.ReniLanguagePackage
                         TraceOptions =
                         {
                             Parser = false
-                        }
+                        },
+                        ProcessErrors = true
                     }
                 );
 

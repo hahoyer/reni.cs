@@ -18,8 +18,12 @@ namespace ReniUI
     public sealed class CompilerBrowser : DumpableObject
     {
         public static CompilerBrowser FromText
-            (string text, CompilerParameters parameters = null, string sourceIdentifier = null)
+            (string text, CompilerParameters parameters, string sourceIdentifier = null)
             => new CompilerBrowser(() => Compiler.FromText(text, parameters, sourceIdentifier));
+
+        public static CompilerBrowser FromText
+            (string text, string sourceIdentifier = null)
+            => new CompilerBrowser(() => Compiler.FromText(text, null, sourceIdentifier));
 
         public static CompilerBrowser FromFile
             (string fileName, CompilerParameters parameters = null)
@@ -42,7 +46,8 @@ namespace ReniUI
 
         internal IEnumerable<Issue> Issues => Compiler.Issues;
 
-        public Token LocatePosition(int offset) => Token.LocatePosition(Compiler.SourceSyntax, offset);
+        public Token LocatePosition(int offset)
+            => Token.LocatePosition(Compiler.SourceSyntax, offset);
 
         internal IEnumerable<CompileSyntax> FindPosition(int offset)
         {
