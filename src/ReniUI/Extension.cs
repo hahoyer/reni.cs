@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -125,6 +126,18 @@ namespace ReniUI
                 (source.ColumnIndex(position) + 1) + "," +
                 (source.LineIndex(positionEnd) + 1) + "," +
                 (source.ColumnIndex(positionEnd) + 1) + ")";
+        }
+
+        internal static IEnumerable<T> Query<T>(Func<IEnumerable<T>> function)
+            => new QueryClass<T>(function);
+
+        sealed class QueryClass<T> : IEnumerable<T>
+        {
+            readonly Func<IEnumerable<T>> Function;
+            public QueryClass(Func<IEnumerable<T>> function) { Function = function; }
+            IEnumerator<T> GetEnumerator() => Function().GetEnumerator();
+            IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
     }
 }

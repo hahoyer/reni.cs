@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -44,6 +43,41 @@ namespace ReniUI
             public void Start() => Timer.Change(DelayForSave, NoPeriodicalActivation);
         }
 
+        internal sealed class ConfigClass : DumpableObject
+        {
+            readonly Persister FilePersister;
+
+            internal ConfigClass(EditorView parent)
+            {
+                FilePersister = new Persister(parent.ConfigFile);
+
+                FilePersister.Register
+                    (
+                        "Selection",
+                        item => parent.TextBox.SetSelection(item.Item1, item.Item2),
+                        () =>
+                            new Tuple<int, int>
+                                (parent.TextBox.SelectionStart, parent.TextBox.SelectionEnd))
+                    ;
+                FilePersister.Load();
+            }
+
+            internal void OnUpdate(UpdateChange change)
+            {
+                switch(change) {
+                case UpdateChange.Selection:
+                    FilePersister.Store("Selection");
+                    return;
+                case UpdateChange.Content:
+                case UpdateChange.VScroll:
+                case UpdateChange.HScroll:
+                    return;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(change), change, null);
+                }
+            }
+        }
+
         int _lineNumberMarginLength;
         readonly Scintilla TextBox;
         readonly ValueCache<CompilerBrowser> CompilerCache;
@@ -52,12 +86,10 @@ namespace ReniUI
         SaveManager _saveManager;
         readonly IssuesView IssuesView;
         readonly AutocompleteMenu AutocompleteMenu;
+        readonly ConfigClass Config;
 
         public EditorView(string fileName, IStudioApplication master)
-            : base(
-                master,
-                Path.Combine(ConfigRoot, "EditorFiles", fileName, "Editor", "Position")
-                )
+            : base(master, Path.Combine(ConfigRoot, "EditorFiles", fileName, "Position"))
         {
             FileName = fileName;
             Master = master;
@@ -81,6 +113,9 @@ namespace ReniUI
             Client = TextBox;
 
             TextBox.Text = FileName.FileHandle().String;
+            Config = new ConfigClass(this);
+            TextBox.UpdateUI += (s, args) => Config.OnUpdate(args.Change);
+
             TextBox.SetSavePoint();
             AlignTitle();
             TextBox.TextChanged += (s, args) => RunSaveManager();
@@ -93,37 +128,28 @@ namespace ReniUI
 
             AutocompleteMenu = new AutocompleteMenu
             {
-                Font =
-                    new Font
-                        (
-                        "Microsoft Sans Serif",
-                        9F,
-                        FontStyle.Regular,
-                        GraphicsUnit.Point,
-                        204),
+                Font = new Font("Microsoft Sans Serif", 9F, FontStyle.Regular, GraphicsUnit.Point, 204),
                 ImageList = null,
                 Items = new[]
                 {
-                    "abc",
-                    "abcd",
-                    "abcde",
-                    "abcdef"
+                    "abc", "abcd", "abcde", "abcdef"
                 },
                 LeftPadding = 0,
                 TargetControlWrapper = null
             };
 
-            AutocompleteMenu.WrapperNeeded +=
-                (s, a) => a.Wrapper = new ScintillaWrapper((Scintilla) a.TargetControl);
-            AutocompleteMenu.SetAutocompleteItems(GetOptions());
+            AutocompleteMenu.WrapperNeeded += (s, a) => a.Wrapper = new ScintillaWrapper((Scintilla) a.TargetControl);
+            AutocompleteMenu.SetAutocompleteItems(Extension.Query(GetOptions));
         }
 
+        hw.Helper.File ConfigFile => Path.Combine(ConfigRoot, "EditorFiles", FileName, "EditorCOnfig").FileHandle();
+
         IEnumerable<AutocompleteItem> GetOptions()
-            => (ActiveSyntaxItem?
-                .DeclarationOptions
-                .Select(item => item ?? "(")
-                ?? new string[0])
-                .Select(item => new AutocompleteItem(item));
+        {
+            var activeSyntaxItem = ActiveSyntaxItem;
+            NotImplementedMethod(nameof(activeSyntaxItem), activeSyntaxItem.SourcePart);
+            return null;
+        }
 
         void OnKeyDown(KeyEventArgs e)
         {
@@ -136,8 +162,7 @@ namespace ReniUI
         {
             get
             {
-                var x = Compiler.Issues;
-                var token = Token.LocatePosition(Compiler.SourceSyntax, TextBox.SelectionStart);
+                var token = Token.LocatePosition(Compiler.SourceSyntax, TextBox.SelectionStart - 1);
                 if(token.IsComment || token.IsLineComment || token.IsText)
                     return null;
                 return token.SourceSyntax.LocatePosition(token.SourceSyntax.SourcePart.Position - 1);
@@ -160,17 +185,11 @@ namespace ReniUI
             AlignTitle();
         }
 
-        CompilerBrowser CreateCompilerBrowser()
-            => CompilerBrowser.FromText
-                (
-                    TextBox.Text,
-                    new CompilerParameters
-                    {
-                        OutStream = new StringStream(),
-                        ProcessErrors = true
-                    },
-                    sourceIdentifier: FileName
-                );
+        CompilerBrowser CreateCompilerBrowser() => CompilerBrowser.FromText(TextBox.Text, new CompilerParameters
+        {
+            OutStream = new StringStream(),
+            ProcessErrors = true
+        }, sourceIdentifier: FileName);
 
         public new void Run() => base.Run();
 
@@ -182,9 +201,7 @@ namespace ReniUI
 
         internal void FormatSelection() => Format(SourcePart);
 
-        SourcePart SourcePart
-            => (Compiler.Source + TextBox.SelectionStart)
-                .Span(TextBox.SelectionEnd - TextBox.SelectionEnd);
+        SourcePart SourcePart => (Compiler.Source + TextBox.SelectionStart).Span(TextBox.SelectionEnd - TextBox.SelectionEnd);
 
         internal bool HasSelection() => TextBox.SelectedText != "";
 
@@ -224,27 +241,17 @@ namespace ReniUI
 
                 _lineNumberMarginLength = value;
                 const int Padding = 2;
-                TextBox.Margins[0].Width
-                    = TextBox.TextWidth(Style.LineNumber, new string('9', value + 1))
-                        + Padding;
+                TextBox.Margins[0].Width = TextBox.TextWidth(Style.LineNumber, new string('9', value + 1)) + Padding;
             }
         }
 
         void Format(SourcePart sourcePart)
         {
-            var reformat = Compiler
-                .Locate(sourcePart)
-                .GetEditPieces
-                (
-                    sourcePart,
-                    new Formatting.Configuration
-                    {
-                        EmptyLineLimit = 1,
-                        MaxLineLength = 120
-                    }
-                        .Create()
-                )
-                .Reverse();
+            var reformat = Compiler.Locate(sourcePart).GetEditPieces(sourcePart, new Formatting.Configuration
+            {
+                EmptyLineLimit = 1,
+                MaxLineLength = 120
+            }.Create()).Reverse();
 
             foreach(var piece in reformat)
             {
