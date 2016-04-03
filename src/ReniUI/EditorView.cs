@@ -43,11 +43,11 @@ namespace ReniUI
             public void Start() => Timer.Change(DelayForSave, NoPeriodicalActivation);
         }
 
-        internal sealed class ConfigClass : DumpableObject
+        internal sealed class ConfigurationClass : DumpableObject
         {
             readonly Persister FilePersister;
 
-            internal ConfigClass(EditorView parent)
+            internal ConfigurationClass(EditorView parent)
             {
                 FilePersister = new Persister(parent.ConfigFile);
 
@@ -86,7 +86,7 @@ namespace ReniUI
         SaveManager _saveManager;
         readonly IssuesView IssuesView;
         readonly AutocompleteMenu AutocompleteMenu;
-        readonly ConfigClass Config;
+        readonly ConfigurationClass Configuration;
 
         public EditorView(string fileName, IStudioApplication master)
             : base(master, Path.Combine(ConfigRoot, "EditorFiles", fileName, "Position"))
@@ -113,8 +113,8 @@ namespace ReniUI
             Client = TextBox;
 
             TextBox.Text = FileName.FileHandle().String;
-            Config = new ConfigClass(this);
-            TextBox.UpdateUI += (s, args) => Config.OnUpdate(args.Change);
+            Configuration = new ConfigurationClass(this);
+            TextBox.UpdateUI += (s, args) => Configuration.OnUpdate(args.Change);
 
             TextBox.SetSavePoint();
             AlignTitle();
@@ -142,7 +142,7 @@ namespace ReniUI
             AutocompleteMenu.SetAutocompleteItems(Extension.Query(GetOptions));
         }
 
-        hw.Helper.File ConfigFile => Path.Combine(ConfigRoot, "EditorFiles", FileName, "EditorCOnfig").FileHandle();
+        hw.Helper.File ConfigFile => Path.Combine(ConfigRoot, "EditorFiles", FileName, "EditorConfiguration").FileHandle();
 
         IEnumerable<AutocompleteItem> GetOptions()
         {
