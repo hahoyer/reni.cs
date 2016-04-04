@@ -5,7 +5,7 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 using Microsoft.VisualStudio.Package;
-using ReniUI.Classifcation;
+using ReniUI.Classification;
 
 namespace HoyerWare.ReniLanguagePackage
 {

@@ -34,6 +34,11 @@ namespace Reni.Type
         protected override Result DeAlign(Category category) => Mutation(Parent) & category;
         protected override PointerType GetPointerForCache() => Parent.ForcedPointer;
 
+        internal override IEnumerable<string> DeclarationOptions
+            => base.DeclarationOptions.Concat(InternalDeclarationOptions);
+
+        IEnumerable<string> InternalDeclarationOptions => Parent.DeclarationOptions;
+
         [DisableDump]
         protected override IEnumerable<IConversion> RawSymmetricConversions
             =>

@@ -144,6 +144,19 @@ namespace Reni.Type
         internal override IImplementation FunctionDeclarationForPointerType
             => Feature.Extension.FunctionFeature(ElementAccessResult);
 
+        internal override IEnumerable<string> DeclarationOptions
+            => base.DeclarationOptions.Concat(InternalDeclarationOptions);
+
+        IEnumerable<string> InternalDeclarationOptions
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
+
+
         IImplementation ISymbolProviderForPointer<ToNumberOfBase>.
             Feature
             (ToNumberOfBase tokenClass)

@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Windows.Forms;
 using hw.DebugFormatter;
-
 using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
@@ -946,5 +944,10 @@ namespace Reni
             result.Code = newCode;
             return result;
         }
+
+        internal Result InvalidConversion(TypeBase destination)
+            =>
+                destination.Result
+                    (CompleteCategory, () => Code.InvalidConversion(destination.Size), () => Exts);
     }
 }

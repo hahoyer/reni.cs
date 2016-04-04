@@ -21,6 +21,19 @@ namespace Reni.Validation
         internal override string DumpPrintText => Issue.IssueId.Tag;
         protected override string GetNodeDump() => base.GetNodeDump() + " " + DumpPrintText;
 
+        internal override IEnumerable<string> DeclarationOptions
+            => base.DeclarationOptions.Concat(InternalDeclarationOptions);
+
+        IEnumerable<string> InternalDeclarationOptions
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
+
+
         protected override IssueType CreateIssue(SourcePart source, IssueId issueId)
             => new ConsequentialIssueType(this, source);
 

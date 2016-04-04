@@ -1,13 +1,18 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using AutocompleteMenuNS;
+using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 using Reni;
+using Reni.TokenClasses;
 using Reni.Validation;
-using ReniUI.Classifcation;
+using ReniUI.Classification;
 using ReniUI.Commands;
 using ReniUI.CompilationView;
 using ReniUI.Formatting;
@@ -46,6 +51,7 @@ namespace ReniUI
         internal readonly IStudioApplication Master;
         SaveManager _saveManager;
         readonly IssuesView IssuesView;
+        readonly AutocompleteMenu AutocompleteMenu;
 
         public EditorView(string fileName, IStudioApplication master)
             : base(
@@ -68,6 +74,7 @@ namespace ReniUI
 
             TextBox.StyleNeeded += (s, args) => SignalStyleNeeded(args.Position);
             TextBox.TextChanged += (s, args) => OnTextChanged();
+            TextBox.KeyDown += (s, args) => OnKeyDown(args);
 
             CompilerCache = new ValueCache<CompilerBrowser>(CreateCompilerBrowser);
 
@@ -83,6 +90,58 @@ namespace ReniUI
             Frame.Menu = result;
 
             IssuesView = new IssuesView(this);
+
+            AutocompleteMenu = new AutocompleteMenu
+            {
+                Font =
+                    new Font
+                        (
+                        "Microsoft Sans Serif",
+                        9F,
+                        FontStyle.Regular,
+                        GraphicsUnit.Point,
+                        204),
+                ImageList = null,
+                Items = new[]
+                {
+                    "abc",
+                    "abcd",
+                    "abcde",
+                    "abcdef"
+                },
+                LeftPadding = 0,
+                TargetControlWrapper = null
+            };
+
+            AutocompleteMenu.WrapperNeeded +=
+                (s, a) => a.Wrapper = new ScintillaWrapper((Scintilla) a.TargetControl);
+            AutocompleteMenu.SetAutocompleteItems(GetOptions());
+        }
+
+        IEnumerable<AutocompleteItem> GetOptions()
+            => (ActiveSyntaxItem?
+                .DeclarationOptions
+                .Select(item => item ?? "(")
+                ?? new string[0])
+                .Select(item => new AutocompleteItem(item));
+
+        void OnKeyDown(KeyEventArgs e)
+        {
+            if(e.Control && e.KeyCode == Keys.Space)
+                AutocompleteMenu.Show(TextBox, true);
+        }
+
+        [DisableDump]
+        SourceSyntax ActiveSyntaxItem
+        {
+            get
+            {
+                var x = Compiler.Issues;
+                var token = Token.LocatePosition(Compiler.SourceSyntax, TextBox.SelectionStart);
+                if(token.IsComment || token.IsLineComment || token.IsText)
+                    return null;
+                return token.SourceSyntax.LocatePosition(token.SourceSyntax.SourcePart.Position - 1);
+            }
         }
 
         void RunSaveManager()
@@ -107,7 +166,8 @@ namespace ReniUI
                     TextBox.Text,
                     new CompilerParameters
                     {
-                        OutStream = new StringStream()
+                        OutStream = new StringStream(),
+                        ProcessErrors = true
                     },
                     sourceIdentifier: FileName
                 );
@@ -142,26 +202,15 @@ namespace ReniUI
 
         void SignalStyleNeeded(int position)
         {
-            var trace = false;
-            StartMethodDump(trace, position);
-            try
+            var sourceSyntax = Compiler.SourceSyntax;
+            while(TextBox.GetEndStyled() < position)
             {
-                var sourceSyntax = Compiler.SourceSyntax;
-                while (TextBox.GetEndStyled() < position)
-                {
-                    var current = TextBox.GetEndStyled();
-                    var token = Token.LocatePosition(sourceSyntax, current);
-                    var style = TextStyle.From(token, Compiler);
-                    TextBox.StartStyling(token.StartPosition);
-                    TextBox.SetStyling(token.SourcePart.Length, style);
-                    sourceSyntax = token.SourceSyntax;
-                }
-
-                ReturnVoidMethodDump(false);
-            }
-            finally
-            {
-                EndMethodDump();
+                var current = TextBox.GetEndStyled();
+                var token = Token.LocatePosition(sourceSyntax, current);
+                var style = TextStyle.From(token, Compiler);
+                TextBox.StartStyling(token.StartPosition);
+                TextBox.SetStyling(token.SourcePart.Length, style);
+                sourceSyntax = token.SourceSyntax;
             }
         }
 
@@ -188,7 +237,7 @@ namespace ReniUI
                 .GetEditPieces
                 (
                     sourcePart,
-                    new Configuration
+                    new Formatting.Configuration
                     {
                         EmptyLineLimit = 1,
                         MaxLineLength = 120
@@ -215,5 +264,7 @@ namespace ReniUI
             TextBox.FirstVisibleLine = part.Source.LineIndex(part.Position);
             TextBox.FirstVisibleLine = part.Source.LineIndex(part.EndPosition);
         }
+
+        internal void ListMembers() => TextBox.AutoCComplete();
     }
 }

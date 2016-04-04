@@ -39,6 +39,19 @@ namespace Reni.Context
             => VoidType
                 .Result(category, DumpPrintCode);
 
+        internal override IEnumerable<string> DeclarationOptions
+            => base.DeclarationOptions.Concat(InternalDeclarationOptions);
+
+        IEnumerable<string> InternalDeclarationOptions
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
+
+
         protected override IEnumerable<IConversion> StripConversions
             => base.StripConversions
                 .Concat(new[] {Feature.Extension.Conversion(PointerConversion)});

@@ -300,6 +300,8 @@ namespace Reni.Code
         internal CodeBase AddCleanup(CodeBase cleanupCode) => new CodeWithCleanup(this, cleanupCode);
 
         virtual internal CodeBase ArrangeCleanupCode() => null;
+
+        internal CodeBase InvalidConversion(Size size) => Add(new InvalidConversionCode(Size, size));
     }
 
     abstract class UnexpectedVisitOfPending : Exception {}

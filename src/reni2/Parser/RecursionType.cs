@@ -19,6 +19,18 @@ namespace Reni.Parser
     {
         public RecursionType(Root root) { Root = root; }
         internal override Root Root { get; }
+        internal override IEnumerable<string> DeclarationOptions
+            => base.DeclarationOptions.Concat(InternalDeclarationOptions);
+
+        IEnumerable<string> InternalDeclarationOptions
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
+
 
         IMeta IMetaImplementation.Function => this;
         IFunction IEvalImplementation.Function => this;

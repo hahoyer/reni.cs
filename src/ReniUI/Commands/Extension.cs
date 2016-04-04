@@ -23,22 +23,23 @@ namespace ReniUI.Commands
                         target.Master.MenuItem(Command.Exit)
                     }
                 },
-
                 new Menu("Edit")
                 {
                     Entries = new[]
                     {
                         target.MenuItem(Command.FormatAll),
                         target.MenuItem(Command.FormatSelection),
-                        target.Master.MenuItem(Command.Exit)
+                        new Menu("Intellisense")
+                        {
+                            Entries = new[] {target.MenuItem(Command.ListMembers)}
+                        }
                     }
                 },
-
                 new Menu("View")
                 {
                     Entries = new[]
                     {
-                        target.MenuItem(Command.IssuesView),
+                        target.MenuItem(Command.IssuesView)
                     }
                 }
             };

@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Linq;
 using hw.Helper;
 using JetBrains.Annotations;
-using ReniUI.Classifcation;
+using ReniUI.Classification;
 using ScintillaNET;
 
 namespace ReniUI.CompilationView

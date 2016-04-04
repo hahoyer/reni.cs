@@ -469,8 +469,7 @@ namespace Reni.Type
             if(path != null)
                 return path.Execute(category.Typed);
 
-            NotImplementedMethod(category, destination);
-            return null;
+            return ArgResult(category).InvalidConversion(destination);
         }
 
         Result Mutation(Category category, TypeBase destination)
@@ -588,6 +587,8 @@ namespace Reni.Type
             if(feature != null)
                 yield return SearchResult.Create(feature, this);
         }
+
+        internal virtual IEnumerable<string> DeclarationOptions { get { yield break; } }
 
         [DisableDump]
         protected virtual IEnumerable<IGenericProviderForType> Genericize

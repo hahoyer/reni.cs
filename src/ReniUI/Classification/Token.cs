@@ -5,7 +5,7 @@ using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.TokenClasses;
 
-namespace ReniUI.Classifcation
+namespace ReniUI.Classification
 {
     public abstract class Token : DumpableObject
     {

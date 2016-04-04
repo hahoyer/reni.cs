@@ -7,7 +7,7 @@ using Reni.Validation;
 
 namespace Reni.Code
 {
-    sealed class IssueCode : CodeBase
+    sealed class IssueCode : FiberHead
     {
         static int _nextObjectId;
         readonly Issue[] _issues;
@@ -16,7 +16,7 @@ namespace Reni.Code
             : base(_nextObjectId++) { _issues = issues; }
 
         protected override Size GetSize() => Size.Zero;
-        internal override CodeBase Add(FiberItem subsequentElement) { throw new NotImplementedException(); }
+
         internal override IEnumerable<Issue> Issues => _issues;
         internal override void Visit(IVisitor visitor) { }
 
