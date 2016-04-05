@@ -115,7 +115,7 @@ namespace ReniUI.Classification
             if (offset < result.Token.Characters.Position)
                 return new WhiteSpaceToken
                     (
-                    result.Token.PrecededWith.First(item => offset >= item.Characters.Position),
+                    result.Token.PrecededWith.First(item => offset <= item.Characters.Position),
                     result
                     );
 
