@@ -165,7 +165,8 @@ namespace ReniUI
                 var token = Token.LocatePosition(Compiler.SourceSyntax, TextBox.SelectionStart - 1);
                 if(token.IsComment || token.IsLineComment || token.IsText)
                     return null;
-                return token.SourceSyntax.LocatePosition(token.SourceSyntax.SourcePart.Position - 1);
+                var current = token.SourceSyntax.Token.SourcePart.Position - 1;
+                return token.SourceSyntax.LocatePosition(current);
             }
         }
 
