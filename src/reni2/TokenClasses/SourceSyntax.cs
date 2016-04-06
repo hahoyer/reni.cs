@@ -263,9 +263,14 @@ namespace Reni.TokenClasses
         }
     }
 
+    interface ISyntaxProvider
+    {
+        Syntax Value { get; }
+        IEnumerable<Issue> Issues { get; }
+    }
+
     interface IBelongingsMatcher
     {
         bool IsBelongingTo(IBelongingsMatcher otherMatcher);
     }
 }
-
