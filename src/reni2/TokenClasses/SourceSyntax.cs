@@ -165,6 +165,7 @@ namespace Reni.TokenClasses
 
             foreach(var items in subChain)
                 yield return items;
+
             yield return this;
         }
 
@@ -196,6 +197,7 @@ namespace Reni.TokenClasses
         IEnumerable<SourceSyntax> GetItems()
         {
             yield return this;
+
             if(Left != null)
                 foreach(var sourceSyntax in Left.Items)
                     yield return sourceSyntax;
@@ -226,8 +228,10 @@ namespace Reni.TokenClasses
             get
             {
                 yield return this;
+
                 if(Parent == null)
                     yield break;
+
                 foreach(var other in Parent.ParentChainIncludingThis)
                     yield return other;
             }
@@ -235,20 +239,28 @@ namespace Reni.TokenClasses
 
         [DisableDump]
         public string[] DeclarationOptions
-            => Syntax
-                .ToCompiledSyntax
-                .Value
-                .ResultCache
-                .Select(item => item.Value.Type)
-                .SelectMany(item => item.DeclarationOptions)
-                .Distinct()
-                .ToArray();
-    }
+        {
+            get
+            {
+                var typeoid = Syntax.Typeoid;
+                NotImplementedMethod(nameof(typeoid), typeoid);
+                return null;
 
-    interface ISyntaxProvider
-    {
-        IEnumerable<Issue> Issues { get; }
-        Syntax Value { get; }
+                var syntax = Syntax
+                    .ToCompiledSyntax
+                    .Value;
+                var functionCache = syntax.ResultCache;
+                if(functionCache.Any())
+                    return functionCache
+                        .Select(item => item.Value.Type)
+                        .SelectMany(item => item.DeclarationOptions)
+                        .Distinct()
+                        .ToArray();
+
+                NotImplementedMethod();
+                return null;
+            }
+        }
     }
 
     interface IBelongingsMatcher
@@ -256,3 +268,4 @@ namespace Reni.TokenClasses
         bool IsBelongingTo(IBelongingsMatcher otherMatcher);
     }
 }
+

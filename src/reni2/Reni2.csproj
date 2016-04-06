@@ -36,6 +36,7 @@
     <Compile Include="CompilerParameters.cs" />
     <Compile Include="Context\ContextReferenceType.cs" />
     <Compile Include="Context\IRootProvider.cs" />
+    <Compile Include="DeclarationOptions\Typeoid.cs" />
     <Compile Include="FeatureTest\Array\ArrayFromPieces.cs" />
     <Compile Include="FeatureTest\Array\CombineArraysFromPieces.cs" />
     <Compile Include="FeatureTest\Array\DefaultInitialized.cs" />

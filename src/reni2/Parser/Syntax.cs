@@ -5,6 +5,7 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
+using Reni.DeclarationOptions;
 using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Validation;
@@ -120,6 +121,16 @@ namespace Reni.Parser
                 .Where(item => item != null)
                 .SelectMany(item => item.Closure)
                 .plus(this);
+
+        internal Typeoid Typeoid
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+
+            }
+        }
 
         internal virtual Checked<ExclamationSyntaxList> ExclamationSyntax(SourcePart token)
         {

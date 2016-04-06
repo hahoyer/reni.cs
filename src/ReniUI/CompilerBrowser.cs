@@ -98,6 +98,7 @@ namespace ReniUI
                 var codeItems = Function(index).CodeItems;
                 foreach(var item in codeItems)
                     CodeToFunctionIndexCache.Add(item, index);
+
                 if(codeItems.Contains(codeBase))
                     return index;
             }

@@ -147,7 +147,8 @@ namespace ReniUI
         IEnumerable<AutocompleteItem> GetOptions()
         {
             var activeSyntaxItem = ActiveSyntaxItem;
-            NotImplementedMethod(nameof(activeSyntaxItem), activeSyntaxItem.SourcePart);
+            var declarationOptions = activeSyntaxItem.DeclarationOptions;
+            NotImplementedMethod(nameof(declarationOptions), declarationOptions);
             return null;
         }
 
