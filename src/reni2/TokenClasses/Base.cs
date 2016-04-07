@@ -11,28 +11,28 @@ namespace Reni.TokenClasses
 {
     abstract class TerminalToken : TokenClass
     {
-        protected sealed override Checked<OldSyntax> Prefix(SourcePart token, OldSyntax right)
+        protected sealed override Checked<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
             => IssueId.UnexpectedUseAsPrefix.Syntax(token, right);
 
-        protected sealed override Checked<OldSyntax> Infix(OldSyntax left, SourcePart token, OldSyntax right)
+        protected sealed override Checked<OldSyntax> OldInfix(OldSyntax left, SourcePart token, OldSyntax right)
             => IssueId.UnexpectedUseAsInfix.Syntax(token, left, right);
 
-        protected sealed override Checked<OldSyntax> Suffix(OldSyntax left, SourcePart token)
+        protected sealed override Checked<OldSyntax> OldSuffix(OldSyntax left, SourcePart token)
             => IssueId.UnexpectedUseAsSuffix.Syntax(token, left);
     }
 
     abstract class NonPrefixToken : TokenClass
     {
-        protected sealed override Checked<OldSyntax> Prefix(SourcePart token, OldSyntax right)
+        protected sealed override Checked<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
             => IssueId.UnexpectedUseAsPrefix.Syntax(token, right);
 
-        protected sealed override Checked<OldSyntax> Infix(OldSyntax left, SourcePart token, OldSyntax right)
+        protected sealed override Checked<OldSyntax> OldInfix(OldSyntax left, SourcePart token, OldSyntax right)
             => IssueId.UnexpectedUseAsInfix.Syntax(token, left, right);
     }
 
     abstract class InfixPrefixToken : TokenClass
     {
-        protected sealed override Checked<OldSyntax> Suffix(OldSyntax left, SourcePart token)
+        protected sealed override Checked<OldSyntax> OldSuffix(OldSyntax left, SourcePart token)
             => IssueId.UnexpectedUseAsSuffix.Syntax(token, left);
 
         protected sealed override Checked<OldSyntax> OldTerminal(SourcePart token)
@@ -41,19 +41,19 @@ namespace Reni.TokenClasses
 
     abstract class NonSuffixToken : TokenClass
     {
-        protected sealed override Checked<OldSyntax> Infix(OldSyntax left, SourcePart token, OldSyntax right)
+        protected sealed override Checked<OldSyntax> OldInfix(OldSyntax left, SourcePart token, OldSyntax right)
             => IssueId.UnexpectedUseAsInfix.Syntax(token, left, right);
 
-        protected sealed override Checked<OldSyntax> Suffix(OldSyntax left, SourcePart token)
+        protected sealed override Checked<OldSyntax> OldSuffix(OldSyntax left, SourcePart token)
             => IssueId.UnexpectedUseAsSuffix.Syntax(token, left);
     }
 
     abstract class SuffixToken : TokenClass
     {
-        protected sealed override Checked<OldSyntax> Prefix(SourcePart token, OldSyntax right)
+        protected sealed override Checked<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
             => IssueId.UnexpectedUseAsPrefix.Syntax(token, right);
 
-        protected sealed override Checked<OldSyntax> Infix(OldSyntax left, SourcePart token, OldSyntax right)
+        protected sealed override Checked<OldSyntax> OldInfix(OldSyntax left, SourcePart token, OldSyntax right)
             => IssueId.UnexpectedUseAsInfix.Syntax(token, left, right);
 
         protected sealed override Checked<OldSyntax> OldTerminal(SourcePart token)
@@ -62,20 +62,20 @@ namespace Reni.TokenClasses
 
     abstract class InfixToken : TokenClass
     {
-        protected sealed override Checked<OldSyntax> Prefix(SourcePart token, OldSyntax right)
+        protected sealed override Checked<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
             => IssueId.UnexpectedUseAsPrefix.Syntax(token, right);
 
         protected sealed override Checked<OldSyntax> OldTerminal(SourcePart token)
             => IssueId.UnexpectedUseAsTerminal.Syntax(token);
 
-        protected sealed override Checked<OldSyntax> Suffix(OldSyntax left, SourcePart token)
+        protected sealed override Checked<OldSyntax> OldSuffix(OldSyntax left, SourcePart token)
             => IssueId.UnexpectedUseAsSuffix.Syntax(token,left);
 
     }
 
     abstract class TerminalSyntaxToken : TerminalToken, ITerminal
     {
-        protected sealed override Checked<OldSyntax> OldTerminal(SourcePart token)
+        protected sealed override Checked<Value> Terminal(SourcePart token)
             => new TerminalSyntax(token, this);
 
         Result ITerminal.Result(ContextBase context, Category category, TerminalSyntax token)
@@ -98,7 +98,7 @@ namespace Reni.TokenClasses
         protected sealed override Checked<OldSyntax> OldTerminal(SourcePart token)
             => new TerminalSyntax(token, this);
 
-        protected override Checked<OldSyntax> Suffix(OldSyntax left, SourcePart token)
+        protected override Checked<OldSyntax> OldSuffix(OldSyntax left, SourcePart token)
             => SuffixSyntax.Create(left.ToCompiledSyntax, this, token);
 
         Result ITerminal.Result(ContextBase context, Category category, TerminalSyntax token)
@@ -123,10 +123,10 @@ namespace Reni.TokenClasses
 
     abstract class InfixPrefixSyntaxToken : InfixPrefixToken, IInfix, IPrefix
     {
-        protected sealed override Checked<OldSyntax> Prefix(SourcePart token, OldSyntax right)
+        protected sealed override Checked<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
             => PrefixSyntax.Create(this, right.ToCompiledSyntax);
 
-        protected sealed override Checked<OldSyntax> Infix(OldSyntax left, SourcePart token, OldSyntax right)
+        protected sealed override Checked<OldSyntax> OldInfix(OldSyntax left, SourcePart token, OldSyntax right)
             => InfixSyntax.Create(left.ToCompiledSyntax, this, token, right.ToCompiledSyntax);
 
         Result IInfix.Result
@@ -149,7 +149,7 @@ namespace Reni.TokenClasses
         protected sealed override Checked<OldSyntax> OldTerminal(SourcePart token)
             => new TerminalSyntax(token, this);
 
-        protected sealed override Checked<OldSyntax> Prefix(SourcePart token, OldSyntax right)
+        protected sealed override Checked<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
             => PrefixSyntax.Create(this, right.ToCompiledSyntax);
 
         Result ITerminal.Result(ContextBase context, Category category, TerminalSyntax token)
@@ -176,7 +176,7 @@ namespace Reni.TokenClasses
 
     abstract class SuffixSyntaxToken : SuffixToken, ISuffix
     {
-        protected sealed override Checked<OldSyntax> Suffix(OldSyntax left, SourcePart token)
+        protected sealed override Checked<OldSyntax> OldSuffix(OldSyntax left, SourcePart token)
             => SuffixSyntax.Create(left.ToCompiledSyntax, this, token);
 
         Result ISuffix.Result(ContextBase context, Category category, Value left)
@@ -187,7 +187,7 @@ namespace Reni.TokenClasses
 
     abstract class InfixSyntaxToken : InfixToken, IInfix
     {
-        protected sealed override Checked<OldSyntax> Infix(OldSyntax left, SourcePart token, OldSyntax right)
+        protected sealed override Checked<OldSyntax> OldInfix(OldSyntax left, SourcePart token, OldSyntax right)
             => InfixSyntax.Create(left.ToCompiledSyntax, this, token, right.ToCompiledSyntax);
 
         Result IInfix.Result

@@ -28,7 +28,7 @@ namespace Reni.TokenClasses
         }
 
         internal override Checked<OldSyntax> RightSyntax(OldSyntax right, SourcePart token)
-            => Checked<OldSyntax>.From(ExpressionSyntax.Create(null, Definable, right, token));
+            => Checked<OldSyntax>.From(ExpressionSyntax.OldCreate(null, Definable, right, token));
 
         [DisableDump]
         internal override Checked<Value> ToCompiledSyntax

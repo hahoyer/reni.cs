@@ -27,15 +27,15 @@ namespace Reni.TokenClasses
         public override string Id => TokenId(Level);
         internal override bool IsVisible => Level != 0;
 
-        protected override Checked<Parser.OldSyntax> Suffix
+        protected override Checked<Parser.OldSyntax> OldSuffix
             (Parser.OldSyntax left, SourcePart token)
             => new Syntax(left, Level, token, null);
 
-        protected override Checked<Parser.OldSyntax> Infix
+        protected override Checked<Parser.OldSyntax> OldInfix
             (Parser.OldSyntax left, SourcePart token, Parser.OldSyntax right)
             => new Syntax(left, Level, token, right);
 
-        protected override Checked<Parser.OldSyntax> Prefix
+        protected override Checked<Parser.OldSyntax> OldPrefix
             (SourcePart token, Parser.OldSyntax right)
             => new Syntax(null, Level, token, right);
 

@@ -75,8 +75,6 @@ namespace Reni.Struct
 
         [DisableDump]
         internal int EndPosition => Statements.Length;
-        [DisableDump]
-        internal override Checked<Value> ToCompiledSyntax => this;
 
         internal override ResultCache.IResultProvider FindSource
             (IContextReference ext, ContextBase context)

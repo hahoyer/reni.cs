@@ -27,10 +27,10 @@ namespace Reni.TokenClasses
 
         protected override Checked<OldSyntax> OldTerminal(SourcePart token)
             => IssueId.MissingFunctionGetter.Syntax(token);
-        protected override Checked<OldSyntax> Suffix(OldSyntax left, SourcePart token)
+        protected override Checked<OldSyntax> OldSuffix(OldSyntax left, SourcePart token)
             => IssueId.MissingFunctionGetter.Syntax(token, left);
 
-        protected override Checked<OldSyntax> Prefix(SourcePart token, OldSyntax right)
+        protected override Checked<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
             => FunctionSyntax.Create
                 (
                     null,
@@ -38,7 +38,7 @@ namespace Reni.TokenClasses
                     _isMetaFunction,
                     right.ToCompiledSyntax);
 
-        protected override Checked<OldSyntax> Infix(OldSyntax left, SourcePart token, OldSyntax right)
+        protected override Checked<OldSyntax> OldInfix(OldSyntax left, SourcePart token, OldSyntax right)
             => FunctionSyntax.Create
                 (
                     left.ToCompiledSyntax,

@@ -15,7 +15,7 @@ namespace Reni.TokenClasses
         public const string TokenId = ":";
         public override string Id => TokenId;
 
-        protected override Checked<OldSyntax> Suffix(OldSyntax left, SourcePart token)
+        protected override Checked<OldSyntax> OldSuffix(OldSyntax left, SourcePart token)
             =>
                 left.CreateDeclarationSyntax
                     (
@@ -24,10 +24,10 @@ namespace Reni.TokenClasses
                         IssueId.MissingValueInDeclaration.CreateIssue(token)
                     );
 
-        protected override Checked<OldSyntax> Prefix(SourcePart token, OldSyntax right)
+        protected override Checked<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
             => IssueId.UnexpectedUseAsPrefix.Syntax(token);
 
-        protected override Checked<OldSyntax> Infix(OldSyntax left, SourcePart token, OldSyntax right)
+        protected override Checked<OldSyntax> OldInfix(OldSyntax left, SourcePart token, OldSyntax right)
             => left.CreateDeclarationSyntax(token, right);
 
         protected override Checked<OldSyntax> OldTerminal(SourcePart token)

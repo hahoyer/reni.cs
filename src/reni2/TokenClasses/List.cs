@@ -29,13 +29,13 @@ namespace Reni.TokenClasses
                         new EmptyList(token),
                         new EmptyList(token));
 
-        protected override Checked<OldSyntax> Prefix(SourcePart token, OldSyntax right)
+        protected override Checked<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
             => ListSyntax(new EmptyList(token), right);
 
-        protected override Checked<OldSyntax> Suffix(OldSyntax left, SourcePart token)
+        protected override Checked<OldSyntax> OldSuffix(OldSyntax left, SourcePart token)
             => ListSyntax(left, new EmptyList(token));
 
-        protected override Checked<OldSyntax> Infix(OldSyntax left, SourcePart token, OldSyntax right)
+        protected override Checked<OldSyntax> OldInfix(OldSyntax left, SourcePart token, OldSyntax right)
             => ListSyntax(left, right);
 
         ListSyntax ListSyntax(OldSyntax left, OldSyntax right)

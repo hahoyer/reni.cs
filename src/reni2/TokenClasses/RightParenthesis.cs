@@ -27,15 +27,15 @@ namespace Reni.TokenClasses
                 return null;
             }
 
-            protected override Checked<OldSyntax> Prefix(SourcePart token, OldSyntax right)
+            protected override Checked<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
             {
                 NotImplementedMethod(token, right);
                 return null;
             }
 
-            protected override Checked<OldSyntax> Suffix(OldSyntax left, SourcePart token) => left;
+            protected override Checked<OldSyntax> OldSuffix(OldSyntax left, SourcePart token) => left;
 
-            protected override Checked<OldSyntax> Infix(OldSyntax left, SourcePart token, OldSyntax right)
+            protected override Checked<OldSyntax> OldInfix(OldSyntax left, SourcePart token, OldSyntax right)
                 => left.InfixOfMatched(token, right);
 
             internal override bool IsVisible => false;
@@ -53,16 +53,16 @@ namespace Reni.TokenClasses
         public override string Id => TokenId(Level);
         internal override bool IsVisible => Level != 0;
 
-        protected override Checked<OldSyntax> Suffix(OldSyntax left, SourcePart token)
+        protected override Checked<OldSyntax> OldSuffix(OldSyntax left, SourcePart token)
             => left.Match(Level, token);
 
-        protected override Checked<OldSyntax> Infix(OldSyntax left, SourcePart token, OldSyntax right)
+        protected override Checked<OldSyntax> OldInfix(OldSyntax left, SourcePart token, OldSyntax right)
         {
             NotImplementedMethod(left, token, right);
             return null;
         }
 
-        protected override Checked<OldSyntax> Prefix(SourcePart token, OldSyntax right)
+        protected override Checked<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
         {
             NotImplementedMethod(token, right);
             return null;

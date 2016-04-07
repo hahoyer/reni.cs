@@ -15,13 +15,13 @@ namespace Reni.TokenClasses
         protected override Checked<OldSyntax> OldTerminal(SourcePart token)
             => Checked<OldSyntax>.From(new EmptyList(token).ToCompound);
 
-        protected override Checked<OldSyntax> Prefix(SourcePart token, OldSyntax right)
+        protected override Checked<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
             => new EmptyList(token).Cleanup(token, right);
 
-        protected override Checked<OldSyntax> Suffix(OldSyntax left, SourcePart token)
+        protected override Checked<OldSyntax> OldSuffix(OldSyntax left, SourcePart token)
             => Checked<OldSyntax>.From(left.ToCompound);
 
-        protected override Checked<OldSyntax> Infix(OldSyntax left, SourcePart token, OldSyntax right)
+        protected override Checked<OldSyntax> OldInfix(OldSyntax left, SourcePart token, OldSyntax right)
             => left.Cleanup(token, right);
     }
 }

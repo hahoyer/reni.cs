@@ -13,16 +13,16 @@ namespace Reni.TokenClasses
         public const string TokenId = "else";
         public override string Id => TokenId;
 
-        protected override Checked<OldSyntax> Suffix(OldSyntax left, SourcePart token)
+        protected override Checked<OldSyntax> OldSuffix(OldSyntax left, SourcePart token)
             => IssueId.MissingElseBody.Syntax(token);
 
-        protected override Checked<OldSyntax> Infix(OldSyntax left, SourcePart token, OldSyntax right)
+        protected override Checked<OldSyntax> OldInfix(OldSyntax left, SourcePart token, OldSyntax right)
             => left.CreateElseSyntax(right.ToCompiledSyntax);
 
         protected override Checked<OldSyntax> OldTerminal(SourcePart token)
             => IssueId.MissingThen.Syntax(token);
 
-        protected override Checked<OldSyntax> Prefix(SourcePart token, OldSyntax right)
+        protected override Checked<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
             => IssueId.MissingThen.Syntax(token, right);
 
     }

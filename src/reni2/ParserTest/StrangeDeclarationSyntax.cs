@@ -15,7 +15,7 @@ namespace Reni.ParserTest
     {
         public StrangeDeclarationSyntax()
         {
-            Parameters.TraceOptions.Parser = true;
+            //Parameters.TraceOptions.Parser = true;
             Parameters.ParseOnly = true;
         }
 

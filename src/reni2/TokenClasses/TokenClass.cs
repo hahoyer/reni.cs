@@ -22,34 +22,78 @@ namespace Reni.TokenClasses
         Syntax Create(Syntax left, IToken token, Syntax right)
             => Syntax.CreateSourceSyntax(left, this, token, right);
 
-        protected abstract Checked<OldSyntax> OldTerminal(SourcePart token);
-        protected abstract Checked<OldSyntax> Prefix(SourcePart token, OldSyntax right);
-        protected abstract Checked<OldSyntax> Suffix(OldSyntax left, SourcePart token);
-        protected abstract Checked<OldSyntax> Infix(OldSyntax left, SourcePart token, OldSyntax right);
+        protected virtual Checked<OldSyntax> OldTerminal(SourcePart token)
+        {
+            NotImplementedMethod(token);
+            return null;
+        }
+
+        protected virtual Checked<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
+        {
+            NotImplementedMethod(token,right);
+            return null;
+        }
+
+        protected virtual Checked<OldSyntax> OldSuffix(OldSyntax left, SourcePart token)
+        {
+            NotImplementedMethod(left, token);
+            return null;
+        }
+
+        protected virtual Checked<OldSyntax> OldInfix
+            (OldSyntax left, SourcePart token, OldSyntax right)
+        {
+            NotImplementedMethod(left, token, right);
+            return null;
+        }
 
         internal virtual bool IsVisible => true;
 
         Checked<Value> ITokenClass.GetValue(Syntax left, IToken token, Syntax right)
         {
-            var leftSyntax = left?.Value;
-            var rightSyntax = right?.Value;
-            if(left != null && leftSyntax == null)
-                return null;
-            if(right != null && rightSyntax == null)
+            var leftValue = left?.Value;
+            if(left != null && leftValue == null)
                 return null;
 
-            if(leftSyntax == null)
-                if(rightSyntax == null)
-                    return Terminal(token.SourcePart);
-            NotImplementedMethod(left, token, right, nameof(leftSyntax), leftSyntax, nameof(rightSyntax), rightSyntax);
+            var rightValue = right?.Value;
+            if(right != null && rightValue == null)
+                return null;
+
+            return leftValue == null
+                ? rightValue == null
+                    ? Terminal(token.Characters)
+                    : Prefix(token, rightValue.Value)
+                        .With(rightValue.Issues)
+                : rightValue == null
+                    ? Suffix(leftValue.Value, token.Characters)
+                        .With(leftValue.Issues)
+                    : Infix(leftValue.Value, token, rightValue.Value)
+                        .With(rightValue.Issues)
+                        .With(leftValue.Issues);
+        }
+
+        protected virtual Checked<Value> Infix(Value left, IToken token, Value right)
+        {
+            NotImplementedMethod(left,token,right);
             return null;
         }
 
-        Checked<Value> Terminal(SourcePart token)
+        protected virtual Checked<Value> Suffix(Value left, SourcePart token)
+        {
+            NotImplementedMethod(left, token);
+            return null;
+        }
+
+        protected virtual Checked<Value> Prefix(IToken token, Value right)
+        {
+            NotImplementedMethod(token, right);
+            return null;
+        }
+
+        protected virtual Checked<Value> Terminal(SourcePart token)
         {
             NotImplementedMethod(token);
             return null;
-
         }
     }
 

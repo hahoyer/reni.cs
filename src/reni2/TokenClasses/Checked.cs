@@ -40,5 +40,7 @@ namespace Reni.TokenClasses
         public static Checked<T> From<TIn>(Checked<TIn> x)
             where TIn : T
             => new Checked<T>(x.Value, x.Issues);
+
+        internal Checked<T> With(IEnumerable<Issue> issues) => new Checked<T>(Value, Issues.plus(issues));
     }
 }

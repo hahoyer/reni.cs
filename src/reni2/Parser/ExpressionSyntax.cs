@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
@@ -14,6 +13,10 @@ namespace Reni.Parser
     sealed class ExpressionSyntax : Value
     {
         internal static Checked<Value> Create
+            (Value left, Definable definable, Value right, SourcePart token)
+            => new Checked<Value>(new ExpressionSyntax(left, definable, right, token));
+
+        internal static Checked<Value> OldCreate
             (OldSyntax left, Definable definable, OldSyntax right, SourcePart token)
         {
             var left1 = left?.ToCompiledSyntax;
@@ -62,22 +65,24 @@ namespace Reni.Parser
                 .From
                 (
                     Right == null
-                        ? Create(Left, Definable, right, Token)
-                        : Create(this, null, right, token)
+                        ? OldCreate(Left, Definable, right, Token)
+                        : OldCreate(this, null, right, token)
                 );
 
         internal override Checked<OldSyntax> InfixOfMatched(SourcePart token, OldSyntax right)
-            => Checked<OldSyntax>.From(Create(this, null, right, token));
+            => Checked<OldSyntax>.From(OldCreate(this, null, right, token));
 
-        int CurrentResultDepth = 0;
+        int CurrentResultDepth;
+
         internal override Result ResultForCache(ContextBase context, Category category)
         {
             if(CurrentResultDepth > 20)
                 throw new EvaluationDepthExhaustedException(this, context, CurrentResultDepth);
+
             try
             {
                 CurrentResultDepth++;
-                if (Left == null)
+                if(Left == null)
                     return context.PrefixResult(category, Definable, Token, Right);
 
                 var left = context.ResultAsReferenceCache(Left);
@@ -96,17 +101,18 @@ namespace Reni.Parser
             readonly ContextBase Context;
             readonly int Depth;
 
-            public EvaluationDepthExhaustedException(ExpressionSyntax target, ContextBase context, int depth)
+            public EvaluationDepthExhaustedException
+                (ExpressionSyntax target, ContextBase context, int depth)
             {
                 Target = target;
                 Context = context;
                 Depth = depth;
             }
 
-            public override string Message 
+            public override string Message
                 => "Depth of " + Depth + " exhausted when evaluation expression.\n" +
-                "Expression: " + Target.SourcePart.GetDumpAroundCurrent(10) +"\n" +
-                "Context: " + Context.NodeDump;
+                    "Expression: " + Target.SourcePart.GetDumpAroundCurrent(10) + "\n" +
+                    "Context: " + Context.NodeDump;
         }
 
         internal override Value Visit(ISyntaxVisitor visitor)
@@ -118,7 +124,7 @@ namespace Reni.Parser
 
             var result = Definable.CreateForVisit(left ?? Left, right ?? Right);
             Tracer.Assert(!result.Issues.Any());
-            return (Value) result.Value;
+            return result.Value;
         }
 
         internal override ResultCache.IResultProvider FindSource
