@@ -7,12 +7,12 @@ using Reni.TokenClasses;
 
 namespace Reni.Parser
 {
-    sealed class ListSyntax : Syntax
+    sealed class ListSyntax : OldSyntax
     {
-        public static Syntax Create(params Syntax[] values)
+        public static OldSyntax Create(params OldSyntax[] values)
             => new ListSyntax(null, values.Where(item => item != null));
 
-        public ListSyntax(List type, IEnumerable<Syntax> data)
+        public ListSyntax(List type, IEnumerable<OldSyntax> data)
         {
             Type = type;
             Data = data.ToArray();
@@ -22,15 +22,15 @@ namespace Reni.Parser
         [EnableDump]
         List Type { get; }
         [EnableDump]
-        Syntax[] Data { get; }
+        OldSyntax[] Data { get; }
 
         [DisableDump]
-        internal override Checked<CompileSyntax> ToCompiledSyntax
+        internal override Checked<Value> ToCompiledSyntax
         {
             get
             {
                 var result = ToCompound;
-                return new Checked<CompileSyntax>(result.Value, result.Issues);
+                return new Checked<Value>(result.Value, result.Issues);
             }
         }
 
@@ -38,7 +38,7 @@ namespace Reni.Parser
         internal override Checked<CompoundSyntax> ToCompound
             => new CompoundSyntax(Data);
 
-        internal override IEnumerable<Syntax> ToList(List type)
+        internal override IEnumerable<OldSyntax> ToList(List type)
         {
             if(Type == null || type == null || Type == type)
                 return Data;
@@ -47,6 +47,6 @@ namespace Reni.Parser
         }
 
         [DisableDump]
-        protected override IEnumerable<Syntax> DirectChildren => Data;
+        protected override IEnumerable<OldSyntax> DirectChildren => Data;
     }
 }

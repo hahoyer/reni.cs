@@ -17,20 +17,20 @@ namespace Reni.Struct
     /// <summary>
     ///     Structured data, context free version
     /// </summary>
-    sealed class CompoundSyntax : CompileSyntax
+    sealed class CompoundSyntax : Value
     {
-        readonly Syntax[] _statements;
+        readonly OldSyntax[] _statements;
         readonly Data[] _data;
-        readonly CompileSyntax CleanupSection;
+        readonly Value CleanupSection;
         static readonly string _runId = Compiler.FormattedNow + "\n";
         internal static bool IsInContainerDump;
         static bool _isInsideFileDump;
         static int _nextObjectId;
 
-        internal CompoundSyntax(Syntax[] statements)
+        internal CompoundSyntax(OldSyntax[] statements)
             : this(statements, null) { }
 
-        CompoundSyntax(Syntax[] statements, CompileSyntax cleanupSection)
+        CompoundSyntax(OldSyntax[] statements, Value cleanupSection)
             : base(_nextObjectId++)
         {
             _statements = statements;
@@ -41,7 +41,7 @@ namespace Reni.Struct
         public string GetCompoundIdentificationDump() => "." + ObjectId + "i";
         [Node]
         [EnableDump]
-        internal CompileSyntax[] Statements => _data.Select(s => s.Statement).ToArray();
+        internal Value[] Statements => _data.Select(s => s.Statement).ToArray();
 
         [EnableDump]
         internal IDictionary<string, int> NameIndex
@@ -76,7 +76,7 @@ namespace Reni.Struct
         [DisableDump]
         internal int EndPosition => Statements.Length;
         [DisableDump]
-        internal override Checked<CompileSyntax> ToCompiledSyntax => this;
+        internal override Checked<Value> ToCompiledSyntax => this;
 
         internal override ResultCache.IResultProvider FindSource
             (IContextReference ext, ContextBase context)
@@ -174,22 +174,22 @@ namespace Reni.Struct
 
         sealed class Data : DumpableObject
         {
-            public Data(Syntax rawStatement, int position)
+            public Data(OldSyntax rawStatement, int position)
             {
                 RawStatement = rawStatement;
                 Position = position;
-                StatementCache = new ValueCache<Checked<CompileSyntax>>(GetStatement);
+                StatementCache = new ValueCache<Checked<Value>>(GetStatement);
                 NamesCache = new ValueCache<string[]>(GetNames);
                 Tracer.Assert(RawStatement != null);
             }
 
-            internal Syntax RawStatement { get; }
+            internal OldSyntax RawStatement { get; }
             public int Position { get; }
 
             ValueCache<string[]> NamesCache { get; }
-            ValueCache<Checked<CompileSyntax>> StatementCache { get; }
+            ValueCache<Checked<Value>> StatementCache { get; }
 
-            public CompileSyntax Statement => StatementCache.Value.Value;
+            public Value Statement => StatementCache.Value.Value;
             public Issue[] Issues => StatementCache.Value.Issues;
             public bool IsDefining(string name) => Names.Contains(name);
             public bool IsConverter => RawStatement.IsConverterSyntax;
@@ -198,20 +198,20 @@ namespace Reni.Struct
 
             public bool IsMutable => RawStatement.IsMutableSyntax;
 
-            Checked<CompileSyntax> GetStatement()
+            Checked<Value> GetStatement()
                 => RawStatement.ContainerStatementToCompileSyntax;
 
             string[] GetNames() => RawStatement.GetDeclarations().ToArray();
         }
 
         [DisableDump]
-        protected override IEnumerable<Syntax> DirectChildren => _statements;
+        protected override IEnumerable<OldSyntax> DirectChildren => _statements;
 
         [DisableDump]
         internal IEnumerable<SourcePart> SourceParts
             => Statements.Select(item => item.SourcePart);
 
-        internal CompoundSyntax AddCleanupSection(SourcePart token, CompileSyntax newCleanupSection)
+        internal CompoundSyntax AddCleanupSection(SourcePart token, Value newCleanupSection)
         {
             if(CleanupSection != null)
             {

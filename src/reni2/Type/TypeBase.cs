@@ -697,7 +697,7 @@ namespace Reni.Type
             SourcePart token,
             Definable definable,
             ContextBase context,
-            CompileSyntax right
+            Parser.Value right
             )
             => ExecuteDeclaration
                 (
@@ -747,7 +747,7 @@ namespace Reni.Type
             => new SymmetricClosureService(this).Execute(SymmetricClosureService.Forward);
 
         public IEnumerable<ResultCache.IResultProvider> GetDefinableResults
-            (IContextReference ext, Definable definable, ContextBase context, CompileSyntax right)
+            (IContextReference ext, Definable definable, ContextBase context, Parser.Value right)
             => DeclarationsForTypeAndCloseRelatives(definable)
                 .RemoveLowPriorityResults()
                 .Single()

@@ -6,10 +6,10 @@ using Reni.TokenClasses;
 
 namespace Reni.Parser
 {
-    sealed class DeclarationSyntax : Syntax
+    sealed class DeclarationSyntax : OldSyntax
     {
-        internal static Checked<Syntax> Create
-            (Syntax body, Definable target, Exclamation.Syntax[] tags)
+        internal static Checked<OldSyntax> Create
+            (OldSyntax body, Definable target, Exclamation.Syntax[] tags)
         {
             var rightResult = body.ToCompiledSyntax;
             return new DeclarationSyntax
@@ -17,9 +17,9 @@ namespace Reni.Parser
                 .Issues(rightResult.Issues);
         }
 
-        DeclarationSyntax
+        internal DeclarationSyntax
             (
-            CompileSyntax body,
+            Value body,
             Definable target,
             params DeclarationTagToken[] tags)
         {
@@ -34,7 +34,7 @@ namespace Reni.Parser
         [EnableDump]
         Definable Target { get; }
         [EnableDump]
-        Syntax Body { get; }
+        OldSyntax Body { get; }
 
         string Name => Target?.Id;
 
@@ -51,15 +51,15 @@ namespace Reni.Parser
             => Tags.Any(item => item.DeclaresMixIn);
 
         [DisableDump]
-        internal override Checked<CompileSyntax> ToCompiledSyntax
-            => Checked<CompileSyntax>.From(ToCompound);
+        internal override Checked<Value> ToCompiledSyntax
+            => Checked<Value>.From(ToCompound);
 
         [DisableDump]
-        internal override Checked<CompileSyntax> ContainerStatementToCompileSyntax
+        internal override Checked<Value> ContainerStatementToCompileSyntax
             => Body.ContainerStatementToCompileSyntax;
 
         [DisableDump]
-        protected override IEnumerable<Syntax> DirectChildren { get { yield return Body; } }
+        protected override IEnumerable<OldSyntax> DirectChildren { get { yield return Body; } }
 
         protected override string GetNodeDump()
             => base.GetNodeDump() +

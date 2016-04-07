@@ -9,7 +9,7 @@ using Reni.Validation;
 
 namespace Reni.Parser
 {
-    sealed class EmptyList : CompileSyntax
+    sealed class EmptyList : Value
     {
         internal override SourcePart Token { get; }
 

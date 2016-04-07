@@ -21,11 +21,11 @@ namespace Reni.Struct
         protected readonly FunctionType Parent;
         [Node]
         [EnableDump]
-        readonly CompileSyntax Body;
+        readonly Value Body;
 
         internal readonly ResultCache ResultCache;
 
-        protected FunctionInstance(FunctionType parent, CompileSyntax body)
+        protected FunctionInstance(FunctionType parent, Value body)
         {
             Body = body;
             Parent = parent;

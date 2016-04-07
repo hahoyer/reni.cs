@@ -11,10 +11,10 @@ namespace ReniUI.Classification
     {
         readonly hw.Parser.WhiteSpaceToken _item;
 
-        internal WhiteSpaceToken(hw.Parser.WhiteSpaceToken item, SourceSyntax parent)
+        internal WhiteSpaceToken(hw.Parser.WhiteSpaceToken item, Syntax parent)
         {
             _item = item;
-            SourceSyntax = parent;
+            Syntax = parent;
         }
 
         public override SourcePart SourcePart => _item.Characters;
@@ -35,7 +35,7 @@ namespace ReniUI.Classification
             return null;
         }
 
-        public override SourceSyntax SourceSyntax { get; }
+        public override Syntax Syntax { get; }
 
         public override string Reformat(SourcePart targetPart)
             => SourcePart.Intersect(targetPart)?.Id ?? "";

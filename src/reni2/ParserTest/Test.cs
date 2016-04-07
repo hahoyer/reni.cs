@@ -20,7 +20,7 @@ namespace Reni.ParserTest
                 (
                     "SimpleFunction",
                     @"f()",
-                    expectedResult: c => syntaxPrototype.AssertLike(c.SourceSyntax));
+                    expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
         }
 
         [UnitTest]
@@ -34,7 +34,7 @@ namespace Reni.ParserTest
                 (
                     "Add2Numbers",
                     @"(2+4) dump_print",
-                    expectedResult: c => syntaxPrototype.AssertLike(c.SourceSyntax));
+                    expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
         }
 
         [UnitTest]
@@ -46,7 +46,7 @@ namespace Reni.ParserTest
             CreateFileAndRunCompiler("Add2Numbers", @"
 (2+4) # ssssss
 dump_print
-", expectedResult: c => syntaxPrototype.AssertLike(c.SourceSyntax));
+", expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
         }
 
         [UnitTest]
@@ -58,7 +58,7 @@ dump_print
             CreateFileAndRunCompiler("Add2Numbers", @"
 (2+4) #(aa ssssss
 aa)#dump_print
-", expectedResult: c => syntaxPrototype.AssertLike(c.SourceSyntax));
+", expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
         }
 
         [UnitTest]
@@ -75,7 +75,7 @@ aa)#dump_print
                 (
                     "Add2Numbers",
                     @"((<< 5)(3)) dump_print",
-                    expectedResult: c => syntaxPrototype.AssertLike(c.SourceSyntax));
+                    expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
         }
 
         [UnitTest]
@@ -92,7 +92,7 @@ aa)#dump_print
                 (
                     "MoreBrackets",
                     @"this()(3) dump_print",
-                    expectedResult: c => syntaxPrototype.AssertLike(c.SourceSyntax));
+                    expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
         }
     }
 }

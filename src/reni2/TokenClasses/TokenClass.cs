@@ -11,28 +11,28 @@ namespace Reni.TokenClasses
 {
     abstract class TokenClass
         : ScannerTokenClass,
-            IType<SourceSyntax>,
+            IType<Syntax>,
             ITokenClass
     {
-        SourceSyntax IType<SourceSyntax>.Create(SourceSyntax left, IToken token, SourceSyntax right)
+        Syntax IType<Syntax>.Create(Syntax left, IToken token, Syntax right)
             => Create(left, token, right);
 
-        string IType<SourceSyntax>.PrioTableId => Id;
+        string IType<Syntax>.PrioTableId => Id;
 
-        SourceSyntax Create(SourceSyntax left, IToken token, SourceSyntax right)
-            => SourceSyntax.CreateSourceSyntax(left, this, token, right);
+        Syntax Create(Syntax left, IToken token, Syntax right)
+            => Syntax.CreateSourceSyntax(left, this, token, right);
 
-        protected abstract Checked<Syntax> OldTerminal(SourcePart token);
-        protected abstract Checked<Syntax> Prefix(SourcePart token, Syntax right);
-        protected abstract Checked<Syntax> Suffix(Syntax left, SourcePart token);
-        protected abstract Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right);
+        protected abstract Checked<OldSyntax> OldTerminal(SourcePart token);
+        protected abstract Checked<OldSyntax> Prefix(SourcePart token, OldSyntax right);
+        protected abstract Checked<OldSyntax> Suffix(OldSyntax left, SourcePart token);
+        protected abstract Checked<OldSyntax> Infix(OldSyntax left, SourcePart token, OldSyntax right);
 
         internal virtual bool IsVisible => true;
 
-        Checked<CompileSyntax> ITokenClass.ToCompiledSyntax(SourceSyntax left, IToken token, SourceSyntax right)
+        Checked<Value> ITokenClass.GetValue(Syntax left, IToken token, Syntax right)
         {
-            var leftSyntax = left?.ToCompiledSyntax;
-            var rightSyntax = right?.ToCompiledSyntax;
+            var leftSyntax = left?.Value;
+            var rightSyntax = right?.Value;
             if(left != null && leftSyntax == null)
                 return null;
             if(right != null && rightSyntax == null)
@@ -45,7 +45,7 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        Checked<CompileSyntax> Terminal(SourcePart token)
+        Checked<Value> Terminal(SourcePart token)
         {
             NotImplementedMethod(token);
             return null;

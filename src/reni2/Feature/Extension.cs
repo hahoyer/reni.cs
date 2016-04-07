@@ -17,11 +17,11 @@ namespace Reni.Feature
     {
         static readonly
             FunctionCache
-                <Func<Category, ResultCache, ContextBase, CompileSyntax, Result>, MetaFunction>
+                <Func<Category, ResultCache, ContextBase, Parser.Value, Result>, MetaFunction>
             _metaFunctionCache
                 =
                 new FunctionCache
-                    <Func<Category, ResultCache, ContextBase, CompileSyntax, Result>, MetaFunction>
+                    <Func<Category, ResultCache, ContextBase, Parser.Value, Result>, MetaFunction>
                     (function => new MetaFunction(function));
 
         static readonly FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Value>>
@@ -74,7 +74,7 @@ namespace Reni.Feature
         }
 
         internal static MetaFunction MetaFeature
-            (Func<Category, ResultCache, ContextBase, CompileSyntax, Result> function)
+            (Func<Category, ResultCache, ContextBase, Parser.Value, Result> function)
             => _metaFunctionCache[function];
 
         internal static TypeBase ResultType(this IConversion conversion)
@@ -116,7 +116,7 @@ namespace Reni.Feature
             Category category,
             SourcePart token,
             ContextBase context,
-            CompileSyntax right)
+            Parser.Value right)
         {
             Tracer.Assert
                 (
@@ -161,7 +161,7 @@ namespace Reni.Feature
             (
             this IEvalImplementation feature,
             ContextBase context,
-            CompileSyntax right,
+            Parser.Value right,
             Category valueCategory)
         {
             if(feature.Function != null && feature.Function.IsImplicit)
@@ -187,7 +187,7 @@ namespace Reni.Feature
             ResultCache left,
             SourcePart token,
             ContextBase context,
-            CompileSyntax right)
+            Parser.Value right)
         {
             var metaFeature = ((IMetaImplementation) feature).Function;
             if(metaFeature != null)
@@ -212,7 +212,7 @@ namespace Reni.Feature
             this IImplementation implementation,
             IContextReference ext,
             ContextBase context,
-            CompileSyntax right)
+            Parser.Value right)
         {
             var metaFeature = ((IMetaImplementation) implementation).Function;
             if(metaFeature != null)

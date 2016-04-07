@@ -10,18 +10,18 @@ namespace Reni.TokenClasses
 {
     abstract class Definable : TokenClass
     {
-        protected override sealed Checked<Syntax> OldTerminal(SourcePart token)
+        protected override sealed Checked<OldSyntax> OldTerminal(SourcePart token)
             => new DefinableSyntax(token, this);
 
-        protected override sealed Checked<Syntax> Prefix(SourcePart token, Syntax right)
-            => Checked<Syntax>
+        protected override sealed Checked<OldSyntax> Prefix(SourcePart token, OldSyntax right)
+            => Checked<OldSyntax>
                 .From(ExpressionSyntax.Create(null, this, right, token));
 
-        protected override sealed Checked<Syntax> Suffix(Syntax left, SourcePart token)
+        protected override sealed Checked<OldSyntax> Suffix(OldSyntax left, SourcePart token)
             => left.SuffixedBy(this, token);
 
-        protected override sealed Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
-            => Checked<Syntax>
+        protected override sealed Checked<OldSyntax> Infix(OldSyntax left, SourcePart token, OldSyntax right)
+            => Checked<OldSyntax>
                 .From(ExpressionSyntax.Create(left, this, right, token));
 
         [DisableDump]
@@ -31,7 +31,7 @@ namespace Reni.TokenClasses
         internal virtual IEnumerable<IDeclarationProvider> Genericize
             => this.GenericListFromDefinable();
 
-        public Checked<CompileSyntax> CreateForVisit(CompileSyntax left, CompileSyntax right)
+        public Checked<Parser.Value> CreateForVisit(Parser.Value left, Parser.Value right)
         {
             NotImplementedMethod(left, right);
             return null;

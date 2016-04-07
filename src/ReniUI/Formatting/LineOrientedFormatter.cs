@@ -18,7 +18,7 @@ namespace ReniUI.Formatting
 
         LineOrientedFormatter() { }
 
-        string IFormatter.Reformat(SourceSyntax target, SourcePart part)
+        string IFormatter.Reformat(Syntax target, SourcePart part)
         {
             var rawLines = target
                 .Chain(item => item.Parent)
@@ -41,7 +41,7 @@ namespace ReniUI.Formatting
             return result;
         }
 
-        IEnumerable<EditPiece> IFormatter.GetEditPieces(SourceSyntax target, SourcePart targetPart)
+        IEnumerable<EditPiece> IFormatter.GetEditPieces(Syntax target, SourcePart targetPart)
         {
             NotImplementedMethod(target, targetPart);
             return null;
@@ -57,7 +57,7 @@ namespace ReniUI.Formatting
             => MaxLineLength != null && line.Lengh > MaxLineLength.Value;
 
         static IEnumerable<IItem1> GetItems
-            (SourceSyntax target)
+            (Syntax target)
         {
             for(var index = 0; index < target.Token.PrecededWith.Length; index++)
             {
@@ -130,9 +130,9 @@ namespace ReniUI.Formatting
 
         internal sealed class TokenItem : DumpableObject, IItem1
         {
-            readonly SourceSyntax Target;
+            readonly Syntax Target;
 
-            internal TokenItem(SourceSyntax target) { Target = target; }
+            internal TokenItem(Syntax target) { Target = target; }
 
             string Id => Target.Token.Characters.Id;
             protected override string GetNodeDump() => Id.Quote();
@@ -149,7 +149,7 @@ namespace ReniUI.Formatting
             readonly WhiteSpaceToken WhiteSpaceToken;
             readonly bool IsRelevant;
 
-            internal WhiteSpaceItem(int index, int lineIndex, SourceSyntax target)
+            internal WhiteSpaceItem(int index, int lineIndex, Syntax target)
             {
                 LineIndex = lineIndex;
                 WhiteSpaceToken = target.Token.PrecededWith[index];

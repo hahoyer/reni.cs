@@ -7,19 +7,19 @@ using Reni.TokenClasses;
 
 namespace Reni.Parser
 {
-    sealed class ExclamationBoxToken : DumpableObject, IType<SourceSyntax>, ITokenClass
+    sealed class ExclamationBoxToken : DumpableObject, IType<Syntax>, ITokenClass
     {
-        SourceSyntax Value { get; }
+        Syntax Value { get; }
 
-        internal ExclamationBoxToken(SourceSyntax value) { Value = value; }
+        internal ExclamationBoxToken(Syntax value) { Value = value; }
 
-        SourceSyntax IType<SourceSyntax>.Create(SourceSyntax left, IToken token, SourceSyntax right)
+        Syntax IType<Syntax>.Create(Syntax left, IToken token, Syntax right)
         {
             Tracer.Assert(right == null);
-            return SourceSyntax.CreateSourceSyntax(left, this, token, Value, GetResult);
+            return Syntax.CreateSourceSyntax(left, this, token, Value, GetResult);
         }
 
-        static Checked<ExclamationSyntaxList> GetResult(Syntax left, IToken token, Syntax right)
+        static Checked<ExclamationSyntaxList> GetResult(OldSyntax left, IToken token, OldSyntax right)
         {
             var result = right.ExclamationSyntax(token.Characters);
             if(left == null)
@@ -30,10 +30,10 @@ namespace Reni.Parser
                 (leftResult.Value, leftResult.Issues.plus(result.Issues));
         }
 
-        string IType<SourceSyntax>.PrioTableId => PrioTable.Any;
+        string IType<Syntax>.PrioTableId => PrioTable.Any;
         string ITokenClass.Id => "!";
 
-        Checked<CompileSyntax> ITokenClass.ToCompiledSyntax
-            (SourceSyntax left, IToken token, SourceSyntax right) => null;
+        Checked<Value> ITokenClass.GetValue
+            (Syntax left, IToken token, Syntax right) => null;
     }
 }

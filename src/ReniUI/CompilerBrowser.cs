@@ -47,14 +47,14 @@ namespace ReniUI
         internal IEnumerable<Issue> Issues => Compiler.Issues;
 
         public Token LocatePosition(int offset)
-            => Token.LocatePosition(Compiler.SourceSyntax, offset);
+            => Token.LocatePosition(Compiler.Syntax, offset);
 
-        internal IEnumerable<CompileSyntax> FindPosition(int offset)
+        internal IEnumerable<Value> FindPosition(int offset)
         {
             var enumerable = LocatePosition(offset)
-                .SourceSyntax
+                .Syntax
                 .ParentChainIncludingThis
-                .Select(item => item.ToCompiledSyntax.Value)
+                .Select(item => item.Value.Value)
                 .ToArray();
 
             var compileSyntaxs = enumerable
@@ -106,15 +106,15 @@ namespace ReniUI
             return null;
         }
 
-        internal IEnumerable<SourceSyntax> FindAllBelongings(SourceSyntax sourceSyntax)
-            => Compiler.SourceSyntax.Belongings(sourceSyntax);
+        internal IEnumerable<Syntax> FindAllBelongings(Syntax syntax)
+            => Compiler.Syntax.Belongings(syntax);
 
         internal string Reformat(IFormatter formatter)
-            => formatter.Reformat(Compiler.SourceSyntax, Compiler.SourceSyntax.SourcePart);
+            => formatter.Reformat(Compiler.Syntax, Compiler.Syntax.SourcePart);
 
-        public SourceSyntax Locate(SourcePart span)
+        public Syntax Locate(SourcePart span)
         {
-            var result = Compiler.SourceSyntax.Locate(span);
+            var result = Compiler.Syntax.Locate(span);
             if(result != null)
                 return result;
 
@@ -140,6 +140,6 @@ namespace ReniUI
             }
         }
 
-        internal SourceSyntax SourceSyntax => Compiler.SourceSyntax;
+        internal Syntax Syntax => Compiler.Syntax;
     }
 }

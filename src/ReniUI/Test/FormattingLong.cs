@@ -34,7 +34,7 @@ namespace ReniUI.Test
                 for(var end = start; end < compiler.Source.Length; end++)
                 {
                     var span = (compiler.Source + start).Span(end - start);
-                    var reformat = compiler.SourceSyntax.Reformat(span);
+                    var reformat = compiler.Syntax.Reformat(span);
                 }
         }
     }

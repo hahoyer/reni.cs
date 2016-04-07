@@ -24,8 +24,8 @@ namespace Reni
         const string DefaultSourceIdentifier = "source";
         const string DefaultModuleName = "ReniModule";
 
-        static IScanner<SourceSyntax> Scanner(ITokenFactory<SourceSyntax> tokenFactory)
-            => new Scanner<SourceSyntax>(Lexer.Instance, tokenFactory);
+        static IScanner<Syntax> Scanner(ITokenFactory<Syntax> tokenFactory)
+            => new Scanner<Syntax>(Lexer.Instance, tokenFactory);
 
         public static Compiler FromFile(string fileName, CompilerParameters parameters = null)
         {
@@ -76,7 +76,7 @@ namespace Reni
             };
 
             CodeContainerCache = NewValueCache
-                (() => new CodeContainer(ModuleName, Root, SourceSyntax, Source.Data));
+                (() => new CodeContainer(ModuleName, Root, Syntax, Source.Data));
         }
 
         static string ModuleNameFromFileName(string fileName)
@@ -84,7 +84,7 @@ namespace Reni
 
         [Node]
         [DisableDump]
-        public SourceSyntax SourceSyntax
+        public Syntax Syntax
         {
             get
             {
@@ -126,10 +126,10 @@ namespace Reni
 
         IExecutionContext Root.IParent.ExecutionContext => this;
 
-        Checked<CompileSyntax> Root.IParent.Parse(string source) => Parse(source);
+        Checked<Value> Root.IParent.Parse(string source) => Parse(source);
 
-        Checked<CompileSyntax> Parse(string sourceText)
-            => Parse(new Source(sourceText) + 0).ToCompiledSyntax;
+        Checked<Value> Parse(string sourceText)
+            => Parse(new Source(sourceText) + 0).Value;
 
         [UsedImplicitly]
         public Compiler Empower()
@@ -154,7 +154,7 @@ namespace Reni
                 Tracer.Line("Dump Source\n" + Source.Dump());
 
             if(Parameters.TraceOptions.Syntax)
-                Tracer.FlaggedLine("Syntax\n" + SourceSyntax.Dump());
+                Tracer.FlaggedLine("Syntax\n" + Syntax.Dump());
 
             if(Parameters.ParseOnly)
                 return;
@@ -209,12 +209,12 @@ namespace Reni
 
         [DisableDump]
         internal IEnumerable<Issue> Issues
-            => SourceSyntax.Issues
+            => Syntax.Issues
                 .plus(Parameters.ParseOnly ? new Issue[0] : CodeContainer.Issues)
             ;
 
 
-        SourceSyntax Parse(SourcePosn source) => _tokenFactory.Parser.Execute(source);
+        Syntax Parse(SourcePosn source) => _tokenFactory.Parser.Execute(source);
 
         void RunFromCode() => CodeContainer.Execute(this, TraceCollector.Instance);
 
@@ -229,8 +229,8 @@ namespace Reni
         CodeBase IExecutionContext.Function(FunctionId functionId)
             => CodeContainer.Function(functionId);
 
-        internal IEnumerable<SourceSyntax> FindAllBelongings(SourceSyntax sourceSyntax)
-            => SourceSyntax.Belongings(sourceSyntax);
+        internal IEnumerable<Syntax> FindAllBelongings(Syntax syntax)
+            => Syntax.Belongings(syntax);
 
         public static string FlatExecute(string code, bool b) => "";
     }

@@ -8,8 +8,8 @@ namespace ReniUI.Formatting
 {
     public interface IFormatter
     {
-        string Reformat(SourceSyntax target, SourcePart part);
-        IEnumerable<EditPiece> GetEditPieces(SourceSyntax target, SourcePart targetPart);
+        string Reformat(Syntax target, SourcePart part);
+        IEnumerable<EditPiece> GetEditPieces(Syntax target, SourcePart targetPart);
     }
 
     public static class FormatterExtension
@@ -17,12 +17,12 @@ namespace ReniUI.Formatting
         public static IFormatter Create(this Configuration configuration )
             => new HierachicalFormatter(configuration ?? new Configuration());
 
-        public static string Reformat(this SourceSyntax syntax, SourcePart sourcePart, IFormatter formatter = null)
+        public static string Reformat(this Syntax syntax, SourcePart sourcePart, IFormatter formatter = null)
             =>
                 (formatter ?? new Configuration().Create()).Reformat
                     (syntax, sourcePart);
 
-        internal static IEnumerable<EditPiece> GetEditPieces(this SourceSyntax syntax, SourcePart sourcePart, IFormatter formatter = null)
+        internal static IEnumerable<EditPiece> GetEditPieces(this Syntax syntax, SourcePart sourcePart, IFormatter formatter = null)
             =>
                 (formatter ?? new Configuration().Create()).GetEditPieces
                     (syntax, sourcePart);

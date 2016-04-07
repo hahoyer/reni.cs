@@ -81,23 +81,23 @@ namespace Reni.Parser
         }
 
 
-        public readonly IParser<SourceSyntax> Parser;
+        public readonly IParser<Syntax> Parser;
 
-        readonly ISubParser<SourceSyntax> _declarationSyntaxSubParser;
-        readonly PrioParser<SourceSyntax> _declarationSyntaxParser;
+        readonly ISubParser<Syntax> _declarationSyntaxSubParser;
+        readonly PrioParser<Syntax> _declarationSyntaxParser;
 
         public MainTokenFactory
-            (Func<ITokenFactory<SourceSyntax>, IScanner<SourceSyntax>> getScanner)
+            (Func<ITokenFactory<Syntax>, IScanner<Syntax>> getScanner)
         {
-            Parser = new PrioParser<SourceSyntax>
+            Parser = new PrioParser<Syntax>
                 (PrioTable, getScanner(this), new LeftParenthesis(0));
-            _declarationSyntaxParser = new PrioParser<SourceSyntax>
+            _declarationSyntaxParser = new PrioParser<Syntax>
                 (
                 DeclarationTokenFactory.PrioTable,
                 getScanner(new DeclarationTokenFactory())
                 ,
                 null);
-            _declarationSyntaxSubParser = new SubParser<SourceSyntax>
+            _declarationSyntaxSubParser = new SubParser<Syntax>
                 (_declarationSyntaxParser, Pack);
         }
 
@@ -119,7 +119,7 @@ namespace Reni.Parser
             return base.SpecialTokenClass(type);
         }
 
-        static IType<SourceSyntax> Pack(SourceSyntax options) => new ExclamationBoxToken(options);
+        static IType<Syntax> Pack(Syntax options) => new ExclamationBoxToken(options);
 
         protected override ScannerTokenClass GetEndOfText() => new RightParenthesis(0);
         protected override ScannerTokenClass GetNumber() => new Number();
@@ -132,7 +132,7 @@ namespace Reni.Parser
     }
 
 
-    sealed class ScannerSyntaxError : ScannerTokenClass, IType<SourceSyntax>, ITokenClass
+    sealed class ScannerSyntaxError : ScannerTokenClass, IType<Syntax>, ITokenClass
     {
         readonly IssueId _issue;
 
@@ -142,21 +142,21 @@ namespace Reni.Parser
             StopByObjectIds(81);
         }
 
-        string IType<SourceSyntax>.PrioTableId => Id;
+        string IType<Syntax>.PrioTableId => Id;
 
         public override string Id => "<error>";
 
-        Checked<CompileSyntax> ITokenClass.ToCompiledSyntax(SourceSyntax left, IToken token, SourceSyntax right)
+        Checked<Value> ITokenClass.GetValue(Syntax left, IToken token, Syntax right)
         {
             NotImplementedMethod(left,token,right);
             return null;
         }
 
-        SourceSyntax IType<SourceSyntax>.Create(SourceSyntax left, IToken token, SourceSyntax right)
-            => SourceSyntax.CreateSourceSyntax(left, this, token, right, GetResult);
+        Syntax IType<Syntax>.Create(Syntax left, IToken token, Syntax right)
+            => Syntax.CreateSourceSyntax(left, this, token, right, GetResult);
 
-        Checked<Syntax> GetResult(Syntax left, IToken token, Syntax right)
-            => new Checked<Syntax>
+        Checked<OldSyntax> GetResult(OldSyntax left, IToken token, OldSyntax right)
+            => new Checked<OldSyntax>
                 (ListSyntax.Create(left, right), _issue.CreateIssue(token.Characters));
     }
 }

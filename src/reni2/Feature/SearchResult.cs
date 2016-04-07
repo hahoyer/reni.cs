@@ -57,7 +57,7 @@ namespace Reni.Feature
             ResultCache left,
             SourcePart token,
             ContextBase context,
-            CompileSyntax right)
+            Parser.Value right)
         {
             var trace = ObjectId.In(34) && category.HasCode;
             StartMethodDump(trace, category, left, token, context, right);
@@ -127,7 +127,7 @@ namespace Reni.Feature
         }
 
         internal IEnumerable<ResultCache.IResultProvider> GetDefinableResults
-            (IContextReference ext, ContextBase context, CompileSyntax right)
+            (IContextReference ext, ContextBase context, Parser.Value right)
             => Feature.GetDefinableResults(ext, context, right);
     }
 }

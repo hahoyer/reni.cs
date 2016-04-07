@@ -8,7 +8,7 @@ using Reni.Validation;
 namespace Reni.TokenClasses
 {
     sealed class Checked<T> : DumpableObject, ISyntaxProvider
-        where T : Syntax
+        where T : OldSyntax
     {
         public Checked(T value, params Issue[] issues)
         {
@@ -32,7 +32,7 @@ namespace Reni.TokenClasses
 
         IEnumerable<Issue> ISyntaxProvider.Issues => Issues;
 
-        Syntax ISyntaxProvider.Value => Value;
+        OldSyntax ISyntaxProvider.Value => Value;
 
         public static implicit operator Checked<T>(T value)
             => new Checked<T>(value);

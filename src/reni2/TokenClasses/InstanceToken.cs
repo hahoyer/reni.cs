@@ -14,13 +14,13 @@ namespace Reni.TokenClasses
         public override string Id => TokenId;
 
         protected override Result Result
-            (ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
+            (ContextBase context, Category category, Value left, Value right)
             => left
                 .Type(context)
                 .InstanceResult(category, c => context.ResultAsReference(c, right));
 
         Result IPendingProvider.Result
-            (ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
+            (ContextBase context, Category category, Value left, Value right)
         {
             if(category <= Category.Type.Replenished)
                 return Result(context, category, left, right);
@@ -33,7 +33,7 @@ namespace Reni.TokenClasses
             ContextBase context,
             Category category,
             Category pendingCategory,
-            CompileSyntax syntax,
+            Value syntax,
             bool asReference)
         {
             if(!asReference && (category | pendingCategory) <= Category.Type)

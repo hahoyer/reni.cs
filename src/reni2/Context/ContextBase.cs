@@ -73,20 +73,20 @@ namespace Reni.Context
         internal Compound Compound(CompoundSyntax context) => CacheObject.Compounds[context];
 
         [DebuggerHidden]
-        internal Result Result(Category category, CompileSyntax syntax)
+        internal Result Result(Category category, Parser.Value syntax)
             => ResultCache(syntax).GetCategories(category);
 
-        internal ResultCache ResultCache(CompileSyntax syntax) => CacheObject.ResultCache[syntax];
+        internal ResultCache ResultCache(Parser.Value syntax) => CacheObject.ResultCache[syntax];
 
-        internal ResultCache ResultAsReferenceCache(CompileSyntax syntax)
+        internal ResultCache ResultAsReferenceCache(Parser.Value syntax)
             => CacheObject.ResultAsReferenceCache[syntax];
 
 
-        internal TypeBase TypeIfKnown(CompileSyntax syntax)
+        internal TypeBase TypeIfKnown(Parser.Value syntax)
             => CacheObject.ResultCache[syntax].Data.Type;
 
         [DebuggerHidden]
-        Result ResultForCache(Category category, CompileSyntax syntax)
+        Result ResultForCache(Category category, Parser.Value syntax)
         {
             var trace = syntax.ObjectId == 10 && ObjectId == 1769 && category.HasType;
             StartMethodDump(trace, category, syntax);
@@ -108,11 +108,11 @@ namespace Reni.Context
             [EnableDumpExcept(false)]
             readonly bool AsReference;
             internal readonly ContextBase Context;
-            internal readonly CompileSyntax Syntax;
+            internal readonly Parser.Value Syntax;
             static int _nextObjectId;
 
             internal ResultProvider
-                (ContextBase context, CompileSyntax syntax, bool asReference = false)
+                (ContextBase context, Parser.Value syntax, bool asReference = false)
                 : base(_nextObjectId++)
             {
                 Context = context;
@@ -152,14 +152,14 @@ namespace Reni.Context
         }
 
         [DebuggerHidden]
-        ResultCache ResultCacheForCache(CompileSyntax syntax)
+        ResultCache ResultCacheForCache(Parser.Value syntax)
         {
             var result = new ResultCache(new ResultProvider(this, syntax));
             syntax.AddToCacheForDebug(this, result);
             return result;
         }
 
-        ResultCache GetResultAsReferenceCacheForCache(CompileSyntax syntax)
+        ResultCache GetResultAsReferenceCacheForCache(Parser.Value syntax)
             => new ResultCache(new ResultProvider(this, syntax, true));
 
         internal virtual CompoundView ObtainRecentCompoundView()
@@ -190,11 +190,11 @@ namespace Reni.Context
 
             [Node]
             [SmartNode]
-            internal readonly FunctionCache<CompileSyntax, ResultCache> ResultCache;
+            internal readonly FunctionCache<Parser.Value, ResultCache> ResultCache;
 
             [Node]
             [SmartNode]
-            internal readonly FunctionCache<CompileSyntax, ResultCache> ResultAsReferenceCache;
+            internal readonly FunctionCache<Parser.Value, ResultCache> ResultAsReferenceCache;
 
             [Node]
             [SmartNode]
@@ -202,9 +202,9 @@ namespace Reni.Context
 
             public Cache(ContextBase target)
             {
-                ResultCache = new FunctionCache<CompileSyntax, ResultCache>
+                ResultCache = new FunctionCache<Parser.Value, ResultCache>
                     (target.ResultCacheForCache);
-                ResultAsReferenceCache = new FunctionCache<CompileSyntax, ResultCache>
+                ResultAsReferenceCache = new FunctionCache<Parser.Value, ResultCache>
                     (target.GetResultAsReferenceCacheForCache);
                 RecentStructure = new ValueCache<CompoundView>(target.ObtainRecentCompoundView);
                 RecentFunctionContextObject = new ValueCache<IFunctionContext>
@@ -219,7 +219,7 @@ namespace Reni.Context
             public string IconKey => "Cache";
         }
 
-        internal Result ResultAsReference(Category category, CompileSyntax syntax)
+        internal Result ResultAsReference(Category category, Parser.Value syntax)
             => Result(category.Typed, syntax)
                 .LocalReferenceResult;
 
@@ -236,7 +236,7 @@ namespace Reni.Context
         /// <param name="token"></param>
         /// <returns> </returns>
         internal Result FunctionalArgResult
-            (Category category, CompileSyntax right, SourcePart token)
+            (Category category, Parser.Value right, SourcePart token)
         {
             var argsType = FindRecentFunctionContextObject.ArgsType;
             return argsType
@@ -269,7 +269,7 @@ namespace Reni.Context
         }
 
         internal Result PrefixResult
-            (Category category, Definable definable, SourcePart source, CompileSyntax right)
+            (Category category, Definable definable, SourcePart source, Parser.Value right)
         {
             var searchResult = Declaration(definable);
             if(searchResult == null)
@@ -314,14 +314,14 @@ namespace Reni.Context
 
         virtual internal IEnumerable<ContextBase> ParentChain { get { yield return this; } }
 
-        ResultCache.IResultProvider FindSource(CompileSyntax syntax, IContextReference ext)
+        ResultCache.IResultProvider FindSource(Parser.Value syntax, IContextReference ext)
         {
             Tracer.Assert(syntax.ResultCache[this].Exts.Contains(ext));
             return syntax.FindSource(ext, this);
         }
 
         internal IEnumerable<ResultCache.IResultProvider> FindSourceChain
-            (CompileSyntax syntax, IContextReference ext)
+            (Parser.Value syntax, IContextReference ext)
         {
             var current = FindSource(syntax, ext);
             while(current != null)
@@ -332,7 +332,7 @@ namespace Reni.Context
         }
 
         internal IEnumerable<ResultCache.IResultProvider> GetDefinableResults
-            (IContextReference ext, Definable definable, CompileSyntax right)
+            (IContextReference ext, Definable definable, Parser.Value right)
             => Declaration(definable).GetDefinableResults(ext, this, right);
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();

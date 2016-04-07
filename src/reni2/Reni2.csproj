@@ -269,7 +269,7 @@
     <Compile Include="Parser\DefinableToken.cs" />
     <Compile Include="Parser\ExpressionSyntax.cs" />
     <Compile Include="Parser\MainTokenFactory.cs" />
-    <Compile Include="Parser\Syntax.cs" />
+    <Compile Include="Parser\OldSyntax.cs" />
     <Compile Include="Runtime\BiasCache.cs" />
     <Compile Include="Runtime\DataHandler.cs" />
     <Compile Include="Numeric\Operation.cs" />
@@ -297,7 +297,7 @@
     <Compile Include="FeatureTest\ThenElse.cs" />
     <Compile Include="ParserTest\Test.cs" />
     <Compile Include="Struct\AccessFeature.cs" />
-    <Compile Include="Parser\CompileSyntax.cs" />
+    <Compile Include="Parser\Value.cs" />
     <Compile Include="Runtime\OutStream.cs" />
     <Compile Include="Parser\Special.cs" />
     <Compile Include="Parser\EmptyList.cs" />
@@ -319,7 +319,7 @@
     <Compile Include="TokenClasses\FunctionSyntax.cs" />
     <Compile Include="TokenClasses\InstanceToken.cs" />
     <Compile Include="TokenClasses\ScannerTokenClass.cs" />
-    <Compile Include="TokenClasses\SourceSyntax.cs" />
+    <Compile Include="TokenClasses\Syntax.cs" />
     <Compile Include="TokenClasses\Checked.cs" />
     <Compile Include="TokenClasses\TokenClass.cs" />
     <Compile Include="TokenClasses\ToNumberOfBase.cs" />

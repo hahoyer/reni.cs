@@ -11,32 +11,32 @@ using Reni.Type;
 
 namespace Reni
 {
-    sealed class CondSyntax : CompileSyntax, IRecursionHandler
+    sealed class CondSyntax : Value, IRecursionHandler
     {
         [Node]
         [EnableDump]
-        readonly CompileSyntax Cond;
+        readonly Value Cond;
 
         [Node]
         [EnableDump]
-        readonly CompileSyntax Then;
+        readonly Value Then;
 
         [Node]
         [EnableDump]
-        readonly CompileSyntax Else;
+        readonly Value Else;
 
         internal CondSyntax
             (
-            CompileSyntax condSyntax,
-            CompileSyntax thenSyntax,
-            CompileSyntax elseSyntax = null)
+            Value condSyntax,
+            Value thenSyntax,
+            Value elseSyntax = null)
         {
             Cond = condSyntax;
             Then = thenSyntax;
             Else = elseSyntax;
         }
 
-        CondSyntax(CondSyntax other, CompileSyntax elseSyntax)
+        CondSyntax(CondSyntax other, Value elseSyntax)
         {
             Cond = other.Cond;
             Then = other.Then;
@@ -45,7 +45,7 @@ namespace Reni
         }
 
         [DisableDump]
-        protected override IEnumerable<Syntax> DirectChildren
+        protected override IEnumerable<OldSyntax> DirectChildren
         {
             get
             {
@@ -64,7 +64,7 @@ namespace Reni
             (IContextReference ext, ContextBase context)
         {
             var result = DirectChildren
-                .Cast<CompileSyntax>()
+                .Cast<Value>()
                 .SelectMany(item => item.ResultCache)
                 .Where(item => item.Value.Exts.Contains(ext))
                 .Where(item => item.Key == context)
@@ -90,7 +90,7 @@ namespace Reni
         Result ThenResult(ContextBase context, Category category)
             => BranchResult(context, category, Then);
 
-        Result BranchResult(ContextBase context, Category category, CompileSyntax syntax)
+        Result BranchResult(ContextBase context, Category category, Value syntax)
         {
             var result = context.Result(category.Typed, syntax);
             if(result == null)
@@ -138,7 +138,7 @@ namespace Reni
             return thenType.CommonType(elseType).Align;
         }
 
-        internal override Syntax CreateElseSyntax(CompileSyntax elseSyntax)
+        internal override OldSyntax CreateElseSyntax(Value elseSyntax)
         {
             Tracer.Assert(Else == null);
             return new CondSyntax(this, elseSyntax);
@@ -149,7 +149,7 @@ namespace Reni
             ContextBase context,
             Category category,
             Category pendingCategory,
-            CompileSyntax syntax,
+            Value syntax,
             bool asReference)
         {
             Tracer.Assert(syntax == this);

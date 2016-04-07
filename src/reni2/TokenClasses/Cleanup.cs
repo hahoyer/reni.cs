@@ -12,16 +12,16 @@ namespace Reni.TokenClasses
         public const string TokenId = "~~~";
         public override string Id => TokenId;
 
-        protected override Checked<Syntax> OldTerminal(SourcePart token)
-            => Checked<Syntax>.From(new EmptyList(token).ToCompound);
+        protected override Checked<OldSyntax> OldTerminal(SourcePart token)
+            => Checked<OldSyntax>.From(new EmptyList(token).ToCompound);
 
-        protected override Checked<Syntax> Prefix(SourcePart token, Syntax right)
+        protected override Checked<OldSyntax> Prefix(SourcePart token, OldSyntax right)
             => new EmptyList(token).Cleanup(token, right);
 
-        protected override Checked<Syntax> Suffix(Syntax left, SourcePart token)
-            => Checked<Syntax>.From(left.ToCompound);
+        protected override Checked<OldSyntax> Suffix(OldSyntax left, SourcePart token)
+            => Checked<OldSyntax>.From(left.ToCompound);
 
-        protected override Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
+        protected override Checked<OldSyntax> Infix(OldSyntax left, SourcePart token, OldSyntax right)
             => left.Cleanup(token, right);
     }
 }

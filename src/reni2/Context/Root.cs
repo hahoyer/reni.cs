@@ -33,7 +33,7 @@ namespace Reni.Context
         readonly ValueCache<BitType> _bitCache;
         readonly ValueCache<VoidType> _voidCache;
         readonly ValueCache<IImplementation> _minusFeatureCache;
-        readonly FunctionCache<string, CompileSyntax> _metaDictionary;
+        readonly FunctionCache<string, Parser.Value> _metaDictionary;
         readonly FunctionCache<bool, IImplementation> _createArrayFeatureCache;
         public IExecutionContext ExecutionContext => Parent.ExecutionContext;
 
@@ -41,7 +41,7 @@ namespace Reni.Context
         {
             Parent = parent;
             _recursionTypeCache = new ValueCache<RecursionType>(() => new RecursionType(this));
-            _metaDictionary = new FunctionCache<string, CompileSyntax>(CreateMetaDictionary);
+            _metaDictionary = new FunctionCache<string, Parser.Value>(CreateMetaDictionary);
             _bitCache = new ValueCache<BitType>(() => new BitType(this));
             _voidCache = new ValueCache<VoidType>(() => new VoidType(this));
             _minusFeatureCache = new ValueCache<IImplementation>
@@ -62,7 +62,7 @@ namespace Reni.Context
                 );
         }
 
-        CompileSyntax CreateMetaDictionary(string source)
+        Parser.Value CreateMetaDictionary(string source)
         {
             var result = Parent.Parse(source);
             Tracer.Assert(!result.Issues.Any());
@@ -105,7 +105,7 @@ namespace Reni.Context
             => _createArrayFeatureCache[tokenClass.IsMutable];
 
         static Result CreateArrayResult
-            (ContextBase context, Category category, CompileSyntax argsType, bool isMutable)
+            (ContextBase context, Category category, Parser.Value argsType, bool isMutable)
         {
             var target = context.Result(category.Typed, argsType).SmartUn<PointerType>().Align;
             return target
@@ -173,7 +173,7 @@ namespace Reni.Context
         internal FunctionContainer FunctionContainer(int index) => _functions.Container(index);
         internal FunctionType Function(int index) => _functions.Item(index);
 
-        internal Container MainContainer(SourceSyntax syntax, string description)
+        internal Container MainContainer(Syntax syntax, string description)
         {
             var compoundSyntax = syntax
                 .ToCompound
@@ -190,7 +190,7 @@ namespace Reni.Context
                 .Container(description);
         }
 
-        void AnalyseUnresolvedReference(CompileSyntax syntax, IContextReference ext)
+        void AnalyseUnresolvedReference(Parser.Value syntax, IContextReference ext)
         {
             DumpTypes(syntax, ext);
 
@@ -242,16 +242,16 @@ namespace Reni.Context
         sealed class ResultGroup
         {
             internal ContextBase Context;
-            internal Syntax Syntax;
+            internal OldSyntax Syntax;
             internal SourcePart All;
             internal SourcePart Atom;
         }
 
-        private static void DumpTypes(CompileSyntax syntax, IContextReference ext)
+        private static void DumpTypes(Parser.Value syntax, IContextReference ext)
         {
             var s = syntax
                 .Closure
-                .OfType<CompileSyntax>()
+                .OfType<Parser.Value>()
                 .SelectMany
                 (
                     item =>
@@ -316,11 +316,11 @@ namespace Reni.Context
                 );
         }
 
-        private static void Analyse1(CompileSyntax syntax, IContextReference ext)
+        private static void Analyse1(Parser.Value syntax, IContextReference ext)
         {
             var s = syntax
                 .Closure
-                .OfType<CompileSyntax>()
+                .OfType<Parser.Value>()
                 .SelectMany
                 (
                     item =>
@@ -458,7 +458,7 @@ namespace Reni.Context
 
         internal interface IParent
         {
-            Checked<CompileSyntax> Parse(string source);
+            Checked<Parser.Value> Parse(string source);
             bool ProcessErrors { get; }
             IExecutionContext ExecutionContext { get; }
         }

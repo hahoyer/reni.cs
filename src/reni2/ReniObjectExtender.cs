@@ -38,8 +38,8 @@ namespace Reni
         internal static bool IsBelongingTo(this ITokenClass current, ITokenClass other)
             => (current as IBelongingsMatcher)?.IsBelongingTo(other) ?? false;
 
-        internal static IEnumerable<SourceSyntax> CheckedItemsAsLongAs
-            (this SourceSyntax target, Func<SourceSyntax, bool> condition)
+        internal static IEnumerable<Syntax> CheckedItemsAsLongAs
+            (this Syntax target, Func<Syntax, bool> condition)
         {
             if(target == null || !condition(target))
                 yield break;

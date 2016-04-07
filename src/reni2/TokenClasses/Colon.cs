@@ -15,7 +15,7 @@ namespace Reni.TokenClasses
         public const string TokenId = ":";
         public override string Id => TokenId;
 
-        protected override Checked<Syntax> Suffix(Syntax left, SourcePart token)
+        protected override Checked<OldSyntax> Suffix(OldSyntax left, SourcePart token)
             =>
                 left.CreateDeclarationSyntax
                     (
@@ -24,33 +24,33 @@ namespace Reni.TokenClasses
                         IssueId.MissingValueInDeclaration.CreateIssue(token)
                     );
 
-        protected override Checked<Syntax> Prefix(SourcePart token, Syntax right)
+        protected override Checked<OldSyntax> Prefix(SourcePart token, OldSyntax right)
             => IssueId.UnexpectedUseAsPrefix.Syntax(token);
 
-        protected override Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
+        protected override Checked<OldSyntax> Infix(OldSyntax left, SourcePart token, OldSyntax right)
             => left.CreateDeclarationSyntax(token, right);
 
-        protected override Checked<Syntax> OldTerminal(SourcePart token)
+        protected override Checked<OldSyntax> OldTerminal(SourcePart token)
             => new DeclarationSyntax(new EmptyList(token), null)
                 .Issues(IssueId.MissingValueInDeclaration.CreateIssue(token));
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class Exclamation : ScannerTokenClass, ISubParser<SourceSyntax> , IType<SourceSyntax>
+    sealed class Exclamation : ScannerTokenClass, ISubParser<Syntax> , IType<Syntax>
     {
         public const string TokenId = "!";
 
-        readonly ISubParser<SourceSyntax> Parser;
+        readonly ISubParser<TokenClasses.Syntax> Parser;
 
-        public Exclamation(ISubParser<SourceSyntax> parser) { Parser = parser; }
+        public Exclamation(ISubParser<TokenClasses.Syntax> parser) { Parser = parser; }
 
-        IType<SourceSyntax> ISubParser<SourceSyntax>.Execute
-            (SourcePosn sourcePosn, Stack<OpenItem<SourceSyntax>> stack)
+        IType<TokenClasses.Syntax> ISubParser<TokenClasses.Syntax>.Execute
+            (SourcePosn sourcePosn, Stack<OpenItem<TokenClasses.Syntax>> stack)
             => Parser.Execute(sourcePosn, stack);
 
         public override string Id => TokenId;
 
-        internal sealed class Syntax : Parser.Syntax
+        internal sealed class Syntax : Parser.OldSyntax
         {
             [EnableDump]
             internal DeclarationTagToken.Syntax Tag { get; }
@@ -63,32 +63,32 @@ namespace Reni.TokenClasses
             }
 
             [DisableDump]
-            internal override Checked<CompileSyntax> ToCompiledSyntax
+            internal override Checked<Value> ToCompiledSyntax
             {
                 get
                 {
                     var result = IssueId.UnexpectedDeclarationTag.Syntax(Token, Tag);
                     var value = result.Value.ToCompiledSyntax;
-                    return new Checked<CompileSyntax>(value.Value, result.Issues.plus(value.Issues));
+                    return new Checked<Value>(value.Value, result.Issues.plus(value.Issues));
                 }
             }
         }
 
-        SourceSyntax IType<SourceSyntax>.Create(SourceSyntax left, IToken token, SourceSyntax right)
+        TokenClasses.Syntax IType<TokenClasses.Syntax>.Create(TokenClasses.Syntax left, IToken token, TokenClasses.Syntax right)
         {
             NotImplementedMethod(left, token, right);
             return null;
 
         }
 
-        string IType<SourceSyntax>.PrioTableId => TokenId;
+        string IType<TokenClasses.Syntax>.PrioTableId => TokenId;
     }
 
 
     [BelongsTo(typeof(DeclarationTokenFactory))]
     abstract class DeclarationTagToken : TerminalToken
     {
-        protected override Checked<Parser.Syntax> Terminal(SourcePart token)
+        protected override Checked<Parser.OldSyntax> OldTerminal(SourcePart token)
             => new Syntax(this);
 
         [DisableDump]
@@ -98,14 +98,14 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal virtual bool DeclaresMixIn => false;
 
-        internal sealed class Syntax : Parser.Syntax
+        internal sealed class Syntax : Parser.OldSyntax
         {
             internal readonly DeclarationTagToken Tag;
 
             internal Syntax(DeclarationTagToken tag) { Tag = tag; }
 
             [DisableDump]
-            internal override Checked<CompileSyntax> ToCompiledSyntax
+            internal override Checked<Value> ToCompiledSyntax
             {
                 get
                 {

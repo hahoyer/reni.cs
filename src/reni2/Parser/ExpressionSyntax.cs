@@ -11,14 +11,14 @@ using Reni.TokenClasses;
 
 namespace Reni.Parser
 {
-    sealed class ExpressionSyntax : CompileSyntax
+    sealed class ExpressionSyntax : Value
     {
-        internal static Checked<CompileSyntax> Create
-            (Syntax left, Definable definable, Syntax right, SourcePart token)
+        internal static Checked<Value> Create
+            (OldSyntax left, Definable definable, OldSyntax right, SourcePart token)
         {
             var left1 = left?.ToCompiledSyntax;
             var right1 = right?.ToCompiledSyntax;
-            return new Checked<CompileSyntax>
+            return new Checked<Value>
                 (
                 new ExpressionSyntax(left1?.Value, definable, right1?.Value, token),
                 left1?.Issues.plus(right1?.Issues)
@@ -27,9 +27,9 @@ namespace Reni.Parser
 
         ExpressionSyntax
             (
-            CompileSyntax left,
+            Value left,
             Definable definable,
-            CompileSyntax right,
+            Value right,
             SourcePart token)
         {
             Left = left;
@@ -40,15 +40,15 @@ namespace Reni.Parser
         }
 
         [Node]
-        internal CompileSyntax Left { get; }
+        internal Value Left { get; }
         [Node]
         public Definable Definable { get; }
         internal override SourcePart Token { get; }
         [Node]
-        internal CompileSyntax Right { get; }
+        internal Value Right { get; }
 
         [DisableDump]
-        protected override IEnumerable<Syntax> DirectChildren
+        protected override IEnumerable<OldSyntax> DirectChildren
         {
             get
             {
@@ -57,8 +57,8 @@ namespace Reni.Parser
             }
         }
 
-        internal override Checked<Syntax> RightSyntax(Syntax right, SourcePart token)
-            => Checked<Syntax>
+        internal override Checked<OldSyntax> RightSyntax(OldSyntax right, SourcePart token)
+            => Checked<OldSyntax>
                 .From
                 (
                     Right == null
@@ -66,8 +66,8 @@ namespace Reni.Parser
                         : Create(this, null, right, token)
                 );
 
-        internal override Checked<Syntax> InfixOfMatched(SourcePart token, Syntax right)
-            => Checked<Syntax>.From(Create(this, null, right, token));
+        internal override Checked<OldSyntax> InfixOfMatched(SourcePart token, OldSyntax right)
+            => Checked<OldSyntax>.From(Create(this, null, right, token));
 
         int CurrentResultDepth = 0;
         internal override Result ResultForCache(ContextBase context, Category category)
@@ -109,7 +109,7 @@ namespace Reni.Parser
                 "Context: " + Context.NodeDump;
         }
 
-        internal override CompileSyntax Visit(ISyntaxVisitor visitor)
+        internal override Value Visit(ISyntaxVisitor visitor)
         {
             var left = Left?.Visit(visitor);
             var right = Right?.Visit(visitor);
@@ -118,14 +118,14 @@ namespace Reni.Parser
 
             var result = Definable.CreateForVisit(left ?? Left, right ?? Right);
             Tracer.Assert(!result.Issues.Any());
-            return (CompileSyntax) result.Value;
+            return (Value) result.Value;
         }
 
         internal override ResultCache.IResultProvider FindSource
             (IContextReference ext, ContextBase context)
         {
             var result = DirectChildren
-                .OfType<CompileSyntax>()
+                .OfType<Value>()
                 .SelectMany(item => item.ResultCache)
                 .Where(item => item.Key == context)
                 .Select(item => item.Value)

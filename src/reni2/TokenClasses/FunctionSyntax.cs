@@ -15,28 +15,28 @@ namespace Reni.TokenClasses
 {
     sealed class FunctionSyntax : SpecialSyntax
     {
-        public static Checked<Syntax> Create
+        public static Checked<OldSyntax> Create
             (
-            Checked<CompileSyntax> setter,
+            Checked<Parser.Value> setter,
             bool isImplicit,
             bool isMetaFunction,
-            Checked<CompileSyntax> getter)
+            Checked<Parser.Value> getter)
             => new FunctionSyntax(setter?.Value, isImplicit, isMetaFunction, getter.Value)
                 .Issues(setter?.Issues.plus(getter.Issues));
 
-        internal CompileSyntax Getter { get; }
+        internal Parser.Value Getter { get; }
 
-        internal CompileSyntax Setter { get; }
+        internal Parser.Value Setter { get; }
 
         bool IsMetaFunction { get; }
         internal bool IsImplicit { get; }
 
         public FunctionSyntax
             (
-            CompileSyntax setter,
+            Parser.Value setter,
             bool isImplicit,
             bool isMetaFunction,
-            CompileSyntax getter)
+            Parser.Value getter)
         {
             Getter = getter;
             Setter = setter;
@@ -45,7 +45,7 @@ namespace Reni.TokenClasses
         }
 
         [DisableDump]
-        protected override IEnumerable<Syntax> DirectChildren
+        protected override IEnumerable<OldSyntax> DirectChildren
         {
             get
             {

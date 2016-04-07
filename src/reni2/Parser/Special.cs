@@ -11,7 +11,7 @@ using Reni.Validation;
 
 namespace Reni.Parser
 {
-    abstract class SpecialSyntax : CompileSyntax {}
+    abstract class SpecialSyntax : Value {}
 
     sealed class TerminalSyntax : SpecialSyntax
     {
@@ -32,7 +32,7 @@ namespace Reni.Parser
         internal override Result ResultForCache(ContextBase context, Category category)
             => Terminal.Result(context, category, this);
 
-        internal override CompileSyntax Visit(ISyntaxVisitor visitor) => Terminal.Visit(visitor);
+        internal override Value Visit(ISyntaxVisitor visitor) => Terminal.Visit(visitor);
 
         [DisableDump]
         internal long ToNumber => BitsConst.Convert(Id).ToInt64();
@@ -42,7 +42,7 @@ namespace Reni.Parser
 
     sealed class PrefixSyntax : SpecialSyntax
     {
-        public static Checked<Syntax> Create(IPrefix prefix, Checked<CompileSyntax> right)
+        public static Checked<OldSyntax> Create(IPrefix prefix, Checked<Value> right)
             => new PrefixSyntax(prefix, right.Value).Issues(right.Issues);
 
         [Node]
@@ -51,9 +51,9 @@ namespace Reni.Parser
 
         [Node]
         [EnableDump]
-        readonly CompileSyntax _right;
+        readonly Value _right;
 
-        public PrefixSyntax(IPrefix prefix, CompileSyntax right)
+        public PrefixSyntax(IPrefix prefix, Value right)
         {
             _prefix = prefix;
             _right = right;
@@ -63,23 +63,23 @@ namespace Reni.Parser
             .Result(context, category, this, _right);
 
         protected override string GetNodeDump() => _prefix.NodeDump() + "(" + _right.NodeDump + ")";
-        protected override IEnumerable<Syntax> DirectChildren { get { yield return _right; } }
+        protected override IEnumerable<OldSyntax> DirectChildren { get { yield return _right; } }
     }
 
     sealed class InfixSyntax : SpecialSyntax
     {
-        public static Checked<Syntax> Create
+        public static Checked<OldSyntax> Create
             (
-            Checked<CompileSyntax> left,
+            Checked<Value> left,
             IInfix infix,
             SourcePart token,
-            Checked<CompileSyntax> right)
+            Checked<Value> right)
             => new InfixSyntax(left.Value, infix, token, right.Value)
                 .Issues(left.Issues.plus(right.Issues));
 
         [Node]
         [EnableDump]
-        readonly CompileSyntax _left;
+        readonly Value _left;
 
         [Node]
         [EnableDump]
@@ -87,11 +87,11 @@ namespace Reni.Parser
 
         [Node]
         [EnableDump]
-        readonly CompileSyntax _right;
+        readonly Value _right;
 
         internal override SourcePart Token { get; }
 
-        public InfixSyntax(CompileSyntax left, IInfix infix, SourcePart token, CompileSyntax right)
+        public InfixSyntax(Value left, IInfix infix, SourcePart token, Value right)
         {
             _left = left;
             _infix = infix;
@@ -118,7 +118,7 @@ namespace Reni.Parser
         }
 
         [DisableDump]
-        protected override IEnumerable<Syntax> DirectChildren
+        protected override IEnumerable<OldSyntax> DirectChildren
         {
             get
             {
@@ -136,24 +136,24 @@ namespace Reni.Parser
     interface IPendingProvider
     {
         Result Result
-            (ContextBase context, Category category, CompileSyntax left, CompileSyntax right);
+            (ContextBase context, Category category, Value left, Value right);
     }
 
     sealed class SuffixSyntax : SpecialSyntax
     {
-        public static Checked<Syntax> Create
-            (Checked<CompileSyntax> left, ISuffix suffix, SourcePart token)
+        public static Checked<OldSyntax> Create
+            (Checked<Value> left, ISuffix suffix, SourcePart token)
             => new SuffixSyntax(left.Value, suffix, token).Issues(left.Issues);
 
         [Node]
         [EnableDump]
-        readonly CompileSyntax _left;
+        readonly Value _left;
 
         [Node]
         [EnableDump]
         readonly ISuffix _suffix;
 
-        internal SuffixSyntax(CompileSyntax left, ISuffix suffix, SourcePart token)
+        internal SuffixSyntax(Value left, ISuffix suffix, SourcePart token)
         {
             _left = left;
             _suffix = suffix;
@@ -168,7 +168,7 @@ namespace Reni.Parser
         protected override string GetNodeDump() => "(" + _left.NodeDump + ")" + _suffix;
 
         [DisableDump]
-        protected override IEnumerable<Syntax> DirectChildren { get { yield return _left; } }
+        protected override IEnumerable<OldSyntax> DirectChildren { get { yield return _left; } }
 
         internal override Checked<ExclamationSyntaxList> Combine
             (ExclamationSyntaxList syntax)
@@ -179,23 +179,23 @@ namespace Reni.Parser
     interface ITerminal
     {
         Result Result(ContextBase context, Category category, TerminalSyntax token);
-        CompileSyntax Visit(ISyntaxVisitor visitor);
+        Value Visit(ISyntaxVisitor visitor);
     }
 
     interface IPrefix
     {
         Result Result
-            (ContextBase context, Category category, PrefixSyntax token, CompileSyntax right);
+            (ContextBase context, Category category, PrefixSyntax token, Value right);
     }
 
     interface IInfix
     {
         Result Result
-            (ContextBase context, Category category, CompileSyntax left, CompileSyntax right);
+            (ContextBase context, Category category, Value left, Value right);
     }
 
     interface ISuffix
     {
-        Result Result(ContextBase context, Category category, CompileSyntax left);
+        Result Result(ContextBase context, Category category, Value left);
     }
 }

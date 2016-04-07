@@ -7,7 +7,7 @@ using Reni.Parser;
 
 namespace Reni.TokenClasses
 {
-    sealed class DefinableSyntax : Syntax
+    sealed class DefinableSyntax : OldSyntax
     {
         internal DefinableSyntax
             (SourcePart token, Definable definable)
@@ -20,19 +20,19 @@ namespace Reni.TokenClasses
         internal Definable Definable { get; }
         internal override SourcePart Token { get; }
 
-        internal override Checked<Syntax> CreateDeclarationSyntax
-            (SourcePart token, Syntax right)
+        internal override Checked<OldSyntax> CreateDeclarationSyntax
+            (SourcePart token, OldSyntax right)
         {
             var rightResult = right.ToCompiledSyntax;
             return new DeclarationSyntax(rightResult.Value, Definable).Issues(rightResult.Issues);
         }
 
-        internal override Checked<Syntax> RightSyntax(Syntax right, SourcePart token)
-            => Checked<Syntax>.From(ExpressionSyntax.Create(null, Definable, right, token));
+        internal override Checked<OldSyntax> RightSyntax(OldSyntax right, SourcePart token)
+            => Checked<OldSyntax>.From(ExpressionSyntax.Create(null, Definable, right, token));
 
         [DisableDump]
-        internal override Checked<CompileSyntax> ToCompiledSyntax
-            => Checked<CompileSyntax>
+        internal override Checked<Value> ToCompiledSyntax
+            => Checked<Value>
                 .From(ExpressionSyntax.Create(null, Definable, null, Token));
     }
 }

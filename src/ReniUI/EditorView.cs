@@ -159,15 +159,15 @@ namespace ReniUI
         }
 
         [DisableDump]
-        SourceSyntax ActiveSyntaxItem
+        Syntax ActiveSyntaxItem
         {
             get
             {
-                var token = Token.LocatePosition(Compiler.SourceSyntax, TextBox.SelectionStart - 1);
+                var token = Token.LocatePosition(Compiler.Syntax, TextBox.SelectionStart - 1);
                 if(token.IsComment || token.IsLineComment || token.IsText)
                     return null;
-                var current = token.SourceSyntax.Token.SourcePart.Position - 1;
-                return token.SourceSyntax.LocatePosition(current);
+                var current = token.Syntax.Token.SourcePart.Position - 1;
+                return token.Syntax.LocatePosition(current);
             }
         }
 
@@ -221,7 +221,7 @@ namespace ReniUI
 
         void SignalStyleNeeded(int position)
         {
-            var sourceSyntax = Compiler.SourceSyntax;
+            var sourceSyntax = Compiler.Syntax;
             while(TextBox.GetEndStyled() < position)
             {
                 var current = TextBox.GetEndStyled();
@@ -229,7 +229,7 @@ namespace ReniUI
                 var style = TextStyle.From(token, Compiler);
                 TextBox.StartStyling(token.StartPosition);
                 TextBox.SetStyling(token.SourcePart.Length, style);
-                sourceSyntax = token.SourceSyntax;
+                sourceSyntax = token.Syntax;
             }
         }
 

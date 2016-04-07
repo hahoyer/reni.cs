@@ -10,7 +10,7 @@ namespace Reni.Struct
 {
     sealed class GetterFunction : FunctionInstance
     {
-        public GetterFunction(FunctionType parent, int index, CompileSyntax body)
+        public GetterFunction(FunctionType parent, int index, Value body)
             : base(parent, body) { FunctionId = FunctionId.Getter(index); }
 
         [DisableDump]

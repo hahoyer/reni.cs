@@ -27,32 +27,32 @@ namespace Reni.TokenClasses
         public override string Id => TokenId(Level);
         internal override bool IsVisible => Level != 0;
 
-        protected override Checked<Parser.Syntax> Suffix
-            (Parser.Syntax left, SourcePart token)
+        protected override Checked<Parser.OldSyntax> Suffix
+            (Parser.OldSyntax left, SourcePart token)
             => new Syntax(left, Level, token, null);
 
-        protected override Checked<Parser.Syntax> Infix
-            (Parser.Syntax left, SourcePart token, Parser.Syntax right)
+        protected override Checked<Parser.OldSyntax> Infix
+            (Parser.OldSyntax left, SourcePart token, Parser.OldSyntax right)
             => new Syntax(left, Level, token, right);
 
-        protected override Checked<Parser.Syntax> Prefix
-            (SourcePart token, Parser.Syntax right)
+        protected override Checked<Parser.OldSyntax> Prefix
+            (SourcePart token, Parser.OldSyntax right)
             => new Syntax(null, Level, token, right);
 
-        protected override Checked<Parser.Syntax> OldTerminal(SourcePart token)
+        protected override Checked<Parser.OldSyntax> OldTerminal(SourcePart token)
             => new Syntax(null, Level, token, null);
 
-        sealed class Syntax : Parser.Syntax
+        sealed class Syntax : Parser.OldSyntax
         {
             internal override SourcePart Token { get; }
             readonly int Level;
 
             [EnableDump]
-            Parser.Syntax Right { get; }
+            Parser.OldSyntax Right { get; }
             [EnableDump]
-            Parser.Syntax Left { get; }
+            Parser.OldSyntax Left { get; }
 
-            public Syntax(Parser.Syntax left, int level, SourcePart token, Parser.Syntax right)
+            public Syntax(Parser.OldSyntax left, int level, SourcePart token, Parser.OldSyntax right)
             {
                 Left = left;
                 Token = token;
@@ -61,7 +61,7 @@ namespace Reni.TokenClasses
             }
 
             [DisableDump]
-            protected override IEnumerable<Parser.Syntax> DirectChildren
+            protected override IEnumerable<Parser.OldSyntax> DirectChildren
             {
                 get
                 {
@@ -79,7 +79,7 @@ namespace Reni.TokenClasses
 
 
             [DisableDump]
-            internal override Checked<CompileSyntax> ToCompiledSyntax
+            internal override Checked<Value> ToCompiledSyntax
             {
                 get
                 {
@@ -93,10 +93,10 @@ namespace Reni.TokenClasses
                 }
             }
 
-            internal override Checked<Parser.Syntax> Match(int level, SourcePart token)
+            internal override Checked<Parser.OldSyntax> Match(int level, SourcePart token)
             {
                 if(Level != level)
-                    return new Checked<Parser.Syntax>
+                    return new Checked<Parser.OldSyntax>
                         (this, IssueId.ExtraLeftBracket.CreateIssue(Token));
 
                 var innerPart = Right ?? new EmptyList(token);
@@ -104,7 +104,7 @@ namespace Reni.TokenClasses
                 if(Level == 0)
                 {
                     Tracer.Assert(Left == null);
-                    return Checked<Parser.Syntax>.From(innerPart.ToCompiledSyntax);
+                    return Checked<Parser.OldSyntax>.From(innerPart.ToCompiledSyntax);
                 }
 
                 if(Left == null)

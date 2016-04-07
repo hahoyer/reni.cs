@@ -22,23 +22,23 @@ namespace Reni.TokenClasses
 
         public override string Id => TokenId(Level);
 
-        protected override Checked<Syntax> OldTerminal(SourcePart token)
+        protected override Checked<OldSyntax> OldTerminal(SourcePart token)
             =>
                 ListSyntax
                     (
                         new EmptyList(token),
                         new EmptyList(token));
 
-        protected override Checked<Syntax> Prefix(SourcePart token, Syntax right)
+        protected override Checked<OldSyntax> Prefix(SourcePart token, OldSyntax right)
             => ListSyntax(new EmptyList(token), right);
 
-        protected override Checked<Syntax> Suffix(Syntax left, SourcePart token)
+        protected override Checked<OldSyntax> Suffix(OldSyntax left, SourcePart token)
             => ListSyntax(left, new EmptyList(token));
 
-        protected override Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
+        protected override Checked<OldSyntax> Infix(OldSyntax left, SourcePart token, OldSyntax right)
             => ListSyntax(left, right);
 
-        ListSyntax ListSyntax(Syntax left, Syntax right)
+        ListSyntax ListSyntax(OldSyntax left, OldSyntax right)
             => new ListSyntax(this, left.ToList(this).Concat(right.ToList(this)).ToArray());
 
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)

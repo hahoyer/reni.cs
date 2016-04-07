@@ -11,13 +11,13 @@ namespace ReniUI.Classification
 {
     sealed class SyntaxToken : Token
     {
-        internal SyntaxToken(SourceSyntax sourceSyntax) { SourceSyntax = sourceSyntax; }
+        internal SyntaxToken(Syntax syntax) { Syntax = syntax; }
 
-        public override SourceSyntax SourceSyntax { get; }
+        public override Syntax Syntax { get; }
 
-        TokenClass TokenClass => SourceSyntax.TokenClass as TokenClass;
+        TokenClass TokenClass => Syntax.TokenClass as TokenClass;
 
-        public override SourcePart SourcePart => SourceSyntax.Token.Characters;
+        public override SourcePart SourcePart => Syntax.Token.Characters;
 
         [EnableDumpExcept(false)]
         public override bool IsKeyword => !IsIdentifier && !IsNumber && !IsText && !IsBrace;
@@ -29,7 +29,7 @@ namespace ReniUI.Classification
         public override bool IsNumber => TokenClass is Number;
         [EnableDumpExcept(false)]
         public override bool IsError 
-            => SourceSyntax.Issues?.Any(item => item.Position == SourcePart)??false;
+            => Syntax.Issues?.Any(item => item.Position == SourcePart)??false;
         [EnableDumpExcept(false)]
         public override bool IsBraceLike => TokenClass is IBelongingsMatcher;
         [EnableDumpExcept(false)]
@@ -38,21 +38,21 @@ namespace ReniUI.Classification
 
         [EnableDumpExcept(false)]
         public override bool IsComment
-            => SourceSyntax.Issues?.Any(item => item.IssueId == IssueId.EOFInComment)??false;
+            => Syntax.Issues?.Any(item => item.IssueId == IssueId.EOFInComment)??false;
 
         [EnableDumpExcept(false)]
         public override bool IsLineComment
-            => SourceSyntax.Issues?.Any(item => item.IssueId == IssueId.EOFInLineComment)??false;
+            => Syntax.Issues?.Any(item => item.IssueId == IssueId.EOFInLineComment)??false;
 
         [DisableDump]
-        public override string State => SourceSyntax.Token.Id ?? "";
+        public override string State => Syntax.Token.Id ?? "";
 
         public override string Reformat(SourcePart targetPart)
-            => new Formatting.Configuration().Create().Reformat(SourceSyntax, targetPart);
+            => new Formatting.Configuration().Create().Reformat(Syntax, targetPart);
 
         public override IEnumerable<SourcePart> FindAllBelongings(CompilerBrowser compiler)
-            => compiler.FindAllBelongings(SourceSyntax)?.Select(item => item.Token.Characters);
+            => compiler.FindAllBelongings(Syntax)?.Select(item => item.Token.Characters);
 
-        public override Token LocatePosition(int current) => LocatePosition(SourceSyntax, current);
+        public override Token LocatePosition(int current) => LocatePosition(Syntax, current);
     }
 }

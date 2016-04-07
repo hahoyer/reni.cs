@@ -17,7 +17,7 @@ namespace ReniUI.Test
             var compiler = CompilerBrowser.FromText(text: Text);
             var thenToken = compiler.LocatePosition(Text.IndexOf("then"));
             var elseToken = compiler.LocatePosition(Text.IndexOf("else"));
-            Tracer.Assert(elseToken.SourceSyntax.Left == thenToken.SourceSyntax);
+            Tracer.Assert(elseToken.Syntax.Left == thenToken.Syntax);
         }
 
         [UnitTest]
@@ -27,7 +27,7 @@ namespace ReniUI.Test
             var compiler = CompilerBrowser.FromText(text: Text);
             var thenToken = compiler.LocatePosition(Text.IndexOf("then"));
             var elseToken = compiler.LocatePosition(Text.IndexOf("else"));
-            Tracer.Assert(elseToken.SourceSyntax.Left == thenToken.SourceSyntax);
+            Tracer.Assert(elseToken.Syntax.Left == thenToken.Syntax);
         }
     }
 }

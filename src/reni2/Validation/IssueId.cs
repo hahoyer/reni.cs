@@ -35,16 +35,16 @@ namespace Reni.Validation
         public static IEnumerable<IssueId> All => AllInstances<IssueId>();
 
         internal Issue CreateIssue(SourcePart token) => new Issue(this, token, "");
-        internal Checked<Syntax> Syntax(SourcePart token)
-            => new Checked<Syntax>(new EmptyList(token), new Issue(this, token, ""));
+        internal Checked<OldSyntax> Syntax(SourcePart token)
+            => new Checked<OldSyntax>(new EmptyList(token), new Issue(this, token, ""));
 
-        internal Checked<Syntax> Syntax(SourcePart token, Syntax value)
-            => new Checked<Syntax>(value, new Issue(this, token, ""));
+        internal Checked<OldSyntax> Syntax(SourcePart token, OldSyntax value)
+            => new Checked<OldSyntax>(value, new Issue(this, token, ""));
 
-        internal Checked<CompileSyntax> Syntax(SourcePart token, CompileSyntax value)
-            => new Checked<CompileSyntax>(value, new Issue(this, token, ""));
+        internal Checked<Value> Syntax(SourcePart token, Value value)
+            => new Checked<Value>(value, new Issue(this, token, ""));
 
-        internal Checked<Syntax> Syntax(SourcePart token, Syntax value1, Syntax value2)
-            => new Checked<Syntax>(ListSyntax.Create(value1, value2), new Issue(this, token, ""));
+        internal Checked<OldSyntax> Syntax(SourcePart token, OldSyntax value1, OldSyntax value2)
+            => new Checked<OldSyntax>(ListSyntax.Create(value1, value2), new Issue(this, token, ""));
     }
 }

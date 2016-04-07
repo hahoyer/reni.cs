@@ -11,10 +11,10 @@ namespace Reni.TokenClasses
     /// <summary>
     ///     Base class for compiler tokens
     /// </summary>
-    abstract class ScannerTokenClass : DumpableObject, Scanner<SourceSyntax>.IType, IUniqueIdProvider
+    abstract class ScannerTokenClass : DumpableObject, Scanner<Syntax>.IType, IUniqueIdProvider
     {
-        ISubParser<SourceSyntax> Scanner<SourceSyntax>.IType.NextParser => this as ISubParser<SourceSyntax>;
-        IType<SourceSyntax> Scanner<SourceSyntax>.IType.Type => this as IType<SourceSyntax>;
+        ISubParser<Syntax> Scanner<Syntax>.IType.NextParser => this as ISubParser<Syntax>;
+        IType<Syntax> Scanner<Syntax>.IType.Type => this as IType<Syntax>;
         string IUniqueIdProvider.Value => Id;
         public abstract string Id { get; }
 

@@ -34,7 +34,7 @@ namespace Reni.Struct
     sealed class SetterFunction : FunctionInstance
     {
         readonly FunctionId _functionId;
-        public SetterFunction(FunctionType parent, int index, CompileSyntax body)
+        public SetterFunction(FunctionType parent, int index, Value body)
             : base(parent, body)
         {
             _functionId = FunctionId

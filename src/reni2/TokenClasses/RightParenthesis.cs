@@ -17,25 +17,25 @@ namespace Reni.TokenClasses
     sealed class RightParenthesis
         : TokenClass
             , IBelongingsMatcher
-            , IBracketMatch<SourceSyntax>
+            , IBracketMatch<Syntax>
     {
         internal sealed class Matched : TokenClass
         {
-            protected override Checked<Syntax> OldTerminal(SourcePart token)
+            protected override Checked<OldSyntax> OldTerminal(SourcePart token)
             {
                 NotImplementedMethod(token);
                 return null;
             }
 
-            protected override Checked<Syntax> Prefix(SourcePart token, Syntax right)
+            protected override Checked<OldSyntax> Prefix(SourcePart token, OldSyntax right)
             {
                 NotImplementedMethod(token, right);
                 return null;
             }
 
-            protected override Checked<Syntax> Suffix(Syntax left, SourcePart token) => left;
+            protected override Checked<OldSyntax> Suffix(OldSyntax left, SourcePart token) => left;
 
-            protected override Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
+            protected override Checked<OldSyntax> Infix(OldSyntax left, SourcePart token, OldSyntax right)
                 => left.InfixOfMatched(token, right);
 
             internal override bool IsVisible => false;
@@ -53,22 +53,22 @@ namespace Reni.TokenClasses
         public override string Id => TokenId(Level);
         internal override bool IsVisible => Level != 0;
 
-        protected override Checked<Syntax> Suffix(Syntax left, SourcePart token)
+        protected override Checked<OldSyntax> Suffix(OldSyntax left, SourcePart token)
             => left.Match(Level, token);
 
-        protected override Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
+        protected override Checked<OldSyntax> Infix(OldSyntax left, SourcePart token, OldSyntax right)
         {
             NotImplementedMethod(left, token, right);
             return null;
         }
 
-        protected override Checked<Syntax> Prefix(SourcePart token, Syntax right)
+        protected override Checked<OldSyntax> Prefix(SourcePart token, OldSyntax right)
         {
             NotImplementedMethod(token, right);
             return null;
         }
 
-        protected override Checked<Syntax> OldTerminal(SourcePart token)
+        protected override Checked<OldSyntax> OldTerminal(SourcePart token)
         {
             NotImplementedMethod(token);
             return null;
@@ -77,6 +77,6 @@ namespace Reni.TokenClasses
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => (otherMatcher as LeftParenthesis)?.Level == Level;
 
-        IType<SourceSyntax> IBracketMatch<SourceSyntax>.Value { get; } = new Matched();
+        IType<Syntax> IBracketMatch<Syntax>.Value { get; } = new Matched();
     }
 }

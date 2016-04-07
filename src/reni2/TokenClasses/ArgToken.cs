@@ -16,10 +16,10 @@ namespace Reni.TokenClasses
         protected override Result Result(ContextBase context, Category category, TerminalSyntax token)
             => context.ArgReferenceResult(category);
 
-        internal override CompileSyntax Visit(ISyntaxVisitor visitor) => visitor.Arg;
+        internal override Value Visit(ISyntaxVisitor visitor) => visitor.Arg;
 
         protected override Result Result
-            (ContextBase context, Category category, PrefixSyntax token, CompileSyntax right)
+            (ContextBase context, Category category, PrefixSyntax token, Value right)
             => context.FunctionalArgResult(category, right,token.SourcePart);
     }
 }

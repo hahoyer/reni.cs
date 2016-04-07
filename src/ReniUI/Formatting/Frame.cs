@@ -9,7 +9,7 @@ namespace ReniUI.Formatting
 {
     sealed class Frame : DumpableObject
     {
-        internal static Frame Create(SourceSyntax target, HierachicalFormatter formatter)
+        internal static Frame Create(Syntax target, HierachicalFormatter formatter)
         {
             var result = new Frame(target, formatter: formatter);
             return result;
@@ -26,11 +26,11 @@ namespace ReniUI.Formatting
         [DisableDump]
         readonly Frame Parent;
         [DisableDump]
-        internal readonly SourceSyntax Target;
+        internal readonly Syntax Target;
         internal string TargetString => Target.SourcePart.NodeDump;
 
 
-        Frame(SourceSyntax target, Frame parent = null, HierachicalFormatter formatter = null)
+        Frame(Syntax target, Frame parent = null, HierachicalFormatter formatter = null)
         {
             Parent = parent;
             Formatter = parent?.Formatter ?? formatter;

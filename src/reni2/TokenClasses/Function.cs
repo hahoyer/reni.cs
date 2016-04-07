@@ -25,12 +25,12 @@ namespace Reni.TokenClasses
             _isMetaFunction = isMetaFunction;
         }
 
-        protected override Checked<Syntax> OldTerminal(SourcePart token)
+        protected override Checked<OldSyntax> OldTerminal(SourcePart token)
             => IssueId.MissingFunctionGetter.Syntax(token);
-        protected override Checked<Syntax> Suffix(Syntax left, SourcePart token)
+        protected override Checked<OldSyntax> Suffix(OldSyntax left, SourcePart token)
             => IssueId.MissingFunctionGetter.Syntax(token, left);
 
-        protected override Checked<Syntax> Prefix(SourcePart token, Syntax right)
+        protected override Checked<OldSyntax> Prefix(SourcePart token, OldSyntax right)
             => FunctionSyntax.Create
                 (
                     null,
@@ -38,7 +38,7 @@ namespace Reni.TokenClasses
                     _isMetaFunction,
                     right.ToCompiledSyntax);
 
-        protected override Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
+        protected override Checked<OldSyntax> Infix(OldSyntax left, SourcePart token, OldSyntax right)
             => FunctionSyntax.Create
                 (
                     left.ToCompiledSyntax,

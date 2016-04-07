@@ -25,17 +25,17 @@ namespace Reni.TokenClasses
             : this(item.NullableToArray().ToArray(), token) {}
 
         [DisableDump]
-        protected override IEnumerable<Syntax> DirectChildren => Tags;
+        protected override IEnumerable<OldSyntax> DirectChildren => Tags;
 
-        internal override Checked<Syntax> SuffixedBy(Definable definable, SourcePart token)
+        internal override Checked<OldSyntax> SuffixedBy(Definable definable, SourcePart token)
             => new DeclaratorSyntax(definable, this);
 
-        internal override Checked<Syntax> CreateDeclarationSyntax(SourcePart token, Syntax right)
+        internal override Checked<OldSyntax> CreateDeclarationSyntax(SourcePart token, OldSyntax right)
             => DeclarationSyntax.Create(right, null, Tags);
 
     }
 
-    sealed class DeclaratorSyntax : CompileSyntax
+    sealed class DeclaratorSyntax : Value
     {
         [EnableDump]
         readonly Definable Definable;
@@ -48,7 +48,7 @@ namespace Reni.TokenClasses
             ExclamationSyntaxList = exclamationSyntaxList;
         }
 
-        internal override Checked<Syntax> CreateDeclarationSyntax(SourcePart token, Syntax right)
+        internal override Checked<OldSyntax> CreateDeclarationSyntax(SourcePart token, OldSyntax right)
             => DeclarationSyntax.Create
                 (
                     right,
@@ -57,7 +57,7 @@ namespace Reni.TokenClasses
                 );
 
         [DisableDump]
-        protected override IEnumerable<Syntax> DirectChildren
+        protected override IEnumerable<OldSyntax> DirectChildren
         {
             get { yield return ExclamationSyntaxList; }
         }

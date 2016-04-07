@@ -21,7 +21,7 @@ namespace Reni.TokenClasses
                 .CreateValueReferenceResult(category);
 
         protected override Result Result
-            (ContextBase context, Category category, PrefixSyntax token, CompileSyntax right)
+            (ContextBase context, Category category, PrefixSyntax token, Value right)
         {
             NotImplementedMethod(context, category, token, right);
             return null;

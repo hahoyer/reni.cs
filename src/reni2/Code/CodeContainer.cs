@@ -23,7 +23,7 @@ namespace Reni.Code
         readonly ValueCache<string> CSharpStringCache;
 
         internal CodeContainer
-            (string moduleName, Root root, SourceSyntax syntax, string description)
+            (string moduleName, Root root, Syntax syntax, string description)
         {
             ModuleName = moduleName;
             Root = root;
