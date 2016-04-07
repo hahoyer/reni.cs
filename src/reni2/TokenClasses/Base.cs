@@ -35,7 +35,7 @@ namespace Reni.TokenClasses
         protected sealed override Checked<Syntax> Suffix(Syntax left, SourcePart token)
             => IssueId.UnexpectedUseAsSuffix.Syntax(token, left);
 
-        protected sealed override Checked<Syntax> Terminal(SourcePart token)
+        protected sealed override Checked<Syntax> OldTerminal(SourcePart token)
             => IssueId.UnexpectedUseAsTerminal.Syntax(token);
     }
 
@@ -56,7 +56,7 @@ namespace Reni.TokenClasses
         protected sealed override Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
             => IssueId.UnexpectedUseAsInfix.Syntax(token, left, right);
 
-        protected sealed override Checked<Syntax> Terminal(SourcePart token)
+        protected sealed override Checked<Syntax> OldTerminal(SourcePart token)
             => IssueId.UnexpectedUseAsTerminal.Syntax(token);
     }
 
@@ -65,7 +65,7 @@ namespace Reni.TokenClasses
         protected sealed override Checked<Syntax> Prefix(SourcePart token, Syntax right)
             => IssueId.UnexpectedUseAsPrefix.Syntax(token, right);
 
-        protected sealed override Checked<Syntax> Terminal(SourcePart token)
+        protected sealed override Checked<Syntax> OldTerminal(SourcePart token)
             => IssueId.UnexpectedUseAsTerminal.Syntax(token);
 
         protected sealed override Checked<Syntax> Suffix(Syntax left, SourcePart token)
@@ -75,7 +75,7 @@ namespace Reni.TokenClasses
 
     abstract class TerminalSyntaxToken : TerminalToken, ITerminal
     {
-        protected sealed override Checked<Syntax> Terminal(SourcePart token)
+        protected sealed override Checked<Syntax> OldTerminal(SourcePart token)
             => new TerminalSyntax(token, this);
 
         Result ITerminal.Result(ContextBase context, Category category, TerminalSyntax token)
@@ -95,7 +95,7 @@ namespace Reni.TokenClasses
 
     abstract class NonPrefixSyntaxToken : NonPrefixToken, ITerminal, ISuffix
     {
-        protected sealed override Checked<Syntax> Terminal(SourcePart token)
+        protected sealed override Checked<Syntax> OldTerminal(SourcePart token)
             => new TerminalSyntax(token, this);
 
         protected override Checked<Syntax> Suffix(Syntax left, SourcePart token)
@@ -146,7 +146,7 @@ namespace Reni.TokenClasses
 
     abstract class NonSuffixSyntaxToken : NonSuffixToken, ITerminal, IPrefix
     {
-        protected sealed override Checked<Syntax> Terminal(SourcePart token)
+        protected sealed override Checked<Syntax> OldTerminal(SourcePart token)
             => new TerminalSyntax(token, this);
 
         protected sealed override Checked<Syntax> Prefix(SourcePart token, Syntax right)

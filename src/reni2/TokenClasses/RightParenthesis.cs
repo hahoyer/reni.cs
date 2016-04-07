@@ -21,7 +21,7 @@ namespace Reni.TokenClasses
     {
         internal sealed class Matched : TokenClass
         {
-            protected override Checked<Syntax> Terminal(SourcePart token)
+            protected override Checked<Syntax> OldTerminal(SourcePart token)
             {
                 NotImplementedMethod(token);
                 return null;
@@ -68,7 +68,7 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        protected override Checked<Syntax> Terminal(SourcePart token)
+        protected override Checked<Syntax> OldTerminal(SourcePart token)
         {
             NotImplementedMethod(token);
             return null;

@@ -6,31 +6,44 @@ using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
 using Reni.Parser;
+using Reni.Struct;
 using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
     public sealed class SourceSyntax : DumpableObject, ISourcePart, ValueCache.IContainer
     {
-        static int _nextObjectId;
-        SourceSyntax _parent;
-        [DisableDump]
-        readonly ISyntaxProvider SyntaxProvider;
-        internal SourceSyntax Left { get; }
-        internal ITokenClass TokenClass { get; }
-        [DisableDump]
-        internal IToken Token { get; }
-        internal SourceSyntax Right { get; }
-        FunctionCache<int, SourceSyntax> LocatePositionCache { get; }
-        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
+        internal static SourceSyntax CreateSourceSyntax
+            (SourceSyntax left, TokenClass tokenClass, IToken token, SourceSyntax right)
+            => CreateSourceSyntax(left, tokenClass, token, right, null);
 
-        internal SourceSyntax
+        internal static SourceSyntax CreateSourceSyntax
             (
             SourceSyntax left,
             ITokenClass tokenClass,
             IToken token,
             SourceSyntax right,
             Func<Syntax, IToken, Syntax, ISyntaxProvider> getSyntax)
+            => new SourceSyntax(left, tokenClass, token, right);
+
+        static int _nextObjectId;
+
+        SourceSyntax _parent;
+        internal SourceSyntax Left { get; }
+        internal ITokenClass TokenClass { get; }
+        [DisableDump]
+        internal IToken Token { get; }
+        internal SourceSyntax Right { get; }
+
+        FunctionCache<int, SourceSyntax> LocatePositionCache { get; }
+        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
+
+        SourceSyntax
+            (
+            SourceSyntax left,
+            ITokenClass tokenClass,
+            IToken token,
+            SourceSyntax right)
             : base(_nextObjectId++)
         {
             Left = left;
@@ -38,54 +51,24 @@ namespace Reni.TokenClasses
             Token = token;
             Right = right;
             LocatePositionCache = new FunctionCache<int, SourceSyntax>(LocatePositionForCache);
-            SyntaxProvider = this.CachedValue(() => getSyntax(Left?.Syntax, Token, Right?.Syntax));
 
             if(Left != null)
                 Left.Parent = this;
 
             if(Right != null)
                 Right.Parent = this;
-
-            AssertValid();
         }
-
-        internal Syntax Syntax => SyntaxProvider.Value;
-
-        void AssertValid() { AssertValidSourceQueue(); }
-
-        void AssertValidSourceQueue()
-        {
-            if(Left != null)
-            {
-                Tracer.Assert
-                    (
-                        Left.SourcePart.End >= Token.SourcePart.Start,
-                        () => Left.SourcePart.End.Span(Token.SourcePart.Start).NodeDump
-                    );
-                if(!Issues.Any())
-                    Tracer.Assert
-                        (
-                            Left.SourcePart.End <= Token.SourcePart.Start,
-                            () => Left.SourcePart.NodeDump + " <> " + Token.SourcePart.NodeDump
-                        );
-            }
-            if(Right != null)
-                Tracer.Assert
-                    (
-                        Token.SourcePart.End == Right.SourcePart.Start,
-                        () => Token.SourcePart.End.Span(Right.SourcePart.Start).NodeDump
-                    );
-        }
-
-        internal Issue[] Issues => (Left?.Issues).plus(SyntaxProvider.Issues).plus(Right?.Issues);
 
         [DisableDump]
         internal SourceSyntax Parent
         {
             get { return _parent; }
-            set
+            private set
             {
-                Tracer.Assert(value == null || _parent == null);
+                if(value == null)
+                    throw new ArgumentNullException(nameof(value));
+
+                Tracer.Assert(_parent == null);
                 _parent = value;
             }
         }
@@ -242,12 +225,10 @@ namespace Reni.TokenClasses
         {
             get
             {
-                var typeoid = Syntax.Typeoid;
-                NotImplementedMethod(nameof(typeoid), typeoid);
+                NotImplementedMethod();
                 return null;
 
-                var syntax = Syntax
-                    .ToCompiledSyntax
+                var syntax = ToCompiledSyntax
                     .Value;
                 var functionCache = syntax.ResultCache;
                 if(functionCache.Any())
@@ -257,6 +238,23 @@ namespace Reni.TokenClasses
                         .Distinct()
                         .ToArray();
 
+                NotImplementedMethod();
+                return null;
+            }
+        }
+
+        [DisableDump]
+        internal Checked<CompileSyntax> ToCompiledSyntax
+            => TokenClass.ToCompiledSyntax(Left, Token, Right);
+
+        [DisableDump]
+        internal Issue[] Issues => Left?.Issues.plus(ToCompiledSyntax?.Issues).plus(Right?.Issues);
+
+        [DisableDump]
+        internal Checked<CompoundSyntax> ToCompound
+        {
+            get
+            {
                 NotImplementedMethod();
                 return null;
             }

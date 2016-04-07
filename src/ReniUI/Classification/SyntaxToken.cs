@@ -29,7 +29,7 @@ namespace ReniUI.Classification
         public override bool IsNumber => TokenClass is Number;
         [EnableDumpExcept(false)]
         public override bool IsError 
-            => SourceSyntax.Issues.Any(item => item.Position == SourcePart);
+            => SourceSyntax.Issues?.Any(item => item.Position == SourcePart)??false;
         [EnableDumpExcept(false)]
         public override bool IsBraceLike => TokenClass is IBelongingsMatcher;
         [EnableDumpExcept(false)]
@@ -38,11 +38,11 @@ namespace ReniUI.Classification
 
         [EnableDumpExcept(false)]
         public override bool IsComment
-            => SourceSyntax.Issues.Any(item => item.IssueId == IssueId.EOFInComment);
+            => SourceSyntax.Issues?.Any(item => item.IssueId == IssueId.EOFInComment)??false;
 
         [EnableDumpExcept(false)]
         public override bool IsLineComment
-            => SourceSyntax.Issues.Any(item => item.IssueId == IssueId.EOFInLineComment);
+            => SourceSyntax.Issues?.Any(item => item.IssueId == IssueId.EOFInLineComment)??false;
 
         [DisableDump]
         public override string State => SourceSyntax.Token.Id ?? "";

@@ -30,7 +30,7 @@ namespace Reni.TokenClasses
         protected override Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
             => left.CreateDeclarationSyntax(token, right);
 
-        protected override Checked<Syntax> Terminal(SourcePart token)
+        protected override Checked<Syntax> OldTerminal(SourcePart token)
             => new DeclarationSyntax(new EmptyList(token), null)
                 .Issues(IssueId.MissingValueInDeclaration.CreateIssue(token));
     }

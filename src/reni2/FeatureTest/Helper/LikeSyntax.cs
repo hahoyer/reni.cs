@@ -8,7 +8,7 @@ using Reni.TokenClasses;
 
 namespace Reni.FeatureTest.Helper
 {
-    abstract class LikeSyntax
+    abstract class LikeSyntax : DumpableObject
     {
         public static LikeSyntax Number(int i) => new Number(i);
 
@@ -23,8 +23,7 @@ namespace Reni.FeatureTest.Helper
             (LikeSyntax[] list, Declaration[] declarations, int[] converters)
             => new Struct(list, declarations, converters);
 
-        public abstract void AssertLike(Syntax syntax);
-        public void AssertLike(SourceSyntax syntax) => AssertLike(syntax.Syntax);
+        public abstract void AssertLike(SourceSyntax syntax);
 
         public static LikeSyntax operator +(LikeSyntax x, LikeSyntax y) => x.Expression("+", y);
         public static LikeSyntax operator -(LikeSyntax x, LikeSyntax y) => x.Expression("-", y);
@@ -38,11 +37,14 @@ namespace Reni.FeatureTest.Helper
             => new Declaration(name, position);
 
         public static LikeSyntax Symbol(string s) => new Expression(null, s, null);
+
+        public void AssertLike(CompileSyntax syntax) => NotImplementedMethod(syntax);
     }
 
     sealed class Empty : LikeSyntax
     {
-        public override void AssertLike(Syntax syntax) => Tracer.Assert(syntax is EmptyList);
+        public override void AssertLike(SourceSyntax syntax)
+            => Tracer.Assert(syntax.ToCompiledSyntax.Value is EmptyList);
     }
 
     sealed class Declaration
@@ -78,15 +80,17 @@ namespace Reni.FeatureTest.Helper
             _converters = converters;
         }
 
-        public override void AssertLike(Syntax syntax)
+        public override void AssertLike(SourceSyntax syntax)
         {
-            var co = (CompoundSyntax) syntax;
+            var co = (CompoundSyntax) syntax.ToCompiledSyntax.Value;
             Tracer.Assert(_list.Length == co.Statements.Length);
             for(var i = 0; i < _list.Length; i++)
                 _list[i].AssertLike(co.Statements[i]);
+
             Tracer.Assert(_declarations.Length == co.Names.Length);
             foreach(var declaration in _declarations)
                 declaration.AssertContains(co);
+
             Tracer.Assert(_converters.Length == co.ConverterStatementPositions.Length);
             for(var i = 0; i < _converters.Length; i++)
                 Tracer.Assert(_converters[i] == co.ConverterStatementPositions[i]);
@@ -106,15 +110,15 @@ namespace Reni.FeatureTest.Helper
             _s3 = s3;
         }
 
-        public override void AssertLike(Syntax syntax)
+        public override void AssertLike(SourceSyntax syntax)
         {
-            var ex = (ExpressionSyntax) syntax;
-            AssertLike(_s1, ex.Left);
+            var ex = (ExpressionSyntax) syntax.ToCompiledSyntax.Value;
+            AssertLike(_s1, syntax.Left);
             Tracer.Assert(ex.Definable?.Id == _s2);
-            AssertLike(_s3, ex.Right);
+            AssertLike(_s3, syntax.Right);
         }
 
-        static void AssertLike(LikeSyntax s3, CompileSyntax right)
+        static void AssertLike(LikeSyntax s3, SourceSyntax right)
         {
             if(s3 == null)
                 Tracer.Assert(right == null);
@@ -125,13 +129,13 @@ namespace Reni.FeatureTest.Helper
 
     sealed class Number : LikeSyntax
     {
-        readonly Int64 _i;
+        readonly long _i;
 
-        internal Number(Int64 i) { _i = i; }
+        internal Number(long i) { _i = i; }
 
-        public override void AssertLike(Syntax syntax)
+        public override void AssertLike(SourceSyntax syntax)
         {
-            var terminalSyntax = (TerminalSyntax) syntax;
+            var terminalSyntax = (TerminalSyntax) syntax.ToCompiledSyntax.Value;
             Tracer.Assert(terminalSyntax.Terminal is TokenClasses.Number);
             Tracer.Assert(terminalSyntax.ToNumber == _i);
         }

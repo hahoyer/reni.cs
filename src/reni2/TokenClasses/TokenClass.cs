@@ -11,7 +11,6 @@ namespace Reni.TokenClasses
 {
     abstract class TokenClass
         : ScannerTokenClass,
-            IOperator<Syntax, Checked<Syntax>>,
             IType<SourceSyntax>,
             ITokenClass
     {
@@ -21,43 +20,37 @@ namespace Reni.TokenClasses
         string IType<SourceSyntax>.PrioTableId => Id;
 
         SourceSyntax Create(SourceSyntax left, IToken token, SourceSyntax right)
-        {
-            var trace = left?.ObjectId == -108;
-            StartMethodDump(trace, left, token, right);
-            try
-            {
-                BreakExecution();
-                var result = new SourceSyntax(left, this, token, right, this.Operation);
-                return ReturnMethodDump(result);
-            }
-            finally
-            {
-                EndMethodDump();
-            }
-        }
+            => SourceSyntax.CreateSourceSyntax(left, this, token, right);
 
-        internal Checked<Syntax> CreateForVisit(Syntax left, Syntax right)
-            => this.Operation(left, null, right);
-
-        Checked<Syntax> IOperator<Syntax, Checked<Syntax>>.Terminal(IToken token)
-            => Terminal(token?.Characters);
-
-        Checked<Syntax> IOperator<Syntax, Checked<Syntax>>.Prefix(IToken token, Syntax right)
-            => Prefix(token?.Characters, right);
-
-        Checked<Syntax> IOperator<Syntax, Checked<Syntax>>.Suffix(Syntax left, IToken token)
-            => Suffix(left, token?.Characters);
-
-        Checked<Syntax> IOperator<Syntax, Checked<Syntax>>.Infix
-            (Syntax left, IToken token, Syntax right)
-            => Infix(left, token?.Characters, right);
-
-        protected abstract Checked<Syntax> Terminal(SourcePart token);
+        protected abstract Checked<Syntax> OldTerminal(SourcePart token);
         protected abstract Checked<Syntax> Prefix(SourcePart token, Syntax right);
         protected abstract Checked<Syntax> Suffix(Syntax left, SourcePart token);
         protected abstract Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right);
 
         internal virtual bool IsVisible => true;
+
+        Checked<CompileSyntax> ITokenClass.ToCompiledSyntax(SourceSyntax left, IToken token, SourceSyntax right)
+        {
+            var leftSyntax = left?.ToCompiledSyntax;
+            var rightSyntax = right?.ToCompiledSyntax;
+            if(left != null && leftSyntax == null)
+                return null;
+            if(right != null && rightSyntax == null)
+                return null;
+
+            if(leftSyntax == null)
+                if(rightSyntax == null)
+                    return Terminal(token.SourcePart);
+            NotImplementedMethod(left, token, right, nameof(leftSyntax), leftSyntax, nameof(rightSyntax), rightSyntax);
+            return null;
+        }
+
+        Checked<CompileSyntax> Terminal(SourcePart token)
+        {
+            NotImplementedMethod(token);
+            return null;
+
+        }
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]

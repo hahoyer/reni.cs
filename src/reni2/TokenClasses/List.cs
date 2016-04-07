@@ -22,7 +22,7 @@ namespace Reni.TokenClasses
 
         public override string Id => TokenId(Level);
 
-        protected override Checked<Syntax> Terminal(SourcePart token)
+        protected override Checked<Syntax> OldTerminal(SourcePart token)
             =>
                 ListSyntax
                     (

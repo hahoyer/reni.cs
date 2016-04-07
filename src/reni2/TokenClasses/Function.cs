@@ -25,7 +25,7 @@ namespace Reni.TokenClasses
             _isMetaFunction = isMetaFunction;
         }
 
-        protected override Checked<Syntax> Terminal(SourcePart token)
+        protected override Checked<Syntax> OldTerminal(SourcePart token)
             => IssueId.MissingFunctionGetter.Syntax(token);
         protected override Checked<Syntax> Suffix(Syntax left, SourcePart token)
             => IssueId.MissingFunctionGetter.Syntax(token, left);

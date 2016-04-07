@@ -7,6 +7,7 @@ using hw.Helper;
 using Reni.Context;
 using Reni.Parser;
 using Reni.Struct;
+using Reni.TokenClasses;
 using Reni.Validation;
 
 namespace Reni.Code
@@ -22,7 +23,7 @@ namespace Reni.Code
         readonly ValueCache<string> CSharpStringCache;
 
         internal CodeContainer
-            (string moduleName, Root root, Syntax syntax, string description)
+            (string moduleName, Root root, SourceSyntax syntax, string description)
         {
             ModuleName = moduleName;
             Root = root;

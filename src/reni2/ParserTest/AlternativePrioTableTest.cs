@@ -24,7 +24,7 @@ namespace Reni.ParserTest
                 (
                     "UseAlternativePrioTable",
                     @"!converter: 3",
-                    expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
+                    expectedResult: c => syntaxPrototype.AssertLike(c.SourceSyntax));
         }
 
         [UnitTest]
@@ -41,7 +41,7 @@ namespace Reni.ParserTest
                 (
                     "UseAlternativePrioTable",
                     @"!converter: 3; !converter: 4",
-                    expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
+                    expectedResult: c => syntaxPrototype.AssertLike(c.SourceSyntax));
         }
     }
 }

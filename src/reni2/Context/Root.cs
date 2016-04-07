@@ -173,13 +173,13 @@ namespace Reni.Context
         internal FunctionContainer FunctionContainer(int index) => _functions.Container(index);
         internal FunctionType Function(int index) => _functions.Item(index);
 
-        internal Container MainContainer(Syntax syntax, string description)
+        internal Container MainContainer(SourceSyntax syntax, string description)
         {
             var compoundSyntax = syntax
                 .ToCompound
                 .SaveValue;
 
-            if(false && Debugger.IsAttached)
+            if (false && Debugger.IsAttached)
                 foreach(var ext in Result(Category.Exts, compoundSyntax).Exts.Data)
                     AnalyseUnresolvedReference(compoundSyntax, ext);
 

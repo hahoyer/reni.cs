@@ -76,15 +76,11 @@ namespace Reni
             };
 
             CodeContainerCache = NewValueCache
-                (() => new CodeContainer(ModuleName, Root, Syntax, Source.Data));
+                (() => new CodeContainer(ModuleName, Root, SourceSyntax, Source.Data));
         }
 
         static string ModuleNameFromFileName(string fileName)
             => "_" + Path.GetFileName(fileName).Symbolize();
-
-        [Node]
-        [DisableDump]
-        internal Syntax Syntax => this.CachedValue(() => SourceSyntax.Syntax);
 
         [Node]
         [DisableDump]
@@ -133,7 +129,7 @@ namespace Reni
         Checked<CompileSyntax> Root.IParent.Parse(string source) => Parse(source);
 
         Checked<CompileSyntax> Parse(string sourceText)
-            => Parse(new Source(sourceText) + 0).Syntax.ToCompiledSyntax;
+            => Parse(new Source(sourceText) + 0).ToCompiledSyntax;
 
         [UsedImplicitly]
         public Compiler Empower()
@@ -158,7 +154,7 @@ namespace Reni
                 Tracer.Line("Dump Source\n" + Source.Dump());
 
             if(Parameters.TraceOptions.Syntax)
-                Tracer.FlaggedLine("Syntax\n" + Syntax.Dump());
+                Tracer.FlaggedLine("Syntax\n" + SourceSyntax.Dump());
 
             if(Parameters.ParseOnly)
                 return;

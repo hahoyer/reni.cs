@@ -12,7 +12,7 @@ namespace Reni.TokenClasses
         public const string TokenId = "~~~";
         public override string Id => TokenId;
 
-        protected override Checked<Syntax> Terminal(SourcePart token)
+        protected override Checked<Syntax> OldTerminal(SourcePart token)
             => Checked<Syntax>.From(new EmptyList(token).ToCompound);
 
         protected override Checked<Syntax> Prefix(SourcePart token, Syntax right)

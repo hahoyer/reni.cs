@@ -16,7 +16,7 @@ namespace Reni.Parser
         SourceSyntax IType<SourceSyntax>.Create(SourceSyntax left, IToken token, SourceSyntax right)
         {
             Tracer.Assert(right == null);
-            return new SourceSyntax(left, this, token, Value, GetResult);
+            return SourceSyntax.CreateSourceSyntax(left, this, token, Value, GetResult);
         }
 
         static Checked<ExclamationSyntaxList> GetResult(Syntax left, IToken token, Syntax right)
@@ -32,5 +32,8 @@ namespace Reni.Parser
 
         string IType<SourceSyntax>.PrioTableId => PrioTable.Any;
         string ITokenClass.Id => "!";
+
+        Checked<CompileSyntax> ITokenClass.ToCompiledSyntax
+            (SourceSyntax left, IToken token, SourceSyntax right) => null;
     }
 }

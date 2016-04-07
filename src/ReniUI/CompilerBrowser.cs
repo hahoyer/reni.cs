@@ -54,12 +54,12 @@ namespace ReniUI
             var enumerable = LocatePosition(offset)
                 .SourceSyntax
                 .ParentChainIncludingThis
-                .Select(item => item.Syntax)
+                .Select(item => item.ToCompiledSyntax.Value)
                 .ToArray();
 
             var compileSyntaxs = enumerable
-                .OfType<CompileSyntax>()
-                .Where(item => item.ResultCache.Any());
+                .Where(item => item?.ResultCache.Any()??false);
+
             return compileSyntaxs;
         }
 

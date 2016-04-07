@@ -115,6 +115,7 @@ namespace Reni.Parser
         {
             if(type == typeof(Exclamation))
                 return new Exclamation(_declarationSyntaxSubParser);
+
             return base.SpecialTokenClass(type);
         }
 
@@ -145,12 +146,17 @@ namespace Reni.Parser
 
         public override string Id => "<error>";
 
+        Checked<CompileSyntax> ITokenClass.ToCompiledSyntax(SourceSyntax left, IToken token, SourceSyntax right)
+        {
+            NotImplementedMethod(left,token,right);
+            return null;
+        }
+
         SourceSyntax IType<SourceSyntax>.Create(SourceSyntax left, IToken token, SourceSyntax right)
-            => new SourceSyntax(left, this, token, right, GetResult);
+            => SourceSyntax.CreateSourceSyntax(left, this, token, right, GetResult);
 
         Checked<Syntax> GetResult(Syntax left, IToken token, Syntax right)
-            =>
-                new Checked<Syntax>
-                    (ListSyntax.Create(left, right), _issue.CreateIssue(token.Characters));
+            => new Checked<Syntax>
+                (ListSyntax.Create(left, right), _issue.CreateIssue(token.Characters));
     }
 }

@@ -19,7 +19,7 @@ namespace Reni.TokenClasses
         protected override Checked<Syntax> Infix(Syntax left, SourcePart token, Syntax right)
             => left.CreateElseSyntax(right.ToCompiledSyntax);
 
-        protected override Checked<Syntax> Terminal(SourcePart token)
+        protected override Checked<Syntax> OldTerminal(SourcePart token)
             => IssueId.MissingThen.Syntax(token);
 
         protected override Checked<Syntax> Prefix(SourcePart token, Syntax right)

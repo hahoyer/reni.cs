@@ -10,7 +10,7 @@ namespace Reni.TokenClasses
 {
     abstract class Definable : TokenClass
     {
-        protected override sealed Checked<Syntax> Terminal(SourcePart token)
+        protected override sealed Checked<Syntax> OldTerminal(SourcePart token)
             => new DefinableSyntax(token, this);
 
         protected override sealed Checked<Syntax> Prefix(SourcePart token, Syntax right)
@@ -30,6 +30,13 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal virtual IEnumerable<IDeclarationProvider> Genericize
             => this.GenericListFromDefinable();
+
+        public Checked<CompileSyntax> CreateForVisit(CompileSyntax left, CompileSyntax right)
+        {
+            NotImplementedMethod(left, right);
+            return null;
+
+        }
     }
 
     [BelongsTo(typeof(MainTokenFactory))]

@@ -17,7 +17,7 @@ namespace Reni.Parser
                 .Issues(rightResult.Issues);
         }
 
-        internal DeclarationSyntax
+        DeclarationSyntax
             (
             CompileSyntax body,
             Definable target,

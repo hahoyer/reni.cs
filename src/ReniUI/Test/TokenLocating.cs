@@ -29,8 +29,8 @@ namespace ReniUI.Test
             var compiler = CompilerBrowser.FromText(text);
             var span = compiler.Source + 2;
             var x = compiler.LocatePosition(span);
-
-            Tracer.Assert(x.SourcePart.Id.Replace("\r", "") == "# Comment\n", x.Dump);
+            var sourcePart = x.SourcePart;
+            Tracer.Assert(sourcePart.Id.Replace("\r", "") == "# Comment\n", x.Dump);
         }
     }
 }

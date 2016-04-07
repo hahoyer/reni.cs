@@ -39,7 +39,7 @@ namespace Reni.TokenClasses
             (SourcePart token, Parser.Syntax right)
             => new Syntax(null, Level, token, right);
 
-        protected override Checked<Parser.Syntax> Terminal(SourcePart token)
+        protected override Checked<Parser.Syntax> OldTerminal(SourcePart token)
             => new Syntax(null, Level, token, null);
 
         sealed class Syntax : Parser.Syntax
