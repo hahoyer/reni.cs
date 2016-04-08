@@ -38,8 +38,9 @@ namespace Reni.TokenClasses
             protected override Checked<OldSyntax> OldInfix(OldSyntax left, SourcePart token, OldSyntax right)
                 => left.InfixOfMatched(token, right);
 
+            [DisableDump]
             internal override bool IsVisible => false;
-
+            [DisableDump]
             public override string Id => "()";
         }
 
@@ -50,7 +51,9 @@ namespace Reni.TokenClasses
 
         [DisableDump]
         internal int Level { get; }
+        [DisableDump]
         public override string Id => TokenId(Level);
+        [DisableDump]
         internal override bool IsVisible => Level != 0;
 
         protected override Checked<OldSyntax> OldSuffix(OldSyntax left, SourcePart token)

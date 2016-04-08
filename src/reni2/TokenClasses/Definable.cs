@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Parser;
 using hw.Scanner;
 using Reni.Feature;
 using Reni.Parser;
@@ -11,19 +10,9 @@ namespace Reni.TokenClasses
 {
     abstract class Definable : TokenClass
     {
-        protected override sealed Checked<Parser.Value> Terminal(SourcePart token)
-            => ExpressionSyntax.Create(null,this, null, token);
-
-        protected override sealed Checked<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
-            => Checked<OldSyntax>
-                .From(ExpressionSyntax.OldCreate(null, this, right, token));
-
-        protected override sealed Checked<Parser.Value> Suffix(Parser.Value left, SourcePart token)
-            => ExpressionSyntax.Create(left, this, null, token);
-
-        protected override sealed Checked<OldSyntax> OldInfix(OldSyntax left, SourcePart token, OldSyntax right)
-            => Checked<OldSyntax>
-                .From(ExpressionSyntax.OldCreate(left, this, right, token));
+        protected sealed override Checked<Parser.Value> Infix
+            (Parser.Value left, SourcePart token, Parser.Value right)
+            => ExpressionSyntax.Create(left, this, right, token);
 
         [DisableDump]
         protected string DataFunctionName => Id.Symbolize();
@@ -36,7 +25,6 @@ namespace Reni.TokenClasses
         {
             NotImplementedMethod(left, right);
             return null;
-
         }
     }
 

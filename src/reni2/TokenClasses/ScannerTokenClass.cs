@@ -16,8 +16,7 @@ namespace Reni.TokenClasses
         ISubParser<Syntax> Scanner<Syntax>.IType.NextParser => this as ISubParser<Syntax>;
         IType<Syntax> Scanner<Syntax>.IType.Type => this as IType<Syntax>;
         string IUniqueIdProvider.Value => Id;
+        [DisableDump]
         public abstract string Id { get; }
-
-        protected override string GetNodeDump() => Id;
     }
 }
