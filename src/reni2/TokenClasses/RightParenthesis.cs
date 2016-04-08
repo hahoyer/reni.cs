@@ -44,7 +44,7 @@ namespace Reni.TokenClasses
         }
 
         public static string TokenId(int level)
-            => level == 0 ? PrioTable.EndOfText : "\0}])".Substring(level, 1);
+            => level == 0 ? PrioTable.EndOfText : "}])".Substring(level-1, 1);
 
         public RightParenthesis(int level) { Level = level; }
 

@@ -18,7 +18,7 @@ namespace Reni.TokenClasses
     sealed class LeftParenthesis : TokenClass, IBelongingsMatcher
     {
         public static string TokenId(int level)
-            => level == 0 ? PrioTable.BeginOfText : "\0{[(".Substring(level, 1);
+            => level == 0 ? PrioTable.BeginOfText : "{[(".Substring(level-1, 1);
 
         public LeftParenthesis(int level) { Level = level; }
         [DisableDump]
