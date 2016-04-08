@@ -162,8 +162,8 @@ namespace hw.Parser
                 Tracer.Line("bracket matching======>");
                 Tracer.Line("======================>");
                 Tracer.IndentStart();
-                TraceItemLine("_current", Current);
-                Tracer.Line("_left = " + Extension.TreeDump(Left));
+                TraceItemLine(nameof(Current), Current);
+                Tracer.Line(nameof(Left) +" = " + Extension.TreeDump(Left));
                 Tracer.Line(FormatStackForTrace(Stack));
                 Tracer.IndentEnd();
             }
@@ -177,8 +177,8 @@ namespace hw.Parser
                 Tracer.Line("begin of " + tag + " ==>");
                 Tracer.Line("======================>");
                 Tracer.IndentStart();
-                TraceItemLine("_current", Current);
-                Tracer.Line("_left = " + Extension.TreeDump(Left));
+                TraceItemLine(nameof(Current), Current);
+                Tracer.Line(nameof(Left) + " = " + Extension.TreeDump(Left));
                 Tracer.Line(FormatStackForTrace(Stack));
                 Tracer.IndentEnd();
             }
@@ -188,8 +188,8 @@ namespace hw.Parser
                 if(!Trace)
                     return;
                 Tracer.IndentStart();
-                TraceItemLine("_current", Current);
-                Tracer.Line("left = " + Extension.TreeDump(Left));
+                TraceItemLine(nameof(Current), Current);
+                Tracer.Line(nameof(Left) + " = " + Extension.TreeDump(Left));
                 Tracer.Line(FormatStackForTrace(Stack));
                 if(StartLevel > Stack.Count)
                     Tracer.Line("*** End reached ***");
