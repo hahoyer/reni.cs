@@ -14,16 +14,11 @@ namespace Reni.TokenClasses
     public sealed class Syntax : DumpableObject, ISourcePart, ValueCache.IContainer
     {
         internal static Syntax CreateSourceSyntax
-            (Syntax left, TokenClass tokenClass, IToken token, Syntax right)
-            => CreateSourceSyntax(left, tokenClass, token, right, null);
-
-        internal static Syntax CreateSourceSyntax
             (
             Syntax left,
             ITokenClass tokenClass,
             IToken token,
-            Syntax right,
-            Func<OldSyntax, IToken, OldSyntax, ISyntaxProvider> getSyntax)
+            Syntax right)
             => new Syntax(left, tokenClass, token, right);
 
         static int _nextObjectId;
@@ -245,7 +240,7 @@ namespace Reni.TokenClasses
 
         [DisableDump]
         internal Checked<Value> Value
-            => TokenClass.GetValue(Left, Token, Right);
+            => TokenClass.GetValue(Left, Token.Characters, Right);
 
         [DisableDump]
         internal Issue[] Issues 
@@ -261,6 +256,21 @@ namespace Reni.TokenClasses
                 NotImplementedMethod();
                 return null;
             }
+        }
+        internal Syntax GetBracketKernel(SourcePart token)
+        {
+            Tracer.Assert(token.Id == "");
+            Tracer.Assert(this != null);
+
+            Tracer.Assert(Left != null);
+            Tracer.Assert(TokenClass is RightParenthesis);
+            Tracer.Assert(Right == null);
+
+            Tracer.Assert(Left.Left == null);
+            Tracer.Assert(Left.TokenClass is LeftParenthesis);
+
+            var syntax = Left.Right;
+            return syntax;
         }
     }
 

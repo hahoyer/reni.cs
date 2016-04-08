@@ -7,8 +7,8 @@ using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
-    sealed class Checked<T> : DumpableObject, ISyntaxProvider
-        where T : OldSyntax
+    sealed class Checked<T> : DumpableObject
+        where T: class
     {
         public Checked(T value, params Issue[] issues)
         {
@@ -30,15 +30,11 @@ namespace Reni.TokenClasses
             }
         }
 
-        IEnumerable<Issue> ISyntaxProvider.Issues => Issues;
-
-        OldSyntax ISyntaxProvider.Value => Value;
-
         public static implicit operator Checked<T>(T value)
             => new Checked<T>(value);
 
         public static Checked<T> From<TIn>(Checked<TIn> x)
-            where TIn : T
+            where TIn : class, T
             => new Checked<T>(x.Value, x.Issues);
 
         internal Checked<T> With(IEnumerable<Issue> issues) => new Checked<T>(Value, Issues.plus(issues));

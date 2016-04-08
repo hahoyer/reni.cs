@@ -35,6 +35,7 @@ namespace Reni.Validation
         public static IEnumerable<IssueId> All => AllInstances<IssueId>();
 
         internal Issue CreateIssue(SourcePart token) => new Issue(this, token, "");
+
         internal Checked<OldSyntax> Syntax(SourcePart token)
             => new Checked<OldSyntax>(new EmptyList(token), new Issue(this, token, ""));
 

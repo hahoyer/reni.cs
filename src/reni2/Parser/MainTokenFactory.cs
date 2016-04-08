@@ -146,17 +146,13 @@ namespace Reni.Parser
 
         public override string Id => "<error>";
 
-        Checked<Value> ITokenClass.GetValue(Syntax left, IToken token, Syntax right)
+        Checked<Value> ITokenClass.GetValue(Syntax left, SourcePart token, Syntax right)
         {
             NotImplementedMethod(left,token,right);
             return null;
         }
 
         Syntax IType<Syntax>.Create(Syntax left, IToken token, Syntax right)
-            => Syntax.CreateSourceSyntax(left, this, token, right, GetResult);
-
-        Checked<OldSyntax> GetResult(OldSyntax left, IToken token, OldSyntax right)
-            => new Checked<OldSyntax>
-                (ListSyntax.Create(left, right), _issue.CreateIssue(token.Characters));
+            => Syntax.CreateSourceSyntax(left, this, token, right);
     }
 }

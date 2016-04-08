@@ -30,6 +30,7 @@ namespace Reni.TokenClasses
 
         protected override Checked<Value> Infix(Value left, SourcePart token, Value right) => null;
         protected override Checked<Value> Prefix(SourcePart token, Value right) => null;
+        protected override Checked<Value> Prefix(SourcePart token, TokenClasses.Syntax right) => null;
         protected override Checked<Value> Suffix(Value left, SourcePart token) => null;
         protected override Checked<Value> Terminal(SourcePart token) => null;
 

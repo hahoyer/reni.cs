@@ -23,9 +23,9 @@ namespace Reni.ParserTest
         {
             var issueArray = issues.ToArray();
             var i = 0;
-            Tracer.Assert(issueArray[i].IssueId == IssueId.MissingDeclarationTag, issueArray[i].Dump);
-            i++;
             Tracer.Assert(issueArray[i].IssueId == IssueId.InvalidExpression, issueArray[i].Dump);
+            i++;
+            Tracer.Assert(issueArray[i].IssueId == IssueId.MissingDeclarationTag, issueArray[i].Dump);
             i++;
             Tracer.Assert(i == issueArray.Length);
         }

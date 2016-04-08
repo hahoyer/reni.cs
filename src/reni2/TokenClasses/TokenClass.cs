@@ -51,16 +51,21 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal virtual bool IsVisible => true;
 
-        Checked<Value> ITokenClass.GetValue(Syntax left, IToken token, Syntax right)
+        Checked<Value> ITokenClass.GetValue(Syntax left, SourcePart token, Syntax right)
         {
             var leftValue = left?.Value;
             var rightValue = right?.Value;
             if((left == null || leftValue != null) && (right == null || rightValue != null))
-                return CheckedInfix(leftValue?.Value, token.Characters, rightValue?.Value)?
+                return CheckedInfix(leftValue?.Value, token, rightValue?.Value)?
                     .With(rightValue?.Issues.plus(leftValue?.Issues));
 
             if(left == null)
+            {
+                Tracer.Assert(right != null);
+                Tracer.Assert(rightValue == null);
+
                 return Prefix(token, right);
+            }
 
             if (right == null)
                 return Suffix(left, token);
@@ -70,13 +75,13 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        Checked<Value> Suffix(Syntax left, IToken token)
+        protected virtual Checked<Value> Suffix(Syntax left, SourcePart token)
         {
             NotImplementedMethod(left, token);
             return null;
         }
 
-        Checked<Value> Prefix(IToken token, Syntax right)
+        protected virtual Checked<Value> Prefix(SourcePart  token, Syntax right)
         {
             NotImplementedMethod(token, right);
             return null;

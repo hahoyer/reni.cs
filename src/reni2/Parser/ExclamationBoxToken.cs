@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
+using hw.Scanner;
 using Reni.TokenClasses;
 
 namespace Reni.Parser
@@ -16,7 +17,7 @@ namespace Reni.Parser
         Syntax IType<Syntax>.Create(Syntax left, IToken token, Syntax right)
         {
             Tracer.Assert(right == null);
-            return Syntax.CreateSourceSyntax(left, this, token, Value, GetResult);
+            return Syntax.CreateSourceSyntax(left, this, token, Value);
         }
 
         static Checked<ExclamationSyntaxList> GetResult(OldSyntax left, IToken token, OldSyntax right)
@@ -33,7 +34,24 @@ namespace Reni.Parser
         string IType<Syntax>.PrioTableId => PrioTable.Any;
         string ITokenClass.Id => "!";
 
-        Checked<Value> ITokenClass.GetValue
-            (Syntax left, IToken token, Syntax right) => null;
+        Checked<Value> ITokenClass.GetValue(Syntax left, SourcePart token, Syntax right)
+        {
+            if(left == null && right != null)
+            {
+                var exclamationProvider = right.TokenClass as IExclamationTagProvider;
+                if(exclamationProvider != null)
+                {
+                    var result = exclamationProvider.GetTags(right.Left, right.Token.Characters, right.Right);
+                    return result.Value.ToCompiledSyntax.With(result.Issues);
+                }
+            }
+            NotImplementedMethod(left, token, right);
+            return null;
+        }
+    }
+
+    interface IExclamationTagProvider
+    {
+        Checked<ExclamationSyntaxList> GetTags(Syntax left, SourcePart token, Syntax right);
     }
 }
