@@ -56,14 +56,15 @@ namespace Reni.TokenClasses
             var leftValue = left?.Value;
             var rightValue = right?.Value;
             if((left == null || leftValue != null) && (right == null || rightValue != null))
-                return CheckedInfix(leftValue?.Value, token, rightValue?.Value)?
-                    .With(rightValue?.Issues.plus(leftValue?.Issues));
+            {
+                var result = CheckedInfix(leftValue?.Value, token, rightValue?.Value);
+                if(result != null)
+                return result.With(rightValue?.Issues.plus(leftValue?.Issues));
+            }
 
             if(left == null)
             {
-                Tracer.Assert(right != null);
                 Tracer.Assert(rightValue == null);
-
                 return Prefix(token, right);
             }
 

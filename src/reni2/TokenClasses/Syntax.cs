@@ -260,7 +260,6 @@ namespace Reni.TokenClasses
         internal Syntax GetBracketKernel(SourcePart token)
         {
             Tracer.Assert(token.Id == "");
-            Tracer.Assert(this != null);
 
             Tracer.Assert(Left != null);
             Tracer.Assert(TokenClass is RightParenthesis);
