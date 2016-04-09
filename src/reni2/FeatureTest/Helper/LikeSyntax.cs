@@ -38,13 +38,16 @@ namespace Reni.FeatureTest.Helper
 
         public static LikeSyntax Symbol(string s) => new Expression(null, s, null);
 
-        public void AssertLike(Value syntax) => NotImplementedMethod(syntax);
+        public abstract void AssertLike(Value syntax);
     }
 
     sealed class Empty : LikeSyntax
     {
         public override void AssertLike(Syntax syntax)
             => Tracer.Assert(syntax.Value.Value is EmptyList);
+
+        public override void AssertLike(Value syntax)
+            => Tracer.Assert(syntax is EmptyList);
     }
 
     sealed class Declaration
@@ -80,19 +83,21 @@ namespace Reni.FeatureTest.Helper
             _converters = converters;
         }
 
-        public override void AssertLike(Syntax syntax)
+        public override void AssertLike(Syntax syntax) => AssertLike(syntax.Value.Value);
+
+        public override void AssertLike(Value syntax)
         {
-            var co = (CompoundSyntax) syntax.Value.Value;
+            var co = (CompoundSyntax) syntax;
             Tracer.Assert(_list.Length == co.Statements.Length);
-            for(var i = 0; i < _list.Length; i++)
+            for (var i = 0; i < _list.Length; i++)
                 _list[i].AssertLike(co.Statements[i]);
 
             Tracer.Assert(_declarations.Length == co.Names.Length);
-            foreach(var declaration in _declarations)
+            foreach (var declaration in _declarations)
                 declaration.AssertContains(co);
 
             Tracer.Assert(_converters.Length == co.ConverterStatementPositions.Length);
-            for(var i = 0; i < _converters.Length; i++)
+            for (var i = 0; i < _converters.Length; i++)
                 Tracer.Assert(_converters[i] == co.ConverterStatementPositions[i]);
         }
     }
@@ -110,20 +115,30 @@ namespace Reni.FeatureTest.Helper
             _s3 = s3;
         }
 
-        public override void AssertLike(Syntax syntax)
+        public override void AssertLike(Syntax syntax) => AssertLike(syntax.Value.Value);
+
+        public override void AssertLike(Value syntax)
         {
-            var ex = (ExpressionSyntax) syntax.Value.Value;
-            AssertLike(_s1, syntax.Left);
+            var ex = (ExpressionSyntax)syntax;
+            AssertLike(_s1, ex.Left);
             Tracer.Assert(ex.Definable?.Id == _s2);
-            AssertLike(_s3, syntax.Right);
+            AssertLike(_s3, ex.Right);
         }
 
-        static void AssertLike(LikeSyntax s3, Syntax right)
+        static void AssertLike(LikeSyntax syntax, Value right)
         {
-            if(s3 == null)
+            if(syntax == null)
                 Tracer.Assert(right == null);
             else
-                s3.AssertLike(right);
+                syntax.AssertLike(right);
+        }
+
+        static void AssertLike(LikeSyntax syntax, Syntax right)
+        {
+            if(syntax == null)
+                Tracer.Assert(right == null);
+            else
+                syntax.AssertLike(right);
         }
     }
 
@@ -136,6 +151,12 @@ namespace Reni.FeatureTest.Helper
         public override void AssertLike(Syntax syntax)
         {
             var terminalSyntax = (TerminalSyntax) syntax.Value.Value;
+            Tracer.Assert(terminalSyntax.Terminal is TokenClasses.Number);
+            Tracer.Assert(terminalSyntax.ToNumber == _i);
+        }
+        public override void AssertLike(Value syntax)
+        {
+            var terminalSyntax = (TerminalSyntax)syntax;
             Tracer.Assert(terminalSyntax.Terminal is TokenClasses.Number);
             Tracer.Assert(terminalSyntax.ToNumber == _i);
         }
