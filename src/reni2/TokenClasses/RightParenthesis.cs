@@ -15,10 +15,10 @@ namespace Reni.TokenClasses
     [Variant(1)]
     [Variant(2)]
     [Variant(3)]
-    sealed class RightParenthesis
-        : TokenClass
-            , IBelongingsMatcher
-            , IBracketMatch<Syntax>
+    sealed class RightParenthesis : TokenClass,
+        IBelongingsMatcher,
+        IBracketMatch<Syntax>,
+        IExclamationTagProvider
     {
         internal sealed class Matched : DumpableObject, IType<Syntax>
         {
@@ -50,9 +50,13 @@ namespace Reni.TokenClasses
 
         protected override Checked<Value> Suffix(Syntax left, SourcePart token)
         {
-            var syntax = left.GetBracketKernel()?.Value;
-            if(syntax != null)
-                return syntax;
+            var syntax = left.GetBracketKernel();
+            if(syntax == null)
+                return new EmptyList(token);
+
+            var value = syntax.Value;
+            if (value != null)
+                return value;
 
             NotImplementedMethod(left, token);
             return null;
