@@ -19,6 +19,7 @@ namespace Reni.TokenClasses
 
         protected sealed override Checked<OldSyntax> OldSuffix(OldSyntax left, SourcePart token)
             => IssueId.UnexpectedUseAsSuffix.Syntax(token, left);
+
     }
 
     abstract class NonPrefixToken : TokenClass
@@ -90,6 +91,14 @@ namespace Reni.TokenClasses
         {
             NotImplementedMethod(visitor);
             return null;
+        }
+
+        protected override Checked<Value> Infix(Value left, SourcePart token, Value right)
+        {
+            if(left == null && right == null)
+                return new TerminalSyntax(token, this);
+
+            return base.Infix(left, token, right);
         }
     }
 

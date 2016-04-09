@@ -20,20 +20,25 @@ namespace Reni.TokenClasses
         IBracketMatch<Syntax>,
         IExclamationTagProvider
     {
-        internal sealed class Matched : DumpableObject, IType<Syntax>
+        internal sealed class Matched : DumpableObject, IType<Syntax>, ITokenClass
         {
             static string Id => "()";
 
-            Syntax IType<Syntax>.Create(Syntax left, IToken token, Syntax right)
+            Checked<Value> ITokenClass.GetValue(Syntax left, SourcePart token, Syntax right)
             {
-                if(right == null)
-                    return left;
-
-                NotImplementedMethod(left, token, right);
-                return null;
+                Tracer.Assert(left != null);
+                Tracer.Assert(right != null);
+                var leftValue = left.Value;
+                var rightValue = right.Value;
+                return ExpressionSyntax.Create(leftValue.Value, null, rightValue.Value, token)
+                    .With(rightValue.Issues.plus(leftValue.Issues));
             }
 
+            Syntax IType<Syntax>.Create(Syntax left, IToken token, Syntax right)
+                => right == null ? left : Syntax.CreateSourceSyntax(left, this, token, right);
+
             string IType<Syntax>.PrioTableId => Id;
+            string ITokenClass.Id => Id;
         }
 
         public static string TokenId(int level)
@@ -55,7 +60,7 @@ namespace Reni.TokenClasses
                 return new EmptyList(token);
 
             var value = syntax.Value;
-            if (value != null)
+            if(value != null)
                 return value;
 
             NotImplementedMethod(left, token);
