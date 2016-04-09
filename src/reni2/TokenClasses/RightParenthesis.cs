@@ -20,31 +20,24 @@ namespace Reni.TokenClasses
             , IBelongingsMatcher
             , IBracketMatch<Syntax>
     {
-        internal sealed class Matched : TokenClass, IExclamationTagProvider
+        internal sealed class Matched : DumpableObject, IType<Syntax>
         {
-            [DisableDump]
-            internal override bool IsVisible => false;
-            protected override Checked<Value> Suffix(Syntax left, SourcePart token)
-                => left.GetBracketKernel(token).Value;
+            static string Id => "()";
 
-            [DisableDump]
-            public override string Id => "()";
-
-            Checked<ExclamationSyntaxList> IExclamationTagProvider.GetTags(Syntax left, SourcePart token, Syntax right)
+            Syntax IType<Syntax>.Create(Syntax left, IToken token, Syntax right)
             {
-                var syntax = left.GetBracketKernel(token);
-                if(syntax == null)
-                    return new Checked<ExclamationSyntaxList>(
-                        ExclamationSyntaxList.Create(token),
-                        IssueId.MissingDeclarationTag.CreateIssue(token));
+                if(right == null)
+                    return left;
 
-                NotImplementedMethod(left, token, right, nameof(syntax), syntax);
+                NotImplementedMethod(left, token, right);
                 return null;
             }
+
+            string IType<Syntax>.PrioTableId => Id;
         }
 
         public static string TokenId(int level)
-            => level == 0 ? PrioTable.EndOfText : "}])".Substring(level-1, 1);
+            => level == 0 ? PrioTable.EndOfText : "}])".Substring(level - 1, 1);
 
         public RightParenthesis(int level) { Level = level; }
 
@@ -54,11 +47,34 @@ namespace Reni.TokenClasses
         public override string Id => TokenId(Level);
         [DisableDump]
         internal override bool IsVisible => Level != 0;
-        protected override Checked<Value> Suffix(Syntax left, SourcePart token) => null;
+
+        protected override Checked<Value> Suffix(Syntax left, SourcePart token)
+        {
+            var syntax = left.GetBracketKernel()?.Value;
+            if(syntax != null)
+                return syntax;
+
+            NotImplementedMethod(left, token);
+            return null;
+        }
 
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => (otherMatcher as LeftParenthesis)?.Level == Level;
 
         IType<Syntax> IBracketMatch<Syntax>.Value { get; } = new Matched();
+
+        Checked<ExclamationSyntaxList> IExclamationTagProvider.GetTags
+            (Syntax left, SourcePart token, Syntax right)
+        {
+            var syntax = left.GetBracketKernel(right);
+            if(syntax == null)
+                return new Checked<ExclamationSyntaxList>
+                    (
+                    ExclamationSyntaxList.Create(token),
+                    IssueId.MissingDeclarationTag.CreateIssue(token));
+
+            NotImplementedMethod(left, token, right, nameof(syntax), syntax);
+            return null;
+        }
     }
 }

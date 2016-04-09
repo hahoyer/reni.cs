@@ -257,19 +257,13 @@ namespace Reni.TokenClasses
                 return null;
             }
         }
-        internal Syntax GetBracketKernel(SourcePart token)
+
+        internal Syntax GetBracketKernel(Syntax right = null)
         {
-            Tracer.Assert(token.Id == "");
-
-            Tracer.Assert(Left != null);
-            Tracer.Assert(TokenClass is RightParenthesis);
-            Tracer.Assert(Right == null);
-
-            Tracer.Assert(Left.Left == null);
-            Tracer.Assert(Left.TokenClass is LeftParenthesis);
-
-            var syntax = Left.Right;
-            return syntax;
+            Tracer.Assert(right == null);
+            Tracer.Assert(Left == null);
+            Tracer.Assert(TokenClass is LeftParenthesis);
+            return Right;
         }
     }
 

@@ -63,10 +63,7 @@ namespace Reni.TokenClasses
             }
 
             if(left == null)
-            {
-                Tracer.Assert(rightValue == null);
                 return Prefix(token, right);
-            }
 
             if (right == null)
                 return Suffix(left, token);
