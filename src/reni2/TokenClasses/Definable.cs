@@ -41,6 +41,9 @@ namespace Reni.TokenClasses
         {
             if(right == null)
             {
+                if(left == null)
+                    return new Declarator(null, this);
+
                 var d = left.Declarator;
                 if(d != null)
                     return d.Target.WithName(this);

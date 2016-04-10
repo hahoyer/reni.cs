@@ -45,7 +45,5 @@ namespace Reni.Validation
         internal Result<Value> Syntax(SourcePart token, Value value)
             => new Result<Value>(value, new Issue(this, token, ""));
 
-        internal Result<OldSyntax> Syntax(SourcePart token, OldSyntax value1, OldSyntax value2)
-            => new Result<OldSyntax>(ListSyntax.Create(value1, value2), new Issue(this, token, ""));
     }
 }

@@ -42,7 +42,7 @@ namespace Reni.Parser
     sealed class PrefixSyntax : SpecialSyntax
     {
         public static Result<OldSyntax> Create(IPrefix prefix, Result<Value> right)
-            => new PrefixSyntax(prefix, right.Target).Issues(right.Issues);
+            => Extension.Issues<OldSyntax>(new PrefixSyntax(prefix, right.Target), right.Issues);
 
         [Node]
         [EnableDump]
@@ -73,8 +73,7 @@ namespace Reni.Parser
             IInfix infix,
             SourcePart token,
             Result<Value> right)
-            => new InfixSyntax(left.Target, infix, token, right.Target)
-                .Issues(left.Issues.plus(right.Issues));
+            => Extension.Issues<OldSyntax>(new InfixSyntax(left.Target, infix, token, right.Target), left.Issues.plus(right.Issues));
 
         [Node]
         [EnableDump]
@@ -137,7 +136,7 @@ namespace Reni.Parser
     {
         public static Result<OldSyntax> Create
             (Result<Value> left, ISuffix suffix, SourcePart token)
-            => new SuffixSyntax(left.Target, suffix, token).Issues(left.Issues);
+            => Extension.Issues<OldSyntax>(new SuffixSyntax(left.Target, suffix, token), left.Issues);
 
         [Node]
         [EnableDump]

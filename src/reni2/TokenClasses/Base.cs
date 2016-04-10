@@ -14,9 +14,6 @@ namespace Reni.TokenClasses
         protected sealed override Result<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
             => IssueId.UnexpectedUseAsPrefix.Syntax(token, right);
 
-        protected sealed override Result<OldSyntax> OldInfix(OldSyntax left, SourcePart token, OldSyntax right)
-            => IssueId.UnexpectedUseAsInfix.Syntax(token, left, right);
-
         protected sealed override Result<OldSyntax> OldSuffix(OldSyntax left, SourcePart token)
             => IssueId.UnexpectedUseAsSuffix.Syntax(token, left);
 
@@ -26,9 +23,6 @@ namespace Reni.TokenClasses
     {
         protected sealed override Result<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
             => IssueId.UnexpectedUseAsPrefix.Syntax(token, right);
-
-        protected sealed override Result<OldSyntax> OldInfix(OldSyntax left, SourcePart token, OldSyntax right)
-            => IssueId.UnexpectedUseAsInfix.Syntax(token, left, right);
     }
 
     abstract class InfixPrefixToken : TokenClass
@@ -42,9 +36,6 @@ namespace Reni.TokenClasses
 
     abstract class NonSuffixToken : TokenClass
     {
-        protected sealed override Result<OldSyntax> OldInfix(OldSyntax left, SourcePart token, OldSyntax right)
-            => IssueId.UnexpectedUseAsInfix.Syntax(token, left, right);
-
         protected sealed override Result<OldSyntax> OldSuffix(OldSyntax left, SourcePart token)
             => IssueId.UnexpectedUseAsSuffix.Syntax(token, left);
     }
@@ -53,9 +44,6 @@ namespace Reni.TokenClasses
     {
         protected sealed override Result<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
             => IssueId.UnexpectedUseAsPrefix.Syntax(token, right);
-
-        protected sealed override Result<OldSyntax> OldInfix(OldSyntax left, SourcePart token, OldSyntax right)
-            => IssueId.UnexpectedUseAsInfix.Syntax(token, left, right);
 
         protected sealed override Result<OldSyntax> OldTerminal(SourcePart token)
             => IssueId.UnexpectedUseAsTerminal.Syntax(token);

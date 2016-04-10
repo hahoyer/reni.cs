@@ -20,7 +20,7 @@ namespace Reni.Parser
         internal Issue[] Issues { get; }
 
         [DisableDump]
-        internal TTarget SaveValue
+        internal TTarget SaveTarget
         {
             get
             {

@@ -263,7 +263,8 @@ namespace Reni.TokenClasses
             {
                 var colon = TokenClass as Colon;
                 if(colon != null)
-                    return Left.GetStatements(Token.Characters, Right);
+                    return Left.GetStatementsFromColon(Token.Characters, Right);
+
                 NotImplementedMethod();
                 return null;
             }
@@ -274,16 +275,6 @@ namespace Reni.TokenClasses
             => Left?.Issues
                 .plus(Value?.Issues)
                 .plus(Right?.Issues);
-
-        [DisableDump]
-        internal Result<CompoundSyntax> ToCompound
-        {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
-        }
 
         internal Syntax GetBracketKernel(Syntax right = null)
         {
@@ -304,8 +295,7 @@ namespace Reni.TokenClasses
                 declaration.Issues.plus(body.Issues).plus(item.Issues));
         }
 
-        internal Result<Statement[]> GetStatements
-            (SourcePart token, Syntax right)
+        internal Result<Statement[]> GetStatementsFromColon(SourcePart token, Syntax right)
         {
             var statement = GetStatement(token, right);
             return new Result<Statement[]>(new[] {statement.Target}, statement.Issues);

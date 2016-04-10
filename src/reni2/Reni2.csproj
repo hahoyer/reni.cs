@@ -202,7 +202,7 @@
     <Compile Include="Parser\ExclamationBoxToken.cs" />
     <Compile Include="Parser\Lexer.cs" />
     <Compile Include="Parser\TokenFactory.cs" />
-    <Compile Include="Parser\ListSyntax.cs" />
+    <Compile Include="Parser\Statements.cs" />
     <Compile Include="ResultCache.cs" />
     <Compile Include="Code\Arg.cs" />
     <Compile Include="Code\Assign.cs" />

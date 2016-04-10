@@ -58,17 +58,7 @@ namespace Reni.Parser
         }
 
         internal Result<OldSyntax> CreateElseSyntax(Result<Value> right)
-            => CreateElseSyntax(right.Target).Issues(right.Issues);
-
-        internal virtual Result<OldSyntax> CreateDeclarationSyntax(SourcePart token, OldSyntax right)
-            => IssueId.IdentifierExpected.Syntax(token, this, right);
-
-        internal Result<OldSyntax> CreateDeclarationSyntax
-            (SourcePart token, EmptyList right, Issue issue)
-        {
-            var result = CreateDeclarationSyntax(token, right);
-            return result.Target.Issues(issue.plus(result.Issues));
-        }
+            => Extension.Issues(CreateElseSyntax(right.Target), right.Issues);
 
         protected sealed override string Dump(bool isRecursion)
         {
@@ -95,8 +85,6 @@ namespace Reni.Parser
 
         internal virtual IEnumerable<OldSyntax> ToList(List type) { yield return this; }
         [DisableDump]
-        internal virtual Result<CompoundSyntax> ToCompound => ToListSyntax.ToCompound;
-        [DisableDump]
         internal virtual bool IsMutableSyntax => false;
         [DisableDump]
         internal virtual bool IsConverterSyntax => false;
@@ -112,8 +100,6 @@ namespace Reni.Parser
 
         [DisableDump]
         protected virtual IEnumerable<OldSyntax> DirectChildren { get { yield break; } }
-
-        internal ListSyntax ToListSyntax => new ListSyntax(null, ToList(null));
 
         [DisableDump]
         public IEnumerable<OldSyntax> Closure
@@ -131,8 +117,6 @@ namespace Reni.Parser
 
             }
         }
-
-        internal Result<OldSyntax> Issues(params Issue[] issues) => new Result<OldSyntax>(this, issues);
 
         internal virtual IEnumerable<OldSyntax> GetMixinsFromBody()
         {
@@ -160,15 +144,6 @@ namespace Reni.Parser
             return null;
         }
 
-        internal Result<OldSyntax> Cleanup(SourcePart token, OldSyntax rawCleanupSection)
-        {
-            var currentCompound = ToCompound;
-            var cleanupSection = rawCleanupSection.ToCompiledSyntax;
-            var result = currentCompound
-                .SaveValue
-                .AddCleanupSection(token, cleanupSection.SaveValue);
-            return new Result<OldSyntax>(result, currentCompound.Issues.plus(cleanupSection.Issues));
-        }
     }
 
     abstract class NonCompileSyntax : OldSyntax

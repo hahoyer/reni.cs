@@ -18,8 +18,18 @@ namespace Reni.Struct
     /// </summary>
     sealed class CompoundSyntax : Value
     {
-        internal static Result<CompoundSyntax> Create(Statement item)
-            => new CompoundSyntax(new[] {item});
+        internal static Result<Value> Create(Result<Statement> item)
+            => new Result<Value>(new CompoundSyntax(new[] {item.Target}), item.Issues);
+
+        internal static Result<Value> Create(Result<Statement[]> item)
+            => new Result<Value>(new CompoundSyntax(item.Target), item.Issues);
+
+        internal static Result<Value> Create(Result<Statement[]> left, Result<Statement[]> right)
+            => new Result<Value>
+                (
+                new CompoundSyntax(left?.Target.plus(right?.Target)),
+                left?.Issues.plus(right?.Issues)
+                );
 
         readonly Statement[] _statements;
         readonly Data[] _data;
@@ -29,10 +39,7 @@ namespace Reni.Struct
         static bool _isInsideFileDump;
         static int _nextObjectId;
 
-        internal CompoundSyntax(Statement[] statements)
-            : this(statements, null) { }
-
-        CompoundSyntax(Statement[] statements, Value cleanupSection)
+        CompoundSyntax(Statement[] statements, Value cleanupSection = null)
             : base(_nextObjectId++)
         {
             _statements = statements;
@@ -120,8 +127,6 @@ namespace Reni.Struct
 
         protected override string GetNodeDump()
             => GetType().PrettyName() + "(" + GetCompoundIdentificationDump() + ")";
-
-        internal override Result<CompoundSyntax> ToCompound => this;
 
         internal bool IsMutable(int position) => _data[position].IsMutable;
 

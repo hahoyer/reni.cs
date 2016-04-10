@@ -175,15 +175,9 @@ namespace Reni.Context
 
         internal Container MainContainer(Syntax syntax, string description)
         {
-            var compoundSyntax = syntax
-                .ToCompound
-                .SaveValue;
+            var compoundSyntax = syntax.Value;
 
-            if (false && Debugger.IsAttached)
-                foreach(var ext in Result(Category.Exts, compoundSyntax).Exts.Data)
-                    AnalyseUnresolvedReference(compoundSyntax, ext);
-
-            var rawResult = compoundSyntax.Result(this);
+            var rawResult = compoundSyntax.Target.Result(this);
             return rawResult
                 .Code
                 .LocalBlock(rawResult.Type.Copier(Category.Code).Code )

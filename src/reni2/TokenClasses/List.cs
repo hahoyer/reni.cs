@@ -27,10 +27,7 @@ namespace Reni.TokenClasses
         {
             var leftResult = left?.Statements;
             var rightResult = right?.Statements;
-            return new Result<Value>(
-                new CompoundSyntax(leftResult?.Target.plus(rightResult?.Target)),
-                leftResult?.Issues.plus(rightResult?.Issues)
-                );
+            return CompoundSyntax.Create(leftResult, rightResult);
         }
 
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)

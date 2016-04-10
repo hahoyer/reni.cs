@@ -5,6 +5,7 @@ using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
 using JetBrains.Annotations;
+using Reni.Validation;
 
 namespace Reni.Parser
 {
@@ -61,6 +62,7 @@ namespace Reni.Parser
                 {
                     foreach(var item in buffer)
                         yield return item;
+
                     buffer = new List<WhiteSpaceToken>();
                     yield return whiteSpace;
                 }
@@ -96,6 +98,7 @@ namespace Reni.Parser
             for(var i = 0; i < data.Length; i++)
                 if(data[i].Characters.Id.Contains("\n"))
                     result = i + 1;
+
             return result;
         }
 
@@ -146,6 +149,7 @@ namespace Reni.Parser
                     return "_" + @char;
                 if(char.IsDigit(@char))
                     return @char.ToString();
+
                 throw new NotImplementedException("Symbolize(" + @char + ")");
             }
         }
@@ -156,5 +160,9 @@ namespace Reni.Parser
 
         internal static int? Apply(this IMatch pattern, string target)
             => (new Source(target) + 0).Match(pattern);
+
+        internal static Result<TTarget> Issues<TTarget>(this TTarget target, params Issue[] issues)
+            where TTarget : class 
+            => new Result<TTarget>(target, issues);
     }
 }

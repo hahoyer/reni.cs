@@ -1,9 +1,8 @@
-using System.Linq;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using hw.Parser;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -15,14 +14,9 @@ namespace Reni.TokenClasses
 {
     sealed class FunctionSyntax : SpecialSyntax
     {
-        public static Result<OldSyntax> Create
-            (
-            Result<Parser.Value> setter,
-            bool isImplicit,
-            bool isMetaFunction,
-            Result<Parser.Value> getter)
-            => new FunctionSyntax(setter?.Target, isImplicit, isMetaFunction, getter.Target)
-                .Issues(setter?.Issues.plus(getter.Issues));
+        public static Parser.Value
+            Create(Parser.Value setter, bool isImplicit, bool isMetaFunction, Parser.Value getter) 
+            => new FunctionSyntax(setter, isImplicit, isMetaFunction, getter);
 
         internal Parser.Value Getter { get; }
 
@@ -88,6 +82,7 @@ namespace Reni.TokenClasses
         {
             if(!IsMetaFunction)
                 return null;
+
             NotImplementedMethod(compoundView);
             return null;
         }
@@ -96,6 +91,7 @@ namespace Reni.TokenClasses
         {
             if(IsMetaFunction)
                 return null;
+
             return new FunctionBodyType(compoundView, this);
         }
 
