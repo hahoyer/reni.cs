@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.DebugFormatter;
 using hw.Parser;
 using hw.Scanner;
 using Reni.Parser;
+using Reni.Struct;
 using Reni.Validation;
 
 namespace Reni.TokenClasses
@@ -16,106 +16,67 @@ namespace Reni.TokenClasses
         public override string Id => TokenId;
 
         protected override Checked<OldSyntax> OldSuffix(OldSyntax left, SourcePart token)
-            =>
-                left.CreateDeclarationSyntax
-                    (
-                        token,
-                        new EmptyList(token),
-                        IssueId.MissingValueInDeclaration.CreateIssue(token)
-                    );
+            => left.CreateDeclarationSyntax
+                (
+                    token,
+                    new EmptyList(token),
+                    IssueId.MissingValueInDeclaration.CreateIssue(token)
+                );
 
         protected override Checked<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
             => IssueId.UnexpectedUseAsPrefix.Syntax(token);
 
-        protected override Checked<OldSyntax> OldInfix(OldSyntax left, SourcePart token, OldSyntax right)
+        protected override Checked<OldSyntax> OldInfix
+            (OldSyntax left, SourcePart token, OldSyntax right)
             => left.CreateDeclarationSyntax(token, right);
 
-        protected override Checked<OldSyntax> OldTerminal(SourcePart token)
-            => new DeclarationSyntax(new EmptyList(token), null)
-                .Issues(IssueId.MissingValueInDeclaration.CreateIssue(token));
+        protected override Checked<Value> Infix(Syntax left, SourcePart token, Value right)
+        {
+            var declaration = left.Declarator;
+            var item = declaration.Value.Statement(token, right);
+            var result = CompoundSyntax.Create(item.Value);
+            return new Checked<Value>
+                (result.Value, declaration.Issues.plus(item.Issues).plus(result.Issues));
+        }
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class Exclamation : ScannerTokenClass, ISubParser<Syntax> , IType<Syntax>
+    sealed class Exclamation : ScannerTokenClass, ISubParser<Syntax>, IType<Syntax>
     {
         public const string TokenId = "!";
 
-        readonly ISubParser<TokenClasses.Syntax> Parser;
+        readonly ISubParser<Syntax> Parser;
 
-        public Exclamation(ISubParser<TokenClasses.Syntax> parser) { Parser = parser; }
+        public Exclamation(ISubParser<Syntax> parser) { Parser = parser; }
 
-        IType<TokenClasses.Syntax> ISubParser<TokenClasses.Syntax>.Execute
-            (SourcePosn sourcePosn, Stack<OpenItem<TokenClasses.Syntax>> stack)
+        IType<Syntax> ISubParser<Syntax>.Execute
+            (SourcePosn sourcePosn, Stack<OpenItem<Syntax>> stack)
             => Parser.Execute(sourcePosn, stack);
 
         public override string Id => TokenId;
 
-        internal sealed class Syntax : Parser.OldSyntax
-        {
-            [EnableDump]
-            internal DeclarationTagToken.Syntax Tag { get; }
-            internal override SourcePart Token { get; }
-
-            public Syntax(DeclarationTagToken.Syntax tag, SourcePart token)
-            {
-                Tag = tag;
-                Token = token;
-            }
-
-            [DisableDump]
-            internal override Checked<Value> ToCompiledSyntax
-            {
-                get
-                {
-                    var result = IssueId.UnexpectedDeclarationTag.Syntax(Token, Tag);
-                    var value = result.Value.ToCompiledSyntax;
-                    return new Checked<Value>(value.Value, result.Issues.plus(value.Issues));
-                }
-            }
-        }
-
-        TokenClasses.Syntax IType<TokenClasses.Syntax>.Create(TokenClasses.Syntax left, IToken token, TokenClasses.Syntax right)
+        Syntax IType<Syntax>.Create
+            (Syntax left, IToken token, Syntax right)
         {
             NotImplementedMethod(left, token, right);
             return null;
-
         }
 
-        string IType<TokenClasses.Syntax>.PrioTableId => TokenId;
+        string IType<Syntax>.PrioTableId => TokenId;
     }
 
 
     [BelongsTo(typeof(DeclarationTokenFactory))]
-    abstract class DeclarationTagToken : TerminalToken
+    abstract class DeclarationTagToken : TerminalToken, IDeclaratorTagProvider, IDeclarationTag
     {
-        protected override Checked<Parser.OldSyntax> OldTerminal(SourcePart token)
-            => new Syntax(this);
-
-        [DisableDump]
-        internal virtual bool DeclaresMutable => false;
-        [DisableDump]
-        internal virtual bool DeclaresConverter => false;
-        [DisableDump]
-        internal virtual bool DeclaresMixIn => false;
-
-        internal sealed class Syntax : Parser.OldSyntax
+        Checked<DeclaratorTags> IDeclaratorTagProvider.Get
+            (Syntax left, SourcePart token, Syntax right)
         {
-            internal readonly DeclarationTagToken Tag;
+            if(left == null && right == null)
+                return new DeclaratorTags(this, token);
 
-            internal Syntax(DeclarationTagToken tag) { Tag = tag; }
-
-            [DisableDump]
-            internal override Checked<Value> ToCompiledSyntax
-            {
-                get
-                {
-                    NotImplementedMethod();
-                    return null;
-                }
-            }
-
-            internal override Checked<ExclamationSyntaxList> ExclamationSyntax(SourcePart token)
-                => new ExclamationSyntaxList(new Exclamation.Syntax(this, token), token);
+            NotImplementedMethod(left, token, right);
+            return null;
         }
     }
 
@@ -123,23 +84,17 @@ namespace Reni.TokenClasses
     {
         const string TokenId = "converter";
         public override string Id => TokenId;
-        [DisableDump]
-        internal override bool DeclaresConverter => true;
     }
 
     sealed class MutableDeclarationToken : DeclarationTagToken
     {
         const string TokenId = "mutable";
         public override string Id => TokenId;
-        [DisableDump]
-        internal override bool DeclaresMutable => true;
     }
 
     sealed class MixInDeclarationToken : DeclarationTagToken
     {
         const string TokenId = "mix_in";
         public override string Id => TokenId;
-        [DisableDump]
-        internal override bool DeclaresMixIn => true;
     }
 }

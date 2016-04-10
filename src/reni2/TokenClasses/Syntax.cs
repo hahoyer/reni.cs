@@ -243,10 +243,24 @@ namespace Reni.TokenClasses
             => TokenClass.GetValue(Left, Token.Characters, Right);
 
         [DisableDump]
-        internal Issue[] Issues 
+        internal Checked<Declarator> Declarator
+        {
+            get
+            {
+                var declaratorTokenClass = TokenClass as IDeclaratorTokenClass;
+                if(declaratorTokenClass != null)
+                    return declaratorTokenClass.Get(Left, Token.Characters, Right);
+
+                NotImplementedMethod();
+                return null;
+            }
+        }
+
+        [DisableDump]
+        internal Issue[] Issues
             => Left?.Issues
-            .plus(Value?.Issues)
-            .plus(Right?.Issues);
+                .plus(Value?.Issues)
+                .plus(Right?.Issues);
 
         [DisableDump]
         internal Checked<CompoundSyntax> ToCompound

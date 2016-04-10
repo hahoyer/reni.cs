@@ -87,7 +87,7 @@ namespace Reni.TokenClasses
 
         Value ITerminal.Visit(ISyntaxVisitor visitor) => Visit(visitor);
 
-        internal virtual Value Visit(ISyntaxVisitor visitor)
+        protected Value Visit(ISyntaxVisitor visitor)
         {
             NotImplementedMethod(visitor);
             return null;

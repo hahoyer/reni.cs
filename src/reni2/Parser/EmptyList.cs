@@ -21,15 +21,15 @@ namespace Reni.Parser
 
         protected override string GetNodeDump() => "()";
 
-        internal override Checked<ExclamationSyntaxList> ExclamationSyntax(SourcePart token)
-            => new Checked<ExclamationSyntaxList>
+        internal override Checked<DeclaratorTags> ExclamationSyntax(SourcePart token)
+            => new Checked<DeclaratorTags>
                 (
-                new ExclamationSyntaxList(null, token),
+                new DeclaratorTags(null, token),
                 IssueId.MissingDeclarationTag.CreateIssue(Token));
 
 
-        internal override Checked<ExclamationSyntaxList> Combine(ExclamationSyntaxList syntax)
-            => new Checked<ExclamationSyntaxList>
+        internal override Checked<DeclaratorTags> Combine(DeclaratorTags syntax)
+            => new Checked<DeclaratorTags>
                 (syntax, IssueId.UnexpectedDeclarationTag.CreateIssue(Token));
 
         internal override Result ResultForCache(ContextBase context, Category category)

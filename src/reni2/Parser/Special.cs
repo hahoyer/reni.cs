@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
@@ -127,9 +126,9 @@ namespace Reni.Parser
             }
         }
 
-        internal override Checked<ExclamationSyntaxList> Combine
-            (ExclamationSyntaxList syntax)
-            => new Checked<ExclamationSyntaxList>
+        internal override Checked<DeclaratorTags> Combine
+            (DeclaratorTags syntax)
+            => new Checked<DeclaratorTags>
                 (syntax, IssueId.UnexpectedDeclarationTag.CreateIssue(Token));
     }
 
@@ -170,9 +169,9 @@ namespace Reni.Parser
         [DisableDump]
         protected override IEnumerable<OldSyntax> DirectChildren { get { yield return _left; } }
 
-        internal override Checked<ExclamationSyntaxList> Combine
-            (ExclamationSyntaxList syntax)
-            => new Checked<ExclamationSyntaxList>
+        internal override Checked<DeclaratorTags> Combine
+            (DeclaratorTags syntax)
+            => new Checked<DeclaratorTags>
                 (syntax, IssueId.UnexpectedDeclarationTag.CreateIssue(Token));
     }
 

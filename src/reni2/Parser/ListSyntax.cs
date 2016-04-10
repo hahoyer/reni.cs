@@ -34,10 +34,6 @@ namespace Reni.Parser
             }
         }
 
-        [DisableDump]
-        internal override Checked<CompoundSyntax> ToCompound
-            => new CompoundSyntax(Data);
-
         internal override IEnumerable<OldSyntax> ToList(List type)
         {
             if(Type == null || type == null || Type == type)

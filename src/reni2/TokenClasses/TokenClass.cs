@@ -59,16 +59,25 @@ namespace Reni.TokenClasses
             {
                 var result = CheckedInfix(leftValue?.Value, token, rightValue?.Value);
                 if(result != null)
-                return result.With(rightValue?.Issues.plus(leftValue?.Issues));
+                    return result.With(rightValue?.Issues.plus(leftValue?.Issues));
             }
 
             if(left == null)
                 return Prefix(token, right);
 
-            if (right == null)
+            if(right == null)
                 return Suffix(left, token);
 
+            if(leftValue == null && rightValue != null)
+                return Infix(left, token, rightValue.Value)
+                    .With(rightValue.Issues);
 
+            NotImplementedMethod(left, token, right);
+            return null;
+        }
+
+        protected virtual Checked<Value> Infix(Syntax left, SourcePart token, Value right)
+        {
             NotImplementedMethod(left, token, right);
             return null;
         }
@@ -79,7 +88,7 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        protected virtual Checked<Value> Prefix(SourcePart  token, Syntax right)
+        protected virtual Checked<Value> Prefix(SourcePart token, Syntax right)
         {
             NotImplementedMethod(token, right);
             return null;

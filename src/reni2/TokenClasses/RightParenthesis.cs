@@ -18,7 +18,7 @@ namespace Reni.TokenClasses
     sealed class RightParenthesis : TokenClass,
         IBelongingsMatcher,
         IBracketMatch<Syntax>,
-        IExclamationTagProvider
+        IDeclaratorTagProvider
     {
         internal sealed class Matched : DumpableObject, IType<Syntax>, ITokenClass
         {
@@ -72,14 +72,14 @@ namespace Reni.TokenClasses
 
         IType<Syntax> IBracketMatch<Syntax>.Value { get; } = new Matched();
 
-        Checked<ExclamationSyntaxList> IExclamationTagProvider.GetTags
+        Checked<DeclaratorTags> IDeclaratorTagProvider.Get
             (Syntax left, SourcePart token, Syntax right)
         {
             var syntax = left.GetBracketKernel(right);
             if(syntax == null)
-                return new Checked<ExclamationSyntaxList>
+                return new Checked<DeclaratorTags>
                     (
-                    ExclamationSyntaxList.Create(token),
+                    DeclaratorTags.Create(token),
                     IssueId.MissingDeclarationTag.CreateIssue(token));
 
             NotImplementedMethod(left, token, right, nameof(syntax), syntax);

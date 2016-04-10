@@ -264,7 +264,7 @@
     <Compile Include="FeatureTest\Text.cs" />
     <Compile Include="Feature\DumpPrintToken.cs" />
     <Compile Include="Feature\Interfaces.cs" />
-    <Compile Include="Parser\DeclarationSyntax.cs" />
+    <Compile Include="Parser\Statement.cs" />
     <Compile Include="Parser\DeclarationTokenFactory.cs" />
     <Compile Include="Parser\DefinableToken.cs" />
     <Compile Include="Parser\ExpressionSyntax.cs" />
@@ -305,7 +305,7 @@
     <Compile Include="TokenClasses\BraceMatchDumper.cs" />
     <Compile Include="TokenClasses\Cleanup.cs" />
     <Compile Include="TokenClasses\CompareOperation.cs" />
-    <Compile Include="TokenClasses\ExclamationSyntaxList.cs" />
+    <Compile Include="TokenClasses\DeclaratorTags.cs" />
     <Compile Include="TokenClasses\ReassignToken.cs" />
     <Compile Include="TokenClasses\Base.cs" />
     <Compile Include="TokenClasses\Colon.cs" />

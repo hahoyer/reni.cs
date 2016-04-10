@@ -132,13 +132,13 @@ namespace Reni.Parser
             }
         }
 
-        internal virtual Checked<ExclamationSyntaxList> ExclamationSyntax(SourcePart token)
+        internal virtual Checked<DeclaratorTags> ExclamationSyntax(SourcePart token)
         {
             NotImplementedMethod(token);
             return null;
         }
 
-        internal virtual Checked<ExclamationSyntaxList> Combine(ExclamationSyntaxList syntax)
+        internal virtual Checked<DeclaratorTags> Combine(DeclaratorTags syntax)
         {
             NotImplementedMethod(syntax);
             return null;

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-
 using hw.Helper;
 using hw.Scanner;
 using Reni.Basics;
@@ -19,7 +18,10 @@ namespace Reni.Struct
     /// </summary>
     sealed class CompoundSyntax : Value
     {
-        readonly OldSyntax[] _statements;
+        internal static Checked<CompoundSyntax> Create(Statement item)
+            => new CompoundSyntax(new[] {item});
+
+        readonly Statement[] _statements;
         readonly Data[] _data;
         readonly Value CleanupSection;
         static readonly string _runId = Compiler.FormattedNow + "\n";
@@ -27,10 +29,10 @@ namespace Reni.Struct
         static bool _isInsideFileDump;
         static int _nextObjectId;
 
-        internal CompoundSyntax(OldSyntax[] statements)
+        internal CompoundSyntax(Statement[] statements)
             : this(statements, null) { }
 
-        CompoundSyntax(OldSyntax[] statements, Value cleanupSection)
+        CompoundSyntax(Statement[] statements, Value cleanupSection)
             : base(_nextObjectId++)
         {
             _statements = statements;
@@ -160,6 +162,7 @@ namespace Reni.Struct
         {
             if(name == null)
                 return null;
+
             return _data
                 .SingleOrDefault(s => s.IsDefining(name))
                 ?.Position;
@@ -172,7 +175,7 @@ namespace Reni.Struct
 
         sealed class Data : DumpableObject
         {
-            public Data(OldSyntax rawStatement, int position)
+            public Data(Statement rawStatement, int position)
             {
                 RawStatement = rawStatement;
                 Position = position;
@@ -181,7 +184,7 @@ namespace Reni.Struct
                 Tracer.Assert(RawStatement != null);
             }
 
-            internal OldSyntax RawStatement { get; }
+            Statement RawStatement { get; }
             public int Position { get; }
 
             ValueCache<string[]> NamesCache { get; }
@@ -193,17 +196,10 @@ namespace Reni.Struct
             public bool IsConverter => RawStatement.IsConverterSyntax;
             public bool IsMixIn => RawStatement.IsMixInSyntax;
             public IEnumerable<string> Names => NamesCache.Value;
-
             public bool IsMutable => RawStatement.IsMutableSyntax;
-
-            Checked<Value> GetStatement()
-                => RawStatement.ContainerStatementToCompileSyntax;
-
+            Checked<Value> GetStatement() => RawStatement.Body;
             string[] GetNames() => RawStatement.GetDeclarations().ToArray();
         }
-
-        [DisableDump]
-        protected override IEnumerable<OldSyntax> DirectChildren => _statements;
 
         [DisableDump]
         internal IEnumerable<SourcePart> SourceParts
