@@ -5,7 +5,6 @@ using hw.Parser;
 using hw.Scanner;
 using Reni.Parser;
 using Reni.Struct;
-using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
@@ -18,9 +17,8 @@ namespace Reni.TokenClasses
         protected override Result<Value> GetValue(Syntax left, SourcePart token, Syntax right)
         {
             var statements = left.GetStatements(token, right);
-            return new Result<Value>(new CompoundSyntax(statements.Target),statements.Issues);
+            return new Result<Value>(new CompoundSyntax(statements.Target), statements.Issues);
         }
-
     }
 
     [BelongsTo(typeof(MainTokenFactory))]

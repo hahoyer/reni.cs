@@ -5,6 +5,7 @@ using hw.DebugFormatter;
 using hw.Parser;
 using hw.Scanner;
 using Reni.TokenClasses;
+using Reni.Validation;
 
 namespace Reni.Parser
 {
@@ -32,10 +33,10 @@ namespace Reni.Parser
         public Declarator WithName(Definable target)
         {
             if(Target == null)
-                return new Declarator(Tags,target);
+                return new Declarator(Tags, target);
 
             NotImplementedMethod(target);
-            return null;               
+            return null;
         }
     }
 
@@ -64,7 +65,8 @@ namespace Reni.Parser
         string IType<Syntax>.PrioTableId => PrioTable.Any;
         string ITokenClass.Id => "!";
 
-        Result<Value> ITokenClass.GetValue(Syntax left, SourcePart token, Syntax right) => null;
+        Result<Value> ITokenClass.GetValue(Syntax left, SourcePart token, Syntax right)
+            => IssueId.InvalidExpression.Syntax(token, new EmptyList(token));
 
         Result<Declarator> IDeclaratorTokenClass.Get(Syntax left, SourcePart token, Syntax right)
         {
