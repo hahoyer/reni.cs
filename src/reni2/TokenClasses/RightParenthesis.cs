@@ -72,14 +72,13 @@ namespace Reni.TokenClasses
 
         IType<Syntax> IBracketMatch<Syntax>.Value { get; } = new Matched();
 
-        Checked<DeclaratorTags> IDeclaratorTagProvider.Get
-            (Syntax left, SourcePart token, Syntax right)
+        Checked<Declarator> IDeclaratorTagProvider.Get(Syntax left, SourcePart token, Syntax right)
         {
             var syntax = left.GetBracketKernel(right);
             if(syntax == null)
-                return new Checked<DeclaratorTags>
+                return new Checked<Declarator>
                     (
-                    DeclaratorTags.Create(token),
+                    new Declarator(null,null),
                     IssueId.MissingDeclarationTag.CreateIssue(token));
 
             NotImplementedMethod(left, token, right, nameof(syntax), syntax);

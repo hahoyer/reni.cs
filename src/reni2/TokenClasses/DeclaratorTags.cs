@@ -11,18 +11,12 @@ namespace Reni.TokenClasses
         [EnableDump]
         readonly Definable Definable;
         [EnableDump]
-        readonly DeclaratorTags DeclaratorTags;
+        readonly IDeclarationTag[] DeclaratorTags;
 
-        internal DeclaratorSyntax(Definable definable, DeclaratorTags declaratorTags)
+        internal DeclaratorSyntax(Definable definable, IDeclarationTag[] declaratorTags)
         {
             Definable = definable;
             DeclaratorTags = declaratorTags;
-        }
-
-        [DisableDump]
-        protected override IEnumerable<OldSyntax> DirectChildren
-        {
-            get { yield return DeclaratorTags; }
         }
     }
 }

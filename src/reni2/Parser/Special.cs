@@ -125,11 +125,6 @@ namespace Reni.Parser
                 yield return _right;
             }
         }
-
-        internal override Checked<DeclaratorTags> Combine
-            (DeclaratorTags syntax)
-            => new Checked<DeclaratorTags>
-                (syntax, IssueId.UnexpectedDeclarationTag.CreateIssue(Token));
     }
 
     interface IPendingProvider
@@ -168,11 +163,6 @@ namespace Reni.Parser
 
         [DisableDump]
         protected override IEnumerable<OldSyntax> DirectChildren { get { yield return _left; } }
-
-        internal override Checked<DeclaratorTags> Combine
-            (DeclaratorTags syntax)
-            => new Checked<DeclaratorTags>
-                (syntax, IssueId.UnexpectedDeclarationTag.CreateIssue(Token));
     }
 
     interface ITerminal

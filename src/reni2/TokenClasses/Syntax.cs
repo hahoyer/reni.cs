@@ -257,6 +257,19 @@ namespace Reni.TokenClasses
         }
 
         [DisableDump]
+        internal Checked<Statement[]> Statements 
+        {
+            get
+            {
+                var colon = TokenClass as Colon;
+                if(colon != null)
+                    return Left.GetStatements(Token.Characters, Right);
+                NotImplementedMethod();
+                return null;
+            }
+        }
+
+        [DisableDump]
         internal Issue[] Issues
             => Left?.Issues
                 .plus(Value?.Issues)
@@ -278,6 +291,24 @@ namespace Reni.TokenClasses
             Tracer.Assert(Left == null);
             Tracer.Assert(TokenClass is LeftParenthesis);
             return Right;
+        }
+
+        internal Checked<Statement> GetStatement(SourcePart token, Syntax right)
+        {
+            var declaration = Declarator;
+            var body = right.Value;
+            var item = declaration.Value.Statement(token, body.Value);
+            return new Checked<Statement>
+                (
+                item.Value,
+                declaration.Issues.plus(body.Issues).plus(item.Issues));
+        }
+
+        internal Checked<Statement[]> GetStatements
+            (SourcePart token, Syntax right)
+        {
+            var statement = GetStatement(token, right);
+            return new Checked<Statement[]>(new[] {statement.Value}, statement.Issues);
         }
     }
 

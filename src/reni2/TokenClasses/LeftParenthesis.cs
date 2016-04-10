@@ -62,14 +62,6 @@ namespace Reni.TokenClasses
                 }
             }
 
-            internal override Checked<DeclaratorTags> ExclamationSyntax(SourcePart token)
-                => new Checked<DeclaratorTags>
-                    (
-                    DeclaratorTags.Create(token),
-                    IssueId.UnexpectedDeclarationTag.CreateIssue(Token)
-                    );
-
-
             [DisableDump]
             internal override Checked<Value> ToCompiledSyntax
             {

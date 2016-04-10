@@ -15,29 +15,12 @@ namespace Reni.TokenClasses
         public const string TokenId = ":";
         public override string Id => TokenId;
 
-        protected override Checked<OldSyntax> OldSuffix(OldSyntax left, SourcePart token)
-            => left.CreateDeclarationSyntax
-                (
-                    token,
-                    new EmptyList(token),
-                    IssueId.MissingValueInDeclaration.CreateIssue(token)
-                );
-
-        protected override Checked<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
-            => IssueId.UnexpectedUseAsPrefix.Syntax(token);
-
-        protected override Checked<OldSyntax> OldInfix
-            (OldSyntax left, SourcePart token, OldSyntax right)
-            => left.CreateDeclarationSyntax(token, right);
-
-        protected override Checked<Value> Infix(Syntax left, SourcePart token, Value right)
+        protected override Checked<Value> GetValue(Syntax left, SourcePart token, Syntax right)
         {
-            var declaration = left.Declarator;
-            var item = declaration.Value.Statement(token, right);
-            var result = CompoundSyntax.Create(item.Value);
-            return new Checked<Value>
-                (result.Value, declaration.Issues.plus(item.Issues).plus(result.Issues));
+            var statements = left.GetStatements(token, right);
+            return new Checked<Value>(new CompoundSyntax(statements.Value),statements.Issues);
         }
+
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
@@ -69,11 +52,11 @@ namespace Reni.TokenClasses
     [BelongsTo(typeof(DeclarationTokenFactory))]
     abstract class DeclarationTagToken : TerminalToken, IDeclaratorTagProvider, IDeclarationTag
     {
-        Checked<DeclaratorTags> IDeclaratorTagProvider.Get
+        Checked<Declarator> IDeclaratorTagProvider.Get
             (Syntax left, SourcePart token, Syntax right)
         {
             if(left == null && right == null)
-                return new DeclaratorTags(this, token);
+                return new Declarator(new IDeclarationTag[] {this}, null);
 
             NotImplementedMethod(left, token, right);
             return null;

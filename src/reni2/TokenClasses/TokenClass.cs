@@ -52,6 +52,9 @@ namespace Reni.TokenClasses
         internal virtual bool IsVisible => true;
 
         Checked<Value> ITokenClass.GetValue(Syntax left, SourcePart token, Syntax right)
+            => GetValue(left, token, right);
+
+        virtual protected Checked<Value> GetValue(Syntax left, SourcePart token, Syntax right)
         {
             var leftValue = left?.Value;
             var rightValue = right?.Value;

@@ -132,18 +132,6 @@ namespace Reni.Parser
             }
         }
 
-        internal virtual Checked<DeclaratorTags> ExclamationSyntax(SourcePart token)
-        {
-            NotImplementedMethod(token);
-            return null;
-        }
-
-        internal virtual Checked<DeclaratorTags> Combine(DeclaratorTags syntax)
-        {
-            NotImplementedMethod(syntax);
-            return null;
-        }
-
         internal Checked<OldSyntax> Issues(params Issue[] issues) => new Checked<OldSyntax>(this, issues);
 
         internal virtual IEnumerable<OldSyntax> GetMixinsFromBody()

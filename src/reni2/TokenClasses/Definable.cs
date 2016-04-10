@@ -8,8 +8,18 @@ using Reni.Parser;
 
 namespace Reni.TokenClasses
 {
-    abstract class Definable : TokenClass
+    abstract class Definable : TokenClass, IDeclaratorTokenClass
     {
+        protected override Checked<Parser.Value> Suffix(Syntax left, SourcePart token)
+        {
+            var d = left.Declarator;
+            if(d != null)
+                return null;
+
+            NotImplementedMethod(left, token);
+            return null;
+        }
+
         protected sealed override Checked<Parser.Value> Infix
             (Parser.Value left, SourcePart token, Parser.Value right)
             => ExpressionSyntax.Create(left, this, right, token);
@@ -24,6 +34,19 @@ namespace Reni.TokenClasses
         public Checked<Parser.Value> CreateForVisit(Parser.Value left, Parser.Value right)
         {
             NotImplementedMethod(left, right);
+            return null;
+        }
+
+        Checked<Declarator> IDeclaratorTokenClass.Get(Syntax left, SourcePart token, Syntax right)
+        {
+            if(right == null)
+            {
+                var d = left.Declarator;
+                if(d != null)
+                    return d.Value.WithName(this);
+            }
+
+            NotImplementedMethod(left, token, right);
             return null;
         }
     }

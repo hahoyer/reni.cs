@@ -4,6 +4,7 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.Parser;
+using Reni.Struct;
 
 namespace Reni.TokenClasses
 {
@@ -22,24 +23,15 @@ namespace Reni.TokenClasses
 
         public override string Id => TokenId(Level);
 
-        protected override Checked<OldSyntax> OldTerminal(SourcePart token)
-            =>
-                ListSyntax
-                    (
-                        new EmptyList(token),
-                        new EmptyList(token));
-
-        protected override Checked<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
-            => ListSyntax(new EmptyList(token), right);
-
-        protected override Checked<OldSyntax> OldSuffix(OldSyntax left, SourcePart token)
-            => ListSyntax(left, new EmptyList(token));
-
-        protected override Checked<OldSyntax> OldInfix(OldSyntax left, SourcePart token, OldSyntax right)
-            => ListSyntax(left, right);
-
-        ListSyntax ListSyntax(OldSyntax left, OldSyntax right)
-            => new ListSyntax(this, left.ToList(this).Concat(right.ToList(this)).ToArray());
+        protected override Checked<Value> GetValue(Syntax left, SourcePart token, Syntax right)
+        {
+            var leftResult = left?.Statements;
+            var rightResult = right?.Statements;
+            return new Checked<Value>(
+                new CompoundSyntax(leftResult?.Value.plus(rightResult?.Value)),
+                leftResult?.Issues.plus(rightResult?.Issues)
+                );
+        }
 
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => otherMatcher == this;
