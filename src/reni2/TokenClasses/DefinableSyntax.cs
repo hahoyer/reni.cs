@@ -20,12 +20,12 @@ namespace Reni.TokenClasses
         internal Definable Definable { get; }
         internal override SourcePart Token { get; }
 
-        internal override Checked<OldSyntax> RightSyntax(OldSyntax right, SourcePart token)
-            => Checked<OldSyntax>.From(ExpressionSyntax.OldCreate(null, Definable, right, token));
+        internal override Result<OldSyntax> RightSyntax(OldSyntax right, SourcePart token)
+            => Result<OldSyntax>.From(ExpressionSyntax.OldCreate(null, Definable, right, token));
 
         [DisableDump]
-        internal override Checked<Value> ToCompiledSyntax
-            => Checked<Value>
+        internal override Result<Value> ToCompiledSyntax
+            => Result<Value>
                 .From(ExpressionSyntax.Create(null, Definable, null, Token));
     }
 }

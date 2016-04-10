@@ -12,11 +12,11 @@ namespace Reni.TokenClasses
         public const string TokenId = "then";
         public override string Id => TokenId;
 
-        protected override Checked<OldSyntax> OldInfix(OldSyntax left, SourcePart token, OldSyntax right)
+        protected override Result<OldSyntax> OldInfix(OldSyntax left, SourcePart token, OldSyntax right)
         {
             var condition = left.ToCompiledSyntax;
-            var result = right.CreateThenSyntax(condition.Value);
-            return new Checked<OldSyntax>(result.Value, condition.Issues.plus(result.Issues));
+            var result = right.CreateThenSyntax(condition.Target);
+            return new Result<OldSyntax>(result.Target, condition.Issues.plus(result.Issues));
         }
     }
 }

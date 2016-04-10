@@ -7,6 +7,6 @@ namespace Reni.Parser
     interface ITokenClass
     {
         string Id { get; }
-        Checked<Value> GetValue(Syntax left, SourcePart token, Syntax right);
+        Result<Value> GetValue(Syntax left, SourcePart token, Syntax right);
     }
 }

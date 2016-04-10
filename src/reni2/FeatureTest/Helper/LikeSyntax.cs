@@ -44,7 +44,7 @@ namespace Reni.FeatureTest.Helper
     sealed class Empty : LikeSyntax
     {
         public override void AssertLike(Syntax syntax)
-            => Tracer.Assert(syntax.Value.Value is EmptyList);
+            => Tracer.Assert(syntax.Value.Target is EmptyList);
 
         public override void AssertLike(Value syntax)
             => Tracer.Assert(syntax is EmptyList);
@@ -83,7 +83,7 @@ namespace Reni.FeatureTest.Helper
             _converters = converters;
         }
 
-        public override void AssertLike(Syntax syntax) => AssertLike(syntax.Value.Value);
+        public override void AssertLike(Syntax syntax) => AssertLike(syntax.Value.Target);
 
         public override void AssertLike(Value syntax)
         {
@@ -115,7 +115,7 @@ namespace Reni.FeatureTest.Helper
             _s3 = s3;
         }
 
-        public override void AssertLike(Syntax syntax) => AssertLike(syntax.Value.Value);
+        public override void AssertLike(Syntax syntax) => AssertLike(syntax.Value.Target);
 
         public override void AssertLike(Value syntax)
         {
@@ -150,7 +150,7 @@ namespace Reni.FeatureTest.Helper
 
         public override void AssertLike(Syntax syntax)
         {
-            var terminalSyntax = (TerminalSyntax) syntax.Value.Value;
+            var terminalSyntax = (TerminalSyntax) syntax.Value.Target;
             Tracer.Assert(terminalSyntax.Terminal is TokenClasses.Number);
             Tracer.Assert(terminalSyntax.ToNumber == _i);
         }

@@ -54,7 +54,7 @@ namespace ReniUI
             var enumerable = LocatePosition(offset)
                 .Syntax
                 .ParentChainIncludingThis
-                .Select(item => item.Value.Value)
+                .Select(item => item.Value.Target)
                 .ToArray();
 
             var compileSyntaxs = enumerable

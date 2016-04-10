@@ -66,7 +66,7 @@ namespace Reni.Context
         {
             var result = Parent.Parse(source);
             Tracer.Assert(!result.Issues.Any());
-            return result.Value;
+            return result.Target;
         }
 
         public override string GetContextIdentificationDump() => "r";
@@ -458,7 +458,7 @@ namespace Reni.Context
 
         internal interface IParent
         {
-            Checked<Parser.Value> Parse(string source);
+            Result<Parser.Value> Parse(string source);
             bool ProcessErrors { get; }
             IExecutionContext ExecutionContext { get; }
         }

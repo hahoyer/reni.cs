@@ -28,11 +28,11 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal override bool IsVisible => Level != 0;
 
-        protected override Checked<Value> Infix(Value left, SourcePart token, Value right) => null;
-        protected override Checked<Value> Prefix(SourcePart token, Value right) => null;
-        protected override Checked<Value> Prefix(SourcePart token, TokenClasses.Syntax right) => null;
-        protected override Checked<Value> Suffix(Value left, SourcePart token) => null;
-        protected override Checked<Value> Terminal(SourcePart token) => null;
+        protected override Result<Value> Infix(Value left, SourcePart token, Value right) => null;
+        protected override Result<Value> Prefix(SourcePart token, Value right) => null;
+        protected override Result<Value> Prefix(SourcePart token, TokenClasses.Syntax right) => null;
+        protected override Result<Value> Suffix(Value left, SourcePart token) => null;
+        protected override Result<Value> Terminal(SourcePart token) => null;
 
         sealed class Syntax : OldSyntax
         {
@@ -63,7 +63,7 @@ namespace Reni.TokenClasses
             }
 
             [DisableDump]
-            internal override Checked<Value> ToCompiledSyntax
+            internal override Result<Value> ToCompiledSyntax
             {
                 get
                 {
@@ -77,10 +77,10 @@ namespace Reni.TokenClasses
                 }
             }
 
-            internal override Checked<OldSyntax> Match(int level, SourcePart token)
+            internal override Result<OldSyntax> Match(int level, SourcePart token)
             {
                 if(Level != level)
-                    return new Checked<OldSyntax>
+                    return new Result<OldSyntax>
                         (this, IssueId.ExtraLeftBracket.CreateIssue(Token));
 
                 var innerPart = Right ?? new EmptyList(token);
@@ -88,7 +88,7 @@ namespace Reni.TokenClasses
                 if(Level == 0)
                 {
                     Tracer.Assert(Left == null);
-                    return Checked<OldSyntax>.From(innerPart.ToCompiledSyntax);
+                    return Result<OldSyntax>.From(innerPart.ToCompiledSyntax);
                 }
 
                 if(Left == null)

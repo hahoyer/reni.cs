@@ -24,13 +24,13 @@ namespace Reni.TokenClasses
         {
             static string Id => "()";
 
-            Checked<Value> ITokenClass.GetValue(Syntax left, SourcePart token, Syntax right)
+            Result<Value> ITokenClass.GetValue(Syntax left, SourcePart token, Syntax right)
             {
                 Tracer.Assert(left != null);
                 Tracer.Assert(right != null);
                 var leftValue = left.Value;
                 var rightValue = right.Value;
-                return ExpressionSyntax.Create(leftValue.Value, null, rightValue.Value, token)
+                return ExpressionSyntax.Create(leftValue.Target, null, rightValue.Target, token)
                     .With(rightValue.Issues.plus(leftValue.Issues));
             }
 
@@ -53,18 +53,10 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal override bool IsVisible => Level != 0;
 
-        protected override Checked<Value> Suffix(Syntax left, SourcePart token)
+        protected override Result<Value> Suffix(Syntax left, SourcePart token)
         {
             var syntax = left.GetBracketKernel();
-            if(syntax == null)
-                return new EmptyList(token);
-
-            var value = syntax.Value;
-            if(value != null)
-                return value;
-
-            NotImplementedMethod(left, token);
-            return null;
+            return syntax == null ? new EmptyList(token) : syntax.Value;
         }
 
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
@@ -72,11 +64,11 @@ namespace Reni.TokenClasses
 
         IType<Syntax> IBracketMatch<Syntax>.Value { get; } = new Matched();
 
-        Checked<Declarator> IDeclaratorTagProvider.Get(Syntax left, SourcePart token, Syntax right)
+        Result<Declarator> IDeclaratorTagProvider.Get(Syntax left, SourcePart token, Syntax right)
         {
             var syntax = left.GetBracketKernel(right);
             if(syntax == null)
-                return new Checked<Declarator>
+                return new Result<Declarator>
                     (
                     new Declarator(null,null),
                     IssueId.MissingDeclarationTag.CreateIssue(token));

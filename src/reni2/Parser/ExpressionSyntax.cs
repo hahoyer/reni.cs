@@ -12,18 +12,18 @@ namespace Reni.Parser
 {
     sealed class ExpressionSyntax : Value
     {
-        internal static Checked<Value> Create
+        internal static Result<Value> Create
             (Value left, Definable definable, Value right, SourcePart token)
-            => new Checked<Value>(new ExpressionSyntax(left, definable, right, token));
+            => new Result<Value>(new ExpressionSyntax(left, definable, right, token));
 
-        internal static Checked<Value> OldCreate
+        internal static Result<Value> OldCreate
             (OldSyntax left, Definable definable, OldSyntax right, SourcePart token)
         {
             var left1 = left?.ToCompiledSyntax;
             var right1 = right?.ToCompiledSyntax;
-            return new Checked<Value>
+            return new Result<Value>
                 (
-                new ExpressionSyntax(left1?.Value, definable, right1?.Value, token),
+                new ExpressionSyntax(left1?.Target, definable, right1?.Target, token),
                 left1?.Issues.plus(right1?.Issues)
                 );
         }
@@ -60,8 +60,8 @@ namespace Reni.Parser
             }
         }
 
-        internal override Checked<OldSyntax> RightSyntax(OldSyntax right, SourcePart token)
-            => Checked<OldSyntax>
+        internal override Result<OldSyntax> RightSyntax(OldSyntax right, SourcePart token)
+            => Result<OldSyntax>
                 .From
                 (
                     Right == null
@@ -69,8 +69,8 @@ namespace Reni.Parser
                         : OldCreate(this, null, right, token)
                 );
 
-        internal override Checked<OldSyntax> InfixOfMatched(SourcePart token, OldSyntax right)
-            => Checked<OldSyntax>.From(OldCreate(this, null, right, token));
+        internal override Result<OldSyntax> InfixOfMatched(SourcePart token, OldSyntax right)
+            => Result<OldSyntax>.From(OldCreate(this, null, right, token));
 
         int CurrentResultDepth;
 
@@ -124,7 +124,7 @@ namespace Reni.Parser
 
             var result = Definable.CreateForVisit(left ?? Left, right ?? Right);
             Tracer.Assert(!result.Issues.Any());
-            return result.Value;
+            return result.Target;
         }
 
         internal override ResultCache.IResultProvider FindSource

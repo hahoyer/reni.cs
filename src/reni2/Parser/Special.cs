@@ -41,8 +41,8 @@ namespace Reni.Parser
 
     sealed class PrefixSyntax : SpecialSyntax
     {
-        public static Checked<OldSyntax> Create(IPrefix prefix, Checked<Value> right)
-            => new PrefixSyntax(prefix, right.Value).Issues(right.Issues);
+        public static Result<OldSyntax> Create(IPrefix prefix, Result<Value> right)
+            => new PrefixSyntax(prefix, right.Target).Issues(right.Issues);
 
         [Node]
         [EnableDump]
@@ -67,13 +67,13 @@ namespace Reni.Parser
 
     sealed class InfixSyntax : SpecialSyntax
     {
-        public static Checked<OldSyntax> Create
+        public static Result<OldSyntax> Create
             (
-            Checked<Value> left,
+            Result<Value> left,
             IInfix infix,
             SourcePart token,
-            Checked<Value> right)
-            => new InfixSyntax(left.Value, infix, token, right.Value)
+            Result<Value> right)
+            => new InfixSyntax(left.Target, infix, token, right.Target)
                 .Issues(left.Issues.plus(right.Issues));
 
         [Node]
@@ -135,9 +135,9 @@ namespace Reni.Parser
 
     sealed class SuffixSyntax : SpecialSyntax
     {
-        public static Checked<OldSyntax> Create
-            (Checked<Value> left, ISuffix suffix, SourcePart token)
-            => new SuffixSyntax(left.Value, suffix, token).Issues(left.Issues);
+        public static Result<OldSyntax> Create
+            (Result<Value> left, ISuffix suffix, SourcePart token)
+            => new SuffixSyntax(left.Target, suffix, token).Issues(left.Issues);
 
         [Node]
         [EnableDump]

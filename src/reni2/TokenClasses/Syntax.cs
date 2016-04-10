@@ -224,7 +224,7 @@ namespace Reni.TokenClasses
                 return null;
 
                 var syntax = Value
-                    .Value;
+                    .Target;
                 var functionCache = syntax.ResultCache;
                 if(functionCache.Any())
                     return functionCache
@@ -239,11 +239,11 @@ namespace Reni.TokenClasses
         }
 
         [DisableDump]
-        internal Checked<Value> Value
+        internal Result<Value> Value
             => TokenClass.GetValue(Left, Token.Characters, Right);
 
         [DisableDump]
-        internal Checked<Declarator> Declarator
+        internal Result<Declarator> Declarator
         {
             get
             {
@@ -257,7 +257,7 @@ namespace Reni.TokenClasses
         }
 
         [DisableDump]
-        internal Checked<Statement[]> Statements 
+        internal Result<Statement[]> Statements 
         {
             get
             {
@@ -276,7 +276,7 @@ namespace Reni.TokenClasses
                 .plus(Right?.Issues);
 
         [DisableDump]
-        internal Checked<CompoundSyntax> ToCompound
+        internal Result<CompoundSyntax> ToCompound
         {
             get
             {
@@ -293,22 +293,22 @@ namespace Reni.TokenClasses
             return Right;
         }
 
-        internal Checked<Statement> GetStatement(SourcePart token, Syntax right)
+        internal Result<Statement> GetStatement(SourcePart token, Syntax right)
         {
             var declaration = Declarator;
             var body = right.Value;
-            var item = declaration.Value.Statement(token, body.Value);
-            return new Checked<Statement>
+            var item = declaration.Target.Statement(token, body.Target);
+            return new Result<Statement>
                 (
-                item.Value,
+                item.Target,
                 declaration.Issues.plus(body.Issues).plus(item.Issues));
         }
 
-        internal Checked<Statement[]> GetStatements
+        internal Result<Statement[]> GetStatements
             (SourcePart token, Syntax right)
         {
             var statement = GetStatement(token, right);
-            return new Checked<Statement[]>(new[] {statement.Value}, statement.Issues);
+            return new Result<Statement[]>(new[] {statement.Target}, statement.Issues);
         }
     }
 

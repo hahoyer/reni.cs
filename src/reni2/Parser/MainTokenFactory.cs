@@ -146,7 +146,7 @@ namespace Reni.Parser
 
         public override string Id => "<error>";
 
-        Checked<Value> ITokenClass.GetValue(Syntax left, SourcePart token, Syntax right)
+        Result<Value> ITokenClass.GetValue(Syntax left, SourcePart token, Syntax right)
         {
             NotImplementedMethod(left,token,right);
             return null;

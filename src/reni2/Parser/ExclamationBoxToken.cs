@@ -10,7 +10,7 @@ namespace Reni.Parser
 {
     interface IDeclaratorTokenClass
     {
-        Checked<Declarator> Get(Syntax left, SourcePart token, Syntax right);
+        Result<Declarator> Get(Syntax left, SourcePart token, Syntax right);
     }
 
     sealed class Declarator : DumpableObject
@@ -26,7 +26,7 @@ namespace Reni.Parser
             Target = target;
         }
 
-        internal Checked<Statement> Statement(SourcePart token, Value right)
+        internal Result<Statement> Statement(SourcePart token, Value right)
             => new Statement(Tags, Target, token, right);
 
         public Declarator WithName(Definable target)
@@ -41,7 +41,7 @@ namespace Reni.Parser
 
     interface IDeclaratorTagProvider
     {
-        Checked<Declarator> Get(Syntax left, SourcePart token, Syntax right);
+        Result<Declarator> Get(Syntax left, SourcePart token, Syntax right);
     }
 
     interface IDeclarationTag {}
@@ -64,9 +64,9 @@ namespace Reni.Parser
         string IType<Syntax>.PrioTableId => PrioTable.Any;
         string ITokenClass.Id => "!";
 
-        Checked<Value> ITokenClass.GetValue(Syntax left, SourcePart token, Syntax right) => null;
+        Result<Value> ITokenClass.GetValue(Syntax left, SourcePart token, Syntax right) => null;
 
-        Checked<Declarator> IDeclaratorTokenClass.Get(Syntax left, SourcePart token, Syntax right)
+        Result<Declarator> IDeclaratorTokenClass.Get(Syntax left, SourcePart token, Syntax right)
         {
             if(left == null && right != null)
             {

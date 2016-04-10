@@ -126,9 +126,9 @@ namespace Reni
 
         IExecutionContext Root.IParent.ExecutionContext => this;
 
-        Checked<Value> Root.IParent.Parse(string source) => Parse(source);
+        Result<Value> Root.IParent.Parse(string source) => Parse(source);
 
-        Checked<Value> Parse(string sourceText)
+        Result<Value> Parse(string sourceText)
             => Parse(new Source(sourceText) + 0).Value;
 
         [UsedImplicitly]

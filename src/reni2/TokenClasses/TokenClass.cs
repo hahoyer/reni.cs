@@ -23,25 +23,25 @@ namespace Reni.TokenClasses
         Syntax Create(Syntax left, IToken token, Syntax right)
             => Syntax.CreateSourceSyntax(left, this, token, right);
 
-        protected virtual Checked<OldSyntax> OldTerminal(SourcePart token)
+        protected virtual Result<OldSyntax> OldTerminal(SourcePart token)
         {
             NotImplementedMethod(token);
             return null;
         }
 
-        protected virtual Checked<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
+        protected virtual Result<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
         {
             NotImplementedMethod(token, right);
             return null;
         }
 
-        protected virtual Checked<OldSyntax> OldSuffix(OldSyntax left, SourcePart token)
+        protected virtual Result<OldSyntax> OldSuffix(OldSyntax left, SourcePart token)
         {
             NotImplementedMethod(left, token);
             return null;
         }
 
-        protected virtual Checked<OldSyntax> OldInfix
+        protected virtual Result<OldSyntax> OldInfix
             (OldSyntax left, SourcePart token, OldSyntax right)
         {
             NotImplementedMethod(left, token, right);
@@ -51,16 +51,16 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal virtual bool IsVisible => true;
 
-        Checked<Value> ITokenClass.GetValue(Syntax left, SourcePart token, Syntax right)
+        Result<Value> ITokenClass.GetValue(Syntax left, SourcePart token, Syntax right)
             => GetValue(left, token, right);
 
-        virtual protected Checked<Value> GetValue(Syntax left, SourcePart token, Syntax right)
+        virtual protected Result<Value> GetValue(Syntax left, SourcePart token, Syntax right)
         {
             var leftValue = left?.Value;
             var rightValue = right?.Value;
             if((left == null || leftValue != null) && (right == null || rightValue != null))
             {
-                var result = CheckedInfix(leftValue?.Value, token, rightValue?.Value);
+                var result = CheckedInfix(leftValue?.Target, token, rightValue?.Target);
                 if(result != null)
                     return result.With(rightValue?.Issues.plus(leftValue?.Issues));
             }
@@ -72,32 +72,32 @@ namespace Reni.TokenClasses
                 return Suffix(left, token);
 
             if(leftValue == null && rightValue != null)
-                return Infix(left, token, rightValue.Value)
+                return Infix(left, token, rightValue.Target)
                     .With(rightValue.Issues);
 
             NotImplementedMethod(left, token, right);
             return null;
         }
 
-        protected virtual Checked<Value> Infix(Syntax left, SourcePart token, Value right)
+        protected virtual Result<Value> Infix(Syntax left, SourcePart token, Value right)
         {
             NotImplementedMethod(left, token, right);
             return null;
         }
 
-        protected virtual Checked<Value> Suffix(Syntax left, SourcePart token)
+        protected virtual Result<Value> Suffix(Syntax left, SourcePart token)
         {
             NotImplementedMethod(left, token);
             return null;
         }
 
-        protected virtual Checked<Value> Prefix(SourcePart token, Syntax right)
+        protected virtual Result<Value> Prefix(SourcePart token, Syntax right)
         {
             NotImplementedMethod(token, right);
             return null;
         }
 
-        Checked<Value> CheckedInfix(Value left, SourcePart token, Value right)
+        Result<Value> CheckedInfix(Value left, SourcePart token, Value right)
         {
             var iresult = Infix(left, token, right);
             if(iresult != null)
@@ -127,25 +127,25 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        protected virtual Checked<Value> Infix(Value left, SourcePart token, Value right)
+        protected virtual Result<Value> Infix(Value left, SourcePart token, Value right)
         {
             NotImplementedMethod(left, token, right);
             return null;
         }
 
-        protected virtual Checked<Value> Suffix(Value left, SourcePart token)
+        protected virtual Result<Value> Suffix(Value left, SourcePart token)
         {
             NotImplementedMethod(left, token);
             return null;
         }
 
-        protected virtual Checked<Value> Prefix(SourcePart token, Value right)
+        protected virtual Result<Value> Prefix(SourcePart token, Value right)
         {
             NotImplementedMethod(token, right);
             return null;
         }
 
-        protected virtual Checked<Value> Terminal(SourcePart token)
+        protected virtual Result<Value> Terminal(SourcePart token)
         {
             NotImplementedMethod(token);
             return null;

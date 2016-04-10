@@ -32,11 +32,11 @@ namespace Reni.Parser
         }
 
         [DisableDump]
-        internal virtual Checked<Value> ContainerStatementToCompileSyntax
+        internal virtual Result<Value> ContainerStatementToCompileSyntax
             => ToCompiledSyntax;
 
         [DisableDump]
-        internal abstract Checked<Value> ToCompiledSyntax { get; }
+        internal abstract Result<Value> ToCompiledSyntax { get; }
 
         internal virtual IEnumerable<KeyValuePair<string, int>> GetDeclarations(int index)
         {
@@ -45,10 +45,10 @@ namespace Reni.Parser
 
         internal virtual IEnumerable<string> GetDeclarations() { yield break; }
 
-        internal Checked<OldSyntax> CreateThenSyntax(Value condition)
+        internal Result<OldSyntax> CreateThenSyntax(Value condition)
         {
             var syntax = ToCompiledSyntax;
-            return new Checked<OldSyntax>(new CondSyntax(condition, syntax.Value), syntax.Issues);
+            return new Result<OldSyntax>(new CondSyntax(condition, syntax.Target), syntax.Issues);
         }
 
         internal virtual OldSyntax CreateElseSyntax(Value elseSyntax)
@@ -57,17 +57,17 @@ namespace Reni.Parser
             return null;
         }
 
-        internal Checked<OldSyntax> CreateElseSyntax(Checked<Value> right)
-            => CreateElseSyntax(right.Value).Issues(right.Issues);
+        internal Result<OldSyntax> CreateElseSyntax(Result<Value> right)
+            => CreateElseSyntax(right.Target).Issues(right.Issues);
 
-        internal virtual Checked<OldSyntax> CreateDeclarationSyntax(SourcePart token, OldSyntax right)
+        internal virtual Result<OldSyntax> CreateDeclarationSyntax(SourcePart token, OldSyntax right)
             => IssueId.IdentifierExpected.Syntax(token, this, right);
 
-        internal Checked<OldSyntax> CreateDeclarationSyntax
+        internal Result<OldSyntax> CreateDeclarationSyntax
             (SourcePart token, EmptyList right, Issue issue)
         {
             var result = CreateDeclarationSyntax(token, right);
-            return result.Value.Issues(issue.plus(result.Issues));
+            return result.Target.Issues(issue.plus(result.Issues));
         }
 
         protected sealed override string Dump(bool isRecursion)
@@ -95,7 +95,7 @@ namespace Reni.Parser
 
         internal virtual IEnumerable<OldSyntax> ToList(List type) { yield return this; }
         [DisableDump]
-        internal virtual Checked<CompoundSyntax> ToCompound => ToListSyntax.ToCompound;
+        internal virtual Result<CompoundSyntax> ToCompound => ToListSyntax.ToCompound;
         [DisableDump]
         internal virtual bool IsMutableSyntax => false;
         [DisableDump]
@@ -103,12 +103,12 @@ namespace Reni.Parser
         [DisableDump]
         internal virtual bool IsMixInSyntax => false;
 
-        internal virtual Checked<OldSyntax> SuffixedBy(Definable definable, SourcePart token)
-            => Checked<OldSyntax>
+        internal virtual Result<OldSyntax> SuffixedBy(Definable definable, SourcePart token)
+            => Result<OldSyntax>
                 .From(ExpressionSyntax.OldCreate(this, definable, null, token));
 
-        internal virtual Checked<OldSyntax> Match(int level, SourcePart token)
-            => new Checked<OldSyntax>(this, IssueId.ExtraRightBracket.CreateIssue(token));
+        internal virtual Result<OldSyntax> Match(int level, SourcePart token)
+            => new Result<OldSyntax>(this, IssueId.ExtraRightBracket.CreateIssue(token));
 
         [DisableDump]
         protected virtual IEnumerable<OldSyntax> DirectChildren { get { yield break; } }
@@ -132,7 +132,7 @@ namespace Reni.Parser
             }
         }
 
-        internal Checked<OldSyntax> Issues(params Issue[] issues) => new Checked<OldSyntax>(this, issues);
+        internal Result<OldSyntax> Issues(params Issue[] issues) => new Result<OldSyntax>(this, issues);
 
         internal virtual IEnumerable<OldSyntax> GetMixinsFromBody()
         {
@@ -140,7 +140,7 @@ namespace Reni.Parser
             return null;
         }
 
-        internal virtual Checked<OldSyntax> RightSyntax(OldSyntax right, SourcePart token)
+        internal virtual Result<OldSyntax> RightSyntax(OldSyntax right, SourcePart token)
         {
             NotImplementedMethod(right, token);
             return null;
@@ -154,20 +154,20 @@ namespace Reni.Parser
                 .Aggregate() + Token;
         }
 
-        internal virtual Checked<OldSyntax> InfixOfMatched(SourcePart token, OldSyntax right)
+        internal virtual Result<OldSyntax> InfixOfMatched(SourcePart token, OldSyntax right)
         {
             NotImplementedMethod(token, right);
             return null;
         }
 
-        internal Checked<OldSyntax> Cleanup(SourcePart token, OldSyntax rawCleanupSection)
+        internal Result<OldSyntax> Cleanup(SourcePart token, OldSyntax rawCleanupSection)
         {
             var currentCompound = ToCompound;
             var cleanupSection = rawCleanupSection.ToCompiledSyntax;
             var result = currentCompound
                 .SaveValue
                 .AddCleanupSection(token, cleanupSection.SaveValue);
-            return new Checked<OldSyntax>(result, currentCompound.Issues.plus(cleanupSection.Issues));
+            return new Result<OldSyntax>(result, currentCompound.Issues.plus(cleanupSection.Issues));
         }
     }
 
@@ -176,9 +176,9 @@ namespace Reni.Parser
         internal override SourcePart Token { get; }
         protected NonCompileSyntax(SourcePart token) { Token = token; }
         [DisableDump]
-        internal override Checked<Value> ToCompiledSyntax
+        internal override Result<Value> ToCompiledSyntax
             =>
-                new Checked<Value>
+                new Result<Value>
                     (new EmptyList(Token), IssueId.InvalidExpression.CreateIssue(Token));
     }
 }

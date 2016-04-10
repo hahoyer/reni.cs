@@ -18,7 +18,7 @@ namespace Reni.Struct
     /// </summary>
     sealed class CompoundSyntax : Value
     {
-        internal static Checked<CompoundSyntax> Create(Statement item)
+        internal static Result<CompoundSyntax> Create(Statement item)
             => new CompoundSyntax(new[] {item});
 
         readonly Statement[] _statements;
@@ -121,7 +121,7 @@ namespace Reni.Struct
         protected override string GetNodeDump()
             => GetType().PrettyName() + "(" + GetCompoundIdentificationDump() + ")";
 
-        internal override Checked<CompoundSyntax> ToCompound => this;
+        internal override Result<CompoundSyntax> ToCompound => this;
 
         internal bool IsMutable(int position) => _data[position].IsMutable;
 
@@ -179,7 +179,7 @@ namespace Reni.Struct
             {
                 RawStatement = rawStatement;
                 Position = position;
-                StatementCache = new ValueCache<Checked<Value>>(GetStatement);
+                StatementCache = new ValueCache<Result<Value>>(GetStatement);
                 NamesCache = new ValueCache<string[]>(GetNames);
                 Tracer.Assert(RawStatement != null);
             }
@@ -188,16 +188,16 @@ namespace Reni.Struct
             public int Position { get; }
 
             ValueCache<string[]> NamesCache { get; }
-            ValueCache<Checked<Value>> StatementCache { get; }
+            ValueCache<Result<Value>> StatementCache { get; }
 
-            public Value Statement => StatementCache.Value.Value;
+            public Value Statement => StatementCache.Value.Target;
             public Issue[] Issues => StatementCache.Value.Issues;
             public bool IsDefining(string name) => Names.Contains(name);
             public bool IsConverter => RawStatement.IsConverterSyntax;
             public bool IsMixIn => RawStatement.IsMixInSyntax;
             public IEnumerable<string> Names => NamesCache.Value;
             public bool IsMutable => RawStatement.IsMutableSyntax;
-            Checked<Value> GetStatement() => RawStatement.Body;
+            Result<Value> GetStatement() => RawStatement.Body;
             string[] GetNames() => RawStatement.GetDeclarations().ToArray();
         }
 

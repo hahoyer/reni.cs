@@ -15,13 +15,13 @@ namespace Reni.TokenClasses
 {
     sealed class FunctionSyntax : SpecialSyntax
     {
-        public static Checked<OldSyntax> Create
+        public static Result<OldSyntax> Create
             (
-            Checked<Parser.Value> setter,
+            Result<Parser.Value> setter,
             bool isImplicit,
             bool isMetaFunction,
-            Checked<Parser.Value> getter)
-            => new FunctionSyntax(setter?.Value, isImplicit, isMetaFunction, getter.Value)
+            Result<Parser.Value> getter)
+            => new FunctionSyntax(setter?.Target, isImplicit, isMetaFunction, getter.Target)
                 .Issues(setter?.Issues.plus(getter.Issues));
 
         internal Parser.Value Getter { get; }

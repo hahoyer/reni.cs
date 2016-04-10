@@ -193,6 +193,7 @@
     <Compile Include="ParserTest\AlternativePrioTableTest.cs" />
     <Compile Include="ParserTest\VerbatimText.cs" />
     <Compile Include="ParserTest\StrangeDeclarationSyntax.cs" />
+    <Compile Include="Parser\Result.cs" />
     <Compile Include="Parser\ITokenClass.cs" />
     <Compile Include="Parser\RecursionType.cs" />
     <Compile Include="Parser\SavePartMatch.cs" />
@@ -320,7 +321,6 @@
     <Compile Include="TokenClasses\InstanceToken.cs" />
     <Compile Include="TokenClasses\ScannerTokenClass.cs" />
     <Compile Include="TokenClasses\Syntax.cs" />
-    <Compile Include="TokenClasses\Checked.cs" />
     <Compile Include="TokenClasses\TokenClass.cs" />
     <Compile Include="TokenClasses\ToNumberOfBase.cs" />
     <Compile Include="TokenClasses\LeftParenthesis.cs" />

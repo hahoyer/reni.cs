@@ -10,7 +10,7 @@ namespace Reni.TokenClasses
 {
     abstract class Definable : TokenClass, IDeclaratorTokenClass
     {
-        protected override Checked<Parser.Value> Suffix(Syntax left, SourcePart token)
+        protected override Result<Parser.Value> Suffix(Syntax left, SourcePart token)
         {
             var d = left.Declarator;
             if(d != null)
@@ -20,7 +20,7 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        protected sealed override Checked<Parser.Value> Infix
+        protected sealed override Result<Parser.Value> Infix
             (Parser.Value left, SourcePart token, Parser.Value right)
             => ExpressionSyntax.Create(left, this, right, token);
 
@@ -31,19 +31,19 @@ namespace Reni.TokenClasses
         internal virtual IEnumerable<IDeclarationProvider> Genericize
             => this.GenericListFromDefinable();
 
-        public Checked<Parser.Value> CreateForVisit(Parser.Value left, Parser.Value right)
+        public Result<Parser.Value> CreateForVisit(Parser.Value left, Parser.Value right)
         {
             NotImplementedMethod(left, right);
             return null;
         }
 
-        Checked<Declarator> IDeclaratorTokenClass.Get(Syntax left, SourcePart token, Syntax right)
+        Result<Declarator> IDeclaratorTokenClass.Get(Syntax left, SourcePart token, Syntax right)
         {
             if(right == null)
             {
                 var d = left.Declarator;
                 if(d != null)
-                    return d.Value.WithName(this);
+                    return d.Target.WithName(this);
             }
 
             NotImplementedMethod(left, token, right);

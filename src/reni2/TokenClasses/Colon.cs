@@ -15,10 +15,10 @@ namespace Reni.TokenClasses
         public const string TokenId = ":";
         public override string Id => TokenId;
 
-        protected override Checked<Value> GetValue(Syntax left, SourcePart token, Syntax right)
+        protected override Result<Value> GetValue(Syntax left, SourcePart token, Syntax right)
         {
             var statements = left.GetStatements(token, right);
-            return new Checked<Value>(new CompoundSyntax(statements.Value),statements.Issues);
+            return new Result<Value>(new CompoundSyntax(statements.Target),statements.Issues);
         }
 
     }
@@ -52,7 +52,7 @@ namespace Reni.TokenClasses
     [BelongsTo(typeof(DeclarationTokenFactory))]
     abstract class DeclarationTagToken : TerminalToken, IDeclaratorTagProvider, IDeclarationTag
     {
-        Checked<Declarator> IDeclaratorTagProvider.Get
+        Result<Declarator> IDeclaratorTagProvider.Get
             (Syntax left, SourcePart token, Syntax right)
         {
             if(left == null && right == null)

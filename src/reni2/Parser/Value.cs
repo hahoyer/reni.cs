@@ -41,7 +41,7 @@ namespace Reni.Parser
         protected virtual bool GetIsLambda() => false;
 
         [DisableDump]
-        internal override Checked<Value> ToCompiledSyntax
+        internal override Result<Value> ToCompiledSyntax
         {
             get
             {

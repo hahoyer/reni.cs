@@ -25,12 +25,12 @@ namespace Reni.Parser
         OldSyntax[] Data { get; }
 
         [DisableDump]
-        internal override Checked<Value> ToCompiledSyntax
+        internal override Result<Value> ToCompiledSyntax
         {
             get
             {
                 var result = ToCompound;
-                return new Checked<Value>(result.Value, result.Issues);
+                return new Result<Value>(result.Target, result.Issues);
             }
         }
 

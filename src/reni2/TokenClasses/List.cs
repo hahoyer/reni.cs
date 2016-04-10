@@ -23,12 +23,12 @@ namespace Reni.TokenClasses
 
         public override string Id => TokenId(Level);
 
-        protected override Checked<Value> GetValue(Syntax left, SourcePart token, Syntax right)
+        protected override Result<Value> GetValue(Syntax left, SourcePart token, Syntax right)
         {
             var leftResult = left?.Statements;
             var rightResult = right?.Statements;
-            return new Checked<Value>(
-                new CompoundSyntax(leftResult?.Value.plus(rightResult?.Value)),
+            return new Result<Value>(
+                new CompoundSyntax(leftResult?.Target.plus(rightResult?.Target)),
                 leftResult?.Issues.plus(rightResult?.Issues)
                 );
         }
