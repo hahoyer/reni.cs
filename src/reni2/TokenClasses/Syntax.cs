@@ -240,7 +240,15 @@ namespace Reni.TokenClasses
 
         [DisableDump]
         internal Result<Value> Value
-            => TokenClass.GetValue(Left, Token.Characters, Right);
+        {
+            get
+            {
+                var statementsProvider = TokenClass as IStatementsProvider;
+                if(statementsProvider != null)
+                    return CompoundSyntax.Create(statementsProvider.Get(Left, Token.Characters, Right));
+                return TokenClass.GetValue(Left, Token.Characters, Right);
+            }
+        }
 
         [DisableDump]
         internal Result<Declarator> Declarator
@@ -257,16 +265,16 @@ namespace Reni.TokenClasses
         }
 
         [DisableDump]
-        internal Result<Statement[]> Statements 
+        internal Result<Statement[]> Statements
         {
             get
             {
-                var colon = TokenClass as Colon;
-                if(colon != null)
-                    return Left.GetStatementsFromColon(Token.Characters, Right);
+                var statementsProvider = TokenClass as IStatementsProvider;
+                if (statementsProvider != null)
+                    return statementsProvider.Get(Left, Token.Characters, Right);
 
-                NotImplementedMethod();
-                return null;
+                var result = Value;
+                return new Statements(Value.Target);
             }
         }
 
@@ -284,7 +292,7 @@ namespace Reni.TokenClasses
             return Right;
         }
 
-        internal Result<Statement> GetStatement(SourcePart token, Syntax right)
+        internal Result<Statement> GetStatementFromColon(SourcePart token, Syntax right)
         {
             var declaration = Declarator;
             var body = right.Value;
@@ -294,12 +302,11 @@ namespace Reni.TokenClasses
                 item.Target,
                 declaration.Issues.plus(body.Issues).plus(item.Issues));
         }
+    }
 
-        internal Result<Statement[]> GetStatementsFromColon(SourcePart token, Syntax right)
-        {
-            var statement = GetStatement(token, right);
-            return new Result<Statement[]>(new[] {statement.Target}, statement.Issues);
-        }
+    interface IStatementsProvider
+    {
+        Result<Statement[]> Get(Syntax left, SourcePart characters, Syntax right);
     }
 
     interface ISyntaxProvider
