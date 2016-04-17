@@ -175,7 +175,7 @@ namespace Reni.Context
 
         internal Container MainContainer(Syntax syntax, string description)
         {
-            var compoundSyntax = syntax.Value;
+            var compoundSyntax = CompoundSyntax.Create(syntax.GetStatements());
 
             var rawResult = compoundSyntax.Target.Result(this);
             return rawResult
