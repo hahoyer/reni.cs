@@ -46,12 +46,12 @@ namespace Reni.Parser
         internal Value Left { get; }
         [Node]
         public Definable Definable { get; }
-        internal override SourcePart Token { get; }
+        SourcePart Token { get; }
         [Node]
         internal Value Right { get; }
 
         [DisableDump]
-        protected override IEnumerable<OldSyntax> DirectChildren
+        protected override IEnumerable<Value> DirectChildren
         {
             get
             {

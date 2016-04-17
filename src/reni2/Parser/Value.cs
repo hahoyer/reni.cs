@@ -12,7 +12,7 @@ using Reni.Type;
 
 namespace Reni.Parser
 {
-    abstract class Value : OldSyntax
+    abstract class Value : DumpableObject
     {
         // Used for debug only
         [DisableDump]
@@ -41,14 +41,14 @@ namespace Reni.Parser
         protected virtual bool GetIsLambda() => false;
 
         [DisableDump]
-        internal override Result<Value> ToCompiledSyntax
-        {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
-        }
+        protected virtual IEnumerable<Value> DirectChildren { get { yield break; } }
+
+        [DisableDump]
+        public IEnumerable<Value> Closure
+            => DirectChildren
+                .Where(item => item != null)
+                .SelectMany(item => item.Closure)
+                .plus(this);
 
         internal virtual IRecursionHandler RecursionHandler => null;
 

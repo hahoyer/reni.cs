@@ -9,7 +9,7 @@ namespace Reni.Parser
 {
     sealed class EmptyList : Value
     {
-        internal override SourcePart Token { get; }
+        SourcePart Token { get; }
 
         public EmptyList(SourcePart token)
         {

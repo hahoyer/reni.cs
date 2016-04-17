@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
-using hw.Scanner;
 using Reni.Parser;
-using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
@@ -18,7 +16,7 @@ namespace Reni.TokenClasses
     sealed class LeftParenthesis : TokenClass, IBelongingsMatcher
     {
         public static string TokenId(int level)
-            => level == 0 ? PrioTable.BeginOfText : "{[(".Substring(level-1, 1);
+            => level == 0 ? PrioTable.BeginOfText : "{[(".Substring(level - 1, 1);
 
         public LeftParenthesis(int level) { Level = level; }
         [DisableDump]
@@ -27,71 +25,6 @@ namespace Reni.TokenClasses
         public override string Id => TokenId(Level);
         [DisableDump]
         internal override bool IsVisible => Level != 0;
-
-        sealed class Syntax : OldSyntax
-        {
-            internal override SourcePart Token { get; }
-            readonly int Level;
-
-            [EnableDump]
-            OldSyntax Right { get; }
-            [EnableDump]
-            OldSyntax Left { get; }
-
-            public Syntax(OldSyntax left, int level, SourcePart token, OldSyntax right)
-            {
-                Left = left;
-                Token = token;
-                Level = level;
-                Right = right;
-            }
-
-            [DisableDump]
-            protected override IEnumerable<OldSyntax> DirectChildren
-            {
-                get
-                {
-                    yield return Left;
-                    yield return Right;
-                }
-            }
-
-            [DisableDump]
-            internal override Result<Value> ToCompiledSyntax
-            {
-                get
-                {
-                    if(Left == null)
-                        return (Right ?? new EmptyList(Token)).ToCompiledSyntax;
-
-                    if(Right != null)
-                        NotImplementedFunction();
-
-                    return Left.ToCompiledSyntax;
-                }
-            }
-
-            internal override Result<OldSyntax> Match(int level, SourcePart token)
-            {
-                if(Level != level)
-                    return new Result<OldSyntax>
-                        (this, IssueId.ExtraLeftBracket.CreateIssue(Token));
-
-                var innerPart = Right ?? new EmptyList(token);
-
-                if(Level == 0)
-                {
-                    Tracer.Assert(Left == null);
-                    return Result<OldSyntax>.From(innerPart.ToCompiledSyntax);
-                }
-
-                if(Left == null)
-                    return innerPart;
-
-                NotImplementedMethod(level, token);
-                return null;
-            }
-        }
 
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => (otherMatcher as RightParenthesis)?.Level == Level;

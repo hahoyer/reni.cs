@@ -236,7 +236,7 @@ namespace Reni.Context
         sealed class ResultGroup
         {
             internal ContextBase Context;
-            internal OldSyntax Syntax;
+            internal Parser.Value Syntax;
             internal SourcePart All;
             internal SourcePart Atom;
         }

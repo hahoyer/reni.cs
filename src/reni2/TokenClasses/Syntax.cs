@@ -363,12 +363,6 @@ namespace Reni.TokenClasses
         Result<Statement[]> Get(List type, Syntax left, SourcePart token, Syntax right);
     }
 
-    interface ISyntaxProvider
-    {
-        OldSyntax Value { get; }
-        IEnumerable<Issue> Issues { get; }
-    }
-
     interface IBelongingsMatcher
     {
         bool IsBelongingTo(IBelongingsMatcher otherMatcher);

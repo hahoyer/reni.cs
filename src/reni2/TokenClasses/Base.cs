@@ -59,31 +59,6 @@ namespace Reni.TokenClasses
         }
     }
 
-    abstract class NonPrefixSyntaxToken : NonPrefixToken, ITerminal, ISuffix
-    {
-        protected sealed override Result<OldSyntax> OldTerminal(SourcePart token)
-            => new TerminalSyntax(token, this);
-
-        Result ITerminal.Result(ContextBase context, Category category, TerminalSyntax token)
-            => Result(context, category, token);
-
-        protected abstract Result Result
-            (ContextBase context, Category category, TerminalSyntax token);
-
-        Result ISuffix.Result(ContextBase context, Category category, Value left)
-            => Result(context, category, left);
-
-        protected abstract Result Result(ContextBase context, Category category, Value left);
-
-        Value ITerminal.Visit(ISyntaxVisitor visitor) => Visit(visitor);
-
-        internal virtual Value Visit(ISyntaxVisitor visitor)
-        {
-            NotImplementedMethod(visitor);
-            return null;
-        }
-    }
-
     abstract class InfixPrefixSyntaxToken : InfixPrefixToken, IInfix, IPrefix, IValueProvider
     {
         Result IInfix.Result
@@ -115,9 +90,6 @@ namespace Reni.TokenClasses
 
     abstract class NonSuffixSyntaxToken : NonSuffixToken, ITerminal, IPrefix,IValueProvider
     {
-        protected sealed override Result<OldSyntax> OldTerminal(SourcePart token)
-            => new TerminalSyntax(token, this);
-
         Result ITerminal.Result(ContextBase context, Category category, TerminalSyntax token)
             => Result(context, category, token);
 

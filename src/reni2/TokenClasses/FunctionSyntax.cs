@@ -27,7 +27,7 @@ namespace Reni.TokenClasses
         }
 
         internal Parser.Value Getter { get; }
-        internal override SourcePart Token { get; }
+        SourcePart Token { get; }
         internal Parser.Value Setter { get; }
 
         bool IsMetaFunction { get; }
@@ -49,7 +49,7 @@ namespace Reni.TokenClasses
         }
 
         [DisableDump]
-        protected override IEnumerable<OldSyntax> DirectChildren
+        protected override IEnumerable<Parser.Value> DirectChildren
         {
             get
             {

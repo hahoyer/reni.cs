@@ -18,8 +18,7 @@ namespace Reni
         [EnableDump]
         readonly Value Cond;
 
-        [DisableDump]
-        internal override SourcePart Token { get; }
+        SourcePart Token { get; }
 
         [Node]
         [EnableDump]
@@ -50,7 +49,7 @@ namespace Reni
         }
 
         [DisableDump]
-        protected override IEnumerable<OldSyntax> DirectChildren
+        protected override IEnumerable<Value> DirectChildren
         {
             get
             {

@@ -13,7 +13,7 @@ namespace Reni.Parser
     sealed class TerminalSyntax : SpecialSyntax
     {
         internal string Id => Token.Id;
-        internal override SourcePart Token { get; }
+        internal SourcePart Token { get; }
 
         [Node]
         [EnableDump]
@@ -54,7 +54,7 @@ namespace Reni.Parser
         readonly Value Right;
 
         [DisableDump]
-        internal override SourcePart Token { get; }
+        internal SourcePart Token { get; }
 
         public PrefixSyntax(IPrefix prefix, SourcePart token, Value right)
         {
@@ -68,7 +68,7 @@ namespace Reni.Parser
             .Result(context, category, this, Right);
 
         protected override string GetNodeDump() => Prefix.NodeDump() + "(" + Right.NodeDump + ")";
-        protected override IEnumerable<OldSyntax> DirectChildren { get { yield return Right; } }
+        protected override IEnumerable<Value> DirectChildren { get { yield return Right; } }
 
         internal override SourcePosn SourceStart => Token.Start;
         internal override SourcePosn SourceEnd => Right.SourceEnd;
@@ -99,7 +99,7 @@ namespace Reni.Parser
         [EnableDump]
         readonly Value Right;
 
-        internal override SourcePart Token { get; }
+        internal SourcePart Token { get; }
 
         public InfixSyntax(Value left, IInfix infix, SourcePart token, Value right)
         {
@@ -131,7 +131,7 @@ namespace Reni.Parser
         }
 
         [DisableDump]
-        protected override IEnumerable<OldSyntax> DirectChildren
+        protected override IEnumerable<Value> DirectChildren
         {
             get
             {
@@ -171,7 +171,7 @@ namespace Reni.Parser
             Token = token;
         }
 
-        internal override SourcePart Token { get; }
+        internal SourcePart Token { get; }
 
         internal override Result ResultForCache(ContextBase context, Category category)
             => Suffix.Result(context, category, Left);
@@ -182,7 +182,7 @@ namespace Reni.Parser
         protected override string GetNodeDump() => "(" + Left.NodeDump + ")" + Suffix;
 
         [DisableDump]
-        protected override IEnumerable<OldSyntax> DirectChildren { get { yield return Left; } }
+        protected override IEnumerable<Value> DirectChildren { get { yield return Left; } }
     }
 
     interface ITerminal
