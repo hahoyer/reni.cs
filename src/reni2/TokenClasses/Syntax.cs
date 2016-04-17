@@ -301,7 +301,7 @@ namespace Reni.TokenClasses
             }
         }
 
-        internal Result<Statement[]> GetStatements(List type)
+        internal Result<Statement[]> GetStatements(List type = null)
         {
             var statements = Option.GetStatements(type);
             if(statements != null)

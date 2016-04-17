@@ -24,11 +24,11 @@ namespace Reni.Struct
         internal static Result<Value> Create(Result<Statement[]> item)
             => new Result<Value>(new CompoundSyntax(item.Target), item.Issues);
 
-        internal static Result<Value> Create(Result<Statement[]> left, Result<Statement[]> right)
+        internal static Result<Value> Create(Result<Statement[]> left, Result<Value> right)
             => new Result<Value>
                 (
-                new CompoundSyntax(left?.Target.plus(right?.Target)),
-                left?.Issues.plus(right?.Issues)
+                new CompoundSyntax(left.Target, right?.Target),
+                left.Issues.plus(right?.Issues)
                 );
 
         readonly Statement[] _statements;
