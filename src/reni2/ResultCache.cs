@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 using hw.DebugFormatter;
@@ -125,7 +126,7 @@ namespace Reni
 
         public static implicit operator ResultCache(Result x) => new ResultCache(x);
 
-        //[DebuggerHidden]
+        [DebuggerHidden]
         void Update(Category category)
         {
             var localCategory = category - Data.CompleteCategory - Data.PendingCategory;
@@ -169,7 +170,7 @@ namespace Reni
         public static Result operator &(ResultCache resultCache, Category category)
             => resultCache.GetCategories(category);
 
-
+        [DebuggerHidden]
         internal Result GetCategories(Category category)
         {
             var trace = ObjectId == -1768;
@@ -187,7 +188,7 @@ namespace Reni
             }
         }
 
-        //[DebuggerHidden]
+        [DebuggerHidden]
         void GuardedUpdate(Category category)
         {
             try
