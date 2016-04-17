@@ -27,7 +27,7 @@ namespace Reni.Parser
             Target = target;
         }
 
-        internal Result<Statement> Statement(SourcePart token, Value right)
+        internal Result<Statement> Statement(SourcePart token, Result<Value> right)
             => Parser.Statement.Create(Tags, Target, token, right);
 
         public Declarator WithName(Definable target)

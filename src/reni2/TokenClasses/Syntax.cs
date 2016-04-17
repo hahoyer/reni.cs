@@ -33,13 +33,17 @@ namespace Reni.TokenClasses
                 => (Parent.TokenClass as IValueProvider)?.Get
                     (Parent.Left, Parent.Token.Characters, Parent.Right);
 
-            internal Result<Statement[]> Statements
-                => (Parent.TokenClass as IStatementsProvider)?.Get
-                    (Parent.Left, Parent.Token.Characters, Parent.Right);
+            internal Result<Statement[]> GetStatements(List type = null)
+                => (Parent.TokenClass as IStatementsProvider)
+                    ?.Get(type, Parent.Left, Parent.Token.Characters, Parent.Right);
+
+            internal Result<Statement> Statement
+                => (Parent.TokenClass as IStatementProvider)
+                    ?.Get(Parent.Left, Parent.Token.Characters, Parent.Right);
 
             internal Result<Declarator> Declarator
-                => (Parent.TokenClass as IDeclaratorTokenClass)?.Get
-                    (Parent.Left, Parent.Token.Characters, Parent.Right);
+                => (Parent.TokenClass as IDeclaratorTokenClass)
+                    ?.Get(Parent.Left, Parent.Token.Characters, Parent.Right);
         }
 
         [DisableDump]
@@ -270,7 +274,11 @@ namespace Reni.TokenClasses
                 if(value != null)
                     return value;
 
-                var statements = Option.Statements;
+                var statement = Option.Statement;
+                if(statement != null)
+                    return CompoundSyntax.Create(statement);
+
+                var statements = Option.GetStatements();
                 if(statements != null)
                     return CompoundSyntax.Create(statements);
 
@@ -293,22 +301,22 @@ namespace Reni.TokenClasses
             }
         }
 
-        [DisableDump]
-        internal Result<Statement[]> Statements
+        internal Result<Statement[]> GetStatements(List type)
         {
-            get
-            {
-                var statements = Option.Statements;
-                if(statements != null)
-                    return statements;
+            var statements = Option.GetStatements(type);
+            if(statements != null)
+                return statements;
 
-                var value = Option.Value;
-                if(value != null)
-                    return Statement.CreateStatements(Token.Characters, value);
+            var statement = Option.Statement;
+            if (statement != null)
+                return statement.Convert(x=>new []{x});
 
-                NotImplementedMethod();
-                return null;
-            }
+            var value = Option.Value;
+            if(value != null)
+                return Statement.CreateStatements(Token.Characters, value);
+
+            NotImplementedMethod(type);
+            return null;
         }
 
         [DisableDump]
@@ -331,9 +339,14 @@ namespace Reni.TokenClasses
         Result<Value> Get(Syntax left, SourcePart token, Syntax right);
     }
 
+    interface IStatementProvider
+    {
+        Result<Statement> Get(Syntax left, SourcePart token, Syntax right);
+    }
+
     interface IStatementsProvider
     {
-        Result<Statement[]> Get(Syntax left, SourcePart characters, Syntax right);
+        Result<Statement[]> Get(List type, Syntax left, SourcePart token, Syntax right);
     }
 
     interface ISyntaxProvider

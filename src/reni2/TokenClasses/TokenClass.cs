@@ -50,6 +50,7 @@ namespace Reni.TokenClasses
 
         [DisableDump]
         internal virtual bool IsVisible => true;
+
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]

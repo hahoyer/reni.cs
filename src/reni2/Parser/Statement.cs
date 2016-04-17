@@ -16,8 +16,8 @@ namespace Reni.Parser
             => value.Convert(x => new Statement(null, null, token, x));
 
         internal static Result<Statement> Create
-            (IDeclarationTag[] tags, Definable target, SourcePart token, Value body)
-            => new Statement(tags, target, token, body);
+            (IDeclarationTag[] tags, Definable target, SourcePart token, Result<Value> body)
+            => body.Convert(x => new Statement(tags, target, token, x));
 
         Statement
             (IDeclarationTag[] tags, Definable target, SourcePart token, Value body)

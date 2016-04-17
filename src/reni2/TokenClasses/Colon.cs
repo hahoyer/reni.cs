@@ -4,15 +4,19 @@ using System.Linq;
 using hw.Parser;
 using hw.Scanner;
 using Reni.Parser;
-using Reni.Struct;
 
 namespace Reni.TokenClasses
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class Colon : TokenClass
+    sealed class Colon : TokenClass, IStatementProvider
     {
         public const string TokenId = ":";
         public override string Id => TokenId;
+
+        Result<Statement> IStatementProvider.Get(Syntax left, SourcePart token, Syntax right)
+            => left
+                .Declarator
+                .Convert(x => x.Statement(token, right.Value));
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
