@@ -19,16 +19,6 @@ namespace Reni.Parser
         internal TTarget Target { get; }
         internal Issue[] Issues { get; }
 
-        [DisableDump]
-        internal TTarget SaveTarget
-        {
-            get
-            {
-                Tracer.Assert(!Issues.Any());
-                return Target;
-            }
-        }
-
         public static implicit operator Result<TTarget>(TTarget value)
             => new Result<TTarget>(value);
 
@@ -45,6 +35,7 @@ namespace Reni.Parser
             var inner = converter(Target);
             return new Result<TOutTarget>(inner.Target, Issues.plus(inner.Issues));
         }
+
         internal Result<TOutTarget> Convert<TOutTarget>(Func<TTarget, TOutTarget> converter)
             where TOutTarget : class
         {

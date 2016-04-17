@@ -141,8 +141,13 @@ namespace Reni.TokenClasses
 
         Result<Value> IValueProvider.Get(Syntax left, SourcePart token, Syntax right)
         {
-            if (left == null && right == null)
-                return new TerminalSyntax(token, this);
+            if (left == null)
+            {
+                if(right == null)
+                    return new TerminalSyntax(token, this);
+
+                return PrefixSyntax.Create(this, token, right.Value);
+            }
 
             NotImplementedMethod(left, token, right);
             return null;

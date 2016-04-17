@@ -5,7 +5,6 @@ using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
-using Reni.TokenClasses;
 
 namespace Reni.Parser
 {
@@ -70,6 +69,9 @@ namespace Reni.Parser
 
         protected override string GetNodeDump() => Prefix.NodeDump() + "(" + Right.NodeDump + ")";
         protected override IEnumerable<OldSyntax> DirectChildren { get { yield return Right; } }
+
+        internal override SourcePosn SourceStart => Token.Start;
+        internal override SourcePosn SourceEnd => Right.SourceEnd;
     }
 
     sealed class InfixSyntax : SpecialSyntax

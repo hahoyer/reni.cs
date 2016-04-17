@@ -8,7 +8,6 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Struct;
-using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Parser
@@ -24,7 +23,7 @@ namespace Reni.Parser
         internal Value() { }
 
         internal Value(int objectId)
-            : base(objectId) {}
+            : base(objectId) { }
 
         [DisableDump]
         internal bool IsLambda => GetIsLambda();
@@ -61,7 +60,6 @@ namespace Reni.Parser
             {
                 NotImplementedMethod();
                 return null;
-
             }
         }
 
@@ -71,7 +69,6 @@ namespace Reni.Parser
             {
                 NotImplementedMethod();
                 return null;
-
             }
         }
 
