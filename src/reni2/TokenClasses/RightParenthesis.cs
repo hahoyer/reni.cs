@@ -61,20 +61,27 @@ namespace Reni.TokenClasses
 
         Result<Value> IValueProvider.Get(Syntax left, SourcePart token, Syntax right)
         {
-            var syntax = left.GetBracketKernel(right);
-            return syntax == null ? new EmptyList(token) : syntax.Value;
+            var result = left.GetBracketKernel(Level, right);
+            var target = result.Item1?.Option.Value ?? new EmptyList(token);
+
+            if(result.Item2 != null)
+                return target.With(result.Item2);
+
+            return result.Item1 == null ? new EmptyList(token) : result.Item1.Value;
         }
 
         Result<Declarator> IDeclaratorTagProvider.Get(Syntax left, SourcePart token, Syntax right)
         {
-            var syntax = left.GetBracketKernel(right);
-            if(syntax == null)
-                return new Result<Declarator>
-                    (
-                    new Declarator(null, null),
-                    IssueId.MissingDeclarationTag.CreateIssue(token));
+            var result = left.GetBracketKernel(Level, right);
+            var target = result.Item1?.Option.Declarator ?? new Declarator(null, null);
 
-            NotImplementedMethod(left, token, right, nameof(syntax), syntax);
+            if(result.Item2 != null)
+                return target.With(result.Item2);
+
+            if(result.Item1 == null)
+                return target.With(IssueId.MissingDeclarationTag.CreateIssue(token));
+
+            NotImplementedMethod(left, token, right, nameof(result), result);
             return null;
         }
     }

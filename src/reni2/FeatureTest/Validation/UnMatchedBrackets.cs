@@ -14,7 +14,7 @@ namespace Reni.FeatureTest.Validation
     {
         public UnMatchedLeftParenthesis()
         {
-            Parameters.TraceOptions.Parser = true;
+            Parameters.TraceOptions.Parser = false;
             Parameters.ParseOnly = true;
         }
 

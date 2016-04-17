@@ -23,7 +23,7 @@ namespace Reni.TokenClasses
 
         static int _nextObjectId;
 
-        sealed class OptionClass
+        internal sealed class OptionClass
         {
             Syntax Parent { get; }
 
@@ -47,7 +47,7 @@ namespace Reni.TokenClasses
         }
 
         [DisableDump]
-        OptionClass Option { get; }
+        internal OptionClass Option { get; }
         Syntax _parent;
         internal Syntax Left { get; }
         internal ITokenClass TokenClass { get; }
@@ -282,7 +282,7 @@ namespace Reni.TokenClasses
                 if(statements != null)
                     return CompoundSyntax.Create(statements);
 
-                return IssueId.InvalidExpression.Syntax(Token.Characters);
+                return IssueId.InvalidExpression.Value(Token.Characters);
             }
         }
 
@@ -308,8 +308,8 @@ namespace Reni.TokenClasses
                 return statements;
 
             var statement = Option.Statement;
-            if (statement != null)
-                return statement.Convert(x=>new []{x});
+            if(statement != null)
+                return statement.Convert(x => new[] {x});
 
             var value = Option.Value;
             if(value != null)
@@ -325,12 +325,22 @@ namespace Reni.TokenClasses
                 .plus(Option.Value?.Issues)
                 .plus(Right?.Issues);
 
-        internal Syntax GetBracketKernel(Syntax right = null)
+        internal Tuple<Syntax,Issue> GetBracketKernel(int level, Syntax right = null)
         {
             Tracer.Assert(right == null);
             Tracer.Assert(Left == null);
-            Tracer.Assert(TokenClass is LeftParenthesis);
-            return Right;
+            var leftParenthesis = TokenClass as LeftParenthesis;
+            Tracer.Assert(leftParenthesis != null);
+            var levelDelta = leftParenthesis.Level - level;
+
+            if (levelDelta == 0)
+                return new Tuple<Syntax, Issue>(Right, null);
+
+            if (levelDelta > 0)
+                return new Tuple<Syntax, Issue>(Right, IssueId.ExtraLeftBracket.CreateIssue(Token.Characters));
+
+            NotImplementedMethod(level, right);
+            return null;
         }
     }
 

@@ -16,8 +16,5 @@ namespace Reni.TokenClasses
         protected override Result<OldSyntax> OldInfix(OldSyntax left, SourcePart token, OldSyntax right)
             => left.CreateElseSyntax(right.ToCompiledSyntax);
 
-        protected override Result<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
-            => IssueId.MissingThen.Syntax(token, right);
-
     }
 }

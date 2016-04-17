@@ -20,7 +20,6 @@ namespace Reni.Validation
         public static readonly IssueId IdentifierExpected = new IssueId();
         public static readonly IssueId InvalidExpression = new IssueId();
         public static readonly IssueId MissingFunctionGetter = new IssueId();
-        public static readonly IssueId MissingRightBracket = new IssueId();
         public static readonly IssueId MissingThen = new IssueId();
         public static readonly IssueId MissingElseBody = new IssueId();
         public static readonly IssueId MissingValueInDeclaration = new IssueId();
@@ -36,14 +35,14 @@ namespace Reni.Validation
 
         internal Issue CreateIssue(SourcePart token) => new Issue(this, token, "");
 
-        internal Result<Value> Syntax(SourcePart token)
+        internal Result<Value> Value(SourcePart token)
             => new Result<Value>(new EmptyList(token), new Issue(this, token, ""));
 
-        internal Result<OldSyntax> Syntax(SourcePart token, OldSyntax value)
-            => new Result<OldSyntax>(value, new Issue(this, token, ""));
-
-        internal Result<Value> Syntax(SourcePart token, Value value)
+        internal Result<Value> Value(SourcePart token, Value value)
             => new Result<Value>(value, new Issue(this, token, ""));
+
+        internal Result<Syntax> Syntax(SourcePart token, Syntax syntax)
+            => new Result<Syntax>(syntax, new Issue(this, token, ""));
 
     }
 }
