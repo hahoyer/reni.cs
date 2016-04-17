@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Parser;
+using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni
@@ -17,6 +18,9 @@ namespace Reni
         [EnableDump]
         readonly Value Cond;
 
+        [DisableDump]
+        internal override SourcePart Token { get; }
+
         [Node]
         [EnableDump]
         readonly Value Then;
@@ -25,22 +29,23 @@ namespace Reni
         [EnableDump]
         readonly Value Else;
 
-        internal CondSyntax
-            (
-            Value condSyntax,
-            Value thenSyntax,
-            Value elseSyntax = null)
+        internal static Result<Value> Create
+            (Syntax condition, SourcePart token, Syntax thenSyntax, Syntax elseSyntax)
         {
-            Cond = condSyntax;
-            Then = thenSyntax;
-            Else = elseSyntax;
+            var conditionValue = condition.Value;
+            var thenValue = thenSyntax?.Value;
+            var elseValue = elseSyntax?.Value;
+            var result = new CondSyntax
+                (conditionValue.Target, token, thenValue?.Target, elseValue?.Target);
+            var issues = conditionValue.Issues.plus(thenValue?.Issues).plus(elseValue?.Issues);
+            return new Result<Value>(result, issues);
         }
 
-        CondSyntax(CondSyntax other, Value elseSyntax)
+        CondSyntax(Value condSyntax, SourcePart token, Value thenSyntax, Value elseSyntax)
         {
-            Cond = other.Cond;
-            Then = other.Then;
-            Tracer.Assert(other.Else == null);
+            Cond = condSyntax;
+            Token = token;
+            Then = thenSyntax;
             Else = elseSyntax;
         }
 
@@ -59,6 +64,9 @@ namespace Reni
             => InternalResult(context, category);
 
         internal override IRecursionHandler RecursionHandler => this;
+
+        internal override SourcePosn SourceStart => Cond.SourceStart;
+        internal override SourcePosn SourceEnd => Else?.SourceEnd ?? Then?.SourceEnd ?? Token.End;
 
         internal override ResultCache.IResultProvider FindSource
             (IContextReference ext, ContextBase context)
@@ -84,6 +92,7 @@ namespace Reni
             if(Else == null)
                 return context
                     .RootContext.VoidType.Result(category);
+
             return BranchResult(context, category, Else);
         }
 
@@ -108,7 +117,7 @@ namespace Reni
         Result InternalResult(ContextBase context, Category category)
         {
             var commonType = CommonType(context);
-            if(category <= (Category.Type.Replenished))
+            if(category <= Category.Type.Replenished)
                 return commonType.Result(category);
 
             var branchCategory = category & Category.Code.Replenished;
@@ -129,19 +138,15 @@ namespace Reni
             if(Else == null)
                 return context
                     .RootContext.VoidType;
+
             var thenType = Then.Type(context);
             var elseType = Else.Type(context);
             if(thenType == null)
                 return elseType?.Align;
             if(elseType == null)
                 return thenType.Align;
-            return thenType.CommonType(elseType).Align;
-        }
 
-        internal override OldSyntax CreateElseSyntax(Value elseSyntax)
-        {
-            Tracer.Assert(Else == null);
-            return new CondSyntax(this, elseSyntax);
+            return thenType.CommonType(elseType).Align;
         }
 
         Result IRecursionHandler.Execute

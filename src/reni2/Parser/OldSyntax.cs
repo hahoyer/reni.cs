@@ -38,21 +38,6 @@ namespace Reni.Parser
 
         internal virtual IEnumerable<string> GetDeclarations() { yield break; }
 
-        internal Result<OldSyntax> CreateThenSyntax(Value condition)
-        {
-            var syntax = ToCompiledSyntax;
-            return new Result<OldSyntax>(new CondSyntax(condition, syntax.Target), syntax.Issues);
-        }
-
-        internal virtual OldSyntax CreateElseSyntax(Value elseSyntax)
-        {
-            NotImplementedMethod(elseSyntax);
-            return null;
-        }
-
-        internal Result<OldSyntax> CreateElseSyntax(Result<Value> right)
-            => Extension.Issues(CreateElseSyntax(right.Target), right.Issues);
-
         protected sealed override string Dump(bool isRecursion)
         {
             if(isRecursion)

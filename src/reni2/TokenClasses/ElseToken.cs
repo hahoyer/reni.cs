@@ -1,20 +1,23 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.Parser;
-using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class ElseToken : TokenClass
+    sealed class ElseToken : TokenClass, IValueProvider
     {
         public const string TokenId = "else";
         public override string Id => TokenId;
 
-        protected override Result<OldSyntax> OldInfix(OldSyntax left, SourcePart token, OldSyntax right)
-            => left.CreateElseSyntax(right.ToCompiledSyntax);
-
+        Result<Value> IValueProvider.Get(Syntax left, SourcePart token, Syntax right)
+        {
+            Tracer.Assert(left != null);
+            Tracer.Assert(left.TokenClass is ThenToken);
+            return CondSyntax.Create(left.Left, left.Token.Characters, left.Right, right);
+        }
     }
 }
