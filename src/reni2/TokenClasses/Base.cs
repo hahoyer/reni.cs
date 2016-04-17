@@ -30,8 +30,6 @@ namespace Reni.TokenClasses
         protected sealed override Result<OldSyntax> OldSuffix(OldSyntax left, SourcePart token)
             => IssueId.UnexpectedUseAsSuffix.Syntax(token, left);
 
-        protected sealed override Result<OldSyntax> OldTerminal(SourcePart token)
-            => IssueId.UnexpectedUseAsTerminal.Syntax(token);
     }
 
     abstract class NonSuffixToken : TokenClass
@@ -45,17 +43,12 @@ namespace Reni.TokenClasses
         protected sealed override Result<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
             => IssueId.UnexpectedUseAsPrefix.Syntax(token, right);
 
-        protected sealed override Result<OldSyntax> OldTerminal(SourcePart token)
-            => IssueId.UnexpectedUseAsTerminal.Syntax(token);
     }
 
     abstract class InfixToken : TokenClass
     {
         protected sealed override Result<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
             => IssueId.UnexpectedUseAsPrefix.Syntax(token, right);
-
-        protected sealed override Result<OldSyntax> OldTerminal(SourcePart token)
-            => IssueId.UnexpectedUseAsTerminal.Syntax(token);
 
         protected sealed override Result<OldSyntax> OldSuffix(OldSyntax left, SourcePart token)
             => IssueId.UnexpectedUseAsSuffix.Syntax(token,left);
@@ -64,9 +57,6 @@ namespace Reni.TokenClasses
 
     abstract class TerminalSyntaxToken : TerminalToken, ITerminal
     {
-        protected sealed override Result<Value> Terminal(SourcePart token)
-            => new TerminalSyntax(token, this);
-
         Result ITerminal.Result(ContextBase context, Category category, TerminalSyntax token)
             => Result(context, category, token);
 
@@ -79,14 +69,6 @@ namespace Reni.TokenClasses
         {
             NotImplementedMethod(visitor);
             return null;
-        }
-
-        protected override Result<Value> Infix(Value left, SourcePart token, Value right)
-        {
-            if(left == null && right == null)
-                return new TerminalSyntax(token, this);
-
-            return base.Infix(left, token, right);
         }
     }
 

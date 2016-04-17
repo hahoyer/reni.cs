@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.Scanner;
 using Reni.Parser;
 using Reni.Validation;
 
@@ -24,12 +23,6 @@ namespace Reni.TokenClasses
         {
             _isImplicit = isImplicit;
             _isMetaFunction = isMetaFunction;
-        }
-
-        protected override Result<Value> Infix(Value left, SourcePart token, Value right)
-        {
-            var result = FunctionSyntax.Create(left, _isImplicit, _isMetaFunction, right);
-            return result;
         }
     }
 }

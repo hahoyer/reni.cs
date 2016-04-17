@@ -36,8 +36,8 @@ namespace Reni.Validation
 
         internal Issue CreateIssue(SourcePart token) => new Issue(this, token, "");
 
-        internal Result<OldSyntax> Syntax(SourcePart token)
-            => new Result<OldSyntax>(new EmptyList(token), new Issue(this, token, ""));
+        internal Result<Value> Syntax(SourcePart token)
+            => new Result<Value>(new EmptyList(token), new Issue(this, token, ""));
 
         internal Result<OldSyntax> Syntax(SourcePart token, OldSyntax value)
             => new Result<OldSyntax>(value, new Issue(this, token, ""));

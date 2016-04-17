@@ -132,7 +132,7 @@ namespace Reni.Parser
     }
 
 
-    sealed class ScannerSyntaxError : ScannerTokenClass, IType<Syntax>, ITokenClass
+    sealed class ScannerSyntaxError : ScannerTokenClass, IType<Syntax>, ITokenClass, IValueProvider
     {
         readonly IssueId _issue;
 
@@ -146,7 +146,7 @@ namespace Reni.Parser
 
         public override string Id => "<error>";
 
-        Result<Value> ITokenClass.GetValue(Syntax left, SourcePart token, Syntax right)
+        Result<Value> IValueProvider.Get(Syntax left, SourcePart token, Syntax right)
         {
             NotImplementedMethod(left,token,right);
             return null;

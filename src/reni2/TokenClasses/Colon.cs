@@ -13,9 +13,6 @@ namespace Reni.TokenClasses
     {
         public const string TokenId = ":";
         public override string Id => TokenId;
-
-        protected override Result<Value> GetValue(Syntax left, SourcePart token, Syntax right)
-            => CompoundSyntax.Create(left.GetStatementsFromColon(token, right));
     }
 
     [BelongsTo(typeof(MainTokenFactory))]

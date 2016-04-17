@@ -1,12 +1,11 @@
-using hw.Parser;
-using hw.Scanner;
-using Reni.TokenClasses;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Reni.Parser
 {
     interface ITokenClass
     {
         string Id { get; }
-        Result<Value> GetValue(Syntax left, SourcePart token, Syntax right);
     }
 }

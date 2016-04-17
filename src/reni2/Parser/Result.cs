@@ -38,5 +38,9 @@ namespace Reni.Parser
 
         internal Result<TTarget> With(IEnumerable<Issue> issues)
             => new Result<TTarget>(Target, Issues.plus(issues));
+
+        internal Result<TOutTarget> Convert<TOutTarget>(Func<TTarget, TOutTarget> converter)
+            where TOutTarget : class
+            => new Result<TOutTarget>(converter(Target), Issues);
     }
 }

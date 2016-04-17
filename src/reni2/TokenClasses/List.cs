@@ -2,9 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Scanner;
 using Reni.Parser;
-using Reni.Struct;
 
 namespace Reni.TokenClasses
 {
@@ -22,13 +20,6 @@ namespace Reni.TokenClasses
         public List(int level) { Level = level; }
 
         public override string Id => TokenId(Level);
-
-        protected override Result<Value> GetValue(Syntax left, SourcePart token, Syntax right)
-        {
-            var leftResult = left?.Statements;
-            var rightResult = right?.Statements;
-            return CompoundSyntax.Create(leftResult, rightResult);
-        }
 
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => otherMatcher == this;

@@ -9,7 +9,17 @@ namespace Reni.Parser
 {
     sealed class Statement : DumpableObject
     {
-        internal Statement
+        internal static Result<Statement[]> CreateStatements(SourcePart token, Result<Value> value)
+            => Create(token, value).Convert(x => new[] {x});
+
+        internal static Result<Statement> Create(SourcePart token, Result<Value> value)
+            => value.Convert(x => new Statement(null, null, token, x));
+
+        internal static Result<Statement> Create
+            (IDeclarationTag[] tags, Definable target, SourcePart token, Value body)
+            => new Statement(tags, target, token, body);
+
+        Statement
             (IDeclarationTag[] tags, Definable target, SourcePart token, Value body)
         {
             Target = target;

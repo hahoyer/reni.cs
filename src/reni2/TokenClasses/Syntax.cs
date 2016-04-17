@@ -23,6 +23,27 @@ namespace Reni.TokenClasses
 
         static int _nextObjectId;
 
+        sealed class OptionClass
+        {
+            Syntax Parent { get; }
+
+            public OptionClass(Syntax parent) { Parent = parent; }
+
+            internal Result<Value> Value
+                => (Parent.TokenClass as IValueProvider)?.Get
+                    (Parent.Left, Parent.Token.Characters, Parent.Right);
+
+            internal Result<Statement[]> Statements
+                => (Parent.TokenClass as IStatementsProvider)?.Get
+                    (Parent.Left, Parent.Token.Characters, Parent.Right);
+
+            internal Result<Declarator> Declarator
+                => (Parent.TokenClass as IDeclaratorTokenClass)?.Get
+                    (Parent.Left, Parent.Token.Characters, Parent.Right);
+        }
+
+        [DisableDump]
+        OptionClass Option { get; }
         Syntax _parent;
         internal Syntax Left { get; }
         internal ITokenClass TokenClass { get; }
@@ -45,6 +66,7 @@ namespace Reni.TokenClasses
             TokenClass = tokenClass;
             Token = token;
             Right = right;
+            Option = new OptionClass(this);
             LocatePositionCache = new FunctionCache<int, Syntax>(LocatePositionForCache);
 
             if(Left != null)
@@ -238,17 +260,24 @@ namespace Reni.TokenClasses
             }
         }
 
+
         [DisableDump]
         internal Result<Value> Value
         {
             get
             {
-                var statementsProvider = TokenClass as IStatementsProvider;
-                if(statementsProvider != null)
-                    return CompoundSyntax.Create(statementsProvider.Get(Left, Token.Characters, Right));
-                return TokenClass.GetValue(Left, Token.Characters, Right);
+                var value = Option.Value;
+                if(value != null)
+                    return value;
+
+                var statements = Option.Statements;
+                if(statements != null)
+                    return CompoundSyntax.Create(statements);
+
+                return IssueId.InvalidExpression.Syntax(Token.Characters);
             }
         }
+
 
         [DisableDump]
         internal Result<Declarator> Declarator
@@ -269,19 +298,23 @@ namespace Reni.TokenClasses
         {
             get
             {
-                var statementsProvider = TokenClass as IStatementsProvider;
-                if (statementsProvider != null)
-                    return statementsProvider.Get(Left, Token.Characters, Right);
+                var statements = Option.Statements;
+                if(statements != null)
+                    return statements;
 
-                var result = Value;
-                return new Statements(Value.Target);
+                var value = Option.Value;
+                if(value != null)
+                    return Statement.CreateStatements(Token.Characters, value);
+
+                NotImplementedMethod();
+                return null;
             }
         }
 
         [DisableDump]
         internal Issue[] Issues
             => Left?.Issues
-                .plus(Value?.Issues)
+                .plus(Option.Value?.Issues)
                 .plus(Right?.Issues);
 
         internal Syntax GetBracketKernel(Syntax right = null)
@@ -291,17 +324,11 @@ namespace Reni.TokenClasses
             Tracer.Assert(TokenClass is LeftParenthesis);
             return Right;
         }
+    }
 
-        internal Result<Statement> GetStatementFromColon(SourcePart token, Syntax right)
-        {
-            var declaration = Declarator;
-            var body = right.Value;
-            var item = declaration.Target.Statement(token, body.Target);
-            return new Result<Statement>
-                (
-                item.Target,
-                declaration.Issues.plus(body.Issues).plus(item.Issues));
-        }
+    interface IValueProvider
+    {
+        Result<Value> Get(Syntax left, SourcePart characters, Syntax right);
     }
 
     interface IStatementsProvider

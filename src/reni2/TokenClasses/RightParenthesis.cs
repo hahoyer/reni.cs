@@ -18,13 +18,14 @@ namespace Reni.TokenClasses
     sealed class RightParenthesis : TokenClass,
         IBelongingsMatcher,
         IBracketMatch<Syntax>,
-        IDeclaratorTagProvider
+        IDeclaratorTagProvider,
+        IValueProvider
     {
-        internal sealed class Matched : DumpableObject, IType<Syntax>, ITokenClass
+        internal sealed class Matched : DumpableObject, IType<Syntax>, ITokenClass, IValueProvider
         {
             static string Id => "()";
 
-            Result<Value> ITokenClass.GetValue(Syntax left, SourcePart token, Syntax right)
+            Result<Value> IValueProvider.Get(Syntax left, SourcePart token, Syntax right)
             {
                 Tracer.Assert(left != null);
                 Tracer.Assert(right != null);
@@ -53,16 +54,16 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal override bool IsVisible => Level != 0;
 
-        protected override Result<Value> Suffix(Syntax left, SourcePart token)
-        {
-            var syntax = left.GetBracketKernel();
-            return syntax == null ? new EmptyList(token) : syntax.Value;
-        }
-
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => (otherMatcher as LeftParenthesis)?.Level == Level;
 
         IType<Syntax> IBracketMatch<Syntax>.Value { get; } = new Matched();
+
+        Result<Value> IValueProvider.Get(Syntax left, SourcePart token, Syntax right)
+        {
+            var syntax = left.GetBracketKernel(right);
+            return syntax == null ? new EmptyList(token) : syntax.Value;
+        }
 
         Result<Declarator> IDeclaratorTagProvider.Get(Syntax left, SourcePart token, Syntax right)
         {
@@ -70,7 +71,7 @@ namespace Reni.TokenClasses
             if(syntax == null)
                 return new Result<Declarator>
                     (
-                    new Declarator(null,null),
+                    new Declarator(null, null),
                     IssueId.MissingDeclarationTag.CreateIssue(token));
 
             NotImplementedMethod(left, token, right, nameof(syntax), syntax);

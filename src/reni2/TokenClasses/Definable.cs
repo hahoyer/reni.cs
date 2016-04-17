@@ -10,20 +10,6 @@ namespace Reni.TokenClasses
 {
     abstract class Definable : TokenClass, IDeclaratorTokenClass
     {
-        protected override Result<Parser.Value> Suffix(Syntax left, SourcePart token)
-        {
-            var d = left.Declarator;
-            if(d != null)
-                return null;
-
-            NotImplementedMethod(left, token);
-            return null;
-        }
-
-        protected sealed override Result<Parser.Value> Infix
-            (Parser.Value left, SourcePart token, Parser.Value right)
-            => ExpressionSyntax.Create(left, this, right, token);
-
         [DisableDump]
         protected string DataFunctionName => Id.Symbolize();
 

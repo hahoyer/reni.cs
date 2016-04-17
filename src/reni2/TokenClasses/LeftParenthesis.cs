@@ -28,12 +28,6 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal override bool IsVisible => Level != 0;
 
-        protected override Result<Value> Infix(Value left, SourcePart token, Value right) => null;
-        protected override Result<Value> Prefix(SourcePart token, Value right) => null;
-        protected override Result<Value> Prefix(SourcePart token, TokenClasses.Syntax right) => null;
-        protected override Result<Value> Suffix(Value left, SourcePart token) => null;
-        protected override Result<Value> Terminal(SourcePart token) => null;
-
         sealed class Syntax : OldSyntax
         {
             internal override SourcePart Token { get; }

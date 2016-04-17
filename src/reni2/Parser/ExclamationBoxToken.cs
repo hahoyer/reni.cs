@@ -28,7 +28,7 @@ namespace Reni.Parser
         }
 
         internal Result<Statement> Statement(SourcePart token, Value right)
-            => new Statement(Tags, Target, token, right);
+            => Parser.Statement.Create(Tags, Target, token, right);
 
         public Declarator WithName(Definable target)
         {
@@ -64,9 +64,6 @@ namespace Reni.Parser
 
         string IType<Syntax>.PrioTableId => PrioTable.Any;
         string ITokenClass.Id => "!";
-
-        Result<Value> ITokenClass.GetValue(Syntax left, SourcePart token, Syntax right)
-            => IssueId.InvalidExpression.Syntax(token, new EmptyList(token));
 
         Result<Declarator> IDeclaratorTokenClass.Get(Syntax left, SourcePart token, Syntax right)
         {
