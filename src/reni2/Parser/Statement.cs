@@ -25,7 +25,7 @@ namespace Reni.Parser
             Target = target;
             Token = token;
             Body = body;
-            Tags = tags;
+            Tags = tags?? new IDeclarationTag[0];
             StopByObjectIds();
         }
 

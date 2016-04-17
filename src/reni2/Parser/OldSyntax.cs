@@ -25,13 +25,6 @@ namespace Reni.Parser
             : base(objectId) {}
 
         [DisableDump]
-        internal SourcePart SourcePart
-        {
-            get { return SourcePartCache ?? (SourcePartCache = GetSourcePartForCache()); }
-            set { SourcePartCache = value; }
-        }
-
-        [DisableDump]
         internal virtual Result<Value> ContainerStatementToCompileSyntax
             => ToCompiledSyntax;
 
@@ -124,14 +117,6 @@ namespace Reni.Parser
         {
             NotImplementedMethod(right, token);
             return null;
-        }
-
-        SourcePart GetSourcePartForCache()
-        {
-            return DirectChildren
-                .Select(item => item?.SourcePart)
-                .Where(item => item != null)
-                .Aggregate() + Token;
         }
 
         internal virtual Result<OldSyntax> InfixOfMatched(SourcePart token, OldSyntax right)

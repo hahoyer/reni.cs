@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -14,24 +15,33 @@ namespace Reni.TokenClasses
 {
     sealed class FunctionSyntax : SpecialSyntax
     {
-        public static Parser.Value
-            Create(Parser.Value setter, bool isImplicit, bool isMetaFunction, Parser.Value getter) 
-            => new FunctionSyntax(setter, isImplicit, isMetaFunction, getter);
+        internal static Result<Parser.Value> Create
+            (Syntax left, bool isImplicit, bool isMetaFunction, SourcePart token, Syntax right)
+        {
+            var leftvalue = left?.Value;
+            var rightvalue = right?.Value;
+            var target = new FunctionSyntax
+                (leftvalue?.Target, isImplicit, isMetaFunction, token, rightvalue?.Target);
+            var issues = leftvalue?.Issues.plus(rightvalue?.Issues);
+            return new Result<Parser.Value>(target, issues);
+        }
 
         internal Parser.Value Getter { get; }
-
+        internal override SourcePart Token { get; }
         internal Parser.Value Setter { get; }
 
         bool IsMetaFunction { get; }
         internal bool IsImplicit { get; }
 
-        public FunctionSyntax
+        FunctionSyntax
             (
             Parser.Value setter,
             bool isImplicit,
             bool isMetaFunction,
+            SourcePart token,
             Parser.Value getter)
         {
+            Token = token;
             Getter = getter;
             Setter = setter;
             IsImplicit = isImplicit;
@@ -47,6 +57,9 @@ namespace Reni.TokenClasses
                 yield return Getter;
             }
         }
+
+        internal override SourcePosn SourceStart => Setter?.SourceStart ?? Token.Start;
+        internal override SourcePosn SourceEnd => Getter?.SourceEnd ?? Token.End;
 
         internal string Tag
             => (IsMetaFunction ? "{0}{0}" : "{0}")

@@ -83,6 +83,9 @@ namespace Reni.Parser
             }
         }
 
+        internal override SourcePosn SourceStart => Left?.SourceStart ?? Token.Start;
+        internal override SourcePosn SourceEnd => Right?.SourceEnd ?? Token.End;
+
         internal sealed class EvaluationDepthExhaustedException : Exception
         {
             readonly ExpressionSyntax Target;

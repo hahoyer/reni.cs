@@ -6,7 +6,6 @@ using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.TokenClasses;
-using Reni.Validation;
 
 namespace Reni.Parser
 {
@@ -31,6 +30,9 @@ namespace Reni.Parser
         internal override Result ResultForCache(ContextBase context, Category category)
             => Terminal.Result(context, category, this);
 
+        internal override SourcePosn SourceStart => Token.Start;
+        internal override SourcePosn SourceEnd => Token.End;
+
         internal override Value Visit(ISyntaxVisitor visitor) => Terminal.Visit(visitor);
 
         [DisableDump]
@@ -42,7 +44,7 @@ namespace Reni.Parser
     sealed class PrefixSyntax : SpecialSyntax
     {
         public static Result<OldSyntax> Create(IPrefix prefix, Result<Value> right)
-            => Extension.Issues<OldSyntax>(new PrefixSyntax(prefix, right.Target), right.Issues);
+            => new PrefixSyntax(prefix, right.Target).Issues<OldSyntax>(right.Issues);
 
         [Node]
         [EnableDump]
@@ -67,50 +69,56 @@ namespace Reni.Parser
 
     sealed class InfixSyntax : SpecialSyntax
     {
-        public static Result<OldSyntax> Create
+        public static Result<Value> Create
             (
             Result<Value> left,
             IInfix infix,
             SourcePart token,
             Result<Value> right)
-            => Extension.Issues<OldSyntax>(new InfixSyntax(left.Target, infix, token, right.Target), left.Issues.plus(right.Issues));
+        {
+            Value value = new InfixSyntax(left.Target, infix, token, right.Target);
+            return value.Issues(left.Issues.plus(right.Issues));
+        }
 
         [Node]
         [EnableDump]
-        readonly Value _left;
+        readonly Value Left;
 
         [Node]
         [EnableDump]
-        readonly IInfix _infix;
+        readonly IInfix Infix;
 
         [Node]
         [EnableDump]
-        readonly Value _right;
+        readonly Value Right;
 
         internal override SourcePart Token { get; }
 
         public InfixSyntax(Value left, IInfix infix, SourcePart token, Value right)
         {
-            _left = left;
-            _infix = infix;
-            _right = right;
+            Left = left;
+            Infix = infix;
+            Right = right;
             Token = token;
             StopByObjectIds();
         }
 
-        internal override IRecursionHandler RecursionHandler => _infix as IRecursionHandler;
+        internal override IRecursionHandler RecursionHandler => Infix as IRecursionHandler;
 
-        internal override Result ResultForCache(ContextBase context, Category category) => _infix
-            .Result(context, category, _left, _right);
+        internal override SourcePosn SourceStart => Left?.SourceStart ?? Token.Start;
+        internal override SourcePosn SourceEnd => Right?.SourceEnd ?? Token.End;
+
+        internal override Result ResultForCache(ContextBase context, Category category) => Infix
+            .Result(context, category, Left, Right);
 
         protected override string GetNodeDump()
         {
             var result = "(";
-            result += _left.NodeDump;
+            result += Left.NodeDump;
             result += ")";
-            result += _infix.NodeDump();
+            result += Infix.NodeDump();
             result += "(";
-            result += _right.NodeDump;
+            result += Right.NodeDump;
             result += ")";
             return result;
         }
@@ -120,8 +128,8 @@ namespace Reni.Parser
         {
             get
             {
-                yield return _left;
-                yield return _right;
+                yield return Left;
+                yield return Right;
             }
         }
     }
@@ -134,34 +142,40 @@ namespace Reni.Parser
 
     sealed class SuffixSyntax : SpecialSyntax
     {
-        public static Result<OldSyntax> Create
+        public static Result<Value> Create
             (Result<Value> left, ISuffix suffix, SourcePart token)
-            => Extension.Issues<OldSyntax>(new SuffixSyntax(left.Target, suffix, token), left.Issues);
+        {
+            Value value = new SuffixSyntax(left.Target, suffix, token);
+            return value.Issues(left.Issues);
+        }
 
         [Node]
         [EnableDump]
-        readonly Value _left;
+        readonly Value Left;
 
         [Node]
         [EnableDump]
-        readonly ISuffix _suffix;
+        readonly ISuffix Suffix;
 
         internal SuffixSyntax(Value left, ISuffix suffix, SourcePart token)
         {
-            _left = left;
-            _suffix = suffix;
+            Left = left;
+            Suffix = suffix;
             Token = token;
         }
 
         internal override SourcePart Token { get; }
 
         internal override Result ResultForCache(ContextBase context, Category category)
-            => _suffix.Result(context, category, _left);
+            => Suffix.Result(context, category, Left);
 
-        protected override string GetNodeDump() => "(" + _left.NodeDump + ")" + _suffix;
+        internal override SourcePosn SourceStart => Left?.SourceStart ?? Token.Start;
+        internal override SourcePosn SourceEnd => Token.End;
+
+        protected override string GetNodeDump() => "(" + Left.NodeDump + ")" + Suffix;
 
         [DisableDump]
-        protected override IEnumerable<OldSyntax> DirectChildren { get { yield return _left; } }
+        protected override IEnumerable<OldSyntax> DirectChildren { get { yield return Left; } }
     }
 
     interface ITerminal

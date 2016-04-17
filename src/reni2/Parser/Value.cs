@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -51,6 +52,28 @@ namespace Reni.Parser
         }
 
         internal virtual IRecursionHandler RecursionHandler => null;
+
+        public SourcePart SourcePart => SourceStart.Span(SourceEnd);
+
+        internal virtual SourcePosn SourceStart
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+
+            }
+        }
+
+        internal virtual SourcePosn SourceEnd
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+
+            }
+        }
 
         internal void AddToCacheForDebug(ContextBase context, ResultCache cacheItem)
             => ResultCache.Add(context, cacheItem);

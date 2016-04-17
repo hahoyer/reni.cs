@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using hw.Helper;
 using System.Linq;
 using hw.DebugFormatter;
-
+using hw.Helper;
 using hw.Scanner;
-using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
@@ -15,9 +13,12 @@ namespace Reni.Struct
 {
     sealed class CompoundContext
         : Child
-            , ISymbolProviderForPointer<Definable>
-            , ISourceProvider
-            , IContextReference
+            ,
+            ISymbolProviderForPointer<Definable>
+            ,
+            ISourceProvider
+            ,
+            IContextReference
     {
         readonly int _order;
 

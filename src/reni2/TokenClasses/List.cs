@@ -27,7 +27,7 @@ namespace Reni.TokenClasses
 
         public Result<Statement[]> Get(List type, Syntax left, SourcePart token, Syntax right)
         {
-            if(type != null)
+            if(type != null && type != this)
             {
                 NotImplementedMethod(type, left, token, right);
                 return null;

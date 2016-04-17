@@ -82,9 +82,6 @@ namespace Reni.TokenClasses
         protected sealed override Result<OldSyntax> OldTerminal(SourcePart token)
             => new TerminalSyntax(token, this);
 
-        protected override Result<OldSyntax> OldSuffix(OldSyntax left, SourcePart token)
-            => SuffixSyntax.Create(left.ToCompiledSyntax, this, token);
-
         Result ITerminal.Result(ContextBase context, Category category, TerminalSyntax token)
             => Result(context, category, token);
 
@@ -105,14 +102,10 @@ namespace Reni.TokenClasses
         }
     }
 
-    abstract class InfixPrefixSyntaxToken : InfixPrefixToken, IInfix, IPrefix
+    abstract class InfixPrefixSyntaxToken : InfixPrefixToken, IInfix, IPrefix, IValueProvider
     {
         protected sealed override Result<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
             => PrefixSyntax.Create(this, right.ToCompiledSyntax);
-
-        protected sealed override Result<OldSyntax> OldInfix
-            (OldSyntax left, SourcePart token, OldSyntax right)
-            => InfixSyntax.Create(left.ToCompiledSyntax, this, token, right.ToCompiledSyntax);
 
         Result IInfix.Result
             (ContextBase context, Category category, Value left, Value right)
@@ -127,9 +120,17 @@ namespace Reni.TokenClasses
 
         protected abstract Result Result
             (ContextBase context, Category category, Value right);
+
+        Result<Value> IValueProvider.Get(Syntax left, SourcePart token, Syntax right)
+        {
+            if(left != null && right != null)
+                return InfixSyntax.Create(left.Value, this, token, right.Value);
+            NotImplementedMethod(left, token, right);
+            return null;
+        }
     }
 
-    abstract class NonSuffixSyntaxToken : NonSuffixToken, ITerminal, IPrefix
+    abstract class NonSuffixSyntaxToken : NonSuffixToken, ITerminal, IPrefix,IValueProvider
     {
         protected sealed override Result<OldSyntax> OldTerminal(SourcePart token)
             => new TerminalSyntax(token, this);
@@ -157,12 +158,27 @@ namespace Reni.TokenClasses
             NotImplementedMethod(visitor);
             return null;
         }
+
+        Result<Value> IValueProvider.Get(Syntax left, SourcePart token, Syntax right)
+        {
+            if (left == null && right == null)
+                return new TerminalSyntax(token, this);
+
+            NotImplementedMethod(left, token, right);
+            return null;
+        }
     }
 
-    abstract class SuffixSyntaxToken : SuffixToken, ISuffix
+    abstract class SuffixSyntaxToken : SuffixToken, ISuffix, IValueProvider
     {
-        protected sealed override Result<OldSyntax> OldSuffix(OldSyntax left, SourcePart token)
-            => SuffixSyntax.Create(left.ToCompiledSyntax, this, token);
+        Result<Value> IValueProvider.Get(Syntax left, SourcePart token, Syntax right)
+        {
+            if(right == null)
+                return SuffixSyntax.Create(left.Value, this, token);
+
+            NotImplementedMethod(left, token, right);
+            return null;
+        }
 
         Result ISuffix.Result(ContextBase context, Category category, Value left)
             => Result(context, category, left);
@@ -170,17 +186,16 @@ namespace Reni.TokenClasses
         protected abstract Result Result(ContextBase context, Category category, Value left);
     }
 
-    abstract class InfixSyntaxToken : InfixToken, IInfix
+    abstract class InfixSyntaxToken : InfixToken, IInfix, IValueProvider
     {
-        protected sealed override Result<OldSyntax> OldInfix
-            (OldSyntax left, SourcePart token, OldSyntax right)
-            => InfixSyntax.Create(left.ToCompiledSyntax, this, token, right.ToCompiledSyntax);
-
         Result IInfix.Result
             (ContextBase context, Category category, Value left, Value right)
             => Result(context, category, left, right);
 
         protected abstract Result Result
             (ContextBase callContext, Category category, Value left, Value right);
+
+        Result<Value> IValueProvider.Get(Syntax left, SourcePart token, Syntax right)
+            => InfixSyntax.Create(left.Value, this, token, right.Value);
     }
 }

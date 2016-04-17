@@ -178,6 +178,9 @@ namespace Reni.Struct
                 .Compound(this)
                 .Result(category);
 
+        internal override SourcePosn SourceStart => SourceParts.First().Start;
+        internal override SourcePosn SourceEnd => SourceParts.Last().End;
+
         sealed class Data : DumpableObject
         {
             public Data(Statement rawStatement, int position)
