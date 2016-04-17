@@ -33,12 +33,16 @@ namespace Reni.TokenClasses
                 return null;
             }
 
-            var leftStatements = left?.GetStatements(this);
-            var rightStatements = right?.GetStatements(this);
+            var leftStatements = CreateStatements(left, token);
+            var rightStatements = CreateStatements(right, token);
             var target = leftStatements?.Target.plus(rightStatements?.Target);
             var issues = leftStatements?.Issues.plus(rightStatements?.Issues);
-            return new Result<Statement[]>(target,issues);
-
+            return new Result<Statement[]>(target, issues);
         }
+
+        Result<Statement[]> CreateStatements(Syntax syntax, SourcePart token)
+            => syntax == null
+                ? Statement.CreateStatements(token, new EmptyList(token))
+                : syntax.GetStatements(this);
     }
 }

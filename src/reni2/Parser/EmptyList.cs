@@ -21,5 +21,8 @@ namespace Reni.Parser
 
         internal override Result ResultForCache(ContextBase context, Category category)
             => context.RootContext.VoidType.Result(category);
+
+        internal override SourcePosn SourceStart => Token.Start;
+        internal override SourcePosn SourceEnd => Token.End;
     }
 }
