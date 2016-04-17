@@ -63,7 +63,7 @@ namespace hw.Scanner
         [DisableDump]
         public string FilePosition => "\n" + Source.FilePosn(Position, EndPosition, Id);
 
-        public string FileErrorPosition(string errorTag) => "\n" + Source.FilePosn(Position, EndPosition, Id, "error " + errorTag);
+        public string FileErrorPosition(string errorTag) => "\n" + Source.FilePosn(Position, EndPosition, Id.Quote(), "error " + errorTag);
 
         [UsedImplicitly]
         string DumpCurrent => Id;

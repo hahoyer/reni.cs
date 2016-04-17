@@ -16,7 +16,7 @@ namespace Reni.Type
         internal override Root Root { get; }
 
         [DisableDump]
-        internal override string DumpPrintText => "void";
+        internal override string DumpPrintText => "()";
         protected override string GetNodeDump() => "void";
 
         [DisableDump]
