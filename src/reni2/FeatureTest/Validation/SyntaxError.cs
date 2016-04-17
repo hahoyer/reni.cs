@@ -22,7 +22,7 @@ namespace Reni.FeatureTest.Validation
             var a = issues.ToArray();
             var i = 0;
             Tracer.Assert
-                (a[i++].IsLogdumpLike(1, 3, 1, 26, IssueId.EOFInComment, "#(x asdf y)# dump_print"));
+                (a[i++].IsLogdumpLike(1, 3, 1, 26, IssueId.EOFInComment, "\"#(x asdf y)# dump_print\""));
             Tracer.Assert(a.Length == i);
         }
     }

@@ -18,7 +18,10 @@ namespace Reni.Code
         : DumpableObject, IIconKeyProvider, IFormalCodeItem, IAggregateable<CodeBase>
     {
         protected CodeBase(int objectId)
-            : base(objectId) {}
+            : base(objectId)
+        {
+            StopByObjectIds();
+        }
 
         [Node]
         [DisableDump]
@@ -291,7 +294,7 @@ namespace Reni.Code
         internal static CodeBase Arg(TypeBase type) => new Arg(type);
 
         internal Container Container(string description, FunctionId functionId = null)
-            => new Container(this, description, functionId);
+            => new Container(Align(), description, functionId);
 
         CodeBase IAggregateable<CodeBase>.Aggregate(CodeBase other) => this + other;
 
