@@ -16,15 +16,15 @@ namespace Reni.Parser
             (Value left, Definable definable, Value right, SourcePart token)
             => new Result<Value>(new ExpressionSyntax(left, definable, right, token));
 
-        internal static Result<Value> OldCreate
-            (OldSyntax left, Definable definable, OldSyntax right, SourcePart token)
+        internal static Result<Value> Create
+            (Syntax left, Definable definable, Syntax right, SourcePart token)
         {
-            var left1 = left?.ToCompiledSyntax;
-            var right1 = right?.ToCompiledSyntax;
+            var leftvalue = left?.Value;
+            var rightvalue = right?.Value;
             return new Result<Value>
                 (
-                new ExpressionSyntax(left1?.Target, definable, right1?.Target, token),
-                left1?.Issues.plus(right1?.Issues)
+                new ExpressionSyntax(leftvalue?.Target, definable, rightvalue?.Target, token),
+                leftvalue?.Issues.plus(rightvalue?.Issues)
                 );
         }
 
@@ -59,18 +59,6 @@ namespace Reni.Parser
                 yield return Right;
             }
         }
-
-        internal override Result<OldSyntax> RightSyntax(OldSyntax right, SourcePart token)
-            => Result<OldSyntax>
-                .From
-                (
-                    Right == null
-                        ? OldCreate(Left, Definable, right, Token)
-                        : OldCreate(this, null, right, token)
-                );
-
-        internal override Result<OldSyntax> InfixOfMatched(SourcePart token, OldSyntax right)
-            => Result<OldSyntax>.From(OldCreate(this, null, right, token));
 
         int CurrentResultDepth;
 

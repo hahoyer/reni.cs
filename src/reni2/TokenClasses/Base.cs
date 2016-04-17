@@ -16,7 +16,6 @@ namespace Reni.TokenClasses
 
         protected sealed override Result<OldSyntax> OldSuffix(OldSyntax left, SourcePart token)
             => IssueId.UnexpectedUseAsSuffix.Syntax(token, left);
-
     }
 
     abstract class NonPrefixToken : TokenClass
@@ -29,7 +28,6 @@ namespace Reni.TokenClasses
     {
         protected sealed override Result<OldSyntax> OldSuffix(OldSyntax left, SourcePart token)
             => IssueId.UnexpectedUseAsSuffix.Syntax(token, left);
-
     }
 
     abstract class NonSuffixToken : TokenClass
@@ -42,7 +40,6 @@ namespace Reni.TokenClasses
     {
         protected sealed override Result<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
             => IssueId.UnexpectedUseAsPrefix.Syntax(token, right);
-
     }
 
     abstract class InfixToken : TokenClass
@@ -51,12 +48,20 @@ namespace Reni.TokenClasses
             => IssueId.UnexpectedUseAsPrefix.Syntax(token, right);
 
         protected sealed override Result<OldSyntax> OldSuffix(OldSyntax left, SourcePart token)
-            => IssueId.UnexpectedUseAsSuffix.Syntax(token,left);
-
+            => IssueId.UnexpectedUseAsSuffix.Syntax(token, left);
     }
 
-    abstract class TerminalSyntaxToken : TerminalToken, ITerminal
+    abstract class TerminalSyntaxToken : TerminalToken, ITerminal, IValueProvider
     {
+        Result<Value> IValueProvider.Get(Syntax left, SourcePart token, Syntax right)
+        {
+            if(left == null && right == null)
+                return new TerminalSyntax(token, this);
+
+            NotImplementedMethod(left, token, right);
+            return null;
+        }
+
         Result ITerminal.Result(ContextBase context, Category category, TerminalSyntax token)
             => Result(context, category, token);
 
@@ -105,7 +110,8 @@ namespace Reni.TokenClasses
         protected sealed override Result<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
             => PrefixSyntax.Create(this, right.ToCompiledSyntax);
 
-        protected sealed override Result<OldSyntax> OldInfix(OldSyntax left, SourcePart token, OldSyntax right)
+        protected sealed override Result<OldSyntax> OldInfix
+            (OldSyntax left, SourcePart token, OldSyntax right)
             => InfixSyntax.Create(left.ToCompiledSyntax, this, token, right.ToCompiledSyntax);
 
         Result IInfix.Result
@@ -166,7 +172,8 @@ namespace Reni.TokenClasses
 
     abstract class InfixSyntaxToken : InfixToken, IInfix
     {
-        protected sealed override Result<OldSyntax> OldInfix(OldSyntax left, SourcePart token, OldSyntax right)
+        protected sealed override Result<OldSyntax> OldInfix
+            (OldSyntax left, SourcePart token, OldSyntax right)
             => InfixSyntax.Create(left.ToCompiledSyntax, this, token, right.ToCompiledSyntax);
 
         Result IInfix.Result
@@ -175,6 +182,5 @@ namespace Reni.TokenClasses
 
         protected abstract Result Result
             (ContextBase callContext, Category category, Value left, Value right);
-
     }
 }

@@ -328,7 +328,7 @@ namespace Reni.TokenClasses
 
     interface IValueProvider
     {
-        Result<Value> Get(Syntax left, SourcePart characters, Syntax right);
+        Result<Value> Get(Syntax left, SourcePart token, Syntax right);
     }
 
     interface IStatementsProvider

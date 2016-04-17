@@ -91,10 +91,6 @@ namespace Reni.Parser
         [DisableDump]
         internal virtual bool IsMixInSyntax => false;
 
-        internal virtual Result<OldSyntax> SuffixedBy(Definable definable, SourcePart token)
-            => Result<OldSyntax>
-                .From(ExpressionSyntax.OldCreate(this, definable, null, token));
-
         internal virtual Result<OldSyntax> Match(int level, SourcePart token)
             => new Result<OldSyntax>(this, IssueId.ExtraRightBracket.CreateIssue(token));
 

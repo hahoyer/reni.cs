@@ -311,7 +311,6 @@
     <Compile Include="TokenClasses\Base.cs" />
     <Compile Include="TokenClasses\Colon.cs" />
     <Compile Include="TokenClasses\EqualityOperation.cs" />
-    <Compile Include="TokenClasses\DefinableSyntax.cs" />
     <Compile Include="TokenClasses\Definable.cs" />
     <Compile Include="TokenClasses\ElseToken.cs" />
     <Compile Include="TokenClasses\EnableCut.cs" />
