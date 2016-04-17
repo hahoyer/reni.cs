@@ -17,11 +17,8 @@ namespace Reni.TokenClasses
         internal virtual IEnumerable<IDeclarationProvider> Genericize
             => this.GenericListFromDefinable();
 
-        public Result<Parser.Value> CreateForVisit(Parser.Value left, Parser.Value right)
-        {
-            NotImplementedMethod(left, right);
-            return null;
-        }
+        internal Result<Parser.Value> CreateForVisit(Parser.Value left, Parser.Value right, SourcePart token)
+            => ExpressionSyntax.Create(left, this, right, token);
 
         Result<Declarator> IDeclaratorTokenClass.Get(Syntax left, SourcePart token, Syntax right)
         {

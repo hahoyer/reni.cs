@@ -113,7 +113,7 @@ namespace Reni.Parser
             if(left == null && right == null)
                 return null;
 
-            var result = Definable.CreateForVisit(left ?? Left, right ?? Right);
+            var result = Definable.CreateForVisit(left ?? Left, right ?? Right, Token);
             Tracer.Assert(!result.Issues.Any());
             return result.Target;
         }
