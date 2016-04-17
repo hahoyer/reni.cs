@@ -86,9 +86,6 @@ namespace Reni.TokenClasses
 
     abstract class InfixPrefixSyntaxToken : InfixPrefixToken, IInfix, IPrefix, IValueProvider
     {
-        protected sealed override Result<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
-            => PrefixSyntax.Create(this, right.ToCompiledSyntax);
-
         Result IInfix.Result
             (ContextBase context, Category category, Value left, Value right)
             => Result(context, category, left, right);
@@ -107,6 +104,10 @@ namespace Reni.TokenClasses
         {
             if(left != null && right != null)
                 return InfixSyntax.Create(left.Value, this, token, right.Value);
+
+            if (left == null && right != null)
+                return PrefixSyntax.Create(this, token, right.Value);
+
             NotImplementedMethod(left, token, right);
             return null;
         }
@@ -116,9 +117,6 @@ namespace Reni.TokenClasses
     {
         protected sealed override Result<OldSyntax> OldTerminal(SourcePart token)
             => new TerminalSyntax(token, this);
-
-        protected sealed override Result<OldSyntax> OldPrefix(SourcePart token, OldSyntax right)
-            => PrefixSyntax.Create(this, right.ToCompiledSyntax);
 
         Result ITerminal.Result(ContextBase context, Category category, TerminalSyntax token)
             => Result(context, category, token);

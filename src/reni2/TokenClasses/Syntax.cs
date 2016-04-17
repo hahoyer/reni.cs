@@ -325,12 +325,16 @@ namespace Reni.TokenClasses
                 .plus(Option.Value?.Issues)
                 .plus(Right?.Issues);
 
-        internal Tuple<Syntax,Issue> GetBracketKernel(int level, Syntax right = null)
+        internal Tuple<Syntax, Issue> GetBracketKernel(int level, SourcePart token, Syntax right = null)
         {
             Tracer.Assert(right == null);
-            Tracer.Assert(Left == null);
             var leftParenthesis = TokenClass as LeftParenthesis;
-            Tracer.Assert(leftParenthesis != null);
+
+            if(leftParenthesis == null)
+                return new Tuple<Syntax, Issue>(this, IssueId.ExtraRightBracket.CreateIssue(token));
+
+            Tracer.Assert(Left == null);
+
             var levelDelta = leftParenthesis.Level - level;
 
             if (levelDelta == 0)

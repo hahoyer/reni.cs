@@ -43,28 +43,33 @@ namespace Reni.Parser
 
     sealed class PrefixSyntax : SpecialSyntax
     {
-        public static Result<OldSyntax> Create(IPrefix prefix, Result<Value> right)
-            => new PrefixSyntax(prefix, right.Target).Issues<OldSyntax>(right.Issues);
+        public static Result<Value> Create(IPrefix prefix, SourcePart token, Result<Value> right)
+            => new PrefixSyntax(prefix, token, right.Target).Issues<Value>(right.Issues);
 
         [Node]
         [EnableDump]
-        readonly IPrefix _prefix;
+        readonly IPrefix Prefix;
 
         [Node]
         [EnableDump]
-        readonly Value _right;
+        readonly Value Right;
 
-        public PrefixSyntax(IPrefix prefix, Value right)
+        [DisableDump]
+        internal override SourcePart Token { get; }
+
+        public PrefixSyntax(IPrefix prefix, SourcePart token, Value right)
         {
-            _prefix = prefix;
-            _right = right;
+            Prefix = prefix;
+            Right = right;
+            Token = token;
         }
 
-        internal override Result ResultForCache(ContextBase context, Category category) => _prefix
-            .Result(context, category, this, _right);
 
-        protected override string GetNodeDump() => _prefix.NodeDump() + "(" + _right.NodeDump + ")";
-        protected override IEnumerable<OldSyntax> DirectChildren { get { yield return _right; } }
+        internal override Result ResultForCache(ContextBase context, Category category) => Prefix
+            .Result(context, category, this, Right);
+
+        protected override string GetNodeDump() => Prefix.NodeDump() + "(" + Right.NodeDump + ")";
+        protected override IEnumerable<OldSyntax> DirectChildren { get { yield return Right; } }
     }
 
     sealed class InfixSyntax : SpecialSyntax

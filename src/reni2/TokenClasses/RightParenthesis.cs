@@ -61,7 +61,7 @@ namespace Reni.TokenClasses
 
         Result<Value> IValueProvider.Get(Syntax left, SourcePart token, Syntax right)
         {
-            var result = left.GetBracketKernel(Level, right);
+            var result = left.GetBracketKernel(Level, token, right);
             var target = result.Item1?.Option.Value ?? new EmptyList(token);
 
             if(result.Item2 != null)
@@ -72,7 +72,7 @@ namespace Reni.TokenClasses
 
         Result<Declarator> IDeclaratorTagProvider.Get(Syntax left, SourcePart token, Syntax right)
         {
-            var result = left.GetBracketKernel(Level, right);
+            var result = left.GetBracketKernel(Level, token, right);
             var target = result.Item1?.Option.Declarator ?? new Declarator(null, null);
 
             if(result.Item2 != null)
