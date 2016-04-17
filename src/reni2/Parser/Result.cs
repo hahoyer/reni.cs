@@ -36,7 +36,7 @@ namespace Reni.Parser
             where TIn : class, TTarget
             => new Result<TTarget>(x.Target, x.Issues);
 
-        internal Result<TTarget> With(IEnumerable<Issue> issues)
+        internal Result<TTarget> With(params Issue[] issues)
             => new Result<TTarget>(Target, Issues.plus(issues));
 
         internal Result<TOutTarget> Convert<TOutTarget>(Func<TTarget, Result<TOutTarget>> converter)

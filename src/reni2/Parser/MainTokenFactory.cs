@@ -134,11 +134,11 @@ namespace Reni.Parser
 
     sealed class ScannerSyntaxError : ScannerTokenClass, IType<Syntax>, ITokenClass, IValueProvider
     {
-        readonly IssueId _issue;
+        readonly IssueId IssueId;
 
         public ScannerSyntaxError(Match.IError message)
         {
-            _issue = Lexer.Parse(message);
+            IssueId = Lexer.Parse(message);
             StopByObjectIds(81);
         }
 
@@ -148,7 +148,15 @@ namespace Reni.Parser
 
         Result<Value> IValueProvider.Get(Syntax left, SourcePart token, Syntax right)
         {
-            NotImplementedMethod(left,token,right);
+            if(right == null)
+            {
+                var issues = IssueId.CreateIssue(token);
+                return left == null
+                    ? new Result<Value>(new EmptyList(token), issues)
+                    : left.Value.With(issues);
+            }
+
+            NotImplementedMethod(left, token, right);
             return null;
         }
 
