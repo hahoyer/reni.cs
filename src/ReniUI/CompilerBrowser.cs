@@ -123,7 +123,7 @@ namespace ReniUI
             return null;
         }
 
-        internal void Ensure() => Compiler.Issues.ToArray();
+        internal void Ensure() => Compiler.Execute();
 
         internal void Execute(DataStack dataStack) => Compiler.ExecuteFromCode(dataStack);
 
