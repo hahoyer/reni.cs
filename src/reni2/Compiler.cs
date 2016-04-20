@@ -209,7 +209,7 @@ namespace Reni
 
         [DisableDump]
         internal IEnumerable<Issue> Issues
-            => Syntax.Issues
+            => Syntax.AllIssues
                 .plus(Parameters.ParseOnly ? new Issue[0] : CodeContainer.Issues)
             ;
 

@@ -8,7 +8,7 @@ using Reni.Parser;
 
 namespace Reni.TokenClasses
 {
-    abstract class Definable : TokenClass, IDeclaratorTokenClass, IValueProvider
+    abstract class Definable : TokenClass, IDeclaratorTokenClass, IValueProvider, IDeclarationItem
     {
         [DisableDump]
         protected string DataFunctionName => Id.Symbolize();
@@ -17,7 +17,8 @@ namespace Reni.TokenClasses
         internal virtual IEnumerable<IDeclarationProvider> Genericize
             => this.GenericListFromDefinable();
 
-        internal Result<Parser.Value> CreateForVisit(Parser.Value left, Parser.Value right, SourcePart token)
+        internal Result<Parser.Value> CreateForVisit
+            (Parser.Value left, Parser.Value right, SourcePart token)
             => ExpressionSyntax.Create(left, this, right, token);
 
         Result<Declarator> IDeclaratorTokenClass.Get(Syntax left, SourcePart token, Syntax right)
@@ -38,6 +39,23 @@ namespace Reni.TokenClasses
 
         Result<Parser.Value> IValueProvider.Get(Syntax left, SourcePart token, Syntax right)
             => ExpressionSyntax.Create(left, this, right, token);
+
+        bool IDeclarationItem.IsDeclarationPart(Syntax syntax)
+        {
+            var t = syntax.Token.SourcePart;
+
+            var p = syntax.Parent.TokenClass;
+            if(p is Colon)
+                return syntax.Parent.Left == syntax;
+
+            if(p is LeftParenthesis || p is Definable || p is ThenToken
+                || p is List || p is Function || p is TypeOperator
+                || p is ElseToken)
+                return false;
+
+            NotImplementedMethod(syntax);
+            return false;
+        }
     }
 
     [BelongsTo(typeof(MainTokenFactory))]

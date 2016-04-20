@@ -5,6 +5,7 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
+using Reni.Context;
 using Reni.Parser;
 using Reni.Struct;
 using Reni.Validation;
@@ -30,8 +31,18 @@ namespace Reni.TokenClasses
             public OptionClass(Syntax parent) { Parent = parent; }
 
             internal Result<Value> Value
-                => (Parent.TokenClass as IValueProvider)?.Get
-                    (Parent.Left, Parent.Token.Characters, Parent.Right);
+            {
+                get
+                {
+                    var declarationItem = Parent.TokenClass as IDeclarationItem;
+                    if(declarationItem != null && declarationItem.IsDeclarationPart(Parent))
+                        return null;
+
+
+                    return (Parent.TokenClass as IValueProvider)?.Get
+                        (Parent.Left, Parent.Token.Characters, Parent.Right);
+                }
+            }
 
             internal Result<Statement[]> GetStatements(List type = null)
                 => (Parent.TokenClass as IStatementsProvider)
@@ -44,6 +55,13 @@ namespace Reni.TokenClasses
             internal Result<Declarator> Declarator
                 => (Parent.TokenClass as IDeclaratorTokenClass)
                     ?.Get(Parent.Left, Parent.Token.Characters, Parent.Right);
+
+            internal Issue[] Issues
+                => Value?.Issues
+                    ?? GetStatements()?.Issues
+                        ?? Statement?.Issues
+                            ?? Declarator?.Issues
+                                ?? new Issue[0];
         }
 
         [DisableDump]
@@ -264,7 +282,6 @@ namespace Reni.TokenClasses
             }
         }
 
-
         [DisableDump]
         internal Result<Value> Value
         {
@@ -320,12 +337,16 @@ namespace Reni.TokenClasses
         }
 
         [DisableDump]
-        internal Issue[] Issues
-            => Left?.Issues
-                .plus(Option.Value?.Issues)
-                .plus(Right?.Issues);
+        internal IEnumerable<Issue> Issues => Option.Issues;
 
-        internal Tuple<Syntax, Issue> GetBracketKernel(int level, SourcePart token, Syntax right = null)
+        [DisableDump]
+        internal IEnumerable<Issue> AllIssues
+            => Left?.AllIssues
+                .plus(Issues)
+                .plus(Right?.AllIssues);
+
+        internal Tuple<Syntax, Issue> GetBracketKernel
+            (int level, SourcePart token, Syntax right = null)
         {
             Tracer.Assert(right == null);
             var leftParenthesis = TokenClass as LeftParenthesis;
@@ -337,15 +358,21 @@ namespace Reni.TokenClasses
 
             var levelDelta = leftParenthesis.Level - level;
 
-            if (levelDelta == 0)
+            if(levelDelta == 0)
                 return new Tuple<Syntax, Issue>(Right, null);
 
-            if (levelDelta > 0)
-                return new Tuple<Syntax, Issue>(Right, IssueId.ExtraLeftBracket.CreateIssue(Token.Characters));
+            if(levelDelta > 0)
+                return new Tuple<Syntax, Issue>
+                    (Right, IssueId.ExtraLeftBracket.CreateIssue(Token.Characters));
 
             NotImplementedMethod(level, right);
             return null;
         }
+    }
+
+    interface IDeclarationItem
+    {
+        bool IsDeclarationPart(Syntax syntax);
     }
 
     interface IValueProvider
