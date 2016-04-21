@@ -306,6 +306,7 @@
     <Compile Include="TokenClasses\Cleanup.cs" />
     <Compile Include="TokenClasses\CompareOperation.cs" />
     <Compile Include="TokenClasses\DeclaratorTags.cs" />
+    <Compile Include="TokenClasses\PreType.cs" />
     <Compile Include="TokenClasses\ReassignToken.cs" />
     <Compile Include="TokenClasses\Base.cs" />
     <Compile Include="TokenClasses\Colon.cs" />
@@ -319,6 +320,7 @@
     <Compile Include="TokenClasses\InstanceToken.cs" />
     <Compile Include="TokenClasses\ScannerTokenClass.cs" />
     <Compile Include="TokenClasses\Syntax.cs" />
+    <Compile Include="TokenClasses\SyntaxOption.cs" />
     <Compile Include="TokenClasses\TokenClass.cs" />
     <Compile Include="TokenClasses\ToNumberOfBase.cs" />
     <Compile Include="TokenClasses\LeftParenthesis.cs" />

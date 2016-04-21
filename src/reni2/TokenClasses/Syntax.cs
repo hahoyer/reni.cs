@@ -5,7 +5,6 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
-using Reni.Context;
 using Reni.Parser;
 using Reni.Struct;
 using Reni.Validation;
@@ -24,48 +23,8 @@ namespace Reni.TokenClasses
 
         static int _nextObjectId;
 
-        internal sealed class OptionClass
-        {
-            Syntax Parent { get; }
-
-            public OptionClass(Syntax parent) { Parent = parent; }
-
-            internal Result<Value> Value
-            {
-                get
-                {
-                    var declarationItem = Parent.TokenClass as IDeclarationItem;
-                    if(declarationItem != null && declarationItem.IsDeclarationPart(Parent))
-                        return null;
-
-
-                    return (Parent.TokenClass as IValueProvider)?.Get
-                        (Parent.Left, Parent.Token.Characters, Parent.Right);
-                }
-            }
-
-            internal Result<Statement[]> GetStatements(List type = null)
-                => (Parent.TokenClass as IStatementsProvider)
-                    ?.Get(type, Parent.Left, Parent.Token.Characters, Parent.Right);
-
-            internal Result<Statement> Statement
-                => (Parent.TokenClass as IStatementProvider)
-                    ?.Get(Parent.Left, Parent.Token.Characters, Parent.Right);
-
-            internal Result<Declarator> Declarator
-                => (Parent.TokenClass as IDeclaratorTokenClass)
-                    ?.Get(Parent.Left, Parent.Token.Characters, Parent.Right);
-
-            internal Issue[] Issues
-                => Value?.Issues
-                    ?? GetStatements()?.Issues
-                        ?? Statement?.Issues
-                            ?? Declarator?.Issues
-                                ?? new Issue[0];
-        }
-
         [DisableDump]
-        internal OptionClass Option { get; }
+        internal SyntaxOption Option { get; }
         Syntax _parent;
         internal Syntax Left { get; }
         internal ITokenClass TokenClass { get; }
@@ -88,7 +47,7 @@ namespace Reni.TokenClasses
             TokenClass = tokenClass;
             Token = token;
             Right = right;
-            Option = new OptionClass(this);
+            Option = new SyntaxOption(this);
             LocatePositionCache = new FunctionCache<int, Syntax>(LocatePositionForCache);
 
             if(Left != null)
@@ -264,6 +223,8 @@ namespace Reni.TokenClasses
         {
             get
             {
+                var preType = Option.PreType;
+
                 NotImplementedMethod();
                 return null;
 
@@ -283,24 +244,23 @@ namespace Reni.TokenClasses
         }
 
         [DisableDump]
-        internal Result<Value> Value
+        internal Result<Value> Value => this.CachedValue(GetValue);
+
+        Result<Value> GetValue()
         {
-            get
-            {
-                var value = Option.Value;
-                if(value != null)
-                    return value;
+            var value = Option.Value;
+            if(value != null)
+                return value;
 
-                var statement = Option.Statement;
-                if(statement != null)
-                    return CompoundSyntax.Create(statement);
+            var statement = Option.Statement;
+            if (statement != null)
+                return CompoundSyntax.Create(statement);
 
-                var statements = Option.GetStatements();
-                if(statements != null)
-                    return CompoundSyntax.Create(statements);
+            var statements = Option.Statements;
+            if (statements != null)
+                return CompoundSyntax.Create(statements);
 
-                return IssueId.InvalidExpression.Value(Token.Characters);
-            }
+            return IssueId.InvalidExpression.Value(Token.Characters);
         }
 
 
@@ -318,18 +278,20 @@ namespace Reni.TokenClasses
             }
         }
 
+        internal Result<Statement[]> ForceStatements => this.CachedValue(() => GetStatements());
+
         internal Result<Statement[]> GetStatements(List type = null)
         {
             var statements = Option.GetStatements(type);
-            if(statements != null)
+            if (statements != null)
                 return statements;
 
             var statement = Option.Statement;
-            if(statement != null)
-                return statement.Convert(x => new[] {x});
+            if (statement != null)
+                return statement.Convert(x => new[] { x });
 
             var value = Option.Value;
-            if(value != null)
+            if (value != null)
                 return Statement.CreateStatements(Token.Characters, value);
 
             NotImplementedMethod(type);
@@ -368,6 +330,7 @@ namespace Reni.TokenClasses
             NotImplementedMethod(level, right);
             return null;
         }
+
     }
 
     interface IDeclarationItem

@@ -15,7 +15,7 @@ namespace Reni.TokenClasses
 
         Result<Value> IValueProvider.Get(Syntax left, SourcePart token, Syntax right)
         {
-            var statements = left?.GetStatements();
+            var statements = left?.ForceStatements;
             if(statements == null)
                 statements = new Statement[0];
             var cleanup = right?.Value;
