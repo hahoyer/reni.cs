@@ -213,17 +213,6 @@ namespace Reni.Struct
         internal IEnumerable<SourcePart> SourceParts
             => Statements.Select(item => item.SourcePart);
 
-        internal CompoundSyntax AddCleanupSection(SourcePart token, Value newCleanupSection)
-        {
-            if(CleanupSection != null)
-            {
-                NotImplementedMethod(token, newCleanupSection);
-                return null;
-            }
-
-            return new CompoundSyntax(_statements, newCleanupSection);
-        }
-
         internal Result Cleanup(ContextBase context, Category category)
         {
             if(CleanupSection != null && (category.HasCode || category.HasExts))

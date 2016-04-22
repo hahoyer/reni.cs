@@ -58,7 +58,9 @@ namespace Reni.TokenClasses
                 if(!IsStatementsLevel)
                     return Parent.Parent.Option.CompoundContexts;
 
-                return Parent.Value.Target.ResultCache.Keys;
+                var target = (CompoundSyntax)Parent.Value.Target;
+
+                return target.;
             }
         }
 
@@ -85,7 +87,7 @@ namespace Reni.TokenClasses
                 if(Value != null)
                 {
                     var contexts = CompoundContexts;
-                    var types = contexts.Select(item => item.Result(Category.Type, Value.Target).Type).ToArray();
+                    var types = contexts.Select(item => Value.Target.Type(item)).ToArray();
                     NotImplementedMethod(nameof(types), types);
                     return null;
                 }
