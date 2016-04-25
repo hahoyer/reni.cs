@@ -12,14 +12,14 @@ using Reni.TokenClasses;
 
 namespace Reni.Type
 {
-    sealed class NumberType
-        : Child<ArrayType>
-            , ISymbolProviderForPointer<DumpPrintToken>
-            , ISymbolProviderForPointer<Operation>
-            , ISymbolProviderForPointer<TokenClasses.EnableCut>
-            , ISymbolProviderForPointer<Negate>
-            , ISymbolProviderForPointer<TextItem>
-            , IForcedConversionProvider<NumberType>
+    sealed class NumberType :
+        Child<ArrayType>,
+        ISymbolProviderForPointer<DumpPrintToken>,
+        ISymbolProviderForPointer<Operation>,
+        ISymbolProviderForPointer<TokenClasses.EnableCut>,
+        ISymbolProviderForPointer<Negate>,
+        ISymbolProviderForPointer<TextItem>,
+        IForcedConversionProvider<NumberType>
     {
         static readonly Minus _minusOperation = new Minus();
         readonly ValueCache<Result> _zeroResult;
@@ -89,6 +89,23 @@ namespace Reni.Type
 
         protected override Size GetSize() => Parent.Size;
 
+        internal override IEnumerable<string> DeclarationOptions
+            => base.DeclarationOptions.Concat(InternalDeclarationOptions);
+
+        static IEnumerable<string> InternalDeclarationOptions
+        {
+            get
+            {
+                return new[]
+                {
+                    DumpPrintToken.TokenId,
+                    TokenClasses.EnableCut.TokenId,
+                    Negate.TokenId,TextItem.TokenId
+                }
+                    .Concat(Extension.GetTokenIds<Operation>());
+            }
+        }
+
         Result TextItemResult(Category category) => Parent
             .TextItem
             .Pointer
@@ -104,7 +121,7 @@ namespace Reni.Type
             .ReplaceAbsolute
             (
                 _zeroResult.Value.Type.ForcedReference,
-                c => _zeroResult.Value.LocalReferenceResult & (c))
+                c => _zeroResult.Value.LocalReferenceResult & c)
             .ReplaceArg(ObjectResult);
 
         protected override CodeBase DumpPrintCode() => Align.ArgCode.DumpPrintNumber(Align.Size);

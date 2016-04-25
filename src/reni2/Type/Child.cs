@@ -24,18 +24,6 @@ namespace Reni.Type
 
         [DisableDump]
         internal override Root Root => Parent.Root;
-        internal override IEnumerable<string> DeclarationOptions
-            => base.DeclarationOptions.Concat(InternalDeclarationOptions);
-
-        IEnumerable<string> InternalDeclarationOptions
-        {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
-        }
-
 
         TParent IChild<TParent>.Parent => Parent;
         IConversion IProxyType.Converter => this;

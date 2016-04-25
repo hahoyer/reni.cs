@@ -51,6 +51,7 @@ namespace Reni.Struct
         internal override IEnumerable<IConversion> StripConversionsFromPointer
             => View.ConverterFeatures.Union(View.MixinConversions);
 
+        [DisableDump]
         internal override IEnumerable<string> DeclarationOptions
             => base.DeclarationOptions.Concat(InternalDeclarationOptions);
 
@@ -58,8 +59,11 @@ namespace Reni.Struct
         {
             get
             {
-                NotImplementedMethod();
-                return null;
+                yield return DumpPrintToken.TokenId;
+                yield return AtToken.TokenId;
+
+                foreach(var name in View.Compound.Syntax.Names)
+                    yield return name;
             }
         }
 

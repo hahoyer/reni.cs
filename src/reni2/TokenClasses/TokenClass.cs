@@ -39,7 +39,7 @@ namespace Reni.TokenClasses
     [MeansImplicitUse]
     sealed class Variant : Attribute
     {
-        object[] CreationParameter { get; }
+        internal object[] CreationParameter { get; }
 
         public Variant(params object[] creationParameter) { CreationParameter = creationParameter; }
 

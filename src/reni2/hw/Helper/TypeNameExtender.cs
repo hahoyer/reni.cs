@@ -17,6 +17,8 @@ namespace hw.Helper
             return ReferencedTypes.ByNamePartMulti[typeName];
         }
 
+        public static Type[] Types => ReferencedTypes.Types;
+
         public static Type ResolveUniqueType(this string typeName)
         {
             return ReferencedTypes.ByNamePart[typeName];
@@ -34,6 +36,7 @@ namespace hw.Helper
             var assembly = Assembly.GetEntryAssembly() ?? Assembly.GetCallingAssembly();
             return new TypeLibrary(assembly.GetReferencedTypes());
         }
+
 
         static TypeLibrary ReferencedTypes
         {

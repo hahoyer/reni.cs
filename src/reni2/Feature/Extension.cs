@@ -7,9 +7,9 @@ using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
-using Reni.Parser;
 using Reni.TokenClasses;
 using Reni.Type;
+using Reni.Validation;
 
 namespace Reni.Feature
 {
@@ -103,6 +103,7 @@ namespace Reni.Feature
             (IEnumerable<TGeneric> baseList, Func<TGeneric> creator)
         {
             yield return creator();
+
             if(baseList == null)
                 yield break;
 
@@ -133,9 +134,13 @@ namespace Reni.Feature
 
             if(right == null)
             {
-                if(valueResult == null)
-                    Dumpable.NotImplementedFunction(feature, category, token, context, right);
-                return valueResult;
+                if(valueResult != null)
+                    return valueResult;
+
+                var result = new RootIssueType
+                    (IssueId.MissingRightExpression.CreateIssue(token), context.RootContext)
+                    .Result(category);
+                return result;
             }
 
             if(valueResult == null)

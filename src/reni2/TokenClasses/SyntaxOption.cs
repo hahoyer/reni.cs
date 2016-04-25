@@ -16,6 +16,7 @@ namespace Reni.TokenClasses
 
         public SyntaxOption(Syntax parent) { Parent = parent; }
 
+        [EnableDumpExcept(null)]
         internal Result<Value> Value
         {
             get
@@ -34,16 +35,20 @@ namespace Reni.TokenClasses
             => (Parent.TokenClass as IStatementsProvider)
                 ?.Get(type, Parent.Left, Parent.Token.Characters, Parent.Right);
 
+        [EnableDumpExcept(null)]
         internal Result<Statement[]> Statements => GetStatements();
 
+        [EnableDumpExcept(null)]
         internal Result<Statement> Statement
             => (Parent.TokenClass as IStatementProvider)
                 ?.Get(Parent.Left, Parent.Token.Characters, Parent.Right);
 
+        [EnableDumpExcept(null)]
         internal Result<Declarator> Declarator
             => (Parent.TokenClass as IDeclaratorTokenClass)
                 ?.Get(Parent.Left, Parent.Token.Characters, Parent.Right);
 
+        [EnableDumpExcept(null)]
         internal Issue[] Issues
             => Value?.Issues
                 ?? GetStatements()?.Issues
@@ -51,6 +56,7 @@ namespace Reni.TokenClasses
                         ?? Declarator?.Issues
                             ?? new Issue[0];
 
+        [EnableDumpExcept(null)]
         ContextBase[] CompoundContexts
         {
             get
@@ -60,10 +66,15 @@ namespace Reni.TokenClasses
 
                 var target = (CompoundSyntax)Parent.Value.Target;
 
-                return target.;
+                return target
+                    .ResultCache
+                    .Values
+                    .Select(item=>item.Type.ToContext)
+                    .ToArray();
             }
         }
 
+        [EnableDumpExcept(null)]
         bool IsStatementsLevel
         {
             get
@@ -78,35 +89,20 @@ namespace Reni.TokenClasses
             }
         }
 
-
-        [DisableDump]
-        internal PreType PreType
+        internal string[] Declarations
         {
             get
             {
-                if(Value != null)
-                {
-                    var contexts = CompoundContexts;
-                    var types = contexts.Select(item => Value.Target.Type(item)).ToArray();
-                    NotImplementedMethod(nameof(types), types);
-                    return null;
-                }
+                if (Value != null)
+                    return CompoundContexts
+                        .Select(item => Value.Target.Type(item))
+                        .SelectMany(item => item.DeclarationOptions)
+                        .Distinct()
+                        .ToArray();
 
-                NotImplementedMethod();
-                return null;
-            }
-        }
-
-        [DisableDump]
-        internal PreContext PreContext
-        {
-            get
-            {
                 NotImplementedMethod();
                 return null;
             }
         }
     }
-
-    class PreContext {}
 }

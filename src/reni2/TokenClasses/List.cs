@@ -28,10 +28,7 @@ namespace Reni.TokenClasses
         public Result<Statement[]> Get(List type, Syntax left, SourcePart token, Syntax right)
         {
             if(type != null && type != this)
-            {
-                NotImplementedMethod(type, left, token, right);
                 return null;
-            }
 
             var leftStatements = CreateStatements(left, token);
             var rightStatements = CreateStatements(right, token);

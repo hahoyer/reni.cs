@@ -15,6 +15,7 @@ namespace Reni.Numeric
         string NumberType.IOperation.Name => DataFunctionName;
         [DisableDump]
         internal override IEnumerable<IDeclarationProvider> Genericize => this.GenericListFromDefinable(base.Genericize);
+
     }
 
     abstract class TransformationOperation

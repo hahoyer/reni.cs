@@ -223,7 +223,7 @@ namespace Reni.TokenClasses
         {
             get
             {
-                var preType = Option.PreType;
+                return Option.Declarations;
 
                 NotImplementedMethod();
                 return null;
@@ -278,6 +278,7 @@ namespace Reni.TokenClasses
             }
         }
 
+        [DisableDump]
         internal Result<Statement[]> ForceStatements => this.CachedValue(() => GetStatements());
 
         internal Result<Statement[]> GetStatements(List type = null)
@@ -294,8 +295,7 @@ namespace Reni.TokenClasses
             if (value != null)
                 return Statement.CreateStatements(Token.Characters, value);
 
-            NotImplementedMethod(type);
-            return null;
+            return new Result<Statement[]>(new Statement[0], IssueId.InvalidListOperandSequence.CreateIssue(Token.Characters));
         }
 
         [DisableDump]

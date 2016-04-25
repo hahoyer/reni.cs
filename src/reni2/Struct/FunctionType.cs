@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-
 using hw.Helper;
 using JetBrains.Annotations;
 using Reni.Basics;
@@ -57,9 +56,19 @@ namespace Reni.Struct
         internal override IEnumerable<string> DeclarationOptions
             => base.DeclarationOptions.Concat(InternalDeclarationOptions);
 
-        static IEnumerable<string> InternalDeclarationOptions
+        IEnumerable<string> InternalDeclarationOptions
         {
-            get { yield return null; }
+            get
+            {
+                if(Body.IsImplicit)
+                    foreach(var option in ValueType.DeclarationOptions)
+                        yield return option;
+
+                yield return "()";
+
+                if (IsMutable)
+                    yield return ReassignToken.TokenId;
+            }
         }
 
 

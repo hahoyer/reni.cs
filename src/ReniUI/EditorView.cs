@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -64,7 +63,8 @@ namespace ReniUI
 
             internal void OnUpdate(UpdateChange change)
             {
-                switch(change) {
+                switch(change)
+                {
                 case UpdateChange.Selection:
                     FilePersister.Store("Selection");
                     return;
@@ -128,29 +128,27 @@ namespace ReniUI
 
             AutocompleteMenu = new AutocompleteMenu
             {
-                Font = new Font("Microsoft Sans Serif", 9F, FontStyle.Regular, GraphicsUnit.Point, 204),
-                ImageList = null,
-                Items = new[]
-                {
-                    "abc", "abcd", "abcde", "abcdef"
-                },
-                LeftPadding = 0,
-                TargetControlWrapper = null
+                AutoPopup = true,
+                AppearInterval = 0,
+                MinFragmentLength = 1
             };
 
-            AutocompleteMenu.WrapperNeeded += (s, a) => a.Wrapper = new ScintillaWrapper((Scintilla) a.TargetControl);
+
+            AutocompleteMenu.WrapperNeeded +=
+                (s, a) => a.Wrapper = new ScintillaWrapper((Scintilla) a.TargetControl);
             AutocompleteMenu.SetAutocompleteItems(Extension.Query(GetOptions));
         }
 
-        hw.Helper.File ConfigFile => Path.Combine(ConfigRoot, "EditorFiles", FileName, "EditorConfiguration").FileHandle();
+        hw.Helper.File ConfigFile
+            => Path.Combine(ConfigRoot, "EditorFiles", FileName, "EditorConfiguration").FileHandle()
+            ;
 
         IEnumerable<AutocompleteItem> GetOptions()
         {
-            var activeSyntaxItem = ActiveSyntaxItem;
             Compiler.Ensure();
-            var declarationOptions = activeSyntaxItem.DeclarationOptions;
-            NotImplementedMethod(nameof(declarationOptions), declarationOptions);
-            return null;
+            return ActiveSyntaxItem
+                .DeclarationOptions
+                .Select(item => new AutocompleteItem(item));
         }
 
         void OnKeyDown(KeyEventArgs e)
@@ -167,6 +165,7 @@ namespace ReniUI
                 var token = Token.LocatePosition(Compiler.Syntax, TextBox.SelectionStart - 1);
                 if(token.IsComment || token.IsLineComment || token.IsText)
                     return null;
+
                 var current = token.Syntax.Token.SourcePart.Position - 1;
                 return token.Syntax.LocatePosition(current);
             }
@@ -188,11 +187,16 @@ namespace ReniUI
             AlignTitle();
         }
 
-        CompilerBrowser CreateCompilerBrowser() => CompilerBrowser.FromText(TextBox.Text, new CompilerParameters
-        {
-            OutStream = new StringStream(),
-            ProcessErrors = true
-        }, sourceIdentifier: FileName);
+        CompilerBrowser CreateCompilerBrowser()
+            => CompilerBrowser.FromText
+                (
+                    TextBox.Text,
+                    new CompilerParameters
+                    {
+                        OutStream = new StringStream(),
+                        ProcessErrors = true
+                    },
+                    sourceIdentifier: FileName);
 
         public new void Run() => base.Run();
 
@@ -204,7 +208,10 @@ namespace ReniUI
 
         internal void FormatSelection() => Format(SourcePart);
 
-        SourcePart SourcePart => (Compiler.Source + TextBox.SelectionStart).Span(TextBox.SelectionEnd - TextBox.SelectionEnd);
+        SourcePart SourcePart
+            =>
+                (Compiler.Source + TextBox.SelectionStart).Span
+                    (TextBox.SelectionEnd - TextBox.SelectionEnd);
 
         internal bool HasSelection() => TextBox.SelectedText != "";
 
@@ -244,17 +251,22 @@ namespace ReniUI
 
                 _lineNumberMarginLength = value;
                 const int Padding = 2;
-                TextBox.Margins[0].Width = TextBox.TextWidth(Style.LineNumber, new string('9', value + 1)) + Padding;
+                TextBox.Margins[0].Width = TextBox.TextWidth
+                    (Style.LineNumber, new string('9', value + 1)) + Padding;
             }
         }
 
         void Format(SourcePart sourcePart)
         {
-            var reformat = Compiler.Locate(sourcePart).GetEditPieces(sourcePart, new Formatting.Configuration
-            {
-                EmptyLineLimit = 1,
-                MaxLineLength = 120
-            }.Create()).Reverse();
+            var reformat = Compiler.Locate(sourcePart)
+                .GetEditPieces
+                (
+                    sourcePart,
+                    new Formatting.Configuration
+                    {
+                        EmptyLineLimit = 1,
+                        MaxLineLength = 120
+                    }.Create()).Reverse();
 
             foreach(var piece in reformat)
             {
