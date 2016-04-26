@@ -16,7 +16,7 @@ namespace Reni.Parser
         protected override IEnumerable<ScannerTokenClass> GetPredefinedTokenClasses()
             => TokenClasses;
 
-        IEnumerable<ScannerTokenClass> TokenClasses
+        internal IEnumerable<ScannerTokenClass> TokenClasses
             => GetType()
                 .Assembly
                 .GetTypes()

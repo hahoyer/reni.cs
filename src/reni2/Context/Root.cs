@@ -97,6 +97,8 @@ namespace Reni.Context
         [DisableDump]
         public bool ProcessErrors => Parent.ProcessErrors;
 
+        internal IEnumerable<ScannerTokenClass> AllTokenClasses => Parent.AllTokenClasses;
+
         IImplementation ISymbolProviderForPointer<Minus>.Feature
             (Minus tokenClass) => _minusFeatureCache.Value;
 
@@ -455,6 +457,7 @@ namespace Reni.Context
             Result<Parser.Value> Parse(string source);
             bool ProcessErrors { get; }
             IExecutionContext ExecutionContext { get; }
+            IEnumerable<ScannerTokenClass> AllTokenClasses{ get; }
         }
     }
 }

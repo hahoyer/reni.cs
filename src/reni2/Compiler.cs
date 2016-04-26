@@ -45,7 +45,7 @@ namespace Reni
                 parameters);
         }
 
-        readonly MainTokenFactory _tokenFactory;
+        readonly MainTokenFactory TokenFactory;
         internal readonly CompilerParameters Parameters;
         readonly string ModuleName;
 
@@ -70,7 +70,7 @@ namespace Reni
             ModuleName = modulName;
 
             Root = new Root(this);
-            _tokenFactory = new MainTokenFactory(Scanner)
+            TokenFactory = new MainTokenFactory(Scanner)
             {
                 Trace = Parameters.TraceOptions.Parser
             };
@@ -125,6 +125,9 @@ namespace Reni
         bool Root.IParent.ProcessErrors => Parameters.ProcessErrors;
 
         IExecutionContext Root.IParent.ExecutionContext => this;
+
+        IEnumerable<ScannerTokenClass> Root.IParent.AllTokenClasses
+            => TokenFactory.AllTokenClasses;
 
         Result<Value> Root.IParent.Parse(string source) => Parse(source);
 
@@ -214,7 +217,7 @@ namespace Reni
             ;
 
 
-        Syntax Parse(SourcePosn source) => _tokenFactory.Parser.Execute(source);
+        Syntax Parse(SourcePosn source) => TokenFactory.Parser.Execute(source);
 
         void RunFromCode() => CodeContainer.Execute(this, TraceCollector.Instance);
 

@@ -9,20 +9,18 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Parser;
 using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Validation;
 
 namespace Reni.Type
 {
-    abstract class TypeBase
-        : DumpableObject
-            , IContextReferenceProvider
-            , IIconKeyProvider
-            , ISearchTarget
-            , ValueCache.IContainer
-            , IRootProvider
+    abstract class TypeBase : DumpableObject,
+        IContextReferenceProvider,
+        IIconKeyProvider,
+        ISearchTarget,
+        ValueCache.IContainer,
+        IRootProvider
     {
         sealed class Cache
         {
@@ -131,6 +129,7 @@ namespace Reni.Type
         {
             if(Hllw)
                 return Size.Zero;
+
             return GetSize();
         }
 
@@ -156,6 +155,7 @@ namespace Reni.Type
         {
             if(IsConvertable(elementType))
                 return 1;
+
             NotImplementedMethod(elementType);
             return null;
         }
@@ -193,6 +193,7 @@ namespace Reni.Type
                 var alignBits = Root.DefaultRefAlignParam.AlignBits;
                 if(Size.Align(alignBits) == Size)
                     return this;
+
                 return _cache.Aligner[alignBits];
             }
         }
@@ -251,6 +252,7 @@ namespace Reni.Type
         {
             if(Hllw)
                 return Result(category);
+
             return new Result
                 (
                 category,
@@ -416,6 +418,7 @@ namespace Reni.Type
         {
             if(Hllw)
                 return Result(category);
+
             return new Result
                 (
                 category,
@@ -588,7 +591,20 @@ namespace Reni.Type
                 yield return SearchResult.Create(feature, this);
         }
 
-        internal virtual IEnumerable<string> DeclarationOptions { get { yield break; } }
+        [DisableDump]
+        internal virtual IEnumerable<string> DeclarationOptions
+            => Root
+                .AllTokenClasses
+                .Where(IsDeclarationOption)
+                .Select(item => item.Id)
+                .OrderBy(item => item)
+                .ToArray();
+
+        bool IsDeclarationOption(ScannerTokenClass tokenClass)
+        {
+            var definable = tokenClass as Definable;
+            return definable != null && DeclarationsForType(definable).Any();
+        }
 
         [DisableDump]
         protected virtual IEnumerable<IGenericProviderForType> Genericize
@@ -615,6 +631,7 @@ namespace Reni.Type
             {
                 if(Hllw)
                     yield break;
+
                 if(IsAligningPossible && Align.Size != Size)
                     yield return Feature.Extension.Conversion(AlignResult);
                 if(IsPointerPossible)
@@ -644,6 +661,7 @@ namespace Reni.Type
             var provider = this as IForcedConversionProvider<TDestination>;
             if(provider != null)
                 return provider.Result(destination);
+
             return new IConversion[0];
         }
 

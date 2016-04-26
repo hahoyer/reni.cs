@@ -53,6 +53,7 @@ namespace Reni.Struct
         internal override CompoundView FindRecentCompoundView => _compoundView;
         [DisableDump]
         internal override bool HasQuickSize => false;
+        [DisableDump]
         internal override IEnumerable<string> DeclarationOptions
             => base.DeclarationOptions.Concat(InternalDeclarationOptions);
 
@@ -60,14 +61,12 @@ namespace Reni.Struct
         {
             get
             {
+                if(IsMutable)
+                    yield return ReassignToken.TokenId;
+
                 if(Body.IsImplicit)
                     foreach(var option in ValueType.DeclarationOptions)
                         yield return option;
-
-                yield return "()";
-
-                if (IsMutable)
-                    yield return ReassignToken.TokenId;
             }
         }
 

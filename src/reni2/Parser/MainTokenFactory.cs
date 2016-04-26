@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using hw.DebugFormatter;
 using hw.Parser;
 using hw.Scanner;
 using Reni.Numeric;
@@ -85,6 +86,7 @@ namespace Reni.Parser
 
         readonly ISubParser<Syntax> _declarationSyntaxSubParser;
         readonly PrioParser<Syntax> _declarationSyntaxParser;
+        readonly List<UserSymbol> UserSymbols = new List<UserSymbol>();
 
         public MainTokenFactory
             (Func<ITokenFactory<Syntax>, IScanner<Syntax>> getScanner)
@@ -94,8 +96,7 @@ namespace Reni.Parser
             _declarationSyntaxParser = new PrioParser<Syntax>
                 (
                 DeclarationTokenFactory.PrioTable,
-                getScanner(new DeclarationTokenFactory())
-                ,
+                getScanner(new DeclarationTokenFactory()),
                 null);
             _declarationSyntaxSubParser = new SubParser<Syntax>
                 (_declarationSyntaxParser, Pack);
@@ -123,12 +124,21 @@ namespace Reni.Parser
 
         protected override ScannerTokenClass GetEndOfText() => new RightParenthesis(0);
         protected override ScannerTokenClass GetNumber() => new Number();
-        protected override ScannerTokenClass GetTokenClass(string name) => new UserSymbol(name);
+
+        protected override ScannerTokenClass GetTokenClass(string name)
+        {
+            var result = new UserSymbol(name);
+            UserSymbols.Add(result);
+            return result;
+        }
 
         protected override ScannerTokenClass GetError(Match.IError message)
             => new ScannerSyntaxError(message);
 
         protected override ScannerTokenClass GetText() => new Text();
+
+        [DisableDump]
+        internal IEnumerable<ScannerTokenClass> AllTokenClasses => TokenClasses.Concat(UserSymbols);
     }
 
 
