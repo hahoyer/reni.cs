@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Helper;
 using hw.Scanner;
+using Reni.Context;
 using Reni.Parser;
 using Reni.TokenClasses;
 
@@ -45,5 +46,8 @@ namespace Reni.Validation
 
         internal Result<Syntax> Syntax(SourcePart token, Syntax syntax)
             => new Result<Syntax>(syntax, new Issue(this, token, ""));
+
+        internal RootIssueType Type(SourcePart token, ContextBase context)
+            => new RootIssueType(CreateIssue(token), context.RootContext);
     }
 }

@@ -33,7 +33,6 @@ namespace Reni.Validation
             }
         }
 
-
         protected override IssueType CreateIssue(SourcePart source, IssueId issueId)
             => new ConsequentialIssueType(this, source);
 

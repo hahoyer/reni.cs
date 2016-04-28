@@ -137,8 +137,8 @@ namespace Reni.Feature
                 if(valueResult != null)
                     return valueResult;
 
-                var result = new RootIssueType
-                    (IssueId.MissingRightExpression.CreateIssue(token), context.RootContext)
+                var result = IssueId.MissingRightExpression
+                    .Type(token, context)
                     .Result(category);
                 return result;
             }
@@ -161,7 +161,7 @@ namespace Reni.Feature
             return valueResult
                 .Type.Execute(category, valueResult, token, null, context, right);
         }
-
+                                                          
         static Result ValueResult
             (
             this IEvalImplementation feature,
