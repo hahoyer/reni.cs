@@ -176,8 +176,9 @@ namespace Reni
             if(Parameters.TraceOptions.ExecutedCode)
                 Tracer.FlaggedLine(CSharpString);
 
-            foreach(var t in Issues)
-                Parameters.OutStream.AddLog(t.LogDump + "\n");
+            if (Parameters.OutStream != null)
+                foreach(var t in Issues)
+                    Parameters.OutStream.AddLog(t.LogDump + "\n");
 
             Data.OutStream = Parameters.OutStream;
 

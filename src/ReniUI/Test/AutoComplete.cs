@@ -58,7 +58,7 @@ system MaxNumber8 +          ;
 ";
 
         [UnitTest]
-        public void GetTokenForPosition()
+        public void GetDeclarationOptions()
         {
             var compiler = CompilerBrowser.FromText(text);
             for(var i = 0; i < text.Length; i++)
