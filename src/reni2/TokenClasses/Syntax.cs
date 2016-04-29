@@ -219,7 +219,29 @@ namespace Reni.TokenClasses
         }
 
         [DisableDump]
-        public string[] DeclarationOptions => Option.Declarations;
+        public string[] DeclarationOptions
+        {
+            get
+            {
+                return Option.Declarations;
+
+                NotImplementedMethod();
+                return null;
+
+                var syntax = Value
+                    .Target;
+                var functionCache = syntax.ResultCache;
+                if(functionCache.Any())
+                    return functionCache
+                        .Select(item => item.Value.Type)
+                        .SelectMany(item => item.DeclarationOptions)
+                        .Distinct()
+                        .ToArray();
+
+                NotImplementedMethod();
+                return null;
+            }
+        }
 
         [DisableDump]
         internal Result<Value> Value => this.CachedValue(GetValue);

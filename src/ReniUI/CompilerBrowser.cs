@@ -58,7 +58,7 @@ namespace ReniUI
                 .ToArray();
 
             var compileSyntaxs = enumerable
-                .Where(item => item?.ResultCache.Any()??false);
+                .Where(item => item?.ResultCache.Any() ?? false);
 
             return compileSyntaxs;
         }
@@ -141,5 +141,21 @@ namespace ReniUI
         }
 
         internal Syntax Syntax => Compiler.Syntax;
+
+        internal Syntax LocateActivePosition(int offset)
+        {
+            var token = Token.LocatePosition(Syntax, offset);
+            if(token.IsComment || token.IsLineComment || token.IsText)
+                return null;
+
+            var current = token.Syntax.Token.SourcePart.Position - 1;
+            return token.Syntax.LocatePosition(current);
+        }
+
+        internal string[] DeclarationOptions(int offset)
+        {
+            Ensure();
+            return LocateActivePosition(offset).DeclarationOptions;
+        }
     }
 }

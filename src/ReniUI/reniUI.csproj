@@ -112,6 +112,7 @@
     <Compile Include="RestFul\ChannelRepo.cs" />
     <Compile Include="RestFul\IChannelRepo.cs" />
     <Compile Include="RestFul\Issue.cs" />
+    <Compile Include="Test\AutoComplete.cs" />
     <Compile Include="Test\BadUserInterAction.cs" />
     <Compile Include="Test\BraceMatching.cs" />
     <Compile Include="Test\ExpressionFormatting.cs" />

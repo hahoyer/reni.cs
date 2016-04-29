@@ -143,32 +143,15 @@ namespace ReniUI
             => Path.Combine(ConfigRoot, "EditorFiles", FileName, "EditorConfiguration").FileHandle()
             ;
 
-        IEnumerable<AutocompleteItem> GetOptions()
-        {
-            Compiler.Ensure();
-            return ActiveSyntaxItem
-                .DeclarationOptions
-                .Select(item => new AutocompleteItem(item));
-        }
+        IEnumerable<AutocompleteItem> GetOptions() 
+            => Compiler
+            .DeclarationOptions(TextBox.SelectionStart - 1)
+            .Select(item => new AutocompleteItem(item));
 
         void OnKeyDown(KeyEventArgs e)
         {
             if(e.Control && e.KeyCode == Keys.Space)
                 AutocompleteMenu.Show(TextBox, true);
-        }
-
-        [DisableDump]
-        Syntax ActiveSyntaxItem
-        {
-            get
-            {
-                var token = Token.LocatePosition(Compiler.Syntax, TextBox.SelectionStart - 1);
-                if(token.IsComment || token.IsLineComment || token.IsText)
-                    return null;
-
-                var current = token.Syntax.Token.SourcePart.Position - 1;
-                return token.Syntax.LocatePosition(current);
-            }
         }
 
         void RunSaveManager()
