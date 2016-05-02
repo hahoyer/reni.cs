@@ -63,4 +63,4 @@ namespace Reni.Context
                 .Result
                 (category, c => ArgResult(c).AddToReference(() => Parent.CompoundViewSize * -1));
     }
-}
+}                                                               

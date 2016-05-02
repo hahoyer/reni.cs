@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
-
 using hw.Helper;
 using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
-using Reni.Parser;
 using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Type;
@@ -23,10 +21,14 @@ namespace Reni.Context
     /// </summary>
     abstract class ContextBase
         : DumpableObject
-            , ResultCache.IResultProvider
-            , IIconKeyProvider
-            , ValueCache.IContainer          
-        ,IRootProvider
+            ,
+            ResultCache.IResultProvider
+            ,
+            IIconKeyProvider
+            ,
+            ValueCache.IContainer
+            ,
+            IRootProvider
     {
         protected override string GetNodeDump()
             => base.GetNodeDump() + "(" + GetContextIdentificationDump() + ")";
@@ -38,7 +40,10 @@ namespace Reni.Context
         internal readonly Cache CacheObject;
 
         protected ContextBase()
-            : base(_nextId++) { CacheObject = new Cache(this); }
+            : base(_nextId++)
+        {
+            CacheObject = new Cache(this);
+        }
 
         public abstract string GetContextIdentificationDump();
 
@@ -59,6 +64,16 @@ namespace Reni.Context
 
         [DisableDump]
         internal abstract bool IsRecursionMode { get; }
+
+        [DisableDump]
+        internal virtual IEnumerable<string> DeclarationOptions
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
 
         [UsedImplicitly]
         internal int SizeToPacketCount(Size size)
@@ -264,6 +279,7 @@ namespace Reni.Context
             var result = results.SingleOrDefault();
             if(result != null || RootContext.ProcessErrors)
                 return result;
+
             NotImplementedMethod(tokenClass);
             return null;
         }
@@ -302,6 +318,7 @@ namespace Reni.Context
         {
             if(pendingCategory == Category.None)
                 return FindRecentCompoundView.ObjectPointerViaContext(category);
+
             NotImplementedMethod(category, pendingCategory);
             return null;
         }
@@ -312,7 +329,7 @@ namespace Reni.Context
             return null;
         }
 
-        virtual internal IEnumerable<ContextBase> ParentChain { get { yield return this; } }
+        internal virtual IEnumerable<ContextBase> ParentChain { get { yield return this; } }
 
         ResultCache.IResultProvider FindSource(Parser.Value syntax, IContextReference ext)
         {
@@ -327,6 +344,7 @@ namespace Reni.Context
             while(current != null)
             {
                 yield return current;
+
                 current = current.FindSource(ext);
             }
         }
@@ -336,7 +354,6 @@ namespace Reni.Context
             => Declaration(definable).GetDefinableResults(ext, this, right);
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
-
     }
 
     class SmartNodeAttribute : Attribute {}

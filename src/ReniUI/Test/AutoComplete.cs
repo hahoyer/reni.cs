@@ -63,8 +63,13 @@ system MaxNumber8 +          ;
             var compiler = CompilerBrowser.FromText(text);
             for(var i = 0; i < text.Length; i++)
             {
-                var t = compiler.DeclarationOptions(text.Length - i - 1);
-                Tracer.Assert(t != null, () => (new Source(text) + i).Dump());
+                var offset = text.Length - i - 1;
+                var position = compiler.Source + offset;
+                if((position + -1).Span(2).Id != "\r\n")
+                {
+                    var t = compiler.DeclarationOptions(offset);
+                    Tracer.Assert(t != null, () => (new Source(text) + i).Dump());
+                }
             }
         }
     }

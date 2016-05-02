@@ -220,28 +220,10 @@ namespace Reni.TokenClasses
 
         [DisableDump]
         public string[] DeclarationOptions
-        {
-            get
-            {
-                return Option.Declarations;
-
-                NotImplementedMethod();
-                return null;
-
-                var syntax = Value
-                    .Target;
-                var functionCache = syntax.ResultCache;
-                if(functionCache.Any())
-                    return functionCache
-                        .Select(item => item.Value.Type)
-                        .SelectMany(item => item.DeclarationOptions)
-                        .Distinct()
-                        .ToArray();
-
-                NotImplementedMethod();
-                return null;
-            }
-        }
+            => Option
+                .Declarations
+                .Distinct()
+                .ToArray();
 
         [DisableDump]
         internal Result<Value> Value => this.CachedValue(GetValue);
@@ -253,11 +235,11 @@ namespace Reni.TokenClasses
                 return value;
 
             var statement = Option.Statement;
-            if (statement != null)
+            if(statement != null)
                 return CompoundSyntax.Create(statement);
 
             var statements = Option.Statements;
-            if (statements != null)
+            if(statements != null)
                 return CompoundSyntax.Create(statements);
 
             return IssueId.InvalidExpression.Value(Token.Characters);
@@ -284,18 +266,19 @@ namespace Reni.TokenClasses
         internal Result<Statement[]> GetStatements(List type = null)
         {
             var statements = Option.GetStatements(type);
-            if (statements != null)
+            if(statements != null)
                 return statements;
 
             var statement = Option.Statement;
-            if (statement != null)
-                return statement.Convert(x => new[] { x });
+            if(statement != null)
+                return statement.Convert(x => new[] {x});
 
             var value = Option.Value;
-            if (value != null)
+            if(value != null)
                 return Statement.CreateStatements(Token.Characters, value);
 
-            return new Result<Statement[]>(new Statement[0], IssueId.InvalidListOperandSequence.CreateIssue(Token.Characters));
+            return new Result<Statement[]>
+                (new Statement[0], IssueId.InvalidListOperandSequence.CreateIssue(Token.Characters));
         }
 
         [DisableDump]
@@ -330,7 +313,6 @@ namespace Reni.TokenClasses
             NotImplementedMethod(level, right);
             return null;
         }
-
     }
 
     interface IDeclarationItem

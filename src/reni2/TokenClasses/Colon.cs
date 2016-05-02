@@ -57,23 +57,33 @@ namespace Reni.TokenClasses
             NotImplementedMethod(left, token, right);
             return null;
         }
+
+        public static IEnumerable<string> DeclarationOptions
+        {
+            get
+            {
+                yield return ConverterToken.TokenId;
+                yield return MutableDeclarationToken.TokenId;
+                yield return MixInDeclarationToken.TokenId;
+            }
+        }
     }
 
     sealed class ConverterToken : DeclarationTagToken
     {
-        const string TokenId = "converter";
+        internal const string TokenId = "converter";
         public override string Id => TokenId;
     }
 
     sealed class MutableDeclarationToken : DeclarationTagToken
     {
-        const string TokenId = "mutable";
+        internal const string TokenId = "mutable";
         public override string Id => TokenId;
     }
 
     sealed class MixInDeclarationToken : DeclarationTagToken
     {
-        const string TokenId = "mix_in";
+        internal const string TokenId = "mix_in";
         public override string Id => TokenId;
     }
 }

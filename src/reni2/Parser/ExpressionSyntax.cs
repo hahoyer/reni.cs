@@ -122,7 +122,6 @@ namespace Reni.Parser
             (IContextReference ext, ContextBase context)
         {
             var result = DirectChildren
-                .OfType<Value>()
                 .SelectMany(item => item.ResultCache)
                 .Where(item => item.Key == context)
                 .Select(item => item.Value)

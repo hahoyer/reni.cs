@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
 using Reni.Struct;
@@ -64,12 +63,12 @@ namespace Reni.TokenClasses
                 if(!IsStatementsLevel)
                     return Parent.Parent.Option.CompoundContexts;
 
-                var target = (CompoundSyntax)Parent.Value.Target;
+                var target = (CompoundSyntax) Parent.Value.Target;
 
                 return target
                     .ResultCache
                     .Values
-                    .Select(item=>item.Type.ToContext)
+                    .Select(item => item.Type.ToContext)
                     .ToArray();
             }
         }
@@ -83,22 +82,27 @@ namespace Reni.TokenClasses
                     return false;
                 if(Statements != null)
                     return Parent.Parent?.TokenClass != Parent.TokenClass;
+                if(Statement != null)
+                    return false;
 
                 NotImplementedMethod();
                 return false;
             }
         }
 
-        internal string[] Declarations
+        [DisableDump]
+        internal IEnumerable<string> Declarations
         {
             get
             {
-                if (Value != null)
+                if(Value != null)
                     return CompoundContexts
-                        .Select(item => Value.Target.Type(item))
+                        .SelectMany(item => Value.Target.DeclarationOptions(item));
+
+                if(Statements != null)
+                    return CompoundContexts
                         .SelectMany(item => item.DeclarationOptions)
-                        .Distinct()
-                        .ToArray();
+                        .Concat(DeclarationTagToken.DeclarationOptions);
 
                 NotImplementedMethod();
                 return null;

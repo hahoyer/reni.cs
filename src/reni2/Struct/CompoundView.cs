@@ -353,5 +353,17 @@ namespace Reni.Struct
         [DisableDump]
         ContextReferenceType ContextReferenceType
             => ValueCacheExtension.CachedValue(this, () => new ContextReferenceType(this));
+
+        internal IEnumerable<string> DeclarationOptions
+        {
+            get
+            {
+                yield return DumpPrintToken.TokenId;
+                yield return AtToken.TokenId;
+
+                foreach(var name in Compound.Syntax.Names)
+                    yield return name;
+            }
+        }
     }
 }

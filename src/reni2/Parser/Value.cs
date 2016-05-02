@@ -119,6 +119,10 @@ namespace Reni.Parser
             NotImplementedMethod(ext, context);
             return null;
         }
+
+        internal IEnumerable<string> DeclarationOptions(ContextBase context)
+            => Type(context).DeclarationOptions;
+
     }
 
     interface IRecursionHandler

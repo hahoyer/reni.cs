@@ -55,18 +55,8 @@ namespace Reni.Struct
         internal override IEnumerable<string> DeclarationOptions
             => base.DeclarationOptions.Concat(InternalDeclarationOptions);
 
-        IEnumerable<string> InternalDeclarationOptions
-        {
-            get
-            {
-                yield return DumpPrintToken.TokenId;
-                yield return AtToken.TokenId;
-
-                foreach(var name in View.Compound.Syntax.Names)
-                    yield return name;
-            }
-        }
-
+        [DisableDump]
+        IEnumerable<string> InternalDeclarationOptions => View.DeclarationOptions;
 
         [DisableDump]
         protected override IEnumerable<IConversion> StripConversions
