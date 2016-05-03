@@ -178,8 +178,8 @@ namespace Reni.Struct
                 .Compound(this)
                 .Result(category);
 
-        internal override SourcePosn SourceStart => SourceParts.First().Start;
-        internal override SourcePosn SourceEnd => SourceParts.Last().End;
+        internal override SourcePosn SourceStart => _data.First().SourceStart;
+        internal override SourcePosn SourceEnd => _data.Last().SourceEnd;
 
         sealed class Data : DumpableObject
         {
@@ -205,13 +205,18 @@ namespace Reni.Struct
             public bool IsMixIn => RawStatement.IsMixInSyntax;
             public IEnumerable<string> Names => NamesCache.Value;
             public bool IsMutable => RawStatement.IsMutableSyntax;
+
+            internal SourcePart SourcePart => RawStatement.SourcePart;
+            internal SourcePosn SourceStart => RawStatement.SourceStart;
+            internal SourcePosn SourceEnd => RawStatement.SourceEnd;
+
             Result<Value> GetStatement() => RawStatement.Body;
             string[] GetNames() => RawStatement.GetDeclarations().ToArray();
         }
 
         [DisableDump]
         internal IEnumerable<SourcePart> SourceParts
-            => Statements.Select(item => item.SourcePart);
+            => _data.Select(item => item.SourcePart);
 
         internal Result Cleanup(ContextBase context, Category category)
         {

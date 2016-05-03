@@ -52,7 +52,7 @@ namespace Reni.TokenClasses
             (Syntax left, SourcePart token, Syntax right)
         {
             if(left == null && right == null)
-                return new Declarator(new IDeclarationTag[] {this}, null);
+                return new Declarator(new IDeclarationTag[] {this}, null, null);
 
             NotImplementedMethod(left, token, right);
             return null;

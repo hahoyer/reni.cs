@@ -26,11 +26,11 @@ namespace Reni.TokenClasses
             if(right == null)
             {
                 if(left == null)
-                    return new Declarator(null, this);
+                    return new Declarator(null, this, token);
 
                 var d = left.Declarator;
                 if(d != null)
-                    return d.Target.WithName(this);
+                    return d.Target.WithName(this, token);
             }
 
             NotImplementedMethod(left, token, right);

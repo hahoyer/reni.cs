@@ -73,7 +73,7 @@ namespace Reni.TokenClasses
         Result<Declarator> IDeclaratorTagProvider.Get(Syntax left, SourcePart token, Syntax right)
         {
             var result = left.GetBracketKernel(Level, token, right);
-            var target = result.Item1?.Option.Declarator ?? new Declarator(null, null);
+            var target = result.Item1?.Option.Declarator ?? new Declarator(null, null, null);
 
             if(result.Item2 != null)
                 return target.With(result.Item2);

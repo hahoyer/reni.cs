@@ -19,20 +19,23 @@ namespace Reni.Parser
         IDeclarationTag[] Tags { get; }
         [EnableDump]
         Definable Target { get; }
+        [DisableDump]
+        SourcePart TargetToken { get; }
 
-        internal Declarator(IDeclarationTag[] tags, Definable target)
+        internal Declarator(IDeclarationTag[] tags, Definable target, SourcePart targetToken)
         {
             Tags = tags;
             Target = target;
+            TargetToken = targetToken;
         }
 
         internal Result<Statement> Statement(SourcePart token, Result<Value> right)
-            => Parser.Statement.Create(Tags, Target, token, right);
+            => Parser.Statement.Create(Tags, Target, TargetToken,  token, right);
 
-        public Declarator WithName(Definable target)
+        public Declarator WithName(Definable target, SourcePart targetToken)
         {
             if(Target == null)
-                return new Declarator(Tags, target);
+                return new Declarator(Tags, target,targetToken);
 
             NotImplementedMethod(target);
             return null;
