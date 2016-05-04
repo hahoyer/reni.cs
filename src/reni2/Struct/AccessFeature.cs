@@ -4,7 +4,6 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using Reni.Basics;
-using Reni.Code;
 using Reni.Feature;
 using Reni.Parser;
 using Reni.TokenClasses;
@@ -60,26 +59,11 @@ namespace Reni.Struct
 
         Result IValue.Execute(Category category) => Result(category);
 
-        ResultCache.IResultProvider IValue.FindSource(IContextReference ext)
-        {
-            var result = Statement.ResultCache
-                .Where(item => item.Value.Exts.Contains(ext))
-                ;
-
-            return result.FirstOrDefault().Value?.Provider;
-        }
-
         Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
         {
             if(pendingCategory == Category.None)
                 return Result(category);
             NotImplementedMethod(category, pendingCategory);
-            return null;
-        }
-
-        ResultCache.IResultProvider ResultCache.IResultProvider.FindSource(IContextReference ext)
-        {
-            NotImplementedMethod(ext);
             return null;
         }
 

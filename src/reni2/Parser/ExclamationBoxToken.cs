@@ -30,7 +30,7 @@ namespace Reni.Parser
         }
 
         internal Result<Statement> Statement(SourcePart token, Result<Value> right)
-            => Parser.Statement.Create(Tags, Target, TargetToken,  token, right);
+            => Parser.Statement.Create(Tags, Target,  token, right);
 
         public Declarator WithName(Definable target, SourcePart targetToken)
         {
@@ -44,7 +44,7 @@ namespace Reni.Parser
 
     interface IDeclaratorTagProvider
     {
-        Result<Declarator> Get(Syntax left, SourcePart token, Syntax right);
+        Result<Declarator> Get(Syntax left, Syntax token, Syntax right);
     }
 
     interface IDeclarationTag {}
@@ -74,7 +74,7 @@ namespace Reni.Parser
                 var exclamationProvider = right.TokenClass as IDeclaratorTagProvider;
                 if(exclamationProvider != null)
                     return exclamationProvider
-                        .Get(right.Left, right.Token.Characters, right.Right);
+                        .Get(right.Left, right, right.Right);
             }
 
             NotImplementedMethod(left, token, right);

@@ -4,10 +4,12 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Scanner;
 using hw.UnitTest;
+using Reni.FeatureTest.Validation;
 
 namespace ReniUI.Test
 {
     [UnitTest]
+    [LowPriority]
     public sealed class AutoComplete : DependantAttribute
     {
         const string text = @"systemdata: 

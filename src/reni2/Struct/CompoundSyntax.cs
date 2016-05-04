@@ -5,7 +5,6 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 using Reni.Basics;
-using Reni.Code;
 using Reni.Context;
 using Reni.Parser;
 using Reni.TokenClasses;
@@ -18,16 +17,16 @@ namespace Reni.Struct
     /// </summary>
     sealed class CompoundSyntax : Value
     {
-        internal static Result<Value> Create(Result<Statement> item)
-            => new Result<Value>(new CompoundSyntax(new[] {item.Target}), item.Issues);
+        internal static Result<Value> Create(Result<Statement> item, Syntax syntax)
+            => new Result<Value>(new CompoundSyntax(new[] {item.Target}, syntax), item.Issues);
 
-        internal static Result<Value> Create(Result<Statement[]> item)
-            => new Result<Value>(new CompoundSyntax(item.Target), item.Issues);
+        internal static Result<Value> Create(Result<Statement[]> item, Syntax syntax)
+            => new Result<Value>(new CompoundSyntax(item.Target, syntax), item.Issues);
 
-        internal static Result<Value> Create(Result<Statement[]> left, Result<Value> right)
+        internal static Result<Value> Create(Result<Statement[]> left, Result<Value> right, Syntax syntax)
             => new Result<Value>
                 (
-                new CompoundSyntax(left.Target, right?.Target),
+                new CompoundSyntax(left.Target, syntax, right?.Target),
                 left.Issues.plus(right?.Issues)
                 );
 
@@ -39,8 +38,8 @@ namespace Reni.Struct
         static bool _isInsideFileDump;
         static int _nextObjectId;
 
-        CompoundSyntax(Statement[] statements, Value cleanupSection = null)
-            : base(_nextObjectId++)
+        CompoundSyntax(Statement[] statements, Syntax syntax, Value cleanupSection = null)
+            : base(_nextObjectId++, syntax)
         {
             _statements = statements;
             _data = GetData;
@@ -84,19 +83,6 @@ namespace Reni.Struct
 
         [DisableDump]
         internal int EndPosition => Statements.Length;
-
-        internal override ResultCache.IResultProvider FindSource
-            (IContextReference ext, ContextBase context)
-        {
-            var result = _data
-                .SelectMany(item => item.Statement.ResultCache)
-                .Where(item => item.Value.Exts.Contains(ext))
-                .Where(item => (item.Key as CompoundContext)?.View.Compound.Syntax == this)
-                .Where(item => (item.Key as Child)?.Parent == context)
-                ;
-
-            return result.FirstOrDefault().Value?.Provider;
-        }
 
 
         [DisableDump]
@@ -178,9 +164,6 @@ namespace Reni.Struct
                 .Compound(this)
                 .Result(category);
 
-        internal override SourcePosn SourceStart => _data.First().SourceStart;
-        internal override SourcePosn SourceEnd => _data.Last().SourceEnd;
-
         sealed class Data : DumpableObject
         {
             public Data(Statement rawStatement, int position)
@@ -206,17 +189,9 @@ namespace Reni.Struct
             public IEnumerable<string> Names => NamesCache.Value;
             public bool IsMutable => RawStatement.IsMutableSyntax;
 
-            internal SourcePart SourcePart => RawStatement.SourcePart;
-            internal SourcePosn SourceStart => RawStatement.SourceStart;
-            internal SourcePosn SourceEnd => RawStatement.SourceEnd;
-
             Result<Value> GetStatement() => RawStatement.Body;
             string[] GetNames() => RawStatement.GetDeclarations().ToArray();
         }
-
-        [DisableDump]
-        internal IEnumerable<SourcePart> SourceParts
-            => _data.Select(item => item.SourcePart);
 
         internal Result Cleanup(ContextBase context, Category category)
         {

@@ -5,7 +5,6 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 using Reni.Basics;
-using Reni.Code;
 using Reni.Context;
 using Reni.Struct;
 using Reni.TokenClasses;
@@ -15,16 +14,18 @@ namespace Reni.Parser
 {
     abstract class Value : DumpableObject
     {
+        internal Syntax Syntax { get; }
+
         // Used for debug only
         [DisableDump]
         [Node("Cache")]
         internal readonly FunctionCache<ContextBase, ResultCache> ResultCache =
             new FunctionCache<ContextBase, ResultCache>();
 
-        internal Value() { }
+        protected Value(Syntax syntax) { Syntax = syntax; }
 
-        internal Value(int objectId)
-            : base(objectId) { }
+        protected Value(int objectId, Syntax syntax)
+            : base(objectId) { Syntax = syntax; }
 
         [DisableDump]
         internal bool IsLambda => GetIsLambda();
@@ -41,37 +42,9 @@ namespace Reni.Parser
 
         protected virtual bool GetIsLambda() => false;
 
-        [DisableDump]
-        protected virtual IEnumerable<Value> DirectChildren { get { yield break; } }
-
-        [DisableDump]
-        public IEnumerable<Value> Closure
-            => DirectChildren
-                .Where(item => item != null)
-                .SelectMany(item => item.Closure)
-                .plus(this);
-
         internal virtual IRecursionHandler RecursionHandler => null;
 
-        public SourcePart SourcePart => SourceStart.Span(SourceEnd);
-
-        internal virtual SourcePosn SourceStart
-        {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
-        }
-
-        internal virtual SourcePosn SourceEnd
-        {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
-        }
+        internal SourcePart SourcePart => Syntax.SourcePart;
 
         internal void AddToCacheForDebug(ContextBase context, ResultCache cacheItem)
             => ResultCache.Add(context, cacheItem);
@@ -80,13 +53,6 @@ namespace Reni.Parser
 
         internal BitsConst Evaluate(ContextBase context)
             => Result(context).Evaluate(context.RootContext.ExecutionContext);
-
-        internal CodeBase Code(ContextBase context)
-        {
-            var result = context.Result(Category.Code, this).Code;
-            Tracer.Assert(result != null);
-            return result;
-        }
 
         //[DebuggerHidden]
         internal TypeBase Type(ContextBase context) => context.Result(Category.Type, this)?.Type;
@@ -113,38 +79,7 @@ namespace Reni.Parser
             return null;
         }
 
-        internal virtual ResultCache.IResultProvider FindSource
-            (IContextReference ext, ContextBase context)
-        {
-            NotImplementedMethod(ext, context);
-            return null;
-        }
-
         internal IEnumerable<string> DeclarationOptions(ContextBase context)
             => Type(context).DeclarationOptions;
-
-    }
-
-    interface IRecursionHandler
-    {
-        Result Execute
-            (
-            ContextBase context,
-            Category category,
-            Category pendingCategory,
-            Value syntax,
-            bool asReference);
-    }
-
-    sealed class ReplaceArgVisitor : DumpableObject, ISyntaxVisitor
-    {
-        readonly Value _value;
-        public ReplaceArgVisitor(Value value) { _value = value; }
-        Value ISyntaxVisitor.Arg => _value;
-    }
-
-    interface ISyntaxVisitor
-    {
-        Value Arg { get; }
     }
 }

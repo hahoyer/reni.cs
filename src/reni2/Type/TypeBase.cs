@@ -698,10 +698,10 @@ namespace Reni.Type
             return null;
         }
 
-        Result IssueResult(SourcePart source, IssueId issueId, Category category)
+        Result IssueResult(Syntax source, IssueId issueId, Category category)
             => CreateIssue(source, issueId).Result(category);
 
-        protected virtual IssueType CreateIssue(SourcePart source, IssueId issueId)
+        protected virtual IssueType CreateIssue(Syntax source, IssueId issueId)
             => new RootIssueType
                 (
                 new Issue(issueId, source, "Type: " + DumpPrintText),
@@ -712,7 +712,7 @@ namespace Reni.Type
             (
             Category category,
             ResultCache left,
-            SourcePart token,
+            Syntax token,
             Definable definable,
             ContextBase context,
             Parser.Value right
@@ -763,13 +763,6 @@ namespace Reni.Type
         [DisableDump]
         internal IEnumerable<IConversion> SymmetricClosureConversions
             => new SymmetricClosureService(this).Execute(SymmetricClosureService.Forward);
-
-        public IEnumerable<ResultCache.IResultProvider> GetDefinableResults
-            (IContextReference ext, Definable definable, ContextBase context, Parser.Value right)
-            => DeclarationsForTypeAndCloseRelatives(definable)
-                .RemoveLowPriorityResults()
-                .Single()
-                .GetDefinableResults(ext, context, right);
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 

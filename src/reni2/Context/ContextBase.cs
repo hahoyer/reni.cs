@@ -7,7 +7,6 @@ using hw.Helper;
 using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Basics;
-using Reni.Code;
 using Reni.Feature;
 using Reni.Struct;
 using Reni.TokenClasses;
@@ -40,10 +39,7 @@ namespace Reni.Context
         internal readonly Cache CacheObject;
 
         protected ContextBase()
-            : base(_nextId++)
-        {
-            CacheObject = new Cache(this);
-        }
+            : base(_nextId++) { CacheObject = new Cache(this); }
 
         public abstract string GetContextIdentificationDump();
 
@@ -91,11 +87,11 @@ namespace Reni.Context
         internal Result Result(Category category, Parser.Value syntax)
             => ResultCache(syntax).GetCategories(category);
 
-        internal ResultCache ResultCache(Parser.Value syntax) => CacheObject.ResultCache[syntax];
+        internal ResultCache ResultCache(Parser.Value syntax)
+            => CacheObject.ResultCache[syntax];
 
         internal ResultCache ResultAsReferenceCache(Parser.Value syntax)
             => CacheObject.ResultAsReferenceCache[syntax];
-
 
         internal TypeBase TypeIfKnown(Parser.Value syntax)
             => CacheObject.ResultCache[syntax].Data.Type;
@@ -151,10 +147,6 @@ namespace Reni.Context
                 NotImplementedMethod(category, pendingCategory);
                 return null;
             }
-
-            ResultCache.IResultProvider ResultCache.IResultProvider.FindSource
-                (IContextReference ext)
-                => Context.FindSource(Syntax, ext);
 
             [EnableDump]
             string ContextId => Context.NodeDump;
@@ -251,7 +243,7 @@ namespace Reni.Context
         /// <param name="token"></param>
         /// <returns> </returns>
         internal Result FunctionalArgResult
-            (Category category, Parser.Value right, SourcePart token)
+            (Category category, Parser.Value right, Syntax token)
         {
             var argsType = FindRecentFunctionContextObject.ArgsType;
             return argsType
@@ -285,7 +277,7 @@ namespace Reni.Context
         }
 
         internal Result PrefixResult
-            (Category category, Definable definable, SourcePart source, Parser.Value right)
+            (Category category, Definable definable, Syntax source, Parser.Value right)
         {
             var searchResult = Declaration(definable);
             if(searchResult == null)
@@ -307,7 +299,7 @@ namespace Reni.Context
                 yield return feature;
         }
 
-        IssueType UndefinedSymbol(SourcePart source)
+        IssueType UndefinedSymbol(Syntax source)
             =>
                 new RootIssueType
                     (
@@ -323,35 +315,7 @@ namespace Reni.Context
             return null;
         }
 
-        ResultCache.IResultProvider ResultCache.IResultProvider.FindSource(IContextReference ext)
-        {
-            NotImplementedMethod(ext);
-            return null;
-        }
-
         internal virtual IEnumerable<ContextBase> ParentChain { get { yield return this; } }
-
-        ResultCache.IResultProvider FindSource(Parser.Value syntax, IContextReference ext)
-        {
-            Tracer.Assert(syntax.ResultCache[this].Exts.Contains(ext));
-            return syntax.FindSource(ext, this);
-        }
-
-        internal IEnumerable<ResultCache.IResultProvider> FindSourceChain
-            (Parser.Value syntax, IContextReference ext)
-        {
-            var current = FindSource(syntax, ext);
-            while(current != null)
-            {
-                yield return current;
-
-                current = current.FindSource(ext);
-            }
-        }
-
-        internal IEnumerable<ResultCache.IResultProvider> GetDefinableResults
-            (IContextReference ext, Definable definable, Parser.Value right)
-            => Declaration(definable).GetDefinableResults(ext, this, right);
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
     }

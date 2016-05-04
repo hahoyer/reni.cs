@@ -14,7 +14,6 @@ namespace Reni.Struct
     sealed class CompoundContext :
         Child,
         ISymbolProviderForPointer<Definable>,
-        ISourceProvider,
         IContextReference
     {
         readonly int _order;
@@ -41,14 +40,6 @@ namespace Reni.Struct
         internal override CompoundView ObtainRecentCompoundView() => View;
 
         int IContextReference.Order => _order;
-
-        SourcePart ISourceProvider.Value
-            => View
-                .Compound
-                .Syntax
-                .SourceParts
-                .Take(View.ViewPosition)
-                .Aggregate();
 
         [DisableDump]
         internal override IEnumerable<string> DeclarationOptions => View.DeclarationOptions;

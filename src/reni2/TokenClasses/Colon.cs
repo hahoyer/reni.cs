@@ -49,7 +49,7 @@ namespace Reni.TokenClasses
     abstract class DeclarationTagToken : TerminalToken, IDeclaratorTagProvider, IDeclarationTag
     {
         Result<Declarator> IDeclaratorTagProvider.Get
-            (Syntax left, SourcePart token, Syntax right)
+            (Syntax left, Syntax token, Syntax right)
         {
             if(left == null && right == null)
                 return new Declarator(new IDeclarationTag[] {this}, null, null);

@@ -226,9 +226,9 @@ namespace Reni.TokenClasses
                 .ToArray();
 
         [DisableDump]
-        internal Result<Value> Value => this.CachedValue(GetValue);
+        internal Result<Value> Value => this.CachedValue(() => GetValue(this));
 
-        Result<Value> GetValue()
+        Result<Value> GetValue(Syntax syntax)
         {
             var value = Option.Value;
             if(value != null)
@@ -236,13 +236,13 @@ namespace Reni.TokenClasses
 
             var statement = Option.Statement;
             if(statement != null)
-                return CompoundSyntax.Create(statement);
+                return CompoundSyntax.Create(statement, syntax);
 
             var statements = Option.Statements;
             if(statements != null)
-                return CompoundSyntax.Create(statements);
+                return CompoundSyntax.Create(statements, syntax);
 
-            return IssueId.InvalidExpression.Value(Token.Characters);
+            return IssueId.InvalidExpression.Value(syntax);
         }
 
 
@@ -278,7 +278,7 @@ namespace Reni.TokenClasses
                 return Statement.CreateStatements(Token.Characters, value);
 
             return new Result<Statement[]>
-                (new Statement[0], IssueId.InvalidListOperandSequence.CreateIssue(Token.Characters));
+                (new Statement[0], IssueId.InvalidListOperandSequence.Create(this));
         }
 
         [DisableDump]
@@ -291,13 +291,13 @@ namespace Reni.TokenClasses
                 .plus(Right?.AllIssues);
 
         internal Tuple<Syntax, Issue> GetBracketKernel
-            (int level, SourcePart token, Syntax right = null)
+            (int level, Syntax token, Syntax right = null)
         {
             Tracer.Assert(right == null);
             var leftParenthesis = TokenClass as LeftParenthesis;
 
             if(leftParenthesis == null)
-                return new Tuple<Syntax, Issue>(this, IssueId.ExtraRightBracket.CreateIssue(token));
+                return new Tuple<Syntax, Issue>(this, IssueId.ExtraRightBracket.Create(token));
 
             Tracer.Assert(Left == null);
 
@@ -308,7 +308,7 @@ namespace Reni.TokenClasses
 
             if(levelDelta > 0)
                 return new Tuple<Syntax, Issue>
-                    (Right, IssueId.ExtraLeftBracket.CreateIssue(Token.Characters));
+                    (Right, IssueId.ExtraLeftBracket.Create(this));
 
             NotImplementedMethod(level, right);
             return null;
@@ -322,7 +322,7 @@ namespace Reni.TokenClasses
 
     interface IValueProvider
     {
-        Result<Value> Get(Syntax left, SourcePart token, Syntax right);
+        Result<Value> Get(Syntax left, Syntax right, Syntax syntax);
     }
 
     interface IStatementProvider
@@ -332,7 +332,7 @@ namespace Reni.TokenClasses
 
     interface IStatementsProvider
     {
-        Result<Statement[]> Get(List type, Syntax left, SourcePart token, Syntax right);
+        Result<Statement[]> Get(List type, Syntax left, SourcePart token, Syntax right, Syntax sourceSyntax);
     }
 
     interface IBelongingsMatcher

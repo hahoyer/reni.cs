@@ -4,7 +4,6 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.Basics;
-using Reni.Code;
 using Reni.Context;
 using Reni.Parser;
 using Reni.TokenClasses;
@@ -39,12 +38,6 @@ namespace Reni.Feature
 
         Result IFunction.Result(Category category, TypeBase argsType)
             => Result(category, argsType);
-
-        ResultCache.IResultProvider IFunction.FindSource(IContextReference ext)
-        {
-            NotImplementedMethod(ext);
-            return null;
-        }
 
         bool IFunction.IsImplicit => IsImplicit;
 
@@ -81,7 +74,6 @@ namespace Reni.Feature
     interface IValue
     {
         Result Execute(Category category);
-        ResultCache.IResultProvider FindSource(IContextReference ext);
     }
 
     interface IFunction
@@ -102,7 +94,6 @@ namespace Reni.Feature
         /// </value>
         [DisableDump]
         bool IsImplicit { get; }
-        ResultCache.IResultProvider FindSource(IContextReference ext);
     }
 
     interface IMeta

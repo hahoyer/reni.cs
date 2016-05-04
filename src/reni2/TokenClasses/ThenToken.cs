@@ -12,7 +12,7 @@ namespace Reni.TokenClasses
         public const string TokenId = "then";
         public override string Id => TokenId;
 
-        Result<Value> IValueProvider.Get(Syntax left, SourcePart token, Syntax right)
-            => CondSyntax.Create(left, token, right, null);
+        Result<Value> IValueProvider.Get(Syntax left, Syntax right, Syntax syntax)
+            => CondSyntax.Create(left, right, null, syntax);
     }
 }

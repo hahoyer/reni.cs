@@ -15,13 +15,13 @@ namespace Reni.TokenClasses
         public const string TokenId = "new_value";
         public override string Id => TokenId;
 
-        protected override Result Result(ContextBase context, Category category, TerminalSyntax token)
+        protected override Result Result(ContextBase context, Category category)
             => context
                 .FindRecentFunctionContextObject
                 .CreateValueReferenceResult(category);
 
         protected override Result Result
-            (ContextBase context, Category category, PrefixSyntax token, Value right)
+            (ContextBase context, Category category, Value right, Syntax token)
         {
             NotImplementedMethod(context, category, token, right);
             return null;

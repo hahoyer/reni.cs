@@ -2,9 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Scanner;
 using Reni.Basics;
-using Reni.Code;
 using Reni.Context;
 using Reni.Parser;
 using Reni.TokenClasses;
@@ -18,8 +16,6 @@ namespace Reni
         [EnableDump]
         readonly Value Cond;
 
-        SourcePart Token { get; }
-
         [Node]
         [EnableDump]
         readonly Value Then;
@@ -29,56 +25,29 @@ namespace Reni
         readonly Value Else;
 
         internal static Result<Value> Create
-            (Syntax condition, SourcePart token, Syntax thenSyntax, Syntax elseSyntax)
+            (Syntax condition, Syntax thenSyntax, Syntax elseSyntax, Syntax syntax)
         {
             var conditionValue = condition.Value;
             var thenValue = thenSyntax?.Value;
             var elseValue = elseSyntax?.Value;
             var result = new CondSyntax
-                (conditionValue.Target, token, thenValue?.Target, elseValue?.Target);
+                (conditionValue.Target, thenValue?.Target, elseValue?.Target, syntax);
             var issues = conditionValue.Issues.plus(thenValue?.Issues).plus(elseValue?.Issues);
             return new Result<Value>(result, issues);
         }
 
-        CondSyntax(Value condSyntax, SourcePart token, Value thenSyntax, Value elseSyntax)
+        CondSyntax(Value condSyntax, Value thenSyntax, Value elseSyntax, Syntax syntax)
+            : base(syntax)
         {
             Cond = condSyntax;
-            Token = token;
             Then = thenSyntax;
             Else = elseSyntax;
-        }
-
-        [DisableDump]
-        protected override IEnumerable<Value> DirectChildren
-        {
-            get
-            {
-                yield return Cond;
-                yield return Then;
-                yield return Else;
-            }
         }
 
         internal override Result ResultForCache(ContextBase context, Category category)
             => InternalResult(context, category);
 
         internal override IRecursionHandler RecursionHandler => this;
-
-        internal override SourcePosn SourceStart => Cond.SourceStart;
-        internal override SourcePosn SourceEnd => Else?.SourceEnd ?? Then?.SourceEnd ?? Token.End;
-
-        internal override ResultCache.IResultProvider FindSource
-            (IContextReference ext, ContextBase context)
-        {
-            var result = DirectChildren
-                .Cast<Value>()
-                .SelectMany(item => item.ResultCache)
-                .Where(item => item.Value.Exts.Contains(ext))
-                .Where(item => item.Key == context)
-                ;
-
-            return result.FirstOrDefault().Value?.Provider;
-        }
 
         Result CondResult(ContextBase context, Category category)
             => context.Result(category.Typed, Cond)

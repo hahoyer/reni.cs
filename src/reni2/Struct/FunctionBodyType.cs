@@ -132,15 +132,6 @@ namespace Reni.Struct
             return null;
         }
 
-        ResultCache.IResultProvider IFunction.FindSource(IContextReference ext)
-            => Syntax.FindSource(ext, CompoundView.Context);
-
-        ResultCache.IResultProvider IValue.FindSource(IContextReference ext)
-        {
-            NotImplementedMethod(ext);
-            return null;
-        }
-
         CompoundView IChild<CompoundView>.Parent => CompoundView;
     }
 }

@@ -5,23 +5,21 @@ using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
+using Reni.TokenClasses;
 
 namespace Reni.Parser
 {
-    abstract class SpecialSyntax : Value {}
-
-    sealed class TerminalSyntax : SpecialSyntax
+    sealed class TerminalSyntax : Value
     {
-        internal string Id => Token.Id;
-        internal SourcePart Token { get; }
+        internal string Id => Syntax.Token.Id;
 
         [Node]
         [EnableDump]
         internal readonly ITerminal Terminal;
 
-        internal TerminalSyntax(SourcePart token, ITerminal terminal)
+        internal TerminalSyntax(ITerminal terminal, Syntax syntax)
+            : base(syntax)
         {
-            Token = token;
             Terminal = terminal;
             StopByObjectIds();
         }
@@ -29,21 +27,21 @@ namespace Reni.Parser
         internal override Result ResultForCache(ContextBase context, Category category)
             => Terminal.Result(context, category, this);
 
-        internal override SourcePosn SourceStart => Token.Start;
-        internal override SourcePosn SourceEnd => Token.End;
-
         internal override Value Visit(ISyntaxVisitor visitor) => Terminal.Visit(visitor);
 
         [DisableDump]
         internal long ToNumber => BitsConst.Convert(Id).ToInt64();
 
+        [DisableDump]
+        internal SourcePart Token => Syntax.Token.Characters;
+
         protected override string GetNodeDump() => Terminal.NodeDump();
     }
 
-    sealed class PrefixSyntax : SpecialSyntax
+    sealed class PrefixSyntax : Value
     {
-        public static Result<Value> Create(IPrefix prefix, SourcePart token, Result<Value> right)
-            => new PrefixSyntax(prefix, token, right.Target).Issues<Value>(right.Issues);
+        public static Result<Value> Create(IPrefix prefix, Result<Value> right, Syntax syntax)
+            => new PrefixSyntax(prefix, right.Target,syntax).Issues<Value>(right.Issues);
 
         [Node]
         [EnableDump]
@@ -53,37 +51,26 @@ namespace Reni.Parser
         [EnableDump]
         readonly Value Right;
 
-        [DisableDump]
-        internal SourcePart Token { get; }
-
-        public PrefixSyntax(IPrefix prefix, SourcePart token, Value right)
+        public PrefixSyntax(IPrefix prefix, Value right, Syntax syntax)
+            : base(syntax)
         {
             Prefix = prefix;
             Right = right;
-            Token = token;
         }
 
 
         internal override Result ResultForCache(ContextBase context, Category category) => Prefix
-            .Result(context, category, this, Right);
+            .Result(context, category, Right, Syntax);
 
         protected override string GetNodeDump() => Prefix.NodeDump() + "(" + Right.NodeDump + ")";
-        protected override IEnumerable<Value> DirectChildren { get { yield return Right; } }
-
-        internal override SourcePosn SourceStart => Token.Start;
-        internal override SourcePosn SourceEnd => Right.SourceEnd;
     }
 
-    sealed class InfixSyntax : SpecialSyntax
+    sealed class InfixSyntax : Value
     {
         public static Result<Value> Create
-            (
-            Result<Value> left,
-            IInfix infix,
-            SourcePart token,
-            Result<Value> right)
+            (Result<Value> left, IInfix infix, Result<Value> right, Syntax syntax)
         {
-            Value value = new InfixSyntax(left.Target, infix, token, right.Target);
+            Value value = new InfixSyntax(left.Target, infix, right.Target, syntax);
             return value.Issues(left.Issues.plus(right.Issues));
         }
 
@@ -99,21 +86,16 @@ namespace Reni.Parser
         [EnableDump]
         readonly Value Right;
 
-        internal SourcePart Token { get; }
-
-        public InfixSyntax(Value left, IInfix infix, SourcePart token, Value right)
+        public InfixSyntax(Value left, IInfix infix, Value right, Syntax syntax)
+            : base(syntax)
         {
             Left = left;
             Infix = infix;
             Right = right;
-            Token = token;
             StopByObjectIds();
         }
 
         internal override IRecursionHandler RecursionHandler => Infix as IRecursionHandler;
-
-        internal override SourcePosn SourceStart => Left?.SourceStart ?? Token.Start;
-        internal override SourcePosn SourceEnd => Right?.SourceEnd ?? Token.End;
 
         internal override Result ResultForCache(ContextBase context, Category category) => Infix
             .Result(context, category, Left, Right);
@@ -129,16 +111,6 @@ namespace Reni.Parser
             result += ")";
             return result;
         }
-
-        [DisableDump]
-        protected override IEnumerable<Value> DirectChildren
-        {
-            get
-            {
-                yield return Left;
-                yield return Right;
-            }
-        }
     }
 
     interface IPendingProvider
@@ -147,12 +119,12 @@ namespace Reni.Parser
             (ContextBase context, Category category, Value left, Value right);
     }
 
-    sealed class SuffixSyntax : SpecialSyntax
+    sealed class SuffixSyntax : Value
     {
         public static Result<Value> Create
-            (Result<Value> left, ISuffix suffix, SourcePart token)
+            (Result<Value> left, ISuffix suffix, Syntax syntax)
         {
-            Value value = new SuffixSyntax(left.Target, suffix, token);
+            Value value = new SuffixSyntax(left.Target, suffix, syntax);
             return value.Issues(left.Issues);
         }
 
@@ -164,25 +136,17 @@ namespace Reni.Parser
         [EnableDump]
         readonly ISuffix Suffix;
 
-        internal SuffixSyntax(Value left, ISuffix suffix, SourcePart token)
+        internal SuffixSyntax(Value left, ISuffix suffix, Syntax syntax)
+            : base(syntax)
         {
             Left = left;
             Suffix = suffix;
-            Token = token;
         }
-
-        internal SourcePart Token { get; }
 
         internal override Result ResultForCache(ContextBase context, Category category)
             => Suffix.Result(context, category, Left);
 
-        internal override SourcePosn SourceStart => Left?.SourceStart ?? Token.Start;
-        internal override SourcePosn SourceEnd => Token.End;
-
         protected override string GetNodeDump() => "(" + Left.NodeDump + ")" + Suffix;
-
-        [DisableDump]
-        protected override IEnumerable<Value> DirectChildren { get { yield return Left; } }
     }
 
     interface ITerminal
@@ -193,14 +157,12 @@ namespace Reni.Parser
 
     interface IPrefix
     {
-        Result Result
-            (ContextBase context, Category category, PrefixSyntax token, Value right);
+        Result Result(ContextBase context, Category category, Value right, Syntax token);
     }
 
     interface IInfix
     {
-        Result Result
-            (ContextBase context, Category category, Value left, Value right);
+        Result Result(ContextBase context, Category category, Value left, Value right);
     }
 
     interface ISuffix

@@ -26,7 +26,7 @@ namespace Reni.TokenClasses
             _isMetaFunction = isMetaFunction;
         }
 
-        Result<Value> IValueProvider.Get(Syntax left, SourcePart token, Syntax right) 
-            => FunctionSyntax.Create(left, _isImplicit, _isMetaFunction, token, right);
+        Result<Value> IValueProvider.Get(Syntax left, Syntax right, Syntax syntax) 
+            => FunctionSyntax.Create(left, _isImplicit, _isMetaFunction, right, syntax);
     }
 }

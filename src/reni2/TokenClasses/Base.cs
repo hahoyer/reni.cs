@@ -1,46 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
-using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
-    abstract class TerminalToken : TokenClass
-    {
-    }
+    abstract class TerminalToken : TokenClass {}
 
-    abstract class NonPrefixToken : TokenClass
-    {
-    }
+    abstract class InfixPrefixToken : TokenClass {}
 
-    abstract class InfixPrefixToken : TokenClass
-    {
-    }
+    abstract class NonSuffixToken : TokenClass {}
 
-    abstract class NonSuffixToken : TokenClass
-    {
-    }
+    abstract class SuffixToken : TokenClass {}
 
-    abstract class SuffixToken : TokenClass
-    {
-    }
-
-    abstract class InfixToken : TokenClass
-    {
-    }
+    abstract class InfixToken : TokenClass {}
 
     abstract class TerminalSyntaxToken : TerminalToken, ITerminal, IValueProvider
     {
-        Result<Value> IValueProvider.Get(Syntax left, SourcePart token, Syntax right)
+        Result<Value> IValueProvider.Get(Syntax left, Syntax right, Syntax syntax)
         {
             if(left == null && right == null)
-                return new TerminalSyntax(token, this);
+                return new TerminalSyntax(this, syntax);
 
-            NotImplementedMethod(left, token, right);
+            NotImplementedMethod(left, right, syntax);
             return null;
         }
 
@@ -66,7 +50,7 @@ namespace Reni.TokenClasses
             => Result(context, category, left, right);
 
         Result IPrefix.Result
-            (ContextBase context, Category category, PrefixSyntax token, Value right)
+            (ContextBase context, Category category, Value right, Syntax token)
             => Result(context, category, right);
 
         protected abstract Result Result
@@ -75,33 +59,33 @@ namespace Reni.TokenClasses
         protected abstract Result Result
             (ContextBase context, Category category, Value right);
 
-        Result<Value> IValueProvider.Get(Syntax left, SourcePart token, Syntax right)
+        Result<Value> IValueProvider.Get(Syntax left, Syntax right, Syntax syntax)
         {
             if(left != null && right != null)
-                return InfixSyntax.Create(left.Value, this, token, right.Value);
+                return InfixSyntax.Create(left.Value, this, right.Value, syntax);
 
-            if (left == null && right != null)
-                return PrefixSyntax.Create(this, token, right.Value);
+            if(left == null && right != null)
+                return PrefixSyntax.Create(this, right.Value, syntax);
 
-            NotImplementedMethod(left, token, right);
+            NotImplementedMethod(left, right, syntax);
             return null;
         }
     }
 
-    abstract class NonSuffixSyntaxToken : NonSuffixToken, ITerminal, IPrefix,IValueProvider
+    abstract class NonSuffixSyntaxToken : NonSuffixToken, ITerminal, IPrefix, IValueProvider
     {
         Result ITerminal.Result(ContextBase context, Category category, TerminalSyntax token)
-            => Result(context, category, token);
+            => Result(context, category);
 
         protected abstract Result Result
-            (ContextBase context, Category category, TerminalSyntax token);
+            (ContextBase context, Category category);
 
         Result IPrefix.Result
-            (ContextBase context, Category category, PrefixSyntax token, Value right)
-            => Result(context, category, token, right);
+            (ContextBase context, Category category, Value right, Syntax token)
+            => Result(context, category, right, token);
 
         protected abstract Result Result
-            (ContextBase callContext, Category category, PrefixSyntax token, Value right);
+            (ContextBase callContext, Category category, Value right, Syntax token);
 
         Value ITerminal.Visit(ISyntaxVisitor visitor) => Visit(visitor);
 
@@ -111,29 +95,29 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        Result<Value> IValueProvider.Get(Syntax left, SourcePart token, Syntax right)
+        Result<Value> IValueProvider.Get(Syntax left, Syntax right, Syntax syntax)
         {
-            if (left == null)
+            if(left == null)
             {
                 if(right == null)
-                    return new TerminalSyntax(token, this);
+                    return new TerminalSyntax(this, syntax);
 
-                return PrefixSyntax.Create(this, token, right.Value);
+                return PrefixSyntax.Create(this, right.Value, syntax);
             }
 
-            NotImplementedMethod(left, token, right);
+            NotImplementedMethod(left, right, syntax);
             return null;
         }
     }
 
     abstract class SuffixSyntaxToken : SuffixToken, ISuffix, IValueProvider
     {
-        Result<Value> IValueProvider.Get(Syntax left, SourcePart token, Syntax right)
+        Result<Value> IValueProvider.Get(Syntax left, Syntax right, Syntax syntax)
         {
             if(right == null)
-                return SuffixSyntax.Create(left.Value, this, token);
+                return SuffixSyntax.Create(left.Value, this, syntax);
 
-            NotImplementedMethod(left, token, right);
+            NotImplementedMethod(left, right, syntax);
             return null;
         }
 
@@ -152,7 +136,7 @@ namespace Reni.TokenClasses
         protected abstract Result Result
             (ContextBase callContext, Category category, Value left, Value right);
 
-        Result<Value> IValueProvider.Get(Syntax left, SourcePart token, Syntax right)
-            => InfixSyntax.Create(left.Value, this, token, right.Value);
+        Result<Value> IValueProvider.Get(Syntax left, Syntax right, Syntax syntax)
+            => InfixSyntax.Create(left.Value, this, right.Value, syntax);
     }
 }

@@ -101,11 +101,5 @@ namespace Reni.Type
         {
             get { yield return Feature.Extension.Conversion(GetterResult); }
         }
-
-        ResultCache.IResultProvider IValue.FindSource(IContextReference ext)
-        {
-            NotImplementedMethod(ext);
-            return null;
-        }
     }
 }

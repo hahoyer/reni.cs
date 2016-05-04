@@ -4,7 +4,6 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using Reni.Basics;
-using Reni.Code;
 using Reni.Feature;
 using Reni.TokenClasses;
 
@@ -199,12 +198,6 @@ namespace Reni.Type
         {
             Tracer.Assert(pendingCategory.IsNone);
             return Source.ArgResult(category);
-        }
-
-        ResultCache.IResultProvider ResultCache.IResultProvider.FindSource(IContextReference ext)
-        {
-            NotImplementedMethod(ext);
-            return null;
         }
     }
 }

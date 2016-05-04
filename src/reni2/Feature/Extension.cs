@@ -115,7 +115,7 @@ namespace Reni.Feature
             (
             this IEvalImplementation feature,
             Category category,
-            SourcePart token,
+            Syntax token,
             ContextBase context,
             Parser.Value right)
         {
@@ -159,9 +159,10 @@ namespace Reni.Feature
             }
 
             return valueResult
-                .Type.Execute(category, valueResult, token, null, context, right);
+                .Type
+                .Execute(category, valueResult, token, null, context, right);
         }
-                                                          
+
         static Result ValueResult
             (
             this IEvalImplementation feature,
@@ -190,7 +191,7 @@ namespace Reni.Feature
             this IImplementation feature,
             Category category,
             ResultCache left,
-            SourcePart token,
+            Syntax token,
             ContextBase context,
             Parser.Value right)
         {
@@ -210,26 +211,6 @@ namespace Reni.Feature
                 .Where(x => x != null)
                 .Distinct()
                 .SingleOrDefault();
-        }
-
-        internal static IEnumerable<ResultCache.IResultProvider> GetDefinableResults
-            (
-            this IImplementation implementation,
-            IContextReference ext,
-            ContextBase context,
-            Parser.Value right)
-        {
-            var metaFeature = ((IMetaImplementation) implementation).Function;
-            if(metaFeature != null)
-            {
-                Dumpable.NotImplementedFunction(implementation, ext, context, right);
-                yield break;
-            }
-
-            var result = ((IEvalImplementation) implementation).Function?.FindSource(ext)
-                ?? implementation.Value.FindSource(ext);
-            if(result != null)
-                yield return result;
         }
     }
 }

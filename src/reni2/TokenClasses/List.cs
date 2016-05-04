@@ -25,21 +25,22 @@ namespace Reni.TokenClasses
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => otherMatcher == this;
 
-        public Result<Statement[]> Get(List type, Syntax left, SourcePart token, Syntax right)
+        Result<Statement[]> IStatementsProvider.Get
+            (List type, Syntax left, SourcePart token, Syntax right, Syntax sourceSyntax)
         {
             if(type != null && type != this)
                 return null;
 
-            var leftStatements = CreateStatements(left, token);
-            var rightStatements = CreateStatements(right, token);
+            var leftStatements = CreateStatements(left, token, sourceSyntax);
+            var rightStatements = CreateStatements(right, token, sourceSyntax);
             var target = leftStatements?.Target.plus(rightStatements?.Target);
             var issues = leftStatements?.Issues.plus(rightStatements?.Issues);
             return new Result<Statement[]>(target, issues);
         }
 
-        Result<Statement[]> CreateStatements(Syntax syntax, SourcePart token)
+        Result<Statement[]> CreateStatements(Syntax syntax, SourcePart token, Syntax sourceSyntax)
             => syntax == null
-                ? Statement.CreateStatements(token, new EmptyList(token))
+                ? Statement.CreateStatements(token, new EmptyList(sourceSyntax))
                 : syntax.GetStatements(this);
     }
 }

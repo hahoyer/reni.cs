@@ -16,7 +16,6 @@ namespace Reni
         internal interface IResultProvider
         {
             Result Execute(Category category, Category pendingCategory);
-            IResultProvider FindSource(IContextReference ext);
         }
 
         sealed class ResultNotSupported : DumpableObject, IResultProvider
@@ -24,12 +23,6 @@ namespace Reni
             Result IResultProvider.Execute(Category category, Category pendingCategory)
             {
                 NotImplementedMethod(category, pendingCategory);
-                return null;
-            }
-
-            IResultProvider IResultProvider.FindSource(IContextReference ext)
-            {
-                NotImplementedMethod(ext);
                 return null;
             }
         }
@@ -47,11 +40,6 @@ namespace Reni
             {
                 Tracer.Assert(pendingCategory.IsNone);
                 return ObtainResult(category);
-            }
-            IResultProvider IResultProvider.FindSource(IContextReference ext)
-            {
-                NotImplementedMethod(ext);
-                return null;
             }
         }
 

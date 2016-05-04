@@ -44,18 +44,6 @@ namespace Reni.Parser
             return null;
         }
 
-        ResultCache.IResultProvider IFunction.FindSource(IContextReference ext)
-        {
-            NotImplementedMethod(ext);
-            return null;
-        }
-
-        ResultCache.IResultProvider IValue.FindSource(IContextReference ext)
-        {
-            NotImplementedMethod(ext);
-            return null;
-        }
-
         Result IValue.Execute(Category category)
         {
             NotImplementedMethod(category);

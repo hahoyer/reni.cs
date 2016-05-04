@@ -5,10 +5,10 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 using Reni.Basics;
-using Reni.Code;
 using Reni.Context;
 using Reni.Parser;
 using Reni.Struct;
+using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Feature
@@ -55,7 +55,7 @@ namespace Reni.Feature
             (
             Category category,
             ResultCache left,
-            SourcePart token,
+            Syntax token,
             ContextBase context,
             Parser.Value right)
         {
@@ -125,9 +125,5 @@ namespace Reni.Feature
                 return null;
             }
         }
-
-        internal IEnumerable<ResultCache.IResultProvider> GetDefinableResults
-            (IContextReference ext, ContextBase context, Parser.Value right)
-            => Feature.GetDefinableResults(ext, context, right);
     }
 }

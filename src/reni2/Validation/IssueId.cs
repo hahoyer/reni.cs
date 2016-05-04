@@ -36,18 +36,18 @@ namespace Reni.Validation
 
         public static IEnumerable<IssueId> All => AllInstances<IssueId>();
 
-        internal Issue CreateIssue(SourcePart token) => new Issue(this, token, "");
+        internal Issue Create(Syntax syntax) => new Issue(this, syntax);
 
-        internal Result<Value> Value(SourcePart token)
-            => new Result<Value>(new EmptyList(token), new Issue(this, token, ""));
+        internal Result<Value> Value(Syntax syntax)
+            => new Result<Value>(new EmptyList(syntax), Create(syntax));
 
-        internal Result<Value> Value(SourcePart token, Value value)
-            => new Result<Value>(value, new Issue(this, token, ""));
+        internal Result<Value> Value(Value value)
+            => new Result<Value>(value, Create(value.Syntax));
 
-        internal Result<Syntax> Syntax(SourcePart token, Syntax syntax)
-            => new Result<Syntax>(syntax, new Issue(this, token, ""));
+        internal Result<Syntax> Syntax(Syntax syntax)
+            => new Result<Syntax>(syntax, Create(syntax));
 
-        internal RootIssueType Type(SourcePart token, ContextBase context)
-            => new RootIssueType(CreateIssue(token), context.RootContext);
+        internal RootIssueType Type(Syntax syntax, ContextBase context)
+            => new RootIssueType(Create(syntax), context.RootContext);
     }
 }

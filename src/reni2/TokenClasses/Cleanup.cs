@@ -13,13 +13,13 @@ namespace Reni.TokenClasses
         public const string TokenId = "~~~";
         public override string Id => TokenId;
 
-        Result<Value> IValueProvider.Get(Syntax left, SourcePart token, Syntax right)
+        Result<Value> IValueProvider.Get(Syntax left, Syntax right, Syntax syntax)
         {
             var statements = left?.ForceStatements;
             if(statements == null)
                 statements = new Statement[0];
             var cleanup = right?.Value;
-            return CompoundSyntax.Create(statements, cleanup);
+            return CompoundSyntax.Create(statements, cleanup, syntax);
         }
     }
 }

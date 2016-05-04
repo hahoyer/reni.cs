@@ -24,15 +24,14 @@ namespace Reni.TokenClasses
                 if(declarationItem != null && declarationItem.IsDeclarationPart(Parent))
                     return null;
 
-
                 return (Parent.TokenClass as IValueProvider)?.Get
-                    (Parent.Left, Parent.Token.Characters, Parent.Right);
+                    (Parent.Left, Parent.Right, Parent);
             }
         }
 
         internal Result<Statement[]> GetStatements(List type = null)
             => (Parent.TokenClass as IStatementsProvider)
-                ?.Get(type, Parent.Left, Parent.Token.Characters, Parent.Right);
+                ?.Get(type, Parent.Left, Parent.Token.Characters, Parent.Right, Parent);
 
         [EnableDumpExcept(null)]
         internal Result<Statement[]> Statements => GetStatements();

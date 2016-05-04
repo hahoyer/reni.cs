@@ -156,17 +156,17 @@ namespace Reni.Parser
 
         public override string Id => "<error>";
 
-        Result<Value> IValueProvider.Get(Syntax left, SourcePart token, Syntax right)
+        Result<Value> IValueProvider.Get(Syntax left, Syntax right, Syntax syntax)
         {
             if(right == null)
             {
-                var issues = IssueId.CreateIssue(token);
+                var issues = IssueId.Create(syntax);
                 return left == null
-                    ? new Result<Value>(new EmptyList(token), issues)
+                    ? new Result<Value>(new EmptyList(syntax), issues)
                     : left.Value.With(issues);
             }
 
-            NotImplementedMethod(left, token, right);
+            NotImplementedMethod(left, right, syntax);
             return null;
         }
 

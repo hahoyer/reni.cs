@@ -1,28 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
+using Reni.TokenClasses;
 
 namespace Reni.Parser
 {
     sealed class EmptyList : Value
     {
-        SourcePart Token { get; }
-
-        public EmptyList(SourcePart token)
-        {
-            Token = token;
-            StopByObjectIds();
-        }
+        public EmptyList(Syntax syntax)
+            : base(syntax) { StopByObjectIds(); }
 
         protected override string GetNodeDump() => "()";
 
         internal override Result ResultForCache(ContextBase context, Category category)
             => context.RootContext.VoidType.Result(category);
-
-        internal override SourcePosn SourceStart => Token.Start;
-        internal override SourcePosn SourceEnd => Token.End;
     }
 }

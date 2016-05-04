@@ -205,12 +205,6 @@ namespace Reni.Struct
             return GetResult(category);
         }
 
-        ResultCache.IResultProvider ResultCache.IResultProvider.FindSource(IContextReference ext)
-        {
-            NotImplementedMethod(ext);
-            return null;
-        }
-
         [DisableDump]
         internal IEnumerable<IFormalCodeItem> CodeItems => BodyCode.Visit(new ItemCollector());
     }

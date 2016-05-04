@@ -18,8 +18,8 @@ namespace Reni.TokenClasses
             => this.GenericListFromDefinable();
 
         internal Result<Parser.Value> CreateForVisit
-            (Parser.Value left, Parser.Value right, SourcePart token)
-            => ExpressionSyntax.Create(left, this, right, token);
+            (Parser.Value left, Parser.Value right, Syntax syntax)
+            => ExpressionSyntax.Create(left, this, right, syntax);
 
         Result<Declarator> IDeclaratorTokenClass.Get(Syntax left, SourcePart token, Syntax right)
         {
@@ -37,8 +37,8 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        Result<Parser.Value> IValueProvider.Get(Syntax left, SourcePart token, Syntax right)
-            => ExpressionSyntax.Create(left, this, right, token);
+        Result<Parser.Value> IValueProvider.Get(Syntax left, Syntax right, Syntax syntax)
+            => ExpressionSyntax.Create(left, this, right, syntax);
 
         bool IDeclarationItem.IsDeclarationPart(Syntax syntax)
         {
@@ -50,7 +50,7 @@ namespace Reni.TokenClasses
 
             if(p is LeftParenthesis || p is Definable || p is ThenToken
                 || p is List || p is Function || p is TypeOperator
-                || p is ElseToken)
+                || p is ElseToken || p is ScannerSyntaxError)
                 return false;
 
             NotImplementedMethod(syntax);

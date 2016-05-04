@@ -29,12 +29,6 @@ namespace Reni.Feature
         Result IFunction.Result(Category category, TypeBase argsType)
             => _function(category, ObjectReference, argsType);
 
-        ResultCache.IResultProvider IFunction.FindSource(IContextReference ext)
-        {
-            NotImplementedMethod(ext);
-            return null;
-        }
-
         bool IFunction.IsImplicit => false;
         IContextReference ObjectReference => _target.ContextReference;
     }

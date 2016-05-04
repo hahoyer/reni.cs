@@ -25,13 +25,13 @@ namespace Reni.TokenClasses
         {
             static string Id => "()";
 
-            Result<Value> IValueProvider.Get(Syntax left, SourcePart token, Syntax right)
+            Result<Value> IValueProvider.Get(Syntax left, Syntax right, Syntax syntax)
             {
                 Tracer.Assert(left != null);
                 Tracer.Assert(right != null);
                 var leftValue = left.Value;
                 var rightValue = right.Value;
-                return ExpressionSyntax.Create(leftValue.Target, null, rightValue.Target, token)
+                return ExpressionSyntax.Create(leftValue.Target, null, rightValue.Target, syntax)
                     .With(rightValue.Issues.plus(leftValue.Issues));
             }
 
@@ -59,18 +59,18 @@ namespace Reni.TokenClasses
 
         IType<Syntax> IBracketMatch<Syntax>.Value { get; } = new Matched();
 
-        Result<Value> IValueProvider.Get(Syntax left, SourcePart token, Syntax right)
+        Result<Value> IValueProvider.Get(Syntax left, Syntax right, Syntax syntax)
         {
-            var result = left.GetBracketKernel(Level, token, right);
-            var target = result.Item1?.Option.Value ?? new EmptyList(token);
+            var result = left.GetBracketKernel(Level, syntax, right);
+            var target = result.Item1?.Option.Value ?? new EmptyList(syntax);
 
             if(result.Item2 != null)
                 return target.With(result.Item2);
 
-            return result.Item1 == null ? new EmptyList(token) : result.Item1.Value;
+            return result.Item1 == null ? new EmptyList(syntax) : result.Item1.Value;
         }
 
-        Result<Declarator> IDeclaratorTagProvider.Get(Syntax left, SourcePart token, Syntax right)
+        Result<Declarator> IDeclaratorTagProvider.Get(Syntax left, Syntax token, Syntax right)
         {
             var result = left.GetBracketKernel(Level, token, right);
             var target = result.Item1?.Option.Declarator ?? new Declarator(null, null, null);
@@ -79,7 +79,7 @@ namespace Reni.TokenClasses
                 return target.With(result.Item2);
 
             if(result.Item1 == null)
-                return target.With(IssueId.MissingDeclarationTag.CreateIssue(token));
+                return target.With(IssueId.MissingDeclarationTag.Create(token));
 
             NotImplementedMethod(left, token, right, nameof(result), result);
             return null;

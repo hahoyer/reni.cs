@@ -193,6 +193,9 @@
     <Compile Include="ParserTest\AlternativePrioTableTest.cs" />
     <Compile Include="ParserTest\VerbatimText.cs" />
     <Compile Include="ParserTest\StrangeDeclarationSyntax.cs" />
+    <Compile Include="Parser\IRecursionHandler.cs" />
+    <Compile Include="Parser\ISyntaxVisitor.cs" />
+    <Compile Include="Parser\ReplaceArgVisitor.cs" />
     <Compile Include="Parser\Result.cs" />
     <Compile Include="Parser\ITokenClass.cs" />
     <Compile Include="Parser\RecursionType.cs" />
@@ -305,7 +308,6 @@
     <Compile Include="TokenClasses\BraceMatchDumper.cs" />
     <Compile Include="TokenClasses\Cleanup.cs" />
     <Compile Include="TokenClasses\CompareOperation.cs" />
-    <Compile Include="TokenClasses\DeclaratorTags.cs" />
     <Compile Include="TokenClasses\PreType.cs" />
     <Compile Include="TokenClasses\ReassignToken.cs" />
     <Compile Include="TokenClasses\Base.cs" />

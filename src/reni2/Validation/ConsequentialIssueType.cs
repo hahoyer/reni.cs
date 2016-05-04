@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Scanner;
 using Reni.Code;
 using Reni.Context;
+using Reni.TokenClasses;
 
 namespace Reni.Validation
 {
@@ -12,11 +12,8 @@ namespace Reni.Validation
     {
         readonly IssueType _issueType;
 
-        public ConsequentialIssueType(IssueType issueType, SourcePart source)
-            : base(new Issue(IssueId.ConsequentialError, source))
-        {
-            _issueType = issueType;
-        }
+        public ConsequentialIssueType(IssueType issueType, Syntax source)
+            : base(new Issue(IssueId.ConsequentialError, source)) { _issueType = issueType; }
 
         [DisableDump]
         internal override Root Root => _issueType.Root;

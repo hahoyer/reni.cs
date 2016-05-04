@@ -5,6 +5,7 @@ using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
+using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Validation
@@ -21,7 +22,7 @@ namespace Reni.Validation
         internal override string DumpPrintText => Issue.IssueId.Tag;
         protected override string GetNodeDump() => base.GetNodeDump() + " " + DumpPrintText;
 
-        protected override IssueType CreateIssue(SourcePart source, IssueId issueId)
+        protected override IssueType CreateIssue(Syntax source, IssueId issueId)
             => new ConsequentialIssueType(this, source);
 
         internal Result Result(Category category) => Result(category, () => Code);
