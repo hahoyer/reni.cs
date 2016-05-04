@@ -10,25 +10,22 @@ namespace Reni.Parser
 {
     sealed class ExpressionSyntax : Value
     {
-        internal static Result<Value> Create
-            (Value left, Definable definable, Value right, Syntax syntax)
-            => new Result<Value>(new ExpressionSyntax(left, definable, right, syntax));
+        internal static Result<Value> Create(Syntax parent, Value left, Definable definable, Value right)
+            => new Result<Value>(new ExpressionSyntax(parent, left, definable, right));
 
-        internal static Result<Value> Create
-            (Syntax left, Definable definable, Syntax right, Syntax syntax)
+        internal static Result<Value> Create(Syntax left, Definable definable, Syntax right, Syntax syntax)
         {
             var leftvalue = left?.Value;
             var rightvalue = right?.Value;
             return new Result<Value>
                 (
-                new ExpressionSyntax(leftvalue?.Target, definable, rightvalue?.Target, syntax),
+                new ExpressionSyntax(syntax, leftvalue?.Target, definable, rightvalue?.Target),
                 leftvalue?.Issues.plus(rightvalue?.Issues)
                 );
         }
 
-        ExpressionSyntax
-            (Value left, Definable definable, Value right, Syntax syntax)
-            : base(syntax)
+        ExpressionSyntax(Syntax parent, Value left, Definable definable, Value right)
+            : base(parent)
         {
             Left = left;
             Definable = definable;
@@ -81,8 +78,8 @@ namespace Reni.Parser
 
             public override string Message
                 => "Depth of " + Depth + " exhausted when evaluation expression.\n" +
-                    "Expression: " + Syntax.SourcePart.GetDumpAroundCurrent(10) + "\n" +
-                    "Context: " + Context.NodeDump;
+                   "Expression: " + Syntax.SourcePart.GetDumpAroundCurrent(10) + "\n" +
+                   "Context: " + Context.NodeDump;
         }
 
         internal override Value Visit(ISyntaxVisitor visitor)
@@ -92,7 +89,7 @@ namespace Reni.Parser
             if(left == null && right == null)
                 return null;
 
-            var result = Definable.CreateForVisit(left ?? Left, right ?? Right, Syntax);
+            var result = Definable.CreateForVisit(Syntax, left ?? Left, right ?? Right);
             Tracer.Assert(!result.Issues.Any());
             return result.Target;
         }

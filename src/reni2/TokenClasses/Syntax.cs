@@ -253,7 +253,7 @@ namespace Reni.TokenClasses
             {
                 var declaratorTokenClass = TokenClass as IDeclaratorTokenClass;
                 if(declaratorTokenClass != null)
-                    return declaratorTokenClass.Get(Left, Token.Characters, Right);
+                    return declaratorTokenClass.Get(this);
 
                 NotImplementedMethod();
                 return null;
@@ -275,7 +275,7 @@ namespace Reni.TokenClasses
 
             var value = Option.Value;
             if(value != null)
-                return Statement.CreateStatements(Token.Characters, value);
+                return Statement.CreateStatements(value);
 
             return new Result<Statement[]>
                 (new Statement[0], IssueId.InvalidListOperandSequence.Create(this));
@@ -290,14 +290,13 @@ namespace Reni.TokenClasses
                 .plus(Issues)
                 .plus(Right?.AllIssues);
 
-        internal Tuple<Syntax, Issue> GetBracketKernel
-            (int level, Syntax token, Syntax right = null)
+        internal Tuple<Syntax, Issue> GetBracketKernel(int level, Syntax parent)
         {
-            Tracer.Assert(right == null);
+            Tracer.Assert(parent.Right == null);
             var leftParenthesis = TokenClass as LeftParenthesis;
 
             if(leftParenthesis == null)
-                return new Tuple<Syntax, Issue>(this, IssueId.ExtraRightBracket.Create(token));
+                return new Tuple<Syntax, Issue>(this, IssueId.ExtraRightBracket.Create(parent));
 
             Tracer.Assert(Left == null);
 
@@ -310,7 +309,7 @@ namespace Reni.TokenClasses
                 return new Tuple<Syntax, Issue>
                     (Right, IssueId.ExtraLeftBracket.Create(this));
 
-            NotImplementedMethod(level, right);
+            NotImplementedMethod(level, parent);
             return null;
         }
     }
@@ -322,17 +321,17 @@ namespace Reni.TokenClasses
 
     interface IValueProvider
     {
-        Result<Value> Get(Syntax left, Syntax right, Syntax syntax);
+        Result<Value> Get(Syntax syntax);
     }
 
     interface IStatementProvider
     {
-        Result<Statement> Get(Syntax left, SourcePart token, Syntax right);
+        Result<Statement> Get(Syntax left, Syntax right);
     }
 
     interface IStatementsProvider
     {
-        Result<Statement[]> Get(List type, Syntax left, SourcePart token, Syntax right, Syntax sourceSyntax);
+        Result<Statement[]> Get(List type, Syntax syntax);
     }
 
     interface IBelongingsMatcher

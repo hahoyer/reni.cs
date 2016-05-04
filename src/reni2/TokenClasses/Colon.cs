@@ -13,10 +13,10 @@ namespace Reni.TokenClasses
         public const string TokenId = ":";
         public override string Id => TokenId;
 
-        Result<Statement> IStatementProvider.Get(Syntax left, SourcePart token, Syntax right)
+        Result<Statement> IStatementProvider.Get(Syntax left, Syntax right)
             => left
                 .Declarator
-                .Convert(x => x.Statement(token, right.Value));
+                .Convert(x => x.Statement(right.Value));
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
@@ -49,12 +49,12 @@ namespace Reni.TokenClasses
     abstract class DeclarationTagToken : TerminalToken, IDeclaratorTagProvider, IDeclarationTag
     {
         Result<Declarator> IDeclaratorTagProvider.Get
-            (Syntax left, Syntax token, Syntax right)
+            (Syntax syntax)
         {
-            if(left == null && right == null)
-                return new Declarator(new IDeclarationTag[] {this}, null, null);
+            if(syntax.Left== null && syntax.Right == null)
+                return new Declarator(new IDeclarationTag[] {this}, null);
 
-            NotImplementedMethod(left, token, right);
+            NotImplementedMethod( syntax);
             return null;
         }
 

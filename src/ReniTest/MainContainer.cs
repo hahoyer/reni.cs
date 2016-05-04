@@ -29,7 +29,7 @@ namespace ReniTest
         {
             if(Debugger.IsAttached)
                 TestRunner.IsModeErrorFocus = true;
-            Assembly.GetExecutingAssembly().RunTests();
+            System.Reflection.Assembly.GetExecutingAssembly().RunTests();
         }
 
         const string Target = @"f: /\ ^(); x: 1; f(/\x) dump_print";

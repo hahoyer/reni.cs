@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Scanner;
 using Reni.Feature;
 using Reni.Parser;
 
@@ -17,28 +16,27 @@ namespace Reni.TokenClasses
         internal virtual IEnumerable<IDeclarationProvider> Genericize
             => this.GenericListFromDefinable();
 
-        internal Result<Parser.Value> CreateForVisit
-            (Parser.Value left, Parser.Value right, Syntax syntax)
-            => ExpressionSyntax.Create(left, this, right, syntax);
+        internal Result<Parser.Value> CreateForVisit(Syntax parent, Parser.Value left, Parser.Value right)
+            => ExpressionSyntax.Create(parent, left, this, right);
 
-        Result<Declarator> IDeclaratorTokenClass.Get(Syntax left, SourcePart token, Syntax right)
+        Result<Declarator> IDeclaratorTokenClass.Get(Syntax syntax)
         {
-            if(right == null)
+            if(syntax.Right == null)
             {
-                if(left == null)
-                    return new Declarator(null, this, token);
+                if(syntax.Left == null)
+                    return new Declarator(null, this);
 
-                var d = left.Declarator;
+                var d = syntax.Left.Declarator;
                 if(d != null)
-                    return d.Target.WithName(this, token);
+                    return d.Target.WithName(this);
             }
 
-            NotImplementedMethod(left, token, right);
+            NotImplementedMethod(syntax);
             return null;
         }
 
-        Result<Parser.Value> IValueProvider.Get(Syntax left, Syntax right, Syntax syntax)
-            => ExpressionSyntax.Create(left, this, right, syntax);
+        Result<Parser.Value> IValueProvider.Get(Syntax syntax)
+            => ExpressionSyntax.Create(syntax.Left, this, syntax.Right, syntax);
 
         bool IDeclarationItem.IsDeclarationPart(Syntax syntax)
         {
@@ -49,8 +47,8 @@ namespace Reni.TokenClasses
                 return syntax.Parent.Left == syntax;
 
             if(p is LeftParenthesis || p is Definable || p is ThenToken
-                || p is List || p is Function || p is TypeOperator
-                || p is ElseToken || p is ScannerSyntaxError)
+               || p is List || p is Function || p is TypeOperator
+               || p is ElseToken || p is ScannerSyntaxError)
                 return false;
 
             NotImplementedMethod(syntax);

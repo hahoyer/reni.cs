@@ -2,42 +2,35 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Scanner;
 using Reni.TokenClasses;
 
 namespace Reni.Parser
 {
     sealed class Statement : DumpableObject
     {
-        internal static Result<Statement[]> CreateStatements(SourcePart token, Result<Value> value)
-            => Create(token, value).Convert(x => new[] {x});
+        internal static Result<Statement[]> CreateStatements(Result<Value> value)
+            => Create(value).Convert(x => new[] {x});
 
-        internal static Result<Statement> Create(SourcePart token, Result<Value> value)
-            => value.Convert(x => new Statement(null, null, token, x));
+        internal static Result<Statement> Create(Result<Value> value)
+            => value.Convert(x => new Statement(null, null, x));
 
         internal static Result<Statement> Create
-            (IDeclarationTag[] tags, Definable target, SourcePart token, Result<Value> body)
-            => body.Convert(x => new Statement(tags, target, token, x));
+            (IDeclarationTag[] tags, Definable target, Result<Value> body)
+            => body.Convert(x => new Statement(tags, target, x));
 
         Statement
-            (IDeclarationTag[] tags, Definable target, SourcePart token, Value body)
+            (IDeclarationTag[] tags, Definable target, Value body)
         {
             Target = target;
-            Token = token;
             Body = body;
             Tags = tags?? new IDeclarationTag[0];
             StopByObjectIds();
         }
 
-        [DisableDump]
-        SourcePart TargetToken { get; }
-
         [EnableDump]
         IDeclarationTag[] Tags { get; }
         [EnableDump]
         Definable Target { get; }
-        [DisableDump]
-        SourcePart Token { get; }
         [EnableDump]
         internal Value Body { get; }
 

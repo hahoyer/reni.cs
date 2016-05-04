@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
-using hw.Scanner;
 using Reni.TokenClasses;
 
 namespace Reni.Parser
 {
     interface IDeclaratorTokenClass
     {
-        Result<Declarator> Get(Syntax left, SourcePart token, Syntax right);
+        Result<Declarator> Get(Syntax syntax);
     }
 
     sealed class Declarator : DumpableObject
@@ -19,23 +18,20 @@ namespace Reni.Parser
         IDeclarationTag[] Tags { get; }
         [EnableDump]
         Definable Target { get; }
-        [DisableDump]
-        SourcePart TargetToken { get; }
 
-        internal Declarator(IDeclarationTag[] tags, Definable target, SourcePart targetToken)
+        internal Declarator(IDeclarationTag[] tags, Definable target)
         {
             Tags = tags;
             Target = target;
-            TargetToken = targetToken;
         }
 
-        internal Result<Statement> Statement(SourcePart token, Result<Value> right)
-            => Parser.Statement.Create(Tags, Target,  token, right);
+        internal Result<Statement> Statement(Result<Value> right)
+            => Parser.Statement.Create(Tags, Target, right);
 
-        public Declarator WithName(Definable target, SourcePart targetToken)
+        public Declarator WithName(Definable target)
         {
             if(Target == null)
-                return new Declarator(Tags, target,targetToken);
+                return new Declarator(Tags, target);
 
             NotImplementedMethod(target);
             return null;
@@ -44,10 +40,11 @@ namespace Reni.Parser
 
     interface IDeclaratorTagProvider
     {
-        Result<Declarator> Get(Syntax left, Syntax token, Syntax right);
+        Result<Declarator> Get(Syntax syntax);
     }
 
-    interface IDeclarationTag {}
+    interface IDeclarationTag
+    {}
 
     sealed class ExclamationBoxToken : DumpableObject,
         IType<Syntax>,
@@ -67,17 +64,17 @@ namespace Reni.Parser
         string IType<Syntax>.PrioTableId => PrioTable.Any;
         string ITokenClass.Id => "!";
 
-        Result<Declarator> IDeclaratorTokenClass.Get(Syntax left, SourcePart token, Syntax right)
+        Result<Declarator> IDeclaratorTokenClass.Get(Syntax syntax)
         {
-            if(left == null && right != null)
+            if(syntax.Left == null && syntax.Right != null)
             {
-                var exclamationProvider = right.TokenClass as IDeclaratorTagProvider;
+                var exclamationProvider = syntax.Right.TokenClass as IDeclaratorTagProvider;
                 if(exclamationProvider != null)
                     return exclamationProvider
-                        .Get(right.Left, right, right.Right);
+                        .Get(syntax.Right);
             }
 
-            NotImplementedMethod(left, token, right);
+            NotImplementedMethod(syntax);
             return null;
         }
     }

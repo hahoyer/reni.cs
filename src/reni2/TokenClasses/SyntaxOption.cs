@@ -25,34 +25,31 @@ namespace Reni.TokenClasses
                     return null;
 
                 return (Parent.TokenClass as IValueProvider)?.Get
-                    (Parent.Left, Parent.Right, Parent);
+                    (Parent);
             }
         }
 
         internal Result<Statement[]> GetStatements(List type = null)
-            => (Parent.TokenClass as IStatementsProvider)
-                ?.Get(type, Parent.Left, Parent.Token.Characters, Parent.Right, Parent);
+            => (Parent.TokenClass as IStatementsProvider)?.Get(type, Parent);
 
         [EnableDumpExcept(null)]
         internal Result<Statement[]> Statements => GetStatements();
 
         [EnableDumpExcept(null)]
         internal Result<Statement> Statement
-            => (Parent.TokenClass as IStatementProvider)
-                ?.Get(Parent.Left, Parent.Token.Characters, Parent.Right);
+            => (Parent.TokenClass as IStatementProvider)?.Get(Parent.Left, Parent.Right);
 
         [EnableDumpExcept(null)]
         internal Result<Declarator> Declarator
-            => (Parent.TokenClass as IDeclaratorTokenClass)
-                ?.Get(Parent.Left, Parent.Token.Characters, Parent.Right);
+            => (Parent.TokenClass as IDeclaratorTokenClass)?.Get(Parent);
 
         [EnableDumpExcept(null)]
         internal Issue[] Issues
             => Value?.Issues
-                ?? GetStatements()?.Issues
-                    ?? Statement?.Issues
-                        ?? Declarator?.Issues
-                            ?? new Issue[0];
+               ?? GetStatements()?.Issues
+               ?? Statement?.Issues
+               ?? Declarator?.Issues
+               ?? new Issue[0];
 
         [EnableDumpExcept(null)]
         ContextBase[] CompoundContexts

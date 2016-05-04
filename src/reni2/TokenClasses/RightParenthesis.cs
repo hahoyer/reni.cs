@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
-using hw.Scanner;
 using Reni.Parser;
 using Reni.Validation;
 
@@ -25,13 +24,13 @@ namespace Reni.TokenClasses
         {
             static string Id => "()";
 
-            Result<Value> IValueProvider.Get(Syntax left, Syntax right, Syntax syntax)
+            Result<Value> IValueProvider.Get(Syntax syntax)
             {
-                Tracer.Assert(left != null);
-                Tracer.Assert(right != null);
-                var leftValue = left.Value;
-                var rightValue = right.Value;
-                return ExpressionSyntax.Create(leftValue.Target, null, rightValue.Target, syntax)
+                Tracer.Assert(syntax.Left != null);
+                Tracer.Assert(syntax.Right != null);
+                var leftValue = syntax.Left.Value;
+                var rightValue = syntax.Right.Value;
+                return ExpressionSyntax.Create(syntax, leftValue.Target, null, rightValue.Target)
                     .With(rightValue.Issues.plus(leftValue.Issues));
             }
 
@@ -59,9 +58,9 @@ namespace Reni.TokenClasses
 
         IType<Syntax> IBracketMatch<Syntax>.Value { get; } = new Matched();
 
-        Result<Value> IValueProvider.Get(Syntax left, Syntax right, Syntax syntax)
+        Result<Value> IValueProvider.Get(Syntax syntax)
         {
-            var result = left.GetBracketKernel(Level, syntax, right);
+            var result = syntax.Left.GetBracketKernel(Level, syntax);
             var target = result.Item1?.Option.Value ?? new EmptyList(syntax);
 
             if(result.Item2 != null)
@@ -70,18 +69,18 @@ namespace Reni.TokenClasses
             return result.Item1 == null ? new EmptyList(syntax) : result.Item1.Value;
         }
 
-        Result<Declarator> IDeclaratorTagProvider.Get(Syntax left, Syntax token, Syntax right)
+        Result<Declarator> IDeclaratorTagProvider.Get(Syntax syntax)
         {
-            var result = left.GetBracketKernel(Level, token, right);
-            var target = result.Item1?.Option.Declarator ?? new Declarator(null, null, null);
+            var result = syntax.Left.GetBracketKernel(Level, syntax);
+            var target = result.Item1?.Option.Declarator ?? new Declarator(null, null);
 
             if(result.Item2 != null)
                 return target.With(result.Item2);
 
             if(result.Item1 == null)
-                return target.With(IssueId.MissingDeclarationTag.Create(token));
+                return target.With(IssueId.MissingDeclarationTag.Create(syntax));
 
-            NotImplementedMethod(left, token, right, nameof(result), result);
+            NotImplementedMethod(syntax, nameof(result), result);
             return null;
         }
     }

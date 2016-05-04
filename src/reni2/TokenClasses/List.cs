@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Scanner;
 using Reni.Parser;
 
 namespace Reni.TokenClasses
@@ -26,21 +25,21 @@ namespace Reni.TokenClasses
             => otherMatcher == this;
 
         Result<Statement[]> IStatementsProvider.Get
-            (List type, Syntax left, SourcePart token, Syntax right, Syntax sourceSyntax)
+            (List type, Syntax syntax)
         {
             if(type != null && type != this)
                 return null;
 
-            var leftStatements = CreateStatements(left, token, sourceSyntax);
-            var rightStatements = CreateStatements(right, token, sourceSyntax);
+            var leftStatements = CreateStatements(syntax.Left, syntax);
+            var rightStatements = CreateStatements(syntax.Right, syntax);
             var target = leftStatements?.Target.plus(rightStatements?.Target);
             var issues = leftStatements?.Issues.plus(rightStatements?.Issues);
             return new Result<Statement[]>(target, issues);
         }
 
-        Result<Statement[]> CreateStatements(Syntax syntax, SourcePart token, Syntax sourceSyntax)
+        Result<Statement[]> CreateStatements(Syntax syntax, Syntax parent)
             => syntax == null
-                ? Statement.CreateStatements(token, new EmptyList(sourceSyntax))
+                ? Statement.CreateStatements(new EmptyList(parent))
                 : syntax.GetStatements(this);
     }
 }
