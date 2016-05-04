@@ -18,12 +18,11 @@ namespace Reni.Parser
             (IDeclarationTag[] tags, Definable target, Result<Value> body)
             => body.Convert(x => new Statement(tags, target, x));
 
-        Statement
-            (IDeclarationTag[] tags, Definable target, Value body)
+        Statement(IDeclarationTag[] tags, Definable target, Value body)
         {
             Target = target;
             Body = body;
-            Tags = tags?? new IDeclarationTag[0];
+            Tags = tags ?? new IDeclarationTag[0];
             StopByObjectIds();
         }
 

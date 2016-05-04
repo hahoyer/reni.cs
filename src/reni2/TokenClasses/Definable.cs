@@ -36,7 +36,7 @@ namespace Reni.TokenClasses
         }
 
         Result<Parser.Value> IValueProvider.Get(Syntax syntax)
-            => ExpressionSyntax.Create(syntax.Left, this, syntax.Right, syntax);
+            => ExpressionSyntax.Create(this, syntax);
 
         bool IDeclarationItem.IsDeclarationPart(Syntax syntax)
         {

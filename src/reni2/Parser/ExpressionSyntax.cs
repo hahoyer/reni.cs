@@ -10,18 +10,18 @@ namespace Reni.Parser
 {
     sealed class ExpressionSyntax : Value
     {
-        internal static Result<Value> Create(Syntax parent, Value left, Definable definable, Value right)
+        internal static Result<Value> Create
+            (Syntax parent, Value left, Definable definable, Value right)
             => new Result<Value>(new ExpressionSyntax(parent, left, definable, right));
 
-        internal static Result<Value> Create(Syntax left, Definable definable, Syntax right, Syntax syntax)
+        internal static Result<Value> Create(Definable definable, Syntax syntax)
         {
-            var leftvalue = left?.Value;
-            var rightvalue = right?.Value;
-            return new Result<Value>
-                (
-                new ExpressionSyntax(syntax, leftvalue?.Target, definable, rightvalue?.Target),
-                leftvalue?.Issues.plus(rightvalue?.Issues)
-                );
+            var leftvalue = syntax.Left?.Value;
+            var rightvalue = syntax.Right?.Value;
+            var left = leftvalue?.Target;
+            var right = rightvalue?.Target;
+            return Create(syntax, left, definable, right)
+                .With(leftvalue?.Issues.plus(rightvalue?.Issues));
         }
 
         ExpressionSyntax(Syntax parent, Value left, Definable definable, Value right)
@@ -78,8 +78,8 @@ namespace Reni.Parser
 
             public override string Message
                 => "Depth of " + Depth + " exhausted when evaluation expression.\n" +
-                   "Expression: " + Syntax.SourcePart.GetDumpAroundCurrent(10) + "\n" +
-                   "Context: " + Context.NodeDump;
+                    "Expression: " + Syntax.SourcePart.GetDumpAroundCurrent(10) + "\n" +
+                    "Context: " + Context.NodeDump;
         }
 
         internal override Value Visit(ISyntaxVisitor visitor)
