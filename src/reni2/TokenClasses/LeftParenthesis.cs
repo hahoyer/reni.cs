@@ -26,6 +26,9 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal override bool IsVisible => Level != 0;
 
+        [DisableDump]
+        internal bool IsFrameToken => Level == 0;
+
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => (otherMatcher as RightParenthesis)?.Level == Level;
     }

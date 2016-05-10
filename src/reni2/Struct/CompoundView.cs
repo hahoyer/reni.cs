@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-
 using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
@@ -15,7 +14,8 @@ namespace Reni.Struct
 {
     sealed class CompoundView
         : DumpableObject
-            , ValueCache.IContainer
+            ,
+            ValueCache.IContainer
     {
         static int _nextObjectId;
         [EnableDump]
@@ -57,7 +57,6 @@ namespace Reni.Struct
                 = new FunctionCache<FunctionSyntax, FunctionBodyType>
                     (syntax => new FunctionBodyType(this, syntax));
 
-            StopByObjectIds(-313);
         }
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
@@ -97,8 +96,7 @@ namespace Reni.Struct
         internal CompoundType Type => _typeCache.Value;
 
         protected override string GetNodeDump()
-            =>
-                base.GetNodeDump() + "(" + Context.GetContextIdentificationDump() + ")";
+            => base.GetNodeDump() + "(" + (Context?.GetContextIdentificationDump()??"?") + ")";
 
         [DisableDump]
         TypeBase IndexType => Compound.IndexType;
@@ -144,6 +142,7 @@ namespace Reni.Struct
                 .ConverterFunctions
                 .Select(ConversionFunction);
 
+        [DisableDump]
         internal string DumpPrintTextOfType
             => Compound
                 .Syntax
@@ -179,6 +178,7 @@ namespace Reni.Struct
             var result = Compound.AccessType(ViewPosition, position);
             if(result.Hllw)
                 return result;
+
             return _fieldAccessTypeCache[position];
         }
 
@@ -352,8 +352,9 @@ namespace Reni.Struct
 
         [DisableDump]
         ContextReferenceType ContextReferenceType
-            => ValueCacheExtension.CachedValue(this, () => new ContextReferenceType(this));
+            => this.CachedValue(() => new ContextReferenceType(this));
 
+        [DisableDump]
         internal IEnumerable<string> DeclarationOptions
         {
             get

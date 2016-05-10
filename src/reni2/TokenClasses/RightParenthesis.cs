@@ -52,11 +52,14 @@ namespace Reni.TokenClasses
         public override string Id => TokenId(Level);
         [DisableDump]
         internal override bool IsVisible => Level != 0;
+        [DisableDump]
+        internal bool IsFrameToken => Level == 0;
 
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => (otherMatcher as LeftParenthesis)?.Level == Level;
 
         IType<Syntax> IBracketMatch<Syntax>.Value { get; } = new Matched();
+
 
         Result<Value> IValueProvider.Get(Syntax syntax)
         {

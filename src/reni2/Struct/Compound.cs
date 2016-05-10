@@ -21,11 +21,9 @@ namespace Reni.Struct
         static int _nextObjectId;
 
         [Node]
-        [DisableDump]
         internal readonly CompoundSyntax Syntax;
 
         [Node]
-        [DisableDump]
         internal readonly ContextBase Parent;
 
         readonly int _order;

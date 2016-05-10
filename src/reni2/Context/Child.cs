@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-
 using Reni.Feature;
 using Reni.Struct;
 
@@ -10,7 +9,7 @@ namespace Reni.Context
 {
     abstract class Child : ContextBase
     {
-        public override sealed string GetContextIdentificationDump()
+        public sealed override string GetContextIdentificationDump()
             => Parent.GetContextIdentificationDump()
                 + GetContextChildIdentificationDump();
 
@@ -22,6 +21,7 @@ namespace Reni.Context
         internal Child(ContextBase parent) { _parent = parent; }
 
         [Node]
+        [DisableDump]
         internal ContextBase Parent => _parent;
 
         [DisableDump]
@@ -43,6 +43,7 @@ namespace Reni.Context
             return result.Any() ? result : Parent.Declarations(tokenClass);
         }
 
+        [DisableDump]
         internal override IEnumerable<ContextBase> ParentChain
             => _parent.ParentChain.Concat(base.ParentChain);
     }

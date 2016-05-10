@@ -17,16 +17,11 @@ namespace Reni.Context
     /// <summary>
     ///     Base class for compiler environments
     /// </summary>
-    abstract class ContextBase
-        : DumpableObject
-            ,
-            ResultCache.IResultProvider
-            ,
-            IIconKeyProvider
-            ,
-            ValueCache.IContainer
-            ,
-            IRootProvider
+    abstract class ContextBase : DumpableObject,
+        ResultCache.IResultProvider,
+        IIconKeyProvider,
+        ValueCache.IContainer,
+        IRootProvider
     {
         protected override string GetNodeDump()
             => base.GetNodeDump() + "(" + GetContextIdentificationDump() + ")";
@@ -38,7 +33,10 @@ namespace Reni.Context
         internal readonly Cache CacheObject;
 
         protected ContextBase()
-            : base(_nextId++) { CacheObject = new Cache(this); }
+            : base(_nextId++)
+        {
+            CacheObject = new Cache(this);
+        }
 
         public abstract string GetContextIdentificationDump();
 
@@ -75,7 +73,7 @@ namespace Reni.Context
             => size.SizeToPacketCount(Root.DefaultRefAlignParam.AlignBits);
 
         internal ContextBase CompoundPositionContext(CompoundSyntax container, int? position = null)
-            => CompoundView(container, position).CompoundContext;
+            => CompoundView(container, position)?.CompoundContext;
 
         internal CompoundView CompoundView(CompoundSyntax syntax, int? accessPosition = null)
             => CacheObject.Compounds[syntax].View[accessPosition ?? syntax.EndPosition];

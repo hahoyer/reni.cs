@@ -46,10 +46,10 @@ namespace Reni.TokenClasses
         [EnableDumpExcept(null)]
         internal Issue[] Issues
             => Value?.Issues
-               ?? GetStatements()?.Issues
-               ?? Statement?.Issues
-               ?? Declarator?.Issues
-               ?? new Issue[0];
+                ?? GetStatements()?.Issues
+                    ?? Statement?.Issues
+                        ?? Declarator?.Issues
+                            ?? new Issue[0];
 
         [EnableDumpExcept(null)]
         ContextBase[] CompoundContexts
@@ -74,11 +74,17 @@ namespace Reni.TokenClasses
         {
             get
             {
-                if(Value != null)
+                if ((Parent.TokenClass as RightParenthesis)?.IsFrameToken ?? false)
+                    return true;
+
+                if (Value != null)
                     return false;
                 if(Statements != null)
                     return Parent.Parent?.TokenClass != Parent.TokenClass;
                 if(Statement != null)
+                    return false;
+
+                if((Parent.TokenClass as LeftParenthesis)?.IsFrameToken ?? false)
                     return false;
 
                 NotImplementedMethod();

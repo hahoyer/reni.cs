@@ -8,25 +8,10 @@ using hw.UnitTest;
 namespace ReniUI.Test
 {
     [UnitTest]
-    [AutoCompleteSimple]
-    public sealed class AutoComplete : DependantAttribute
+    public sealed class AutoCompleteSimple : DependantAttribute
     {
-        const string text = @"systemdata: 
-{
-    Memory: ((0 type *(125)) mutable) instance();
-    !mutable FreePointer: Memory array_reference mutable;
-};
 
-
-repeat: /\ ^ while  () then(^ body(), repeat(^));
-
-system:
-{
-    MaxNumber8: /!\ '7f' to_number_of_base 16.
-    MaxNumber16: /!\ '7fff' to_number_of_base 16.
-    MaxNumber32: /!\ '7fffffff' to_number_of_base 16.
-    MaxNumber64: /!\ '7fffffffffffffff' to_number_of_base 16.
-    TextItemType: /!\ MaxNumber8 text_item type.
+        const string text = @"
 
     NewMemory: /\
     {
@@ -54,19 +39,17 @@ system:
         instance((result + count) mutable enable_reinterpretation)
     }
     result
-};
-system MaxNumber8 +          ;
 ";
 
         [UnitTest]
         public void GetDeclarationOptions()
         {
             var compiler = CompilerBrowser.FromText(text);
-            for(var i = 0; i < text.Length; i++)
+            for (var i = 0; i < text.Length; i++)
             {
                 var offset = text.Length - i - 1;
                 var position = compiler.Source + offset;
-                if((position + -1).Span(2).Id != "\r\n")
+                if ((position + -1).Span(2).Id != "\r\n")
                 {
                     var t = compiler.DeclarationOptions(offset);
                     Tracer.Assert(t != null, () => (new Source(text) + i).Dump());
