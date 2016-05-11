@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Scanner;
 using Reni.Context;
 using Reni.Parser;
 using Reni.Struct;
@@ -84,7 +85,8 @@ namespace Reni.TokenClasses
                 if(Statement != null)
                     return false;
 
-                if((Parent.TokenClass as LeftParenthesis)?.IsFrameToken ?? false)
+                var leftParenthesis = Parent.TokenClass as LeftParenthesis;
+                if(leftParenthesis != null)
                     return false;
 
                 NotImplementedMethod();
@@ -101,14 +103,19 @@ namespace Reni.TokenClasses
                     return CompoundContexts
                         .SelectMany(item => Value.Target.DeclarationOptions(item));
 
-                if(Statements != null)
+                if(Statements != null || Statement != null)
                     return CompoundContexts
                         .SelectMany(item => item.DeclarationOptions)
                         .Concat(DeclarationTagToken.DeclarationOptions);
+                if(Declarator != null || Parent.TokenClass is LeftParenthesis)
+                    return new string[0];
 
                 NotImplementedMethod();
                 return null;
             }
         }
+
+        [EnableDump]
+        SourcePart Token => Parent.Token.Characters;
     }
 }

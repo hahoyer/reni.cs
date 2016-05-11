@@ -16,27 +16,7 @@ namespace ReniUI.Test
     NewMemory: /\
     {
 
-        result: (((^ elementType) * 1) array_reference mutable)
-        instance(systemdata FreePointer enable_reinterpretation).
-
-        initializer: ^ initializer.
-
-        count: ^ count.
-        !mutable position: count type instance(0).
-
-        repeat
-        (
-            while: /\ position < count,
-
-            body: /\
-            (
-                result(position) := initializer(position),
-                position :=(position + 1) enable_cut
-            )
-        ).
-
-        systemdata FreePointer :=(systemdata FreePointer type)
-        instance((result + count) mutable enable_reinterpretation)
+        result: 1
     }
     result
 ";
@@ -49,7 +29,7 @@ namespace ReniUI.Test
             {
                 var offset = text.Length - i - 1;
                 var position = compiler.Source + offset;
-                if ((position + -1).Span(2).Id != "\r\n")
+                if (offset > 0 && (position + -1).Span(2).Id != "\r\n")
                 {
                     var t = compiler.DeclarationOptions(offset);
                     Tracer.Assert(t != null, () => (new Source(text) + i).Dump());

@@ -149,7 +149,7 @@ namespace ReniUI
                 return null;
 
             var current = token.Syntax.Token.SourcePart.Position - 1;
-            return token.Syntax.LocatePosition(current);
+            return current < 0 ? Compiler.Syntax.Left : token.Syntax.LocatePosition(current);
         }
 
         internal string[] DeclarationOptions(int offset)

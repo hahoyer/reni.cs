@@ -18,17 +18,6 @@ namespace Reni.Type
 
         protected abstract CodeBase SetterCode();
         protected abstract CodeBase GetterCode();
-        internal override IEnumerable<string> DeclarationOptions
-            => base.DeclarationOptions.Concat(InternalDeclarationOptions);
-
-        IEnumerable<string> InternalDeclarationOptions
-        {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
-        }
 
     }
 }
