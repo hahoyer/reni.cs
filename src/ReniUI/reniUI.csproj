@@ -113,6 +113,7 @@
     <Compile Include="RestFul\IChannelRepo.cs" />
     <Compile Include="RestFul\Issue.cs" />
     <Compile Include="Test\AutoComplete.cs" />
+    <Compile Include="Test\AutoCompleteFunctionInCompound.cs" />
     <Compile Include="Test\AutoCompleteSimple.cs" />
     <Compile Include="Test\BadUserInterAction.cs" />
     <Compile Include="Test\BraceMatching.cs" />

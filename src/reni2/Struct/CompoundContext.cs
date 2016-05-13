@@ -21,7 +21,7 @@ namespace Reni.Struct
         {
             _order = CodeArgs.NextOrder++;
             View = view;
-            StopByObjectIds();
+            StopByObjectIds(3);
         }
 
         [DisableDump]
@@ -41,5 +41,8 @@ namespace Reni.Struct
 
         [DisableDump]
         internal override IEnumerable<string> DeclarationOptions => View.DeclarationOptions;
+
+        [EnableDump]
+        Parser.Value[] Syntax => View.Compound.Syntax.Statements;
     }
 }

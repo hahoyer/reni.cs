@@ -57,6 +57,7 @@ namespace Reni.Struct
                 = new FunctionCache<FunctionSyntax, FunctionBodyType>
                     (syntax => new FunctionBodyType(this, syntax));
 
+            StopByObjectIds(4);
         }
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();

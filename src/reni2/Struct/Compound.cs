@@ -39,6 +39,7 @@ namespace Reni.Struct
             Parent = parent;
             View = new FunctionCache<int, CompoundView>
                 (position => new CompoundView(this, position));
+            StopByObjectIds(2);
         }
 
         Root IRootProvider.Value => Root;
