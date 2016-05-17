@@ -17,7 +17,6 @@ namespace Reni.Runtime
             {
                 var bytes = Root.DefaultRefAlignParam.RefSize.SaveByteCount;
                 Tracer.Assert(bytes == 4);
-                Tracer.Assert(sizeof(byte*) == 4);
                 Tracer.Assert(sizeof(int) == 4);
                 return bytes;
             }
