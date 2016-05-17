@@ -9,7 +9,6 @@ namespace ReniUI.Test
 {
     [UnitTest]
     [AutoCompleteSimple]
-    [LowPriority]
     public sealed class AutoCompleteFunctionInCompound : DependantAttribute
     {
         const string text = @"
