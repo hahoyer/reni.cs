@@ -55,7 +55,7 @@ namespace Reni.TokenClasses
                 .FunctionalType(this)
                 .Result(category);
 
-        protected override bool GetIsLambda() => true;
+        internal override bool IsLambda => true;
 
         internal IMeta MetaFunctionFeature(CompoundView compoundView)
         {

@@ -28,7 +28,7 @@ namespace Reni.Parser
             : base(objectId) { Syntax = syntax; }
 
         [DisableDump]
-        internal bool IsLambda => GetIsLambda();
+        internal virtual bool IsLambda => false;
 
         [DisableDump]
         internal virtual bool? Hllw => IsLambda ? (bool?) true : null;
@@ -40,8 +40,7 @@ namespace Reni.Parser
             return null;
         }
 
-        protected virtual bool GetIsLambda() => false;
-
+        [DisableDump]
         internal virtual IRecursionHandler RecursionHandler => null;
 
         internal SourcePart SourcePart => Syntax.SourcePart;
