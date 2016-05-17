@@ -26,14 +26,14 @@ namespace Reni.Context
         protected override string GetNodeDump()
             => base.GetNodeDump() + "(" + GetContextIdentificationDump() + ")";
 
-        static int _nextId;
+        static int NextId;
 
         [DisableDump]
         [Node]
         internal readonly Cache CacheObject;
 
         protected ContextBase()
-            : base(_nextId++)
+            : base(NextId++)
         {
             CacheObject = new Cache(this);
         }
@@ -117,11 +117,11 @@ namespace Reni.Context
             readonly bool AsReference;
             internal readonly ContextBase Context;
             internal readonly Parser.Value Syntax;
-            static int _nextObjectId;
+            static int NextObjectId;
 
             internal ResultProvider
                 (ContextBase context, Parser.Value syntax, bool asReference = false)
-                : base(_nextObjectId++)
+                : base(NextObjectId++)
             {
                 Context = context;
                 Syntax = syntax;
@@ -317,5 +317,5 @@ namespace Reni.Context
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
     }
 
-    class SmartNodeAttribute : Attribute {}
+    sealed class SmartNodeAttribute : Attribute {}
 }
