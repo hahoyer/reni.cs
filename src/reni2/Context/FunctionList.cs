@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-
 using hw.Helper;
 using Reni.Code;
 using Reni.Struct;
@@ -14,14 +13,17 @@ namespace Reni.Context
     sealed class FunctionList : DumpableObject
     {
         [Node]
-        readonly FunctionCache<FunctionSyntax, FunctionCache<CompoundView, FunctionCache<TypeBase, int>>> _dictionary;
+        readonly
+            FunctionCache<FunctionSyntax, FunctionCache<CompoundView, FunctionCache<TypeBase, int>>>
+            _dictionary;
 
         [Node]
         readonly List<FunctionType> _list = new List<FunctionType>();
 
         public FunctionList()
         {
-            _dictionary = new FunctionCache<FunctionSyntax, FunctionCache<CompoundView, FunctionCache<TypeBase, int>>>
+            _dictionary = new FunctionCache
+                <FunctionSyntax, FunctionCache<CompoundView, FunctionCache<TypeBase, int>>>
                 (
                 syntax => new FunctionCache<CompoundView, FunctionCache<TypeBase, int>>
                     (
@@ -31,11 +33,15 @@ namespace Reni.Context
 
         internal int Count => _list.Count;
 
-        internal FunctionType Find(FunctionSyntax syntax, CompoundView compoundView, TypeBase argsType)
+        internal FunctionType Find
+            (FunctionSyntax syntax, CompoundView compoundView, TypeBase argsType)
         {
             var index = _dictionary[syntax][compoundView][argsType];
             return _list[index];
         }
+
+        internal IEnumerable<FunctionType> Find(FunctionSyntax syntax, CompoundView compoundView)
+            => _dictionary[syntax][compoundView].Select(item => _list[item.Value]);
 
         internal FunctionContainer Container(int index) => _list[index].Container;
         internal FunctionType Item(int index) => _list[index];

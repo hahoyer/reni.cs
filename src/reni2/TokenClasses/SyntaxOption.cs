@@ -70,7 +70,15 @@ namespace Reni.TokenClasses
 
                 if(IsFunctionLevel)
                 {
-                    var r = Parent.Value
+                    var r = Parent
+                        .Parent
+                        .Option
+                        .Contexts
+                        .SelectMany(item=>
+                        {
+                            var typeBase = (FunctionBodyType)item.ResultCache(Value.Target).Type;
+                            return typeBase.Functions;
+                        }).ToArray();
                     NotImplementedMethod();
                     return null;
                 }

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-
 using hw.Helper;
 using hw.Scanner;
 using Reni.Basics;
@@ -18,8 +17,10 @@ namespace Reni.Context
 {
     sealed class Root
         : ContextBase
-            , ISymbolProviderForPointer<Minus>
-            , ISymbolProviderForPointer<ConcatArrays>
+            ,
+            ISymbolProviderForPointer<Minus>
+            ,
+            ISymbolProviderForPointer<ConcatArrays>
     {
         [DisableDump]
         [Node]
@@ -126,6 +127,9 @@ namespace Reni.Context
             return functionInstance;
         }
 
+        internal IEnumerable<FunctionType> FunctionInstances
+            (CompoundView compoundView, FunctionSyntax body) => _functions.Find(body, compoundView);
+
         internal Result ConcatPrintResult
             (Category category, int count, Func<Category, int, Result> elemResults)
         {
@@ -162,6 +166,7 @@ namespace Reni.Context
                     Dump("result", result);
                     BreakExecution();
                 }
+
                 if(category.HasCode)
                     result.Code = result.Code + CodeBase.DumpPrintText(")");
                 return ReturnMethodDump(result);
@@ -182,7 +187,7 @@ namespace Reni.Context
             var rawResult = compoundSyntax.Target.Result(this);
             return rawResult
                 .Code
-                .LocalBlock(rawResult.Type.Copier(Category.Code).Code )
+                .LocalBlock(rawResult.Type.Copier(Category.Code).Code)
                 .Container(description);
         }
 
@@ -202,7 +207,7 @@ namespace Reni.Context
             Result<Parser.Value> Parse(string source);
             bool ProcessErrors { get; }
             IExecutionContext ExecutionContext { get; }
-            IEnumerable<ScannerTokenClass> AllTokenClasses{ get; }
+            IEnumerable<ScannerTokenClass> AllTokenClasses { get; }
         }
     }
 }

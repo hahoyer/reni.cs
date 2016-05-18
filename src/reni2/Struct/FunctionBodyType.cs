@@ -99,6 +99,8 @@ namespace Reni.Struct
             => VoidType
                 .Result(category, DumpPrintCode);
 
+        [DisableDump]
+        internal IEnumerable<FunctionType> Functions => CompoundView.Functions(Syntax);
 
         FunctionType Function(TypeBase argsType) => CompoundView.Function(Syntax, argsType);
 

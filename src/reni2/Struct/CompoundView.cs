@@ -287,6 +287,11 @@ namespace Reni.Struct
                 .Root
                 .FunctionInstance(this, body, argsType);
 
+        internal IEnumerable<FunctionType> Functions(FunctionSyntax body)
+            => Compound
+                .Root
+                .FunctionInstances(this, body);
+
         internal Result ObjectPointerViaContext(Category category)
         {
             if(Hllw)
@@ -367,5 +372,6 @@ namespace Reni.Struct
                     yield return name;
             }
         }
+
     }
 }
