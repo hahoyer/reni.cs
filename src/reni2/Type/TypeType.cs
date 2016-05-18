@@ -67,19 +67,6 @@ namespace Reni.Type
             (Category category, Func<Category, Result> getRightResult)
             => RawInstanceResult(category.Typed, getRightResult).LocalReferenceResult;
 
-        internal override IEnumerable<string> DeclarationOptions
-            => base.DeclarationOptions.Concat(InternalDeclarationOptions);
-
-        IEnumerable<string> InternalDeclarationOptions
-        {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
-        }
-
-
         Result RawInstanceResult(Category category, Func<Category, Result> getRightResult)
         {
             if(category <= Category.Type.Replenished)
