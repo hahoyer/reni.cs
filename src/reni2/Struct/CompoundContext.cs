@@ -21,7 +21,7 @@ namespace Reni.Struct
         {
             _order = CodeArgs.NextOrder++;
             View = view;
-            StopByObjectIds(3);
+            StopByObjectIds();
         }
 
         [DisableDump]
