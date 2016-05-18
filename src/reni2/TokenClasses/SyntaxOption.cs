@@ -52,33 +52,45 @@ namespace Reni.TokenClasses
                         ?? Declarator?.Issues
                             ?? new Issue[0];
 
-        [EnableDumpExcept(null)]
-        ContextBase[] CompoundContexts
+        [DisableDump]
+        ContextBase[] Contexts
         {
             get
             {
-                if(!IsStatementsLevel)
-                    return Parent.Parent.Option.CompoundContexts;
+                if(IsStatementsLevel)
+                {
+                    var target = (CompoundSyntax) Parent.Value.Target;
 
-                var target = (CompoundSyntax) Parent.Value.Target;
+                    return target
+                        .ResultCache
+                        .Values
+                        .Select(item => item.Type.ToContext)
+                        .ToArray();
+                }
 
-                return target
-                    .ResultCache
-                    .Values
-                    .Select(item => item.Type.ToContext)
-                    .ToArray();
+                if(IsFunctionLevel)
+                {
+                    var r = Parent.Value
+                    NotImplementedMethod();
+                    return null;
+                }
+
+                return Parent.Parent.Option.Contexts;
             }
         }
 
-        [EnableDumpExcept(null)]
+        [DisableDump]
+        bool IsFunctionLevel => Parent.TokenClass is Function;
+
+        [DisableDump]
         bool IsStatementsLevel
         {
             get
             {
-                if ((Parent.TokenClass as RightParenthesis)?.IsFrameToken ?? false)
+                if((Parent.TokenClass as RightParenthesis)?.IsFrameToken ?? false)
                     return true;
 
-                if (Value != null)
+                if(Value != null)
                     return false;
                 if(Statements != null)
                     return Parent.Parent?.TokenClass != Parent.TokenClass;
@@ -100,11 +112,11 @@ namespace Reni.TokenClasses
             get
             {
                 if(Value != null)
-                    return CompoundContexts
+                    return Contexts
                         .SelectMany(item => Value.Target.DeclarationOptions(item));
 
                 if(Statements != null || Statement != null)
-                    return CompoundContexts
+                    return Contexts
                         .SelectMany(item => item.DeclarationOptions)
                         .Concat(DeclarationTagToken.DeclarationOptions);
                 if(Declarator != null || Parent.TokenClass is LeftParenthesis)

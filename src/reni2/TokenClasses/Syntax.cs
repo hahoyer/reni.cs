@@ -21,7 +21,7 @@ namespace Reni.TokenClasses
             Syntax right)
             => new Syntax(left, tokenClass, token, right);
 
-        static int _nextObjectId;
+        static int NextObjectId;
 
         [DisableDump]
         internal SyntaxOption Option { get; }
@@ -41,7 +41,7 @@ namespace Reni.TokenClasses
             ITokenClass tokenClass,
             IToken token,
             Syntax right)
-            : base(_nextObjectId++)
+            : base(NextObjectId++)
         {
             Left = left;
             TokenClass = tokenClass;
@@ -75,8 +75,6 @@ namespace Reni.TokenClasses
 
         [DisableDump]
         internal SourcePart SourcePart => Left?.SourcePart + Token.SourcePart + Right?.SourcePart;
-        [DisableDump]
-        string FilePosition => Token.Characters.FilePosition;
 
         public Syntax LocatePosition(int current) => LocatePositionCache[current];
 
@@ -187,22 +185,6 @@ namespace Reni.TokenClasses
                     yield return sourceSyntax;
         }
 
-        public string BraceMatchDump => new BraceMatchDumper(this, 3).Dump();
-
-        [DisableDump]
-        internal IEnumerable<WhiteSpaceToken> LeadingWhiteSpaceTokens
-            => Left != null
-                ? Left.LeadingWhiteSpaceTokens
-                : Token.PrecededWith.OnlyLeftPart();
-
-        [DisableDump]
-        internal ITokenClass LeftMostTokenClass
-            => Left == null ? TokenClass : Left.LeftMostTokenClass;
-
-        [DisableDump]
-        internal ITokenClass RightMostTokenClass
-            => Right == null ? TokenClass : Right.RightMostTokenClass;
-
         [DisableDump]
         public IEnumerable<Syntax> ParentChainIncludingThis
         {
@@ -254,6 +236,9 @@ namespace Reni.TokenClasses
                 var declaratorTokenClass = TokenClass as IDeclaratorTokenClass;
                 if(declaratorTokenClass != null)
                     return declaratorTokenClass.Get(this);
+
+                if(TokenClass is RightParenthesis)
+                    return null;
 
                 NotImplementedMethod();
                 return null;

@@ -27,8 +27,10 @@ namespace Reni.TokenClasses
                     return new Declarator(null, this);
 
                 var d = syntax.Left.Declarator;
-                if(d != null)
-                    return d.Target.WithName(this);
+                if(d == null)
+                    return null;
+
+                return d.Target.WithName(this);
             }
 
             NotImplementedMethod(syntax);
