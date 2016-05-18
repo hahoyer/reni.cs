@@ -70,22 +70,22 @@ namespace Reni.TokenClasses
 
                 if(IsFunctionLevel)
                 {
-                    var r = Parent
+                    return Parent
                         .Parent
                         .Option
                         .Contexts
-                        .SelectMany(item=>
-                        {
-                            var typeBase = (FunctionBodyType)item.ResultCache(Value.Target).Type;
-                            return typeBase.Functions;
-                        }).ToArray();
-                    NotImplementedMethod();
-                    return null;
+                        .SelectMany(context => FunctionContexts(context, Value.Target))
+                        .ToArray();
                 }
 
                 return Parent.Parent.Option.Contexts;
             }
         }
+
+        static IEnumerable<ContextBase> FunctionContexts(ContextBase context, Value body) 
+            => ((FunctionBodyType)context.ResultCache(body).Type)
+            .Functions
+            .Select(item=>item.CreateSubContext(false));
 
         [DisableDump]
         bool IsFunctionLevel => Parent.TokenClass is Function;
