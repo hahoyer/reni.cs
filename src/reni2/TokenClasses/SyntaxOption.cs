@@ -58,34 +58,28 @@ namespace Reni.TokenClasses
             get
             {
                 if(IsStatementsLevel)
-                {
-                    var target = (CompoundSyntax) Parent.Value.Target;
-
-                    return target
+                    return ((CompoundSyntax) Parent.Value.Target)
                         .ResultCache
                         .Values
                         .Select(item => item.Type.ToContext)
                         .ToArray();
-                }
 
                 if(IsFunctionLevel)
-                {
                     return Parent
                         .Parent
                         .Option
                         .Contexts
                         .SelectMany(context => FunctionContexts(context, Value.Target))
                         .ToArray();
-                }
 
                 return Parent.Parent.Option.Contexts;
             }
         }
 
-        static IEnumerable<ContextBase> FunctionContexts(ContextBase context, Value body) 
-            => ((FunctionBodyType)context.ResultCache(body).Type)
-            .Functions
-            .Select(item=>item.CreateSubContext(false));
+        static IEnumerable<ContextBase> FunctionContexts(ContextBase context, Value body)
+            => ((FunctionBodyType) context.ResultCache(body).Type)
+                .Functions
+                .Select(item => item.CreateSubContext(false));
 
         [DisableDump]
         bool IsFunctionLevel => Parent.TokenClass is Function;
@@ -127,7 +121,10 @@ namespace Reni.TokenClasses
                     return Contexts
                         .SelectMany(item => item.DeclarationOptions)
                         .Concat(DeclarationTagToken.DeclarationOptions);
-                if(Declarator != null || Parent.TokenClass is LeftParenthesis)
+
+                if(Declarator != null
+                    || Parent.TokenClass is LeftParenthesis
+                    || Parent.TokenClass is DeclarationTagToken)
                     return new string[0];
 
                 NotImplementedMethod();
