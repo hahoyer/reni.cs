@@ -39,7 +39,7 @@ namespace Reni.Code
             streamWriter.Close();
         }
 
-        internal static Assembly CodeToAssembly(this string codeToString, bool traceFilePosn)
+        internal static Assembly CodeToAssembly(this string codeToString, bool traceFilePosn, bool includeDebugInformation)
         {
             var name =
                 Environment.GetEnvironmentVariable("temp")
@@ -57,8 +57,8 @@ namespace Reni.Code
             {
                 GenerateInMemory = true,
                 CompilerOptions = "/unsafe /debug",
-                IncludeDebugInformation = true,
-                TempFiles = new TempFileCollection(null, true)
+                IncludeDebugInformation = includeDebugInformation,
+                TempFiles = new TempFileCollection(null, false)
             };
             var referencedAssemblies
                 = new[]

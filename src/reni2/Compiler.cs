@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using hw.DebugFormatter;
@@ -185,7 +186,7 @@ namespace Reni
             try
             {
                 var method = CSharpString
-                    .CodeToAssembly(Parameters.TraceOptions.GeneratorFilePosn)
+                    .CodeToAssembly(Parameters.TraceOptions.GeneratorFilePosn, Debugger.IsAttached)
                     .GetExportedTypes()[0]
                     .GetMethod(Generator.MainFunctionName);
 
