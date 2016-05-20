@@ -8,6 +8,7 @@ using hw.UnitTest;
 namespace ReniUI.Test
 {
     [UnitTest]
+    [LowPriority]
     [AutoCompleteFunctionInCompound]
     public sealed class AutoComplete : DependantAttribute
     {
@@ -62,10 +63,10 @@ system MaxNumber8 +          ;
         public void GetDeclarationOptions()
         {
             var compiler = CompilerBrowser.FromText(text);
-            for (var offset = 1; offset < text.Length; offset++)
+            for(var offset = 1; offset < text.Length; offset++)
             {
                 var position = compiler.Source + offset;
-                if ((position + -1).Span(2).Id != "\r\n")
+                if((position + -1).Span(2).Id != "\r\n")
                 {
                     var t = compiler.DeclarationOptions(offset);
                     Tracer.Assert(t != null, () => (new Source(text) + offset).Dump());
