@@ -4,10 +4,11 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Scanner;
 using hw.UnitTest;
+using NUnit.Framework;
 
 namespace ReniUI.Test
 {
-    [UnitTest]
+    [UnitTest, TestFixture]
     public sealed class AutoCompleteSimple : DependantAttribute
     {
 
@@ -21,7 +22,7 @@ namespace ReniUI.Test
     result
 ";
 
-        [UnitTest]
+        [UnitTest, Test]
         public void GetDeclarationOptions()
         {
             var compiler = CompilerBrowser.FromText(text);
