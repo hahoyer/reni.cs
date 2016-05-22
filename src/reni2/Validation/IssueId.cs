@@ -18,21 +18,12 @@ namespace Reni.Validation
         public static readonly IssueId EOLInString = new IssueId();
         public static readonly IssueId ExtraLeftBracket = new IssueId();
         public static readonly IssueId ExtraRightBracket = new IssueId();
-        public static readonly IssueId IdentifierExpected = new IssueId();
+        public static readonly IssueId InvalidCharacter = new IssueId();
         public static readonly IssueId InvalidExpression = new IssueId();
         public static readonly IssueId InvalidListOperandSequence = new IssueId();
         public static readonly IssueId MissingDeclaration = new IssueId();
         public static readonly IssueId MissingDeclarationTag = new IssueId();
         public static readonly IssueId MissingRightExpression = new IssueId();
-        public static readonly IssueId MissingElseBody = new IssueId();
-        public static readonly IssueId MissingFunctionGetter = new IssueId();
-        public static readonly IssueId MissingThen = new IssueId();
-        public static readonly IssueId MissingValueInDeclaration = new IssueId();
-        public static readonly IssueId UnexpectedDeclarationTag = new IssueId();
-        public static readonly IssueId UnexpectedUseAsInfix = new IssueId();
-        public static readonly IssueId UnexpectedUseAsPrefix = new IssueId();
-        public static readonly IssueId UnexpectedUseAsSuffix = new IssueId();
-        public static readonly IssueId UnexpectedUseAsTerminal = new IssueId();
 
         public static IEnumerable<IssueId> All => AllInstances<IssueId>();
 

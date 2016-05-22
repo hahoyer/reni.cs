@@ -107,6 +107,9 @@ namespace Reni.Parser
 
         int? ILexer.Number(SourcePosn sourcePosn) => sourcePosn.Match(_number);
         int? ILexer.Any(SourcePosn sourcePosn) => sourcePosn.Match(_any);
+
+        Match.IError ILexer.InvalidCharacterError { get; }  = new Error(IssueId.InvalidCharacter);
+
         int? ILexer.Text(SourcePosn sourcePosn) => sourcePosn.Match(_text);
         public static IssueId Parse(Match.IError error) => ((Error) error).IssueId;
 

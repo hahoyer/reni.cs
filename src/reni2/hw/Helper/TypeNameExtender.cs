@@ -12,12 +12,12 @@ namespace hw.Helper
 
         public static void OnModuleLoaded() { _referencedTypesCache.IsValid = false; }
 
+        public static Type[] Types => ReferencedTypes.Types;
+
         public static Type[] ResolveType(this string typeName)
         {
             return ReferencedTypes.ByNamePartMulti[typeName];
         }
-
-        public static Type[] Types => ReferencedTypes.Types;
 
         public static Type ResolveUniqueType(this string typeName)
         {
@@ -36,7 +36,6 @@ namespace hw.Helper
             var assembly = Assembly.GetEntryAssembly() ?? Assembly.GetCallingAssembly();
             return new TypeLibrary(assembly.GetReferencedTypes());
         }
-
 
         static TypeLibrary ReferencedTypes
         {
