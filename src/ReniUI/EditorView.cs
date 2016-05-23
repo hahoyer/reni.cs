@@ -63,18 +63,8 @@ namespace ReniUI
 
             internal void OnUpdate(UpdateChange change)
             {
-                switch(change)
-                {
-                case UpdateChange.Selection:
+                if(change.HasFlag(UpdateChange.Selection))
                     FilePersister.Store("Selection");
-                    return;
-                case UpdateChange.Content:
-                case UpdateChange.VScroll:
-                case UpdateChange.HScroll:
-                    return;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(change), change, null);
-                }
             }
         }
 
@@ -129,7 +119,7 @@ namespace ReniUI
             AutocompleteMenu = new AutocompleteMenu
             {
                 AutoPopup = true,
-                AppearInterval = 0,
+                AppearInterval = 1,
                 MinFragmentLength = 1
             };
 
