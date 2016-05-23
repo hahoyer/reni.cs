@@ -48,9 +48,14 @@ namespace Reni.TokenClasses
             if(p is Colon)
                 return syntax.Parent.Left == syntax;
 
-            if(p is LeftParenthesis || p is Definable || p is ThenToken
-               || p is List || p is Function || p is TypeOperator
-               || p is ElseToken || p is ScannerSyntaxError)
+            if(p is LeftParenthesis ||
+                p is Definable ||
+                p is ThenToken ||
+                p is List ||
+                p is Function ||
+                p is TypeOperator ||
+                p is ElseToken ||
+                p is ScannerSyntaxError)
                 return false;
 
             NotImplementedMethod(syntax);

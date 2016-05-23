@@ -14,9 +14,14 @@ namespace Reni.TokenClasses
         public override string Id => TokenId;
 
         Result<Statement> IStatementProvider.Get(Syntax left, Syntax right)
-            => left
-                .Declarator
+        {
+            var declarator = left.Declarator;
+            if(declarator == null)
+                return null;
+
+            return declarator
                 .Convert(x => x.Statement(right.Value));
+        }
     }
 
     [BelongsTo(typeof(MainTokenFactory))]

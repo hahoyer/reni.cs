@@ -237,7 +237,7 @@ namespace Reni.TokenClasses
                 if(declaratorTokenClass != null)
                     return declaratorTokenClass.Get(this);
 
-                if(TokenClass is RightParenthesis)
+                if(TokenClass is RightParenthesis || TokenClass is ScannerSyntaxError)
                     return null;
 
                 NotImplementedMethod();
