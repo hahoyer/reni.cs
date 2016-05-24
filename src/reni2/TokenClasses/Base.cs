@@ -4,6 +4,7 @@ using System.Linq;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
+using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
@@ -23,6 +24,10 @@ namespace Reni.TokenClasses
         {
             if(syntax.Left == null && syntax.Right == null)
                 return new TerminalSyntax(this, syntax);
+
+            if(syntax.Left != null && syntax.Right == null)
+                return new TerminalSyntax(this, syntax)
+                    .Issues<Value>(IssueId.TerminalUsedAsSuffix.Create(syntax.Left));
 
             NotImplementedMethod(syntax);
             return null;
