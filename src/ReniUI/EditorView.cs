@@ -103,6 +103,7 @@ namespace ReniUI
             Client = TextBox;
 
             TextBox.Text = FileName.FileHandle().String;
+            TextBox.EmptyUndoBuffer();
             Configuration = new ConfigurationClass(this);
             TextBox.UpdateUI += (s, args) => Configuration.OnUpdate(args.Change);
 
