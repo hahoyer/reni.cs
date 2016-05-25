@@ -244,8 +244,8 @@ namespace ReniUI
 
             foreach(var piece in reformat)
             {
-                TextBox.TargetStart = piece.Position;
-                TextBox.TargetEnd = piece.Position + piece.RemoveCount;
+                TextBox.TargetStart = piece.EndPosition - piece.RemoveCount;
+                TextBox.TargetEnd = piece.EndPosition;
                 TextBox.ReplaceTarget(piece.NewText);
             }
         }

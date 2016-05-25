@@ -298,7 +298,7 @@ namespace ReniUI.Formatting
                     {
                         NewText = newText,
                         RemoveCount = removeCount,
-                        Position = sourcePart.Position
+                        EndPosition = sourcePart.Position
                     };
                     newText = "";
                     removeCount = 0;
@@ -323,7 +323,7 @@ namespace ReniUI.Formatting
 
     public sealed class EditPiece : DumpableObject
     {
-        internal int Position;
+        internal int EndPosition;
         internal int RemoveCount;
         internal string NewText;
     }
