@@ -14,18 +14,19 @@ namespace ReniUI.Formatting
 
     public static class FormatterExtension
     {
-        public static IFormatter Create(this Configuration configuration )
+        public static IFormatter Create(this Configuration configuration)
             => new HierachicalFormatter(configuration ?? new Configuration());
 
-        public static string Reformat(this Syntax syntax, SourcePart sourcePart, IFormatter formatter = null)
+        public static string Reformat
+            (this Syntax syntax, SourcePart sourcePart, IFormatter formatter = null)
             =>
                 (formatter ?? new Configuration().Create()).Reformat
                     (syntax, sourcePart);
 
-        internal static IEnumerable<EditPiece> GetEditPieces(this Syntax syntax, SourcePart sourcePart, IFormatter formatter = null)
-            =>
-                (formatter ?? new Configuration().Create()).GetEditPieces
-                    (syntax, sourcePart);
+        internal static IEnumerable<EditPiece> GetEditPieces
+            (this Syntax syntax, SourcePart sourcePart, IFormatter formatter = null)
+            => (formatter ?? new Configuration().Create())
+                .GetEditPieces(syntax, sourcePart);
 
         internal static int Length(this LineOrientedFormatter.Item2 item)
         {
@@ -45,6 +46,7 @@ namespace ReniUI.Formatting
 
             foreach(var item in lines)
                 result += item.NewValue(part);
+
             return result;
         }
 

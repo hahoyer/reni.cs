@@ -158,6 +158,7 @@ namespace ReniUI.Formatting
             var result = new ResultItems(Data);
             foreach(var item in other.Data)
                 result.Add(item);
+
             return result;
         }
 
@@ -259,6 +260,7 @@ namespace ReniUI.Formatting
                     if(targetPart.EndPosition == s.EndPosition)
                         return result;
                 }
+
                 start1 = 0;
             }
 
@@ -300,6 +302,7 @@ namespace ReniUI.Formatting
                         RemoveCount = removeCount,
                         EndPosition = sourcePart.Position
                     };
+
                     newText = "";
                     removeCount = 0;
                 }

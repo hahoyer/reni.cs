@@ -18,10 +18,7 @@ namespace Reni.Context
         [DisableDump]
         readonly ContextBase _parent;
 
-        internal Child(ContextBase parent)
-        {
-            _parent = parent;
-        }
+        internal Child(ContextBase parent) { _parent = parent; }
 
         [Node]
         [DisableDump]
@@ -37,10 +34,7 @@ namespace Reni.Context
             => Parent.ObtainRecentCompoundView();
 
         internal override IFunctionContext ObtainRecentFunctionContext()
-        {
-            Tracer.FlaggedLine(Dump());
-            return Parent.ObtainRecentFunctionContext();
-        }
+            => Parent.ObtainRecentFunctionContext();
 
         internal override IEnumerable<IImplementation> Declarations<TDefinable>
             (TDefinable tokenClass)
