@@ -8,5 +8,6 @@ namespace ReniUI
     {
         void Exit();
         void New();
+        void Open();
     }
 }

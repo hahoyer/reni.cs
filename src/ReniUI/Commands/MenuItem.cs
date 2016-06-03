@@ -25,8 +25,8 @@ namespace ReniUI.Commands
             = new CommandHandler<IStudioApplication>(s => s.New(), s => false, "New");
         public static ICommandHandler<IStudioApplication> Exit { get; }
             = new CommandHandler<IStudioApplication>(s => s.Exit(), s => true, "Exit");
-        public static ICommandHandler<EditorView> Open { get; }
-            = new CommandHandler<EditorView>(s => s.Open(), s => true, "Open");
+        public static ICommandHandler<IStudioApplication> Open { get; }
+            = new CommandHandler<IStudioApplication>(s => s.Open(), s => true, "Open");
 
         public static ICommandHandler<EditorView> FormatAll { get; }
             = new CommandHandler<EditorView>(s => s.FormatAll(), s => true, "FormatAll");

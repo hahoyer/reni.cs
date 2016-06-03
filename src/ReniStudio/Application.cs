@@ -18,14 +18,15 @@ namespace ReniStudio
         }
 
         void IStudioApplication.Exit() => ExitThread();
-
         void IStudioApplication.New() => Dumpable.NotImplementedFunction();
+        void IStudioApplication.Open() => Dumpable.NotImplementedFunction();
 
         void CheckedExit(Form child)
         {
             Children.Remove(child);
-            if(Children.Count == 0)
-                ExitThread();
+            if(Children.Any(item => item.Visible))
+                return;
+            ExitThread();
         }
     }
 }

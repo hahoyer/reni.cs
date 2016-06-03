@@ -176,8 +176,6 @@ namespace ReniUI
 
         CompilerBrowser Compiler => CompilerCache.Value;
 
-        internal void Open() => NotImplementedMethod();
-
         internal void FormatAll() => Format(Compiler.Source.All);
 
         internal void FormatSelection() => Format(SourcePart);
