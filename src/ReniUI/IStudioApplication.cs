@@ -7,7 +7,6 @@ namespace ReniUI
     public interface IStudioApplication: IApplication
     {
         void Exit();
-        void New();
         void Open();
     }
 }

@@ -37,6 +37,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="StudioApplication.cs" />
     <Compile Include="AssemblyInfo.cs">
       <DependentUpon>AssemblyInfo.tt</DependentUpon>
       <AutoGen>True</AutoGen>
@@ -71,6 +72,7 @@
     <Compile Include="CompilerBrowser.cs" />
     <Compile Include="EditorView.cs" />
     <Compile Include="Extension.cs" />
+    <Compile Include="FileOpenController.cs" />
     <Compile Include="Persister.cs" />
     <Compile Include="Formatting\Configuration.cs" />
     <Compile Include="Formatting\ContactType.cs" />
@@ -113,6 +115,7 @@
     <Compile Include="RestFul\ChannelRepo.cs" />
     <Compile Include="RestFul\IChannelRepo.cs" />
     <Compile Include="RestFul\Issue.cs" />
+    <Compile Include="SystemConfiguration.cs" />
     <Compile Include="Test\AutoComplete.cs" />
     <Compile Include="Test\AutoCompleteFunctionInCompound.cs" />
     <Compile Include="Test\AutoCompleteSimple.cs" />

@@ -8,14 +8,14 @@ namespace ReniStudio
 {
     static class MainContainer
     {
+        [STAThread]
         public static void Main()
         {
-            System.Windows.Forms.Application.EnableVisualStyles();
-            System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
-            var master = new Application();
-
-            new EditorView("test.reni", master).Run();
-            System.Windows.Forms.Application.Run(master);
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            var master = new StudioApplication();
+            master.Initialize();
+            Application.Run(master);
         }
     }
 }

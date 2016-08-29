@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using AutocompleteMenuNS;
@@ -8,7 +7,6 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 using Reni;
-using Reni.TokenClasses;
 using Reni.Validation;
 using ReniUI.Classification;
 using ReniUI.Commands;
@@ -18,9 +16,8 @@ using ScintillaNET;
 
 namespace ReniUI
 {
-    public sealed class EditorView : ChildView, IssuesView.IDataProvider
+    public sealed class EditorView : ChildView, IssuesView.IDataProvider, IEditView
     {
-        const string ConfigRoot = "StudioConfig";
         static readonly TimeSpan DelayForSave = TimeSpan.FromSeconds(1);
         static readonly TimeSpan NoPeriodicalActivation = TimeSpan.FromMilliseconds(-1);
 
@@ -48,7 +45,9 @@ namespace ReniUI
 
             internal ConfigurationClass(EditorView parent)
             {
-                FilePersister = new Persister(parent.ConfigFile);
+                var configurationPath = SystemConfiguration.GetEditorConfigurationPath
+                    (parent.FileName);
+                FilePersister = new Persister(configurationPath.FileHandle());
 
                 FilePersister.Register
                     (
@@ -79,7 +78,7 @@ namespace ReniUI
         readonly ConfigurationClass Configuration;
 
         public EditorView(string fileName, IStudioApplication master)
-            : base(master, Path.Combine(ConfigRoot, "EditorFiles", fileName, "Position"))
+            : base(master, SystemConfiguration.GetPositionPath(fileName))
         {
             FileName = fileName;
             Master = master;
@@ -114,6 +113,7 @@ namespace ReniUI
             var result = new MainMenu();
             result.MenuItems.AddRange(this.Menus().Select(item => item.CreateMenuItem()).ToArray());
             Frame.Menu = result;
+            Frame.FormClosing += (a, s) => OnClosing();
 
             IssuesView = new IssuesView(this);
 
@@ -124,20 +124,20 @@ namespace ReniUI
                 MinFragmentLength = 1
             };
 
-
             AutocompleteMenu.WrapperNeeded +=
                 (s, a) => a.Wrapper = new ScintillaWrapper((Scintilla) a.TargetControl);
             AutocompleteMenu.SetAutocompleteItems(Extension.Query(GetOptions));
         }
 
-        hw.Helper.File ConfigFile
-            => Path.Combine(ConfigRoot, "EditorFiles", FileName, "EditorConfiguration").FileHandle()
-            ;
+        void OnClosing()
+        {
+            Configuration.OnUpdate();
+        }
 
-        IEnumerable<AutocompleteItem> GetOptions() 
+        IEnumerable<AutocompleteItem> GetOptions()
             => Compiler
-            .DeclarationOptions(TextBox.SelectionStart - 1)
-            .Select(item => new AutocompleteItem(item));
+                .DeclarationOptions(TextBox.SelectionStart - 1)
+                .Select(item => new AutocompleteItem(item));
 
         void OnKeyDown(KeyEventArgs e)
         {
@@ -163,14 +163,14 @@ namespace ReniUI
 
         CompilerBrowser CreateCompilerBrowser()
             => CompilerBrowser.FromText
-                (
-                    TextBox.Text,
-                    new CompilerParameters
-                    {
-                        OutStream = new StringStream(),
-                        ProcessErrors = true
-                    },
-                    sourceIdentifier: FileName);
+            (
+                TextBox.Text,
+                new CompilerParameters
+                {
+                    OutStream = new StringStream(),
+                    ProcessErrors = true
+                },
+                sourceIdentifier: FileName);
 
         public new void Run() => base.Run();
 
@@ -182,8 +182,8 @@ namespace ReniUI
 
         SourcePart SourcePart
             =>
-                (Compiler.Source + TextBox.SelectionStart).Span
-                    (TextBox.SelectionEnd - TextBox.SelectionEnd);
+            (Compiler.Source + TextBox.SelectionStart).Span
+                (TextBox.SelectionEnd - TextBox.SelectionEnd);
 
         internal bool HasSelection() => TextBox.SelectedText != "";
 
@@ -224,7 +224,8 @@ namespace ReniUI
                 _lineNumberMarginLength = value;
                 const int Padding = 2;
                 TextBox.Margins[0].Width = TextBox.TextWidth
-                    (Style.LineNumber, new string('9', value + 1)) + Padding;
+                        (Style.LineNumber, new string('9', value + 1)) +
+                    Padding;
             }
         }
 
@@ -260,5 +261,6 @@ namespace ReniUI
         }
 
         internal void ListMembers() => TextBox.AutoCComplete();
+        string IEditView.FileName => FileName;
     }
 }

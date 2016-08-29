@@ -162,7 +162,7 @@ namespace ReniUI.Test
 };
 
 1 = 1 then 2 else 4;
-3;
+3;                 
 (Text('H') << 'allo') dump_print"
                     .Replace("\r\n", "\n");
 

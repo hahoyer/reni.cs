@@ -19,7 +19,6 @@ namespace ReniUI.Commands
                     Entries = new[]
                     {
                         target.Master.MenuItem(Command.Open),
-                        target.Master.MenuItem(Command.New),
                         target.Master.MenuItem(Command.Exit)
                     }
                 },

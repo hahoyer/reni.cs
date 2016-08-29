@@ -18,21 +18,19 @@ namespace ReniUI.Commands
     static class Command
     {
         public static ICommandHandler<EditorView> ListMembers { get; }
-            = new CommandHandler<EditorView>(s => s.ListMembers(), s => true, "ListMembers");
+        = new CommandHandler<EditorView>(s => s.ListMembers(), s => true, "ListMembers");
         public static ICommandHandler<EditorView> IssuesView { get; }
-            = new CommandHandler<EditorView>(s => s.Issues(), s => true, "Issues");
-        public static ICommandHandler<IStudioApplication> New { get; }
-            = new CommandHandler<IStudioApplication>(s => s.New(), s => false, "New");
+        = new CommandHandler<EditorView>(s => s.Issues(), s => true, "Issues");
         public static ICommandHandler<IStudioApplication> Exit { get; }
-            = new CommandHandler<IStudioApplication>(s => s.Exit(), s => true, "Exit");
+        = new CommandHandler<IStudioApplication>(s => s.Exit(), s => true, "Exit");
         public static ICommandHandler<IStudioApplication> Open { get; }
-            = new CommandHandler<IStudioApplication>(s => s.Open(), s => true, "Open");
+        = new CommandHandler<IStudioApplication>(s => s.Open(), s => true, "Open");
 
         public static ICommandHandler<EditorView> FormatAll { get; }
-            = new CommandHandler<EditorView>(s => s.FormatAll(), s => true, "FormatAll");
+        = new CommandHandler<EditorView>(s => s.FormatAll(), s => true, "FormatAll");
         public static ICommandHandler<EditorView> FormatSelection { get; }
-            = new CommandHandler<EditorView>
-                (s => s.FormatSelection(), s => s.HasSelection(), "FormatSelection");
+        = new CommandHandler<EditorView>
+            (s => s.FormatSelection(), s => s.HasSelection(), "FormatSelection");
     }
 
     sealed class CommandHandler<T> : DumpableObject, ICommandHandler<T>

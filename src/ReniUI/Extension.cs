@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using hw.DebugFormatter;
+using hw.Helper;
 using hw.Scanner;
 using ReniUI.CompilationView;
 
@@ -83,12 +84,12 @@ namespace ReniUI
 
         static Font CreateFont(double factor, bool isBold = false)
             =>
-                new Font
-                    (
-                    "Lucida Console",
-                    (int) (DefaultTextSize * factor),
-                    isBold ? FontStyle.Bold : FontStyle.Regular
-                    );
+            new Font
+            (
+                "Lucida Console",
+                (int) (DefaultTextSize * factor),
+                isBold ? FontStyle.Bold : FontStyle.Regular
+            );
 
         internal static Label CreateView(this int value, double factor = 1, bool isBold = false)
             => new Label
@@ -139,5 +140,46 @@ namespace ReniUI
             IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
+
+        internal static void OnFileOpen
+        (
+            this IFileOpenController controller,
+            string title,
+            string filter,
+            string defaultExtension,
+            int filterIndex = 2,
+            bool checkFileExists = false,
+            bool restoreDirectory = true
+        )
+        {
+            var d = new OpenFileDialog
+            {
+                Title = title,
+                RestoreDirectory = restoreDirectory,
+                InitialDirectory =
+                    controller.FileName == null
+                        ? "."
+                        : controller.FileName.FileHandle().DirectoryName,
+                FileName = controller.FileName?.FileHandle().Name,
+                Filter = filter,
+                CheckFileExists = checkFileExists,
+                FilterIndex = filterIndex,
+                DefaultExt = defaultExtension
+            };
+
+            if(d.ShowDialog() != DialogResult.OK)
+                return;
+
+            var newFile = d.FileName.FileHandle();
+            if(!newFile.Exists)
+                newFile.String = controller.CreateEmptyFile;
+            controller.FileName = d.FileName;
+        }
+    }
+
+    interface IFileOpenController
+    {
+        string FileName { get; set; }
+        string CreateEmptyFile { get; }
     }
 }

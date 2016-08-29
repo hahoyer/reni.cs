@@ -17,9 +17,11 @@ namespace ReniUI
             Frame.FormClosing += (a, b) => Application.Exit();
         }
 
-        void IApplication.Register(Form child) { Frame.Closing += (a, s) => child.Close(); }
+        void IApplication.Register(Form child)
+        {
+            Frame.Closing += (a, s) => child.Close();
+        }
 
         internal void Run() => Application.Run(Context);
-
     }
 }
