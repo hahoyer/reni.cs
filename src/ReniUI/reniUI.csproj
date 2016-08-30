@@ -37,6 +37,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FileConfiguration.cs" />
     <Compile Include="StudioApplication.cs" />
     <Compile Include="AssemblyInfo.cs">
       <DependentUpon>AssemblyInfo.tt</DependentUpon>

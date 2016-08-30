@@ -7,7 +7,6 @@ namespace ReniUI
 {
     public sealed class StudioApplication : ApplicationContext, IStudioApplication
     {
-        internal SystemConfiguration SystemConfiguration = new SystemConfiguration();
         readonly FileOpenController FileOpenController = new FileOpenController();
         readonly List<Form> Children = new List<Form>();
 
@@ -47,7 +46,10 @@ namespace ReniUI
 
         public void Initialize()
         {
-            var files = SystemConfiguration.EditorFileNames.ToArray();
+            var files = SystemConfiguration
+                .EditorFileNames
+                .Where(item=> new FileConfiguration(item).Status != "Closed")
+                .ToArray();
             if(files.Any())
                 foreach(var file in files)
                     new EditorView(file, this).Run();

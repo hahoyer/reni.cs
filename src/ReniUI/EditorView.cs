@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using AutocompleteMenuNS;
-using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 using Reni;
@@ -39,34 +38,6 @@ namespace ReniUI
             public void Start() => Timer.Change(DelayForSave, NoPeriodicalActivation);
         }
 
-        internal sealed class ConfigurationClass : DumpableObject
-        {
-            readonly Persister FilePersister;
-
-            internal ConfigurationClass(EditorView parent)
-            {
-                var configurationPath = SystemConfiguration.GetEditorConfigurationPath
-                    (parent.FileName);
-                FilePersister = new Persister(configurationPath.FileHandle());
-
-                FilePersister.Register
-                    (
-                        "Selection",
-                        item => parent.TextBox.SetSelection(item.Item1, item.Item2),
-                        () =>
-                            new Tuple<int, int>
-                                (parent.TextBox.SelectionStart, parent.TextBox.SelectionEnd))
-                    ;
-                FilePersister.Load();
-            }
-
-            internal void OnUpdate(UpdateChange change)
-            {
-                if(change.HasFlag(UpdateChange.Selection))
-                    FilePersister.Store("Selection");
-            }
-        }
-
         int _lineNumberMarginLength;
         readonly Scintilla TextBox;
         readonly ValueCache<CompilerBrowser> CompilerCache;
@@ -75,7 +46,7 @@ namespace ReniUI
         SaveManager _saveManager;
         readonly IssuesView IssuesView;
         readonly AutocompleteMenu AutocompleteMenu;
-        readonly ConfigurationClass Configuration;
+        readonly FileConfiguration Configuration;
 
         public EditorView(string fileName, IStudioApplication master)
             : base(master, SystemConfiguration.GetPositionPath(fileName))
@@ -103,8 +74,8 @@ namespace ReniUI
 
             TextBox.Text = FileName.FileHandle().String;
             TextBox.EmptyUndoBuffer();
-            Configuration = new ConfigurationClass(this);
-            TextBox.UpdateUI += (s, args) => Configuration.OnUpdate(args.Change);
+            Configuration = new FileConfiguration(FileName);
+            Configuration.Connect(TextBox);
 
             TextBox.SetSavePoint();
             AlignTitle();
@@ -113,7 +84,7 @@ namespace ReniUI
             var result = new MainMenu();
             result.MenuItems.AddRange(this.Menus().Select(item => item.CreateMenuItem()).ToArray());
             Frame.Menu = result;
-            Frame.FormClosing += (a, s) => OnClosing();
+            Frame.FormClosing += (a, s) => Configuration.OnClosing();
 
             IssuesView = new IssuesView(this);
 
@@ -127,11 +98,6 @@ namespace ReniUI
             AutocompleteMenu.WrapperNeeded +=
                 (s, a) => a.Wrapper = new ScintillaWrapper((Scintilla) a.TargetControl);
             AutocompleteMenu.SetAutocompleteItems(Extension.Query(GetOptions));
-        }
-
-        void OnClosing()
-        {
-            Configuration.OnUpdate();
         }
 
         IEnumerable<AutocompleteItem> GetOptions()
