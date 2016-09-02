@@ -7,7 +7,7 @@ namespace ReniUI
 {
     public sealed class StudioApplication : ApplicationContext, IStudioApplication
     {
-        readonly FileOpenController FileOpenController = new FileOpenController();
+        readonly FileOpenController FileOpenController = new FileOpenController(".");
         readonly List<Form> Children = new List<Form>();
 
         void IApplication.Register(Form child)
@@ -44,17 +44,27 @@ namespace ReniUI
             ExitThread();
         }
 
-        public void Initialize()
+        public void Run()
         {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+
             var files = SystemConfiguration
-                .EditorFileNames
-                .Where(item=> new FileConfiguration(item).Status != "Closed")
+                .EditorFileNames?
+                .Where(item => new FileConfiguration(item).Status != "Closed")
                 .ToArray();
-            if(files.Any())
+
+            if(files != null && files.Any())
                 foreach(var file in files)
                     new EditorView(file, this).Run();
             else
+            {
                 Open();
+                if(FileOpenController.FileName == null)
+                    return;
+            }
+
+            Application.Run(this);
         }
     }
 

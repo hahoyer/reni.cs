@@ -9,13 +9,6 @@ namespace ReniStudio
     static class MainContainer
     {
         [STAThread]
-        public static void Main()
-        {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            var master = new StudioApplication();
-            master.Initialize();
-            Application.Run(master);
-        }
+        public static void Main() => new StudioApplication().Run();
     }
 }

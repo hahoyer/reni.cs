@@ -156,10 +156,7 @@ namespace ReniUI
             {
                 Title = title,
                 RestoreDirectory = restoreDirectory,
-                InitialDirectory =
-                    controller.FileName == null
-                        ? "."
-                        : controller.FileName.FileHandle().DirectoryName,
+                InitialDirectory = InitialDirectory(controller),
                 FileName = controller.FileName?.FileHandle().Name,
                 Filter = filter,
                 CheckFileExists = checkFileExists,
@@ -175,11 +172,17 @@ namespace ReniUI
                 newFile.String = controller.CreateEmptyFile;
             controller.FileName = d.FileName;
         }
+
+        static string InitialDirectory(IFileOpenController controller) 
+            => controller.FileName == null
+            ? controller.DefaultDirectory.FileHandle().FullName
+            : controller.FileName.FileHandle().DirectoryName;
     }
 
     interface IFileOpenController
     {
         string FileName { get; set; }
         string CreateEmptyFile { get; }
+        string DefaultDirectory { get; }
     }
 }

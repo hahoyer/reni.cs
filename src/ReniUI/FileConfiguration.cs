@@ -10,12 +10,18 @@ namespace ReniUI
     sealed class FileConfiguration : DumpableObject
     {
         readonly string FileName;
-        public FileConfiguration(string fileName) { FileName = fileName; }
+        readonly ValueCache<Persister> FilePersister;
 
-        internal Persister FilePersister
-            =>
-            new Persister(SystemConfiguration.GetEditorConfigurationPath(FileName).FileHandle())
-            ;
+        public FileConfiguration(string fileName)
+        {
+            FileName = fileName;
+            FilePersister = new ValueCache<Persister>
+            (
+                () =>
+                    new Persister
+                        (SystemConfiguration.GetEditorConfigurationPath(FileName).FileHandle()));
+        }
+
 
         internal string Status
         {
@@ -39,12 +45,12 @@ namespace ReniUI
         internal void OnUpdate(UpdateChange change)
         {
             if(change.HasFlag(UpdateChange.Selection))
-                FilePersister.Store("Selection");
+                FilePersister.Value.Store("Selection");
         }
 
         internal void Connect(Scintilla editor)
         {
-            FilePersister.Register
+            FilePersister.Value.Register
                 (
                     "Selection",
                     item => editor.SetSelection(item.Item1, item.Item2),
@@ -52,7 +58,7 @@ namespace ReniUI
                         new Tuple<int, int>
                             (editor.SelectionStart, editor.SelectionEnd))
                 ;
-            FilePersister.Load();
+            FilePersister.Value.Load();
             Status = "Open";
             editor.UpdateUI += (s, args) => OnUpdate(args.Change);
         }

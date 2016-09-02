@@ -37,8 +37,12 @@ namespace ReniUI
             Tracer.Assert(fullFileName.StartsWith(projectPath));
             var fileName = fullFileName.Substring(projectPath.Length);
 
+            var fileHandle = EditorFilesPath.PathCombine(fileName).FileHandle();
+            fileHandle.AssumeDirectoryOfFileExists();
+
             var result = ConfigurationPaths
-                .SingleOrDefault(item => GetEditorFileName(item).FileHandle().FullName == fullFileName);
+                .SingleOrDefault
+                (item => GetEditorFileName(item).FileHandle().FullName == fullFileName);
 
             return result ?? NewConfigurationPath(fileName);
         }
@@ -55,7 +59,7 @@ namespace ReniUI
                     .Select(item => item.Name)
                     .Count(item => item.StartsWith(configurationFileName));
 
-                if (duplicates == 0)
+                if(duplicates == 0)
                 {
                     var result = Path.Combine(EditorFilesPath, configurationFileName);
                     var nameFile = Path.Combine(result, "Name").FileHandle();
@@ -65,17 +69,25 @@ namespace ReniUI
                 }
 
                 configurationFileName += "_" + duplicates;
-            } 
+            }
         }
 
         internal static IEnumerable<string> EditorFileNames
-            => ConfigurationPaths.Select(GetEditorFileName);
+            => ConfigurationPaths?.Select(GetEditorFileName);
 
         static IEnumerable<string> ConfigurationPaths
-            => EditorFilesPath
-                .FileHandle()
-                .Items
-                .Select(item => item.FullName);
+        {
+            get
+            {
+                var fileHandle = EditorFilesPath.FileHandle();
+                if(fileHandle.Exists)
+                    return fileHandle
+                        .Items
+                        .Select(item => item.FullName);
+
+                return null;
+            }
+        }
 
         static string GetEditorFileName(string configurationPath)
             => Path.Combine(configurationPath, "Name").FileHandle().String;
