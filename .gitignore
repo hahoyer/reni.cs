@@ -10,3 +10,5 @@ obj/
 /src/packages/**
 *.sln.ide
 /src/artifacts/bin
+/src/.idea
+/src/reni2.sdf
