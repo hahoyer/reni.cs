@@ -26,7 +26,10 @@ namespace hw.Helper
         ///     constructs a FileInfo
         /// </summary>
         /// <param name="name"> the filename </param>
-        internal static File Create(string name) { return new File(name); }
+        internal static File Create(string name)
+        {
+            return new File(name);
+        }
 
         File(string name) { _name = name; }
 
@@ -53,12 +56,18 @@ namespace hw.Helper
                     if(Uri.Scheme == Uri.UriSchemeHttp)
                         return StringFromHTTP;
                 }
-                catch
-                {}
+                catch {}
+
                 return null;
             }
             set
             {
+                if(value == null)
+                {
+                    Delete();
+                    return;
+                }
+
                 var f = System.IO.File.CreateText(_name);
                 f.Write(value);
                 f.Close();
@@ -70,6 +79,7 @@ namespace hw.Helper
             var dn = DirectoryName;
             if(dn == null || dn.FileHandle().Exists)
                 return;
+
             Directory.CreateDirectory(dn);
         }
 
@@ -121,6 +131,7 @@ namespace hw.Helper
         ///     Gets the full path of the directory or file.
         /// </summary>
         public string FullName { get { return FileSystemInfo.FullName; } }
+
         public string DirectoryName { get { return Path.GetDirectoryName(FullName); } }
         public string Extension { get { return Path.GetExtension(FullName); } }
 
@@ -145,6 +156,7 @@ namespace hw.Helper
                     return false;
                 if((FileSystemInfo.Attributes & FileAttributes.ReparsePoint) == 0)
                     return false;
+
                 try
                 {
                     ((DirectoryInfo) FileSystemInfo).GetFileSystemInfos("dummy");
@@ -167,6 +179,7 @@ namespace hw.Helper
             else
                 System.IO.File.Delete(_name);
         }
+
         /// <summary>
         ///     Move the file
         /// </summary>
@@ -211,10 +224,15 @@ namespace hw.Helper
                 result += fi.Name;
                 result += "\n";
             }
+
             return result;
         }
 
-        FileSystemInfo[] GetItems() { return ((DirectoryInfo) FileSystemInfo).GetFileSystemInfos().ToArray(); }
+        FileSystemInfo[] GetItems()
+        {
+            return ((DirectoryInfo) FileSystemInfo).GetFileSystemInfos().ToArray();
+        }
+
         public File[] Items { get { return GetItems().Select(f => Create(f.FullName)).ToArray(); } }
 
         /// <summary>
@@ -222,7 +240,10 @@ namespace hw.Helper
         /// </summary>
         /// <param name="depth"> The depth. </param>
         /// <returns> </returns>
-        public static string SourcePath(int depth) { return new FileInfo(SourceFileName(depth + 1)).DirectoryName; }
+        public static string SourcePath(int depth)
+        {
+            return new FileInfo(SourceFileName(depth + 1)).DirectoryName;
+        }
 
         /// <summary>
         ///     Gets the name of the source file that called this function
@@ -234,6 +255,7 @@ namespace hw.Helper
             var sf = new StackTrace(true).GetFrame(depth + 1);
             return sf.GetFileName();
         }
+
         /// <summary>
         ///     Gets list of files that match given path and pattern
         /// </summary>
@@ -243,7 +265,8 @@ namespace hw.Helper
         {
             var namePattern = filePattern.Split('\\').Last();
             return Directory
-                .GetFiles(filePattern.Substring(0, filePattern.Length - namePattern.Length - 1), namePattern);
+                .GetFiles
+                (filePattern.Substring(0, filePattern.Length - namePattern.Length - 1), namePattern);
         }
 
         public bool IsLocked

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 using hw.DebugFormatter;
 using hw.Helper;
 using ScintillaNET;
@@ -9,46 +11,41 @@ namespace ReniUI
 {
     sealed class FileConfiguration : DumpableObject
     {
-        readonly string FileName;
+        internal readonly string FileName;
         readonly ValueCache<Persister> FilePersister;
 
         public FileConfiguration(string fileName)
         {
             FileName = fileName;
             FilePersister = new ValueCache<Persister>
-            (
-                () =>
-                    new Persister
-                        (SystemConfiguration.GetEditorConfigurationPath(FileName).FileHandle()));
+                (() => new Persister(ItemFile("EditorConfiguration")));
         }
-
 
         internal string Status
         {
-            get { return StatusFile.String; }
-            set { StatusFile.String = value; }
+            get { return ItemFile("Status").String; }
+            private set { ItemFile("Status").String = value; }
         }
 
-        File StatusFile
+        internal DateTime? LastUsed
         {
-            get
-            {
-                var statusFileName = SystemConfiguration.GetConfigurationPath(FileName)
-                    .PathCombine("Status");
-                var fileHandle = statusFileName.FileHandle();
-                return fileHandle;
-            }
+            get { return FromDateTime(ItemFile("LastUsed").String); }
+            private set { ItemFile("LastUsed").String = value?.ToString("O"); }
         }
 
-        internal void OnClosing() { Status = "Closed"; }
-
-        internal void OnUpdate(UpdateChange change)
+        static DateTime? FromDateTime(string value)
         {
-            if(change.HasFlag(UpdateChange.Selection))
-                FilePersister.Value.Store("Selection");
+            if(value == null)
+                return null;
+
+            DateTime result;
+            if(DateTime.TryParse(value, out result))
+                return result;
+
+            return null;
         }
 
-        internal void Connect(Scintilla editor)
+        internal void ConnectToEditor(Scintilla editor)
         {
             FilePersister.Value.Register
                 (
@@ -62,5 +59,29 @@ namespace ReniUI
             Status = "Open";
             editor.UpdateUI += (s, args) => OnUpdate(args.Change);
         }
+
+        internal void ConnectToFrame(Form frame)
+        {
+            frame.FormClosing += (a, s) => OnClosing();
+            frame.Activated += (a, s) => LastUsed = DateTime.Now;
+        }
+
+        hw.Helper.File ItemFile(string itemName) => ItemFileName(itemName).FileHandle();
+
+        string ItemFileName(string itemName)
+            => SystemConfiguration
+                .GetConfigurationPath(FileName)
+                .PathCombine(itemName);
+
+        void OnClosing() { Status = "Closed"; }
+        void OnActivated() { LastUsed = DateTime.Now; }
+
+        void OnUpdate(UpdateChange change)
+        {
+            if(change.HasFlag(UpdateChange.Selection))
+                FilePersister.Value.Store("Selection");
+        }
+
+        internal string PositionPath => ItemFileName("Position");
     }
 }

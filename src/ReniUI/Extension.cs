@@ -141,48 +141,6 @@ namespace ReniUI
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
-        internal static void OnFileOpen
-        (
-            this IFileOpenController controller,
-            string title,
-            string filter,
-            string defaultExtension,
-            int filterIndex = 2,
-            bool checkFileExists = false,
-            bool restoreDirectory = true
-        )
-        {
-            var d = new OpenFileDialog
-            {
-                Title = title,
-                RestoreDirectory = restoreDirectory,
-                InitialDirectory = InitialDirectory(controller),
-                FileName = controller.FileName?.FileHandle().Name,
-                Filter = filter,
-                CheckFileExists = checkFileExists,
-                FilterIndex = filterIndex,
-                DefaultExt = defaultExtension
-            };
-
-            if(d.ShowDialog() != DialogResult.OK)
-                return;
-
-            var newFile = d.FileName.FileHandle();
-            if(!newFile.Exists)
-                newFile.String = controller.CreateEmptyFile;
-            controller.FileName = d.FileName;
-        }
-
-        static string InitialDirectory(IFileOpenController controller) 
-            => controller.FileName == null
-            ? controller.DefaultDirectory.FileHandle().FullName
-            : controller.FileName.FileHandle().DirectoryName;
     }
 
-    interface IFileOpenController
-    {
-        string FileName { get; set; }
-        string CreateEmptyFile { get; }
-        string DefaultDirectory { get; }
-    }
 }

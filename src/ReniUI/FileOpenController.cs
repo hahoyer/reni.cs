@@ -6,17 +6,17 @@ namespace ReniUI
 {
     sealed class FileOpenController : IFileOpenController
     {
-        internal string FileName;
         readonly string DefaultDirectory;
-        internal FileOpenController(string defaultDirectory) { DefaultDirectory = defaultDirectory; }
 
-        string IFileOpenController.FileName { get { return FileName; } set { FileName = value; } }
+        internal FileOpenController(string defaultDirectory)
+        {
+            DefaultDirectory = defaultDirectory;
+        }
+
+        string IFileOpenController.FileName { get; set; }
 
         string IFileOpenController.CreateEmptyFile => "";
 
         string IFileOpenController.DefaultDirectory => DefaultDirectory;
-
-        public void OnOpen()
-            => this.OnFileOpen("Reni file", "Reni files|*.reni|All files|*.*", "reni");
     }
 }

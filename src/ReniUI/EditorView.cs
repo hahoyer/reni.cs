@@ -41,17 +41,16 @@ namespace ReniUI
         int _lineNumberMarginLength;
         readonly Scintilla TextBox;
         readonly ValueCache<CompilerBrowser> CompilerCache;
-        readonly string FileName;
         internal readonly IStudioApplication Master;
         SaveManager _saveManager;
         readonly IssuesView IssuesView;
         readonly AutocompleteMenu AutocompleteMenu;
         readonly FileConfiguration Configuration;
 
-        public EditorView(string fileName, IStudioApplication master)
-            : base(master, SystemConfiguration.GetPositionPath(fileName))
+        internal EditorView(FileConfiguration configuration, IStudioApplication master)
+            : base(master, configuration.PositionPath)
         {
-            FileName = fileName;
+            Configuration = configuration;
             Master = master;
             TextBox = new Scintilla
             {
@@ -72,10 +71,9 @@ namespace ReniUI
 
             Client = TextBox;
 
-            TextBox.Text = FileName.FileHandle().String;
+            TextBox.Text = Configuration.FileName.FileHandle().String;
             TextBox.EmptyUndoBuffer();
-            Configuration = new FileConfiguration(FileName);
-            Configuration.Connect(TextBox);
+            Configuration.ConnectToEditor(TextBox);
 
             TextBox.SetSavePoint();
             AlignTitle();
@@ -84,7 +82,6 @@ namespace ReniUI
             var result = new MainMenu();
             result.MenuItems.AddRange(this.Menus().Select(item => item.CreateMenuItem()).ToArray());
             Frame.Menu = result;
-            Frame.FormClosing += (a, s) => Configuration.OnClosing();
 
             IssuesView = new IssuesView(this);
 
@@ -122,7 +119,7 @@ namespace ReniUI
         void SaveFile()
         {
             _saveManager = null;
-            FileName.FileHandle().String = TextBox.Text;
+            Configuration.FileName.FileHandle().String = TextBox.Text;
             TextBox.SetSavePoint();
             AlignTitle();
         }
@@ -136,9 +133,13 @@ namespace ReniUI
                     OutStream = new StringStream(),
                     ProcessErrors = true
                 },
-                sourceIdentifier: FileName);
+                sourceIdentifier: Configuration.FileName);
 
-        public new void Run() => base.Run();
+        internal new void Run()
+        {
+            base.Run();
+            Configuration.ConnectToFrame(Frame);
+        }
 
         CompilerBrowser Compiler => CompilerCache.Value;
 
@@ -161,7 +162,7 @@ namespace ReniUI
             CompilerCache.IsValid = false;
         }
 
-        void AlignTitle() { Title = FileName + (TextBox.Modified ? "*" : ""); }
+        void AlignTitle() { Title = Configuration.FileName + (TextBox.Modified ? "*" : ""); }
 
         void StyleConfig(TextStyle id) => id.Config(TextBox.Styles[id]);
 
@@ -227,6 +228,6 @@ namespace ReniUI
         }
 
         internal void ListMembers() => TextBox.AutoCComplete();
-        string IEditView.FileName => FileName;
+        string IEditView.FileName => Configuration.FileName;
     }
 }

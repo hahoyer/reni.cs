@@ -117,7 +117,7 @@ namespace ReniUI
 
         hw.Helper.File FileHandle(string name)
         {
-            var result = Path.Combine(FileName, name).FileHandle();
+            var result = FileName.PathCombine(name).FileHandle();
             result.AssumeDirectoryOfFileExists();
             return result;
         }

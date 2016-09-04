@@ -16,7 +16,8 @@ namespace Reni.TokenClasses
         internal virtual IEnumerable<IDeclarationProvider> Genericize
             => this.GenericListFromDefinable();
 
-        internal Result<Parser.Value> CreateForVisit(Syntax parent, Parser.Value left, Parser.Value right)
+        internal Result<Parser.Value> CreateForVisit
+            (Syntax parent, Parser.Value left, Parser.Value right)
             => ExpressionSyntax.Create(parent, left, this, right);
 
         Result<Declarator> IDeclaratorTokenClass.Get(Syntax syntax)
@@ -33,7 +34,7 @@ namespace Reni.TokenClasses
                 return d.Target.WithName(this);
             }
 
-            NotImplementedMethod(syntax);
+            Tracer.FlaggedLine(nameof(syntax) + "=" + syntax);
             return null;
         }
 
@@ -58,7 +59,7 @@ namespace Reni.TokenClasses
                 p is ScannerSyntaxError)
                 return false;
 
-            NotImplementedMethod(syntax);
+            Tracer.FlaggedLine(nameof(syntax) + "=" + syntax);
             return false;
         }
     }
