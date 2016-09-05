@@ -1,0 +1,27 @@
+! local name: /!\ string("name");
+
+CompilerTest: /\
+(
+    ! local file: TextFile(name);
+    file data := ^;
+    compiler: Compiler(name);
+);
+
+Check: /\
+(
+    text: string(^ text);
+    expectedResult: string(^ expectedResult);
+
+    ct: CompilerTest(text);
+
+    co: ct Compiler;
+    result: co Execute();
+
+    result data != expectedResult then
+    (
+        dd("Text: " << System NewLine << text << System NewLine);
+        d(expectedResult);
+        dd("c++ code:" << System NewLine << co cppCode << System NewLine);
+        a_fail_throw_;
+    )
+)
