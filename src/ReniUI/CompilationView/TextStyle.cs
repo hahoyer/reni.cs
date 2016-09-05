@@ -28,7 +28,7 @@ namespace ReniUI.CompilationView
         public static readonly TextStyle Text = new TextStyle(Color.Red);
         [UsedImplicitly]
         public static readonly TextStyle Error = new TextStyle
-            (
+        (
             Color.Red,
             isItalic: true,
             isUnderlined: true);
@@ -36,19 +36,27 @@ namespace ReniUI.CompilationView
         [UsedImplicitly]
         public static TextStyle From(Token token, CompilerBrowser compiler)
         {
-            if(token.IsError)
+            try
+            {
+                if(token.IsError)
+                    return Error;
+                if(token.IsBraceLike && compiler.FindAllBelongings(token).Skip(1).Any())
+                    return token.IsBrace ? Brace : BraceLikeKeyWord;
+                if(token.IsKeyword)
+                    return KeyWord;
+                if(token.IsComment || token.IsLineComment)
+                    return Comment;
+                if(token.IsNumber)
+                    return Number;
+                if(token.IsText)
+                    return Text;
+
+                return Default;
+            }
+            catch(Exception)
+            {
                 return Error;
-            if(token.IsBraceLike && compiler.FindAllBelongings(token).Skip(1).Any())
-                return token.IsBrace ? Brace : BraceLikeKeyWord;
-            if(token.IsKeyword)
-                return KeyWord;
-            if(token.IsComment || token.IsLineComment)
-                return Comment;
-            if(token.IsNumber)
-                return Number;
-            if(token.IsText)
-                return Text;
-            return Default;
+            }
         }
 
         public static implicit operator int(TextStyle v) => v.Id;
@@ -62,7 +70,7 @@ namespace ReniUI.CompilationView
         readonly bool IsUnderlined;
 
         TextStyle
-            (
+        (
             Color foreColor,
             Color? backColor = null,
             bool isBold = false,
