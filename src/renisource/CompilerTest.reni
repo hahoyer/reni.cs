@@ -1,3 +1,5 @@
+! mix_in: system;
+
 ! local name: /!\ string("name");
 
 CompilerTest: /\
