@@ -70,6 +70,7 @@ namespace Reni.TokenClasses
                 yield return ConverterToken.TokenId;
                 yield return MutableDeclarationToken.TokenId;
                 yield return MixInDeclarationToken.TokenId;
+                yield return LocalDeclarationToken.TokenId;
             }
         }
     }
@@ -89,6 +90,12 @@ namespace Reni.TokenClasses
     sealed class MixInDeclarationToken : DeclarationTagToken
     {
         internal const string TokenId = "mix_in";
+        public override string Id => TokenId;
+    }
+
+    sealed class LocalDeclarationToken : DeclarationTagToken
+    {
+        internal const string TokenId = "local";
         public override string Id => TokenId;
     }
 }

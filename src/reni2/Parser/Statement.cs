@@ -44,6 +44,9 @@ namespace Reni.Parser
         [DisableDump]
         internal bool IsMutableSyntax => Tags.Any(item => item is MutableDeclarationToken);
 
+        [DisableDump]
+        internal bool IsLocalSyntax => Tags.Any(item => item is LocalDeclarationToken);
+
         protected override string GetNodeDump()
             => base.GetNodeDump() +
                 (Name == null ? "" : "(" + Name + ")");

@@ -73,6 +73,8 @@ namespace Reni.Struct
         internal int[] Converters => IndexList(item => item.IsConverter).ToArray();
         [EnableDump]
         internal int[] MixIns => IndexList(item => item.IsMixIn).ToArray();
+        [EnableDump]
+        internal int[] Locals => IndexList(item => item.IsLocal).ToArray();
 
         IEnumerable<int> IndexList(Func<Data, bool> selector)
         {
@@ -115,6 +117,7 @@ namespace Reni.Struct
             => GetType().PrettyName() + "(" + GetCompoundIdentificationDump() + ")";
 
         internal bool IsMutable(int position) => _data[position].IsMutable;
+        internal bool IsLocal(int position) => _data[position].IsLocal;
 
         public override string DumpData()
         {
@@ -188,6 +191,7 @@ namespace Reni.Struct
             public bool IsMixIn => RawStatement.IsMixInSyntax;
             public IEnumerable<string> Names => NamesCache.Value;
             public bool IsMutable => RawStatement.IsMutableSyntax;
+            public bool IsLocal => RawStatement.IsLocalSyntax;
 
             Result<Value> GetStatement() => RawStatement.Body;
             string[] GetNames() => RawStatement.GetDeclarations().ToArray();
