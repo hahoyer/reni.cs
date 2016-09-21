@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
@@ -40,7 +41,7 @@ namespace Reni
         {
             Tracer.Assert(text != null);
             return new Compiler
-                (
+            (
                 new Source(text, sourceIdentifier ?? DefaultSourceIdentifier),
                 DefaultModuleName,
                 parameters);
@@ -177,31 +178,40 @@ namespace Reni
             if(Parameters.TraceOptions.ExecutedCode)
                 Tracer.FlaggedLine(CSharpString);
 
-            if (Parameters.OutStream != null)
+            if(Parameters.OutStream != null)
                 foreach(var t in Issues)
                     Parameters.OutStream.AddLog(t.LogDump + "\n");
 
+            var method = CSharpMethod;
+
+            if(method == null)
+                return;
+
             Data.OutStream = Parameters.OutStream;
+            _isInExecutionPhase = true;
+            method.Invoke(null, new object[0]);
+            _isInExecutionPhase = false;
+            Data.OutStream = null;
+        }
 
-            try
+        MethodInfo CSharpMethod
+        {
+            get
             {
-                var method = CSharpString
-                    .CodeToAssembly(Parameters.TraceOptions.GeneratorFilePosn, Debugger.IsAttached)
-                    .GetExportedTypes()[0]
-                    .GetMethod(Generator.MainFunctionName);
+                try
+                {
+                    return CSharpString
+                        .CodeToAssembly(Parameters.TraceOptions.GeneratorFilePosn, Debugger.IsAttached)
+                        .GetExportedTypes()[0]
+                        .GetMethod(Generator.MainFunctionName);
+                }
+                catch (CSharpCompilerErrorException e)
+                {
+                    for (var i = 0; i < e.CompilerErrorCollection.Count; i++)
+                        Parameters.OutStream.AddLog(e.CompilerErrorCollection[i] + "\n");
+                    return null;
+                }
 
-                _isInExecutionPhase = true;
-                method.Invoke(null, new object[0]);
-            }
-            catch(CSharpCompilerErrorException e)
-            {
-                for(var i = 0; i < e.CompilerErrorCollection.Count; i++)
-                    Parameters.OutStream.AddLog(e.CompilerErrorCollection[i] + "\n");
-            }
-            finally
-            {
-                _isInExecutionPhase = false;
-                Data.OutStream = null;
             }
         }
 
