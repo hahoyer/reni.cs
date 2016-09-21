@@ -16,10 +16,8 @@ using Reni.Type;
 namespace Reni.Context
 {
     sealed class Root
-        : ContextBase
-            ,
-            ISymbolProviderForPointer<Minus>
-            ,
+        : ContextBase,
+            ISymbolProviderForPointer<Minus>,
             ISymbolProviderForPointer<ConcatArrays>
     {
         [DisableDump]

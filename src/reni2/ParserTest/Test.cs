@@ -14,7 +14,6 @@ namespace Reni.ParserTest
         public void SimpleFunction()
         {
             var syntaxPrototype = LikeSyntax.Expression(null, "f", LikeSyntax.Null);
-            Parameters.TraceOptions.Source = true;
             Parameters.ParseOnly = true;
             CreateFileAndRunCompiler
                 (
