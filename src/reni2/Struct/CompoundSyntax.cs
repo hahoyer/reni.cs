@@ -33,7 +33,7 @@ namespace Reni.Struct
         readonly Statement[] _statements;
         readonly Data[] _data;
         readonly Value CleanupSection;
-        static readonly string _runId = Compiler.FormattedNow + "\n";
+        static readonly string _runId = Extension.GetFormattedNow() + "\n";
         internal static bool IsInContainerDump;
         static bool _isInsideFileDump;
         static int _nextObjectId;

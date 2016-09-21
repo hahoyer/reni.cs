@@ -49,10 +49,6 @@ namespace Reni
 
             [Node]
             [EnableDump]
-            public bool Source;
-
-            [Node]
-            [EnableDump]
             public bool Parser;
 
             [Node]
@@ -64,7 +60,6 @@ namespace Reni
 
             public void None()
             {
-                Source = false;
                 Syntax = false;
                 Parser = false;
                 CodeSequence = false;
@@ -74,7 +69,6 @@ namespace Reni
 
             public void UseOnModeErrorFocus()
             {
-                Source = true;
                 Syntax = true;
                 CodeSequence = true;
                 ExecutedCode = true;

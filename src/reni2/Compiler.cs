@@ -103,24 +103,6 @@ namespace Reni
         [Node]
         internal string CSharpString => this.CachedValue(() => CodeContainer.CSharpString);
 
-        internal static string FormattedNow
-        {
-            get
-            {
-                var n = DateTime.Now;
-                var result = "Date";
-                result += n.Year.ToString("0000");
-                result += n.Month.ToString("00");
-                result += n.Day.ToString("00");
-                result += "Time";
-                result += n.Hour.ToString("00");
-                result += n.Minute.ToString("00");
-                result += n.Second.ToString("00");
-                result += n.Millisecond.ToString("000");
-                return result;
-            }
-        }
-
         bool IsTraceEnabled
             => _isInExecutionPhase && Parameters.TraceOptions.Functions;
 
@@ -155,9 +137,6 @@ namespace Reni
         /// </summary>
         public void Execute()
         {
-            if(Parameters.TraceOptions.Source)
-                Tracer.Line("Dump Source\n" + Source.Dump());
-
             if(Parameters.TraceOptions.Syntax)
                 Tracer.FlaggedLine("Syntax\n" + Syntax.Dump());
 
