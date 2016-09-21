@@ -64,6 +64,7 @@ namespace Reni
         [UsedImplicitly]
         public Exception Exception;
         readonly ValueCache<CodeContainer> CodeContainerCache;
+        readonly ValueCache<Syntax> SyntaxCache;
 
         Compiler(Source source, string modulName, CompilerParameters parameters)
         {
@@ -79,6 +80,8 @@ namespace Reni
 
             CodeContainerCache = NewValueCache
                 (() => new CodeContainer(ModuleName, Root, Syntax, Source.Data));
+            SyntaxCache = NewValueCache(() => Parse(Source + 0));
+
         }
 
         static string ModuleNameFromFileName(string fileName)
@@ -137,11 +140,11 @@ namespace Reni
         /// </summary>
         public void Execute()
         {
-            if(Parameters.TraceOptions.Syntax)
-                Tracer.FlaggedLine("Syntax\n" + Syntax.Dump());
-
             if(Parameters.ParseOnly)
+            {
+                SyntaxCache.IsValid = true;
                 return;
+            }
 
             if(Parameters.TraceOptions.CodeSequence)
                 Tracer.FlaggedLine("Code\n" + CodeContainer.Dump());
