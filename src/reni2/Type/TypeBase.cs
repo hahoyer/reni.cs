@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
@@ -63,24 +62,24 @@ namespace Reni.Type
             {
                 EnableCut = new ValueCache<EnableCut>(() => new EnableCut(parent));
                 Mutation = new FunctionCache<TypeBase, ResultCache>
-                    (
+                (
                     destination =>
-                        new ResultCache(category => parent.Mutation(category, destination))
-                    );
+                            new ResultCache(category => parent.Mutation(category, destination))
+                );
                 ForcedReference = new ValueCache<IReference>(parent.GetForcedReferenceForCache);
                 Pointer = new ValueCache<PointerType>(parent.GetPointerForCache);
                 Pair = new FunctionCache<TypeBase, Pair>(first => new Pair(first, parent));
                 Array = new FunctionCache<int, FunctionCache<string, ArrayType>>
-                    (
+                (
                     count
                         =>
-                        new FunctionCache<string, ArrayType>
+                            new FunctionCache<string, ArrayType>
                             (
-                            optionsId
-                                =>
-                                parent.GetArrayForCache(count, optionsId)
+                                optionsId
+                                    =>
+                                        parent.GetArrayForCache(count, optionsId)
                             )
-                    );
+                );
 
                 Aligner = new FunctionCache<int, AlignType>
                     (alignBits => new AlignType(parent, alignBits));
@@ -175,9 +174,9 @@ namespace Reni.Type
         [DisableDump]
         internal TypeBase AutomaticDereferenceType
             =>
-                IsWeakReference
-                    ? CheckedReference.Converter.ResultType().AutomaticDereferenceType
-                    : this;
+            IsWeakReference
+                ? CheckedReference.Converter.ResultType().AutomaticDereferenceType
+                : this;
 
         [DisableDump]
         internal TypeBase SmartPointer => Hllw ? this : Pointer;
@@ -254,42 +253,42 @@ namespace Reni.Type
                 return Result(category);
 
             return new Result
-                (
+            (
                 category,
                 getType: () => this,
                 getCode: () => CodeBase.ReferenceCode(target)
-                );
+            );
         }
 
         internal Result Result(Category category, Result codeAndExts) => new Result
-            (
+        (
             category,
             getType: () => this,
             getCode: () => codeAndExts.Code,
             getExts: () => codeAndExts.Exts
-            );
+        );
 
         internal Result Result(Category category, Func<Category, Result> getCodeAndRefs)
         {
             var localCategory = category & (Category.Code | Category.Exts);
             var codeAndExts = getCodeAndRefs(localCategory);
             return Result
-                (
-                    category,
-                    () => codeAndExts.Code,
-                    () => codeAndExts.Exts
-                );
+            (
+                category,
+                () => codeAndExts.Code,
+                () => codeAndExts.Exts
+            );
         }
 
         internal Result Result
             (Category category, Func<CodeBase> getCode = null, Func<CodeArgs> getArgs = null)
             => new Result
-                (
+            (
                 category,
                 getType: () => this,
                 getCode: getCode,
                 getExts: getArgs
-                );
+            );
 
         internal TypeBase CommonType(TypeBase elseType)
         {
@@ -313,11 +312,11 @@ namespace Reni.Type
                 return combination.Single().Item1;
 
             NotImplementedMethod
-                (
-                    elseType,
-                    nameof(combination),
-                    combination
-                );
+            (
+                elseType,
+                nameof(combination),
+                combination
+            );
             return null;
         }
 
@@ -420,12 +419,12 @@ namespace Reni.Type
                 return Result(category);
 
             return new Result
-                (
+            (
                 category,
                 getType: () => this,
                 getCode:
-                    () => CodeBase.ReferenceCode(target).ReferencePlus(getOffset()).DePointer(Size)
-                );
+                () => CodeBase.ReferenceCode(target).ReferencePlus(getOffset()).DePointer(Size)
+            );
         }
 
         protected virtual IReference GetForcedReferenceForCache()
@@ -506,7 +505,7 @@ namespace Reni.Type
 
         internal TypeBase SmartUn<T>()
             where T : IConversion
-            => this is T ? ((IConversion) this).Result(Category.Type).Type : this;
+        => this is T ? ((IConversion) this).Result(Category.Type).Type : this;
 
         internal Result ResultFromPointer(Category category, TypeBase resultType) => resultType
             .Pointer
@@ -594,17 +593,14 @@ namespace Reni.Type
         [DisableDump]
         internal virtual IEnumerable<string> DeclarationOptions
             => Root
-                .AllTokenClasses
+                .AllDefinables
                 .Where(IsDeclarationOption)
                 .Select(item => item.Id)
                 .OrderBy(item => item)
                 .ToArray();
 
-        bool IsDeclarationOption(ScannerTokenClass tokenClass)
-        {
-            var definable = tokenClass as Definable;
-            return definable != null && DeclarationsForType(definable).Any();
-        }
+        bool IsDeclarationOption(Definable tokenClass)
+            => DeclarationsForType(tokenClass).Any();
 
         [DisableDump]
         protected virtual IEnumerable<IGenericProviderForType> Genericize
@@ -685,9 +681,9 @@ namespace Reni.Type
 
         Result DereferencesObjectResult(Category category)
             =>
-                Hllw
-                    ? Result(category)
-                    : Pointer.Result(category.Typed, ForcedReference).DereferenceResult;
+            Hllw
+                ? Result(category)
+                : Pointer.Result(category.Typed, ForcedReference).DereferenceResult;
 
         internal Result ObjectResult(Category category)
             => Hllw ? Result(category) : Pointer.Result(category.Typed, ForcedReference);
@@ -703,29 +699,29 @@ namespace Reni.Type
 
         protected virtual IssueType CreateIssue(Syntax source, IssueId issueId)
             => new RootIssueType
-                (
+            (
                 new Issue(issueId, source, "Type: " + DumpPrintText),
                 Root
-                );
+            );
 
         internal Result Execute
             (
-            Category category,
-            ResultCache left,
-            Syntax token,
-            Definable definable,
-            ContextBase context,
-            Parser.Value right
+                Category category,
+                ResultCache left,
+                Syntax token,
+                Definable definable,
+                ContextBase context,
+                Parser.Value right
             )
             => ExecuteDeclaration
-                (
-                    definable,
-                    result => result.Execute(category, left, token, context, right),
-                    issueId => IssueResult(token, issueId, category)
-                );
+            (
+                definable,
+                result => result.Execute(category, left, token, context, right),
+                issueId => IssueResult(token, issueId, category)
+            );
 
         TResult ExecuteDeclaration<TResult>
-            (
+        (
             Definable definable,
             Func<SearchResult, TResult> execute,
             Func<IssueId, TResult> onError)

@@ -336,9 +336,9 @@ namespace Reni.Struct
                 .AccessType(ViewPosition, position)
                 .TypeForStructureElement;
 
-        internal IImplementation Find(Definable definable)
+        internal IImplementation Find(Definable definable, bool publicOnly)
         {
-            var position = Compound.Syntax.Find(definable?.Id);
+            var position = Compound.Syntax.Find(definable?.Id, publicOnly);
             return position == null ? null : AccessFeature(position.Value);
         }
 
@@ -368,7 +368,7 @@ namespace Reni.Struct
                 yield return DumpPrintToken.TokenId;
                 yield return AtToken.TokenId;
 
-                foreach(var name in Compound.Syntax.Names)
+                foreach(var name in Compound.Syntax.AllNames)
                     yield return name;
             }
         }

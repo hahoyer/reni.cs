@@ -75,13 +75,13 @@ namespace Reni.Struct
             => Feature.Extension.Value(DumpPrintTokenResult);
 
         IImplementation ISymbolProviderForPointer<Definable>.Feature(Definable tokenClass)
-            => View.Find(tokenClass);
+            => View.Find(tokenClass, true);
 
         IImplementation ISymbolProvider<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
             => Hllw ? Feature.Extension.Value(DumpPrintTokenResult) : null;
 
         IImplementation ISymbolProvider<Definable>.Feature(Definable tokenClass)
-            => Hllw ? View.Find(tokenClass) : null;
+            => Hllw ? View.Find(tokenClass,true) : null;
 
         protected override Size GetSize() => View.CompoundViewSize;
 

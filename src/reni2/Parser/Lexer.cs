@@ -7,24 +7,17 @@ using Reni.Validation;
 
 namespace Reni.Parser
 {
-    sealed class Lexer : ILexer
+    public sealed class Lexer
     {
         const string Symbols = "^!%&/=?\\*+~><|:-";
         const string SingleCharSymbol = "({[)}];,.";
         internal static readonly Lexer Instance = new Lexer();
 
-        sealed class Error : Match.IError
-        {
-            public readonly IssueId IssueId;
-            public Error(IssueId issueId) { IssueId = issueId; }
-            public override string ToString() => IssueId.Tag;
-        }
-
         readonly Match _any;
         readonly Match _text;
-        readonly Error _invalidTextEnd = new Error(IssueId.EOLInString);
-        readonly Error _invalidLineComment = new Error(IssueId.EOFInLineComment);
-        readonly Error _invalidComment = new Error(IssueId.EOFInComment);
+        readonly IssueId _invalidTextEnd = IssueId.EOLInString;
+        readonly IssueId _invalidLineComment = IssueId.EOFInLineComment;
+        readonly IssueId _invalidComment = IssueId.EOFInComment;
         readonly IMatch _number;
         readonly Match _lineComment;
         readonly Match _comment;
@@ -54,8 +47,8 @@ namespace Reni.Parser
                     .Else
                     (
                         "(".AnyChar().Not +
-                            _lineEnd.Find
-                                .Else(Match.End.Find)
+                        _lineEnd.Find
+                            .Else(Match.End.Find)
                     );
 
             _whiteSpace = " \t".AnyChar();
@@ -72,10 +65,10 @@ namespace Reni.Parser
             _number = Match.Digit.Repeat(1);
 
             var varbatimText = "@("
-                +
-                (Match.WhiteSpace + (Match.WhiteSpace + ")@").Find)
-                    .Else(identifier.Value(id => (Match.WhiteSpace + id + ")@").Box().Find))
-                    .Else(Match.End.Find + _invalidTextEnd)
+                    +
+                    (Match.WhiteSpace + (Match.WhiteSpace + ")@").Find)
+                        .Else(identifier.Value(id => (Match.WhiteSpace + id + ")@").Box().Find))
+                        .Else(Match.End.Find + _invalidTextEnd)
                 ;
 
             _varbatimTextHead = "@(" + Match.WhiteSpace.Else(identifier);
@@ -89,45 +82,51 @@ namespace Reni.Parser
                 .Else(varbatimText);
         }
 
+        public static bool IsWhiteSpace(IItem item)
+            => item.ScannerTokenType == Instance.WhiteSpaceItem.ScannerTokenType;
 
-        public static bool IsWhiteSpace(WhiteSpaceToken item) => item.Index == 0;
-        public static bool IsComment(WhiteSpaceToken item) => item.Index == 1;
-        public static bool IsLineComment(WhiteSpaceToken item) => item.Index == 2;
-        public static bool IsLineEnd(WhiteSpaceToken item) => item.Index == 3;
+        public static bool IsComment(IItem item)
+            => item.ScannerTokenType == Instance.CommentItem.ScannerTokenType;
 
-        Func<SourcePosn, int?>[] ILexer.WhiteSpace
-            => new Func<SourcePosn, int?>[]
-            {
-                WhiteSpace,
-                Comment,
-                LineComment,
-                LineEnd
-            };
+        public static bool IsLineComment(IItem item)
+            => item.ScannerTokenType == Instance.LineCommentItem.ScannerTokenType;
 
+        public static bool IsLineEnd(IItem item)
+            => item.ScannerTokenType == Instance.LineEndItem.ScannerTokenType;
 
-        int? ILexer.Number(SourcePosn sourcePosn) => sourcePosn.Match(_number);
-        int? ILexer.Any(SourcePosn sourcePosn) => sourcePosn.Match(_any);
-
-        Match.IError ILexer.InvalidCharacterError { get; }  = new Error(IssueId.InvalidCharacter);
-
-        int? ILexer.Text(SourcePosn sourcePosn) => sourcePosn.Match(_text);
-        public static IssueId Parse(Match.IError error) => ((Error) error).IssueId;
+        internal int? Number(SourcePosn sourcePosn) => sourcePosn.Match(_number);
+        internal int? Any(SourcePosn sourcePosn) => sourcePosn.Match(_any);
+        internal int? Text(SourcePosn sourcePosn) => sourcePosn.Match(_text);
 
         int? WhiteSpace(SourcePosn sourcePosn) => sourcePosn.Match(_whiteSpace);
         int? LineEnd(SourcePosn sourcePosn) => sourcePosn.Match(_lineEnd);
         int? Comment(SourcePosn sourcePosn) => sourcePosn.Match(_comment);
         int? LineComment(SourcePosn sourcePosn) => sourcePosn.Match(_lineComment);
 
-        public string WhiteSpaceId(WhiteSpaceToken item)
+        internal readonly LexerItem WhiteSpaceItem
+            = new LexerItem(new WhiteSpaceTokenType(), Instance.WhiteSpace);
+
+        internal readonly LexerItem LineEndItem = new LexerItem
+            (new WhiteSpaceTokenType(), Instance.LineEnd);
+
+        internal readonly LexerItem CommentItem = new LexerItem
+            (new WhiteSpaceTokenType(), Instance.Comment);
+
+        internal readonly LexerItem LineCommentItem = new LexerItem
+            (new WhiteSpaceTokenType(), Instance.LineComment);
+
+        //Match.IError InvalidCharacterError { get; } = new Error(IssueId.InvalidCharacter);
+
+        public string WhiteSpaceId(IItem item)
         {
             if(!IsComment(item))
                 return null;
 
-            var headEnd = item.Characters.Start.Match(_commentHead);
+            var headEnd = item.SourcePart.Start.Match(_commentHead);
             if(headEnd == null)
                 return null;
 
-            return item.Characters.Start.Span(headEnd.Value).Id;
+            return item.SourcePart.Start.Span(headEnd.Value).Id;
         }
 
         public static bool IsSymbolLike(string id)
@@ -154,7 +153,13 @@ namespace Reni.Parser
                 if((token.Start + i).Current == token.Start.Current)
                     i++;
             }
+
             return result;
+        }
+
+        public class WhiteSpaceToken
+        {
+            public SourcePart Characters;
         }
     }
 }

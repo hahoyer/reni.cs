@@ -63,7 +63,7 @@ namespace Reni.FeatureTest.Helper
 
         public void AssertContains(CompoundSyntax container)
         {
-            var s = container.Find(_name);
+            var s = container.Find(_name, false);
 
             Tracer.Assert(s != null);
             Tracer.Assert(_position == s.Value);
@@ -92,7 +92,7 @@ namespace Reni.FeatureTest.Helper
             for (var i = 0; i < _list.Length; i++)
                 _list[i].AssertLike(co.Statements[i]);
 
-            Tracer.Assert(_declarations.Length == co.Names.Length);
+            Tracer.Assert(_declarations.Length == co.AllNames.Length);
             foreach (var declaration in _declarations)
                 declaration.AssertContains(co);
 

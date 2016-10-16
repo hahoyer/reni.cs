@@ -21,7 +21,7 @@ namespace hw.Parser
         }
 
         public static ISubParser<TTreeItem> Convert<TTreeItem>
-            (this IParser<TTreeItem> parser, Func<TTreeItem, IType<TTreeItem>> converter)
+            (this IParser<TTreeItem> parser, Func<TTreeItem, IParserTokenType<TTreeItem>> converter)
             where TTreeItem : class, ISourcePart
         {
             return new SubParser<TTreeItem>(parser, converter);
@@ -48,9 +48,9 @@ namespace hw.Parser
             return result;
         }
 
-        public static SourcePart SourcePart(this IEnumerable<WhiteSpaceToken> whiteSpaceTokens)
+        public static SourcePart SourcePart(this IEnumerable<IItem> items)
         {
-            return whiteSpaceTokens.Select(item => item.Characters).Aggregate();
+            return items.Select(item => item.SourcePart).Aggregate();
         }
 
         public static int BracketBalance(this IToken token)
@@ -66,13 +66,13 @@ namespace hw.Parser
             }
         }
 
-        internal static BracketContext RightCOntext(this PrioTable.ITargetItem item)
+        internal static BracketContext GetRightContext(this PrioTable.ITargetItem item)
             => item.LeftContext.Add(item.Token);
 
-        internal static int RightDepth(this PrioTable.ITargetItem item)
-            => item.RightCOntext().Depth;
+        internal static int GetRightDepth(this PrioTable.ITargetItem item)
+            => item.GetRightContext().Depth;
 
-        internal static int LeftDepth(this PrioTable.ITargetItem item)
+        internal static int GetLeftDepth(this PrioTable.ITargetItem item)
             => item.LeftContext.Depth;
     }
 }

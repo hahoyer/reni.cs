@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using hw.Parser;
 using hw.Scanner;
 using Reni;
 using Reni.Code;
@@ -59,7 +60,6 @@ namespace ReniUI
 
             var compileSyntaxs = enumerable
                 .Where(item => item?.ResultCache.Any() ?? false);
-
             return compileSyntaxs;
         }
 
@@ -145,10 +145,10 @@ namespace ReniUI
         internal Syntax LocateActivePosition(int offset)
         {
             var token = Token.LocatePosition(Syntax, offset);
-            if(token.IsComment || token.IsLineComment )
+            if(token.IsComment || token.IsLineComment)
                 return null;
 
-            var current = token.Syntax.Token.SourcePart.Position - 1;
+            var current = token.Syntax.Token.SourcePart().Position - 1;
             return current < 0 ? Compiler.Syntax.Left : token.Syntax.LocatePosition(current);
         }
 

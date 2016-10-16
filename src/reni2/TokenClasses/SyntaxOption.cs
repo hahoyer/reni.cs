@@ -12,6 +12,9 @@ namespace Reni.TokenClasses
 {
     sealed class SyntaxOption : DumpableObject
     {
+        [DisableDump]
+        internal IDefaultScopeProvider DefaultScopeProvider => Parent.DefaultScopeProvider;
+
         Syntax Parent { get; }
 
         public SyntaxOption(Syntax parent) { Parent = parent; }
@@ -31,14 +34,14 @@ namespace Reni.TokenClasses
         }
 
         internal Result<Statement[]> GetStatements(List type = null)
-            => (Parent.TokenClass as IStatementsProvider)?.Get(type, Parent);
+            => (Parent.TokenClass as IStatementsProvider)?.Get(type, Parent, DefaultScopeProvider);
 
         [EnableDumpExcept(null)]
         internal Result<Statement[]> Statements => GetStatements();
 
         [EnableDumpExcept(null)]
         internal Result<Statement> Statement
-            => (Parent.TokenClass as IStatementProvider)?.Get(Parent.Left, Parent.Right);
+            => (Parent.TokenClass as IStatementProvider)?.Get(Parent.Left, Parent.Right, DefaultScopeProvider);
 
         [EnableDumpExcept(null)]
         internal Result<Declarator> Declarator
@@ -47,10 +50,10 @@ namespace Reni.TokenClasses
         [EnableDumpExcept(null)]
         internal Issue[] Issues
             => Value?.Issues
-                ?? GetStatements()?.Issues
-                    ?? Statement?.Issues
-                        ?? Declarator?.Issues
-                            ?? new Issue[0];
+            ?? GetStatements()?.Issues
+            ?? Statement?.Issues
+            ?? Declarator?.Issues
+            ?? new Issue[0];
 
         [DisableDump]
         ContextBase[] Contexts

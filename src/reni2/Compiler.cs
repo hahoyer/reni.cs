@@ -25,8 +25,8 @@ namespace Reni
         const string DefaultSourceIdentifier = "source";
         const string DefaultModuleName = "ReniModule";
 
-        static IScanner<Syntax> Scanner(ITokenFactory<Syntax> tokenFactory)
-            => new Scanner<Syntax>(Lexer.Instance, tokenFactory);
+        static IScanner Scanner(ITokenFactory tokenFactory)
+            => new Scanner(tokenFactory);
 
         public static Compiler FromFile(string fileName, CompilerParameters parameters = null)
         {
@@ -109,8 +109,8 @@ namespace Reni
 
         IExecutionContext Root.IParent.ExecutionContext => this;
 
-        IEnumerable<ScannerTokenClass> Root.IParent.AllTokenClasses
-            => TokenFactory.AllTokenClasses;
+        IEnumerable<Definable> Root.IParent.AllDefinables
+            => TokenFactory.AllTokenClasses.OfType<Definable>();
 
         Result<Value> Root.IParent.Parse(string source) => Parse(source);
 

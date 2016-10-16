@@ -68,10 +68,10 @@ namespace ReniUI.Formatting
 
     sealed class WhiteSpace : DumpableObject, IResultItem
     {
-        public static WhiteSpace Create(WhiteSpaceToken token, bool isVisible)
+        public static WhiteSpace Create(IItem token, bool isVisible)
         {
             var isLineBreak = token.IsLineBreak();
-            var sourcePart = token.Characters;
+            var sourcePart = token.SourcePart;
 
             if(isLineBreak || sourcePart.Id != "\t")
                 return new WhiteSpace(sourcePart, isLineBreak, isVisible);
@@ -174,15 +174,15 @@ namespace ReniUI.Formatting
                 Add(new NewWhiteSpace(count, false));
         }
 
-        internal void Add(WhiteSpaceToken token)
+        internal void Add(IItem token)
             => Add
                 (
                     token.IsComment()
-                        ? (IResultItem) new Skeleton(token.Characters)
+                        ? (IResultItem) new Skeleton(token.SourcePart)
                         : WhiteSpace.Create(token, true)
                 );
 
-        internal void AddHidden(WhiteSpaceToken token)
+        internal void AddHidden(IItem token)
         {
             Tracer.Assert(token.IsNonComment());
             Add(WhiteSpace.Create(token, false));

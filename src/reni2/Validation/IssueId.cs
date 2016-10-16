@@ -9,7 +9,7 @@ using Reni.TokenClasses;
 
 namespace Reni.Validation
 {
-    sealed class IssueId : EnumEx
+    sealed class IssueId : EnumEx, Match.IError
     {
         public static readonly IssueId AmbigousSymbol = new IssueId();
         public static readonly IssueId ConsequentialError = new IssueId();

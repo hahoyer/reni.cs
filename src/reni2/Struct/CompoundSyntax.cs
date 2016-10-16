@@ -23,12 +23,13 @@ namespace Reni.Struct
         internal static Result<Value> Create(Result<Statement[]> item, Syntax syntax)
             => new Result<Value>(new CompoundSyntax(item.Target, syntax), item.Issues);
 
-        internal static Result<Value> Create(Result<Statement[]> left, Result<Value> right, Syntax syntax)
+        internal static Result<Value> Create
+            (Result<Statement[]> left, Result<Value> right, Syntax syntax)
             => new Result<Value>
-                (
+            (
                 new CompoundSyntax(left.Target, syntax, right?.Target),
                 left.Issues.plus(right?.Issues)
-                );
+            );
 
         readonly Statement[] _statements;
         readonly Data[] _data;
@@ -56,14 +57,14 @@ namespace Reni.Struct
             => _data
                 .SelectMany
                 (
-                    (statement, index) => statement.Names.Select
-                        (
-                            name => new
-                            {
-                                Key = name,
-                                Value = index
-                            }
-                        )
+                    (statement, index) => statement.AllNames.Select
+                    (
+                        name => new
+                        {
+                            Key = name,
+                            Value = index
+                        }
+                    )
                 )
                 .ToDictionary(item => item.Key, item => item.Value);
 
@@ -73,8 +74,6 @@ namespace Reni.Struct
         internal int[] Converters => IndexList(item => item.IsConverter).ToArray();
         [EnableDump]
         internal int[] MixIns => IndexList(item => item.IsMixIn).ToArray();
-        [EnableDump]
-        internal int[] Locals => IndexList(item => item.IsLocal).ToArray();
 
         IEnumerable<int> IndexList(Func<Data, bool> selector)
         {
@@ -93,7 +92,7 @@ namespace Reni.Struct
         internal Size IndexSize => Size.AutoSize(Statements.Length);
 
         [DisableDump]
-        internal string[] Names => _data.SelectMany(s => s.Names).ToArray();
+        internal string[] AllNames => _data.SelectMany(s => s.AllNames).ToArray();
 
         [DisableDump]
         internal int[] ConverterStatementPositions
@@ -117,7 +116,6 @@ namespace Reni.Struct
             => GetType().PrettyName() + "(" + GetCompoundIdentificationDump() + ")";
 
         internal bool IsMutable(int position) => _data[position].IsMutable;
-        internal bool IsLocal(int position) => _data[position].IsLocal;
 
         public override string DumpData()
         {
@@ -152,13 +150,13 @@ namespace Reni.Struct
             return result;
         }
 
-        internal int? Find(string name)
+        internal int? Find(string name, bool publicOnly)
         {
             if(name == null)
                 return null;
 
             return _data
-                .SingleOrDefault(s => s.IsDefining(name))
+                .SingleOrDefault(s => s.IsDefining(name, publicOnly))
                 ?.Position;
         }
 
@@ -174,27 +172,34 @@ namespace Reni.Struct
                 RawStatement = rawStatement;
                 Position = position;
                 StatementCache = new ValueCache<Result<Value>>(GetStatement);
-                NamesCache = new ValueCache<string[]>(GetNames);
+                AllNamesCache = new ValueCache<string[]>(GetAllNames);
+                PublicNamesCache = new ValueCache<string[]>(GetPublicNames);
                 Tracer.Assert(RawStatement != null);
             }
 
             Statement RawStatement { get; }
             public int Position { get; }
 
-            ValueCache<string[]> NamesCache { get; }
+            ValueCache<string[]> AllNamesCache { get; }
+            ValueCache<string[]> PublicNamesCache { get; }
             ValueCache<Result<Value>> StatementCache { get; }
 
             public Value Statement => StatementCache.Value.Target;
             public Issue[] Issues => StatementCache.Value.Issues;
-            public bool IsDefining(string name) => Names.Contains(name);
+
+            public bool IsDefining(string name, bool publicOnly)
+                => (publicOnly ? PublicNames : AllNames)
+                    .Contains(name);
+
             public bool IsConverter => RawStatement.IsConverterSyntax;
             public bool IsMixIn => RawStatement.IsMixInSyntax;
-            public IEnumerable<string> Names => NamesCache.Value;
+            public IEnumerable<string> AllNames => AllNamesCache.Value;
+            public IEnumerable<string> PublicNames => PublicNamesCache.Value;
             public bool IsMutable => RawStatement.IsMutableSyntax;
-            public bool IsLocal => RawStatement.IsLocalSyntax;
 
             Result<Value> GetStatement() => RawStatement.Body;
-            string[] GetNames() => RawStatement.GetDeclarations().ToArray();
+            string[] GetAllNames() => RawStatement.GetAllDeclarations().ToArray();
+            string[] GetPublicNames() => RawStatement.GetPublicDeclarations().ToArray();
         }
 
         internal Result Cleanup(ContextBase context, Category category)
