@@ -61,7 +61,7 @@ namespace hw.Scanner
             int? IMatch.Match(SourcePosn sourcePosn)
             {
                 var result = _data.Match(sourcePosn);
-                return result == null ? 1 : (int?)null;
+                return result == null ? 1 : (int?) null;
             }
         }
 
@@ -81,11 +81,11 @@ namespace hw.Scanner
             int? IMatch.Match(SourcePosn sourcePosn)
             {
                 var result = _data.Match(sourcePosn);
-                if (result == null)
+                if(result == null)
                     return null;
 
                 var otherResult = _other.Match(sourcePosn + result.Value);
-                if (otherResult == null)
+                if(otherResult == null)
                     return null;
 
                 return result.Value + otherResult.Value;
@@ -106,7 +106,7 @@ namespace hw.Scanner
             }
 
             int? IMatch.Match(SourcePosn sourcePosn)
-                => _func(sourcePosn.Current) != _isTrue ? null : (int?)1;
+                => _func(sourcePosn.Current) != _isTrue ? null : (int?) 1;
         }
 
         sealed class FindMatch : Dumpable, IMatch
@@ -118,13 +118,13 @@ namespace hw.Scanner
             int? IMatch.Match(SourcePosn sourcePosn)
             {
                 var current = sourcePosn.Clone;
-                while (true)
+                while(true)
                 {
                     var result = _data.Match(current);
-                    if (result != null)
+                    if(result != null)
                         return current - sourcePosn + result;
 
-                    if (current.IsEnd)
+                    if(current.IsEnd)
                         return null;
 
                     current.Position += 1;
@@ -148,7 +148,7 @@ namespace hw.Scanner
             int? IMatch.Match(SourcePosn sourcePosn)
             {
                 var length = _data.Match(sourcePosn);
-                if (length == null)
+                if(length == null)
                     return null;
 
                 var value = sourcePosn.SubString(0, length.Value);
@@ -159,7 +159,7 @@ namespace hw.Scanner
 
         sealed class EndMatch : Dumpable, IMatch
         {
-            int? IMatch.Match(SourcePosn sourcePosn) => sourcePosn.IsEnd ? 0 : (int?)null;
+            int? IMatch.Match(SourcePosn sourcePosn) => sourcePosn.IsEnd ? 0 : (int?) null;
         }
 
         sealed class BreakMatch : IMatch
@@ -171,7 +171,7 @@ namespace hw.Scanner
             }
         }
 
-        public interface IError { }
+        public interface IError {}
 
         public interface IException
         {
