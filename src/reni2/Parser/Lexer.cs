@@ -13,6 +13,11 @@ namespace Reni.Parser
         const string SingleCharSymbol = "({[)}];,.";
         internal static readonly Lexer Instance = new Lexer();
 
+        internal readonly LexerItem WhiteSpaceItem;
+        internal readonly LexerItem LineEndItem;
+        internal readonly LexerItem CommentItem;
+        internal readonly LexerItem LineCommentItem;
+
         readonly Match _any;
         readonly Match _text;
         readonly IssueId _invalidTextEnd = IssueId.EOLInString;
@@ -52,7 +57,6 @@ namespace Reni.Parser
                     );
 
             _whiteSpace = " \t".AnyChar();
-
             _comment = "#("
                 +
                 (Match.WhiteSpace + (Match.WhiteSpace + ")#").Find)
@@ -80,6 +84,11 @@ namespace Reni.Parser
                         return textEnd.Find + (head + textEnd.Find).Repeat();
                     })
                 .Else(varbatimText);
+
+            LineCommentItem = new LexerItem(new WhiteSpaceTokenType(), LineComment);
+            CommentItem = new LexerItem(new WhiteSpaceTokenType(), Comment);
+            LineEndItem = new LexerItem(new WhiteSpaceTokenType(), LineEnd);
+            WhiteSpaceItem = new LexerItem(new WhiteSpaceTokenType(), WhiteSpace);
         }
 
         public static bool IsWhiteSpace(IItem item)
@@ -103,17 +112,6 @@ namespace Reni.Parser
         int? Comment(SourcePosn sourcePosn) => sourcePosn.Match(_comment);
         int? LineComment(SourcePosn sourcePosn) => sourcePosn.Match(_lineComment);
 
-        internal readonly LexerItem WhiteSpaceItem
-            = new LexerItem(new WhiteSpaceTokenType(), Instance.WhiteSpace);
-
-        internal readonly LexerItem LineEndItem = new LexerItem
-            (new WhiteSpaceTokenType(), Instance.LineEnd);
-
-        internal readonly LexerItem CommentItem = new LexerItem
-            (new WhiteSpaceTokenType(), Instance.Comment);
-
-        internal readonly LexerItem LineCommentItem = new LexerItem
-            (new WhiteSpaceTokenType(), Instance.LineComment);
 
         //Match.IError InvalidCharacterError { get; } = new Error(IssueId.InvalidCharacter);
 
