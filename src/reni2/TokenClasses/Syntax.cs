@@ -15,10 +15,10 @@ namespace Reni.TokenClasses
     {
         internal static Syntax CreateSourceSyntax
             (
-            Syntax left,
-            ITokenClass tokenClass,
-            IToken token,
-            Syntax right)
+                Syntax left,
+                ITokenClass tokenClass,
+                IToken token,
+                Syntax right)
             => new Syntax(left, tokenClass, token, right);
 
         static int NextObjectId;
@@ -36,7 +36,7 @@ namespace Reni.TokenClasses
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
         Syntax
-            (
+        (
             Syntax left,
             ITokenClass tokenClass,
             IToken token,
@@ -74,7 +74,7 @@ namespace Reni.TokenClasses
         SourcePart ISourcePart.All => SourcePart;
 
         [DisableDump]
-        internal SourcePart SourcePart => Left?.SourcePart + Token.SourcePart + Right?.SourcePart;
+        internal SourcePart SourcePart => Left?.SourcePart + Token.SourcePart() + Right?.SourcePart;
 
         public Syntax LocatePosition(int current) => LocatePositionCache[current];
 
@@ -85,19 +85,19 @@ namespace Reni.TokenClasses
 
             return Left?.CheckedLocatePosition(current) ??
                 Right?.CheckedLocatePosition(current) ??
-                    this;
+                this;
         }
 
         Syntax CheckedLocatePosition(int current)
             =>
-                SourcePart.Position <= current && current < SourcePart.EndPosition
-                    ? LocatePosition(current)
-                    : null;
+            SourcePart.Position <= current && current < SourcePart.EndPosition
+                ? LocatePosition(current)
+                : null;
 
         internal Syntax Locate(SourcePart part)
             => Left?.CheckedLocate(part) ??
-                Right?.CheckedLocate(part) ??
-                    this;
+            Right?.CheckedLocate(part) ??
+            this;
 
         Syntax CheckedLocate(SourcePart part)
             => SourcePart.Contains(part) ? Locate(part) : null;
@@ -130,9 +130,9 @@ namespace Reni.TokenClasses
                 .ToArray();
 
             return sourceSyntaxs
-                .Skip(1)
-                .TakeWhile(item => matcher.IsBelongingTo(item.TokenClass))
-                .LastOrDefault()
+                    .Skip(1)
+                    .TakeWhile(item => matcher.IsBelongingTo(item.TokenClass))
+                    .LastOrDefault()
                 ?? recent;
         }
 
@@ -260,7 +260,7 @@ namespace Reni.TokenClasses
 
             var value = Option.Value;
             if(value != null)
-                return Statement.CreateStatements(value);
+                return Statement.CreateStatements(value, Option.DefaultScopeProvider);
 
             return new Result<Statement[]>
                 (new Statement[0], IssueId.InvalidListOperandSequence.Create(this));
@@ -274,6 +274,11 @@ namespace Reni.TokenClasses
             => Left?.AllIssues
                 .plus(Issues)
                 .plus(Right?.AllIssues);
+
+        [DisableDump]
+        internal IDefaultScopeProvider DefaultScopeProvider
+            => TokenClass as IDefaultScopeProvider
+            ?? Parent?.DefaultScopeProvider;
 
         internal Tuple<Syntax, Issue> GetBracketKernel(int level, Syntax parent)
         {
@@ -311,12 +316,12 @@ namespace Reni.TokenClasses
 
     interface IStatementProvider
     {
-        Result<Statement> Get(Syntax left, Syntax right);
+        Result<Statement> Get(Syntax left, Syntax right, IDefaultScopeProvider container);
     }
 
     interface IStatementsProvider
     {
-        Result<Statement[]> Get(List type, Syntax syntax);
+        Result<Statement[]> Get(List type, Syntax syntax, IDefaultScopeProvider container);
     }
 
     interface IBelongingsMatcher

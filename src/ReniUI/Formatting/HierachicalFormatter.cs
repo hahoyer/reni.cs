@@ -40,7 +40,7 @@ namespace ReniUI.Formatting
             ITokenClass leftTokenClass,
             int leadingLineBreaks,
             int indentLevel,
-            IEnumerable<WhiteSpaceToken> whiteSpaces,
+            IEnumerable<IItem> whiteSpaces,
             ITokenClass rightTokenClass
             )
         {

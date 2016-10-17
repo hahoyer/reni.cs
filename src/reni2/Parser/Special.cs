@@ -11,7 +11,7 @@ namespace Reni.Parser
 {
     sealed class TerminalSyntax : Value
     {
-        internal string Id => Syntax.Token.Id;
+        internal string Id => Syntax.Token.Characters.Id;
 
         [Node]
         [EnableDump]

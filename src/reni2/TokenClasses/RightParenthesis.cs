@@ -18,9 +18,10 @@ namespace Reni.TokenClasses
         IBelongingsMatcher,
         IBracketMatch<Syntax>,
         IDeclaratorTagProvider,
-        IValueProvider
+        IValueProvider,
+        IDefaultScopeProvider
     {
-        internal sealed class Matched : DumpableObject, IType<Syntax>, ITokenClass, IValueProvider
+        internal sealed class Matched : DumpableObject, IParserTokenType<Syntax>, ITokenClass, IValueProvider
         {
             static string Id => "()";
 
@@ -34,10 +35,10 @@ namespace Reni.TokenClasses
                     .With(rightValue.Issues.plus(leftValue.Issues));
             }
 
-            Syntax IType<Syntax>.Create(Syntax left, IToken token, Syntax right)
+            Syntax IParserTokenType<Syntax>.Create(Syntax left, IToken token, Syntax right)
                 => right == null ? left : Syntax.CreateSourceSyntax(left, this, token, right);
 
-            string IType<Syntax>.PrioTableId => Id;
+            string IParserTokenType<Syntax>.PrioTableId => Id;
             string ITokenClass.Id => Id;
         }
 
@@ -58,7 +59,7 @@ namespace Reni.TokenClasses
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => (otherMatcher as LeftParenthesis)?.Level == Level;
 
-        IType<Syntax> IBracketMatch<Syntax>.Value { get; } = new Matched();
+        IParserTokenType<Syntax> IBracketMatch<Syntax>.Value { get; } = new Matched();
 
 
         Result<Value> IValueProvider.Get(Syntax syntax)
@@ -86,5 +87,7 @@ namespace Reni.TokenClasses
             NotImplementedMethod(syntax, nameof(result), result);
             return null;
         }
+
+        bool IDefaultScopeProvider.MeansPublic => Level == 3;
     }
 }

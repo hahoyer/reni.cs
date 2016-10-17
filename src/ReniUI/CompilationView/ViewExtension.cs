@@ -119,7 +119,7 @@ namespace ReniUI.CompilationView
 
         internal static SourcePart GetSource(this object item)
         {
-            var target = item as ISourceProvider;
+            var target = item as Reni.Feature.ISourceProvider;
             if(target != null)
                 return target.Value;
 

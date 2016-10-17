@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using hw.Parser;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
@@ -96,7 +97,7 @@ namespace Reni.Context
         public bool ProcessErrors => Parent.ProcessErrors;
 
         [DisableDump]
-        internal IEnumerable<ScannerTokenClass> AllTokenClasses => Parent.AllTokenClasses;
+        internal IEnumerable<Definable> AllDefinables => Parent.AllDefinables;
 
         IImplementation ISymbolProviderForPointer<Minus>.Feature
             (Minus tokenClass) => _minusFeatureCache.Value;
@@ -205,7 +206,7 @@ namespace Reni.Context
             Result<Parser.Value> Parse(string source);
             bool ProcessErrors { get; }
             IExecutionContext ExecutionContext { get; }
-            IEnumerable<ScannerTokenClass> AllTokenClasses { get; }
+            IEnumerable<Definable> AllDefinables { get; }
         }
     }
 }

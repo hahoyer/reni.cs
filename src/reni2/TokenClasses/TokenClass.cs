@@ -9,17 +9,11 @@ using Reni.Parser;
 
 namespace Reni.TokenClasses
 {
-    abstract class TokenClass
-        : ScannerTokenClass,
-            IType<Syntax>,
-            ITokenClass
+    abstract class TokenClass : CommonTokenType<Syntax>, ITokenClass
     {
-        Syntax IType<Syntax>.Create(Syntax left, IToken token, Syntax right)
-            => Create(left, token, right);
+        string ITokenClass.Id => Id;
 
-        string IType<Syntax>.PrioTableId => Id;
-
-        Syntax Create(Syntax left, IToken token, Syntax right)
+        protected override Syntax Create(Syntax left, IToken token, Syntax right)
             => Syntax.CreateSourceSyntax(left, this, token, right);
 
         [DisableDump]

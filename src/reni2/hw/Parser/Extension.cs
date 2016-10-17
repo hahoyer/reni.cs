@@ -11,21 +11,15 @@ namespace hw.Parser
     {
         public static TOut Operation<TIn, TOut>
             (this IOperator<TIn, TOut> @operator, TIn left, IToken token, TIn right)
-            where TIn : class
-        {
-            return left == null
-                ? (right == null ? @operator.Terminal(token) : @operator.Prefix(token, right))
-                : (right == null
-                    ? @operator.Suffix(left, token)
-                    : @operator.Infix(left, token, right));
-        }
+            where TIn : class => left == null
+            ? (right == null ? @operator.Terminal(token) : @operator.Prefix(token, right))
+            : (right == null
+                ? @operator.Suffix(left, token)
+                : @operator.Infix(left, token, right));
 
         public static ISubParser<TTreeItem> Convert<TTreeItem>
-            (this IParser<TTreeItem> parser, Func<TTreeItem, IType<TTreeItem>> converter)
-            where TTreeItem : class, ISourcePart
-        {
-            return new SubParser<TTreeItem>(parser, converter);
-        }
+            (this IParser<TTreeItem> parser, Func<TTreeItem, IParserTokenType<TTreeItem>> converter)
+            where TTreeItem : class, ISourcePart => new SubParser<TTreeItem>(parser, converter);
 
         internal static string TreeDump<TTreeItem>(TTreeItem value) where TTreeItem : class
         {
@@ -48,10 +42,8 @@ namespace hw.Parser
             return result;
         }
 
-        public static SourcePart SourcePart(this IEnumerable<WhiteSpaceToken> whiteSpaceTokens)
-        {
-            return whiteSpaceTokens.Select(item => item.Characters).Aggregate();
-        }
+        public static SourcePart SourcePart(this IEnumerable<IItem> items)
+            => items.Select(item => item.SourcePart).Aggregate();
 
         public static int BracketBalance(this IToken token)
         {
@@ -66,13 +58,13 @@ namespace hw.Parser
             }
         }
 
-        internal static BracketContext RightCOntext(this PrioTable.ITargetItem item)
+        internal static BracketContext GetRightContext(this PrioTable.ITargetItem item)
             => item.LeftContext.Add(item.Token);
 
-        internal static int RightDepth(this PrioTable.ITargetItem item)
-            => item.RightCOntext().Depth;
+        internal static int GetRightDepth(this PrioTable.ITargetItem item)
+            => item.GetRightContext().Depth;
 
-        internal static int LeftDepth(this PrioTable.ITargetItem item)
+        internal static int GetLeftDepth(this PrioTable.ITargetItem item)
             => item.LeftContext.Depth;
     }
 }

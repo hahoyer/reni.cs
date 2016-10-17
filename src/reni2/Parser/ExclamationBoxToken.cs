@@ -25,8 +25,8 @@ namespace Reni.Parser
             Target = target;
         }
 
-        internal Result<Statement> Statement(Result<Value> right)
-            => Parser.Statement.Create(Tags, Target, right);
+        internal Result<Statement> Statement(Result<Value> right, IDefaultScopeProvider container)
+            => Parser.Statement.Create(Tags, Target, right, container);
 
         public Declarator WithName(Definable target)
         {
@@ -43,11 +43,10 @@ namespace Reni.Parser
         Result<Declarator> Get(Syntax syntax);
     }
 
-    interface IDeclarationTag
-    {}
+    interface IDeclarationTag {}
 
     sealed class ExclamationBoxToken : DumpableObject,
-        IType<Syntax>,
+        IParserTokenType<Syntax>,
         ITokenClass,
         IDeclaratorTokenClass
     {
@@ -55,13 +54,13 @@ namespace Reni.Parser
 
         internal ExclamationBoxToken(Syntax value) { Value = value; }
 
-        Syntax IType<Syntax>.Create(Syntax left, IToken token, Syntax right)
+        Syntax IParserTokenType<Syntax>.Create(Syntax left, IToken token, Syntax right)
         {
             Tracer.Assert(right == null);
             return Syntax.CreateSourceSyntax(left, this, token, Value);
         }
 
-        string IType<Syntax>.PrioTableId => PrioTable.Any;
+        string IParserTokenType<Syntax>.PrioTableId => PrioTable.Any;
         string ITokenClass.Id => "!";
 
         Result<Declarator> IDeclaratorTokenClass.Get(Syntax syntax)

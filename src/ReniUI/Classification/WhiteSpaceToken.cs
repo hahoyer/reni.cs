@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using hw.Parser;
 using hw.Scanner;
 using Reni.Parser;
 using Reni.TokenClasses;
@@ -9,15 +10,15 @@ namespace ReniUI.Classification
 {
     sealed class WhiteSpaceToken : Token
     {
-        readonly hw.Parser.WhiteSpaceToken _item;
+        readonly IItem _item;
 
-        internal WhiteSpaceToken(hw.Parser.WhiteSpaceToken item, Syntax parent)
+        internal WhiteSpaceToken(IItem item, Syntax parent)
         {
             _item = item;
             Syntax = parent;
         }
 
-        public override SourcePart SourcePart => _item.Characters;
+        public override SourcePart SourcePart => _item.SourcePart;
         public override bool IsComment => Lexer.IsComment(_item);
         public override bool IsLineComment => Lexer.IsLineComment(_item);
         public override bool IsWhiteSpace => Lexer.IsWhiteSpace(_item);

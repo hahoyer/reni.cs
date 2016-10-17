@@ -5,9 +5,25 @@ using hw.Scanner;
 
 namespace hw.Parser
 {
-    public interface IScanner<TTreeItem>
-        where TTreeItem : class, ISourcePart
+    public interface IScanner
     {
-        Scanner<TTreeItem> .Item NextToken(SourcePosn sourcePosn);
+        IItem[] GetNextTokenGroup(SourcePosn sourcePosn);
+    }
+
+    public interface IItem
+    {
+        IScannerTokenType ScannerTokenType { get; }
+        SourcePart SourcePart { get; }
+    }
+
+    public interface IScannerTokenType
+    {
+        IParserTokenFactory ParserTokenFactory { get; }
+    }
+
+    public interface IParserTokenFactory
+    {
+        IParserTokenType<TTreeItem> GetTokenType<TTreeItem>(string id)
+            where TTreeItem : class, ISourcePart;
     }
 }

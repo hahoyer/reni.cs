@@ -28,32 +28,32 @@ namespace Reni.Parser
         internal static T[] ToDistinctNotNullArray<T>(this IEnumerable<T> y)
             => (y ?? new T[0]).Where(item => item != null).Distinct().ToArray();
 
-        internal static bool IsRelevantWhitespace(this IEnumerable<WhiteSpaceToken> whiteSpaces)
+        internal static bool IsRelevantWhitespace(this IEnumerable<IItem> whiteSpaces)
             => whiteSpaces?.Any(item => !Lexer.IsWhiteSpace(item)) ?? false;
 
-        internal static bool HasComment(this IEnumerable<WhiteSpaceToken> whiteSpaces)
+        internal static bool HasComment(this IEnumerable<IItem> whiteSpaces)
             => whiteSpaces?.Any(IsComment) ?? false;
 
-        internal static bool HasLineComment(this IEnumerable<WhiteSpaceToken> whiteSpaces)
+        internal static bool HasLineComment(this IEnumerable<IItem> whiteSpaces)
             => whiteSpaces?.Any(Lexer.IsLineComment) ?? false;
 
         internal static SourcePart PrefixCharacters(this IToken token)
             => token.PrecededWith.SourcePart() ?? token.Characters.Start.Span(0);
 
-        internal static bool HasWhiteSpaces(this IEnumerable<WhiteSpaceToken> whiteSpaces)
+        internal static bool HasWhiteSpaces(this IEnumerable<IItem> whiteSpaces)
             => whiteSpaces?.Any(Lexer.IsWhiteSpace) ?? false;
 
-        internal static bool HasLines(this IEnumerable<WhiteSpaceToken> whiteSpaces)
-            => whiteSpaces?.Any(item => item.Characters.Id.Contains("\n")) ?? false;
+        internal static bool HasLines(this IEnumerable<IItem> whiteSpaces)
+            => whiteSpaces?.Any(item => item.SourcePart.Id.Contains("\n")) ?? false;
 
-        internal static IEnumerable<WhiteSpaceToken> OnlyComments
-            (this IEnumerable<WhiteSpaceToken> whiteSpaces)
+        internal static IEnumerable<IItem> OnlyComments
+            (this IEnumerable<IItem> whiteSpaces)
             => whiteSpaces.Where(IsComment);
 
-        internal static IEnumerable<WhiteSpaceToken> Trim
-            (this IEnumerable<WhiteSpaceToken> whiteSpaces)
+        internal static IEnumerable<IItem> Trim
+            (this IEnumerable<IItem> whiteSpaces)
         {
-            var buffer = new List<WhiteSpaceToken>();
+            var buffer = new List<IItem>();
 
             foreach(var whiteSpace in whiteSpaces.SkipWhile(IsNonComment))
                 if(IsNonComment(whiteSpace))
@@ -63,35 +63,35 @@ namespace Reni.Parser
                     foreach(var item in buffer)
                         yield return item;
 
-                    buffer = new List<WhiteSpaceToken>();
+                    buffer = new List<IItem>();
                     yield return whiteSpace;
                 }
         }
 
-        internal static bool IsNonComment(this WhiteSpaceToken item)
+        internal static bool IsNonComment(this IItem item)
             => !IsComment(item);
 
-        internal static bool IsComment(this WhiteSpaceToken item)
+        internal static bool IsComment(this IItem item)
             => Lexer.IsComment(item) || Lexer.IsLineComment(item);
 
-        internal static bool IsLineBreak(this WhiteSpaceToken item)
+        internal static bool IsLineBreak(this IItem item)
             => Lexer.IsLineEnd(item);
 
-        public static int Length(this IEnumerable<WhiteSpaceToken> whiteSpaceTokens)
+        public static int Length(this IEnumerable<Lexer.WhiteSpaceToken> whiteSpaceTokens)
             => whiteSpaceTokens.Sum(item => item.Characters.Id.Length);
 
-        public static string Id(this IEnumerable<WhiteSpaceToken> whiteSpaceTokens)
+        public static string Id(this IEnumerable<Lexer.WhiteSpaceToken> whiteSpaceTokens)
             => whiteSpaceTokens.Select(item => item.Characters.Id).Stringify("");
 
-        internal static IEnumerable<WhiteSpaceToken> OnlyLeftPart
-            (this IEnumerable<WhiteSpaceToken> whiteSpaces)
+        internal static IEnumerable<Lexer.WhiteSpaceToken> OnlyLeftPart
+            (this IEnumerable<Lexer.WhiteSpaceToken> whiteSpaces)
             => whiteSpaces.Take(ThisLineIndex(whiteSpaces));
 
-        internal static IEnumerable<WhiteSpaceToken> OnlyRightPart
-            (this IEnumerable<WhiteSpaceToken> whiteSpaces)
+        internal static IEnumerable<Lexer.WhiteSpaceToken> OnlyRightPart
+            (this IEnumerable<Lexer.WhiteSpaceToken> whiteSpaces)
             => whiteSpaces.Skip(ThisLineIndex(whiteSpaces));
 
-        static int ThisLineIndex(IEnumerable<WhiteSpaceToken> whiteSpaces)
+        static int ThisLineIndex(IEnumerable<Lexer.WhiteSpaceToken> whiteSpaces)
         {
             var data = whiteSpaces.ToArray();
             var result = 0;

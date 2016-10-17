@@ -55,6 +55,7 @@
     <None Include="rawtest.reni" />
     <None Include="system.reni" />
     <None Include="test.reni" />
+    <None Include="tests\scope.renitest" />
     <None Include="tv-scheduler\tv-schedule.main.reni" />
     <None Include="tv-scheduler\tv-schedule.reni" />
     <None Include="Windows\Windows.reni" />

@@ -25,21 +25,21 @@ namespace Reni.TokenClasses
             => otherMatcher == this;
 
         Result<Statement[]> IStatementsProvider.Get
-            (List type, Syntax syntax)
+            (List type, Syntax syntax, IDefaultScopeProvider container)
         {
             if(type != null && type != this)
                 return null;
 
-            var leftStatements = CreateStatements(syntax.Left, syntax);
-            var rightStatements = CreateStatements(syntax.Right, syntax);
+            var leftStatements = CreateStatements(syntax.Left, syntax, container);
+            var rightStatements = CreateStatements(syntax.Right, syntax, container);
             var target = leftStatements?.Target.plus(rightStatements?.Target);
             var issues = leftStatements?.Issues.plus(rightStatements?.Issues);
             return new Result<Statement[]>(target, issues);
         }
 
-        Result<Statement[]> CreateStatements(Syntax syntax, Syntax parent)
+        Result<Statement[]> CreateStatements(Syntax syntax, Syntax parent, IDefaultScopeProvider container)
             => syntax == null
-                ? Statement.CreateStatements(new EmptyList(parent))
+                ? Statement.CreateStatements(new EmptyList(parent), container)
                 : syntax.GetStatements(this);
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Parser;
 using Reni.Feature;
 using Reni.Parser;
 
@@ -27,11 +28,7 @@ namespace Reni.TokenClasses
                 if(syntax.Left == null)
                     return new Declarator(null, this);
 
-                var d = syntax.Left.Declarator;
-                if(d == null)
-                    return null;
-
-                return d.Target.WithName(this);
+                return syntax.Left.Declarator?.Target.WithName(this);
             }
 
             Tracer.FlaggedLine(nameof(syntax) + "=" + syntax);
@@ -43,20 +40,20 @@ namespace Reni.TokenClasses
 
         bool IDeclarationItem.IsDeclarationPart(Syntax syntax)
         {
-            var t = syntax.Token.SourcePart;
+            var token = syntax.Token.SourcePart();
 
-            var p = syntax.Parent.TokenClass;
-            if(p is Colon)
+            var parentTokenClass = syntax.Parent.TokenClass;
+            if(parentTokenClass is Colon)
                 return syntax.Parent.Left == syntax;
 
-            if(p is LeftParenthesis ||
-                p is Definable ||
-                p is ThenToken ||
-                p is List ||
-                p is Function ||
-                p is TypeOperator ||
-                p is ElseToken ||
-                p is ScannerSyntaxError)
+            if(parentTokenClass is LeftParenthesis ||
+                parentTokenClass is Definable ||
+                parentTokenClass is ThenToken ||
+                parentTokenClass is List ||
+                parentTokenClass is Function ||
+                parentTokenClass is TypeOperator ||
+                parentTokenClass is ElseToken ||
+                parentTokenClass is ScannerSyntaxError)
                 return false;
 
             Tracer.FlaggedLine(nameof(syntax) + "=" + syntax);

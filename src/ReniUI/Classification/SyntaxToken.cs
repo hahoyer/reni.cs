@@ -45,7 +45,7 @@ namespace ReniUI.Classification
             => Syntax.Issues?.Any(item => item.IssueId == IssueId.EOFInLineComment)??false;
 
         [DisableDump]
-        public override string State => Syntax.Token.Id ?? "";
+        public override string State => Syntax.Token.Characters.Id ?? "";
 
         public override string Reformat(SourcePart targetPart)
             => new Formatting.Configuration().Create().Reformat(Syntax, targetPart);

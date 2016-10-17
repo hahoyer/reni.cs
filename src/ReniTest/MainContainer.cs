@@ -8,7 +8,6 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.UnitTest;
 using Reni;
-using Reni.FeatureTest.TypeType;
 using Reni.Runtime;
 using ReniUI;
 
@@ -21,6 +20,7 @@ namespace ReniTest
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
+            //new FilebasedTests().TestMethod();
             RunAllTests();
             //ExecT4CompilerGeneratedTest();
         }
@@ -56,32 +56,6 @@ namespace ReniTest
             T4CompilerGenerated.MainFunction();
             Data.OutStream = null;
         }
-
-        [UnitTest]
-        public sealed class TypeNameExtenderTest
-        {
-            [UnitTest]
-            public void TestMethod()
-            {
-                InternalTest(typeof(int), "int");
-                InternalTest(typeof(List<int>), "List<int>");
-                InternalTest(typeof(List<List<int>>), "List<List<int>>");
-                InternalTest(typeof(Dictionary<int, string>), "Dictionary<int,string>");
-                InternalTest(typeof(TypeOperator), "TypeType.TypeOperator");
-            }
-
-            [DebuggerHidden]
-            static void InternalTest(Type type, string expectedTypeName)
-            {
-                Tracer
-                    .Assert
-                    (
-                        type.PrettyName() == expectedTypeName,
-                        () =>
-                            type + "\nFound   : " + type.PrettyName() + "\nExpected: "
-                                + expectedTypeName,
-                        1);
-            }
-        }
     }
+
 }

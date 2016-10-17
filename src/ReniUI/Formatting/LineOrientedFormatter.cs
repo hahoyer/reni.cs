@@ -21,13 +21,13 @@ namespace ReniUI.Formatting
         string IFormatter.Reformat(Syntax target, SourcePart part)
         {
             var rawLines = target
-                .Chain(item => item.Parent)
-                .Last()
-                .Items
-                .OrderBy(item => item.Token.SourcePart.Position)
-                .SelectMany(GetItems)
-                .NullableToArray()
-                .Select(CreateLine)
+                    .Chain(item => item.Parent)
+                    .Last()
+                    .Items
+                    .OrderBy(item => item.Token.SourcePart().Position)
+                    .SelectMany(GetItems)
+                    .NullableToArray()
+                    .Select(CreateLine)
                 ;
 
             while(rawLines.Any(IsTooLongLine))
@@ -59,22 +59,20 @@ namespace ReniUI.Formatting
         static IEnumerable<IItem1> GetItems
             (Syntax target)
         {
-            for(var index = 0; index < target.Token.PrecededWith.Length; index++)
+            var whiteSpaceParts = target.Token.PrecededWith.ToArray();
+            for(var index = 0; index < whiteSpaceParts.Length; index++)
             {
-                var lines = target
-                    .Token
-                    .PrecededWith[index]
-                    .Characters
-                    .Id
-                    .Count(c => c == '\n');
+                var lines = whiteSpaceParts[index].SourcePart.Id.Count(c => c == '\n');
 
                 for(var lineIndex = 0; lineIndex < lines; lineIndex++)
                 {
                     IItem1 item = new WhiteSpaceItem(index, lineIndex, target);
                     yield return item;
                 }
+
                 yield return new WhiteSpaceItem(index, lines, target);
             }
+
             yield return new TokenItem(target);
         }
 
@@ -146,25 +144,25 @@ namespace ReniUI.Formatting
         internal sealed class WhiteSpaceItem : DumpableObject, IItem1
         {
             readonly int LineIndex;
-            readonly WhiteSpaceToken WhiteSpaceToken;
+            readonly IItem WhiteSpaceToken;
             readonly bool IsRelevant;
 
             internal WhiteSpaceItem(int index, int lineIndex, Syntax target)
             {
                 LineIndex = lineIndex;
-                WhiteSpaceToken = target.Token.PrecededWith[index];
+                WhiteSpaceToken = target.Token.PrecededWith.Skip(index).First();
                 IsRelevant = Lexer.IsComment(WhiteSpaceToken)
                     || Lexer.IsLineComment(WhiteSpaceToken);
             }
 
-            string Id => WhiteSpaceToken.Characters.Id.Split('\n')[LineIndex];
+            string Id => WhiteSpaceToken.SourcePart.Id.Split('\n')[LineIndex];
             protected override string GetNodeDump() => Id.Quote() + "(=" + LineIndex + ")";
 
             SourcePart IItem1.Part
             {
                 get
                 {
-                    var part = WhiteSpaceToken.Characters;
+                    var part = WhiteSpaceToken.SourcePart;
                     var lineLengths = part.Id.Split('\n').Select(item => item.Length + 1);
                     var start = lineLengths.Take(LineIndex).Sum();
                     return (part.Start + start).Span(Id.Length);

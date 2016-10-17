@@ -13,19 +13,14 @@ namespace Reni.TokenClasses
         public const string TokenId = ":";
         public override string Id => TokenId;
 
-        Result<Statement> IStatementProvider.Get(Syntax left, Syntax right)
-        {
-            var declarator = left.Declarator;
-            if(declarator == null)
-                return null;
-
-            return declarator
-                .Convert(x => x.Statement(right.Value));
-        }
+        Result<Statement> IStatementProvider.Get
+            (Syntax left, Syntax right, IDefaultScopeProvider container)
+            => left.Declarator?.Convert(x => x.Statement(right.Value, container));
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class Exclamation : ScannerTokenClass, ISubParser<Syntax>, IType<Syntax>
+    sealed class Exclamation : CommonTokenType<Syntax>,
+        PrioParser<Syntax>.ISubParserProvider
     {
         public const string TokenId = "!";
 
@@ -33,20 +28,15 @@ namespace Reni.TokenClasses
 
         public Exclamation(ISubParser<Syntax> parser) { Parser = parser; }
 
-        IType<Syntax> ISubParser<Syntax>.Execute
-            (SourcePosn sourcePosn, Stack<OpenItem<Syntax>> stack)
-            => Parser.Execute(sourcePosn, stack);
-
         public override string Id => TokenId;
 
-        Syntax IType<Syntax>.Create
-            (Syntax left, IToken token, Syntax right)
+        protected override Syntax Create(Syntax left, IToken token, Syntax right)
         {
             NotImplementedMethod(left, token, right);
             return null;
         }
 
-        string IType<Syntax>.PrioTableId => TokenId;
+        ISubParser<Syntax> PrioParser<Syntax>.ISubParserProvider.NextParser => Parser;
     }
 
 
@@ -56,10 +46,10 @@ namespace Reni.TokenClasses
         Result<Declarator> IDeclaratorTagProvider.Get
             (Syntax syntax)
         {
-            if(syntax.Left== null && syntax.Right == null)
+            if(syntax.Left == null && syntax.Right == null)
                 return new Declarator(new IDeclarationTag[] {this}, null);
 
-            NotImplementedMethod( syntax);
+            NotImplementedMethod(syntax);
             return null;
         }
 
@@ -70,7 +60,10 @@ namespace Reni.TokenClasses
                 yield return ConverterToken.TokenId;
                 yield return MutableDeclarationToken.TokenId;
                 yield return MixInDeclarationToken.TokenId;
-                yield return LocalDeclarationToken.TokenId;
+                yield return NonPositionalDeclarationToken.TokenId;
+                yield return NonPublicDeclarationToken.TokenId;
+                yield return PositionalDeclarationToken.TokenId;
+                yield return PublicDeclarationToken.TokenId;
             }
         }
     }
@@ -93,9 +86,27 @@ namespace Reni.TokenClasses
         public override string Id => TokenId;
     }
 
-    sealed class LocalDeclarationToken : DeclarationTagToken
+    sealed class PublicDeclarationToken : DeclarationTagToken
     {
-        internal const string TokenId = "local";
+        internal const string TokenId = "public";
+        public override string Id => TokenId;
+    }
+
+    sealed class NonPublicDeclarationToken : DeclarationTagToken
+    {
+        internal const string TokenId = "non_public";
+        public override string Id => TokenId;
+    }
+
+    sealed class PositionalDeclarationToken : DeclarationTagToken
+    {
+        internal const string TokenId = "positional";
+        public override string Id => TokenId;
+    }
+
+    sealed class NonPositionalDeclarationToken : DeclarationTagToken
+    {
+        internal const string TokenId = "non_positional";
         public override string Id => TokenId;
     }
 }
