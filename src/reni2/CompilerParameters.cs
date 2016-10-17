@@ -53,14 +53,10 @@ namespace Reni
 
             [Node]
             [EnableDump]
-            public bool Syntax;
-            [Node]
-            [EnableDump]
             public bool GeneratorFilePosn;
 
             public void None()
             {
-                Syntax = false;
                 Parser = false;
                 CodeSequence = false;
                 ExecutedCode = false;
@@ -69,7 +65,6 @@ namespace Reni
 
             public void UseOnModeErrorFocus()
             {
-                Syntax = true;
                 CodeSequence = true;
                 ExecutedCode = true;
                 Functions = true;
