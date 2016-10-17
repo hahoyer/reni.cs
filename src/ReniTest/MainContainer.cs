@@ -20,7 +20,7 @@ namespace ReniTest
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            new FilebasedTests().TestMethod();
+            //new FilebasedTests().TestMethod();
             RunAllTests();
             //ExecT4CompilerGeneratedTest();
         }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
-using hw.Scanner;
 using Reni.Numeric;
 using Reni.Struct;
 using Reni.TokenClasses;
@@ -87,8 +86,7 @@ namespace Reni.Parser
         readonly PrioParser<Syntax> _declarationSyntaxParser;
         readonly List<UserSymbol> UserSymbols = new List<UserSymbol>();
 
-        public MainTokenFactory
-            (Func<ITokenFactory, IScanner> getScanner)
+        public MainTokenFactory(Func<ITokenFactory, IScanner> getScanner)
         {
             Parser = new PrioParser<Syntax>(PrioTable, getScanner(this), new LeftParenthesis(0));
             _declarationSyntaxParser = new PrioParser<Syntax>
@@ -110,7 +108,7 @@ namespace Reni.Parser
             }
         }
 
-        protected override ScannerTokenType SpecialTokenClass(System.Type type)
+        protected override IParserTokenType<Syntax> SpecialTokenClass(System.Type type)
         {
             if(type == typeof(Exclamation))
                 return new Exclamation(_declarationSyntaxSubParser);
@@ -121,11 +119,9 @@ namespace Reni.Parser
         static IParserTokenType<Syntax> Pack(Syntax options) => new ExclamationBoxToken(options);
 
         protected override IScannerTokenType NumberTokenType => new Number();
-        protected override IScannerTokenType AnyTokenType { get { throw new NotImplementedException(); } }
-
         protected override IScannerTokenType TextTokenType => new Text();
 
-        ScannerTokenType GetTokenClass(string name)
+        internal override IParserTokenType<Syntax> GetTokenClass(string name)
         {
             var result = new UserSymbol(name);
             UserSymbols.Add(result);
@@ -133,6 +129,7 @@ namespace Reni.Parser
         }
 
         [DisableDump]
-        internal IEnumerable<ScannerTokenType> AllTokenClasses => TokenClasses.Concat(UserSymbols);
+        internal IEnumerable<IParserTokenType<Syntax>> AllTokenClasses
+            => PredefinedTokenClasses.Concat(UserSymbols);
     }
 }

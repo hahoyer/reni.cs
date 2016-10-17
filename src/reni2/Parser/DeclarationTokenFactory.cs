@@ -40,9 +40,8 @@ namespace Reni.Parser
             public override string Id => "<unexpected>";
         }
 
-        protected override IScannerTokenType AnyTokenType { get { throw new NotImplementedException(); } }
-
         protected override IScannerTokenType TextTokenType { get { throw new NotImplementedException(); } }
         protected override IScannerTokenType NumberTokenType { get { throw new NotImplementedException(); } }
+        internal override IParserTokenType<Syntax> GetTokenClass(string name) { throw new NotImplementedException(); }
     }
 }

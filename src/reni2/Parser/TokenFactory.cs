@@ -11,14 +11,14 @@ namespace Reni.Parser
 {
     abstract class TokenFactory : DumpableObject, ITokenFactory
     {
-        internal IEnumerable<ScannerTokenType> TokenClasses
+        internal IEnumerable<IParserTokenType<Syntax>> PredefinedTokenClasses
             => GetType()
                 .Assembly
                 .GetTypes()
                 .Where(BelongsToFactory)
                 .SelectMany(CreateInstance);
 
-        IEnumerable<ScannerTokenType> CreateInstance(System.Type type)
+        IEnumerable<IParserTokenType<Syntax>> CreateInstance(System.Type type)
         {
             var variants = type.GetAttributes<Variant>(false).ToArray();
             if(variants.Any())
@@ -28,7 +28,7 @@ namespace Reni.Parser
             return new[] {SpecialTokenClass(type)};
         }
 
-        protected virtual ScannerTokenType SpecialTokenClass(System.Type type)
+        protected virtual IParserTokenType<Syntax> SpecialTokenClass(System.Type type)
             => (TokenClass) Activator.CreateInstance(type);
 
         bool BelongsToFactory(System.Type type)
@@ -55,12 +55,24 @@ namespace Reni.Parser
             Lexer.Instance.CommentItem,
             Lexer.Instance.LineCommentItem,
             new LexerItem(NumberTokenType, Lexer.Instance.Number),
-            new LexerItem(AnyTokenType, Lexer.Instance.Any),
+            new LexerItem(new AnyTokenType(this), Lexer.Instance.Any),
             new LexerItem(TextTokenType, Lexer.Instance.Text)
         };
 
-        protected abstract IScannerTokenType AnyTokenType { get; }
         protected abstract IScannerTokenType TextTokenType { get; }
         protected abstract IScannerTokenType NumberTokenType { get; }
+        internal abstract IParserTokenType<Syntax> GetTokenClass(string name);
+    }
+
+    sealed class AnyTokenType : PredefinedTokenFactory<Syntax>
+    {
+        readonly TokenFactory Parent;
+        public AnyTokenType(TokenFactory parent) { Parent = parent; }
+
+        protected override IParserTokenType<Syntax> GetTokenClass(string name)
+            => Parent.GetTokenClass(name);
+
+        protected override IEnumerable<IParserTokenType<Syntax>> GetPredefinedTokenClasses()
+            => Parent.PredefinedTokenClasses;
     }
 }
