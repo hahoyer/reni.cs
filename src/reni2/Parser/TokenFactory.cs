@@ -54,13 +54,11 @@ namespace Reni.Parser
             Lexer.Instance.LineEndItem,
             Lexer.Instance.CommentItem,
             Lexer.Instance.LineCommentItem,
-            new LexerItem(NumberTokenType, Lexer.Instance.Number),
+            new LexerItem(new Number(), Lexer.Instance.Number),
             new LexerItem(new AnyTokenType(this), Lexer.Instance.Any),
-            new LexerItem(TextTokenType, Lexer.Instance.Text)
+            new LexerItem(new Text(), Lexer.Instance.Text)
         };
 
-        protected abstract IScannerTokenType TextTokenType { get; }
-        protected abstract IScannerTokenType NumberTokenType { get; }
         internal abstract IParserTokenType<Syntax> GetTokenClass(string name);
     }
 

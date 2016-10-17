@@ -19,17 +19,14 @@ namespace Reni.TokenClasses
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class Exclamation : CommonTokenType<Syntax>, ISubParser<Syntax>
+    sealed class Exclamation : CommonTokenType<Syntax>,
+        PrioParser<Syntax>.ISubParserProvider
     {
         public const string TokenId = "!";
 
         readonly ISubParser<Syntax> Parser;
 
         public Exclamation(ISubParser<Syntax> parser) { Parser = parser; }
-
-        IParserTokenType<Syntax> ISubParser<Syntax>.Execute
-            (SourcePosn sourcePosn, Stack<OpenItem<Syntax>> stack)
-            => Parser.Execute(sourcePosn, stack);
 
         public override string Id => TokenId;
 
@@ -38,6 +35,8 @@ namespace Reni.TokenClasses
             NotImplementedMethod(left, token, right);
             return null;
         }
+
+        ISubParser<Syntax> PrioParser<Syntax>.ISubParserProvider.NextParser => Parser;
     }
 
 

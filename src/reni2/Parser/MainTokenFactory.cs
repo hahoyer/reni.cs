@@ -79,7 +79,6 @@ namespace Reni.Parser
             }
         }
 
-
         public readonly IParser<Syntax> Parser;
 
         readonly ISubParser<Syntax> _declarationSyntaxSubParser;
@@ -117,9 +116,6 @@ namespace Reni.Parser
         }
 
         static IParserTokenType<Syntax> Pack(Syntax options) => new ExclamationBoxToken(options);
-
-        protected override IScannerTokenType NumberTokenType => new Number();
-        protected override IScannerTokenType TextTokenType => new Text();
 
         internal override IParserTokenType<Syntax> GetTokenClass(string name)
         {
