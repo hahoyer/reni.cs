@@ -11,16 +11,20 @@ namespace Reni.Parser
 {
     abstract class TokenFactory : DumpableObject, ITokenFactory
     {
-        internal IEnumerable<IParserTokenType<Syntax>> PredefinedTokenClasses
-            => GetType()
+        protected TokenFactory()
+        {
+            PredefinedTokenClasses = GetType()
                 .Assembly
                 .GetTypes()
                 .Where(BelongsToFactory)
                 .SelectMany(CreateInstance);
+        }
+
+        internal readonly IEnumerable<IParserTokenType<Syntax>> PredefinedTokenClasses;
 
         IEnumerable<IParserTokenType<Syntax>> CreateInstance(System.Type type)
         {
-            var variants = type.GetAttributes<Variant>(false).ToArray();
+            var variants = type.GetAttributes<Variant>(true).ToArray();
             if(variants.Any())
                 return variants
                     .Select(variant => variant.CreateInstance(type));
@@ -41,14 +45,14 @@ namespace Reni.Parser
                     .Any(attr => thisType.Is(attr.TokenFactory));
         }
 
-        IScannerTokenType ITokenFactory.EndOfText => new RightParenthesis(0);
+        IScannerTokenType ITokenFactory.EndOfText => new EndOfText();
 
         IScannerTokenType ITokenFactory.InvalidCharacterError
             => new ScannerSyntaxError(IssueId.InvalidCharacter);
 
         LexerItem[] ITokenFactory.Classes => Classes;
 
-        protected LexerItem[] Classes => new[]
+        LexerItem[] Classes => new[]
         {
             Lexer.Instance.WhiteSpaceItem,
             Lexer.Instance.LineEndItem,
@@ -60,17 +64,5 @@ namespace Reni.Parser
         };
 
         internal abstract IParserTokenType<Syntax> GetTokenClass(string name);
-    }
-
-    sealed class AnyTokenType : PredefinedTokenFactory<Syntax>
-    {
-        readonly TokenFactory Parent;
-        public AnyTokenType(TokenFactory parent) { Parent = parent; }
-
-        protected override IParserTokenType<Syntax> GetTokenClass(string name)
-            => Parent.GetTokenClass(name);
-
-        protected override IEnumerable<IParserTokenType<Syntax>> GetPredefinedTokenClasses()
-            => Parent.PredefinedTokenClasses;
     }
 }

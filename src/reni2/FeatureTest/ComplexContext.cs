@@ -15,6 +15,7 @@ namespace Reni.FeatureTest
     [UndefinedSymbol]
     [UseOfUndefinedContextSymbol]
     [IndirectUseOfUndefinedContextSymbol]
+    [AllScopeHandling]
     [Output("Ha")]
     public sealed class ComplexContext : CompilerTest
     {

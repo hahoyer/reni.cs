@@ -67,9 +67,9 @@ namespace Reni.Parser
                     },
                     new[]
                     {
-                        RightParenthesis.TokenId(3),
-                        RightParenthesis.TokenId(2),
-                        RightParenthesis.TokenId(1),
+                        RightParenthesisBase.TokenId(3),
+                        RightParenthesisBase.TokenId(2),
+                        RightParenthesisBase.TokenId(1),
                         PrioTable.EndOfText
                     }
                 );
@@ -87,7 +87,7 @@ namespace Reni.Parser
 
         public MainTokenFactory(Func<ITokenFactory, IScanner> getScanner)
         {
-            Parser = new PrioParser<Syntax>(PrioTable, getScanner(this), new LeftParenthesis(0));
+            Parser = new PrioParser<Syntax>(PrioTable, getScanner(this), new BeginOfText());
             _declarationSyntaxParser = new PrioParser<Syntax>
             (
                 DeclarationTokenFactory.PrioTable,

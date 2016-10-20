@@ -9,10 +9,30 @@ namespace Reni.FeatureTest
     [UnitTest]
     [Target(@"!public x: 1")]
     [Output("")]
-    public sealed class ScopeHandling : CompilerTest { }
-
+    public sealed class ScopeHandlingPublic : CompilerTest {}
 
     [UnitTest]
-    [ScopeHandling]
+    [Target(@"!(public mutable) x: 1")]
+    [ScopeHandlingPublic]
+    [Output("")]
+    public sealed class ScopeHandlingGroup : CompilerTest {}
+
+    [UnitTest]
+    [Target(@"!public !mutable x: 1")]
+    [ScopeHandlingPublic]
+    [Output("")]
+    public sealed class ScopeHandlingMultiple : CompilerTest {}
+
+    [UnitTest]
+    [Target(@"!unkown x: 1")]
+    [ScopeHandlingPublic]
+    [Output("")]
+    public sealed class ScopeHandlingError : CompilerTest {}
+
+    [UnitTest]
+    [ScopeHandlingPublic]
+    [ScopeHandlingGroup]
+    [ScopeHandlingError]
+    [ScopeHandlingMultiple]
     public sealed class AllScopeHandling : CompilerTest {}
 }

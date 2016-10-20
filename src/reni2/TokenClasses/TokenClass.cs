@@ -38,12 +38,9 @@ namespace Reni.TokenClasses
         public Variant(params object[] creationParameter) { CreationParameter = creationParameter; }
 
         internal TokenClass CreateInstance(System.Type type)
-        {
-            return (TokenClass)
-                type
-                    .GetConstructor(CreationParameter.Select(p => p.GetType()).ToArray())
-                    .AssertNotNull()
-                    .Invoke(CreationParameter);
-        }
+            => (TokenClass) type
+                .GetConstructor(CreationParameter.Select(p => p.GetType()).ToArray())
+                .AssertNotNull()
+                .Invoke(CreationParameter);
     }
 }

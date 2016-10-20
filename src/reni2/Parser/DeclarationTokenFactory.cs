@@ -20,14 +20,14 @@ namespace Reni.Parser
                         LeftParenthesis.TokenId(3),
                         LeftParenthesis.TokenId(2),
                         LeftParenthesis.TokenId(1),
-                        LeftParenthesis.TokenId(0)
+                        PrioTable.BeginOfText
                     },
                     new[]
                     {
-                        RightParenthesis.TokenId(3),
-                        RightParenthesis.TokenId(2),
-                        RightParenthesis.TokenId(1),
-                        RightParenthesis.TokenId(0)
+                        RightParenthesisBase.TokenId(3),
+                        RightParenthesisBase.TokenId(2),
+                        RightParenthesisBase.TokenId(1),
+                        PrioTable.EndOfText
                     }
                 );
                 return prioTable;
