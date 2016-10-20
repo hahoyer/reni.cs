@@ -13,7 +13,6 @@ namespace Reni.Parser
         {
             Target = target;
             Issues = issues ?? new Issue[0];
-            Tracer.Assert(Target != null);
         }
 
         internal TTarget Target { get; }
