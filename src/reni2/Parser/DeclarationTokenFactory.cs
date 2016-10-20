@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.Parser;
-using hw.Scanner;
 using Reni.TokenClasses;
 
 namespace Reni.Parser
@@ -15,22 +14,22 @@ namespace Reni.Parser
             {
                 var prioTable = PrioTable.Left(PrioTable.Any);
                 prioTable += PrioTable.BracketParallels
-                    (
-                        new[]
-                        {
-                            LeftParenthesis.TokenId(3),
-                            LeftParenthesis.TokenId(2),
-                            LeftParenthesis.TokenId(1),
-                            LeftParenthesis.TokenId(0)
-                        },
-                        new[]
-                        {
-                            RightParenthesis.TokenId(3),
-                            RightParenthesis.TokenId(2),
-                            RightParenthesis.TokenId(1),
-                            RightParenthesis.TokenId(0)
-                        }
-                    );
+                (
+                    new[]
+                    {
+                        LeftParenthesis.TokenId(3),
+                        LeftParenthesis.TokenId(2),
+                        LeftParenthesis.TokenId(1),
+                        PrioTable.BeginOfText
+                    },
+                    new[]
+                    {
+                        RightParenthesisBase.TokenId(3),
+                        RightParenthesisBase.TokenId(2),
+                        RightParenthesisBase.TokenId(1),
+                        PrioTable.EndOfText
+                    }
+                );
                 return prioTable;
             }
         }
@@ -40,6 +39,9 @@ namespace Reni.Parser
             public override string Id => "<unexpected>";
         }
 
-        internal override IParserTokenType<Syntax> GetTokenClass(string name) { throw new NotImplementedException(); }
+        internal override IParserTokenType<Syntax> GetTokenClass(string name)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

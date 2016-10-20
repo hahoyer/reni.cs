@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Parser;
-using hw.Scanner;
 using Reni.Parser;
 
 namespace Reni.TokenClasses
@@ -41,7 +40,10 @@ namespace Reni.TokenClasses
 
 
     [BelongsTo(typeof(DeclarationTokenFactory))]
-    abstract class DeclarationTagToken : TerminalToken, IDeclaratorTagProvider, IDeclarationTag
+    abstract class DeclarationTagToken : 
+        TerminalToken, 
+        IDeclaratorTagProvider, 
+        IDeclarationTag
     {
         Result<Declarator> IDeclaratorTagProvider.Get
             (Syntax syntax)

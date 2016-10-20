@@ -41,11 +41,29 @@ namespace Reni.TokenClasses
 
         [EnableDumpExcept(null)]
         internal Result<Statement> Statement
-            => (Parent.TokenClass as IStatementProvider)?.Get(Parent.Left, Parent.Right, DefaultScopeProvider);
+            =>
+            (Parent.TokenClass as IStatementProvider)?.Get
+                (Parent.Left, Parent.Right, DefaultScopeProvider);
 
         [EnableDumpExcept(null)]
         internal Result<Declarator> Declarator
-            => (Parent.TokenClass as IDeclaratorTokenClass)?.Get(Parent);
+        {
+            get
+            {
+                var declaratorTokenClass = Parent.TokenClass as IDeclaratorTokenClass;
+                var declarator = declaratorTokenClass?.Get(Parent);
+                if(declarator != null)
+                    return declarator;
+                if(IsInDump)
+                    return null;
+
+                NotImplementedMethod();
+                return null;
+            }
+        }
+
+        [EnableDumpExcept(null)]
+        internal IDeclarationTag DeclarationTag => Parent.TokenClass as IDeclarationTag;
 
         [EnableDumpExcept(null)]
         internal Issue[] Issues
@@ -92,7 +110,7 @@ namespace Reni.TokenClasses
         {
             get
             {
-                if((Parent.TokenClass as RightParenthesis)?.IsFrameToken ?? false)
+                if(Parent.TokenClass is EndOfText)
                     return true;
 
                 if(Value != null)

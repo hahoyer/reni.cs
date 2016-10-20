@@ -9,7 +9,6 @@ namespace Reni.TokenClasses
 {
     [BelongsTo(typeof(MainTokenFactory))]
     [BelongsTo(typeof(DeclarationTokenFactory))]
-    [Variant(0)]
     [Variant(1)]
     [Variant(2)]
     [Variant(3)]
@@ -32,4 +31,5 @@ namespace Reni.TokenClasses
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => (otherMatcher as RightParenthesis)?.Level == Level;
     }
+
 }

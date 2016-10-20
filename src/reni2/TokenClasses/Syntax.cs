@@ -175,11 +175,12 @@ namespace Reni.TokenClasses
 
         IEnumerable<Syntax> GetItems()
         {
+            if (Left != null)
+                foreach (var sourceSyntax in Left.Items)
+                    yield return sourceSyntax;
+
             yield return this;
 
-            if(Left != null)
-                foreach(var sourceSyntax in Left.Items)
-                    yield return sourceSyntax;
             if(Right != null)
                 foreach(var sourceSyntax in Right.Items)
                     yield return sourceSyntax;
@@ -280,23 +281,23 @@ namespace Reni.TokenClasses
             => TokenClass as IDefaultScopeProvider
             ?? Parent?.DefaultScopeProvider;
 
-        internal Tuple<Syntax, Issue> GetBracketKernel(int level, Syntax parent)
+        internal Result<Syntax> GetBracketKernel(int level, Syntax parent)
         {
             Tracer.Assert(parent.Right == null);
             var leftParenthesis = TokenClass as LeftParenthesis;
 
             if(leftParenthesis == null)
-                return new Tuple<Syntax, Issue>(this, IssueId.ExtraRightBracket.Create(parent));
+                return new Result<Syntax>(this, IssueId.ExtraRightBracket.Create(parent));
 
             Tracer.Assert(Left == null);
 
             var levelDelta = leftParenthesis.Level - level;
 
             if(levelDelta == 0)
-                return new Tuple<Syntax, Issue>(Right, null);
+                return Right;
 
             if(levelDelta > 0)
-                return new Tuple<Syntax, Issue>
+                return new Result<Syntax>
                     (Right, IssueId.ExtraLeftBracket.Create(this));
 
             NotImplementedMethod(level, parent);

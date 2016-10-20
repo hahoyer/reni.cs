@@ -27,7 +27,7 @@ namespace Reni
         const string DefaultModuleName = "ReniModule";
 
         static IScanner Scanner(ITokenFactory tokenFactory)
-            => new Scanner(tokenFactory);
+            => new Scanner(new CachingTokenFactory(tokenFactory));
 
         public static Compiler FromFile(string fileName, CompilerParameters parameters = null)
         {

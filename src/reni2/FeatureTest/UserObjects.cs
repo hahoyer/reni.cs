@@ -8,6 +8,7 @@ namespace Reni.FeatureTest
 {
     [UnitTest]
     [AllScopeHandling]
+    [ComplexContext]
     [TargetSet(@"
 system: /!\
 { MaxNumber8: /!\ '7f' to_number_of_base 16 
