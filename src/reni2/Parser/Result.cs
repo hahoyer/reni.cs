@@ -41,5 +41,6 @@ namespace Reni.Parser
             var inner = converter(Target);
             return new Result<TOutTarget>(inner, Issues);
         }
+
     }
 }
