@@ -27,20 +27,20 @@ namespace Reni.Parser
 
         Result<Declarator> IDeclaratorTokenClass.Get(Syntax syntax)
         {
-            if(syntax.Left != null || syntax.Right == null)
-            {
-                NotImplementedMethod(syntax);
-                return null;
-            }
-
             var provider = syntax.Right.TokenClass as IDeclaratorTagProvider;
-            if (provider == null)
+            if(provider == null)
             {
                 NotImplementedMethod(syntax);
                 return null;
             }
 
-            return provider.Get(syntax.Right);
+            var result = provider.Get(syntax.Right);
+
+            var other = syntax.Left?.Declarator;
+            if(other == null)
+                return result;
+
+            return result.Target.Combine(other.Target).Issues(result.Issues.plus(other.Issues));
         }
     }
 }

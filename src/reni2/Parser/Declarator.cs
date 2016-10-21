@@ -30,6 +30,12 @@ namespace Reni.Parser
             NotImplementedMethod(target);
             return null;
         }
+
+        public Declarator Combine(Declarator other)
+        {
+            Tracer.Assert(Target == null|| other.Target == null);
+            return new Declarator(Tags.plus(other.Tags), Target ?? other.Target);
+        }
     }
 
     interface IDeclaratorTokenClass
@@ -42,6 +48,5 @@ namespace Reni.Parser
         Result<Declarator> Get(Syntax syntax);
     }
 
-    interface IDeclarationTag { }
-
+    interface IDeclarationTag {}
 }
