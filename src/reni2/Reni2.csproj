@@ -270,7 +270,6 @@
     <Compile Include="Context\ContextOperator.cs" />
     <Compile Include="Context\FunctionList.cs" />
     <Compile Include="Context\ReplacePrimitiveRecursivity.cs" />
-    <Compile Include="ExpectedCompilationResult.cs" />
     <Compile Include="FeatureTest\BitArrayOp.cs" />
     <Compile Include="Context\Function.cs" />
     <Compile Include="Context\Root.cs" />
