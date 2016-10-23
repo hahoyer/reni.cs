@@ -300,7 +300,7 @@ namespace Reni.Context
             =>
                 new RootIssueType
                     (
-                    new Issue(IssueId.MissingDeclaration, source, "Context: " + Dump()),
+                    new Issue(IssueId.MissingDeclarationInContext, source, "Context: " + Dump()),
                     RootContext);
 
         Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)

@@ -23,7 +23,8 @@ namespace Reni.Validation
         public static readonly IssueId UnknownDeclarationTag = new IssueId();
         public static readonly IssueId InvalidExpression = new IssueId();
         public static readonly IssueId InvalidListOperandSequence = new IssueId();
-        public static readonly IssueId MissingDeclaration = new IssueId();
+        public static readonly IssueId MissingDeclarationForType = new IssueId();
+        public static readonly IssueId MissingDeclarationInContext = new IssueId();
         public static readonly IssueId MissingDeclarationTag = new IssueId();
         public static readonly IssueId MissingRightExpression = new IssueId();
         public static readonly IssueId TerminalUsedAsSuffix = new IssueId();
