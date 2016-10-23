@@ -20,6 +20,7 @@ namespace Reni.Validation
         public static readonly IssueId ExtraRightBracket = new IssueId();
         public static readonly IssueId InvalidCharacter = new IssueId();
         public static readonly IssueId InvalidDeclarationTag = new IssueId();
+        public static readonly IssueId UnknownDeclarationTag = new IssueId();
         public static readonly IssueId InvalidExpression = new IssueId();
         public static readonly IssueId InvalidListOperandSequence = new IssueId();
         public static readonly IssueId MissingDeclaration = new IssueId();
