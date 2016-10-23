@@ -32,6 +32,7 @@ namespace Reni.Context
             => "/\\(." + ArgsType.ObjectId + "i)";
 
         internal override IFunctionContext ObtainRecentFunctionContext() => this;
+        protected override string LevelFormat => "function";
 
         TypeBase IFunctionContext.ArgsType => ArgsType;
 

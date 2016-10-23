@@ -36,6 +36,7 @@ namespace Reni.Struct
             => View.Find(tokenClass, true);
 
         internal override CompoundView ObtainRecentCompoundView() => View;
+        protected override string LevelFormat => "compount";
 
         int IContextReference.Order => _order;
 
