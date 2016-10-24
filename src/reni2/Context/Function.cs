@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using hw.DebugFormatter;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Type;
@@ -32,6 +32,7 @@ namespace Reni.Context
             => "/\\(." + ArgsType.ObjectId + "i)";
 
         internal override IFunctionContext ObtainRecentFunctionContext() => this;
+        [DisableDump]
         protected override string LevelFormat => "function";
 
         TypeBase IFunctionContext.ArgsType => ArgsType;
