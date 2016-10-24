@@ -36,7 +36,7 @@ namespace Reni.FeatureTest
     public sealed class ScopeHandlingError : CompilerTest {}
 
     [UnitTest]
-    [Target(@"(!non_public x: 1; !public y: 2); x dump_print")]
+    [Target(@"a:(!non_public x: 1; !public y: 2); a x dump_print")]
     [ScopeHandlingPublic]
     [ScopeHandlingNonPublic]
     public sealed class PublicNonPublic1 : CompilerTest
@@ -61,7 +61,7 @@ namespace Reni.FeatureTest
     }
 
     [UnitTest]
-    [Target(@"(!non_public x: 1; !public y: 2); y dump_print")]
+    [Target(@"a: (!non_public x: 1; !public y: 2); a y dump_print")]
     [ScopeHandlingPublic]
     [ScopeHandlingNonPublic]
     [Output("2")]
