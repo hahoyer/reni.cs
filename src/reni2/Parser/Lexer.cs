@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.Parser;
 using hw.Scanner;
 using Reni.Validation;
 
 namespace Reni.Parser
 {
-    public sealed class Lexer
+    public sealed class Lexer : Match2TwoLayerScannerGuard
     {
         const string Symbols = "^!%&/=?\\*+~><|:-";
         const string SingleCharSymbol = "({[)}];,.";
@@ -24,7 +23,7 @@ namespace Reni.Parser
         readonly IssueId _invalidLineComment = IssueId.EOFInLineComment;
         readonly IssueId _invalidComment = IssueId.EOFInComment;
         readonly IMatch _number;
-        readonly Match _lineComment;
+        readonly IMatch _lineComment;
         readonly Match _comment;
         readonly Match _whiteSpace;
         readonly Match _commentHead;
@@ -33,6 +32,7 @@ namespace Reni.Parser
         readonly Match _lineEndOrEnd;
 
         Lexer()
+            : base(error => new ScannerSyntaxError((IssueId) error))
         {
             var alpha = Match.Letter.Else("_");
             var symbol1 = SingleCharSymbol.AnyChar();
@@ -103,14 +103,13 @@ namespace Reni.Parser
         public static bool IsLineEnd(IItem item)
             => item.ScannerTokenType == Instance.LineEndItem.ScannerTokenType;
 
-        internal int? Number(SourcePosn sourcePosn) => sourcePosn.Match(_number);
-        internal int? Any(SourcePosn sourcePosn) => sourcePosn.Match(_any);
-        internal int? Text(SourcePosn sourcePosn) => sourcePosn.Match(_text);
-
-        int? WhiteSpace(SourcePosn sourcePosn) => sourcePosn.Match(_whiteSpace);
-        int? LineEnd(SourcePosn sourcePosn) => sourcePosn.Match(_lineEnd);
-        int? Comment(SourcePosn sourcePosn) => sourcePosn.Match(_comment);
-        int? LineComment(SourcePosn sourcePosn) => sourcePosn.Match(_lineComment);
+        internal int? Number(SourcePosn sourcePosn) => GuardedMatch(sourcePosn, _number);
+        internal int? Any(SourcePosn sourcePosn) => GuardedMatch(sourcePosn, _any);
+        internal int? Text(SourcePosn sourcePosn) => GuardedMatch(sourcePosn, _text);
+        int? WhiteSpace(SourcePosn sourcePosn) => GuardedMatch(sourcePosn, _whiteSpace);
+        int? LineEnd(SourcePosn sourcePosn) => GuardedMatch(sourcePosn, _lineEnd);
+        int? Comment(SourcePosn sourcePosn) => GuardedMatch(sourcePosn, _comment);
+        int? LineComment(SourcePosn sourcePosn) => GuardedMatch(sourcePosn, _lineComment);
 
 
         //Match.IError InvalidCharacterError { get; } = new Error(IssueId.InvalidCharacter);

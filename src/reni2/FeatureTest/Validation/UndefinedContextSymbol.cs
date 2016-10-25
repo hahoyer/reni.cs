@@ -76,7 +76,7 @@ namespace Reni.FeatureTest.Validation
         {
             var issueArray = issues.ToArray();
             var i = 0;
-            Tracer.Assert(issueArray[i].IssueId == IssueId.MissingDeclarationForType, issueArray[i].Dump);
+            Tracer.Assert(issueArray[i].IssueId == IssueId.MissingDeclarationInContext, issueArray[i].Dump);
             i++;
             Tracer.Assert(issueArray[i].IssueId == IssueId.ConsequentialError, issueArray[i].Dump);
             i++;

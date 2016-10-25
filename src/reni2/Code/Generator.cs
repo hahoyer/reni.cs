@@ -74,7 +74,7 @@ namespace Reni.Code
 
             return cr.CompiledAssembly;
         }
-
+                                                                            
         internal static void HandleErrors(CompilerErrorCollection cr)
         {
             for(var i = 0; i < cr.Count; i++)

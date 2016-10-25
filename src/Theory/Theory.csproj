@@ -42,6 +42,7 @@
     <Compile Include="hw\Helper\EnumEx.cs" />
     <Compile Include="hw\Helper\File.cs" />
     <Compile Include="hw\Helper\FunctionCache.cs" />
+    <Compile Include="hw\Helper\IUniqueIdProvider.cs" />
     <Compile Include="hw\Helper\LinqExtension.cs" />
     <Compile Include="hw\Helper\LongExtender.cs" />
     <Compile Include="hw\Helper\ReflectionExtender.cs" />
