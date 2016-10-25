@@ -11,5 +11,6 @@ obj/
 *.sln.ide
 /src/artifacts/bin
 /src/.idea
-/src/reni2.sdf
-/src/reni2/*.DotSettings
+/src/*.sdf
+/src/*.VC.db
+/src/*/*.DotSettings
