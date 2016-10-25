@@ -48,7 +48,7 @@ namespace Reni.FeatureTest
             var issueArray = issues.ToArray();
             var i = 0;
             var issueBase = issueArray[i];
-            Tracer.Assert(issueBase.IssueId == IssueId.MissingDeclarationInContext, issueBase.Dump);
+            Tracer.Assert(issueBase.IssueId == IssueId.MissingDeclarationForType, issueBase.Dump);
             Tracer.Assert(issueBase.Position.Id == "x", issueBase.Dump);
             i++;
             issueBase = issueArray[i];
