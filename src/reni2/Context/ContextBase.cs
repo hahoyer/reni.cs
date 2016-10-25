@@ -300,8 +300,9 @@ namespace Reni.Context
             =>
                 new RootIssueType
                     (
-                    new Issue(IssueId.MissingDeclaration, source, "Context: " + Dump()),
+                    new Issue(IssueId.MissingDeclarationInContext, source, "Context: " + Format),
                     RootContext);
+
 
         Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
         {
@@ -315,6 +316,11 @@ namespace Reni.Context
         internal virtual IEnumerable<ContextBase> ParentChain { get { yield return this; } }
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
+
+        [DisableDump]
+        public string Format => ParentChain.Select(item=>item.LevelFormat).Stringify(" in ");
+        [DisableDump]
+        protected abstract string LevelFormat { get; }
     }
 
     sealed class SmartNodeAttribute : Attribute {}

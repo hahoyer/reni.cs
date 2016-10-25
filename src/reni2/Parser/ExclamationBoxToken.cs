@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
+using JetBrains.Annotations;
 using Reni.TokenClasses;
+using Reni.Validation;
 
 namespace Reni.Parser
 {
@@ -25,14 +27,13 @@ namespace Reni.Parser
         string IParserTokenType<Syntax>.PrioTableId => PrioTable.Any;
         string ITokenClass.Id => "!";
 
+        [CanBeNull]
         Result<Declarator> IDeclaratorTokenClass.Get(Syntax syntax)
         {
             var provider = syntax.Right.TokenClass as IDeclaratorTagProvider;
             if(provider == null)
-            {
-                NotImplementedMethod(syntax);
-                return null;
-            }
+                return new Declarator(null, null)
+                    .Issues(IssueId.UnknownDeclarationTag.Create(syntax));
 
             var result = provider.Get(syntax.Right);
 

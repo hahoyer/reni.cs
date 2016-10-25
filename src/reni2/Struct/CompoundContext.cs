@@ -37,6 +37,9 @@ namespace Reni.Struct
 
         internal override CompoundView ObtainRecentCompoundView() => View;
 
+        [DisableDump]
+        protected override string LevelFormat => "compount";
+
         int IContextReference.Order => _order;
 
         [DisableDump]

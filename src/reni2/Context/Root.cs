@@ -74,6 +74,8 @@ namespace Reni.Context
 
         [DisableDump]
         internal override bool IsRecursionMode => false;
+        [DisableDump]
+        protected override string LevelFormat => "root context";
 
         [DisableDump]
         [Node]

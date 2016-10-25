@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using hw.DebugFormatter;
 using hw.Parser;
 using Reni.TokenClasses;
 
@@ -40,8 +41,18 @@ namespace Reni.Parser
         }
 
         internal override IParserTokenType<Syntax> GetTokenClass(string name)
-        {
-            throw new NotImplementedException();
-        }
+            => new InvalidDeclarationError(name);
+    }
+
+    sealed class InvalidDeclarationError : DumpableObject, IParserTokenType<Syntax>, ITokenClass
+    {
+        readonly string Name;
+        public InvalidDeclarationError(string name) { Name = name; }
+
+        Syntax IParserTokenType<Syntax>.Create(Syntax left, IToken token, Syntax right)
+            => Syntax.CreateSourceSyntax(left, this, token, right);
+
+        string IParserTokenType<Syntax>.PrioTableId => Name;
+        string ITokenClass.Id => Name;
     }
 }

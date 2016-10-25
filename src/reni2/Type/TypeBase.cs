@@ -734,7 +734,7 @@ namespace Reni.Type
             switch(searchResults.Length)
             {
             case 0:
-                return onError(IssueId.MissingDeclaration);
+                return onError(IssueId.MissingDeclarationForType);
             case 1:
                 return execute(searchResults.First());
             default:
