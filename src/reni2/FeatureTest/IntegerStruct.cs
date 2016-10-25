@@ -19,7 +19,7 @@ Integer8:
 /\{
     !public _data: 127 type instance(^ enable_cut);
 
-    create   : /\(Integer8(^));
+    !public create   : /\(Integer8(^));
     !public dump_print: /\(_data dump_print);
     !public +        :  /\create(_data + create(^) _data);
     !public clone: /!\create(_data) ;
