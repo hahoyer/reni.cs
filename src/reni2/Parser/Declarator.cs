@@ -2,19 +2,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Scanner;
 using Reni.TokenClasses;
+using Reni.Validation;
 
 namespace Reni.Parser
 {
     sealed class Declarator : DumpableObject
     {
+        SourcePart Position { get; }
         [EnableDump]
         IDeclarationTag[] Tags { get; }
         [EnableDump]
         Definable Target { get; }
 
-        internal Declarator(IDeclarationTag[] tags, Definable target)
+        internal Declarator(IDeclarationTag[] tags, Definable target, SourcePart position)
         {
+            Position = position;
             Tags = tags;
             Target = target;
         }
@@ -22,19 +26,19 @@ namespace Reni.Parser
         internal Result<Statement> Statement(Result<Value> right, IDefaultScopeProvider container)
             => Parser.Statement.Create(Tags, Target, right, container);
 
-        public Declarator WithName(Definable target)
+        public Result<Declarator> WithName(Definable target, SourcePart position)
         {
-            if(Target == null)
-                return new Declarator(Tags, target);
+            var result = new Declarator(Tags, target, Position + position);
+            if (Target == null)
+                return result;
 
-            NotImplementedMethod(target);
-            return null;
+            return result.Issues(IssueId.InvalidDeclarationTag.Create(Position));
         }
 
         public Declarator Combine(Declarator other)
         {
             Tracer.Assert(Target == null|| other.Target == null);
-            return new Declarator(Tags.plus(other.Tags), Target ?? other.Target);
+            return new Declarator(Tags.plus(other.Tags), Target ?? other.Target, Position + other.Position);
         }
     }
 

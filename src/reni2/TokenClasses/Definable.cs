@@ -26,9 +26,9 @@ namespace Reni.TokenClasses
             if(syntax.Right == null)
             {
                 if(syntax.Left == null)
-                    return new Declarator(null, this);
+                    return new Declarator(null, this,syntax.SourcePart);
 
-                return syntax.Left.Declarator?.Target.WithName(this);
+                return syntax.Left.Declarator?.Target.WithName(this,syntax.SourcePart);
             }
 
             Tracer.FlaggedLine(nameof(syntax) + "=" + syntax);

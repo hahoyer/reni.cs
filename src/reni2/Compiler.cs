@@ -6,7 +6,6 @@ using System.Linq;
 using System.Reflection;
 using hw.DebugFormatter;
 using hw.Helper;
-using hw.Parser;
 using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Code;
@@ -81,7 +80,6 @@ namespace Reni
             CodeContainerCache = NewValueCache
                 (() => new CodeContainer(ModuleName, Root, Syntax, Source.Data));
             SyntaxCache = NewValueCache(() => Parse(Source + 0));
-
         }
 
         static string ModuleNameFromFileName(string fileName)
@@ -206,8 +204,11 @@ namespace Reni
 
         [DisableDump]
         internal IEnumerable<Issue> Issues
-            => Syntax.AllIssues
-                .plus(Parameters.ParseOnly ? new Issue[0] : CodeContainer.Issues)
+            =>
+            Syntax
+                ?.AllIssues
+                .plus(Parameters.ParseOnly ? null : CodeContainer.Issues)
+            ?? new Issue[0]
             ;
 
 

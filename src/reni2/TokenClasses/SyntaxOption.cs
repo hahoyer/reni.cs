@@ -51,14 +51,7 @@ namespace Reni.TokenClasses
             get
             {
                 var declaratorTokenClass = Parent.TokenClass as IDeclaratorTokenClass;
-                var declarator = declaratorTokenClass?.Get(Parent);
-                if(declarator != null)
-                    return declarator;
-                if(IsInDump)
-                    return null;
-
-                NotImplementedMethod();
-                return null;
+                return declaratorTokenClass?.Get(Parent);
             }
         }
 

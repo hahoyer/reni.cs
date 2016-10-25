@@ -264,7 +264,7 @@ namespace Reni.TokenClasses
                 return Statement.CreateStatements(value, Option.DefaultScopeProvider);
 
             return new Result<Statement[]>
-                (new Statement[0], IssueId.InvalidListOperandSequence.Create(this));
+                (new Statement[0], IssueId.InvalidListOperandSequence.Create(this.SourcePart));
         }
 
         [DisableDump]
@@ -287,7 +287,7 @@ namespace Reni.TokenClasses
             var leftParenthesis = TokenClass as LeftParenthesis;
 
             if(leftParenthesis == null)
-                return new Result<Syntax>(this, IssueId.ExtraRightBracket.Create(parent));
+                return new Result<Syntax>(this, IssueId.ExtraRightBracket.Create(parent.SourcePart));
 
             Tracer.Assert(Left == null);
 
@@ -298,7 +298,7 @@ namespace Reni.TokenClasses
 
             if(levelDelta > 0)
                 return new Result<Syntax>
-                    (Right, IssueId.ExtraLeftBracket.Create(this));
+                    (Right, IssueId.ExtraLeftBracket.Create(this.SourcePart));
 
             NotImplementedMethod(level, parent);
             return null;

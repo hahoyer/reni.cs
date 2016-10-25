@@ -700,7 +700,7 @@ namespace Reni.Type
         protected virtual IssueType CreateIssue(Syntax source, IssueId issueId)
             => new RootIssueType
             (
-                new Issue(issueId, source, "Type: " + DumpPrintText),
+                new Issue(issueId, source.Token.Characters, "Type: " + DumpPrintText),
                 Root
             );
 

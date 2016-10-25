@@ -13,7 +13,7 @@ namespace Reni.Validation
         readonly IssueType _issueType;
 
         public ConsequentialIssueType(IssueType issueType, Syntax source)
-            : base(new Issue(IssueId.ConsequentialError, source)) { _issueType = issueType; }
+            : base(new Issue(IssueId.ConsequentialError, source.Token.Characters)) { _issueType = issueType; }
 
         [DisableDump]
         internal override Root Root => _issueType.Root;

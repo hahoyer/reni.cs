@@ -42,15 +42,16 @@ namespace Reni.TokenClasses
                 var result = new Declarator
                 (
                     items.Select(item => item.Target).Where(item => item != null).ToArray(),
-                    null
+                    null,
+                    syntax.SourcePart
                 );
                 var issues = items.SelectMany(item => item.Issues).ToArray();
                 return result.Issues(issues);
             }
             else
             {
-                var issues = bracketKernel.Issues.plus(IssueId.MissingDeclarationTag.Create(syntax));
-                return new Declarator(null, null).Issues(issues);
+                var issues = bracketKernel.Issues.plus(IssueId.MissingDeclarationTag.Create(syntax.SourcePart));
+                return new Declarator(null, null,syntax.SourcePart).Issues(issues);
             }
         }
 
@@ -60,7 +61,7 @@ namespace Reni.TokenClasses
             if(result != null)
                 return new Result<IDeclarationTag>(result);
 
-            return new Result<IDeclarationTag>(null, IssueId.InvalidDeclarationTag.Create(item));
+            return new Result<IDeclarationTag>(null, IssueId.InvalidDeclarationTag.Create(item.SourcePart));
         }
 
         IParserTokenType<Syntax> IBracketMatch<Syntax>.Value { get; } = new Matched();

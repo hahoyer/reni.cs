@@ -1,10 +1,10 @@
 ! mix_in: system;
 
-! local name: /!\ string("name");
+! non_public name: /!\ string("name");
 
 CompilerTest: /\
 (
-    ! local file: TextFile(name);
+    ! non_public file: TextFile(name);
     file data := ^;
     compiler: Compiler(name);
 );

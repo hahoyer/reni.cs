@@ -26,8 +26,13 @@ namespace Reni.TokenClasses
                 return new TerminalSyntax(this, syntax);
 
             if(syntax.Left != null && syntax.Right == null)
+            {
                 return new TerminalSyntax(this, syntax)
-                    .Issues<Value>(IssueId.TerminalUsedAsSuffix.Create(syntax.Left));
+                    .Issues<Value>
+                    (
+                    IssueId.TerminalUsedAsSuffix
+                    .Create(syntax.Left.SourcePart));
+            }
 
             NotImplementedMethod(syntax);
             return null;

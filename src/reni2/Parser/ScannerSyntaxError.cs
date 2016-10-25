@@ -25,7 +25,7 @@ namespace Reni.Parser
         {
             if(syntax.Right == null)
             {
-                var issues = IssueId.Create(syntax);
+                var issues = IssueId.Create(syntax.SourcePart);
                 return syntax.Left == null
                     ? new Result<Value>(new EmptyList(syntax), issues)
                     : syntax.Left.Value.With(issues);

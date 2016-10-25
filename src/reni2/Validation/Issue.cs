@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using hw.Parser;
 using hw.Scanner;
 using Reni.Code;
-using Reni.TokenClasses;
 
 namespace Reni.Validation
 {
@@ -13,11 +13,11 @@ namespace Reni.Validation
     {
         internal static readonly IEnumerable<Issue> Empty = new Issue[0];
 
-        internal Issue(IssueId issueId, Syntax syntax, string message = null)
+        internal Issue(IssueId issueId, SourcePart position, string message = null)
         {
             IssueId = issueId;
-            Syntax = syntax;
             Message = message??"";
+            Position = position;
             AssertValid();
             StopByObjectIds(139,145);
         }
@@ -26,10 +26,8 @@ namespace Reni.Validation
 
         [DisableDump]
         internal IssueId IssueId { get; }
-        [DisableDump]
-        Syntax Syntax { get; }
         [EnableDump]
-        internal SourcePart Position => Syntax.Token.Characters;
+        internal SourcePart Position;
         [EnableDump]
         internal string Message { get; }
         [DisableDump]

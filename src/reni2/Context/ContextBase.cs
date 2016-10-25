@@ -300,7 +300,7 @@ namespace Reni.Context
             =>
                 new RootIssueType
                     (
-                    new Issue(IssueId.MissingDeclarationInContext, source, "Context: " + Format),
+                    new Issue(IssueId.MissingDeclarationInContext, source.Token.Characters, "Context: " + Format),
                     RootContext);
 
 
