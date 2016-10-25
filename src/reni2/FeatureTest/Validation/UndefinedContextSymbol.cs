@@ -38,8 +38,6 @@ namespace Reni.FeatureTest.Validation
             var i = 0;
             Tracer.Assert(issueArray[i].IssueId == IssueId.MissingDeclarationForType, issueArray[i].Dump);
             i++;
-            Tracer.Assert(issueArray[i].IssueId == IssueId.ConsequentialError, issueArray[i].Dump);
-            i++;
             Tracer.Assert(i == issueArray.Length);
         }
     }
