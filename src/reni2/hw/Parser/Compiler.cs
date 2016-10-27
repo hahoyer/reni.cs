@@ -1,15 +1,15 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using hw.Parser;
 using hw.Scanner;
-using Reni.TokenClasses;
+using hw.Tests.CompilerTool.Util;
 
-namespace Reni
+namespace hw.Parser
 {
-    public class CompilerBase : DumpableObject
+    public class Compiler<TTreeItem> : DumpableObject
+        where TTreeItem : class, ISourcePart
     {
         sealed class ComponentData : DumpableObject
         {
@@ -19,38 +19,43 @@ namespace Reni
             readonly PrioTable PrioTable;
             readonly ITokenFactory TokenFactory;
 
-            readonly ValueCache<IParser<Syntax>> ParserCache;
-            readonly ValueCache<ISubParser<Syntax>> SubParserCache;
-            readonly Func<Syntax, IParserTokenType<Syntax>> Converter;
+            readonly ValueCache<IParser<TTreeItem>> ParserCache;
+            readonly ValueCache<ISubParser<TTreeItem>> SubParserCache;
+            readonly Func<TTreeItem, IParserTokenType<TTreeItem>> Converter;
 
-            internal IParser<Syntax> Parser => ParserCache.Value;
-            internal ISubParser<Syntax> SubParser => SubParserCache.Value;
+            internal IParser<TTreeItem> Parser => ParserCache.Value;
+            internal ISubParser<TTreeItem> SubParser => SubParserCache.Value;
 
             internal ComponentData
             (
                 PrioTable prioTable,
                 ITokenFactory tokenFactory,
-                Func<Syntax, IParserTokenType<Syntax>> converter)
+                Func<TTreeItem, IParserTokenType<TTreeItem>> converter)
             {
                 PrioTable = prioTable;
                 TokenFactory = tokenFactory;
                 Converter = converter;
-                ParserCache = new ValueCache<IParser<Syntax>>(CreateParser);
-                SubParserCache = new ValueCache<ISubParser<Syntax>>(CreateSubParser);
+                ParserCache = new ValueCache<IParser<TTreeItem>>(CreateParser);
+                SubParserCache = new ValueCache<ISubParser<TTreeItem>>(CreateSubParser);
             }
 
-            ISubParser<Syntax> CreateSubParser() => new SubParser<Syntax>(Parser, Converter);
+            ISubParser<TTreeItem> CreateSubParser() => new SubParser<TTreeItem>(Parser, Converter);
 
-            IParser<Syntax> CreateParser()
+            IParser<TTreeItem> CreateParser()
             {
-                if(PrioTable == null)
+                if (PrioTable == null)
                     return null;
 
-                return new PrioParser<Syntax>
+                ITokenFactory tokenFactory = new CachingTokenFactory(TokenFactory);
+                var beginOfText = tokenFactory.BeginOfText as IParserTokenType<TTreeItem>;
+                if (beginOfText == null)
+                    return null;
+
+                return new PrioParser<TTreeItem>
                 (
                     PrioTable,
-                    new TwoLayerScanner(new CachingTokenFactory(TokenFactory)),
-                    new BeginOfText()
+                    new TwoLayerScanner(tokenFactory),
+                    beginOfText
                 );
             }
 
@@ -58,13 +63,13 @@ namespace Reni
                 (
                     PrioTable prioTable,
                     ITokenFactory tokenFactory,
-                    Func<Syntax, IParserTokenType<Syntax>> converter
+                    Func<TTreeItem, IParserTokenType<TTreeItem>> converter
                 )
                 =>
                 new ComponentData
                     (prioTable ?? PrioTable, tokenFactory ?? TokenFactory, converter ?? Converter);
 
-            internal T Get<T>() => (T) Components[typeof(T)];
+            internal T Get<T>() => (T)Components[typeof(T)];
             internal void Add<T>(T value) => Components.Add(typeof(T), value);
         }
 
@@ -81,10 +86,10 @@ namespace Reni
 
         public sealed class Component
         {
-            public readonly CompilerBase Parent;
+            public readonly Compiler<TTreeItem> Parent;
             public readonly object Tag;
 
-            internal Component(CompilerBase parent, object tag)
+            internal Component(Compiler<TTreeItem> parent, object tag)
             {
                 Parent = parent;
                 Tag = tag;
@@ -98,25 +103,25 @@ namespace Reni
                 {
                     Parent.Define(null, value, null, Tag);
                     var component = value as IComponent;
-                    if(component != null)
+                    if (component != null)
                         component.Current = this;
                 }
             }
 
-            public Func<Syntax, IParserTokenType<Syntax>> BoxFunction
+            public Func<TTreeItem, IParserTokenType<TTreeItem>> BoxFunction
             {
                 set { Parent.Define(null, null, value, Tag); }
             }
 
-            public IParser<Syntax> Parser => Parent.Dictionary[Tag].Parser;
-            public ISubParser<Syntax> SubParser => Parent.Dictionary[Tag].SubParser;
+            public IParser<TTreeItem> Parser => Parent.Dictionary[Tag].Parser;
+            public ISubParser<TTreeItem> SubParser => Parent.Dictionary[Tag].SubParser;
             public T Get<T>() => Parent.Dictionary[Tag].Get<T>();
 
             public void Add<T>(T value)
             {
                 Parent.Dictionary[Tag].Add(value);
                 var component = value as IComponent;
-                if(component != null)
+                if (component != null)
                     component.Current = this;
             }
         }
@@ -125,7 +130,7 @@ namespace Reni
         (
             PrioTable prioTable,
             ITokenFactory tokenFactory,
-            Func<Syntax, IParserTokenType<Syntax>> converter,
+            Func<TTreeItem, IParserTokenType<TTreeItem>> converter,
             object tag
         )
         {
@@ -138,7 +143,7 @@ namespace Reni
 
         public PrioTable PrioTable { set { Define(value, null, null, EmptyTag); } }
         public ITokenFactory TokenFactory { set { Define(null, value, null, EmptyTag); } }
-        public IParser<Syntax> Parser => Dictionary[EmptyTag].Parser;
+        public IParser<TTreeItem> Parser => Dictionary[EmptyTag].Parser;
         public T Get<T>() => Dictionary[EmptyTag].Get<T>();
         public void Add<T>(T value) => Dictionary[EmptyTag].Add(value);
     }

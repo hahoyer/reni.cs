@@ -9,10 +9,11 @@ using Reni.Validation;
 
 namespace Reni.Parser
 {
-    sealed class ScannerTokenFactory : DumpableObject, ITokenFactory, CompilerBase.IComponent
+    sealed class ScannerTokenFactory : DumpableObject, ITokenFactory, Compiler<Syntax>.IComponent
     {
-        CompilerBase.Component Current;
+        Compiler<Syntax>.Component Current;
 
+        object ITokenFactory.BeginOfText => new BeginOfText();
         IScannerTokenType ITokenFactory.EndOfText => new EndOfText();
 
         IScannerTokenType ITokenFactory.InvalidCharacterError
@@ -31,6 +32,6 @@ namespace Reni.Parser
             new LexerItem(new Text(), Lexer.Instance.Text)
         };
 
-        CompilerBase.Component CompilerBase.IComponent.Current { set { Current = value; } }
+        Compiler<Syntax>.Component Compiler<Syntax>.IComponent.Current { set { Current = value; } }
     }
 }

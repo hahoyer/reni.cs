@@ -33,7 +33,6 @@
     <Compile Include="Code\None.cs" />
     <Compile Include="Code\ArrayAccess.cs" />
     <Compile Include="Code\UnknownStackData.cs" />
-    <Compile Include="CompilerBase.cs" />
     <Compile Include="CompilerParameters.cs" />
     <Compile Include="Context\ContextReferenceType.cs" />
     <Compile Include="Context\IRootProvider.cs" />
@@ -159,6 +158,7 @@
     <Compile Include="hw\Parser\BelongsToAttribute.cs" />
     <Compile Include="hw\Parser\BracketContext.cs" />
     <Compile Include="hw\Parser\CommonTokenType.cs" />
+    <Compile Include="hw\Parser\Compiler.cs" />
     <Compile Include="hw\Parser\Extension.cs" />
     <Compile Include="hw\Parser\GenericTokenFactory.cs" />
     <Compile Include="hw\Parser\IBinaryTreeItem.cs" />

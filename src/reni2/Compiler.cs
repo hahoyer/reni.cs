@@ -22,7 +22,7 @@ using static hw.Helper.ValueCacheExtension;
 namespace Reni
 {
     public sealed class Compiler
-        : CompilerBase, ValueCache.IContainer, Root.IParent, IExecutionContext
+        : Compiler<Syntax>, ValueCache.IContainer, Root.IParent, IExecutionContext
     {
         const string DefaultSourceIdentifier = "source";
         const string DefaultModuleName = "ReniModule";
