@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.Scanner;
+using hw.Parser;
 using Reni.Parser;
-using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
@@ -11,7 +10,7 @@ namespace Reni.TokenClasses
     [Variant(false, false)]
     [Variant(true, false)]
     [Variant(false, true)]
-    sealed class Function : TokenClass,IValueProvider
+    sealed class Function : TokenClass, IValueProvider
     {
         public static string TokenId(bool isImplicit = false, bool isMetaFunction = false)
             => "/" + (isImplicit ? "!" : "") + "\\" + (isMetaFunction ? "/\\" : "");
@@ -26,7 +25,8 @@ namespace Reni.TokenClasses
             _isMetaFunction = isMetaFunction;
         }
 
-        Result<Value> IValueProvider.Get(Syntax syntax) 
-            => FunctionSyntax.Create(syntax.Left, _isImplicit, _isMetaFunction, syntax.Right, syntax);
+        Result<Value> IValueProvider.Get(Syntax syntax)
+            =>
+            FunctionSyntax.Create(syntax.Left, _isImplicit, _isMetaFunction, syntax.Right, syntax);
     }
 }

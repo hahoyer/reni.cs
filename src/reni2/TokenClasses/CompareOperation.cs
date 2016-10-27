@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Parser;
 using Reni.Feature;
 using Reni.Numeric;
 using Reni.Parser;
@@ -15,7 +16,8 @@ namespace Reni.TokenClasses
     [Variant(true, true)]
     sealed class CompareOperation : Operation
     {
-        public static string TokenId(bool isLess=true, bool canBeEqual=false) => (isLess ? "<" : ">") + (canBeEqual ? "=" : "");
+        public static string TokenId(bool isLess = true, bool canBeEqual = false)
+            => (isLess ? "<" : ">") + (canBeEqual ? "=" : "");
 
         public CompareOperation(bool isLess, bool canBeEqual)
         {
@@ -28,6 +30,7 @@ namespace Reni.TokenClasses
         public override string Id => TokenId(IsLess, CanBeEqual);
 
         [DisableDump]
-        internal override IEnumerable<IDeclarationProvider> Genericize => this.GenericListFromDefinable(base.Genericize);
+        internal override IEnumerable<IDeclarationProvider> Genericize
+            => this.GenericListFromDefinable(base.Genericize);
     }
 }

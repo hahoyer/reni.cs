@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using hw.Parser;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
@@ -24,12 +25,13 @@ namespace Reni.TokenClasses
         {
             if(category <= Category.Type.Replenished)
                 return Result(context, category, left, right);
+
             NotImplementedMethod(context, category, left, right);
             return null;
         }
 
         Result IRecursionHandler.Execute
-            (
+        (
             ContextBase context,
             Category category,
             Category pendingCategory,

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Parser;
 using Reni.Parser;
 
 namespace Reni.TokenClasses
@@ -37,7 +38,8 @@ namespace Reni.TokenClasses
             return new Result<Statement[]>(target, issues);
         }
 
-        Result<Statement[]> CreateStatements(Syntax syntax, Syntax parent, IDefaultScopeProvider container)
+        Result<Statement[]> CreateStatements
+            (Syntax syntax, Syntax parent, IDefaultScopeProvider container)
             => syntax == null
                 ? Statement.CreateStatements(new EmptyList(parent), container)
                 : syntax.GetStatements(this);

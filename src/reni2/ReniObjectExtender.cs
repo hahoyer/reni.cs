@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using hw.DebugFormatter;
 using hw.Helper;
+using hw.Parser;
 using Reni.Numeric;
 using Reni.Parser;
 using Reni.TokenClasses;
@@ -71,7 +72,7 @@ namespace Reni
             case MemberTypes.Method:
                 return member
                     .DeclaringType
-                    .GetAttributes<Variant>(false)
+                    .GetAttributes<VariantAttribute>(false)
                     .Select
                     (item => (string) ((MethodInfo) member).Invoke(null, item.CreationParameter));
             case MemberTypes.Field:

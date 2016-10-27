@@ -12,7 +12,7 @@ namespace ReniStudio
         [STAThread]
         public static void Main()
         {
-            Tracer.IsBreakDisabled = true;
+            //Tracer.IsBreakDisabled = true;
             new StudioApplication().Run();
         }
     }

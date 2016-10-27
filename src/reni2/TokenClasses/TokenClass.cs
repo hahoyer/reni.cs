@@ -2,9 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Helper;
 using hw.Parser;
-using JetBrains.Annotations;
 using Reni.Parser;
 
 namespace Reni.TokenClasses
@@ -18,29 +16,5 @@ namespace Reni.TokenClasses
 
         [DisableDump]
         internal virtual bool IsVisible => true;
-    }
-
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    [MeansImplicitUse]
-    sealed class BelongsTo : Attribute
-    {
-        public System.Type TokenFactory { get; }
-
-        public BelongsTo(System.Type tokenFactory) { TokenFactory = tokenFactory; }
-    }
-
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    [MeansImplicitUse]
-    sealed class Variant : Attribute
-    {
-        internal object[] CreationParameter { get; }
-
-        public Variant(params object[] creationParameter) { CreationParameter = creationParameter; }
-
-        internal TokenClass CreateInstance(System.Type type)
-            => (TokenClass) type
-                .GetConstructor(CreationParameter.Select(p => p.GetType()).ToArray())
-                .AssertNotNull()
-                .Invoke(CreationParameter);
     }
 }
