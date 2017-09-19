@@ -8,7 +8,8 @@ using hw.Helper;
 
 namespace ReniUI
 {
-    static class SystemConfiguration
+    static class 
+        SystemConfiguration
     {
         const string ConfigRoot = ".StudioConfig";
 
@@ -28,7 +29,8 @@ namespace ReniUI
             if(fileOpenController.FileName == null)
                 return;
 
-            new EditorView(new FileConfiguration(fileOpenController.FileName), application).Run();
+            new EditorView(new FileConfiguration(fileOpenController.FileName), application)
+                .Run();
         }
 
         internal static void OnFileOpen

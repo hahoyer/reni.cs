@@ -28,7 +28,7 @@ namespace Reni.Parser
             Lexer.Instance.CommentItem,
             Lexer.Instance.LineCommentItem,
             new LexerItem(new Number(), Lexer.Instance.Number),
-            new LexerItem(Current.Get<GenericTokenFactory<Syntax>>(), Lexer.Instance.Any),
+            new LexerItem(Current.Get<ScannerTokenType<Syntax>>(), Lexer.Instance.Any),
             new LexerItem(new Text(), Lexer.Instance.Text)
         };
 

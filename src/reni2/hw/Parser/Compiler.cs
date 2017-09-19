@@ -4,7 +4,6 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
-using hw.Tests.CompilerTool.Util;
 
 namespace hw.Parser
 {

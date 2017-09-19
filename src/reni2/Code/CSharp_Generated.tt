@@ -1,4 +1,5 @@
 ﻿<#@ template language="C#" #>
+<#@ import namespace="Reni.Code" #>
 
 using System;
 using Reni;

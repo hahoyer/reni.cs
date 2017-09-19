@@ -69,18 +69,21 @@ namespace Reni
             Source = source;
             Parameters = parameters ?? new CompilerParameters();
             ModuleName = modulName;
-            MainTokenFactory = new MainTokenFactory();
+
+            var declaration = this["Declaration"];
+
+            MainTokenFactory = new MainTokenFactory(declaration);
 
             PrioTable = MainPrioTable;
             TokenFactory = new ScannerTokenFactory();
-            Add<GenericTokenFactory<Syntax>>(MainTokenFactory);
-            this["Declaration"].PrioTable = DeclarationPrioTable;
-            this["Declaration"].TokenFactory = new ScannerTokenFactory();
-            this["Declaration"].BoxFunction = target => new ExclamationBoxToken(target);
-            this["Declaration"].Add<GenericTokenFactory<Syntax>>(new DeclarationTokenFactory());
+            Add<ScannerTokenType<Syntax>>(MainTokenFactory);
+            declaration.PrioTable = DeclarationPrioTable;
+            declaration.TokenFactory = new ScannerTokenFactory();
+            declaration.BoxFunction = target => new ExclamationBoxToken(target);
+            declaration.Add<ScannerTokenType<Syntax>>(new DeclarationTokenFactory());
 
             Parser.Trace = Parameters.TraceOptions.Parser;
-            this["Declaration"].Parser.Trace = Parameters.TraceOptions.Parser;
+            declaration.Parser.Trace = Parameters.TraceOptions.Parser;
 
             Root = new Root(this);
             CodeContainerCache = NewValueCache

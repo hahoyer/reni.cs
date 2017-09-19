@@ -7,15 +7,20 @@ using Reni.TokenClasses;
 
 namespace Reni.Parser
 {
-    sealed class MainTokenFactory : GenericTokenFactory<Syntax>, Compiler<Syntax>.IComponent
+    sealed class MainTokenFactory : GenericTokenFactory<Syntax>
     {
+        readonly Compiler<Syntax>.Component Declaration;
         readonly List<UserSymbol> UserSymbols = new List<UserSymbol>();
-        ISubParser<Syntax> DeclarationSubParser;
+
+        public MainTokenFactory(Compiler<Syntax>.Component declaration)
+        {
+            Declaration = declaration;
+        }
 
         protected override IParserTokenType<Syntax> SpecialTokenClass(System.Type type)
         {
             if(type == typeof(Exclamation))
-                return new Exclamation(DeclarationSubParser);
+                return new Exclamation(Declaration.SubParser);
 
             return base.SpecialTokenClass(type);
         }
@@ -30,10 +35,5 @@ namespace Reni.Parser
         [DisableDump]
         internal IEnumerable<IParserTokenType<Syntax>> AllTokenClasses
             => PredefinedTokenClasses.Concat(UserSymbols);
-
-        Compiler<Syntax>.Component Compiler<Syntax>.IComponent.Current
-        {
-            set { DeclarationSubParser = value.Parent["Declaration"].SubParser; }
-        }
     }
 }
