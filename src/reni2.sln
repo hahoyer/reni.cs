@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{71905A24-D1C7-468D-8E25-553FA67DA2D9}"
 	ProjectSection(SolutionItems) = preProject
@@ -34,12 +34,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Resources\UnknownCache.bmp = Resources\UnknownCache.bmp
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reni2", "reni2\Reni2.csproj", "{EBB73C84-6622-4183-A28F-B0DFF606006B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "reniTest", "ReniTest\reniTest.csproj", "{A639A515-D066-4C12-A4C5-07DA91C19A2C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReniExe", "ReniExe\ReniExe.csproj", "{54D4A90B-C3CF-4F72-B447-CBC08B6EF5AB}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{42AF6999-EE7E-46AC-BF8E-14F2F567ECF1}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\NuGet.Config = .nuget\NuGet.Config
@@ -59,6 +53,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{A045FCB3
 		..\build\NuGetPackage.targets = ..\build\NuGetPackage.targets
 		..\build\sys.targets = ..\build\sys.targets
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reni2", "reni2\Reni2.csproj", "{EBB73C84-6622-4183-A28F-B0DFF606006B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "reniTest", "ReniTest\reniTest.csproj", "{A639A515-D066-4C12-A4C5-07DA91C19A2C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReniExe", "ReniExe\ReniExe.csproj", "{54D4A90B-C3CF-4F72-B447-CBC08B6EF5AB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Theory", "Theory\Theory.csproj", "{9C9C2707-F251-4376-8940-A96A0E1688C2}"
 EndProject
@@ -159,6 +159,7 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		VisualSVNWorkingCopyRoot = .
+		SolutionGuid = {16B1A750-4D72-48AD-A91D-23A7F10F4CDD}
 	EndGlobalSection
 	GlobalSection(CodealikeProperties) = postSolution
 		SolutionGuid = eaf46459-7dac-4986-b4bb-bb69ffbc6141

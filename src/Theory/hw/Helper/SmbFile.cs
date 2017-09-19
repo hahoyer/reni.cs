@@ -3,34 +3,39 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
+using System.Text;
 using hw.DebugFormatter;
 
 namespace hw.Helper
 {
-    /// <summary>
-    ///     Summary description for File.
-    /// </summary>
     [Serializable]
-    public sealed class File
+    public sealed class SmbFile
     {
         readonly string _name;
+        FileSystemInfo _fileInfoCache;
 
-        Uri _uriCache;
-
-        public Uri Uri => _uriCache ?? (_uriCache = new Uri(_name));
-
-        public bool IsFTP => Uri.Scheme == Uri.UriSchemeFtp;
+        /// <summary>
+        ///     Ensure, that all directories are existent when writing to file.
+        ///     Can be modified at any time.
+        /// </summary>
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
+        public bool AutoCreateDirectories;
 
         /// <summary>
         ///     constructs a FileInfo
         /// </summary>
         /// <param name="name"> the filename </param>
-        internal static File Create(string name) => new File(name);
+        /// <param name="autoCreateDirectories"></param>
+        internal static SmbFile Create(string name, bool autoCreateDirectories)
+            => new SmbFile(name, autoCreateDirectories);
 
-        File(string name) { _name = name; }
+        SmbFile(string name, bool autoCreateDirectories)
+        {
+            _name = name;
+            AutoCreateDirectories = autoCreateDirectories;
+        }
 
-        public File() { _name = ""; }
+        public SmbFile() { _name = ""; }
 
         /// <summary>
         ///     considers the file as a string. If file existe it should be a text file
@@ -40,34 +45,42 @@ namespace hw.Helper
         {
             get
             {
-                if(System.IO.File.Exists(_name))
-                    using(var f = System.IO.File.OpenText(_name))
-                        return f.ReadToEnd();
+                if(!System.IO.File.Exists(_name))
+                    return null;
 
-                try
-                {
-                    if(Uri.Scheme == Uri.UriSchemeHttp)
-                        return StringFromHTTP;
-                }
-                catch
-                {
-                    // ignored
-                }
-
-                return null;
+                using(var f = System.IO.File.OpenText(_name))
+                    return f.ReadToEnd();
             }
             set
             {
+                CheckedEnsureDirectoryOfFileExists();
                 using(var f = System.IO.File.CreateText(_name))
                     f.Write(value);
             }
         }
 
-        public void EnsureDirectoryOfFileExists()
-            => DirectoryName?.FileHandle().EnsureIsExistentDirectory();
+        public string SubString(long start, int size)
+        {
+            if(!System.IO.File.Exists(_name))
+                return null;
 
-        [Obsolete("(Renamed) Use EnsureDirectoryOfFileExists instead")]
-        public void AssumeDirectoryOfFileExists() => EnsureDirectoryOfFileExists();
+            using(var f = Reader)
+            {
+                f.Position = start;
+                var buffer = new byte[size];
+                f.Read(buffer, 0, size);
+                return Encoding.UTF8.GetString(buffer);
+            }
+        }
+
+        public void CheckedEnsureDirectoryOfFileExists()
+        {
+            if(AutoCreateDirectories)
+                EnsureDirectoryOfFileExists();
+        }
+
+        public void EnsureDirectoryOfFileExists()
+            => DirectoryName?.ToSmbFile(false).EnsureIsExistentDirectory();
 
         public void EnsureIsExistentDirectory()
         {
@@ -77,20 +90,6 @@ namespace hw.Helper
             {
                 EnsureDirectoryOfFileExists();
                 Directory.CreateDirectory(FullName);
-            }
-        }
-
-        string StringFromHTTP
-        {
-            get
-            {
-                var req = WebRequest.Create(Uri.AbsoluteUri);
-                var resp = req.GetResponse();
-                var stream = resp.GetResponseStream();
-                Tracer.Assert(stream != null);
-                var streamReader = new StreamReader(stream);
-                var result = streamReader.ReadToEnd();
-                return result;
             }
         }
 
@@ -117,7 +116,8 @@ namespace hw.Helper
             }
         }
 
-        public FileStream Reader => System.IO.File.OpenRead(_name);
+        public FileStream Reader
+            => new FileStream(_name, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
         /// <summary>
         ///     Size of file in bytes
@@ -193,17 +193,17 @@ namespace hw.Helper
         /// </summary>
         public bool IsDirectory => Directory.Exists(_name);
 
-        FileSystemInfo _fileInfoCache;
-
         FileSystemInfo FileSystemInfo
         {
             get
             {
-                if(_fileInfoCache == null)
-                    if(IsDirectory)
-                        _fileInfoCache = new DirectoryInfo(_name);
-                    else
-                        _fileInfoCache = new FileInfo(_name);
+                if(_fileInfoCache != null)
+                    return _fileInfoCache;
+
+                _fileInfoCache = IsDirectory
+                    ? (FileSystemInfo) new DirectoryInfo(_name)
+                    : new FileInfo(_name);
+
                 return _fileInfoCache;
             }
         }
@@ -228,7 +228,13 @@ namespace hw.Helper
         FileSystemInfo[] GetItems()
             => ((DirectoryInfo) FileSystemInfo).GetFileSystemInfos().ToArray();
 
-        public File[] Items { get { return GetItems().Select(f => Create(f.FullName)).ToArray(); } }
+        public SmbFile[] Items
+        {
+            get
+            {
+                return GetItems().Select(f => Create(f.FullName, AutoCreateDirectories)).ToArray();
+            }
+        }
 
         /// <summary>
         ///     Gets the directory of the source file that called this function
@@ -257,9 +263,8 @@ namespace hw.Helper
         public static string[] Select(string filePattern)
         {
             var namePattern = filePattern.Split('\\').Last();
-            return Directory
-                .GetFiles
-                (filePattern.Substring(0, filePattern.Length - namePattern.Length - 1), namePattern);
+            var path = filePattern.Substring(0, filePattern.Length - namePattern.Length - 1);
+            return Directory.GetFiles(path, namePattern);
         }
 
         public bool IsLocked
@@ -297,7 +302,7 @@ namespace hw.Helper
                 System.IO.File.Copy(FullName, destinationPath);
         }
 
-        public File[] GuardedItems()
+        public SmbFile[] GuardedItems()
         {
             try
             {
@@ -309,13 +314,14 @@ namespace hw.Helper
                 // ignored
             }
 
-            return new File[0];
+            return new SmbFile[0];
         }
 
-        public IEnumerable<File> RecursiveItems()
+        public IEnumerable<SmbFile> RecursiveItems()
         {
             yield return this;
-            if (!IsDirectory)
+
+            if(!IsDirectory)
                 yield break;
 
             Tracer.Line(FullName);
@@ -323,7 +329,9 @@ namespace hw.Helper
             while(true)
             {
                 var newList = new List<string>();
-                var items = filePaths.SelectMany(s => s.FileHandle().GuardedItems()).ToArray();
+                var items =
+                    filePaths.SelectMany(s => s.ToSmbFile(AutoCreateDirectories).GuardedItems())
+                        .ToArray();
                 foreach(var item in items)
                 {
                     yield return item;

@@ -7,7 +7,11 @@
     <TargetTypeEx>CSharp.WinExe</TargetTypeEx>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="JetBrains.Annotations, Version=11.0.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\packages\JetBrains.Annotations.11.0.0\lib\net20\JetBrains.Annotations.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -46,6 +50,7 @@
     <Compile Include="hw\Helper\LinqExtension.cs" />
     <Compile Include="hw\Helper\LongExtender.cs" />
     <Compile Include="hw\Helper\ReflectionExtender.cs" />
+    <Compile Include="hw\Helper\SmbFile.cs" />
     <Compile Include="hw\Helper\StringAligner.cs" />
     <Compile Include="hw\Helper\StringExtender.cs" />
     <Compile Include="hw\Helper\TypeLibrary.cs" />
