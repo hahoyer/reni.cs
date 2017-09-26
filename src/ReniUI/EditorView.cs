@@ -71,7 +71,7 @@ namespace ReniUI
 
             Client = TextBox;
 
-            TextBox.Text = Configuration.FileName.FileHandle().String;
+            TextBox.Text = Configuration.FileName.ToSmbFile().String;
             TextBox.EmptyUndoBuffer();
             Configuration.ConnectToEditor(TextBox);
 
@@ -119,7 +119,7 @@ namespace ReniUI
         void SaveFile()
         {
             _saveManager = null;
-            Configuration.FileName.FileHandle().String = TextBox.Text;
+            Configuration.FileName.ToSmbFile().String = TextBox.Text;
             TextBox.SetSavePoint();
             AlignTitle();
         }

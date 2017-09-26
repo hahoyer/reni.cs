@@ -19,6 +19,6 @@ namespace Reni.FeatureTest
     [Output("Ha")]
     public sealed class ComplexContext : CompilerTest
     {
-        protected override string Target => "FeatureTest\\ComplexContext.reni".FileHandle().String;
+        protected override string Target => "FeatureTest\\ComplexContext.reni".ToSmbFile().String;
     }
 }

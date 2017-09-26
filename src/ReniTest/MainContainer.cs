@@ -42,7 +42,7 @@ namespace ReniTest
         {
             Tracer.IsBreakDisabled = false;
             const string fileName = "temptest.reni";
-            var f = fileName.FileHandle();
+            var f = fileName.ToSmbFile();
             f.String = text;
             var compiler = Compiler.FromText(fileName);
             //Profiler.Measure(()=>compiler.Exec());

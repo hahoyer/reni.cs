@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Windows.Forms;
 using hw.DebugFormatter;
 using hw.Helper;
@@ -23,23 +20,24 @@ namespace ReniUI
 
         internal string Status
         {
-            get { return ItemFile("Status").String; }
-            private set { ItemFile("Status").String = value; }
+            get => ItemFile("Status").String;
+            private set => ItemFile("Status").String = value;
         }
 
         internal DateTime? LastUsed
         {
-            get { return FromDateTime(ItemFile("LastUsed").String); }
-            private set { ItemFile("LastUsed").String = value?.ToString("O"); }
+            get => FromDateTime(ItemFile("LastUsed").String);
+            private set => ItemFile("LastUsed").String = value?.ToString("O");
         }
+
+        internal string PositionPath => ItemFileName("Position");
 
         static DateTime? FromDateTime(string value)
         {
-            if(value == null)
+            if (value == null)
                 return null;
 
-            DateTime result;
-            if(DateTime.TryParse(value, out result))
+            if (DateTime.TryParse(value, out var result))
                 return result;
 
             return null;
@@ -66,22 +64,22 @@ namespace ReniUI
             frame.Activated += (a, s) => LastUsed = DateTime.Now;
         }
 
-        hw.Helper.File ItemFile(string itemName) => ItemFileName(itemName).FileHandle();
+        SmbFile ItemFile(string itemName) 
+            => ItemFileName(itemName).ToSmbFile();
 
-        string ItemFileName(string itemName)
+        string ItemFileName(string itemName) 
             => SystemConfiguration
-                .GetConfigurationPath(FileName)
-                .PathCombine(itemName);
+            .GetConfigurationPath(FileName)
+            .PathCombine(itemName);
 
-        void OnClosing() { Status = "Closed"; }
-        void OnActivated() { LastUsed = DateTime.Now; }
+        void OnClosing() => Status = "Closed";
+
+        void OnActivated() => LastUsed = DateTime.Now;
 
         void OnUpdate(UpdateChange change)
         {
-            if(change.HasFlag(UpdateChange.Selection))
+            if (change.HasFlag(UpdateChange.Selection))
                 FilePersister.Value.Store("Selection");
         }
-
-        internal string PositionPath => ItemFileName("Position");
     }
 }

@@ -20,7 +20,7 @@ namespace Reni.FeatureTest
 {
     abstract public class TextStruct : CompilerTest
     {
-        static string Definition() => "FeatureTest\\Text.reni".FileHandle().String;
+        static string Definition() => "FeatureTest\\Text.reni".ToSmbFile().String;
         protected override string Target => Definition() + "; (" + InstanceCode + ") dump_print";
         protected virtual string InstanceCode => GetStringAttribute<InstanceCodeAttribute>();
     }

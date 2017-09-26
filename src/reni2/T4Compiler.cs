@@ -14,8 +14,7 @@ namespace Reni
         public string Code()
         {
             var fileName = Environment.GetEnvironmentVariable("temp") + "\\reni\\T4Compiler.reni";
-            var f = fileName.FileHandle();
-            f.AssumeDirectoryOfFileExists();
+            var f = fileName.ToSmbFile();
             f.String = _text;
             var compiler = Compiler.FromFile(fileName);
             return compiler.CSharpString;

@@ -36,7 +36,7 @@ namespace ReniUI.CompilationView
                 return;
 
             _savedDataCache.IsValid = false;
-            _fileName.FileHandle().String = _savedDataCache.Value;
+            _fileName.ToSmbFile().String = _savedDataCache.Value;
         }
     }
 }

@@ -13,11 +13,12 @@ namespace hw.Scanner
         public FileSourceProvider(File file, bool useCache = true)
         {
             File = file;
-            if(useCache)
+            if (useCache)
                 DataCache = new ValueCache<string>(() => File.String);
         }
 
         string ISourceProvider.Data => DataCache?.Value ?? File.String;
         bool ISourceProvider.IsPersistent => false;
     }
+
 }

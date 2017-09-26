@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using hw.DebugFormatter;
@@ -8,7 +7,7 @@ using hw.Helper;
 
 namespace ReniUI
 {
-    static class 
+    static class
         SystemConfiguration
     {
         const string ConfigRoot = ".StudioConfig";
@@ -19,14 +18,49 @@ namespace ReniUI
         internal static string SystemConfigurationPath
             => OurFolder(Environment.SpecialFolder.CommonApplicationData);
 
+        internal static FileConfiguration[] ActiveFileNames
+        {
+            get
+            {
+                var allKnownFileNames = AllKnownFileNames.ToArray();
+                return allKnownFileNames
+                    .Select(item => new FileConfiguration(item))
+                    .Where(item => item.Status != "Closed")
+                    .OrderBy(item => item.LastUsed)
+                    .ToArray();
+            }
+        }
+
+        static string EditorFilesPath => ConfigRoot.PathCombine("EditorFiles");
+
+        static IEnumerable<string> AllKnownFileNames
+            => ConfigurationPathsForAllKnownFiles
+                .Select(GetEditorFileName);
+
+        static IEnumerable<string> ConfigurationPathsForAllKnownFiles
+        {
+            get
+            {
+                var fileHandle = EditorFilesPath.ToSmbFile();
+                if (fileHandle.Exists)
+                    return fileHandle
+                        .Items
+                        .Select(item => item.FullName);
+
+                return Enumerable.Empty<string>();
+            }
+        }
+
         static string OurFolder(Environment.SpecialFolder folder)
-            => OurFolder(Environment.GetFolderPath(folder));
+        {
+            return OurFolder(Environment.GetFolderPath(folder));
+        }
 
         internal static void QueryFileAndOpenIt
             (this IFileOpenController fileOpenController, IStudioApplication application)
         {
             fileOpenController.OnFileOpen("Reni file", "Reni files|*.reni|All files|*.*", "reni");
-            if(fileOpenController.FileName == null)
+            if (fileOpenController.FileName == null)
                 return;
 
             new EditorView(new FileConfiguration(fileOpenController.FileName), application)
@@ -49,74 +83,66 @@ namespace ReniUI
                 Title = title,
                 RestoreDirectory = restoreDirectory,
                 InitialDirectory = InitialDirectory(controller),
-                FileName = controller.FileName?.FileHandle().Name,
+                FileName = controller.FileName?.ToSmbFile().Name,
                 Filter = filter,
                 CheckFileExists = checkFileExists,
                 FilterIndex = filterIndex,
                 DefaultExt = defaultExtension
             };
 
-            if(dialog.ShowDialog() != DialogResult.OK)
+            if (dialog.ShowDialog() != DialogResult.OK)
                 return;
 
-            var newFile = dialog.FileName.FileHandle();
-            if(!newFile.Exists)
+            var newFile = dialog.FileName.ToSmbFile();
+            if (!newFile.Exists)
                 newFile.String = controller.CreateEmptyFile;
             controller.FileName = newFile.FullName;
         }
 
-        internal static FileConfiguration[] ActiveFileNames
-            => AllKnownFileNames
-                .Select(item => new FileConfiguration(item))
-                .Where(item => item.Status != "Closed")
-                .OrderBy(item => item.LastUsed)
-                .ToArray();
-
 
         internal static string GetConfigurationPath(string editorFileName)
         {
-            var projectPath = ".".FileHandle().FullName + "\\";
-            var fullFileName = editorFileName.FileHandle().FullName;
+            var projectPath = ".".ToSmbFile().FullName + "\\";
+            var fullFileName = editorFileName.ToSmbFile().FullName;
 
             Tracer.Assert(fullFileName.StartsWith(projectPath));
             var fileName = fullFileName.Substring(projectPath.Length);
 
             return GetKnownConfigurationPath(fileName, fullFileName)
-                ?? GetNewConfigurationPath(fileName);
+                   ?? GetNewConfigurationPath(fileName);
         }
 
         static string GetKnownConfigurationPath(string fileName, string fullFileName)
         {
-            var fileHandle = EditorFilesPath.PathCombine(fileName).FileHandle();
-            fileHandle.AssumeDirectoryOfFileExists();
+            EditorFilesPath.PathCombine(fileName).ToSmbFile().EnsureDirectoryOfFileExists();
 
             var result = ConfigurationPathsForAllKnownFiles
                 .SingleOrDefault
-                (item => GetEditorFileName(item).FileHandle().FullName == fullFileName);
+                (item => GetEditorFileName(item).ToSmbFile().FullName == fullFileName);
             return result;
         }
 
-        static string EditorFilesPath => ConfigRoot.PathCombine( "EditorFiles");
-
-        static string OurFolder(string head) => head.PathCombine("HoyerWare", "ReniStudio");
+        static string OurFolder(string head)
+        {
+            return head.PathCombine("HoyerWare", "ReniStudio");
+        }
 
         static string GetNewConfigurationPath(string fileName)
         {
             var configurationFileName = fileName.Replace("\\", "_");
 
-            while(true)
+            while (true)
             {
                 var duplicates = EditorFilesPath
-                    .FileHandle()
+                    .ToSmbFile()
                     .Items
                     .Select(item => item.Name)
                     .Count(item => item.StartsWith(configurationFileName));
 
-                if(duplicates == 0)
+                if (duplicates == 0)
                 {
                     var result = EditorFilesPath.PathCombine(configurationFileName);
-                    var nameFile = result.PathCombine("Name").FileHandle();
-                    nameFile.AssumeDirectoryOfFileExists();
+                    var nameFile = result.PathCombine("Name").ToSmbFile();
                     nameFile.String = fileName;
                     return result;
                 }
@@ -125,31 +151,17 @@ namespace ReniUI
             }
         }
 
-        static IEnumerable<string> AllKnownFileNames
-            => ConfigurationPathsForAllKnownFiles
-                .Select(GetEditorFileName);
-
-        static IEnumerable<string> ConfigurationPathsForAllKnownFiles
+        static string GetEditorFileName(string configurationPath)
         {
-            get
-            {
-                var fileHandle = EditorFilesPath.FileHandle();
-                if(fileHandle.Exists)
-                    return fileHandle
-                        .Items
-                        .Select(item => item.FullName);
-
-                return Enumerable.Empty<string>();
-            }
+            return configurationPath.PathCombine("Name").ToSmbFile().String;
         }
 
-        static string GetEditorFileName(string configurationPath)
-            => configurationPath.PathCombine("Name").FileHandle().String;
-
         static string InitialDirectory(IFileOpenController controller)
-            => controller.FileName == null
-                ? controller.DefaultDirectory.FileHandle().FullName
-                : controller.FileName.FileHandle().DirectoryName;
+        {
+            return controller.FileName == null
+                ? controller.DefaultDirectory.ToSmbFile().FullName
+                : controller.FileName.ToSmbFile().DirectoryName;
+        }
     }
 
     interface IFileOpenController

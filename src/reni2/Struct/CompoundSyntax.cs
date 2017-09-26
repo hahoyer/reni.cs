@@ -128,7 +128,7 @@ namespace Reni.Struct
 
         string DumpDataToFile()
         {
-            var dumpFile = ("compound." + ObjectId).FileHandle();
+            var dumpFile = ("compound." + ObjectId).ToSmbFile();
             var oldResult = dumpFile.String;
             var newResult = (_runId + DumpDataToString()).Replace("\n", "\r\n");
             if(oldResult == null || !oldResult.StartsWith(_runId))

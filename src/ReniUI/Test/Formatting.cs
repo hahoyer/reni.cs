@@ -260,11 +260,11 @@ namespace ReniUI.Test
             var srcDir = new StackTrace(true)
                 .GetFrame(0)
                 .GetFileName()
-                .FileHandle()
+                .ToSmbFile()
                 .DirectoryName
                 + @"\..\..";
             var fileName = srcDir + @"\renisource\test.reni";
-            var file = fileName.FileHandle();
+            var file = fileName.ToSmbFile();
             Tracer.Line(Tracer.FilePosn(fileName, 0, 0, 0, 0, "see there"));
             var compiler = CompilerBrowser.FromFile(fileName);
             var source = compiler.Source.All;

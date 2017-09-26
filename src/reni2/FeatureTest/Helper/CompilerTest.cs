@@ -39,7 +39,7 @@ namespace Reni.FeatureTest.Helper
             (string name, TargetSetData targetSetData, Action<Compiler> expectedResult)
         {
             var fileName = name + ".reni";
-            var f = fileName.FileHandle();
+            var f = fileName.ToSmbFile();
             f.String = targetSetData.Target;
             return InternalRunCompiler(fileName, expectedResult, targetSetData);
         }

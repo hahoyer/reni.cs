@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -14,8 +12,8 @@ namespace ReniUI
     public abstract class View : DumpableObject
     {
         protected readonly Form Frame;
-        [UsedImplicitly]
-        PositionConfig PositionConfig;
+
+        [UsedImplicitly] PositionConfig PositionConfig;
 
         protected View(string configFileName = null)
         {
@@ -27,23 +25,38 @@ namespace ReniUI
 
             Frame.Closing += OnClosing;
 
-            if(configFileName == null)
+            if (configFileName == null)
                 configFileName = GetFileName();
-            configFileName.FileHandle().AssumeDirectoryOfFileExists();
+            configFileName.ToSmbFile().EnsureDirectoryOfFileExists();
 
-            PositionConfig = new PositionConfig(()=> configFileName)
+            PositionConfig = new PositionConfig(() => configFileName)
             {
                 Target = Frame
             };
         }
 
-        internal string Title { get { return Frame.Text; } set { Frame.Text = value; } }
+        internal string Title
+        {
+            get => Frame.Text;
+            set => Frame.Text = value;
+        }
+
+        internal Control Client
+        {
+            get => Frame.Controls.Cast<Control>().FirstOrDefault();
+            set
+            {
+                Tracer.Assert(Frame.Controls.Count == 0);
+                value.Dock = DockStyle.Fill;
+                Frame.Controls.Add(value);
+            }
+        }
 
         string GetFileName() => Frame.Text.Select(ToValidFileChar).Aggregate("", (c, n) => c + n);
 
         static string ToValidFileChar(char c)
         {
-            if(Path.GetInvalidFileNameChars().Contains(c))
+            if (Path.GetInvalidFileNameChars().Contains(c))
                 return "%" + (int) c;
             return "" + c;
         }
@@ -52,17 +65,6 @@ namespace ReniUI
         {
             e.Cancel = true;
             Frame.Visible = false;
-        }
-
-        internal Control Client
-        {
-            get { return Frame.Controls.Cast<Control>().FirstOrDefault(); }
-            set
-            {
-                Tracer.Assert(Frame.Controls.Count == 0);
-                value.Dock = DockStyle.Fill;
-                Frame.Controls.Add(value);
-            }
         }
     }
 }

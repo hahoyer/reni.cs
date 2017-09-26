@@ -12,10 +12,10 @@ namespace ReniTest
             => (new StackTrace(true)
                         .GetFrame(0)
                         .GetFileName()
-                        .FileHandle()
+                        .ToSmbFile()
                         .DirectoryName
                     + @"\..\..")
-                .FileHandle()
+                .ToSmbFile()
                 .FullName;
     }
 }

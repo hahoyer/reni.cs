@@ -43,11 +43,11 @@ namespace ReniUI
 
         readonly IDictionary<string, IMember> Members = new ConcurrentDictionary<string, IMember>();
 
-        readonly hw.Helper.File Handle;
+        readonly SmbFile Handle;
         [EnableDump]
         string FileName => Handle.FullName;
 
-        internal Persister(hw.Helper.File handle) { Handle = handle; }
+        internal Persister(SmbFile handle) { Handle = handle; }
 
         public void Register<T>(string name, Action<T> load, Func<T> store)
             =>
@@ -96,7 +96,7 @@ namespace ReniUI
 
         protected object Get(Type type, string name)
         {
-            var text = FileHandle(name).String;
+            var text = ToSmbFile(name).String;
             if(text == null)
                 return null;
 
@@ -115,13 +115,8 @@ namespace ReniUI
             return null;
         }
 
-        hw.Helper.File FileHandle(string name)
-        {
-            var result = FileName.PathCombine(name).FileHandle();
-            result.AssumeDirectoryOfFileExists();
-            return result;
-        }
+        SmbFile ToSmbFile(string name) => FileName.PathCombine(name).ToSmbFile();
 
-        protected void Set(string name, object value) => FileHandle(name).String = value.ToString();
+        protected void Set(string name, object value) => ToSmbFile(name).String = value.ToString();
     }
 }                                                              

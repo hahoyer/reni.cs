@@ -34,7 +34,7 @@ namespace Reni.Code
             var streamWriter = new StreamWriter(name);
             if(traceFilePosn)
                 Tracer.Line
-                    (Tracer.FilePosn(name.FileHandle().FullName, 0, 0, FilePositionTag.Debug));
+                    (Tracer.FilePosn(name.ToSmbFile().FullName, 0, 0, FilePositionTag.Debug));
             streamWriter.Write(result);
             streamWriter.Close();
         }
@@ -47,8 +47,7 @@ namespace Reni.Code
                     + Process.GetCurrentProcess().Id
                     + "." + Thread.CurrentThread.ManagedThreadId
                     + ".reni.cs";
-            var fileHandle = name.FileHandle();
-            fileHandle.AssumeDirectoryOfFileExists();
+            name.ToSmbFile().EnsureDirectoryOfFileExists();
 
             CodeToFile(name, codeToString, traceFilePosn);
 

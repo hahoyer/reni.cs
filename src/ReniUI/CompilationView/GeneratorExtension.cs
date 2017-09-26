@@ -24,7 +24,7 @@ namespace ReniUI.CompilationView
                 TempFiles = new TempFileCollection(null, true)
             };
 
-            cp.ReferencedAssemblies.AddRange(GetReferencedAssemblies(fileName.FileHandle().String));
+            cp.ReferencedAssemblies.AddRange(GetReferencedAssemblies(fileName.ToSmbFile().String));
             var cr = _provider.CompileAssemblyFromFile(cp, fileName);
 
             if(cr.Errors.Count > 0)
