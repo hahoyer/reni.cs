@@ -39,6 +39,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileConfiguration.cs" />
+    <Compile Include="hw\Forms\CursorUtil.cs" />
+    <Compile Include="hw\Forms\Extender.cs" />
+    <Compile Include="hw\Forms\IAdditionalNodeInfoProvider.cs" />
+    <Compile Include="hw\Forms\IIconKeyProvider.cs" />
+    <Compile Include="hw\Forms\ITreeNodeSupport.cs" />
+    <Compile Include="hw\Forms\NodeAttribute.cs" />
+    <Compile Include="hw\Forms\NodeNameAttribute.cs" />
+    <Compile Include="hw\Forms\PositionConfig.cs" />
+    <Compile Include="hw\Forms\SmartNodeAttribute.cs" />
+    <Compile Include="hw\Forms\TreeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="hw\Forms\TreeForm.Designer.cs" />
     <Compile Include="StudioApplication.cs" />
     <Compile Include="AssemblyInfo.cs">
       <DependentUpon>AssemblyInfo.tt</DependentUpon>
@@ -85,19 +98,6 @@
     <Compile Include="Formatting\Item.cs" />
     <Compile Include="Formatting\LineOrientedFormatter.cs" />
     <Compile Include="Formatting\SeparatorType.cs" />
-    <Compile Include="hw\Forms\CursorUtil.cs" />
-    <Compile Include="hw\Forms\Extender.cs" />
-    <Compile Include="hw\Forms\IAdditionalNodeInfoProvider.cs" />
-    <Compile Include="hw\Forms\IIconKeyProvider.cs" />
-    <Compile Include="hw\Forms\ITreeNodeSupport.cs" />
-    <Compile Include="hw\Forms\NodeAttribute.cs" />
-    <Compile Include="hw\Forms\NodeNameAttribute.cs" />
-    <Compile Include="hw\Forms\PositionConfig.cs" />
-    <Compile Include="hw\Forms\SmartNodeAttribute.cs" />
-    <Compile Include="hw\Forms\TreeForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="hw\Forms\TreeForm.Designer.cs" />
     <Compile Include="hw\Graphics\IGraphTarget.cs" />
     <Compile Include="hw\Graphics\SVG\Circle.cs" />
     <Compile Include="hw\Graphics\SVG\Content.cs" />

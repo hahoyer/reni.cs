@@ -11,7 +11,7 @@ using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
-    public sealed class Syntax : DumpableObject, ISourcePart, ValueCache.IContainer
+    public sealed class Syntax : DumpableObject, ISourcePartProxy, ValueCache.IContainer
     {
         internal static Syntax CreateSourceSyntax
             (
@@ -71,7 +71,7 @@ namespace Reni.TokenClasses
             }
         }
 
-        SourcePart ISourcePart.All => SourcePart;
+        SourcePart ISourcePartProxy.All => SourcePart;
 
         [DisableDump]
         internal SourcePart SourcePart => Left?.SourcePart + Token.SourcePart() + Right?.SourcePart;

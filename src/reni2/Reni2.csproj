@@ -160,6 +160,7 @@
     <Compile Include="hw\Helper\ValueCacheExtension.cs" />
     <Compile Include="hw\Parser\BelongsToAttribute.cs" />
     <Compile Include="hw\Parser\BracketContext.cs" />
+    <Compile Include="hw\Parser\CachingTokenFactory.cs" />
     <Compile Include="hw\Parser\CommonTokenType.cs" />
     <Compile Include="hw\Parser\Compiler.cs" />
     <Compile Include="hw\Parser\Extension.cs" />
@@ -170,6 +171,7 @@
     <Compile Include="hw\Parser\IParserTokenType.cs" />
     <Compile Include="hw\Parser\Item.cs" />
     <Compile Include="hw\Parser\IToken.cs" />
+    <Compile Include="hw\Parser\ITokenFactory.cs" />
     <Compile Include="hw\Parser\OpenItem.cs" />
     <Compile Include="hw\Parser\ParserTokenType.cs" />
     <Compile Include="hw\Parser\PredefinedTokenFactory.cs" />
@@ -179,16 +181,16 @@
     <Compile Include="hw\Parser\ScannerTokenType.cs" />
     <Compile Include="hw\Parser\SubParser.cs" />
     <Compile Include="hw\Parser\VariantAttribute.cs" />
-    <Compile Include="hw\Scanner\CachingTokenFactory.cs" />
     <Compile Include="hw\Scanner\FileSourceProvider.cs" />
     <Compile Include="hw\Scanner\IScanner.cs" />
-    <Compile Include="hw\Scanner\ISourcePart.cs" />
+    <Compile Include="hw\Scanner\ISourcePartProxy.cs" />
     <Compile Include="hw\Scanner\ISourceProvider.cs" />
     <Compile Include="hw\Scanner\ITokenFactory.cs" />
     <Compile Include="hw\Scanner\LexerItem.cs" />
     <Compile Include="hw\Scanner\Match.cs" />
     <Compile Include="hw\Scanner\Match2TwoLayerScannerGuard.cs" />
     <Compile Include="hw\Scanner\MatchExtension.cs" />
+    <Compile Include="hw\Scanner\SmbFileSourceProvider.cs" />
     <Compile Include="hw\Scanner\Source.cs" />
     <Compile Include="hw\Scanner\SourcePart.cs" />
     <Compile Include="hw\Scanner\SourcePosn.cs" />
@@ -446,11 +448,11 @@
     </Content>
   </ItemGroup>
   <Import Project="sys.targets" />
-  <Import Project="..\packages\NETStandard.Library.2.0.0\build\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.0\build\NETStandard.Library.targets')" />
+  <Import Project="..\packages\NETStandard.Library.2.0.1\build\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.1\build\NETStandard.Library.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\NETStandard.Library.2.0.0\build\NETStandard.Library.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NETStandard.Library.2.0.0\build\NETStandard.Library.targets'))" />
+    <Error Condition="!Exists('..\packages\NETStandard.Library.2.0.1\build\NETStandard.Library.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NETStandard.Library.2.0.1\build\NETStandard.Library.targets'))" />
   </Target>
 </Project>

@@ -14,9 +14,9 @@ namespace ReniTest
         public void Run() { NotImplementedMethod(); }
     }
 
-    abstract class TreeItem : DumpableObject, ISourcePart
+    abstract class TreeItem : DumpableObject, ISourcePartProxy
     {
-        SourcePart ISourcePart.All
+        SourcePart ISourcePartProxy.All
         {
             get
             {

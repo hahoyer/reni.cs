@@ -29,7 +29,7 @@ namespace ReniTest
                 foreach(var item in file.Items)
                     Run(item);
             else if(file.Exists && file.Extension == "renitest")
-                Run(new Source(file.FullName.FileHandle()));
+                Run(new Source(file.FullName.ToSmbFile()));
         }
 
         static void Run(Source file)

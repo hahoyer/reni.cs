@@ -7,7 +7,7 @@ using hw.Scanner;
 namespace Reni.Validation
 {
     [Obsolete("",true)]
-    public sealed class SourceIssue : DumpableObject, ISourcePart
+    public sealed class SourceIssue : DumpableObject, ISourcePartProxy
     {
         internal SourceIssue(Issue issue, SourcePart sourcePart)
         {
@@ -22,7 +22,7 @@ namespace Reni.Validation
         [DisableDump]
         internal string GetLogDump => Issue.LogDump;
 
-        SourcePart ISourcePart.All => SourcePart;
+        SourcePart ISourcePartProxy.All => SourcePart;
         internal IssueId IssueId => Issue.IssueId;
     }
 }

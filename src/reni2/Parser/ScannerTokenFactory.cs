@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
 using hw.Scanner;
@@ -9,11 +6,16 @@ using Reni.Validation;
 
 namespace Reni.Parser
 {
-    sealed class ScannerTokenFactory : DumpableObject, ITokenFactory, Compiler<Syntax>.IComponent
+    sealed class ScannerTokenFactory : DumpableObject, ITokenFactory<Syntax>, Compiler<Syntax>.IComponent
     {
         Compiler<Syntax>.Component Current;
 
-        object ITokenFactory.BeginOfText => new BeginOfText();
+        Compiler<Syntax>.Component Compiler<Syntax>.IComponent.Current
+        {
+            set => Current = value;
+        }
+
+        IParserTokenType<Syntax> ITokenFactory<Syntax>.BeginOfText => new BeginOfText();
         IScannerTokenType ITokenFactory.EndOfText => new EndOfText();
 
         IScannerTokenType ITokenFactory.InvalidCharacterError
@@ -31,7 +33,5 @@ namespace Reni.Parser
             new LexerItem(Current.Get<ScannerTokenType<Syntax>>(), Lexer.Instance.Any),
             new LexerItem(new Text(), Lexer.Instance.Text)
         };
-
-        Compiler<Syntax>.Component Compiler<Syntax>.IComponent.Current { set { Current = value; } }
     }
 }
