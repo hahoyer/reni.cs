@@ -33,7 +33,7 @@ namespace Reni.Struct
             => GetCompoundIdentificationDump();
 
         IImplementation ISymbolProviderForPointer<Definable>.Feature(Definable tokenClass)
-            => View.Find(tokenClass, true);
+            => View.Find(tokenClass, false);
 
         internal override CompoundView ObtainRecentCompoundView() => View;
 

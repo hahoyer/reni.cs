@@ -40,7 +40,7 @@ Text: /\
             data(1) dump_print,
         }.
 
-        << : /\ concat(count: ^ count, data: ^).
+        !public << : /\ concat(count: ^ count, data: ^).
 
         concat: /\
         Text
