@@ -102,7 +102,7 @@ namespace Reni.Context
             {
                 BreakExecution();
                 var result = syntax.ResultForCache(this, category.Replenished);
-                Tracer.Assert(result == null || category <= result.CompleteCategory);
+                Tracer.Assert(result == null || result.IsValidOrIssue(category));
                 return ReturnMethodDump(result);
             }
             finally

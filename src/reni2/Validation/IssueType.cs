@@ -1,8 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using hw.DebugFormatter;
-using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.TokenClasses;
@@ -12,21 +9,36 @@ namespace Reni.Validation
 {
     abstract class IssueType : TypeBase
     {
-        [EnableDump]
+        class TryToAccessHllwException
+            : Exception
+        {
+            readonly IssueType IssueType;
+
+            public TryToAccessHllwException(IssueType issueType)
+            {
+                IssueType = issueType;
+                Tracer.TraceBreak();
+            }
+        }
+
+        [EnableDump]                                      
         internal readonly Issue Issue;
 
-        protected IssueType(Issue issue) { Issue = issue; }
+        protected IssueType(Issue issue) => Issue = issue;
 
         [DisableDump]
-        internal override bool Hllw => true;
+        internal override bool Hllw => throw new TryToAccessHllwException(this);
+
         internal override string DumpPrintText => Issue.IssueId.Tag;
-        protected override string GetNodeDump() => base.GetNodeDump() + " " + DumpPrintText;
-
-        protected override IssueType CreateIssue(Syntax source, IssueId issueId)
-            => new ConsequentialIssueType(this, source);
-
-        internal Result Result(Category category) => Result(category, () => Code);
 
         internal virtual CodeBase Code => Issue.Code;
+        protected override string GetNodeDump() => base.GetNodeDump() + " " + DumpPrintText;
+
+        protected override IssueType CreateIssue(ISyntax currentTarget, IssueId issueId)
+            => new ConsequentialIssueType(this, currentTarget);
+
+        internal Result Result(Category category) => Result(Filtered(category), () => Code);
+
+        static Category Filtered(Category category) => category & (Category.Type | Category.Code | Category.Exts);
     }
 }
