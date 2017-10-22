@@ -7,7 +7,6 @@ using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Type;
-using Reni.Validation;
 
 namespace Reni
 {
@@ -32,6 +31,7 @@ namespace Reni
         internal Result
         (
             Category category,
+            bool isIssue = false,
             Func<bool> getHllw = null,
             Func<Size> getSize = null,
             Func<TypeBase> getType = null,
@@ -40,6 +40,7 @@ namespace Reni
             Root rootContext = null)
             : this()
         {
+            IsIssue = isIssue;
             var hllw = getHllw == null ? null : new ValueCache<bool>(getHllw);
             var size = getSize == null ? null : new ValueCache<Size>(getSize);
             var type = getType == null ? null : new ValueCache<TypeBase>(getType);
@@ -76,6 +77,9 @@ namespace Reni
         [EnableDumpWithExceptionPredicate]
         public Category CompleteCategory
             => Category.CreateCategory(HasHllw, HasSize, HasType, HasCode, HasExts);
+
+        [DebuggerHidden]
+        public bool IsIssue { get; }
 
         [Node]
         [DebuggerHidden]
@@ -281,6 +285,9 @@ namespace Reni
         {
             get
             {
+                if(IsIssue)
+                    return this;
+
                 var size = FindSize;
                 if(size == null)
                     return this;
@@ -293,12 +300,11 @@ namespace Reni
                 var result = new Result
                 (
                     CompleteCategory,
-                    () => Hllw.Value,
-                    () => alignedSize,
-                    () => Type.Align,
-                    () => Code.BitCast(alignedSize),
-                    () => Exts
-                );
+                    getHllw: () => Hllw.Value,
+                    getSize: () => alignedSize,
+                    getType: () => Type.Align,
+                    getCode: () => Code.BitCast(alignedSize),
+                    getExts: () => Exts);
                 return result;
             }
         }
@@ -534,6 +540,7 @@ namespace Reni
             return new Result
             (
                 CompleteCategory & category,
+                IsIssue,
                 () => Hllw.Value,
                 () => Size,
                 () => Type,
@@ -868,9 +875,11 @@ namespace Reni
         }
 
         internal Result DereferencedAlignedResult(Size size)
-            => HasCode
-                ? new Result(CompleteCategory - Category.Type, getCode: () => Code.DePointer(size))
-                : this;
+            => IsIssue
+                ? this
+                : HasCode
+                    ? new Result(CompleteCategory - Category.Type, getCode: () => Code.DePointer(size))
+                    : this;
 
         internal Result ConvertToConverter(TypeBase source)
             => source.Hllw || !HasExts && !HasCode
@@ -911,11 +920,6 @@ namespace Reni
                     (CompleteCategory, () => Code.InvalidConversion(destination.Size), () => Exts);
 
         internal bool IsValidOrIssue(Category category)
-        {
-            if(category.HasType && Type is IssueType || category.HasCode && Code is IssueCode)
-                category = category & (Category.Hllw | Category.Size | Category.Exts);
-
-            return category <= CompleteCategory;
-        }
+            => category <= CompleteCategory || IsIssue;
     }
 }

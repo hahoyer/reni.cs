@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using hw.Helper;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using hw.DebugFormatter;
+using hw.Helper;
 using Reni.Basics;
 using Reni.Code.ReplaceVisitor;
 
@@ -15,17 +13,8 @@ namespace Reni.Code
         {
             readonly Dictionary<LocalReference, int> _references =
                 new Dictionary<LocalReference, int>();
-            public Counter(CodeBase body) { body.Visit(this); }
 
-            internal override CodeBase LocalReference(LocalReference visitedObject)
-            {
-                if(_references.ContainsKey(visitedObject))
-                    _references[visitedObject]++;
-                else
-                    _references.Add(visitedObject, 1);
-                visitedObject.ValueCode.Visit(this);
-                return null;
-            }
+            public Counter(CodeBase body) { body.Visit(this); }
 
             internal LocalReference[] SingleReferences
                 => _references
@@ -34,12 +23,22 @@ namespace Reni.Code
                     .ToArray();
 
             internal LocalReference[] References => _references.Keys.ToArray();
+
+            internal override CodeBase LocalReference(LocalReference visitedObject)
+            {
+                if(_references.ContainsKey(visitedObject))
+                    _references[visitedObject]++;
+                else
+                    _references.Add(visitedObject, value: 1);
+                visitedObject.ValueCode.Visit(this);
+                return null;
+            }
         }
 
         sealed class Reducer : Base
         {
-            readonly LocalReference[] _references;
             readonly FunctionCache<LocalReference, LocalReference> _map;
+            readonly LocalReference[] _references;
 
             public Reducer(LocalReference[] references, CodeBase body)
             {
@@ -48,10 +47,10 @@ namespace Reni.Code
                 NewBody = GetNewBody(body);
             }
 
+            public CodeBase NewBody { get; }
+
             CodeBase GetNewBody(CodeBase body)
                 => _references.Any() ? (body.Visit(this) ?? body) : body;
-
-            public CodeBase NewBody { get; }
 
             internal override CodeBase LocalReference(LocalReference visitedObject)
                 => _references.Contains(visitedObject) ? _map[visitedObject] : null;
@@ -60,7 +59,7 @@ namespace Reni.Code
             {
                 var valueCode = reference.ValueCode;
                 return (valueCode.Visit(this) ?? valueCode)
-                    .LocalReference(reference.ValueType, true);
+                    .LocalReference(reference.ValueType, isUsedOnce: true);
             }
         }
 
@@ -76,7 +75,9 @@ namespace Reni.Code
             }
 
             public FinalReplacer(LocalReference target)
-                : this(Size.Zero, target) { }
+                : this(Size.Zero, target)
+            {
+            }
 
             internal override CodeBase LocalReference(LocalReference visitedObject)
                 => visitedObject != _target
@@ -86,14 +87,11 @@ namespace Reni.Code
                         .ReferencePlus(_offset);
 
 
-            protected override Visitor<CodeBase,FiberItem> After(Size size)
-                => new FinalReplacer(_offset + size,_target);
+            protected override Visitor<CodeBase, FiberItem> After(Size size)
+                => new FinalReplacer(_offset + size, _target);
         }
 
         static int _nextObjectId;
-
-        CodeBase Body { get; }
-        CodeBase Copier { get; }
         readonly ValueCache<CodeBase> _reducedBodyCache;
         readonly ValueCache<LocalReference[]> _referencesCache;
 
@@ -106,12 +104,15 @@ namespace Reni.Code
             _reducedBodyCache = new ValueCache<CodeBase>(GetReducedBodyForCache);
         }
 
+        CodeBase Body { get; }
+        CodeBase Copier { get; }
+
         [DisableDump]
         internal CodeBase NewBody
         {
             get
             {
-                if (!References.Any())
+                if(!References.Any())
                     return ReducedBody;
 
                 var trace = ObjectId == -10;
@@ -128,7 +129,7 @@ namespace Reni.Code
                     var body = ReducedBody;
                     var initialSize = Size.Zero;
 
-                    var cleanup = new Result(Category.Code|Category.Exts, ()=>true);
+                    var cleanup = new Result(Category.Code | Category.Exts, getHllw: () => true);
 
                     foreach(var reference in References)
                     {
@@ -145,15 +146,14 @@ namespace Reni.Code
 
                         var cleanup1 = reference
                             .ValueType
-                            .Cleanup(Category.Code|Category.Exts)
-                            .ReplaceAbsolute(reference.ValueType.ForcedPointer, CodeBase.
-                            TopRef, CodeArgs.Void);
+                            .Cleanup(Category.Code | Category.Exts)
+                            .ReplaceAbsolute(reference.ValueType.ForcedPointer, CodeBase.TopRef, CodeArgs.Void);
                         cleanup = cleanup1 + cleanup;
                         Dump(nameof(cleanup), cleanup);
                         BreakExecution();
                     }
 
-                    var result = (body + cleanup.Code).LocalBlockEnd(Copier, initialSize) ;
+                    var result = (body + cleanup.Code).LocalBlockEnd(Copier, initialSize);
                     return ReturnMethodDump(result);
                 }
                 finally

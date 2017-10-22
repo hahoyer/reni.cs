@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using hw.DebugFormatter;
-
 using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
@@ -13,17 +10,18 @@ using Reni.Type;
 namespace Reni.Struct
 {
     abstract class FunctionInstance
-        : DumpableObject
-            , ResultCache.IResultProvider
-            , ValueCache.IContainer
+        : DumpableObject, ResultCache.IResultProvider, ValueCache.IContainer
     {
-        [DisableDump]
-        protected readonly FunctionType Parent;
         [Node]
         [EnableDump]
         readonly Value Body;
 
+        [DisableDump]
+        protected readonly FunctionType Parent;
+
         internal readonly ResultCache ResultCache;
+
+        bool _isObtainBodyCodeActive;
 
         protected FunctionInstance(FunctionType parent, Value body)
         {
@@ -34,11 +32,23 @@ namespace Reni.Struct
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
+        Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
+        {
+            if(category.IsNone && pendingCategory == Category.Exts)
+                return new Result(Category.Exts, getExts: CodeArgs.Void);
+
+
+            Tracer.Assert(pendingCategory.IsNone);
+            return GetResult(category);
+        }
+
         [Node]
         [DisableDump]
-        internal CodeBase BodyCode => ValueCacheExtension.CachedValue(this, GetBodyCode);
+        internal CodeBase BodyCode => this.CachedValue(GetBodyCode);
+
         [DisableDump]
         Size ArgsPartSize => Parent.ArgsType.Size + RelevantValueSize;
+
         [DisableDump]
         protected abstract Size RelevantValueSize { get; }
 
@@ -57,9 +67,10 @@ namespace Reni.Struct
         }
 
         protected abstract FunctionId FunctionId { get; }
+
         [Node]
         [DisableDump]
-        ContextBase Context => ValueCacheExtension.CachedValue(this, GetContext);
+        ContextBase Context => this.CachedValue(GetContext);
 
         [DisableDump]
         internal Container Container
@@ -77,6 +88,14 @@ namespace Reni.Struct
             }
         }
 
+        [DisableDump]
+        protected virtual TypeBase CallType => Parent;
+
+        bool IsGetter => FunctionId.IsGetter;
+
+        [DisableDump]
+        internal IEnumerable<IFormalCodeItem> CodeItems => BodyCode.Visit(new ItemCollector());
+
         internal Result GetCallResult(Category category)
         {
             var result = ResultCache & category.FunctionCall;
@@ -91,9 +110,6 @@ namespace Reni.Struct
                     .Call(FunctionId, result.Size);
             return result;
         }
-
-        [DisableDump]
-        protected virtual TypeBase CallType => Parent;
 
         Result GetResult(Category category)
         {
@@ -159,8 +175,6 @@ namespace Reni.Struct
                 .FrameRef()
                 .ReferencePlus(ArgsPartSize);
 
-        bool _isObtainBodyCodeActive;
-
         CodeBase GetBodyCode()
         {
             if(_isObtainBodyCodeActive || IsStopByObjectIdActive)
@@ -193,19 +207,5 @@ namespace Reni.Struct
         }
 
         ContextBase GetContext() => Parent.CreateSubContext(!IsGetter);
-        bool IsGetter => FunctionId.IsGetter;
-
-        Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
-        {
-            if(category.IsNone && pendingCategory == Category.Exts)
-                return new Result(Category.Exts, getExts: CodeArgs.Void);
-
-
-            Tracer.Assert(pendingCategory.IsNone);
-            return GetResult(category);
-        }
-
-        [DisableDump]
-        internal IEnumerable<IFormalCodeItem> CodeItems => BodyCode.Visit(new ItemCollector());
     }
 }
