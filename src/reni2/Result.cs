@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using Reni.Basics;
@@ -9,19 +7,20 @@ using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Type;
+using Reni.Validation;
 
 namespace Reni
 {
     sealed class Result : DumpableObject, IAggregateable<Result>
     {
         static int _nextObjectId = 1;
-        bool _isDirty;
-        bool? _hllw;
-        Size _size;
-        TypeBase _type;
         CodeBase _code;
         CodeArgs _exts;
+        bool? _hllw;
+        bool _isDirty;
         Category _pendingCategory;
+        Size _size;
+        TypeBase _type;
 
         internal Result()
             : base(_nextObjectId++)
@@ -31,7 +30,7 @@ namespace Reni
         }
 
         internal Result
-            (
+        (
             Category category,
             Func<bool> getHllw = null,
             Func<Size> getSize = null,
@@ -65,125 +64,7 @@ namespace Reni
             AssertValid();
         }
 
-        CodeBase ObtainCode
-            (
-            ValueCache<bool> getHllw,
-            ValueCache<Size> getSize,
-            ValueCache<TypeBase> getType,
-            ValueCache<CodeBase> getCode)
-        {
-            if(getCode != null)
-                return getCode.Value;
-// ReSharper disable ExpressionIsAlwaysNull
-            var hllw = TryObtainHllw(getHllw, getSize, getType, getCode);
-// ReSharper restore ExpressionIsAlwaysNull
-            if(hllw == true)
-                return CodeBase.Void;
-            Tracer.AssertionFailed("Code cannot be determined", ToString);
-            return null;
-        }
-
-        TypeBase ObtainType
-            (
-            ValueCache<bool> getHllw,
-            ValueCache<Size> getSize,
-            ValueCache<TypeBase> getType,
-            ValueCache<CodeBase> getCode,
-            Root rootContext)
-        {
-            if(getType != null)
-                return getType.Value;
-// ReSharper disable ExpressionIsAlwaysNull
-            var hllw = TryObtainHllw(getHllw, getSize, getType, getCode);
-// ReSharper restore ExpressionIsAlwaysNull
-            if(hllw == true)
-                return rootContext.VoidType;
-            Tracer.AssertionFailed("Type cannot be determned", ToString);
-            return null;
-        }
-
-        Size ObtainSize
-            (
-            ValueCache<bool> getHllw,
-            ValueCache<Size> getSize,
-            ValueCache<TypeBase> getType,
-            ValueCache<CodeBase> getCode)
-        {
-            var result = TryObtainSize(getHllw, getSize, getType, getCode);
-            Tracer.Assert(result != null, () => "Size cannot be determned " + ToString());
-            return result;
-        }
-
-        static Size TryObtainSize
-            (
-            ValueCache<bool> getHllw,
-            ValueCache<Size> getSize,
-            ValueCache<TypeBase> getType,
-            ValueCache<CodeBase> getCode)
-        {
-            if(getSize != null)
-                return getSize.Value;
-            if(getType != null)
-                return getType.Value.Size;
-            if(getCode != null)
-                return getCode.Value.Size;
-            if(getHllw != null && getHllw.Value)
-                return Size.Zero;
-            return null;
-        }
-
-        bool ObtainHllw
-            (
-            ValueCache<bool> getHllw,
-            ValueCache<Size> getSize,
-            ValueCache<TypeBase> getType,
-            ValueCache<CodeBase> getCode)
-        {
-            var result = TryObtainHllw(getHllw, getSize, getType, getCode);
-            if(result != null)
-                return result.Value;
-            Tracer.AssertionFailed("Datalessness cannot be determned", ToString);
-            return false;
-        }
-
-        static bool? TryObtainHllw
-            (
-            ValueCache<bool> getHllw,
-            ValueCache<Size> getSize,
-            ValueCache<TypeBase> getType,
-            ValueCache<CodeBase> getCode)
-        {
-            if(getHllw != null)
-                return getHllw.Value;
-            if(getSize != null)
-                return getSize.Value.IsZero;
-            if(getType != null)
-                return getType.Value.Hllw;
-            if(getCode != null)
-                return getCode.Value.IsEmpty;
-            return null;
-        }
-
-        CodeArgs ObtainExts
-            (
-            ValueCache<bool> getHllw,
-            ValueCache<Size> getSize,
-            ValueCache<TypeBase> getType,
-            ValueCache<CodeBase> getCode,
-            ValueCache<CodeArgs> getArgs)
-        {
-            if(getArgs != null)
-                return getArgs.Value;
-            if(getCode != null)
-                return getCode.Value.Exts;
-// ReSharper disable ExpressionIsAlwaysNull
-            if(TryObtainHllw(getHllw, getSize, getType, getCode) == true)
-// ReSharper restore ExpressionIsAlwaysNull
-                return CodeArgs.Void();
-
-            Tracer.AssertionFailed("CodeArgs cannot be determned", ToString);
-            return null;
-        }
+        Result IAggregateable<Result>.Aggregate(Result other) => this + other;
 
         internal bool HasSize => Size != null;
         internal bool HasType => Type != null;
@@ -200,7 +81,7 @@ namespace Reni
         [DebuggerHidden]
         public bool? Hllw
         {
-            get { return _hllw; }
+            get => _hllw;
             set
             {
                 _hllw = value;
@@ -212,7 +93,7 @@ namespace Reni
         [DebuggerHidden]
         public Size Size
         {
-            get { return _size; }
+            get => _size;
             set
             {
                 _size = value;
@@ -224,7 +105,7 @@ namespace Reni
         [DebuggerHidden]
         internal TypeBase Type
         {
-            get { return _type; }
+            get => _type;
             set
             {
                 _type = value;
@@ -236,10 +117,7 @@ namespace Reni
         internal CodeBase Code
         {
             [DebuggerHidden]
-            get
-            {
-                return _code;
-            }
+            get { return _code; }
             [DebuggerHidden]
             set
             {
@@ -252,7 +130,7 @@ namespace Reni
         [DebuggerHidden]
         internal CodeArgs Exts
         {
-            get { return _exts; }
+            get => _exts;
             set
             {
                 _exts = value;
@@ -260,31 +138,9 @@ namespace Reni
             }
         }
 
-        internal bool? FindHllw
-        {
-            get
-            {
-                if(HasHllw)
-                    return _hllw;
-                var size = FindSize;
-                if(size == null)
-                    return null;
-                return size.IsZero;
-            }
-        }
+        internal bool? FindHllw => HasHllw ? _hllw : FindSize?.IsZero;
 
-        bool? QuickFindHllw
-        {
-            get
-            {
-                if(HasHllw)
-                    return _hllw;
-                var size = QuickFindSize;
-                if(size == null)
-                    return null;
-                return size.IsZero;
-            }
-        }
+        bool? QuickFindHllw => HasHllw ? _hllw : QuickFindSize?.IsZero;
 
         internal bool SmartHllw
         {
@@ -293,7 +149,7 @@ namespace Reni
                 var result = FindHllw;
                 if(result == null)
                 {
-                    DumpMethodWithBreak("No approriate result property defined");
+                    DumpMethodWithBreak(text: "No approriate result property defined");
                     Debugger.Break();
                     return false;
                 }
@@ -336,7 +192,7 @@ namespace Reni
                 var result = FindSize;
                 if(result == null)
                 {
-                    DumpMethodWithBreak("No approriate result property defined");
+                    DumpMethodWithBreak(text: "No approriate result property defined");
                     Debugger.Break();
                 }
                 return result;
@@ -363,7 +219,7 @@ namespace Reni
                 var result = FindExts;
                 if(result == null)
                 {
-                    DumpMethodWithBreak("No approriate result property defined");
+                    DumpMethodWithBreak(text: "No approriate result property defined");
                     Debugger.Break();
                 }
                 return result;
@@ -372,7 +228,7 @@ namespace Reni
 
         internal bool IsDirty
         {
-            get { return _isDirty; }
+            get => _isDirty;
             set
             {
                 _isDirty = value;
@@ -412,7 +268,7 @@ namespace Reni
 
         public Category PendingCategory
         {
-            get { return _pendingCategory; }
+            get => _pendingCategory;
             set
             {
                 _pendingCategory = value;
@@ -420,7 +276,214 @@ namespace Reni
             }
         }
 
-        Result IAggregateable<Result>.Aggregate(Result other) => this + other;
+        [DisableDump]
+        internal Result Align
+        {
+            get
+            {
+                var size = FindSize;
+                if(size == null)
+                    return this;
+
+                var alignBits = Root.DefaultRefAlignParam.AlignBits;
+                var alignedSize = size.Align(alignBits);
+                if(alignedSize == size)
+                    return this;
+
+                var result = new Result
+                (
+                    CompleteCategory,
+                    () => Hllw.Value,
+                    () => alignedSize,
+                    () => Type.Align,
+                    () => Code.BitCast(alignedSize),
+                    () => Exts
+                );
+                return result;
+            }
+        }
+
+        [DisableDump]
+        internal Result Weaken
+        {
+            get
+            {
+                var weakType = Type?.Weaken;
+                return weakType == null
+                    ? this
+                    : (Type.Mutation(weakType) & CompleteCategory).ReplaceArg(this);
+            }
+        }
+
+        [DisableDump]
+        internal Result Clone => Filter(CompleteCategory);
+
+        [DisableDump]
+        internal Result AutomaticDereferenceResult
+        {
+            get
+            {
+                Tracer.Assert(HasType, () => "Dereference requires type category:\n " + Dump());
+
+                var result = this;
+                while(result.Type.IsWeakReference)
+                    result = result.DereferenceResult;
+                return result;
+            }
+        }
+
+        [DisableDump]
+        internal Result DereferenceResult
+        {
+            get
+            {
+                Tracer.Assert(HasType, () => "Dereference requires type category:\n " + Dump());
+                var referenceType = Type.CheckedReference;
+                var converter = referenceType.Converter;
+                var result = converter.Result(CompleteCategory);
+                return result
+                    .ReplaceArg(this);
+            }
+        }
+
+        [DisableDump]
+        internal Result UnalignedResult
+        {
+            get
+            {
+                Tracer.Assert(HasType, () => "UnalignedResult requires type category:\n " + Dump());
+                return ((AlignType) Type)
+                    .UnalignedResult(CompleteCategory)
+                    .ReplaceArg(this);
+            }
+        }
+
+        [DisableDump]
+        internal Result LocalReferenceResult
+        {
+            get
+            {
+                if(!HasCode && !HasType && !HasSize)
+                    return this;
+                if(Type.Hllw)
+                    return this;
+                if(Type is IReference)
+                    return this;
+                return Type
+                    .LocalReferenceResult(CompleteCategory)
+                    .ReplaceArg(this);
+            }
+        }
+
+        CodeBase ObtainCode
+        (
+            ValueCache<bool> getHllw,
+            ValueCache<Size> getSize,
+            ValueCache<TypeBase> getType,
+            ValueCache<CodeBase> getCode)
+        {
+            if(getCode != null)
+                return getCode.Value;
+// ReSharper disable ExpressionIsAlwaysNull
+            var hllw = TryObtainHllw(getHllw, getSize, getType, getCode);
+// ReSharper restore ExpressionIsAlwaysNull
+            if(hllw == true)
+                return CodeBase.Void;
+            Tracer.AssertionFailed(cond: "Code cannot be determined", getText: ToString);
+            return null;
+        }
+
+        TypeBase ObtainType
+        (
+            ValueCache<bool> getHllw,
+            ValueCache<Size> getSize,
+            ValueCache<TypeBase> getType,
+            ValueCache<CodeBase> getCode,
+            Root rootContext)
+        {
+            if(getType != null)
+                return getType.Value;
+// ReSharper disable ExpressionIsAlwaysNull
+            var hllw = TryObtainHllw(getHllw, getSize, getType, getCode);
+// ReSharper restore ExpressionIsAlwaysNull
+            if(hllw == true)
+                return rootContext.VoidType;
+            Tracer.AssertionFailed(cond: "Type cannot be determned", getText: ToString);
+            return null;
+        }
+
+        Size ObtainSize
+        (
+            ValueCache<bool> getHllw,
+            ValueCache<Size> getSize,
+            ValueCache<TypeBase> getType,
+            ValueCache<CodeBase> getCode)
+        {
+            var result = TryObtainSize(getHllw, getSize, getType, getCode);
+            Tracer.Assert(result != null, () => "Size cannot be determned " + ToString());
+            return result;
+        }
+
+        static Size TryObtainSize
+        (
+            ValueCache<bool> getHllw,
+            ValueCache<Size> getSize,
+            ValueCache<TypeBase> getType,
+            ValueCache<CodeBase> getCode)
+        {
+            if(getSize != null)
+                return getSize.Value;
+            if(getType != null)
+                return getType.Value.Size;
+            if(getCode != null)
+                return getCode.Value.Size;
+            if(getHllw != null && getHllw.Value)
+                return Size.Zero;
+            return null;
+        }
+
+        bool ObtainHllw
+        (
+            ValueCache<bool> getHllw,
+            ValueCache<Size> getSize,
+            ValueCache<TypeBase> getType,
+            ValueCache<CodeBase> getCode)
+        {
+            var result = TryObtainHllw(getHllw, getSize, getType, getCode);
+            if(result != null)
+                return result.Value;
+            Tracer.AssertionFailed(cond: "Datalessness cannot be determned", getText: ToString);
+            return false;
+        }
+
+        static bool? TryObtainHllw
+        (
+            ValueCache<bool> getHllw,
+            ValueCache<Size> getSize,
+            ValueCache<TypeBase> getType,
+            ValueCache<CodeBase> getCode) =>
+            getHllw?.Value ?? getSize?.Value.IsZero ?? getType?.Value.Hllw ?? getCode?.Value.IsEmpty;
+
+        CodeArgs ObtainExts
+        (
+            ValueCache<bool> getHllw,
+            ValueCache<Size> getSize,
+            ValueCache<TypeBase> getType,
+            ValueCache<CodeBase> getCode,
+            ValueCache<CodeArgs> getArgs)
+        {
+            if(getArgs != null)
+                return getArgs.Value;
+            if(getCode != null)
+                return getCode.Value.Exts;
+// ReSharper disable ExpressionIsAlwaysNull
+            if(TryObtainHllw(getHllw, getSize, getType, getCode) == true)
+// ReSharper restore ExpressionIsAlwaysNull
+                return CodeArgs.Void();
+
+            Tracer.AssertionFailed(cond: "CodeArgs cannot be determned", getText: ToString);
+            return null;
+        }
 
         public override string DumpData()
         {
@@ -441,7 +504,7 @@ namespace Reni
                 result += "\nCode=" + Tracer.Dump(_code);
             if(result == "")
                 return "";
-            return result.Substring(1);
+            return result.Substring(startIndex: 1);
         }
 
         internal void Update(Result result)
@@ -469,7 +532,7 @@ namespace Reni
         Result Filter(Category category)
         {
             return new Result
-                (
+            (
                 CompleteCategory & category,
                 () => Hllw.Value,
                 () => Size,
@@ -480,48 +543,6 @@ namespace Reni
                 _pendingCategory = _pendingCategory & category
             };
         }
-
-        [DisableDump]
-        internal Result Align
-        {
-            get
-            {
-                var size = FindSize;
-                if(size == null)
-                    return this;
-
-                var alignBits = Root.DefaultRefAlignParam.AlignBits;
-                var alignedSize = size.Align(alignBits);
-                if(alignedSize == size)
-                    return this;
-
-                var result = new Result
-                    (
-                    CompleteCategory,
-                    () => Hllw.Value,
-                    () => alignedSize,
-                    () => Type.Align,
-                    () => Code.BitCast(alignedSize),
-                    () => Exts
-                    );
-                return result;
-            }
-        }
-
-        [DisableDump]
-        internal Result Weaken
-        {
-            get
-            {
-                var weakType = Type?.Weaken;
-                return weakType == null
-                    ? this
-                    : (Type.Mutation(weakType) & CompleteCategory).ReplaceArg(this);
-            }
-        }
-
-        [DisableDump]
-        internal Result Clone => Filter(CompleteCategory);
 
         void AssertValid()
         {
@@ -622,8 +643,7 @@ namespace Reni
                 if(HasCode)
                     result.Code = Code.ReplaceArg(resultForArg);
                 if(HasExts)
-                    result.Exts = Exts.WithoutArg()
-                        + resultForArg.Exts;
+                    result.Exts = Exts.WithoutArg() + resultForArg.Exts;
             }
             result.IsDirty = false;
             return result;
@@ -747,46 +767,6 @@ namespace Reni
             return result.Code.Evaluate(context);
         }
 
-        [DisableDump]
-        internal Result AutomaticDereferenceResult
-        {
-            get
-            {
-                Tracer.Assert(HasType, () => "Dereference requires type category:\n " + Dump());
-
-                var result = this;
-                while(result.Type.IsWeakReference)
-                    result = result.DereferenceResult;
-                return result;
-            }
-        }
-
-        [DisableDump]
-        internal Result DereferenceResult
-        {
-            get
-            {
-                Tracer.Assert(HasType, () => "Dereference requires type category:\n " + Dump());
-                var referenceType = Type.CheckedReference;
-                var converter = referenceType.Converter;
-                var result = converter.Result(CompleteCategory);
-                return result
-                    .ReplaceArg(this);
-            }
-        }
-
-        [DisableDump]
-        internal Result UnalignedResult
-        {
-            get
-            {
-                Tracer.Assert(HasType, () => "UnalignedResult requires type category:\n " + Dump());
-                return ((AlignType) Type)
-                    .UnalignedResult(CompleteCategory)
-                    .ReplaceArg(this);
-            }
-        }
-
         [DebuggerHidden]
         public static Result operator &(Result result, Category category) => result.Filter(category);
 
@@ -802,38 +782,21 @@ namespace Reni
         [DebuggerHidden]
         public static Result operator +(Result aResult, Result bResult) => aResult.Sequence(bResult);
 
-        [DisableDump]
-        internal Result LocalReferenceResult
-        {
-            get
-            {
-                if(!HasCode && !HasType && !HasSize)
-                    return this;
-                if(Type.Hllw)
-                    return this;
-                if(Type is IReference)
-                    return this;
-                return Type
-                    .LocalReferenceResult(CompleteCategory)
-                    .ReplaceArg(this);
-            }
-        }
-
         [DebuggerHidden]
         internal void AssertVoidOrValidReference()
         {
             var size = FindSize;
             if(size != null)
                 Tracer.Assert
-                    (
-                        size.IsZero || size == Root.DefaultRefAlignParam.RefSize,
-                        () => "Expected size: 0 or RefSize\n" + Dump());
+                (
+                    size.IsZero || size == Root.DefaultRefAlignParam.RefSize,
+                    () => "Expected size: 0 or RefSize\n" + Dump());
 
             if(HasType)
                 Tracer.Assert
-                    (
-                        Type is VoidType || Type is PointerType,
-                        () => "Expected type: Void or PointerType\n" + Dump());
+                (
+                    Type is VoidType || Type is PointerType,
+                    () => "Expected type: Void or PointerType\n" + Dump());
         }
 
         [DebuggerHidden]
@@ -842,9 +805,9 @@ namespace Reni
             var size = FindSize;
             if(size != null)
                 Tracer.Assert
-                    (
-                        size == Root.DefaultRefAlignParam.RefSize,
-                        () => "Expected size: RefSize\n" + Dump());
+                (
+                    size == Root.DefaultRefAlignParam.RefSize,
+                    () => "Expected size: RefSize\n" + Dump());
 
             if(HasType)
                 Tracer.Assert(Type is PointerType, () => "Expected type: PointerType\n" + Dump());
@@ -862,19 +825,16 @@ namespace Reni
                 if(size.IsZero)
                     return;
                 Tracer.Assert
-                    (
-                        size == Root.DefaultRefAlignParam.RefSize,
-                        () => "Expected size: 0 or RefSize\n" + Dump());
+                (
+                    size == Root.DefaultRefAlignParam.RefSize,
+                    () => "Expected size: 0 or RefSize\n" + Dump());
             }
 
             if(HasType)
                 Tracer.Assert(Type is PointerType, () => "Expected type: PointerType\n" + Dump());
         }
 
-        internal Result AddToReference(Func<Size> func)
-        {
-            return Change(code => code.ReferencePlus(func()));
-        }
+        internal Result AddToReference(Func<Size> func) { return Change(code => code.ReferencePlus(func())); }
 
         Result Change(Func<CodeBase, CodeBase> func)
         {
@@ -885,14 +845,14 @@ namespace Reni
             return result;
         }
 
-        Result Un<T>()
-            where T : IConversion
+        Result Un()
         {
             var result = ((IConversion) Type).Result(CompleteCategory);
             return result.ReplaceArg(this);
         }
 
-        internal Result SmartUn<T>() where T : IConversion => Type is T ? Un<T>() : this;
+        internal Result SmartUn<T>()
+            where T : IConversion => Type is T ? Un() : this;
 
         internal Result AutomaticDereferencedAlignedResult()
         {
@@ -913,7 +873,7 @@ namespace Reni
                 : this;
 
         internal Result ConvertToConverter(TypeBase source)
-            => source.Hllw || (!HasExts && !HasCode)
+            => source.Hllw || !HasExts && !HasCode
                 ? this
                 : ReplaceAbsolute(source.CheckedReference, source.ArgResult);
 
@@ -949,5 +909,13 @@ namespace Reni
             =>
                 destination.Result
                     (CompleteCategory, () => Code.InvalidConversion(destination.Size), () => Exts);
+
+        internal bool IsValidOrIssue(Category category)
+        {
+            if(category.HasType && Type is IssueType || category.HasCode && Code is IssueCode)
+                category = category & (Category.Hllw | Category.Size | Category.Exts);
+
+            return category <= CompleteCategory;
+        }
     }
 }
