@@ -31,7 +31,7 @@ namespace Reni
         {
             Tracer.Assert(fileName != null);
             var moduleName = ModuleNameFromFileName(fileName);
-            return new Compiler(new Source(new SmbFileSourceProvider(fileName)), moduleName, parameters);
+            return new Compiler(new Source(fileName.ToSmbFile()), moduleName, parameters);
         }
 
         public static Compiler FromText
@@ -373,27 +373,4 @@ namespace Reni
         void AddData(string text);
         void AddLog(string text);
     }
-
-    public sealed class SmbFileSourceProvider : ISourceProvider
-    {
-        readonly ValueCache<string> DataCache;
-        readonly SmbFile File;
-
-        public SmbFileSourceProvider(string fileName)
-            : this(fileName.ToSmbFile())
-        {
-        }
-
-
-        SmbFileSourceProvider(SmbFile file, bool useCache = true)
-        {
-            File = file;
-            if (useCache)
-                DataCache = new ValueCache<string>(() => File.String);
-        }
-
-        string ISourceProvider.Data => DataCache?.Value ?? File.String;
-        bool ISourceProvider.IsPersistent => false;
-    }
-
 }
