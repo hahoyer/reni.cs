@@ -694,13 +694,13 @@ namespace Reni.Type
             return null;
         }
 
-        Result IssueResult(Syntax source, IssueId issueId, Category category)
-            => CreateIssue(source, issueId).Result(category);
+        Result IssueResult(ISyntax currentTarget, IssueId issueId, Category category)
+            => CreateIssue(currentTarget, issueId).Result(category);
 
-        protected virtual IssueType CreateIssue(Syntax source, IssueId issueId)
+        protected virtual IssueType CreateIssue(ISyntax currentTarget, IssueId issueId)
             => new RootIssueType
             (
-                new Issue(issueId, source.Token.Characters, "Type: " + DumpPrintText),
+                new Issue(issueId, currentTarget.Main, "Type: " + DumpPrintText),
                 Root
             );
 
@@ -708,7 +708,7 @@ namespace Reni.Type
             (
                 Category category,
                 ResultCache left,
-                Syntax token,
+                ISyntax currentTarget,
                 Definable definable,
                 ContextBase context,
                 Parser.Value right
@@ -716,8 +716,8 @@ namespace Reni.Type
             => ExecuteDeclaration
             (
                 definable,
-                result => result.Execute(category, left, token, context, right),
-                issueId => IssueResult(token, issueId, category)
+                result => result.Execute(category, left, currentTarget, context, right),
+                issueId => IssueResult(currentTarget, issueId, category)
             );
 
         TResult ExecuteDeclaration<TResult>

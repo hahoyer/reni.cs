@@ -115,7 +115,7 @@ namespace Reni.Feature
             (
             this IEvalImplementation feature,
             Category category,
-            Syntax token,
+            ISyntax currentTarget,
             ContextBase context,
             Parser.Value right)
         {
@@ -138,7 +138,7 @@ namespace Reni.Feature
                     return valueResult;
 
                 var result = IssueId.MissingRightExpression
-                    .Type(token, context)
+                    .Type(currentTarget, context)
                     .Result(category);
                 return result;
             }
@@ -146,7 +146,7 @@ namespace Reni.Feature
             if(valueResult == null)
             {
                 if(feature.Function == null)
-                    Dumpable.NotImplementedFunction(feature, category, token, context, right);
+                    Dumpable.NotImplementedFunction(feature, category, currentTarget, context, right);
 
                 Tracer.Assert(feature.Function != null);
 
@@ -160,7 +160,7 @@ namespace Reni.Feature
 
             return valueResult
                 .Type
-                .Execute(category, valueResult, token, null, context, right);
+                .Execute(category, valueResult, currentTarget, null, context, right);
         }
 
         static Result ValueResult

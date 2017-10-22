@@ -325,6 +325,7 @@
     <Compile Include="TokenClasses\Cleanup.cs" />
     <Compile Include="TokenClasses\CompareOperation.cs" />
     <Compile Include="TokenClasses\EndOfText.cs" />
+    <Compile Include="TokenClasses\ISyntax.cs" />
     <Compile Include="TokenClasses\PreType.cs" />
     <Compile Include="TokenClasses\ReassignToken.cs" />
     <Compile Include="TokenClasses\Base.cs" />

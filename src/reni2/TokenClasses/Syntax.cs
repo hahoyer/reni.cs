@@ -11,29 +11,10 @@ using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
-    public sealed class Syntax : DumpableObject, ISourcePartProxy, ValueCache.IContainer
+    public sealed class Syntax : DumpableObject, ISourcePartProxy, ValueCache.IContainer, ISyntax
     {
-        internal static Syntax CreateSourceSyntax
-            (
-                Syntax left,
-                ITokenClass tokenClass,
-                IToken token,
-                Syntax right)
-            => new Syntax(left, tokenClass, token, right);
-
         static int NextObjectId;
-
-        [DisableDump]
-        internal SyntaxOption Option { get; }
         Syntax _parent;
-        internal Syntax Left { get; }
-        internal ITokenClass TokenClass { get; }
-        [DisableDump]
-        internal IToken Token { get; }
-        internal Syntax Right { get; }
-
-        FunctionCache<int, Syntax> LocatePositionCache { get; }
-        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
         Syntax
         (
@@ -57,10 +38,29 @@ namespace Reni.TokenClasses
                 Right.Parent = this;
         }
 
+        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
+
+        SourcePart ISourcePartProxy.All => SourcePart;
+        SourcePart ISyntax.All => SourcePart;
+        SourcePart ISyntax.Main => Token.Characters;
+
+        [DisableDump]
+        internal SyntaxOption Option { get; }
+
+        internal Syntax Left { get; }
+        internal ITokenClass TokenClass { get; }
+
+        [DisableDump]
+        internal IToken Token { get; }
+
+        internal Syntax Right { get; }
+
+        FunctionCache<int, Syntax> LocatePositionCache { get; }
+
         [DisableDump]
         internal Syntax Parent
         {
-            get { return _parent; }
+            get => _parent;
             private set
             {
                 if(value == null)
@@ -71,10 +71,78 @@ namespace Reni.TokenClasses
             }
         }
 
-        SourcePart ISourcePartProxy.All => SourcePart;
-
         [DisableDump]
         internal SourcePart SourcePart => Left?.SourcePart + Token.SourcePart() + Right?.SourcePart;
+
+        [DisableDump]
+        internal IEnumerable<Syntax> Items => this.CachedValue(GetItems);
+
+        [DisableDump]
+        public IEnumerable<Syntax> ParentChainIncludingThis
+        {
+            get
+            {
+                yield return this;
+
+                if(Parent == null)
+                    yield break;
+
+                foreach(var other in Parent.ParentChainIncludingThis)
+                    yield return other;
+            }
+        }
+
+        [DisableDump]
+        public string[] DeclarationOptions
+            => Option
+                .Declarations
+                .Distinct()
+                .ToArray();
+
+        [DisableDump]
+        internal Result<Value> Value => this.CachedValue(() => GetValue(this));
+
+
+        [DisableDump]
+        internal Result<Declarator> Declarator
+        {
+            get
+            {
+                switch(TokenClass)
+                {
+                    case IDeclaratorTokenClass declaratorTokenClass: return declaratorTokenClass.Get(this);
+                    case RightParenthesis _:
+                    case ScannerSyntaxError _: return null;
+                }
+
+                NotImplementedMethod();
+                return null;
+            }
+        }
+
+        [DisableDump]
+        internal Result<Statement[]> ForceStatements => this.CachedValue(() => GetStatements());
+
+        [DisableDump]
+        internal IEnumerable<Issue> Issues => Option.Issues;
+
+        [DisableDump]
+        internal IEnumerable<Issue> AllIssues
+            => Left?.AllIssues
+                .plus(Issues)
+                .plus(Right?.AllIssues);
+
+        [DisableDump]
+        internal IDefaultScopeProvider DefaultScopeProvider
+            => TokenClass as IDefaultScopeProvider ?? Parent?.DefaultScopeProvider;
+
+        internal static Syntax CreateSourceSyntax
+        (
+            Syntax left,
+            ITokenClass tokenClass,
+            IToken token,
+            Syntax right)
+            => new Syntax(left, tokenClass, token, right);
 
         public Syntax LocatePosition(int current) => LocatePositionCache[current];
 
@@ -84,20 +152,20 @@ namespace Reni.TokenClasses
                 return Parent?.LocatePosition(current);
 
             return Left?.CheckedLocatePosition(current) ??
-                Right?.CheckedLocatePosition(current) ??
-                this;
+                   Right?.CheckedLocatePosition(current) ??
+                   this;
         }
 
         Syntax CheckedLocatePosition(int current)
             =>
-            SourcePart.Position <= current && current < SourcePart.EndPosition
-                ? LocatePosition(current)
-                : null;
+                SourcePart.Position <= current && current < SourcePart.EndPosition
+                    ? LocatePosition(current)
+                    : null;
 
         internal Syntax Locate(SourcePart part)
             => Left?.CheckedLocate(part) ??
-            Right?.CheckedLocate(part) ??
-            this;
+               Right?.CheckedLocate(part) ??
+               this;
 
         Syntax CheckedLocate(SourcePart part)
             => SourcePart.Contains(part) ? Locate(part) : null;
@@ -106,12 +174,11 @@ namespace Reni.TokenClasses
         {
             var root = RootOfBelongings(recent);
 
-            var matcher = root?.TokenClass as IBelongingsMatcher;
-            return matcher == null
-                ? null
-                : root
+            return root?.TokenClass is IBelongingsMatcher matcher
+                ? root
                     .ItemsAsLongAs(item => matcher.IsBelongingTo(item.TokenClass))
-                    .ToArray();
+                    .ToArray()
+                : null;
         }
 
         internal IEnumerable<Syntax> ItemsAsLongAs(Func<Syntax, bool> condition)
@@ -122,18 +189,17 @@ namespace Reni.TokenClasses
 
         internal Syntax RootOfBelongings(Syntax recent)
         {
-            var matcher = recent.TokenClass as IBelongingsMatcher;
-            if(matcher == null)
+            if(!(recent.TokenClass is IBelongingsMatcher matcher))
                 return null;
 
             var sourceSyntaxs = BackChain(recent)
                 .ToArray();
 
             return sourceSyntaxs
-                    .Skip(1)
-                    .TakeWhile(item => matcher.IsBelongingTo(item.TokenClass))
-                    .LastOrDefault()
-                ?? recent;
+                       .Skip(count: 1)
+                       .TakeWhile(item => matcher.IsBelongingTo(item.TokenClass))
+                       .LastOrDefault() ??
+                   recent;
         }
 
         IEnumerable<Syntax> BackChain(Syntax recent)
@@ -170,13 +236,10 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        [DisableDump]
-        internal IEnumerable<Syntax> Items => this.CachedValue(GetItems);
-
         IEnumerable<Syntax> GetItems()
         {
-            if (Left != null)
-                foreach (var sourceSyntax in Left.Items)
+            if(Left != null)
+                foreach(var sourceSyntax in Left.Items)
                     yield return sourceSyntax;
 
             yield return this;
@@ -185,31 +248,6 @@ namespace Reni.TokenClasses
                 foreach(var sourceSyntax in Right.Items)
                     yield return sourceSyntax;
         }
-
-        [DisableDump]
-        public IEnumerable<Syntax> ParentChainIncludingThis
-        {
-            get
-            {
-                yield return this;
-
-                if(Parent == null)
-                    yield break;
-
-                foreach(var other in Parent.ParentChainIncludingThis)
-                    yield return other;
-            }
-        }
-
-        [DisableDump]
-        public string[] DeclarationOptions
-            => Option
-                .Declarations
-                .Distinct()
-                .ToArray();
-
-        [DisableDump]
-        internal Result<Value> Value => this.CachedValue(() => GetValue(this));
 
         Result<Value> GetValue(Syntax syntax)
         {
@@ -228,27 +266,6 @@ namespace Reni.TokenClasses
             return IssueId.InvalidExpression.Value(syntax);
         }
 
-
-        [DisableDump]
-        internal Result<Declarator> Declarator
-        {
-            get
-            {
-                var declaratorTokenClass = TokenClass as IDeclaratorTokenClass;
-                if(declaratorTokenClass != null)
-                    return declaratorTokenClass.Get(this);
-
-                if(TokenClass is RightParenthesis || TokenClass is ScannerSyntaxError)
-                    return null;
-
-                NotImplementedMethod();
-                return null;
-            }
-        }
-
-        [DisableDump]
-        internal Result<Statement[]> ForceStatements => this.CachedValue(() => GetStatements());
-
         internal Result<Statement[]> GetStatements(List type = null)
         {
             var statements = Option.GetStatements(type);
@@ -264,29 +281,14 @@ namespace Reni.TokenClasses
                 return Statement.CreateStatements(value, Option.DefaultScopeProvider);
 
             return new Result<Statement[]>
-                (new Statement[0], IssueId.InvalidListOperandSequence.Create(this.SourcePart));
+                (new Statement[0], IssueId.InvalidListOperandSequence.Create(SourcePart));
         }
-
-        [DisableDump]
-        internal IEnumerable<Issue> Issues => Option.Issues;
-
-        [DisableDump]
-        internal IEnumerable<Issue> AllIssues
-            => Left?.AllIssues
-                .plus(Issues)
-                .plus(Right?.AllIssues);
-
-        [DisableDump]
-        internal IDefaultScopeProvider DefaultScopeProvider
-            => TokenClass as IDefaultScopeProvider
-            ?? Parent?.DefaultScopeProvider;
 
         internal Result<Syntax> GetBracketKernel(int level, Syntax parent)
         {
             Tracer.Assert(parent.Right == null);
-            var leftParenthesis = TokenClass as LeftParenthesis;
 
-            if(leftParenthesis == null)
+            if(!(TokenClass is LeftParenthesis leftParenthesis))
                 return new Result<Syntax>(this, IssueId.ExtraRightBracket.Create(parent.SourcePart));
 
             Tracer.Assert(Left == null);
@@ -298,7 +300,7 @@ namespace Reni.TokenClasses
 
             if(levelDelta > 0)
                 return new Result<Syntax>
-                    (Right, IssueId.ExtraLeftBracket.Create(this.SourcePart));
+                    (Right, IssueId.ExtraLeftBracket.Create(SourcePart));
 
             NotImplementedMethod(level, parent);
             return null;

@@ -42,7 +42,7 @@ namespace Reni.Validation
         internal Result<Syntax> Syntax(Syntax syntax)
             => new Result<Syntax>(syntax, Create(syntax.SourcePart));
 
-        internal RootIssueType Type(Syntax syntax, ContextBase context)
-            => new RootIssueType(Create(syntax.SourcePart), context.RootContext);
+        internal RootIssueType Type(ISyntax currentTarget, ContextBase context)
+            => new RootIssueType(Create(currentTarget.All), context.RootContext);
     }
 }

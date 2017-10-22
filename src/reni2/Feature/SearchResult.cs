@@ -55,12 +55,12 @@ namespace Reni.Feature
             (
             Category category,
             ResultCache left,
-            Syntax token,
+            ISyntax currentTarget,
             ContextBase context,
             Parser.Value right)
         {
             var trace = ObjectId.In(34) && category.HasCode;
-            StartMethodDump(trace, category, left, token, context, right);
+            StartMethodDump(trace, category, left, currentTarget, context, right);
             try
             {
                 var metaFeature = ((IMetaImplementation) Feature).Function;
@@ -68,7 +68,7 @@ namespace Reni.Feature
                     return metaFeature.Result(category, left, context, right);
 
                 BreakExecution();
-                var result = Feature.Result(category.Typed, token, context, right);
+                var result = Feature.Result(category.Typed, currentTarget, context, right);
                 Dump(nameof(result), result);
                 Dump("ConverterPath.Destination.CheckedReference", ConverterPath.Destination.CheckedReference);
                 Dump("ConverterPath.Execute", ConverterPath.Execute(Category.Code));
