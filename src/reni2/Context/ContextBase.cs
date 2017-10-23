@@ -80,7 +80,7 @@ namespace Reni.Context
 
         internal Compound Compound(CompoundSyntax context) => CacheObject.Compounds[context];
 
-        [DebuggerHidden]
+        //[DebuggerHidden]
         internal Result Result(Category category, Parser.Value syntax)
             => ResultCache(syntax).GetCategories(category);
 

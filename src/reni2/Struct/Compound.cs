@@ -1,32 +1,29 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-
 using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Type;
+using Reni.Validation;
 
 namespace Reni.Struct
 {
     sealed class Compound
-        : DumpableObject, IContextReference, IChild<ContextBase>
-            , ValueCache.IContainer
-            , IRootProvider
+        : DumpableObject, IContextReference, IChild<ContextBase>, ValueCache.IContainer, IRootProvider
 
     {
         static int _nextObjectId;
 
-        [Node]
-        internal readonly CompoundSyntax Syntax;
+        readonly int _order;
 
         [Node]
         internal readonly ContextBase Parent;
 
-        readonly int _order;
+        [Node]
+        internal readonly CompoundSyntax Syntax;
 
         [DisableDump]
         internal readonly FunctionCache<int, CompoundView> View;
@@ -42,16 +39,13 @@ namespace Reni.Struct
             StopByObjectIds();
         }
 
-        Root IRootProvider.Value => Root;
+        ContextBase IChild<ContextBase>.Parent => Parent;
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
-        public string GetCompoundIdentificationDump() => Syntax.GetCompoundIdentificationDump();
-
-        protected override string GetNodeDump()
-            => base.GetNodeDump() + "(" + GetCompoundIdentificationDump() + ")";
-
         int IContextReference.Order => _order;
+
+        Root IRootProvider.Value => Root;
 
         [DisableDump]
         internal TypeBase IndexType => Parent.RootContext.BitType.Number(IndexSize.ToInt());
@@ -67,6 +61,13 @@ namespace Reni.Struct
         [DisableDump]
         internal IEnumerable<ResultCache> CachedResults => Syntax.EndPosition.Select(CachedResult);
 
+        int EndPosition => Syntax.EndPosition;
+
+        public string GetCompoundIdentificationDump() => Syntax.GetCompoundIdentificationDump();
+
+        protected override string GetNodeDump()
+            => base.GetNodeDump() + "(" + GetCompoundIdentificationDump() + ")";
+
         ResultCache CachedResult(int position)
             => Parent
                 .CompoundPositionContext(Syntax, position)
@@ -76,7 +77,7 @@ namespace Reni.Struct
         {
             if(Hllw(position))
                 return Basics.Size.Zero;
-            return ResultsOfStatements(Category.Size, 0, position).Size;
+            return ResultsOfStatements(Category.Size, fromPosition: 0, fromNotPosition: position).Size;
         }
 
         internal bool Hllw(int? accessPosition = null) => ObtainHllw(accessPosition);
@@ -92,22 +93,29 @@ namespace Reni.Struct
             StartMethodDump(trace, category, fromPosition, fromNotPosition);
             try
             {
-                Dump("Statements", Syntax.Statements);
+                Dump(nameof(Syntax.Statements), Syntax.Statements);
                 BreakExecution();
 
-                var statements = ((fromNotPosition ?? EndPosition) - fromPosition)
+                var positions = ((fromNotPosition ?? EndPosition) - fromPosition)
                     .Select(i => fromPosition + i)
                     .Where(position => !Syntax.Statements[position].IsLambda)
+                    .ToArray();
+
+                var rawResults = positions
                     .Select(position => AccessResult(category, position))
+                    .ToArray();
+
+                var results = rawResults
                     .Select(r => r.Align.LocalBlock(category))
                     .ToArray();
-                Dump("Statements", statements);
+                Dump(nameof(results), results);
                 BreakExecution();
-                var result = statements
+                var result = results
                     .Aggregate
                     (
                         Parent.RootContext.VoidType.Result(category.Typed),
-                        (current, next) => current + next);
+                        (current, next) => current + next
+                    );
                 return ReturnMethodDump(result);
             }
             finally
@@ -116,8 +124,6 @@ namespace Reni.Struct
             }
         }
 
-        int EndPosition => Syntax.EndPosition;
-
         internal Result Result(Category category)
         {
             var trace = Syntax.ObjectId.In() && category.HasCode;
@@ -125,7 +131,7 @@ namespace Reni.Struct
             try
             {
                 var resultsOfStatements = ResultsOfStatements
-                    (category - Category.Type, 0, Syntax.EndPosition);
+                    (category - Category.Type, fromPosition: 0, fromNotPosition: Syntax.EndPosition);
 
                 Dump("resultsOfStatements", resultsOfStatements);
                 BreakExecution();
@@ -143,11 +149,16 @@ namespace Reni.Struct
                 BreakExecution();
 
                 var result = resultWithCleanup
-                    .ReplaceRelative(this, CodeBase.TopRef, CodeArgs.Void)
-                    & category;
+                                 .ReplaceRelative(this, CodeBase.TopRef, CodeArgs.Void) &
+                             category;
+
+                if(result.HasIssue)
+                    return ReturnMethodDump
+                        (CompoundView.Type.IssueResult(Syntax.Syntax, IssueId.ConsequentialError, category));
 
                 if(category.HasType)
                     result.Type = CompoundView.Type;
+
                 return ReturnMethodDump(result);
             }
             finally
@@ -237,8 +248,6 @@ namespace Reni.Struct
 
         bool? InnerHllwStatic(int position) => Syntax.Statements[position].Hllw;
 
-        ContextBase IChild<ContextBase>.Parent => Parent;
-
         internal Result Cleanup(Category category)
         {
             var uniqueChildContext = Parent.CompoundPositionContext(Syntax);
@@ -257,5 +266,9 @@ namespace Reni.Struct
             Tracer.Assert(result.CompleteCategory == category);
             return result;
         }
+
+        internal Issue GetRecentIssue(int viewPosition)
+            => ResultsOfStatements(Category.Type, fromPosition: 0, fromNotPosition: viewPosition)
+                .RecentIssue;
     }
 }

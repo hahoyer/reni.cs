@@ -5,6 +5,7 @@ using hw.DebugFormatter;
 using hw.Helper;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Validation;
 
 namespace Reni.Type
 {
@@ -18,6 +19,8 @@ namespace Reni.Type
         internal Pair(TypeBase first, TypeBase second)
         {
             Tracer.Assert(first.Root == second.Root);
+            Tracer.Assert(!(first is IssueType));
+            Tracer.Assert(!(second is IssueType));
             _first = first;
             _second = second;
         }
@@ -47,6 +50,7 @@ namespace Reni.Type
         internal override IEnumerable<string> DeclarationOptions
             => base.DeclarationOptions.Concat(InternalDeclarationOptions);
 
+        [DisableDump]
         IEnumerable<string> InternalDeclarationOptions
         {
             get

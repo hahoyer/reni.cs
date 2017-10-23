@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
@@ -401,21 +402,20 @@ namespace Reni.Type
             if(Hllw)
                 return Result(category);
 
-            return new Result
+            return Result
             (
                 category,
-                this is IssueType,
-                getType: () => this,
-                getCode: () => CodeBase.ReferenceCode(target));
+                getCode: () => CodeBase.ReferenceCode(target)
+            );
         }
 
-        internal Result Result(Category category, Result codeAndExts) => new Result
-        (
-            category,
-            this is IssueType,
-            getType: () => this,
-            getCode: () => codeAndExts.Code,
-            getExts: () => codeAndExts.Exts);
+        internal Result Result(Category category, Result codeAndExts)
+            => Result
+            (
+                category,
+                getCode: () => codeAndExts.Code,
+                getExts: () => codeAndExts.Exts
+            );
 
         internal Result Result(Category category, Func<Category, Result> getCodeAndRefs)
         {
@@ -430,14 +430,16 @@ namespace Reni.Type
         }
 
         internal Result Result
-            (Category category, Func<CodeBase> getCode = null, Func<CodeArgs> getArgs = null)
+            (Category category, Func<CodeBase> getCode = null, Func<CodeArgs> getExts = null)
             => new Result
             (
                 category,
-                this is IssueType,
+                RecentIssue,
                 getType: () => this,
                 getCode: getCode,
-                getExts: getArgs);
+                getExts: getExts);
+
+        internal virtual Issue RecentIssue => null;
 
         internal TypeBase CommonType(TypeBase elseType)
         {
@@ -506,12 +508,11 @@ namespace Reni.Type
             if(Hllw)
                 return Result(category);
 
-            return new Result
+            return Result
             (
                 category,
-                this is IssueType,
-                getType: () => this,
-                getCode: () => CodeBase.ReferenceCode(target).ReferencePlus(getOffset()).DePointer(Size));
+                () => CodeBase.ReferenceCode(target).ReferencePlus(getOffset()).DePointer(Size)
+            );
         }
 
         protected virtual IReference GetForcedReferenceForCache()
@@ -532,14 +533,16 @@ namespace Reni.Type
         internal Result GenericDumpPrintResult(Category category)
         {
             var searchResults = SmartPointer
-                .Declarations<DumpPrintToken>(tokenClass: null);
-            if(searchResults.Any())
-                return searchResults
-                    .Single()
-                    .SpecialExecute(category);
+                .Declarations<DumpPrintToken>(tokenClass: null)
+                .SingleOrDefault();
 
-            NotImplementedMethod(category);
-            return null;
+            if(searchResults == null)
+            {
+                NotImplementedMethod(category);
+                return null;
+            }
+
+            return searchResults.SpecialExecute(category);
         }
 
         internal Result CreateArray(Category category, string optionsId = null) => Align
@@ -719,7 +722,7 @@ namespace Reni.Type
             return null;
         }
 
-        Result IssueResult(ISyntax currentTarget, IssueId issueId, Category category)
+        internal Result IssueResult(ISyntax currentTarget, IssueId issueId, Category category)
             => CreateIssue(currentTarget, issueId).Result(category);
 
         protected virtual IssueType CreateIssue(ISyntax currentTarget, IssueId issueId)

@@ -1,43 +1,39 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
 
 namespace Reni.Basics
 {
-    [Dump("Dump")]
+    [Dump(name: "Dump")]
     sealed class Category : DumpableObject, IEquatable<Category>
     {
-        readonly bool _code;
-        readonly bool _type;
-        readonly bool _exts;
-        readonly bool _size;
-        readonly bool _hllw;
-
         static readonly Category[] _cache = new Category[32];
 
         Category(bool hllw, bool size, bool type, bool code, bool exts)
-            : base(null)
+            : base(nextObjectId: null)
         {
-            _code = code;
-            _type = type;
-            _exts = exts;
-            _hllw = hllw;
-            _size = size;
+            HasCode = code;
+            HasType = type;
+            HasExts = exts;
+            HasHllw = hllw;
+            HasSize = size;
         }
 
-        [DebuggerHidden]
-        internal static Category CreateCategory
-            (bool hllw = false, bool size = false, bool type = false, bool code = false, bool exts = false)
+        public bool Equals(Category obj)
         {
-            var result = _cache[IndexFromBool(hllw, size, type, code, exts)];
-            if(result != null)
-                return result;
-            return _cache[IndexFromBool(hllw, size, type, code, exts)] = new Category(hllw, size, type, code, exts);
+            if(ReferenceEquals(objA: null, objB: obj))
+                return false;
+            if(ReferenceEquals(this, obj))
+                return true;
+            return
+                obj.HasCode.Equals(HasCode) &&
+                obj.HasType.Equals(HasType) &&
+                obj.HasExts.Equals(HasExts) &&
+                obj.HasSize.Equals(HasSize) &&
+                obj.HasHllw.Equals(HasHllw)
+                ;
         }
-
-        static int IndexFromBool(params bool[] data) { return data.Aggregate(0, (c, n) => c * 2 + (n ? 1 : 0)); }
 
         [DebuggerHidden]
         public static Category Size => CreateCategory(size: true);
@@ -52,21 +48,26 @@ namespace Reni.Basics
         public static Category Exts => CreateCategory(exts: true);
 
         [DebuggerHidden]
-        public static Category Hllw => CreateCategory(true);
+        public static Category Hllw => CreateCategory(hllw: true);
 
         [DebuggerHidden]
         public static Category None => CreateCategory();
 
         [DebuggerHidden]
-        public static Category All => CreateCategory(true, true, true, true, true);
+        public static Category All => CreateCategory(hllw: true, size: true, type: true, code: true, exts: true);
 
         public bool IsNone => !HasAny;
-        public bool HasCode => _code;
-        public bool HasType => _type;
-        public bool HasExts => _exts;
-        public bool HasSize => _size;
-        public bool HasHllw => _hllw;
-        public bool HasAny => _code || _type || _exts || _size || _hllw;
+        public bool HasCode { get; }
+
+        public bool HasType { get; }
+
+        public bool HasExts { get; }
+
+        public bool HasSize { get; }
+
+        public bool HasHllw { get; }
+
+        public bool HasAny => HasCode || HasType || HasExts || HasSize || HasHllw;
 
         [DebuggerHidden]
         [DisableDump]
@@ -128,47 +129,62 @@ namespace Reni.Basics
         }
 
         [DebuggerHidden]
+        internal static Category CreateCategory
+            (bool hllw = false, bool size = false, bool type = false, bool code = false, bool exts = false)
+        {
+            var result = _cache[IndexFromBool(hllw, size, type, code, exts)];
+            if(result != null)
+                return result;
+            return _cache[IndexFromBool(hllw, size, type, code, exts)] = new Category(hllw, size, type, code, exts);
+        }
+
+        static int IndexFromBool(params bool[] data)
+            => data.Aggregate(seed: 0, func: (c, n) => c * 2 + (n ? 1 : 0));
+
+        [DebuggerHidden]
         public static Category operator |(Category x, Category y) => CreateCategory
-            (
-                x.HasHllw || y.HasHllw,
-                x.HasSize || y.HasSize,
-                x.HasType || y.HasType,
-                x.HasCode || y.HasCode,
-                x.HasExts || y.HasExts);
+        (
+            x.HasHllw || y.HasHllw,
+            x.HasSize || y.HasSize,
+            x.HasType || y.HasType,
+            x.HasCode || y.HasCode,
+            x.HasExts || y.HasExts);
 
         [DebuggerHidden]
         public static Category operator &(Category x, Category y) => CreateCategory
-            (
-                x.HasHllw && y.HasHllw,
-                x.HasSize && y.HasSize,
-                x.HasType && y.HasType,
-                x.HasCode && y.HasCode,
-                x.HasExts && y.HasExts);
+        (
+            x.HasHllw && y.HasHllw,
+            x.HasSize && y.HasSize,
+            x.HasType && y.HasType,
+            x.HasCode && y.HasCode,
+            x.HasExts && y.HasExts);
 
         public override int GetHashCode()
         {
             unchecked
             {
-                var result = _code.GetHashCode();
-                result = (result * 397) ^ _type.GetHashCode();
-                result = (result * 397) ^ _exts.GetHashCode();
-                result = (result * 397) ^ _size.GetHashCode();
-                result = (result * 397) ^ _hllw.GetHashCode();
+                var result = HasCode.GetHashCode();
+                result = (result * 397) ^ HasType.GetHashCode();
+                result = (result * 397) ^ HasExts.GetHashCode();
+                result = (result * 397) ^ HasSize.GetHashCode();
+                result = (result * 397) ^ HasHllw.GetHashCode();
                 return result;
             }
         }
 
-        public bool IsEqual(Category x) => HasCode == x.HasCode
-            && HasExts == x.HasExts
-            && HasSize == x.HasSize
-            && HasType == x.HasType
-            && HasHllw == x.HasHllw;
+        public bool IsEqual(Category x) =>
+            HasCode == x.HasCode &&
+            HasExts == x.HasExts &&
+            HasSize == x.HasSize &&
+            HasType == x.HasType &&
+            HasHllw == x.HasHllw;
 
-        bool IsLessThan(Category x) => (!HasCode && x.HasCode)
-            || (!HasExts && x.HasExts)
-            || (!HasSize && x.HasSize)
-            || (!HasType && x.HasType)
-            || (!HasHllw && x.HasHllw);
+        bool IsLessThan(Category x) =>
+            !HasCode && x.HasCode ||
+            !HasExts && x.HasExts ||
+            !HasSize && x.HasSize ||
+            !HasType && x.HasType ||
+            !HasHllw && x.HasHllw;
 
         bool IsLessThanOrEqual(Category x)
         {
@@ -187,12 +203,12 @@ namespace Reni.Basics
 
         [DebuggerHidden]
         public static Category operator -(Category x, Category y) => CreateCategory
-            (
-                x.HasHllw && !y.HasHllw,
-                x.HasSize && !y.HasSize,
-                x.HasType && !y.HasType,
-                x.HasCode && !y.HasCode,
-                x.HasExts && !y.HasExts);
+        (
+            x.HasHllw && !y.HasHllw,
+            x.HasSize && !y.HasSize,
+            x.HasType && !y.HasType,
+            x.HasCode && !y.HasCode,
+            x.HasExts && !y.HasExts);
 
         protected override string Dump(bool isRecursion) => NodeDump;
 
@@ -213,20 +229,6 @@ namespace Reni.Basics
             if(result == "")
                 return "none";
             return result;
-        }
-
-        public bool Equals(Category obj)
-        {
-            if(ReferenceEquals(null, obj))
-                return false;
-            if(ReferenceEquals(this, obj))
-                return true;
-            return obj._code.Equals(_code)
-                && obj._type.Equals(_type)
-                && obj._exts.Equals(_exts)
-                && obj._size.Equals(_size)
-                && obj._hllw.Equals(_hllw)
-                ;
         }
 
         public override bool Equals(object obj)

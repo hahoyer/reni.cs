@@ -2,11 +2,13 @@
 using System.Diagnostics;
 using hw.DebugFormatter;
 using hw.Helper;
+using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Type;
+using Reni.Validation;
 
 namespace Reni
 {
@@ -31,7 +33,7 @@ namespace Reni
         internal Result
         (
             Category category,
-            bool isIssue = false,
+            Issue recentIssue = null,
             Func<bool> getHllw = null,
             Func<Size> getSize = null,
             Func<TypeBase> getType = null,
@@ -40,7 +42,7 @@ namespace Reni
             Root rootContext = null)
             : this()
         {
-            IsIssue = isIssue;
+            RecentIssue = recentIssue;
             var hllw = getHllw == null ? null : new ValueCache<bool>(getHllw);
             var size = getSize == null ? null : new ValueCache<Size>(getSize);
             var type = getType == null ? null : new ValueCache<TypeBase>(getType);
@@ -78,8 +80,9 @@ namespace Reni
         public Category CompleteCategory
             => Category.CreateCategory(HasHllw, HasSize, HasType, HasCode, HasExts);
 
+        [CanBeNull]
         [DebuggerHidden]
-        public bool IsIssue { get; }
+        public Issue RecentIssue { get; private set; }
 
         [Node]
         [DebuggerHidden]
@@ -285,7 +288,7 @@ namespace Reni
         {
             get
             {
-                if(IsIssue)
+                if(HasIssue)
                     return this;
 
                 var size = FindSize;
@@ -308,6 +311,8 @@ namespace Reni
                 return result;
             }
         }
+
+        public bool HasIssue => RecentIssue != null;
 
         [DisableDump]
         internal Result Weaken
@@ -515,6 +520,12 @@ namespace Reni
 
         internal void Update(Result result)
         {
+            if(result.HasIssue)
+            {
+                Tracer.Assert(!HasIssue, ()=>nameof(RecentIssue).DumpValue(RecentIssue) + " " + nameof(result).DumpValue(result.RecentIssue));
+                RecentIssue = result.RecentIssue;
+            }
+
             if(result.HasHllw)
                 _hllw = result.Hllw;
 
@@ -540,7 +551,7 @@ namespace Reni
             return new Result
             (
                 CompleteCategory & category,
-                IsIssue,
+                RecentIssue,
                 () => Hllw.Value,
                 () => Size,
                 () => Type,
@@ -576,25 +587,72 @@ namespace Reni
                     (Code.Exts.IsEqual(Exts), () => "Code and Exts differ: " + Dump());
 
             Tracer.Assert((CompleteCategory & PendingCategory) == Category.None);
+
+            if(HasIssue)
+            {
+                Tracer.Assert(!HasHllw);
+                Tracer.Assert(!HasSize);
+                if (HasType )
+                    Tracer.Assert(Type is IssueType, Type.Dump);
+                if (HasCode )
+                    Tracer.Assert(Code is IssueCode, Code.Dump);
+            }
+
+
+            if (HasType && Type is IssueType)
+                Tracer.Assert(HasIssue);
+
+            if(HasCode && Code is IssueCode)
+                Tracer.Assert(HasIssue);
         }
 
         void Add(Result other) => Add(other, CompleteCategory);
 
         void Add(Result other, Category category)
         {
-            Tracer.Assert(category <= other.CompleteCategory);
-            Tracer.Assert(category <= CompleteCategory);
+            if(!(category <= other.CompleteCategory) && other.HasIssue || !(category <= CompleteCategory) && HasIssue)
+                category = IssueType.Filtered(category);
+
+            Tracer.Assert
+            (
+                category <= other.CompleteCategory,
+                () => nameof(other).DumpValue(other) + ", " + nameof(category).DumpValue(category)
+            );
+            Tracer.Assert
+            (
+                category <= CompleteCategory,
+                () => "this".DumpValue(this) + ", " + nameof(category).DumpValue(category)
+            );
             IsDirty = true;
-            if(category.HasHllw)
+
+            if((category.HasType || category.HasCode) && !HasIssue)
+                RecentIssue = other.RecentIssue;
+
+            if (category.HasHllw)
                 Hllw = SmartHllw && other.SmartHllw;
-            if(category.HasSize)
+            else if(HasHllw)
+                Hllw = null;
+
+            if (category.HasSize)
                 Size += other.Size;
-            if(category.HasType)
+            else if (HasSize)
+                Size = null;
+
+            if (category.HasType)
                 Type = Type.Pair(other.Type);
-            if(category.HasCode)
+            else if (HasType)
+                Type = null;
+
+            if (category.HasCode)
                 Code = Code + other.Code;
-            if(category.HasExts)
+            else if (HasCode)
+                Code = null;
+
+            if (category.HasExts)
                 Exts = Exts.Sequence(other.Exts);
+            else if (HasExts)
+                Exts = null;
+
             IsDirty = false;
         }
 
@@ -875,7 +933,7 @@ namespace Reni
         }
 
         internal Result DereferencedAlignedResult(Size size)
-            => IsIssue
+            => HasIssue
                 ? this
                 : HasCode
                     ? new Result(CompleteCategory - Category.Type, getCode: () => Code.DePointer(size))
@@ -920,6 +978,6 @@ namespace Reni
                     (CompleteCategory, () => Code.InvalidConversion(destination.Size), () => Exts);
 
         internal bool IsValidOrIssue(Category category)
-            => category <= CompleteCategory || IsIssue;
+            => category <= CompleteCategory || HasIssue;
     }
 }

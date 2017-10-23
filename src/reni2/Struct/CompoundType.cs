@@ -1,37 +1,57 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
 using Reni.TokenClasses;
 using Reni.Type;
+using Reni.Validation;
 
 namespace Reni.Struct
 {
     sealed class CompoundType
-        : TypeBase
-            , ISymbolProviderForPointer<DumpPrintToken>
-            , ISymbolProviderForPointer<Definable>
-            , ISymbolProvider<DumpPrintToken>
-            , ISymbolProvider<Definable>
-            , IChild<ContextBase>
+        : TypeBase,
+            ISymbolProviderForPointer<DumpPrintToken>,
+            ISymbolProviderForPointer<Definable>,
+            ISymbolProvider<DumpPrintToken>,
+            ISymbolProvider<Definable>,
+            IChild<ContextBase>
     {
-        internal CompoundType(CompoundView view) { View = view; }
+        bool IsDumpPrintTextActive;
+
+        internal CompoundType(CompoundView view) => View = view;
+
+        ContextBase IChild<ContextBase>.Parent => View.CompoundContext;
+
+        IImplementation ISymbolProvider<Definable>.Feature(Definable tokenClass)
+            => Hllw ? View.Find(tokenClass, publicOnly: true) : null;
+
+        IImplementation ISymbolProvider<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
+            => Hllw ? Feature.Extension.Value(DumpPrintTokenResult) : null;
+
+        IImplementation ISymbolProviderForPointer<Definable>.Feature(Definable tokenClass)
+            => View.Find(tokenClass, publicOnly: true);
+
+        IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature
+            (DumpPrintToken tokenClass)
+            => Feature.Extension.Value(DumpPrintTokenResult);
 
         [Node]
         [DisableDump]
         internal CompoundView View { get; }
+
+        internal override Issue RecentIssue => View.RecentIssue;
+
         [DisableDump]
         internal override Root Root => View.Root;
+
         [DisableDump]
         internal override CompoundView FindRecentCompoundView => View;
+
         [DisableDump]
         internal override bool Hllw => View.Hllw;
 
-        bool IsDumpPrintTextActive; 
         internal override string DumpPrintText
         {
             get
@@ -42,7 +62,8 @@ namespace Reni.Struct
                 var result = View.DumpPrintTextOfType;
                 IsDumpPrintTextActive = false;
                 return result;
-            } }
+            }
+        }
 
         [DisableDump]
         internal override bool HasQuickSize => false;
@@ -68,20 +89,10 @@ namespace Reni.Struct
             }
         }
 
+        [DisableDump]
+        internal override ContextBase ToContext => View.Context;
+
         Result VoidConversion(Category category) => Mutation(Root.VoidType) & category;
-
-        IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature
-            (DumpPrintToken tokenClass)
-            => Feature.Extension.Value(DumpPrintTokenResult);
-
-        IImplementation ISymbolProviderForPointer<Definable>.Feature(Definable tokenClass)
-            => View.Find(tokenClass, true);
-
-        IImplementation ISymbolProvider<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
-            => Hllw ? Feature.Extension.Value(DumpPrintTokenResult) : null;
-
-        IImplementation ISymbolProvider<Definable>.Feature(Definable tokenClass)
-            => Hllw ? View.Find(tokenClass,true) : null;
 
         protected override Size GetSize() => View.CompoundViewSize;
 
@@ -90,11 +101,6 @@ namespace Reni.Struct
 
         new Result DumpPrintTokenResult(Category category)
             => View.DumpPrintResultViaObject(category);
-
-        [DisableDump]
-        internal override ContextBase ToContext => View.Context;
-
-        ContextBase IChild<ContextBase>.Parent => View.CompoundContext;
 
         internal override Result Cleanup(Category category) => View.Compound.Cleanup(category);
     }

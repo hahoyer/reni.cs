@@ -9,6 +9,7 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.TokenClasses;
 using Reni.Type;
+using Reni.Validation;
 
 namespace Reni.Struct
 {
@@ -373,5 +374,6 @@ namespace Reni.Struct
             }
         }
 
+        internal Issue RecentIssue => Compound.GetRecentIssue(ViewPosition);
     }
 }
