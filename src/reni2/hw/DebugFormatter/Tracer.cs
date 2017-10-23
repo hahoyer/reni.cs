@@ -261,6 +261,12 @@ namespace hw.DebugFormatter
                 + DumpMethodWithData(null, data).Indent();
         }
 
+        [DebuggerHidden]
+        public static string DumpValue(this string name, object value)
+        {
+            return DumpData("", new[] { name, value }, 1);
+        }
+
         static string DumpMethodWithData(MethodBase m, object o, object[] p)
         {
             var result = "\n";
