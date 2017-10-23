@@ -89,6 +89,7 @@ namespace Reni.Type
 
         protected override Size GetSize() => Parent.Size;
 
+        [DisableDump]
         internal override IEnumerable<string> DeclarationOptions
             => base.DeclarationOptions.Concat(InternalDeclarationOptions);
 
