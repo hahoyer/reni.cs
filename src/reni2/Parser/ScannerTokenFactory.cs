@@ -8,6 +8,7 @@ namespace Reni.Parser
 {
     sealed class ScannerTokenFactory : DumpableObject, ITokenFactory<Syntax>, Compiler<Syntax>.IComponent
     {
+        [EnableDump]
         Compiler<Syntax>.Component Current;
 
         Compiler<Syntax>.Component Compiler<Syntax>.IComponent.Current

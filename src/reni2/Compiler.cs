@@ -70,20 +70,24 @@ namespace Reni
             Parameters = parameters ?? new CompilerParameters();
             ModuleName = modulName;
 
+            var main = this["Main"];
             var declaration = this["Declaration"];
 
-            MainTokenFactory = new MainTokenFactory(declaration);
+            MainTokenFactory = new MainTokenFactory(declaration, "Main");
 
-            PrioTable = MainPrioTable;
-            TokenFactory = new ScannerTokenFactory();
-            Add<ScannerTokenType<Syntax>>(MainTokenFactory);
+            main.PrioTable = MainPrioTable;
+            main.TokenFactory = new ScannerTokenFactory();
+            main.Add<ScannerTokenType<Syntax>>(MainTokenFactory);
+
             declaration.PrioTable = DeclarationPrioTable;
             declaration.TokenFactory = new ScannerTokenFactory();
             declaration.BoxFunction = target => new ExclamationBoxToken(target);
-            declaration.Add<ScannerTokenType<Syntax>>(new DeclarationTokenFactory());
+            declaration.Add<ScannerTokenType<Syntax>>(new DeclarationTokenFactory("Declaration"));
 
-            Parser.Trace = Parameters.TraceOptions.Parser;
+            main.Parser.Trace = Parameters.TraceOptions.Parser;
             declaration.Parser.Trace = Parameters.TraceOptions.Parser;
+
+            //Tracer.FlaggedLine(PrettyDump);
 
             Root = new Root(this);
             CodeContainerCache = NewValueCache
@@ -223,7 +227,7 @@ namespace Reni
             ;
 
 
-        Syntax Parse(SourcePosn source) => Parser.Execute(source);
+        Syntax Parse(SourcePosn source) => this["Main"].Parser.Execute(source);
 
         void RunFromCode() => CodeContainer.Execute(this, TraceCollector.Instance);
 
@@ -306,6 +310,7 @@ namespace Reni
                     }
                 );
 
+                result.Title = "Main";
                 //Tracer.FlaggedLine("\n"+x.ToString());
                 return result;
             }
@@ -315,8 +320,8 @@ namespace Reni
         {
             get
             {
-                var prioTable = PrioTable.Left(PrioTable.Any);
-                prioTable += PrioTable.BracketParallels
+                var result = PrioTable.Left(PrioTable.Any);
+                result += PrioTable.BracketParallels
                 (
                     new[]
                     {
@@ -333,7 +338,8 @@ namespace Reni
                         PrioTable.EndOfText
                     }
                 );
-                return prioTable;
+                result.Title = "Declaration";
+                return result;
             }
         }
     }

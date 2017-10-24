@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using hw.DebugFormatter;
+﻿using hw.DebugFormatter;
 using hw.Parser;
 using Reni.TokenClasses;
 
@@ -9,6 +6,11 @@ namespace Reni.Parser
 {
     sealed class DeclarationTokenFactory : GenericTokenFactory<Syntax>
     {
+        public DeclarationTokenFactory(string title)
+            : base(title)
+        {
+        }
+
         protected override IParserTokenType<Syntax> GetTokenClass(string name)
             => new InvalidDeclarationError(name);
     }
@@ -16,7 +18,7 @@ namespace Reni.Parser
     sealed class InvalidDeclarationError : DumpableObject, IParserTokenType<Syntax>, ITokenClass
     {
         readonly string Name;
-        public InvalidDeclarationError(string name) { Name = name; }
+        public InvalidDeclarationError(string name) => Name = name;
 
         Syntax IParserTokenType<Syntax>.Create(Syntax left, IToken token, Syntax right)
             => Syntax.CreateSourceSyntax(left, this, token, right);

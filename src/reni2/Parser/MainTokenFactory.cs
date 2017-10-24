@@ -12,7 +12,8 @@ namespace Reni.Parser
         readonly Compiler<Syntax>.Component Declaration;
         readonly List<UserSymbol> UserSymbols = new List<UserSymbol>();
 
-        public MainTokenFactory(Compiler<Syntax>.Component declaration)
+        public MainTokenFactory(Compiler<Syntax>.Component declaration, string title)
+            : base(title)
         {
             Declaration = declaration;
         }
