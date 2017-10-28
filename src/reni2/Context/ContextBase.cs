@@ -17,14 +17,103 @@ namespace Reni.Context
     /// <summary>
     ///     Base class for compiler environments
     /// </summary>
-    abstract class ContextBase : DumpableObject,
-        ResultCache.IResultProvider,
-        IIconKeyProvider,
-        ValueCache.IContainer,
-        IRootProvider
+    abstract class ContextBase
+        : DumpableObject,
+            ResultCache.IResultProvider,
+            IIconKeyProvider,
+            ValueCache.IContainer,
+            IRootProvider
     {
-        protected override string GetNodeDump()
-            => base.GetNodeDump() + "(" + GetContextIdentificationDump() + ")";
+        internal sealed class ResultProvider : DumpableObject, ResultCache.IResultProvider
+        {
+            static int NextObjectId;
+
+            [EnableDumpExcept(exception: false)]
+            readonly bool AsReference;
+
+            internal readonly ContextBase Context;
+            internal readonly Parser.Value Syntax;
+
+            internal ResultProvider
+                (ContextBase context, Parser.Value syntax, bool asReference = false)
+                : base(NextObjectId++)
+            {
+                Context = context;
+                Syntax = syntax;
+                AsReference = asReference;
+                StopByObjectIds();
+            }
+
+            Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
+            {
+                if(pendingCategory.IsNone)
+                    return AsReference
+                        ? Context.ResultAsReference(category, Syntax)
+                        : Context.ResultForCache(category, Syntax);
+
+                var recursionHandler = Syntax.RecursionHandler;
+                if(recursionHandler != null)
+                    return recursionHandler
+                        .Execute(Context, category, pendingCategory, Syntax, AsReference);
+
+                NotImplementedMethod(category, pendingCategory);
+                return null;
+            }
+
+            [EnableDump]
+            string ContextId => Context.NodeDump;
+
+            [EnableDump]
+            int SyntaxObjectId => Syntax.ObjectId;
+
+            [EnableDump]
+            string SyntaxText => Syntax.SourcePart.Id;
+        }
+
+        internal sealed class Cache : DumpableObject, IIconKeyProvider
+        {
+            [Node]
+            [SmartNode]
+            internal readonly ResultCache AsObject;
+
+            [Node]
+            [SmartNode]
+            internal readonly FunctionCache<CompoundSyntax, Compound> Compounds;
+
+            [Node]
+            [DisableDump]
+            internal readonly ValueCache<IFunctionContext> RecentFunctionContextObject;
+
+            [Node]
+            [DisableDump]
+            internal readonly ValueCache<CompoundView> RecentStructure;
+
+            [Node]
+            [SmartNode]
+            internal readonly FunctionCache<Parser.Value, ResultCache> ResultAsReferenceCache;
+
+            [Node]
+            [SmartNode]
+            internal readonly FunctionCache<Parser.Value, ResultCache> ResultCache;
+
+            public Cache(ContextBase target)
+            {
+                ResultCache = new FunctionCache<Parser.Value, ResultCache>
+                    (target.ResultCacheForCache);
+                ResultAsReferenceCache = new FunctionCache<Parser.Value, ResultCache>
+                    (target.GetResultAsReferenceCacheForCache);
+                RecentStructure = new ValueCache<CompoundView>(target.ObtainRecentCompoundView);
+                RecentFunctionContextObject = new ValueCache<IFunctionContext>
+                    (target.ObtainRecentFunctionContext);
+                Compounds = new FunctionCache<CompoundSyntax, Compound>
+                    (container => new Compound(container, target));
+
+                AsObject = new ResultCache(target);
+            }
+
+            [DisableDump]
+            public string IconKey => "Cache";
+        }
 
         static int NextId;
 
@@ -33,14 +122,21 @@ namespace Reni.Context
         internal readonly Cache CacheObject;
 
         protected ContextBase()
-            : base(NextId++)
-        {
-            CacheObject = new Cache(this);
-        }
+            : base(NextId++) => CacheObject = new Cache(this);
 
-        public abstract string GetContextIdentificationDump();
+        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
         string IIconKeyProvider.IconKey => "Context";
+
+
+        Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
+        {
+            if(pendingCategory == Category.None)
+                return FindRecentCompoundView.ObjectPointerViaContext(category);
+
+            NotImplementedMethod(category, pendingCategory);
+            return null;
+        }
 
         Root IRootProvider.Value => RootContext;
 
@@ -67,6 +163,19 @@ namespace Reni.Context
                 return null;
             }
         }
+
+        internal virtual IEnumerable<ContextBase> ParentChain { get { yield return this; } }
+
+        [DisableDump]
+        public string Format => ParentChain.Select(item => item.LevelFormat).Stringify(separator: " in ");
+
+        [DisableDump]
+        protected abstract string LevelFormat { get; }
+
+        protected override string GetNodeDump()
+            => base.GetNodeDump() + "(" + GetContextIdentificationDump() + ")";
+
+        public abstract string GetContextIdentificationDump();
 
         [UsedImplicitly]
         internal int SizeToPacketCount(Size size)
@@ -111,50 +220,6 @@ namespace Reni.Context
             }
         }
 
-        internal sealed class ResultProvider : DumpableObject, ResultCache.IResultProvider
-        {
-            [EnableDumpExcept(false)]
-            readonly bool AsReference;
-            internal readonly ContextBase Context;
-            internal readonly Parser.Value Syntax;
-            static int NextObjectId;
-
-            internal ResultProvider
-                (ContextBase context, Parser.Value syntax, bool asReference = false)
-                : base(NextObjectId++)
-            {
-                Context = context;
-                Syntax = syntax;
-                AsReference = asReference;
-                StopByObjectIds();
-            }
-
-            Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
-            {
-                if(pendingCategory.IsNone)
-                    return AsReference
-                        ? Context.ResultAsReference(category, Syntax)
-                        : Context.ResultForCache(category, Syntax);
-
-                var recursionHandler = Syntax.RecursionHandler;
-                if(recursionHandler != null)
-                    return recursionHandler
-                        .Execute(Context, category, pendingCategory, Syntax, AsReference);
-
-                NotImplementedMethod(category, pendingCategory);
-                return null;
-            }
-
-            [EnableDump]
-            string ContextId => Context.NodeDump;
-
-            [EnableDump]
-            int SyntaxObjectId => Syntax.ObjectId;
-
-            [EnableDump]
-            string SyntaxText => Syntax.SourcePart.Id;
-        }
-
         [DebuggerHidden]
         ResultCache ResultCacheForCache(Parser.Value syntax)
         {
@@ -164,7 +229,7 @@ namespace Reni.Context
         }
 
         ResultCache GetResultAsReferenceCacheForCache(Parser.Value syntax)
-            => new ResultCache(new ResultProvider(this, syntax, true));
+            => new ResultCache(new ResultProvider(this, syntax, asReference: true));
 
         internal virtual CompoundView ObtainRecentCompoundView()
         {
@@ -176,51 +241,6 @@ namespace Reni.Context
         {
             NotImplementedMethod();
             return null;
-        }
-
-        internal sealed class Cache : DumpableObject, IIconKeyProvider
-        {
-            [Node]
-            [DisableDump]
-            internal readonly ValueCache<CompoundView> RecentStructure;
-
-            [Node]
-            [DisableDump]
-            internal readonly ValueCache<IFunctionContext> RecentFunctionContextObject;
-
-            [Node]
-            [SmartNode]
-            internal readonly FunctionCache<CompoundSyntax, Compound> Compounds;
-
-            [Node]
-            [SmartNode]
-            internal readonly FunctionCache<Parser.Value, ResultCache> ResultCache;
-
-            [Node]
-            [SmartNode]
-            internal readonly FunctionCache<Parser.Value, ResultCache> ResultAsReferenceCache;
-
-            [Node]
-            [SmartNode]
-            internal readonly ResultCache AsObject;
-
-            public Cache(ContextBase target)
-            {
-                ResultCache = new FunctionCache<Parser.Value, ResultCache>
-                    (target.ResultCacheForCache);
-                ResultAsReferenceCache = new FunctionCache<Parser.Value, ResultCache>
-                    (target.GetResultAsReferenceCacheForCache);
-                RecentStructure = new ValueCache<CompoundView>(target.ObtainRecentCompoundView);
-                RecentFunctionContextObject = new ValueCache<IFunctionContext>
-                    (target.ObtainRecentFunctionContext);
-                Compounds = new FunctionCache<CompoundSyntax, Compound>
-                    (container => new Compound(container, target));
-
-                AsObject = new ResultCache(target);
-            }
-
-            [DisableDump]
-            public string IconKey => "Cache";
         }
 
         internal Result ResultAsReference(Category category, Parser.Value syntax)
@@ -249,9 +269,9 @@ namespace Reni.Context
                     category,
                     new ResultCache(FunctionalArgObjectResult),
                     token,
-                    null,
-                    this,
-                    right
+                    definable: null,
+                    context: this,
+                    right: right
                 );
         }
 
@@ -278,7 +298,9 @@ namespace Reni.Context
         {
             var searchResult = Declaration(definable);
             if(searchResult == null)
-                return RootContext.UndefinedSymbol(source).Result(category);
+                return IssueId
+                    .MissingDeclarationInContext
+                    .IssueResult(source.Token.Characters, "Context: " + RootContext.Format);
 
             var result = searchResult.Result(category, CacheObject.AsObject, source, this, right);
 
@@ -295,33 +317,9 @@ namespace Reni.Context
             if(feature != null)
                 yield return feature;
         }
-
-        IssueType UndefinedSymbol(Syntax source)
-            =>
-                new RootIssueType
-                    (
-                    new Issue(IssueId.MissingDeclarationInContext, source.Token.Characters, "Context: " + Format),
-                    RootContext);
-
-
-        Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
-        {
-            if(pendingCategory == Category.None)
-                return FindRecentCompoundView.ObjectPointerViaContext(category);
-
-            NotImplementedMethod(category, pendingCategory);
-            return null;
-        }
-
-        internal virtual IEnumerable<ContextBase> ParentChain { get { yield return this; } }
-
-        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
-
-        [DisableDump]
-        public string Format => ParentChain.Select(item=>item.LevelFormat).Stringify(" in ");
-        [DisableDump]
-        protected abstract string LevelFormat { get; }
     }
 
-    sealed class SmartNodeAttribute : Attribute {}
+    sealed class SmartNodeAttribute : Attribute
+    {
+    }
 }

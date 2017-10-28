@@ -47,7 +47,6 @@ namespace Reni.Code
         [DisableDump]
         internal TypeBase ArgType => Visit(new ArgTypeVisitor());
 
-        internal static CodeBase Issue(Issue issue) => new IssueCode(issue);
         internal static CodeBase BitsConst(Size size, BitsConst t) => new BitArray(size, t);
         internal static CodeBase BitsConst(BitsConst t) => BitsConst(t.Size, t);
 
@@ -71,9 +70,7 @@ namespace Reni.Code
                 .SelectMany(item => item.AsList())
                 .ToArray();
 
-            var issues = IssueCode.CheckedCreate(allData.Where(item => item is IssueCode));
-            var nonIssues = allData.Where(item => !(item is IssueCode));
-            return Code.List.Create(issues.plus(nonIssues));
+            return Code.List.Create(allData);
         }
 
         protected abstract Size GetSize();
@@ -225,9 +222,6 @@ namespace Reni.Code
         protected override string GetNodeDump() => base.GetNodeDump() + " Size=" + Size;
 
         [DisableDump]
-        internal abstract IEnumerable<Issue> Issues { get; }
-
-        [DisableDump]
         internal bool Hllw => Size.IsZero;
 
         internal CodeBase LocalBlock(CodeBase copier)
@@ -302,7 +296,7 @@ namespace Reni.Code
 
         internal CodeBase AddCleanup(CodeBase cleanupCode) => new CodeWithCleanup(this, cleanupCode);
 
-        virtual internal CodeBase ArrangeCleanupCode() => null;
+        internal virtual CodeBase ArrangeCleanupCode() => null;
 
         internal CodeBase InvalidConversion(Size size) => Add(new InvalidConversionCode(Size, size));
     }

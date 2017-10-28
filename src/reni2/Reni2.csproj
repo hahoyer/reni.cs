@@ -29,7 +29,6 @@
     <Compile Include="Code\Generator.cs" />
     <Compile Include="Code\Holder.cs" />
     <Compile Include="Code\InvalidConversionCode.cs" />
-    <Compile Include="Code\IssueCode.cs" />
     <Compile Include="Code\ItemCollector.cs" />
     <Compile Include="Code\IVisitor.cs" />
     <Compile Include="Code\None.cs" />

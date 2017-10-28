@@ -149,7 +149,7 @@ namespace Reni.Struct
             => Compound
                 .Syntax
                 .EndPosition
-                .Select(position => Compound.AccessType(ViewPosition, position).DumpPrintText)
+                .Select(position => Compound.AccessType(ViewPosition, position)?.DumpPrintText?? "?")
                 .Stringify(", ")
                 .Surround("(", ")");
 
@@ -374,6 +374,6 @@ namespace Reni.Struct
             }
         }
 
-        internal Issue RecentIssue => Compound.GetRecentIssue(ViewPosition);
+        internal Issue[] Issues => Compound.GetIssues(ViewPosition);
     }
 }

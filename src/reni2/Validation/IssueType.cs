@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.Basics;
@@ -8,6 +9,7 @@ using Reni.Type;
 
 namespace Reni.Validation
 {
+    [Obsolete("",true)]
     abstract class IssueType : TypeBase
     {
         class TryToAccessHllwException
@@ -22,42 +24,32 @@ namespace Reni.Validation
             }
         }
 
-        [EnableDump]
-        internal override Issue RecentIssue { get; }
+        new readonly Issue Issue;
 
-        protected IssueType(Issue issue) => RecentIssue = issue;
+        protected IssueType(Issue issue) => Issue = issue;
 
         [DisableDump]
         internal override bool Hllw => throw new TryToAccessHllwException(this);
 
-        internal override string DumpPrintText => RecentIssue.IssueId.Tag;
-
-        internal virtual CodeBase Code => RecentIssue.Code;
+        internal override string DumpPrintText => Issue.IssueId.Tag;
 
         protected override TypeBase ReversePair(TypeBase first)
         {
             Tracer.Assert(!(first is IssueType));
-            return new IssueInCompoundType(this);
+            return new IssueInCompoundType(this, null);
         }
 
-        internal override TypeBase Pair(TypeBase second)
+        internal override TypeBase Pair(TypeBase second, SourcePart position)
         {
             NotImplementedMethod(second);
-            return base.Pair(second);
+            return base.Pair(second, position);
         }
 
         protected override string GetNodeDump() => base.GetNodeDump() + " " + DumpPrintText;
 
-        protected override IssueType CreateIssue(ISyntax currentTarget, IssueId issueId)
-        {
-            Tracer.Assert(issueId == IssueId.ConsequentialError);
-            return new ConsequentialIssueType(this, currentTarget.Main);
-        }
+        protected IssueType CreateIssue(ISyntax currentTarget, IssueId issueId) 
+            => new ConsequentialIssueType(this, currentTarget.Main);
 
-        internal Result Result(Category category) => Result(Filtered(category), () => Code);
-
-        internal static Category Filtered
-            (Category category) => category & (Category.Type | Category.Code | Category.Exts);
 
     }
 

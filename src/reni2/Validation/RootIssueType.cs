@@ -1,18 +1,16 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using hw.DebugFormatter;
 using Reni.Code;
 using Reni.Context;
-using Reni.Feature;
 
 namespace Reni.Validation
 {
-    sealed class RootIssueType 
+    [Obsolete(message: "", error: true)]
+    sealed class RootIssueType
         : IssueType
     {
         public RootIssueType(Issue issue, Root root)
-            : base(issue) { Root = root; }
+            : base(issue) => Root = root;
 
         [DisableDump]
         internal override Root Root { get; }

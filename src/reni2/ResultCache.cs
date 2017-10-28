@@ -8,6 +8,7 @@ using hw.DebugFormatter;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Type;
+using Reni.Validation;
 
 namespace Reni
 {
@@ -213,6 +214,9 @@ namespace Reni
 
         [DisableDump]
         internal bool? Hllw => GetCategories(Category.Hllw).Hllw;
+
+        [DisableDump]
+        internal Issue[] Issues => GetCategories(Category.Hllw).Issues;
 
         public override string DumpData()
         {

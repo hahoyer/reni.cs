@@ -186,6 +186,9 @@ namespace Reni.Context
             var compoundSyntax = CompoundSyntax.Create(syntax.ForceStatements, syntax);
 
             var rawResult = compoundSyntax.Target.Result(this);
+            if(rawResult.HasIssue)
+                return rawResult.Issues.Container(description);
+
             return rawResult
                 .Code
                 .LocalBlock(rawResult.Type.Copier(Category.Code).Code)

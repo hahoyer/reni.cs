@@ -177,7 +177,7 @@ namespace Reni.Type
         {
             Tracer.Assert(!(right is PointerType));
             return Align
-                .Pair(right.Align)
+                .Pair(right.Align, null)
                 .ArgCode
                 .NumberOperation(token, resultSize, Align.Size, right.Align.Size);
         }

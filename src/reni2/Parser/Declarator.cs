@@ -32,7 +32,7 @@ namespace Reni.Parser
             if (Target == null)
                 return result;
 
-            return result.Issues(IssueId.InvalidDeclarationTag.Create(Position));
+            return result.Issues(IssueId.InvalidDeclarationTag.Issue(Position));
         }
 
         public Declarator Combine(Declarator other)

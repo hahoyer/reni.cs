@@ -66,9 +66,6 @@ namespace Reni.Code
         [DisableDump]
         internal Size TemporarySize => OutputSize + GetAdditionalTemporarySize();
 
-        [DisableDump]
-        internal virtual IEnumerable<Issue> Issues => Issue.Empty;
-
         protected virtual Size GetAdditionalTemporarySize() => Size.Zero;
 
         internal FiberItem[] TryToCombine(FiberItem subsequentElement)

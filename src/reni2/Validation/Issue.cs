@@ -1,43 +1,50 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using hw.Parser;
 using hw.Scanner;
-using Reni.Code;
 
 namespace Reni.Validation
 {
-    public sealed class Issue : DumpableObject
+    public sealed class Issue : DumpableObject, IEquatable<Issue>
     {
+        static int NextObjectId;
+
         internal static readonly IEnumerable<Issue> Empty = new Issue[0];
 
+        [EnableDump]
+        internal readonly SourcePart Position;
+
         internal Issue(IssueId issueId, SourcePart position, string message = null)
+            : base(NextObjectId++)
         {
             IssueId = issueId;
-            Message = message??"";
+            Message = message ?? "";
             Position = position;
             AssertValid();
-            StopByObjectIds(3168);
+            StopByObjectIds();
         }
 
-        void AssertValid() => Tracer.Assert(Position != null);
+        bool IEquatable<Issue>.Equals(Issue other)
+        {
+            if(ReferenceEquals(objA: null, objB: other))
+                return false;
+            if(ReferenceEquals(this, other))
+                return true;
+            return
+                Equals(Position, other.Position) &&
+                Equals(IssueId, other.IssueId) &&
+                string.Equals(Message, other.Message);
+        }
 
         [DisableDump]
         internal IssueId IssueId { get; }
-        [EnableDump]
-        internal SourcePart Position;
+
         [EnableDump]
         internal string Message { get; }
+
         [DisableDump]
         internal string Tag => IssueId.Tag;
-
-        [DisableDump]
-        internal CodeBase Code => CodeBase.Issue(this);
-
-        protected override string GetNodeDump()
-            => base.GetNodeDump() + IssueId.NodeDump().Surround("{", "}");
 
         internal string LogDump
         {
@@ -51,5 +58,34 @@ namespace Reni.Validation
                 return result + " " + Message;
             }
         }
+
+        void AssertValid() => Tracer.Assert(Position != null);
+
+        protected override string GetNodeDump()
+            => base.GetNodeDump() +
+               IssueId.NodeDump().Surround(left: "{", right: "}");
+
+        public override bool Equals(object obj)
+        {
+            if(ReferenceEquals(objA: null, objB: obj))
+                return false;
+            if(ReferenceEquals(this, obj))
+                return true;
+            return obj is Issue issue && Equals(issue);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = Position.GetHashCode();
+                hashCode = (hashCode * 397) ^ IssueId.GetHashCode();
+                hashCode = (hashCode * 397) ^ Message.GetHashCode();
+                return hashCode;
+            }
+        }
+
+        public static bool operator ==(Issue left, Issue right) => Equals(left, right);
+        public static bool operator !=(Issue left, Issue right) => !Equals(left, right);
     }
 }

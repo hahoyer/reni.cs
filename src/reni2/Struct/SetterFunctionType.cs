@@ -13,7 +13,7 @@ namespace Reni.Struct
 
         protected override FunctionId FunctionId { get; }
 
-        protected override TypeBase CallType => base.CallType.Pair(Parent.ValueType.Pointer);
+        protected override TypeBase CallType => base.CallType.Pair(Parent.ValueType.Pointer, null);
         protected override Size RelevantValueSize => Root.DefaultRefAlignParam.RefSize;
     }
 }

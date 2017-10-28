@@ -19,8 +19,6 @@ namespace Reni.Type
         internal Pair(TypeBase first, TypeBase second)
         {
             Tracer.Assert(first.Root == second.Root);
-            Tracer.Assert(!(first is IssueType));
-            Tracer.Assert(!(second is IssueType));
             _first = first;
             _second = second;
         }

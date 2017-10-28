@@ -110,11 +110,6 @@ namespace Reni.Code
         protected override TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
             => actual.Fiber(this);
 
-        internal override IEnumerable<Issue> Issues
-            => _fiberHead
-                .Issues
-                .Union(_fiberItems.SelectMany(item => item.Issues));
-
         [DisableDump]
         internal new bool HasArg => FiberHead.HasArg || FiberItems.Any(x => x.HasArg);
 

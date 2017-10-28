@@ -38,8 +38,6 @@ namespace Reni.Code
 
             var dataArray = data.ToArray();
 
-            Tracer.Assert(!dataArray.Any(item => item is IssueCode));
-
             if(!dataArray.Any())
                 return null;
             if(dataArray.Length == 1)
@@ -69,9 +67,6 @@ namespace Reni.Code
 
         protected override TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual)
             => actual.List(this);
-
-        [DisableDump]
-        internal override IEnumerable<Issue> Issues => Data.SelectMany(data => data.Issues);
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement)
         {

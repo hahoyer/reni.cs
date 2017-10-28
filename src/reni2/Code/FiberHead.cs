@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using hw.DebugFormatter;
-using Reni.Validation;
+﻿using hw.DebugFormatter;
 
 namespace Reni.Code
 {
@@ -11,26 +7,21 @@ namespace Reni.Code
         static int _nextObjectId;
 
         protected FiberHead(int objectId)
-            : base(objectId) { }
+            : base(objectId)
+        {
+        }
 
         protected FiberHead()
-            : base(_nextObjectId++) { }
+            : base(_nextObjectId++)
+        {
+        }
+
+        [DisableDump]
+        internal virtual bool IsNonFiberHeadList => false;
 
         protected virtual CodeBase TryToCombine(FiberItem subsequentElement) => null;
 
         internal override CodeBase Add(FiberItem subsequentElement)
-        {
-            var newResult = TryToCombine(subsequentElement);
-            if(newResult == null)
-                return new Fiber(this, subsequentElement);
-
-            return newResult;
-        }
-
-        [DisableDump]
-        internal override IEnumerable<Issue> Issues => Validation.Issue.Empty;
-
-        [DisableDump]
-        internal virtual bool IsNonFiberHeadList => false;
+            => TryToCombine(subsequentElement) ?? new Fiber(this, subsequentElement);
     }
 }

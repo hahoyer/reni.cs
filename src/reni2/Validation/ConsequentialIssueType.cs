@@ -1,14 +1,15 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.Code;
 using Reni.Context;
-using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Validation
 {
+    [Obsolete("", true)]
     sealed class ConsequentialIssueType : IssueType
     {
         readonly IssueType _issueType;
@@ -32,17 +33,16 @@ namespace Reni.Validation
                 return null;
             }
         }
-
-        internal override CodeBase Code => _issueType.Code + base.Code;
     }
 
+    [Obsolete("", true)]
     class IssueInCompoundType : IssueType
     {
         [EnableDump]
         readonly IssueType IssueType;
 
-        public IssueInCompoundType(IssueType issueType)
-            : base(new Issue(IssueId.IssueInCompound, issueType.RecentIssue.Position)) 
+        public IssueInCompoundType(IssueType issueType, SourcePart position)
+            : base(new Issue(IssueId.IssueInCompound, position))
             => IssueType = issueType;
 
         [DisableDump]
@@ -51,14 +51,13 @@ namespace Reni.Validation
         protected override TypeBase ReversePair(TypeBase first)
         {
             Tracer.Assert(!(first is IssueType));
-            return new IssueInCompoundType(IssueType);
+            return new IssueInCompoundType(IssueType, null);
         }
 
-        internal override TypeBase Pair(TypeBase second)
+        internal override TypeBase Pair(TypeBase second, SourcePart position)
         {
             NotImplementedMethod(second);
-            return base.Pair(second);
+            return base.Pair(second, position);
         }
-
     }
 }

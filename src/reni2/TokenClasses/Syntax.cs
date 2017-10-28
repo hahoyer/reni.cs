@@ -281,7 +281,7 @@ namespace Reni.TokenClasses
                 return Statement.CreateStatements(value, Option.DefaultScopeProvider);
 
             return new Result<Statement[]>
-                (new Statement[0], IssueId.InvalidListOperandSequence.Create(SourcePart));
+                (new Statement[0], IssueId.InvalidListOperandSequence.Issue(SourcePart));
         }
 
         internal Result<Syntax> GetBracketKernel(int level, Syntax parent)
@@ -289,7 +289,7 @@ namespace Reni.TokenClasses
             Tracer.Assert(parent.Right == null);
 
             if(!(TokenClass is LeftParenthesis leftParenthesis))
-                return new Result<Syntax>(this, IssueId.ExtraRightBracket.Create(parent.SourcePart));
+                return new Result<Syntax>(this, IssueId.ExtraRightBracket.Issue(parent.SourcePart));
 
             Tracer.Assert(Left == null);
 
@@ -300,7 +300,7 @@ namespace Reni.TokenClasses
 
             if(levelDelta > 0)
                 return new Result<Syntax>
-                    (Right, IssueId.ExtraLeftBracket.Create(SourcePart));
+                    (Right, IssueId.ExtraLeftBracket.Issue(SourcePart));
 
             NotImplementedMethod(level, parent);
             return null;

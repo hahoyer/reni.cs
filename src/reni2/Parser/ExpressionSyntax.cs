@@ -5,7 +5,9 @@ using hw.DebugFormatter;
 using hw.Parser;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Feature;
 using Reni.TokenClasses;
+using Reni.Validation;
 
 namespace Reni.Parser
 {
@@ -55,8 +57,15 @@ namespace Reni.Parser
                     return context.PrefixResult(category, Definable, Syntax, Right);
 
                 var left = context.ResultAsReferenceCache(Left);
+                var leftType = left.Type;
+                if(leftType != null)
+                    return leftType
+                        .Execute(category, left, Syntax, Definable, context, Right);
 
-                return left.Type.Execute(category, left, Syntax, Definable, context, Right);
+                return left
+                    .Issues
+                    .plus(IssueId.ConsequentialError.Issue(Syntax.Token.Characters))
+                    .Result();
             }
             finally
             {

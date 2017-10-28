@@ -1,7 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using hw.DebugFormatter;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -32,8 +30,8 @@ namespace Reni.Type
 
         protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize + IndexType.Size;
 
-        protected override CodeBase SetterCode()
-            => Pair(ValueType.SmartPointer)
+        protected override CodeBase SetterCode(SourcePart position)
+            => Pair(ValueType.SmartPointer, position)
                 .ArgCode
                 .ArraySetter(ValueType.Size, IndexType.Size);
 

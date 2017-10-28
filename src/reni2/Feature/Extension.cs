@@ -16,28 +16,23 @@ namespace Reni.Feature
     static class Extension
     {
         static readonly
-            FunctionCache
-                <Func<Category, ResultCache, ContextBase, Parser.Value, Result>, MetaFunction>
+            FunctionCache<Func<Category, ResultCache, ContextBase, Parser.Value, Result>, MetaFunction>
             _metaFunctionCache
                 =
-                new FunctionCache
-                    <Func<Category, ResultCache, ContextBase, Parser.Value, Result>, MetaFunction>
+                new FunctionCache<Func<Category, ResultCache, ContextBase, Parser.Value, Result>, MetaFunction>
                     (function => new MetaFunction(function));
 
-        static readonly FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Value>>
-            ValueCache
-                = new FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Value>>
-                    (
-                    function =>
-                        new FunctionCache<TypeBase, Value>(type => new Value(function, type)));
+        static readonly FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Value>> ValueCache
+            = new FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Value>>
+            (
+                function =>
+                    new FunctionCache<TypeBase, Value>(type => new Value(function, type)));
 
-        static readonly FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Conversion>>
-            ConversionCache
-                = new FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Conversion>>
-                    (
-                    function =>
-                        new FunctionCache<TypeBase, Conversion>
-                            (type => new Conversion(function, type)));
+        static readonly FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Conversion>> ConversionCache
+            = new FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Conversion>>
+            (
+                function =>
+                    new FunctionCache<TypeBase, Conversion>(type => new Conversion(function, type)));
 
         internal static Value Value(Func<Category, Result> function, TypeBase target = null)
             => ValueCache[function][(target ?? function.Target as TypeBase).AssertNotNull()];
@@ -47,10 +42,10 @@ namespace Reni.Feature
             => ConversionCache[function][(target ?? function.Target as TypeBase).AssertNotNull()];
 
         internal static ObjectFunction FunctionFeature
-            (
+        (
             Func<Category, IContextReference, TypeBase, Result> function,
             IContextReferenceProvider target = null
-            )
+        )
         {
             var context = (target ?? function.Target as IContextReferenceProvider).AssertNotNull();
             return new ObjectFunction(function, context);
@@ -112,7 +107,7 @@ namespace Reni.Feature
         }
 
         internal static Result Result
-            (
+        (
             this IEvalImplementation feature,
             Category category,
             ISyntax currentTarget,
@@ -120,11 +115,9 @@ namespace Reni.Feature
             Parser.Value right)
         {
             Tracer.Assert
-                (
-                    feature.Function == null
-                        || !feature.Function.IsImplicit
-                        || feature.Value == null
-                );
+            (
+                feature.Function == null || !feature.Function.IsImplicit || feature.Value == null
+            );
 
             var valueCategory = category;
             if(right != null)
@@ -137,10 +130,9 @@ namespace Reni.Feature
                 if(valueResult != null)
                     return valueResult;
 
-                var result = IssueId.MissingRightExpression
-                    .Type(currentTarget, context)
-                    .Result(category);
-                return result;
+                return IssueId
+                    .MissingRightExpression
+                    .IssueResult(currentTarget.All);
             }
 
             if(valueResult == null)
@@ -160,11 +152,11 @@ namespace Reni.Feature
 
             return valueResult
                 .Type
-                .Execute(category, valueResult, currentTarget, null, context, right);
+                .Execute(category, valueResult, currentTarget, definable: null, context: context, right: right);
         }
 
         static Result ValueResult
-            (
+        (
             this IEvalImplementation feature,
             ContextBase context,
             Parser.Value right,
@@ -187,7 +179,7 @@ namespace Reni.Feature
         }
 
         internal static Result Result
-            (
+        (
             this IImplementation feature,
             Category category,
             ResultCache left,
@@ -211,6 +203,15 @@ namespace Reni.Feature
                 .Where(x => x != null)
                 .Distinct()
                 .SingleOrDefault();
+        }
+
+        internal static Result Result(this Issue[] issues) { return new Result(issues); }
+
+
+        public static Container Container(this Issue[] issues, string description)
+        {
+        return new Container(issues, description);
+            
         }
     }
 }

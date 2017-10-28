@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -41,8 +42,8 @@ namespace Reni.Type
         protected override CodeBase GetterCode()
             => ArgCode.ReferencePlus(FieldOffset);
 
-        protected override CodeBase SetterCode()
-            => Pair(ValueType.ForcedPointer)
+        protected override CodeBase SetterCode(SourcePart position)
+            => Pair(ValueType.ForcedPointer, position)
                 .ArgCode
                 .Assignment(ValueType.Size);
 

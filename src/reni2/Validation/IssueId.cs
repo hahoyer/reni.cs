@@ -1,9 +1,6 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using hw.Helper;
 using hw.Scanner;
-using Reni.Context;
 using Reni.Parser;
 using Reni.TokenClasses;
 
@@ -32,18 +29,18 @@ namespace Reni.Validation
 
         public static IEnumerable<IssueId> All => AllInstances<IssueId>();
 
-        internal Issue Create(SourcePart position) => new Issue(this, position);
+        internal Issue Issue(SourcePart position, string message = null) => new Issue(this, position, message);
+
+        internal Result IssueResult(SourcePart position, string message = null)
+            => new Result(Issue(position, message));
 
         internal Result<Value> Value(Syntax syntax)
-            => new Result<Value>(new EmptyList(syntax), Create(syntax.SourcePart));
+            => new Result<Value>(new EmptyList(syntax), Issue(syntax.SourcePart));
 
         internal Result<Value> Value(Value value)
-            => new Result<Value>(value, Create(value.SourcePart));
+            => new Result<Value>(value, Issue(value.SourcePart));
 
         internal Result<Syntax> Syntax(Syntax syntax)
-            => new Result<Syntax>(syntax, Create(syntax.SourcePart));
-
-        internal RootIssueType Type(ISyntax currentTarget, ContextBase context)
-            => new RootIssueType(Create(currentTarget.All), context.RootContext);
+            => new Result<Syntax>(syntax, Issue(syntax.SourcePart));
     }
 }

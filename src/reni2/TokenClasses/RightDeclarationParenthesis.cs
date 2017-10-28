@@ -50,7 +50,7 @@ namespace Reni.TokenClasses
             }
             else
             {
-                var issues = bracketKernel.Issues.plus(IssueId.MissingDeclarationTag.Create(syntax.SourcePart));
+                var issues = bracketKernel.Issues.plus(IssueId.MissingDeclarationTag.Issue(syntax.SourcePart));
                 return new Declarator(null, null,syntax.SourcePart).Issues(issues);
             }
         }
@@ -61,7 +61,7 @@ namespace Reni.TokenClasses
             if(result != null)
                 return new Result<IDeclarationTag>(result);
 
-            return new Result<IDeclarationTag>(null, IssueId.InvalidDeclarationTag.Create(item.SourcePart));
+            return new Result<IDeclarationTag>(null, IssueId.InvalidDeclarationTag.Issue(item.SourcePart));
         }
 
         IParserTokenType<Syntax> IBracketMatch<Syntax>.Value { get; } = new Matched();

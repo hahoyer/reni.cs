@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using hw.DebugFormatter;
 using Reni.Basics;
-using Reni.Validation;
 
 namespace Reni.Code
 {
@@ -12,9 +8,10 @@ namespace Reni.Code
         static int _nextObjectId;
 
         [EnableDump]
-        readonly CodeBase Initialisation;
-        [EnableDump]
         readonly CodeBase CleanupCode;
+
+        [EnableDump]
+        readonly CodeBase Initialisation;
 
         internal CodeWithCleanup(CodeBase initialisation, CodeBase cleanupCode)
             : base(_nextObjectId++)
@@ -30,9 +27,6 @@ namespace Reni.Code
             NotImplementedMethod(subsequentElement);
             return null;
         }
-
-        [DisableDump]
-        internal override IEnumerable<Issue> Issues => Validation.Issue.Empty;
 
         internal override CodeBase ArrangeCleanupCode()
         {

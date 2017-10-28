@@ -296,7 +296,7 @@ namespace Reni.Type
         {
             get
             {
-                if(Hllw)
+                if (Hllw)
                     yield break;
 
                 if(IsAligningPossible && Align.Size != Size)
@@ -371,7 +371,7 @@ namespace Reni.Type
             => _cache.ArrayReferenceCache[optionsId];
 
         protected virtual TypeBase ReversePair(TypeBase first) => first._cache.Pair[this];
-        internal virtual TypeBase Pair(TypeBase second) => second.ReversePair(this);
+        internal virtual TypeBase Pair(TypeBase second, SourcePart position) => second.ReversePair(this);
 
         internal virtual Result Cleanup(Category category)
             => VoidCodeAndRefs(category);
@@ -434,12 +434,9 @@ namespace Reni.Type
             => new Result
             (
                 category,
-                RecentIssue,
                 getType: () => this,
                 getCode: getCode,
                 getExts: getExts);
-
-        internal virtual Issue RecentIssue => null;
 
         internal TypeBase CommonType(TypeBase elseType)
         {
@@ -722,15 +719,9 @@ namespace Reni.Type
             return null;
         }
 
-        internal Result IssueResult(ISyntax currentTarget, IssueId issueId, Category category)
-            => CreateIssue(currentTarget, issueId).Result(category);
-
-        protected virtual IssueType CreateIssue(ISyntax currentTarget, IssueId issueId)
-            => new RootIssueType
-            (
-                new Issue(issueId, currentTarget.Main, "Type: " + DumpPrintText),
-                Root
-            );
+        internal Result IssueResult(ISyntax currentTarget, IssueId issueId) 
+            => issueId
+            .IssueResult(currentTarget.Main, "Type: " + DumpPrintText);
 
         internal Result Execute
         (
@@ -745,7 +736,7 @@ namespace Reni.Type
             (
                 definable,
                 result => result.Execute(category, left, currentTarget, context, right),
-                issueId => IssueResult(currentTarget, issueId, category)
+                issueId => IssueResult(currentTarget, issueId)
             );
 
         TResult ExecuteDeclaration<TResult>

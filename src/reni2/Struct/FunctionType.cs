@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
@@ -110,7 +111,7 @@ namespace Reni.Struct
             }
         }
 
-        protected override Result SetterResult(Category category) => Setter.GetCallResult(category);
+        protected override Result SetterResult(Category category, SourcePart position) => Setter.GetCallResult(category);
         protected override Result GetterResult(Category category) => Getter.GetCallResult(category);
         protected override Size GetSize() => ArgsType.Size + Exts.Size;
 

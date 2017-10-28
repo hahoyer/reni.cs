@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
-using hw.Helper;
-using System.Linq;
 using hw.DebugFormatter;
-
+using hw.Helper;
 using Reni.Basics;
 using Reni.Struct;
 using Reni.Validation;
@@ -17,6 +13,9 @@ namespace Reni.Code
         [Node]
         internal readonly FunctionId FunctionId;
 
+        [Node]
+        internal readonly Issue[] Issues;
+
         internal Container(CodeBase data, string description, FunctionId functionId = null)
             : base(_nextObjectId++)
         {
@@ -26,7 +25,14 @@ namespace Reni.Code
             StopByObjectIds(-10);
         }
 
-        Container(string errorText) { Description = errorText; }
+        Container(string errorText) => Description = errorText;
+
+        internal Container(Issue[] issues, string description)
+            : base(_nextObjectId++)
+        {
+            Description = description;
+            Issues = issues;
+        }
 
         [Node]
         [EnableDump]
@@ -38,19 +44,18 @@ namespace Reni.Code
 
         [Node]
         [DisableDump]
-        public Size MaxSize => Data.TemporarySize;
+        internal Size MaxSize => Data?.TemporarySize ?? Size.Zero;
 
         [Node]
         [DisableDump]
         public static Container UnexpectedVisitOfPending { get; }
-            = new Container("UnexpectedVisitOfPending");
-
-        [Node]
-        public Issue[] Issues => Data.Issues.ToArray();
+            = new Container(errorText: "UnexpectedVisitOfPending");
 
         public string GetCSharpStatements(int indent)
         {
-            var generator = new CSharpGenerator(Data.TemporarySize.SaveByteCount);
+            if(Issues != null)
+                return "";
+            var generator = new CSharpGenerator(MaxSize.SaveByteCount);
             Data.Visit(generator);
             return generator.Data.Indent(indent);
         }

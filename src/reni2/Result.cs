@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using JetBrains.Annotations;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Parser;
 using Reni.Type;
 using Reni.Validation;
 
@@ -23,6 +25,8 @@ namespace Reni
         Size _size;
         TypeBase _type;
 
+        public Issue[] Issues = new Issue[0];
+
         internal Result()
             : base(_nextObjectId++)
         {
@@ -30,19 +34,56 @@ namespace Reni
             StopByObjectIds(-88);
         }
 
+        internal Result(Issue[] recentIssues)
+            : this()
+        {
+            Issues = recentIssues;
+            AssertValid();
+        }
+
+        internal Result(Issue recentIssue)
+            : this()
+        {
+            Issues = new[] {recentIssue};
+            AssertValid();
+        }
+
         internal Result
         (
             Category category,
-            Issue recentIssue = null,
             Func<bool> getHllw = null,
             Func<Size> getSize = null,
             Func<TypeBase> getType = null,
             Func<CodeBase> getCode = null,
             Func<CodeArgs> getExts = null,
             Root rootContext = null)
+            : this
+            (
+                category,
+                issues: null,
+                getHllw: getHllw,
+                getSize: getSize,
+                getType: getType,
+                getCode: getCode,
+                getExts: getExts,
+                rootContext: rootContext)
+        {
+        }
+
+        Result
+        (
+            Category category,
+            Issue[] issues,
+            Func<bool> getHllw,
+            Func<Size> getSize,
+            Func<TypeBase> getType,
+            Func<CodeBase> getCode,
+            Func<CodeArgs> getExts,
+            Root rootContext = null)
             : this()
         {
-            RecentIssue = recentIssue;
+            Issues = issues ?? new Issue[0];
+
             var hllw = getHllw == null ? null : new ValueCache<bool>(getHllw);
             var size = getSize == null ? null : new ValueCache<Size>(getSize);
             var type = getType == null ? null : new ValueCache<TypeBase>(getType);
@@ -79,10 +120,6 @@ namespace Reni
         [EnableDumpWithExceptionPredicate]
         public Category CompleteCategory
             => Category.CreateCategory(HasHllw, HasSize, HasType, HasCode, HasExts);
-
-        [CanBeNull]
-        [DebuggerHidden]
-        public Issue RecentIssue { get; private set; }
 
         [Node]
         [DebuggerHidden]
@@ -303,16 +340,16 @@ namespace Reni
                 var result = new Result
                 (
                     CompleteCategory,
-                    getHllw: () => Hllw.Value,
-                    getSize: () => alignedSize,
-                    getType: () => Type.Align,
-                    getCode: () => Code.BitCast(alignedSize),
-                    getExts: () => Exts);
+                    () => Hllw.Value,
+                    () => alignedSize,
+                    () => Type.Align,
+                    () => Code.BitCast(alignedSize),
+                    () => Exts);
                 return result;
             }
         }
 
-        public bool HasIssue => RecentIssue != null;
+        public bool HasIssue => Issues.Any();
 
         [DisableDump]
         internal Result Weaken
@@ -334,6 +371,9 @@ namespace Reni
         {
             get
             {
+                if(HasIssue)
+                    return this;
+
                 Tracer.Assert(HasType, () => "Dereference requires type category:\n " + Dump());
 
                 var result = this;
@@ -374,6 +414,8 @@ namespace Reni
         {
             get
             {
+                if(HasIssue)
+                    return this;
                 if(!HasCode && !HasType && !HasSize)
                     return this;
                 if(Type.Hllw)
@@ -520,26 +562,27 @@ namespace Reni
 
         internal void Update(Result result)
         {
-            if(result.HasIssue)
+            if(HasIssue || result.HasIssue)
             {
-                Tracer.Assert(!HasIssue, ()=>nameof(RecentIssue).DumpValue(RecentIssue) + " " + nameof(result).DumpValue(result.RecentIssue));
-                RecentIssue = result.RecentIssue;
+                Issues = Issues.Union(result.Issues).ToArray();
             }
+            else
+            {
+                if (result.HasHllw)
+                    _hllw = result.Hllw;
 
-            if(result.HasHllw)
-                _hllw = result.Hllw;
+                if (result.HasSize)
+                    _size = result.Size;
 
-            if(result.HasSize)
-                _size = result.Size;
+                if (result.HasType)
+                    _type = result.Type;
 
-            if(result.HasType)
-                _type = result.Type;
+                if (result.HasExts)
+                    _exts = result.Exts;
 
-            if(result.HasExts)
-                _exts = result.Exts;
-
-            if(result.HasCode)
-                _code = result.Code;
+                if (result.HasCode)
+                    _code = result.Code;
+            }
 
             _pendingCategory = _pendingCategory - result.CompleteCategory;
 
@@ -551,7 +594,7 @@ namespace Reni
             return new Result
             (
                 CompleteCategory & category,
-                RecentIssue,
+                Issues,
                 () => Hllw.Value,
                 () => Size,
                 () => Type,
@@ -564,7 +607,7 @@ namespace Reni
 
         void AssertValid()
         {
-            if(IsDirty)
+            if(IsDirty || HasIssue)
                 return;
 
             if(HasHllw && HasSize)
@@ -592,26 +635,30 @@ namespace Reni
             {
                 Tracer.Assert(!HasHllw);
                 Tracer.Assert(!HasSize);
-                if (HasType )
-                    Tracer.Assert(Type is IssueType, Type.Dump);
-                if (HasCode )
-                    Tracer.Assert(Code is IssueCode, Code.Dump);
+                Tracer.Assert(!HasType);
+                Tracer.Assert(!HasCode);
+                Tracer.Assert(!HasExts);
             }
-
-
-            if (HasType && Type is IssueType)
-                Tracer.Assert(HasIssue);
-
-            if(HasCode && Code is IssueCode)
-                Tracer.Assert(HasIssue);
         }
 
-        void Add(Result other) => Add(other, CompleteCategory);
+        void Add(Result other, SourcePart position) => Add(other, CompleteCategory, position);
 
-        void Add(Result other, Category category)
+        void Add(Result other, Category category, SourcePart position)
         {
-            if(!(category <= other.CompleteCategory) && other.HasIssue || !(category <= CompleteCategory) && HasIssue)
-                category = IssueType.Filtered(category);
+            if (HasIssue || other.HasIssue)
+            {
+                IsDirty = true;
+                Hllw = null;
+                Size = null;
+                Type = null;
+                Code = null;
+                Exts = null;
+                Issues = Issues.Concat(other.Issues).ToArray();
+                IsDirty = false;
+                return;
+            }
+
+            IsDirty = true;
 
             Tracer.Assert
             (
@@ -623,34 +670,30 @@ namespace Reni
                 category <= CompleteCategory,
                 () => "this".DumpValue(this) + ", " + nameof(category).DumpValue(category)
             );
-            IsDirty = true;
 
-            if((category.HasType || category.HasCode) && !HasIssue)
-                RecentIssue = other.RecentIssue;
-
-            if (category.HasHllw)
+            if(category.HasHllw)
                 Hllw = SmartHllw && other.SmartHllw;
             else if(HasHllw)
                 Hllw = null;
 
-            if (category.HasSize)
+            if(category.HasSize)
                 Size += other.Size;
-            else if (HasSize)
+            else if(HasSize)
                 Size = null;
 
-            if (category.HasType)
-                Type = Type.Pair(other.Type);
-            else if (HasType)
+            if(category.HasType)
+                Type = Type.Pair(other.Type, position);
+            else if(HasType)
                 Type = null;
 
-            if (category.HasCode)
+            if(category.HasCode)
                 Code = Code + other.Code;
-            else if (HasCode)
+            else if(HasCode)
                 Code = null;
 
-            if (category.HasExts)
+            if(category.HasExts)
                 Exts = Exts.Sequence(other.Exts);
-            else if (HasExts)
+            else if(HasExts)
                 Exts = null;
 
             IsDirty = false;
@@ -670,10 +713,10 @@ namespace Reni
                 Exts = null;
         }
 
-        Result Sequence(Result second)
+        internal Result Sequence(Result second, SourcePart position)
         {
             var result = Clone;
-            result.Add(second);
+            result.Add(second, position);
             return result;
         }
 
@@ -807,6 +850,9 @@ namespace Reni
 
         internal Result InternalLocalBlock(Category category)
         {
+            if(HasIssue)
+                return this;
+
             if(!category.HasCode && !category.HasExts)
                 return this;
 
@@ -844,8 +890,7 @@ namespace Reni
             return result;
         }
 
-        [DebuggerHidden]
-        public static Result operator +(Result aResult, Result bResult) => aResult.Sequence(bResult);
+        public static Result operator +(Result aResult, Result bResult) => aResult.Sequence(bResult, position: null);
 
         [DebuggerHidden]
         internal void AssertVoidOrValidReference()

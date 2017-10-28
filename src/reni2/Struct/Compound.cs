@@ -114,7 +114,7 @@ namespace Reni.Struct
                     .Aggregate
                     (
                         Parent.RootContext.VoidType.Result(category.Typed),
-                        (current, next) => current + next
+                        (current, next) => current.Sequence(next,Syntax.SourcePart)
                     );
                 return ReturnMethodDump(result);
             }
@@ -133,7 +133,7 @@ namespace Reni.Struct
                 var resultsOfStatements = ResultsOfStatements
                     (category - Category.Type, fromPosition: 0, fromNotPosition: Syntax.EndPosition);
 
-                Dump("resultsOfStatements", resultsOfStatements);
+                Dump(name: "resultsOfStatements", value: resultsOfStatements);
                 BreakExecution();
 
                 var aggregate = Syntax
@@ -153,8 +153,12 @@ namespace Reni.Struct
                              category;
 
                 if(result.HasIssue)
-                    return ReturnMethodDump
-                        (CompoundView.Type.IssueResult(Syntax.Syntax, IssueId.ConsequentialError, category));
+                {
+                    var issueResult = CompoundView
+                        .Type
+                        .IssueResult(Syntax.Syntax, IssueId.ConsequentialError);
+                    return ReturnMethodDump(result + issueResult);
+                }
 
                 if(category.HasType)
                     result.Type = CompoundView.Type;
@@ -215,21 +219,21 @@ namespace Reni.Struct
             try
             {
                 var subStatementIds = (accessPosition ?? EndPosition).Select().ToArray();
-                Dump("subStatementIds", subStatementIds);
+                Dump(name: "subStatementIds", value: subStatementIds);
                 BreakExecution();
                 if(subStatementIds.Any(position => InnerHllwStatic(position) == false))
-                    return ReturnMethodDump(false);
+                    return ReturnMethodDump(rv: false);
                 var quickNonDataLess = subStatementIds
                     .Where(position => InnerHllwStatic(position) == null)
                     .ToArray();
-                Dump("quickNonDataLess", quickNonDataLess);
+                Dump(name: "quickNonDataLess", value: quickNonDataLess);
                 BreakExecution();
                 if(quickNonDataLess.Length == 0)
-                    return ReturnMethodDump(true);
+                    return ReturnMethodDump(rv: true);
                 if(quickNonDataLess.Any
                     (position => InternalInnerHllwStructureElement(position) == false))
-                    return ReturnMethodDump(false);
-                return ReturnMethodDump(true);
+                    return ReturnMethodDump(rv: false);
+                return ReturnMethodDump(rv: true);
             }
             finally
             {
@@ -267,8 +271,8 @@ namespace Reni.Struct
             return result;
         }
 
-        internal Issue GetRecentIssue(int viewPosition)
+        internal Issue[] GetIssues(int viewPosition)
             => ResultsOfStatements(Category.Type, fromPosition: 0, fromNotPosition: viewPosition)
-                .RecentIssue;
+                .Issues;
     }
 }

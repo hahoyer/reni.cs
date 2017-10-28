@@ -1,7 +1,6 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using hw.DebugFormatter;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -11,79 +10,39 @@ using Reni.TokenClasses;
 namespace Reni.Type
 {
     abstract class SetterTargetType
-        : TypeBase
-            , IProxyType
-            , IConversion
-            , IValue
-            , IReference
-            , ISymbolProvider<ReassignToken>
+        : TypeBase, IProxyType, IConversion, IValue, IReference, ISymbolProvider<ReassignToken>
     {
         readonly int _order;
 
-        protected SetterTargetType() { _order = CodeArgs.NextOrder++; }
+        protected SetterTargetType() => _order = CodeArgs.NextOrder++;
 
-        int IContextReference.Order => _order;
-        IConversion IProxyType.Converter => this;
-        bool IReference.IsWeak => true;
-        IConversion IReference.Converter => this;
-        Result IValue.Execute(Category category) => GetterResult(category);
-
-        TypeBase IConversion.Source => (TypeBase) this;
+        TypeBase IConversion.Source => this;
 
         Result IConversion.Execute(Category category)
             => GetterResult(category).ConvertToConverter(this);
 
-        [DisableDump]
-        internal override bool IsAligningPossible => false;
-        [DisableDump]
-        internal override bool IsPointerPossible => false;
+        IConversion IProxyType.Converter => this;
+
+        int IContextReference.Order => _order;
+        bool IReference.IsWeak => true;
+        IConversion IReference.Converter => this;
 
         IImplementation ISymbolProvider<ReassignToken>.Feature(ReassignToken tokenClass)
             => IsMutable ? Feature.Extension.FunctionFeature(ReassignResult) : null;
 
-        [EnableDumpExcept(false)]
+        Result IValue.Execute(Category category) => GetterResult(category);
+
+        [DisableDump]
+        internal override bool IsAligningPossible => false;
+
+        [DisableDump]
+        internal override bool IsPointerPossible => false;
+
+        [EnableDumpExcept(exception: false)]
         protected abstract bool IsMutable { get; }
-
-        Result ReassignResult(Category category, TypeBase right)
-        {
-            if(category == Category.Type)
-                return Root.VoidType.Result(category);
-
-            var trace = ObjectId == -97 && category.HasCode;
-            StartMethodDump(trace, category, right);
-            try
-            {
-                BreakExecution();
-                var sourceResult = right
-                    .Conversion(category.Typed, ValueType.ForcedPointer);
-                Dump("sourceResult", sourceResult);
-                BreakExecution();
-
-                var destinationResult = DestinationResult(category.Typed)
-                    .ReplaceArg(Result(category.Typed, this));
-                Dump("destinationResult", destinationResult);
-                BreakExecution();
-
-                var resultForArg = destinationResult + sourceResult;
-                Dump("resultForArg", resultForArg);
-
-                var result = SetterResult(category);
-                Dump("result", result);
-                BreakExecution();
-
-                return ReturnMethodDump(result.ReplaceArg(resultForArg));
-            }
-            finally
-            {
-                EndMethodDump();
-            }
-        }
 
         [DisableDump]
         internal abstract TypeBase ValueType { get; }
-        internal virtual Result DestinationResult(Category category) => ArgResult(category);
-        protected abstract Result SetterResult(Category category);
-        protected abstract Result GetterResult(Category category);
 
         [DisableDump]
         internal override Root Root => ValueType.Root;
@@ -101,5 +60,44 @@ namespace Reni.Type
         {
             get { yield return Feature.Extension.Conversion(GetterResult); }
         }
+
+        Result ReassignResult(Category category, TypeBase right)
+        {
+            if(category == Category.Type)
+                return Root.VoidType.Result(category);
+
+            var trace = ObjectId == -97 && category.HasCode;
+            StartMethodDump(trace, category, right);
+            try
+            {
+                BreakExecution();
+                var sourceResult = right
+                    .Conversion(category.Typed, ValueType.ForcedPointer);
+                Dump(name: "sourceResult", value: sourceResult);
+                BreakExecution();
+
+                var destinationResult = DestinationResult(category.Typed)
+                    .ReplaceArg(Result(category.Typed, this));
+                Dump(name: "destinationResult", value: destinationResult);
+                BreakExecution();
+
+                var resultForArg = destinationResult + sourceResult;
+                Dump(name: "resultForArg", value: resultForArg);
+
+                var result = SetterResult(category, null);
+                Dump(name: "result", value: result);
+                BreakExecution();
+
+                return ReturnMethodDump(result.ReplaceArg(resultForArg));
+            }
+            finally
+            {
+                EndMethodDump();
+            }
+        }
+
+        internal virtual Result DestinationResult(Category category) => ArgResult(category);
+        protected abstract Result SetterResult(Category category, SourcePart position);
+        protected abstract Result GetterResult(Category category);
     }
 }

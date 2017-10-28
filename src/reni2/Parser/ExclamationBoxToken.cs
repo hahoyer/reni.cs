@@ -33,7 +33,7 @@ namespace Reni.Parser
             var provider = syntax.Right.TokenClass as IDeclaratorTagProvider;
             if(provider == null)
                 return new Declarator(null, null, syntax.SourcePart)
-                    .Issues(IssueId.UnknownDeclarationTag.Create(syntax.SourcePart));
+                    .Issues(IssueId.UnknownDeclarationTag.Issue(syntax.SourcePart));
 
             var result = provider.Get(syntax.Right);
 
