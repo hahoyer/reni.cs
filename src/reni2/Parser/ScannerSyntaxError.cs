@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using hw.Parser;
+﻿using hw.Parser;
 using Reni.TokenClasses;
 using Reni.Validation;
 
@@ -19,13 +16,11 @@ namespace Reni.Parser
 
         string ITokenClass.Id => Id;
 
-        public override string Id => "<error>";
-
         Result<Value> IValueProvider.Get(Syntax syntax)
         {
             if(syntax.Right == null)
             {
-                var issues = IssueId.Issue(syntax.SourcePart);
+                var issues = IssueId.Issue(syntax.Token.Characters);
                 return syntax.Left == null
                     ? new Result<Value>(new EmptyList(syntax), issues)
                     : syntax.Left.Value.With(issues);
@@ -35,8 +30,9 @@ namespace Reni.Parser
             return null;
         }
 
+        public override string Id => "<error>";
+
         protected override Syntax Create(Syntax left, IToken token, Syntax right)
             => Syntax.CreateSourceSyntax(left, this, token, right);
-
     }
 }

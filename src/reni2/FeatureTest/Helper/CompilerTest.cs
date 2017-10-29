@@ -81,6 +81,9 @@ namespace Reni.FeatureTest.Helper
                                     + targetSet.Output);
                 }
 
+                foreach (var issue in compiler.Issues)
+                    Tracer.Line(issue.Dump());
+
                 try
                 {
                     Verify(compiler.Issues);

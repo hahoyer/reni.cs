@@ -36,7 +36,7 @@ namespace Reni.Code
         internal IEnumerable<Issue> Issues
             => Main
                 .Issues
-                .Union(Functions.SelectMany(f => f.Value.Issues));
+                .plus(Functions.SelectMany(f => f.Value.Issues));
 
         FunctionCache<int, FunctionContainer> Functions
         {

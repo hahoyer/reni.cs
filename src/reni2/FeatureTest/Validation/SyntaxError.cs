@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
@@ -12,8 +11,8 @@ using Reni.Validation;
 namespace Reni.FeatureTest.Validation
 {
     [UnitTest]
-    [Target(@"1 #(x asdf y)# dump_print")]
-    [Output("")]
+    [Target(value: @"1 #(x asdf y)# dump_print")]
+    [Output(value: "")]
     [UseOfUndefinedContextSymbol]
     public sealed class SyntaxErrorComment : CompilerTest
     {
@@ -28,11 +27,13 @@ namespace Reni.FeatureTest.Validation
     }
 
     [UnitTest]
-    [Target(@"
+    [Target
+        (
+            value: @"
 ' hallo
 world'
 ")]
-    [Output("")]
+    [Output(value: "")]
     public sealed class SyntaxErrorString : CompilerTest
     {
         protected override void Verify(IEnumerable<Issue> issues)
@@ -41,8 +42,7 @@ world'
             var i = 0;
             Tracer.Assert(a[i++].IsLogdumpLike(2, 1, 3, 1, IssueId.EOLInString, "\"' hallo\r\n\""));
             Tracer.Assert(a[i++].IsLogdumpLike(3, 6, 4, 1, IssueId.EOLInString, "\"'\r\n\""));
-            Tracer.Assert
-                (a[i++].IsLogdumpLike(3, 1, 3, 6, IssueId.MissingDeclarationForType, "\"world\" Type: ()"));
+            Tracer.Assert(a[i++].IsLogdumpLike(3, 1, 3, 6, IssueId.MissingDeclarationForType, "\"world\" Type: ()"));
             Tracer.Assert(a.Length == i);
         }
     }
@@ -54,7 +54,7 @@ world'
         const string RegExPattern = ".*\\.reni\\({0},{1}\\): error {2}: (.*)";
 
         internal static bool IsLogdumpLike
-            (
+        (
             this Issue target,
             int line,
             int column,
@@ -76,7 +76,7 @@ world'
                 return false;
 
             var logText = logDump.Substring(start.Value);
-            if (logText.StartsWith(expectedText))
+            if(logText.StartsWith(expectedText))
                 return true;
 
             return false;

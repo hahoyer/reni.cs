@@ -153,12 +153,7 @@ namespace Reni.Struct
                              category;
 
                 if(result.HasIssue)
-                {
-                    var issueResult = CompoundView
-                        .Type
-                        .IssueResult(Syntax.Syntax, IssueId.ConsequentialError);
-                    return ReturnMethodDump(result + issueResult);
-                }
+                    return ReturnMethodDump(result);
 
                 if(category.HasType)
                     result.Type = CompoundView.Type;
