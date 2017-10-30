@@ -6,7 +6,6 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.TokenClasses;
 using Reni.Type;
-using Reni.Validation;
 
 namespace Reni.Struct
 {
@@ -20,7 +19,11 @@ namespace Reni.Struct
     {
         bool IsDumpPrintTextActive;
 
-        internal CompoundType(CompoundView view) => View = view;
+        internal CompoundType(CompoundView view)
+        {
+            Tracer.Assert(!view.HasIssues);
+            View = view;
+        }
 
         ContextBase IChild<ContextBase>.Parent => View.CompoundContext;
 
@@ -89,6 +92,8 @@ namespace Reni.Struct
 
         [DisableDump]
         internal override ContextBase ToContext => View.Context;
+
+        internal override bool HasIssues => View.HasIssues;
 
         Result VoidConversion(Category category) => Mutation(Root.VoidType) & category;
 
