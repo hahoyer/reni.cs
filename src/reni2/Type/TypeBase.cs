@@ -333,6 +333,8 @@ namespace Reni.Type
         [DisableDump]
         internal virtual TypeBase Weaken => null;
 
+        internal virtual bool HasIssues => false;
+
         [NotNull]
         protected virtual Size GetSize()
         {
