@@ -58,7 +58,7 @@ namespace Reni.Parser
 
                 var left = context.ResultAsReferenceCache(Left);
                 var leftType = left.Type;
-                if(leftType != null)
+                if(leftType != null && !leftType.HasIssues)
                     return leftType
                         .Execute(category, left, Syntax, Definable, context, Right);
 
