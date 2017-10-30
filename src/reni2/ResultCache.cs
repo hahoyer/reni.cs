@@ -2,9 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Windows.Forms;
 using hw.DebugFormatter;
-
 using Reni.Basics;
 using Reni.Code;
 using Reni.Type;
@@ -32,10 +30,7 @@ namespace Reni
         {
             readonly Func<Category, Result> ObtainResult;
 
-            public SimpleProvider(Func<Category, Result> obtainResult)
-            {
-                ObtainResult = obtainResult;
-            }
+            public SimpleProvider(Func<Category, Result> obtainResult) => ObtainResult = obtainResult;
 
             Result IResultProvider.Execute(Category category, Category pendingCategory)
             {
@@ -63,8 +58,8 @@ namespace Reni
 
         sealed class Call : DumpableObject
         {
-            internal ResultCache Item;
             internal Category Category;
+            internal ResultCache Item;
 
             protected override string Dump(bool isRecursion)
             {
@@ -80,31 +75,21 @@ namespace Reni
 
         [DisableDump]
         static CallStack Current;
+
         [DisableDump]
         static readonly IResultProvider NotSupported = new ResultNotSupported();
+
         [DisableDump]
         static int NextObjectId;
-        [DisableDump]
-        internal IResultProvider Provider { get; }
+
         [DisableDump]
         internal string FunctionDump = "";
-        [DisableDump]
-        static Call[] Calls => Current?.ToEnumerable.ToArray() ?? new Call[0];
-
-        [DisableDump]
-        internal Result Data { get; } = new Result();
 
         internal ResultCache(IResultProvider obtainResult)
-            : base(NextObjectId++)
-        {
-            Provider = obtainResult ?? NotSupported;
-        }
+            : base(NextObjectId++) => Provider = obtainResult ?? NotSupported;
 
         internal ResultCache(Func<Category, Result> obtainResult)
-            : base(NextObjectId++)
-        {
-            Provider = new SimpleProvider(obtainResult);
-        }
+            : base(NextObjectId++) => Provider = new SimpleProvider(obtainResult);
 
         ResultCache(Result data)
             : base(NextObjectId++)
@@ -113,9 +98,36 @@ namespace Reni
             Provider = NotSupported;
         }
 
+        [DisableDump]
+        internal IResultProvider Provider { get; }
+
+        [DisableDump]
+        static Call[] Calls => Current?.ToEnumerable.ToArray() ?? new Call[0];
+
+        [DisableDump]
+        internal Result Data { get; } = new Result();
+
+        [DisableDump]
+        internal TypeBase Type => GetCategories(Category.Type).Type;
+
+        [DisableDump]
+        internal CodeBase Code => GetCategories(Category.Code).Code;
+
+        [DisableDump]
+        internal CodeArgs Exts => GetCategories(Category.Exts).Exts;
+
+        [DisableDump]
+        internal Size Size => GetCategories(Category.Size).Size;
+
+        [DisableDump]
+        internal bool? Hllw => GetCategories(Category.Hllw).Hllw;
+
+        [DisableDump]
+        internal Issue[] Issues => GetCategories(Category.Hllw).Issues;
+
         public static implicit operator ResultCache(Result x) => new ResultCache(x);
 
-        [DebuggerHidden]
+        //[DebuggerHidden]
         void Update(Category category)
         {
             var localCategory = category - Data.CompleteCategory - Data.PendingCategory;
@@ -200,24 +212,6 @@ namespace Reni
             }
         }
 
-        [DisableDump]
-        internal TypeBase Type => GetCategories(Category.Type).Type;
-
-        [DisableDump]
-        internal CodeBase Code => GetCategories(Category.Code).Code;
-
-        [DisableDump]
-        internal CodeArgs Exts => GetCategories(Category.Exts).Exts;
-
-        [DisableDump]
-        internal Size Size => GetCategories(Category.Size).Size;
-
-        [DisableDump]
-        internal bool? Hllw => GetCategories(Category.Hllw).Hllw;
-
-        [DisableDump]
-        internal Issue[] Issues => GetCategories(Category.Hllw).Issues;
-
         public override string DumpData()
         {
             var result = FunctionDump;
@@ -226,6 +220,5 @@ namespace Reni
             result += Data.DumpData();
             return result;
         }
-
     }
 }
