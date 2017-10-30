@@ -55,10 +55,6 @@ namespace Reni.FeatureTest
             Tracer.Assert(issueBase.IssueId == IssueId.ConsequentialError, issueBase.Dump);
             Tracer.Assert(issueBase.Position.Id == "dump_print", issueBase.Dump);
             i++;
-            issueBase = issueArray[i];
-            Tracer.Assert(issueBase.IssueId == IssueId.ConsequentialError, issueBase.Dump);
-            Tracer.Assert(issueBase.Position.Id == ";", issueBase.Dump);
-            i++;
             Tracer.Assert(i == issueArray.Length);
         }
 
