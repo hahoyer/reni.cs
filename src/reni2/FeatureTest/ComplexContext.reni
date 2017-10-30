@@ -50,7 +50,8 @@ Text: /\
 
 			!mix_in: /\ ^ < this count
             then this data(^ enable_cut)
-            else other data((^ - this count)enable_cut);        }
+            else other data((^ - this count)enable_cut);        
+		}
     }
 }
 result;
