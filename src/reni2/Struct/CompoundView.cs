@@ -98,7 +98,13 @@ namespace Reni.Struct
         internal CompoundType Type => _typeCache.Value;
 
         protected override string GetNodeDump()
-            => base.GetNodeDump() + "(" + (Context?.GetContextIdentificationDump()??"?") + ")";
+        {
+            var result = base.GetNodeDump();
+            result += "(" + (Context?.GetContextIdentificationDump() ?? "?") + ")";
+            if(HasIssues)
+                result += ".Issues[" + Issues.Length + "]";
+            return result;
+        }
 
         [DisableDump]
         TypeBase IndexType => Compound.IndexType;
@@ -375,5 +381,6 @@ namespace Reni.Struct
         }
 
         internal Issue[] Issues => Compound.GetIssues(ViewPosition);
+        internal bool HasIssues => Issues.Any();
     }
 }
