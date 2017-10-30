@@ -62,10 +62,7 @@ namespace Reni.Parser
                     return leftType
                         .Execute(category, left, Syntax, Definable, context, Right);
 
-                return left
-                    .Issues
-                    .plus(IssueId.ConsequentialError.Issue(Syntax.Token.Characters))
-                    .Result(category);
+                return left.Issues.Result(category);
             }
             finally
             {

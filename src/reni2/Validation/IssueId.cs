@@ -10,7 +10,6 @@ namespace Reni.Validation
     sealed class IssueId : EnumEx, Match.IError
     {
         public static readonly IssueId AmbigousSymbol = new IssueId();
-        public static readonly IssueId ConsequentialError = new IssueId();
         public static readonly IssueId EOFInComment = new IssueId();
         public static readonly IssueId EOFInLineComment = new IssueId();
         public static readonly IssueId EOLInString = new IssueId();
@@ -18,7 +17,6 @@ namespace Reni.Validation
         public static readonly IssueId ExtraRightBracket = new IssueId();
         public static readonly IssueId InvalidCharacter = new IssueId();
         public static readonly IssueId InvalidDeclarationTag = new IssueId();
-        public static readonly IssueId IssueInCompound = new IssueId();
         public static readonly IssueId InvalidExpression = new IssueId();
         public static readonly IssueId InvalidListOperandSequence = new IssueId();
         public static readonly IssueId MissingDeclarationForType = new IssueId();
