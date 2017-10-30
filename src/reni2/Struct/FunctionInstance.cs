@@ -124,7 +124,7 @@ namespace Reni.Struct
                 BreakExecution();
                 var rawResult = Context.Result(category.Typed, Body);
 
-                Tracer.Assert(rawResult.CompleteCategory == category.Typed);
+                Tracer.Assert(rawResult.HasIssue || rawResult.CompleteCategory == category.Typed);
                 if(rawResult.FindExts != null)
                     Tracer.Assert(!rawResult.SmartExts.Contains(CodeArgs.Arg()), rawResult.Dump);
 

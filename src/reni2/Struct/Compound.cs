@@ -62,6 +62,8 @@ namespace Reni.Struct
         internal IEnumerable<ResultCache> CachedResults => Syntax.EndPosition.Select(CachedResult);
 
         int EndPosition => Syntax.EndPosition;
+        public bool HasIssue => Issues.Any();
+        public Issue[] Issues => GetIssues();
 
         public string GetCompoundIdentificationDump() => Syntax.GetCompoundIdentificationDump();
 
@@ -267,7 +269,7 @@ namespace Reni.Struct
             return result;
         }
 
-        internal Issue[] GetIssues(int viewPosition)
+        internal Issue[] GetIssues(int? viewPosition = null)
             => ResultsOfStatements(Category.Type, fromPosition: 0, fromNotPosition: viewPosition)
                 .Issues;
     }

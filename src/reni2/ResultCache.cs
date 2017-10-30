@@ -158,7 +158,7 @@ namespace Reni
             {
                 Data.PendingCategory |= localCategory;
                 var result = Provider.Execute(localCategory, oldPendingCategory & category);
-                Tracer.Assert(result != null);
+                Tracer.Assert(result != null, ()=>Tracer.Dump(Provider));
                 Tracer.Assert(result.IsValidOrIssue(localCategory));
                 Data.Update(result);
             }

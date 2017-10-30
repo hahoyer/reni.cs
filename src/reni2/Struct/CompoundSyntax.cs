@@ -161,9 +161,12 @@ namespace Reni.Struct
         }
 
         internal override Result ResultForCache(ContextBase context, Category category)
-            => context
-                .Compound(this)
-                .Result(category);
+        {
+            var compound = context.Compound(this);
+            if (compound.HasIssue)
+                return Feature.Extension.Result(compound.Issues);
+            return compound.Result(category);
+        }
 
         sealed class Data : DumpableObject
         {
