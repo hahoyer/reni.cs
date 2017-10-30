@@ -288,7 +288,7 @@ namespace Reni.Code
         internal static CodeBase Arg(TypeBase type) => new Arg(type);
 
         internal Container Container(string description, FunctionId functionId = null)
-            => new Container(Align(), description, functionId);
+            => new Container(Align(), null, description, functionId);
 
         CodeBase IAggregateable<CodeBase>.Aggregate(CodeBase other) => this + other;
 

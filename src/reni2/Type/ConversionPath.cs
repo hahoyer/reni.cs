@@ -144,7 +144,12 @@ namespace Reni.Type
             => new ConversionPath(new[] {a}.Concat(b.Elements).ToArray());
 
         public static ConversionPath operator +(ConversionPath a, IConversion b)
-            => new ConversionPath(a.Elements.Concat(new[] {b}).ToArray());
+        {
+            if(a == null)
+                return new ConversionPath(b);
+
+            return new ConversionPath(a.Elements.Concat(new[] {b}).ToArray());
+        }
 
         internal Result Execute(Category category)
         {

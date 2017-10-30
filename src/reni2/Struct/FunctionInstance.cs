@@ -47,6 +47,9 @@ namespace Reni.Struct
         internal CodeBase BodyCode => this.CachedValue(GetBodyCode);
 
         [DisableDump]
+        internal CodeBase AlignedBodyCode => BodyCode?.Align();
+
+        [DisableDump]
         Size ArgsPartSize => Parent.ArgsType.Size + RelevantValueSize;
 
         [DisableDump]
@@ -79,7 +82,7 @@ namespace Reni.Struct
             {
                 try
                 {
-                    return BodyCode.Container(Description, FunctionId);
+                    return new Container(AlignedBodyCode, ResultCache.Issues, Description, FunctionId);
                 }
                 catch(UnexpectedVisitOfPending)
                 {

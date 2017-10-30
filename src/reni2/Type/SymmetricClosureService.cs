@@ -8,7 +8,7 @@ namespace Reni.Type
     sealed class SymmetricClosureService
     {
         internal static IEnumerable<IConversion> To(TypeBase source)
-            => new SymmetricClosureService(source).Execute(_backward);
+            => new SymmetricClosureService(source).Execute(Backward);
 
         internal interface INavigator
         {
@@ -18,7 +18,7 @@ namespace Reni.Type
         }
 
         internal static readonly INavigator Forward = new ForwardNavigator();
-        static readonly INavigator _backward = new BackwardNavigator();
+        static readonly INavigator Backward = new BackwardNavigator();
 
         TypeBase Source { get; }
         IEnumerable<IConversion> AllFeatures { get; }

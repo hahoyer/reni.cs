@@ -16,22 +16,15 @@ namespace Reni.Code
         [Node]
         internal readonly Issue[] Issues;
 
-        internal Container(CodeBase data, string description, FunctionId functionId = null)
-            : base(_nextObjectId++)
-        {
-            Description = description;
-            FunctionId = functionId;
-            Data = data;
-            StopByObjectIds(-10);
-        }
-
         Container(string errorText) => Description = errorText;
 
-        internal Container(Issue[] issues, string description)
+        internal Container(CodeBase data, Issue[] issues, string description, FunctionId functionId = null)
             : base(_nextObjectId++)
         {
             Description = description;
+            Data = data;
             Issues = issues;
+            FunctionId = functionId;
         }
 
         [Node]

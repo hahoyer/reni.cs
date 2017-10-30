@@ -72,14 +72,17 @@ namespace Reni.Feature
             => _metaFunctionCache[function];
 
         internal static TypeBase ResultType(this IConversion conversion)
-            => conversion.Result(Category.Type)?.Type;
+            => conversion.Result(Category.Type).Type;
 
         internal static Result Result(this IConversion conversion, Category category)
         {
             var result = conversion.Execute(category);
-            if(category.HasCode && result.Code.ArgType != null)
+            Tracer.Assert(result!= null);
+
+            if (category.HasCode && result.Code.ArgType != null)
                 Tracer.Assert
                     (result.Code.ArgType == conversion.Source, () => result.DebuggerDump());
+
             return result;
         }
 
@@ -206,8 +209,5 @@ namespace Reni.Feature
 
         internal static Result Result(this Issue[] issues, Category category) => new Result(category, issues);
 
-
-        public static Container Container
-            (this Issue[] issues, string description) => new Container(issues, description);
     }
 }

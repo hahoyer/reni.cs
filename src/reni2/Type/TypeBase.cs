@@ -323,7 +323,7 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        internal IEnumerable<IConversion> NextConversionStep
+        internal IEnumerable<IConversion> NextConversionStepOptions
             => SymmetricClosureConversions.Union(StripConversions);
 
         [DisableDump]

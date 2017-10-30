@@ -186,13 +186,13 @@ namespace Reni.Context
             var compoundSyntax = CompoundSyntax.Create(syntax.ForceStatements, syntax);
 
             var rawResult = compoundSyntax.Target.Result(this);
-            if(rawResult.HasIssue)
-                return rawResult.Issues.Container(description);
 
-            return rawResult
-                .Code
+            var result = rawResult
+                .Code?
                 .LocalBlock(rawResult.Type.Copier(Category.Code).Code)
-                .Container(description);
+                .Align();
+
+            return new Container(result, rawResult.Issues, description);
         }
 
         static string Combine(SourcePart fullSource, SourcePart source)
