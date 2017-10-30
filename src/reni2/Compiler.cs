@@ -170,7 +170,7 @@ namespace Reni
             }
 
             if(Parameters.TraceOptions.ExecutedCode)
-                Tracer.FlaggedLine(CSharpString);
+                Tracer.FlaggedLine("ExecutedCode:\n" + CSharpString);
 
             if(Parameters.OutStream != null)
                 foreach(var t in Issues)

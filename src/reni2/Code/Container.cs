@@ -1,3 +1,4 @@
+using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using Reni.Basics;
@@ -25,7 +26,12 @@ namespace Reni.Code
             Data = data;
             Issues = issues;
             FunctionId = functionId;
+
+            Tracer.Assert(HasCode != HasIssues);
         }
+
+        bool HasIssues => Issues?.Any() ?? false;
+        bool HasCode => Data != null;
 
         [Node]
         [EnableDump]
@@ -46,7 +52,7 @@ namespace Reni.Code
 
         public string GetCSharpStatements(int indent)
         {
-            if(Issues != null)
+            if(HasIssues)
                 return "";
             var generator = new CSharpGenerator(MaxSize.SaveByteCount);
             Data.Visit(generator);
