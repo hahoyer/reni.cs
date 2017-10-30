@@ -65,7 +65,7 @@ namespace Reni.Parser
                 return left
                     .Issues
                     .plus(IssueId.ConsequentialError.Issue(Syntax.Token.Characters))
-                    .Result();
+                    .Result(category);
             }
             finally
             {

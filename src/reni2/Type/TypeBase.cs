@@ -721,9 +721,9 @@ namespace Reni.Type
             return null;
         }
 
-        internal Result IssueResult(ISyntax currentTarget, IssueId issueId) 
+        internal Result IssueResult(Category category, IssueId issueId, ISyntax currentTarget) 
             => issueId
-            .IssueResult(currentTarget.Main, "Type: " + DumpPrintText);
+            .IssueResult(category, currentTarget.Main, "Type: " + DumpPrintText);
 
         internal Result Execute
         (
@@ -738,7 +738,7 @@ namespace Reni.Type
             (
                 definable,
                 result => result.Execute(category, left, currentTarget, context, right),
-                issueId => IssueResult(currentTarget, issueId)
+                issueId => IssueResult(category, issueId, currentTarget)
             );
 
         TResult ExecuteDeclaration<TResult>

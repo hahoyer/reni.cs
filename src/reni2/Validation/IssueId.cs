@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using hw.Helper;
 using hw.Scanner;
+using Reni.Basics;
 using Reni.Parser;
 using Reni.TokenClasses;
 
@@ -31,8 +32,8 @@ namespace Reni.Validation
 
         internal Issue Issue(SourcePart position, string message = null) => new Issue(this, position, message);
 
-        internal Result IssueResult(SourcePart position, string message = null)
-            => new Result(Issue(position, message));
+        internal Result IssueResult(Category category, SourcePart position, string message = null)
+            => new Result(category, Issue(position, message));
 
         internal Result<Value> Value(Syntax syntax)
             => new Result<Value>(new EmptyList(syntax), Issue(syntax.SourcePart));

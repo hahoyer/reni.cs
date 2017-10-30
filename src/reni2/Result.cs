@@ -8,7 +8,6 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Parser;
 using Reni.Type;
 using Reni.Validation;
 
@@ -28,24 +27,24 @@ namespace Reni
         public Issue[] Issues = new Issue[0];
 
         internal Result()
-            : base(_nextObjectId++)
+            : base(_nextObjectId++) => _pendingCategory = Category.None;
+
+        internal Result(Category category, Issue[] issues)
+            : this
+            (
+                category & Category.Exts,
+                issues,
+                getHllw: null,
+                getSize: null,
+                getType: null,
+                getCode: null,
+                getExts: CodeArgs.Void)
         {
-            _pendingCategory = Category.None;
-            StopByObjectIds(-88);
         }
 
-        internal Result(Issue[] recentIssues)
-            : this()
+        internal Result(Category category, Issue recentIssue)
+            : this(category, new[] {recentIssue})
         {
-            Issues = recentIssues;
-            AssertValid();
-        }
-
-        internal Result(Issue recentIssue)
-            : this()
-        {
-            Issues = new[] {recentIssue};
-            AssertValid();
         }
 
         internal Result
@@ -562,27 +561,27 @@ namespace Reni
 
         internal void Update(Result result)
         {
-            if(HasIssue || result.HasIssue)
-            {
-                Issues = Issues.Union(result.Issues).ToArray();
-            }
+            Issues = Issues.Union(result.Issues).ToArray();
+
+            if(HasIssue)
+                Reset(Category.All);
             else
             {
-                if (result.HasHllw)
+                if(result.HasHllw)
                     _hllw = result.Hllw;
 
-                if (result.HasSize)
+                if(result.HasSize)
                     _size = result.Size;
 
-                if (result.HasType)
+                if(result.HasType)
                     _type = result.Type;
 
-                if (result.HasExts)
-                    _exts = result.Exts;
-
-                if (result.HasCode)
+                if(result.HasCode)
                     _code = result.Code;
             }
+
+            if(result.HasExts)
+                _exts = result.Exts;
 
             _pendingCategory = _pendingCategory - result.CompleteCategory;
 
@@ -607,8 +606,19 @@ namespace Reni
 
         void AssertValid()
         {
-            if(IsDirty || HasIssue)
+            if(IsDirty)
                 return;
+
+            Tracer.Assert((CompleteCategory & PendingCategory) == Category.None);
+
+            if(HasIssue)
+            {
+                Tracer.Assert(!HasHllw);
+                Tracer.Assert(!HasSize);
+                Tracer.Assert(!HasType);
+                Tracer.Assert(!HasCode);
+                return;
+            }
 
             if(HasHllw && HasSize)
                 Tracer.Assert
@@ -628,68 +638,59 @@ namespace Reni
             if(HasExts && HasCode)
                 Tracer.Assert
                     (Code.Exts.IsEqual(Exts), () => "Code and Exts differ: " + Dump());
-
-            Tracer.Assert((CompleteCategory & PendingCategory) == Category.None);
-
-            if(HasIssue)
-            {
-                Tracer.Assert(!HasHllw);
-                Tracer.Assert(!HasSize);
-                Tracer.Assert(!HasType);
-                Tracer.Assert(!HasCode);
-                Tracer.Assert(!HasExts);
-            }
         }
 
         void Add(Result other, SourcePart position) => Add(other, CompleteCategory, position);
 
         void Add(Result other, Category category, SourcePart position)
         {
-            if (HasIssue || other.HasIssue)
-            {
-                IsDirty = true;
-                Hllw = null;
-                Size = null;
-                Type = null;
-                Code = null;
-                Exts = null;
-                Issues = Issues.Concat(other.Issues).ToArray();
-                IsDirty = false;
-                return;
-            }
-
             IsDirty = true;
 
-            Tracer.Assert
-            (
-                category <= other.CompleteCategory,
-                () => nameof(other).DumpValue(other) + ", " + nameof(category).DumpValue(category)
-            );
-            Tracer.Assert
-            (
-                category <= CompleteCategory,
-                () => "this".DumpValue(this) + ", " + nameof(category).DumpValue(category)
-            );
+            Issues = Issues.Union(other.Issues).ToArray();
 
-            if(category.HasHllw)
-                Hllw = SmartHllw && other.SmartHllw;
-            else if(HasHllw)
+            var hasIssue = HasIssue;
+
+            if(hasIssue)
+            {
                 Hllw = null;
-
-            if(category.HasSize)
-                Size += other.Size;
-            else if(HasSize)
                 Size = null;
-
-            if(category.HasType)
-                Type = Type.Pair(other.Type, position);
-            else if(HasType)
                 Type = null;
-
-            if(category.HasCode)
-                Code = Code + other.Code;
-            else if(HasCode)
                 Code = null;
+            }
+            else
+            {
+                Tracer.Assert
+                (
+                    category <= other.CompleteCategory,
+                    () => nameof(other).DumpValue(other) + ", " + nameof(category).DumpValue(category)
+                );
+
+                Tracer.Assert
+                (
+                    category <= CompleteCategory,
+                    () => "this".DumpValue(this) + ", " + nameof(category).DumpValue(category)
+                );
+
+                if(category.HasHllw)
+                    Hllw = SmartHllw && other.SmartHllw;
+                else if(HasHllw)
+                    Hllw = null;
+
+                if(category.HasSize)
+                    Size += other.Size;
+                else if(HasSize)
+                    Size = null;
+
+                if(category.HasType)
+                    Type = Type.Pair(other.Type, position);
+                else if(HasType)
+                    Type = null;
+
+                if(category.HasCode)
+                    Code = Code + other.Code;
+                else if(HasCode)
+                    Code = null;
+            }
 
             if(category.HasExts)
                 Exts = Exts.Sequence(other.Exts);

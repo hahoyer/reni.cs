@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -132,7 +131,7 @@ namespace Reni.Feature
 
                 return IssueId
                     .MissingRightExpression
-                    .IssueResult(currentTarget.All);
+                    .IssueResult(category, currentTarget.All);
             }
 
             if(valueResult == null)
@@ -205,13 +204,10 @@ namespace Reni.Feature
                 .SingleOrDefault();
         }
 
-        internal static Result Result(this Issue[] issues) { return new Result(issues); }
+        internal static Result Result(this Issue[] issues, Category category) => new Result(category, issues);
 
 
-        public static Container Container(this Issue[] issues, string description)
-        {
-        return new Container(issues, description);
-            
-        }
+        public static Container Container
+            (this Issue[] issues, string description) => new Container(issues, description);
     }
 }

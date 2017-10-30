@@ -300,7 +300,7 @@ namespace Reni.Context
             if(searchResult == null)
                 return IssueId
                     .MissingDeclarationInContext
-                    .IssueResult(source.Token.Characters, "Context: " + RootContext.Format);
+                    .IssueResult(category, source.Token.Characters, "Context: " + RootContext.Format);
 
             var result = searchResult.Result(category, CacheObject.AsObject, source, this, right);
 

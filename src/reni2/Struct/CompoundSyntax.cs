@@ -164,7 +164,7 @@ namespace Reni.Struct
         {
             var compound = context.Compound(this);
             if (compound.HasIssue)
-                return Feature.Extension.Result(compound.Issues);
+                return Feature.Extension.Result(compound.Issues,category);
             return compound.Result(category);
         }
 

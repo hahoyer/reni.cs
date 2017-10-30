@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Type;
@@ -85,14 +86,20 @@ namespace Reni
         [DisableDump]
         internal string FunctionDump = "";
 
+        ResultCache()
+            : base(NextObjectId++)
+        {
+            StopByObjectIds();
+        }
+
         internal ResultCache(IResultProvider obtainResult)
-            : base(NextObjectId++) => Provider = obtainResult ?? NotSupported;
+            : this() => Provider = obtainResult ?? NotSupported;
 
         internal ResultCache(Func<Category, Result> obtainResult)
-            : base(NextObjectId++) => Provider = new SimpleProvider(obtainResult);
+            : this() => Provider = new SimpleProvider(obtainResult);
 
         ResultCache(Result data)
-            : base(NextObjectId++)
+            : this()
         {
             Data = data;
             Provider = NotSupported;
@@ -171,10 +178,10 @@ namespace Reni
         public static Result operator &(ResultCache resultCache, Category category)
             => resultCache.GetCategories(category);
 
-        [DebuggerHidden]
+        //[DebuggerHidden]
         internal Result GetCategories(Category category)
         {
-            var trace = ObjectId == -1768;
+            var trace = ObjectId.In();
             StartMethodDump(trace, category);
             try
             {
