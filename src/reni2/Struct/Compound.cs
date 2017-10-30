@@ -126,10 +126,11 @@ namespace Reni.Struct
 
         internal Result Result(Category category)
         {
-            var trace = Syntax.ObjectId.In() && category.HasCode;
+            var trace = Syntax.ObjectId.In(7) && category.HasType;
             StartMethodDump(trace, category);
             try
             {
+                BreakExecution();
                 var resultsOfStatements = ResultsOfStatements
                     (category - Category.Type, fromPosition: 0, fromNotPosition: Syntax.EndPosition);
 

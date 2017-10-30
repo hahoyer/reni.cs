@@ -16,9 +16,11 @@ namespace Reni.TokenClasses
 
         protected override Result Result
             (ContextBase context, Category category, Value left, Value right)
-            => left
-                .Type(context)
+        {
+            var leftType = left.Type(context);
+            return leftType
                 .InstanceResult(category, c => context.ResultAsReference(c, right));
+        }
 
         Result IPendingProvider.Result
             (ContextBase context, Category category, Value left, Value right)

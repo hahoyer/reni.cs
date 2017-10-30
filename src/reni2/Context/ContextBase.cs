@@ -202,10 +202,10 @@ namespace Reni.Context
         internal TypeBase TypeIfKnown(Parser.Value syntax)
             => CacheObject.ResultCache[syntax].Data.Type;
 
-        [DebuggerHidden]
+        //[DebuggerHidden]
         Result ResultForCache(Category category, Parser.Value syntax)
         {
-            var trace = syntax.ObjectId == 10 && ObjectId == 1769 && category.HasType;
+            var trace = syntax.ObjectId.In() && ObjectId.In() && category.HasType;
             StartMethodDump(trace, category, syntax);
             try
             {
