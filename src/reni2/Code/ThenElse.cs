@@ -13,7 +13,8 @@ namespace Reni.Code
     {
         static int _nextId;
 
-        static Size CondSize => Size.Bit;
+        [Node]
+        readonly Size CondSize;
 
         [Node]
         internal readonly CodeBase ElseCode;
@@ -22,8 +23,12 @@ namespace Reni.Code
         internal readonly CodeBase ThenCode;
 
         internal ThenElse(CodeBase thenCode, CodeBase elseCode)
+            : this(Size.Bit, thenCode, elseCode) {}
+
+        ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode)
             : base(_nextId++)
         {
+            CondSize = condSize.AssertNotNull();
             ThenCode = thenCode.AssertNotNull();
             ElseCode = elseCode.AssertNotNull();
         }
@@ -40,8 +45,8 @@ namespace Reni.Code
                 return null;
             return new FiberItem[]
             {
-                new BitCast(preceding.InputSize, preceding.InputSize, Size.Create(1)),
-                new ThenElse(ThenCode, ElseCode)
+                new BitCast(preceding.InputSize, preceding.InputSize, Size.Bit),
+                new ThenElse(preceding.InputSize, ThenCode, ElseCode)
             };
         }
 
@@ -55,7 +60,7 @@ namespace Reni.Code
             => visitor.ThenElse(CondSize, ThenCode, ElseCode);
 
         internal FiberItem ReCreate(CodeBase newThen, CodeBase newElse)
-            => new ThenElse(newThen ?? ThenCode, newElse ?? ElseCode);
+            => new ThenElse(CondSize, newThen ?? ThenCode, newElse ?? ElseCode);
 
         internal TypeBase Visit(Visitor<TypeBase, TypeBase> actual)
             => new[]
