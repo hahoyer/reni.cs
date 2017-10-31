@@ -13,12 +13,12 @@ repeat: /\ ^ while() then(^ body(), repeat(^));
 
 o: 
 /\
-{ 
+( 
     data: ^ array_reference ;
     count: ^ count;
     dump_print: 
     /!\ 
-    {
+    (
         !mutable position: count type instance (0) ;
         repeat
         (
@@ -29,8 +29,8 @@ o:
                 position := (position + 1) enable_cut
             ) 
         )
-    }
-};
+    )
+);
 
 o('abcdef') dump_print
 ")]

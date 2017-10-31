@@ -8,7 +8,7 @@ using Reni;
 
 namespace ReniUI.Test
 {
-    [UnitTest]
+    [UnitTest]         [LowPriority]
     public sealed class UserInterAction : DependantAttribute
     {
         const string text = @"

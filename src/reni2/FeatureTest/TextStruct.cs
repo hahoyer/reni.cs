@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using hw.Helper;
 using hw.UnitTest;
 using Reni.FeatureTest.Array;
@@ -18,7 +15,7 @@ using Reni.FeatureTest.Validation;
 
 namespace Reni.FeatureTest
 {
-    abstract public class TextStruct : CompilerTest
+    public abstract class TextStruct : CompilerTest
     {
         static string Definition() => "FeatureTest\\Text.reni".ToSmbFile().String;
         protected override string Target => Definition() + "; (" + InstanceCode + ") dump_print";

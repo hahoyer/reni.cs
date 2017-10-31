@@ -12,15 +12,15 @@ namespace Reni.FeatureTest.MixIn
     [ArrayReferenceAll]
     [TargetSet(@"
 Base: /\ 
-{
+(
     a: 3;
-}; 
+); 
 
 This: /\ 
-{
+(
     !mix_in: #(  )# Base();
     aa: 2;
-}; 
+); 
 
 This()a dump_print
 ", "3")]

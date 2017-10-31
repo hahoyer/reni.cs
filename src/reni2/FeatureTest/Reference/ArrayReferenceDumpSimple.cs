@@ -10,7 +10,7 @@ namespace Reni.FeatureTest.Reference
     [Target(@"
 o: 
 /\
-{ 
+( 
     data: ^ ;
     dump_print1: 
     /!\ 
@@ -22,7 +22,7 @@ o:
         data (4) dump_print;
         data (5) dump_print
     }
-};
+);
 
 o('abcdef') dump_print1
 ")]
@@ -34,7 +34,7 @@ o('abcdef') dump_print1
     [Target(@"
 o: 
 /\
-{ 
+( 
     data: ^ array_reference ;
     dump_print1: 
     /!\ 
@@ -43,7 +43,7 @@ o:
         data (3) dump_print;
         data (5) dump_print
     }
-};
+);
 
 o('abcdef') dump_print1
 ")]

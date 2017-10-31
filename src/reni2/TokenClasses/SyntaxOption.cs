@@ -13,28 +13,28 @@ namespace Reni.TokenClasses
     sealed class SyntaxOption : DumpableObject
     {
         [DisableDump]
-        internal IDefaultScopeProvider DefaultScopeProvider => Parent.DefaultScopeProvider;
+        internal IDefaultScopeProvider DefaultScopeProvider => Owner.DefaultScopeProvider;
 
-        Syntax Parent { get; }
+        Syntax Owner { get; }
 
-        public SyntaxOption(Syntax parent) { Parent = parent; }
+        public SyntaxOption(Syntax owner) { Owner = owner; }
 
         [EnableDumpExcept(null)]
         internal Result<Value> Value
         {
             get
             {
-                var declarationItem = Parent.TokenClass as IDeclarationItem;
-                if(declarationItem != null && declarationItem.IsDeclarationPart(Parent))
+                var declarationItem = Owner.TokenClass as IDeclarationItem;
+                if(declarationItem != null && declarationItem.IsDeclarationPart(Owner))
                     return null;
 
-                return (Parent.TokenClass as IValueProvider)?.Get
-                    (Parent);
+                return (Owner.TokenClass as IValueProvider)?.Get
+                    (Owner);
             }
         }
 
         internal Result<Statement[]> GetStatements(List type = null)
-            => (Parent.TokenClass as IStatementsProvider)?.Get(type, Parent, DefaultScopeProvider);
+            => (Owner.TokenClass as IStatementsProvider)?.Get(type, Owner, DefaultScopeProvider);
 
         [EnableDumpExcept(null)]
         internal Result<Statement[]> Statements => GetStatements();
@@ -42,21 +42,21 @@ namespace Reni.TokenClasses
         [EnableDumpExcept(null)]
         internal Result<Statement> Statement
             =>
-            (Parent.TokenClass as IStatementProvider)?.Get
-                (Parent.Left, Parent.Right, DefaultScopeProvider);
+            (Owner.TokenClass as IStatementProvider)?.Get
+                (Owner.Left, Owner.Right, DefaultScopeProvider);
 
         [EnableDumpExcept(null)]
         internal Result<Declarator> Declarator
         {
             get
             {
-                var declaratorTokenClass = Parent.TokenClass as IDeclaratorTokenClass;
-                return declaratorTokenClass?.Get(Parent);
+                var declaratorTokenClass = Owner.TokenClass as IDeclaratorTokenClass;
+                return declaratorTokenClass?.Get(Owner);
             }
         }
 
         [EnableDumpExcept(null)]
-        internal IDeclarationTag DeclarationTag => Parent.TokenClass as IDeclarationTag;
+        internal IDeclarationTag DeclarationTag => Owner.TokenClass as IDeclarationTag;
 
         [EnableDumpExcept(null)]
         internal Issue[] Issues
@@ -72,21 +72,20 @@ namespace Reni.TokenClasses
             get
             {
                 if(IsStatementsLevel)
-                    return ((CompoundSyntax) Parent.Value.Target)
+                    return ((CompoundSyntax) Owner.Value.Target)
                         .ResultCache
                         .Values
                         .Select(item => item.Type.ToContext)
                         .ToArray();
 
+                var parentContexts = Owner.Parent.Option.Contexts;
+
                 if(IsFunctionLevel)
-                    return Parent
-                        .Parent
-                        .Option
-                        .Contexts
+                    return parentContexts
                         .SelectMany(context => FunctionContexts(context, Value.Target))
                         .ToArray();
 
-                return Parent.Parent.Option.Contexts;
+                return parentContexts;
             }
         }
 
@@ -96,25 +95,27 @@ namespace Reni.TokenClasses
                 .Select(item => item.CreateSubContext(false));
 
         [DisableDump]
-        bool IsFunctionLevel => Parent.TokenClass is Function;
+        bool IsFunctionLevel => Owner.TokenClass is Function;
 
         [DisableDump]
         bool IsStatementsLevel
         {
             get
             {
-                if(Parent.TokenClass is EndOfText)
+                if(Owner.TokenClass is EndOfText)
                     return true;
 
                 if(Value != null)
                     return false;
                 if(Statements != null)
-                    return Parent.Parent?.TokenClass != Parent.TokenClass;
+                    return Owner.Parent?.TokenClass != Owner.TokenClass;
                 if(Statement != null)
                     return false;
 
-                var leftParenthesis = Parent.TokenClass as LeftParenthesis;
-                if(leftParenthesis != null)
+                if(Owner.TokenClass is LeftParenthesis)
+                    return false;
+
+                if (Owner.TokenClass is BeginOfText)
                     return false;
 
                 NotImplementedMethod();
@@ -137,8 +138,8 @@ namespace Reni.TokenClasses
                         .Concat(DeclarationTagToken.DeclarationOptions);
 
                 if(Declarator != null
-                    || Parent.TokenClass is LeftParenthesis
-                    || Parent.TokenClass is DeclarationTagToken)
+                    || Owner.TokenClass is LeftParenthesis
+                    || Owner.TokenClass is DeclarationTagToken)
                     return new string[0];
 
                 NotImplementedMethod();
@@ -147,6 +148,6 @@ namespace Reni.TokenClasses
         }
 
         [EnableDump]
-        SourcePart Token => Parent.Token.Characters;
+        SourcePart Token => Owner.Token.Characters;
     }
 }

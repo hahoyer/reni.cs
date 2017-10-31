@@ -11,7 +11,7 @@ using ReniUI.Formatting;
 namespace ReniUI.Test
 {
     [UnitTest]
-    [TestFixture]
+    [TestFixture]       [LowPriority]
     public sealed class FormattingSimple : DependantAttribute
     {
         [Test]
