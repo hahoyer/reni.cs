@@ -74,6 +74,8 @@ namespace Reni
                 return null;
 
             var branchResult = result;
+            if(branchResult.HasIssue)
+                return branchResult;
 
             var commonType = CommonType(context);
             return branchResult.Type
