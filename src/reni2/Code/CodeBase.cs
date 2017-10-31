@@ -25,7 +25,7 @@ namespace Reni.Code
 
         [Node]
         [DisableDump]
-        internal Size Size => GetSize();
+        internal Size Size => GetSize().AssertNotNull();
 
         [DisableDump]
         internal Size TemporarySize => GetTemporarySize();
@@ -246,7 +246,7 @@ namespace Reni.Code
             => Add(new DumpPrintNumberOperation(leftSize, Size - leftSize));
 
         internal CodeBase DumpPrintText(Size itemSize)
-            => Add(new DumpPrintTextOperation(Size, itemSize));
+            => Add(new DumpPrintTextOperation(Size, itemSize.AssertNotNull()));
 
         internal CodeBase NumberOperation(string operation, Size size)
             => Add(new BitArrayPrefixOp(operation, size, Size));

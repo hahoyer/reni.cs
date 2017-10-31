@@ -376,7 +376,7 @@ namespace Reni
                 Tracer.Assert(HasType, () => "Dereference requires type category:\n " + Dump());
 
                 var result = this;
-                while(result.Type.IsWeakReference)
+                while(!result.HasIssue && result.Type.IsWeakReference)
                     result = result.DereferenceResult;
                 return result;
             }
@@ -544,7 +544,9 @@ namespace Reni
                 result += "\nPendingCategory=" + _pendingCategory.Dump();
             if(CompleteCategory != Category.None)
                 result += "\nCompleteCategory=" + CompleteCategory.Dump();
-            if(HasHllw)
+            if (HasIssue)
+                result += "\nIssues=" + Tracer.Dump(Issues);
+            if (HasHllw)
                 result += "\nHllw=" + Tracer.Dump(_hllw);
             if(HasSize)
                 result += "\nSize=" + Tracer.Dump(_size);
@@ -564,7 +566,7 @@ namespace Reni
             Issues = Issues.Union(result.Issues).ToArray();
 
             if(HasIssue)
-                Reset(Category.All);
+                Reset(Category.All - Category.Exts);
             else
             {
                 if(result.HasHllw)
@@ -702,6 +704,7 @@ namespace Reni
 
         internal void Reset(Category category)
         {
+            IsDirty = true;
             if(category.HasHllw)
                 Hllw = null;
             if(category.HasSize)
@@ -712,6 +715,7 @@ namespace Reni
                 Code = null;
             if(category.HasExts)
                 Exts = null;
+            IsDirty = false;
         }
 
         internal Result Sequence(Result second, SourcePart position)
@@ -734,6 +738,7 @@ namespace Reni
         {
             var result = new Result
             {
+                Issues = Issues,
                 Hllw = Hllw,
                 Size = Size,
                 Type = Type,
@@ -749,10 +754,13 @@ namespace Reni
             var resultForArg = getResultForArg & categoryForArg;
             if(resultForArg != null)
             {
-                if(HasCode)
+                result.Issues = result.Issues.Union(resultForArg.Issues).ToArray();
+
+                if (HasCode)
                     result.Code = Code.ReplaceArg(resultForArg);
                 if(HasExts)
                     result.Exts = Exts.WithoutArg() + resultForArg.Exts;
+
             }
             result.IsDirty = false;
             return result;
@@ -770,6 +778,7 @@ namespace Reni
 
             var result = new Result
             {
+                Issues = Issues,
                 Hllw = Hllw,
                 Size = Size,
                 Type = Type,
@@ -796,6 +805,7 @@ namespace Reni
             var replacement = getReplacement(CompleteCategory - Category.Size - Category.Type);
             var result = new Result
             {
+                Issues = Issues,
                 Hllw = Hllw,
                 Size = Size,
                 Type = Type,
@@ -821,6 +831,7 @@ namespace Reni
 
             var result = new Result
             {
+                Issues = Issues,
                 Hllw = Hllw,
                 Size = Size,
                 Type = Type
@@ -1024,6 +1035,6 @@ namespace Reni
                     (CompleteCategory, () => Code.InvalidConversion(destination.Size), () => Exts);
 
         internal bool IsValidOrIssue(Category category)
-            => category <= CompleteCategory || HasIssue;
+            => HasIssue || category <= CompleteCategory;
     }
 }

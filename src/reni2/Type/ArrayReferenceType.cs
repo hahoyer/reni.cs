@@ -106,6 +106,8 @@ namespace Reni.Type
         protected override IEnumerable<IConversion> RawSymmetricConversions
             => base.RawSymmetricConversions;
 
+        internal override Size SimpleItemSize => ValueType.Size;
+
         protected override CodeBase DumpPrintCode() => ArgCode.DumpPrintText(SimpleItemSize);
 
         protected override string GetNodeDump()

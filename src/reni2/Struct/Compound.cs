@@ -128,7 +128,7 @@ namespace Reni.Struct
 
         internal Result Result(Category category)
         {
-            var trace = Syntax.ObjectId.In(7) && category.HasType;
+            var trace = Syntax.ObjectId.In() && category.HasType;
             StartMethodDump(trace, category);
             try
             {

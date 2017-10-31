@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-
+using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -73,7 +73,7 @@ namespace Reni.Struct
             {
                 BreakExecution();
 
-                var functionType = Function(argsType);
+                var functionType = Function(argsType.AssertNotNull());
 
                 Dump("functionType", functionType);
                 BreakExecution();
@@ -102,7 +102,7 @@ namespace Reni.Struct
         [DisableDump]
         internal IEnumerable<FunctionType> Functions => CompoundView.Functions(Syntax);
 
-        FunctionType Function(TypeBase argsType) => CompoundView.Function(Syntax, argsType);
+        FunctionType Function(TypeBase argsType) => CompoundView.Function(Syntax, argsType.AssertNotNull());
 
         IMeta IMetaImplementation.Function => null;
         IFunction IEvalImplementation.Function => this;

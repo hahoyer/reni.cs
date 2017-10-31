@@ -6,6 +6,7 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.TokenClasses;
 using Reni.Type;
+using Reni.Validation;
 
 namespace Reni.Struct
 {
@@ -21,20 +22,20 @@ namespace Reni.Struct
 
         internal CompoundType(CompoundView view)
         {
-            Tracer.Assert(!view.HasIssues, ()=>Tracer.Dump(view.Issues));
+            Tracer.Assert(!view.HasIssues, () => Tracer.Dump(view.Issues));
             View = view;
         }
 
         ContextBase IChild<ContextBase>.Parent => View.CompoundContext;
 
         IImplementation ISymbolProvider<Definable>.Feature(Definable tokenClass)
-            => Hllw ? View.Find(tokenClass, publicOnly: true) : null;
+            => Hllw ? View.Find(tokenClass, true) : null;
 
         IImplementation ISymbolProvider<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
             => Hllw ? Feature.Extension.Value(DumpPrintTokenResult) : null;
 
         IImplementation ISymbolProviderForPointer<Definable>.Feature(Definable tokenClass)
-            => View.Find(tokenClass, publicOnly: true);
+            => View.Find(tokenClass, true);
 
         IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature
             (DumpPrintToken tokenClass)
@@ -42,7 +43,7 @@ namespace Reni.Struct
 
         [Node]
         [DisableDump]
-        internal CompoundView View { get; }
+        internal CompoundView View {get;}
 
         [DisableDump]
         internal override Root Root => View.Root;
@@ -93,7 +94,7 @@ namespace Reni.Struct
         [DisableDump]
         internal override ContextBase ToContext => View.Context;
 
-        internal override bool HasIssues => View.HasIssues;
+        internal override Issue[] Issues => View.Issues;
 
         Result VoidConversion(Category category) => Mutation(Root.VoidType) & category;
 

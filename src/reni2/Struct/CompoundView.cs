@@ -292,7 +292,7 @@ namespace Reni.Struct
         internal FunctionType Function(FunctionSyntax body, TypeBase argsType)
             => Compound
                 .Root
-                .FunctionInstance(this, body, argsType);
+                .FunctionInstance(this, body, argsType.AssertNotNull());
 
         internal IEnumerable<FunctionType> Functions(FunctionSyntax body)
             => Compound

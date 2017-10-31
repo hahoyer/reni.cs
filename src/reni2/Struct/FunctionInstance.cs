@@ -6,6 +6,7 @@ using Reni.Code;
 using Reni.Context;
 using Reni.Parser;
 using Reni.Type;
+using Reni.Validation;
 
 namespace Reni.Struct
 {
@@ -30,7 +31,7 @@ namespace Reni.Struct
             ResultCache = new ResultCache(this);
         }
 
-        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
+        ValueCache ValueCache.IContainer.Cache {get;} = new ValueCache();
 
         Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
         {
@@ -53,7 +54,7 @@ namespace Reni.Struct
         Size ArgsPartSize => Parent.ArgsType.Size + RelevantValueSize;
 
         [DisableDump]
-        protected abstract Size RelevantValueSize { get; }
+        protected abstract Size RelevantValueSize {get;}
 
         string Description => Body.SourcePart.Id;
 
@@ -69,7 +70,7 @@ namespace Reni.Struct
             }
         }
 
-        protected abstract FunctionId FunctionId { get; }
+        protected abstract FunctionId FunctionId {get;}
 
         [Node]
         [DisableDump]
@@ -82,7 +83,7 @@ namespace Reni.Struct
             {
                 try
                 {
-                    return new Container(AlignedBodyCode, ResultCache.Issues, Description, FunctionId);
+                    return new Container(AlignedBodyCode, Issues, Description, FunctionId);
                 }
                 catch(UnexpectedVisitOfPending)
                 {
@@ -90,6 +91,10 @@ namespace Reni.Struct
                 }
             }
         }
+
+        [Node]
+        [DisableDump]
+        internal Issue[] Issues => ResultCache.Issues;
 
         [DisableDump]
         protected virtual TypeBase CallType => Parent;
@@ -107,7 +112,7 @@ namespace Reni.Struct
 
             if(category.HasExts)
                 result.Exts = CodeArgs.Arg();
-            if(category.HasCode)
+            if(!result.HasIssue && category.HasCode)
                 result.Code = CallType
                     .ArgCode
                     .Call(FunctionId, result.Size);
@@ -119,7 +124,7 @@ namespace Reni.Struct
             if(IsStopByObjectIdActive)
                 return null;
 
-            var trace = FunctionId.Index.In() && category.HasExts;
+            var trace = FunctionId.Index.In() && category.HasExts && category.HasCode;
             StartMethodDump(trace, category);
             try
             {
@@ -151,7 +156,7 @@ namespace Reni.Struct
 
                 var result = argReferenceReplaced
                     .ReplaceAbsolute
-                    (Context.FindRecentFunctionContextObject, CreateContextRefCode, CodeArgs.Void)
+                        (Context.FindRecentFunctionContextObject, CreateContextRefCode, CodeArgs.Void)
                     .Weaken;
 
                 return ReturnMethodDump(result);
@@ -170,7 +175,7 @@ namespace Reni.Struct
 
             return result
                 .ReplaceAbsolute
-                (reference, () => CodeBase.FrameRef().DePointer(reference.Size()), CodeArgs.Void);
+                    (reference, () => CodeBase.FrameRef().DePointer(reference.Size()), CodeArgs.Void);
         }
 
         CodeBase CreateContextRefCode()

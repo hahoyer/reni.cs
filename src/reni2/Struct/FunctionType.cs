@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
@@ -10,27 +9,33 @@ using Reni.Code;
 using Reni.Context;
 using Reni.TokenClasses;
 using Reni.Type;
+using Reni.Validation;
 
 namespace Reni.Struct
 {
     sealed class FunctionType : SetterTargetType
     {
-        [EnableDump]
-        internal readonly int Index;
-        [DisableDump]
-        internal readonly FunctionSyntax Body;
         [Node]
         [EnableDump]
         readonly CompoundView _compoundView;
+
         [Node]
         internal readonly TypeBase ArgsType;
-        [Node]
-        [EnableDump]
-        internal readonly SetterFunction Setter;
+
+        [DisableDump]
+        internal readonly FunctionSyntax Body;
+
         [NotNull]
         [Node]
         [EnableDump]
         internal readonly GetterFunction Getter;
+
+        [EnableDump]
+        internal readonly int Index;
+
+        [Node]
+        [EnableDump]
+        internal readonly SetterFunction Setter;
 
         internal FunctionType
             (int index, FunctionSyntax body, CompoundView compoundView, TypeBase argsType)
@@ -48,15 +53,24 @@ namespace Reni.Struct
 
         [DisableDump]
         internal override TypeBase ValueType => Getter.ReturnType;
+
         [DisableDump]
         internal override bool Hllw => Exts.IsNone && ArgsType.Hllw;
+
         [DisableDump]
         internal override CompoundView FindRecentCompoundView => _compoundView;
+
         [DisableDump]
         internal override bool HasQuickSize => false;
+
         [DisableDump]
         internal override IEnumerable<string> DeclarationOptions
             => base.DeclarationOptions.Concat(InternalDeclarationOptions);
+
+        internal override Issue[] Issues
+            => Setter == null
+                ? Getter.Issues
+                : Getter.Issues.Concat(Setter.Issues).ToArray();
 
         IEnumerable<string> InternalDeclarationOptions
         {
@@ -111,7 +125,9 @@ namespace Reni.Struct
             }
         }
 
-        protected override Result SetterResult(Category category, SourcePart position) => Setter.GetCallResult(category);
+        protected override Result SetterResult(Category category, SourcePart position) => Setter.GetCallResult
+            (category);
+
         protected override Result GetterResult(Category category) => Getter.GetCallResult(category);
         protected override Size GetSize() => ArgsType.Size + Exts.Size;
 
@@ -149,11 +165,11 @@ namespace Reni.Struct
             {
                 BreakExecution();
                 var result = Result
-                    (
-                        category,
-                        () => Exts.ToCode() + ArgsType.ArgCode,
-                        () => Exts + CodeArgs.Arg()
-                    );
+                (
+                    category,
+                    () => Exts.ToCode() + ArgsType.ArgCode,
+                    () => Exts + CodeArgs.Arg()
+                );
                 Tracer.Assert(category == result.CompleteCategory);
                 return ReturnMethodDump(result);
             }

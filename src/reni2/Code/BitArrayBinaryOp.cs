@@ -100,6 +100,8 @@ namespace Reni.Code
         internal readonly Size ItemSize;
         internal DumpPrintTextOperation(Size leftSize, Size itemSize)
         {
+            Tracer.Assert(leftSize != null);
+            Tracer.Assert(itemSize != null);
             InputSize = leftSize;
             ItemSize = itemSize;
         }

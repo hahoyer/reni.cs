@@ -205,7 +205,7 @@ namespace Reni.Context
         //[DebuggerHidden]
         Result ResultForCache(Category category, Parser.Value syntax)
         {
-            var trace = syntax.ObjectId.In() && ObjectId.In() && category.HasType;
+            var trace = syntax.ObjectId.In() && ObjectId.In(7) && category.HasType;
             StartMethodDump(trace, category, syntax);
             try
             {
@@ -304,7 +304,7 @@ namespace Reni.Context
 
             var result = searchResult.Result(category, CacheObject.AsObject, source, this, right);
 
-            Tracer.Assert(category <= result.CompleteCategory);
+            Tracer.Assert(result.HasIssue || category <= result.CompleteCategory);
             return result;
         }
 

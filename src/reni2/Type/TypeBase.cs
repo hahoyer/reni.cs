@@ -333,7 +333,8 @@ namespace Reni.Type
         [DisableDump]
         internal virtual TypeBase Weaken => null;
 
-        internal virtual bool HasIssues => false;
+        internal bool HasIssues => Issues?.Any() ?? false;
+        internal virtual Issue[] Issues => null;
 
         [NotNull]
         protected virtual Size GetSize()

@@ -6,9 +6,9 @@
 
 system:
 {
-    NewMemory: /\
+    !public NewMemory: /\
     {
-        result:(((^ elementType) * 1) array_reference mutable)
+        !public result:(((^ elementType) * 1) array_reference mutable)
         instance(systemdata FreePointer enable_reinterpretation).
         initializer: ^ initializer.
 		result(0) := initializer(0).
@@ -21,20 +21,20 @@ Text: /\
 {
     value: ^.
 
-    result:
+    !public result:
     {
         !mix_in: data(^) := new_value /\ data(^).
         this: /!\ ^^.
-        count: ^ count.
+        !public count: ^ count.
 
-        data: system NewMemory
+        !public data: system NewMemory
         (
             elementType: value(0) type.
             count: value count.
             initializer: /\ value(^)
         ).
 
-        dump_print: /!\
+        !public dump_print: /!\
         {
             data(0) dump_print,
             data(1) dump_print,
@@ -44,14 +44,14 @@ Text: /\
 
         concat: /\
         Text
-        {
+        (
             other: ^;
             count: this count + other count;
 
 			!mix_in: /\ ^ < this count
             then this data(^ enable_cut)
             else other data((^ - this count)enable_cut);        
-		}
+		)
     }
 }
 result;

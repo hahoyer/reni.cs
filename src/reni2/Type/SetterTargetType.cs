@@ -38,11 +38,11 @@ namespace Reni.Type
         [DisableDump]
         internal override bool IsPointerPossible => false;
 
-        [EnableDumpExcept(exception: false)]
-        protected abstract bool IsMutable { get; }
+        [EnableDumpExcept(false)]
+        protected abstract bool IsMutable {get;}
 
         [DisableDump]
-        internal abstract TypeBase ValueType { get; }
+        internal abstract TypeBase ValueType {get;}
 
         [DisableDump]
         internal override Root Root => ValueType.Root;
@@ -53,12 +53,12 @@ namespace Reni.Type
         [DisableDump]
         internal override TypeBase ElementTypeForReference => ValueType.ElementTypeForReference;
 
-        protected override IEnumerable<IConversion> RawSymmetricConversions { get { yield break; } }
+        protected override IEnumerable<IConversion> RawSymmetricConversions {get {yield break;}}
 
         [DisableDump]
         protected override IEnumerable<IConversion> StripConversions
         {
-            get { yield return Feature.Extension.Conversion(GetterResult); }
+            get {yield return Feature.Extension.Conversion(GetterResult);}
         }
 
         Result ReassignResult(Category category, TypeBase right)
@@ -73,19 +73,19 @@ namespace Reni.Type
                 BreakExecution();
                 var sourceResult = right
                     .Conversion(category.Typed, ValueType.ForcedPointer);
-                Dump(name: "sourceResult", value: sourceResult);
+                Dump("sourceResult", sourceResult);
                 BreakExecution();
 
                 var destinationResult = DestinationResult(category.Typed)
                     .ReplaceArg(Result(category.Typed, this));
-                Dump(name: "destinationResult", value: destinationResult);
+                Dump("destinationResult", destinationResult);
                 BreakExecution();
 
                 var resultForArg = destinationResult + sourceResult;
-                Dump(name: "resultForArg", value: resultForArg);
+                Dump("resultForArg", resultForArg);
 
                 var result = SetterResult(category, null);
-                Dump(name: "result", value: result);
+                Dump("result", result);
                 BreakExecution();
 
                 return ReturnMethodDump(result.ReplaceArg(resultForArg));

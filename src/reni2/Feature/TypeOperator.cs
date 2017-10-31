@@ -18,11 +18,16 @@ namespace Reni.Feature
         protected override Result Result(ContextBase context, Category category, Parser.Value left)
         {
             if(category.HasType)
-                return left
-                    .Type(context)
+            {
+                var leftType = left.Type(context);
+                if(leftType.HasIssues)
+                    return new Result(category, leftType.Issues);
+
+                return leftType
                     .TypeForTypeOperator
                     .TypeType
                     .Result(category);
+            }
 
             return context
                 .RootContext.VoidType.Result(category);

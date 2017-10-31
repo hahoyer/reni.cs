@@ -79,7 +79,7 @@ namespace Reni.Feature
             var result = conversion.Execute(category);
             Tracer.Assert(result!= null);
 
-            if (category.HasCode && result.Code.ArgType != null)
+            if (!result.HasIssue && category.HasCode && result.Code.ArgType != null)
                 Tracer.Assert
                     (result.Code.ArgType == conversion.Source, () => result.DebuggerDump());
 
@@ -144,12 +144,13 @@ namespace Reni.Feature
 
                 Tracer.Assert(feature.Function != null);
 
-                var result = feature
-                    .Function
-                    .Result(category, context.ResultAsReferenceCache(right).Type);
+                var argsResult = context.ResultAsReferenceCache(right);
+                var argsType = argsResult.Type;
+                if(argsType == null)
+                    return argsResult.GetCategories(category);
 
-                return result
-                    .ReplaceArg(context.ResultAsReferenceCache(right));
+                var result = feature.Function.Result(category, argsType);
+                return result.ReplaceArg(argsResult);
             }
 
             return valueResult
