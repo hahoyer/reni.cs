@@ -48,9 +48,9 @@ Text: /\
     {
         !mix_in: data(^) := new_value /\ data(^).
         this: /!\ ^^.
-        count: ^ count.
+        !public count: ^ count.
 
-        data: system NewMemory
+        !public data: system NewMemory
         (
             elementType: value(0) type.
             count: value count.
@@ -73,18 +73,18 @@ Text: /\
             )
         }.
 
-        << : /\ concat(count: ^ count, data: ^).
+        !public << : /\ concat(count: ^ count, data: ^).
 
         concat: /\
         Text
-        {
+        (
             other: ^;
             count: this count + other count;
 
             !mix_in: /\ ^ < this count
             then this data(^ enable_cut)
             else other data((^ - this count)enable_cut);
-        }
+        )
     }
 }
 result
