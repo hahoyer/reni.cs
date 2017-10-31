@@ -28,7 +28,8 @@ namespace Reni.Basics
 
         public int SaveByteCount => SaveSizeToPacketCount(BitsConst.SegmentAlignBits);
         public static Size Zero => Create(0);
-        public static Size Byte => Create(1).ByteAlignedSize;
+        public static Size Bit => Create(1);
+        public static Size Byte => Bit.ByteAlignedSize;
         public bool IsPositive => _value > 0;
         public int ByteCount => SizeToPacketCount(BitsConst.SegmentAlignBits);
         public Size ByteAlignedSize => NextPacketSize(BitsConst.SegmentAlignBits);
@@ -215,6 +216,7 @@ namespace Reni.Basics
                 return this * -1;
             }
         }
+
     }
 
     interface IIconKeyProvider
@@ -249,7 +251,7 @@ namespace Reni.Basics
         {
             get
             {
-                var result = Size.Create(0);
+                var result = Size.Zero;
                 for(var i = 0; i < Count; i++)
                     result += this[i];
                 return result;

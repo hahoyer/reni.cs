@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
-
 using Reni.Basics;
 using Reni.Feature;
 using Reni.Type;
@@ -15,25 +12,24 @@ namespace Reni.Code
     {
         static int _nextId;
 
-        [Node]
-        readonly Size _condSize;
-
-        [Node]
-        internal readonly CodeBase ThenCode;
+        static Size CondSize => Size.Bit;
 
         [Node]
         internal readonly CodeBase ElseCode;
 
-        internal ThenElse(CodeBase thenCode, CodeBase elseCode)
-            : this(Size.Create(1), thenCode, elseCode) {}
+        [Node]
+        internal readonly CodeBase ThenCode;
 
-        ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode)
+        internal ThenElse(CodeBase thenCode, CodeBase elseCode)
             : base(_nextId++)
         {
-            _condSize = condSize;
             ThenCode = thenCode;
             ElseCode = elseCode;
         }
+
+        internal override Size InputSize => CondSize;
+        internal override Size OutputSize => ThenCode.Size;
+        internal override bool HasArg => ThenCode.HasArg || ElseCode.HasArg;
 
         protected override CodeArgs GetRefsImplementation() => ThenCode.Exts.Sequence(ElseCode.Exts);
 
@@ -44,13 +40,9 @@ namespace Reni.Code
             return new FiberItem[]
             {
                 new BitCast(preceding.InputSize, preceding.InputSize, Size.Create(1)),
-                new ThenElse(preceding.InputSize, ThenCode, ElseCode)
+                new ThenElse(ThenCode, ElseCode)
             };
         }
-
-        internal override Size InputSize => _condSize;
-        internal override Size OutputSize => ThenCode.Size;
-        internal override bool HasArg => ThenCode.HasArg || ElseCode.HasArg;
 
         protected override Size GetAdditionalTemporarySize()
             => ThenCode.TemporarySize.Max(ElseCode.TemporarySize).Max(OutputSize) - OutputSize;
@@ -59,17 +51,17 @@ namespace Reni.Code
             (Visitor<TResult, TFiber> actual) => actual.ThenElse(this);
 
         internal override void Visit(IVisitor visitor)
-            => visitor.ThenElse(_condSize, ThenCode, ElseCode);
+            => visitor.ThenElse(CondSize, ThenCode, ElseCode);
 
         internal FiberItem ReCreate(CodeBase newThen, CodeBase newElse)
-            => new ThenElse(_condSize, newThen ?? ThenCode, newElse ?? ElseCode);
+            => new ThenElse(newThen ?? ThenCode, newElse ?? ElseCode);
 
         internal TypeBase Visit(Visitor<TypeBase, TypeBase> actual)
             => new[]
-            {
-                ThenCode,
-                ElseCode
-            }
+                {
+                    ThenCode,
+                    ElseCode
+                }
                 .Select(item => item?.Visit(actual))
                 .DistinctNotNull();
     }

@@ -23,7 +23,7 @@ namespace Reni.Type
 
         [DisableDump]
         internal override bool Hllw => false;
-        protected override Size GetSize() => Size.Create(1);
+        protected override Size GetSize() => Size.Bit;
 
         IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature
             (DumpPrintToken tokenClass)

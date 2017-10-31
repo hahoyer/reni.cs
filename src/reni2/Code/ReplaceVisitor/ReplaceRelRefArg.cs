@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using hw.DebugFormatter;
 using Reni.Basics;
 
@@ -16,10 +13,10 @@ namespace Reni.Code.ReplaceVisitor
         }
 
         internal ReplaceRelRefArg(ResultCache actualArg)
-            : this(actualArg, Size.Create(0)) {}
+            : this(actualArg, Size.Zero) {}
 
         [EnableDump]
-        Size Offset { get; }
+        Size Offset {get;}
 
         [DisableDump]
         protected override CodeBase ActualCode

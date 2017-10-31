@@ -357,7 +357,7 @@ namespace Reni.Basics
         string ToBitString()
         {
             var result = "";
-            for(var i = Size.Create(0); i < Size; i += 1)
+            for(var i = Size.Zero; i < Size; i += 1)
                 result = "01"[GetBit(i)] + result;
             return result;
         }

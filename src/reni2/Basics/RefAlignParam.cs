@@ -54,7 +54,7 @@ namespace Reni.Basics
 
         public static Size Offset(SizeArray list, int index)
         {
-            var result = Size.Create(0);
+            var result = Size.Zero;
             for(var i = index + 1; i < list.Count; i++)
                 result += list[i];
             return result;
