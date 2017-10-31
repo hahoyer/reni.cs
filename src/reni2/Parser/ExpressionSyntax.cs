@@ -1,18 +1,39 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Parser;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
 using Reni.TokenClasses;
-using Reni.Validation;
 
 namespace Reni.Parser
 {
     sealed class ExpressionSyntax : Value
     {
+        internal sealed class EvaluationDepthExhaustedException : Exception
+        {
+            readonly ContextBase Context;
+            readonly int Depth;
+            readonly Syntax Syntax;
+
+            public EvaluationDepthExhaustedException(Syntax syntax, ContextBase context, int depth)
+            {
+                Syntax = syntax;
+                Context = context;
+                Depth = depth;
+            }
+
+            public override string Message
+                => "Depth of " +
+                   Depth +
+                   " exhausted when evaluation expression.\n" +
+                   "Expression: " +
+                   Syntax.SourcePart.GetDumpAroundCurrent(10) +
+                   "\n" +
+                   "Context: " +
+                   Context.NodeDump;
+        }
+
         internal static Result<Value> Create
             (Syntax parent, Value left, Definable definable, Value right)
             => new Result<Value>(new ExpressionSyntax(parent, left, definable, right));
@@ -27,6 +48,8 @@ namespace Reni.Parser
                 .With(leftvalue?.Issues.plus(rightvalue?.Issues));
         }
 
+        int CurrentResultDepth;
+
         ExpressionSyntax(Syntax parent, Value left, Definable definable, Value right)
             : base(parent)
         {
@@ -37,13 +60,13 @@ namespace Reni.Parser
         }
 
         [Node]
-        internal Value Left { get; }
-        [Node]
-        public Definable Definable { get; }
-        [Node]
-        internal Value Right { get; }
+        internal Value Left {get;}
 
-        int CurrentResultDepth;
+        [Node]
+        public Definable Definable {get;}
+
+        [Node]
+        internal Value Right {get;}
 
         internal override Result ResultForCache(ContextBase context, Category category)
         {
@@ -57,36 +80,21 @@ namespace Reni.Parser
                     return context.PrefixResult(category, Definable, Syntax, Right);
 
                 var left = context.ResultAsReferenceCache(Left);
-                var leftType = left.Type;
-                if(leftType != null && !leftType.HasIssues)
-                    return leftType
-                        .Execute(category, left, Syntax, Definable, context, Right);
 
-                return left.Issues.Result(category);
+                var leftType = left.Type;
+                if(leftType == null)
+                    return left.Issues.Result(category);
+
+                if(leftType.HasIssues)
+                    return leftType.Issues.Result(category);
+
+                return leftType
+                    .Execute(category, left, Syntax, Definable, context, Right);
             }
             finally
             {
                 CurrentResultDepth--;
             }
-        }
-
-        internal sealed class EvaluationDepthExhaustedException : Exception
-        {
-            readonly Syntax Syntax;
-            readonly ContextBase Context;
-            readonly int Depth;
-
-            public EvaluationDepthExhaustedException(Syntax syntax, ContextBase context, int depth)
-            {
-                Syntax = syntax;
-                Context = context;
-                Depth = depth;
-            }
-
-            public override string Message
-                => "Depth of " + Depth + " exhausted when evaluation expression.\n" +
-                    "Expression: " + Syntax.SourcePart.GetDumpAroundCurrent(10) + "\n" +
-                    "Context: " + Context.NodeDump;
         }
 
         internal override Value Visit(ISyntaxVisitor visitor)
