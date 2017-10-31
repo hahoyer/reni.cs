@@ -1,8 +1,7 @@
-using System;
 using System.Collections.Generic;
-using hw.Helper;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -12,32 +11,20 @@ namespace Reni.Type
 {
     sealed class BitType : TypeBase, ISymbolProviderForPointer<DumpPrintToken>
     {
-        internal BitType(Root root) { Root = root; }
-
-        [DisableDump]
-        internal override Root Root { get; }
-
-        [DisableDump]
-        internal override string DumpPrintText => "bit";
-        protected override string GetNodeDump() => "bit";
-
-        [DisableDump]
-        internal override bool Hllw => false;
-        protected override Size GetSize() => Size.Bit;
+        internal BitType(Root root) => Root = root;
 
         IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature
             (DumpPrintToken tokenClass)
             => Feature.Extension.Value(DumpPrintTokenResult, this);
 
-        protected override string Dump(bool isRecursion) => GetType().PrettyName();
+        [DisableDump]
+        internal override Root Root {get;}
 
-        internal NumberType Number(int bitCount) => Array(bitCount).Number;
+        [DisableDump]
+        internal override string DumpPrintText => "bit";
 
-        internal Result Result(Category category, BitsConst bitsConst)
-        {
-            return Number(bitsConst.Size.ToInt())
-                .Result(category, () => CodeBase.BitsConst(bitsConst));
-        }
+        [DisableDump]
+        internal override bool Hllw => false;
 
         internal override IEnumerable<string> DeclarationOptions
             => base.DeclarationOptions.Concat(InternalDeclarationOptions);
@@ -49,6 +36,19 @@ namespace Reni.Type
                 NotImplementedMethod();
                 return null;
             }
+        }
+
+        protected override string GetNodeDump() => "bit";
+        protected override Size GetSize() => Size.Bit;
+
+        protected override string Dump(bool isRecursion) => GetType().PrettyName();
+
+        internal NumberType Number(int bitCount) => Array(bitCount).Number;
+
+        internal Result Result(Category category, BitsConst bitsConst)
+        {
+            return Number(bitsConst.Size.ToInt())
+                .Result(category, () => CodeBase.BitsConst(bitsConst));
         }
 
 
