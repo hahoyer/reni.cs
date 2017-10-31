@@ -11,18 +11,18 @@ namespace Reni.FeatureTest
     [ComplexContext]
     [TargetSet(@"
 system: /!\
-{ MaxNumber8: /!\ '7f' to_number_of_base 16 
+( MaxNumber8: /!\ '7f' to_number_of_base 16 
 . MaxNumber16: /!\ '7fff' to_number_of_base 16 
 . MaxNumber32: /!\ '7fffffff' to_number_of_base 16 
 . MaxNumber64: /!\ '7fffffffffffffff' to_number_of_base 16 
-};
+);
 
 complex: 
-{
+(
     FromReal: /\ Create(^;0);
 
     Create: /\
-    {
+    (
         re: system MaxNumber8 type instance((^_A_T_ 0) enable_cut);
         im: system MaxNumber8 type instance((^_A_T_ 1) enable_cut);
         + : /\ complex Create(re + ^re, im + ^im);
@@ -34,8 +34,8 @@ complex:
             im dump_print;
             'i' dump_print
         )
-    }
-};
+    )
+);
 
 complex FromReal(2) dump_print;
 ' ' dump_print;
