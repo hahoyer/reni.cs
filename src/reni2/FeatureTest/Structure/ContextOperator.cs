@@ -47,13 +47,13 @@ xxx xxx dump_print
     [ContextOperatorAccess]
     [TargetSet(@"
 x: /\ 
-{
+(
   '12345';
   this: /\ ^^;
   '12345678901';
   !mutable xxx: 257;
   '12345678901234567890123456789';
-};
+);
 
 xx : x();
 xx this() xxx dump_print
@@ -68,13 +68,13 @@ xx this() xxx dump_print
     [ContextOperatorAccess]
     [TargetSet(@"
 x: /\ 
-{
+(
   '12345';
   this: /!\ ^^;
   '12345678901';
   !mutable xxx: 257;
   '12345678901234567890123456789';
-};
+);
 
 xx : x();
 xx this xxx dump_print
@@ -88,13 +88,13 @@ xx this xxx dump_print
     [ContextOperatorPropertyAccess]
     [TargetSet(@"
 x: /\ 
-{
+(
   '12345';
   this: /!\ ^^;
   '12345678901';
   !mutable xxx: 257;
   '12345678901234567890123456789';
-};
+);
 
 xx : x();
 xx this xxx := 2;
