@@ -43,19 +43,13 @@ namespace Reni.Code
 
         [Node]
         [DisableDump]
-        internal Size MaxSize => Data?.TemporarySize ?? Size.Zero;
-
-        [Node]
-        [DisableDump]
         public static Container UnexpectedVisitOfPending { get; }
             = new Container(errorText: "UnexpectedVisitOfPending");
 
         public string GetCSharpStatements(int indent)
         {
-            if(HasIssues)
-                return "";
-            var generator = new CSharpGenerator(MaxSize.SaveByteCount);
-            Data.Visit(generator);
+            var generator = new CSharpGenerator(Data?.TemporarySize.SaveByteCount ?? 0);
+            Data?.Visit(generator);
             return generator.Data.Indent(indent);
         }
     }
