@@ -21,7 +21,7 @@ namespace Reni.Struct
 
         internal CompoundType(CompoundView view)
         {
-            Tracer.Assert(!view.HasIssues);
+            Tracer.Assert(!view.HasIssues, ()=>Tracer.Dump(view.Issues));
             View = view;
         }
 

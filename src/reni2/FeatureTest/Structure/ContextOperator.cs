@@ -27,13 +27,13 @@ x() dump_print
     [NamedSimpleAssignment]
     [TargetSet(@"
 x: /\ 
-{
+(
   '12345';
   this: ^^;
   '12345678901';
   xxx: 257;
   '12345678901234567890123456789';
-};
+);
 
 xx : x();
 xxx : xx this;
