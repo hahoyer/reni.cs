@@ -1,4 +1,5 @@
 using System.Linq;
+using hw.Helper;
 using Reni.Basics;
 using Reni.Feature;
 using Reni.Type;
@@ -23,8 +24,8 @@ namespace Reni.Code
         internal ThenElse(CodeBase thenCode, CodeBase elseCode)
             : base(_nextId++)
         {
-            ThenCode = thenCode;
-            ElseCode = elseCode;
+            ThenCode = thenCode.AssertNotNull();
+            ElseCode = elseCode.AssertNotNull();
         }
 
         internal override Size InputSize => CondSize;
