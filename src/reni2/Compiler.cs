@@ -101,14 +101,7 @@ namespace Reni
 
         [Node]
         [DisableDump]
-        public Syntax Syntax
-        {
-            get
-            {
-                lock(this)
-                    return this.CachedValue(() => Parse(Source + 0));
-            }
-        }
+        public Syntax Syntax => SyntaxCache.Value;
 
         [Node]
         [DisableDump]
