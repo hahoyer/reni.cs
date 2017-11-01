@@ -14,3 +14,4 @@ obj/
 /src/*.sdf
 /src/*.VC.db
 /src/*/*.DotSettings
+/src/renisource/Debug/renisource.vcxprojResolveAssemblyReference.cache
