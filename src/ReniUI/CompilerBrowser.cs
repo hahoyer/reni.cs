@@ -149,13 +149,13 @@ namespace ReniUI
                 return null;
 
             var current = token.Syntax.Token.SourcePart().Position - 1;
-            return current < 0 ? Compiler.Syntax.Left : token.Syntax.LocatePosition(current);
+            return current < 0 ? null : token.Syntax.LocatePosition(current);
         }
 
         internal string[] DeclarationOptions(int offset)
         {
             Ensure();
-            return LocateActivePosition(offset).DeclarationOptions;
+            return LocateActivePosition(offset)?.DeclarationOptions??new string[0];
         }
     }
 }
