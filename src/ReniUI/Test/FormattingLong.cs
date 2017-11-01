@@ -10,7 +10,6 @@ namespace ReniUI.Test
 {
     [UnitTest]
     [TestFixture]
-    [LowPriority]
     public sealed class FormattingLong : DependantAttribute
     {
         [Test]

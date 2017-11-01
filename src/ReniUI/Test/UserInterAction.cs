@@ -1,14 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using hw.DebugFormatter;
 using hw.Scanner;
 using hw.UnitTest;
 using Reni;
 
 namespace ReniUI.Test
-{
-    [UnitTest]         [LowPriority]
+{              
+    [UnitTest]
     public sealed class UserInterAction : DependantAttribute
     {
         const string text = @"

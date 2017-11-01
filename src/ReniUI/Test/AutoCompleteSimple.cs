@@ -7,7 +7,6 @@ namespace ReniUI.Test
 {
     [UnitTest]
     [TestFixture]
-    [LowPriority]
     public sealed class AutoCompleteSimple : DependantAttribute
     {
         const string text = @"
@@ -36,5 +35,6 @@ namespace ReniUI.Test
                 }
             }
         }
+
     }
 }

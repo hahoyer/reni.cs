@@ -8,7 +8,6 @@ using hw.UnitTest;
 namespace ReniUI.Test
 {
     [UnitTest]
-    [LowPriority]
     [AutoCompleteFunctionInCompound]
     public sealed class AutoComplete : DependantAttribute
     {
