@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using hw.DebugFormatter;
+﻿using hw.DebugFormatter;
 using hw.Parser;
 using JetBrains.Annotations;
 using Reni.TokenClasses;
@@ -9,29 +6,18 @@ using Reni.Validation;
 
 namespace Reni.Parser
 {
-    sealed class ExclamationBoxToken : DumpableObject,
-        IParserTokenType<Syntax>,
-        ITokenClass,
-        IDeclaratorTokenClass
+    sealed class ExclamationBoxToken
+        : DumpableObject,
+            IParserTokenType<Syntax>,
+            ITokenClass,
+            IDeclaratorTokenClass
     {
-        Syntax Value { get; }
-
-        internal ExclamationBoxToken(Syntax value) { Value = value; }
-
-        Syntax IParserTokenType<Syntax>.Create(Syntax left, IToken token, Syntax right)
-        {
-            Tracer.Assert(right == null);
-            return Syntax.CreateSourceSyntax(left, this, token, Value);
-        }
-
-        string IParserTokenType<Syntax>.PrioTableId => PrioTable.Any;
-        string ITokenClass.Id => "!";
+        internal ExclamationBoxToken(Syntax value) => Value = value;
 
         [CanBeNull]
         Result<Declarator> IDeclaratorTokenClass.Get(Syntax syntax)
         {
-            var provider = syntax.Right.TokenClass as IDeclaratorTagProvider;
-            if(provider == null)
+            if(!(syntax.Right.TokenClass is IDeclaratorTagProvider provider))
                 return new Declarator(null, null, syntax.SourcePart)
                     .Issues(IssueId.UnknownDeclarationTag.Issue(syntax.SourcePart));
 
@@ -43,5 +29,15 @@ namespace Reni.Parser
 
             return result.Target.Combine(other.Target).Issues(result.Issues.plus(other.Issues));
         }
+
+        Syntax IParserTokenType<Syntax>.Create(Syntax left, IToken token, Syntax right)
+        {
+            Tracer.Assert(right == null);
+            return Syntax.CreateSourceSyntax(left, this, token, Value);
+        }
+
+        string IParserTokenType<Syntax>.PrioTableId => PrioTable.Any;
+        string ITokenClass.Id => "!";
+        Syntax Value {get;}
     }
 }
