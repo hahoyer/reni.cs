@@ -16,7 +16,7 @@ namespace Reni.ParserTest
         public StrangeDeclarationSyntax()
         {
             //Parameters.TraceOptions.Parser = true;
-            Parameters.ParseOnly = true;
+            //Parameters.ParseOnly = true;
         }
 
         protected override void Verify(IEnumerable<Issue> issues)

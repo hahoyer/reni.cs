@@ -1,7 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using hw.UnitTest;
 using Reni.FeatureTest.Helper;
 
@@ -16,10 +12,10 @@ namespace Reni.ParserTest
             var syntaxPrototype = LikeSyntax.Expression(null, "f", LikeSyntax.Null);
             Parameters.ParseOnly = true;
             CreateFileAndRunCompiler
-                (
-                    "SimpleFunction",
-                    @"f()",
-                    expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
+            (
+                "SimpleFunction",
+                @"f()",
+                expectedResult: c => c.AssertSyntaxIsLike(syntaxPrototype));
         }
 
         [UnitTest]
@@ -30,10 +26,10 @@ namespace Reni.ParserTest
             Parameters.ParseOnly = true;
 
             CreateFileAndRunCompiler
-                (
-                    "Add2Numbers",
-                    @"(2+4) dump_print",
-                    expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
+            (
+                "Add2Numbers",
+                @"(2+4) dump_print",
+                expectedResult: c => c.AssertSyntaxIsLike(syntaxPrototype));
         }
 
         [UnitTest]
@@ -42,10 +38,14 @@ namespace Reni.ParserTest
             var syntaxPrototype =
                 (LikeSyntax.Number(2) + LikeSyntax.Number(4)).dump_print;
             Parameters.ParseOnly = true;
-            CreateFileAndRunCompiler("Add2Numbers", @"
+            CreateFileAndRunCompiler
+            (
+                "Add2Numbers",
+                @"
 (2+4) # ssssss
 dump_print
-", expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
+",
+                expectedResult: c => c.AssertSyntaxIsLike(syntaxPrototype));
         }
 
         [UnitTest]
@@ -54,10 +54,14 @@ dump_print
             var syntaxPrototype =
                 (LikeSyntax.Number(2) + LikeSyntax.Number(4)).dump_print;
             Parameters.ParseOnly = true;
-            CreateFileAndRunCompiler("Add2Numbers", @"
+            CreateFileAndRunCompiler
+            (
+                "Add2Numbers",
+                @"
 (2+4) #(aa ssssss
 aa)#dump_print
-", expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
+",
+                expectedResult: c => c.AssertSyntaxIsLike(syntaxPrototype));
         }
 
         [UnitTest]
@@ -71,10 +75,10 @@ aa)#dump_print
             Parameters.ParseOnly = true;
             Parameters.TraceOptions.Parser = false;
             CreateFileAndRunCompiler
-                (
-                    "Add2Numbers",
-                    @"((<< 5)(3)) dump_print",
-                    expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
+            (
+                "Add2Numbers",
+                @"((<< 5)(3)) dump_print",
+                expectedResult: c => c.AssertSyntaxIsLike(syntaxPrototype));
         }
 
         [UnitTest]
@@ -88,10 +92,10 @@ aa)#dump_print
             Parameters.ParseOnly = true;
             Parameters.TraceOptions.Parser = false;
             CreateFileAndRunCompiler
-                (
-                    "MoreBrackets",
-                    @"this()(3) dump_print",
-                    expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
+            (
+                "MoreBrackets",
+                @"this()(3) dump_print",
+                expectedResult: c => c.AssertSyntaxIsLike(syntaxPrototype));
         }
     }
 }

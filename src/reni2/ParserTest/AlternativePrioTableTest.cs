@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using hw.UnitTest;
 using NUnit.Framework;
 using Reni.FeatureTest.Helper;
@@ -26,7 +23,7 @@ namespace Reni.ParserTest
             (
                 "UseAlternativePrioTable",
                 @"!converter: 3",
-                expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
+                expectedResult: c => c.AssertSyntaxIsLike(syntaxPrototype));
         }
 
         [UnitTest]
@@ -43,7 +40,7 @@ namespace Reni.ParserTest
             (
                 "UseAlternativePrioTable",
                 @"!converter: 3; !converter: 4",
-                expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
+                expectedResult: c => c.AssertSyntaxIsLike(syntaxPrototype));
         }
 
         [UnitTest]
@@ -61,7 +58,7 @@ namespace Reni.ParserTest
             (
                 "KeyWordAsUserObject",
                 @"converter: 3",
-                expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
+                expectedResult: c => c.AssertSyntaxIsLike(syntaxPrototype));
         }
     }
 }

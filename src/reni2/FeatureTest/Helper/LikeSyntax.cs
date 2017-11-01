@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using hw.DebugFormatter;
 using Reni.Parser;
 using Reni.Struct;
@@ -12,24 +9,18 @@ namespace Reni.FeatureTest.Helper
     {
         public static LikeSyntax Number(int i) => new Number(i);
 
-        public LikeSyntax Expression(string s2, LikeSyntax s3) => new Expression(this, s2, s3);
-
         public static LikeSyntax Expression(LikeSyntax s1, string s2, LikeSyntax s3)
             => new Expression(s1, s2, s3);
-
-        public LikeSyntax Expression(string s2) => new Expression(this, s2, null);
 
         public static LikeSyntax Compound
             (LikeSyntax[] list, Declaration[] declarations, int[] converters)
             => new Struct(list, declarations, converters);
 
-        public abstract void AssertLike(Syntax syntax);
 
-        public static LikeSyntax operator +(LikeSyntax x, LikeSyntax y) => x.Expression("+", y);
-        public static LikeSyntax operator -(LikeSyntax x, LikeSyntax y) => x.Expression("-", y);
-        public static LikeSyntax operator *(LikeSyntax x, LikeSyntax y) => x.Expression("*", y);
-        public static LikeSyntax operator /(LikeSyntax x, LikeSyntax y) => x.Expression("/", y);
-        public LikeSyntax dump_print => Expression("dump_print");
+        public static LikeSyntax operator+(LikeSyntax x, LikeSyntax y) => x.Expression("+", y);
+        public static LikeSyntax operator-(LikeSyntax x, LikeSyntax y) => x.Expression("-", y);
+        public static LikeSyntax operator*(LikeSyntax x, LikeSyntax y) => x.Expression("*", y);
+        public static LikeSyntax operator/(LikeSyntax x, LikeSyntax y) => x.Expression("/", y);
 
         public static LikeSyntax Null => new Empty();
 
@@ -37,16 +28,22 @@ namespace Reni.FeatureTest.Helper
             => new Declaration(name, position);
 
         public static LikeSyntax Symbol(string s) => new Expression(null, s, null);
+        public LikeSyntax dump_print => Expression("dump_print");
 
-        public abstract void AssertLike(Value syntax);
+        public LikeSyntax Expression(string s2, LikeSyntax s3) => new Expression(this, s2, s3);
+
+        public LikeSyntax Expression(string s2) => new Expression(this, s2, null);
+
+        internal abstract void AssertLike(Syntax syntax);
+        internal abstract void AssertLike(Value syntax);
     }
 
     sealed class Empty : LikeSyntax
     {
-        public override void AssertLike(Syntax syntax)
+        internal override void AssertLike(Syntax syntax)
             => Tracer.Assert(syntax.Value.Target is EmptyList);
 
-        public override void AssertLike(Value syntax)
+        internal override void AssertLike(Value syntax)
             => Tracer.Assert(syntax is EmptyList);
     }
 
@@ -72,9 +69,9 @@ namespace Reni.FeatureTest.Helper
 
     sealed class Struct : LikeSyntax
     {
-        readonly LikeSyntax[] _list;
-        readonly Declaration[] _declarations;
         readonly int[] _converters;
+        readonly Declaration[] _declarations;
+        readonly LikeSyntax[] _list;
 
         public Struct(LikeSyntax[] list, Declaration[] declarations, int[] converters)
         {
@@ -83,48 +80,27 @@ namespace Reni.FeatureTest.Helper
             _converters = converters;
         }
 
-        public override void AssertLike(Syntax syntax) => AssertLike(syntax.Value.Target);
+        internal override void AssertLike(Syntax syntax) => AssertLike(syntax.Value.Target);
 
-        public override void AssertLike(Value syntax)
+        internal override void AssertLike(Value syntax)
         {
             var co = (CompoundSyntax) syntax;
             Tracer.Assert(_list.Length == co.Statements.Length);
-            for (var i = 0; i < _list.Length; i++)
+            for(var i = 0; i < _list.Length; i++)
                 _list[i].AssertLike(co.Statements[i]);
 
             Tracer.Assert(_declarations.Length == co.AllNames.Length);
-            foreach (var declaration in _declarations)
+            foreach(var declaration in _declarations)
                 declaration.AssertContains(co);
 
             Tracer.Assert(_converters.Length == co.ConverterStatementPositions.Length);
-            for (var i = 0; i < _converters.Length; i++)
+            for(var i = 0; i < _converters.Length; i++)
                 Tracer.Assert(_converters[i] == co.ConverterStatementPositions[i]);
         }
     }
 
     sealed class Expression : LikeSyntax
     {
-        readonly LikeSyntax _s1;
-        readonly string _s2;
-        readonly LikeSyntax _s3;
-
-        public Expression(LikeSyntax s1, string s2, LikeSyntax s3)
-        {
-            _s1 = s1;
-            _s2 = s2;
-            _s3 = s3;
-        }
-
-        public override void AssertLike(Syntax syntax) => AssertLike(syntax.Value.Target);
-
-        public override void AssertLike(Value syntax)
-        {
-            var ex = (ExpressionSyntax)syntax;
-            AssertLike(_s1, ex.Left);
-            Tracer.Assert(ex.Definable?.Id == _s2);
-            AssertLike(_s3, ex.Right);
-        }
-
         static void AssertLike(LikeSyntax syntax, Value right)
         {
             if(syntax == null)
@@ -140,23 +116,45 @@ namespace Reni.FeatureTest.Helper
             else
                 syntax.AssertLike(right);
         }
+
+        readonly LikeSyntax _s1;
+        readonly string _s2;
+        readonly LikeSyntax _s3;
+
+        public Expression(LikeSyntax s1, string s2, LikeSyntax s3)
+        {
+            _s1 = s1;
+            _s2 = s2;
+            _s3 = s3;
+        }
+
+        internal override void AssertLike(Syntax syntax) => AssertLike(syntax.Value.Target);
+
+        internal override void AssertLike(Value syntax)
+        {
+            var ex = (ExpressionSyntax) syntax;
+            AssertLike(_s1, ex.Left);
+            Tracer.Assert(ex.Definable?.Id == _s2);
+            AssertLike(_s3, ex.Right);
+        }
     }
 
     sealed class Number : LikeSyntax
     {
         readonly long _i;
 
-        internal Number(long i) { _i = i; }
+        internal Number(long i) => _i = i;
 
-        public override void AssertLike(Syntax syntax)
+        internal override void AssertLike(Syntax syntax)
         {
             var terminalSyntax = (TerminalSyntax) syntax.Value.Target;
             Tracer.Assert(terminalSyntax.Terminal is TokenClasses.Number);
             Tracer.Assert(terminalSyntax.ToNumber == _i);
         }
-        public override void AssertLike(Value syntax)
+
+        internal override void AssertLike(Value syntax)
         {
-            var terminalSyntax = (TerminalSyntax)syntax;
+            var terminalSyntax = (TerminalSyntax) syntax;
             Tracer.Assert(terminalSyntax.Terminal is TokenClasses.Number);
             Tracer.Assert(terminalSyntax.ToNumber == _i);
         }

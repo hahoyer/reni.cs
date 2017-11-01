@@ -78,6 +78,7 @@
     <Compile Include="FeatureTest\Function\TwoFunctions.cs" />
     <Compile Include="FeatureTest\Function\TwoFunctions1.cs" />
     <Compile Include="FeatureTest\Helper\CompilerTest.cs" />
+    <Compile Include="FeatureTest\Helper\Extension.cs" />
     <Compile Include="FeatureTest\Helper\LikeSyntax.cs" />
     <Compile Include="FeatureTest\Helper\TargetSetData.cs" />
     <Compile Include="FeatureTest\MixIn\Function.cs" />
