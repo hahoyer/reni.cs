@@ -9,7 +9,6 @@ using Reni.FeatureTest.Validation;
 
 namespace Reni.FeatureTest
 {
-    [LowPriority]
     [UnitTest]
     [SimpleAssignment]
     [UndefinedContextSymbol]
