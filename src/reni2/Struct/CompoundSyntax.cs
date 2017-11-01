@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
@@ -168,6 +167,19 @@ namespace Reni.Struct
             return compound.Result(category);
         }
 
+        internal override Value Visit(ISyntaxVisitor visitor)
+        {
+            var statements = _statements.Select(s=> s.Visit(visitor)).ToArray();
+            var cleanupSection = CleanupSection?.Visit(visitor);
+
+            if(statements.All(s => s == null) && cleanupSection == null)
+                return null;
+
+            var newStatements = statements.Select((s, i) => s ?? _statements[i]).ToArray();
+            var newCleanupSection = cleanupSection??CleanupSection;
+            return new CompoundSyntax(newStatements, Syntax, newCleanupSection);
+        }
+
         sealed class Data : DumpableObject
         {
             public Data(Statement rawStatement, int position)
@@ -216,4 +228,6 @@ namespace Reni.Struct
             return context.RootContext.VoidType.Result(category);
         }
     }
+    #region
+#endregion
 }

@@ -28,6 +28,12 @@ namespace Reni.Parser
             StopByObjectIds();
         }
 
+        public Statement Visit(ISyntaxVisitor visitor)
+        {
+            var newBody = Body.Visit(visitor);
+            return newBody == null ? this : new Statement(Tags, Target, newBody, Container);
+        }
+
         [EnableDump]
         IDeclarationTag[] Tags { get; }
         [EnableDump]
@@ -78,6 +84,7 @@ namespace Reni.Parser
             if(Target != null && IsPublicSyntax)
                 yield return Target.Id;
         }
+
     }
 
     interface IDefaultScopeProvider
