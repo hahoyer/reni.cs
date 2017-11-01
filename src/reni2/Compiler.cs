@@ -121,10 +121,21 @@ namespace Reni
         IEnumerable<Definable> Root.IParent.AllDefinables
             => MainTokenFactory.AllTokenClasses.OfType<Definable>();
 
-        Result<Value> Root.IParent.Parse(string source) => Parse(source);
+        Result<Value> Root.IParent.ParsePredefinedItem(string source) => ParsePredefinedItem(source);
 
-        Result<Value> Parse(string sourceText)
-            => Parse(new Source(sourceText) + 0).Value;
+        Result<Value> ParsePredefinedItem(string sourceText)
+        {
+            var syntax = Parse(new Source(sourceText) + 0);
+            
+            Tracer.Assert(syntax.Left != null);
+            Tracer.Assert(syntax.TokenClass is EndOfText);
+            Tracer.Assert(syntax.Right == null);
+
+            Tracer.Assert(syntax.Left .Left== null);
+            Tracer.Assert(syntax.Left .TokenClass is BeginOfText);
+
+            return syntax.Left.Right.Value;
+        }
 
         [UsedImplicitly]
         public Compiler Empower()

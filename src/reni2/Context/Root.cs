@@ -63,7 +63,7 @@ namespace Reni.Context
 
         Parser.Value CreateMetaDictionary(string source)
         {
-            var result = Parent.Parse(source);
+            var result = Parent.ParsePredefinedItem(source);
             Tracer.Assert(!result.Issues.Any());
             return result.Target;
         }
@@ -208,7 +208,7 @@ namespace Reni.Context
 
         internal interface IParent
         {
-            Result<Parser.Value> Parse(string source);
+            Result<Parser.Value> ParsePredefinedItem(string source);
             bool ProcessErrors { get; }
             IExecutionContext ExecutionContext { get; }
             IEnumerable<Definable> AllDefinables { get; }
