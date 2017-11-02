@@ -39,6 +39,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileConfiguration.cs" />
+    <Compile Include="Formatting\EditPiece.cs" />
+    <Compile Include="Formatting\IResultItem.cs" />
+    <Compile Include="Formatting\ResultItems.cs" />
+    <Compile Include="Formatting\Skeleton.cs" />
+    <Compile Include="Formatting\WhiteSpace.cs" />
     <Compile Include="hw\Forms\CursorUtil.cs" />
     <Compile Include="hw\Forms\Extender.cs" />
     <Compile Include="hw\Forms\IAdditionalNodeInfoProvider.cs" />
@@ -95,7 +100,7 @@
     <Compile Include="Formatting\HierachicalFormatter.cs" />
     <Compile Include="Formatting\IChainLink.cs" />
     <Compile Include="Formatting\IFormatter.cs" />
-    <Compile Include="Formatting\Item.cs" />
+    <Compile Include="Formatting\NewWhiteSpace.cs" />
     <Compile Include="Formatting\LineOrientedFormatter.cs" />
     <Compile Include="Formatting\SeparatorType.cs" />
     <Compile Include="hw\Graphics\IGraphTarget.cs" />
