@@ -208,5 +208,6 @@ namespace ReniUI.Formatting
             yield return Formatter.Item(this);
             yield return Right.ItemsWithoutLeadingBreaks;
         }
+
     }
 }

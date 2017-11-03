@@ -390,7 +390,6 @@
     <Compile Include="Validation\Issue.cs" />
     <Compile Include="Validation\IssueId.cs" />
     <Compile Include="Validation\SourceIssue.cs" />
-    <Compile Include="ValueCache.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Code\CSharp_Generated.tt">

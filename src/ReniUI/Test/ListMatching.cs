@@ -3,8 +3,7 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.UnitTest;
 
-namespace ReniUI.Test
-{
+namespace ReniUI.Test{
     [UnitTest]
     public sealed class ListMatching : DependantAttribute
     {
@@ -75,5 +74,7 @@ namespace ReniUI.Test
 
             Tracer.Assert(firstPart.Length == 2);
         }
+        
     }
+
 }
