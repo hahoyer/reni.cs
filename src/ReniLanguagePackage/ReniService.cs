@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using hw.Helper;
+﻿using hw.Helper;
 using JetBrains.Annotations;
 using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
@@ -13,11 +10,13 @@ namespace HoyerWare.ReniLanguagePackage
     {
         readonly ValueCache<LanguagePreferences> _preferencesCache;
 
-        public ReniService()
-        {
-            _preferencesCache = new ValueCache<LanguagePreferences>
-                (CreateLanguagePreferences);
-        }
+        public ReniService() => _preferencesCache = new ValueCache<LanguagePreferences>
+            (CreateLanguagePreferences);
+
+        public override string Name => "Reni";
+
+        public ReniLanguagePackage Package
+            => (ReniLanguagePackage) GetLanguagePreferences().GetSite();
 
         LanguagePreferences CreateLanguagePreferences()
             => new LanguagePreferences(Site, typeof(ReniService).GUID, Name)
@@ -30,10 +29,6 @@ namespace HoyerWare.ReniLanguagePackage
                 AutoOutlining = true,
                 EnableFormatSelection = true
             };
-
-        public override string Name => "Reni";
-        public ReniLanguagePackage Package
-            => (ReniLanguagePackage) GetLanguagePreferences().GetSite();
 
         public override LanguagePreferences GetLanguagePreferences()
             => _preferencesCache.Value;
