@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.Package;
+﻿using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
 
 namespace HoyerWare.ReniLanguagePackage
@@ -18,7 +15,7 @@ namespace HoyerWare.ReniLanguagePackage
             OnChange();
         }
 
-        void OnChange() { Data = GetTextLines().CreateReniSource(); }
+        void OnChange() {Data = GetTextLines().CreateReniSource();}
 
         public override void OnChangeLineText(TextLineChange[] lineChange, int last)
         {
