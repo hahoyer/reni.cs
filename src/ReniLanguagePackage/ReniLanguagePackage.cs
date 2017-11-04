@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.Design;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using JetBrains.Annotations;
@@ -41,8 +39,7 @@ namespace HoyerWare.ReniLanguagePackage
             {
                 MaxLineLength = pd.MaxLineLength,
                 EmptyLineLimit = pd.EmptyLineLimit
-            }.
-            Create();
+            }.Create();
         }
     }
 }
