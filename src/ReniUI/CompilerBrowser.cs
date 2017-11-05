@@ -12,6 +12,7 @@ using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Validation;
 using ReniUI.Classification;
+using ReniUI.CompilationView;
 using ReniUI.Formatting;
 
 namespace ReniUI
@@ -32,20 +33,31 @@ namespace ReniUI
 
         readonly IDictionary<IFormalCodeItem, int> CodeToFunctionIndexCache =
             new Dictionary<IFormalCodeItem, int>();
+
         readonly ValueCache<Compiler> ParentCache;
 
-        internal CompilerBrowser(Func<Compiler> parent)
-        {
-            ParentCache = new ValueCache<Compiler>(parent);
-        }
+        internal CompilerBrowser(Func<Compiler> parent) => ParentCache = new ValueCache<Compiler>(parent);
 
         public Source Source => Compiler.Source;
 
-        Compiler Compiler => ParentCache.Value;
+        public Compiler Compiler => ParentCache.Value;
 
         internal IExecutionContext ExecutionContext => Compiler;
 
         internal IEnumerable<Issue> Issues => Compiler.Issues;
+
+        public StringStream Result
+        {
+            get
+            {
+                var result = new StringStream();
+                Compiler.Parameters.OutStream = result;
+                Compiler.Execute();
+                return result;
+            }
+        }
+
+        internal Syntax Syntax => Compiler.Syntax;
 
         public Token LocatePosition(int offset)
             => Token.LocatePosition(Compiler.Syntax, offset);
@@ -109,8 +121,10 @@ namespace ReniUI
         internal IEnumerable<Syntax> FindAllBelongings(Syntax syntax)
             => Compiler.Syntax.Belongings(syntax);
 
-        internal string Reformat(IFormatter formatter)
-            => formatter.Reformat(Compiler.Syntax, Compiler.Syntax.SourcePart);
+        public string Reformat(IFormatter formatter = null, SourcePart sourcePart = null)
+            => (formatter ?? new Formatting.Configuration().Create())
+                .GetEditPieces(this, sourcePart??Syntax.SourcePart)
+                .Combine(this);
 
         public Syntax Locate(SourcePart span)
         {
@@ -129,19 +143,6 @@ namespace ReniUI
 
         public IEnumerable<SourcePart> FindAllBelongings(Token open) => open.FindAllBelongings(this);
 
-        public StringStream Result
-        {
-            get
-            {
-                var result = new StringStream();
-                Compiler.Parameters.OutStream = result;
-                Compiler.Execute();
-                return result;
-            }
-        }
-
-        internal Syntax Syntax => Compiler.Syntax;
-
         internal Syntax LocateActivePosition(int offset)
         {
             var token = Token.LocatePosition(Syntax, offset);
@@ -155,7 +156,16 @@ namespace ReniUI
         internal string[] DeclarationOptions(int offset)
         {
             Ensure();
-            return LocateActivePosition(offset)?.DeclarationOptions??new string[0];
+            return LocateActivePosition(offset)?.DeclarationOptions ?? new string[0];
         }
+
+        public IEnumerable<Edit> GetEditPieces
+            (SourcePart sourcePart, IFormatter formatter = null)
+            => (formatter ?? new Formatting.Configuration().Create())
+                .GetEditPieces(this, sourcePart);
+
+        internal IEnumerable<IFormatItem> GetTokenList(SourcePart targetPart)
+            => Compiler.Syntax.GetTokenList(targetPart);
+
     }
 }

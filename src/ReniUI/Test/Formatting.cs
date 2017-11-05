@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
@@ -17,14 +15,43 @@ namespace ReniUI.Test
     {
         [Test]
         [UnitTest]
-        public void SimpleLineCommentFromSourcePart()
+        public void CommentFromSourcePart()
         {
-            const string Text = @"(1,3,4,6)";
+            const string Text = @"( #(aa Comment aa)#
+1,3,4,6)";
             var compiler = CompilerBrowser.FromText(Text);
-            var span = compiler.Source.All;
-            var trimmed = compiler.Locate(span).Reformat(span);
+            var span = (compiler.Source + 2).Span(3);
+            var reformat = compiler.Reformat(sourcePart: span);
+            Tracer.Assert(reformat == "#(a", reformat);
+        }
 
-            Tracer.Assert(trimmed == "(1, 3, 4, 6)", trimmed);
+        [UnitTest]
+        [Formatting]
+        [Test]
+        public void LegacySystem()
+        {
+            var srcDir = new StackTrace(true)
+                             .GetFrame(0)
+                             .GetFileName()
+                             .ToSmbFile()
+                             .DirectoryName +
+                         @"\..\..";
+            var fileName = srcDir + @"\renisource\test.reni";
+            var file = fileName.ToSmbFile();
+            Tracer.Line(Tracer.FilePosn(fileName, 0, 0, 0, 0, "see there"));
+            var compiler = CompilerBrowser.FromFile(fileName);
+            var source = compiler.Source.All;
+            var newSource = compiler.Reformat
+            (
+                new ReniUI.Formatting.Configuration
+                    {
+                        EmptyLineLimit = 0
+                    }.Create
+                    ()
+            );
+            var lineCount = newSource.Count(item => item == '\n');
+            Tracer.Assert
+                (lineCount == 57, nameof(lineCount) + "=" + lineCount + "\n" + newSource);
         }
 
         [Test]
@@ -35,21 +62,9 @@ namespace ReniUI.Test
 1,3,4,6)";
             var compiler = CompilerBrowser.FromText(Text);
             var span = (compiler.Source + 2).Span(3);
-            var trimmed = compiler.Locate(span).Reformat(span);
+            var trimmed = compiler.Reformat(sourcePart: span);
 
             Tracer.Assert(trimmed == "# C", trimmed);
-        }
-
-        [Test]
-        [UnitTest]
-        public void CommentFromSourcePart()
-        {
-            const string Text = @"( #(aa Comment aa)#
-1,3,4,6)";
-            var compiler = CompilerBrowser.FromText(Text);
-            var span = (compiler.Source + 2).Span(3);
-            var reformat = compiler.Locate(span).Reformat(span);
-            Tracer.Assert(reformat == "#(a", reformat);
         }
 
         [Test]
@@ -92,7 +107,7 @@ namespace ReniUI.Test
 
             Tracer.Assert(newSource == expectedText, "\n\"" + newSource + "\"");
         }
-            
+
         [Test]
         [UnitTest]
         public void Reformat1_120()
@@ -165,9 +180,9 @@ namespace ReniUI.Test
             var lineCount = newSource.Count(item => item == '\n');
 
             Tracer.Assert
-                (
-                    newSource.Replace("\r\n", "\n") == ExpectedText.Replace("\r\n", "\n"),
-                    "\n\"" + newSource + "\"");
+            (
+                newSource.Replace("\r\n", "\n") == ExpectedText.Replace("\r\n", "\n"),
+                "\n\"" + newSource + "\"");
         }
 
         [Test]
@@ -198,44 +213,27 @@ namespace ReniUI.Test
 
             var compiler = CompilerBrowser.FromText(Text);
             var newSource = compiler.Reformat
-                (
-                    new ReniUI.Formatting.Configuration
+            (
+                new ReniUI.Formatting.Configuration
                     {
                         EmptyLineLimit = 1
                     }.Create
-                        ());
+                    ());
 
             var lineCount = newSource.Count(item => item == '\n');
             Tracer.Assert(lineCount == 18, "\n\"" + newSource + "\"");
         }
 
-        [UnitTest]
-        [Formatting]
         [Test]
-        public void LegacySystem()
+        [UnitTest]
+        public void SimpleLineCommentFromSourcePart()
         {
-            var srcDir = new StackTrace(true)
-                .GetFrame(0)
-                .GetFileName()
-                .ToSmbFile()
-                .DirectoryName
-                + @"\..\..";
-            var fileName = srcDir + @"\renisource\test.reni";
-            var file = fileName.ToSmbFile();
-            Tracer.Line(Tracer.FilePosn(fileName, 0, 0, 0, 0, "see there"));
-            var compiler = CompilerBrowser.FromFile(fileName);
-            var source = compiler.Source.All;
-            var newSource = compiler.Reformat
-                (
-                    new ReniUI.Formatting.Configuration
-                    {
-                        EmptyLineLimit = 0
-                    }.Create
-                        ()
-                );
-            var lineCount = newSource.Count(item => item == '\n');
-            Tracer.Assert
-                (lineCount == 57, nameof(lineCount) + "=" + lineCount + "\n" + newSource);
+            const string Text = @"(1,3,4,6)";
+            var compiler = CompilerBrowser.FromText(Text);
+            var span = compiler.Source.All;
+            var trimmed = compiler.Reformat(sourcePart: span);
+
+            Tracer.Assert(trimmed == "(1, 3, 4, 6)", trimmed);
         }
     }
 }

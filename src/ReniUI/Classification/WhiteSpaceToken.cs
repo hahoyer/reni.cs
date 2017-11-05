@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using hw.Parser;
 using hw.Scanner;
+using Reni;
 using Reni.Parser;
 using Reni.TokenClasses;
 
@@ -25,20 +23,8 @@ namespace ReniUI.Classification
         public override bool IsLineEnd => Lexer.IsLineEnd(_item);
         public override string State => Lexer.Instance.WhiteSpaceId(_item) ?? "";
 
-        public override IEnumerable<SourcePart> FindAllBelongings(CompilerBrowser compiler)
-        {
-            yield break;
-        }
+        public override Syntax Syntax {get;}
 
-        public override Token LocatePosition(int current)
-        {
-            NotImplementedMethod(current);
-            return null;
-        }
-
-        public override Syntax Syntax { get; }
-
-        public override string Reformat(SourcePart targetPart)
-            => SourcePart.Intersect(targetPart)?.Id ?? "";
+        public override IEnumerable<SourcePart> FindAllBelongings(CompilerBrowser compiler) {yield break;}
     }
 }

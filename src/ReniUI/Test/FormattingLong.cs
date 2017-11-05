@@ -1,17 +1,17 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using hw.DebugFormatter;
 using hw.UnitTest;
 using NUnit.Framework;
-using Reni;
-using ReniUI.Formatting;
+using Reni.TokenClasses;
 
 namespace ReniUI.Test
 {
     [UnitTest]
     [TestFixture]
+    [LowPriority]
     public sealed class FormattingLong : DependantAttribute
     {
+        static readonly IComparator IgnoreWhiteSpaces = new IgnoreWhiteSpacesComparator();
+
         [Test]
         [UnitTest]
         public void ReformatPart()
@@ -27,14 +27,21 @@ namespace ReniUI.Test
 3;
 (Text ('H') << 'allo') dump_print";
 
-            var compiler = Compiler.FromText(text: Text);
+            var compiler = CompilerBrowser.FromText(Text);
 
             for(var start = 0; start < compiler.Source.Length; start++)
-                for(var end = start; end < compiler.Source.Length; end++)
+            for(var end = start + 1; end < compiler.Source.Length; end++)
+            {
+                var span = (compiler.Source + start).Span(end - start);
+                var reformat = compiler.Reformat(sourcePart:span);
+                if(reformat != null)
                 {
-                    var span = (compiler.Source + start).Span(end - start);
-                    var reformat = compiler.Syntax.Reformat(span);
+                    var newCompiler = CompilerBrowser.FromText(reformat);
+                    Tracer.Assert(compiler.Syntax.IsEqual(newCompiler.Syntax, IgnoreWhiteSpaces));
                 }
+            }
         }
     }
+
+    class IgnoreWhiteSpacesComparator : IComparator {}
 }

@@ -34,7 +34,7 @@ namespace ReniUI.Test {
             (
                 new ReniUI.Formatting.Configuration
                     {
-                        EmptyLineLimit = 0
+                        EmptyLineLimit = 2
                     }
                     .Create()
             );

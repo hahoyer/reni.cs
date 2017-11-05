@@ -16,10 +16,10 @@ namespace Reni.Runtime
         string Dump(Data data, bool isAddress)
         {
             var splitted = Split(data.GetBytes(), isAddress);
-            return splitted == null ? data.GetBytes(1).Single().ToString() : Dump(splitted);
+            return splitted == null ? data.GetBytes(1).Single().ToString() : Dump(splitted.Value);
         }
 
-        static string Dump(Tuple<int, BigInteger> value)
+        static string Dump((int, BigInteger) value)
         {
             var offset = "";
             if(value.Item2 > 0)
@@ -31,11 +31,11 @@ namespace Reni.Runtime
 
         public string AddressDump(Data data) => Dump(data, true);
 
-        Tuple<int, BigInteger> AddBase(byte[] data)
+        (int, BigInteger) AddBase(byte[] data)
         {
             Tracer.Assert(data.Length == DataHandler.RefBytes);
             _data.Add(data);
-            return new Tuple<int, BigInteger>(_data.Count - 1, 0);
+            return (_data.Count - 1, 0);
         }
 
         static BigInteger Distance(byte[] aa, BigInteger b)
@@ -53,10 +53,10 @@ namespace Reni.Runtime
                 return null;
 
             var result = Split(data.Get(position, DataHandler.RefBytes), false);
-            return result != null ? Dump(result) : null;
+            return result == null ? null : Dump(result.Value);
         }
 
-        Tuple<int, BigInteger> Split(byte[] data, bool isAddress)
+        (int, BigInteger)? Split(byte[] data, bool isAddress)
         {
             Tracer.Assert(data.Length == DataHandler.RefBytes);
             var value = new BigInteger(data);
@@ -65,11 +65,14 @@ namespace Reni.Runtime
             {
                 var minDistanceIndex = _data.Select(d => Distance(d, value)).MinIndexList().First();
                 if(Distance(_data[minDistanceIndex], value) <= _maxDistance)
-                    return new Tuple<int, BigInteger>
+                    return 
                         (minDistanceIndex, value - new BigInteger(_data[minDistanceIndex]));
             }
 
-            return isAddress ? AddBase(data) : null;
+            if(isAddress)
+                return AddBase(data);
+            
+            return null;
         }
     }
 }

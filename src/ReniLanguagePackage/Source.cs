@@ -15,6 +15,20 @@ namespace HoyerWare.ReniLanguagePackage
 {
     sealed class Source : DumpableObject
     {
+        static CompilerBrowser CreateCompilerForCache(string text)
+            => CompilerBrowser.FromText
+            (
+                text,
+                new CompilerParameters
+                {
+                    TraceOptions =
+                    {
+                        Parser = false
+                    },
+                    ProcessErrors = true
+                }
+            );
+
         readonly ValueCache<CompilerBrowser> _compilerCache;
 
         public Source(string text)
@@ -22,19 +36,8 @@ namespace HoyerWare.ReniLanguagePackage
             _compilerCache = new ValueCache<CompilerBrowser>(() => CreateCompilerForCache(text));
         }
 
-        static CompilerBrowser CreateCompilerForCache(string text)
-            => CompilerBrowser.FromText
-                (
-                    text,
-                    new CompilerParameters
-                    {
-                        TraceOptions =
-                        {
-                            Parser = false
-                        },
-                        ProcessErrors = true
-                    }
-                );
+        CompilerBrowser Compiler => _compilerCache.Value;
+        hw.Scanner.Source Data => Compiler.Source;
 
         public TokenInfo GetTokenInfo(int line, int column)
         {
@@ -53,9 +56,6 @@ namespace HoyerWare.ReniLanguagePackage
                 EndMethodDump();
             }
         }
-
-        CompilerBrowser Compiler => _compilerCache.Value;
-        hw.Scanner.Source Data => Compiler.Source;
 
         IEnumerable<Token.Trimmed> TokensForLine(int lineIndex, bool trace)
         {
@@ -126,8 +126,19 @@ namespace HoyerWare.ReniLanguagePackage
         internal void ReformatSpan(EditArray mgr, TextSpan span, IFormatter provider)
         {
             var sourcePart = Data.ToSourcePart(span);
-            var reformat = Compiler.Locate(sourcePart).Reformat(sourcePart, provider);
-            mgr.Add(new EditSpan(span, reformat));
+            var reformat = provider
+                .GetEditPieces(Compiler, sourcePart)
+                .OrderByDescending(p => p.Location.EndPosition);
+
+            foreach(var edit in reformat)
+            {
+                var editSpan = new EditSpan
+                (
+                    edit.Location.ToTextSpan(),
+                    edit.NewText
+                );
+                mgr.Add(editSpan);
+            }
             mgr.ApplyEdits();
         }
     }

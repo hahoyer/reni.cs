@@ -14,6 +14,15 @@ namespace Reni.TokenClasses
     public sealed class Syntax : DumpableObject, ISourcePartProxy, ValueCache.IContainer, ISyntax
     {
         static int NextObjectId;
+
+        internal static Syntax CreateSourceSyntax
+        (
+            Syntax left,
+            ITokenClass tokenClass,
+            IToken token,
+            Syntax right)
+            => new Syntax(left, tokenClass, token, right);
+
         Syntax _parent;
 
         Syntax
@@ -38,24 +47,24 @@ namespace Reni.TokenClasses
                 Right.Parent = this;
         }
 
-        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
+        ValueCache ValueCache.IContainer.Cache {get;} = new ValueCache();
 
         SourcePart ISourcePartProxy.All => SourcePart;
         SourcePart ISyntax.All => SourcePart;
         SourcePart ISyntax.Main => Token.Characters;
 
         [DisableDump]
-        internal SyntaxOption Option { get; }
+        internal SyntaxOption Option {get;}
 
-        internal Syntax Left { get; }
-        internal ITokenClass TokenClass { get; }
+        internal Syntax Left {get;}
+        internal ITokenClass TokenClass {get;}
 
         [DisableDump]
-        internal IToken Token { get; }
+        internal IToken Token {get;}
 
-        internal Syntax Right { get; }
+        internal Syntax Right {get;}
 
-        FunctionCache<int, Syntax> LocatePositionCache { get; }
+        FunctionCache<int, Syntax> LocatePositionCache {get;}
 
         [DisableDump]
         internal Syntax Parent
@@ -136,14 +145,6 @@ namespace Reni.TokenClasses
         internal IDefaultScopeProvider DefaultScopeProvider
             => TokenClass as IDefaultScopeProvider ?? Parent?.DefaultScopeProvider;
 
-        internal static Syntax CreateSourceSyntax
-        (
-            Syntax left,
-            ITokenClass tokenClass,
-            IToken token,
-            Syntax right)
-            => new Syntax(left, tokenClass, token, right);
-
         public Syntax LocatePosition(int current) => LocatePositionCache[current];
 
         Syntax LocatePositionForCache(int current)
@@ -196,7 +197,7 @@ namespace Reni.TokenClasses
                 .ToArray();
 
             return sourceSyntaxs
-                       .Skip(count: 1)
+                       .Skip(1)
                        .TakeWhile(item => matcher.IsBelongingTo(item.TokenClass))
                        .LastOrDefault() ??
                    recent;
@@ -305,30 +306,45 @@ namespace Reni.TokenClasses
             NotImplementedMethod(level, parent);
             return null;
         }
-    }
 
-    interface IDeclarationItem
-    {
-        bool IsDeclarationPart(Syntax syntax);
-    }
+        internal IEnumerable<IFormatItem> GetTokenList(SourcePart targetPart)
+        {
+            var isStart = true;
+            var mainTokenPart = Token.SourcePart();
+            if(Left != null && targetPart.Position < mainTokenPart.Position)
+                foreach(var item in Left.GetTokenList(targetPart))
+                {
+                    isStart = false;
+                    yield return item;
+                }
 
-    interface IValueProvider
-    {
-        Result<Value> Get(Syntax syntax);
-    }
+            var isTokenInRange = Token.Characters.Length > 0 && Token.Characters.Intersect(targetPart) != null;
 
-    interface IStatementProvider
-    {
-        Result<Statement> Get(Syntax left, Syntax right, IDefaultScopeProvider container);
-    }
+            if(isStart && Token.SourcePart().Start == targetPart.Start)
+                isStart = false;
 
-    interface IStatementsProvider
-    {
-        Result<Statement[]> Get(List type, Syntax syntax, IDefaultScopeProvider container);
-    }
+            if(isStart || !isTokenInRange )
+                foreach(var item in Token.PrecededWith)
+                    if(item.SourcePart.Intersect(targetPart) != null)
+                        yield return new WhiteItem(item, this);
 
-    interface IBelongingsMatcher
-    {
-        bool IsBelongingTo(IBelongingsMatcher otherMatcher);
+            if(isTokenInRange)
+                yield return new TokenItem(this,isStart);
+
+            if(Right == null || targetPart.EndPosition <= mainTokenPart.EndPosition)
+                yield break;
+
+            foreach(var item in Right.GetTokenList(targetPart))
+                yield return item;
+        }
+
+        public bool IsEqual(Syntax other, IComparator diffenceHandler)
+        {
+            if(TokenClass != other.TokenClass)
+                return false;
+
+            NotImplementedMethod(other, diffenceHandler);
+            return false;
+        }
     }
 }

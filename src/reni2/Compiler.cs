@@ -249,8 +249,6 @@ namespace Reni
         internal IEnumerable<Syntax> FindAllBelongings(Syntax syntax)
             => Syntax.Belongings(syntax);
 
-        public static string FlatExecute(string code, bool b) => "";
-
         internal static PrioTable MainPrioTable
         {
             get

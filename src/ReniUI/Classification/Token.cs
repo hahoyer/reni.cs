@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Scanner;
+using Reni;
 using Reni.TokenClasses;
 
 namespace ReniUI.Classification
@@ -103,11 +104,7 @@ namespace ReniUI.Classification
                     .ToCharArray();
         }
 
-        public string Reformat() => Reformat(SourcePart);
-
-        public abstract string Reformat(SourcePart targetPart);
         public abstract IEnumerable<SourcePart> FindAllBelongings(CompilerBrowser compiler);
-        public abstract Token LocatePosition(int current);
 
         internal static Token LocatePosition(Syntax start, int offset)
         {

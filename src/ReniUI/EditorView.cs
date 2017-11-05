@@ -17,9 +17,6 @@ namespace ReniUI
 {
     public sealed class EditorView : ChildView, IssuesView.IDataProvider, IEditView
     {
-        static readonly TimeSpan DelayForSave = TimeSpan.FromSeconds(1);
-        static readonly TimeSpan NoPeriodicalActivation = TimeSpan.FromMilliseconds(-1);
-
         sealed class SaveManager
         {
             readonly EditorView Parent;
@@ -38,14 +35,17 @@ namespace ReniUI
             public void Start() => Timer.Change(DelayForSave, NoPeriodicalActivation);
         }
 
-        int _lineNumberMarginLength;
-        readonly Scintilla TextBox;
-        readonly ValueCache<CompilerBrowser> CompilerCache;
-        internal readonly IStudioApplication Master;
-        SaveManager _saveManager;
-        readonly IssuesView IssuesView;
+        static readonly TimeSpan DelayForSave = TimeSpan.FromSeconds(1);
+        static readonly TimeSpan NoPeriodicalActivation = TimeSpan.FromMilliseconds(-1);
         readonly AutocompleteMenu AutocompleteMenu;
+        readonly ValueCache<CompilerBrowser> CompilerCache;
         readonly FileConfiguration Configuration;
+        readonly IssuesView IssuesView;
+        internal readonly IStudioApplication Master;
+        readonly Scintilla TextBox;
+
+        int _lineNumberMarginLength;
+        SaveManager _saveManager;
 
         internal EditorView(FileConfiguration configuration, IStudioApplication master)
             : base(master, configuration.PositionPath)
@@ -97,6 +97,42 @@ namespace ReniUI
             AutocompleteMenu.SetAutocompleteItems(Extension.Query(GetOptions));
         }
 
+        IEnumerable<Issue> IssuesView.IDataProvider.Data => Compiler.Issues;
+
+        IApplication IssuesView.IDataProvider.Master => Master;
+
+        void IssuesView.IDataProvider.SignalClicked(SourcePart part)
+        {
+            TextBox.SetSelection(part.Position, part.EndPosition);
+            TextBox.FirstVisibleLine = part.Source.LineIndex(part.Position);
+            TextBox.FirstVisibleLine = part.Source.LineIndex(part.EndPosition);
+        }
+
+        string IEditView.FileName => Configuration.FileName;
+
+        CompilerBrowser Compiler => CompilerCache.Value;
+
+        SourcePart SourcePart
+            =>
+                (Compiler.Source + TextBox.SelectionStart).Span
+                (TextBox.SelectionEnd - TextBox.SelectionEnd);
+
+        int LinenumberMarginLength
+        {
+            get => _lineNumberMarginLength;
+            set
+            {
+                if(_lineNumberMarginLength == value)
+                    return;
+
+                _lineNumberMarginLength = value;
+                const int Padding = 2;
+                TextBox.Margins[0].Width = TextBox.TextWidth
+                                               (Style.LineNumber, new string('9', value + 1)) +
+                                           Padding;
+            }
+        }
+
         IEnumerable<AutocompleteItem> GetOptions()
             => Compiler
                 .DeclarationOptions(TextBox.SelectionStart - 1)
@@ -133,7 +169,7 @@ namespace ReniUI
                     OutStream = new StringStream(),
                     ProcessErrors = true
                 },
-                sourceIdentifier: Configuration.FileName);
+                Configuration.FileName);
 
         internal new void Run()
         {
@@ -141,16 +177,9 @@ namespace ReniUI
             Configuration.ConnectToFrame(Frame);
         }
 
-        CompilerBrowser Compiler => CompilerCache.Value;
-
         internal void FormatAll() => Format(Compiler.Source.All);
 
         internal void FormatSelection() => Format(SourcePart);
-
-        SourcePart SourcePart
-            =>
-            (Compiler.Source + TextBox.SelectionStart).Span
-                (TextBox.SelectionEnd - TextBox.SelectionEnd);
 
         internal bool HasSelection() => TextBox.SelectedText != "";
 
@@ -162,7 +191,7 @@ namespace ReniUI
             CompilerCache.IsValid = false;
         }
 
-        void AlignTitle() { Title = Configuration.FileName + (TextBox.Modified ? "*" : ""); }
+        void AlignTitle() {Title = Configuration.FileName + (TextBox.Modified ? "*" : "");}
 
         void StyleConfig(TextStyle id) => id.Config(TextBox.Styles[id]);
 
@@ -180,54 +209,20 @@ namespace ReniUI
             }
         }
 
-        int LinenumberMarginLength
-        {
-            get { return _lineNumberMarginLength; }
-            set
-            {
-                if(_lineNumberMarginLength == value)
-                    return;
-
-                _lineNumberMarginLength = value;
-                const int Padding = 2;
-                TextBox.Margins[0].Width = TextBox.TextWidth
-                        (Style.LineNumber, new string('9', value + 1)) +
-                    Padding;
-            }
-        }
-
         void Format(SourcePart sourcePart)
         {
-            var reformat = Compiler.Locate(sourcePart)
-                .GetEditPieces
-                (
-                    sourcePart,
-                    new Formatting.Configuration
-                    {
-                        EmptyLineLimit = 1,
-                        MaxLineLength = 120
-                    }.Create()).Reverse();
+            var reformat = Compiler
+                .GetEditPieces(sourcePart)
+                .OrderByDescending(p=>p.Location.EndPosition);
 
             foreach(var piece in reformat)
             {
-                TextBox.TargetStart = piece.EndPosition - piece.RemoveCount;
-                TextBox.TargetEnd = piece.EndPosition;
+                TextBox.TargetStart = piece.Location.Position;
+                TextBox.TargetEnd = piece.Location.EndPosition;
                 TextBox.ReplaceTarget(piece.NewText);
             }
         }
 
-        IEnumerable<Issue> IssuesView.IDataProvider.Data => Compiler.Issues;
-
-        IApplication IssuesView.IDataProvider.Master => Master;
-
-        void IssuesView.IDataProvider.SignalClicked(SourcePart part)
-        {
-            TextBox.SetSelection(part.Position, part.EndPosition);
-            TextBox.FirstVisibleLine = part.Source.LineIndex(part.Position);
-            TextBox.FirstVisibleLine = part.Source.LineIndex(part.EndPosition);
-        }
-
         internal void ListMembers() => TextBox.AutoCComplete();
-        string IEditView.FileName => Configuration.FileName;
     }
 }

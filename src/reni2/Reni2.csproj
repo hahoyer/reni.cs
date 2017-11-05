@@ -325,7 +325,14 @@
     <Compile Include="TokenClasses\Cleanup.cs" />
     <Compile Include="TokenClasses\CompareOperation.cs" />
     <Compile Include="TokenClasses\EndOfText.cs" />
+    <Compile Include="TokenClasses\IBelongingsMatcher.cs" />
+    <Compile Include="TokenClasses\IComparator.cs" />
+    <Compile Include="TokenClasses\IDeclarationItem.cs" />
+    <Compile Include="TokenClasses\IFormatItem.cs" />
+    <Compile Include="TokenClasses\IStatementProvider.cs" />
+    <Compile Include="TokenClasses\IStatementsProvider.cs" />
     <Compile Include="TokenClasses\ISyntax.cs" />
+    <Compile Include="TokenClasses\IValueProvider.cs" />
     <Compile Include="TokenClasses\PreType.cs" />
     <Compile Include="TokenClasses\ReassignToken.cs" />
     <Compile Include="TokenClasses\Base.cs" />
@@ -343,6 +350,7 @@
     <Compile Include="TokenClasses\Syntax.cs" />
     <Compile Include="TokenClasses\SyntaxOption.cs" />
     <Compile Include="TokenClasses\TokenClass.cs" />
+    <Compile Include="TokenClasses\TokenItem.cs" />
     <Compile Include="TokenClasses\ToNumberOfBase.cs" />
     <Compile Include="TokenClasses\LeftParenthesis.cs" />
     <Compile Include="TokenClasses\List.cs" />
@@ -353,6 +361,7 @@
     <Compile Include="TokenClasses\ThenToken.cs" />
     <Compile Include="TokenClasses\UserSymbol.cs" />
     <Compile Include="TokenClasses\NewValueToken.cs" />
+    <Compile Include="TokenClasses\WhiteItem.cs" />
     <Compile Include="Type\ConversionPath.cs" />
     <Compile Include="Type\ConversionService.cs" />
     <Compile Include="Type\DataSetterTargetType.cs" />
@@ -410,8 +419,8 @@
     <Reference Include="DiffPlex, Version=1.4.1.0, Culture=neutral, PublicKeyToken=1d35e91d1bd7bc0f, processorArchitecture=MSIL">
       <HintPath>..\packages\DiffPlex.1.4.1\lib\netstandard1.0\DiffPlex.dll</HintPath>
     </Reference>
-    <Reference Include="JetBrains.Annotations, Version=11.0.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
-      <HintPath>..\packages\JetBrains.Annotations.11.0.0\lib\net20\JetBrains.Annotations.dll</HintPath>
+    <Reference Include="JetBrains.Annotations, Version=11.1.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\packages\JetBrains.Annotations.11.1.0\lib\net20\JetBrains.Annotations.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework, Version=3.8.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>..\packages\NUnit.3.8.1\lib\net45\nunit.framework.dll</HintPath>

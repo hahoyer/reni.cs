@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
@@ -15,19 +14,22 @@ namespace ReniUI.Formatting
             return result;
         }
 
-        readonly ValueCache<Frame> LeftCache;
-        readonly ValueCache<Frame> RightCache;
-        readonly ValueCache<ResultItems> ItemsWithoutLeadingBreaksCache;
-        readonly ValueCache<bool> HasInnerLineBreaksCache;
-        readonly ValueCache<int> LeadingLineBreaksCache;
-
         [DisableDump]
         readonly HierachicalFormatter Formatter;
+
+        readonly ValueCache<bool> HasInnerLineBreaksCache;
+        readonly ValueCache<ResultItems> ItemsWithoutLeadingBreaksCache;
+        readonly ValueCache<int> LeadingLineBreaksCache;
+
+        readonly ValueCache<Frame> LeftCache;
+
         [DisableDump]
         readonly Frame Parent;
+
+        readonly ValueCache<Frame> RightCache;
+
         [DisableDump]
         internal readonly Syntax Target;
-        internal string TargetString => Target.SourcePart.NodeDump;
 
 
         Frame(Syntax target, Frame parent = null, HierachicalFormatter formatter = null)
@@ -43,14 +45,14 @@ namespace ReniUI.Formatting
             HasInnerLineBreaksCache = new ValueCache<bool>(GetHasInnerLineBreaksForCache);
         }
 
-        protected override string GetNodeDump()
-            => base.GetNodeDump() + "(" + Target?.TokenClass.GetType().PrettyName() + ")";
+        internal string TargetString => Target.SourcePart.NodeDump;
 
         Frame Left => LeftCache.Value;
         Frame Right => RightCache.Value;
         ResultItems ItemsWithoutLeadingBreaks => ItemsWithoutLeadingBreaksCache.Value;
         bool HasInnerLineBreaks => HasInnerLineBreaksCache.Value;
         int LeadingLineBreaks => LeadingLineBreaksCache.Value;
+
         [DisableDump]
         internal Frame LeftNeighbor => Left.RightMostTokenClassFrame ?? LeftTokenClassFrame;
 
@@ -77,10 +79,16 @@ namespace ReniUI.Formatting
         }
 
         Frame LeftNeighborOfTarget => Parent?.Left == this ? Parent.LeftNeighborOfTarget : Parent;
+
         bool RequiresLineBreak
             =>
                 IsLineBreakRuler
-                    ? Formatter.RequiresLineBreak(ItemsWithoutLeadingBreaks.Format())
+                    ? Formatter.RequiresLineBreak
+                    (
+                        ItemsWithoutLeadingBreaks
+                            .GetEditPieces()
+                            .Combine(null)
+                    )
                     : Parent?.RequiresLineBreak ?? false;
 
         bool IsLineBreakRuler
@@ -89,7 +97,9 @@ namespace ReniUI.Formatting
         Frame RightMostTokenClassFrame
             => Target == null
                 ? null
-                : Target.Right == null ? this : Right.RightMostTokenClassFrame;
+                : Target.Right == null
+                    ? this
+                    : Right.RightMostTokenClassFrame;
 
         Frame LeftTokenClassFrame
             => Parent == null || Target == Parent.Target.Right
@@ -105,16 +115,13 @@ namespace ReniUI.Formatting
                 if(rightToken is List)
                     return false;
 
-                if(rightToken is RightParenthesis
-                    || rightToken is LeftParenthesis
-                    )
+                if(rightToken is RightParenthesis || rightToken is LeftParenthesis
+                )
                     return true;
 
                 var leftToken = LeftNeighbor?.Target.TokenClass;
 
-                return leftToken is List
-                    || leftToken is RightParenthesis
-                    || leftToken is LeftParenthesis;
+                return leftToken is List || leftToken is RightParenthesis || leftToken is LeftParenthesis;
             }
         }
 
@@ -127,8 +134,7 @@ namespace ReniUI.Formatting
                     return false;
 
                 var leftToken = LeftNeighbor?.Target.TokenClass;
-                return leftToken is List || leftToken is RightParenthesis
-                    || !(rightToken is LeftParenthesis);
+                return leftToken is List || leftToken is RightParenthesis || !(rightToken is LeftParenthesis);
             }
         }
 
@@ -162,6 +168,13 @@ namespace ReniUI.Formatting
             }
         }
 
+        [DisableDump]
+        internal ResultItems ItemsForResult
+            => CollectItemsForResult().Aggregate(ResultItems.Default);
+
+        protected override string GetNodeDump()
+            => base.GetNodeDump() + "(" + Target?.TokenClass.GetType().PrettyName() + ")";
+
         int GetLeadingLineBreaksForCache()
         {
             if(!IsLineBreakCandidate)
@@ -183,13 +196,7 @@ namespace ReniUI.Formatting
             => ItemsWithoutLeadingBreaksCache.Value.HasInnerLineBreaks();
 
         ResultItems GetItemsWithoutLeadingBreaks()
-            => CollectItemsWithoutLeadingBreaks()
-                .Aggregate(new ResultItems(), (c, n) => c.Combine(n));
-
-        [DisableDump]
-        internal ResultItems ItemsForResult
-            => CollectItemsForResult()
-                .Aggregate(new ResultItems(), (c, n) => c.Combine(n));
+            => CollectItemsWithoutLeadingBreaks().Aggregate(ResultItems.Default);
 
         IEnumerable<ResultItems> CollectItemsForResult()
         {
@@ -208,6 +215,5 @@ namespace ReniUI.Formatting
             yield return Formatter.Item(this);
             yield return Right.ItemsWithoutLeadingBreaks;
         }
-
     }
 }

@@ -1,10 +1,10 @@
-using System;
 using System.Collections.Generic;
-using hw.Helper;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
+using Reni;
 using Reni.Parser;
 using Reni.TokenClasses;
 
@@ -12,39 +12,37 @@ namespace ReniUI.Formatting
 {
     public sealed class HierachicalFormatter : DumpableObject, IFormatter
     {
+        static bool IsRelevant(ITokenClass tokenClass)
+            => (tokenClass as TokenClass)?.IsVisible ?? true;
+
         readonly Configuration Configuration;
 
-        public HierachicalFormatter(Configuration configuration) { Configuration = configuration; }
+        public HierachicalFormatter(Configuration configuration) => Configuration = configuration;
 
-        string IFormatter.Reformat(Syntax target, SourcePart targetPart)
-            => Frame.Create(target, this).ItemsForResult.Format(targetPart);
-
-        IEnumerable<EditPiece> IFormatter.GetEditPieces(Syntax target, SourcePart targetPart)
-            => Frame.Create(target, this).ItemsForResult.GetEditPieces(targetPart);
+        IEnumerable<Edit> IFormatter.GetEditPieces(CompilerBrowser compilerBrowser, SourcePart targetPart)
+            => Frame.Create(compilerBrowser.Locate(targetPart), this).ItemsForResult.GetEditPieces(targetPart);
 
         bool IsRelevantLineBreak(int emptyLines, ITokenClass tokenClass)
         {
             if(Configuration.EmptyLineLimit == null)
                 return true;
 
-            if(tokenClass is RightParenthesis
-               || tokenClass is LeftParenthesis
-               || tokenClass is List)
+            if(tokenClass is RightParenthesis || tokenClass is LeftParenthesis || tokenClass is List)
                 return false;
 
             return emptyLines < Configuration.EmptyLineLimit.Value;
         }
 
-        internal ResultItems InternalGetWhitespaces
-            (
+        ResultItems InternalGetWhitespaces
+        (
             ITokenClass leftTokenClass,
             int leadingLineBreaks,
             int indentLevel,
             IEnumerable<IItem> whiteSpaces,
             ITokenClass rightTokenClass
-            )
+        )
         {
-            var result = new ResultItems();
+            var result = ResultItems.Default();
             var emptyLines = 0;
             var isBeginOfLine = leadingLineBreaks > 0;
             foreach(var token in whiteSpaces)
@@ -58,8 +56,9 @@ namespace ReniUI.Formatting
                     isBeginOfLine = false;
                 }
 
-                if(Lexer.IsWhiteSpace(token)
-                   || (Lexer.IsLineEnd(token) && !IsRelevantLineBreak(emptyLines, rightTokenClass)))
+                if(Lexer.IsWhiteSpace
+                       (token) ||
+                   Lexer.IsLineEnd(token) && !IsRelevantLineBreak(emptyLines, rightTokenClass))
                     result.AddHidden(token);
                 else
                 {
@@ -81,7 +80,7 @@ namespace ReniUI.Formatting
                 leadingLineBreaks = 0;
             }
 
-            if (result.IsEmpty && SeparatorType.Get(leftTokenClass, rightTokenClass) == SeparatorType.Close)
+            if(result.IsEmpty && SeparatorType.Get(leftTokenClass, rightTokenClass) == SeparatorType.CloseSeparator)
                 result.AddSpaces(1);
 
             Tracer.Assert(leadingLineBreaks == 0);
@@ -89,8 +88,8 @@ namespace ReniUI.Formatting
             return result;
         }
 
-        internal ResultItems Item
-            (
+        ResultItems Item
+        (
             ITokenClass leftTokenClass,
             int leadingLineBreaks,
             int indentLevel,
@@ -107,13 +106,13 @@ namespace ReniUI.Formatting
             {
                 BreakExecution();
                 var result = InternalGetWhitespaces
-                    (
-                        leftTokenClass,
-                        leadingLineBreaks,
-                        indentLevel,
-                        token.PrecededWith,
-                        tokenClass
-                    );
+                (
+                    leftTokenClass,
+                    leadingLineBreaks,
+                    indentLevel,
+                    token.PrecededWith,
+                    tokenClass
+                );
 
                 result.Add(token);
 
@@ -129,7 +128,7 @@ namespace ReniUI.Formatting
         {
             var tokenClass = target.Target.TokenClass;
             if(!IsRelevant(tokenClass))
-                return new ResultItems();
+                return ResultItems.Default();
 
             var leftNeighbor = target
                 .LeftNeighbor?
@@ -140,22 +139,18 @@ namespace ReniUI.Formatting
             var indentLevel = target.IndentLevel;
             var token = target.Target.Token;
             return Item
-                (
-                    leftTokenClass,
-                    leadingLineBreaks,
-                    indentLevel,
-                    token,
-                    tokenClass
-                );
+            (
+                leftTokenClass,
+                leadingLineBreaks,
+                indentLevel,
+                token,
+                tokenClass
+            );
         }
-
-        static bool IsRelevant(ITokenClass tokenClass)
-            => (tokenClass as TokenClass)?.IsVisible ?? true;
 
         internal bool RequiresLineBreak(string flatText)
         {
-            return flatText.Any(item => item == '\n')
-                   || flatText.Length > Configuration.MaxLineLength;
+            return flatText.Any(item => item == '\n') || flatText.Length > Configuration.MaxLineLength;
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Scanner;
+using Reni;
 using Reni.TokenClasses;
 using Reni.Validation;
 using ReniUI.Formatting;
@@ -47,12 +48,7 @@ namespace ReniUI.Classification
         [DisableDump]
         public override string State => Syntax.Token.Characters.Id ?? "";
 
-        public override string Reformat(SourcePart targetPart)
-            => new Formatting.Configuration().Create().Reformat(Syntax, targetPart);
-
         public override IEnumerable<SourcePart> FindAllBelongings(CompilerBrowser compiler)
             => compiler.FindAllBelongings(Syntax)?.Select(item => item.Token.Characters);
-
-        public override Token LocatePosition(int current) => LocatePosition(Syntax, current);
     }
 }

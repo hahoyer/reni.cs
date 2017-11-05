@@ -1,10 +1,10 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
+using Reni;
 using Reni.Parser;
 using Reni.TokenClasses;
 
@@ -12,49 +12,99 @@ namespace ReniUI.Formatting
 {
     public sealed class LineOrientedFormatter : DumpableObject, IFormatter
     {
-        public int? MaxLineLength = 100;
-        public int? EmptyLineLimit = 1;
-        public string IndentItem = "    ";
-
-        LineOrientedFormatter() { }
-
-        string IFormatter.Reformat(Syntax target, SourcePart part)
+        internal interface IItem1
         {
-            var rawLines = target
-                    .Chain(item => item.Parent)
-                    .Last()
-                    .Items
-                    .OrderBy(item => item.Token.SourcePart().Position)
-                    .SelectMany(GetItems)
-                    .NullableToArray()
-                    .Select(CreateLine)
-                ;
-
-            while(rawLines.Any(IsTooLongLine))
-                rawLines = rawLines.SelectMany(LineBreaker);
-
-            var result = rawLines.Filter(part);
-
-            if(rawLines.Any(IsTooLongLine))
-                NotImplementedMethod(result, part);
-
-            return result;
+            SourcePart Part {get;}
+            bool IsRelevant {get;}
+            ITokenClass TokenClass {get;}
         }
 
-        IEnumerable<EditPiece> IFormatter.GetEditPieces(Syntax target, SourcePart targetPart)
+        internal sealed class Item2
         {
-            NotImplementedMethod(target, targetPart);
-            return null;
+            internal readonly bool IsRelevant;
+            internal readonly string NewHeader;
+            internal readonly SourcePart Part;
+
+            public Item2(SourcePart part, string newHeader, bool isRelevant)
+            {
+                Part = part;
+                NewHeader = newHeader;
+                IsRelevant = isRelevant;
+            }
         }
 
-        IEnumerable<Line> LineBreaker(Line arg)
+        internal sealed class Line
         {
-            NotImplementedMethod();
-            return null;
+            static IEnumerable<Item2> AddSepearators(IEnumerable<IItem1> data)
+            {
+                ITokenClass last = null;
+                foreach(var item in data)
+                    if(item.IsRelevant)
+                    {
+                        var current = item.TokenClass;
+                        var x = SeparatorType.Get(last, current);
+                        yield return new Item2(item.Part, x.Text, true);
+
+                        last = current;
+                    }
+                    else
+                        yield return new Item2(item.Part, "", false);
+            }
+
+            internal readonly Item2[] Data;
+
+            internal Line(IEnumerable<IItem1> data) => Data = AddSepearators(data).ToArray();
+
+            internal int StartPosition => Data.First().Part.Position;
+            internal int EndPosition => Data.Last().Part.EndPosition;
+            internal int Lengh => Data.Sum(item => item.Length());
         }
 
-        bool IsTooLongLine(Line line)
-            => MaxLineLength != null && line.Lengh > MaxLineLength.Value;
+        internal sealed class TokenItem : DumpableObject, IItem1
+        {
+            readonly Syntax Target;
+
+            internal TokenItem(Syntax target) => Target = target;
+
+            SourcePart IItem1.Part => Target.Token.Characters;
+            bool IItem1.IsRelevant => Target.TokenClass.Id != "()";
+
+            ITokenClass IItem1.TokenClass => Target.TokenClass;
+
+            string Id => Target.Token.Characters.Id;
+            protected override string GetNodeDump() => Id.Quote();
+        }
+
+        internal sealed class WhiteSpaceItem : DumpableObject, IItem1
+        {
+            readonly bool IsRelevant;
+            readonly int LineIndex;
+            readonly IItem WhiteSpaceToken;
+
+            internal WhiteSpaceItem(int index, int lineIndex, Syntax target)
+            {
+                LineIndex = lineIndex;
+                WhiteSpaceToken = target.Token.PrecededWith.Skip(index).First();
+                IsRelevant = Lexer.IsComment(WhiteSpaceToken) || Lexer.IsLineComment(WhiteSpaceToken);
+            }
+
+            SourcePart IItem1.Part
+            {
+                get
+                {
+                    var part = WhiteSpaceToken.SourcePart;
+                    var lineLengths = part.Id.Split('\n').Select(item => item.Length + 1);
+                    var start = lineLengths.Take(LineIndex).Sum();
+                    return (part.Start + start).Span(Id.Length);
+                }
+            }
+
+            bool IItem1.IsRelevant => IsRelevant;
+            ITokenClass IItem1.TokenClass => null;
+
+            string Id => WhiteSpaceToken.SourcePart.Id.Split('\n')[LineIndex];
+            protected override string GetNodeDump() => Id.Quote() + "(=" + LineIndex + ")";
+        }
 
         static IEnumerable<IItem1> GetItems
             (Syntax target)
@@ -77,100 +127,44 @@ namespace ReniUI.Formatting
         }
 
         static Line CreateLine(IEnumerable<IItem1> item) => new Line(item);
+        public int? EmptyLineLimit = 1;
+        public string IndentItem = "    ";
+        public int? MaxLineLength = 100;
 
-        internal interface IItem1
+        LineOrientedFormatter() {}
+
+        IEnumerable<Edit> IFormatter.GetEditPieces(CompilerBrowser compiler, SourcePart targetPart)
         {
-            SourcePart Part { get; }
-            bool IsRelevant { get; }
-            ITokenClass TokenClass { get; }
+            var target = compiler.Locate(targetPart);
+            var rawLines = target
+                    .Chain(item => item.Parent)
+                    .Last()
+                    .Items
+                    .OrderBy(item => item.Token.SourcePart().Position)
+                    .SelectMany(GetItems)
+                    .NullableToArray()
+                    .Select(CreateLine)
+                ;
+
+            while(rawLines.Any(IsTooLongLine))
+                rawLines = rawLines.SelectMany(LineBreaker);
+
+            var result = rawLines.Filter(targetPart);
+
+            if(rawLines.Any(IsTooLongLine))
+                NotImplementedMethod(compiler, result, targetPart);
+
+            NotImplementedMethod(compiler, target, targetPart);
+            return null;
         }
 
-        internal sealed class Item2
+        IEnumerable<Line> LineBreaker(Line arg)
         {
-            internal readonly SourcePart Part;
-            internal readonly string NewHeader;
-            internal readonly bool IsRelevant;
-
-            public Item2(SourcePart part, string newHeader, bool isRelevant)
-            {
-                Part = part;
-                NewHeader = newHeader;
-                IsRelevant = isRelevant;
-            }
+            NotImplementedMethod();
+            return null;
         }
 
-        internal sealed class Line
-        {
-            internal readonly Item2[] Data;
-
-            internal Line(IEnumerable<IItem1> data) { Data = AddSepearators(data).ToArray(); }
-
-            static IEnumerable<Item2> AddSepearators(IEnumerable<IItem1> data)
-            {
-                ITokenClass last = null;
-                foreach(var item in data)
-                    if(item.IsRelevant)
-                    {
-                        var current = item.TokenClass;
-                        var x = SeparatorType.Get(last, current);
-                        yield return new Item2(item.Part, x.Text, true);
-
-                        last = current;
-                    }
-                    else
-                        yield return new Item2(item.Part, "", false);
-            }
-
-            internal int StartPosition => Data.First().Part.Position;
-            internal int EndPosition => Data.Last().Part.EndPosition;
-            internal int Lengh => Data.Sum(item => item.Length());
-        }
-
-        internal sealed class TokenItem : DumpableObject, IItem1
-        {
-            readonly Syntax Target;
-
-            internal TokenItem(Syntax target) { Target = target; }
-
-            string Id => Target.Token.Characters.Id;
-            protected override string GetNodeDump() => Id.Quote();
-
-            SourcePart IItem1.Part => Target.Token.Characters;
-            bool IItem1.IsRelevant => Target.TokenClass.Id != "()";
-
-            ITokenClass IItem1.TokenClass => Target.TokenClass;
-        }
-
-        internal sealed class WhiteSpaceItem : DumpableObject, IItem1
-        {
-            readonly int LineIndex;
-            readonly IItem WhiteSpaceToken;
-            readonly bool IsRelevant;
-
-            internal WhiteSpaceItem(int index, int lineIndex, Syntax target)
-            {
-                LineIndex = lineIndex;
-                WhiteSpaceToken = target.Token.PrecededWith.Skip(index).First();
-                IsRelevant = Lexer.IsComment(WhiteSpaceToken)
-                    || Lexer.IsLineComment(WhiteSpaceToken);
-            }
-
-            string Id => WhiteSpaceToken.SourcePart.Id.Split('\n')[LineIndex];
-            protected override string GetNodeDump() => Id.Quote() + "(=" + LineIndex + ")";
-
-            SourcePart IItem1.Part
-            {
-                get
-                {
-                    var part = WhiteSpaceToken.SourcePart;
-                    var lineLengths = part.Id.Split('\n').Select(item => item.Length + 1);
-                    var start = lineLengths.Take(LineIndex).Sum();
-                    return (part.Start + start).Span(Id.Length);
-                }
-            }
-
-            bool IItem1.IsRelevant => IsRelevant;
-            ITokenClass IItem1.TokenClass => null;
-        }
+        bool IsTooLongLine(Line line)
+            => MaxLineLength != null && line.Lengh > MaxLineLength.Value;
     }
 }

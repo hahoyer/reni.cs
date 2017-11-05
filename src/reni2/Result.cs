@@ -26,7 +26,7 @@ namespace Reni
 
         public Issue[] Issues = new Issue[0];
 
-        internal Result()
+        public Result()
             : base(_nextObjectId++) => _pendingCategory = Category.None;
 
         internal Result(Category category, Issue[] issues)
