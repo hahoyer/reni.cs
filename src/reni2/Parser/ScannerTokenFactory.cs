@@ -28,11 +28,11 @@ namespace Reni.Parser
         {
             Lexer.Instance.WhiteSpaceItem,
             Lexer.Instance.LineEndItem,
-            Lexer.Instance.CommentItem,
+            Lexer.Instance.MultiLineCommentItem,
             Lexer.Instance.LineCommentItem,
-            new LexerItem(new Number(), Lexer.Instance.Number),
-            new LexerItem(Current.Get<ScannerTokenType<Syntax>>(), Lexer.Instance.Any),
-            new LexerItem(new Text(), Lexer.Instance.Text)
+            new LexerItem(new Number(), Lexer.Instance.MatchNumber),
+            new LexerItem(Current.Get<ScannerTokenType<Syntax>>(), Lexer.Instance.MatchAny),
+            new LexerItem(new Text(), Lexer.Instance.MatchText)
         };
     }
 }
