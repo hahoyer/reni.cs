@@ -2,15 +2,16 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using hw.Scanner;
 using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
     sealed class Frame : DumpableObject
     {
-        internal static Frame Create(Syntax target, HierachicalFormatter formatter)
+        internal static Frame Create(HierachicalFormatter formatter, CompilerBrowser compiler, SourcePart targetPart)
         {
-            var result = new Frame(target, formatter: formatter);
+            var result = new Frame(compiler.Locate(targetPart), compiler, formatter: formatter);
             return result;
         }
 
@@ -31,14 +32,16 @@ namespace ReniUI.Formatting
         [DisableDump]
         internal readonly Syntax Target;
 
+        readonly CompilerBrowser Compiler;
 
-        Frame(Syntax target, Frame parent = null, HierachicalFormatter formatter = null)
+        Frame(Syntax target, CompilerBrowser compiler, Frame parent = null, HierachicalFormatter formatter = null)
         {
             Parent = parent;
             Formatter = parent?.Formatter ?? formatter;
             Target = target;
-            LeftCache = new ValueCache<Frame>(() => new Frame(Target.Left, this));
-            RightCache = new ValueCache<Frame>(() => new Frame(Target.Right, this));
+            Compiler = compiler;
+            LeftCache = new ValueCache<Frame>(() => new Frame(Target.Left, Compiler, this));
+            RightCache = new ValueCache<Frame>(() => new Frame(Target.Right, Compiler, this));
             ItemsWithoutLeadingBreaksCache = new ValueCache<ResultItems>
                 (GetItemsWithoutLeadingBreaks);
             LeadingLineBreaksCache = new ValueCache<int>(GetLeadingLineBreaksForCache);
@@ -87,7 +90,7 @@ namespace ReniUI.Formatting
                     (
                         ItemsWithoutLeadingBreaks
                             .GetEditPieces()
-                            .Combine(null)
+                            .Combine(Compiler)
                     )
                     : Parent?.RequiresLineBreak ?? false;
 

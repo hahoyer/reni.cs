@@ -17,7 +17,7 @@ namespace ReniUI.Classification
         }
 
         public override SourcePart SourcePart => _item.SourcePart;
-        public override bool IsComment => Lexer.IsComment(_item);
+        public override bool IsComment => Lexer.IsMultiLineComment(_item);
         public override bool IsLineComment => Lexer.IsLineComment(_item);
         public override bool IsWhiteSpace => Lexer.IsWhiteSpace(_item);
         public override bool IsLineEnd => Lexer.IsLineEnd(_item);

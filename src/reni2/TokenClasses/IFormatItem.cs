@@ -15,8 +15,9 @@ namespace Reni.TokenClasses {
         ITokenClass TokenClass {get;}
 
         [EnableDump]
-        bool HasWhiteSpaces {get;}
+        bool HasEssentialWhiteSpaces {get;}
 
+        [EnableDump]
         string WhiteSpaces {get;}
     }
 }

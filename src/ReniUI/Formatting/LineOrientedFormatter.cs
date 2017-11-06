@@ -85,7 +85,7 @@ namespace ReniUI.Formatting
             {
                 LineIndex = lineIndex;
                 WhiteSpaceToken = target.Token.PrecededWith.Skip(index).First();
-                IsRelevant = Lexer.IsComment(WhiteSpaceToken) || Lexer.IsLineComment(WhiteSpaceToken);
+                IsRelevant = Lexer.IsMultiLineComment(WhiteSpaceToken) || Lexer.IsLineComment(WhiteSpaceToken);
             }
 
             SourcePart IItem1.Part

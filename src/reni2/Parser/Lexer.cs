@@ -18,7 +18,7 @@ namespace Reni.Parser
         public static bool IsWhiteSpace(IItem item)
             => item.ScannerTokenType == Instance.WhiteSpaceItem.ScannerTokenType;
 
-        public static bool IsComment(IItem item)
+        public static bool IsMultiLineComment(IItem item)
             => item.ScannerTokenType == Instance.MultiLineCommentItem.ScannerTokenType;
 
         public static bool IsLineComment(IItem item)
@@ -127,7 +127,7 @@ namespace Reni.Parser
 
         public string WhiteSpaceId(IItem item)
         {
-            if(!IsComment(item))
+            if(!IsMultiLineComment(item))
                 return null;
 
             var headEnd = item.SourcePart.Start.Match(CommentHead);

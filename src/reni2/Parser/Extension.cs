@@ -72,7 +72,7 @@ namespace Reni.Parser
             => !IsComment(item);
 
         internal static bool IsComment(this IItem item)
-            => Lexer.IsComment(item) || Lexer.IsLineComment(item);
+            => Lexer.IsMultiLineComment(item) || Lexer.IsLineComment(item);
 
         internal static bool IsLineBreak(this IItem item)
             => Lexer.IsLineEnd(item);

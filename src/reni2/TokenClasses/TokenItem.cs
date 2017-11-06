@@ -1,14 +1,14 @@
-using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
 using hw.Scanner;
 using Reni.Parser;
 
-namespace Reni.TokenClasses {
+namespace Reni.TokenClasses
+{
     class TokenItem : DumpableObject, IFormatItem
     {
-        readonly Syntax Syntax;
         readonly bool IgnoreWhitespaces;
+        readonly Syntax Syntax;
 
         public TokenItem(Syntax syntax, bool ignoreWhitespaces)
         {
@@ -25,9 +25,15 @@ namespace Reni.TokenClasses {
         [EnableDump]
         ITokenClass IFormatItem.TokenClass => Syntax.TokenClass;
 
-        [EnableDump]
-        bool IFormatItem.HasWhiteSpaces => !IgnoreWhitespaces && Syntax.Token.PrecededWith.Any();
+        bool IFormatItem.HasEssentialWhiteSpaces
+        {
+            get
+            {
+                var tokenPrecededWith = Syntax.Token.PrecededWith;
+                return !IgnoreWhitespaces && tokenPrecededWith.HasComment();
+            }
+        }
 
-        string IFormatItem.WhiteSpaces => Syntax.Token.PrecededWith.SourcePart().Id;
+        string IFormatItem.WhiteSpaces => IgnoreWhitespaces ? "" : Syntax.Token.PrecededWith.SourcePart()?.Id ?? "";
     }
 }

@@ -94,6 +94,50 @@ namespace ReniUI.Formatting
         internal IEnumerable<Edit> GetEditPieces(SourcePart targetPart = null)
         {
             if(targetPart == null)
+                return Enumerable.Empty<Edit>();
+
+            IEnumerable<IResultItem> data = Data;
+
+            var start = Data.IndexWhere
+                (item => item.SourcePart?.Intersect(targetPart) != null);
+
+            if(start != null)
+                data = Data.Skip(start.Value);
+
+            var newText = "";
+            var removeCount = 0;
+
+            var pieces = new List<Edit>();
+            foreach(var item in data)
+            {
+                newText += item.NewText;
+                removeCount += item.RemoveCount;
+
+                var sourcePart = item.SourcePart;
+                if(sourcePart == null)
+                    continue;
+
+                if(newText != "" || removeCount > 0)
+                {
+                    pieces.Add(new Edit
+                    {
+                        Location = (sourcePart.End + -removeCount).Span(removeCount),
+                        NewText = newText
+                    });
+
+                    newText = "";
+                    removeCount = 0;
+                }
+
+                if(targetPart.EndPosition <= sourcePart.Position)
+                    return pieces;
+            }
+            return pieces;
+        }
+
+        internal IEnumerable<Edit> GetEditPieces1(SourcePart targetPart = null)
+        {
+            if(targetPart == null)
                 yield break;
 
             IEnumerable<IResultItem> data = Data;

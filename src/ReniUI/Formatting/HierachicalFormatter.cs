@@ -4,7 +4,6 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
-using Reni;
 using Reni.Parser;
 using Reni.TokenClasses;
 
@@ -20,7 +19,9 @@ namespace ReniUI.Formatting
         public HierachicalFormatter(Configuration configuration) => Configuration = configuration;
 
         IEnumerable<Edit> IFormatter.GetEditPieces(CompilerBrowser compilerBrowser, SourcePart targetPart)
-            => Frame.Create(compilerBrowser.Locate(targetPart), this).ItemsForResult.GetEditPieces(targetPart);
+            => Frame.Create
+                (this, compilerBrowser, targetPart)
+                .ItemsForResult.GetEditPieces(targetPart);
 
         bool IsRelevantLineBreak(int emptyLines, ITokenClass tokenClass)
         {
@@ -69,7 +70,7 @@ namespace ReniUI.Formatting
                     else
                         emptyLines = Lexer.IsLineComment(token) ? 1 : 0;
 
-                    isBeginOfLine = !Lexer.IsComment(token);
+                    isBeginOfLine = !Lexer.IsMultiLineComment(token);
                 }
             }
 

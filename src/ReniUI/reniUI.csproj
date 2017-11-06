@@ -133,6 +133,7 @@
     <Compile Include="Test\ExpressionFormatting.cs" />
     <Compile Include="Test\Formatting.cs" />
     <Compile Include="Test\FormattingLong.cs" />
+    <Compile Include="Test\FormattingMultiLines.cs" />
     <Compile Include="Test\FormattingSimple.cs" />
     <Compile Include="Test\ListMatching.cs" />
     <Compile Include="Test\ThenElseMatching.cs" />

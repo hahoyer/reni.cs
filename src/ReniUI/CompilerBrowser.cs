@@ -165,7 +165,7 @@ namespace ReniUI
                 .GetEditPieces(this, sourcePart);
 
         internal IEnumerable<IFormatItem> GetTokenList(SourcePart targetPart)
-            => Compiler.Syntax.GetTokenList(targetPart);
+            => Compiler.Syntax.GetTokenList(targetPart, true);
 
     }
 }

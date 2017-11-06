@@ -1,8 +1,10 @@
+using System;
 using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.Parser;
 
-namespace Reni.TokenClasses {
+namespace Reni.TokenClasses
+{
     class WhiteItem : DumpableObject, IFormatItem
     {
         readonly IItem Item;
@@ -12,6 +14,7 @@ namespace Reni.TokenClasses {
         {
             Item = item;
             Syntax = syntax;
+            StopByObjectIds(401);
         }
 
         [EnableDump]
@@ -21,11 +24,10 @@ namespace Reni.TokenClasses {
         SourcePart IFormatItem.Content => Item.SourcePart;
 
         [EnableDump]
-        bool IFormatItem.IsEssential => Lexer.IsComment(Item) || Lexer.IsLineComment(Item);
-        [EnableDump]
-        bool IFormatItem.HasWhiteSpaces => true;
+        bool IFormatItem.IsEssential => Lexer.IsMultiLineComment(Item) || Lexer.IsLineComment(Item);
+
+        bool IFormatItem.HasEssentialWhiteSpaces => Item.IsComment();
 
         string IFormatItem.WhiteSpaces => Item.SourcePart.Id;
-
     }
 }

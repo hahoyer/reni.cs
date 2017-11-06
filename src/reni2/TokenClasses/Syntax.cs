@@ -307,21 +307,17 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        internal IEnumerable<IFormatItem> GetTokenList(SourcePart targetPart)
+        internal IEnumerable<IFormatItem> GetTokenList(SourcePart targetPart, bool isStart)
         {
-            var isStart = true;
             var mainTokenPart = Token.SourcePart();
             if(Left != null && targetPart.Position < mainTokenPart.Position)
-                foreach(var item in Left.GetTokenList(targetPart))
+                foreach(var item in Left.GetTokenList(targetPart, isStart))
                 {
-                    isStart = false;
                     yield return item;
+                    isStart = false;
                 }
 
             var isTokenInRange = Token.Characters.Length > 0 && Token.Characters.Intersect(targetPart) != null;
-
-            if(isStart && Token.SourcePart().Start == targetPart.Start)
-                isStart = false;
 
             if(isStart || !isTokenInRange )
                 foreach(var item in Token.PrecededWith)
@@ -329,12 +325,15 @@ namespace Reni.TokenClasses
                         yield return new WhiteItem(item, this);
 
             if(isTokenInRange)
+            {
                 yield return new TokenItem(this,isStart);
+                isStart = false;
+            }
 
             if(Right == null || targetPart.EndPosition <= mainTokenPart.EndPosition)
                 yield break;
 
-            foreach(var item in Right.GetTokenList(targetPart))
+            foreach(var item in Right.GetTokenList(targetPart, isStart))
                 yield return item;
         }
 

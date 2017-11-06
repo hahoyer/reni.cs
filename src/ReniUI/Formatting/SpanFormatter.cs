@@ -19,60 +19,63 @@ namespace ReniUI.Formatting
 
             public IEnumerable<Edit> Add(IFormatItem item)
             {
-                var newWhiteSpaces = GetWhiteSpaces(item);
-                var oldWhiteSpaces = item.WhiteSpaces;
-
-                
-                var separator = SeparatorType.Get(LastItem?.TokenClass, item?.TokenClass);
-
-                if(item != null && item.HasWhiteSpaces)
-                {
-                    NotImplementedMethod(item);
-                    return null;
-                }
-
-                var add = new List<Edit>();
-                if(item != null)
-                    if(separator.Text.Length > 0)
-                        add.Add
-                        (
-                            new Edit
-                            {
-                                NewText = separator.Text,
-                                Location = item.Content.Start.Span(0)
-                            });
-
-                if(item == null)
-                {
-                    if(LastItem != null && LastItem.IsEssential)
-                        return add;
-
-                    NotImplementedMethod(item);
-                    return null;
-                }
-
-                if(item.TokenClass == null)
-                {
-                    if(item.IsEssential)
-                    {
-                        NotImplementedMethod(item);
-                        return null;
-                    }
-
-
-                    NotImplementedMethod(item);
-                    return null;
-                }
-
+                var result = ToEdits(item, GetWhiteSpaces(item));
                 LastItem = item;
-                return add;
+                return result;
+            }
+
+            IEnumerable<Edit> ToEdits(IFormatItem item, string newWhiteSpaces)
+            {
+                if(newWhiteSpaces == (item?.WhiteSpaces ?? ""))
+                    return new Edit[0];
+
+                if(item == null || item.WhiteSpaces == "")
+                {
+                    var location = (item?.Content.Start ?? LastItem.Content.End).Span(0);
+                    return new[]
+                    {
+                        new Edit
+                        {
+                            NewText = newWhiteSpaces,
+                            Location = location
+                        }
+                    };
+                }
+
+                NotImplementedMethod(item, newWhiteSpaces);
+                return null;
             }
 
             string GetWhiteSpaces(IFormatItem item)
             {
-                NotImplementedMethod(item);
-                return "";
+                if(item == null)
+                    return GetWhiteSpacesAtEndOfRegion();
+
+                if(LastItem == null)
+                    return GetWhiteSpacesAtStartOfRegion(item);
+
+                if(LastItem.TokenClass == null)
+                    return GetWhiteSpacesAtStartOfRegionAfterWhiteSpaces(item);
+
+                if(item.HasEssentialWhiteSpaces)
+                {
+                    NotImplementedMethod(item);
+                    return "";
+                }
+
+                var separator = SeparatorType.Get(LastItem.TokenClass, item.TokenClass);
+                return separator.Text;
             }
+
+            string GetWhiteSpacesAtEndOfRegion() => "";
+
+            string GetWhiteSpacesAtStartOfRegionAfterWhiteSpaces(IFormatItem item)
+            {
+                NotImplementedMethod(item);
+                return null;
+            }
+
+            string GetWhiteSpacesAtStartOfRegion(IFormatItem item) => "";
         }
 
         readonly Configuration Configuration;
@@ -81,9 +84,10 @@ namespace ReniUI.Formatting
         IEnumerable<Edit> IFormatter.GetEditPieces(CompilerBrowser compiler, SourcePart targetPart)
         {
             var worker = new Worker(this);
-            return compiler
+            var items = compiler
                 .GetTokenList(targetPart)
-                .Concat(new IFormatItem []{null})
+                .Concat(new IFormatItem[] {null});
+            return items
                 .SelectMany(item => worker.Add(item));
         }
     }

@@ -4,38 +4,29 @@ using hw.UnitTest;
 using NUnit.Framework;
 using ReniUI.Formatting;
 
-namespace ReniUI.Test
-{
+namespace ReniUI.Test {
     [UnitTest]
     [TestFixture]
-    public sealed class FormattingSimple : DependantAttribute
+    public sealed class FormattingMultiLines : DependantAttribute
     {
         [Test]
         [UnitTest]
         public void ReformatComments()
         {
             const string Text =
-                @"137;
-
-################################################################
-# Test
-################################################################
-                   3
-";
+                @"(12345,12345,12345,12345,12345,12345,12345,12345,12345)";
 
             const string ExpectedText =
                 @"137;
 
-################################################################
-# Test
-################################################################
 3";
             var compiler = CompilerBrowser.FromText(Text);
             var newSource = compiler.Reformat
             (
                 new ReniUI.Formatting.Configuration
                     {
-                        EmptyLineLimit = 2
+                        EmptyLineLimit = 2,
+                        MaxLineLength = 20
                     }
                     .Create()
             );

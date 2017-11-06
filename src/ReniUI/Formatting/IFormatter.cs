@@ -12,7 +12,7 @@ namespace ReniUI.Formatting
     public static class FormatterExtension
     {
         public static IFormatter Create(this Configuration configuration)
-            => new SpanFormatter(configuration ?? new Configuration());
+            => new HierachicalFormatter(configuration ?? new Configuration());
 
         internal static int Length(this LineOrientedFormatter.Item2 item)
         {
