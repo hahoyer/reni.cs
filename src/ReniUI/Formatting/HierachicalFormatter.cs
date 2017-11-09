@@ -19,9 +19,13 @@ namespace ReniUI.Formatting
         public HierachicalFormatter(Configuration configuration) => Configuration = configuration;
 
         IEnumerable<Edit> IFormatter.GetEditPieces(CompilerBrowser compilerBrowser, SourcePart targetPart)
-            => Frame.Create
+        {
+            var result = Frame.Create
                 (this, compilerBrowser, targetPart)
-                .ItemsForResult.GetEditPieces(targetPart);
+                .ItemsForResult;
+
+            return result.GetEditPieces(targetPart);
+        }
 
         bool IsRelevantLineBreak(int emptyLines, ITokenClass tokenClass)
         {
@@ -57,8 +61,7 @@ namespace ReniUI.Formatting
                     isBeginOfLine = false;
                 }
 
-                if(Lexer.IsWhiteSpace
-                       (token) ||
+                if(Lexer.IsWhiteSpace(token) ||
                    Lexer.IsLineEnd(token) && !IsRelevantLineBreak(emptyLines, rightTokenClass))
                     result.AddHidden(token);
                 else

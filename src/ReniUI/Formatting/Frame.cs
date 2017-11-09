@@ -86,12 +86,7 @@ namespace ReniUI.Formatting
         bool RequiresLineBreak
             =>
                 IsLineBreakRuler
-                    ? Formatter.RequiresLineBreak
-                    (
-                        ItemsWithoutLeadingBreaks
-                            .GetEditPieces()
-                            .Combine(Compiler)
-                    )
+                    ? Formatter.RequiresLineBreak(ItemsWithoutLeadingBreaks.Text)
                     : Parent?.RequiresLineBreak ?? false;
 
         bool IsLineBreakRuler

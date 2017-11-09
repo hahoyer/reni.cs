@@ -2,12 +2,13 @@ using System.Collections.Generic;
 using hw.DebugFormatter;
 using hw.Scanner;
 
-namespace ReniUI.Formatting {
+namespace ReniUI.Formatting
+{
     sealed class Skeleton : DumpableObject, IResultItem
     {
         readonly SourcePart Token;
 
-        internal Skeleton(SourcePart token) { Token = token; }
+        internal Skeleton(SourcePart token) => Token = token;
 
         SourcePart IResultItem.SourcePart => Token;
         string IResultItem.VisibleText => Token.Id;

@@ -21,7 +21,7 @@ namespace ReniUI.Formatting
 
         public bool IsEmpty => Data.All(item => item.VisibleText == "");
 
-        string Text {get {return Data.Aggregate("", (c, n) => c + n.VisibleText);}}
+        internal string Text {get {return Data.Aggregate("", (c, n) => c + n.VisibleText);}}
 
         ResultItems Combine(ResultItems other)
         {
@@ -91,90 +91,74 @@ namespace ReniUI.Formatting
             }
         }
 
-        internal IEnumerable<Edit> GetEditPieces(SourcePart targetPart = null)
+        internal IEnumerable<Edit> GetEditPieces(SourcePart targetPart)
         {
-            if(targetPart == null)
-                return Enumerable.Empty<Edit>();
+            Tracer.Assert(targetPart != null);
+
+            var sourceStart = FindPrecedingPosition(targetPart);
+            Tracer.Assert(sourceStart != null);
 
             IEnumerable<IResultItem> data = Data;
-
             var start = Data.IndexWhere
                 (item => item.SourcePart?.Intersect(targetPart) != null);
 
             if(start != null)
                 data = Data.Skip(start.Value);
 
+            var endPosition = targetPart.EndPosition;
+
+            var result = new List<Edit>();
+
             var newText = "";
             var removeCount = 0;
 
-            var pieces = new List<Edit>();
             foreach(var item in data)
             {
                 newText += item.NewText;
                 removeCount += item.RemoveCount;
 
-                var sourcePart = item.SourcePart;
-                if(sourcePart == null)
+                if(item.SourcePart == null)
                     continue;
 
                 if(newText != "" || removeCount > 0)
                 {
-                    pieces.Add(new Edit
-                    {
-                        Location = (sourcePart.End + -removeCount).Span(removeCount),
-                        NewText = newText
-                    });
+                    result.Add
+                    (
+                        new Edit
+                        {
+                            Location = (sourceStart + -removeCount).Span(removeCount),
+                            NewText = newText
+                        });
 
                     newText = "";
                     removeCount = 0;
                 }
 
-                if(targetPart.EndPosition <= sourcePart.Position)
-                    return pieces;
+                if(endPosition <= sourceStart.Position)
+                    return result;
+
+                sourceStart = item.SourcePart.End;
             }
-            return pieces;
+            return result;
         }
 
-        internal IEnumerable<Edit> GetEditPieces1(SourcePart targetPart = null)
+        SourcePosn FindPrecedingPosition(SourcePart targetPart)
         {
-            if(targetPart == null)
-                yield break;
-
-            IEnumerable<IResultItem> data = Data;
-
-            var start = Data.IndexWhere
-                (item => item.SourcePart?.Intersect(targetPart) != null);
-
-            if(start != null)
-                data = Data.Skip(start.Value);
-
-            var newText = "";
-            var removeCount = 0;
-
-            foreach(var item in data)
+            var result = targetPart.Start;
+            using(var e = Data.GetEnumerator())
             {
-                newText += item.NewText;
-                removeCount += item.RemoveCount;
-
-                var sourcePart = item.SourcePart;
-                if(sourcePart == null)
-                    continue;
-
-                if(newText != "" || removeCount > 0)
+                while(e.MoveNext())
                 {
-                    yield return new Edit
-                    {
-                        Location = (sourcePart.End + -removeCount).Span(removeCount),
-                        NewText = newText
-                    };
-
-                    newText = "";
-                    removeCount = 0;
+                    var i = e.Current;
+                    if(i?.SourcePart == null)
+                        continue;
+                    if(i.SourcePart.Intersect(targetPart) != null)
+                        return result;
+                    result = i.SourcePart.End;
                 }
 
-                if(targetPart.EndPosition <= sourcePart.Position)
-                    yield break;
-            }
+                return null;
+            };
         }
 
         protected override string GetNodeDump() => Data.Count + "->" + Text + "<-";
