@@ -10,7 +10,23 @@ namespace ReniUI.Formatting
 {
     sealed class ResultItems : DumpableObject, IAggregateable<ResultItems>
     {
-        public static ResultItems Default() {return new ResultItems();}
+        public static ResultItems Default() => new ResultItems();
+
+        static bool CheckForStart(IResultItem item, ref SourcePosn lastPosition, SourcePart targetPart)
+        {
+            Tracer.Assert(item != null);
+
+            var sourcePart = item.SourcePart;
+
+            if(sourcePart == null)
+                return false;
+
+            if(lastPosition == null || sourcePart.Intersect(targetPart) == null)
+                lastPosition = sourcePart.End;
+
+            return sourcePart.Intersect(targetPart) != null;
+        }
+
         readonly List<IResultItem> Data;
 
         ResultItems() => Data = new List<IResultItem>();
@@ -95,78 +111,60 @@ namespace ReniUI.Formatting
         {
             Tracer.Assert(targetPart != null);
 
-            var sourceStart = FindPrecedingPosition(targetPart);
-            Tracer.Assert(sourceStart != null);
-
-            IEnumerable<IResultItem> data = Data;
-            var start = Data.IndexWhere
-                (item => item.SourcePart?.Intersect(targetPart) != null);
-
-            if(start != null)
-                data = Data.Skip(start.Value);
-
             var endPosition = targetPart.EndPosition;
-
-            var result = new List<Edit>();
-
-            var newText = "";
-            var removeCount = 0;
-
-            foreach(var item in data)
+            SourcePosn lastPosition = null;
+            using(var enumerator = Data.GetEnumerator())
             {
-                newText += item.NewText;
-                removeCount += item.RemoveCount;
+                while(enumerator.MoveNext() && !CheckForStart(enumerator.Current, ref lastPosition, targetPart))
+                    ;
 
-                if(item.SourcePart == null)
-                    continue;
+                Tracer.Assert(lastPosition != null);
 
-                if(newText != "" || removeCount > 0)
+                var result = new List<Edit>();
+                var newText = "";
+                var removeCount = 0;
+
+                while(enumerator.MoveNext())
                 {
-                    result.Add
-                    (
-                        new Edit
-                        {
-                            Location = (sourceStart + -removeCount).Span(removeCount),
-                            NewText = newText
-                        });
+                    var item = enumerator.Current;
 
-                    newText = "";
-                    removeCount = 0;
-                }
+                    Tracer.Assert(item != null);
 
-                if(endPosition <= sourceStart.Position)
-                    return result;
+                    newText += item.NewText;
+                    removeCount += item.RemoveCount;
 
-                sourceStart = item.SourcePart.End;
-            }
-            return result;
-        }
-
-        SourcePosn FindPrecedingPosition(SourcePart targetPart)
-        {
-            var result = targetPart.Start;
-            using(var e = Data.GetEnumerator())
-            {
-                while(e.MoveNext())
-                {
-                    var i = e.Current;
-                    if(i?.SourcePart == null)
+                    if(item.SourcePart == null)
                         continue;
-                    if(i.SourcePart.Intersect(targetPart) != null)
-                        return result;
-                    result = i.SourcePart.End;
-                }
 
-                return null;
-            };
+                    if(newText != "" || removeCount > 0)
+                    {
+                        result.Add
+                        (
+                            new Edit
+                            {
+                                Location = lastPosition.Span(removeCount),
+                                NewText = newText
+                            });
+
+                        newText = "";
+                        removeCount = 0;
+                    }
+
+                    if(endPosition <= lastPosition.Position)
+                        return result;
+
+                    lastPosition = item.SourcePart.End;
+                }
+                return result;
+            }
         }
 
         protected override string GetNodeDump() => Data.Count + "->" + Text + "<-";
 
-        internal bool HasInnerLineBreaks() 
+        internal bool HasInnerLineBreaks()
             => Data
-            .Skip(1)
-            .Any(item => item.VisibleText.Contains("\n"));
+                .Skip(1)
+                .Any(item => item.VisibleText.Contains("\n"));
 
         public override string ToString() => Text;
     }
