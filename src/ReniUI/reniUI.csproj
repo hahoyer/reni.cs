@@ -39,12 +39,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileConfiguration.cs" />
-    <Compile Include="Formatting\EditPiece.cs" />
     <Compile Include="Formatting\Edit.cs" />
+    <Compile Include="Formatting\FormatterExtension.cs" />
     <Compile Include="Formatting\IResultItem.cs" />
     <Compile Include="Formatting\ResultItems.cs" />
     <Compile Include="Formatting\Skeleton.cs" />
-    <Compile Include="Formatting\SpanFormatter.cs" />
+    <Compile Include="Formatting\StructFormatter.cs" />
+    <Compile Include="Formatting\StructFormatterExtension.cs" />
     <Compile Include="Formatting\WhiteSpace.cs" />
     <Compile Include="hw\Forms\CursorUtil.cs" />
     <Compile Include="hw\Forms\Extender.cs" />

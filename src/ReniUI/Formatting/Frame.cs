@@ -10,10 +10,7 @@ namespace ReniUI.Formatting
     sealed class Frame : DumpableObject
     {
         internal static Frame Create(HierachicalFormatter formatter, CompilerBrowser compiler, SourcePart targetPart)
-        {
-            var result = new Frame(compiler.Locate(targetPart), compiler, formatter: formatter);
-            return result;
-        }
+            => new Frame(compiler.Locate(targetPart), compiler, formatter: formatter);
 
         [DisableDump]
         readonly HierachicalFormatter Formatter;
@@ -32,16 +29,14 @@ namespace ReniUI.Formatting
         [DisableDump]
         internal readonly Syntax Target;
 
-        readonly CompilerBrowser Compiler;
-
         Frame(Syntax target, CompilerBrowser compiler, Frame parent = null, HierachicalFormatter formatter = null)
         {
             Parent = parent;
             Formatter = parent?.Formatter ?? formatter;
             Target = target;
-            Compiler = compiler;
-            LeftCache = new ValueCache<Frame>(() => new Frame(Target.Left, Compiler, this));
-            RightCache = new ValueCache<Frame>(() => new Frame(Target.Right, Compiler, this));
+            var compiler1 = compiler;
+            LeftCache = new ValueCache<Frame>(() => new Frame(Target.Left, compiler1, this));
+            RightCache = new ValueCache<Frame>(() => new Frame(Target.Right, compiler1, this));
             ItemsWithoutLeadingBreaksCache = new ValueCache<ResultItems>
                 (GetItemsWithoutLeadingBreaks);
             LeadingLineBreaksCache = new ValueCache<int>(GetLeadingLineBreaksForCache);

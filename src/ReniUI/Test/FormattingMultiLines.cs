@@ -14,7 +14,7 @@ namespace ReniUI.Test {
         public void ReformatComments()
         {
             const string Text =
-                @"(12345,12345,12345,12345,12345,12345,12345,12345,12345)";
+                @"(12345,12345,12345,12345,12345)";
 
             const string ExpectedText =
                 @"137;
@@ -39,4 +39,4 @@ namespace ReniUI.Test {
                 "\n\"" + newSource + "\"");
         }
     }
-}
+}                                 
