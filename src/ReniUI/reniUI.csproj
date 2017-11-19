@@ -39,11 +39,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileConfiguration.cs" />
+    <Compile Include="Formatting\ChainStructure.cs" />
     <Compile Include="Formatting\Edit.cs" />
     <Compile Include="Formatting\FormatterExtension.cs" />
+    <Compile Include="Formatting\FormatterToken.cs" />
     <Compile Include="Formatting\IResultItem.cs" />
+    <Compile Include="Formatting\IStructure.cs" />
+    <Compile Include="Formatting\ListStructure.cs" />
+    <Compile Include="Formatting\ParenthesisStructure.cs" />
     <Compile Include="Formatting\ResultItems.cs" />
     <Compile Include="Formatting\Skeleton.cs" />
+    <Compile Include="Formatting\SourcePartEditExtension.cs" />
     <Compile Include="Formatting\StructFormatter.cs" />
     <Compile Include="Formatting\StructFormatterExtension.cs" />
     <Compile Include="Formatting\WhiteSpace.cs" />

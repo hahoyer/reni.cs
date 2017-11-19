@@ -9,5 +9,7 @@ namespace ReniUI.Formatting
         public int? EmptyLineLimit;
         public int? MaxLineLength;
         public int IndentCount = 4;
+        public bool SpaceBeforeListItem = false;
+        public bool SpaceAfterListItem = true;
     }
 }

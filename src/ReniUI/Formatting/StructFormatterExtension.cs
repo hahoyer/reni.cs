@@ -1,66 +1,40 @@
-using System.Collections;
-using System.Collections.Generic;
 using hw.DebugFormatter;
-using hw.Parser;
-using hw.Scanner;
+using JetBrains.Annotations;
+using NUnit.Framework.Api;
 using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
     static class StructFormatterExtension
     {
-        internal interface IStructure
-        {
-            IEnumerable<SourcePartEdit> GetSourcePartEdits(SourcePart targetPart);
-        }
-
-        class ParenthesisStructure : DumpableObject, IStructure
-        {
-            [EnableDump]
-            readonly Syntax Syntax;
-
-            public ParenthesisStructure(Syntax syntax) => Syntax = syntax;
-
-            IEnumerable<SourcePartEdit> IStructure.GetSourcePartEdits(SourcePart targetPart)
-            {
-                if(HasOuterLinebreak)
-                    yield return new SourcePartEdit(Syntax.Token.PrecededWith.SourcePart(), "\n");
-                yield return new SourcePartEdit(Syntax.Token.Characters);
-                if(HasInnerLineBreak)
-                    yield return new SourcePartEdit(Syntax.Token.Characters.End.Span(0), "\n");
-
-                foreach(var edit in GetInnerSourcePartEdits(targetPart))
-                    yield return edit;
-
-                if(HasInnerLineBreak)
-                    yield return new SourcePartEdit(Syntax.Left.Right.Token.SourcePart().Start.Span
-                        , "\n");
-                else
-                    yield return new SourcePartEdit(Syntax.Left.Right.Token.Characters);
-
-                if(HasOuterLinebreak)
-                    yield return new SourcePartEdit(Syntax.Token.PrecededWith.SourcePart(), "\n");
-
-            }
-
-            IEnumerable<SourcePartEdit> GetInnerSourcePartEdits(SourcePart targetPart)
-            {
-                
-            }
-
-            bool HasInnerLineBreak
-                {get {throw new System.NotImplementedException();}}
-
-            bool HasOuterLinebreak
-                {get {throw new System.NotImplementedException();}}
-        }
-
-        internal static IStructure CreateStruct(this Syntax syntax)
+        [CanBeNull]
+        internal static IStructure CreateStruct(this Syntax syntax, StructFormatter parent)
         {
             if(syntax.TokenClass is RightParenthesis)
-                return new ParenthesisStructure(syntax);
-            Dumpable.NotImplementedFunction(syntax);
+                return new ParenthesisStructure(syntax, parent);
+
+            if(syntax.TokenClass is List)
+                return new ListStructure(syntax, parent);
+
+            if(syntax.TokenClass is Number)
+            {
+                if(syntax.Right == null || syntax.Right.TokenClass is RightParenthesis)
+                    return new ChainStructure(syntax, parent);
+
+                Dumpable.NotImplementedFunction(syntax, parent);
+                return null;
+            }
+
+            Dumpable.NotImplementedFunction(syntax, parent);
             return null;
+        }
+
+        internal static bool LineBreakScan(this FormatterToken[] target, ref int? lineLength)
+        {
+            foreach(var token in target)
+                if(token.LineBreakScan(ref lineLength))
+                    return true;
+            return false;
         }
     }
 }

@@ -17,9 +17,13 @@ namespace ReniUI.Test {
                 @"(12345,12345,12345,12345,12345)";
 
             const string ExpectedText =
-                @"137;
-
-3";
+                @"(
+    12345,
+    12345,
+    12345,
+    12345,
+    12345
+)";
             var compiler = CompilerBrowser.FromText(Text);
             var newSource = compiler.Reformat
             (

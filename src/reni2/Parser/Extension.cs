@@ -44,7 +44,9 @@ namespace Reni.Parser
             => whiteSpaces?.Any(Lexer.IsWhiteSpace) ?? false;
 
         internal static bool HasLines(this IEnumerable<IItem> whiteSpaces)
-            => whiteSpaces?.Any(item => item.SourcePart.Id.Contains("\n")) ?? false;
+            => whiteSpaces?.Any(HasLines) ?? false;
+
+        internal static bool HasLines(this IItem item) => item.SourcePart.Id.Contains("\n");
 
         internal static IEnumerable<IItem> OnlyComments
             (this IEnumerable<IItem> whiteSpaces)
@@ -112,45 +114,29 @@ namespace Reni.Parser
         {
             switch(@char)
             {
-            case '&':
-                return "And";
-            case '\\':
-                return "Backslash";
-            case ':':
-                return "Colon";
-            case '.':
-                return "Dot";
-            case '=':
-                return "Equal";
-            case '>':
-                return "Greater";
-            case '<':
-                return "Less";
-            case '-':
-                return "Minus";
-            case '!':
-                return "Not";
-            case '|':
-                return "Or";
-            case '+':
-                return "Plus";
-            case '/':
-                return "Slash";
-            case '*':
-                return "Star";
-            case '~':
-                return "Tilde";
-            case ' ':
-                return "Space";
-            case '_':
-                return "__";
-            default:
-                if(char.IsLetter(@char))
-                    return "_" + @char;
-                if(char.IsDigit(@char))
-                    return @char.ToString();
+                case '&': return "And";
+                case '\\': return "Backslash";
+                case ':': return "Colon";
+                case '.': return "Dot";
+                case '=': return "Equal";
+                case '>': return "Greater";
+                case '<': return "Less";
+                case '-': return "Minus";
+                case '!': return "Not";
+                case '|': return "Or";
+                case '+': return "Plus";
+                case '/': return "Slash";
+                case '*': return "Star";
+                case '~': return "Tilde";
+                case ' ': return "Space";
+                case '_': return "__";
+                default:
+                    if(char.IsLetter(@char))
+                        return "_" + @char;
+                    if(char.IsDigit(@char))
+                        return @char.ToString();
 
-                throw new NotImplementedException("Symbolize(" + @char + ")");
+                    throw new NotImplementedException("Symbolize(" + @char + ")");
             }
         }
 
@@ -162,7 +148,7 @@ namespace Reni.Parser
             => (new Source(target) + 0).Match(pattern);
 
         internal static Result<TTarget> Issues<TTarget>(this TTarget target, params Issue[] issues)
-            where TTarget : class 
+            where TTarget : class
             => new Result<TTarget>(target, issues);
     }
 }
