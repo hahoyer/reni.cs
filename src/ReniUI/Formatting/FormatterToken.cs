@@ -78,19 +78,6 @@ namespace ReniUI.Formatting
         }
 
         internal IEnumerable<Edit> GetEditPieces(EditPieceParameter parameter)
-        {
-            if(LineBreakCount == 0)
-            {
-                if(SpaceCount == 0)
-                {
-                    if(parameter.LineBreakCount == 0)
-                        return new Edit[0];
-                    return new[] {parameter.CreateLine(SourcePart.Start)};
-                }
-            }
-
-            NotImplementedMethod(parameter);
-            return null;
-        }
+            => parameter.GetEditPieces(SourcePart.Start, LineBreakCount, SpaceCount);
     }
 }

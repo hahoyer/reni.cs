@@ -72,8 +72,6 @@ namespace ReniUI.Formatting
                 if(BodyItems[i].LineBreakScan(ref lineLength))
                     return true;
             }
-
-            NotImplementedMethod(lineLength);
             return false;
         }
 

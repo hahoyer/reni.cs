@@ -26,7 +26,7 @@ namespace ReniUI.Formatting
         {
             if(targetPart.Position > 0)
             {
-                Dumpable.NotImplementedFunction(target.ToArray(), targetPart);
+                Dumpable.NotImplementedFunction(target.ToArray(), targetPart, configuration);
                 return null;
             }
 
@@ -41,18 +41,15 @@ namespace ReniUI.Formatting
                 else if(part == LineBreak)
                     parameter.LineBreakCount++;
                 else if(part == Space)
-                {
-                    Dumpable.NotImplementedFunction(target.ToArray(), targetPart);
-                    return Enumerable.Empty<Edit>();
-                }
+                    parameter.Space++;
                 else if(part is SourcePartEdit spe)
                 {
                     result.AddRange(spe.GetEditPieces(parameter));
-                    parameter.LineBreakCount = 0;
+                    parameter.Reset();
                 }
                 else
                 {
-                    Dumpable.NotImplementedFunction(target.ToArray(), targetPart);
+                    Dumpable.NotImplementedFunction(target.ToArray(), targetPart, configuration);
                     return null;
                 }
 
@@ -60,19 +57,45 @@ namespace ReniUI.Formatting
         }
     }
 
-    class EditPieceParameter
+    class EditPieceParameter : DumpableObject
     {
         readonly Configuration Configuration;
         public int Indent;
         public int LineBreakCount;
+        public int Space;
 
         public EditPieceParameter(Configuration configuration) => Configuration = configuration;
 
-        public Edit CreateLine(SourcePosn span)
-            => new Edit
+        Edit Create(SourcePosn span)
+        {
+            var lineBreakText = "\n".Repeat(LineBreakCount);
+            var indentText = LineBreakCount > 0 ? " ".Repeat(Indent * Configuration.IndentCount) : "";
+            var spaceText = " ".Repeat(Space);
+
+            return new Edit
             {
                 Location = span.Span(0),
-                NewText = "\n".Repeat(LineBreakCount) + " ".Repeat(Indent * Configuration.IndentCount)
+                NewText = lineBreakText + indentText + spaceText
             };
+        }
+
+        public void Reset()
+        {
+            LineBreakCount = 0;
+            Space = 0;
+        }
+
+        public IEnumerable<Edit> GetEditPieces(SourcePosn sourcePosn, int lineBreakCount, int spaceCount)
+        {
+            if(lineBreakCount == 0 && spaceCount == 0)
+            {
+                if(LineBreakCount == 0 && Space == 0)
+                    return new Edit[0];
+                return new[] {Create(sourcePosn)};
+            }
+
+            NotImplementedMethod(sourcePosn, lineBreakCount, spaceCount);
+            return null;
+        }
     }
 }
