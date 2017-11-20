@@ -1,28 +1,21 @@
 using hw.DebugFormatter;
-using JetBrains.Annotations;
-using NUnit.Framework.Api;
 using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
     static class StructFormatterExtension
     {
-        [CanBeNull]
         internal static IStructure CreateStruct(this Syntax syntax, StructFormatter parent)
         {
-            if(syntax.TokenClass is RightParenthesis)
-                return new ParenthesisStructure(syntax, parent);
-
-            if(syntax.TokenClass is List)
-                return new ListStructure(syntax, parent);
-
-            if(syntax.TokenClass is Number)
+            switch(syntax.TokenClass)
             {
-                if(syntax.Right == null || syntax.Right.TokenClass is RightParenthesis)
-                    return new ChainStructure(syntax, parent);
+                case RightParenthesis _: return new ParenthesisStructure(syntax, parent);
+                case Number _:
+                    if(syntax.Right == null || syntax.Right.TokenClass is RightParenthesis)
+                        return new ChainStructure(syntax, parent);
 
-                Dumpable.NotImplementedFunction(syntax, parent);
-                return null;
+                    Dumpable.NotImplementedFunction(syntax, parent);
+                    return null;
             }
 
             Dumpable.NotImplementedFunction(syntax, parent);
@@ -35,6 +28,32 @@ namespace ReniUI.Formatting
                 if(token.LineBreakScan(ref lineLength))
                     return true;
             return false;
+        }
+
+        internal static IStructure CreateBodyStruct(this Syntax syntax, StructFormatter parent)
+        {
+            switch(syntax.TokenClass)
+            {
+                case List _: return new ListStructure(syntax, parent);
+                case Colon _:
+                    Dumpable.NotImplementedFunction(syntax, parent);
+                    return null;
+            }
+
+            Dumpable.NotImplementedFunction(syntax, parent);
+            return null;
+        }
+
+        internal static IStructure CreateListItemStruct(this Syntax syntax, StructFormatter parent)
+        {
+            switch(syntax.TokenClass)
+            {
+                case Colon _:
+                    Dumpable.NotImplementedFunction(syntax, parent);
+                    return null;
+            }
+
+            return CreateStruct(syntax, parent);
         }
     }
 }

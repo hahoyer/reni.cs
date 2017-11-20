@@ -63,7 +63,7 @@ namespace ReniUI.Formatting
                 .AssertNotNull()
                 .Right
                 .AssertNotNull()
-                .CreateStruct(Parent);
+                .CreateBodyStruct(Parent);
 
         bool LineBreakScan(ref int? lineLength)
             => Left.LineBreakScan(ref lineLength) ||

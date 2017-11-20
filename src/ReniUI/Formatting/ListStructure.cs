@@ -58,7 +58,7 @@ namespace ReniUI.Formatting
         }
 
         IStructure[] BodyItems => BodyItemsValue ??
-                                  (BodyItemsValue = GetBodyItems().Select(i => i.CreateStruct(Parent)).ToArray());
+                                  (BodyItemsValue = GetBodyItems().Select(i => i.CreateListItemStruct(Parent)).ToArray());
 
         FormatterToken[][] ListItems => ListItemsValue ?? (ListItemsValue = GetListItems().ToArray());
 
