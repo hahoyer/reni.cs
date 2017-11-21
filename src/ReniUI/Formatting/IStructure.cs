@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using hw.Scanner;
+using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
@@ -7,5 +8,6 @@ namespace ReniUI.Formatting
     {
         IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart);
         bool LineBreakScan(ref int? lineLength);
+        Syntax Syntax {get;}
     }
 }

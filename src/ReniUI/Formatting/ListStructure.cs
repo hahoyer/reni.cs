@@ -22,6 +22,8 @@ namespace ReniUI.Formatting
             Parent = parent;
         }
 
+        Syntax IStructure.Syntax => Syntax;
+
         IEnumerable<ISourcePartEdit> IStructure.GetSourcePartEdits(SourcePart targetPart)
         {
             for(var i = 0; i <= ListItems.Length; i++)
@@ -58,7 +60,8 @@ namespace ReniUI.Formatting
         }
 
         IStructure[] BodyItems => BodyItemsValue ??
-                                  (BodyItemsValue = GetBodyItems().Select(i => i.CreateListItemStruct(Parent)).ToArray());
+                                  (BodyItemsValue =
+                                      GetBodyItems().Select(i => i.CreateListItemStruct(Parent)).ToArray());
 
         FormatterToken[][] ListItems => ListItemsValue ?? (ListItemsValue = GetListItems().ToArray());
 

@@ -18,6 +18,7 @@ namespace ReniUI.Formatting
             Parent = parent;
         }
 
+        Syntax IStructure.Syntax => Syntax;
         [CanBeNull]
         IEnumerable<ISourcePartEdit> IStructure.GetSourcePartEdits(SourcePart targetPart)
         {

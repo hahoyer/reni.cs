@@ -24,6 +24,7 @@ namespace ReniUI.Formatting
             Parent = parent;
         }
 
+        Syntax IStructure.Syntax => Syntax;
         IEnumerable<ISourcePartEdit> IStructure.GetSourcePartEdits(SourcePart targetPart)
         {
             Tracer.Assert(Left.Length == 1);
