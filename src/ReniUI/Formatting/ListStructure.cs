@@ -49,7 +49,7 @@ namespace ReniUI.Formatting
         }
 
 
-        bool HasLineBreak => Syntax.HasLineBreak(Parent.Configuration);
+        bool HasLineBreak => Syntax.IsLineBreakRequired(Parent.Configuration);
 
         IStructure[] BodyItems => BodyItemsValue ??
                                   (BodyItemsValue =

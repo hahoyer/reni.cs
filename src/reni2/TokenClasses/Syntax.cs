@@ -72,16 +72,19 @@ namespace Reni.TokenClasses
             get => _parent;
             private set
             {
-                if(value == null)
-                    throw new ArgumentNullException(nameof(value));
-
                 Tracer.Assert(_parent == null);
-                _parent = value;
+                _parent = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 
         [DisableDump]
         internal SourcePart SourcePart => Left?.SourcePart + Token.SourcePart() + Right?.SourcePart;
+
+        [DisableDump]
+        internal Syntax LeftMost => Left == null ? this : Left.LeftMost;
+
+        [DisableDump]
+        internal Syntax RightMost => Right == null ? this : Right.RightMost;
 
         [DisableDump]
         internal IEnumerable<Syntax> Items => this.CachedValue(GetItems);
@@ -197,7 +200,7 @@ namespace Reni.TokenClasses
                 .ToArray();
 
             return sourceSyntaxs
-                       .Skip(1)
+                       .Skip(count: 1)
                        .TakeWhile(item => matcher.IsBelongingTo(item.TokenClass))
                        .LastOrDefault() ??
                    recent;
@@ -319,14 +322,14 @@ namespace Reni.TokenClasses
 
             var isTokenInRange = Token.Characters.Length > 0 && Token.Characters.Intersect(targetPart) != null;
 
-            if(isStart || !isTokenInRange )
+            if(isStart || !isTokenInRange)
                 foreach(var item in Token.PrecededWith)
                     if(item.SourcePart.Intersect(targetPart) != null)
                         yield return new WhiteItem(item, this);
 
             if(isTokenInRange)
             {
-                yield return new TokenItem(this,isStart);
+                yield return new TokenItem(this, isStart);
                 isStart = false;
             }
 

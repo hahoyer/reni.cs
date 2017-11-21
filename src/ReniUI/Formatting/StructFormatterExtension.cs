@@ -56,7 +56,7 @@ namespace ReniUI.Formatting
                 return null;
 
             var rightResult = target.Right?.EssentialLineLength();
-            if (rightResult == null)
+            if(rightResult == null)
                 return null;
 
             return leftResult + result + rightResult;
@@ -89,21 +89,42 @@ namespace ReniUI.Formatting
             return CreateStruct(syntax, parent);
         }
 
-        internal static int? BasicLineLength(this Syntax target)
+        /// <summary>
+        ///     Calulate the length, if all ignorable linebreaks would have been ignored.
+        ///     Spaces outside of comments are always ignored.
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="configuration"></param>
+        /// <returns>the line length or null if there is any line break, that cannot be ignored.</returns>
+        static int? BasicLineLength(this Syntax target, Configuration configuration)
         {
-            var tokenLength = target.Token.BasicLineLength();
+            var leftTokenClass = target.Left?.RightMost.TokenClass;
+            var rightNeighbor = target.Right?.LeftMost;
+            if(rightNeighbor != null && rightNeighbor.Token.PrecededWith.HasComment())
+                rightNeighbor = null;
+            var rightTokenClass = rightNeighbor?.TokenClass;
+
+            var tokenLength = target.Token.BasicLineLength
+                (leftTokenClass, target.TokenClass, rightTokenClass, configuration);
             if(tokenLength == null)
                 return null;
-            var leftLength = target.Left?.BasicLineLength();
+
+            var leftLength = target.Left?.BasicLineLength(configuration);
             if(leftLength == null)
                 return null;
-            var rightLength = target.Right?.BasicLineLength();
+            var rightLength = target.Right?.BasicLineLength(configuration);
             if(rightLength == null)
                 return null;
             return leftLength + tokenLength + rightLength;
         }
 
-        static int? BasicLineLength(this IToken target)
+        static int? BasicLineLength
+        (
+            this IToken target,
+            ITokenClass leftTokenClass,
+            ITokenClass targetTokenClass,
+            ITokenClass rightTokenClass,
+            Configuration configuration)
         {
             var result = 0;
             foreach(var item in target.PrecededWith.Where(item => item.IsComment()))
@@ -113,15 +134,24 @@ namespace ReniUI.Formatting
                 result += item.SourcePart.Length;
             }
 
+            if(configuration.EmptyLineLimit != 0 && target.PrecededWith.Any(item => item.IsLineBreak()))
+                return null;
+
+            if(result == 0 && leftTokenClass != null)
+                result += SeparatorType.Get(leftTokenClass, targetTokenClass).Text.Length;
+
+            if(rightTokenClass != null)
+                result += SeparatorType.Get(targetTokenClass, rightTokenClass).Text.Length;
+
             return result + target.Characters.Length;
         }
 
-        internal static bool HasLineBreak(this Syntax syntax, Configuration configuration)
+        internal static bool IsLineBreakRequired(this Syntax syntax, Configuration configuration)
         {
-            var x = syntax.BasicLineLength();
-            if(x == null)
+            var basicLineLength = syntax.BasicLineLength(configuration);
+            if(basicLineLength == null)
                 return true;
-            return x > configuration.MaxLineLength;
+            return basicLineLength > configuration.MaxLineLength;
         }
     }
 }

@@ -36,7 +36,7 @@ namespace ReniUI.Formatting
             foreach(var edit in Body.GetSourcePartEdits(targetPart))
                 yield return edit;
 
-            if(StructFormatterExtension.HasLineBreak(Syntax, Parent.Configuration))
+            if(Syntax.IsLineBreakRequired(Parent.Configuration))
                 yield return SourcePartEditExtension.LineBreak;
 
             yield return SourcePartEditExtension.IndentEnd;

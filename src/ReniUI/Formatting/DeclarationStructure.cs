@@ -22,10 +22,6 @@ namespace ReniUI.Formatting
             return null;
         }
 
-        public bool LineBreakScan(ref int? lineLength)
-        {
-            NotImplementedMethod(lineLength);
-            return false;
-        }
+        Syntax IStructure.Syntax => Syntax;
     }
 }
