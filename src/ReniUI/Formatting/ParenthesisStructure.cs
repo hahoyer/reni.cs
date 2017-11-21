@@ -36,27 +36,16 @@ namespace ReniUI.Formatting
             foreach(var edit in Body.GetSourcePartEdits(targetPart))
                 yield return edit;
 
-            if(HasInnerLineBreak)
+            if(StructFormatterExtension.HasLineBreak(Syntax, Parent.Configuration))
                 yield return SourcePartEditExtension.LineBreak;
 
             yield return SourcePartEditExtension.IndentEnd;
             yield return Right.Single().ToSourcePartEdit();
         }
 
-        bool IStructure.LineBreakScan(ref int? lineLength) => LineBreakScan(ref lineLength);
-
         IStructure Body => BodyValue ?? (BodyValue = GetBody());
         FormatterToken[] Left => LeftValue ?? (LeftValue = FormatterToken.Create(Syntax.Left).ToArray());
         FormatterToken[] Right => RightValue ?? (RightValue = FormatterToken.Create(Syntax).ToArray());
-
-        bool HasInnerLineBreak
-        {
-            get
-            {
-                var lineLength = Parent.Configuration.MaxLineLength;
-                return LineBreakScan(ref lineLength);
-            }
-        }
 
         IStructure GetBody()
             => Syntax
@@ -66,9 +55,5 @@ namespace ReniUI.Formatting
                 .AssertNotNull()
                 .CreateBodyStruct(Parent);
 
-        bool LineBreakScan(ref int? lineLength)
-            => Left.LineBreakScan(ref lineLength) ||
-               Body.LineBreakScan(ref lineLength) ||
-               Right.LineBreakScan(ref lineLength);
     }
 }

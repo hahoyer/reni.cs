@@ -29,7 +29,7 @@ namespace ReniUI.Formatting
             return null;
         }
 
-        bool IStructure.LineBreakScan(ref int? lineLength)
+        public bool LineBreakScan(ref int? lineLength)
         {
             if(Syntax.Left == null && Syntax.Right == null)
             {

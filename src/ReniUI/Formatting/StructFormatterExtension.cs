@@ -1,3 +1,4 @@
+using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
 using Reni.Parser;
@@ -37,9 +38,7 @@ namespace ReniUI.Formatting
             switch(syntax.TokenClass)
             {
                 case List _: return new ListStructure(syntax, parent);
-                case Colon _:
-                    Dumpable.NotImplementedFunction(syntax, parent);
-                    return null;
+                case Colon _: return new DeclarationStructure(syntax, parent);
             }
 
             Dumpable.NotImplementedFunction(syntax, parent);
@@ -88,6 +87,41 @@ namespace ReniUI.Formatting
             }
 
             return CreateStruct(syntax, parent);
+        }
+
+        internal static int? BasicLineLength(this Syntax target)
+        {
+            var tokenLength = target.Token.BasicLineLength();
+            if(tokenLength == null)
+                return null;
+            var leftLength = target.Left?.BasicLineLength();
+            if(leftLength == null)
+                return null;
+            var rightLength = target.Right?.BasicLineLength();
+            if(rightLength == null)
+                return null;
+            return leftLength + tokenLength + rightLength;
+        }
+
+        static int? BasicLineLength(this IToken target)
+        {
+            var result = 0;
+            foreach(var item in target.PrecededWith.Where(item => item.IsComment()))
+            {
+                if(item.HasLines())
+                    return null;
+                result += item.SourcePart.Length;
+            }
+
+            return result + target.Characters.Length;
+        }
+
+        internal static bool HasLineBreak(this Syntax syntax, Configuration configuration)
+        {
+            var x = syntax.BasicLineLength();
+            if(x == null)
+                return true;
+            return x > configuration.MaxLineLength;
         }
     }
 }

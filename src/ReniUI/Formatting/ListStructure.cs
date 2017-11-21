@@ -48,35 +48,14 @@ namespace ReniUI.Formatting
             }
         }
 
-        bool IStructure.LineBreakScan(ref int? lineLength) => LineBreakScan(ref lineLength);
 
-        bool HasLineBreak
-        {
-            get
-            {
-                var lineLength = Parent.Configuration.MaxLineLength;
-                return LineBreakScan(ref lineLength);
-            }
-        }
+        bool HasLineBreak => Syntax.HasLineBreak(Parent.Configuration);
 
         IStructure[] BodyItems => BodyItemsValue ??
                                   (BodyItemsValue =
                                       GetBodyItems().Select(i => i.CreateListItemStruct(Parent)).ToArray());
 
         FormatterToken[][] ListItems => ListItemsValue ?? (ListItemsValue = GetListItems().ToArray());
-
-        bool LineBreakScan(ref int? lineLength)
-        {
-            for(var i = 0; i <= ListItems.Length; i++)
-            {
-                if(i > 0 && ListItems[i - 1].LineBreakScan(ref lineLength))
-                    return true;
-
-                if(BodyItems[i].LineBreakScan(ref lineLength))
-                    return true;
-            }
-            return false;
-        }
 
         IEnumerable<Syntax> GetBodyItems()
         {
