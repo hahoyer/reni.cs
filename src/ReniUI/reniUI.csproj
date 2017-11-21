@@ -40,6 +40,7 @@
   <ItemGroup>
     <Compile Include="FileConfiguration.cs" />
     <Compile Include="Formatting\ChainStructure.cs" />
+    <Compile Include="Formatting\DeclarationStructure.cs" />
     <Compile Include="Formatting\Edit.cs" />
     <Compile Include="Formatting\FormatterExtension.cs" />
     <Compile Include="Formatting\FormatterToken.cs" />
