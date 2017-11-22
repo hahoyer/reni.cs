@@ -39,6 +39,8 @@ namespace ReniUI.Formatting
 
             if(IsMultiLine && IsInnerMultiLine)
                 yield return SourcePartEditExtension.LineBreak;
+            else if(Syntax.RightSideSeparator() == SeparatorType.CloseSeparator)
+                yield return SourcePartEditExtension.Space;
 
             foreach(var edit in Right.GetSourcePartEdits(targetPart))
                 yield return edit;

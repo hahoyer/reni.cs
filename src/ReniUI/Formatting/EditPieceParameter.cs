@@ -10,7 +10,7 @@ namespace ReniUI.Formatting
         readonly Configuration Configuration;
         public int Indent;
         public int LineBreakCount;
-        public int Space;
+        public int SpaceCount;
 
         public EditPieceParameter(Configuration configuration) => Configuration = configuration;
 
@@ -18,7 +18,7 @@ namespace ReniUI.Formatting
         {
             var lineBreakText = "\n".Repeat(LineBreakCount);
             var indentText = LineBreakCount > 0 ? " ".Repeat(Indent * Configuration.IndentCount) : "";
-            var spaceText = " ".Repeat(Space);
+            var spaceText = " ".Repeat(SpaceCount);
 
             return new Edit
             {
@@ -30,19 +30,24 @@ namespace ReniUI.Formatting
         public void Reset()
         {
             LineBreakCount = 0;
-            Space = 0;
+            SpaceCount = 0;
         }
 
-        public IEnumerable<Edit> GetEditPieces(SourcePosn sourcePosn, int lineBreakCount, int spaceCount)
+        public IEnumerable<Edit> GetEditPieces(SourcePosn sourcePosn, int currentLineBreakCount, int currentSpaceCount)
         {
-            if(lineBreakCount == 0 && spaceCount == 0)
+            if(currentLineBreakCount == LineBreakCount && currentSpaceCount == SpaceCount)
+                return new Edit[0];
+
+            if((currentLineBreakCount > 0 || LineBreakCount > 0) && Indent > 0)
             {
-                if(LineBreakCount == 0 && Space == 0)
-                    return new Edit[0];
-                return new[] {Create(sourcePosn)};
+                NotImplementedMethod(sourcePosn, currentLineBreakCount, currentSpaceCount);
+                return null;
             }
 
-            NotImplementedMethod(sourcePosn, lineBreakCount, spaceCount);
+            if(currentLineBreakCount == 0 && currentSpaceCount == 0)
+                return new[] {Create(sourcePosn)};
+
+            NotImplementedMethod(sourcePosn, currentLineBreakCount, currentSpaceCount);
             return null;
         }
     }

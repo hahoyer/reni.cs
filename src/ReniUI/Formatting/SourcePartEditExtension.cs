@@ -40,7 +40,7 @@ namespace ReniUI.Formatting
                 else if(part == LineBreak)
                     parameter.LineBreakCount++;
                 else if(part == Space)
-                    parameter.Space++;
+                    parameter.SpaceCount++;
                 else if(part is SourcePartEdit spe)
                 {
                     result.AddRange(spe.GetEditPieces(parameter));
