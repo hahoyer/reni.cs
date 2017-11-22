@@ -1,27 +1,53 @@
 using System.Collections.Generic;
-using hw.DebugFormatter;
+using System.Linq;
+using hw.Helper;
 using hw.Scanner;
 using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
-    class DeclarationStructure : DumpableObject, IStructure
+    sealed class DeclarationStructure : Structure
     {
-        readonly StructFormatter Parent;
-        readonly Syntax Syntax;
+        IStructure LeftValue;
+        IStructure RightValue;
 
         public DeclarationStructure(Syntax syntax, StructFormatter parent)
+            : base(syntax, parent) {}
+
+        IStructure Left => LeftValue ?? (LeftValue = GetLeft());
+        IStructure Right => RightValue ?? (RightValue = GetRight());
+
+        bool IsMultiLine => false;
+        bool IsInnerMultiLine => false;
+
+        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart)
         {
-            Syntax = syntax;
-            Parent = parent;
+            if(IsMultiLine)
+                yield return SourcePartEditExtension.IndentEnd;
+
+            foreach(var edit in Left.GetSourcePartEdits(targetPart))
+                yield return edit;
+
+            if(Syntax.LeftSideSeparator() == SeparatorType.CloseSeparator)
+                yield return SourcePartEditExtension.Space;
+
+            foreach(var edit in FormatterToken.Create(Syntax).Select(i => i.ToSourcePartEdit()))
+                yield return edit;
+
+            if(IsMultiLine)
+                yield return SourcePartEditExtension.IndentStart;
+
+            if(IsMultiLine && IsInnerMultiLine)
+                yield return SourcePartEditExtension.LineBreak;
+
+            foreach(var edit in Right.GetSourcePartEdits(targetPart))
+                yield return edit;
+
+            if(IsMultiLine)
+                yield return SourcePartEditExtension.IndentEnd;
         }
 
-        IEnumerable<ISourcePartEdit> IStructure.GetSourcePartEdits(SourcePart targetPart)
-        {
-            NotImplementedMethod(targetPart);
-            return null;
-        }
-
-        Syntax IStructure.Syntax => Syntax;
+        IStructure GetLeft() => Syntax.Left.AssertNotNull().CreateDeclaratorStruct(Parent);
+        IStructure GetRight() => Syntax.Right.AssertNotNull().CreateBodyStruct(Parent);
     }
 }

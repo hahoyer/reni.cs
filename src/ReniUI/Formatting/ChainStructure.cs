@@ -1,26 +1,16 @@
 using System.Collections.Generic;
 using System.Linq;
-using hw.DebugFormatter;
 using hw.Scanner;
-using JetBrains.Annotations;
 using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
-    class ChainStructure : DumpableObject, IStructure
+    sealed class ChainStructure : Structure
     {
-        readonly StructFormatter Parent;
-        readonly Syntax Syntax;
-
         public ChainStructure(Syntax syntax, StructFormatter parent)
-        {
-            Syntax = syntax;
-            Parent = parent;
-        }
+            : base(syntax, parent) {}
 
-        Syntax IStructure.Syntax => Syntax;
-        [CanBeNull]
-        IEnumerable<ISourcePartEdit> IStructure.GetSourcePartEdits(SourcePart targetPart)
+        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart)
         {
             if(Syntax.Left == null && Syntax.Right == null)
                 return FormatterToken.Create(Syntax).Select(item => item.ToSourcePartEdit());
@@ -28,19 +18,7 @@ namespace ReniUI.Formatting
             NotImplementedMethod(targetPart);
             return null;
         }
-
-        public bool LineBreakScan(ref int? lineLength)
-        {
-            if(Syntax.Left == null && Syntax.Right == null)
-            {
-                var tokens = FormatterToken.Create(Syntax).ToArray();
-                Tracer.Assert(tokens.Length == 1);
-                var token = tokens.Single();
-                return token.LineBreakScan(ref lineLength);
-            }
-
-            NotImplementedMethod(lineLength);
-            return false;
-        }
     }
 }
+
+    

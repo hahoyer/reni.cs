@@ -42,6 +42,7 @@
     <Compile Include="Formatting\ChainStructure.cs" />
     <Compile Include="Formatting\DeclarationStructure.cs" />
     <Compile Include="Formatting\Edit.cs" />
+    <Compile Include="Formatting\EditPieceParameter.cs" />
     <Compile Include="Formatting\FormatterExtension.cs" />
     <Compile Include="Formatting\FormatterToken.cs" />
     <Compile Include="Formatting\IResultItem.cs" />
@@ -49,10 +50,13 @@
     <Compile Include="Formatting\ListStructure.cs" />
     <Compile Include="Formatting\ParenthesisStructure.cs" />
     <Compile Include="Formatting\ResultItems.cs" />
+    <Compile Include="Formatting\SingleItemStructure.cs" />
     <Compile Include="Formatting\Skeleton.cs" />
+    <Compile Include="Formatting\SourcePartEdit.cs" />
     <Compile Include="Formatting\SourcePartEditExtension.cs" />
     <Compile Include="Formatting\StructFormatter.cs" />
     <Compile Include="Formatting\StructFormatterExtension.cs" />
+    <Compile Include="Formatting\Structure.cs" />
     <Compile Include="Formatting\WhiteSpace.cs" />
     <Compile Include="hw\Forms\CursorUtil.cs" />
     <Compile Include="hw\Forms\Extender.cs" />

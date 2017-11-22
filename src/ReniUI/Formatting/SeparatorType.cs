@@ -22,7 +22,7 @@ namespace ReniUI.Formatting
             string ISeparatorType.Text => " ";
         }
 
-        static readonly ISeparatorType ContactSeparator = new Contact();
+        internal static readonly ISeparatorType ContactSeparator = new Contact();
         internal static readonly ISeparatorType CloseSeparator= new Close();
 
         internal static ISeparatorType Get(ITokenClass left, ITokenClass right)

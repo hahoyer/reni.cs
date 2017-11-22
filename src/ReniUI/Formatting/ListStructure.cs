@@ -6,25 +6,24 @@ using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
-    class ListStructure : DumpableObject, IStructure
+    sealed class ListStructure : Structure
     {
-        readonly StructFormatter Parent;
-
-        [EnableDump]
-        readonly Syntax Syntax;
-
         IStructure[] BodyItemsValue;
         FormatterToken[][] ListItemsValue;
 
         public ListStructure(Syntax syntax, StructFormatter parent)
-        {
-            Syntax = syntax;
-            Parent = parent;
-        }
+            : base(syntax, parent) {}
 
-        Syntax IStructure.Syntax => Syntax;
 
-        IEnumerable<ISourcePartEdit> IStructure.GetSourcePartEdits(SourcePart targetPart)
+        bool HasLineBreak => Syntax.IsLineBreakRequired(Parent.Configuration);
+
+        IStructure[] BodyItems => BodyItemsValue ??
+                                  (BodyItemsValue =
+                                      GetBodyItems().Select(i => i.CreateListItemStruct(Parent)).ToArray());
+
+        FormatterToken[][] ListItems => ListItemsValue ?? (ListItemsValue = GetListItems().ToArray());
+
+        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart)
         {
             for(var i = 0; i <= ListItems.Length; i++)
             {
@@ -47,15 +46,6 @@ namespace ReniUI.Formatting
                     yield return edit;
             }
         }
-
-
-        bool HasLineBreak => Syntax.IsLineBreakRequired(Parent.Configuration);
-
-        IStructure[] BodyItems => BodyItemsValue ??
-                                  (BodyItemsValue =
-                                      GetBodyItems().Select(i => i.CreateListItemStruct(Parent)).ToArray());
-
-        FormatterToken[][] ListItems => ListItemsValue ?? (ListItemsValue = GetListItems().ToArray());
 
         IEnumerable<Syntax> GetBodyItems()
         {

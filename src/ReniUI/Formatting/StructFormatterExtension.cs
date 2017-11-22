@@ -8,6 +8,32 @@ namespace ReniUI.Formatting
 {
     static class StructFormatterExtension
     {
+        interface IFormatResult<TValue>
+        {
+            TValue Value {get; set;}
+
+            TContainer Concat<TContainer>(string token, TContainer other)
+                where TContainer : class, IFormatResult<TValue>, new();
+        }
+
+        sealed class IntegerResult : DumpableObject, IFormatResult<int>
+        {
+            internal int Value;
+            int IFormatResult<int>.Value {get => Value; set => Value = value;}
+
+            TContainer IFormatResult<int>.Concat<TContainer>(string token, TContainer other)
+                => new TContainer {Value = Value + token.Length + other.Value};
+        }
+
+        sealed class StringResult : DumpableObject, IFormatResult<string>
+        {
+            internal string Value;
+            string IFormatResult<string>.Value {get => Value; set => Value = value;}
+
+            TContainer IFormatResult<string>.Concat<TContainer>(string token, TContainer other)
+                => new TContainer {Value = Value + token + other.Value};
+        }
+
         internal static IStructure CreateStruct(this Syntax syntax, StructFormatter parent)
         {
             switch(syntax.TokenClass)
@@ -41,41 +67,19 @@ namespace ReniUI.Formatting
                 case Colon _: return new DeclarationStructure(syntax, parent);
             }
 
+            return new ChainStructure(syntax, parent);
+        }
+
+        internal static IStructure CreateDeclaratorStruct(this Syntax syntax, StructFormatter parent)
+        {
+            if(syntax.Left == null && syntax.Right == null)
+
+
+                return new SingleItemStructure(syntax, parent);
+
             Dumpable.NotImplementedFunction(syntax, parent);
             return null;
         }
-
-        internal static int? EssentialLineLength(this Syntax target)
-        {
-            var result = target.Token.EssentialLineLength();
-            if(result == null)
-                return null;
-
-            var leftResult = target.Left?.EssentialLineLength();
-            if(leftResult == null)
-                return null;
-
-            var rightResult = target.Right?.EssentialLineLength();
-            if(rightResult == null)
-                return null;
-
-            return leftResult + result + rightResult;
-        }
-
-        static int? EssentialLineLength(this IToken target)
-        {
-            var result = 0;
-            foreach(var item in target.PrecededWith)
-                if(item.IsComment())
-                {
-                    if(item.HasLines())
-                        return null;
-                    result += item.SourcePart.Length;
-                }
-
-            return result + target.Characters.Length;
-        }
-
 
         internal static IStructure CreateListItemStruct(this Syntax syntax, StructFormatter parent)
         {
@@ -96,62 +100,74 @@ namespace ReniUI.Formatting
         /// <param name="target"></param>
         /// <param name="configuration"></param>
         /// <returns>the line length or null if there is any line break, that cannot be ignored.</returns>
-        static int? BasicLineLength(this Syntax target, Configuration configuration)
+        static TContainer FlatFormat<TContainer, TValue>(this Syntax target, Configuration configuration)
+            where TContainer : class, IFormatResult<TValue>, new()
         {
-            var leftTokenClass = target.Left?.RightMost.TokenClass;
-            var rightNeighbor = target.Right?.LeftMost;
-            if(rightNeighbor != null && rightNeighbor.Token.PrecededWith.HasComment())
-                rightNeighbor = null;
-            var rightTokenClass = rightNeighbor?.TokenClass;
+            var tokenString = target
+                .Token
+                .FlatFormat(configuration);
 
-            var tokenLength = target.Token.BasicLineLength
-                (leftTokenClass, target.TokenClass, rightTokenClass, configuration);
-            if(tokenLength == null)
+            if(tokenString == null)
                 return null;
 
-            var leftLength = target.Left?.BasicLineLength(configuration);
-            if(leftLength == null)
+            tokenString = target.LeftSideSeparator().Text + tokenString + target.RightSideSeparator().Text;
+
+            var leftResult = target.Left.FlatSubFormat<TContainer, TValue>(configuration);
+            if(leftResult == null)
                 return null;
-            var rightLength = target.Right?.BasicLineLength(configuration);
-            if(rightLength == null)
+
+            var rightResult = target.Right.FlatSubFormat<TContainer, TValue>(configuration);
+            if(rightResult == null)
                 return null;
-            return leftLength + tokenLength + rightLength;
+
+            return leftResult.Concat(tokenString, rightResult);
         }
 
-        static int? BasicLineLength
-        (
-            this IToken target,
-            ITokenClass leftTokenClass,
-            ITokenClass targetTokenClass,
-            ITokenClass rightTokenClass,
-            Configuration configuration)
+        static TContainer FlatSubFormat<TContainer, TValue>(this Syntax left, Configuration configuration)
+            where TContainer : class, IFormatResult<TValue>, new()
+            => left == null ? new TContainer() : left.FlatFormat<TContainer, TValue>(configuration);
+
+        static string FlatFormat(this IToken target, Configuration configuration)
         {
-            var result = 0;
+            var result = "";
             foreach(var item in target.PrecededWith.Where(item => item.IsComment()))
             {
                 if(item.HasLines())
                     return null;
-                result += item.SourcePart.Length;
+                result += item.SourcePart.Id;
             }
 
             if(configuration.EmptyLineLimit != 0 && target.PrecededWith.Any(item => item.IsLineBreak()))
                 return null;
 
-            if(result == 0 && leftTokenClass != null)
-                result += SeparatorType.Get(leftTokenClass, targetTokenClass).Text.Length;
-
-            if(rightTokenClass != null)
-                result += SeparatorType.Get(targetTokenClass, rightTokenClass).Text.Length;
-
-            return result + target.Characters.Length;
+            return result + target.Characters.Id;
         }
+
+        internal static ISeparatorType LeftSideSeparator(this Syntax target)
+        {
+            var left = target.Left?.RightMost.TokenClass;
+            if(target.Token.PrecededWith.HasComment())
+                return SeparatorType.ContactSeparator;
+            return SeparatorType.Get(left, target.TokenClass);
+        }
+
+        internal static ISeparatorType RightSideSeparator(this Syntax target)
+        {
+            var right = target.Right?.LeftMost;
+            if(right == null || right.Token.PrecededWith.HasComment())
+                return SeparatorType.ContactSeparator;
+            return SeparatorType.Get(target.TokenClass, right.TokenClass);
+        }
+
+        internal static string FlatFormat
+            (this Syntax target, Configuration configuration)
+            => target.FlatFormat<StringResult, string>(configuration).Value;
+
 
         internal static bool IsLineBreakRequired(this Syntax syntax, Configuration configuration)
         {
-            var basicLineLength = syntax.BasicLineLength(configuration);
-            if(basicLineLength == null)
-                return true;
-            return basicLineLength > configuration.MaxLineLength;
+            var basicLineLength = syntax.FlatFormat<IntegerResult, int>(configuration)?.Value;
+            return basicLineLength == null || basicLineLength > configuration.MaxLineLength;
         }
     }
 }

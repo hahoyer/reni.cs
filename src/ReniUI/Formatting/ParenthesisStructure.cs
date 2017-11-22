@@ -7,25 +7,20 @@ using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
-    class ParenthesisStructure : DumpableObject, IStructure
+    sealed class ParenthesisStructure : Structure
     {
-        readonly StructFormatter Parent;
-
-        [EnableDump]
-        readonly Syntax Syntax;
-
         IStructure BodyValue;
         FormatterToken[] LeftValue;
         FormatterToken[] RightValue;
 
         public ParenthesisStructure(Syntax syntax, StructFormatter parent)
-        {
-            Syntax = syntax;
-            Parent = parent;
-        }
+            : base(syntax, parent) {}
 
-        Syntax IStructure.Syntax => Syntax;
-        IEnumerable<ISourcePartEdit> IStructure.GetSourcePartEdits(SourcePart targetPart)
+        IStructure Body => BodyValue ?? (BodyValue = GetBody());
+        FormatterToken[] Left => LeftValue ?? (LeftValue = FormatterToken.Create(Syntax.Left).ToArray());
+        FormatterToken[] Right => RightValue ?? (RightValue = FormatterToken.Create(Syntax).ToArray());
+
+        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart)
         {
             Tracer.Assert(Left.Length == 1);
             Tracer.Assert(Right.Length == 1);
@@ -43,10 +38,6 @@ namespace ReniUI.Formatting
             yield return Right.Single().ToSourcePartEdit();
         }
 
-        IStructure Body => BodyValue ?? (BodyValue = GetBody());
-        FormatterToken[] Left => LeftValue ?? (LeftValue = FormatterToken.Create(Syntax.Left).ToArray());
-        FormatterToken[] Right => RightValue ?? (RightValue = FormatterToken.Create(Syntax).ToArray());
-
         IStructure GetBody()
             => Syntax
                 .Left
@@ -54,6 +45,5 @@ namespace ReniUI.Formatting
                 .Right
                 .AssertNotNull()
                 .CreateBodyStruct(Parent);
-
     }
 }

@@ -8,7 +8,7 @@ using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
-    class FormatterToken : DumpableObject
+    sealed class FormatterToken : DumpableObject
     {
         public static IEnumerable<FormatterToken> Create(Syntax syntax)
         {
