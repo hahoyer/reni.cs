@@ -35,14 +35,8 @@ namespace ReniUI.Formatting
 
         public IEnumerable<Edit> GetEditPieces(SourcePosn sourcePosn, int currentLineBreakCount, int currentSpaceCount)
         {
-            if(currentLineBreakCount == LineBreakCount && currentSpaceCount == SpaceCount)
+            if(currentLineBreakCount == LineBreakCount && currentSpaceCount == SpaceCount && Indent == 0)
                 return new Edit[0];
-
-            if((currentLineBreakCount > 0 || LineBreakCount > 0) && Indent > 0)
-            {
-                NotImplementedMethod(sourcePosn, currentLineBreakCount, currentSpaceCount);
-                return null;
-            }
 
             if(currentLineBreakCount == 0 && currentSpaceCount == 0)
                 return new[] {Create(sourcePosn)};

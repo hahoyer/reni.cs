@@ -10,36 +10,10 @@ namespace ReniUI.Formatting
 {
     sealed class FormatterToken : DumpableObject
     {
-        public static IEnumerable<FormatterToken> Create(Syntax syntax)
-        {
-            var token = syntax.Token;
-            var start = token.SourcePart().Start;
-            var items = token.PrecededWith.ToArray();
-            var lineCount = 0;
-            var spaceCount = 0;
+        public static IEnumerable<FormatterToken> Create(Syntax syntax) => Create(syntax.Token, syntax.TokenClass);
 
-            foreach(var item in items)
-                if(item.IsLineBreak())
-                {
-                    spaceCount = 0;
-                    lineCount++;
-                }
-                else if(item.IsComment())
-                {
-                    var end = item.SourcePart.End;
-                    var span = start.Span(end);
-                    yield return new FormatterToken(lineCount, spaceCount, span, item, null);
-                    start = end;
-                }
-                else
-                    spaceCount++;
-
-            var sourcePart = start.Span(token.Characters.End);
-            var tokenClass = syntax.TokenClass;
-            yield return new FormatterToken(lineCount, spaceCount, sourcePart, null, tokenClass);
-        }
-
-        [EnableDumpExcept(null)]
+        static IEnumerable<FormatterToken> Create(IToken token, ITokenClass tokenClass)        {            var start = token.SourcePart().Start;            var items = token.PrecededWith.ToArray();            var lineCount = 0;            var spaceCount = 0;            foreach(var item in items)                if(item.IsLineBreak())                {                    spaceCount = 0;                    lineCount++;                }                else if(item.IsComment())                {                    var end = item.SourcePart.End;                    var span = start.Span(end);                    yield return new FormatterToken(lineCount, spaceCount, span, item, null);                    start = end;                }                else                    spaceCount++;            var sourcePart = start.Span(token.Characters.End);
+            yield return new FormatterToken(lineCount, spaceCount, sourcePart, null, tokenClass);        }        [EnableDumpExcept(null)]
         internal readonly IItem Item;
 
         [EnableDumpExcept(0)]

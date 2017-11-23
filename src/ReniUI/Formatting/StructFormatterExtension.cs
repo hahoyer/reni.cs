@@ -38,6 +38,7 @@ namespace ReniUI.Formatting
         {
             switch(syntax.TokenClass)
             {
+            case EndOfText _: return new FrameStructure(syntax, parent);
                 case RightParenthesis _: return new ParenthesisStructure(syntax, parent);
                 case Number _:
                     if(syntax.Right == null || syntax.Right.TokenClass is RightParenthesis)
@@ -170,4 +171,5 @@ namespace ReniUI.Formatting
             return basicLineLength == null || basicLineLength > configuration.MaxLineLength;
         }
     }
+
 }
