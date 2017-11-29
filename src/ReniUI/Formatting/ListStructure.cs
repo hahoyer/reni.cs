@@ -14,12 +14,11 @@ namespace ReniUI.Formatting
         public ListStructure(Syntax syntax, StructFormatter parent)
             : base(syntax, parent) {}
 
+        bool IsLineBreakRequired => Syntax.IsLineBreakRequired(Parent.Configuration);
 
-        bool HasLineBreak => Syntax.IsLineBreakRequired(Parent.Configuration);
-
-        IStructure[] BodyItems => BodyItemsValue ??
-                                  (BodyItemsValue =
-                                      GetBodyItems().Select(i => i.CreateListItemStruct(Parent)).ToArray());
+        IStructure[] BodyItems
+            => BodyItemsValue ??
+               (BodyItemsValue = GetBodyItems().Select(i => i.CreateListItemStruct(Parent)).ToArray());
 
         FormatterToken[][] ListItems => ListItemsValue ?? (ListItemsValue = GetListItems().ToArray());
 
@@ -29,18 +28,19 @@ namespace ReniUI.Formatting
             {
                 if(i > 0)
                 {
+                    Tracer.FlaggedLine(FlatResult);
                     if(Parent.Configuration.SpaceBeforeListItem)
                         yield return SourcePartEditExtension.Space;
 
                     foreach(var items in ListItems[i - 1])
                         yield return items.ToSourcePartEdit();
 
-                    if(!HasLineBreak && Parent.Configuration.SpaceAfterListItem)
+                    if(!IsLineBreakRequired && Parent.Configuration.SpaceAfterListItem)
                         yield return SourcePartEditExtension.Space;
-                }
 
-                if(HasLineBreak)
-                    yield return SourcePartEditExtension.LineBreak;
+                    if(IsLineBreakRequired)
+                        yield return SourcePartEditExtension.LineBreak;
+                }
 
                 foreach(var edit in BodyItems[i].GetSourcePartEdits(targetPart))
                     yield return edit;

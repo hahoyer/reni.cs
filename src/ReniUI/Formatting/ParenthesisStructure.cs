@@ -9,16 +9,22 @@ namespace ReniUI.Formatting
 {
     sealed class ParenthesisStructure : Structure
     {
+        readonly ValueCache<bool> IsLineBreakRequiredCache;
         IStructure BodyValue;
         FormatterToken[] LeftValue;
         FormatterToken[] RightValue;
 
         public ParenthesisStructure(Syntax syntax, StructFormatter parent)
-            : base(syntax, parent) {}
+            : base(syntax, parent)
+        {
+            IsLineBreakRequiredCache = new ValueCache<bool>(() => Syntax.IsLineBreakRequired(Parent.Configuration));
+        }
 
         IStructure Body => BodyValue ?? (BodyValue = GetBody());
         FormatterToken[] Left => LeftValue ?? (LeftValue = FormatterToken.Create(Syntax.Left).ToArray());
         FormatterToken[] Right => RightValue ?? (RightValue = FormatterToken.Create(Syntax).ToArray());
+
+        bool IsLineBreakRequired => IsLineBreakRequiredCache.Value;
 
         protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart)
         {
@@ -28,10 +34,13 @@ namespace ReniUI.Formatting
             yield return Left.Single().ToSourcePartEdit();
             yield return SourcePartEditExtension.IndentStart;
 
+            if(IsLineBreakRequired)
+                yield return SourcePartEditExtension.LineBreak;
+
             foreach(var edit in Body.GetSourcePartEdits(targetPart))
                 yield return edit;
 
-            if(Syntax.IsLineBreakRequired(Parent.Configuration))
+            if(IsLineBreakRequired)
                 yield return SourcePartEditExtension.LineBreak;
 
             yield return SourcePartEditExtension.IndentEnd;

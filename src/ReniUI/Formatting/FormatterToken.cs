@@ -10,48 +10,59 @@ namespace ReniUI.Formatting
 {
     sealed class FormatterToken : DumpableObject
     {
-        public static IEnumerable<FormatterToken> Create(Syntax syntax) => Create(syntax.Token, syntax.TokenClass);
+        internal static IEnumerable<FormatterToken> Create(Syntax syntax) => Create(syntax.Token);
 
-        static IEnumerable<FormatterToken> Create(IToken token, ITokenClass tokenClass)        {            var start = token.SourcePart().Start;            var items = token.PrecededWith.ToArray();            var lineCount = 0;            var spaceCount = 0;            foreach(var item in items)                if(item.IsLineBreak())                {                    spaceCount = 0;                    lineCount++;                }                else if(item.IsComment())                {                    var end = item.SourcePart.End;                    var span = start.Span(end);                    yield return new FormatterToken(lineCount, spaceCount, span, item, null);                    start = end;                }                else                    spaceCount++;            var sourcePart = start.Span(token.Characters.End);
-            yield return new FormatterToken(lineCount, spaceCount, sourcePart, null, tokenClass);        }        [EnableDumpExcept(null)]
-        internal readonly IItem Item;
-
-        [EnableDumpExcept(0)]
-        internal readonly int LineBreakCount;
-
-        internal readonly SourcePart SourcePart;
-
-        [EnableDumpExcept(0)]
-        internal readonly int SpaceCount;
-
-        [EnableDumpExcept(null)]
-        internal readonly ITokenClass Token;
-
-        FormatterToken(int lineBreakCount, int spaceCount, SourcePart sourcePart, IItem item, ITokenClass token)
+        static IEnumerable<FormatterToken> Create(IToken token)
         {
-            LineBreakCount = lineBreakCount;
-            SpaceCount = spaceCount;
-            SourcePart = sourcePart;
-            Item = item;
-            Token = token;
+            var anchor = token.SourcePart().Start;
+            var items = token.PrecededWith.ToArray();
+            var lineBreaks = new List<int>();
+            var spaces = new List<int>();
+
+            foreach(var item in items)
+                if(item.IsLineBreak())
+                {
+                    spaces = new List<int>();
+                    lineBreaks.Insert(0, item.SourcePart.Position);
+                    anchor = item.SourcePart.End;
+                }
+                else if(item.IsComment())
+                {
+                    yield return new FormatterToken(lineBreaks, anchor, spaces);
+                    spaces = new List<int>();
+                    lineBreaks = new List<int>();
+                }
+                else
+                    spaces.Add(item.SourcePart.EndPosition);
+
+            yield return new FormatterToken(lineBreaks, anchor, spaces);
         }
 
-        [DisableDump]
-        internal bool HasLineBreak => LineBreakCount > 0 || Item != null && Item.HasLines();
+        readonly SourcePosn Anchor;
+
+        readonly int[] LineBreaks;
+        readonly int[] Spaces;
+
+        FormatterToken
+        (
+            IEnumerable<int> lineBreaks,
+            SourcePosn anchor,
+            IEnumerable<int> spaces)
+        {
+            LineBreaks = lineBreaks.ToArray();
+            Anchor = anchor;
+            Spaces = spaces.ToArray();
+        }
+
+        [EnableDumpExcept(0)]
+        int LineBreakCount => LineBreaks.Length;
+
+        [EnableDumpExcept(0)]
+        int SpaceCount => Spaces.Length;
 
         internal SourcePartEdit ToSourcePartEdit() => new SourcePartEdit(this);
 
-        internal bool LineBreakScan(ref int? lineLength)
-        {
-            if(HasLineBreak)
-                return true;
-            if(lineLength == null)
-                return false;
-            lineLength -= SourcePart.Length;
-            return lineLength <= 0;
-        }
-
-        internal IEnumerable<Edit> GetEditPieces(EditPieceParameter parameter)
-            => parameter.GetEditPieces(SourcePart.Start, LineBreakCount, SpaceCount);
+        internal Edit GetEditPiece(EditPieceParameter parameter)
+            => parameter.GetEditPiece(LineBreaks, Anchor, Spaces);
     }
 }

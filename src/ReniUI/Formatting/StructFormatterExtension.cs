@@ -52,14 +52,6 @@ namespace ReniUI.Formatting
             return null;
         }
 
-        internal static bool LineBreakScan(this FormatterToken[] target, ref int? lineLength)
-        {
-            foreach(var token in target)
-                if(token.LineBreakScan(ref lineLength))
-                    return true;
-            return false;
-        }
-
         internal static IStructure CreateBodyStruct(this Syntax syntax, StructFormatter parent)
         {
             switch(syntax.TokenClass)
@@ -162,7 +154,7 @@ namespace ReniUI.Formatting
 
         internal static string FlatFormat
             (this Syntax target, Configuration configuration)
-            => target.FlatFormat<StringResult, string>(configuration).Value;
+            => target.FlatFormat<StringResult, string>(configuration)?.Value;
 
 
         internal static bool IsLineBreakRequired(this Syntax syntax, Configuration configuration)

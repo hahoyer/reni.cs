@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using hw.DebugFormatter;
+using hw.Helper;
 
 namespace ReniUI.Formatting
 {
@@ -10,7 +11,7 @@ namespace ReniUI.Formatting
 
         internal SourcePartEdit(FormatterToken source) => Source = source;
 
-        internal IEnumerable<Edit> GetEditPieces(EditPieceParameter parameter)
-            => Source.GetEditPieces(parameter);
+        internal Edit GetEditPiece(EditPieceParameter parameter)
+            => Source.GetEditPiece(parameter);
     }
 }

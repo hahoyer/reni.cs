@@ -7,7 +7,7 @@ namespace ReniUI.Formatting
 {
     static class SourcePartEditExtension
     {
-        class SpecialEdit : DumpableObject, ISourcePartEdit
+        sealed class SpecialEdit : DumpableObject, ISourcePartEdit
         {
             readonly string Id;
             public SpecialEdit(string id) => Id = id;
@@ -43,7 +43,9 @@ namespace ReniUI.Formatting
                     parameter.SpaceCount++;
                 else if(part is SourcePartEdit spe)
                 {
-                    result.AddRange(spe.GetEditPieces(parameter));
+                    var edit = spe.GetEditPiece(parameter);
+                    if(edit != null)
+                        result.Add(edit);
                     parameter.Reset();
                 }
                 else

@@ -7,7 +7,7 @@ using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
-    class FrameStructure : Structure
+    sealed class FrameStructure : Structure
     {
         IStructure BodyValue;
         FormatterToken[] RightValue;

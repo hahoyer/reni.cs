@@ -33,16 +33,49 @@ namespace ReniUI.Formatting
             SpaceCount = 0;
         }
 
-        public IEnumerable<Edit> GetEditPieces(SourcePosn sourcePosn, int currentLineBreakCount, int currentSpaceCount)
+        internal Edit GetEditPiece(int[] currentLineBreaks, SourcePosn anchor, int[] currentSpaces)
         {
-            if(currentLineBreakCount == LineBreakCount && currentSpaceCount == SpaceCount && Indent == 0)
-                return new Edit[0];
+            var lineBreakPart = GetLineBreakPart(currentLineBreaks, anchor);
+            var spacesPart = GetSpacesPart(anchor, currentSpaces);
 
-            if(currentLineBreakCount == 0 && currentSpaceCount == 0)
-                return new[] {Create(sourcePosn)};
+            var location = lineBreakPart.start.Span(spacesPart.end);
+            var newText = lineBreakPart.text + spacesPart.text;
 
-            NotImplementedMethod(sourcePosn, currentLineBreakCount, currentSpaceCount);
-            return null;
+            if(location.Length == 0 && newText == "")
+                return null;
+
+            return
+                new Edit
+                {
+                    Location = location,
+                    NewText = newText
+                };
+        }
+
+        (string text, SourcePosn end) GetSpacesPart(SourcePosn anchor, int[] currentSpaces)
+        {
+            var newspacesCount = SpaceCount;
+            if(LineBreakCount > 0)
+                newspacesCount += Indent * Configuration.IndentCount;
+
+            var spaceDelta = newspacesCount - currentSpaces.Length;
+
+            return spaceDelta > 0
+                ? (" ".Repeat(spaceDelta), anchor)
+                : spaceDelta == 0
+                    ? ("", anchor)
+                    : ("", anchor.Source + currentSpaces[-spaceDelta - 1]);
+        }
+
+        (SourcePosn start, string text) GetLineBreakPart(int[] currentLineBreaks, SourcePosn anchor)
+        {
+            var lineBreaksDelta = LineBreakCount - currentLineBreaks.Length;
+
+            if(lineBreaksDelta > 0)
+                return (anchor, "\n".Repeat(lineBreaksDelta));
+            if(lineBreaksDelta == 0)
+                return (anchor, "");
+            return (anchor.Source + currentLineBreaks[-lineBreaksDelta - 1], "");
         }
     }
 }

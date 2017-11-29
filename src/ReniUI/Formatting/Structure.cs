@@ -24,6 +24,6 @@ namespace ReniUI.Formatting
         protected abstract IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart);
 
         [EnableDump]
-        string FlatResult => Syntax.FlatFormat(Parent.Configuration);
+        protected string FlatResult => Syntax.FlatFormat(Parent.Configuration);
     }
 }
