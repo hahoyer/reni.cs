@@ -9,6 +9,7 @@ namespace ReniUI.Formatting
     {
         readonly Configuration Configuration;
         public int Indent;
+        public bool IsEndOfFile;
         public int LineBreakCount;
         public int SpaceCount;
 
@@ -70,22 +71,7 @@ namespace ReniUI.Formatting
 
         (int startPosition, string text) GetLineBreakPart(bool hasCommentLineBreak, int[] currentLineBreaks)
         {
-            var newLineBreakCount = LineBreakCount;
-            if(hasCommentLineBreak)
-                newLineBreakCount--;
-
-            if(Configuration.EmptyLineLimit == null)
-                newLineBreakCount = currentLineBreaks.Length;
-            else
-                newLineBreakCount = Math.Max
-                (
-                    newLineBreakCount,
-                    Math.Min
-                    (
-                        Configuration.EmptyLineLimit.Value,
-                        currentLineBreaks.Length
-                    )
-                );
+            var newLineBreakCount = NewLineBreakCount(hasCommentLineBreak, currentLineBreaks.Length);
 
             var delta = newLineBreakCount - currentLineBreaks.Length;
 
@@ -94,6 +80,22 @@ namespace ReniUI.Formatting
                 delta < 0 ? currentLineBreaks[newLineBreakCount] : 0,
                 delta > 0 ? "\n".Repeat(delta) : ""
                 );
+        }
+
+        int NewLineBreakCount(bool hasCommentLineBreak, int currentLineBreaks)
+        {
+            if(IsEndOfFile && Configuration.LineBreakAtEndOfText != null)
+                return Configuration.LineBreakAtEndOfText.Value ? 1 : 0;
+            
+            var effectiveLineBreakCount = currentLineBreaks;
+            
+            var emptyLineLimit = Configuration.EmptyLineLimit;
+
+            if(emptyLineLimit != null && effectiveLineBreakCount > emptyLineLimit.Value)
+                effectiveLineBreakCount = emptyLineLimit.Value;
+
+            var result = LineBreakCount - (hasCommentLineBreak ? 1 : 0);
+            return result > effectiveLineBreakCount ? result : effectiveLineBreakCount;
         }
     }
 }

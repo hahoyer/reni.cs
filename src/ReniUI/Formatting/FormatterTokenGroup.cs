@@ -29,22 +29,29 @@ namespace ReniUI.Formatting
         {
             Tracer.Assert(!Prefix.Any());
 
-            var result = new List<ISourcePartEdit>();
             if(configuration.SpaceBeforeListItem)
-                result.Add(SourcePartEditExtension.Space);
+                yield return SourcePartEditExtension.Space;
 
             if(configuration.SpaceAfterListItem)
-                result.Add(SourcePartEditExtension.Space);
+                yield return SourcePartEditExtension.Space;
 
             var suffix = Suffix.Select(items => items.ToSourcePartEdit());
             foreach(var item in suffix)
             {
                 if(isLineBreakRequired)
-                    result.Add(SourcePartEditExtension.LineBreak);
-                result.Add(item);
+                    yield return SourcePartEditExtension.LineBreak;
+                yield return item;
             }
+        }
 
-            return result;
+        internal IEnumerable<ISourcePartEdit> FormatFrameEnd(Configuration configuration)
+        {
+            for(var i = 0; i < Prefix.Length; i++)
+            {
+                if(i >= Prefix.Length - 1)
+                    yield return SourcePartEditExtension.EndOfFile;
+                yield return Prefix[i].ToSourcePartEdit();
+            }
         }
     }
 }

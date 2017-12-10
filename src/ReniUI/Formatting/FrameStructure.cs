@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 using Reni.TokenClasses;
@@ -10,21 +9,19 @@ namespace ReniUI.Formatting
     sealed class FrameStructure : Structure
     {
         IStructure BodyValue;
-        FormatterToken[] RightValue;
+        FormatterTokenGroup RightValue;
 
         public FrameStructure(Syntax syntax, StructFormatter parent)
             : base(syntax, parent) {}
 
         IStructure Body => BodyValue ?? (BodyValue = GetBody());
-        FormatterToken[] Right => RightValue ?? (RightValue = FormatterTokenGroup.Create(Syntax).Prefix.ToArray());
+        FormatterTokenGroup Right => RightValue ?? (RightValue = FormatterTokenGroup.Create(Syntax));
 
         protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart, bool? exlucdePrefix)
         {
-            foreach(var edit in Body.GetSourcePartEdits(targetPart, exlucdePrefix))
-                yield return edit;
-
-            if(Syntax.IsLineBreakRequired(Parent.Configuration))
-                yield return SourcePartEditExtension.LineBreak;
+            return
+                Body.GetSourcePartEdits(targetPart, exlucdePrefix)
+                    .Concat(Right.FormatFrameEnd(Parent.Configuration));
         }
 
         IStructure GetBody()

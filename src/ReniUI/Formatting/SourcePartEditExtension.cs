@@ -19,6 +19,7 @@ namespace ReniUI.Formatting
         internal static readonly ISourcePartEdit Space = new SpecialEdit("Space");
         internal static readonly ISourcePartEdit IndentStart = new SpecialEdit("IndentStart");
         internal static readonly ISourcePartEdit IndentEnd = new SpecialEdit("IndentEnd");
+        internal static readonly ISourcePartEdit EndOfFile = new SpecialEdit("EndOfFile");
 
         internal static IEnumerable<Edit> GetEditPieces
             (this IEnumerable<ISourcePartEdit> target, SourcePart targetPart, Configuration configuration)
@@ -44,6 +45,8 @@ namespace ReniUI.Formatting
                 }
                 else if(part == Space)
                     parameter.SpaceCount++;
+                else if(part == EndOfFile)
+                    parameter.IsEndOfFile = true;
                 else if(part is SourcePartEdit spe)
                 {
                     var edit = spe.GetEditPiece(parameter);
