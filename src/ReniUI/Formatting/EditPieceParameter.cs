@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
@@ -33,12 +33,13 @@ namespace ReniUI.Formatting
             SpaceCount = 0;
         }
 
-        internal Edit GetEditPiece(int[] currentLineBreaks, SourcePosn anchor, int[] currentSpaces)
+        internal Edit GetEditPiece
+            (bool hasCommentLineBreak, int[] currentLineBreaks, SourcePosn anchor, int[] currentSpaces)
         {
-            var lineBreakPart = GetLineBreakPart(currentLineBreaks, anchor);
-            var spacesPart = GetSpacesPart(anchor, currentSpaces);
+            var lineBreakPart = GetLineBreakPart(hasCommentLineBreak, currentLineBreaks);
+            var spacesPart = GetSpacesPart(currentSpaces);
 
-            var location = lineBreakPart.start.Span(spacesPart.end);
+            var location = (anchor + lineBreakPart.startPosition).Span(anchor + spacesPart.endPosition);
             var newText = lineBreakPart.text + spacesPart.text;
 
             if(location.Length == 0 && newText == "")
@@ -52,30 +53,47 @@ namespace ReniUI.Formatting
                 };
         }
 
-        (string text, SourcePosn end) GetSpacesPart(SourcePosn anchor, int[] currentSpaces)
+        (string text, int endPosition) GetSpacesPart(int[] currentSpaces)
         {
             var newspacesCount = SpaceCount;
             if(LineBreakCount > 0)
                 newspacesCount += Indent * Configuration.IndentCount;
 
-            var spaceDelta = newspacesCount - currentSpaces.Length;
+            var delta = newspacesCount - currentSpaces.Length;
 
-            return spaceDelta > 0
-                ? (" ".Repeat(spaceDelta), anchor)
-                : spaceDelta == 0
-                    ? ("", anchor)
-                    : ("", anchor.Source + currentSpaces[-spaceDelta - 1]);
+            return
+                (
+                delta > 0 ? " ".Repeat(delta) : "",
+                delta < 0 ? currentSpaces[-delta - 1] : 0
+                );
         }
 
-        (SourcePosn start, string text) GetLineBreakPart(int[] currentLineBreaks, SourcePosn anchor)
+        (int startPosition, string text) GetLineBreakPart(bool hasCommentLineBreak, int[] currentLineBreaks)
         {
-            var lineBreaksDelta = LineBreakCount - currentLineBreaks.Length;
+            var newLineBreakCount = LineBreakCount;
+            if(hasCommentLineBreak)
+                newLineBreakCount--;
 
-            if(lineBreaksDelta > 0)
-                return (anchor, "\n".Repeat(lineBreaksDelta));
-            if(lineBreaksDelta == 0)
-                return (anchor, "");
-            return (anchor.Source + currentLineBreaks[-lineBreaksDelta - 1], "");
+            if(Configuration.EmptyLineLimit == null)
+                newLineBreakCount = currentLineBreaks.Length;
+            else
+                newLineBreakCount = Math.Max
+                (
+                    newLineBreakCount,
+                    Math.Min
+                    (
+                        Configuration.EmptyLineLimit.Value,
+                        currentLineBreaks.Length
+                    )
+                );
+
+            var delta = newLineBreakCount - currentLineBreaks.Length;
+
+            return
+                (
+                delta < 0 ? currentLineBreaks[newLineBreakCount] : 0,
+                delta > 0 ? "\n".Repeat(delta) : ""
+                );
         }
     }
 }

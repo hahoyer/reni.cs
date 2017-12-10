@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.TokenClasses;
 
@@ -9,7 +8,7 @@ namespace ReniUI.Formatting
     sealed class ListStructure : Structure
     {
         IStructure[] BodyItemsValue;
-        FormatterToken[][] ListItemsValue;
+        FormatterTokenGroup[] ListItemsValue;
 
         public ListStructure(Syntax syntax, StructFormatter parent)
             : base(syntax, parent) {}
@@ -20,31 +19,19 @@ namespace ReniUI.Formatting
             => BodyItemsValue ??
                (BodyItemsValue = GetBodyItems().Select(i => i.CreateListItemStruct(Parent)).ToArray());
 
-        FormatterToken[][] ListItems => ListItemsValue ?? (ListItemsValue = GetListItems().ToArray());
+        FormatterTokenGroup[] ListItems => ListItemsValue ?? (ListItemsValue = GetListItems().ToArray());
 
-        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart)
+        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart, bool? exlucdePrefix)
+            => BodyItems
+                .SelectMany((item, index) => GetSourcePartEdits(targetPart, item, index - 1, exlucdePrefix));
+
+        IEnumerable<ISourcePartEdit> GetSourcePartEdits
+            (SourcePart targetPart, IStructure item, int index, bool? exlucdePrefix)
         {
-            for(var i = 0; i <= ListItems.Length; i++)
-            {
-                if(i > 0)
-                {
-                    Tracer.FlaggedLine(FlatResult);
-                    if(Parent.Configuration.SpaceBeforeListItem)
-                        yield return SourcePartEditExtension.Space;
-
-                    foreach(var items in ListItems[i - 1])
-                        yield return items.ToSourcePartEdit();
-
-                    if(!IsLineBreakRequired && Parent.Configuration.SpaceAfterListItem)
-                        yield return SourcePartEditExtension.Space;
-
-                    if(IsLineBreakRequired)
-                        yield return SourcePartEditExtension.LineBreak;
-                }
-
-                foreach(var edit in BodyItems[i].GetSourcePartEdits(targetPart))
-                    yield return edit;
-            }
+            var result = item.GetSourcePartEdits(targetPart, index < 0 ? exlucdePrefix : true);
+            return index >= 0
+                ? ListItems[index].FormatListItem(IsLineBreakRequired, Parent.Configuration).Concat(result)
+                : result;
         }
 
         IEnumerable<Syntax> GetBodyItems()
@@ -54,7 +41,6 @@ namespace ReniUI.Formatting
             do
             {
                 yield return current.Left;
-                Tracer.Assert(FormatterToken.Create(Syntax).Count() == 1);
                 current = current.Right;
             }
             while(current.TokenClass == main);
@@ -62,15 +48,13 @@ namespace ReniUI.Formatting
             yield return current;
         }
 
-        IEnumerable<FormatterToken[]> GetListItems()
+        IEnumerable<FormatterTokenGroup> GetListItems()
         {
             var main = Syntax.TokenClass;
             var current = Syntax;
             do
             {
-                var items = FormatterToken.Create(current).ToArray();
-                Tracer.Assert(items.Length == 1);
-                yield return items;
+                yield return FormatterTokenGroup.Create(current);
                 current = current.Right;
             }
             while(current.TokenClass == main);

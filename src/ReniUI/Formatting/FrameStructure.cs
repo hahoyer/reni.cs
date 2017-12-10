@@ -16,19 +16,15 @@ namespace ReniUI.Formatting
             : base(syntax, parent) {}
 
         IStructure Body => BodyValue ?? (BodyValue = GetBody());
-        FormatterToken[] Right => RightValue ?? (RightValue = FormatterToken.Create(Syntax).ToArray());
+        FormatterToken[] Right => RightValue ?? (RightValue = FormatterTokenGroup.Create(Syntax).Prefix.ToArray());
 
-        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart)
+        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart, bool? exlucdePrefix)
         {
-            Tracer.Assert(Right.Length == 1);
-
-            foreach(var edit in Body.GetSourcePartEdits(targetPart))
+            foreach(var edit in Body.GetSourcePartEdits(targetPart, exlucdePrefix))
                 yield return edit;
 
             if(Syntax.IsLineBreakRequired(Parent.Configuration))
                 yield return SourcePartEditExtension.LineBreak;
-
-            yield return Right.Single().ToSourcePartEdit();
         }
 
         IStructure GetBody()

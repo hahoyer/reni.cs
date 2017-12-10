@@ -45,6 +45,7 @@
     <Compile Include="Formatting\EditPieceParameter.cs" />
     <Compile Include="Formatting\FormatterExtension.cs" />
     <Compile Include="Formatting\FormatterToken.cs" />
+    <Compile Include="Formatting\FormatterTokenGroup.cs" />
     <Compile Include="Formatting\FrameStructure.cs" />
     <Compile Include="Formatting\IResultItem.cs" />
     <Compile Include="Formatting\IStructure.cs" />

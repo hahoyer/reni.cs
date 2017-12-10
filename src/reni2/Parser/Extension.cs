@@ -79,6 +79,9 @@ namespace Reni.Parser
         internal static bool IsLineBreak(this IItem item)
             => Lexer.IsLineEnd(item);
 
+        internal static bool IsWhiteSpace(this IItem item)
+            => Lexer.IsWhiteSpace(item);
+
         public static int Length(this IEnumerable<Lexer.WhiteSpaceToken> whiteSpaceTokens)
             => whiteSpaceTokens.Sum(item => item.Characters.Id.Length);
 

@@ -7,8 +7,8 @@ namespace ReniUI.Formatting
 {
     abstract class Structure : DumpableObject, IStructure
     {
-        protected readonly Syntax Syntax;
         protected readonly StructFormatter Parent;
+        protected readonly Syntax Syntax;
 
         protected Structure(Syntax syntax, StructFormatter parent)
         {
@@ -18,12 +18,12 @@ namespace ReniUI.Formatting
 
         Syntax IStructure.Syntax => Syntax;
 
-        IEnumerable<ISourcePartEdit> IStructure.GetSourcePartEdits(SourcePart targetPart)
-            => GetSourcePartEdits(targetPart);
-
-        protected abstract IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart);
+        IEnumerable<ISourcePartEdit> IStructure.GetSourcePartEdits(SourcePart targetPart, bool? exlucdePrefix)
+            => GetSourcePartEdits(targetPart, exlucdePrefix);
 
         [EnableDump]
         protected string FlatResult => Syntax.FlatFormat(Parent.Configuration);
+
+        protected abstract IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart, bool? exlucdePrefix);
     }
 }

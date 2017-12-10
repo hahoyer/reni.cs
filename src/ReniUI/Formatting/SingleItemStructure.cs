@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Scanner;
+using Reni.Parser;
 using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
@@ -15,7 +16,13 @@ namespace ReniUI.Formatting
             Tracer.Assert(Syntax.Right == null);
         }
 
-        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart)
-            => FormatterToken.Create(Syntax).Select(item => item.ToSourcePartEdit());
+        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart, bool? exlucdePrefix)
+        {
+            var tokenGroup = FormatterTokenGroup.Create(Syntax);
+            if(exlucdePrefix == null)
+                Tracer.Assert(!tokenGroup.Prefix.Any());
+
+            return tokenGroup.Prefix.Select(item => item.ToSourcePartEdit());
+        }
     }
 }

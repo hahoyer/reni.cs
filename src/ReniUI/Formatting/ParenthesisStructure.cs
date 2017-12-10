@@ -11,8 +11,8 @@ namespace ReniUI.Formatting
     {
         readonly ValueCache<bool> IsLineBreakRequiredCache;
         IStructure BodyValue;
-        FormatterToken[] LeftValue;
-        FormatterToken[] RightValue;
+        FormatterTokenGroup LeftValue;
+        FormatterTokenGroup RightValue;
 
         public ParenthesisStructure(Syntax syntax, StructFormatter parent)
             : base(syntax, parent)
@@ -21,17 +21,18 @@ namespace ReniUI.Formatting
         }
 
         IStructure Body => BodyValue ?? (BodyValue = GetBody());
-        FormatterToken[] Left => LeftValue ?? (LeftValue = FormatterToken.Create(Syntax.Left).ToArray());
-        FormatterToken[] Right => RightValue ?? (RightValue = FormatterToken.Create(Syntax).ToArray());
+        FormatterTokenGroup Left => LeftValue ?? (LeftValue = FormatterTokenGroup.Create(Syntax.Left));
+        FormatterTokenGroup Right => RightValue ?? (RightValue = FormatterTokenGroup.Create(Syntax));
 
         bool IsLineBreakRequired => IsLineBreakRequiredCache.Value;
 
-        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart)
+        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart, bool? exlucdePrefix)
         {
-            Tracer.Assert(Left.Length == 1);
-            Tracer.Assert(Right.Length == 1);
+            Tracer.Assert(!Left.Prefix.Any());
+            Tracer.Assert(!Left.Suffix.Any());
+            Tracer.Assert(!Right.Prefix.Any());
+            Tracer.Assert(!Right.Suffix.Any());
 
-            yield return Left.Single().ToSourcePartEdit();
             yield return SourcePartEditExtension.IndentStart;
 
             if(IsLineBreakRequired)
@@ -44,7 +45,6 @@ namespace ReniUI.Formatting
                 yield return SourcePartEditExtension.LineBreak;
 
             yield return SourcePartEditExtension.IndentEnd;
-            yield return Right.Single().ToSourcePartEdit();
         }
 
         IStructure GetBody()

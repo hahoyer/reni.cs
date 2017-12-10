@@ -4,65 +4,80 @@ using hw.DebugFormatter;
 using hw.Parser;
 using hw.Scanner;
 using Reni.Parser;
-using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
     sealed class FormatterToken : DumpableObject
     {
-        internal static IEnumerable<FormatterToken> Create(Syntax syntax) => Create(syntax.Token);
+        internal static IEnumerable<FormatterToken> CreateOther(IToken other)
+            => other == null ? Enumerable.Empty<FormatterToken>() : Create(other);
 
-        static IEnumerable<FormatterToken> Create(IToken token)
+        internal static IEnumerable<FormatterToken> Create(IToken token)
         {
             var anchor = token.SourcePart().Start;
             var items = token.PrecededWith.ToArray();
-            var lineBreaks = new List<int>();
-            var spaces = new List<int>();
+            var hasCommentLineBreak = false;
+            var lineBreaks = new List<SourcePosn>();
+            var spaces = new List<SourcePosn>();
 
             foreach(var item in items)
+            {
+                if(item.IsComment() && (lineBreaks.Any() || spaces.Any()))
+                {
+                    yield return new FormatterToken(hasCommentLineBreak, lineBreaks, anchor, spaces);
+                    hasCommentLineBreak = false;
+                    lineBreaks = new List<SourcePosn>();
+                    spaces = new List<SourcePosn>();
+                }
+
+                if(item.IsWhiteSpace())
+                    spaces.Add(item.SourcePart.End);
+                else
+                    anchor = item.SourcePart.End;
+
                 if(item.IsLineBreak())
                 {
-                    spaces = new List<int>();
-                    lineBreaks.Insert(0, item.SourcePart.Position);
-                    anchor = item.SourcePart.End;
+                    spaces = new List<SourcePosn>();
+                    lineBreaks.Add(item.SourcePart.Start);
                 }
-                else if(item.IsComment())
-                {
-                    yield return new FormatterToken(lineBreaks, anchor, spaces);
-                    spaces = new List<int>();
-                    lineBreaks = new List<int>();
-                }
-                else
-                    spaces.Add(item.SourcePart.EndPosition);
 
-            yield return new FormatterToken(lineBreaks, anchor, spaces);
+                if(Lexer.IsLineComment(item))
+                    hasCommentLineBreak = true;
+            }
+
+            if(lineBreaks.Any() || spaces.Any())
+                yield return new FormatterToken(hasCommentLineBreak, lineBreaks, anchor, spaces);
         }
 
+        [EnableDump]
         readonly SourcePosn Anchor;
 
+        [EnableDumpExcept(false)]
+        readonly bool HasCommentLineBreak;
+
+        [EnableDump]
         readonly int[] LineBreaks;
+
+        [EnableDump]
         readonly int[] Spaces;
 
         FormatterToken
         (
-            IEnumerable<int> lineBreaks,
+            bool hasCommentLineBreak,
+            IEnumerable<SourcePosn> lineBreaks,
             SourcePosn anchor,
-            IEnumerable<int> spaces)
+            IEnumerable<SourcePosn> spaces)
         {
-            LineBreaks = lineBreaks.ToArray();
+            HasCommentLineBreak = hasCommentLineBreak;
             Anchor = anchor;
-            Spaces = spaces.ToArray();
+            LineBreaks = lineBreaks.Select(index => index - anchor).ToArray();
+            Spaces = spaces.Select(index => index - anchor).ToArray();
+            StopByObjectIds(223, 224);
         }
-
-        [EnableDumpExcept(0)]
-        int LineBreakCount => LineBreaks.Length;
-
-        [EnableDumpExcept(0)]
-        int SpaceCount => Spaces.Length;
 
         internal SourcePartEdit ToSourcePartEdit() => new SourcePartEdit(this);
 
         internal Edit GetEditPiece(EditPieceParameter parameter)
-            => parameter.GetEditPiece(LineBreaks, Anchor, Spaces);
+            => parameter.GetEditPiece(HasCommentLineBreak, LineBreaks, Anchor, Spaces);
     }
 }

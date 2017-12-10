@@ -20,18 +20,22 @@ namespace ReniUI.Formatting
         bool IsMultiLine => false;
         bool IsInnerMultiLine => false;
 
-        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart)
+        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart, bool? exlucdePrefix)
         {
             if(IsMultiLine)
                 yield return SourcePartEditExtension.IndentEnd;
 
-            foreach(var edit in Left.GetSourcePartEdits(targetPart))
+            foreach(var edit in Left.GetSourcePartEdits(targetPart, exlucdePrefix))
                 yield return edit;
 
             if(Syntax.LeftSideSeparator() == SeparatorType.CloseSeparator)
                 yield return SourcePartEditExtension.Space;
 
-            foreach(var edit in FormatterToken.Create(Syntax).Select(i => i.ToSourcePartEdit()))
+            var declarationToken = FormatterTokenGroup.Create(Syntax);
+            foreach(var edit in declarationToken.Prefix.Select(i => i.ToSourcePartEdit()))
+                yield return edit;
+
+            foreach(var edit in declarationToken.Suffix.Select(i => i.ToSourcePartEdit()))
                 yield return edit;
 
             if(IsMultiLine)
@@ -42,7 +46,7 @@ namespace ReniUI.Formatting
             else if(Syntax.RightSideSeparator() == SeparatorType.CloseSeparator)
                 yield return SourcePartEditExtension.Space;
 
-            foreach(var edit in Right.GetSourcePartEdits(targetPart))
+            foreach(var edit in Right.GetSourcePartEdits(targetPart, false))
                 yield return edit;
 
             if(IsMultiLine)

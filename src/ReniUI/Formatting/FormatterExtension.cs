@@ -54,7 +54,7 @@ namespace ReniUI.Formatting
                 var length = edit.Location.Position - current;
                 result += original.Substring(current, length);
                 result += edit.NewText;
-                current += length;
+                current = edit.Location.EndPosition;
             }
 
             result += original.Substring(current);

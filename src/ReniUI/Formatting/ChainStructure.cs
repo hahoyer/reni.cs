@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.TokenClasses;
 
@@ -10,15 +11,22 @@ namespace ReniUI.Formatting
         public ChainStructure(Syntax syntax, StructFormatter parent)
             : base(syntax, parent) {}
 
-        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart)
+        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart, bool? exlucdePrefix)
         {
             if(Syntax.Left == null && Syntax.Right == null)
-                return FormatterToken.Create(Syntax).Select(item => item.ToSourcePartEdit());
+            {
+                if(exlucdePrefix == true)
+                    return Enumerable.Empty<ISourcePartEdit>();
 
-            NotImplementedMethod(targetPart);
+                var tokenGroup = FormatterTokenGroup.Create(Syntax);
+                if(exlucdePrefix == null)
+                    Tracer.Assert(!tokenGroup.Prefix.Any());
+
+                return tokenGroup.Prefix.Select(item => item.ToSourcePartEdit());
+            }
+
+            NotImplementedMethod(targetPart, exlucdePrefix);
             return null;
         }
     }
 }
-
-    

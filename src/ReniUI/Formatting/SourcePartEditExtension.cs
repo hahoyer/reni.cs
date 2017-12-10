@@ -38,7 +38,10 @@ namespace ReniUI.Formatting
                 else if(part == IndentEnd)
                     --parameter.Indent;
                 else if(part == LineBreak)
+                {
                     parameter.LineBreakCount++;
+                    parameter.SpaceCount = 0;
+                }
                 else if(part == Space)
                     parameter.SpaceCount++;
                 else if(part is SourcePartEdit spe)
