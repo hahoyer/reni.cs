@@ -17,8 +17,8 @@ namespace ReniUI.Formatting
         IStructure Left => LeftValue ?? (LeftValue = GetLeft());
         IStructure Right => RightValue ?? (RightValue = GetRight());
 
-        bool IsMultiLine => false;
-        bool IsInnerMultiLine => false;
+        static bool IsMultiLine => false;
+        static bool IsInnerMultiLine => false;
 
         protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart, bool? exlucdePrefix)
         {
@@ -28,14 +28,14 @@ namespace ReniUI.Formatting
             foreach(var edit in Left.GetSourcePartEdits(targetPart, exlucdePrefix))
                 yield return edit;
 
-            if(Syntax.LeftSideSeparator() == SeparatorType.CloseSeparator)
-                yield return SourcePartEditExtension.Space;
-
             var declarationToken = FormatterTokenGroup.Create(Syntax);
-            foreach(var edit in declarationToken.Prefix.Select(i => i.ToSourcePartEdit()))
+            foreach(var edit in declarationToken.Prefix)
                 yield return edit;
+            if (Syntax.LeftSideSeparator() == SeparatorType.CloseSeparator)
+                yield return SourcePartEditExtension.Space;
+            yield return declarationToken.Main;
 
-            foreach(var edit in declarationToken.Suffix.Select(i => i.ToSourcePartEdit()))
+            foreach (var edit in declarationToken.Suffix)
                 yield return edit;
 
             if(IsMultiLine)

@@ -5,6 +5,7 @@ using hw.Helper;
 using hw.Scanner;
 using Reni.TokenClasses;
 
+
 namespace ReniUI.Formatting
 {
     sealed class ParenthesisStructure : Structure
@@ -28,23 +29,39 @@ namespace ReniUI.Formatting
 
         protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart, bool? exlucdePrefix)
         {
-            Tracer.Assert(!Left.Prefix.Any());
-            Tracer.Assert(!Left.Suffix.Any());
-            Tracer.Assert(!Right.Prefix.Any());
-            Tracer.Assert(!Right.Suffix.Any());
+            foreach(var edit in Left.Prefix)
+                yield return edit;
+
+            yield return Left.Main;
+
 
             yield return SourcePartEditExtension.IndentStart;
 
             if(IsLineBreakRequired)
                 yield return SourcePartEditExtension.LineBreak;
 
-            foreach(var edit in Body.GetSourcePartEdits(targetPart))
+            foreach (var edit in Left.Suffix)
                 yield return edit;
 
-            if(IsLineBreakRequired)
-                yield return SourcePartEditExtension.LineBreak;
+
+            foreach (var edit in Body.GetSourcePartEdits(targetPart))
+                yield return edit;
+
+            foreach(var edit in Right.Prefix)
+            {
+                if (IsLineBreakRequired)
+                    yield return SourcePartEditExtension.LineBreak;
+
+                yield return edit;
+            }
 
             yield return SourcePartEditExtension.IndentEnd;
+            yield return Right.Main;
+
+            foreach (var edit in Right.Suffix)
+                yield return edit;
+
+
         }
 
         IStructure GetBody()

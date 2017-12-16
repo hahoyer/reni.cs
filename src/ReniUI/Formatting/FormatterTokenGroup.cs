@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Parser;
 using Reni.TokenClasses;
+
 
 namespace ReniUI.Formatting
 {
@@ -10,33 +12,60 @@ namespace ReniUI.Formatting
         internal static FormatterTokenGroup Create(Syntax syntax) => new FormatterTokenGroup(syntax);
         readonly Syntax Syntax;
 
-        FormatterToken[] PrefixData;
+        SourcePartEdit[] PrefixData;
         FormatterToken[] PrefixResultData;
-        FormatterToken[] SuffixData;
+        SourcePartEdit[] SuffixData;
+        SourcePartEdit MainData;
 
         FormatterTokenGroup(Syntax syntax) => Syntax = syntax;
 
-        internal FormatterToken[] Prefix
-            => PrefixData ?? (PrefixData = PrefixResult.ToArray());
+        internal SourcePartEdit[] Prefix
+        {
+            get
+            {
+                EnsurePrefixResult();
+                return PrefixData;
+            }
+        }
 
-        internal FormatterToken[] Suffix
-            => SuffixData ?? (SuffixData = FormatterToken.CreateOther(Syntax.Right?.LeftMost.Token).ToArray());
+        internal SourcePartEdit Main
+        {
+            get
+            {
+                EnsurePrefixResult();
+                return MainData;
+            }
+        }
 
-        FormatterToken[] PrefixResult
-            => PrefixResultData ?? (PrefixResultData = FormatterToken.Create(Syntax.Token).ToArray());
+        void EnsurePrefixResult()
+        {
+            if(MainData != null && PrefixData != null)
+                return;
+            var prefix = CreateSourcePartEdits(Syntax.Token);
+            MainData = prefix.Last();
+            PrefixData = prefix.Take(prefix.Length - 1).ToArray();
+        }
+
+        static SourcePartEdit[] CreateSourcePartEdits(IToken token, bool returnMain = true) 
+            => FormatterToken.Create(token, returnMain).Select(i => i.ToSourcePartEdit()).ToArray();
+
+        internal SourcePartEdit[] Suffix 
+            => SuffixData ?? (SuffixData = CreateSourcePartEdits(Syntax.Right?.LeftMost.Token, false));
 
         internal IEnumerable<ISourcePartEdit> FormatListItem(bool isLineBreakRequired, Configuration configuration)
         {
-            Tracer.Assert(!Prefix.Any());
+            foreach(var edit in Prefix)
+                yield return edit;
 
             if(configuration.SpaceBeforeListItem)
                 yield return SourcePartEditExtension.Space;
 
+            yield return Main;
+
             if(configuration.SpaceAfterListItem)
                 yield return SourcePartEditExtension.Space;
 
-            var suffix = Suffix.Select(items => items.ToSourcePartEdit());
-            foreach(var item in suffix)
+            foreach(var item in Suffix)
             {
                 if(isLineBreakRequired)
                     yield return SourcePartEditExtension.LineBreak;
@@ -46,12 +75,11 @@ namespace ReniUI.Formatting
 
         internal IEnumerable<ISourcePartEdit> FormatFrameEnd(Configuration configuration)
         {
-            for(var i = 0; i < Prefix.Length; i++)
-            {
-                if(i >= Prefix.Length - 1)
-                    yield return SourcePartEditExtension.EndOfFile;
-                yield return Prefix[i].ToSourcePartEdit();
-            }
+            foreach(var edit in Prefix)
+                yield return edit;
+
+            yield return SourcePartEditExtension.EndOfFile;
+            yield return Main;
         }
     }
 }

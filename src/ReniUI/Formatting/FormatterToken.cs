@@ -5,15 +5,16 @@ using hw.Parser;
 using hw.Scanner;
 using Reni.Parser;
 
+
 namespace ReniUI.Formatting
 {
     sealed class FormatterToken : DumpableObject
     {
-        internal static IEnumerable<FormatterToken> CreateOther(IToken other)
-            => other == null ? Enumerable.Empty<FormatterToken>() : Create(other);
-
-        internal static IEnumerable<FormatterToken> Create(IToken token)
+        internal static IEnumerable<FormatterToken> Create(IToken token, bool returnMain = true)
         {
+            if(token == null)
+                yield break;
+
             var anchor = token.SourcePart().Start;
             var items = token.PrecededWith.ToArray();
             var hasCommentLineBreak = false;
@@ -45,7 +46,7 @@ namespace ReniUI.Formatting
                     hasCommentLineBreak = true;
             }
 
-            if(lineBreaks.Any() || spaces.Any())
+            if(returnMain)
                 yield return new FormatterToken(hasCommentLineBreak, lineBreaks, anchor, spaces);
         }
 
@@ -79,5 +80,7 @@ namespace ReniUI.Formatting
 
         internal Edit GetEditPiece(EditPieceParameter parameter)
             => parameter.GetEditPiece(HasCommentLineBreak, LineBreaks, Anchor, Spaces);
+
+        public bool IsEmpty => !HasCommentLineBreak && !LineBreaks.Any() && !Spaces.Any();
     }
 }

@@ -22,7 +22,7 @@ namespace ReniUI.Formatting
             if(exlucdePrefix == null)
                 Tracer.Assert(!tokenGroup.Prefix.Any());
 
-            return tokenGroup.Prefix.Select(item => item.ToSourcePartEdit());
+            return tokenGroup.Prefix.plus(tokenGroup.Main);
         }
     }
 }
