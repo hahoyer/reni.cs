@@ -21,7 +21,7 @@ namespace ReniUI.Test
 1,3,4,6)";
             var compiler = CompilerBrowser.FromText(Text);
             var span = (compiler.Source + 2).Span(3);
-            var reformat = compiler.Reformat(sourcePart: span);
+            var reformat = compiler.Reformat(sourcePart: span);                                      
             Tracer.Assert(reformat == "#(a", reformat);
         }
 

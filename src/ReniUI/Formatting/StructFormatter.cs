@@ -11,7 +11,7 @@ namespace ReniUI.Formatting
         public StructFormatter(Configuration configuration) => Configuration = configuration;
 
         IEnumerable<Edit> IFormatter.GetEditPieces(CompilerBrowser compiler, SourcePart targetPart)
-        {            var syntax = compiler.Locate(targetPart);            var structItem = syntax.CreateStruct(this);
+        {            var syntax = compiler.LocateAndFilter(targetPart);            if(syntax == null)                return new Edit[0];            var structItem = syntax.CreateStruct(this);
 
             var sourcePartEdits = structItem.GetSourcePartEdits(targetPart).ToArray();
             var editPieces = sourcePartEdits.GetEditPieces(targetPart, Configuration);

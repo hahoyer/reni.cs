@@ -24,12 +24,6 @@ namespace ReniUI.Formatting
         internal static IEnumerable<Edit> GetEditPieces
             (this IEnumerable<ISourcePartEdit> target, SourcePart targetPart, Configuration configuration)
         {
-            if(targetPart.Position > 0)
-            {
-                Dumpable.NotImplementedFunction(target.ToArray(), targetPart, configuration);
-                return null;
-            }
-
             var parameter = new EditPieceParameter(configuration);
 
             var result = new List<Edit>();

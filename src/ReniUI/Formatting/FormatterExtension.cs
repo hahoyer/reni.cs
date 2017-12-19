@@ -1,6 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using hw.DebugFormatter;
+using hw.Parser;
 using hw.Scanner;
+using Reni.TokenClasses;
+
 
 namespace ReniUI.Formatting
 {
@@ -43,22 +48,72 @@ namespace ReniUI.Formatting
         internal static bool Contains(this LineOrientedFormatter.Item2 item, SourcePart part)
             => item.Part.Position < part.EndPosition && item.Part.EndPosition > part.Position;
 
-        internal static string Combine(this IEnumerable<Edit> pieces, CompilerBrowser compiler)
+        internal static string Combine(this IEnumerable<Edit> pieces, CompilerBrowser compiler, SourcePart targetPart)
         {
-            var original = compiler.Source.Data;
-            var current = 0;
+            var original = targetPart?.Id ?? compiler.Source.Data;
+            var originalPosition = targetPart?.Position ?? 0;
+            var originalEndPosition = originalPosition + original.Length;
+
+            var currentPosition = -originalPosition;
             var result = "";
 
             foreach(var edit in pieces.OrderBy(edit => edit.Location.Position))
             {
-                var length = edit.Location.Position - current;
-                result += original.Substring(current, length);
-                result += edit.NewText;
-                current = edit.Location.EndPosition;
+                Tracer.Assert(edit.Location.EndPosition < originalEndPosition);
+                var newPosition = edit.Location.EndPosition - originalPosition;
+                if (currentPosition < 0)
+                {
+                    Tracer.Assert(newPosition <= 0);
+                }
+                else
+                {
+                    var length = edit.Location.Position - originalPosition - currentPosition;
+                    var itemResult = original.Substring(currentPosition, length) + edit.NewText;
+                    result += itemResult;
+                }
+
+                currentPosition = newPosition;
             }
 
-            result += original.Substring(current);
+            result += original.Substring(Math.Max(0, currentPosition));
             return result;
+        }
+
+        public static Syntax LocateAndFilter(this CompilerBrowser compiler, SourcePart targetPart)
+        {
+            var result = compiler.Locate(targetPart);
+            return IsTooSmall(result.Token, targetPart) ? null : result;
+        }
+
+        static bool IsTooSmall(IToken resultToken, SourcePart targetPart)
+        {
+            var sourcePart = resultToken.SourcePart();
+            if(targetPart.End > sourcePart.End)
+                return true;
+            if(targetPart.Start < sourcePart.Start)
+                return true;
+
+            if(targetPart.Start >= resultToken.Characters.Start)
+                return true;
+
+            if(targetPart.End > resultToken.Characters.Start)
+                return false;
+
+            if(!resultToken.PrecededWith.Any())
+                return true;
+
+            foreach(var item in resultToken.PrecededWith)
+            {
+                var part = item.SourcePart;
+                if(part.Contains(targetPart))
+                    return true;
+                var intersect = part.Intersect(targetPart);
+                if(intersect != null && intersect.Length > 0)
+                    return false;
+            }
+
+            DumpableObject.NotImplementedFunction(resultToken, targetPart);
+            return false;
         }
     }
 }
