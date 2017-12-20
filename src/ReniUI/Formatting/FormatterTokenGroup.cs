@@ -71,6 +71,9 @@ namespace ReniUI.Formatting
                     yield return SourcePartEditExtension.LineBreak;
                 yield return item;
             }
+
+            if(isLineBreakRequired)
+                yield return SourcePartEditExtension.LineBreak;
         }
 
         internal IEnumerable<ISourcePartEdit> FormatFrameEnd(Configuration configuration)

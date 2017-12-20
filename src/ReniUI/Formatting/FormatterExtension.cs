@@ -88,19 +88,21 @@ namespace ReniUI.Formatting
         static bool IsTooSmall(IToken resultToken, SourcePart targetPart)
         {
             var sourcePart = resultToken.SourcePart();
-            if(targetPart.End > sourcePart.End)
-                return true;
-            if(targetPart.Start < sourcePart.Start)
+
+            if (targetPart.End > sourcePart.End)
+                return false;
+
+            if (targetPart.Start < sourcePart.Start)
+                return false;
+
+            if (!resultToken.PrecededWith.Any())
                 return true;
 
-            if(targetPart.Start >= resultToken.Characters.Start)
+            if (targetPart.Start >= resultToken.Characters.Start)
                 return true;
 
             if(targetPart.End > resultToken.Characters.Start)
                 return false;
-
-            if(!resultToken.PrecededWith.Any())
-                return true;
 
             foreach(var item in resultToken.PrecededWith)
             {

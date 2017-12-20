@@ -52,11 +52,12 @@ namespace ReniUI.Formatting
             return null;
         }
 
-        internal static IStructure CreateBodyStruct(this Syntax syntax, StructFormatter parent)
+        internal static IStructure CreateBodyStruct
+            (this Syntax syntax, StructFormatter parent, bool isLineBreakRequired)
         {
             switch(syntax.TokenClass)
             {
-                case List _: return new ListStructure(syntax, parent);
+                case List _: return new ListStructure(syntax, parent,isLineBreakRequired);
                 case Colon _: return new DeclarationStructure(syntax, parent);
             }
 

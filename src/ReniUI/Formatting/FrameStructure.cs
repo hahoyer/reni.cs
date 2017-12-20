@@ -30,6 +30,6 @@ namespace ReniUI.Formatting
                 .AssertNotNull()
                 .Right
                 .AssertNotNull()
-                .CreateBodyStruct(Parent);
+                .CreateBodyStruct(Parent, IsLineBreakRequired);
     }
 }

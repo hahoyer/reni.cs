@@ -54,6 +54,6 @@ namespace ReniUI.Formatting
         }
 
         IStructure GetLeft() => Syntax.Left.AssertNotNull().CreateDeclaratorStruct(Parent);
-        IStructure GetRight() => Syntax.Right.AssertNotNull().CreateBodyStruct(Parent);
+        IStructure GetRight() => Syntax.Right.AssertNotNull().CreateBodyStruct(Parent, IsMultiLine);
     }
 }

@@ -3,6 +3,7 @@ using System.Linq;
 using hw.Scanner;
 using Reni.TokenClasses;
 
+
 namespace ReniUI.Formatting
 {
     sealed class ListStructure : Structure
@@ -10,14 +11,17 @@ namespace ReniUI.Formatting
         IStructure[] BodyItemsValue;
         FormatterTokenGroup[] ListItemsValue;
 
-        public ListStructure(Syntax syntax, StructFormatter parent)
-            : base(syntax, parent) {}
+        public ListStructure(Syntax syntax, StructFormatter parent, bool isLineBreakRequired)
+            : base(syntax, parent)
+        {
+            IsLineBreakRequired = isLineBreakRequired;
+        }
 
-        bool IsLineBreakRequired => Syntax.IsLineBreakRequired(Parent.Configuration);
+        new readonly bool IsLineBreakRequired;
 
         IStructure[] BodyItems
-            => BodyItemsValue ??
-               (BodyItemsValue = GetBodyItems().Select(i => i.CreateListItemStruct(Parent)).ToArray());
+            => BodyItemsValue
+               ?? (BodyItemsValue = GetBodyItems().Select(i => i.CreateListItemStruct(Parent)).ToArray());
 
         FormatterTokenGroup[] ListItems => ListItemsValue ?? (ListItemsValue = GetListItems().ToArray());
 
