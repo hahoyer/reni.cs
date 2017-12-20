@@ -59,7 +59,7 @@ namespace ReniUI.Formatting
 
             foreach(var edit in pieces.OrderBy(edit => edit.Location.Position))
             {
-                Tracer.Assert(edit.Location.EndPosition < originalEndPosition);
+                Tracer.Assert(edit.Location.EndPosition <= originalEndPosition,"not implemented.");
                 var newPosition = edit.Location.EndPosition - originalPosition;
                 if (currentPosition < 0)
                 {
