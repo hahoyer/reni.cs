@@ -122,9 +122,12 @@ namespace ReniUI
             => Compiler.Syntax.Belongings(syntax);
 
         public string Reformat(IFormatter formatter = null, SourcePart sourcePart = null)
-            => (formatter ?? new Formatting.Configuration().Create())
-                .GetEditPieces(this, sourcePart ?? Syntax.SourcePart)
-                .Combine(this, sourcePart);
+        {
+            var targetPart = sourcePart ?? Source.All;
+            return (formatter ?? new Formatting.Configuration().Create())
+                .GetEditPieces(this, targetPart)
+                .Combine(targetPart);
+        }
 
         public Syntax Locate(SourcePart span)
         {

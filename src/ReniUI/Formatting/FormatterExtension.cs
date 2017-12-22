@@ -48,10 +48,10 @@ namespace ReniUI.Formatting
         internal static bool Contains(this LineOrientedFormatter.Item2 item, SourcePart part)
             => item.Part.Position < part.EndPosition && item.Part.EndPosition > part.Position;
 
-        internal static string Combine(this IEnumerable<Edit> pieces, CompilerBrowser compiler, SourcePart targetPart)
+        internal static string Combine(this IEnumerable<Edit> pieces, SourcePart targetPart)
         {
-            var original = targetPart?.Id ?? compiler.Source.Data;
-            var originalPosition = targetPart?.Position ?? 0;
+            var original = targetPart.Id;
+            var originalPosition = targetPart.Position;
             var originalEndPosition = originalPosition + original.Length;
 
             var currentPosition = -originalPosition;
