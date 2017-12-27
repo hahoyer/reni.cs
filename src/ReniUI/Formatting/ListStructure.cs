@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.TokenClasses;
 
@@ -44,8 +45,11 @@ namespace ReniUI.Formatting
             var current = Syntax;
             do
             {
+                Tracer.Assert(current != null);
                 yield return current.Left;
                 current = current.Right;
+                if(current == null)
+                    yield break;
             }
             while(current.TokenClass == main);
 

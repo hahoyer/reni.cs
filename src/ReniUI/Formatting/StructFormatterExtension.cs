@@ -1,8 +1,11 @@
+using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
+using hw.Scanner;
 using Reni.Parser;
 using Reni.TokenClasses;
+
 
 namespace ReniUI.Formatting
 {
@@ -38,18 +41,11 @@ namespace ReniUI.Formatting
         {
             switch(syntax.TokenClass)
             {
-            case EndOfText _: return new FrameStructure(syntax, parent);
+                case EndOfText _: return new FrameStructure(syntax, parent);
                 case RightParenthesis _: return new ParenthesisStructure(syntax, parent);
-                case Number _:
-                    if(syntax.Right == null || syntax.Right.TokenClass is RightParenthesis)
-                        return new ChainStructure(syntax, parent);
-
-                    Dumpable.NotImplementedFunction(syntax, parent);
-                    return null;
             }
 
-            Dumpable.NotImplementedFunction(syntax, parent);
-            return null;
+            return new ChainStructure(syntax, parent);
         }
 
         internal static IStructure CreateBodyStruct
@@ -57,7 +53,7 @@ namespace ReniUI.Formatting
         {
             switch(syntax.TokenClass)
             {
-                case List _: return new ListStructure(syntax, parent,isLineBreakRequired);
+                case List _: return new ListStructure(syntax, parent, isLineBreakRequired);
                 case Colon _: return new DeclarationStructure(syntax, parent);
             }
 
@@ -79,9 +75,7 @@ namespace ReniUI.Formatting
         {
             switch(syntax.TokenClass)
             {
-                case Colon _:
-                    Dumpable.NotImplementedFunction(syntax, parent);
-                    return null;
+                case Colon _: return new DeclarationStructure(syntax, parent);
             }
 
             return CreateStruct(syntax, parent);
@@ -164,5 +158,4 @@ namespace ReniUI.Formatting
             return basicLineLength == null || basicLineLength > configuration.MaxLineLength;
         }
     }
-
 }
