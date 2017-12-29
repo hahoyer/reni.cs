@@ -2,22 +2,24 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
-using hw.Scanner;
 using Reni;
 using Reni.TokenClasses;
-
 
 namespace ReniUI.Formatting
 {
     sealed class FormatterTokenGroup : DumpableObject
     {
         internal static FormatterTokenGroup Create(Syntax syntax) => new FormatterTokenGroup(syntax);
+
+        static SourcePartEdit[] CreateSourcePartEdits(IToken token, bool returnMain = true)
+            => FormatterToken.Create(token, returnMain).Select(i => i.ToSourcePartEdit()).ToArray();
+
         readonly Syntax Syntax;
+        SourcePartEdit MainData;
 
         SourcePartEdit[] PrefixData;
         FormatterToken[] PrefixResultData;
         SourcePartEdit[] SuffixData;
-        SourcePartEdit MainData;
 
         FormatterTokenGroup(Syntax syntax) => Syntax = syntax;
 
@@ -39,6 +41,9 @@ namespace ReniUI.Formatting
             }
         }
 
+        internal SourcePartEdit[] Suffix
+            => SuffixData ?? (SuffixData = CreateSourcePartEdits(Syntax.RightNeigbor?.Token, false));
+
         void EnsurePrefixResult()
         {
             if(MainData != null && PrefixData != null)
@@ -48,52 +53,43 @@ namespace ReniUI.Formatting
             PrefixData = prefix.Take(prefix.Length - 1).ToArray();
         }
 
-        static SourcePartEdit[] CreateSourcePartEdits(IToken token, bool returnMain = true) 
-            => FormatterToken.Create(token, returnMain).Select(i => i.ToSourcePartEdit()).ToArray();
-
-        internal SourcePartEdit[] Suffix 
-            => SuffixData ?? (SuffixData = CreateSourcePartEdits(Syntax.RightNeigbor?.Token, false));
-
-        internal IEnumerable<ISourcePartEdit> FormatListItem(bool isLineBreakRequired, Configuration configuration)
+        internal IEnumerable<IEnumerable<ISourcePartEdit>> FormatListItem
+            (bool isLineBreakRequired, Configuration configuration)
         {
-            foreach(var edit in Prefix)
-                yield return edit;
+            yield return Prefix;
 
             if(configuration.SpaceBeforeListItem)
-                yield return SourcePartEditExtension.Space;
+                yield return SourcePartEditExtension.Space.SingleToArray();
 
-            yield return Main;
+            yield return Main.SingleToArray();
 
             if(configuration.SpaceAfterListItem)
-                yield return SourcePartEditExtension.Space;
+                yield return SourcePartEditExtension.Space.SingleToArray();
 
             foreach(var item in Suffix)
             {
                 if(isLineBreakRequired)
-                    yield return SourcePartEditExtension.LineBreak;
-                yield return item;
+                    yield return SourcePartEditExtension.LineBreak.SingleToArray();
+                yield return item.SingleToArray();
             }
 
             if(isLineBreakRequired)
-                yield return SourcePartEditExtension.LineBreak;
+                yield return SourcePartEditExtension.LineBreak.SingleToArray();
         }
 
-        internal IEnumerable<ISourcePartEdit> FormatFrameEnd(Configuration configuration)
+        internal IEnumerable<IEnumerable<ISourcePartEdit>> FormatFrameEnd()
         {
-            foreach(var edit in Prefix)
-                yield return edit;
-
-            yield return SourcePartEditExtension.EndOfFile;
-            yield return Main;
+            yield return Prefix;
+            yield return SourcePartEditExtension.EndOfFile.SingleToArray();
+            yield return Main.SingleToArray();
         }
 
-        public IEnumerable<ISourcePartEdit> FormatChainItem(bool isLineBreakRequired, Configuration configuration)
+        internal IEnumerable<IEnumerable<ISourcePartEdit>> FormatChainItem(bool exlucdePrefix)
         {
-            if(!Prefix.Any() && !Suffix.Any())
-                return Main.SingleToArray();
+            if(!exlucdePrefix)
+                yield return Prefix;
 
-            NotImplementedMethod(isLineBreakRequired,configuration);
-            return null;
+            yield return Main.SingleToArray();
         }
     }
 }

@@ -26,16 +26,16 @@ namespace ReniUI.Formatting
 
         FormatterTokenGroup[] ListItems => ListItemsValue ?? (ListItemsValue = GetListItems().ToArray());
 
-        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart, bool? exlucdePrefix)
+        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart, bool exlucdePrefix)
             => BodyItems
                 .SelectMany((item, index) => GetSourcePartEdits(targetPart, item, index - 1, exlucdePrefix));
 
         IEnumerable<ISourcePartEdit> GetSourcePartEdits
-            (SourcePart targetPart, IStructure item, int index, bool? exlucdePrefix)
+            (SourcePart targetPart, IStructure item, int index, bool exlucdePrefix)
         {
-            var result = item.GetSourcePartEdits(targetPart, index < 0 ? exlucdePrefix : true);
+            var result = item.GetSourcePartEdits(targetPart, index >= 0 || exlucdePrefix);
             return index >= 0
-                ? ListItems[index].FormatListItem(IsLineBreakRequired, Parent.Configuration).Concat(result)
+                ? ListItems[index].FormatListItem(IsLineBreakRequired, Parent.Configuration).SelectMany(i=>i).Concat(result)
                 : result;
         }
 

@@ -69,14 +69,13 @@ namespace Reni
         {
             switch(member.MemberType)
             {
-            case MemberTypes.Method:
-                return member
-                    .DeclaringType
-                    .GetAttributes<VariantAttribute>(false)
-                    .Select
-                    (item => (string) ((MethodInfo) member).Invoke(null, item.CreationParameter));
-            case MemberTypes.Field:
-                return new[] {(string) ((FieldInfo) member).GetValue(null)};
+                case MemberTypes.Method:
+                    return member
+                        .DeclaringType
+                        .GetAttributes<VariantAttribute>(false)
+                        .Select
+                            (item => (string) ((MethodInfo) member).Invoke(null, item.CreationParameter));
+                case MemberTypes.Field: return new[] {(string) ((FieldInfo) member).GetValue(null)};
             }
 
             Dumpable.NotImplementedFunction(member.Name);
@@ -98,6 +97,6 @@ namespace Reni
             return result;
         }
 
-        public static IEnumerable<T> SingleToArray<T>(this T target) => new[] {target};
+        public static IEnumerable<T> SingleToArray<T>(this T target) {yield return target;}
     }
 }

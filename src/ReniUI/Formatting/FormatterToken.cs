@@ -73,7 +73,6 @@ namespace ReniUI.Formatting
             Anchor = anchor;
             LineBreaks = lineBreaks.Select(index => index - anchor).ToArray();
             Spaces = spaces.Select(index => index - anchor).ToArray();
-            StopByObjectIds(223, 224);
         }
 
         internal SourcePartEdit ToSourcePartEdit() => new SourcePartEdit(this);

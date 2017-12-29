@@ -20,7 +20,7 @@ namespace ReniUI.Formatting
         static bool IsMultiLine => false;
         static bool IsInnerMultiLine => false;
 
-        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart, bool? exlucdePrefix)
+        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart, bool exlucdePrefix)
         {
             if(IsMultiLine)
                 yield return SourcePartEditExtension.IndentEnd;

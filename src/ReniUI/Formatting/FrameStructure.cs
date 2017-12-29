@@ -17,11 +17,11 @@ namespace ReniUI.Formatting
         IStructure Body => BodyValue ?? (BodyValue = GetBody());
         FormatterTokenGroup Right => RightValue ?? (RightValue = FormatterTokenGroup.Create(Syntax));
 
-        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart, bool? exlucdePrefix)
+        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart, bool exlucdePrefix)
         {
             return
                 Body.GetSourcePartEdits(targetPart, exlucdePrefix)
-                    .Concat(Right.FormatFrameEnd(Parent.Configuration));
+                    .Concat(Right.FormatFrameEnd().SelectMany(i=>i));
         }
 
         IStructure GetBody()

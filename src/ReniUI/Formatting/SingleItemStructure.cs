@@ -16,10 +16,10 @@ namespace ReniUI.Formatting
             Tracer.Assert(Syntax.Right == null);
         }
 
-        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart, bool? exlucdePrefix)
+        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart, bool exlucdePrefix)
         {
             var tokenGroup = FormatterTokenGroup.Create(Syntax);
-            if(exlucdePrefix == null)
+            if(!exlucdePrefix)
                 Tracer.Assert(!tokenGroup.Prefix.Any());
 
             return tokenGroup.Prefix.plus(tokenGroup.Main);
