@@ -1,11 +1,8 @@
-using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
-using hw.Scanner;
 using Reni.Parser;
 using Reni.TokenClasses;
-
 
 namespace ReniUI.Formatting
 {
@@ -63,8 +60,6 @@ namespace ReniUI.Formatting
         internal static IStructure CreateDeclaratorStruct(this Syntax syntax, StructFormatter parent)
         {
             if(syntax.Left == null && syntax.Right == null)
-
-
                 return new SingleItemStructure(syntax, parent);
 
             Dumpable.NotImplementedFunction(syntax, parent);
@@ -80,6 +75,9 @@ namespace ReniUI.Formatting
 
             return CreateStruct(syntax, parent);
         }
+
+        internal static ChainItemStruct CreateChainItemStruct(this Syntax syntax, StructFormatter parent)
+            => new ChainItemStruct(syntax, parent);
 
         /// <summary>
         ///     Calulate the length, if all ignorable linebreaks would have been ignored.
@@ -133,7 +131,7 @@ namespace ReniUI.Formatting
 
         internal static ISeparatorType LeftSideSeparator(this Syntax target)
         {
-            var left = target.Left?.RightMost.TokenClass;
+            var left = target.LeftNeigbor?.TokenClass;
             if(target.Token.PrecededWith.HasComment())
                 return SeparatorType.ContactSeparator;
             return SeparatorType.Get(left, target.TokenClass);
@@ -141,7 +139,7 @@ namespace ReniUI.Formatting
 
         internal static ISeparatorType RightSideSeparator(this Syntax target)
         {
-            var right = target.Right?.LeftMost;
+            var right = target.RightNeigbor;
             if(right == null || right.Token.PrecededWith.HasComment())
                 return SeparatorType.ContactSeparator;
             return SeparatorType.Get(target.TokenClass, right.TokenClass);

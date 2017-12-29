@@ -81,6 +81,58 @@ namespace Reni.TokenClasses
         internal SourcePart SourcePart => Left?.SourcePart + Token.SourcePart() + Right?.SourcePart;
 
         [DisableDump]
+        internal Syntax LeftNeigbor => LeftParent?.RightMost;
+
+        [DisableDump]
+        Syntax LeftParent
+        {
+            get
+            {
+                if(Left != null)
+                    return Left;
+                var current = this;
+                do
+                {
+                    var parent = current.Parent;
+                    if(parent == null)
+                        return null;
+
+                    if(parent.Right == current && parent.Left != null)
+                        return parent.Left;
+
+                    current = parent;
+                }
+                while(true);
+            }
+        }
+
+        [DisableDump]
+        internal Syntax RightNeigbor => RightParent?.LeftMost;
+
+        [DisableDump]
+        Syntax RightParent
+        {
+            get
+            {
+                if(Right != null)
+                    return Right;
+                var current = this;
+                do
+                {
+                    var parent = current.Parent;
+                    if(parent == null)
+                        return null;
+
+                    if(parent.Right == current && parent.Right != null)
+                        return parent.Right;
+
+                    current = parent;
+                }
+                while(true);
+            }
+        }
+
+        [DisableDump]
         internal Syntax LeftMost => Left == null ? this : Left.LeftMost;
 
         [DisableDump]
@@ -200,7 +252,7 @@ namespace Reni.TokenClasses
                 .ToArray();
 
             return sourceSyntaxs
-                       .Skip(count: 1)
+                       .Skip(1)
                        .TakeWhile(item => matcher.IsBelongingTo(item.TokenClass))
                        .LastOrDefault() ??
                    recent;

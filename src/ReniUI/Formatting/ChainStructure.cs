@@ -1,62 +1,81 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
-using hw.DebugFormatter;
 using hw.Scanner;
-using Reni.Parser;
 using Reni.TokenClasses;
-
 
 namespace ReniUI.Formatting
 {
     sealed class ChainStructure : Structure
     {
-        IStructure[] BodyItemsValue;
+        ChainItemStruct[] BodyItemsValue;
 
         public ChainStructure(Syntax syntax, StructFormatter parent)
             : base(syntax, parent) {}
 
-        IStructure[] BodyItems
-            => BodyItemsValue
-               ?? (BodyItemsValue = GetBodyItems().Select(i => i.CreateListItemStruct(Parent)).ToArray());
+        ChainItemStruct[] BodyItems
+            => BodyItemsValue ??
+               (BodyItemsValue = GetBodyItems().Select(i => i.CreateChainItemStruct(Parent)).ToArray());
 
-        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart, bool? exlucdePrefix) 
-            => ConvertToSourcePartEdits(targetPart, exlucdePrefix).SelectMany(i=>i);
+        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart, bool? exlucdePrefix)
+            => ConvertToSourcePartEdits(targetPart, exlucdePrefix);
 
-        IEnumerable<IEnumerable<ISourcePartEdit>> ConvertToSourcePartEdits(SourcePart targetPart, bool? exlucdePrefix)
+        IEnumerable<ISourcePartEdit> ConvertToSourcePartEdits(SourcePart targetPart, bool? exlucdePrefix)
         {
-            var bodyItems = BodyItems;
+            var effectiveExcludePrefix = exlucdePrefix;
 
-            yield return bodyItems.First().GetSourcePartEdits(targetPart, exlucdePrefix);
-
-            yield return new[]{SourcePartEditExtension.IndentStart};
-            
-            foreach(var item in bodyItems.Skip(1))
+            foreach(var item in BodyItems)
             {
-                if(IsLineBreakRequired)
-                    yield return new[]{SourcePartEditExtension.LineBreak};
+                if(item.IsTailItem && IsLineBreakRequired)
+                    yield return SourcePartEditExtension.LineBreak;
 
-                yield return item.GetSourcePartEdits(targetPart, exlucdePrefix);
+                var edits = ((IStructure) item).GetSourcePartEdits(targetPart, effectiveExcludePrefix);
+                foreach(var edit in edits)
+                    yield return edit;
+
+                effectiveExcludePrefix = true;
             }
-
-            yield return new[]{SourcePartEditExtension.IndentEnd};
         }
 
         IEnumerable<Syntax> GetBodyItems()
         {
-            var main = Syntax.TokenClass;
             var current = Syntax;
-            do
+            var items = new List<Syntax>();
+            while(current.Left != null)
             {
-                Tracer.Assert(current != null);
-                yield return current.Left;
-                current = current.Right;
-                if(current == null)
-                    yield break;
+                items.Add(current);
+                current = current.Left;
             }
-            while(current.TokenClass == main);
 
-            yield return current;
+            items.Add(current);
+            return items;
+        }
+    }
+
+    sealed class ChainItemStruct : Structure
+    {
+        public ChainItemStruct(Syntax syntax, StructFormatter parent)
+            : base(syntax, parent) {}
+
+        internal bool IsTailItem => Syntax.Left != null;
+
+        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart, bool? exlucdePrefix)
+        {
+            if(IsTailItem)
+                yield return SourcePartEditExtension.IndentStart;
+
+            var edits = FormatterTokenGroup
+                .Create(Syntax)
+                .FormatChainItem(IsLineBreakRequired, Parent.Configuration);
+
+            foreach(var edit in edits)
+                yield return edit;
+
+            if(Syntax.Right != null)
+                foreach(var edit in Syntax.Right.CreateStruct(Parent).GetSourcePartEdits(targetPart, false))
+                    yield return edit;
+
+            if(IsTailItem)
+                yield return SourcePartEditExtension.IndentEnd;
         }
     }
 }

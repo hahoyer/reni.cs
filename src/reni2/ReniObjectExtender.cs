@@ -97,5 +97,7 @@ namespace Reni
             result += n.Millisecond.ToString("000");
             return result;
         }
+
+        public static IEnumerable<T> SingleToArray<T>(this T target) => new[] {target};
     }
 }

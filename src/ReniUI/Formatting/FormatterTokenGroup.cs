@@ -3,6 +3,7 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
 using hw.Scanner;
+using Reni;
 using Reni.TokenClasses;
 
 
@@ -51,7 +52,7 @@ namespace ReniUI.Formatting
             => FormatterToken.Create(token, returnMain).Select(i => i.ToSourcePartEdit()).ToArray();
 
         internal SourcePartEdit[] Suffix 
-            => SuffixData ?? (SuffixData = CreateSourcePartEdits(Syntax.Right?.LeftMost.Token, false));
+            => SuffixData ?? (SuffixData = CreateSourcePartEdits(Syntax.RightNeigbor?.Token, false));
 
         internal IEnumerable<ISourcePartEdit> FormatListItem(bool isLineBreakRequired, Configuration configuration)
         {
@@ -84,6 +85,15 @@ namespace ReniUI.Formatting
 
             yield return SourcePartEditExtension.EndOfFile;
             yield return Main;
+        }
+
+        public IEnumerable<ISourcePartEdit> FormatChainItem(bool isLineBreakRequired, Configuration configuration)
+        {
+            if(!Prefix.Any() && !Suffix.Any())
+                return Main.SingleToArray();
+
+            NotImplementedMethod(isLineBreakRequired,configuration);
+            return null;
         }
     }
 }
