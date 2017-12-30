@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using System.Linq;
 using hw.Helper;
 using hw.Scanner;
+using Reni;
 using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
@@ -18,42 +20,31 @@ namespace ReniUI.Formatting
         FormatterTokenGroup Left => LeftValue ?? (LeftValue = FormatterTokenGroup.Create(Syntax.Left));
         FormatterTokenGroup Right => RightValue ?? (RightValue = FormatterTokenGroup.Create(Syntax));
 
-        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart, bool exlucdePrefix)
+        protected override IEnumerable<IEnumerable<ISourcePartEdit>> GetSourcePartEdits(SourcePart targetPart, bool exlucdePrefix)
         {
             if(!exlucdePrefix)
-                foreach(var edit in Left.Prefix)
-                    yield return edit;
+                yield return Left.Prefix;
 
             yield return Left.Main;
 
-
-            yield return SourcePartEditExtension.IndentStart;
+            yield return SourcePartEditExtension.IndentStart.SingleToArray();
 
             if(IsLineBreakRequired)
-                yield return SourcePartEditExtension.LineBreak;
+                yield return SourcePartEditExtension.LineBreak.SingleToArray();
 
-            foreach(var edit in Left.Suffix)
-                yield return edit;
+            yield return Left.Suffix;
 
+            if(Body != null)
+                yield return Body.GetSourcePartEdits(targetPart, true);
 
-            foreach(var edit in Body.GetSourcePartEdits(targetPart, true))
-                yield return edit;
+            yield return Right.Prefix;
 
-            foreach(var edit in Right.Prefix)
-            {
-                if(IsLineBreakRequired)
-                    yield return SourcePartEditExtension.LineBreak;
-
-                yield return edit;
-            }
-
-            yield return SourcePartEditExtension.IndentEnd;
+            yield return SourcePartEditExtension.IndentEnd.SingleToArray();
             if(IsLineBreakRequired)
-                yield return SourcePartEditExtension.LineBreak;
+                yield return SourcePartEditExtension.LineBreak.SingleToArray();
             yield return Right.Main;
 
-            foreach(var edit in Right.Suffix)
-                yield return edit;
+            yield return Right.Suffix;
         }
 
         IStructure GetBody()
@@ -61,7 +52,6 @@ namespace ReniUI.Formatting
                 .Left
                 .AssertNotNull()
                 .Right
-                .AssertNotNull()
                 .CreateBodyStruct(Parent, IsLineBreakRequired);
     }
 }

@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using hw.DebugFormatter;
 using Reni.Parser;
 using Reni.TokenClasses;
@@ -23,7 +22,7 @@ namespace ReniUI.Formatting
         }
 
         internal static readonly ISeparatorType ContactSeparator = new Contact();
-        internal static readonly ISeparatorType CloseSeparator= new Close();
+        internal static readonly ISeparatorType CloseSeparator = new Close();
 
         internal static ISeparatorType Get(ITokenClass left, ITokenClass right)
             => PrettySeparatorType(left, right) ?? BaseSeparatorType(left, right);
@@ -43,6 +42,7 @@ namespace ReniUI.Formatting
             if(right is RightParenthesis ||
                right is LeftParenthesis ||
                right is List ||
+               right is EndOfText ||
                left is LeftParenthesis
             )
                 return ContactSeparator;

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
@@ -22,7 +23,7 @@ namespace ReniUI.Formatting
         Syntax IStructure.Syntax => Syntax;
 
         IEnumerable<ISourcePartEdit> IStructure.GetSourcePartEdits(SourcePart targetPart, bool exlucdePrefix)
-            => GetSourcePartEdits(targetPart, exlucdePrefix);
+            => GetSourcePartEdits(targetPart, exlucdePrefix).SelectMany(i => i);
 
         [EnableDump]
         protected bool IsLineBreakRequired => IsLineBreakRequiredCache.Value;
@@ -30,6 +31,7 @@ namespace ReniUI.Formatting
         [EnableDump]
         protected string FlatResult => Syntax.FlatFormat(Parent.Configuration);
 
-        protected abstract IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart, bool exlucdePrefix);
+        protected abstract IEnumerable<IEnumerable<ISourcePartEdit>> GetSourcePartEdits
+            (SourcePart targetPart, bool exlucdePrefix);
     }
 }

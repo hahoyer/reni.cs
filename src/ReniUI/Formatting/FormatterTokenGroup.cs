@@ -3,6 +3,7 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
 using Reni;
+using Reni.Parser;
 using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
@@ -15,15 +16,13 @@ namespace ReniUI.Formatting
             => FormatterToken.Create(token, returnMain).Select(i => i.ToSourcePartEdit()).ToArray();
 
         readonly Syntax Syntax;
-        SourcePartEdit MainData;
-
-        SourcePartEdit[] PrefixData;
-        FormatterToken[] PrefixResultData;
-        SourcePartEdit[] SuffixData;
+        ISourcePartEdit[] MainData;
+        ISourcePartEdit[] PrefixData;
+        ISourcePartEdit[] SuffixData;
 
         FormatterTokenGroup(Syntax syntax) => Syntax = syntax;
 
-        internal SourcePartEdit[] Prefix
+        internal ISourcePartEdit[] Prefix
         {
             get
             {
@@ -32,7 +31,7 @@ namespace ReniUI.Formatting
             }
         }
 
-        internal SourcePartEdit Main
+        internal ISourcePartEdit[] Main
         {
             get
             {
@@ -41,37 +40,33 @@ namespace ReniUI.Formatting
             }
         }
 
-        internal SourcePartEdit[] Suffix
+        internal ISourcePartEdit[] Suffix
             => SuffixData ?? (SuffixData = CreateSourcePartEdits(Syntax.RightNeigbor?.Token, false));
+
+        IToken RightNeigborToken => Syntax.RightNeigbor?.Token;
 
         void EnsurePrefixResult()
         {
             if(MainData != null && PrefixData != null)
                 return;
             var prefix = CreateSourcePartEdits(Syntax.Token);
-            MainData = prefix.Last();
-            PrefixData = prefix.Take(prefix.Length - 1).ToArray();
+            var prefixLength = prefix.Length - 1;
+            PrefixData = prefix.Take(prefixLength).ToArray();
+            MainData = prefix.Skip(prefixLength).Take(1).plus(GetDistanceMarker()).ToArray();
+        }
+
+        IEnumerable<ISourcePartEdit> GetDistanceMarker()
+        {
+            if(Syntax.RightSideSeparator() == SeparatorType.CloseSeparator)
+                yield return SourcePartEditExtension.SpaceRequired;
         }
 
         internal IEnumerable<IEnumerable<ISourcePartEdit>> FormatListItem
             (bool isLineBreakRequired, Configuration configuration)
         {
             yield return Prefix;
-
-            if(configuration.SpaceBeforeListItem)
-                yield return SourcePartEditExtension.Space.SingleToArray();
-
-            yield return Main.SingleToArray();
-
-            if(configuration.SpaceAfterListItem)
-                yield return SourcePartEditExtension.Space.SingleToArray();
-
-            foreach(var item in Suffix)
-            {
-                if(isLineBreakRequired)
-                    yield return SourcePartEditExtension.LineBreak.SingleToArray();
-                yield return item.SingleToArray();
-            }
+            yield return Main;
+            yield return Prefix;
 
             if(isLineBreakRequired)
                 yield return SourcePartEditExtension.LineBreak.SingleToArray();
@@ -81,7 +76,7 @@ namespace ReniUI.Formatting
         {
             yield return Prefix;
             yield return SourcePartEditExtension.EndOfFile.SingleToArray();
-            yield return Main.SingleToArray();
+            yield return Main;
         }
 
         internal IEnumerable<IEnumerable<ISourcePartEdit>> FormatChainItem(bool exlucdePrefix)
@@ -89,7 +84,7 @@ namespace ReniUI.Formatting
             if(!exlucdePrefix)
                 yield return Prefix;
 
-            yield return Main.SingleToArray();
+            yield return Main;
         }
     }
 }

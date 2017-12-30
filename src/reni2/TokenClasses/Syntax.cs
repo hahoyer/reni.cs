@@ -81,62 +81,23 @@ namespace Reni.TokenClasses
         internal SourcePart SourcePart => Left?.SourcePart + Token.SourcePart() + Right?.SourcePart;
 
         [DisableDump]
-        internal Syntax LeftNeigbor => LeftParent?.RightMost;
+        internal Syntax LeftNeigbor => Left?.RightMost ?? LeftParent;
 
         [DisableDump]
-        Syntax LeftParent
-        {
-            get
-            {
-                if(Left != null)
-                    return Left;
-                var current = this;
-                do
-                {
-                    var parent = current.Parent;
-                    if(parent == null)
-                        return null;
-
-                    if(parent.Right == current && parent.Left != null)
-                        return parent.Left;
-
-                    current = parent;
-                }
-                while(true);
-            }
-        }
+        internal Syntax RightNeigbor => Right?.LeftMost ?? RightParent;
 
         [DisableDump]
-        internal Syntax RightNeigbor => RightParent?.LeftMost;
+        internal Syntax LeftParent => Parent?.Left == this ? Parent.LeftParent : Parent;
 
         [DisableDump]
-        Syntax RightParent
-        {
-            get
-            {
-                if(Right != null)
-                    return Right;
-                var current = this;
-                do
-                {
-                    var parent = current.Parent;
-                    if(parent == null)
-                        return null;
+        internal Syntax RightParent => Parent?.Right == this ? Parent.RightParent : Parent;
 
-                    if(parent.Right == current && parent.Right != null)
-                        return parent.Right;
-
-                    current = parent;
-                }
-                while(true);
-            }
-        }
 
         [DisableDump]
-        internal Syntax LeftMost => Left == null ? this : Left.LeftMost;
+        internal Syntax LeftMost => Left?.LeftMost ?? this;
 
         [DisableDump]
-        internal Syntax RightMost => Right == null ? this : Right.RightMost;
+        internal Syntax RightMost => Right?.RightMost ?? this;
 
         [DisableDump]
         internal IEnumerable<Syntax> Items => this.CachedValue(GetItems);

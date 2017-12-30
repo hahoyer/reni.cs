@@ -1,4 +1,3 @@
-using System;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
@@ -11,7 +10,7 @@ namespace ReniUI.Formatting
         public int Indent;
         public bool IsEndOfFile;
         public int LineBreakCount;
-        public int SpaceCount;
+        public bool IsSpaceRequired;
 
         public EditPieceParameter(Configuration configuration) => Configuration = configuration;
 
@@ -19,7 +18,7 @@ namespace ReniUI.Formatting
         {
             var lineBreakText = "\n".Repeat(LineBreakCount);
             var indentText = LineBreakCount > 0 ? " ".Repeat(Indent * Configuration.IndentCount) : "";
-            var spaceText = " ".Repeat(SpaceCount);
+            var spaceText = IsSpaceRequired ? " " : "";
 
             return new Edit
             {
@@ -31,7 +30,7 @@ namespace ReniUI.Formatting
         public void Reset()
         {
             LineBreakCount = 0;
-            SpaceCount = 0;
+            IsSpaceRequired = false;
         }
 
         internal Edit GetEditPiece
@@ -56,7 +55,7 @@ namespace ReniUI.Formatting
 
         (string text, int endPosition) GetSpacesPart(int[] currentSpaces)
         {
-            var newspacesCount = SpaceCount;
+            var newspacesCount = IsSpaceRequired ? 1 : 0;
             if(LineBreakCount > 0)
                 newspacesCount += Indent * Configuration.IndentCount;
 
@@ -86,9 +85,9 @@ namespace ReniUI.Formatting
         {
             if(IsEndOfFile && Configuration.LineBreakAtEndOfText != null)
                 return Configuration.LineBreakAtEndOfText.Value ? 1 : 0;
-            
+
             var effectiveLineBreakCount = currentLineBreaks;
-            
+
             var emptyLineLimit = Configuration.EmptyLineLimit;
 
             if(emptyLineLimit != null && effectiveLineBreakCount > emptyLineLimit.Value)

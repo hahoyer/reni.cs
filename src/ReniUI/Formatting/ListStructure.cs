@@ -26,9 +26,9 @@ namespace ReniUI.Formatting
 
         FormatterTokenGroup[] ListItems => ListItemsValue ?? (ListItemsValue = GetListItems().ToArray());
 
-        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart, bool exlucdePrefix)
+        protected override IEnumerable<IEnumerable<ISourcePartEdit>> GetSourcePartEdits(SourcePart targetPart, bool exlucdePrefix)
             => BodyItems
-                .SelectMany((item, index) => GetSourcePartEdits(targetPart, item, index - 1, exlucdePrefix));
+                .Select((item, index) => GetSourcePartEdits(targetPart, item, index - 1, exlucdePrefix));
 
         IEnumerable<ISourcePartEdit> GetSourcePartEdits
             (SourcePart targetPart, IStructure item, int index, bool exlucdePrefix)
@@ -65,7 +65,7 @@ namespace ReniUI.Formatting
                 yield return FormatterTokenGroup.Create(current);
                 current = current.Right;
             }
-            while(current.TokenClass == main);
+            while(current?.TokenClass == main);
         }
     }
 }

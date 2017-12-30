@@ -48,6 +48,9 @@ namespace ReniUI.Formatting
         internal static IStructure CreateBodyStruct
             (this Syntax syntax, StructFormatter parent, bool isLineBreakRequired)
         {
+            if(syntax == null)
+                return null;
+
             switch(syntax.TokenClass)
             {
                 case List _: return new ListStructure(syntax, parent, isLineBreakRequired);

@@ -17,21 +17,17 @@ namespace ReniUI.Formatting
             => BodyItemsValue ??
                (BodyItemsValue = GetBodyItems().Select(i => i.CreateChainItemStruct(Parent)).ToArray());
 
-        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart, bool exlucdePrefix)
-            => ConvertToSourcePartEdits(targetPart, exlucdePrefix);
-
-        IEnumerable<ISourcePartEdit> ConvertToSourcePartEdits(SourcePart targetPart, bool exlucdePrefix)
+        protected override IEnumerable<IEnumerable<ISourcePartEdit>> GetSourcePartEdits
+            (SourcePart targetPart, bool exlucdePrefix)
         {
             var effectiveExcludePrefix = exlucdePrefix;
 
             foreach(var item in BodyItems)
             {
                 if(item.IsTailItem && IsLineBreakRequired)
-                    yield return SourcePartEditExtension.LineBreak;
+                    yield return SourcePartEditExtension.LineBreak.SingleToArray();
 
-                var edits = ((IStructure) item).GetSourcePartEdits(targetPart, effectiveExcludePrefix);
-                foreach(var edit in edits)
-                    yield return edit;
+                yield return ((IStructure) item).GetSourcePartEdits(targetPart, effectiveExcludePrefix);
 
                 effectiveExcludePrefix = false;
             }
@@ -59,10 +55,7 @@ namespace ReniUI.Formatting
 
         internal bool IsTailItem => Syntax.Left != null;
 
-        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart, bool exlucdePrefix)
-            => SourcePartEdits(targetPart, exlucdePrefix).SelectMany(i => i);
-
-        IEnumerable<IEnumerable<ISourcePartEdit>> SourcePartEdits(SourcePart targetPart, bool exlucdePrefix)
+        protected override IEnumerable<IEnumerable<ISourcePartEdit>> GetSourcePartEdits(SourcePart targetPart, bool exlucdePrefix)
         {
             if(IsTailItem)
                 yield return SourcePartEditExtension.IndentStart.SingleToArray();

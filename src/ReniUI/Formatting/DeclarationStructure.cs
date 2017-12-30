@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Helper;
 using hw.Scanner;
+using Reni;
 using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
@@ -20,37 +21,28 @@ namespace ReniUI.Formatting
         static bool IsMultiLine => false;
         static bool IsInnerMultiLine => false;
 
-        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart, bool exlucdePrefix)
+        protected override IEnumerable<IEnumerable<ISourcePartEdit>> GetSourcePartEdits(SourcePart targetPart, bool exlucdePrefix)
         {
             if(IsMultiLine)
-                yield return SourcePartEditExtension.IndentEnd;
+                yield return SourcePartEditExtension.IndentEnd.SingleToArray();
 
-            foreach(var edit in Left.GetSourcePartEdits(targetPart, exlucdePrefix))
-                yield return edit;
+            yield return Left.GetSourcePartEdits(targetPart, exlucdePrefix);
 
             var declarationToken = FormatterTokenGroup.Create(Syntax);
-            foreach(var edit in declarationToken.Prefix)
-                yield return edit;
-            if (Syntax.LeftSideSeparator() == SeparatorType.CloseSeparator)
-                yield return SourcePartEditExtension.Space;
+            yield return declarationToken.Prefix;
             yield return declarationToken.Main;
-
-            foreach (var edit in declarationToken.Suffix)
-                yield return edit;
+            yield return declarationToken.Suffix;
 
             if(IsMultiLine)
-                yield return SourcePartEditExtension.IndentStart;
+                yield return SourcePartEditExtension.IndentStart.SingleToArray();
 
             if(IsMultiLine && IsInnerMultiLine)
-                yield return SourcePartEditExtension.LineBreak;
-            else if(Syntax.RightSideSeparator() == SeparatorType.CloseSeparator)
-                yield return SourcePartEditExtension.Space;
+                yield return SourcePartEditExtension.LineBreak.SingleToArray();
 
-            foreach(var edit in Right.GetSourcePartEdits(targetPart, false))
-                yield return edit;
+            yield return Right.GetSourcePartEdits(targetPart, false);
 
             if(IsMultiLine)
-                yield return SourcePartEditExtension.IndentEnd;
+                yield return SourcePartEditExtension.IndentEnd.SingleToArray();
         }
 
         IStructure GetLeft() => Syntax.Left.AssertNotNull().CreateDeclaratorStruct(Parent);

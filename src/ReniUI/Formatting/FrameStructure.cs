@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using hw.Helper;
 using hw.Scanner;
 using Reni.TokenClasses;
@@ -17,11 +16,12 @@ namespace ReniUI.Formatting
         IStructure Body => BodyValue ?? (BodyValue = GetBody());
         FormatterTokenGroup Right => RightValue ?? (RightValue = FormatterTokenGroup.Create(Syntax));
 
-        protected override IEnumerable<ISourcePartEdit> GetSourcePartEdits(SourcePart targetPart, bool exlucdePrefix)
+        protected override IEnumerable<IEnumerable<ISourcePartEdit>> GetSourcePartEdits
+            (SourcePart targetPart, bool exlucdePrefix)
         {
-            return
-                Body.GetSourcePartEdits(targetPart, exlucdePrefix)
-                    .Concat(Right.FormatFrameEnd().SelectMany(i=>i));
+            yield return Body.GetSourcePartEdits(targetPart, exlucdePrefix);
+            foreach(var edit in Right.FormatFrameEnd())
+                yield return edit;
         }
 
         IStructure GetBody()
