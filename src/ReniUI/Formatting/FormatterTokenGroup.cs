@@ -13,7 +13,10 @@ namespace ReniUI.Formatting
         internal static FormatterTokenGroup Create(Syntax syntax) => new FormatterTokenGroup(syntax);
 
         static SourcePartEdit[] CreateSourcePartEdits(IToken token, bool returnMain = true)
-            => FormatterToken.Create(token, returnMain).Select(i => i.ToSourcePartEdit()).ToArray();
+        {
+            var tokens = FormatterToken.Create(token, returnMain);
+            return tokens.Select(i => i.ToSourcePartEdit()).ToArray();
+        }
 
         readonly Syntax Syntax;
         ISourcePartEdit[] MainData;
@@ -43,8 +46,6 @@ namespace ReniUI.Formatting
         internal ISourcePartEdit[] Suffix
             => SuffixData ?? (SuffixData = CreateSourcePartEdits(Syntax.RightNeigbor?.Token, false));
 
-        IToken RightNeigborToken => Syntax.RightNeigbor?.Token;
-
         void EnsurePrefixResult()
         {
             if(MainData != null && PrefixData != null)
@@ -52,11 +53,12 @@ namespace ReniUI.Formatting
             var prefix = CreateSourcePartEdits(Syntax.Token);
             var prefixLength = prefix.Length - 1;
             PrefixData = prefix.Take(prefixLength).ToArray();
-            MainData = prefix.Skip(prefixLength).Take(1).plus(GetDistanceMarker()).ToArray();
+            MainData = prefix.Skip(prefixLength).Take(1).plus(GetDistanceMarker().ToArray()).ToArray();
         }
 
         IEnumerable<ISourcePartEdit> GetDistanceMarker()
         {
+            //Tracer.ConditionalBreak(Syntax.Token.Characters.Id == "data");
             if(Syntax.RightSideSeparator() == SeparatorType.CloseSeparator)
                 yield return SourcePartEditExtension.SpaceRequired;
         }

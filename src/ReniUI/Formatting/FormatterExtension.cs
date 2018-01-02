@@ -57,7 +57,8 @@ namespace ReniUI.Formatting
             var currentPosition = -originalPosition;
             var result = "";
 
-            foreach(var edit in pieces.OrderBy(edit => edit.Location.Position))
+            var edits = pieces.OrderBy(edit => edit.Location.Position).ToArray();
+            foreach(var edit in edits)
             {
                 Tracer.Assert(edit.Location.EndPosition <= originalEndPosition,"not implemented.");
                 var newPosition = edit.Location.EndPosition - originalPosition;
@@ -118,4 +119,5 @@ namespace ReniUI.Formatting
             return false;
         }
     }
+
 }

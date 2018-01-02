@@ -15,8 +15,8 @@ namespace Reni.Parser
         const string SingleCharSymbol = "({[)}];,.";
         internal static readonly Lexer Instance = new Lexer();
 
-        public static bool IsWhiteSpace(IItem item)
-            => item.ScannerTokenType == Instance.WhiteSpaceItem.ScannerTokenType;
+        public static bool IsSpace(IItem item)
+            => item.ScannerTokenType == Instance.SpaceItem.ScannerTokenType;
 
         public static bool IsMultiLineComment(IItem item)
             => item.ScannerTokenType == Instance.MultiLineCommentItem.ScannerTokenType;
@@ -50,12 +50,12 @@ namespace Reni.Parser
         readonly IMatch Number;
         readonly Match Text;
         readonly Match VarbatimTextHead;
-        readonly Match WhiteSpace;
+        readonly Match Space;
         internal readonly LexerItem LineCommentItem;
         internal readonly LexerItem LineEndItem;
         internal readonly LexerItem MultiLineCommentItem;
 
-        internal readonly LexerItem WhiteSpaceItem;
+        internal readonly LexerItem SpaceItem;
 
         Lexer()
             : base(error => new ScannerSyntaxError((IssueId) error))
@@ -81,7 +81,7 @@ namespace Reni.Parser
                                        .Else(Match.End.Find)
                                );
 
-            WhiteSpace = " \t".AnyChar();
+            Space = " \t".AnyChar();
             MultiLineComment = "#(" +
                        (Match.WhiteSpace + (Match.WhiteSpace + ")#").Find)
                        .Else(identifier.Value(id => (Match.WhiteSpace + id + ")#").Box().Find))
@@ -108,16 +108,16 @@ namespace Reni.Parser
                     })
                 .Else(varbatimText);
 
-            LineCommentItem = new LexerItem(new WhiteSpaceTokenType(), MatchLineComment);
-            MultiLineCommentItem = new LexerItem(new WhiteSpaceTokenType(), MatchMultiLineComment);
-            LineEndItem = new LexerItem(new WhiteSpaceTokenType(), MatchLineEnd);
-            WhiteSpaceItem = new LexerItem(new WhiteSpaceTokenType(), MatchWhiteSpace);
+            LineCommentItem = new LexerItem(new WhiteSpaceTokenType("LineComment"), MatchLineComment);
+            MultiLineCommentItem = new LexerItem(new WhiteSpaceTokenType("MultiLineComment"), MatchMultiLineComment);
+            LineEndItem = new LexerItem(new WhiteSpaceTokenType("LineEnd"), MatchLineEnd);
+            SpaceItem = new LexerItem(new WhiteSpaceTokenType("Space"), MatchSpace);
         }
 
         internal int? MatchNumber(SourcePosn sourcePosn) => GuardedMatch(sourcePosn, Number);
         internal int? MatchAny(SourcePosn sourcePosn) => GuardedMatch(sourcePosn, Any);
         internal int? MatchText(SourcePosn sourcePosn) => GuardedMatch(sourcePosn, Text);
-        int? MatchWhiteSpace(SourcePosn sourcePosn) => GuardedMatch(sourcePosn, WhiteSpace);
+        int? MatchSpace(SourcePosn sourcePosn) => GuardedMatch(sourcePosn, Space);
         int? MatchLineEnd(SourcePosn sourcePosn) => GuardedMatch(sourcePosn, LineEnd);
         int? MatchMultiLineComment(SourcePosn sourcePosn) => GuardedMatch(sourcePosn, MultiLineComment);
         int? MatchLineComment(SourcePosn sourcePosn) => GuardedMatch(sourcePosn, LineComment);

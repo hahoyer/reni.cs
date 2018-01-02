@@ -29,7 +29,7 @@ namespace Reni.Parser
             => (y ?? new T[0]).Where(item => item != null).Distinct().ToArray();
 
         internal static bool IsRelevantWhitespace(this IEnumerable<IItem> whiteSpaces)
-            => whiteSpaces?.Any(item => !Lexer.IsWhiteSpace(item)) ?? false;
+            => whiteSpaces?.Any(item => !Lexer.IsSpace(item)) ?? false;
 
         internal static bool HasComment(this IEnumerable<IItem> whiteSpaces)
             => whiteSpaces?.Any(IsComment) ?? false;
@@ -41,7 +41,7 @@ namespace Reni.Parser
             => token.PrecededWith.SourcePart() ?? token.Characters.Start.Span(0);
 
         internal static bool HasWhiteSpaces(this IEnumerable<IItem> whiteSpaces)
-            => whiteSpaces?.Any(Lexer.IsWhiteSpace) ?? false;
+            => whiteSpaces?.Any(Lexer.IsSpace) ?? false;
 
         internal static bool HasLines(this IEnumerable<IItem> whiteSpaces)
             => whiteSpaces?.Any(HasLines) ?? false;
@@ -80,7 +80,7 @@ namespace Reni.Parser
             => Lexer.IsLineEnd(item);
 
         internal static bool IsWhiteSpace(this IItem item)
-            => Lexer.IsWhiteSpace(item);
+            => Lexer.IsSpace(item);
 
         public static int Length(this IEnumerable<Lexer.WhiteSpaceToken> whiteSpaceTokens)
             => whiteSpaceTokens.Sum(item => item.Characters.Id.Length);

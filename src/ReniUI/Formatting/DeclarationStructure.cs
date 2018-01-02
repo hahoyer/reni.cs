@@ -23,26 +23,29 @@ namespace ReniUI.Formatting
 
         protected override IEnumerable<IEnumerable<ISourcePartEdit>> GetSourcePartEdits(SourcePart targetPart, bool exlucdePrefix)
         {
+            var result = new List<ISourcePartEdit>();
             if(IsMultiLine)
-                yield return SourcePartEditExtension.IndentEnd.SingleToArray();
+                result.Add(SourcePartEditExtension.IndentEnd);
 
-            yield return Left.GetSourcePartEdits(targetPart, exlucdePrefix);
+            result.AddRange(Left.GetSourcePartEdits(targetPart, exlucdePrefix));
 
             var declarationToken = FormatterTokenGroup.Create(Syntax);
-            yield return declarationToken.Prefix;
-            yield return declarationToken.Main;
-            yield return declarationToken.Suffix;
+            result.AddRange(declarationToken.Prefix);
+            result.AddRange(declarationToken.Main);
+            result.AddRange(declarationToken.Suffix);
 
             if(IsMultiLine)
-                yield return SourcePartEditExtension.IndentStart.SingleToArray();
+                result.Add(SourcePartEditExtension.IndentStart);
 
             if(IsMultiLine && IsInnerMultiLine)
-                yield return SourcePartEditExtension.LineBreak.SingleToArray();
+                result.Add(SourcePartEditExtension.LineBreak);
 
-            yield return Right.GetSourcePartEdits(targetPart, false);
+            var sourcePartEdits = Right.GetSourcePartEdits(targetPart, false);
+            result.AddRange(sourcePartEdits);
 
             if(IsMultiLine)
-                yield return SourcePartEditExtension.IndentEnd.SingleToArray();
+                result.Add(SourcePartEditExtension.IndentEnd);
+            return result.SingleToArray();
         }
 
         IStructure GetLeft() => Syntax.Left.AssertNotNull().CreateDeclaratorStruct(Parent);

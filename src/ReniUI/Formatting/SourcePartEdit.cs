@@ -5,11 +5,17 @@ namespace ReniUI.Formatting
     sealed class SourcePartEdit : DumpableObject, ISourcePartEdit
     {
         [EnableDump]
-        FormatterToken Source;
+        internal FormatterToken Source;
 
-        internal SourcePartEdit(FormatterToken source) => Source = source;
+        internal SourcePartEdit(FormatterToken source)
+        {
+            Source = source;
+            StopByObjectIds(3161,3169);
+        }
 
         internal Edit GetEditPiece(EditPieceParameter parameter)
             => Source.GetEditPiece(parameter);
+
+        protected override string GetNodeDump() {return base.GetNodeDump() + " " + Source.OrientationDump;}
     }
 }

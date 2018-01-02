@@ -61,7 +61,7 @@ namespace ReniUI.Formatting
                     isBeginOfLine = false;
                 }
 
-                if(Lexer.IsWhiteSpace(token) ||
+                if(Lexer.IsSpace(token) ||
                    Lexer.IsLineEnd(token) && !IsRelevantLineBreak(emptyLines, rightTokenClass))
                     result.AddHidden(token);
                 else

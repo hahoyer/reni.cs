@@ -2,12 +2,16 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Scanner;
 using Reni;
+using Reni.Parser;
 using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
     sealed class ChainStructure : Structure
     {
+        static IEnumerable<Syntax> GetBodyItems(Syntax syntax)
+            => syntax == null ? Enumerable.Empty<Syntax>() : GetBodyItems(syntax.Left).plus(syntax);
+
         ChainItemStruct[] BodyItemsValue;
 
         public ChainStructure(Syntax syntax, StructFormatter parent)
@@ -15,36 +19,25 @@ namespace ReniUI.Formatting
 
         ChainItemStruct[] BodyItems
             => BodyItemsValue ??
-               (BodyItemsValue = GetBodyItems().Select(i => i.CreateChainItemStruct(Parent)).ToArray());
+               (BodyItemsValue = GetBodyItems(Syntax).Select(i => i.CreateChainItemStruct(Parent)).ToArray());
 
         protected override IEnumerable<IEnumerable<ISourcePartEdit>> GetSourcePartEdits
             (SourcePart targetPart, bool exlucdePrefix)
         {
             var effectiveExcludePrefix = exlucdePrefix;
 
+            var edits = new List<ISourcePartEdit>();
             foreach(var item in BodyItems)
             {
                 if(item.IsTailItem && IsLineBreakRequired)
-                    yield return SourcePartEditExtension.LineBreak.SingleToArray();
+                    edits.Add(SourcePartEditExtension.LineBreak);
 
-                yield return ((IStructure) item).GetSourcePartEdits(targetPart, effectiveExcludePrefix);
+                edits.AddRange(((IStructure) item).GetSourcePartEdits(targetPart, effectiveExcludePrefix));
 
                 effectiveExcludePrefix = false;
             }
-        }
 
-        IEnumerable<Syntax> GetBodyItems()
-        {
-            var current = Syntax;
-            var items = new List<Syntax>();
-            while(current.Left != null)
-            {
-                items.Add(current);
-                current = current.Left;
-            }
-
-            items.Add(current);
-            return items;
+            return edits.SingleToArray();
         }
     }
 
@@ -55,15 +48,21 @@ namespace ReniUI.Formatting
 
         internal bool IsTailItem => Syntax.Left != null;
 
-        protected override IEnumerable<IEnumerable<ISourcePartEdit>> GetSourcePartEdits(SourcePart targetPart, bool exlucdePrefix)
+        protected override IEnumerable<IEnumerable<ISourcePartEdit>> GetSourcePartEdits
+            (SourcePart targetPart, bool exlucdePrefix)
         {
             if(IsTailItem)
                 yield return SourcePartEditExtension.IndentStart.SingleToArray();
 
-            yield return FormatterTokenGroup
-                .Create(Syntax)
+            var tokenGroup = FormatterTokenGroup
+                .Create(Syntax);
+
+            var edits = tokenGroup
                 .FormatChainItem(exlucdePrefix)
-                .SelectMany(i => i);
+                .SelectMany(i => i)
+                .ToArray();
+
+            yield return edits;
 
             if(Syntax.Right != null)
                 yield return Syntax.Right.CreateStruct(Parent).GetSourcePartEdits(targetPart, false);

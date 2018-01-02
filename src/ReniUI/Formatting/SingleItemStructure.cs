@@ -26,4 +26,4 @@ namespace ReniUI.Formatting
             yield return tokenGroup.Main;
         }
     }
-}
+}                                             

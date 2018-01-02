@@ -26,7 +26,7 @@ namespace Reni.Parser
 
         LexerItem[] Classes => new[]
         {
-            Lexer.Instance.WhiteSpaceItem,
+            Lexer.Instance.SpaceItem,
             Lexer.Instance.LineEndItem,
             Lexer.Instance.MultiLineCommentItem,
             Lexer.Instance.LineCommentItem,

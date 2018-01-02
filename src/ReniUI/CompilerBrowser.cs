@@ -162,7 +162,7 @@ namespace ReniUI
             return LocateActivePosition(offset)?.DeclarationOptions ?? new string[0];
         }
 
-        public IEnumerable<Edit> GetEditPieces
+        internal IEnumerable<Edit> GetEditPieces
             (SourcePart sourcePart, IFormatter formatter = null)
             => (formatter ?? new Formatting.Configuration().Create())
                 .GetEditPieces(this, sourcePart);
