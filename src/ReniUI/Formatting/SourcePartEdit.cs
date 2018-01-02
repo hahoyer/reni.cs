@@ -7,15 +7,11 @@ namespace ReniUI.Formatting
         [EnableDump]
         internal FormatterToken Source;
 
-        internal SourcePartEdit(FormatterToken source)
-        {
-            Source = source;
-            StopByObjectIds(3161,3169);
-        }
+        internal SourcePartEdit(FormatterToken source) => Source = source;
 
         internal Edit GetEditPiece(EditPieceParameter parameter)
             => Source.GetEditPiece(parameter);
 
-        protected override string GetNodeDump() {return base.GetNodeDump() + " " + Source.OrientationDump;}
+        protected override string GetNodeDump() => base.GetNodeDump() + " " + Source.OrientationDump;
     }
 }
