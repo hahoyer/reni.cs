@@ -53,7 +53,6 @@
     <Compile Include="Formatting\ListStructure.cs" />
     <Compile Include="Formatting\ParenthesisStructure.cs" />
     <Compile Include="Formatting\ResultItems.cs" />
-    <Compile Include="Formatting\SingleItemStructure.cs" />
     <Compile Include="Formatting\Skeleton.cs" />
     <Compile Include="Formatting\SourcePartEdit.cs" />
     <Compile Include="Formatting\SourcePartEditExtension.cs" />

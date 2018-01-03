@@ -22,29 +22,31 @@ namespace ReniUI.Formatting
 
         protected override IEnumerable<IEnumerable<ISourcePartEdit>> GetSourcePartEdits(SourcePart targetPart, bool exlucdePrefix)
         {
+            var result = new List<ISourcePartEdit>();
             if(!exlucdePrefix)
-                yield return Left.Prefix;
+                result.AddRange(Left.Prefix);
 
-            yield return Left.Main;
+            result.AddRange(Left.Main);
 
-            yield return SourcePartEditExtension.IndentStart.SingleToArray();
+            result.Add(SourcePartEditExtension.IndentStart);
 
             if(IsLineBreakRequired)
-                yield return SourcePartEditExtension.LineBreak.SingleToArray();
+                result.Add(SourcePartEditExtension.LineBreak);
 
-            yield return Left.Suffix;
+            result.AddRange(Left.Suffix);
 
             if(Body != null)
-                yield return Body.GetSourcePartEdits(targetPart, true);
+                result.AddRange(Body.GetSourcePartEdits(targetPart, true));
 
-            yield return Right.Prefix;
+            result.AddRange(Right.Prefix);
 
-            yield return SourcePartEditExtension.IndentEnd.SingleToArray();
+            result.Add(SourcePartEditExtension.IndentEnd);
             if(IsLineBreakRequired)
-                yield return SourcePartEditExtension.LineBreak.SingleToArray();
-            yield return Right.Main;
+                result.Add(SourcePartEditExtension.LineBreak);
+            result.AddRange(Right.Main);
 
-            yield return Right.Suffix;
+            result.AddRange(Right.Suffix);
+            return result.SingleToArray();
         }
 
         IStructure GetBody()

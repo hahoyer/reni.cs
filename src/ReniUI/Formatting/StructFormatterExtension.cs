@@ -62,11 +62,9 @@ namespace ReniUI.Formatting
 
         internal static IStructure CreateDeclaratorStruct(this Syntax syntax, StructFormatter parent)
         {
-            if(syntax.Left == null && syntax.Right == null)
-                return new SingleItemStructure(syntax, parent);
+            Tracer.Assert(syntax.Right == null);
 
-            Dumpable.NotImplementedFunction(syntax, parent);
-            return null;
+            return new DeclaratorItemStructure(syntax, parent);
         }
 
         internal static IStructure CreateListItemStruct(this Syntax syntax, StructFormatter parent)
@@ -159,4 +157,5 @@ namespace ReniUI.Formatting
             return basicLineLength == null || basicLineLength > configuration.MaxLineLength;
         }
     }
+
 }

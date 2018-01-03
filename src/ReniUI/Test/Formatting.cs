@@ -13,59 +13,6 @@ namespace ReniUI.Test
     [FormattingSimple]
     public sealed class Formatting : DependantAttribute
     {
-        [Test]
-        [UnitTest]
-        public void CommentFromSourcePart()
-        {
-            const string Text = @"( #(aa Comment aa)#
-1,3,4,6)";
-            var compiler = CompilerBrowser.FromText(Text);
-            var span = (compiler.Source + 2).Span(3);
-            var reformat = compiler.Reformat(sourcePart: span);                                      
-            Tracer.Assert(reformat == "#(a", reformat);
-        }
-
-        [UnitTest]
-        [Formatting]
-        [Test]
-        public void LegacySystem()
-        {
-            var srcDir = new StackTrace(true)
-                             .GetFrame(0)
-                             .GetFileName()
-                             .ToSmbFile()
-                             .DirectoryName +
-                         @"\..\..";
-            var fileName = srcDir + @"\renisource\test.reni";
-            var file = fileName.ToSmbFile();
-            Tracer.Line(Tracer.FilePosn(fileName, 0, 0, 0, 0, "see there"));
-            var compiler = CompilerBrowser.FromFile(fileName);
-            var source = compiler.Source.All;
-            var newSource = compiler.Reformat
-            (
-                new ReniUI.Formatting.Configuration
-                    {
-                        EmptyLineLimit = 0
-                    }.Create
-                    ()
-            );
-            var lineCount = newSource.Count(item => item == '\n');
-            Tracer.Assert
-                (lineCount == 57, nameof(lineCount) + "=" + lineCount + "\n" + newSource);
-        }
-
-        [Test]
-        [UnitTest]
-        public void LineCommentFromSourcePart()
-        {
-            const string Text = @"( # Comment
-1,3,4,6)";
-            var compiler = CompilerBrowser.FromText(Text);
-            var span = (compiler.Source + 2).Span(3);
-            var trimmed = compiler.Reformat(sourcePart: span);
-
-            Tracer.Assert(trimmed == "# C", trimmed);
-        }
 
         [Test]
         [UnitTest]

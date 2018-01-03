@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using hw.Helper;
 using hw.Scanner;
 using Reni;
@@ -9,6 +8,8 @@ namespace ReniUI.Formatting
 {
     sealed class DeclarationStructure : Structure
     {
+        static bool IsMultiLine => false;
+        static bool IsInnerMultiLine => false;
         IStructure LeftValue;
         IStructure RightValue;
 
@@ -18,10 +19,8 @@ namespace ReniUI.Formatting
         IStructure Left => LeftValue ?? (LeftValue = GetLeft());
         IStructure Right => RightValue ?? (RightValue = GetRight());
 
-        static bool IsMultiLine => false;
-        static bool IsInnerMultiLine => false;
-
-        protected override IEnumerable<IEnumerable<ISourcePartEdit>> GetSourcePartEdits(SourcePart targetPart, bool exlucdePrefix)
+        protected override IEnumerable<IEnumerable<ISourcePartEdit>> GetSourcePartEdits
+            (SourcePart targetPart, bool exlucdePrefix)
         {
             var result = new List<ISourcePartEdit>();
             if(IsMultiLine)
@@ -49,6 +48,24 @@ namespace ReniUI.Formatting
         }
 
         IStructure GetLeft() => Syntax.Left.AssertNotNull().CreateDeclaratorStruct(Parent);
-        IStructure GetRight() => Syntax.Right.AssertNotNull().CreateBodyStruct(Parent, IsMultiLine);
+        IStructure GetRight() => Syntax.Right.AssertNotNull().CreateStruct(Parent);
+    }
+
+    sealed class DeclaratorItemStructure : Structure
+    {
+        public DeclaratorItemStructure(Syntax syntax, StructFormatter parent)
+            : base(syntax, parent) {}
+
+
+        protected override IEnumerable<IEnumerable<ISourcePartEdit>> GetSourcePartEdits
+            (SourcePart targetPart, bool exlucdePrefix)
+        {
+            var tokenGroup = FormatterTokenGroup.Create(Syntax);
+            var result = new List<ISourcePartEdit>();
+            if(!exlucdePrefix)
+                result.AddRange(tokenGroup.Prefix);
+            result.AddRange(tokenGroup.Main);
+            return result.SingleToArray();
+        }
     }
 }
