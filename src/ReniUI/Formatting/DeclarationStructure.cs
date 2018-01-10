@@ -6,7 +6,7 @@ using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
-    sealed class DeclarationStructure : Structure
+    sealed class DeclarationStructure : StructureBase
     {
         static bool IsMultiLine => false;
         static bool IsInnerMultiLine => false;
@@ -26,7 +26,7 @@ namespace ReniUI.Formatting
             if(IsMultiLine)
                 result.Add(SourcePartEditExtension.IndentEnd);
 
-            result.AddRange(Left.GetSourcePartEdits(targetPart, exlucdePrefix));
+            result.AddRange(Left.GetSourcePartEdits(targetPart, exlucdePrefix, false));
 
             var declarationToken = FormatterTokenGroup.Create(Syntax);
             result.AddRange(declarationToken.Prefix);
@@ -39,7 +39,7 @@ namespace ReniUI.Formatting
             if(IsMultiLine && IsInnerMultiLine)
                 result.Add(SourcePartEditExtension.LineBreak);
 
-            var sourcePartEdits = Right.GetSourcePartEdits(targetPart, false);
+            var sourcePartEdits = Right.GetSourcePartEdits(targetPart, false, false);
             result.AddRange(sourcePartEdits);
 
             if(IsMultiLine)
@@ -51,7 +51,7 @@ namespace ReniUI.Formatting
         IStructure GetRight() => Syntax.Right.AssertNotNull().CreateStruct(Parent);
     }
 
-    sealed class DeclaratorItemStructure : Structure
+    sealed class DeclaratorItemStructure : StructureBase
     {
         public DeclaratorItemStructure(Syntax syntax, StructFormatter parent)
             : base(syntax, parent) {}
@@ -60,12 +60,40 @@ namespace ReniUI.Formatting
         protected override IEnumerable<IEnumerable<ISourcePartEdit>> GetSourcePartEdits
             (SourcePart targetPart, bool exlucdePrefix)
         {
-            var tokenGroup = FormatterTokenGroup.Create(Syntax);
             var result = new List<ISourcePartEdit>();
+
+            if(Syntax.Left != null)
+            {
+                var edits = Syntax
+                    .Left
+                    .CreateDeclarationTagStruct(Parent)
+                    .GetSourcePartEdits(targetPart, exlucdePrefix, false);
+                result.AddRange(edits);
+                exlucdePrefix = true;
+            }
+
+            var tokenGroup = FormatterTokenGroup.Create(Syntax);
             if(!exlucdePrefix)
                 result.AddRange(tokenGroup.Prefix);
             result.AddRange(tokenGroup.Main);
             return result.SingleToArray();
+        }
+    }
+
+    sealed class DeclarationTagStructure : StructureBase
+    {
+        public DeclarationTagStructure(Syntax syntax, StructFormatter parent)
+            : base(syntax, parent) {}
+
+
+        protected override IEnumerable<IEnumerable<ISourcePartEdit>> GetSourcePartEdits
+            (SourcePart targetPart, bool exlucdePrefix)
+        {
+            var l = Syntax.Left;
+            var r = Syntax.Right;
+
+            NotImplementedMethod(targetPart, exlucdePrefix);
+            return null;
         }
     }
 }

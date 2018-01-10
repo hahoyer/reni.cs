@@ -43,7 +43,8 @@ namespace ReniUI.Formatting
                right is LeftParenthesis ||
                right is List ||
                right is EndOfText ||
-               left is LeftParenthesis
+               left is LeftParenthesis || 
+               left is BeginOfText
             )
                 return ContactSeparator;
 

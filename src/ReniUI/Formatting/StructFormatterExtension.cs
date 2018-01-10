@@ -34,7 +34,7 @@ namespace ReniUI.Formatting
                 => new TContainer {Value = Value + token + other.Value};
         }
 
-        internal static IStructure CreateStruct(this Syntax syntax, StructFormatter parent)
+        internal static IStructure CreateFrameStruct(this Syntax syntax, StructFormatter parent)
         {
             switch(syntax.TokenClass)
             {
@@ -43,6 +43,11 @@ namespace ReniUI.Formatting
             }
 
             return new ChainStructure(syntax, parent);
+        }
+
+        internal static IStructure CreateStruct(this Syntax syntax, StructFormatter parent)
+        {
+            return new Structure(syntax, parent);
         }
 
         internal static IStructure CreateBodyStruct
@@ -65,6 +70,19 @@ namespace ReniUI.Formatting
             Tracer.Assert(syntax.Right == null);
 
             return new DeclaratorItemStructure(syntax, parent);
+        }
+
+        internal static IStructure CreateDeclarationTagStruct(this Syntax syntax, StructFormatter parent)
+        {
+            switch(syntax.TokenClass)
+            {
+                case ExclamationBoxToken _: return new DeclarationTagStructure(syntax, parent);
+            }
+
+
+
+            Tracer.ConditionalBreak(syntax != null);
+            return null;
         }
 
         internal static IStructure CreateListItemStruct(this Syntax syntax, StructFormatter parent)
@@ -157,5 +175,4 @@ namespace ReniUI.Formatting
             return basicLineLength == null || basicLineLength > configuration.MaxLineLength;
         }
     }
-
 }

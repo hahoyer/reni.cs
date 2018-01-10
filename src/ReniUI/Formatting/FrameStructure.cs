@@ -5,7 +5,7 @@ using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
-    sealed class FrameStructure : Structure
+    sealed class FrameStructure : StructureBase
     {
         IStructure BodyValue;
         FormatterTokenGroup RightValue;
@@ -19,7 +19,7 @@ namespace ReniUI.Formatting
         protected override IEnumerable<IEnumerable<ISourcePartEdit>> GetSourcePartEdits
             (SourcePart targetPart, bool exlucdePrefix)
         {
-            yield return Body.GetSourcePartEdits(targetPart, exlucdePrefix);
+            yield return Body.GetSourcePartEdits(targetPart, exlucdePrefix, false);
             foreach(var edit in Right.FormatFrameEnd())
                 yield return edit;
         }

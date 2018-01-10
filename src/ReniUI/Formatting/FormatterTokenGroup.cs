@@ -58,7 +58,7 @@ namespace ReniUI.Formatting
 
         IEnumerable<ISourcePartEdit> GetDistanceMarker()
         {
-            //Tracer.ConditionalBreak(Syntax.Token.Characters.Id == "data");
+            Tracer.ConditionalBreak(Syntax.Token.Characters.Id == "data");
             if(Syntax.RightSideSeparator() == SeparatorType.CloseSeparator)
                 yield return SourcePartEditExtension.SpaceRequired;
         }

@@ -10,6 +10,7 @@ namespace ReniUI.Formatting
     {
         public SourcePart Location;
         public string NewText;
+        public Edit() {StopByObjectIds(689);}
     }
 
 }

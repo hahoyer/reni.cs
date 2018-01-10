@@ -7,7 +7,7 @@ using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
-    sealed class ParenthesisStructure : Structure
+    sealed class ParenthesisStructure : StructureBase
     {
         IStructure BodyValue;
         FormatterTokenGroup LeftValue;
@@ -36,7 +36,7 @@ namespace ReniUI.Formatting
             result.AddRange(Left.Suffix);
 
             if(Body != null)
-                result.AddRange(Body.GetSourcePartEdits(targetPart, true));
+                result.AddRange(Body.GetSourcePartEdits(targetPart, true, false));
 
             result.AddRange(Right.Prefix);
 

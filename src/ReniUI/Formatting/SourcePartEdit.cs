@@ -7,7 +7,10 @@ namespace ReniUI.Formatting
         [EnableDump]
         internal FormatterToken Source;
 
-        internal SourcePartEdit(FormatterToken source) => Source = source;
+        internal SourcePartEdit(FormatterToken source)
+        {
+            Source = source;
+        }
 
         internal Edit GetEditPiece(EditPieceParameter parameter)
             => Source.GetEditPiece(parameter);

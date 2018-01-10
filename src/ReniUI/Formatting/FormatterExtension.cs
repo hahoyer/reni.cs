@@ -50,6 +50,7 @@ namespace ReniUI.Formatting
 
         internal static string Combine(this IEnumerable<Edit> pieces, SourcePart targetPart)
         {
+            pieces = pieces.ToArray();
             var original = targetPart.Id;
             var originalPosition = targetPart.Position;
             var originalEndPosition = originalPosition + original.Length;

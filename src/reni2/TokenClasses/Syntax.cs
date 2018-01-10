@@ -361,5 +361,6 @@ namespace Reni.TokenClasses
             NotImplementedMethod(other, diffenceHandler);
             return false;
         }
+
     }
 }

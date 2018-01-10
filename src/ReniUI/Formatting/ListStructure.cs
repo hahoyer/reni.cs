@@ -7,7 +7,7 @@ using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
-    sealed class ListStructure : Structure
+    sealed class ListStructure : StructureBase
     {
         IStructure[] BodyItemsValue;
         FormatterTokenGroup[] ListItemsValue;
@@ -33,7 +33,7 @@ namespace ReniUI.Formatting
         IEnumerable<ISourcePartEdit> GetSourcePartEdits
             (SourcePart targetPart, IStructure item, int index, bool exlucdePrefix)
         {
-            var result = item.GetSourcePartEdits(targetPart, index >= 0 || exlucdePrefix);
+            var result = item.GetSourcePartEdits(targetPart, index >= 0 || exlucdePrefix, false);
             return index >= 0
                 ? ListItems[index].FormatListItem(IsLineBreakRequired, Parent.Configuration).SelectMany(i=>i).Concat(result)
                 : result;
