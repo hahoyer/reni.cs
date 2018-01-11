@@ -9,8 +9,8 @@ namespace ReniUI.Formatting
         readonly Configuration Configuration;
         public int Indent;
         public bool IsEndOfFile;
-        public int LineBreakCount;
         public bool IsSpaceRequired;
+        public int LineBreakCount;
 
         public EditPieceParameter(Configuration configuration) => Configuration = configuration;
 
@@ -33,8 +33,8 @@ namespace ReniUI.Formatting
             IsSpaceRequired = false;
         }
 
-        internal Edit GetEditPiece
-            (bool hasCommentLineBreak, int[] currentLineBreaks, SourcePosn anchor, int[] currentSpaces)
+        internal Edit 
+            GetEditPiece(bool hasCommentLineBreak, int[] currentLineBreaks, SourcePosn anchor, int[] currentSpaces)
         {
             var lineBreakPart = GetLineBreakPart(hasCommentLineBreak, currentLineBreaks);
             var spacesPart = GetSpacesPart(currentSpaces);

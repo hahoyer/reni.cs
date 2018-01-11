@@ -14,74 +14,91 @@ namespace ReniUI.Formatting
             if(token == null)
                 return Enumerable.Empty<FormatterToken>();
 
-            var anchor = token.SourcePart().Start;
             var items = token.PrecededWith.ToArray();
-            var hasCommentLineBreak = false;
-            var lineBreaks = new List<SourcePosn>();
-            var spaces = new List<SourcePosn>();
+            var resultItem = new FormatterToken();
+            resultItem.Anchor = token.SourcePart().Start;
 
             var result = new List<FormatterToken>();
             foreach(var item in items)
+            {
                 if(item.IsComment())
                 {
-                    result.Add(new FormatterToken(hasCommentLineBreak, lineBreaks, anchor, spaces));
-                    hasCommentLineBreak = Lexer.IsLineComment(item);
-                    lineBreaks = new List<SourcePosn>();
-                    spaces = new List<SourcePosn>();
-                    anchor = item.SourcePart.End;
-                }
-                else if(item.IsWhiteSpace())
-                    spaces.Add(item.SourcePart.End);
-                else
-                {
-                    Tracer.Assert(item.IsLineBreak());
-                    lineBreaks.Add(item.SourcePart.Start);
-                    spaces = new List<SourcePosn>();
-                    anchor = item.SourcePart.End;
+                    Tracer.Assert(resultItem.Anchor != null);
+                    result.Add(resultItem);
+                    resultItem = new FormatterToken();
                 }
 
+                resultItem.Modify(item);
+            }
+
             if(returnMain)
-                result.Add(new FormatterToken(hasCommentLineBreak, lineBreaks, anchor, spaces));
+            {
+                Tracer.Assert(resultItem.Anchor != null);
+                result.Add(resultItem);
+            }
+
             return result;
         }
 
+        readonly List<SourcePosn> LineBreaks = new List<SourcePosn>();
+
         [EnableDump]
-        readonly SourcePosn Anchor;
+        SourcePosn Anchor;
 
         [EnableDumpExcept(false)]
-        readonly bool HasCommentLineBreak;
+        bool HasCommentLineBreak;
 
-        [EnableDump]
-        readonly int[] RelativeLineBreakPositions;
-
-        [EnableDump]
-        readonly int[] RelativeSpacePositions;
-
-        FormatterToken
-        (
-            bool hasCommentLineBreak,
-            IEnumerable<SourcePosn> lineBreaks,
-            SourcePosn anchor,
-            IEnumerable<SourcePosn> spaces)
-        {
-            HasCommentLineBreak = hasCommentLineBreak;
-            Anchor = anchor;
-            RelativeLineBreakPositions = lineBreaks.Select(index => index - anchor).ToArray();
-            RelativeSpacePositions = spaces.Select(index => index - anchor).ToArray();
-        }
+        List<SourcePart> Spaces = new List<SourcePart>();
 
         SourcePart ISourcePartProxy.All
             => (Anchor + (RelativeLineBreakPositions.Any() ? RelativeLineBreakPositions.First() : 0))
                 .Span(Anchor + (RelativeSpacePositions.Any() ? RelativeSpacePositions.Last() : 0));
+
+        [EnableDump]
+        int[] RelativeLineBreakPositions => LineBreaks.Select(index => index - Anchor).ToArray();
+
+        [EnableDump]
+        int[] RelativeSpacePositions => Spaces.Select(part => part.End - Anchor).ToArray();
 
         internal bool IsEmpty =>
             !HasCommentLineBreak && !RelativeLineBreakPositions.Any() && !RelativeSpacePositions.Any();
 
         internal string OrientationDump => Anchor.GetDumpAroundCurrent(5);
 
-        internal SourcePartEdit ToSourcePartEdit() => new SourcePartEdit(this);
+        void Modify(IItem item)
+        {
+            if(item.IsComment())
+                HasCommentLineBreak = Lexer.IsLineComment(item);
+
+            if(item.IsWhiteSpace())
+            {
+                if(Spaces.Any())
+                    Tracer.Assert(Spaces.Last().End == item.SourcePart.Start);
+                Spaces.Add(item.SourcePart);
+            }
+
+            if(item.IsLineBreak())
+            {
+                if(Spaces.Any())
+                    Tracer.Assert(Spaces.Last().End == item.SourcePart.Start);
+
+                LineBreaks.Add(Spaces.Any() ? Spaces.First().Start : item.SourcePart.Start);
+                Spaces = new List<SourcePart>();
+            }
+
+            if(item.IsComment() || item.IsLineBreak())
+                Anchor = item.SourcePart.End;
+        }
+
+        internal ISourcePartEdit ToSourcePartEdit() => new SourcePartEdit(this);
 
         internal Edit GetEditPiece(EditPieceParameter parameter)
-            => parameter.GetEditPiece(HasCommentLineBreak, RelativeLineBreakPositions, Anchor, RelativeSpacePositions);
+            => parameter.GetEditPiece
+            (
+                HasCommentLineBreak,
+                RelativeLineBreakPositions,
+                Anchor,
+                RelativeSpacePositions
+            );
     }
 }

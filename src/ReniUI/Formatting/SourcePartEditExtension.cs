@@ -21,8 +21,8 @@ namespace ReniUI.Formatting
         internal static readonly ISourcePartEdit IndentEnd = new SpecialEdit("IndentEnd");
         internal static readonly ISourcePartEdit EndOfFile = new SpecialEdit("EndOfFile");
 
-        internal static IEnumerable<Edit> GetEditPieces
-            (this IEnumerable<ISourcePartEdit> target, SourcePart targetPart, Configuration configuration)
+        internal static IEnumerable<Edit> 
+            GetEditPieces(this IEnumerable<ISourcePartEdit> target, SourcePart targetPart, Configuration configuration)
         {
             var currentPosition = 0;
             var currentIndex = 0;

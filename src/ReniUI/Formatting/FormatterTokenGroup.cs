@@ -12,7 +12,7 @@ namespace ReniUI.Formatting
     {
         internal static FormatterTokenGroup Create(Syntax syntax) => new FormatterTokenGroup(syntax);
 
-        static SourcePartEdit[] CreateSourcePartEdits(IToken token, bool returnMain = true)
+        static ISourcePartEdit[] CreateSourcePartEdits(IToken token, bool returnMain = true)
         {
             var tokens = FormatterToken.Create(token, returnMain);
             return tokens.Select(i => i.ToSourcePartEdit()).ToArray();
