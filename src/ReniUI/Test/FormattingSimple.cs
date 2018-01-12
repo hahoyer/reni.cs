@@ -10,6 +10,7 @@ namespace ReniUI.Test
 {
     [UnitTest]
     [TestFixture]
+    [StructFormatting]
     public sealed class FormattingSimple : DependantAttribute
     {
         [Test]

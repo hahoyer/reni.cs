@@ -16,7 +16,7 @@ namespace ReniUI.Formatting
         }
 
         internal static readonly ISourcePartEdit LineBreak = new SpecialEdit("LineBreak");
-        internal static readonly ISourcePartEdit SpaceRequired = new SpecialEdit("SpaceRequired");
+        internal static readonly ISourcePartEdit EnsureSeparator = new SpecialEdit("EnsureSeparator");
         internal static readonly ISourcePartEdit IndentStart = new SpecialEdit("IndentStart");
         internal static readonly ISourcePartEdit IndentEnd = new SpecialEdit("IndentEnd");
         internal static readonly ISourcePartEdit EndOfFile = new SpecialEdit("EndOfFile");
@@ -29,6 +29,7 @@ namespace ReniUI.Formatting
 
             var parameter = new EditPieceParameter(configuration);
 
+            var result = new List<Edit>();
             foreach(var part in target)
             {
                 if(part == IndentStart)
@@ -38,20 +39,20 @@ namespace ReniUI.Formatting
                 else if(part == LineBreak)
                 {
                     parameter.LineBreakCount++;
-                    parameter.IsSpaceRequired = false;
+                    parameter.IsSeparatorRequired = false;
                 }
-                else if(part == SpaceRequired)
-                    parameter.IsSpaceRequired = true;
+                else if(part == EnsureSeparator)
+                    parameter.IsSeparatorRequired = true;
                 else if(part == EndOfFile)
                     parameter.IsEndOfFile = true;
                 else if(part is SourcePartEdit spe)
                 {
-                    var edit = spe.GetEditPiece(parameter);
-                    if(edit != null)
+                    var edits = spe.GetEditPiece(parameter).ToArray();
+                    foreach(var edit in edits)
                     {
                         Tracer.Assert(currentPosition <= edit.Location.Position);
                         currentPosition = edit.Location.EndPosition;
-                        yield return edit;
+                        result.Add(edit);
                     }
                     parameter.Reset();
                 }
@@ -60,6 +61,8 @@ namespace ReniUI.Formatting
 
                 currentIndex++;
             }
+
+            return result;
         }
     }
 }

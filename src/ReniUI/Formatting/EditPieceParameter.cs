@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
@@ -9,7 +11,7 @@ namespace ReniUI.Formatting
         readonly Configuration Configuration;
         public int Indent;
         public bool IsEndOfFile;
-        public bool IsSpaceRequired;
+        public bool IsSeparatorRequired;
         public int LineBreakCount;
 
         public EditPieceParameter(Configuration configuration) => Configuration = configuration;
@@ -18,7 +20,7 @@ namespace ReniUI.Formatting
         {
             var lineBreakText = "\n".Repeat(LineBreakCount);
             var indentText = LineBreakCount > 0 ? " ".Repeat(Indent * Configuration.IndentCount) : "";
-            var spaceText = IsSpaceRequired ? " " : "";
+            var spaceText = IsSeparatorRequired ? " " : "";
 
             return new Edit
             {
@@ -30,32 +32,44 @@ namespace ReniUI.Formatting
         public void Reset()
         {
             LineBreakCount = 0;
-            IsSpaceRequired = false;
+            IsSeparatorRequired = false;
         }
 
-        internal Edit 
-            GetEditPiece(bool hasCommentLineBreak, int[] currentLineBreaks, SourcePosn anchor, int[] currentSpaces)
+        internal IEnumerable<Edit>
+            GetEditPiece
+            (bool hasCommentLineBreak, SourcePart[] currentLineBreaks, SourcePosn anchor, int[] currentSpaces)
         {
-            var lineBreakPart = GetLineBreakPart(hasCommentLineBreak, currentLineBreaks);
-            var spacesPart = GetSpacesPart(currentSpaces);
+            var lineBreakPart = GetLineBreakPart(hasCommentLineBreak, currentLineBreaks, anchor);
+            var spacesPart = GetSpacesPart(currentSpaces, lineBreakPart.isSeparatorRequired);
 
             var location = (anchor + lineBreakPart.startPosition).Span(anchor + spacesPart.endPosition);
             var newText = lineBreakPart.text + spacesPart.text;
 
             if(location.Length == 0 && newText == "")
-                return null;
+                return Enumerable.Empty<Edit>();
 
-            return
+            var piece = new List<Edit>();
+            foreach(var lineBreak in currentLineBreaks.Where(item => item.Length > 0 && item.End <= location.Start))
+                piece.Add
+                (
+                    new Edit
+                    {
+                        Location = lineBreak,
+                        NewText = ""
+                    });
+            piece.Add
+            (
                 new Edit
                 {
                     Location = location,
                     NewText = newText
-                };
+                });
+            return piece;
         }
 
-        (string text, int endPosition) GetSpacesPart(int[] currentSpaces)
+        (string text, int endPosition) GetSpacesPart(int[] currentSpaces, bool isSeparatorRequired)
         {
-            var newspacesCount = IsSpaceRequired ? 1 : 0;
+            var newspacesCount = isSeparatorRequired ? 1 : 0;
             if(LineBreakCount > 0)
                 newspacesCount += Indent * Configuration.IndentCount;
 
@@ -68,7 +82,8 @@ namespace ReniUI.Formatting
                 );
         }
 
-        (int startPosition, string text) GetLineBreakPart(bool hasCommentLineBreak, int[] currentLineBreaks)
+        (int startPosition, string text, bool isSeparatorRequired) GetLineBreakPart
+            (bool hasCommentLineBreak, SourcePart[] currentLineBreaks, SourcePosn anchor)
         {
             var newLineBreakCount = NewLineBreakCount(hasCommentLineBreak, currentLineBreaks.Length);
 
@@ -76,8 +91,9 @@ namespace ReniUI.Formatting
 
             return
                 (
-                delta < 0 ? currentLineBreaks[newLineBreakCount] : 0,
-                delta > 0 ? "\n".Repeat(delta) : ""
+                delta < 0 ? currentLineBreaks[newLineBreakCount].End - anchor : 0,
+                delta > 0 ? "\n".Repeat(delta) : "",
+                newLineBreakCount == 0 && IsSeparatorRequired
                 );
         }
 

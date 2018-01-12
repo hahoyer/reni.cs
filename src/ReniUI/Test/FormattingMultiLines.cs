@@ -4,9 +4,11 @@ using hw.UnitTest;
 using NUnit.Framework;
 using ReniUI.Formatting;
 
-namespace ReniUI.Test {
+namespace ReniUI.Test
+{
     [UnitTest]
     [TestFixture]
+    [StructFormatting]
     public sealed class FormattingMultiLines : DependantAttribute
     {
         [Test]
@@ -43,4 +45,4 @@ namespace ReniUI.Test {
                 "\n\"" + newSource + "\"");
         }
     }
-}                                 
+}

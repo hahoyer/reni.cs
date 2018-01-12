@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using hw.DebugFormatter;
 
 namespace ReniUI.Formatting
@@ -12,7 +13,7 @@ namespace ReniUI.Formatting
             Source = source;
         }
 
-        internal Edit GetEditPiece(EditPieceParameter parameter)
+        internal IEnumerable<Edit> GetEditPiece(EditPieceParameter parameter)
             => Source.GetEditPiece(parameter);
 
         protected override string GetNodeDump() => base.GetNodeDump() + " " + Source.OrientationDump;

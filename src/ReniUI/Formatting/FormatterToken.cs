@@ -40,7 +40,7 @@ namespace ReniUI.Formatting
             return result;
         }
 
-        readonly List<SourcePosn> LineBreaks = new List<SourcePosn>();
+        readonly List<SourcePart> LineBreakPrefixes = new List<SourcePart>();
 
         [EnableDump]
         SourcePosn Anchor;
@@ -51,17 +51,14 @@ namespace ReniUI.Formatting
         List<SourcePart> Spaces = new List<SourcePart>();
 
         SourcePart ISourcePartProxy.All
-            => (Anchor + (RelativeLineBreakPositions.Any() ? RelativeLineBreakPositions.First() : 0))
+            => (LineBreakPrefixes.Any() ? LineBreakPrefixes.First().Start : Anchor)
                 .Span(Anchor + (RelativeSpacePositions.Any() ? RelativeSpacePositions.Last() : 0));
-
-        [EnableDump]
-        int[] RelativeLineBreakPositions => LineBreaks.Select(index => index - Anchor).ToArray();
 
         [EnableDump]
         int[] RelativeSpacePositions => Spaces.Select(part => part.End - Anchor).ToArray();
 
         internal bool IsEmpty =>
-            !HasCommentLineBreak && !RelativeLineBreakPositions.Any() && !RelativeSpacePositions.Any();
+            !HasCommentLineBreak && !LineBreakPrefixes.Any() && !RelativeSpacePositions.Any();
 
         internal string OrientationDump => Anchor.GetDumpAroundCurrent(5);
 
@@ -82,7 +79,10 @@ namespace ReniUI.Formatting
                 if(Spaces.Any())
                     Tracer.Assert(Spaces.Last().End == item.SourcePart.Start);
 
-                LineBreaks.Add(Spaces.Any() ? Spaces.First().Start : item.SourcePart.Start);
+                var lineBreakPrefix = (Spaces.Any() ? Spaces.First().Start : item.SourcePart.Start)
+                    .Span(item.SourcePart.Start);
+
+                LineBreakPrefixes.Add(lineBreakPrefix);
                 Spaces = new List<SourcePart>();
             }
 
@@ -92,11 +92,11 @@ namespace ReniUI.Formatting
 
         internal ISourcePartEdit ToSourcePartEdit() => new SourcePartEdit(this);
 
-        internal Edit GetEditPiece(EditPieceParameter parameter)
+        internal IEnumerable<Edit> GetEditPiece(EditPieceParameter parameter)
             => parameter.GetEditPiece
             (
                 HasCommentLineBreak,
-                RelativeLineBreakPositions,
+                LineBreakPrefixes.ToArray(),
                 Anchor,
                 RelativeSpacePositions
             );
