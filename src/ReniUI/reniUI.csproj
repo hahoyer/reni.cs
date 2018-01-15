@@ -58,6 +58,7 @@
     <Compile Include="Formatting\SourcePartEditExtension.cs" />
     <Compile Include="Formatting\StructFormatter.cs" />
     <Compile Include="Formatting\StructFormatterExtension.cs" />
+    <Compile Include="Formatting\Structure.cs" />
     <Compile Include="Formatting\StructureBase.cs" />
     <Compile Include="Formatting\WhiteSpace.cs" />
     <Compile Include="hw\Forms\CursorUtil.cs" />

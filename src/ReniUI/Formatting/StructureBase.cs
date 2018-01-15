@@ -1,8 +1,8 @@
-using System;
 using System.Collections.Generic;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
+using Reni.Parser;
 using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
@@ -41,7 +41,7 @@ namespace ReniUI.Formatting
 
         Syntax IStructure.Syntax => Syntax;
 
-        IEnumerable<ISourcePartEdit> 
+        IEnumerable<ISourcePartEdit>
             IStructure.GetSourcePartEdits(SourcePart targetPart, bool exlucdePrefix, bool includeSuffix)
         {
             var result = new List<ISourcePartEdit>();
@@ -76,21 +76,19 @@ namespace ReniUI.Formatting
             => Syntax.Left.CreateStruct(Parent).GetSourcePartEdits(targetPart, exlucdePrefix, false);
 
         IEnumerable<ISourcePartEdit> GetRightSiteEdits(SourcePart targetPart, bool includeSuffix)
-            => Syntax.Right.CreateStruct(Parent).GetSourcePartEdits(targetPart, true, includeSuffix);
+        {
+            var result = Syntax.Right.CreateStruct(Parent).GetSourcePartEdits(targetPart, true, includeSuffix);
+            if(Syntax.TokenClass is LeftParenthesis)
+                return SourcePartEditExtension.IndentStart
+                    .plus(result)
+                    .plus(SourcePartEditExtension.IndentEnd);
 
-        protected abstract IEnumerable<IEnumerable<ISourcePartEdit>> 
+            return result;
+        }
+
+        protected abstract IEnumerable<IEnumerable<ISourcePartEdit>>
             GetSourcePartEdits(SourcePart targetPart, bool exlucdePrefix);
 
         protected override string GetNodeDump() => base.GetNodeDump() + " " + Syntax.Token.Characters.Id;
-    }
-
-    sealed class Structure : StructureBase
-    {
-        public Structure(Syntax syntax, StructFormatter parent)
-            : base(syntax, parent) {}
-
-        protected override IEnumerable<IEnumerable<ISourcePartEdit>>
-            GetSourcePartEdits(SourcePart targetPart, bool exlucdePrefix)
-            => throw new NotImplementedException();
     }
 }

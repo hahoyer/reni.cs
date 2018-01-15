@@ -12,23 +12,27 @@ namespace ReniUI.Test
     {
         [Test]
         [UnitTest]
-        public void OmitSpaceWhenLinebreakRemains()
+        public void UseSpaceWhenLinebreakIsRemoved()
         {
             const string text =
-                @"a
-b";
+                @"(12345,12345,12345,12345,12345)";
 
-            var expectedText = @"aa
-b"              
-                .Replace("\r\n", "\n");
-            ;
+            const string expectedText =
+                @"(
+    12345,
+    12345,
+    12345,
+    12345,
+    12345
+)";
 
             var compiler = CompilerBrowser.FromText(text);
             var newSource = compiler.Reformat
                 (
                     new ReniUI.Formatting.Configuration
                     {
-                        EmptyLineLimit = null
+                        EmptyLineLimit = 0,
+                        //MaxLineLength = 20
                     }.Create()
                 )
                 .Replace("\r\n", "\n");

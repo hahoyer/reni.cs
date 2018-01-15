@@ -95,8 +95,7 @@ namespace ReniUI
 
         internal int? FindFunctionIndex(IFormalCodeItem codeBase)
         {
-            int result;
-            if(CodeToFunctionIndexCache.TryGetValue(codeBase, out result))
+            if(CodeToFunctionIndexCache.TryGetValue(codeBase, out var result))
                 return result;
 
             var results = Compiler

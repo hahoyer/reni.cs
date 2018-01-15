@@ -58,12 +58,14 @@ namespace ReniUI.Formatting
 
         IEnumerable<ISourcePartEdit> GetDistanceMarker()
         {
-            Tracer.ConditionalBreak(Syntax.Token.Characters.Id == " b");
-            if(Syntax.RightSideSeparator() == SeparatorType.CloseSeparator)
-            {
-                Tracer.ConditionalBreak(Syntax.Token.Characters.Id == " a");
-                yield return SourcePartEditExtension.EnsureSeparator;
-            }
+            var id = Syntax.Token.Characters.Id;
+            Tracer.ConditionalBreak(id == " b");
+            if(Syntax.RightSideSeparator() != SeparatorType.CloseSeparator)
+                return new ISourcePartEdit[0];
+            
+            Tracer.ConditionalBreak(id == " a");
+            return new [] {SourcePartEditExtension.EnsureSeparator};
+
         }
 
         internal IEnumerable<IEnumerable<ISourcePartEdit>> FormatListItem
