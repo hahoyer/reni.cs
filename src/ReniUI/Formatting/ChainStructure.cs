@@ -52,7 +52,7 @@ namespace ReniUI.Formatting
             (SourcePart targetPart, bool exlucdePrefix)
         {
             if(IsTailItem)
-                yield return SourcePartEditExtension.IndentStart.SingleToArray();
+                yield return SourcePartEditExtension.ToRight.SingleToArray();
 
             var tokenGroup = FormatterTokenGroup
                 .Create(Syntax);
@@ -68,7 +68,7 @@ namespace ReniUI.Formatting
                 yield return Syntax.Right.CreateStruct(Parent).GetSourcePartEdits(targetPart, false, false);
 
             if(IsTailItem)
-                yield return SourcePartEditExtension.IndentEnd.SingleToArray();
+                yield return SourcePartEditExtension.ToLeft.SingleToArray();
         }
     }
 }

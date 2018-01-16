@@ -24,7 +24,7 @@ namespace ReniUI.Formatting
         {
             var result = new List<ISourcePartEdit>();
             if(IsMultiLine)
-                result.Add(SourcePartEditExtension.IndentEnd);
+                result.Add(SourcePartEditExtension.ToLeft);
 
             result.AddRange(Left.GetSourcePartEdits(targetPart, exlucdePrefix, false));
 
@@ -34,7 +34,7 @@ namespace ReniUI.Formatting
             result.AddRange(declarationToken.Suffix);
 
             if(IsMultiLine)
-                result.Add(SourcePartEditExtension.IndentStart);
+                result.Add(SourcePartEditExtension.ToRight);
 
             if(IsMultiLine && IsInnerMultiLine)
                 result.Add(SourcePartEditExtension.LineBreak);
@@ -43,7 +43,7 @@ namespace ReniUI.Formatting
             result.AddRange(sourcePartEdits);
 
             if(IsMultiLine)
-                result.Add(SourcePartEditExtension.IndentEnd);
+                result.Add(SourcePartEditExtension.ToLeft);
             return result.SingleToArray();
         }
 

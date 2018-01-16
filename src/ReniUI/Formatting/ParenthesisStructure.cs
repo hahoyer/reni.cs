@@ -28,7 +28,7 @@ namespace ReniUI.Formatting
 
             result.AddRange(Left.Main);
 
-            result.Add(SourcePartEditExtension.IndentStart);
+            result.Add(SourcePartEditExtension.ToRight);
 
             if(IsLineBreakRequired)
                 result.Add(SourcePartEditExtension.LineBreak);
@@ -40,7 +40,7 @@ namespace ReniUI.Formatting
 
             result.AddRange(Right.Prefix);
 
-            result.Add(SourcePartEditExtension.IndentEnd);
+            result.Add(SourcePartEditExtension.ToLeft);
             if(IsLineBreakRequired)
                 result.Add(SourcePartEditExtension.LineBreak);
             result.AddRange(Right.Main);

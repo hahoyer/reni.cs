@@ -17,8 +17,8 @@ namespace ReniUI.Formatting
 
         internal static readonly ISourcePartEdit LineBreak = new SpecialEdit("LineBreak");
         internal static readonly ISourcePartEdit EnsureSeparator = new SpecialEdit("EnsureSeparator");
-        internal static readonly ISourcePartEdit IndentStart = new SpecialEdit("IndentStart");
-        internal static readonly ISourcePartEdit IndentEnd = new SpecialEdit("IndentEnd");
+        internal static readonly ISourcePartEdit ToRight = new SpecialEdit("ToRight");
+        internal static readonly ISourcePartEdit ToLeft = new SpecialEdit("ToLeft");
         internal static readonly ISourcePartEdit EndOfFile = new SpecialEdit("EndOfFile");
 
         internal static IEnumerable<Edit> GetEditPieces
@@ -32,9 +32,9 @@ namespace ReniUI.Formatting
             var result = new List<Edit>();
             foreach(var part in target)
             {
-                if(part == IndentStart)
+                if(part == ToRight)
                     parameter.Indent++;
-                else if(part == IndentEnd)
+                else if(part == ToLeft)
                     --parameter.Indent;
                 else if(part == LineBreak)
                 {
@@ -68,10 +68,10 @@ namespace ReniUI.Formatting
 
         internal static IEnumerable<ISourcePartEdit>
             IndentRight(this IEnumerable<ISourcePartEdit> target)
-            => new[] {IndentStart}.Concat(target).Concat(new[] {IndentEnd});
+            => new[] {ToRight}.Concat(target).Concat(new[] {ToLeft});
 
         internal static IEnumerable<ISourcePartEdit>
             IndentLeft(this IEnumerable<ISourcePartEdit> target)
-            => new[] {IndentEnd}.Concat(target).Concat(new[] {IndentStart});
+            => new[] {ToLeft}.Concat(target).Concat(new[] {ToRight});
     }
 }
