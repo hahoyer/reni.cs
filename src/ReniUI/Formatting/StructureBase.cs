@@ -60,7 +60,11 @@ namespace ReniUI.Formatting
                 result.AddRange(main.Suffix);
 
             if(Syntax.Right != null)
-                result.AddRange(GetRightSiteEdits(targetPart, includeSuffix));
+            {
+                var sourcePartEdits = GetRightSiteEdits(targetPart, includeSuffix);
+                //Tracer.ConditionalBreak(Syntax.TokenClass.Id == "(");
+                result.AddRange(sourcePartEdits);
+            }
 
             AssertValid(result);
             return result;
@@ -79,9 +83,7 @@ namespace ReniUI.Formatting
         {
             var result = Syntax.Right.CreateStruct(Parent).GetSourcePartEdits(targetPart, true, includeSuffix);
             if(Syntax.TokenClass is LeftParenthesis)
-                return SourcePartEditExtension.IndentStart
-                    .plus(result)
-                    .plus(SourcePartEditExtension.IndentEnd);
+                return (result).IndentRight();
 
             return result;
         }

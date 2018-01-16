@@ -21,8 +21,8 @@ namespace ReniUI.Formatting
         internal static readonly ISourcePartEdit IndentEnd = new SpecialEdit("IndentEnd");
         internal static readonly ISourcePartEdit EndOfFile = new SpecialEdit("EndOfFile");
 
-        internal static IEnumerable<Edit> 
-            GetEditPieces(this IEnumerable<ISourcePartEdit> target, SourcePart targetPart, Configuration configuration)
+        internal static IEnumerable<Edit> GetEditPieces
+            (this IEnumerable<ISourcePartEdit> target, SourcePart targetPart, Configuration configuration)
         {
             var currentPosition = 0;
             var currentIndex = 0;
@@ -54,6 +54,7 @@ namespace ReniUI.Formatting
                         currentPosition = edit.Location.EndPosition;
                         result.Add(edit);
                     }
+
                     parameter.Reset();
                 }
                 else
@@ -64,5 +65,13 @@ namespace ReniUI.Formatting
 
             return result;
         }
+
+        internal static IEnumerable<ISourcePartEdit>
+            IndentRight(this IEnumerable<ISourcePartEdit> target)
+            => new[] {IndentStart}.Concat(target).Concat(new[] {IndentEnd});
+
+        internal static IEnumerable<ISourcePartEdit>
+            IndentLeft(this IEnumerable<ISourcePartEdit> target)
+            => new[] {IndentEnd}.Concat(target).Concat(new[] {IndentStart});
     }
 }
