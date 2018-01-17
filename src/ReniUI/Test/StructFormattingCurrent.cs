@@ -32,7 +32,7 @@ namespace ReniUI.Test
                     new ReniUI.Formatting.Configuration
                     {
                         EmptyLineLimit = 0,
-                        //MaxLineLength = 20
+                        MaxLineLength = 20
                     }.Create()
                 )
                 .Replace("\r\n", "\n");

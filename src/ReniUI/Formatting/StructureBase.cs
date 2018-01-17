@@ -1,8 +1,8 @@
 using System.Collections.Generic;
+using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
-using Reni.Parser;
 using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
@@ -44,28 +44,13 @@ namespace ReniUI.Formatting
         IEnumerable<ISourcePartEdit>
             IStructure.GetSourcePartEdits(SourcePart targetPart, bool exlucdePrefix, bool includeSuffix)
         {
+            var lr = IsLineBreakRequired;
             var result = new List<ISourcePartEdit>();
 
             if(Syntax.Left != null)
                 result.AddRange(GetLeftSiteEdits(targetPart, exlucdePrefix));
 
-            var main = FormatterTokenGroup.Create(Syntax);
-
-            if(Syntax.Left != null || !exlucdePrefix)
-                result.AddRange(main.Prefix);
-
-            result.AddRange(main.Main);
-
-            if(Syntax.Right != null || includeSuffix)
-                result.AddRange(main.Suffix);
-
-            if(Syntax.Right != null)
-            {
-                var sourcePartEdits = GetRightSiteEdits(targetPart, includeSuffix);
-                //Tracer.ConditionalBreak(Syntax.TokenClass.Id == "(");
-                result.AddRange(sourcePartEdits);
-            }
-
+            result.AddRange(GetMainAndSiteEdits(targetPart, includeSuffix));
             AssertValid(result);
             return result;
         }
@@ -76,20 +61,29 @@ namespace ReniUI.Formatting
         [EnableDump]
         protected string FlatResult => Syntax.FlatFormat(Parent.Configuration);
 
-        IEnumerable<ISourcePartEdit> GetLeftSiteEdits(SourcePart targetPart, bool exlucdePrefix)
-            => Syntax.Left.CreateStruct(Parent).GetSourcePartEdits(targetPart, exlucdePrefix, false);
-
-        IEnumerable<ISourcePartEdit> GetRightSiteEdits(SourcePart targetPart, bool includeSuffix)
+        protected virtual IEnumerable<ISourcePartEdit> GetMainAndSiteEdits(SourcePart targetPart, bool includeSuffix)
         {
-            var result = Syntax.Right.CreateStruct(Parent).GetSourcePartEdits(targetPart, true, includeSuffix);
-            if(Syntax.TokenClass is LeftParenthesis)
-                return (result).IndentRight();
+            var main = FormatterTokenGroup.Create(Syntax);
+
+            IEnumerable<ISourcePartEdit> result = main.Main;
+
+            if(Syntax.Right != null || includeSuffix)
+                result = result.Concat(main.Suffix);
+
+            if(Syntax.Right != null)
+                result = result.Concat(GetRightSiteEdits(targetPart, includeSuffix));
 
             return result;
         }
 
-        protected abstract IEnumerable<IEnumerable<ISourcePartEdit>>
-            GetSourcePartEdits(SourcePart targetPart, bool exlucdePrefix);
+        protected virtual IEnumerable<ISourcePartEdit> GetLeftSiteEdits(SourcePart targetPart, bool exlucdePrefix)
+            => Syntax.Left.CreateStruct(Parent).GetSourcePartEdits(targetPart, exlucdePrefix, false);
+
+        protected virtual IEnumerable<ISourcePartEdit> GetRightSiteEdits(SourcePart targetPart, bool includeSuffix)
+            => Syntax.Right.CreateStruct(Parent).GetSourcePartEdits(targetPart, true, includeSuffix);
+
+        protected virtual IEnumerable<IEnumerable<ISourcePartEdit>>
+            GetSourcePartEdits(SourcePart targetPart, bool exlucdePrefix) => null;
 
         protected override string GetNodeDump() => base.GetNodeDump() + " " + Syntax.Token.Characters.Id;
     }

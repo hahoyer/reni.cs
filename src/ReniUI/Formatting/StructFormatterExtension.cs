@@ -47,6 +47,16 @@ namespace ReniUI.Formatting
 
         internal static IStructure CreateStruct(this Syntax syntax, StructFormatter parent)
         {
+            switch(syntax.TokenClass)
+            {
+                case LeftParenthesis _ :return new LeftParenthesisStructure(syntax, parent);
+                case Colon _ :return new ColonStructure(syntax, parent);
+                case Definable _ :
+                    if(syntax.Left != null)
+                        return new DefinableChainStructure(syntax, parent);
+                    break;
+            }
+
             return new Structure(syntax, parent);
         }
 
@@ -175,4 +185,5 @@ namespace ReniUI.Formatting
             return basicLineLength == null || basicLineLength > configuration.MaxLineLength;
         }
     }
+
 }

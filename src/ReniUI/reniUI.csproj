@@ -41,7 +41,9 @@
   <ItemGroup>
     <Compile Include="FileConfiguration.cs" />
     <Compile Include="Formatting\ChainStructure.cs" />
+    <Compile Include="Formatting\ColonStructure.cs" />
     <Compile Include="Formatting\DeclarationStructure.cs" />
+    <Compile Include="Formatting\DefinableChainStructure.cs" />
     <Compile Include="Formatting\Edit.cs" />
     <Compile Include="Formatting\EditPieceParameter.cs" />
     <Compile Include="Formatting\FormatterExtension.cs" />
@@ -50,6 +52,7 @@
     <Compile Include="Formatting\FrameStructure.cs" />
     <Compile Include="Formatting\IResultItem.cs" />
     <Compile Include="Formatting\IStructure.cs" />
+    <Compile Include="Formatting\LeftParenthesisStructure.cs" />
     <Compile Include="Formatting\ListStructure.cs" />
     <Compile Include="Formatting\ParenthesisStructure.cs" />
     <Compile Include="Formatting\ResultItems.cs" />
