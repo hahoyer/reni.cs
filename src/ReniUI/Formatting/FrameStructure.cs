@@ -19,7 +19,7 @@ namespace ReniUI.Formatting
         protected override IEnumerable<IEnumerable<ISourcePartEdit>> GetSourcePartEdits
             (SourcePart targetPart, bool exlucdePrefix)
         {
-            yield return Body.GetSourcePartEdits(targetPart, exlucdePrefix, false);
+            yield return Body.GetSourcePartEdits(exlucdePrefix, false);
             foreach(var edit in Right.FormatFrameEnd())
                 yield return edit;
         }

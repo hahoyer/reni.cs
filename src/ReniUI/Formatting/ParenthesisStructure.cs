@@ -36,7 +36,7 @@ namespace ReniUI.Formatting
             result.AddRange(Left.Suffix);
 
             if(Body != null)
-                result.AddRange(Body.GetSourcePartEdits(targetPart, true, false));
+                result.AddRange(Body.GetSourcePartEdits(true, false));
 
             result.AddRange(Right.Prefix);
 

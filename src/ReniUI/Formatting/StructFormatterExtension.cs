@@ -34,31 +34,8 @@ namespace ReniUI.Formatting
                 => new TContainer {Value = Value + token + other.Value};
         }
 
-        internal static IStructure CreateFrameStruct(this Syntax syntax, StructFormatter parent)
-        {
-            switch(syntax.TokenClass)
-            {
-                case EndOfText _: return new FrameStructure(syntax, parent);
-                case RightParenthesis _: return new ParenthesisStructure(syntax, parent);
-            }
-
-            return new ChainStructure(syntax, parent);
-        }
-
-        internal static IStructure CreateStruct(this Syntax syntax, StructFormatter parent)
-        {
-            switch(syntax.TokenClass)
-            {
-                case LeftParenthesis _ :return new LeftParenthesisStructure(syntax, parent);
-                case Colon _ :return new ColonStructure(syntax, parent);
-                case Definable _ :
-                    if(syntax.Left != null)
-                        return new DefinableChainStructure(syntax, parent);
-                    break;
-            }
-
-            return new Structure(syntax, parent);
-        }
+        internal static IStructure CreateStruct(this Syntax syntax, StructFormatter parent) 
+            => new Structure(syntax, parent);
 
         internal static IStructure CreateBodyStruct
             (this Syntax syntax, StructFormatter parent, bool isLineBreakRequired)
@@ -89,9 +66,6 @@ namespace ReniUI.Formatting
                 case ExclamationBoxToken _: return new DeclarationTagStructure(syntax, parent);
             }
 
-
-
-            Tracer.ConditionalBreak(syntax != null);
             return null;
         }
 

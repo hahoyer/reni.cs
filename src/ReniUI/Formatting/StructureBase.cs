@@ -9,6 +9,36 @@ namespace ReniUI.Formatting
 {
     abstract class StructureBase : DumpableObject, IStructure
     {
+        abstract class BaseFormatter : DumpableObject
+        {
+            public virtual bool? MainAndRightSite=> null;
+            public virtual bool? LeftSite => null;
+            public virtual bool? RightSite => null;
+        }
+
+        class DefaultFormatter : BaseFormatter
+        {
+            public static readonly BaseFormatter Instance = new DefaultFormatter();
+        }
+
+        class LeftParenthesisFormatter : BaseFormatter
+        {
+            public static readonly BaseFormatter Instance = new LeftParenthesisFormatter();
+            public override bool? RightSite => false;
+        }
+
+        class ColonFormatter : BaseFormatter
+        {
+            public static readonly BaseFormatter Instance = new ColonFormatter();
+            public override bool? LeftSite => true;
+        }
+
+        class ChainFormatter : BaseFormatter
+        {
+            public static readonly BaseFormatter Instance = new ChainFormatter();
+            public override bool? MainAndRightSite => false;
+        }
+
         static void AssertValid(IEnumerable<ISourcePartEdit> result)
         {
             var currentPosition = 0;
@@ -27,12 +57,30 @@ namespace ReniUI.Formatting
             }
         }
 
+        static BaseFormatter CreateFormatter(Syntax syntax)
+        {
+            switch(syntax.TokenClass)
+            {
+                case LeftParenthesis _: return LeftParenthesisFormatter.Instance;
+                case Colon _: return ColonFormatter.Instance;
+                case Definable _:
+                    if(syntax.Left != null)
+                        return ChainFormatter.Instance;
+                    break;
+            }
+
+            return DefaultFormatter.Instance;
+        }
+
+        readonly BaseFormatter Formatter;
+
         readonly ValueCache<bool> IsLineBreakRequiredCache;
         protected readonly StructFormatter Parent;
         protected readonly Syntax Syntax;
 
         protected StructureBase(Syntax syntax, StructFormatter parent)
         {
+            Formatter = CreateFormatter(syntax);
             Syntax = syntax;
             Parent = parent;
             IsLineBreakRequiredCache = new ValueCache<bool>(() => Syntax.IsLineBreakRequired(Parent.Configuration));
@@ -42,15 +90,15 @@ namespace ReniUI.Formatting
         Syntax IStructure.Syntax => Syntax;
 
         IEnumerable<ISourcePartEdit>
-            IStructure.GetSourcePartEdits(SourcePart targetPart, bool exlucdePrefix, bool includeSuffix)
+            IStructure.GetSourcePartEdits(bool exlucdePrefix, bool includeSuffix)
         {
             var lr = IsLineBreakRequired;
             var result = new List<ISourcePartEdit>();
 
             if(Syntax.Left != null)
-                result.AddRange(GetLeftSiteEdits(targetPart, exlucdePrefix));
+                result.AddRange(GetLeftSiteEdits(exlucdePrefix));
 
-            result.AddRange(GetMainAndSiteEdits(targetPart, includeSuffix));
+            result.AddRange(GetMainAndRightSiteEdits(includeSuffix));
             AssertValid(result);
             return result;
         }
@@ -61,7 +109,7 @@ namespace ReniUI.Formatting
         [EnableDump]
         protected string FlatResult => Syntax.FlatFormat(Parent.Configuration);
 
-        protected virtual IEnumerable<ISourcePartEdit> GetMainAndSiteEdits(SourcePart targetPart, bool includeSuffix)
+        IEnumerable<ISourcePartEdit> GetMainAndRightSiteEdits(bool includeSuffix)
         {
             var main = FormatterTokenGroup.Create(Syntax);
 
@@ -71,16 +119,22 @@ namespace ReniUI.Formatting
                 result = result.Concat(main.Suffix);
 
             if(Syntax.Right != null)
-                result = result.Concat(GetRightSiteEdits(targetPart, includeSuffix));
+                result = result.Concat(GetRightSiteEdits(includeSuffix));
 
-            return result;
+            return result.Indent(Formatter.MainAndRightSite);
         }
 
-        protected virtual IEnumerable<ISourcePartEdit> GetLeftSiteEdits(SourcePart targetPart, bool exlucdePrefix)
-            => Syntax.Left.CreateStruct(Parent).GetSourcePartEdits(targetPart, exlucdePrefix, false);
+        IEnumerable<ISourcePartEdit> GetLeftSiteEdits(bool exlucdePrefix)
+            => Syntax.Left
+                .CreateStruct(Parent)
+                .GetSourcePartEdits(exlucdePrefix, includeSuffix: false)
+                .Indent(Formatter.LeftSite);
 
-        protected virtual IEnumerable<ISourcePartEdit> GetRightSiteEdits(SourcePart targetPart, bool includeSuffix)
-            => Syntax.Right.CreateStruct(Parent).GetSourcePartEdits(targetPart, true, includeSuffix);
+        IEnumerable<ISourcePartEdit> GetRightSiteEdits(bool includeSuffix)
+            => Syntax.Right
+                .CreateStruct(Parent)
+                .GetSourcePartEdits(exlucdePrefix: true, includeSuffix: includeSuffix)
+                .Indent(Formatter.RightSite);
 
         protected virtual IEnumerable<IEnumerable<ISourcePartEdit>>
             GetSourcePartEdits(SourcePart targetPart, bool exlucdePrefix) => null;

@@ -32,7 +32,7 @@ namespace ReniUI.Formatting
                 if(item.IsTailItem && IsLineBreakRequired)
                     edits.Add(SourcePartEditExtension.LineBreak);
 
-                edits.AddRange(((IStructure) item).GetSourcePartEdits(targetPart, effectiveExcludePrefix,false));
+                edits.AddRange(((IStructure) item).GetSourcePartEdits(effectiveExcludePrefix,false));
 
                 effectiveExcludePrefix = false;
             }
@@ -65,7 +65,7 @@ namespace ReniUI.Formatting
             yield return edits;
 
             if(Syntax.Right != null)
-                yield return Syntax.Right.CreateStruct(Parent).GetSourcePartEdits(targetPart, false, false);
+                yield return Syntax.Right.CreateStruct(Parent).GetSourcePartEdits(false, false);
 
             if(IsTailItem)
                 yield return SourcePartEditExtension.ToLeft.SingleToArray();
