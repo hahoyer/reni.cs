@@ -120,12 +120,11 @@ namespace ReniUI
         internal IEnumerable<Syntax> FindAllBelongings(Syntax syntax)
             => Compiler.Syntax.Belongings(syntax);
 
-        public string Reformat(IFormatter formatter = null, SourcePart sourcePart = null)
+        public string Reformat(IFormatter formatter = null, SourcePart targetPart = null)
         {
-            var targetPart = sourcePart ?? Source.All;
             return (formatter ?? new Formatting.Configuration().Create())
                 .GetEditPieces(this, targetPart)
-                .Combine(targetPart);
+                .Combine(targetPart ?? Syntax.SourcePart);
         }
 
         public Syntax Locate(SourcePart span)

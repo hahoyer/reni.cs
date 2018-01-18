@@ -34,53 +34,8 @@ namespace ReniUI.Formatting
                 => new TContainer {Value = Value + token + other.Value};
         }
 
-        internal static IStructure CreateStruct(this Syntax syntax, StructFormatter parent) 
-            => new Structure(syntax, parent);
-
-        internal static IStructure CreateBodyStruct
-            (this Syntax syntax, StructFormatter parent, bool isLineBreakRequired)
-        {
-            if(syntax == null)
-                return null;
-
-            switch(syntax.TokenClass)
-            {
-                case List _: return new ListStructure(syntax, parent, isLineBreakRequired);
-                case Colon _: return new DeclarationStructure(syntax, parent);
-            }
-
-            return new ChainStructure(syntax, parent);
-        }
-
-        internal static IStructure CreateDeclaratorStruct(this Syntax syntax, StructFormatter parent)
-        {
-            Tracer.Assert(syntax.Right == null);
-
-            return new DeclaratorItemStructure(syntax, parent);
-        }
-
-        internal static IStructure CreateDeclarationTagStruct(this Syntax syntax, StructFormatter parent)
-        {
-            switch(syntax.TokenClass)
-            {
-                case ExclamationBoxToken _: return new DeclarationTagStructure(syntax, parent);
-            }
-
-            return null;
-        }
-
-        internal static IStructure CreateListItemStruct(this Syntax syntax, StructFormatter parent)
-        {
-            switch(syntax.TokenClass)
-            {
-                case Colon _: return new DeclarationStructure(syntax, parent);
-            }
-
-            return CreateStruct(syntax, parent);
-        }
-
-        internal static ChainItemStruct CreateChainItemStruct(this Syntax syntax, StructFormatter parent)
-            => new ChainItemStruct(syntax, parent);
+        internal static IStructure CreateStruct(this Syntax syntax, StructFormatter parent, bool isLineBreakForced)
+            => new Structure(syntax, parent, isLineBreakForced);
 
         /// <summary>
         ///     Calulate the length, if all ignorable linebreaks would have been ignored.
@@ -135,17 +90,17 @@ namespace ReniUI.Formatting
         internal static ISeparatorType LeftSideSeparator(this Syntax target)
         {
             var left = target.LeftNeigbor?.TokenClass;
-            if(target.Token.PrecededWith.HasComment())
-                return SeparatorType.ContactSeparator;
-            return SeparatorType.Get(left, target.TokenClass);
+            return target.Token.PrecededWith.HasComment()
+                ? SeparatorType.ContactSeparator
+                : SeparatorType.Get(left, target.TokenClass);
         }
 
         internal static ISeparatorType RightSideSeparator(this Syntax target)
         {
             var right = target.RightNeigbor;
-            if(right == null || right.Token.PrecededWith.HasComment())
-                return SeparatorType.ContactSeparator;
-            return SeparatorType.Get(target.TokenClass, right.TokenClass);
+            return right == null || right.Token.PrecededWith.HasComment()
+                ? SeparatorType.ContactSeparator
+                : SeparatorType.Get(target.TokenClass, right.TokenClass);
         }
 
         internal static string FlatFormat
@@ -159,5 +114,4 @@ namespace ReniUI.Formatting
             return basicLineLength == null || basicLineLength > configuration.MaxLineLength;
         }
     }
-
 }

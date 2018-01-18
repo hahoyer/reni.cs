@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
-using Reni;
 using Reni.Parser;
 using Reni.TokenClasses;
 
@@ -53,7 +52,7 @@ namespace ReniUI.Formatting
             var prefix = CreateSourcePartEdits(Syntax.Token);
             var prefixLength = prefix.Length - 1;
             PrefixData = prefix.Take(prefixLength).ToArray();
-            MainData = prefix.Skip(prefixLength).Take(1).plus(GetDistanceMarker().ToArray()).ToArray();
+            MainData = prefix.Skip(prefixLength).Take(1).Concat(GetDistanceMarker()).ToArray();
         }
 
         IEnumerable<ISourcePartEdit> GetDistanceMarker()
@@ -66,24 +65,6 @@ namespace ReniUI.Formatting
             Tracer.ConditionalBreak(id == " a");
             return new [] {SourcePartEditExtension.EnsureSeparator};
 
-        }
-
-        internal IEnumerable<IEnumerable<ISourcePartEdit>> FormatListItem
-            (bool isLineBreakRequired, Configuration configuration)
-        {
-            yield return Prefix;
-            yield return Main;
-            yield return Prefix;
-
-            if(isLineBreakRequired)
-                yield return SourcePartEditExtension.LineBreak.SingleToArray();
-        }
-
-        internal IEnumerable<IEnumerable<ISourcePartEdit>> FormatFrameEnd()
-        {
-            yield return Prefix;
-            yield return SourcePartEditExtension.EndOfFile.SingleToArray();
-            yield return Main;
         }
 
         internal IEnumerable<IEnumerable<ISourcePartEdit>> FormatChainItem(bool exlucdePrefix)

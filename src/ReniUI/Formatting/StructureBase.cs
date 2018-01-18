@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Helper;
 using hw.Scanner;
 using Reni.TokenClasses;
 
@@ -11,29 +10,29 @@ namespace ReniUI.Formatting
     {
         abstract class BaseFormatter : DumpableObject
         {
-            public virtual bool? MainAndRightSite=> null;
+            public virtual bool? MainAndRightSite => null;
             public virtual bool? LeftSite => null;
             public virtual bool? RightSite => null;
         }
 
-        class DefaultFormatter : BaseFormatter
+        sealed class DefaultFormatter : BaseFormatter
         {
             public static readonly BaseFormatter Instance = new DefaultFormatter();
         }
 
-        class LeftParenthesisFormatter : BaseFormatter
+        sealed class LeftParenthesisFormatter : BaseFormatter
         {
             public static readonly BaseFormatter Instance = new LeftParenthesisFormatter();
             public override bool? RightSite => false;
         }
 
-        class ColonFormatter : BaseFormatter
+        sealed class ColonFormatter : BaseFormatter
         {
             public static readonly BaseFormatter Instance = new ColonFormatter();
             public override bool? LeftSite => true;
         }
 
-        class ChainFormatter : BaseFormatter
+        sealed class ChainFormatter : BaseFormatter
         {
             public static readonly BaseFormatter Instance = new ChainFormatter();
             public override bool? MainAndRightSite => false;
@@ -73,17 +72,17 @@ namespace ReniUI.Formatting
         }
 
         readonly BaseFormatter Formatter;
-
-        readonly ValueCache<bool> IsLineBreakRequiredCache;
         protected readonly StructFormatter Parent;
         protected readonly Syntax Syntax;
 
-        protected StructureBase(Syntax syntax, StructFormatter parent)
+        bool? IsLineBreakRequiredCache;
+
+        protected StructureBase(Syntax syntax, StructFormatter parent, bool isLineBreakRequired)
         {
             Formatter = CreateFormatter(syntax);
             Syntax = syntax;
             Parent = parent;
-            IsLineBreakRequiredCache = new ValueCache<bool>(() => Syntax.IsLineBreakRequired(Parent.Configuration));
+            IsLineBreakRequiredCache = isLineBreakRequired ? true : (bool?) null;
             Tracer.Assert(Syntax != null);
         }
 
@@ -92,7 +91,6 @@ namespace ReniUI.Formatting
         IEnumerable<ISourcePartEdit>
             IStructure.GetSourcePartEdits(bool exlucdePrefix, bool includeSuffix)
         {
-            var lr = IsLineBreakRequired;
             var result = new List<ISourcePartEdit>();
 
             if(Syntax.Left != null)
@@ -104,10 +102,13 @@ namespace ReniUI.Formatting
         }
 
         [EnableDump]
-        protected bool IsLineBreakRequired => IsLineBreakRequiredCache.Value;
+        protected bool IsLineBreakRequired
+            => IsLineBreakRequiredCache ?? (IsLineBreakRequiredCache = GetIsLineBreakRequired()).Value;
 
         [EnableDump]
         protected string FlatResult => Syntax.FlatFormat(Parent.Configuration);
+
+        bool GetIsLineBreakRequired() => Syntax.IsLineBreakRequired(Parent.Configuration);
 
         IEnumerable<ISourcePartEdit> GetMainAndRightSiteEdits(bool includeSuffix)
         {
@@ -126,14 +127,14 @@ namespace ReniUI.Formatting
 
         IEnumerable<ISourcePartEdit> GetLeftSiteEdits(bool exlucdePrefix)
             => Syntax.Left
-                .CreateStruct(Parent)
-                .GetSourcePartEdits(exlucdePrefix, includeSuffix: false)
+                .CreateStruct(Parent, false)
+                .GetSourcePartEdits(exlucdePrefix, false)
                 .Indent(Formatter.LeftSite);
 
         IEnumerable<ISourcePartEdit> GetRightSiteEdits(bool includeSuffix)
             => Syntax.Right
-                .CreateStruct(Parent)
-                .GetSourcePartEdits(exlucdePrefix: true, includeSuffix: includeSuffix)
+                .CreateStruct(Parent, false)
+                .GetSourcePartEdits(true, includeSuffix)
                 .Indent(Formatter.RightSite);
 
         protected virtual IEnumerable<IEnumerable<ISourcePartEdit>>

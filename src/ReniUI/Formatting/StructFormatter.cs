@@ -16,10 +16,11 @@ namespace ReniUI.Formatting
             if(syntax == null)
                 return new Edit[0];
 
-            var structItem = syntax.CreateStruct(this);
+            var structItem = syntax.CreateStruct(this, false);
 
             var sourcePartEdits = structItem.GetSourcePartEdits(false, false).ToArray();
-            var editPieces = sourcePartEdits.GetEditPieces(targetPart, Configuration);
+            var editPieces = sourcePartEdits
+                .GetEditPieces(targetPart ?? syntax.SourcePart, Configuration);
             return editPieces;
         }
     }

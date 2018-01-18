@@ -14,7 +14,7 @@ namespace ReniUI.Test
             const string Text = @"(1,3,4,6)";
             var compiler = CompilerBrowser.FromText(Text);
             var span = (compiler.Source + 0).Span(Text.Length);
-            var x = compiler.Reformat(sourcePart:span);
+            var x = compiler.Reformat(targetPart: span);
             Tracer.Assert(x == "(1, 3, 4, 6)", x);
         }
 
@@ -25,7 +25,7 @@ namespace ReniUI.Test
             const string Text = @"{^ : ^}";
             var compiler = CompilerBrowser.FromText(Text);
             var span = (compiler.Source + 0).Span(Text.Length);
-            var x = compiler.Reformat(sourcePart:span);
+            var x = compiler.Reformat(targetPart: span);
 
             Tracer.Assert(x == "{^ : ^}", x);
         }

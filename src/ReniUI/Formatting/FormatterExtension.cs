@@ -83,6 +83,8 @@ namespace ReniUI.Formatting
 
         public static Syntax LocateAndFilter(this CompilerBrowser compiler, SourcePart targetPart)
         {
+            if(targetPart == null)
+                return compiler.Syntax;
             var result = compiler.Locate(targetPart);
             return IsTooSmall(result.Token, targetPart) ? null : result;
         }

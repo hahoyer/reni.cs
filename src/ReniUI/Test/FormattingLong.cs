@@ -33,7 +33,7 @@ namespace ReniUI.Test
             for(var end = start + 1; end < compiler.Source.Length; end++)
             {
                 var span = (compiler.Source + start).Span(end - start);
-                var reformat = compiler.Reformat(sourcePart:span);
+                var reformat = compiler.Reformat(targetPart:span);
                 if(reformat != null)
                 {
                     var newCompiler = CompilerBrowser.FromText(reformat);

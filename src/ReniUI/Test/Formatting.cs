@@ -220,7 +220,7 @@ repeat: /\ ^ while() then
             const string Text = @"(1,3,4,6)";
             var compiler = CompilerBrowser.FromText(Text);
             var span = compiler.Source.All;
-            var trimmed = compiler.Reformat(sourcePart: span);
+            var trimmed = compiler.Reformat(targetPart:span);
 
             Tracer.Assert(trimmed == "(1, 3, 4, 6)", trimmed);
         }

@@ -1,4 +1,3 @@
-using System.Linq;
 using hw.DebugFormatter;
 using hw.UnitTest;
 using NUnit.Framework;
@@ -17,14 +16,14 @@ namespace ReniUI.Test
             const string text =
                 @"(12345,12345,12345,12345,12345)";
 
-            const string expectedText =
-                @"(
+            var expectedText = @"(
     12345,
     12345,
     12345,
     12345,
     12345
-)";
+)"
+                .Replace("\r\n", "\n");
 
             var compiler = CompilerBrowser.FromText(text);
             var newSource = compiler.Reformat
