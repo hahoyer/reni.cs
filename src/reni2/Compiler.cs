@@ -66,6 +66,7 @@ namespace Reni
 
         Compiler(Source source, string modulName, CompilerParameters parameters)
         {
+            Tracer.Assert(source != null);
             Source = source;
             Parameters = parameters ?? new CompilerParameters();
             ModuleName = modulName;

@@ -30,13 +30,14 @@ namespace ReniUI.Test
         [Test]
         public void LegacySystem()
         {
-            var srcDir = new StackTrace(true)
-                             .GetFrame(0)
-                             .GetFileName()
-                             .ToSmbFile()
-                             .DirectoryName +
-                         @"\..\..";
-            var fileName = srcDir + @"\renisource\test.reni";
+            var sourceDirectory
+                = new StackTrace(true)
+                      .GetFrame(0)
+                      .GetFileName()
+                      .ToSmbFile()
+                      .DirectoryName +
+                  @"\..\..";
+            var fileName = sourceDirectory + @"\renisource\test.reni";
             var file = fileName.ToSmbFile();
             Tracer.Line(Tracer.FilePosn(fileName, 0, 0, 0, 0, "see there"));
             var compiler = CompilerBrowser.FromFile(fileName);
@@ -60,7 +61,7 @@ namespace ReniUI.Test
 1,3,4,6)";
             var compiler = CompilerBrowser.FromText(Text);
             var span = (compiler.Source + 2).Span(3);
-            var trimmed = compiler.Reformat(targetPart:span);
+            var trimmed = compiler.Reformat(targetPart: span);
 
             Tracer.Assert(trimmed == "# C", trimmed);
         }
