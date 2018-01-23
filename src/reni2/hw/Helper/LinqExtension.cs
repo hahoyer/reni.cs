@@ -83,11 +83,12 @@ namespace hw.Helper
                 yield return subResult.ToArray();
         }
 
+        [CanBeNull]
         public static T Aggregate<T>(this IEnumerable<T> x, Func<T> getDefault = null) where T : class, IAggregateable<T>
         {
             var xx = x.ToArray();
             if(!xx.Any())
-                return getDefault == null? null : getDefault();
+                return getDefault?.Invoke();
             var result = xx[0];
             for(var i = 1; i < xx.Length; i++)
                 result = result.Aggregate(xx[i]);

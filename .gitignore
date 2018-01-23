@@ -15,3 +15,4 @@ obj/
 /src/*.VC.db
 /src/*/*.DotSettings
 /src/renisource/Debug/renisource.vcxprojResolveAssemblyReference.cache
+/bin/Packages/**

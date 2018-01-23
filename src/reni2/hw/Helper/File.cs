@@ -64,7 +64,7 @@ namespace hw.Helper
         }
 
         public void EnsureDirectoryOfFileExists()
-            => DirectoryName?.ToSmbFile().EnsureIsExistentDirectory();
+            => DirectoryName?.FileHandle().EnsureIsExistentDirectory();
 
         [Obsolete("(Renamed) Use EnsureDirectoryOfFileExists instead")]
         public void AssumeDirectoryOfFileExists() => EnsureDirectoryOfFileExists();
@@ -286,7 +286,7 @@ namespace hw.Helper
         {
             if(IsDirectory)
             {
-                destinationPath.ToSmbFile().EnsureIsExistentDirectory();
+                destinationPath.FileHandle().EnsureIsExistentDirectory();
                 foreach(var sourceSubFile in Items)
                 {
                     var destinationSubPath = destinationPath.PathCombine(sourceSubFile.Name);
