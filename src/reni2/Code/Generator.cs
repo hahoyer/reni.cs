@@ -63,7 +63,7 @@ namespace Reni.Code
                 = new[]
                 {
                     Assembly.GetAssembly(typeof(Generator)).Location,
-                    Assembly.GetAssembly(typeof(hw.Helper.File)).Location
+                    Assembly.GetAssembly(typeof(hw.Helper.SmbFile)).Location
                 };
             cp.ReferencedAssemblies.AddRange(referencedAssemblies);
             var cr = _provider.CompileAssemblyFromFile(cp, name);

@@ -190,7 +190,6 @@
     <Compile Include="hw\Scanner\Match.cs" />
     <Compile Include="hw\Scanner\Match2TwoLayerScannerGuard.cs" />
     <Compile Include="hw\Scanner\MatchExtension.cs" />
-    <Compile Include="hw\Scanner\SmbFileSourceProvider.cs" />
     <Compile Include="hw\Scanner\Source.cs" />
     <Compile Include="hw\Scanner\SourcePart.cs" />
     <Compile Include="hw\Scanner\SourcePosn.cs" />
