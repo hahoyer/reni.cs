@@ -1,0 +1,25 @@
+using System.Collections.Generic;
+using System.Linq;
+using hw.DebugFormatter;
+using hw.Parser;
+
+namespace Stx {
+    sealed class TokenFactory : GenericTokenFactory<Syntax>
+    {
+        readonly List<UserSymbol> UserSymbols = new List<UserSymbol>();
+
+        public TokenFactory(string title)
+            : base(title) {}
+
+        [DisableDump]
+        internal IEnumerable<IParserTokenType<Syntax>> AllTokenClasses
+            => PredefinedTokenClasses.Concat(UserSymbols);
+
+        protected override IParserTokenType<Syntax> GetTokenClass(string name)
+        {
+            var result = new UserSymbol(name);
+            UserSymbols.Add(result);
+            return result;
+        }
+    }
+}
