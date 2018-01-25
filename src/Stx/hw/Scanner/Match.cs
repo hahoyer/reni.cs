@@ -39,6 +39,7 @@ namespace hw.Scanner
         public static Match End => new Match(new EndMatch());
         public static Match Digit => Box(char.IsDigit);
         public static Match Letter => Box(char.IsLetter);
+        public static Match Any => Box(c=>true);
         [DisableDump]
         public Match Not => new Match(new NotMatch(this));
 

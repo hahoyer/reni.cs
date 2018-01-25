@@ -1,5 +1,6 @@
-using System;
+using System.Collections.Generic;
 using System.Linq;
+using hw.Parser;
 using hw.Scanner;
 
 namespace Stx
@@ -9,18 +10,6 @@ namespace Stx
         const string Symbols = "^!%&/=?\\*+~><|:-";
         const string SingleCharSymbol = "({[)}];,.";
         internal static readonly Lexer Instance = new Lexer();
-
-        public static bool IsSpace(IItem item)
-            => item.ScannerTokenType == Instance.SpaceItem.ScannerTokenType;
-
-        public static bool IsMultiLineComment(IItem item)
-            => item.ScannerTokenType == Instance.MultiLineCommentItem.ScannerTokenType;
-
-        public static bool IsLineComment(IItem item)
-            => item.ScannerTokenType == Instance.LineCommentItem.ScannerTokenType;
-
-        public static bool IsLineEnd(IItem item)
-            => item.ScannerTokenType == Instance.LineEndItem.ScannerTokenType;
 
         public static bool IsSymbolLike(string id)
             => id.Length > 0 && Symbols.Contains(id[0]);
@@ -36,104 +25,61 @@ namespace Stx
         readonly Match Any;
 
         readonly IssueId InvalidTextEnd = IssueId.EOLInString;
-        readonly IMatch LineComment;
-        readonly LexerItem LineCommentItem;
-        internal readonly LexerItem LineEndItem;
+
+        readonly IDictionary<IScannerTokenType, IMatch> Items = new Dictionary<IScannerTokenType, IMatch>();
         readonly IssueId MissingEndOfComment = IssueId.MissingEndOfComment;
         readonly IssueId MissingEndOfPragma = IssueId.MissingEndOfPragma;
-        internal readonly LexerItem MultiLineCommentItem;
-        internal readonly IMatch Number;
-        internal readonly LexerItem PragmaItem;
-
-        internal readonly LexerItem SpaceItem;
-        readonly Match Text;
-        readonly Match VarbatimTextHead;
 
         Lexer()
             : base(error => new ScannerSyntaxError((IssueId) error))
         {
-            var symbol1 = SingleCharSymbol.AnyChar();
-            var textFrame = "'\"".AnyChar();
-
             var identifier =
                 Match.Letter.Else("_") + Match.Letter.Else("_").Else(Match.Digit).Repeat();
 
-            Any = symbol1.Else(identifier);
+            Any = identifier;
 
-            var lineEnd = "\r\n".Box().Else("\n".Box()).Else("\r" + Match.End);
-            var lineEndOrEnd = lineEnd.Else(Match.End);
+            var sign = "+-".AnyChar();
+            var decimalDigits = Match.Digit.Else("_").Repeat(1);
+            var integerLiteral = sign.Repeat(maxCount: 1) + decimalDigits;
+            var exponent = "E".AnyChar(false) + integerLiteral;
 
-            LineComment = "#" +
-                          lineEndOrEnd
-                              .Else
-                              (
-                                  "(".AnyChar().Not +
-                                  lineEnd.Find
-                                      .Else(Match.End.Find)
-                              );
+            Items[new WhiteSpaceTokenType("Space")] = " \t".AnyChar();
+            Items[new WhiteSpaceTokenType("LineEnd")] = "\r\n".Box().Else("\n".Box()).Else("\r" + Match.End);
+            Items[new WhiteSpaceTokenType("MultiLineComment")] =
+                "(*" + "*)".Box().Find.Else(Match.End.Find + MissingEndOfComment);
+            Items[new WhiteSpaceTokenType("Pragma")] =
+                "{" + "}".Box().Find.Else(Match.End.Find + MissingEndOfPragma);
 
-            var integerLiteral = Match.Digit.Repeat(1);
-            var realLiteral = Match.Digit.Repeat(1);
-            var base2Literal = Match.Digit.Repeat(1);
-            var base8Literal = Match.Digit.Repeat(1);
-            var base16Literal = Match.Digit.Repeat(1);
-
-            Number = integerLiteral
-                    .Else(realLiteral)
-                    .Else(base2Literal)
-                    .Else(base8Literal)
-                    .Else(base16Literal)
-                ;
-
-            var varbatimText = "@(" +
-                               (Match.WhiteSpace + (Match.WhiteSpace + ")@").Find)
-                               .Else(identifier.Value(id => (Match.WhiteSpace + id + ")@").Box().Find))
-                               .Else(Match.End.Find + InvalidTextEnd)
-                ;
-
-            VarbatimTextHead = "@(" + Match.WhiteSpace.Else(identifier);
-            Text = textFrame.Value
-                (
-                    head =>
-                    {
-                        var textEnd = head.Else(lineEndOrEnd + InvalidTextEnd);
-                        return textEnd.Find + (head + textEnd.Find).Repeat();
-                    })
-                .Else(varbatimText);
-
-            LineCommentItem = new LexerItem(new WhiteSpaceTokenType("LineComment"), MatchLineComment);
-            MultiLineCommentItem = CreateLexerItem
-            (
-                "MultiLineComment",
-                "(*" +
-                "*)".Box()
-                    .Find
-                    .Else(Match.End.Find + MissingEndOfComment)
-            );
-            PragmaItem = CreateLexerItem
-            (
-                "Pragma",
-                "{" +
-                "}".Box()
-                    .Find
-                    .Else(Match.End.Find + MissingEndOfPragma));
-
-            LineEndItem = CreateLexerItem("LineEnd", "\r\n".Box().Else("\n".Box()).Else("\r" + Match.End));
-            SpaceItem = CreateLexerItem("Space", " \t".AnyChar());
+            Items[new IntegerLiteral()] = integerLiteral;
+            Items[new RealLiteral()] = integerLiteral + "." + decimalDigits + exponent.Repeat(maxCount: 1);
+            Items[new Base2Literal()] = "2#".Box() + "01_".AnyChar().Repeat(1);
+            Items[new Base8Literal()] = "8#".Box() + "01234567_".AnyChar().Repeat(1);
+            Items[new Base16Literal()] = "16#".Box() + "0123456789abcdef_".AnyChar(false).Repeat(1);
+            Items[new StringLiteral1()] = StringLiteral('\'', '$');
+            Items[new DurationLiteral()] = "T".Box(false).Else("TIME".Box(false)) + "#" + "0123456789._mshd-+".AnyChar(false).Repeat();
+            Items[new DateLTimeiteral()] = Match.Any;
+            Items[new DateLiteral()] = Match.Any;
+            Items[new Timeiteral()] = Match.Any;
         }
 
-        LexerItem CreateLexerItem(string whiteSpaceTokenTypeName, IMatch matchExpression)
-            => new LexerItem
-            (
-                new WhiteSpaceTokenType(whiteSpaceTokenTypeName),
-                GuardedMatch(matchExpression)
-            );
+        Match StringLiteral(char delimiter, char escape)
+            => (delimiter + "").Box(false) +
+               (escape + "" + delimiter).AnyChar(false).Else(Match.LineEnd).Not.Repeat() +
+               (escape + "" + Match.LineEnd.Not + (escape + "" + delimiter).AnyChar(false).Else(Match.LineEnd).Not.Repeat())
+               .Repeat() +
+               (delimiter + "").Box(false).Else(Match.LineEnd + InvalidTextEnd);
 
-        internal Func<SourcePosn, int?> GuardedMatch(IMatch matchExpression) => sourcePosn => GuardedMatch(sourcePosn, matchExpression);
+        internal LexerItem[] LexerItems(ScannerTokenType<Syntax> scannerTokenType)
+            => Items
+                .Concat(new[] {new KeyValuePair<IScannerTokenType, IMatch>(scannerTokenType, Any)})
+                .Select(i => CreateLexerItem(i.Key, i.Value))
+                .ToArray();
 
-        internal int? MatchNumber(SourcePosn sourcePosn) => GuardedMatch(sourcePosn, Number);
-        internal int? MatchAny(SourcePosn sourcePosn) => GuardedMatch(sourcePosn, Any);
-        internal int? MatchText(SourcePosn sourcePosn) => GuardedMatch(sourcePosn, Text);
-        int? MatchLineComment(SourcePosn sourcePosn) => GuardedMatch(sourcePosn, LineComment);
+
+        LexerItem CreateLexerItem(IScannerTokenType scannerTokenType, IMatch match)
+            => new LexerItem(scannerTokenType, sourcePosn => GuardedMatch(sourcePosn, match));
     }
+
+
+
 }

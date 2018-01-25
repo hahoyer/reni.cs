@@ -7,37 +7,14 @@ namespace hw.Scanner
 {
     public static class MatchExtension
     {
-        public static IMatch UnBox(this IMatch data)
-        {
-            var box = data as Match;
-            return box == null ? data : box.UnBox;
-        }
-
-        public static Match AnyChar(this string data) => new Match(new AnyCharMatch(data));
-        public static Match Box(this Match.IError error) => new Match(new ErrorMatch(error));
-        public static Match Box(this string data) => new Match(new CharMatch(data));
-        public static Match Box(this IMatch data) => data as Match ?? new Match(data);
-
-        public static Match Repeat(this IMatch data, int minCount = 0, int? maxCount = null)
-            => new Match(new Repeater(data.UnBox(), minCount, maxCount));
-
-        public static Match Else(this string data, IMatch other) => data.Box().Else(other);
-        public static Match Else(this IMatch data, string other) => data.Else(other.Box());
-        public static Match Else(this Match.IError data, IMatch other) => data.Box().Else(other);
-        public static Match Else(this IMatch data, Match.IError other) => data.Else(other.Box());
-
-        public static Match Else(this IMatch data, IMatch other)
-            => new Match(new ElseMatch(data.UnBox(), other.UnBox()));
-
         sealed class ErrorMatch : Dumpable, IMatch
         {
             readonly Match.IError _error;
-            public ErrorMatch(Match.IError error) { _error = error; }
+            public ErrorMatch(Match.IError error) => _error = error;
 
             int? IMatch.Match(SourcePosn sourcePosn)
             {
-                var positionFactory = _error as IPositionExceptionFactory;
-                if(positionFactory != null)
+                if(_error is IPositionExceptionFactory positionFactory)
                     throw positionFactory.Create(sourcePosn);
 
                 throw new Match.Exception(sourcePosn, _error);
@@ -48,29 +25,61 @@ namespace hw.Scanner
         {
             [EnableDump]
             readonly string _data;
-            public CharMatch(string data) { _data = data; }
+
+            readonly StringComparison Type;
+
+            public CharMatch(string data, bool isCaseSenitive)
+            {
+                _data = data;
+                Type = isCaseSenitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+            }
 
             int? IMatch.Match(SourcePosn sourcePosn)
             {
                 var result = _data.Length;
-                return sourcePosn.StartsWith(_data) ? (int?) result : null;
+                return sourcePosn.StartsWith(_data, Type) ? (int?) result : null;
             }
         }
 
         sealed class AnyCharMatch : Dumpable, IMatch
         {
+            sealed class DefaultComparer : IEqualityComparer<char>
+            {
+                bool IEqualityComparer<char>.Equals(char x, char y) => x == y;
+                int IEqualityComparer<char>.GetHashCode(char obj) => obj;
+            }
+
+            sealed class UpperInvariantComparer : IEqualityComparer<char>
+            {
+                bool IEqualityComparer<char>.Equals(char x, char y)
+                    => char.ToUpperInvariant(x) == char.ToUpperInvariant(y);
+
+                int IEqualityComparer<char>.GetHashCode(char obj) => char.ToUpperInvariant(obj);
+            }
+
+            static IEqualityComparer<char> Default => new DefaultComparer();
+            static IEqualityComparer<char> UpperInvariant => new UpperInvariantComparer();
+
             [EnableDump]
             readonly string _data;
-            public AnyCharMatch(string data) { _data = data; }
+
+            readonly IEqualityComparer<char> Comparer;
+
+            public AnyCharMatch(string data, bool isCaseSenitive = true)
+            {
+                _data = data;
+                Comparer = isCaseSenitive ? Default : UpperInvariant;
+            }
 
             int? IMatch.Match(SourcePosn sourcePosn)
-                => _data.Contains(sourcePosn.Current) ? (int?) 1 : null;
+                => _data.Contains(sourcePosn.Current, Comparer) ? (int?) 1 : null;
         }
 
         sealed class ElseMatch : Dumpable, IMatch
         {
             [EnableDump]
             readonly IMatch _data;
+
             [EnableDump]
             readonly IMatch _other;
 
@@ -88,10 +97,12 @@ namespace hw.Scanner
         {
             [EnableDump]
             readonly IMatch _data;
-            [EnableDump]
-            readonly int _minCount;
+
             [EnableDump]
             readonly int? _maxCount;
+
+            [EnableDump]
+            readonly int _minCount;
 
             public Repeater(IMatch data, int minCount, int? maxCount)
             {
@@ -125,9 +136,33 @@ namespace hw.Scanner
             }
         }
 
-        internal interface IPositionExceptionFactory
+        public interface IPositionExceptionFactory
         {
             Exception Create(SourcePosn sourcePosn);
         }
+
+        public static IMatch UnBox(this IMatch data)
+        {
+            var box = data as Match;
+            return box == null ? data : box.UnBox;
+        }
+
+        public static Match AnyChar
+            (this string data, bool isCaseSenitive = true) => new Match(new AnyCharMatch(data, isCaseSenitive));
+
+        public static Match Box(this Match.IError error) => new Match(new ErrorMatch(error));
+        public static Match Box(this string data, bool isCaseSenitive = true) => new Match(new CharMatch(data,isCaseSenitive));
+        public static Match Box(this IMatch data) => data as Match ?? new Match(data);
+
+        public static Match Repeat(this IMatch data, int minCount = 0, int? maxCount = null)
+            => new Match(new Repeater(data.UnBox(), minCount, maxCount));
+
+        public static Match Else(this string data, IMatch other) => data.Box().Else(other);
+        public static Match Else(this IMatch data, string other) => data.Else(other.Box());
+        public static Match Else(this Match.IError data, IMatch other) => data.Box().Else(other);
+        public static Match Else(this IMatch data, Match.IError other) => data.Else(other.Box());
+
+        public static Match Else(this IMatch data, IMatch other)
+            => new Match(new ElseMatch(data.UnBox(), other.UnBox()));
     }
 }

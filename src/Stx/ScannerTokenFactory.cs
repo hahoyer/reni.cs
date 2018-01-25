@@ -19,16 +19,6 @@ namespace Stx
 
         LexerItem[] ITokenFactory.Classes => Classes;
 
-        LexerItem[] Classes => new[]
-        {
-            Lexer.Instance.SpaceItem,
-            Lexer.Instance.LineEndItem,
-            Lexer.Instance.MultiLineCommentItem,
-            Lexer.Instance.PragmaItem,
-            new LexerItem(Current.Get<ScannerTokenType<Syntax>>(), Lexer.Instance.MatchAny),
-
-            new LexerItem(Current.Get<ScannerTokenType<Syntax>>(), Lexer.Instance.MatchAny),
-            new LexerItem(new Number(), Lexer.Instance.MatchNumber)
-        };
+        LexerItem[] Classes => Lexer.Instance.LexerItems(Current.Get<ScannerTokenType<Syntax>>());
     }
 }
