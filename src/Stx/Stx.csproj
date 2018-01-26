@@ -120,6 +120,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Template1.tt</DependentUpon>
     </Compile>
+    <Compile Include="Test.cs" />
     <Compile Include="Text.cs" />
     <Compile Include="TokenClass.cs" />
     <Compile Include="TokenFactory.cs" />

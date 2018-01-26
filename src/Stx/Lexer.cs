@@ -33,16 +33,6 @@ namespace Stx
         Lexer()
             : base(error => new ScannerSyntaxError((IssueId) error))
         {
-            var identifier =
-                Match.Letter.Else("_") + Match.Letter.Else("_").Else(Match.Digit).Repeat();
-
-            Any = identifier;
-
-            var sign = "+-".AnyChar();
-            var decimalDigits = Match.Digit.Else("_").Repeat(1);
-            var integerLiteral = sign.Repeat(maxCount: 1) + decimalDigits;
-            var exponent = "E".AnyChar(false) + integerLiteral;
-
             Items[new WhiteSpaceTokenType("Space")] = " \t".AnyChar();
             Items[new WhiteSpaceTokenType("LineEnd")] = "\r\n".Box().Else("\n".Box()).Else("\r" + Match.End);
             Items[new WhiteSpaceTokenType("MultiLineComment")] =
@@ -50,24 +40,91 @@ namespace Stx
             Items[new WhiteSpaceTokenType("Pragma")] =
                 "{" + "}".Box().Find.Else(Match.End.Find + MissingEndOfPragma);
 
-            Items[new IntegerLiteral()] = integerLiteral;
-            Items[new RealLiteral()] = integerLiteral + "." + decimalDigits + exponent.Repeat(maxCount: 1);
-            Items[new Base2Literal()] = "2#".Box() + "01_".AnyChar().Repeat(1);
-            Items[new Base8Literal()] = "8#".Box() + "01234567_".AnyChar().Repeat(1);
-            Items[new Base16Literal()] = "16#".Box() + "0123456789abcdef_".AnyChar(false).Repeat(1);
-            Items[new StringLiteral1()] = StringLiteral('\'', '$');
-            Items[new DurationLiteral()] = "T".Box(false).Else("TIME".Box(false)) + "#" + "0123456789._mshd-+".AnyChar(false).Repeat();
-            Items[new DateLTimeiteral()] = Match.Any;
-            Items[new DateLiteral()] = Match.Any;
-            Items[new Timeiteral()] = Match.Any;
-        }
+            var signedIntegerTypeName = "SINT".Box(false) | "INT".Box(false) | "DINT".Box(false) | "LINT".Box(false);
 
-        Match StringLiteral(char delimiter, char escape)
-            => (delimiter + "").Box(false) +
-               (escape + "" + delimiter).AnyChar(false).Else(Match.LineEnd).Not.Repeat() +
-               (escape + "" + Match.LineEnd.Not + (escape + "" + delimiter).AnyChar(false).Else(Match.LineEnd).Not.Repeat())
-               .Repeat() +
-               (delimiter + "").Box(false).Else(Match.LineEnd + InvalidTextEnd);
+            var unsignedIntegerTypeName
+                = "USINT".Box(false) |
+                  "UINT".Box(false) |
+                  "UDINT".Box(false) |
+                  "ULINT".Box(false);
+
+            var realTypeName = "REAL".Box(false) | "LREAL".Box(false);
+
+            var integerTypeName = signedIntegerTypeName | unsignedIntegerTypeName;
+
+            var integer = Match.Digit.Else("_").Repeat(1);
+            var bit = "01".AnyChar();
+            var octalDigit = "01234567".AnyChar();
+            var hexDigit = integer | "abcdef".AnyChar(false);
+
+            var signedInteger = "+-".AnyChar().Option() + integer;
+            var binaryInteger = "2#" + bit + ("_".Box().Option() + bit).Repeat();
+            var octalInteger = "8#" + octalDigit + ("_".Box().Option() + octalDigit).Repeat();
+            var hexInteger = "16#" + hexDigit + ("_".Box().Option() + hexDigit).Repeat();
+            var integerLiteral = (integerTypeName + "#").Option() +
+                                 (signedInteger | binaryInteger | octalInteger | hexInteger);
+            var exponent = "E".AnyChar(false) + signedInteger;
+            var realLiteral = (realTypeName + "#").Option() + signedInteger + "." + integer + exponent.Option();
+
+            var numericLiteral = integerLiteral | realLiteral;
+
+            Items[new NumericLiteral()] = numericLiteral;
+
+            var commonCharacterRepresentation
+                = "$\"'".AnyChar().Not |
+                  "$$".Box() |
+                  "$L".Box() |
+                  "$N".Box() |
+                  "$P".Box() |
+                  "$R".Box() |
+                  "$T".Box() |
+                  "$l".Box() |
+                  "$n".Box() |
+                  "$p".Box() |
+                  "$r".Box() |
+                  "$t".Box();
+            ;
+            var singleByteCharacterRepresentation =
+                commonCharacterRepresentation | "$'".Box() | "\"".Box() | ("$" + hexDigit + hexDigit);
+            var doubleByteCharacterRepresentation =
+                commonCharacterRepresentation | "$\"".Box() | "'".Box() | ("$" + hexDigit + hexDigit);
+
+            var singleByteCharacterString = "'" + singleByteCharacterRepresentation.Repeat() + "'";
+            var doubleByteCharacterString = "'" + doubleByteCharacterRepresentation.Repeat() + "'";
+
+            var characterString = singleByteCharacterString | doubleByteCharacterString;
+
+            Items[new StringLiteral1()] = characterString;
+
+            var fixedPoint = integer + ("." + integer).Option();
+            var milliseconds = fixedPoint + "ms".Box(false);
+            var seconds = (fixedPoint + "s".Box(false)) |
+                          (integer + "s".Box(false) + "_".Box().Option() + milliseconds);
+            var minutes = (fixedPoint + "m".Box(false)) | (integer + "m".Box(false) + "_".Box().Option() + seconds);
+            var hours = (fixedPoint + "h".Box(false)) | (integer + "h".Box(false) + "_".Box().Option() + minutes);
+            var days = (fixedPoint + "d".Box(false)) | (integer + "d".Box(false) + "_".Box().Option() + hours);
+            var interval = days | hours | minutes | seconds | milliseconds;
+            var duration = ("time".Box(false) | "t".Box(false)) + "#" + "-".Box().Option() + interval;
+
+            var dayHour = integer;
+            var dayMinute = integer;
+            var daySecond = fixedPoint;
+            var daytime = dayHour + ":" + dayMinute + ":" + daySecond;
+            var timeOfDay = ("TIME_OF_DAY".Box(false) | "TOD".Box(false)) + "#" + daytime;
+            var year = integer;
+            var month = integer;
+            var day = integer;
+            var dateLiteral = year + "-" + month + "-" + day;
+            var date = ("date".Box(false) | "d".Box(false)) + "#" + dateLiteral;
+            var dateAndTime =  ("DATE_AND_TIME".Box(false) | "DT".Box(false))+ "#"+ dateLiteral +"-"+ daytime;
+            var timeLiteral = duration | timeOfDay | date | dateAndTime;
+            Items[new Timeiteral()] = timeLiteral;
+
+            var identifier =
+                Match.Letter.Else("_") + Match.Letter.Else("_").Else(Match.Digit).Repeat();
+
+            Any = identifier;
+        }
 
         internal LexerItem[] LexerItems(ScannerTokenType<Syntax> scannerTokenType)
             => Items
@@ -79,7 +136,4 @@ namespace Stx
         LexerItem CreateLexerItem(IScannerTokenType scannerTokenType, IMatch match)
             => new LexerItem(scannerTokenType, sourcePosn => GuardedMatch(sourcePosn, match));
     }
-
-
-
 }

@@ -22,6 +22,7 @@ namespace Stx
         readonly string Text;
 
         Source SourceCache;
+        Syntax SyntaxCache;
 
         Compiler(string text)
         {
@@ -35,6 +36,9 @@ namespace Stx
             main.Add<ScannerTokenType<Syntax>>(tokenFactory);
         }
 
-        Source Source => SourceCache ?? (SourceCache = new Source(Text));
+        internal Source Source => SourceCache ?? (SourceCache = new Source(Text));
+        internal Syntax Syntax => SyntaxCache ?? (SyntaxCache = GetSyntax());
+
+        Syntax GetSyntax() => this["Main"].Parser.Execute(Source+0);
     }
 }

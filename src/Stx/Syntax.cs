@@ -1,16 +1,29 @@
-using System;
 using hw.Parser;
 using hw.Scanner;
 
 namespace Stx
 {
-    class Syntax : ISourcePartProxy
+    sealed class Syntax : ISourcePartProxy
     {
-        readonly SourcePart SourcePart;
-        public Syntax(SourcePart sourcePart) => SourcePart = sourcePart;
+        public static Syntax CreateSourceSyntax
+            (Syntax left, TokenClass tokenClass, IToken token, Syntax right) =>
+            new Syntax(left, tokenClass, token, right);
+
+        public readonly Syntax Left;
+        public readonly Syntax Right;
+        readonly IToken Token;
+        readonly TokenClass TokenClass;
+
+        Syntax(Syntax left, TokenClass tokenClass, IToken token, Syntax right)
+        {
+            Left = left;
+            TokenClass = tokenClass;
+            Token = token;
+            Right = right;
+        }
+
         SourcePart ISourcePartProxy.All => SourcePart;
-        public Syntax Left => throw new NotImplementedException();
-        public Syntax Right => throw new NotImplementedException();
-        public static Syntax CreateSourceSyntax(Syntax left, TokenClass tokenClass, IToken token, Syntax right) {throw new NotImplementedException();}
+
+        SourcePart SourcePart => Left?.SourcePart + Token.SourcePart() + Right?.SourcePart;
     }
 }
