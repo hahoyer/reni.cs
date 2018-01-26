@@ -1,4 +1,4 @@
-namespace Stx
+namespace Stx 
 {
     abstract class Literal : TokenClass
     {
