@@ -9,128 +9,67 @@ namespace ReniUI.Formatting
     {
         abstract class BaseFormatter : DumpableObject
         {
-            public virtual bool? MainAndRightSite => null;
-            public virtual bool? LeftSite => null;
-            public virtual bool? RightSite => null;
-            public virtual bool UseLineBreakBeforeMain(bool isLineBreakForced) => false;
-            public virtual bool UseLineBreakAfterMain(bool isLineBreakForced) => false;
-            public virtual bool ForceLineBreakOnLeftSize(bool isLineBreakForced) => false;
-            public virtual bool ForceLineBreakOnRightSize(bool isLineBreakForced) => false;
+            public virtual bool? IndentMainAndRightSite => null;
+            public virtual bool? IndentLeftSite => null;
+            public virtual bool? IndentRightSite => null;
+            public virtual bool UseLineBreakBeforeMainWhenForced => false;
+            public virtual bool UseLineBreakAfterMainWhenForced => false;
+            public virtual bool ForceLineBreakOnLeftSizeWhenForced => false;
+            public virtual bool ForceLineBreakOnRightSizeWhenForced => false;
+            public virtual bool UseLineBreakBeforeMain => false;
+            public virtual bool UseLineBreakAfterMain => false;
+            public virtual bool ForceLineBreakOnLeftSize => false;
+            public virtual bool ForceLineBreakOnRightSize => false;
         }
 
         sealed class EmptyFormatter : BaseFormatter {}
 
-        sealed class DefaultFormatter : BaseFormatter
-        {
-            public override bool UseLineBreakBeforeMain(bool isLineBreakForced)
-            {
-                NotImplementedFunction(isLineBreakForced);
-                return base.UseLineBreakBeforeMain(isLineBreakForced);
-            }
-
-            public override bool UseLineBreakAfterMain(bool isLineBreakForced)
-            {
-                NotImplementedFunction(isLineBreakForced);
-                return base.UseLineBreakAfterMain
-                    (isLineBreakForced);
-            }
-
-            public override bool ForceLineBreakOnLeftSize(bool isLineBreakForced)
-            {
-                NotImplementedFunction(isLineBreakForced);
-                return base.ForceLineBreakOnLeftSize(isLineBreakForced);
-            }
-
-            public override bool ForceLineBreakOnRightSize(bool isLineBreakForced)
-            {
-                NotImplementedFunction(isLineBreakForced);
-                return base.ForceLineBreakOnRightSize(isLineBreakForced);
-            }
-        }
+        sealed class DefaultFormatter : BaseFormatter {}
 
         sealed class RightParenthesisFormatter : BaseFormatter
         {
-            public override bool UseLineBreakBeforeMain(bool isLineBreakForced) => true;
-            public override bool UseLineBreakAfterMain(bool isLineBreakForced) => isLineBreakForced;
-            public override bool ForceLineBreakOnLeftSize(bool isLineBreakForced) => isLineBreakForced;
+            public override bool UseLineBreakBeforeMainWhenForced => true;
+            public override bool UseLineBreakAfterMainWhenForced => true;
+            public override bool UseLineBreakBeforeMain => true;
+            public override bool ForceLineBreakOnLeftSize => true;
+            public override bool ForceLineBreakOnLeftSizeWhenForced => true;
         }
 
         sealed class LeftParenthesisFormatter : BaseFormatter
         {
-            public override bool? RightSite => false;
-            public override bool UseLineBreakBeforeMain(bool isLineBreakForced) => isLineBreakForced;
-            public override bool UseLineBreakAfterMain(bool isLineBreakForced) => true;
-            public override bool ForceLineBreakOnRightSize(bool isLineBreakForced) => true;
+            public override bool? IndentRightSite => false;
+            public override bool UseLineBreakBeforeMainWhenForced => true;
+            public override bool UseLineBreakAfterMainWhenForced => true;
+            public override bool UseLineBreakAfterMain => true;
+            public override bool ForceLineBreakOnRightSizeWhenForced => true;
+            public override bool ForceLineBreakOnRightSize => true;
         }
 
         sealed class ColonFormatter : BaseFormatter
         {
-            public override bool? LeftSite => true;
-
-            public override bool UseLineBreakBeforeMain(bool isLineBreakForced)
-            {
-                NotImplementedFunction(isLineBreakForced);
-                return base.UseLineBreakBeforeMain(isLineBreakForced);
-            }
-
-            public override bool UseLineBreakAfterMain(bool isLineBreakForced)
-            {
-                NotImplementedFunction(isLineBreakForced);
-                return base.UseLineBreakAfterMain
-                    (isLineBreakForced);
-            }
-
-            public override bool ForceLineBreakOnLeftSize(bool isLineBreakForced)
-            {
-                NotImplementedFunction(isLineBreakForced);
-                return base.ForceLineBreakOnLeftSize(isLineBreakForced);
-            }
-
-            public override bool ForceLineBreakOnRightSize(bool isLineBreakForced)
-            {
-                NotImplementedFunction(isLineBreakForced);
-                return base.ForceLineBreakOnRightSize(isLineBreakForced);
-            }
+            public override bool? IndentLeftSite => true;
+            public override bool UseLineBreakAfterMainWhenForced => true;
+            public override bool UseLineBreakAfterMain => true;
         }
 
         sealed class ChainFormatter : BaseFormatter
         {
-            public override bool? MainAndRightSite => false;
-
-            public override bool UseLineBreakBeforeMain(bool isLineBreakForced)
-            {
-                NotImplementedFunction(isLineBreakForced);
-                return base.UseLineBreakBeforeMain(isLineBreakForced);
-            }
-
-            public override bool UseLineBreakAfterMain(bool isLineBreakForced)
-            {
-                NotImplementedFunction(isLineBreakForced);
-                return base.UseLineBreakAfterMain
-                    (isLineBreakForced);
-            }
-
-            public override bool ForceLineBreakOnLeftSize(bool isLineBreakForced)
-            {
-                NotImplementedFunction(isLineBreakForced);
-                return base.ForceLineBreakOnLeftSize(isLineBreakForced);
-            }
-
-            public override bool ForceLineBreakOnRightSize(bool isLineBreakForced)
-            {
-                NotImplementedFunction(isLineBreakForced);
-                return base.ForceLineBreakOnRightSize(isLineBreakForced);
-            }
+            public override bool? IndentMainAndRightSite => false;
+            public override bool UseLineBreakBeforeMainWhenForced => true;
+            public override bool ForceLineBreakOnLeftSizeWhenForced => true;
+            public override bool UseLineBreakBeforeMain => true;
+            public override bool ForceLineBreakOnLeftSize => true;
         }
 
         abstract class AnyListFormatter : BaseFormatter
         {
-            public override bool UseLineBreakAfterMain(bool isLineBreakForced) => isLineBreakForced;
+            public override bool UseLineBreakAfterMainWhenForced => true;
+            public override bool UseLineBreakAfterMain => true;
         }
 
         sealed class ListFormatter : AnyListFormatter
         {
-            public override bool ForceLineBreakOnRightSize(bool isLineBreakForced) => true;
+            public override bool ForceLineBreakOnRightSize => true;
         }
 
         sealed class LastListFormatter : AnyListFormatter {}
@@ -213,6 +152,8 @@ namespace ReniUI.Formatting
                 !(Syntax.TokenClass is BeginOfText) &&
                 !(Syntax.TokenClass is RightParenthesis) &&
                 !(Syntax.TokenClass is LeftParenthesis) &&
+                !(Syntax.TokenClass is Colon) &&
+                !(Syntax.TokenClass is Definable) &&
                 !(Syntax.TokenClass is List),
                 () => Syntax.TokenClass.Id
             );
@@ -230,11 +171,29 @@ namespace ReniUI.Formatting
         [EnableDump]
         string FlatResult => Syntax.FlatFormat(Parent.Configuration);
 
+        [EnableDumpExcept(exception: false)]
+        bool UseLineBreakBeforeMain
+            => IsLineBreakForced && Formatter.UseLineBreakBeforeMainWhenForced ||
+               IsLineBreakRequired && Formatter.UseLineBreakBeforeMain;
+
+        [EnableDumpExcept(exception: false)]
+        bool UseLineBreakAfterMain
+            => IsLineBreakForced && Formatter.UseLineBreakAfterMainWhenForced ||
+               IsLineBreakRequired && Formatter.UseLineBreakAfterMain;
+
+        [EnableDumpExcept(exception: false)]
+        bool ForceLineBreakOnLeftSize
+            => (IsLineBreakForced || IsLineBreakRequired) && Formatter.ForceLineBreakOnLeftSize;
+
+        [EnableDumpExcept(exception: false)]
+        bool ForceLineBreakOnRightSize
+            => (IsLineBreakForced || IsLineBreakRequired) && Formatter.ForceLineBreakOnRightSize;
+
         IEnumerable<ISourcePartEdit> BeforeMain
         {
             get
             {
-                if((IsLineBreakForced || IsLineBreakRequired) && Formatter.UseLineBreakBeforeMain(IsLineBreakForced))
+                if(UseLineBreakBeforeMain)
                     yield return SourcePartEditExtension.LineBreak;
             }
         }
@@ -243,17 +202,10 @@ namespace ReniUI.Formatting
         {
             get
             {
-                if((IsLineBreakForced || IsLineBreakRequired) && Formatter.UseLineBreakAfterMain(IsLineBreakForced))
+                if(UseLineBreakAfterMain)
                     yield return SourcePartEditExtension.LineBreak;
             }
         }
-
-        bool ForceLineBreakOnLeftSize
-            => (IsLineBreakForced || IsLineBreakRequired) && Formatter.ForceLineBreakOnLeftSize(IsLineBreakForced);
-
-        bool ForceLineBreakOnRightSize
-            => (IsLineBreakForced || IsLineBreakRequired) && Formatter.ForceLineBreakOnRightSize(IsLineBreakForced);
-
 
         bool GetIsLineBreakRequired() => Syntax.IsLineBreakRequired(Parent.Configuration);
 
@@ -275,21 +227,21 @@ namespace ReniUI.Formatting
             if(Syntax.Right != null)
                 result.AddRange(GetRightSiteEdits(includeSuffix));
 
-            return result.Indent(Formatter.MainAndRightSite);
+            return result.Indent(Formatter.IndentMainAndRightSite);
         }
 
         IEnumerable<ISourcePartEdit> GetLeftSiteEdits(bool exlucdePrefix)
             => Syntax.Left
                 .CreateStruct(Parent, ForceLineBreakOnLeftSize)
-                .GetSourcePartEdits(exlucdePrefix, false)
-                .Indent(Formatter.LeftSite);
+                .GetSourcePartEdits(exlucdePrefix, includeSuffix: false)
+                .Indent(Formatter.IndentLeftSite);
 
 
         IEnumerable<ISourcePartEdit> GetRightSiteEdits(bool includeSuffix)
             => Syntax.Right
                 .CreateStruct(Parent, ForceLineBreakOnRightSize)
-                .GetSourcePartEdits(true, includeSuffix)
-                .Indent(Formatter.RightSite);
+                .GetSourcePartEdits(exlucdePrefix: true, includeSuffix: includeSuffix)
+                .Indent(Formatter.IndentRightSite);
 
 
         protected override string GetNodeDump() => base.GetNodeDump() + " " + Syntax.Token.Characters.Id;

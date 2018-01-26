@@ -11,18 +11,20 @@ namespace ReniUI.Test
     {
         [Test]
         [UnitTest]
-        public void UseSpaceWhenLinebreakIsRemoved()
+        public void LongChainInList()
         {
             const string text =
-                @"(12345,12345,12345,12345,12345)";
+                @"method member function(parameter1, parameter2, parameter3), thing2()";
 
-            var expectedText = @"(
-    12345,
-    12345,
-    12345,
-    12345,
-    12345
-)"
+            var expectedText = @"method
+    member
+    function
+    (
+        parameter1,
+        parameter2,
+        parameter3
+    ),
+thing2()"
                 .Replace("\r\n", "\n");
 
             var compiler = CompilerBrowser.FromText(text);
@@ -36,6 +38,7 @@ namespace ReniUI.Test
                 )
                 .Replace("\r\n", "\n");
 
+            var both = newSource + "\n==\n" + expectedText;
             Tracer.Assert(newSource == expectedText, "\n\"" + newSource + "\"");
         }
     }

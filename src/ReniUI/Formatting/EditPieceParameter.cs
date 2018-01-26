@@ -72,8 +72,10 @@ namespace ReniUI.Formatting
             var newspacesCount = isSeparatorRequired ? 1 : 0;
             if(LineBreakCount > 0)
                 newspacesCount += Indent * Configuration.IndentCount;
+            if(newspacesCount < 0)
+                newspacesCount = 0;
 
-            var delta = newspacesCount - currentSpaces.Length;
+             var delta = newspacesCount - currentSpaces.Length;
 
             return
                 (
