@@ -1,3 +1,4 @@
+using System;
 using hw.DebugFormatter;
 using hw.UnitTest;
 
@@ -22,6 +23,7 @@ END_CASE;";
             var c = Compiler.FromText(x);
             var s = c.Syntax;
             Tracer.Assert(s != s);
+            throw new NotImplementedException();
         }
     }
 }

@@ -49,7 +49,6 @@
     <Compile Include="hw\Helper\DateRange.cs" />
     <Compile Include="hw\Helper\DateTimeExtender.cs" />
     <Compile Include="hw\Helper\EnumEx.cs" />
-    <Compile Include="hw\Helper\File.cs" />
     <Compile Include="hw\Helper\FunctionCache.cs" />
     <Compile Include="hw\Helper\IUniqueIdProvider.cs" />
     <Compile Include="hw\Helper\LinqExtension.cs" />
@@ -121,7 +120,6 @@
       <DependentUpon>Template1.tt</DependentUpon>
     </Compile>
     <Compile Include="Test.cs" />
-    <Compile Include="Text.cs" />
     <Compile Include="TokenClass.cs" />
     <Compile Include="TokenFactory.cs" />
     <Compile Include="UserSymbol.cs" />

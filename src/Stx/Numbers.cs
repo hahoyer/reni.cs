@@ -1,4 +1,4 @@
-namespace Stx 
+namespace Stx
 {
     abstract class Literal : TokenClass
     {
@@ -6,6 +6,8 @@ namespace Stx
     }
 
     sealed class NumericLiteral : Literal {}
-    sealed class StringLiteral1: Literal {}
-    sealed class Timeiteral: Literal {}
+
+    sealed class StringLiteral1 : Literal {}
+
+    sealed class Timeiteral : Literal {}
 }

@@ -1,13 +1,13 @@
+using hw.DebugFormatter;
 using hw.Parser;
 using hw.Scanner;
 
 namespace Stx
 {
-    sealed class Syntax : ISourcePartProxy
+    sealed class Syntax : DumpableObject, ISourcePartProxy
     {
-        public static Syntax CreateSourceSyntax
-            (Syntax left, TokenClass tokenClass, IToken token, Syntax right) =>
-            new Syntax(left, tokenClass, token, right);
+        public static Syntax CreateSourceSyntax(Syntax left, TokenClass tokenClass, IToken token, Syntax right)
+            => new Syntax(left, tokenClass, token, right);
 
         public readonly Syntax Left;
         public readonly Syntax Right;
@@ -23,7 +23,6 @@ namespace Stx
         }
 
         SourcePart ISourcePartProxy.All => SourcePart;
-
         SourcePart SourcePart => Left?.SourcePart + Token.SourcePart() + Right?.SourcePart;
     }
 }

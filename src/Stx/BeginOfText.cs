@@ -1,7 +1,8 @@
 using hw.DebugFormatter;
 using hw.Parser;
 
-namespace Stx {
+namespace Stx
+{
     sealed class BeginOfText : TokenClass
     {
         const string TokenId = PrioTable.BeginOfText;

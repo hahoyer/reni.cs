@@ -1,8 +1,9 @@
 using hw.DebugFormatter;
 using hw.Parser;
 
-namespace Stx {
-    sealed class EndOfText : TokenClass
+namespace Stx
+{
+    sealed class EndOfText : ParserTokenType<Syntax>
     {
         public override string Id => PrioTable.EndOfText;
 

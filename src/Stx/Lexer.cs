@@ -123,7 +123,7 @@ namespace Stx
             var identifier =
                 Match.Letter.Else("_") + Match.Letter.Else("_").Else(Match.Digit).Repeat();
 
-            Any = identifier;
+            Any = identifier | ":=".Box();
         }
 
         internal LexerItem[] LexerItems(ScannerTokenType<Syntax> scannerTokenType)

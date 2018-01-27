@@ -1,15 +1,20 @@
-using System;
+using System.Collections.Generic;
+using hw.DebugFormatter;
 using hw.Parser;
 
-namespace Stx {
-    sealed class UserSymbol : IParserTokenType<Syntax>
+namespace Stx
+{
+    sealed class UserSymbol : TokenClass, IAliasKeeper
     {
+        [EnableDump]
         readonly string Name;
-        public UserSymbol(string name) {Name = name;}
 
-        Syntax IParserTokenType<Syntax>.Create(Syntax left, IToken token, Syntax right) =>
-            throw new NotImplementedException();
+        [EnableDump]
+        readonly IList<string> Names = new List<string>();
 
-        string IParserTokenType<Syntax>.PrioTableId => throw new NotImplementedException();
+        public UserSymbol(string name) => Name = name;
+
+        void IAliasKeeper.Add(string id) => Names.Add(id);
+        public override string Id => Name;
     }
 }

@@ -3,7 +3,8 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
 
-namespace Stx {
+namespace Stx
+{
     sealed class TokenFactory : GenericTokenFactory<Syntax>
     {
         readonly List<UserSymbol> UserSymbols = new List<UserSymbol>();
@@ -14,6 +15,8 @@ namespace Stx {
         [DisableDump]
         internal IEnumerable<IParserTokenType<Syntax>> AllTokenClasses
             => PredefinedTokenClasses.Concat(UserSymbols);
+
+        protected override string GetTokenClassKeyFromToken(string id) => id.ToLower();
 
         protected override IParserTokenType<Syntax> GetTokenClass(string name)
         {

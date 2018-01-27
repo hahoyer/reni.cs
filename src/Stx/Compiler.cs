@@ -13,6 +13,11 @@ namespace Stx
             {
                 var result = PrioTable.Left(PrioTable.Any);
 
+                result += PrioTable.BracketParallels
+                (
+                    new[] {PrioTable.BeginOfText},
+                    new[] {PrioTable.EndOfText}
+                );
                 result.Title = "Main";
                 //Tracer.FlaggedLine("\n"+x.ToString());
                 return result;
@@ -39,6 +44,6 @@ namespace Stx
         internal Source Source => SourceCache ?? (SourceCache = new Source(Text));
         internal Syntax Syntax => SyntaxCache ?? (SyntaxCache = GetSyntax());
 
-        Syntax GetSyntax() => this["Main"].Parser.Execute(Source+0);
+        Syntax GetSyntax() => this["Main"].Parser.Execute(Source + 0);
     }
 }

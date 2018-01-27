@@ -141,14 +141,10 @@ namespace hw.Scanner
             Exception Create(SourcePosn sourcePosn);
         }
 
-        public static IMatch UnBox(this IMatch data)
-        {
-            var box = data as Match;
-            return box == null ? data : box.UnBox;
-        }
+        public static IMatch UnBox(this IMatch data) => data is Match box ? box.UnBox : data;
 
-        public static Match AnyChar
-            (this string data, bool isCaseSenitive = true) => new Match(new AnyCharMatch(data, isCaseSenitive));
+        public static Match AnyChar(this string data, bool isCaseSenitive = true) 
+            => new Match(new AnyCharMatch(data, isCaseSenitive));
 
         public static Match Box(this Match.IError error) => new Match(new ErrorMatch(error));
         public static Match Box(this string data, bool isCaseSenitive = true) => new Match(new CharMatch(data,isCaseSenitive));
