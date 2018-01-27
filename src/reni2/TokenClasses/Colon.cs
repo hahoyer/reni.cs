@@ -18,7 +18,7 @@ namespace Reni.TokenClasses
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class Exclamation : CommonTokenType<Syntax>,
+    sealed class Exclamation : ParserTokenType<Syntax>,
         PrioParser<Syntax>.ISubParserProvider
     {
         public const string TokenId = "!";

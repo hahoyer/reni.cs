@@ -7,7 +7,7 @@ using Reni.Parser;
 
 namespace Reni.TokenClasses
 {
-    abstract class TokenClass : CommonTokenType<Syntax>, ITokenClass
+    abstract class TokenClass : ParserTokenType<Syntax>, ITokenClass
     {
         string ITokenClass.Id => Id;
 

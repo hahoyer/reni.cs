@@ -84,11 +84,11 @@ namespace hw.Helper
         }
 
         [CanBeNull]
-        public static T Aggregate<T>(this IEnumerable<T> x) where T : class, IAggregateable<T>
+        public static T Aggregate<T>(this IEnumerable<T> x, Func<T> getDefault = null) where T : class, IAggregateable<T>
         {
             var xx = x.ToArray();
             if(!xx.Any())
-                return null;
+                return getDefault?.Invoke();
             var result = xx[0];
             for(var i = 1; i < xx.Length; i++)
                 result = result.Aggregate(xx[i]);
@@ -101,12 +101,6 @@ namespace hw.Helper
         {
             var i = 0;
             return x.Aggregate("", (a, xx) => a + "[" + i++ + "] " + xx.Dump() + "\n");
-        }
-
-        [Obsolete("use Stringify")]
-        public static string Format<T>(this IEnumerable<T> x, string separator)
-        {
-            return Stringify(x, separator);
         }
 
         public static string Stringify<T>
@@ -321,12 +315,6 @@ namespace hw.Helper
         {
             foreach(var item in newEntries.Where(x => !target.ContainsKey(x.Key)))
                 target.Add(item);
-        }
-
-        [Obsolete("Use IndexWhere")]
-        public static int? IndexOf<T>(this IEnumerable<T> items, Func<T, bool> predicate)
-        {
-            return IndexWhere(items, predicate);
         }
 
         /// <summary>Finds the index of the first item matching an expression in an enumerable.</summary>
