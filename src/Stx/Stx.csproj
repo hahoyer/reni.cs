@@ -22,11 +22,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BeginOfText.cs" />
+    <Compile Include="CodeItems\CodeItem.cs" />
+    <Compile Include="Features\Context.cs" />
+    <Compile Include="Features\DataType.cs" />
+    <Compile Include="Features\Feature.cs" />
+    <Compile Include="Features\IssueDataType.cs" />
+    <Compile Include="Features\Result.cs" />
+    <Compile Include="Features\ResultValue.cs" />
+    <Compile Include="TokenClasses\BeginOfText.cs" />
     <Compile Include="Compiler.cs" />
-    <Compile Include="EndOfText.cs" />
-    <Compile Include="Extension.cs" />
-    <Compile Include="FilebasedTests.cs" />
+    <Compile Include="TokenClasses\Case.cs" />
+    <Compile Include="TokenClasses\EndOfText.cs" />
+    <Compile Include="Tests\Extension.cs" />
+    <Compile Include="Tests\FilebasedTests.cs" />
     <Compile Include="hw\DebugFormatter\Configuration.cs" />
     <Compile Include="hw\DebugFormatter\DebugTextWriter.cs" />
     <Compile Include="hw\DebugFormatter\DisableDumpAttribute.cs" />
@@ -107,22 +115,26 @@
     <Compile Include="hw\UnitTest\TestRunner.cs" />
     <Compile Include="hw\UnitTest\TestType.cs" />
     <Compile Include="IssueId.cs" />
-    <Compile Include="Lexer.cs" />
+    <Compile Include="Scanner\Lexer.cs" />
     <Compile Include="MainContainer.cs" />
-    <Compile Include="Numbers.cs" />
+    <Compile Include="TokenClasses\LeftBracket.cs" />
+    <Compile Include="TokenClasses\Numbers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ScannerSyntaxError.cs" />
-    <Compile Include="ScannerTokenFactory.cs" />
+    <Compile Include="TokenClasses\Reassign.cs" />
+    <Compile Include="TokenClasses\RightBracket.cs" />
+    <Compile Include="TokenClasses\ScannerSyntaxError.cs" />
+    <Compile Include="Scanner\ScannerTokenFactory.cs" />
     <Compile Include="Syntax.cs" />
     <Compile Include="Template1.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Template1.tt</DependentUpon>
     </Compile>
-    <Compile Include="Test.cs" />
-    <Compile Include="TokenClass.cs" />
-    <Compile Include="TokenFactory.cs" />
-    <Compile Include="UserSymbol.cs" />
+    <Compile Include="Tests\Test.cs" />
+    <Compile Include="TokenClasses\Semicolon.cs" />
+    <Compile Include="TokenClasses\TokenClass.cs" />
+    <Compile Include="Scanner\TokenFactory.cs" />
+    <Compile Include="TokenClasses\UserSymbol.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

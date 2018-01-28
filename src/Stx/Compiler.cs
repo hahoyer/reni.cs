@@ -1,5 +1,7 @@
 using hw.Parser;
 using hw.Scanner;
+using Stx.Scanner;
+using Stx.TokenClasses;
 
 namespace Stx
 {
@@ -13,6 +15,23 @@ namespace Stx
             {
                 var result = PrioTable.Left(PrioTable.Any);
 
+                result += PrioTable.Right(Colon.TokenId);
+                result += PrioTable.Right(Reassign.TokenId);
+
+                result += PrioTable.BracketParallels
+                (
+                    new[] {LeftBracket.TokenId, LeftParentheses.TokenId},
+                    new[] {RightBracket.TokenId, RightParentheses.TokenId}
+                );
+
+                result += PrioTable.Right(Semicolon.TokenId);
+
+                result += PrioTable.BracketParallels
+                (
+                    new[] {Case.TokenId},
+                    new[] {EndCase.TokenId}
+                );
+                
                 result += PrioTable.BracketParallels
                 (
                     new[] {PrioTable.BeginOfText},
