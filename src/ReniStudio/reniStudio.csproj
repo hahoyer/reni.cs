@@ -28,7 +28,6 @@
     <Compile Include="MainContainer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
     <None Include="StudioConfig\Commands\Base\System.Exit">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
