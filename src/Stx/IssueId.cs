@@ -1,5 +1,6 @@
 using hw.Helper;
 using hw.Scanner;
+using Stx.DataTypes;
 using Stx.Features;
 
 namespace Stx

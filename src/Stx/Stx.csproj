@@ -23,10 +23,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CodeItems\CodeItem.cs" />
-    <Compile Include="Features\Context.cs" />
-    <Compile Include="Features\DataType.cs" />
+    <Compile Include="Contexts\Context.cs" />
+    <Compile Include="Contexts\WithName.cs" />
+    <Compile Include="DataTypes\DataType.cs" />
     <Compile Include="Features\Feature.cs" />
-    <Compile Include="Features\IssueDataType.cs" />
+    <Compile Include="DataTypes\Issue.cs" />
     <Compile Include="Features\Result.cs" />
     <Compile Include="Features\ResultValue.cs" />
     <Compile Include="TokenClasses\BeginOfText.cs" />

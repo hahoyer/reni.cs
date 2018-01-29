@@ -1,5 +1,8 @@
 using hw.Parser;
 using hw.Scanner;
+using Stx.CodeItems;
+using Stx.Contexts;
+using Stx.DataTypes;
 using Stx.Scanner;
 using Stx.TokenClasses;
 
@@ -16,7 +19,7 @@ namespace Stx
                 var result = PrioTable.Left(PrioTable.Any);
 
                 result += PrioTable.Right(Colon.TokenId);
-                result += PrioTable.Right(Reassign.TokenId);
+                result += PrioTable.Right(TokenClasses.Reassign.TokenId);
 
                 result += PrioTable.BracketParallels
                 (
@@ -31,7 +34,7 @@ namespace Stx
                     new[] {Case.TokenId},
                     new[] {EndCase.TokenId}
                 );
-                
+
                 result += PrioTable.BracketParallels
                 (
                     new[] {PrioTable.BeginOfText},
@@ -44,6 +47,8 @@ namespace Stx
         }
 
         readonly string Text;
+        CodeItem[] CodeItemsCache;
+        internal Context RootContext = Context.Root;
 
         Source SourceCache;
         Syntax SyntaxCache;
@@ -62,6 +67,9 @@ namespace Stx
 
         internal Source Source => SourceCache ?? (SourceCache = new Source(Text));
         internal Syntax Syntax => SyntaxCache ?? (SyntaxCache = GetSyntax());
+        internal CodeItem[] CodeItems => CodeItemsCache ?? (CodeItemsCache = GetCodeItems());
+
+        CodeItem[] GetCodeItems() => Syntax.GetResult(RootContext).CodeItems;
 
         Syntax GetSyntax() => this["Main"].Parser.Execute(Source + 0);
     }
