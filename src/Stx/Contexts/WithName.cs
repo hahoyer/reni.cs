@@ -51,7 +51,26 @@ namespace Stx.Contexts
                 return base.Access(name, token, subsctiptionDataType);
 
             if(subsctiptionDataType != null)
+            {
+                Tracer.Assert(subsctiptionDataType == DataType.Integer);
+
+                var itemType = (DataType as DataTypes.Array)?.ElementType;
+                Tracer.Assert(itemType != null);
+
+                return new Result
+                (
+                    token.Characters,
+                    itemType.Reference,
+                    new[]
+                    {
+                        CodeItem.CreateArrayAccessVariable(Name,itemType.ByteSize),
+                        CodeItem.CreateSourceHint(token)
+                    }
+                );
+
+                
                 NotImplementedMethod(name, token, subsctiptionDataType);
+            }
 
             return new Result
             (

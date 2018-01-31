@@ -97,6 +97,7 @@ namespace Stx.Features
             }
         }
 
+        [DisableDump]
         public Result Rereference => new Result
         (
             Position,
@@ -121,7 +122,6 @@ namespace Stx.Features
             if(Feature.CodeItems <= effectiveFeature)
                 Value.CodeItems = GetCodeItems();
         }
-
 
         public Result Subscription(Result value)
         {

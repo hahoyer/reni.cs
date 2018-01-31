@@ -12,14 +12,16 @@ namespace Stx.DataTypes
 
         DataType ReferenceCache;
 
-        public DataType() => ArrayCache = new FunctionCache<int, DataType>(count => new Array(this, count));
+        protected DataType() => ArrayCache = new FunctionCache<int, DataType>(count => new Array(this, count));
 
         public abstract int ByteSize {get;}
 
         [DisableDump]
         public DataType Reference => ReferenceCache ?? (ReferenceCache = new Reference(this));
 
+        [DisableDump]
         public DataType Dereference => DereferenceCache ?? (DereferenceCache = GetDereference());
+
         protected virtual DataType GetDereference() => this;
 
         public DataType Array(int elementCount) => ArrayCache[elementCount];
@@ -37,7 +39,7 @@ namespace Stx.DataTypes
     sealed class Array : DataType
     {
         readonly int ElementCount;
-        readonly DataType ElementType;
+        internal readonly DataType ElementType;
 
         public Array(DataType elementType, int elementCount)
         {
