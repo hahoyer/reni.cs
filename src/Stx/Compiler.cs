@@ -18,8 +18,6 @@ namespace Stx
             {
                 var result = PrioTable.Left(PrioTable.Any);
 
-                result += PrioTable.Right(Colon.TokenId);
-                result += PrioTable.Right(TokenClasses.Reassign.TokenId);
 
                 result += PrioTable.BracketParallels
                 (
@@ -27,8 +25,11 @@ namespace Stx
                     new[] {RightBracket.TokenId, RightParentheses.TokenId}
                 );
 
+                result += PrioTable.Right(TokenClasses.Reassign.TokenId);
+                result += PrioTable.Right(Colon.TokenId);
                 result += PrioTable.Right(Semicolon.TokenId);
 
+                result += PrioTable.Right(Of.TokenId);
                 result += PrioTable.BracketParallels
                 (
                     new[] {Case.TokenId},
@@ -69,7 +70,7 @@ namespace Stx
         internal Syntax Syntax => SyntaxCache ?? (SyntaxCache = GetSyntax());
         internal CodeItem[] CodeItems => CodeItemsCache ?? (CodeItemsCache = GetCodeItems());
 
-        CodeItem[] GetCodeItems() => Syntax.GetResult(RootContext).CodeItems;
+        CodeItem[] GetCodeItems() => Syntax.Form.GetResult(RootContext).CodeItems;
 
         Syntax GetSyntax() => this["Main"].Parser.Execute(Source + 0);
     }

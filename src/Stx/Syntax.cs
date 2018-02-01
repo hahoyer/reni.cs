@@ -1,9 +1,7 @@
 using hw.DebugFormatter;
-using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
-using Stx.Contexts;
-using Stx.Features;
+using Stx.Forms;
 using Stx.TokenClasses;
 
 namespace Stx
@@ -13,7 +11,6 @@ namespace Stx
         public static Syntax Create(Syntax left, ITokenClass tokenClass, IToken token, Syntax right)
             => new Syntax(left, tokenClass, token, right);
 
-        readonly FunctionCache<Context, Result> ResultCache;
 
         Syntax(Syntax left, ITokenClass tokenClass, IToken token, Syntax right)
         {
@@ -21,9 +18,6 @@ namespace Stx
             TokenClass = tokenClass;
             Token = token;
             Right = right;
-
-            ResultCache = new FunctionCache<Context, Result>
-                (context => TokenClass.GetResult(context, Left, Token, Right));
         }
 
         SourcePart ISourcePartProxy.All => SourcePart;
@@ -31,7 +25,7 @@ namespace Stx
         [EnableDumpExcept(null)]
         internal Syntax Left {get;}
 
-        IToken Token {get;}
+        internal IToken Token {get;}
 
         [EnableDump]
         internal ITokenClass TokenClass {get;}
@@ -40,7 +34,6 @@ namespace Stx
         internal Syntax Right {get;}
 
         SourcePart SourcePart => Left?.SourcePart + Token.SourcePart() + Right?.SourcePart;
-
-        public Result GetResult(Context context) => ResultCache[context];
+        public IForm Form => TokenClass.GetForm(this);
     }
 }

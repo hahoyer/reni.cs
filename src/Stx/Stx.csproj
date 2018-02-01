@@ -30,6 +30,7 @@
     <Compile Include="DataTypes\Issue.cs" />
     <Compile Include="Features\Result.cs" />
     <Compile Include="Features\ResultValue.cs" />
+    <Compile Include="Forms\IForm.cs" />
     <Compile Include="TokenClasses\BeginOfText.cs" />
     <Compile Include="Compiler.cs" />
     <Compile Include="TokenClasses\Case.cs" />

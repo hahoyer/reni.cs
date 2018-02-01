@@ -123,10 +123,12 @@ namespace Stx.Features
                 Value.CodeItems = GetCodeItems();
         }
 
-        public Result Subscription(Result value)
-        {
-            NotImplementedMethod(value);
-            return null;
-        }
+        public Result Subscription(SourcePart position, Result value)
+            => new Result
+            (
+                position,
+                getDataType: () => DataType,
+                getCodeItems: () => CodeItem.Combine(value.CodeItems, null, CodeItems).ToArray()
+            );
     }
 }

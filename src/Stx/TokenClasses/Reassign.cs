@@ -6,6 +6,7 @@ using Stx.CodeItems;
 using Stx.Contexts;
 using Stx.DataTypes;
 using Stx.Features;
+using Stx.Forms;
 using Stx.Scanner;
 
 namespace Stx.TokenClasses
@@ -15,41 +16,14 @@ namespace Stx.TokenClasses
     {
         public const string TokenId = ":=";
 
-        static Result ValidateDestination
-            (Context context, Syntax syntax, SourcePart position, DataType inferredDataType)
-            => syntax == null
-                ? IssueId.ReassignDestinationMissing.At(position)
-                : syntax.GetResult(context.ReassignDestination(inferredDataType));
-
-        static Result ValidateValue(Context context, Syntax syntax, SourcePart position)
-            => syntax == null
-                ? IssueId.ReassignValueMissing.At(position)
-                : syntax.GetResult(context.ReassignValue);
-
         [DisableDump]
         public override string Id => TokenId;
 
-        protected override Result GetResult
-            (Context context, Syntax left, IToken token, Syntax right)
+        protected override IForm GetForm(Syntax parent)
         {
-            var value = ValidateValue(context, right, token.Characters);
-            var destination = ValidateDestination(context, left, token.Characters, value.DataType);
-
-            return
-                new Result
-                (
-                    token.Characters,
-                    getCodeItems: () =>
-                        CodeItem
-                            .Combine
-                            (
-                                destination.CodeItems,
-                                CodeItem.CreateSourceHint(token),
-                                value.CodeItems,
-                                CodeItem.CreateReassign(value.ByteSize)
-                            )
-                            .ToArray()
-                );
+            var left = parent.Left.Form;
+            var right = parent.Right.Form;
+            return FormBase.CreateReassign(parent, left, right);
         }
     }
 
@@ -61,10 +35,24 @@ namespace Stx.TokenClasses
         [DisableDump]
         public override string Id => TokenId;
 
-        protected override Result GetResult
-            (Context context, Syntax left, IToken token, Syntax right)
+        protected override IForm GetForm(Syntax parent)
         {
-            NotImplementedMethod(left, token, right);
+            NotImplementedMethod(parent);
+            return null;
+        }
+    }
+
+    [BelongsTo(typeof(TokenFactory))]
+    sealed class Of : TokenClass
+    {
+        public const string TokenId = "OF";
+
+        [DisableDump]
+        public override string Id => TokenId;
+
+        protected override IForm GetForm(Syntax parent)
+        {
+            NotImplementedMethod(parent);
             return null;
         }
     }

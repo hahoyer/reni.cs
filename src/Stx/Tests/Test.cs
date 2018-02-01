@@ -29,6 +29,7 @@ END_CASE;";
                 .WithVariable("STATES", DataType.Integer.Array(10))
                 ;
 
+            var form = c.Syntax.Form;
             var s = c.CodeItems;
             Tracer.Assert(s != s, () => Tracer.Dump(s));
             throw new NotImplementedException();

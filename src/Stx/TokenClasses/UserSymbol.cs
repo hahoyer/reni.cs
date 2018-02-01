@@ -1,7 +1,5 @@
 using hw.DebugFormatter;
-using hw.Parser;
-using Stx.Contexts;
-using Stx.Features;
+using Stx.Forms;
 
 namespace Stx.TokenClasses
 {
@@ -12,13 +10,12 @@ namespace Stx.TokenClasses
         [DisableDump]
         public override string Id {get;}
 
-        protected override Result GetResult(Context context, Syntax left, IToken token, Syntax right)
+        protected override IForm GetForm(Syntax parent)
         {
-            Tracer.Assert(left == null, () => left.Dump());
+            Tracer.Assert(parent.Left == null, () => parent.Left.Dump());
 
-            var value = right?.GetResult(context.Subscription);
-            var variable = context.Access(this, token, value?.DataType);
-            return right == null ? variable : variable.Subscription(value);
+            return FormBase.CreateUserSymbol(parent, Id, parent.Right?.Form);
+
         }
     }
 }

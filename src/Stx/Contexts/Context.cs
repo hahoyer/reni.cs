@@ -7,6 +7,8 @@ using Stx.TokenClasses;
 
 namespace Stx.Contexts
 {
+    interface IExtension {}
+
     class Context : DumpableObject
     {
         public static readonly Context Root = new Context(null, "root");
@@ -57,6 +59,10 @@ namespace Stx.Contexts
 
         public Context Extend(DataType dataType)
         {
+            var e = dataType.AsExtension;
+            if(e == null)
+                return this;
+
             NotImplementedMethod(dataType);
             return null;
         }

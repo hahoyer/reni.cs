@@ -50,35 +50,30 @@ namespace Stx.Contexts
             if(!string.Equals(name.Id, Name, StringComparison.InvariantCultureIgnoreCase))
                 return base.Access(name, token, subsctiptionDataType);
 
-            if(subsctiptionDataType != null)
-            {
-                Tracer.Assert(subsctiptionDataType == DataType.Integer);
-
-                var itemType = (DataType as DataTypes.Array)?.ElementType;
-                Tracer.Assert(itemType != null);
-
+            if(subsctiptionDataType == null)
                 return new Result
                 (
                     token.Characters,
-                    itemType.Reference,
+                    DataType.Reference,
                     new[]
                     {
-                        CodeItem.CreateArrayAccessVariable(Name,itemType.ByteSize),
+                        CodeItem.CreateAccessVariable(Name),
                         CodeItem.CreateSourceHint(token)
                     }
                 );
+            
+            Tracer.Assert(subsctiptionDataType == DataType.Integer);
 
-                
-                NotImplementedMethod(name, token, subsctiptionDataType);
-            }
+            var itemType = (DataType as DataTypes.Array)?.ElementType;
+            Tracer.Assert(itemType != null);
 
             return new Result
             (
                 token.Characters,
-                DataType.Reference,
+                itemType.Reference,
                 new[]
                 {
-                    CodeItem.CreateAccessVariable(Name),
+                    CodeItem.CreateArrayAccessVariable(Name,itemType.ByteSize),
                     CodeItem.CreateSourceHint(token)
                 }
             );

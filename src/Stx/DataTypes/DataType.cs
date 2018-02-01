@@ -1,12 +1,15 @@
 using hw.DebugFormatter;
 using hw.Helper;
 using Stx.CodeItems;
+using Stx.Contexts;
 
 namespace Stx.DataTypes
 {
     abstract class DataType
     {
         public static readonly DataType Integer = new Integer();
+
+        public static DataType Void => new Void();
         readonly FunctionCache<int, DataType> ArrayCache;
         DataType DereferenceCache;
 
@@ -14,6 +17,7 @@ namespace Stx.DataTypes
 
         protected DataType() => ArrayCache = new FunctionCache<int, DataType>(count => new Array(this, count));
 
+        [DisableDump]
         public abstract int ByteSize {get;}
 
         [DisableDump]
@@ -22,9 +26,16 @@ namespace Stx.DataTypes
         [DisableDump]
         public DataType Dereference => DereferenceCache ?? (DereferenceCache = GetDereference());
 
+        public virtual IExtension AsExtension => null;
+
         protected virtual DataType GetDereference() => this;
 
         public DataType Array(int elementCount) => ArrayCache[elementCount];
+    }
+
+    sealed class Void : DataType
+    {
+        public override int ByteSize => 0;
     }
 
     sealed class Reference : DataType

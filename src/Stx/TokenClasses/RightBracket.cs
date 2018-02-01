@@ -1,8 +1,6 @@
 using hw.DebugFormatter;
 using hw.Parser;
-using Stx.Contexts;
-using Stx.DataTypes;
-using Stx.Features;
+using Stx.Forms;
 using Stx.Scanner;
 
 namespace Stx.TokenClasses
@@ -17,8 +15,10 @@ namespace Stx.TokenClasses
         [DisableDump]
         public override string Id => TokenId;
 
-        protected override Result GetResult(Context context, Syntax left, IToken token, Syntax right)
+        protected override IForm GetForm(Syntax parent)
         {
+            var right = parent.Right;
+            var left = parent.Left;
             Tracer.Assert(right == null);
             Tracer.Assert(left.TokenClass is LeftBracket);
             Tracer.Assert(left.Left == null);
@@ -37,9 +37,9 @@ namespace Stx.TokenClasses
         [DisableDump]
         public override string Id => TokenId;
 
-        protected override Result GetResult(Context context, Syntax left, IToken token, Syntax right)
+        protected override IForm GetForm(Syntax parent)
         {
-            NotImplementedMethod(context, left, token, right);
+            NotImplementedMethod(parent);
             return null;
         }
     }
@@ -50,9 +50,9 @@ namespace Stx.TokenClasses
 
         public override string Id {get;}
 
-        Result ITokenClass.GetResult(Context context, Syntax left, IToken token, Syntax right)
+        IForm ITokenClass.GetForm(Syntax parent)
         {
-            NotImplementedMethod(context, left, token, right);
+            NotImplementedMethod(parent);
             return null;
         }
 

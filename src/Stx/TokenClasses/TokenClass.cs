@@ -2,17 +2,14 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Helper;
 using hw.Parser;
-using Stx.CodeItems;
-using Stx.Contexts;
-using Stx.DataTypes;
-using Stx.Features;
+using Stx.Forms;
 
 namespace Stx.TokenClasses
 {
     interface ITokenClass
     {
         string Id {get;}
-        Result GetResult(Context context, Syntax left, IToken token, Syntax right);
+        IForm GetForm(Syntax parent);
     }
 
     abstract class TokenClass : ParserTokenType<Syntax>, ITokenClass, IAliasKeeper
@@ -29,17 +26,15 @@ namespace Stx.TokenClasses
 
         string ITokenClass.Id => Id;
 
-        Result ITokenClass.GetResult(Context context, Syntax left, IToken token, Syntax right)
-            => GetResult(context, left, token, right);
+        IForm ITokenClass.GetForm(Syntax parent) => GetForm(parent);
 
         string Name => Names.OrderByDescending(i => i.Value).FirstOrDefault().Key ?? Id;
 
-        protected abstract Result GetResult(Context context, Syntax left, IToken token, Syntax right);
+        protected abstract IForm GetForm(Syntax parent);
 
         protected override string GetNodeDump() => GetType().PrettyName() + "(" + Name.Quote() + ")";
 
         protected sealed override Syntax Create(Syntax left, IToken token, Syntax right)
             => Syntax.Create(left, this, token, right);
     }
-
 }

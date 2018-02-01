@@ -1,8 +1,6 @@
 using hw.DebugFormatter;
 using hw.Parser;
-using Stx.Contexts;
-using Stx.DataTypes;
-using Stx.Features;
+using Stx.Forms;
 using Stx.Scanner;
 
 namespace Stx.TokenClasses
@@ -15,10 +13,9 @@ namespace Stx.TokenClasses
         [DisableDump]
         public override string Id => TokenId;
 
-        protected override Result GetResult
-            (Context context, Syntax left, IToken token, Syntax right)
+        protected override IForm GetForm(Syntax parent)
         {
-            NotImplementedMethod(left, token, right);
+            NotImplementedMethod(parent);
             return null;
         }
     }
@@ -33,11 +30,15 @@ namespace Stx.TokenClasses
         [DisableDump]
         public override string Id => TokenId;
 
-        protected override Result GetResult
-            (Context context, Syntax left, IToken token, Syntax right)
+        protected override IForm GetForm(Syntax parent)
         {
-            NotImplementedMethod(left, token, right);
-            return null;
+            var right = parent.Right;
+            var left = parent.Left;
+            Tracer.Assert(right == null);
+            Tracer.Assert(left.TokenClass is Case);
+            Tracer.Assert(left.Left == null);
+
+            return left.Right.GetResult(context.InBrackets);
         }
     }
 }

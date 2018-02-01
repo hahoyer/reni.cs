@@ -58,7 +58,9 @@ namespace Stx.CodeItems
             ItemByteSize = itemByteSize;
         }
 
+        [DisableDump]
         protected override int InByteSize => ArrayIndexByteSize + PointerByteSize;
+        [DisableDump]
         protected override int OutByteSize => PointerByteSize;
     }
 

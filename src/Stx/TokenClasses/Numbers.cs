@@ -1,7 +1,4 @@
-using hw.Parser;
-using Stx.Contexts;
-using Stx.DataTypes;
-using Stx.Features;
+using Stx.Forms;
 
 namespace Stx.TokenClasses
 {
@@ -9,9 +6,9 @@ namespace Stx.TokenClasses
     {
         public override string Id => "<Literal>";
 
-        protected override Result GetResult(Context context, Syntax left, IToken token, Syntax right)
+        protected override IForm GetForm(Syntax parent)
         {
-            NotImplementedMethod(left, token, right);
+            NotImplementedMethod(parent);
             return null;
         }
     }
