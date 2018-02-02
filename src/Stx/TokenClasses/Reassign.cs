@@ -1,10 +1,6 @@
-using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
-using hw.Scanner;
-using Stx.CodeItems;
 using Stx.Contexts;
-using Stx.DataTypes;
 using Stx.Features;
 using Stx.Forms;
 using Stx.Scanner;
@@ -21,9 +17,15 @@ namespace Stx.TokenClasses
 
         protected override IForm GetForm(Syntax parent)
         {
-            var left = parent.Left.Form;
-            var right = parent.Right.Form;
-            return FormBase.CreateReassign(parent, left, right);
+            var left = parent.Left.Form.Checked<ReassignForm.IDestination>(parent);
+            if(left is IError)
+                return left;
+
+            var right = parent.Right.Form.Checked<IExpression>(parent);
+            if(right is IError)
+                return right;
+
+            return new ReassignForm(parent, (ReassignForm.IDestination) left, (IExpression) right);
         }
     }
 
@@ -52,8 +54,19 @@ namespace Stx.TokenClasses
 
         protected override IForm GetForm(Syntax parent)
         {
+            var left = parent.Left.Form.Checked<IExpression>(parent);
+            if(left is IError)
+                return left;
+
+            var right = parent.Right.Form.Checked<Forms.Case.IItems>(parent);
+            if(right is IError)
+                return right;
+
+            return new Forms.Case.Body(parent, (IExpression) left, (Forms.Case.IItems) right);
+
             NotImplementedMethod(parent);
             return null;
         }
     }
+
 }

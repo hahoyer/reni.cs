@@ -23,7 +23,7 @@ namespace Stx.TokenClasses
             Tracer.Assert(left.TokenClass is LeftBracket);
             Tracer.Assert(left.Left == null);
 
-            return left.Right.GetResult(context.InBrackets);
+            return left.Right.Form.Checked<IExpression>(parent);
         }
     }
 

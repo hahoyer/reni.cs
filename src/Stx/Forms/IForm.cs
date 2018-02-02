@@ -1,9 +1,9 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using Stx.CodeItems;
 using Stx.Contexts;
-using Stx.DataTypes;
 using Stx.Features;
 
 namespace Stx.Forms
@@ -16,79 +16,122 @@ namespace Stx.Forms
 
     abstract class FormBase : DumpableObject, IForm
     {
-        public static IForm CreateUserSymbol(Syntax parent, string name, IForm index)
-            => index == null
-                ? (IForm) new UserSymbolForm(parent, name)
-                : new UserArraySymbolForm(parent, name, index);
-            ;
-
         readonly FunctionCache<Context, Result> ResultCache;
+
         protected FormBase() => ResultCache = new FunctionCache<Context, Result>(GetResult);
         Result IForm.GetResult(Context context) => ResultCache[context];
+
         protected abstract Result GetResult(Context context);
-        public static IForm CreateReassign(Syntax parent, IForm destination, IForm source)=>new ReassignForm(parent, destination, source);
+    }
+
+    interface ISequence
+    {
+        ISequenceItem[] Items {get;}
+    }
+
+    interface ISequenceItem {}
+
+    interface IError {}
+
+
+    sealed class Sequence : FormBase, ISequence
+    {
+        readonly ISequenceItem[] Items;
+        readonly Syntax Parent;
+
+        public Sequence(Syntax parent, IEnumerable<ISequenceItem> items)
+        {
+            Parent = parent;
+            Items = items.ToArray();
+        }
+
+        ISequenceItem[] ISequence.Items => Items;
+
+        protected override Result GetResult(Context context)
+        {
+            NotImplementedMethod(context);
+            return null;
+        }
+    }
+
+    sealed class Case : FormBase, Case.IForm
+    {
+        internal interface IForm {}
+
+        internal sealed class Body : FormBase, IBody
+        {
+            readonly IItems Items;
+            readonly Syntax Parent;
+            readonly IExpression Value;
+
+            public Body(Syntax parent, IExpression value, IItems items)
+            {
+                Parent = parent;
+                Value = value;
+                Items = items;
+            }
+
+            IExpression IBody.Value => Value;
+            IItems IBody.Items => Items;
+
+            protected override Result GetResult(Context context) => throw new NotImplementedException();
+        }
+
+        public interface IBody
+        {
+            IExpression Value {get;}
+            IItems Items {get;}
+        }
+
+        internal interface IItems {}
+
+        readonly IItems Items;
+        readonly Syntax Parent;
+
+        readonly IExpression Value;
+
+        public Case(Syntax parent, IBody body)
+        {
+            Parent = parent;
+            Value = body.Value;
+            Items = body.Items;
+        }
+
+        protected override Result GetResult(Context context) => throw new NotImplementedException();
     }
 
     sealed class ReassignForm : FormBase
     {
-        readonly Syntax Parent;
-        readonly IForm Destination;
-        readonly IForm Source;
+        internal interface IDestination {}
 
-        public ReassignForm(Syntax parent, IForm destination, IForm source)
+        readonly IDestination Destination;
+        readonly Syntax Parent;
+        readonly IExpression Source;
+
+        public ReassignForm(Syntax parent, IDestination destination, IExpression source)
         {
             Parent = parent;
             Destination = destination;
             Source = source;
         }
 
-        static Result ValidateDestination
-            (Context context, Syntax syntax, SourcePart position, DataType inferredDataType)
-            => syntax == null
-                ? IssueId.ReassignDestinationMissing.At(position)
-                : syntax.GetResult(context.ReassignDestination(inferredDataType));
-
-        static Result ValidateValue(Context context, Syntax syntax, SourcePart position)
-            => syntax == null
-                ? IssueId.ReassignValueMissing.At(position)
-                : syntax.GetResult(context.ReassignValue);
-
 
         protected override Result GetResult(Context context)
         {
             NotImplementedMethod(context);
             return null;
-        
-            
-            var value = ValidateValue(context, right, token.Characters);
-            var destination = ValidateDestination(context, left, token.Characters, value.DataType);
-
-            return
-                new Result
-                (
-                    token.Characters,
-                    DataType.Void,
-                    getCodeItems: () =>
-                        CodeItem
-                            .Combine
-                            (
-                                destination.CodeItems,
-                                CodeItem.CreateSourceHint(token),
-                                value.CodeItems,
-                                CodeItem.CreateReassign(value.ByteSize)
-                            )
-                            .ToArray()
-                );
         }
     }
 
-    sealed class UserArraySymbolForm : FormBase
+    interface IExpression {}
+
+    sealed class UserSymbolFormWithIndex : FormBase, ReassignForm.IDestination, IExpression
     {
         readonly IForm Index;
         readonly string Name;
         readonly Syntax Parent;
 
-        public UserArraySymbolForm(Syntax parent, string name, IForm index)
+        public UserSymbolFormWithIndex(Syntax parent, string name, IForm index)
         {
             Parent = parent;
             Name = name;
@@ -99,15 +142,10 @@ namespace Stx.Forms
         {
             NotImplementedMethod(context);
             return null;
-
-            var value = Index.GetResult(context.Subscription);
-            var token = Parent.Token;
-            var variable = context.Access(this, token, value?.DataType);
-            return variable.Subscription(token.Characters, value);
         }
     }
 
-    sealed class UserSymbolForm : FormBase
+    sealed class UserSymbolForm : FormBase, ReassignForm.IDestination, IExpression
     {
         readonly string Name;
         readonly Syntax Parent;
@@ -122,9 +160,23 @@ namespace Stx.Forms
         {
             NotImplementedMethod(context);
             return null;
-
-            var token = Parent.Token;
-            return context.Access(this, token, null);
         }
+    }
+
+    sealed class Error<T> : IForm, IError
+        where T : class
+    {
+        IForm Form;
+        Syntax Parent;
+
+        public Error(Syntax parent, IForm form)
+        {
+            Parent = parent;
+            Form = form;
+        }
+
+        Result IForm.GetResult(Context context) => throw new NotImplementedException();
+
+        string Message => "Form is not " + typeof(T).Name;
     }
 }

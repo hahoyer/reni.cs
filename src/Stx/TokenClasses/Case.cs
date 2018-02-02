@@ -38,7 +38,10 @@ namespace Stx.TokenClasses
             Tracer.Assert(left.TokenClass is Case);
             Tracer.Assert(left.Left == null);
 
-            return left.Right.GetResult(context.InBrackets);
+            var items = left.Right.Form.Checked<Forms.Case.IBody>(parent);
+            if(items is Forms.Case.IBody caseBody)
+                return new Forms.Case(parent, caseBody);
+            return items;
         }
     }
 }

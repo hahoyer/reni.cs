@@ -1,8 +1,6 @@
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
-using Stx.CodeItems;
-using Stx.Features;
 using Stx.Forms;
 using Stx.Scanner;
 
@@ -13,24 +11,35 @@ namespace Stx.TokenClasses
     {
         public const string TokenId = ";";
 
+        static (ISequenceItem[] items, IForm error) Checked(Syntax parent, IForm form)
+        {
+            if(form == null)
+                return (new ISequenceItem[0], null);
+
+            var result = (form as ISequence)?.Items;
+            if(result != null)
+                return (result, null);
+
+            var @checked = Extension.Checked<ISequenceItem>(form, parent);
+            var leftItem = @checked as ISequenceItem;
+            return leftItem == null ? (null, @checked ) : (new[] {leftItem}, @checked );
+        }
+
         [DisableDump]
         public override string Id => TokenId;
 
         protected override IForm GetForm(Syntax parent)
         {
-            var right = parent.Right;
-            var left = parent.Left;
-            var leftResult = left.GetResult(context);
-            var rightResult = right.GetResult(context.Extend(leftResult.DataType));
+            var left = parent.Left?.Form;
+            var right = parent.Right?.Form;
 
-            return new Result
-            (
-                parent.Token.Characters,
-                getCodeItems:
-                () => CodeItem
-                    .Combine(leftResult.CodeItems, CodeItem.CreateSourceHint(parent.Token), rightResult.CodeItems)
-                    .ToArray()
-            );
+            var leftResult = Checked(parent, left);
+            var rightResult = Checked(parent, right);
+
+            return leftResult.error ??
+                   rightResult.error ?? 
+                   new Sequence(parent, leftResult.items.Concat(rightResult.items));
         }
     }
+
 }

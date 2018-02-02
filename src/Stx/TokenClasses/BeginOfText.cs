@@ -1,8 +1,5 @@
 using hw.DebugFormatter;
 using hw.Parser;
-using Stx.Contexts;
-using Stx.DataTypes;
-using Stx.Features;
 using Stx.Forms;
 
 namespace Stx.TokenClasses
@@ -16,7 +13,7 @@ namespace Stx.TokenClasses
 
         protected override IForm GetForm(Syntax parent)
         {
-            NotImplementedMethod(left, token, right);
+            NotImplementedMethod(parent);
             return null;
         }
     }

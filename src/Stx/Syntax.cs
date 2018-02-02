@@ -33,7 +33,10 @@ namespace Stx
         [EnableDumpExcept(null)]
         internal Syntax Right {get;}
 
+        [DisableDump]
         SourcePart SourcePart => Left?.SourcePart + Token.SourcePart() + Right?.SourcePart;
+
+        [DisableDump]
         public IForm Form => TokenClass.GetForm(this);
     }
 }

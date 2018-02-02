@@ -14,7 +14,11 @@ namespace Stx.TokenClasses
         {
             Tracer.Assert(parent.Left == null, () => parent.Left.Dump());
 
-            return FormBase.CreateUserSymbol(parent, Id, parent.Right?.Form);
+            string name = Id;
+            IForm index = parent.Right?.Form;
+            return index == null
+                ? (IForm) new UserSymbolForm(parent, name)
+                : new UserSymbolFormWithIndex(parent, name, index);
 
         }
     }
