@@ -11,35 +11,26 @@ namespace Stx.TokenClasses
     {
         public const string TokenId = ";";
 
-        static (ISequenceItem[] items, IForm error) Checked(Syntax parent, IForm form)
-        {
-            if(form == null)
-                return (new ISequenceItem[0], null);
-
-            var result = (form as ISequence)?.Items;
-            if(result != null)
-                return (result, null);
-
-            var @checked = Extension.Checked<ISequenceItem>(form, parent);
-            var leftItem = @checked as ISequenceItem;
-            return leftItem == null ? (null, @checked ) : (new[] {leftItem}, @checked );
-        }
-
         [DisableDump]
         public override string Id => TokenId;
 
         protected override IForm GetForm(Syntax parent)
         {
-            var left = parent.Left?.Form;
-            var right = parent.Right?.Form;
+            var left =  parent.Left?.Form.Checked<IStatement>(parent);
+            var rightForm = parent.Right?.Form;
+            var right = rightForm.MakeStatements();
+            if(right != null)
+            {
+                if(left is IStatement statement)
+                    return new Statements(parent, new[] {statement}.Concat(right).ToArray());
+                return left;
+            }
 
-            var leftResult = Checked(parent, left);
-            var rightResult = Checked(parent, right);
-
-            return leftResult.error ??
-                   rightResult.error ?? 
-                   new Sequence(parent, leftResult.items.Concat(rightResult.items));
+            if(rightForm is IList rightList)
+                return new List(parent, left, rightList.Data);
+            
+            NotImplementedMethod(parent);
+            return null;
         }
     }
-
 }

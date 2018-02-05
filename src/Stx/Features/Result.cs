@@ -21,6 +21,36 @@ namespace Stx.Features
 
         static int NextObjectId;
 
+        public static Result Create(SourcePart position, IssueId issueId)
+            => new Result(position, null, null, null, null, issueId);
+
+        public static Result Create
+        (
+            SourcePart position,
+            DataType dataType,
+            params CodeItem[] codeItems
+        )
+            => new Result(position, dataType, codeItems, null, null, null);
+
+        public static Result Create
+        (
+            SourcePart position,
+            DataType dataType,
+            Func<CodeItem[]> getCodeItems
+        )
+            => new Result(position, dataType, null, null, getCodeItems, null);
+
+        public static Result Create
+        (
+            SourcePart position,
+            Func<DataType> getDataType = null,
+            Func<CodeItem[]> getCodeItems = null
+        )
+            => new Result(position, null, null, getDataType, getCodeItems, null);
+
+        public static Result Empty(SourcePart position)
+            => Create(position, DataType.Void);
+
         readonly Func<CodeItem[]> GetCodeItems;
         readonly Func<DataType> GetDataType;
 
@@ -34,34 +64,23 @@ namespace Stx.Features
         [EnableDumpExcept(null)]
         ResultValue ValueCache;
 
-        public Result
+        Result
         (
             SourcePart position,
-            DataType dataType = null,
-            CodeItem[] codeItems = null,
-            Func<DataType> getDataType = null,
-            Func<CodeItem[]> getCodeItems = null)
+            DataType dataType,
+            CodeItem[] codeItems,
+            Func<DataType> getDataType,
+            Func<CodeItem[]> getCodeItems,
+            IssueId issueId)
             : base(NextObjectId++)
         {
-            Tracer.Assert(dataType == null != (getDataType == null));
-            Tracer.Assert(codeItems == null != (getCodeItems == null));
-
             Position = position;
             GetDataType = getDataType;
             GetCodeItems = getCodeItems;
             Value.DataType = dataType;
             Value.CodeItems = codeItems;
-        }
-
-        [DisableDump]
-        public IssueId IssueId
-        {
-            set
-            {
-                if(IssueCache != null)
-                    NotImplementedMethod(value);
-                IssueCache = new Issue(value);
-            }
+            if(issueId != null)
+                IssueCache = new Issue(issueId);
         }
 
         [DisableDump]
@@ -98,11 +117,31 @@ namespace Stx.Features
         }
 
         [DisableDump]
-        public Result Rereference => new Result
+        public Result Rereference => Create
         (
             Position,
             DataType.Dereference,
             CodeItems.Concat(new[] {CodeItem.CreateDereference(DataType.Dereference.ByteSize)}).ToArray());
+
+        [DisableDump]
+        public Result Dereference
+        {
+            get
+            {
+                var dataType = DataType.Dereference;
+                return Create
+                (
+                    Position,
+                    dataType,
+                    () => CodeItems.Concat(new[] {CodeItem.CreateDereference(dataType.ByteSize)}).ToArray());
+            }
+        }
+
+        public Result Combine(Result result)
+        {
+            NotImplementedMethod(result);
+            return null;
+        }
 
         ResultValue GetValue(Feature feature)
         {
@@ -124,11 +163,10 @@ namespace Stx.Features
         }
 
         public Result Subscription(SourcePart position, Result value)
-            => new Result
+            => Create
             (
                 position,
-                getDataType: () => DataType,
-                getCodeItems: () => CodeItem.Combine(value.CodeItems, null, CodeItems).ToArray()
-            );
+                () => DataType,
+                () => CodeItem.Combine(value.CodeItems, null, CodeItems).ToArray());
     }
 }

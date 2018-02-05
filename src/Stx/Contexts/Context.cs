@@ -1,6 +1,7 @@
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
+using hw.Scanner;
 using Stx.DataTypes;
 using Stx.Features;
 using Stx.TokenClasses;
@@ -16,13 +17,13 @@ namespace Stx.Contexts
         [EnableDumpExcept(null)]
         public readonly string Id;
 
+        [EnableDumpExcept(null)]
+        public Context Parent;
+
         readonly FunctionCache<DataType, Context> ReassignDestinationCache;
         readonly FunctionCache<string, WithName> WithVariableCache;
 
         Context InBracketsCache;
-
-        [EnableDumpExcept(null)]
-        public Context Parent;
 
         Context ReassignValueCache;
         Context SubscriptionCache;
@@ -42,7 +43,7 @@ namespace Stx.Contexts
         public Context InBrackets => InBracketsCache ?? (InBracketsCache = new Context(this, "InBrackets"));
 
         [DisableDump]
-        public Context ReassignValue => ReassignValueCache ?? (ReassignValueCache = new Context(this, "ReassignValue"));
+        public Context ReassignValue => ReassignValueCache ?? (ReassignValueCache = new ReassignValue(this));
 
         [DisableDump]
         public virtual DataType InferredDataType
@@ -67,7 +68,7 @@ namespace Stx.Contexts
             return null;
         }
 
-        public virtual Result Access(UserSymbol name, IToken token, DataType subsctiptionDataType)
+        protected virtual Result Access(UserSymbol name, IToken token, DataType subsctiptionDataType)
         {
             if(Parent != null)
                 return AccessCorrection(Parent.Access(name, token, subsctiptionDataType));
@@ -80,23 +81,45 @@ namespace Stx.Contexts
 
         public Context WithVariable(string name, DataType dataType)
             => WithVariableCache[name].WithType(dataType);
+
+        public virtual Result UserSymbol(SourcePart position, string name)
+        {
+            NotImplementedMethod(position, name);
+            return null;
+        }
+
+        protected virtual Result UserSymbolReference(SourcePart position, string name)
+        {
+            if(Parent != null)
+                return Parent.UserSymbolReference(position, name);
+            
+            NotImplementedMethod(position, name);
+            return null;
+        }
     }
 
     sealed class Subscription : Context
     {
-        public Subscription(Context parent):base(parent) {}
+        public Subscription(Context parent)
+            : base(parent) {}
 
-        protected override Result AccessCorrection(Result result)
-        {
-            return result.Rereference;
-        }
+        protected override Result AccessCorrection(Result result) => result.Rereference;
+    }
+
+    sealed class ReassignValue : Context
+    {
+        public ReassignValue(Context parent)
+            : base(parent) {}
+
+        public override Result UserSymbol(SourcePart position, string name)
+            => UserSymbolReference(position, name).Dereference;
     }
 
     sealed class ReassignDestination : Context
     {
-        public ReassignDestination(Context parent, DataType inferredDataType)
-            : base(parent) => InferredDataType = inferredDataType;
+        readonly DataType TargetType;
 
-        public override DataType InferredDataType {get;}
+        public ReassignDestination(Context parent, DataType targetType)
+            : base(parent) => TargetType = targetType;
     }
 }

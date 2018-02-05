@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
 using Stx.Forms;
@@ -23,6 +25,10 @@ namespace Stx.TokenClasses
     [BelongsTo(typeof(TokenFactory))]
     sealed class EndCase : TokenClass, IBracketMatch<Syntax>
     {
+        internal interface IOf {}
+
+        internal interface IElse {}
+
         public const string TokenId = "END_CASE";
 
         IParserTokenType<Syntax> IBracketMatch<Syntax>.Value {get;} = new MatchedItem();
@@ -38,10 +44,43 @@ namespace Stx.TokenClasses
             Tracer.Assert(left.TokenClass is Case);
             Tracer.Assert(left.Left == null);
 
-            var items = left.Right.Form.Checked<Forms.Case.IBody>(parent);
-            if(items is Forms.Case.IBody caseBody)
-                return new Forms.Case(parent, caseBody);
-            return items;
+            var center = left.Right;
+            if(center == null)
+                return new Error(parent, IssueId.SyntaxError);
+
+            if(!(center.TokenClass is Of))
+                return new Error(parent, IssueId.SyntaxError);
+
+            var body = center.Right;
+            if(body == null)
+                return new Error(parent, IssueId.SyntaxError);
+
+            if(!(body.TokenClass is Else))
+                return new Error(parent, IssueId.SyntaxError);
+
+            var clausesSyntax = body.Left;
+            if(clausesSyntax == null)
+                return new Error(parent, IssueId.SyntaxError);
+
+            var elseSyntax = body.Right;
+            if(elseSyntax == null)
+                return new Error(parent, IssueId.SyntaxError);
+
+            if(!(center.Left?.Form is IExpression value))
+                return new Error(parent, IssueId.SyntaxError);
+
+            var labeledClauses = clausesSyntax.CreateLabeledClauses();
+            if(labeledClauses == null)
+                return new Error(parent, IssueId.SyntaxError);
+
+            if(!(elseSyntax.Form is IStatements elseStatements))
+                return new Error(parent, IssueId.SyntaxError);
+
+            var clasuses = labeledClauses
+                .Concat(new[] {new Forms.Case.Clause(null, elseStatements.Data)})
+                .ToArray();
+
+            return new Forms.Case(parent, value, clasuses);
         }
     }
 }

@@ -2,7 +2,6 @@ using hw.Parser;
 using hw.Scanner;
 using Stx.CodeItems;
 using Stx.Contexts;
-using Stx.DataTypes;
 using Stx.Scanner;
 using Stx.TokenClasses;
 
@@ -26,10 +25,8 @@ namespace Stx
                 );
 
                 result += PrioTable.Right(TokenClasses.Reassign.TokenId);
-                result += PrioTable.Right(Colon.TokenId);
-                result += PrioTable.Right(Semicolon.TokenId);
-
-                result += PrioTable.Right(Of.TokenId);
+                result += PrioTable.Right(Colon.TokenId, Semicolon.TokenId);
+                result += PrioTable.Right(Of.TokenId, Else.TokenId);
                 result += PrioTable.BracketParallels
                 (
                     new[] {Case.TokenId},

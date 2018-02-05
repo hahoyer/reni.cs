@@ -1,5 +1,6 @@
 using System;
 using hw.DebugFormatter;
+using hw.Helper;
 using hw.UnitTest;
 using Stx.DataTypes;
 
@@ -30,6 +31,7 @@ END_CASE;";
                 ;
 
             var form = c.Syntax.Form;
+            Tracer.Line(Tracer.Dump(form));
             var s = c.CodeItems;
             Tracer.Assert(s != s, () => Tracer.Dump(s));
             throw new NotImplementedException();

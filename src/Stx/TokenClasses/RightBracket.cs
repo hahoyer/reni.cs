@@ -23,7 +23,7 @@ namespace Stx.TokenClasses
             Tracer.Assert(left.TokenClass is LeftBracket);
             Tracer.Assert(left.Left == null);
 
-            return left.Right.Form.Checked<IExpression>(parent);
+            return new Index(parent, (IExpression) left.Right.Form.Checked<IExpression>(parent));
         }
     }
 
@@ -39,8 +39,14 @@ namespace Stx.TokenClasses
 
         protected override IForm GetForm(Syntax parent)
         {
-            NotImplementedMethod(parent);
-            return null;
+            var right = parent.Right;
+            var left = parent.Left;
+            Tracer.Assert(right == null);
+            Tracer.Assert(left.TokenClass is LeftParentheses);
+            Tracer.Assert(left.Left == null);
+
+            var value = left.Right;
+            return value == null ? Form.Empty : value.Form.Checked<IExpression>(parent);
         }
     }
 

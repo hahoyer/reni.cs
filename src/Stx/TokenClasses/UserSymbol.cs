@@ -14,12 +14,16 @@ namespace Stx.TokenClasses
         {
             Tracer.Assert(parent.Left == null, () => parent.Left.Dump());
 
-            string name = Id;
-            IForm index = parent.Right?.Form;
-            return index == null
-                ? (IForm) new UserSymbolForm(parent, name)
-                : new UserSymbolFormWithIndex(parent, name, index);
+            var right = parent.Right?.Form;
 
+            switch(right)
+            {
+                case null: return new Forms.UserSymbol(parent, Id);
+                case IIndex index: return new UserSymbolWithIndex(parent, Id, index.Value);
+                case IExpression expression: return new UserSymbolWithExpression(parent, Id, expression);
+            }
+
+            return new Error<IForm>(parent, right);
         }
     }
 }

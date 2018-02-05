@@ -1,6 +1,7 @@
 using System;
 using hw.DebugFormatter;
 using hw.Parser;
+using hw.Scanner;
 using Stx.CodeItems;
 using Stx.DataTypes;
 using Stx.Features;
@@ -45,38 +46,40 @@ namespace Stx.Contexts
             DataType = dataType;
         }
 
-        public override Result Access(UserSymbol name, IToken token, DataType subsctiptionDataType)
+        protected override Result Access(UserSymbol name, IToken token, DataType subsctiptionDataType)
         {
             if(!string.Equals(name.Id, Name, StringComparison.InvariantCultureIgnoreCase))
                 return base.Access(name, token, subsctiptionDataType);
 
             if(subsctiptionDataType == null)
-                return new Result
-                (
-                    token.Characters,
+                return Result.Create(token.Characters,
                     DataType.Reference,
                     new[]
                     {
                         CodeItem.CreateAccessVariable(Name),
                         CodeItem.CreateSourceHint(token)
-                    }
-                );
+                    });
             
             Tracer.Assert(subsctiptionDataType == DataType.Integer);
 
             var itemType = (DataType as DataTypes.Array)?.ElementType;
             Tracer.Assert(itemType != null);
 
-            return new Result
-            (
-                token.Characters,
+            return Result.Create(token.Characters,
                 itemType.Reference,
                 new[]
                 {
                     CodeItem.CreateArrayAccessVariable(Name,itemType.ByteSize),
                     CodeItem.CreateSourceHint(token)
-                }
-            );
+                });
+        }
+
+        protected override Result UserSymbolReference(SourcePart position, string name)
+        {
+            if(!string.Equals(name, Name, StringComparison.InvariantCultureIgnoreCase))
+                return base.UserSymbolReference(position, name);
+
+            return Result.Create(position, DataType.Reference, CodeItem.CreateAccessVariable(Name));
         }
     }
 }
