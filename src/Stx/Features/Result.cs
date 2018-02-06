@@ -137,6 +137,24 @@ namespace Stx.Features
             }
         }
 
+        [DisableDump]
+        public Result ToVoid
+        {
+            get
+            {
+                var size = DataType.ByteSize;
+                if(size == 0)
+                    return this;
+
+                return Create
+                (
+                    Position,
+                    DataType.Void,
+                    () => CodeItem.Combine(CodeItems, CodeItem.CreateDrop(size), null).ToArray()
+                );
+            }
+        }
+
         public Result Combine(Result result)
         {
             NotImplementedMethod(result);
@@ -168,5 +186,22 @@ namespace Stx.Features
                 position,
                 () => DataType,
                 () => CodeItem.Combine(value.CodeItems, null, CodeItems).ToArray());
+
+        public Result Reassign(SourcePart position, Result source)
+        {
+            return Create
+            (
+                position,
+                () => DataType,
+                () => CodeItem.Combine
+                    (
+                        CodeItems,
+                        null,
+                        source.CodeItems,
+                        CodeItem.CreateReassign(DataType.Dereference.ByteSize)
+                    )
+                    .ToArray()
+            );
+        }
     }
 }

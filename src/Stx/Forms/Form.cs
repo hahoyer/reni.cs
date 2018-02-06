@@ -2,7 +2,9 @@ using System;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using Stx.CodeItems;
 using Stx.Contexts;
+using Stx.DataTypes;
 using Stx.Features;
 
 namespace Stx.Forms
@@ -57,18 +59,12 @@ namespace Stx.Forms
         IStatement[] IStatements.Data => Data;
 
         protected override Result GetResult(Context context)
-        {
-            var s = Data.Select(st => st.GetResult(context))
-                .Aggregate
-                (
-                    Result.Empty(Parent.Token.Characters),
-                    (current, next) => current.Combine(next)
-                );
-
-
-            NotImplementedMethod(context);
-            return null;
-        }
+            => Result.Create
+            (
+                Parent.Token.Characters,
+                DataType.Void,
+                Data.Select(st => st.GetResult(context).ToVoid.CodeItems).Aggregate()
+            );
     }
 
     sealed class List : Form, IList

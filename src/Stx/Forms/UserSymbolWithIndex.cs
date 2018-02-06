@@ -17,10 +17,9 @@ namespace Stx.Forms
 
         protected override Result GetResult(Context context)
         {
-            var index = Index.GetResult(context);
-
-            NotImplementedMethod(context);
-            return null;
+            return context
+                .UserSymbol(Parent.Token.Characters, Name)
+                .Subscription(null, Index.GetResult(context));
         }
     }
 

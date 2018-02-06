@@ -92,7 +92,7 @@ namespace Stx.Contexts
         {
             if(Parent != null)
                 return Parent.UserSymbolReference(position, name);
-            
+
             NotImplementedMethod(position, name);
             return null;
         }
@@ -121,5 +121,8 @@ namespace Stx.Contexts
 
         public ReassignDestination(Context parent, DataType targetType)
             : base(parent) => TargetType = targetType;
+
+        public override Result UserSymbol(SourcePart position, string name)
+            => UserSymbolReference(position, name);
     }
 }

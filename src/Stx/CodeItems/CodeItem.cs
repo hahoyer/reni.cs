@@ -7,8 +7,8 @@ namespace Stx.CodeItems
 {
     abstract class CodeItem : DumpableObject
     {
-        public const int PointerByteSize = 4;
         public const int ArrayIndexByteSize = 4;
+        public const int PointerByteSize = 4;
 
         public static IEnumerable<CodeItem> Combine
             (CodeItem[] left, CodeItem center, CodeItem[] right, CodeItem tail = null)
@@ -39,16 +39,32 @@ namespace Stx.CodeItems
         public static CodeItem CreateArrayAccessVariable(string name, int itemByteSize)
             => new ArrayAccessVariable(name, itemByteSize);
 
+        public static CodeItem CreateDrop(int size) => new Drop(size);
+
         [EnableDumpExcept(0)]
         protected abstract int InByteSize {get;}
+
         [EnableDumpExcept(0)]
         protected abstract int OutByteSize {get;}
+
         public int ByteSize => OutByteSize - InByteSize;
+    }
+
+    sealed class Drop : CodeItem
+    {
+        public Drop(int size) => InByteSize = size;
+
+        [DisableDump]
+        protected override int InByteSize {get;}
+
+        [DisableDump]
+        protected override int OutByteSize => 0;
     }
 
     sealed class ArrayAccessVariable : CodeItem
     {
         readonly int ItemByteSize;
+
         [EnableDump]
         readonly string Name;
 
@@ -60,6 +76,7 @@ namespace Stx.CodeItems
 
         [DisableDump]
         protected override int InByteSize => ArrayIndexByteSize + PointerByteSize;
+
         [DisableDump]
         protected override int OutByteSize => PointerByteSize;
     }
@@ -70,6 +87,7 @@ namespace Stx.CodeItems
 
         [DisableDump]
         protected override int InByteSize => PointerByteSize;
+
         protected override int OutByteSize {get;}
     }
 
@@ -77,6 +95,7 @@ namespace Stx.CodeItems
     {
         [EnableDump]
         readonly IssueId IssueId;
+
         public Error(IssueId issueId) => IssueId = issueId;
         protected override int InByteSize => 0;
         protected override int OutByteSize => 0;
@@ -86,6 +105,7 @@ namespace Stx.CodeItems
     {
         [EnableDump]
         string Name;
+
         public AccessVariable(string name) => Name = name;
         protected override int InByteSize => 0;
         protected override int OutByteSize => PointerByteSize;
@@ -110,9 +130,12 @@ namespace Stx.CodeItems
     {
         [EnableDump]
         readonly int TargetByteSize;
+
         public Reassign(int byteSize) => TargetByteSize = byteSize;
+
         [DisableDump]
         protected override int InByteSize => PointerByteSize + TargetByteSize;
+
         protected override int OutByteSize => 0;
     }
 
@@ -128,5 +151,11 @@ namespace Stx.CodeItems
     static class Extension
     {
         public static int GetByteSize(this IEnumerable<CodeItem> target) => target.Sum(i => i.ByteSize);
+
+        public static CodeItem[] Aggregate(this IEnumerable<CodeItem[]> target)
+        {
+            Tracer.ConditionalBreak(Tracer.Dump(target.ToArray()));
+            return null;
+        }
     }
 }

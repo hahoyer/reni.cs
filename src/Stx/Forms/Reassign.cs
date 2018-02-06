@@ -1,3 +1,4 @@
+using hw.DebugFormatter;
 using Stx.Contexts;
 using Stx.Features;
 
@@ -7,8 +8,11 @@ namespace Stx.Forms
     {
         internal interface IDestination : IForm {}
 
-        public readonly IDestination Destination;
-        public readonly IExpression Source;
+        [EnableDump]
+        readonly IDestination Destination;
+
+        [EnableDump]
+        readonly IExpression Source;
 
         public Reassign(Syntax parent, IDestination destination, IExpression source)
             : base(parent)
@@ -23,8 +27,7 @@ namespace Stx.Forms
             var source = Source.GetResult(context.ReassignValue);
             var destination = Destination.GetResult(context.ReassignDestination(source.DataType));
 
-            NotImplementedMethod(context);
-            return null;
+            return destination.Reassign(Parent.Token.Characters, source);
         }
     }
 }
