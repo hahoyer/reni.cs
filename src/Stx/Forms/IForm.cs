@@ -1,6 +1,7 @@
 using Stx.Contexts;
 using Stx.Features;
 
+
 namespace Stx.Forms
 {
     interface IForm
@@ -14,7 +15,7 @@ namespace Stx.Forms
 
     interface IConstant {}
 
-    interface IStatements
+    interface IStatements : IForm
     {
         IStatement[] Data {get;}
     }

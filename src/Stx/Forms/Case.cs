@@ -12,12 +12,12 @@ namespace Stx.Forms
         internal sealed class Clause : DumpableObject
         {
             public readonly IConstant Label;
-            public readonly IStatement[] Statements;
+            public readonly IStatements Statements;
 
             public Clause(IConstant label, IEnumerable<IStatement> statements)
             {
                 Label = label;
-                Statements = statements.ToArray();
+                Statements = new Statements(null, statements.ToArray());
             }
         }
 
@@ -34,6 +34,13 @@ namespace Stx.Forms
             Value = value;
         }
 
-        protected override Result GetResult(Context context) => throw new NotImplementedException();
+        protected override Result GetResult(Context context)
+        {
+            var value = Value.GetResult(context);
+            var items = Items.Select(c=>c.Statements.GetResult(context)).Aggregate())
+
+            NotImplementedMethod(context);
+            return null;
+        }
     }
 }
