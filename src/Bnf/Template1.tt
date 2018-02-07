@@ -1,0 +1,5 @@
+﻿<#@ template debug="true" hostSpecific="true" #>
+<#@ include file="EF.Utility.CS.ttinclude"#>
+<#@ output extension=".cs" #>
+// <#= DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") #> 
+<#= "class T4CompilerGenerated{internal static void MainFunction(){}}" #>     

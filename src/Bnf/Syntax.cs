@@ -1,0 +1,42 @@
+using Bnf.Forms;
+using Bnf.TokenClasses;
+using hw.DebugFormatter;
+using hw.Parser;
+using hw.Scanner;
+
+namespace Bnf
+{
+    sealed class Syntax : DumpableObject, ISourcePartProxy
+    {
+        public static Syntax Create(Syntax left, ITokenClass tokenClass, IToken token, Syntax right)
+            => new Syntax(left, tokenClass, token, right);
+
+
+        Syntax(Syntax left, ITokenClass tokenClass, IToken token, Syntax right)
+        {
+            Left = left;
+            TokenClass = tokenClass;
+            Token = token;
+            Right = right;
+        }
+
+        SourcePart ISourcePartProxy.All => SourcePart;
+
+        [EnableDumpExcept(null)]
+        internal Syntax Left {get;}
+
+        internal IToken Token {get;}
+
+        [EnableDump]
+        internal ITokenClass TokenClass {get;}
+
+        [EnableDumpExcept(null)]
+        internal Syntax Right {get;}
+
+        [DisableDump]
+        SourcePart SourcePart => Left?.SourcePart + Token.SourcePart() + Right?.SourcePart;
+
+        [DisableDump]
+        public IForm Form => TokenClass.GetForm(this);
+    }
+}

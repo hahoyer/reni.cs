@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{71905A24-D1C7-468D-8E25-553FA67DA2D9}"
 	ProjectSection(SolutionItems) = preProject
@@ -76,6 +76,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "renisource", "renisource\renisource.vcxproj", "{35E96DF4-0D75-49C3-A0EB-8E3D0EC39C8B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stx", "Stx\Stx.csproj", "{5CA11CC4-C088-460B-975E-4E1B6B723749}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bnf", "Bnf\Bnf.csproj", "{22BB6C7A-FD56-48DC-9E12-998A217140E0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -163,13 +165,21 @@ Global
 		{5CA11CC4-C088-460B-975E-4E1B6B723749}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5CA11CC4-C088-460B-975E-4E1B6B723749}.Release|x86.ActiveCfg = Release|Any CPU
 		{5CA11CC4-C088-460B-975E-4E1B6B723749}.Release|x86.Build.0 = Release|Any CPU
+		{22BB6C7A-FD56-48DC-9E12-998A217140E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22BB6C7A-FD56-48DC-9E12-998A217140E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22BB6C7A-FD56-48DC-9E12-998A217140E0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{22BB6C7A-FD56-48DC-9E12-998A217140E0}.Debug|x86.Build.0 = Debug|Any CPU
+		{22BB6C7A-FD56-48DC-9E12-998A217140E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22BB6C7A-FD56-48DC-9E12-998A217140E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22BB6C7A-FD56-48DC-9E12-998A217140E0}.Release|x86.ActiveCfg = Release|Any CPU
+		{22BB6C7A-FD56-48DC-9E12-998A217140E0}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {16B1A750-4D72-48AD-A91D-23A7F10F4CDD}
 		VisualSVNWorkingCopyRoot = .
+		SolutionGuid = {16B1A750-4D72-48AD-A91D-23A7F10F4CDD}
 	EndGlobalSection
 	GlobalSection(CodealikeProperties) = postSolution
 		SolutionGuid = eaf46459-7dac-4986-b4bb-bb69ffbc6141
