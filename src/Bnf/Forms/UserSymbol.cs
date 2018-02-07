@@ -4,7 +4,7 @@ using hw.DebugFormatter;
 
 namespace Bnf.Forms
 {
-    sealed class UserSymbol : Form, Reassign.IDestination, IExpression
+    sealed class UserSymbol : Form, Define.IDestination, IExpression
     {
         [EnableDump]
         readonly string Name;

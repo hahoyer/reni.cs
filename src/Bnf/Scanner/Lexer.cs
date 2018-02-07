@@ -10,14 +10,17 @@ namespace Bnf.Scanner
     {
         internal static readonly Lexer Instance = new Lexer();
 
+        internal const char StringEscapeChar = '\\';
+
         static Match StringLiteral(char delimiter)
         {
             var delimiterString = delimiter.ToString();
+            var stringEscapeString = StringEscapeChar.ToString();
             return
                 delimiterString +
                 (
-                    (delimiterString + "\\\r\n").AnyChar().Not |
-                    ("\\" + (delimiterString + "\\rn").AnyChar())
+                    (delimiterString + stringEscapeString + "\r\n").AnyChar().Not |
+                    (stringEscapeString + (delimiterString + stringEscapeString + "rn").AnyChar())
                 )
                 .Repeat() +
                 delimiterString;
@@ -37,13 +40,13 @@ namespace Bnf.Scanner
             Items[new WhiteSpaceTokenType("Space")] = " \t".AnyChar();
             Items[new WhiteSpaceTokenType("LineEnd")] = "\r\n".Box() | "\n".Box() | ("\r" + Match.End);
 
-            Items[new StringLiteral("'")] = StringLiteral('\'');
-            Items[new StringLiteral("\"")] = StringLiteral('"');
+            Items[new StringLiteral('\'')] = StringLiteral('\'');
+            Items[new StringLiteral('"')] = StringLiteral('"');
 
             var letterPlus = Match.Letter.Else("_");
             var identifier = letterPlus + (letterPlus | Match.Digit).Repeat();
 
-            Any = identifier | "::=".Box() | "<...>".Box() | ";|{}()".AnyChar();
+            Any = identifier | "::=".Box() | "<...>".Box() | ";|[]{}()".AnyChar();
         }
 
         internal LexerItem[] LexerItems(ScannerTokenType<Syntax> scannerTokenType)

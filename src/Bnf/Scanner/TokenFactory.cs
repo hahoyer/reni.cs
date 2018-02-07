@@ -3,27 +3,37 @@ using System.Linq;
 using Bnf.TokenClasses;
 using hw.DebugFormatter;
 using hw.Parser;
+using hw.Scanner;
 
 namespace Bnf.Scanner
 {
-    sealed class TokenFactory : GenericTokenFactory<Syntax>
+    abstract class TokenFactoryWithUserSymbols<TSourcePart> : GenericTokenFactory<TSourcePart>
+        where TSourcePart : class, ISourcePartProxy
     {
-        readonly List<UserSymbol> UserSymbols = new List<UserSymbol>();
+        readonly List<IParserTokenType<TSourcePart>> UserSymbols = new List<IParserTokenType<TSourcePart>>();
 
-        public TokenFactory(string title)
-            : base(title) {}
+        protected TokenFactoryWithUserSymbols(string title)
+            : base(title) { }
 
         [DisableDump]
-        internal IEnumerable<IParserTokenType<Syntax>> AllTokenClasses
+        internal IEnumerable<IParserTokenType<TSourcePart>> AllTokenClasses
             => PredefinedTokenClasses.Concat(UserSymbols);
 
-        protected override string GetTokenClassKeyFromToken(string id) => id.ToLower();
-
-        protected override IParserTokenType<Syntax> GetTokenClass(string name)
+        protected override IParserTokenType<TSourcePart> GetTokenClass(string name)
         {
-            var result = new UserSymbol(name);
+            var result = NewSymbol(name);
             UserSymbols.Add(result);
             return result;
         }
+
+        protected abstract IParserTokenType<TSourcePart> NewSymbol(string name);
+    }
+
+    sealed class TokenFactory : TokenFactoryWithUserSymbols<Syntax>
+    {
+        public TokenFactory(string title)
+            : base(title) { }
+
+        protected override IParserTokenType<Syntax> NewSymbol(string name) => new UserSymbol(name);
     }
 }

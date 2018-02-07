@@ -9,9 +9,9 @@ namespace Bnf.TokenClasses
     [Variant(2)]
     [Variant(3)]
     [BelongsTo(typeof(TokenFactory))]
-    abstract class RightParenthesis : TokenClass, IBracketMatch<Syntax>
+    sealed class RightParenthesis : TokenClass, IBracketMatch<Syntax>
     {
-        public static string TokenId(int level) => "}])".Substring(level - 1, 1);
+        public static string TokenId(int level) => "}])".Substring(level - 1, length: 1);
 
         public RightParenthesis(int level) => Level = level;
 
@@ -30,25 +30,15 @@ namespace Bnf.TokenClasses
             Tracer.Assert(right == null);
             Tracer.Assert(left.TokenClass is LeftParenthesis);
             Tracer.Assert(left.Left == null);
+            Tracer.Assert(left.Right != null);
 
-            var value = left.Right;
-            return value == null ? Form.Empty : value.Form.Checked<IExpression>(parent);
+            var result = (IExpression) left.Right.Form.Checked<IExpression>(parent);
+            switch(Level)
+            {
+                case 1: return new Repeat(parent, result);
+                case 2: return new Option(parent, result);
+                default: return result;
+            }
         }
-    }
-
-    sealed class MatchedItem : ParserTokenType<Syntax>, ITokenClass
-    {
-        public MatchedItem(string id = "()") => Id = id;
-
-        public override string Id {get;}
-
-        IForm ITokenClass.GetForm(Syntax parent)
-        {
-            NotImplementedMethod(parent);
-            return null;
-        }
-
-        protected override Syntax Create(Syntax left, IToken token, Syntax right)
-            => right == null ? left : Syntax.Create(left, this, token, right);
     }
 }

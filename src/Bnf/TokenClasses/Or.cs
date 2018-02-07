@@ -7,9 +7,9 @@ using hw.Parser;
 namespace Bnf.TokenClasses
 {
     [BelongsTo(typeof(TokenFactory))]
-    sealed class Semicolon : TokenClass
+    sealed class Or : TokenClass
     {
-        public const string TokenId = ";";
+        public const string TokenId = "|";
 
         [DisableDump]
         public override string Id => TokenId;
@@ -18,10 +18,10 @@ namespace Bnf.TokenClasses
         {
             var left = parent.Left?.Form;
             var right = parent.Right?.Form;
-            var expressions = new List<IStatement>();
-            expressions.Add<Statements, IStatement>(left);
-            expressions.Add<Statements, IStatement>(right);
-            return new Statements(parent, expressions.ToArray());
+            var expressions = new List<IExpression>();
+            expressions.Add<Forms.Or, IExpression>(left);
+            expressions.Add<Forms.Or, IExpression>(right);
+            return new Forms.Or(parent, expressions.ToArray());
         }
     }
 }

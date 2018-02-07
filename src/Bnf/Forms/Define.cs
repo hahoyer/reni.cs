@@ -4,7 +4,7 @@ using hw.DebugFormatter;
 
 namespace Bnf.Forms
 {
-    sealed class Reassign : Form, IStatement
+    sealed class Define : Form, IStatement
     {
         internal interface IDestination : IForm {}
 
@@ -14,7 +14,7 @@ namespace Bnf.Forms
         [EnableDump]
         readonly IExpression Source;
 
-        public Reassign(Syntax parent, IDestination destination, IExpression source)
+        public Define(Syntax parent, IDestination destination, IExpression source)
             : base(parent)
         {
             Destination = destination;

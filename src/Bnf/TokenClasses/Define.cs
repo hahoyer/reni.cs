@@ -6,16 +6,16 @@ using hw.Parser;
 namespace Bnf.TokenClasses
 {
     [BelongsTo(typeof(TokenFactory))]
-    sealed class Reassign : TokenClass
+    sealed class Define : TokenClass
     {
-        public const string TokenId = ":=";
+        public const string TokenId = "::=";
 
         [DisableDump]
         public override string Id => TokenId;
 
         protected override IForm GetForm(Syntax parent)
         {
-            var left = parent.Left.Form.Checked<Forms.Reassign.IDestination>(parent);
+            var left = parent.Left.Form.Checked<Forms.Define.IDestination>(parent);
             if(left is IError)
                 return left;
 
@@ -23,7 +23,7 @@ namespace Bnf.TokenClasses
             if(right is IError)
                 return right;
 
-            return new Forms.Reassign(parent, (Forms.Reassign.IDestination) left, (IExpression) right);
+            return new Forms.Define(parent, (Forms.Define.IDestination) left, (IExpression) right);
         }
     }
 }

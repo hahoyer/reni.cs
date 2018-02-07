@@ -12,18 +12,10 @@ namespace Bnf.TokenClasses
 
         protected override IForm GetForm(Syntax parent)
         {
-            Tracer.Assert(parent.Left == null, () => parent.Left.Dump());
-
-            var right = parent.Right?.Form;
-
-            switch(right)
-            {
-                case null: return new Forms.UserSymbol(parent, Id);
-                case IIndex index: return new UserSymbolWithIndex(parent, Id, index.Value);
-                case IExpression expression: return new UserSymbolWithExpression(parent, Id, expression);
-            }
-
-            return new Error<IForm>(parent, right);
+            Tracer.Assert(parent.Left == null);
+            Tracer.Assert(parent.Right == null);
+            return new Forms.UserSymbol(parent, Id);
         }
     }
+
 }

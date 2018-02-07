@@ -37,7 +37,6 @@ namespace Stx.Forms
         protected override Result GetResult(Context context)
         {
             var value = Value.GetResult(context);
-            var items = Items.Select(c=>c.Statements.GetResult(context)).Aggregate())
 
             NotImplementedMethod(context);
             return null;

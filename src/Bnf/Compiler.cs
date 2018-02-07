@@ -18,9 +18,7 @@ namespace Bnf
                 var result = PrioTable.Left(PrioTable.Any);
 
 
-                result += PrioTable.Right(TokenClasses.Reassign.TokenId);
-                result += PrioTable.Right(Colon.TokenId, Semicolon.TokenId);
-                result += PrioTable.Right(Of.TokenId, Else.TokenId);
+                result += PrioTable.Left(TokenClasses.Or.TokenId);
 
                 result += PrioTable.BracketParallels
                 (
@@ -40,6 +38,8 @@ namespace Bnf
                     }
                 );
 
+                result += PrioTable.Right(TokenClasses.Define.TokenId);
+                result += PrioTable.Right(Semicolon.TokenId);
                 result.Title = "Main";
                 //Tracer.FlaggedLine("\n"+x.ToString());
                 return result;

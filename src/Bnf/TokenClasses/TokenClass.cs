@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using Bnf.Forms;
 using hw.Helper;
 using hw.Parser;
@@ -12,23 +10,13 @@ namespace Bnf.TokenClasses
         IForm GetForm(Syntax parent);
     }
 
-    abstract class TokenClass : ParserTokenType<Syntax>, ITokenClass, IAliasKeeper
+    abstract class TokenClass : ParserTokenType<Syntax>, ITokenClass
     {
-        readonly IDictionary<string, int> Names = new Dictionary<string, int>();
-
-        void IAliasKeeper.Add(string value)
-        {
-            if(!Names.ContainsKey(value))
-                Names[value] = 0;
-
-            Names[value]++;
-        }
-
         string ITokenClass.Id => Id;
 
         IForm ITokenClass.GetForm(Syntax parent) => GetForm(parent);
 
-        string Name => Names.OrderByDescending(i => i.Value).FirstOrDefault().Key ?? Id;
+        string Name => Id;
 
         protected abstract IForm GetForm(Syntax parent);
 
