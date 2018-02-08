@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Bnf.Forms;
 using hw.DebugFormatter;
 
@@ -12,10 +13,19 @@ namespace Bnf.TokenClasses
 
         protected override IForm GetForm(Syntax parent)
         {
-            Tracer.Assert(parent.Left == null);
-            Tracer.Assert(parent.Right == null);
-            return new Forms.UserSymbol(parent, Id);
+            var left = parent.Left?.Form;
+            var userSymbol = new Forms.UserSymbol(parent, Id);
+            var right = parent.Right?.Form;
+
+            if(left == null && right == null)
+                return userSymbol;
+
+            var expressions = new List<IExpression>();
+            expressions.Add<Sequence, IExpression>(left);
+            expressions.Add(userSymbol);
+            expressions.Add<Sequence, IExpression>(right);
+
+            return new Sequence(parent, expressions.ToArray());
         }
     }
-
 }

@@ -1,12 +1,14 @@
 using Bnf.Contexts;
-using Bnf.Features;
 using hw.DebugFormatter;
 
 namespace Bnf.Forms
 {
     sealed class Define : Form, IStatement
     {
-        internal interface IDestination : IForm {}
+        internal interface IDestination : IForm
+        {
+            string Name {get;}
+        }
 
         [EnableDump]
         readonly IDestination Destination;
@@ -21,13 +23,7 @@ namespace Bnf.Forms
             Source = source;
         }
 
-
-        protected override Result GetResult(Context context)
-        {
-            var source = Source.GetResult(context.ReassignValue);
-            var destination = Destination.GetResult(context.ReassignDestination(source.DataType));
-
-            return destination.Reassign(Parent.Token.Characters, source);
-        }
+        protected override string GetResult(IContext context)
+            => context.Define(Destination.Name , Source);
     }
 }

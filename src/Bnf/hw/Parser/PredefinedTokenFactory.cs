@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Helper;
@@ -14,6 +15,15 @@ namespace hw.Parser
         protected PredefinedTokenFactory() => PredefinedTokenClassesCache =
             new ValueCache<FunctionCache<string, IParserTokenType<TSourcePart>>>(GetDictionary);
 
+        /// <summary>
+        ///     Override this method, when the dictionary requires a key different from occurence found in source,
+        ///     for instance, when your language is not case sensitive or for names only some first characters are significant.
+        ///     To register the names actually used, <see cref="IAliasKeeper" />.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>Default implementation returns the id.</returns>
+        public Func<string, string> GetTokenClassKeyFromToken {get; set;} = id => id;
+
         FunctionCache<string, IParserTokenType<TSourcePart>> GetDictionary()
             => new FunctionCache<string, IParserTokenType<TSourcePart>>
             (
@@ -28,27 +38,19 @@ namespace hw.Parser
             (result as IAliasKeeper)?.Add(id);
             return result;
         }
-        
-        /// <summary>
-        /// Override this method, when the dictionary requires a key different from occurence found in source,
-        /// for instance, when your language is not case sensitive or for names only some first characters are significant.
-        /// To register the names actually used, <see cref="IAliasKeeper"/>.
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns>Default implementation returns the id.</returns>
-        protected virtual string GetTokenClassKeyFromToken(string id) => id;
 
         protected abstract IEnumerable<IParserTokenType<TSourcePart>> GetPredefinedTokenClasses();
         protected abstract IParserTokenType<TSourcePart> GetTokenClass(string name);
     }
 
     /// <summary>
-    /// Use this interface at your <see cref="IParserTokenType&lt;TSourcePart&gt;"/> to register names that are acually used for your token type.
+    ///     Use this interface at your <see cref="IParserTokenType&lt;TSourcePart&gt;" /> to register names that are acually
+    ///     used for your token type.
     /// </summary>
     interface IAliasKeeper
     {
         /// <summary>
-        /// Method is called for every occurence 
+        ///     Method is called for every occurence
         /// </summary>
         /// <param name="id">the actual name version</param>
         void Add(string id);

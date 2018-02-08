@@ -1,16 +1,12 @@
-using System.Collections.Generic;
-using System.Linq;
 using Bnf.TokenClasses;
-using hw.Parser;
 using hw.Scanner;
 
 namespace Bnf.Scanner
 {
-    public sealed class Lexer : Match2TwoLayerScannerGuard
+    public sealed class Lexer : hw.Scanner.Lexer
     {
-        internal static readonly Lexer Instance = new Lexer();
-
         internal const char StringEscapeChar = '\\';
+        internal static readonly Lexer Instance = new Lexer();
 
         static Match StringLiteral(char delimiter)
         {
@@ -26,11 +22,8 @@ namespace Bnf.Scanner
                 delimiterString;
         }
 
-        readonly Match Any;
-
         readonly IssueId InvalidTextEnd = IssueId.EOLInString;
 
-        readonly IDictionary<IScannerTokenType, IMatch> Items = new Dictionary<IScannerTokenType, IMatch>();
         readonly IssueId MissingEndOfComment = IssueId.MissingEndOfComment;
         readonly IssueId MissingEndOfPragma = IssueId.MissingEndOfPragma;
 
@@ -38,7 +31,7 @@ namespace Bnf.Scanner
             : base(error => new ScannerSyntaxError((IssueId) error))
         {
             Items[new WhiteSpaceTokenType("Space")] = " \t".AnyChar();
-            Items[new WhiteSpaceTokenType("LineEnd")] = "\r\n".Box() | "\n".Box() | ("\r" + Match.End);
+            Items[new WhiteSpaceTokenType("LineEnd")] = "\r\n".Box() | "\n".Box() | "\r".Box() | ("\r" + Match.End);
 
             Items[new StringLiteral('\'')] = StringLiteral('\'');
             Items[new StringLiteral('"')] = StringLiteral('"');
@@ -49,14 +42,6 @@ namespace Bnf.Scanner
             Any = identifier | "::=".Box() | "<...>".Box() | ";|[]{}()".AnyChar();
         }
 
-        internal LexerItem[] LexerItems(ScannerTokenType<Syntax> scannerTokenType)
-            => Items
-                .Concat(new[] {new KeyValuePair<IScannerTokenType, IMatch>(scannerTokenType, Any)})
-                .Select(i => CreateLexerItem(i.Key, i.Value))
-                .ToArray();
-
-
-        LexerItem CreateLexerItem(IScannerTokenType scannerTokenType, IMatch match)
-            => new LexerItem(scannerTokenType, sourcePosn => GuardedMatch(sourcePosn, match));
+        protected override IMatch Any {get;}
     }
 }

@@ -10,7 +10,7 @@ namespace Bnf
     {
         public static void Main()
         {
-            new Tests.Test().TestMethod();
+            new Tests.StructuredTextCompiler().ScannerTest();
             RunAllTests();
             //ExecT4CompilerGeneratedTest();
         }

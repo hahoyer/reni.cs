@@ -1,5 +1,4 @@
 using Bnf.Contexts;
-using Bnf.Features;
 using hw.DebugFormatter;
 
 namespace Bnf.Forms
@@ -12,7 +11,7 @@ namespace Bnf.Forms
         public Repeat(Syntax parent, IExpression data)
             : base(parent) => Data = data;
 
-        protected override Result GetResult(Context context)
+        protected override string GetResult(IContext context)
         {
             NotImplementedMethod(context);
             return null;

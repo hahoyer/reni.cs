@@ -1,9 +1,7 @@
 using System.Linq;
-using Bnf.CodeItems;
 using Bnf.Contexts;
-using Bnf.DataTypes;
-using Bnf.Features;
 using hw.DebugFormatter;
+using hw.Helper;
 
 namespace Bnf.Forms
 {
@@ -17,13 +15,8 @@ namespace Bnf.Forms
 
         IStatement[] IListForm<IStatement>.Data => Data;
 
-        protected override Result GetResult(Context context)
-            => Result.Create
-            (
-                Parent.Token.Characters,
-                DataType.Void,
-                Data.Select(st => st.GetResult(context).ToVoid.CodeItems).Aggregate()
-            );
+        protected override string GetResult(IContext context) 
+            => context.Statements(Data);
 
     }
 }

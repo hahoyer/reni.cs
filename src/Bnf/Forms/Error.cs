@@ -1,6 +1,5 @@
 using System;
 using Bnf.Contexts;
-using Bnf.Features;
 
 namespace Bnf.Forms
 {
@@ -16,7 +15,7 @@ namespace Bnf.Forms
             Form = form;
         }
 
-        Result IForm.GetResult(Context context) => throw new NotImplementedException();
+        string IForm.GetResult(IContext context) => throw new NotImplementedException();
 
         string Message => "Form is not " + typeof(T).Name;
     }
@@ -32,6 +31,6 @@ namespace Bnf.Forms
             IssueId = issueId;
         }
 
-        Result IForm.GetResult(Context context) => throw new NotImplementedException();
+        string IForm.GetResult(IContext context) => throw new NotImplementedException();
     }
 }

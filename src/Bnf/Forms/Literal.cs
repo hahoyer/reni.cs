@@ -1,5 +1,4 @@
 using Bnf.Contexts;
-using Bnf.Features;
 using hw.DebugFormatter;
 
 namespace Bnf.Forms
@@ -12,7 +11,7 @@ namespace Bnf.Forms
         public Literal(Syntax parent, string name)
             : base(parent) => Name = name;
 
-        protected override Result GetResult(Context context)
+        protected override string GetResult(IContext context)
         {
             NotImplementedFunction(context);
             return null;

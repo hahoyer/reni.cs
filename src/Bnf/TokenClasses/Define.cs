@@ -26,4 +26,5 @@ namespace Bnf.TokenClasses
             return new Forms.Define(parent, (Forms.Define.IDestination) left, (IExpression) right);
         }
     }
+
 }

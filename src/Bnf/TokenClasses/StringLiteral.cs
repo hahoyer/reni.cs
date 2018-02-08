@@ -15,14 +15,16 @@ namespace Bnf.TokenClasses
 
         protected override IForm GetForm(Syntax parent)
         {
-            Tracer.Assert(parent.Left == null);
+            var left = parent.Left?.Form;
             var literal = new Literal(parent, Parse(parent.Token.Characters.Id));
-
             var right = parent.Right?.Form;
-            if(right == null)
+
+            if(left == null && right == null)
                 return literal;
 
-            var expressions = new List<IExpression> {literal};
+            var expressions = new List<IExpression>();
+            expressions.Add<Sequence, IExpression>(left);
+            expressions.Add(literal);
             expressions.Add<Sequence, IExpression>(right);
 
             return new Sequence(parent, expressions.ToArray());

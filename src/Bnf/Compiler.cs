@@ -1,5 +1,3 @@
-using Bnf.CodeItems;
-using Bnf.Contexts;
 using Bnf.Scanner;
 using Bnf.TokenClasses;
 using hw.Parser;
@@ -16,9 +14,7 @@ namespace Bnf
             get
             {
                 var result = PrioTable.Left(PrioTable.Any);
-
-
-                result += PrioTable.Left(TokenClasses.Or.TokenId);
+                result += PrioTable.Left(Or.TokenId);
 
                 result += PrioTable.BracketParallels
                 (
@@ -38,7 +34,7 @@ namespace Bnf
                     }
                 );
 
-                result += PrioTable.Right(TokenClasses.Define.TokenId);
+                result += PrioTable.Right(Define.TokenId);
                 result += PrioTable.Right(Semicolon.TokenId);
                 result.Title = "Main";
                 //Tracer.FlaggedLine("\n"+x.ToString());
@@ -46,10 +42,7 @@ namespace Bnf
             }
         }
 
-        internal Context RootContext = Context.Root;
-
         readonly string Text;
-        CodeItem[] CodeItemsCache;
 
         Source SourceCache;
         Syntax SyntaxCache;
@@ -59,7 +52,7 @@ namespace Bnf
             Text = text;
 
             var main = this["Main"];
-            var tokenFactory = new TokenFactory("Main");
+            var tokenFactory = new TokenFactory(name => new UserSymbol(name), "Main");
 
             main.PrioTable = PrioTable;
             main.TokenFactory = new ScannerTokenFactory();
@@ -68,9 +61,8 @@ namespace Bnf
 
         internal Source Source => SourceCache ?? (SourceCache = new Source(Text));
         internal Syntax Syntax => SyntaxCache ?? (SyntaxCache = GetSyntax());
-        internal CodeItem[] CodeItems => CodeItemsCache ?? (CodeItemsCache = GetCodeItems());
+        internal string Interfaces => Syntax.Form.GetResult(new InterfaceContext());
 
-        CodeItem[] GetCodeItems() => Syntax.Form.GetResult(RootContext).CodeItems;
 
         Syntax GetSyntax() => this["Main"].Parser.Execute(Source + 0);
     }

@@ -24,13 +24,7 @@
   <ItemGroup>
     <Compile Include="CodeItems\CodeItem.cs" />
     <Compile Include="Contexts\Context.cs" />
-    <Compile Include="Contexts\WithName.cs" />
-    <Compile Include="DataTypes\DataType.cs" />
     <Compile Include="Extension.cs" />
-    <Compile Include="Features\Feature.cs" />
-    <Compile Include="DataTypes\Issue.cs" />
-    <Compile Include="Features\Result.cs" />
-    <Compile Include="Features\ResultValue.cs" />
     <Compile Include="Forms\Error.cs" />
     <Compile Include="Forms\Form.cs" />
     <Compile Include="Forms\IForm.cs" />
@@ -42,6 +36,8 @@
     <Compile Include="Forms\Sequence.cs" />
     <Compile Include="Forms\Statements.cs" />
     <Compile Include="Forms\UserSymbol.cs" />
+    <Compile Include="InterfaceContext.cs" />
+    <Compile Include="Scanner\TokenFactory.cs" />
     <Compile Include="TokenClasses\BeginOfText.cs" />
     <Compile Include="Compiler.cs" />
     <Compile Include="TokenClasses\Or.cs" />
@@ -112,7 +108,7 @@
     <Compile Include="hw\Scanner\ITokenFactory.cs" />
     <Compile Include="hw\Scanner\LexerItem.cs" />
     <Compile Include="hw\Scanner\Match.cs" />
-    <Compile Include="hw\Scanner\Match2TwoLayerScannerGuard.cs" />
+    <Compile Include="hw\Scanner\Lexer.cs" />
     <Compile Include="hw\Scanner\MatchExtension.cs" />
     <Compile Include="hw\Scanner\Source.cs" />
     <Compile Include="hw\Scanner\SourcePart.cs" />
@@ -144,10 +140,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Template1.tt</DependentUpon>
     </Compile>
-    <Compile Include="Tests\Test.cs" />
+    <Compile Include="Tests\StructuredTextCompiler.cs" />
     <Compile Include="TokenClasses\Semicolon.cs" />
     <Compile Include="TokenClasses\TokenClass.cs" />
-    <Compile Include="Scanner\TokenFactory.cs" />
     <Compile Include="TokenClasses\UserSymbol.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -158,6 +153,9 @@
       <LastGenOutput>Template1.cs</LastGenOutput>
     </None>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="DataTypes\" />
   </ItemGroup>
   <Import Project="sys.targets" />
 </Project>
