@@ -1,0 +1,1 @@
+﻿using hw.DebugFormatter;namespace Bnf.StructuredText{    sealed class Compiler : DumpableObject    {        Compiler(string programText) {}        public static Compiler FromText(string programText)        {           return new Compiler(programText);        }    }}

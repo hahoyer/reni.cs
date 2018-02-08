@@ -38,6 +38,8 @@
     <Compile Include="Forms\UserSymbol.cs" />
     <Compile Include="InterfaceContext.cs" />
     <Compile Include="Scanner\TokenFactory.cs" />
+    <Compile Include="StructuredText\BnfDefinitions.cs" />
+    <Compile Include="StructuredText\Compiler.cs" />
     <Compile Include="TokenClasses\BeginOfText.cs" />
     <Compile Include="Compiler.cs" />
     <Compile Include="TokenClasses\Or.cs" />
@@ -140,7 +142,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Template1.tt</DependentUpon>
     </Compile>
-    <Compile Include="Tests\StructuredTextCompiler.cs" />
+    <Compile Include="Tests\StructuredTextCompilerTest.cs" />
     <Compile Include="TokenClasses\Semicolon.cs" />
     <Compile Include="TokenClasses\TokenClass.cs" />
     <Compile Include="TokenClasses\UserSymbol.cs" />

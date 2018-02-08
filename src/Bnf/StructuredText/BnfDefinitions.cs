@@ -1,8 +1,5 @@
-using hw.DebugFormatter;using hw.UnitTest;namespace Bnf.Tests{    [UnitTest]    public sealed class StructuredTextCompiler    {
-                [UnitTest]
-        public void ScannerTest()
-        {
-            var definition= @"letter ::= 'A' | 'B' | <...> | 'Z' | 'a' | 'b' | <...> | 'z';
+﻿namespace Bnf.StructuredText{    static class BnfDefinitions    {
+        public const string Scanner = @"letter ::= 'A' | 'B' | <...> | 'Z' | 'a' | 'b' | <...> | 'z';
 digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
 octal_digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7';
 hex_digit ::= digit | 'A'|'B'|'C'|'D'|'E'|'F'                 ;
@@ -50,19 +47,7 @@ month ::= integer;
 day ::= integer;
 date_and_time ::= ('DATE_AND_TIME' | 'DT') '#' date_literal '-' daytime;";
 
-            var compiler = Compiler.FromText(definition);
-
-            var form = compiler.Syntax.Form;
-            Tracer.Line(Tracer.Dump(form));
-            var code = compiler.Interfaces;
-            Tracer.Line(code);
-            Tracer.TraceBreak();
-        }
-
-
-        [UnitTest]
-        public void ParserTest()
-        {            var definition = @"elementary_type_name ::= numeric_type_name | date_type_name| bit_string_type_name | 'STRING' | 'WSTRING' | 'TIME';
+        public const string Parser = @"elementary_type_name ::= numeric_type_name | date_type_name| bit_string_type_name | 'STRING' | 'WSTRING' | 'TIME';
 numeric_type_name ::= integer_type_name | real_type_name;
 integer_type_name ::= signed_integer_type_name| unsigned_integer_type_name;
 signed_integer_type_name ::= 'SINT' | 'INT' | 'DINT' | 'LINT';
@@ -291,4 +276,4 @@ control_variable ::= identifier;
 for_list ::= expression 'TO' expression ['BY' expression];
 while_statement ::= 'WHILE' expression 'DO' statement_list 'END_WHILE';
 repeat_statement ::='REPEAT' statement_list 'UNTIL' expression 'END_REPEAT';
-exit_statement ::= 'EXIT'";            var compiler = Compiler.FromText(definition);            var form = compiler.Syntax.Form;            Tracer.Line(Tracer.Dump(form));            var code = compiler.Interfaces;            Tracer.Line(code);            Tracer.TraceBreak();        }    }}
+exit_statement ::= 'EXIT'";    }}
