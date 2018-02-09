@@ -16,8 +16,8 @@ namespace Bnf.Forms
 
         string Define.IDestination.Name => Name;
 
-        int? IExpression.Match(SourcePosn sourcePosn, ScannerContext scannerContext)
-            => scannerContext.Resolve(Name).Function(sourcePosn, scannerContext);
+        int? IExpression.Match(SourcePosn sourcePosn, IScannerContext scannerContext)
+            => scannerContext.Resolve(Name).Function(sourcePosn);
 
         protected override string GetResult(IContext context)
         {

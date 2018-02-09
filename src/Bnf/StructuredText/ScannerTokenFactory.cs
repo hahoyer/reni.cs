@@ -9,51 +9,53 @@ using hw.Scanner;
 
 namespace Bnf.StructuredText
 {
-    sealed class ScannerTokenFactory : DumpableObject, ITokenFactory<ISyntax>
+    sealed class ScannerTokenFactory : DumpableObject, ITokenFactory<ISyntax>, IScannerContext
     {
-        static IScannerTokenType CreateInstance(Type type)
-            => (IScannerTokenType) Activator.CreateInstance(type);
+        static IEnumerable<KeyValuePair<string, IMatchProvider>> GetPredefinedMatchProviders(Type factoryType)
+        {
+            return
+                factoryType
+                    .Assembly
+                    .GetTypes()
+                    .Where(type => type.IsBelongingTo<INamedMatchProvider>(factoryType))
+                    .Select(CreateMatchProvider);
+        }
 
+        static KeyValuePair<string, IMatchProvider> CreateMatchProvider(Type type)
+        {
+            var tokenType = (INamedMatchProvider) Activator.CreateInstance(type);
+            return new KeyValuePair<string, IMatchProvider>(tokenType.Value, tokenType);
+        }
+
+        readonly IDictionary<string, IMatchProvider> MatchProviders;
+
+        public ScannerTokenFactory()
+        {
+            var statements = Bnf.Compiler.FromText(BnfDefinitions.Scanner).Statements;
+            MatchProviders =
+                statements.ToDictionary(i => i.Key, i => (IMatchProvider) new BnfMatchProvider(i.Value, this))
+                    .Concat(GetPredefinedMatchProviders(GetType()))
+                    .ToDictionary(i => i.Key, i => i.Value);
+        }
+
+        IMatchProvider IScannerContext.Resolve(string name) => MatchProviders[name];
         IParserTokenType<ISyntax> ITokenFactory<ISyntax>.BeginOfText => new BeginOfText();
         IScannerTokenType ITokenFactory.EndOfText => new EndOfText();
         IScannerTokenType ITokenFactory.InvalidCharacterError => new ScannerSyntaxError(IssueId.InvalidCharacter);
+        LexerItem[] ITokenFactory.Classes => GetLexerItems(GetType());
 
-        LexerItem[] ITokenFactory.Classes => Classes;
-        LexerItem[] Classes => ToLexerItems(Bnf.Compiler.FromText(BnfDefinitions.Scanner).Statements);
-
-        LexerItem[] ToLexerItems(IDictionary<string, IExpression> statements)
-        {
-            var names = statements.Keys;
-            var scannerContext = new ScannerContext(statements);
-            return GetType()
+        LexerItem[] GetLexerItems(Type factoryType)
+            => factoryType
                 .Assembly
                 .GetTypes()
-                .Where(BelongsToFactory<IScannerTokenType>)
-                .Select(scannerContext.CreateItem)
-                .OrderBy(scannerContext.Priority)
+                .Where(type => type.IsBelongingTo<IScannerTokenType>(factoryType))
+                .Select(CreateLexerItem)
+                .OrderBy(Priority)
                 .ToArray();
-        }
 
-
-        bool BelongsToFactory<T>(Type type)
+        int Priority(LexerItem item)
         {
-            var thisType = GetType();
-            return type.Is<T>() &&
-                   !type.IsAbstract &&
-                   type
-                       .GetAttributes<BelongsToAttribute>(true)
-                       .Any(attr => thisType.Is(attr.TokenFactory));
-        }
-    }
-
-    sealed class ScannerContext : DumpableObject
-    {
-        readonly IDictionary<string, IExpression> Statements;
-        public ScannerContext(IDictionary<string, IExpression> statements) => Statements = statements;
-
-        public int Priority(LexerItem item)
-        {
-            var result = Statements.Keys.IndexWhere(k => k == item.ScannerTokenType.Id);
+            var result = MatchProviders.Keys.IndexWhere(k => k == item.ScannerTokenType.Id);
             if(result != null)
                 return result.Value;
 
@@ -61,19 +63,10 @@ namespace Bnf.StructuredText
             return 0;
         }
 
-        public LexerItem CreateItem(Type type)
+        LexerItem CreateLexerItem(Type type)
         {
             var tokenType = (IScannerTokenType) Activator.CreateInstance(type);
-            Statements.TryGetValue(tokenType.Id, out var value);
-            var matchProvider = value == null ? (IMatchProvider) tokenType : new BnfMatchProvider(value, this);
-            return new LexerItem(tokenType, matchProvider.Function);
-        }
-
-        public IMatchProvider Resolve(string name)
-        {
-            Statements.TryGetValue(name, out var expression);
-            if(expression != null)
-                return new BnfMatchProvider(expression, this);
+            return new LexerItem(tokenType, MatchProviders[tokenType.Id].Function);
         }
     }
 
@@ -82,18 +75,26 @@ namespace Bnf.StructuredText
         int? Function(SourcePosn sourcePosn);
     }
 
+    interface INamedMatchProvider : IMatchProvider, IUniqueIdProvider {}
+
     sealed class BnfMatchProvider : DumpableObject, IMatchProvider
     {
-        readonly ScannerContext Context;
+        readonly IScannerContext Context;
         readonly IExpression Expression;
 
-        public BnfMatchProvider(IExpression expression, ScannerContext context)
+        public BnfMatchProvider(IExpression expression, IScannerContext context)
         {
             Expression = expression;
             Context = context;
+            Tracer.Assert(Expression != null);
         }
 
         int? IMatchProvider.Function(SourcePosn sourcePosn)
             => Expression.Match(sourcePosn, Context);
+    }
+
+    interface IScannerContext
+    {
+        IMatchProvider Resolve(string name);
     }
 }

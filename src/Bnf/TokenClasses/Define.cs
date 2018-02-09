@@ -27,25 +27,4 @@ namespace Bnf.TokenClasses
         }
     }
 
-    [BelongsTo(typeof(TokenFactory))]
-    sealed class DefineSpecial : TokenClass
-    {
-        public const string TokenId = "::=?";
-
-        [DisableDump]
-        public override string Id => TokenId;
-
-        protected override IForm GetForm(Syntax parent)
-        {
-            var left = parent.Left.Form.Checked<Forms.Define.IDestination>(parent);
-            if(left is IError)
-                return left;
-
-            if(parent.Right != null)
-                return new Error(parent, IssueId.SyntaxError);
-
-            return new Forms.Define(parent, (Forms.Define.IDestination) left, null);
-        }
-    }
-
 }

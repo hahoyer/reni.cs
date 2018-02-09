@@ -38,7 +38,7 @@ namespace Bnf
                     }
                 );
 
-                result += PrioTable.Right(TokenClasses.Define.TokenId, TokenClasses.DefineSpecial.TokenId);
+                result += PrioTable.Right(TokenClasses.Define.TokenId);
                 result += PrioTable.Right(Semicolon.TokenId);
                 result.Title = "Main";
                 //Tracer.FlaggedLine("\n"+x.ToString());

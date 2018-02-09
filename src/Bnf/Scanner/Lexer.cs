@@ -15,8 +15,8 @@ namespace Bnf.Scanner
             return
                 delimiterString +
                 (
-                    (delimiterString + stringEscapeString + "\r\n").AnyChar().Not |
-                    (stringEscapeString + (delimiterString + stringEscapeString + "rn").AnyChar())
+                    (delimiterString + stringEscapeString + "\t\r\n").AnyChar().Not |
+                    (stringEscapeString + (delimiterString + stringEscapeString + "trn").AnyChar())
                 )
                 .Repeat() +
                 delimiterString;
@@ -39,7 +39,7 @@ namespace Bnf.Scanner
             var letterPlus = Match.Letter.Else("_");
             var identifier = letterPlus + (letterPlus | Match.Digit).Repeat();
 
-            Any = identifier | "::=?".Box()| "::=".Box() | ";|[]{}()".AnyChar();
+            Any = identifier | "::=".Box() | ";|[]{}()".AnyChar();
         }
 
         protected override IMatch Any {get;}

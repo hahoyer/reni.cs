@@ -15,7 +15,7 @@ namespace Bnf.Forms
         public Or(Syntax parent, IExpression[] data)
             : base(parent) => Data = data;
 
-        int? IExpression.Match(SourcePosn sourcePosn, ScannerContext scannerContext) 
+        int? IExpression.Match(SourcePosn sourcePosn, IScannerContext scannerContext) 
             => Data.Select(e => e.Match(sourcePosn, scannerContext)).FirstOrDefault(i=>i != null);
 
         IExpression[] IListForm<IExpression>.Data => Data;

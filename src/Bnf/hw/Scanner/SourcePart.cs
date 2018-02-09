@@ -16,6 +16,7 @@ namespace hw.Scanner
             Source = source;
             Length = length;
             Position = position;
+            Tracer.Assert(length>= 0);
         }
 
         [DisableDump]

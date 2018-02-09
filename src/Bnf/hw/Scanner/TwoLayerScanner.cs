@@ -38,8 +38,15 @@ namespace hw.Scanner
                 IScannerTokenType IItem.ScannerTokenType => Type;
                 SourcePart IItem.SourcePart => SourcePart;
 
-                protected override string GetNodeDump() {return base.GetNodeDump()+"("+Type.Id+")";}
+                protected override string GetNodeDump() => base.GetNodeDump() + "(" + Type.Id + ")";
+            }
 
+            static void Advance(SourcePosn sourcePosn, int position)
+            {
+                var wasEnd = sourcePosn.IsEnd;
+                sourcePosn.Position += position;
+                if(wasEnd)
+                    sourcePosn.IsValid = false;
             }
 
             readonly TwoLayerScanner Parent;
@@ -71,16 +78,17 @@ namespace hw.Scanner
                 try
                 {
                     if(SourcePosn.IsEnd)
-                        return CreateAndAdvance(length: 0, type: TokenFactory.EndOfText);
+                        return CreateAndAdvance(0, TokenFactory.EndOfText);
 
                     foreach(var item in TokenFactory.Classes)
                     {
                         var length = item.Match(SourcePosn);
+                        Tracer.Assert(length == null || length >= 0);
                         if(length != null)
                             return CreateAndAdvance(length.Value, item.ScannerTokenType);
                     }
 
-                    return CreateAndAdvance(length: 1, type: TokenFactory.InvalidCharacterError);
+                    return CreateAndAdvance(1, TokenFactory.InvalidCharacterError);
                 }
                 catch(Exception scannerException)
                 {
@@ -90,14 +98,6 @@ namespace hw.Scanner
             }
 
             void Advance(int position) => Advance(SourcePosn, position);
-
-            static void Advance(SourcePosn sourcePosn, int position)
-            {
-                var wasEnd = sourcePosn.IsEnd;
-                sourcePosn.Position += position;
-                if(wasEnd)
-                    sourcePosn.IsValid = false;
-            }
 
             IItem CreateAndAdvance(int length, IScannerTokenType type)
             {
@@ -126,7 +126,7 @@ namespace hw.Scanner
         }
 
         readonly ITokenFactory TokenFactory;
-        public TwoLayerScanner(ITokenFactory tokenFactory) { TokenFactory = tokenFactory; }
+        public TwoLayerScanner(ITokenFactory tokenFactory) => TokenFactory = tokenFactory;
 
         IItem[] IScanner.GetNextTokenGroup(SourcePosn sourcePosn)
             => new Worker(this, sourcePosn).GetNextTokenGroup().ToArray();

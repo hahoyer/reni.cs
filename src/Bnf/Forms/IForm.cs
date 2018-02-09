@@ -14,7 +14,7 @@ namespace Bnf.Forms
 
     interface IExpression : IForm
     {
-        int? Match(SourcePosn sourcePosn, ScannerContext scannerContext);
+        int? Match(SourcePosn sourcePosn, IScannerContext scannerContext);
     }
 
     interface IStatements : IForm, IListForm<IStatement> {}

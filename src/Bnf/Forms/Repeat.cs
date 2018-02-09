@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Bnf.Contexts;
 using Bnf.StructuredText;
 using hw.DebugFormatter;
@@ -14,14 +13,21 @@ namespace Bnf.Forms
         public Repeat(Syntax parent, IExpression data)
             : base(parent) => Data = data;
 
+        int? IExpression.Match(SourcePosn sourcePosn, IScannerContext scannerContext)
+        {
+            var current = sourcePosn+0;
+            while(true)
+            {
+                var result = Data.Match(current, scannerContext);
+                if(result == null)
+                    return current - sourcePosn;
+                current += result.Value;
+            }
+        }
+
         protected override string GetResult(IContext context)
         {
             NotImplementedMethod(context);
-            return null;
-        }
-        int? IExpression.Match(SourcePosn sourcePosn, ScannerContext scannerContext)
-        {
-            NotImplementedMethod(sourcePosn, "statements");
             return null;
         }
     }

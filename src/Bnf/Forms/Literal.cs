@@ -45,7 +45,7 @@ namespace Bnf.Forms
         public Literal(Syntax parent, string name)
             : base(parent) => Text = Parse(name);
 
-        int? IExpression.Match(SourcePosn sourcePosn, ScannerContext scannerContext)
+        int? IExpression.Match(SourcePosn sourcePosn, IScannerContext scannerContext)
             => sourcePosn.StartsWith(Text) ? (int?) Text.Length : null;
 
         protected override string GetResult(IContext context)

@@ -14,9 +14,9 @@ namespace Bnf.Forms
         public Sequence(Syntax parent, IExpression[] data)
             : base(parent) => Data = data;
 
-        int? IExpression.Match(SourcePosn sourcePosn, ScannerContext scannerContext)
+        int? IExpression.Match(SourcePosn sourcePosn, IScannerContext scannerContext)
         {
-            var current = sourcePosn;
+            var current = sourcePosn+0;
             foreach(var expression in Data)
             {
                 var result = expression.Match(current, scannerContext);

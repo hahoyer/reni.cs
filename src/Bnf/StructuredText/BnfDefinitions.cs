@@ -233,7 +233,7 @@ while_statement ::= 'WHILE' expression 'DO' statement_list 'END_WHILE';
 repeat_statement ::='REPEAT' statement_list 'UNTIL' expression 'END_REPEAT';
 exit_statement ::= 'EXIT'";
 
-        public const string Scanner = @"whitespace ::= ' '| '    ' | '\n' | '\r';comment ::=?;digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
+        public const string Scanner = @"whitespace ::= ' '| '\t' | '\n' | '\r';digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
 octal_digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7';
 hex_digit ::= digit | 'A'|'B'|'C'|'D'|'E'|'F'                 ;
 identifier ::= (letter | ('_' (letter | digit))) {['_'] (letter | digit)};

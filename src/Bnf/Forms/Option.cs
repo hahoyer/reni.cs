@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Bnf.Contexts;
 using Bnf.StructuredText;
 using hw.DebugFormatter;
@@ -14,11 +13,8 @@ namespace Bnf.Forms
         public Option(Syntax parent, IExpression data)
             : base(parent) => Data = data;
 
-        int? IExpression.Match(SourcePosn sourcePosn, ScannerContext scannerContext)
-        {
-            NotImplementedMethod(sourcePosn, "statements");
-            return null;
-        }
+        int? IExpression.Match(SourcePosn sourcePosn, IScannerContext scannerContext)
+            => Data.Match(sourcePosn, scannerContext) ?? 0;
 
         protected override string GetResult(IContext context)
         {

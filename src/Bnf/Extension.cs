@@ -1,6 +1,10 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Bnf.Forms;
 using hw.DebugFormatter;
+using hw.Helper;
+using hw.Parser;
 
 namespace Bnf
 {
@@ -31,6 +35,15 @@ namespace Bnf
             }
 
             Dumpable.NotImplementedFunction(result, form);
+        }
+
+        public static bool IsBelongingTo<T>(this Type childType, Type factoryType)
+        {
+            return childType.Is<T>() &&
+                   !childType.IsAbstract &&
+                   childType
+                       .GetAttributes<BelongsToAttribute>(true)
+                       .Any(attr => factoryType.Is(attr.TokenFactory));
         }
     }
 
