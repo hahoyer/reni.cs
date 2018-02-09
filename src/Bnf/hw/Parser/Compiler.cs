@@ -17,7 +17,7 @@ namespace hw.Parser
             readonly IDictionary<Type, object> Components =
                 new Dictionary<Type, object>();
 
-            readonly ValueCache<IParser<TSourcePart>> ParserCache;
+            readonly ValueCache<IPriorityParser<TSourcePart>> ParserCache;
             readonly ValueCache<ISubParser<TSourcePart>> SubParserCache;
 
             internal ComponentData
@@ -30,7 +30,7 @@ namespace hw.Parser
                 Add(prioTable, component);
                 Add(tokenFactory, component);
                 Add(converter, component);
-                ParserCache = new ValueCache<IParser<TSourcePart>>(CreateParser);
+                ParserCache = new ValueCache<IPriorityParser<TSourcePart>>(CreateParser);
                 SubParserCache = new ValueCache<ISubParser<TSourcePart>>(CreateSubParser);
             }
 
@@ -45,7 +45,7 @@ namespace hw.Parser
             PrioTable PrioTable => Get<PrioTable>();
             ITokenFactory<TSourcePart> TokenFactory => Get<ITokenFactory<TSourcePart>>();
 
-            internal IParser<TSourcePart> Parser => ParserCache.Value;
+            internal IPriorityParser<TSourcePart> Parser => ParserCache.Value;
             internal ISubParser<TSourcePart> SubParser => SubParserCache.Value;
 
             static string PrettyDumpPair(Type key, object value)
@@ -58,7 +58,7 @@ namespace hw.Parser
 
             ISubParser<TSourcePart> CreateSubParser() => new SubParser<TSourcePart>(Parser, Converter);
 
-            IParser<TSourcePart> CreateParser()
+            IPriorityParser<TSourcePart> CreateParser()
             {
                 if(PrioTable == null)
                     return null;
@@ -126,7 +126,7 @@ namespace hw.Parser
                 set => Parent.Define(null, null, value, Tag);
             }
 
-            public IParser<TSourcePart> Parser => Parent.Dictionary[Tag].Parser;
+            public IPriorityParser<TSourcePart> Parser => Parent.Dictionary[Tag].Parser;
             public ISubParser<TSourcePart> SubParser => Parent.Dictionary[Tag].SubParser;
             public T Get<T>() => Parent.Dictionary[Tag].Get<T>();
             public void Add<T>(T value) { Parent.Dictionary[Tag].Add(value, this); }

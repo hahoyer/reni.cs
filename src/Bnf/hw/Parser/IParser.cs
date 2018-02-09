@@ -5,7 +5,14 @@ using hw.Scanner;
 
 namespace hw.Parser
 {
-    public interface IParser<TSourcePart>
+    public interface IParser<out TSourcePart>
+        where TSourcePart : class, ISourcePartProxy
+    {
+        TSourcePart Execute(SourcePosn start);
+        bool Trace { get; set; }
+    }
+
+    public interface IPriorityParser<TSourcePart>
         where TSourcePart : class, ISourcePartProxy
     {
         TSourcePart Execute(SourcePosn start, Stack<OpenItem<TSourcePart>> stack = null);

@@ -264,7 +264,7 @@ namespace hw.Parser
 
                 var typeDump = item.Type == null
                     ? "null"
-                    : item.Type.PrioTableId
+                    : item.Type.Id
                     + " Type = "
                     + item.Type.GetType().PrettyName();
                 Tracer.Line(title + " = " + typeDump + " Depth=" + item.Context.Depth);
@@ -274,7 +274,7 @@ namespace hw.Parser
                 => Extension.TreeDump(value.Left) + " "
                 + (value.Type == null
                     ? "null"
-                    : value.Type.PrioTableId + " NextDepth=" + value.NextDepth);
+                    : value.Type.Id + " NextDepth=" + value.NextDepth);
         }
 
         internal interface ISubParserProvider

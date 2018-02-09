@@ -39,7 +39,12 @@
     <Compile Include="InterfaceContext.cs" />
     <Compile Include="Scanner\TokenFactory.cs" />
     <Compile Include="StructuredText\BnfDefinitions.cs" />
+    <Compile Include="StructuredText\Comment.cs" />
     <Compile Include="StructuredText\Compiler.cs" />
+    <Compile Include="StructuredText\Identifier.cs" />
+    <Compile Include="StructuredText\ScannerTokenFactory.cs" />
+    <Compile Include="StructuredText\WhiteSpace.cs" />
+    <Compile Include="Tests\StructuredTextTest.cs" />
     <Compile Include="TokenClasses\BeginOfText.cs" />
     <Compile Include="Compiler.cs" />
     <Compile Include="TokenClasses\Or.cs" />

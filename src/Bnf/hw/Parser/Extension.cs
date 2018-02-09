@@ -18,7 +18,7 @@ namespace hw.Parser
                 : @operator.Infix(left, token, right));
 
         public static ISubParser<TTreeItem> Convert<TTreeItem>
-            (this IParser<TTreeItem> parser, Func<TTreeItem, IParserTokenType<TTreeItem>> converter)
+            (this IPriorityParser<TTreeItem> parser, Func<TTreeItem, IParserTokenType<TTreeItem>> converter)
             where TTreeItem : class, ISourcePartProxy => new SubParser<TTreeItem>(parser, converter);
 
         internal static string TreeDump<TTreeItem>(TTreeItem value) where TTreeItem : class

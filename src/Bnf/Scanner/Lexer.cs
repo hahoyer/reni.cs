@@ -39,7 +39,7 @@ namespace Bnf.Scanner
             var letterPlus = Match.Letter.Else("_");
             var identifier = letterPlus + (letterPlus | Match.Digit).Repeat();
 
-            Any = identifier | "::=".Box() | "<...>".Box() | ";|[]{}()".AnyChar();
+            Any = identifier | "::=?".Box()| "::=".Box() | ";|[]{}()".AnyChar();
         }
 
         protected override IMatch Any {get;}

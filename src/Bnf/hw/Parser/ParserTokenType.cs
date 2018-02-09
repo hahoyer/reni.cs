@@ -13,7 +13,7 @@ namespace hw.Parser
         TTreeItem IParserTokenType<TTreeItem>.Create(TTreeItem left, IToken token, TTreeItem right) 
             => Create(left, token, right);
 
-        string IParserTokenType<TTreeItem>.PrioTableId => Id;
+        string IParserTokenType<TTreeItem>.Id => Id;
 
         string IUniqueIdProvider.Value => Id;
 

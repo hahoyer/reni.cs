@@ -6,7 +6,7 @@ using hw.Scanner;
 
 namespace hw.Parser
 {
-    public sealed partial class PrioParser<TSourcePart> : DumpableObject, IParser<TSourcePart>
+    public sealed partial class PrioParser<TSourcePart> : DumpableObject, IPriorityParser<TSourcePart>
         where TSourcePart : class, ISourcePartProxy
     {
         readonly PrioTable PrioTable;
@@ -21,7 +21,7 @@ namespace hw.Parser
             StartParserType = startParserType;
         }
 
-        TSourcePart IParser<TSourcePart>.Execute
+        TSourcePart IPriorityParser<TSourcePart>.Execute
             (SourcePosn start, Stack<OpenItem<TSourcePart>> initialStack)
         {
             StartMethodDump(Trace, start.GetDumpAroundCurrent(50), initialStack);

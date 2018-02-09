@@ -1,52 +1,7 @@
-﻿namespace Bnf.StructuredText{    static class BnfDefinitions    {
-        public const string Scanner = @"letter ::= 'A' | 'B' | <...> | 'Z' | 'a' | 'b' | <...> | 'z';
-digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
-octal_digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7';
-hex_digit ::= digit | 'A'|'B'|'C'|'D'|'E'|'F'                 ;
-identifier ::= (letter | ('_' (letter | digit))) {['_'] (letter | digit)};
-
-constant ::= numeric_literal | character_string | time_literal | bit_string_literal | boolean_literal;
-
-numeric_literal ::= integer_literal | real_literal;
-integer_literal ::= [ integer_type_name '#' ]( signed_integer | binary_integer | octal_integer | hex_integer);
-signed_integer ::= ['+' |'-'] integer;
-integer ::= digit {['_'] digit};
-binary_integer ::= '2#' bit {['_'] bit};
-bit ::= '1' | '0';
-octal_integer ::= '8#' octal_digit {['_'] octal_digit};
-hex_integer ::= '16#' hex_digit {['_'] hex_digit};
-real_literal ::= [ real_type_name '#' ]signed_integer '.' integer [exponent];
-exponent ::= ('E' | 'e') ['+'|'-'] integer;
-bit_string_literal ::=[ ('BYTE' | 'WORD' | 'DWORD' | 'LWORD') '#' ]( unsigned_integer | binary_integer | octal_integer | hex_integer);
-boolean_literal ::=( [ 'BOOL#' ] ( '1' | '0' ) )| 'TRUE' | 'FALSE';
-character_string ::=single_byte_character_string | double_byte_character_string;
-single_byte_character_string ::=""'"" {single_byte_character_representation} ""'"";
-double_byte_character_string ::='""' {double_byte_character_representation} '""'| ""$'"" | '""' | '$' hex_digit hex_digit;
-double_byte_character_representation ::= common_character_representation| '$""' | ""'""| '$' hex_digit hex_digit hex_digit hex_digit;
-common_character_representation ::= any_printable_character_except ('$'| '""' | ""'"")| '$$' | '$L' | '$N' | '$P' | '$R' | '$T'| '$l' | '$n' | '$p' | '$r' | '$t';
-
-duration ::= ('T' | 'TIME') '#' ['-'] interval;
-interval ::= days | hours | minutes | seconds | milliseconds;
-days ::= fixed_point ('d') | integer ('d') ['_'] hours;
-fixed_point ::= integer [ '.' integer];
-hours ::= fixed_point ('h') | integer ('h') ['_'] minutes;
-minutes ::= fixed_point ('m') | integer ('m') ['_'] seconds;
-seconds ::= fixed_point ('s') | integer ('s') ['_'] milliseconds;
-milliseconds ::= fixed_point ('ms');
-
-time_of_day ::= ('TIME_OF_DAY' | 'TOD') '#' daytime;
-daytime ::= day_hour ':' day_minute ':' day_second;
-day_hour ::= integer;
-day_minute ::= integer;
-day_second ::= fixed_point;
-date ::= ('DATE' | 'D') '#' date_literal;
-date_literal ::= year '-' month '-' day;
-year ::= integer;
-
-month ::= integer;
-day ::= integer;
-date_and_time ::= ('DATE_AND_TIME' | 'DT') '#' date_literal '-' daytime;";
-
+﻿namespace Bnf.StructuredText
+{
+    static class BnfDefinitions
+    {
         public const string Parser = @"elementary_type_name ::= numeric_type_name | date_type_name| bit_string_type_name | 'STRING' | 'WSTRING' | 'TIME';
 numeric_type_name ::= integer_type_name | real_type_name;
 integer_type_name ::= signed_integer_type_name| unsigned_integer_type_name;
@@ -276,4 +231,53 @@ control_variable ::= identifier;
 for_list ::= expression 'TO' expression ['BY' expression];
 while_statement ::= 'WHILE' expression 'DO' statement_list 'END_WHILE';
 repeat_statement ::='REPEAT' statement_list 'UNTIL' expression 'END_REPEAT';
-exit_statement ::= 'EXIT'";    }}
+exit_statement ::= 'EXIT'";
+
+        public const string Scanner = @"whitespace ::= ' '| '    ' | '\n' | '\r';comment ::=?;digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
+octal_digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7';
+hex_digit ::= digit | 'A'|'B'|'C'|'D'|'E'|'F'                 ;
+identifier ::= (letter | ('_' (letter | digit))) {['_'] (letter | digit)};
+
+constant ::= numeric_literal | character_string | time_literal | bit_string_literal | boolean_literal;
+
+numeric_literal ::= integer_literal | real_literal;
+integer_literal ::= [ integer_type_name '#' ]( signed_integer | binary_integer | octal_integer | hex_integer);
+signed_integer ::= ['+' |'-'] integer;
+integer ::= digit {['_'] digit};
+binary_integer ::= '2#' bit {['_'] bit};
+bit ::= '1' | '0';
+octal_integer ::= '8#' octal_digit {['_'] octal_digit};
+hex_integer ::= '16#' hex_digit {['_'] hex_digit};
+real_literal ::= [ real_type_name '#' ]signed_integer '.' integer [exponent];
+exponent ::= ('E' | 'e') ['+'|'-'] integer;
+bit_string_literal ::=[ ('BYTE' | 'WORD' | 'DWORD' | 'LWORD') '#' ]( unsigned_integer | binary_integer | octal_integer | hex_integer);
+boolean_literal ::=( [ 'BOOL#' ] ( '1' | '0' ) )| 'TRUE' | 'FALSE';
+character_string ::=single_byte_character_string | double_byte_character_string;
+single_byte_character_string ::=""'"" {single_byte_character_representation} ""'"";
+double_byte_character_string ::='""' {double_byte_character_representation} '""'| ""$'"" | '""' | '$' hex_digit hex_digit;
+double_byte_character_representation ::= common_character_representation| '$""' | ""'""| '$' hex_digit hex_digit hex_digit hex_digit;
+common_character_representation ::= any_printable_character_except ('$'| '""' | ""'"")| '$$' | '$L' | '$N' | '$P' | '$R' | '$T'| '$l' | '$n' | '$p' | '$r' | '$t';
+
+duration ::= ('T' | 'TIME') '#' ['-'] interval;
+interval ::= days | hours | minutes | seconds | milliseconds;
+days ::= fixed_point ('d') | integer ('d') ['_'] hours;
+fixed_point ::= integer [ '.' integer];
+hours ::= fixed_point ('h') | integer ('h') ['_'] minutes;
+minutes ::= fixed_point ('m') | integer ('m') ['_'] seconds;
+seconds ::= fixed_point ('s') | integer ('s') ['_'] milliseconds;
+milliseconds ::= fixed_point ('ms');
+
+time_of_day ::= ('TIME_OF_DAY' | 'TOD') '#' daytime;
+daytime ::= day_hour ':' day_minute ':' day_second;
+day_hour ::= integer;
+day_minute ::= integer;
+day_second ::= fixed_point;
+date ::= ('DATE' | 'D') '#' date_literal;
+date_literal ::= year '-' month '-' day;
+year ::= integer;
+
+month ::= integer;
+day ::= integer;
+date_and_time ::= ('DATE_AND_TIME' | 'DT') '#' date_literal '-' daytime;";
+    }
+}

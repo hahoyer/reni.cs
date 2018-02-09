@@ -9,7 +9,7 @@ namespace hw.Parser
         where TTreeItem : class, ISourcePartProxy
     {
         TTreeItem Create(TTreeItem left, IToken token, TTreeItem right);
-        string PrioTableId { get; }
+        string Id { get; }
     }
 
     public interface IBracketMatch<TTreeItem>

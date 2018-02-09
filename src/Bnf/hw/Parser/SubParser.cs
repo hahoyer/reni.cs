@@ -8,13 +8,13 @@ namespace hw.Parser
     sealed class SubParser<TTreeItem> : ISubParser<TTreeItem>
         where TTreeItem : class, ISourcePartProxy
     {
-        readonly IParser<TTreeItem> _parser;
+        readonly IPriorityParser<TTreeItem> _parser;
         readonly Func<TTreeItem, IParserTokenType<TTreeItem>> _converter;
         readonly Func<Stack<OpenItem<TTreeItem>>, Stack<OpenItem<TTreeItem>>> _prepareStack;
 
         public SubParser
             (
-            IParser<TTreeItem> parser,
+            IPriorityParser<TTreeItem> parser,
             Func<TTreeItem, IParserTokenType<TTreeItem>> converter,
             Func<Stack<OpenItem<TTreeItem>>, Stack<OpenItem<TTreeItem>>> prepareStack = null)
         {

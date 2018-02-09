@@ -1,5 +1,8 @@
+using System.Collections.Generic;
 using Bnf.Contexts;
+using Bnf.StructuredText;
 using hw.DebugFormatter;
+using hw.Scanner;
 
 namespace Bnf.Forms
 {
@@ -14,6 +17,11 @@ namespace Bnf.Forms
         protected override string GetResult(IContext context)
         {
             NotImplementedMethod(context);
+            return null;
+        }
+        int? IExpression.Match(SourcePosn sourcePosn, ScannerContext scannerContext)
+        {
+            NotImplementedMethod(sourcePosn, "statements");
             return null;
         }
     }

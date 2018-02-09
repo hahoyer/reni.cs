@@ -1,5 +1,8 @@
+using System.Collections.Generic;
 using Bnf.Contexts;
+using Bnf.StructuredText;
 using hw.DebugFormatter;
+using hw.Scanner;
 
 namespace Bnf.Forms
 {
@@ -12,6 +15,9 @@ namespace Bnf.Forms
             : base(parent) => Name = name;
 
         string Define.IDestination.Name => Name;
+
+        int? IExpression.Match(SourcePosn sourcePosn, ScannerContext scannerContext)
+            => scannerContext.Resolve(Name).Function(sourcePosn, scannerContext);
 
         protected override string GetResult(IContext context)
         {

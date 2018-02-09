@@ -23,7 +23,12 @@ namespace Bnf.Forms
             Source = source;
         }
 
+        string IStatement.Name => Destination.Name;
+        IExpression IStatement.Value => Source;
+
         protected override string GetResult(IContext context)
-            => context.Define(Destination.Name , Source);
+            => context.Define(Destination.Name, Source);
+
+        protected override string GetNodeDump() => base.GetNodeDump() + "." + Destination.Name;
     }
 }

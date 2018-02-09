@@ -97,7 +97,7 @@ namespace hw.Parser
                 newContext ?? Context,
                 IsBracketAndLeftBracket);
 
-        string PrioTable.ITargetItem.Token => Type?.PrioTableId ?? PrioTable.BeginOfText;
+        string PrioTable.ITargetItem.Token => Type?.Id ?? PrioTable.BeginOfText;
         BracketContext PrioTable.ITargetItem.LeftContext => Context;
 
         internal TTreeItem Create(TTreeItem left) => Type.Create(left, this, null);

@@ -10,7 +10,8 @@ namespace hw.Parser
             => GetParserTokenType<TSourcePart>(id);
 
         IParserTokenFactory IScannerTokenType.ParserTokenFactory => this;
-        string IScannerTokenType.Id => GetType().PrettyName();
+        string IScannerTokenType.Id => Id;
+        protected virtual string Id => GetType().PrettyName();
 
         protected abstract IParserTokenType<TSourcePart> GetParserTokenType<TSourcePart>(string id)
             where TSourcePart : class, ISourcePartProxy;

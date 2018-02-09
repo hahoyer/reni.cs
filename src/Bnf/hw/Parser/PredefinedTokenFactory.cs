@@ -27,7 +27,7 @@ namespace hw.Parser
         FunctionCache<string, IParserTokenType<TSourcePart>> GetDictionary()
             => new FunctionCache<string, IParserTokenType<TSourcePart>>
             (
-                GetPredefinedTokenClasses().ToDictionary(item => GetTokenClassKeyFromToken(item.PrioTableId)),
+                GetPredefinedTokenClasses().ToDictionary(item => GetTokenClassKeyFromToken(item.Id)),
                 GetTokenClass
             );
 

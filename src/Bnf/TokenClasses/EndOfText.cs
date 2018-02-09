@@ -16,7 +16,7 @@ namespace Bnf.TokenClasses
                 return left.Left.Right;
             }
 
-            string IParserTokenType<Syntax>.PrioTableId => "<frame>";
+            string IParserTokenType<Syntax>.Id => "<frame>";
         }
 
         IParserTokenType<Syntax> IBracketMatch<Syntax>.Value {get;} = new Matched();

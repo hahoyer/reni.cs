@@ -1,5 +1,9 @@
+using System.Collections.Generic;
+using System.Linq;
+using Bnf.Forms;
 using Bnf.Scanner;
 using Bnf.TokenClasses;
+using hw.DebugFormatter;
 using hw.Parser;
 using hw.Scanner;
 
@@ -14,7 +18,7 @@ namespace Bnf
             get
             {
                 var result = PrioTable.Left(PrioTable.Any);
-                result += PrioTable.Left(Or.TokenId);
+                result += PrioTable.Left(TokenClasses.Or.TokenId);
 
                 result += PrioTable.BracketParallels
                 (
@@ -34,7 +38,7 @@ namespace Bnf
                     }
                 );
 
-                result += PrioTable.Right(Define.TokenId);
+                result += PrioTable.Right(TokenClasses.Define.TokenId, TokenClasses.DefineSpecial.TokenId);
                 result += PrioTable.Right(Semicolon.TokenId);
                 result.Title = "Main";
                 //Tracer.FlaggedLine("\n"+x.ToString());
@@ -52,17 +56,24 @@ namespace Bnf
             Text = text;
 
             var main = this["Main"];
-            var tokenFactory = new TokenFactory(name => new UserSymbol(name), "Main");
+            var tokenFactory = new TokenFactory(name => new TokenClasses.UserSymbol(name), "Main");
 
             main.PrioTable = PrioTable;
             main.TokenFactory = new ScannerTokenFactory();
             main.Add<ScannerTokenType<Syntax>>(tokenFactory);
         }
 
+        [DisableDump]
         internal Source Source => SourceCache ?? (SourceCache = new Source(Text));
+
+        [DisableDump]
         internal Syntax Syntax => SyntaxCache ?? (SyntaxCache = GetSyntax());
+
+        [DisableDump]
         internal string Interfaces => Syntax.Form.GetResult(new InterfaceContext());
 
+        public IDictionary<string, IExpression> Statements 
+            => ((IStatements) Syntax.Form).Data.ToDictionary(i=>i.Name, i=>i.Value);
 
         Syntax GetSyntax() => this["Main"].Parser.Execute(Source + 0);
     }
