@@ -22,6 +22,6 @@ namespace hw.Parser
     public interface ISubParser<TSourcePart>
         where TSourcePart : class, ISourcePartProxy
     {
-        IParserTokenType<TSourcePart> Execute(SourcePosn sourcePosn, Stack<OpenItem<TSourcePart>> stack = null);
+        IPriorityParserTokenType<TSourcePart> Execute(SourcePosn sourcePosn, Stack<OpenItem<TSourcePart>> stack = null);
     }
 }

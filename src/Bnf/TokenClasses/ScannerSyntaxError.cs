@@ -2,7 +2,7 @@ using hw.Parser;
 
 namespace Bnf.TokenClasses
 {
-    sealed class ScannerSyntaxError : ParserTokenType<Syntax>
+    sealed class ScannerSyntaxError : PriorityParserTokenType<Syntax>
     {
         readonly IssueId IssueId;
 

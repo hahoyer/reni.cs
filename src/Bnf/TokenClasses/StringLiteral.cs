@@ -1,16 +1,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using Bnf.Forms;
-using Bnf.Scanner;
 using hw.DebugFormatter;
+using hw.Scanner;
 
 namespace Bnf.TokenClasses
 {
-    sealed class StringLiteral : TokenClass
+    sealed class StringLiteral : TokenType, IFactoryTokenType
     {
         readonly char Delimiter;
 
         public StringLiteral(char delimiter) => Delimiter = delimiter;
+
+        hw.Scanner.ITokenType ITokenTypeFactory.Get(string id) => this;
         public override string Id => "<Literal>";
 
         protected override IForm GetForm(Syntax parent)
@@ -38,7 +40,7 @@ namespace Bnf.TokenClasses
             var result = "";
             for(var i = 1; i < text.Length - 1; i++)
             {
-                if(i == Lexer.StringEscapeChar)
+                if(i == Scanner.Lexer.StringEscapeChar)
                     i++;
                 result += text[i];
             }

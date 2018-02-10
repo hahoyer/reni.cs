@@ -1,13 +1,13 @@
 ﻿using hw.DebugFormatter;
+using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
 
 namespace Bnf.StructuredText
 {
     [BelongsTo(typeof(ScannerTokenFactory))]
-    sealed class WhiteSpace : DumpableObject, IScannerTokenType
+    sealed class WhiteSpace : DumpableObject, ILexerTokenType
     {
-        IParserTokenFactory IScannerTokenType.ParserTokenFactory => null;
-        string IScannerTokenType.Id => "whitespace";
+        string IUniqueIdProvider.Value => "whitespace";
     }
 }

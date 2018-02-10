@@ -10,75 +10,60 @@ namespace hw.Parser
     /// <summary>
     ///     Tokenfactory, that obains token classes from current assembly.
     ///     At constuctor time, all classes are registered, that fulfil the conditions stated in function
-    ///     <see cref="BelongsToFactory" />.
+    ///     <see cref="Extension.GetBelongings{T}" />.
     /// </summary>
-    /// <typeparam name="TSourcePart"></typeparam>
-    abstract class GenericTokenFactory<TSourcePart> : PredefinedTokenFactory<TSourcePart>
-        where TSourcePart : class, ISourcePartProxy
+    abstract class GenericTokenFactory : PredefinedTokenFactory
     {
-        static IEnumerable<IParserTokenType<TSourcePart>> CreateInstance(Type type)
+        static IEnumerable<ITokenType> CreateInstance(Type type)
         {
-            var variants = type.GetAttributes<VariantAttribute>(true).ToArray();
+            VariantAttribute[] variants = type.GetAttributes<VariantAttribute>(true).ToArray();
             if(variants.Any())
                 return variants
-                    .Select(variant => variant.CreateInstance<TSourcePart>(type));
+                    .Select(variant => variant.CreateInstance(type));
 
             return new[] {SpecialTokenClass(type)};
         }
 
-        static IParserTokenType<TSourcePart> SpecialTokenClass(Type type)
-            => (IParserTokenType<TSourcePart>) Activator.CreateInstance(type);
+        static ITokenType SpecialTokenClass(Type type)
+            => (ITokenType) Activator.CreateInstance(type);
 
         /// <summary>
         ///     Tokenclasses that have been obtained from current assembly
         /// </summary>
-        public readonly IEnumerable<IParserTokenType<TSourcePart>> PredefinedTokenClasses;
-
-        protected abstract IParserTokenType<TSourcePart> NewSymbol(string name);
+        public readonly IEnumerable<ITokenType> PredefinedTokenClasses;
 
         [EnableDump]
         readonly string Title;
 
-        readonly List<IParserTokenType<TSourcePart>> UserSymbols = new List<IParserTokenType<TSourcePart>>();
+        readonly List<ITokenType> UserSymbols = new List<ITokenType>();
 
         /// <summary />
-        /// <param name="newSymbol">Function that should be called, when any well formed, but yet unknown symbol is found.</param>
         /// <param name="title">Optional name for use in trace log.</param>
-        public GenericTokenFactory(Func<string, IParserTokenType<TSourcePart>> newSymbol, string title = null)
+        public GenericTokenFactory(string title = null)
         {
             Title = title;
             PredefinedTokenClasses = GetType()
-                .Assembly
-                .GetTypes()
-                .Where(BelongsToFactory)
+                .GetBelongingTypes<ITokenType>()
                 .SelectMany(CreateInstance);
         }
 
         /// <summary>
-        /// Complete list of token classes seen or predefined. Will probaly increase during compilation.
+        ///     Complete list of token classes seen or predefined. Will probaly increase during compilation.
         /// </summary>
         [DisableDump]
-        public IEnumerable<IParserTokenType<TSourcePart>> AllTokenClasses
+        public IEnumerable<ITokenType> AllTokenClasses
             => PredefinedTokenClasses.Concat(UserSymbols);
 
-        protected sealed override IParserTokenType<TSourcePart> GetTokenClass(string name)
+        protected abstract ITokenType NewSymbol(string name);
+
+        protected sealed override ITokenType GetTokenClass(string name)
         {
             var result = NewSymbol(name);
             UserSymbols.Add(result);
             return result;
         }
 
-        protected sealed override IEnumerable<IParserTokenType<TSourcePart>> GetPredefinedTokenClasses()
+        protected sealed override IEnumerable<ITokenType> GetPredefinedTokenClasses()
             => PredefinedTokenClasses;
-
-        bool BelongsToFactory(Type type)
-        {
-            var thisType = GetType();
-            return type.Is<ScannerTokenType>() &&
-                   !type.IsAbstract &&
-                   type
-                       .GetAttributes<BelongsToAttribute>(true)
-                       .Any(attr => thisType.Is(attr.TokenFactory));
-        }
     }
 }

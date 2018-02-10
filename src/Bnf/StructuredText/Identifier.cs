@@ -1,16 +1,13 @@
-﻿using hw.Parser;
+﻿using hw.DebugFormatter;
+using hw.Helper;
+using hw.Parser;
+using hw.Scanner;
 
 namespace Bnf.StructuredText
 {
     [BelongsTo(typeof(ScannerTokenFactory))]
-    sealed class Identifier : ScannerTokenType
+    sealed class Identifier : DumpableObject, ITokenType
     {
-        protected override string Id => "identifier";
-
-        protected override IParserTokenType<TSourcePart> GetParserTokenType<TSourcePart>(string id)
-        {
-            NotImplementedMethod(id);
-            return null;
-        }
+        string IUniqueIdProvider.Value => "identifier";
     }
 }

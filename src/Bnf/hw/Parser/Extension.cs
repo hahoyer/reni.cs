@@ -18,14 +18,13 @@ namespace hw.Parser
                 : @operator.Infix(left, token, right));
 
         public static ISubParser<TTreeItem> Convert<TTreeItem>
-            (this IPriorityParser<TTreeItem> parser, Func<TTreeItem, IParserTokenType<TTreeItem>> converter)
-            where TTreeItem : class, ISourcePartProxy => new SubParser<TTreeItem>(parser, converter);
+            (this IPriorityParser<TTreeItem> parser, Func<TTreeItem, IPriorityParserTokenType<TTreeItem>> converter)
+            where TTreeItem : class, ISourcePartProxy
+            => new SubParser<TTreeItem>(parser, converter);
 
-        internal static string TreeDump<TTreeItem>(TTreeItem value) where TTreeItem : class
-        {
-            var t = value as IBinaryTreeItem;
-            return t == null ? Tracer.Dump(value) : TreeDump(t);
-        }
+        internal static string TreeDump<TTreeItem>(TTreeItem value)
+            where TTreeItem : class
+            => value is IBinaryTreeItem t ? TreeDump(t) : Tracer.Dump(value);
 
         public static string TreeDump(this IBinaryTreeItem value)
         {
@@ -42,19 +41,16 @@ namespace hw.Parser
             return result;
         }
 
-        public static SourcePart SourcePart(this IEnumerable<IItem> items)
+        public static SourcePart SourcePart(this IEnumerable<LexerToken> items)
             => items.Select(item => item.SourcePart).Aggregate();
 
-        public static int BracketBalance(this IToken token)
+        public static int BracketBalance(this IPrioParserToken token)
         {
             switch(token.IsBracketAndLeftBracket)
             {
-            case true:
-                return -1;
-            case false:
-                return 1;
-            default:
-                return 0;
+                case true: return -1;
+                case false: return 1;
+                default: return 0;
             }
         }
 
@@ -66,5 +62,24 @@ namespace hw.Parser
 
         internal static int GetLeftDepth(this PrioTable.ITargetItem item)
             => item.LeftContext.Depth;
+
+
+        static bool IsBelongingTo<T>(this Type childType, Type factoryType)
+            => childType.Is<T>() &&
+               !childType.IsAbstract &&
+               childType
+                   .GetAttributes<BelongsToAttribute>(true)
+                   .Any(attr => factoryType.Is(attr.TokenFactory));
+
+        public static IEnumerable<T> GetBelongings<T>(this Type factoryType)
+            => factoryType
+                .GetBelongingTypes<T>()
+                .Select(t => (T) Activator.CreateInstance(t));
+
+        public static IEnumerable<Type> GetBelongingTypes<T>(this Type factoryType)
+            => factoryType
+                .Assembly
+                .GetTypes()
+                .Where(type => type.IsBelongingTo<T>(factoryType));
     }
 }

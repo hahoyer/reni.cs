@@ -4,13 +4,13 @@ using hw.Parser;
 
 namespace Bnf.TokenClasses
 {
-    sealed class MatchedItem : ParserTokenType<Syntax>, ITokenClass
+    sealed class MatchedItem : PriorityParserTokenType<Syntax>, ITokenType
     {
         public MatchedItem(string id = "()") => Id = id;
 
         public override string Id {get;}
 
-        IForm ITokenClass.GetForm(Syntax parent)
+        IForm ITokenType.GetForm(Syntax parent)
         {
             var left = parent.Left?.Form;
             var right = parent.Right?.Form;

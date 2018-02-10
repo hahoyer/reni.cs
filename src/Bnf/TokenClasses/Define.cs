@@ -6,7 +6,7 @@ using hw.Parser;
 namespace Bnf.TokenClasses
 {
     [BelongsTo(typeof(TokenFactory))]
-    sealed class Define : TokenClass
+    sealed class Define : TokenType
     {
         public const string TokenId = "::=";
 

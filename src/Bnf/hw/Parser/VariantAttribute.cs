@@ -15,8 +15,8 @@ namespace hw.Parser
 
         public VariantAttribute(params object[] creationParameter) { CreationParameter = creationParameter; }
 
-        internal IParserTokenType<TTreeItem> CreateInstance<TTreeItem>(System.Type type)
-            where TTreeItem : class, ISourcePartProxy => (IParserTokenType<TTreeItem>)type
+        internal ITokenType CreateInstance(System.Type type)
+            => (ITokenType)type
             .GetConstructor(CreationParameter.Select(p => p.GetType()).ToArray())
             .AssertNotNull()
             .Invoke(CreationParameter);

@@ -4,7 +4,7 @@ using hw.DebugFormatter;
 
 namespace Bnf.TokenClasses
 {
-    sealed class UserSymbol : TokenClass
+    sealed class UserSymbol : TokenType
     {
         public UserSymbol(string name) => Id = name;
 

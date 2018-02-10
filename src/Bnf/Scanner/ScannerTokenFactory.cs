@@ -12,14 +12,16 @@ namespace Bnf.Scanner
 
         Compiler<Syntax>.Component Compiler<Syntax>.IComponent.Current {set => Current = value;}
 
-        IParserTokenType<Syntax> ITokenFactory<Syntax>.BeginOfText => new BeginOfText();
-        IScannerTokenType ITokenFactory.EndOfText => new EndOfText();
+        hw.Scanner.ITokenType ILexerTokenFactory.EndOfText
+            => new EndOfText();
 
-        IScannerTokenType ITokenFactory.InvalidCharacterError
+        hw.Scanner.ITokenType ILexerTokenFactory.InvalidCharacterError
             => new ScannerSyntaxError(IssueId.InvalidCharacter);
 
-        LexerItem[] ITokenFactory.Classes => Classes;
+        LexerItem[] ILexerTokenFactory.Classes
+            => Lexer.Instance.LexerItems(Current.Get<ITokenTypeFactory>());
 
-        LexerItem[] Classes => Lexer.Instance.LexerItems(Current.Get<ScannerTokenType<Syntax>>());
+        IPriorityParserTokenType<Syntax> ITokenFactory<Syntax>.BeginOfText
+            => new BeginOfText();
     }
 }

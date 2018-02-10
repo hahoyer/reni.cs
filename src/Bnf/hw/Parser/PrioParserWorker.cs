@@ -74,8 +74,9 @@ namespace hw.Parser
             Item<TSourcePart> ReadNextToken(SourcePosn sourcePosn, BracketContext context)
             {
                 TraceNextToken(sourcePosn);
-                var result = Item<TSourcePart>.Create
-                    (Parent.Scanner.GetNextTokenGroup(sourcePosn), context);
+                var nextTokenGroup = Parent.Scanner.GetNextTokenGroup(sourcePosn);
+                
+                var result = Item<TSourcePart>.Create(nextTokenGroup, context);
 
                 var nextParser = (result.Type as ISubParserProvider)?.NextParser;
                 if(nextParser == null)
@@ -118,7 +119,7 @@ namespace hw.Parser
                 if(relation.IsMatch)
                     Current = Item<TSourcePart>.Create
                     (
-                        new IItem[0],
+                        new LexerToken[0],
                         ((IBracketMatch<TSourcePart>) Current.Type).Value,
                         Current.Characters.End.Span(0),
                         other.BracketItem.LeftContext,
@@ -264,7 +265,7 @@ namespace hw.Parser
 
                 var typeDump = item.Type == null
                     ? "null"
-                    : item.Type.Id
+                    : item.Type.Value
                     + " Type = "
                     + item.Type.GetType().PrettyName();
                 Tracer.Line(title + " = " + typeDump + " Depth=" + item.Context.Depth);
@@ -274,7 +275,7 @@ namespace hw.Parser
                 => Extension.TreeDump(value.Left) + " "
                 + (value.Type == null
                     ? "null"
-                    : value.Type.Id + " NextDepth=" + value.NextDepth);
+                    : value.Type.Value + " NextDepth=" + value.NextDepth);
         }
 
         internal interface ISubParserProvider

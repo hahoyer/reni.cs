@@ -12,59 +12,55 @@ namespace hw.Parser
     {
         sealed class ComponentData : DumpableObject
         {
-            static ComponentData() => Tracer.Dumper.Configuration.Handlers.Add(typeof(Delegate), (type, o) => "?");
+            static string PrettyDumpPair(Type key, object value)
+                => key.PrettyName() + "=" + ("\n" + PrettyDumpValue(value)).Indent();
+
+            static string PrettyDumpValue(object value) => Tracer.Dump(value);
 
             readonly IDictionary<Type, object> Components =
                 new Dictionary<Type, object>();
 
             readonly ValueCache<IPriorityParser<TSourcePart>> ParserCache;
             readonly ValueCache<ISubParser<TSourcePart>> SubParserCache;
+            static ComponentData() => Tracer.Dumper.Configuration.Handlers.Add(typeof(Delegate), (type, o) => "?");
 
             internal ComponentData
             (
                 PrioTable prioTable,
                 ITokenFactory<TSourcePart> tokenFactory,
-                Func<TSourcePart, IParserTokenType<TSourcePart>> converter,
+                Func<TSourcePart, IPriorityParserTokenType<TSourcePart>> converter,
                 Component component)
             {
                 Add(prioTable, component);
                 Add(tokenFactory, component);
                 Add(converter, component);
-                ParserCache = new ValueCache<IPriorityParser<TSourcePart>>(CreateParser);
+                ParserCache = new ValueCache<IPriorityParser<TSourcePart>>(() => CreateParser(tokenFactory.BeginOfText));
                 SubParserCache = new ValueCache<ISubParser<TSourcePart>>(CreateSubParser);
             }
 
             public string PrettyDump
                 => Components
                     .Select(p => PrettyDumpPair(p.Key, p.Value))
-                    .Stringify(separator: "\n");
+                    .Stringify("\n");
 
-            Func<TSourcePart, IParserTokenType<TSourcePart>> Converter =>
-                Get<Func<TSourcePart, IParserTokenType<TSourcePart>>>();
+            Func<TSourcePart, IPriorityParserTokenType<TSourcePart>> Converter =>
+                Get<Func<TSourcePart, IPriorityParserTokenType<TSourcePart>>>();
 
             PrioTable PrioTable => Get<PrioTable>();
-            ITokenFactory<TSourcePart> TokenFactory => Get<ITokenFactory<TSourcePart>>();
+            ITokenFactory<TSourcePart>  TokenFactory => Get<ITokenFactory<TSourcePart>>();
 
             internal IPriorityParser<TSourcePart> Parser => ParserCache.Value;
             internal ISubParser<TSourcePart> SubParser => SubParserCache.Value;
 
-            static string PrettyDumpPair(Type key, object value)
-                => key.PrettyName() + "=" + ("\n" + PrettyDumpValue(value)).Indent();
-
-            static string PrettyDumpValue(object value)
-            {
-                return Tracer.Dump(value);
-            }
-
             ISubParser<TSourcePart> CreateSubParser() => new SubParser<TSourcePart>(Parser, Converter);
 
-            IPriorityParser<TSourcePart> CreateParser()
+            IPriorityParser<TSourcePart> CreateParser(IPriorityParserTokenType<TSourcePart> beginOfText)
             {
                 if(PrioTable == null)
                     return null;
 
-                ITokenFactory<TSourcePart> tokenFactory = new CachingTokenFactory<TSourcePart>(TokenFactory);
-                var beginOfText = tokenFactory.BeginOfText;
+                ILexerTokenFactory tokenFactory =
+                    new CachingTokenFactory(TokenFactory);
                 if(beginOfText == null)
                     return null;
 
@@ -80,7 +76,7 @@ namespace hw.Parser
             (
                 PrioTable prioTable,
                 ITokenFactory<TSourcePart> tokenFactory,
-                Func<TSourcePart, IParserTokenType<TSourcePart>> converter,
+                Func<TSourcePart, IPriorityParserTokenType<TSourcePart>> converter,
                 Component t
             )
                 =>
@@ -100,7 +96,7 @@ namespace hw.Parser
 
         public interface IComponent
         {
-            Component Current { set; }
+            Component Current {set;}
         }
 
         public sealed class Component
@@ -114,14 +110,11 @@ namespace hw.Parser
                 Tag = tag;
             }
 
-            public PrioTable PrioTable { set => Parent.Define(value, null, null, Tag); }
+            public PrioTable PrioTable {set => Parent.Define(value, null, null, Tag);}
 
-            public ITokenFactory<TSourcePart> TokenFactory
-            {
-                set => Parent.Define(null, value, null, Tag);
-            }
+            public ITokenFactory<TSourcePart> TokenFactory {set => Parent.Define(null, value, null, Tag);}
 
-            public Func<TSourcePart, IParserTokenType<TSourcePart>> BoxFunction
+            public Func<TSourcePart, IPriorityParserTokenType<TSourcePart>> BoxFunction
             {
                 set => Parent.Define(null, null, value, Tag);
             }
@@ -129,8 +122,10 @@ namespace hw.Parser
             public IPriorityParser<TSourcePart> Parser => Parent.Dictionary[Tag].Parser;
             public ISubParser<TSourcePart> SubParser => Parent.Dictionary[Tag].SubParser;
             public T Get<T>() => Parent.Dictionary[Tag].Get<T>();
-            public void Add<T>(T value) { Parent.Dictionary[Tag].Add(value, this); }
+            public void Add<T>(T value) {Parent.Dictionary[Tag].Add(value, this);}
         }
+
+        static string PrettyDumpPair(object key, ComponentData value) => key + "=" + ("\n" + value.PrettyDump).Indent();
 
         readonly IDictionary<object, ComponentData> Dictionary =
             new Dictionary<object, ComponentData>();
@@ -140,20 +135,18 @@ namespace hw.Parser
         public string PrettyDump
             => Dictionary
                 .Select(p => PrettyDumpPair(p.Key, p.Value))
-                .Stringify(separator: "\n");
+                .Stringify("\n");
 
         void Define
         (
             PrioTable prioTable,
-            ITokenFactory<TSourcePart> tokenFactory,
-            Func<TSourcePart, IParserTokenType<TSourcePart>> converter,
+            ITokenFactory<TSourcePart>  tokenFactory,
+            Func<TSourcePart, IPriorityParserTokenType<TSourcePart>> converter,
             object tag
         )
             => Dictionary[tag] =
                 Dictionary.TryGetValue(tag, out var componentData)
                     ? componentData.ReCreate(prioTable, tokenFactory, converter, this[tag])
                     : new ComponentData(prioTable, tokenFactory, converter, this[tag]);
-
-        static string PrettyDumpPair(object key, ComponentData value) => key + "=" + ("\n" + value.PrettyDump).Indent();
     }
 }

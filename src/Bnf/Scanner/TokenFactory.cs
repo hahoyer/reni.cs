@@ -1,14 +1,15 @@
-using System;
 using Bnf.TokenClasses;
+using hw.Helper;
 using hw.Parser;
+using hw.Scanner;
 
 namespace Bnf.Scanner
 {
-    sealed class TokenFactory : GenericTokenFactory<Syntax>
+    sealed class TokenFactory : GenericTokenFactory
     {
-        public TokenFactory(Func<string, IParserTokenType<Syntax>> newSymbol, string title = null)
-            : base(newSymbol, title) {}
+        public TokenFactory(string title = null)
+            : base(title) {}
 
-        protected override IParserTokenType<Syntax> NewSymbol(string name) => new UserSymbol(name);
+        protected override hw.Scanner.ITokenType NewSymbol(string name) => new UserSymbol(name);
     }
 }

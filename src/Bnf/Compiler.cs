@@ -56,11 +56,11 @@ namespace Bnf
             Text = text;
 
             var main = this["Main"];
-            var tokenFactory = new TokenFactory(name => new TokenClasses.UserSymbol(name), "Main");
+            var tokenFactory = new TokenFactory("Main");
 
             main.PrioTable = PrioTable;
             main.TokenFactory = new ScannerTokenFactory();
-            main.Add<ScannerTokenType<Syntax>>(tokenFactory);
+            main.Add<ITokenTypeFactory>(tokenFactory);
         }
 
         [DisableDump]
@@ -72,9 +72,11 @@ namespace Bnf
         [DisableDump]
         internal string Interfaces => Syntax.Form.GetResult(new InterfaceContext());
 
+        [DisableDump]
         public IDictionary<string, IExpression> Statements 
             => ((IStatements) Syntax.Form).Data.ToDictionary(i=>i.Name, i=>i.Value);
 
         Syntax GetSyntax() => this["Main"].Parser.Execute(Source + 0);
     }
+
 }

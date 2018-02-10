@@ -7,7 +7,7 @@ using hw.Scanner;
 namespace Bnf.StructuredText
 {
     [BelongsTo(typeof(ScannerTokenFactory))]
-    sealed class Comment : DumpableObject, IScannerTokenType, INamedMatchProvider
+    sealed class Comment : DumpableObject, ILexerTokenType, INamedMatchProvider
     {
         static readonly IssueId MissingEndOfComment = IssueId.MissingEndOfComment;
         static string TokenId => "comment";
@@ -17,8 +17,6 @@ namespace Bnf.StructuredText
             => sourcePosn.Match(MatchExpression);
 
         string IUniqueIdProvider.Value => TokenId;
-        IParserTokenFactory IScannerTokenType.ParserTokenFactory => null;
-        string IScannerTokenType.Id => TokenId;
     }
 
     [BelongsTo(typeof(ScannerTokenFactory))]

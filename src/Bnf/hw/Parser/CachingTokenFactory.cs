@@ -1,36 +1,31 @@
-﻿using hw.DebugFormatter;
+using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 
 namespace hw.Parser
 {
     /// <summary>
-    /// Provides a token factory that caches the items used. 
-    /// It is also used internally, so you can define token factories, 
-    /// that may use labourious functions in your token factory.
+    ///     Provides a token factory that caches the items used.
+    ///     It is also used internally, so you can define token factories,
+    ///     that may use labourious functions in your token factory.
     /// </summary>
-    /// <typeparam name="TTreeItem"></typeparam>
-    public sealed class CachingTokenFactory<TTreeItem> : Dumpable, ITokenFactory<TTreeItem>
-        where TTreeItem : class, ISourcePartProxy
+    public sealed class CachingTokenFactory : Dumpable, ILexerTokenFactory
     {
-        readonly ValueCache<IParserTokenType<TTreeItem>> BeginOfTextCache;
         readonly ValueCache<LexerItem[]> ClassesCache;
-        readonly ValueCache<IScannerTokenType> EndOfTextCache;
-        readonly ValueCache<IScannerTokenType> InvalidCharacterErrorCache;
-        readonly ITokenFactory<TTreeItem> Target;
+        readonly ValueCache<ITokenType> EndOfTextCache;
+        readonly ValueCache<ITokenType> InvalidCharacterErrorCache;
+        readonly ILexerTokenFactory Target;
 
-        public CachingTokenFactory(ITokenFactory<TTreeItem> target)
+        public CachingTokenFactory(ILexerTokenFactory target)
         {
             Target = target;
-            EndOfTextCache = new ValueCache<IScannerTokenType>(() => Target.EndOfText);
-            BeginOfTextCache = new ValueCache<IParserTokenType<TTreeItem>>(() => Target.BeginOfText);
-            InvalidCharacterErrorCache = new ValueCache<IScannerTokenType>(() => Target.InvalidCharacterError);
+            EndOfTextCache = new ValueCache<ITokenType>(() => Target.EndOfText);
+            InvalidCharacterErrorCache = new ValueCache<ITokenType>(() => Target.InvalidCharacterError);
             ClassesCache = new ValueCache<LexerItem[]>(() => Target.Classes);
         }
 
-        IParserTokenType<TTreeItem> ITokenFactory<TTreeItem>.BeginOfText => BeginOfTextCache.Value;
-        IScannerTokenType ITokenFactory.EndOfText => EndOfTextCache.Value;
-        IScannerTokenType ITokenFactory.InvalidCharacterError => InvalidCharacterErrorCache.Value;
-        LexerItem[] ITokenFactory.Classes => ClassesCache.Value;
+        ITokenType ILexerTokenFactory.EndOfText => EndOfTextCache.Value;
+        ITokenType ILexerTokenFactory.InvalidCharacterError => InvalidCharacterErrorCache.Value;
+        LexerItem[] ILexerTokenFactory.Classes => ClassesCache.Value;
     }
 }

@@ -8,16 +8,17 @@ namespace Bnf
 {
     sealed class Syntax : DumpableObject, ISourcePartProxy
     {
-        public static Syntax Create(Syntax left, ITokenClass tokenClass, IToken token, Syntax right)
-            => new Syntax(left, tokenClass, token, right);
+        public static Syntax Create(Syntax left, TokenClasses.ITokenType tokenType, IToken token, Syntax right)
+            => new Syntax(left, tokenType, token, right);
 
 
-        Syntax(Syntax left, ITokenClass tokenClass, IToken token, Syntax right)
+        Syntax(Syntax left, TokenClasses.ITokenType tokenType, IToken token, Syntax right)
         {
             Left = left;
-            TokenClass = tokenClass;
+            TokenType = tokenType;
             Token = token;
             Right = right;
+            StopByObjectIds(553);
         }
 
         SourcePart ISourcePartProxy.All => SourcePart;
@@ -28,7 +29,7 @@ namespace Bnf
         internal IToken Token {get;}
 
         [EnableDump]
-        internal ITokenClass TokenClass {get;}
+        internal TokenClasses.ITokenType TokenType {get;}
 
         [EnableDumpExcept(null)]
         internal Syntax Right {get;}
@@ -37,6 +38,6 @@ namespace Bnf
         SourcePart SourcePart => Left?.SourcePart + Token.SourcePart() + Right?.SourcePart;
 
         [DisableDump]
-        public IForm Form => TokenClass.GetForm(this);
+        public IForm Form => TokenType.GetForm(this);
     }
 }

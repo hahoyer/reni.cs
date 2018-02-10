@@ -9,7 +9,7 @@ namespace Bnf.TokenClasses
     [Variant(1)]
     [Variant(2)]
     [Variant(3)]
-    sealed class LeftParenthesis : TokenClass
+    sealed class LeftParenthesis : TokenType
     {
         public static string TokenId(int level)
             => level == 0 ? PrioTable.BeginOfText : "{[(".Substring(level - 1, 1);

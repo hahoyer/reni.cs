@@ -9,13 +9,13 @@ namespace hw.Parser
         where TTreeItem : class, ISourcePartProxy
     {
         readonly IPriorityParser<TTreeItem> _parser;
-        readonly Func<TTreeItem, IParserTokenType<TTreeItem>> _converter;
+        readonly Func<TTreeItem, IPriorityParserTokenType<TTreeItem>> _converter;
         readonly Func<Stack<OpenItem<TTreeItem>>, Stack<OpenItem<TTreeItem>>> _prepareStack;
 
         public SubParser
             (
             IPriorityParser<TTreeItem> parser,
-            Func<TTreeItem, IParserTokenType<TTreeItem>> converter,
+            Func<TTreeItem, IPriorityParserTokenType<TTreeItem>> converter,
             Func<Stack<OpenItem<TTreeItem>>, Stack<OpenItem<TTreeItem>>> prepareStack = null)
         {
             _parser = parser;
@@ -23,7 +23,7 @@ namespace hw.Parser
             _prepareStack = prepareStack ?? (stack => null);
         }
 
-        IParserTokenType<TTreeItem> ISubParser<TTreeItem>.Execute
+        IPriorityParserTokenType<TTreeItem> ISubParser<TTreeItem>.Execute
             (SourcePosn sourcePosn, Stack<OpenItem<TTreeItem>> stack)
         {
             return _converter(_parser.Execute(sourcePosn, _prepareStack(stack)));

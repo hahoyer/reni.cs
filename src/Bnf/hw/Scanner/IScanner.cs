@@ -1,38 +1,63 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using hw.DebugFormatter;
+using hw.Helper;
 using hw.Parser;
 
 namespace hw.Scanner
 {
     /// <summary>
-    /// Scanner interface that is used by <see cref="PrioParser{TTreeItem}"/> to split source into tokens.
+    ///     Scanner interface that is used by <see cref="PrioParser{TSourcePart}" /> to split source into tokens.
     /// </summary>
     public interface IScanner
     {
         /// <summary>
-        /// Get the next group of tokens, that belongs together, like the actual token and leading or trailing whitespaces.
+        ///     Get the next group of tokens, that belongs together, like the actual token and leading or trailing whitespaces.
         /// </summary>
-        /// <param name="sourcePosn">The position in the source, where to start. The position is advanced to the end of the token group.</param>
+        /// <param name="sourcePosn">
+        ///     The position in the source, where to start. The position is advanced to the end of the token
+        ///     group.
+        /// </param>
         /// <returns>A list of tokens that are taken from source position given.</returns>
-        IItem[] GetNextTokenGroup(SourcePosn sourcePosn);
+        TokenGroup GetNextTokenGroup(SourcePosn sourcePosn);
     }
 
-    public interface IItem
+    public interface ILexerTokenType : IUniqueIdProvider {}
+
+    public interface ITokenTypeFactory
     {
-        IScannerTokenType ScannerTokenType { get; }
-        SourcePart SourcePart { get; }
+        ITokenType Get(string id);
     }
 
-    public interface IScannerTokenType
+    public interface IFactoryTokenType : ILexerTokenType, ITokenTypeFactory {}
+
+    public sealed class LexerToken : DumpableObject
     {
-        IParserTokenFactory ParserTokenFactory { get; }
-        string Id {get;}
+        [DisableDump]
+        internal readonly SourcePart SourcePart;
+        [DisableDump]
+        internal readonly ILexerTokenType Type;
+
+        public LexerToken(SourcePart sourcePart, ILexerTokenType type)
+        {
+            SourcePart = sourcePart;
+            Type = type;
+        }
     }
 
-    public interface IParserTokenFactory
+    public interface ITokenType : IUniqueIdProvider {}
+
+    public sealed class TokenGroup
     {
-        IParserTokenType<TSourcePart> GetTokenType<TSourcePart>(string id)
-            where TSourcePart : class, ISourcePartProxy;
+        public readonly SourcePart Characters;
+        public readonly LexerToken[] PrefixItems;
+        public readonly ITokenType Type;
+
+        public TokenGroup(IEnumerable<LexerToken> prefixItems, SourcePart characters, ITokenType type)
+        {
+            PrefixItems = prefixItems.ToArray();
+            Characters = characters;
+            Type = type;
+        }
     }
 }

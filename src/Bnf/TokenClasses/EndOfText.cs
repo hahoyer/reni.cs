@@ -1,14 +1,15 @@
 using Bnf.Forms;
 using hw.DebugFormatter;
+using hw.Helper;
 using hw.Parser;
 
 namespace Bnf.TokenClasses
 {
-    sealed class EndOfText : TokenClass, IBracketMatch<Syntax>
+    sealed class EndOfText : TokenType, IBracketMatch<Syntax>
     {
-        sealed class Matched : DumpableObject, IParserTokenType<Syntax>
+        sealed class Matched : DumpableObject, IPriorityParserTokenType<Syntax>
         {
-            Syntax IParserTokenType<Syntax>.Create(Syntax left, IToken token, Syntax right)
+            Syntax IPriorityParserTokenType<Syntax>.Create(Syntax left, IPrioParserToken token, Syntax right)
             {
                 Tracer.Assert(right == null);
                 Tracer.Assert(left.Right == null);
@@ -16,10 +17,10 @@ namespace Bnf.TokenClasses
                 return left.Left.Right;
             }
 
-            string IParserTokenType<Syntax>.Id => "<frame>";
+            string IUniqueIdProvider.Value => "<frame>";
         }
 
-        IParserTokenType<Syntax> IBracketMatch<Syntax>.Value {get;} = new Matched();
+        IPriorityParserTokenType<Syntax> IBracketMatch<Syntax>.Value {get;} = new Matched();
         public override string Id => PrioTable.EndOfText;
 
         protected override IForm GetForm(Syntax parent)

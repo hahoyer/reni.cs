@@ -11,10 +11,10 @@ namespace hw.Parser
     {
         readonly PrioTable PrioTable;
         readonly IScanner Scanner;
-        readonly IParserTokenType<TSourcePart> StartParserType;
+        readonly IPriorityParserTokenType<TSourcePart> StartParserType;
         public bool Trace { get; set; }
 
-        public PrioParser(PrioTable prioTable, IScanner scanner, IParserTokenType<TSourcePart> startParserType)
+        public PrioParser(PrioTable prioTable, IScanner scanner, IPriorityParserTokenType<TSourcePart> startParserType)
         {
             PrioTable = prioTable;
             Scanner = scanner;

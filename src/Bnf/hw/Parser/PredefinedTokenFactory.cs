@@ -1,19 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 
 namespace hw.Parser
 {
-    abstract class PredefinedTokenFactory<TSourcePart> : ScannerTokenType<TSourcePart>
-        where TSourcePart : class, ISourcePartProxy
+    abstract class PredefinedTokenFactory : DumpableObject, ITokenTypeFactory
     {
-        readonly ValueCache<FunctionCache<string, IParserTokenType<TSourcePart>>>
+        readonly ValueCache<FunctionCache<string, ITokenType>>
             PredefinedTokenClassesCache;
 
         protected PredefinedTokenFactory() => PredefinedTokenClassesCache =
-            new ValueCache<FunctionCache<string, IParserTokenType<TSourcePart>>>(GetDictionary);
+            new ValueCache<FunctionCache<string, ITokenType>>(GetDictionary);
 
         /// <summary>
         ///     Override this method, when the dictionary requires a key different from occurence found in source,
@@ -22,29 +22,29 @@ namespace hw.Parser
         /// </summary>
         /// <param name="id"></param>
         /// <returns>Default implementation returns the id.</returns>
-        public Func<string, string> GetTokenClassKeyFromToken {get; set;} = id => id;
+        protected virtual string GetTokenClassKeyFromToken(string id) => id;
 
-        FunctionCache<string, IParserTokenType<TSourcePart>> GetDictionary()
-            => new FunctionCache<string, IParserTokenType<TSourcePart>>
+        FunctionCache<string, ITokenType> GetDictionary()
+            => new FunctionCache<string, ITokenType>
             (
-                GetPredefinedTokenClasses().ToDictionary(item => GetTokenClassKeyFromToken(item.Id)),
+                GetPredefinedTokenClasses().ToDictionary(item => GetTokenClassKeyFromToken(item.Value)),
                 GetTokenClass
             );
 
-        protected sealed override IParserTokenType<TSourcePart> GetParserTokenType(string id)
+        ITokenType ITokenTypeFactory.Get(string id)
         {
             var key = GetTokenClassKeyFromToken(id);
-            IParserTokenType<TSourcePart> result = PredefinedTokenClassesCache.Value[key];
+            ITokenType result = PredefinedTokenClassesCache.Value[key];
             (result as IAliasKeeper)?.Add(id);
             return result;
         }
 
-        protected abstract IEnumerable<IParserTokenType<TSourcePart>> GetPredefinedTokenClasses();
-        protected abstract IParserTokenType<TSourcePart> GetTokenClass(string name);
+        protected abstract IEnumerable<ITokenType> GetPredefinedTokenClasses();
+        protected abstract ITokenType GetTokenClass(string name);
     }
 
     /// <summary>
-    ///     Use this interface at your <see cref="IParserTokenType&lt;TSourcePart&gt;" /> to register names that are acually
+    ///     Use this interface at your <see cref="IPriorityParserTokenType{TTreeItem}" /> to register names that are acually
     ///     used for your token type.
     /// </summary>
     interface IAliasKeeper

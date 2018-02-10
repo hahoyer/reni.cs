@@ -9,13 +9,13 @@ namespace Bnf.TokenClasses
     [Variant(2)]
     [Variant(3)]
     [BelongsTo(typeof(TokenFactory))]
-    sealed class RightParenthesis : TokenClass, IBracketMatch<Syntax>
+    sealed class RightParenthesis : TokenType, IBracketMatch<Syntax>
     {
         public static string TokenId(int level) => "}])".Substring(level - 1, length: 1);
 
         public RightParenthesis(int level) => Level = level;
 
-        IParserTokenType<Syntax> IBracketMatch<Syntax>.Value {get;} = new MatchedItem();
+        IPriorityParserTokenType<Syntax> IBracketMatch<Syntax>.Value {get;} = new MatchedItem();
 
         [DisableDump]
         internal int Level {get;}
@@ -28,7 +28,7 @@ namespace Bnf.TokenClasses
             var right = parent.Right;
             var left = parent.Left;
             Tracer.Assert(right == null);
-            Tracer.Assert(left.TokenClass is LeftParenthesis);
+            Tracer.Assert(left.TokenType is LeftParenthesis);
             Tracer.Assert(left.Left == null);
             Tracer.Assert(left.Right != null);
 

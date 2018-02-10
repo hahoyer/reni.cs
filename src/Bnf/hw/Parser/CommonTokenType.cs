@@ -3,8 +3,8 @@ using hw.Scanner;
 
 namespace hw.Parser
 {
-    [Obsolete("... since 18.1. Use ParserTokenType.",true)]
+    [Obsolete("... since 18.1. Use PriorityParserTokenType.",true)]
     public abstract class CommonTokenType<TTreeItem>
-        : ParserTokenType<TTreeItem>
+        : PriorityParserTokenType<TTreeItem>
         where TTreeItem : class, ISourcePartProxy {}
 }

@@ -9,23 +9,13 @@ using hw.Scanner;
 
 namespace Bnf.StructuredText
 {
-    sealed class ScannerTokenFactory : DumpableObject, ITokenFactory<ISyntax>, IScannerContext
+    sealed class ScannerTokenFactory : DumpableObject, ILexerTokenFactory, IScannerContext
     {
         static IEnumerable<KeyValuePair<string, IMatchProvider>> GetPredefinedMatchProviders(Type factoryType)
-        {
-            return
-                factoryType
-                    .Assembly
-                    .GetTypes()
-                    .Where(type => type.IsBelongingTo<INamedMatchProvider>(factoryType))
-                    .Select(CreateMatchProvider);
-        }
+            => factoryType.GetBelongings<INamedMatchProvider>().Select(CreateMatchProvider);
 
-        static KeyValuePair<string, IMatchProvider> CreateMatchProvider(Type type)
-        {
-            var tokenType = (INamedMatchProvider) Activator.CreateInstance(type);
-            return new KeyValuePair<string, IMatchProvider>(tokenType.Value, tokenType);
-        }
+        static KeyValuePair<string, IMatchProvider> CreateMatchProvider(INamedMatchProvider provider)
+            => new KeyValuePair<string, IMatchProvider>(provider.Value, provider);
 
         readonly IDictionary<string, IMatchProvider> MatchProviders;
 
@@ -38,24 +28,33 @@ namespace Bnf.StructuredText
                     .ToDictionary(i => i.Key, i => i.Value);
         }
 
-        IMatchProvider IScannerContext.Resolve(string name) => MatchProviders[name];
-        IParserTokenType<ISyntax> ITokenFactory<ISyntax>.BeginOfText => new BeginOfText();
-        IScannerTokenType ITokenFactory.EndOfText => new EndOfText();
-        IScannerTokenType ITokenFactory.InvalidCharacterError => new ScannerSyntaxError(IssueId.InvalidCharacter);
-        LexerItem[] ITokenFactory.Classes => GetLexerItems(GetType());
+        ITokenType ILexerTokenFactory.EndOfText => new EndOfText();
+        ITokenType ILexerTokenFactory.InvalidCharacterError => new ScannerSyntaxError(IssueId.InvalidCharacter);
 
-        LexerItem[] GetLexerItems(Type factoryType)
-            => factoryType
-                .Assembly
-                .GetTypes()
-                .Where(type => type.IsBelongingTo<IScannerTokenType>(factoryType))
-                .Select(CreateLexerItem)
-                .OrderBy(Priority)
-                .ToArray();
+        LexerItem[] ILexerTokenFactory.Classes
+        {
+            get
+            {
+                var lexerTokenItems = GetType()
+                    .GetBelongings<ILexerTokenType>()
+                    .Select(CreateLexerItem);
+
+                var tokenItems = GetType()
+                    .GetBelongings<ITokenType>()
+                    .Select(CreateLexerItem);
+
+                return lexerTokenItems
+                    .Concat(tokenItems)
+                    .OrderBy(Priority)
+                    .ToArray();
+            }
+        }
+
+        IMatchProvider IScannerContext.Resolve(string name) => MatchProviders[name];
 
         int Priority(LexerItem item)
         {
-            var result = MatchProviders.Keys.IndexWhere(k => k == item.ScannerTokenType.Id);
+            var result = MatchProviders.Keys.IndexWhere(k => k == item.LexerTokenType.Value);
             if(result != null)
                 return result.Value;
 
@@ -63,11 +62,11 @@ namespace Bnf.StructuredText
             return 0;
         }
 
-        LexerItem CreateLexerItem(Type type)
-        {
-            var tokenType = (IScannerTokenType) Activator.CreateInstance(type);
-            return new LexerItem(tokenType, MatchProviders[tokenType.Id].Function);
-        }
+        LexerItem CreateLexerItem(ILexerTokenType type)
+            => new LexerItem(type, MatchProviders[type.Value].Function);
+
+        LexerItem CreateLexerItem(ITokenType type)
+            => new LexerItem(new ImbeddedTokenType(type), MatchProviders[type.Value].Function);
     }
 
     interface IMatchProvider

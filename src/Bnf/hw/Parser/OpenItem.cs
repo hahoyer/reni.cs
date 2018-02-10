@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using hw.DebugFormatter;
+﻿using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 
@@ -10,10 +7,10 @@ namespace hw.Parser
     public sealed class OpenItem<TTreeItem> : DumpableObject
         where TTreeItem : class, ISourcePartProxy
     {
-        internal readonly IToken Token;
-        internal readonly TTreeItem Left;
-        internal readonly IParserTokenType<TTreeItem> Type;
         internal readonly PrioTable.ITargetItem BracketItem;
+        internal readonly TTreeItem Left;
+        internal readonly IPrioParserToken Token;
+        internal readonly IPriorityParserTokenType<TTreeItem> Type;
 
         internal OpenItem(TTreeItem left, Item<TTreeItem> current)
         {

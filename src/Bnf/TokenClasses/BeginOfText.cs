@@ -4,7 +4,7 @@ using hw.Parser;
 
 namespace Bnf.TokenClasses
 {
-    sealed class BeginOfText : TokenClass
+    sealed class BeginOfText : TokenType
     {
         const string TokenId = PrioTable.BeginOfText;
 

@@ -1,20 +1,21 @@
 using Bnf.Forms;
 using hw.Helper;
 using hw.Parser;
+using hw.Scanner;
 
 namespace Bnf.TokenClasses
 {
-    interface ITokenClass
+    interface ITokenType
     {
         string Id {get;}
         IForm GetForm(Syntax parent);
     }
 
-    abstract class TokenClass : ParserTokenType<Syntax>, ITokenClass
+    abstract class TokenType : PriorityParserTokenType<Syntax>, ITokenType
     {
-        string ITokenClass.Id => Id;
+        string ITokenType.Id => Id;
 
-        IForm ITokenClass.GetForm(Syntax parent) => GetForm(parent);
+        IForm ITokenType.GetForm(Syntax parent) => GetForm(parent);
 
         string Name => Id;
 

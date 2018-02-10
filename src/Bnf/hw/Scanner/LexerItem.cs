@@ -14,11 +14,11 @@ namespace hw.Scanner
         /// or null if there is no match.
         /// </summary>
         public readonly Func<SourcePosn, int?> Match;
-        public readonly IScannerTokenType ScannerTokenType;
+        public readonly ILexerTokenType LexerTokenType;
 
-        public LexerItem(IScannerTokenType scannerTokenType, Func<SourcePosn, int?> match)
+        public LexerItem(ILexerTokenType lexerTokenType, Func<SourcePosn, int?> match)
         {
-            ScannerTokenType = scannerTokenType;
+            LexerTokenType = lexerTokenType;
             Match = match;
         }
     }

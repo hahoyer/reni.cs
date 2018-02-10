@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Reflection;
+using Bnf.Tests;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.UnitTest;
@@ -10,7 +11,7 @@ namespace Bnf
     {
         public static void Main()
         {
-            new Tests.StructuredTextTest().Case();
+            new StructuredTextTest().Case();
             RunAllTests();
             //ExecT4CompilerGeneratedTest();
         }
