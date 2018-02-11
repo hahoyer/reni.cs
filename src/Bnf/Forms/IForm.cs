@@ -1,20 +1,47 @@
 using System.Collections.Generic;
-using Bnf.Contexts;
 using Bnf.StructuredText;
 using hw.Scanner;
 
 namespace Bnf.Forms
 {
-    interface IForm
-    {
-        string GetResult(IContext context);
-    }
+    interface IForm {}
 
     interface IError {}
 
     interface IExpression : IForm
     {
         int? Match(SourcePosn sourcePosn, IScannerContext scannerContext);
+
+        T Parse<T>(IParserCursor source, IContext<T> context)
+            where T : class, ISourcePartProxy, IParseSpan;
+    }
+
+    interface IParserCursor
+    {
+        int Current {get;}
+        IParserCursor Clone {get;}
+        void Add(int value);
+    }
+
+    interface IParseSpan
+    {
+        int Value {get;}
+    }
+
+    interface IContext<T>
+        where T : class, IParseSpan, ISourcePartProxy
+    {
+        IDeclaration<T> this[string name] {get;}
+        TokenGroup this[IParserCursor source] {get;}
+        T Repeat(IEnumerable<T> parseData);
+        T Sequence(IEnumerable<T> data);
+    }
+
+    interface IDeclaration<T>
+        where T : class, IParseSpan, ISourcePartProxy
+    {
+        string Name {get;}
+        T Parse(IParserCursor source, IContext<T> context);
     }
 
     interface IStatements : IForm, IListForm<IStatement> {}

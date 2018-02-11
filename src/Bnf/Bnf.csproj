@@ -39,7 +39,6 @@
     <Compile Include="hw\Parser\CachingTokenFactory.cs" />
     <Compile Include="hw\Parser\ITokenFactory.cs" />
     <Compile Include="hw\Scanner\ImbeddedTokenType.cs" />
-    <Compile Include="InterfaceContext.cs" />
     <Compile Include="Scanner\ScannerTokenFactory.cs" />
     <Compile Include="Scanner\TokenFactory.cs" />
     <Compile Include="StructuredText\BnfDefinitions.cs" />
@@ -47,7 +46,8 @@
     <Compile Include="StructuredText\Comment.cs" />
     <Compile Include="StructuredText\Compiler.cs" />
     <Compile Include="StructuredText\Context.cs" />
-    <Compile Include="StructuredText\Identifier.cs" />
+    <Compile Include="StructuredText\TokenClasses\Identifier.cs" />
+    <Compile Include="Base\Definitions.cs" />
     <Compile Include="StructuredText\ScannerTokenFactory.cs" />
     <Compile Include="StructuredText\WhiteSpace.cs" />
     <Compile Include="Tests\StructuredTextTest.cs" />

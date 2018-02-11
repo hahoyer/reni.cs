@@ -20,7 +20,7 @@ namespace hw.Parser
             readonly IDictionary<Type, object> Components =
                 new Dictionary<Type, object>();
 
-            readonly ValueCache<IPriorityParser<TSourcePart>> ParserCache;
+            readonly ValueCache<IParser<TSourcePart>> ParserCache;
             readonly ValueCache<ISubParser<TSourcePart>> SubParserCache;
             static ComponentData() => Tracer.Dumper.Configuration.Handlers.Add(typeof(Delegate), (type, o) => "?");
 
@@ -34,7 +34,7 @@ namespace hw.Parser
                 Add(prioTable, component);
                 Add(tokenFactory, component);
                 Add(converter, component);
-                ParserCache = new ValueCache<IPriorityParser<TSourcePart>>(() => CreateParser(tokenFactory.BeginOfText));
+                ParserCache = new ValueCache<IParser<TSourcePart>>(() => CreateParser(tokenFactory.BeginOfText));
                 SubParserCache = new ValueCache<ISubParser<TSourcePart>>(CreateSubParser);
             }
 
@@ -49,12 +49,12 @@ namespace hw.Parser
             PrioTable PrioTable => Get<PrioTable>();
             ITokenFactory<TSourcePart>  TokenFactory => Get<ITokenFactory<TSourcePart>>();
 
-            internal IPriorityParser<TSourcePart> Parser => ParserCache.Value;
+            internal IParser<TSourcePart> Parser => ParserCache.Value;
             internal ISubParser<TSourcePart> SubParser => SubParserCache.Value;
 
-            ISubParser<TSourcePart> CreateSubParser() => new SubParser<TSourcePart>(Parser, Converter);
+            ISubParser<TSourcePart> CreateSubParser() => new SubParser<TSourcePart>((IPriorityParser<TSourcePart>) Parser, Converter);
 
-            IPriorityParser<TSourcePart> CreateParser(IPriorityParserTokenType<TSourcePart> beginOfText)
+            IParser<TSourcePart> CreateParser(IPriorityParserTokenType<TSourcePart> beginOfText)
             {
                 if(PrioTable == null)
                     return null;
@@ -119,7 +119,7 @@ namespace hw.Parser
                 set => Parent.Define(null, null, value, Tag);
             }
 
-            public IPriorityParser<TSourcePart> Parser => Parent.Dictionary[Tag].Parser;
+            public IParser<TSourcePart> Parser => Parent.Dictionary[Tag].Parser;
             public ISubParser<TSourcePart> SubParser => Parent.Dictionary[Tag].SubParser;
             public T Get<T>() => Parent.Dictionary[Tag].Get<T>();
             public void Add<T>(T value) {Parent.Dictionary[Tag].Add(value, this);}

@@ -1,4 +1,4 @@
-using Bnf.Contexts;
+using Bnf.Base;
 using Bnf.StructuredText;
 using hw.DebugFormatter;
 using hw.Scanner;
@@ -16,9 +16,9 @@ namespace Bnf.Forms
         int? IExpression.Match(SourcePosn sourcePosn, IScannerContext scannerContext)
             => Data.Match(sourcePosn, scannerContext) ?? 0;
 
-        protected override string GetResult(IContext context)
+        T IExpression.Parse<T>(IParserCursor source, IContext<T> context)
         {
-            NotImplementedMethod(context);
+            NotImplementedMethod(source, nameof(context));
             return null;
         }
     }

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using hw.DebugFormatter;
 using hw.Scanner;
 
@@ -12,7 +10,6 @@ namespace hw.Parser
         readonly PrioTable PrioTable;
         readonly IScanner Scanner;
         readonly IPriorityParserTokenType<TSourcePart> StartParserType;
-        public bool Trace { get; set; }
 
         public PrioParser(PrioTable prioTable, IScanner scanner, IPriorityParserTokenType<TSourcePart> startParserType)
         {
@@ -21,8 +18,13 @@ namespace hw.Parser
             StartParserType = startParserType;
         }
 
-        TSourcePart IPriorityParser<TSourcePart>.Execute
-            (SourcePosn start, Stack<OpenItem<TSourcePart>> initialStack)
+        TSourcePart IParser<TSourcePart>.Execute(SourcePosn start) => Execute(start, null);
+        public bool Trace {get; set;}
+
+        TSourcePart IPriorityParser<TSourcePart>.Execute(SourcePosn start, Stack<OpenItem<TSourcePart>> initialStack) 
+            => Execute(start, initialStack);
+
+        TSourcePart Execute(SourcePosn start, Stack<OpenItem<TSourcePart>> initialStack)
         {
             StartMethodDump(Trace, start.GetDumpAroundCurrent(50), initialStack);
             try

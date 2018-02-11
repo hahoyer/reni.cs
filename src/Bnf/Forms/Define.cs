@@ -1,4 +1,3 @@
-using Bnf.Contexts;
 using hw.DebugFormatter;
 
 namespace Bnf.Forms
@@ -25,9 +24,6 @@ namespace Bnf.Forms
 
         string IStatement.Name => Destination.Name;
         IExpression IStatement.Value => Source;
-
-        protected override string GetResult(IContext context)
-            => context.Define(Destination.Name, Source);
 
         protected override string GetNodeDump() => base.GetNodeDump() + "." + Destination.Name;
     }

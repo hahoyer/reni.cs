@@ -16,8 +16,6 @@ namespace Bnf.Tests
 
             var form = compiler.Syntax.Form;
             Tracer.Line(Tracer.Dump(form));
-            var code = compiler.Interfaces;
-            Tracer.Line(code);
             Tracer.TraceBreak();
         }
 
@@ -30,8 +28,6 @@ namespace Bnf.Tests
 
             var form = compiler.Syntax.Form;
             Tracer.Line(Tracer.Dump(form));
-            var code = compiler.Interfaces;
-            Tracer.Line(code);
             Tracer.TraceBreak();
         }
     }

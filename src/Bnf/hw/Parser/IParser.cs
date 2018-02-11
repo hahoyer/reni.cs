@@ -12,11 +12,10 @@ namespace hw.Parser
         bool Trace { get; set; }
     }
 
-    public interface IPriorityParser<TSourcePart>
+    public interface IPriorityParser<TSourcePart>: IParser<TSourcePart>
         where TSourcePart : class, ISourcePartProxy
     {
-        TSourcePart Execute(SourcePosn start, Stack<OpenItem<TSourcePart>> stack = null);
-        bool Trace { get; set; }
+        TSourcePart Execute(SourcePosn start, Stack<OpenItem<TSourcePart>> stack );
     }
 
     public interface ISubParser<TSourcePart>

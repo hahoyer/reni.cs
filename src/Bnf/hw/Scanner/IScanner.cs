@@ -33,16 +33,25 @@ namespace hw.Scanner
 
     public sealed class LexerToken : DumpableObject
     {
+        static int NextObjectId;
+
         [DisableDump]
         internal readonly SourcePart SourcePart;
+
         [DisableDump]
         internal readonly ILexerTokenType Type;
+
+        public LexerToken()
+            : base(NextObjectId++) {}
 
         public LexerToken(SourcePart sourcePart, ILexerTokenType type)
         {
             SourcePart = sourcePart;
             Type = type;
         }
+
+        protected override string GetNodeDump()
+            => Type.Value + "(" + SourcePart.Position + "(" + SourcePart.Length + "))";
     }
 
     public interface ITokenType : IUniqueIdProvider {}
@@ -59,5 +68,8 @@ namespace hw.Scanner
             Characters = characters;
             Type = type;
         }
+
+        public SourcePart SourcePart 
+            => PrefixItems.Select(i => i.SourcePart).Aggregate() + Characters;
     }
 }

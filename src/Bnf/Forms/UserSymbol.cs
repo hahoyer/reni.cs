@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using Bnf.Contexts;
 using Bnf.StructuredText;
 using hw.DebugFormatter;
 using hw.Scanner;
@@ -16,13 +14,10 @@ namespace Bnf.Forms
 
         string Define.IDestination.Name => Name;
 
+        T IExpression.Parse<T>(IParserCursor source, IContext<T> context) 
+            => context[Name].Parse(source, context);
+
         int? IExpression.Match(SourcePosn sourcePosn, IScannerContext scannerContext)
             => scannerContext.Resolve(Name).Function(sourcePosn);
-
-        protected override string GetResult(IContext context)
-        {
-            NotImplementedFunction(context);
-            return null;
-        }
     }
 }

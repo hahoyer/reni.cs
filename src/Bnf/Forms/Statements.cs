@@ -1,5 +1,4 @@
 using System.Linq;
-using Bnf.Contexts;
 using hw.DebugFormatter;
 using hw.Helper;
 
@@ -14,9 +13,5 @@ namespace Bnf.Forms
             : base(parent) => Data = data;
 
         IStatement[] IListForm<IStatement>.Data => Data;
-
-        protected override string GetResult(IContext context) 
-            => context.Statements(Data);
-
     }
 }

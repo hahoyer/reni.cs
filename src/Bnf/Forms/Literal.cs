@@ -1,4 +1,3 @@
-using Bnf.Contexts;
 using Bnf.StructuredText;
 using hw.DebugFormatter;
 using hw.Scanner;
@@ -48,9 +47,13 @@ namespace Bnf.Forms
         int? IExpression.Match(SourcePosn sourcePosn, IScannerContext scannerContext)
             => sourcePosn.StartsWith(Text) ? (int?) Text.Length : null;
 
-        protected override string GetResult(IContext context)
+        T IExpression.Parse<T>(IParserCursor source, IContext<T> context)
         {
-            NotImplementedFunction(context);
+            var token = context[source];
+            if(token.Characters.Id != Text)
+                return null;
+            
+            NotImplementedMethod(source, nameof(context), nameof(token), token);
             return null;
         }
     }

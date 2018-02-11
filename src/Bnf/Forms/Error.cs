@@ -1,6 +1,3 @@
-using System;
-using Bnf.Contexts;
-
 namespace Bnf.Forms
 {
     sealed class Error<T> : IForm, IError
@@ -15,8 +12,6 @@ namespace Bnf.Forms
             Form = form;
         }
 
-        string IForm.GetResult(IContext context) => throw new NotImplementedException();
-
         string Message => "Form is not " + typeof(T).Name;
     }
 
@@ -30,7 +25,5 @@ namespace Bnf.Forms
             Parent = parent;
             IssueId = issueId;
         }
-
-        string IForm.GetResult(IContext context) => throw new NotImplementedException();
     }
 }

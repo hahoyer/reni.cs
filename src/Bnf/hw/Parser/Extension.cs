@@ -74,7 +74,10 @@ namespace hw.Parser
         public static IEnumerable<T> GetBelongings<T>(this Type factoryType)
             => factoryType
                 .GetBelongingTypes<T>()
-                .Select(t => (T) Activator.CreateInstance(t));
+                .Select(t => (T) Singletons[t]);
+
+        static readonly FunctionCache<Type, object> Singletons 
+            = new FunctionCache<Type, object>(Activator.CreateInstance);
 
         public static IEnumerable<Type> GetBelongingTypes<T>(this Type factoryType)
             => factoryType

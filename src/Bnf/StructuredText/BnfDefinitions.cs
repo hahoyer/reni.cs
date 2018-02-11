@@ -2,7 +2,7 @@
 {
     static class BnfDefinitions
     {
-        public const string Parser = @"elementary_type_name ::= numeric_type_name | date_type_name| bit_string_type_name | 'STRING' | 'WSTRING' | 'TIME';
+        public const string Parser = @"structured_text ::= statement_list;elementary_type_name ::= numeric_type_name | date_type_name| bit_string_type_name | 'STRING' | 'WSTRING' | 'TIME';
 numeric_type_name ::= integer_type_name | real_type_name;
 integer_type_name ::= signed_integer_type_name| unsigned_integer_type_name;
 signed_integer_type_name ::= 'SINT' | 'INT' | 'DINT' | 'LINT';
