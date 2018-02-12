@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Bnf.Forms;
+using Bnf.Parser;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
@@ -12,6 +13,8 @@ namespace Bnf.Base
     sealed class Definitions<T> : DumpableObject
         where T : class, IParseSpan, ISourcePartProxy
     {
+        readonly string RootName;
+
         sealed class BnfDefinition : DumpableObject, IDeclaration<T>
         {
             readonly IExpression Expression;
@@ -31,11 +34,14 @@ namespace Bnf.Base
 
         internal readonly IDictionary<string, IDeclaration<T>> Data;
 
-        internal Definitions(IDictionary<string, IExpression> data)
+        internal Definitions(IDictionary<string, IExpression> data, string rootName)
         {
+            RootName = rootName;
             Data = data
                 .ToDictionary(i => i.Key, i => (IDeclaration<T>) new BnfDefinition(i.Key, i.Value));
         }
+
+        public IDeclaration<T> Root => Data[RootName];
 
         public void Register(Type type)
             => Data.AddRange(type.GetBelongings<IDeclaration<T>>().ToDictionary(i => i.Name, i => i));

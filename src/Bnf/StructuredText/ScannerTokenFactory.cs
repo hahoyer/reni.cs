@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Bnf.Forms;
+using Bnf.Parser;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
@@ -19,13 +20,12 @@ namespace Bnf.StructuredText
 
         readonly IDictionary<string, IMatchProvider> MatchProviders;
 
-        public ScannerTokenFactory()
+        public ScannerTokenFactory(IDictionary<string, IExpression> definitionTextStatements)
         {
-            var statements = Bnf.Compiler.FromText(BnfDefinitions.Scanner).Statements;
             MatchProviders =
-                statements.ToDictionary(i => i.Key, i => (IMatchProvider) new BnfMatchProvider(i.Value, this))
-                    .Concat(GetPredefinedMatchProviders(GetType()))
-                    .ToDictionary(i => i.Key, i => i.Value);
+                Enumerable.ToDictionary<KeyValuePair<string, IMatchProvider>, string, IMatchProvider>(
+                        definitionTextStatements.ToDictionary(i => i.Key, i => (IMatchProvider) new BnfMatchProvider(i.Value, this))
+                            .Concat(GetPredefinedMatchProviders(GetType())), i => i.Key, i => i.Value);
         }
 
         ITokenType ILexerTokenFactory.EndOfText => new EndOfText();

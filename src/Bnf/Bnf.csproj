@@ -42,7 +42,7 @@
     <Compile Include="Scanner\ScannerTokenFactory.cs" />
     <Compile Include="Scanner\TokenFactory.cs" />
     <Compile Include="StructuredText\BnfDefinitions.cs" />
-    <Compile Include="StructuredText\BnfParser.cs" />
+    <Compile Include="Parser\BnfParser.cs" />
     <Compile Include="StructuredText\Comment.cs" />
     <Compile Include="StructuredText\Compiler.cs" />
     <Compile Include="StructuredText\Context.cs" />
