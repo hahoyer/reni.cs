@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Bnf.Parser;
-using Bnf.StructuredText;
 using hw.DebugFormatter;
 using hw.Scanner;
 
@@ -52,15 +51,10 @@ namespace Bnf.Forms
         T IExpression.Parse<T>(IParserCursor source, IContext<T> context)
         {
             var token = context[source];
-            if(token.Characters.Id != Text)
-                return null;
-            
-            NotImplementedMethod(source, nameof(context), nameof(token), token);
-            return null;
+            return token.Characters.Id == Text ? context.LiteralMatch(token) : null;
         }
 
         IEnumerable<IExpression> IExpression.Children {get {yield break;}}
         string ILiteral.Value => Text;
     }
-
 }

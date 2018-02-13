@@ -2,7 +2,6 @@
 using System.Linq;
 using Bnf.Base;
 using Bnf.Forms;
-using Bnf.StructuredText;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
@@ -15,6 +14,7 @@ namespace Bnf.Parser
     {
         sealed class Cursor : DumpableObject, IParserCursor
         {
+            [EnableDump]
             int Position;
 
             public Cursor() {}
@@ -59,6 +59,9 @@ namespace Bnf.Parser
                 return null;
             }
 
+            T IContext<T>.LiteralMatch(TokenGroup token) 
+                => Parent.ResultFactory.LiteralMatch(token);
+
             TokenGroup IContext<T>.this[IParserCursor source]
             {
                 get
@@ -79,8 +82,8 @@ namespace Bnf.Parser
         }
 
         readonly Definitions<T> Definitions;
-        readonly IScanner Scanner;
         readonly IResultFactory<T> ResultFactory;
+        readonly IScanner Scanner;
 
 
         public BnfParser(IScanner scanner, Definitions<T> definitions, IResultFactory<T> resultFactory)
@@ -100,10 +103,11 @@ namespace Bnf.Parser
     {
         T EmptyRepeat {get;}
         T EmptySequence {get;}
+        T LiteralMatch(TokenGroup token);
     }
+
     sealed class EndOfText : DumpableObject, ITokenType
     {
         string IUniqueIdProvider.Value => "<endoftext>";
     }
-
 }

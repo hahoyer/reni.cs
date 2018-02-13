@@ -10,12 +10,11 @@ namespace Bnf.Forms
 
     interface IExpression : IForm
     {
+        IEnumerable<IExpression> Children {get;}
         int? Match(SourcePosn sourcePosn, IScannerContext scannerContext);
 
         T Parse<T>(IParserCursor source, IContext<T> context)
             where T : class, ISourcePartProxy, IParseSpan;
-
-        IEnumerable<IExpression> Children {get;}
     }
 
     interface ILiteral
@@ -42,14 +41,15 @@ namespace Bnf.Forms
         TokenGroup this[IParserCursor source] {get;}
         T Repeat(IEnumerable<T> parseData);
         T Sequence(IEnumerable<T> data);
+        T LiteralMatch(TokenGroup token);
     }
 
     interface IDeclaration<T>
         where T : class, IParseSpan, ISourcePartProxy
     {
         string Name {get;}
-        T Parse(IParserCursor source, IContext<T> context);
         IEnumerable<IExpression> Items {get;}
+        T Parse(IParserCursor source, IContext<T> context);
     }
 
     interface IStatements : IForm, IListForm<IStatement> {}

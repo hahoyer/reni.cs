@@ -83,9 +83,10 @@ namespace Bnf.Parser
             => new LexerItem(new ImbeddedTokenType(type), MatchProviders[type.Value].Function);
     }
 
-    sealed class ParserLiteral : DumpableObject, ILexerTokenType
+    sealed class ParserLiteral : DumpableObject, IFactoryTokenType, ITokenType
     {
         string IUniqueIdProvider.Value => "<parserliteral>";
+        ITokenType ITokenTypeFactory.Get(string id) => this;
     }
 
     interface IMatchProvider
