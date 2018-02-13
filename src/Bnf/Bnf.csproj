@@ -48,7 +48,7 @@
     <Compile Include="StructuredText\Context.cs" />
     <Compile Include="StructuredText\TokenClasses\Identifier.cs" />
     <Compile Include="Base\Definitions.cs" />
-    <Compile Include="StructuredText\ScannerTokenFactory.cs" />
+    <Compile Include="Parser\ScannerTokenFactory.cs" />
     <Compile Include="StructuredText\WhiteSpace.cs" />
     <Compile Include="Tests\StructuredTextTest.cs" />
     <Compile Include="TokenClasses\BeginOfText.cs" />

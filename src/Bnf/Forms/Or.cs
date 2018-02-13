@@ -1,4 +1,5 @@
 using System.Linq;
+using Bnf.Parser;
 using Bnf.StructuredText;
 using hw.DebugFormatter;
 using hw.Scanner;

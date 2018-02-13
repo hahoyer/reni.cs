@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using Bnf.Parser;
 using Bnf.StructuredText;
 using hw.DebugFormatter;
 using hw.Scanner;
@@ -56,5 +58,14 @@ namespace Bnf.Forms
             NotImplementedMethod(source, nameof(context), nameof(token), token);
             return null;
         }
+
+        IEnumerable<ITerminal> IExpression.Terminals
+        {
+            get
+            {
+                yield break;
+            }
+        }
+
     }
 }

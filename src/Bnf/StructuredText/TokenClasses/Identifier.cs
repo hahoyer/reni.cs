@@ -1,4 +1,6 @@
-﻿using Bnf.Forms;
+﻿using System.Collections.Generic;
+using Bnf.Forms;
+using Bnf.Parser;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
@@ -24,5 +26,11 @@ namespace Bnf.StructuredText.TokenClasses
         string IDeclaration<ISyntax>.Name => Name;
 
         string IUniqueIdProvider.Value => Name;
+
+        IEnumerable<ITerminal> IDeclaration<ISyntax>.Terminals
+        {
+            get {yield break;}
+        }
+
     }
 }

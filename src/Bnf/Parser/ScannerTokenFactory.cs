@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using Bnf.Forms;
-using Bnf.Parser;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
 
-namespace Bnf.StructuredText
+namespace Bnf.Parser
 {
     sealed class ScannerTokenFactory : DumpableObject, ILexerTokenFactory, IScannerContext
     {
@@ -19,14 +18,22 @@ namespace Bnf.StructuredText
             => new KeyValuePair<string, IMatchProvider>(provider.Value, provider);
 
         readonly IDictionary<string, IMatchProvider> MatchProviders;
+        readonly IMatch ParserLiteralMatch;
 
-        public ScannerTokenFactory(IDictionary<string, IExpression> definitionTextStatements)
+        public ScannerTokenFactory
+        (
+            IDictionary<string, IExpression> scannerDefinitions,
+            IMatch parserLiteralMatch
+        )
         {
+            ParserLiteralMatch = parserLiteralMatch;
             MatchProviders =
-                Enumerable.ToDictionary<KeyValuePair<string, IMatchProvider>, string, IMatchProvider>(
-                        definitionTextStatements.ToDictionary(i => i.Key, i => (IMatchProvider) new BnfMatchProvider(i.Value, this))
-                            .Concat(GetPredefinedMatchProviders(GetType())), i => i.Key, i => i.Value);
+                scannerDefinitions
+                    .ToDictionary(i => i.Key, i => (IMatchProvider) new BnfMatchProvider(i.Value, this))
+                    .Concat(GetPredefinedMatchProviders(GetType()))
+                    .ToDictionary(i => i.Key, i => i.Value);
         }
+
 
         ITokenType ILexerTokenFactory.EndOfText => new EndOfText();
         ITokenType ILexerTokenFactory.InvalidCharacterError => new ScannerSyntaxError(IssueId.InvalidCharacter);
@@ -43,9 +50,16 @@ namespace Bnf.StructuredText
                     .GetBelongings<ITokenType>()
                     .Select(CreateLexerItem);
 
+                var parserLiteralItem = new LexerItem
+                (
+                    new ParserLiteral(),
+                    sourcePosition => ParserLiteralMatch.Match(sourcePosition)
+                );
+
                 return lexerTokenItems
                     .Concat(tokenItems)
                     .OrderBy(Priority)
+                    .Concat(new[] {parserLiteralItem})
                     .ToArray();
             }
         }
@@ -67,6 +81,11 @@ namespace Bnf.StructuredText
 
         LexerItem CreateLexerItem(ITokenType type)
             => new LexerItem(new ImbeddedTokenType(type), MatchProviders[type.Value].Function);
+    }
+
+    sealed class ParserLiteral : DumpableObject, ILexerTokenType
+    {
+        string IUniqueIdProvider.Value => "<parserliteral>";
     }
 
     interface IMatchProvider
@@ -95,5 +114,13 @@ namespace Bnf.StructuredText
     interface IScannerContext
     {
         IMatchProvider Resolve(string name);
+    }
+
+    sealed class ScannerSyntaxError : DumpableObject, ITokenType
+    {
+        readonly IssueId IssueId;
+        public ScannerSyntaxError(IssueId issueId) => IssueId = issueId;
+
+        string IUniqueIdProvider.Value => "<error>";
     }
 }
