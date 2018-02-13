@@ -1,5 +1,5 @@
+using System.Collections.Generic;
 using Bnf.Parser;
-using Bnf.StructuredText;
 using hw.DebugFormatter;
 using hw.Scanner;
 
@@ -15,8 +15,10 @@ namespace Bnf.Forms
 
         string Define.IDestination.Name => Name;
 
-        T IExpression.Parse<T>(IParserCursor source, IContext<T> context) 
+        T IExpression.Parse<T>(IParserCursor source, IContext<T> context)
             => context[Name].Parse(source, context);
+
+        IEnumerable<IExpression> IExpression.Children {get {yield break;}}
 
         int? IExpression.Match(SourcePosn sourcePosn, IScannerContext scannerContext)
             => scannerContext.Resolve(Name).Function(sourcePosn);

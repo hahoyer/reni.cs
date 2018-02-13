@@ -25,12 +25,8 @@ namespace Bnf.StructuredText.TokenClasses
 
         string IDeclaration<ISyntax>.Name => Name;
 
+        IEnumerable<IExpression> IDeclaration<ISyntax>.Items {get {yield break;}}
+
         string IUniqueIdProvider.Value => Name;
-
-        IEnumerable<ITerminal> IDeclaration<ISyntax>.Terminals
-        {
-            get {yield break;}
-        }
-
     }
 }

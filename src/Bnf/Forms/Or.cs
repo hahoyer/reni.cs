@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Bnf.Parser;
 using Bnf.StructuredText;
@@ -19,6 +20,8 @@ namespace Bnf.Forms
 
         T IExpression.Parse<T>(IParserCursor source, IContext<T> context)
             => Data.Select(e => e.Parse(source, context)).FirstOrDefault(i => i != null);
+
+        IEnumerable<IExpression> IExpression.Children => Data;
 
         IExpression[] IListForm<IExpression>.Data => Data;
     }

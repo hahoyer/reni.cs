@@ -15,10 +15,13 @@ namespace Bnf.Forms
         T Parse<T>(IParserCursor source, IContext<T> context)
             where T : class, ISourcePartProxy, IParseSpan;
 
-        IEnumerable<ITerminal> Terminals {get;}
+        IEnumerable<IExpression> Children {get;}
     }
 
-    interface ITerminal {}
+    interface ILiteral
+    {
+        string Value {get;}
+    }
 
     interface IParserCursor
     {
@@ -46,7 +49,7 @@ namespace Bnf.Forms
     {
         string Name {get;}
         T Parse(IParserCursor source, IContext<T> context);
-        IEnumerable<ITerminal> Terminals {get;}
+        IEnumerable<IExpression> Items {get;}
     }
 
     interface IStatements : IForm, IListForm<IStatement> {}

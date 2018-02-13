@@ -28,10 +28,13 @@ namespace Bnf.Base
             T IDeclaration<T>.Parse(IParserCursor source, IContext<T> context)
                 => Expression.Parse(source, context);
 
-            IEnumerable<ITerminal> IDeclaration<T>.Terminals => Expression.Terminals;
+            IEnumerable<IExpression> IDeclaration<T>.Items
+                => Expression.SelectHierachical(parent => parent.Children);
         }
 
+        [DisableDump]
         internal readonly IDictionary<string, IDeclaration<T>> Data;
+
         readonly string RootName;
 
         internal Definitions(IDictionary<string, IExpression> data, string rootName)
@@ -41,33 +44,37 @@ namespace Bnf.Base
                 .ToDictionary(i => i.Key, i => (IDeclaration<T>) new BnfDefinition(i.Key, i.Value));
         }
 
+        [DisableDump]
         public IDeclaration<T> Root => Data[RootName];
 
-        public IMatch ParserLiteralMatch
-            => RelevantDefintions()
-                .SelectMany(ParserLiterals)
-                .OrderByDescending(i => i.Length)
-                .Select(i => i.Box())
-                .Aggregate((t, n) => t.Else(n));
+        [DisableDump]
+        public IMatch ParserLiteralMatch => RelevantDefintions()
+                           .SelectMany(ParserLiterals)
+                           .OrderByDescending(i => i.Length)
+                           .Select(i => i.Box())
+                           .Aggregate((t, n) => t.Else(n));
 
-        IEnumerable<string> ParserLiterals(IExpression expression)
-        {
-            NotImplementedMethod(expression);
-            return null;
-        }
+        static IEnumerable<string> ParserLiterals(IDeclaration<T> declaration) 
+            => declaration.Items.OfType<ILiteral>().Select(i => i.Value);
 
-        IEnumerable<IExpression> RelevantDefintions()
+        IEnumerable<IDeclaration<T>> RelevantDefintions() 
+            => new[] {RootName}.Closure(Expand).SelectMany(Resolve);
+
+        IEnumerable<IDeclaration<T>> Resolve(string name)
         {
-            var x = new[]{RootName}.Closure(Expand);
-            NotImplementedMethod();
-            return null;
+            Data.TryGetValue(name, out var result);
+            if(result != null)
+                yield return result;
         }
 
         IEnumerable<string> Expand(string name)
         {
-            var terminals = Data[name].Terminals;
-            NotImplementedMethod(name);
-            return null;
+            if(Data.TryGetValue(name, out var value))
+                return value
+                    .Items
+                    .OfType<Define.IDestination>()
+                    .Select(i => i.Name);
+            return new string[0];
         }
 
         public void Register(Type type)

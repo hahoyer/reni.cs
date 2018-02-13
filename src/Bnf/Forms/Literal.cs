@@ -6,7 +6,7 @@ using hw.Scanner;
 
 namespace Bnf.Forms
 {
-    sealed class Literal : Form, IExpression
+    sealed class Literal : Form, IExpression, ILiteral
     {
         static string Parse(string name)
         {
@@ -59,13 +59,8 @@ namespace Bnf.Forms
             return null;
         }
 
-        IEnumerable<ITerminal> IExpression.Terminals
-        {
-            get
-            {
-                yield break;
-            }
-        }
-
+        IEnumerable<IExpression> IExpression.Children {get {yield break;}}
+        string ILiteral.Value => Text;
     }
+
 }

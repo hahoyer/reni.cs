@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Bnf.Parser;
-using Bnf.StructuredText;
 using hw.DebugFormatter;
 using hw.Scanner;
 
@@ -25,6 +24,8 @@ namespace Bnf.Forms
                 data.Add(result);
             }
         }
+
+        IEnumerable<IExpression> IExpression.Children {get {yield return Data;}}
 
         int? IExpression.Match(SourcePosn sourcePosn, IScannerContext scannerContext)
         {
