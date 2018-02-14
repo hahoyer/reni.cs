@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Bnf.Parser;
 using hw.DebugFormatter;
 using hw.Scanner;
@@ -17,10 +18,8 @@ namespace Bnf.Forms
             => Data.Match(sourcePosn, scannerContext) ?? 0;
 
         T IExpression.Parse<T>(IParserCursor source, IContext<T> context)
-        {
-            NotImplementedMethod(source, nameof(context));
-            return null;
-        }
+            => Data.Parse(source, context) ??
+               context.Repeat(Enumerable.Empty<T>());
 
         IEnumerable<IExpression> IExpression.Children {get {yield return Data;}}
     }

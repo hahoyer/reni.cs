@@ -231,17 +231,19 @@ control_variable ::= identifier;
 for_list ::= expression 'TO' expression ['BY' expression];
 while_statement ::= 'WHILE' expression 'DO' statement_list 'END_WHILE';
 repeat_statement ::='REPEAT' statement_list 'UNTIL' expression 'END_REPEAT';
-exit_statement ::= 'EXIT'";
+exit_statement ::= 'EXIT';
+
+constant ::= numeric_literal | character_string | time_literal | bit_string_literal | boolean_literal;
+numeric_literal ::= integer_literal | real_literal;
+integer_literal ::= [ integer_type_name '#' ]( signed_integer | binary_integer | octal_integer | hex_integer);
+
+";
 
         public const string Scanner = @"whitespace ::= ' '| '\t' | '\n' | '\r';digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
 octal_digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7';
 hex_digit ::= digit | 'A'|'B'|'C'|'D'|'E'|'F'                 ;
 identifier ::= (letter | ('_' (letter | digit))) {['_'] (letter | digit)};
 
-constant ::= numeric_literal | character_string | time_literal | bit_string_literal | boolean_literal;
-
-numeric_literal ::= integer_literal | real_literal;
-integer_literal ::= [ integer_type_name '#' ]( signed_integer | binary_integer | octal_integer | hex_integer);
 signed_integer ::= ['+' |'-'] integer;
 integer ::= digit {['_'] digit};
 binary_integer ::= '2#' bit {['_'] bit};

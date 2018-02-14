@@ -29,4 +29,23 @@ namespace Bnf.StructuredText.TokenClasses
 
         string IUniqueIdProvider.Value => Name;
     }
+
+    [BelongsTo(typeof(ScannerTokenFactory))]
+    [BelongsTo(typeof(Compiler))]
+    sealed class SignedInteger : DumpableObject, ITokenType, IDeclaration<ISyntax>
+    {
+        const string Name = "signed_integer";
+
+        ISyntax IDeclaration<ISyntax>.Parse(IParserCursor source, IContext<ISyntax> context)
+        {
+            NotImplementedMethod(source, context);
+            return null;
+        }
+
+        string IDeclaration<ISyntax>.Name => Name;
+
+        IEnumerable<IExpression> IDeclaration<ISyntax>.Items {get {yield break;}}
+
+        string IUniqueIdProvider.Value => Name;
+    }
 }
