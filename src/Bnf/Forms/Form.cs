@@ -10,5 +10,8 @@ namespace Bnf.Forms
 
         protected Form(Syntax parent)
             : base(NextObjectId++) => Parent = parent;
+
+        protected Form(Syntax parent, int objectId)
+            : base(objectId) => Parent = parent;
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Bnf.Base;
 using Bnf.Parser;
 using hw.DebugFormatter;
 using hw.Scanner;
@@ -17,22 +18,25 @@ namespace Bnf.Forms
         int? IExpression.Match(SourcePosn sourcePosn, IScannerContext scannerContext)
             => Data.Select(e => e.Match(sourcePosn, scannerContext)).FirstOrDefault(i => i != null);
 
-        T IExpression.Parse<T>(IParserCursor source, IContext<T> context)
+        OccurenceDictionary<T> IExpression.GetTokenOccurences<T>(Definitions<T>.IContext context)
         {
-            StartMethodDump(false, source, context);
+            NotImplementedMethod(context);
+            return null;
+        }
+
+        T IExpression.Parse<T>(IParserCursor cursor, IContext<T> context)
+        {
+            StartMethodDump(false, cursor, context);
 
             try
             {
-                foreach(var expression in Data)
-                {
-                    Dump(nameof(expression), expression);
-                    var result = expression.Parse(source, context);
-                    Dump(nameof(result), result);
-                    if(result != null)
-                        return ReturnMethodDump(result);
-                }
+                var results = Data
+                    .Select(expression => expression.Parse(cursor, context))
+                    .OrderByDescending(r => r?.Value ?? -1);
 
-                return ReturnMethodDump<T>(null);
+                var result = results.FirstOrDefault();
+
+                return ReturnMethodDump(result);
             }
             finally
             {

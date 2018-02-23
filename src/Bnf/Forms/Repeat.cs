@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Bnf.Base;
 using Bnf.Parser;
 using hw.DebugFormatter;
 using hw.Scanner;
@@ -13,12 +14,18 @@ namespace Bnf.Forms
         public Repeat(Syntax parent, IExpression data)
             : base(parent) => Data = data;
 
-        T IExpression.Parse<T>(IParserCursor source, IContext<T> context)
+        OccurenceDictionary<T> IExpression.GetTokenOccurences<T>(Definitions<T>.IContext context)
+        {
+            var children = Data.GetTokenOccurences(context);
+            return context.CreateRepeat(children);
+        }
+
+        T IExpression.Parse<T>(IParserCursor cursor, IContext<T> context)
         {
             var data = new List<T>();
             while(true)
             {
-                var result = Data.Parse(source, context);
+                var result = Data.Parse(cursor, context);
                 if(result == null)
                     return context.Repeat(data);
                 data.Add(result);

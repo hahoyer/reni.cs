@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Bnf.Forms;
+﻿using Bnf.Forms;
 using Bnf.Parser;
 using hw.DebugFormatter;
 using hw.Helper;
@@ -8,44 +7,182 @@ using hw.Scanner;
 
 namespace Bnf.StructuredText.TokenClasses
 {
-    [BelongsTo(typeof(ScannerTokenFactory))]
-    [BelongsTo(typeof(Compiler))]
-    sealed class Identifier : DumpableObject, ITokenType, IDeclaration<ISyntax>
+    abstract class Terminal : DumpableObject, ITokenType, IHiearachicalItem<ISyntax>, ILiteral
     {
-        const string Name = "identifier";
-
-        ISyntax IDeclaration<ISyntax>.Parse(IParserCursor source, IContext<ISyntax> context)
+        ISyntax IHiearachicalItem<ISyntax>.Parse(IParserCursor source, IContext<ISyntax> context)
         {
             var token = context[source];
-            if(token.Type == this)
-                return new Singleton(token);
-            NotImplementedMethod(source, context);
-            return null;
+            return token.Type == this ? CreateMatch(token) : null;
         }
 
-        string IDeclaration<ISyntax>.Name => Name;
-
-        IEnumerable<IExpression> IDeclaration<ISyntax>.Items {get {yield break;}}
-
+        string IHiearachicalItem<ISyntax>.Name => Name;
         string IUniqueIdProvider.Value => Name;
+        protected abstract string Name {get;}
+
+        protected abstract ISyntax CreateMatch(TokenGroup token);
     }
 
     [BelongsTo(typeof(ScannerTokenFactory))]
     [BelongsTo(typeof(Compiler))]
-    sealed class SignedInteger : DumpableObject, ITokenType, IDeclaration<ISyntax>
+    sealed class Identifier : Terminal
     {
-        const string Name = "signed_integer";
+        protected override string Name => "identifier";
+        protected override ISyntax CreateMatch(TokenGroup token) => new Singleton(token);
+    }
 
-        ISyntax IDeclaration<ISyntax>.Parse(IParserCursor source, IContext<ISyntax> context)
+    [BelongsTo(typeof(ScannerTokenFactory))]
+    [BelongsTo(typeof(Compiler))]
+    sealed class SignedInteger : Terminal
+    {
+        protected override string Name => "signed_integer";
+
+        protected override ISyntax CreateMatch(TokenGroup token)
         {
-            NotImplementedMethod(source, context);
-            return null;
+            NotImplementedMethod(token);
+            return new Singleton(token);
         }
+    }
 
-        string IDeclaration<ISyntax>.Name => Name;
+    [BelongsTo(typeof(ScannerTokenFactory))]
+    [BelongsTo(typeof(Compiler))]
+    sealed class BooleanLiteral : Terminal
+    {
+        protected override string Name => "boolean_literal";
 
-        IEnumerable<IExpression> IDeclaration<ISyntax>.Items {get {yield break;}}
+        protected override ISyntax CreateMatch(TokenGroup token)
+        {
+            NotImplementedMethod(token);
+            return new Singleton(token);
+        }
+    }
 
-        string IUniqueIdProvider.Value => Name;
+    [BelongsTo(typeof(ScannerTokenFactory))]
+    [BelongsTo(typeof(Compiler))]
+    sealed class UnsignedInteger : Terminal
+    {
+        protected override string Name => "unsigned_integer";
+
+        protected override ISyntax CreateMatch(TokenGroup token)
+        {
+            NotImplementedMethod(token);
+            return new Singleton(token);
+        }
+    }
+
+    [BelongsTo(typeof(ScannerTokenFactory))]
+    [BelongsTo(typeof(Compiler))]
+    sealed class BinaryInteger : Terminal
+    {
+        protected override string Name => "binary_integer";
+
+        protected override ISyntax CreateMatch(TokenGroup token)
+        {
+            NotImplementedMethod(token);
+            return new Singleton(token);
+        }
+    }
+
+    [BelongsTo(typeof(ScannerTokenFactory))]
+    [BelongsTo(typeof(Compiler))]
+    sealed class OctalInteger : Terminal
+    {
+        protected override string Name => "octal_integer";
+
+        protected override ISyntax CreateMatch(TokenGroup token)
+        {
+            NotImplementedMethod(token);
+            return new Singleton(token);
+        }
+    }
+
+    [BelongsTo(typeof(ScannerTokenFactory))]
+    [BelongsTo(typeof(Compiler))]
+    sealed class HexInteger : Terminal
+    {
+        protected override string Name => "hex_integer";
+
+        protected override ISyntax CreateMatch(TokenGroup token)
+        {
+            NotImplementedMethod(token);
+            return new Singleton(token);
+        }
+    }
+
+    [BelongsTo(typeof(ScannerTokenFactory))]
+    [BelongsTo(typeof(Compiler))]
+    sealed class Real : Terminal
+    {
+        protected override string Name => "real";
+
+        protected override ISyntax CreateMatch(TokenGroup token)
+        {
+            NotImplementedMethod(token);
+            return new Singleton(token);
+        }
+    }
+
+    [BelongsTo(typeof(ScannerTokenFactory))]
+    [BelongsTo(typeof(Compiler))]
+    sealed class CharacterString : Terminal
+    {
+        protected override string Name => "character_string";
+
+        protected override ISyntax CreateMatch(TokenGroup token)
+        {
+            NotImplementedMethod(token);
+            return new Singleton(token);
+        }
+    }
+
+    [BelongsTo(typeof(ScannerTokenFactory))]
+    [BelongsTo(typeof(Compiler))]
+    sealed class Duration : Terminal
+    {
+        protected override string Name => "duration";
+
+        protected override ISyntax CreateMatch(TokenGroup token)
+        {
+            NotImplementedMethod(token);
+            return new Singleton(token);
+        }
+    }
+
+    [BelongsTo(typeof(ScannerTokenFactory))]
+    [BelongsTo(typeof(Compiler))]
+    sealed class TimeOfDay : Terminal
+    {
+        protected override string Name => "time_of_day";
+
+        protected override ISyntax CreateMatch(TokenGroup token)
+        {
+            NotImplementedMethod(token);
+            return new Singleton(token);
+        }
+    }
+
+    [BelongsTo(typeof(ScannerTokenFactory))]
+    [BelongsTo(typeof(Compiler))]
+    sealed class Date : Terminal
+    {
+        protected override string Name => "date";
+
+        protected override ISyntax CreateMatch(TokenGroup token)
+        {
+            NotImplementedMethod(token);
+            return new Singleton(token);
+        }
+    }
+
+    [BelongsTo(typeof(ScannerTokenFactory))]
+    [BelongsTo(typeof(Compiler))]
+    sealed class DateAndTime : Terminal
+    {
+        protected override string Name => "date_and_time";
+
+        protected override ISyntax CreateMatch(TokenGroup token)
+        {
+            NotImplementedMethod(token);
+            return new Singleton(token);
+        }
     }
 }

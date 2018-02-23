@@ -14,6 +14,9 @@ namespace Bnf.Parser
     {
         sealed class Cursor : DumpableObject, IParserCursor
         {
+            [EnableDumpExcept(null)]
+            HashSet<string> Names;
+
             [EnableDump]
             int Position;
 
@@ -21,9 +24,31 @@ namespace Bnf.Parser
 
             Cursor(int position) => Position = position;
 
-            IParserCursor IParserCursor.Clone => new Cursor(Position);
-            int IParserCursor.Current => Position;
-            void IParserCursor.Add(int value) {Position += value;}
+            Cursor(int position, IEnumerable<string> names, string name)
+            {
+                Position = position;
+                Names = new HashSet<string> {name};
+                if(names == null)
+                    return;
+
+                foreach(var items in names)
+                    Names.Add(items);
+            }
+
+            int IParserCursor.Position => Position;
+            IParserCursor IParserCursor.Add(int value) => value > 0 ? new Cursor(Position + value) : this;
+
+            IParserCursor IParserCursor.TryDeclaration(string name)
+            {
+                if(Names != null && Names.Contains(name))
+                    return null;
+
+                return new Cursor(Position, Names, name);
+
+                if(Names == null)
+                    Names = new HashSet<string>();
+                Names.Add(name);
+            }
         }
 
         sealed class Context : DumpableObject, IContext<T>
@@ -39,7 +64,7 @@ namespace Bnf.Parser
                 SourcePosition = sourcePosition;
             }
 
-            IDeclaration<T> IContext<T>.this[string name] => Parent.Definitions.Data[name];
+            IDeclaration IDeclarationContext.this[string name] => Parent.Definitions.Data[name];
 
             T IContext<T>.Repeat(IEnumerable<T> data)
             {
@@ -51,22 +76,16 @@ namespace Bnf.Parser
             }
 
             T IContext<T>.Sequence(IEnumerable<T> data)
-            {
-                if(!data.Any())
-                    return Parent.ResultFactory.EmptySequence;
+                => Parent.ResultFactory.Sequence(data);
 
-                NotImplementedMethod(data.ToArray().Stringify(";"));
-                return null;
-            }
-
-            T IContext<T>.LiteralMatch(TokenGroup token) 
+            T IContext<T>.LiteralMatch(TokenGroup token)
                 => Parent.ResultFactory.LiteralMatch(token);
 
             TokenGroup IContext<T>.this[IParserCursor source]
             {
                 get
                 {
-                    var position = source.Current;
+                    var position = source.Position;
 
                     while(position >= Items.Count)
                     {
@@ -96,14 +115,35 @@ namespace Bnf.Parser
         public bool Trace {get; set;}
 
         T IParser<T>.Execute(SourcePosn position)
-            => Definitions.Root.Parse(new Cursor(), new Context(this, position));
+        {
+            IParserCursor cursor = new Cursor();
+            IContext<T> context = new Context(this, position);
+
+            while(!(context[cursor].Type is EndOfText))
+            {
+                var token = context[cursor];
+                var matches = Definitions.Find(token);
+
+
+                cursor = cursor.Add(1);
+            }
+
+            NotImplementedMethod(position);
+            return null;
+        }
+
+        T RootFunction()
+        {
+            NotImplementedMethod();
+            return null;
+        }
     }
 
-    interface IResultFactory<out T>
+    interface IResultFactory<T>
     {
         T EmptyRepeat {get;}
-        T EmptySequence {get;}
         T LiteralMatch(TokenGroup token);
+        T Sequence(IEnumerable<T> data);
     }
 
     sealed class EndOfText : DumpableObject, ITokenType

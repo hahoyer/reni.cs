@@ -4,9 +4,9 @@ using hw.DebugFormatter;
 
 namespace Bnf.TokenClasses
 {
-    sealed class UserSymbol : TokenType
+    sealed class Declarator : TokenType
     {
-        public UserSymbol(string name) => Id = name;
+        public Declarator(string name) => Id = name;
 
         [DisableDump]
         public override string Id {get;}
@@ -14,7 +14,7 @@ namespace Bnf.TokenClasses
         protected override IForm GetForm(Syntax parent)
         {
             var left = parent.Left?.Form;
-            var userSymbol = new Forms.UserSymbol(parent, Id);
+            var userSymbol = new Forms.Declarator(parent, Id);
             var right = parent.Right?.Form;
 
             if(left == null && right == null)

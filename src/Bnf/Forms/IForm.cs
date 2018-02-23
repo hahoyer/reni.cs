@@ -1,5 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
+using Bnf.Base;
 using Bnf.Parser;
+using hw.DebugFormatter;
+using hw.Helper;
 using hw.Scanner;
 
 namespace Bnf.Forms
@@ -13,20 +17,86 @@ namespace Bnf.Forms
         IEnumerable<IExpression> Children {get;}
         int? Match(SourcePosn sourcePosn, IScannerContext scannerContext);
 
-        T Parse<T>(IParserCursor source, IContext<T> context)
+        T Parse<T>(IParserCursor cursor, IContext<T> context)
             where T : class, ISourcePartProxy, IParseSpan;
+
+        OccurenceDictionary<T> GetTokenOccurences<T>(Definitions<T>.IContext context)
+            where T : class, IParseSpan, ISourcePartProxy;
     }
 
-    interface ILiteral
+    sealed class OccurenceDictionary<T> : DumpableObject
+        where T : class, IParseSpan, ISourcePartProxy
     {
-        string Value {get;}
+        [EnableDump]
+        internal readonly IDictionary<ILiteral, object> Data;
+
+        [EnableDump]
+        internal readonly string[] ToDo;
+
+        [EnableDump]
+        readonly string  Reference;
+
+        public OccurenceDictionary(string reference)
+        {
+            ToDo = new[] {reference};
+            Reference = reference;
+        }
+
+        OccurenceDictionary(string[] toDo, IDictionary<ILiteral, object> data)
+        {
+            ToDo = toDo;
+            Data = data;
+        }
+
+        public OccurenceDictionary(Literal destination)
+        {
+            ToDo = new string[0];
+            Data = new Dictionary<ILiteral, object> {[destination] = new LiteralOccurence(destination)};
+        }
+
+        public OccurenceDictionary<T> AssignTo(string name)
+        {
+            if(name == Reference)
+                NotImplementedMethod(name);
+
+            if(Data == null)
+                return this;
+
+            NotImplementedMethod(name);
+            return null;
+        }
+
+        KeyValuePair<ILiteral, object>
+            KeyValuePair(string name, KeyValuePair<ILiteral, object> pair)
+            => new KeyValuePair<ILiteral, object>(pair.Key, AssignTo(name, pair.Value));
+
+        object AssignTo(string name, object value)
+        {
+            NotImplementedMethod(name, value);
+            return null;
+        }
+
+        public OccurenceDictionary<T> Repeat()
+        {
+            NotImplementedMethod();
+            return null;
+        }
     }
+
+    sealed class LiteralOccurence : DumpableObject
+    {
+        readonly Literal Literal;
+
+        public LiteralOccurence(Literal literal) => Literal = literal;
+    }
+
+    interface ILiteral : IUniqueIdProvider {}
 
     interface IParserCursor
     {
-        int Current {get;}
-        IParserCursor Clone {get;}
-        void Add(int value);
+        int Position {get;}
+        IParserCursor Add(int value);
+        IParserCursor TryDeclaration(string name);
     }
 
     interface IParseSpan
@@ -34,21 +104,31 @@ namespace Bnf.Forms
         int Value {get;}
     }
 
-    interface IContext<T>
+    interface IDeclarationContext
+    {
+        IDeclaration this[string name] {get;}
+    }
+
+    interface IContext<T> : IDeclarationContext
         where T : class, IParseSpan, ISourcePartProxy
     {
-        IDeclaration<T> this[string name] {get;}
         TokenGroup this[IParserCursor source] {get;}
         T Repeat(IEnumerable<T> parseData);
         T Sequence(IEnumerable<T> data);
         T LiteralMatch(TokenGroup token);
     }
 
-    interface IDeclaration<T>
+    interface IDeclaration
+    {
+        string Name {get;}
+        IExpression Expression {get;}
+        IEnumerable<IExpression> Items {get;}
+    }
+
+    interface IHiearachicalItem<T>
         where T : class, IParseSpan, ISourcePartProxy
     {
         string Name {get;}
-        IEnumerable<IExpression> Items {get;}
         T Parse(IParserCursor source, IContext<T> context);
     }
 

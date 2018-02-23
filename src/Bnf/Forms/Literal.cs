@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using Bnf.Base;
 using Bnf.Parser;
 using hw.DebugFormatter;
+using hw.Helper;
 using hw.Scanner;
 
 namespace Bnf.Forms
@@ -48,13 +50,16 @@ namespace Bnf.Forms
         int? IExpression.Match(SourcePosn sourcePosn, IScannerContext scannerContext)
             => sourcePosn.StartsWith(Text) ? (int?) Text.Length : null;
 
-        T IExpression.Parse<T>(IParserCursor source, IContext<T> context)
+        T IExpression.Parse<T>(IParserCursor cursor, IContext<T> context)
         {
-            var token = context[source];
+            var token = context[cursor];
             return token.Characters.Id == Text ? context.LiteralMatch(token) : null;
         }
 
+        OccurenceDictionary<T> IExpression.GetTokenOccurences<T>(Definitions<T>.IContext context) 
+            => context.CreateOccurence(this);
+
         IEnumerable<IExpression> IExpression.Children {get {yield break;}}
-        string ILiteral.Value => Text;
+        string IUniqueIdProvider.Value => Text;
     }
 }

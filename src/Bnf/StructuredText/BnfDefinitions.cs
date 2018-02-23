@@ -49,7 +49,7 @@ structure_element_initialization ::=structure_element_name ':=' (constant | enum
 string_type_name ::= identifier;
 string_type_declaration ::= string_type_name ':'('STRING'|'WSTRING') ['[' integer ']'] [':=' character_string];
 variable ::= direct_variable | symbolic_variable;
-symbolic_variable ::= variable_name | multi_element_variable;
+symbolic_variable ::= variable_name | multi_element_variable ;
 variable_name ::= identifier;
 direct_variable ::= '%' location_prefix size_prefix integer {'.' integer};
 location_prefix ::= 'I' | 'Q' | 'M';
@@ -103,6 +103,7 @@ incompl_located_var_decl ::= variable_name incompl_location ':' var_spec;
 incompl_location ::= 'AT' '%' ('I' | 'Q' | 'M') '*';
 var_spec ::= simple_specification| subrange_specification | enumerated_specification| array_specification | structure_type_name| 'STRING' ['[' integer ']'] | 'WSTRING' ['[' integer ']'];
 function_name ::= standard_function_name | derived_function_name;
+standard_function_name ::= identifier;
 derived_function_name ::= identifier;
 function_declaration ::='FUNCTION' derived_function_name ':'(elementary_type_name | derived_type_name){ io_var_declarations | function_var_decls }function_body'END_FUNCTION';
 io_var_declarations ::= input_declarations | output_declarations |input_output_declarations;
@@ -236,6 +237,9 @@ exit_statement ::= 'EXIT';
 constant ::= numeric_literal | character_string | time_literal | bit_string_literal | boolean_literal;
 numeric_literal ::= integer_literal | real_literal;
 integer_literal ::= [ integer_type_name '#' ]( signed_integer | binary_integer | octal_integer | hex_integer);
+real_literal ::= [ real_type_name '#' ]real;
+time_literal ::= duration | time_of_day | date | date_and_time;
+bit_string_literal ::=[ ('BYTE' | 'WORD' | 'DWORD' | 'LWORD') '#' ]( unsigned_integer | binary_integer | octal_integer | hex_integer);
 
 ";
 
@@ -246,14 +250,14 @@ identifier ::= (letter | ('_' (letter | digit))) {['_'] (letter | digit)};
 
 signed_integer ::= ['+' |'-'] integer;
 integer ::= digit {['_'] digit};
+unsigned_integer ::= integer;
 binary_integer ::= '2#' bit {['_'] bit};
 bit ::= '1' | '0';
 octal_integer ::= '8#' octal_digit {['_'] octal_digit};
 hex_integer ::= '16#' hex_digit {['_'] hex_digit};
-real_literal ::= [ real_type_name '#' ]signed_integer '.' integer [exponent];
+real ::= signed_integer '.' integer [exponent];
 exponent ::= ('E' | 'e') ['+'|'-'] integer;
-bit_string_literal ::=[ ('BYTE' | 'WORD' | 'DWORD' | 'LWORD') '#' ]( unsigned_integer | binary_integer | octal_integer | hex_integer);
-boolean_literal ::=( [ 'BOOL#' ] ( '1' | '0' ) )| 'TRUE' | 'FALSE';
+boolean_literal ::=(  'BOOL#'  ( '1' | '0' ) )| 'TRUE' | 'FALSE';
 character_string ::=single_byte_character_string | double_byte_character_string;
 single_byte_character_string ::=""'"" {single_byte_character_representation} ""'"";
 double_byte_character_string ::='""' {double_byte_character_representation} '""'| ""$'"" | '""' | '$' hex_digit hex_digit;

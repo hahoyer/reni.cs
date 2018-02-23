@@ -35,7 +35,7 @@
     <Compile Include="Forms\Repeat.cs" />
     <Compile Include="Forms\Sequence.cs" />
     <Compile Include="Forms\Statements.cs" />
-    <Compile Include="Forms\UserSymbol.cs" />
+    <Compile Include="Forms\Declarator.cs" />
     <Compile Include="hw\Parser\CachingTokenFactory.cs" />
     <Compile Include="hw\Parser\ITokenFactory.cs" />
     <Compile Include="hw\Scanner\ImbeddedTokenType.cs" />
@@ -152,7 +152,7 @@
     <Compile Include="Tests\StructuredTextCompilerTest.cs" />
     <Compile Include="TokenClasses\Semicolon.cs" />
     <Compile Include="TokenClasses\TokenClass.cs" />
-    <Compile Include="TokenClasses\UserSymbol.cs" />
+    <Compile Include="TokenClasses\Declarator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

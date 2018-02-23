@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
+using Bnf.Base;
 using Bnf.Parser;
 using hw.DebugFormatter;
 using hw.Scanner;
@@ -7,26 +9,43 @@ namespace Bnf.Forms
 {
     sealed class Sequence : Form, IExpression, IListForm<IExpression>
     {
+        static int NextObjectId;
+
         [EnableDump]
         readonly IExpression[] Data;
 
         public Sequence(Syntax parent, IExpression[] data)
-            : base(parent) => Data = data;
+            : base(parent, NextObjectId++) => Data = data;
 
-        T IExpression.Parse<T>(IParserCursor source, IContext<T> context)
+        OccurenceDictionary<T> IExpression.GetTokenOccurences<T>(Definitions<T>.IContext context)
         {
-            var current = source.Clone;
-            var data = new List<T>();
-            foreach(var expression in Data)
-            {
-                var result = expression.Parse(current, context);
-                if(result == null)
-                    return null;
-                data.Add(result);
-                current.Add(result.Value);
-            }
+            return context.CreateSequnce(Data);
+        }
 
-            return context.Sequence(data);
+        T IExpression.Parse<T>(IParserCursor cursor, IContext<T> context)
+        {
+            bool trace = ObjectId == -381;
+            StartMethodDump(trace, cursor, context);
+            BreakExecution();
+            try
+            {
+                var current = cursor;
+                var data = new List<T>();
+                foreach(var expression in Data)
+                {
+                    var result = expression.Parse(current, context);
+                    if(result == null)
+                        return ReturnMethodDump<T>(null);
+                    data.Add(result);
+                    current = current.Add(result.Value);
+                }
+
+                return ReturnMethodDump(context.Sequence(data));
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
 
         IEnumerable<IExpression> IExpression.Children => Data;
