@@ -18,7 +18,7 @@ namespace Bnf.Forms
         int? IExpression.Match(SourcePosn sourcePosn, IScannerContext scannerContext)
             => Data.Select(e => e.Match(sourcePosn, scannerContext)).FirstOrDefault(i => i != null);
 
-        OccurenceDictionary<T> IExpression.GetTokenOccurences<T>(Definitions<T>.IContext context)
+        OccurenceDictionary<T> IExpression.GetTokenOccurences<T>(Base.IContext<T> context)
         {
             NotImplementedMethod(context);
             return null;

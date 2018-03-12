@@ -56,7 +56,7 @@ namespace Bnf.Forms
             return token.Characters.Id == Text ? context.LiteralMatch(token) : null;
         }
 
-        OccurenceDictionary<T> IExpression.GetTokenOccurences<T>(Definitions<T>.IContext context) 
+        OccurenceDictionary<T> IExpression.GetTokenOccurences<T>(Base.IContext<T> context) 
             => context.CreateOccurence(this);
 
         IEnumerable<IExpression> IExpression.Children {get {yield break;}}

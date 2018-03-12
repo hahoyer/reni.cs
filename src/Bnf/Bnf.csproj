@@ -22,6 +22,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Base\IContext.cs" />
     <Compile Include="CodeItems\CodeItem.cs" />
     <Compile Include="Contexts\Context.cs" />
     <Compile Include="Extension.cs" />
@@ -29,6 +30,7 @@
     <Compile Include="Forms\Form.cs" />
     <Compile Include="Forms\IForm.cs" />
     <Compile Include="Forms\Literal.cs" />
+    <Compile Include="Forms\OccurenceDictionary.cs" />
     <Compile Include="Forms\Option.cs" />
     <Compile Include="Forms\Or.cs" />
     <Compile Include="Forms\Define.cs" />

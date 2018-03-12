@@ -14,7 +14,7 @@ namespace Bnf.Forms
         public Repeat(Syntax parent, IExpression data)
             : base(parent) => Data = data;
 
-        OccurenceDictionary<T> IExpression.GetTokenOccurences<T>(Definitions<T>.IContext context)
+        OccurenceDictionary<T> IExpression.GetTokenOccurences<T>(Base.IContext<T> context)
         {
             var children = Data.GetTokenOccurences(context);
             return context.CreateRepeat(children);

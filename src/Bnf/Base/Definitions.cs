@@ -9,7 +9,7 @@ using hw.Scanner;
 
 namespace Bnf.Base
 {
-    sealed class Definitions<T> : DumpableObject, Definitions<T>.IContext
+    sealed class Definitions<T> : DumpableObject, IContext<T>
         where T : class, IParseSpan, ISourcePartProxy
     {
         sealed class BnfDefinition : DumpableObject, IDeclaration
@@ -33,18 +33,15 @@ namespace Bnf.Base
             IEnumerable<IExpression> IDeclaration.Items
                 => Expression.SelectHierachical(parent => parent.Children);
 
-            T Parse(IParserCursor source, IContext<T> context)
+            ILiteral[] IDeclaration.Literals {get; set;}
+
+            T Parse(IParserCursor source, Forms.IContext<T> context)
                 => Expression.Parse(source, context);
         }
 
-        internal interface IOccurences {}
-
-        internal interface IContext
+        internal interface IOccurences
         {
-            OccurenceDictionary<T> CreateOccurence(Literal literal);
-            OccurenceDictionary<T> CreateOccurence(Define.IDestination destination);
-            OccurenceDictionary<T> CreateRepeat(OccurenceDictionary<T> children);
-            OccurenceDictionary<T> CreateSequnce(IExpression[] expressions);
+            IOccurences this[ILiteral literal] {get;}
         }
 
         static IEnumerable<string> ParserLiterals(IDeclaration declaration)
@@ -57,7 +54,8 @@ namespace Bnf.Base
         internal readonly IDictionary<string, IDeclaration> Data;
 
         readonly string RootName;
-        Dictionary<ILiteral, IOccurences> TokenDictionaryCache;
+        IOccurences TokenDictionaryCache;
+        IDictionary<string, IOccurences> TokenOccurencesCache;
 
         internal Definitions(IDictionary<string, IExpression> data, string rootName)
         {
@@ -67,22 +65,23 @@ namespace Bnf.Base
                     (i => i.Key, i => (IDeclaration) new BnfDefinition(i.Key, i.Value));
         }
 
-        OccurenceDictionary<T> IContext.CreateOccurence(Literal literal) 
+        OccurenceDictionary<T> IContext<T>.CreateOccurence(Literal literal)
             => new OccurenceDictionary<T>(literal);
 
-        OccurenceDictionary<T> IContext.CreateOccurence(Define.IDestination destination) 
+        OccurenceDictionary<T> IContext<T>.CreateOccurence(Define.IDestination destination)
             => new OccurenceDictionary<T>(destination.Name);
 
-        OccurenceDictionary<T> IContext.CreateRepeat(OccurenceDictionary<T> children) 
+        OccurenceDictionary<T> IContext<T>.CreateRepeat(OccurenceDictionary<T> children)
             => children.Repeat();
 
-        OccurenceDictionary<T> IContext.CreateSequnce(IExpression[] expressions)
+        OccurenceDictionary<T> IContext<T>.CreateSequence(IExpression[] expressions)
         {
             var children = expressions.Select(data => data.GetTokenOccurences(this)).ToArray();
             NotImplementedMethod(expressions.Stringify(";\n"), nameof(children), children);
             return null;
-
         }
+
+        IOccurences TokenDictionary => TokenDictionaryCache ?? (TokenDictionaryCache = TokenOccurences[RootName]);
 
         [DisableDump]
         IDeclaration Root => Data[RootName];
@@ -94,9 +93,6 @@ namespace Bnf.Base
                 .OrderByDescending(i => i.Length)
                 .Select(i => i.Box())
                 .Aggregate((t, n) => t.Else(n));
-
-        Dictionary<ILiteral, IOccurences> TokenDictionary
-            => TokenDictionaryCache ?? (TokenDictionaryCache = GetTokenDictionary());
 
         bool IsMatch(ITokenType tokenType, ILiteral literal)
         {
@@ -135,25 +131,27 @@ namespace Bnf.Base
             var tokenType = token.Type;
             var l = tokenType as ILiteral;
             Tracer.Assert(l != null);
-            IOccurences find = TokenDictionary[l];
+            var find = TokenDictionary[l];
 
             return find;
         }
 
-        Dictionary<ILiteral, IOccurences> GetTokenDictionary()
-            => GetTokenOccurences().ToDictionary(i => i.Key, i => i.Value);
+        IDictionary<string, IOccurences> TokenOccurences 
+            => TokenOccurencesCache ?? (TokenOccurencesCache = GetTokenOccurences());
 
-        IDictionary<ILiteral, IOccurences> GetTokenOccurences()
+        Dictionary<string, IOccurences> GetTokenOccurences()
         {
+            while(ReplendishLiterals()) {}
+
+
             var known = new List<string>();
             string[] toDo = {RootName};
-            IDictionary<ILiteral, IOccurences> result = new Dictionary<ILiteral, IOccurences>();
             do
             {
                 known.AddRange(toDo);
 
                 var ndt = toDo
-                    .Select(name => Data[name].Expression.GetTokenOccurences(this).AssignTo(name))
+                    .Select(name => AssignTo(name, Data[name].Expression.GetTokenOccurences(this)))
                     .ToArray();
 
                 toDo = ndt
@@ -161,11 +159,54 @@ namespace Bnf.Base
                     .Where(name => !known.Contains(name))
                     .ToArray();
 
-                NotImplementedMethod(nameof(result), result, nameof(ndt), ndt);
+                NotImplementedMethod(nameof(toDo), toDo, nameof(ndt), ndt);
             }
             while(toDo.Any());
 
+            return TokenOccurencesCache.ToDictionary(i => i.Key, i => i.Value);
+        }
+
+        bool ReplendishLiterals()
+        {
+            var result = false;
+            foreach(var declaration in Data)
+                if(ReplendishLiterals(declaration.Value))
+                    result = true;
+
             return result;
+        }
+
+        static bool ReplendishLiterals(IDeclaration declaration)
+        {
+            var result = false;
+            var literals = declaration.Literals;
+            if(literals == null)
+            {
+                literals = declaration.Items.OfType<ILiteral>().ToArray();
+                declaration.Literals = literals;
+                result = true;
+            }
+
+            var newLiterals = declaration
+                .Items
+                .OfType<ILiteral>()
+                .Where(l=> !literals.Contains(l))
+                .ToArray();
+
+            if(newLiterals.Any())
+            {
+                declaration.Literals = declaration.Literals.Concat(newLiterals).ToArray();
+                result = true;
+            }
+
+            return result;
+        }
+
+        OccurenceDictionary<T> AssignTo(string name, OccurenceDictionary<T> assignTo)
+        {
+
+            NotImplementedMethod(name, assignTo);
+            return null;
         }
     }
 }

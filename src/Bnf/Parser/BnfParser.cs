@@ -51,7 +51,7 @@ namespace Bnf.Parser
             }
         }
 
-        sealed class Context : DumpableObject, IContext<T>
+        sealed class Context : DumpableObject, Forms.IContext<T>
         {
             readonly List<TokenGroup> Items = new List<TokenGroup>();
 
@@ -66,7 +66,7 @@ namespace Bnf.Parser
 
             IDeclaration IDeclarationContext.this[string name] => Parent.Definitions.Data[name];
 
-            T IContext<T>.Repeat(IEnumerable<T> data)
+            T Forms.IContext<T>.Repeat(IEnumerable<T> data)
             {
                 if(!data.Any())
                     return Parent.ResultFactory.EmptyRepeat;
@@ -75,13 +75,13 @@ namespace Bnf.Parser
                 return null;
             }
 
-            T IContext<T>.Sequence(IEnumerable<T> data)
+            T Forms.IContext<T>.Sequence(IEnumerable<T> data)
                 => Parent.ResultFactory.Sequence(data);
 
-            T IContext<T>.LiteralMatch(TokenGroup token)
+            T Forms.IContext<T>.LiteralMatch(TokenGroup token)
                 => Parent.ResultFactory.LiteralMatch(token);
 
-            TokenGroup IContext<T>.this[IParserCursor source]
+            TokenGroup Forms.IContext<T>.this[IParserCursor source]
             {
                 get
                 {
@@ -117,7 +117,7 @@ namespace Bnf.Parser
         T IParser<T>.Execute(SourcePosn position)
         {
             IParserCursor cursor = new Cursor();
-            IContext<T> context = new Context(this, position);
+            Forms.IContext<T> context = new Context(this, position);
 
             while(!(context[cursor].Type is EndOfText))
             {

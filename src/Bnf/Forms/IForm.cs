@@ -1,6 +1,5 @@
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using Bnf.Base;
 using Bnf.Parser;
 using hw.DebugFormatter;
 using hw.Helper;
@@ -20,67 +19,8 @@ namespace Bnf.Forms
         T Parse<T>(IParserCursor cursor, IContext<T> context)
             where T : class, ISourcePartProxy, IParseSpan;
 
-        OccurenceDictionary<T> GetTokenOccurences<T>(Definitions<T>.IContext context)
+        OccurenceDictionary<T> GetTokenOccurences<T>(Base.IContext<T> context)
             where T : class, IParseSpan, ISourcePartProxy;
-    }
-
-    sealed class OccurenceDictionary<T> : DumpableObject
-        where T : class, IParseSpan, ISourcePartProxy
-    {
-        [EnableDump]
-        internal readonly IDictionary<ILiteral, object> Data;
-
-        [EnableDump]
-        internal readonly string[] ToDo;
-
-        [EnableDump]
-        readonly string  Reference;
-
-        public OccurenceDictionary(string reference)
-        {
-            ToDo = new[] {reference};
-            Reference = reference;
-        }
-
-        OccurenceDictionary(string[] toDo, IDictionary<ILiteral, object> data)
-        {
-            ToDo = toDo;
-            Data = data;
-        }
-
-        public OccurenceDictionary(Literal destination)
-        {
-            ToDo = new string[0];
-            Data = new Dictionary<ILiteral, object> {[destination] = new LiteralOccurence(destination)};
-        }
-
-        public OccurenceDictionary<T> AssignTo(string name)
-        {
-            if(name == Reference)
-                NotImplementedMethod(name);
-
-            if(Data == null)
-                return this;
-
-            NotImplementedMethod(name);
-            return null;
-        }
-
-        KeyValuePair<ILiteral, object>
-            KeyValuePair(string name, KeyValuePair<ILiteral, object> pair)
-            => new KeyValuePair<ILiteral, object>(pair.Key, AssignTo(name, pair.Value));
-
-        object AssignTo(string name, object value)
-        {
-            NotImplementedMethod(name, value);
-            return null;
-        }
-
-        public OccurenceDictionary<T> Repeat()
-        {
-            NotImplementedMethod();
-            return null;
-        }
     }
 
     sealed class LiteralOccurence : DumpableObject
@@ -123,6 +63,7 @@ namespace Bnf.Forms
         string Name {get;}
         IExpression Expression {get;}
         IEnumerable<IExpression> Items {get;}
+        ILiteral[] Literals {get; set;}
     }
 
     interface IHiearachicalItem<T>

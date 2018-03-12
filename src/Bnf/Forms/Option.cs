@@ -22,7 +22,7 @@ namespace Bnf.Forms
             => Data.Parse(cursor, context) ??
                context.Repeat(Enumerable.Empty<T>());
 
-        OccurenceDictionary<T>  IExpression.GetTokenOccurences<T>(Definitions<T>.IContext context)
+        OccurenceDictionary<T>  IExpression.GetTokenOccurences<T>(Base.IContext<T> context)
         {
             NotImplementedMethod(context);
             return null;

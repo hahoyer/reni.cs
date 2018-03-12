@@ -17,10 +17,8 @@ namespace Bnf.Forms
         public Sequence(Syntax parent, IExpression[] data)
             : base(parent, NextObjectId++) => Data = data;
 
-        OccurenceDictionary<T> IExpression.GetTokenOccurences<T>(Definitions<T>.IContext context)
-        {
-            return context.CreateSequnce(Data);
-        }
+        OccurenceDictionary<T> IExpression.GetTokenOccurences<T>(Base.IContext<T> context) 
+            => context.CreateSequence(Data);
 
         T IExpression.Parse<T>(IParserCursor cursor, IContext<T> context)
         {
