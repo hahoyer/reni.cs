@@ -6,7 +6,10 @@ namespace Bnf.TokenClasses
 {
     sealed class Declarator : TokenType
     {
-        public Declarator(string name) => Id = name;
+        public Declarator(string name)
+        {
+            Id = name;
+        }
 
         [DisableDump]
         public override string Id {get;}
@@ -14,9 +17,9 @@ namespace Bnf.TokenClasses
         protected override IForm GetForm(Syntax parent)
         {
             var left = parent.Left?.Form;
-            var userSymbol = new Forms.Declarator(parent, Id);
             var right = parent.Right?.Form;
 
+            var userSymbol = new Forms.Declarator(parent, Id);
             if(left == null && right == null)
                 return userSymbol;
 

@@ -37,6 +37,8 @@ namespace Bnf.Base
 
             T Parse(IParserCursor source, Forms.IContext<T> context)
                 => Expression.Parse(source, context);
+
+            protected override string GetNodeDump() => base.GetNodeDump() + "." + Name;
         }
 
         internal interface IOccurences
@@ -45,10 +47,10 @@ namespace Bnf.Base
         }
 
         static IEnumerable<string> ParserLiterals(IDeclaration declaration)
-            => declaration.Items.OfType<ILiteral>().Select(i => i.Value);
+            => declaration.Items.OfType<ILiteralContainer>().Select(i => i.Value.Value);
 
-        static IEnumerable<ILiteral> GetTerminals(IDeclaration declaration)
-            => declaration.Items.OfType<ILiteral>();
+        static IEnumerable<ILiteralContainer> GetTerminals(IDeclaration declaration)
+            => declaration.Items.OfType<ILiteralContainer>();
 
         [DisableDump]
         internal readonly IDictionary<string, IDeclaration> Data;
@@ -94,6 +96,10 @@ namespace Bnf.Base
                 .Select(i => i.Box())
                 .Aggregate((t, n) => t.Else(n));
 
+        IDictionary<string, IOccurences> TokenOccurences
+            => TokenOccurencesCache ?? (TokenOccurencesCache = GetTokenOccurences());
+
+
         bool IsMatch(ITokenType tokenType, ILiteral literal)
         {
             NotImplementedMethod(tokenType, literal);
@@ -136,9 +142,6 @@ namespace Bnf.Base
             return find;
         }
 
-        IDictionary<string, IOccurences> TokenOccurences 
-            => TokenOccurencesCache ?? (TokenOccurencesCache = GetTokenOccurences());
-
         Dictionary<string, IOccurences> GetTokenOccurences()
         {
             while(ReplendishLiterals()) {}
@@ -176,35 +179,41 @@ namespace Bnf.Base
             return result;
         }
 
-        static bool ReplendishLiterals(IDeclaration declaration)
+        bool ReplendishLiterals(IDeclaration declaration)
         {
-            var result = false;
             var literals = declaration.Literals;
+            var declarationItems = declaration.Items;
             if(literals == null)
             {
-                literals = declaration.Items.OfType<ILiteral>().ToArray();
+                Tracer.ConditionalBreak
+                (
+                    declaration.Name == "simple_type_name");
+                literals = declarationItems
+                    .OfType<ILiteralContainer>()
+                    .Select(i => i.Value)
+                    .ToArray();
                 declaration.Literals = literals;
-                result = true;
+                return true;
             }
 
-            var newLiterals = declaration
-                .Items
-                .OfType<ILiteral>()
-                .Where(l=> !literals.Contains(l))
+            var newLiterals = declarationItems
+                .OfType<Define.IDestination>()
+                .SelectMany(GetLiterals)
+                .Distinct()
+                .Where(l => !literals.Contains(l))
                 .ToArray();
 
-            if(newLiterals.Any())
-            {
+            var result = newLiterals.Any();
+            if(result)
                 declaration.Literals = declaration.Literals.Concat(newLiterals).ToArray();
-                result = true;
-            }
-
             return result;
         }
 
+        ILiteral[] GetLiterals(Define.IDestination i)
+            => Data.TryGetValue(i.Name, out var result) ? result.Literals : new ILiteral[0];
+
         OccurenceDictionary<T> AssignTo(string name, OccurenceDictionary<T> assignTo)
         {
-
             NotImplementedMethod(name, assignTo);
             return null;
         }

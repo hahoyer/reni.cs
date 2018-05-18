@@ -34,6 +34,7 @@
     <Compile Include="TypeNameExtenderTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="sys.targets" />
     <None Include="Template1.tt">
@@ -41,6 +42,7 @@
       <LastGenOutput>Template1.cs</LastGenOutput>
     </None>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="sys.targets" />
 </Project>

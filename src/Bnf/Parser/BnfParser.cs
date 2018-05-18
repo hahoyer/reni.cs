@@ -104,7 +104,6 @@ namespace Bnf.Parser
         readonly IResultFactory<T> ResultFactory;
         readonly IScanner Scanner;
 
-
         public BnfParser(IScanner scanner, Definitions<T> definitions, IResultFactory<T> resultFactory)
         {
             Scanner = scanner;
@@ -116,6 +115,7 @@ namespace Bnf.Parser
 
         T IParser<T>.Execute(SourcePosn position)
         {
+
             IParserCursor cursor = new Cursor();
             Forms.IContext<T> context = new Context(this, position);
 

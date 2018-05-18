@@ -26,6 +26,7 @@ namespace Bnf.StructuredText.TokenClasses
     [BelongsTo(typeof(Compiler))]
     sealed class Identifier : Terminal
     {
+        public Identifier() {}
         protected override string Name => "identifier";
         protected override ISyntax CreateMatch(TokenGroup token) => new Singleton(token);
     }
