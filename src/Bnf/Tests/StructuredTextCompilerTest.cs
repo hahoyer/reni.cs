@@ -8,9 +8,9 @@ namespace Bnf.Tests
     public sealed class StructuredTextCompilerTest
     {
         [UnitTest]
-        public void ScannerTest()
+        public void BnfTest()
         {
-            var definition = BnfDefinitions.Scanner;
+            var definition = BnfDefinitions.Text;
 
             var compiler = Compiler.FromText(definition);
 
@@ -19,16 +19,5 @@ namespace Bnf.Tests
             Tracer.TraceBreak();
         }
 
-
-        [UnitTest]
-        public void ParserTest()
-        {
-            string definition = BnfDefinitions.Parser;
-            var compiler = Compiler.FromText(definition);
-
-            var form = compiler.Syntax.Form;
-            Tracer.Line(Tracer.Dump(form));
-            Tracer.TraceBreak();
-        }
     }
 }

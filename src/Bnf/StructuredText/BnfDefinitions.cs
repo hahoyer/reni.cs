@@ -2,7 +2,7 @@
 {
     static class BnfDefinitions
     {
-        public const string Parser = @"structured_text ::= statement_list;elementary_type_name ::= numeric_type_name | date_type_name| bit_string_type_name | 'STRING' | 'WSTRING' | 'TIME';
+        public const string Text = @"structured_text ::= statement_list;elementary_type_name ::= numeric_type_name | date_type_name| bit_string_type_name | 'STRING' | 'WSTRING' | 'TIME';
 numeric_type_name ::= integer_type_name | real_type_name;
 integer_type_name ::= signed_integer_type_name| unsigned_integer_type_name;
 signed_integer_type_name ::= 'SINT' | 'INT' | 'DINT' | 'LINT';
@@ -241,9 +241,7 @@ real_literal ::= [ real_type_name '#' ]real;
 time_literal ::= duration | time_of_day | date | date_and_time;
 bit_string_literal ::=[ ('BYTE' | 'WORD' | 'DWORD' | 'LWORD') '#' ]( unsigned_integer | binary_integer | octal_integer | hex_integer);
 
-";
-
-        public const string Scanner = @"whitespace ::= ' '| '\t' | '\n' | '\r';digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
+whitespace ::= ' '| '\t' | '\n' | '\r';digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
 octal_digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7';
 hex_digit ::= digit | 'A'|'B'|'C'|'D'|'E'|'F'                 ;
 identifier ::= (letter | ('_' (letter | digit))) {['_'] (letter | digit)};

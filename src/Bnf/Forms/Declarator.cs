@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Bnf.Base;
 using Bnf.Parser;
 using hw.DebugFormatter;
 using hw.Scanner;
@@ -12,7 +11,11 @@ namespace Bnf.Forms
         readonly string Name;
 
         public Declarator(Syntax parent, string name)
-            : base(parent) => Name = name;
+            : base(parent)
+        {
+            Name = name;
+            Tracer.ConditionalBreak(name == "identifier");
+        }
 
         string Define.IDestination.Name => Name;
 
@@ -38,7 +41,7 @@ namespace Bnf.Forms
             }
         }
 
-        OccurenceDictionary<T>  IExpression.GetTokenOccurences<T>(Base.IContext<T> context) 
+        OccurenceDictionary<T> IExpression.GetTokenOccurences<T>(Base.IContext<T> context)
             => context.CreateOccurence(this);
 
         IEnumerable<IExpression> IExpression.Children {get {yield break;}}

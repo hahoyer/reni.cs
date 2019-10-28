@@ -1,4 +1,6 @@
+using Bnf.Forms;
 using Bnf.TokenClasses;
+using hw.Helper;
 using hw.Scanner;
 
 namespace Bnf.Scanner
@@ -26,15 +28,17 @@ namespace Bnf.Scanner
 
         readonly IssueId MissingEndOfComment = IssueId.MissingEndOfComment;
         readonly IssueId MissingEndOfPragma = IssueId.MissingEndOfPragma;
+        readonly FunctionCache<string, ParserLiteral> ParserLiterals;
 
         Lexer()
             : base(error => new ScannerSyntaxError((IssueId) error))
         {
+            ParserLiterals = new FunctionCache<string, ParserLiteral>(name => new ParserLiteral(name));
             Items[new WhiteSpaceTokenType("Space")] = " \t".AnyChar();
             Items[new WhiteSpaceTokenType("LineEnd")] = "\r\n".Box() | "\n".Box() | "\r".Box() | ("\r" + Match.End);
 
-            Items[new StringLiteral('\'')] = StringLiteral('\'');
-            Items[new StringLiteral('"')] = StringLiteral('"');
+            Items[new StringLiteral('\'', ParserLiterals)] = StringLiteral('\'');
+            Items[new StringLiteral('"', ParserLiterals)] = StringLiteral('"');
 
             var letterPlus = Match.Letter.Else("_");
             var identifier = letterPlus + (letterPlus | Match.Digit).Repeat();

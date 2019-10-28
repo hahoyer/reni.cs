@@ -2,15 +2,22 @@ using System.Collections.Generic;
 using System.Linq;
 using Bnf.Forms;
 using hw.DebugFormatter;
+using hw.Helper;
 using hw.Scanner;
 
 namespace Bnf.TokenClasses
 {
     sealed class StringLiteral : TokenType, IFactoryTokenType
     {
+        readonly FunctionCache<string, ParserLiteral> Cache;
+
         readonly char Delimiter;
 
-        public StringLiteral(char delimiter) => Delimiter = delimiter;
+        public StringLiteral(char delimiter, FunctionCache<string, ParserLiteral> cache)
+        {
+            Delimiter = delimiter;
+            Cache = cache;
+        }
 
         hw.Scanner.ITokenType ITokenTypeFactory.Get(string id) => this;
         public override string Id => "<Literal>";
@@ -18,7 +25,7 @@ namespace Bnf.TokenClasses
         protected override IForm GetForm(Syntax parent)
         {
             var left = parent.Left?.Form;
-            var literal = new Literal(parent, Parse(parent.Token.Characters.Id));
+            var literal = new Literal(parent, Cache[Parse(parent.Token.Characters.Id)]);
             var right = parent.Right?.Form;
 
             if(left == null && right == null)

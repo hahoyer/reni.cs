@@ -32,6 +32,11 @@ namespace Bnf.Forms
 
     interface ILiteral : IUniqueIdProvider {}
 
+    interface ILiteralContainer
+    {
+        ILiteral Value {get;}
+    }
+
     interface IParserCursor
     {
         int Position {get;}

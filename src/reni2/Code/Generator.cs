@@ -29,17 +29,17 @@ namespace Reni.Code
             FunctionCache<int, FunctionContainer> functions)
             => new CSharp_Generated(moduleName, main, functions).TransformText();
 
-        internal static void CodeToFile(string name, string result, bool traceFilePosn)
+        internal static void CodeToFile(string name, string result, bool traceFilePosition)
         {
             var streamWriter = new StreamWriter(name);
-            if(traceFilePosn)
+            if(traceFilePosition)
                 Tracer.Line
                     (Tracer.FilePosn(name.ToSmbFile().FullName, 0, 0, FilePositionTag.Debug));
             streamWriter.Write(result);
             streamWriter.Close();
         }
 
-        internal static Assembly CodeToAssembly(this string codeToString, bool traceFilePosn, bool includeDebugInformation)
+        internal static Assembly CodeToAssembly(this string codeToString, bool traceFilePosition, bool includeDebugInformation)
         {
             var name =
                 Environment.GetEnvironmentVariable("temp")
@@ -49,7 +49,7 @@ namespace Reni.Code
                     + ".reni.cs";
             name.ToSmbFile().EnsureDirectoryOfFileExists();
 
-            CodeToFile(name, codeToString, traceFilePosn);
+            CodeToFile(name, codeToString, traceFilePosition);
 
             // Build the parameters for source compilation.
             var cp = new System.CodeDom.Compiler.CompilerParameters

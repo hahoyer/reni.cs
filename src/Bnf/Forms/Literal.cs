@@ -1,13 +1,11 @@
 using System.Collections.Generic;
-using Bnf.Base;
 using Bnf.Parser;
 using hw.DebugFormatter;
-using hw.Helper;
 using hw.Scanner;
 
 namespace Bnf.Forms
 {
-    sealed class Literal : Form, IExpression, ILiteral
+    sealed class Literal : Form, IExpression, ILiteralContainer
     {
         static string Parse(string name)
         {
@@ -42,10 +40,10 @@ namespace Bnf.Forms
         }
 
         [EnableDump]
-        readonly string Text;
+        internal readonly ILiteral Value;
 
-        public Literal(Syntax parent, string name)
-            : base(parent) => Text = Parse(name);
+        public Literal(Syntax parent, ParserLiteral value)
+            : base(parent) => Value = value;
 
         int? IExpression.Match(SourcePosn sourcePosn, IScannerContext scannerContext)
             => sourcePosn.StartsWith(Text) ? (int?) Text.Length : null;
@@ -56,10 +54,12 @@ namespace Bnf.Forms
             return token.Characters.Id == Text ? context.LiteralMatch(token) : null;
         }
 
-        OccurenceDictionary<T> IExpression.GetTokenOccurences<T>(Base.IContext<T> context) 
+        OccurenceDictionary<T> IExpression.GetTokenOccurences<T>(Base.IContext<T> context)
             => context.CreateOccurence(this);
 
         IEnumerable<IExpression> IExpression.Children {get {yield break;}}
-        string IUniqueIdProvider.Value => Text;
+        ILiteral ILiteralContainer.Value => Value;
+
+        string Text => Value.Value;
     }
 }

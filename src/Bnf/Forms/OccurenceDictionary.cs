@@ -31,7 +31,7 @@ namespace Bnf.Forms
         public OccurenceDictionary(Literal destination)
         {
             ToDo = new string[0];
-            Data = new Dictionary<ILiteral, object> {[destination] = new LiteralOccurence(destination)};
+            Data = new Dictionary<ILiteral, object> {[destination.Value] = destination};
         }
 
         public OccurenceDictionary<T> AssignTo(string name)

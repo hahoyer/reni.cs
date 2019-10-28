@@ -4,6 +4,8 @@
     <ProjectGuid>{DF39A515-D066-4C12-A4C5-07DA91C19A2C}</ProjectGuid>
     <AssemblyName>ReniStudio</AssemblyName>
     <TargetTypeEx>CSharp.WinExe</TargetTypeEx>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup>
     <RootNamespace>ReniStudio</RootNamespace>
@@ -18,6 +20,7 @@
       <Project>{EBB73C84-6622-4183-A28F-B0DFF606006B}</Project>
       <Name>Reni2</Name>
     </ProjectReference>
+    <Reference Include="System.Xaml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs">
@@ -28,6 +31,7 @@
     <Compile Include="MainContainer.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="StudioConfig\Commands\Base\System.Exit">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

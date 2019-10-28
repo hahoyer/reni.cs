@@ -29,7 +29,7 @@ namespace Bnf
             const string fileName = "temptest.reni";
             var f = fileName.ToSmbFile();
             f.String = text;
-            var compiler = Compiler.FromText(fileName);
+            var compiler = Compiler.FromText(fileName, null);
             //Profiler.Measure(()=>compiler.Exec());
             //Tracer.FlaggedLine(Profiler.Format(10,0.0));
             return compiler;

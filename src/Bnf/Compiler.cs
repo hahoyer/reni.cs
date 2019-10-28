@@ -11,7 +11,7 @@ namespace Bnf
 {
     sealed class Compiler : Compiler<Syntax>
     {
-        public static Compiler FromText(string text) => new Compiler(text);
+        public static Compiler FromText(string text, string name = null) => new Compiler(text, name ?? "Main");
 
         static PrioTable PrioTable
         {
@@ -51,12 +51,12 @@ namespace Bnf
         Source SourceCache;
         Syntax SyntaxCache;
 
-        Compiler(string text)
+        Compiler(string text, string name)
         {
             Text = text;
 
             var main = this["Main"];
-            var tokenFactory = new TokenFactory("Main");
+            var tokenFactory = new TokenFactory(name);
 
             main.PrioTable = PrioTable;
             main.TokenFactory = new ScannerTokenFactory();
@@ -70,10 +70,9 @@ namespace Bnf
         internal Syntax Syntax => SyntaxCache ?? (SyntaxCache = GetSyntax());
 
         [DisableDump]
-        public IDictionary<string, IExpression> Statements 
-            => ((IStatements) Syntax.Form).Data.ToDictionary(i=>i.Name, i=>i.Value);
+        public IDictionary<string, IExpression> Statements
+            => ((IStatements) Syntax.Form).Data.ToDictionary(i => i.Name, i => i.Value);
 
         Syntax GetSyntax() => this["Main"].Parser.Execute(Source + 0);
     }
-
 }
