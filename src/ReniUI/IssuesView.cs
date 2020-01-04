@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using hw.Helper;
 using hw.Scanner;
 using Reni.Validation;
 
@@ -10,7 +11,7 @@ namespace ReniUI
     sealed class IssuesView : ChildView
     {
         public IssuesView(IDataProvider provider)
-            : base(provider.Master, SystemConfiguration.IssuesFilePath)
+            : base(provider.Master, SystemConfiguration.IssuesFilePath.PathCombine("Position"))
         {
             Frame.Text = "Issues";
 
