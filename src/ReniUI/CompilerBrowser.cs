@@ -57,7 +57,21 @@ namespace ReniUI
             }
         }
 
-        internal Syntax Syntax => Compiler.Syntax;
+        internal Syntax Syntax
+        {
+            get {
+                try
+                {
+                    return Compiler.Syntax;
+                }
+                catch(Exception e)
+                {
+                    $"Syntax: Unexpected {e} \nText:\n{Source.Data}".WriteLine();
+                    throw;
+                }
+
+                ;}
+        }
 
         public Token LocatePosition(int offset)
             => Token.LocatePosition(Compiler.Syntax, offset);
