@@ -16,3 +16,5 @@ obj/
 /src/*/*.DotSettings
 /src/renisource/Debug/renisource.vcxprojResolveAssemblyReference.cache
 /bin/Packages/**
+/.sync
+/.sync
