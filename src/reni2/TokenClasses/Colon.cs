@@ -14,7 +14,7 @@ namespace Reni.TokenClasses
 
         Result<Statement> IStatementProvider.Get
             (Syntax left, Syntax right, IDefaultScopeProvider container)
-            => left.Declarator?.Convert(x => x.Statement(right.Value, container));
+            => left.Declarer?.Convert(x => x.Statement(right.Value, container));
     }
 
     [BelongsTo(typeof(MainTokenFactory))]

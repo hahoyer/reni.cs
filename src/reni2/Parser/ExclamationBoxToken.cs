@@ -23,7 +23,7 @@ namespace Reni.Parser
 
             var result = provider.Get(syntax.Right);
 
-            var other = syntax.Left?.Declarator;
+            var other = syntax.Left?.Declarer;
             if(other == null)
                 return result;
 

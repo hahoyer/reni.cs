@@ -81,10 +81,10 @@ namespace Reni.TokenClasses
         internal SourcePart SourcePart => Left?.SourcePart + Token.SourcePart() + Right?.SourcePart;
 
         [DisableDump]
-        internal Syntax LeftNeigbor => Left?.RightMost ?? LeftParent;
+        internal Syntax LeftNeighbor => Left?.RightMost ?? LeftParent;
 
         [DisableDump]
-        internal Syntax RightNeigbor => Right?.LeftMost ?? RightParent;
+        internal Syntax RightNeighbor => Right?.LeftMost ?? RightParent;
 
         [DisableDump]
         internal Syntax LeftParent => Parent?.Left == this ? Parent.LeftParent : Parent;
@@ -129,7 +129,7 @@ namespace Reni.TokenClasses
 
 
         [DisableDump]
-        internal Result<Declarator> Declarator
+        internal Result<Declarator> Declarer
         {
             get
             {

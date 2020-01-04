@@ -89,7 +89,7 @@ namespace ReniUI.Formatting
 
         internal static ISeparatorType LeftSideSeparator(this Syntax target)
         {
-            var left = target.LeftNeigbor?.TokenClass;
+            var left = target.LeftNeighbor?.TokenClass;
             return target.Token.PrecededWith.HasComment()
                 ? SeparatorType.ContactSeparator
                 : SeparatorType.Get(left, target.TokenClass);
@@ -97,7 +97,7 @@ namespace ReniUI.Formatting
 
         internal static ISeparatorType RightSideSeparator(this Syntax target)
         {
-            var right = target.RightNeigbor;
+            var right = target.RightNeighbor;
             return right == null || right.Token.PrecededWith.HasComment()
                 ? SeparatorType.ContactSeparator
                 : SeparatorType.Get(target.TokenClass, right.TokenClass);

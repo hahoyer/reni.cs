@@ -8,7 +8,7 @@ namespace ReniUI.Test
     public sealed class StructFormatting : DependantAttribute
     {
         [UnitTest]
-        public void OmitSpaceWhenLinebreakRemains()
+        public void OmitSpaceWhenLineBreakRemains()
         {
             const string text =
                 @"a
@@ -17,7 +17,7 @@ b";
             var expectedText = @"a
 b"
                 .Replace("\r\n", "\n");
-            ;
+            
 
             var compiler = CompilerBrowser.FromText(text);
             var newSource = compiler.Reformat
@@ -31,14 +31,13 @@ b"
         }
 
         [UnitTest]
-        public void UseSpaceWhenLinebreakIsRemoved()
+        public void UseSpaceWhenLineBreakIsRemoved()
         {
             const string text =
                 @"a
 b";
 
             var expectedText = @"a b".Replace("\r\n", "\n");
-            ;
 
             var compiler = CompilerBrowser.FromText(text);
             var newSource = compiler.Reformat

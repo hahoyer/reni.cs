@@ -43,7 +43,7 @@ namespace ReniUI.Formatting
         }
 
         internal ISourcePartEdit[] Suffix
-            => SuffixData ?? (SuffixData = CreateSourcePartEdits(Syntax.RightNeigbor?.Token, false));
+            => SuffixData ?? (SuffixData = CreateSourcePartEdits(Syntax.RightNeighbor?.Token, false));
 
         void EnsurePrefixResult()
         {
