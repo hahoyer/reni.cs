@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
@@ -15,9 +16,8 @@ namespace Reni.Parser
         }
 
         [EnableDump]
-        List Type {get;}
-
+        List Type { get; }
         [EnableDump]
-        Statement[] Data {get;}
-    }
+        Statement[] Data { get; }
+      }
 }

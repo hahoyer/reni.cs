@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using hw.DebugFormatter;
@@ -12,10 +15,6 @@ namespace ReniTest
 {
     static class MainContainer
     {
-        const string Output = "1";
-
-        const string Target = @"f: /\ ^(); x: 1; f(/\x) dump_print";
-
         public static void Main()
         {
             Application.EnableVisualStyles();
@@ -30,11 +29,14 @@ namespace ReniTest
         {
             if(Debugger.IsAttached)
                 TestRunner.IsModeErrorFocus = true;
-            Assembly.GetExecutingAssembly().RunTests();
+            System.Reflection.Assembly.GetExecutingAssembly().RunTests();
         }
 
+        const string Target = @"f: /\ ^(); x: 1; f(/\x) dump_print";
+        const string Output = "1";
+
         // Keep this to ensure reference to ReniUI
-        static void BrowseCompiler(CompilerBrowser compiler) {}
+        static void BrowseCompiler(CompilerBrowser compiler) { }
 
         static Compiler CreateCompiler(string text)
         {
@@ -55,4 +57,5 @@ namespace ReniTest
             Data.OutStream = null;
         }
     }
-}
+
+}                    

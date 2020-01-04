@@ -15,7 +15,7 @@ namespace ReniUI.Test
 b";
 
             var expectedText = @"a
-    b"
+b"
                 .Replace("\r\n", "\n");
             ;
 
@@ -45,36 +45,6 @@ b";
                 (
                     new ReniUI.Formatting.Configuration
                         {EmptyLineLimit = 0}.Create()
-                )
-                .Replace("\r\n", "\n");
-
-            Tracer.Assert(newSource == expectedText, "\n\"" + newSource + "\"");
-        }
-        [UnitTest]
-        public void LongChainInList()
-        {
-            const string text =
-                @"method member function(parameter1, parameter2, parameter3), thing2()";
-
-            var expectedText = @"method
-    member
-    function
-    (
-        parameter1,
-        parameter2,
-        parameter3
-    ),
-thing2()"
-                .Replace("\r\n", "\n");
-
-            var compiler = CompilerBrowser.FromText(text);
-            var newSource = compiler.Reformat
-                (
-                    new ReniUI.Formatting.Configuration
-                    {
-                        EmptyLineLimit = 0,
-                        MaxLineLength = 20
-                    }.Create()
                 )
                 .Replace("\r\n", "\n");
 

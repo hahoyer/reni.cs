@@ -13,7 +13,7 @@ namespace ReniUI.Test
     {
         [Test]
         [UnitTest]
-        public void LongList()
+        public void ReformatComments()
         {
             const string Text =
                 @"(12345,12345,12345,12345,12345)";

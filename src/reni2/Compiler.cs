@@ -222,7 +222,6 @@ namespace Reni
             _isInExecutionPhase = false;
         }
 
-
         [DisableDump]
         internal IEnumerable<Issue> Issues
             =>

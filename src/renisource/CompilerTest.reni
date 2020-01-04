@@ -1,4 +1,4 @@
-! mix_in: system;
+! mix_in: System;
 
 ! non_public name: /!\ string("name");
 
