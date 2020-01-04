@@ -228,7 +228,7 @@ namespace ReniUI.Formatting
             => IsLineBreakRequiredCache ?? (IsLineBreakRequiredCache = GetIsLineBreakRequired()).Value;
 
         [EnableDump]
-        string FlatResult => Syntax.FlatFormat(Parent.Configuration);
+        string FlatResult => Syntax.FlatFormat(Parent.Configuration.EmptyLineLimit);
 
         IEnumerable<ISourcePartEdit> BeforeMain
         {
@@ -255,14 +255,14 @@ namespace ReniUI.Formatting
             => (IsLineBreakForced || IsLineBreakRequired) && Formatter.ForceLineBreakOnRightSize(IsLineBreakForced);
 
 
-        bool GetIsLineBreakRequired() => Syntax.IsLineBreakRequired(Parent.Configuration);
+        bool GetIsLineBreakRequired() => Syntax.IsLineBreakRequired(Parent.Configuration.EmptyLineLimit, Parent.Configuration.MaxLineLength);
 
-        IEnumerable<ISourcePartEdit> GetMainAndRightSiteEdits(bool exlucdePrefix, bool includeSuffix)
+        IEnumerable<ISourcePartEdit> GetMainAndRightSiteEdits(bool excludePrefix, bool includeSuffix)
         {
             var result = new List<ISourcePartEdit>();
             var main = FormatterTokenGroup.Create(Syntax);
 
-            if(!exlucdePrefix)
+            if(!excludePrefix)
                 result.AddRange(main.Prefix);
 
             result.AddRange(BeforeMain);
@@ -278,10 +278,10 @@ namespace ReniUI.Formatting
             return result.Indent(Formatter.MainAndRightSite);
         }
 
-        IEnumerable<ISourcePartEdit> GetLeftSiteEdits(bool exlucdePrefix)
+        IEnumerable<ISourcePartEdit> GetLeftSiteEdits(bool excludePrefix)
             => Syntax.Left
                 .CreateStruct(Parent, ForceLineBreakOnLeftSize)
-                .GetSourcePartEdits(exlucdePrefix, false)
+                .GetSourcePartEdits(excludePrefix, false)
                 .Indent(Formatter.LeftSite);
 
 
