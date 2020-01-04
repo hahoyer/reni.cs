@@ -5,7 +5,7 @@ namespace ReniUI.Formatting
 {
     interface IStructure
     {
-        IEnumerable<ISourcePartEdit> GetSourcePartEdits(bool exlucdePrefix, bool includeSuffix);
+        IEnumerable<ISourcePartEdit> GetSourcePartEdits(bool excludePrefix, bool includeSuffix);
         Syntax Syntax {get;}
     }
 }
