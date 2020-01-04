@@ -32,6 +32,7 @@ namespace ReniUI
         }
 
         static string EditorFilesPath => ConfigRoot.PathCombine("EditorFiles");
+        internal static string IssuesFilePath => ConfigRoot.PathCombine("Issues");
 
         static IEnumerable<string> AllKnownFileNames
             => ConfigurationPathsForAllKnownFiles

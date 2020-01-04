@@ -10,7 +10,7 @@ namespace ReniUI
     sealed class IssuesView : ChildView
     {
         public IssuesView(IDataProvider provider)
-            : base(provider.Master, "Issues")
+            : base(provider.Master, SystemConfiguration.IssuesFilePath)
         {
             Frame.Text = "Issues";
 
@@ -25,8 +25,15 @@ namespace ReniUI
             result.Columns.AddRange(DataGridViewColumns().ToArray());
             result.Rows.AddRange(data.Select(CreateRow).ToArray());
             result.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
-            result.CellClick += (a, b) => OnSelect(data[b.RowIndex], provider);
+            result.CellClick += (a, b) => OnSelect(data, b.RowIndex, provider);
             Client = result;
+        }
+
+        static void OnSelect(Issue[] data, int index, IDataProvider provider)
+        {
+            if(index < 0 || index >= data.Length)
+                return;
+            OnSelect(data[index], provider);
         }
 
         static void OnSelect(Issue issue, IDataProvider provider) 
