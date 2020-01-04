@@ -23,13 +23,12 @@ namespace ReniUI.Test
         public void GetDeclarationOptions()
         {
             var compiler = CompilerBrowser.FromText(text);
-            var offset = 64;
+            var offset = compiler.Source.Data.IndexOf("}", StringComparison.InvariantCulture) + 1;
             var position = compiler.Source + offset;
-            if((position + -1).Span(2).Id != "\r\n")
-            {
-                var t = compiler.DeclarationOptions(offset);
-                Tracer.Assert(t != null, () => (new Source(text) + offset).Dump());
-            }
+            Tracer.Assert(position.Span(1).Id == "\n");
+            
+            var t = compiler.DeclarationOptions(offset);
+            Tracer.Assert(t != null, () => (new Source(text) + offset).Dump());
         }
     }
 }

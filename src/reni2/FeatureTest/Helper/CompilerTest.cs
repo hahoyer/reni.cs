@@ -161,7 +161,8 @@ namespace Reni.FeatureTest.Helper
 
         public string[] Targets => TargetSet.Select(item => item.Target).ToArray();
 
-        protected virtual void Verify(IEnumerable<Issue> issues) => Tracer.Assert(!issues.Any());
+        protected virtual void Verify(IEnumerable<Issue> issues) 
+            => Tracer.Assert(!issues.Any(),()=> issues.Select(issue=> issue.LogDump).Stringify("\n"));
 
         internal string GetStringAttribute<T>() where T : StringAttribute
         {

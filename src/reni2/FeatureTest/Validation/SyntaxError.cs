@@ -40,8 +40,8 @@ world'
         {
             var a = issues.ToArray();
             var i = 0;
-            Tracer.Assert(a[i++].IsLogdumpLike(2, 1, 3, 1, IssueId.EOLInString, "\"' hallo\r\n\""));
-            Tracer.Assert(a[i++].IsLogdumpLike(3, 6, 4, 1, IssueId.EOLInString, "\"'\r\n\""));
+            Tracer.Assert(a[i++].IsLogdumpLike(2, 1, 3, 1, IssueId.EOLInString, "\"' hallo\n\""));
+            Tracer.Assert(a[i++].IsLogdumpLike(3, 6, 4, 1, IssueId.EOLInString, "\"'\n\""));
             Tracer.Assert(a[i++].IsLogdumpLike(3, 1, 3, 6, IssueId.MissingDeclarationForType, "\"world\" Type: ()"));
             Tracer.Assert(a.Length == i);
         }

@@ -85,7 +85,8 @@ namespace ReniUI.Test
 ################################################################
 # Test
 ################################################################
-3";
+3
+";
             var compiler = CompilerBrowser.FromText(Text);
             var newSource = compiler.Reformat
             (
