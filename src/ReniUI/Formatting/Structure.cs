@@ -204,7 +204,7 @@ namespace ReniUI.Formatting
 
         Syntax IStructure.Syntax => Syntax;
 
-        IEnumerable<ISourcePartEdit> IStructure.GetSourcePartEdits(bool exlucdePrefix, bool includeSuffix)
+        IEnumerable<ISourcePartEdit> IStructure.GetSourcePartEdits(bool excludePrefix, bool includeSuffix)
         {
             Tracer.ConditionalBreak
             (
@@ -218,8 +218,8 @@ namespace ReniUI.Formatting
             );
             var result = new List<ISourcePartEdit>();
             if(Syntax.Left != null)
-                result.AddRange(GetLeftSiteEdits(exlucdePrefix));
-            result.AddRange(GetMainAndRightSiteEdits(Syntax.Left == null && exlucdePrefix, includeSuffix));
+                result.AddRange(GetLeftSiteEdits(excludePrefix));
+            result.AddRange(GetMainAndRightSiteEdits(Syntax.Left == null && excludePrefix, includeSuffix));
             return result;
         }
 
