@@ -78,13 +78,5 @@ namespace ReniUI.Formatting
             Tracer.ConditionalBreak(id == " a");
             return new[] {SourcePartEditExtension.EnsureSeparator};
         }
-
-        internal IEnumerable<IEnumerable<ISourcePartEdit>> FormatChainItem(bool excludePrefix)
-        {
-            if(!excludePrefix)
-                yield return Prefix;
-
-            yield return Main;
-        }
     }
 }
