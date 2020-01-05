@@ -10,9 +10,9 @@ namespace ReniUI.Formatting
     {
         sealed class CacheContainer
         {
-            internal ISourcePartEdit[] Main;
-            internal ISourcePartEdit[] Prefix;
-            internal ISourcePartEdit[] Suffix;
+            internal ISourcePartEdit[] TokenEdits;
+            internal ISourcePartEdit[] PrefixEdits;
+            internal ISourcePartEdit[] SuffixEdits;
         }
 
         internal static FormatterTokenGroup Create(Syntax syntax)
@@ -43,41 +43,41 @@ namespace ReniUI.Formatting
         /// <summary>
         /// Returns all edits, except the last. So it's all comments and whitespaces before the actual token
         /// </summary>
-        internal ISourcePartEdit[] Prefix
+        internal ISourcePartEdit[] PrefixEdits
         {
             get
             {
                 EnsureMainAndPrefix();
-                return Cache.Prefix;
+                return Cache.PrefixEdits;
             }
         }
 
         /// <summary>
         /// Returns the last edits, except the last. So this is the actual token
         /// </summary>
-        internal ISourcePartEdit[] Main
+        internal ISourcePartEdit[] TokenEdits
         {
             get
             {
                 EnsureMainAndPrefix();
-                return Cache.Main;
+                return Cache.TokenEdits;
             }
         }
 
         /// <summary>
         /// Returns the prefix edits of the right neighbor token
         /// </summary>
-        internal ISourcePartEdit[] Suffix
-            => Cache.Suffix ?? (Cache.Suffix = CreateSourcePartEdits(RightNeighbor, returnMain: false));
+        internal ISourcePartEdit[] SuffixEdits
+            => Cache.SuffixEdits ?? (Cache.SuffixEdits = CreateSourcePartEdits(RightNeighbor, returnMain: false));
 
         void EnsureMainAndPrefix()
         {
-            if(Cache.Main != null && Cache.Prefix != null)
+            if(Cache.TokenEdits != null && Cache.PrefixEdits != null)
                 return;
             var prefix = CreateSourcePartEdits(Token);
             var prefixLength = prefix.Length - 1;
-            Cache.Prefix = prefix.Take(prefixLength).ToArray();
-            Cache.Main = prefix.Skip(prefixLength).Take(count: 1).Concat(GetDistanceMarker()).ToArray();
+            Cache.PrefixEdits = prefix.Take(prefixLength).ToArray();
+            Cache.TokenEdits = prefix.Skip(prefixLength).Take(count: 1).Concat(GetDistanceMarker()).ToArray();
         }
 
         IEnumerable<ISourcePartEdit> GetDistanceMarker()
