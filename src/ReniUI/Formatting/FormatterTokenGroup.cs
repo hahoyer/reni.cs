@@ -10,14 +10,14 @@ namespace ReniUI.Formatting
     {
         sealed class CacheContainer
         {
-            internal ISourcePartEdit[] Main;
             internal ISourcePartEdit[] Prefix;
+            internal ISourcePartEdit[] Main;
             internal ISourcePartEdit[] Suffix;
         }
 
         internal static FormatterTokenGroup Create(Syntax syntax)
             => new FormatterTokenGroup
-                (syntax.Token, syntax.RightNeighbor, syntax.RightSideSeparator() != SeparatorType.CloseSeparator);
+                (syntax.Token, syntax.RightNeighbor?.Token, syntax.RightSideSeparator() != SeparatorType.CloseSeparator);
 
         static ISourcePartEdit[] CreateSourcePartEdits(IToken token, bool returnMain = true)
         {
@@ -27,14 +27,14 @@ namespace ReniUI.Formatting
 
         readonly CacheContainer Cache = new CacheContainer();
         readonly bool IsCloseSeparatorOnRightSide;
-        readonly Syntax RightNeighbor;
         readonly IToken Token;
+        readonly IToken RightNeighbor;
 
-        FormatterTokenGroup(IToken token, Syntax rightNeighbor, bool isCloseSeparatorOnRightSide)
+        FormatterTokenGroup(IToken token, IToken rightNeighbor, bool isCloseSeparatorOnRightSide)
         {
-            RightNeighbor = rightNeighbor;
             Token = token;
             IsCloseSeparatorOnRightSide = isCloseSeparatorOnRightSide;
+            RightNeighbor = rightNeighbor;
         }
 
         internal ISourcePartEdit[] Prefix
@@ -56,7 +56,7 @@ namespace ReniUI.Formatting
         }
 
         internal ISourcePartEdit[] Suffix
-            => Cache.Suffix ?? (Cache.Suffix = CreateSourcePartEdits(RightNeighbor?.Token, returnMain: false));
+            => Cache.Suffix ?? (Cache.Suffix = CreateSourcePartEdits(RightNeighbor, returnMain: false));
 
         void EnsureMainAndPrefix()
         {
@@ -79,9 +79,9 @@ namespace ReniUI.Formatting
             return new[] {SourcePartEditExtension.EnsureSeparator};
         }
 
-        internal IEnumerable<IEnumerable<ISourcePartEdit>> FormatChainItem(bool exlucdePrefix)
+        internal IEnumerable<IEnumerable<ISourcePartEdit>> FormatChainItem(bool excludePrefix)
         {
-            if(!exlucdePrefix)
+            if(!excludePrefix)
                 yield return Prefix;
 
             yield return Main;
