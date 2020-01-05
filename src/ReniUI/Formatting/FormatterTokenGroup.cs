@@ -10,14 +10,17 @@ namespace ReniUI.Formatting
     {
         sealed class CacheContainer
         {
-            internal ISourcePartEdit[] Prefix;
             internal ISourcePartEdit[] Main;
+            internal ISourcePartEdit[] Prefix;
             internal ISourcePartEdit[] Suffix;
         }
 
         internal static FormatterTokenGroup Create(Syntax syntax)
             => new FormatterTokenGroup
-                (syntax.Token, syntax.RightNeighbor?.Token, syntax.RightSideSeparator() != SeparatorType.CloseSeparator);
+            (
+                syntax.Token,
+                syntax.RightNeighbor?.Token,
+                syntax.RightSideSeparator() != SeparatorType.CloseSeparator);
 
         static ISourcePartEdit[] CreateSourcePartEdits(IToken token, bool returnMain = true)
         {
@@ -27,8 +30,8 @@ namespace ReniUI.Formatting
 
         readonly CacheContainer Cache = new CacheContainer();
         readonly bool IsCloseSeparatorOnRightSide;
-        readonly IToken Token;
         readonly IToken RightNeighbor;
+        readonly IToken Token;
 
         FormatterTokenGroup(IToken token, IToken rightNeighbor, bool isCloseSeparatorOnRightSide)
         {
@@ -37,6 +40,9 @@ namespace ReniUI.Formatting
             RightNeighbor = rightNeighbor;
         }
 
+        /// <summary>
+        /// Returns all edits, except the last. So it's all comments and whitespaces before the actual token
+        /// </summary>
         internal ISourcePartEdit[] Prefix
         {
             get
@@ -46,6 +52,9 @@ namespace ReniUI.Formatting
             }
         }
 
+        /// <summary>
+        /// Returns the last edits, except the last. So this is the actual token
+        /// </summary>
         internal ISourcePartEdit[] Main
         {
             get
@@ -55,6 +64,9 @@ namespace ReniUI.Formatting
             }
         }
 
+        /// <summary>
+        /// Returns the prefix edits of the right neighbor token
+        /// </summary>
         internal ISourcePartEdit[] Suffix
             => Cache.Suffix ?? (Cache.Suffix = CreateSourcePartEdits(RightNeighbor, returnMain: false));
 
