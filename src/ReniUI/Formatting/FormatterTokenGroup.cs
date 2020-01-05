@@ -2,14 +2,22 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
-using Reni.Parser;
 using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
     sealed class FormatterTokenGroup : DumpableObject
     {
-        internal static FormatterTokenGroup Create(Syntax syntax) => new FormatterTokenGroup(syntax);
+        sealed class CacheContainer
+        {
+            internal ISourcePartEdit[] Main;
+            internal ISourcePartEdit[] Prefix;
+            internal ISourcePartEdit[] Suffix;
+        }
+
+        internal static FormatterTokenGroup Create(Syntax syntax)
+            => new FormatterTokenGroup
+                (syntax.Token, syntax.RightNeighbor, syntax.RightSideSeparator() != SeparatorType.CloseSeparator);
 
         static ISourcePartEdit[] CreateSourcePartEdits(IToken token, bool returnMain = true)
         {
@@ -17,19 +25,24 @@ namespace ReniUI.Formatting
             return tokens.Select(i => i.ToSourcePartEdit()).ToArray();
         }
 
-        readonly Syntax Syntax;
-        ISourcePartEdit[] MainData;
-        ISourcePartEdit[] PrefixData;
-        ISourcePartEdit[] SuffixData;
+        readonly CacheContainer Cache = new CacheContainer();
+        readonly bool IsCloseSeparatorOnRightSide;
+        readonly Syntax RightNeighbor;
+        readonly IToken Token;
 
-        FormatterTokenGroup(Syntax syntax) => Syntax = syntax;
+        FormatterTokenGroup(IToken token, Syntax rightNeighbor, bool isCloseSeparatorOnRightSide)
+        {
+            RightNeighbor = rightNeighbor;
+            Token = token;
+            IsCloseSeparatorOnRightSide = isCloseSeparatorOnRightSide;
+        }
 
         internal ISourcePartEdit[] Prefix
         {
             get
             {
-                EnsurePrefixResult();
-                return PrefixData;
+                EnsureMainAndPrefix();
+                return Cache.Prefix;
             }
         }
 
@@ -37,34 +50,33 @@ namespace ReniUI.Formatting
         {
             get
             {
-                EnsurePrefixResult();
-                return MainData;
+                EnsureMainAndPrefix();
+                return Cache.Main;
             }
         }
 
         internal ISourcePartEdit[] Suffix
-            => SuffixData ?? (SuffixData = CreateSourcePartEdits(Syntax.RightNeighbor?.Token, false));
+            => Cache.Suffix ?? (Cache.Suffix = CreateSourcePartEdits(RightNeighbor?.Token, returnMain: false));
 
-        void EnsurePrefixResult()
+        void EnsureMainAndPrefix()
         {
-            if(MainData != null && PrefixData != null)
+            if(Cache.Main != null && Cache.Prefix != null)
                 return;
-            var prefix = CreateSourcePartEdits(Syntax.Token);
+            var prefix = CreateSourcePartEdits(Token);
             var prefixLength = prefix.Length - 1;
-            PrefixData = prefix.Take(prefixLength).ToArray();
-            MainData = prefix.Skip(prefixLength).Take(1).Concat(GetDistanceMarker()).ToArray();
+            Cache.Prefix = prefix.Take(prefixLength).ToArray();
+            Cache.Main = prefix.Skip(prefixLength).Take(count: 1).Concat(GetDistanceMarker()).ToArray();
         }
 
         IEnumerable<ISourcePartEdit> GetDistanceMarker()
         {
-            var id = Syntax.Token.Characters.Id;
+            var id = Token.Characters.Id;
             Tracer.ConditionalBreak(id == " b");
-            if(Syntax.RightSideSeparator() != SeparatorType.CloseSeparator)
+            if(IsCloseSeparatorOnRightSide)
                 return new ISourcePartEdit[0];
-            
-            Tracer.ConditionalBreak(id == " a");
-            return new [] {SourcePartEditExtension.EnsureSeparator};
 
+            Tracer.ConditionalBreak(id == " a");
+            return new[] {SourcePartEditExtension.EnsureSeparator};
         }
 
         internal IEnumerable<IEnumerable<ISourcePartEdit>> FormatChainItem(bool exlucdePrefix)
