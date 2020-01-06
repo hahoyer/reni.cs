@@ -127,13 +127,13 @@ namespace ReniUI.Formatting
 
         IEnumerable<ISourcePartEdit> GetLeftSiteEdits(bool excludePrefix)
             => Syntax.Left
-                .CreateStruct(Parent, false)
+                .CreateStruct(Parent, FormatterMode.None)
                 .GetSourcePartEdits(excludePrefix, false)
                 .Indent(Formatter.IndentLeftSite);
 
         IEnumerable<ISourcePartEdit> GetRightSiteEdits(bool includeSuffix)
             => Syntax.Right
-                .CreateStruct(Parent, false)
+                .CreateStruct(Parent, FormatterMode.None)
                 .GetSourcePartEdits(true, includeSuffix)
                 .Indent(Formatter.IndentRightSite);
 
