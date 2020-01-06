@@ -114,10 +114,10 @@ namespace ReniUI.Formatting
         {
             var main = FormatterTokenGroup.Create(Syntax);
 
-            IEnumerable<ISourcePartEdit> result = main.Main;
+            IEnumerable<ISourcePartEdit> result = main.TokenEdits;
 
             if(Syntax.Right != null || includeSuffix)
-                result = result.Concat(main.Suffix);
+                result = result.Concat(main.SuffixEdits);
 
             if(Syntax.Right != null)
                 result = result.Concat(GetRightSiteEdits(includeSuffix));
