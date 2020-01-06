@@ -53,7 +53,7 @@ namespace ReniUI.Formatting
         {
             public override bool UseLineBreakBeforeToken(bool isLineBreakForced) => true;
             public override bool UseLineBreakAfterToken(bool isLineBreakForced) => isLineBreakForced;
-            public override bool ForceLineBreakOnLeftSite(bool isLineBreakForced) => isLineBreakForced;
+            public override bool ForceLineBreakOnLeftSite(bool isLineBreakForced) => true;
         }
 
         sealed class LeftParenthesisFormatter : BaseFormatter
