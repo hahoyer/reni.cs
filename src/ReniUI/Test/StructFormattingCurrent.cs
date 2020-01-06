@@ -12,17 +12,23 @@ namespace ReniUI.Test
     {
         [Test]
         [UnitTest]
-        public void UseLineBreakBeforeParenthesis()
+        public void LabeledEntriesInList()
         {
             const string Text =
-                @"a:{ 1234512345, 12345}";
+                @"{12345, a: 12345
+    };";
 
             var expectedText =
-                @"a:
+                @"systemdata:
 {
-    1234512345,
-    12345
-}"
+    1 type instance();
+    Memory: ((0 type *('100' to_number_of_base 64)) mutable) instance();
+    !mutable FreePointer: Memory array_reference mutable;
+    repeat: /\ ^ while() then(^ body(), repeat(^));
+};
+1 = 1 then 2 else 4;
+3;
+(Text('H') << 'allo') dump_print"
                     .Replace("\r\n", "\n");
 
 
