@@ -69,11 +69,11 @@ namespace ReniUI.Formatting
 
         (string text, int endPosition) GetSpacesPart(int[] currentSpaces, bool isSeparatorRequired)
         {
-            var newspacesCount = isSeparatorRequired ? 1 : 0;
+            var newSpacesCount = isSeparatorRequired ? 1 : 0;
             if(LineBreakCount > 0)
-                newspacesCount += Indent * Configuration.IndentCount;
+                newSpacesCount += Indent * Configuration.IndentCount;
 
-            var delta = newspacesCount - currentSpaces.Length;
+            var delta = newSpacesCount - currentSpaces.Length;
 
             return
                 (
