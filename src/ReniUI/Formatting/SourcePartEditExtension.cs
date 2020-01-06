@@ -74,8 +74,7 @@ namespace ReniUI.Formatting
             IndentLeft(this IEnumerable<ISourcePartEdit> target)
             => new[] {ToLeft}.Concat(target).Concat(new[] {ToRight});
 
-        internal static IEnumerable<ISourcePartEdit>
-            Indent(this IEnumerable<ISourcePartEdit> target, bool? toLeft)
+        internal static IEnumerable<ISourcePartEdit>Indent(this IEnumerable<ISourcePartEdit> target, bool? toLeft)
         {
             switch(toLeft)
             {
