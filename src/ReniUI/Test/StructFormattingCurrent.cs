@@ -1,3 +1,4 @@
+using System.Linq;
 using hw.DebugFormatter;
 using hw.UnitTest;
 using NUnit.Framework;
@@ -11,30 +12,32 @@ namespace ReniUI.Test
     {
         [Test]
         [UnitTest]
-        public void UseSpaceWhenLinebreakIsRemoved()
+        public void UseLineBreakBeforeParenthesis()
         {
-            const string text =
-                @"(12345,12345,12345,12345,12345)";
+            const string Text =
+                @"a:{ 1234512345, 12345}";
 
-            var expectedText = @"(
-    12345,
-    12345,
-    12345,
-    12345,
+            var expectedText =
+                @"a:
+{
+    1234512345,
     12345
-)"
-                .Replace("\r\n", "\n");
+}"
+                    .Replace("\r\n", "\n");
 
-            var compiler = CompilerBrowser.FromText(text);
+
+            var compiler = CompilerBrowser.FromText(Text);
             var newSource = compiler.Reformat
                 (
                     new ReniUI.Formatting.Configuration
                     {
-                        EmptyLineLimit = 0,
-                        MaxLineLength = 20
+                        MaxLineLength = 10,
+                        EmptyLineLimit = 0
                     }.Create()
                 )
                 .Replace("\r\n", "\n");
+
+            var lineCount = newSource.Count(item => item == '\n');
 
             Tracer.Assert(newSource == expectedText, "\n\"" + newSource + "\"");
         }

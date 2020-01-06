@@ -28,7 +28,7 @@ namespace ReniUI.Test
             {
                 var offset = text.Length - i - 1;
                 var position = compiler.Source + offset;
-                if(offset > 0 && (position + -1).Span(length: 2).Id != "\r\n")
+                if(offset > 0 && (position + -1).Span(2).Id != "\r\n")
                 {
                     var t = compiler.DeclarationOptions(offset);
                     Tracer.Assert(t != null, () => (new Source(text) + i).Dump());

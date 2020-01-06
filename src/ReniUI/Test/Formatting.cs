@@ -13,6 +13,35 @@ namespace ReniUI.Test
     [FormattingSimple]
     public sealed class Formatting : DependantAttribute
     {
+        [Test]
+        [UnitTest]
+        public void UseSpaceWhenLinebreakIsRemoved()
+        {
+            const string text =
+                @"(12345,12345,12345,12345,12345)";
+
+            var expectedText = @"(
+    12345,
+    12345,
+    12345,
+    12345,
+    12345
+)"
+                .Replace("\r\n", "\n");
+
+            var compiler = CompilerBrowser.FromText(text);
+            var newSource = compiler.Reformat
+                (
+                    new ReniUI.Formatting.Configuration
+                    {
+                        EmptyLineLimit = 0,
+                        MaxLineLength = 20
+                    }.Create()
+                )
+                .Replace("\r\n", "\n");
+
+            Tracer.Assert(newSource == expectedText, "\n\"" + newSource + "\"");
+        }
 
         [Test]
         [UnitTest]
@@ -41,7 +70,7 @@ repeat: /\ ^ while() then
 
 
             var compiler = CompilerBrowser.FromText(Text);
-            var newSource = compiler.Reformat
+            string newSource = compiler.Reformat
                 (
                     new ReniUI.Formatting.Configuration
                     {

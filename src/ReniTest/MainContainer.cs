@@ -7,6 +7,7 @@ using hw.UnitTest;
 using Reni;
 using Reni.Runtime;
 using ReniUI;
+using ReniUI.Test;
 
 namespace ReniTest
 {
@@ -20,7 +21,8 @@ namespace ReniTest
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(defaultValue: false);
 
-            //new FilebasedTests().TestMethod();
+            new Formatting().Reformat();
+
             RunAllTests();
             //ExecT4CompilerGeneratedTest();
         }
