@@ -135,8 +135,9 @@ namespace Reni.TokenClasses
             {
                 switch(TokenClass)
                 {
-                    case IDeclaratorTokenClass declaratorTokenClass: return declaratorTokenClass.Get(this);
+                    case IDeclaratorTokenClass tokenClass: return tokenClass.Get(this);
                     case RightParenthesis _:
+                    case EndOfText _:
                     case ScannerSyntaxError _: return null;
                 }
 
@@ -213,7 +214,7 @@ namespace Reni.TokenClasses
                 .ToArray();
 
             return sourceSyntaxs
-                       .Skip(1)
+                       .Skip(count: 1)
                        .TakeWhile(item => matcher.IsBelongingTo(item.TokenClass))
                        .LastOrDefault() ??
                    recent;
@@ -361,6 +362,5 @@ namespace Reni.TokenClasses
             NotImplementedMethod(other, diffenceHandler);
             return false;
         }
-
     }
 }
