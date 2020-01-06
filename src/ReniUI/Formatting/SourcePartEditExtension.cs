@@ -15,11 +15,11 @@ namespace ReniUI.Formatting
             protected override string GetNodeDump() => Id;
         }
 
-        internal static readonly ISourcePartEdit LineBreak = new SpecialEdit("LineBreak");
-        internal static readonly ISourcePartEdit EnsureSeparator = new SpecialEdit("EnsureSeparator");
-        internal static readonly ISourcePartEdit ToRight = new SpecialEdit("ToRight");
-        internal static readonly ISourcePartEdit ToLeft = new SpecialEdit("ToLeft");
-        internal static readonly ISourcePartEdit EndOfFile = new SpecialEdit("EndOfFile");
+        internal static readonly ISourcePartEdit LineBreak = new SpecialEdit(id: "LineBreak");
+        internal static readonly ISourcePartEdit EnsureSeparator = new SpecialEdit(id: "EnsureSeparator");
+        internal static readonly ISourcePartEdit ToRight = new SpecialEdit(id: "ToRight");
+        internal static readonly ISourcePartEdit ToLeft = new SpecialEdit(id: "ToLeft");
+        internal static readonly ISourcePartEdit EndOfFile = new SpecialEdit(id: "EndOfFile");
 
         internal static IEnumerable<Edit> GetEditPieces
             (this IEnumerable<ISourcePartEdit> target, SourcePart targetPart, Configuration configuration)
@@ -66,22 +66,30 @@ namespace ReniUI.Formatting
             return result;
         }
 
-        internal static IEnumerable<ISourcePartEdit>
+        static IEnumerable<ISourcePartEdit>
             IndentRight(this IEnumerable<ISourcePartEdit> target)
             => new[] {ToRight}.Concat(target).Concat(new[] {ToLeft});
 
-        internal static IEnumerable<ISourcePartEdit>
+        static IEnumerable<ISourcePartEdit>
             IndentLeft(this IEnumerable<ISourcePartEdit> target)
             => new[] {ToLeft}.Concat(target).Concat(new[] {ToRight});
 
-        internal static IEnumerable<ISourcePartEdit>Indent(this IEnumerable<ISourcePartEdit> target, bool? toLeft)
+        internal static IEnumerable<ISourcePartEdit> 
+            Indent(this IEnumerable<ISourcePartEdit> target, IndentDirection toLeft)
         {
             switch(toLeft)
             {
-                case true: return IndentLeft(target);
-                case null: return target;
-                default: return IndentRight(target);
+                case IndentDirection.ToLeft: return IndentLeft(target);
+                case IndentDirection.ToRight: return IndentRight(target);
+                default: return target;
             }
         }
+    }
+
+    enum IndentDirection
+    {
+        ToLeft,
+        ToRight,
+        NoIndent
     }
 }

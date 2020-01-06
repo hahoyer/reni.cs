@@ -10,9 +10,9 @@ namespace ReniUI.Formatting
     {
         abstract class BaseFormatter : DumpableObject
         {
-            public virtual bool? MainAndRightSite => null;
-            public virtual bool? LeftSite => null;
-            public virtual bool? RightSite => null;
+            public virtual IndentDirection IndentTokenAndRightSite => IndentDirection.NoIndent;
+            public virtual IndentDirection IndentLeftSite => IndentDirection.NoIndent;
+            public virtual IndentDirection IndentRightSite => IndentDirection.NoIndent;
         }
 
         sealed class DefaultFormatter : BaseFormatter
@@ -23,19 +23,19 @@ namespace ReniUI.Formatting
         sealed class LeftParenthesisFormatter : BaseFormatter
         {
             public static readonly BaseFormatter Instance = new LeftParenthesisFormatter();
-            public override bool? RightSite => false;
+            public override IndentDirection IndentRightSite => IndentDirection.ToRight;
         }
 
         sealed class ColonFormatter : BaseFormatter
         {
             public static readonly BaseFormatter Instance = new ColonFormatter();
-            public override bool? LeftSite => true;
+            public override IndentDirection IndentLeftSite => IndentDirection.ToLeft;
         }
 
         sealed class ChainFormatter : BaseFormatter
         {
             public static readonly BaseFormatter Instance = new ChainFormatter();
-            public override bool? MainAndRightSite => false;
+            public override IndentDirection IndentTokenAndRightSite => IndentDirection.ToRight;
         }
 
         static void AssertValid(IEnumerable<ISourcePartEdit> result)
@@ -96,7 +96,7 @@ namespace ReniUI.Formatting
             if(Syntax.Left != null)
                 result.AddRange(GetLeftSiteEdits(excludePrefix));
 
-            result.AddRange(GetMainAndRightSiteEdits(includeSuffix));
+            result.AddRange(GetTokenAndRightSiteEdits(includeSuffix));
             AssertValid(result);
             return result;
         }
@@ -110,32 +110,32 @@ namespace ReniUI.Formatting
 
         bool GetIsLineBreakRequired() => Syntax.IsLineBreakRequired(Parent.Configuration.EmptyLineLimit, Parent.Configuration.MaxLineLength);
 
-        IEnumerable<ISourcePartEdit> GetMainAndRightSiteEdits(bool includeSuffix)
+        IEnumerable<ISourcePartEdit> GetTokenAndRightSiteEdits(bool includeSuffix)
         {
-            var main = FormatterTokenGroup.Create(Syntax);
+            var token = FormatterTokenGroup.Create(Syntax);
 
-            IEnumerable<ISourcePartEdit> result = main.TokenEdits;
+            IEnumerable<ISourcePartEdit> result = token.TokenEdits;
 
             if(Syntax.Right != null || includeSuffix)
-                result = result.Concat(main.SuffixEdits);
+                result = result.Concat(token.SuffixEdits);
 
             if(Syntax.Right != null)
                 result = result.Concat(GetRightSiteEdits(includeSuffix));
 
-            return result.Indent(Formatter.MainAndRightSite);
+            return result.Indent(Formatter.IndentTokenAndRightSite);
         }
 
         IEnumerable<ISourcePartEdit> GetLeftSiteEdits(bool excludePrefix)
             => Syntax.Left
                 .CreateStruct(Parent, false)
                 .GetSourcePartEdits(excludePrefix, false)
-                .Indent(Formatter.LeftSite);
+                .Indent(Formatter.IndentLeftSite);
 
         IEnumerable<ISourcePartEdit> GetRightSiteEdits(bool includeSuffix)
             => Syntax.Right
                 .CreateStruct(Parent, false)
                 .GetSourcePartEdits(true, includeSuffix)
-                .Indent(Formatter.RightSite);
+                .Indent(Formatter.IndentRightSite);
 
         protected override string GetNodeDump() => base.GetNodeDump() + " " + Syntax.Token.Characters.Id;
     }
