@@ -15,20 +15,14 @@ namespace ReniUI.Test
         public void LabeledEntriesInList()
         {
             const string Text =
-                @"{12345, a: 12345
-    };";
+                @"{aaaaa, label: bbbbb
+    }";
 
             var expectedText =
-                @"systemdata:
-{
-    1 type instance();
-    Memory: ((0 type *('100' to_number_of_base 64)) mutable) instance();
-    !mutable FreePointer: Memory array_reference mutable;
-    repeat: /\ ^ while() then(^ body(), repeat(^));
-};
-1 = 1 then 2 else 4;
-3;
-(Text('H') << 'allo') dump_print"
+                @"{
+    aaaaa,
+    label: 6bbbbb
+}"
                     .Replace("\r\n", "\n");
 
 

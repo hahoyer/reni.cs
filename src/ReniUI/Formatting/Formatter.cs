@@ -1,144 +1,117 @@
-using hw.DebugFormatter;
 using hw.Helper;
+using Reni.Feature;
+using Reni.Parser;
 using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
     abstract class Formatter : EnumEx
     {
-        sealed class EmptyFormatter : Formatter {}
+        sealed class RootFormatter : Formatter {}
 
-        sealed class DefaultFormatter : Formatter
-        {
-            public override bool UseLineBreakBeforeToken(FormatterMode mode)
-            {
-                NotImplementedFunction(mode);
-                return base.UseLineBreakBeforeToken(mode);
-            }
+        sealed class UnknownFormatter : Formatter {}
 
-            public override bool UseLineBreakAfterToken(FormatterMode mode)
-            {
-                NotImplementedFunction(mode);
-                return base.UseLineBreakAfterToken(mode);
-            }
-
-            public override FormatterMode LeftSideWithLineBreaksMode(FormatterMode mode)
-            {
-                NotImplementedFunction(mode);
-                return base.LeftSideWithLineBreaksMode(mode);
-            }
-
-            public override FormatterMode RightSideWithLineBreaksMode(FormatterMode mode)
-            {
-                NotImplementedFunction(mode);
-                return base.RightSideWithLineBreaksMode(mode);
-            }
-        }
-
-        sealed class RightParenthesisFormatter : Formatter
-        {
-            public override bool UseLineBreakBeforeToken(FormatterMode mode) => !mode.IsRoot;
-            public override bool UseLineBreakAfterToken(FormatterMode mode) => mode.HasLineBreakForced;
-
-            public override FormatterMode LeftSideWithLineBreaksMode
-                (FormatterMode mode) => FormatterMode.ForcedLineBreaks;
-        }
-
-        sealed class LeftParenthesisFormatter : Formatter
-        {
-            public override IndentDirection IndentRightSite => IndentDirection.ToRight;
-            public override bool UseLineBreakBeforeToken(FormatterMode mode) => mode.HasLineBreakForced;
-            public override bool UseLineBreakAfterToken(FormatterMode mode) => true;
-
-            public override FormatterMode RightSideWithLineBreaksMode
-                (FormatterMode mode) => FormatterMode.ForcedLineBreaks;
-
-            public override FormatterMode LeftSideWithLineBreaksMode(FormatterMode mode)
-            {
-                NotImplementedFunction(mode);
-                return base.LeftSideWithLineBreaksMode(mode);
-            }
-        }
+        sealed class SingleFormatter : Formatter {}
 
         sealed class ColonFormatter : Formatter
         {
-            public override IndentDirection IndentLeftSite => IndentDirection.ToLeft;
-
-            public override bool UseLineBreakBeforeToken(FormatterMode mode)
-            {
-                NotImplementedFunction(mode);
-                return base.UseLineBreakBeforeToken(mode);
-            }
-
-            public override bool UseLineBreakAfterToken(FormatterMode mode) => true;
-
-            public override FormatterMode LeftSideWithLineBreaksMode(FormatterMode mode) => FormatterMode.None;
-
-            public override FormatterMode RightSideWithLineBreaksMode(FormatterMode mode)
-            {
-                NotImplementedFunction(mode);
-                return base.RightSideWithLineBreaksMode(mode);
-            }
+            public override Context RightSideLineBreakContext(Context context) => context.BodyOfColon;
         }
 
         sealed class ChainFormatter : Formatter
         {
-            public override IndentDirection IndentTokenAndRightSite => IndentDirection.ToRight;
-
-            public override FormatterMode LeftSideWithLineBreaksMode(FormatterMode mode)
-                => mode;
-
-            public override FormatterMode RightSideWithLineBreaksMode(FormatterMode mode)
-                => mode;
+            public override bool UseLineBreakBeforeToken(Context context) => true;
         }
 
-        abstract class AnyListFormatter : Formatter
+        sealed class LeftParenthesisFormatter : Formatter
         {
-            public override bool UseLineBreakAfterToken(FormatterMode mode) => mode.HasLineBreakForced;
+            public override IndentDirection IndentRightSide => IndentDirection.ToRight;
+            public override bool UseLineBreakBeforeToken(Context context) => context.LineBreakBeforeLeftParenthesis;
+            public override bool UseLineBreakAfterToken(Context context) => true;
+            public override Context RightSideLineBreakContext(Context context) => context.ForList;
+            public override bool HasLineBreaksByContext(Context context) => context.LineBreaksForLeftParenthesis;
         }
 
-        sealed class ListFormatter : AnyListFormatter
+        sealed class RightParenthesisFormatter : Formatter
         {
-            public override FormatterMode RightSideWithLineBreaksMode
-                (FormatterMode mode) => FormatterMode.ForcedLineBreaks;
+            public override bool UseLineBreakBeforeToken(Context context) => true;
+            public override Context LeftSideLineBreakContext(Context context) => context.LeftSideOfRightParenthesis;
+            public override bool HasLineBreaksByContext(Context context) => context.LineBreaksForRightParenthesis;
         }
 
-        sealed class LastListFormatter : AnyListFormatter {}
+        sealed class ListFormatter : Formatter
+        {
+            public override bool UseLineBreakAfterToken(Context context) => true;
+            public override bool HasLineBreaksByContext(Context context) => context.LineBreaksForList;
+            public override Context RightSideLineBreakContext(Context context) => context.ForList;
+        }
 
-        static readonly Formatter Empty = new EmptyFormatter();
-        static readonly Formatter Default = new DefaultFormatter();
+        sealed class LastListFormatter : Formatter
+        {
+            public override bool HasLineBreaksByContext(Context context) => context.LineBreaksForList;
+        }
+
+        sealed class ListEndFormatter : Formatter
+        {
+            public override bool UseLineBreakAfterToken(Context context) => true;
+            public override bool HasLineBreaksByContext(Context context) => context.LineBreaksForList;
+        }
+
+        static readonly Formatter Root = new RootFormatter();
+        static readonly Formatter List = new ListFormatter();
+        static readonly Formatter ListEnd = new ListEndFormatter();
+        static readonly Formatter LastList = new LastListFormatter();
         static readonly Formatter RightParenthesis = new RightParenthesisFormatter();
         static readonly Formatter LeftParenthesis = new LeftParenthesisFormatter();
         static readonly Formatter Colon = new ColonFormatter();
+        static readonly Formatter Single = new SingleFormatter();
         static readonly Formatter Chain = new ChainFormatter();
-        static readonly Formatter List = new ListFormatter();
-        static readonly Formatter LastList = new LastListFormatter();
+        static readonly Formatter Unknown = new UnknownFormatter();
+
 
         public static Formatter CreateFormatter(Syntax syntax)
         {
             switch(syntax.TokenClass)
             {
                 case BeginOfText _:
-                case EndOfText _: return Empty;
-                case LeftParenthesis _: return LeftParenthesis;
+                case EndOfText _: return Root;
+                case List _: return GetListTokenFormatter(syntax);
                 case RightParenthesis _: return RightParenthesis;
+                case LeftParenthesis _: return LeftParenthesis;
                 case Colon _: return Colon;
+
+                case ThenToken _:
+                case Reni.TokenClasses.Function _:
+                case ExclamationBoxToken _:
+                case MutableDeclarationToken _:
+                case ElseToken _: return Unknown;
+
+                case ArgToken _:
                 case Definable _:
-                    if(syntax.Left != null)
-                        return Chain;
-                    break;
-                case List _: return syntax.Right?.TokenClass == syntax.TokenClass ? List : LastList;
+                case Text _:
+                case Number _:
+                case TypeOperator _:
+                case InstanceToken _: return syntax.Left != null ? Chain : Single;
             }
 
-            return Default;
+            NotImplementedFunction(syntax, "tokenClass", syntax.TokenClass);
+            return default;
         }
 
-        public virtual IndentDirection IndentTokenAndRightSite => IndentDirection.NoIndent;
-        public virtual IndentDirection IndentLeftSite => IndentDirection.NoIndent;
-        public virtual IndentDirection IndentRightSite => IndentDirection.NoIndent;
-        public virtual bool UseLineBreakBeforeToken(FormatterMode mode) => false;
-        public virtual bool UseLineBreakAfterToken(FormatterMode mode) => false;
-        public virtual FormatterMode LeftSideWithLineBreaksMode(FormatterMode mode) => FormatterMode.None;
-        public virtual FormatterMode RightSideWithLineBreaksMode(FormatterMode mode) => FormatterMode.None;
+        static Formatter GetListTokenFormatter(Syntax syntax)
+            => syntax.Right == null
+                ? LastList
+                : syntax.Right.TokenClass == syntax.TokenClass
+                    ? List
+                    : ListEnd;
+
+        public virtual IndentDirection IndentTokenAndRightSide => IndentDirection.NoIndent;
+        public virtual IndentDirection IndentLeftSide => IndentDirection.NoIndent;
+        public virtual IndentDirection IndentRightSide => IndentDirection.NoIndent;
+        public virtual bool UseLineBreakBeforeToken(Context context) => false;
+        public virtual bool UseLineBreakAfterToken(Context context) => false;
+        public virtual Context LeftSideLineBreakContext(Context context) => context.None;
+        public virtual Context RightSideLineBreakContext(Context context) => context.None;
+        public virtual bool HasLineBreaksByContext(Context context) => false;
     }
 }

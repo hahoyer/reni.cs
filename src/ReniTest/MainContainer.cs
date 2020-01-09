@@ -21,8 +21,6 @@ namespace ReniTest
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(defaultValue: false);
 
-            new Formatting().Reformat();
-
             RunAllTests();
             //ExecT4CompilerGeneratedTest();
         }

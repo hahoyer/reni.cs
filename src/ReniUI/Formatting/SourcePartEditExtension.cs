@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Scanner;
 
 namespace ReniUI.Formatting
 {
@@ -21,8 +20,8 @@ namespace ReniUI.Formatting
         internal static readonly ISourcePartEdit ToLeft = new SpecialEdit(id: "ToLeft");
         internal static readonly ISourcePartEdit EndOfFile = new SpecialEdit(id: "EndOfFile");
 
-        internal static IEnumerable<Edit> GetEditPieces
-            (this IEnumerable<ISourcePartEdit> target, SourcePart targetPart, Configuration configuration)
+        internal static IEnumerable<Edit> 
+            GetEditPieces(this IEnumerable<ISourcePartEdit> target, Configuration configuration)
         {
             var currentPosition = 0;
             var currentIndex = 0;
@@ -58,7 +57,7 @@ namespace ReniUI.Formatting
                     parameter.Reset();
                 }
                 else
-                    Dumpable.NotImplementedFunction(target.ToArray(), targetPart, configuration);
+                    Dumpable.NotImplementedFunction(target.ToArray(), configuration);
 
                 currentIndex++;
             }
@@ -66,12 +65,10 @@ namespace ReniUI.Formatting
             return result;
         }
 
-        static IEnumerable<ISourcePartEdit>
-            IndentRight(this IEnumerable<ISourcePartEdit> target)
+        static IEnumerable<ISourcePartEdit> IndentRight(this IEnumerable<ISourcePartEdit> target)
             => new[] {ToRight}.Concat(target).Concat(new[] {ToLeft});
 
-        static IEnumerable<ISourcePartEdit>
-            IndentLeft(this IEnumerable<ISourcePartEdit> target)
+        static IEnumerable<ISourcePartEdit> IndentLeft(this IEnumerable<ISourcePartEdit> target)
             => new[] {ToLeft}.Concat(target).Concat(new[] {ToRight});
 
         internal static IEnumerable<ISourcePartEdit> 

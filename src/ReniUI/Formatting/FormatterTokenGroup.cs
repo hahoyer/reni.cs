@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Helper;
 using hw.Parser;
 using Reni.TokenClasses;
 
@@ -29,9 +30,9 @@ namespace ReniUI.Formatting
         }
 
         readonly CacheContainer Cache = new CacheContainer();
-        readonly bool IsCloseSeparatorOnRightSide;
-        readonly IToken RightNeighbor;
         readonly IToken Token;
+        readonly IToken RightNeighbor;
+        readonly bool IsCloseSeparatorOnRightSide;
 
         FormatterTokenGroup(IToken token, IToken rightNeighbor, bool isCloseSeparatorOnRightSide)
         {
@@ -90,5 +91,7 @@ namespace ReniUI.Formatting
             Tracer.ConditionalBreak(id == " a");
             return new[] {SourcePartEditExtension.EnsureSeparator};
         }
+
+        protected override string GetNodeDump() => $"{Token.Characters.Id} {RightNeighbor.Characters.Id}";
     }
 }

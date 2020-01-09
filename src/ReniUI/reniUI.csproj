@@ -69,7 +69,7 @@
     <Compile Include="Formatting\EditPieceParameter.cs" />
     <Compile Include="Formatting\Extension.cs" />
     <Compile Include="Formatting\FormatterExtension.cs" />
-    <Compile Include="Formatting\FormatterMode.cs" />
+    <Compile Include="Formatting\Context.cs" />
     <Compile Include="Formatting\FormatterToken.cs" />
     <Compile Include="Formatting\FormatterTokenGroup.cs" />
     <Compile Include="Formatting\IResultItem.cs" />
@@ -81,7 +81,6 @@
     <Compile Include="Formatting\StructFormatter.cs" />
     <Compile Include="Formatting\StructFormatterExtension.cs" />
     <Compile Include="Formatting\Structure.cs" />
-    <Compile Include="Formatting\StructureBase.cs" />
     <Compile Include="Formatting\WhiteSpace.cs" />
     <Compile Include="hw\Forms\CursorUtil.cs" />
     <Compile Include="hw\Forms\Extender.cs" />

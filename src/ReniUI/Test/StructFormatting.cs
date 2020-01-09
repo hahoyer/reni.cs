@@ -1,13 +1,16 @@
 using hw.DebugFormatter;
 using hw.UnitTest;
+using NUnit.Framework;
 using ReniUI.Formatting;
 
 namespace ReniUI.Test
 {
     [UnitTest]
+    [TestFixture]
     public sealed class StructFormatting : DependantAttribute
     {
         [UnitTest]
+        [Test]
         public void OmitSpaceWhenLineBreakRemains()
         {
             const string text =
@@ -31,6 +34,7 @@ b"
         }
 
         [UnitTest]
+        [Test]
         public void UseSpaceWhenLineBreakIsRemoved()
         {
             const string text =

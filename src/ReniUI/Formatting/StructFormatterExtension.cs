@@ -8,8 +8,8 @@ namespace ReniUI.Formatting
 {
     static class StructFormatterExtension
     {
-        internal static IStructure CreateStruct(this Syntax syntax, StructFormatter parent, FormatterMode mode)
-            => new Structure(syntax, parent, mode);
+        internal static IStructure CreateStruct(this Syntax syntax, Context context)
+            => new Structure(syntax, context);
     }
 
 }

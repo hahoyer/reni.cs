@@ -138,6 +138,7 @@ namespace Reni.TokenClasses
                     case IDeclaratorTokenClass tokenClass: return tokenClass.Get(this);
                     case RightParenthesis _:
                     case EndOfText _:
+                    case List _: 
                     case ScannerSyntaxError _: return null;
                 }
 

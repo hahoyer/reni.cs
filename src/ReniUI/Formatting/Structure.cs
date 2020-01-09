@@ -26,19 +26,18 @@ namespace ReniUI.Formatting
             }
         }
 
+        readonly Context Context;
+
         readonly Formatter Formatter;
-        readonly FormatterMode Mode;
-        readonly StructFormatter Parent;
         readonly Syntax Syntax;
 
-        bool? IsLineBreakRequiredCache;
+        bool? IsLineSplitRequiredCache;
 
-        internal Structure(Syntax syntax, StructFormatter parent, FormatterMode mode)
+        internal Structure(Syntax syntax, Context context)
         {
             Formatter = Formatter.CreateFormatter(syntax);
             Syntax = syntax;
-            Parent = parent;
-            Mode = mode;
+            Context = context;
             Tracer.Assert(Syntax != null);
         }
 
@@ -46,83 +45,83 @@ namespace ReniUI.Formatting
 
         IEnumerable<ISourcePartEdit> IStructure.GetSourcePartEdits(bool excludePrefix, bool includeSuffix)
         {
+            var token = FormatterTokenGroup.Create(Syntax);
+
+            var tokenAndRightSideEdits = new List<ISourcePartEdit>();
+
+            if(!(Syntax.Left == null && excludePrefix))
+                tokenAndRightSideEdits.AddRange(token.PrefixEdits);
+
+            tokenAndRightSideEdits.AddRange(EditsBeforeToken);
+            tokenAndRightSideEdits.AddRange(token.TokenEdits);
+            tokenAndRightSideEdits.AddRange(EditsAfterToken);
+
+            if(Syntax.Right != null || includeSuffix)
+                tokenAndRightSideEdits.AddRange(token.SuffixEdits);
+
+            if(Syntax.Right != null)
+                tokenAndRightSideEdits.AddRange(GetRightSiteEdits(includeSuffix));
+
             var result = new List<ISourcePartEdit>();
             if(Syntax.Left != null)
                 result.AddRange(GetLeftSiteEdits(excludePrefix));
-            result.AddRange(GetTokenAndRightSiteEdits(Syntax.Left == null && excludePrefix, includeSuffix));
+
+            result.AddRange(tokenAndRightSideEdits.Indent(Formatter.IndentTokenAndRightSide));
+
+            var trace = result.GetEditPieces(Context.Configuration);
             return result;
         }
 
         [EnableDump]
-        bool IsLineBreakRequired
-            => IsLineBreakRequiredCache ?? (IsLineBreakRequiredCache = GetIsLineBreakRequired()).Value;
+        string FlatResult => Syntax.FlatFormat(Context.Configuration.EmptyLineLimit);
+
+        IEnumerable<ISourcePartEdit> EditsBeforeToken
+        {
+            get
+            {
+                if(IsLineSplitRequired && Formatter.UseLineBreakBeforeToken(Context))
+                    yield return SourcePartEditExtension.LineBreak;
+            }
+        }
+
+        IEnumerable<ISourcePartEdit> EditsAfterToken
+        {
+            get
+            {
+                if(IsLineSplitRequired && Formatter.UseLineBreakAfterToken(Context))
+                    yield return SourcePartEditExtension.LineBreak;
+            }
+        }
 
         [EnableDump]
-        string FlatResult => Syntax.FlatFormat(Parent.Configuration.EmptyLineLimit);
+        bool IsLineSplitRequired
+            => IsLineSplitRequiredCache ?? (IsLineSplitRequiredCache = GetIsLineSplitRequired()).Value;
 
-        IEnumerable<ISourcePartEdit> EditsBetweenPrefixAndToken
-        {
-            get
-            {
-                if((Mode.HasLineBreakForced || IsLineBreakRequired) && Formatter.UseLineBreakBeforeToken(Mode))
-                    yield return SourcePartEditExtension.LineBreak;
-            }
-        }
+        Context LeftSideContext
+            => IsLineSplitRequired
+                ? Formatter.LeftSideLineBreakContext(Context)
+                : Context.None;
 
-        IEnumerable<ISourcePartEdit> EditsBetweenTokenAndSuffix
-        {
-            get
-            {
-                if((Mode.HasLineBreakForced || IsLineBreakRequired) && Formatter.UseLineBreakAfterToken(Mode))
-                    yield return SourcePartEditExtension.LineBreak;
-            }
-        }
+        Context RightSideContext
+            => IsLineSplitRequired
+                ? Formatter.RightSideLineBreakContext(Context)
+                : Context.None;
 
-        FormatterMode LeftSideMode
-            => Mode.HasLineBreakForced || IsLineBreakRequired
-                ? Formatter.LeftSideWithLineBreaksMode(Mode)
-                : FormatterMode.None;
-
-        FormatterMode RightSideMode
-            => Mode.HasLineBreakForced || IsLineBreakRequired
-                ? Formatter.RightSideWithLineBreaksMode(Mode)
-                : FormatterMode.None;
-
-        bool GetIsLineBreakRequired()
-            => Syntax.IsLineBreakRequired(Parent.Configuration.EmptyLineLimit, Parent.Configuration.MaxLineLength);
-
-        IEnumerable<ISourcePartEdit> GetTokenAndRightSiteEdits(bool excludePrefix, bool includeSuffix)
-        {
-            var result = new List<ISourcePartEdit>();
-            var token = FormatterTokenGroup.Create(Syntax);
-
-            if(!excludePrefix)
-                result.AddRange(token.PrefixEdits);
-
-            result.AddRange(EditsBetweenPrefixAndToken);
-            result.AddRange(token.TokenEdits);
-            result.AddRange(EditsBetweenTokenAndSuffix);
-
-            if(Syntax.Right != null || includeSuffix)
-                result.AddRange(token.SuffixEdits);
-
-            if(Syntax.Right != null)
-                result.AddRange(GetRightSiteEdits(includeSuffix));
-
-            return result.Indent(Formatter.IndentTokenAndRightSite);
-        }
+        bool GetIsLineSplitRequired()
+            => Formatter.HasLineBreaksByContext(Context) ||
+               Syntax.IsLineBreakRequired(Context.Configuration.EmptyLineLimit, Context.Configuration.MaxLineLength);
 
         IEnumerable<ISourcePartEdit> GetLeftSiteEdits(bool excludePrefix)
             => Syntax.Left
-                .CreateStruct(Parent, LeftSideMode)
+                .CreateStruct(LeftSideContext)
                 .GetSourcePartEdits(excludePrefix, includeSuffix: false)
-                .Indent(Formatter.IndentLeftSite);
+                .Indent(Formatter.IndentLeftSide);
 
         IEnumerable<ISourcePartEdit> GetRightSiteEdits(bool includeSuffix)
             => Syntax.Right
-                .CreateStruct(Parent, RightSideMode)
+                .CreateStruct(RightSideContext)
                 .GetSourcePartEdits(excludePrefix: true, includeSuffix: includeSuffix)
-                .Indent(Formatter.IndentRightSite);
+                .Indent(Formatter.IndentRightSide);
 
         protected override string GetNodeDump() => base.GetNodeDump() + " " + Syntax.Token.Characters.Id;
     }

@@ -25,9 +25,6 @@ namespace ReniUI.Test
             Tracer.Assert(reformat == "#(a", reformat);
         }
 
-        [UnitTest]
-        [Formatting]
-        [Test]
         public void LegacySystem()
         {
             var sourceDirectory
@@ -45,7 +42,8 @@ namespace ReniUI.Test
             var newSource = compiler.Reformat
             (
                 new ReniUI.Formatting.Configuration
-                    {EmptyLineLimit = 0}.Create
+                    {EmptyLineLimit = 0}
+                    .Create
                     ()
             );
             var lineCount = newSource.Count(item => item == '\n');
