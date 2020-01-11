@@ -126,9 +126,8 @@ ccccc";
         public void Reformat1_120Temp()
         {
             const string Text =
-                @"(aaaaa :
+                @"(aaaaa 
     (
-        ccccc
     ))";
 
             var expectedText =

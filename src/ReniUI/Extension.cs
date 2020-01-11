@@ -5,7 +5,6 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using hw.DebugFormatter;
-using hw.Helper;
 using hw.Scanner;
 using ReniUI.CompilationView;
 
@@ -20,10 +19,7 @@ namespace ReniUI
         {
             var result = new GroupBox
             {
-                Text = title,
-                AutoSize = true,
-                Dock = DockStyle.Fill,
-                AutoSizeMode = AutoSizeMode.GrowAndShrink
+                Text = title, AutoSize = true, Dock = DockStyle.Fill, AutoSizeMode = AutoSizeMode.GrowAndShrink
             };
             client.Location = result.DisplayRectangle.Location;
 
@@ -32,10 +28,10 @@ namespace ReniUI
         }
 
         internal static Control CreateColumnView(this IEnumerable<Control> controls)
-            => InternalCreateLineupView(true, controls);
+            => InternalCreateLineupView(useColumns: true, controls: controls);
 
         internal static Control CreateRowView(this IEnumerable<Control> controls)
-            => InternalCreateLineupView(false, controls);
+            => InternalCreateLineupView(useColumns: false, controls: controls);
 
         internal static Control CreateLineupView
             (this bool inColumns, params Control[] controls)
@@ -75,21 +71,16 @@ namespace ReniUI
             => CreateView(dumpable.Dump());
 
         internal static Label CreateView(this string text, double factor = 1, bool isBold = false)
-            => new Label
-            {
-                Font = CreateFont(factor, isBold),
-                AutoSize = true,
-                Text = text
-            };
+            => new Label {Font = CreateFont(factor, isBold), AutoSize = true, Text = text};
 
         static Font CreateFont(double factor, bool isBold = false)
             =>
-            new Font
-            (
-                "Lucida Console",
-                (int) (DefaultTextSize * factor),
-                isBold ? FontStyle.Bold : FontStyle.Regular
-            );
+                new Font
+                (
+                    familyName: "Lucida Console",
+                    emSize: (int) (DefaultTextSize * factor),
+                    style: isBold ? FontStyle.Bold : FontStyle.Regular
+                );
 
         internal static Label CreateView(this int value, double factor = 1, bool isBold = false)
             => new Label
@@ -122,11 +113,16 @@ namespace ReniUI
             var source = sourcePart.Source;
             var position = sourcePart.Position;
             var positionEnd = sourcePart.EndPosition;
-            return source.Identifier + "(" +
-                (source.LineIndex(position) + 1) + "," +
-                (source.ColumnIndex(position) + 1) + "," +
-                (source.LineIndex(positionEnd) + 1) + "," +
-                (source.ColumnIndex(positionEnd) + 1) + ")";
+            return source.Identifier +
+                   "(" +
+                   (source.LineIndex(position) + 1) +
+                   "," +
+                   (source.ColumnIndex(position) + 1) +
+                   "," +
+                   (source.LineIndex(positionEnd) + 1) +
+                   "," +
+                   (source.ColumnIndex(positionEnd) + 1) +
+                   ")";
         }
 
         internal static IEnumerable<T> Query<T>(Func<IEnumerable<T>> function)
@@ -135,12 +131,37 @@ namespace ReniUI
         sealed class QueryClass<T> : IEnumerable<T>
         {
             readonly Func<IEnumerable<T>> Function;
-            public QueryClass(Func<IEnumerable<T>> function) { Function = function; }
+            public QueryClass(Func<IEnumerable<T>> function) => Function = function;
             IEnumerator<T> GetEnumerator() => Function().GetEnumerator();
             IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
-    }
+        internal static IEnumerable<IEnumerable<T>> Split<T>(this IEnumerable<T> target, Func<T, bool> isSeparator, bool?assignSeparatorAtTopOfList)
+        {
+            var part = new List<T>();
+            foreach(var item in target)
+                if(isSeparator(item))
+                {
+                    if(assignSeparatorAtTopOfList == false)
+                        part.Add(item);
 
+                    if(part.Any())
+                        yield return part.ToArray();
+                    part = new List<T>();
+
+                    if(assignSeparatorAtTopOfList == true)
+                        part.Add(item);
+
+                }
+                else
+                    part.Add(item);
+
+            if (part.Any())
+                yield return part.ToArray();
+        }
+
+        internal static SourcePart Combine(this IEnumerable<SourcePart> target) 
+            => SourcePart.SaveCombine(target).Single();
+    }
 }

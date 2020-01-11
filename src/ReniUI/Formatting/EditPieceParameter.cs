@@ -52,12 +52,8 @@ namespace ReniUI.Formatting
 
             var piece = new List<Edit>();
             foreach(var lineBreak in currentLineBreaks.Where(item => item.Length > 0 && item.End <= location.Start))
-                piece.Add
-                (
-                    new Edit {Location = lineBreak, NewText = ""});
-            piece.Add
-            (
-                new Edit {Location = location, NewText = newText});
+                piece.Add(Edit.Create(lineBreak));
+            piece.Add(Edit.Create(location));
             return piece;
         }
 

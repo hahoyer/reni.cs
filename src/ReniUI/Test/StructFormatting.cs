@@ -9,6 +9,38 @@ namespace ReniUI.Test
     [TestFixture]
     public sealed class StructFormatting : DependantAttribute
     {
+        [Test]
+        [UnitTest]
+        public void One() {@"aaaaa".SimpleTest();}
+
+        [Test]
+        [UnitTest]
+        public void Two() {@"aaaaa bbbbb".SimpleTest();}
+
+        [Test]
+        [UnitTest]
+        public void BreakLine()
+        {
+            @"aaaaa bbbbb".SimpleTest(maxLineLength: 10, expected:@"aaaaa
+bbbbb");
+        }
+
+        [Test]
+        [UnitTest]
+        public void BreakLineWithLimit1() {@"aaaaa 
+
+bbbbb".SimpleTest(expected: @"aaaaa
+bbbbb",
+            emptyLineLimit:1);}
+
+        [Test]
+        [UnitTest]
+        public void BreakLineWithLimit0() {@"aaaaa 
+
+bbbbb".SimpleTest(expected: @"aaaaa bbbbb",
+            emptyLineLimit:0);}
+
+
         [UnitTest]
         [Test]
         public void OmitSpaceWhenLineBreakRemains()

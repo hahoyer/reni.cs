@@ -20,28 +20,31 @@ namespace ReniUI.Formatting
 
         sealed class ChainFormatter : Formatter
         {
-            public override bool UseLineBreakBeforeToken(Context context) => true;
+            public override int LineBreaksBeforeToken(Context context) => 1;
         }
 
         sealed class LeftParenthesisFormatter : Formatter
         {
             public override IndentDirection IndentRightSide => IndentDirection.ToRight;
-            public override bool UseLineBreakBeforeToken(Context context) => context.LineBreakBeforeLeftParenthesis;
-            public override bool UseLineBreakAfterToken(Context context) => true;
+
+            public override int LineBreaksBeforeToken(Context context) 
+                => context.LineBreakBeforeLeftParenthesis ? 1 : 0;
+
+            public override int LineBreaksAfterToken(Context context) => 1;
             public override Context RightSideLineBreakContext(Context context) => context.ForList;
             public override bool HasLineBreaksByContext(Context context) => context.LineBreaksForLeftParenthesis;
         }
 
         sealed class RightParenthesisFormatter : Formatter
         {
-            public override bool UseLineBreakBeforeToken(Context context) => true;
+            public override int LineBreaksBeforeToken(Context context) => 1;
             public override Context LeftSideLineBreakContext(Context context) => context.LeftSideOfRightParenthesis;
             public override bool HasLineBreaksByContext(Context context) => context.LineBreaksForRightParenthesis;
         }
 
         sealed class ListFormatter : Formatter
         {
-            public override bool UseLineBreakAfterToken(Context context) => true;
+            public override int LineBreaksAfterToken(Context context) => 1;
             public override bool HasLineBreaksByContext(Context context) => context.LineBreaksForList;
             public override Context RightSideLineBreakContext(Context context) => context.ForList;
         }
@@ -53,7 +56,7 @@ namespace ReniUI.Formatting
 
         sealed class ListEndFormatter : Formatter
         {
-            public override bool UseLineBreakAfterToken(Context context) => true;
+            public override int LineBreaksAfterToken(Context context) => 1;
             public override bool HasLineBreaksByContext(Context context) => context.LineBreaksForList;
         }
 
@@ -105,11 +108,11 @@ namespace ReniUI.Formatting
                     ? List
                     : ListEnd;
 
-        public virtual IndentDirection IndentTokenAndRightSide => IndentDirection.NoIndent;
+        public virtual IndentDirection IndentToken => IndentDirection.NoIndent;
         public virtual IndentDirection IndentLeftSide => IndentDirection.NoIndent;
         public virtual IndentDirection IndentRightSide => IndentDirection.NoIndent;
-        public virtual bool UseLineBreakBeforeToken(Context context) => false;
-        public virtual bool UseLineBreakAfterToken(Context context) => false;
+        public virtual int LineBreaksBeforeToken(Context context) => 0;
+        public virtual int LineBreaksAfterToken(Context context) => 0;
         public virtual Context LeftSideLineBreakContext(Context context) => context.None;
         public virtual Context RightSideLineBreakContext(Context context) => context.None;
         public virtual bool HasLineBreaksByContext(Context context) => false;

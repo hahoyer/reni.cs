@@ -1,31 +1,13 @@
 using System.Collections.Generic;
+using System.Linq;
 using hw.DebugFormatter;
-using hw.Scanner;
+using hw.Parser;
 using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
     sealed class Structure : DumpableObject, IStructure
     {
-        static void AssertValid(IEnumerable<ISourcePartEdit> result)
-        {
-            var currentPosition = 0;
-            // ReSharper disable once NotAccessedVariable, is for debugging purpose
-            var currentIndex = 0;
-
-            foreach(var edit in result)
-            {
-                if(edit is SourcePartEdit s)
-                {
-                    var part = ((ISourcePartProxy) s.Source).All;
-                    Tracer.Assert(part.Position >= currentPosition);
-                    currentPosition = part.EndPosition;
-                }
-
-                currentIndex++;
-            }
-        }
-
         readonly Context Context;
 
         readonly Formatter Formatter;
@@ -43,55 +25,38 @@ namespace ReniUI.Formatting
 
         Syntax IStructure.Syntax => Syntax;
 
-        IEnumerable<ISourcePartEdit> IStructure.GetSourcePartEdits(bool excludePrefix, bool includeSuffix)
+        IEnumerable<ISourcePartEdit> IStructure.GetSourcePartEdits()
         {
-            var token = FormatterTokenGroup.Create(Syntax);
-
-            var tokenAndRightSideEdits = new List<ISourcePartEdit>();
-
-            if(!(Syntax.Left == null && excludePrefix))
-                tokenAndRightSideEdits.AddRange(token.PrefixEdits);
-
-            tokenAndRightSideEdits.AddRange(EditsBeforeToken);
-            tokenAndRightSideEdits.AddRange(token.TokenEdits);
-            tokenAndRightSideEdits.AddRange(EditsAfterToken);
-
-            if(Syntax.Right != null || includeSuffix)
-                tokenAndRightSideEdits.AddRange(token.SuffixEdits);
-
-            if(Syntax.Right != null)
-                tokenAndRightSideEdits.AddRange(GetRightSiteEdits(includeSuffix));
-
             var result = new List<ISourcePartEdit>();
-            if(Syntax.Left != null)
-                result.AddRange(GetLeftSiteEdits(excludePrefix));
+            if(Syntax.Left!= null)
+                result.AddRange(GetLeftSiteEdits().Indent(Formatter.IndentLeftSide));
+            result.AddRange(GetTokenEdits().Indent(Formatter.IndentToken));
+            if(Syntax.Right != null)
+                result.AddRange(GetRightSiteEdits().Indent(Formatter.IndentRightSide));
 
-            result.AddRange(tokenAndRightSideEdits.Indent(Formatter.IndentTokenAndRightSide));
-
-            var trace = result.GetEditPieces(Context.Configuration);
-            return result;
+            var b = AsString(result.ToArray());
+            return result.ToArray();
         }
+
+        IEnumerable<ISourcePartEdit> GetTokenEdits()
+        {
+            ISeparatorType leftSeparator = Syntax.LeftSideSeparator();
+            yield return new FormatterTokenView(leftSeparator, LineBreaksBeforeToken,Syntax.Token, LineBreaksAfterToken, Context.Configuration);
+        }
+
+        string AsString(ISourcePartEdit[] tokenAndRightSideEdits)
+            => tokenAndRightSideEdits
+                .GetEditPieces(Context.Configuration)
+                .Combine(Syntax.SourcePart.Source.All);
 
         [EnableDump]
         string FlatResult => Syntax.FlatFormat(Context.Configuration.EmptyLineLimit);
 
-        IEnumerable<ISourcePartEdit> EditsBeforeToken
-        {
-            get
-            {
-                if(IsLineSplitRequired && Formatter.UseLineBreakBeforeToken(Context))
-                    yield return SourcePartEditExtension.LineBreak;
-            }
-        }
+        int LineBreaksBeforeToken 
+            => IsLineSplitRequired ? Formatter.LineBreaksBeforeToken(Context) : 0;
 
-        IEnumerable<ISourcePartEdit> EditsAfterToken
-        {
-            get
-            {
-                if(IsLineSplitRequired && Formatter.UseLineBreakAfterToken(Context))
-                    yield return SourcePartEditExtension.LineBreak;
-            }
-        }
+        int LineBreaksAfterToken 
+            => IsLineSplitRequired ? Formatter.LineBreaksAfterToken(Context) : 0;
 
         [EnableDump]
         bool IsLineSplitRequired
@@ -111,18 +76,20 @@ namespace ReniUI.Formatting
             => Formatter.HasLineBreaksByContext(Context) ||
                Syntax.IsLineBreakRequired(Context.Configuration.EmptyLineLimit, Context.Configuration.MaxLineLength);
 
-        IEnumerable<ISourcePartEdit> GetLeftSiteEdits(bool excludePrefix)
+        IEnumerable<ISourcePartEdit> GetLeftSiteEdits()
             => Syntax.Left
                 .CreateStruct(LeftSideContext)
-                .GetSourcePartEdits(excludePrefix, includeSuffix: false)
+                .GetSourcePartEdits()
                 .Indent(Formatter.IndentLeftSide);
 
-        IEnumerable<ISourcePartEdit> GetRightSiteEdits(bool includeSuffix)
+        IEnumerable<ISourcePartEdit> GetRightSiteEdits()
             => Syntax.Right
                 .CreateStruct(RightSideContext)
-                .GetSourcePartEdits(excludePrefix: true, includeSuffix: includeSuffix)
+                .GetSourcePartEdits()
                 .Indent(Formatter.IndentRightSide);
 
         protected override string GetNodeDump() => base.GetNodeDump() + " " + Syntax.Token.Characters.Id;
+
+        static IEnumerable<TValue> T<TValue>(params TValue[] value) => value;
     }
 }

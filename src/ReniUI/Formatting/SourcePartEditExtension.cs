@@ -44,9 +44,9 @@ namespace ReniUI.Formatting
                     parameter.IsSeparatorRequired = true;
                 else if(part == EndOfFile)
                     parameter.IsEndOfFile = true;
-                else if(part is SourcePartEdit spe)
+                else if(part is IEditPieces spe)
                 {
-                    var edits = spe.GetEditPiece(parameter).ToArray();
+                    var edits = spe.Get(parameter).ToArray();
                     foreach(var edit in edits)
                     {
                         Tracer.Assert(currentPosition <= edit.Location.Position);
@@ -72,15 +72,20 @@ namespace ReniUI.Formatting
             => new[] {ToLeft}.Concat(target).Concat(new[] {ToRight});
 
         internal static IEnumerable<ISourcePartEdit> 
-            Indent(this IEnumerable<ISourcePartEdit> target, IndentDirection toLeft)
+            Indent(this IEnumerable<ISourcePartEdit> target, IndentDirection direction)
         {
-            switch(toLeft)
+            switch(direction)
             {
                 case IndentDirection.ToLeft: return IndentLeft(target);
                 case IndentDirection.ToRight: return IndentRight(target);
                 default: return target;
             }
         }
+    }
+
+    interface IEditPieces
+    {
+        IEnumerable<Edit> Get(EditPieceParameter parameter);
     }
 
     enum IndentDirection

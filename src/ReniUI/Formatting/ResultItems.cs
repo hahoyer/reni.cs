@@ -138,14 +138,7 @@ namespace ReniUI.Formatting
 
                     if(newText != "" || removeCount > 0)
                     {
-                        result.Add
-                        (
-                            new Edit
-                            {
-                                Location = lastPosition.Span(removeCount),
-                                NewText = newText
-                            });
-
+                        result.Add(Edit.Create(lastPosition.Span(removeCount), newText));
                         newText = "";
                         removeCount = 0;
                     }

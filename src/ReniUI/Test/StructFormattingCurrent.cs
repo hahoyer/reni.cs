@@ -10,6 +10,15 @@ namespace ReniUI.Test
     [StructFormatting]
     public sealed class StructFormattingCurrent : DependantAttribute
     {
+
+        [Test]
+        [UnitTest]
+        public void Start() {@"aaaaa 
+
+bbbbb".SimpleTest(expected: @"aaaaa
+bbbbb",
+            maxLineLength: 10);}
+
         [Test]
         [UnitTest]
         public void LabeledEntriesInList()

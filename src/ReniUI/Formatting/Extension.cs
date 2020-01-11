@@ -50,7 +50,7 @@ namespace ReniUI.Formatting
             return result + target.Characters.Id;
         }
 
-        static ISeparatorType LeftSideSeparator(this Syntax target)
+        internal static ISeparatorType LeftSideSeparator(this Syntax target)
         {
             var left = target.LeftNeighbor?.TokenClass;
             return target.Token.PrecededWith.HasComment()

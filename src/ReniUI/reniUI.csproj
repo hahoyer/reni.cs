@@ -70,13 +70,11 @@
     <Compile Include="Formatting\Extension.cs" />
     <Compile Include="Formatting\FormatterExtension.cs" />
     <Compile Include="Formatting\Context.cs" />
-    <Compile Include="Formatting\FormatterToken.cs" />
-    <Compile Include="Formatting\FormatterTokenGroup.cs" />
+    <Compile Include="Formatting\FormatterTokenView.cs" />
     <Compile Include="Formatting\IResultItem.cs" />
     <Compile Include="Formatting\IStructure.cs" />
     <Compile Include="Formatting\ResultItems.cs" />
     <Compile Include="Formatting\Skeleton.cs" />
-    <Compile Include="Formatting\SourcePartEdit.cs" />
     <Compile Include="Formatting\SourcePartEditExtension.cs" />
     <Compile Include="Formatting\StructFormatter.cs" />
     <Compile Include="Formatting\StructFormatterExtension.cs" />
@@ -167,6 +165,7 @@
     <Compile Include="Test\BadUserInterAction.cs" />
     <Compile Include="Test\BraceMatching.cs" />
     <Compile Include="Test\ExpressionFormatting.cs" />
+    <Compile Include="Test\Extension.cs" />
     <Compile Include="Test\Formatting.cs" />
     <Compile Include="Test\FormattingLong.cs" />
     <Compile Include="Test\FormattingMultiLines.cs" />
