@@ -10,9 +10,9 @@ namespace ReniUI.Formatting
 {
     /// <summary>
     ///     Encapsulates all comment, line-break and space formatting for a token.
-    /// This class has a very high complexity, since the target is quite complex.
-    /// The member names by default belong to thing on the left side of the token.
-    /// Things on the right side contain this fact in their name.
+    ///     This class has a very high complexity, since the target is quite complex.
+    ///     The member names by default belong to thing on the left side of the token.
+    ///     Things on the right side contain this fact in their name.
     /// </summary>
     sealed class FormatterTokenView : DumpableObject, ISourcePartEdit, IEditPieces
     {
@@ -29,35 +29,38 @@ namespace ReniUI.Formatting
         [EnableDump]
         readonly ISeparatorType Separator;
 
+        [EnableDumpExcept(exception: 0)]
+        readonly int LineBreaksFromNeighbor;
+
         [EnableDump]
         readonly int MinimalLineBreaks;
 
         [EnableDump]
         readonly IToken Token;
 
-        [EnableDump]
-        readonly int MinimalLineBreaksOnRightSide;
-
         readonly Configuration Configuration;
 
         internal FormatterTokenView
         (
             ISeparatorType separator,
+            int lineBreaksFromNeighbor,
             int lineBreaks,
             IToken token,
-            int minimalLineBreaksOnRightSide,
-            Configuration configuration)
+            Configuration configuration
+        )
         {
             Separator = separator;
-            MinimalLineBreaks = lineBreaks;
+
+            Tracer.Assert(lineBreaksFromNeighbor == 0 || lineBreaks == 0);
+            LineBreaksFromNeighbor = lineBreaksFromNeighbor;
+            MinimalLineBreaks = lineBreaks + lineBreaksFromNeighbor;
             Token = token;
-            MinimalLineBreaksOnRightSide = minimalLineBreaksOnRightSide;
             Configuration = configuration;
         }
 
         /// <summary>
-        /// Edits, i. e. pairs of oldtext/newtext are generated to accomplish the target text.
-        /// The goal is, to change only things necessary to allow editors to work smoothly
+        ///     Edits, i. e. pairs of oldtext/newtext are generated to accomplish the target text.
+        ///     The goal is, to change only things necessary to allow editors to work smoothly
         /// </summary>
         /// <returns></returns>
         IEnumerable<Edit> IEditPieces.Get(EditPieceParameter parameter)
@@ -74,20 +77,14 @@ namespace ReniUI.Formatting
                 return default;
             }
 
-            if(MinimalLineBreaksOnRightSide > 0)
-            {
-                NotImplementedMethod(parameter);
-                return default;
-            }
-
-            return GetLineBreakEdits().Concat(GetSpaceEdits(parameter.Indent));
+            return GetLineBreakEdits().Concat(GetSpaceEdits(parameter.IndentCharacterCount));
         }
 
         /// <summary>
-        /// Extra line breaks are added at first.
-        /// Then current line breaks are re-used from left to right.
-        /// For those edits could be generated if they had leading spaces.
-        /// Line breaks that are not used anymore are removed.
+        ///     Extra line breaks are added at first.
+        ///     Then current line breaks are re-used from left to right.
+        ///     For those edits could be generated if they had leading spaces.
+        ///     Line breaks that are not used anymore are removed.
         /// </summary>
         /// <returns></returns>
         IEnumerable<Edit> GetLineBreakEdits()
@@ -109,15 +106,15 @@ namespace ReniUI.Formatting
             }
         }
 
-        IEnumerable<Edit> GetSpaceEdits(int indent)
+        IEnumerable<Edit> GetSpaceEdits(int indentCharacterCount)
         {
-            Tracer.Assert(TargetLineBreaks == 0 || TargetSeparator == SeparatorType.CloseSeparator);
+            Tracer.Assert(TargetLineBreaks == 0 || TargetSeparator == SeparatorType.ContactSeparator);
             Tracer.Assert(Spaces.Id.All(c => c == ' '));
             Tracer.Assert(TargetSeparator.Text.All(c => c == ' '));
 
             var targetSpacesCount = TargetLineBreaks == 0
                 ? TargetSeparator.Text.Length
-                : indent * Configuration.IndentCount;
+                : indentCharacterCount;
 
             var delta = targetSpacesCount - Spaces.Length;
             if(delta == 0)
@@ -136,9 +133,9 @@ namespace ReniUI.Formatting
 
 
         /// <summary>
-        /// Can be controlled by configuration value EmptyLineLimit.
-        /// If not set, all line breaks are retained.
-        /// However, new line break can be added if required
+        ///     Can be controlled by configuration value EmptyLineLimit.
+        ///     If not set, all line breaks are retained.
+        ///     However, new line break can be added if required
         /// </summary>
         int TargetLineBreaks
         {
@@ -155,7 +152,7 @@ namespace ReniUI.Formatting
                 ? Separator
                 : SeparatorType.ContactSeparator;
 
-        SourcePart LineBreaksAnchor 
+        SourcePart LineBreaksAnchor
             => (LineBreakGroups.FirstOrDefault() ?? Spaces).Start.Span(length: 0);
 
         SourcePart[] LineBreakGroups

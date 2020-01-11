@@ -20,17 +20,7 @@ namespace ReniUI.Test
 llll: bbbbb;
 ccccc";
 
-            var compiler = CompilerBrowser.FromText(text);
-            var newSource = compiler.Reformat
-            (
-                new ReniUI.Formatting.Configuration
-                {
-                    MaxLineLength = 10,
-                    EmptyLineLimit = 1
-                }.Create()
-                );
-
-            Tracer.Assert(newSource == expectedText, "\n\"" + newSource + "\"");
+            text.SimpleTest(expectedText,10,1);
         }
 
         [Test]

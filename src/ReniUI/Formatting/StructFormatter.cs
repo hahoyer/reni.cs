@@ -18,7 +18,7 @@ namespace ReniUI.Formatting
 
             var structItem = syntax.CreateStruct(Context.GetRoot(Configuration));
 
-            var sourcePartEdits = structItem.GetSourcePartEdits().ToArray();
+            var sourcePartEdits = structItem.Get(0).edits.ToArray();
             var editPieces = sourcePartEdits.GetEditPieces(Configuration);
             return editPieces;
         }

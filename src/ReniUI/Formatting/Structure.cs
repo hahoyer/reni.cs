@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using System.Linq;
 using hw.DebugFormatter;
-using hw.Parser;
 using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
@@ -25,37 +23,53 @@ namespace ReniUI.Formatting
 
         Syntax IStructure.Syntax => Syntax;
 
-        IEnumerable<ISourcePartEdit> IStructure.GetSourcePartEdits()
+        (IEnumerable<ISourcePartEdit>, int) IStructure.Get(int minimalLineBreaks)
         {
             var result = new List<ISourcePartEdit>();
-            if(Syntax.Left!= null)
-                result.AddRange(GetLeftSiteEdits().Indent(Formatter.IndentLeftSide));
-            result.AddRange(GetTokenEdits().Indent(Formatter.IndentToken));
+            if(Syntax.Left != null)
+            {
+                var leftSide = GetLeftSide(minimalLineBreaks);
+                result.AddRange(leftSide.edits.Indent(Formatter.IndentLeftSide));
+                minimalLineBreaks = leftSide.lineBreaks;
+            }
+
+            result.AddRange(GetTokenEdits(minimalLineBreaks).Indent(Formatter.IndentToken));
+            var lineBreaksOnRightSide = LineBreaksOnRightSide;
             if(Syntax.Right != null)
-                result.AddRange(GetRightSiteEdits().Indent(Formatter.IndentRightSide));
+            {
+                var rightSide = GetRightSide(lineBreaksOnRightSide);
+                result.AddRange(rightSide.edits.Indent(Formatter.IndentRightSide));
+                lineBreaksOnRightSide = rightSide.lineBreaks;
+            }
 
             var b = AsString(result.ToArray());
-            return result.ToArray();
+            return (result.ToArray(), lineBreaksOnRightSide);
         }
 
-        IEnumerable<ISourcePartEdit> GetTokenEdits()
+        IEnumerable<ISourcePartEdit> GetTokenEdits(int minimalLineBreaks)
         {
-            ISeparatorType leftSeparator = Syntax.LeftSideSeparator();
-            yield return new FormatterTokenView(leftSeparator, LineBreaksBeforeToken,Syntax.Token, LineBreaksAfterToken, Context.Configuration);
+            yield return new FormatterTokenView
+            (
+                Syntax.LeftSideSeparator(),
+                minimalLineBreaks,
+                LineBreaksOnLeftSide,
+                Syntax.Token,
+                Context.Configuration
+            );
         }
 
-        string AsString(ISourcePartEdit[] tokenAndRightSideEdits)
-            => tokenAndRightSideEdits
+        string AsString(ISourcePartEdit[] target)
+            => target
                 .GetEditPieces(Context.Configuration)
                 .Combine(Syntax.SourcePart.Source.All);
 
         [EnableDump]
         string FlatResult => Syntax.FlatFormat(Context.Configuration.EmptyLineLimit);
 
-        int LineBreaksBeforeToken 
+        int LineBreaksOnLeftSide
             => IsLineSplitRequired ? Formatter.LineBreaksBeforeToken(Context) : 0;
 
-        int LineBreaksAfterToken 
+        int LineBreaksOnRightSide
             => IsLineSplitRequired ? Formatter.LineBreaksAfterToken(Context) : 0;
 
         [EnableDump]
@@ -76,17 +90,15 @@ namespace ReniUI.Formatting
             => Formatter.HasLineBreaksByContext(Context) ||
                Syntax.IsLineBreakRequired(Context.Configuration.EmptyLineLimit, Context.Configuration.MaxLineLength);
 
-        IEnumerable<ISourcePartEdit> GetLeftSiteEdits()
+        (IEnumerable<ISourcePartEdit> edits, int lineBreaks) GetLeftSide(int minimalLineBreaks)
             => Syntax.Left
                 .CreateStruct(LeftSideContext)
-                .GetSourcePartEdits()
-                .Indent(Formatter.IndentLeftSide);
+                .Get(minimalLineBreaks);
 
-        IEnumerable<ISourcePartEdit> GetRightSiteEdits()
+        (IEnumerable<ISourcePartEdit> edits, int lineBreaks) GetRightSide(int minimalLineBreaks)
             => Syntax.Right
                 .CreateStruct(RightSideContext)
-                .GetSourcePartEdits()
-                .Indent(Formatter.IndentRightSide);
+                .Get(minimalLineBreaks);
 
         protected override string GetNodeDump() => base.GetNodeDump() + " " + Syntax.Token.Characters.Id;
 
