@@ -10,48 +10,56 @@ namespace ReniUI.Formatting
 {
     /// <summary>
     ///     Encapsulates all comment, line-break and space formatting for a token.
+    /// This class has a very high complexity, since the target is quite complex.
+    /// The member names by default belong to thing on the left side of the token.
+    /// Things on the right side contain this fact in their name.
     /// </summary>
     sealed class FormatterTokenView : DumpableObject, ISourcePartEdit, IEditPieces
     {
         sealed class CacheContainer
         {
             public IEnumerable<IItem>[] CommentGroups;
-            public SourcePart[] LineBreaksBefore;
-            public SourcePart SpacesBefore;
+            public SourcePart[] LineBreaks;
+            public SourcePart Spaces;
         }
 
         readonly CacheContainer Cache = new CacheContainer();
 
 
         [EnableDump]
-        readonly ISeparatorType LeftSeparator;
+        readonly ISeparatorType Separator;
 
         [EnableDump]
-        readonly int MinimalLineBreaksBefore;
+        readonly int MinimalLineBreaks;
 
         [EnableDump]
         readonly IToken Token;
 
         [EnableDump]
-        readonly int LineBreaksAfter;
+        readonly int MinimalLineBreaksOnRightSide;
 
         readonly Configuration Configuration;
 
         internal FormatterTokenView
         (
-            ISeparatorType leftSeparator,
-            int lineBreaksBefore,
+            ISeparatorType separator,
+            int lineBreaks,
             IToken token,
-            int lineBreaksAfter,
+            int minimalLineBreaksOnRightSide,
             Configuration configuration)
         {
-            LeftSeparator = leftSeparator;
-            MinimalLineBreaksBefore = lineBreaksBefore;
+            Separator = separator;
+            MinimalLineBreaks = lineBreaks;
             Token = token;
-            LineBreaksAfter = lineBreaksAfter;
+            MinimalLineBreaksOnRightSide = minimalLineBreaksOnRightSide;
             Configuration = configuration;
         }
 
+        /// <summary>
+        /// Edits, i. e. pairs of oldtext/newtext are generated to accomplish the target text.
+        /// The goal is, to change only things necessary to allow editors to work smoothly
+        /// </summary>
+        /// <returns></returns>
         IEnumerable<Edit> IEditPieces.Get(EditPieceParameter parameter)
         {
             if(Token == null)
@@ -66,26 +74,33 @@ namespace ReniUI.Formatting
                 return default;
             }
 
-            if(LineBreaksAfter > 0)
+            if(MinimalLineBreaksOnRightSide > 0)
             {
                 NotImplementedMethod(parameter);
                 return default;
             }
 
-            return GetLineBreakEditsBefore().Concat(GetSpaceEditsBefore(parameter.Indent));
+            return GetLineBreakEdits().Concat(GetSpaceEdits(parameter.Indent));
         }
 
-        IEnumerable<Edit> GetLineBreakEditsBefore()
+        /// <summary>
+        /// Extra line breaks are added at first.
+        /// Then current line breaks are re-used from left to right.
+        /// For those edits could be generated if they had leading spaces.
+        /// Line breaks that are not used anymore are removed.
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<Edit> GetLineBreakEdits()
         {
-            var delta = NewLineBreaksBefore - LineBreakGroupsBefore.Length;
+            var delta = TargetLineBreaks - LineBreakGroups.Length;
             if(delta > 0)
                 yield return Edit.Create(LineBreaksAnchor, "\n".Repeat(delta));
 
-            for(var index = 0; index < LineBreakGroupsBefore.Length; index++)
+            for(var index = 0; index < LineBreakGroups.Length; index++)
             {
-                var groupPart = LineBreakGroupsBefore[index];
+                var groupPart = LineBreakGroups[index];
 
-                if(index >= NewLineBreaksBefore)
+                if(index >= TargetLineBreaks)
                     yield return Edit.Create(groupPart); // Remove spaces and break
                 else if(groupPart.Length > 1)
                     yield return Edit.Create(groupPart.Start.Span(groupPart.Length - 1));
@@ -94,19 +109,21 @@ namespace ReniUI.Formatting
             }
         }
 
-        IEnumerable<Edit> GetSpaceEditsBefore(int indent)
+        IEnumerable<Edit> GetSpaceEdits(int indent)
         {
-            var newSpaces = NewLeftSeparator.Text.Length;
-            if(NewLineBreaksBefore > 0)
-                newSpaces += indent * Configuration.IndentCount;
+            Tracer.Assert(TargetLineBreaks == 0 || TargetSeparator == SeparatorType.CloseSeparator);
+            Tracer.Assert(Spaces.Id.All(c => c == ' '));
+            Tracer.Assert(TargetSeparator.Text.All(c => c == ' '));
 
-            Tracer.Assert(SpacesBefore.Id.All(c => c == ' '));
+            var targetSpacesCount = TargetLineBreaks == 0
+                ? TargetSeparator.Text.Length
+                : indent * Configuration.IndentCount;
 
-            var delta = newSpaces - SpacesBefore.Length;
+            var delta = targetSpacesCount - Spaces.Length;
             if(delta == 0)
                 yield break;
 
-            var deletedPart = SpacesBefore.Start.Span(T(-delta, 0).Max());
+            var deletedPart = Spaces.Start.Span(T(-delta, 0).Max());
             var newText = " ".Repeat(T(delta, 0).Max());
             yield return Edit.Create(deletedPart, newText);
         }
@@ -114,31 +131,37 @@ namespace ReniUI.Formatting
         IEnumerable<IItem>[] CommentGroups
             => Cache.CommentGroups ?? (Cache.CommentGroups = GetCommentGroups());
 
-        SourcePart SpacesBefore
-            => Cache.SpacesBefore ?? (Cache.SpacesBefore = GetSpacesBefore());
+        SourcePart Spaces
+            => Cache.Spaces ?? (Cache.Spaces = GetSpaces());
 
-        int NewLineBreaksBefore
+
+        /// <summary>
+        /// Can be controlled by configuration value EmptyLineLimit.
+        /// If not set, all line breaks are retained.
+        /// However, new line break can be added if required
+        /// </summary>
+        int TargetLineBreaks
         {
             get
             {
-                var emptyLineLimit = Configuration.EmptyLineLimit ?? LineBreakGroupsBefore.Length;
-                var keepLineBreaksBefore = T(LineBreakGroupsBefore.Length, emptyLineLimit).Min();
-                return T(MinimalLineBreaksBefore, keepLineBreaksBefore).Max();
+                var emptyLineLimit = Configuration.EmptyLineLimit ?? LineBreakGroups.Length;
+                var keepLineBreaksBefore = T(LineBreakGroups.Length, emptyLineLimit).Min();
+                return T(MinimalLineBreaks, keepLineBreaksBefore).Max();
             }
         }
 
-        ISeparatorType NewLeftSeparator
-            => NewLineBreaksBefore == 0
-                ? LeftSeparator
+        ISeparatorType TargetSeparator
+            => TargetLineBreaks == 0
+                ? Separator
                 : SeparatorType.ContactSeparator;
 
         SourcePart LineBreaksAnchor 
-            => (LineBreakGroupsBefore.FirstOrDefault() ?? SpacesBefore).Start.Span(length: 0);
+            => (LineBreakGroups.FirstOrDefault() ?? Spaces).Start.Span(length: 0);
 
-        SourcePart[] LineBreakGroupsBefore
-            => Cache.LineBreaksBefore ?? (Cache.LineBreaksBefore = GetLineBreaksBefore());
+        SourcePart[] LineBreakGroups
+            => Cache.LineBreaks ?? (Cache.LineBreaks = GetLineBreaks());
 
-        SourcePart GetSpacesBefore()
+        SourcePart GetSpaces()
         {
             var result = Token
                 .PrecededWith
@@ -149,7 +172,7 @@ namespace ReniUI.Formatting
             return result?.Last().IsWhiteSpace() == true ? result.SourcePart() : Token.Characters.Start.Span(length: 0);
         }
 
-        SourcePart[] GetLineBreaksBefore()
+        SourcePart[] GetLineBreaks()
         {
             var result = Token
                 .PrecededWith
