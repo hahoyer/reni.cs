@@ -77,7 +77,7 @@ namespace ReniUI.Formatting
             if(tokenString == null)
                 return null;
 
-            tokenString = target.LeftSideSeparator().Text + tokenString + target.RightSideSeparator().Text;
+            tokenString = target.LeftSideSeparator().Text + tokenString;
 
             var leftResult = target.Left.FlatSubFormat<TContainer, TValue>(emptyLineLimit);
             if(leftResult == null)
