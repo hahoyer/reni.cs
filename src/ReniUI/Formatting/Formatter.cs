@@ -1,4 +1,5 @@
 using hw.Helper;
+using NUnit.Framework.Constraints;
 using Reni.Feature;
 using Reni.Parser;
 using Reni.TokenClasses;
@@ -37,7 +38,7 @@ namespace ReniUI.Formatting
 
         sealed class RightParenthesisFormatter : Formatter
         {
-            public override int LineBreaksBeforeToken(Context context) => 1;
+            public override int LineBreaksBeforeToken(Context context) => 0;
             public override Context LeftSideLineBreakContext(Context context) => context.LeftSideOfRightParenthesis;
             public override bool HasLineBreaksByContext(Context context) => context.LineBreaksForRightParenthesis;
         }
@@ -51,6 +52,7 @@ namespace ReniUI.Formatting
 
         sealed class LastListFormatter : Formatter
         {
+            public override int LineBreaksAfterToken(Context context) => 1;
             public override bool HasLineBreaksByContext(Context context) => context.LineBreaksForList;
         }
 
@@ -58,6 +60,7 @@ namespace ReniUI.Formatting
         {
             public override int LineBreaksAfterToken(Context context) => 1;
             public override bool HasLineBreaksByContext(Context context) => context.LineBreaksForList;
+            public override int LineBreaksRightOfRight => 1;
         }
 
         static readonly Formatter Root = new RootFormatter();
@@ -111,10 +114,14 @@ namespace ReniUI.Formatting
         public virtual IndentDirection IndentToken => IndentDirection.NoIndent;
         public virtual IndentDirection IndentLeftSide => IndentDirection.NoIndent;
         public virtual IndentDirection IndentRightSide => IndentDirection.NoIndent;
+
+        public virtual int LineBreaksLeftOfLeft => 0;
         public virtual int LineBreaksBeforeToken(Context context) => 0;
         public virtual int LineBreaksAfterToken(Context context) => 0;
         public virtual Context LeftSideLineBreakContext(Context context) => context.None;
         public virtual Context RightSideLineBreakContext(Context context) => context.None;
         public virtual bool HasLineBreaksByContext(Context context) => false;
+        public virtual int LineBreaksRightOfRight => 0;
+        public virtual bool IsTrace => false;
     }
 }
