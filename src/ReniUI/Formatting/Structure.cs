@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using hw.DebugFormatter;
 using Reni.TokenClasses;
 
@@ -8,6 +9,7 @@ namespace ReniUI.Formatting
     {
         readonly Context Context;
 
+        [EnableDump]
         readonly Formatter Formatter;
         readonly Syntax Syntax;
 
@@ -25,25 +27,38 @@ namespace ReniUI.Formatting
 
         (IEnumerable<ISourcePartEdit>, int) IStructure.Get(int minimalLineBreaks)
         {
-            var result = new List<ISourcePartEdit>();
-            if(Syntax.Left != null)
+            var trace = Formatter.IsTrace;
+            StartMethodDump(trace, minimalLineBreaks);
+            try
             {
-                var leftSide = GetLeftSide(minimalLineBreaks);
-                result.AddRange(leftSide.edits.Indent(Formatter.IndentLeftSide));
-                minimalLineBreaks = leftSide.lineBreaks;
-            }
+                Tracer.ConditionalBreak(trace);
+                var result = new List<ISourcePartEdit>();
+                if(Syntax.Left != null)
+                {
+                    var leftOfLeft = Formatter.LineBreaksLeftOfLeft;
+                    if(minimalLineBreaks < leftOfLeft)
+                        minimalLineBreaks = leftOfLeft;
+                    var leftSide = GetLeftSide(minimalLineBreaks);
+                    result.AddRange(leftSide.edits.Indent(Formatter.IndentLeftSide));
+                    minimalLineBreaks = leftSide.lineBreaks;
+                }
 
-            result.AddRange(GetTokenEdits(minimalLineBreaks).Indent(Formatter.IndentToken));
-            var lineBreaksOnRightSide = LineBreaksOnRightSide;
-            if(Syntax.Right != null)
+                result.AddRange(GetTokenEdits(minimalLineBreaks).Indent(Formatter.IndentToken));
+                var lineBreaksOnRightSide = LineBreaksOnRightSide;
+                if(Syntax.Right != null)
+                {
+                    var rightSide = GetRightSide(lineBreaksOnRightSide);
+                    result.AddRange(rightSide.edits.Indent(Formatter.IndentRightSide));
+                    lineBreaksOnRightSide = T(rightSide.lineBreaks, Formatter.LineBreaksRightOfRight).Max();
+                }
+
+                var b = AsString(result.ToArray());
+                return ReturnMethodDump((result.ToArray(), lineBreaksOnRightSide), false);
+            }
+            finally
             {
-                var rightSide = GetRightSide(lineBreaksOnRightSide);
-                result.AddRange(rightSide.edits.Indent(Formatter.IndentRightSide));
-                lineBreaksOnRightSide = rightSide.lineBreaks;
+                EndMethodDump();
             }
-
-            var b = AsString(result.ToArray());
-            return (result.ToArray(), lineBreaksOnRightSide);
         }
 
         IEnumerable<ISourcePartEdit> GetTokenEdits(int minimalLineBreaks)

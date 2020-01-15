@@ -5,7 +5,7 @@ namespace ReniUI.Formatting
 {
     interface IStructure
     {
-        (IEnumerable<ISourcePartEdit> edits,int) Get(int minimalLineBreaks);
+        (IEnumerable<ISourcePartEdit> edits,int endLineBreaks) Get(int minimalLineBreaks);
         Syntax Syntax {get;}
     }
 }

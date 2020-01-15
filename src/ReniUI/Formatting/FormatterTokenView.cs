@@ -25,17 +25,16 @@ namespace ReniUI.Formatting
 
         readonly CacheContainer Cache = new CacheContainer();
 
-
-        [EnableDump]
         readonly ISeparatorType Separator;
 
+        [EnableDump]
         [EnableDumpExcept(exception: 0)]
         readonly int LineBreaksFromNeighbor;
 
         [EnableDump]
+        [EnableDumpExcept(exception: 0)]
         readonly int MinimalLineBreaks;
 
-        [EnableDump]
         readonly IToken Token;
 
         readonly Configuration Configuration;
@@ -57,6 +56,14 @@ namespace ReniUI.Formatting
             Token = token;
             Configuration = configuration;
         }
+
+        [EnableDump]
+        [EnableDumpExcept(exception: "")]
+        string TokenDump => Token.Characters.Id;
+
+        [EnableDump]
+        [EnableDumpExcept(exception: "")]
+        string TargetSeparatorDump => TargetSeparator.Text;
 
         /// <summary>
         ///     Edits, i. e. pairs of oldtext/newtext are generated to accomplish the target text.
@@ -131,12 +138,13 @@ namespace ReniUI.Formatting
         SourcePart Spaces
             => Cache.Spaces ?? (Cache.Spaces = GetSpaces());
 
-
         /// <summary>
         ///     Can be controlled by configuration value EmptyLineLimit.
         ///     If not set, all line breaks are retained.
         ///     However, new line break can be added if required
         /// </summary>
+        [EnableDump]
+        [EnableDumpExcept(exception: 0)]
         int TargetLineBreaks
         {
             get
