@@ -15,14 +15,38 @@ namespace ReniUI.Test
         [UnitTest]
         public void LabelsOnToLevel()
         {
+            const string text = @"aaaaa;ccccc";
+            const string expectedText = @"aaaaa; ccccc";
+
+            var compiler = CompilerBrowser.FromText(text);
+            var newSource = compiler.Syntax.FlatFormat(0);
+            Tracer.Assert(newSource == expectedText, "\n\"" + newSource + "\"");
+        }
+
+        [Test]
+        [UnitTest]
+        public void FlatFormatTest()
+        {
             const string text = @"aaaaa;llll:bbbbb;ccccc";
             const string expectedText = @"aaaaa;
 llll: bbbbb;
-ccccc";
+ccccc
+";
 
             text.SimpleTest(expectedText,10,1);
         }
 
+        [Test]
+        [UnitTest]
+        public void StraightList()
+        {
+            const string text = @"(aaaaa;ccccc)";
+            const string expectedText = @"(
+    aaaaa;
+    ccccc
+)";
+            text.SimpleTest(expectedText,10,1);
+        }
         [Test]
         [UnitTest]
         public void LabeledList()
@@ -91,7 +115,8 @@ ccccc";
 };
 1 = 1 then 2 else 4;
 3;
-(Text('H') << 'allo') dump_print"
+(Text('H') << 'allo') dump_print
+"
                     .Replace(oldValue: "\r\n", newValue: "\n");
 
 
