@@ -7,13 +7,18 @@ namespace ReniUI.Formatting
 {
     sealed class Structure : DumpableObject, IStructure
     {
+        [EnableDump]
         readonly Context Context;
 
         [EnableDump]
         readonly Formatter Formatter;
+
         readonly Syntax Syntax;
 
+        [EnableDump]
+        [EnableDumpExcept(exception: null)]
         bool? IsLineSplitRequiredCache;
+
 
         internal Structure(Syntax syntax, Context context)
         {
@@ -27,17 +32,16 @@ namespace ReniUI.Formatting
 
         (IEnumerable<ISourcePartEdit>, int) IStructure.Get(int minimalLineBreaks)
         {
-            var trace = Formatter.IsTrace;
+            var trace = false;//Formatter is Formatter.ListItemFormatter;
             StartMethodDump(trace, minimalLineBreaks);
             try
             {
                 Tracer.ConditionalBreak(trace);
                 var result = new List<ISourcePartEdit>();
+                minimalLineBreaks = T(minimalLineBreaks, LineBreaksLeftOfAll).Max();
                 if(Syntax.Left != null)
                 {
-                    var leftOfLeft = Formatter.LineBreaksLeftOfLeft;
-                    if(minimalLineBreaks < leftOfLeft)
-                        minimalLineBreaks = leftOfLeft;
+                    minimalLineBreaks = T(minimalLineBreaks, LineBreaksLeftOfLeft).Max();
                     var leftSide = GetLeftSide(minimalLineBreaks);
                     result.AddRange(leftSide.edits.Indent(Formatter.IndentLeftSide));
                     minimalLineBreaks = leftSide.lineBreaks;
@@ -49,17 +53,30 @@ namespace ReniUI.Formatting
                 {
                     var rightSide = GetRightSide(lineBreaksOnRightSide);
                     result.AddRange(rightSide.edits.Indent(Formatter.IndentRightSide));
-                    lineBreaksOnRightSide = T(rightSide.lineBreaks, Formatter.LineBreaksRightOfRight).Max();
+                    lineBreaksOnRightSide = T(rightSide.lineBreaks, LineBreaksRightOfRight).Max();
                 }
 
+                lineBreaksOnRightSide = T(lineBreaksOnRightSide, LineBreaksRightOfAll).Max();
                 var b = AsString(result.ToArray());
-                return ReturnMethodDump((result.ToArray(), lineBreaksOnRightSide), false);
+                return ReturnMethodDump((result.ToArray(), lineBreaksOnRightSide), breakExecution: false);
             }
             finally
             {
                 EndMethodDump();
             }
         }
+
+        int LineBreaksRightOfAll => HasLineBreaksRightOfAll ? 1 : 0;
+        int LineBreaksRightOfRight => HasLineBreaksRightOfRight ? 1 : 0;
+        int LineBreaksOnRightSide => HasLineBreaksOnRightSide ? HasMultipleLineBreaksOnRightSide ? 2 : 1 : 0;
+        int LineBreaksLeftOfLeft => HasLineBreaksLeftOfLeft ? 1 : 0;
+        int LineBreaksLeftOfAll => HasLineBreaksLeftOfAll ? 1 : 0;
+
+        bool RequiresExtraLineBreak => ThisListItemHasLineBreaks || NextListItemHasLineBreaks;
+
+        bool NextListItemHasLineBreaks => Context.Configuration.IsLineBreakRequired(Syntax.Right?.Left);
+
+        bool ThisListItemHasLineBreaks => Context.Configuration.IsLineBreakRequired(Syntax.Left);
 
         IEnumerable<ISourcePartEdit> GetTokenEdits(int minimalLineBreaks)
         {
@@ -73,6 +90,8 @@ namespace ReniUI.Formatting
             );
         }
 
+        public int LineBreaksOnLeftSide => HasLineBreaksOnLeftSide ? 1 : 0;
+
         string AsString(ISourcePartEdit[] target)
             => target
                 .GetEditPieces(Context.Configuration)
@@ -81,11 +100,25 @@ namespace ReniUI.Formatting
         [EnableDump]
         string FlatResult => Syntax.FlatFormat(Context.Configuration.EmptyLineLimit);
 
-        int LineBreaksOnLeftSide
-            => IsLineSplitRequired ? Formatter.LineBreaksBeforeToken(Context) : 0;
+        bool HasLineBreaksLeftOfLeft
+            => IsLineSplitRequired && Formatter.HasLineBreaksLeftOfLeft;
 
-        int LineBreaksOnRightSide
-            => IsLineSplitRequired ? Formatter.LineBreaksAfterToken(Context) : 0;
+        bool HasLineBreaksLeftOfAll
+            => IsLineSplitRequired && Formatter.HasLineBreaksLeftOfAll;
+
+        bool HasLineBreaksRightOfRight
+            => IsLineSplitRequired && Formatter.HasLineBreaksRightOfRight;
+
+        bool HasLineBreaksRightOfAll
+            => IsLineSplitRequired && Formatter.HasLineBreaksRightOfAll;
+
+        bool HasLineBreaksOnLeftSide
+            => IsLineSplitRequired && Formatter.HasLineBreaksBeforeToken(Context);
+
+        bool HasLineBreaksOnRightSide
+            => IsLineSplitRequired && Formatter.HasLineBreaksAfterToken(Context);
+
+        bool HasMultipleLineBreaksOnRightSide => Formatter.HasMultipleLineBreaksOnRightSide(BothSidesContext);
 
         [EnableDump]
         bool IsLineSplitRequired
@@ -96,14 +129,16 @@ namespace ReniUI.Formatting
                 ? Formatter.LeftSideLineBreakContext(Context)
                 : Context.None;
 
+        Context BothSidesContext
+            => Formatter.BothSideContext(Context,Syntax);
+
         Context RightSideContext
             => IsLineSplitRequired
                 ? Formatter.RightSideLineBreakContext(Context)
                 : Context.None;
 
         bool GetIsLineSplitRequired()
-            => Formatter.HasLineBreaksByContext(Context) ||
-               Syntax.IsLineBreakRequired(Context.Configuration.EmptyLineLimit, Context.Configuration.MaxLineLength);
+            => Formatter.HasLineBreaksByContext(Context) || Context.Configuration.IsLineBreakRequired(Syntax);
 
         (IEnumerable<ISourcePartEdit> edits, int lineBreaks) GetLeftSide(int minimalLineBreaks)
             => Syntax.Left

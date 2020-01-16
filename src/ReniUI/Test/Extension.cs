@@ -1,5 +1,6 @@
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Helper;
 using ReniUI.Formatting;
 
 namespace ReniUI.Test
@@ -25,7 +26,13 @@ namespace ReniUI.Test
 
             var lineCount = newSource.Count(item => item == '\n');
 
-            Tracer.Assert(newSource == expected, ()=> $"\n\"{newSource}\"",1);
+            Tracer.Assert(newSource == expected, 
+                ()=> $@"
+newSource:
+{newSource.Quote()}
+expected:
+{expected.Quote()}
+",1);
         }
     }
 }

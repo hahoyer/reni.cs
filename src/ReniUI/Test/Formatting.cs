@@ -19,7 +19,7 @@ namespace ReniUI.Test
             const string expectedText = @"aaaaa; ccccc";
 
             var compiler = CompilerBrowser.FromText(text);
-            var newSource = compiler.Syntax.FlatFormat(0);
+            var newSource = compiler.Syntax.FlatFormat(emptyLineLimit: 0);
             Tracer.Assert(newSource == expectedText, "\n\"" + newSource + "\"");
         }
 
@@ -30,10 +30,31 @@ namespace ReniUI.Test
             const string text = @"aaaaa;llll:bbbbb;ccccc";
             const string expectedText = @"aaaaa;
 llll: bbbbb;
-ccccc
-";
+ccccc";
 
-            text.SimpleTest(expectedText,10,1);
+            text.SimpleTest(expectedText, maxLineLength: 10, emptyLineLimit: 1);
+        }
+
+        [Test]
+        [UnitTest]
+        public void SingleElementList()
+        {
+            const string text = @"(aaaaaddddd)";
+            const string expectedText = @"(
+    aaaaaddddd
+)";
+
+            text.SimpleTest(expectedText, maxLineLength: 10, emptyLineLimit: 1);
+        }
+
+        [Test]
+        [UnitTest]
+        public void SingleElementListFlat()
+        {
+            const string text = @"(aaaaaddddd)";
+            const string expectedText = @"(aaaaaddddd)";
+
+            text.SimpleTest(expectedText, maxLineLength: 14, emptyLineLimit: 1);
         }
 
         [Test]
@@ -45,8 +66,9 @@ ccccc
     aaaaa;
     ccccc
 )";
-            text.SimpleTest(expectedText,10,1);
+            text.SimpleTest(expectedText, maxLineLength: 10, emptyLineLimit: 1);
         }
+
         [Test]
         [UnitTest]
         public void LabeledList()
@@ -62,15 +84,12 @@ ccccc
             var compiler = CompilerBrowser.FromText(text);
             var newSource = compiler.Reformat
             (
-                new ReniUI.Formatting.Configuration
-                {
-                    MaxLineLength = 10,
-                    EmptyLineLimit = 1
-                }.Create()
+                new ReniUI.Formatting.Configuration {MaxLineLength = 10, EmptyLineLimit = 1}.Create()
             );
 
             Tracer.Assert(newSource == expectedText, "\n\"" + newSource + "\"");
         }
+
         [Test]
         [UnitTest]
         public void ListEndsWithListToken()
@@ -85,15 +104,26 @@ ccccc
             var compiler = CompilerBrowser.FromText(text);
             var newSource = compiler.Reformat
             (
-                new ReniUI.Formatting.Configuration
-                {
-                    MaxLineLength = 20,
-                    EmptyLineLimit = 1
-                }.Create()
+                new ReniUI.Formatting.Configuration {MaxLineLength = 20, EmptyLineLimit = 1}.Create()
             );
 
             Tracer.Assert(newSource == expectedText, "\n\"" + newSource + "\"");
         }
+
+        [Test]
+        [UnitTest]
+        public void TwoLevelParenthesis()
+        {
+            const string text = @"aaaaa;llll:bbbbb;(cccccsssss)";
+            const string expectedText = @"aaaaa;
+llll: bbbbb;
+(
+    cccccsssss
+)";
+
+            text.SimpleTest(expectedText, maxLineLength: 10, emptyLineLimit: 1);
+        }
+
         [Test]
         [UnitTest]
         public void Reformat()
@@ -115,19 +145,14 @@ ccccc
 };
 1 = 1 then 2 else 4;
 3;
-(Text('H') << 'allo') dump_print
-"
+(Text('H') << 'allo') dump_print"
                     .Replace(oldValue: "\r\n", newValue: "\n");
 
 
             var compiler = CompilerBrowser.FromText(Text);
             var newSource = compiler.Reformat
                 (
-                    new ReniUI.Formatting.Configuration
-                    {
-                        MaxLineLength = 100, 
-                        EmptyLineLimit = 0
-                    }.Create()
+                    new ReniUI.Formatting.Configuration {MaxLineLength = 100, EmptyLineLimit = 0}.Create()
                 )
                 .Replace(oldValue: "\r\n", newValue: "\n");
 
@@ -140,41 +165,60 @@ ccccc
         [UnitTest]
         public void Reformat1_120Temp()
         {
-            const string Text =
+            const string text =
                 @"(aaaaa 
     (
     ))";
 
             var expectedText =
-                @"(aaaaa :
+                @"(
+    aaaaa
     (
-        ccccc
-    ))"
-                    .Replace(oldValue: "\r\n", newValue: "\n");
+    )
+)".Replace(oldValue: "\r\n", newValue: "\n");
 
-
-            var compiler = CompilerBrowser.FromText(Text);
-            var newSource = compiler.Reformat
-                (
-                    new ReniUI.Formatting.Configuration
-                    {
-                        MaxLineLength = 120, 
-                        EmptyLineLimit = 1
-                    }
-                        .Create()
-                )
-                .Replace(oldValue: "\r\n", newValue: "\n");
-
-            var lineCount = newSource.Count(item => item == '\n');
-
-            Tracer.Assert(newSource == expectedText, "\n\"" + newSource + "\"");
+            text.SimpleTest(expectedText, maxLineLength: 120, emptyLineLimit: 1);
         }
 
         [Test]
         [UnitTest]
+        public void MultilineBreakTest1()
+        {
+            const string text =
+                @"(ccccc,aaaaa bbbbb)";
+
+            var expectedText = @"(
+    ccccc,
+
+    aaaaa
+    bbbbb
+)".Replace(oldValue: "\r\n", newValue: "\n");
+
+            text.SimpleTest(expectedText, maxLineLength: 10, emptyLineLimit: 1);
+        }
+
+        [Test]
+        [UnitTest]
+        public void MultilineBreakTest()
+        {
+            const string text =
+                @"(ccccc,aaaaa bbbbb, )";
+
+            var expectedText = @"(
+    ccccc,
+
+    aaaaa
+    bbbbb;
+)".Replace(oldValue: "\r\n", newValue: "\n");
+
+            text.SimpleTest(expectedText, maxLineLength: 10, emptyLineLimit: 1);
+        }
+        
+        [Test]
+        [UnitTest]
         public void Reformat1_120()
         {
-            const string Text =
+            const string text =
                 @"systemdata:{1 type instance(); Memory:((0 type *('100' to_number_of_base 64)) mutable) instance(); !mutable FreePointer: Memory array_reference mutable; repeat: /\ ^ while() then
     (
         ^ body(),
@@ -197,25 +241,9 @@ ccccc
 
 1 = 1 then 2 else 4;
 3;
-(Text('H') << 'allo') dump_print"
-                    .Replace(oldValue: "\r\n", newValue: "\n");
+(Text('H') << 'allo') dump_print";
 
-
-            var compiler = CompilerBrowser.FromText(Text);
-            var newSource = compiler.Reformat
-                (
-                    new ReniUI.Formatting.Configuration
-                        {
-                            MaxLineLength = 120,
-                            EmptyLineLimit = 1
-                        }
-                        .Create()
-                )
-                .Replace(oldValue: "\r\n", newValue: "\n");
-
-            var lineCount = newSource.Count(item => item == '\n');
-
-            Tracer.Assert(newSource == expectedText, "\n\"" + newSource + "\"");
+            text.SimpleTest(expectedText, maxLineLength: 120, emptyLineLimit: 1);
         }
 
         [Test]

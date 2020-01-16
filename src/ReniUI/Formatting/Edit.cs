@@ -13,7 +13,6 @@ namespace ReniUI.Formatting
         {
             Location = location;
             NewText = newText;
-            StopByObjectIds(689);
         }
     }
 }

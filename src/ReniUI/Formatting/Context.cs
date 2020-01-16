@@ -1,4 +1,5 @@
 using hw.DebugFormatter;
+using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
@@ -8,12 +9,16 @@ namespace ReniUI.Formatting
         {
             public RootContext(Configuration configuration)
                 : base(configuration) {}
+
             [DisableDump]
             public override Context None => this;
+
             [DisableDump]
             public override Context LeftSideOfRightParenthesis => new LineBreakContextForLeftParenthesis(Configuration);
+
             [DisableDump]
             public override Context BodyOfColon => new LineBreakContextForParenthesisAfterColon(Configuration);
+
             [DisableDump]
             public override Context ForList => new LineBreakContextForList(Configuration);
         }
@@ -24,16 +29,15 @@ namespace ReniUI.Formatting
                 : base(configuration) {}
 
             [DisableDump]
-            public override Context LeftSideOfRightParenthesis => new LineBreakContextForLeftParenthesis(Configuration, true);
+            public override Context LeftSideOfRightParenthesis => new LineBreakContextForLeftParenthesis
+                (Configuration, lineBreakBeforeLeftParenthesis: true);
         }
 
         sealed class LineBreakContextForLeftParenthesis : Context
         {
-            public LineBreakContextForLeftParenthesis(Configuration configuration, bool lineBreakBeforeLeftParenthesis = false)
-                : base(configuration)
-            {
-                LineBreakBeforeLeftParenthesis = lineBreakBeforeLeftParenthesis;
-            }
+            public LineBreakContextForLeftParenthesis
+                (Configuration configuration, bool lineBreakBeforeLeftParenthesis = false)
+                : base(configuration) => LineBreakBeforeLeftParenthesis = lineBreakBeforeLeftParenthesis;
 
             public override Context ForList => new LineBreakContextForList(Configuration);
             public override bool LineBreaksForLeftParenthesis => true;
@@ -46,6 +50,27 @@ namespace ReniUI.Formatting
                 : base(configuration) {}
 
             public override bool LineBreaksForList => true;
+
+            public override Context MultiLineBreaksForList(Syntax left, Syntax right)
+                => new MultiLineBreaksForListContext(Configuration, left, right);
+        }
+
+        sealed class MultiLineBreaksForListContext : Context
+        {
+            readonly Syntax Left;
+            readonly Syntax Right;
+
+            public MultiLineBreaksForListContext(Configuration configuration, Syntax left, Syntax right)
+                : base(configuration)
+            {
+                Left = left;
+                Right = right;
+            }
+
+            [DisableDump]
+            public override bool HasMultipleLineBreaksOnRightSide
+                => Configuration.IsLineBreakRequired(Left) ||
+                   Configuration.IsLineBreakRequired(Right);
         }
 
         sealed class NoneContext : Context
@@ -68,8 +93,10 @@ namespace ReniUI.Formatting
 
         [DisableDump]
         public virtual Context BodyOfColon => this;
+
         [DisableDump]
         public virtual Context ForList => this;
+
         [DisableDump]
         public virtual Context LeftSideOfRightParenthesis => this;
 
@@ -77,5 +104,8 @@ namespace ReniUI.Formatting
         public virtual bool LineBreaksForLeftParenthesis => false;
         public virtual bool LineBreaksForRightParenthesis => false;
         public virtual bool LineBreaksForList => false;
+        public virtual bool HasMultipleLineBreaksOnRightSide => false;
+
+        public virtual Context MultiLineBreaksForList(Syntax left, Syntax right) => this;
     }
 }
