@@ -208,7 +208,7 @@ llll: bbbbb;
     ccccc,
 
     aaaaa
-    bbbbb;
+    bbbbb,
 )".Replace(oldValue: "\r\n", newValue: "\n");
 
             text.SimpleTest(expectedText, maxLineLength: 10, emptyLineLimit: 1);

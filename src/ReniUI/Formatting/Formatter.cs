@@ -16,6 +16,7 @@ namespace ReniUI.Formatting
         sealed class ColonFormatter : Formatter
         {
             public override Context RightSideLineBreakContext(Context context) => context.BodyOfColon;
+            public override bool HasLineBreaksAfterToken(Context context) => true;
         }
 
         sealed class ChainFormatter : Formatter
