@@ -29,7 +29,8 @@ namespace ReniUI.Test
         {
             const string text = @"aaaaa;llll:bbbbb;ccccc";
             const string expectedText = @"aaaaa;
-llll: bbbbb;
+llll:
+bbbbb;
 ccccc";
 
             text.SimpleTest(expectedText, maxLineLength: 10, emptyLineLimit: 1);
