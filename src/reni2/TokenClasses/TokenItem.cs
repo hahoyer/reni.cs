@@ -17,7 +17,7 @@ namespace Reni.TokenClasses
         }
 
         [EnableDump]
-        SourcePart IFormatItem.Content => Syntax.Token.Characters;
+        SourcePart IFormatItem.Content => Syntax.Main;
 
         [EnableDump]
         bool IFormatItem.IsEssential => true;
@@ -29,11 +29,11 @@ namespace Reni.TokenClasses
         {
             get
             {
-                var tokenPrecededWith = Syntax.Token.PrecededWith;
+                var tokenPrecededWith = Syntax.LeftWhiteSpaces;
                 return !IgnoreWhitespaces && tokenPrecededWith.HasComment();
             }
         }
 
-        string IFormatItem.WhiteSpaces => IgnoreWhitespaces ? "" : Syntax.Token.PrecededWith.SourcePart()?.Id ?? "";
+        string IFormatItem.WhiteSpaces => IgnoreWhitespaces ? "" : Syntax.LeftWhiteSpaces.SourcePart()?.Id ?? "";
     }
 }

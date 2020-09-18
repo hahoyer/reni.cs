@@ -32,7 +32,7 @@ namespace ReniUI.Formatting
 
         (IEnumerable<ISourcePartEdit>, int) IStructure.Get(int minimalLineBreaks)
         {
-            var trace = false;//Formatter is Formatter.ListItemFormatter;
+            var trace = True; //Formatter is Formatter.ListItemFormatter;
             StartMethodDump(trace, minimalLineBreaks);
             try
             {
@@ -58,13 +58,16 @@ namespace ReniUI.Formatting
 
                 lineBreaksOnRightSide = T(lineBreaksOnRightSide, LineBreaksRightOfAll).Max();
                 var b = AsString(result.ToArray());
-                return ReturnMethodDump((result.ToArray(), lineBreaksOnRightSide), breakExecution: false);
+                return ReturnMethodDump((result.ToArray(), lineBreaksOnRightSide), false);
             }
             finally
             {
                 EndMethodDump();
             }
         }
+
+        static bool True => true;
+        static bool False => false;
 
         int LineBreaksRightOfAll => HasLineBreaksRightOfAll ? 1 : 0;
         int LineBreaksRightOfRight => HasLineBreaksRightOfRight ? 1 : 0;
@@ -85,8 +88,9 @@ namespace ReniUI.Formatting
                 Syntax.LeftSideSeparator(),
                 minimalLineBreaks,
                 LineBreaksOnLeftSide,
-                Syntax.Token,
-                Context.Configuration
+                Syntax.Main,
+                Context.Configuration,
+                Syntax.LeftWhiteSpaces
             );
         }
 
@@ -130,7 +134,7 @@ namespace ReniUI.Formatting
                 : Context.None;
 
         Context BothSidesContext
-            => Formatter.BothSideContext(Context,Syntax);
+            => Formatter.BothSideContext(Context, Syntax);
 
         Context RightSideContext
             => IsLineSplitRequired
@@ -150,7 +154,7 @@ namespace ReniUI.Formatting
                 .CreateStruct(RightSideContext)
                 .Get(minimalLineBreaks);
 
-        protected override string GetNodeDump() => base.GetNodeDump() + " " + Syntax.Token.Characters.Id;
+        protected override string GetNodeDump() => base.GetNodeDump() + " " + Syntax.Main.Id;
 
         static IEnumerable<TValue> T<TValue>(params TValue[] value) => value;
     }

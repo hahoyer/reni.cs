@@ -160,11 +160,13 @@ namespace ReniUI
 
         internal Syntax LocateActivePosition(int offset)
         {
+            NotImplementedMethod(offset);
+
             var token = Token.LocatePosition(Syntax, offset);
             if(token.IsComment || token.IsLineComment)
                 return null;
 
-            var current = token.Syntax.Token.SourcePart().Position - 1;
+            var current = token.Syntax.LeftWhiteSpaces.SourcePart().Intersect(token.Syntax.Main).Position - 1;
             return current < 0 ? null : token.Syntax.LocatePosition(current);
         }
 

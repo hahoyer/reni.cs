@@ -66,12 +66,12 @@ namespace ReniUI.Formatting
 
             internal TokenItem(Syntax target) => Target = target;
 
-            SourcePart IItem1.Part => Target.Token.Characters;
+            SourcePart IItem1.Part => Target.Main;
             bool IItem1.IsRelevant => Target.TokenClass.Id != "()";
 
             ITokenClass IItem1.TokenClass => Target.TokenClass;
 
-            string Id => Target.Token.Characters.Id;
+            string Id => Target.Main.Id;
             protected override string GetNodeDump() => Id.Quote();
         }
 
@@ -84,7 +84,7 @@ namespace ReniUI.Formatting
             internal WhiteSpaceItem(int index, int lineIndex, Syntax target)
             {
                 LineIndex = lineIndex;
-                WhiteSpaceToken = target.Token.PrecededWith.Skip(index).First();
+                WhiteSpaceToken = target.LeftWhiteSpaces.Skip(index).First();
                 IsRelevant = Lexer.IsMultiLineComment(WhiteSpaceToken) || Lexer.IsLineComment(WhiteSpaceToken);
             }
 
@@ -109,7 +109,7 @@ namespace ReniUI.Formatting
         static IEnumerable<IItem1> GetItems
             (Syntax target)
         {
-            var whiteSpaceParts = target.Token.PrecededWith.ToArray();
+            var whiteSpaceParts = target.LeftWhiteSpaces.ToArray();
             for(var index = 0; index < whiteSpaceParts.Length; index++)
             {
                 var lines = whiteSpaceParts[index].SourcePart.Id.Count(c => c == '\n');
@@ -140,7 +140,7 @@ namespace ReniUI.Formatting
                     .Chain(item => item.Parent)
                     .Last()
                     .Items
-                    .OrderBy(item => item.Token.SourcePart().Position)
+                    .OrderBy(item => item.Main.Position)
                     .SelectMany(GetItems)
                     .NullableToArray()
                     .Select(CreateLine)

@@ -11,7 +11,7 @@ namespace Reni.Parser
 {
     sealed class TerminalSyntax : Value
     {
-        internal string Id => Syntax.Token.Characters.Id;
+        internal string Id => Syntax.Main.Id;
 
         [Node]
         [EnableDump]
@@ -33,7 +33,7 @@ namespace Reni.Parser
         internal long ToNumber => BitsConst.Convert(Id).ToInt64();
 
         [DisableDump]
-        internal SourcePart Token => Syntax.Token.Characters;
+        internal SourcePart Token => Syntax.Main;
 
         protected override string GetNodeDump() => Terminal.NodeDump();
     }

@@ -11,6 +11,7 @@ using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
+
     public sealed class Syntax : DumpableObject, ISourcePartProxy, ValueCache.IContainer, ISyntax
     {
         static int NextObjectId;
@@ -20,7 +21,8 @@ namespace Reni.TokenClasses
             Syntax left,
             ITokenClass tokenClass,
             IToken token,
-            Syntax right)
+            Syntax right
+            )
             => new Syntax(left, tokenClass, token, right);
 
         Syntax _parent;
@@ -30,13 +32,17 @@ namespace Reni.TokenClasses
             Syntax left,
             ITokenClass tokenClass,
             IToken token,
-            Syntax right)
+            Syntax right
+)
             : base(NextObjectId++)
         {
             Left = left;
             TokenClass = tokenClass;
-            Token = token;
+            Main = token.Characters;
             Right = right;
+            LeftWhiteSpacesRaw = token.PrecededWith;
+            RightWhiteSpaces = Right?.LeftWhiteSpacesRaw;
+
             Option = new SyntaxOption(this);
             LocatePositionCache = new FunctionCache<int, Syntax>(LocatePositionForCache);
 
@@ -51,18 +57,22 @@ namespace Reni.TokenClasses
 
         SourcePart ISourcePartProxy.All => SourcePart;
         SourcePart ISyntax.All => SourcePart;
-        SourcePart ISyntax.Main => Token.Characters;
+        SourcePart ISyntax.Main => Main;
 
         [DisableDump]
         internal SyntaxOption Option {get;}
 
         internal Syntax Left {get;}
+        internal Syntax Right { get; }
+
+        internal IEnumerable<IItem> LeftWhiteSpaces => Left == null ? null : LeftWhiteSpacesRaw;
+        IEnumerable<IItem> LeftWhiteSpacesRaw {get;}
+        internal IEnumerable<IItem> RightWhiteSpaces { get; }
+
         internal ITokenClass TokenClass {get;}
 
         [DisableDump]
-        internal IToken Token {get;}
-
-        internal Syntax Right {get;}
+        internal SourcePart Main {get;}
 
         FunctionCache<int, Syntax> LocatePositionCache {get;}
 
@@ -78,7 +88,7 @@ namespace Reni.TokenClasses
         }
 
         [DisableDump]
-        internal SourcePart SourcePart => Left?.SourcePart + Token.SourcePart() + Right?.SourcePart;
+        internal SourcePart SourcePart => Left?.SourcePart + Main + Right?.SourcePart;
 
         [DisableDump]
         internal Syntax LeftNeighbor => Left?.RightMost ?? LeftParent;
@@ -327,31 +337,34 @@ namespace Reni.TokenClasses
 
         internal IEnumerable<IFormatItem> GetTokenList(SourcePart targetPart, bool isStart)
         {
-            var mainTokenPart = Token.SourcePart();
-            if(Left != null && targetPart.Position < mainTokenPart.Position)
-                foreach(var item in Left.GetTokenList(targetPart, isStart))
-                {
-                    yield return item;
-                    isStart = false;
-                }
+            var isTokenInRange = Main.Length > 0 && Main.Intersect(targetPart) != null;
 
-            var isTokenInRange = Token.Characters.Length > 0 && Token.Characters.Intersect(targetPart) != null;
+            if (Left != null && targetPart.Position < Main.Position)
+            {
+                foreach(var formatItem in Left.GetTokenList(targetPart, isStart))
+                    yield return formatItem;
 
-            if(isStart || !isTokenInRange)
-                foreach(var item in Token.PrecededWith)
-                    if(item.SourcePart.Intersect(targetPart) != null)
-                        yield return new WhiteItem(item, this);
+                if (isStart || !isTokenInRange)
+                    foreach (var item in LeftWhiteSpaces)
+                        if (item.SourcePart.Intersect(targetPart) != null)
+                            yield return new WhiteItem(item);
+            }
 
-            if(isTokenInRange)
+            if (isTokenInRange)
             {
                 yield return new TokenItem(this, isStart);
                 isStart = false;
             }
 
-            if(Right == null || targetPart.EndPosition <= mainTokenPart.EndPosition)
+            if(Right == null || targetPart.EndPosition <= Main.EndPosition)
                 yield break;
 
-            foreach(var item in Right.GetTokenList(targetPart, isStart))
+            if (isStart || !isTokenInRange)
+                foreach (var item in RightWhiteSpaces)
+                    if (item.SourcePart.Intersect(targetPart) != null)
+                        yield return new WhiteItem(item);
+
+            foreach (var item in Right.GetTokenList(targetPart, isStart))
                 yield return item;
         }
 

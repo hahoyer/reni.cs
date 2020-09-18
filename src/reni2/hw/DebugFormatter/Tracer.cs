@@ -290,12 +290,13 @@ namespace hw.DebugFormatter
         static string DumpMethodWithData(MethodBase m, object o, object[] p)
         {
             var result = "\n";
-            result += "this=";
-            result += Dump(o);
+            result += IsSetTo("this", o);
             result += "\n";
             result += DumpMethodWithData(m.GetParameters(), p);
             return result;
         }
+
+        public static string IsSetTo(this string name, object value) => name + "=" + Dump(value);
 
         static string DumpMethodWithData(ParameterInfo[] infos, object[] p)
         {
@@ -309,17 +310,13 @@ namespace hw.DebugFormatter
                     result += "\n";
                 Assert(infos != null);
                 Assert(infos[i] != null);
-                result += infos[i].Name;
-                result += "=";
-                result += Dump(p[i]);
+                result += IsSetTo(infos[i].Name, p[i]);
             }
 
             for(var i = n; i < p.Length; i += 2)
             {
                 result += "\n";
-                result += (string) p[i];
-                result += "=";
-                result += Dump(p[i + 1]);
+                result += IsSetTo((string) p[i], p[i + 1]);
             }
 
             return result;

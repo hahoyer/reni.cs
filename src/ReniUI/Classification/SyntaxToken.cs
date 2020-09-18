@@ -18,7 +18,7 @@ namespace ReniUI.Classification
 
         TokenClass TokenClass => Syntax.TokenClass as TokenClass;
 
-        public override SourcePart SourcePart => Syntax.Token.Characters;
+        public override SourcePart SourcePart => Syntax.Main;
 
         [EnableDumpExcept(false)]
         public override bool IsKeyword => !IsIdentifier && !IsNumber && !IsText && !IsBrace;
@@ -46,9 +46,9 @@ namespace ReniUI.Classification
             => Syntax.Issues?.Any(item => item.IssueId == IssueId.EOFInLineComment)??false;
 
         [DisableDump]
-        public override string State => Syntax.Token.Characters.Id ?? "";
+        public override string State => Syntax.Main.Id ?? "";
 
         public override IEnumerable<SourcePart> FindAllBelongings(CompilerBrowser compiler)
-            => compiler.FindAllBelongings(Syntax)?.Select(item => item.Token.Characters);
+            => compiler.FindAllBelongings(Syntax)?.Select(item => item.Main);
     }
 }

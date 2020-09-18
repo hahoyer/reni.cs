@@ -109,10 +109,10 @@ namespace ReniUI.Classification
         internal static Token LocatePosition(Syntax start, int offset)
         {
             var result = start.LocatePosition(offset);
-            if (offset < result.Token.Characters.Position)
+            if (offset < result.Main.Position)
                 return new WhiteSpaceToken
                     (
-                    result.Token.PrecededWith.Last(item => offset >= item.SourcePart.Position),
+                    result.LeftWhiteSpaces.Last(item => offset >= item.SourcePart.Position),
                     result
                     );
 

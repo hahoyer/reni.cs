@@ -86,12 +86,12 @@ namespace ReniUI.Formatting
             if(targetPart == null)
                 return compiler.Syntax;
             var result = compiler.Locate(targetPart);
-            return IsTooSmall(result.Token, targetPart) ? null : result;
+            return IsTooSmall(result.LeftWhiteSpaces, result.Main, targetPart) ? null : result;
         }
 
-        static bool IsTooSmall(IToken resultToken, SourcePart targetPart)
+        static bool IsTooSmall(IEnumerable<IItem> precede, SourcePart resultToken, SourcePart targetPart)
         {
-            var sourcePart = resultToken.SourcePart();
+            var sourcePart = precede.SourcePart() + resultToken;
 
             if (targetPart.End > sourcePart.End)
                 return false;
@@ -99,16 +99,16 @@ namespace ReniUI.Formatting
             if (targetPart.Start < sourcePart.Start)
                 return false;
 
-            if (!resultToken.PrecededWith.Any())
+            if (!precede.Any())
                 return true;
 
-            if (targetPart.Start >= resultToken.Characters.Start)
+            if (targetPart.Start >= resultToken.Start)
                 return true;
 
-            if(targetPart.End > resultToken.Characters.Start)
+            if(targetPart.End > resultToken.Start)
                 return false;
 
-            foreach(var item in resultToken.PrecededWith)
+            foreach(var item in precede)
             {
                 var part = item.SourcePart;
                 if(part.Contains(targetPart))

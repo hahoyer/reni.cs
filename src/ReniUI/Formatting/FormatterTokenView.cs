@@ -35,7 +35,8 @@ namespace ReniUI.Formatting
         [EnableDumpExcept(exception: 0)]
         readonly int MinimalLineBreaks;
 
-        readonly IToken Token;
+        readonly IEnumerable<IItem> Precede;
+        readonly SourcePart Token;
 
         readonly Configuration Configuration;
 
@@ -44,9 +45,9 @@ namespace ReniUI.Formatting
             ISeparatorType separator,
             int lineBreaksFromNeighbor,
             int lineBreaks,
-            IToken token,
-            Configuration configuration
-        )
+            SourcePart token,
+            Configuration configuration,
+            IEnumerable<IItem> precede)
         {
             Separator = separator;
 
@@ -55,11 +56,13 @@ namespace ReniUI.Formatting
             MinimalLineBreaks = lineBreaks + lineBreaksFromNeighbor;
             Token = token;
             Configuration = configuration;
+            Tracer.Assert(precede != null);
+            Precede = precede;
         }
 
         [EnableDump]
         [EnableDumpExcept(exception: "")]
-        string TokenDump => Token.Characters.Id;
+        string TokenDump => Token.Id;
 
         [EnableDump]
         [EnableDumpExcept(exception: "")]
@@ -168,19 +171,17 @@ namespace ReniUI.Formatting
 
         SourcePart GetSpaces()
         {
-            var result = Token
-                .PrecededWith
+            var result = Precede
                 .Split(item => !item.IsWhiteSpace(), assignSeparatorAtTopOfList: false)
                 .LastOrDefault()
                 ?
                 .ToArray();
-            return result?.Last().IsWhiteSpace() == true ? result.SourcePart() : Token.Characters.Start.Span(length: 0);
+            return result?.Last().IsWhiteSpace() == true ? result.SourcePart() : Token.Start.Span(length: 0);
         }
 
         SourcePart[] GetLineBreaks()
         {
-            var result = Token
-                .PrecededWith
+            var result = Precede
                 .Split(item => item.IsComment(), assignSeparatorAtTopOfList: false)
                 .LastOrDefault()
                 ?
@@ -196,8 +197,7 @@ namespace ReniUI.Formatting
         }
 
         IEnumerable<IItem>[] GetCommentGroups()
-            => Token
-                .PrecededWith
+            => Precede
                 .Split(item => item.IsComment(), assignSeparatorAtTopOfList: false)
                 .Where(group => group.Last().IsComment())
                 .ToArray();

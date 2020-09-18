@@ -40,7 +40,7 @@ namespace Reni.TokenClasses
 
         bool IDeclarationItem.IsDeclarationPart(Syntax syntax)
         {
-            var token = syntax.Token.SourcePart();
+            //var token = syntax.Main.SourcePart();
 
             var parentTokenClass = syntax.Parent.TokenClass;
             if(parentTokenClass is Colon)

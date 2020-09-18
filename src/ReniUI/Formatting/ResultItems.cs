@@ -74,7 +74,7 @@ namespace ReniUI.Formatting
             Add(WhiteSpace.Create(token, false));
         }
 
-        internal void Add(IToken token) => Add(new Skeleton(token.Characters));
+        internal void Add(SourcePart token) => Add(new Skeleton(token));
 
         void Add(IResultItem item)
         {

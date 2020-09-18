@@ -148,6 +148,6 @@ namespace Reni.TokenClasses
         }
 
         [EnableDump]
-        SourcePart Token => Owner.Token.Characters;
+        SourcePart Token => Owner.Main;
     }
 }

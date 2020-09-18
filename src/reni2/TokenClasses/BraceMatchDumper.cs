@@ -29,7 +29,7 @@ namespace Reni.TokenClasses
 
         internal BraceMatchDumper Right => Dump(_parent.Right);
 
-        internal string Token => _parent.Token.Characters.NodeDump;
+        internal string Token => _parent.Main.NodeDump;
 
         BraceMatchDumper Dump(Syntax syntax)
             => syntax == null

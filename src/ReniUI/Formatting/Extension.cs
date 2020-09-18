@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
+using hw.Scanner;
 using Reni.Parser;
 using Reni.TokenClasses;
 
@@ -10,7 +12,7 @@ namespace ReniUI.Formatting
     {
         interface IFormatResult<TValue>
         {
-            TValue Value { get; set; }
+            TValue Value {get; set;}
 
             TContainer Concat<TContainer>(string token, TContainer other)
                 where TContainer : class, IFormatResult<TValue>, new();
@@ -19,19 +21,19 @@ namespace ReniUI.Formatting
         sealed class IntegerResult : DumpableObject, IFormatResult<int>
         {
             internal int Value;
-            int IFormatResult<int>.Value { get => Value; set => Value = value; }
+            int IFormatResult<int>.Value {get => Value; set => Value = value;}
 
             TContainer IFormatResult<int>.Concat<TContainer>(string token, TContainer other)
-                => new TContainer { Value = Value + token.Length + other.Value };
+                => new TContainer {Value = Value + token.Length + other.Value};
         }
 
         sealed class StringResult : DumpableObject, IFormatResult<string>
         {
             internal string Value;
-            string IFormatResult<string>.Value { get => Value; set => Value = value; }
+            string IFormatResult<string>.Value {get => Value; set => Value = value;}
 
             TContainer IFormatResult<string>.Concat<TContainer>(string token, TContainer other)
-                => new TContainer { Value = Value + token + other.Value };
+                => new TContainer {Value = Value + token + other.Value};
         }
 
         static string FlatFormat(this IToken target, int? emptyLineLimit)
@@ -50,10 +52,25 @@ namespace ReniUI.Formatting
             return result + target.Characters.Id;
         }
 
+        static string FlatFormat(this SourcePart target, IEnumerable<IItem> precede, int? emptyLineLimit)
+        {
+            if(precede.Any(item => item.IsComment() && item.HasLines()))
+                return null;
+
+            if(emptyLineLimit != 0 && precede.Any(item => item.IsLineBreak()))
+                return null;
+
+            var result = precede
+                .Where(item => item.IsComment())
+                .Aggregate(seed: "", func: (current, item) => current + item.SourcePart.Id);
+
+            return result + target.Id;
+        }
+
         internal static ISeparatorType LeftSideSeparator(this Syntax target)
         {
             var left = target.LeftNeighbor?.TokenClass;
-            return target.Token.PrecededWith.HasComment()
+            return target.LeftWhiteSpaces.HasComment()
                 ? SeparatorType.ContactSeparator
                 : SeparatorType.Get(left, target.TokenClass);
         }
@@ -61,7 +78,7 @@ namespace ReniUI.Formatting
         internal static ISeparatorType RightSideSeparator(this Syntax target)
         {
             var right = target.RightNeighbor;
-            return right == null || right.Token.PrecededWith.HasComment()
+            return right == null || target.RightWhiteSpaces.HasComment()
                 ? SeparatorType.ContactSeparator
                 : SeparatorType.Get(target.TokenClass, right.TokenClass);
         }
@@ -69,25 +86,65 @@ namespace ReniUI.Formatting
         static TContainer FlatFormat<TContainer, TValue>(this Syntax target, int? emptyLineLimit)
             where TContainer : class, IFormatResult<TValue>, new()
         {
+            var left = target.Left?.FlatFormat<TContainer, TValue>(emptyLineLimit);
+            var main = target.Main.Id;
+            var right = target.Right?.FlatFormat<TContainer, TValue>(emptyLineLimit);
 
-            var tokenString = target
-                .Token
-                .FlatFormat(emptyLineLimit);
+            if(target.TokenClass is BeginOfText)
+            {
+                Tracer.Assert(target.Left == null);
+                Tracer.Assert(target.Right != null);
 
-            if(tokenString == null)
-                return null;
+                Tracer.ConditionalBreak(target.RightWhiteSpaces.Any());
+            }
 
-            tokenString = target.LeftSideSeparator().Text + tokenString;
+            else if(target.TokenClass is List || target.TokenClass is Colon)
+            {
+                Tracer.ConditionalBreak(target.Right == null);
+                Tracer.ConditionalBreak(target.Left == null);
 
-            var leftResult = target.Left.FlatSubFormat<TContainer, TValue>(emptyLineLimit);
-            if(leftResult == null)
-                return null;
+                Tracer.ConditionalBreak(target.LeftWhiteSpaces.Any());
+                Tracer.ConditionalBreak(target.RightWhiteSpaces.Any());
+                main = main + " ";
+            }
 
-            var rightResult = target.Right.FlatSubFormat<TContainer, TValue>(emptyLineLimit);
-            if(rightResult == null)
-                return null;
+            else if (target.TokenClass is Definable)
+            {
+                Tracer.Assert(target.Left == null);
+                Tracer.Assert(target.Right == null);
+            }
 
-            return leftResult.Concat(tokenString, rightResult);
+            else if (target.TokenClass is EndOfText)
+            {
+                Tracer.Assert(target.Left != null);
+                Tracer.Assert(target.Right == null);
+
+                Tracer.ConditionalBreak(target.LeftWhiteSpaces.Any());
+            }
+
+            else
+            {
+                Tracer.DumpStaticMethodWithData(target, emptyLineLimit);
+
+
+                var tokenString = target
+                    .Main
+                    .FlatFormat(target.LeftWhiteSpaces, emptyLineLimit);
+
+                if(tokenString == null)
+                    return null;
+
+                tokenString = target.LeftSideSeparator().Text + tokenString;
+
+                var leftResult = target.Left.FlatSubFormat<TContainer, TValue>(emptyLineLimit);
+                if(leftResult == null)
+                    return null;
+
+                var rightResult = target.Right.FlatSubFormat<TContainer, TValue>(emptyLineLimit);
+                return rightResult == null ? null : leftResult.Concat(tokenString, rightResult);
+            }
+
+            return (left ?? new TContainer()).Concat(main, right ?? new TContainer());
         }
 
         static TContainer FlatSubFormat<TContainer, TValue>(this Syntax left, int? emptyLineLimit)

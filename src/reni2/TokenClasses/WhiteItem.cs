@@ -8,12 +8,10 @@ namespace Reni.TokenClasses
     class WhiteItem : DumpableObject, IFormatItem
     {
         readonly IItem Item;
-        readonly Syntax Syntax;
 
-        public WhiteItem(IItem item, Syntax syntax)
+        public WhiteItem(IItem item)
         {
             Item = item;
-            Syntax = syntax;
             StopByObjectIds(401);
         }
 

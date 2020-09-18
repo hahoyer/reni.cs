@@ -97,7 +97,8 @@ namespace ReniUI.Formatting
             ITokenClass leftTokenClass,
             int leadingLineBreaks,
             int indentLevel,
-            IToken token,
+            IEnumerable<IItem> precede,
+            SourcePart main,
             ITokenClass tokenClass)
         {
             Tracer.Assert(IsRelevant(tokenClass));
@@ -105,7 +106,7 @@ namespace ReniUI.Formatting
 
             var trace = tokenClass.Id == " repeat";
             StartMethodDump
-                (trace, leftTokenClass, leadingLineBreaks, indentLevel, token, tokenClass);
+                (trace, leftTokenClass, leadingLineBreaks, indentLevel, precede, main, tokenClass);
             try
             {
                 BreakExecution();
@@ -114,11 +115,11 @@ namespace ReniUI.Formatting
                     leftTokenClass,
                     leadingLineBreaks,
                     indentLevel,
-                    token.PrecededWith,
+                    precede,
                     tokenClass
                 );
 
-                result.Add(token);
+                result.Add(main);
 
                 return ReturnMethodDump(result);
             }
@@ -141,13 +142,15 @@ namespace ReniUI.Formatting
 
             var leftTokenClass = leftNeighbor?.Target.TokenClass;
             var indentLevel = target.IndentLevel;
-            var token = target.Target.Token;
+            var leftWhiteSpaces = target.Target.LeftWhiteSpaces;
+            var main = target.Target.Main;
             return Item
             (
                 leftTokenClass,
                 leadingLineBreaks,
                 indentLevel,
-                token,
+                leftWhiteSpaces,
+                main,
                 tokenClass
             );
         }

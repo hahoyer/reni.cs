@@ -158,7 +158,7 @@ namespace hw.DebugFormatter
         {
             try
             {
-                return memberInfo.Name + "=" + Tracer.Dump(x.InvokeValue(memberInfo));
+                return Tracer.IsSetTo(memberInfo.Name,x.InvokeValue(memberInfo));
             }
             catch(Exception)
             {
