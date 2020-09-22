@@ -12,7 +12,7 @@ namespace Reni.TokenClasses
         string ITokenClass.Id => Id;
 
         protected override Syntax Create(Syntax left, IToken token, Syntax right)
-            => Syntax.CreateSourceSyntax(left, this, token, right);
+            => Syntax.Create(left, this, token, right);
 
         [DisableDump]
         internal virtual bool IsVisible => true;

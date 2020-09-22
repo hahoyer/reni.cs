@@ -21,7 +21,7 @@ namespace Reni.Parser
         public InvalidDeclarationError(string name) => Name = name;
 
         Syntax IParserTokenType<Syntax>.Create(Syntax left, IToken token, Syntax right)
-            => Syntax.CreateSourceSyntax(left, this, token, right);
+            => Syntax.Create(left, this, token, right);
 
         string IParserTokenType<Syntax>.PrioTableId => Name;
         string ITokenClass.Id => Name;

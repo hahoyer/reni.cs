@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
+using hw.Scanner;
 using Reni.Parser;
 using Reni.Validation;
 
@@ -27,6 +29,7 @@ namespace Reni.TokenClasses
         public RightDeclarationParenthesis(int level)
             : base(level) {}
 
+        [Obsolete("",true)]
         Result<Declarator> IDeclaratorTagProvider.Get(Syntax syntax)
         {
             var bracketKernel = syntax.Left.GetBracketKernel(Level, syntax);
@@ -43,25 +46,26 @@ namespace Reni.TokenClasses
                 (
                     items.Select(item => item.Target).Where(item => item != null).ToArray(),
                     null,
-                    syntax.Option.SourcePart
+                    syntax.SourcePart
                 );
                 var issues = items.SelectMany(item => item.Issues).ToArray();
                 return result.Issues(issues);
             }
             else
             {
-                var issues = bracketKernel.Issues.plus(IssueId.MissingDeclarationTag.Issue(syntax.Option.SourcePart));
-                return new Declarator(null, null, syntax.Option.SourcePart).Issues(issues);
+                var issues = bracketKernel.Issues.plus(IssueId.MissingDeclarationTag.Issue(syntax.SourcePart));
+                return new Declarator(null, null, syntax.SourcePart).Issues(issues);
             }
         }
 
+        [Obsolete("",true)]
         static Result<IDeclarationTag> GetDeclarationTag(Syntax item)
         {
             var result = item.Option.DeclarationTag;
             if(result != null)
                 return new Result<IDeclarationTag>(result);
 
-            return new Result<IDeclarationTag>(null, IssueId.InvalidDeclarationTag.Issue(item.Option.SourcePart));
+            return new Result<IDeclarationTag>(null, IssueId.InvalidDeclarationTag.Issue(item.SourcePart));
         }
 
         IParserTokenType<Syntax> IBracketMatch<Syntax>.Value {get;} = new Matched();

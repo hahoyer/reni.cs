@@ -37,7 +37,7 @@ namespace ReniUI.Test
                 if(reformat != null)
                 {
                     var newCompiler = CompilerBrowser.FromText(reformat);
-                    Tracer.Assert(compiler.Syntax.IsEqual(newCompiler.Syntax, IgnoreWhiteSpaces));
+                    Tracer.Assert(compiler.Syntax.Target.IsEqual(newCompiler.Syntax.Target, IgnoreWhiteSpaces));
                 }
             }
         }

@@ -14,19 +14,19 @@ namespace ReniUI.Formatting
         [EnableDump]
         readonly Formatter Formatter;
 
-        readonly Syntax Syntax;
+        readonly Helper.Syntax Target;
 
         [EnableDump]
         [EnableDumpExcept(null)]
         bool? IsLineSplitRequiredCache;
 
 
-        internal Structure(Syntax syntax, Context context)
+        internal Structure(Helper.Syntax syntax, Context context)
         {
-            Syntax = syntax;
+            Target = syntax;
             Context = context;
-            Formatter = Formatter.CreateFormatter(Syntax);
-            Tracer.Assert(Syntax != null);
+            Formatter = Formatter.CreateFormatter(Target);
+            Tracer.Assert(Target != null);
         }
 
         int IStructure.LineBreaks => LineBreaks;
@@ -55,13 +55,13 @@ namespace ReniUI.Formatting
         {
             get
             {
-                if(Syntax.Left != null)
+                if(Target.Left != null)
                 {
                     yield return LeftEdits.Indent(Formatter.IndentLeftSide);
                     yield return LeftWhiteSpacesEdits.Indent(Formatter.IndentToken);
                 }
 
-                if(Syntax.Right != null)
+                if(Target.Right != null)
                 {
                     yield return RightWhiteSpacesEdits.Indent(Formatter.IndentToken);
                     yield return RightEdits.Indent(Formatter.IndentRightSide);
@@ -71,9 +71,9 @@ namespace ReniUI.Formatting
 
         [DisableDump]
         bool Trace =>
-            !(Syntax.TokenClass is EndOfText) &&
-            !(Syntax.TokenClass is BeginOfText) &&
-            !(Syntax.TokenClass is UserSymbol);
+            !(Target.TokenClass is EndOfText) &&
+            !(Target.TokenClass is BeginOfText) &&
+            !(Target.TokenClass is UserSymbol);
 
 
         [DisableDump]
@@ -83,7 +83,7 @@ namespace ReniUI.Formatting
             {
                 if(Trace)
                 {
-                    nameof(Syntax.TokenClass).DumpValue(Syntax.TokenClass).WriteLine();
+                    nameof(Target.TokenClass).DumpValue(Target.TokenClass).WriteLine();
                     Tracer.ConditionalBreak(True);
                 }
 
@@ -101,19 +101,19 @@ namespace ReniUI.Formatting
 
         bool RequiresExtraLineBreak => ThisListItemHasLineBreaks || NextListItemHasLineBreaks;
 
-        bool NextListItemHasLineBreaks => Context.Configuration.IsLineBreakRequired(Syntax.Right?.Left);
+        bool NextListItemHasLineBreaks => Context.Configuration.IsLineBreakRequired(Target.Right?.Left);
 
-        bool ThisListItemHasLineBreaks => Context.Configuration.IsLineBreakRequired(Syntax.Left);
+        bool ThisListItemHasLineBreaks => Context.Configuration.IsLineBreakRequired(Target.Left);
 
         public int LineBreaksOnLeftSide => HasLineBreaksOnLeftSide ? 1 : 0;
 
         string AsString(ISourcePartEdit[] target)
             => target
                 .GetEditPieces(Context.Configuration)
-                .Combine(Syntax.Target.Option.SourcePart.Source.All);
+                .Combine(Target.Target.SourcePart.Source.All);
 
         [EnableDump]
-        string FlatResult => Syntax.FlatFormat(Context.Configuration.EmptyLineLimit != 0);
+        string FlatResult => Target.FlatFormat(Context.Configuration.EmptyLineLimit != 0);
 
         bool HasLineBreaksLeftOfLeft
             => IsLineSplitRequired && Formatter.HasLineBreaksLeftOfLeft;
@@ -142,7 +142,7 @@ namespace ReniUI.Formatting
                 : Context.None;
 
         Context BothSidesContext
-            => Formatter.BothSideContext(Context, Syntax);
+            => Formatter.BothSideContext(Context, Target);
 
         Context RightSideContext
             => IsLineSplitRequired
@@ -150,25 +150,25 @@ namespace ReniUI.Formatting
                 : Context.None;
 
         bool GetIsLineSplitRequired()
-            => Formatter.HasLineBreaksByContext(Context) || Context.Configuration.IsLineBreakRequired(Syntax);
+            => Formatter.HasLineBreaksByContext(Context) || Context.Configuration.IsLineBreakRequired(Target);
 
         int LeftSideLineBreaks =>
-            Syntax.Left
+            Target.Left
                 .CreateStruct(LeftSideContext)
                 .LineBreaks;
 
         IEnumerable<ISourcePartEdit> LeftEdits =>
-            Syntax.Left
+            Target.Left
                 .CreateStruct(LeftSideContext)
                 .Edits;
 
         int RightSideLineBreaks =>
-            Syntax.Right
+            Target.Right
                 .CreateStruct(RightSideContext)
                 .LineBreaks;
 
         IEnumerable<ISourcePartEdit> RightEdits =>
-            Syntax.Right
+            Target.Right
                 .CreateStruct(RightSideContext)
                 .Edits;
 
@@ -178,9 +178,9 @@ namespace ReniUI.Formatting
             {
                 yield return GetWhiteSpaceView
                 (
-                    Syntax.LeftWhiteSpaces,
-                    Syntax.MainToken.Start,
-                    Syntax.LeftSideSeparator(),
+                    Target.LeftWhiteSpaces,
+                    Target.MainToken.Start,
+                    Target.LeftSideSeparator,
                     LineBreaksOnLeftSide);
             }
         }
@@ -191,9 +191,9 @@ namespace ReniUI.Formatting
             {
                 yield return GetWhiteSpaceView
                 (
-                    Syntax.RightWhiteSpaces,
-                    Syntax.MainToken.End,
-                    Syntax.RightSideSeparator(),
+                    Target.RightWhiteSpaces,
+                    Target.MainToken.End,
+                    Target.RightSideSeparator,
                     LineBreaksOnRightSide);
             }
         }
@@ -221,7 +221,7 @@ namespace ReniUI.Formatting
         }
 
 
-        protected override string GetNodeDump() => base.GetNodeDump() + " " + Syntax.MainToken.Id;
+        protected override string GetNodeDump() => base.GetNodeDump() + " " + Target.MainToken.Id;
 
         static IEnumerable<TValue> T<TValue>(params TValue[] value) => value;
     }

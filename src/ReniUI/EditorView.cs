@@ -117,7 +117,7 @@ namespace ReniUI
                 (Compiler.Source + TextBox.SelectionStart).Span
                 (TextBox.SelectionEnd - TextBox.SelectionEnd);
 
-        int LinenumberMarginLength
+        int LineNumberMarginLength
         {
             get => _lineNumberMarginLength;
             set
@@ -187,7 +187,7 @@ namespace ReniUI
 
         void OnTextChanged()
         {
-            LinenumberMarginLength = TextBox.Lines.Count.ToString().Length;
+            LineNumberMarginLength = TextBox.Lines.Count.ToString().Length;
             CompilerCache.IsValid = false;
         }
 

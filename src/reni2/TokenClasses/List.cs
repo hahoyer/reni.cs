@@ -25,6 +25,7 @@ namespace Reni.TokenClasses
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => otherMatcher == this;
 
+        [Obsolete("",true)]
         Result<Statement[]> IStatementsProvider.Get
             (List type, Syntax syntax, IDefaultScopeProvider container)
         {
@@ -38,6 +39,7 @@ namespace Reni.TokenClasses
             return new Result<Statement[]>(target, issues);
         }
 
+        [Obsolete("",true)]
         Result<Statement[]> CreateStatements
             (Syntax syntax, Syntax parent, IDefaultScopeProvider container)
             => syntax == null

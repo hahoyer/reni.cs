@@ -19,8 +19,8 @@ namespace Reni.Parser
         Result<Declarator> IDeclaratorTokenClass.Get(Syntax syntax)
         {
             if(!(syntax.Right.TokenClass is IDeclaratorTagProvider provider))
-                return new Declarator(null, null, syntax.Option.SourcePart)
-                    .Issues(IssueId.UnknownDeclarationTag.Issue(syntax.Option.SourcePart));
+                return new Declarator(null, null, syntax.SourcePart)
+                    .Issues(IssueId.UnknownDeclarationTag.Issue(syntax.SourcePart));
 
             var result = provider.Get(syntax.Right);
 
@@ -34,7 +34,7 @@ namespace Reni.Parser
         Syntax IParserTokenType<Syntax>.Create(Syntax left, IToken token, Syntax right)
         {
             Tracer.Assert(right == null);
-            return Syntax.CreateSourceSyntax(left, this, token, Value);
+            return Syntax.Create(left, this, token, Value);
         }
 
         string IParserTokenType<Syntax>.PrioTableId => PrioTable.Any;

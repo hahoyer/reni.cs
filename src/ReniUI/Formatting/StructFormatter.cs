@@ -5,7 +5,7 @@ using hw.Scanner;
 
 namespace ReniUI.Formatting
 {
-    public sealed class StructFormatter : DumpableObject, IFormatter
+    sealed class StructFormatter : DumpableObject, IFormatter
     {
         internal readonly Configuration Configuration;
         public StructFormatter(Configuration configuration) => Configuration = configuration;

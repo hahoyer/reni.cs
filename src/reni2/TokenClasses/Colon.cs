@@ -50,7 +50,7 @@ namespace Reni.TokenClasses
             (Syntax syntax)
         {
             if(syntax.Left == null && syntax.Right == null)
-                return new Declarator(new IDeclarationTag[] {this}, null,syntax.Option.SourcePart);
+                return new Declarator(new IDeclarationTag[] {this}, null,syntax.SourcePart);
 
             NotImplementedMethod(syntax);
             return null;

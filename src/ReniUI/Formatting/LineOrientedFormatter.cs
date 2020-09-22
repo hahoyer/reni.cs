@@ -1,10 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using hw.Parser;
 using hw.Scanner;
-using Reni;
 using Reni.Parser;
 using Reni.TokenClasses;
 
@@ -43,7 +42,7 @@ namespace ReniUI.Formatting
                     {
                         var current = item.TokenClass;
                         var x = SeparatorExtension.Get(last, current);
-                        yield return new Item2(item.Part, x?" ":"", true);
+                        yield return new Item2(item.Part, x ? " " : "", true);
 
                         last = current;
                     }
@@ -62,16 +61,16 @@ namespace ReniUI.Formatting
 
         internal sealed class TokenItem : DumpableObject, IItem1
         {
-            readonly Reni.TokenClasses.Syntax Target;
+            readonly Helper.Syntax Target;
 
-            internal TokenItem(Reni.TokenClasses.Syntax target) => Target = target;
+            internal TokenItem(Helper.Syntax target) => Target = target;
 
-            SourcePart IItem1.Part => Target.Option.MainToken;
+            SourcePart IItem1.Part => Target.Token.Characters;
             bool IItem1.IsRelevant => Target.TokenClass.Id != "()";
 
             ITokenClass IItem1.TokenClass => Target.TokenClass;
 
-            string Id => Target.Option.MainToken.Id;
+            string Id => Target.Token.Characters.Id;
             protected override string GetNodeDump() => Id.Quote();
         }
 
@@ -81,7 +80,7 @@ namespace ReniUI.Formatting
             readonly int LineIndex;
             readonly IItem WhiteSpaceToken;
 
-            internal WhiteSpaceItem(int index, int lineIndex, Reni.TokenClasses.Syntax target)
+            internal WhiteSpaceItem(int index, int lineIndex, Helper.Syntax target)
             {
                 LineIndex = lineIndex;
                 WhiteSpaceToken = target.Token.PrecededWith.Skip(index).First();
@@ -106,10 +105,9 @@ namespace ReniUI.Formatting
             protected override string GetNodeDump() => Id.Quote() + "(=" + LineIndex + ")";
         }
 
-        static IEnumerable<IItem1> GetItems
-            (Reni.TokenClasses.Syntax target)
+        static IEnumerable<IItem1> GetItems(Helper.Syntax target)
         {
-            var whiteSpaceParts = target.Token.PrecededWith.ToArray();
+            var whiteSpaceParts = target.Target.Token.PrecededWith.ToArray();
             for(var index = 0; index < whiteSpaceParts.Length; index++)
             {
                 var lines = whiteSpaceParts[index].SourcePart.Id.Count(c => c == '\n');
@@ -133,14 +131,15 @@ namespace ReniUI.Formatting
 
         LineOrientedFormatter() {}
 
+        [Obsolete("", true)]
         IEnumerable<Edit> IFormatter.GetEditPieces(CompilerBrowser compiler, SourcePart targetPart)
         {
-            var target = compiler.Locate(targetPart).Option;
+            var target = compiler.Locate(targetPart);
             var rawLines = target
                     .Chain(item => item.Parent)
                     .Last()
                     .Items
-                    .OrderBy(item => item.Option.MainToken.Position)
+                    .OrderBy(item => item.Target.Token.Characters.Position)
                     .SelectMany(GetItems)
                     .NullableToArray()
                     .Select(CreateLine)

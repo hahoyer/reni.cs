@@ -124,6 +124,7 @@
     <Compile Include="Feature\Function.cs" />
     <Compile Include="Feature\SearchResult.cs" />
     <Compile Include="Feature\Simple.cs" />
+    <Compile Include="Helper\SyntaxWithParent.cs" />
     <Compile Include="hw\DebugFormatter\Configuration.cs" />
     <Compile Include="hw\DebugFormatter\DebugTextWriter.cs" />
     <Compile Include="hw\DebugFormatter\DisableDumpAttribute.cs" />
@@ -348,7 +349,7 @@
     <Compile Include="TokenClasses\RightDeclarationParenthesis.cs" />
     <Compile Include="TokenClasses\RightParenthesisBase.cs" />
     <Compile Include="TokenClasses\Syntax.cs" />
-    <Compile Include="TokenClasses\SyntaxOption.cs" />
+    <Compile Include="Helper\SyntaxOption.cs" />
     <Compile Include="TokenClasses\TokenClass.cs" />
     <Compile Include="TokenClasses\TokenItem.cs" />
     <Compile Include="TokenClasses\ToNumberOfBase.cs" />

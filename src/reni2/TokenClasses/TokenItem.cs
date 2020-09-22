@@ -1,3 +1,4 @@
+using System;
 using hw.DebugFormatter;
 using hw.Parser;
 using hw.Scanner;
@@ -17,7 +18,8 @@ namespace Reni.TokenClasses
         }
 
         [EnableDump]
-        SourcePart IFormatItem.Content => Syntax.Option.MainToken;
+        [Obsolete("",true)]
+        SourcePart IFormatItem.Content => Syntax.Token.Characters;
 
         [EnableDump]
         bool IFormatItem.IsEssential => true;

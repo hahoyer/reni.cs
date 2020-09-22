@@ -9,14 +9,14 @@ using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
-    public sealed class HierachicalFormatter : DumpableObject, IFormatter
+    sealed class HierarchicalFormatter : DumpableObject, IFormatter
     {
         static bool IsRelevant(ITokenClass tokenClass)
             => (tokenClass as TokenClass)?.IsVisible ?? true;
 
         readonly Configuration Configuration;
 
-        public HierachicalFormatter(Configuration configuration) => Configuration = configuration;
+        public HierarchicalFormatter(Configuration configuration) => Configuration = configuration;
 
         IEnumerable<Edit> IFormatter.GetEditPieces(CompilerBrowser compilerBrowser, SourcePart targetPart)
         {
@@ -142,8 +142,8 @@ namespace ReniUI.Formatting
 
             var leftTokenClass = leftNeighbor?.Target.TokenClass;
             var indentLevel = target.IndentLevel;
-            var leftWhiteSpaces = target.Target.Token.PrecededWith;
-            var main = target.Target.Token.Characters;
+            var leftWhiteSpaces = target.Target.Target.Token.PrecededWith;
+            var main = target.Target.Target.Token.Characters;
             return Item
             (
                 leftTokenClass,

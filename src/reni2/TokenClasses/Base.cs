@@ -32,7 +32,7 @@ namespace Reni.TokenClasses
                     .Issues<Value>
                     (
                     IssueId.TerminalUsedAsSuffix
-                    .Issue(syntax.Left.Option.SourcePart));
+                    .Issue(syntax.Left.SourcePart));
             }
 
             NotImplementedMethod(syntax);

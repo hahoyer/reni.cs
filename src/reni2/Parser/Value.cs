@@ -22,10 +22,11 @@ namespace Reni.Parser
         internal readonly FunctionCache<ContextBase, ResultCache> ResultCache =
             new FunctionCache<ContextBase, ResultCache>();
 
-        protected Value(Syntax syntax) { Syntax = syntax; }
+        protected Value(Syntax syntax) => Syntax = syntax;
 
         protected Value(int objectId, Syntax syntax)
-            : base(objectId) { Syntax = syntax; }
+            : base(objectId) 
+            => Syntax = syntax;
 
         [DisableDump]
         internal virtual bool IsLambda => false;
@@ -43,7 +44,7 @@ namespace Reni.Parser
         [DisableDump]
         internal virtual IRecursionHandler RecursionHandler => null;
 
-        internal SourcePart SourcePart => Syntax.Option.SourcePart;
+        internal SourcePart SourcePart => Syntax.SourcePart;
 
         internal void AddToCacheForDebug(ContextBase context, ResultCache cacheItem)
             => ResultCache.Add(context, cacheItem);

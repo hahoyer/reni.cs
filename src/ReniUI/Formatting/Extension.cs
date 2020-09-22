@@ -67,7 +67,7 @@ namespace ReniUI.Formatting
             return result + target.Id;
         }
 
-        static TContainer FlatFormat<TContainer, TValue>(this Syntax target, bool areEmptyLinesPossible)
+        static TContainer FlatFormat<TContainer, TValue>(this Helper.Syntax target, bool areEmptyLinesPossible)
             where TContainer : class, IFormatResult<TValue>, new()
         {
             var left = target.Left?.FlatFormat<TContainer, TValue>(areEmptyLinesPossible);
@@ -118,7 +118,7 @@ namespace ReniUI.Formatting
                 if(tokenString == null)
                     return null;
 
-                tokenString = (target.LeftSideSeparator()?" ":"") + tokenString;
+                tokenString = (target.LeftSideSeparator?" ":"") + tokenString;
 
                 var leftResult = target.Left.FlatSubFormat<TContainer, TValue>(areEmptyLinesPossible);
                 if(leftResult == null)
@@ -131,11 +131,11 @@ namespace ReniUI.Formatting
             return (left ?? new TContainer()).Concat(main, right ?? new TContainer());
         }
 
-        static TContainer FlatSubFormat<TContainer, TValue>(this Syntax left, bool areEmptyLinesPossible)
+        static TContainer FlatSubFormat<TContainer, TValue>(this Helper.Syntax left, bool areEmptyLinesPossible)
             where TContainer : class, IFormatResult<TValue>, new()
             => left == null ? new TContainer() : left.FlatFormat<TContainer, TValue>(areEmptyLinesPossible);
 
-        internal static bool HasAlreadyLineBreakOrIsTooLong(this Syntax syntax, int? maxLineLength, bool areEmptyLinesPossible)
+        internal static bool HasAlreadyLineBreakOrIsTooLong(this Helper.Syntax syntax, int? maxLineLength, bool areEmptyLinesPossible)
         {
             var basicLineLength = syntax.GetFlatLength(areEmptyLinesPossible);
             return basicLineLength == null || basicLineLength > maxLineLength;
@@ -147,7 +147,7 @@ namespace ReniUI.Formatting
         /// <param name="target"></param>
         /// <param name="areEmptyLinesPossible"></param>
         /// <returns>The formatted line or null if target contains line breaks.</returns>
-        internal static string FlatFormat(this Syntax target, bool areEmptyLinesPossible)
+        internal static string FlatFormat(this Helper.Syntax target, bool areEmptyLinesPossible)
             => target.FlatFormat<StringResult, string>(areEmptyLinesPossible)?.Value;
 
         /// <summary>
@@ -156,7 +156,7 @@ namespace ReniUI.Formatting
         /// <param name="target"></param>
         /// <param name="areEmptyLinesPossible"></param>
         /// <returns>The line length calculated or null if target contains line breaks.</returns>
-        internal static int? GetFlatLength(this Syntax target, bool areEmptyLinesPossible)
+        internal static int? GetFlatLength(this Helper.Syntax target, bool areEmptyLinesPossible)
             => target.FlatFormat<IntegerResult, int>(areEmptyLinesPossible)?.Value;
     }
 }

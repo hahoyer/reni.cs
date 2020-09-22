@@ -5,6 +5,7 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
+using Reni.Helper;
 using Reni.Parser;
 using Reni.Struct;
 using Reni.Validation;
@@ -15,7 +16,7 @@ namespace Reni.TokenClasses
     {
         static int NextObjectId;
 
-        internal static Syntax CreateSourceSyntax
+        internal static Syntax Create
         (
             Syntax left,
             ITokenClass tokenClass,
@@ -38,7 +39,6 @@ namespace Reni.TokenClasses
         internal ITokenClass TokenClass {get;}
         ValueCache ValueCache.IContainer.Cache {get;} = new ValueCache();
 
-
         Syntax
         (
             Syntax left,
@@ -56,10 +56,12 @@ namespace Reni.TokenClasses
             Option = new SyntaxOption(this);
         }
 
-        SourcePart ISourcePartProxy.All => Option.SourcePart;
-        SourcePart ISyntax.All => Option.SourcePart;
-        SourcePart ISyntax.Main => Option.MainToken;
+        SourcePart ISourcePartProxy.All => SourcePart;
+        SourcePart ISyntax.All => SourcePart;
+        SourcePart ISyntax.Main => Token.Characters;
 
+        [DisableDump]
+        internal SourcePart SourcePart => Left?.SourcePart + Token.Characters + Right?.SourcePart;
 
         [DisableDump]
         public string[] DeclarationOptions
@@ -70,7 +72,6 @@ namespace Reni.TokenClasses
 
         [DisableDump]
         internal Result<Value> Value => this.CachedValue(() => GetValue(this));
-
 
         [DisableDump]
         internal Result<Declarator> Declarer
@@ -109,7 +110,7 @@ namespace Reni.TokenClasses
                this;
 
         Syntax CheckedLocate(SourcePart part)
-            => Option.SourcePart.Contains(part) ? Locate(part) : null;
+            => SourcePart.Contains(part) ? Locate(part) : null;
 
         internal IEnumerable<Syntax> Belongings(Syntax recent)
         {
@@ -209,7 +210,7 @@ namespace Reni.TokenClasses
                 return Statement.CreateStatements(value, Option.DefaultScopeProvider);
 
             return new Result<Statement[]>
-                (new Statement[0], IssueId.InvalidListOperandSequence.Issue(Option.SourcePart));
+                (new Statement[0], IssueId.InvalidListOperandSequence.Issue(SourcePart));
         }
 
         internal Result<Syntax> GetBracketKernel(int level, Syntax parent)
@@ -217,7 +218,7 @@ namespace Reni.TokenClasses
             Tracer.Assert(parent.Right == null);
 
             if(!(TokenClass is LeftParenthesis leftParenthesis))
-                return new Result<Syntax>(this, IssueId.ExtraRightBracket.Issue(parent.Option.SourcePart));
+                return new Result<Syntax>(this, IssueId.ExtraRightBracket.Issue(parent.SourcePart));
 
             Tracer.Assert(Left == null);
 
@@ -228,7 +229,7 @@ namespace Reni.TokenClasses
 
             if(levelDelta > 0)
                 return new Result<Syntax>
-                    (Right, IssueId.ExtraLeftBracket.Issue(Option.SourcePart));
+                    (Right, IssueId.ExtraLeftBracket.Issue(SourcePart));
 
             NotImplementedMethod(level, parent);
             return null;

@@ -33,7 +33,7 @@ namespace Reni.Parser
         internal long ToNumber => BitsConst.Convert(Id).ToInt64();
 
         [DisableDump]
-        internal SourcePart Token => Syntax.Option.MainToken;
+        internal SourcePart Token => Syntax.Token.Characters;
 
         protected override string GetNodeDump() => Terminal.NodeDump();
     }

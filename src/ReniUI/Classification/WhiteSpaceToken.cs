@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using hw.Scanner;
-using Reni;
 using Reni.Parser;
-using Reni.TokenClasses;
+using ReniUI.Helper;
 
 namespace ReniUI.Classification
 {
@@ -23,7 +22,7 @@ namespace ReniUI.Classification
         public override bool IsLineEnd => Lexer.IsLineEnd(_item);
         public override string State => Lexer.Instance.WhiteSpaceId(_item) ?? "";
 
-        public override Syntax Syntax {get;}
+        internal override Syntax Syntax {get;}
 
         public override IEnumerable<SourcePart> FindAllBelongings(CompilerBrowser compiler) {yield break;}
     }

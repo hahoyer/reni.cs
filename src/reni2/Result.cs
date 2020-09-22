@@ -18,6 +18,9 @@ namespace Reni
         static int _nextObjectId = 1;
         CodeBase _code;
         CodeArgs _exts;
+        /// <summary>
+        /// Is this an hollow object? With no data?
+        /// </summary>
         bool? _hllw;
         bool _isDirty;
         Category _pendingCategory;
@@ -120,6 +123,9 @@ namespace Reni
         public Category CompleteCategory
             => Category.CreateCategory(HasHllw, HasSize, HasType, HasCode, HasExts);
 
+        /// <summary>
+        /// Is this an hollow object? With no data?
+        /// </summary>
         [Node]
         [DebuggerHidden]
         public bool? Hllw

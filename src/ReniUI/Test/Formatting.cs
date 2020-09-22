@@ -3,6 +3,7 @@ using hw.DebugFormatter;
 using hw.UnitTest;
 using NUnit.Framework;
 using ReniUI.Formatting;
+using ReniUI.Helper;
 
 namespace ReniUI.Test
 {
@@ -19,7 +20,7 @@ namespace ReniUI.Test
             const string expectedText = @"aaaaa; ccccc";
 
             var compiler = CompilerBrowser.FromText(text);
-            var newSource = new Syntax(compiler.Syntax, null).FlatFormat(false);
+            var newSource = compiler.Syntax.FlatFormat(false);
             Tracer.Assert(newSource == expectedText, "\n\"" + newSource + "\"");
         }
 

@@ -9,11 +9,11 @@ namespace ReniUI.Formatting
 {
     sealed class Frame : DumpableObject
     {
-        internal static Frame Create(HierachicalFormatter formatter, CompilerBrowser compiler, SourcePart targetPart)
+        internal static Frame Create(HierarchicalFormatter formatter, CompilerBrowser compiler, SourcePart targetPart)
             => new Frame(compiler.Locate(targetPart), compiler, formatter: formatter);
 
         [DisableDump]
-        readonly HierachicalFormatter Formatter;
+        readonly HierarchicalFormatter Formatter;
 
         readonly ValueCache<bool> HasInnerLineBreaksCache;
         readonly ValueCache<ResultItems> ItemsWithoutLeadingBreaksCache;
@@ -27,9 +27,10 @@ namespace ReniUI.Formatting
         readonly ValueCache<Frame> RightCache;
 
         [DisableDump]
-        internal readonly Reni.TokenClasses.Syntax Target;
+        internal readonly Helper.Syntax Target;
 
-        Frame(Reni.TokenClasses.Syntax target, CompilerBrowser compiler, Frame parent = null, HierachicalFormatter formatter = null)
+        Frame
+            (Helper.Syntax target, CompilerBrowser compiler, Frame parent = null, HierarchicalFormatter formatter = null)
         {
             Parent = parent;
             Formatter = parent?.Formatter ?? formatter;
@@ -43,7 +44,7 @@ namespace ReniUI.Formatting
             HasInnerLineBreaksCache = new ValueCache<bool>(GetHasInnerLineBreaksForCache);
         }
 
-        internal string TargetString => Target.Option.SourcePart.NodeDump;
+        internal string TargetString => Target.Target.SourcePart.NodeDump;
 
         Frame Left => LeftCache.Value;
         Frame Right => RightCache.Value;
@@ -88,11 +89,8 @@ namespace ReniUI.Formatting
             => Target.TokenClass is RightParenthesis;
 
         Frame RightMostTokenClassFrame
-            => Target == null
-                ? null
-                : Target.Right == null
-                    ? this
-                    : Right.RightMostTokenClassFrame;
+            => Target == null ? null :
+                Target.Right == null ? this : Right.RightMostTokenClassFrame;
 
         Frame LeftTokenClassFrame
             => Parent == null || Target == Parent.Target.Right

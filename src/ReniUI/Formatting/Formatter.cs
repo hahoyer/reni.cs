@@ -55,7 +55,7 @@ namespace ReniUI.Formatting
         {
             public override Context RightSideLineBreakContext(Context context) => context.ForList;
 
-            public override Context BothSideContext(Context context, Syntax syntax) 
+            public override Context BothSideContext(Context context, Helper.Syntax syntax) 
                 => context.MultiLineBreaksForList(syntax.Left, syntax.Right?.Left);
         }
 
@@ -65,7 +65,7 @@ namespace ReniUI.Formatting
 
         sealed class ListEndFormatter : ListItemFormatter 
         {
-            public override Context BothSideContext(Context context, Syntax syntax) 
+            public override Context BothSideContext(Context context, Helper.Syntax syntax) 
                 => context.MultiLineBreaksForList(syntax.Left, syntax.Right);
         }
 
@@ -81,7 +81,7 @@ namespace ReniUI.Formatting
         public static readonly Formatter Unknown = new UnknownFormatter();
 
 
-        public static Formatter CreateFormatter(Syntax syntax)
+        public static Formatter CreateFormatter(Helper.Syntax syntax)
         {
             switch(syntax.TokenClass)
             {
@@ -110,7 +110,7 @@ namespace ReniUI.Formatting
             return default;
         }
 
-        static Formatter GetListTokenFormatter(Syntax syntax)
+        static Formatter GetListTokenFormatter(Helper.Syntax syntax)
             => syntax.Right == null
                 ? LastList
                 : syntax.Right.TokenClass == syntax.TokenClass
@@ -128,7 +128,7 @@ namespace ReniUI.Formatting
         public virtual bool HasLineBreaksAfterToken(Context context) => false;
         public virtual Context LeftSideLineBreakContext(Context context) => context.None;
         public virtual Context RightSideLineBreakContext(Context context) => context.None;
-        public virtual Context BothSideContext(Context context, Syntax syntax) => context.None;
+        public virtual Context BothSideContext(Context context, Helper.Syntax syntax) => context.None;
         public virtual bool HasLineBreaksByContext(Context context) => false;
         public virtual bool IsTrace => false;
         public virtual bool HasMultipleLineBreaksOnRightSide(Context context) => false;

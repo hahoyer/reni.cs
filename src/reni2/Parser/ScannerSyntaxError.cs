@@ -20,7 +20,7 @@ namespace Reni.Parser
         {
             if(syntax.Right == null)
             {
-                var issues = IssueId.Issue(syntax.Option.MainToken);
+                var issues = IssueId.Issue(syntax.Token.Characters);
                 return syntax.Left == null
                     ? new Result<Value>(new EmptyList(syntax), issues)
                     : syntax.Left.Value.With(issues);
@@ -33,6 +33,6 @@ namespace Reni.Parser
         public override string Id => "<error>";
 
         protected override Syntax Create(Syntax left, IToken token, Syntax right)
-            => Syntax.CreateSourceSyntax(left, this, token, right);
+            => Syntax.Create(left, this, token, right);
     }
 }

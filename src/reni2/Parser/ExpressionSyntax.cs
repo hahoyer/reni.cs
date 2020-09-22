@@ -29,7 +29,7 @@ namespace Reni.Parser
                    Depth +
                    " exhausted when evaluation expression.\n" +
                    "Expression: " +
-                   Syntax.Option.SourcePart.GetDumpAroundCurrent(10) +
+                   Syntax.SourcePart.GetDumpAroundCurrent(10) +
                    "\n" +
                    "Context: " +
                    Context.NodeDump;

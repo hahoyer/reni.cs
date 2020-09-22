@@ -31,7 +31,7 @@ namespace Reni.TokenClasses
             }
 
             Syntax IParserTokenType<Syntax>.Create(Syntax left, IToken token, Syntax right)
-                => right == null ? left : Syntax.CreateSourceSyntax(left, this, token, right);
+                => right == null ? left : Syntax.Create(left, this, token, right);
 
             string IParserTokenType<Syntax>.PrioTableId => Id;
             string ITokenClass.Id => Id;
@@ -40,10 +40,11 @@ namespace Reni.TokenClasses
         public RightParenthesis(int level)
             : base(level) { }
 
+        [Obsolete("",true)]
         Result<Value> IValueProvider.Get(Syntax syntax)
         {
             var result = syntax.Left.GetBracketKernel(Level, syntax);
-            var target = result.Target?.Option.Value ?? new EmptyList(syntax);
+            var target = result.Target?.Value ?? new EmptyList(syntax);
 
             if(result.Issues.Any())
                 return target.With(result.Issues);

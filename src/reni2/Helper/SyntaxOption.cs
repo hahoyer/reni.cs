@@ -1,15 +1,16 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using hw.Scanner;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Parser;
 using Reni.Struct;
+using Reni.TokenClasses;
 using Reni.Validation;
 
-namespace Reni.TokenClasses
+namespace Reni.Helper
 {
     sealed class SyntaxOption : DumpableObject, ValueCache.IContainer
     {
@@ -21,26 +22,24 @@ namespace Reni.TokenClasses
             public SyntaxOption Parent;
             public FunctionCache<int, Syntax> LocatePosition;
         }
+        readonly CacheContainer Cache = new CacheContainer();
 
         ValueCache ValueCache.IContainer.Cache {get;} = new ValueCache();
 
-        readonly CacheContainer Cache = new CacheContainer();
 
         [DisableDump]
         readonly Syntax Target;
 
-        public SyntaxOption Parent
+        //[Obsolete("",true)]
+        SyntaxOption Parent
         {
             get => Cache.Parent;
-            private set
+            set
             {
                 Tracer.Assert(value == Cache.Parent || Cache.Parent == null);
                 Cache.Parent = value;
             }
         }
-
-        [DisableDump]
-        internal SourcePart MainToken => Target.Token.Characters;
 
         public SyntaxOption(Syntax target)
         {
@@ -72,40 +71,17 @@ namespace Reni.TokenClasses
                     yield return sourceSyntax;
         }
 
-        [DisableDump]
-        internal SourcePart SourcePart
-            => Target.Left?.Option.SourcePart + Target.Token.Characters + Target.Right?.Option.SourcePart;
-
-        [DisableDump]
-        public IEnumerable<Syntax> ParentChainIncludingThis
-        {
-            get
-            {
-                yield return Target;
-
-                if(Parent == null)
-                    yield break;
-
-                foreach(var other in Parent.ParentChainIncludingThis)
-                    yield return other;
-            }
-        }
-
         public Syntax LocatePosition(int current) => Cache.LocatePosition[current];
 
         Syntax LocatePositionForCache(int current)
-        {
-            if(current < Target.Option.SourcePart.Position || current >= Target.Option.SourcePart.EndPosition)
-                return Parent?.LocatePosition(current);
-
-            return Target.Left?.Option.CheckedLocatePosition(current) ??
-                   Target.Right?.Option.CheckedLocatePosition(current) ??
-                   Target;
-        }
+            =>
+                Target.Left?.Option.CheckedLocatePosition(current) ??
+                Target.Right?.Option.CheckedLocatePosition(current) ??
+                Target;
 
         Syntax CheckedLocatePosition(int current)
             =>
-                Target.Option.SourcePart.Position <= current && current < Target.Option.SourcePart.EndPosition
+                Target.SourcePart.Position <= current && current < Target.SourcePart.EndPosition
                     ? LocatePosition(current)
                     : null;
 
@@ -180,7 +156,7 @@ namespace Reni.TokenClasses
                 .Select(item => item.CreateSubContext(false));
 
         [DisableDump]
-        bool IsFunctionLevel => Target.TokenClass is Function;
+        bool IsFunctionLevel => Target.TokenClass is TokenClasses.Function;
 
         [DisableDump]
         bool IsStatementsLevel
@@ -243,7 +219,7 @@ namespace Reni.TokenClasses
                parentTokenClass is Definable ||
                parentTokenClass is ThenToken ||
                parentTokenClass is List ||
-               parentTokenClass is Function ||
+               parentTokenClass is TokenClasses.Function ||
                parentTokenClass is TypeOperator ||
                parentTokenClass is ElseToken ||
                parentTokenClass is ScannerSyntaxError)

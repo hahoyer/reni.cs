@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using hw.DebugFormatter;
 using hw.Parser;
-using hw.Scanner;
 using Reni.Feature;
 using Reni.Parser;
 
@@ -27,9 +24,9 @@ namespace Reni.TokenClasses
             if(syntax.Right == null)
             {
                 if(syntax.Left == null)
-                    return new Declarator(null, this,syntax.Option.SourcePart);
+                    return new Declarator(null, this, syntax.SourcePart);
 
-                return syntax.Left.Declarer?.Target.WithName(this,syntax.Option.SourcePart);
+                return syntax.Left.Declarer?.Target.WithName(this, syntax.SourcePart);
             }
 
             Tracer.FlaggedLine(nameof(syntax) + "=" + syntax);
@@ -39,7 +36,7 @@ namespace Reni.TokenClasses
         Result<Parser.Value> IValueProvider.Get(Syntax syntax)
             => ExpressionSyntax.Create(this, syntax);
 
-        bool IDeclarationItem.IsDeclarationPart(Syntax syntax) 
+        bool IDeclarationItem.IsDeclarationPart(Syntax syntax)
             => syntax.Option.IsDeclarationPart();
     }
 
@@ -50,9 +47,9 @@ namespace Reni.TokenClasses
     {
         public const string TokenId = "<<";
         public const string MutableId = "<<:=";
-        internal bool IsMutable { get; }
+        internal bool IsMutable {get;}
 
-        public ConcatArrays(bool isMutable) { IsMutable = isMutable; }
+        public ConcatArrays(bool isMutable) => IsMutable = isMutable;
 
         [DisableDump]
         internal override IEnumerable<IDeclarationProvider> MakeGeneric
@@ -65,9 +62,11 @@ namespace Reni.TokenClasses
     sealed class Count : Definable
     {
         public const string TokenId = "count";
+
         [DisableDump]
         internal override IEnumerable<IDeclarationProvider> MakeGeneric
             => this.GenericListFromDefinable(base.MakeGeneric);
+
         public override string Id => TokenId;
     }
 
@@ -75,9 +74,11 @@ namespace Reni.TokenClasses
     sealed class StableReference : Definable
     {
         public const string TokenId = "stable_reference";
+
         [DisableDump]
         internal override IEnumerable<IDeclarationProvider> MakeGeneric
             => this.GenericListFromDefinable(base.MakeGeneric);
+
         public override string Id => TokenId;
     }
 
@@ -85,9 +86,11 @@ namespace Reni.TokenClasses
     sealed class ArrayReference : Definable
     {
         public const string TokenId = "array_reference";
+
         [DisableDump]
         internal override IEnumerable<IDeclarationProvider> MakeGeneric
             => this.GenericListFromDefinable(base.MakeGeneric);
+
         public override string Id => TokenId;
     }
 }

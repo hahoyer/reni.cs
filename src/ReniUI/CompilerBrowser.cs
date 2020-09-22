@@ -9,11 +9,10 @@ using Reni;
 using Reni.Code;
 using Reni.Parser;
 using Reni.Struct;
-using Reni.TokenClasses;
 using Reni.Validation;
 using ReniUI.Classification;
-using ReniUI.CompilationView;
 using ReniUI.Formatting;
+using ReniUI.Helper;
 
 namespace ReniUI
 {
@@ -57,12 +56,13 @@ namespace ReniUI
             }
         }
 
-        internal Reni.TokenClasses.Syntax Syntax
+        internal Syntax Syntax
         {
-            get {
+            get
+            {
                 try
                 {
-                    return Compiler.Syntax;
+                    return new Syntax(Compiler.Syntax);
                 }
                 catch(Exception e)
                 {
@@ -70,19 +70,19 @@ namespace ReniUI
                     throw;
                 }
 
-                ;}
+                ;
+            }
         }
 
         public Token LocatePosition(int offset)
-            => Token.LocatePosition(Compiler.Syntax, offset);
+            => Token.LocatePosition(Syntax, offset);
 
         internal IEnumerable<Value> FindPosition(int offset)
         {
             var enumerable = LocatePosition(offset)
                 .Syntax
-                .Option
                 .ParentChainIncludingThis
-                .Select(item => item.Value.Target)
+                .Select(item => item.Target.Value.Target)
                 .ToArray();
 
             var compileSyntaxs = enumerable
@@ -132,19 +132,17 @@ namespace ReniUI
             return null;
         }
 
-        internal IEnumerable<Reni.TokenClasses.Syntax> FindAllBelongings(Reni.TokenClasses.Syntax syntax)
-            => Compiler.Syntax.Belongings(syntax);
+        internal IEnumerable<Reni.TokenClasses.Syntax> FindAllBelongings(Syntax syntax)
+            => Compiler.Syntax.Belongings(syntax.Target);
 
-        public string Reformat(IFormatter formatter = null, SourcePart targetPart = null)
-        {
-            return (formatter ?? new Formatting.Configuration().Create())
-                .GetEditPieces(this, targetPart)
-                .Combine(targetPart ?? Syntax.Option.SourcePart);
-        }
+        internal string Reformat(IFormatter formatter = null, SourcePart targetPart = null) =>
+            (formatter ?? new Formatting.Configuration().Create())
+            .GetEditPieces(this, targetPart)
+            .Combine(targetPart ?? Syntax.Target.SourcePart);
 
-        public Reni.TokenClasses.Syntax Locate(SourcePart span)
+        internal Syntax Locate(SourcePart span)
         {
-            var result = Compiler.Syntax.Locate(span);
+            var result = Syntax.Locate(span);
             if(result != null)
                 return result;
 
@@ -167,8 +165,10 @@ namespace ReniUI
             if(token.IsComment || token.IsLineComment)
                 return null;
 
-            var current = token.Syntax.Token.PrecededWith.SourcePart().Intersect(token.Syntax.Option.MainToken).Position - 1;
-            return current < 0 ? null : token.Syntax.Option.LocatePosition(current);
+            var tokenSyntax = token.Syntax.Target;
+            var current =
+                tokenSyntax.Token.PrecededWith.SourcePart().Intersect(tokenSyntax.Token.Characters).Position - 1;
+            return current < 0 ? null : tokenSyntax.Option.LocatePosition(current);
         }
 
         internal string[] DeclarationOptions(int offset)
@@ -181,6 +181,5 @@ namespace ReniUI
             (SourcePart sourcePart, IFormatter formatter = null)
             => (formatter ?? new Formatting.Configuration().Create())
                 .GetEditPieces(this, sourcePart);
-
     }
 }

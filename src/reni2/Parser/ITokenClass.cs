@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Reni.Parser
 {
-    interface ITokenClass
+    public interface ITokenClass
     {
         string Id { get; }
     }

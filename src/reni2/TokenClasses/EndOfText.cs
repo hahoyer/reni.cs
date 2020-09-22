@@ -1,4 +1,5 @@
-﻿using hw.DebugFormatter;
+﻿using System;
+using hw.DebugFormatter;
 using hw.Parser;
 using Reni.Parser;
 
@@ -23,6 +24,7 @@ namespace Reni.TokenClasses
         IParserTokenType<Syntax> IBracketMatch<Syntax>.Value {get;} = new Matched();
         bool IDefaultScopeProvider.MeansPublic => true;
 
+        [Obsolete("",true)]
         Result<Statement[]> IStatementsProvider.Get(List type, Syntax right, IDefaultScopeProvider container)
         {
             Tracer.Assert(type == null);

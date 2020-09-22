@@ -2,7 +2,7 @@
 
 namespace ReniUI.Formatting
 {
-    public sealed class Configuration
+    sealed class Configuration
     {
         public int? EmptyLineLimit;
         public int? MaxLineLength;
@@ -11,7 +11,7 @@ namespace ReniUI.Formatting
         public bool SpaceAfterListItem = true;
         public bool? LineBreakAtEndOfText = false;
 
-        public bool IsLineBreakRequired(Syntax syntax)
+        public bool IsLineBreakRequired(Helper.Syntax syntax)
             => syntax?.HasAlreadyLineBreakOrIsTooLong(MaxLineLength, EmptyLineLimit != 0) == true;
     }
 }

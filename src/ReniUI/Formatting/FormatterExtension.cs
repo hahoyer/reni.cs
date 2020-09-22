@@ -4,12 +4,11 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
 using hw.Scanner;
-using Reni.TokenClasses;
-
+using ReniUI.Helper;
 
 namespace ReniUI.Formatting
 {
-    public static class FormatterExtension
+    static class FormatterExtension
     {
         public static IFormatter Create(this Configuration configuration)
             => new StructFormatter(configuration ?? new Configuration());
@@ -61,12 +60,10 @@ namespace ReniUI.Formatting
             var edits = pieces.OrderBy(edit => edit.Location.Position).ToArray();
             foreach(var edit in edits)
             {
-                Tracer.Assert(edit.Location.EndPosition <= originalEndPosition,"not implemented.");
+                Tracer.Assert(edit.Location.EndPosition <= originalEndPosition, "not implemented.");
                 var newPosition = edit.Location.EndPosition - originalPosition;
-                if (currentPosition < 0)
-                {
+                if(currentPosition < 0)
                     Tracer.Assert(newPosition <= 0);
-                }
                 else
                 {
                     var length = edit.Location.Position - originalPosition - currentPosition;
@@ -81,28 +78,31 @@ namespace ReniUI.Formatting
             return result;
         }
 
-        public static Reni.TokenClasses.Syntax LocateAndFilter(this CompilerBrowser compiler, SourcePart targetPart)
+        public static Syntax LocateAndFilter(this CompilerBrowser compiler, SourcePart targetPart)
         {
             if(targetPart == null)
                 return compiler.Syntax;
             var result = compiler.Locate(targetPart);
-            return IsTooSmall(result.Token.PrecededWith, result.Token.Characters, targetPart) ? null : result;
+            return IsTooSmall
+                (result.Target.Token.PrecededWith, result.Target.Token.Characters, targetPart)
+                ? null
+                : result;
         }
 
         static bool IsTooSmall(IEnumerable<IItem> precede, SourcePart resultToken, SourcePart targetPart)
         {
             var sourcePart = precede.SourcePart() + resultToken;
 
-            if (targetPart.End > sourcePart.End)
+            if(targetPart.End > sourcePart.End)
                 return false;
 
-            if (targetPart.Start < sourcePart.Start)
+            if(targetPart.Start < sourcePart.Start)
                 return false;
 
-            if (!precede.Any())
+            if(!precede.Any())
                 return true;
 
-            if (targetPart.Start >= resultToken.Start)
+            if(targetPart.Start >= resultToken.Start)
                 return true;
 
             if(targetPart.End > resultToken.Start)
@@ -118,9 +118,8 @@ namespace ReniUI.Formatting
                     return false;
             }
 
-            DumpableObject.NotImplementedFunction(resultToken, targetPart);
+            Dumpable.NotImplementedFunction(resultToken, targetPart);
             return false;
         }
     }
-
 }

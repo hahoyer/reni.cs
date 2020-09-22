@@ -135,6 +135,9 @@ namespace Reni.Type
         [Node]
         internal Size Size => _cache.Size.Value;
 
+        /// <summary>
+        /// Is this an hollow type? With no data?
+        /// </summary>
         [DisableDump]
         internal virtual bool Hllw
         {

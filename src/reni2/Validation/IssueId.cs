@@ -34,12 +34,12 @@ namespace Reni.Validation
             => new Result(category, Issue(position, message));
 
         internal Result<Value> Value(Syntax syntax)
-            => new Result<Value>(new EmptyList(syntax), Issue(syntax.Option.SourcePart));
+            => new Result<Value>(new EmptyList(syntax), Issue(syntax.SourcePart));
 
         internal Result<Value> Value(Value value)
             => new Result<Value>(value, Issue(value.SourcePart));
 
         internal Result<Syntax> Syntax(Syntax syntax)
-            => new Result<Syntax>(syntax, Issue(syntax.Option.SourcePart));
+            => new Result<Syntax>(syntax, Issue(syntax.SourcePart));
     }
 }
