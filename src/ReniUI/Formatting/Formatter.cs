@@ -103,7 +103,7 @@ namespace ReniUI.Formatting
                 case Text _:
                 case Number _:
                 case TypeOperator _:
-                case InstanceToken _: return syntax.Left != null ? Chain : Single;
+                case InstanceToken _: return syntax.Left == null ? Single : Chain;
             }
 
             NotImplementedFunction(syntax, "tokenClass", syntax.TokenClass);
@@ -123,7 +123,6 @@ namespace ReniUI.Formatting
 
         public virtual bool HasLineBreaksLeftOfLeft => false;
         public virtual bool HasLineBreaksRightOfRight => false;
-        public virtual bool HasLineBreaksLeftOfAll => false;
         public virtual bool HasLineBreaksRightOfAll => false;
         public virtual bool HasLineBreaksBeforeToken(Context context) => false;
         public virtual bool HasLineBreaksAfterToken(Context context) => false;

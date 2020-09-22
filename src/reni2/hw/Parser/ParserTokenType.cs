@@ -1,4 +1,5 @@
 using System;
+using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 
@@ -22,7 +23,6 @@ namespace hw.Parser
 
         protected override IParserTokenType<TTreeItem> GetParserTokenType(string id) => this;
 
-        protected override string GetNodeDump() => base.GetNodeDump() + "(" + Id.Quote() + ")";
         public override string ToString() => base.ToString() + " Id=" + Id.Quote();
     }
 }

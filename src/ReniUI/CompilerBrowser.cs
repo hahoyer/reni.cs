@@ -57,7 +57,7 @@ namespace ReniUI
             }
         }
 
-        internal Syntax Syntax
+        internal Reni.TokenClasses.Syntax Syntax
         {
             get {
                 try
@@ -80,6 +80,7 @@ namespace ReniUI
         {
             var enumerable = LocatePosition(offset)
                 .Syntax
+                .Option
                 .ParentChainIncludingThis
                 .Select(item => item.Value.Target)
                 .ToArray();
@@ -131,17 +132,17 @@ namespace ReniUI
             return null;
         }
 
-        internal IEnumerable<Syntax> FindAllBelongings(Syntax syntax)
+        internal IEnumerable<Reni.TokenClasses.Syntax> FindAllBelongings(Reni.TokenClasses.Syntax syntax)
             => Compiler.Syntax.Belongings(syntax);
 
         public string Reformat(IFormatter formatter = null, SourcePart targetPart = null)
         {
             return (formatter ?? new Formatting.Configuration().Create())
                 .GetEditPieces(this, targetPart)
-                .Combine(targetPart ?? Syntax.SourcePart);
+                .Combine(targetPart ?? Syntax.Option.SourcePart);
         }
 
-        public Syntax Locate(SourcePart span)
+        public Reni.TokenClasses.Syntax Locate(SourcePart span)
         {
             var result = Compiler.Syntax.Locate(span);
             if(result != null)
@@ -158,7 +159,7 @@ namespace ReniUI
 
         public IEnumerable<SourcePart> FindAllBelongings(Token open) => open.FindAllBelongings(this);
 
-        internal Syntax LocateActivePosition(int offset)
+        internal Reni.TokenClasses.Syntax LocateActivePosition(int offset)
         {
             NotImplementedMethod(offset);
 
@@ -166,8 +167,8 @@ namespace ReniUI
             if(token.IsComment || token.IsLineComment)
                 return null;
 
-            var current = token.Syntax.LeftWhiteSpaces.SourcePart().Intersect(token.Syntax.Main).Position - 1;
-            return current < 0 ? null : token.Syntax.LocatePosition(current);
+            var current = token.Syntax.Token.PrecededWith.SourcePart().Intersect(token.Syntax.Option.MainToken).Position - 1;
+            return current < 0 ? null : token.Syntax.Option.LocatePosition(current);
         }
 
         internal string[] DeclarationOptions(int offset)
@@ -180,9 +181,6 @@ namespace ReniUI
             (SourcePart sourcePart, IFormatter formatter = null)
             => (formatter ?? new Formatting.Configuration().Create())
                 .GetEditPieces(this, sourcePart);
-
-        internal IEnumerable<IFormatItem> GetTokenList(SourcePart targetPart)
-            => Compiler.Syntax.GetTokenList(targetPart, true);
 
     }
 }

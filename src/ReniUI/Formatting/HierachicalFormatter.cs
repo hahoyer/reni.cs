@@ -84,7 +84,7 @@ namespace ReniUI.Formatting
                 leadingLineBreaks = 0;
             }
 
-            if(result.IsEmpty && SeparatorType.Get(leftTokenClass, rightTokenClass) == SeparatorType.CloseSeparator)
+            if(result.IsEmpty && SeparatorExtension.Get(leftTokenClass, rightTokenClass))
                 result.AddSpaces(1);
 
             Tracer.Assert(leadingLineBreaks == 0);
@@ -142,8 +142,8 @@ namespace ReniUI.Formatting
 
             var leftTokenClass = leftNeighbor?.Target.TokenClass;
             var indentLevel = target.IndentLevel;
-            var leftWhiteSpaces = target.Target.LeftWhiteSpaces;
-            var main = target.Target.Main;
+            var leftWhiteSpaces = target.Target.Token.PrecededWith;
+            var main = target.Target.Token.Characters;
             return Item
             (
                 leftTokenClass,

@@ -12,13 +12,13 @@ namespace ReniUI.Classification
 {
     sealed class SyntaxToken : Token
     {
-        internal SyntaxToken(Syntax syntax) { Syntax = syntax; }
+        internal SyntaxToken(Reni.TokenClasses.Syntax syntax) { Syntax = syntax; }
 
-        public override Syntax Syntax { get; }
+        public override Reni.TokenClasses.Syntax Syntax { get; }
 
         TokenClass TokenClass => Syntax.TokenClass as TokenClass;
 
-        public override SourcePart SourcePart => Syntax.Main;
+        public override SourcePart SourcePart => Syntax.Option.MainToken;
 
         [EnableDumpExcept(false)]
         public override bool IsKeyword => !IsIdentifier && !IsNumber && !IsText && !IsBrace;
@@ -46,9 +46,9 @@ namespace ReniUI.Classification
             => Syntax.Issues?.Any(item => item.IssueId == IssueId.EOFInLineComment)??false;
 
         [DisableDump]
-        public override string State => Syntax.Main.Id ?? "";
+        public override string State => Syntax.Option.MainToken.Id ?? "";
 
         public override IEnumerable<SourcePart> FindAllBelongings(CompilerBrowser compiler)
-            => compiler.FindAllBelongings(Syntax)?.Select(item => item.Main);
+            => compiler.FindAllBelongings(Syntax)?.Select(item => item.Option.MainToken);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using hw.DebugFormatter;
 using hw.Parser;
+using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.TokenClasses;
 using Reni.Validation;
@@ -18,8 +19,8 @@ namespace Reni.Parser
         Result<Declarator> IDeclaratorTokenClass.Get(Syntax syntax)
         {
             if(!(syntax.Right.TokenClass is IDeclaratorTagProvider provider))
-                return new Declarator(null, null, syntax.SourcePart)
-                    .Issues(IssueId.UnknownDeclarationTag.Issue(syntax.SourcePart));
+                return new Declarator(null, null, syntax.Option.SourcePart)
+                    .Issues(IssueId.UnknownDeclarationTag.Issue(syntax.Option.SourcePart));
 
             var result = provider.Get(syntax.Right);
 

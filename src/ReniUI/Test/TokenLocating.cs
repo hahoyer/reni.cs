@@ -19,7 +19,7 @@ namespace ReniUI.Test
             const string text = @"(1,3,4,6)";
             var compiler = CompilerBrowser.FromText(text);
             var span = (compiler.Source + 2).Span(3);
-            var x = compiler.Locate(span).SourcePart;
+            var x = compiler.Locate(span).Option.SourcePart;
 
             Tracer.Assert(x.Id == "1,3,4,6", x.Dump);
         }

@@ -4,40 +4,20 @@ using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
-    interface ISeparatorType
+    static class SeparatorExtension
     {
-        string Text {get;}
-    }
-
-    static class SeparatorType
-    {
-        sealed class Contact : DumpableObject, ISeparatorType
-        {
-            string ISeparatorType.Text => "";
-        }
-
-        sealed class Close : DumpableObject, ISeparatorType
-        {
-            string ISeparatorType.Text => " ";
-        }
-
-        internal static readonly ISeparatorType ContactSeparator = new Contact();
-        internal static readonly ISeparatorType CloseSeparator = new Close();
-
-        internal static ISeparatorType Get(ITokenClass left, ITokenClass right)
+        internal static bool Get(ITokenClass left, ITokenClass right)
             => PrettySeparatorType(left, right) ?? BaseSeparatorType(left, right);
 
-        static ISeparatorType BaseSeparatorType(ITokenClass left, ITokenClass right)
-            => ContactType.Get(left).IsCompatible(ContactType.Get(right))
-                ? ContactSeparator
-                : CloseSeparator;
+        static bool BaseSeparatorType(ITokenClass left, ITokenClass right)
+            => !ContactType.Get(left).IsCompatible(ContactType.Get(right));
 
-        static ISeparatorType PrettySeparatorType(ITokenClass left, ITokenClass right)
+        static bool? PrettySeparatorType(ITokenClass left, ITokenClass right)
         {
             if(left == null || right == null)
                 return null;
             if((left is List || left is Colon) && !(right is RightParenthesis))
-                return CloseSeparator;
+                return true;
 
             if(right is RightParenthesis ||
                right is LeftParenthesis ||
@@ -46,12 +26,12 @@ namespace ReniUI.Formatting
                left is LeftParenthesis || 
                left is BeginOfText
             )
-                return ContactSeparator;
+                return false;
 
             if(right is Colon || left is ExclamationBoxToken)
                 return null;
 
-            return CloseSeparator;
+            return true;
         }
     }
 }

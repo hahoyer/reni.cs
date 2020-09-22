@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
+using hw.Scanner;
 using Reni.Feature;
 using Reni.Parser;
 
@@ -14,7 +15,7 @@ namespace Reni.TokenClasses
         protected string DataFunctionName => Id.Symbolize();
 
         [DisableDump]
-        internal virtual IEnumerable<IDeclarationProvider> Genericize
+        internal virtual IEnumerable<IDeclarationProvider> MakeGeneric
             => this.GenericListFromDefinable();
 
         internal Result<Parser.Value> CreateForVisit
@@ -26,9 +27,9 @@ namespace Reni.TokenClasses
             if(syntax.Right == null)
             {
                 if(syntax.Left == null)
-                    return new Declarator(null, this,syntax.SourcePart);
+                    return new Declarator(null, this,syntax.Option.SourcePart);
 
-                return syntax.Left.Declarer?.Target.WithName(this,syntax.SourcePart);
+                return syntax.Left.Declarer?.Target.WithName(this,syntax.Option.SourcePart);
             }
 
             Tracer.FlaggedLine(nameof(syntax) + "=" + syntax);
@@ -38,27 +39,8 @@ namespace Reni.TokenClasses
         Result<Parser.Value> IValueProvider.Get(Syntax syntax)
             => ExpressionSyntax.Create(this, syntax);
 
-        bool IDeclarationItem.IsDeclarationPart(Syntax syntax)
-        {
-            //var token = syntax.Main.SourcePart();
-
-            var parentTokenClass = syntax.Parent.TokenClass;
-            if(parentTokenClass is Colon)
-                return syntax.Parent.Left == syntax;
-
-            if(parentTokenClass is LeftParenthesis ||
-                parentTokenClass is Definable ||
-                parentTokenClass is ThenToken ||
-                parentTokenClass is List ||
-                parentTokenClass is Function ||
-                parentTokenClass is TypeOperator ||
-                parentTokenClass is ElseToken ||
-                parentTokenClass is ScannerSyntaxError)
-                return false;
-
-            Tracer.FlaggedLine(nameof(syntax) + "=" + syntax);
-            return false;
-        }
+        bool IDeclarationItem.IsDeclarationPart(Syntax syntax) 
+            => syntax.Option.IsDeclarationPart();
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
@@ -73,8 +55,8 @@ namespace Reni.TokenClasses
         public ConcatArrays(bool isMutable) { IsMutable = isMutable; }
 
         [DisableDump]
-        internal override IEnumerable<IDeclarationProvider> Genericize
-            => this.GenericListFromDefinable(base.Genericize);
+        internal override IEnumerable<IDeclarationProvider> MakeGeneric
+            => this.GenericListFromDefinable(base.MakeGeneric);
 
         public override string Id => IsMutable ? MutableId : TokenId;
     }
@@ -84,8 +66,8 @@ namespace Reni.TokenClasses
     {
         public const string TokenId = "count";
         [DisableDump]
-        internal override IEnumerable<IDeclarationProvider> Genericize
-            => this.GenericListFromDefinable(base.Genericize);
+        internal override IEnumerable<IDeclarationProvider> MakeGeneric
+            => this.GenericListFromDefinable(base.MakeGeneric);
         public override string Id => TokenId;
     }
 
@@ -94,8 +76,8 @@ namespace Reni.TokenClasses
     {
         public const string TokenId = "stable_reference";
         [DisableDump]
-        internal override IEnumerable<IDeclarationProvider> Genericize
-            => this.GenericListFromDefinable(base.Genericize);
+        internal override IEnumerable<IDeclarationProvider> MakeGeneric
+            => this.GenericListFromDefinable(base.MakeGeneric);
         public override string Id => TokenId;
     }
 
@@ -104,8 +86,8 @@ namespace Reni.TokenClasses
     {
         public const string TokenId = "array_reference";
         [DisableDump]
-        internal override IEnumerable<IDeclarationProvider> Genericize
-            => this.GenericListFromDefinable(base.Genericize);
+        internal override IEnumerable<IDeclarationProvider> MakeGeneric
+            => this.GenericListFromDefinable(base.MakeGeneric);
         public override string Id => TokenId;
     }
 }

@@ -11,8 +11,7 @@ using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
-
-    public sealed class Syntax : DumpableObject, ISourcePartProxy, ValueCache.IContainer, ISyntax
+    public sealed class Syntax : DumpableObject, ISourcePartProxy, ISyntax, ValueCache.IContainer
     {
         static int NextObjectId;
 
@@ -22,10 +21,23 @@ namespace Reni.TokenClasses
             ITokenClass tokenClass,
             IToken token,
             Syntax right
-            )
+        )
             => new Syntax(left, tokenClass, token, right);
 
-        Syntax _parent;
+        [DisableDump]
+        internal readonly IToken Token;
+        [DisableDump]
+        internal SyntaxOption Option {get;}
+
+        [EnableDumpExcept(null)]
+        internal Syntax Left {get;}
+
+        [EnableDumpExcept(null)]
+        internal Syntax Right {get;}
+
+        internal ITokenClass TokenClass {get;}
+        ValueCache ValueCache.IContainer.Cache {get;} = new ValueCache();
+
 
         Syntax
         (
@@ -33,99 +45,21 @@ namespace Reni.TokenClasses
             ITokenClass tokenClass,
             IToken token,
             Syntax right
-)
+        )
             : base(NextObjectId++)
         {
+            Token = token;
             Left = left;
             TokenClass = tokenClass;
-            Main = token.Characters;
             Right = right;
-            LeftWhiteSpacesRaw = token.PrecededWith;
-            RightWhiteSpaces = Right?.LeftWhiteSpacesRaw;
 
             Option = new SyntaxOption(this);
-            LocatePositionCache = new FunctionCache<int, Syntax>(LocatePositionForCache);
-
-            if(Left != null)
-                Left.Parent = this;
-
-            if(Right != null)
-                Right.Parent = this;
         }
 
-        ValueCache ValueCache.IContainer.Cache {get;} = new ValueCache();
+        SourcePart ISourcePartProxy.All => Option.SourcePart;
+        SourcePart ISyntax.All => Option.SourcePart;
+        SourcePart ISyntax.Main => Option.MainToken;
 
-        SourcePart ISourcePartProxy.All => SourcePart;
-        SourcePart ISyntax.All => SourcePart;
-        SourcePart ISyntax.Main => Main;
-
-        [DisableDump]
-        internal SyntaxOption Option {get;}
-
-        internal Syntax Left {get;}
-        internal Syntax Right { get; }
-
-        internal IEnumerable<IItem> LeftWhiteSpaces => Left == null ? null : LeftWhiteSpacesRaw;
-        IEnumerable<IItem> LeftWhiteSpacesRaw {get;}
-        internal IEnumerable<IItem> RightWhiteSpaces { get; }
-
-        internal ITokenClass TokenClass {get;}
-
-        [DisableDump]
-        internal SourcePart Main {get;}
-
-        FunctionCache<int, Syntax> LocatePositionCache {get;}
-
-        [DisableDump]
-        internal Syntax Parent
-        {
-            get => _parent;
-            private set
-            {
-                Tracer.Assert(_parent == null);
-                _parent = value ?? throw new ArgumentNullException(nameof(value));
-            }
-        }
-
-        [DisableDump]
-        internal SourcePart SourcePart => Left?.SourcePart + Main + Right?.SourcePart;
-
-        [DisableDump]
-        internal Syntax LeftNeighbor => Left?.RightMost ?? LeftParent;
-
-        [DisableDump]
-        internal Syntax RightNeighbor => Right?.LeftMost ?? RightParent;
-
-        [DisableDump]
-        internal Syntax LeftParent => Parent?.Left == this ? Parent.LeftParent : Parent;
-
-        [DisableDump]
-        internal Syntax RightParent => Parent?.Right == this ? Parent.RightParent : Parent;
-
-
-        [DisableDump]
-        internal Syntax LeftMost => Left?.LeftMost ?? this;
-
-        [DisableDump]
-        internal Syntax RightMost => Right?.RightMost ?? this;
-
-        [DisableDump]
-        internal IEnumerable<Syntax> Items => this.CachedValue(GetItems);
-
-        [DisableDump]
-        public IEnumerable<Syntax> ParentChainIncludingThis
-        {
-            get
-            {
-                yield return this;
-
-                if(Parent == null)
-                    yield break;
-
-                foreach(var other in Parent.ParentChainIncludingThis)
-                    yield return other;
-            }
-        }
 
         [DisableDump]
         public string[] DeclarationOptions
@@ -148,7 +82,7 @@ namespace Reni.TokenClasses
                     case IDeclaratorTokenClass tokenClass: return tokenClass.Get(this);
                     case RightParenthesis _:
                     case EndOfText _:
-                    case List _: 
+                    case List _:
                     case ScannerSyntaxError _: return null;
                 }
 
@@ -169,35 +103,13 @@ namespace Reni.TokenClasses
                 .plus(Issues)
                 .plus(Right?.AllIssues);
 
-        [DisableDump]
-        internal IDefaultScopeProvider DefaultScopeProvider
-            => TokenClass as IDefaultScopeProvider ?? Parent?.DefaultScopeProvider;
-
-        public Syntax LocatePosition(int current) => LocatePositionCache[current];
-
-        Syntax LocatePositionForCache(int current)
-        {
-            if(current < SourcePart.Position || current >= SourcePart.EndPosition)
-                return Parent?.LocatePosition(current);
-
-            return Left?.CheckedLocatePosition(current) ??
-                   Right?.CheckedLocatePosition(current) ??
-                   this;
-        }
-
-        Syntax CheckedLocatePosition(int current)
-            =>
-                SourcePart.Position <= current && current < SourcePart.EndPosition
-                    ? LocatePosition(current)
-                    : null;
-
         internal Syntax Locate(SourcePart part)
             => Left?.CheckedLocate(part) ??
                Right?.CheckedLocate(part) ??
                this;
 
         Syntax CheckedLocate(SourcePart part)
-            => SourcePart.Contains(part) ? Locate(part) : null;
+            => Option.SourcePart.Contains(part) ? Locate(part) : null;
 
         internal IEnumerable<Syntax> Belongings(Syntax recent)
         {
@@ -225,7 +137,7 @@ namespace Reni.TokenClasses
                 .ToArray();
 
             return sourceSyntaxs
-                       .Skip(count: 1)
+                       .Skip(1)
                        .TakeWhile(item => matcher.IsBelongingTo(item.TokenClass))
                        .LastOrDefault() ??
                    recent;
@@ -265,19 +177,6 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        IEnumerable<Syntax> GetItems()
-        {
-            if(Left != null)
-                foreach(var sourceSyntax in Left.Items)
-                    yield return sourceSyntax;
-
-            yield return this;
-
-            if(Right != null)
-                foreach(var sourceSyntax in Right.Items)
-                    yield return sourceSyntax;
-        }
-
         Result<Value> GetValue(Syntax syntax)
         {
             var value = Option.Value;
@@ -310,7 +209,7 @@ namespace Reni.TokenClasses
                 return Statement.CreateStatements(value, Option.DefaultScopeProvider);
 
             return new Result<Statement[]>
-                (new Statement[0], IssueId.InvalidListOperandSequence.Issue(SourcePart));
+                (new Statement[0], IssueId.InvalidListOperandSequence.Issue(Option.SourcePart));
         }
 
         internal Result<Syntax> GetBracketKernel(int level, Syntax parent)
@@ -318,7 +217,7 @@ namespace Reni.TokenClasses
             Tracer.Assert(parent.Right == null);
 
             if(!(TokenClass is LeftParenthesis leftParenthesis))
-                return new Result<Syntax>(this, IssueId.ExtraRightBracket.Issue(parent.SourcePart));
+                return new Result<Syntax>(this, IssueId.ExtraRightBracket.Issue(parent.Option.SourcePart));
 
             Tracer.Assert(Left == null);
 
@@ -329,52 +228,21 @@ namespace Reni.TokenClasses
 
             if(levelDelta > 0)
                 return new Result<Syntax>
-                    (Right, IssueId.ExtraLeftBracket.Issue(SourcePart));
+                    (Right, IssueId.ExtraLeftBracket.Issue(Option.SourcePart));
 
             NotImplementedMethod(level, parent);
             return null;
         }
 
-        internal IEnumerable<IFormatItem> GetTokenList(SourcePart targetPart, bool isStart)
-        {
-            var isTokenInRange = Main.Length > 0 && Main.Intersect(targetPart) != null;
-
-            if (Left != null && targetPart.Position < Main.Position)
-            {
-                foreach(var formatItem in Left.GetTokenList(targetPart, isStart))
-                    yield return formatItem;
-
-                if (isStart || !isTokenInRange)
-                    foreach (var item in LeftWhiteSpaces)
-                        if (item.SourcePart.Intersect(targetPart) != null)
-                            yield return new WhiteItem(item);
-            }
-
-            if (isTokenInRange)
-            {
-                yield return new TokenItem(this, isStart);
-                isStart = false;
-            }
-
-            if(Right == null || targetPart.EndPosition <= Main.EndPosition)
-                yield break;
-
-            if (isStart || !isTokenInRange)
-                foreach (var item in RightWhiteSpaces)
-                    if (item.SourcePart.Intersect(targetPart) != null)
-                        yield return new WhiteItem(item);
-
-            foreach (var item in Right.GetTokenList(targetPart, isStart))
-                yield return item;
-        }
-
-        public bool IsEqual(Syntax other, IComparator diffenceHandler)
+        public bool IsEqual(Syntax other, IComparator differenceHandler)
         {
             if(TokenClass != other.TokenClass)
                 return false;
 
-            NotImplementedMethod(other, diffenceHandler);
+            NotImplementedMethod(other, differenceHandler);
             return false;
         }
+
+        static IEnumerable<TValue> T<TValue>(params TValue[] value) => value;
     }
 }

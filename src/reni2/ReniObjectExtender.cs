@@ -26,14 +26,8 @@ namespace Reni
             return null;
         }
 
-        internal static string NodeDump(this object o)
-        {
-            var r = o as DumpableObject;
-            if(r != null)
-                return r.NodeDump;
-
-            return o.ToString();
-        }
+        internal static string NodeDump(this object o) 
+            => o is DumpableObject r ? r.NodeDump : o.ToString();
 
         internal static bool IsBelongingTo(this IBelongingsMatcher current, ITokenClass other)
         {

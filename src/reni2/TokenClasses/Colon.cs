@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Parser;
+using hw.Scanner;
 using Reni.Parser;
 
 namespace Reni.TokenClasses
@@ -49,7 +50,7 @@ namespace Reni.TokenClasses
             (Syntax syntax)
         {
             if(syntax.Left == null && syntax.Right == null)
-                return new Declarator(new IDeclarationTag[] {this}, null,syntax.SourcePart);
+                return new Declarator(new IDeclarationTag[] {this}, null,syntax.Option.SourcePart);
 
             NotImplementedMethod(syntax);
             return null;

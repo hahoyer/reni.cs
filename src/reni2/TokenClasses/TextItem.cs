@@ -12,8 +12,8 @@ namespace Reni.TokenClasses
     sealed class TextItem : Definable
     {
         [DisableDump]
-        internal override IEnumerable<IDeclarationProvider> Genericize
-            => this.GenericListFromDefinable(base.Genericize);
+        internal override IEnumerable<IDeclarationProvider> MakeGeneric
+            => this.GenericListFromDefinable(base.MakeGeneric);
         public const string TokenId = "text_item";
         public override string Id => TokenId;
     }

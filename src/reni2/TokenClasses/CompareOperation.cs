@@ -30,7 +30,7 @@ namespace Reni.TokenClasses
         public override string Id => TokenId(IsLess, CanBeEqual);
 
         [DisableDump]
-        internal override IEnumerable<IDeclarationProvider> Genericize
-            => this.GenericListFromDefinable(base.Genericize);
+        internal override IEnumerable<IDeclarationProvider> MakeGeneric
+            => this.GenericListFromDefinable(base.MakeGeneric);
     }
 }

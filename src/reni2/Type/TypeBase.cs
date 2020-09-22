@@ -620,7 +620,7 @@ namespace Reni.Type
                 return FunctionDeclarationsForType;
 
             return definable
-                .Genericize
+                .MakeGeneric
                 .SelectMany(g => g.Declarations(this))
                 .ToArray();
         }

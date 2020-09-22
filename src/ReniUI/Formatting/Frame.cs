@@ -27,9 +27,9 @@ namespace ReniUI.Formatting
         readonly ValueCache<Frame> RightCache;
 
         [DisableDump]
-        internal readonly Syntax Target;
+        internal readonly Reni.TokenClasses.Syntax Target;
 
-        Frame(Syntax target, CompilerBrowser compiler, Frame parent = null, HierachicalFormatter formatter = null)
+        Frame(Reni.TokenClasses.Syntax target, CompilerBrowser compiler, Frame parent = null, HierachicalFormatter formatter = null)
         {
             Parent = parent;
             Formatter = parent?.Formatter ?? formatter;
@@ -43,7 +43,7 @@ namespace ReniUI.Formatting
             HasInnerLineBreaksCache = new ValueCache<bool>(GetHasInnerLineBreaksForCache);
         }
 
-        internal string TargetString => Target.SourcePart.NodeDump;
+        internal string TargetString => Target.Option.SourcePart.NodeDump;
 
         Frame Left => LeftCache.Value;
         Frame Right => RightCache.Value;

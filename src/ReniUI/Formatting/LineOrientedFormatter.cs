@@ -35,15 +35,15 @@ namespace ReniUI.Formatting
 
         internal sealed class Line
         {
-            static IEnumerable<Item2> AddSepearators(IEnumerable<IItem1> data)
+            static IEnumerable<Item2> AddSeparators(IEnumerable<IItem1> data)
             {
                 ITokenClass last = null;
                 foreach(var item in data)
                     if(item.IsRelevant)
                     {
                         var current = item.TokenClass;
-                        var x = SeparatorType.Get(last, current);
-                        yield return new Item2(item.Part, x.Text, true);
+                        var x = SeparatorExtension.Get(last, current);
+                        yield return new Item2(item.Part, x?" ":"", true);
 
                         last = current;
                     }
@@ -53,7 +53,7 @@ namespace ReniUI.Formatting
 
             internal readonly Item2[] Data;
 
-            internal Line(IEnumerable<IItem1> data) => Data = AddSepearators(data).ToArray();
+            internal Line(IEnumerable<IItem1> data) => Data = AddSeparators(data).ToArray();
 
             internal int StartPosition => Data.First().Part.Position;
             internal int EndPosition => Data.Last().Part.EndPosition;
@@ -62,16 +62,16 @@ namespace ReniUI.Formatting
 
         internal sealed class TokenItem : DumpableObject, IItem1
         {
-            readonly Syntax Target;
+            readonly Reni.TokenClasses.Syntax Target;
 
-            internal TokenItem(Syntax target) => Target = target;
+            internal TokenItem(Reni.TokenClasses.Syntax target) => Target = target;
 
-            SourcePart IItem1.Part => Target.Main;
+            SourcePart IItem1.Part => Target.Option.MainToken;
             bool IItem1.IsRelevant => Target.TokenClass.Id != "()";
 
             ITokenClass IItem1.TokenClass => Target.TokenClass;
 
-            string Id => Target.Main.Id;
+            string Id => Target.Option.MainToken.Id;
             protected override string GetNodeDump() => Id.Quote();
         }
 
@@ -81,10 +81,10 @@ namespace ReniUI.Formatting
             readonly int LineIndex;
             readonly IItem WhiteSpaceToken;
 
-            internal WhiteSpaceItem(int index, int lineIndex, Syntax target)
+            internal WhiteSpaceItem(int index, int lineIndex, Reni.TokenClasses.Syntax target)
             {
                 LineIndex = lineIndex;
-                WhiteSpaceToken = target.LeftWhiteSpaces.Skip(index).First();
+                WhiteSpaceToken = target.Token.PrecededWith.Skip(index).First();
                 IsRelevant = Lexer.IsMultiLineComment(WhiteSpaceToken) || Lexer.IsLineComment(WhiteSpaceToken);
             }
 
@@ -107,9 +107,9 @@ namespace ReniUI.Formatting
         }
 
         static IEnumerable<IItem1> GetItems
-            (Syntax target)
+            (Reni.TokenClasses.Syntax target)
         {
-            var whiteSpaceParts = target.LeftWhiteSpaces.ToArray();
+            var whiteSpaceParts = target.Token.PrecededWith.ToArray();
             for(var index = 0; index < whiteSpaceParts.Length; index++)
             {
                 var lines = whiteSpaceParts[index].SourcePart.Id.Count(c => c == '\n');
@@ -135,12 +135,12 @@ namespace ReniUI.Formatting
 
         IEnumerable<Edit> IFormatter.GetEditPieces(CompilerBrowser compiler, SourcePart targetPart)
         {
-            var target = compiler.Locate(targetPart);
+            var target = compiler.Locate(targetPart).Option;
             var rawLines = target
                     .Chain(item => item.Parent)
                     .Last()
                     .Items
-                    .OrderBy(item => item.Main.Position)
+                    .OrderBy(item => item.Option.MainToken.Position)
                     .SelectMany(GetItems)
                     .NullableToArray()
                     .Select(CreateLine)

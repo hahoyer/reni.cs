@@ -52,12 +52,12 @@ namespace ReniUI.Formatting
             return result + target.Characters.Id;
         }
 
-        static string FlatFormat(this SourcePart target, IEnumerable<IItem> precede, int? emptyLineLimit)
+        static string FlatFormat(this SourcePart target, IEnumerable<IItem> precede, bool areEmptyLinesPossible)
         {
             if(precede.Any(item => item.IsComment() && item.HasLines()))
                 return null;
 
-            if(emptyLineLimit != 0 && precede.Any(item => item.IsLineBreak()))
+            if(areEmptyLinesPossible && precede.Any(item => item.IsLineBreak()))
                 return null;
 
             var result = precede
@@ -67,28 +67,12 @@ namespace ReniUI.Formatting
             return result + target.Id;
         }
 
-        internal static ISeparatorType LeftSideSeparator(this Syntax target)
-        {
-            var left = target.LeftNeighbor?.TokenClass;
-            return target.LeftWhiteSpaces.HasComment()
-                ? SeparatorType.ContactSeparator
-                : SeparatorType.Get(left, target.TokenClass);
-        }
-
-        internal static ISeparatorType RightSideSeparator(this Syntax target)
-        {
-            var right = target.RightNeighbor;
-            return right == null || target.RightWhiteSpaces.HasComment()
-                ? SeparatorType.ContactSeparator
-                : SeparatorType.Get(target.TokenClass, right.TokenClass);
-        }
-
-        static TContainer FlatFormat<TContainer, TValue>(this Syntax target, int? emptyLineLimit)
+        static TContainer FlatFormat<TContainer, TValue>(this Syntax target, bool areEmptyLinesPossible)
             where TContainer : class, IFormatResult<TValue>, new()
         {
-            var left = target.Left?.FlatFormat<TContainer, TValue>(emptyLineLimit);
-            var main = target.Main.Id;
-            var right = target.Right?.FlatFormat<TContainer, TValue>(emptyLineLimit);
+            var left = target.Left?.FlatFormat<TContainer, TValue>(areEmptyLinesPossible);
+            var main = target.MainToken.Id;
+            var right = target.Right?.FlatFormat<TContainer, TValue>(areEmptyLinesPossible);
 
             if(target.TokenClass is BeginOfText)
             {
@@ -124,40 +108,55 @@ namespace ReniUI.Formatting
 
             else
             {
-                Tracer.DumpStaticMethodWithData(target, emptyLineLimit);
+                Tracer.DumpStaticMethodWithData(target, areEmptyLinesPossible);
 
 
                 var tokenString = target
-                    .Main
-                    .FlatFormat(target.LeftWhiteSpaces, emptyLineLimit);
+                    .MainToken
+                    .FlatFormat(target.LeftWhiteSpaces, areEmptyLinesPossible);
 
                 if(tokenString == null)
                     return null;
 
-                tokenString = target.LeftSideSeparator().Text + tokenString;
+                tokenString = (target.LeftSideSeparator()?" ":"") + tokenString;
 
-                var leftResult = target.Left.FlatSubFormat<TContainer, TValue>(emptyLineLimit);
+                var leftResult = target.Left.FlatSubFormat<TContainer, TValue>(areEmptyLinesPossible);
                 if(leftResult == null)
                     return null;
 
-                var rightResult = target.Right.FlatSubFormat<TContainer, TValue>(emptyLineLimit);
+                var rightResult = target.Right.FlatSubFormat<TContainer, TValue>(areEmptyLinesPossible);
                 return rightResult == null ? null : leftResult.Concat(tokenString, rightResult);
             }
 
             return (left ?? new TContainer()).Concat(main, right ?? new TContainer());
         }
 
-        static TContainer FlatSubFormat<TContainer, TValue>(this Syntax left, int? emptyLineLimit)
+        static TContainer FlatSubFormat<TContainer, TValue>(this Syntax left, bool areEmptyLinesPossible)
             where TContainer : class, IFormatResult<TValue>, new()
-            => left == null ? new TContainer() : left.FlatFormat<TContainer, TValue>(emptyLineLimit);
+            => left == null ? new TContainer() : left.FlatFormat<TContainer, TValue>(areEmptyLinesPossible);
 
-        internal static bool IsLineBreakRequired(this Syntax syntax, int? emptyLineLimit, int? maxLineLength)
+        internal static bool HasAlreadyLineBreakOrIsTooLong(this Syntax syntax, int? maxLineLength, bool areEmptyLinesPossible)
         {
-            var basicLineLength = syntax.FlatFormat<IntegerResult, int>(emptyLineLimit)?.Value;
+            var basicLineLength = syntax.GetFlatLength(areEmptyLinesPossible);
             return basicLineLength == null || basicLineLength > maxLineLength;
         }
 
-        internal static string FlatFormat(this Syntax target, int? emptyLineLimit)
-            => target.FlatFormat<StringResult, string>(emptyLineLimit)?.Value;
+        /// <summary>
+        /// Try to format target into one line.
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="areEmptyLinesPossible"></param>
+        /// <returns>The formatted line or null if target contains line breaks.</returns>
+        internal static string FlatFormat(this Syntax target, bool areEmptyLinesPossible)
+            => target.FlatFormat<StringResult, string>(areEmptyLinesPossible)?.Value;
+
+        /// <summary>
+        /// Get the line length of target when formatted as one line.
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="areEmptyLinesPossible"></param>
+        /// <returns>The line length calculated or null if target contains line breaks.</returns>
+        internal static int? GetFlatLength(this Syntax target, bool areEmptyLinesPossible)
+            => target.FlatFormat<IntegerResult, int>(areEmptyLinesPossible)?.Value;
     }
 }

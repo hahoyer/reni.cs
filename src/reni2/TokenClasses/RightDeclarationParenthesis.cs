@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
 using Reni.Parser;
@@ -9,9 +7,10 @@ using Reni.Validation;
 namespace Reni.TokenClasses
 {
     [BelongsTo(typeof(DeclarationTokenFactory))]
-    sealed class RightDeclarationParenthesis : RightParenthesisBase,
-        IDeclaratorTagProvider,
-        IBracketMatch<Syntax>
+    sealed class RightDeclarationParenthesis
+        : RightParenthesisBase,
+            IDeclaratorTagProvider,
+            IBracketMatch<Syntax>
 
     {
         sealed class Matched : DumpableObject, IParserTokenType<Syntax>
@@ -26,7 +25,7 @@ namespace Reni.TokenClasses
         }
 
         public RightDeclarationParenthesis(int level)
-            : base(level) { }
+            : base(level) {}
 
         Result<Declarator> IDeclaratorTagProvider.Get(Syntax syntax)
         {
@@ -35,6 +34,7 @@ namespace Reni.TokenClasses
             if(target != null)
             {
                 var items = target
+                    .Option
                     .Items
                     .Select(GetDeclarationTag)
                     .ToArray();
@@ -43,15 +43,15 @@ namespace Reni.TokenClasses
                 (
                     items.Select(item => item.Target).Where(item => item != null).ToArray(),
                     null,
-                    syntax.SourcePart
+                    syntax.Option.SourcePart
                 );
                 var issues = items.SelectMany(item => item.Issues).ToArray();
                 return result.Issues(issues);
             }
             else
             {
-                var issues = bracketKernel.Issues.plus(IssueId.MissingDeclarationTag.Issue(syntax.SourcePart));
-                return new Declarator(null, null,syntax.SourcePart).Issues(issues);
+                var issues = bracketKernel.Issues.plus(IssueId.MissingDeclarationTag.Issue(syntax.Option.SourcePart));
+                return new Declarator(null, null, syntax.Option.SourcePart).Issues(issues);
             }
         }
 
@@ -61,9 +61,9 @@ namespace Reni.TokenClasses
             if(result != null)
                 return new Result<IDeclarationTag>(result);
 
-            return new Result<IDeclarationTag>(null, IssueId.InvalidDeclarationTag.Issue(item.SourcePart));
+            return new Result<IDeclarationTag>(null, IssueId.InvalidDeclarationTag.Issue(item.Option.SourcePart));
         }
 
-        IParserTokenType<Syntax> IBracketMatch<Syntax>.Value { get; } = new Matched();
+        IParserTokenType<Syntax> IBracketMatch<Syntax>.Value {get;} = new Matched();
     }
 }

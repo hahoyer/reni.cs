@@ -81,12 +81,12 @@ namespace ReniUI.Formatting
             return result;
         }
 
-        public static Syntax LocateAndFilter(this CompilerBrowser compiler, SourcePart targetPart)
+        public static Reni.TokenClasses.Syntax LocateAndFilter(this CompilerBrowser compiler, SourcePart targetPart)
         {
             if(targetPart == null)
                 return compiler.Syntax;
             var result = compiler.Locate(targetPart);
-            return IsTooSmall(result.LeftWhiteSpaces, result.Main, targetPart) ? null : result;
+            return IsTooSmall(result.Token.PrecededWith, result.Token.Characters, targetPart) ? null : result;
         }
 
         static bool IsTooSmall(IEnumerable<IItem> precede, SourcePart resultToken, SourcePart targetPart)

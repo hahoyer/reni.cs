@@ -19,19 +19,178 @@ namespace ReniUI.Test
             const string expectedText = @"aaaaa; ccccc";
 
             var compiler = CompilerBrowser.FromText(text);
-            var newSource = compiler.Syntax.FlatFormat(emptyLineLimit: 0);
+            var newSource = new Syntax(compiler.Syntax, null).FlatFormat(false);
             Tracer.Assert(newSource == expectedText, "\n\"" + newSource + "\"");
         }
 
         [Test]
         [UnitTest]
-        public void FlatFormatTest()
+        public void ListTest1()
+        {
+            const string text = @"aaaaa";
+            const string expectedText = @"aaaaa";
+
+            text.SimpleTest(expectedText, maxLineLength: 10, emptyLineLimit: 1);
+        }
+
+        [Test]
+        [UnitTest]
+        public void ListTest2()
+        {
+            const string text = @"aaaaa;bbbbb";
+            const string expectedText = @"aaaaa; bbbbb";
+
+            text.SimpleTest(expectedText, maxLineLength: 20, emptyLineLimit: 1);
+        }
+
+        [Test]
+        [UnitTest]
+        public void ListLineBreakTest2()
+        {
+            const string text = @"aaaaa;bbbbb";
+            const string expectedText = @"aaaaa;
+bbbbb";
+
+            text.SimpleTest(expectedText, maxLineLength: 10, emptyLineLimit: 1);
+        }
+
+        [Test]
+        [UnitTest]
+        public void ListLineBreakTest3()
+        {
+            const string text = @"aaaaa;bbbbb;ccccc";
+            const string expectedText = @"aaaaa;
+bbbbb;
+ccccc";
+
+            text.SimpleTest(expectedText, maxLineLength: 10, emptyLineLimit: 1);
+        }
+
+        [Test]
+        [UnitTest]
+        public void ListWithDeclarationTest1()
+        {
+            const string text = @"lllll:bbbbb";
+            const string expectedText = @"lllll: bbbbb";
+
+            text.SimpleTest(expectedText, emptyLineLimit: 1);
+        }
+
+        [Test]
+        [UnitTest]
+        public void ListWithDeclarationLineBreakTest1()
+        {
+            const string text = @"lllll:bbbbb";
+            const string expectedText = @"lllll:
+bbbbb";
+
+            text.SimpleTest(expectedText, maxLineLength: 10, emptyLineLimit: 1);
+        }
+
+        [Test]
+        [UnitTest]
+        public void ListWithDeclarationTest2()
+        {
+            const string text = @"aaaaa;llll:bbbbb";
+            const string expectedText = @"aaaaa; llll: bbbbb";
+
+            text.SimpleTest(expectedText, emptyLineLimit: 1);
+        }
+
+        [Test]
+        [UnitTest]
+        public void ListWithDeclarationLineBreakTest2()
+        {
+            const string text = @"aaaaa;llll:bbbbb";
+            const string expectedText = @"aaaaa;
+llll: bbbbb";
+
+            text.SimpleTest(expectedText, maxLineLength: 15, emptyLineLimit: 1);
+        }
+
+        [Test]
+        [UnitTest]
+        public void ListWithDeclarationLineBreakTestA2()
+        {
+            const string text = @"aaaaa;llll:bbbbb";
+            const string expectedText = @"aaaaa;
+
+llll:
+bbbbb";
+
+            text.SimpleTest(expectedText, maxLineLength: 10, emptyLineLimit: 1);
+        }
+
+        [Test]
+        [UnitTest]
+        public void ListWithDeclarationTest3()
+        {
+            const string text = @"aaaaa;llll:bbbbb;ccccc";
+            const string expectedText = @"aaaaa; llll: bbbbb; ccccc";
+
+            text.SimpleTest(expectedText, emptyLineLimit: 1);
+        }
+
+        [Test]
+        [UnitTest]
+        public void ListWithDeclarationLineBreakTest3()
         {
             const string text = @"aaaaa;llll:bbbbb;ccccc";
             const string expectedText = @"aaaaa;
+llll: bbbbb;
+ccccc";
+
+            text.SimpleTest(expectedText, maxLineLength: 20, emptyLineLimit: 1);
+        }
+
+        [Test]
+        [UnitTest]
+        public void ListWithDeclarationLineBreakTestA3()
+        {
+            const string text = @"aaaaa;llll:bbbbb;ccccc";
+            const string expectedText = @"aaaaa;
+
 llll:
 bbbbb;
+
 ccccc";
+
+            text.SimpleTest(expectedText, maxLineLength: 10, emptyLineLimit: 1);
+        }
+
+        [Test]
+        [UnitTest]
+        public void ListWithDeclarationLineBreakTestA4()
+        {
+            const string text = @"aaaaa;aaaaa;llll:bbbbb;ccccc;ddddd";
+            const string expectedText = @"aaaaa;
+aaaaa;
+
+llll:
+bbbbb;
+
+ccccc;
+ddddd";
+
+            text.SimpleTest(expectedText, maxLineLength: 10, emptyLineLimit: 1);
+        }
+
+        [Test]
+        [UnitTest]
+        public void ListWithDeclarationLineBreakTestAA4()
+        {
+            const string text = @"aaaaa;aaaaa;llll:bbbbb;mmmmm:22222;ccccc;ddddd";
+            const string expectedText = @"aaaaa;
+aaaaa;
+
+llll:
+bbbbb;
+
+mmmmm:
+22222;
+
+ccccc;
+ddddd";
 
             text.SimpleTest(expectedText, maxLineLength: 10, emptyLineLimit: 1);
         }

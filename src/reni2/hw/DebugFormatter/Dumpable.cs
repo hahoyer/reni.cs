@@ -170,6 +170,7 @@ namespace hw.DebugFormatter
         /// </summary>
         [DisableDump]
         [UsedImplicitly]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public string DebuggerDumpString => DebuggerDump().Replace("\n", "\r\n");
 
         [DisableDump]
@@ -188,6 +189,7 @@ namespace hw.DebugFormatter
         /// </value>
         /// created 23.09.2006 17:39
         [DisableDump]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public bool IsInDump {get; set;}
 
         /// <summary>

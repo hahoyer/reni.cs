@@ -115,8 +115,8 @@ namespace ReniUI.Formatting
             SourcePosn lastPosition = null;
             using(var enumerator = Data.GetEnumerator())
             {
-                while(enumerator.MoveNext() && !CheckForStart(enumerator.Current, ref lastPosition, targetPart))
-                    ;
+                while(enumerator.MoveNext() && !CheckForStart(enumerator.Current, ref lastPosition, targetPart)) 
+                {}
 
                 Tracer.Assert(lastPosition != null);
 
@@ -138,7 +138,7 @@ namespace ReniUI.Formatting
 
                     if(newText != "" || removeCount > 0)
                     {
-                        result.Add(Edit.Create(lastPosition.Span(removeCount), newText));
+                        result.Add(Edit.Create("", lastPosition.Span(removeCount), newText));
                         newText = "";
                         removeCount = 0;
                     }

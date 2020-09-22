@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
@@ -31,7 +32,7 @@ namespace Reni.TokenClasses
                     .Issues<Value>
                     (
                     IssueId.TerminalUsedAsSuffix
-                    .Issue(syntax.Left.SourcePart));
+                    .Issue(syntax.Left.Option.SourcePart));
             }
 
             NotImplementedMethod(syntax);

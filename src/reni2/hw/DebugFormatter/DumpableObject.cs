@@ -11,6 +11,7 @@ namespace hw.DebugFormatter
     public abstract class DumpableObject : Dumpable
     {
         static int _nextObjectId;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         readonly int? _objectId;
 
         protected DumpableObject()
@@ -50,6 +51,7 @@ namespace hw.DebugFormatter
         }
 
         [DisableDump]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal bool IsStopByObjectIdActive { get; private set; }
 
         protected static string CallingMethodName

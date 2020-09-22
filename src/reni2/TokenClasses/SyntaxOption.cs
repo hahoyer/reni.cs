@@ -1,40 +1,129 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Helper;
 using hw.Scanner;
 using Reni.Context;
+using Reni.Feature;
 using Reni.Parser;
 using Reni.Struct;
 using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
-    sealed class SyntaxOption : DumpableObject
+    sealed class SyntaxOption : DumpableObject, ValueCache.IContainer
     {
         [DisableDump]
-        internal IDefaultScopeProvider DefaultScopeProvider => Owner.DefaultScopeProvider;
+        internal IDefaultScopeProvider DefaultScopeProvider => Target.Option.DefaultScopeProvider;
 
-        Syntax Owner { get; }
+        class CacheContainer
+        {
+            public SyntaxOption Parent;
+            public FunctionCache<int, Syntax> LocatePosition;
+        }
 
-        public SyntaxOption(Syntax owner) { Owner = owner; }
+        ValueCache ValueCache.IContainer.Cache {get;} = new ValueCache();
 
-        [EnableDumpExcept(null)]
-        internal Result<Value> Value
+        readonly CacheContainer Cache = new CacheContainer();
+
+        [DisableDump]
+        readonly Syntax Target;
+
+        public SyntaxOption Parent
+        {
+            get => Cache.Parent;
+            private set
+            {
+                Tracer.Assert(value == Cache.Parent || Cache.Parent == null);
+                Cache.Parent = value;
+            }
+        }
+
+        [DisableDump]
+        internal SourcePart MainToken => Target.Token.Characters;
+
+        public SyntaxOption(Syntax target)
+        {
+            Target = target;
+
+            if(Target.Left != null)
+                Target.Left.Option.Parent = this;
+
+            if(Target.Right != null)
+                Target.Right.Option.Parent = this;
+
+            Cache.LocatePosition = new FunctionCache<int, Syntax>(LocatePositionForCache);
+        }
+
+
+        [DisableDump]
+        internal IEnumerable<Syntax> Items => this.CachedValue(GetItems);
+
+        IEnumerable<Syntax> GetItems()
+        {
+            if(Target.Left != null)
+                foreach(var sourceSyntax in Target.Left.Option.Items)
+                    yield return sourceSyntax;
+
+            yield return Target;
+
+            if(Target.Right != null)
+                foreach(var sourceSyntax in Target.Right.Option.Items)
+                    yield return sourceSyntax;
+        }
+
+        [DisableDump]
+        internal SourcePart SourcePart
+            => Target.Left?.Option.SourcePart + Target.Token.Characters + Target.Right?.Option.SourcePart;
+
+        [DisableDump]
+        public IEnumerable<Syntax> ParentChainIncludingThis
         {
             get
             {
-                var declarationItem = Owner.TokenClass as IDeclarationItem;
-                if(declarationItem != null && declarationItem.IsDeclarationPart(Owner))
+                yield return Target;
+
+                if(Parent == null)
+                    yield break;
+
+                foreach(var other in Parent.ParentChainIncludingThis)
+                    yield return other;
+            }
+        }
+
+        public Syntax LocatePosition(int current) => Cache.LocatePosition[current];
+
+        Syntax LocatePositionForCache(int current)
+        {
+            if(current < Target.Option.SourcePart.Position || current >= Target.Option.SourcePart.EndPosition)
+                return Parent?.LocatePosition(current);
+
+            return Target.Left?.Option.CheckedLocatePosition(current) ??
+                   Target.Right?.Option.CheckedLocatePosition(current) ??
+                   Target;
+        }
+
+        Syntax CheckedLocatePosition(int current)
+            =>
+                Target.Option.SourcePart.Position <= current && current < Target.Option.SourcePart.EndPosition
+                    ? LocatePosition(current)
+                    : null;
+
+        [EnableDumpExcept(null)]
+        internal Result<Parser.Value> Value
+        {
+            get
+            {
+                if(Target.TokenClass is IDeclarationItem declarationItem && declarationItem.IsDeclarationPart(Target))
                     return null;
 
-                return (Owner.TokenClass as IValueProvider)?.Get
-                    (Owner);
+                return (Target.TokenClass as IValueProvider)?.Get
+                    (Target);
             }
         }
 
         internal Result<Statement[]> GetStatements(List type = null)
-            => (Owner.TokenClass as IStatementsProvider)?.Get(type, Owner, DefaultScopeProvider);
+            => (Target.TokenClass as IStatementsProvider)?.Get(type, Target, DefaultScopeProvider);
 
         [EnableDumpExcept(null)]
         internal Result<Statement[]> Statements => GetStatements();
@@ -42,29 +131,25 @@ namespace Reni.TokenClasses
         [EnableDumpExcept(null)]
         internal Result<Statement> Statement
             =>
-            (Owner.TokenClass as IStatementProvider)?.Get
-                (Owner.Left, Owner.Right, DefaultScopeProvider);
+                (Target.TokenClass as IStatementProvider)?.Get
+                    (Target.Left, Target.Right, DefaultScopeProvider);
 
         [EnableDumpExcept(null)]
         internal Result<Declarator> Declarator
         {
             get
             {
-                var declaratorTokenClass = Owner.TokenClass as IDeclaratorTokenClass;
-                return declaratorTokenClass?.Get(Owner);
+                var declaratorTokenClass = Target.TokenClass as IDeclaratorTokenClass;
+                return declaratorTokenClass?.Get(Target);
             }
         }
 
         [EnableDumpExcept(null)]
-        internal IDeclarationTag DeclarationTag => Owner.TokenClass as IDeclarationTag;
+        internal IDeclarationTag DeclarationTag => Target.TokenClass as IDeclarationTag;
 
         [EnableDumpExcept(null)]
         internal Issue[] Issues
-            => Value?.Issues
-            ?? GetStatements()?.Issues
-            ?? Statement?.Issues
-            ?? Declarator?.Issues
-            ?? new Issue[0];
+            => Value?.Issues ?? GetStatements()?.Issues ?? Statement?.Issues ?? Declarator?.Issues ?? new Issue[0];
 
         [DisableDump]
         ContextBase[] Contexts
@@ -72,13 +157,13 @@ namespace Reni.TokenClasses
             get
             {
                 if(IsStatementsLevel)
-                    return ((CompoundSyntax) Owner.Value.Target)
+                    return ((CompoundSyntax) Target.Value.Target)
                         .ResultCache
                         .Values
                         .Select(item => item.Type.ToContext)
                         .ToArray();
 
-                var parentContexts = Owner.Parent.Option.Contexts;
+                var parentContexts = Target.Option.Parent.Contexts;
 
                 if(IsFunctionLevel)
                     return parentContexts
@@ -89,33 +174,33 @@ namespace Reni.TokenClasses
             }
         }
 
-        static IEnumerable<ContextBase> FunctionContexts(ContextBase context, Value body)
+        static IEnumerable<ContextBase> FunctionContexts(ContextBase context, Parser.Value body)
             => ((FunctionBodyType) context.ResultCache(body).Type)
                 .Functions
                 .Select(item => item.CreateSubContext(false));
 
         [DisableDump]
-        bool IsFunctionLevel => Owner.TokenClass is Function;
+        bool IsFunctionLevel => Target.TokenClass is Function;
 
         [DisableDump]
         bool IsStatementsLevel
         {
             get
             {
-                if(Owner.TokenClass is EndOfText)
+                if(Target.TokenClass is EndOfText)
                     return true;
 
                 if(Value != null)
                     return false;
                 if(Statements != null)
-                    return Owner.Parent?.TokenClass != Owner.TokenClass;
+                    return Target.Option.Parent?.Target.TokenClass != Target.TokenClass;
                 if(Statement != null)
                     return false;
 
-                if(Owner.TokenClass is LeftParenthesis)
+                if(Target.TokenClass is LeftParenthesis)
                     return false;
 
-                if (Owner.TokenClass is BeginOfText)
+                if(Target.TokenClass is BeginOfText)
                     return false;
 
                 NotImplementedMethod();
@@ -137,9 +222,9 @@ namespace Reni.TokenClasses
                         .SelectMany(item => item.DeclarationOptions)
                         .Concat(DeclarationTagToken.DeclarationOptions);
 
-                if(Declarator != null
-                    || Owner.TokenClass is LeftParenthesis
-                    || Owner.TokenClass is DeclarationTagToken)
+                if(Declarator != null ||
+                   Target.TokenClass is LeftParenthesis ||
+                   Target.TokenClass is DeclarationTagToken)
                     return new string[0];
 
                 NotImplementedMethod();
@@ -147,7 +232,25 @@ namespace Reni.TokenClasses
             }
         }
 
-        [EnableDump]
-        SourcePart Token => Owner.Main;
+
+        public bool IsDeclarationPart()
+        {
+            var parentTokenClass = Parent.Target.TokenClass;
+            if(parentTokenClass is Colon)
+                return Parent.Target.Left == Target;
+
+            if(parentTokenClass is LeftParenthesis ||
+               parentTokenClass is Definable ||
+               parentTokenClass is ThenToken ||
+               parentTokenClass is List ||
+               parentTokenClass is Function ||
+               parentTokenClass is TypeOperator ||
+               parentTokenClass is ElseToken ||
+               parentTokenClass is ScannerSyntaxError)
+                return false;
+
+            Tracer.FlaggedLine(nameof(Target) + "=" + Target);
+            return false;
+        }
     }
 }

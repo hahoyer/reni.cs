@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
@@ -28,7 +29,7 @@ namespace Reni.Parser
                    Depth +
                    " exhausted when evaluation expression.\n" +
                    "Expression: " +
-                   Syntax.SourcePart.GetDumpAroundCurrent(10) +
+                   Syntax.Option.SourcePart.GetDumpAroundCurrent(10) +
                    "\n" +
                    "Context: " +
                    Context.NodeDump;

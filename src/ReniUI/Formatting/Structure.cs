@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Scanner;
 using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
@@ -16,53 +17,77 @@ namespace ReniUI.Formatting
         readonly Syntax Syntax;
 
         [EnableDump]
-        [EnableDumpExcept(exception: null)]
+        [EnableDumpExcept(null)]
         bool? IsLineSplitRequiredCache;
 
 
         internal Structure(Syntax syntax, Context context)
         {
-            Formatter = Formatter.CreateFormatter(syntax);
             Syntax = syntax;
             Context = context;
+            Formatter = Formatter.CreateFormatter(Syntax);
             Tracer.Assert(Syntax != null);
         }
 
-        Syntax IStructure.Syntax => Syntax;
+        int IStructure.LineBreaks => LineBreaks;
 
-        (IEnumerable<ISourcePartEdit>, int) IStructure.Get(int minimalLineBreaks)
+        IEnumerable<ISourcePartEdit> IStructure.Edits
         {
-            var trace = True; //Formatter is Formatter.ListItemFormatter;
-            StartMethodDump(trace, minimalLineBreaks);
-            try
+            get
             {
-                Tracer.ConditionalBreak(trace);
-                var result = new List<ISourcePartEdit>();
-                minimalLineBreaks = T(minimalLineBreaks, LineBreaksLeftOfAll).Max();
+                var trace = False;
+                StartMethodDump(trace);
+                try
+                {
+                    var result = Edits.SelectMany(i => i).ToArray();
+                    Dump(nameof(result), result);
+                    Tracer.ConditionalBreak(trace);
+                    return ReturnMethodDump(result, trace);
+                }
+                finally
+                {
+                    EndMethodDump();
+                }
+            }
+        }
+
+        IEnumerable<IEnumerable<ISourcePartEdit>> Edits
+        {
+            get
+            {
                 if(Syntax.Left != null)
                 {
-                    minimalLineBreaks = T(minimalLineBreaks, LineBreaksLeftOfLeft).Max();
-                    var leftSide = GetLeftSide(minimalLineBreaks);
-                    result.AddRange(leftSide.edits.Indent(Formatter.IndentLeftSide));
-                    minimalLineBreaks = leftSide.lineBreaks;
+                    yield return LeftEdits.Indent(Formatter.IndentLeftSide);
+                    yield return LeftWhiteSpacesEdits.Indent(Formatter.IndentToken);
                 }
 
-                result.AddRange(GetTokenEdits(minimalLineBreaks).Indent(Formatter.IndentToken));
-                var lineBreaksOnRightSide = LineBreaksOnRightSide;
                 if(Syntax.Right != null)
                 {
-                    var rightSide = GetRightSide(lineBreaksOnRightSide);
-                    result.AddRange(rightSide.edits.Indent(Formatter.IndentRightSide));
-                    lineBreaksOnRightSide = T(rightSide.lineBreaks, LineBreaksRightOfRight).Max();
+                    yield return RightWhiteSpacesEdits.Indent(Formatter.IndentToken);
+                    yield return RightEdits.Indent(Formatter.IndentRightSide);
+                }
+            }
+        }
+
+        [DisableDump]
+        bool Trace =>
+            !(Syntax.TokenClass is EndOfText) &&
+            !(Syntax.TokenClass is BeginOfText) &&
+            !(Syntax.TokenClass is UserSymbol);
+
+
+        [DisableDump]
+        int LineBreaks
+        {
+            get
+            {
+                if(Trace)
+                {
+                    nameof(Syntax.TokenClass).DumpValue(Syntax.TokenClass).WriteLine();
+                    Tracer.ConditionalBreak(True);
                 }
 
-                lineBreaksOnRightSide = T(lineBreaksOnRightSide, LineBreaksRightOfAll).Max();
-                var b = AsString(result.ToArray());
-                return ReturnMethodDump((result.ToArray(), lineBreaksOnRightSide), false);
-            }
-            finally
-            {
-                EndMethodDump();
+                return 0;
             }
         }
 
@@ -73,7 +98,6 @@ namespace ReniUI.Formatting
         int LineBreaksRightOfRight => HasLineBreaksRightOfRight ? 1 : 0;
         int LineBreaksOnRightSide => HasLineBreaksOnRightSide ? HasMultipleLineBreaksOnRightSide ? 2 : 1 : 0;
         int LineBreaksLeftOfLeft => HasLineBreaksLeftOfLeft ? 1 : 0;
-        int LineBreaksLeftOfAll => HasLineBreaksLeftOfAll ? 1 : 0;
 
         bool RequiresExtraLineBreak => ThisListItemHasLineBreaks || NextListItemHasLineBreaks;
 
@@ -81,34 +105,18 @@ namespace ReniUI.Formatting
 
         bool ThisListItemHasLineBreaks => Context.Configuration.IsLineBreakRequired(Syntax.Left);
 
-        IEnumerable<ISourcePartEdit> GetTokenEdits(int minimalLineBreaks)
-        {
-            yield return new FormatterTokenView
-            (
-                Syntax.LeftSideSeparator(),
-                minimalLineBreaks,
-                LineBreaksOnLeftSide,
-                Syntax.Main,
-                Context.Configuration,
-                Syntax.LeftWhiteSpaces
-            );
-        }
-
         public int LineBreaksOnLeftSide => HasLineBreaksOnLeftSide ? 1 : 0;
 
         string AsString(ISourcePartEdit[] target)
             => target
                 .GetEditPieces(Context.Configuration)
-                .Combine(Syntax.SourcePart.Source.All);
+                .Combine(Syntax.Target.Option.SourcePart.Source.All);
 
         [EnableDump]
-        string FlatResult => Syntax.FlatFormat(Context.Configuration.EmptyLineLimit);
+        string FlatResult => Syntax.FlatFormat(Context.Configuration.EmptyLineLimit != 0);
 
         bool HasLineBreaksLeftOfLeft
             => IsLineSplitRequired && Formatter.HasLineBreaksLeftOfLeft;
-
-        bool HasLineBreaksLeftOfAll
-            => IsLineSplitRequired && Formatter.HasLineBreaksLeftOfAll;
 
         bool HasLineBreaksRightOfRight
             => IsLineSplitRequired && Formatter.HasLineBreaksRightOfRight;
@@ -144,17 +152,76 @@ namespace ReniUI.Formatting
         bool GetIsLineSplitRequired()
             => Formatter.HasLineBreaksByContext(Context) || Context.Configuration.IsLineBreakRequired(Syntax);
 
-        (IEnumerable<ISourcePartEdit> edits, int lineBreaks) GetLeftSide(int minimalLineBreaks)
-            => Syntax.Left
+        int LeftSideLineBreaks =>
+            Syntax.Left
                 .CreateStruct(LeftSideContext)
-                .Get(minimalLineBreaks);
+                .LineBreaks;
 
-        (IEnumerable<ISourcePartEdit> edits, int lineBreaks) GetRightSide(int minimalLineBreaks)
-            => Syntax.Right
+        IEnumerable<ISourcePartEdit> LeftEdits =>
+            Syntax.Left
+                .CreateStruct(LeftSideContext)
+                .Edits;
+
+        int RightSideLineBreaks =>
+            Syntax.Right
                 .CreateStruct(RightSideContext)
-                .Get(minimalLineBreaks);
+                .LineBreaks;
 
-        protected override string GetNodeDump() => base.GetNodeDump() + " " + Syntax.Main.Id;
+        IEnumerable<ISourcePartEdit> RightEdits =>
+            Syntax.Right
+                .CreateStruct(RightSideContext)
+                .Edits;
+
+        IEnumerable<ISourcePartEdit> LeftWhiteSpacesEdits
+        {
+            get
+            {
+                yield return GetWhiteSpaceView
+                (
+                    Syntax.LeftWhiteSpaces,
+                    Syntax.MainToken.Start,
+                    Syntax.LeftSideSeparator(),
+                    LineBreaksOnLeftSide);
+            }
+        }
+
+        IEnumerable<ISourcePartEdit> RightWhiteSpacesEdits
+        {
+            get
+            {
+                yield return GetWhiteSpaceView
+                (
+                    Syntax.RightWhiteSpaces,
+                    Syntax.MainToken.End,
+                    Syntax.RightSideSeparator(),
+                    LineBreaksOnRightSide);
+            }
+        }
+
+        ISourcePartEdit GetWhiteSpaceView
+        (
+            IEnumerable<IItem> target,
+            SourcePosn anchor,
+            bool isSeparatorRequired,
+            int minimalLineBreakCount)
+        {
+            if(target.Any())
+                return new WhiteSpaceView
+                (
+                    target,
+                    Context.Configuration,
+                    isSeparatorRequired,
+                    minimalLineBreakCount);
+            
+            return new EmptyWhiteSpaceView
+            (
+                anchor,
+                isSeparatorRequired,
+                minimalLineBreakCount);
+        }
+
+
+        protected override string GetNodeDump() => base.GetNodeDump() + " " + Syntax.MainToken.Id;
 
         static IEnumerable<TValue> T<TValue>(params TValue[] value) => value;
     }

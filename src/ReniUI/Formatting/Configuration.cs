@@ -12,6 +12,6 @@ namespace ReniUI.Formatting
         public bool? LineBreakAtEndOfText = false;
 
         public bool IsLineBreakRequired(Syntax syntax)
-            => syntax?.IsLineBreakRequired(EmptyLineLimit, MaxLineLength) == true;
+            => syntax?.HasAlreadyLineBreakOrIsTooLong(MaxLineLength, EmptyLineLimit != 0) == true;
     }
 }

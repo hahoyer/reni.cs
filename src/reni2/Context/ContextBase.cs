@@ -283,7 +283,7 @@ namespace Reni.Context
 
         IImplementation Declaration(Definable tokenClass)
         {
-            var genericize = tokenClass.Genericize.ToArray();
+            var genericize = tokenClass.MakeGeneric.ToArray();
             var results = genericize.SelectMany(g => g.Declarations(this));
             var result = results.SingleOrDefault();
             if(result != null || RootContext.ProcessErrors)
@@ -300,7 +300,7 @@ namespace Reni.Context
             if(searchResult == null)
                 return IssueId
                     .MissingDeclarationInContext
-                    .IssueResult(category, source.Main, "Context: " + RootContext.Format);
+                    .IssueResult(category, source.Option.MainToken, "Context: " + RootContext.Format);
 
             var result = searchResult.Result(category, CacheObject.AsObject, source, this, right);
 

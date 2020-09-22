@@ -137,7 +137,7 @@ namespace ReniUI
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
-        internal static IEnumerable<IEnumerable<T>> Split<T>(this IEnumerable<T> target, Func<T, bool> isSeparator, bool?assignSeparatorAtTopOfList)
+        internal static IEnumerable<IEnumerable<T>> Split<T>(this IEnumerable<T> target, Func<T, bool> isSeparator, bool?assignSeparatorAtTopOfList = null)
         {
             var part = new List<T>();
             foreach(var item in target)

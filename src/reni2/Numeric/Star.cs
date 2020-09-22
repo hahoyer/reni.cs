@@ -19,7 +19,7 @@ namespace Reni.Numeric
             => BitsConst.MultiplySize(objSize, argSize);
 
         [DisableDump]
-        internal override IEnumerable<IDeclarationProvider> Genericize
-            => this.GenericListFromDefinable(base.Genericize);
+        internal override IEnumerable<IDeclarationProvider> MakeGeneric
+            => this.GenericListFromDefinable(base.MakeGeneric);
     }
 }                                                                      

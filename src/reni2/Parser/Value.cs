@@ -43,7 +43,7 @@ namespace Reni.Parser
         [DisableDump]
         internal virtual IRecursionHandler RecursionHandler => null;
 
-        internal SourcePart SourcePart => Syntax.SourcePart;
+        internal SourcePart SourcePart => Syntax.Option.SourcePart;
 
         internal void AddToCacheForDebug(ContextBase context, ResultCache cacheItem)
             => ResultCache.Add(context, cacheItem);
