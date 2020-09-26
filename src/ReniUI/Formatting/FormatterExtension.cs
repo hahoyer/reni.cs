@@ -4,7 +4,6 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
 using hw.Scanner;
-using ReniUI.Helper;
 
 namespace ReniUI.Formatting
 {
@@ -78,48 +77,17 @@ namespace ReniUI.Formatting
             return result;
         }
 
-        public static Syntax LocateAndFilter(this CompilerBrowser compiler, SourcePart targetPart)
+        public static Helper.Syntax LocateAndFilter(this CompilerBrowser compiler, SourcePart targetPart)
         {
             if(targetPart == null)
                 return compiler.Syntax;
             var result = compiler.Locate(targetPart);
-            return IsTooSmall
-                (result.Target.Token.PrecededWith, result.Target.Token.Characters, targetPart)
-                ? null
-                : result;
+            return IsTooSmall(result.Target.Token, targetPart) ? null : result;
         }
 
-        static bool IsTooSmall(IEnumerable<IItem> precede, SourcePart resultToken, SourcePart targetPart)
-        {
-            var sourcePart = precede.SourcePart() + resultToken;
-
-            if(targetPart.End > sourcePart.End)
-                return false;
-
-            if(targetPart.Start < sourcePart.Start)
-                return false;
-
-            if(!precede.Any())
-                return true;
-
-            if(targetPart.Start >= resultToken.Start)
-                return true;
-
-            if(targetPart.End > resultToken.Start)
-                return false;
-
-            foreach(var item in precede)
-            {
-                var part = item.SourcePart;
-                if(part.Contains(targetPart))
-                    return true;
-                var intersect = part.Intersect(targetPart);
-                if(intersect != null && intersect.Length > 0)
-                    return false;
-            }
-
-            Dumpable.NotImplementedFunction(resultToken, targetPart);
-            return false;
-        }
+        static bool IsTooSmall(IToken token, SourcePart targetPart)
+            => token.Characters.Contains
+                   (targetPart) ||
+               token.PrecededWith.Any(part => part.SourcePart.Contains(targetPart));
     }
 }

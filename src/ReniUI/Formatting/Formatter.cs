@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using hw.Helper;
+using hw.Scanner;
 using Reni.Feature;
 using Reni.Parser;
 using Reni.TokenClasses;
@@ -16,6 +18,9 @@ namespace ReniUI.Formatting
         sealed class ColonFormatter : Formatter
         {
             public override Context RightSideLineBreakContext(Context context) => context.BodyOfColon;
+            internal override int GetLineBreaksForChild(Syntax parent, Syntax target) 
+                => parent.LeftMost == target ? 0 : 1;
+
             public override bool HasLineBreaksAfterToken(Context context) => true;
         }
 
@@ -55,8 +60,11 @@ namespace ReniUI.Formatting
         {
             public override Context RightSideLineBreakContext(Context context) => context.ForList;
 
-            public override Context BothSideContext(Context context, Helper.Syntax syntax) 
+            public override Context BothSideContext(Context context, Syntax syntax) 
                 => context.MultiLineBreaksForList(syntax.Left, syntax.Right?.Left);
+
+            internal override int GetLineBreaksForChild(Syntax parent, Syntax target) 
+                => parent.LeftMost == target ? 0 : 1;
         }
 
         sealed class LastListFormatter : ListItemFormatter 
@@ -65,7 +73,7 @@ namespace ReniUI.Formatting
 
         sealed class ListEndFormatter : ListItemFormatter 
         {
-            public override Context BothSideContext(Context context, Helper.Syntax syntax) 
+            public override Context BothSideContext(Context context, Syntax syntax) 
                 => context.MultiLineBreaksForList(syntax.Left, syntax.Right);
         }
 
@@ -81,7 +89,7 @@ namespace ReniUI.Formatting
         public static readonly Formatter Unknown = new UnknownFormatter();
 
 
-        public static Formatter CreateFormatter(Helper.Syntax syntax)
+        public static Formatter CreateFormatter(Syntax syntax)
         {
             switch(syntax.TokenClass)
             {
@@ -110,7 +118,7 @@ namespace ReniUI.Formatting
             return default;
         }
 
-        static Formatter GetListTokenFormatter(Helper.Syntax syntax)
+        static Formatter GetListTokenFormatter(Syntax syntax)
             => syntax.Right == null
                 ? LastList
                 : syntax.Right.TokenClass == syntax.TokenClass
@@ -128,9 +136,15 @@ namespace ReniUI.Formatting
         public virtual bool HasLineBreaksAfterToken(Context context) => false;
         public virtual Context LeftSideLineBreakContext(Context context) => context.None;
         public virtual Context RightSideLineBreakContext(Context context) => context.None;
-        public virtual Context BothSideContext(Context context, Helper.Syntax syntax) => context.None;
+        public virtual Context BothSideContext(Context context, Syntax syntax) => context.None;
         public virtual bool HasLineBreaksByContext(Context context) => false;
         public virtual bool IsTrace => false;
         public virtual bool HasMultipleLineBreaksOnRightSide(Context context) => false;
+
+        internal virtual int GetLineBreaksForChild(Syntax parent, Syntax target)
+        {
+            NotImplementedMethod(parent, target);
+            return default;
+        }
     }
 }

@@ -7,7 +7,7 @@ namespace ReniUI.Formatting
 {
     sealed class StructFormatter : DumpableObject, IFormatter
     {
-        internal readonly Configuration Configuration;
+        readonly Configuration Configuration;
         public StructFormatter(Configuration configuration) => Configuration = configuration;
 
         IEnumerable<Edit> IFormatter.GetEditPieces(CompilerBrowser compiler, SourcePart targetPart)
@@ -16,12 +16,15 @@ namespace ReniUI.Formatting
             if(syntax == null)
                 return new Edit[0];
 
-            var structItem = syntax.CreateStruct(Context.GetRoot(Configuration));
+            var item = syntax.Target.CreateStruct(Configuration);
 
-            var sourcePartEdits = structItem.Edits.ToArray();
+            var sourcePartEdits = item.Edits.ToArray();
             var editPieces = sourcePartEdits.GetEditPieces(Configuration);
             return editPieces;
         }
+
+        internal string FlatFormat(Helper.Syntax syntax, bool areEmptyLinesPossible) 
+            => syntax.Target.CreateStruct(Configuration).FlatFormat(areEmptyLinesPossible);
     }
 
     interface ISourcePartEdit {}

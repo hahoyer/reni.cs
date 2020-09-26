@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using hw.DebugFormatter;
 using hw.Helper;
+using hw.Parser;
 using hw.Scanner;
 using Reni.Parser;
 
 namespace Reni.Helper
 {
-    public abstract class SyntaxWithParent : DumpableObject, ValueCache.IContainer
+    abstract class SyntaxWithParent : DumpableObject, ValueCache.IContainer
     {
         ValueCache ValueCache.IContainer.Cache {get;} = new ValueCache();
 
@@ -15,14 +16,6 @@ namespace Reni.Helper
 
         [DisableDump]
         public readonly TokenClasses.Syntax Target;
-
-        [DisableDump]
-        public SyntaxWithParent Left
-            => Target.Left == null ? null : this.CachedValue(() => Create(Target.Left, this));
-
-        [DisableDump]
-        public SyntaxWithParent Right
-            => Target.Right == null ? null : this.CachedValue(() => Create(Target.Right, this));
 
         protected SyntaxWithParent(TokenClasses.Syntax target, SyntaxWithParent parent)
         {
@@ -45,36 +38,49 @@ namespace Reni.Helper
                 : Parent;
 
         [DisableDump]
-        public SourcePart MainToken => Target.Token.Characters;
+        internal SyntaxWithParent Left
+            => Target.Left == null ? null : this.CachedValue(() => Create(Target.Left, this));
+
+        [DisableDump]
+        internal SyntaxWithParent Right
+            => Target.Right == null ? null : this.CachedValue(() => Create(Target.Right, this));
+
+        [DisableDump]
+        internal IToken Token => Target.Token;
 
         [EnableDumpExcept(null)]
-        public IEnumerable<IItem> MainWhiteSpaces => Target.Token.PrecededWith;
-
-        [EnableDumpExcept(null)]
-        public IEnumerable<IItem> LeftWhiteSpaces
-            => Target.Left == null ? null : MainWhiteSpaces;
-
-        [EnableDumpExcept(null)]
-        public IEnumerable<IItem> RightWhiteSpaces =>
-            Right?.LeftMost.MainWhiteSpaces;
+        internal IEnumerable<IItem> WhiteSpaces => Token.PrecededWith;
 
         [DisableDump]
-        SyntaxWithParent LeftMost => Left?.LeftMost ?? this;
+        internal SourcePart SourcePart => Target.SourcePart;
 
         [DisableDump]
-        SyntaxWithParent RightMost => Right?.RightMost ?? this;
+        internal SyntaxWithParent LeftMost => Left?.LeftMost ?? this;
 
         [DisableDump]
-        public TokenClasses.Syntax LeftNeighbor => (Left?.RightMost ?? LeftParent).Target;
+        internal SyntaxWithParent RightMost => Right?.RightMost ?? this;
 
         [DisableDump]
-        public TokenClasses.Syntax RightNeighbor => (Right?.LeftMost ?? RightParent).Target;
+        internal SyntaxWithParent LeftNeighbor => (Left?.RightMost ?? LeftParent);
 
         [DisableDump]
-        public ITokenClass TokenClass => Target.TokenClass;
+        internal SyntaxWithParent RightNeighbor => (Right?.LeftMost ?? RightParent);
+        
+        [DisableDump]
+        internal bool IsLeftChild => Parent?.Left == this;
+
+        [DisableDump]
+        internal bool IsRightChild => Parent?.Right == this;
+        
+        [EnableDump]
+        internal ITokenClass TokenClass => Target.TokenClass;
+
+        internal bool Contains(int current)
+            => SourcePart.Position <= current && current < SourcePart.EndPosition;
+
     }
 
-    public abstract class SyntaxWithParent<TSyntax> : SyntaxWithParent
+    abstract class SyntaxWithParent<TSyntax> : SyntaxWithParent
         where TSyntax : SyntaxWithParent<TSyntax>
     {
         protected SyntaxWithParent(TokenClasses.Syntax target, TSyntax parent)
@@ -88,6 +94,18 @@ namespace Reni.Helper
 
         [DisableDump]
         public new TSyntax Right => (TSyntax) base.Right;
+
+        [DisableDump]
+        public new TSyntax LeftMost => (TSyntax) base.LeftMost;
+
+        [DisableDump]
+        public new TSyntax RightMost => (TSyntax) base.RightMost;
+
+        [DisableDump]
+        public new TSyntax LeftNeighbor => (TSyntax) base.LeftNeighbor ;
+
+        [DisableDump]
+        public new TSyntax RightNeighbor => (TSyntax) base.RightNeighbor;
 
         protected sealed override SyntaxWithParent Create(TokenClasses.Syntax target, SyntaxWithParent parent)
             => Create(target, (TSyntax) parent);

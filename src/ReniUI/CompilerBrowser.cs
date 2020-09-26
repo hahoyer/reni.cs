@@ -12,7 +12,6 @@ using Reni.Struct;
 using Reni.Validation;
 using ReniUI.Classification;
 using ReniUI.Formatting;
-using ReniUI.Helper;
 
 namespace ReniUI
 {
@@ -56,13 +55,13 @@ namespace ReniUI
             }
         }
 
-        internal Syntax Syntax
+        internal Helper.Syntax Syntax
         {
             get
             {
                 try
                 {
-                    return new Syntax(Compiler.Syntax);
+                    return new Helper.Syntax(Compiler.Syntax);
                 }
                 catch(Exception e)
                 {
@@ -132,7 +131,7 @@ namespace ReniUI
             return null;
         }
 
-        internal IEnumerable<Reni.TokenClasses.Syntax> FindAllBelongings(Syntax syntax)
+        internal IEnumerable<Reni.TokenClasses.Syntax> FindAllBelongings(Helper.Syntax syntax)
             => Compiler.Syntax.Belongings(syntax.Target);
 
         internal string Reformat(IFormatter formatter = null, SourcePart targetPart = null) =>
@@ -140,7 +139,7 @@ namespace ReniUI
             .GetEditPieces(this, targetPart)
             .Combine(targetPart ?? Syntax.Target.SourcePart);
 
-        internal Syntax Locate(SourcePart span)
+        internal Helper.Syntax Locate(SourcePart span)
         {
             var result = Syntax.Locate(span);
             if(result != null)
@@ -157,7 +156,7 @@ namespace ReniUI
 
         public IEnumerable<SourcePart> FindAllBelongings(Token open) => open.FindAllBelongings(this);
 
-        internal Reni.TokenClasses.Syntax LocateActivePosition(int offset)
+        Reni.TokenClasses.Syntax LocateActivePosition(int offset)
         {
             NotImplementedMethod(offset);
 
@@ -181,5 +180,12 @@ namespace ReniUI
             (SourcePart sourcePart, IFormatter formatter = null)
             => (formatter ?? new Formatting.Configuration().Create())
                 .GetEditPieces(this, sourcePart);
+
+        public string FlatFormat(bool areEmptyLinesPossible)
+        {
+            var formatter = (StructFormatter) new Formatting.Configuration().Create();
+            return formatter.FlatFormat(Syntax, areEmptyLinesPossible);
+
+        }
     }
 }

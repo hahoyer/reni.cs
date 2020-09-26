@@ -42,12 +42,10 @@ namespace ReniUI.Classification
             => TokenClass is LeftParenthesis || TokenClass is RightParenthesis;
 
         [EnableDumpExcept(false)]
-        [Obsolete("", true)]
         public override bool IsComment
             => Syntax.Target.Issues?.Any(item => item.IssueId == IssueId.EOFInComment) ?? false;
 
         [EnableDumpExcept(false)]
-        [Obsolete("", true)]
         public override bool IsLineComment
             => Syntax.Target.Issues?.Any(item => item.IssueId == IssueId.EOFInLineComment) ?? false;
 

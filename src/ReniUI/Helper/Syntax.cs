@@ -1,11 +1,8 @@
 using System.Collections.Generic;
 using hw.DebugFormatter;
 using hw.Helper;
-using hw.Parser;
 using hw.Scanner;
 using Reni.Helper;
-using Reni.Parser;
-using ReniUI.Formatting;
 
 namespace ReniUI.Helper
 {
@@ -18,35 +15,12 @@ namespace ReniUI.Helper
 
         readonly CacheContainer Cache = new CacheContainer();
 
-
         public Syntax(Reni.TokenClasses.Syntax target, Syntax parent = null)
             : base(target, parent)
             => Cache.LocatePosition = new FunctionCache<int, Syntax>(LocatePositionForCache);
 
-        protected override Syntax Create(Reni.TokenClasses.Syntax target, Syntax parent) => new Syntax(target, parent);
-
-        internal bool LeftSideSeparator
-        {
-            get
-            {
-                var left = LeftNeighbor?.TokenClass;
-                return !LeftWhiteSpaces.HasComment() && SeparatorExtension.Get(left, Target.TokenClass);
-            }
-        }
-
-        internal bool RightSideSeparator
-        {
-            get
-            {
-                var tokenClass = RightNeighbor?.TokenClass;
-                return tokenClass != null &&
-                       !RightWhiteSpaces.HasComment() &&
-                       SeparatorExtension.Get(Target.TokenClass, tokenClass);
-            }
-        }
-
-        [DisableDump]
-        internal SourcePart SourcePart => Target.SourcePart;
+        protected override Syntax Create(Reni.TokenClasses.Syntax target, Syntax parent)
+            => new Syntax(target, parent);
 
         [DisableDump]
         internal IEnumerable<Syntax> ParentChainIncludingThis
@@ -65,9 +39,6 @@ namespace ReniUI.Helper
 
         [DisableDump]
         internal IEnumerable<Syntax> Items => this.CachedValue(GetItems);
-
-        internal Result<Value> Value => Target.Value;
-        internal IToken Token => Target.Token;
 
         IEnumerable<Syntax> GetItems()
         {
@@ -88,7 +59,7 @@ namespace ReniUI.Helper
                this;
 
         Syntax CheckedLocate(SourcePart part)
-            => Target.SourcePart.Contains(part) ? Locate(part) : null;
+            => SourcePart.Contains(part) ? Locate(part) : null;
 
         public Syntax LocatePosition(int current) => Cache.LocatePosition[current];
 
@@ -104,8 +75,5 @@ namespace ReniUI.Helper
                 Contains(current)
                     ? LocatePosition(current)
                     : null;
-
-        bool Contains(int current)
-            => Target.SourcePart.Position <= current && current < Target.SourcePart.EndPosition;
     }
 }

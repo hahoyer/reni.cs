@@ -17,6 +17,9 @@ namespace ReniUI.Formatting
             public override Context LeftSideOfRightParenthesis => new LineBreakContextForLeftParenthesis(Configuration);
 
             [DisableDump]
+            protected override Context ToRoot => this;
+
+            [DisableDump]
             public override Context BodyOfColon => new LineBreakContextForParenthesisAfterColon(Configuration);
 
             [DisableDump]
@@ -30,7 +33,7 @@ namespace ReniUI.Formatting
 
             [DisableDump]
             public override Context LeftSideOfRightParenthesis => new LineBreakContextForLeftParenthesis
-                (Configuration, lineBreakBeforeLeftParenthesis: true);
+                (Configuration, true);
         }
 
         sealed class LineBreakContextForLeftParenthesis : Context
@@ -51,16 +54,16 @@ namespace ReniUI.Formatting
 
             public override bool LineBreaksForList => true;
 
-            public override Context MultiLineBreaksForList(Helper.Syntax left, Helper.Syntax right)
+            public override Context MultiLineBreaksForList(Syntax left, Syntax right)
                 => new MultiLineBreaksForListContext(Configuration, left, right);
         }
 
         sealed class MultiLineBreaksForListContext : Context
         {
-            readonly Helper.Syntax Left;
-            readonly Helper.Syntax Right;
+            readonly Syntax Left;
+            readonly Syntax Right;
 
-            public MultiLineBreaksForListContext(Configuration configuration, Helper.Syntax left, Helper.Syntax right)
+            public MultiLineBreaksForListContext(Configuration configuration, Syntax left, Syntax right)
                 : base(configuration)
             {
                 Left = left;
@@ -69,8 +72,8 @@ namespace ReniUI.Formatting
 
             [DisableDump]
             public override bool HasMultipleLineBreaksOnRightSide
-                => Configuration.IsLineBreakRequired(Left) ||
-                   Configuration.IsLineBreakRequired(Right);
+                => Left.HasAlreadyLineBreakOrIsTooLong ||
+                   Right.HasAlreadyLineBreakOrIsTooLong;
         }
 
         sealed class NoneContext : Context
@@ -106,6 +109,34 @@ namespace ReniUI.Formatting
         public virtual bool LineBreaksForList => false;
         public virtual bool HasMultipleLineBreaksOnRightSide => false;
 
-        public virtual Context MultiLineBreaksForList(Helper.Syntax left, Helper.Syntax right) => this;
+        public virtual Context MultiLineBreaksForList(Syntax left, Syntax right) => this;
+
+        public Context ChildContext(Syntax target)
+        {
+            switch(target.TokenClass)
+            {
+                case BeginOfText _:
+                case EndOfText _: return ToRoot;
+                case List _:
+                    return ToList;
+
+                default:
+                    NotImplementedMethod(target);
+                    return null;
+            }
+        }
+
+
+        class ListContext : Context
+        {
+            readonly Context Parent;
+
+            public ListContext(Context parent)
+                : base(parent.Configuration)
+                => Parent = parent;
+        }
+
+        protected virtual Context ToList => new ListContext(this);
+        protected virtual Context ToRoot => GetRoot(Configuration);
     }
 }

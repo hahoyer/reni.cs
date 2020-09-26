@@ -20,7 +20,7 @@ namespace ReniUI.Test
             const string expectedText = @"aaaaa; ccccc";
 
             var compiler = CompilerBrowser.FromText(text);
-            var newSource = compiler.Syntax.FlatFormat(false);
+            var newSource = compiler.FlatFormat(false);
             Tracer.Assert(newSource == expectedText, "\n\"" + newSource + "\"");
         }
 
@@ -83,7 +83,7 @@ ccccc";
         {
             const string text = @"lllll:bbbbb";
             const string expectedText = @"lllll:
-bbbbb";
+    bbbbb";
 
             text.SimpleTest(expectedText, maxLineLength: 10, emptyLineLimit: 1);
         }
@@ -117,7 +117,7 @@ llll: bbbbb";
             const string expectedText = @"aaaaa;
 
 llll:
-bbbbb";
+    bbbbb";
 
             text.SimpleTest(expectedText, maxLineLength: 10, emptyLineLimit: 1);
         }
@@ -152,7 +152,7 @@ ccccc";
             const string expectedText = @"aaaaa;
 
 llll:
-bbbbb;
+    bbbbb;
 
 ccccc";
 
@@ -168,7 +168,7 @@ ccccc";
 aaaaa;
 
 llll:
-bbbbb;
+    bbbbb;
 
 ccccc;
 ddddd";
@@ -185,10 +185,10 @@ ddddd";
 aaaaa;
 
 llll:
-bbbbb;
+    bbbbb;
 
 mmmmm:
-22222;
+    22222;
 
 ccccc;
 ddddd";
