@@ -32,6 +32,8 @@ newSource:
 {newSource.Quote()}
 expected:
 {expected.Quote()}
+Target: {compiler.FormattingSyntax.Dump()}
+
 ",1);
         }
     }

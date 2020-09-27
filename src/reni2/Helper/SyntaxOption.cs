@@ -15,7 +15,7 @@ namespace Reni.Helper
     sealed class SyntaxOption : DumpableObject, ValueCache.IContainer
     {
         [DisableDump]
-        internal IDefaultScopeProvider DefaultScopeProvider => Target.Option.DefaultScopeProvider;
+        internal IDefaultScopeProvider DefaultScopeProvider => Target.DefaultScopeProvider;
 
         class CacheContainer
         {
@@ -31,7 +31,7 @@ namespace Reni.Helper
         readonly Syntax Target;
 
         //[Obsolete("",true)]
-        SyntaxOption Parent
+        internal SyntaxOption Parent
         {
             get => Cache.Parent;
             set

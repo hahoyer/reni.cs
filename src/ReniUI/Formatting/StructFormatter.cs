@@ -16,17 +16,17 @@ namespace ReniUI.Formatting
             if(syntax == null)
                 return new Edit[0];
 
-            var item = syntax.Target.CreateStruct(Configuration);
+            var item = new Structure(compiler.FormattingSyntax, Configuration);
 
             var sourcePartEdits = item.Edits.ToArray();
             var editPieces = sourcePartEdits.GetEditPieces(Configuration);
             return editPieces;
         }
 
-        internal string FlatFormat(Helper.Syntax syntax, bool areEmptyLinesPossible) 
-            => syntax.Target.CreateStruct(Configuration).FlatFormat(areEmptyLinesPossible);
+        internal string FlatFormat(Syntax syntax, bool areEmptyLinesPossible) 
+            => syntax.FlatFormat(areEmptyLinesPossible);
     }
 
     interface ISourcePartEdit {}
 
-}
+}                                                                             

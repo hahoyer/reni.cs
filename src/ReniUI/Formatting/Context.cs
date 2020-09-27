@@ -70,10 +70,6 @@ namespace ReniUI.Formatting
                 Right = right;
             }
 
-            [DisableDump]
-            public override bool HasMultipleLineBreaksOnRightSide
-                => Left.HasAlreadyLineBreakOrIsTooLong ||
-                   Right.HasAlreadyLineBreakOrIsTooLong;
         }
 
         sealed class NoneContext : Context

@@ -17,6 +17,15 @@ namespace ReniUI
 {
     public sealed class CompilerBrowser : DumpableObject
     {
+        class CacheContainer
+        {
+            internal Syntax FomattingSyntax;
+            internal Helper.Syntax HelperSyntax;
+        }
+
+        readonly CacheContainer Cache = new CacheContainer();
+
+
         public static CompilerBrowser FromText
             (string text, CompilerParameters parameters, string sourceIdentifier = null)
             => new CompilerBrowser(() => Compiler.FromText(text, parameters, sourceIdentifier));
@@ -55,22 +64,24 @@ namespace ReniUI
             }
         }
 
-        internal Helper.Syntax Syntax
-        {
-            get
-            {
-                try
-                {
-                    return new Helper.Syntax(Compiler.Syntax);
-                }
-                catch(Exception e)
-                {
-                    $"Syntax: Unexpected {e} \nText:\n{Source.Data}".WriteLine();
-                    throw;
-                }
+        internal Syntax FormattingSyntax 
+            => Cache.FomattingSyntax ?? (Cache.FomattingSyntax = new Syntax(Compiler.Syntax));
 
-                ;
+        internal Helper.Syntax Syntax => Cache.HelperSyntax ?? (Cache.HelperSyntax = GetHelperSyntax());
+
+        Helper.Syntax GetHelperSyntax()
+        {
+            try
+            {
+                return new Helper.Syntax(Compiler.Syntax);
             }
+            catch(Exception e)
+            {
+                $"Syntax: Unexpected {e} \nText:\n{Source.Data}".WriteLine();
+                throw;
+            }
+
+            ;
         }
 
         public Token LocatePosition(int offset)
@@ -184,8 +195,7 @@ namespace ReniUI
         public string FlatFormat(bool areEmptyLinesPossible)
         {
             var formatter = (StructFormatter) new Formatting.Configuration().Create();
-            return formatter.FlatFormat(Syntax, areEmptyLinesPossible);
-
+            return formatter.FlatFormat(FormattingSyntax, areEmptyLinesPossible);
         }
     }
 }

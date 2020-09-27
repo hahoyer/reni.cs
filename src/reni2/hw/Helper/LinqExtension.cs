@@ -468,6 +468,31 @@ namespace hw.Helper
             while(enumerator.MoveNext());
         }
 
+        public static int? MaxEx(this IEnumerable<int> values)
+        {
+            if (values == null)
+                throw new ArgumentNullException(nameof (values));
+            int? result = null;
+            foreach (var value in values)
+                if(result == null)
+                    result = value;
+                else if(value > result)
+                    result = value;
+            return result;
+        }
+
+        public static int? MinEx(this IEnumerable<int> values)
+        {
+            if (values == null)
+                throw new ArgumentNullException(nameof (values));
+            int? result = null;
+            foreach (var value in values)
+                if(result == null)
+                    result = value;
+                else if(value < result)
+                    result = value;
+            return result;
+        }
     }
 
     public interface IAggregateable<T>
@@ -476,4 +501,5 @@ namespace hw.Helper
     }
 
     sealed class DuplicateKeyException : Exception {}
+
 }

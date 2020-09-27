@@ -12,7 +12,7 @@ using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
-    public sealed class Syntax : DumpableObject, ISourcePartProxy, ISyntax, ValueCache.IContainer
+    public sealed class Syntax : DumpableObject, ISourcePartProxy, ISyntax, ValueCache.IContainer, ITree<Syntax>
     {
         static int NextObjectId;
 
@@ -29,6 +29,10 @@ namespace Reni.TokenClasses
         internal readonly IToken Token;
         [DisableDump]
         internal SyntaxOption Option {get;}
+
+        Syntax ITree<Syntax>.Left => Left;
+        Syntax ITree<Syntax>.Right => Right;
+
 
         [EnableDumpExcept(null)]
         internal Syntax Left {get;}
@@ -59,6 +63,10 @@ namespace Reni.TokenClasses
         SourcePart ISourcePartProxy.All => SourcePart;
         SourcePart ISyntax.All => SourcePart;
         SourcePart ISyntax.Main => Token.Characters;
+
+        [DisableDump]
+        internal IDefaultScopeProvider DefaultScopeProvider
+            => TokenClass as IDefaultScopeProvider ?? Option.Parent?.DefaultScopeProvider;
 
         [DisableDump]
         internal SourcePart SourcePart => Left?.SourcePart + Token.Characters + Right?.SourcePart;
