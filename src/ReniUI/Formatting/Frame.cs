@@ -160,7 +160,7 @@ namespace ReniUI.Formatting
         }
 
         [DisableDump]
-        internal ResultItems ItemsForResult
+        ResultItems ItemsForResult
             => CollectItemsForResult().Aggregate(ResultItems.Default);
 
         protected override string GetNodeDump()

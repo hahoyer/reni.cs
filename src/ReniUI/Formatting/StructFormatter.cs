@@ -18,15 +18,11 @@ namespace ReniUI.Formatting
 
             var item = new Structure(compiler.FormattingSyntax, Configuration);
 
-            var sourcePartEdits = item.Edits.ToArray();
+            ISourcePartEdit[] sourcePartEdits = item.Edits.ToArray();
             var editPieces = sourcePartEdits.GetEditPieces(Configuration);
             return editPieces;
         }
-
-        internal string FlatFormat(Syntax syntax, bool areEmptyLinesPossible) 
-            => syntax.FlatFormat(areEmptyLinesPossible);
     }
 
     interface ISourcePartEdit {}
-
 }                                                                             

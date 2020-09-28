@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Diagnostics;
 using hw.DebugFormatter;
 using hw.Parser;
 using hw.Scanner;
@@ -27,10 +26,10 @@ namespace Reni.Helper
         internal SourcePart SourcePart => Target.SourcePart;
 
         [EnableDump]
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal ITokenClass TokenClass => Target.TokenClass;
 
         internal bool Contains(int current)
             => SourcePart.Position <= current && current < SourcePart.EndPosition;
+
     }
 }

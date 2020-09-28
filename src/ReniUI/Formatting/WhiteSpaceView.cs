@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
@@ -30,6 +31,7 @@ namespace ReniUI.Formatting
         readonly bool IsSeparatorRequired;
 
         [EnableDump]
+        [Obsolete("",true)]
         [EnableDumpExcept(0)]
         readonly int MinimalLineBreakCount;
 
@@ -40,14 +42,12 @@ namespace ReniUI.Formatting
         (
             IEnumerable<IItem> target,
             Configuration configuration,
-            bool isSeparatorRequired,
-            int minimalLineBreakCount)
+            bool isSeparatorRequired)
         {
             Tracer.Assert(target != null);
             Tracer.Assert(target.Any());
             Target = target;
             IsSeparatorRequired = isSeparatorRequired;
-            MinimalLineBreakCount = minimalLineBreakCount;
             Configuration = configuration;
         }
 
@@ -64,7 +64,8 @@ namespace ReniUI.Formatting
                 return default;
             }
 
-            return GetLineBreakEdits().Concat(GetSpaceEdits(parameter.IndentCharacterCount));
+            return GetLineBreakEdits(parameter.LineBreakCount)
+                .Concat(GetSpaceEdits(parameter.LineBreakCount, parameter.IndentCharacterCount));
         }
 
         /// <summary>
@@ -74,10 +75,11 @@ namespace ReniUI.Formatting
         ///     For those line breaks edits might be generated if they had leading spaces.
         ///     Line breaks that are not used anymore are removed.
         /// </summary>
+        /// <param name="minimalLineBreakCount"></param>
         /// <returns></returns>
-        IEnumerable<Edit> GetLineBreakEdits()
+        IEnumerable<Edit> GetLineBreakEdits(int minimalLineBreakCount)
         {
-            var delta = TargetLineBreakCount - LineBreakCount;
+            var delta = GetTargetLineBreakCount(minimalLineBreakCount) - LineBreakCount;
             if(delta > 0)
                 yield return Edit.Create("+LineBreaks", LineBreaksAnchor, "\n".Repeat(delta));
 
@@ -85,7 +87,7 @@ namespace ReniUI.Formatting
             {
                 var groupPart = LineBreakGroups[index];
 
-                if(index >= TargetLineBreakCount)
+                if(index >= GetTargetLineBreakCount(minimalLineBreakCount))
                     yield return Edit.Create("-AllLineBreaks", groupPart); // Remove spaces and line break
                 else if(groupPart.Length > 1)
                     yield return Edit.Create("-SomeLineBreaks", groupPart.Start.Span(groupPart.Length - 1));
@@ -94,14 +96,14 @@ namespace ReniUI.Formatting
             }
         }
 
-        IEnumerable<Edit> GetSpaceEdits(int indentCharacterCount)
+        IEnumerable<Edit> GetSpaceEdits(int minimalLineBreakCount, int indentCharacterCount)
         {
-            Tracer.Assert(TargetLineBreakCount == 0 || !TargetSeparator);
+            Tracer.Assert(GetTargetLineBreakCount(minimalLineBreakCount) == 0 || !GetTargetSeparator(minimalLineBreakCount));
             Tracer.Assert(Spaces.Id.All(c => c == ' '));
 
             var targetSpacesCount
-                = TargetLineBreakCount != 0 ? indentCharacterCount :
-                TargetSeparator ? 1 : 0;
+                = GetTargetLineBreakCount(minimalLineBreakCount) != 0 ? indentCharacterCount :
+                GetTargetSeparator(minimalLineBreakCount) ? 1 : 0;
 
             var delta = targetSpacesCount - Spaces.Length;
             if(delta == 0)
@@ -118,32 +120,22 @@ namespace ReniUI.Formatting
         SourcePart Spaces
             => Cache.Spaces ?? (Cache.Spaces = GetSpaces());
 
-        [EnableDump]
-        [EnableDumpExcept(0)]
-        int TargetLineBreakCount =>
-            Cache.TargetLineBreakCount ?? (Cache.TargetLineBreakCount = GetTargetLineBreakCount()).Value;
-
-        /// <summary>
-        ///     Can be controlled by configuration value EmptyLineLimit.
-        ///     If not set, all line breaks are retained.
-        ///     However, new line break can be added if required
-        /// </summary>
-        int GetTargetLineBreakCount()
+        int GetTargetLineBreakCount(int minimalLineBreakCount)
         {
-            if(MinimalLineBreakCount >= LineBreakCount)
-                return MinimalLineBreakCount;
+            if(minimalLineBreakCount >= LineBreakCount)
+                return minimalLineBreakCount;
 
             var limit = Configuration.EmptyLineLimit;
             if(limit == null)
                 return LineBreakCount;
 
             var keepLineBreaks = T(LineBreakCount, limit.Value).Min();
-            return T(MinimalLineBreakCount, keepLineBreaks).Max();
+            return T(minimalLineBreakCount, keepLineBreaks).Max();
         }
 
         int LineBreakCount => LineBreakGroups.Length;
 
-        bool TargetSeparator => TargetLineBreakCount == 0 && IsSeparatorRequired;
+        bool GetTargetSeparator(int minimalLineBreakCount) => GetTargetLineBreakCount(minimalLineBreakCount) == 0 && IsSeparatorRequired;
 
         SourcePart LineBreaksAnchor
             => (LineBreakGroups.FirstOrDefault() ?? Spaces).Start.Span(0);

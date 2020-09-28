@@ -14,9 +14,15 @@ namespace ReniUI.Formatting
     {
         class CacheContainer
         {
-            internal ValueCache<SplitMaster> SplitMaster;
             internal ValueCache<SplitItem> SplitItem;
+            internal ValueCache<SplitMaster> SplitMaster;
         }
+
+        static TContainer FlatSubFormat<TContainer, TValue>(Syntax left, bool areEmptyLinesPossible)
+            where TContainer : class, IFormatResult<TValue>, new()
+            => left == null ? new TContainer() : left.FlatFormat<TContainer, TValue>(areEmptyLinesPossible);
+
+        static IEnumerable<TValue> T<TValue>(params TValue[] value) => value;
 
         readonly CacheContainer Cache = new CacheContainer();
 
@@ -31,9 +37,6 @@ namespace ReniUI.Formatting
             Cache.SplitMaster = new ValueCache<SplitMaster>(GetSplitMaster);
         }
 
-        protected override Syntax Create(Reni.TokenClasses.Syntax target, Syntax parent)
-            => new Syntax(target, parent);
-
         [EnableDump]
         [EnableDumpExcept(null)]
         public new Syntax Left => base.Left;
@@ -42,15 +45,27 @@ namespace ReniUI.Formatting
         [EnableDumpExcept(null)]
         public new Syntax Right => base.Right;
 
-        [EnableDump]
-        [EnableDumpExcept(null)]
+        [DisableDump]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal SplitItem SplitItem => Cache.SplitItem.Value;
 
-        [EnableDump]
-        [EnableDumpExcept(null)]
+        [DisableDump]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal SplitMaster SplitMaster => Cache.SplitMaster.Value;
+
+        [EnableDump]
+        new ITokenClass TokenClass => base.TokenClass;
+
+        [DisableDump]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        internal IndentDirection IndentDirection => SplitItem?.Indent ?? IndentDirection.NoIndent;
+
+        [DisableDump]
+        internal bool IsSeparatorRequired
+            => !WhiteSpaces.HasComment() && SeparatorExtension.Get(LeftNeighbor?.TokenClass, TokenClass);
+
+        protected override Syntax Create(Reni.TokenClasses.Syntax target, Syntax parent)
+            => new Syntax(target, parent);
 
         SplitMaster GetSplitMaster()
         {
@@ -105,7 +120,7 @@ namespace ReniUI.Formatting
                     Tracer.Assert(!(TokenClass is Colon));
                     return IsLeftChild ? SplitItem.ColonLabel[tokenClass] : SplitItem.ColonBody[tokenClass];
                 case LeftParenthesis tokenClass: return SplitItem.List[tokenClass];
-                case List tokenClass: 
+                case List tokenClass:
                     var master = Parent
                         .Chain(target => target.Parent)
                         .SkipWhile(target => target.TokenClass == tokenClass)
@@ -116,15 +131,7 @@ namespace ReniUI.Formatting
                     NotImplementedMethod(nameof(Parent), Parent);
                     return default;
             }
-
         }
-
-        [EnableDump]
-        new ITokenClass TokenClass => base.TokenClass;
-
-        [DisableDump]
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        internal IndentDirection IndentDirection => SplitItem?.Indent ?? IndentDirection.NoIndent;
 
         TContainer FlatFormat<TContainer, TValue>(bool areEmptyLinesPossible)
             where TContainer : class, IFormatResult<TValue>, new()
@@ -145,10 +152,6 @@ namespace ReniUI.Formatting
             return rightResult == null ? null : leftResult.Concat(tokenString, rightResult);
         }
 
-        static TContainer FlatSubFormat<TContainer, TValue>(Syntax left, bool areEmptyLinesPossible)
-            where TContainer : class, IFormatResult<TValue>, new()
-            => left == null ? new TContainer() : left.FlatFormat<TContainer, TValue>(areEmptyLinesPossible);
-
         /// <summary>
         ///     Try to format target into one line.
         /// </summary>
@@ -165,12 +168,6 @@ namespace ReniUI.Formatting
         internal int? GetFlatLength(bool areEmptyLinesPossible)
             => FlatFormat<IntegerResult, int>(areEmptyLinesPossible)?.Value;
 
-        [DisableDump]
-        internal bool IsSeparatorRequired
-            => !WhiteSpaces.HasComment() && SeparatorExtension.Get(LeftNeighbor?.TokenClass, TokenClass);
-
         protected override string GetNodeDump() => base.GetNodeDump() + " " + Target.Token.Characters.Id;
-
-        static IEnumerable<TValue> T<TValue>(params TValue[] value) => value;
     }
 }

@@ -2,38 +2,29 @@ using System.Collections.Generic;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
-using Reni;
 
 namespace ReniUI.Formatting
 {
     sealed class EmptyWhiteSpaceView : DumpableObject, ISourcePartEdit, IEditPieces
     {
-        readonly bool IsSeparatorRequired;
-
-        [EnableDump]
-        [EnableDumpExcept(0)]
-        readonly int MinimalLineBreakCount;
-
         readonly SourcePosn Anchor;
+        readonly bool IsSeparatorRequired;
 
         internal EmptyWhiteSpaceView
         (
             SourcePosn anchor,
-            bool isSeparatorRequired,
-            int minimalLineBreakCount)
+            bool isSeparatorRequired)
         {
             Anchor = anchor;
             IsSeparatorRequired = isSeparatorRequired;
-            MinimalLineBreakCount = minimalLineBreakCount;
-            StopByObjectIds(235);
         }
 
         IEnumerable<Edit> IEditPieces.Get(EditPieceParameter parameter)
         {
             var spaceCount
-                = MinimalLineBreakCount > 0 ? parameter.IndentCharacterCount :
+                = parameter.LineBreakCount > 0 ? parameter.IndentCharacterCount :
                 IsSeparatorRequired ? 1 : 0;
-            var newText = "\n".Repeat(MinimalLineBreakCount) + " ".Repeat(spaceCount);
+            var newText = "\n".Repeat(parameter.LineBreakCount) + " ".Repeat(spaceCount);
 
             if(newText != "")
                 yield return Edit.Create("+LineBreaksSpaces", Anchor.Span(0), newText);

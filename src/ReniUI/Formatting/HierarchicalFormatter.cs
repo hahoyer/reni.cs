@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using hw.Parser;
 using hw.Scanner;
 using Reni.Parser;
 using Reni.TokenClasses;
@@ -20,11 +19,15 @@ namespace ReniUI.Formatting
 
         IEnumerable<Edit> IFormatter.GetEditPieces(CompilerBrowser compilerBrowser, SourcePart targetPart)
         {
-            var result = Frame.Create
-                (this, compilerBrowser, targetPart)
-                .ItemsForResult;
+            var syntax = compilerBrowser.LocateAndFilter(targetPart);
+            if(syntax == null)
+                return new Edit[0];
 
-            return result.GetEditPieces(targetPart);
+            var item = new HierarchicalStructure.Frame {Target = compilerBrowser.FormattingSyntax, Configuration = Configuration};
+
+            var sourcePartEdits = item.Edits.ToArray();
+            var editPieces = sourcePartEdits.GetEditPieces(Configuration);
+            return editPieces;
         }
 
         bool IsRelevantLineBreak(int emptyLines, ITokenClass tokenClass)
@@ -159,5 +162,6 @@ namespace ReniUI.Formatting
         {
             return flatText.Any(item => item == '\n') || flatText.Length > Configuration.MaxLineLength;
         }
+
     }
 }

@@ -242,13 +242,7 @@ ddddd";
     ccccc
 )";
 
-            var compiler = CompilerBrowser.FromText(text);
-            var newSource = compiler.Reformat
-            (
-                new ReniUI.Formatting.Configuration {MaxLineLength = 10, EmptyLineLimit = 1}.Create()
-            );
-
-            Tracer.Assert(newSource == expectedText, "\n\"" + newSource + "\"");
+            text.SimpleTest(expectedText, maxLineLength: 12, emptyLineLimit: 1);
         }
 
         [Test]
@@ -278,18 +272,19 @@ ddddd";
             const string text = @"aaaaa;llll:bbbbb;(cccccsssss)";
             const string expectedText = @"aaaaa;
 llll: bbbbb;
+
 (
     cccccsssss
 )";
 
-            text.SimpleTest(expectedText, maxLineLength: 10, emptyLineLimit: 1);
+            text.SimpleTest(expectedText, maxLineLength: 12, emptyLineLimit: 1);
         }
 
         [Test]
         [UnitTest]
         public void Reformat()
         {
-            const string Text =
+            const string text =
                 @"systemdata:{1 type instance(); Memory:((0 type *('100' to_number_of_base 64)) mutable) instance(); !mutable FreePointer: Memory array_reference mutable; repeat: /\ ^ while() then
     (
         ^ body(),
@@ -304,22 +299,13 @@ llll: bbbbb;
     !mutable FreePointer: Memory array_reference mutable;
     repeat: /\ ^ while() then(^ body(), repeat(^));
 };
+
 1 = 1 then 2 else 4;
 3;
 (Text('H') << 'allo') dump_print"
                     .Replace(oldValue: "\r\n", newValue: "\n");
 
-
-            var compiler = CompilerBrowser.FromText(Text);
-            var newSource = compiler.Reformat
-                (
-                    new ReniUI.Formatting.Configuration {MaxLineLength = 100, EmptyLineLimit = 0}.Create()
-                )
-                .Replace(oldValue: "\r\n", newValue: "\n");
-
-            var lineCount = newSource.Count(item => item == '\n');
-
-            Tracer.Assert(newSource == expectedText, "\n\"" + newSource + "\"");
+            text.SimpleTest(expectedText, maxLineLength:100, emptyLineLimit:0);
         }
 
         [Test]

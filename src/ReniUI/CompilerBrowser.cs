@@ -192,10 +192,7 @@ namespace ReniUI
             => (formatter ?? new Formatting.Configuration().Create())
                 .GetEditPieces(this, sourcePart);
 
-        public string FlatFormat(bool areEmptyLinesPossible)
-        {
-            var formatter = (StructFormatter) new Formatting.Configuration().Create();
-            return formatter.FlatFormat(FormattingSyntax, areEmptyLinesPossible);
-        }
+        public string FlatFormat(bool areEmptyLinesPossible) 
+            => FormattingSyntax.FlatFormat( areEmptyLinesPossible);
     }
 }

@@ -70,19 +70,19 @@ namespace ReniUI.Formatting
         {
             get
             {
+                if(LineBreaks != 0)
+                    yield return LineBreaks.AsMinimalLineBreaks();
+
                 if(Target.Token.PrecededWith.Any())
-                    return T
-                    (
+                    yield return
                         new WhiteSpaceView
                         (
                             Target.WhiteSpaces,
                             Configuration,
-                            Target.IsSeparatorRequired,
-                            LineBreaks));
-                return T
-                (
+                            Target.IsSeparatorRequired);
+                yield return
                     new EmptyWhiteSpaceView
-                        (Target.Token.Characters.Start, Target.IsSeparatorRequired, LineBreaks));
+                        (Target.Token.Characters.Start, Target.IsSeparatorRequired);
             }
         }
 
