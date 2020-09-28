@@ -4,7 +4,6 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using Reni;
-using Reni.Feature;
 using Reni.Parser;
 using Reni.TokenClasses;
 
@@ -33,40 +32,15 @@ namespace ReniUI.Formatting
                     );
                 }
             }
-
-            protected override HierarchicalStructure Create(ITokenClass tokenClass, bool isLast)
-            {
-                switch(tokenClass)
-                {
-                    case List _: return new ListFrame();
-                    case Colon _: return new ColonFrame();
-                    case TerminalSyntaxToken _:
-                    case Definable _: return new ExpressionFrame(tokenClass);
-                    case RightParenthesis _: return new ParenthesisFrame(false);
-                }
-
-                NotImplementedMethod(tokenClass);
-                return default;
-            }
         }
 
         class ListFrame : HierarchicalStructure
         {
-            public ListFrame() => AdditionalLineSpaces = true;
+            public ListFrame() => AdditionalLineBreaksForMultilineItems = true;
 
             [DisableDump]
             protected override IEnumerable<IEnumerable<ISourcePartEdit>> EditGroups
                 => GetEditGroupsForChains<List>();
-
-            protected override HierarchicalStructure Create(ITokenClass tokenClass, bool isLast)
-            {
-                switch(tokenClass)
-                {
-                    case Colon _: return new ColonFrame();
-                    case RightParenthesis _: return new ParenthesisFrame(false);
-                    default:return new ExpressionFrame(tokenClass);
-                }
-            }
         }
 
         class ExpressionFrame : HierarchicalStructure
@@ -90,16 +64,6 @@ namespace ReniUI.Formatting
                         yield return CreateChild(Target.Right).Edits;
                 }
             }
-
-            protected override HierarchicalStructure Create(ITokenClass tokenClass, bool isLast)
-            {
-                switch(tokenClass)
-                {
-                    case RightParenthesis _: return new ParenthesisFrame(false);
-                }
-
-                return new ExpressionFrame(tokenClass);
-            }
         }
 
         class ColonFrame : HierarchicalStructure
@@ -110,21 +74,15 @@ namespace ReniUI.Formatting
 
             protected override HierarchicalStructure Create(ITokenClass tokenClass, bool isLast)
             {
-                switch(tokenClass)
-                {
-                    case RightParenthesis _: return new ParenthesisFrame(false);
-                }
-
-                return new ExpressionFrame(tokenClass) {IsIndentRequired = isLast};
+                var result = base.Create(tokenClass, isLast);
+                if(isLast && result is ExpressionFrame)
+                    result.IsIndentRequired = true;
+                return result;
             }
         }
 
         class ParenthesisFrame : HierarchicalStructure
         {
-            readonly bool SurroundingLineBreaks;
-
-            public ParenthesisFrame(bool surroundingLineBreaks) => SurroundingLineBreaks = surroundingLineBreaks;
-
             [DisableDump]
             protected override IEnumerable<IEnumerable<ISourcePartEdit>> EditGroups
             {
@@ -139,7 +97,7 @@ namespace ReniUI.Formatting
 
                     var isLineSplit = IsLineSplit;
 
-                    if(isLineSplit && SurroundingLineBreaks)
+                    if(isLineSplit)
                         yield return T(SourcePartEditExtension.MinimalLineBreak);
                     yield return GetWhiteSpacesEdits(Target.Left);
 
@@ -157,20 +115,10 @@ namespace ReniUI.Formatting
                         yield return T(SourcePartEditExtension.MinimalLineBreak);
                     yield return GetWhiteSpacesEdits(Target);
 
-                    if(isLineSplit && SurroundingLineBreaks)
+                    if(isLineSplit)
                         yield return T(SourcePartEditExtension.MinimalLineBreak);
                 }
             }
-
-            protected override HierarchicalStructure Create(ITokenClass tokenClass, bool isLast)
-            {
-                switch(tokenClass)
-                {
-                    case List _: return new ListFrame();
-                    case Colon _: return new ColonFrame();
-                }
-
-                return new ExpressionFrame(tokenClass);            }
         }
 
         static bool GetIsSeparatorRequired(Syntax target)
@@ -180,7 +128,7 @@ namespace ReniUI.Formatting
         static IEnumerable<TValue> T<TValue>(params TValue[] value) => value;
         static bool True => true;
         static bool False => false;
-        bool AdditionalLineSpaces;
+        bool AdditionalLineBreaksForMultilineItems;
 
         internal Configuration Configuration;
         bool ForceLineSplit;
@@ -245,8 +193,13 @@ namespace ReniUI.Formatting
 
         protected virtual HierarchicalStructure Create(ITokenClass tokenClass, bool isLast)
         {
-            NotImplementedMethod(tokenClass, isLast);
-            return default;
+            switch(tokenClass)
+            {
+                case List _: return new ListFrame();
+                case Colon _: return new ColonFrame();
+                case RightParenthesis _: return new ParenthesisFrame();
+                default: return new ExpressionFrame(tokenClass);
+            }
         }
 
         bool GetHasAlreadyLineBreakOrIsTooLong(Syntax target)
@@ -282,7 +235,7 @@ namespace ReniUI.Formatting
             if(isInsideChain)
                 second = second.Left;
 
-            if(!AdditionalLineSpaces || second == null)
+            if(!AdditionalLineBreaksForMultilineItems || second == null)
                 return SourcePartEditExtension.MinimalLineBreak;
 
             if(GetHasAlreadyLineBreakOrIsTooLong(target.Left) || GetHasAlreadyLineBreakOrIsTooLong(second))

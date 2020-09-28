@@ -49,14 +49,13 @@
     <Compile Include="Formatting\Context.cs" />
     <Compile Include="Formatting\HierarchicalStructure.cs" />
     <Compile Include="Formatting\SplitItem.cs" />
-    <Compile Include="Formatting\Structure.cs" />
     <Compile Include="Helper\Syntax.cs" />
     <Compile Include="Formatting\WhiteSpaceView.cs" />
     <Compile Include="Formatting\IResultItem.cs" />
     <Compile Include="Formatting\ResultItems.cs" />
     <Compile Include="Formatting\Skeleton.cs" />
     <Compile Include="Formatting\SourcePartEditExtension.cs" />
-    <Compile Include="Formatting\StructFormatter.cs" />
+    <Compile Include="Formatting\ISourcePartEdit.cs" />
     <Compile Include="Formatting\Syntax.cs" />
     <Compile Include="Formatting\WhiteSpace.cs" />
     <Compile Include="hw\Forms\CursorUtil.cs" />
@@ -111,7 +110,6 @@
     <Compile Include="Persister.cs" />
     <Compile Include="Formatting\Configuration.cs" />
     <Compile Include="Formatting\ContactType.cs" />
-    <Compile Include="Formatting\Frame.cs" />
     <Compile Include="Formatting\HierarchicalFormatter.cs" />
     <Compile Include="Formatting\IChainLink.cs" />
     <Compile Include="Formatting\IFormatter.cs" />
