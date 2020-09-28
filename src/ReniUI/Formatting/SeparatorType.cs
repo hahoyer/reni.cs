@@ -16,15 +16,15 @@ namespace ReniUI.Formatting
         {
             if(left == null || right == null)
                 return null;
+            if(left is BeginOfText || right is EndOfText)
+                return false;
             if((left is List || left is Colon) && !(right is RightParenthesis))
                 return true;
 
             if(right is RightParenthesis ||
                right is LeftParenthesis ||
                right is List ||
-               right is EndOfText ||
-               left is LeftParenthesis || 
-               left is BeginOfText
+               left is LeftParenthesis
             )
                 return false;
 

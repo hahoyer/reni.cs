@@ -137,7 +137,7 @@ namespace ReniUI.Formatting
             where TContainer : class, IFormatResult<TValue>, new()
         {
             var tokenString = Token.Characters
-                .FlatFormat(WhiteSpaces, areEmptyLinesPossible);
+                .FlatFormat(Left == null? null:WhiteSpaces, areEmptyLinesPossible);
 
             if(tokenString == null)
                 return null;

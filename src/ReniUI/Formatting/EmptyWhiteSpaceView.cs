@@ -31,5 +31,6 @@ namespace ReniUI.Formatting
         }
 
         protected override string GetNodeDump() => Anchor.DebuggerDumpString + " " + base.GetNodeDump();
+        bool ISourcePartEdit.HasLines => false;
     }
 }

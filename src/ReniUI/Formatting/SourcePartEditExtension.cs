@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
@@ -9,20 +8,28 @@ namespace ReniUI.Formatting
     {
         sealed class SpecialEdit : DumpableObject, ISourcePartEdit
         {
+            readonly bool HasLines;
             readonly string Id;
-            public SpecialEdit(string id) => Id = id;
+
+            public SpecialEdit(string id, bool hasLines = false)
+            {
+                Id = id;
+                HasLines = hasLines;
+            }
+
+            bool ISourcePartEdit.HasLines => HasLines;
             public override string ToString() => Id;
             protected override string GetNodeDump() => Id;
         }
 
-        internal static readonly ISourcePartEdit MinimalLineBreak = new SpecialEdit(id: "MinimalLineBreak");
-        internal static readonly ISourcePartEdit MinimalLineBreaks = new SpecialEdit(id: "MinimalLineBreaks");
-        internal static readonly ISourcePartEdit EnsureSeparator = new SpecialEdit(id: "EnsureSeparator");
-        internal static readonly ISourcePartEdit ToRight = new SpecialEdit(id: "ToRight");
-        internal static readonly ISourcePartEdit ToLeft = new SpecialEdit(id: "ToLeft");
-        internal static readonly ISourcePartEdit EndOfFile = new SpecialEdit(id: "EndOfFile");
+        internal static readonly ISourcePartEdit MinimalLineBreak = new SpecialEdit("MinimalLineBreak", true);
+        internal static readonly ISourcePartEdit MinimalLineBreaks = new SpecialEdit("MinimalLineBreaks", true);
+        internal static readonly ISourcePartEdit EnsureSeparator = new SpecialEdit("EnsureSeparator");
+        internal static readonly ISourcePartEdit ToRight = new SpecialEdit("ToRight");
+        internal static readonly ISourcePartEdit ToLeft = new SpecialEdit("ToLeft");
+        internal static readonly ISourcePartEdit EndOfFile = new SpecialEdit("EndOfFile");
 
-        internal static IEnumerable<Edit> 
+        internal static IEnumerable<Edit>
             GetEditPieces(this IEnumerable<ISourcePartEdit> target, Configuration configuration)
         {
             var currentPosition = 0;
@@ -72,24 +79,13 @@ namespace ReniUI.Formatting
             return result;
         }
 
-        internal static ISourcePartEdit AsMinimalLineBreaks(this int target)
-        {
-            switch(target)
-            {
-                case 1: return MinimalLineBreak;
-                case 2: return MinimalLineBreaks;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(target), target,"Invalid value for minimal line break setup. Must be 1 or 2.");
-            }
-        }
-
         static IEnumerable<ISourcePartEdit> IndentRight(this IEnumerable<ISourcePartEdit> target)
             => new[] {ToRight}.Concat(target).Concat(new[] {ToLeft});
 
         static IEnumerable<ISourcePartEdit> IndentLeft(this IEnumerable<ISourcePartEdit> target)
             => new[] {ToLeft}.Concat(target).Concat(new[] {ToRight});
 
-        internal static IEnumerable<ISourcePartEdit> 
+        internal static IEnumerable<ISourcePartEdit>
             Indent(this IEnumerable<ISourcePartEdit> target, IndentDirection direction)
         {
             switch(direction)

@@ -1,4 +1,7 @@
 namespace ReniUI.Formatting
 {
-    interface ISourcePartEdit {}
+    interface ISourcePartEdit
+    {
+        bool HasLines {get;}
+    }
 }                                                                             

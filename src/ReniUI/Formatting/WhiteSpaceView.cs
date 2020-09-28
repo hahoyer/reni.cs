@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
@@ -23,20 +22,15 @@ namespace ReniUI.Formatting
             public IEnumerable<IItem>[] CommentGroups;
             public SourcePart[] LineBreakGroups;
             public SourcePart Spaces;
-            public int? TargetLineBreakCount;
         }
 
+        static IEnumerable<TValue> T<TValue>(params TValue[] value) => value;
         readonly CacheContainer Cache = new CacheContainer();
+        readonly Configuration Configuration;
 
         readonly bool IsSeparatorRequired;
 
-        [EnableDump]
-        [Obsolete("",true)]
-        [EnableDumpExcept(0)]
-        readonly int MinimalLineBreakCount;
-
         readonly IEnumerable<IItem> Target;
-        readonly Configuration Configuration;
 
         internal WhiteSpaceView
         (
@@ -52,7 +46,7 @@ namespace ReniUI.Formatting
         }
 
         /// <summary>
-        ///     Edits, i. e. pairs of oldtext/newtext are generated to accomplish the target text.
+        ///     Edits, i. e. pairs of old text/new text are generated to accomplish the target text.
         ///     The goal is, to change only things necessary to allow editors to work smoothly
         /// </summary>
         /// <returns></returns>
@@ -67,6 +61,22 @@ namespace ReniUI.Formatting
             return GetLineBreakEdits(parameter.LineBreakCount)
                 .Concat(GetSpaceEdits(parameter.LineBreakCount, parameter.IndentCharacterCount));
         }
+
+        bool ISourcePartEdit.HasLines => Target.HasLineComment() || GetTargetLineBreakCount(0) > 0;
+
+        IEnumerable<IItem>[] CommentGroups
+            => Cache.CommentGroups ?? (Cache.CommentGroups = GetCommentGroups());
+
+        SourcePart Spaces
+            => Cache.Spaces ?? (Cache.Spaces = GetSpaces());
+
+        int LineBreakCount => LineBreakGroups.Length;
+
+        SourcePart LineBreaksAnchor
+            => (LineBreakGroups.FirstOrDefault() ?? Spaces).Start.Span(0);
+
+        SourcePart[] LineBreakGroups
+            => Cache.LineBreakGroups ?? (Cache.LineBreakGroups = GetLineBreakGroups());
 
         /// <summary>
         ///     Get edits to ensure the correct number of line breaks.
@@ -98,7 +108,8 @@ namespace ReniUI.Formatting
 
         IEnumerable<Edit> GetSpaceEdits(int minimalLineBreakCount, int indentCharacterCount)
         {
-            Tracer.Assert(GetTargetLineBreakCount(minimalLineBreakCount) == 0 || !GetTargetSeparator(minimalLineBreakCount));
+            Tracer.Assert
+                (GetTargetLineBreakCount(minimalLineBreakCount) == 0 || !GetTargetSeparator(minimalLineBreakCount));
             Tracer.Assert(Spaces.Id.All(c => c == ' '));
 
             var targetSpacesCount
@@ -114,12 +125,6 @@ namespace ReniUI.Formatting
             yield return Edit.Create("+-Spaces", deletedPart, newText);
         }
 
-        IEnumerable<IItem>[] CommentGroups
-            => Cache.CommentGroups ?? (Cache.CommentGroups = GetCommentGroups());
-
-        SourcePart Spaces
-            => Cache.Spaces ?? (Cache.Spaces = GetSpaces());
-
         int GetTargetLineBreakCount(int minimalLineBreakCount)
         {
             if(minimalLineBreakCount >= LineBreakCount)
@@ -133,15 +138,8 @@ namespace ReniUI.Formatting
             return T(minimalLineBreakCount, keepLineBreaks).Max();
         }
 
-        int LineBreakCount => LineBreakGroups.Length;
-
-        bool GetTargetSeparator(int minimalLineBreakCount) => GetTargetLineBreakCount(minimalLineBreakCount) == 0 && IsSeparatorRequired;
-
-        SourcePart LineBreaksAnchor
-            => (LineBreakGroups.FirstOrDefault() ?? Spaces).Start.Span(0);
-
-        SourcePart[] LineBreakGroups
-            => Cache.LineBreakGroups ?? (Cache.LineBreakGroups = GetLineBreakGroups());
+        bool GetTargetSeparator
+            (int minimalLineBreakCount) => GetTargetLineBreakCount(minimalLineBreakCount) == 0 && IsSeparatorRequired;
 
         /// <summary>
         ///     If also comments or line breaks are existent
@@ -180,7 +178,7 @@ namespace ReniUI.Formatting
                 .Last();
 
             return lastLineBreakGroup
-                .Split(item => item.IsLineBreak(), assignSeparatorAtTopOfList: false)
+                .Split(item => item.IsLineBreak(), false)
                 .Where(group => group.Last().IsLineBreak())
                 .Select(group => group.SourcePart())
                 .ToArray();
@@ -188,10 +186,11 @@ namespace ReniUI.Formatting
 
         IEnumerable<IItem>[] GetCommentGroups()
             => Target
-                .Split(item => item.IsComment(), assignSeparatorAtTopOfList: false)
+                .Split(item => item.IsComment(), false)
                 .Where(group => group.Last().IsComment())
                 .ToArray();
 
-        static IEnumerable<TValue> T<TValue>(params TValue[] value) => value;
+        protected override string GetNodeDump() =>
+            Target.SourcePart().GetDumpAroundCurrent(10) + " " + base.GetNodeDump();
     }
 }

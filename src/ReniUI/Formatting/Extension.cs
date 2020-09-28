@@ -54,7 +54,10 @@ namespace ReniUI.Formatting
         internal static string FlatFormat
             (this SourcePart target, IEnumerable<IItem> precede, bool areEmptyLinesPossible)
         {
-            if(precede.Any(item => item.IsComment() && item.HasLines()))
+            if(precede == null)
+                return target.Id;
+
+            if(precede.Any(item => item.IsComment() && item.HasLines()) )
                 return null;
 
             if(areEmptyLinesPossible && precede.Any(item => item.IsLineBreak()))

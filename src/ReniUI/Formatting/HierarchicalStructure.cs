@@ -56,7 +56,11 @@ namespace ReniUI.Formatting
                     Tracer.Assert(Target.TokenClass == TokenClass, Target.Dump);
 
                     if(Target.Left != null)
+                    {
                         yield return CreateChild(Target.Left).Edits;
+                        if(IsLineSplit)
+                            yield return T(SourcePartEditExtension.MinimalLineBreak);
+                    }
 
                     yield return GetWhiteSpacesEdits(Target);
 
@@ -97,8 +101,6 @@ namespace ReniUI.Formatting
 
                     var isLineSplit = IsLineSplit;
 
-                    if(isLineSplit)
-                        yield return T(SourcePartEditExtension.MinimalLineBreak);
                     yield return GetWhiteSpacesEdits(Target.Left);
 
                     if(isLineSplit)
@@ -109,14 +111,12 @@ namespace ReniUI.Formatting
                         var child = CreateChild(Target.Left.Right);
                         child.ForceLineSplit = isLineSplit;
                         yield return child.Edits.Indent(IndentDirection.ToRight);
+
+                        if(isLineSplit)
+                            yield return T(SourcePartEditExtension.MinimalLineBreak);
                     }
 
-                    if(isLineSplit)
-                        yield return T(SourcePartEditExtension.MinimalLineBreak);
                     yield return GetWhiteSpacesEdits(Target);
-
-                    if(isLineSplit)
-                        yield return T(SourcePartEditExtension.MinimalLineBreak);
                 }
             }
         }
@@ -142,7 +142,7 @@ namespace ReniUI.Formatting
         {
             get
             {
-                var trace = ObjectId == -181;
+                var trace = ObjectId == -240;
                 StartMethodDump(trace);
                 try
                 {
@@ -151,6 +151,8 @@ namespace ReniUI.Formatting
                         .ToArray()
                         .Indent(IndentDirection);
                     Dump(nameof(result), result);
+                    //Tracer.Assert(CheckMultilineExpectations(result), Target.Dump);
+
                     Tracer.ConditionalBreak(trace);
                     return ReturnMethodDump(result, trace);
                 }
@@ -161,7 +163,7 @@ namespace ReniUI.Formatting
             }
         }
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]                               
         IndentDirection IndentDirection => IsIndentRequired ? IndentDirection.ToRight : IndentDirection.NoIndent;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -175,6 +177,10 @@ namespace ReniUI.Formatting
         }
 
         bool IsLineSplit => ForceLineSplit || GetHasAlreadyLineBreakOrIsTooLong(Target);
+
+        bool CheckMultilineExpectations(IEnumerable<ISourcePartEdit> result)
+            => Target.Left == null && Target.Right == null && IsLineSplit ||
+               result.Skip(1).Any(edit => edit.HasLines) == IsLineSplit;
 
         IEnumerable<ISourcePartEdit> GetWhiteSpacesEdits(Syntax target)
         {
@@ -222,10 +228,13 @@ namespace ReniUI.Formatting
             yield return CreateChild(target.Left).Edits;
             yield return GetWhiteSpacesEdits(target);
 
+            if(target.Right == null)
+                yield break;
+            
             if(IsLineSplit)
                 yield return T(GetLineSplitter(target, target.Right?.TokenClass is TSeparator));
 
-            if(target.Right != null && !(target.Right.TokenClass is TSeparator))
+            if(!(target.Right.TokenClass is TSeparator))
                 yield return CreateChild(target.Right, true).Edits;
         }
 

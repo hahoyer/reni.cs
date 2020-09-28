@@ -114,7 +114,6 @@
     <Compile Include="Formatting\IChainLink.cs" />
     <Compile Include="Formatting\IFormatter.cs" />
     <Compile Include="Formatting\NewWhiteSpace.cs" />
-    <Compile Include="Formatting\LineOrientedFormatter.cs" />
     <Compile Include="Formatting\SeparatorType.cs" />
     <Compile Include="hw\Graphics\IGraphTarget.cs" />
     <Compile Include="hw\Graphics\SVG\Circle.cs" />
