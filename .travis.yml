@@ -1,4 +1,2 @@
 language: csharp
 solution: src/reni2.sln
-install:
-  - nuget restore src/reni2.sln
