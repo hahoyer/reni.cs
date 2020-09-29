@@ -441,8 +441,8 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="JetBrains.Annotations, Version=2020.2.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
-      <HintPath>..\..\bin\Packages\JetBrains.Annotations.2020.2.0-eap\lib\net20\JetBrains.Annotations.dll</HintPath>
+    <Reference Include="JetBrains.Annotations, Version=2020.1.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\..\bin\Packages\JetBrains.Annotations.2020.1.0\lib\net20\JetBrains.Annotations.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework, Version=3.9.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>..\..\bin\Packages\NUnit.3.9.0\lib\net45\nunit.framework.dll</HintPath>
@@ -450,7 +450,6 @@
     </Reference>
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Numerics" />
-    <Reference Include="System.Runtime" />
   </ItemGroup>
   <Import Project="sys.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
