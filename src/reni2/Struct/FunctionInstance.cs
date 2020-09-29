@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using hw.DebugFormatter;
 using hw.Helper;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -56,7 +57,7 @@ namespace Reni.Struct
         [DisableDump]
         protected abstract Size RelevantValueSize {get;}
 
-        string Description => Body.SourcePart.Id;
+        string Description => Body.Syntax.SourcePart.Id;
 
         [Node]
         [DisableDump]
@@ -128,7 +129,7 @@ namespace Reni.Struct
             StartMethodDump(trace, category);
             try
             {
-                Dump(nameof(Body), Body.SourcePart);
+                Dump(nameof(Body), Body.Syntax.SourcePart);
                 BreakExecution();
                 var rawResult = Context.Result(category.Typed, Body);
 

@@ -14,9 +14,9 @@ namespace ReniUI.CompilationView
         {
             Title = name;
             Master = master;
-            Frame.Activated += (a, b) => Master.SelectSource(Source);
+            Frame.Activated += (a, b) => Master.SelectSource(SourcePart);
         }
 
-        protected abstract SourcePart Source { get; }
+        protected abstract SourcePart SourcePart { get; }
     }
 }

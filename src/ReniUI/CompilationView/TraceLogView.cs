@@ -18,7 +18,7 @@ namespace ReniUI.CompilationView
             Client = LogView;
         }
 
-        protected override SourcePart Source => null;
+        protected override SourcePart SourcePart => null;
 
         public void SignalClickedObject(Step[] target)
         {

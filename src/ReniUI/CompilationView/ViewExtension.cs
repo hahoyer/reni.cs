@@ -273,7 +273,7 @@ namespace ReniUI.CompilationView
             for(var i = 0; i < x.Length; i++)
             {
                 var control = ((i < viewPosition ? "" : "?") + i).CreateView(1.5);
-                var sourcePart = compound.Syntax.Statements[i].SourcePart;
+                var sourcePart = compound.Syntax.Statements[i].Syntax.SourcePart;
                 control.Click += (a, b) => master.SelectSource(sourcePart);
                 result.Controls.Add(control, 0, i);
                 result.Controls.Add(x[i], 1, i);

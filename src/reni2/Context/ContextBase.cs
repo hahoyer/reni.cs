@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Feature;
@@ -67,7 +68,7 @@ namespace Reni.Context
             int SyntaxObjectId => Syntax.ObjectId;
 
             [EnableDump]
-            string SyntaxText => Syntax.SourcePart.Id;
+            string SyntaxText => Syntax.Syntax.SourcePart.Id;
         }
 
         internal sealed class Cache : DumpableObject, IIconKeyProvider
