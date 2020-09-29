@@ -148,7 +148,7 @@ namespace ReniUI
         internal string Reformat(IFormatter formatter = null, SourcePart targetPart = null) =>
             (formatter ?? new Formatting.Configuration().Create())
             .GetEditPieces(this, targetPart)
-            .Combine(targetPart ?? Syntax.Target.SourcePart);
+            .Combine(Syntax.Target.SourcePart);
 
         internal Helper.Syntax Locate(SourcePart span)
         {
@@ -169,16 +169,13 @@ namespace ReniUI
 
         Reni.TokenClasses.Syntax LocateActivePosition(int offset)
         {
-            NotImplementedMethod(offset);
-
             var token = Token.LocatePosition(Syntax, offset);
             if(token.IsComment || token.IsLineComment)
                 return null;
 
             var tokenSyntax = token.Syntax.Target;
-            var current =
-                tokenSyntax.Token.PrecededWith.SourcePart().Intersect(tokenSyntax.Token.Characters).Position - 1;
-            return current < 0 ? null : tokenSyntax.Option.LocatePosition(current);
+            var position = tokenSyntax.Token.Characters.Position;
+            return position <= 0 ? null : tokenSyntax.Option.LocatePosition(position - 1);
         }
 
         internal string[] DeclarationOptions(int offset)

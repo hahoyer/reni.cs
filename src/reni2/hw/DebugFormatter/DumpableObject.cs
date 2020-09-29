@@ -41,7 +41,7 @@ namespace hw.DebugFormatter
             }
         }
 
-        protected virtual string GetNodeDump() { return GetType().PrettyName(); }
+         protected virtual string GetNodeDump() { return GetType().PrettyName(); }
 
         internal string NodeDumpForDebug()
         {

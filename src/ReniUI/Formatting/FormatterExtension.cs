@@ -22,7 +22,10 @@ namespace ReniUI.Formatting
             var currentPosition = -originalPosition;
             var result = "";
 
-            var edits = pieces.OrderBy(edit => edit.Location.Position).ToArray();
+            var edits = pieces
+                .OrderBy(edit => edit.Location.Position)
+                .Where(edit=> edit.Location.Intersect(targetPart) != null)
+                .ToArray();
             foreach(var edit in edits)
             {
                 Tracer.Assert(edit.Location.EndPosition <= originalEndPosition, "not implemented.");

@@ -8,6 +8,12 @@
   <PropertyGroup>
     <RootNamespace>ReniBrowser</RootNamespace>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\ReniUI\reniUI.csproj">
       <Project>{C339A515-D066-4C12-A4C5-07DA91C19A2C}</Project>

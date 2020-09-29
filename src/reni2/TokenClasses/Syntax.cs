@@ -69,9 +69,6 @@ namespace Reni.TokenClasses
             => TokenClass as IDefaultScopeProvider ?? Option.Parent?.DefaultScopeProvider;
 
         [DisableDump]
-        internal SourcePart SourcePart => Left?.SourcePart + Token.Characters + Right?.SourcePart;
-
-        [DisableDump]
         public string[] DeclarationOptions
             => Option
                 .Declarations
@@ -112,7 +109,10 @@ namespace Reni.TokenClasses
                 .plus(Issues)
                 .plus(Right?.AllIssues);
 
-        internal Syntax Locate(SourcePart part)
+        [DisableDump]
+        internal SourcePart SourcePart => Option.SourcePart;
+
+        Syntax Locate(SourcePart part)
             => Left?.CheckedLocate(part) ??
                Right?.CheckedLocate(part) ??
                this;
@@ -137,15 +137,15 @@ namespace Reni.TokenClasses
                 .Concat(Right.CheckedItemsAsLongAs(condition));
 
 
-        internal Syntax RootOfBelongings(Syntax recent)
+        Syntax RootOfBelongings(Syntax recent)
         {
             if(!(recent.TokenClass is IBelongingsMatcher matcher))
                 return null;
 
-            var sourceSyntaxs = BackChain(recent)
+            var sourceSyntaxList = BackChain(recent)
                 .ToArray();
 
-            return sourceSyntaxs
+            return sourceSyntaxList
                        .Skip(1)
                        .TakeWhile(item => matcher.IsBelongingTo(item.TokenClass))
                        .LastOrDefault() ??
@@ -245,11 +245,37 @@ namespace Reni.TokenClasses
 
         public bool IsEqual(Syntax other, IComparator differenceHandler)
         {
-            if(TokenClass != other.TokenClass)
+            if(TokenClass.Id != other.TokenClass.Id)
                 return false;
 
-            NotImplementedMethod(other, differenceHandler);
-            return false;
+            if(Left == null && other.Left != null)
+                return false;
+
+            if(Left != null && other.Left == null)
+                return false;
+
+            if(Right == null && other.Right != null)
+                return false;
+
+            if(Right != null && other.Right == null)
+                return false;
+
+            if(Left != null && !Left.IsEqual(other.Left,differenceHandler))
+                return false;
+
+            if(Right != null && !Right.IsEqual(other.Right,differenceHandler))
+                return false;
+
+            return CompareWhiteSpaces(Token.PrecededWith, other.Token.PrecededWith, differenceHandler);
+        }
+
+        static bool CompareWhiteSpaces(IEnumerable<IItem> target, IEnumerable<IItem> other, IComparator differenceHandler)
+        {
+            if(target.Where(item=>item.IsComment()).SequenceEqual(other.Where(item=>item.IsComment()), differenceHandler.WhiteSpaceComparer))
+                return true;
+
+            NotImplementedFunction(target.Dump(), other.Dump(), differenceHandler);
+            return default;
         }
 
         static IEnumerable<TValue> T<TValue>(params TValue[] value) => value;

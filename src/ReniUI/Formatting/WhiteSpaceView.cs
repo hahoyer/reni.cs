@@ -43,6 +43,7 @@ namespace ReniUI.Formatting
             Target = target;
             IsSeparatorRequired = isSeparatorRequired;
             Configuration = configuration;
+            Tracer.Assert(!(CommentGroups.Any() && IsSeparatorRequired));
         }
 
         /// <summary>
@@ -50,17 +51,9 @@ namespace ReniUI.Formatting
         ///     The goal is, to change only things necessary to allow editors to work smoothly
         /// </summary>
         /// <returns></returns>
-        IEnumerable<Edit> IEditPieces.Get(EditPieceParameter parameter)
-        {
-            if(CommentGroups.Any())
-            {
-                NotImplementedMethod(parameter);
-                return default;
-            }
-
-            return GetLineBreakEdits(parameter.LineBreakCount)
+        IEnumerable<Edit> IEditPieces.Get(EditPieceParameter parameter) 
+            => GetLineBreakEdits(parameter.LineBreakCount)
                 .Concat(GetSpaceEdits(parameter.LineBreakCount, parameter.IndentCharacterCount));
-        }
 
         bool ISourcePartEdit.HasLines => Target.HasLineComment() || GetTargetLineBreakCount(0) > 0;
 

@@ -4,6 +4,7 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Scanner;
 using hw.UnitTest;
+using Reni;
 
 namespace ReniUI.Test
 {
@@ -61,7 +62,7 @@ system MaxNumber8 +          ;
         [UnitTest]
         public void GetDeclarationOptions()
         {
-            var compiler = CompilerBrowser.FromText(text);
+            var compiler = CompilerBrowser.FromText(text, parameters:new CompilerParameters {ForceDebug = false});
             for(var offset = 1; offset < text.Length; offset++)
             {
                 var position = compiler.Source + offset;

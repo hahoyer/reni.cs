@@ -125,7 +125,7 @@ namespace ReniUI.Formatting
             => !target.WhiteSpaces.HasComment() &&
                SeparatorExtension.Get(target.LeftNeighbor?.TokenClass, target.TokenClass);
 
-        static IEnumerable<TValue> T<TValue>(params TValue[] value) => value;
+        static TValue[] T<TValue>(params TValue[] value) => value;
         static bool True => true;
         static bool False => false;
         bool AdditionalLineBreaksForMultilineItems;

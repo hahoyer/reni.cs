@@ -5,6 +5,12 @@
     <AssemblyName>ReniTest</AssemblyName>
     <TargetTypeEx>CSharp.WinExe</TargetTypeEx>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\ReniUI\reniUI.csproj">
       <Project>{c339a515-d066-4c12-a4c5-07da91c19a2c}</Project>

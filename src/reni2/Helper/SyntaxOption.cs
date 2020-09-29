@@ -1,8 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using hw.Parser;
+using hw.Scanner;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Parser;
@@ -14,32 +15,22 @@ namespace Reni.Helper
 {
     sealed class SyntaxOption : DumpableObject, ValueCache.IContainer
     {
-        [DisableDump]
-        internal IDefaultScopeProvider DefaultScopeProvider => Target.DefaultScopeProvider;
-
         class CacheContainer
         {
-            public SyntaxOption Parent;
             public FunctionCache<int, Syntax> LocatePosition;
+            public SyntaxOption Parent;
         }
-        readonly CacheContainer Cache = new CacheContainer();
 
-        ValueCache ValueCache.IContainer.Cache {get;} = new ValueCache();
+        static IEnumerable<ContextBase> FunctionContexts(ContextBase context, Parser.Value body)
+            => ((FunctionBodyType) context.ResultCache(body).Type)
+                .Functions
+                .Select(item => item.CreateSubContext(false));
+
+        readonly CacheContainer Cache = new CacheContainer();
 
 
         [DisableDump]
         readonly Syntax Target;
-
-        //[Obsolete("",true)]
-        internal SyntaxOption Parent
-        {
-            get => Cache.Parent;
-            set
-            {
-                Tracer.Assert(value == Cache.Parent || Cache.Parent == null);
-                Cache.Parent = value;
-            }
-        }
 
         public SyntaxOption(Syntax target)
         {
@@ -54,36 +45,31 @@ namespace Reni.Helper
             Cache.LocatePosition = new FunctionCache<int, Syntax>(LocatePositionForCache);
         }
 
+        ValueCache ValueCache.IContainer.Cache {get;} = new ValueCache();
+
+        [DisableDump]
+        internal IDefaultScopeProvider DefaultScopeProvider => Target.DefaultScopeProvider;
+
+        //[Obsolete("",true)]
+        internal SyntaxOption Parent
+        {
+            get => Cache.Parent;
+            set
+            {
+                Tracer.Assert(value == Cache.Parent || Cache.Parent == null);
+                Cache.Parent = value;
+            }
+        }
+
 
         [DisableDump]
         internal IEnumerable<Syntax> Items => this.CachedValue(GetItems);
 
-        IEnumerable<Syntax> GetItems()
-        {
-            if(Target.Left != null)
-                foreach(var sourceSyntax in Target.Left.Option.Items)
-                    yield return sourceSyntax;
+        [DisableDump]
+        internal SyntaxOption LeftMost => Target.Left?.Option.LeftMost ?? this;
 
-            yield return Target;
-
-            if(Target.Right != null)
-                foreach(var sourceSyntax in Target.Right.Option.Items)
-                    yield return sourceSyntax;
-        }
-
-        public Syntax LocatePosition(int current) => Cache.LocatePosition[current];
-
-        Syntax LocatePositionForCache(int current)
-            =>
-                Target.Left?.Option.CheckedLocatePosition(current) ??
-                Target.Right?.Option.CheckedLocatePosition(current) ??
-                Target;
-
-        Syntax CheckedLocatePosition(int current)
-            =>
-                Target.SourcePart.Position <= current && current < Target.SourcePart.EndPosition
-                    ? LocatePosition(current)
-                    : null;
+        [DisableDump]
+        internal SyntaxOption RightMost => Target.Right?.Option.RightMost ?? this;
 
         [EnableDumpExcept(null)]
         internal Result<Parser.Value> Value
@@ -97,9 +83,6 @@ namespace Reni.Helper
                     (Target);
             }
         }
-
-        internal Result<Statement[]> GetStatements(List type = null)
-            => (Target.TokenClass as IStatementsProvider)?.Get(type, Target, DefaultScopeProvider);
 
         [EnableDumpExcept(null)]
         internal Result<Statement[]> Statements => GetStatements();
@@ -149,11 +132,6 @@ namespace Reni.Helper
                 return parentContexts;
             }
         }
-
-        static IEnumerable<ContextBase> FunctionContexts(ContextBase context, Parser.Value body)
-            => ((FunctionBodyType) context.ResultCache(body).Type)
-                .Functions
-                .Select(item => item.CreateSubContext(false));
 
         [DisableDump]
         bool IsFunctionLevel => Target.TokenClass is TokenClasses.Function;
@@ -207,6 +185,38 @@ namespace Reni.Helper
                 return null;
             }
         }
+
+        IEnumerable<Syntax> GetItems()
+        {
+            if(Target.Left != null)
+                foreach(var sourceSyntax in Target.Left.Option.Items)
+                    yield return sourceSyntax;
+
+            yield return Target;
+
+            if(Target.Right != null)
+                foreach(var sourceSyntax in Target.Right.Option.Items)
+                    yield return sourceSyntax;
+        }
+
+        public Syntax LocatePosition(int current) => Cache.LocatePosition[current];
+
+        Syntax LocatePositionForCache(int current)
+            =>
+                Target.Left?.Option.CheckedLocatePosition(current) ??
+                Target.Right?.Option.CheckedLocatePosition(current) ??
+                Target;
+
+        Syntax CheckedLocatePosition(int current)
+            =>
+                SourcePart.Position <= current && current < SourcePart.EndPosition
+                    ? LocatePosition(current)
+                    : null;
+
+        internal SourcePart SourcePart => LeftMost.Target.Token.SourcePart().Start.Span(RightMost.Target.Token.Characters.End);
+
+        internal Result<Statement[]> GetStatements(List type = null)
+            => (Target.TokenClass as IStatementsProvider)?.Get(type, Target, DefaultScopeProvider);
 
 
         public bool IsDeclarationPart()

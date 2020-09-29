@@ -23,7 +23,15 @@ namespace Reni.Helper
         internal IEnumerable<IItem> WhiteSpaces => Token.PrecededWith;
 
         [DisableDump]
-        internal SourcePart SourcePart => Target.SourcePart;
+        internal SourcePart SourcePart
+        {
+            get
+            {
+                var l = LeftMost.Token.SourcePart();
+                var r = RightMost.Token.SourcePart();
+                return l.Start.Span(r.End);
+            }
+        }
 
         [EnableDump]
         internal ITokenClass TokenClass => Target.TokenClass;

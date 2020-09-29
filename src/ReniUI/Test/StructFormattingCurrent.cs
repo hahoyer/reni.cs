@@ -17,7 +17,7 @@ namespace ReniUI.Test
 
 bbbbb".SimpleTest(expected: @"aaaaa
 bbbbb",
-            maxLineLength: 10);}
+            maxLineLength: 10, emptyLineLimit:1);}
 
         [Test]
         [UnitTest]
@@ -30,7 +30,9 @@ bbbbb",
             var expectedText =
                 @"{
     aaaaa,
-    label: 6bbbbb
+
+    label:
+        bbbbb
 }"
                     .Replace("\r\n", "\n");
 

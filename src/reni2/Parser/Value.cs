@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
@@ -14,8 +12,6 @@ namespace Reni.Parser
 {
     abstract class Value : DumpableObject
     {
-        internal Syntax Syntax { get; }
-
         // Used for debug only
         [DisableDump]
         [Node("Cache")]
@@ -25,8 +21,10 @@ namespace Reni.Parser
         protected Value(Syntax syntax) => Syntax = syntax;
 
         protected Value(int objectId, Syntax syntax)
-            : base(objectId) 
+            : base(objectId)
             => Syntax = syntax;
+
+        internal Syntax Syntax {get;}
 
         [DisableDump]
         internal virtual bool IsLambda => false;
@@ -34,17 +32,17 @@ namespace Reni.Parser
         [DisableDump]
         internal virtual bool? Hllw => IsLambda ? (bool?) true : null;
 
+        [DisableDump]
+        internal virtual IRecursionHandler RecursionHandler => null;
+
+        public SourcePart SourcePart => Syntax.SourcePart;
+
         //[DebuggerHidden]
         internal virtual Result ResultForCache(ContextBase context, Category category)
         {
             NotImplementedMethod(context, category);
             return null;
         }
-
-        [DisableDump]
-        internal virtual IRecursionHandler RecursionHandler => null;
-
-        internal SourcePart SourcePart => Syntax.SourcePart;
 
         internal void AddToCacheForDebug(ContextBase context, ResultCache cacheItem)
             => ResultCache.Add(context, cacheItem);

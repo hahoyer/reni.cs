@@ -1,4 +1,7 @@
+using System.CodeDom;
+using System.Collections.Generic;
 using hw.DebugFormatter;
+using hw.Scanner;
 using hw.UnitTest;
 using NUnit.Framework;
 using Reni.TokenClasses;
@@ -37,11 +40,46 @@ namespace ReniUI.Test
                 if(reformat != null)
                 {
                     var newCompiler = CompilerBrowser.FromText(reformat);
-                    Tracer.Assert(compiler.Syntax.Target.IsEqual(newCompiler.Syntax.Target, IgnoreWhiteSpaces));
+                    Tracer.Assert(compiler.Syntax.Target.IsEqual(newCompiler.Syntax.Target, IgnoreWhiteSpaces),
+                        ()=>@$"origin: 
+{compiler.Syntax.Target.Dump()} 
+
+new ({span.NodeDump}): 
+{newCompiler.Syntax.Target.Dump()} 
+
+"
+                    );
                 }
             }
         }
     }
 
-    class IgnoreWhiteSpacesComparator : IComparator {}
+    class IgnoreWhiteSpacesComparator : DumpableObject, IComparator, IEqualityComparer<IItem>
+    {
+        IEqualityComparer<IItem> IComparator.WhiteSpaceComparer => this;
+
+        bool IEqualityComparer<IItem>.Equals(IItem target, IItem other)
+        {
+            if(target == null)
+                return other == null;
+
+            if(other == null)
+                return false;
+
+            if(target.ScannerTokenType != other.ScannerTokenType )
+                return false;
+
+            if(target.SourcePart.Id == other.SourcePart.Id)
+                return true;
+
+            NotImplementedFunction(target,other);
+            return default;
+        }
+
+        int IEqualityComparer<IItem>.GetHashCode(IItem target)
+        {
+            NotImplementedFunction(target);
+            return default;
+        }
+    }
 }

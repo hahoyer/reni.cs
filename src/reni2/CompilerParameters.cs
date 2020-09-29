@@ -27,6 +27,7 @@ namespace Reni
 
         public bool ParseOnly;
         public bool RunFromCode;
+        public bool? ForceDebug; 
         [Node]
         [EnableDump]
         public bool ProcessErrors = false;
@@ -53,7 +54,7 @@ namespace Reni
 
             [Node]
             [EnableDump]
-            public bool GeneratorFilePosn;
+            public bool GeneratorFilePosition;
 
             public void None()
             {
@@ -68,7 +69,7 @@ namespace Reni
                 CodeSequence = true;
                 ExecutedCode = true;
                 Functions = true;
-                GeneratorFilePosn = true;
+                GeneratorFilePosition = true;
             }
         }
     }

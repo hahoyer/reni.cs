@@ -24,7 +24,9 @@ namespace ReniUI.Test
             Tracer.Assert(x.Id == "1,3,4,6", x.Dump);
         }
 
+
         [UnitTest]
+        [Test]
         public void CommentFromSourcePart()
         {
             const string text = @"( # Comment

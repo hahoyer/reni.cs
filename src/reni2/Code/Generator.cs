@@ -3,7 +3,6 @@ using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Threading;
 using hw.DebugFormatter;
@@ -23,7 +22,7 @@ namespace Reni.Code
             => (functionId.IsGetter ? "GetFunction" : "SetFunction") + functionId.Index;
 
         internal static string CreateCSharpString
-            (
+        (
             this string moduleName,
             Container main,
             FunctionCache<int, FunctionContainer> functions)
@@ -39,41 +38,49 @@ namespace Reni.Code
             streamWriter.Close();
         }
 
-        internal static Assembly CodeToAssembly(this string codeToString, bool traceFilePosn, bool includeDebugInformation)
+        internal static Assembly CodeToAssembly
+            (this string codeToString, bool traceFilePosition, bool includeDebugInformation)
         {
-            var name =
-                Environment.GetEnvironmentVariable("temp")
-                    + "\\reni.compiler\\"
-                    + Process.GetCurrentProcess().Id
-                    + "." + Thread.CurrentThread.ManagedThreadId
-                    + ".reni.cs";
-            name.ToSmbFile().EnsureDirectoryOfFileExists();
+            var directoryName
+                = Environment.GetEnvironmentVariable
+                      ("temp") +
+                  "\\reni.compiler\\" +
+                  Process.GetCurrentProcess().Id +
+                  "." +
+                  Thread.CurrentThread.ManagedThreadId;
+            directoryName.ToSmbFile().EnsureIsExistentDirectory();
+            //nameof(directoryName).IsSetTo(directoryName).WriteLine();
+            var name = directoryName + ".reni.cs";
+            name.ToSmbFile().CheckedEnsureDirectoryOfFileExists();
 
-            CodeToFile(name, codeToString, traceFilePosn);
+            CodeToFile(name, codeToString, traceFilePosition);
 
             // Build the parameters for source compilation.
             var cp = new System.CodeDom.Compiler.CompilerParameters
             {
                 GenerateInMemory = true,
-                CompilerOptions = "/unsafe /debug",
+                CompilerOptions = "/unsafe",
                 IncludeDebugInformation = includeDebugInformation,
-                TempFiles = new TempFileCollection(null, false)
+                TempFiles = new TempFileCollection(directoryName, false)
             };
             var referencedAssemblies
-                = new[]
-                {
+                = T
+                (
                     Assembly.GetAssembly(typeof(Generator)).Location,
-                    Assembly.GetAssembly(typeof(hw.Helper.SmbFile)).Location
-                };
+                    Assembly.GetAssembly(typeof(SmbFile)).Location
+                );
             cp.ReferencedAssemblies.AddRange(referencedAssemblies);
             var cr = _provider.CompileAssemblyFromFile(cp, name);
+
+            if(!includeDebugInformation)
+                directoryName.ToSmbFile().Delete(true);
 
             if(cr.Errors.Count > 0)
                 HandleErrors(cr.Errors);
 
             return cr.CompiledAssembly;
         }
-                                                                            
+
         internal static void HandleErrors(CompilerErrorCollection cr)
         {
             for(var i = 0; i < cr.Count; i++)
@@ -81,25 +88,24 @@ namespace Reni.Code
 
             throw new CSharpCompilerErrorException(cr);
         }
+
+        static TValue[] T<TValue>(params TValue[] value) => value;
     }
 
     sealed class CSharpCompilerErrorException : Exception
     {
-        public CompilerErrorCollection CompilerErrorCollection { get; }
+        public CSharpCompilerErrorException(CompilerErrorCollection cr) => CompilerErrorCollection = cr;
 
-        public CSharpCompilerErrorException(CompilerErrorCollection cr)
-        {
-            CompilerErrorCollection = cr;
-        }
+        public CompilerErrorCollection CompilerErrorCollection {get;}
     }
 
 // ReSharper disable InconsistentNaming
     partial class CSharp_Generated
 // ReSharper restore InconsistentNaming
     {
-        readonly string ModuleName;
-        readonly Container _main;
         readonly FunctionCache<int, FunctionContainer> _functions;
+        readonly Container _main;
+        readonly string ModuleName;
 
         internal CSharp_Generated
             (string moduleName, Container main, FunctionCache<int, FunctionContainer> functions)

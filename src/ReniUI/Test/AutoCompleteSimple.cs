@@ -2,6 +2,7 @@ using hw.DebugFormatter;
 using hw.Scanner;
 using hw.UnitTest;
 using NUnit.Framework;
+using Reni;
 
 namespace ReniUI.Test
 {
@@ -23,7 +24,7 @@ namespace ReniUI.Test
         [Test]
         public void GetDeclarationOptions()
         {
-            var compiler = CompilerBrowser.FromText(text);
+            var compiler = CompilerBrowser.FromText(text,new CompilerParameters {ForceDebug = false});
             for(var i = 0; i < text.Length; i++)
             {
                 var offset = text.Length - i - 1;
