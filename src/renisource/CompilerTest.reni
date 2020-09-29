@@ -1,29 +1,30 @@
-! mix_in: System;
+!mix_in: System;
 
-! non_public name: /!\ string("name");
+!non_public name: /!\ string("name");
 
-CompilerTest: /\
-(
-    ! non_public file: TextFile(name);
-    file data := ^;
-    compiler: Compiler(name);
-);
-
-Check: /\
-(
-    text: string(^ text);
-    expectedResult: string(^ expectedResult);
-
-    ct: CompilerTest(text);
-
-    co: ct Compiler;
-    result: co Execute();
-
-    result data != expectedResult then
+CompilerTest:
+    /\
     (
-        dd("Text: " << System NewLine << text << System NewLine);
-        d(expectedResult);
-        dd("c++ code:" << System NewLine << co cppCode << System NewLine);
-        a_fail_throw_;
+        !non_public file: TextFile(name);
+        file data := ^;
+        compiler: Compiler(name);
+    );
+
+Check:
+    /\
+    (
+        text: string(^ text);
+        expectedResult: string(^ expectedResult);
+        ct: CompilerTest(text);
+        co: ct Compiler;
+        result: co Execute();
+
+        result data != expectedResult
+        then
+        (
+            dd("Text: " << System NewLine << text << System NewLine);
+            d(expectedResult);
+            dd("c++ code:" << System NewLine << co cppCode << System NewLine);
+            a_fail_throw_;
+        )
     )
-)
