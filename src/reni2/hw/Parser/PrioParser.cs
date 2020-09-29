@@ -7,7 +7,7 @@ using hw.Scanner;
 namespace hw.Parser
 {
     public sealed partial class PrioParser<TSourcePart> : DumpableObject, IParser<TSourcePart>
-        where TSourcePart : class, ISourcePartProxy
+        where TSourcePart : class
     {
         readonly PrioTable PrioTable;
         readonly IScanner Scanner;

@@ -186,6 +186,9 @@ namespace Reni.Helper
             }
         }
 
+        internal SourcePart SourcePart =>
+            LeftMost.Target.Token.SourcePart().Start.Span(RightMost.Target.Token.Characters.End);
+
         IEnumerable<Syntax> GetItems()
         {
             if(Target.Left != null)
@@ -213,8 +216,6 @@ namespace Reni.Helper
                     ? LocatePosition(current)
                     : null;
 
-        internal SourcePart SourcePart => LeftMost.Target.Token.SourcePart().Start.Span(RightMost.Target.Token.Characters.End);
-
         internal Result<Statement[]> GetStatements(List type = null)
             => (Target.TokenClass as IStatementsProvider)?.Get(type, Target, DefaultScopeProvider);
 
@@ -225,18 +226,15 @@ namespace Reni.Helper
             if(parentTokenClass is Colon)
                 return Parent.Target.Left == Target;
 
-            if(parentTokenClass is LeftParenthesis ||
-               parentTokenClass is Definable ||
-               parentTokenClass is ThenToken ||
-               parentTokenClass is List ||
-               parentTokenClass is TokenClasses.Function ||
-               parentTokenClass is TypeOperator ||
-               parentTokenClass is ElseToken ||
-               parentTokenClass is ScannerSyntaxError)
-                return false;
-
-            Tracer.FlaggedLine(nameof(Target) + "=" + Target);
-            return false;
+            return (parentTokenClass is LeftParenthesis ||
+                    parentTokenClass is Definable ||
+                    parentTokenClass is ThenToken ||
+                    parentTokenClass is List ||
+                    parentTokenClass is TokenClasses.Function ||
+                    parentTokenClass is TypeOperator ||
+                    parentTokenClass is ElseToken ||
+                    parentTokenClass is ScannerSyntaxError) &&
+                   false;
         }
     }
 }

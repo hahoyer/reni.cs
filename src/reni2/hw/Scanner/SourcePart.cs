@@ -9,7 +9,7 @@ using JetBrains.Annotations;
 namespace hw.Scanner
 {
     [DebuggerDisplay("{NodeDump}")]
-    public sealed class SourcePart : Dumpable, IAggregateable<SourcePart>, ISourcePartProxy
+    public sealed class SourcePart : Dumpable, IAggregateable<SourcePart>
     {
         SourcePart(Source source, int position, int length)
         {
@@ -177,8 +177,6 @@ namespace hw.Scanner
 
             yield return currentValue;
         }
-
-        SourcePart ISourcePartProxy.All => this;
 
         public static bool operator !=(SourcePart left, SourcePart right) => !(left == right);
 

@@ -11,7 +11,7 @@ namespace hw.Parser
     /// </summary>
     /// <typeparam name="TTreeItem"></typeparam>
     public sealed class CachingTokenFactory<TTreeItem> : Dumpable, ITokenFactory<TTreeItem>
-        where TTreeItem : class, ISourcePartProxy
+        where TTreeItem : class
     {
         readonly ValueCache<IParserTokenType<TTreeItem>> BeginOfTextCache;
         readonly ValueCache<LexerItem[]> ClassesCache;

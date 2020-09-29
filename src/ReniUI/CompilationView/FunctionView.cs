@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using hw.Scanner;
 using Reni.Struct;
 
@@ -12,9 +9,9 @@ namespace ReniUI.CompilationView
             : base(master, "Function: " + item.NodeDump)
         {
             Client = item.CreateView(Master);
-            Source = item.Body.SourcePart;
+            SourcePart = item.Body.Syntax.SourcePart;
         }
 
-        protected override SourcePart Source { get; }
+        protected override SourcePart SourcePart {get;}
     }
 }

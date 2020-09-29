@@ -10,6 +10,9 @@ using Reni.Type;
 
 namespace Reni.Parser
 {
+    /// <summary>
+    /// Static syntax items that represent a value
+    /// </summary>
     abstract class Value : DumpableObject
     {
         // Used for debug only
@@ -34,8 +37,6 @@ namespace Reni.Parser
 
         [DisableDump]
         internal virtual IRecursionHandler RecursionHandler => null;
-
-        public SourcePart SourcePart => Syntax.SourcePart;
 
         //[DebuggerHidden]
         internal virtual Result ResultForCache(ContextBase context, Category category)

@@ -9,7 +9,7 @@ namespace hw.Parser
         : ScannerTokenType<TTreeItem>,
             IUniqueIdProvider,
             IParserTokenType<TTreeItem>
-        where TTreeItem : class, ISourcePartProxy
+        where TTreeItem : class
     {
         TTreeItem IParserTokenType<TTreeItem>.Create(TTreeItem left, IToken token, TTreeItem right) 
             => Create(left, token, right);

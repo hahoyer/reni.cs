@@ -13,11 +13,11 @@ namespace hw.Parser
         string IScannerTokenType.Id => GetType().PrettyName();
 
         protected abstract IParserTokenType<TSourcePart> GetParserTokenType<TSourcePart>(string id)
-            where TSourcePart : class, ISourcePartProxy;
+            where TSourcePart : class;
     }
 
     public abstract class ScannerTokenType<TSourcePart> : ScannerTokenType
-        where TSourcePart : class, ISourcePartProxy
+        where TSourcePart : class
     {
         protected sealed override IParserTokenType<TSourcePartTarget> GetParserTokenType<TSourcePartTarget>
             (string id)

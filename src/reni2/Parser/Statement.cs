@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-using Reni.Code;
 using Reni.TokenClasses;
 
 namespace Reni.Parser
@@ -13,11 +11,11 @@ namespace Reni.Parser
             => Create(value, container).Convert(x => new[] {x});
 
         internal static Result<Statement> Create(Result<Value> value, IDefaultScopeProvider container)
-            => value.Convert(x => new Statement(null, null, x,container));
+            => value.Convert(x => new Statement(null, null, x, container));
 
         internal static Result<Statement> Create
             (IDeclarationTag[] tags, Definable target, Result<Value> body, IDefaultScopeProvider container)
-            => body.Convert(x => new Statement(tags, target, x,container));
+            => body.Convert(x => new Statement(tags, target, x, container));
 
         Statement(IDeclarationTag[] tags, Definable target, Value body, IDefaultScopeProvider container)
         {
@@ -28,20 +26,16 @@ namespace Reni.Parser
             StopByObjectIds();
         }
 
-        public Statement Visit(ISyntaxVisitor visitor)
-        {
-            var newBody = Body.Visit(visitor);
-            return newBody == null ? this : new Statement(Tags, Target, newBody, Container);
-        }
+        [EnableDump]
+        IDeclarationTag[] Tags {get;}
 
         [EnableDump]
-        IDeclarationTag[] Tags { get; }
-        [EnableDump]
-        Definable Target { get; }
-        [EnableDump]
-        internal Value Body { get; }
+        Definable Target {get;}
 
-        IDefaultScopeProvider Container { get; }
+        [EnableDump]
+        internal Value Body {get;}
+
+        IDefaultScopeProvider Container {get;}
 
         string Name => Target?.Id;
 
@@ -69,9 +63,15 @@ namespace Reni.Parser
             }
         }
 
+        public Statement Visit(ISyntaxVisitor visitor)
+        {
+            var newBody = Body.Visit(visitor);
+            return newBody == null ? this : new Statement(Tags, Target, newBody, Container);
+        }
+
         protected override string GetNodeDump()
             => base.GetNodeDump() +
-            (Name == null ? "" : "(" + Name + ")");
+               (Name == null ? "" : "(" + Name + ")");
 
         internal IEnumerable<string> GetAllDeclarations()
         {
@@ -84,11 +84,10 @@ namespace Reni.Parser
             if(Target != null && IsPublicSyntax)
                 yield return Target.Id;
         }
-
     }
 
     interface IDefaultScopeProvider
     {
-        bool MeansPublic { get; }
+        bool MeansPublic {get;}
     }
 }

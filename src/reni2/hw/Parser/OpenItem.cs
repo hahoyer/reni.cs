@@ -8,7 +8,7 @@ using hw.Scanner;
 namespace hw.Parser
 {
     public sealed class OpenItem<TTreeItem> : DumpableObject
-        where TTreeItem : class, ISourcePartProxy
+        where TTreeItem : class
     {
         internal readonly IToken Token;
         internal readonly TTreeItem Left;

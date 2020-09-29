@@ -8,7 +8,7 @@ using hw.Scanner;
 namespace hw.Parser
 {
     abstract class GenericTokenFactory<TSourcePart> : PredefinedTokenFactory<TSourcePart>
-        where TSourcePart : class, ISourcePartProxy
+        where TSourcePart : class
     {
         [EnableDump]
         readonly string Title;

@@ -33,6 +33,6 @@ namespace hw.Scanner
     public interface IParserTokenFactory
     {
         IParserTokenType<TSourcePart> GetTokenType<TSourcePart>(string id)
-            where TSourcePart : class, ISourcePartProxy;
+            where TSourcePart : class;
     }
 }

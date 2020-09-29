@@ -6,7 +6,7 @@ using hw.Scanner;
 namespace hw.Parser
 {
     abstract class PredefinedTokenFactory<TSourcePart> : ScannerTokenType<TSourcePart>
-        where TSourcePart : class, ISourcePartProxy
+        where TSourcePart : class
     {
         readonly ValueCache<FunctionCache<string, IParserTokenType<TSourcePart>>>
             PredefinedTokenClassesCache;

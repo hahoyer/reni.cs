@@ -8,7 +8,7 @@ using hw.Scanner;
 namespace hw.Parser
 {
     public class Compiler<TSourcePart> : DumpableObject
-        where TSourcePart : class, ISourcePartProxy
+        where TSourcePart : class
     {
         sealed class ComponentData : DumpableObject
         {
