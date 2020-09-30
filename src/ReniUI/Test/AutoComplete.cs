@@ -62,7 +62,7 @@ system MaxNumber8 +          ;
         [UnitTest]
         public void GetDeclarationOptions()
         {
-            var compiler = CompilerBrowser.FromText(text, parameters:new CompilerParameters {ForceDebug = false});
+            var compiler = CompilerBrowser.FromText(text);
             for(var offset = 1; offset < text.Length; offset++)
             {
                 var position = compiler.Source + offset;

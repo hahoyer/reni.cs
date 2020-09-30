@@ -24,7 +24,7 @@ namespace ReniUI.Test
         [Test]
         public void GetDeclarationOptions()
         {
-            var compiler = CompilerBrowser.FromText(text,new CompilerParameters {ForceDebug = false});
+            var compiler = CompilerBrowser.FromText(text);
             for(var i = 0; i < text.Length; i++)
             {
                 var offset = text.Length - i - 1;

@@ -199,7 +199,7 @@ namespace Reni
             {
                 try
                 {
-                    var includeDebugInformation = Parameters.ForceDebug ?? Debugger.IsAttached;
+                    var includeDebugInformation = Parameters.DebuggableGeneratedCode ?? Debugger.IsAttached;
                     return CSharpString
                         .CodeToAssembly
                         (Parameters.TraceOptions.GeneratorFilePosition, includeDebugInformation)

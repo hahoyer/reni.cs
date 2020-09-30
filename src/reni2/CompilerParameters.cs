@@ -61,7 +61,7 @@ namespace Reni
         [EnableDump]
         public readonly TraceOptionsClass TraceOptions = new TraceOptionsClass();
 
-        public bool? ForceDebug;
+        public bool? DebuggableGeneratedCode = false;
 
         public IOutStream OutStream;
 
