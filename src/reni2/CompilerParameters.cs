@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using hw.DebugFormatter;
-
 
 namespace Reni
 {
@@ -11,30 +8,7 @@ namespace Reni
     /// </summary>
     public sealed class CompilerParameters : Attribute
     {
-        internal static CompilerParameters CreateTraceAll()
-        {
-            var result = new CompilerParameters();
-            result.TraceOptions.UseOnModeErrorFocus();
-            return result;
-        }
-
-        /// <summary>
-        ///     Shows or hides syntax tree
-        /// </summary>
-        [Node]
-        [EnableDump]
-        public readonly TraceOptionsClass TraceOptions = new TraceOptionsClass();
-
-        public bool ParseOnly;
-        public bool RunFromCode;
-        public bool? ForceDebug; 
-        [Node]
-        [EnableDump]
-        public bool ProcessErrors = false;
-
-        public IOutStream OutStream;
-
-        public sealed class TraceOptionsClass 
+        public sealed class TraceOptionsClass
         {
             [Node]
             [EnableDump]
@@ -50,11 +24,11 @@ namespace Reni
 
             [Node]
             [EnableDump]
-            public bool Parser;
+            public bool GeneratorFilePosition;
 
             [Node]
             [EnableDump]
-            public bool GeneratorFilePosition;
+            public bool Parser;
 
             public void None()
             {
@@ -72,15 +46,38 @@ namespace Reni
                 GeneratorFilePosition = true;
             }
         }
+
+        internal static CompilerParameters CreateTraceAll()
+        {
+            var result = new CompilerParameters();
+            result.TraceOptions.UseOnModeErrorFocus();
+            return result;
+        }
+
+        /// <summary>
+        ///     Shows or hides syntax tree
+        /// </summary>
+        [Node]
+        [EnableDump]
+        public readonly TraceOptionsClass TraceOptions = new TraceOptionsClass();
+
+        public bool? ForceDebug;
+
+        public IOutStream OutStream;
+
+        public bool ParseOnly;
+
+        [Node]
+        [EnableDump]
+        public bool ProcessErrors;
+
+        public bool RunFromCode;
     }
 
     public class NodeAttribute : Attribute
     {
-        private string v;
+        string v;
 
-        public NodeAttribute(string v=null)
-        {
-            this.v = v;
-        }
+        public NodeAttribute(string v = null) => this.v = v;
     }
 }
