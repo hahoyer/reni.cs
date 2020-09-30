@@ -51,7 +51,7 @@ namespace Reni.Validation
             get
             {
                 var result = Position.Id == "("
-                    ? Position.Start.FilePosn(Tag) + " Functional"
+                    ? Position.Start.FilePosition(Tag) + " Functional"
                     : Position.FileErrorPosition(Tag);
                 if(string.IsNullOrWhiteSpace(Message))
                     return result;

@@ -1,6 +1,5 @@
 using System;
 using System.CodeDom.Compiler;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -33,7 +32,7 @@ namespace Reni.Code
             var streamWriter = new StreamWriter(name);
             if(traceFilePosn)
                 Tracer.Line
-                    (Tracer.FilePosn(name.ToSmbFile().FullName, 0, 0, FilePositionTag.Debug));
+                    (Tracer.FilePosition(name.ToSmbFile().FullName, 0, 0, FilePositionTag.Debug));
             streamWriter.Write(result);
             streamWriter.Close();
         }

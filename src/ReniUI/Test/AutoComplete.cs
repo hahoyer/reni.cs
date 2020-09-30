@@ -10,7 +10,7 @@ namespace ReniUI.Test
 {
     [UnitTest]
     [AutoCompleteFunctionInCompound]
-    public sealed class AutoComplete : DependantAttribute
+    public sealed class AutoComplete : DependenceProvider
     {
         const string text = @"systemdata: 
 {

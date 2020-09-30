@@ -10,7 +10,7 @@ namespace ReniUI.Test
 {
     [UnitTest]
     [UserInterAction]
-    public sealed class UserInterAction3 : DependantAttribute
+    public sealed class UserInterAction3 : DependenceProvider
     {
         const string Text = @"   !mutable FreePointer: Memory array_reference mutable;";
         const string Type = @"wwwkkkkkkkkwiiiiiiiiiiikwiiiiiiwiiiiiiiiiiiiiiiwiiiiiiik";

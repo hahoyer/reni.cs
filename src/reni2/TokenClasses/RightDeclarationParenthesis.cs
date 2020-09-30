@@ -2,7 +2,6 @@
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
-using hw.Scanner;
 using Reni.Parser;
 using Reni.Validation;
 

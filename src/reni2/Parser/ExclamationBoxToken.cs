@@ -1,6 +1,5 @@
 ﻿using hw.DebugFormatter;
 using hw.Parser;
-using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.TokenClasses;
 using Reni.Validation;

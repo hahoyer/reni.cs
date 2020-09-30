@@ -21,11 +21,6 @@
 
 #endregion
 
-using System.Linq;
-using System.Collections.Generic;
-using System;
-using hw.DebugFormatter;
-
 namespace Reni.Code
 {
     /// <summary>

@@ -9,7 +9,7 @@ namespace ReniUI.Test
 {
     [UnitTest]
     [AutoCompleteSimple]
-    public sealed class AutoCompleteFunctionInCompound : DependantAttribute
+    public sealed class AutoCompleteFunctionInCompound : DependenceProvider
     {
         const string text = @"
     NewMemory: /\

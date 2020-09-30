@@ -8,7 +8,7 @@ using Reni;
 namespace ReniUI.Test
 {
     [UnitTest]
-    public sealed class ThenElseMatching : DependantAttribute
+    public sealed class ThenElseMatching : DependenceProvider
     {
         [UnitTest]
         public void Matching()

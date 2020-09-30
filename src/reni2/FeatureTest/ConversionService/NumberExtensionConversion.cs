@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.UnitTest;
@@ -9,7 +7,7 @@ using Reni.Type;
 namespace Reni.FeatureTest.ConversionService
 {
     [UnitTest]
-    public sealed class NumberExtensionConversion : DependantAttribute
+    public sealed class NumberExtensionConversion : DependenceProvider
     {
         [UnitTest]
         public void Run4to8Forced()

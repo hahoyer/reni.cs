@@ -6,7 +6,7 @@ namespace ReniUI.Test
 {
     [UnitTest]
     [TestFixture]
-    public sealed class ExpressionFormatting : DependantAttribute
+    public sealed class ExpressionFormatting : DependenceProvider
     {
         [UnitTest]
         public void FromSourcePart()

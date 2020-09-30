@@ -8,7 +8,7 @@ using hw.UnitTest;
 namespace ReniUI.Test
 {
     [UnitTest]
-    public sealed class BadUserInterAction : DependantAttribute
+    public sealed class BadUserInterAction : DependenceProvider
     {
         const string text = @"systemdata:
 { 1 type instance

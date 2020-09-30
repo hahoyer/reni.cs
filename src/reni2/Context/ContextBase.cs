@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Feature;
@@ -29,7 +28,7 @@ namespace Reni.Context
         {
             static int NextObjectId;
 
-            [EnableDumpExcept(exception: false)]
+            [EnableDumpExcept(false)]
             readonly bool AsReference;
 
             internal readonly ContextBase Context;

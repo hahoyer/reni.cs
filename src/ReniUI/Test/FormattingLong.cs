@@ -11,7 +11,7 @@ namespace ReniUI.Test
     [UnitTest]
     [TestFixture]
     [LowPriority]
-    public sealed class FormattingLong : DependantAttribute
+    public sealed class FormattingLong : DependenceProvider
     {
         static readonly IComparator IgnoreWhiteSpaces = new IgnoreWhiteSpacesComparator();
 

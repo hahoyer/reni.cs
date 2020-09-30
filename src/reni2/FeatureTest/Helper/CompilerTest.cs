@@ -14,7 +14,7 @@ namespace Reni.FeatureTest.Helper
     ///     Helper class for unittests, that compile something
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
-    public abstract class CompilerTest : DependantAttribute, ITestFixture
+    public abstract class CompilerTest : DependenceProvider, ITestFixture
     {
         internal readonly CompilerParameters Parameters;
 

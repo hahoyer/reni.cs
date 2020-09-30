@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using hw.Parser;
 using hw.Scanner;
 using Reni;
 using Reni.Code;
@@ -19,24 +18,11 @@ namespace ReniUI
     {
         class CacheContainer
         {
-            internal Syntax FomattingSyntax;
+            internal Syntax FormattingSyntax;
             internal Helper.Syntax HelperSyntax;
         }
 
         readonly CacheContainer Cache = new CacheContainer();
-
-
-        public static CompilerBrowser FromText
-            (string text, CompilerParameters parameters, string sourceIdentifier = null)
-            => new CompilerBrowser(() => Compiler.FromText(text, parameters, sourceIdentifier));
-
-        public static CompilerBrowser FromText
-            (string text, string sourceIdentifier = null)
-            => new CompilerBrowser(() => Compiler.FromText(text, null, sourceIdentifier));
-
-        public static CompilerBrowser FromFile
-            (string fileName, CompilerParameters parameters = null)
-            => new CompilerBrowser(() => Compiler.FromFile(fileName, parameters));
 
         readonly IDictionary<IFormalCodeItem, int> CodeToFunctionIndexCache =
             new Dictionary<IFormalCodeItem, int>();
@@ -49,10 +35,6 @@ namespace ReniUI
 
         public Compiler Compiler => ParentCache.Value;
 
-        internal IExecutionContext ExecutionContext => Compiler;
-
-        internal IEnumerable<Issue> Issues => Compiler.Issues;
-
         public StringStream Result
         {
             get
@@ -64,28 +46,39 @@ namespace ReniUI
             }
         }
 
-        internal Syntax FormattingSyntax 
-            => Cache.FomattingSyntax ?? (Cache.FomattingSyntax = new Syntax(Compiler.Syntax));
+        internal IExecutionContext ExecutionContext => Compiler;
+
+        internal IEnumerable<Issue> Issues => Compiler.Issues;
+
+        internal Syntax FormattingSyntax
+            => Cache.FormattingSyntax ?? (Cache.FormattingSyntax = new Syntax(Compiler.Syntax));
 
         internal Helper.Syntax Syntax => Cache.HelperSyntax ?? (Cache.HelperSyntax = GetHelperSyntax());
 
-        Helper.Syntax GetHelperSyntax()
-        {
-            try
-            {
-                return new Helper.Syntax(Compiler.Syntax);
-            }
-            catch(Exception e)
-            {
-                $"Syntax: Unexpected {e} \nText:\n{Source.Data}".WriteLine();
-                throw;
-            }
 
-            ;
-        }
+        public static CompilerBrowser FromText
+            (string text, CompilerParameters parameters, string sourceIdentifier = null)
+            => new CompilerBrowser(() => Compiler.FromText(text, parameters, sourceIdentifier));
+
+        public static CompilerBrowser FromText(string text, string sourceIdentifier = null)
+            => new CompilerBrowser(() => Compiler.FromText(text, null, sourceIdentifier));
+
+        public static CompilerBrowser FromFile(string fileName, CompilerParameters parameters = null)
+            => new CompilerBrowser(() => Compiler.FromFile(fileName, parameters));
 
         public Token LocatePosition(int offset)
             => Token.LocatePosition(Syntax, offset);
+
+        public Token LocatePosition(SourcePosition current)
+        {
+            Tracer.Assert(current.Source == Source);
+            return LocatePosition(current.Position);
+        }
+
+        public IEnumerable<SourcePart> FindAllBelongings(Token open) => open.FindAllBelongings(this);
+
+        public string FlatFormat(bool areEmptyLinesPossible)
+            => FormattingSyntax.FlatFormat(areEmptyLinesPossible);
 
         internal IEnumerable<Value> FindPosition(int offset)
         {
@@ -100,12 +93,6 @@ namespace ReniUI
             return compileSyntaxs;
         }
 
-        public Token LocatePosition(SourcePosn current)
-        {
-            Tracer.Assert(current.Source == Source);
-            return LocatePosition(current.Position);
-        }
-
         internal FunctionType Function(int index)
             => Compiler.Root.Function(index);
 
@@ -114,7 +101,7 @@ namespace ReniUI
         {
             var result = FindFunctionIndex(codeBase);
             return result == null
-                ? (object) Compiler.CodeContainer.Main.Data
+                ? (object)Compiler.CodeContainer.Main.Data
                 : Function(result.Value);
         }
 
@@ -165,7 +152,30 @@ namespace ReniUI
 
         internal void Execute(DataStack dataStack) => Compiler.ExecuteFromCode(dataStack);
 
-        public IEnumerable<SourcePart> FindAllBelongings(Token open) => open.FindAllBelongings(this);
+        internal string[] DeclarationOptions(int offset)
+        {
+            Ensure();
+            return LocateActivePosition(offset)?.DeclarationOptions ?? new string[0];
+        }
+
+        internal IEnumerable<Edit> GetEditPieces(SourcePart sourcePart, IFormatter formatter = null)
+            => (formatter ?? new Formatting.Configuration().Create())
+                .GetEditPieces(this, sourcePart);
+
+        Helper.Syntax GetHelperSyntax()
+        {
+            try
+            {
+                return new Helper.Syntax(Compiler.Syntax);
+            }
+            catch(Exception e)
+            {
+                $"Syntax: Unexpected {e} \nText:\n{Source.Data}".Log();
+                throw;
+            }
+
+            ;
+        }
 
         Reni.TokenClasses.Syntax LocateActivePosition(int offset)
         {
@@ -175,21 +185,7 @@ namespace ReniUI
 
             var tokenSyntax = token.Syntax.Target;
             var position = tokenSyntax.Token.Characters.Position;
-            return position <= 0 ? null : tokenSyntax.Option.LocatePosition(position - 1);
+            return position <= 0? null : tokenSyntax.Option.LocatePosition(position - 1);
         }
-
-        internal string[] DeclarationOptions(int offset)
-        {
-            Ensure();
-            return LocateActivePosition(offset)?.DeclarationOptions ?? new string[0];
-        }
-
-        internal IEnumerable<Edit> GetEditPieces
-            (SourcePart sourcePart, IFormatter formatter = null)
-            => (formatter ?? new Formatting.Configuration().Create())
-                .GetEditPieces(this, sourcePart);
-
-        public string FlatFormat(bool areEmptyLinesPossible) 
-            => FormattingSyntax.FlatFormat( areEmptyLinesPossible);
     }
 }

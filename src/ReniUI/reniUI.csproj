@@ -75,10 +75,19 @@
     <Compile Include="hw\Forms\NodeNameAttribute.cs" />
     <Compile Include="hw\Forms\PositionConfig.cs" />
     <Compile Include="hw\Forms\SmartNodeAttribute.cs" />
-    <Compile Include="hw\Forms\TreeForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="hw\Forms\TreeForm.cs" />
     <Compile Include="hw\Forms\TreeForm.Designer.cs" />
+    <Compile Include="hw\Graphics\IGraphTarget.cs" />
+    <Compile Include="hw\Graphics\SVG\Circle.cs" />
+    <Compile Include="hw\Graphics\SVG\Content.cs" />
+    <Compile Include="hw\Graphics\SVG\Path.cs" />
+    <Compile Include="hw\Graphics\SVG\Rect.cs" />
+    <Compile Include="hw\Graphics\SVG\Root.cs" />
+    <Compile Include="hw\Graphics\SVG\SVG.cs" />
+    <Compile Include="hw\Graphics\SVG\SyntaxDrawer.cs" />
+    <Compile Include="hw\Graphics\SVG\Text.cs" />
+    <Compile Include="hw\Graphics\Syntax.cs" />
+    <Compile Include="hw\Graphics\SyntaxDrawer.cs" />
     <Compile Include="StudioApplication.cs" />
     <Compile Include="AssemblyInfo.cs">
       <DependentUpon>AssemblyInfo.tt</DependentUpon>
@@ -123,17 +132,6 @@
     <Compile Include="Formatting\IFormatter.cs" />
     <Compile Include="Formatting\NewWhiteSpace.cs" />
     <Compile Include="Formatting\SeparatorType.cs" />
-    <Compile Include="hw\Graphics\IGraphTarget.cs" />
-    <Compile Include="hw\Graphics\SVG\Circle.cs" />
-    <Compile Include="hw\Graphics\SVG\Content.cs" />
-    <Compile Include="hw\Graphics\SVG\Path.cs" />
-    <Compile Include="hw\Graphics\SVG\Rect.cs" />
-    <Compile Include="hw\Graphics\SVG\Root.cs" />
-    <Compile Include="hw\Graphics\SVG\SVG.cs" />
-    <Compile Include="hw\Graphics\SVG\SyntaxDrawer.cs" />
-    <Compile Include="hw\Graphics\SVG\Text.cs" />
-    <Compile Include="hw\Graphics\Syntax.cs" />
-    <Compile Include="hw\Graphics\SyntaxDrawer.cs" />
     <Compile Include="IApplication.cs" />
     <Compile Include="IssuesView.cs" />
     <Compile Include="IStudioApplication.cs" />
@@ -182,7 +180,6 @@
   <ItemGroup>
     <EmbeddedResource Include="hw\Forms\TreeForm.resx" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="sys.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

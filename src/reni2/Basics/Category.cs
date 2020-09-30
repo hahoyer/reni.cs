@@ -8,7 +8,7 @@ namespace Reni.Basics
     [Dump(name: "Dump")]
     sealed class Category : DumpableObject, IEquatable<Category>
     {
-        static readonly Category[] _cache = new Category[32];
+        static readonly Category[] Cache = new Category[32];
 
         Category(bool hllw, bool size, bool type, bool code, bool exts)
             : base(nextObjectId: null)
@@ -132,10 +132,10 @@ namespace Reni.Basics
         internal static Category CreateCategory
             (bool hllw = false, bool size = false, bool type = false, bool code = false, bool exts = false)
         {
-            var result = _cache[IndexFromBool(hllw, size, type, code, exts)];
+            var result = Cache[IndexFromBool(hllw, size, type, code, exts)];
             if(result != null)
                 return result;
-            return _cache[IndexFromBool(hllw, size, type, code, exts)] = new Category(hllw, size, type, code, exts);
+            return Cache[IndexFromBool(hllw, size, type, code, exts)] = new Category(hllw, size, type, code, exts);
         }
 
         static int IndexFromBool(params bool[] data)

@@ -7,12 +7,12 @@ namespace ReniUI.Formatting
 {
     sealed class EmptyWhiteSpaceView : DumpableObject, ISourcePartEdit, IEditPieces
     {
-        readonly SourcePosn Anchor;
+        readonly SourcePosition Anchor;
         readonly bool IsSeparatorRequired;
 
         internal EmptyWhiteSpaceView
         (
-            SourcePosn anchor,
+            SourcePosition anchor,
             bool isSeparatorRequired)
         {
             Anchor = anchor;

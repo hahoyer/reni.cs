@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using hw.DebugFormatter;
 using hw.Helper;
-using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Struct;

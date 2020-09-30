@@ -5,7 +5,7 @@ using hw.UnitTest;
 
 namespace ReniUI.Test{
     [UnitTest]
-    public sealed class ListMatching : DependantAttribute
+    public sealed class ListMatching : DependenceProvider
     {
         [UnitTest]
         public void Matching()

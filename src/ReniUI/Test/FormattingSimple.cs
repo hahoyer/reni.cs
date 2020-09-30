@@ -11,7 +11,7 @@ namespace ReniUI.Test
     [UnitTest]
     [TestFixture]
     [StructFormattingCurrent]
-    public sealed class FormattingSimple : DependantAttribute
+    public sealed class FormattingSimple : DependenceProvider
     {
 
         [Test]

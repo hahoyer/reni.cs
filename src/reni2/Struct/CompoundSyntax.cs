@@ -137,7 +137,7 @@ namespace Reni.Struct
             }
             else
                 Tracer.Assert(oldResult == newResult);
-            return Tracer.FilePosn(dumpFile.FullName, 1, 0, FilePositionTag.Debug) + "see there\n";
+            return Tracer.FilePosition(dumpFile.FullName, 1, 0, FilePositionTag.Debug) + "see there\n";
         }
 
         string DumpDataToString()

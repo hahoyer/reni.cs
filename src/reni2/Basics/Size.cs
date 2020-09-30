@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.UnitTest;
@@ -12,17 +11,45 @@ namespace Reni.Basics
 {
     [AdditionalNodeInfo("DebuggerDumpString")]
     [DebuggerDisplay("{NodeDump,nq}")]
-    sealed class Size : DumpableObject, IIconKeyProvider, IComparable<Size>, IAggregateable<Size>
+    sealed class Size
+        : DumpableObject
+            , IIconKeyProvider
+            , IComparable<Size>
+            , IAggregateable<Size>
     {
-        static readonly Hashtable _values = new Hashtable();
-        readonly int _value;
+        [UnitTest]
+        sealed class Tests
+        {
+            [UnitTest]
+            public void NextPacketSize()
+            {
+                TestNextPacketSize(0, 0);
+                TestNextPacketSize(1, 8);
+                TestNextPacketSize(2, 8);
+                TestNextPacketSize(4, 8);
+                TestNextPacketSize(6, 8);
+                TestNextPacketSize(7, 8);
+                TestNextPacketSize(8, 8);
+                TestNextPacketSize(9, 16);
+                TestNextPacketSize(15, 16);
+                TestNextPacketSize(16, 16);
+                TestNextPacketSize(17, 24);
+            }
+
+            static void TestNextPacketSize(int x, int b)
+            {
+                var xs = Create(x);
+                Tracer.Assert(xs.NextPacketSize(BitsConst.SegmentAlignBits) == Create(b));
+            }
+        }
+
+        static readonly Hashtable Values = new Hashtable();
         static int _nextObjectId;
+        readonly int _value;
 
         Size(int value)
             : base(_nextObjectId++)
-        {
-            _value = value;
-        }
+            => _value = value;
 
         public bool IsZero => _value == 0;
 
@@ -34,29 +61,41 @@ namespace Reni.Basics
         public int ByteCount => SizeToPacketCount(BitsConst.SegmentAlignBits);
         public Size ByteAlignedSize => NextPacketSize(BitsConst.SegmentAlignBits);
 
+        internal bool IsNegative => !(IsPositive || IsZero);
+
+        internal Size Absolute
+        {
+            get
+            {
+                if(IsPositive)
+                    return this;
+                return this * -1;
+            }
+        }
+
+        Size IAggregateable<Size>.Aggregate(Size other) => this + other;
+
+        public int CompareTo(Size other) => LessThan(other)? -1 :
+            other.LessThan(this)? 1 : 0;
+
+
+        /// <summary>
+        ///     Gets the icon key.
+        /// </summary>
+        /// <value>The icon key.</value>
+        string IIconKeyProvider.IconKey => "Size";
+
         public static Size Create(int x)
         {
-            var result = (Size) _values[x];
+            var result = (Size)Values[x];
             if(result == null)
             {
                 result = new Size(x);
-                _values[x] = result;
+                Values[x] = result;
             }
+
             return result;
         }
-
-        internal static Size AutoSize(long value)
-        {
-            var size = 1;
-            var xn = value >= 0 ? value : -value;
-            for(long upper = 1; xn >= upper; size++, upper *= 2)
-                continue;
-            return Create(size);
-        }
-
-        protected override string Dump(bool isRecursion) => GetNodeDump();
-
-        protected override string GetNodeDump() => _value.ToString();
 
         public Size Align(int alignBits)
         {
@@ -71,27 +110,7 @@ namespace Reni.Basics
         public Size NextPacketSize(int alignBits)
             => Create(SizeToPacketCount(alignBits) << alignBits);
 
-        internal void AssertAlignedSize(int alignBits)
-        {
-            var result = SizeToPacketCount(alignBits);
-            if(result << alignBits == _value)
-                return;
-            NotImplementedMethod(alignBits);
-
-            throw new NotAlignableException(this, alignBits);
-        }
-
-        int SaveSizeToPacketCount(int alignBits)
-        {
-            AssertAlignedSize(alignBits);
-            return SizeToPacketCount(alignBits);
-        }
-
         public int ToInt() => _value;
-
-        bool LessThan(Size x) => _value < x._value;
-
-        Size Modulo(Size x) => Create(_value % x._value);
 
         public static bool operator <(Size x, Size y) => x.LessThan(y);
 
@@ -131,20 +150,6 @@ namespace Reni.Basics
 
         public static Size Multiply(int x, Size y) => y.Times(x);
 
-        Size Plus(int y) => Create(_value + y);
-
-        Size Times(int y) => Create(_value * y);
-
-        Size Minus(int y) => Create(_value - y);
-
-        Size Divide(int y) => Create(_value / y);
-
-        Size Plus(Size y) => Create(_value + y._value);
-
-        int Divide(Size y) => _value / y._value;
-
-        Size Minus(Size y) => Create(_value - y._value);
-
         public Size Max(Size x)
         {
             if(_value > x._value)
@@ -164,59 +169,56 @@ namespace Reni.Basics
         [UsedImplicitly]
         public string CodeDump() => ByteCount.ToString();
 
-        public int CompareTo(Size other) => LessThan(other) ? -1 : (other.LessThan(this) ? 1 : 0);
-
         public override string ToString() => ToInt().ToString();
 
-        [UnitTest]
-        sealed class Tests
-        {
-            static void TestNextPacketSize(int x, int b)
-            {
-                var xs = Create(x);
-                Tracer.Assert(xs.NextPacketSize(BitsConst.SegmentAlignBits) == Create(b));
-            }
+        protected override string Dump(bool isRecursion) => GetNodeDump();
 
-            [UnitTest]
-            public void NextPacketSize()
-            {
-                TestNextPacketSize(0, 0);
-                TestNextPacketSize(1, 8);
-                TestNextPacketSize(2, 8);
-                TestNextPacketSize(4, 8);
-                TestNextPacketSize(6, 8);
-                TestNextPacketSize(7, 8);
-                TestNextPacketSize(8, 8);
-                TestNextPacketSize(9, 16);
-                TestNextPacketSize(15, 16);
-                TestNextPacketSize(16, 16);
-                TestNextPacketSize(17, 24);
-            }
+        protected override string GetNodeDump() => _value.ToString();
+
+        internal static Size AutoSize(long value)
+        {
+            var size = 1;
+            var xn = value >= 0? value : -value;
+            for(long upper = 1; xn >= upper; size++, upper *= 2) { }
+
+            return Create(size);
+        }
+
+        internal void AssertAlignedSize(int alignBits)
+        {
+            var result = SizeToPacketCount(alignBits);
+            if(result << alignBits == _value)
+                return;
+            NotImplementedMethod(alignBits);
+
+            throw new NotAlignableException(this, alignBits);
         }
 
         internal string FormatForView() => ToString() + " " + ToCCodeByteType();
 
-        Size IAggregateable<Size>.Aggregate(Size other) => this + other;
-
-
-        /// <summary>
-        ///     Gets the icon key.
-        /// </summary>
-        /// <value>The icon key.</value>
-        string IIconKeyProvider.IconKey => "Size";
-
-        internal bool IsNegative => !(IsPositive || IsZero);
-
-        internal Size Absolute
+        int SaveSizeToPacketCount(int alignBits)
         {
-            get
-            {
-                if(IsPositive)
-                    return this;
-                return this * -1;
-            }
+            AssertAlignedSize(alignBits);
+            return SizeToPacketCount(alignBits);
         }
 
+        bool LessThan(Size x) => _value < x._value;
+
+        Size Modulo(Size x) => Create(_value % x._value);
+
+        Size Plus(int y) => Create(_value + y);
+
+        Size Times(int y) => Create(_value * y);
+
+        Size Minus(int y) => Create(_value - y);
+
+        Size Divide(int y) => Create(_value / y);
+
+        Size Plus(Size y) => Create(_value + y._value);
+
+        int Divide(Size y) => _value / y._value;
+
+        Size Minus(Size y) => Create(_value - y._value);
     }
 
     interface IIconKeyProvider
@@ -228,6 +230,7 @@ namespace Reni.Basics
     {
         [EnableDump]
         internal readonly int Bits;
+
         [EnableDump]
         internal readonly Size Size;
 
@@ -271,6 +274,7 @@ namespace Reni.Basics
                     result += ",";
                 result += this[i].ToString();
             }
+
             return result + ")";
         }
     }

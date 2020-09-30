@@ -6,7 +6,7 @@ using Reni;
 namespace ReniUI.Test
 {              
     [UnitTest]
-    public sealed class UserInterAction : DependantAttribute
+    public sealed class UserInterAction : DependenceProvider
     {
         const string text = @"
 system: /!\

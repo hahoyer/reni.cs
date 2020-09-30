@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 using Reni.Basics;
 using Reni.Type;
 
@@ -11,15 +7,15 @@ namespace Reni.Code
     {
         static int _nextObjectId;
 
+        [Node]
+        internal TypeBase Type { get; }
+
         internal Arg(TypeBase type)
             : base(_nextObjectId++)
         {
             Type = type;
             StopByObjectIds();
         }
-
-        [Node]
-        internal TypeBase Type { get; }
 
         protected override Size GetSize() => Type.Size;
         protected override CodeArgs GetRefsImplementation() => CodeArgs.Arg();

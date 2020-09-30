@@ -8,7 +8,7 @@ using hw.UnitTest;
 namespace ReniUI.Test
 {
     [UnitTest]
-    public sealed class BraceMatching : DependantAttribute
+    public sealed class BraceMatching : DependenceProvider
     {
         [UnitTest]
         public void MatchingBraces()

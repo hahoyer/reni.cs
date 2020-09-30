@@ -12,7 +12,7 @@ namespace ReniUI.Formatting
     {
         public static ResultItems Default() => new ResultItems();
 
-        static bool CheckForStart(IResultItem item, ref SourcePosn lastPosition, SourcePart targetPart)
+        static bool CheckForStart(IResultItem item, ref SourcePosition lastPosition, SourcePart targetPart)
         {
             Tracer.Assert(item != null);
 
@@ -112,7 +112,7 @@ namespace ReniUI.Formatting
             Tracer.Assert(targetPart != null);
 
             var endPosition = targetPart.EndPosition;
-            SourcePosn lastPosition = null;
+            SourcePosition lastPosition = null;
             using(var enumerator = Data.GetEnumerator())
             {
                 while(enumerator.MoveNext() && !CheckForStart(enumerator.Current, ref lastPosition, targetPart)) 

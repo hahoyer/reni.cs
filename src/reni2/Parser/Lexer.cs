@@ -114,13 +114,13 @@ namespace Reni.Parser
             SpaceItem = new LexerItem(new WhiteSpaceTokenType("Space"), MatchSpace);
         }
 
-        internal int? MatchNumber(SourcePosn sourcePosn) => GuardedMatch(sourcePosn, Number);
-        internal int? MatchAny(SourcePosn sourcePosn) => GuardedMatch(sourcePosn, Any);
-        internal int? MatchText(SourcePosn sourcePosn) => GuardedMatch(sourcePosn, Text);
-        int? MatchSpace(SourcePosn sourcePosn) => GuardedMatch(sourcePosn, Space);
-        int? MatchLineEnd(SourcePosn sourcePosn) => GuardedMatch(sourcePosn, LineEnd);
-        int? MatchMultiLineComment(SourcePosn sourcePosn) => GuardedMatch(sourcePosn, MultiLineComment);
-        int? MatchLineComment(SourcePosn sourcePosn) => GuardedMatch(sourcePosn, LineComment);
+        internal int? MatchNumber(SourcePosition sourcePosn) => GuardedMatch(sourcePosn, Number);
+        internal int? MatchAny(SourcePosition sourcePosn) => GuardedMatch(sourcePosn, Any);
+        internal int? MatchText(SourcePosition sourcePosn) => GuardedMatch(sourcePosn, Text);
+        int? MatchSpace(SourcePosition sourcePosn) => GuardedMatch(sourcePosn, Space);
+        int? MatchLineEnd(SourcePosition sourcePosn) => GuardedMatch(sourcePosn, LineEnd);
+        int? MatchMultiLineComment(SourcePosition sourcePosn) => GuardedMatch(sourcePosn, MultiLineComment);
+        int? MatchLineComment(SourcePosition sourcePosn) => GuardedMatch(sourcePosn, LineComment);
 
 
         //Match.IError InvalidCharacterError { get; } = new Error(IssueId.InvalidCharacter);

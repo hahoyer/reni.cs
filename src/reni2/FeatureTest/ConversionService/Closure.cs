@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
@@ -10,7 +8,7 @@ using Reni.Type;
 namespace Reni.FeatureTest.ConversionService
 {
     [UnitTest]
-    public sealed class Closure : DependantAttribute
+    public sealed class Closure : DependenceProvider
     {
         [UnitTest]
         public void OfNumber()

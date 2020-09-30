@@ -1,29 +1,5 @@
-#region Copyright (C) 2013
-
-//     Project Reni2
-//     Copyright (C) 2011 - 2013 Harald Hoyer
-// 
-//     This program is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
-// 
-//     This program is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
-// 
-//     You should have received a copy of the GNU General Public License
-//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//     
-//     Comments, bugs and suggestions to hahoyer at yahoo.de
-
-#endregion
-
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using hw.DebugFormatter;
 
 namespace Reni.Basics
@@ -32,17 +8,26 @@ namespace Reni.Basics
     [DebuggerDisplay("{CodeDump,nq}")]
     sealed class RefAlignParam : IEquatable<RefAlignParam>
     {
-        readonly int _alignBits;
-        readonly Size _refSize;
-
         public RefAlignParam(int alignBits, Size refSize)
         {
-            _alignBits = alignBits;
-            _refSize = refSize;
+            AlignBits = alignBits;
+            RefSize = refSize;
         }
 
-        public int AlignBits => _alignBits;
-        public Size RefSize => _refSize;
+        public int AlignBits { get; }
+
+        public Size RefSize { get; }
+
+        internal string CodeDump => AlignBits + "/" + RefSize.ToInt();
+
+        public bool Equals(RefAlignParam obj)
+        {
+            if(ReferenceEquals(null, obj))
+                return false;
+            if(ReferenceEquals(this, obj))
+                return true;
+            return obj.AlignBits == AlignBits && Equals(obj.RefSize, RefSize);
+        }
 
         public RefAlignParam Align(int alignBits)
         {
@@ -73,23 +58,12 @@ namespace Reni.Basics
 
         public string Dump() => "[A:" + AlignBits + ",S:" + RefSize.Dump() + "]";
 
-        internal string CodeDump => AlignBits + "/" + RefSize.ToInt();
-
         public override int GetHashCode()
         {
             unchecked
             {
-                return (_alignBits * 397) ^ (_refSize != null ? _refSize.GetHashCode() : 0);
+                return (AlignBits * 397) ^ (RefSize != null? RefSize.GetHashCode() : 0);
             }
-        }
-
-        public bool Equals(RefAlignParam obj)
-        {
-            if(ReferenceEquals(null, obj))
-                return false;
-            if(ReferenceEquals(this, obj))
-                return true;
-            return obj._alignBits == _alignBits && Equals(obj._refSize, _refSize);
         }
 
         public override bool Equals(object obj)
@@ -100,7 +74,7 @@ namespace Reni.Basics
                 return true;
             if(obj.GetType() != typeof(RefAlignParam))
                 return false;
-            return Equals((RefAlignParam) obj);
+            return Equals((RefAlignParam)obj);
         }
 
         public static bool operator ==(RefAlignParam left, RefAlignParam right) => Equals(left, right);

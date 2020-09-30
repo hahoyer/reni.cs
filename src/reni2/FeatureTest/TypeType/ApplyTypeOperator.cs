@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using hw.UnitTest;
 using Reni.FeatureTest.ConversionService;
 using Reni.FeatureTest.Helper;
-using Reni.ParserTest;
 
 namespace Reni.FeatureTest.TypeType
 {

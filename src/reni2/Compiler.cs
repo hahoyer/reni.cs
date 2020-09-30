@@ -233,7 +233,7 @@ namespace Reni
             ;
 
 
-        Syntax Parse(SourcePosn source) => this["Main"].Parser.Execute(source);
+        Syntax Parse(SourcePosition source) => this["Main"].Parser.Execute(source);
 
         void RunFromCode() => CodeContainer.Execute(this, TraceCollector.Instance);
 

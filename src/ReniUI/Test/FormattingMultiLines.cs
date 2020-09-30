@@ -9,7 +9,7 @@ namespace ReniUI.Test
     [UnitTest]
     [TestFixture]
     [StructFormattingCurrent]
-    public sealed class FormattingMultiLines : DependantAttribute
+    public sealed class FormattingMultiLines : DependenceProvider
     {
         [Test]
         [UnitTest]

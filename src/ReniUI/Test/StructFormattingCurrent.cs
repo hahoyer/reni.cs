@@ -8,7 +8,7 @@ namespace ReniUI.Test
 {
     [UnitTest]
     [StructFormatting]
-    public sealed class StructFormattingCurrent : DependantAttribute
+    public sealed class StructFormattingCurrent : DependenceProvider
     {
 
         [Test]

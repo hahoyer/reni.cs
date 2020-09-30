@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using hw.Scanner;
-
-namespace hw.Parser
+﻿namespace hw.Parser
 {
     public interface IParserTokenType<TTreeItem>
         where TTreeItem : class
     {
-        TTreeItem Create(TTreeItem left, IToken token, TTreeItem right);
         string PrioTableId { get; }
+        TTreeItem Create(TTreeItem left, IToken token, TTreeItem right);
     }
 
     public interface IBracketMatch<TTreeItem>
@@ -17,5 +12,4 @@ namespace hw.Parser
     {
         IParserTokenType<TTreeItem> Value { get; }
     }
-
 }

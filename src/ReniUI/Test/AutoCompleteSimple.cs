@@ -8,7 +8,7 @@ namespace ReniUI.Test
 {
     [UnitTest]
     [TestFixture]
-    public sealed class AutoCompleteSimple : DependantAttribute
+    public sealed class AutoCompleteSimple : DependenceProvider
     {
         const string text = @"
 

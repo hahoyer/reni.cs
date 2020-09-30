@@ -20,10 +20,6 @@
 
 #endregion
 
-using System.Linq;
-using System.Collections.Generic;
-using System;
-using hw.DebugFormatter;
 using hw.UnitTest;
 using Reni.FeatureTest.Function;
 using Reni.FeatureTest.Helper;

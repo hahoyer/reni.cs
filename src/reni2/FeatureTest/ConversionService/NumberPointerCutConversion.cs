@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using hw.DebugFormatter;
 using hw.UnitTest;
 using Reni.Basics;
@@ -9,7 +6,7 @@ using Reni.Context;
 namespace Reni.FeatureTest.ConversionService
 {
     [UnitTest]
-    public sealed class NumberPointerCutConversion : DependantAttribute
+    public sealed class NumberPointerCutConversion : DependenceProvider
     {
         [UnitTest]
         public void Run()

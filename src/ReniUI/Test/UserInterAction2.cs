@@ -10,7 +10,7 @@ namespace ReniUI.Test
 {
     [UnitTest]
     [UserInterAction]
-    public sealed class UserInterAction2 : DependantAttribute
+    public sealed class UserInterAction2 : DependenceProvider
     {
         const string Text = @"#(aa comment aa)# !mutable name: 3";
         const string Type = @"cccccccccccccccccwkkkkkkkkwiiiikwn";

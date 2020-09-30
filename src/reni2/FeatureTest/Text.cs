@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-using System;
-using hw.Parser;
 using hw.UnitTest;
 using Reni.FeatureTest.Array;
 using Reni.FeatureTest.Helper;

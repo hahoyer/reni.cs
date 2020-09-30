@@ -171,7 +171,6 @@
     <Compile Include="hw\Parser\BelongsToAttribute.cs" />
     <Compile Include="hw\Parser\BracketContext.cs" />
     <Compile Include="hw\Parser\CachingTokenFactory.cs" />
-    <Compile Include="hw\Parser\CommonTokenType.cs" />
     <Compile Include="hw\Parser\Compiler.cs" />
     <Compile Include="hw\Parser\Extension.cs" />
     <Compile Include="hw\Parser\GenericTokenFactory.cs" />
@@ -193,7 +192,6 @@
     <Compile Include="hw\Parser\VariantAttribute.cs" />
     <Compile Include="hw\Scanner\FileSourceProvider.cs" />
     <Compile Include="hw\Scanner\IScanner.cs" />
-    <Compile Include="hw\Scanner\ISourcePartProxy.cs" />
     <Compile Include="hw\Scanner\ISourceProvider.cs" />
     <Compile Include="hw\Scanner\ITokenFactory.cs" />
     <Compile Include="hw\Scanner\LexerItem.cs" />
@@ -202,12 +200,13 @@
     <Compile Include="hw\Scanner\MatchExtension.cs" />
     <Compile Include="hw\Scanner\Source.cs" />
     <Compile Include="hw\Scanner\SourcePart.cs" />
-    <Compile Include="hw\Scanner\SourcePosn.cs" />
+    <Compile Include="hw\Scanner\SourcePosition.cs" />
     <Compile Include="hw\Scanner\StringSourceProvider.cs" />
     <Compile Include="hw\Scanner\TwoLayerScanner.cs" />
     <Compile Include="hw\Scanner\WhiteSpaceTokenType.cs" />
     <Compile Include="hw\UnitTest\CategoryAttribute.cs" />
     <Compile Include="hw\UnitTest\DependantAttribute.cs" />
+    <Compile Include="hw\UnitTest\DependenceProvider.cs" />
     <Compile Include="hw\UnitTest\ITestFixture.cs" />
     <Compile Include="hw\UnitTest\TestExtender.cs" />
     <Compile Include="hw\UnitTest\TestMethod.cs" />
@@ -421,7 +420,6 @@
     <None Include="FeatureTest\Text.reni">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="hw\CSharp.Exe.targets" />
     <None Include="packages.config" />
     <None Include="sys.targets" />
   </ItemGroup>
