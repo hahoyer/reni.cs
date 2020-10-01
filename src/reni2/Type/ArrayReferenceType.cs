@@ -59,7 +59,7 @@ namespace Reni.Type
             _repeaterAccessTypeCache = new ValueCache<RepeaterAccessType>
                 (() => new RepeaterAccessType(this));
             ValueType = valueType;
-            Tracer.Assert(!valueType.Hllw, valueType.Dump);
+            Tracer.Assert(!valueType.IsHollow, valueType.Dump);
             Tracer.Assert(!(valueType.CoreType is PointerType), valueType.Dump);
 
             StopByObjectIds(-10);
@@ -79,7 +79,7 @@ namespace Reni.Type
         [DisableDump]
         RepeaterAccessType AccessType => _repeaterAccessTypeCache.Value;
         [DisableDump]
-        internal override bool Hllw => false;
+        internal override bool IsHollow => false;
         [DisableDump]
         internal override bool IsAligningPossible => false;
 

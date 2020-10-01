@@ -10,13 +10,13 @@ namespace Reni.Basics
     {
         static readonly Category[] Cache = new Category[32];
 
-        Category(bool hllw, bool size, bool type, bool code, bool exts)
+        Category(bool isHollow, bool size, bool type, bool code, bool exts)
             : base(nextObjectId: null)
         {
             HasCode = code;
             HasType = type;
             HasExts = exts;
-            HasHllw = hllw;
+            HasIsHollow = isHollow;
             HasSize = size;
         }
 
@@ -31,7 +31,7 @@ namespace Reni.Basics
                 obj.HasType.Equals(HasType) &&
                 obj.HasExts.Equals(HasExts) &&
                 obj.HasSize.Equals(HasSize) &&
-                obj.HasHllw.Equals(HasHllw)
+                obj.HasIsHollow.Equals(HasIsHollow)
                 ;
         }
 
@@ -48,13 +48,13 @@ namespace Reni.Basics
         public static Category Exts => CreateCategory(exts: true);
 
         [DebuggerHidden]
-        public static Category Hllw => CreateCategory(hllw: true);
+        public static Category IsHollow => CreateCategory(isHollow: true);
 
         [DebuggerHidden]
         public static Category None => CreateCategory();
 
         [DebuggerHidden]
-        public static Category All => CreateCategory(hllw: true, size: true, type: true, code: true, exts: true);
+        public static Category All => CreateCategory(isHollow: true, size: true, type: true, code: true, exts: true);
 
         public bool IsNone => !HasAny;
         public bool HasCode { get; }
@@ -65,13 +65,13 @@ namespace Reni.Basics
 
         public bool HasSize { get; }
 
-        public bool HasHllw { get; }
+        public bool HasIsHollow { get; }
 
-        public bool HasAny => HasCode || HasType || HasExts || HasSize || HasHllw;
+        public bool HasAny => HasCode || HasType || HasExts || HasSize || HasIsHollow;
 
         [DebuggerHidden]
         [DisableDump]
-        public Category Hllwed => this | Hllw;
+        public Category IsHollowed => this | IsHollow;
 
         [DebuggerHidden]
         [DisableDump]
@@ -101,7 +101,7 @@ namespace Reni.Basics
                 }
 
                 if(result.HasSize)
-                    result |= Hllw;
+                    result |= IsHollow;
                 return result;
             }
         }
@@ -130,12 +130,12 @@ namespace Reni.Basics
 
         [DebuggerHidden]
         internal static Category CreateCategory
-            (bool hllw = false, bool size = false, bool type = false, bool code = false, bool exts = false)
+            (bool isHollow = false, bool size = false, bool type = false, bool code = false, bool exts = false)
         {
-            var result = Cache[IndexFromBool(hllw, size, type, code, exts)];
+            var result = Cache[IndexFromBool(isHollow, size, type, code, exts)];
             if(result != null)
                 return result;
-            return Cache[IndexFromBool(hllw, size, type, code, exts)] = new Category(hllw, size, type, code, exts);
+            return Cache[IndexFromBool(isHollow, size, type, code, exts)] = new Category(isHollow, size, type, code, exts);
         }
 
         static int IndexFromBool(params bool[] data)
@@ -144,7 +144,7 @@ namespace Reni.Basics
         [DebuggerHidden]
         public static Category operator |(Category x, Category y) => CreateCategory
         (
-            x.HasHllw || y.HasHllw,
+            x.HasIsHollow || y.HasIsHollow,
             x.HasSize || y.HasSize,
             x.HasType || y.HasType,
             x.HasCode || y.HasCode,
@@ -153,7 +153,7 @@ namespace Reni.Basics
         [DebuggerHidden]
         public static Category operator &(Category x, Category y) => CreateCategory
         (
-            x.HasHllw && y.HasHllw,
+            x.HasIsHollow && y.HasIsHollow,
             x.HasSize && y.HasSize,
             x.HasType && y.HasType,
             x.HasCode && y.HasCode,
@@ -167,7 +167,7 @@ namespace Reni.Basics
                 result = (result * 397) ^ HasType.GetHashCode();
                 result = (result * 397) ^ HasExts.GetHashCode();
                 result = (result * 397) ^ HasSize.GetHashCode();
-                result = (result * 397) ^ HasHllw.GetHashCode();
+                result = (result * 397) ^ HasIsHollow.GetHashCode();
                 return result;
             }
         }
@@ -177,14 +177,14 @@ namespace Reni.Basics
             HasExts == x.HasExts &&
             HasSize == x.HasSize &&
             HasType == x.HasType &&
-            HasHllw == x.HasHllw;
+            HasIsHollow == x.HasIsHollow;
 
         bool IsLessThan(Category x) =>
             !HasCode && x.HasCode ||
             !HasExts && x.HasExts ||
             !HasSize && x.HasSize ||
             !HasType && x.HasType ||
-            !HasHllw && x.HasHllw;
+            !HasIsHollow && x.HasIsHollow;
 
         bool IsLessThanOrEqual(Category x)
         {
@@ -196,7 +196,7 @@ namespace Reni.Basics
                 return false;
             if(HasType && !x.HasType)
                 return false;
-            if(HasHllw && !x.HasHllw)
+            if(HasIsHollow && !x.HasIsHollow)
                 return false;
             return true;
         }
@@ -204,7 +204,7 @@ namespace Reni.Basics
         [DebuggerHidden]
         public static Category operator -(Category x, Category y) => CreateCategory
         (
-            x.HasHllw && !y.HasHllw,
+            x.HasIsHollow && !y.HasIsHollow,
             x.HasSize && !y.HasSize,
             x.HasType && !y.HasType,
             x.HasCode && !y.HasCode,
@@ -215,8 +215,8 @@ namespace Reni.Basics
         protected override string GetNodeDump()
         {
             var result = "";
-            if(HasHllw)
-                result += ".Hllw.";
+            if(HasIsHollow)
+                result += ".IsHollow.";
             if(HasSize)
                 result += ".Size.";
             if(HasType)

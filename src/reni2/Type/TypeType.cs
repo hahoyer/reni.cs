@@ -27,7 +27,7 @@ namespace Reni.Type
         internal override Root Root => Value.Root;
 
         [DisableDump]
-        internal override bool Hllw => true;
+        internal override bool IsHollow => true;
 
         [DisableDump]
         internal TypeBase Value { get; }

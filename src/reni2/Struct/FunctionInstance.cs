@@ -196,7 +196,7 @@ namespace Reni.Struct
                 var result = visitResult
                     .ReplaceRefsForFunctionBody(foreignRefsRef)
                     .Code;
-                if(Parent.ArgsType.Hllw)
+                if(Parent.ArgsType.IsHollow)
                     return result.TryReplacePrimitiveRecursivity(FunctionId);
                 return result;
             }

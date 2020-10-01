@@ -55,7 +55,7 @@ namespace Reni.Struct
         internal override TypeBase ValueType => Getter.ReturnType;
 
         [DisableDump]
-        internal override bool Hllw => Exts.IsNone && ArgsType.Hllw;
+        internal override bool IsHollow => Exts.IsNone && ArgsType.IsHollow;
 
         [DisableDump]
         internal override CompoundView FindRecentCompoundView => _compoundView;

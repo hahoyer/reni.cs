@@ -28,7 +28,7 @@ namespace Reni.Code
 
         protected override IEnumerable<CodeBase> AsList()
         {
-            if(Hllw)
+            if(IsHollow)
                 return new CodeBase[0];
             return new[] {this};
         }
@@ -37,7 +37,7 @@ namespace Reni.Code
             => actual.BitArray(this);
 
         [DisableDump]
-        internal override bool IsEmpty => Hllw;
+        internal override bool IsEmpty => IsHollow;
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement)
             => subsequentElement.TryToCombineBack(this);

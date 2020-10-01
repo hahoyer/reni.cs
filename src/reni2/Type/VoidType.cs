@@ -18,7 +18,7 @@ namespace Reni.Type
         protected override string GetNodeDump() => "void";
 
         [DisableDump]
-        internal override bool Hllw => true;
+        internal override bool IsHollow => true;
 
         IImplementation ISymbolProvider<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
             => Feature.Extension.Value(DumpPrintTokenResult);

@@ -77,12 +77,12 @@ namespace Reni.Struct
 
         internal Size Size(int? position = null)
         {
-            if(Hllw(position))
+            if(IsHollow(position))
                 return Basics.Size.Zero;
             return ResultsOfStatements(Category.Size, fromPosition: 0, fromNotPosition: position).Size;
         }
 
-        internal bool Hllw(int? accessPosition = null) => ObtainHllw(accessPosition);
+        internal bool IsHollow(int? accessPosition = null) => ObtainIsHollow(accessPosition);
 
         internal Size FieldOffsetFromAccessPoint(int accessPosition, int fieldPosition)
             => ResultsOfStatements(Category.Size, fieldPosition + 1, accessPosition).Size;
@@ -210,7 +210,7 @@ namespace Reni.Struct
         internal TypeBase AccessType(int accessPosition, int position)
             => AccessResult(Category.Type, accessPosition, position).Type;
 
-        bool ObtainHllw(int? accessPosition)
+        bool ObtainIsHollow(int? accessPosition)
         {
             var trace = ObjectId == -10 && accessPosition == 3 && Parent.ObjectId == 4;
             StartMethodDump(trace, accessPosition);
@@ -219,17 +219,17 @@ namespace Reni.Struct
                 var subStatementIds = (accessPosition ?? EndPosition).Select().ToArray();
                 Dump(name: "subStatementIds", value: subStatementIds);
                 BreakExecution();
-                if(subStatementIds.Any(position => InnerHllwStatic(position) == false))
+                if(subStatementIds.Any(position => InnerIsHollowStatic(position) == false))
                     return ReturnMethodDump(rv: false);
                 var quickNonDataLess = subStatementIds
-                    .Where(position => InnerHllwStatic(position) == null)
+                    .Where(position => InnerIsHollowStatic(position) == null)
                     .ToArray();
                 Dump(name: "quickNonDataLess", value: quickNonDataLess);
                 BreakExecution();
                 if(quickNonDataLess.Length == 0)
                     return ReturnMethodDump(rv: true);
                 if(quickNonDataLess.Any
-                    (position => InternalInnerHllwStructureElement(position) == false))
+                    (position => InternalInnerIsHollowStructureElement(position) == false))
                     return ReturnMethodDump(rv: false);
                 return ReturnMethodDump(rv: true);
             }
@@ -239,16 +239,16 @@ namespace Reni.Struct
             }
         }
 
-        bool InternalInnerHllwStructureElement(int position)
+        bool InternalInnerIsHollowStructureElement(int position)
         {
             var uniqueChildContext = Parent
                 .CompoundPositionContext(Syntax, position);
             return Syntax
                 .Statements[position]
-                .HllwStructureElement(uniqueChildContext);
+                .IsHollowStructureElement(uniqueChildContext);
         }
 
-        bool? InnerHllwStatic(int position) => Syntax.Statements[position].Hllw;
+        bool? InnerIsHollowStatic(int position) => Syntax.Statements[position].IsHollow;
 
         internal Result Cleanup(Category category)
         {

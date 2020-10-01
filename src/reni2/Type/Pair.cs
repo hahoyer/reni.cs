@@ -22,7 +22,7 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        internal override bool Hllw => _first.Hllw && _second.Hllw;
+        internal override bool IsHollow => _first.IsHollow && _second.IsHollow;
         [DisableDump]
         internal override Root Root => _first.Root;
         protected override Size GetSize() => _first.Size + _second.Size;

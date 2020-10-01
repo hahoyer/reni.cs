@@ -22,7 +22,7 @@ namespace Reni.Context
         [DisableDump]
         internal override CompoundView FindRecentCompoundView => Parent;
         [DisableDump]
-        internal override bool Hllw => false;
+        internal override bool IsHollow => false;
         [DisableDump]
         internal override bool IsPointerPossible => true;
 

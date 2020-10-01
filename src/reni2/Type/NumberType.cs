@@ -40,7 +40,7 @@ namespace Reni.Type
         [DisableDump]
         internal override Root Root => Parent.Root;
         [DisableDump]
-        internal override bool Hllw => Parent.Hllw;
+        internal override bool IsHollow => Parent.IsHollow;
         [DisableDump]
         internal override string DumpPrintText => "number(bits:" + Bits + ")";
         [DisableDump]

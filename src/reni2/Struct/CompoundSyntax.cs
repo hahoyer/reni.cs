@@ -86,7 +86,7 @@ namespace Reni.Struct
 
 
         [DisableDump]
-        internal override bool? Hllw => Statements.All(syntax => syntax.Hllw == true);
+        internal override bool? IsHollow => Statements.All(syntax => syntax.IsHollow == true);
         [DisableDump]
         internal Size IndexSize => Size.AutoSize(Statements.Length);
 

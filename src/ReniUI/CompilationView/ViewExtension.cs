@@ -44,7 +44,7 @@ namespace ReniUI.CompilationView
         internal static Control CreateSizeView(this Result result)
         {
             var size = result.Type?.Size
-                ?? result.Size ?? (result.HasHllw ? Size.Zero : null);
+                ?? result.Size ?? (result.HasIsHollow ? Size.Zero : null);
             return size.CreateView();
         }
 
@@ -77,7 +77,7 @@ namespace ReniUI.CompilationView
 
         internal static Control CreateTypeLineView(this Result target, SourceView master)
         {
-            if(!target.HasType && !target.HasSize && !target.HasHllw)
+            if(!target.HasType && !target.HasSize && !target.HasIsHollow)
                 return null;
 
             return true.CreateLineupView
@@ -110,7 +110,7 @@ namespace ReniUI.CompilationView
         internal static Control CreateView(this Result result, SourceView master)
         {
             var clients = new List<Control>();
-            if(result.HasType || result.HasSize || result.HasHllw)
+            if(result.HasType || result.HasSize || result.HasIsHollow)
                 clients.Add(result.CreateTypeLineView(master));
             clients.Add(result.Exts?.CreateView(master));
             clients.Add(result.Code?.CreateView(master));

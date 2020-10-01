@@ -139,7 +139,7 @@ namespace Reni.Type
         /// Is this an hollow type? With no data?
         /// </summary>
         [DisableDump]
-        internal virtual bool Hllw
+        internal virtual bool IsHollow
         {
             get
             {
@@ -176,7 +176,7 @@ namespace Reni.Type
                     : this;
 
         [DisableDump]
-        internal TypeBase SmartPointer => Hllw ? this : Pointer;
+        internal TypeBase SmartPointer => IsHollow ? this : Pointer;
 
         [DisableDump]
         internal TypeBase Align
@@ -299,7 +299,7 @@ namespace Reni.Type
         {
             get
             {
-                if (Hllw)
+                if (IsHollow)
                     yield break;
 
                 if(IsAligningPossible && Align.Size != Size)
@@ -349,7 +349,7 @@ namespace Reni.Type
         [NotNull]
         Size GetSizeForCache()
         {
-            if(Hllw)
+            if(IsHollow)
                 return Size.Zero;
 
             return GetSize();
@@ -405,7 +405,7 @@ namespace Reni.Type
 
         internal Result Result(Category category, IContextReference target)
         {
-            if(Hllw)
+            if(IsHollow)
                 return Result(category);
 
             return Result
@@ -489,7 +489,7 @@ namespace Reni.Type
 
         internal Result LocalReferenceResult(Category category)
         {
-            if(Hllw)
+            if(IsHollow)
                 return ArgResult(category);
 
             return ForcedPointer
@@ -508,7 +508,7 @@ namespace Reni.Type
         internal Result ContextAccessResult
             (Category category, IContextReference target, Func<Size> getOffset)
         {
-            if(Hllw)
+            if(IsHollow)
                 return Result(category);
 
             return Result
@@ -520,13 +520,13 @@ namespace Reni.Type
 
         protected virtual IReference GetForcedReferenceForCache()
         {
-            Tracer.Assert(!Hllw);
+            Tracer.Assert(!IsHollow);
             return CheckedReference ?? ForcedPointer;
         }
 
         protected virtual PointerType GetPointerForCache()
         {
-            Tracer.Assert(!Hllw);
+            Tracer.Assert(!IsHollow);
             return new PointerType(this);
         }
 
@@ -712,12 +712,12 @@ namespace Reni.Type
 
         Result DereferencesObjectResult(Category category)
             =>
-                Hllw
+                IsHollow
                     ? Result(category)
                     : Pointer.Result(category.Typed, ForcedReference).DereferenceResult;
 
         internal Result ObjectResult(Category category)
-            => Hllw ? Result(category) : Pointer.Result(category.Typed, ForcedReference);
+            => IsHollow ? Result(category) : Pointer.Result(category.Typed, ForcedReference);
 
         protected virtual CodeBase DumpPrintCode()
         {

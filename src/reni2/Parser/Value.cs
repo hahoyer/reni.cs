@@ -32,7 +32,7 @@ namespace Reni.Parser
         internal virtual bool IsLambda => false;
 
         [DisableDump]
-        internal virtual bool? Hllw => IsLambda ? (bool?) true : null;
+        internal virtual bool? IsHollow => IsLambda ? (bool?) true : null;
 
         [DisableDump]
         internal virtual IRecursionHandler RecursionHandler => null;
@@ -55,17 +55,17 @@ namespace Reni.Parser
         //[DebuggerHidden]
         internal TypeBase Type(ContextBase context) => context.Result(Category.Type, this)?.Type;
 
-        internal bool HllwStructureElement(ContextBase context)
+        internal bool IsHollowStructureElement(ContextBase context)
         {
-            var result = Hllw;
+            var result = IsHollow;
             if(result != null)
                 return result.Value;
 
             var type = context.TypeIfKnown(this);
             if(type != null)
-                return type.SmartUn<FunctionType>().Hllw;
+                return type.SmartUn<FunctionType>().IsHollow;
 
-            return Type(context).SmartUn<FunctionType>().Hllw;
+            return Type(context).SmartUn<FunctionType>().IsHollow;
         }
 
         internal Value ReplaceArg(Value value)

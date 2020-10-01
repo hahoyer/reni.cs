@@ -26,7 +26,7 @@ namespace Reni.Type
         internal override TypeBase ValueType { get; }
 
         [DisableDump]
-        internal override bool Hllw => false;
+        internal override bool IsHollow => false;
 
         protected override Size GetSize() => Root.DefaultRefAlignParam.RefSize + IndexType.Size;
 

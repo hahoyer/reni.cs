@@ -84,7 +84,7 @@ namespace Reni.Code
             get
             {
                 for(var i = 0; i < Data.Length - 1; i++)
-                    if(!Data[i].Hllw)
+                    if(!Data[i].IsHollow)
                         return false;
                 return true;
             }

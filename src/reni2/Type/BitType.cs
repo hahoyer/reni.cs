@@ -24,7 +24,7 @@ namespace Reni.Type
         internal override string DumpPrintText => "bit";
 
         [DisableDump]
-        internal override bool Hllw => false;
+        internal override bool IsHollow => false;
 
         internal override IEnumerable<string> DeclarationOptions
             => base.DeclarationOptions.Concat(InternalDeclarationOptions);

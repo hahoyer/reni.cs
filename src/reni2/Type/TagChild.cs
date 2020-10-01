@@ -16,7 +16,7 @@ namespace Reni.Type
         [DisableDump]
         internal override string DumpPrintText => "(" + Parent.DumpPrintText + ")" + TagTitle;
         [DisableDump]
-        internal override sealed bool Hllw => Parent.Hllw;
+        internal override sealed bool IsHollow => Parent.IsHollow;
         [DisableDump]
         internal override sealed TypeBase CoreType => Parent.CoreType;
         protected override sealed Size GetSize() => Parent.Size;

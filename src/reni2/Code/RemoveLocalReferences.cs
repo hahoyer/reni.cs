@@ -129,7 +129,7 @@ namespace Reni.Code
                     var body = ReducedBody;
                     var initialSize = Size.Zero;
 
-                    var cleanup = new Result(Category.Code | Category.Exts, getHllw: () => true);
+                    var cleanup = new Result(Category.Code | Category.Exts, getIsHollow: () => true);
 
                     foreach(var reference in References)
                     {

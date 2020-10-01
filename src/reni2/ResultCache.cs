@@ -127,10 +127,10 @@ namespace Reni
         internal Size Size => GetCategories(Category.Size).Size;
 
         [DisableDump]
-        internal bool? Hllw => GetCategories(Category.Hllw).Hllw;
+        internal bool? IsHollow => GetCategories(Category.IsHollow).IsHollow;
 
         [DisableDump]
-        internal Issue[] Issues => GetCategories(Category.Hllw).Issues;
+        internal Issue[] Issues => GetCategories(Category.IsHollow).Issues;
 
         public static implicit operator ResultCache(Result x) => new ResultCache(x);
 
@@ -139,10 +139,10 @@ namespace Reni
         {
             var localCategory = category - Data.CompleteCategory - Data.PendingCategory;
 
-            if(localCategory.HasHllw && Data.FindHllw != null)
+            if(localCategory.HasIsHollow && Data.FindIsHollow != null)
             {
-                Data.Hllw = Data.FindHllw;
-                localCategory -= Category.Hllw;
+                Data.IsHollow = Data.FindIsHollow;
+                localCategory -= Category.IsHollow;
             }
 
             if(localCategory.HasSize && Data.FindSize != null)

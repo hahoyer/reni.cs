@@ -26,7 +26,7 @@ namespace Reni.Type
         {
             _order = CodeArgs.NextOrder++;
             ValueType = valueType;
-            Tracer.Assert(!valueType.Hllw, valueType.Dump);
+            Tracer.Assert(!valueType.IsHollow, valueType.Dump);
             Tracer.Assert(valueType.IsPointerPossible, valueType.Dump);
             StopByObjectIds(-10);
         }
@@ -44,7 +44,7 @@ namespace Reni.Type
         [DisableDump]
         internal override IImplementation CheckedFeature => ValueType.CheckedFeature;
         [DisableDump]
-        internal override bool Hllw => false;
+        internal override bool IsHollow => false;
         [DisableDump]
         internal override bool IsAligningPossible => false;
         [DisableDump]

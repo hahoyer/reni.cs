@@ -21,7 +21,7 @@ namespace Reni
         /// <summary>
         /// Is this an hollow object? With no data?
         /// </summary>
-        bool? _hllw;
+        bool? _isHollow;
         bool _isDirty;
         Category _pendingCategory;
         Size _size;
@@ -37,7 +37,7 @@ namespace Reni
             (
                 category & Category.Exts,
                 issues,
-                getHllw: null,
+                getIsHollow: null,
                 getSize: null,
                 getType: null,
                 getCode: null,
@@ -53,7 +53,7 @@ namespace Reni
         internal Result
         (
             Category category,
-            Func<bool> getHllw = null,
+            Func<bool> getIsHollow = null,
             Func<Size> getSize = null,
             Func<TypeBase> getType = null,
             Func<CodeBase> getCode = null,
@@ -63,7 +63,7 @@ namespace Reni
             (
                 category,
                 issues: null,
-                getHllw: getHllw,
+                getIsHollow: getIsHollow,
                 getSize: getSize,
                 getType: getType,
                 getCode: getCode,
@@ -76,7 +76,7 @@ namespace Reni
         (
             Category category,
             Issue[] issues,
-            Func<bool> getHllw,
+            Func<bool> getIsHollow,
             Func<Size> getSize,
             Func<TypeBase> getType,
             Func<CodeBase> getCode,
@@ -86,26 +86,26 @@ namespace Reni
         {
             Issues = issues ?? new Issue[0];
 
-            var hllw = getHllw == null ? null : new ValueCache<bool>(getHllw);
+            var isHollow = getIsHollow == null ? null : new ValueCache<bool>(getIsHollow);
             var size = getSize == null ? null : new ValueCache<Size>(getSize);
             var type = getType == null ? null : new ValueCache<TypeBase>(getType);
             var code = getCode == null ? null : new ValueCache<CodeBase>(getCode);
             var exts = getExts == null ? null : new ValueCache<CodeArgs>(getExts);
 
             if(category.HasType)
-                _type = ObtainType(hllw, size, type, code, rootContext);
+                _type = ObtainType(isHollow, size, type, code, rootContext);
 
             if(category.HasCode)
-                _code = ObtainCode(hllw, size, type, code);
+                _code = ObtainCode(isHollow, size, type, code);
 
             if(category.HasSize)
-                _size = ObtainSize(hllw, size, type, code);
+                _size = ObtainSize(isHollow, size, type, code);
 
             if(category.HasExts)
-                _exts = ObtainExts(hllw, size, type, code, exts);
+                _exts = ObtainExts(isHollow, size, type, code, exts);
 
-            if(category.HasHllw)
-                _hllw = ObtainHllw(hllw, size, type, code);
+            if(category.HasIsHollow)
+                _isHollow = ObtainIsHollow(isHollow, size, type, code);
 
             AssertValid();
         }
@@ -116,24 +116,24 @@ namespace Reni
         internal bool HasType => Type != null;
         internal bool HasCode => Code != null;
         internal bool HasExts => Exts != null;
-        internal bool HasHllw => _hllw != null;
+        internal bool HasIsHollow => _isHollow != null;
 
         [Node]
         [EnableDumpWithExceptionPredicate]
         public Category CompleteCategory
-            => Category.CreateCategory(HasHllw, HasSize, HasType, HasCode, HasExts);
+            => Category.CreateCategory(HasIsHollow, HasSize, HasType, HasCode, HasExts);
 
         /// <summary>
         /// Is this an hollow object? With no data?
         /// </summary>
         [Node]
         [DebuggerHidden]
-        public bool? Hllw
+        public bool? IsHollow
         {
-            get => _hllw;
+            get => _isHollow;
             set
             {
-                _hllw = value;
+                _isHollow = value;
                 AssertValid();
             }
         }
@@ -187,15 +187,15 @@ namespace Reni
             }
         }
 
-        internal bool? FindHllw => HasHllw ? _hllw : FindSize?.IsZero;
+        internal bool? FindIsHollow => HasIsHollow ? _isHollow : FindSize?.IsZero;
 
-        bool? QuickFindHllw => HasHllw ? _hllw : QuickFindSize?.IsZero;
+        bool? QuickFindIsHollow => HasIsHollow ? _isHollow : QuickFindSize?.IsZero;
 
-        internal bool SmartHllw
+        internal bool SmartIsHollow
         {
             get
             {
-                var result = FindHllw;
+                var result = FindIsHollow;
                 if(result == null)
                 {
                     DumpMethodWithBreak(text: "No approriate result property defined");
@@ -289,7 +289,7 @@ namespace Reni
         {
             get
             {
-                if(HasHllw && Hllw == false)
+                if(HasIsHollow && IsHollow == false)
                     return false;
                 if(HasSize && !Size.IsZero)
                     return false;
@@ -345,7 +345,7 @@ namespace Reni
                 var result = new Result
                 (
                     CompleteCategory,
-                    () => Hllw.Value,
+                    () => IsHollow.Value,
                     () => alignedSize,
                     () => Type.Align,
                     () => Code.BitCast(alignedSize),
@@ -423,7 +423,7 @@ namespace Reni
                     return this;
                 if(!HasCode && !HasType && !HasSize)
                     return this;
-                if(Type.Hllw)
+                if(Type.IsHollow)
                     return this;
                 if(Type is IReference)
                     return this;
@@ -435,7 +435,7 @@ namespace Reni
 
         CodeBase ObtainCode
         (
-            ValueCache<bool> getHllw,
+            ValueCache<bool> getIsHollow,
             ValueCache<Size> getSize,
             ValueCache<TypeBase> getType,
             ValueCache<CodeBase> getCode)
@@ -443,9 +443,9 @@ namespace Reni
             if(getCode != null)
                 return getCode.Value;
 // ReSharper disable ExpressionIsAlwaysNull
-            var hllw = TryObtainHllw(getHllw, getSize, getType, getCode);
+            var isHollow = TryObtainIsHollow(getIsHollow, getSize, getType, getCode);
 // ReSharper restore ExpressionIsAlwaysNull
-            if(hllw == true)
+            if(isHollow == true)
                 return CodeBase.Void;
             Tracer.AssertionFailed(cond: "Code cannot be determined", getText: ToString);
             return null;
@@ -453,7 +453,7 @@ namespace Reni
 
         TypeBase ObtainType
         (
-            ValueCache<bool> getHllw,
+            ValueCache<bool> getIsHollow,
             ValueCache<Size> getSize,
             ValueCache<TypeBase> getType,
             ValueCache<CodeBase> getCode,
@@ -462,9 +462,9 @@ namespace Reni
             if(getType != null)
                 return getType.Value;
 // ReSharper disable ExpressionIsAlwaysNull
-            var hllw = TryObtainHllw(getHllw, getSize, getType, getCode);
+            var isHollow = TryObtainIsHollow(getIsHollow, getSize, getType, getCode);
 // ReSharper restore ExpressionIsAlwaysNull
-            if(hllw == true)
+            if(isHollow == true)
                 return rootContext.VoidType;
             Tracer.AssertionFailed(cond: "Type cannot be determned", getText: ToString);
             return null;
@@ -472,19 +472,19 @@ namespace Reni
 
         Size ObtainSize
         (
-            ValueCache<bool> getHllw,
+            ValueCache<bool> getIsHollow,
             ValueCache<Size> getSize,
             ValueCache<TypeBase> getType,
             ValueCache<CodeBase> getCode)
         {
-            var result = TryObtainSize(getHllw, getSize, getType, getCode);
+            var result = TryObtainSize(getIsHollow, getSize, getType, getCode);
             Tracer.Assert(result != null, () => "Size cannot be determned " + ToString());
             return result;
         }
 
         static Size TryObtainSize
         (
-            ValueCache<bool> getHllw,
+            ValueCache<bool> getIsHollow,
             ValueCache<Size> getSize,
             ValueCache<TypeBase> getType,
             ValueCache<CodeBase> getCode)
@@ -495,36 +495,36 @@ namespace Reni
                 return getType.Value.Size;
             if(getCode != null)
                 return getCode.Value.Size;
-            if(getHllw != null && getHllw.Value)
+            if(getIsHollow != null && getIsHollow.Value)
                 return Size.Zero;
             return null;
         }
 
-        bool ObtainHllw
+        bool ObtainIsHollow
         (
-            ValueCache<bool> getHllw,
+            ValueCache<bool> getIsHollow,
             ValueCache<Size> getSize,
             ValueCache<TypeBase> getType,
             ValueCache<CodeBase> getCode)
         {
-            var result = TryObtainHllw(getHllw, getSize, getType, getCode);
+            var result = TryObtainIsHollow(getIsHollow, getSize, getType, getCode);
             if(result != null)
                 return result.Value;
             Tracer.AssertionFailed(cond: "Datalessness cannot be determned", getText: ToString);
             return false;
         }
 
-        static bool? TryObtainHllw
+        static bool? TryObtainIsHollow
         (
-            ValueCache<bool> getHllw,
+            ValueCache<bool> getIsHollow,
             ValueCache<Size> getSize,
             ValueCache<TypeBase> getType,
             ValueCache<CodeBase> getCode) =>
-            getHllw?.Value ?? getSize?.Value.IsZero ?? getType?.Value.Hllw ?? getCode?.Value.IsEmpty;
+            getIsHollow?.Value ?? getSize?.Value.IsZero ?? getType?.Value.IsHollow ?? getCode?.Value.IsEmpty;
 
         CodeArgs ObtainExts
         (
-            ValueCache<bool> getHllw,
+            ValueCache<bool> getIsHollow,
             ValueCache<Size> getSize,
             ValueCache<TypeBase> getType,
             ValueCache<CodeBase> getCode,
@@ -535,7 +535,7 @@ namespace Reni
             if(getCode != null)
                 return getCode.Value.Exts;
 // ReSharper disable ExpressionIsAlwaysNull
-            if(TryObtainHllw(getHllw, getSize, getType, getCode) == true)
+            if(TryObtainIsHollow(getIsHollow, getSize, getType, getCode) == true)
 // ReSharper restore ExpressionIsAlwaysNull
                 return CodeArgs.Void();
 
@@ -552,8 +552,8 @@ namespace Reni
                 result += "\nCompleteCategory=" + CompleteCategory.Dump();
             if (HasIssue)
                 result += "\nIssues=" + Tracer.Dump(Issues);
-            if (HasHllw)
-                result += "\nHllw=" + Tracer.Dump(_hllw);
+            if (HasIsHollow)
+                result += "\nIsHollow=" + Tracer.Dump(_isHollow);
             if(HasSize)
                 result += "\nSize=" + Tracer.Dump(_size);
             if(HasType)
@@ -575,8 +575,8 @@ namespace Reni
                 Reset(Category.All - Category.Exts);
             else
             {
-                if(result.HasHllw)
-                    _hllw = result.Hllw;
+                if(result.HasIsHollow)
+                    _isHollow = result.IsHollow;
 
                 if(result.HasSize)
                     _size = result.Size;
@@ -602,7 +602,7 @@ namespace Reni
             (
                 CompleteCategory & category,
                 Issues,
-                () => Hllw.Value,
+                () => IsHollow.Value,
                 () => Size,
                 () => Type,
                 () => Code,
@@ -621,22 +621,22 @@ namespace Reni
 
             if(HasIssue)
             {
-                Tracer.Assert(!HasHllw);
+                Tracer.Assert(!HasIsHollow);
                 Tracer.Assert(!HasSize);
                 Tracer.Assert(!HasType);
                 Tracer.Assert(!HasCode);
                 return;
             }
 
-            if(HasHllw && HasSize)
+            if(HasIsHollow && HasSize)
                 Tracer.Assert
-                    (Size.IsZero == Hllw, () => "Size and Hllw differ: " + Dump());
-            if(HasHllw && HasType && Type.HasQuickSize)
+                    (Size.IsZero == IsHollow, () => "Size and IsHollow differ: " + Dump());
+            if(HasIsHollow && HasType && Type.HasQuickSize)
                 Tracer.Assert
-                    (Type.Hllw == Hllw, () => "Type and Hllw differ: " + Dump());
-            if(HasHllw && HasCode)
+                    (Type.IsHollow == IsHollow, () => "Type and IsHollow differ: " + Dump());
+            if(HasIsHollow && HasCode)
                 Tracer.Assert
-                    (Code.Hllw == Hllw, () => "Code and Hllw differ: " + Dump());
+                    (Code.IsHollow == IsHollow, () => "Code and IsHollow differ: " + Dump());
             if(HasSize && HasType && Type.HasQuickSize)
                 Tracer.Assert(Type.Size == Size, () => "Type and Size differ: " + Dump());
             if(HasSize && HasCode)
@@ -660,7 +660,7 @@ namespace Reni
 
             if(hasIssue)
             {
-                Hllw = null;
+                IsHollow = null;
                 Size = null;
                 Type = null;
                 Code = null;
@@ -679,10 +679,10 @@ namespace Reni
                     () => "this".DumpValue(this) + ", " + nameof(category).DumpValue(category)
                 );
 
-                if(category.HasHllw)
-                    Hllw = SmartHllw && other.SmartHllw;
-                else if(HasHllw)
-                    Hllw = null;
+                if(category.HasIsHollow)
+                    IsHollow = SmartIsHollow && other.SmartIsHollow;
+                else if(HasIsHollow)
+                    IsHollow = null;
 
                 if(category.HasSize)
                     Size += other.Size;
@@ -711,8 +711,8 @@ namespace Reni
         internal void Reset(Category category)
         {
             IsDirty = true;
-            if(category.HasHllw)
-                Hllw = null;
+            if(category.HasIsHollow)
+                IsHollow = null;
             if(category.HasSize)
                 Size = null;
             if(category.HasType)
@@ -745,7 +745,7 @@ namespace Reni
             var result = new Result
             {
                 Issues = Issues,
-                Hllw = Hllw,
+                IsHollow = IsHollow,
                 Size = Size,
                 Type = Type,
                 Code = Code,
@@ -785,7 +785,7 @@ namespace Reni
             var result = new Result
             {
                 Issues = Issues,
-                Hllw = Hllw,
+                IsHollow = IsHollow,
                 Size = Size,
                 Type = Type,
                 IsDirty = true
@@ -812,7 +812,7 @@ namespace Reni
             var result = new Result
             {
                 Issues = Issues,
-                Hllw = Hllw,
+                IsHollow = IsHollow,
                 Size = Size,
                 Type = Type,
                 IsDirty = true
@@ -838,7 +838,7 @@ namespace Reni
             var result = new Result
             {
                 Issues = Issues,
-                Hllw = Hllw,
+                IsHollow = IsHollow,
                 Size = Size,
                 Type = Type
             };
@@ -944,7 +944,7 @@ namespace Reni
         [DebuggerHidden]
         internal void AssertEmptyOrValidReference()
         {
-            if(FindHllw == true)
+            if(FindIsHollow == true)
                 return;
 
             var size = FindSize;
@@ -1003,7 +1003,7 @@ namespace Reni
                     : this;
 
         internal Result ConvertToConverter(TypeBase source)
-            => source.Hllw || !HasExts && !HasCode
+            => source.IsHollow || !HasExts && !HasCode
                 ? this
                 : ReplaceAbsolute(source.CheckedReference, source.ArgResult);
 

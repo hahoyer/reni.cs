@@ -56,7 +56,7 @@ namespace Reni.Struct
         [DisableDump]
         internal override Root Root => CompoundView.Root;
         [DisableDump]
-        internal override bool Hllw => true;
+        internal override bool IsHollow => true;
 
         [DisableDump]
         internal override IImplementation FunctionDeclarationForType => this;

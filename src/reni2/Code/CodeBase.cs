@@ -221,7 +221,7 @@ namespace Reni.Code
         protected override string GetNodeDump() => base.GetNodeDump() + " Size=" + Size;
 
         [DisableDump]
-        internal bool Hllw => Size.IsZero;
+        internal bool IsHollow => Size.IsZero;
 
         internal CodeBase LocalBlock(CodeBase copier)
             => new RemoveLocalReferences(this, copier).NewBody;

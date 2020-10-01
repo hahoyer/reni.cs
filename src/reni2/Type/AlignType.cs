@@ -26,7 +26,7 @@ namespace Reni.Type
             => "(" + Parent.DumpPrintText + ")" + AlignToken.TokenId + _alignBits;
 
         [DisableDump]
-        internal override bool Hllw => Parent.Hllw;
+        internal override bool IsHollow => Parent.IsHollow;
 
         protected override IReference GetForcedReferenceForCache() => Parent.ForcedReference;
 

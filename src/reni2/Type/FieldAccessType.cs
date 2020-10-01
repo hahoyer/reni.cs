@@ -24,7 +24,7 @@ namespace Reni.Type
         [DisableDump]
         internal override TypeBase ValueType => View.ValueType(Position);
         [DisableDump]
-        internal override bool Hllw => false;
+        internal override bool IsHollow => false;
         [DisableDump]
         Size FieldOffset => View.FieldOffset(Position);
 

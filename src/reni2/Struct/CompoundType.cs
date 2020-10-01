@@ -29,10 +29,10 @@ namespace Reni.Struct
         ContextBase IChild<ContextBase>.Parent => View.CompoundContext;
 
         IImplementation ISymbolProvider<Definable>.Feature(Definable tokenClass)
-            => Hllw ? View.Find(tokenClass, true) : null;
+            => IsHollow ? View.Find(tokenClass, true) : null;
 
         IImplementation ISymbolProvider<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
-            => Hllw ? Feature.Extension.Value(DumpPrintTokenResult) : null;
+            => IsHollow ? Feature.Extension.Value(DumpPrintTokenResult) : null;
 
         IImplementation ISymbolProviderForPointer<Definable>.Feature(Definable tokenClass)
             => View.Find(tokenClass, true);
@@ -52,7 +52,7 @@ namespace Reni.Struct
         internal override CompoundView FindRecentCompoundView => View;
 
         [DisableDump]
-        internal override bool Hllw => View.Hllw;
+        internal override bool IsHollow => View.IsHollow;
 
         internal override string DumpPrintText
         {
@@ -86,7 +86,7 @@ namespace Reni.Struct
         {
             get
             {
-                if(Hllw)
+                if(IsHollow)
                     yield return Feature.Extension.Conversion(VoidConversion);
             }
         }

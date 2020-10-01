@@ -61,7 +61,7 @@ namespace Reni.Type
             OptionsValue = Options.Create(optionsId);
             Tracer.Assert(count > 0);
             Tracer.Assert(elementType.CheckedReference == null);
-            Tracer.Assert(!elementType.Hllw);
+            Tracer.Assert(!elementType.IsHollow);
             _repeaterAccessTypeCache = new ValueCache<RepeaterAccessType>
                 (() => new RepeaterAccessType(this));
             _numberCache = new ValueCache<NumberType>(() => new NumberType(this));
@@ -95,7 +95,7 @@ namespace Reni.Type
             => ElementType.ArrayReference(ArrayReferenceType.Options.ForceMutable(isForceMutable));
 
         [DisableDump]
-        internal override bool Hllw => Count == 0 || ElementType.Hllw;
+        internal override bool IsHollow => Count == 0 || ElementType.IsHollow;
 
         internal override string DumpPrintText
             => "(" + ElementType.DumpPrintText + ")*" + Count + OptionsValue.DumpPrintText;

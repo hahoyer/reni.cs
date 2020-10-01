@@ -138,7 +138,7 @@ namespace Reni.Struct
         }
 
         [DisableDump]
-        internal bool Hllw => Compound.Hllw(ViewPosition);
+        internal bool IsHollow => Compound.IsHollow(ViewPosition);
 
         [DisableDump]
         internal Root Root => Compound.Root;
@@ -184,7 +184,7 @@ namespace Reni.Struct
         internal TypeBase AccessType(int position)
         {
             var result = Compound.AccessType(ViewPosition, position);
-            if(result.Hllw)
+            if(result.IsHollow)
                 return result;
 
             return _fieldAccessTypeCache[position];
@@ -224,7 +224,7 @@ namespace Reni.Struct
         Result AccessViaObjectPointer(Category category, int position)
         {
             var resultType = AccessType(position);
-            if(resultType.Hllw)
+            if(resultType.IsHollow)
                 return resultType.Result(category);
 
             return Type.SmartPointer.Mutation(resultType) & category;
@@ -233,7 +233,7 @@ namespace Reni.Struct
         internal Result AccessViaObject(Category category, int position)
         {
             var resultType = AccessType(position);
-            if(resultType.Hllw)
+            if(resultType.IsHollow)
                 return resultType.Result(category);
 
             return resultType.Result(category, Type.ObjectResult);
@@ -242,7 +242,7 @@ namespace Reni.Struct
         internal Result AccessValueViaObject(Category category, int position)
         {
             var resultType = ValueType(position);
-            if(resultType.Hllw)
+            if(resultType.IsHollow)
                 return resultType.Result(category);
 
             return resultType.Result
@@ -301,7 +301,7 @@ namespace Reni.Struct
 
         internal Result ObjectPointerViaContext(Category category)
         {
-            if(Hllw)
+            if(IsHollow)
                 return Type.Result(category);
 
             return Type.SmartPointer
@@ -357,7 +357,7 @@ namespace Reni.Struct
             => ContextReferenceType.Result(category, ContextOperatorCode);
 
         CodeBase ContextOperatorCode()
-            => Hllw
+            => IsHollow
                 ? CodeBase.Void
                 : CodeBase
                     .ReferenceCode(Type.ForcedReference)
