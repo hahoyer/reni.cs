@@ -37,7 +37,7 @@ namespace Reni.TokenClasses
             => ExpressionSyntax.Create(this, syntax);
 
         bool IDeclarationItem.IsDeclarationPart(Syntax syntax)
-            => syntax.Option.IsDeclarationPart();
+            => syntax.IsDeclarationPart;
     }
 
     [BelongsTo(typeof(MainTokenFactory))]

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
@@ -203,22 +204,5 @@ namespace Reni.Helper
         internal Result<Statement[]> GetStatements(List type = null)
             => (Target.TokenClass as IStatementsProvider)?.Get(type, Target, DefaultScopeProvider);
 
-
-        public bool IsDeclarationPart()
-        {
-            var parentTokenClass = Parent.Target.TokenClass;
-            if(parentTokenClass is Colon)
-                return Parent.Target.Left == Target;
-
-            return (parentTokenClass is LeftParenthesis ||
-                    parentTokenClass is Definable ||
-                    parentTokenClass is ThenToken ||
-                    parentTokenClass is List ||
-                    parentTokenClass is TokenClasses.Function ||
-                    parentTokenClass is TypeOperator ||
-                    parentTokenClass is ElseToken ||
-                    parentTokenClass is ScannerSyntaxError) &&
-                   false;
-        }
     }
 }

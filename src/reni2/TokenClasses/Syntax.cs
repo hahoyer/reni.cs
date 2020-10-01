@@ -27,6 +27,9 @@ namespace Reni.TokenClasses
 
         [DisableDump]
         internal readonly IToken Token;
+
+        internal bool IsDeclarationPart { get; private set; }
+
         [DisableDump]
         internal SyntaxOption Option {get;}
 
@@ -57,7 +60,17 @@ namespace Reni.TokenClasses
             TokenClass = tokenClass;
             Right = right;
 
+            SetIsDeclarationPart();
+
             Option = new SyntaxOption(this);
+        }
+
+        void SetIsDeclarationPart()
+        {
+            if(TokenClass is not Colon _ || Left == null)
+                return;
+            
+            Left.IsDeclarationPart = true;
         }
 
         SourcePart ISyntax.All => SourcePart;
