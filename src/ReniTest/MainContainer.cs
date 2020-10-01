@@ -26,7 +26,7 @@ namespace ReniTest
 
         static void RunAllTests()
         {
-            if(Debugger.IsAttached)
+            if(false && Debugger.IsAttached)
                 TestRunner.IsModeErrorFocus = true;
             Assembly.GetExecutingAssembly().RunTests();
         }
