@@ -17,7 +17,6 @@ namespace Reni.Helper
     {
         class CacheContainer
         {
-            public FunctionCache<int, Syntax> LocatePosition;
             public SyntaxOption Parent;
         }
 
@@ -42,7 +41,6 @@ namespace Reni.Helper
             if(Target.Right != null)
                 Target.Right.Option.Parent = this;
 
-            Cache.LocatePosition = new FunctionCache<int, Syntax>(LocatePositionForCache);
         }
 
         ValueCache ValueCache.IContainer.Cache {get;} = new ValueCache();
@@ -201,20 +199,6 @@ namespace Reni.Helper
                 foreach(var sourceSyntax in Target.Right.Option.Items)
                     yield return sourceSyntax;
         }
-
-        public Syntax LocatePosition(int current) => Cache.LocatePosition[current];
-
-        Syntax LocatePositionForCache(int current)
-            =>
-                Target.Left?.Option.CheckedLocatePosition(current) ??
-                Target.Right?.Option.CheckedLocatePosition(current) ??
-                Target;
-
-        Syntax CheckedLocatePosition(int current)
-            =>
-                SourcePart.Position <= current && current < SourcePart.EndPosition
-                    ? LocatePosition(current)
-                    : null;
 
         internal Result<Statement[]> GetStatements(List type = null)
             => (Target.TokenClass as IStatementsProvider)?.Get(type, Target, DefaultScopeProvider);

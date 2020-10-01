@@ -18,7 +18,7 @@ namespace ReniUI
     {
         class CacheContainer
         {
-            internal Syntax FormattingSyntax;
+            internal Syntax FomattingSyntax;
             internal Helper.Syntax HelperSyntax;
         }
 
@@ -51,7 +51,7 @@ namespace ReniUI
         internal IEnumerable<Issue> Issues => Compiler.Issues;
 
         internal Syntax FormattingSyntax
-            => Cache.FormattingSyntax ?? (Cache.FormattingSyntax = new Syntax(Compiler.Syntax));
+            => Cache.FomattingSyntax ?? (Cache.FomattingSyntax = new Syntax(Compiler.Syntax));
 
         internal Helper.Syntax Syntax => Cache.HelperSyntax ?? (Cache.HelperSyntax = GetHelperSyntax());
 
@@ -183,9 +183,9 @@ namespace ReniUI
             if(token.IsComment || token.IsLineComment)
                 return null;
 
-            var tokenSyntax = token.Syntax.Target;
+            var tokenSyntax = token.Syntax;
             var position = tokenSyntax.Token.Characters.Position;
-            return position <= 0? null : tokenSyntax.Option.LocatePosition(position - 1);
+            return position <= 0? null : tokenSyntax.LocatePosition(position - 1).Target;
         }
     }
 }

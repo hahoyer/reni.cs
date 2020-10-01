@@ -11,13 +11,17 @@ namespace ReniUI.Helper
         class CacheContainer
         {
             public FunctionCache<int, Syntax> LocatePosition;
+            public FunctionCache<int, Syntax> LocatePositionExtended;
         }
 
         readonly CacheContainer Cache = new CacheContainer();
 
         public Syntax(Reni.TokenClasses.Syntax target, Syntax parent = null)
             : base(target, parent)
-            => Cache.LocatePosition = new FunctionCache<int, Syntax>(LocatePositionForCache);
+        {
+            Cache.LocatePosition = new FunctionCache<int, Syntax>(LocatePositionForCache);
+            Cache.LocatePositionExtended = new FunctionCache<int, Syntax>(LocatePositionExtendedForCache);
+        }
 
         protected override Syntax Create(Reni.TokenClasses.Syntax target, Syntax parent)
             => new Syntax(target, parent);
@@ -62,18 +66,29 @@ namespace ReniUI.Helper
             => SourcePart.Contains(part) ? Locate(part) : null;
 
         public Syntax LocatePosition(int current) => Cache.LocatePosition[current];
+        Syntax LocatePositionExtended(int current) => Cache.LocatePositionExtended[current];
 
         Syntax LocatePositionForCache(int current)
-            => Contains(current)
-                ? Left?.CheckedLocatePosition(current) ??
+            => Left?.CheckedLocatePosition(current) ??
                   Right?.CheckedLocatePosition(current) ??
+                  this;
+
+        Syntax LocatePositionExtendedForCache(int current)
+            => Contains(current)
+                ? Left?.CheckedLocatePositionExtended(current) ??
+                  Right?.CheckedLocatePositionExtended(current) ??
                   this
-                : Parent.LocatePositionForCache(current);
+                : Parent.LocatePositionExtendedForCache(current);
 
         Syntax CheckedLocatePosition(int current)
             =>
                 Contains(current)
                     ? LocatePosition(current)
+                    : null;
+        Syntax CheckedLocatePositionExtended(int current)
+            =>
+                Contains(current)
+                    ? LocatePositionExtended(current)
                     : null;
     }
 }
