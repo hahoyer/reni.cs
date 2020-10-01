@@ -10,7 +10,7 @@ namespace Reni.TokenClasses
     [BelongsTo(typeof(DeclarationTokenFactory))]
     sealed class RightDeclarationParenthesis
         : RightParenthesisBase,
-            IDeclaratorTagProvider,
+            IDeclarerTagProvider,
             IBracketMatch<Syntax>
 
     {
@@ -29,7 +29,7 @@ namespace Reni.TokenClasses
             : base(level) {}
 
         [Obsolete("",true)]
-        Result<Declarator> IDeclaratorTagProvider.Get(Syntax syntax)
+        Result<Declarer> IDeclarerTagProvider.Get(Syntax syntax)
         {
             var bracketKernel = syntax.Left.GetBracketKernel(Level, syntax);
             var target = bracketKernel.Target;
@@ -41,7 +41,7 @@ namespace Reni.TokenClasses
                     .Select(GetDeclarationTag)
                     .ToArray();
 
-                var result = new Declarator
+                var result = new Declarer
                 (
                     items.Select(item => item.Target).Where(item => item != null).ToArray(),
                     null,
@@ -53,7 +53,7 @@ namespace Reni.TokenClasses
             else
             {
                 var issues = bracketKernel.Issues.plus(IssueId.MissingDeclarationTag.Issue(syntax.SourcePart));
-                return new Declarator(null, null, syntax.SourcePart).Issues(issues);
+                return new Declarer(null, null, syntax.SourcePart).Issues(issues);
             }
         }
 

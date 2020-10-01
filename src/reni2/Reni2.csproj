@@ -216,7 +216,7 @@
     <Compile Include="ParserTest\AlternativePrioTableTest.cs" />
     <Compile Include="ParserTest\VerbatimText.cs" />
     <Compile Include="ParserTest\StrangeDeclarationSyntax.cs" />
-    <Compile Include="Parser\Declarator.cs" />
+    <Compile Include="Parser\Declarer.cs" />
     <Compile Include="Parser\IRecursionHandler.cs" />
     <Compile Include="Parser\ISyntaxVisitor.cs" />
     <Compile Include="Parser\ReplaceArgVisitor.cs" />

@@ -40,14 +40,14 @@ namespace Reni.TokenClasses
     [BelongsTo(typeof(DeclarationTokenFactory))]
     abstract class DeclarationTagToken : 
         TerminalToken, 
-        IDeclaratorTagProvider, 
+        IDeclarerTagProvider, 
         IDeclarationTag
     {
-        Result<Declarator> IDeclaratorTagProvider.Get
+        Result<Declarer> IDeclarerTagProvider.Get
             (Syntax syntax)
         {
             if(syntax.Left == null && syntax.Right == null)
-                return new Declarator(new IDeclarationTag[] {this}, null,syntax.SourcePart);
+                return new Declarer(new IDeclarationTag[] {this}, null,syntax.SourcePart);
 
             NotImplementedMethod(syntax);
             return null;

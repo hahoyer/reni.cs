@@ -54,7 +54,7 @@ namespace Reni.Helper
         internal SyntaxOption Parent
         {
             get => Cache.Parent;
-            set
+            private set
             {
                 Tracer.Assert(value == Cache.Parent || Cache.Parent == null);
                 Cache.Parent = value;
@@ -66,10 +66,10 @@ namespace Reni.Helper
         internal IEnumerable<Syntax> Items => this.CachedValue(GetItems);
 
         [DisableDump]
-        internal SyntaxOption LeftMost => Target.Left?.Option.LeftMost ?? this;
+        SyntaxOption LeftMost => Target.Left?.Option.LeftMost ?? this;
 
         [DisableDump]
-        internal SyntaxOption RightMost => Target.Right?.Option.RightMost ?? this;
+        SyntaxOption RightMost => Target.Right?.Option.RightMost ?? this;
 
         [EnableDumpExcept(null)]
         internal Result<Parser.Value> Value
@@ -94,12 +94,12 @@ namespace Reni.Helper
                     (Target.Left, Target.Right, DefaultScopeProvider);
 
         [EnableDumpExcept(null)]
-        internal Result<Declarator> Declarator
+        internal Result<Declarer> Declarer
         {
             get
             {
-                var declaratorTokenClass = Target.TokenClass as IDeclaratorTokenClass;
-                return declaratorTokenClass?.Get(Target);
+                var declarerTokenClass = Target.TokenClass as IDeclarerTokenClass;
+                return declarerTokenClass?.Get(Target);
             }
         }
 
@@ -108,7 +108,7 @@ namespace Reni.Helper
 
         [EnableDumpExcept(null)]
         internal Issue[] Issues
-            => Value?.Issues ?? GetStatements()?.Issues ?? Statement?.Issues ?? Declarator?.Issues ?? new Issue[0];
+            => Value?.Issues ?? GetStatements()?.Issues ?? Statement?.Issues ?? Declarer?.Issues ?? new Issue[0];
 
         [DisableDump]
         ContextBase[] Contexts
@@ -176,7 +176,7 @@ namespace Reni.Helper
                         .SelectMany(item => item.DeclarationOptions)
                         .Concat(DeclarationTagToken.DeclarationOptions);
 
-                if(Declarator != null ||
+                if(Declarer != null ||
                    Target.TokenClass is LeftParenthesis ||
                    Target.TokenClass is DeclarationTagToken)
                     return new string[0];

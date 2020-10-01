@@ -78,13 +78,13 @@ namespace Reni.TokenClasses
         internal Result<Value> Value => this.CachedValue(() => GetValue(this));
 
         [DisableDump]
-        internal Result<Declarator> Declarer
+        internal Result<Declarer> Declarer
         {
             get
             {
                 switch(TokenClass)
                 {
-                    case IDeclaratorTokenClass tokenClass: return tokenClass.Get(this);
+                    case IDeclarerTokenClass tokenClass: return tokenClass.Get(this);
                     case RightParenthesis _:
                     case EndOfText _:
                     case List _:

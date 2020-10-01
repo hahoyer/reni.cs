@@ -10,15 +10,15 @@ namespace Reni.Parser
         : DumpableObject,
             IParserTokenType<Syntax>,
             ITokenClass,
-            IDeclaratorTokenClass
+            IDeclarerTokenClass
     {
         internal ExclamationBoxToken(Syntax value) => Value = value;
 
         [CanBeNull]
-        Result<Declarator> IDeclaratorTokenClass.Get(Syntax syntax)
+        Result<Declarer> IDeclarerTokenClass.Get(Syntax syntax)
         {
-            if(!(syntax.Right.TokenClass is IDeclaratorTagProvider provider))
-                return new Declarator(null, null, syntax.SourcePart)
+            if(!(syntax.Right.TokenClass is IDeclarerTagProvider provider))
+                return new Declarer(null, null, syntax.SourcePart)
                     .Issues(IssueId.UnknownDeclarationTag.Issue(syntax.SourcePart));
 
             var result = provider.Get(syntax.Right);
