@@ -1,30 +1,25 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
-using Reni.Context;
-using Reni.Feature;
 using Reni.Parser;
-using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Validation;
 
 namespace Reni.Helper
 {
-    sealed class SyntaxOption : DumpableObject, ValueCache.IContainer
+    sealed class SyntaxOption
+        : DumpableObject
+            , ValueCache.IContainer
     {
+        const bool UseParent = false;
+
         class CacheContainer
         {
             public SyntaxOption Parent;
         }
-
-        static IEnumerable<ContextBase> FunctionContexts(ContextBase context, Parser.Value body)
-            => ((FunctionBodyType) context.ResultCache(body).Type)
-                .Functions
-                .Select(item => item.CreateSubContext(false));
 
         readonly CacheContainer Cache = new CacheContainer();
 
@@ -35,21 +30,13 @@ namespace Reni.Helper
         public SyntaxOption(Syntax target)
         {
             Target = target;
-
-            if(Target.Left != null)
-                Target.Left.Option.Parent = this;
-
-            if(Target.Right != null)
-                Target.Right.Option.Parent = this;
-
+            SetParent();
         }
-
-        ValueCache ValueCache.IContainer.Cache {get;} = new ValueCache();
 
         [DisableDump]
         internal IDefaultScopeProvider DefaultScopeProvider => Target.DefaultScopeProvider;
 
-        //[Obsolete("",true)]
+        [Obsolete("", UseParent)]
         internal SyntaxOption Parent
         {
             get => Cache.Parent;
@@ -64,14 +51,8 @@ namespace Reni.Helper
         [DisableDump]
         internal IEnumerable<Syntax> Items => this.CachedValue(GetItems);
 
-        [DisableDump]
-        SyntaxOption LeftMost => Target.Left?.Option.LeftMost ?? this;
-
-        [DisableDump]
-        SyntaxOption RightMost => Target.Right?.Option.RightMost ?? this;
-
         [EnableDumpExcept(null)]
-        internal Result<Parser.Value> Value
+        internal Result<Value> Value
         {
             get
             {
@@ -109,84 +90,29 @@ namespace Reni.Helper
         internal Issue[] Issues
             => Value?.Issues ?? GetStatements()?.Issues ?? Statement?.Issues ?? Declarer?.Issues ?? new Issue[0];
 
-        [DisableDump]
-        ContextBase[] Contexts
-        {
-            get
-            {
-                if(IsStatementsLevel)
-                    return ((CompoundSyntax) Target.Value.Target)
-                        .ResultCache
-                        .Values
-                        .Select(item => item.Type.ToContext)
-                        .ToArray();
-
-                var parentContexts = Target.Option.Parent.Contexts;
-
-                if(IsFunctionLevel)
-                    return parentContexts
-                        .SelectMany(context => FunctionContexts(context, Value.Target))
-                        .ToArray();
-
-                return parentContexts;
-            }
-        }
-
-        [DisableDump]
-        bool IsFunctionLevel => Target.TokenClass is TokenClasses.Function;
-
-        [DisableDump]
-        bool IsStatementsLevel
-        {
-            get
-            {
-                if(Target.TokenClass is EndOfText)
-                    return true;
-
-                if(Value != null)
-                    return false;
-                if(Statements != null)
-                    return Target.Option.Parent?.Target.TokenClass != Target.TokenClass;
-                if(Statement != null)
-                    return false;
-
-                if(Target.TokenClass is LeftParenthesis)
-                    return false;
-
-                if(Target.TokenClass is BeginOfText)
-                    return false;
-
-                NotImplementedMethod();
-                return false;
-            }
-        }
-
-        [DisableDump]
-        internal IEnumerable<string> Declarations
-        {
-            get
-            {
-                if(Value != null)
-                    return Contexts
-                        .SelectMany(item => Value.Target.DeclarationOptions(item));
-
-                if(Statements != null || Statement != null)
-                    return Contexts
-                        .SelectMany(item => item.DeclarationOptions)
-                        .Concat(DeclarationTagToken.DeclarationOptions);
-
-                if(Declarer != null ||
-                   Target.TokenClass is LeftParenthesis ||
-                   Target.TokenClass is DeclarationTagToken)
-                    return new string[0];
-
-                NotImplementedMethod();
-                return null;
-            }
-        }
-
         internal SourcePart SourcePart =>
             LeftMost.Target.Token.SourcePart().Start.Span(RightMost.Target.Token.Characters.End);
+
+        [DisableDump]
+        SyntaxOption LeftMost => Target.Left?.Option.LeftMost ?? this;
+
+        [DisableDump]
+        SyntaxOption RightMost => Target.Right?.Option.RightMost ?? this;
+
+        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
+
+        internal Result<Statement[]> GetStatements(List type = null)
+            => (Target.TokenClass as IStatementsProvider)?.Get(type, Target, DefaultScopeProvider);
+
+        [Obsolete("", UseParent)]
+        void SetParent()
+        {
+            if(Target.Left != null)
+                Target.Left.Option.Parent = this;
+
+            if(Target.Right != null)
+                Target.Right.Option.Parent = this;
+        }
 
         IEnumerable<Syntax> GetItems()
         {
@@ -200,9 +126,5 @@ namespace Reni.Helper
                 foreach(var sourceSyntax in Target.Right.Option.Items)
                     yield return sourceSyntax;
         }
-
-        internal Result<Statement[]> GetStatements(List type = null)
-            => (Target.TokenClass as IStatementsProvider)?.Get(type, Target, DefaultScopeProvider);
-
     }
 }

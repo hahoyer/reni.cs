@@ -12,39 +12,30 @@ using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
-    public sealed class Syntax : DumpableObject, ISyntax, ValueCache.IContainer, ITree<Syntax>
+    public sealed class Syntax
+        : DumpableObject
+            , ISyntax
+            , ValueCache.IContainer
+            , ITree<Syntax>
     {
         static int NextObjectId;
 
-        internal static Syntax Create
-        (
-            Syntax left,
-            ITokenClass tokenClass,
-            IToken token,
-            Syntax right
-        )
-            => new Syntax(left, tokenClass, token, right);
+        internal bool IsDeclarationPart { get; private set; }
+
+
+        [EnableDumpExcept(null)]
+        internal Syntax Left { get; }
+
+        [DisableDump]
+        internal SyntaxOption Option { get; }
+
+        [EnableDumpExcept(null)]
+        internal Syntax Right { get; }
 
         [DisableDump]
         internal readonly IToken Token;
 
-        internal bool IsDeclarationPart { get; private set; }
-
-        [DisableDump]
-        internal SyntaxOption Option {get;}
-
-        Syntax ITree<Syntax>.Left => Left;
-        Syntax ITree<Syntax>.Right => Right;
-
-
-        [EnableDumpExcept(null)]
-        internal Syntax Left {get;}
-
-        [EnableDumpExcept(null)]
-        internal Syntax Right {get;}
-
-        internal ITokenClass TokenClass {get;}
-        ValueCache ValueCache.IContainer.Cache {get;} = new ValueCache();
+        internal ITokenClass TokenClass { get; }
 
         Syntax
         (
@@ -65,25 +56,9 @@ namespace Reni.TokenClasses
             Option = new SyntaxOption(this);
         }
 
-        void SetIsDeclarationPart()
-        {
-            if(TokenClass is Colon && Left != null)
-                Left.IsDeclarationPart = true;
-        }
-
-        SourcePart ISyntax.All => SourcePart;
-        SourcePart ISyntax.Main => Token.Characters;
-
         [DisableDump]
         internal IDefaultScopeProvider DefaultScopeProvider
             => TokenClass as IDefaultScopeProvider ?? Option.Parent?.DefaultScopeProvider;
-
-        [DisableDump]
-        public string[] DeclarationOptions
-            => Option
-                .Declarations
-                .Distinct()
-                .ToArray();
 
         [DisableDump]
         internal Result<Value> Value => this.CachedValue(() => GetValue(this));
@@ -95,11 +70,13 @@ namespace Reni.TokenClasses
             {
                 switch(TokenClass)
                 {
-                    case IDeclarerTokenClass tokenClass: return tokenClass.Get(this);
+                    case IDeclarerTokenClass tokenClass:
+                        return tokenClass.Get(this);
                     case RightParenthesis _:
                     case EndOfText _:
                     case List _:
-                    case ScannerSyntaxError _: return null;
+                    case ScannerSyntaxError _:
+                        return null;
                 }
 
                 NotImplementedMethod();
@@ -122,13 +99,50 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal SourcePart SourcePart => Option.SourcePart;
 
-        Syntax Locate(SourcePart part)
-            => Left?.CheckedLocate(part) ??
-               Right?.CheckedLocate(part) ??
-               this;
+        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
-        Syntax CheckedLocate(SourcePart part)
-            => SourcePart.Contains(part) ? Locate(part) : null;
+        SourcePart ISyntax.All => SourcePart;
+        SourcePart ISyntax.Main => Token.Characters;
+
+        Syntax ITree<Syntax>.Left => Left;
+        Syntax ITree<Syntax>.Right => Right;
+
+        public bool IsEqual(Syntax other, IComparator differenceHandler)
+        {
+            if(TokenClass.Id != other.TokenClass.Id)
+                return false;
+
+            if(Left == null && other.Left != null)
+                return false;
+
+            if(Left != null && other.Left == null)
+                return false;
+
+            if(Right == null && other.Right != null)
+                return false;
+
+            if(Right != null && other.Right == null)
+                return false;
+
+            if(Left != null && !Left.IsEqual(other.Left, differenceHandler))
+                return false;
+
+            if(Right != null && !Right.IsEqual(other.Right, differenceHandler))
+                return false;
+
+            return CompareWhiteSpaces(Token.PrecededWith, other.Token.PrecededWith, differenceHandler);
+        }
+
+        protected override string GetNodeDump() => base.GetNodeDump() + $"({TokenClass.Id})";
+
+        internal static Syntax Create
+        (
+            Syntax left,
+            ITokenClass tokenClass,
+            IToken token,
+            Syntax right
+        )
+            => new Syntax(left, tokenClass, token, right);
 
         internal IEnumerable<Syntax> Belongings(Syntax recent)
         {
@@ -145,6 +159,60 @@ namespace Reni.TokenClasses
             => new[] {this}
                 .Concat(Left.CheckedItemsAsLongAs(condition))
                 .Concat(Right.CheckedItemsAsLongAs(condition));
+
+        internal Result<Statement[]> GetStatements(List type = null)
+        {
+            var statements = Option.GetStatements(type);
+            if(statements != null)
+                return statements;
+
+            var statement = Option.Statement;
+            if(statement != null)
+                return statement.Convert(x => new[] {x});
+
+            var value = Option.Value;
+            if(value != null)
+                return Statement.CreateStatements(value, Option.DefaultScopeProvider);
+
+            return new Result<Statement[]>
+                (new Statement[0], IssueId.InvalidListOperandSequence.Issue(SourcePart));
+        }
+
+        internal Result<Syntax> GetBracketKernel(int level, Syntax parent)
+        {
+            Tracer.Assert(parent.Right == null);
+
+            if(!(TokenClass is LeftParenthesis leftParenthesis))
+                return new Result<Syntax>(this, IssueId.ExtraRightBracket.Issue(parent.SourcePart));
+
+            Tracer.Assert(Left == null);
+
+            var levelDelta = leftParenthesis.Level - level;
+
+            if(levelDelta == 0)
+                return Right;
+
+            if(levelDelta > 0)
+                return new Result<Syntax>
+                    (Right, IssueId.ExtraLeftBracket.Issue(SourcePart));
+
+            NotImplementedMethod(level, parent);
+            return null;
+        }
+
+        void SetIsDeclarationPart()
+        {
+            if(TokenClass is Colon && Left != null)
+                Left.IsDeclarationPart = true;
+        }
+
+        Syntax Locate(SourcePart part)
+            => Left?.CheckedLocate(part) ??
+               Right?.CheckedLocate(part) ??
+               this;
+
+        Syntax CheckedLocate(SourcePart part)
+            => SourcePart.Contains(part)? Locate(part) : null;
 
 
         Syntax RootOfBelongings(Syntax recent)
@@ -213,75 +281,11 @@ namespace Reni.TokenClasses
             return IssueId.InvalidExpression.Value(syntax);
         }
 
-        internal Result<Statement[]> GetStatements(List type = null)
+        static bool CompareWhiteSpaces
+            (IEnumerable<IItem> target, IEnumerable<IItem> other, IComparator differenceHandler)
         {
-            var statements = Option.GetStatements(type);
-            if(statements != null)
-                return statements;
-
-            var statement = Option.Statement;
-            if(statement != null)
-                return statement.Convert(x => new[] {x});
-
-            var value = Option.Value;
-            if(value != null)
-                return Statement.CreateStatements(value, Option.DefaultScopeProvider);
-
-            return new Result<Statement[]>
-                (new Statement[0], IssueId.InvalidListOperandSequence.Issue(SourcePart));
-        }
-
-        internal Result<Syntax> GetBracketKernel(int level, Syntax parent)
-        {
-            Tracer.Assert(parent.Right == null);
-
-            if(!(TokenClass is LeftParenthesis leftParenthesis))
-                return new Result<Syntax>(this, IssueId.ExtraRightBracket.Issue(parent.SourcePart));
-
-            Tracer.Assert(Left == null);
-
-            var levelDelta = leftParenthesis.Level - level;
-
-            if(levelDelta == 0)
-                return Right;
-
-            if(levelDelta > 0)
-                return new Result<Syntax>
-                    (Right, IssueId.ExtraLeftBracket.Issue(SourcePart));
-
-            NotImplementedMethod(level, parent);
-            return null;
-        }
-
-        public bool IsEqual(Syntax other, IComparator differenceHandler)
-        {
-            if(TokenClass.Id != other.TokenClass.Id)
-                return false;
-
-            if(Left == null && other.Left != null)
-                return false;
-
-            if(Left != null && other.Left == null)
-                return false;
-
-            if(Right == null && other.Right != null)
-                return false;
-
-            if(Right != null && other.Right == null)
-                return false;
-
-            if(Left != null && !Left.IsEqual(other.Left,differenceHandler))
-                return false;
-
-            if(Right != null && !Right.IsEqual(other.Right,differenceHandler))
-                return false;
-
-            return CompareWhiteSpaces(Token.PrecededWith, other.Token.PrecededWith, differenceHandler);
-        }
-
-        static bool CompareWhiteSpaces(IEnumerable<IItem> target, IEnumerable<IItem> other, IComparator differenceHandler)
-        {
-            if(target.Where(item=>item.IsComment()).SequenceEqual(other.Where(item=>item.IsComment()), differenceHandler.WhiteSpaceComparer))
+            if(target.Where(item => item.IsComment()).SequenceEqual(other.Where(item => item.IsComment())
+                , differenceHandler.WhiteSpaceComparer))
                 return true;
 
             NotImplementedFunction(target.Dump(), other.Dump(), differenceHandler);

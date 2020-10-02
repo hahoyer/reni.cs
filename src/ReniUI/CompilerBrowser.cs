@@ -177,7 +177,7 @@ namespace ReniUI
             ;
         }
 
-        Reni.TokenClasses.Syntax LocateActivePosition(int offset)
+        Helper.Syntax LocateActivePosition(int offset)
         {
             var token = Token.LocatePosition(Syntax, offset);
             if(token.IsComment || token.IsLineComment)
@@ -185,7 +185,7 @@ namespace ReniUI
 
             var tokenSyntax = token.Syntax;
             var position = tokenSyntax.Token.Characters.Position;
-            return position <= 0? null : tokenSyntax.LocatePosition(position - 1).Target;
+            return position <= 0? null : tokenSyntax.LocatePosition(position - 1);
         }
     }
 }
