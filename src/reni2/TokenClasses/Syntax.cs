@@ -67,10 +67,8 @@ namespace Reni.TokenClasses
 
         void SetIsDeclarationPart()
         {
-            if(TokenClass is not Colon || Left == null)
-                return;
-            
-            Left.IsDeclarationPart = true;
+            if(TokenClass is Colon && Left != null)
+                Left.IsDeclarationPart = true;
         }
 
         SourcePart ISyntax.All => SourcePart;
