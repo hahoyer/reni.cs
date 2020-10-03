@@ -40,12 +40,12 @@ namespace ReniUI.Test
                 if(reformat != null)
                 {
                     var newCompiler = CompilerBrowser.FromText(reformat);
-                    Tracer.Assert(compiler.Syntax.Target.IsEqual(newCompiler.Syntax.Target, IgnoreWhiteSpaces),
+                    Tracer.Assert(compiler.BinaryTreeSyntax.Target.IsEqual(newCompiler.BinaryTreeSyntax.Target, IgnoreWhiteSpaces),
                         ()=>@$"origin: 
-{compiler.Syntax.Target.Dump()} 
+{compiler.BinaryTreeSyntax.Target.Dump()} 
 
 new ({span.NodeDump}): 
-{newCompiler.Syntax.Target.Dump()} 
+{newCompiler.BinaryTreeSyntax.Target.Dump()} 
 
 "
                     );

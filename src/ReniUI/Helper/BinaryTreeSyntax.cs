@@ -6,30 +6,30 @@ using Reni.Helper;
 
 namespace ReniUI.Helper
 {
-    sealed class Syntax : SyntaxWithParent<Syntax>
+    sealed class BinaryTreeSyntax : BinaryTreeSyntaxWithParent<BinaryTreeSyntax>
     {
         class CacheContainer
         {
-            public FunctionCache<int, Syntax> ExtendedLocateByPosition;
-            public FunctionCache<int, Syntax> LocateByPosition;
+            public FunctionCache<int, BinaryTreeSyntax> ExtendedLocateByPosition;
+            public FunctionCache<int, BinaryTreeSyntax> LocateByPosition;
         }
 
         readonly CacheContainer Cache = new CacheContainer();
 
-        internal Syntax(Reni.TokenClasses.BinaryTree target)
+        internal BinaryTreeSyntax(Reni.TokenClasses.BinaryTree target)
             : this(target, null)
         {
         }
 
-        Syntax(Reni.TokenClasses.BinaryTree target, Syntax parent)
+        BinaryTreeSyntax(Reni.TokenClasses.BinaryTree target, BinaryTreeSyntax parent)
             : base(target, parent)
         {
-            Cache.LocateByPosition = new FunctionCache<int, Syntax>(LocateByPositionForCache);
-            Cache.ExtendedLocateByPosition = new FunctionCache<int, Syntax>(ExtendedLocateByPositionForCache);
+            Cache.LocateByPosition = new FunctionCache<int, BinaryTreeSyntax>(LocateByPositionForCache);
+            Cache.ExtendedLocateByPosition = new FunctionCache<int, BinaryTreeSyntax>(ExtendedLocateByPositionForCache);
         }
 
         [DisableDump]
-        internal IEnumerable<Syntax> ParentChainIncludingThis
+        internal IEnumerable<BinaryTreeSyntax> ParentChainIncludingThis
         {
             get
             {
@@ -43,40 +43,40 @@ namespace ReniUI.Helper
             }
         }
 
-        public Syntax LocateByPosition(int current) => Cache.LocateByPosition[current];
+        public BinaryTreeSyntax LocateByPosition(int current) => Cache.LocateByPosition[current];
 
-        protected override Syntax Create(Reni.TokenClasses.BinaryTree target, Syntax parent)
-            => new Syntax(target, parent);
+        protected override BinaryTreeSyntax Create(Reni.TokenClasses.BinaryTree target, BinaryTreeSyntax parent)
+            => new BinaryTreeSyntax(target, parent);
 
-        internal Syntax Locate(SourcePart part)
+        internal BinaryTreeSyntax Locate(SourcePart part)
             => Left?.CheckedLocate(part) ??
                Right?.CheckedLocate(part) ??
                this;
 
-        Syntax CheckedLocate(SourcePart part)
+        BinaryTreeSyntax CheckedLocate(SourcePart part)
             => SourcePart.Contains(part)? Locate(part) : null;
 
-        Syntax LocatePositionExtended(int current) => Cache.ExtendedLocateByPosition[current];
+        BinaryTreeSyntax LocatePositionExtended(int current) => Cache.ExtendedLocateByPosition[current];
 
-        Syntax LocateByPositionForCache(int current)
+        BinaryTreeSyntax LocateByPositionForCache(int current)
             => Left?.LocateByPositionOrDefault(current) ??
                Right?.LocateByPositionOrDefault(current) ??
                this;
 
-        Syntax ExtendedLocateByPositionForCache(int current)
+        BinaryTreeSyntax ExtendedLocateByPositionForCache(int current)
             => Contains(current)
                 ? Left?.ExtendedLocateByPositionOrDefault(current) ??
                   Right?.ExtendedLocateByPositionOrDefault(current) ??
                   this
                 : Parent.ExtendedLocateByPositionForCache(current);
 
-        Syntax LocateByPositionOrDefault(int current)
+        BinaryTreeSyntax LocateByPositionOrDefault(int current)
             =>
                 Contains(current)
                     ? LocateByPosition(current)
                     : null;
 
-        Syntax ExtendedLocateByPositionOrDefault(int current)
+        BinaryTreeSyntax ExtendedLocateByPositionOrDefault(int current)
             =>
                 Contains(current)
                     ? LocatePositionExtended(current)

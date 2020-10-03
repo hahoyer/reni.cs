@@ -44,7 +44,7 @@ namespace ReniUI.Helper
 
         [DisableDump]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public Syntax Syntax
+        public BinaryTreeSyntax BinaryTreeSyntax
         {
             get
             {

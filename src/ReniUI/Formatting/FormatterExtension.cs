@@ -46,10 +46,10 @@ namespace ReniUI.Formatting
             return result;
         }
 
-        public static Helper.Syntax LocateAndFilter(this CompilerBrowser compiler, SourcePart targetPart)
+        public static Helper.BinaryTreeSyntax LocateAndFilter(this CompilerBrowser compiler, SourcePart targetPart)
         {
             if(targetPart == null)
-                return compiler.Syntax;
+                return compiler.BinaryTreeSyntax;
             var result = compiler.Locate(targetPart);
             return IsTooSmall(result.Target.Token, targetPart) ? null : result;
         }

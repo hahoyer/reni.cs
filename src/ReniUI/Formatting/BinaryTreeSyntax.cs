@@ -10,7 +10,7 @@ using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
-    sealed class Syntax : SyntaxWithParent<Syntax>
+    sealed class BinaryTreeSyntax : BinaryTreeSyntaxWithParent<BinaryTreeSyntax>
     {
         class CacheContainer
         {
@@ -18,16 +18,16 @@ namespace ReniUI.Formatting
             internal ValueCache<SplitMaster> SplitMaster;
         }
 
-        static TContainer FlatSubFormat<TContainer, TValue>(Syntax left, bool areEmptyLinesPossible)
+        static TContainer FlatSubFormat<TContainer, TValue>(BinaryTreeSyntax left, bool areEmptyLinesPossible)
             where TContainer : class, IFormatResult<TValue>, new()
             => left == null ? new TContainer() : left.FlatFormat<TContainer, TValue>(areEmptyLinesPossible);
 
         readonly CacheContainer Cache = new CacheContainer();
 
-        internal Syntax(Reni.TokenClasses.BinaryTree target)
+        internal BinaryTreeSyntax(Reni.TokenClasses.BinaryTree target)
             : this(target, null) {}
 
-        Syntax(Reni.TokenClasses.BinaryTree target, Syntax parent)
+        BinaryTreeSyntax(Reni.TokenClasses.BinaryTree target, BinaryTreeSyntax parent)
             : base(target, parent)
         {
             Tracer.Assert(Target != null);
@@ -37,11 +37,11 @@ namespace ReniUI.Formatting
 
         [EnableDump]
         [EnableDumpExcept(null)]
-        public new Syntax Left => base.Left;
+        public new BinaryTreeSyntax Left => base.Left;
 
         [EnableDump]
         [EnableDumpExcept(null)]
-        public new Syntax Right => base.Right;
+        public new BinaryTreeSyntax Right => base.Right;
 
         [DisableDump]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -62,8 +62,8 @@ namespace ReniUI.Formatting
         internal bool IsSeparatorRequired
             => !WhiteSpaces.HasComment() && SeparatorExtension.Get(LeftNeighbor?.TokenClass, TokenClass);
 
-        protected override Syntax Create(Reni.TokenClasses.BinaryTree target, Syntax parent)
-            => new Syntax(target, parent);
+        protected override BinaryTreeSyntax Create(Reni.TokenClasses.BinaryTree target, BinaryTreeSyntax parent)
+            => new BinaryTreeSyntax(target, parent);
 
         SplitMaster GetSplitMaster()
         {

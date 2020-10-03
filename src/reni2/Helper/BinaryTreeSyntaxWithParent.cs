@@ -7,12 +7,12 @@ using Reni.TokenClasses;
 
 namespace Reni.Helper
 {
-    abstract class SyntaxWithParent<TResult>
+    abstract class BinaryTreeSyntaxWithParent<TResult>
         : BinaryTreeWithParentExtended<TResult, BinaryTree>
             , IBinaryTree<TResult>
-        where TResult : SyntaxWithParent<TResult>
+        where TResult : BinaryTreeSyntaxWithParent<TResult>
     {
-        protected SyntaxWithParent(BinaryTree target, TResult parent)
+        protected BinaryTreeSyntaxWithParent(BinaryTree target, TResult parent)
             : base(target, parent) { }
 
         [DisableDump]

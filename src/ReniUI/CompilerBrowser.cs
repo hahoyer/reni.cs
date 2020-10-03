@@ -18,8 +18,8 @@ namespace ReniUI
     {
         class CacheContainer
         {
-            internal Formatting.Syntax FomattingSyntax;
-            internal Helper.Syntax HelperSyntax;
+            internal Formatting.BinaryTreeSyntax FomattingBinaryTreeSyntax;
+            internal Helper.BinaryTreeSyntax HelperBinaryTreeSyntax;
             internal Helper.Value Value;
         }
 
@@ -51,10 +51,10 @@ namespace ReniUI
 
         internal IEnumerable<Issue> Issues => Compiler.Issues;
 
-        internal Formatting.Syntax FormattingSyntax
-            => Cache.FomattingSyntax ?? (Cache.FomattingSyntax = new Formatting.Syntax(Compiler.BinaryTree));
+        internal Formatting.BinaryTreeSyntax FormattingBinaryTreeSyntax
+            => Cache.FomattingBinaryTreeSyntax ?? (Cache.FomattingBinaryTreeSyntax = new Formatting.BinaryTreeSyntax(Compiler.BinaryTree));
 
-        internal Helper.Syntax Syntax => Cache.HelperSyntax ?? (Cache.HelperSyntax = GetHelperSyntax());
+        internal Helper.BinaryTreeSyntax BinaryTreeSyntax => Cache.HelperBinaryTreeSyntax ?? (Cache.HelperBinaryTreeSyntax = GetHelperSyntax());
         internal Helper.Value Value => Cache.Value?? (Cache.Value= GetValue());
 
 
@@ -81,7 +81,7 @@ namespace ReniUI
             => open.FindAllBelongings(this);
 
         public string FlatFormat(bool areEmptyLinesPossible)
-            => FormattingSyntax.FlatFormat(areEmptyLinesPossible);
+            => FormattingBinaryTreeSyntax.FlatFormat(areEmptyLinesPossible);
 
         internal IEnumerable<Reni.Parser.Value> FindPosition(int offset)
         {
@@ -132,17 +132,17 @@ namespace ReniUI
             return null;
         }
 
-        internal IEnumerable<Reni.TokenClasses.BinaryTree> FindAllBelongings(Helper.Syntax syntax)
-            => Compiler.BinaryTree.Belongings(syntax.Target);
+        internal IEnumerable<Reni.TokenClasses.BinaryTree> FindAllBelongings(Helper.BinaryTreeSyntax binaryTreeSyntax)
+            => Compiler.BinaryTree.Belongings(binaryTreeSyntax.Target);
 
         internal string Reformat(IFormatter formatter = null, SourcePart targetPart = null) =>
             (formatter ?? new Formatting.Configuration().Create())
             .GetEditPieces(this, targetPart)
-            .Combine(Syntax.Target.SourcePart);
+            .Combine(BinaryTreeSyntax.Target.SourcePart);
 
-        internal Helper.Syntax Locate(SourcePart span)
+        internal Helper.BinaryTreeSyntax Locate(SourcePart span)
         {
-            var result = Syntax.Locate(span);
+            var result = BinaryTreeSyntax.Locate(span);
             if(result != null)
                 return result;
 
@@ -165,11 +165,11 @@ namespace ReniUI
             => (formatter ?? new Formatting.Configuration().Create())
                 .GetEditPieces(this, sourcePart);
 
-        Helper.Syntax GetHelperSyntax()
+        Helper.BinaryTreeSyntax GetHelperSyntax()
         {
             try
             {
-                return new Helper.Syntax(Compiler.BinaryTree);
+                return new Helper.BinaryTreeSyntax(Compiler.BinaryTree);
             }
             catch(Exception e)
             {
