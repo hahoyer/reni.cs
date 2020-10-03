@@ -5,7 +5,6 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
-using Reni.Context;
 using Reni.Helper;
 using Reni.Parser;
 using Reni.Struct;
@@ -19,7 +18,20 @@ namespace Reni.TokenClasses
             , ValueCache.IContainer
             , IBinaryTree<Syntax>
     {
+        class NullScope
+            : DumpableObject
+                , IValuesScope
+                , IDefaultScopeProvider
+        {
+            bool IDefaultScopeProvider.MeansPublic => false;
+            IDefaultScopeProvider IValuesScope.DefaultScopeProvider => this;
+            bool IValuesScope.IsDeclarationPart => false;
+        }
+
+        public const bool ValuePropertyIsObsolete = true;
         static int NextObjectId;
+
+        static readonly IValuesScope NullScopeInstance = new NullScope();
 
         [EnableDump]
         [EnableDumpExcept(null)]
@@ -54,10 +66,6 @@ namespace Reni.TokenClasses
             Option = new SyntaxOption(this);
         }
 
-        public const bool ValuePropertyIsObsolete = true;
-
-        internal Result<Value> Value(IValuesScope scope) => this.CachedFunction(scope??NullScopeInstance, GetValue);
-
         [DisableDump]
         internal Result<Declarer> Declarer
         {
@@ -82,13 +90,13 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal SourcePart SourcePart => Option.SourcePart;
 
+        Syntax IBinaryTree<Syntax>.Left => Left;
+        Syntax IBinaryTree<Syntax>.Right => Right;
+
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
         SourcePart ISyntax.All => SourcePart;
         SourcePart ISyntax.Main => Token.Characters;
-
-        Syntax IBinaryTree<Syntax>.Left => Left;
-        Syntax IBinaryTree<Syntax>.Right => Right;
 
         public bool IsEqual(Syntax other, IComparator differenceHandler)
         {
@@ -118,6 +126,8 @@ namespace Reni.TokenClasses
 
         protected override string GetNodeDump() => base.GetNodeDump() + $"({TokenClass.Id})";
 
+        internal Result<Value> Value(IValuesScope scope) => this.CachedFunction(scope ?? NullScopeInstance, GetValue);
+
         internal static Syntax Create
         (
             Syntax left,
@@ -142,17 +152,6 @@ namespace Reni.TokenClasses
             => new[] {this}
                 .Concat(Left.CheckedItemsAsLongAs(condition))
                 .Concat(Right.CheckedItemsAsLongAs(condition));
-
-        Result<Value> GetValueOrDefault(IValuesScope scope)
-            => scope != null && scope.IsDeclarationPart
-                ? null
-                : (TokenClass as IValueProvider)?.Get(this, scope);
-
-        Result<Statement> GetStatementOrDefault(IValuesScope scope) 
-            => (TokenClass as IStatementProvider)?.Get(Left, Right, scope);
-
-        Result<Statement[]> GetStatementsOrDefault(IValuesScope scope, List type) 
-            => (TokenClass as IStatementsProvider)?.Get(type, this, scope);
 
 
         internal Result<Statement[]> GetStatements(IValuesScope scope, List type = null)
@@ -184,7 +183,7 @@ namespace Reni.TokenClasses
             if(statement != null)
                 return CompoundSyntax.Create(statement, this);
 
-            var statements = GetStatementsOrDefault(scope,null);
+            var statements = GetStatementsOrDefault(scope, null);
             if(statements != null)
                 return CompoundSyntax.Create(statements, this);
 
@@ -211,6 +210,17 @@ namespace Reni.TokenClasses
             NotImplementedMethod(level, parent);
             return null;
         }
+
+        Result<Value> GetValueOrDefault(IValuesScope scope)
+            => scope != null && scope.IsDeclarationPart
+                ? null
+                : (TokenClass as IValueProvider)?.Get(this, scope);
+
+        Result<Statement> GetStatementOrDefault(IValuesScope scope)
+            => (TokenClass as IStatementProvider)?.Get(Left, Right, scope);
+
+        Result<Statement[]> GetStatementsOrDefault(IValuesScope scope, List type)
+            => (TokenClass as IStatementsProvider)?.Get(type, this, scope);
 
         Syntax Locate(SourcePart part)
             => Left?.CheckedLocate(part) ??
@@ -279,16 +289,6 @@ namespace Reni.TokenClasses
 
             NotImplementedFunction(target.Dump(), other.Dump(), differenceHandler);
             return default;
-        }
-
-        static readonly IValuesScope NullScopeInstance = new NullScope();
-
-        class NullScope : DumpableObject, IValuesScope
-            , IDefaultScopeProvider
-        {
-            IDefaultScopeProvider IValuesScope.DefaultScopeProvider => this;
-            bool IDefaultScopeProvider.MeansPublic => false;
-            bool IValuesScope.IsDeclarationPart => false;
         }
     }
 }
