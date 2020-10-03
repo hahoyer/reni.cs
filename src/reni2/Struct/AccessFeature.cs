@@ -65,7 +65,7 @@ namespace Reni.Struct
 
         Result Result(Category category) => View.AccessViaObject(category, Position);
 
-        Parser.Value Statement => View
+        Parser.Syntax Statement => View
             .Compound
             .Syntax
             .Statements[Position];

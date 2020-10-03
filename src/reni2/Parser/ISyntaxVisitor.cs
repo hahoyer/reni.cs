@@ -2,6 +2,6 @@ namespace Reni.Parser
 {
     interface ISyntaxVisitor
     {
-        Value Arg { get; }
+        Syntax Arg { get; }
     }
 }

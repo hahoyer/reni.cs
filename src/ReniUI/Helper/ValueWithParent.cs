@@ -9,11 +9,11 @@ using Reni.Parser;
 namespace ReniUI.Helper
 {
     abstract class ValueWithParent<TResult>
-        : TreeWithParentExtended<TResult, Reni.Parser.Value>
+        : TreeWithParentExtended<TResult, Reni.Parser.Syntax>
             , ITree<TResult>
         where TResult : ValueWithParent<TResult>
     {
-        protected ValueWithParent(Reni.Parser.Value target, TResult parent)
+        protected ValueWithParent(Reni.Parser.Syntax target, TResult parent)
             : base(target, parent) { }
 
         [DisableDump]

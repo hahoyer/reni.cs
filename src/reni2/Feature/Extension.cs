@@ -15,10 +15,10 @@ namespace Reni.Feature
     static class Extension
     {
         static readonly
-            FunctionCache<Func<Category, ResultCache, ContextBase, Parser.Value, Result>, MetaFunction>
+            FunctionCache<Func<Category, ResultCache, ContextBase, Parser.Syntax, Result>, MetaFunction>
             _metaFunctionCache
                 =
-                new FunctionCache<Func<Category, ResultCache, ContextBase, Parser.Value, Result>, MetaFunction>
+                new FunctionCache<Func<Category, ResultCache, ContextBase, Parser.Syntax, Result>, MetaFunction>
                     (function => new MetaFunction(function));
 
         static readonly FunctionCache<Func<Category, Result>, FunctionCache<TypeBase, Value>> ValueCache
@@ -68,7 +68,7 @@ namespace Reni.Feature
         }
 
         internal static MetaFunction MetaFeature
-            (Func<Category, ResultCache, ContextBase, Parser.Value, Result> function)
+            (Func<Category, ResultCache, ContextBase, Parser.Syntax, Result> function)
             => _metaFunctionCache[function];
 
         internal static TypeBase ResultType(this IConversion conversion)
@@ -114,7 +114,7 @@ namespace Reni.Feature
             Category category,
             ISyntax currentTarget,
             ContextBase context,
-            Parser.Value right)
+            Parser.Syntax right)
         {
             Tracer.Assert
             (
@@ -162,7 +162,7 @@ namespace Reni.Feature
         (
             this IEvalImplementation feature,
             ContextBase context,
-            Parser.Value right,
+            Parser.Syntax right,
             Category valueCategory)
         {
             if(feature.Function != null && feature.Function.IsImplicit)
@@ -188,7 +188,7 @@ namespace Reni.Feature
             ResultCache left,
             BinaryTree token,
             ContextBase context,
-            Parser.Value right)
+            Parser.Syntax right)
         {
             var metaFeature = ((IMetaImplementation) feature).Function;
             if(metaFeature != null)

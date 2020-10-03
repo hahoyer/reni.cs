@@ -12,7 +12,7 @@ namespace Reni.TokenClasses
         public override string Id => TokenId;
 
         protected override Result Result
-            (ContextBase context, Category category, Value left, Value right)
+            (ContextBase context, Category category, Syntax left, Syntax right)
         {
             var leftType = left.Type(context);
             return leftType
@@ -20,7 +20,7 @@ namespace Reni.TokenClasses
         }
 
         Result IPendingProvider.Result
-            (ContextBase context, Category category, Value left, Value right)
+            (ContextBase context, Category category, Syntax left, Syntax right)
         {
             if(category <= Category.Type.Replenished)
                 return Result(context, category, left, right);
@@ -34,7 +34,7 @@ namespace Reni.TokenClasses
             ContextBase context,
             Category category,
             Category pendingCategory,
-            Value syntax,
+            Syntax syntax,
             bool asReference)
         {
             if(!asReference && (category | pendingCategory) <= Category.Type)

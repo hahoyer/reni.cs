@@ -32,10 +32,10 @@ namespace Reni.Context
             readonly bool AsReference;
 
             internal readonly ContextBase Context;
-            internal readonly Parser.Value Syntax;
+            internal readonly Parser.Syntax Syntax;
 
             internal ResultProvider
-                (ContextBase context, Parser.Value syntax, bool asReference = false)
+                (ContextBase context, Parser.Syntax syntax, bool asReference = false)
                 : base(NextObjectId++)
             {
                 Context = context;
@@ -90,17 +90,17 @@ namespace Reni.Context
 
             [Node]
             [SmartNode]
-            internal readonly FunctionCache<Parser.Value, ResultCache> ResultAsReferenceCache;
+            internal readonly FunctionCache<Parser.Syntax, ResultCache> ResultAsReferenceCache;
 
             [Node]
             [SmartNode]
-            internal readonly FunctionCache<Parser.Value, ResultCache> ResultCache;
+            internal readonly FunctionCache<Parser.Syntax, ResultCache> ResultCache;
 
             public Cache(ContextBase target)
             {
-                ResultCache = new FunctionCache<Parser.Value, ResultCache>
+                ResultCache = new FunctionCache<Parser.Syntax, ResultCache>
                     (target.ResultCacheForCache);
-                ResultAsReferenceCache = new FunctionCache<Parser.Value, ResultCache>
+                ResultAsReferenceCache = new FunctionCache<Parser.Syntax, ResultCache>
                     (target.GetResultAsReferenceCacheForCache);
                 RecentStructure = new ValueCache<CompoundView>(target.ObtainRecentCompoundView);
                 RecentFunctionContextObject = new ValueCache<IFunctionContext>
@@ -190,20 +190,20 @@ namespace Reni.Context
         internal Compound Compound(CompoundSyntax context) => CacheObject.Compounds[context];
 
         //[DebuggerHidden]
-        internal Result Result(Category category, Parser.Value syntax)
+        internal Result Result(Category category, Parser.Syntax syntax)
             => ResultCache(syntax).GetCategories(category);
 
-        internal ResultCache ResultCache(Parser.Value syntax)
+        internal ResultCache ResultCache(Parser.Syntax syntax)
             => CacheObject.ResultCache[syntax];
 
-        internal ResultCache ResultAsReferenceCache(Parser.Value syntax)
+        internal ResultCache ResultAsReferenceCache(Parser.Syntax syntax)
             => CacheObject.ResultAsReferenceCache[syntax];
 
-        internal TypeBase TypeIfKnown(Parser.Value syntax)
+        internal TypeBase TypeIfKnown(Parser.Syntax syntax)
             => CacheObject.ResultCache[syntax].Data.Type;
 
         //[DebuggerHidden]
-        Result ResultForCache(Category category, Parser.Value syntax)
+        Result ResultForCache(Category category, Parser.Syntax syntax)
         {
             var trace = syntax.ObjectId.In() && ObjectId.In(7) && category.HasType;
             StartMethodDump(trace, category, syntax);
@@ -221,14 +221,14 @@ namespace Reni.Context
         }
 
         [DebuggerHidden]
-        ResultCache ResultCacheForCache(Parser.Value syntax)
+        ResultCache ResultCacheForCache(Parser.Syntax syntax)
         {
             var result = new ResultCache(new ResultProvider(this, syntax));
             syntax.AddToCacheForDebug(this, result);
             return result;
         }
 
-        ResultCache GetResultAsReferenceCacheForCache(Parser.Value syntax)
+        ResultCache GetResultAsReferenceCacheForCache(Parser.Syntax syntax)
             => new ResultCache(new ResultProvider(this, syntax, asReference: true));
 
         internal virtual CompoundView ObtainRecentCompoundView()
@@ -243,7 +243,7 @@ namespace Reni.Context
             return null;
         }
 
-        internal Result ResultAsReference(Category category, Parser.Value syntax)
+        internal Result ResultAsReference(Category category, Parser.Syntax syntax)
             => Result(category.Typed, syntax)
                 .LocalReferenceResult;
 
@@ -260,7 +260,7 @@ namespace Reni.Context
         /// <param name="token"></param>
         /// <returns> </returns>
         internal Result FunctionalArgResult
-            (Category category, Parser.Value right, BinaryTree token)
+            (Category category, Parser.Syntax right, BinaryTree token)
         {
             var argsType = FindRecentFunctionContextObject.ArgsType;
             return argsType
@@ -296,7 +296,7 @@ namespace Reni.Context
         }
 
         internal Result PrefixResult
-            (Category category, Definable definable, BinaryTree source, Parser.Value right)
+            (Category category, Definable definable, BinaryTree source, Parser.Syntax right)
         {
             var searchResult = Declaration(definable);
             if(searchResult == null)

@@ -9,7 +9,7 @@ using Reni.TokenClasses;
 
 namespace Reni.Parser
 {
-    sealed class ExpressionSyntax : Value
+    sealed class ExpressionSyntax : Syntax
     {
         internal sealed class EvaluationDepthExhaustedException : Exception
         {
@@ -35,11 +35,11 @@ namespace Reni.Parser
                    Context.NodeDump;
         }
 
-        internal static Result<Value> Create
-            (BinaryTree parent, Value left, Definable definable, Value right)
-            => new Result<Value>(new ExpressionSyntax(parent, left, definable, right));
+        internal static Result<Syntax> Create
+            (BinaryTree parent, Syntax left, Definable definable, Syntax right)
+            => new Result<Syntax>(new ExpressionSyntax(parent, left, definable, right));
 
-        internal static Result<Value> Create(Definable definable, BinaryTree binaryTree, IValuesScope scope)
+        internal static Result<Syntax> Create(Definable definable, BinaryTree binaryTree, IValuesScope scope)
         {
             var leftValue = binaryTree.Left?.Value(scope);
             var rightValue = binaryTree.Right?.Value(scope);
@@ -51,7 +51,7 @@ namespace Reni.Parser
 
         int CurrentResultDepth;
 
-        ExpressionSyntax(BinaryTree parent, Value left, Definable definable, Value right)
+        ExpressionSyntax(BinaryTree parent, Syntax left, Definable definable, Syntax right)
             : base(parent)
         {
             Left = left;
@@ -61,15 +61,15 @@ namespace Reni.Parser
         }
 
         [Node]
-        internal Value Left {get;}
+        internal Syntax Left {get;}
 
         [Node]
         public Definable Definable {get;}
 
         [Node]
-        internal Value Right {get;}
+        internal Syntax Right {get;}
 
-        protected override IEnumerable<Value> GetChildren() => T(Left,Right);
+        protected override IEnumerable<Syntax> GetChildren() => T(Left,Right);
 
         internal override Result ResultForCache(ContextBase context, Category category)
         {
@@ -100,7 +100,7 @@ namespace Reni.Parser
             }
         }
 
-        internal override Value Visit(ISyntaxVisitor visitor)
+        internal override Syntax Visit(ISyntaxVisitor visitor)
         {
             var left = Left?.Visit(visitor);
             var right = Right?.Visit(visitor);

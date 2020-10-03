@@ -8,21 +8,21 @@ using Reni.Type;
 
 namespace Reni
 {
-    sealed class CondSyntax : Value, IRecursionHandler
+    sealed class CondSyntax : Syntax, IRecursionHandler
     {
         [Node]
         [EnableDump]
-        readonly Value Cond;
+        readonly Syntax Cond;
 
         [Node]
         [EnableDump]
-        readonly Value Then;
+        readonly Syntax Then;
 
         [Node]
         [EnableDump]
-        readonly Value Else;
+        readonly Syntax Else;
 
-        internal static Result<Value> Create
+        internal static Result<Syntax> Create
             (BinaryTree condition, BinaryTree thenBinaryTree, BinaryTree elseBinaryTree, BinaryTree binaryTree, IValuesScope scope)
         {
             var conditionValue = condition.Value(scope);
@@ -31,10 +31,10 @@ namespace Reni
             var result = new CondSyntax
                 (conditionValue.Target, thenValue?.Target, elseValue?.Target, binaryTree);
             var issues = conditionValue.Issues.plus(thenValue?.Issues).plus(elseValue?.Issues);
-            return new Result<Value>(result, issues);
+            return new Result<Syntax>(result, issues);
         }
 
-        CondSyntax(Value condSyntax, Value thenSyntax, Value elseSyntax, BinaryTree binaryTree)
+        CondSyntax(Syntax condSyntax, Syntax thenSyntax, Syntax elseSyntax, BinaryTree binaryTree)
             : base(binaryTree)
         {
             Cond = condSyntax;
@@ -42,7 +42,7 @@ namespace Reni
             Else = elseSyntax;
         }
 
-        protected override IEnumerable<Value> GetChildren() => T(Cond, Then,Else);
+        protected override IEnumerable<Syntax> GetChildren() => T(Cond, Then,Else);
 
         internal override Result ResultForCache(ContextBase context, Category category)
             => InternalResult(context, category);
@@ -67,7 +67,7 @@ namespace Reni
         Result ThenResult(ContextBase context, Category category)
             => BranchResult(context, category, Then);
 
-        Result BranchResult(ContextBase context, Category category, Value syntax)
+        Result BranchResult(ContextBase context, Category category, Syntax syntax)
         {
             var result = context.Result(category.Typed, syntax);
             if(result == null)
@@ -127,7 +127,7 @@ namespace Reni
             ContextBase context,
             Category category,
             Category pendingCategory,
-            Value syntax,
+            Syntax syntax,
             bool asReference)
         {
             Tracer.Assert(syntax == this);

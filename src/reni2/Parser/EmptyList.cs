@@ -5,14 +5,14 @@ using Reni.TokenClasses;
 
 namespace Reni.Parser
 {
-    sealed class EmptyList : Value
+    sealed class EmptyList : Syntax
     {
         public EmptyList(BinaryTree binaryTree)
             : base(binaryTree) { StopByObjectIds(); }
 
         protected override string GetNodeDump() => "()";
 
-        protected override IEnumerable<Value> GetChildren() => new Value[0];
+        protected override IEnumerable<Syntax> GetChildren() => new Syntax[0];
 
         internal override Result ResultForCache(ContextBase context, Category category)
             => context.RootContext.VoidType.Result(category);

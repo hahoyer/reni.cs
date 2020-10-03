@@ -327,7 +327,7 @@
     <Compile Include="FeatureTest\ThenElse.cs" />
     <Compile Include="ParserTest\Test.cs" />
     <Compile Include="Struct\AccessFeature.cs" />
-    <Compile Include="Parser\Value.cs" />
+    <Compile Include="Parser\Syntax.cs" />
     <Compile Include="Runtime\OutStream.cs" />
     <Compile Include="Parser\Special.cs" />
     <Compile Include="Parser\EmptyList.cs" />

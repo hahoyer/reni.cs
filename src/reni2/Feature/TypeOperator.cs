@@ -12,7 +12,7 @@ namespace Reni.Feature
         public const string TokenId = "type";
         public override string Id => TokenId;
 
-        protected override Result Result(ContextBase context, Category category, Parser.Value left)
+        protected override Result Result(ContextBase context, Category category, Parser.Syntax left)
         {
             if(category.HasType)
             {

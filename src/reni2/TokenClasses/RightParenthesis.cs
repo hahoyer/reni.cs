@@ -20,7 +20,7 @@ namespace Reni.TokenClasses
         {
             static string Id => "()";
 
-            Result<Value> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
+            Result<Syntax> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
             {
                 Tracer.Assert(binaryTree.Left != null);
                 Tracer.Assert(binaryTree.Right != null);
@@ -41,7 +41,7 @@ namespace Reni.TokenClasses
             : base(level) { }
 
         [Obsolete("",true)]
-        Result<Value> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
+        Result<Syntax> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
         {
             var result = binaryTree.Left.GetBracketKernel(Level, binaryTree);
             var target = result.Target?.Value(this) ?? new EmptyList(binaryTree);

@@ -22,11 +22,11 @@ namespace Reni.Code
         readonly string ModuleName;
         readonly Root Root;
 
-        internal CodeContainer(Value value, Root root, string moduleName, string description)
+        internal CodeContainer(Syntax syntax, Root root, string moduleName, string description)
         {
             ModuleName = moduleName;
             Root = root;
-            MainCache = new ValueCache<Container>(() => root.MainContainer(value, description));
+            MainCache = new ValueCache<Container>(() => root.MainContainer(syntax, description));
             CSharpStringCache = new ValueCache<string>(GetCSharpStringForCache);
             _functions = new FunctionCache<int, FunctionContainer>(Root.FunctionContainer);
         }

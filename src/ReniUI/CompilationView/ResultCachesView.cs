@@ -6,7 +6,7 @@ namespace ReniUI.CompilationView
 {
     sealed class ResultCachesView : ChildView
     {
-        public ResultCachesView(Value syntax, SourceView master)
+        public ResultCachesView(Syntax syntax, SourceView master)
             : base(master, "ResultCaches: " + syntax.GetType().PrettyName() + "-" + syntax.ObjectId)
         {
             Client = syntax.ResultCache.CreateClient(Master);

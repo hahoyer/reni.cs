@@ -83,7 +83,7 @@ namespace ReniUI
         public string FlatFormat(bool areEmptyLinesPossible)
             => FormattingBinaryTreeSyntax.FlatFormat(areEmptyLinesPossible);
 
-        internal IEnumerable<Reni.Parser.Value> FindPosition(int offset)
+        internal IEnumerable<Reni.Parser.Syntax> FindPosition(int offset)
         {
             var enumerable = LocatePosition(offset)
                 .Syntax
@@ -184,7 +184,7 @@ namespace ReniUI
         {
             try
             {
-                return new Value(Compiler.Value);
+                return new Value(Compiler.Syntax);
             }
             catch(Exception e)
             {

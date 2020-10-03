@@ -78,7 +78,7 @@ namespace Reni.Type
             => Value.DumpPrintTypeNameResult(category);
 
         Result StarResult
-            (Category category, ResultCache left, ContextBase context, Parser.Value right)
+            (Category category, ResultCache left, ContextBase context, Parser.Syntax right)
         {
             var countResult = right.Result(context).AutomaticDereferenceResult;
             var count = countResult
@@ -92,7 +92,7 @@ namespace Reni.Type
         }
 
         Result SlashResult
-            (Category category, ResultCache left, ContextBase context, Parser.Value right)
+            (Category category, ResultCache left, ContextBase context, Parser.Syntax right)
         {
             var rightType = right
                 .Type(context)

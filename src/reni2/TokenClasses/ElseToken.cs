@@ -10,7 +10,7 @@ namespace Reni.TokenClasses
         public const string TokenId = "else";
         public override string Id => TokenId;
 
-        Result<Value> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
+        Result<Syntax> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
         {
             Tracer.Assert(binaryTree.Left != null);
             Tracer.Assert(binaryTree.Left.TokenClass is ThenToken);

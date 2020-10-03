@@ -16,13 +16,13 @@ namespace Reni.Parser
 
         string ITokenClass.Id => Id;
 
-        Result<Value> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
+        Result<Syntax> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
         {
             if(binaryTree.Right == null)
             {
                 var issues = IssueId.Issue(binaryTree.Token.Characters);
                 if(binaryTree.Left == null)
-                    return new Result<Value>(new EmptyList(binaryTree), issues);
+                    return new Result<Syntax>(new EmptyList(binaryTree), issues);
                 else
                 return binaryTree.Left.GetValue(scope).With(issues);
             }

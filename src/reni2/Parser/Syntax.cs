@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
@@ -13,19 +12,18 @@ using Reni.Type;
 namespace Reni.Parser
 {
     /// <summary>
-    /// Static syntax items that represent a value
+    ///     Static syntax items that represent a value
     /// </summary>
-    abstract class Value : DumpableObject
-        , ITree<Value>
+    abstract class Syntax
+        : DumpableObject
+            , ITree<Syntax>
     {
         class CacheContainer
         {
-            public Value[] Children;
+            public Syntax[] Children;
         }
 
-        readonly CacheContainer Cache = new CacheContainer();
-
-
+        internal readonly BinaryTree BinaryTree;
 
         // Used for debug only
         [DisableDump]
@@ -33,25 +31,28 @@ namespace Reni.Parser
         internal readonly FunctionCache<ContextBase, ResultCache> ResultCache =
             new FunctionCache<ContextBase, ResultCache>();
 
-        protected Value(BinaryTree binaryTree) => BinaryTree = binaryTree;
+        readonly CacheContainer Cache = new CacheContainer();
 
-        protected Value(int objectId, BinaryTree binaryTree)
+        protected Syntax(BinaryTree binaryTree) => BinaryTree = binaryTree;
+
+        protected Syntax(int objectId, BinaryTree binaryTree)
             : base(objectId)
             => BinaryTree = binaryTree;
-
-        internal BinaryTree BinaryTree {get;}
 
         [DisableDump]
         internal virtual bool IsLambda => false;
 
         [DisableDump]
-        internal virtual bool? IsHollow => IsLambda ? (bool?) true : null;
+        internal virtual bool? IsHollow => IsLambda? (bool?)true : null;
 
         [DisableDump]
         internal virtual IRecursionHandler RecursionHandler => null;
 
-        internal Value[] Children => Cache.Children?? (Cache.Children = GetChildren().ToArray());
-        protected abstract IEnumerable<Value> GetChildren();
+        internal Syntax[] Children => Cache.Children ?? (Cache.Children = GetChildren().ToArray());
+        Syntax ITree<Syntax>.Child(int index) => Children[index];
+
+        int ITree<Syntax>.ChildrenCount => Children.Length;
+        protected abstract IEnumerable<Syntax> GetChildren();
 
         //[DebuggerHidden]
         internal virtual Result ResultForCache(ContextBase context, Category category)
@@ -84,10 +85,10 @@ namespace Reni.Parser
             return Type(context).SmartUn<FunctionType>().IsHollow;
         }
 
-        internal Value ReplaceArg(Value value)
-            => Visit(new ReplaceArgVisitor(value)) ?? this;
+        internal Syntax ReplaceArg(Syntax syntax)
+            => Visit(new ReplaceArgVisitor(syntax)) ?? this;
 
-        internal virtual Value Visit(ISyntaxVisitor visitor)
+        internal virtual Syntax Visit(ISyntaxVisitor visitor)
         {
             NotImplementedMethod(visitor);
             return null;
@@ -95,10 +96,6 @@ namespace Reni.Parser
 
         internal IEnumerable<string> DeclarationOptions(ContextBase context)
             => Type(context).DeclarationOptions;
-
-        int ITree<Value>.ChildrenCount => Children.Length;
-        Value ITree<Value>.Child(int index) => Children[index];
-
     }
 
     interface IValuesScope

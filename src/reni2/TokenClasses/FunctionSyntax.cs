@@ -8,9 +8,9 @@ using Reni.Struct;
 
 namespace Reni.TokenClasses
 {
-    sealed class FunctionSyntax : Parser.Value
+    sealed class FunctionSyntax : Parser.Syntax
     {
-        internal static Result<Parser.Value> Create
+        internal static Result<Parser.Syntax> Create
             (BinaryTree left, bool isImplicit, bool isMetaFunction, BinaryTree right, BinaryTree binaryTree, IValuesScope scope)
         {
             var leftValue = left?.Value(scope);
@@ -18,21 +18,21 @@ namespace Reni.TokenClasses
             var target = new FunctionSyntax
                 (leftValue?.Target, isImplicit, isMetaFunction, rightValue?.Target,binaryTree);
             var issues = leftValue?.Issues.plus(rightValue?.Issues);
-            return new Result<Parser.Value>(target, issues);
+            return new Result<Parser.Syntax>(target, issues);
         }
 
-        internal Parser.Value Getter { get; }
-        internal Parser.Value Setter { get; }
+        internal Parser.Syntax Getter { get; }
+        internal Parser.Syntax Setter { get; }
 
         bool IsMetaFunction { get; }
         internal bool IsImplicit { get; }
 
         FunctionSyntax
             (
-            Parser.Value setter,
+            Parser.Syntax setter,
             bool isImplicit,
             bool isMetaFunction,
-            Parser.Value getter, BinaryTree binaryTree)
+            Parser.Syntax getter, BinaryTree binaryTree)
             : base(binaryTree)
         {
             Getter = getter;
@@ -46,7 +46,7 @@ namespace Reni.TokenClasses
                 .ReplaceArgs("/{0}\\")
                 .ReplaceArgs(IsImplicit ? "!" : "");
 
-        protected override IEnumerable<Parser.Value> GetChildren() => T(Getter,Setter);
+        protected override IEnumerable<Parser.Syntax> GetChildren() => T(Getter,Setter);
 
         internal override Result ResultForCache(ContextBase context, Category category)
             => context

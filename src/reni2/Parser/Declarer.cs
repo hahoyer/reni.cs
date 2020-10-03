@@ -20,7 +20,7 @@ namespace Reni.Parser
             Target = target;
         }
 
-        internal Result<Statement> Statement(Result<Value> right, IDefaultScopeProvider container)
+        internal Result<Statement> Statement(Result<Syntax> right, IDefaultScopeProvider container)
             => Parser.Statement.Create(Tags, Target, right, container);
 
         public Result<Declarer> WithName(Definable target, SourcePart position)
