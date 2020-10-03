@@ -14,6 +14,8 @@ namespace Reni.ParserTest
     {
         public StrangeDeclarationSyntax()
         {
+            // ReSharper disable once ArrangeConstructorOrDestructorBody
+            Parameters.ParseOnly = Parameters.ParseOnly;
             //Parameters.TraceOptions.Parser = true;
             //Parameters.ParseOnly = true;
         }

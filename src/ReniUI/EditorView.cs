@@ -197,11 +197,11 @@ namespace ReniUI
 
         void SignalStyleNeeded(int position)
         {
-            var sourceSyntax = Compiler.Syntax;
+            var sourceSyntax = Compiler.Value;
             while(TextBox.GetEndStyled() < position)
             {
                 var current = TextBox.GetEndStyled();
-                var token = Token.LocatePosition(sourceSyntax, current);
+                var token = Token.LocateByPosition(sourceSyntax, current);
                 var style = TextStyle.From(token, Compiler);
                 TextBox.StartStyling(token.StartPosition);
                 TextBox.SetStyling(token.SourcePart.Length, style);

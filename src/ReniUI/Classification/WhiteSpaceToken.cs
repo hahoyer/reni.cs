@@ -9,7 +9,7 @@ namespace ReniUI.Classification
     {
         readonly IItem _item;
 
-        internal WhiteSpaceToken(IItem item, Syntax parent)
+        internal WhiteSpaceToken(IItem item, Helper.Value parent)
         {
             _item = item;
             Syntax = parent;
@@ -22,7 +22,7 @@ namespace ReniUI.Classification
         public override bool IsLineEnd => Lexer.IsLineEnd(_item);
         public override string State => Lexer.Instance.WhiteSpaceId(_item) ?? "";
 
-        internal override Syntax Syntax {get;}
+        internal override Helper.Value Syntax {get;}
 
         public override IEnumerable<SourcePart> FindAllBelongings(CompilerBrowser compiler) {yield break;}
     }

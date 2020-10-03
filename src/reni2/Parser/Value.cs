@@ -1,8 +1,11 @@
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Helper;
 using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Type;
@@ -13,7 +16,17 @@ namespace Reni.Parser
     /// Static syntax items that represent a value
     /// </summary>
     abstract class Value : DumpableObject
+        , ITree<Value>
     {
+        class CacheContainer
+        {
+            public Value[] Children;
+        }
+
+        readonly CacheContainer Cache = new CacheContainer();
+
+
+
         // Used for debug only
         [DisableDump]
         [Node("Cache")]
@@ -36,6 +49,9 @@ namespace Reni.Parser
 
         [DisableDump]
         internal virtual IRecursionHandler RecursionHandler => null;
+
+        internal Value[] Children => Cache.Children?? (Cache.Children = GetChildren().ToArray());
+        protected abstract IEnumerable<Value> GetChildren();
 
         //[DebuggerHidden]
         internal virtual Result ResultForCache(ContextBase context, Category category)
@@ -79,5 +95,15 @@ namespace Reni.Parser
 
         internal IEnumerable<string> DeclarationOptions(ContextBase context)
             => Type(context).DeclarationOptions;
+
+        int ITree<Value>.ChildrenCount => Children.Length;
+        Value ITree<Value>.Child(int index) => Children[index];
+
+    }
+
+    interface IValuesScope
+    {
+        IDefaultScopeProvider DefaultScopeProvider { get; }
+        bool IsDeclarationPart { get; }
     }
 }

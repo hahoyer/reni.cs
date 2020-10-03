@@ -283,8 +283,10 @@ namespace Reni.Context
 
         IImplementation Declaration(Definable tokenClass)
         {
-            var genericize = tokenClass.MakeGeneric.ToArray();
-            var results = genericize.SelectMany(g => g.Declarations(this));
+            var genericTokenClass = tokenClass.MakeGeneric.ToArray();
+            var results 
+                = genericTokenClass
+                    .SelectMany(g => g.Declarations(this));
             var result = results.SingleOrDefault();
             if(result != null || RootContext.ProcessErrors)
                 return result;

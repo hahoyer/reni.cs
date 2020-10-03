@@ -84,6 +84,8 @@ namespace Reni.Parser
             if(Target != null && IsPublicSyntax)
                 yield return Target.Id;
         }
+
+        internal Value GetChildren() => Body;
     }
 
     interface IDefaultScopeProvider

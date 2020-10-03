@@ -14,7 +14,7 @@ namespace Reni.Helper
         : DumpableObject
             , ValueCache.IContainer
     {
-        const bool UseParent = false;
+        internal const bool ParentIsObsolete = false;
 
         class CacheContainer
         {
@@ -33,10 +33,7 @@ namespace Reni.Helper
             SetParent();
         }
 
-        [DisableDump]
-        internal IDefaultScopeProvider DefaultScopeProvider => Target.DefaultScopeProvider;
-
-        [Obsolete("", UseParent)]
+        [Obsolete("", ParentIsObsolete)]
         internal SyntaxOption Parent
         {
             get => Cache.Parent;
@@ -52,28 +49,6 @@ namespace Reni.Helper
         internal IEnumerable<Syntax> Items => this.CachedValue(GetItems);
 
         [EnableDumpExcept(null)]
-        internal Result<Value> Value
-        {
-            get
-            {
-                if(Target.TokenClass is IDeclarationItem declarationItem && declarationItem.IsDeclarationPart(Target))
-                    return null;
-
-                return (Target.TokenClass as IValueProvider)?.Get
-                    (Target);
-            }
-        }
-
-        [EnableDumpExcept(null)]
-        internal Result<Statement[]> Statements => GetStatements();
-
-        [EnableDumpExcept(null)]
-        internal Result<Statement> Statement
-            =>
-                (Target.TokenClass as IStatementProvider)?.Get
-                    (Target.Left, Target.Right, DefaultScopeProvider);
-
-        [EnableDumpExcept(null)]
         internal Result<Declarer> Declarer
         {
             get
@@ -86,10 +61,6 @@ namespace Reni.Helper
         [EnableDumpExcept(null)]
         internal IDeclarationTag DeclarationTag => Target.TokenClass as IDeclarationTag;
 
-        [EnableDumpExcept(null)]
-        internal Issue[] Issues
-            => Value?.Issues ?? GetStatements()?.Issues ?? Statement?.Issues ?? Declarer?.Issues ?? new Issue[0];
-
         internal SourcePart SourcePart =>
             LeftMost.Target.Token.SourcePart().Start.Span(RightMost.Target.Token.Characters.End);
 
@@ -101,10 +72,7 @@ namespace Reni.Helper
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
-        internal Result<Statement[]> GetStatements(List type = null)
-            => (Target.TokenClass as IStatementsProvider)?.Get(type, Target, DefaultScopeProvider);
-
-        [Obsolete("", UseParent)]
+        [Obsolete("", ParentIsObsolete)]
         void SetParent()
         {
             if(Target.Left != null)

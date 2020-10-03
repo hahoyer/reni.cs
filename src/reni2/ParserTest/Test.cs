@@ -1,12 +1,15 @@
 using hw.UnitTest;
+using NUnit.Framework;
 using Reni.FeatureTest.Helper;
 
 namespace Reni.ParserTest
 {
     [UnitTest]
+    [TestFixture]
     public sealed class ParserTest : CompilerTest
     {
         [UnitTest]
+        [Test]
         public void SimpleFunction()
         {
             var syntaxPrototype = LikeSyntax.Expression(null, "f", LikeSyntax.Null);

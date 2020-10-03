@@ -4,6 +4,6 @@ namespace Reni.TokenClasses
 {
     interface IStatementsProvider
     {
-        Result<Statement[]> Get(List type, Syntax syntax, IDefaultScopeProvider container);
+        Result<Statement[]> Get(List type, Syntax syntax, IValuesScope scope);
     }
 }

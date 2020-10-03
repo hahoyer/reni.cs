@@ -6,11 +6,11 @@ using hw.Helper;
 using hw.Scanner;
 using Reni;
 using Reni.Code;
-using Reni.Parser;
 using Reni.Struct;
 using Reni.Validation;
 using ReniUI.Classification;
 using ReniUI.Formatting;
+using ReniUI.Helper;
 
 namespace ReniUI
 {
@@ -18,8 +18,9 @@ namespace ReniUI
     {
         class CacheContainer
         {
-            internal Syntax FomattingSyntax;
+            internal Formatting.Syntax FomattingSyntax;
             internal Helper.Syntax HelperSyntax;
+            internal Helper.Value Value;
         }
 
         readonly CacheContainer Cache = new CacheContainer();
@@ -50,10 +51,11 @@ namespace ReniUI
 
         internal IEnumerable<Issue> Issues => Compiler.Issues;
 
-        internal Syntax FormattingSyntax
-            => Cache.FomattingSyntax ?? (Cache.FomattingSyntax = new Syntax(Compiler.Syntax));
+        internal Formatting.Syntax FormattingSyntax
+            => Cache.FomattingSyntax ?? (Cache.FomattingSyntax = new Formatting.Syntax(Compiler.Syntax));
 
         internal Helper.Syntax Syntax => Cache.HelperSyntax ?? (Cache.HelperSyntax = GetHelperSyntax());
+        internal Helper.Value Value => Cache.Value?? (Cache.Value= GetValue());
 
 
         public static CompilerBrowser FromText
@@ -67,7 +69,7 @@ namespace ReniUI
             => new CompilerBrowser(() => Compiler.FromFile(fileName, parameters));
 
         public Token LocatePosition(int offset)
-            => Token.LocatePosition(Syntax, offset);
+            => Token.LocateByPosition(Value, offset);
 
         public Token LocatePosition(SourcePosition current)
         {
@@ -75,17 +77,18 @@ namespace ReniUI
             return LocatePosition(current.Position);
         }
 
-        public IEnumerable<SourcePart> FindAllBelongings(Token open) => open.FindAllBelongings(this);
+        public IEnumerable<SourcePart> FindAllBelongings(Token open) 
+            => open.FindAllBelongings(this);
 
         public string FlatFormat(bool areEmptyLinesPossible)
             => FormattingSyntax.FlatFormat(areEmptyLinesPossible);
 
-        internal IEnumerable<Value> FindPosition(int offset)
+        internal IEnumerable<Reni.Parser.Value> FindPosition(int offset)
         {
             var enumerable = LocatePosition(offset)
                 .Syntax
                 .ParentChainIncludingThis
-                .Select(item => item.Target.Value.Target)
+                .Select(item => item.Target)
                 .ToArray();
 
             var compileSyntaxs = enumerable
@@ -155,7 +158,7 @@ namespace ReniUI
         internal string[] DeclarationOptions(int offset)
         {
             Ensure();
-            return LocateActivePosition(offset)?.DeclarationOptions ?? new string[0];
+            return LocateValueByPosition(offset)?.DeclarationOptions ?? new string[0];
         }
 
         internal IEnumerable<Edit> GetEditPieces(SourcePart sourcePart, IFormatter formatter = null)
@@ -177,15 +180,30 @@ namespace ReniUI
             ;
         }
 
-        Helper.Syntax LocateActivePosition(int offset)
+        Helper.Value GetValue()
         {
-            var token = Token.LocatePosition(Syntax, offset);
+            try
+            {
+                return new Value(Compiler.Value);
+            }
+            catch(Exception e)
+            {
+                $"Syntax: Unexpected {e} \nText:\n{Source.Data}".Log();
+                throw;
+            }
+
+            ;
+        }
+
+        Helper.Value  LocateValueByPosition(int offset)
+        {
+            var token = Token.LocateByPosition(Value, offset);
             if(token.IsComment || token.IsLineComment)
                 return null;
 
             var tokenSyntax = token.Syntax;
             var position = tokenSyntax.Token.Characters.Position;
-            return position <= 0? null : tokenSyntax.LocatePosition(position - 1);
+            return position <= 0? null : tokenSyntax.LocateByPosition(position - 1);
         }
     }
 }

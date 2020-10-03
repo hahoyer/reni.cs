@@ -22,8 +22,6 @@ namespace ReniUI.Formatting
             where TContainer : class, IFormatResult<TValue>, new()
             => left == null ? new TContainer() : left.FlatFormat<TContainer, TValue>(areEmptyLinesPossible);
 
-        static IEnumerable<TValue> T<TValue>(params TValue[] value) => value;
-
         readonly CacheContainer Cache = new CacheContainer();
 
         internal Syntax(Reni.TokenClasses.Syntax target)

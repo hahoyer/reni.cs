@@ -5,6 +5,7 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
+using Reni.Context;
 using Reni.Helper;
 using Reni.Parser;
 using Reni.Struct;
@@ -16,19 +17,18 @@ namespace Reni.TokenClasses
         : DumpableObject
             , ISyntax
             , ValueCache.IContainer
-            , ITree<Syntax>
+            , IBinaryTree<Syntax>
     {
         static int NextObjectId;
 
-        internal bool IsDeclarationPart { get; private set; }
-
-
+        [EnableDump]
         [EnableDumpExcept(null)]
         internal Syntax Left { get; }
 
         [DisableDump]
         internal SyntaxOption Option { get; }
 
+        [EnableDump]
         [EnableDumpExcept(null)]
         internal Syntax Right { get; }
 
@@ -51,17 +51,12 @@ namespace Reni.TokenClasses
             TokenClass = tokenClass;
             Right = right;
 
-            SetIsDeclarationPart();
-
             Option = new SyntaxOption(this);
         }
 
-        [DisableDump]
-        internal IDefaultScopeProvider DefaultScopeProvider
-            => TokenClass as IDefaultScopeProvider ?? Option.Parent?.DefaultScopeProvider;
+        public const bool ValuePropertyIsObsolete = true;
 
-        [DisableDump]
-        internal Result<Value> Value => this.CachedValue(() => GetValue(this));
+        internal Result<Value> Value(IValuesScope scope) => this.CachedFunction(scope??NullScopeInstance, GetValue);
 
         [DisableDump]
         internal Result<Declarer> Declarer
@@ -85,18 +80,6 @@ namespace Reni.TokenClasses
         }
 
         [DisableDump]
-        internal Result<Statement[]> ForceStatements => this.CachedValue(() => GetStatements());
-
-        [DisableDump]
-        internal IEnumerable<Issue> Issues => Option.Issues;
-
-        [DisableDump]
-        internal IEnumerable<Issue> AllIssues
-            => Left?.AllIssues
-                .plus(Issues)
-                .plus(Right?.AllIssues);
-
-        [DisableDump]
         internal SourcePart SourcePart => Option.SourcePart;
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
@@ -104,8 +87,8 @@ namespace Reni.TokenClasses
         SourcePart ISyntax.All => SourcePart;
         SourcePart ISyntax.Main => Token.Characters;
 
-        Syntax ITree<Syntax>.Left => Left;
-        Syntax ITree<Syntax>.Right => Right;
+        Syntax IBinaryTree<Syntax>.Left => Left;
+        Syntax IBinaryTree<Syntax>.Right => Right;
 
         public bool IsEqual(Syntax other, IComparator differenceHandler)
         {
@@ -160,22 +143,52 @@ namespace Reni.TokenClasses
                 .Concat(Left.CheckedItemsAsLongAs(condition))
                 .Concat(Right.CheckedItemsAsLongAs(condition));
 
-        internal Result<Statement[]> GetStatements(List type = null)
+        Result<Value> GetValueOrDefault(IValuesScope scope)
+            => scope != null && scope.IsDeclarationPart
+                ? null
+                : (TokenClass as IValueProvider)?.Get(this, scope);
+
+        Result<Statement> GetStatementOrDefault(IValuesScope scope) 
+            => (TokenClass as IStatementProvider)?.Get(Left, Right, scope);
+
+        Result<Statement[]> GetStatementsOrDefault(IValuesScope scope, List type) 
+            => (TokenClass as IStatementsProvider)?.Get(type, this, scope);
+
+
+        internal Result<Statement[]> GetStatements(IValuesScope scope, List type = null)
         {
-            var statements = Option.GetStatements(type);
+            var statements = GetStatementsOrDefault(scope, type);
             if(statements != null)
                 return statements;
 
-            var statement = Option.Statement;
+            var statement = GetStatementOrDefault(scope);
             if(statement != null)
                 return statement.Convert(x => new[] {x});
 
-            var value = Option.Value;
+            var value = GetValueOrDefault(scope);
             if(value != null)
-                return Statement.CreateStatements(value, Option.DefaultScopeProvider);
+                return Statement.CreateStatements(value, scope.DefaultScopeProvider);
 
-            return new Result<Statement[]>
-                (new Statement[0], IssueId.InvalidListOperandSequence.Issue(SourcePart));
+            return new Result<Statement[]>(new Statement[0], IssueId.InvalidListOperandSequence.Issue(SourcePart));
+        }
+
+        internal Result<Value> GetValue(IValuesScope scopeKey)
+        {
+            var scope = scopeKey == NullScopeInstance? null : scopeKey;
+
+            var value = GetValueOrDefault(scope);
+            if(value != null)
+                return value;
+
+            var statement = GetStatementOrDefault(scopeKey);
+            if(statement != null)
+                return CompoundSyntax.Create(statement, this);
+
+            var statements = GetStatementsOrDefault(scope,null);
+            if(statements != null)
+                return CompoundSyntax.Create(statements, this);
+
+            return IssueId.InvalidExpression.Value(this);
         }
 
         internal Result<Syntax> GetBracketKernel(int level, Syntax parent)
@@ -193,17 +206,10 @@ namespace Reni.TokenClasses
                 return Right;
 
             if(levelDelta > 0)
-                return new Result<Syntax>
-                    (Right, IssueId.ExtraLeftBracket.Issue(SourcePart));
+                return new Result<Syntax>(Right, IssueId.ExtraLeftBracket.Issue(SourcePart));
 
             NotImplementedMethod(level, parent);
             return null;
-        }
-
-        void SetIsDeclarationPart()
-        {
-            if(TokenClass is Colon && Left != null)
-                Left.IsDeclarationPart = true;
         }
 
         Syntax Locate(SourcePart part)
@@ -264,23 +270,6 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        Result<Value> GetValue(Syntax syntax)
-        {
-            var value = Option.Value;
-            if(value != null)
-                return value;
-
-            var statement = Option.Statement;
-            if(statement != null)
-                return CompoundSyntax.Create(statement, syntax);
-
-            var statements = Option.Statements;
-            if(statements != null)
-                return CompoundSyntax.Create(statements, syntax);
-
-            return IssueId.InvalidExpression.Value(syntax);
-        }
-
         static bool CompareWhiteSpaces
             (IEnumerable<IItem> target, IEnumerable<IItem> other, IComparator differenceHandler)
         {
@@ -292,6 +281,14 @@ namespace Reni.TokenClasses
             return default;
         }
 
-        static IEnumerable<TValue> T<TValue>(params TValue[] value) => value;
+        static readonly IValuesScope NullScopeInstance = new NullScope();
+
+        class NullScope : DumpableObject, IValuesScope
+            , IDefaultScopeProvider
+        {
+            IDefaultScopeProvider IValuesScope.DefaultScopeProvider => this;
+            bool IDefaultScopeProvider.MeansPublic => false;
+            bool IValuesScope.IsDeclarationPart => false;
+        }
     }
 }

@@ -4,10 +4,12 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.UnitTest;
+using NUnit.Framework;
 using Reni;
 
 namespace ReniUI.Test
 {
+    [TestFixture]
     [UnitTest]
     [UserInterAction]
     public sealed class UserInterAction2 : DependenceProvider
@@ -15,6 +17,7 @@ namespace ReniUI.Test
         const string Text = @"#(aa comment aa)# !mutable name: 3";
         const string Type = @"cccccccccccccccccwkkkkkkkkwiiiikwn";
 
+        [Test]
         [UnitTest]
         public void GetTokenForPosition()
         {

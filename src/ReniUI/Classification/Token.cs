@@ -5,6 +5,7 @@ using hw.DebugFormatter;
 using hw.Scanner;
 using Reni;
 using Reni.TokenClasses;
+using ReniUI.Helper;
 
 namespace ReniUI.Classification
 {
@@ -67,7 +68,7 @@ namespace ReniUI.Classification
 
         public int StartPosition => SourcePart.Position;
         public int EndPosition => SourcePart.EndPosition;
-        internal abstract Helper.Syntax Syntax { get; }
+        internal abstract Value Syntax { get; }
 
         public Trimmed TrimLine(SourcePart span) => new Trimmed(this, span);
 
@@ -106,9 +107,9 @@ namespace ReniUI.Classification
 
         public abstract IEnumerable<SourcePart> FindAllBelongings(CompilerBrowser compiler);
 
-        internal static Token LocatePosition(Helper.Syntax start, int offset)
+        internal static Token LocateByPosition(Helper.Value start, int offset)
         {
-            var result = start.LocatePosition(offset);
+            var result = start.LocateByPosition(offset);
             if (offset < result.Token.Characters.Position)
                 return new WhiteSpaceToken
                     (

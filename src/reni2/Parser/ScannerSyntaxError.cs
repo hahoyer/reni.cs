@@ -16,14 +16,15 @@ namespace Reni.Parser
 
         string ITokenClass.Id => Id;
 
-        Result<Value> IValueProvider.Get(Syntax syntax)
+        Result<Value> IValueProvider.Get(Syntax syntax, IValuesScope scope)
         {
             if(syntax.Right == null)
             {
                 var issues = IssueId.Issue(syntax.Token.Characters);
-                return syntax.Left == null
-                    ? new Result<Value>(new EmptyList(syntax), issues)
-                    : syntax.Left.Value.With(issues);
+                if(syntax.Left == null)
+                    return new Result<Value>(new EmptyList(syntax), issues);
+                else
+                return syntax.Left.GetValue(scope).With(issues);
             }
 
             NotImplementedMethod(syntax);

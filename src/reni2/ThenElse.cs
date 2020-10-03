@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using hw.DebugFormatter;
 using Reni.Basics;
 using Reni.Context;
@@ -22,11 +23,11 @@ namespace Reni
         readonly Value Else;
 
         internal static Result<Value> Create
-            (Syntax condition, Syntax thenSyntax, Syntax elseSyntax, Syntax syntax)
+            (Syntax condition, Syntax thenSyntax, Syntax elseSyntax, Syntax syntax, IValuesScope scope)
         {
-            var conditionValue = condition.Value;
-            var thenValue = thenSyntax?.Value;
-            var elseValue = elseSyntax?.Value;
+            var conditionValue = condition.Value(scope);
+            var thenValue = thenSyntax?.Value(scope);
+            var elseValue = elseSyntax?.Value(scope);
             var result = new CondSyntax
                 (conditionValue.Target, thenValue?.Target, elseValue?.Target, syntax);
             var issues = conditionValue.Issues.plus(thenValue?.Issues).plus(elseValue?.Issues);
@@ -40,6 +41,8 @@ namespace Reni
             Then = thenSyntax;
             Else = elseSyntax;
         }
+
+        protected override IEnumerable<Value> GetChildren() => T(Cond, Then,Else);
 
         internal override Result ResultForCache(ContextBase context, Category category)
             => InternalResult(context, category);

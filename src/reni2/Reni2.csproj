@@ -131,9 +131,12 @@
     <Compile Include="Feature\Function.cs" />
     <Compile Include="Feature\SearchResult.cs" />
     <Compile Include="Feature\Simple.cs" />
-    <Compile Include="Helper\ITree.cs" />
+    <Compile Include="Helper\BinaryTreeWithParentExtended.cs" />
+    <Compile Include="Helper\IBinaryTree.cs" />
     <Compile Include="Helper\SyntaxWithParent.cs" />
+    <Compile Include="Helper\BinaryTreeWithParent.cs" />
     <Compile Include="Helper\TreeWithParent.cs" />
+    <Compile Include="Helper\TreeWithParentExtended.cs" />
     <Compile Include="hw\DebugFormatter\Configuration.cs" />
     <Compile Include="hw\DebugFormatter\DebugTextWriter.cs" />
     <Compile Include="hw\DebugFormatter\DisableDumpAttribute.cs" />

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using hw.Helper;
 using Reni.Basics;
 using Reni.Context;
@@ -10,13 +11,13 @@ namespace Reni.TokenClasses
     sealed class FunctionSyntax : Parser.Value
     {
         internal static Result<Parser.Value> Create
-            (Syntax left, bool isImplicit, bool isMetaFunction, Syntax right, Syntax syntax)
+            (Syntax left, bool isImplicit, bool isMetaFunction, Syntax right, Syntax syntax, IValuesScope scope)
         {
-            var leftvalue = left?.Value;
-            var rightvalue = right?.Value;
+            var leftValue = left?.Value(scope);
+            var rightValue = right?.Value(scope);
             var target = new FunctionSyntax
-                (leftvalue?.Target, isImplicit, isMetaFunction, rightvalue?.Target,syntax);
-            var issues = leftvalue?.Issues.plus(rightvalue?.Issues);
+                (leftValue?.Target, isImplicit, isMetaFunction, rightValue?.Target,syntax);
+            var issues = leftValue?.Issues.plus(rightValue?.Issues);
             return new Result<Parser.Value>(target, issues);
         }
 
@@ -44,6 +45,8 @@ namespace Reni.TokenClasses
             => (IsMetaFunction ? "{0}{0}" : "{0}")
                 .ReplaceArgs("/{0}\\")
                 .ReplaceArgs(IsImplicit ? "!" : "");
+
+        protected override IEnumerable<Parser.Value> GetChildren() => T(Getter,Setter);
 
         internal override Result ResultForCache(ContextBase context, Category category)
             => context

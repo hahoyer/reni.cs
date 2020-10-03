@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using Reni.Basics;
@@ -38,14 +39,14 @@ namespace Reni.Parser
             (Syntax parent, Value left, Definable definable, Value right)
             => new Result<Value>(new ExpressionSyntax(parent, left, definable, right));
 
-        internal static Result<Value> Create(Definable definable, Syntax syntax)
+        internal static Result<Value> Create(Definable definable, Syntax syntax, IValuesScope scope)
         {
-            var leftvalue = syntax.Left?.Value;
-            var rightvalue = syntax.Right?.Value;
-            var left = leftvalue?.Target;
-            var right = rightvalue?.Target;
+            var leftValue = syntax.Left?.Value(scope);
+            var rightValue = syntax.Right?.Value(scope);
+            var left = leftValue?.Target;
+            var right = rightValue?.Target;
             return Create(syntax, left, definable, right)
-                .With(leftvalue?.Issues.plus(rightvalue?.Issues));
+                .With(leftValue?.Issues.plus(rightValue?.Issues));
         }
 
         int CurrentResultDepth;
@@ -67,6 +68,8 @@ namespace Reni.Parser
 
         [Node]
         internal Value Right {get;}
+
+        protected override IEnumerable<Value> GetChildren() => T(Left,Right);
 
         internal override Result ResultForCache(ContextBase context, Category category)
         {

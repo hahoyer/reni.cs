@@ -4,6 +4,6 @@ namespace Reni.TokenClasses
 {
     interface IValueProvider
     {
-        Result<Value> Get(Syntax syntax);
+        Result<Value> Get(Syntax syntax, IValuesScope scope);
     }
 }

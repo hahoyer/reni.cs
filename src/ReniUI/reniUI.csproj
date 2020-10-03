@@ -66,6 +66,8 @@
     <Compile Include="Formatting\ISourcePartEdit.cs" />
     <Compile Include="Formatting\Syntax.cs" />
     <Compile Include="Formatting\WhiteSpace.cs" />
+    <Compile Include="Helper\Value.cs" />
+    <Compile Include="Helper\ValueWithParent.cs" />
     <Compile Include="hw\Forms\CursorUtil.cs" />
     <Compile Include="hw\Forms\Extender.cs" />
     <Compile Include="hw\Forms\IAdditionalNodeInfoProvider.cs" />

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.Basics;
@@ -23,6 +24,8 @@ namespace Reni.Parser
 
         internal override Result ResultForCache(ContextBase context, Category category)
             => Terminal.Result(context, category, this);
+
+        protected override IEnumerable<Value> GetChildren() => new Value[0];
 
         internal override Value Visit(ISyntaxVisitor visitor) => Terminal.Visit(visitor);
 
@@ -55,6 +58,7 @@ namespace Reni.Parser
             Right = right;
         }
 
+        protected override IEnumerable<Value> GetChildren() => T(Right);
 
         internal override Result ResultForCache(ContextBase context, Category category) => Prefix
             .Result(context, category, Right, Syntax);
@@ -92,6 +96,7 @@ namespace Reni.Parser
             StopByObjectIds();
         }
 
+        protected override IEnumerable<Value> GetChildren() => T(Left,Right);
         internal override IRecursionHandler RecursionHandler => Infix as IRecursionHandler;
 
         internal override Result ResultForCache(ContextBase context, Category category) => Infix
@@ -140,6 +145,7 @@ namespace Reni.Parser
             Suffix = suffix;
         }
 
+        protected override IEnumerable<Value> GetChildren() => T(Left);
         internal override Result ResultForCache(ContextBase context, Category category)
             => Suffix.Result(context, category, Left);
 

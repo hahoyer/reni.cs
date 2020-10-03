@@ -10,9 +10,10 @@ namespace Reni.TokenClasses
         public const string TokenId = ":";
         public override string Id => TokenId;
 
-        Result<Statement> IStatementProvider.Get
-            (Syntax left, Syntax right, IDefaultScopeProvider container)
-            => left.Declarer?.Convert(x => x.Statement(right.Value, container));
+        Result<Statement> IStatementProvider.Get(Syntax left, Syntax right, IValuesScope scope)
+        {
+            return left.Declarer?.Convert(x => x.Statement(right.Value(scope), scope.DefaultScopeProvider));
+        }
     }
 
     [BelongsTo(typeof(MainTokenFactory))]

@@ -6,7 +6,7 @@ using Reni.Parser;
 
 namespace Reni.TokenClasses
 {
-    abstract class Definable : TokenClass, IDeclarerTokenClass, IValueProvider, IDeclarationItem
+    abstract class Definable : TokenClass, IDeclarerTokenClass, IValueProvider
     {
         [DisableDump]
         protected string DataFunctionName => Id.Symbolize();
@@ -33,11 +33,9 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        Result<Parser.Value> IValueProvider.Get(Syntax syntax)
-            => ExpressionSyntax.Create(this, syntax);
+        Result<Parser.Value> IValueProvider.Get(Syntax syntax, IValuesScope scope)
+            => ExpressionSyntax.Create(this, syntax, scope);
 
-        bool IDeclarationItem.IsDeclarationPart(Syntax syntax)
-            => syntax.IsDeclarationPart;
     }
 
     [BelongsTo(typeof(MainTokenFactory))]

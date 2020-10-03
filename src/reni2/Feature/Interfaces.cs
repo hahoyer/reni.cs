@@ -147,8 +147,7 @@ namespace Reni.Feature
         IEnumerable<SearchResult> IDeclarationProvider.Declarations(TypeBase source)
             => source.Declarations(_target);
 
-        IEnumerable<IImplementation> IDeclarationProvider.Declarations
-            (ContextBase source)
+        IEnumerable<IImplementation> IDeclarationProvider.Declarations(ContextBase source)
             => source.Declarations(_target);
     }
 

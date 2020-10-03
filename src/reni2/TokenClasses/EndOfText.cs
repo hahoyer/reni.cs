@@ -6,6 +6,7 @@ using Reni.Parser;
 namespace Reni.TokenClasses
 {
     sealed class EndOfText : TokenClass, IDefaultScopeProvider, IBracketMatch<Syntax>, IStatementsProvider
+        , IValuesScope
     {
         sealed class Matched : DumpableObject, IParserTokenType<Syntax>
         {
@@ -25,7 +26,8 @@ namespace Reni.TokenClasses
         bool IDefaultScopeProvider.MeansPublic => true;
 
         [Obsolete("",true)]
-        Result<Statement[]> IStatementsProvider.Get(List type, Syntax right, IDefaultScopeProvider container)
+        Result<Statement[]> IStatementsProvider.Get
+            (List type, Syntax right, IValuesScope scope)
         {
             Tracer.Assert(type == null);
             Tracer.Assert(right != null);
@@ -37,8 +39,10 @@ namespace Reni.TokenClasses
             Tracer.Assert(right.Left.Left == null);
             Tracer.Assert(right.Left.TokenClass is BeginOfText);
 
+            Tracer.Assert(scope == null);
+
             var result = right.Left.Right;
-            return result?.GetStatements() ?? new Result<Statement[]>(new Statement[0]);
+            return result?.GetStatements(this) ?? new Result<Statement[]>(new Statement[0]);
         }
 
         [DisableDump]
@@ -46,6 +50,10 @@ namespace Reni.TokenClasses
 
         [DisableDump]
         internal override bool IsVisible => false;
+
+        IDefaultScopeProvider IValuesScope.DefaultScopeProvider => this;
+
+        bool IValuesScope.IsDeclarationPart => false;
     }
 
     sealed class BeginOfText : TokenClass

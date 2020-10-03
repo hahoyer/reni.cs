@@ -33,6 +33,7 @@ namespace Reni.Context
         readonly ValueCache<IImplementation> _minusFeatureCache;
         readonly FunctionCache<string, Parser.Value> _metaDictionary;
         readonly FunctionCache<bool, IImplementation> _createArrayFeatureCache;
+
         public IExecutionContext ExecutionContext => Parent.ExecutionContext;
 
         internal Root(IParent parent)
@@ -180,18 +181,16 @@ namespace Reni.Context
         internal FunctionContainer FunctionContainer(int index) => _functions.Container(index);
         internal FunctionType Function(int index) => _functions.Item(index);
 
-        internal Container MainContainer(Syntax syntax, string description)
+        internal Container MainContainer(Parser.Value value, string description)
         {
-            var compoundSyntax = CompoundSyntax.Create(syntax.ForceStatements, syntax);
-
-            var rawResult = compoundSyntax.Target.Result(this);
+            var rawResult = value.Result(this);
 
             var result = rawResult
                 .Code?
                 .LocalBlock(rawResult.Type.Copier(Category.Code).Code)
                 .Align();
 
-            return new Container(result, rawResult.Issues, description);
+            return new Container(result, rawResult.Issues.ToArray(), description);
         }
 
         static string Combine(SourcePart fullSource, SourcePart source)

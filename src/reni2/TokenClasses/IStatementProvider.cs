@@ -4,6 +4,6 @@ namespace Reni.TokenClasses
 {
     interface IStatementProvider
     {
-        Result<Statement> Get(Syntax left, Syntax right, IDefaultScopeProvider container);
+        Result<Statement> Get(Syntax left, Syntax right, IValuesScope scope);
     }
 }

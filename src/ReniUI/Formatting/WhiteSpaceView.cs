@@ -24,7 +24,6 @@ namespace ReniUI.Formatting
             public SourcePart Spaces;
         }
 
-        static IEnumerable<TValue> T<TValue>(params TValue[] value) => value;
         readonly CacheContainer Cache = new CacheContainer();
         readonly Configuration Configuration;
 

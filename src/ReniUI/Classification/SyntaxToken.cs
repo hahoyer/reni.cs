@@ -5,18 +5,19 @@ using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.TokenClasses;
 using Reni.Validation;
+using ReniUI.Helper;
 
 namespace ReniUI.Classification
 {
     sealed class SyntaxToken : Token
     {
-        internal SyntaxToken(Helper.Syntax syntax) => Syntax = syntax;
+        internal SyntaxToken(Value syntax) => Syntax = syntax;
 
-        internal override Helper.Syntax Syntax {get;}
+        internal override Helper.Value Syntax { get; }
 
         TokenClass TokenClass => Syntax.TokenClass as TokenClass;
 
-        public override SourcePart SourcePart => Syntax.Target.Token.Characters;
+        public override SourcePart SourcePart => Syntax.Token.Characters;
 
         [EnableDumpExcept(false)]
         public override bool IsKeyword => !IsIdentifier && !IsNumber && !IsText && !IsBrace;
@@ -32,7 +33,7 @@ namespace ReniUI.Classification
 
         [EnableDumpExcept(false)]
         public override bool IsError
-            => Syntax.Target.Issues?.Any(item => item.Position == SourcePart) ?? false;
+            => Syntax.Issues?.Any(item => item.Position == SourcePart) ?? false;
 
         [EnableDumpExcept(false)]
         public override bool IsBraceLike => TokenClass is IBelongingsMatcher;
@@ -43,16 +44,16 @@ namespace ReniUI.Classification
 
         [EnableDumpExcept(false)]
         public override bool IsComment
-            => Syntax.Target.Issues?.Any(item => item.IssueId == IssueId.EOFInComment) ?? false;
+            => Syntax.Issues.Any(item => item.IssueId == IssueId.EOFInComment);
 
         [EnableDumpExcept(false)]
         public override bool IsLineComment
-            => Syntax.Target.Issues?.Any(item => item.IssueId == IssueId.EOFInLineComment) ?? false;
+            => Syntax.Issues.Any(item => item.IssueId == IssueId.EOFInLineComment);
 
         [DisableDump]
-        public override string State => Syntax.Target.Token.Characters.Id ?? "";
+        public override string State => Syntax.Token.Characters.Id ?? "";
 
         public override IEnumerable<SourcePart> FindAllBelongings(CompilerBrowser compiler)
-            => compiler.FindAllBelongings(Syntax)?.Select(item => item.Token.Characters);
+            => compiler.FindAllBelongings(Syntax.Syntax)?.Select(item => item.Token.Characters);
     }
 }

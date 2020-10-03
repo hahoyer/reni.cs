@@ -62,14 +62,16 @@ namespace Reni
         public Exception Exception;
         readonly ValueCache<CodeContainer> CodeContainerCache;
         readonly ValueCache<Syntax> SyntaxCache;
+        readonly ValueCache<Result<Value>> ValueSyntaxCache;
+
         readonly MainTokenFactory MainTokenFactory;
 
-        Compiler(Source source, string modulName, CompilerParameters parameters)
+        Compiler(Source source, string moduleName, CompilerParameters parameters)
         {
             Tracer.Assert(source != null);
             Source = source;
             Parameters = parameters ?? new CompilerParameters();
-            ModuleName = modulName;
+            ModuleName = moduleName;
 
             var main = this["Main"];
             var declaration = this["Declaration"];
@@ -91,10 +93,15 @@ namespace Reni
             //Tracer.FlaggedLine(PrettyDump);
 
             Root = new Root(this);
-            CodeContainerCache = NewValueCache
-                (() => new CodeContainer(ModuleName, Root, Syntax, Source.Data));
+            CodeContainerCache = NewValueCache(GetCodeContainer);
             SyntaxCache = NewValueCache(() => Parse(Source + 0));
+            ValueSyntaxCache = NewValueCache(GetValue);
         }
+
+        CodeContainer GetCodeContainer() => new CodeContainer(Value, Root, ModuleName, Source.Data);
+
+        Result<Value> GetValue() 
+            => CompoundSyntax.Create(Syntax.GetStatements(null), Syntax);
 
 
         static string ModuleNameFromFileName(string fileName)
@@ -106,7 +113,11 @@ namespace Reni
 
         [Node]
         [DisableDump]
-        public CodeContainer CodeContainer => CodeContainerCache.Value;
+        internal Value Value => ValueSyntaxCache.Value.Target;
+
+        [Node]
+        [DisableDump]
+        public CodeContainer CodeContainer => Parameters.ParseOnly? null : CodeContainerCache.Value;
 
         [DisableDump]
         [Node]
@@ -135,7 +146,7 @@ namespace Reni
             Tracer.Assert(syntax.Left .Left== null);
             Tracer.Assert(syntax.Left .TokenClass is BeginOfText);
 
-            return syntax.Left.Right.Value;
+            return syntax.Left.Right.Value(null);
         }
 
         [UsedImplicitly]
@@ -224,14 +235,8 @@ namespace Reni
         }
 
         [DisableDump]
-        internal IEnumerable<Issue> Issues
-            =>
-            Syntax
-                ?.AllIssues
-                .plus(Parameters.ParseOnly ? null : CodeContainer.Issues)
-            ?? new Issue[0]
-            ;
-
+        internal IEnumerable<Issue> Issues 
+            => T(ValueSyntaxCache.Value.Issues, CodeContainer?.Issues).Concat();
 
         Syntax Parse(SourcePosition source) => this["Main"].Parser.Execute(source);
 
