@@ -37,9 +37,6 @@ namespace Reni.TokenClasses
         [EnableDumpExcept(null)]
         internal BinaryTree Left { get; }
 
-        [DisableDump]
-        internal SyntaxOption Option { get; }
-
         [EnableDump]
         [EnableDumpExcept(null)]
         internal BinaryTree Right { get; }
@@ -62,9 +59,10 @@ namespace Reni.TokenClasses
             Left = left;
             TokenClass = tokenClass;
             Right = right;
-
-            Option = new SyntaxOption(this);
         }
+
+        [EnableDumpExcept(null)]
+        internal IDeclarationTag DeclarationTag => TokenClass as IDeclarationTag;
 
         [DisableDump]
         internal Result<Declarer> Declarer
@@ -88,7 +86,11 @@ namespace Reni.TokenClasses
         }
 
         [DisableDump]
-        internal SourcePart SourcePart => Option.SourcePart;
+        internal SourcePart SourcePart =>
+            LeftMost.Token.SourcePart().Start.Span(RightMost.Token.Characters.End);
+
+        BinaryTree LeftMost => Left?.LeftMost ?? this;
+        BinaryTree RightMost => Right?.RightMost ?? this;
 
         BinaryTree IBinaryTree<BinaryTree>.Left => Left;
         BinaryTree IBinaryTree<BinaryTree>.Right => Right;
@@ -290,5 +292,20 @@ namespace Reni.TokenClasses
             NotImplementedFunction(target.Dump(), other.Dump(), differenceHandler);
             return default;
         }
+        internal IEnumerable<BinaryTree> Items => this.CachedValue(GetItems);
+
+        IEnumerable<BinaryTree> GetItems()
+        {
+            if(Left != null)
+                foreach(var sourceSyntax in Left.Items)
+                    yield return sourceSyntax;
+
+            yield return this;
+
+            if(Right != null)
+                foreach(var sourceSyntax in Right.Items)
+                    yield return sourceSyntax;
+        }
+
     }
 }
