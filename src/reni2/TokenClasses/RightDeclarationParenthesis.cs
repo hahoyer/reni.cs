@@ -11,27 +11,27 @@ namespace Reni.TokenClasses
     sealed class RightDeclarationParenthesis
         : RightParenthesisBase,
             IDeclarerTagProvider,
-            IBracketMatch<Syntax>
+            IBracketMatch<BinaryTree>
 
     {
-        sealed class Matched : DumpableObject, IParserTokenType<Syntax>
+        sealed class Matched : DumpableObject, IParserTokenType<BinaryTree>
         {
-            Syntax IParserTokenType<Syntax>.Create(Syntax left, IToken token, Syntax right)
+            BinaryTree IParserTokenType<BinaryTree>.Create(BinaryTree left, IToken token, BinaryTree right)
             {
                 Tracer.Assert(right == null);
                 return left;
             }
 
-            string IParserTokenType<Syntax>.PrioTableId => "()";
+            string IParserTokenType<BinaryTree>.PrioTableId => "()";
         }
 
         public RightDeclarationParenthesis(int level)
             : base(level) {}
 
         [Obsolete("",true)]
-        Result<Declarer> IDeclarerTagProvider.Get(Syntax syntax)
+        Result<Declarer> IDeclarerTagProvider.Get(BinaryTree binaryTree)
         {
-            var bracketKernel = syntax.Left.GetBracketKernel(Level, syntax);
+            var bracketKernel = binaryTree.Left.GetBracketKernel(Level, binaryTree);
             var target = bracketKernel.Target;
             if(target != null)
             {
@@ -45,20 +45,20 @@ namespace Reni.TokenClasses
                 (
                     items.Select(item => item.Target).Where(item => item != null).ToArray(),
                     null,
-                    syntax.SourcePart
+                    binaryTree.SourcePart
                 );
                 var issues = items.SelectMany(item => item.Issues).ToArray();
                 return result.Issues(issues);
             }
             else
             {
-                var issues = bracketKernel.Issues.plus(IssueId.MissingDeclarationTag.Issue(syntax.SourcePart));
-                return new Declarer(null, null, syntax.SourcePart).Issues(issues);
+                var issues = bracketKernel.Issues.plus(IssueId.MissingDeclarationTag.Issue(binaryTree.SourcePart));
+                return new Declarer(null, null, binaryTree.SourcePart).Issues(issues);
             }
         }
 
         [Obsolete("",true)]
-        static Result<IDeclarationTag> GetDeclarationTag(Syntax item)
+        static Result<IDeclarationTag> GetDeclarationTag(BinaryTree item)
         {
             var result = item.Option.DeclarationTag;
             if(result != null)
@@ -67,6 +67,6 @@ namespace Reni.TokenClasses
             return new Result<IDeclarationTag>(null, IssueId.InvalidDeclarationTag.Issue(item.SourcePart));
         }
 
-        IParserTokenType<Syntax> IBracketMatch<Syntax>.Value {get;} = new Matched();
+        IParserTokenType<BinaryTree> IBracketMatch<BinaryTree>.Value {get;} = new Matched();
     }
 }

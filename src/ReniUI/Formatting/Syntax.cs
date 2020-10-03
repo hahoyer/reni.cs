@@ -24,10 +24,10 @@ namespace ReniUI.Formatting
 
         readonly CacheContainer Cache = new CacheContainer();
 
-        internal Syntax(Reni.TokenClasses.Syntax target)
+        internal Syntax(Reni.TokenClasses.BinaryTree target)
             : this(target, null) {}
 
-        Syntax(Reni.TokenClasses.Syntax target, Syntax parent)
+        Syntax(Reni.TokenClasses.BinaryTree target, Syntax parent)
             : base(target, parent)
         {
             Tracer.Assert(Target != null);
@@ -62,7 +62,7 @@ namespace ReniUI.Formatting
         internal bool IsSeparatorRequired
             => !WhiteSpaces.HasComment() && SeparatorExtension.Get(LeftNeighbor?.TokenClass, TokenClass);
 
-        protected override Syntax Create(Reni.TokenClasses.Syntax target, Syntax parent)
+        protected override Syntax Create(Reni.TokenClasses.BinaryTree target, Syntax parent)
             => new Syntax(target, parent);
 
         SplitMaster GetSplitMaster()

@@ -11,12 +11,12 @@ namespace Reni.TokenClasses
     sealed class FunctionSyntax : Parser.Value
     {
         internal static Result<Parser.Value> Create
-            (Syntax left, bool isImplicit, bool isMetaFunction, Syntax right, Syntax syntax, IValuesScope scope)
+            (BinaryTree left, bool isImplicit, bool isMetaFunction, BinaryTree right, BinaryTree binaryTree, IValuesScope scope)
         {
             var leftValue = left?.Value(scope);
             var rightValue = right?.Value(scope);
             var target = new FunctionSyntax
-                (leftValue?.Target, isImplicit, isMetaFunction, rightValue?.Target,syntax);
+                (leftValue?.Target, isImplicit, isMetaFunction, rightValue?.Target,binaryTree);
             var issues = leftValue?.Issues.plus(rightValue?.Issues);
             return new Result<Parser.Value>(target, issues);
         }
@@ -32,8 +32,8 @@ namespace Reni.TokenClasses
             Parser.Value setter,
             bool isImplicit,
             bool isMetaFunction,
-            Parser.Value getter, Syntax syntax)
-            : base(syntax)
+            Parser.Value getter, BinaryTree binaryTree)
+            : base(binaryTree)
         {
             Getter = getter;
             Setter = setter;

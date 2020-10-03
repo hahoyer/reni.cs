@@ -74,8 +74,8 @@ namespace Reni.Struct
         readonly Value CleanupSection;
         readonly StatementData[] StatementsData;
 
-        CompoundSyntax(Statement[] rawStatements, Value cleanupSection, Syntax syntax)
-            : base(NextObjectId++, syntax)
+        CompoundSyntax(Statement[] rawStatements, Value cleanupSection, BinaryTree binaryTree)
+            : base(NextObjectId++, binaryTree)
         {
             StatementsData = GetData(rawStatements);
             CleanupSection = cleanupSection;
@@ -151,16 +151,16 @@ namespace Reni.Struct
         protected override IEnumerable<Value> GetChildren()
             => T(StatementsData.Select(s => s.GetChildren()), T(CleanupSection)).Concat();
 
-        internal static Result<Value> Create(Result<Statement> statement, Syntax syntax)
-            => new Result<Value>(new CompoundSyntax(new[] {statement.Target}, null, syntax), statement.Issues);
+        internal static Result<Value> Create(Result<Statement> statement, BinaryTree binaryTree)
+            => new Result<Value>(new CompoundSyntax(new[] {statement.Target}, null, binaryTree), statement.Issues);
 
-        internal static Result<Value> Create(Result<Statement[]> statements, Syntax syntax)
-            => new Result<Value>(new CompoundSyntax(statements.Target, null, syntax), statements.Issues);
+        internal static Result<Value> Create(Result<Statement[]> statements, BinaryTree binaryTree)
+            => new Result<Value>(new CompoundSyntax(statements.Target, null, binaryTree), statements.Issues);
 
-        internal static Result<Value> Create(Result<Statement[]> statements, Result<Value> cleanup, Syntax syntax)
+        internal static Result<Value> Create(Result<Statement[]> statements, Result<Value> cleanup, BinaryTree binaryTree)
             => new Result<Value>
             (
-                new CompoundSyntax(statements.Target, cleanup?.Target, syntax),
+                new CompoundSyntax(statements.Target, cleanup?.Target, binaryTree),
                 statements.Issues.plus(cleanup?.Issues)
             );
 
@@ -194,7 +194,7 @@ namespace Reni.Struct
 
             var newStatements = statements.Select((s, i) => s ?? StatementsData[i].RawStatement).ToArray();
             var newCleanupSection = cleanupSection ?? CleanupSection;
-            return new CompoundSyntax(newStatements, newCleanupSection, Syntax);
+            return new CompoundSyntax(newStatements, newCleanupSection, BinaryTree);
         }
 
         internal Result Cleanup(ContextBase context, Category category)

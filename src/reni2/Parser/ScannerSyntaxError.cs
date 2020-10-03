@@ -4,7 +4,7 @@ using Reni.Validation;
 
 namespace Reni.Parser
 {
-    sealed class ScannerSyntaxError : ParserTokenType<Syntax>, ITokenClass, IValueProvider
+    sealed class ScannerSyntaxError : ParserTokenType<BinaryTree>, ITokenClass, IValueProvider
     {
         readonly IssueId IssueId;
 
@@ -16,24 +16,24 @@ namespace Reni.Parser
 
         string ITokenClass.Id => Id;
 
-        Result<Value> IValueProvider.Get(Syntax syntax, IValuesScope scope)
+        Result<Value> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
         {
-            if(syntax.Right == null)
+            if(binaryTree.Right == null)
             {
-                var issues = IssueId.Issue(syntax.Token.Characters);
-                if(syntax.Left == null)
-                    return new Result<Value>(new EmptyList(syntax), issues);
+                var issues = IssueId.Issue(binaryTree.Token.Characters);
+                if(binaryTree.Left == null)
+                    return new Result<Value>(new EmptyList(binaryTree), issues);
                 else
-                return syntax.Left.GetValue(scope).With(issues);
+                return binaryTree.Left.GetValue(scope).With(issues);
             }
 
-            NotImplementedMethod(syntax);
+            NotImplementedMethod(binaryTree);
             return null;
         }
 
         public override string Id => "<error>";
 
-        protected override Syntax Create(Syntax left, IToken token, Syntax right)
-            => Syntax.Create(left, this, token, right);
+        protected override BinaryTree Create(BinaryTree left, IToken token, BinaryTree right)
+            => BinaryTree.Create(left, this, token, right);
     }
 }

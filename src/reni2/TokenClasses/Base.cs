@@ -17,21 +17,21 @@ namespace Reni.TokenClasses
 
     abstract class TerminalSyntaxToken : TerminalToken, ITerminal, IValueProvider
     {
-        Result<Value> IValueProvider.Get(Syntax syntax, IValuesScope scope)
+        Result<Value> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
         {
-            if(syntax.Left == null && syntax.Right == null)
-                return new TerminalSyntax(this, syntax);
+            if(binaryTree.Left == null && binaryTree.Right == null)
+                return new TerminalSyntax(this, binaryTree);
 
-            if(syntax.Left != null && syntax.Right == null)
+            if(binaryTree.Left != null && binaryTree.Right == null)
             {
-                return new TerminalSyntax(this, syntax)
+                return new TerminalSyntax(this, binaryTree)
                     .Issues<Value>
                     (
                     IssueId.TerminalUsedAsSuffix
-                    .Issue(syntax.Left.SourcePart));
+                    .Issue(binaryTree.Left.SourcePart));
             }
 
-            NotImplementedMethod(syntax);
+            NotImplementedMethod(binaryTree);
             return null;
         }
 
@@ -57,7 +57,7 @@ namespace Reni.TokenClasses
             => Result(context, category, left, right);
 
         Result IPrefix.Result
-            (ContextBase context, Category category, Value right, Syntax token)
+            (ContextBase context, Category category, Value right, BinaryTree token)
             => Result(context, category, right);
 
         protected abstract Result Result
@@ -66,15 +66,15 @@ namespace Reni.TokenClasses
         protected abstract Result Result
             (ContextBase context, Category category, Value right);
 
-        Result<Value> IValueProvider.Get(Syntax syntax, IValuesScope scope)
+        Result<Value> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
         {
-            if(syntax.Left != null && syntax.Right != null)
-                return InfixSyntax.Create(syntax.Left.Value(scope), this, syntax.Right.Value(scope), syntax);
+            if(binaryTree.Left != null && binaryTree.Right != null)
+                return InfixSyntax.Create(binaryTree.Left.Value(scope), this, binaryTree.Right.Value(scope), binaryTree);
 
-            if(syntax.Left == null && syntax.Right != null)
-                return PrefixSyntax.Create(this, syntax.Right.Value(scope), syntax);
+            if(binaryTree.Left == null && binaryTree.Right != null)
+                return PrefixSyntax.Create(this, binaryTree.Right.Value(scope), binaryTree);
 
-            NotImplementedMethod(syntax);
+            NotImplementedMethod(binaryTree);
             return null;
         }
     }
@@ -88,11 +88,11 @@ namespace Reni.TokenClasses
             (ContextBase context, Category category);
 
         Result IPrefix.Result
-            (ContextBase context, Category category, Value right, Syntax token)
+            (ContextBase context, Category category, Value right, BinaryTree token)
             => Result(context, category, right, token);
 
         protected abstract Result Result
-            (ContextBase callContext, Category category, Value right, Syntax token);
+            (ContextBase callContext, Category category, Value right, BinaryTree token);
 
         Value ITerminal.Visit(ISyntaxVisitor visitor) => Visit(visitor);
 
@@ -102,29 +102,29 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        Result<Value> IValueProvider.Get(Syntax syntax, IValuesScope scope)
+        Result<Value> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
         {
-            if(syntax.Left == null)
+            if(binaryTree.Left == null)
             {
-                if(syntax.Right == null)
-                    return new TerminalSyntax(this, syntax);
+                if(binaryTree.Right == null)
+                    return new TerminalSyntax(this, binaryTree);
 
-                return PrefixSyntax.Create(this, syntax.Right.Value(scope), syntax);
+                return PrefixSyntax.Create(this, binaryTree.Right.Value(scope), binaryTree);
             }
 
-            NotImplementedMethod(syntax);
+            NotImplementedMethod(binaryTree);
             return null;
         }
     }
 
     abstract class SuffixSyntaxToken : SuffixToken, ISuffix, IValueProvider
     {
-        Result<Value> IValueProvider.Get(Syntax syntax, IValuesScope scope)
+        Result<Value> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
         {
-            if(syntax.Right == null)
-                return SuffixSyntax.Create(syntax.Left.Value(scope), this, syntax);
+            if(binaryTree.Right == null)
+                return SuffixSyntax.Create(binaryTree.Left.Value(scope), this, binaryTree);
 
-            NotImplementedMethod(syntax);
+            NotImplementedMethod(binaryTree);
             return null;
         }
 
@@ -143,7 +143,7 @@ namespace Reni.TokenClasses
         protected abstract Result Result
             (ContextBase callContext, Category category, Value left, Value right);
 
-        Result<Value> IValueProvider.Get(Syntax syntax, IValuesScope scope)
-            => InfixSyntax.Create(syntax.Left.Value(scope), this, syntax.Right.Value(scope), syntax);
+        Result<Value> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
+            => InfixSyntax.Create(binaryTree.Left.Value(scope), this, binaryTree.Right.Value(scope), binaryTree);
     }
 }

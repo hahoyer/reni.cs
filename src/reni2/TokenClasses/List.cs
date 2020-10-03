@@ -25,13 +25,13 @@ namespace Reni.TokenClasses
 
         [Obsolete("",true)]
         Result<Statement[]> IStatementsProvider.Get
-            (List type, Syntax syntax, IValuesScope scope)
+            (List type, BinaryTree binaryTree, IValuesScope scope)
         {
             if(type != null && type != this)
                 return null;
 
-            var leftStatements = CreateStatements(syntax.Left, syntax, scope);
-            var rightStatements = CreateStatements(syntax.Right, syntax, scope);
+            var leftStatements = CreateStatements(binaryTree.Left, binaryTree, scope);
+            var rightStatements = CreateStatements(binaryTree.Right, binaryTree, scope);
             var target = leftStatements?.Target.plus(rightStatements?.Target);
             var issues = leftStatements?.Issues.plus(rightStatements?.Issues);
             return new Result<Statement[]>(target, issues);
@@ -39,9 +39,9 @@ namespace Reni.TokenClasses
 
         [Obsolete("",true)]
         Result<Statement[]> CreateStatements
-            (Syntax syntax, Syntax parent, IValuesScope scope)
-            => syntax == null
+            (BinaryTree binaryTree, BinaryTree parent, IValuesScope scope)
+            => binaryTree == null
                 ? Statement.CreateStatements(new EmptyList(parent), scope.DefaultScopeProvider)
-                : syntax.GetStatements(scope, this);
+                : binaryTree.GetStatements(scope, this);
     }
 }

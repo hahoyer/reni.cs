@@ -16,12 +16,12 @@ namespace ReniUI.Helper
 
         readonly CacheContainer Cache = new CacheContainer();
 
-        internal Syntax(Reni.TokenClasses.Syntax target)
+        internal Syntax(Reni.TokenClasses.BinaryTree target)
             : this(target, null)
         {
         }
 
-        Syntax(Reni.TokenClasses.Syntax target, Syntax parent)
+        Syntax(Reni.TokenClasses.BinaryTree target, Syntax parent)
             : base(target, parent)
         {
             Cache.LocateByPosition = new FunctionCache<int, Syntax>(LocateByPositionForCache);
@@ -45,7 +45,7 @@ namespace ReniUI.Helper
 
         public Syntax LocateByPosition(int current) => Cache.LocateByPosition[current];
 
-        protected override Syntax Create(Reni.TokenClasses.Syntax target, Syntax parent)
+        protected override Syntax Create(Reni.TokenClasses.BinaryTree target, Syntax parent)
             => new Syntax(target, parent);
 
         internal Syntax Locate(SourcePart part)

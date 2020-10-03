@@ -6,18 +6,18 @@ using Reni.TokenClasses;
 
 namespace Reni.Parser
 {
-    sealed class MainTokenFactory : GenericTokenFactory<Syntax>
+    sealed class MainTokenFactory : GenericTokenFactory<BinaryTree>
     {
-        readonly Compiler<Syntax>.Component Declaration;
+        readonly Compiler<BinaryTree>.Component Declaration;
         readonly List<UserSymbol> UserSymbols = new List<UserSymbol>();
 
-        public MainTokenFactory(Compiler<Syntax>.Component declaration, string title)
+        public MainTokenFactory(Compiler<BinaryTree>.Component declaration, string title)
             : base(title)
         {
             Declaration = declaration;
         }
 
-        protected override IParserTokenType<Syntax> SpecialTokenClass(System.Type type)
+        protected override IParserTokenType<BinaryTree> SpecialTokenClass(System.Type type)
         {
             if(type == typeof(Exclamation))
                 return new Exclamation(Declaration.SubParser);
@@ -25,7 +25,7 @@ namespace Reni.Parser
             return base.SpecialTokenClass(type);
         }
 
-        protected override IParserTokenType<Syntax> GetTokenClass(string name)
+        protected override IParserTokenType<BinaryTree> GetTokenClass(string name)
         {
             var result = new UserSymbol(name);
             UserSymbols.Add(result);
@@ -33,7 +33,7 @@ namespace Reni.Parser
         }
 
         [DisableDump]
-        internal IEnumerable<IParserTokenType<Syntax>> AllTokenClasses
+        internal IEnumerable<IParserTokenType<BinaryTree>> AllTokenClasses
             => PredefinedTokenClasses.Concat(UserSymbols);
     }
 }

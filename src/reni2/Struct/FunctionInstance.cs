@@ -56,7 +56,7 @@ namespace Reni.Struct
         [DisableDump]
         protected abstract Size RelevantValueSize {get;}
 
-        string Description => Body.Syntax.SourcePart.Id;
+        string Description => Body.BinaryTree.SourcePart.Id;
 
         [Node]
         [DisableDump]
@@ -128,7 +128,7 @@ namespace Reni.Struct
             StartMethodDump(trace, category);
             try
             {
-                Dump(nameof(Body), Body.Syntax.SourcePart);
+                Dump(nameof(Body), Body.BinaryTree.SourcePart);
                 BreakExecution();
                 var rawResult = Context.Result(category.Typed, Body);
 

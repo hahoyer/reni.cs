@@ -23,19 +23,19 @@ namespace Reni
         readonly Value Else;
 
         internal static Result<Value> Create
-            (Syntax condition, Syntax thenSyntax, Syntax elseSyntax, Syntax syntax, IValuesScope scope)
+            (BinaryTree condition, BinaryTree thenBinaryTree, BinaryTree elseBinaryTree, BinaryTree binaryTree, IValuesScope scope)
         {
             var conditionValue = condition.Value(scope);
-            var thenValue = thenSyntax?.Value(scope);
-            var elseValue = elseSyntax?.Value(scope);
+            var thenValue = thenBinaryTree?.Value(scope);
+            var elseValue = elseBinaryTree?.Value(scope);
             var result = new CondSyntax
-                (conditionValue.Target, thenValue?.Target, elseValue?.Target, syntax);
+                (conditionValue.Target, thenValue?.Target, elseValue?.Target, binaryTree);
             var issues = conditionValue.Issues.plus(thenValue?.Issues).plus(elseValue?.Issues);
             return new Result<Value>(result, issues);
         }
 
-        CondSyntax(Value condSyntax, Value thenSyntax, Value elseSyntax, Syntax syntax)
-            : base(syntax)
+        CondSyntax(Value condSyntax, Value thenSyntax, Value elseSyntax, BinaryTree binaryTree)
+            : base(binaryTree)
         {
             Cond = condSyntax;
             Then = thenSyntax;

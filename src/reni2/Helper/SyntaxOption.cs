@@ -25,9 +25,9 @@ namespace Reni.Helper
 
 
         [DisableDump]
-        readonly Syntax Target;
+        readonly BinaryTree Target;
 
-        public SyntaxOption(Syntax target)
+        public SyntaxOption(BinaryTree target)
         {
             Target = target;
             SetParent();
@@ -46,7 +46,7 @@ namespace Reni.Helper
 
 
         [DisableDump]
-        internal IEnumerable<Syntax> Items => this.CachedValue(GetItems);
+        internal IEnumerable<BinaryTree> Items => this.CachedValue(GetItems);
 
         [EnableDumpExcept(null)]
         internal Result<Declarer> Declarer
@@ -82,7 +82,7 @@ namespace Reni.Helper
                 Target.Right.Option.Parent = this;
         }
 
-        IEnumerable<Syntax> GetItems()
+        IEnumerable<BinaryTree> GetItems()
         {
             if(Target.Left != null)
                 foreach(var sourceSyntax in Target.Left.Option.Items)

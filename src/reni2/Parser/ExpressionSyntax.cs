@@ -15,11 +15,11 @@ namespace Reni.Parser
         {
             readonly ContextBase Context;
             readonly int Depth;
-            readonly Syntax Syntax;
+            readonly BinaryTree BinaryTree;
 
-            public EvaluationDepthExhaustedException(Syntax syntax, ContextBase context, int depth)
+            public EvaluationDepthExhaustedException(BinaryTree binaryTree, ContextBase context, int depth)
             {
-                Syntax = syntax;
+                BinaryTree = binaryTree;
                 Context = context;
                 Depth = depth;
             }
@@ -29,29 +29,29 @@ namespace Reni.Parser
                    Depth +
                    " exhausted when evaluation expression.\n" +
                    "Expression: " +
-                   Syntax.SourcePart.GetDumpAroundCurrent(10) +
+                   BinaryTree.SourcePart.GetDumpAroundCurrent(10) +
                    "\n" +
                    "Context: " +
                    Context.NodeDump;
         }
 
         internal static Result<Value> Create
-            (Syntax parent, Value left, Definable definable, Value right)
+            (BinaryTree parent, Value left, Definable definable, Value right)
             => new Result<Value>(new ExpressionSyntax(parent, left, definable, right));
 
-        internal static Result<Value> Create(Definable definable, Syntax syntax, IValuesScope scope)
+        internal static Result<Value> Create(Definable definable, BinaryTree binaryTree, IValuesScope scope)
         {
-            var leftValue = syntax.Left?.Value(scope);
-            var rightValue = syntax.Right?.Value(scope);
+            var leftValue = binaryTree.Left?.Value(scope);
+            var rightValue = binaryTree.Right?.Value(scope);
             var left = leftValue?.Target;
             var right = rightValue?.Target;
-            return Create(syntax, left, definable, right)
+            return Create(binaryTree, left, definable, right)
                 .With(leftValue?.Issues.plus(rightValue?.Issues));
         }
 
         int CurrentResultDepth;
 
-        ExpressionSyntax(Syntax parent, Value left, Definable definable, Value right)
+        ExpressionSyntax(BinaryTree parent, Value left, Definable definable, Value right)
             : base(parent)
         {
             Left = left;
@@ -74,13 +74,13 @@ namespace Reni.Parser
         internal override Result ResultForCache(ContextBase context, Category category)
         {
             if(CurrentResultDepth > 20)
-                throw new EvaluationDepthExhaustedException(Syntax, context, CurrentResultDepth);
+                throw new EvaluationDepthExhaustedException(BinaryTree, context, CurrentResultDepth);
 
             try
             {
                 CurrentResultDepth++;
                 if(Left == null)
-                    return context.PrefixResult(category, Definable, Syntax, Right);
+                    return context.PrefixResult(category, Definable, BinaryTree, Right);
 
                 var left = context.ResultAsReferenceCache(Left);
 
@@ -92,7 +92,7 @@ namespace Reni.Parser
                     return leftType.Issues.Result(category);
 
                 return leftType
-                    .Execute(category, left, Syntax, Definable, context, Right);
+                    .Execute(category, left, BinaryTree, Definable, context, Right);
             }
             finally
             {
@@ -107,7 +107,7 @@ namespace Reni.Parser
             if(left == null && right == null)
                 return null;
 
-            var result = Definable.CreateForVisit(Syntax, left ?? Left, right ?? Right);
+            var result = Definable.CreateForVisit(BinaryTree, left ?? Left, right ?? Right);
             Tracer.Assert(!result.Issues.Any());
             return result.Target;
         }

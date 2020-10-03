@@ -52,7 +52,7 @@ namespace ReniUI
         internal IEnumerable<Issue> Issues => Compiler.Issues;
 
         internal Formatting.Syntax FormattingSyntax
-            => Cache.FomattingSyntax ?? (Cache.FomattingSyntax = new Formatting.Syntax(Compiler.Syntax));
+            => Cache.FomattingSyntax ?? (Cache.FomattingSyntax = new Formatting.Syntax(Compiler.BinaryTree));
 
         internal Helper.Syntax Syntax => Cache.HelperSyntax ?? (Cache.HelperSyntax = GetHelperSyntax());
         internal Helper.Value Value => Cache.Value?? (Cache.Value= GetValue());
@@ -132,8 +132,8 @@ namespace ReniUI
             return null;
         }
 
-        internal IEnumerable<Reni.TokenClasses.Syntax> FindAllBelongings(Helper.Syntax syntax)
-            => Compiler.Syntax.Belongings(syntax.Target);
+        internal IEnumerable<Reni.TokenClasses.BinaryTree> FindAllBelongings(Helper.Syntax syntax)
+            => Compiler.BinaryTree.Belongings(syntax.Target);
 
         internal string Reformat(IFormatter formatter = null, SourcePart targetPart = null) =>
             (formatter ?? new Formatting.Configuration().Create())
@@ -169,7 +169,7 @@ namespace ReniUI
         {
             try
             {
-                return new Helper.Syntax(Compiler.Syntax);
+                return new Helper.Syntax(Compiler.BinaryTree);
             }
             catch(Exception e)
             {

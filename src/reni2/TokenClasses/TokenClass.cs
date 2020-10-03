@@ -4,12 +4,12 @@ using Reni.Parser;
 
 namespace Reni.TokenClasses
 {
-    abstract class TokenClass : ParserTokenType<Syntax>, ITokenClass
+    abstract class TokenClass : ParserTokenType<BinaryTree>, ITokenClass
     {
         string ITokenClass.Id => Id;
 
-        protected override Syntax Create(Syntax left, IToken token, Syntax right)
-            => Syntax.Create(left, this, token, right);
+        protected override BinaryTree Create(BinaryTree left, IToken token, BinaryTree right)
+            => BinaryTree.Create(left, this, token, right);
 
         [DisableDump]
         internal virtual bool IsVisible => true;

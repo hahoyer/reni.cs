@@ -5,10 +5,10 @@ namespace Reni.TokenClasses
 {
     sealed class BraceMatchDumper : DumpableObject
     {
-        readonly Syntax _parent;
+        readonly BinaryTree _parent;
         readonly int _depth;
 
-        public BraceMatchDumper(Syntax parent, int depth)
+        public BraceMatchDumper(BinaryTree parent, int depth)
             : base(null)
         {
             _parent = parent;
@@ -28,9 +28,9 @@ namespace Reni.TokenClasses
 
         internal string Token => _parent.Token.Characters.NodeDump;
 
-        BraceMatchDumper Dump(Syntax syntax)
-            => syntax == null
+        BraceMatchDumper Dump(BinaryTree binaryTree)
+            => binaryTree == null
                 ? null
-                : new BraceMatchDumper(syntax, _depth - 1);
+                : new BraceMatchDumper(binaryTree, _depth - 1);
     }
 }

@@ -10,31 +10,31 @@ namespace Reni.TokenClasses
         public const string TokenId = ":";
         public override string Id => TokenId;
 
-        Result<Statement> IStatementProvider.Get(Syntax left, Syntax right, IValuesScope scope)
+        Result<Statement> IStatementProvider.Get(BinaryTree left, BinaryTree right, IValuesScope scope)
         {
             return left.Declarer?.Convert(x => x.Statement(right.Value(scope), scope.DefaultScopeProvider));
         }
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class Exclamation : ParserTokenType<Syntax>,
-        PrioParser<Syntax>.ISubParserProvider
+    sealed class Exclamation : ParserTokenType<BinaryTree>,
+        PrioParser<BinaryTree>.ISubParserProvider
     {
         public const string TokenId = "!";
 
-        readonly ISubParser<Syntax> Parser;
+        readonly ISubParser<BinaryTree> Parser;
 
-        public Exclamation(ISubParser<Syntax> parser) { Parser = parser; }
+        public Exclamation(ISubParser<BinaryTree> parser) { Parser = parser; }
 
         public override string Id => TokenId;
 
-        protected override Syntax Create(Syntax left, IToken token, Syntax right)
+        protected override BinaryTree Create(BinaryTree left, IToken token, BinaryTree right)
         {
             NotImplementedMethod(left, token, right);
             return null;
         }
 
-        ISubParser<Syntax> PrioParser<Syntax>.ISubParserProvider.NextParser => Parser;
+        ISubParser<BinaryTree> PrioParser<BinaryTree>.ISubParserProvider.NextParser => Parser;
     }
 
 
@@ -45,12 +45,12 @@ namespace Reni.TokenClasses
         IDeclarationTag
     {
         Result<Declarer> IDeclarerTagProvider.Get
-            (Syntax syntax)
+            (BinaryTree binaryTree)
         {
-            if(syntax.Left == null && syntax.Right == null)
-                return new Declarer(new IDeclarationTag[] {this}, null,syntax.SourcePart);
+            if(binaryTree.Left == null && binaryTree.Right == null)
+                return new Declarer(new IDeclarationTag[] {this}, null,binaryTree.SourcePart);
 
-            NotImplementedMethod(syntax);
+            NotImplementedMethod(binaryTree);
             return null;
         }
 

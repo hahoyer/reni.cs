@@ -10,13 +10,13 @@ namespace Reni.TokenClasses
         public const string TokenId = "~~~";
         public override string Id => TokenId;
 
-        Result<Value> IValueProvider.Get(Syntax syntax, IValuesScope scope)
+        Result<Value> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
         {
-            var statements = syntax.Left?.GetStatements(scope);
+            var statements = binaryTree.Left?.GetStatements(scope);
             if(statements == null)
                 statements = new Statement[0];
-            var cleanup = syntax.Right?.Value(scope);
-            return CompoundSyntax.Create(statements, cleanup, syntax);
+            var cleanup = binaryTree.Right?.Value(scope);
+            return CompoundSyntax.Create(statements, cleanup, binaryTree);
         }
     }
 }

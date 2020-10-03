@@ -22,7 +22,7 @@ using static hw.Helper.ValueCacheExtension;
 namespace Reni
 {
     public sealed class Compiler
-        : Compiler<Syntax>, ValueCache.IContainer, Root.IParent, IExecutionContext
+        : Compiler<BinaryTree>, ValueCache.IContainer, Root.IParent, IExecutionContext
     {
         const string DefaultSourceIdentifier = "source";
         const string DefaultModuleName = "ReniModule";
@@ -61,7 +61,7 @@ namespace Reni
         [UsedImplicitly]
         public Exception Exception;
         readonly ValueCache<CodeContainer> CodeContainerCache;
-        readonly ValueCache<Syntax> SyntaxCache;
+        readonly ValueCache<BinaryTree> SyntaxCache;
         readonly ValueCache<Result<Value>> ValueSyntaxCache;
 
         readonly MainTokenFactory MainTokenFactory;
@@ -80,12 +80,12 @@ namespace Reni
 
             main.PrioTable = MainPrioTable;
             main.TokenFactory = new ScannerTokenFactory();
-            main.Add<ScannerTokenType<Syntax>>(MainTokenFactory);
+            main.Add<ScannerTokenType<BinaryTree>>(MainTokenFactory);
 
             declaration.PrioTable = DeclarationPrioTable;
             declaration.TokenFactory = new ScannerTokenFactory();
             declaration.BoxFunction = target => new ExclamationBoxToken(target);
-            declaration.Add<ScannerTokenType<Syntax>>(new DeclarationTokenFactory("Declaration"));
+            declaration.Add<ScannerTokenType<BinaryTree>>(new DeclarationTokenFactory("Declaration"));
 
             main.Parser.Trace = Parameters.TraceOptions.Parser;
             declaration.Parser.Trace = Parameters.TraceOptions.Parser;
@@ -101,7 +101,7 @@ namespace Reni
         CodeContainer GetCodeContainer() => new CodeContainer(Value, Root, ModuleName, Source.Data);
 
         Result<Value> GetValue() 
-            => CompoundSyntax.Create(Syntax.GetStatements(null), Syntax);
+            => CompoundSyntax.Create(BinaryTree.GetStatements(null), BinaryTree);
 
 
         static string ModuleNameFromFileName(string fileName)
@@ -109,7 +109,7 @@ namespace Reni
 
         [Node]
         [DisableDump]
-        public Syntax Syntax => SyntaxCache.Value;
+        public BinaryTree BinaryTree => SyntaxCache.Value;
 
         [Node]
         [DisableDump]
@@ -238,7 +238,7 @@ namespace Reni
         internal IEnumerable<Issue> Issues 
             => T(ValueSyntaxCache.Value.Issues, CodeContainer?.Issues).Concat();
 
-        Syntax Parse(SourcePosition source) => this["Main"].Parser.Execute(source);
+        BinaryTree Parse(SourcePosition source) => this["Main"].Parser.Execute(source);
 
         void RunFromCode() => CodeContainer.Execute(this, TraceCollector.Instance);
 
@@ -253,8 +253,8 @@ namespace Reni
         CodeBase IExecutionContext.Function(FunctionId functionId)
             => CodeContainer.Function(functionId);
 
-        internal IEnumerable<Syntax> FindAllBelongings(Syntax syntax)
-            => Syntax.Belongings(syntax);
+        internal IEnumerable<BinaryTree> FindAllBelongings(BinaryTree binaryTree)
+            => BinaryTree.Belongings(binaryTree);
 
         internal static PrioTable MainPrioTable
         {

@@ -34,14 +34,14 @@ namespace Reni.FeatureTest.Helper
 
         public LikeSyntax Expression(string s2) => new Expression(this, s2, null);
 
-        internal abstract void AssertLike(Syntax syntax);
+        internal abstract void AssertLike(BinaryTree binaryTree);
         internal abstract void AssertLike(Value syntax);
     }
 
     sealed class Empty : LikeSyntax
     {
-        internal override void AssertLike(Syntax syntax)
-            => Tracer.Assert(syntax.Value(null).Target is EmptyList);
+        internal override void AssertLike(BinaryTree binaryTree)
+            => Tracer.Assert(binaryTree.Value(null).Target is EmptyList);
 
         internal override void AssertLike(Value syntax)
             => Tracer.Assert(syntax is EmptyList);
@@ -80,7 +80,7 @@ namespace Reni.FeatureTest.Helper
             _converters = converters;
         }
 
-        internal override void AssertLike(Syntax syntax) => AssertLike(syntax.Value(null).Target);
+        internal override void AssertLike(BinaryTree binaryTree) => AssertLike(binaryTree.Value(null).Target);
 
         internal override void AssertLike(Value syntax)
         {
@@ -109,7 +109,7 @@ namespace Reni.FeatureTest.Helper
                 syntax.AssertLike(right);
         }
 
-        static void AssertLike(LikeSyntax syntax, Syntax right)
+        static void AssertLike(LikeSyntax syntax, BinaryTree right)
         {
             if(syntax == null)
                 Tracer.Assert(right == null);
@@ -128,8 +128,8 @@ namespace Reni.FeatureTest.Helper
             _s3 = s3;
         }
 
-        internal override void AssertLike(Reni.TokenClasses.Syntax syntax) 
-            => AssertLike(syntax.Value(null).Target);
+        internal override void AssertLike(Reni.TokenClasses.BinaryTree binaryTree) 
+            => AssertLike(binaryTree.Value(null).Target);
 
         internal override void AssertLike(Value syntax)
         {
@@ -146,9 +146,9 @@ namespace Reni.FeatureTest.Helper
 
         internal Number(long i) => _i = i;
 
-        internal override void AssertLike(Syntax syntax)
+        internal override void AssertLike(BinaryTree binaryTree)
         {
-            var terminalSyntax = (TerminalSyntax) syntax.Value(null).Target;
+            var terminalSyntax = (TerminalSyntax) binaryTree.Value(null).Target;
             Tracer.Assert(terminalSyntax.Terminal is TokenClasses.Number);
             Tracer.Assert(terminalSyntax.ToNumber == _i);
         }

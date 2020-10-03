@@ -8,11 +8,11 @@ using Reni.TokenClasses;
 namespace Reni.Helper
 {
     abstract class SyntaxWithParent<TResult>
-        : BinaryTreeWithParentExtended<TResult, Syntax>
+        : BinaryTreeWithParentExtended<TResult, BinaryTree>
             , IBinaryTree<TResult>
         where TResult : SyntaxWithParent<TResult>
     {
-        protected SyntaxWithParent(Syntax target, TResult parent)
+        protected SyntaxWithParent(BinaryTree target, TResult parent)
             : base(target, parent) { }
 
         [DisableDump]

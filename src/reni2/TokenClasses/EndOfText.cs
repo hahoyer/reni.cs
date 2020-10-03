@@ -5,12 +5,12 @@ using Reni.Parser;
 
 namespace Reni.TokenClasses
 {
-    sealed class EndOfText : TokenClass, IDefaultScopeProvider, IBracketMatch<Syntax>, IStatementsProvider
+    sealed class EndOfText : TokenClass, IDefaultScopeProvider, IBracketMatch<BinaryTree>, IStatementsProvider
         , IValuesScope
     {
-        sealed class Matched : DumpableObject, IParserTokenType<Syntax>
+        sealed class Matched : DumpableObject, IParserTokenType<BinaryTree>
         {
-            Syntax IParserTokenType<Syntax>.Create(Syntax left, IToken token, Syntax right)
+            BinaryTree IParserTokenType<BinaryTree>.Create(BinaryTree left, IToken token, BinaryTree right)
             {
                 Tracer.Assert(right == null);
                 Tracer.Assert(left.Right == null);
@@ -18,16 +18,16 @@ namespace Reni.TokenClasses
                 return left;
             }
 
-            string IParserTokenType<Syntax>.PrioTableId => "()";
+            string IParserTokenType<BinaryTree>.PrioTableId => "()";
         }
 
         const string TokenId = PrioTable.EndOfText;
-        IParserTokenType<Syntax> IBracketMatch<Syntax>.Value {get;} = new Matched();
+        IParserTokenType<BinaryTree> IBracketMatch<BinaryTree>.Value {get;} = new Matched();
         bool IDefaultScopeProvider.MeansPublic => true;
 
         [Obsolete("",true)]
         Result<Statement[]> IStatementsProvider.Get
-            (List type, Syntax right, IValuesScope scope)
+            (List type, BinaryTree right, IValuesScope scope)
         {
             Tracer.Assert(type == null);
             Tracer.Assert(right != null);

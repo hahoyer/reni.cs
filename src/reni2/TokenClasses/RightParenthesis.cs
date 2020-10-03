@@ -10,30 +10,30 @@ namespace Reni.TokenClasses
     sealed class RightParenthesis : RightParenthesisBase,
         IValueProvider,
         IDefaultScopeProvider,
-        IBracketMatch<Syntax>
+        IBracketMatch<BinaryTree>
         , IValuesScope
     {
         sealed class Matched : DumpableObject,
-            IParserTokenType<Syntax>,
+            IParserTokenType<BinaryTree>,
             ITokenClass,
             IValueProvider
         {
             static string Id => "()";
 
-            Result<Value> IValueProvider.Get(Syntax syntax, IValuesScope scope)
+            Result<Value> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
             {
-                Tracer.Assert(syntax.Left != null);
-                Tracer.Assert(syntax.Right != null);
-                var leftValue = syntax.Left.Value(scope);
-                var rightValue = syntax.Right.Value(scope);
-                return ExpressionSyntax.Create(syntax, leftValue.Target, null, rightValue.Target)
+                Tracer.Assert(binaryTree.Left != null);
+                Tracer.Assert(binaryTree.Right != null);
+                var leftValue = binaryTree.Left.Value(scope);
+                var rightValue = binaryTree.Right.Value(scope);
+                return ExpressionSyntax.Create(binaryTree, leftValue.Target, null, rightValue.Target)
                     .With(rightValue.Issues.plus(leftValue.Issues));
             }
 
-            Syntax IParserTokenType<Syntax>.Create(Syntax left, IToken token, Syntax right)
-                => right == null ? left : Syntax.Create(left, this, token, right);
+            BinaryTree IParserTokenType<BinaryTree>.Create(BinaryTree left, IToken token, BinaryTree right)
+                => right == null ? left : BinaryTree.Create(left, this, token, right);
 
-            string IParserTokenType<Syntax>.PrioTableId => Id;
+            string IParserTokenType<BinaryTree>.PrioTableId => Id;
             string ITokenClass.Id => Id;
         }
 
@@ -41,20 +41,20 @@ namespace Reni.TokenClasses
             : base(level) { }
 
         [Obsolete("",true)]
-        Result<Value> IValueProvider.Get(Syntax syntax, IValuesScope scope)
+        Result<Value> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
         {
-            var result = syntax.Left.GetBracketKernel(Level, syntax);
-            var target = result.Target?.Value(this) ?? new EmptyList(syntax);
+            var result = binaryTree.Left.GetBracketKernel(Level, binaryTree);
+            var target = result.Target?.Value(this) ?? new EmptyList(binaryTree);
 
             if(result.Issues.Any())
                 return target.With(result.Issues);
 
-            return result.Target == null ? new EmptyList(syntax) : result.Target.Value(this);
+            return result.Target == null ? new EmptyList(binaryTree) : result.Target.Value(this);
         }
 
         bool IDefaultScopeProvider.MeansPublic => Level == 3;
         IDefaultScopeProvider IValuesScope.DefaultScopeProvider => this;
         bool IValuesScope.IsDeclarationPart => false;
-        IParserTokenType<Syntax> IBracketMatch<Syntax>.Value { get; } = new Matched();
+        IParserTokenType<BinaryTree> IBracketMatch<BinaryTree>.Value { get; } = new Matched();
     }
 }

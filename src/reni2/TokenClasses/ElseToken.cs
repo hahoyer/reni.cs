@@ -10,11 +10,11 @@ namespace Reni.TokenClasses
         public const string TokenId = "else";
         public override string Id => TokenId;
 
-        Result<Value> IValueProvider.Get(Syntax syntax, IValuesScope scope)
+        Result<Value> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
         {
-            Tracer.Assert(syntax.Left != null);
-            Tracer.Assert(syntax.Left.TokenClass is ThenToken);
-            return CondSyntax.Create(syntax.Left.Left, syntax.Left.Right, syntax.Right, syntax, scope);
+            Tracer.Assert(binaryTree.Left != null);
+            Tracer.Assert(binaryTree.Left.TokenClass is ThenToken);
+            return CondSyntax.Create(binaryTree.Left.Left, binaryTree.Left.Right, binaryTree.Right, binaryTree, scope);
         }
     }
 }

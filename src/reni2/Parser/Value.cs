@@ -33,13 +33,13 @@ namespace Reni.Parser
         internal readonly FunctionCache<ContextBase, ResultCache> ResultCache =
             new FunctionCache<ContextBase, ResultCache>();
 
-        protected Value(Syntax syntax) => Syntax = syntax;
+        protected Value(BinaryTree binaryTree) => BinaryTree = binaryTree;
 
-        protected Value(int objectId, Syntax syntax)
+        protected Value(int objectId, BinaryTree binaryTree)
             : base(objectId)
-            => Syntax = syntax;
+            => BinaryTree = binaryTree;
 
-        internal Syntax Syntax {get;}
+        internal BinaryTree BinaryTree {get;}
 
         [DisableDump]
         internal virtual bool IsLambda => false;

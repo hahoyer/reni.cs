@@ -15,8 +15,8 @@ namespace Reni.Parser
         [EnableDump]
         internal readonly ITerminal Terminal;
 
-        internal TerminalSyntax(ITerminal terminal, Syntax syntax)
-            : base(syntax)
+        internal TerminalSyntax(ITerminal terminal, BinaryTree binaryTree)
+            : base(binaryTree)
         {
             Terminal = terminal;
             StopByObjectIds();
@@ -33,15 +33,15 @@ namespace Reni.Parser
         internal long ToNumber => BitsConst.Convert(Id).ToInt64();
 
         [DisableDump]
-        internal SourcePart Token => Syntax.Token.Characters;
+        internal SourcePart Token => BinaryTree.Token.Characters;
 
         protected override string GetNodeDump() => Terminal.NodeDump();
     }
 
     sealed class PrefixSyntax : Value
     {
-        public static Result<Value> Create(IPrefix prefix, Result<Value> right, Syntax syntax)
-            => new PrefixSyntax(prefix, right.Target,syntax).Issues<Value>(right.Issues);
+        public static Result<Value> Create(IPrefix prefix, Result<Value> right, BinaryTree binaryTree)
+            => new PrefixSyntax(prefix, right.Target,binaryTree).Issues<Value>(right.Issues);
 
         [Node]
         [EnableDump]
@@ -51,8 +51,8 @@ namespace Reni.Parser
         [EnableDump]
         readonly Value Right;
 
-        public PrefixSyntax(IPrefix prefix, Value right, Syntax syntax)
-            : base(syntax)
+        public PrefixSyntax(IPrefix prefix, Value right, BinaryTree binaryTree)
+            : base(binaryTree)
         {
             Prefix = prefix;
             Right = right;
@@ -61,7 +61,7 @@ namespace Reni.Parser
         protected override IEnumerable<Value> GetChildren() => T(Right);
 
         internal override Result ResultForCache(ContextBase context, Category category) => Prefix
-            .Result(context, category, Right, Syntax);
+            .Result(context, category, Right, BinaryTree);
 
         protected override string GetNodeDump() => Prefix.NodeDump() + "(" + Right.NodeDump + ")";
     }
@@ -69,9 +69,9 @@ namespace Reni.Parser
     sealed class InfixSyntax : Value
     {
         public static Result<Value> Create
-            (Result<Value> left, IInfix infix, Result<Value> right, Syntax syntax)
+            (Result<Value> left, IInfix infix, Result<Value> right, BinaryTree binaryTree)
         {
-            Value value = new InfixSyntax(left.Target, infix, right.Target, syntax);
+            Value value = new InfixSyntax(left.Target, infix, right.Target, binaryTree);
             return value.Issues(left.Issues.plus(right.Issues));
         }
 
@@ -87,8 +87,8 @@ namespace Reni.Parser
         [EnableDump]
         readonly Value Right;
 
-        public InfixSyntax(Value left, IInfix infix, Value right, Syntax syntax)
-            : base(syntax)
+        public InfixSyntax(Value left, IInfix infix, Value right, BinaryTree binaryTree)
+            : base(binaryTree)
         {
             Left = left;
             Infix = infix;
@@ -124,9 +124,9 @@ namespace Reni.Parser
     sealed class SuffixSyntax : Value
     {
         public static Result<Value> Create
-            (Result<Value> left, ISuffix suffix, Syntax syntax)
+            (Result<Value> left, ISuffix suffix, BinaryTree binaryTree)
         {
-            Value value = new SuffixSyntax(left.Target, suffix, syntax);
+            Value value = new SuffixSyntax(left.Target, suffix, binaryTree);
             return value.Issues(left.Issues);
         }
 
@@ -138,8 +138,8 @@ namespace Reni.Parser
         [EnableDump]
         readonly ISuffix Suffix;
 
-        internal SuffixSyntax(Value left, ISuffix suffix, Syntax syntax)
-            : base(syntax)
+        internal SuffixSyntax(Value left, ISuffix suffix, BinaryTree binaryTree)
+            : base(binaryTree)
         {
             Left = left;
             Suffix = suffix;
@@ -160,7 +160,7 @@ namespace Reni.Parser
 
     interface IPrefix
     {
-        Result Result(ContextBase context, Category category, Value right, Syntax token);
+        Result Result(ContextBase context, Category category, Value right, BinaryTree token);
     }
 
     interface IInfix

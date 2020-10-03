@@ -7,8 +7,8 @@ namespace Reni.Parser
 {
     sealed class EmptyList : Value
     {
-        public EmptyList(Syntax syntax)
-            : base(syntax) { StopByObjectIds(); }
+        public EmptyList(BinaryTree binaryTree)
+            : base(binaryTree) { StopByObjectIds(); }
 
         protected override string GetNodeDump() => "()";
 

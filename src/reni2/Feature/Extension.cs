@@ -186,7 +186,7 @@ namespace Reni.Feature
             this IImplementation feature,
             Category category,
             ResultCache left,
-            Syntax token,
+            BinaryTree token,
             ContextBase context,
             Parser.Value right)
         {

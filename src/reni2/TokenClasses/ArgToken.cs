@@ -17,7 +17,7 @@ namespace Reni.TokenClasses
         internal override Value Visit(ISyntaxVisitor visitor) => visitor.Arg;
 
         protected override Result Result
-            (ContextBase context, Category category, Value right, Syntax token)
+            (ContextBase context, Category category, Value right, BinaryTree token)
             => context.FunctionalArgResult(category, right, token);
     }
 }

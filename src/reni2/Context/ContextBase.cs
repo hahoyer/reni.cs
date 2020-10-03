@@ -67,7 +67,7 @@ namespace Reni.Context
             int SyntaxObjectId => Syntax.ObjectId;
 
             [EnableDump]
-            string SyntaxText => Syntax.Syntax.SourcePart.Id;
+            string SyntaxText => Syntax.BinaryTree.SourcePart.Id;
         }
 
         internal sealed class Cache : DumpableObject, IIconKeyProvider
@@ -260,7 +260,7 @@ namespace Reni.Context
         /// <param name="token"></param>
         /// <returns> </returns>
         internal Result FunctionalArgResult
-            (Category category, Parser.Value right, Syntax token)
+            (Category category, Parser.Value right, BinaryTree token)
         {
             var argsType = FindRecentFunctionContextObject.ArgsType;
             return argsType
@@ -296,7 +296,7 @@ namespace Reni.Context
         }
 
         internal Result PrefixResult
-            (Category category, Definable definable, Syntax source, Parser.Value right)
+            (Category category, Definable definable, BinaryTree source, Parser.Value right)
         {
             var searchResult = Declaration(definable);
             if(searchResult == null)

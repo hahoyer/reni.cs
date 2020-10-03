@@ -16,25 +16,25 @@ namespace Reni.TokenClasses
             => this.GenericListFromDefinable();
 
         internal Result<Parser.Value> CreateForVisit
-            (Syntax parent, Parser.Value left, Parser.Value right)
+            (BinaryTree parent, Parser.Value left, Parser.Value right)
             => ExpressionSyntax.Create(parent, left, this, right);
 
-        Result<Declarer> IDeclarerTokenClass.Get(Syntax syntax)
+        Result<Declarer> IDeclarerTokenClass.Get(BinaryTree binaryTree)
         {
-            if(syntax.Right == null)
+            if(binaryTree.Right == null)
             {
-                if(syntax.Left == null)
-                    return new Declarer(null, this, syntax.SourcePart);
+                if(binaryTree.Left == null)
+                    return new Declarer(null, this, binaryTree.SourcePart);
 
-                return syntax.Left.Declarer?.Target.WithName(this, syntax.SourcePart);
+                return binaryTree.Left.Declarer?.Target.WithName(this, binaryTree.SourcePart);
             }
 
-            Tracer.FlaggedLine(nameof(syntax) + "=" + syntax);
+            Tracer.FlaggedLine(nameof(binaryTree) + "=" + binaryTree);
             return null;
         }
 
-        Result<Parser.Value> IValueProvider.Get(Syntax syntax, IValuesScope scope)
-            => ExpressionSyntax.Create(this, syntax, scope);
+        Result<Parser.Value> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
+            => ExpressionSyntax.Create(this, binaryTree, scope);
 
     }
 

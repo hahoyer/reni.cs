@@ -9,33 +9,33 @@ namespace Reni.TokenClasses
     class TokenItem : DumpableObject, IFormatItem
     {
         readonly bool IgnoreWhitespaces;
-        readonly Syntax Syntax;
+        readonly BinaryTree BinaryTree;
 
-        public TokenItem(Syntax syntax, bool ignoreWhitespaces)
+        public TokenItem(BinaryTree binaryTree, bool ignoreWhitespaces)
         {
-            Syntax = syntax;
+            BinaryTree = binaryTree;
             IgnoreWhitespaces = ignoreWhitespaces;
         }
 
         [EnableDump]
         [Obsolete("",true)]
-        SourcePart IFormatItem.Content => Syntax.Token.Characters;
+        SourcePart IFormatItem.Content => BinaryTree.Token.Characters;
 
         [EnableDump]
         bool IFormatItem.IsEssential => true;
 
         [EnableDump]
-        ITokenClass IFormatItem.TokenClass => Syntax.TokenClass;
+        ITokenClass IFormatItem.TokenClass => BinaryTree.TokenClass;
 
         bool IFormatItem.HasEssentialWhiteSpaces
         {
             get
             {
-                var tokenPrecededWith = Syntax.Token.PrecededWith;
+                var tokenPrecededWith = BinaryTree.Token.PrecededWith;
                 return !IgnoreWhitespaces && tokenPrecededWith.HasComment();
             }
         }
 
-        string IFormatItem.WhiteSpaces => IgnoreWhitespaces ? "" : Syntax.Token.PrecededWith.SourcePart()?.Id ?? "";
+        string IFormatItem.WhiteSpaces => IgnoreWhitespaces ? "" : BinaryTree.Token.PrecededWith.SourcePart()?.Id ?? "";
     }
 }

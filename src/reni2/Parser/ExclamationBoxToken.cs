@@ -8,36 +8,36 @@ namespace Reni.Parser
 {
     sealed class ExclamationBoxToken
         : DumpableObject,
-            IParserTokenType<Syntax>,
+            IParserTokenType<BinaryTree>,
             ITokenClass,
             IDeclarerTokenClass
     {
-        internal ExclamationBoxToken(Syntax value) => Value = value;
+        internal ExclamationBoxToken(BinaryTree value) => Value = value;
 
         [CanBeNull]
-        Result<Declarer> IDeclarerTokenClass.Get(Syntax syntax)
+        Result<Declarer> IDeclarerTokenClass.Get(BinaryTree binaryTree)
         {
-            if(!(syntax.Right.TokenClass is IDeclarerTagProvider provider))
-                return new Declarer(null, null, syntax.SourcePart)
-                    .Issues(IssueId.UnknownDeclarationTag.Issue(syntax.SourcePart));
+            if(!(binaryTree.Right.TokenClass is IDeclarerTagProvider provider))
+                return new Declarer(null, null, binaryTree.SourcePart)
+                    .Issues(IssueId.UnknownDeclarationTag.Issue(binaryTree.SourcePart));
 
-            var result = provider.Get(syntax.Right);
+            var result = provider.Get(binaryTree.Right);
 
-            var other = syntax.Left?.Declarer;
+            var other = binaryTree.Left?.Declarer;
             if(other == null)
                 return result;
 
             return result.Target.Combine(other.Target).Issues(result.Issues.plus(other.Issues));
         }
 
-        Syntax IParserTokenType<Syntax>.Create(Syntax left, IToken token, Syntax right)
+        BinaryTree IParserTokenType<BinaryTree>.Create(BinaryTree left, IToken token, BinaryTree right)
         {
             Tracer.Assert(right == null);
-            return Syntax.Create(left, this, token, Value);
+            return BinaryTree.Create(left, this, token, Value);
         }
 
-        string IParserTokenType<Syntax>.PrioTableId => PrioTable.Any;
+        string IParserTokenType<BinaryTree>.PrioTableId => PrioTable.Any;
         string ITokenClass.Id => "!";
-        Syntax Value {get;}
+        BinaryTree Value {get;}
     }
 }

@@ -41,12 +41,12 @@ namespace Reni.Parser
 
     interface IDeclarerTokenClass
     {
-        Result<Declarer> Get(Syntax syntax);
+        Result<Declarer> Get(BinaryTree binaryTree);
     }
 
     interface IDeclarerTagProvider
     {
-        Result<Declarer> Get(Syntax syntax);
+        Result<Declarer> Get(BinaryTree binaryTree);
     }
 
     interface IDeclarationTag {}
