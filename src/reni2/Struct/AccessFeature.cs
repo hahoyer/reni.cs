@@ -68,7 +68,7 @@ namespace Reni.Struct
         Parser.Syntax Statement => View
             .Compound
             .Syntax
-            .Statements[Position];
+            .SyntaxStatements[Position];
 
         IFunction ObtainFunctionFeature()
         {

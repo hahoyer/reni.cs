@@ -5,7 +5,8 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.UnitTest;
 using Reni;
-using Reni.ParserTest;
+using Reni.FeatureTest;
+using Reni.FeatureTest.Helper;
 using Reni.Runtime;
 using ReniUI;
 
@@ -28,15 +29,13 @@ namespace ReniTest
         static void RunAllTests()
         {
             if(Debugger.IsAttached)
-            {
                 TestRunner.IsBreakDisabled = false;
-                //TestRunner.IsModeErrorFocus = true;
-            }
+            //TestRunner.IsModeErrorFocus = true;
             Assembly.GetExecutingAssembly().RunTests();
         }
 
         // Keep this to ensure reference to ReniUI
-        static void BrowseCompiler(CompilerBrowser compiler) {}
+        static void BrowseCompiler(CompilerBrowser compiler) { }
 
         static Compiler CreateCompiler(string text)
         {
@@ -56,5 +55,9 @@ namespace ReniTest
             T4CompilerGenerated.MainFunction();
             Data.OutStream = null;
         }
+
+        static void Run<TTarget>()
+            where TTarget : CompilerTest, new()
+            => new TTarget().Run();
     }
 }

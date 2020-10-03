@@ -24,28 +24,28 @@ namespace Reni.Struct
         static int NextObjectId;
 
         readonly Syntax CleanupSection;
-        readonly Statement[] StatementsData;
+        readonly Statement[] Statements;
 
-        CompoundSyntax(Statement[] rawStatements, Syntax cleanupSection, BinaryTree binaryTree)
+        CompoundSyntax(Statement[] statements, Syntax cleanupSection, BinaryTree binaryTree)
             : base(NextObjectId++, binaryTree)
         {
-            StatementsData = rawStatements;
+            Statements = statements;
             CleanupSection = cleanupSection;
         }
 
         [DisableDump]
         public IEnumerable<FunctionSyntax> ConverterFunctions
-            => StatementsData
+            => Statements
                 .Where(data => data.IsConverterSyntax)
                 .Select(data => (FunctionSyntax)data.Syntax);
 
         [Node]
         [EnableDump]
-        internal Syntax[] Statements => StatementsData.Select(s => s.Syntax).ToArray();
+        internal Syntax[] SyntaxStatements => Statements.Select(s => s.Syntax).ToArray();
 
         [EnableDump]
         internal IDictionary<string, int> NameIndex
-            => StatementsData
+            => Statements
                 .SelectMany
                 (
                     (statement, index) => statement.AllNames.Select
@@ -68,21 +68,21 @@ namespace Reni.Struct
         internal int[] MixIns => IndexList(item => item.IsMixInSyntax).ToArray();
 
         [DisableDump]
-        internal int EndPosition => Statements.Length;
+        internal int EndPosition => SyntaxStatements.Length;
 
 
         [DisableDump]
-        internal override bool? IsHollow => Statements.All(syntax => syntax.IsHollow == true);
+        internal override bool? IsHollow => SyntaxStatements.All(syntax => syntax.IsHollow == true);
 
         [DisableDump]
-        internal Size IndexSize => Size.AutoSize(Statements.Length);
+        internal Size IndexSize => Size.AutoSize(SyntaxStatements.Length);
 
         [DisableDump]
-        internal string[] AllNames => StatementsData.SelectMany(s => s.AllNames).ToArray();
+        internal string[] AllNames => Statements.SelectMany(s => s.AllNames).ToArray();
 
         [DisableDump]
         internal int[] ConverterStatementPositions
-            => StatementsData
+            => Statements
                 .SelectMany((s, i) => s.IsConverterSyntax? new[] {i} : new int[0])
                 .ToArray();
 
@@ -101,7 +101,7 @@ namespace Reni.Struct
             => GetType().PrettyName() + "(" + GetCompoundIdentificationDump() + ")";
 
         protected override IEnumerable<Syntax> GetChildren()
-            => T(StatementsData.Select(s => s.GetChildren()), T(CleanupSection)).Concat();
+            => T(Statements.Select(s => s.GetChildren()), T(CleanupSection)).Concat();
 
         internal static Result<Syntax> Create(Result<Statement> statement, BinaryTree binaryTree)
             => new Result<Syntax>(new CompoundSyntax(new[] {statement.Target}, null, binaryTree), statement.Issues);
@@ -117,16 +117,16 @@ namespace Reni.Struct
                 statements.Issues.plus(cleanup?.Issues)
             );
 
-        internal bool IsMutable(int position) => StatementsData[position].IsMutableSyntax;
+        internal bool IsMutable(int position) => Statements[position].IsMutableSyntax;
 
         internal int? Find(string name, bool publicOnly)
         {
             if(name == null)
                 return null;
 
-            return StatementsData
+            return Statements
                 .Select((data, index) => data.IsDefining(name, publicOnly)? index : (int?)null)
-                .FirstOrDefault();
+                .FirstOrDefault(data => data!= null);
         }
 
         internal override Result ResultForCache(ContextBase context, Category category)
@@ -139,13 +139,13 @@ namespace Reni.Struct
 
         internal override Syntax Visit(ISyntaxVisitor visitor)
         {
-            var statements = StatementsData.Select(s => s.Visit(visitor)).ToArray();
+            var statements = Statements.Select(s => s.Visit(visitor)).ToArray();
             var cleanupSection = CleanupSection?.Visit(visitor);
 
             if(statements.All(s => s == null) && cleanupSection == null)
                 return null;
 
-            var newStatements = statements.Select((s, i) => s ?? StatementsData[i]).ToArray();
+            var newStatements = statements.Select((s, i) => s ?? Statements[i]).ToArray();
             var newCleanupSection = cleanupSection ?? CleanupSection;
             return new CompoundSyntax(newStatements, newCleanupSection, BinaryTree);
         }
@@ -163,8 +163,8 @@ namespace Reni.Struct
 
         IEnumerable<int> IndexList(Func<Statement, bool> selector)
         {
-            for(var index = 0; index < StatementsData.Length; index++)
-                if(selector(StatementsData[index]))
+            for(var index = 0; index < Statements.Length; index++)
+                if(selector(Statements[index]))
                     yield return index;
         }
 
