@@ -1,5 +1,6 @@
-﻿using hw.DebugFormatter;
-using hw.Scanner;
+﻿using System.Linq;
+using hw.DebugFormatter;
+using hw.Helper;
 using Reni.TokenClasses;
 using Reni.Validation;
 
@@ -14,12 +15,13 @@ namespace Reni.Parser
         internal Definable Target { get; }
 
         [EnableDump]
-        readonly BinaryTree BinaryTree;
+        readonly BinaryTree[] BinaryTrees;
 
-        internal Declarer(IDeclarationTag[] tags, Definable target, BinaryTree binaryTree)
+        internal Declarer(IDeclarationTag[] tags, Definable target, BinaryTree[] binaryTrees)
         {
-            BinaryTree = binaryTree;
+            BinaryTrees = binaryTrees;
             Tags = tags ?? new IDeclarationTag[0];
+            Tracer.ConditionalBreak(BinaryTrees == null && Tags.Length ==2);
             Target = target;
         }
 
@@ -28,23 +30,26 @@ namespace Reni.Parser
 
         public Result<Declarer> WithName(Definable target, BinaryTree binaryTree)
         {
-
-
-            NotImplementedMethod(target, binaryTree);
-
-            var result = new Declarer(Tags, target, binaryTree);
+            var combinedBinaryTree = T(T(binaryTree),BinaryTrees).Combine();
+            var result = new Declarer(Tags, target, combinedBinaryTree);
             if(Target == null)
                 return result;
+            var combinedSourcePart = combinedBinaryTree
+                .Select(b => b.SourcePart)
+                .Aggregate();
 
-            return result.Issues(IssueId.InvalidDeclarationTag.Issue(binaryTree.SourcePart));
+            return result.Issues(IssueId.InvalidDeclarationTag.Issue(combinedSourcePart));
         }
 
         public Declarer Combine(Declarer other)
         {
-            NotImplementedMethod(other);
-
             Tracer.Assert(Target == null || other.Target == null);
-            return new Declarer(Tags.plus(other.Tags), Target ?? other.Target, other.BinaryTree);
+            return new Declarer
+            (
+                Tags.plus(other.Tags),
+                Target ?? other.Target,
+                T(other.BinaryTrees,BinaryTrees).Combine()
+            );
         }
     }
 

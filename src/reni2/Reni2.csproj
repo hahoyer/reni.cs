@@ -330,6 +330,7 @@
     <Compile Include="TokenClasses\Cleanup.cs" />
     <Compile Include="TokenClasses\CompareOperation.cs" />
     <Compile Include="TokenClasses\EndOfText.cs" />
+    <Compile Include="TokenClasses\Extension.cs" />
     <Compile Include="TokenClasses\ExtensionFactoryContainer.cs" />
     <Compile Include="TokenClasses\IBelongingsMatcher.cs" />
     <Compile Include="TokenClasses\IComparator.cs" />

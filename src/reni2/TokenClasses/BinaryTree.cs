@@ -300,5 +300,6 @@ namespace Reni.TokenClasses
                 foreach(var sourceSyntax in Right.Items)
                     yield return sourceSyntax;
         }
+
     }
 }

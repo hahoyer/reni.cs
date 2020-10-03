@@ -24,7 +24,7 @@ namespace Reni.TokenClasses
             if(binaryTree.Right == null)
             {
                 if(binaryTree.Left == null)
-                    return new Declarer(null, this, binaryTree);
+                    return new Declarer(null, this, T(binaryTree));
 
                 return binaryTree.Left.Declarer?.Target.WithName(this, binaryTree);
             }

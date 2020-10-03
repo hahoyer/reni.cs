@@ -48,7 +48,7 @@ namespace Reni.TokenClasses
             (BinaryTree binaryTree)
         {
             if(binaryTree.Left == null && binaryTree.Right == null)
-                return new Declarer(new IDeclarationTag[] {this}, null,binaryTree);
+                return new Declarer(new IDeclarationTag[] {this}, null,T(binaryTree));
 
             NotImplementedMethod(binaryTree);
             return null;

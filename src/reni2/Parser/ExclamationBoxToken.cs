@@ -18,7 +18,7 @@ namespace Reni.Parser
         Result<Declarer> IDeclarerTokenClass.Get(BinaryTree binaryTree)
         {
             if(!(binaryTree.Right.TokenClass is IDeclarerTagProvider provider))
-                return new Declarer(null, null, binaryTree)
+                return new Declarer(null, null, T(binaryTree))
                     .Issues(IssueId.UnknownDeclarationTag.Issue(binaryTree.SourcePart));
 
             var result = provider.Get(binaryTree.Right);
