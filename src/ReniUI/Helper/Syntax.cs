@@ -29,8 +29,6 @@ namespace ReniUI.Helper
             Cache.ExtendedLocateByPosition = new FunctionCache<int, Syntax>(ExtendedLocateByPositionForCache);
         }
 
-        protected override string GetNodeDump() => $"{GetType().PrettyName()}({SourcePart.NodeDump})";
-
         [DisableDump]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public Issue[] Issues
@@ -84,6 +82,8 @@ namespace ReniUI.Helper
 
         [DisableDump]
         bool IsFunctionLevel => TokenClass is Function;
+
+        protected override string GetNodeDump() => $"{GetType().PrettyName()}({SourcePart.NodeDump})";
 
         public Syntax LocateByPosition(int current) => Cache.LocateByPosition[current];
 

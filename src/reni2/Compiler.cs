@@ -146,7 +146,7 @@ namespace Reni
             Tracer.Assert(syntax.Left .Left== null);
             Tracer.Assert(syntax.Left .TokenClass is BeginOfText);
 
-            return syntax.Left.Right.Value(null);
+            return syntax.Left.Right.Syntax(null);
         }
 
         [UsedImplicitly]

@@ -9,6 +9,7 @@ using Reni.FeatureTest;
 using Reni.FeatureTest.Helper;
 using Reni.Runtime;
 using ReniUI;
+using ReniUI.Test;
 
 namespace ReniTest
 {
@@ -28,6 +29,8 @@ namespace ReniTest
 
         static void RunAllTests()
         {
+            //new AutoCompleteSimple ().GetDeclarationOptions();
+
             if(Debugger.IsAttached)
                 TestRunner.IsBreakDisabled = false;
             //TestRunner.IsModeErrorFocus = true;

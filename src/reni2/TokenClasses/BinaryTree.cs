@@ -12,23 +12,15 @@ using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
-    public sealed class BinaryTree
-        : DumpableObject
-            , ISyntax
-            , ValueCache.IContainer
-            , IBinaryTree<BinaryTree>
+    public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer, IBinaryTree<BinaryTree>
     {
-        class NullScope
-            : DumpableObject
-                , IValuesScope
-                , IDefaultScopeProvider
+        class NullScope : DumpableObject, IValuesScope, IDefaultScopeProvider
         {
             bool IDefaultScopeProvider.MeansPublic => false;
             IDefaultScopeProvider IValuesScope.DefaultScopeProvider => this;
             bool IValuesScope.IsDeclarationPart => false;
         }
 
-        public const bool ValuePropertyIsObsolete = true;
         static int NextObjectId;
 
         static readonly IValuesScope NullScopeInstance = new NullScope();
@@ -92,6 +84,9 @@ namespace Reni.TokenClasses
         BinaryTree LeftMost => Left?.LeftMost ?? this;
         BinaryTree RightMost => Right?.RightMost ?? this;
 
+        [DisableDump]
+        internal IEnumerable<BinaryTree> Items => this.CachedValue(GetItems);
+
         BinaryTree IBinaryTree<BinaryTree>.Left => Left;
         BinaryTree IBinaryTree<BinaryTree>.Right => Right;
 
@@ -128,7 +123,7 @@ namespace Reni.TokenClasses
 
         protected override string GetNodeDump() => base.GetNodeDump() + $"({TokenClass.Id})";
 
-        internal Result<Syntax> Value(IValuesScope scope) => this.CachedFunction(scope ?? NullScopeInstance, GetValue);
+        internal Result<Syntax> Syntax(IValuesScope scope) => this.CachedFunction(scope ?? NullScopeInstance, GetValue);
 
         internal static BinaryTree Create
         (
@@ -292,7 +287,6 @@ namespace Reni.TokenClasses
             NotImplementedFunction(target.Dump(), other.Dump(), differenceHandler);
             return default;
         }
-        internal IEnumerable<BinaryTree> Items => this.CachedValue(GetItems);
 
         IEnumerable<BinaryTree> GetItems()
         {
@@ -306,6 +300,5 @@ namespace Reni.TokenClasses
                 foreach(var sourceSyntax in Right.Items)
                     yield return sourceSyntax;
         }
-
     }
 }

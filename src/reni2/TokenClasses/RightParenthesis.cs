@@ -24,8 +24,8 @@ namespace Reni.TokenClasses
             {
                 Tracer.Assert(binaryTree.Left != null);
                 Tracer.Assert(binaryTree.Right != null);
-                var leftValue = binaryTree.Left.Value(scope);
-                var rightValue = binaryTree.Right.Value(scope);
+                var leftValue = binaryTree.Left.Syntax(scope);
+                var rightValue = binaryTree.Right.Syntax(scope);
                 return ExpressionSyntax.Create(binaryTree, leftValue.Target, null, rightValue.Target)
                     .With(rightValue.Issues.plus(leftValue.Issues));
             }
@@ -44,12 +44,12 @@ namespace Reni.TokenClasses
         Result<Syntax> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
         {
             var result = binaryTree.Left.GetBracketKernel(Level, binaryTree);
-            var target = result.Target?.Value(this) ?? new EmptyList(binaryTree);
+            var target = result.Target?.Syntax(this) ?? new EmptyList(binaryTree);
 
             if(result.Issues.Any())
                 return target.With(result.Issues);
 
-            return result.Target == null ? new EmptyList(binaryTree) : result.Target.Value(this);
+            return result.Target == null ? new EmptyList(binaryTree) : result.Target.Syntax(this);
         }
 
         bool IDefaultScopeProvider.MeansPublic => Level == 3;

@@ -50,7 +50,7 @@ namespace Reni.TokenClasses
                         .Where(item => item != null)
                         .ToArray(),
                     null,
-                    binaryTree.SourcePart
+                    binaryTree
                 );
 
                 var issues = items.SelectMany(item => item.Issues).ToArray();
@@ -63,7 +63,7 @@ namespace Reni.TokenClasses
                     = T(bracketKernel.Issues, T(IssueId.MissingDeclarationTag.Issue(binaryTree.SourcePart)))
                         .Concat()
                         .ToArray();
-                return new Declarer(null, null, binaryTree.SourcePart).Issues(issues);
+                return new Declarer(null, null, binaryTree).Issues(issues);
             }
         }
 

@@ -24,22 +24,23 @@ namespace Reni.Parser
         IDefaultScopeProvider Container { get; }
 
         [EnableDump]
-        IDeclarationTag[] Tags { get; }
+        readonly Declarer Declarer;
 
-        [EnableDump]
-        Definable Target { get; }
 
-        Statement(IDeclarationTag[] tags, Definable target, Syntax body, IDefaultScopeProvider container)
+        Statement(Declarer declarer, Syntax body, IDefaultScopeProvider container)
         {
-            Target = target;
             Body = body;
             Container = container;
-            Tags = tags ?? new IDeclarationTag[0];
+            Declarer = declarer?? new Declarer(null,null,null);
+            Tracer.Assert(Tags != null);
             Cache.Syntax = new ValueCache<Result<Syntax>>(GetSyntax);
             Cache.AllNames = new ValueCache<string[]>(GetAllNames);
             Cache.PublicNames = new ValueCache<string[]>(GetPublicNames);
             StopByObjectIds();
         }
+
+        IDeclarationTag[] Tags => Declarer.Tags;
+        Definable Target => Declarer.Target;
 
         [DisableDump]
         internal Syntax Syntax => Cache.Syntax.Value.Target;
@@ -82,7 +83,7 @@ namespace Reni.Parser
         public Statement Visit(ISyntaxVisitor visitor)
         {
             var newBody = Body.Visit(visitor);
-            return newBody == null? this : new Statement(Tags, Target, newBody, Container);
+            return newBody == null? this : new Statement(Declarer, newBody, Container);
         }
 
         protected override string GetNodeDump()
@@ -97,11 +98,10 @@ namespace Reni.Parser
             => Create(value, container).Convert(x => new[] {x});
 
         internal static Result<Statement> Create(Result<Syntax> value, IDefaultScopeProvider container)
-            => value.Convert(x => new Statement(null, null, x, container));
+            => value.Convert(x => new Statement(null, x, container));
 
-        internal static Result<Statement> Create
-            (IDeclarationTag[] tags, Definable target, Result<Syntax> body, IDefaultScopeProvider container)
-            => body.Convert(x => new Statement(tags, target, x, container));
+        internal static Result<Statement> Create(Declarer declarer, Result<Syntax> body, IDefaultScopeProvider container)
+            => body.Convert(x => new Statement(declarer, x, container));
 
         internal IEnumerable<string> GetAllDeclarations()
         {

@@ -41,8 +41,8 @@ namespace Reni.Parser
 
         internal static Result<Syntax> Create(Definable definable, BinaryTree binaryTree, IValuesScope scope)
         {
-            var leftValue = binaryTree.Left?.Value(scope);
-            var rightValue = binaryTree.Right?.Value(scope);
+            var leftValue = binaryTree.Left?.Syntax(scope);
+            var rightValue = binaryTree.Right?.Syntax(scope);
             var left = leftValue?.Target;
             var right = rightValue?.Target;
             return Create(binaryTree, left, definable, right)

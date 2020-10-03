@@ -7,35 +7,44 @@ namespace Reni.Parser
 {
     sealed class Declarer : DumpableObject
     {
-        SourcePart Position { get; }
         [EnableDump]
-        IDeclarationTag[] Tags { get; }
-        [EnableDump]
-        Definable Target { get; }
+        internal IDeclarationTag[] Tags { get; }
 
-        internal Declarer(IDeclarationTag[] tags, Definable target, SourcePart position)
+        [EnableDump]
+        internal Definable Target { get; }
+
+        [EnableDump]
+        readonly BinaryTree BinaryTree;
+
+        internal Declarer(IDeclarationTag[] tags, Definable target, BinaryTree binaryTree)
         {
-            Position = position;
-            Tags = tags;
+            BinaryTree = binaryTree;
+            Tags = tags ?? new IDeclarationTag[0];
             Target = target;
         }
 
         internal Result<Statement> Statement(Result<Syntax> right, IDefaultScopeProvider container)
-            => Parser.Statement.Create(Tags, Target, right, container);
+            => Parser.Statement.Create(this, right, container);
 
-        public Result<Declarer> WithName(Definable target, SourcePart position)
+        public Result<Declarer> WithName(Definable target, BinaryTree binaryTree)
         {
-            var result = new Declarer(Tags, target, Position + position);
-            if (Target == null)
+
+
+            NotImplementedMethod(target, binaryTree);
+
+            var result = new Declarer(Tags, target, binaryTree);
+            if(Target == null)
                 return result;
 
-            return result.Issues(IssueId.InvalidDeclarationTag.Issue(Position));
+            return result.Issues(IssueId.InvalidDeclarationTag.Issue(binaryTree.SourcePart));
         }
 
         public Declarer Combine(Declarer other)
         {
-            Tracer.Assert(Target == null|| other.Target == null);
-            return new Declarer(Tags.plus(other.Tags), Target ?? other.Target, Position + other.Position);
+            NotImplementedMethod(other);
+
+            Tracer.Assert(Target == null || other.Target == null);
+            return new Declarer(Tags.plus(other.Tags), Target ?? other.Target, other.BinaryTree);
         }
     }
 
@@ -49,5 +58,5 @@ namespace Reni.Parser
         Result<Declarer> Get(BinaryTree binaryTree);
     }
 
-    interface IDeclarationTag {}
+    interface IDeclarationTag { }
 }

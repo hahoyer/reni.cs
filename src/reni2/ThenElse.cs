@@ -25,9 +25,9 @@ namespace Reni
         internal static Result<Syntax> Create
             (BinaryTree condition, BinaryTree thenBinaryTree, BinaryTree elseBinaryTree, BinaryTree binaryTree, IValuesScope scope)
         {
-            var conditionValue = condition.Value(scope);
-            var thenValue = thenBinaryTree?.Value(scope);
-            var elseValue = elseBinaryTree?.Value(scope);
+            var conditionValue = condition.Syntax(scope);
+            var thenValue = thenBinaryTree?.Syntax(scope);
+            var elseValue = elseBinaryTree?.Syntax(scope);
             var result = new CondSyntax
                 (conditionValue.Target, thenValue?.Target, elseValue?.Target, binaryTree);
             var issues = conditionValue.Issues.plus(thenValue?.Issues).plus(elseValue?.Issues);

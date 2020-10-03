@@ -15,7 +15,7 @@ namespace Reni.TokenClasses
             var statements = binaryTree.Left?.GetStatements(scope);
             if(statements == null)
                 statements = new Statement[0];
-            var cleanup = binaryTree.Right?.Value(scope);
+            var cleanup = binaryTree.Right?.Syntax(scope);
             return CompoundSyntax.Create(statements, cleanup, binaryTree);
         }
     }

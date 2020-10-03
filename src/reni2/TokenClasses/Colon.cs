@@ -12,7 +12,7 @@ namespace Reni.TokenClasses
 
         Result<Statement> IStatementProvider.Get(BinaryTree left, BinaryTree right, IValuesScope scope)
         {
-            return left.Declarer?.Convert(x => x.Statement(right.Value(scope), scope.DefaultScopeProvider));
+            return left.Declarer?.Convert(x => x.Statement(right.Syntax(scope), scope.DefaultScopeProvider));
         }
     }
 
@@ -48,7 +48,7 @@ namespace Reni.TokenClasses
             (BinaryTree binaryTree)
         {
             if(binaryTree.Left == null && binaryTree.Right == null)
-                return new Declarer(new IDeclarationTag[] {this}, null,binaryTree.SourcePart);
+                return new Declarer(new IDeclarationTag[] {this}, null,binaryTree);
 
             NotImplementedMethod(binaryTree);
             return null;

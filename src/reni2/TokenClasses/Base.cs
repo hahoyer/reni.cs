@@ -69,10 +69,10 @@ namespace Reni.TokenClasses
         Result<Syntax> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
         {
             if(binaryTree.Left != null && binaryTree.Right != null)
-                return InfixSyntax.Create(binaryTree.Left.Value(scope), this, binaryTree.Right.Value(scope), binaryTree);
+                return InfixSyntax.Create(binaryTree.Left.Syntax(scope), this, binaryTree.Right.Syntax(scope), binaryTree);
 
             if(binaryTree.Left == null && binaryTree.Right != null)
-                return PrefixSyntax.Create(this, binaryTree.Right.Value(scope), binaryTree);
+                return PrefixSyntax.Create(this, binaryTree.Right.Syntax(scope), binaryTree);
 
             NotImplementedMethod(binaryTree);
             return null;
@@ -109,7 +109,7 @@ namespace Reni.TokenClasses
                 if(binaryTree.Right == null)
                     return new TerminalSyntax(this, binaryTree);
 
-                return PrefixSyntax.Create(this, binaryTree.Right.Value(scope), binaryTree);
+                return PrefixSyntax.Create(this, binaryTree.Right.Syntax(scope), binaryTree);
             }
 
             NotImplementedMethod(binaryTree);
@@ -122,7 +122,7 @@ namespace Reni.TokenClasses
         Result<Syntax> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
         {
             if(binaryTree.Right == null)
-                return SuffixSyntax.Create(binaryTree.Left.Value(scope), this, binaryTree);
+                return SuffixSyntax.Create(binaryTree.Left.Syntax(scope), this, binaryTree);
 
             NotImplementedMethod(binaryTree);
             return null;
@@ -144,6 +144,6 @@ namespace Reni.TokenClasses
             (ContextBase callContext, Category category, Syntax left, Syntax right);
 
         Result<Syntax> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
-            => InfixSyntax.Create(binaryTree.Left.Value(scope), this, binaryTree.Right.Value(scope), binaryTree);
+            => InfixSyntax.Create(binaryTree.Left.Syntax(scope), this, binaryTree.Right.Syntax(scope), binaryTree);
     }
 }

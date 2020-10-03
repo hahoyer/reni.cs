@@ -41,7 +41,7 @@ namespace Reni.FeatureTest.Helper
     sealed class Empty : LikeSyntax
     {
         internal override void AssertLike(BinaryTree binaryTree)
-            => Tracer.Assert(binaryTree.Value(null).Target is EmptyList);
+            => Tracer.Assert(binaryTree.Syntax(null).Target is EmptyList);
 
         internal override void AssertLike(Syntax syntax)
             => Tracer.Assert(syntax is EmptyList);
@@ -80,7 +80,7 @@ namespace Reni.FeatureTest.Helper
             _converters = converters;
         }
 
-        internal override void AssertLike(BinaryTree binaryTree) => AssertLike(binaryTree.Value(null).Target);
+        internal override void AssertLike(BinaryTree binaryTree) => AssertLike(binaryTree.Syntax(null).Target);
 
         internal override void AssertLike(Syntax syntax)
         {
@@ -129,7 +129,7 @@ namespace Reni.FeatureTest.Helper
         }
 
         internal override void AssertLike(Reni.TokenClasses.BinaryTree binaryTree) 
-            => AssertLike(binaryTree.Value(null).Target);
+            => AssertLike(binaryTree.Syntax(null).Target);
 
         internal override void AssertLike(Syntax syntax)
         {
@@ -148,7 +148,7 @@ namespace Reni.FeatureTest.Helper
 
         internal override void AssertLike(BinaryTree binaryTree)
         {
-            var terminalSyntax = (TerminalSyntax) binaryTree.Value(null).Target;
+            var terminalSyntax = (TerminalSyntax) binaryTree.Syntax(null).Target;
             Tracer.Assert(terminalSyntax.Terminal is TokenClasses.Number);
             Tracer.Assert(terminalSyntax.ToNumber == _i);
         }

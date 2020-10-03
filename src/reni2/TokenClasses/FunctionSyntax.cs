@@ -13,8 +13,8 @@ namespace Reni.TokenClasses
         internal static Result<Parser.Syntax> Create
             (BinaryTree left, bool isImplicit, bool isMetaFunction, BinaryTree right, BinaryTree binaryTree, IValuesScope scope)
         {
-            var leftValue = left?.Value(scope);
-            var rightValue = right?.Value(scope);
+            var leftValue = left?.Syntax(scope);
+            var rightValue = right?.Syntax(scope);
             var target = new FunctionSyntax
                 (leftValue?.Target, isImplicit, isMetaFunction, rightValue?.Target,binaryTree);
             var issues = leftValue?.Issues.plus(rightValue?.Issues);
