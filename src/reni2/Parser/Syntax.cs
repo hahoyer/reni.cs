@@ -14,9 +14,7 @@ namespace Reni.Parser
     /// <summary>
     ///     Static syntax items that represent a value
     /// </summary>
-    abstract class Syntax
-        : DumpableObject
-            , ITree<Syntax>
+    abstract class Syntax : DumpableObject, ITree<Syntax>
     {
         class CacheContainer
         {

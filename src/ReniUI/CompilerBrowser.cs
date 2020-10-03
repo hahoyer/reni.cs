@@ -20,7 +20,7 @@ namespace ReniUI
         {
             internal Formatting.BinaryTreeSyntax FomattingBinaryTreeSyntax;
             internal Helper.BinaryTreeSyntax HelperBinaryTreeSyntax;
-            internal Helper.Value Value;
+            internal Helper.Syntax Syntax;
         }
 
         readonly CacheContainer Cache = new CacheContainer();
@@ -55,7 +55,7 @@ namespace ReniUI
             => Cache.FomattingBinaryTreeSyntax ?? (Cache.FomattingBinaryTreeSyntax = new Formatting.BinaryTreeSyntax(Compiler.BinaryTree));
 
         internal Helper.BinaryTreeSyntax BinaryTreeSyntax => Cache.HelperBinaryTreeSyntax ?? (Cache.HelperBinaryTreeSyntax = GetHelperSyntax());
-        internal Helper.Value Value => Cache.Value?? (Cache.Value= GetValue());
+        internal Helper.Syntax Syntax => Cache.Syntax?? (Cache.Syntax= GetValue());
 
 
         public static CompilerBrowser FromText
@@ -69,7 +69,7 @@ namespace ReniUI
             => new CompilerBrowser(() => Compiler.FromFile(fileName, parameters));
 
         public Token LocatePosition(int offset)
-            => Token.LocateByPosition(Value, offset);
+            => Token.LocateByPosition(Syntax, offset);
 
         public Token LocatePosition(SourcePosition current)
         {
@@ -180,11 +180,11 @@ namespace ReniUI
             ;
         }
 
-        Helper.Value GetValue()
+        Helper.Syntax GetValue()
         {
             try
             {
-                return new Value(Compiler.Syntax);
+                return new Syntax(Compiler.Syntax);
             }
             catch(Exception e)
             {
@@ -195,9 +195,9 @@ namespace ReniUI
             ;
         }
 
-        Helper.Value  LocateValueByPosition(int offset)
+        Helper.Syntax  LocateValueByPosition(int offset)
         {
-            var token = Token.LocateByPosition(Value, offset);
+            var token = Token.LocateByPosition(Syntax, offset);
             if(token.IsComment || token.IsLineComment)
                 return null;
 

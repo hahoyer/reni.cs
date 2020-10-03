@@ -8,12 +8,10 @@ using Reni.Parser;
 
 namespace ReniUI.Helper
 {
-    abstract class ValueWithParent<TResult>
-        : TreeWithParentExtended<TResult, Reni.Parser.Syntax>
-            , ITree<TResult>
-        where TResult : ValueWithParent<TResult>
+    abstract class SyntaxWithParent<TResult> : TreeWithParentExtended<TResult, Reni.Parser.Syntax>
+        where TResult : SyntaxWithParent<TResult>
     {
-        protected ValueWithParent(Reni.Parser.Syntax target, TResult parent)
+        protected SyntaxWithParent(Reni.Parser.Syntax target, TResult parent)
             : base(target, parent) { }
 
         [DisableDump]
@@ -78,10 +76,10 @@ namespace ReniUI.Helper
         internal bool Contains(int current)
             => SourcePart.Position <= current && current < SourcePart.EndPosition;
 
-        bool IsLeftSiteChild(TResult child) 
+        bool IsLeftSiteChild(TResult child)
             => child != null && child.Token.SourcePart().End <= Token.SourcePart().Start;
 
-        bool IsRightSideChild(TResult child) 
+        bool IsRightSideChild(TResult child)
             => child != null && Token.SourcePart().End <= child.Token.SourcePart().Start;
     }
 }

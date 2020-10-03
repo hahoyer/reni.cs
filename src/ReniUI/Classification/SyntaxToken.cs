@@ -11,9 +11,9 @@ namespace ReniUI.Classification
 {
     sealed class SyntaxToken : Token
     {
-        internal SyntaxToken(Value syntax) => Syntax = syntax;
+        internal SyntaxToken(Syntax syntax) => Syntax = syntax;
 
-        internal override Helper.Value Syntax { get; }
+        internal override Helper.Syntax Syntax { get; }
 
         TokenClass TokenClass => Syntax.TokenClass as TokenClass;
 

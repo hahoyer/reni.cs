@@ -68,7 +68,7 @@ namespace ReniUI.Classification
 
         public int StartPosition => SourcePart.Position;
         public int EndPosition => SourcePart.EndPosition;
-        internal abstract Value Syntax { get; }
+        internal abstract Syntax Syntax { get; }
 
         public Trimmed TrimLine(SourcePart span) => new Trimmed(this, span);
 
@@ -107,7 +107,7 @@ namespace ReniUI.Classification
 
         public abstract IEnumerable<SourcePart> FindAllBelongings(CompilerBrowser compiler);
 
-        internal static Token LocateByPosition(Helper.Value start, int offset)
+        internal static Token LocateByPosition(Helper.Syntax start, int offset)
         {
             var result = start.LocateByPosition(offset);
             if (offset < result.Token.Characters.Position)

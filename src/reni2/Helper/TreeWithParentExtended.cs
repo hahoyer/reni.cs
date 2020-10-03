@@ -1,8 +1,6 @@
 namespace Reni.Helper
 {
-    abstract class TreeWithParentExtended<TResult, TTarget>
-        : TreeWithParent<TResult, TTarget>
-            , ITree<TResult>
+    abstract class TreeWithParentExtended<TResult, TTarget> : TreeWithParent<TResult, TTarget>, ITree<TResult>
         where TResult : TreeWithParentExtended<TResult, TTarget>
         where TTarget : class, ITree<TTarget>
     {
