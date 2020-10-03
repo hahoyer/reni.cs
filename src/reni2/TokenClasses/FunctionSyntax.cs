@@ -11,7 +11,7 @@ namespace Reni.TokenClasses
     sealed class FunctionSyntax : Parser.Syntax
     {
         internal static Result<Parser.Syntax> Create
-            (BinaryTree left, bool isImplicit, bool isMetaFunction, BinaryTree right, BinaryTree binaryTree, IValuesScope scope)
+            (BinaryTree left, bool isImplicit, bool isMetaFunction, BinaryTree right, BinaryTree binaryTree, ISyntaxScope scope)
         {
             var leftValue = left?.Syntax(scope);
             var rightValue = right?.Syntax(scope);

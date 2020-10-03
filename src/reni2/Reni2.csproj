@@ -214,6 +214,7 @@
     <Compile Include="ParserTest\StrangeDeclarationSyntax.cs" />
     <Compile Include="Parser\Declarer.cs" />
     <Compile Include="Parser\IRecursionHandler.cs" />
+    <Compile Include="Parser\ISyntaxScope.cs" />
     <Compile Include="Parser\ISyntaxVisitor.cs" />
     <Compile Include="Parser\ReplaceArgVisitor.cs" />
     <Compile Include="Parser\Result.cs" />

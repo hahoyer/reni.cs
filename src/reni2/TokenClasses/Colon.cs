@@ -10,7 +10,7 @@ namespace Reni.TokenClasses
         public const string TokenId = ":";
         public override string Id => TokenId;
 
-        Result<Statement> IStatementProvider.Get(BinaryTree left, BinaryTree right, IValuesScope scope)
+        Result<Statement> IStatementProvider.Get(BinaryTree left, BinaryTree right, ISyntaxScope scope)
         {
             return left.Declarer?.Convert(x => x.Statement(right.Syntax(scope), scope.DefaultScopeProvider));
         }

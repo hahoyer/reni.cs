@@ -39,7 +39,7 @@ namespace Reni.Parser
             (BinaryTree parent, Syntax left, Definable definable, Syntax right)
             => new Result<Syntax>(new ExpressionSyntax(parent, left, definable, right));
 
-        internal static Result<Syntax> Create(Definable definable, BinaryTree binaryTree, IValuesScope scope)
+        internal static Result<Syntax> Create(Definable definable, BinaryTree binaryTree, ISyntaxScope scope)
         {
             var leftValue = binaryTree.Left?.Syntax(scope);
             var rightValue = binaryTree.Right?.Syntax(scope);

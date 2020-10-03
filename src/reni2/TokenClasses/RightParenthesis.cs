@@ -11,7 +11,7 @@ namespace Reni.TokenClasses
         IValueProvider,
         IDefaultScopeProvider,
         IBracketMatch<BinaryTree>
-        , IValuesScope
+        , ISyntaxScope
     {
         sealed class Matched : DumpableObject,
             IParserTokenType<BinaryTree>,
@@ -20,7 +20,7 @@ namespace Reni.TokenClasses
         {
             static string Id => "()";
 
-            Result<Syntax> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
+            Result<Syntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
             {
                 Tracer.Assert(binaryTree.Left != null);
                 Tracer.Assert(binaryTree.Right != null);
@@ -41,7 +41,7 @@ namespace Reni.TokenClasses
             : base(level) { }
 
         [Obsolete("",true)]
-        Result<Syntax> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
+        Result<Syntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
         {
             var result = binaryTree.Left.GetBracketKernel(Level, binaryTree);
             var target = result.Target?.Syntax(this) ?? new EmptyList(binaryTree);
@@ -53,8 +53,8 @@ namespace Reni.TokenClasses
         }
 
         bool IDefaultScopeProvider.MeansPublic => Level == 3;
-        IDefaultScopeProvider IValuesScope.DefaultScopeProvider => this;
-        bool IValuesScope.IsDeclarationPart => false;
+        IDefaultScopeProvider ISyntaxScope.DefaultScopeProvider => this;
+        bool ISyntaxScope.IsDeclarationPart => false;
         IParserTokenType<BinaryTree> IBracketMatch<BinaryTree>.Value { get; } = new Matched();
     }
 }

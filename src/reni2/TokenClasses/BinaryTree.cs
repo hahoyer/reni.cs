@@ -14,16 +14,16 @@ namespace Reni.TokenClasses
 {
     public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer, IBinaryTree<BinaryTree>
     {
-        class NullScope : DumpableObject, IValuesScope, IDefaultScopeProvider
+        class NullScope : DumpableObject, ISyntaxScope, IDefaultScopeProvider
         {
             bool IDefaultScopeProvider.MeansPublic => false;
-            IDefaultScopeProvider IValuesScope.DefaultScopeProvider => this;
-            bool IValuesScope.IsDeclarationPart => false;
+            IDefaultScopeProvider ISyntaxScope.DefaultScopeProvider => this;
+            bool ISyntaxScope.IsDeclarationPart => false;
         }
 
         static int NextObjectId;
 
-        static readonly IValuesScope NullScopeInstance = new NullScope();
+        static readonly ISyntaxScope NullScopeInstance = new NullScope();
 
         [EnableDump]
         [EnableDumpExcept(null)]
@@ -123,7 +123,7 @@ namespace Reni.TokenClasses
 
         protected override string GetNodeDump() => base.GetNodeDump() + $"({TokenClass.Id})";
 
-        internal Result<Syntax> Syntax(IValuesScope scope) => this.CachedFunction(scope ?? NullScopeInstance, GetValue);
+        internal Result<Syntax> Syntax(ISyntaxScope scope) => this.CachedFunction(scope ?? NullScopeInstance, GetValue);
 
         internal static BinaryTree Create
         (
@@ -151,7 +151,7 @@ namespace Reni.TokenClasses
                 .Concat(Right.CheckedItemsAsLongAs(condition));
 
 
-        internal Result<Statement[]> GetStatements(IValuesScope scope, List type = null)
+        internal Result<Statement[]> GetStatements(ISyntaxScope scope, List type = null)
         {
             var statements = GetStatementsOrDefault(scope, type);
             if(statements != null)
@@ -168,7 +168,7 @@ namespace Reni.TokenClasses
             return new Result<Statement[]>(new Statement[0], IssueId.InvalidListOperandSequence.Issue(SourcePart));
         }
 
-        internal Result<Syntax> GetValue(IValuesScope scopeKey)
+        internal Result<Syntax> GetValue(ISyntaxScope scopeKey)
         {
             var scope = scopeKey == NullScopeInstance? null : scopeKey;
 
@@ -208,15 +208,15 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        Result<Syntax> GetValueOrDefault(IValuesScope scope)
+        Result<Syntax> GetValueOrDefault(ISyntaxScope scope)
             => scope != null && scope.IsDeclarationPart
                 ? null
                 : (TokenClass as IValueProvider)?.Get(this, scope);
 
-        Result<Statement> GetStatementOrDefault(IValuesScope scope)
+        Result<Statement> GetStatementOrDefault(ISyntaxScope scope)
             => (TokenClass as IStatementProvider)?.Get(Left, Right, scope);
 
-        Result<Statement[]> GetStatementsOrDefault(IValuesScope scope, List type)
+        Result<Statement[]> GetStatementsOrDefault(ISyntaxScope scope, List type)
             => (TokenClass as IStatementsProvider)?.Get(type, this, scope);
 
         BinaryTree Locate(SourcePart part)

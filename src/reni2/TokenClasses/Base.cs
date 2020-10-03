@@ -17,7 +17,7 @@ namespace Reni.TokenClasses
 
     abstract class TerminalSyntaxToken : TerminalToken, ITerminal, IValueProvider
     {
-        Result<Syntax> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
+        Result<Syntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
         {
             if(binaryTree.Left == null && binaryTree.Right == null)
                 return new TerminalSyntax(this, binaryTree);
@@ -66,7 +66,7 @@ namespace Reni.TokenClasses
         protected abstract Result Result
             (ContextBase context, Category category, Syntax right);
 
-        Result<Syntax> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
+        Result<Syntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
         {
             if(binaryTree.Left != null && binaryTree.Right != null)
                 return InfixSyntax.Create(binaryTree.Left.Syntax(scope), this, binaryTree.Right.Syntax(scope), binaryTree);
@@ -102,7 +102,7 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        Result<Syntax> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
+        Result<Syntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
         {
             if(binaryTree.Left == null)
             {
@@ -119,7 +119,7 @@ namespace Reni.TokenClasses
 
     abstract class SuffixSyntaxToken : SuffixToken, ISuffix, IValueProvider
     {
-        Result<Syntax> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
+        Result<Syntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
         {
             if(binaryTree.Right == null)
                 return SuffixSyntax.Create(binaryTree.Left.Syntax(scope), this, binaryTree);
@@ -143,7 +143,7 @@ namespace Reni.TokenClasses
         protected abstract Result Result
             (ContextBase callContext, Category category, Syntax left, Syntax right);
 
-        Result<Syntax> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
+        Result<Syntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
             => InfixSyntax.Create(binaryTree.Left.Syntax(scope), this, binaryTree.Right.Syntax(scope), binaryTree);
     }
 }

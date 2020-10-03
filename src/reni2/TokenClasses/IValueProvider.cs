@@ -4,6 +4,6 @@ namespace Reni.TokenClasses
 {
     interface IValueProvider
     {
-        Result<Syntax> Get(BinaryTree binaryTree, IValuesScope scope);
+        Result<Syntax> Get(BinaryTree binaryTree, ISyntaxScope scope);
     }
 }

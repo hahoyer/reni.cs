@@ -23,7 +23,7 @@ namespace Reni
         readonly Syntax Else;
 
         internal static Result<Syntax> Create
-            (BinaryTree condition, BinaryTree thenBinaryTree, BinaryTree elseBinaryTree, BinaryTree binaryTree, IValuesScope scope)
+            (BinaryTree condition, BinaryTree thenBinaryTree, BinaryTree elseBinaryTree, BinaryTree binaryTree, ISyntaxScope scope)
         {
             var conditionValue = condition.Syntax(scope);
             var thenValue = thenBinaryTree?.Syntax(scope);

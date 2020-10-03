@@ -95,10 +95,4 @@ namespace Reni.Parser
         internal IEnumerable<string> DeclarationOptions(ContextBase context)
             => Type(context).DeclarationOptions;
     }
-
-    interface IValuesScope
-    {
-        IDefaultScopeProvider DefaultScopeProvider { get; }
-        bool IsDeclarationPart { get; }
-    }
 }

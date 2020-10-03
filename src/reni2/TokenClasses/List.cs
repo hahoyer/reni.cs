@@ -25,7 +25,7 @@ namespace Reni.TokenClasses
 
         [Obsolete("",true)]
         Result<Statement[]> IStatementsProvider.Get
-            (List type, BinaryTree binaryTree, IValuesScope scope)
+            (List type, BinaryTree binaryTree, ISyntaxScope scope)
         {
             if(type != null && type != this)
                 return null;
@@ -39,7 +39,7 @@ namespace Reni.TokenClasses
 
         [Obsolete("",true)]
         Result<Statement[]> CreateStatements
-            (BinaryTree binaryTree, BinaryTree parent, IValuesScope scope)
+            (BinaryTree binaryTree, BinaryTree parent, ISyntaxScope scope)
             => binaryTree == null
                 ? Statement.CreateStatements(new EmptyList(parent), scope.DefaultScopeProvider)
                 : binaryTree.GetStatements(scope, this);

@@ -16,7 +16,7 @@ namespace Reni.Parser
 
         string ITokenClass.Id => Id;
 
-        Result<Syntax> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
+        Result<Syntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
         {
             if(binaryTree.Right == null)
             {

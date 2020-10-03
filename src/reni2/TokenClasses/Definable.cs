@@ -33,7 +33,7 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        Result<Parser.Syntax> IValueProvider.Get(BinaryTree binaryTree, IValuesScope scope)
+        Result<Parser.Syntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
             => ExpressionSyntax.Create(this, binaryTree, scope);
 
     }
