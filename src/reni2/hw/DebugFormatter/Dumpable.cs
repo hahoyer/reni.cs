@@ -296,6 +296,5 @@ namespace hw.DebugFormatter
         }
 
         public static TValue[] T<TValue>(params TValue[] value) => value;
-
     }
 }
