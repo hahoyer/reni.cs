@@ -12,17 +12,19 @@ namespace hw.UnitTest
         public string FileName;
         public int LineNumber;
 
-        public string ToString(FilePositionTag tag) => Tracer.FilePosition(FileName, LineNumber, 0, tag);
+        public string ToString(FilePositionTag tag)
+            => Tracer.FilePosition(FileName, new TextPart {Start = new TextPosition {LineNumber = LineNumber}}, tag);
     }
 
     sealed class TestMethod : Dumpable
     {
-        interface IActor
+        internal interface IActor
         {
             string Name { get; }
             string LongName { get; }
             object Instance { get; }
             IEnumerable<SourceFilePosition> FilePositions { get; }
+            string RunString { get; }
             void Run(object test);
         }
 
@@ -71,6 +73,15 @@ namespace hw.UnitTest
 
             string IActor.Name => Target.Name;
             void IActor.Run(object test) => Target.Invoke(test, new object[0]);
+
+            string IActor.RunString
+            {
+                get
+                {
+                    var type = Target.ReflectedType;
+                    return type == null? null : $"new {type.FullName}().{Target.Name}()";
+                }
+            }
         }
 
         sealed class InterfaceActor : IActor
@@ -92,11 +103,12 @@ namespace hw.UnitTest
             string IActor.LongName => Target.PrettyName();
             string IActor.Name => Target.Name;
             void IActor.Run(object test) => ((ITestFixture)test).Run();
+            string IActor.RunString => $"((ITestFixture)new {Target.FullName}()).Run()";
         }
 
         public bool IsSuspended;
 
-        readonly IActor Actor;
+        internal readonly IActor Actor;
 
         public TestMethod(MethodInfo methodInfo, Type type) => Actor = new MethodActor(methodInfo, type);
 

@@ -5,11 +5,9 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.UnitTest;
 using Reni;
-using Reni.FeatureTest;
 using Reni.FeatureTest.Helper;
 using Reni.Runtime;
 using ReniUI;
-using ReniUI.Test;
 
 namespace ReniTest
 {
@@ -29,11 +27,17 @@ namespace ReniTest
 
         static void RunAllTests()
         {
-            //new AutoCompleteSimple ().GetDeclarationOptions();
+            new ReniUI.Test.BraceMatching().MatchingBraces();
 
             if(Debugger.IsAttached)
+            {
                 TestRunner.IsBreakDisabled = false;
-            //TestRunner.IsModeErrorFocus = true;
+                TestRunner.IsModeErrorFocus = true;
+                TestRunner.TestsFileName = SmbFile.SourcePath(0).PathCombine("PendingTests.debug.cs");
+            }
+            else
+                TestRunner.TestsFileName = SmbFile.SourcePath(0).PathCombine("PendingTests.cs");
+
             Assembly.GetExecutingAssembly().RunTests();
         }
 

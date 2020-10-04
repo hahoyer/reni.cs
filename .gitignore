@@ -19,3 +19,5 @@ obj/
 /.sync
 /.sync
 /src/renisource/Debug
+/src/ReniTest/PendingTests.cs
+/src/ReniTest/PendingTests.debug.cs
