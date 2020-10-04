@@ -306,7 +306,7 @@ namespace Reni.Type
             => AccessType.Result(category, ObjectResult(category), right);
 
         Result ToNumberOfBaseResult
-            (Category category, ResultCache left, ContextBase context, Parser.Syntax right)
+            (Category category, ResultCache left, ContextBase context, Parser.ValueSyntax right)
         {
             var target = (left & Category.All)
                 .AutomaticDereferencedAlignedResult()
@@ -319,7 +319,7 @@ namespace Reni.Type
         }
 
         Result CountResult
-            (Category category, ResultCache left, ContextBase context, Parser.Syntax right)
+            (Category category, ResultCache left, ContextBase context, Parser.ValueSyntax right)
         {
             Tracer.Assert(right == null);
             return IndexType.Result

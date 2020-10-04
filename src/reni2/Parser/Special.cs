@@ -7,7 +7,7 @@ using Reni.TokenClasses;
 
 namespace Reni.Parser
 {
-    sealed class TerminalSyntax : Syntax
+    sealed class TerminalSyntax : ValueSyntax
     {
         internal string Id => Token.Id;
 
@@ -25,9 +25,9 @@ namespace Reni.Parser
         internal override Result ResultForCache(ContextBase context, Category category)
             => Terminal.Result(context, category, this);
 
-        protected override IEnumerable<Syntax> GetChildren() => new Syntax[0];
+        protected override IEnumerable<ValueSyntax> GetChildren() => new ValueSyntax[0];
 
-        internal override Syntax Visit(ISyntaxVisitor visitor) => Terminal.Visit(visitor);
+        internal override ValueSyntax Visit(ISyntaxVisitor visitor) => Terminal.Visit(visitor);
 
         [DisableDump]
         internal long ToNumber => BitsConst.Convert(Id).ToInt64();
@@ -38,10 +38,10 @@ namespace Reni.Parser
         protected override string GetNodeDump() => Terminal.NodeDump();
     }
 
-    sealed class PrefixSyntax : Syntax
+    sealed class PrefixSyntax : ValueSyntax
     {
-        public static Result<Syntax> Create(IPrefix prefix, Result<Syntax> right, BinaryTree binaryTree)
-            => new PrefixSyntax(prefix, right.Target,binaryTree).Issues<Syntax>(right.Issues);
+        public static Result<ValueSyntax> Create(IPrefix prefix, Result<ValueSyntax> right, BinaryTree binaryTree)
+            => new PrefixSyntax(prefix, right.Target,binaryTree).Issues<ValueSyntax>(right.Issues);
 
         [Node]
         [EnableDump]
@@ -49,16 +49,16 @@ namespace Reni.Parser
 
         [Node]
         [EnableDump]
-        readonly Syntax Right;
+        readonly ValueSyntax Right;
 
-        public PrefixSyntax(IPrefix prefix, Syntax right, BinaryTree binaryTree)
+        public PrefixSyntax(IPrefix prefix, ValueSyntax right, BinaryTree binaryTree)
             : base(binaryTree)
         {
             Prefix = prefix;
             Right = right;
         }
 
-        protected override IEnumerable<Syntax> GetChildren() => T(Right);
+        protected override IEnumerable<ValueSyntax> GetChildren() => T(Right);
 
         internal override Result ResultForCache(ContextBase context, Category category) => Prefix
             .Result(context, category, Right, BinaryTree);
@@ -66,18 +66,18 @@ namespace Reni.Parser
         protected override string GetNodeDump() => Prefix.NodeDump() + "(" + Right.NodeDump + ")";
     }
 
-    sealed class InfixSyntax : Syntax
+    sealed class InfixSyntax : ValueSyntax
     {
-        public static Result<Syntax> Create
-            (Result<Syntax> left, IInfix infix, Result<Syntax> right, BinaryTree binaryTree)
+        public static Result<ValueSyntax> Create
+            (Result<ValueSyntax> left, IInfix infix, Result<ValueSyntax> right, BinaryTree binaryTree)
         {
-            Syntax syntax = new InfixSyntax(left.Target, infix, right.Target, binaryTree);
+            ValueSyntax syntax = new InfixSyntax(left.Target, infix, right.Target, binaryTree);
             return syntax.Issues(left.Issues.plus(right.Issues));
         }
 
         [Node]
         [EnableDump]
-        readonly Syntax Left;
+        readonly ValueSyntax Left;
 
         [Node]
         [EnableDump]
@@ -85,9 +85,9 @@ namespace Reni.Parser
 
         [Node]
         [EnableDump]
-        readonly Syntax Right;
+        readonly ValueSyntax Right;
 
-        public InfixSyntax(Syntax left, IInfix infix, Syntax right, BinaryTree binaryTree)
+        public InfixSyntax(ValueSyntax left, IInfix infix, ValueSyntax right, BinaryTree binaryTree)
             : base(binaryTree)
         {
             Left = left;
@@ -96,7 +96,7 @@ namespace Reni.Parser
             StopByObjectIds();
         }
 
-        protected override IEnumerable<Syntax> GetChildren() => T(Left,Right);
+        protected override IEnumerable<ValueSyntax> GetChildren() => T(Left,Right);
         internal override IRecursionHandler RecursionHandler => Infix as IRecursionHandler;
 
         internal override Result ResultForCache(ContextBase context, Category category) => Infix
@@ -118,34 +118,34 @@ namespace Reni.Parser
     interface IPendingProvider
     {
         Result Result
-            (ContextBase context, Category category, Syntax left, Syntax right);
+            (ContextBase context, Category category, ValueSyntax left, ValueSyntax right);
     }
 
-    sealed class SuffixSyntax : Syntax
+    sealed class SuffixSyntax : ValueSyntax
     {
-        public static Result<Syntax> Create
-            (Result<Syntax> left, ISuffix suffix, BinaryTree binaryTree)
+        public static Result<ValueSyntax> Create
+            (Result<ValueSyntax> left, ISuffix suffix, BinaryTree binaryTree)
         {
-            Syntax syntax = new SuffixSyntax(left.Target, suffix, binaryTree);
+            ValueSyntax syntax = new SuffixSyntax(left.Target, suffix, binaryTree);
             return syntax.Issues(left.Issues);
         }
 
         [Node]
         [EnableDump]
-        readonly Syntax Left;
+        readonly ValueSyntax Left;
 
         [Node]
         [EnableDump]
         readonly ISuffix Suffix;
 
-        internal SuffixSyntax(Syntax left, ISuffix suffix, BinaryTree binaryTree)
+        internal SuffixSyntax(ValueSyntax left, ISuffix suffix, BinaryTree binaryTree)
             : base(binaryTree)
         {
             Left = left;
             Suffix = suffix;
         }
 
-        protected override IEnumerable<Syntax> GetChildren() => T(Left);
+        protected override IEnumerable<ValueSyntax> GetChildren() => T(Left);
         internal override Result ResultForCache(ContextBase context, Category category)
             => Suffix.Result(context, category, Left);
 
@@ -155,21 +155,21 @@ namespace Reni.Parser
     interface ITerminal
     {
         Result Result(ContextBase context, Category category, TerminalSyntax token);
-        Syntax Visit(ISyntaxVisitor visitor);
+        ValueSyntax Visit(ISyntaxVisitor visitor);
     }
 
     interface IPrefix
     {
-        Result Result(ContextBase context, Category category, Syntax right, BinaryTree token);
+        Result Result(ContextBase context, Category category, ValueSyntax right, BinaryTree token);
     }
 
     interface IInfix
     {
-        Result Result(ContextBase context, Category category, Syntax left, Syntax right);
+        Result Result(ContextBase context, Category category, ValueSyntax left, ValueSyntax right);
     }
 
     interface ISuffix
     {
-        Result Result(ContextBase context, Category category, Syntax left);
+        Result Result(ContextBase context, Category category, ValueSyntax left);
     }
 }

@@ -15,8 +15,8 @@ namespace Reni.TokenClasses
         internal virtual IEnumerable<IDeclarationProvider> MakeGeneric
             => this.GenericListFromDefinable();
 
-        internal Result<Parser.Syntax> CreateForVisit
-            (BinaryTree parent, Parser.Syntax left, Parser.Syntax right)
+        internal Result<Parser.ValueSyntax> CreateForVisit
+            (BinaryTree parent, Parser.ValueSyntax left, Parser.ValueSyntax right)
             => ExpressionSyntax.Create(parent, left, this, right);
 
         Result<Declarer> IDeclarerTokenClass.Get(BinaryTree binaryTree)
@@ -33,7 +33,7 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        Result<Parser.Syntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
+        Result<Parser.ValueSyntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
             => ExpressionSyntax.Create(this, binaryTree, scope);
 
     }

@@ -50,7 +50,7 @@ namespace Reni.Parser
         }
 
         Result IMeta.Result
-            (Category category, ResultCache left, ContextBase contextBase, Syntax right)
+            (Category category, ResultCache left, ContextBase contextBase, ValueSyntax right)
         {
             NotImplementedMethod(contextBase, left, category, right);
             return null;

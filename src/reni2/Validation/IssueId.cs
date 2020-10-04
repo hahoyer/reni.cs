@@ -33,11 +33,11 @@ namespace Reni.Validation
         internal Result IssueResult(Category category, SourcePart position, string message = null)
             => new Result(category, Issue(position, message));
 
-        internal Result<Syntax> Value(BinaryTree binaryTree)
-            => new Result<Syntax>(new EmptyList(binaryTree), Issue(binaryTree.SourcePart));
+        internal Result<ValueSyntax> Value(BinaryTree binaryTree)
+            => new Result<ValueSyntax>(new EmptyList(binaryTree), Issue(binaryTree.SourcePart));
 
-        internal Result<Syntax> Value(Syntax syntax)
-            => new Result<Syntax>(syntax, Issue(syntax.BinaryTree.SourcePart));
+        internal Result<ValueSyntax> Value(ValueSyntax syntax)
+            => new Result<ValueSyntax>(syntax, Issue(syntax.BinaryTree.SourcePart));
 
         internal Result<BinaryTree> Syntax(BinaryTree binaryTree)
             => new Result<BinaryTree>(binaryTree, Issue(binaryTree.SourcePart));

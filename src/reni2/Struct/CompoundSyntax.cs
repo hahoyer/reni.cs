@@ -14,7 +14,7 @@ namespace Reni.Struct
     /// <summary>
     ///     Structured data, context free version
     /// </summary>
-    sealed class CompoundSyntax : Syntax
+    sealed class CompoundSyntax : ValueSyntax
     {
         [UsedImplicitly]
         internal static bool IsInContainerDump;
@@ -23,10 +23,10 @@ namespace Reni.Struct
         static bool IsInsideFileDump;
         static int NextObjectId;
 
-        readonly Syntax CleanupSection;
+        readonly ValueSyntax CleanupSection;
         readonly Statement[] Statements;
 
-        CompoundSyntax(Statement[] statements, Syntax cleanupSection, BinaryTree binaryTree)
+        CompoundSyntax(Statement[] statements, ValueSyntax cleanupSection, BinaryTree binaryTree)
             : base(NextObjectId++, binaryTree)
         {
             Statements = statements;
@@ -41,7 +41,7 @@ namespace Reni.Struct
 
         [Node]
         [EnableDump]
-        internal Syntax[] SyntaxStatements => Statements.Select(s => s.Syntax).ToArray();
+        internal ValueSyntax[] SyntaxStatements => Statements.Select(s => s.Syntax).ToArray();
 
         [EnableDump]
         internal IDictionary<string, int> NameIndex
@@ -100,18 +100,18 @@ namespace Reni.Struct
         protected override string GetNodeDump()
             => GetType().PrettyName() + "(" + GetCompoundIdentificationDump() + ")";
 
-        protected override IEnumerable<Syntax> GetChildren()
+        protected override IEnumerable<ValueSyntax> GetChildren()
             => T(Statements.Select(s => s.GetChildren()), T(CleanupSection)).Concat();
 
-        internal static Result<Syntax> Create(Result<Statement> statement, BinaryTree binaryTree)
-            => new Result<Syntax>(new CompoundSyntax(new[] {statement.Target}, null, binaryTree), statement.Issues);
+        internal static Result<ValueSyntax> Create(Result<Statement> statement, BinaryTree binaryTree)
+            => new Result<ValueSyntax>(new CompoundSyntax(new[] {statement.Target}, null, binaryTree), statement.Issues);
 
-        internal static Result<Syntax> Create(Result<Statement[]> statements, BinaryTree binaryTree)
-            => new Result<Syntax>(new CompoundSyntax(statements.Target, null, binaryTree), statements.Issues);
+        internal static Result<ValueSyntax> Create(Result<Statement[]> statements, BinaryTree binaryTree)
+            => new Result<ValueSyntax>(new CompoundSyntax(statements.Target, null, binaryTree), statements.Issues);
 
-        internal static Result<Syntax> Create
-            (Result<Statement[]> statements, Result<Syntax> cleanup, BinaryTree binaryTree)
-            => new Result<Syntax>
+        internal static Result<ValueSyntax> Create
+            (Result<Statement[]> statements, Result<ValueSyntax> cleanup, BinaryTree binaryTree)
+            => new Result<ValueSyntax>
             (
                 new CompoundSyntax(statements.Target, cleanup?.Target, binaryTree),
                 statements.Issues.plus(cleanup?.Issues)
@@ -137,7 +137,7 @@ namespace Reni.Struct
             return compound.Result(category);
         }
 
-        internal override Syntax Visit(ISyntaxVisitor visitor)
+        internal override ValueSyntax Visit(ISyntaxVisitor visitor)
         {
             var statements = Statements.Select(s => s.Visit(visitor)).ToArray();
             var cleanupSection = CleanupSection?.Visit(visitor);

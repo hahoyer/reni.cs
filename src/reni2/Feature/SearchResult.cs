@@ -52,7 +52,7 @@ namespace Reni.Feature
             ResultCache left,
             ISyntax currentTarget,
             ContextBase context,
-            Parser.Syntax right)
+            Parser.ValueSyntax right)
         {
             var trace = ObjectId.In(-34) && category.HasCode;
             StartMethodDump(trace, category, left, currentTarget, context, right);

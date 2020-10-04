@@ -736,7 +736,7 @@ namespace Reni.Type
             ISyntax currentTarget,
             Definable definable,
             ContextBase context,
-            Parser.Syntax right
+            Parser.ValueSyntax right
         )
             => ExecuteDeclaration
             (

@@ -14,11 +14,11 @@ namespace Reni.Parser
     /// <summary>
     ///     Static syntax items that represent a value
     /// </summary>
-    abstract class Syntax : DumpableObject, ITree<Syntax>
+    abstract class ValueSyntax : DumpableObject, ITree<ValueSyntax>
     {
         class CacheContainer
         {
-            public Syntax[] Children;
+            public ValueSyntax[] Children;
         }
 
         internal readonly BinaryTree BinaryTree;
@@ -31,9 +31,9 @@ namespace Reni.Parser
 
         readonly CacheContainer Cache = new CacheContainer();
 
-        protected Syntax(BinaryTree binaryTree) => BinaryTree = binaryTree;
+        protected ValueSyntax(BinaryTree binaryTree) => BinaryTree = binaryTree;
 
-        protected Syntax(int objectId, BinaryTree binaryTree)
+        protected ValueSyntax(int objectId, BinaryTree binaryTree)
             : base(objectId)
             => BinaryTree = binaryTree;
 
@@ -46,11 +46,11 @@ namespace Reni.Parser
         [DisableDump]
         internal virtual IRecursionHandler RecursionHandler => null;
 
-        internal Syntax[] Children => Cache.Children ?? (Cache.Children = GetChildren().ToArray());
-        Syntax ITree<Syntax>.Child(int index) => Children[index];
+        internal ValueSyntax[] Children => Cache.Children ?? (Cache.Children = GetChildren().ToArray());
+        ValueSyntax ITree<ValueSyntax>.Child(int index) => Children[index];
 
-        int ITree<Syntax>.ChildrenCount => Children.Length;
-        protected abstract IEnumerable<Syntax> GetChildren();
+        int ITree<ValueSyntax>.ChildrenCount => Children.Length;
+        protected abstract IEnumerable<ValueSyntax> GetChildren();
 
         //[DebuggerHidden]
         internal virtual Result ResultForCache(ContextBase context, Category category)
@@ -83,10 +83,10 @@ namespace Reni.Parser
             return Type(context).SmartUn<FunctionType>().IsHollow;
         }
 
-        internal Syntax ReplaceArg(Syntax syntax)
+        internal ValueSyntax ReplaceArg(ValueSyntax syntax)
             => Visit(new ReplaceArgVisitor(syntax)) ?? this;
 
-        internal virtual Syntax Visit(ISyntaxVisitor visitor)
+        internal virtual ValueSyntax Visit(ISyntaxVisitor visitor)
         {
             NotImplementedMethod(visitor);
             return null;

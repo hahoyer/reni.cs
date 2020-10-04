@@ -13,11 +13,11 @@ namespace Reni.Parser
         {
             public ValueCache<string[]> AllNames;
             public ValueCache<string[]> PublicNames;
-            public ValueCache<Result<Syntax>> Syntax;
+            public ValueCache<Result<ValueSyntax>> Syntax;
         }
 
         [EnableDump]
-        internal Syntax Body { get; }
+        internal ValueSyntax Body { get; }
 
         readonly CacheContainer Cache = new CacheContainer();
 
@@ -27,13 +27,13 @@ namespace Reni.Parser
         readonly Declarer Declarer;
 
 
-        Statement(Declarer declarer, Syntax body, IDefaultScopeProvider container)
+        Statement(Declarer declarer, ValueSyntax body, IDefaultScopeProvider container)
         {
             Body = body;
             Container = container;
             Declarer = declarer?? new Declarer(null,null,null);
             Tracer.Assert(Tags != null);
-            Cache.Syntax = new ValueCache<Result<Syntax>>(GetSyntax);
+            Cache.Syntax = new ValueCache<Result<ValueSyntax>>(GetSyntax);
             Cache.AllNames = new ValueCache<string[]>(GetAllNames);
             Cache.PublicNames = new ValueCache<string[]>(GetPublicNames);
             StopByObjectIds();
@@ -43,7 +43,7 @@ namespace Reni.Parser
         Definable Target => Declarer.Target;
 
         [DisableDump]
-        internal Syntax Syntax => Cache.Syntax.Value.Target;
+        internal ValueSyntax Syntax => Cache.Syntax.Value.Target;
 
         [DisableDump]
         internal Issue[] Issues => Cache.Syntax.Value.Issues;
@@ -94,13 +94,13 @@ namespace Reni.Parser
             => (publicOnly? PublicNames : AllNames)
                 .Contains(name);
 
-        internal static Result<Statement[]> CreateStatements(Result<Syntax> value, IDefaultScopeProvider container)
+        internal static Result<Statement[]> CreateStatements(Result<ValueSyntax> value, IDefaultScopeProvider container)
             => Create(value, container).Convert(x => new[] {x});
 
-        internal static Result<Statement> Create(Result<Syntax> value, IDefaultScopeProvider container)
+        internal static Result<Statement> Create(Result<ValueSyntax> value, IDefaultScopeProvider container)
             => value.Convert(x => new Statement(null, x, container));
 
-        internal static Result<Statement> Create(Declarer declarer, Result<Syntax> body, IDefaultScopeProvider container)
+        internal static Result<Statement> Create(Declarer declarer, Result<ValueSyntax> body, IDefaultScopeProvider container)
             => body.Convert(x => new Statement(declarer, x, container));
 
         internal IEnumerable<string> GetAllDeclarations()
@@ -115,9 +115,9 @@ namespace Reni.Parser
                 yield return Target.Id;
         }
 
-        internal Syntax GetChildren() => Body;
+        internal ValueSyntax GetChildren() => Body;
 
-        Result<Syntax> GetSyntax() => Body;
+        Result<ValueSyntax> GetSyntax() => Body;
         string[] GetAllNames() => GetAllDeclarations().ToArray();
         string[] GetPublicNames() => GetPublicDeclarations().ToArray();
     }

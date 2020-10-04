@@ -22,7 +22,7 @@ namespace Reni.TokenClasses
             _isMetaFunction = isMetaFunction;
         }
 
-        Result<Syntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
+        Result<ValueSyntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
             =>
             FunctionSyntax.Create(binaryTree.Left, _isImplicit, _isMetaFunction, binaryTree.Right, binaryTree, scope);
     }

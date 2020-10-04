@@ -7,7 +7,7 @@ namespace Reni.Struct
 {
     sealed class SetterFunction : FunctionInstance
     {
-        public SetterFunction(FunctionType parent, int index, Syntax body)
+        public SetterFunction(FunctionType parent, int index, ValueSyntax body)
             : base(parent, body) => FunctionId = FunctionId
             .Setter(index);
 

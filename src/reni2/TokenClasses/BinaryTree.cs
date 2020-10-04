@@ -123,7 +123,7 @@ namespace Reni.TokenClasses
 
         protected override string GetNodeDump() => base.GetNodeDump() + $"({TokenClass.Id})";
 
-        internal Result<Syntax> Syntax(ISyntaxScope scope) => this.CachedFunction(scope ?? NullScopeInstance, GetValue);
+        internal Result<ValueSyntax> Syntax(ISyntaxScope scope) => this.CachedFunction(scope ?? NullScopeInstance, GetValue);
 
         internal static BinaryTree Create
         (
@@ -168,7 +168,7 @@ namespace Reni.TokenClasses
             return new Result<Statement[]>(new Statement[0], IssueId.InvalidListOperandSequence.Issue(SourcePart));
         }
 
-        internal Result<Syntax> GetValue(ISyntaxScope scopeKey)
+        internal Result<ValueSyntax> GetValue(ISyntaxScope scopeKey)
         {
             var scope = scopeKey == NullScopeInstance? null : scopeKey;
 
@@ -208,7 +208,7 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        Result<Syntax> GetValueOrDefault(ISyntaxScope scope)
+        Result<ValueSyntax> GetValueOrDefault(ISyntaxScope scope)
             => scope != null && scope.IsDeclarationPart
                 ? null
                 : (TokenClass as IValueProvider)?.Get(this, scope);

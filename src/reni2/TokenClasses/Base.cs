@@ -17,7 +17,7 @@ namespace Reni.TokenClasses
 
     abstract class TerminalSyntaxToken : TerminalToken, ITerminal, IValueProvider
     {
-        Result<Syntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
+        Result<ValueSyntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
         {
             if(binaryTree.Left == null && binaryTree.Right == null)
                 return new TerminalSyntax(this, binaryTree);
@@ -25,7 +25,7 @@ namespace Reni.TokenClasses
             if(binaryTree.Left != null && binaryTree.Right == null)
             {
                 return new TerminalSyntax(this, binaryTree)
-                    .Issues<Syntax>
+                    .Issues<ValueSyntax>
                     (
                     IssueId.TerminalUsedAsSuffix
                     .Issue(binaryTree.Left.SourcePart));
@@ -41,9 +41,9 @@ namespace Reni.TokenClasses
         protected abstract Result Result
             (ContextBase context, Category category, TerminalSyntax token);
 
-        Syntax ITerminal.Visit(ISyntaxVisitor visitor) => Visit(visitor);
+        ValueSyntax ITerminal.Visit(ISyntaxVisitor visitor) => Visit(visitor);
 
-        protected Syntax Visit(ISyntaxVisitor visitor)
+        protected ValueSyntax Visit(ISyntaxVisitor visitor)
         {
             NotImplementedMethod(visitor);
             return null;
@@ -53,20 +53,20 @@ namespace Reni.TokenClasses
     abstract class InfixPrefixSyntaxToken : InfixPrefixToken, IInfix, IPrefix, IValueProvider
     {
         Result IInfix.Result
-            (ContextBase context, Category category, Syntax left, Syntax right)
+            (ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
             => Result(context, category, left, right);
 
         Result IPrefix.Result
-            (ContextBase context, Category category, Syntax right, BinaryTree token)
+            (ContextBase context, Category category, ValueSyntax right, BinaryTree token)
             => Result(context, category, right);
 
         protected abstract Result Result
-            (ContextBase context, Category category, Syntax left, Syntax right);
+            (ContextBase context, Category category, ValueSyntax left, ValueSyntax right);
 
         protected abstract Result Result
-            (ContextBase context, Category category, Syntax right);
+            (ContextBase context, Category category, ValueSyntax right);
 
-        Result<Syntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
+        Result<ValueSyntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
         {
             if(binaryTree.Left != null && binaryTree.Right != null)
                 return InfixSyntax.Create(binaryTree.Left.Syntax(scope), this, binaryTree.Right.Syntax(scope), binaryTree);
@@ -88,21 +88,21 @@ namespace Reni.TokenClasses
             (ContextBase context, Category category);
 
         Result IPrefix.Result
-            (ContextBase context, Category category, Syntax right, BinaryTree token)
+            (ContextBase context, Category category, ValueSyntax right, BinaryTree token)
             => Result(context, category, right, token);
 
         protected abstract Result Result
-            (ContextBase callContext, Category category, Syntax right, BinaryTree token);
+            (ContextBase callContext, Category category, ValueSyntax right, BinaryTree token);
 
-        Syntax ITerminal.Visit(ISyntaxVisitor visitor) => Visit(visitor);
+        ValueSyntax ITerminal.Visit(ISyntaxVisitor visitor) => Visit(visitor);
 
-        internal virtual Syntax Visit(ISyntaxVisitor visitor)
+        internal virtual ValueSyntax Visit(ISyntaxVisitor visitor)
         {
             NotImplementedMethod(visitor);
             return null;
         }
 
-        Result<Syntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
+        Result<ValueSyntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
         {
             if(binaryTree.Left == null)
             {
@@ -119,7 +119,7 @@ namespace Reni.TokenClasses
 
     abstract class SuffixSyntaxToken : SuffixToken, ISuffix, IValueProvider
     {
-        Result<Syntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
+        Result<ValueSyntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
         {
             if(binaryTree.Right == null)
                 return SuffixSyntax.Create(binaryTree.Left.Syntax(scope), this, binaryTree);
@@ -128,22 +128,22 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        Result ISuffix.Result(ContextBase context, Category category, Syntax left)
+        Result ISuffix.Result(ContextBase context, Category category, ValueSyntax left)
             => Result(context, category, left);
 
-        protected abstract Result Result(ContextBase context, Category category, Syntax left);
+        protected abstract Result Result(ContextBase context, Category category, ValueSyntax left);
     }
 
     abstract class InfixSyntaxToken : InfixToken, IInfix, IValueProvider
     {
         Result IInfix.Result
-            (ContextBase context, Category category, Syntax left, Syntax right)
+            (ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
             => Result(context, category, left, right);
 
         protected abstract Result Result
-            (ContextBase callContext, Category category, Syntax left, Syntax right);
+            (ContextBase callContext, Category category, ValueSyntax left, ValueSyntax right);
 
-        Result<Syntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
+        Result<ValueSyntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
             => InfixSyntax.Create(binaryTree.Left.Syntax(scope), this, binaryTree.Right.Syntax(scope), binaryTree);
     }
 }

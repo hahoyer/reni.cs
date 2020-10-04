@@ -13,7 +13,7 @@ namespace Reni.Struct
         public override string Id => TokenId;
 
         protected override Result Result
-            (ContextBase context, Category category, Syntax left, Syntax right)
+            (ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
         {
             var target = context.ResultAsReference(category.Typed, left);
             return target
@@ -23,7 +23,7 @@ namespace Reni.Struct
                 .ReplaceArg(target);
         }
 
-        protected override Result Result(ContextBase context, Category category, Syntax right)
+        protected override Result Result(ContextBase context, Category category, ValueSyntax right)
             => context.FindRecentCompoundView.AtTokenResult(category, right.Result(context));
     }
 }

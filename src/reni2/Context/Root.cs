@@ -31,7 +31,7 @@ namespace Reni.Context
         readonly ValueCache<BitType> _bitCache;
         readonly ValueCache<VoidType> _voidCache;
         readonly ValueCache<IImplementation> _minusFeatureCache;
-        readonly FunctionCache<string, Parser.Syntax> _metaDictionary;
+        readonly FunctionCache<string, Parser.ValueSyntax> _metaDictionary;
         readonly FunctionCache<bool, IImplementation> _createArrayFeatureCache;
 
         public IExecutionContext ExecutionContext => Parent.ExecutionContext;
@@ -40,7 +40,7 @@ namespace Reni.Context
         {
             Parent = parent;
             _recursionTypeCache = new ValueCache<RecursionType>(() => new RecursionType(this));
-            _metaDictionary = new FunctionCache<string, Parser.Syntax>(CreateMetaDictionary);
+            _metaDictionary = new FunctionCache<string, Parser.ValueSyntax>(CreateMetaDictionary);
             _bitCache = new ValueCache<BitType>(() => new BitType(this));
             _voidCache = new ValueCache<VoidType>(() => new VoidType(this));
             _minusFeatureCache = new ValueCache<IImplementation>
@@ -61,7 +61,7 @@ namespace Reni.Context
                 );
         }
 
-        Parser.Syntax CreateMetaDictionary(string source)
+        Parser.ValueSyntax CreateMetaDictionary(string source)
         {
             var result = Parent.ParsePredefinedItem(source);
             Tracer.Assert(!result.Issues.Any());
@@ -109,7 +109,7 @@ namespace Reni.Context
             => _createArrayFeatureCache[tokenClass.IsMutable];
 
         static Result CreateArrayResult
-            (ContextBase context, Category category, Parser.Syntax argsType, bool isMutable)
+            (ContextBase context, Category category, Parser.ValueSyntax argsType, bool isMutable)
         {
             var target = context.Result(category.Typed, argsType).SmartUn<PointerType>().Align;
             return target
@@ -181,7 +181,7 @@ namespace Reni.Context
         internal FunctionContainer FunctionContainer(int index) => _functions.Container(index);
         internal FunctionType Function(int index) => _functions.Item(index);
 
-        internal Container MainContainer(Parser.Syntax syntax, string description)
+        internal Container MainContainer(Parser.ValueSyntax syntax, string description)
         {
             var rawResult = syntax.Result(this);
 
@@ -206,7 +206,7 @@ namespace Reni.Context
 
         internal interface IParent
         {
-            Result<Parser.Syntax> ParsePredefinedItem(string source);
+            Result<Parser.ValueSyntax> ParsePredefinedItem(string source);
             bool ProcessErrors { get; }
             IExecutionContext ExecutionContext { get; }
             IEnumerable<Definable> AllDefinables { get; }

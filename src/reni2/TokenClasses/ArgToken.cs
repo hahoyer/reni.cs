@@ -14,10 +14,10 @@ namespace Reni.TokenClasses
         protected override Result Result(ContextBase context, Category category)
             => context.ArgReferenceResult(category);
 
-        internal override Syntax Visit(ISyntaxVisitor visitor) => visitor.Arg;
+        internal override ValueSyntax Visit(ISyntaxVisitor visitor) => visitor.Arg;
 
         protected override Result Result
-            (ContextBase context, Category category, Syntax right, BinaryTree token)
+            (ContextBase context, Category category, ValueSyntax right, BinaryTree token)
             => context.FunctionalArgResult(category, right, token);
     }
 }

@@ -53,11 +53,11 @@ namespace Reni.Feature
         IValue IEvalImplementation.Value => null;
 
         Result IMeta.Result
-            (Category category, ResultCache left, ContextBase contextBase, Parser.Syntax right)
+            (Category category, ResultCache left, ContextBase contextBase, Parser.ValueSyntax right)
             => Result(contextBase, category, right);
 
         protected abstract Result Result
-            (ContextBase contextBase, Category category, Parser.Syntax right);
+            (ContextBase contextBase, Category category, Parser.ValueSyntax right);
     }
 
     /// <summary>
@@ -97,7 +97,7 @@ namespace Reni.Feature
     interface IMeta
     {
         Result Result
-            (Category category, ResultCache left, ContextBase contextBase, Parser.Syntax right);
+            (Category category, ResultCache left, ContextBase contextBase, Parser.ValueSyntax right);
     }
 
     interface ISearchTarget {}
@@ -153,10 +153,10 @@ namespace Reni.Feature
 
     sealed class MetaFunction : DumpableObject, IImplementation, IMeta
     {
-        readonly Func<Category, ResultCache, ContextBase, Parser.Syntax, Result> _function;
+        readonly Func<Category, ResultCache, ContextBase, Parser.ValueSyntax, Result> _function;
 
         public MetaFunction
-            (Func<Category, ResultCache, ContextBase, Parser.Syntax, Result> function)
+            (Func<Category, ResultCache, ContextBase, Parser.ValueSyntax, Result> function)
         {
             _function = function;
         }
@@ -166,21 +166,21 @@ namespace Reni.Feature
         IValue IEvalImplementation.Value => null;
 
         Result IMeta.Result
-            (Category category, ResultCache left, ContextBase contextBase, Parser.Syntax right)
+            (Category category, ResultCache left, ContextBase contextBase, Parser.ValueSyntax right)
             => _function(category, left, contextBase, right);
     }
 
     sealed class ContextMetaFunction : ContextMetaFeatureImplementation
     {
-        readonly Func<ContextBase, Category, Parser.Syntax, Result> _function;
+        readonly Func<ContextBase, Category, Parser.ValueSyntax, Result> _function;
 
-        public ContextMetaFunction(Func<ContextBase, Category, Parser.Syntax, Result> function)
+        public ContextMetaFunction(Func<ContextBase, Category, Parser.ValueSyntax, Result> function)
         {
             _function = function;
         }
 
         protected override Result Result
-            (ContextBase contextBase, Category category, Parser.Syntax right)
+            (ContextBase contextBase, Category category, Parser.ValueSyntax right)
             => _function(contextBase, category, right);
     }
 
@@ -188,15 +188,15 @@ namespace Reni.Feature
         : DumpableObject, IImplementation, IMeta
     {
         [EnableDump]
-        readonly Parser.Syntax _definition;
-        public ContextMetaFunctionFromSyntax(Parser.Syntax definition) { _definition = definition; }
+        readonly Parser.ValueSyntax _definition;
+        public ContextMetaFunctionFromSyntax(Parser.ValueSyntax definition) { _definition = definition; }
 
         IMeta IMetaImplementation.Function => this;
         IFunction IEvalImplementation.Function => null;
         IValue IEvalImplementation.Value => null;
 
         Result IMeta.Result
-            (Category category, ResultCache left, ContextBase callContext, Parser.Syntax right)
+            (Category category, ResultCache left, ContextBase callContext, Parser.ValueSyntax right)
             => callContext.Result(category, _definition.ReplaceArg(right));
     }
 

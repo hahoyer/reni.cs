@@ -15,7 +15,7 @@ namespace Reni.Struct
     {
         [Node]
         [EnableDump]
-        readonly Syntax Body;
+        readonly ValueSyntax Body;
 
         [DisableDump]
         protected readonly FunctionType Parent;
@@ -24,7 +24,7 @@ namespace Reni.Struct
 
         bool _isObtainBodyCodeActive;
 
-        protected FunctionInstance(FunctionType parent, Syntax body)
+        protected FunctionInstance(FunctionType parent, ValueSyntax body)
         {
             Body = body;
             Parent = parent;

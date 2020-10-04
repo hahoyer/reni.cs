@@ -19,7 +19,7 @@ namespace ReniUI.CompilationView
         int _lineNumberMarginLength;
         readonly Scintilla TextBox;
         readonly ValueCache<CompilerBrowser> CompilerCache;
-        readonly FunctionCache<Syntax, ResultCachesView> ResultCachesViews;
+        readonly FunctionCache<ValueSyntax, ResultCachesView> ResultCachesViews;
         readonly FunctionCache<object, ChildView> ChildViews;
         readonly BrowseTraceCollector TraceLog;
         readonly TraceLogView LogView;
@@ -44,7 +44,7 @@ namespace ReniUI.CompilationView
 
             CompilerCache = new ValueCache<CompilerBrowser>(CreateCompilerBrowser);
 
-            ResultCachesViews = new FunctionCache<Syntax, ResultCachesView>
+            ResultCachesViews = new FunctionCache<ValueSyntax, ResultCachesView>
                 (item => new ResultCachesView(item, this));
             ChildViews = new FunctionCache<object, ChildView>(CreateView);
 
@@ -132,7 +132,7 @@ namespace ReniUI.CompilationView
             menuItems.AddRange(items);
         }
 
-        MenuItem CreateMenuItem(Syntax syntax)
+        MenuItem CreateMenuItem(ValueSyntax syntax)
         {
             var text = syntax.GetType().PrettyName() + " " + syntax.ObjectId;
 
@@ -145,7 +145,7 @@ namespace ReniUI.CompilationView
             return menuItem;
         }
 
-        void SignalContextMenuSelect(Syntax syntax)
+        void SignalContextMenuSelect(ValueSyntax syntax)
             => TextBox.SetSelection(syntax.BinaryTree.SourcePart.Position, syntax.BinaryTree.SourcePart.EndPosition);
 
         void StyleConfig(TextStyle id) => id.Config(TextBox.Styles[id]);

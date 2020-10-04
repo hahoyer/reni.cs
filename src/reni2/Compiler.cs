@@ -62,7 +62,7 @@ namespace Reni
         public Exception Exception;
         readonly ValueCache<CodeContainer> CodeContainerCache;
         readonly ValueCache<BinaryTree> SyntaxCache;
-        readonly ValueCache<Result<Syntax>> ValueSyntaxCache;
+        readonly ValueCache<Result<ValueSyntax>> ValueSyntaxCache;
 
         readonly MainTokenFactory MainTokenFactory;
 
@@ -100,7 +100,7 @@ namespace Reni
 
         CodeContainer GetCodeContainer() => new CodeContainer(Syntax, Root, ModuleName, Source.Data);
 
-        Result<Syntax> GetValue() 
+        Result<ValueSyntax> GetValue() 
             => CompoundSyntax.Create(BinaryTree.GetStatements(null), BinaryTree);
 
 
@@ -113,7 +113,7 @@ namespace Reni
 
         [Node]
         [DisableDump]
-        internal Syntax Syntax => ValueSyntaxCache.Value.Target;
+        internal ValueSyntax Syntax => ValueSyntaxCache.Value.Target;
 
         [Node]
         [DisableDump]
@@ -133,9 +133,9 @@ namespace Reni
         IEnumerable<Definable> Root.IParent.AllDefinables
             => MainTokenFactory.AllTokenClasses.OfType<Definable>();
 
-        Result<Syntax> Root.IParent.ParsePredefinedItem(string source) => ParsePredefinedItem(source);
+        Result<ValueSyntax> Root.IParent.ParsePredefinedItem(string source) => ParsePredefinedItem(source);
 
-        Result<Syntax> ParsePredefinedItem(string sourceText)
+        Result<ValueSyntax> ParsePredefinedItem(string sourceText)
         {
             var syntax = Parse(new Source(sourceText) + 0);
             

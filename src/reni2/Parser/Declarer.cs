@@ -25,7 +25,7 @@ namespace Reni.Parser
             Target = target;
         }
 
-        internal Result<Statement> Statement(Result<Syntax> right, IDefaultScopeProvider container)
+        internal Result<Statement> Statement(Result<ValueSyntax> right, IDefaultScopeProvider container)
             => Parser.Statement.Create(this, right, container);
 
         public Result<Declarer> WithName(Definable target, BinaryTree binaryTree)

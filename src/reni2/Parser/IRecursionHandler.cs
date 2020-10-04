@@ -10,7 +10,7 @@ namespace Reni.Parser
             ContextBase context,
             Category category,
             Category pendingCategory,
-            Syntax syntax,
+            ValueSyntax syntax,
             bool asReference);
     }
 }

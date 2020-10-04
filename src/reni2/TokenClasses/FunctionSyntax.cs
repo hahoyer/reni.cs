@@ -8,20 +8,20 @@ using Reni.Struct;
 
 namespace Reni.TokenClasses
 {
-    sealed class FunctionSyntax : Syntax
+    sealed class FunctionSyntax : ValueSyntax
     {
-        internal Syntax Getter { get; }
+        internal ValueSyntax Getter { get; }
         internal bool IsImplicit { get; }
-        internal Syntax Setter { get; }
+        internal ValueSyntax Setter { get; }
 
         bool IsMetaFunction { get; }
 
         FunctionSyntax
         (
-            Syntax setter,
+            ValueSyntax setter,
             bool isImplicit,
             bool isMetaFunction,
-            Syntax getter, BinaryTree binaryTree
+            ValueSyntax getter, BinaryTree binaryTree
         )
             : base(binaryTree)
         {
@@ -38,7 +38,7 @@ namespace Reni.TokenClasses
 
         internal override bool IsLambda => true;
 
-        internal static Result<Syntax> Create
+        internal static Result<ValueSyntax> Create
         (
             BinaryTree left, bool isImplicit, bool isMetaFunction, BinaryTree right, BinaryTree binaryTree
             , ISyntaxScope scope
@@ -49,10 +49,10 @@ namespace Reni.TokenClasses
             var target = new FunctionSyntax
                 (leftValue?.Target, isImplicit, isMetaFunction, rightValue?.Target, binaryTree);
             var issues = leftValue?.Issues.plus(rightValue?.Issues);
-            return new Result<Syntax>(target, issues);
+            return new Result<ValueSyntax>(target, issues);
         }
 
-        protected override IEnumerable<Syntax> GetChildren() => T(Getter, Setter);
+        protected override IEnumerable<ValueSyntax> GetChildren() => T(Getter, Setter);
 
         internal override Result ResultForCache(ContextBase context, Category category)
             => context

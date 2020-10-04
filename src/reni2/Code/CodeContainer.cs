@@ -22,7 +22,7 @@ namespace Reni.Code
         readonly string ModuleName;
         readonly Root Root;
 
-        internal CodeContainer(Syntax syntax, Root root, string moduleName, string description)
+        internal CodeContainer(ValueSyntax syntax, Root root, string moduleName, string description)
         {
             ModuleName = moduleName;
             Root = root;

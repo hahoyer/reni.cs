@@ -19,10 +19,10 @@ namespace ReniUI.Helper
 
         readonly CacheContainer Cache = new CacheContainer();
 
-        internal Syntax(Reni.Parser.Syntax target)
+        internal Syntax(Reni.Parser.ValueSyntax target)
             : this(target, null) { }
 
-        Syntax(Reni.Parser.Syntax target, Syntax parent)
+        Syntax(Reni.Parser.ValueSyntax target, Syntax parent)
             : base(target, parent)
         {
             Cache.LocateByPosition = new FunctionCache<int, Syntax>(LocateByPositionForCache);
@@ -87,7 +87,7 @@ namespace ReniUI.Helper
 
         public Syntax LocateByPosition(int current) => Cache.LocateByPosition[current];
 
-        protected override Syntax Create(Reni.Parser.Syntax target, Syntax parent) => new Syntax(target, parent);
+        protected override Syntax Create(Reni.Parser.ValueSyntax target, Syntax parent) => new Syntax(target, parent);
 
         internal Syntax Locate(SourcePart part)
         {
