@@ -12,7 +12,7 @@ namespace Reni.Parser
 
         protected override string GetNodeDump() => "()";
 
-        protected override IEnumerable<ValueSyntax> GetChildren() => new ValueSyntax[0];
+        protected override IEnumerable<Syntax> GetChildren() => new ValueSyntax[0];
 
         internal override Result ResultForCache(ContextBase context, Category category)
             => context.RootContext.VoidType.Result(category);

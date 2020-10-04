@@ -100,7 +100,7 @@ namespace Reni.Struct
         protected override string GetNodeDump()
             => GetType().PrettyName() + "(" + GetCompoundIdentificationDump() + ")";
 
-        protected override IEnumerable<ValueSyntax> GetChildren()
+        protected override IEnumerable<Syntax> GetChildren()
             => T(Statements.Select(s => s.GetChildren()), T(CleanupSection)).Concat();
 
         internal static Result<ValueSyntax> Create(Result<Statement> statement, BinaryTree binaryTree)

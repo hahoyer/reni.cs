@@ -6,11 +6,12 @@ using hw.Helper;
 using hw.Scanner;
 using Reni;
 using Reni.Code;
+using Reni.Parser;
 using Reni.Struct;
+using Reni.TokenClasses;
 using Reni.Validation;
 using ReniUI.Classification;
 using ReniUI.Formatting;
-using ReniUI.Helper;
 
 namespace ReniUI
 {
@@ -52,10 +53,13 @@ namespace ReniUI
         internal IEnumerable<Issue> Issues => Compiler.Issues;
 
         internal Formatting.BinaryTreeSyntax FormattingBinaryTreeSyntax
-            => Cache.FomattingBinaryTreeSyntax ?? (Cache.FomattingBinaryTreeSyntax = new Formatting.BinaryTreeSyntax(Compiler.BinaryTree));
+            => Cache.FomattingBinaryTreeSyntax ??
+               (Cache.FomattingBinaryTreeSyntax = new Formatting.BinaryTreeSyntax(Compiler.BinaryTree));
 
-        internal Helper.BinaryTreeSyntax BinaryTreeSyntax => Cache.HelperBinaryTreeSyntax ?? (Cache.HelperBinaryTreeSyntax = GetHelperSyntax());
-        internal Helper.Syntax Syntax => Cache.Syntax?? (Cache.Syntax= GetValue());
+        internal Helper.BinaryTreeSyntax BinaryTreeSyntax
+            => Cache.HelperBinaryTreeSyntax ?? (Cache.HelperBinaryTreeSyntax = GetHelperSyntax());
+
+        internal Helper.Syntax Syntax => Cache.Syntax ?? (Cache.Syntax = GetValue());
 
 
         public static CompilerBrowser FromText
@@ -77,24 +81,19 @@ namespace ReniUI
             return LocatePosition(current.Position);
         }
 
-        public IEnumerable<SourcePart> FindAllBelongings(Token open) 
+        public IEnumerable<SourcePart> FindAllBelongings(Token open)
             => open.FindAllBelongings(this);
 
         public string FlatFormat(bool areEmptyLinesPossible)
             => FormattingBinaryTreeSyntax.FlatFormat(areEmptyLinesPossible);
 
-        internal IEnumerable<Reni.Parser.ValueSyntax> FindPosition(int offset)
-        {
-            var enumerable = LocatePosition(offset)
+        internal IEnumerable<ValueSyntax> FindPosition(int offset)
+            => LocatePosition(offset)
                 .Syntax
                 .ParentChainIncludingThis
                 .Select(item => item.Target)
-                .ToArray();
-
-            var compileSyntaxs = enumerable
-                .Where(item => item?.ResultCache.Any() ?? false);
-            return compileSyntaxs;
-        }
+                .OfType<ValueSyntax>()
+                .Where(item => item.ResultCache.Any());
 
         internal FunctionType Function(int index)
             => Compiler.Root.Function(index);
@@ -132,7 +131,7 @@ namespace ReniUI
             return null;
         }
 
-        internal IEnumerable<Reni.TokenClasses.BinaryTree> FindAllBelongings(Helper.BinaryTreeSyntax binaryTreeSyntax)
+        internal IEnumerable<BinaryTree> FindAllBelongings(Helper.BinaryTreeSyntax binaryTreeSyntax)
             => Compiler.BinaryTree.Belongings(binaryTreeSyntax.Target);
 
         internal string Reformat(IFormatter formatter = null, SourcePart targetPart = null) =>
@@ -184,7 +183,7 @@ namespace ReniUI
         {
             try
             {
-                return new Syntax(Compiler.Syntax);
+                return new Helper.Syntax(Compiler.Syntax);
             }
             catch(Exception e)
             {
@@ -195,7 +194,7 @@ namespace ReniUI
             ;
         }
 
-        Helper.Syntax  LocateValueByPosition(int offset)
+        Helper.Syntax LocateValueByPosition(int offset)
         {
             var token = Token.LocateByPosition(Syntax, offset);
             if(token.IsComment || token.IsLineComment)

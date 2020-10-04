@@ -25,7 +25,7 @@ namespace Reni.Parser
         internal override Result ResultForCache(ContextBase context, Category category)
             => Terminal.Result(context, category, this);
 
-        protected override IEnumerable<ValueSyntax> GetChildren() => new ValueSyntax[0];
+        protected override IEnumerable<Syntax> GetChildren() => new ValueSyntax[0];
 
         internal override ValueSyntax Visit(ISyntaxVisitor visitor) => Terminal.Visit(visitor);
 
@@ -58,7 +58,7 @@ namespace Reni.Parser
             Right = right;
         }
 
-        protected override IEnumerable<ValueSyntax> GetChildren() => T(Right);
+        protected override IEnumerable<Syntax> GetChildren() => T(Right);
 
         internal override Result ResultForCache(ContextBase context, Category category) => Prefix
             .Result(context, category, Right, BinaryTree);
@@ -96,7 +96,7 @@ namespace Reni.Parser
             StopByObjectIds();
         }
 
-        protected override IEnumerable<ValueSyntax> GetChildren() => T(Left,Right);
+        protected override IEnumerable<Syntax> GetChildren() => T(Left,Right);
         internal override IRecursionHandler RecursionHandler => Infix as IRecursionHandler;
 
         internal override Result ResultForCache(ContextBase context, Category category) => Infix
@@ -145,7 +145,7 @@ namespace Reni.Parser
             Suffix = suffix;
         }
 
-        protected override IEnumerable<ValueSyntax> GetChildren() => T(Left);
+        protected override IEnumerable<Syntax> GetChildren() => T(Left);
         internal override Result ResultForCache(ContextBase context, Category category)
             => Suffix.Result(context, category, Left);
 

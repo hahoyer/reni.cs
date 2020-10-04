@@ -52,7 +52,7 @@ namespace Reni.TokenClasses
             return new Result<ValueSyntax>(target, issues);
         }
 
-        protected override IEnumerable<ValueSyntax> GetChildren() => T(Getter, Setter);
+        protected override IEnumerable<Syntax> GetChildren() => T(Getter, Setter);
 
         internal override Result ResultForCache(ContextBase context, Category category)
             => context

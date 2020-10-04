@@ -8,10 +8,10 @@ using Reni.Parser;
 
 namespace ReniUI.Helper
 {
-    abstract class SyntaxWithParent<TResult> : TreeWithParentExtended<TResult, Reni.Parser.ValueSyntax>
+    abstract class SyntaxWithParent<TResult> : TreeWithParentExtended<TResult, Reni.Parser.Syntax>
         where TResult : SyntaxWithParent<TResult>
     {
-        protected SyntaxWithParent(Reni.Parser.ValueSyntax target, TResult parent)
+        protected SyntaxWithParent(Reni.Parser.Syntax target, TResult parent)
             : base(target, parent) { }
 
         [DisableDump]

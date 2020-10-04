@@ -2,97 +2,29 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using Reni.Basics;
-using Reni.Context;
 using Reni.Helper;
-using Reni.Struct;
 using Reni.TokenClasses;
-using Reni.Type;
 
 namespace Reni.Parser
 {
     /// <summary>
-    ///     Static syntax items that represent a value
+    ///     Static syntax items
     /// </summary>
-    abstract class ValueSyntax : DumpableObject, ITree<ValueSyntax>
+    abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer
     {
-        class CacheContainer
-        {
-            public ValueSyntax[] Children;
-        }
-
         internal readonly BinaryTree BinaryTree;
 
-        // Used for debug only
-        [DisableDump]
-        [Node("Cache")]
-        internal readonly FunctionCache<ContextBase, ResultCache> ResultCache =
-            new FunctionCache<ContextBase, ResultCache>();
+        protected Syntax(BinaryTree binaryTree) => BinaryTree = binaryTree;
 
-        readonly CacheContainer Cache = new CacheContainer();
-
-        protected ValueSyntax(BinaryTree binaryTree) => BinaryTree = binaryTree;
-
-        protected ValueSyntax(int objectId, BinaryTree binaryTree)
+        protected Syntax(int objectId, BinaryTree binaryTree)
             : base(objectId)
             => BinaryTree = binaryTree;
 
-        [DisableDump]
-        internal virtual bool IsLambda => false;
+        internal Syntax[] Children => this.CachedValue(() => GetChildren().ToArray());
 
-        [DisableDump]
-        internal virtual bool? IsHollow => IsLambda? (bool?)true : null;
-
-        [DisableDump]
-        internal virtual IRecursionHandler RecursionHandler => null;
-
-        internal ValueSyntax[] Children => Cache.Children ?? (Cache.Children = GetChildren().ToArray());
-        ValueSyntax ITree<ValueSyntax>.Child(int index) => Children[index];
-
-        int ITree<ValueSyntax>.ChildrenCount => Children.Length;
-        protected abstract IEnumerable<ValueSyntax> GetChildren();
-
-        //[DebuggerHidden]
-        internal virtual Result ResultForCache(ContextBase context, Category category)
-        {
-            NotImplementedMethod(context, category);
-            return null;
-        }
-
-        internal void AddToCacheForDebug(ContextBase context, ResultCache cacheItem)
-            => ResultCache.Add(context, cacheItem);
-
-        internal Result Result(ContextBase context) => context.Result(Category.All, this);
-
-        internal BitsConst Evaluate(ContextBase context)
-            => Result(context).Evaluate(context.RootContext.ExecutionContext);
-
-        //[DebuggerHidden]
-        internal TypeBase Type(ContextBase context) => context.Result(Category.Type, this)?.Type;
-
-        internal bool IsHollowStructureElement(ContextBase context)
-        {
-            var result = IsHollow;
-            if(result != null)
-                return result.Value;
-
-            var type = context.TypeIfKnown(this);
-            if(type != null)
-                return type.SmartUn<FunctionType>().IsHollow;
-
-            return Type(context).SmartUn<FunctionType>().IsHollow;
-        }
-
-        internal ValueSyntax ReplaceArg(ValueSyntax syntax)
-            => Visit(new ReplaceArgVisitor(syntax)) ?? this;
-
-        internal virtual ValueSyntax Visit(ISyntaxVisitor visitor)
-        {
-            NotImplementedMethod(visitor);
-            return null;
-        }
-
-        internal IEnumerable<string> DeclarationOptions(ContextBase context)
-            => Type(context).DeclarationOptions;
+        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
+        Syntax ITree<Syntax>.Child(int index) => Children[index];
+        int ITree<Syntax>.ChildrenCount => Children.Length;
+        protected abstract IEnumerable<Syntax> GetChildren();
     }
 }

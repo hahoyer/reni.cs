@@ -42,7 +42,7 @@ namespace Reni
             Else = elseSyntax;
         }
 
-        protected override IEnumerable<ValueSyntax> GetChildren() => T(Cond, Then,Else);
+        protected override IEnumerable<Syntax> GetChildren() => T(Cond, Then,Else);
 
         internal override Result ResultForCache(ContextBase context, Category category)
             => InternalResult(context, category);

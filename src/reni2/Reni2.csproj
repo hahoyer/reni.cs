@@ -224,6 +224,7 @@
     <Compile Include="Parser\SavePartMatch.cs" />
     <Compile Include="Parser\ScannerSyntaxError.cs" />
     <Compile Include="Parser\ScannerTokenFactory.cs" />
+    <Compile Include="Parser\ValueSyntax.cs" />
     <Compile Include="ReniObjectExtender.cs" />
     <Compile Include="Parser\Extension.cs" />
     <Compile Include="Parser\ExclamationBoxToken.cs" />

@@ -69,7 +69,7 @@ namespace Reni.Parser
         [Node]
         internal ValueSyntax Right {get;}
 
-        protected override IEnumerable<ValueSyntax> GetChildren() => T(Left,Right);
+        protected override IEnumerable<Syntax> GetChildren() => T(Left,Right);
 
         internal override Result ResultForCache(ContextBase context, Category category)
         {
