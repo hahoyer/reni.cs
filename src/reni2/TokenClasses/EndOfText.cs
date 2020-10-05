@@ -5,8 +5,14 @@ using Reni.Parser;
 
 namespace Reni.TokenClasses
 {
-    sealed class EndOfText : TokenClass, IDefaultScopeProvider, IBracketMatch<BinaryTree>, IStatementsProvider
-        , ISyntaxScope
+    sealed class EndOfText
+        : TokenClass
+            , IDefaultScopeProvider
+            , IBracketMatch<BinaryTree>
+            , IStatementsProvider
+            , ISyntaxScope
+            , IBelongingsMatcher
+            , ISyntaxFactoryToken
     {
         sealed class Matched : DumpableObject, IParserTokenType<BinaryTree>
         {
@@ -22,12 +28,21 @@ namespace Reni.TokenClasses
         }
 
         const string TokenId = PrioTable.EndOfText;
-        IParserTokenType<BinaryTree> IBracketMatch<BinaryTree>.Value {get;} = new Matched();
+
+        [DisableDump]
+        public override string Id => TokenId;
+
+        [DisableDump]
+        internal override bool IsVisible => false;
+
+        bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
+            => otherMatcher is BeginOfText;
+
+        IParserTokenType<BinaryTree> IBracketMatch<BinaryTree>.Value { get; } = new Matched();
         bool IDefaultScopeProvider.MeansPublic => true;
 
-        [Obsolete("",true)]
-        Result<Statement[]> IStatementsProvider.Get
-            (List type, BinaryTree right, ISyntaxScope scope)
+        [Obsolete("", true)]
+        Result<Statement[]> IStatementsProvider.Get(List type, BinaryTree right, ISyntaxScope scope)
         {
             Tracer.Assert(type == null);
             Tracer.Assert(right != null);
@@ -45,22 +60,21 @@ namespace Reni.TokenClasses
             return result?.GetStatements(this) ?? new Result<Statement[]>(new Statement[0]);
         }
 
-        [DisableDump]
-        public override string Id => TokenId;
-
-        [DisableDump]
-        internal override bool IsVisible => false;
+        ISyntaxFactory ISyntaxFactoryToken.Provider => SyntaxFactory.Bracket;
 
         IDefaultScopeProvider ISyntaxScope.DefaultScopeProvider => this;
 
         bool ISyntaxScope.IsDeclarationPart => false;
     }
 
-    sealed class BeginOfText : TokenClass
+    sealed class BeginOfText : TokenClass, IBelongingsMatcher
     {
         const string TokenId = PrioTable.BeginOfText;
 
         [DisableDump]
         public override string Id => TokenId;
+
+        bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
+            => otherMatcher is EndOfText;
     }
 }

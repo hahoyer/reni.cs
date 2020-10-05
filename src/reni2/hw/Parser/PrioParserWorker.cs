@@ -28,7 +28,7 @@ namespace hw.Parser
                 Stack = stack ?? new Stack<OpenItem<TSourcePart>>();
                 StartLevel = Stack.Count;
                 if(Trace)
-                    Tracer.Line(Parent.PrioTable.Title ?? "");
+                    Tracer.Log(Parent.PrioTable.Title ?? "");
             }
 
             bool Trace => Parent.Trace;
@@ -142,7 +142,7 @@ namespace hw.Parser
                 if(!Trace)
                     return;
 
-                Tracer.Line("---- " + relation + " ----");
+                Tracer.Log("---- " + relation + " ----");
             }
 
             void TraceNextToken(SourcePosition sourcePosition)
@@ -150,8 +150,8 @@ namespace hw.Parser
                 if(!Trace)
                     return;
 
-                Tracer.Line("\n== NextToken ====>");
-                Tracer.Line(sourcePosition.GetDumpAroundCurrent(50));
+                Tracer.Log("\n== NextToken ====>");
+                Tracer.Log(sourcePosition.GetDumpAroundCurrent(50));
             }
 
             void TraceNewItem(SourcePosition sourcePosition)
@@ -159,10 +159,10 @@ namespace hw.Parser
                 if(!Trace)
                     return;
 
-                Tracer.Line(Current.Characters.GetDumpAroundCurrent(50));
-                Tracer.Line(sourcePosition.GetDumpAroundCurrent(50));
-                Tracer.Line("Depth = " + Current.Depth);
-                Tracer.Line("=================>");
+                Tracer.Log(Current.Characters.GetDumpAroundCurrent(50));
+                Tracer.Log(sourcePosition.GetDumpAroundCurrent(50));
+                Tracer.Log("Depth = " + Current.Depth);
+                Tracer.Log("=================>");
             }
 
             void TraceMatchPhase()
@@ -170,13 +170,13 @@ namespace hw.Parser
                 if(!Trace)
                     return;
 
-                Tracer.Line("\n======================>");
-                Tracer.Line("bracket matching======>");
-                Tracer.Line("======================>");
+                Tracer.Log("\n======================>");
+                Tracer.Log("bracket matching======>");
+                Tracer.Log("======================>");
                 Tracer.IndentStart();
                 TraceItemLine(nameof(Current), Current);
-                Tracer.Line(nameof(Left) + " = " + Extension.TreeDump(Left));
-                Tracer.Line(FormatStackForTrace(Stack));
+                Tracer.Log(nameof(Left) + " = " + Extension.TreeDump(Left));
+                Tracer.Log(FormatStackForTrace(Stack));
                 Tracer.IndentEnd();
             }
 
@@ -186,13 +186,13 @@ namespace hw.Parser
                     return;
 
                 Tracer.IndentStart();
-                Tracer.Line("\n======================>");
-                Tracer.Line("begin of " + tag + " ==>");
-                Tracer.Line("======================>");
+                Tracer.Log("\n======================>");
+                Tracer.Log("begin of " + tag + " ==>");
+                Tracer.Log("======================>");
                 Tracer.IndentStart();
                 TraceItemLine(nameof(Current), Current);
-                Tracer.Line(nameof(Left) + " = " + Extension.TreeDump(Left));
-                Tracer.Line(FormatStackForTrace(Stack));
+                Tracer.Log(nameof(Left) + " = " + Extension.TreeDump(Left));
+                Tracer.Log(FormatStackForTrace(Stack));
                 Tracer.IndentEnd();
             }
 
@@ -203,14 +203,14 @@ namespace hw.Parser
 
                 Tracer.IndentStart();
                 TraceItemLine(nameof(Current), Current);
-                Tracer.Line(nameof(Left) + " = " + Extension.TreeDump(Left));
-                Tracer.Line(FormatStackForTrace(Stack));
+                Tracer.Log(nameof(Left) + " = " + Extension.TreeDump(Left));
+                Tracer.Log(FormatStackForTrace(Stack));
                 if(StartLevel > Stack.Count)
-                    Tracer.Line("*** End reached ***");
+                    Tracer.Log("*** End reached ***");
                 Tracer.IndentEnd();
-                Tracer.Line("\n<======================");
-                Tracer.Line("end of " + tag + " <==");
-                Tracer.Line("<======================\n");
+                Tracer.Log("\n<======================");
+                Tracer.Log("end of " + tag + " <==");
+                Tracer.Log("<======================\n");
                 Tracer.IndentEnd();
             }
 
@@ -219,10 +219,10 @@ namespace hw.Parser
                 if(!Trace)
                     return;
 
-                Tracer.Line("\n======================>");
-                Tracer.Line("begin of Sub-parser  ==>");
-                Tracer.Line("triggered by " + item.Characters.GetDumpAroundCurrent(50));
-                Tracer.Line("======================>");
+                Tracer.Log("\n======================>");
+                Tracer.Log("begin of Sub-parser  ==>");
+                Tracer.Log("triggered by " + item.Characters.GetDumpAroundCurrent(50));
+                Tracer.Log("======================>");
                 Tracer.IndentStart();
             }
 
@@ -232,10 +232,10 @@ namespace hw.Parser
                     return;
 
                 Tracer.IndentEnd();
-                Tracer.Line("\n======================>");
-                Tracer.Line("end of Sub-parser    ==>");
-                Tracer.Line("triggered by " + item.Characters.GetDumpAroundCurrent(50));
-                Tracer.Line("======================>");
+                Tracer.Log("\n======================>");
+                Tracer.Log("end of Sub-parser    ==>");
+                Tracer.Log("triggered by " + item.Characters.GetDumpAroundCurrent(50));
+                Tracer.Log("======================>");
             }
 
             static string FormatStackForTrace(Stack<OpenItem<TSourcePart>> stack)
@@ -263,7 +263,7 @@ namespace hw.Parser
 
                 if(item == null)
                 {
-                    Tracer.Line(title + " = null");
+                    Tracer.Log(title + " = null");
                     return;
                 }
 
@@ -272,7 +272,7 @@ namespace hw.Parser
                     : item.Type.PrioTableId
                       + " Type = "
                       + item.Type.GetType().PrettyName();
-                Tracer.Line(title + " = " + typeDump + " Depth=" + item.Context.Depth);
+                Tracer.Log(title + " = " + typeDump + " Depth=" + item.Context.Depth);
             }
 
             static string TreeDump(OpenItem<TSourcePart> value)

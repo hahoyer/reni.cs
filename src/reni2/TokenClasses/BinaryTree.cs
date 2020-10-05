@@ -123,7 +123,13 @@ namespace Reni.TokenClasses
 
         protected override string GetNodeDump() => base.GetNodeDump() + $"({TokenClass.Id})";
 
-        internal Result<ValueSyntax> Syntax(ISyntaxScope scope) => this.CachedFunction(scope ?? NullScopeInstance, GetValue);
+        [Obsolete("")]
+        internal Result<ValueSyntax> Syntax(ISyntaxScope scope)
+        {
+            
+            
+            return this.CachedFunction(scope ?? NullScopeInstance, GetValue);
+        }
 
         internal static BinaryTree Create
         (
@@ -216,8 +222,8 @@ namespace Reni.TokenClasses
         Result<Statement> GetStatementOrDefault(ISyntaxScope scope)
             => (TokenClass as IStatementProvider)?.Get(Left, Right, scope);
 
-        Result<Statement[]> GetStatementsOrDefault(ISyntaxScope scope, List type)
-            => (TokenClass as IStatementsProvider)?.Get(type, this, scope);
+        Result<Statement[]> GetStatementsOrDefault
+            (ISyntaxScope scope, List type) => (TokenClass as IStatementsProvider)?.Get(type, this, scope);
 
         BinaryTree Locate(SourcePart part)
             => Left?.CheckedLocate(part) ??
@@ -302,4 +308,5 @@ namespace Reni.TokenClasses
         }
 
     }
+
 }

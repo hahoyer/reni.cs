@@ -31,7 +31,7 @@ namespace Reni.Code
         {
             var streamWriter = new StreamWriter(name);
             if(traceFilePosn)
-                Tracer.Line
+                Tracer.Log
                     (Tracer.FilePosition(name.ToSmbFile().FullName, 0, 0, FilePositionTag.Debug));
             streamWriter.Write(result);
             streamWriter.Close();
@@ -83,7 +83,7 @@ namespace Reni.Code
         internal static void HandleErrors(CompilerErrorCollection cr)
         {
             for(var i = 0; i < cr.Count; i++)
-                Tracer.Line(cr[i].ToString());
+                Tracer.Log(cr[i].ToString());
 
             throw new CSharpCompilerErrorException(cr);
         }

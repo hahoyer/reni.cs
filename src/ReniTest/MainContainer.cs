@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.Reflection;
 using System.Windows.Forms;
@@ -18,6 +19,9 @@ namespace ReniTest
 
         public static void Main()
         {
+            "Start".Log();
+            Log4NetTextWriter.Register(false);
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
@@ -27,18 +31,23 @@ namespace ReniTest
 
         static void RunAllTests()
         {
-            new ReniUI.Test.BraceMatching().MatchingBraces();
-
+            var configuration = TestRunner.Configuration;
             if(Debugger.IsAttached)
             {
-                TestRunner.IsBreakDisabled = false;
-                TestRunner.IsModeErrorFocus = true;
-                TestRunner.TestsFileName = SmbFile.SourcePath(0).PathCombine("PendingTests.debug.cs");
+                configuration.IsBreakEnabled = true;
+                configuration.SkipSuccessfulMethods = true;
+                configuration.SaveResults = true;
+                PendingTests.Run();
+                configuration.TestsFileName = SmbFile.SourcePath().PathCombine("PendingTests.cs");
             }
             else
-                TestRunner.TestsFileName = SmbFile.SourcePath(0).PathCombine("PendingTests.cs");
-
+            {
+                //configuration.SkipSuccessfulMethods = true;
+                configuration.SaveResults = true;
+                configuration.TestsFileName = SmbFile.SourcePath().PathCombine("PendingTests.cs");
+            }
             Assembly.GetExecutingAssembly().RunTests();
+
         }
 
         // Keep this to ensure reference to ReniUI

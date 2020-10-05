@@ -11,7 +11,7 @@ using Reni.Runtime;
 namespace Reni.Basics
 {
     [DumpToString]
-    sealed class BitsConst : DumpableObject
+    public sealed class BitsConst : DumpableObject
     {
         [UnitTest]
         public sealed class Test

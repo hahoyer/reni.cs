@@ -16,14 +16,14 @@ namespace Reni.Runtime
         void IOutStream.AddData(string x)
         {
             _data += x;
-            Tracer.Line("-data----------------\n" + _data + "|<--\n---------------------");
+            Tracer.Log("-data----------------\n" + _data + "|<--\n---------------------");
             Tracer.Assert(_data.Length < 1000);
         }
 
         void IOutStream.AddLog(string x)
         {
             _log += x;
-            Tracer.Line("-log----------------\n" + _log + "\n---------------------");
+            Tracer.Log("-log----------------\n" + _log + "\n---------------------");
         }
     }
 }

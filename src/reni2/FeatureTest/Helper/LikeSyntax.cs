@@ -1,3 +1,4 @@
+using System;
 using hw.DebugFormatter;
 using Reni.Parser;
 using Reni.Struct;
@@ -34,12 +35,14 @@ namespace Reni.FeatureTest.Helper
 
         public LikeSyntax Expression(string s2) => new Expression(this, s2, null);
 
+        [Obsolete("",true)]
         internal abstract void AssertLike(BinaryTree binaryTree);
         internal abstract void AssertLike(ValueSyntax syntax);
     }
 
     sealed class Empty : LikeSyntax
     {
+        [Obsolete("",true)]
         internal override void AssertLike(BinaryTree binaryTree)
             => Tracer.Assert(binaryTree.Syntax(null).Target is EmptyList);
 
@@ -80,6 +83,7 @@ namespace Reni.FeatureTest.Helper
             _converters = converters;
         }
 
+        [Obsolete("",true)]
         internal override void AssertLike(BinaryTree binaryTree) => AssertLike(binaryTree.Syntax(null).Target);
 
         internal override void AssertLike(ValueSyntax syntax)
@@ -109,6 +113,7 @@ namespace Reni.FeatureTest.Helper
                 syntax.AssertLike(right);
         }
 
+        [Obsolete("",true)]
         static void AssertLike(LikeSyntax syntax, BinaryTree right)
         {
             if(syntax == null)
@@ -128,6 +133,7 @@ namespace Reni.FeatureTest.Helper
             _s3 = s3;
         }
 
+        [Obsolete("",true)]
         internal override void AssertLike(Reni.TokenClasses.BinaryTree binaryTree) 
             => AssertLike(binaryTree.Syntax(null).Target);
 
@@ -146,6 +152,7 @@ namespace Reni.FeatureTest.Helper
 
         internal Number(long i) => _i = i;
 
+        [Obsolete("",true)]
         internal override void AssertLike(BinaryTree binaryTree)
         {
             var terminalSyntax = (TerminalSyntax) binaryTree.Syntax(null).Target;

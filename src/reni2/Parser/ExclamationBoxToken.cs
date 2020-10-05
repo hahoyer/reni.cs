@@ -7,11 +7,9 @@ using Reni.Validation;
 namespace Reni.Parser
 {
     sealed class ExclamationBoxToken
-        : DumpableObject,
-            IParserTokenType<BinaryTree>,
-            ITokenClass,
-            IDeclarerTokenClass
+        : DumpableObject, IParserTokenType<BinaryTree>, ITokenClass, IDeclarerTokenClass, ISyntaxFactoryToken
     {
+        BinaryTree Value { get; }
         internal ExclamationBoxToken(BinaryTree value) => Value = value;
 
         [CanBeNull]
@@ -37,7 +35,8 @@ namespace Reni.Parser
         }
 
         string IParserTokenType<BinaryTree>.PrioTableId => PrioTable.Any;
+
+        ISyntaxFactory ISyntaxFactoryToken.Provider => SyntaxFactory.DeclarationMark;
         string ITokenClass.Id => "!";
-        BinaryTree Value {get;}
     }
 }

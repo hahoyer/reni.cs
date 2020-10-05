@@ -11,14 +11,14 @@ namespace Reni.Basics
 {
     [AdditionalNodeInfo("DebuggerDumpString")]
     [DebuggerDisplay("{NodeDump,nq}")]
-    sealed class Size
+    public sealed class Size
         : DumpableObject
             , IIconKeyProvider
             , IComparable<Size>
             , IAggregateable<Size>
     {
         [UnitTest]
-        sealed class Tests
+        public sealed class Tests
         {
             [UnitTest]
             public void NextPacketSize()

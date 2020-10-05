@@ -61,7 +61,7 @@ namespace Reni
         [UsedImplicitly]
         public Exception Exception;
         readonly ValueCache<CodeContainer> CodeContainerCache;
-        readonly ValueCache<BinaryTree> SyntaxCache;
+        readonly ValueCache<BinaryTree> BinaryTreeCache;
         readonly ValueCache<Result<ValueSyntax>> ValueSyntaxCache;
 
         readonly MainTokenFactory MainTokenFactory;
@@ -94,22 +94,20 @@ namespace Reni
 
             Root = new Root(this);
             CodeContainerCache = NewValueCache(GetCodeContainer);
-            SyntaxCache = NewValueCache(() => Parse(Source + 0));
-            ValueSyntaxCache = NewValueCache(GetValue);
+            BinaryTreeCache = NewValueCache(() => Parse(Source + 0));
+            ValueSyntaxCache = NewValueCache(GetValueSyntax);
         }
 
+        Result<ValueSyntax> GetValueSyntax() => Parameters.ParseOnly? null : BinaryTree.GetFrameSyntax();
+
         CodeContainer GetCodeContainer() => new CodeContainer(Syntax, Root, ModuleName, Source.Data);
-
-        Result<ValueSyntax> GetValue() 
-            => CompoundSyntax.Create(BinaryTree.GetStatements(null), BinaryTree);
-
 
         static string ModuleNameFromFileName(string fileName)
             => "_" + Path.GetFileName(fileName).Symbolize();
 
         [Node]
         [DisableDump]
-        public BinaryTree BinaryTree => SyntaxCache.Value;
+        public BinaryTree BinaryTree => BinaryTreeCache.Value;
 
         [Node]
         [DisableDump]
@@ -170,7 +168,7 @@ namespace Reni
         {
             if(Parameters.ParseOnly)
             {
-                SyntaxCache.IsValid = true;
+                BinaryTreeCache.IsValid = true;
                 return;
             }
 
@@ -236,7 +234,7 @@ namespace Reni
 
         [DisableDump]
         internal IEnumerable<Issue> Issues 
-            => T(ValueSyntaxCache.Value.Issues, CodeContainer?.Issues).Concat();
+            => T(ValueSyntaxCache.Value?.Issues, CodeContainer?.Issues).Concat();
 
         BinaryTree Parse(SourcePosition source) => this["Main"].Parser.Execute(source);
 
@@ -363,8 +361,8 @@ namespace Reni
         void ITraceCollector.Run(DataStack dataStack, IFormalCodeItem codeBase)
         {
             const string Stars = "\n******************************\n";
-            Tracer.Line(Stars + dataStack.Dump() + Stars);
-            Tracer.Line(codeBase.Dump());
+            Tracer.Log(Stars + dataStack.Dump() + Stars);
+            Tracer.Log(codeBase.Dump());
             Tracer.IndentStart();
             codeBase.Visit(dataStack);
             Tracer.IndentEnd();
@@ -372,14 +370,14 @@ namespace Reni
 
         void ITraceCollector.Call(StackData argsAndRefs, FunctionId functionId)
         {
-            Tracer.Line("\n>>>>>> Call" + functionId.NodeDump + "\n");
+            Tracer.Log("\n>>>>>> Call" + functionId.NodeDump + "\n");
             Tracer.IndentStart();
         }
 
         void ITraceCollector.Return()
         {
             Tracer.IndentEnd();
-            Tracer.Line("\n<<<<<< Return\n");
+            Tracer.Log("\n<<<<<< Return\n");
         }
     }
 

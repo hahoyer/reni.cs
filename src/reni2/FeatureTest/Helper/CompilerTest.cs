@@ -21,7 +21,7 @@ namespace Reni.FeatureTest.Helper
         protected CompilerTest()
         {
             Parameters = new CompilerParameters();
-            if(TestRunner.IsModeErrorFocus)
+            if(TestRunner.Configuration.SkipSuccessfulMethods)
                 Parameters.TraceOptions.UseOnModeErrorFocus();
         }
 
@@ -71,7 +71,7 @@ namespace Reni.FeatureTest.Helper
 
                 if(outStream.Data != targetSet.Output)
                 {
-                    Tracer.Line
+                    Tracer.Log
                         ("---------------------\n" + outStream.Data + "\n---------------------");
                     Tracer.ThrowAssertionFailed
                         (
@@ -82,7 +82,7 @@ namespace Reni.FeatureTest.Helper
                 }
 
                 foreach (var issue in compiler.Issues)
-                    Tracer.Line(issue.Dump());
+                    Tracer.Log(issue.Dump());
 
                 try
                 {
@@ -90,7 +90,7 @@ namespace Reni.FeatureTest.Helper
                 }
                 catch(Exception)
                 {
-                    Tracer.Line
+                    Tracer.Log
                         ("---------------------\n" + compiler.Issues + "\n---------------------");
                     throw;
                 }

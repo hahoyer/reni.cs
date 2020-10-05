@@ -24,7 +24,7 @@ namespace ReniTest
 
         static void Run(SmbFile file)
         {
-            Tracer.Line(Tracer.FilePosition(file.FullName,0,0,0,0,FilePositionTag.Test));
+            (file.FullName.ToSmbFile().FilePosition(null, FilePositionTag.Test)).Log();
             if(file.IsDirectory)
                 foreach(var item in file.Items)
                     Run(item);

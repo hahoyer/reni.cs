@@ -144,6 +144,7 @@
     <Compile Include="hw\DebugFormatter\EnableDumpAttribute.cs" />
     <Compile Include="hw\DebugFormatter\EnableDumpExceptAttribute.cs" />
     <Compile Include="hw\DebugFormatter\EnableDumpWithExceptionPredicateAttribute.cs" />
+    <Compile Include="hw\DebugFormatter\Log4NetTextWriter.cs" />
     <Compile Include="hw\DebugFormatter\Profiler.cs" />
     <Compile Include="hw\DebugFormatter\TextWriters.cs" />
     <Compile Include="hw\DebugFormatter\Tracer.cs" />
@@ -155,6 +156,7 @@
     <Compile Include="hw\Helper\FunctionCache.cs" />
     <Compile Include="hw\Helper\IUniqueIdProvider.cs" />
     <Compile Include="hw\Helper\LinqExtension.cs" />
+    <Compile Include="hw\Helper\LocationProviderAttribute.cs" />
     <Compile Include="hw\Helper\LongExtender.cs" />
     <Compile Include="hw\Helper\ReflectionExtender.cs" />
     <Compile Include="hw\Helper\SmbFile.cs" />
@@ -334,6 +336,7 @@
     <Compile Include="TokenClasses\EndOfText.cs" />
     <Compile Include="TokenClasses\Extension.cs" />
     <Compile Include="TokenClasses\ExtensionFactoryContainer.cs" />
+    <Compile Include="TokenClasses\FrameSyntax.cs" />
     <Compile Include="TokenClasses\IBelongingsMatcher.cs" />
     <Compile Include="TokenClasses\IComparator.cs" />
     <Compile Include="TokenClasses\IDeclarationItem.cs" />
@@ -357,6 +360,7 @@
     <Compile Include="TokenClasses\RightDeclarationParenthesis.cs" />
     <Compile Include="TokenClasses\RightParenthesisBase.cs" />
     <Compile Include="TokenClasses\BinaryTree.cs" />
+    <Compile Include="TokenClasses\SyntaxFactory.cs" />
     <Compile Include="TokenClasses\TokenClass.cs" />
     <Compile Include="TokenClasses\TokenItem.cs" />
     <Compile Include="TokenClasses\ToNumberOfBase.cs" />
@@ -420,6 +424,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
+    <None Include="Reni2.csproj.DotSettings" />
     <None Include="sys.targets" />
   </ItemGroup>
   <ItemGroup>
@@ -437,16 +442,24 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>AssemblyInfo.cs</LastGenOutput>
     </Content>
+    <Content Include="log4net.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="JetBrains.Annotations, Version=2020.1.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <HintPath>..\..\bin\Packages\JetBrains.Annotations.2020.1.0\lib\net20\JetBrains.Annotations.dll</HintPath>
     </Reference>
+    <Reference Include="log4net, Version=2.0.11.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\..\bin\Packages\log4net.2.0.11\lib\net45\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.framework, Version=3.12.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>..\..\bin\Packages\NUnit.3.12.0\lib\net45\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Numerics" />
+    <Reference Include="System.Web" />
   </ItemGroup>
   <Import Project="sys.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

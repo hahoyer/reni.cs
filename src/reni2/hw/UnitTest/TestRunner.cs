@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using hw.DebugFormatter;
@@ -11,9 +12,16 @@ namespace hw.UnitTest
     [PublicAPI]
     public sealed class TestRunner : Dumpable
     {
-        public static bool IsModeErrorFocus;
-        public static bool? IsBreakDisabled;
-        public static string TestsFileName;
+        [PublicAPI]
+        public class ConfigurationContainer
+        {
+            public bool IsBreakEnabled;
+            public bool SaveResults;
+            public bool SkipSuccessfulMethods;
+            public string TestsFileName;
+        }
+
+        public static readonly ConfigurationContainer Configuration = new ConfigurationContainer();
 
         public static readonly List<IFramework> RegisteredFrameworks = new List<IFramework>();
         int Complete;
@@ -21,7 +29,7 @@ namespace hw.UnitTest
         // ReSharper disable once StringLiteralTypo
         readonly SmbFile ConfigFile = "Test.HW.config".ToSmbFile();
         string CurrentMethodName = "";
-        readonly SmbFile PendingTestsFile = TestsFileName?.ToSmbFile();
+        readonly SmbFile PendingTestsFile = Configuration.TestsFileName?.ToSmbFile();
         string Status = "Start";
 
         readonly Func<Type, bool>[] TestLevels;
@@ -35,7 +43,7 @@ namespace hw.UnitTest
             (
                 TestTypes.IsCircuitFree(DependentTypes),
                 () => Tracer.Dump(TestTypes.Circuits(DependentTypes).ToArray()));
-            if(IsModeErrorFocus)
+            if(Configuration.SkipSuccessfulMethods)
                 LoadConfiguration();
         }
 
@@ -82,18 +90,19 @@ namespace hw.UnitTest
 
         string GeneratedTestCalls
             => TestTypes
-                .Where(testType => !testType.IsSuccessful)
-                .OrderBy(testType => testType.ConfigurationModePriority)
-                .GroupBy(testType => testType.ConfigurationMode)
+                .SelectMany(type => type.UnitTestMethods.Select(method => (type, method)).ToArray())
+                .Where(item => !item.type.IsSuccessful)
+                .OrderBy(item => item.type.GetPriority(item.method))
+                .GroupBy(item => item.type.GetMode(item.method))
                 .Select(GeneratedTestCallsForMode)
                 .Stringify("\n");
 
         string HeaderText => $"{DateTime.Now.Format()} {Status} {Complete} of {TestTypes.Length} {CurrentMethodName}";
 
-        string GeneratedTestCallsForMode(IGrouping<string, TestType> group)
+        string GeneratedTestCallsForMode(IGrouping<string, (TestType type, TestMethod method)> group)
             => $"\n// {group.Key} \n\n" +
                group
-                   .SelectMany(testType => testType.GeneratedTestCalls)
+                   .Select(testType => $"{testType.method.RunString};")
                    .Stringify("\n");
 
         public static bool RunTests(Assembly rootAssembly)
@@ -109,7 +118,7 @@ namespace hw.UnitTest
 
         TestType[] DependentTypes(TestType type)
         {
-            if(IsModeErrorFocus)
+            if(Configuration.SkipSuccessfulMethods)
                 return new TestType[0];
             return
                 type.DependenceProviders.SelectMany
@@ -118,6 +127,12 @@ namespace hw.UnitTest
 
         void Run()
         {
+            "".Log();
+            "".Log();
+            "======================================".Log();
+            "Test run started.".Log();
+            "======================================".Log();
+            "".Log();
             PendingTestsFile?.FilePosition(null, FilePositionTag.Test).Log();
             Status = "run";
             for(var index = 0; index < TestLevels.Length && AllIsFine; index++)
@@ -128,6 +143,10 @@ namespace hw.UnitTest
 
             Status = "ran";
             SaveConfiguration();
+            "".Log();
+            "======================================".Log();
+            "Test run completed.".Log();
+            "======================================".Log();
         }
 
         bool RunLevel(Func<Type, bool> isLevel)
@@ -145,14 +164,7 @@ namespace hw.UnitTest
                     openTest.IsStarted = true;
                     if(dependentTypes.All(test => test.IsSuccessful))
                     {
-                        if(!IsModeErrorFocus)
-                        {
-                            CurrentMethodName = openTest.Type.FullName;
-                            SaveConfiguration();
-                            CurrentMethodName = "";
-                        }
-
-                        openTest.Run();
+                        Run(openTest);
                         Complete++;
                         hasAnyTestRan = true;
                     }
@@ -162,12 +174,44 @@ namespace hw.UnitTest
             return hasAnyTestRan;
         }
 
+        void Run(TestType type)
+        {
+            foreach(var method in type.UnitTestMethods.Where(unitTestMethod => !unitTestMethod.IsSuspended))
+                try
+                {
+                    method.IsActive = true;
+                    CurrentMethodName = method.LongName;
+                    SaveConfiguration();
+                    CurrentMethodName = "";
+
+                    method.Run();
+                }
+                catch(TestFailedException)
+                {
+                    type.FailedMethods.Add(method);
+                }
+                finally
+                {
+                    method.IsActive = false;
+                }
+
+            type.IsComplete = true;
+        }
+
         void SaveConfiguration()
         {
-            ConfigFile.String = ConfigurationString;
-            if(PendingTestsFile != null)
-                PendingTestsFile.String = PendingTestsString;
-            ConfigFileMessage("Configuration saved");
+            try
+            {
+                if(Configuration.SaveResults)
+                {
+                    ConfigFile.String = ConfigurationString;
+                    ConfigFileMessage("Configuration saved");
+                }
+
+                if(PendingTestsFile != null)
+                    PendingTestsFile.String = PendingTestsString;
+            }
+            catch(Exception exception) { }
         }
 
         void ConfigFileMessage(string flagText)
@@ -193,6 +237,9 @@ namespace hw.UnitTest
                 return true;
             return RegisteredFrameworks.Any(any => any.IsUnitTestType(type));
         }
+
+        public static void RunTest(Action action) => new TestMethod(action).Run();
+        public static void RunTest(MethodInfo method) => new TestMethod(method).Run();
     }
 
     public interface IFramework

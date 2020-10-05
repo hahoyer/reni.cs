@@ -760,7 +760,7 @@ namespace Reni.Type
             {
                 case 0: return onError(IssueId.MissingDeclarationForType);
                 case 1: return execute(searchResults.First());
-                default: return onError(IssueId.AmbigousSymbol);
+                default: return onError(IssueId.AmbiguousSymbol);
             }
         }
     }

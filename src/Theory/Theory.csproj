@@ -42,6 +42,7 @@
     <Compile Include="hw\Helper\FunctionCache.cs" />
     <Compile Include="hw\Helper\IUniqueIdProvider.cs" />
     <Compile Include="hw\Helper\LinqExtension.cs" />
+    <Compile Include="hw\Helper\LocationProviderAttribute.cs" />
     <Compile Include="hw\Helper\LongExtender.cs" />
     <Compile Include="hw\Helper\ReflectionExtender.cs" />
     <Compile Include="hw\Helper\SmbFile.cs" />

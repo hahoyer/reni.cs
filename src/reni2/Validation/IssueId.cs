@@ -9,7 +9,8 @@ namespace Reni.Validation
 {
     sealed class IssueId : EnumEx, Match.IError
     {
-        public static readonly IssueId AmbigousSymbol = new IssueId();
+        public static readonly IssueId AmbiguousSymbol = new IssueId();
+        public static readonly IssueId ConsequentialError = new IssueId();
         public static readonly IssueId EOFInComment = new IssueId();
         public static readonly IssueId EOFInLineComment = new IssueId();
         public static readonly IssueId EOLInString = new IssueId();

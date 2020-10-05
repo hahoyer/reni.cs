@@ -19,7 +19,7 @@ namespace ReniUI.Helper
 
         readonly CacheContainer Cache = new CacheContainer();
 
-        internal Syntax(Reni.Parser.ValueSyntax target)
+        internal Syntax(Reni.Parser.Syntax target)
             : this(target, null) { }
 
         Syntax(Reni.Parser.Syntax target, Syntax parent)
