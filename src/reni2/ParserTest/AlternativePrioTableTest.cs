@@ -7,6 +7,7 @@ namespace Reni.ParserTest
     [UnitTest]
     [ParserTest]
     [TestFixture]
+    [LowPriority]
     public sealed class AlternativePrioTableTest : CompilerTest
     {
         [UnitTest]
@@ -15,7 +16,7 @@ namespace Reni.ParserTest
             var syntaxPrototype = LikeSyntax.Compound
             (
                 new[] {LikeSyntax.Number(3)},
-                new Declaration[] {},
+                new Declaration[] { },
                 new[] {0}
             );
             Parameters.ParseOnly = true;
@@ -32,7 +33,7 @@ namespace Reni.ParserTest
             var syntaxPrototype = LikeSyntax.Compound
             (
                 new[] {LikeSyntax.Number(3), LikeSyntax.Number(4)},
-                new Declaration[] {},
+                new Declaration[] { },
                 new[] {0, 1}
             );
             Parameters.ParseOnly = true;
@@ -51,7 +52,7 @@ namespace Reni.ParserTest
             (
                 new[] {LikeSyntax.Number(3)},
                 new[] {new Declaration("converter", 0)},
-                new int[] {}
+                new int[] { }
             );
             Parameters.ParseOnly = true;
             CreateFileAndRunCompiler

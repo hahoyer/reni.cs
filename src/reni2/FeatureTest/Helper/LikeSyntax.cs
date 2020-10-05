@@ -8,44 +8,53 @@ namespace Reni.FeatureTest.Helper
 {
     abstract class LikeSyntax : DumpableObject
     {
+        public static LikeSyntax Null => new Empty();
+        public LikeSyntax dump_print => Expression("dump_print");
         public static LikeSyntax Number(int i) => new Number(i);
 
         public static LikeSyntax Expression(LikeSyntax s1, string s2, LikeSyntax s3)
             => new Expression(s1, s2, s3);
 
-        public static LikeSyntax Compound
-            (LikeSyntax[] list, Declaration[] declarations, int[] converters)
+        public static LikeSyntax Compound(LikeSyntax[] list, Declaration[] declarations, int[] converters)
             => new Struct(list, declarations, converters);
 
 
-        public static LikeSyntax operator+(LikeSyntax x, LikeSyntax y) => x.Expression("+", y);
-        public static LikeSyntax operator-(LikeSyntax x, LikeSyntax y) => x.Expression("-", y);
-        public static LikeSyntax operator*(LikeSyntax x, LikeSyntax y) => x.Expression("*", y);
-        public static LikeSyntax operator/(LikeSyntax x, LikeSyntax y) => x.Expression("/", y);
-
-        public static LikeSyntax Null => new Empty();
+        public static LikeSyntax operator +(LikeSyntax x, LikeSyntax y) => x.Expression("+", y);
+        public static LikeSyntax operator -(LikeSyntax x, LikeSyntax y) => x.Expression("-", y);
+        public static LikeSyntax operator *(LikeSyntax x, LikeSyntax y) => x.Expression("*", y);
+        public static LikeSyntax operator /(LikeSyntax x, LikeSyntax y) => x.Expression("/", y);
 
         public static Declaration Declaration(string name, int position)
             => new Declaration(name, position);
 
         public static LikeSyntax Symbol(string s) => new Expression(null, s, null);
-        public LikeSyntax dump_print => Expression("dump_print");
 
         public LikeSyntax Expression(string s2, LikeSyntax s3) => new Expression(this, s2, s3);
 
         public LikeSyntax Expression(string s2) => new Expression(this, s2, null);
 
-        [Obsolete("",true)]
-        internal abstract void AssertLike(BinaryTree binaryTree);
+        internal abstract void AssertLike(BinaryTree target);
+
+        [Obsolete("", true)]
         internal abstract void AssertLike(ValueSyntax syntax);
     }
 
     sealed class Empty : LikeSyntax
     {
-        [Obsolete("",true)]
-        internal override void AssertLike(BinaryTree binaryTree)
-            => Tracer.Assert(binaryTree.Syntax(null).Target is EmptyList);
+        internal override void AssertLike(BinaryTree target)
+        {
+            Tracer.Assert(target.Left != null);
+            Tracer.Assert(target.TokenClass is RightParenthesis);
+            Tracer.Assert(target.Right == null);
 
+            Tracer.Assert(target.Left.Left == null);
+            Tracer.Assert(target.Left.TokenClass is LeftParenthesis);
+            Tracer.Assert(target.Right == null);
+
+            Tracer.Assert(target.Left.TokenClass.IsBelongingTo(target.TokenClass));
+        }
+
+        [Obsolete("", true)]
         internal override void AssertLike(ValueSyntax syntax)
             => Tracer.Assert(syntax is EmptyList);
     }
@@ -83,12 +92,13 @@ namespace Reni.FeatureTest.Helper
             _converters = converters;
         }
 
-        [Obsolete("",true)]
-        internal override void AssertLike(BinaryTree binaryTree) => AssertLike(binaryTree.Syntax(null).Target);
+        internal override void AssertLike(BinaryTree target) 
+            => NotImplementedMethod(target);
 
+        [Obsolete("", true)]
         internal override void AssertLike(ValueSyntax syntax)
         {
-            var co = (CompoundSyntax) syntax;
+            var co = (CompoundSyntax)syntax;
             Tracer.Assert(_list.Length == co.SyntaxStatements.Length);
             for(var i = 0; i < _list.Length; i++)
                 _list[i].AssertLike(co.SyntaxStatements[i]);
@@ -105,23 +115,6 @@ namespace Reni.FeatureTest.Helper
 
     sealed class Expression : LikeSyntax
     {
-        static void AssertLike(LikeSyntax syntax, ValueSyntax right)
-        {
-            if(syntax == null)
-                Tracer.Assert(right == null);
-            else
-                syntax.AssertLike(right);
-        }
-
-        [Obsolete("",true)]
-        static void AssertLike(LikeSyntax syntax, BinaryTree right)
-        {
-            if(syntax == null)
-                Tracer.Assert(right == null);
-            else
-                syntax.AssertLike(right);
-        }
-
         readonly LikeSyntax _s1;
         readonly string _s2;
         readonly LikeSyntax _s3;
@@ -133,13 +126,34 @@ namespace Reni.FeatureTest.Helper
             _s3 = s3;
         }
 
-        [Obsolete("",true)]
-        internal override void AssertLike(Reni.TokenClasses.BinaryTree binaryTree) 
-            => AssertLike(binaryTree.Syntax(null).Target);
+        [Obsolete("", true)]
+        static void AssertLike(LikeSyntax syntax, ValueSyntax right)
+        {
+            if(syntax == null)
+                Tracer.Assert(right == null);
+            else
+                syntax.AssertLike(right);
+        }
 
+        static void AssertLike(LikeSyntax syntax, BinaryTree right)
+        {
+            if(syntax == null)
+                Tracer.Assert(right == null);
+            else
+                syntax.AssertLike(right);
+        }
+
+        internal override void AssertLike(BinaryTree target)
+        {
+            AssertLike(_s1, target.Left);
+            Tracer.Assert(target.TokenClass.Id == _s2);
+            AssertLike(_s3, target.Right);
+        }
+
+        [Obsolete("", true)]
         internal override void AssertLike(ValueSyntax syntax)
         {
-            var ex = (ExpressionSyntax) syntax;
+            var ex = (ExpressionSyntax)syntax;
             AssertLike(_s1, ex.Left);
             Tracer.Assert(ex.Definable?.Id == _s2);
             AssertLike(_s3, ex.Right);
@@ -152,17 +166,17 @@ namespace Reni.FeatureTest.Helper
 
         internal Number(long i) => _i = i;
 
-        [Obsolete("",true)]
-        internal override void AssertLike(BinaryTree binaryTree)
+        [Obsolete("", true)]
+        internal override void AssertLike(BinaryTree target)
         {
-            var terminalSyntax = (TerminalSyntax) binaryTree.Syntax(null).Target;
+            var terminalSyntax = (TerminalSyntax)target.Syntax(null).Target;
             Tracer.Assert(terminalSyntax.Terminal is TokenClasses.Number);
             Tracer.Assert(terminalSyntax.ToNumber == _i);
         }
 
         internal override void AssertLike(ValueSyntax syntax)
         {
-            var terminalSyntax = (TerminalSyntax) syntax;
+            var terminalSyntax = (TerminalSyntax)syntax;
             Tracer.Assert(terminalSyntax.Terminal is TokenClasses.Number);
             Tracer.Assert(terminalSyntax.ToNumber == _i);
         }
