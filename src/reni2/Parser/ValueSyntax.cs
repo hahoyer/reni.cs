@@ -23,8 +23,8 @@ namespace Reni.Parser
         protected ValueSyntax(BinaryTree binaryTree)
             : base(binaryTree) { }
 
-        protected ValueSyntax(int objectId, BinaryTree binaryTree)
-            : base(objectId, binaryTree) { }
+        protected ValueSyntax(int objectId, BinaryTree target)
+            : base(objectId, target) { }
 
         [DisableDump]
         internal virtual bool IsLambda => false;

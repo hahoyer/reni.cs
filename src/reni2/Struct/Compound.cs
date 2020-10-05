@@ -116,7 +116,7 @@ namespace Reni.Struct
                     .Aggregate
                     (
                         Parent.RootContext.VoidType.Result(category.Typed),
-                        (current, next) => current.Sequence(next,Syntax.BinaryTree.SourcePart)
+                        (current, next) => current.Sequence(next,Syntax.Target.SourcePart)
                     );
                 return ReturnMethodDump(result);
             }

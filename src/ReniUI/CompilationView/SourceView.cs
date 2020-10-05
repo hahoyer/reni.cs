@@ -146,7 +146,7 @@ namespace ReniUI.CompilationView
         }
 
         void SignalContextMenuSelect(ValueSyntax syntax)
-            => TextBox.SetSelection(syntax.BinaryTree.SourcePart.Position, syntax.BinaryTree.SourcePart.EndPosition);
+            => TextBox.SetSelection(syntax.Target.SourcePart.Position, syntax.Target.SourcePart.EndPosition);
 
         void StyleConfig(TextStyle id) => id.Config(TextBox.Styles[id]);
 

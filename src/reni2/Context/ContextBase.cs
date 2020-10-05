@@ -67,7 +67,7 @@ namespace Reni.Context
             int SyntaxObjectId => Syntax.ObjectId;
 
             [EnableDump]
-            string SyntaxText => Syntax.BinaryTree.SourcePart.Id;
+            string SyntaxText => Syntax.Target.SourcePart.Id;
         }
 
         internal sealed class Cache : DumpableObject, IIconKeyProvider

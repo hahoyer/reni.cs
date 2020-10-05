@@ -12,13 +12,13 @@ namespace Reni.Parser
     /// </summary>
     abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer
     {
-        internal readonly BinaryTree BinaryTree;
+        internal readonly BinaryTree Target;
 
-        protected Syntax(BinaryTree binaryTree) => BinaryTree = binaryTree;
+        protected Syntax(BinaryTree binaryTree) => Target = binaryTree;
 
-        protected Syntax(int objectId, BinaryTree binaryTree)
+        protected Syntax(int objectId, BinaryTree target)
             : base(objectId)
-            => BinaryTree = binaryTree;
+            => Target = target;
 
         internal Syntax[] Children => this.CachedValue(() => GetChildren().ToArray());
 

@@ -74,13 +74,13 @@ namespace Reni.Parser
         internal override Result ResultForCache(ContextBase context, Category category)
         {
             if(CurrentResultDepth > 20)
-                throw new EvaluationDepthExhaustedException(BinaryTree, context, CurrentResultDepth);
+                throw new EvaluationDepthExhaustedException(Target, context, CurrentResultDepth);
 
             try
             {
                 CurrentResultDepth++;
                 if(Left == null)
-                    return context.PrefixResult(category, Definable, BinaryTree, Right);
+                    return context.PrefixResult(category, Definable, Target, Right);
 
                 var left = context.ResultAsReferenceCache(Left);
 
@@ -92,7 +92,7 @@ namespace Reni.Parser
                     return leftType.Issues.Result(category);
 
                 return leftType
-                    .Execute(category, left, BinaryTree, Definable, context, Right);
+                    .Execute(category, left, Target, Definable, context, Right);
             }
             finally
             {
@@ -107,7 +107,7 @@ namespace Reni.Parser
             if(left == null && right == null)
                 return null;
 
-            var result = Definable.CreateForVisit(BinaryTree, left ?? Left, right ?? Right);
+            var result = Definable.CreateForVisit(Target, left ?? Left, right ?? Right);
             Tracer.Assert(!result.Issues.Any());
             return result.Target;
         }

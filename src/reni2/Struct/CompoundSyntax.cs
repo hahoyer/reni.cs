@@ -26,8 +26,8 @@ namespace Reni.Struct
         readonly ValueSyntax CleanupSection;
         readonly Statement[] Statements;
 
-        CompoundSyntax(Statement[] statements, ValueSyntax cleanupSection, BinaryTree binaryTree)
-            : base(NextObjectId++, binaryTree)
+        CompoundSyntax(Statement[] statements, ValueSyntax cleanupSection, BinaryTree target)
+            : base(NextObjectId++, target)
         {
             Statements = statements;
             CleanupSection = cleanupSection;
@@ -147,7 +147,7 @@ namespace Reni.Struct
 
             var newStatements = statements.Select((s, i) => s ?? Statements[i]).ToArray();
             var newCleanupSection = cleanupSection ?? CleanupSection;
-            return new CompoundSyntax(newStatements, newCleanupSection, BinaryTree);
+            return new CompoundSyntax(newStatements, newCleanupSection, Target);
         }
 
         internal Result Cleanup(ContextBase context, Category category)

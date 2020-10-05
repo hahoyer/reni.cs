@@ -33,7 +33,7 @@ namespace Reni.Parser
         internal long ToNumber => BitsConst.Convert(Id).ToInt64();
 
         [DisableDump]
-        internal SourcePart Token => BinaryTree.Token.Characters;
+        internal SourcePart Token => Target.Token.Characters;
 
         protected override string GetNodeDump() => Terminal.NodeDump();
     }
@@ -61,7 +61,7 @@ namespace Reni.Parser
         protected override IEnumerable<Syntax> GetChildren() => T(Right);
 
         internal override Result ResultForCache(ContextBase context, Category category) => Prefix
-            .Result(context, category, Right, BinaryTree);
+            .Result(context, category, Right, Target);
 
         protected override string GetNodeDump() => Prefix.NodeDump() + "(" + Right.NodeDump + ")";
     }

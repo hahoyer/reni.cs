@@ -5,6 +5,6 @@ namespace Reni.FeatureTest.Helper
     static class Extension
     {
         public static void AssertSyntaxIsLike(this Compiler compiler, LikeSyntax prototype)
-            => prototype.AssertLike(compiler.Syntax.BinaryTree.Left.Right);
+            => prototype.AssertLike(compiler.Syntax.Target.Left.Right);
     }
 }

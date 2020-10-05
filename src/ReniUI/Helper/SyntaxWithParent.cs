@@ -15,7 +15,7 @@ namespace ReniUI.Helper
             : base(target, parent) { }
 
         [DisableDump]
-        internal IToken Token => Target.BinaryTree.Token;
+        internal IToken Token => Target.Target.Token;
 
         [DisableDump]
         internal TResult FirstOrDefault => Children.FirstOrDefault(IsLeftSiteChild);
@@ -59,7 +59,7 @@ namespace ReniUI.Helper
         }
 
         [EnableDump]
-        internal ITokenClass TokenClass => Target.BinaryTree.TokenClass;
+        internal ITokenClass TokenClass => Target.Target.TokenClass;
 
         [DisableDump]
         TResult LeftParent
