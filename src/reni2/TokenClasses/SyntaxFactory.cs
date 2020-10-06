@@ -1,19 +1,26 @@
+using System.Linq;
 using hw.DebugFormatter;
 using Reni.Parser;
 
 namespace Reni.TokenClasses
 {
-    static class SyntaxFactory
+    class SyntaxFactory : DumpableObject, IDefaultScopeProvider
     {
         class BracketHandler : DumpableObject, ISyntaxFactory
         {
-            Result<DeclarerSyntax> ISyntaxFactory.GetDeclarerSyntax(BinaryTree target)
+            Result<DeclarerSyntax> ISyntaxFactory.GetDeclarerSyntax(BinaryTree target, SyntaxFactory factory)
             {
-                NotImplementedFunction(target);
+                NotImplementedMethod(target, factory);
                 return default;
             }
 
-            Result<ValueSyntax> ISyntaxFactory.GetValueSyntax(BinaryTree target)
+            Result<Syntax> ISyntaxFactory.GetSyntax(BinaryTree target, SyntaxFactory factory)
+            {
+                NotImplementedMethod(target, factory);
+                return default;
+            }
+
+            Result<ValueSyntax> ISyntaxFactory.GetValueSyntax(BinaryTree target, SyntaxFactory factory)
             {
                 Tracer.Assert(target.Left != null);
                 Tracer.Assert(target.Right == null);
@@ -23,16 +30,20 @@ namespace Reni.TokenClasses
                 );
                 Tracer.Assert(target.Left.Right != null);
 
-                var result = GetValueSyntax(target.Left.Right).ToBracketFrame(target);
+                var result = factory
+                    .GetSyntax(target.Left.Right)
+                    .Target
+                    .ToValueSyntax(target)
+                    .With(factory.GetSyntax(target.Left.Right).Issues);
 
-                NotImplementedFunction(target);
+                NotImplementedMethod(target, factory);
                 return default;
             }
         }
 
         class DeclarationMarkHandler : DumpableObject, ISyntaxFactory
         {
-            Result<DeclarerSyntax> ISyntaxFactory.GetDeclarerSyntax(BinaryTree target)
+            Result<DeclarerSyntax> ISyntaxFactory.GetDeclarerSyntax(BinaryTree target, SyntaxFactory factory)
             {
                 Tracer.Assert(target.Left == null);
                 Tracer.Assert(target.Right != null);
@@ -42,51 +53,83 @@ namespace Reni.TokenClasses
                 var tag = target.Right.TokenClass as DeclarationTagToken;
                 Tracer.Assert(tag != null);
 
-                return new DeclarerSyntax.Tag(tag, target);
+                return DeclarerSyntax.Tag(tag, target);
+            }
 
-                NotImplementedFunction(target);
+            Result<Syntax> ISyntaxFactory.GetSyntax(BinaryTree target, SyntaxFactory factory)
+            {
+                NotImplementedMethod(target, factory);
                 return default;
             }
 
 
-            Result<ValueSyntax> ISyntaxFactory.GetValueSyntax(BinaryTree target)
+            Result<ValueSyntax> ISyntaxFactory.GetValueSyntax(BinaryTree target, SyntaxFactory factory)
             {
-                NotImplementedFunction(target);
+                NotImplementedMethod(target, factory);
                 return default;
             }
         }
 
         class ColonHandler : DumpableObject, ISyntaxFactory
         {
-            Result<DeclarerSyntax> ISyntaxFactory.GetDeclarerSyntax(BinaryTree target)
+            Result<DeclarerSyntax> ISyntaxFactory.GetDeclarerSyntax(BinaryTree target, SyntaxFactory factory)
             {
-                NotImplementedFunction(target);
+                NotImplementedMethod(target, factory);
                 return default;
             }
 
-            Result<ValueSyntax> ISyntaxFactory.GetValueSyntax(BinaryTree target)
-            {
-                var declarer = GetDeclarerSyntax(target.Left);
-                var value = GetValueSyntax(target.Right);
+            Result<Syntax> ISyntaxFactory.GetSyntax(BinaryTree target, SyntaxFactory factory) 
+                => factory.ToDeclaration(target);
 
-                return ToDeclaration(declarer, target, value);
+            Result<ValueSyntax> ISyntaxFactory.GetValueSyntax(BinaryTree target, SyntaxFactory factory)
+            {
+                NotImplementedMethod(target, factory);
+                return default;
             }
         }
 
         class DefinableHandler : DumpableObject, ISyntaxFactory
         {
-            Result<DeclarerSyntax> ISyntaxFactory.GetDeclarerSyntax(BinaryTree target)
+            Result<DeclarerSyntax> ISyntaxFactory.GetDeclarerSyntax(BinaryTree target, SyntaxFactory factory)
             {
                 Tracer.Assert(target.Right == null);
 
-                var left = target.Left == null? null : GetDeclarerSyntax(target.Left);
-                return left.ToDeclarer(target, target.Token.Characters.Id);
+                var left = target.Left == null? null : factory.GetDeclarerSyntax(target.Left);
+                return ToDeclarer(left, target, target.Token.Characters.Id);
             }
 
-            Result<ValueSyntax> ISyntaxFactory.GetValueSyntax(BinaryTree target)
+            Result<Syntax> ISyntaxFactory.GetSyntax(BinaryTree target, SyntaxFactory factory)
             {
-                NotImplementedFunction(target);
+                NotImplementedMethod(target, factory);
                 return default;
+            }
+
+            Result<ValueSyntax> ISyntaxFactory.GetValueSyntax(BinaryTree target, SyntaxFactory factory)
+            {
+                NotImplementedMethod(target, factory);
+                return default;
+            }
+        }
+
+        class TerminalHandler : DumpableObject, ISyntaxFactory
+        {
+            Result<DeclarerSyntax> ISyntaxFactory.GetDeclarerSyntax(BinaryTree target, SyntaxFactory factory)
+            {
+                NotImplementedMethod(target, factory);
+                return default;
+            }
+
+            Result<Syntax> ISyntaxFactory.GetSyntax(BinaryTree target, SyntaxFactory factory)
+            {
+                NotImplementedMethod(target, factory);
+                return default;
+            }
+
+            Result<ValueSyntax> ISyntaxFactory.GetValueSyntax(BinaryTree target, SyntaxFactory factory)
+            {
+                Tracer.Assert(target.Left == null);
+                Tracer.Assert(target.Right == null);
+                return new TerminalSyntax((ITerminal)target.TokenClass, target);
             }
         }
 
@@ -94,60 +137,60 @@ namespace Reni.TokenClasses
         internal static readonly ISyntaxFactory DeclarationMark = new DeclarationMarkHandler();
         internal static readonly ISyntaxFactory Colon = new ColonHandler();
         internal static readonly ISyntaxFactory Definable = new DefinableHandler();
+        internal static readonly ISyntaxFactory Terminal = new TerminalHandler();
+        internal static readonly SyntaxFactory Root = new SyntaxFactory();
 
+        bool IDefaultScopeProvider.MeansPublic => true;
 
-        internal static Result<ValueSyntax> GetFrameSyntax(this BinaryTree target)
-            => GetValueSyntax(target).ToFrame();
-
-        static Result<DeclarerSyntax> GetDeclarerSyntax(BinaryTree target)
+        Result<DeclarerSyntax> GetDeclarerSyntax(BinaryTree target)
         {
             if(target.TokenClass is ISyntaxFactoryToken token)
-                return token.Provider.GetDeclarerSyntax(target);
+                return token.Provider.GetDeclarerSyntax(target, this);
 
-            Dumpable.NotImplementedFunction(target, nameof(target.TokenClass), target.TokenClass);
+            NotImplementedMethod(target, nameof(target.TokenClass), target.TokenClass);
             return default;
         }
 
-        static Result<ValueSyntax> GetValueSyntax(this BinaryTree target)
+        Result<ValueSyntax> GetValueSyntax(BinaryTree target)
         {
             if(target.TokenClass is ISyntaxFactoryToken token)
-                return token.Provider.GetValueSyntax(target);
+                return token.Provider.GetValueSyntax(target, this);
 
-            Dumpable.NotImplementedFunction(target, nameof(target.TokenClass), target.TokenClass);
+            NotImplementedMethod(target, nameof(target.TokenClass), target.TokenClass);
             return default;
         }
 
-        static Result<ValueSyntax> ToFrame(this Result<ValueSyntax> target)
+        internal Result<Syntax> GetSyntax(BinaryTree target)
         {
-            Dumpable.NotImplementedFunction(target);
+            if(target.TokenClass is ISyntaxFactoryToken token)
+                return token.Provider.GetSyntax(target, this);
+
+            NotImplementedMethod(target, nameof(target.TokenClass), target.TokenClass);
             return default;
         }
 
-        static Result<ValueSyntax> ToBracketFrame(this Result<ValueSyntax> target, BinaryTree root)
+        static Result<DeclarerSyntax> ToDeclarer(Result<DeclarerSyntax> left, BinaryTree root, string name)
         {
-            Dumpable.NotImplementedFunction(target, root.TokenClass);
-            return default;
+            Tracer.Assert(!left.Issues.Any());
+            return left.Target.WithName(root, name);
         }
 
-        static Result<ValueSyntax> ToDeclaration
-            (Result<DeclarerSyntax> declarer, BinaryTree root, Result<ValueSyntax> value)
+        Result<Syntax> ToDeclaration(BinaryTree target)
         {
-            Dumpable.NotImplementedFunction(declarer, root.TokenClass, value);
-            return default;
-        }
+            var declarer = GetDeclarerSyntax(target.Left);
+            var value = GetValueSyntax(target.Right);
 
-        static Result<DeclarerSyntax> ToDeclarer(this Result<DeclarerSyntax> left, BinaryTree root, string name)
-        {
-
-            Dumpable.NotImplementedFunction(left, root.TokenClass, name);
-            return default;
+            Tracer.Assert(!declarer.Issues.Any());
+            Tracer.Assert(!value.Issues.Any());
+            return new DeclarationSyntax(declarer.Target, target, value.Target, this);
         }
     }
 
     interface ISyntaxFactory
     {
-        Result<ValueSyntax> GetValueSyntax(BinaryTree target);
-        Result<DeclarerSyntax> GetDeclarerSyntax(BinaryTree target);
+        Result<ValueSyntax> GetValueSyntax(BinaryTree target, SyntaxFactory factory);
+        Result<DeclarerSyntax> GetDeclarerSyntax(BinaryTree target, SyntaxFactory factory);
+        Result<Syntax> GetSyntax(BinaryTree target, SyntaxFactory factory);
     }
 
     interface ISyntaxFactoryToken

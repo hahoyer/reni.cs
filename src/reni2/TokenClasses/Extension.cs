@@ -2,10 +2,11 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using Reni.Parser;
 
 namespace Reni.TokenClasses
 {
-    static class Extension
+    static partial class Extension
     {
         internal static BinaryTree[] Combine(this IEnumerable<IEnumerable<BinaryTree>> targets)
         {
@@ -13,6 +14,12 @@ namespace Reni.TokenClasses
             return target
                 .Where(b => !target.Any(p => p != b && p.SourcePart.Contains(b.SourcePart)))
                 .ToArray();
+        }
+
+        internal static Result<ValueSyntax> ToFrame(this Result<Syntax> target)
+        {
+            Dumpable.NotImplementedFunction(target);
+            return default;
         }
     }
 }

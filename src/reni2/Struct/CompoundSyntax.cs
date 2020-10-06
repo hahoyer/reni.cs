@@ -24,24 +24,46 @@ namespace Reni.Struct
         static int NextObjectId;
 
         readonly ValueSyntax CleanupSection;
-        readonly Statement[] Statements;
+        readonly DeclarationSyntax[] Statements;
 
-        CompoundSyntax(Statement[] statements, ValueSyntax cleanupSection, BinaryTree target)
+        internal static Result<ValueSyntax> Create(DeclarationSyntax statement, BinaryTree root) 
+            => new CompoundSyntax(T(statement), null, root);
+
+        internal static Result<ValueSyntax> Create(Result<Statement> statement, BinaryTree binaryTree)
+            => new Result<ValueSyntax>(new CompoundSyntax(new[] {statement.Target}, null, binaryTree)
+                , statement.Issues);
+
+        internal static Result<ValueSyntax> Create(Result<Statement[]> statements, BinaryTree binaryTree)
+            => new Result<ValueSyntax>(new CompoundSyntax(statements.Target, null, binaryTree), statements.Issues);
+
+        internal static Result<ValueSyntax> Create
+            (Result<Statement[]> statements, Result<ValueSyntax> cleanup, BinaryTree binaryTree)
+            => new Result<ValueSyntax>
+            (
+                new CompoundSyntax(statements.Target, cleanup?.Target, binaryTree),
+                statements.Issues.plus(cleanup?.Issues)
+            );
+
+        CompoundSyntax(DeclarationSyntax[] statements, ValueSyntax cleanupSection, BinaryTree target)
             : base(NextObjectId++, target)
         {
             Statements = statements;
             CleanupSection = cleanupSection;
         }
 
+        CompoundSyntax(Statement[] statements, ValueSyntax cleanupSection, BinaryTree target)
+            : base(NextObjectId++, target)
+            => NotImplementedMethod(statements, cleanupSection,target);
+
         [DisableDump]
         public IEnumerable<FunctionSyntax> ConverterFunctions
             => Statements
                 .Where(data => data.IsConverterSyntax)
-                .Select(data => (FunctionSyntax)data.Syntax);
+                .Select(data => (FunctionSyntax)data.Value);
 
         [Node]
         [EnableDump]
-        internal ValueSyntax[] SyntaxStatements => Statements.Select(s => s.Syntax).ToArray();
+        internal ValueSyntax[] SyntaxStatements => Statements.Select(s => s.Value).ToArray();
 
         [EnableDump]
         internal IDictionary<string, int> NameIndex
@@ -103,20 +125,6 @@ namespace Reni.Struct
         protected override IEnumerable<Syntax> GetChildren()
             => T(Statements.Select(s => s.GetChildren()), T(CleanupSection)).Concat();
 
-        internal static Result<ValueSyntax> Create(Result<Statement> statement, BinaryTree binaryTree)
-            => new Result<ValueSyntax>(new CompoundSyntax(new[] {statement.Target}, null, binaryTree), statement.Issues);
-
-        internal static Result<ValueSyntax> Create(Result<Statement[]> statements, BinaryTree binaryTree)
-            => new Result<ValueSyntax>(new CompoundSyntax(statements.Target, null, binaryTree), statements.Issues);
-
-        internal static Result<ValueSyntax> Create
-            (Result<Statement[]> statements, Result<ValueSyntax> cleanup, BinaryTree binaryTree)
-            => new Result<ValueSyntax>
-            (
-                new CompoundSyntax(statements.Target, cleanup?.Target, binaryTree),
-                statements.Issues.plus(cleanup?.Issues)
-            );
-
         internal bool IsMutable(int position) => Statements[position].IsMutableSyntax;
 
         internal int? Find(string name, bool publicOnly)
@@ -126,7 +134,7 @@ namespace Reni.Struct
 
             return Statements
                 .Select((data, index) => data.IsDefining(name, publicOnly)? index : (int?)null)
-                .FirstOrDefault(data => data!= null);
+                .FirstOrDefault(data => data != null);
         }
 
         internal override Result ResultForCache(ContextBase context, Category category)
@@ -192,5 +200,6 @@ namespace Reni.Struct
             IsInContainerDump = isInDump;
             return result;
         }
+
     }
 }

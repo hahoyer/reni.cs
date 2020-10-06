@@ -334,6 +334,7 @@
     <Compile Include="TokenClasses\Cleanup.cs" />
     <Compile Include="TokenClasses\CompareOperation.cs" />
     <Compile Include="TokenClasses\DeclarationSyntax.cs" />
+    <Compile Include="TokenClasses\DeclarerSyntax.cs" />
     <Compile Include="TokenClasses\EndOfText.cs" />
     <Compile Include="TokenClasses\Extension.cs" />
     <Compile Include="TokenClasses\ExtensionFactoryContainer.cs" />

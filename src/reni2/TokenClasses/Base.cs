@@ -48,6 +48,9 @@ namespace Reni.TokenClasses
             NotImplementedMethod(visitor);
             return null;
         }
+
+        protected override ISyntaxFactory Provider => SyntaxFactory.Terminal;
+
     }
 
     abstract class InfixPrefixSyntaxToken : InfixPrefixToken, IInfix, IPrefix, IValueProvider

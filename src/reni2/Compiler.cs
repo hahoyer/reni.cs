@@ -98,7 +98,7 @@ namespace Reni
             ValueSyntaxCache = NewValueCache(GetValueSyntax);
         }
 
-        Result<ValueSyntax> GetValueSyntax() => Parameters.ParseOnly? null : BinaryTree.GetFrameSyntax();
+        Result<ValueSyntax> GetValueSyntax() => Parameters.ParseOnly? null : SyntaxFactory.Root.GetSyntax(BinaryTree).ToFrame();
 
         CodeContainer GetCodeContainer() => new CodeContainer(Syntax, Root, ModuleName, Source.Data);
 

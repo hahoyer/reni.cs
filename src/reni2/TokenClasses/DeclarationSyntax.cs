@@ -1,25 +1,57 @@
 using System.Collections.Generic;
+using System.Linq;
+using hw.DebugFormatter;
+using hw.Helper;
+using JetBrains.Annotations;
 using Reni.Parser;
+using Reni.Struct;
 
 namespace Reni.TokenClasses
 {
-    abstract class DeclarerSyntax : Syntax
+    class DeclarationSyntax : Syntax
     {
-        public class Tag : DeclarerSyntax
+        internal readonly IDefaultScopeProvider Container;
+
+        internal readonly DeclarerSyntax Declarer;
+        internal readonly ValueSyntax Value;
+
+        public DeclarationSyntax
+            ([NotNull]DeclarerSyntax declarer, [NotNull]BinaryTree root, [NotNull]ValueSyntax value, [NotNull]IDefaultScopeProvider container)
+            : base(root)
         {
-            readonly IDeclarationTag[] Tags;
+            Declarer = declarer;
+            Value = value;
+            Container = container;
 
-            public Tag(IDeclarationTag tag, BinaryTree target)
-                : base(target)
-                => Tags = T(tag);
-
-            protected override IEnumerable<Syntax> GetChildren() => new Syntax[0];
         }
 
-        DeclarerSyntax(BinaryTree target)
-            : base(target) { }
+        [DisableDump]
+        internal bool IsMixInSyntax => Declarer.Tags.Any(item => item.Value is MixInDeclarationToken);
 
-        protected DeclarerSyntax(int objectId, BinaryTree target)
-            : base(objectId, target) { }
+        [DisableDump]
+        internal bool IsConverterSyntax => Declarer.Tags.Any(item => item.Value is ConverterToken);
+
+        [DisableDump]
+        internal bool IsMutableSyntax => Declarer.Tags.Any(item => item.Value is MutableDeclarationToken);
+
+        [DisableDump]
+        internal bool IsPublicSyntax
+        {
+            get
+            {
+                if(Declarer.Tags.Any(item => item.Value is PublicDeclarationToken))
+                    return true;
+
+                if(Declarer.Tags.Any(item => item.Value is NonPublicDeclarationToken))
+                    return false;
+
+                return Container.MeansPublic;
+            }
+        }
+
+        protected override IEnumerable<Syntax> GetChildren() => T((Syntax)Declarer, (Syntax)Value);
+
+        internal override Result<ValueSyntax> ToValueSyntax(BinaryTree target)
+            => CompoundSyntax.Create(this, target);
     }
 }

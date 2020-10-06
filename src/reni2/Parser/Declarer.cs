@@ -7,7 +7,7 @@ using Reni.Validation;
 namespace Reni.Parser
 {
     sealed class Declarer : DumpableObject
-    {
+    {                                                         
         [EnableDump]
         internal IDeclarationTag[] Tags { get; }
 
@@ -46,7 +46,7 @@ namespace Reni.Parser
             Tracer.Assert(Target == null || other.Target == null);
             return new Declarer
             (
-                Tags.plus(other.Tags),
+                Tags.plus(other.Tags),                                
                 Target ?? other.Target,
                 T(other.BinaryTrees,BinaryTrees).Combine()
             );
