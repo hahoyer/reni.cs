@@ -63,7 +63,7 @@ namespace Reni.Struct
 
         [Node]
         [EnableDump]
-        internal ValueSyntax[] SyntaxStatements => Statements.Select(s => s.Value).ToArray();
+        internal ValueSyntax[] PureStatements => Statements.Select(s => s.Value).ToArray();
 
         [EnableDump]
         internal IDictionary<string, int> NameIndex
@@ -90,14 +90,14 @@ namespace Reni.Struct
         internal int[] MixIns => IndexList(item => item.IsMixInSyntax).ToArray();
 
         [DisableDump]
-        internal int EndPosition => SyntaxStatements.Length;
+        internal int EndPosition => PureStatements.Length;
 
 
         [DisableDump]
-        internal override bool? IsHollow => SyntaxStatements.All(syntax => syntax.IsHollow == true);
+        internal override bool? IsHollow => PureStatements.All(syntax => syntax.IsHollow == true);
 
         [DisableDump]
-        internal Size IndexSize => Size.AutoSize(SyntaxStatements.Length);
+        internal Size IndexSize => Size.AutoSize(PureStatements.Length);
 
         [DisableDump]
         internal string[] AllNames => Statements.SelectMany(s => s.AllNames).ToArray();

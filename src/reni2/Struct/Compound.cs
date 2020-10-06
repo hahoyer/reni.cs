@@ -73,7 +73,7 @@ namespace Reni.Struct
         ResultCache CachedResult(int position)
             => Parent
                 .CompoundPositionContext(Syntax, position)
-                .ResultCache(Syntax.SyntaxStatements[position]);
+                .ResultCache(Syntax.PureStatements[position]);
 
         internal Size Size(int? position = null)
         {
@@ -95,12 +95,12 @@ namespace Reni.Struct
             StartMethodDump(trace, category, fromPosition, fromNotPosition);
             try
             {
-                Dump(nameof(Syntax.SyntaxStatements), Syntax.SyntaxStatements);
+                Dump(nameof(Syntax.PureStatements), Syntax.PureStatements);
                 BreakExecution();
 
                 var positions = ((fromNotPosition ?? EndPosition) - fromPosition)
                     .Select(i => fromPosition + i)
-                    .Where(position => !Syntax.SyntaxStatements[position].IsLambda)
+                    .Where(position => !Syntax.PureStatements[position].IsLambda)
                     .ToArray();
 
                 var rawResults = positions
@@ -174,7 +174,7 @@ namespace Reni.Struct
 
         Result AccessResult(Category category, int position)
         {
-            Tracer.Assert(!Syntax.SyntaxStatements[position].IsLambda);
+            Tracer.Assert(!Syntax.PureStatements[position].IsLambda);
             return AccessResult(category, position, position);
         }
 
@@ -189,10 +189,10 @@ namespace Reni.Struct
             try
             {
                 var uniqueChildContext = Parent.CompoundPositionContext(Syntax, accessPosition);
-                Dump(nameof(Syntax.SyntaxStatements), Syntax.SyntaxStatements[position]);
+                Dump(nameof(Syntax.PureStatements), Syntax.PureStatements[position]);
                 BreakExecution();
                 var rawResult = uniqueChildContext.Result
-                    (category.Typed, Syntax.SyntaxStatements[position]);
+                    (category.Typed, Syntax.PureStatements[position]);
                 Dump(nameof(rawResult), rawResult);
                 BreakExecution();
                 var unFunction = rawResult.SmartUn<FunctionType>();
@@ -244,11 +244,11 @@ namespace Reni.Struct
             var uniqueChildContext = Parent
                 .CompoundPositionContext(Syntax, position);
             return Syntax
-                .SyntaxStatements[position]
+                .PureStatements[position]
                 .IsHollowStructureElement(uniqueChildContext);
         }
 
-        bool? InnerIsHollowStatic(int position) => Syntax.SyntaxStatements[position].IsHollow;
+        bool? InnerIsHollowStatic(int position) => Syntax.PureStatements[position].IsHollow;
 
         internal Result Cleanup(Category category)
         {

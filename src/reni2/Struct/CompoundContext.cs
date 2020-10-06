@@ -44,6 +44,6 @@ namespace Reni.Struct
         internal override IEnumerable<string> DeclarationOptions => View.DeclarationOptions;
 
         [EnableDump]
-        Parser.ValueSyntax[] Syntax => View.Compound.Syntax.SyntaxStatements;
+        Parser.ValueSyntax[] Syntax => View.Compound.Syntax.PureStatements;
     }
 }

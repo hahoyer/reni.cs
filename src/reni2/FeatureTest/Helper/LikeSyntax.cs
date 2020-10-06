@@ -134,9 +134,9 @@ namespace Reni.FeatureTest.Helper
         internal override void AssertLike(ValueSyntax syntax)
         {
             var co = (CompoundSyntax)syntax;
-            Tracer.Assert(_list.Length == co.SyntaxStatements.Length);
+            Tracer.Assert(_list.Length == co.PureStatements.Length);
             for(var i = 0; i < _list.Length; i++)
-                _list[i].AssertLike(co.SyntaxStatements[i]);
+                _list[i].AssertLike(co.PureStatements[i]);
 
             Tracer.Assert(_declarations.Length == co.AllNames.Length);
             foreach(var declaration in _declarations)
