@@ -34,8 +34,8 @@ namespace Reni
             return new Result<ValueSyntax>(result, issues);
         }
 
-        CondSyntax(ValueSyntax condSyntax, ValueSyntax thenSyntax, ValueSyntax elseSyntax, BinaryTree binaryTree)
-            : base(binaryTree)
+        CondSyntax(ValueSyntax condSyntax, ValueSyntax thenSyntax, ValueSyntax elseSyntax, BinaryTree target)
+            : base(target)
         {
             Cond = condSyntax;
             Then = thenSyntax;

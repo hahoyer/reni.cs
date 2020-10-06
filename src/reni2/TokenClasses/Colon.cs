@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using hw.DebugFormatter;
 using hw.Parser;
 using Reni.Parser;
 
@@ -8,52 +9,41 @@ namespace Reni.TokenClasses
     sealed class Colon : TokenClass, IStatementProvider
     {
         public const string TokenId = ":";
+
+        [DisableDump]
+        protected override ISyntaxFactory Provider => SyntaxFactory.Colon;
+
         public override string Id => TokenId;
 
-        Result<Statement> IStatementProvider.Get(BinaryTree left, BinaryTree right, ISyntaxScope scope)
-        {
-            return left.Declarer?.Convert(x => x.Statement(right.Syntax(scope), scope.DefaultScopeProvider));
-        }
+        Result<Statement> IStatementProvider.Get
+            (BinaryTree left, BinaryTree right, ISyntaxScope scope)
+            => left.Declarer?.Convert(x => x.Statement(right.Syntax(scope), scope.DefaultScopeProvider));
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class Exclamation : ParserTokenType<BinaryTree>,
-        PrioParser<BinaryTree>.ISubParserProvider
+    sealed class Exclamation : ParserTokenType<BinaryTree>, PrioParser<BinaryTree>.ISubParserProvider
     {
         public const string TokenId = "!";
 
         readonly ISubParser<BinaryTree> Parser;
 
-        public Exclamation(ISubParser<BinaryTree> parser) { Parser = parser; }
+        public Exclamation(ISubParser<BinaryTree> parser) => Parser = parser;
 
         public override string Id => TokenId;
+
+        ISubParser<BinaryTree> PrioParser<BinaryTree>.ISubParserProvider.NextParser => Parser;
 
         protected override BinaryTree Create(BinaryTree left, IToken token, BinaryTree right)
         {
             NotImplementedMethod(left, token, right);
             return null;
         }
-
-        ISubParser<BinaryTree> PrioParser<BinaryTree>.ISubParserProvider.NextParser => Parser;
     }
 
 
     [BelongsTo(typeof(DeclarationTokenFactory))]
-    abstract class DeclarationTagToken : 
-        TerminalToken, 
-        IDeclarerTagProvider, 
-        IDeclarationTag
+    abstract class DeclarationTagToken : TerminalToken, IDeclarerTagProvider, IDeclarationTag
     {
-        Result<Declarer> IDeclarerTagProvider.Get
-            (BinaryTree binaryTree)
-        {
-            if(binaryTree.Left == null && binaryTree.Right == null)
-                return new Declarer(new IDeclarationTag[] {this}, null,T(binaryTree));
-
-            NotImplementedMethod(binaryTree);
-            return null;
-        }
-
         public static IEnumerable<string> DeclarationOptions
         {
             get
@@ -66,6 +56,15 @@ namespace Reni.TokenClasses
                 yield return PositionalDeclarationToken.TokenId;
                 yield return PublicDeclarationToken.TokenId;
             }
+        }
+
+        Result<Declarer> IDeclarerTagProvider.Get(BinaryTree binaryTree)
+        {
+            if(binaryTree.Left == null && binaryTree.Right == null)
+                return new Declarer(new IDeclarationTag[] {this}, null, T(binaryTree));
+
+            NotImplementedMethod(binaryTree);
+            return null;
         }
     }
 

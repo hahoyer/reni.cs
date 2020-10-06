@@ -36,6 +36,7 @@ namespace Reni.TokenClasses
         Result<Parser.ValueSyntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
             => ExpressionSyntax.Create(this, binaryTree, scope);
 
+        protected override ISyntaxFactory Provider => SyntaxFactory.Definable;
     }
 
     [BelongsTo(typeof(MainTokenFactory))]

@@ -20,8 +20,8 @@ namespace Reni.Parser
         internal readonly FunctionCache<ContextBase, ResultCache> ResultCache =
             new FunctionCache<ContextBase, ResultCache>();
 
-        protected ValueSyntax(BinaryTree binaryTree)
-            : base(binaryTree) { }
+        protected ValueSyntax(BinaryTree target)
+            : base(target) { }
 
         protected ValueSyntax(int objectId, BinaryTree target)
             : base(objectId, target) { }

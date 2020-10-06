@@ -15,8 +15,8 @@ namespace Reni.Parser
         [EnableDump]
         internal readonly ITerminal Terminal;
 
-        internal TerminalSyntax(ITerminal terminal, BinaryTree binaryTree)
-            : base(binaryTree)
+        internal TerminalSyntax(ITerminal terminal, BinaryTree target)
+            : base(target)
         {
             Terminal = terminal;
             StopByObjectIds();
@@ -51,8 +51,8 @@ namespace Reni.Parser
         [EnableDump]
         readonly ValueSyntax Right;
 
-        public PrefixSyntax(IPrefix prefix, ValueSyntax right, BinaryTree binaryTree)
-            : base(binaryTree)
+        public PrefixSyntax(IPrefix prefix, ValueSyntax right, BinaryTree target)
+            : base(target)
         {
             Prefix = prefix;
             Right = right;
@@ -87,8 +87,8 @@ namespace Reni.Parser
         [EnableDump]
         readonly ValueSyntax Right;
 
-        public InfixSyntax(ValueSyntax left, IInfix infix, ValueSyntax right, BinaryTree binaryTree)
-            : base(binaryTree)
+        public InfixSyntax(ValueSyntax left, IInfix infix, ValueSyntax right, BinaryTree target)
+            : base(target)
         {
             Left = left;
             Infix = infix;
@@ -138,8 +138,8 @@ namespace Reni.Parser
         [EnableDump]
         readonly ISuffix Suffix;
 
-        internal SuffixSyntax(ValueSyntax left, ISuffix suffix, BinaryTree binaryTree)
-            : base(binaryTree)
+        internal SuffixSyntax(ValueSyntax left, ISuffix suffix, BinaryTree target)
+            : base(target)
         {
             Left = left;
             Suffix = suffix;

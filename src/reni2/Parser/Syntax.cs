@@ -14,7 +14,7 @@ namespace Reni.Parser
     {
         internal readonly BinaryTree Target;
 
-        protected Syntax(BinaryTree binaryTree) => Target = binaryTree;
+        protected Syntax(BinaryTree target) => Target = target;
 
         protected Syntax(int objectId, BinaryTree target)
             : base(objectId)

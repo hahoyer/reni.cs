@@ -37,7 +37,42 @@ namespace Reni.FeatureTest.Helper
 
         [Obsolete("", true)]
         internal abstract void AssertLike(ValueSyntax syntax);
+
+        public LikeSyntax Brackets(ITokenClass tokenClass = null) => new Brackets(this, tokenClass);
     }
+
+    class Brackets : LikeSyntax
+    {
+        readonly LikeSyntax Target;
+        readonly ITokenClass TokenClass;
+
+        public Brackets(LikeSyntax target, ITokenClass tokenClass)
+        {
+            Target = target;
+            TokenClass = tokenClass;
+        }
+
+        internal override void AssertLike(BinaryTree target)
+        {
+            Tracer.Assert(target.Left != null);
+            Tracer.Assert(target.TokenClass is RightParenthesis);
+            Tracer.Assert(target.Right == null);
+
+            Tracer.Assert(target.Left.Left == null);
+            Tracer.Assert(target.Left.TokenClass is LeftParenthesis);
+            Tracer.Assert(target.Left.TokenClass.IsBelongingTo(target.TokenClass));
+            if(TokenClass != null)
+                Tracer.Assert(target.TokenClass == TokenClass || target.Left.TokenClass == TokenClass );
+
+            Target.AssertLike(target.Left.Right);
+
+        }
+
+        [Obsolete("", true)]
+        internal override void AssertLike(ValueSyntax syntax)
+            => Tracer.Assert(syntax is EmptyList);
+    }
+
 
     sealed class Empty : LikeSyntax
     {
@@ -115,8 +150,11 @@ namespace Reni.FeatureTest.Helper
 
     sealed class Expression : LikeSyntax
     {
+        [EnableDump]
         readonly LikeSyntax _s1;
+        [EnableDump]
         readonly string _s2;
+        [EnableDump]
         readonly LikeSyntax _s3;
 
         public Expression(LikeSyntax s1, string s2, LikeSyntax s3)
@@ -145,8 +183,8 @@ namespace Reni.FeatureTest.Helper
 
         internal override void AssertLike(BinaryTree target)
         {
+            Tracer.Assert(target.TokenClass.Id == _s2, ()=>$"\nTarget: {target.Dump()}\nPattern: {Dump()}");
             AssertLike(_s1, target.Left);
-            Tracer.Assert(target.TokenClass.Id == _s2);
             AssertLike(_s3, target.Right);
         }
 
@@ -166,7 +204,6 @@ namespace Reni.FeatureTest.Helper
 
         internal Number(long i) => _i = i;
 
-        [Obsolete("", true)]
         internal override void AssertLike(BinaryTree target)
         {
             var terminalSyntax = (TerminalSyntax)target.Syntax(null).Target;
@@ -174,6 +211,7 @@ namespace Reni.FeatureTest.Helper
             Tracer.Assert(terminalSyntax.ToNumber == _i);
         }
 
+        [Obsolete("", true)]
         internal override void AssertLike(ValueSyntax syntax)
         {
             var terminalSyntax = (TerminalSyntax)syntax;
