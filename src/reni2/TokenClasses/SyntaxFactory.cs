@@ -32,7 +32,8 @@ namespace Reni.TokenClasses
                 );
                 Tracer.Assert(target.Left.Right != null);
 
-                return factory
+                var localFactory = new SyntaxFactory((target.TokenClass as IDefaultScopeProvider)?.MeansPublic ?? false);
+                return localFactory
                     .GetSyntax(target.Left.Right)
                     .Apply(syntax => syntax.ToValueSyntax(target));
             }
@@ -142,9 +143,12 @@ namespace Reni.TokenClasses
         internal static readonly ISyntaxFactory Colon = new ColonHandler();
         internal static readonly ISyntaxFactory Definable = new DefinableHandler();
         internal static readonly ISyntaxFactory Terminal = new TerminalHandler();
-        internal static readonly SyntaxFactory Root = new SyntaxFactory();
+        internal static readonly SyntaxFactory Root = new SyntaxFactory(false);
 
-        bool IDefaultScopeProvider.MeansPublic => true;
+        readonly bool MeansPublic ;
+        internal SyntaxFactory(bool meansPublic) => MeansPublic = meansPublic;
+
+        bool IDefaultScopeProvider.MeansPublic => MeansPublic ;
 
         Result<DeclarerSyntax> GetDeclarerSyntax(BinaryTree target)
         {
