@@ -1,17 +1,16 @@
 ﻿<#@ template debug="true" hostSpecific="true" #>
 <#@ output extension=".cs" #>
-<#@ import namespace="System.Collections.Generic" #>
 <#
-            var title = "Library";
-            var product = "Reni Compiler";
-            var company = "HoyerWare";
-            var major = $"{DateTime.Today:yy}";
-            var minor = 1;
-            var build = $"{DateTime.Now:MMdd}";
-            var revision = $"{DateTime.Now:HHmm}";
-            var versionString = $"{major}.{minor}";
-            var fileVersionString = $"{major}.{minor}.{build}.{revision}";
-    #>
+    var title = "Library";
+    var product = "Reni Compiler";
+    var company = "HoyerWare";
+    var major = $"{DateTime.Today:yy}";
+    var minor = 1;
+    var build = $"{DateTime.Now:MMdd}";
+    var revision = $"{DateTime.Now:HHmm}";
+    var versionString = $"{major}.{minor}";
+    var fileVersionString = $"{major}.{minor}.{build}.{revision}";
+#>
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
