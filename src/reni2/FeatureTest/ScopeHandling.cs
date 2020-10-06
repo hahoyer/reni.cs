@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Helper;
 using hw.UnitTest;
 using Reni.FeatureTest.Helper;
 using Reni.Validation;
@@ -32,7 +33,16 @@ namespace Reni.FeatureTest
     [UnitTest]
     [Target(@"!unkown x: 1")]
     [Output("")]
-    public sealed class ScopeHandlingError : CompilerTest {}
+    public sealed class ScopeHandlingError : CompilerTest
+    {
+        protected override void Verify(IEnumerable<Issue> issues)
+        {
+            var issue = issues.Single();
+            Tracer.Assert(issue.IssueId == IssueId.InvalidDeclarationTag
+                , () => $"Issue of type {IssueId.InvalidDeclarationTag} expected. \n" +
+                        $"Found: {issues.Select(issue => issue.LogDump).Stringify("\n")}");
+        }
+    }
 
     [UnitTest]
     [Target(@"a:(!non_public x: 1; !public y: 2); a x dump_print")]

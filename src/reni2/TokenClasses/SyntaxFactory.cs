@@ -34,9 +34,7 @@ namespace Reni.TokenClasses
 
                 return factory
                     .GetSyntax(target.Left.Right)
-                    .Target
-                    .ToValueSyntax(target)
-                    .With(factory.GetSyntax(target.Left.Right).Issues);
+                    .Apply(syntax => syntax.ToValueSyntax(target));
             }
         }
 
@@ -56,7 +54,7 @@ namespace Reni.TokenClasses
                 IEnumerable<Issue> GetIssues()
                 {
                     if(tag == null)
-                        yield return IssueId.InvalidDeclarationTag.Issue(target.Token.Characters);
+                        yield return IssueId.InvalidDeclarationTag.Issue(right.Token.Characters);
                 }
 
                 return new Result<DeclarerSyntax>(result, GetIssues().ToArray());
@@ -178,9 +176,10 @@ namespace Reni.TokenClasses
         static Result<DeclarerSyntax> ToDeclarer(Result<DeclarerSyntax> left, BinaryTree target, string name)
             => left.Apply(x => x.WithName(target, name));
 
-        Result<DeclarationSyntax> ToDeclaration(BinaryTree target) 
-            => (GetDeclarerSyntax(target.Left),GetValueSyntax(target.Right))
-                .Apply((declarerSyntax, valueSyntax) => new DeclarationSyntax(declarerSyntax, target, valueSyntax, this));
+        Result<DeclarationSyntax> ToDeclaration(BinaryTree target)
+            => (GetDeclarerSyntax(target.Left), GetValueSyntax(target.Right))
+                .Apply(
+                    (declarerSyntax, valueSyntax) => new DeclarationSyntax(declarerSyntax, target, valueSyntax, this));
     }
 
     interface ISyntaxFactory
