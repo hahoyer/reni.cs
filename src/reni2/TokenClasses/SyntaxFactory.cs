@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using Reni.Parser;
+using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
@@ -30,14 +32,11 @@ namespace Reni.TokenClasses
                 );
                 Tracer.Assert(target.Left.Right != null);
 
-                var result = factory
+                return factory
                     .GetSyntax(target.Left.Right)
                     .Target
                     .ToValueSyntax(target)
                     .With(factory.GetSyntax(target.Left.Right).Issues);
-
-                NotImplementedMethod(target, factory);
-                return default;
             }
         }
 
@@ -46,14 +45,21 @@ namespace Reni.TokenClasses
             Result<DeclarerSyntax> ISyntaxFactory.GetDeclarerSyntax(BinaryTree target, SyntaxFactory factory)
             {
                 Tracer.Assert(target.Left == null);
-                Tracer.Assert(target.Right != null);
-                Tracer.Assert(target.Right.Left == null);
-                Tracer.Assert(target.Right.Right == null);
+                var right = target.Right;
+                Tracer.Assert(right != null);
+                Tracer.Assert(right.Left == null);
+                Tracer.Assert(right.Right == null);
 
-                var tag = target.Right.TokenClass as DeclarationTagToken;
-                Tracer.Assert(tag != null);
+                var tag = right.TokenClass as DeclarationTagToken;
+                var result = DeclarerSyntax.Tag(tag, target);
 
-                return DeclarerSyntax.Tag(tag, target);
+                IEnumerable<Issue> GetIssues()
+                {
+                    if(tag == null)
+                        yield return IssueId.InvalidDeclarationTag.Issue(target.Token.Characters);
+                }
+
+                return new Result<DeclarerSyntax>(result, GetIssues().ToArray());
             }
 
             Result<Syntax> ISyntaxFactory.GetSyntax(BinaryTree target, SyntaxFactory factory)
@@ -78,8 +84,8 @@ namespace Reni.TokenClasses
                 return default;
             }
 
-            Result<Syntax> ISyntaxFactory.GetSyntax(BinaryTree target, SyntaxFactory factory) 
-                => factory.ToDeclaration(target);
+            Result<Syntax> ISyntaxFactory.GetSyntax(BinaryTree target, SyntaxFactory factory)
+                => Result<Syntax>.From(factory.ToDeclaration(target));
 
             Result<ValueSyntax> ISyntaxFactory.GetValueSyntax(BinaryTree target, SyntaxFactory factory)
             {
@@ -151,7 +157,7 @@ namespace Reni.TokenClasses
             return default;
         }
 
-        Result<ValueSyntax> GetValueSyntax(BinaryTree target)
+        internal Result<ValueSyntax> GetValueSyntax(BinaryTree target)
         {
             if(target.TokenClass is ISyntaxFactoryToken token)
                 return token.Provider.GetValueSyntax(target, this);
@@ -169,21 +175,12 @@ namespace Reni.TokenClasses
             return default;
         }
 
-        static Result<DeclarerSyntax> ToDeclarer(Result<DeclarerSyntax> left, BinaryTree root, string name)
-        {
-            Tracer.Assert(!left.Issues.Any());
-            return left.Target.WithName(root, name);
-        }
+        static Result<DeclarerSyntax> ToDeclarer(Result<DeclarerSyntax> left, BinaryTree target, string name)
+            => left.Apply(x => x.WithName(target, name));
 
-        Result<Syntax> ToDeclaration(BinaryTree target)
-        {
-            var declarer = GetDeclarerSyntax(target.Left);
-            var value = GetValueSyntax(target.Right);
-
-            Tracer.Assert(!declarer.Issues.Any());
-            Tracer.Assert(!value.Issues.Any());
-            return new DeclarationSyntax(declarer.Target, target, value.Target, this);
-        }
+        Result<DeclarationSyntax> ToDeclaration(BinaryTree target) 
+            => (GetDeclarerSyntax(target.Left),GetValueSyntax(target.Right))
+                .Apply((declarerSyntax, valueSyntax) => new DeclarationSyntax(declarerSyntax, target, valueSyntax, this));
     }
 
     interface ISyntaxFactory

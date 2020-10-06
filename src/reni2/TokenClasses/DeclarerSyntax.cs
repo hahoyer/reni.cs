@@ -17,11 +17,11 @@ namespace Reni.TokenClasses
 
         internal class NameSyntax : Terminal
         {
-            internal readonly string Name;
+            internal readonly string Value;
 
             internal NameSyntax(BinaryTree target, string name)
                 : base(target)
-                => Name = name;
+                => Value = name;
         }
 
         internal readonly NameSyntax Name;
@@ -41,7 +41,7 @@ namespace Reni.TokenClasses
                 yield return tag;
         }
 
-        public static Result<DeclarerSyntax> Tag(DeclarationTagToken tag, BinaryTree target)
+        public static DeclarerSyntax Tag(DeclarationTagToken tag, BinaryTree target)
             => new DeclarerSyntax(new[] {new TagSyntax(tag, target)}, target);
 
         public DeclarerSyntax WithName(BinaryTree root, string name)

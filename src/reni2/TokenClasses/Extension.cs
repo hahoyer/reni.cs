@@ -16,10 +16,6 @@ namespace Reni.TokenClasses
                 .ToArray();
         }
 
-        internal static Result<ValueSyntax> ToFrame(this Result<Syntax> target)
-        {
-            Dumpable.NotImplementedFunction(target);
-            return default;
-        }
+        internal static Result<ValueSyntax> ToFrame(this Result<ValueSyntax> target) => target;
     }
 }

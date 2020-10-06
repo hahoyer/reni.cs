@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Helper;
 using JetBrains.Annotations;
 using Reni.Parser;
 using Reni.Struct;
@@ -16,13 +15,15 @@ namespace Reni.TokenClasses
         internal readonly ValueSyntax Value;
 
         public DeclarationSyntax
-            ([NotNull]DeclarerSyntax declarer, [NotNull]BinaryTree root, [NotNull]ValueSyntax value, [NotNull]IDefaultScopeProvider container)
+        (
+            [NotNull] DeclarerSyntax declarer, [NotNull] BinaryTree root, [NotNull] ValueSyntax value
+            , [NotNull] IDefaultScopeProvider container
+        )
             : base(root)
         {
             Declarer = declarer;
             Value = value;
             Container = container;
-
         }
 
         [DisableDump]
@@ -49,9 +50,21 @@ namespace Reni.TokenClasses
             }
         }
 
+        [DisableDump]
+        internal string NameOrNull => Declarer.Name.Value;
+
         protected override IEnumerable<Syntax> GetChildren() => T((Syntax)Declarer, (Syntax)Value);
 
         internal override Result<ValueSyntax> ToValueSyntax(BinaryTree target)
             => CompoundSyntax.Create(this, target);
+
+        internal bool IsDefining(string name, bool publicOnly) 
+            => name != null && NameOrNull == name && (IsPublicSyntax || !publicOnly);
+
+        internal DeclarationSyntax Visit(ISyntaxVisitor visitor)
+        {
+            NotImplementedMethod(visitor);
+            return default;
+        }
     }
 }

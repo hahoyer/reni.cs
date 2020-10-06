@@ -163,7 +163,7 @@ namespace Reni.Struct
         internal IEnumerable<IConversion> MixinConversions
             => Compound
                 .Syntax
-                .MixIns
+                .MixInDeclarations
                 .Select(AccessFeature);
 
         sealed class RecursionWhileObtainingCompoundSizeException : Exception
