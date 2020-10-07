@@ -36,8 +36,8 @@ namespace Reni.Parser
         }
 
         internal static Result<ValueSyntax> Create
-            (BinaryTree parent, ValueSyntax left, Definable definable, ValueSyntax right)
-            => new Result<ValueSyntax>(new ExpressionSyntax(parent, left, definable, right));
+            (BinaryTree target, ValueSyntax left, Definable definable, ValueSyntax right)
+            => new Result<ValueSyntax>(new ExpressionSyntax(target, left, definable, right));
 
         internal static Result<ValueSyntax> Create(Definable definable, BinaryTree binaryTree, ISyntaxScope scope)
         {
@@ -51,8 +51,8 @@ namespace Reni.Parser
 
         int CurrentResultDepth;
 
-        ExpressionSyntax(BinaryTree parent, ValueSyntax left, Definable definable, ValueSyntax right)
-            : base(parent)
+        ExpressionSyntax(BinaryTree target, ValueSyntax left, Definable definable, ValueSyntax right)
+            : base(target)
         {
             Left = left;
             Definable = definable;
