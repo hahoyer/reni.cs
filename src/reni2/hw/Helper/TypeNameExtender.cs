@@ -1,6 +1,5 @@
 using System;
 using System.Reflection;
-using hw.DebugFormatter;
 using JetBrains.Annotations;
 
 namespace hw.Helper
@@ -36,12 +35,7 @@ namespace hw.Helper
 
         public static Type ResolveUniqueType(this string typeName) => ReferencedTypes.ByNamePart[typeName];
 
-        public static string PrettyName(this Type type)
-        {
-            var result = ReferencedTypes.PrettyName[type];
-            Tracer.Assert(!result.Contains("+"));
-            return result;
-        }
+        public static string PrettyName(this Type type) => ReferencedTypes.PrettyName[type];
 
         public static string CompleteName(this Type type) => ReferencedTypes.CompleteName[type];
 

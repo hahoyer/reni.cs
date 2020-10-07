@@ -68,7 +68,7 @@ namespace hw.DebugFormatter
         public static void NotImplementedFunction(params object[] p)
         {
             var os = Tracer.DumpMethodWithData("not implemented", null, p, 1);
-            Tracer.Line(os);
+            Tracer.Log(os);
             Tracer.TraceBreak();
         }
 
@@ -85,7 +85,7 @@ namespace hw.DebugFormatter
             if(IsMethodDumpTraceActive)
             {
                 var os = Tracer.DumpData("", new[] {name, value}, 1);
-                Tracer.Line(os);
+                Tracer.Log(os);
             }
         }
 
@@ -102,7 +102,7 @@ namespace hw.DebugFormatter
             if(IsMethodDumpTraceActive)
             {
                 var os = Tracer.DumpData("", new[] {name, getValue()}, 1);
-                Tracer.Line(os);
+                Tracer.Log(os);
             }
         }
 
@@ -115,7 +115,7 @@ namespace hw.DebugFormatter
 
         // ReSharper disable once InconsistentNaming
         [PublicAPI]
-        public void t() => Tracer.Line(DebuggerDumpString);
+        public void t() => Tracer.Log(DebuggerDumpString);
 
         public string Dump()
         {
@@ -162,7 +162,7 @@ namespace hw.DebugFormatter
             if(IsMethodDumpTraceActive)
             {
                 Tracer.IndentEnd();
-                Tracer.Line(Tracer.MethodHeader(stackFrameDepth: 1) + "[returns] " + Tracer.Dump(rv));
+                Tracer.Log(Tracer.MethodHeader(stackFrameDepth: 1) + "[returns] " + Tracer.Dump(rv));
                 if(breakExecution)
                     Tracer.TraceBreak();
             }
@@ -180,7 +180,7 @@ namespace hw.DebugFormatter
             if(IsMethodDumpTraceActive)
             {
                 Tracer.IndentEnd();
-                Tracer.Line(Tracer.MethodHeader(stackFrameDepth: 1) + "[returns]");
+                Tracer.Log(Tracer.MethodHeader(stackFrameDepth: 1) + "[returns]");
                 if(breakExecution)
                     Tracer.TraceBreak();
             }
@@ -210,7 +210,7 @@ namespace hw.DebugFormatter
         protected static void DumpDataWithBreak(string text, params object[] p)
         {
             var os = Tracer.DumpData(text, p, 1);
-            Tracer.Line(os);
+            Tracer.Log(os);
             Tracer.TraceBreak();
         }
 
@@ -227,7 +227,7 @@ namespace hw.DebugFormatter
             if(!IsMethodDumpTraceActive)
                 return;
             var os = Tracer.DumpMethodWithData("", this, p, 1);
-            Tracer.Line(os);
+            Tracer.Log(os);
             Tracer.IndentStart();
         }
 
@@ -250,7 +250,7 @@ namespace hw.DebugFormatter
         protected void DumpMethodWithBreak(string text, params object[] p)
         {
             var os = Tracer.DumpMethodWithData(text, this, p, 1);
-            Tracer.Line(os);
+            Tracer.Log(os);
             Tracer.TraceBreak();
         }
 
@@ -266,7 +266,7 @@ namespace hw.DebugFormatter
                 throw new NotImplementedException();
 
             var os = Tracer.DumpMethodWithData("not implemented", this, p, 1);
-            Tracer.Line(os);
+            Tracer.Log(os);
             Tracer.TraceBreak();
         }
 

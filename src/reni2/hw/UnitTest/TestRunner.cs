@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using hw.DebugFormatter;
@@ -20,6 +19,7 @@ namespace hw.UnitTest
             public bool SkipSuccessfulMethods;
             public string TestsFileName;
         }
+
 
         public static readonly ConfigurationContainer Configuration = new ConfigurationContainer();
 
@@ -99,6 +99,16 @@ namespace hw.UnitTest
 
         string HeaderText => $"{DateTime.Now.Format()} {Status} {Complete} of {TestTypes.Length} {CurrentMethodName}";
 
+        public static bool IsModeErrorFocus
+        {
+            set
+            {
+                Configuration.IsBreakEnabled = value;
+                Configuration.SaveResults = !value;
+                Configuration.SkipSuccessfulMethods = value;
+            }
+        }
+
         string GeneratedTestCallsForMode(IGrouping<string, (TestType type, TestMethod method)> group)
             => $"\n// {group.Key} \n\n" +
                group
@@ -122,7 +132,7 @@ namespace hw.UnitTest
                 return new TestType[0];
             return
                 type.DependenceProviders.SelectMany
-                    (attribute => attribute.AsTestType(TestTypes).NullableToArray()).ToArray();
+                  (attribute => attribute.AsTestType(TestTypes).NullableToArray()).ToArray();
         }
 
         void Run()
