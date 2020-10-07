@@ -25,7 +25,6 @@
     <Compile Include="FileTestCompiler.cs" />
     <Compile Include="MainContainer.cs" />
     <Compile Include="PendingTests.cs" />
-    <None Include="PendingTests.debug.cs" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Template1.cs">
       <AutoGen>True</AutoGen>
