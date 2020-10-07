@@ -16,64 +16,66 @@ using Reni.Type;
 namespace Reni.Context
 {
     sealed class Root
-        : ContextBase,
-            ISymbolProviderForPointer<Minus>,
-            ISymbolProviderForPointer<ConcatArrays>
+        : ContextBase, ISymbolProviderForPointer<Minus>, ISymbolProviderForPointer<ConcatArrays>
     {
+        internal interface IParent
+        {
+            bool ProcessErrors { get; }
+            IExecutionContext ExecutionContext { get; }
+            IEnumerable<Definable> DefinedNames { get; }
+            Result<ValueSyntax> ParsePredefinedItem(string source);
+        }
+
+        readonly ValueCache<BitType> _bitCache;
+        readonly FunctionCache<bool, IImplementation> _createArrayFeatureCache;
+
         [DisableDump]
         [Node]
         readonly FunctionList _functions = new FunctionList();
+
+        readonly FunctionCache<string, ValueSyntax> _metaDictionary;
+        readonly ValueCache<IImplementation> _minusFeatureCache;
+
+        readonly ValueCache<RecursionType> _recursionTypeCache;
+        readonly ValueCache<VoidType> _voidCache;
+
         [DisableDump]
         [Node]
         readonly IParent Parent;
-
-        readonly ValueCache<RecursionType> _recursionTypeCache;
-        readonly ValueCache<BitType> _bitCache;
-        readonly ValueCache<VoidType> _voidCache;
-        readonly ValueCache<IImplementation> _minusFeatureCache;
-        readonly FunctionCache<string, Parser.ValueSyntax> _metaDictionary;
-        readonly FunctionCache<bool, IImplementation> _createArrayFeatureCache;
-
-        public IExecutionContext ExecutionContext => Parent.ExecutionContext;
 
         internal Root(IParent parent)
         {
             Parent = parent;
             _recursionTypeCache = new ValueCache<RecursionType>(() => new RecursionType(this));
-            _metaDictionary = new FunctionCache<string, Parser.ValueSyntax>(CreateMetaDictionary);
+            _metaDictionary = new FunctionCache<string, ValueSyntax>(CreateMetaDictionary);
             _bitCache = new ValueCache<BitType>(() => new BitType(this));
             _voidCache = new ValueCache<VoidType>(() => new VoidType(this));
             _minusFeatureCache = new ValueCache<IImplementation>
-                (
+            (
                 () =>
                     new ContextMetaFunctionFromSyntax
                         (_metaDictionary[ArgToken.TokenId + " " + Negate.TokenId])
-                );
+            );
             _createArrayFeatureCache = new FunctionCache<bool, IImplementation>
-                (
+            (
                 isMutable =>
                     new ContextMetaFunction
-                        (
+                    (
                         (context, category, argsType) =>
                             CreateArrayResult
                                 (context, category, argsType, isMutable)
-                        )
-                );
+                    )
+            );
         }
 
-        Parser.ValueSyntax CreateMetaDictionary(string source)
-        {
-            var result = Parent.ParsePredefinedItem(source);
-            Tracer.Assert(!result.Issues.Any());
-            return result.Target;
-        }
+        public IExecutionContext ExecutionContext => Parent.ExecutionContext;
 
-        public override string GetContextIdentificationDump() => "r";
         [DisableDump]
         internal override Root RootContext => this;
 
         [DisableDump]
         internal override bool IsRecursionMode => false;
+
         [DisableDump]
         protected override string LevelFormat => "root context";
 
@@ -99,29 +101,35 @@ namespace Reni.Context
         public bool ProcessErrors => Parent.ProcessErrors;
 
         [DisableDump]
-        internal IEnumerable<Definable> AllDefinables => Parent.AllDefinables;
-
-        IImplementation ISymbolProviderForPointer<Minus>.Feature
-            (Minus tokenClass) => _minusFeatureCache.Value;
+        internal IEnumerable<Definable> DefinedNames => Parent.DefinedNames;
 
         IImplementation ISymbolProviderForPointer<ConcatArrays>.
             Feature(ConcatArrays tokenClass)
             => _createArrayFeatureCache[tokenClass.IsMutable];
 
-        static Result CreateArrayResult
-            (ContextBase context, Category category, Parser.ValueSyntax argsType, bool isMutable)
+        IImplementation ISymbolProviderForPointer<Minus>.Feature(Minus tokenClass) => _minusFeatureCache.Value;
+
+        ValueSyntax CreateMetaDictionary(string source)
+        {
+            var result = Parent.ParsePredefinedItem(source);
+            Tracer.Assert(!result.Issues.Any());
+            return result.Target;
+        }
+
+        public override string GetContextIdentificationDump() => "r";
+
+        static Result CreateArrayResult(ContextBase context, Category category, ValueSyntax argsType, bool isMutable)
         {
             var target = context.Result(category.Typed, argsType).SmartUn<PointerType>().Align;
             return target
-                .Type
-                .Array(1, ArrayType.Options.Create().IsMutable.SetTo(isMutable))
-                .Result(category.Typed, target)
-                .LocalReferenceResult
-                & category;
+                       .Type
+                       .Array(1, ArrayType.Options.Create().IsMutable.SetTo(isMutable))
+                       .Result(category.Typed, target)
+                       .LocalReferenceResult
+                   & category;
         }
 
-        internal FunctionType FunctionInstance
-            (CompoundView compoundView, FunctionSyntax body, TypeBase argsType)
+        internal FunctionType FunctionInstance(CompoundView compoundView, FunctionSyntax body, TypeBase argsType)
         {
             var alignedArgsType = argsType.Align;
             var functionInstance = _functions.Find(body, compoundView, alignedArgsType);
@@ -131,8 +139,7 @@ namespace Reni.Context
         internal IEnumerable<FunctionType> FunctionInstances
             (CompoundView compoundView, FunctionSyntax body) => _functions.Find(body, compoundView);
 
-        internal Result ConcatPrintResult
-            (Category category, int count, Func<Category, int, Result> elemResults)
+        internal Result ConcatPrintResult(Category category, int count, Func<Category, int, Result> elemResults)
         {
             var result = VoidType.Result(category);
             if(!(category.HasCode || category.HasExts))
@@ -160,6 +167,7 @@ namespace Reni.Context
                             result.Code = result.Code + CodeBase.DumpPrintText(", ");
                         result.Code = result.Code + elemResult.Code;
                     }
+
                     if(category.HasExts)
                         result.Exts = result.Exts.Sequence(elemResult.Exts);
                     result.IsDirty = false;
@@ -181,7 +189,7 @@ namespace Reni.Context
         internal FunctionContainer FunctionContainer(int index) => _functions.Container(index);
         internal FunctionType Function(int index) => _functions.Item(index);
 
-        internal Container MainContainer(Parser.ValueSyntax syntax, string description)
+        internal Container MainContainer(ValueSyntax syntax, string description)
         {
             var rawResult = syntax.Result(this);
 
@@ -198,18 +206,10 @@ namespace Reni.Context
             Tracer.Assert(fullSource.Contains(source));
 
             return fullSource.Start.Span(source.Start).Id
-                + "["
-                + source.Id
-                + "]"
-                + source.End.Span(fullSource.End).Id;
-        }
-
-        internal interface IParent
-        {
-            Result<Parser.ValueSyntax> ParsePredefinedItem(string source);
-            bool ProcessErrors { get; }
-            IExecutionContext ExecutionContext { get; }
-            IEnumerable<Definable> AllDefinables { get; }
+                   + "["
+                   + source.Id
+                   + "]"
+                   + source.End.Span(fullSource.End).Id;
         }
     }
 }

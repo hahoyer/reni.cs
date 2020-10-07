@@ -9,6 +9,7 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Parser;
 using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Validation;
@@ -16,12 +17,12 @@ using Reni.Validation;
 namespace Reni.Type
 {
     abstract class TypeBase
-        : DumpableObject,
-            IContextReferenceProvider,
-            IIconKeyProvider,
-            ISearchTarget,
-            ValueCache.IContainer,
-            IRootProvider
+        : DumpableObject
+            , IContextReferenceProvider
+            , IIconKeyProvider
+            , ISearchTarget
+            , ValueCache.IContainer
+            , IRootProvider
     {
         sealed class Cache
         {
@@ -32,10 +33,6 @@ namespace Reni.Type
             [Node]
             [SmartNode]
             public readonly FunctionCache<int, FunctionCache<string, ArrayType>> Array;
-
-            [Node]
-            [SmartNode]
-            internal readonly FunctionCache<string, ArrayReferenceType> ArrayReferenceCache;
 
             [Node]
             [SmartNode]
@@ -71,6 +68,10 @@ namespace Reni.Type
             [SmartNode]
             public readonly ValueCache<TypeType> TypeType;
 
+            [Node]
+            [SmartNode]
+            internal readonly FunctionCache<string, ArrayReferenceType> ArrayReferenceCache;
+
             public Cache(TypeBase parent)
             {
                 EnableCut = new ValueCache<EnableCut>(() => new EnableCut(parent));
@@ -86,12 +87,12 @@ namespace Reni.Type
                 (
                     count
                         =>
-                            new FunctionCache<string, ArrayType>
-                            (
-                                optionsId
-                                    =>
-                                        parent.GetArrayForCache(count, optionsId)
-                            )
+                        new FunctionCache<string, ArrayType>
+                        (
+                            optionsId
+                                =>
+                                parent.GetArrayForCache(count, optionsId)
+                        )
                 );
 
                 Aligner = new FunctionCache<int, AlignType>
@@ -116,18 +117,6 @@ namespace Reni.Type
         protected TypeBase()
             : base(_nextObjectId++) => _cache = new Cache(this);
 
-        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
-
-        IContextReference IContextReferenceProvider.ContextReference => ForcedReference;
-
-        /// <summary>
-        ///     Gets the icon key.
-        /// </summary>
-        /// <value> The icon key. </value>
-        string IIconKeyProvider.IconKey => "Type";
-
-        Root IRootProvider.Value => Root;
-
         [DisableDump]
         [Node]
         internal abstract Root Root { get; }
@@ -136,7 +125,7 @@ namespace Reni.Type
         internal Size Size => _cache.Size.Value;
 
         /// <summary>
-        /// Is this an hollow type? With no data?
+        ///     Is this an hollow type? With no data?
         /// </summary>
         [DisableDump]
         internal virtual bool IsHollow
@@ -176,7 +165,7 @@ namespace Reni.Type
                     : this;
 
         [DisableDump]
-        internal TypeBase SmartPointer => IsHollow ? this : Pointer;
+        internal TypeBase SmartPointer => IsHollow? this : Pointer;
 
         [DisableDump]
         internal TypeBase Align
@@ -184,10 +173,7 @@ namespace Reni.Type
             get
             {
                 var alignBits = Root.DefaultRefAlignParam.AlignBits;
-                if(Size.Align(alignBits) == Size)
-                    return this;
-
-                return _cache.Aligner[alignBits];
+                return Size.Align(alignBits) == Size? this : _cache.Aligner[alignBits];
             }
         }
 
@@ -280,7 +266,7 @@ namespace Reni.Type
         [DisableDump]
         internal virtual IEnumerable<string> DeclarationOptions
             => Root
-                .AllDefinables
+                .DefinedNames
                 .Where(IsDeclarationOption)
                 .Select(item => item.Id)
                 .OrderBy(item => item)
@@ -299,7 +285,7 @@ namespace Reni.Type
         {
             get
             {
-                if (IsHollow)
+                if(IsHollow)
                     yield break;
 
                 if(IsAligningPossible && Align.Size != Size)
@@ -310,10 +296,16 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        protected virtual IEnumerable<IConversion> StripConversions { get { yield break; } }
+        protected virtual IEnumerable<IConversion> StripConversions
+        {
+            get { yield break; }
+        }
 
         [DisableDump]
-        internal virtual IEnumerable<IConversion> StripConversionsFromPointer { get { yield break; } }
+        internal virtual IEnumerable<IConversion> StripConversionsFromPointer
+        {
+            get { yield break; }
+        }
 
         [DisableDump]
         internal virtual ContextBase ToContext
@@ -338,6 +330,18 @@ namespace Reni.Type
 
         internal bool HasIssues => Issues?.Any() ?? false;
         internal virtual Issue[] Issues => null;
+
+        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
+
+        IContextReference IContextReferenceProvider.ContextReference => ForcedReference;
+
+        /// <summary>
+        ///     Gets the icon key.
+        /// </summary>
+        /// <value> The icon key. </value>
+        string IIconKeyProvider.IconKey => "Type";
+
+        Root IRootProvider.Value => Root;
 
         [NotNull]
         protected virtual Size GetSize()
@@ -399,7 +403,7 @@ namespace Reni.Type
         internal virtual Result ApplyTypeOperator(Result argResult)
             => argResult.Type.Conversion(argResult.CompleteCategory, this).ReplaceArg(argResult);
 
-        internal Result ArgResult(Category category) { return Result(category, () => ArgCode, CodeArgs.Arg); }
+        internal Result ArgResult(Category category) => Result(category, () => ArgCode, CodeArgs.Arg);
 
         Result PointerArgResult(Category category) => Pointer.ArgResult(category);
 
@@ -411,7 +415,7 @@ namespace Reni.Type
             return Result
             (
                 category,
-                getCode: () => CodeBase.ReferenceCode(target)
+                () => CodeBase.ReferenceCode(target)
             );
         }
 
@@ -419,8 +423,8 @@ namespace Reni.Type
             => Result
             (
                 category,
-                getCode: () => codeAndExts.Code,
-                getExts: () => codeAndExts.Exts
+                () => codeAndExts.Code,
+                () => codeAndExts.Exts
             );
 
         internal Result Result(Category category, Func<Category, Result> getCodeAndRefs)
@@ -435,8 +439,7 @@ namespace Reni.Type
             );
         }
 
-        internal Result Result
-            (Category category, Func<CodeBase> getCode = null, Func<CodeArgs> getExts = null)
+        internal Result Result(Category category, Func<CodeBase> getCode = null, Func<CodeArgs> getExts = null)
             => new Result
             (
                 category,
@@ -505,8 +508,7 @@ namespace Reni.Type
             => ArgCode
                 .LocalReference(this);
 
-        internal Result ContextAccessResult
-            (Category category, IContextReference target, Func<Size> getOffset)
+        internal Result ContextAccessResult(Category category, IContextReference target, Func<Size> getOffset)
         {
             if(IsHollow)
                 return Result(category);
@@ -536,7 +538,7 @@ namespace Reni.Type
         internal Result GenericDumpPrintResult(Category category)
         {
             var searchResults = SmartPointer
-                .Declarations<DumpPrintToken>(tokenClass: null)
+                .Declarations<DumpPrintToken>(null)
                 .SingleOrDefault();
 
             if(searchResults == null)
@@ -549,7 +551,7 @@ namespace Reni.Type
         }
 
         internal Result CreateArray(Category category, string optionsId = null) => Align
-            .Array(count: 1, options: optionsId)
+            .Array(1, optionsId)
             .Pointer
             .Result(category, PointerArgResult(category));
 
@@ -599,14 +601,13 @@ namespace Reni.Type
 
         internal TypeBase SmartUn<T>()
             where T : IConversion
-            => this is T ? ((IConversion) this).Result(Category.Type).Type : this;
+            => this is T? ((IConversion)this).Result(Category.Type).Type : this;
 
         internal Result ResultFromPointer(Category category, TypeBase resultType) => resultType
             .Pointer
             .Result(category, ObjectResult);
 
-        internal virtual Result InstanceResult
-            (Category category, Func<Category, Result> getRightResult)
+        internal virtual Result InstanceResult(Category category, Func<Category, Result> getRightResult)
         {
             NotImplementedMethod(category, getRightResult(Category.All));
             return null;
@@ -634,8 +635,7 @@ namespace Reni.Type
         /// </summary>
         /// <param name="tokenClass"></param>
         /// <returns></returns>
-        IEnumerable<SearchResult> DeclarationsForTypeAndCloseRelatives
-            (Definable tokenClass)
+        IEnumerable<SearchResult> DeclarationsForTypeAndCloseRelatives(Definable tokenClass)
         {
             var result = DeclarationsForType(tokenClass).ToArray();
             if(result.Any())
@@ -671,7 +671,7 @@ namespace Reni.Type
         bool IsDeclarationOption(Definable tokenClass)
             => DeclarationsForType(tokenClass).Any();
 
-        Result AlignResult(Category category) { return Align.Result(category, () => ArgCode.Align(), CodeArgs.Arg); }
+        Result AlignResult(Category category) => Align.Result(category, () => ArgCode.Align(), CodeArgs.Arg);
 
         IEnumerable<IConversion> GetSymmetricConversionsForCache()
             => RawSymmetricConversions
@@ -694,8 +694,7 @@ namespace Reni.Type
             return result;
         }
 
-        internal virtual IEnumerable<IConversion> GetForcedConversions<TDestination>
-            (TDestination destination)
+        internal virtual IEnumerable<IConversion> GetForcedConversions<TDestination>(TDestination destination)
         {
             var provider = this as IForcedConversionProvider<TDestination>;
             if(provider != null)
@@ -717,7 +716,7 @@ namespace Reni.Type
                     : Pointer.Result(category.Typed, ForcedReference).DereferenceResult;
 
         internal Result ObjectResult(Category category)
-            => IsHollow ? Result(category) : Pointer.Result(category.Typed, ForcedReference);
+            => IsHollow? Result(category) : Pointer.Result(category.Typed, ForcedReference);
 
         protected virtual CodeBase DumpPrintCode()
         {
@@ -725,9 +724,9 @@ namespace Reni.Type
             return null;
         }
 
-        internal Result IssueResult(Category category, IssueId issueId, ISyntax currentTarget) 
+        internal Result IssueResult(Category category, IssueId issueId, ISyntax currentTarget)
             => issueId
-            .IssueResult(category, currentTarget.Main, "Type: " + DumpPrintText);
+                .IssueResult(category, currentTarget.Main, "Type: " + DumpPrintText);
 
         internal Result Execute
         (
@@ -736,7 +735,7 @@ namespace Reni.Type
             ISyntax currentTarget,
             Definable definable,
             ContextBase context,
-            Parser.ValueSyntax right
+            ValueSyntax right
         )
             => ExecuteDeclaration
             (
@@ -749,7 +748,8 @@ namespace Reni.Type
         (
             Definable definable,
             Func<SearchResult, TResult> execute,
-            Func<IssueId, TResult> onError)
+            Func<IssueId, TResult> onError
+        )
         {
             var searchResults
                 = DeclarationsForTypeAndCloseRelatives(definable)
@@ -758,9 +758,12 @@ namespace Reni.Type
 
             switch(searchResults.Length)
             {
-                case 0: return onError(IssueId.MissingDeclarationForType);
-                case 1: return execute(searchResults.First());
-                default: return onError(IssueId.AmbiguousSymbol);
+                case 0:
+                    return onError(IssueId.MissingDeclarationForType);
+                case 1:
+                    return execute(searchResults.First());
+                default:
+                    return onError(IssueId.AmbiguousSymbol);
             }
         }
     }

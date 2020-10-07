@@ -27,44 +27,25 @@ namespace Reni
         const string DefaultSourceIdentifier = "source";
         const string DefaultModuleName = "ReniModule";
 
-        public static Compiler FromFile(string fileName, CompilerParameters parameters = null)
-        {
-            Tracer.Assert(fileName != null);
-            var moduleName = ModuleNameFromFileName(fileName);
-            return new Compiler(new Source(fileName.ToSmbFile()), moduleName, parameters);
-        }
-
-        public static Compiler FromText
-            (string text, CompilerParameters parameters = null, string sourceIdentifier = null)
-        {
-            Tracer.Assert(text != null);
-            return new Compiler
-            (
-                new Source(text, sourceIdentifier ?? DefaultSourceIdentifier),
-                DefaultModuleName,
-                parameters);
-        }
+        [UsedImplicitly]
+        public Exception Exception;
 
         internal readonly CompilerParameters Parameters;
-        readonly string ModuleName;
-
-        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
-        [Node]
-        [DisableDump]
-        internal readonly Source Source;
 
         [Node]
         internal readonly Root Root;
 
-        bool _isInExecutionPhase;
+        [Node]
+        [DisableDump]
+        internal readonly Source Source;
 
-        [UsedImplicitly]
-        public Exception Exception;
-        readonly ValueCache<CodeContainer> CodeContainerCache;
+        bool _isInExecutionPhase;
         readonly ValueCache<BinaryTree> BinaryTreeCache;
-        readonly ValueCache<Result<ValueSyntax>> ValueSyntaxCache;
+        readonly ValueCache<CodeContainer> CodeContainerCache;
 
         readonly MainTokenFactory MainTokenFactory;
+        readonly string ModuleName;
+        readonly ValueCache<Result<ValueSyntax>> ValueSyntaxCache;
 
         Compiler(Source source, string moduleName, CompilerParameters parameters)
         {
@@ -78,11 +59,11 @@ namespace Reni
 
             MainTokenFactory = new MainTokenFactory(declaration, "Main");
 
-            main.PrioTable = MainPrioTable;
+            main.PrioTable = MainPriorityTable;
             main.TokenFactory = new ScannerTokenFactory();
             main.Add<ScannerTokenType<BinaryTree>>(MainTokenFactory);
 
-            declaration.PrioTable = DeclarationPrioTable;
+            declaration.PrioTable = DeclarationPriorityTable;
             declaration.TokenFactory = new ScannerTokenFactory();
             declaration.BoxFunction = target => new ExclamationBoxToken(target);
             declaration.Add<ScannerTokenType<BinaryTree>>(new DeclarationTokenFactory("Declaration"));
@@ -97,14 +78,6 @@ namespace Reni
             BinaryTreeCache = NewValueCache(() => Parse(Source + 0));
             ValueSyntaxCache = NewValueCache(GetValueSyntax);
         }
-
-        Result<ValueSyntax> GetValueSyntax() 
-            => Parameters.IsSyntaxRequired? SyntaxFactory.Root.GetValueSyntax(BinaryTree).ToFrame() : null;
-
-        CodeContainer GetCodeContainer() => new CodeContainer(Syntax, Root, ModuleName, Source.Data);
-
-        static string ModuleNameFromFileName(string fileName)
-            => "_" + Path.GetFileName(fileName).Symbolize();
 
         [Node]
         [DisableDump]
@@ -125,86 +98,6 @@ namespace Reni
         bool IsTraceEnabled
             => _isInExecutionPhase && Parameters.TraceOptions.Functions;
 
-        bool Root.IParent.ProcessErrors => Parameters.ProcessErrors;
-
-        IExecutionContext Root.IParent.ExecutionContext => this;
-
-        IEnumerable<Definable> Root.IParent.AllDefinables
-            => MainTokenFactory.AllTokenClasses.OfType<Definable>();
-
-        Result<ValueSyntax> Root.IParent.ParsePredefinedItem(string source) => ParsePredefinedItem(source);
-
-        Result<ValueSyntax> ParsePredefinedItem(string sourceText)
-        {
-            var syntax = Parse(new Source(sourceText) + 0);
-            
-            Tracer.Assert(syntax.Left != null);
-            Tracer.Assert(syntax.TokenClass is EndOfText);
-            Tracer.Assert(syntax.Right == null);
-
-            Tracer.Assert(syntax.Left .Left== null);
-            Tracer.Assert(syntax.Left .TokenClass is BeginOfText);
-
-            return syntax.Left.Right.Syntax(null);
-        }
-
-        [UsedImplicitly]
-        public Compiler Empower()
-        {
-            try
-            {
-                Execute();
-            }
-            catch(Exception exception)
-            {
-                Exception = exception;
-            }
-            return this;
-        }
-
-        /// <summary>
-        ///     Performs compilation
-        /// </summary>
-        public void Execute()
-        {
-            if(!Parameters.IsSyntaxRequired)
-            {
-                BinaryTreeCache.IsValid = true;
-                return;
-            }
-
-            if(Parameters.TraceOptions.CodeSequence)
-                Tracer.FlaggedLine("Code\n" + CodeContainer.Dump());
-
-            if(Parameters.RunFromCode)
-            {
-                _isInExecutionPhase = true;
-                RunFromCode();
-                _isInExecutionPhase = false;
-                return;
-            }
-
-            if(Parameters.TraceOptions.ExecutedCode)
-                Tracer.FlaggedLine("ExecutedCode:\n" + CSharpString);
-
-            if(Parameters.OutStream != null)
-                foreach(var t in Issues)
-                    Parameters.OutStream.AddLog(t.LogDump + "\n");
-
-            var method = CSharpMethod;
-
-            if(method == null)
-                return;
-            if(!Parameters.IsRunRequired)
-                return;
-
-            Data.OutStream = Parameters.OutStream;
-            _isInExecutionPhase = true;
-            method.Invoke(null, new object[0]);
-            _isInExecutionPhase = false;
-            Data.OutStream = null;
-        }
-
         MethodInfo CSharpMethod
         {
             get
@@ -214,7 +107,7 @@ namespace Reni
                     var includeDebugInformation = Parameters.DebuggableGeneratedCode ?? Debugger.IsAttached;
                     return CSharpString
                         .CodeToAssembly
-                        (Parameters.TraceOptions.GeneratorFilePosition, includeDebugInformation)
+                            (Parameters.TraceOptions.GeneratorFilePosition, includeDebugInformation)
                         .GetExportedTypes()[0]
                         .GetMethod(Generator.MainFunctionName);
                 }
@@ -228,36 +121,11 @@ namespace Reni
             }
         }
 
-        internal void ExecuteFromCode(DataStack dataStack)
-        {
-            _isInExecutionPhase = true;
-            CodeContainer.Main.Data.Visit(dataStack);
-            _isInExecutionPhase = false;
-        }
-
         [DisableDump]
-        internal IEnumerable<Issue> Issues 
-            => T(BinaryTree.Issues,ValueSyntaxCache.Value?.Issues, CodeContainer?.Issues).Concat();
+        internal IEnumerable<Issue> Issues
+            => T(BinaryTree.Issues, ValueSyntaxCache.Value?.Issues, CodeContainer?.Issues).Concat();
 
-        BinaryTree Parse(SourcePosition source) => this["Main"].Parser.Execute(source);
-
-        void RunFromCode() => CodeContainer.Execute(this, TraceCollector.Instance);
-
-        internal void Materialize()
-        {
-            if(Parameters.IsCodeRequired)
-                CodeContainerCache.IsValid = true;
-        }
-
-        IOutStream IExecutionContext.OutStream => Parameters.OutStream;
-
-        CodeBase IExecutionContext.Function(FunctionId functionId)
-            => CodeContainer.Function(functionId);
-
-        internal IEnumerable<BinaryTree> FindAllBelongings(BinaryTree binaryTree)
-            => BinaryTree.Belongings(binaryTree);
-
-        internal static PrioTable MainPrioTable
+        static PrioTable MainPriorityTable
         {
             get
             {
@@ -306,17 +174,13 @@ namespace Reni
                 (
                     new[]
                     {
-                        LeftParenthesis.TokenId(3),
-                        LeftParenthesis.TokenId(2),
-                        LeftParenthesis.TokenId(1),
-                        PrioTable.BeginOfText
+                        LeftParenthesis.TokenId(3), LeftParenthesis.TokenId(2), LeftParenthesis.TokenId(1)
+                        , PrioTable.BeginOfText
                     },
                     new[]
                     {
-                        RightParenthesisBase.TokenId(3),
-                        RightParenthesisBase.TokenId(2),
-                        RightParenthesisBase.TokenId(1),
-                        PrioTable.EndOfText
+                        RightParenthesisBase.TokenId(3), RightParenthesisBase.TokenId(2)
+                        , RightParenthesisBase.TokenId(1), PrioTable.EndOfText
                     }
                 );
 
@@ -326,7 +190,7 @@ namespace Reni
             }
         }
 
-        public static PrioTable DeclarationPrioTable
+        static PrioTable DeclarationPriorityTable
         {
             get
             {
@@ -335,23 +199,153 @@ namespace Reni
                 (
                     new[]
                     {
-                        LeftParenthesis.TokenId(3),
-                        LeftParenthesis.TokenId(2),
-                        LeftParenthesis.TokenId(1),
-                        PrioTable.BeginOfText
+                        LeftParenthesis.TokenId(3), LeftParenthesis.TokenId(2), LeftParenthesis.TokenId(1)
+                        , PrioTable.BeginOfText
                     },
                     new[]
                     {
-                        RightParenthesisBase.TokenId(3),
-                        RightParenthesisBase.TokenId(2),
-                        RightParenthesisBase.TokenId(1),
-                        PrioTable.EndOfText
+                        RightParenthesisBase.TokenId(3), RightParenthesisBase.TokenId(2)
+                        , RightParenthesisBase.TokenId(1), PrioTable.EndOfText
                     }
                 );
                 result.Title = "Declaration";
                 return result;
             }
         }
+
+        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
+
+        CodeBase IExecutionContext.Function(FunctionId functionId)
+            => CodeContainer.Function(functionId);
+
+        IOutStream IExecutionContext.OutStream => Parameters.OutStream;
+
+        IEnumerable<Definable> Root.IParent.DefinedNames
+            => MainTokenFactory.AllTokenClasses.OfType<Definable>();
+
+        IExecutionContext Root.IParent.ExecutionContext => this;
+
+        Result<ValueSyntax> Root.IParent.ParsePredefinedItem(string source) => ParsePredefinedItem(source);
+
+        bool Root.IParent.ProcessErrors => Parameters.ProcessErrors;
+
+        public static Compiler FromFile(string fileName, CompilerParameters parameters = null)
+        {
+            Tracer.Assert(fileName != null);
+            var moduleName = ModuleNameFromFileName(fileName);
+            return new Compiler(new Source(fileName.ToSmbFile()), moduleName, parameters);
+        }
+
+        public static Compiler FromText
+            (string text, CompilerParameters parameters = null, string sourceIdentifier = null)
+        {
+            Tracer.Assert(text != null);
+            return new Compiler
+            (
+                new Source(text, sourceIdentifier ?? DefaultSourceIdentifier),
+                DefaultModuleName,
+                parameters);
+        }
+
+        Result<ValueSyntax> GetValueSyntax()
+            => Parameters.IsSyntaxRequired? SyntaxFactory.Root.GetValueSyntax(BinaryTree).ToFrame() : null;
+
+        CodeContainer GetCodeContainer() => new CodeContainer(Syntax, Root, ModuleName, Source.Data);
+
+        static string ModuleNameFromFileName(string fileName)
+            => "_" + Path.GetFileName(fileName).Symbolize();
+
+        Result<ValueSyntax> ParsePredefinedItem(string sourceText)
+        {
+            var syntax = Parse(new Source(sourceText) + 0);
+
+            Tracer.Assert(syntax.Left != null);
+            Tracer.Assert(syntax.TokenClass is EndOfText);
+            Tracer.Assert(syntax.Right == null);
+
+            Tracer.Assert(syntax.Left.Left == null);
+            Tracer.Assert(syntax.Left.TokenClass is BeginOfText);
+
+            return syntax.Left.Right.Syntax(null);
+        }
+
+        [UsedImplicitly]
+        public Compiler Empower()
+        {
+            try
+            {
+                Execute();
+            }
+            catch(Exception exception)
+            {
+                Exception = exception;
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        ///     Performs compilation
+        /// </summary>
+        public void Execute()
+        {
+            if(!Parameters.IsSyntaxRequired)
+            {
+                BinaryTreeCache.IsValid = true;
+                return;
+            }
+
+            if(Parameters.TraceOptions.CodeSequence)
+                Tracer.FlaggedLine("Code\n" + CodeContainer.Dump());
+
+            if(Parameters.RunFromCode)
+            {
+                _isInExecutionPhase = true;
+                RunFromCode();
+                _isInExecutionPhase = false;
+                return;
+            }
+
+            if(Parameters.TraceOptions.ExecutedCode)
+                Tracer.FlaggedLine("ExecutedCode:\n" + CSharpString);
+
+            if(Parameters.OutStream != null)
+                foreach(var t in Issues)
+                    Parameters.OutStream.AddLog(t.LogDump + "\n");
+
+            var method = CSharpMethod;
+
+            if(method == null)
+                return;
+            if(!Parameters.IsRunRequired)
+                return;
+
+            Data.OutStream = Parameters.OutStream;
+            _isInExecutionPhase = true;
+            method.Invoke(null, new object[0]);
+            _isInExecutionPhase = false;
+            Data.OutStream = null;
+        }
+
+        internal void ExecuteFromCode(DataStack dataStack)
+        {
+            _isInExecutionPhase = true;
+            CodeContainer.Main.Data.Visit(dataStack);
+            _isInExecutionPhase = false;
+        }
+
+        BinaryTree Parse(SourcePosition source) => this["Main"].Parser.Execute(source);
+
+        void RunFromCode() => CodeContainer.Execute(this, TraceCollector.Instance);
+
+        internal void Materialize()
+        {
+            if(Parameters.IsCodeRequired)
+                CodeContainerCache.IsValid = true;
+        }
+
+        internal IEnumerable<BinaryTree> FindAllBelongings(BinaryTree binaryTree)
+            => BinaryTree.Belongings(binaryTree);
     }
 
     public sealed class TraceCollector : DumpableObject, ITraceCollector
@@ -361,26 +355,26 @@ namespace Reni
         void ITraceCollector.AssertionFailed(Func<string> dumper, int depth)
             => Tracer.Assert(false, dumper, depth + 1);
 
-        void ITraceCollector.Run(DataStack dataStack, IFormalCodeItem codeBase)
-        {
-            const string Stars = "\n******************************\n";
-            Tracer.Log(Stars + dataStack.Dump() + Stars);
-            Tracer.Log(codeBase.Dump());
-            Tracer.IndentStart();
-            codeBase.Visit(dataStack);
-            Tracer.IndentEnd();
-        }
-
         void ITraceCollector.Call(StackData argsAndRefs, FunctionId functionId)
         {
-            Tracer.Log("\n>>>>>> Call" + functionId.NodeDump + "\n");
+            ("\n>>>>>> Call" + functionId.NodeDump + "\n").Log();
             Tracer.IndentStart();
         }
 
         void ITraceCollector.Return()
         {
             Tracer.IndentEnd();
-            Tracer.Log("\n<<<<<< Return\n");
+            "\n<<<<<< Return\n".Log();
+        }
+
+        void ITraceCollector.Run(DataStack dataStack, IFormalCodeItem codeBase)
+        {
+            const string stars = "\n******************************\n";
+            (stars + dataStack.Dump() + stars).Log();
+            codeBase.Dump().Log();
+            Tracer.IndentStart();
+            codeBase.Visit(dataStack);
+            Tracer.IndentEnd();
         }
     }
 
