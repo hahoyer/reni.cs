@@ -16,7 +16,7 @@ namespace Reni.TokenClasses
                 .Array(data.Length)
                 .TextItem
                 .Result
-                (category, () => CodeBase.BitsConst(BitsConst.ConvertAsText(data)), CodeArgs.Void);
+                (category, () => CodeBase.BitsConst(BitsConst.ConvertAsText(data)), Closures.Void);
         }
 
         public override string Id => "<text>";

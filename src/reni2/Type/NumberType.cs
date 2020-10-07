@@ -162,7 +162,7 @@ namespace Reni.Type
                 (
                     category,
                     () => OperationCode(resultType.Size, operationName, right),
-                    CodeArgs.Arg
+                    Closures.Arg
                 );
 
             var leftResult = ObjectResult(category.WithType)
@@ -190,7 +190,7 @@ namespace Reni.Type
                 (
                     category,
                     () => source.ArgCode.BitCast(Size),
-                    CodeArgs.Arg
+                    Closures.Arg
                 );
         }
 
@@ -204,7 +204,7 @@ namespace Reni.Type
                 (
                     category,
                     () => EnableCut.ArgCode.BitCast(destination.Size),
-                    CodeArgs.Arg
+                    Closures.Arg
                 );
         }
 

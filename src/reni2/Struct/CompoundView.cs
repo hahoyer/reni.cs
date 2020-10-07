@@ -309,7 +309,7 @@ namespace Reni.Struct
                 (
                     category,
                     ObjectPointerViaContext,
-                    () => CodeArgs.Create(Compound)
+                    () => Closures.Create(Compound)
                 );
         }
 

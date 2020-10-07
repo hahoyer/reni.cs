@@ -53,7 +53,7 @@ namespace Reni.Code
         string DumpSignature => "(" + InputSize + "==>" + OutputSize + ")";
 
         [DisableDump]
-        internal CodeArgs CodeArgs => GetRefsImplementation();
+        internal Closures Closures => GetRefsImplementation();
 
         [DisableDump]
         internal virtual bool HasArg => false;
@@ -101,7 +101,7 @@ namespace Reni.Code
 
         void IFormalCodeItem.Visit(IVisitor visitor) => Visit(visitor);
 
-        protected virtual CodeArgs GetRefsImplementation() => CodeArgs.Void();
+        protected virtual Closures GetRefsImplementation() => Closures.Void();
 
     }
 

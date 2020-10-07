@@ -41,7 +41,7 @@ namespace Reni.Struct
             public ContextReference(FunctionBodyType parent)
                 : base(parent.ObjectId)
             {
-                _order = CodeArgs.NextOrder++;
+                _order = Closures.NextOrder++;
                 _parent = parent;
                 StopByObjectIds(-5);
             }

@@ -19,7 +19,7 @@ namespace Reni.Feature
             (Func<Category, IContextReference, TypeBase, Result> function, IContextReferenceProvider target)
             : base(_nextObjectId++)
         {
-            _order = CodeArgs.NextOrder++;
+            _order = Closures.NextOrder++;
             _function = function;
             _target = target;
         }
@@ -63,7 +63,7 @@ namespace Reni.Feature
         public ExtendedFunction(Func<Category, TypeBase, T, Result> function, T arg)
             : base(_nextObjectId++)
         {
-            _order = CodeArgs.NextOrder++;
+            _order = Closures.NextOrder++;
             _function = function;
             _arg = arg;
             Tracer.Assert(_function.Target is IContextReferenceProvider);

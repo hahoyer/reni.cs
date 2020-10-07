@@ -121,7 +121,7 @@ namespace Reni
         internal CodeBase Code => GetCategories(Category.Code).Code;
 
         [DisableDump]
-        internal CodeArgs Closures => GetCategories(Category.Closures).Closures;
+        internal Closures Closures => GetCategories(Category.Closures).Closures;
 
         [DisableDump]
         internal Size Size => GetCategories(Category.Size).Size;

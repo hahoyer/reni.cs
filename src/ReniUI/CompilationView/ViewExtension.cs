@@ -26,7 +26,7 @@ namespace ReniUI.CompilationView
             return control.CreateGroup(title);
         }
 
-        internal static Control CreateView(this CodeArgs closures, SourceView master)
+        internal static Control CreateView(this Closures closures, SourceView master)
             => false.CreateLineupView
                 (
                     closures

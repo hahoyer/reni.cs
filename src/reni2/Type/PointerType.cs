@@ -24,7 +24,7 @@ namespace Reni.Type
 
         internal PointerType(TypeBase valueType)
         {
-            _order = CodeArgs.NextOrder++;
+            _order = Closures.NextOrder++;
             ValueType = valueType;
             Tracer.Assert(!valueType.IsHollow, valueType.Dump);
             Tracer.Assert(valueType.IsPointerPossible, valueType.Dump);
@@ -118,7 +118,7 @@ namespace Reni.Type
                 (
                     category,
                     () => ArgCode.DePointer(ValueType.Size).Align(),
-                    CodeArgs.Arg
+                    Closures.Arg
                 );
 
         protected override ResultCache DePointer(Category category)
@@ -127,7 +127,7 @@ namespace Reni.Type
                 (
                     category,
                     () => ArgCode.DePointer(ValueType.Size),
-                    CodeArgs.Arg
+                    Closures.Arg
                 );
 
         internal override Result ConvertToStableReference(Category category)

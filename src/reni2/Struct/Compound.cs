@@ -31,7 +31,7 @@ namespace Reni.Struct
         internal Compound(CompoundSyntax syntax, ContextBase parent)
             : base(_nextObjectId++)
         {
-            _order = CodeArgs.NextOrder++;
+            _order = Closures.NextOrder++;
             Syntax = syntax;
             Parent = parent;
             View = new FunctionCache<int, CompoundView>
@@ -152,7 +152,7 @@ namespace Reni.Struct
                 BreakExecution();
 
                 var result = resultWithCleanup
-                                 .ReplaceRelative(this, CodeBase.TopRef, CodeArgs.Void) &
+                                 .ReplaceRelative(this, CodeBase.TopRef, Closures.Void) &
                              category;
 
                 if(result.HasIssue)

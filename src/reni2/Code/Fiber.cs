@@ -67,10 +67,10 @@ namespace Reni.Code
 
         protected override Size GetSize() => _fiberItems.Last().OutputSize;
 
-        protected override CodeArgs GetRefsImplementation()
+        protected override Closures GetRefsImplementation()
             => _fiberItems
                 .Aggregate
-                (FiberHead.Closures, (current, fiberItem) => current.Sequence(fiberItem.CodeArgs));
+                (FiberHead.Closures, (current, fiberItem) => current.Sequence(fiberItem.Closures));
 
         internal override CodeBase Add(FiberItem subsequentElement)
         {

@@ -17,7 +17,7 @@ namespace Reni.Struct
         internal CompoundContext(CompoundView view)
             : base(view.Compound.Parent)
         {
-            _order = CodeArgs.NextOrder++;
+            _order = Closures.NextOrder++;
             View = view;
             StopByObjectIds();
         }

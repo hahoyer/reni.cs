@@ -107,7 +107,7 @@ namespace Reni.Code
             => Data
                 .Aggregate(Size.Zero, (size, codeBase) => size + codeBase.Size);
 
-        protected override CodeArgs GetRefsImplementation() => GetRefs(Data);
+        protected override Closures GetRefsImplementation() => GetRefs(Data);
         internal override void Visit(IVisitor visitor) => visitor.List(Data);
 
         internal bool IsCombinePossible(RecursiveCallCandidate recursiveCallCandidate)

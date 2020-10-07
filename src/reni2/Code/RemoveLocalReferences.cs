@@ -147,7 +147,7 @@ namespace Reni.Code
                         var cleanup1 = reference
                             .ValueType
                             .Cleanup(Category.Code | Category.Closures)
-                            .ReplaceAbsolute(reference.ValueType.ForcedPointer, CodeBase.TopRef, CodeArgs.Void);
+                            .ReplaceAbsolute(reference.ValueType.ForcedPointer, CodeBase.TopRef, Closures.Void);
                         cleanup = cleanup1 + cleanup;
                         Dump(nameof(cleanup), cleanup);
                         BreakExecution();

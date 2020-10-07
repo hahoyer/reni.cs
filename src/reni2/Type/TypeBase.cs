@@ -397,7 +397,7 @@ namespace Reni.Type
         internal virtual Result ApplyTypeOperator(Result argResult)
             => argResult.Type.Conversion(argResult.CompleteCategory, this).ReplaceArg(argResult);
 
-        internal Result ArgResult(Category category) => Result(category, () => ArgCode, CodeArgs.Arg);
+        internal Result ArgResult(Category category) => Result(category, () => ArgCode, Closures.Arg);
 
         Result PointerArgResult(Category category) => Pointer.ArgResult(category);
 
@@ -433,7 +433,7 @@ namespace Reni.Type
             );
         }
 
-        internal Result Result(Category category, Func<CodeBase> getCode = null, Func<CodeArgs> getClosures = null)
+        internal Result Result(Category category, Func<CodeBase> getCode = null, Func<Closures> getClosures = null)
             => new Result
             (
                 category,
@@ -494,7 +494,7 @@ namespace Reni.Type
                 (
                     category,
                     LocalReferenceCode,
-                    CodeArgs.Arg
+                    Closures.Arg
                 );
         }
 
@@ -589,7 +589,7 @@ namespace Reni.Type
             (
                 category,
                 () => CodeBase.DumpPrintText(DumpPrintText),
-                CodeArgs.Void
+                Closures.Void
             );
 
         internal TypeBase SmartUn<T>()
@@ -664,7 +664,7 @@ namespace Reni.Type
         bool IsDeclarationOption(Definable tokenClass)
             => DeclarationsForType(tokenClass).Any();
 
-        Result AlignResult(Category category) => Align.Result(category, () => ArgCode.Align(), CodeArgs.Arg);
+        Result AlignResult(Category category) => Align.Result(category, () => ArgCode.Align(), Closures.Arg);
 
         IEnumerable<IConversion> GetSymmetricConversionsForCache()
             => RawSymmetricConversions

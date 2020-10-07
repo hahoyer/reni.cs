@@ -36,7 +36,7 @@ namespace Reni.Struct
         Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
         {
             if(category.IsNone && pendingCategory == Category.Closures)
-                return new Result(Category.Closures, getClosures: CodeArgs.Void);
+                return new Result(Category.Closures, getClosures: Reni.Closures.Void);
 
 
             Tracer.Assert(pendingCategory.IsNone);
@@ -60,7 +60,7 @@ namespace Reni.Struct
 
         [Node]
         [DisableDump]
-        internal CodeArgs Closures
+        internal Closures Closures
         {
             get
             {
@@ -111,7 +111,7 @@ namespace Reni.Struct
                 return null;
 
             if(category.HasClosures)
-                result.Closures = CodeArgs.Arg();
+                result.Closures = Closures.Arg();
             if(!result.HasIssue && category.HasCode)
                 result.Code = CallType
                     .ArgCode
@@ -134,7 +134,7 @@ namespace Reni.Struct
 
                 Tracer.Assert(rawResult.HasIssue || rawResult.CompleteCategory == category.WithType);
                 if(rawResult.FindClosures != null)
-                    Tracer.Assert(!rawResult.SmartClosures.Contains(CodeArgs.Arg()), rawResult.Dump);
+                    Tracer.Assert(!rawResult.SmartClosures.Contains(Closures.Arg()), rawResult.Dump);
 
                 Dump("rawResult", rawResult);
                 BreakExecution();
@@ -156,7 +156,7 @@ namespace Reni.Struct
 
                 var result = argReferenceReplaced
                     .ReplaceAbsolute
-                        (Context.FindRecentFunctionContextObject, CreateContextRefCode, CodeArgs.Void)
+                        (Context.FindRecentFunctionContextObject, CreateContextRefCode, Closures.Void)
                     .Weaken;
 
                 return ReturnMethodDump(result);
@@ -175,7 +175,7 @@ namespace Reni.Struct
 
             return result
                 .ReplaceAbsolute
-                    (reference, () => CodeBase.FrameRef().DePointer(reference.Size()), CodeArgs.Void);
+                    (reference, () => CodeBase.FrameRef().DePointer(reference.Size()), Closures.Void);
         }
 
         CodeBase CreateContextRefCode()

@@ -13,7 +13,7 @@ namespace Reni.Context
         internal Function(ContextBase parent, TypeBase argsType, TypeBase valueType = null)
             : base(parent)
         {
-            _order = CodeArgs.NextOrder++;
+            _order = Closures.NextOrder++;
             ArgsType = argsType;
             ValueType = valueType;
             StopByObjectIds();

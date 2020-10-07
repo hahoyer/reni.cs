@@ -18,7 +18,7 @@ namespace Reni.Code
         }
 
         protected override Size GetSize() => Type.Size;
-        protected override CodeArgs GetRefsImplementation() => CodeArgs.Arg();
+        protected override Closures GetRefsImplementation() => Closures.Arg();
         protected override TCode VisitImplementation<TCode, TFiber>(Visitor<TCode, TFiber> actual) => actual.Arg(this);
     }
 }

@@ -17,7 +17,7 @@ namespace Reni
     {
         class DataContainer
         {
-            internal CodeArgs Closure;
+            internal Closures Closure;
             internal CodeBase Code;
             internal bool IsDirty;
             internal bool? IsHollow;
@@ -47,7 +47,7 @@ namespace Reni
                 null,
                 null,
                 null,
-                CodeArgs.Void) { }
+                Closures.Void) { }
 
         internal Result(Category category, Issue recentIssue)
             : this(category, new[] {recentIssue}) { }
@@ -59,7 +59,7 @@ namespace Reni
             Func<Size> getSize = null,
             Func<TypeBase> getType = null,
             Func<CodeBase> getCode = null,
-            Func<CodeArgs> getClosures = null,
+            Func<Closures> getClosures = null,
             Root rootContext = null
         )
             : this
@@ -81,7 +81,7 @@ namespace Reni
             Func<Size> getSize,
             Func<TypeBase> getType,
             Func<CodeBase> getCode,
-            Func<CodeArgs> getClosures,
+            Func<Closures> getClosures,
             Root rootContext = null
         )
             : this()
@@ -92,7 +92,7 @@ namespace Reni
             var size = getSize == null? null : new ValueCache<Size>(getSize);
             var type = getType == null? null : new ValueCache<TypeBase>(getType);
             var code = getCode == null? null : new ValueCache<CodeBase>(getCode);
-            var closures = getClosures == null? null : new ValueCache<CodeArgs>(getClosures);
+            var closures = getClosures == null? null : new ValueCache<Closures>(getClosures);
 
             if(category.HasType)
                 Data.Type = ObtainType(isHollow, size, type, code, rootContext);
@@ -177,7 +177,7 @@ namespace Reni
 
         [Node]
         [DebuggerHidden]
-        internal CodeArgs Closures
+        internal Closures Closures
         {
             get => Data.Closure;
             set
@@ -250,7 +250,7 @@ namespace Reni
             }
         }
 
-        internal CodeArgs FindClosures
+        internal Closures FindClosures
         {
             get
             {
@@ -263,7 +263,7 @@ namespace Reni
         }
 
         [DisableDump]
-        internal CodeArgs SmartClosures
+        internal Closures SmartClosures
         {
             get
             {
@@ -533,13 +533,13 @@ namespace Reni
         ) =>
             getIsHollow?.Value ?? getSize?.Value.IsZero ?? getType?.Value.IsHollow ?? getCode?.Value.IsEmpty;
 
-        CodeArgs ObtainClosures
+        Closures ObtainClosures
         (
             ValueCache<bool> getIsHollow,
             ValueCache<Size> getSize,
             ValueCache<TypeBase> getType,
             ValueCache<CodeBase> getCode,
-            ValueCache<CodeArgs> getArgs
+            ValueCache<Closures> getArgs
         )
         {
             if(getArgs != null)
@@ -549,7 +549,7 @@ namespace Reni
 // ReSharper disable ExpressionIsAlwaysNull
             if(TryObtainIsHollow(getIsHollow, getSize, getType, getCode) == true)
 // ReSharper restore ExpressionIsAlwaysNull
-                return CodeArgs.Void();
+                return Closures.Void();
 
             Tracer.AssertionFailed("CodeArgs cannot be determned", ToString);
             return null;
@@ -779,7 +779,7 @@ namespace Reni
         }
 
         internal Result ReplaceAbsolute<TRefInCode>
-            (TRefInCode refInCode, Func<CodeBase> replacementCode, Func<CodeArgs> replacementRefs)
+            (TRefInCode refInCode, Func<CodeBase> replacementCode, Func<Closures> replacementRefs)
             where TRefInCode : IContextReference
         {
             if(HasClosures && !Closures.Contains(refInCode))
@@ -823,7 +823,7 @@ namespace Reni
         }
 
         internal Result ReplaceRelative<TRefInCode>
-            (TRefInCode refInCode, Func<CodeBase> replacementCode, Func<CodeArgs> replacementRefs)
+            (TRefInCode refInCode, Func<CodeBase> replacementCode, Func<Closures> replacementRefs)
             where TRefInCode : IContextReference
         {
             if(HasClosures && !Closures.Contains(refInCode))

@@ -88,7 +88,7 @@ namespace Reni.Struct
 
         [Node]
         [DisableDump]
-        internal CodeArgs Closures => GetClosures();
+        internal Closures Closures => GetClosures();
 
         [DisableDump]
         internal FunctionContainer Container
@@ -168,7 +168,7 @@ namespace Reni.Struct
                 (
                     category,
                     () => Closures.ToCode() + ArgsType.ArgCode,
-                    () => Closures + CodeArgs.Arg()
+                    () => Closures + Closures.Arg()
                 );
                 Tracer.Assert(category == result.CompleteCategory);
                 return ReturnMethodDump(result);
@@ -179,7 +179,7 @@ namespace Reni.Struct
             }
         }
 
-        CodeArgs GetClosures()
+        Closures GetClosures()
         {
             var result = Getter.Closures;
             Tracer.Assert(result != null);

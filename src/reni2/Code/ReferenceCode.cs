@@ -21,7 +21,7 @@ namespace Reni.Code
         }
 
 
-        protected override CodeArgs GetRefsImplementation() => CodeArgs.Create(Target);
+        protected override Closures GetRefsImplementation() => Reni.Closures.Create(Target);
 
         protected override Size GetSize() => Target.Size();
 

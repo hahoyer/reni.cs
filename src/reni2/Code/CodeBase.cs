@@ -30,7 +30,7 @@ namespace Reni.Code
         internal Size TemporarySize => GetTemporarySize();
 
         [DisableDump]
-        internal CodeArgs Closures => GetRefsImplementation();
+        internal Closures Closures => GetRefsImplementation();
 
         [DisableDump]
         internal virtual bool IsEmpty => false;
@@ -74,7 +74,7 @@ namespace Reni.Code
 
         protected abstract Size GetSize();
 
-        protected virtual CodeArgs GetRefsImplementation() => CodeArgs.Void();
+        protected virtual Closures GetRefsImplementation() => Closures.Void();
 
         internal CodeBase Assignment(Size size)
         {
@@ -278,10 +278,10 @@ namespace Reni.Code
         void IFormalCodeItem.Visit(IVisitor visitor) => Visit(visitor);
         Size IFormalCodeItem.Size => Size;
 
-        protected static CodeArgs GetRefs(CodeBase[] codeBases)
+        protected static Closures GetRefs(CodeBase[] codeBases)
         {
             var refs = codeBases.Select(code => code.Closures).ToArray();
-            return refs.Aggregate(CodeArgs.Void(), (r1, r2) => r1.Sequence(r2));
+            return refs.Aggregate(Closures.Void(), (r1, r2) => r1.Sequence(r2));
         }
 
         internal static CodeBase Arg(TypeBase type) => new Arg(type);

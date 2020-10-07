@@ -54,7 +54,7 @@ namespace Reni.Type
 
         internal ArrayReferenceType(TypeBase valueType, string optionsId)
         {
-            _order = CodeArgs.NextOrder++;
+            _order = Closures.NextOrder++;
             OptionsValue = Options.Create(optionsId);
             _repeaterAccessTypeCache = new ValueCache<RepeaterAccessType>
                 (() => new RepeaterAccessType(this));
@@ -232,7 +232,7 @@ namespace Reni.Type
                 (
                     category,
                     () => ArgCode.DePointer(ValueType.Size).Align(),
-                    CodeArgs.Arg
+                    Closures.Arg
                 );
 
         TypeBase IChild<TypeBase>.Parent => ValueType;

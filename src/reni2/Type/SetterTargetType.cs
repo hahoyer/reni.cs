@@ -14,7 +14,7 @@ namespace Reni.Type
     {
         readonly int _order;
 
-        protected SetterTargetType() => _order = CodeArgs.NextOrder++;
+        protected SetterTargetType() => _order = Closures.NextOrder++;
 
         TypeBase IConversion.Source => this;
 
