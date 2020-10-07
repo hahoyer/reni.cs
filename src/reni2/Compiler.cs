@@ -39,7 +39,7 @@ namespace Reni
         [DisableDump]
         internal readonly Source Source;
 
-        bool _isInExecutionPhase;
+        bool IsInExecutionPhase;
         readonly ValueCache<BinaryTree> BinaryTreeCache;
         readonly ValueCache<CodeContainer> CodeContainerCache;
 
@@ -96,7 +96,7 @@ namespace Reni
         internal string CSharpString => this.CachedValue(() => CodeContainer.CSharpString);
 
         bool IsTraceEnabled
-            => _isInExecutionPhase && Parameters.TraceOptions.Functions;
+            => IsInExecutionPhase && Parameters.TraceOptions.Functions;
 
         MethodInfo CSharpMethod
         {
@@ -300,9 +300,9 @@ namespace Reni
 
             if(Parameters.RunFromCode)
             {
-                _isInExecutionPhase = true;
+                IsInExecutionPhase = true;
                 RunFromCode();
-                _isInExecutionPhase = false;
+                IsInExecutionPhase = false;
                 return;
             }
 
@@ -321,17 +321,17 @@ namespace Reni
                 return;
 
             Data.OutStream = Parameters.OutStream;
-            _isInExecutionPhase = true;
+            IsInExecutionPhase = true;
             method.Invoke(null, new object[0]);
-            _isInExecutionPhase = false;
+            IsInExecutionPhase = false;
             Data.OutStream = null;
         }
 
         internal void ExecuteFromCode(DataStack dataStack)
         {
-            _isInExecutionPhase = true;
+            IsInExecutionPhase = true;
             CodeContainer.Main.Data.Visit(dataStack);
-            _isInExecutionPhase = false;
+            IsInExecutionPhase = false;
         }
 
         BinaryTree Parse(SourcePosition source) => this["Main"].Parser.Execute(source);

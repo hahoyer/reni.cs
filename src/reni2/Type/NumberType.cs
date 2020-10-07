@@ -48,8 +48,8 @@ namespace Reni.Type
         [EnableDump]
         internal int Bits => Size.ToInt();
         [DisableDump]
-        protected override IEnumerable<IGenericProviderForType> Genericize
-            => this.GenericListFromType(base.Genericize);
+        protected override IEnumerable<IGenericProviderForType> GenericList
+            => this.GenericListFromType(base.GenericList);
 
         internal override IEnumerable<IConversion> CutEnabledConversion(NumberType destination)
         {

@@ -24,7 +24,7 @@ namespace Reni.Type
             , ValueCache.IContainer
             , IRootProvider
     {
-        sealed class Cache
+        sealed class CacheContainer
         {
             [Node]
             [SmartNode]
@@ -72,7 +72,7 @@ namespace Reni.Type
             [SmartNode]
             internal readonly FunctionCache<string, ArrayReferenceType> ArrayReferenceCache;
 
-            public Cache(TypeBase parent)
+            public CacheContainer(TypeBase parent)
             {
                 EnableCut = new ValueCache<EnableCut>(() => new EnableCut(parent));
                 Mutation = new FunctionCache<TypeBase, ResultCache>
@@ -108,21 +108,21 @@ namespace Reni.Type
             }
         }
 
-        static int _nextObjectId;
+        static int NextObjectId;
 
         [Node]
         [SmartNode]
-        readonly Cache _cache;
+        readonly CacheContainer Cache;
 
         protected TypeBase()
-            : base(_nextObjectId++) => _cache = new Cache(this);
+            : base(NextObjectId++) => Cache = new CacheContainer(this);
 
         [DisableDump]
         [Node]
         internal abstract Root Root { get; }
 
         [Node]
-        internal Size Size => _cache.Size.Value;
+        internal Size Size => Cache.Size.Value;
 
         /// <summary>
         ///     Is this an hollow type? With no data?
@@ -146,13 +146,13 @@ namespace Reni.Type
         internal virtual string DumpPrintText => NodeDump;
 
         [DisableDump]
-        internal EnableCut EnableCut => _cache.EnableCut.Value;
+        internal EnableCut EnableCut => Cache.EnableCut.Value;
 
         [DisableDump]
         internal TypeBase Pointer => ForcedReference.Type();
 
         [DisableDump]
-        internal IReference ForcedReference => _cache.ForcedReference.Value;
+        internal IReference ForcedReference => Cache.ForcedReference.Value;
 
         [DisableDump]
         internal CodeBase ArgCode => CodeBase.Arg(this);
@@ -173,7 +173,7 @@ namespace Reni.Type
             get
             {
                 var alignBits = Root.DefaultRefAlignParam.AlignBits;
-                return Size.Align(alignBits) == Size? this : _cache.Aligner[alignBits];
+                return Size.Align(alignBits) == Size? this : Cache.Aligner[alignBits];
             }
         }
 
@@ -190,13 +190,13 @@ namespace Reni.Type
         internal virtual Size SimpleItemSize => null;
 
         [DisableDump]
-        internal TypeType TypeType => _cache.TypeType.Value;
+        internal TypeType TypeType => Cache.TypeType.Value;
 
         [DisableDump]
-        internal TypeBase FunctionInstance => _cache.FunctionInstanceType.Value;
+        internal TypeBase FunctionInstance => Cache.FunctionInstanceType.Value;
 
         [DisableDump]
-        internal PointerType ForcedPointer => _cache.Pointer.Value;
+        internal PointerType ForcedPointer => Cache.Pointer.Value;
 
         [DisableDump]
         internal virtual CompoundView FindRecentCompoundView
@@ -273,12 +273,12 @@ namespace Reni.Type
                 .ToArray();
 
         [DisableDump]
-        protected virtual IEnumerable<IGenericProviderForType> Genericize
+        protected virtual IEnumerable<IGenericProviderForType> GenericList
             => this.GenericListFromType();
 
         [DisableDump]
         [NotNull]
-        public IEnumerable<IConversion> SymmetricConversions => _cache.SymmetricConversions.Value;
+        public IEnumerable<IConversion> SymmetricConversions => Cache.SymmetricConversions.Value;
 
         [DisableDump]
         protected virtual IEnumerable<IConversion> RawSymmetricConversions
@@ -351,17 +351,11 @@ namespace Reni.Type
         }
 
         [NotNull]
-        Size GetSizeForCache()
-        {
-            if(IsHollow)
-                return Size.Zero;
-
-            return GetSize();
-        }
+        Size GetSizeForCache() => IsHollow? Size.Zero : GetSize();
 
         internal virtual int? SmartArrayLength(TypeBase elementType)
         {
-            if(IsConvertable(elementType))
+            if(IsConvertible(elementType))
                 return 1;
 
             NotImplementedMethod(elementType);
@@ -375,12 +369,12 @@ namespace Reni.Type
             => Root.VoidType.Result(category & (Category.Code | Category.Exts));
 
         internal ArrayType Array(int count, string options = null)
-            => _cache.Array[count][options ?? ArrayType.Options.DefaultOptionsId];
+            => Cache.Array[count][options ?? ArrayType.Options.DefaultOptionsId];
 
         internal ArrayReferenceType ArrayReference(string optionsId)
-            => _cache.ArrayReferenceCache[optionsId];
+            => Cache.ArrayReferenceCache[optionsId];
 
-        protected virtual TypeBase ReversePair(TypeBase first) => first._cache.Pair[this];
+        protected virtual TypeBase ReversePair(TypeBase first) => first.Cache.Pair[this];
         internal virtual TypeBase Pair(TypeBase second, SourcePart position) => second.ReversePair(this);
 
         internal virtual Result Cleanup(Category category)
@@ -419,39 +413,39 @@ namespace Reni.Type
             );
         }
 
-        internal Result Result(Category category, Result codeAndExts)
+        internal Result Result(Category category, Result codeAndClosures)
             => Result
             (
                 category,
-                () => codeAndExts.Code,
-                () => codeAndExts.Exts
+                () => codeAndClosures.Code,
+                () => codeAndClosures.Exts
             );
 
         internal Result Result(Category category, Func<Category, Result> getCodeAndRefs)
         {
             var localCategory = category & (Category.Code | Category.Exts);
-            var codeAndExts = getCodeAndRefs(localCategory);
+            var codeAndClosures = getCodeAndRefs(localCategory);
             return Result
             (
                 category,
-                () => codeAndExts.Code,
-                () => codeAndExts.Exts
+                () => codeAndClosures.Code,
+                () => codeAndClosures.Exts
             );
         }
 
-        internal Result Result(Category category, Func<CodeBase> getCode = null, Func<CodeArgs> getExts = null)
+        internal Result Result(Category category, Func<CodeBase> getCode = null, Func<CodeArgs> getClosures = null)
             => new Result
             (
                 category,
                 getType: () => this,
                 getCode: getCode,
-                getExts: getExts);
+                getExts: getClosures);
 
         internal TypeBase CommonType(TypeBase elseType)
         {
-            if(elseType.IsConvertable(this))
+            if(elseType.IsConvertible(this))
                 return this;
-            if(IsConvertable(elseType))
+            if(IsConvertible(elseType))
                 return elseType;
 
             var thenConversions = ConversionService.ClosureService.Result(this);
@@ -555,7 +549,7 @@ namespace Reni.Type
             .Pointer
             .Result(category, PointerArgResult(category));
 
-        internal bool IsConvertable(TypeBase destination)
+        internal bool IsConvertible(TypeBase destination)
             => ConversionService.FindPath(this, destination) != null;
 
         internal Result Conversion(Category category, TypeBase destination)
@@ -564,17 +558,16 @@ namespace Reni.Type
                 return destination.SmartPointer.Result(category);
 
             var path = ConversionService.FindPath(this, destination);
-            if(path != null)
-                return path.Execute(category.Typed);
-
-            return ArgResult(category).InvalidConversion(destination);
+            return path == null
+                ? ArgResult(category).InvalidConversion(destination) 
+                : path.Execute(category.Typed);
         }
 
         Result Mutation(Category category, TypeBase destination)
             => destination.Result(category, ArgResult);
 
         internal ResultCache Mutation(TypeBase destination)
-            => _cache.Mutation[destination];
+            => Cache.Mutation[destination];
 
         internal virtual Result ConstructorResult(Category category, TypeBase argsType)
         {
@@ -654,7 +647,7 @@ namespace Reni.Type
         ///     Only declaration, that are made exactly for type <see cref="TDefinable" />
         ///     should be considered.
         ///     This implementation checks if this type is symbol provider for definable.
-        ///     Dont call this except in overriden versions.
+        ///     Don't call this except in overriden versions.
         /// </summary>
         /// <typeparam name="TDefinable"></typeparam>
         /// <param name="tokenClass"></param>
@@ -681,7 +674,7 @@ namespace Reni.Type
         internal IEnumerable<IConversion> GetForcedConversions(TypeBase destination)
         {
             var genericProviderForTypes = destination
-                .Genericize
+                .GenericList
                 .ToArray();
             var result = genericProviderForTypes
                 .SelectMany(g => g.GetForcedConversions(this).ToArray())
@@ -694,14 +687,10 @@ namespace Reni.Type
             return result;
         }
 
-        internal virtual IEnumerable<IConversion> GetForcedConversions<TDestination>(TDestination destination)
-        {
-            var provider = this as IForcedConversionProvider<TDestination>;
-            if(provider != null)
-                return provider.Result(destination);
-
-            return new IConversion[0];
-        }
+        internal virtual IEnumerable<IConversion> GetForcedConversions<TDestination>(TDestination destination) 
+            => this is IForcedConversionProvider<TDestination> provider
+            ? provider.Result(destination)
+            : new IConversion[0];
 
         internal virtual IEnumerable<IConversion> CutEnabledConversion(NumberType destination) { yield break; }
 
@@ -724,7 +713,7 @@ namespace Reni.Type
             return null;
         }
 
-        internal Result IssueResult(Category category, IssueId issueId, ISyntax currentTarget)
+        Result IssueResult(Category category, IssueId issueId, ISyntax currentTarget)
             => issueId
                 .IssueResult(category, currentTarget.Main, "Type: " + DumpPrintText);
 
@@ -769,6 +758,7 @@ namespace Reni.Type
     }
 
 
+    // ReSharper disable CommentTypo
     // Krautpuster
     // Gurkennudler
 }

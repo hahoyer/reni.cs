@@ -99,8 +99,8 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        protected override IEnumerable<IGenericProviderForType> Genericize
-            => this.GenericListFromType(base.Genericize);
+        protected override IEnumerable<IGenericProviderForType> GenericList
+            => this.GenericListFromType(base.GenericList);
         [DisableDump]
         protected override IEnumerable<IConversion> RawSymmetricConversions
             => base.RawSymmetricConversions;

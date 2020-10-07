@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
@@ -26,18 +25,22 @@ namespace Reni.Context
             Result<ValueSyntax> ParsePredefinedItem(string source);
         }
 
-        readonly ValueCache<BitType> _bitCache;
-        readonly FunctionCache<bool, IImplementation> _createArrayFeatureCache;
+        class CacheContainer
+        {
+            public ValueCache<BitType> Bit;
+            public FunctionCache<bool, IImplementation> CreateArrayFeature;
+            public ValueCache<IImplementation> MinusFeature;
+
+            public ValueCache<RecursionType> RecursionType;
+            public ValueCache<VoidType> Void;
+        }
+
 
         [DisableDump]
         [Node]
-        readonly FunctionList _functions = new FunctionList();
+        readonly FunctionList Functions = new FunctionList();
 
-        readonly FunctionCache<string, ValueSyntax> _metaDictionary;
-        readonly ValueCache<IImplementation> _minusFeatureCache;
-
-        readonly ValueCache<RecursionType> _recursionTypeCache;
-        readonly ValueCache<VoidType> _voidCache;
+        new readonly CacheContainer Cache = new CacheContainer();
 
         [DisableDump]
         [Node]
@@ -46,17 +49,17 @@ namespace Reni.Context
         internal Root(IParent parent)
         {
             Parent = parent;
-            _recursionTypeCache = new ValueCache<RecursionType>(() => new RecursionType(this));
-            _metaDictionary = new FunctionCache<string, ValueSyntax>(CreateMetaDictionary);
-            _bitCache = new ValueCache<BitType>(() => new BitType(this));
-            _voidCache = new ValueCache<VoidType>(() => new VoidType(this));
-            _minusFeatureCache = new ValueCache<IImplementation>
+            Cache.RecursionType = new ValueCache<RecursionType>(() => new RecursionType(this));
+            var metaDictionary = new FunctionCache<string, ValueSyntax>(CreateMetaDictionary);
+            Cache.Bit = new ValueCache<BitType>(() => new BitType(this));
+            Cache.Void = new ValueCache<VoidType>(() => new VoidType(this));
+            Cache.MinusFeature = new ValueCache<IImplementation>
             (
                 () =>
                     new ContextMetaFunctionFromSyntax
-                        (_metaDictionary[ArgToken.TokenId + " " + Negate.TokenId])
+                        (metaDictionary[ArgToken.TokenId + " " + Negate.TokenId])
             );
-            _createArrayFeatureCache = new FunctionCache<bool, IImplementation>
+            Cache.CreateArrayFeature = new FunctionCache<bool, IImplementation>
             (
                 isMutable =>
                     new ContextMetaFunction
@@ -81,18 +84,18 @@ namespace Reni.Context
 
         [DisableDump]
         [Node]
-        internal BitType BitType => _bitCache.Value;
+        internal BitType BitType => Cache.Bit.Value;
 
         [DisableDump]
         [Node]
-        internal RecursionType RecursionType => _recursionTypeCache.Value;
+        internal RecursionType RecursionType => Cache.RecursionType.Value;
 
         [DisableDump]
         [Node]
-        internal VoidType VoidType => _voidCache.Value;
+        internal VoidType VoidType => Cache.Void.Value;
 
         [DisableDump]
-        internal int FunctionCount => _functions.Count;
+        internal int FunctionCount => Functions.Count;
 
         internal static RefAlignParam DefaultRefAlignParam
             => new RefAlignParam(BitsConst.SegmentAlignBits, Size.Create(32));
@@ -105,9 +108,9 @@ namespace Reni.Context
 
         IImplementation ISymbolProviderForPointer<ConcatArrays>.
             Feature(ConcatArrays tokenClass)
-            => _createArrayFeatureCache[tokenClass.IsMutable];
+            => Cache.CreateArrayFeature[tokenClass.IsMutable];
 
-        IImplementation ISymbolProviderForPointer<Minus>.Feature(Minus tokenClass) => _minusFeatureCache.Value;
+        IImplementation ISymbolProviderForPointer<Minus>.Feature(Minus tokenClass) => Cache.MinusFeature.Value;
 
         ValueSyntax CreateMetaDictionary(string source)
         {
@@ -132,12 +135,12 @@ namespace Reni.Context
         internal FunctionType FunctionInstance(CompoundView compoundView, FunctionSyntax body, TypeBase argsType)
         {
             var alignedArgsType = argsType.Align;
-            var functionInstance = _functions.Find(body, compoundView, alignedArgsType);
+            var functionInstance = Functions.Find(body, compoundView, alignedArgsType);
             return functionInstance;
         }
 
         internal IEnumerable<FunctionType> FunctionInstances
-            (CompoundView compoundView, FunctionSyntax body) => _functions.Find(body, compoundView);
+            (CompoundView compoundView, FunctionSyntax body) => Functions.Find(body, compoundView);
 
         internal Result ConcatPrintResult(Category category, int count, Func<Category, int, Result> elemResults)
         {
@@ -186,8 +189,8 @@ namespace Reni.Context
             }
         }
 
-        internal FunctionContainer FunctionContainer(int index) => _functions.Container(index);
-        internal FunctionType Function(int index) => _functions.Item(index);
+        internal FunctionContainer FunctionContainer(int index) => Functions.Container(index);
+        internal FunctionType Function(int index) => Functions.Item(index);
 
         internal Container MainContainer(ValueSyntax syntax, string description)
         {
@@ -199,17 +202,6 @@ namespace Reni.Context
                 .Align();
 
             return new Container(result, rawResult.Issues.ToArray(), description);
-        }
-
-        static string Combine(SourcePart fullSource, SourcePart source)
-        {
-            Tracer.Assert(fullSource.Contains(source));
-
-            return fullSource.Start.Span(source.Start).Id
-                   + "["
-                   + source.Id
-                   + "]"
-                   + source.End.Span(fullSource.End).Id;
         }
     }
 }

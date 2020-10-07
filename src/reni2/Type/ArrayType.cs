@@ -169,7 +169,7 @@ namespace Reni.Type
             => Feature.Extension.Value(ReferenceResult);
 
         internal override int? SmartArrayLength(TypeBase elementType)
-            => ElementType.IsConvertable(elementType) ? Count : base.SmartArrayLength(elementType);
+            => ElementType.IsConvertible(elementType) ? Count : base.SmartArrayLength(elementType);
 
         IImplementation ISymbolProviderForPointer<Count>.Feature
             (Count tokenClass)
@@ -264,7 +264,7 @@ namespace Reni.Type
             var oldElementsResult = Pointer
                 .Result(category.Typed, objectReference).DereferenceResult;
 
-            var isElementArg = argsType.IsConvertable(ElementAccessType);
+            var isElementArg = argsType.IsConvertible(ElementAccessType);
             var newCount = isElementArg ? 1 : argsType.ArrayLength(ElementAccessType);
             var newElementsResultRaw
                 = isElementArg
