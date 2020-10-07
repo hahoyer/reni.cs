@@ -14,10 +14,10 @@ namespace Reni
     /// </summary>
     sealed class Closures : DumpableObject
     {
-        sealed class CodeArg : Singleton<CodeArg, DumpableObject>, IContextReference
+        sealed class Closure : Singleton<Closure, DumpableObject>, IContextReference
         {
             int IContextReference.Order => -1;
-            protected override string GetNodeDump() => "CodeArg";
+            protected override string GetNodeDump() => "Closure";
         }
 
         public static int NextOrder;
@@ -56,7 +56,7 @@ namespace Reni
         [DisableDump]
         SizeArray Sizes => SizesCache ??= CalculateSizes();
 
-        internal bool HasArg => Contains(CodeArg.Instance);
+        internal bool HasArg => Contains(Closure.Instance);
         public int Count => Data.Count;
 
         IContextReference this[int i] => Data[i];
@@ -78,7 +78,7 @@ namespace Reni
         }
 
         internal static Closures Void() => new Closures();
-        internal static Closures Arg() => new Closures(CodeArg.Instance);
+        internal static Closures Arg() => new Closures(Closure.Instance);
 
         public Closures Sequence(Closures closures)
             => closures.Count == 0? this :
@@ -125,7 +125,7 @@ namespace Reni
                 .OrderBy(codeArg => codeArg.Order)
                 .ToArray();
 
-        public Closures WithoutArg() => Without(CodeArg.Instance);
+        public Closures WithoutArg() => Without(Closure.Instance);
 
         Closures Without(Closures other)
             => other

@@ -208,18 +208,9 @@ namespace Reni
         }
 
         internal Size FindSize
-        {
-            get
-            {
-                if(HasSize)
-                    return Size;
-                if(HasCode)
-                    return Code.Size;
-                if(HasType)
-                    return Type.Size;
-                return null;
-            }
-        }
+            => HasSize? Size :
+                HasCode? Code.Size :
+                HasType? Type.Size : null;
 
         Size QuickFindSize
         {
@@ -251,16 +242,8 @@ namespace Reni
         }
 
         internal Closures FindClosures
-        {
-            get
-            {
-                if(HasClosures)
-                    return Closures;
-                if(HasCode)
-                    return Code.Closures;
-                return null;
-            }
-        }
+            => HasClosures? Closures :
+                HasCode? Code.Closures : null;
 
         [DisableDump]
         internal Closures SmartClosures
@@ -270,7 +253,7 @@ namespace Reni
                 var result = FindClosures;
                 if(result == null)
                 {
-                    DumpMethodWithBreak("No approriate result property defined");
+                    DumpMethodWithBreak("No appropriate result property defined");
                     Debugger.Break();
                 }
 
@@ -307,16 +290,7 @@ namespace Reni
         }
 
         internal bool HasArg
-        {
-            get
-            {
-                if(HasClosures)
-                    return Closures.HasArg;
-                if(HasCode)
-                    return Code.HasArg;
-                return false;
-            }
-        }
+            => HasClosures? Closures.HasArg : HasCode && Code.HasArg;
 
         public Category PendingCategory
         {
@@ -473,7 +447,7 @@ namespace Reni
 // ReSharper restore ExpressionIsAlwaysNull
             if(isHollow == true)
                 return rootContext.VoidType;
-            Tracer.AssertionFailed("Type cannot be determned", ToString);
+            Tracer.AssertionFailed("Type cannot be determined", ToString);
             return null;
         }
 
@@ -486,7 +460,7 @@ namespace Reni
         )
         {
             var result = TryObtainSize(getIsHollow, getSize, getType, getCode);
-            Tracer.Assert(result != null, () => "Size cannot be determned " + ToString());
+            Tracer.Assert(result != null, () => "Size cannot be determined " + ToString());
             return result;
         }
 
@@ -520,7 +494,7 @@ namespace Reni
             var result = TryObtainIsHollow(getIsHollow, getSize, getType, getCode);
             if(result != null)
                 return result.Value;
-            Tracer.AssertionFailed("Datalessness cannot be determned", ToString);
+            Tracer.AssertionFailed("It cannot be obtained if it is hollow.", ToString);
             return false;
         }
 
@@ -551,7 +525,7 @@ namespace Reni
 // ReSharper restore ExpressionIsAlwaysNull
                 return Closures.Void();
 
-            Tracer.AssertionFailed("CodeArgs cannot be determned", ToString);
+            Tracer.AssertionFailed("Closures cannot be determined", ToString);
             return null;
         }
 
