@@ -15,26 +15,25 @@ namespace Reni
 {
     sealed class Result : DumpableObject, IAggregateable<Result>
     {
-        static int NextObjectId = 1;
-
         class DataContainer
         {
-            internal CodeBase Code;
             internal CodeArgs Closure;
+            internal CodeBase Code;
+            internal bool IsDirty;
             internal bool? IsHollow;
+            internal Category PendingCategory;
             internal Size Size;
             internal TypeBase Type;
-            internal bool IsDirty;
-            internal Category PendingCategory;
         }
 
-        readonly DataContainer Data = new DataContainer();
+        static int NextObjectId = 1;
 
         /// <summary>
-        /// Is this an hollow object? With no data?
+        ///     Is this an hollow object? With no data?
         /// </summary>
-
         public Issue[] Issues = new Issue[0];
+
+        readonly DataContainer Data = new DataContainer();
 
         public Result()
             : base(NextObjectId++) => Data.PendingCategory = Category.None;
@@ -44,18 +43,14 @@ namespace Reni
             (
                 category & Category.Closures,
                 issues,
-                getIsHollow: null,
-                getSize: null,
-                getType: null,
-                getCode: null,
-                getClosures: CodeArgs.Void)
-        {
-        }
+                null,
+                null,
+                null,
+                null,
+                CodeArgs.Void) { }
 
         internal Result(Category category, Issue recentIssue)
-            : this(category, new[] {recentIssue})
-        {
-        }
+            : this(category, new[] {recentIssue}) { }
 
         internal Result
         (
@@ -65,19 +60,18 @@ namespace Reni
             Func<TypeBase> getType = null,
             Func<CodeBase> getCode = null,
             Func<CodeArgs> getClosures = null,
-            Root rootContext = null)
+            Root rootContext = null
+        )
             : this
             (
                 category,
-                issues: null,
-                getIsHollow: getIsHollow,
-                getSize: getSize,
-                getType: getType,
-                getCode: getCode,
-                getClosures: getClosures,
-                rootContext: rootContext)
-        {
-        }
+                null,
+                getIsHollow,
+                getSize,
+                getType,
+                getCode,
+                getClosures,
+                rootContext) { }
 
         Result
         (
@@ -88,16 +82,17 @@ namespace Reni
             Func<TypeBase> getType,
             Func<CodeBase> getCode,
             Func<CodeArgs> getClosures,
-            Root rootContext = null)
+            Root rootContext = null
+        )
             : this()
         {
             Issues = issues ?? new Issue[0];
 
-            var isHollow = getIsHollow == null ? null : new ValueCache<bool>(getIsHollow);
-            var size = getSize == null ? null : new ValueCache<Size>(getSize);
-            var type = getType == null ? null : new ValueCache<TypeBase>(getType);
-            var code = getCode == null ? null : new ValueCache<CodeBase>(getCode);
-            var closures = getClosures == null ? null : new ValueCache<CodeArgs>(getClosures);
+            var isHollow = getIsHollow == null? null : new ValueCache<bool>(getIsHollow);
+            var size = getSize == null? null : new ValueCache<Size>(getSize);
+            var type = getType == null? null : new ValueCache<TypeBase>(getType);
+            var code = getCode == null? null : new ValueCache<CodeBase>(getCode);
+            var closures = getClosures == null? null : new ValueCache<CodeArgs>(getClosures);
 
             if(category.HasType)
                 Data.Type = ObtainType(isHollow, size, type, code, rootContext);
@@ -117,8 +112,6 @@ namespace Reni
             AssertValid();
         }
 
-        Result IAggregateable<Result>.Aggregate(Result other) => this + other;
-
         internal bool HasSize => Size != null;
         internal bool HasType => Type != null;
         internal bool HasCode => Code != null;
@@ -131,7 +124,7 @@ namespace Reni
             => Category.CreateCategory(HasIsHollow, HasSize, HasType, HasCode, HasClosures);
 
         /// <summary>
-        /// Is this an hollow object? With no data?
+        ///     Is this an hollow object? With no data?
         /// </summary>
         [Node]
         [DebuggerHidden]
@@ -194,9 +187,9 @@ namespace Reni
             }
         }
 
-        internal bool? FindIsHollow => HasIsHollow ? Data.IsHollow : FindSize?.IsZero;
+        internal bool? FindIsHollow => HasIsHollow? Data.IsHollow : FindSize?.IsZero;
 
-        bool? QuickFindIsHollow => HasIsHollow ? Data.IsHollow : QuickFindSize?.IsZero;
+        bool? QuickFindIsHollow => HasIsHollow? Data.IsHollow : QuickFindSize?.IsZero;
 
         internal bool SmartIsHollow
         {
@@ -205,10 +198,11 @@ namespace Reni
                 var result = FindIsHollow;
                 if(result == null)
                 {
-                    DumpMethodWithBreak(text: "No appropriate result property defined");
+                    DumpMethodWithBreak("No appropriate result property defined");
                     Debugger.Break();
                     return false;
                 }
+
                 return result.Value;
             }
         }
@@ -248,9 +242,10 @@ namespace Reni
                 var result = FindSize;
                 if(result == null)
                 {
-                    DumpMethodWithBreak(text: "No appropriate result property defined");
+                    DumpMethodWithBreak("No appropriate result property defined");
                     Debugger.Break();
                 }
+
                 return result;
             }
         }
@@ -275,9 +270,10 @@ namespace Reni
                 var result = FindClosures;
                 if(result == null)
                 {
-                    DumpMethodWithBreak(text: "No approriate result property defined");
+                    DumpMethodWithBreak("No approriate result property defined");
                     Debugger.Break();
                 }
+
                 return result;
             }
         }
@@ -415,7 +411,7 @@ namespace Reni
             get
             {
                 Tracer.Assert(HasType, () => "UnalignedResult requires type category:\n " + Dump());
-                return ((AlignType) Type)
+                return ((AlignType)Type)
                     .UnalignedResult(CompleteCategory)
                     .ReplaceArg(this);
             }
@@ -440,12 +436,15 @@ namespace Reni
             }
         }
 
+        Result IAggregateable<Result>.Aggregate(Result other) => this + other;
+
         CodeBase ObtainCode
         (
             ValueCache<bool> getIsHollow,
             ValueCache<Size> getSize,
             ValueCache<TypeBase> getType,
-            ValueCache<CodeBase> getCode)
+            ValueCache<CodeBase> getCode
+        )
         {
             if(getCode != null)
                 return getCode.Value;
@@ -454,7 +453,7 @@ namespace Reni
 // ReSharper restore ExpressionIsAlwaysNull
             if(isHollow == true)
                 return CodeBase.Void;
-            Tracer.AssertionFailed(cond: "Code cannot be determined", getText: ToString);
+            Tracer.AssertionFailed("Code cannot be determined", ToString);
             return null;
         }
 
@@ -464,7 +463,8 @@ namespace Reni
             ValueCache<Size> getSize,
             ValueCache<TypeBase> getType,
             ValueCache<CodeBase> getCode,
-            Root rootContext)
+            Root rootContext
+        )
         {
             if(getType != null)
                 return getType.Value;
@@ -473,7 +473,7 @@ namespace Reni
 // ReSharper restore ExpressionIsAlwaysNull
             if(isHollow == true)
                 return rootContext.VoidType;
-            Tracer.AssertionFailed(cond: "Type cannot be determned", getText: ToString);
+            Tracer.AssertionFailed("Type cannot be determned", ToString);
             return null;
         }
 
@@ -482,7 +482,8 @@ namespace Reni
             ValueCache<bool> getIsHollow,
             ValueCache<Size> getSize,
             ValueCache<TypeBase> getType,
-            ValueCache<CodeBase> getCode)
+            ValueCache<CodeBase> getCode
+        )
         {
             var result = TryObtainSize(getIsHollow, getSize, getType, getCode);
             Tracer.Assert(result != null, () => "Size cannot be determned " + ToString());
@@ -494,7 +495,8 @@ namespace Reni
             ValueCache<bool> getIsHollow,
             ValueCache<Size> getSize,
             ValueCache<TypeBase> getType,
-            ValueCache<CodeBase> getCode)
+            ValueCache<CodeBase> getCode
+        )
         {
             if(getSize != null)
                 return getSize.Value;
@@ -512,12 +514,13 @@ namespace Reni
             ValueCache<bool> getIsHollow,
             ValueCache<Size> getSize,
             ValueCache<TypeBase> getType,
-            ValueCache<CodeBase> getCode)
+            ValueCache<CodeBase> getCode
+        )
         {
             var result = TryObtainIsHollow(getIsHollow, getSize, getType, getCode);
             if(result != null)
                 return result.Value;
-            Tracer.AssertionFailed(cond: "Datalessness cannot be determned", getText: ToString);
+            Tracer.AssertionFailed("Datalessness cannot be determned", ToString);
             return false;
         }
 
@@ -526,7 +529,8 @@ namespace Reni
             ValueCache<bool> getIsHollow,
             ValueCache<Size> getSize,
             ValueCache<TypeBase> getType,
-            ValueCache<CodeBase> getCode) =>
+            ValueCache<CodeBase> getCode
+        ) =>
             getIsHollow?.Value ?? getSize?.Value.IsZero ?? getType?.Value.IsHollow ?? getCode?.Value.IsEmpty;
 
         CodeArgs ObtainClosures
@@ -535,7 +539,8 @@ namespace Reni
             ValueCache<Size> getSize,
             ValueCache<TypeBase> getType,
             ValueCache<CodeBase> getCode,
-            ValueCache<CodeArgs> getArgs)
+            ValueCache<CodeArgs> getArgs
+        )
         {
             if(getArgs != null)
                 return getArgs.Value;
@@ -546,7 +551,7 @@ namespace Reni
 // ReSharper restore ExpressionIsAlwaysNull
                 return CodeArgs.Void();
 
-            Tracer.AssertionFailed(cond: "CodeArgs cannot be determned", getText: ToString);
+            Tracer.AssertionFailed("CodeArgs cannot be determned", ToString);
             return null;
         }
 
@@ -557,9 +562,9 @@ namespace Reni
                 result += "\nPendingCategory=" + Data.PendingCategory.Dump();
             if(CompleteCategory != Category.None)
                 result += "\nCompleteCategory=" + CompleteCategory.Dump();
-            if (HasIssue)
+            if(HasIssue)
                 result += "\nIssues=" + Tracer.Dump(Issues);
-            if (HasIsHollow)
+            if(HasIsHollow)
                 result += "\nIsHollow=" + Tracer.Dump(Data.IsHollow);
             if(HasSize)
                 result += "\nSize=" + Tracer.Dump(Data.Size);
@@ -571,7 +576,7 @@ namespace Reni
                 result += "\nCode=" + Tracer.Dump(Data.Code);
             if(result == "")
                 return "";
-            return result.Substring(startIndex: 1);
+            return result.Substring(1);
         }
 
         internal void Update(Result result)
@@ -613,9 +618,7 @@ namespace Reni
                 () => Size,
                 () => Type,
                 () => Code,
-                () => Closures)
-            {
-            };
+                () => Closures);
             result.Data.PendingCategory = result.Data.PendingCategory & category;
             return result;
         }
@@ -740,25 +743,20 @@ namespace Reni
         }
 
         internal Result ReplaceArg(ResultCache resultCache)
-            => HasArg ? InternalReplaceArg(resultCache) : this;
+            => HasArg? InternalReplaceArg(resultCache) : this;
 
         internal Result ReplaceArg(ResultCache.IResultProvider provider)
-            => HasArg ? InternalReplaceArg(new ResultCache(provider)) : this;
+            => HasArg? InternalReplaceArg(new ResultCache(provider)) : this;
 
         internal Result ReplaceArg(Func<Category, Result> getArgs)
-            => HasArg ? InternalReplaceArg(new ResultCache(getArgs)) : this;
+            => HasArg? InternalReplaceArg(new ResultCache(getArgs)) : this;
 
         Result InternalReplaceArg(ResultCache getResultForArg)
         {
             var result = new Result
             {
-                Issues = Issues,
-                IsHollow = IsHollow,
-                Size = Size,
-                Type = Type,
-                Code = Code,
-                Closures = Closures,
-                IsDirty = true
+                Issues = Issues, IsHollow = IsHollow, Size = Size, Type = Type, Code = Code, Closures = Closures
+                , IsDirty = true
             };
 
             var categoryForArg = CompleteCategory & Category.Code.WithClosures;
@@ -770,12 +768,12 @@ namespace Reni
             {
                 result.Issues = result.Issues.Union(resultForArg.Issues).ToArray();
 
-                if (HasCode)
+                if(HasCode)
                     result.Code = Code.ReplaceArg(resultForArg);
                 if(HasClosures)
                     result.Closures = Closures.WithoutArg() + resultForArg.Closures;
-
             }
+
             result.IsDirty = false;
             return result;
         }
@@ -792,11 +790,7 @@ namespace Reni
 
             var result = new Result
             {
-                Issues = Issues,
-                IsHollow = IsHollow,
-                Size = Size,
-                Type = Type,
-                IsDirty = true
+                Issues = Issues, IsHollow = IsHollow, Size = Size, Type = Type, IsDirty = true
             };
             if(HasCode)
                 result.Code = Code.ReplaceAbsolute(refInCode, replacementCode);
@@ -806,8 +800,7 @@ namespace Reni
             return result;
         }
 
-        internal Result ReplaceAbsolute<TRefInCode>
-            (TRefInCode refInCode, Func<Category, Result> getReplacement)
+        internal Result ReplaceAbsolute<TRefInCode>(TRefInCode refInCode, Func<Category, Result> getReplacement)
             where TRefInCode : IContextReference
         {
             if(HasClosures && !Closures.Contains(refInCode))
@@ -819,11 +812,7 @@ namespace Reni
             var replacement = getReplacement(CompleteCategory - Category.Size - Category.Type);
             var result = new Result
             {
-                Issues = Issues,
-                IsHollow = IsHollow,
-                Size = Size,
-                Type = Type,
-                IsDirty = true
+                Issues = Issues, IsHollow = IsHollow, Size = Size, Type = Type, IsDirty = true
             };
             if(HasCode)
                 result.Code = Code.ReplaceAbsolute(refInCode, () => replacement.Code);
@@ -845,10 +834,7 @@ namespace Reni
 
             var result = new Result
             {
-                Issues = Issues,
-                IsHollow = IsHollow,
-                Size = Size,
-                Type = Type
+                Issues = Issues, IsHollow = IsHollow, Size = Size, Type = Type
             };
             if(HasCode)
                 result.Code = Code.ReplaceRelative(refInCode, replacementCode);
@@ -916,7 +902,7 @@ namespace Reni
             return result;
         }
 
-        public static Result operator +(Result aResult, Result bResult) => aResult.Sequence(bResult, position: null);
+        public static Result operator +(Result aResult, Result bResult) => aResult.Sequence(bResult, null);
 
         [DebuggerHidden]
         internal void AssertVoidOrValidReference()
@@ -970,7 +956,7 @@ namespace Reni
                 Tracer.Assert(Type is PointerType, () => "Expected type: PointerType\n" + Dump());
         }
 
-        internal Result AddToReference(Func<Size> func) { return Change(code => code.ReferencePlus(func())); }
+        internal Result AddToReference(Func<Size> func) => Change(code => code.ReferencePlus(func()));
 
         Result Change(Func<CodeBase, CodeBase> func)
         {
@@ -983,12 +969,12 @@ namespace Reni
 
         Result Un()
         {
-            var result = ((IConversion) Type).Result(CompleteCategory);
+            var result = ((IConversion)Type).Result(CompleteCategory);
             return result.ReplaceArg(this);
         }
 
         internal Result SmartUn<T>()
-            where T : IConversion => Type is T ? Un() : this;
+            where T : IConversion => Type is T? Un() : this;
 
         internal Result AutomaticDereferencedAlignedResult()
         {
@@ -1004,11 +990,8 @@ namespace Reni
         }
 
         internal Result DereferencedAlignedResult(Size size)
-            => HasIssue
-                ? this
-                : HasCode
-                    ? new Result(CompleteCategory - Category.Type, getCode: () => Code.DePointer(size))
-                    : this;
+            => HasIssue? this :
+                HasCode? new Result(CompleteCategory - Category.Type, getCode: () => Code.DePointer(size)) : this;
 
         internal Result ConvertToConverter(TypeBase source)
             => source.IsHollow || !HasClosures && !HasCode
