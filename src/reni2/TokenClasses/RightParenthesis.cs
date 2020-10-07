@@ -13,6 +13,7 @@ namespace Reni.TokenClasses
             , IDefaultScopeProvider
             , IBracketMatch<BinaryTree>
             , ISyntaxScope
+            , IValueSyntaxFactoryToken
     {
         sealed class Matched : DumpableObject, IParserTokenType<BinaryTree>, ITokenClass, IValueProvider
         {
@@ -38,8 +39,7 @@ namespace Reni.TokenClasses
         public RightParenthesis(int level)
             : base(level) { }
 
-        [DisableDump]
-        protected override ISyntaxFactory Provider => SyntaxFactory.Bracket;
+        IValueSyntaxFactory IValueSyntaxFactoryToken.Provider => SyntaxFactory.Bracket;
 
         IParserTokenType<BinaryTree> IBracketMatch<BinaryTree>.Value { get; } = new Matched();
 

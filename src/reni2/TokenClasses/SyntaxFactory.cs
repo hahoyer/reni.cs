@@ -8,15 +8,9 @@ namespace Reni.TokenClasses
 {
     class SyntaxFactory : DumpableObject, IDefaultScopeProvider
     {
-        class BracketHandler : DumpableObject, ISyntaxFactory
+        class BracketHandler : DumpableObject, IValueSyntaxFactory
         {
-            Result<Syntax> ISyntaxFactory.GetSyntax(BinaryTree target, SyntaxFactory factory)
-            {
-                NotImplementedMethod(target, factory);
-                return default;
-            }
-
-            Result<ValueSyntax> ISyntaxFactory.GetValueSyntax(BinaryTree target, SyntaxFactory factory)
+            Result<ValueSyntax> IValueSyntaxFactory.Get(BinaryTree target, SyntaxFactory factory)
             {
                 Tracer.Assert(target.Left != null);
                 Tracer.Assert(target.Right == null);
@@ -34,9 +28,18 @@ namespace Reni.TokenClasses
             }
         }
 
+        class ListHandler : DumpableObject, ISyntaxFactory
+        {
+            Result<Syntax> ISyntaxFactory.Get(BinaryTree target, SyntaxFactory factory)
+            {
+                NotImplementedMethod(target, factory);
+                return default;
+            }
+        }
+
         class DeclarationMarkHandler : DumpableObject, IDeclarerSyntaxFactory
         {
-            Result<DeclarerSyntax> IDeclarerSyntaxFactory.GetDeclarerSyntax(BinaryTree target, SyntaxFactory factory)
+            Result<DeclarerSyntax> IDeclarerSyntaxFactory.Get(BinaryTree target, SyntaxFactory factory)
             {
                 var left = target.Left == null? null : factory.GetDeclarerSyntax(target.Left);
                 var right = target.Right;
@@ -54,19 +57,14 @@ namespace Reni.TokenClasses
 
         class ColonHandler : DumpableObject, ISyntaxFactory
         {
-            Result<Syntax> ISyntaxFactory.GetSyntax(BinaryTree target, SyntaxFactory factory)
+            Result<Syntax> ISyntaxFactory.Get(BinaryTree target, SyntaxFactory factory)
                 => Result<Syntax>.From(factory.ToDeclaration(target));
 
-            Result<ValueSyntax> ISyntaxFactory.GetValueSyntax(BinaryTree target, SyntaxFactory factory)
-            {
-                NotImplementedMethod(target, factory);
-                return default;
-            }
         }
 
-        class DefinableHandler : DumpableObject, ISyntaxFactory,IDeclarerSyntaxFactory
+        class DefinableHandler : DumpableObject, IDeclarerSyntaxFactory, IValueSyntaxFactory
         {
-            Result<DeclarerSyntax> IDeclarerSyntaxFactory.GetDeclarerSyntax(BinaryTree target, SyntaxFactory factory)
+            Result<DeclarerSyntax> IDeclarerSyntaxFactory.Get(BinaryTree target, SyntaxFactory factory)
             {
                 Tracer.Assert(target.Right == null);
 
@@ -74,28 +72,16 @@ namespace Reni.TokenClasses
                 return ToDeclarer(left, target, target.Token.Characters.Id);
             }
 
-            Result<Syntax> ISyntaxFactory.GetSyntax(BinaryTree target, SyntaxFactory factory)
-            {
-                NotImplementedMethod(target, factory);
-                return default;
-            }
-
-            Result<ValueSyntax> ISyntaxFactory.GetValueSyntax(BinaryTree target, SyntaxFactory factory)
+            Result<ValueSyntax> IValueSyntaxFactory.Get(BinaryTree target, SyntaxFactory factory)
             {
                 NotImplementedMethod(target, factory);
                 return default;
             }
         }
 
-        class TerminalHandler : DumpableObject, ISyntaxFactory
+        class TerminalHandler : DumpableObject, IValueSyntaxFactory
         {
-            Result<Syntax> ISyntaxFactory.GetSyntax(BinaryTree target, SyntaxFactory factory)
-            {
-                NotImplementedMethod(target, factory);
-                return default;
-            }
-
-            Result<ValueSyntax> ISyntaxFactory.GetValueSyntax(BinaryTree target, SyntaxFactory factory)
+            Result<ValueSyntax> IValueSyntaxFactory.Get(BinaryTree target, SyntaxFactory factory)
             {
                 Tracer.Assert(target.Left == null);
                 Tracer.Assert(target.Right == null);
@@ -105,13 +91,13 @@ namespace Reni.TokenClasses
 
         class DeclarerHandler : DumpableObject, IDeclarerSyntaxFactory
         {
-            Result<DeclarerSyntax> IDeclarerSyntaxFactory.GetDeclarerSyntax(BinaryTree target, SyntaxFactory factory) 
+            Result<DeclarerSyntax> IDeclarerSyntaxFactory.Get(BinaryTree target, SyntaxFactory factory) 
                 => GetDeclarationTag(target);
         }
 
         class ComplexDeclarerHandler : DumpableObject, IDeclarerSyntaxFactory
         {
-            Result<DeclarerSyntax> IDeclarerSyntaxFactory.GetDeclarerSyntax(BinaryTree target, SyntaxFactory factory)
+            Result<DeclarerSyntax> IDeclarerSyntaxFactory.Get(BinaryTree target, SyntaxFactory factory)
                 => target
                     .GetBracketKernel()
                     .Apply(GetDeclarationTags);
@@ -123,12 +109,13 @@ namespace Reni.TokenClasses
                     .Aggregate(DeclarerSyntax.Empty, (result1, result2) => Combine(result1, result2, target));
         }
 
-        internal static readonly ISyntaxFactory Bracket = new BracketHandler();
+        internal static readonly ISyntaxFactory List = new ListHandler();
+        internal static readonly IValueSyntaxFactory Bracket = new BracketHandler();
         internal static readonly IDeclarerSyntaxFactory DeclarationMark = new DeclarationMarkHandler();
         internal static readonly ISyntaxFactory Colon = new ColonHandler();
-        internal static readonly ISyntaxFactory Definable = new DefinableHandler();
+        internal static readonly IValueSyntaxFactory Definable = new DefinableHandler();
         internal static readonly IDeclarerSyntaxFactory DefinableAsDeclarer = new DefinableHandler();
-        internal static readonly ISyntaxFactory Terminal = new TerminalHandler();
+        internal static readonly IValueSyntaxFactory Terminal = new TerminalHandler();
         internal static readonly IDeclarerSyntaxFactory Declarer = new DeclarerHandler();
         internal static readonly IDeclarerSyntaxFactory ComplexDeclarer = new ComplexDeclarerHandler();
 
@@ -143,7 +130,7 @@ namespace Reni.TokenClasses
         Result<DeclarerSyntax> GetDeclarerSyntax(BinaryTree target)
         {
             if(target.TokenClass is IDeclarerSyntaxFactoryToken token)
-                return token.Provider.GetDeclarerSyntax(target, this);
+                return token.Provider.Get(target, this);
 
             NotImplementedMethod(target, nameof(target.TokenClass), target.TokenClass);
             return default;
@@ -151,8 +138,8 @@ namespace Reni.TokenClasses
 
         internal Result<ValueSyntax> GetValueSyntax(BinaryTree target)
         {
-            if(target.TokenClass is ISyntaxFactoryToken token)
-                return token.Provider.GetValueSyntax(target, this);
+            if(target.TokenClass is IValueSyntaxFactoryToken token)
+                return token.Provider.Get(target, this);
 
             NotImplementedMethod(target, nameof(target.TokenClass), target.TokenClass);
             return default;
@@ -161,7 +148,7 @@ namespace Reni.TokenClasses
         internal Result<Syntax> GetSyntax(BinaryTree target)
         {
             if(target.TokenClass is ISyntaxFactoryToken token)
-                return token.Provider.GetSyntax(target, this);
+                return token.Provider.Get(target, this);
 
             NotImplementedMethod(target, nameof(target.TokenClass), target.TokenClass);
             return default;
@@ -178,7 +165,7 @@ namespace Reni.TokenClasses
         Result<DeclarerSyntax> ToDeclarer(BinaryTree root, BinaryTree target)
         {
             if(target.TokenClass is IDeclarerSyntaxFactoryToken token)
-                return token.Provider.GetDeclarerSyntax(target, this);
+                return token.Provider.Get(target, this);
 
             NotImplementedMethod(root, target);
             return default;
@@ -213,17 +200,26 @@ namespace Reni.TokenClasses
 
     interface IDeclarerSyntaxFactory
     {
-        Result<DeclarerSyntax> GetDeclarerSyntax(BinaryTree target, SyntaxFactory factory);
+        Result<DeclarerSyntax> Get(BinaryTree target, SyntaxFactory factory);
     }
 
     interface ISyntaxFactory
     {
-        Result<ValueSyntax> GetValueSyntax(BinaryTree target, SyntaxFactory factory);
-        Result<Syntax> GetSyntax(BinaryTree target, SyntaxFactory factory);
+        Result<Syntax> Get(BinaryTree target, SyntaxFactory factory);
     }
 
     interface ISyntaxFactoryToken
     {
         ISyntaxFactory Provider { get; }
+    }
+
+    interface IValueSyntaxFactory
+    {
+        Result<ValueSyntax> Get(BinaryTree target, SyntaxFactory factory);
+    }
+
+    interface IValueSyntaxFactoryToken
+    {
+        IValueSyntaxFactory Provider { get; }
     }
 }

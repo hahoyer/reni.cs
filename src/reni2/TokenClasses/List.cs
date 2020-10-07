@@ -9,23 +9,20 @@ namespace Reni.TokenClasses
     [Variant(0)]
     [Variant(1)]
     [Variant(2)]
-    sealed class List : TokenClass, IBelongingsMatcher, IStatementsProvider
+    sealed class List : TokenClass, IBelongingsMatcher, IStatementsProvider, ISyntaxFactoryToken
     {
-        public static string TokenId(int level) => ",;.".Substring(level, 1);
-
         [DisableDump]
         internal readonly int Level;
 
-        public List(int level) { Level = level; }
+        public List(int level) => Level = level;
 
         public override string Id => TokenId(Level);
 
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => otherMatcher == this;
 
-        [Obsolete("",true)]
-        Result<Statement[]> IStatementsProvider.Get
-            (List type, BinaryTree binaryTree, ISyntaxScope scope)
+        [Obsolete("", true)]
+        Result<Statement[]> IStatementsProvider.Get(List type, BinaryTree binaryTree, ISyntaxScope scope)
         {
             if(type != null && type != this)
                 return null;
@@ -37,9 +34,11 @@ namespace Reni.TokenClasses
             return new Result<Statement[]>(target, issues);
         }
 
-        [Obsolete("",true)]
-        Result<Statement[]> CreateStatements
-            (BinaryTree binaryTree, BinaryTree parent, ISyntaxScope scope)
+        ISyntaxFactory ISyntaxFactoryToken.Provider => SyntaxFactory.List;
+        public static string TokenId(int level) => ",;.".Substring(level, 1);
+
+        [Obsolete("", true)]
+        Result<Statement[]> CreateStatements(BinaryTree binaryTree, BinaryTree parent, ISyntaxScope scope)
             => binaryTree == null
                 ? Statement.CreateStatements(new EmptyList(parent), scope.DefaultScopeProvider)
                 : binaryTree.GetStatements(scope, this);

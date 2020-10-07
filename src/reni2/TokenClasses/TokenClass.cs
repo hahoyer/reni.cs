@@ -4,23 +4,10 @@ using Reni.Parser;
 
 namespace Reni.TokenClasses
 {
-    abstract class TokenClass : ParserTokenType<BinaryTree>, ITokenClass, ISyntaxFactoryToken
+    abstract class TokenClass : ParserTokenType<BinaryTree>, ITokenClass
     {
         [DisableDump]
         internal virtual bool IsVisible => true;
-
-        [DisableDump]
-        protected virtual ISyntaxFactory Provider
-        {
-            get
-            {
-                NotImplementedMethod();
-                return default;
-            }
-        }
-
-        [DisableDump]
-        ISyntaxFactory ISyntaxFactoryToken.Provider => Provider;
 
         string ITokenClass.Id => Id;
 
