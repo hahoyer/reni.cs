@@ -6,13 +6,11 @@ namespace Reni.Parser
 {
     sealed class ScannerSyntaxError : ParserTokenType<BinaryTree>, ITokenClass, IValueProvider
     {
-        readonly IssueId IssueId;
+        internal readonly IssueId IssueId;
 
-        public ScannerSyntaxError(IssueId issueId)
-        {
-            IssueId = issueId;
-            StopByObjectIds(81);
-        }
+        public ScannerSyntaxError(IssueId issueId) => IssueId = issueId;
+
+        public override string Id => "<error>";
 
         string ITokenClass.Id => Id;
 
@@ -23,15 +21,12 @@ namespace Reni.Parser
                 var issues = IssueId.Issue(binaryTree.Token.Characters);
                 if(binaryTree.Left == null)
                     return new Result<ValueSyntax>(new EmptyList(binaryTree), issues);
-                else
                 return binaryTree.Left.GetValue(scope).With(issues);
             }
 
             NotImplementedMethod(binaryTree);
             return null;
         }
-
-        public override string Id => "<error>";
 
         protected override BinaryTree Create(BinaryTree left, IToken token, BinaryTree right)
             => BinaryTree.Create(left, this, token, right);

@@ -51,7 +51,6 @@ world'
             var i = 0;
             Tracer.Assert(a[i++].IsLogDumpLike(2, 1, 3, 1, IssueId.EOLInString, "\"' hallo\n\""));
             Tracer.Assert(a[i++].IsLogDumpLike(3, 6, 4, 1, IssueId.EOLInString, "\"'\n\""));
-            Tracer.Assert(a[i++].IsLogDumpLike(3, 1, 3, 6, IssueId.MissingDeclarationForType, "\"world\" Type: ()"));
             Tracer.Assert(a.Length == i);
         }
     }

@@ -98,7 +98,8 @@ namespace Reni
             ValueSyntaxCache = NewValueCache(GetValueSyntax);
         }
 
-        Result<ValueSyntax> GetValueSyntax() => Parameters.ParseOnly? null : SyntaxFactory.Root.GetValueSyntax(BinaryTree).ToFrame();
+        Result<ValueSyntax> GetValueSyntax() 
+            => Parameters.IsSyntaxRequired? SyntaxFactory.Root.GetValueSyntax(BinaryTree).ToFrame() : null;
 
         CodeContainer GetCodeContainer() => new CodeContainer(Syntax, Root, ModuleName, Source.Data);
 
@@ -115,7 +116,7 @@ namespace Reni
 
         [Node]
         [DisableDump]
-        public CodeContainer CodeContainer => Parameters.ParseOnly? null : CodeContainerCache.Value;
+        public CodeContainer CodeContainer => Parameters.IsCodeRequired? CodeContainerCache.Value : null;
 
         [DisableDump]
         [Node]
@@ -166,7 +167,7 @@ namespace Reni
         /// </summary>
         public void Execute()
         {
-            if(Parameters.ParseOnly)
+            if(!Parameters.IsSyntaxRequired)
             {
                 BinaryTreeCache.IsValid = true;
                 return;
@@ -193,6 +194,8 @@ namespace Reni
             var method = CSharpMethod;
 
             if(method == null)
+                return;
+            if(!Parameters.IsRunRequired)
                 return;
 
             Data.OutStream = Parameters.OutStream;
@@ -234,7 +237,7 @@ namespace Reni
 
         [DisableDump]
         internal IEnumerable<Issue> Issues 
-            => T(BinaryTree.AddIssues(),ValueSyntaxCache.Value?.Issues, CodeContainer?.Issues).Concat();
+            => T(BinaryTree.Issues,ValueSyntaxCache.Value?.Issues, CodeContainer?.Issues).Concat();
 
         BinaryTree Parse(SourcePosition source) => this["Main"].Parser.Execute(source);
 
@@ -242,7 +245,7 @@ namespace Reni
 
         internal void Materialize()
         {
-            if(!Parameters.ParseOnly)
+            if(Parameters.IsCodeRequired)
                 CodeContainerCache.IsValid = true;
         }
 

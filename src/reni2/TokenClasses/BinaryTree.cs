@@ -21,6 +21,30 @@ namespace Reni.TokenClasses
             bool ISyntaxScope.IsDeclarationPart => false;
         }
 
+        interface IVisitor
+        {
+            void VisitMain(BinaryTree target);
+        }
+
+
+        class IssuesVisitor : DumpableObject, IVisitor
+        {
+            readonly List<Issue> ValueCollector = new List<Issue>();
+
+            [DisableDump]
+            internal IEnumerable<Issue> Value => ValueCollector;
+
+            void IVisitor.VisitMain(BinaryTree target)
+            {
+                var issue = (target.TokenClass as ScannerSyntaxError)
+                    ?.IssueId
+                    .Issue(target.Token.Characters);
+
+                if(issue != null)
+                    ValueCollector.Add(issue);
+            }
+        }
+
         static int NextObjectId;
 
         static readonly ISyntaxScope NullScopeInstance = new NullScope();
@@ -84,6 +108,17 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal IEnumerable<BinaryTree> Items => this.CachedValue(GetItems);
 
+        [DisableDump]
+        internal IEnumerable<Issue> Issues
+        {
+            get
+            {
+                var visitor = new IssuesVisitor();
+                Visit(visitor);
+                return visitor.Value;
+            }
+        }
+
         BinaryTree IBinaryTree<BinaryTree>.Left => Left;
         BinaryTree IBinaryTree<BinaryTree>.Right => Right;
 
@@ -91,6 +126,13 @@ namespace Reni.TokenClasses
 
         SourcePart ISyntax.All => SourcePart;
         SourcePart ISyntax.Main => Token.Characters;
+
+        void Visit(IVisitor visitor)
+        {
+            Left?.Visit(visitor);
+            visitor.VisitMain(this);
+            Right?.Visit(visitor);
+        }
 
         public bool IsEqual(BinaryTree other, IComparator differenceHandler)
         {
@@ -324,7 +366,7 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        internal Result<BinaryTree> GetBracketKernel() 
+        internal Result<BinaryTree> GetBracketKernel()
             => GetBracketKernel(((RightParenthesisBase)TokenClass).Level);
     }
 }
