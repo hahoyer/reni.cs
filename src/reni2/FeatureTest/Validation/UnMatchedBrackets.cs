@@ -14,7 +14,7 @@ namespace Reni.FeatureTest.Validation
         public UnMatchedLeftParenthesis()
         {
             Parameters.TraceOptions.Parser = false;
-            Parameters.ParseOnly = true;
+            Parameters.CompilationLevel = CompilationLevel.Syntax;
         }
 
         protected override void Verify(IEnumerable<Issue> issues)

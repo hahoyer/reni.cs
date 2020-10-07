@@ -93,7 +93,7 @@ namespace Reni
 
         [DisableDump]
         [Node]
-        internal string CSharpString => this.CachedValue(() => CodeContainer.CSharpString);
+        internal string CSharpString => this.CachedValue(() => CodeContainer?.CSharpString);
 
         bool IsTraceEnabled
             => IsInExecutionPhase && Parameters.TraceOptions.Functions;
@@ -295,7 +295,7 @@ namespace Reni
                 return;
             }
 
-            if(Parameters.TraceOptions.CodeSequence)
+            if(Parameters.TraceOptions.CodeSequence && Parameters.IsCodeRequired)
                 Tracer.FlaggedLine("Code\n" + CodeContainer.Dump());
 
             if(Parameters.RunFromCode)

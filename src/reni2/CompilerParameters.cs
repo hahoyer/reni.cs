@@ -8,15 +8,6 @@ namespace Reni
     /// </summary>
     public sealed class CompilerParameters : Attribute
     {
-        public enum Level
-        {
-            Scanner = 0
-            , Parser = 1
-            , Syntax = 2
-            , Code = 3
-            , Run = 4
-        }
-
         public sealed class TraceOptionsClass
         {
             [Node]
@@ -56,7 +47,7 @@ namespace Reni
             }
         }
 
-        public Level CompilationLevel = Level.Run;
+        public CompilationLevel CompilationLevel = CompilationLevel.Run;
         public bool? DebuggableGeneratedCode = false;
 
         public IOutStream OutStream;
@@ -74,17 +65,17 @@ namespace Reni
         [EnableDump]
         public readonly TraceOptionsClass TraceOptions = new TraceOptionsClass();
 
-        public bool IsParserRequired => CompilationLevel >= Level.Parser;
-        public bool IsSyntaxRequired => CompilationLevel >= Level.Syntax;
-        public bool IsCodeRequired => CompilationLevel >= Level.Code;
-        public bool IsRunRequired => CompilationLevel >= Level.Run;
+        public bool IsParserRequired => CompilationLevel >= CompilationLevel.Parser;
+        public bool IsSyntaxRequired => CompilationLevel >= CompilationLevel.Syntax;
+        public bool IsCodeRequired => CompilationLevel >= CompilationLevel.Code;
+        public bool IsRunRequired => CompilationLevel >= CompilationLevel.Run;
 
         public bool ParseOnly
         {
             set
             {
                 Tracer.Assert(value);
-                CompilationLevel = Level.Scanner;
+                CompilationLevel = CompilationLevel.Scanner;
             }
         }
 
@@ -94,6 +85,15 @@ namespace Reni
             result.TraceOptions.UseOnModeErrorFocus();
             return result;
         }
+    }
+
+    public enum CompilationLevel
+    {
+        Scanner = 0
+        , Parser = 1
+        , Syntax = 2
+        , Code = 3
+        , Run = 4
     }
 
     public class NodeAttribute : Attribute
