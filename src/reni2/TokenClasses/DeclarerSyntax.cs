@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 using hw.DebugFormatter;
+using JetBrains.Annotations;
 using Reni.Parser;
 
 namespace Reni.TokenClasses
@@ -19,10 +21,13 @@ namespace Reni.TokenClasses
         {
             internal readonly string Value;
 
-            internal NameSyntax(BinaryTree target, string name)
+            internal NameSyntax([NotNull] BinaryTree target, [NotNull] string name)
                 : base(target)
                 => Value = name;
         }
+
+        internal static readonly Result<DeclarerSyntax> Empty
+            = new Result<DeclarerSyntax>(new DeclarerSyntax(new TagSyntax[0], null));
 
         internal readonly NameSyntax Name;
         internal readonly TagSyntax[] Tags;
@@ -48,6 +53,12 @@ namespace Reni.TokenClasses
         {
             Tracer.Assert(Name == null);
             return new DeclarerSyntax(Tags, root, new NameSyntax(root, name));
+        }
+
+        public DeclarerSyntax Combine(DeclarerSyntax other, BinaryTree root)
+        {
+            Tracer.Assert(Name == null || other.Name == null);
+            return new DeclarerSyntax(Tags.Concat(other.Tags).ToArray(), root, Name ?? other.Name);
         }
     }
 }

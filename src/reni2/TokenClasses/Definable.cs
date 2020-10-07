@@ -6,7 +6,7 @@ using Reni.Parser;
 
 namespace Reni.TokenClasses
 {
-    abstract class Definable : TokenClass, IDeclarerTokenClass, IValueProvider
+    abstract class Definable : TokenClass, IDeclarerTokenClass, IValueProvider, IDeclarerSyntaxFactoryToken
     {
         [DisableDump]
         protected string DataFunctionName => Id.Symbolize();
@@ -37,6 +37,7 @@ namespace Reni.TokenClasses
             => ExpressionSyntax.Create(this, binaryTree, scope);
 
         protected override ISyntaxFactory Provider => SyntaxFactory.Definable;
+        IDeclarerSyntaxFactory IDeclarerSyntaxFactoryToken.Provider => SyntaxFactory.DefinableAsDeclarer;
     }
 
     [BelongsTo(typeof(MainTokenFactory))]

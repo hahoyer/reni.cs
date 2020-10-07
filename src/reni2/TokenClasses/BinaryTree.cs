@@ -53,9 +53,6 @@ namespace Reni.TokenClasses
             Right = right;
         }
 
-        [EnableDumpExcept(null)]
-        internal IDeclarationTag DeclarationTag => TokenClass as IDeclarationTag;
-
         [DisableDump]
         internal Result<Declarer> Declarer
         {
@@ -124,12 +121,8 @@ namespace Reni.TokenClasses
         protected override string GetNodeDump() => base.GetNodeDump() + $"({TokenClass.Id})";
 
         [Obsolete("")]
-        internal Result<ValueSyntax> Syntax(ISyntaxScope scope)
-        {
-            
-            
-            return this.CachedFunction(scope ?? NullScopeInstance, GetValue);
-        }
+        internal Result<ValueSyntax> Syntax
+            (ISyntaxScope scope) => this.CachedFunction(scope ?? NullScopeInstance, GetValue);
 
         internal static BinaryTree Create
         (
@@ -193,7 +186,7 @@ namespace Reni.TokenClasses
             return IssueId.InvalidExpression.Value(this);
         }
 
-        internal Result<BinaryTree> GetBracketKernel(int level, BinaryTree parent)
+        Result<BinaryTree> GetBracketKernel(int level, BinaryTree parent)
         {
             Tracer.Assert(parent.Right == null);
 
@@ -307,6 +300,32 @@ namespace Reni.TokenClasses
                     yield return sourceSyntax;
         }
 
-    }
+        internal Result<BinaryTree> GetBracketKernel(int level)
+        {
+            var rightParenthesis = TokenClass as RightParenthesisBase;
+            Tracer.Assert(rightParenthesis != null);
+            Tracer.Assert(level == rightParenthesis.Level);
 
+            Tracer.Assert(Right == null);
+
+            if(!(Left.TokenClass is LeftParenthesis leftParenthesis))
+                return new Result<BinaryTree>(Left, IssueId.ExtraRightBracket.Issue(SourcePart));
+
+            Tracer.Assert(Left.Left == null);
+
+            var levelDelta = leftParenthesis.Level - level;
+
+            if(levelDelta == 0)
+                return Left.Right;
+
+            if(levelDelta > 0)
+                return new Result<BinaryTree>(Left.Right, IssueId.ExtraLeftBracket.Issue(Left.SourcePart));
+
+            Left.NotImplementedMethod(level, this);
+            return null;
+        }
+
+        internal Result<BinaryTree> GetBracketKernel() 
+            => GetBracketKernel(((RightParenthesisBase)TokenClass).Level);
+    }
 }

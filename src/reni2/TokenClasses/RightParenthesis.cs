@@ -50,7 +50,7 @@ namespace Reni.TokenClasses
         [Obsolete("", true)]
         Result<ValueSyntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
         {
-            var result = binaryTree.Left.GetBracketKernel(Level, binaryTree);
+            var result = binaryTree.GetBracketKernel(Level);
             var target = result.Target?.Syntax(this) ?? new EmptyList(binaryTree);
 
             if(result.Issues.Any())

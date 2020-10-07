@@ -42,7 +42,7 @@ namespace Reni.TokenClasses
 
 
     [BelongsTo(typeof(DeclarationTokenFactory))]
-    abstract class DeclarationTagToken : TerminalToken, IDeclarerTagProvider, IDeclarationTag
+    abstract class DeclarationTagToken : TerminalToken, IDeclarerTagProvider, IDeclarationTag, IDeclarerSyntaxFactoryToken
     {
         public static IEnumerable<string> DeclarationOptions
         {
@@ -66,6 +66,8 @@ namespace Reni.TokenClasses
             NotImplementedMethod(binaryTree);
             return null;
         }
+
+        IDeclarerSyntaxFactory IDeclarerSyntaxFactoryToken.Provider => SyntaxFactory.Declarer;
     }
 
     sealed class ConverterToken : DeclarationTagToken

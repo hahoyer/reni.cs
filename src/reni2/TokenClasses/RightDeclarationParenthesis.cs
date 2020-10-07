@@ -11,7 +11,7 @@ namespace Reni.TokenClasses
     sealed class RightDeclarationParenthesis
         : RightParenthesisBase
             , IDeclarerTagProvider
-            , IBracketMatch<BinaryTree>
+            , IBracketMatch<BinaryTree>,IDeclarerSyntaxFactoryToken
 
     {
         sealed class Matched
@@ -34,7 +34,7 @@ namespace Reni.TokenClasses
 
         Result<Declarer> IDeclarerTagProvider.Get(BinaryTree binaryTree)
         {
-            var bracketKernel = binaryTree.Left.GetBracketKernel(Level, binaryTree);
+            var bracketKernel = binaryTree.GetBracketKernel(Level);
             var target = bracketKernel.Target;
             if(target != null)
             {
@@ -69,11 +69,12 @@ namespace Reni.TokenClasses
 
         static Result<IDeclarationTag> GetDeclarationTag(BinaryTree item)
         {
-            var result = item.DeclarationTag;
-            if(result != null)
+            if(item.TokenClass is IDeclarationTag result)
                 return new Result<IDeclarationTag>(result);
 
             return new Result<IDeclarationTag>(null, IssueId.InvalidDeclarationTag.Issue(item.SourcePart));
         }
+
+        IDeclarerSyntaxFactory IDeclarerSyntaxFactoryToken.Provider => SyntaxFactory.ComplexDeclarer;
     }
 }

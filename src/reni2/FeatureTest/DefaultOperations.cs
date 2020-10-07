@@ -16,36 +16,42 @@ namespace Reni.FeatureTest.DefaultOperations
         protected virtual IEnumerable<System.Type> DependsOn => new[] {typeof(Add2Numbers)};
     }
 
+    [UnitTest]
     public sealed class Equal : ApplyCompareOperator
     {
         protected override string Operator => "=";
         protected override bool Result => false;
     }
 
+    [UnitTest]
     public sealed class NotEqual : ApplyCompareOperator
     {
         protected override string Operator => "<>";
         protected override bool Result => true;
     }
 
+    [UnitTest]
     public sealed class GreaterThan : ApplyCompareOperator
     {
         protected override string Operator => ">";
         protected override bool Result => false;
     }
 
+    [UnitTest]
     public sealed class LessThan : ApplyCompareOperator
     {
         protected override string Operator => "<";
         protected override bool Result => true;
     }
 
+    [UnitTest]
     public sealed class LessOrEqual : ApplyCompareOperator
     {
         protected override string Operator => "<=";
         protected override bool Result => true;
     }
 
+    [UnitTest]
     public sealed class GreaterOrEqual : ApplyCompareOperator
     {
         protected override string Operator => ">=";
