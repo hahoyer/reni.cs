@@ -221,7 +221,10 @@ namespace hw.UnitTest
                 if(PendingTestsFile != null)
                     PendingTestsFile.String = PendingTestsString;
             }
-            catch(Exception exception) { }
+            catch(Exception)
+            {
+                // ignored
+            }
         }
 
         void ConfigFileMessage(string flagText)

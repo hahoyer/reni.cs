@@ -8,7 +8,7 @@ namespace Reni.TokenClasses
 {
     sealed class DeclarerSyntax : Syntax
     {
-        internal class TagSyntax : Terminal
+        internal class TagSyntax : NoChildren
         {
             internal readonly IDeclarationTag Value;
 
@@ -17,7 +17,7 @@ namespace Reni.TokenClasses
                 => Value = value;
         }
 
-        internal class NameSyntax : Terminal
+        internal class NameSyntax : NoChildren
         {
             internal readonly string Value;
 

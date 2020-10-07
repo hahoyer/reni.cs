@@ -12,12 +12,12 @@ namespace Reni.Parser
     /// </summary>
     abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer
     {
-        internal abstract class Terminal : Syntax
+        internal abstract class NoChildren : Syntax
         {
-            protected Terminal(BinaryTree target)
+            protected NoChildren(BinaryTree target)
                 : base(target) { }
 
-            protected Terminal(int objectId, BinaryTree target)
+            protected NoChildren(int objectId, BinaryTree target)
                 : base(objectId, target) { }
 
             protected sealed override IEnumerable<Syntax> GetChildren() => new Syntax[0];

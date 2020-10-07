@@ -120,7 +120,6 @@ namespace Reni.TokenClasses
 
         protected override string GetNodeDump() => base.GetNodeDump() + $"({TokenClass.Id})";
 
-        [Obsolete("")]
         internal Result<ValueSyntax> Syntax
             (ISyntaxScope scope) => this.CachedFunction(scope ?? NullScopeInstance, GetValue);
 
