@@ -72,12 +72,12 @@ namespace Reni.Type
             {
                 BreakExecution();
                 var sourceResult = right
-                    .Conversion(category.Typed, ValueType.ForcedPointer);
+                    .Conversion(category.WithType, ValueType.ForcedPointer);
                 Dump("sourceResult", sourceResult);
                 BreakExecution();
 
-                var destinationResult = DestinationResult(category.Typed)
-                    .ReplaceArg(Result(category.Typed, this));
+                var destinationResult = DestinationResult(category.WithType)
+                    .ReplaceArg(Result(category.WithType, this));
                 Dump("destinationResult", destinationResult);
                 BreakExecution();
 

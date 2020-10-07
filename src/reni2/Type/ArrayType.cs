@@ -220,7 +220,7 @@ namespace Reni.Type
             var indexType = BitType
                 .Number(BitsConst.Convert(Count).Size.ToInt())
                 .Align;
-            var constructorResult = function.Result(category.Typed, indexType);
+            var constructorResult = function.Result(category.WithType, indexType);
             var elements = Count
                 .Select(i => ElementConstructorResult(category, constructorResult, i, indexType))
                 .Aggregate((c, n) => n + c)
@@ -233,7 +233,7 @@ namespace Reni.Type
         {
             var resultForArg = indexType
                 .Result
-                (category.Typed, () => CodeBase.BitsConst(indexType.Size, BitsConst.Convert(i)));
+                (category.WithType, () => CodeBase.BitsConst(indexType.Size, BitsConst.Convert(i)));
             return elementConstructorResult
                 .ReplaceArg(resultForArg)
                 .Conversion(ElementAccessType)
@@ -262,14 +262,14 @@ namespace Reni.Type
             string argsOptions)
         {
             var oldElementsResult = Pointer
-                .Result(category.Typed, objectReference).DereferenceResult;
+                .Result(category.WithType, objectReference).DereferenceResult;
 
             var isElementArg = argsType.IsConvertible(ElementAccessType);
             var newCount = isElementArg ? 1 : argsType.ArrayLength(ElementAccessType);
             var newElementsResultRaw
                 = isElementArg
-                    ? argsType.Conversion(category.Typed, ElementAccessType)
-                    : argsType.Conversion(category.Typed, ElementType.Array(newCount, argsOptions));
+                    ? argsType.Conversion(category.WithType, ElementAccessType)
+                    : argsType.Conversion(category.WithType, ElementType.Array(newCount, argsOptions));
 
             var newElementsResult = newElementsResultRaw.AutomaticDereferencedAlignedResult();
             var result = ElementType

@@ -129,7 +129,7 @@ namespace Reni.Code
                     var body = ReducedBody;
                     var initialSize = Size.Zero;
 
-                    var cleanup = new Result(Category.Code | Category.Exts, getIsHollow: () => true);
+                    var cleanup = new Result(Category.Code | Category.Closures, getIsHollow: () => true);
 
                     foreach(var reference in References)
                     {
@@ -146,7 +146,7 @@ namespace Reni.Code
 
                         var cleanup1 = reference
                             .ValueType
-                            .Cleanup(Category.Code | Category.Exts)
+                            .Cleanup(Category.Code | Category.Closures)
                             .ReplaceAbsolute(reference.ValueType.ForcedPointer, CodeBase.TopRef, CodeArgs.Void);
                         cleanup = cleanup1 + cleanup;
                         Dump(nameof(cleanup), cleanup);

@@ -70,7 +70,7 @@ namespace Reni.Code
         protected override CodeArgs GetRefsImplementation()
             => _fiberItems
                 .Aggregate
-                (FiberHead.Exts, (current, fiberItem) => current.Sequence(fiberItem.CodeArgs));
+                (FiberHead.Closures, (current, fiberItem) => current.Sequence(fiberItem.CodeArgs));
 
         internal override CodeBase Add(FiberItem subsequentElement)
         {

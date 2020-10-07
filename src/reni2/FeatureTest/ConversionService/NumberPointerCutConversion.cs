@@ -20,7 +20,7 @@ namespace Reni.FeatureTest.ConversionService
             var calulatedDestination = path.Execute(Category.Type).Type;
             Tracer.Assert(calulatedDestination == destination);
 
-            var code = path.Execute(Category.Code.Typed).Code.ReplaceArg(source.ArgResult(Category.Code.Typed));
+            var code = path.Execute(Category.Code.WithType).Code.ReplaceArg(source.ArgResult(Category.Code.WithType));
         }
     }
 }

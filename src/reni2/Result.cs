@@ -15,33 +15,40 @@ namespace Reni
 {
     sealed class Result : DumpableObject, IAggregateable<Result>
     {
-        static int _nextObjectId = 1;
-        CodeBase _code;
-        CodeArgs _exts;
+        static int NextObjectId = 1;
+
+        class DataContainer
+        {
+            internal CodeBase Code;
+            internal CodeArgs Closure;
+            internal bool? IsHollow;
+            internal Size Size;
+            internal TypeBase Type;
+            internal bool IsDirty;
+            internal Category PendingCategory;
+        }
+
+        readonly DataContainer Data = new DataContainer();
+
         /// <summary>
         /// Is this an hollow object? With no data?
         /// </summary>
-        bool? _isHollow;
-        bool _isDirty;
-        Category _pendingCategory;
-        Size _size;
-        TypeBase _type;
 
         public Issue[] Issues = new Issue[0];
 
         public Result()
-            : base(_nextObjectId++) => _pendingCategory = Category.None;
+            : base(NextObjectId++) => Data.PendingCategory = Category.None;
 
         internal Result(Category category, Issue[] issues)
             : this
             (
-                category & Category.Exts,
+                category & Category.Closures,
                 issues,
                 getIsHollow: null,
                 getSize: null,
                 getType: null,
                 getCode: null,
-                getExts: CodeArgs.Void)
+                getClosures: CodeArgs.Void)
         {
         }
 
@@ -57,7 +64,7 @@ namespace Reni
             Func<Size> getSize = null,
             Func<TypeBase> getType = null,
             Func<CodeBase> getCode = null,
-            Func<CodeArgs> getExts = null,
+            Func<CodeArgs> getClosures = null,
             Root rootContext = null)
             : this
             (
@@ -67,7 +74,7 @@ namespace Reni
                 getSize: getSize,
                 getType: getType,
                 getCode: getCode,
-                getExts: getExts,
+                getClosures: getClosures,
                 rootContext: rootContext)
         {
         }
@@ -80,7 +87,7 @@ namespace Reni
             Func<Size> getSize,
             Func<TypeBase> getType,
             Func<CodeBase> getCode,
-            Func<CodeArgs> getExts,
+            Func<CodeArgs> getClosures,
             Root rootContext = null)
             : this()
         {
@@ -90,22 +97,22 @@ namespace Reni
             var size = getSize == null ? null : new ValueCache<Size>(getSize);
             var type = getType == null ? null : new ValueCache<TypeBase>(getType);
             var code = getCode == null ? null : new ValueCache<CodeBase>(getCode);
-            var exts = getExts == null ? null : new ValueCache<CodeArgs>(getExts);
+            var closures = getClosures == null ? null : new ValueCache<CodeArgs>(getClosures);
 
             if(category.HasType)
-                _type = ObtainType(isHollow, size, type, code, rootContext);
+                Data.Type = ObtainType(isHollow, size, type, code, rootContext);
 
             if(category.HasCode)
-                _code = ObtainCode(isHollow, size, type, code);
+                Data.Code = ObtainCode(isHollow, size, type, code);
 
             if(category.HasSize)
-                _size = ObtainSize(isHollow, size, type, code);
+                Data.Size = ObtainSize(isHollow, size, type, code);
 
-            if(category.HasExts)
-                _exts = ObtainExts(isHollow, size, type, code, exts);
+            if(category.HasClosures)
+                Data.Closure = ObtainClosures(isHollow, size, type, code, closures);
 
             if(category.HasIsHollow)
-                _isHollow = ObtainIsHollow(isHollow, size, type, code);
+                Data.IsHollow = ObtainIsHollow(isHollow, size, type, code);
 
             AssertValid();
         }
@@ -115,13 +122,13 @@ namespace Reni
         internal bool HasSize => Size != null;
         internal bool HasType => Type != null;
         internal bool HasCode => Code != null;
-        internal bool HasExts => Exts != null;
-        internal bool HasIsHollow => _isHollow != null;
+        internal bool HasClosures => Closures != null;
+        internal bool HasIsHollow => Data.IsHollow != null;
 
         [Node]
         [EnableDumpWithExceptionPredicate]
         public Category CompleteCategory
-            => Category.CreateCategory(HasIsHollow, HasSize, HasType, HasCode, HasExts);
+            => Category.CreateCategory(HasIsHollow, HasSize, HasType, HasCode, HasClosures);
 
         /// <summary>
         /// Is this an hollow object? With no data?
@@ -130,10 +137,10 @@ namespace Reni
         [DebuggerHidden]
         public bool? IsHollow
         {
-            get => _isHollow;
+            get => Data.IsHollow;
             set
             {
-                _isHollow = value;
+                Data.IsHollow = value;
                 AssertValid();
             }
         }
@@ -142,10 +149,10 @@ namespace Reni
         [DebuggerHidden]
         public Size Size
         {
-            get => _size;
+            get => Data.Size;
             set
             {
-                _size = value;
+                Data.Size = value;
                 AssertValid();
             }
         }
@@ -154,10 +161,10 @@ namespace Reni
         [DebuggerHidden]
         internal TypeBase Type
         {
-            get => _type;
+            get => Data.Type;
             set
             {
-                _type = value;
+                Data.Type = value;
                 AssertValid();
             }
         }
@@ -166,30 +173,30 @@ namespace Reni
         internal CodeBase Code
         {
             [DebuggerHidden]
-            get { return _code; }
+            get => Data.Code;
             [DebuggerHidden]
             set
             {
-                _code = value;
+                Data.Code = value;
                 AssertValid();
             }
         }
 
         [Node]
         [DebuggerHidden]
-        internal CodeArgs Exts
+        internal CodeArgs Closures
         {
-            get => _exts;
+            get => Data.Closure;
             set
             {
-                _exts = value;
+                Data.Closure = value;
                 AssertValid();
             }
         }
 
-        internal bool? FindIsHollow => HasIsHollow ? _isHollow : FindSize?.IsZero;
+        internal bool? FindIsHollow => HasIsHollow ? Data.IsHollow : FindSize?.IsZero;
 
-        bool? QuickFindIsHollow => HasIsHollow ? _isHollow : QuickFindSize?.IsZero;
+        bool? QuickFindIsHollow => HasIsHollow ? Data.IsHollow : QuickFindSize?.IsZero;
 
         internal bool SmartIsHollow
         {
@@ -198,7 +205,7 @@ namespace Reni
                 var result = FindIsHollow;
                 if(result == null)
                 {
-                    DumpMethodWithBreak(text: "No approriate result property defined");
+                    DumpMethodWithBreak(text: "No appropriate result property defined");
                     Debugger.Break();
                     return false;
                 }
@@ -241,31 +248,31 @@ namespace Reni
                 var result = FindSize;
                 if(result == null)
                 {
-                    DumpMethodWithBreak(text: "No approriate result property defined");
+                    DumpMethodWithBreak(text: "No appropriate result property defined");
                     Debugger.Break();
                 }
                 return result;
             }
         }
 
-        internal CodeArgs FindExts
+        internal CodeArgs FindClosures
         {
             get
             {
-                if(HasExts)
-                    return Exts;
+                if(HasClosures)
+                    return Closures;
                 if(HasCode)
-                    return Code.Exts;
+                    return Code.Closures;
                 return null;
             }
         }
 
         [DisableDump]
-        internal CodeArgs SmartExts
+        internal CodeArgs SmartClosures
         {
             get
             {
-                var result = FindExts;
+                var result = FindClosures;
                 if(result == null)
                 {
                     DumpMethodWithBreak(text: "No approriate result property defined");
@@ -277,10 +284,10 @@ namespace Reni
 
         internal bool IsDirty
         {
-            get => _isDirty;
+            get => Data.IsDirty;
             set
             {
-                _isDirty = value;
+                Data.IsDirty = value;
                 AssertValid();
             }
         }
@@ -297,7 +304,7 @@ namespace Reni
                     return false;
                 if(HasCode && !Code.IsEmpty)
                     return false;
-                if(HasExts && !Exts.IsNone)
+                if(HasClosures && !Closures.IsNone)
                     return false;
                 return true;
             }
@@ -307,8 +314,8 @@ namespace Reni
         {
             get
             {
-                if(HasExts)
-                    return Exts.HasArg;
+                if(HasClosures)
+                    return Closures.HasArg;
                 if(HasCode)
                     return Code.HasArg;
                 return false;
@@ -317,10 +324,10 @@ namespace Reni
 
         public Category PendingCategory
         {
-            get => _pendingCategory;
+            get => Data.PendingCategory;
             set
             {
-                _pendingCategory = value;
+                Data.PendingCategory = value;
                 AssertValid();
             }
         }
@@ -349,7 +356,7 @@ namespace Reni
                     () => alignedSize,
                     () => Type.Align,
                     () => Code.BitCast(alignedSize),
-                    () => Exts);
+                    () => Closures);
                 return result;
             }
         }
@@ -522,7 +529,7 @@ namespace Reni
             ValueCache<CodeBase> getCode) =>
             getIsHollow?.Value ?? getSize?.Value.IsZero ?? getType?.Value.IsHollow ?? getCode?.Value.IsEmpty;
 
-        CodeArgs ObtainExts
+        CodeArgs ObtainClosures
         (
             ValueCache<bool> getIsHollow,
             ValueCache<Size> getSize,
@@ -533,7 +540,7 @@ namespace Reni
             if(getArgs != null)
                 return getArgs.Value;
             if(getCode != null)
-                return getCode.Value.Exts;
+                return getCode.Value.Closures;
 // ReSharper disable ExpressionIsAlwaysNull
             if(TryObtainIsHollow(getIsHollow, getSize, getType, getCode) == true)
 // ReSharper restore ExpressionIsAlwaysNull
@@ -546,22 +553,22 @@ namespace Reni
         public override string DumpData()
         {
             var result = "";
-            if(_pendingCategory != Category.None)
-                result += "\nPendingCategory=" + _pendingCategory.Dump();
+            if(Data.PendingCategory != Category.None)
+                result += "\nPendingCategory=" + Data.PendingCategory.Dump();
             if(CompleteCategory != Category.None)
                 result += "\nCompleteCategory=" + CompleteCategory.Dump();
             if (HasIssue)
                 result += "\nIssues=" + Tracer.Dump(Issues);
             if (HasIsHollow)
-                result += "\nIsHollow=" + Tracer.Dump(_isHollow);
+                result += "\nIsHollow=" + Tracer.Dump(Data.IsHollow);
             if(HasSize)
-                result += "\nSize=" + Tracer.Dump(_size);
+                result += "\nSize=" + Tracer.Dump(Data.Size);
             if(HasType)
-                result += "\nType=" + Tracer.Dump(_type);
-            if(HasExts)
-                result += "\nExts=" + Tracer.Dump(_exts);
+                result += "\nType=" + Tracer.Dump(Data.Type);
+            if(HasClosures)
+                result += "\nClosures=" + Tracer.Dump(Data.Closure);
             if(HasCode)
-                result += "\nCode=" + Tracer.Dump(_code);
+                result += "\nCode=" + Tracer.Dump(Data.Code);
             if(result == "")
                 return "";
             return result.Substring(startIndex: 1);
@@ -572,33 +579,33 @@ namespace Reni
             Issues = Issues.Union(result.Issues).ToArray();
 
             if(HasIssue)
-                Reset(Category.All - Category.Exts);
+                Reset(Category.All - Category.Closures);
             else
             {
                 if(result.HasIsHollow)
-                    _isHollow = result.IsHollow;
+                    Data.IsHollow = result.IsHollow;
 
                 if(result.HasSize)
-                    _size = result.Size;
+                    Data.Size = result.Size;
 
                 if(result.HasType)
-                    _type = result.Type;
+                    Data.Type = result.Type;
 
                 if(result.HasCode)
-                    _code = result.Code;
+                    Data.Code = result.Code;
             }
 
-            if(result.HasExts)
-                _exts = result.Exts;
+            if(result.HasClosures)
+                Data.Closure = result.Closures;
 
-            _pendingCategory = _pendingCategory - result.CompleteCategory;
+            Data.PendingCategory = Data.PendingCategory - result.CompleteCategory;
 
             AssertValid();
         }
 
         Result Filter(Category category)
         {
-            return new Result
+            var result = new Result
             (
                 CompleteCategory & category,
                 Issues,
@@ -606,10 +613,11 @@ namespace Reni
                 () => Size,
                 () => Type,
                 () => Code,
-                () => Exts)
+                () => Closures)
             {
-                _pendingCategory = _pendingCategory & category
             };
+            result.Data.PendingCategory = result.Data.PendingCategory & category;
+            return result;
         }
 
         void AssertValid()
@@ -643,9 +651,9 @@ namespace Reni
                 Tracer.Assert(Code.Size == Size, () => "Code and Size differ: " + Dump());
             if(HasType && HasCode && Type.HasQuickSize)
                 Tracer.Assert(Code.Size == Type.Size, () => "Code and Type differ: " + Dump());
-            if(HasExts && HasCode)
+            if(HasClosures && HasCode)
                 Tracer.Assert
-                    (Code.Exts.IsEqual(Exts), () => "Code and Exts differ: " + Dump());
+                    (Code.Closures.IsEqual(Closures), () => "Code and Closures differ: " + Dump());
         }
 
         void Add(Result other, SourcePart position) => Add(other, CompleteCategory, position);
@@ -700,10 +708,10 @@ namespace Reni
                     Code = null;
             }
 
-            if(category.HasExts)
-                Exts = Exts.Sequence(other.Exts);
-            else if(HasExts)
-                Exts = null;
+            if(category.HasClosures)
+                Closures = Closures.Sequence(other.Closures);
+            else if(HasClosures)
+                Closures = null;
 
             IsDirty = false;
         }
@@ -719,8 +727,8 @@ namespace Reni
                 Type = null;
             if(category.HasCode)
                 Code = null;
-            if(category.HasExts)
-                Exts = null;
+            if(category.HasClosures)
+                Closures = null;
             IsDirty = false;
         }
 
@@ -749,11 +757,11 @@ namespace Reni
                 Size = Size,
                 Type = Type,
                 Code = Code,
-                Exts = Exts,
+                Closures = Closures,
                 IsDirty = true
             };
 
-            var categoryForArg = CompleteCategory & Category.Code.CodeExtsed;
+            var categoryForArg = CompleteCategory & Category.Code.WithClosures;
             if(HasCode)
                 categoryForArg |= Category.Type;
 
@@ -764,8 +772,8 @@ namespace Reni
 
                 if (HasCode)
                     result.Code = Code.ReplaceArg(resultForArg);
-                if(HasExts)
-                    result.Exts = Exts.WithoutArg() + resultForArg.Exts;
+                if(HasClosures)
+                    result.Closures = Closures.WithoutArg() + resultForArg.Closures;
 
             }
             result.IsDirty = false;
@@ -776,10 +784,10 @@ namespace Reni
             (TRefInCode refInCode, Func<CodeBase> replacementCode, Func<CodeArgs> replacementRefs)
             where TRefInCode : IContextReference
         {
-            if(HasExts && !Exts.Contains(refInCode))
+            if(HasClosures && !Closures.Contains(refInCode))
                 return this;
 
-            if(!HasCode && !HasExts)
+            if(!HasCode && !HasClosures)
                 return this;
 
             var result = new Result
@@ -792,8 +800,8 @@ namespace Reni
             };
             if(HasCode)
                 result.Code = Code.ReplaceAbsolute(refInCode, replacementCode);
-            if(HasExts)
-                result.Exts = Exts.Without(refInCode).Sequence(replacementRefs());
+            if(HasClosures)
+                result.Closures = Closures.Without(refInCode).Sequence(replacementRefs());
             result.IsDirty = false;
             return result;
         }
@@ -802,10 +810,10 @@ namespace Reni
             (TRefInCode refInCode, Func<Category, Result> getReplacement)
             where TRefInCode : IContextReference
         {
-            if(HasExts && !Exts.Contains(refInCode))
+            if(HasClosures && !Closures.Contains(refInCode))
                 return this;
 
-            if(!HasCode && !HasExts)
+            if(!HasCode && !HasClosures)
                 return this;
 
             var replacement = getReplacement(CompleteCategory - Category.Size - Category.Type);
@@ -819,8 +827,8 @@ namespace Reni
             };
             if(HasCode)
                 result.Code = Code.ReplaceAbsolute(refInCode, () => replacement.Code);
-            if(HasExts)
-                result.Exts = Exts.Without(refInCode).Sequence(replacement.Exts);
+            if(HasClosures)
+                result.Closures = Closures.Without(refInCode).Sequence(replacement.Closures);
             result.IsDirty = false;
             return result;
         }
@@ -829,10 +837,10 @@ namespace Reni
             (TRefInCode refInCode, Func<CodeBase> replacementCode, Func<CodeArgs> replacementRefs)
             where TRefInCode : IContextReference
         {
-            if(HasExts && !Exts.Contains(refInCode))
+            if(HasClosures && !Closures.Contains(refInCode))
                 return this;
 
-            if(!HasCode && !HasExts)
+            if(!HasCode && !HasClosures)
                 return this;
 
             var result = new Result
@@ -844,8 +852,8 @@ namespace Reni
             };
             if(HasCode)
                 result.Code = Code.ReplaceRelative(refInCode, replacementCode);
-            if(HasExts)
-                result.Exts = Exts.Without(refInCode).Sequence(replacementRefs());
+            if(HasClosures)
+                result.Closures = Closures.Without(refInCode).Sequence(replacementRefs());
             return result;
         }
 
@@ -853,33 +861,33 @@ namespace Reni
         {
             if(!HasCode)
                 return this;
-            if(SmartExts.Count == 0)
+            if(SmartClosures.Count == 0)
                 return this;
             var result = Clone;
             result.IsDirty = true;
-            result.Code = SmartExts.ReplaceRefsForFunctionBody(Code, replacement);
-            result.Exts = replacement.Exts;
+            result.Code = SmartClosures.ReplaceRefsForFunctionBody(Code, replacement);
+            result.Closures = replacement.Closures;
             result.IsDirty = false;
             return result;
         }
 
         internal Result LocalBlock(Category category)
-            => AutomaticDereferenceResult.InternalLocalBlock(category.Typed);
+            => AutomaticDereferenceResult.InternalLocalBlock(category.WithType);
 
         internal Result InternalLocalBlock(Category category)
         {
             if(HasIssue)
                 return this;
 
-            if(!category.HasCode && !category.HasExts)
+            if(!category.HasCode && !category.HasClosures)
                 return this;
 
             var result = this & category;
             var copier = Type.Copier(category);
             if(category.HasCode)
                 result.Code = Code.LocalBlock(copier.Code);
-            if(category.HasExts)
-                result.Exts = Exts.Sequence(copier.Exts);
+            if(category.HasClosures)
+                result.Closures = Closures.Sequence(copier.Closures);
             return result;
         }
 
@@ -891,7 +899,7 @@ namespace Reni
 
         internal BitsConst Evaluate(IExecutionContext context)
         {
-            Tracer.Assert(Exts.IsNone, Dump);
+            Tracer.Assert(Closures.IsNone, Dump);
             var result = Align.LocalBlock(CompleteCategory);
             return result.Code.Evaluate(context);
         }
@@ -1003,16 +1011,16 @@ namespace Reni
                     : this;
 
         internal Result ConvertToConverter(TypeBase source)
-            => source.IsHollow || !HasExts && !HasCode
+            => source.IsHollow || !HasClosures && !HasCode
                 ? this
                 : ReplaceAbsolute(source.CheckedReference, source.ArgResult);
 
         internal Result AddCleanup(Result cleanup)
         {
-            if(!HasCode || !HasExts || cleanup.IsEmpty)
+            if(!HasCode || !HasClosures || cleanup.IsEmpty)
                 return this;
 
-            if(HasExts && !cleanup.Exts.IsNone)
+            if(HasClosures && !cleanup.Closures.IsNone)
                 NotImplementedMethod(cleanup);
 
             var result = Clone;
@@ -1038,7 +1046,7 @@ namespace Reni
         internal Result InvalidConversion(TypeBase destination)
             =>
                 destination.Result
-                    (CompleteCategory, () => Code.InvalidConversion(destination.Size), () => Exts);
+                    (CompleteCategory, () => Code.InvalidConversion(destination.Size), () => Closures);
 
         internal bool IsValidOrIssue(Category category)
             => HasIssue || category <= CompleteCategory;

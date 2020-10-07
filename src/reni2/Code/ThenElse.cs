@@ -37,7 +37,7 @@ namespace Reni.Code
         internal override Size OutputSize => ThenCode.Size;
         internal override bool HasArg => ThenCode.HasArg || ElseCode.HasArg;
 
-        protected override CodeArgs GetRefsImplementation() => ThenCode.Exts.Sequence(ElseCode.Exts);
+        protected override CodeArgs GetRefsImplementation() => ThenCode.Closures.Sequence(ElseCode.Closures);
 
         internal override FiberItem[] TryToCombineBack(BitCast preceding)
         {

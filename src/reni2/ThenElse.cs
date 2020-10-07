@@ -50,9 +50,9 @@ namespace Reni
         internal override IRecursionHandler RecursionHandler => this;
 
         Result CondResult(ContextBase context, Category category)
-            => context.Result(category.Typed, Cond)
+            => context.Result(category.WithType, Cond)
                 .Conversion(context.RootContext.BitType.Align)
-                .LocalBlock(category.Typed)
+                .LocalBlock(category.WithType)
                 .Conversion(context.RootContext.BitType);
 
         Result ElseResult(ContextBase context, Category category)
@@ -69,7 +69,7 @@ namespace Reni
 
         Result BranchResult(ContextBase context, Category category, ValueSyntax syntax)
         {
-            var result = context.Result(category.Typed, syntax);
+            var result = context.Result(category.WithType, syntax);
             if(result == null)
                 return null;
 
@@ -79,7 +79,7 @@ namespace Reni
 
             var commonType = CommonType(context);
             return branchResult.Type
-                .Conversion(category.Typed, commonType)
+                .Conversion(category.WithType, commonType)
                 .ReplaceArg(branchResult)
                 & category;
         }
@@ -102,7 +102,7 @@ namespace Reni
                 (
                     category,
                     () => condResult.Code.ThenElse(thenResult.Code, elseResult.Code),
-                    () => condResult.Exts + thenResult.Exts + elseResult.Exts
+                    () => condResult.Closures + thenResult.Closures + elseResult.Closures
                 );
         }
 

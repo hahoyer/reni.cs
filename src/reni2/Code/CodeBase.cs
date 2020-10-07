@@ -30,7 +30,7 @@ namespace Reni.Code
         internal Size TemporarySize => GetTemporarySize();
 
         [DisableDump]
-        internal CodeArgs Exts => GetRefsImplementation();
+        internal CodeArgs Closures => GetRefsImplementation();
 
         [DisableDump]
         internal virtual bool IsEmpty => false;
@@ -280,7 +280,7 @@ namespace Reni.Code
 
         protected static CodeArgs GetRefs(CodeBase[] codeBases)
         {
-            var refs = codeBases.Select(code => code.Exts).ToArray();
+            var refs = codeBases.Select(code => code.Closures).ToArray();
             return refs.Aggregate(CodeArgs.Void(), (r1, r2) => r1.Sequence(r2));
         }
 

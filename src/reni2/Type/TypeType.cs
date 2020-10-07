@@ -62,12 +62,12 @@ namespace Reni.Type
 
         internal override Result InstanceResult
             (Category category, Func<Category, Result> getRightResult)
-            => RawInstanceResult(category.Typed, getRightResult).LocalReferenceResult;
+            => RawInstanceResult(category.WithType, getRightResult).LocalReferenceResult;
 
         Result RawInstanceResult(Category category, Func<Category, Result> getRightResult)
         {
             if(category <= Category.Type.Replenished)
-                return Value.Result(category.Typed);
+                return Value.Result(category.WithType);
             var constructorResult = Value
                 .ConstructorResult(category, getRightResult(Category.Type).Type);
             return constructorResult

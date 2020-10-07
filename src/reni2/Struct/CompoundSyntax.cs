@@ -159,9 +159,9 @@ namespace Reni.Struct
 
         internal Result Cleanup(ContextBase context, Category category)
         {
-            if(CleanupSection != null && (category.HasCode || category.HasExts))
+            if(CleanupSection != null && (category.HasCode || category.HasClosures))
                 return context
-                    .Result(category.Typed, CleanupSection)
+                    .Result(category.WithType, CleanupSection)
                     .Conversion(context.RootContext.VoidType)
                     .LocalBlock(category) & category;
 

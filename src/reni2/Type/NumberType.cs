@@ -114,7 +114,7 @@ namespace Reni.Type
                 category,
                 Parent
                     .Pointer
-                    .Result(category, ObjectResult(category.Typed)));
+                    .Result(category, ObjectResult(category.WithType)));
 
         Result NegationResult(Category category) => ((NumberType) _zeroResult.Value.Type)
             .OperationResult(category, _minusOperation, this)
@@ -129,7 +129,7 @@ namespace Reni.Type
         Result EnableCutTokenResult(Category category)
             => EnableCut
                 .Pointer
-                .Result(category.Typed, ObjectResult(category));
+                .Result(category.WithType, ObjectResult(category));
 
         Result OperationResult(Category category, TypeBase right, IOperation operation)
         {
@@ -165,9 +165,9 @@ namespace Reni.Type
                     CodeArgs.Arg
                 );
 
-            var leftResult = ObjectResult(category.Typed)
+            var leftResult = ObjectResult(category.WithType)
                 .Conversion(Align);
-            var rightResult = right.Pointer.ArgResult(category.Typed).Conversion(right.Align);
+            var rightResult = right.Pointer.ArgResult(category.WithType).Conversion(right.Align);
             var pair = leftResult + rightResult;
             return result.ReplaceArg(pair);
         }
@@ -184,7 +184,7 @@ namespace Reni.Type
         Result FlatConversion(Category category, NumberType source)
         {
             if(Bits == source.Bits)
-                return ArgResult(category.Typed);
+                return ArgResult(category.WithType);
 
             return Result
                 (

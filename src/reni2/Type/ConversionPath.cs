@@ -154,7 +154,7 @@ namespace Reni.Type
         internal Result Execute(Category category)
         {
             var results = Elements
-                .Select(item => item.Result(category.Typed))
+                .Select(item => item.Result(category.WithType))
                 //  .ToArray()
                 ;
             //Tracer.FlaggedLine("\n"+Tracer.Dump(results));

@@ -35,8 +35,8 @@ namespace Reni.Struct
 
         Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
         {
-            if(category.IsNone && pendingCategory == Category.Exts)
-                return new Result(Category.Exts, getExts: CodeArgs.Void);
+            if(category.IsNone && pendingCategory == Category.Closures)
+                return new Result(Category.Closures, getClosures: CodeArgs.Void);
 
 
             Tracer.Assert(pendingCategory.IsNone);
@@ -60,11 +60,11 @@ namespace Reni.Struct
 
         [Node]
         [DisableDump]
-        internal CodeArgs Exts
+        internal CodeArgs Closures
         {
             get
             {
-                var result = ResultCache.Exts;
+                var result = ResultCache.Closures;
                 Tracer.Assert(result != null);
                 return result;
             }
@@ -110,8 +110,8 @@ namespace Reni.Struct
             if(result == null)
                 return null;
 
-            if(category.HasExts)
-                result.Exts = CodeArgs.Arg();
+            if(category.HasClosures)
+                result.Closures = CodeArgs.Arg();
             if(!result.HasIssue && category.HasCode)
                 result.Code = CallType
                     .ArgCode
@@ -124,17 +124,17 @@ namespace Reni.Struct
             if(IsStopByObjectIdActive)
                 return null;
 
-            var trace = FunctionId.Index.In() && category.HasExts && category.HasCode;
+            var trace = FunctionId.Index.In() && category.HasClosures && category.HasCode;
             StartMethodDump(trace, category);
             try
             {
                 Dump(nameof(Body), Body.Target.SourcePart);
                 BreakExecution();
-                var rawResult = Context.Result(category.Typed, Body);
+                var rawResult = Context.Result(category.WithType, Body);
 
-                Tracer.Assert(rawResult.HasIssue || rawResult.CompleteCategory == category.Typed);
-                if(rawResult.FindExts != null)
-                    Tracer.Assert(!rawResult.SmartExts.Contains(CodeArgs.Arg()), rawResult.Dump);
+                Tracer.Assert(rawResult.HasIssue || rawResult.CompleteCategory == category.WithType);
+                if(rawResult.FindClosures != null)
+                    Tracer.Assert(!rawResult.SmartClosures.Contains(CodeArgs.Arg()), rawResult.Dump);
 
                 Dump("rawResult", rawResult);
                 BreakExecution();
@@ -192,7 +192,7 @@ namespace Reni.Struct
             {
                 _isObtainBodyCodeActive = true;
                 var foreignRefsRef = CreateContextRefCode();
-                var visitResult = ResultCache & (Category.Code | Category.Exts);
+                var visitResult = ResultCache & (Category.Code | Category.Closures);
                 var result = visitResult
                     .ReplaceRefsForFunctionBody(foreignRefsRef)
                     .Code;

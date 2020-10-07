@@ -244,7 +244,7 @@ namespace Reni.Context
         }
 
         internal Result ResultAsReference(Category category, Parser.ValueSyntax syntax)
-            => Result(category.Typed, syntax)
+            => Result(category.WithType, syntax)
                 .LocalReferenceResult;
 
         internal Result ArgReferenceResult(Category category)

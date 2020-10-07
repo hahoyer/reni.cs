@@ -366,7 +366,7 @@ namespace Reni.Type
             => ArgResult(category);
 
         Result VoidCodeAndRefs(Category category)
-            => Root.VoidType.Result(category & (Category.Code | Category.Exts));
+            => Root.VoidType.Result(category & (Category.Code | Category.Closures));
 
         internal ArrayType Array(int count, string options = null)
             => Cache.Array[count][options ?? ArrayType.Options.DefaultOptionsId];
@@ -418,18 +418,18 @@ namespace Reni.Type
             (
                 category,
                 () => codeAndClosures.Code,
-                () => codeAndClosures.Exts
+                () => codeAndClosures.Closures
             );
 
         internal Result Result(Category category, Func<Category, Result> getCodeAndRefs)
         {
-            var localCategory = category & (Category.Code | Category.Exts);
+            var localCategory = category & (Category.Code | Category.Closures);
             var codeAndClosures = getCodeAndRefs(localCategory);
             return Result
             (
                 category,
                 () => codeAndClosures.Code,
-                () => codeAndClosures.Exts
+                () => codeAndClosures.Closures
             );
         }
 
@@ -439,7 +439,7 @@ namespace Reni.Type
                 category,
                 getType: () => this,
                 getCode: getCode,
-                getExts: getClosures);
+                getClosures: getClosures);
 
         internal TypeBase CommonType(TypeBase elseType)
         {
@@ -560,7 +560,7 @@ namespace Reni.Type
             var path = ConversionService.FindPath(this, destination);
             return path == null
                 ? ArgResult(category).InvalidConversion(destination) 
-                : path.Execute(category.Typed);
+                : path.Execute(category.WithType);
         }
 
         Result Mutation(Category category, TypeBase destination)
@@ -702,10 +702,10 @@ namespace Reni.Type
             =>
                 IsHollow
                     ? Result(category)
-                    : Pointer.Result(category.Typed, ForcedReference).DereferenceResult;
+                    : Pointer.Result(category.WithType, ForcedReference).DereferenceResult;
 
         internal Result ObjectResult(Category category)
-            => IsHollow? Result(category) : Pointer.Result(category.Typed, ForcedReference);
+            => IsHollow? Result(category) : Pointer.Result(category.WithType, ForcedReference);
 
         protected virtual CodeBase DumpPrintCode()
         {

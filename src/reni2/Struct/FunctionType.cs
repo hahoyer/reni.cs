@@ -55,7 +55,7 @@ namespace Reni.Struct
         internal override TypeBase ValueType => Getter.ReturnType;
 
         [DisableDump]
-        internal override bool IsHollow => Exts.IsNone && ArgsType.IsHollow;
+        internal override bool IsHollow => Closures.IsNone && ArgsType.IsHollow;
 
         [DisableDump]
         internal override CompoundView FindRecentCompoundView => _compoundView;
@@ -88,7 +88,7 @@ namespace Reni.Struct
 
         [Node]
         [DisableDump]
-        internal CodeArgs Exts => GetExts();
+        internal CodeArgs Closures => GetClosures();
 
         [DisableDump]
         internal FunctionContainer Container
@@ -129,7 +129,7 @@ namespace Reni.Struct
             (category);
 
         protected override Result GetterResult(Category category) => Getter.GetCallResult(category);
-        protected override Size GetSize() => ArgsType.Size + Exts.Size;
+        protected override Size GetSize() => ArgsType.Size + Closures.Size;
 
         internal ContextBase CreateSubContext(bool useValue)
             => new Context.Function(_compoundView.Context, ArgsType, useValue ? ValueType : null);
@@ -167,8 +167,8 @@ namespace Reni.Struct
                 var result = Result
                 (
                     category,
-                    () => Exts.ToCode() + ArgsType.ArgCode,
-                    () => Exts + CodeArgs.Arg()
+                    () => Closures.ToCode() + ArgsType.ArgCode,
+                    () => Closures + CodeArgs.Arg()
                 );
                 Tracer.Assert(category == result.CompleteCategory);
                 return ReturnMethodDump(result);
@@ -179,12 +179,12 @@ namespace Reni.Struct
             }
         }
 
-        CodeArgs GetExts()
+        CodeArgs GetClosures()
         {
-            var result = Getter.Exts;
+            var result = Getter.Closures;
             Tracer.Assert(result != null);
             if(Setter != null)
-                result += Setter.Exts;
+                result += Setter.Closures;
             var argsExt = ArgsType as IContextReference;
             if(argsExt != null)
                 Tracer.Assert(!result.Contains(argsExt));

@@ -38,7 +38,7 @@ namespace Reni.Context
         Result IFunctionContext.CreateArgReferenceResult(Category category)
         {
             return ArgsType
-                .ContextAccessResult(category.Typed, this, () => ArgsType.Size * -1)
+                .ContextAccessResult(category.WithType, this, () => ArgsType.Size * -1)
                 & category;
         }
 
@@ -49,7 +49,7 @@ namespace Reni.Context
             return ValueType.Pointer
                 .ContextAccessResult
                 (
-                    category.Typed,
+                    category.WithType,
                     this,
                     () => (ArgsType.Size + Root.DefaultRefAlignParam.RefSize) * -1)
                 & category;

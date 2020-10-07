@@ -123,11 +123,11 @@ namespace Reni.Context
 
         static Result CreateArrayResult(ContextBase context, Category category, ValueSyntax argsType, bool isMutable)
         {
-            var target = context.Result(category.Typed, argsType).SmartUn<PointerType>().Align;
+            var target = context.Result(category.WithType, argsType).SmartUn<PointerType>().Align;
             return target
                        .Type
                        .Array(1, ArrayType.Options.Create().IsMutable.SetTo(isMutable))
-                       .Result(category.Typed, target)
+                       .Result(category.WithType, target)
                        .LocalReferenceResult
                    & category;
         }
@@ -145,7 +145,7 @@ namespace Reni.Context
         internal Result ConcatPrintResult(Category category, int count, Func<Category, int, Result> elemResults)
         {
             var result = VoidType.Result(category);
-            if(!(category.HasCode || category.HasExts))
+            if(!(category.HasCode || category.HasClosures))
                 return result;
 
             StartMethodDump(false, category, count, "elemResults");
@@ -171,8 +171,8 @@ namespace Reni.Context
                         result.Code = result.Code + elemResult.Code;
                     }
 
-                    if(category.HasExts)
-                        result.Exts = result.Exts.Sequence(elemResult.Exts);
+                    if(category.HasClosures)
+                        result.Closures = result.Closures.Sequence(elemResult.Closures);
                     result.IsDirty = false;
 
                     Dump("result", result);

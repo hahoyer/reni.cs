@@ -215,8 +215,8 @@ namespace Reni.Type
 
         Result PlusResult(Category category, TypeBase right)
         {
-            var codeAndExts = AccessResult(category, right).DereferenceResult;
-            return Result(category, codeAndExts);
+            var codeAndClosures = AccessResult(category, right).DereferenceResult;
+            return Result(category, codeAndClosures);
         }
 
         Result MinusResult(Category category, TypeBase right)

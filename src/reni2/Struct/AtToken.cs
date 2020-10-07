@@ -15,7 +15,7 @@ namespace Reni.Struct
         protected override Result Result
             (ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
         {
-            var target = context.ResultAsReference(category.Typed, left);
+            var target = context.ResultAsReference(category.WithType, left);
             return target
                 .Type
                 .FindRecentCompoundView

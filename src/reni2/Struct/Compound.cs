@@ -115,7 +115,7 @@ namespace Reni.Struct
                 var result = results
                     .Aggregate
                     (
-                        Parent.RootContext.VoidType.Result(category.Typed),
+                        Parent.RootContext.VoidType.Result(category.WithType),
                         (current, next) => current.Sequence(next,Syntax.Target.SourcePart)
                     );
                 return ReturnMethodDump(result);
@@ -192,7 +192,7 @@ namespace Reni.Struct
                 Dump(nameof(Syntax.PureStatements), Syntax.PureStatements[position]);
                 BreakExecution();
                 var rawResult = uniqueChildContext.Result
-                    (category.Typed, Syntax.PureStatements[position]);
+                    (category.WithType, Syntax.PureStatements[position]);
                 Dump(nameof(rawResult), rawResult);
                 BreakExecution();
                 var unFunction = rawResult.SmartUn<FunctionType>();

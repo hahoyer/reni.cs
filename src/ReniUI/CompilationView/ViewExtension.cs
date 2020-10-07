@@ -26,10 +26,10 @@ namespace ReniUI.CompilationView
             return control.CreateGroup(title);
         }
 
-        internal static Control CreateView(this CodeArgs exts, SourceView master)
+        internal static Control CreateView(this CodeArgs closures, SourceView master)
             => false.CreateLineupView
                 (
-                    exts
+                    closures
                         .Data
                         .Select(item => item.CreateLink(master))
                         .ToArray()
@@ -112,7 +112,7 @@ namespace ReniUI.CompilationView
             var clients = new List<Control>();
             if(result.HasType || result.HasSize || result.HasIsHollow)
                 clients.Add(result.CreateTypeLineView(master));
-            clients.Add(result.Exts?.CreateView(master));
+            clients.Add(result.Closures?.CreateView(master));
             clients.Add(result.Code?.CreateView(master));
             return clients.CreateRowView();
         }
@@ -194,14 +194,14 @@ namespace ReniUI.CompilationView
 
             var indexView = target.Index.CreateView(2);
             var argsTypeView = target.ArgsType.CreateLink(master).CreateGroup("args");
-            var extsView = target.Exts.CreateView(master).CreateGroup("exts");
+            var closuresView = target.Closures.CreateView(master).CreateGroup("closures");
             var valueTypeView = target.ValueType.CreateLink(master).CreateGroup("value");
             var setterView = target.Setter?.CreateView(master);
             var getterView = target.Getter.CreateView(master);
 
             return false.CreateLineupView
                 (
-                    true.CreateLineupView(indexView, argsTypeView, extsView, valueTypeView),
+                    true.CreateLineupView(indexView, argsTypeView, closuresView, valueTypeView),
                     setterView?.CreateGroup("Set"),
                     getterView?.CreateGroup("Get")
                 );

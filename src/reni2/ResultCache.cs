@@ -121,7 +121,7 @@ namespace Reni
         internal CodeBase Code => GetCategories(Category.Code).Code;
 
         [DisableDump]
-        internal CodeArgs Exts => GetCategories(Category.Exts).Exts;
+        internal CodeArgs Closures => GetCategories(Category.Closures).Closures;
 
         [DisableDump]
         internal Size Size => GetCategories(Category.Size).Size;
@@ -151,10 +151,10 @@ namespace Reni
                 localCategory -= Category.Size;
             }
 
-            if(localCategory.HasExts && Data.FindExts != null)
+            if(localCategory.HasClosures && Data.FindClosures != null)
             {
-                Data.Exts = Data.FindExts;
-                localCategory -= Category.Exts;
+                Data.Closures = Data.FindClosures;
+                localCategory -= Category.Closures;
             }
 
             if(!localCategory.HasAny && !(category & Data.PendingCategory).HasAny)

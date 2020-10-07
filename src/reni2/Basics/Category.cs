@@ -10,12 +10,12 @@ namespace Reni.Basics
     {
         static readonly Category[] Cache = new Category[32];
 
-        Category(bool isHollow, bool size, bool type, bool code, bool exts)
+        Category(bool isHollow, bool size, bool type, bool code, bool closures)
             : base(nextObjectId: null)
         {
             HasCode = code;
             HasType = type;
-            HasExts = exts;
+            HasClosures = closures;
             HasIsHollow = isHollow;
             HasSize = size;
         }
@@ -29,7 +29,7 @@ namespace Reni.Basics
             return
                 obj.HasCode.Equals(HasCode) &&
                 obj.HasType.Equals(HasType) &&
-                obj.HasExts.Equals(HasExts) &&
+                obj.HasClosures.Equals(HasClosures) &&
                 obj.HasSize.Equals(HasSize) &&
                 obj.HasIsHollow.Equals(HasIsHollow)
                 ;
@@ -45,7 +45,7 @@ namespace Reni.Basics
         public static Category Code => CreateCategory(code: true);
 
         [DebuggerHidden]
-        public static Category Exts => CreateCategory(exts: true);
+        public static Category Closures => CreateCategory(closures: true);
 
         [DebuggerHidden]
         public static Category IsHollow => CreateCategory(isHollow: true);
@@ -54,40 +54,40 @@ namespace Reni.Basics
         public static Category None => CreateCategory();
 
         [DebuggerHidden]
-        public static Category All => CreateCategory(isHollow: true, size: true, type: true, code: true, exts: true);
+        public static Category All => CreateCategory(isHollow: true, size: true, type: true, code: true, closures: true);
 
         public bool IsNone => !HasAny;
         public bool HasCode { get; }
 
         public bool HasType { get; }
 
-        public bool HasExts { get; }
+        public bool HasClosures { get; }
 
         public bool HasSize { get; }
 
         public bool HasIsHollow { get; }
 
-        public bool HasAny => HasCode || HasType || HasExts || HasSize || HasIsHollow;
+        public bool HasAny => HasCode || HasType || HasClosures || HasSize || HasIsHollow;
 
         [DebuggerHidden]
         [DisableDump]
-        public Category IsHollowed => this | IsHollow;
+        public Category WithHollow => this | IsHollow;
 
         [DebuggerHidden]
         [DisableDump]
-        public Category Sized => this | Size;
+        public Category WithSize => this | Size;
 
         [DebuggerHidden]
         [DisableDump]
-        public Category Typed => this | Type;
+        public Category WithType => this | Type;
 
         [DebuggerHidden]
         [DisableDump]
-        public Category Coded => this | Code;
+        public Category WithCode => this | Code;
 
         [DebuggerHidden]
         [DisableDump]
-        public Category CodeExtsed => this | Exts;
+        public Category WithClosures => this | Closures;
 
         public Category Replenished
         {
@@ -97,7 +97,7 @@ namespace Reni.Basics
                 if(result.HasCode)
                 {
                     result |= Size;
-                    result |= Exts;
+                    result |= Closures;
                 }
 
                 if(result.HasSize)
@@ -113,8 +113,8 @@ namespace Reni.Basics
                 var result = None;
                 if(HasCode)
                     result |= Type | Code;
-                if(HasExts)
-                    result |= Exts;
+                if(HasClosures)
+                    result |= Closures;
                 return result;
             }
         }
@@ -123,19 +123,19 @@ namespace Reni.Basics
         {
             get
             {
-                var result = this - Exts - Code;
-                return HasCode ? result.Sized : result;
+                var result = this - Closures - Code;
+                return HasCode ? result.WithSize : result;
             }
         }
 
         [DebuggerHidden]
         internal static Category CreateCategory
-            (bool isHollow = false, bool size = false, bool type = false, bool code = false, bool exts = false)
+            (bool isHollow = false, bool size = false, bool type = false, bool code = false, bool closures = false)
         {
-            var result = Cache[IndexFromBool(isHollow, size, type, code, exts)];
+            var result = Cache[IndexFromBool(isHollow, size, type, code, closures)];
             if(result != null)
                 return result;
-            return Cache[IndexFromBool(isHollow, size, type, code, exts)] = new Category(isHollow, size, type, code, exts);
+            return Cache[IndexFromBool(isHollow, size, type, code, closures)] = new Category(isHollow, size, type, code, closures);
         }
 
         static int IndexFromBool(params bool[] data)
@@ -148,7 +148,7 @@ namespace Reni.Basics
             x.HasSize || y.HasSize,
             x.HasType || y.HasType,
             x.HasCode || y.HasCode,
-            x.HasExts || y.HasExts);
+            x.HasClosures || y.HasClosures);
 
         [DebuggerHidden]
         public static Category operator &(Category x, Category y) => CreateCategory
@@ -157,7 +157,7 @@ namespace Reni.Basics
             x.HasSize && y.HasSize,
             x.HasType && y.HasType,
             x.HasCode && y.HasCode,
-            x.HasExts && y.HasExts);
+            x.HasClosures && y.HasClosures);
 
         public override int GetHashCode()
         {
@@ -165,7 +165,7 @@ namespace Reni.Basics
             {
                 var result = HasCode.GetHashCode();
                 result = (result * 397) ^ HasType.GetHashCode();
-                result = (result * 397) ^ HasExts.GetHashCode();
+                result = (result * 397) ^ HasClosures.GetHashCode();
                 result = (result * 397) ^ HasSize.GetHashCode();
                 result = (result * 397) ^ HasIsHollow.GetHashCode();
                 return result;
@@ -174,14 +174,14 @@ namespace Reni.Basics
 
         public bool IsEqual(Category x) =>
             HasCode == x.HasCode &&
-            HasExts == x.HasExts &&
+            HasClosures == x.HasClosures &&
             HasSize == x.HasSize &&
             HasType == x.HasType &&
             HasIsHollow == x.HasIsHollow;
 
         bool IsLessThan(Category x) =>
             !HasCode && x.HasCode ||
-            !HasExts && x.HasExts ||
+            !HasClosures && x.HasClosures ||
             !HasSize && x.HasSize ||
             !HasType && x.HasType ||
             !HasIsHollow && x.HasIsHollow;
@@ -190,7 +190,7 @@ namespace Reni.Basics
         {
             if(HasCode && !x.HasCode)
                 return false;
-            if(HasExts && !x.HasExts)
+            if(HasClosures && !x.HasClosures)
                 return false;
             if(HasSize && !x.HasSize)
                 return false;
@@ -208,7 +208,7 @@ namespace Reni.Basics
             x.HasSize && !y.HasSize,
             x.HasType && !y.HasType,
             x.HasCode && !y.HasCode,
-            x.HasExts && !y.HasExts);
+            x.HasClosures && !y.HasClosures);
 
         protected override string Dump(bool isRecursion) => NodeDump;
 
@@ -221,8 +221,8 @@ namespace Reni.Basics
                 result += ".Size.";
             if(HasType)
                 result += ".Type.";
-            if(HasExts)
-                result += ".Exts.";
+            if(HasClosures)
+                result += ".Closures.";
             if(HasCode)
                 result += ".Code.";
             result = result.Replace("..", ",").Replace(".", "");

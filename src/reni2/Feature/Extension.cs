@@ -123,7 +123,7 @@ namespace Reni.Feature
 
             var valueCategory = category;
             if(right != null)
-                valueCategory = category.Typed;
+                valueCategory = category.WithType;
 
             var valueResult = feature.ValueResult(context, right, valueCategory);
 

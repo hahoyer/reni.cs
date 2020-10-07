@@ -10,9 +10,9 @@ namespace Reni.TokenClasses
         public override string Id => TokenId;
 
         protected override Result Result(ContextBase context, Category category, ValueSyntax left)
-            => context.Result(category.Typed, left)
+            => context.Result(category.WithType, left)
                 .Type
                 .FunctionInstance
-                .Result(category, context.Result(category.Typed, left));
+                .Result(category, context.Result(category.WithType, left));
     }
 }

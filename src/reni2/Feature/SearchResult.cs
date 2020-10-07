@@ -63,7 +63,7 @@ namespace Reni.Feature
                     return metaFeature.Result(category, left, context, right);
 
                 BreakExecution();
-                var result = Feature.Result(category.Typed, currentTarget, context, right);
+                var result = Feature.Result(category.WithType, currentTarget, context, right);
                 Dump(nameof(result), result);
                 Dump("ConverterPath.Destination.CheckedReference", ConverterPath.Destination.CheckedReference);
                 Dump("ConverterPath.Execute", ConverterPath.Execute(Category.Code));

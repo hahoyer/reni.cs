@@ -41,7 +41,7 @@ namespace Reni.Type
         internal Result Result(Category category, Result leftResult, TypeBase right)
         {
             var rightResult = right
-                .Conversion(category.Typed, IndexType)
+                .Conversion(category.WithType, IndexType)
                 .AutomaticDereferencedAlignedResult();
 
             return Result(category, leftResult + rightResult);
