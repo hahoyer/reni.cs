@@ -27,16 +27,18 @@ namespace Reni.TokenClasses
         }
 
         internal static readonly Result<DeclarerSyntax> Empty
-            = new Result<DeclarerSyntax>(new DeclarerSyntax(new TagSyntax[0], null));
+            = new Result<DeclarerSyntax>(new DeclarerSyntax(new TagSyntax[0], null, null, null));
 
         internal readonly NameSyntax Name;
         internal readonly TagSyntax[] Tags;
+        internal readonly IDefaultScopeProvider Container;
 
-        DeclarerSyntax(TagSyntax[] tags, BinaryTree target, NameSyntax name = null)
+        DeclarerSyntax(TagSyntax[] tags, BinaryTree target, NameSyntax name, IDefaultScopeProvider container)
             : base(target)
         {
             Tags = tags;
             Name = name;
+            Container = container;
         }
 
         protected override IEnumerable<Syntax> GetChildren()
@@ -46,19 +48,34 @@ namespace Reni.TokenClasses
                 yield return tag;
         }
 
-        public static DeclarerSyntax Tag(DeclarationTagToken tag, BinaryTree target)
-            => new DeclarerSyntax(new[] {new TagSyntax(tag, target)}, target);
+        internal static DeclarerSyntax FromTag
+            (DeclarationTagToken tag, BinaryTree target, IDefaultScopeProvider container)
+            => new DeclarerSyntax(new[] {new TagSyntax(tag, target)}, target, null, container);
 
-        public DeclarerSyntax WithName(BinaryTree root, string name)
+        internal static DeclarerSyntax FromName(BinaryTree target, string name, IDefaultScopeProvider container)
+            => new DeclarerSyntax(new TagSyntax[0], target, new NameSyntax(target, name), container);
+
+        internal DeclarerSyntax Combine(DeclarerSyntax other, BinaryTree root)
         {
-            Tracer.Assert(Name == null);
-            return new DeclarerSyntax(Tags, root, new NameSyntax(root, name));
+            if(other == null)
+                return this;
+            Tracer.Assert(Name == null || other.Name == null);
+            Tracer.Assert(Container == other.Container);
+            return new DeclarerSyntax(Tags.Concat(other.Tags).ToArray(), root, Name ?? other.Name, Container);
         }
 
-        public DeclarerSyntax Combine(DeclarerSyntax other, BinaryTree root)
+        public bool IsPublic
         {
-            Tracer.Assert(Name == null || other.Name == null);
-            return new DeclarerSyntax(Tags.Concat(other.Tags).ToArray(), root, Name ?? other.Name);
+            get
+            {
+                if(Tags.Any(item => item.Value is PublicDeclarationToken))
+                    return true;
+
+                if(Tags.Any(item => item.Value is NonPublicDeclarationToken))
+                    return false;
+
+                return Container.MeansPublic;
+            }
         }
     }
 }

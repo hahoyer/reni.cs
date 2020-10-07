@@ -170,27 +170,28 @@ namespace Reni.Parser
             (this Result<TArg1> arg1, Func<TArg1, TResult> creator)
             where TArg1 : class
             where TResult : class
-            => creator(arg1.Target).Issues(arg1.Issues);
+            => creator(arg1?.Target).Issues(arg1?.Issues);
 
         internal static Result<TResult> Apply<TArg1, TArg2,TResult>
             (this (Result<TArg1> arg1, Result<TArg2> arg2) arg, Func<TArg1, TArg2, TResult> creator)
             where TArg1 : class
             where TArg2 : class
             where TResult : class
-            => creator(arg.arg1.Target, arg.arg2.Target).Issues(T(arg.arg1.Issues, arg.arg2.Issues).Concat().ToArray());
+            => creator(arg.arg1?.Target, arg.arg2?.Target)
+                .Issues(T(arg.arg1?.Issues, arg.arg2?.Issues).Concat().ToArray());
 
         internal static Result<TResult> Apply<TArg1,TResult>
             (this Result<TArg1> arg1, Func<TArg1, Result<TResult>> creator)
             where TArg1 : class
             where TResult : class
-            => creator(arg1.Target).With(arg1.Issues);
+            => creator(arg1?.Target).With(arg1?.Issues);
 
         internal static Result<TResult> Apply<TArg1, TArg2,TResult>
             (this (Result<TArg1> arg1, Result<TArg2> arg2) arg, Func<TArg1, TArg2, Result<TResult>> creator)
             where TArg1 : class
             where TArg2 : class
             where TResult : class
-            => creator(arg.arg1.Target, arg.arg2.Target).With(T(arg.arg1.Issues, arg.arg2.Issues).Concat().ToArray());
+            => creator(arg.arg1?.Target, arg.arg2?.Target).With(T(arg.arg1?.Issues, arg.arg2?.Issues).Concat().ToArray());
 
         public static TValue[] T<TValue>(params TValue[] value) => value;
     }

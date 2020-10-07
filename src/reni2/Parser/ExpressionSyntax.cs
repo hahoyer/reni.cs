@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
+using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Struct;
 using Reni.TokenClasses;
 
 namespace Reni.Parser
@@ -35,11 +37,11 @@ namespace Reni.Parser
                    Context.NodeDump;
         }
 
-        internal static Result<ValueSyntax> Create
+        internal static Result<ExpressionSyntax> Create
             (BinaryTree target, ValueSyntax left, Definable definable, ValueSyntax right)
-            => new Result<ValueSyntax>(new ExpressionSyntax(target, left, definable, right));
+            => new ExpressionSyntax(target, left, definable, right);
 
-        internal static Result<ValueSyntax> Create(Definable definable, BinaryTree binaryTree, ISyntaxScope scope)
+        internal static Result<ExpressionSyntax> Create(Definable definable, BinaryTree binaryTree, ISyntaxScope scope)
         {
             var leftValue = binaryTree.Left?.Syntax(scope);
             var rightValue = binaryTree.Right?.Syntax(scope);
@@ -70,6 +72,8 @@ namespace Reni.Parser
         internal ValueSyntax Right {get;}
 
         protected override IEnumerable<Syntax> GetChildren() => T(Left,Right);
+        internal override Result<CompoundSyntax> ToCompoundSyntax(BinaryTree target = null) 
+            => new DeclarationSyntax(null, target, this).ToCompoundSyntax(null);
 
         internal override Result ResultForCache(ContextBase context, Category category)
         {

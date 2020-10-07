@@ -31,8 +31,8 @@ namespace Reni.TokenClasses
                 Tracer.Assert(binaryTree.Right != null);
                 var leftValue = binaryTree.Left.Syntax(scope);
                 var rightValue = binaryTree.Right.Syntax(scope);
-                return ExpressionSyntax.Create(binaryTree, leftValue.Target, null, rightValue.Target)
-                    .With(rightValue.Issues.plus(leftValue.Issues));
+                return Result<ValueSyntax> .From(ExpressionSyntax.Create(binaryTree, leftValue.Target, null, rightValue.Target)
+                    .With(rightValue.Issues.plus(leftValue.Issues)));
             }
         }
 

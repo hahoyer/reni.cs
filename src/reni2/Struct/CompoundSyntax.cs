@@ -23,7 +23,9 @@ namespace Reni.Struct
         static bool IsInsideFileDump;
         static int NextObjectId;
 
+        [EnableDump]
         readonly ValueSyntax CleanupSection;
+        [EnableDump]
         readonly DeclarationSyntax[] Statements;
 
         CompoundSyntax(DeclarationSyntax[] statements, ValueSyntax cleanupSection, BinaryTree target)
@@ -85,8 +87,8 @@ namespace Reni.Struct
                 .SelectMany((s, i) => s.IsConverterSyntax? new[] {i} : new int[0])
                 .ToArray();
 
-        internal static Result<ValueSyntax> Create(DeclarationSyntax statement, BinaryTree root)
-            => new CompoundSyntax(T(statement), null, root);
+        internal static Result<CompoundSyntax> Create(DeclarationSyntax[] statements, BinaryTree root)
+            => new CompoundSyntax(statements, null, root);
 
         internal static Result<ValueSyntax> Create(Result<Statement> statement, BinaryTree binaryTree)
             => new Result<ValueSyntax>(new CompoundSyntax(new[] {statement.Target}, null, binaryTree)
@@ -196,6 +198,24 @@ namespace Reni.Struct
             var result = base.DumpData();
             IsInContainerDump = isInDump;
             return result;
+        }
+
+        public static CompoundSyntax Combine(CompoundSyntax left, CompoundSyntax right, BinaryTree target)
+        {
+            if(left == null)
+                return right;
+            if(right == null)
+                return left;
+
+            Tracer.Assert(left.Target == null);
+            Tracer.Assert(right.Target == null);
+
+            var statements = left.Statements.Concat(right.Statements).ToArray();
+
+            Tracer.Assert(left.CleanupSection == null || right.CleanupSection == null);
+            var cleanupSection = left.CleanupSection ?? right.CleanupSection;
+            
+            return new CompoundSyntax(statements, cleanupSection, target);
         }
     }
 }

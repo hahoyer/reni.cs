@@ -6,7 +6,8 @@ using Reni.Parser;
 
 namespace Reni.TokenClasses
 {
-    abstract class Definable : TokenClass, IDeclarerTokenClass, IValueProvider, SyntaxFactory.IDeclarerToken, SyntaxFactory.IValueToken
+    abstract class Definable
+        : TokenClass, IDeclarerTokenClass, IValueProvider, SyntaxFactory.IDeclarerToken, SyntaxFactory.IValueToken
     {
         [DisableDump]
         protected string DataFunctionName => Id.Symbolize();
@@ -15,9 +16,7 @@ namespace Reni.TokenClasses
         internal virtual IEnumerable<IDeclarationProvider> MakeGeneric
             => this.GenericListFromDefinable();
 
-        internal Result<Parser.ValueSyntax> CreateForVisit
-            (BinaryTree parent, Parser.ValueSyntax left, Parser.ValueSyntax right)
-            => ExpressionSyntax.Create(parent, left, this, right);
+        SyntaxFactory.IDeclarerProvider SyntaxFactory.IDeclarerToken.Provider => SyntaxFactory.DefinableAsDeclarer;
 
         Result<Declarer> IDeclarerTokenClass.Get(BinaryTree binaryTree)
         {
@@ -33,11 +32,13 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        Result<Parser.ValueSyntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
-            => ExpressionSyntax.Create(this, binaryTree, scope);
+        Result<ValueSyntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
+            => Result<ValueSyntax> .From(ExpressionSyntax.Create(this, binaryTree, scope));
 
         SyntaxFactory.IValueProvider SyntaxFactory.IValueToken.Provider => SyntaxFactory.Definable;
-        SyntaxFactory.IDeclarerProvider SyntaxFactory.IDeclarerToken.Provider => SyntaxFactory.DefinableAsDeclarer;
+
+        internal Result<ValueSyntax> CreateForVisit(BinaryTree parent, ValueSyntax left, ValueSyntax right)
+            => Result<ValueSyntax> .From(ExpressionSyntax.Create(parent, left, this, right));
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
@@ -47,7 +48,7 @@ namespace Reni.TokenClasses
     {
         public const string TokenId = "<<";
         public const string MutableId = "<<:=";
-        internal bool IsMutable {get;}
+        internal bool IsMutable { get; }
 
         public ConcatArrays(bool isMutable) => IsMutable = isMutable;
 
@@ -55,7 +56,7 @@ namespace Reni.TokenClasses
         internal override IEnumerable<IDeclarationProvider> MakeGeneric
             => this.GenericListFromDefinable(base.MakeGeneric);
 
-        public override string Id => IsMutable ? MutableId : TokenId;
+        public override string Id => IsMutable? MutableId : TokenId;
     }
 
     [BelongsTo(typeof(MainTokenFactory))]

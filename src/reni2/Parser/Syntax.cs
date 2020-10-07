@@ -3,6 +3,7 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using Reni.Helper;
+using Reni.Struct;
 using Reni.TokenClasses;
 
 namespace Reni.Parser
@@ -38,7 +39,16 @@ namespace Reni.Parser
         int ITree<Syntax>.ChildrenCount => Children.Length;
         protected abstract IEnumerable<Syntax> GetChildren();
 
-        internal virtual Result<ValueSyntax> ToValueSyntax(BinaryTree target)
+        internal virtual Result<ValueSyntax> ToValueSyntax(BinaryTree target= null)
+        {
+            if(GetType().Is<ValueSyntax>())
+                return (ValueSyntax)this;
+
+            NotImplementedMethod(target);
+            return default;
+        }
+
+        internal virtual Result<CompoundSyntax> ToCompoundSyntax(BinaryTree target= null)
         {
             NotImplementedMethod(target);
             return default;
