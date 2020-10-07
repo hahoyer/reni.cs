@@ -11,7 +11,7 @@ namespace Reni.TokenClasses
     sealed class RightDeclarationParenthesis
         : RightParenthesisBase
             , IDeclarerTagProvider
-            , IBracketMatch<BinaryTree>,IDeclarerSyntaxFactoryToken
+            , IBracketMatch<BinaryTree>,SyntaxFactory.IDeclarerToken
 
     {
         sealed class Matched
@@ -75,6 +75,6 @@ namespace Reni.TokenClasses
             return new Result<IDeclarationTag>(null, IssueId.InvalidDeclarationTag.Issue(item.SourcePart));
         }
 
-        IDeclarerSyntaxFactory IDeclarerSyntaxFactoryToken.Provider => SyntaxFactory.ComplexDeclarer;
+        SyntaxFactory.IDeclarerProvider SyntaxFactory.IDeclarerToken.Provider => SyntaxFactory.ComplexDeclarer;
     }
 }

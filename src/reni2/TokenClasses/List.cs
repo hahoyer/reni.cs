@@ -9,7 +9,7 @@ namespace Reni.TokenClasses
     [Variant(0)]
     [Variant(1)]
     [Variant(2)]
-    sealed class List : TokenClass, IBelongingsMatcher, IStatementsProvider, ISyntaxFactoryToken
+    sealed class List : TokenClass, IBelongingsMatcher, IStatementsProvider, SyntaxFactory.IToken
     {
         [DisableDump]
         internal readonly int Level;
@@ -34,7 +34,7 @@ namespace Reni.TokenClasses
             return new Result<Statement[]>(target, issues);
         }
 
-        ISyntaxFactory ISyntaxFactoryToken.Provider => SyntaxFactory.List;
+        SyntaxFactory.IProvider SyntaxFactory.IToken.Provider => SyntaxFactory.List;
         public static string TokenId(int level) => ",;.".Substring(level, 1);
 
         [Obsolete("", true)]

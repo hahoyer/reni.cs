@@ -12,7 +12,7 @@ namespace Reni.TokenClasses
             , IStatementsProvider
             , ISyntaxScope
             , IBelongingsMatcher
-            , IValueSyntaxFactoryToken
+            , SyntaxFactory.IValueToken
     {
         sealed class Matched : DumpableObject, IParserTokenType<BinaryTree>
         {
@@ -60,7 +60,7 @@ namespace Reni.TokenClasses
             return result?.GetStatements(this) ?? new Result<Statement[]>(new Statement[0]);
         }
 
-        IValueSyntaxFactory IValueSyntaxFactoryToken.Provider => SyntaxFactory.Bracket;
+        SyntaxFactory.IValueProvider SyntaxFactory.IValueToken.Provider => SyntaxFactory.Bracket;
 
         IDefaultScopeProvider ISyntaxScope.DefaultScopeProvider => this;
 

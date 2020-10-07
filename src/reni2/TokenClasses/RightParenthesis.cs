@@ -13,7 +13,7 @@ namespace Reni.TokenClasses
             , IDefaultScopeProvider
             , IBracketMatch<BinaryTree>
             , ISyntaxScope
-            , IValueSyntaxFactoryToken
+            , SyntaxFactory.IValueToken
     {
         sealed class Matched : DumpableObject, IParserTokenType<BinaryTree>, ITokenClass, IValueProvider
         {
@@ -39,8 +39,6 @@ namespace Reni.TokenClasses
         public RightParenthesis(int level)
             : base(level) { }
 
-        IValueSyntaxFactory IValueSyntaxFactoryToken.Provider => SyntaxFactory.Bracket;
-
         IParserTokenType<BinaryTree> IBracketMatch<BinaryTree>.Value { get; } = new Matched();
 
         bool IDefaultScopeProvider.MeansPublic => Level == 3;
@@ -58,5 +56,7 @@ namespace Reni.TokenClasses
 
             return result.Target == null? new EmptyList(binaryTree) : result.Target.Syntax(this);
         }
+
+        SyntaxFactory.IValueProvider SyntaxFactory.IValueToken.Provider => SyntaxFactory.Bracket;
     }
 }

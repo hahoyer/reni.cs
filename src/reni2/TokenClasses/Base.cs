@@ -15,7 +15,7 @@ namespace Reni.TokenClasses
 
     abstract class InfixToken : TokenClass {}
 
-    abstract class TerminalSyntaxToken : TerminalToken, ITerminal, IValueProvider, IValueSyntaxFactoryToken
+    abstract class TerminalSyntaxToken : TerminalToken, ITerminal, IValueProvider, SyntaxFactory.IValueToken
     {
         Result<ValueSyntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
         {
@@ -49,7 +49,7 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        IValueSyntaxFactory IValueSyntaxFactoryToken.Provider => SyntaxFactory.Terminal;
+        SyntaxFactory.IValueProvider SyntaxFactory.IValueToken.Provider => SyntaxFactory.Terminal;
 
     }
 
