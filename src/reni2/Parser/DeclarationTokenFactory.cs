@@ -15,7 +15,7 @@ namespace Reni.Parser
             => new InvalidDeclarationError(name);
     }
 
-    sealed class InvalidDeclarationError : DumpableObject, IParserTokenType<BinaryTree>, ITokenClass
+    sealed class InvalidDeclarationError : DumpableObject, IParserTokenType<BinaryTree>, ITokenClass, SyntaxFactory.IDeclarerToken
     {
         readonly string Name;
         public InvalidDeclarationError(string name) => Name = name;
@@ -25,5 +25,7 @@ namespace Reni.Parser
 
         string IParserTokenType<BinaryTree>.PrioTableId => Name;
         string ITokenClass.Id => Name;
+
+        SyntaxFactory.IDeclarerProvider SyntaxFactory.IDeclarerToken.Provider => SyntaxFactory.Declarer;
     }
 }

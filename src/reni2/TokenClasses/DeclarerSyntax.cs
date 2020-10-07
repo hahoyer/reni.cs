@@ -29,9 +29,10 @@ namespace Reni.TokenClasses
         internal static readonly Result<DeclarerSyntax> Empty
             = new Result<DeclarerSyntax>(new DeclarerSyntax(new TagSyntax[0], null, null, null));
 
+        internal readonly IDefaultScopeProvider Container;
+
         internal readonly NameSyntax Name;
         internal readonly TagSyntax[] Tags;
-        internal readonly IDefaultScopeProvider Container;
 
         DeclarerSyntax(TagSyntax[] tags, BinaryTree target, NameSyntax name, IDefaultScopeProvider container)
             : base(target)
@@ -39,6 +40,20 @@ namespace Reni.TokenClasses
             Tags = tags;
             Name = name;
             Container = container;
+        }
+
+        public bool IsPublic
+        {
+            get
+            {
+                if(Tags.Any(item => item.Value is PublicDeclarationToken))
+                    return true;
+
+                if(Tags.Any(item => item.Value is NonPublicDeclarationToken))
+                    return false;
+
+                return Container.MeansPublic;
+            }
         }
 
         protected override IEnumerable<Syntax> GetChildren()
@@ -60,22 +75,9 @@ namespace Reni.TokenClasses
             if(other == null)
                 return this;
             Tracer.Assert(Name == null || other.Name == null);
-            Tracer.Assert(Container == other.Container);
-            return new DeclarerSyntax(Tags.Concat(other.Tags).ToArray(), root, Name ?? other.Name, Container);
-        }
-
-        public bool IsPublic
-        {
-            get
-            {
-                if(Tags.Any(item => item.Value is PublicDeclarationToken))
-                    return true;
-
-                if(Tags.Any(item => item.Value is NonPublicDeclarationToken))
-                    return false;
-
-                return Container.MeansPublic;
-            }
+            Tracer.Assert(Container == null || other.Container == null || Container == other.Container);
+            return new DeclarerSyntax(Tags.Concat(other.Tags).ToArray(), root, Name ?? other.Name
+                , Container ?? other.Container);
         }
     }
 }

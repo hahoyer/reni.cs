@@ -240,17 +240,14 @@ namespace Reni.TokenClasses
 
         Result<ExpressionSyntax> GetExpressionSyntax(BinaryTree target)
         {
-            Tracer.Assert(target.Right == null);
-
             var definable = target.TokenClass as Definable;
             Tracer.Assert(definable != null);
-
-            if(target.Left == null)
-                return ExpressionSyntax.Create(target, null, definable, null);
-
             return
-                GetValueSyntax(target.Left)
-                    .Apply(left => ExpressionSyntax.Create(target, left, definable, null));
+                (
+                    target.Left == null ? null:GetValueSyntax(target.Left), 
+                    target.Right == null ? null:GetValueSyntax(target.Right)
+                    )
+                .Apply((left, right) => ExpressionSyntax.Create(target, left, definable, right));
         }
 
         Result<DeclarerSyntax> GetDeclarationTags(BinaryTree target)

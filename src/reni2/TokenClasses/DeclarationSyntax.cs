@@ -32,7 +32,7 @@ namespace Reni.TokenClasses
         internal bool IsPublic => Declarer.IsPublic;
 
         [DisableDump]
-        internal string NameOrNull => Declarer.Name.Value;
+        internal string NameOrNull => Declarer?.Name.Value;
 
         protected override IEnumerable<Syntax> GetChildren() => T((Syntax)Declarer, (Syntax)Value);
 

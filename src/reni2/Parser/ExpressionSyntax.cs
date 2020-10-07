@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
@@ -15,9 +14,9 @@ namespace Reni.Parser
     {
         internal sealed class EvaluationDepthExhaustedException : Exception
         {
+            readonly BinaryTree BinaryTree;
             readonly ContextBase Context;
             readonly int Depth;
-            readonly BinaryTree BinaryTree;
 
             public EvaluationDepthExhaustedException(BinaryTree binaryTree, ContextBase context, int depth)
             {
@@ -37,6 +36,26 @@ namespace Reni.Parser
                    Context.NodeDump;
         }
 
+        [Node]
+        public Definable Definable { get; }
+
+        [Node]
+        internal ValueSyntax Left { get; }
+
+        [Node]
+        internal ValueSyntax Right { get; }
+
+        int CurrentResultDepth;
+
+        ExpressionSyntax(BinaryTree target, ValueSyntax left, Definable definable, ValueSyntax right)
+            : base(target)
+        {
+            Left = left;
+            Definable = definable;
+            Right = right;
+            StopByObjectIds();
+        }
+
         internal static Result<ExpressionSyntax> Create
             (BinaryTree target, ValueSyntax left, Definable definable, ValueSyntax right)
             => new ExpressionSyntax(target, left, definable, right);
@@ -51,29 +70,7 @@ namespace Reni.Parser
                 .With(leftValue?.Issues.plus(rightValue?.Issues));
         }
 
-        int CurrentResultDepth;
-
-        ExpressionSyntax(BinaryTree target, ValueSyntax left, Definable definable, ValueSyntax right)
-            : base(target)
-        {
-            Left = left;
-            Definable = definable;
-            Right = right;
-            StopByObjectIds();
-        }
-
-        [Node]
-        internal ValueSyntax Left {get;}
-
-        [Node]
-        public Definable Definable {get;}
-
-        [Node]
-        internal ValueSyntax Right {get;}
-
-        protected override IEnumerable<Syntax> GetChildren() => T(Left,Right);
-        internal override Result<CompoundSyntax> ToCompoundSyntax(BinaryTree target = null) 
-            => new DeclarationSyntax(null, target, this).ToCompoundSyntax(null);
+        protected override IEnumerable<Syntax> GetChildren() => T(Left, Right);
 
         internal override Result ResultForCache(ContextBase context, Category category)
         {
