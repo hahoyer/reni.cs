@@ -38,7 +38,7 @@ namespace Reni.Parser
                 .Select(b => b.SourcePart)
                 .Aggregate();
 
-            return result.Issues(IssueId.InvalidDeclarationTag.Issue(combinedSourcePart));
+            return result.AddIssues(IssueId.InvalidDeclarationTag.Issue(combinedSourcePart));
         }
 
         public Declarer Combine(Declarer other)

@@ -25,7 +25,7 @@ namespace Reni.TokenClasses
             if(binaryTree.Left != null && binaryTree.Right == null)
             {
                 return new TerminalSyntax(this, binaryTree)
-                    .Issues<ValueSyntax>
+                    .AddIssues<ValueSyntax>
                     (
                     IssueId.TerminalUsedAsSuffix
                     .Issue(binaryTree.Left.SourcePart));

@@ -3,6 +3,7 @@ using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Struct;
 using Reni.TokenClasses;
 
 namespace Reni.Parser
@@ -41,7 +42,7 @@ namespace Reni.Parser
     sealed class PrefixSyntax : ValueSyntax
     {
         public static Result<ValueSyntax> Create(IPrefix prefix, Result<ValueSyntax> right, BinaryTree binaryTree)
-            => new PrefixSyntax(prefix, right.Target,binaryTree).Issues<ValueSyntax>(right.Issues);
+            => new PrefixSyntax(prefix, right.Target,binaryTree).AddIssues<ValueSyntax>(right.Issues);
 
         [Node]
         [EnableDump]
@@ -72,7 +73,7 @@ namespace Reni.Parser
             (Result<ValueSyntax> left, IInfix infix, Result<ValueSyntax> right, BinaryTree binaryTree)
         {
             ValueSyntax syntax = new InfixSyntax(left.Target, infix, right.Target, binaryTree);
-            return syntax.Issues(left.Issues.plus(right.Issues));
+            return syntax.AddIssues(left.Issues.plus(right.Issues));
         }
 
         [Node]
@@ -127,7 +128,7 @@ namespace Reni.Parser
             (Result<ValueSyntax> left, ISuffix suffix, BinaryTree binaryTree)
         {
             ValueSyntax syntax = new SuffixSyntax(left.Target, suffix, binaryTree);
-            return syntax.Issues(left.Issues);
+            return syntax.AddIssues(left.Issues);
         }
 
         [Node]

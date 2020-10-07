@@ -234,7 +234,7 @@ namespace Reni
 
         [DisableDump]
         internal IEnumerable<Issue> Issues 
-            => T(ValueSyntaxCache.Value?.Issues, CodeContainer?.Issues).Concat();
+            => T(BinaryTree.AddIssues(),ValueSyntaxCache.Value?.Issues, CodeContainer?.Issues).Concat();
 
         BinaryTree Parse(SourcePosition source) => this["Main"].Parser.Execute(source);
 

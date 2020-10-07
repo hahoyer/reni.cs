@@ -17,7 +17,7 @@ namespace Reni.Parser
         {
             if(!(binaryTree.Right.TokenClass is IDeclarerTagProvider provider))
                 return new Declarer(null, null, T(binaryTree))
-                    .Issues(IssueId.UnknownDeclarationTag.Issue(binaryTree.SourcePart));
+                    .AddIssues(IssueId.UnknownDeclarationTag.Issue(binaryTree.SourcePart));
 
             var result = provider.Get(binaryTree.Right);
 
@@ -25,7 +25,7 @@ namespace Reni.Parser
             if(other == null)
                 return result;
 
-            return result.Target.Combine(other.Target).Issues(result.Issues.plus(other.Issues));
+            return result.Target.Combine(other.Target).AddIssues(result.Issues.plus(other.Issues));
         }
 
         BinaryTree IParserTokenType<BinaryTree>.Create(BinaryTree left, IToken token, BinaryTree right)

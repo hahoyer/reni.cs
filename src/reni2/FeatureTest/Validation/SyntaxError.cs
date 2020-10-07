@@ -4,6 +4,7 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 using hw.UnitTest;
+using NUnit.Framework;
 using Reni.FeatureTest.Helper;
 using Reni.Parser;
 using Reni.Validation;
@@ -11,17 +12,23 @@ using Reni.Validation;
 namespace Reni.FeatureTest.Validation
 {
     [UnitTest]
+    [TestFixture]
     [Target(value: @"1 #(x asdf y)# dump_print")]
     [Output(value: "")]
     [UseOfUndefinedContextSymbol]
     public sealed class SyntaxErrorComment : CompilerTest
     {
+        public SyntaxErrorComment() => Parameters.ParseOnly = true;
+
+        [Test]
+        public new void Run() => base.Run();
+
         protected override void Verify(IEnumerable<Issue> issues)
         {
             var a = issues.ToArray();
             var i = 0;
             Tracer.Assert
-                (a[i++].IsLogdumpLike(1, 3, 1, 26, IssueId.EOFInComment, "\"#(x asdf y)# dump_print\""));
+                (a[i++].IsLogDumpLike(1, 3, 1, 26, IssueId.EOFInComment, "\"#(x asdf y)# dump_print\""));
             Tracer.Assert(a.Length == i);
         }
     }
@@ -36,13 +43,15 @@ world'
     [Output(value: "")]
     public sealed class SyntaxErrorString : CompilerTest
     {
+        public SyntaxErrorString() => Parameters.ParseOnly = true;
+
         protected override void Verify(IEnumerable<Issue> issues)
         {
             var a = issues.ToArray();
             var i = 0;
-            Tracer.Assert(a[i++].IsLogdumpLike(2, 1, 3, 1, IssueId.EOLInString, "\"' hallo\n\""));
-            Tracer.Assert(a[i++].IsLogdumpLike(3, 6, 4, 1, IssueId.EOLInString, "\"'\n\""));
-            Tracer.Assert(a[i++].IsLogdumpLike(3, 1, 3, 6, IssueId.MissingDeclarationForType, "\"world\" Type: ()"));
+            Tracer.Assert(a[i++].IsLogDumpLike(2, 1, 3, 1, IssueId.EOLInString, "\"' hallo\n\""));
+            Tracer.Assert(a[i++].IsLogDumpLike(3, 6, 4, 1, IssueId.EOLInString, "\"'\n\""));
+            Tracer.Assert(a[i++].IsLogDumpLike(3, 1, 3, 6, IssueId.MissingDeclarationForType, "\"world\" Type: ()"));
             Tracer.Assert(a.Length == i);
         }
     }
@@ -53,7 +62,7 @@ world'
 
         const string RegExPattern = ".*\\.reni\\({0},{1}\\): error {2}: (.*)";
 
-        internal static bool IsLogdumpLike
+        internal static bool IsLogDumpLike
         (
             this Issue target,
             int line,
