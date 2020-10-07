@@ -1,8 +1,7 @@
 using System.Collections.Generic;
-
-using hw.Helper;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -11,26 +10,37 @@ using Reni.Type;
 namespace Reni
 {
     /// <summary>
-    ///     Contains list of references to compiler environemnts.
+    ///     Contains list of references to compiler environments.
     /// </summary>
     sealed class Closures : DumpableObject
     {
-        static int _nextId;
-        readonly List<IContextReference> _data;
-        SizeArray _sizesCache;
-        readonly ValueCache<IContextReference[]> _sortedDataCache;
+        sealed class CodeArg : Singleton<CodeArg, DumpableObject>, IContextReference
+        {
+            int IContextReference.Order => -1;
+            protected override string GetNodeDump() => "CodeArg";
+        }
+
         public static int NextOrder;
+        static int NextId;
+
+        [SmartNode]
+        [DisableDump]
+        public List<IContextReference> Data { get; }
+
+        SizeArray SizesCache;
+        readonly ValueCache<IContextReference[]> SortedDataCache;
 
         Closures()
-            : base(_nextId++)
+            : base(NextId++)
         {
-            _data = new List<IContextReference>();
-            _sortedDataCache = new ValueCache<IContextReference[]>(ObtainSortedData);
+            Data = new List<IContextReference>();
+            SortedDataCache = new ValueCache<IContextReference[]>(ObtainSortedData);
             StopByObjectIds(-10);
         }
 
         Closures(IContextReference context)
-            : this() { Add(context); }
+            : this()
+            => Add(context);
 
         Closures(IEnumerable<IContextReference> a, IEnumerable<IContextReference> b)
             : this()
@@ -40,7 +50,19 @@ namespace Reni
         }
 
         Closures(IEnumerable<IContextReference> a)
-            : this() { AddRange(a); }
+            : this()
+            => AddRange(a);
+
+        [DisableDump]
+        SizeArray Sizes => SizesCache ??= CalculateSizes();
+
+        internal bool HasArg => Contains(CodeArg.Instance);
+        public int Count => Data.Count;
+
+        IContextReference this[int i] => Data[i];
+        public Size Size => Sizes.Size;
+        public bool IsNone => Count == 0;
+        IContextReference[] SortedData => SortedDataCache.Value;
 
 
         void AddRange(IEnumerable<IContextReference> a)
@@ -51,36 +73,17 @@ namespace Reni
 
         void Add(IContextReference e)
         {
-            if(!_data.Contains(e))
-                _data.Add(e);
+            if(!Data.Contains(e))
+                Data.Add(e);
         }
-
-        [SmartNode]
-        [DisableDump]
-        public List<IContextReference> Data => _data;
-
-        [DisableDump]
-        SizeArray Sizes => _sizesCache ?? (_sizesCache = CalculateSizes());
-
-        internal bool HasArg => Contains(CodeArg.Instance);
-        public int Count => _data.Count;
-
-        IContextReference this[int i] => _data[i];
-        public Size Size => Sizes.Size;
-        public bool IsNone => Count == 0;
-        IContextReference[] SortedData => _sortedDataCache.Value;
 
         internal static Closures Void() => new Closures();
         internal static Closures Arg() => new Closures(CodeArg.Instance);
 
         public Closures Sequence(Closures closures)
-        {
-            if(closures.Count == 0)
-                return this;
-            if(Count == 0)
-                return closures;
-            return new Closures(_data, closures._data);
-        }
+            => closures.Count == 0? this :
+                Count == 0? closures :
+                new Closures(Data, closures.Data);
 
         internal static Closures Create(IContextReference contextReference)
             => new Closures(contextReference);
@@ -94,8 +97,9 @@ namespace Reni
             {
                 if(i > 0)
                     result += "\n";
-                result += Tracer.Dump(_data[i]);
+                result += Tracer.Dump(Data[i]);
             }
+
             return result;
         }
 
@@ -103,21 +107,21 @@ namespace Reni
         {
             var result = new SizeArray();
             for(var i = 0; i < Count; i++)
-                result.Add(_data[i].Size());
+                result.Add(Data[i].Size());
             return result;
         }
 
         public Closures Without(IContextReference e)
         {
-            if(!_data.Contains(e))
+            if(!Data.Contains(e))
                 return this;
-            var r = new List<IContextReference>(_data);
+            var r = new List<IContextReference>(Data);
             r.Remove(e);
             return new Closures(r);
         }
 
         IContextReference[] ObtainSortedData()
-            => _data
+            => Data
                 .OrderBy(codeArg => codeArg.Order)
                 .ToArray();
 
@@ -125,10 +129,11 @@ namespace Reni
 
         Closures Without(Closures other)
             => other
-                ._data
+                .Data
                 .Aggregate(this, (current, refInCode) => current.Without(refInCode));
 
-        public bool Contains(IContextReference context) => _data.Contains(context);
+        public bool Contains(IContextReference context) => Data.Contains(context);
+
         public bool Contains(Closures other)
         {
             if(Count < other.Count)
@@ -148,8 +153,10 @@ namespace Reni
                         return true;
                 }
             }
+
             return false;
         }
+
         public bool IsEqual(Closures other)
         {
             if(Count != other.Count)
@@ -163,7 +170,7 @@ namespace Reni
         }
 
         internal CodeBase ToCode()
-            => _data
+            => Data
                 .Aggregate(CodeBase.Void, (current, t) => current + CodeBase.ReferenceCode(t));
 
         internal CodeBase ReplaceRefsForFunctionBody(CodeBase code, CodeBase codeArgsReference)
@@ -173,9 +180,9 @@ namespace Reni
             try
             {
                 var refSize = Root.DefaultRefAlignParam.RefSize;
-                var reference = codeArgsReference.ReferencePlus(refSize * _data.Count);
+                var reference = codeArgsReference.ReferencePlus(refSize * Data.Count);
                 var result = code;
-                foreach(var referenceInCode in _data)
+                foreach(var referenceInCode in Data)
                 {
                     Dump("reference", reference);
                     BreakExecution();
@@ -184,6 +191,7 @@ namespace Reni
                         (referenceInCode, () => reference.DePointer(refSize));
                     Dump("result", result);
                 }
+
                 return ReturnMethodDump(result);
             }
             finally
@@ -195,11 +203,5 @@ namespace Reni
         public static Closures operator +(Closures x, Closures y) => x.Sequence(y);
         public static Closures operator -(Closures x, Closures y) => x.Without(y);
         public static Closures operator -(Closures x, IContextReference y) => x.Without(y);
-
-        sealed class CodeArg : Singleton<CodeArg, DumpableObject>, IContextReference
-        {
-            int IContextReference.Order => -1;
-            protected override string GetNodeDump() => "CodeArg";
-        }
     }
 }
