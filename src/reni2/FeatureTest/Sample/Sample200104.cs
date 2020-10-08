@@ -8,13 +8,12 @@ using Reni.Validation;
 namespace Reni.FeatureTest.Sample
 {
     [UnitTest]
-    [Target(value: @"!")]
+    [LowPriority]
+    [Target(@"!")]
     public sealed class Sample200104 : CompilerTest
     {
         public Sample200104()
-        {
-            Parameters.ParseOnly = true;
-        }
+            => Parameters.CompilationLevel = CompilationLevel.Parser;
 
         protected override void Verify(IEnumerable<Issue> issues)
         {

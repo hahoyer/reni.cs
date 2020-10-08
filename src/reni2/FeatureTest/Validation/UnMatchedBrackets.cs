@@ -32,7 +32,8 @@ namespace Reni.FeatureTest.Validation
     [Target(@"x:{ 1 x ) }; 1 dump_print")]
     public sealed class UnMatchedRightParenthesis : CompilerTest
     {
-        public UnMatchedRightParenthesis() { Parameters.ParseOnly = true; }
+        public UnMatchedRightParenthesis() 
+            => Parameters.CompilationLevel = CompilationLevel.Syntax;
 
         protected override void Verify(IEnumerable<Issue> issues)
         {

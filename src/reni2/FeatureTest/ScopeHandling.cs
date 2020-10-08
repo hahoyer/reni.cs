@@ -4,6 +4,7 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.UnitTest;
 using Reni.FeatureTest.Helper;
+using Reni.FeatureTest.Structure;
 using Reni.Validation;
 
 namespace Reni.FeatureTest
@@ -47,6 +48,7 @@ namespace Reni.FeatureTest
     [UnitTest]
     [Target(@"a:(!non_public x: 1; !public y: 2); a x dump_print")]
     [ScopeHandlingPublic]
+    [DumpPrint]
     [ScopeHandlingNonPublic]
     public sealed class PublicNonPublic1 : CompilerTest
     {
@@ -67,6 +69,7 @@ namespace Reni.FeatureTest
 
     [UnitTest]
     [Target(@"a: (!non_public x: 1; !public y: 2); a y dump_print")]
+    [DumpPrint]
     [ScopeHandlingPublic]
     [ScopeHandlingNonPublic]
     [Output("2")]

@@ -1,5 +1,6 @@
 using hw.UnitTest;
 using Reni.FeatureTest.Helper;
+using Reni.FeatureTest.Structure;
 
 namespace Reni.FeatureTest.BitArrayOp
 {
@@ -71,6 +72,7 @@ namespace Reni.FeatureTest.BitArrayOp
     [UnitTest]
     [Target(@"3 dump_print")]
     [Output("3")]
+    [DumpPrint]
     public sealed class Number : CompilerTest
     {}
 
