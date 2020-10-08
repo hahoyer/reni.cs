@@ -105,7 +105,7 @@ namespace Reni
                 try
                 {
                     var includeDebugInformation = Parameters.DebuggableGeneratedCode ?? Debugger.IsAttached;
-                    return CSharpString
+                    return CSharpString?
                         .CodeToAssembly
                             (Parameters.TraceOptions.GeneratorFilePosition, includeDebugInformation)
                         .GetExportedTypes()[0]
