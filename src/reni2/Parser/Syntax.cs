@@ -48,9 +48,20 @@ namespace Reni.Parser
             return default;
         }
 
-        internal virtual Result<CompoundSyntax> ToCompoundSyntax(BinaryTree target= null)
+        internal Result<CompoundSyntax> ToCompoundSyntax(BinaryTree target = null)
+            => this is CompoundSyntax compoundSyntax
+                ? compoundSyntax
+                : ToCompoundSyntaxHandler(target);
+
+        protected virtual Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree target= null)
         {
             NotImplementedMethod(target);
+            return default;
+        }
+
+        public Result<DeclarationSyntax[]> ToDeclarationsSyntax()
+        {
+            NotImplementedMethod();
             return default;
         }
     }

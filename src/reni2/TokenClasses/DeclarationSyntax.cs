@@ -12,8 +12,8 @@ namespace Reni.TokenClasses
         internal readonly ValueSyntax Value;
 
         public DeclarationSyntax
-            (DeclarerSyntax declarer, BinaryTree root, ValueSyntax value)
-            : base(root)
+            (DeclarerSyntax declarer, BinaryTree target, ValueSyntax value)
+            : base(target)
         {
             Declarer = declarer;
             Value = value;
@@ -39,7 +39,7 @@ namespace Reni.TokenClasses
         internal override Result<ValueSyntax> ToValueSyntax(BinaryTree target)
             => ToCompoundSyntax(target).Apply(syntax => syntax.ToValueSyntax());
 
-        internal override Result<CompoundSyntax> ToCompoundSyntax(BinaryTree target)
+        protected override Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree target)
             => CompoundSyntax.Create(T(this), target);
 
         internal bool IsDefining(string name, bool publicOnly)

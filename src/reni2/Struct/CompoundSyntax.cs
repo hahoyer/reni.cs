@@ -207,9 +207,6 @@ namespace Reni.Struct
             if(right == null)
                 return left;
 
-            Tracer.Assert(left.Target == null);
-            Tracer.Assert(right.Target == null);
-
             var statements = left.Statements.Concat(right.Statements).ToArray();
 
             Tracer.Assert(left.CleanupSection == null || right.CleanupSection == null);

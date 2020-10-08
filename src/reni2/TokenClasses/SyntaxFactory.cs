@@ -159,7 +159,7 @@ namespace Reni.TokenClasses
             if(target.TokenClass is IValueToken valueToken)
                 return Result<Syntax>.From(valueToken.Provider.Get(target, GetCurrentFactory(target.TokenClass)));
 
-            NotImplementedMethod(target, nameof(target.TokenClass), target.TokenClass);
+            NotImplementedMethod(target, onNull);
             return default;
         }
 
@@ -172,7 +172,7 @@ namespace Reni.TokenClasses
             if(target.TokenClass is IDeclarerToken token)
                 return token.Provider.Get(target, GetCurrentFactory(target.TokenClass));
 
-            NotImplementedMethod(target, nameof(target.TokenClass), target.TokenClass);
+            NotImplementedMethod(target, onNull);
             return default;
         }
 
@@ -185,7 +185,7 @@ namespace Reni.TokenClasses
                 return token.Provider.Get(target, GetCurrentFactory(target.TokenClass));
 
 
-            NotImplementedMethod(target, nameof(target.TokenClass), target.TokenClass);
+            NotImplementedMethod(target, onNull);
             return default;
         }
 
