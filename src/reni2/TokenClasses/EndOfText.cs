@@ -13,6 +13,8 @@ namespace Reni.TokenClasses
             , ISyntaxScope
             , IBelongingsMatcher
             , SyntaxFactory.IValueToken
+            , IRightBracket
+
     {
         sealed class Matched : DumpableObject, IParserTokenType<BinaryTree>
         {
@@ -32,8 +34,7 @@ namespace Reni.TokenClasses
         [DisableDump]
         public override string Id => TokenId;
 
-        [DisableDump]
-        internal override bool IsVisible => false;
+        int IRightBracket.Level => -1;
 
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => otherMatcher is BeginOfText;
@@ -67,14 +68,16 @@ namespace Reni.TokenClasses
         bool ISyntaxScope.IsDeclarationPart => false;
     }
 
-    sealed class BeginOfText : TokenClass, IBelongingsMatcher
+    sealed class BeginOfText : TokenClass, IBelongingsMatcher, ILeftBracket
     {
         const string TokenId = PrioTable.BeginOfText;
 
         [DisableDump]
         public override string Id => TokenId;
 
+        int ILeftBracket.Level => -1;
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => otherMatcher is EndOfText;
     }
+
 }

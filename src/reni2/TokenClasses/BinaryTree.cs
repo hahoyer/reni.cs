@@ -343,13 +343,13 @@ namespace Reni.TokenClasses
 
         internal Result<BinaryTree> GetBracketKernel(int level)
         {
-            var rightParenthesis = TokenClass as RightParenthesisBase;
+            var rightParenthesis = TokenClass as IRightBracket;
             Tracer.Assert(rightParenthesis != null);
             Tracer.Assert(level == rightParenthesis.Level);
 
             Tracer.Assert(Right == null);
 
-            if(!(Left.TokenClass is LeftParenthesis leftParenthesis))
+            if(!(Left.TokenClass is ILeftBracket leftParenthesis))
                 return new Result<BinaryTree>(Left, IssueId.ExtraRightBracket.Issue(SourcePart));
 
             Tracer.Assert(Left.Left == null);
@@ -367,6 +367,6 @@ namespace Reni.TokenClasses
         }
 
         internal Result<BinaryTree> GetBracketKernel()
-            => GetBracketKernel(((RightParenthesisBase)TokenClass).Level);
+            => GetBracketKernel(((IRightBracket)TokenClass).Level);
     }
 }

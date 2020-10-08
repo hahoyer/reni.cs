@@ -9,24 +9,21 @@ namespace Reni.TokenClasses
     [Variant(1)]
     [Variant(2)]
     [Variant(3)]
-    sealed class LeftParenthesis : TokenClass, IBelongingsMatcher
+    sealed class LeftParenthesis : TokenClass, IBelongingsMatcher, ILeftBracket
     {
-        public static string TokenId(int level)
-            => level == 0 ? PrioTable.BeginOfText : "{[(".Substring(level - 1, 1);
-
-        public LeftParenthesis(int level) { Level = level; }
-        [DisableDump]
         internal int Level { get; }
+
+        public LeftParenthesis(int level) => Level = level;
+
         [DisableDump]
         public override string Id => TokenId(Level);
-        [DisableDump]
-        internal override bool IsVisible => Level != 0;
-
-        [DisableDump]
-        internal bool IsFrameToken => Level == 0;
 
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => (otherMatcher as RightParenthesis)?.Level == Level;
-    }
 
+        int ILeftBracket.Level => Level;
+
+        public static string TokenId(int level)
+            => level == 0? PrioTable.BeginOfText : "{[(".Substring(level - 1, 1);
+    }
 }

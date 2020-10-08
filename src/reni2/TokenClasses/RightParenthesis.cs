@@ -31,13 +31,17 @@ namespace Reni.TokenClasses
                 Tracer.Assert(binaryTree.Right != null);
                 var leftValue = binaryTree.Left.Syntax(scope);
                 var rightValue = binaryTree.Right.Syntax(scope);
-                return Result<ValueSyntax> .From(ExpressionSyntax.Create(binaryTree, leftValue.Target, null, rightValue.Target)
+                return Result<ValueSyntax>.From(ExpressionSyntax
+                    .Create(binaryTree, leftValue.Target, null, rightValue.Target)
                     .With(rightValue.Issues.plus(leftValue.Issues)));
             }
         }
 
         public RightParenthesis(int level)
             : base(level) { }
+
+        [EnableDump]
+        new int Level => base.Level;
 
         IParserTokenType<BinaryTree> IBracketMatch<BinaryTree>.Value { get; } = new Matched();
 
