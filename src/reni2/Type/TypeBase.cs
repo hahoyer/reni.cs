@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
@@ -375,7 +374,7 @@ namespace Reni.Type
             => Cache.ArrayReferenceCache[optionsId];
 
         protected virtual TypeBase ReversePair(TypeBase first) => first.Cache.Pair[this];
-        internal virtual TypeBase Pair(TypeBase second, SourcePart position) => second.ReversePair(this);
+        internal virtual TypeBase Pair(TypeBase second) => second.ReversePair(this);
 
         internal virtual Result Cleanup(Category category)
             => VoidCodeAndRefs(category);

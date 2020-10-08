@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -633,9 +632,9 @@ namespace Reni
                     (Code.Closures.IsEqual(Closures), () => "Code and Closures differ: " + Dump());
         }
 
-        void Add(Result other, SourcePart position) => Add(other, CompleteCategory, position);
+        void Add(Result other) => Add(other, CompleteCategory);
 
-        void Add(Result other, Category category, SourcePart position)
+        void Add(Result other, Category category)
         {
             IsDirty = true;
 
@@ -675,7 +674,7 @@ namespace Reni
                     Size = null;
 
                 if(category.HasType)
-                    Type = Type.Pair(other.Type, position);
+                    Type = Type.Pair(other.Type);
                 else if(HasType)
                     Type = null;
 
@@ -709,10 +708,10 @@ namespace Reni
             IsDirty = false;
         }
 
-        internal Result Sequence(Result second, SourcePart position)
+        internal Result Sequence(Result second)
         {
             var result = Clone;
-            result.Add(second, position);
+            result.Add(second);
             return result;
         }
 
@@ -876,7 +875,7 @@ namespace Reni
             return result;
         }
 
-        public static Result operator +(Result aResult, Result bResult) => aResult.Sequence(bResult, null);
+        public static Result operator +(Result aResult, Result bResult) => aResult.Sequence(bResult);
 
         [DebuggerHidden]
         internal void AssertVoidOrValidReference()

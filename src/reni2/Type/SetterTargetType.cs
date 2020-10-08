@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using hw.DebugFormatter;
-using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -84,7 +83,7 @@ namespace Reni.Type
                 var resultForArg = destinationResult + sourceResult;
                 Dump("resultForArg", resultForArg);
 
-                var result = SetterResult(category, null);
+                var result = SetterResult(category);
                 Dump("result", result);
                 BreakExecution();
 
@@ -97,7 +96,7 @@ namespace Reni.Type
         }
 
         internal virtual Result DestinationResult(Category category) => ArgResult(category);
-        protected abstract Result SetterResult(Category category, SourcePart position);
+        protected abstract Result SetterResult(Category category);
         protected abstract Result GetterResult(Category category);
     }
 }
