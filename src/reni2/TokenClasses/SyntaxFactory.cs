@@ -52,15 +52,11 @@ namespace Reni.TokenClasses
         class ListHandler : DumpableObject, IProvider
         {
             Result<Syntax> IProvider.Get(BinaryTree target, SyntaxFactory factory)
-            {
-                var result =
-                    (
+                => (
                         factory.GetCompoundSyntax(target.Left),
                         factory.GetCompoundSyntax(target.Right)
                     )
-                    .Apply((left, right) => CompoundSyntax.Combine(left, right, target));
-                return Result<Syntax>.From(result);
-            }
+                    .Apply((left, right) => (Syntax)CompoundSyntax.Combine(left, right, target));
         }
 
         class DeclarationMarkHandler : DumpableObject, IDeclarerProvider
@@ -97,13 +93,25 @@ namespace Reni.TokenClasses
                 => Result<ValueSyntax>.From(factory.GetExpressionSyntax(target));
         }
 
-        class TerminalHandler : DumpableObject, IValueProvider
+        class InfixHandler : DumpableObject, IValueProvider
         {
+            readonly bool? HasLeft;
+            readonly bool? HasRight;
+
+            public InfixHandler(bool? hasLeft = null, bool? hasRight = null)
+            {
+                HasLeft = hasLeft;
+                HasRight = hasRight;
+            }
+
             Result<ValueSyntax> IValueProvider.Get(BinaryTree target, SyntaxFactory factory)
             {
-                Tracer.Assert(target.Left == null);
-                Tracer.Assert(target.Right == null);
-                return new TerminalSyntax((ITerminal)target.TokenClass, target);
+                if(HasLeft != null)
+                    Tracer.Assert(target.Left == null != HasLeft);
+                if(HasRight != null)
+                    Tracer.Assert(target.Right == null != HasRight);
+
+                return factory.GetInfixSyntax(target);
             }
         }
 
@@ -123,7 +131,11 @@ namespace Reni.TokenClasses
 
         internal static readonly IValueProvider Bracket = new BracketHandler();
         internal static readonly IValueProvider Definable = new DefinableHandler();
-        internal static readonly IValueProvider Terminal = new TerminalHandler();
+        internal static readonly IValueProvider Terminal = new InfixHandler(false, false);
+        internal static readonly IValueProvider Suffix = new InfixHandler(true, false);
+        internal static readonly IValueProvider NonSuffix = new InfixHandler(false);
+        internal static readonly IValueProvider InfixPrefix = new InfixHandler(hasRight: true);
+        internal static readonly IValueProvider Infix = new InfixHandler(true, true);
 
         internal static readonly IProvider List = new ListHandler();
         internal static readonly IProvider Colon = new ColonHandler();
@@ -145,8 +157,9 @@ namespace Reni.TokenClasses
         static Result<Syntax> EmptyListIfNull(BinaryTree target) => new EmptyList(target);
 
         Result<CompoundSyntax> GetCompoundSyntax(BinaryTree target)
-            => GetSyntax(target)
-                .Apply(syntax => syntax.ToCompoundSyntax());
+            => target == null
+                ? null
+                : GetSyntax(target).Apply(syntax => syntax.ToCompoundSyntax());
 
         Result<Syntax> GetSyntax(BinaryTree target, Func<Result<Syntax>> onNull = null)
         {
@@ -248,11 +261,25 @@ namespace Reni.TokenClasses
             Tracer.Assert(definable != null);
             return
                 (
-                    target.Left == null? null : GetValueSyntax(target.Left),
-                    target.Right == null? null : GetValueSyntax(target.Right)
+                    GetValueSyntax(target.Left),
+                    GetValueSyntax(target.Right)
                 )
                 .Apply((left, right) => ExpressionSyntax.Create(target, left, definable, right));
         }
+
+        Result<ValueSyntax> GetInfixSyntax(BinaryTree target)
+            => (
+                    GetValueSyntax(target.Left),
+                    GetValueSyntax(target.Right)
+                )
+                .Apply((left, right) => GetInfixSyntax(left, target, right));
+
+        static Result<ValueSyntax> GetInfixSyntax(ValueSyntax left, BinaryTree target, ValueSyntax right)
+            => left == null? right == null?
+                    (Result<ValueSyntax>)new TerminalSyntax((ITerminal)target.TokenClass, target) :
+                    new PrefixSyntax((IPrefix)target.TokenClass, right, target) :
+                right == null? (Result<ValueSyntax>)new SuffixSyntax(left, (ISuffix)target.TokenClass, target) :
+                new InfixSyntax(left, (IInfix)target.TokenClass, right, target);
 
         Result<DeclarerSyntax> GetDeclarationTags(BinaryTree target)
             => target
