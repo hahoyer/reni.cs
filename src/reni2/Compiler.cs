@@ -248,26 +248,17 @@ namespace Reni
         }
 
         Result<ValueSyntax> GetValueSyntax()
-            => Parameters.IsSyntaxRequired? SyntaxFactory.Root.GetValueSyntax(BinaryTree).ToFrame() : null;
+            => Parameters.IsSyntaxRequired? GetValueSyntax(BinaryTree).ToFrame() : null;
+
+        static Result<ValueSyntax> GetValueSyntax(BinaryTree target) => SyntaxFactory.Root.GetValueSyntax(target);
 
         CodeContainer GetCodeContainer() => new CodeContainer(Syntax, Root, ModuleName, Source.Data);
 
         static string ModuleNameFromFileName(string fileName)
             => "_" + Path.GetFileName(fileName).Symbolize();
 
-        Result<ValueSyntax> ParsePredefinedItem(string sourceText)
-        {
-            var syntax = Parse(new Source(sourceText) + 0);
-
-            Tracer.Assert(syntax.Left != null);
-            Tracer.Assert(syntax.TokenClass is EndOfText);
-            Tracer.Assert(syntax.Right == null);
-
-            Tracer.Assert(syntax.Left.Left == null);
-            Tracer.Assert(syntax.Left.TokenClass is BeginOfText);
-
-            return syntax.Left.Right.Syntax(null);
-        }
+        Result<ValueSyntax> ParsePredefinedItem(string sourceText) 
+            => GetValueSyntax(Parse(new Source(sourceText) + 0));
 
         [UsedImplicitly]
         public Compiler Empower()

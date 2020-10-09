@@ -1,4 +1,4 @@
-//03:50:48.607 09.10.2020 ran 171 of 178 
+//11:49:35.139 09.10.2020 ran 173 of 178 
 
 namespace hw.UnitTest
 {
@@ -9,8 +9,6 @@ namespace hw.UnitTest
         
 // error 
 
-TestRunner.RunTest(new Reni.FeatureTest.Sample.Sample200104().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Array.FromTypeAndFunction().Run);
 TestRunner.RunTest(new ReniUI.Test.AutoCompleteSimple().GetDeclarationOptions);
 TestRunner.RunTest(new ReniUI.Test.BadUserInterAction().GetTokenForPosition);
 TestRunner.RunTest(new ReniUI.Test.BraceMatching().MatchingBraces);
@@ -30,8 +28,6 @@ TestRunner.RunTest(new ReniUI.Test.UserInterAction().GetTokenForPosition);
 
 // dependanterror 
 
-TestRunner.RunTest(new Reni.FeatureTest.Text1().Run);
-TestRunner.RunTest(new Reni.FeatureTest.TextConcat().Run);
 TestRunner.RunTest(new ReniUI.Test.AutoComplete().GetDeclarationOptions);
 TestRunner.RunTest(new ReniUI.Test.AutoCompleteFunctionInCompound().GetDeclarationOptions);
 TestRunner.RunTest(new ReniUI.Test.UserInterAction2().GetTokenForPosition);
