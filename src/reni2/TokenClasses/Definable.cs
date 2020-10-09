@@ -18,23 +18,6 @@ namespace Reni.TokenClasses
 
         SyntaxFactory.IDeclarerProvider SyntaxFactory.IDeclarerToken.Provider => SyntaxFactory.DefinableAsDeclarer;
 
-        Result<Declarer> IDeclarerTokenClass.Get(BinaryTree binaryTree)
-        {
-            if(binaryTree.Right == null)
-            {
-                if(binaryTree.Left == null)
-                    return new Declarer(null, this, T(binaryTree));
-
-                return binaryTree.Left.Declarer?.Target.WithName(this, binaryTree);
-            }
-
-            Tracer.FlaggedLine(nameof(binaryTree) + "=" + binaryTree);
-            return null;
-        }
-
-        Result<ValueSyntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
-            => Result<ValueSyntax> .From(ExpressionSyntax.Create(this, binaryTree, scope));
-
         SyntaxFactory.IValueProvider SyntaxFactory.IValueToken.Provider => SyntaxFactory.Definable;
 
         internal Result<ValueSyntax> CreateForVisit(BinaryTree parent, ValueSyntax left, ValueSyntax right)

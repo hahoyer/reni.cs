@@ -11,19 +11,19 @@ namespace Reni.Type
         : Child<TypeBase>
     {
         [DisableDump]
-        readonly int _alignBits;
+        readonly int AlignBits;
 
         public AlignType(TypeBase target, int alignBits)
             : base(target)
         {
-            _alignBits = alignBits;
+            AlignBits = alignBits;
             StopByObjectIds(-9);
             Tracer.Assert(Parent.IsAligningPossible, Parent.Dump);
         }
 
         [DisableDump]
         internal override string DumpPrintText
-            => "(" + Parent.DumpPrintText + ")" + AlignToken.TokenId + _alignBits;
+            => "(" + Parent.DumpPrintText + ")" + AlignToken.TokenId + AlignBits;
 
         [DisableDump]
         internal override bool IsHollow => Parent.IsHollow;
@@ -49,7 +49,7 @@ namespace Reni.Type
         [DisableDump]
         internal override bool IsPointerPossible => false;
 
-        protected override Size GetSize() => Parent.Size.Align(_alignBits);
+        protected override Size GetSize() => Parent.Size.Align(AlignBits);
 
         internal override int? SmartArrayLength(TypeBase elementType)
             => Parent.SmartArrayLength(elementType);

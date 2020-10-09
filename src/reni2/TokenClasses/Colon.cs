@@ -11,9 +11,6 @@ namespace Reni.TokenClasses
 
         public override string Id => TokenId;
 
-        Result<Statement> IStatementProvider.Get(BinaryTree left, BinaryTree right, ISyntaxScope scope)
-            => left.Declarer?.Convert(x => x.Statement(right.Syntax(scope), scope.DefaultScopeProvider));
-
         SyntaxFactory.IDeclarationsProvider SyntaxFactory.IDeclarationsToken.Provider => SyntaxFactory.Colon;
     }
 
@@ -54,15 +51,6 @@ namespace Reni.TokenClasses
                 yield return PositionalDeclarationToken.TokenId;
                 yield return PublicDeclarationToken.TokenId;
             }
-        }
-
-        Result<Declarer> IDeclarerTagProvider.Get(BinaryTree binaryTree)
-        {
-            if(binaryTree.Left == null && binaryTree.Right == null)
-                return new Declarer(new IDeclarationTag[] {this}, null, T(binaryTree));
-
-            NotImplementedMethod(binaryTree);
-            return null;
         }
 
         SyntaxFactory.IDeclarerProvider SyntaxFactory.IDeclarerToken.Provider => SyntaxFactory.Declarer;

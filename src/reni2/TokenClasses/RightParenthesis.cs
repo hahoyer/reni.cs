@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using hw.DebugFormatter;
+﻿using hw.DebugFormatter;
 using hw.Parser;
 using Reni.Parser;
 
@@ -26,17 +24,6 @@ namespace Reni.TokenClasses
             string IParserTokenType<BinaryTree>.PrioTableId => Id;
             string ITokenClass.Id => Id;
 
-            Result<ValueSyntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
-            {
-                Tracer.Assert(binaryTree.Left != null);
-                Tracer.Assert(binaryTree.Right != null);
-                var leftValue = binaryTree.Left.Syntax(scope);
-                var rightValue = binaryTree.Right.Syntax(scope);
-                return Result<ValueSyntax>.From(ExpressionSyntax
-                    .Create(binaryTree, leftValue.Target, null, rightValue.Target)
-                    .With(rightValue.Issues.plus(leftValue.Issues)));
-            }
-
             SyntaxFactory.IValueProvider SyntaxFactory.IValueToken.Provider => SyntaxFactory.MatchedBracket;
         }
 
@@ -51,18 +38,6 @@ namespace Reni.TokenClasses
         bool IDefaultScopeProvider.MeansPublic => Level == 3;
         IDefaultScopeProvider ISyntaxScope.DefaultScopeProvider => this;
         bool ISyntaxScope.IsDeclarationPart => false;
-
-        [Obsolete("", true)]
-        Result<ValueSyntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
-        {
-            var result = binaryTree.GetBracketKernel(Level);
-            var target = result.Target?.Syntax(this) ?? new EmptyList(binaryTree);
-
-            if(result.Issues.Any())
-                return target.With(result.Issues);
-
-            return result.Target == null? new EmptyList(binaryTree) : result.Target.Syntax(this);
-        }
 
         SyntaxFactory.IValueProvider SyntaxFactory.IValueToken.Provider => SyntaxFactory.Bracket;
     }

@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using hw.DebugFormatter;
-using hw.Helper;
+﻿using hw.DebugFormatter;
 using hw.Parser;
 using Reni.Parser;
 using Reni.Validation;
@@ -31,41 +29,6 @@ namespace Reni.TokenClasses
             : base(level) { }
 
         IParserTokenType<BinaryTree> IBracketMatch<BinaryTree>.Value { get; } = new Matched();
-
-        Result<Declarer> IDeclarerTagProvider.Get(BinaryTree binaryTree)
-        {
-            var bracketKernel = binaryTree.GetBracketKernel(Level);
-            var target = bracketKernel.Target;
-            if(target != null)
-            {
-                var items = target
-                    .Items
-                    .Select(GetDeclarationTag)
-                    .ToArray();
-
-                var result = new Declarer
-                (
-                    items
-                        .Select(item => item.Target)
-                        .Where(item => item != null)
-                        .ToArray(),
-                    null,
-                    T(binaryTree)
-                );
-
-                var issues = items.SelectMany(item => item.Issues).ToArray();
-
-                return result.AddIssues(issues);
-            }
-            else
-            {
-                var issues
-                    = T(bracketKernel.Issues, T(IssueId.MissingDeclarationTag.Issue(binaryTree.SourcePart)))
-                        .Concat()
-                        .ToArray();
-                return new Declarer(null, null, T(binaryTree)).AddIssues(issues);
-            }
-        }
 
         static Result<IDeclarationTag> GetDeclarationTag(BinaryTree item)
         {

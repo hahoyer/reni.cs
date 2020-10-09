@@ -78,27 +78,6 @@ namespace Reni.TokenClasses
         }
 
         [DisableDump]
-        internal Result<Declarer> Declarer
-        {
-            get
-            {
-                switch(TokenClass)
-                {
-                    case IDeclarerTokenClass tokenClass:
-                        return tokenClass.Get(this);
-                    case RightParenthesis _:
-                    case EndOfText _:
-                    case List _:
-                    case ScannerSyntaxError _:
-                        return null;
-                }
-
-                NotImplementedMethod();
-                return null;
-            }
-        }
-
-        [DisableDump]
         internal SourcePart SourcePart =>
             LeftMost.Token.SourcePart().Start.Span(RightMost.Token.Characters.End);
 
@@ -162,9 +141,6 @@ namespace Reni.TokenClasses
 
         protected override string GetNodeDump() => base.GetNodeDump() + $"({TokenClass.Id})";
 
-        internal Result<ValueSyntax> Syntax
-            (ISyntaxScope scope) => this.CachedFunction(scope ?? NullScopeInstance, GetValue);
-
         internal static BinaryTree Create
         (
             BinaryTree left,
@@ -189,75 +165,6 @@ namespace Reni.TokenClasses
             => new[] {this}
                 .Concat(Left.CheckedItemsAsLongAs(condition))
                 .Concat(Right.CheckedItemsAsLongAs(condition));
-
-
-        internal Result<Statement[]> GetStatements(ISyntaxScope scope, List type = null)
-        {
-            var statements = GetStatementsOrDefault(scope, type);
-            if(statements != null)
-                return statements;
-
-            var statement = GetStatementOrDefault(scope);
-            if(statement != null)
-                return statement.Convert(x => new[] {x});
-
-            var value = GetValueOrDefault(scope);
-            if(value != null)
-                return Statement.CreateStatements(value, scope.DefaultScopeProvider);
-
-            return new Result<Statement[]>(new Statement[0], IssueId.InvalidListOperandSequence.Issue(SourcePart));
-        }
-
-        internal Result<ValueSyntax> GetValue(ISyntaxScope scopeKey)
-        {
-            var scope = scopeKey == NullScopeInstance? null : scopeKey;
-
-            var value = GetValueOrDefault(scope);
-            if(value != null)
-                return value;
-
-            var statement = GetStatementOrDefault(scopeKey);
-            if(statement != null)
-                return CompoundSyntax.Create(statement, this);
-
-            var statements = GetStatementsOrDefault(scope, null);
-            if(statements != null)
-                return CompoundSyntax.Create(statements, this);
-
-            return IssueId.InvalidExpression.Value(this);
-        }
-
-        Result<BinaryTree> GetBracketKernel(int level, BinaryTree parent)
-        {
-            Tracer.Assert(parent.Right == null);
-
-            if(!(TokenClass is LeftParenthesis leftParenthesis))
-                return new Result<BinaryTree>(this, IssueId.ExtraRightBracket.Issue(parent.SourcePart));
-
-            Tracer.Assert(Left == null);
-
-            var levelDelta = leftParenthesis.Level - level;
-
-            if(levelDelta == 0)
-                return Right;
-
-            if(levelDelta > 0)
-                return new Result<BinaryTree>(Right, IssueId.ExtraLeftBracket.Issue(SourcePart));
-
-            NotImplementedMethod(level, parent);
-            return null;
-        }
-
-        Result<ValueSyntax> GetValueOrDefault(ISyntaxScope scope)
-            => scope != null && scope.IsDeclarationPart
-                ? null
-                : (TokenClass as IValueProvider)?.Get(this, scope);
-
-        Result<Statement> GetStatementOrDefault(ISyntaxScope scope)
-            => (TokenClass as IStatementProvider)?.Get(Left, Right, scope);
-
-        Result<Statement[]> GetStatementsOrDefault
-            (ISyntaxScope scope, List type) => (TokenClass as IStatementsProvider)?.Get(type, this, scope);
 
         BinaryTree Locate(SourcePart part)
             => Left?.CheckedLocate(part) ??

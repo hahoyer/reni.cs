@@ -22,18 +22,6 @@ namespace Reni
         [EnableDump]
         readonly ValueSyntax Else;
 
-        internal static Result<ValueSyntax> Create
-            (BinaryTree condition, BinaryTree thenBinaryTree, BinaryTree elseBinaryTree, BinaryTree binaryTree, ISyntaxScope scope)
-        {
-            var conditionValue = condition.Syntax(scope);
-            var thenValue = thenBinaryTree?.Syntax(scope);
-            var elseValue = elseBinaryTree?.Syntax(scope);
-            var result = new CondSyntax
-                (conditionValue.Target, thenValue?.Target, elseValue?.Target, binaryTree);
-            var issues = conditionValue.Issues.plus(thenValue?.Issues).plus(elseValue?.Issues);
-            return new Result<ValueSyntax>(result, issues);
-        }
-
         internal CondSyntax(ValueSyntax condSyntax, ValueSyntax thenSyntax, ValueSyntax elseSyntax, BinaryTree target)
             : base(target)
         {

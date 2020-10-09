@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using Reni.TokenClasses;
@@ -6,6 +7,7 @@ using Reni.Validation;
 
 namespace Reni.Parser
 {
+    [Obsolete("", true)]
     sealed class Declarer : DumpableObject
     {                                                         
         [EnableDump]
@@ -21,12 +23,8 @@ namespace Reni.Parser
         {
             BinaryTrees = binaryTrees;
             Tags = tags ?? new IDeclarationTag[0];
-            Tracer.ConditionalBreak(BinaryTrees == null && Tags.Length ==2);
             Target = target;
         }
-
-        internal Result<Statement> Statement(Result<ValueSyntax> right, IDefaultScopeProvider container)
-            => Parser.Statement.Create(this, right, container);
 
         public Result<Declarer> WithName(Definable target, BinaryTree binaryTree)
         {
@@ -54,14 +52,10 @@ namespace Reni.Parser
     }
 
     interface IDeclarerTokenClass
-    {
-        Result<Declarer> Get(BinaryTree binaryTree);
-    }
+    { }
 
     interface IDeclarerTagProvider
-    {
-        Result<Declarer> Get(BinaryTree binaryTree);
-    }
+    { }
 
     interface IDeclarationTag { }
 }

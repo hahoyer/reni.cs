@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-using log4net.Core;
 using Reni.Parser;
 using Reni.Struct;
 using Reni.Validation;
@@ -239,31 +238,6 @@ namespace Reni.TokenClasses
         bool IDefaultScopeProvider.MeansPublic => MeansPublic;
 
         static Result<ValueSyntax> EmptyListIfNull(BinaryTree target) => new EmptyList(target);
-
-        Result<Syntax> GetSyntax(BinaryTree target, Func<Result<Syntax>> onNull = null)
-        {
-            if(target == null)
-                return onNull?.Invoke();
-
-            var valueToken = target.TokenClass as IValueToken;
-            var declarationsToken = target.TokenClass as IDeclarationsToken;
-
-            Tracer.Assert(
-                (valueToken == null? 0 : 1) +
-                (declarationsToken == null? 0 : 1)
-                == 1);
-
-            if(valueToken != null)
-                return Result<Syntax>.From(valueToken.Provider.Get(target, GetCurrentFactory(target.TokenClass)));
-
-            if(declarationsToken != null)
-                return Result<Syntax>.From(
-                    declarationsToken.Provider.Get(target, GetCurrentFactory(target.TokenClass))
-                        .Apply(list => new CompoundSyntax(list, null, target)));
-
-            NotImplementedMethod(target, onNull);
-            return default;
-        }
 
         Result<DeclarerSyntax> GetDeclarerSyntax(BinaryTree target, Func<Result<DeclarerSyntax>> onNull = null)
         {

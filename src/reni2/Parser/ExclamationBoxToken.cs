@@ -1,8 +1,6 @@
 ﻿using hw.DebugFormatter;
 using hw.Parser;
-using JetBrains.Annotations;
 using Reni.TokenClasses;
-using Reni.Validation;
 
 namespace Reni.Parser
 {
@@ -11,22 +9,6 @@ namespace Reni.Parser
     {
         BinaryTree Value { get; }
         internal ExclamationBoxToken(BinaryTree value) => Value = value;
-
-        [CanBeNull]
-        Result<Declarer> IDeclarerTokenClass.Get(BinaryTree binaryTree)
-        {
-            if(!(binaryTree.Right.TokenClass is IDeclarerTagProvider provider))
-                return new Declarer(null, null, T(binaryTree))
-                    .AddIssues(IssueId.UnknownDeclarationTag.Issue(binaryTree.SourcePart));
-
-            var result = provider.Get(binaryTree.Right);
-
-            var other = binaryTree.Left?.Declarer;
-            if(other == null)
-                return result;
-
-            return result.Target.Combine(other.Target).AddIssues(result.Issues.plus(other.Issues));
-        }
 
         BinaryTree IParserTokenType<BinaryTree>.Create(BinaryTree left, IToken token, BinaryTree right)
         {

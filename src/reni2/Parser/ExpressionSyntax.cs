@@ -60,16 +60,6 @@ namespace Reni.Parser
             (BinaryTree target, ValueSyntax left, Definable definable, ValueSyntax right)
             => new ExpressionSyntax(target, left, definable, right);
 
-        internal static Result<ExpressionSyntax> Create(Definable definable, BinaryTree binaryTree, ISyntaxScope scope)
-        {
-            var leftValue = binaryTree.Left?.Syntax(scope);
-            var rightValue = binaryTree.Right?.Syntax(scope);
-            var left = leftValue?.Target;
-            var right = rightValue?.Target;
-            return Create(binaryTree, left, definable, right)
-                .With(leftValue?.Issues.plus(rightValue?.Issues));
-        }
-
         protected override IEnumerable<Syntax> GetChildren() => T(Left, Right);
 
         internal override Result ResultForCache(ContextBase context, Category category)

@@ -38,20 +38,6 @@ namespace Reni.TokenClasses
 
         internal override bool IsLambda => true;
 
-        internal static Result<ValueSyntax> Create
-        (
-            BinaryTree left, bool isImplicit, bool isMetaFunction, BinaryTree right, BinaryTree binaryTree
-            , ISyntaxScope scope
-        )
-        {
-            var leftValue = left?.Syntax(scope);
-            var rightValue = right?.Syntax(scope);
-            var target = new FunctionSyntax
-                (leftValue?.Target, isImplicit, isMetaFunction, rightValue?.Target, binaryTree);
-            var issues = leftValue?.Issues.plus(rightValue?.Issues);
-            return new Result<ValueSyntax>(target, issues);
-        }
-
         protected override IEnumerable<Syntax> GetChildren() => T(Getter, Setter);
 
         internal override Result ResultForCache(ContextBase context, Category category)

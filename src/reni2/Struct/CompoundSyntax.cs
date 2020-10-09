@@ -35,10 +35,6 @@ namespace Reni.Struct
             CleanupSection = cleanupSection;
         }
 
-        CompoundSyntax(Statement[] statements, ValueSyntax cleanupSection, BinaryTree target)
-            : base(NextObjectId++, target)
-            => NotImplementedMethod(statements, cleanupSection, target);
-
         [DisableDump]
         public IEnumerable<FunctionSyntax> ConverterFunctions
             => Statements
@@ -86,21 +82,6 @@ namespace Reni.Struct
             => Statements
                 .SelectMany((s, i) => s.IsConverterSyntax? new[] {i} : new int[0])
                 .ToArray();
-
-        internal static Result<ValueSyntax> Create(Result<Statement> statement, BinaryTree binaryTree)
-            => new Result<ValueSyntax>(new CompoundSyntax(new[] {statement.Target}, null, binaryTree)
-                , statement.Issues);
-
-        internal static Result<ValueSyntax> Create(Result<Statement[]> statements, BinaryTree binaryTree)
-            => new Result<ValueSyntax>(new CompoundSyntax(statements.Target, null, binaryTree), statements.Issues);
-
-        internal static Result<ValueSyntax> Create
-            (Result<Statement[]> statements, Result<ValueSyntax> cleanup, BinaryTree binaryTree)
-            => new Result<ValueSyntax>
-            (
-                new CompoundSyntax(statements.Target, cleanup?.Target, binaryTree),
-                statements.Issues.plus(cleanup?.Issues)
-            );
 
         public string GetCompoundIdentificationDump() => "." + ObjectId + "i";
 
@@ -198,21 +179,6 @@ namespace Reni.Struct
             var result = base.DumpData();
             IsInContainerDump = isInDump;
             return result;
-        }
-
-        public static CompoundSyntax Combine(CompoundSyntax left, CompoundSyntax right, BinaryTree target)
-        {
-            if(left == null)
-                return right;
-            if(right == null)
-                return left;
-
-            var statements = left.Statements.Concat(right.Statements).ToArray();
-
-            Tracer.Assert(left.CleanupSection == null || right.CleanupSection == null);
-            var cleanupSection = left.CleanupSection ?? right.CleanupSection;
-            
-            return new CompoundSyntax(statements, cleanupSection, target);
         }
     }
 }

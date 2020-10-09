@@ -200,9 +200,7 @@ namespace Reni.FeatureTest.Helper
 
         internal override void AssertLike(BinaryTree target)
         {
-            var terminalSyntax = (TerminalSyntax)target.Syntax(null).Target;
-            Tracer.Assert(terminalSyntax.Terminal is TokenClasses.Number);
-            Tracer.Assert(terminalSyntax.ToNumber == _i);
+            NotImplementedMethod(target);
         }
 
         internal override void AssertLike(ValueSyntax syntax)

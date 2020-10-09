@@ -11,14 +11,5 @@ namespace Reni.TokenClasses
         public override string Id => TokenId;
 
         SyntaxFactory.IValueProvider SyntaxFactory.IValueToken.Provider => SyntaxFactory.Cleanup;
-
-        Result<ValueSyntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
-        {
-            var statements = binaryTree.Left?.GetStatements(scope);
-            if(statements == null)
-                statements = new Statement[0];
-            var cleanup = binaryTree.Right?.Syntax(scope);
-            return CompoundSyntax.Create(statements, cleanup, binaryTree);
-        }
     }
 }
