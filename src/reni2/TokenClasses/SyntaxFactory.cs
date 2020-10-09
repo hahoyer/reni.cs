@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
+using log4net.Core;
 using Reni.Parser;
 using Reni.Struct;
 using Reni.Validation;
@@ -158,6 +159,17 @@ namespace Reni.TokenClasses
             }
         }
 
+        class MatchedBracketHandler : DumpableObject, IValueProvider
+        {
+            Result<ValueSyntax> IValueProvider.Get(BinaryTree target, SyntaxFactory factory)
+                => (
+                        factory.GetValueSyntax(target.Left),
+                        factory.GetValueSyntax(target.Right)
+                    )
+                    .Apply((left, right)
+                        => (ValueSyntax)new ExpressionSyntax(target, left, (Definable)target.TokenClass, right));
+        }
+
         class ThenHandler : DumpableObject, IValueProvider
         {
             Result<ValueSyntax> IValueProvider.Get(BinaryTree target, SyntaxFactory factory)
@@ -196,6 +208,7 @@ namespace Reni.TokenClasses
         }
 
         internal static readonly IValueProvider Bracket = new BracketHandler();
+        internal static readonly IValueProvider MatchedBracket = new MatchedBracketHandler();
         internal static readonly IValueProvider Definable = new DefinableHandler();
         internal static readonly IValueProvider Terminal = new InfixHandler(false, false);
         internal static readonly IValueProvider Suffix = new InfixHandler(true, false);

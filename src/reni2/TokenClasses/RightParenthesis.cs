@@ -15,7 +15,8 @@ namespace Reni.TokenClasses
             , ISyntaxScope
             , SyntaxFactory.IValueToken
     {
-        sealed class Matched : DumpableObject, IParserTokenType<BinaryTree>, ITokenClass, IValueProvider
+        sealed class Matched
+            : DumpableObject, IParserTokenType<BinaryTree>, ITokenClass, IValueProvider, SyntaxFactory.IValueToken
         {
             static string Id => "()";
 
@@ -35,6 +36,8 @@ namespace Reni.TokenClasses
                     .Create(binaryTree, leftValue.Target, null, rightValue.Target)
                     .With(rightValue.Issues.plus(leftValue.Issues)));
             }
+
+            SyntaxFactory.IValueProvider SyntaxFactory.IValueToken.Provider => SyntaxFactory.MatchedBracket;
         }
 
         public RightParenthesis(int level)
