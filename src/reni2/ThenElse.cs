@@ -34,7 +34,7 @@ namespace Reni
             return new Result<ValueSyntax>(result, issues);
         }
 
-        CondSyntax(ValueSyntax condSyntax, ValueSyntax thenSyntax, ValueSyntax elseSyntax, BinaryTree target)
+        internal CondSyntax(ValueSyntax condSyntax, ValueSyntax thenSyntax, ValueSyntax elseSyntax, BinaryTree target)
             : base(target)
         {
             Cond = condSyntax;
@@ -138,5 +138,6 @@ namespace Reni
             NotImplementedMethod(context, category, pendingCategory, syntax, asReference);
             return null;
         }
+
     }
 }

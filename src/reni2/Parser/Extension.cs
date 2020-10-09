@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
@@ -166,32 +165,53 @@ namespace Reni.Parser
             where TTarget : class
             => new Result<TTarget>(target, issues);
 
-        internal static Result<TResult> Apply<TArg1,TResult>
-            (this Result<TArg1> arg1, Func<TArg1, TResult> creator)
+        internal static Result<TResult> Apply<TArg1, TResult>(this Result<TArg1> arg1, Func<TArg1, TResult> creator)
             where TArg1 : class
             where TResult : class
             => creator(arg1?.Target).AddIssues(arg1?.Issues);
 
-        internal static Result<TResult> Apply<TArg1, TArg2,TResult>
-            (this (Result<TArg1> arg1, Result<TArg2> arg2) arg, Func<TArg1, TArg2, TResult> creator)
+        internal static Result<TResult> Apply<TArg1, TArg2, TResult>
+            (this(Result<TArg1> arg1, Result<TArg2> arg2) arg, Func<TArg1, TArg2, TResult> creator)
             where TArg1 : class
             where TArg2 : class
             where TResult : class
             => creator(arg.arg1?.Target, arg.arg2?.Target)
                 .AddIssues(T(arg.arg1?.Issues, arg.arg2?.Issues).Concat().ToArray());
 
-        internal static Result<TResult> Apply<TArg1,TResult>
+        internal static Result<TResult> Apply<TArg1, TArg2, TArg3, TResult>
+            (this(Result<TArg1> arg1, Result<TArg2> arg2, Result<TArg3> arg3) arg, Func<TArg1, TArg2, TArg3, TResult> creator)
+            where TArg1 : class
+            where TArg2 : class
+            where TResult : class
+            where TArg3 : class
+            => creator(arg.arg1?.Target, arg.arg2?.Target, arg.arg3?.Target)
+                .AddIssues(T(arg.arg1?.Issues, arg.arg2?.Issues, arg.arg3?.Issues).Concat().ToArray());
+
+        internal static Result<TResult> Apply<TArg1, TResult>
             (this Result<TArg1> arg1, Func<TArg1, Result<TResult>> creator)
             where TArg1 : class
             where TResult : class
             => creator(arg1?.Target).With(arg1?.Issues);
 
-        internal static Result<TResult> Apply<TArg1, TArg2,TResult>
-            (this (Result<TArg1> arg1, Result<TArg2> arg2) arg, Func<TArg1, TArg2, Result<TResult>> creator)
+        internal static Result<TResult> Apply<TArg1, TArg2, TResult>
+            (this(Result<TArg1> arg1, Result<TArg2> arg2) arg, Func<TArg1, TArg2, Result<TResult>> creator)
             where TArg1 : class
             where TArg2 : class
             where TResult : class
-            => creator(arg.arg1?.Target, arg.arg2?.Target).With(T(arg.arg1?.Issues, arg.arg2?.Issues).Concat().ToArray());
+            => creator(arg.arg1?.Target, arg.arg2?.Target)
+                .With(T(arg.arg1?.Issues, arg.arg2?.Issues).Concat().ToArray());
+
+        internal static Result<TResult> Apply<TArg1, TArg2, TArg3, TResult>
+        (
+            this(Result<TArg1> arg1, Result<TArg2> arg2, Result<TArg3> arg3) arg
+            , Func<TArg1, TArg2, TArg3, Result<TResult>> creator
+        )
+            where TArg1 : class
+            where TArg2 : class
+            where TArg3 : class
+            where TResult : class
+            => creator(arg.arg1?.Target, arg.arg2?.Target, arg.arg3?.Target)
+                .With(T(arg.arg1?.Issues, arg.arg2?.Issues, arg.arg3?.Issues).Concat().ToArray());
 
         public static TValue[] T<TValue>(params TValue[] value) => value;
     }

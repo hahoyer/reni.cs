@@ -20,9 +20,9 @@ namespace Reni.TokenClasses
 
         public override string Id => TokenId(IsImplicit, IsMetaFunction);
 
-        Result<ValueSyntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
+        Result<ValueSyntax> IValueProvider.Get(BinaryTree target, ISyntaxScope scope)
             =>
-                FunctionSyntax.Create(binaryTree.Left, IsImplicit, IsMetaFunction, binaryTree.Right, binaryTree
+                FunctionSyntax.Create(target.Left, IsImplicit, IsMetaFunction, target.Right, target
                     , scope);
 
         SyntaxFactory.IValueProvider SyntaxFactory.IValueToken.Provider => SyntaxFactory.Function;
