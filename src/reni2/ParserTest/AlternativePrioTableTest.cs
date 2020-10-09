@@ -7,7 +7,6 @@ namespace Reni.ParserTest
     [UnitTest]
     [ParserTest]
     [TestFixture]
-    [LowPriority]
     public sealed class AlternativePrioTableTest : CompilerTest
     {
         [UnitTest]

@@ -8,7 +8,6 @@ using Reni.Validation;
 namespace Reni.FeatureTest.Sample
 {
     [UnitTest]
-    [LowPriority]
     [Target(@"!")]
     public sealed class Sample200104 : CompilerTest
     {

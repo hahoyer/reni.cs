@@ -10,7 +10,6 @@ namespace Reni.ParserTest
     [UnitTest]
     [Target(@"{!()}")]
     [Output("")]
-    [LowPriority]
     public sealed class StrangeDeclarationSyntax : CompilerTest
     {
         public StrangeDeclarationSyntax()
