@@ -9,21 +9,23 @@ namespace Reni.TokenClasses
     [Variant(false, true)]
     sealed class Function : TokenClass, IValueProvider
     {
-        public static string TokenId(bool isImplicit = false, bool isMetaFunction = false)
-            => "/" + (isImplicit ? "!" : "") + "\\" + (isMetaFunction ? "/\\" : "");
-
-        public override string Id => TokenId(_isImplicit, _isMetaFunction);
-        readonly bool _isImplicit;
-        readonly bool _isMetaFunction;
+        readonly bool IsImplicit;
+        readonly bool IsMetaFunction;
 
         public Function(bool isImplicit, bool isMetaFunction)
         {
-            _isImplicit = isImplicit;
-            _isMetaFunction = isMetaFunction;
+            IsImplicit = isImplicit;
+            IsMetaFunction = isMetaFunction;
         }
+
+        public override string Id => TokenId(IsImplicit, IsMetaFunction);
 
         Result<ValueSyntax> IValueProvider.Get(BinaryTree binaryTree, ISyntaxScope scope)
             =>
-            FunctionSyntax.Create(binaryTree.Left, _isImplicit, _isMetaFunction, binaryTree.Right, binaryTree, scope);
+                FunctionSyntax.Create(binaryTree.Left, IsImplicit, IsMetaFunction, binaryTree.Right, binaryTree
+                    , scope);
+
+        public static string TokenId(bool isImplicit = false, bool isMetaFunction = false)
+            => "/" + (isImplicit? "!" : "") + "\\" + (isMetaFunction? "/\\" : "");
     }
 }
