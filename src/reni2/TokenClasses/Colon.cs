@@ -1,12 +1,11 @@
 using System.Collections.Generic;
-using hw.DebugFormatter;
 using hw.Parser;
 using Reni.Parser;
 
 namespace Reni.TokenClasses
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class Colon : TokenClass, IStatementProvider, SyntaxFactory.IToken
+    sealed class Colon : TokenClass, IStatementProvider, SyntaxFactory.IDeclarationsToken
     {
         public const string TokenId = ":";
 
@@ -15,7 +14,7 @@ namespace Reni.TokenClasses
         Result<Statement> IStatementProvider.Get(BinaryTree left, BinaryTree right, ISyntaxScope scope)
             => left.Declarer?.Convert(x => x.Statement(right.Syntax(scope), scope.DefaultScopeProvider));
 
-        SyntaxFactory.IProvider SyntaxFactory.IToken.Provider => SyntaxFactory.Colon;
+        SyntaxFactory.IDeclarationsProvider SyntaxFactory.IDeclarationsToken.Provider => SyntaxFactory.Colon;
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
@@ -57,8 +56,6 @@ namespace Reni.TokenClasses
             }
         }
 
-        SyntaxFactory.IDeclarerProvider SyntaxFactory.IDeclarerToken.Provider => SyntaxFactory.Declarer;
-
         Result<Declarer> IDeclarerTagProvider.Get(BinaryTree binaryTree)
         {
             if(binaryTree.Left == null && binaryTree.Right == null)
@@ -67,6 +64,8 @@ namespace Reni.TokenClasses
             NotImplementedMethod(binaryTree);
             return null;
         }
+
+        SyntaxFactory.IDeclarerProvider SyntaxFactory.IDeclarerToken.Provider => SyntaxFactory.Declarer;
     }
 
     sealed class ConverterToken : DeclarationTagToken

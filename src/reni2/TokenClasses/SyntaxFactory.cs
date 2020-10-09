@@ -15,19 +15,19 @@ namespace Reni.TokenClasses
             IDeclarerProvider Provider { get; }
         }
 
+        internal interface IDeclarationsToken
+        {
+            IDeclarationsProvider Provider { get; }
+        }
+
         internal interface IDeclarerProvider
         {
             Result<DeclarerSyntax> Get(BinaryTree target, SyntaxFactory factory);
         }
 
-        internal interface IProvider
+        internal interface IDeclarationsProvider
         {
-            Result<Syntax> Get(BinaryTree target, SyntaxFactory factory);
-        }
-
-        internal interface IToken
-        {
-            IProvider Provider { get; }
+            Result<DeclarationSyntax[]> Get(BinaryTree target, SyntaxFactory factory);
         }
 
         internal interface IValueProvider
@@ -45,18 +45,45 @@ namespace Reni.TokenClasses
             Result<ValueSyntax> IValueProvider.Get(BinaryTree target, SyntaxFactory factory)
                 => target
                     .GetBracketKernel()
-                    .Apply(tree => factory.GetSyntax(tree, () => EmptyListIfNull(target)))
-                    .Apply(syntax => syntax.ToValueSyntax(target));
+                    .Apply(tree => factory.GetValueSyntax(tree, () => EmptyListIfNull(target)));
         }
 
-        class ListHandler : DumpableObject, IProvider
+        class ListHandler : DumpableObject, IDeclarationsProvider
         {
-            Result<Syntax> IProvider.Get(BinaryTree target, SyntaxFactory factory)
+            Result<DeclarationSyntax[]> IDeclarationsProvider.Get(BinaryTree target, SyntaxFactory factory)
                 => (
-                        factory.GetCompoundSyntax(target.Left),
-                        factory.GetCompoundSyntax(target.Right)
+                        factory.GetDeclarationsSyntax(target.Left),
+                        factory.GetDeclarationsSyntax(target.Right)
                     )
-                    .Apply((left, right) => (Syntax)CompoundSyntax.Combine(left, right, target));
+                    .Apply((left, right) => left.Concat(right).ToArray());
+        }
+
+        class ColonHandler : DumpableObject, IDeclarationsProvider
+        {
+            Result<DeclarationSyntax[]> IDeclarationsProvider.Get(BinaryTree target, SyntaxFactory factory)
+                =>
+                    (
+                        factory.GetDeclarerSyntax(target.Left),
+                        factory.GetValueSyntax(target.Right)
+                    )
+                    .Apply
+                    ((declarer, value)
+                        => T(new DeclarationSyntax(declarer, target, value))
+                    );
+        }
+
+        class CleanupHandler : DumpableObject, IValueProvider
+        {
+            Result<ValueSyntax> IValueProvider.Get(BinaryTree target, SyntaxFactory factory)
+                =>
+                    (
+                        factory.GetDeclarationsSyntax(target.Left),
+                        factory.GetValueSyntax(target.Right)
+                    )
+                    .Apply
+                    ((statements, cleanup)
+                        => (ValueSyntax)new CompoundSyntax(statements, cleanup, target)
+                    );
         }
 
         class DeclarationMarkHandler : DumpableObject, IDeclarerProvider
@@ -72,12 +99,6 @@ namespace Reni.TokenClasses
                     )
                     .Apply((left, other) => Combine(left, other, target));
             }
-        }
-
-        class ColonHandler : DumpableObject, IProvider
-        {
-            Result<Syntax> IProvider.Get(BinaryTree target, SyntaxFactory factory)
-                => Result<Syntax>.From(factory.ToDeclaration(target));
         }
 
         class DefinableHandler : DumpableObject, IDeclarerProvider, IValueProvider
@@ -137,8 +158,9 @@ namespace Reni.TokenClasses
         internal static readonly IValueProvider InfixPrefix = new InfixHandler(hasRight: true);
         internal static readonly IValueProvider Infix = new InfixHandler(true, true);
 
-        internal static readonly IProvider List = new ListHandler();
-        internal static readonly IProvider Colon = new ColonHandler();
+        internal static readonly IDeclarationsProvider List = new ListHandler();
+        internal static readonly IDeclarationsProvider Colon = new ColonHandler();
+        internal static readonly IValueProvider Cleanup = new CleanupHandler();
 
         internal static readonly IDeclarerProvider DeclarationMark = new DeclarationMarkHandler();
         internal static readonly IDeclarerProvider DefinableAsDeclarer = new DefinableHandler();
@@ -154,28 +176,32 @@ namespace Reni.TokenClasses
 
         bool IDefaultScopeProvider.MeansPublic => MeansPublic;
 
-        static Result<Syntax> EmptyListIfNull(BinaryTree target) => new EmptyList(target);
-
-        Result<CompoundSyntax> GetCompoundSyntax(BinaryTree target)
-            => target == null
-                ? null
-                : GetSyntax(target).Apply(syntax => syntax.ToCompoundSyntax());
+        static Result<ValueSyntax> EmptyListIfNull(BinaryTree target) => new EmptyList(target);
 
         Result<Syntax> GetSyntax(BinaryTree target, Func<Result<Syntax>> onNull = null)
         {
             if(target == null)
                 return onNull?.Invoke();
 
-            if(target.TokenClass is IToken token)
-                return token.Provider.Get(target, GetCurrentFactory(target.TokenClass));
+            var valueToken = target.TokenClass as IValueToken;
+            var declarationsToken = target.TokenClass as IDeclarationsToken;
 
-            if(target.TokenClass is IValueToken valueToken)
+            Tracer.Assert(
+                (valueToken== null? 0:1)+
+                (declarationsToken== null? 0:1) 
+                == 1);
+            
+            if(valueToken != null)
                 return Result<Syntax>.From(valueToken.Provider.Get(target, GetCurrentFactory(target.TokenClass)));
+
+            if(declarationsToken != null)
+                return Result<Syntax>.From(
+                    declarationsToken.Provider.Get(target, GetCurrentFactory(target.TokenClass))
+                        .Apply(list=> new CompoundSyntax(list, null, target)));
 
             NotImplementedMethod(target, onNull);
             return default;
         }
-
 
         Result<DeclarerSyntax> GetDeclarerSyntax(BinaryTree target, Func<Result<DeclarerSyntax>> onNull = null)
         {
@@ -189,16 +215,49 @@ namespace Reni.TokenClasses
             return default;
         }
 
+        Result<DeclarationSyntax[]> GetDeclarationsSyntax(BinaryTree target)
+        {
+            if(target == null)
+                return new DeclarationSyntax[0];
+
+            return GetValueLikeSyntax(
+                target,
+                value => value.ToDeclarationsSyntax(),
+                i => i);
+        }
+
         internal Result<ValueSyntax> GetValueSyntax(BinaryTree target, Func<Result<ValueSyntax>> onNull = null)
         {
             if(target == null)
                 return onNull?.Invoke();
 
-            if(target.TokenClass is IValueToken token)
-                return token.Provider.Get(target, GetCurrentFactory(target.TokenClass));
+            return GetValueLikeSyntax(
+                target,
+                value => value,
+                list => (ValueSyntax)new CompoundSyntax(list, null, null));
+        }
 
+        Result<TResult> GetValueLikeSyntax<TResult>
+            (BinaryTree target
+            , Func<ValueSyntax, TResult> fromValueSyntax
+            , Func<DeclarationSyntax[], TResult> fromDeclarationsSyntax
+            )
+            where TResult : class
+        {
+            var factory = GetCurrentFactory(target.TokenClass);
+            var valueToken = target.TokenClass as IValueToken;
+            var declarationsToken = target.TokenClass as IDeclarationsToken;
 
-            NotImplementedMethod(target, onNull);
+            Tracer.Assert(!(valueToken != null && declarationsToken != null));
+
+            if(valueToken != null)
+                return valueToken.Provider.Get(target, factory)
+                    .Apply(fromValueSyntax);
+            
+            if(declarationsToken != null)
+                return declarationsToken.Provider.Get(target, factory)
+                    .Apply(fromDeclarationsSyntax);
+            NotImplementedMethod(target, fromValueSyntax,fromDeclarationsSyntax);
             return default;
         }
 
@@ -215,15 +274,6 @@ namespace Reni.TokenClasses
                 ? namePart
                 : left.Apply(left => left.Combine(namePart, target));
         }
-
-        Result<DeclarationSyntax> ToDeclaration(BinaryTree target)
-            =>
-                (
-                    GetDeclarerSyntax(target.Left),
-                    target.Right == null? null : GetValueSyntax(target.Right)
-                )
-                .Apply(
-                    (declarerSyntax, valueSyntax) => new DeclarationSyntax(declarerSyntax, target, valueSyntax));
 
         Result<DeclarerSyntax> ToDeclarer(BinaryTree root, BinaryTree target)
         {

@@ -28,7 +28,7 @@ namespace Reni.Struct
         [EnableDump]
         readonly DeclarationSyntax[] Statements;
 
-        CompoundSyntax(DeclarationSyntax[] statements, ValueSyntax cleanupSection, BinaryTree target)
+        internal CompoundSyntax(DeclarationSyntax[] statements, ValueSyntax cleanupSection, BinaryTree target)
             : base(NextObjectId++, target)
         {
             Statements = statements;
@@ -86,9 +86,6 @@ namespace Reni.Struct
             => Statements
                 .SelectMany((s, i) => s.IsConverterSyntax? new[] {i} : new int[0])
                 .ToArray();
-
-        internal static Result<CompoundSyntax> Create(DeclarationSyntax[] statements, BinaryTree root)
-            => new CompoundSyntax(statements, null, root);
 
         internal static Result<ValueSyntax> Create(Result<Statement> statement, BinaryTree binaryTree)
             => new Result<ValueSyntax>(new CompoundSyntax(new[] {statement.Target}, null, binaryTree)
@@ -168,11 +165,14 @@ namespace Reni.Struct
             return context.RootContext.VoidType.Result(category);
         }
 
-        IEnumerable<int> IndexList(Func<DeclarationSyntax, bool> selector)
+        IEnumerable<int> IndexList(Func<DeclarerSyntax, bool> selector)
         {
             for(var index = 0; index < Statements.Length; index++)
-                if(selector(Statements[index]))
+            {
+                var declarer = Statements[index].Declarer;
+                if(declarer != null && selector(declarer))
                     yield return index;
+            }
         }
 
         string DumpDataToFile()

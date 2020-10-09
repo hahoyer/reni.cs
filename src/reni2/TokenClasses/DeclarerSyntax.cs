@@ -56,6 +56,15 @@ namespace Reni.TokenClasses
             }
         }
 
+        [DisableDump]
+        internal bool IsMixInSyntax => Tags.Any(item => item.Value is MixInDeclarationToken);
+
+        [DisableDump]
+        internal bool IsConverterSyntax => Tags.Any(item => item.Value is ConverterToken);
+
+        [DisableDump]
+        internal bool IsMutableSyntax => Tags.Any(item => item.Value is MutableDeclarationToken);
+
         protected override IEnumerable<Syntax> GetChildren()
         {
             yield return Name;

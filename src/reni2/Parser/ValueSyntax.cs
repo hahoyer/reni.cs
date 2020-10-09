@@ -80,5 +80,7 @@ namespace Reni.Parser
 
         protected override Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree target = null)
             => new DeclarationSyntax(null, target, this).ToCompoundSyntax(null);
+
+        internal override DeclarationSyntax[] ToDeclarationsSyntax(BinaryTree target = null) => T(new DeclarationSyntax(null, target, this));
     }
 }

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using hw.DebugFormatter;
 using Reni.Parser;
 using Reni.Struct;
@@ -11,28 +10,23 @@ namespace Reni.TokenClasses
         internal readonly DeclarerSyntax Declarer;
         internal readonly ValueSyntax Value;
 
-        public DeclarationSyntax
-            (DeclarerSyntax declarer, BinaryTree target, ValueSyntax value)
+        public DeclarationSyntax(DeclarerSyntax declarer, BinaryTree target, ValueSyntax value)
             : base(target)
         {
+            Tracer.ConditionalBreak(value == null &&
+                                    (declarer == null || declarer.Tags == null && declarer.Name == null));
             Declarer = declarer;
             Value = value;
         }
 
         [DisableDump]
-        internal bool IsMixInSyntax => Declarer.Tags.Any(item => item.Value is MixInDeclarationToken);
-
-        [DisableDump]
-        internal bool IsConverterSyntax => Declarer.Tags.Any(item => item.Value is ConverterToken);
-
-        [DisableDump]
-        internal bool IsMutableSyntax => Declarer.Tags.Any(item => item.Value is MutableDeclarationToken);
-
-        [DisableDump]
-        internal bool IsPublic => Declarer.IsPublic;
-
-        [DisableDump]
         internal string NameOrNull => Declarer?.Name.Value;
+
+        [DisableDump]
+        internal bool IsConverterSyntax => Declarer?.IsConverterSyntax ?? false;
+
+        [DisableDump]
+        internal bool IsMutableSyntax => Declarer?.IsMutableSyntax ?? false;
 
         protected override IEnumerable<Syntax> GetChildren() => T((Syntax)Declarer, (Syntax)Value);
 
@@ -40,10 +34,10 @@ namespace Reni.TokenClasses
             => ToCompoundSyntax(target).Apply(syntax => syntax.ToValueSyntax());
 
         protected override Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree target)
-            => CompoundSyntax.Create(T(this), target);
+            => new CompoundSyntax(T(this), null, target);
 
         internal bool IsDefining(string name, bool publicOnly)
-            => name != null && NameOrNull == name && (IsPublic || !publicOnly);
+            => name != null && NameOrNull == name && (!publicOnly || Declarer.IsPublic);
 
         internal DeclarationSyntax Visit(ISyntaxVisitor visitor)
         {
