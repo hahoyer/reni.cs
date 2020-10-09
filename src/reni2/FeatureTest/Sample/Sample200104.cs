@@ -18,9 +18,6 @@ namespace Reni.FeatureTest.Sample
         {
             var issueArray = issues.ToArray();
             var i = 0;
-            var issueBase = issueArray[i];
-            Tracer.Assert(issueBase.IssueId == IssueId.InvalidListOperandSequence, issueBase.Dump);
-            i++;
             Tracer.Assert(i == issueArray.Length);
         }
     }

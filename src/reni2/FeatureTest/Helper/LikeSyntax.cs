@@ -87,7 +87,6 @@ namespace Reni.FeatureTest.Helper
             Tracer.Assert(target.Left.TokenClass.IsBelongingTo(target.TokenClass));
         }
 
-        [Obsolete("", true)]
         internal override void AssertLike(ValueSyntax syntax)
             => Tracer.Assert(syntax is EmptyList);
     }
@@ -161,7 +160,6 @@ namespace Reni.FeatureTest.Helper
             _s3 = s3;
         }
 
-        [Obsolete("", true)]
         static void AssertLike(LikeSyntax syntax, ValueSyntax right)
         {
             if(syntax == null)
@@ -185,7 +183,6 @@ namespace Reni.FeatureTest.Helper
             AssertLike(_s3, target.Right);
         }
 
-        [Obsolete("", true)]
         internal override void AssertLike(ValueSyntax syntax)
         {
             var ex = (ExpressionSyntax)syntax;
@@ -208,7 +205,6 @@ namespace Reni.FeatureTest.Helper
             Tracer.Assert(terminalSyntax.ToNumber == _i);
         }
 
-        [Obsolete("", true)]
         internal override void AssertLike(ValueSyntax syntax)
         {
             var terminalSyntax = (TerminalSyntax)syntax;
