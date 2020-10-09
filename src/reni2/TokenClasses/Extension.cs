@@ -1,12 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
-using hw.DebugFormatter;
 using hw.Helper;
 using Reni.Parser;
 
 namespace Reni.TokenClasses
 {
-    static partial class Extension
+    static class Extension
     {
         internal static BinaryTree[] Combine(this IEnumerable<IEnumerable<BinaryTree>> targets)
         {
@@ -16,6 +15,7 @@ namespace Reni.TokenClasses
                 .ToArray();
         }
 
-        internal static Result<ValueSyntax> ToFrame(this Result<ValueSyntax> target) => target;
+        internal static Result<ValueSyntax> ToFrame(this Result<ValueSyntax> target)
+            => Result<ValueSyntax>.From(target.Apply(expression => expression.ToCompoundSyntax()));
     }
 }
