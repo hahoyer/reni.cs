@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using hw.DebugFormatter;
 using Reni.Parser;
 using Reni.Struct;
@@ -28,7 +27,16 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal bool IsMutableSyntax => Declarer?.IsMutableSyntax ?? false;
 
-        protected override IEnumerable<Syntax> GetDirectChildren() => T((Syntax)Declarer, (Syntax)Value);
+        protected override int DirectNodeCount => 3;
+
+        protected override Syntax GetDirectNode(int index)
+            => index switch
+            {
+                0 => Declarer
+                , 1 => this
+                , 2 => Value
+                , _ => null
+            };
 
         internal override Result<ValueSyntax> ToValueSyntax(BinaryTree target)
             => ToCompoundSyntax(target).Apply(syntax => syntax.ToValueSyntax());

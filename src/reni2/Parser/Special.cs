@@ -53,10 +53,18 @@ namespace Reni.Parser
             Right = right;
         }
 
+        protected override int DirectNodeCount => 2;
+
         public static Result<ValueSyntax> Create(IPrefix prefix, Result<ValueSyntax> right, BinaryTree binaryTree)
             => new PrefixSyntax(prefix, right.Target, binaryTree).AddIssues<ValueSyntax>(right.Issues);
 
-        protected override IEnumerable<Syntax> GetDirectChildren() => T(Right);
+        protected override Syntax GetDirectNode(int index)
+            => index switch
+            {
+                0 => this
+                , 1 => Right
+                , _ => null
+            };
 
         internal override Result ResultForCache(ContextBase context, Category category) => Prefix
             .Result(context, category, Right, Target);
@@ -89,14 +97,23 @@ namespace Reni.Parser
 
         internal override IRecursionHandler RecursionHandler => Infix as IRecursionHandler;
 
+        protected override int DirectNodeCount => 3;
+
+        protected override Syntax GetDirectNode(int index)
+            => index switch
+            {
+                0 => Left
+                , 1 => this
+                , 2 => Right
+                , _ => null
+            };
+
         public static Result<ValueSyntax> Create
             (Result<ValueSyntax> left, IInfix infix, Result<ValueSyntax> right, BinaryTree binaryTree)
         {
             ValueSyntax syntax = new InfixSyntax(left.Target, infix, right.Target, binaryTree);
             return syntax.AddIssues(left.Issues.plus(right.Issues));
         }
-
-        protected override IEnumerable<Syntax> GetDirectChildren() => T(Left, Right);
 
         internal override Result ResultForCache(ContextBase context, Category category) => Infix
             .Result(context, category, Left, Right);
@@ -136,13 +153,20 @@ namespace Reni.Parser
             Suffix = suffix;
         }
 
+        protected override int DirectNodeCount => 2;
+
+        protected override Syntax GetDirectNode(int index)
+            => index switch
+            {
+                0 => Left
+                , 1 => this
+                , _ => null
+            };
         public static Result<ValueSyntax> Create(Result<ValueSyntax> left, ISuffix suffix, BinaryTree binaryTree)
         {
             ValueSyntax syntax = new SuffixSyntax(left.Target, suffix, binaryTree);
             return syntax.AddIssues(left.Issues);
         }
-
-        protected override IEnumerable<Syntax> GetDirectChildren() => T(Left);
 
         internal override Result ResultForCache(ContextBase context, Category category)
             => Suffix.Result(context, category, Left);

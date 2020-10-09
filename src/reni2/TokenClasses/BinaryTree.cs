@@ -11,7 +11,7 @@ using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
-    public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer, IBinaryTree<BinaryTree>
+    public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer, ITree<BinaryTree>
     {
         interface IVisitor
         {
@@ -67,16 +67,12 @@ namespace Reni.TokenClasses
         }
 
 
-
         [DisableDump]
         internal SourcePart SourcePart =>
             LeftMost.Token.SourcePart().Start.Span(RightMost.Token.Characters.End);
 
         BinaryTree LeftMost => Left?.LeftMost ?? this;
         BinaryTree RightMost => Right?.RightMost ?? this;
-
-        [DisableDump]
-        internal IEnumerable<BinaryTree> Items => this.CachedValue(GetItems);
 
         [DisableDump]
         internal IEnumerable<Issue> Issues
@@ -89,13 +85,21 @@ namespace Reni.TokenClasses
             }
         }
 
-        BinaryTree IBinaryTree<BinaryTree>.Left => Left;
-        BinaryTree IBinaryTree<BinaryTree>.Right => Right;
-
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
         SourcePart ISyntax.All => SourcePart;
         SourcePart ISyntax.Main => Token.Characters;
+
+        int ITree<BinaryTree>.DirectNodeCount => 3;
+
+        BinaryTree ITree<BinaryTree>.GetDirectNode(int index)
+            => index switch
+            {
+                0 => Left
+                , 1 => this
+                , 2 => Right
+                , _ => null
+            };
 
         void Visit(IVisitor visitor)
         {
@@ -224,19 +228,6 @@ namespace Reni.TokenClasses
 
             NotImplementedFunction(target.Dump(), other.Dump(), differenceHandler);
             return default;
-        }
-
-        IEnumerable<BinaryTree> GetItems()
-        {
-            if(Left != null)
-                foreach(var sourceSyntax in Left.Items)
-                    yield return sourceSyntax;
-
-            yield return this;
-
-            if(Right != null)
-                foreach(var sourceSyntax in Right.Items)
-                    yield return sourceSyntax;
         }
 
         Result<BinaryTree> GetBracketKernel(int level)

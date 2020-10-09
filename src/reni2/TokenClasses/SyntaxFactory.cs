@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
+using Reni.Helper;
 using Reni.Parser;
 using Reni.Struct;
 using Reni.Validation;
@@ -371,7 +372,7 @@ namespace Reni.TokenClasses
 
         Result<DeclarerSyntax> GetDeclarationTags(BinaryTree target)
             => target
-                .Items
+                .GetNodesFromLeftToRight()
                 .Select(GetDeclarationTag)
                 .Aggregate(DeclarerSyntax.Empty, (left, right) => Combine(left, right, target));
     }

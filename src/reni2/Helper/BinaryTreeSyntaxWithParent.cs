@@ -7,9 +7,7 @@ using Reni.TokenClasses;
 
 namespace Reni.Helper
 {
-    abstract class BinaryTreeSyntaxWithParent<TResult>
-        : BinaryTreeWithParentExtended<TResult, BinaryTree>
-            , IBinaryTree<TResult>
+    abstract class BinaryTreeSyntaxWithParent<TResult> : TreeWithParentExtended<TResult, BinaryTree>
         where TResult : BinaryTreeSyntaxWithParent<TResult>
     {
         protected BinaryTreeSyntaxWithParent(BinaryTree target, TResult parent)
@@ -33,10 +31,15 @@ namespace Reni.Helper
         }
 
         [EnableDump]
-        internal ITokenClass TokenClass => Target.TokenClass;
+        [EnableDumpExcept(null)]
+        public TResult Left => ((ITree<TResult>)this).GetDirectNode(0);
 
-        TResult IBinaryTree<TResult>.Left => Left;
-        TResult IBinaryTree<TResult>.Right => Right;
+        [EnableDump]
+        [EnableDumpExcept(null)]
+        public TResult Right => ((ITree<TResult>)this).GetDirectNode(2);
+
+        [EnableDump]
+        internal ITokenClass TokenClass => Target.TokenClass;
 
         internal bool Contains(int current)
             => SourcePart.Position <= current && current < SourcePart.EndPosition;

@@ -25,6 +25,7 @@ namespace Reni.Struct
 
         [EnableDump]
         readonly ValueSyntax CleanupSection;
+
         [EnableDump]
         readonly DeclarationSyntax[] Statements;
 
@@ -74,7 +75,7 @@ namespace Reni.Struct
         [DisableDump]
         internal string[] AllNames => Statements
             .Select(s => s.NameOrNull)
-            .Where(name=>name!= null)
+            .Where(name => name != null)
             .ToArray();
 
         [DisableDump]
@@ -82,6 +83,8 @@ namespace Reni.Struct
             => Statements
                 .SelectMany((s, i) => s.IsConverterSyntax? new[] {i} : new int[0])
                 .ToArray();
+
+        protected override int DirectNodeCount => Statements.Length + 2;
 
         public string GetCompoundIdentificationDump() => "." + ObjectId + "i";
 
@@ -97,8 +100,36 @@ namespace Reni.Struct
         protected override string GetNodeDump()
             => GetType().PrettyName() + "(" + GetCompoundIdentificationDump() + ")";
 
-        protected override IEnumerable<Syntax> GetDirectChildren()
-            => T(Statements.Cast<Syntax>(), T(CleanupSection)).Concat();
+        protected override Syntax GetDirectNode(int index)
+        {
+            if(!Statements.Any())
+                return index switch
+                {
+                    0 => this
+                    , 1 => CleanupSection
+                    , _ => null
+                };
+            
+            if(CleanupSection == null)
+            {
+                return index switch
+                {
+                    0 => Statements[0]
+                    , 1 => this
+                    , _ => index <= Statements.Length? Statements[index - 1] : null
+                };
+            }
+
+            var delta = index - Statements.Length;
+
+            return delta switch
+            {
+                0 => this
+                , 1 => CleanupSection
+                , _ => delta < 0? Statements[index] : null
+            };
+
+        }
 
         internal bool IsMutable(int position) => Statements[position].IsMutableSyntax;
 

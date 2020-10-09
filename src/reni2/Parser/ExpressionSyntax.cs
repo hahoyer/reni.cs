@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using Reni.Basics;
@@ -55,11 +54,20 @@ namespace Reni.Parser
             StopByObjectIds();
         }
 
+        protected override int DirectNodeCount => 3;
+
+        protected override Syntax GetDirectNode(int index)
+            => index switch
+            {
+                0 => Left
+                , 1 => this
+                , 2 => Right
+                , _ => null
+            };
+
         internal static Result<ExpressionSyntax> Create
             (BinaryTree target, ValueSyntax left, Definable definable, ValueSyntax right)
             => new ExpressionSyntax(target, left, definable, right);
-
-        protected override IEnumerable<Syntax> GetDirectChildren() => T(Left, Right);
 
         internal override Result ResultForCache(ContextBase context, Category category)
         {

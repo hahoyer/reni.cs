@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using hw.DebugFormatter;
 using hw.Helper;
@@ -22,7 +23,10 @@ namespace Reni.Parser
             protected NoChildren(int objectId, BinaryTree target)
                 : base(objectId, target) { }
 
-            protected sealed override IEnumerable<Syntax> GetDirectChildren() => new Syntax[0];
+            protected sealed override int DirectNodeCount => 0;
+
+            protected sealed override Syntax GetDirectNode(int index) 
+                => throw new Exception($"Unexpected call: {nameof(GetDirectNode)}({index})");
         }
 
         // Used for debug only

@@ -95,16 +95,10 @@ namespace ReniUI.Helper
             return default;
         }
 
-
         IEnumerable<Syntax> GetItems()
         {
-            var left = LeftChildren
-                .SelectMany(item => item?.Items ?? new Syntax[0]);
-
-            var right = RightChildren
-                .SelectMany(item => item?.Items ?? new Syntax[0]);
-
-            return T(left, T(this), right).Concat();
+            NotImplementedMethod();
+            return default;
         }
 
         Syntax CheckedLocate(SourcePart part)

@@ -30,7 +30,17 @@ namespace Reni
             Else = elseSyntax;
         }
 
-        protected override IEnumerable<Syntax> GetDirectChildren() => T(Cond, Then,Else);
+        protected override int DirectNodeCount => 4;
+
+        protected override Syntax GetDirectNode(int index)
+            => index switch
+            {
+                0 => Cond
+                , 1 => Else == null ? this: Then
+                , 2 => Else == null ? Then: this
+                , 3 => Else 
+                , _ => null
+            };
 
         internal override Result ResultForCache(ContextBase context, Category category)
             => InternalResult(context, category);

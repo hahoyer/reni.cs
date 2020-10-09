@@ -1,17 +1,16 @@
 using System.Collections.Generic;
+using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 
 namespace Reni.Helper
 {
-    abstract class TreeWithParent<TResult, TTarget>
-        : DumpableObject
-            , ValueCache.IContainer
+    abstract class TreeWithParent<TResult, TTarget> : DumpableObject, ValueCache.IContainer
         where TTarget : ITree<TTarget>
         where TResult : TreeWithParent<TResult, TTarget>
     {
-        public readonly TResult Parent;
-        public readonly TTarget Target;
+        internal readonly TResult Parent;
+        internal readonly TTarget Target;
 
         protected TreeWithParent(TTarget target, TResult parent)
         {
@@ -19,14 +18,21 @@ namespace Reni.Helper
             Parent = parent;
         }
 
-        internal IEnumerable<TResult> Children => Target.ChildrenCount.Select(Child);
+        internal IEnumerable<TResult> DirectChildren
+            => Target.DirectNodeCount.Select(GetDirectNode).Where(child => child != null);
+
+        TResult Center => this as TResult;
+
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
         protected abstract TResult Create(TTarget target, TResult parent);
 
-        internal TResult Child(int index)
-            => Target.Child(index) == null
-                ? null
-                : this.CachedFunction(index, index => Create(Target.Child(index), (TResult)this));
+        protected TResult GetDirectNode(int index)
+        {
+            var node = Target.GetDirectNode(index);
+            return node == null? null :
+                ReferenceEquals(node, Target)? Center :
+                this.CachedFunction(index, index => Create(node, Center));
+        }
     }
 }

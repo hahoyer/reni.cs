@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using hw.Helper;
 using Reni.Basics;
 using Reni.Context;
@@ -38,7 +37,16 @@ namespace Reni.TokenClasses
 
         internal override bool IsLambda => true;
 
-        protected override IEnumerable<Syntax> GetDirectChildren() => T(Getter, Setter);
+        protected override int DirectNodeCount => 3;
+
+        protected override Syntax GetDirectNode(int index)
+            => index switch
+            {
+                0 => Getter
+                , 1 => this
+                , 2 => Setter
+                , _ => null
+            };
 
         internal override Result ResultForCache(ContextBase context, Category category)
             => context

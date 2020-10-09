@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
@@ -18,30 +17,18 @@ namespace ReniUI.Formatting
             internal ValueCache<SplitMaster> SplitMaster;
         }
 
-        static TContainer FlatSubFormat<TContainer, TValue>(BinaryTreeSyntax left, bool areEmptyLinesPossible)
-            where TContainer : class, IFormatResult<TValue>, new()
-            => left == null ? new TContainer() : left.FlatFormat<TContainer, TValue>(areEmptyLinesPossible);
-
         readonly CacheContainer Cache = new CacheContainer();
 
-        internal BinaryTreeSyntax(Reni.TokenClasses.BinaryTree target)
-            : this(target, null) {}
+        internal BinaryTreeSyntax(BinaryTree target)
+            : this(target, null) { }
 
-        BinaryTreeSyntax(Reni.TokenClasses.BinaryTree target, BinaryTreeSyntax parent)
+        BinaryTreeSyntax(BinaryTree target, BinaryTreeSyntax parent)
             : base(target, parent)
         {
             Tracer.Assert(Target != null);
             Cache.SplitItem = new ValueCache<SplitItem>(GetSplitItem);
             Cache.SplitMaster = new ValueCache<SplitMaster>(GetSplitMaster);
         }
-
-        [EnableDump]
-        [EnableDumpExcept(null)]
-        public new BinaryTreeSyntax Left => base.Left;
-
-        [EnableDump]
-        [EnableDumpExcept(null)]
-        public new BinaryTreeSyntax Right => base.Right;
 
         [DisableDump]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -62,7 +49,11 @@ namespace ReniUI.Formatting
         internal bool IsSeparatorRequired
             => !WhiteSpaces.HasComment() && SeparatorExtension.Get(LeftNeighbor?.TokenClass, TokenClass);
 
-        protected override BinaryTreeSyntax Create(Reni.TokenClasses.BinaryTree target, BinaryTreeSyntax parent)
+        static TContainer FlatSubFormat<TContainer, TValue>(BinaryTreeSyntax left, bool areEmptyLinesPossible)
+            where TContainer : class, IFormatResult<TValue>, new()
+            => left == null? new TContainer() : left.FlatFormat<TContainer, TValue>(areEmptyLinesPossible);
+
+        protected override BinaryTreeSyntax Create(BinaryTree target, BinaryTreeSyntax parent)
             => new BinaryTreeSyntax(target, parent);
 
         SplitMaster GetSplitMaster()
@@ -73,7 +64,8 @@ namespace ReniUI.Formatting
                     switch(Parent.TokenClass)
                     {
                         case BeginOfText _:
-                        case EndOfText _: return SplitMaster.List[tokenClass];
+                        case EndOfText _:
+                            return SplitMaster.List[tokenClass];
                         case List _:
                             Tracer.Assert(tokenClass == Parent.TokenClass);
                             return null;
@@ -85,8 +77,10 @@ namespace ReniUI.Formatting
                 case Colon tokenClass:
                     switch(Parent.TokenClass)
                     {
-                        case Colon _: return null;
-                        default: return SplitMaster.Colon[tokenClass];
+                        case Colon _:
+                            return null;
+                        default:
+                            return SplitMaster.Colon[tokenClass];
                     }
 
                 case RightParenthesis tokenClass:
@@ -95,7 +89,8 @@ namespace ReniUI.Formatting
                         Left?.TokenClass is RightParenthesis && Left.TokenClass.IsBelongingTo(tokenClass)
                     );
                     return SplitMaster.Parenthesis[Left.TokenClass];
-                default: return null;
+                default:
+                    return null;
             }
         }
 
@@ -104,7 +99,8 @@ namespace ReniUI.Formatting
             switch(TokenClass)
             {
                 case BeginOfText _:
-                case EndOfText _: return null;
+                case EndOfText _:
+                    return null;
                 case LeftParenthesis tokenClass:
                     Tracer.Assert(Parent.TokenClass.IsBelongingTo(tokenClass));
                     return SplitItem.LeftParenthesis[tokenClass];
@@ -113,17 +109,19 @@ namespace ReniUI.Formatting
             switch(Parent.TokenClass)
             {
                 case BeginOfText _:
-                case EndOfText _: return null;
+                case EndOfText _:
+                    return null;
                 case Colon tokenClass:
                     Tracer.Assert(!(TokenClass is Colon));
-                    return IsLeftChild ? SplitItem.ColonLabel[tokenClass] : SplitItem.ColonBody[tokenClass];
-                case LeftParenthesis tokenClass: return SplitItem.List[tokenClass];
+                    return IsLeftChild? SplitItem.ColonLabel[tokenClass] : SplitItem.ColonBody[tokenClass];
+                case LeftParenthesis tokenClass:
+                    return SplitItem.List[tokenClass];
                 case List tokenClass:
                     var master = Parent
                         .Chain(target => target.Parent)
                         .SkipWhile(target => target.TokenClass == tokenClass)
                         .First();
-                    var masterTokenClass = master.TokenClass is LeftParenthesis ? master.TokenClass : tokenClass;
+                    var masterTokenClass = master.TokenClass is LeftParenthesis? master.TokenClass : tokenClass;
                     return SplitItem.List[masterTokenClass];
                 default:
                     NotImplementedMethod(nameof(Parent), Parent);
@@ -135,19 +133,19 @@ namespace ReniUI.Formatting
             where TContainer : class, IFormatResult<TValue>, new()
         {
             var tokenString = Token.Characters
-                .FlatFormat(Left == null? null:WhiteSpaces, areEmptyLinesPossible);
+                .FlatFormat(Left == null? null : WhiteSpaces, areEmptyLinesPossible);
 
             if(tokenString == null)
                 return null;
 
-            tokenString = (IsSeparatorRequired ? " " : "") + tokenString;
+            tokenString = (IsSeparatorRequired? " " : "") + tokenString;
 
             var leftResult = FlatSubFormat<TContainer, TValue>(Left, areEmptyLinesPossible);
             if(leftResult == null)
                 return null;
 
             var rightResult = FlatSubFormat<TContainer, TValue>(Right, areEmptyLinesPossible);
-            return rightResult == null ? null : leftResult.Concat(tokenString, rightResult);
+            return rightResult == null? null : leftResult.Concat(tokenString, rightResult);
         }
 
         /// <summary>

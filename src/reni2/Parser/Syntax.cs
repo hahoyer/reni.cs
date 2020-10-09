@@ -1,5 +1,4 @@
-using System.Collections.Generic;
-using System.Linq;
+using System;
 using hw.DebugFormatter;
 using hw.Helper;
 using Reni.Helper;
@@ -21,7 +20,10 @@ namespace Reni.Parser
             protected NoChildren(int objectId, BinaryTree target)
                 : base(objectId, target) { }
 
-            protected sealed override IEnumerable<Syntax> GetDirectChildren() => new Syntax[0];
+            protected sealed override int DirectNodeCount => 0;
+
+            protected sealed override Syntax GetDirectNode(int index) 
+                => throw new Exception($"Unexpected call: {nameof(GetDirectNode)}({index})");
         }
 
         internal readonly BinaryTree Target;
@@ -32,14 +34,14 @@ namespace Reni.Parser
             : base(objectId)
             => Target = target;
 
-        internal Syntax[] Children => this.CachedValue(() => GetDirectChildren().ToArray());
+        protected abstract int DirectNodeCount { get; }
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
-        Syntax ITree<Syntax>.Child(int index) => Children[index];
-        int ITree<Syntax>.ChildrenCount => Children.Length;
-        protected abstract IEnumerable<Syntax> GetDirectChildren();
+        int ITree<Syntax>.DirectNodeCount => DirectNodeCount;
+        Syntax ITree<Syntax>.GetDirectNode(int index) => GetDirectNode(index);
+        protected abstract Syntax GetDirectNode(int index);
 
-        internal virtual Result<ValueSyntax> ToValueSyntax(BinaryTree target= null)
+        internal virtual Result<ValueSyntax> ToValueSyntax(BinaryTree target = null)
         {
             if(GetType().Is<ValueSyntax>())
                 return (ValueSyntax)this;
@@ -53,7 +55,7 @@ namespace Reni.Parser
                 ? compoundSyntax
                 : ToCompoundSyntaxHandler(target);
 
-        protected virtual Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree target= null)
+        protected virtual Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree target = null)
         {
             NotImplementedMethod(target);
             return default;
