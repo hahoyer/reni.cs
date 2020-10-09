@@ -8,7 +8,7 @@ namespace Reni.TokenClasses
     [Variant(0)]
     [Variant(1)]
     [Variant(2)]
-    sealed class List : TokenClass, IBelongingsMatcher, IStatementsProvider, SyntaxFactory.IDeclarationsToken
+    sealed class List : TokenClass, IBelongingsMatcher, SyntaxFactory.IDeclarationsToken
     {
         [DisableDump]
         internal readonly int Level;

@@ -215,7 +215,6 @@
     <Compile Include="ParserTest\AlternativePrioTableTest.cs" />
     <Compile Include="ParserTest\VerbatimText.cs" />
     <Compile Include="ParserTest\StrangeDeclarationSyntax.cs" />
-    <Compile Include="Parser\Declarer.cs" />
     <Compile Include="Parser\IRecursionHandler.cs" />
     <Compile Include="Parser\ISyntaxScope.cs" />
     <Compile Include="Parser\ISyntaxVisitor.cs" />
@@ -231,7 +230,6 @@
     <Compile Include="Parser\Extension.cs" />
     <Compile Include="Parser\ExclamationBoxToken.cs" />
     <Compile Include="Parser\Lexer.cs" />
-    <Compile Include="Parser\Statements.cs" />
     <Compile Include="ResultCache.cs" />
     <Compile Include="Code\Arg.cs" />
     <Compile Include="Code\Assign.cs" />
@@ -293,7 +291,7 @@
     <Compile Include="FeatureTest\Text.cs" />
     <Compile Include="Feature\DumpPrintToken.cs" />
     <Compile Include="Feature\Interfaces.cs" />
-    <Compile Include="Parser\Statement.cs" />
+    <Compile Include="Parser\IDefaultScopeProvider.cs" />
     <Compile Include="Parser\DeclarationTokenFactory.cs" />
     <Compile Include="Parser\DefinableToken.cs" />
     <Compile Include="Parser\ExpressionSyntax.cs" />
@@ -337,15 +335,11 @@
     <Compile Include="TokenClasses\DeclarerSyntax.cs" />
     <Compile Include="TokenClasses\EndOfText.cs" />
     <Compile Include="TokenClasses\Extension.cs" />
-    <Compile Include="TokenClasses\FrameSyntax.cs" />
     <Compile Include="TokenClasses\IBelongingsMatcher.cs" />
     <Compile Include="TokenClasses\IComparator.cs" />
     <Compile Include="TokenClasses\IDeclarationItem.cs" />
     <Compile Include="TokenClasses\IFormatItem.cs" />
-    <Compile Include="TokenClasses\IStatementProvider.cs" />
-    <Compile Include="TokenClasses\IStatementsProvider.cs" />
     <Compile Include="TokenClasses\ISyntax.cs" />
-    <Compile Include="TokenClasses\IValueProvider.cs" />
     <Compile Include="TokenClasses\PreType.cs" />
     <Compile Include="TokenClasses\ReassignToken.cs" />
     <Compile Include="TokenClasses\Base.cs" />

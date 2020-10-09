@@ -7,25 +7,16 @@ using hw.Parser;
 using hw.Scanner;
 using Reni.Helper;
 using Reni.Parser;
-using Reni.Struct;
 using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
     public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer, IBinaryTree<BinaryTree>
     {
-        class NullScope : DumpableObject, ISyntaxScope, IDefaultScopeProvider
-        {
-            bool IDefaultScopeProvider.MeansPublic => false;
-            IDefaultScopeProvider ISyntaxScope.DefaultScopeProvider => this;
-            bool ISyntaxScope.IsDeclarationPart => false;
-        }
-
         interface IVisitor
         {
             void VisitMain(BinaryTree target);
         }
-
 
         class IssuesVisitor : DumpableObject, IVisitor
         {
@@ -46,8 +37,6 @@ namespace Reni.TokenClasses
         }
 
         static int NextObjectId;
-
-        static readonly ISyntaxScope NullScopeInstance = new NullScope();
 
         [EnableDump]
         [EnableDumpExcept(null)]
@@ -76,6 +65,8 @@ namespace Reni.TokenClasses
             TokenClass = tokenClass;
             Right = right;
         }
+
+
 
         [DisableDump]
         internal SourcePart SourcePart =>
@@ -248,7 +239,7 @@ namespace Reni.TokenClasses
                     yield return sourceSyntax;
         }
 
-        internal Result<BinaryTree> GetBracketKernel(int level)
+        Result<BinaryTree> GetBracketKernel(int level)
         {
             var rightParenthesis = TokenClass as IRightBracket;
             Tracer.Assert(rightParenthesis != null);

@@ -38,7 +38,7 @@ namespace Reni.TokenClasses
 
         internal override bool IsLambda => true;
 
-        protected override IEnumerable<Syntax> GetChildren() => T(Getter, Setter);
+        protected override IEnumerable<Syntax> GetDirectChildren() => T(Getter, Setter);
 
         internal override Result ResultForCache(ContextBase context, Category category)
             => context

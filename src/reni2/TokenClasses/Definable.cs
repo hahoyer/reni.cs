@@ -7,7 +7,7 @@ using Reni.Parser;
 namespace Reni.TokenClasses
 {
     abstract class Definable
-        : TokenClass, IDeclarerTokenClass, IValueProvider, SyntaxFactory.IDeclarerToken, SyntaxFactory.IValueToken
+        : TokenClass, SyntaxFactory.IDeclarerToken, SyntaxFactory.IValueToken
     {
         [DisableDump]
         protected string DataFunctionName => Id.Symbolize();

@@ -7,7 +7,7 @@ namespace Reni.TokenClasses
     [Variant(false, false)]
     [Variant(true, false)]
     [Variant(false, true)]
-    sealed class Function : TokenClass, IValueProvider, SyntaxFactory.IValueToken
+    sealed class Function : TokenClass, SyntaxFactory.IValueToken
     {
         internal readonly bool IsImplicit;
         internal readonly bool IsMetaFunction;

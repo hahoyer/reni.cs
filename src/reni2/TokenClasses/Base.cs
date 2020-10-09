@@ -14,7 +14,7 @@ namespace Reni.TokenClasses
 
     abstract class InfixToken : TokenClass {}
 
-    abstract class TerminalSyntaxToken : TerminalToken, ITerminal, IValueProvider, SyntaxFactory.IValueToken
+    abstract class TerminalSyntaxToken : TerminalToken, ITerminal, SyntaxFactory.IValueToken
     {
         Result ITerminal.Result(ContextBase context, Category category, TerminalSyntax token)
             => Result(context, category, token);
@@ -34,7 +34,7 @@ namespace Reni.TokenClasses
 
     }
 
-    abstract class InfixPrefixSyntaxToken : InfixPrefixToken, IInfix, IPrefix, IValueProvider, SyntaxFactory.IValueToken
+    abstract class InfixPrefixSyntaxToken : InfixPrefixToken, IInfix, IPrefix, SyntaxFactory.IValueToken
     {
         Result IInfix.Result
             (ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
@@ -53,7 +53,7 @@ namespace Reni.TokenClasses
         SyntaxFactory.IValueProvider SyntaxFactory.IValueToken.Provider => SyntaxFactory.InfixPrefix;
     }
 
-    abstract class NonSuffixSyntaxToken : NonSuffixToken, ITerminal, IPrefix, IValueProvider, SyntaxFactory.IValueToken
+    abstract class NonSuffixSyntaxToken : NonSuffixToken, ITerminal, IPrefix, SyntaxFactory.IValueToken
     {
         Result ITerminal.Result(ContextBase context, Category category, TerminalSyntax token)
             => Result(context, category);
@@ -79,7 +79,7 @@ namespace Reni.TokenClasses
         SyntaxFactory.IValueProvider SyntaxFactory.IValueToken.Provider => SyntaxFactory.NonSuffix;
     }
 
-    abstract class SuffixSyntaxToken : SuffixToken, ISuffix, IValueProvider, SyntaxFactory.IValueToken
+    abstract class SuffixSyntaxToken : SuffixToken, ISuffix, SyntaxFactory.IValueToken
     {
         Result ISuffix.Result(ContextBase context, Category category, ValueSyntax left)
             => Result(context, category, left);
@@ -89,7 +89,7 @@ namespace Reni.TokenClasses
         SyntaxFactory.IValueProvider SyntaxFactory.IValueToken.Provider => SyntaxFactory.Suffix;
     }
 
-    abstract class InfixSyntaxToken : InfixToken, IInfix, IValueProvider, SyntaxFactory.IValueToken
+    abstract class InfixSyntaxToken : InfixToken, IInfix, SyntaxFactory.IValueToken
     {
         Result IInfix.Result
             (ContextBase context, Category category, ValueSyntax left, ValueSyntax right)

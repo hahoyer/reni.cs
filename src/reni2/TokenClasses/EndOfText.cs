@@ -8,7 +8,6 @@ namespace Reni.TokenClasses
         : TokenClass
             , IDefaultScopeProvider
             , IBracketMatch<BinaryTree>
-            , IStatementsProvider
             , ISyntaxScope
             , IBelongingsMatcher
             , SyntaxFactory.IValueToken

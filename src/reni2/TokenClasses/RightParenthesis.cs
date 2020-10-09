@@ -7,14 +7,13 @@ namespace Reni.TokenClasses
     [BelongsTo(typeof(MainTokenFactory))]
     sealed class RightParenthesis
         : RightParenthesisBase
-            , IValueProvider
             , IDefaultScopeProvider
             , IBracketMatch<BinaryTree>
             , ISyntaxScope
             , SyntaxFactory.IValueToken
     {
         sealed class Matched
-            : DumpableObject, IParserTokenType<BinaryTree>, ITokenClass, IValueProvider, SyntaxFactory.IValueToken
+            : DumpableObject, IParserTokenType<BinaryTree>, ITokenClass, SyntaxFactory.IValueToken
         {
             static string Id => "()";
 

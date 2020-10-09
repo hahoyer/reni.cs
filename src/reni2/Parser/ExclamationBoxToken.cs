@@ -5,7 +5,7 @@ using Reni.TokenClasses;
 namespace Reni.Parser
 {
     sealed class ExclamationBoxToken
-        : DumpableObject, IParserTokenType<BinaryTree>, ITokenClass, IDeclarerTokenClass, SyntaxFactory.IDeclarerToken
+        : DumpableObject, IParserTokenType<BinaryTree>, ITokenClass, SyntaxFactory.IDeclarerToken
     {
         BinaryTree Value { get; }
         internal ExclamationBoxToken(BinaryTree value) => Value = value;

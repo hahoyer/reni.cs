@@ -10,9 +10,9 @@ namespace Reni.TokenClasses
     {
         internal class TagSyntax : NoChildren
         {
-            internal readonly IDeclarationTag Value;
+            internal readonly SyntaxFactory.IDeclarerToken Value;
 
-            internal TagSyntax(IDeclarationTag value, BinaryTree target)
+            internal TagSyntax(SyntaxFactory.IDeclarerToken value, BinaryTree target)
                 : base(target)
                 => Value = value;
         }
@@ -65,7 +65,7 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal bool IsMutableSyntax => Tags.Any(item => item.Value is MutableDeclarationToken);
 
-        protected override IEnumerable<Syntax> GetChildren()
+        protected override IEnumerable<Syntax> GetDirectChildren()
         {
             yield return Name;
             foreach(var tag in Tags)
@@ -89,4 +89,7 @@ namespace Reni.TokenClasses
                 , Container ?? other.Container);
         }
     }
+
+
+
 }

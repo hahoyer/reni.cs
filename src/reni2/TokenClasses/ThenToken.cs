@@ -4,7 +4,7 @@ using Reni.Parser;
 namespace Reni.TokenClasses
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class ThenToken : InfixToken, IValueProvider, SyntaxFactory.IValueToken
+    sealed class ThenToken : InfixToken, SyntaxFactory.IValueToken
     {
         public const string TokenId = "then";
         public override string Id => TokenId;

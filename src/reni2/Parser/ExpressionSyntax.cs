@@ -5,7 +5,6 @@ using hw.DebugFormatter;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Struct;
 using Reni.TokenClasses;
 
 namespace Reni.Parser
@@ -60,7 +59,7 @@ namespace Reni.Parser
             (BinaryTree target, ValueSyntax left, Definable definable, ValueSyntax right)
             => new ExpressionSyntax(target, left, definable, right);
 
-        protected override IEnumerable<Syntax> GetChildren() => T(Left, Right);
+        protected override IEnumerable<Syntax> GetDirectChildren() => T(Left, Right);
 
         internal override Result ResultForCache(ContextBase context, Category category)
         {

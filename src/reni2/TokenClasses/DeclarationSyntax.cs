@@ -28,7 +28,7 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal bool IsMutableSyntax => Declarer?.IsMutableSyntax ?? false;
 
-        protected override IEnumerable<Syntax> GetChildren() => T((Syntax)Declarer, (Syntax)Value);
+        protected override IEnumerable<Syntax> GetDirectChildren() => T((Syntax)Declarer, (Syntax)Value);
 
         internal override Result<ValueSyntax> ToValueSyntax(BinaryTree target)
             => ToCompoundSyntax(target).Apply(syntax => syntax.ToValueSyntax());

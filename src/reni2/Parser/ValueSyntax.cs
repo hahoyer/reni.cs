@@ -14,6 +14,17 @@ namespace Reni.Parser
     /// </summary>
     abstract class ValueSyntax : Syntax
     {
+        internal new abstract class NoChildren : ValueSyntax
+        {
+            protected NoChildren(BinaryTree target)
+                : base(target) { }
+
+            protected NoChildren(int objectId, BinaryTree target)
+                : base(objectId, target) { }
+
+            protected sealed override IEnumerable<Syntax> GetDirectChildren() => new Syntax[0];
+        }
+
         // Used for debug only
         [DisableDump]
         [Node("Cache")]
@@ -79,7 +90,7 @@ namespace Reni.Parser
             => Type(context).DeclarationOptions;
 
         protected override Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree target = null)
-            => new DeclarationSyntax(null, target, this).ToCompoundSyntax(null);
+            => new DeclarationSyntax(null, target, this).ToCompoundSyntax();
 
         internal override DeclarationSyntax[] ToDeclarationsSyntax(BinaryTree target = null) => T(new DeclarationSyntax(null, target, this));
     }

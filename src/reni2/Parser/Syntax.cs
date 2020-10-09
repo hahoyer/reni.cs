@@ -21,7 +21,7 @@ namespace Reni.Parser
             protected NoChildren(int objectId, BinaryTree target)
                 : base(objectId, target) { }
 
-            protected sealed override IEnumerable<Syntax> GetChildren() => new Syntax[0];
+            protected sealed override IEnumerable<Syntax> GetDirectChildren() => new Syntax[0];
         }
 
         internal readonly BinaryTree Target;
@@ -32,12 +32,12 @@ namespace Reni.Parser
             : base(objectId)
             => Target = target;
 
-        internal Syntax[] Children => this.CachedValue(() => GetChildren().ToArray());
+        internal Syntax[] Children => this.CachedValue(() => GetDirectChildren().ToArray());
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
         Syntax ITree<Syntax>.Child(int index) => Children[index];
         int ITree<Syntax>.ChildrenCount => Children.Length;
-        protected abstract IEnumerable<Syntax> GetChildren();
+        protected abstract IEnumerable<Syntax> GetDirectChildren();
 
         internal virtual Result<ValueSyntax> ToValueSyntax(BinaryTree target= null)
         {

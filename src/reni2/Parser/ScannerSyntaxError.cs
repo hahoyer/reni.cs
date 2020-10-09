@@ -4,7 +4,7 @@ using Reni.Validation;
 
 namespace Reni.Parser
 {
-    sealed class ScannerSyntaxError : ParserTokenType<BinaryTree>, ITokenClass, IValueProvider
+    sealed class ScannerSyntaxError : ParserTokenType<BinaryTree>, ITokenClass
     {
         internal readonly IssueId IssueId;
 

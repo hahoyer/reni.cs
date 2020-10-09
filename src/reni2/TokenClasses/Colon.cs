@@ -5,7 +5,7 @@ using Reni.Parser;
 namespace Reni.TokenClasses
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class Colon : TokenClass, IStatementProvider, SyntaxFactory.IDeclarationsToken
+    sealed class Colon : TokenClass, SyntaxFactory.IDeclarationsToken
     {
         public const string TokenId = ":";
 
@@ -37,7 +37,7 @@ namespace Reni.TokenClasses
 
     [BelongsTo(typeof(DeclarationTokenFactory))]
     abstract class DeclarationTagToken
-        : TerminalToken, IDeclarerTagProvider, IDeclarationTag, SyntaxFactory.IDeclarerToken
+        : TerminalToken, SyntaxFactory.IDeclarerToken
     {
         public static IEnumerable<string> DeclarationOptions
         {

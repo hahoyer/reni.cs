@@ -97,7 +97,7 @@ namespace Reni.Struct
         protected override string GetNodeDump()
             => GetType().PrettyName() + "(" + GetCompoundIdentificationDump() + ")";
 
-        protected override IEnumerable<Syntax> GetChildren()
+        protected override IEnumerable<Syntax> GetDirectChildren()
             => T(Statements.Cast<Syntax>(), T(CleanupSection)).Concat();
 
         internal bool IsMutable(int position) => Statements[position].IsMutableSyntax;
