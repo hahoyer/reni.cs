@@ -136,6 +136,15 @@ namespace Reni.TokenClasses
             }
         }
 
+        class FunctionHandler : DumpableObject, IValueProvider
+        {
+            Result<ValueSyntax> IValueProvider.Get(BinaryTree target, SyntaxFactory factory)
+            {
+                NotImplementedMethod(target, factory);
+                return default;
+            }
+        }
+
         class DeclarerHandler : DumpableObject, IDeclarerProvider
         {
             Result<DeclarerSyntax> IDeclarerProvider.Get(BinaryTree target, SyntaxFactory factory)
@@ -157,10 +166,11 @@ namespace Reni.TokenClasses
         internal static readonly IValueProvider NonSuffix = new InfixHandler(false);
         internal static readonly IValueProvider InfixPrefix = new InfixHandler(hasRight: true);
         internal static readonly IValueProvider Infix = new InfixHandler(true, true);
+        internal static readonly IValueProvider Function = new FunctionHandler();
+        internal static readonly IValueProvider Cleanup = new CleanupHandler();
 
         internal static readonly IDeclarationsProvider List = new ListHandler();
         internal static readonly IDeclarationsProvider Colon = new ColonHandler();
-        internal static readonly IValueProvider Cleanup = new CleanupHandler();
 
         internal static readonly IDeclarerProvider DeclarationMark = new DeclarationMarkHandler();
         internal static readonly IDeclarerProvider DefinableAsDeclarer = new DefinableHandler();
@@ -171,6 +181,7 @@ namespace Reni.TokenClasses
 
         [EnableDump]
         readonly bool MeansPublic;
+
 
         SyntaxFactory(bool meansPublic) => MeansPublic = meansPublic;
 

@@ -7,7 +7,7 @@ namespace Reni.TokenClasses
     [Variant(false, false)]
     [Variant(true, false)]
     [Variant(false, true)]
-    sealed class Function : TokenClass, IValueProvider
+    sealed class Function : TokenClass, IValueProvider, SyntaxFactory.IValueToken
     {
         readonly bool IsImplicit;
         readonly bool IsMetaFunction;
@@ -24,6 +24,8 @@ namespace Reni.TokenClasses
             =>
                 FunctionSyntax.Create(binaryTree.Left, IsImplicit, IsMetaFunction, binaryTree.Right, binaryTree
                     , scope);
+
+        SyntaxFactory.IValueProvider SyntaxFactory.IValueToken.Provider => SyntaxFactory.Function;
 
         public static string TokenId(bool isImplicit = false, bool isMetaFunction = false)
             => "/" + (isImplicit? "!" : "") + "\\" + (isMetaFunction? "/\\" : "");
