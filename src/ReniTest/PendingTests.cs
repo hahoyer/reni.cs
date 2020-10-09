@@ -1,4 +1,4 @@
-//03:16:49.167 09.10.2020 run 48 of 178 ReniUI.Test.UserInterAction.TypingAProgram
+//03:46:37.149 09.10.2020 run 32 of 178 Reni.FeatureTest.Reference.FunctionalDumpSimple.Run
 
 namespace hw.UnitTest
 {
@@ -9,26 +9,7 @@ namespace hw.UnitTest
         
 // active 
 
-TestRunner.RunTest(new ReniUI.Test.UserInterAction().TypingAProgram);
-TestRunner.RunTest(new ReniUI.Test.UserInterAction().GetTokenForPosition);
-
-// error 
-
-TestRunner.RunTest(new Reni.FeatureTest.Array.FromTypeAndFunction().Run);
-TestRunner.RunTest(new ReniUI.Test.AutoCompleteSimple().GetDeclarationOptions);
-TestRunner.RunTest(new ReniUI.Test.BadUserInterAction().GetTokenForPosition);
-TestRunner.RunTest(new ReniUI.Test.BraceMatching().MatchingBraces);
-TestRunner.RunTest(new ReniUI.Test.BraceMatching().MoreMatchingBraces);
-TestRunner.RunTest(new ReniUI.Test.BraceMatching().NotMatchingBraces);
-TestRunner.RunTest(new ReniUI.Test.ListMatching().Matching);
-TestRunner.RunTest(new ReniUI.Test.ListMatching().CombinationsOfMatching);
-TestRunner.RunTest(new ReniUI.Test.ListMatching().MixedMatching);
-TestRunner.RunTest(new ReniUI.Test.ThenElseMatching().Matching);
-TestRunner.RunTest(new ReniUI.Test.ThenElseMatching().NestedMatching);
-TestRunner.RunTest(new ReniUI.Test.TokenLocating().FromSourcePart);
-TestRunner.RunTest(new ReniUI.Test.TokenLocating().CommentFromSourcePart);
-TestRunner.RunTest(new ReniUI.Test.TokenLocating().CompoundSourcePart);
-TestRunner.RunTest(new ReniUI.Test.TokenLocating().NamedCompoundSourcePart);
+TestRunner.RunTest(new Reni.FeatureTest.Reference.FunctionalDumpSimple().Run);
 
 // notrun 
 
@@ -148,20 +129,34 @@ TestRunner.RunTest(new Reni.FeatureTest.Reference.ArrayReferenceByInstance().Run
 TestRunner.RunTest(new Reni.FeatureTest.Reference.ArrayReferenceCopy().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Reference.ArrayReferenceCopyAssign().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Reference.ArrayReferenceDumpLoop().Run);
+TestRunner.RunTest(new Reni.FeatureTest.Reference.ArrayReferenceDumpSimple().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Array.ArrayFromPieces().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Array.TypeOfArrayFromPieces().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Array.CombineArraysFromPieces().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Array.TypeOfCombineArraysFromPieces().Run);
+TestRunner.RunTest(new Reni.FeatureTest.Array.DefaultInitialized().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Array.ElementAccessSimple().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Array.ElementAccess().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Array.ArrayVariable().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Array.ElementAccessVariableSetterSimple().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Array.ElementAccessVariableSetter().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Array.ElementAccessVariable().Run);
+TestRunner.RunTest(new Reni.FeatureTest.Array.FromTypeAndFunction().Run);
+TestRunner.RunTest(new Reni.FeatureTest.Array.SimpleArrayFromPiece().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Array.TypeOfSimpleArrayFromPiece().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Array.TypeOfElementOfSimpleArrayFromPiece().Run);
+TestRunner.RunTest(new Reni.Basics.BitsConst.Test().All);
+TestRunner.RunTest(new Reni.Basics.BitsConst.Test().Resize);
+TestRunner.RunTest(new Reni.Basics.Size.Tests().NextPacketSize);
 TestRunner.RunTest(new ReniUI.Test.AutoComplete().GetDeclarationOptions);
 TestRunner.RunTest(new ReniUI.Test.AutoCompleteFunctionInCompound().GetDeclarationOptions);
+TestRunner.RunTest(new ReniUI.Test.AutoCompleteSimple().GetDeclarationOptions);
+TestRunner.RunTest(new ReniUI.Test.BadUserInterAction().GetTokenForPosition);
+TestRunner.RunTest(new ReniUI.Test.BraceMatching().MatchingBraces);
+TestRunner.RunTest(new ReniUI.Test.BraceMatching().MoreMatchingBraces);
+TestRunner.RunTest(new ReniUI.Test.BraceMatching().NotMatchingBraces);
+TestRunner.RunTest(new ReniUI.Test.ExpressionFormatting().FromSourcePart);
+TestRunner.RunTest(new ReniUI.Test.ExpressionFormatting().BadArgDeclaration);
 TestRunner.RunTest(new ReniUI.Test.Formatting().LabeledList);
 TestRunner.RunTest(new ReniUI.Test.Formatting().LabelsOnToLevel);
 TestRunner.RunTest(new ReniUI.Test.Formatting().ListEndsWithListToken);
@@ -197,6 +192,26 @@ TestRunner.RunTest(new ReniUI.Test.Formatting().UseSpaceWhenLineBreakIsRemoved);
 TestRunner.RunTest(new ReniUI.Test.FormattingLong().ReformatPart);
 TestRunner.RunTest(new ReniUI.Test.FormattingMultiLines().ReformatComments);
 TestRunner.RunTest(new ReniUI.Test.FormattingSimple().ReformatComments);
+TestRunner.RunTest(new ReniUI.Test.ListMatching().Matching);
+TestRunner.RunTest(new ReniUI.Test.ListMatching().CombinationsOfMatching);
+TestRunner.RunTest(new ReniUI.Test.ListMatching().MixedMatching);
+TestRunner.RunTest(new ReniUI.Test.StructFormatting().One);
+TestRunner.RunTest(new ReniUI.Test.StructFormatting().Two);
+TestRunner.RunTest(new ReniUI.Test.StructFormatting().BreakLine);
+TestRunner.RunTest(new ReniUI.Test.StructFormatting().BreakLineWithLimit1);
+TestRunner.RunTest(new ReniUI.Test.StructFormatting().BreakLineWithLimit0);
+TestRunner.RunTest(new ReniUI.Test.StructFormatting().OmitSpaceWhenLineBreakRemains);
+TestRunner.RunTest(new ReniUI.Test.StructFormatting().UseSpaceWhenLineBreakIsRemoved);
+TestRunner.RunTest(new ReniUI.Test.StructFormattingCurrent().Start);
+TestRunner.RunTest(new ReniUI.Test.StructFormattingCurrent().LabeledEntriesInList);
+TestRunner.RunTest(new ReniUI.Test.ThenElseMatching().Matching);
+TestRunner.RunTest(new ReniUI.Test.ThenElseMatching().NestedMatching);
+TestRunner.RunTest(new ReniUI.Test.TokenLocating().FromSourcePart);
+TestRunner.RunTest(new ReniUI.Test.TokenLocating().CommentFromSourcePart);
+TestRunner.RunTest(new ReniUI.Test.TokenLocating().CompoundSourcePart);
+TestRunner.RunTest(new ReniUI.Test.TokenLocating().NamedCompoundSourcePart);
+TestRunner.RunTest(new ReniUI.Test.UserInterAction().TypingAProgram);
+TestRunner.RunTest(new ReniUI.Test.UserInterAction().GetTokenForPosition);
 TestRunner.RunTest(new ReniUI.Test.UserInterAction2().GetTokenForPosition);
 TestRunner.RunTest(new ReniUI.Test.UserInterAction3().GetTokenForPosition);
 }}}

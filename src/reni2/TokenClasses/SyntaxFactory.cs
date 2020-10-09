@@ -282,7 +282,7 @@ namespace Reni.TokenClasses
             if(target == null)
                 return new DeclarationSyntax[0];
 
-            return GetValueLikeSyntax(
+            return GetSyntax(
                 target,
                 value => value.ToDeclarationsSyntax(),
                 i => i);
@@ -293,13 +293,13 @@ namespace Reni.TokenClasses
             if(target == null)
                 return onNull?.Invoke();
 
-            return GetValueLikeSyntax(
+            return GetSyntax(
                 target,
                 value => value,
                 list => (ValueSyntax)new CompoundSyntax(list, null, null));
         }
 
-        Result<TResult> GetValueLikeSyntax<TResult>
+        Result<TResult> GetSyntax<TResult>
         (
             BinaryTree target
             , Func<ValueSyntax, TResult> fromValueSyntax
@@ -320,8 +320,9 @@ namespace Reni.TokenClasses
             if(declarationsToken != null)
                 return declarationsToken.Provider.Get(target, factory)
                     .Apply(fromDeclarationsSyntax);
-            NotImplementedMethod(target, fromValueSyntax, fromDeclarationsSyntax);
-            return default;
+
+            return new Result<TResult>(fromValueSyntax(new EmptyList(target)), 
+                IssueId.InvalidExpression.Issue(target.Token.Characters));
         }
 
         SyntaxFactory GetCurrentFactory(ITokenClass tokenClass)

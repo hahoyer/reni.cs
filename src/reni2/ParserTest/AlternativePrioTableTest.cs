@@ -19,7 +19,7 @@ namespace Reni.ParserTest
                 new Declaration[] { },
                 new[] {0}
             );
-            Parameters.ParseOnly = true;
+            Parameters.CompilationLevel= CompilationLevel.Syntax;
             CreateFileAndRunCompiler
             (
                 "UseAlternativePrioTable",
@@ -36,7 +36,7 @@ namespace Reni.ParserTest
                 new Declaration[] { },
                 new[] {0, 1}
             );
-            Parameters.ParseOnly = true;
+            Parameters.CompilationLevel= CompilationLevel.Syntax;
             CreateFileAndRunCompiler
             (
                 "UseAlternativePrioTable",
@@ -54,7 +54,7 @@ namespace Reni.ParserTest
                 new[] {new Declaration("converter", 0)},
                 new int[] { }
             );
-            Parameters.ParseOnly = true;
+            Parameters.CompilationLevel= CompilationLevel.Syntax;
             CreateFileAndRunCompiler
             (
                 "KeyWordAsUserObject",

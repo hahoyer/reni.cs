@@ -35,7 +35,6 @@ namespace Reni.FeatureTest.Helper
 
         internal abstract void AssertLike(BinaryTree target);
 
-        [Obsolete("", true)]
         internal abstract void AssertLike(ValueSyntax syntax);
 
         public LikeSyntax Brackets(ITokenClass tokenClass = null) => new Brackets(this, tokenClass);
@@ -68,7 +67,6 @@ namespace Reni.FeatureTest.Helper
 
         }
 
-        [Obsolete("", true)]
         internal override void AssertLike(ValueSyntax syntax)
             => Tracer.Assert(syntax is EmptyList);
     }
@@ -130,7 +128,6 @@ namespace Reni.FeatureTest.Helper
         internal override void AssertLike(BinaryTree target) 
             => NotImplementedMethod(target);
 
-        [Obsolete("", true)]
         internal override void AssertLike(ValueSyntax syntax)
         {
             var co = (CompoundSyntax)syntax;

@@ -18,7 +18,7 @@ namespace Reni.ParserTest
             (
                 "SimpleFunction",
                 @"f()",
-                expectedResult: c => c.AssertSyntaxIsLike(syntaxPrototype));
+                expectedResult: c => c.AssertBinaryTreeIsLike(syntaxPrototype));
         }
 
         [UnitTest]
@@ -32,7 +32,7 @@ namespace Reni.ParserTest
             (
                 "Add2Numbers",
                 @"(2+4) dump_print",
-                expectedResult: c => c.AssertSyntaxIsLike(syntaxPrototype));
+                expectedResult: c => c.AssertBinaryTreeIsLike(syntaxPrototype));
         }
 
         [UnitTest]
@@ -48,7 +48,7 @@ namespace Reni.ParserTest
 (2+4) # ssssss
 dump_print
 ",
-                expectedResult: c => c.AssertSyntaxIsLike(syntaxPrototype));
+                expectedResult: c => c.AssertBinaryTreeIsLike(syntaxPrototype));
         }
 
         [UnitTest]
@@ -64,7 +64,7 @@ dump_print
 (2+4) #(aa ssssss
 aa)#dump_print
 ",
-                expectedResult: c => c.AssertSyntaxIsLike(syntaxPrototype));
+                expectedResult: c => c.AssertBinaryTreeIsLike(syntaxPrototype));
         }
 
         [UnitTest]
@@ -83,7 +83,7 @@ aa)#dump_print
             (
                 "Add2Numbers",
                 @"((<< 5)(3)) dump_print",
-                expectedResult: c => c.AssertSyntaxIsLike(syntaxPrototype));
+                expectedResult: c => c.AssertBinaryTreeIsLike(syntaxPrototype));
         }
 
         [UnitTest]
@@ -100,7 +100,7 @@ aa)#dump_print
             (
                 "MoreBrackets",
                 @"this()(3) dump_print",
-                expectedResult: c => c.AssertSyntaxIsLike(syntaxPrototype));
+                expectedResult: c => c.AssertBinaryTreeIsLike(syntaxPrototype));
         }
     }
 }
