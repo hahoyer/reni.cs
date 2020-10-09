@@ -167,7 +167,7 @@ namespace Reni.TokenClasses
                         factory.GetValueSyntax(target.Right)
                     )
                     .Apply((left, right)
-                        => (ValueSyntax)new ExpressionSyntax(target, left, (Definable)target.TokenClass, right));
+                        => (ValueSyntax)new ExpressionSyntax(target, left, null, right));
         }
 
         class ThenHandler : DumpableObject, IValueProvider
