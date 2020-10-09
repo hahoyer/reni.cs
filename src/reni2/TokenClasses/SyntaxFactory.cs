@@ -140,8 +140,21 @@ namespace Reni.TokenClasses
         {
             Result<ValueSyntax> IValueProvider.Get(BinaryTree target, SyntaxFactory factory)
             {
-                NotImplementedMethod(target, factory);
-                return default;
+                var token = (Function)target.TokenClass;
+                return (
+                        factory.GetValueSyntax(target.Left),
+                        factory.GetValueSyntax(target.Right)
+                    )
+                    .Apply((setter, getter)
+                        => (ValueSyntax)new FunctionSyntax
+                        (
+                            setter
+                            , token.IsImplicit
+                            , token.IsMetaFunction
+                            , getter
+                            , target
+                        )
+                    );
             }
         }
 

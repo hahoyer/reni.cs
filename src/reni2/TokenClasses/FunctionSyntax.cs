@@ -16,7 +16,7 @@ namespace Reni.TokenClasses
 
         bool IsMetaFunction { get; }
 
-        FunctionSyntax
+        internal FunctionSyntax
         (
             ValueSyntax setter,
             bool isImplicit,

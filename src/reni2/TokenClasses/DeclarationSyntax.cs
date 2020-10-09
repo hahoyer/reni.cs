@@ -20,7 +20,7 @@ namespace Reni.TokenClasses
         }
 
         [DisableDump]
-        internal string NameOrNull => Declarer?.Name.Value;
+        internal string NameOrNull => Declarer?.Name?.Value;
 
         [DisableDump]
         internal bool IsConverterSyntax => Declarer?.IsConverterSyntax ?? false;
