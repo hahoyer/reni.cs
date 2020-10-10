@@ -1,3 +1,4 @@
+using hw.DebugFormatter;
 using hw.Helper;
 using Reni.Basics;
 using Reni.Context;
@@ -9,8 +10,12 @@ namespace Reni.TokenClasses
 {
     sealed class FunctionSyntax : ValueSyntax
     {
+        [EnableDumpExcept(null)]
         internal ValueSyntax Getter { get; }
+        [EnableDump]
+        [EnableDumpExcept(false)]
         internal bool IsImplicit { get; }
+        [EnableDumpExcept(null)]
         internal ValueSyntax Setter { get; }
 
         bool IsMetaFunction { get; }
@@ -30,14 +35,18 @@ namespace Reni.TokenClasses
             IsMetaFunction = isMetaFunction;
         }
 
+        [DisableDump]
         internal string Tag
             => (IsMetaFunction? "{0}{0}" : "{0}")
                 .ReplaceArgs("/{0}\\")
                 .ReplaceArgs(IsImplicit? "!" : "");
 
+        [DisableDump]
         internal override bool IsLambda => true;
 
+        [DisableDump]
         protected override int LeftChildCount => 1;
+        [DisableDump]
         protected override int DirectChildCount => 2;
 
         protected override Syntax GetDirectChild(int index)

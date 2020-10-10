@@ -42,8 +42,7 @@ namespace Reni.Struct
                 .Where(data => data.IsConverterSyntax)
                 .Select(data => (FunctionSyntax)data.Value);
 
-        [Node]
-        [EnableDump]
+        [DisableDump]
         internal ValueSyntax[] PureStatements => Statements.Select(s => s.Value).ToArray();
 
         [EnableDump]
@@ -86,6 +85,7 @@ namespace Reni.Struct
 
 
         
+        [DisableDump]
         protected override int LeftChildCount 
         {
             get
@@ -97,6 +97,7 @@ namespace Reni.Struct
             }
         }
 
+        [DisableDump]
         protected override int DirectChildCount => Statements.Length + 1;
 
         public string GetCompoundIdentificationDump() => "." + ObjectId + "i";

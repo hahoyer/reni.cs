@@ -1,40 +1,67 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Scanner;
-using Reni;
-using Reni.TokenClasses;
 using ReniUI.Helper;
 
 namespace ReniUI.Classification
 {
     public abstract class Token : DumpableObject
     {
+        public sealed class Trimmed : DumpableObject
+        {
+            public readonly SourcePart SourcePart;
+            public readonly Token Token;
+
+            internal Trimmed(Token token, SourcePart sourcePart)
+            {
+                Token = token;
+                SourcePart = sourcePart.Intersect(Token.SourcePart)
+                             ?? Token.SourcePart.Start.Span(0);
+            }
+
+            public IEnumerable<char> GetCharArray()
+                => SourcePart
+                    .Id
+                    .ToCharArray();
+        }
+
         [DisableDump]
         public abstract SourcePart SourcePart { get; }
+
         [DisableDump]
         public virtual bool IsKeyword => false;
+
         [DisableDump]
         public virtual bool IsIdentifier => false;
+
         [DisableDump]
         public virtual bool IsText => false;
+
         [DisableDump]
         public virtual bool IsNumber => false;
+
         [DisableDump]
         public virtual bool IsComment => false;
+
         [DisableDump]
         public virtual bool IsLineComment => false;
+
         [DisableDump]
         public virtual bool IsWhiteSpace => false;
+
         [DisableDump]
         public virtual bool IsBraceLike => false;
+
         [DisableDump]
         public virtual bool IsLineEnd => false;
+
         [DisableDump]
         public virtual bool IsError => false;
+
         [DisableDump]
         public virtual bool IsBrace => false;
+
         [DisableDump]
         public virtual string State => "";
 
@@ -82,40 +109,22 @@ namespace ReniUI.Classification
                 return true;
             if(obj.GetType() != GetType())
                 return false;
-            return Equals((Token) obj);
+            return Equals((Token)obj);
         }
 
         public override int GetHashCode() => SourcePart.GetHashCode();
 
-        public sealed class Trimmed : DumpableObject
-        {
-            public readonly Token Token;
-            public readonly SourcePart SourcePart;
-
-            internal Trimmed(Token token, SourcePart sourcePart)
-            {
-                Token = token;
-                SourcePart = sourcePart.Intersect(Token.SourcePart)
-                    ?? Token.SourcePart.Start.Span(0);
-            }
-
-            public IEnumerable<char> GetCharArray()
-                => SourcePart
-                    .Id
-                    .ToCharArray();
-        }
-
         public abstract IEnumerable<SourcePart> FindAllBelongings(CompilerBrowser compiler);
 
-        internal static Token LocateByPosition(Helper.Syntax start, int offset)
+        internal static Token LocateByPosition(Syntax target, int offset)
         {
-            var result = start.LocateByPosition(offset);
-            if (offset < result.Token.Characters.Position)
+            var result = target.LocateByPosition(offset);
+            if(offset < result.Token.Characters.Position)
                 return new WhiteSpaceToken
-                    (
+                (
                     result.Token.PrecededWith.Last(item => offset >= item.SourcePart.Position),
                     result
-                    );
+                );
 
             return new SyntaxToken(result);
         }

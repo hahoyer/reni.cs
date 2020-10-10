@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using Reni.Helper;
@@ -20,8 +22,11 @@ namespace Reni.Parser
             protected NoChildren(int objectId, BinaryTree target)
                 : base(objectId, target) { }
 
+            [DisableDump]
             protected sealed override int LeftChildCount => 0;
+            [DisableDump]
             protected sealed override int DirectChildCount => 0;
+
             protected sealed override Syntax GetDirectChild(int index)
                 => throw new Exception($"Unexpected call: {nameof(GetDirectChild)}({index})");
         }
@@ -34,15 +39,19 @@ namespace Reni.Parser
             : base(objectId)
             => Target = target;
 
+        [DisableDump]
         protected abstract int LeftChildCount { get; }
+        [DisableDump]
         protected abstract int DirectChildCount { get; }
 
-        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
+        internal Syntax[] DirectChildren => this.CachedValue(() => DirectChildCount.Select(GetDirectChild).ToArray());
 
-        int ITree<Syntax>.LeftDirectChildCount => LeftChildCount;
+        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
         int ITree<Syntax>.DirectChildCount => DirectChildCount;
         Syntax ITree<Syntax>.GetDirectChild(int index) => GetDirectChild(index);
-        
+
+        int ITree<Syntax>.LeftDirectChildCount => LeftChildCount;
+
         protected abstract Syntax GetDirectChild(int index);
 
         internal virtual Result<ValueSyntax> ToValueSyntax(BinaryTree target = null)
@@ -70,6 +79,9 @@ namespace Reni.Parser
             NotImplementedMethod(target);
             return default;
         }
+
+        internal IEnumerable<Syntax> ItemsAsLongAs(Func<Syntax, bool> condition)
+            => this.GetNodesFromLeftToRight().SelectMany(node => node.CheckedItemsAsLongAs(condition));
 
     }
 }

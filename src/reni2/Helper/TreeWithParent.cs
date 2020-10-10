@@ -9,7 +9,9 @@ namespace Reni.Helper
         where TTarget : ITree<TTarget>
         where TResult : TreeWithParent<TResult, TTarget>
     {
+        [DisableDump]
         internal readonly TResult Parent;
+        [DisableDump]
         internal readonly TTarget Target;
 
         protected TreeWithParent(TTarget target, TResult parent)
@@ -19,8 +21,9 @@ namespace Reni.Helper
         }
 
         internal IEnumerable<TResult> DirectChildren
-            => Target.DirectChildCount.Select(GetDirectChild).Where(child => child != null);
+            => this.CachedValue(()=> Target.DirectChildCount.Select(GetDirectChild).Where(child => child != null));
 
+        [DisableDump]
         TResult Center => this as TResult;
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();

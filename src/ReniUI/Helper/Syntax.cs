@@ -4,6 +4,7 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
+using Reni.Helper;
 using Reni.TokenClasses;
 using Reni.Validation;
 
@@ -78,12 +79,12 @@ namespace ReniUI.Helper
         }
 
         [DisableDump]
-        IEnumerable<Syntax> Items => this.CachedValue(GetItems);
-
-        [DisableDump]
         bool IsFunctionLevel => TokenClass is Function;
 
-        protected override string GetNodeDump() => $"{GetType().PrettyName()}({SourcePart.NodeDump})";
+        [EnableDump]
+        new Reni.Parser.Syntax Target => base.Target;
+
+        protected override string GetNodeDump() => $"{GetType().PrettyName()}(Target.GetType().PrettyName())";
 
         public Syntax LocateByPosition(int current) => Cache.LocateByPosition[current];
 
@@ -95,12 +96,6 @@ namespace ReniUI.Helper
             return default;
         }
 
-        IEnumerable<Syntax> GetItems()
-        {
-            NotImplementedMethod();
-            return default;
-        }
-
         Syntax CheckedLocate(SourcePart part)
             => SourcePart.Contains(part)? Locate(part) : null;
 
@@ -109,7 +104,7 @@ namespace ReniUI.Helper
         Syntax LocateByPositionForCache(int current)
         {
             var s = SourcePart;
-            var i = Items.ToArray();
+            var i = this.GetNodesFromLeftToRight().ToArray();
             NotImplementedMethod(current);
             return default;
         }

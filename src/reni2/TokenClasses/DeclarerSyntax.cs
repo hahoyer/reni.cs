@@ -29,7 +29,8 @@ namespace Reni.TokenClasses
         internal static readonly Result<DeclarerSyntax> Empty
             = new Result<DeclarerSyntax>(new DeclarerSyntax(new TagSyntax[0], null, null, null));
 
-        internal readonly IDefaultScopeProvider Container;
+        [DisableDump]
+        readonly IDefaultScopeProvider Container;
 
         internal readonly NameSyntax Name;
         internal readonly TagSyntax[] Tags;
@@ -65,7 +66,9 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal bool IsMutableSyntax => Tags.Any(item => item.Value is MutableDeclarationToken);
 
+        [DisableDump]
         protected override int LeftChildCount => Tags.Length;
+        [DisableDump]
         protected override int DirectChildCount => Tags.Length + 1;
 
         protected override Syntax GetDirectChild(int index)

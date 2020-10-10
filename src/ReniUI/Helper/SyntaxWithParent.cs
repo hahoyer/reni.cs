@@ -1,3 +1,4 @@
+using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
 using hw.Scanner;
@@ -20,11 +21,12 @@ namespace ReniUI.Helper
         {
             get
             {
-                var l = LeftMost.Token.SourcePart();
-                var r = RightMost.Token.SourcePart();
-                return l.Start.Span(r.End);
+                var left = this.GetNodesFromLeftToRight().First(node => node?.Target.Target != null).Token.SourcePart();
+                var right= this.GetNodesFromRightToLeft().First(node => node?.Target.Target != null).Token.SourcePart();
+                return left.Start.Span(right.End);
             }
         }
+
 
         [EnableDump]
         internal ITokenClass TokenClass => Target.Target.TokenClass;

@@ -19,7 +19,7 @@ namespace ReniUI
     {
         class CacheContainer
         {
-            internal BinaryTreeSyntax FormattingBinaryTreeSyntax;
+            internal Formatting.BinaryTreeSyntax FormattingBinaryTreeSyntax;
             internal Helper.BinaryTreeSyntax HelperBinaryTreeSyntax;
             internal Helper.Syntax Syntax;
         }
@@ -52,9 +52,9 @@ namespace ReniUI
 
         internal IEnumerable<Issue> Issues => Compiler.Issues;
 
-        internal BinaryTreeSyntax FormattingBinaryTreeSyntax
+        internal Formatting.BinaryTreeSyntax FormattingBinaryTreeSyntax
             => Cache.FormattingBinaryTreeSyntax ??
-               (Cache.FormattingBinaryTreeSyntax = new BinaryTreeSyntax(Compiler.BinaryTree));
+               (Cache.FormattingBinaryTreeSyntax = new Formatting.BinaryTreeSyntax(Compiler.BinaryTree));
 
         internal Helper.BinaryTreeSyntax BinaryTreeSyntax
             => Cache.HelperBinaryTreeSyntax ?? (Cache.HelperBinaryTreeSyntax = GetHelperSyntax());
@@ -132,9 +132,23 @@ namespace ReniUI
         }
 
 
-        [Obsolete("", true)]
-        internal IEnumerable<BinaryTree> FindAllBelongings(Helper.BinaryTreeSyntax binaryTreeSyntax)
-            => Belongings(Compiler.BinaryTree, binaryTreeSyntax.Target);
+        internal IEnumerable<Syntax> FindAllBelongings(Helper.Syntax syntax)
+        {
+            if(!(syntax.Target.Target.TokenClass is IBelongingsMatcher matcher))
+                return null;
+
+            var sourceSyntaxList = Reni.Helper.Extension.BackChain(Compiler.Syntax, syntax.Target).ToArray();
+
+            var root = sourceSyntaxList
+                           .Skip(1)
+                           .TakeWhile(item => matcher.IsBelongingTo(item.Target.TokenClass))
+                           .LastOrDefault() ??
+                       syntax.Target;
+
+            return root?.Target.TokenClass is IBelongingsMatcher rootMatcher
+                ? root.ItemsAsLongAs(item => rootMatcher.IsBelongingTo(item.Target.TokenClass)).ToArray()
+                : null;
+        }
 
         internal string Reformat(IFormatter formatter = null, SourcePart targetPart = null) =>
             (formatter ?? new Formatting.Configuration().Create())
@@ -201,65 +215,6 @@ namespace ReniUI
             var tokenSyntax = token.Syntax;
             var position = tokenSyntax.Token.Characters.Position;
             return position <= 0? null : tokenSyntax.LocateByPosition(position - 1);
-        }
-
-        [Obsolete("", true)]
-        static IEnumerable<BinaryTree> Belongings(BinaryTree target, BinaryTree recent)
-        {
-            var root = RootOfBelongings(target, recent);
-
-            return root?.TokenClass is IBelongingsMatcher matcher
-                ? root
-                    .ItemsAsLongAs(item => matcher.IsBelongingTo(item.TokenClass)).ToArray()
-                : null;
-        }
-
-        static BinaryTree RootOfBelongings(BinaryTree target, BinaryTree recent)
-        {
-            if(!(recent.TokenClass is IBelongingsMatcher matcher))
-                return null;
-
-            var sourceSyntaxList = BackChain(target, recent).ToArray();
-
-            return sourceSyntaxList
-                       .Skip(1)
-                       .TakeWhile(item => matcher.IsBelongingTo(item.TokenClass))
-                       .LastOrDefault() ??
-                   recent;
-        }
-
-        static IEnumerable<BinaryTree> BackChain(BinaryTree target, BinaryTree recent)
-        {
-            var subChain = SubBackChain(target, recent);
-            if(subChain == null)
-                yield break;
-
-            foreach(var items in subChain)
-                yield return items;
-
-            yield return target;
-        }
-
-        static BinaryTree[] SubBackChain(BinaryTree target, BinaryTree recent)
-        {
-            if(target == recent)
-                return new BinaryTree[0];
-
-            if(target.Left != null)
-            {
-                var result = BackChain(target.Left, recent).ToArray();
-                if(result.Any())
-                    return result;
-            }
-
-            if(target.Right != null)
-            {
-                var result = BackChain(target.Right, recent).ToArray();
-                if(result.Any())
-                    return result;
-            }
-
-            return null;
         }
     }
 }

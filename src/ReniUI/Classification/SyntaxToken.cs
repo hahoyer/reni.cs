@@ -52,8 +52,7 @@ namespace ReniUI.Classification
         [DisableDump]
         public override string State => Syntax.Token.Characters.Id ?? "";
 
-        [Obsolete("", true)]
         public override IEnumerable<SourcePart> FindAllBelongings(CompilerBrowser compiler)
-            => compiler.FindAllBelongings(Syntax.BinaryTreeSyntax)?.Select(item => item.Token.Characters);
+            => compiler.FindAllBelongings(Syntax)?.Select(item => item.Target?.Token.Characters);
     }
 }

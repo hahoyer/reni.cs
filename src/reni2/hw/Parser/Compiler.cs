@@ -148,15 +148,15 @@ namespace hw.Parser
 
         void Define
         (
-            PrioTable prioTable,
+            PrioTable priorityTable,
             ITokenFactory<TSourcePart> tokenFactory,
             Func<TSourcePart, IParserTokenType<TSourcePart>> converter,
             object tag
         )
             => Dictionary[tag] =
                 Dictionary.TryGetValue(tag, out var componentData)
-                    ? componentData.ReCreate(prioTable, tokenFactory, converter, this[tag])
-                    : new ComponentData(prioTable, tokenFactory, converter, this[tag]);
+                    ? componentData.ReCreate(priorityTable, tokenFactory, converter, this[tag])
+                    : new ComponentData(priorityTable, tokenFactory, converter, this[tag]);
 
         static string PrettyDumpPair(object key, ComponentData value) => key + "=" + ("\n" + value.PrettyDump).Indent();
     }

@@ -14,7 +14,10 @@ namespace Reni.Helper
         int DirectChildCount => Target.DirectChildCount;
         int LeftDirectChildCount => Target.LeftDirectChildCount;
 
+        [DisableDump]
         TResult[] LeftSiblings => this.CachedValue(() => LeftDirectChildCount.Select(GetDirectChild).ToArray());
+
+        [DisableDump]
         TResult[] RightSiblings => this.CachedValue(GetRightSiblings);
 
         [DisableDump]
@@ -53,15 +56,17 @@ namespace Reni.Helper
                 ? Parent.RightParent
                 : Parent;
 
+        [DisableDump]
+        int ITree<TResult>.DirectChildCount => DirectChildCount;
+
+        TResult ITree<TResult>.GetDirectChild(int index) => GetDirectChild(index);
+
+        [DisableDump]
+        int ITree<TResult>.LeftDirectChildCount => Target.LeftDirectChildCount;
+
         TResult[] GetRightSiblings()
             => (DirectChildCount - LeftDirectChildCount)
                 .Select(index => GetDirectChild(index + LeftDirectChildCount))
                 .ToArray();
-
-        int ITree<TResult>.LeftDirectChildCount => Target.LeftDirectChildCount;
-
-        int ITree<TResult>.DirectChildCount => DirectChildCount;
-
-        TResult ITree<TResult>.GetDirectChild(int index) => GetDirectChild(index);
     }
 }

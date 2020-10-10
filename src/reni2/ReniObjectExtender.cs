@@ -50,6 +50,16 @@ namespace Reni
                 yield return result;
         }
 
+        internal static IEnumerable<Syntax> CheckedItemsAsLongAs
+            (this Syntax target, Func<Syntax, bool> condition)
+        {
+            if(target == null || !condition(target))
+                yield break;
+
+            foreach(var result in target.ItemsAsLongAs(condition))
+                yield return result;
+        }
+
         internal static IEnumerable<System.Type> DerivedClasses<T>()
             => TypeNameExtender.Types.Where(item => item.Is<T>());
 

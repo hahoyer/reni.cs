@@ -38,9 +38,11 @@ namespace Reni.Parser
         public Definable Definable { get; }
 
         [Node]
+        [EnableDumpExcept(null)]
         internal ValueSyntax Left { get; }
 
         [Node]
+        [EnableDumpExcept(null)]
         internal ValueSyntax Right { get; }
 
         int CurrentResultDepth;
@@ -54,7 +56,9 @@ namespace Reni.Parser
             StopByObjectIds();
         }
 
+        [DisableDump]
         protected override int LeftChildCount => 1;
+        [DisableDump]
         protected override int DirectChildCount => 2;
 
         protected override Syntax GetDirectChild(int index)

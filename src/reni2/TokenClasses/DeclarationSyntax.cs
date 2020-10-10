@@ -6,7 +6,9 @@ namespace Reni.TokenClasses
 {
     class DeclarationSyntax : Syntax
     {
+        [EnableDumpExcept(null)]
         internal readonly DeclarerSyntax Declarer;
+        [EnableDumpExcept(null)]
         internal readonly ValueSyntax Value;
 
         public DeclarationSyntax(DeclarerSyntax declarer, BinaryTree target, ValueSyntax value)
@@ -27,7 +29,9 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal bool IsMutableSyntax => Declarer?.IsMutableSyntax ?? false;
 
+        [DisableDump]
         protected override int LeftChildCount => 1;
+        [DisableDump]
         protected override int DirectChildCount => 2;
 
         protected override Syntax GetDirectChild(int index)
