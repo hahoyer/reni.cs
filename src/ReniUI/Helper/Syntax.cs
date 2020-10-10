@@ -3,10 +3,12 @@ using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using hw.Parser;
 using hw.Scanner;
 using Reni.Helper;
 using Reni.TokenClasses;
 using Reni.Validation;
+using ReniUI.CompilationView;
 
 namespace ReniUI.Helper
 {
@@ -20,30 +22,22 @@ namespace ReniUI.Helper
 
         readonly CacheContainer Cache = new CacheContainer();
 
-        internal Syntax(Reni.Parser.Syntax target)
-            : this(target, null) { }
+        internal Syntax(Reni.Parser.Syntax flatItem)
+            : this(flatItem, null) { }
 
-        Syntax(Reni.Parser.Syntax target, Syntax parent)
-            : base(target, parent)
+        Syntax(Reni.Parser.Syntax flatItem, Syntax parent)
+            : base(flatItem, parent)
         {
             Cache.LocateByPosition = new FunctionCache<int, Syntax>(LocateByPositionForCache);
             Cache.ExtendedLocateByPosition = new FunctionCache<int, Syntax>(ExtendedLocateByPositionForCache);
         }
 
-        [DisableDump]
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public Issue[] Issues
-        {
-            get
-            {
-                NotImplementedMethod();
-                return default;
-            }
-        }
+        BinaryTree Binary;
+
 
         [DisableDump]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public BinaryTreeSyntax BinaryTreeSyntax
+        public Issue[] Issues
         {
             get
             {
@@ -82,9 +76,9 @@ namespace ReniUI.Helper
         bool IsFunctionLevel => TokenClass is Function;
 
         [EnableDump]
-        new Reni.Parser.Syntax Target => base.Target;
+        new Reni.Parser.Syntax FlatItem => base.FlatItem;
 
-        protected override string GetNodeDump() => $"{GetType().PrettyName()}(Target.GetType().PrettyName())";
+        protected override string GetNodeDump() => $"{GetType().PrettyName()}({FlatItem.GetType().PrettyName()})";
 
         public Syntax LocateByPosition(int current) => Cache.LocateByPosition[current];
 
@@ -104,9 +98,31 @@ namespace ReniUI.Helper
         Syntax LocateByPositionForCache(int current)
         {
             var s = SourcePart;
-            var i = this.GetNodesFromLeftToRight().ToArray();
-            NotImplementedMethod(current);
-            return default;
+            //var e = this.GetNodesFromLeftToRight().Select(target=>target.Binary.GetSource()?.EndPosition).ToArray();
+            var result = this
+                .GetNodesFromLeftToRight()
+                .FirstOrDefault(node=>Touches(current, node));
+            if(result == null)
+            {
+                NotImplementedMethod(current);
+                return default;
+
+            }
+            
+            Tracer.Assert(result.FlatItem.GetSource().Position <= current);
+            return result;
+        }
+
+        static bool Touches(int targetPosition, Syntax target)
+        {
+            var token = target.FlatItem.Binary?.Token;
+            if(token == null)
+                return false;
+            var sourcePart = token.SourcePart();
+            if(sourcePart.EndPosition < targetPosition)
+                return false;
+            Tracer.Assert(sourcePart.Position <= targetPosition);
+            return true;
         }
 
         Syntax ExtendedLocateByPositionForCache(int current)

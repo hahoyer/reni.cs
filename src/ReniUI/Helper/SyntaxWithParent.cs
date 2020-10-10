@@ -10,26 +10,26 @@ namespace ReniUI.Helper
     abstract class SyntaxWithParent<TResult> : TreeWithParentExtended<TResult, Reni.Parser.Syntax>
         where TResult : SyntaxWithParent<TResult>
     {
-        protected SyntaxWithParent(Reni.Parser.Syntax target, TResult parent)
-            : base(target, parent) { }
+        protected SyntaxWithParent(Reni.Parser.Syntax flatItem, TResult parent)
+            : base(flatItem, parent) { }
 
         [DisableDump]
-        internal IToken Token => Target.Target.Token;
+        internal IToken Token => FlatItem.Binary.Token;
 
         [DisableDump]
         internal SourcePart SourcePart
         {
             get
             {
-                var left = this.GetNodesFromLeftToRight().First(node => node?.Target.Target != null).Token.SourcePart();
-                var right= this.GetNodesFromRightToLeft().First(node => node?.Target.Target != null).Token.SourcePart();
+                var left = this.GetNodesFromLeftToRight().First(node => node?.FlatItem.Binary != null).Token.SourcePart();
+                var right= this.GetNodesFromRightToLeft().First(node => node?.FlatItem.Binary != null).Token.SourcePart();
                 return left.Start.Span(right.End);
             }
         }
 
 
         [EnableDump]
-        internal ITokenClass TokenClass => Target.Target.TokenClass;
+        internal ITokenClass TokenClass => FlatItem.Binary.TokenClass;
 
         internal bool Contains(int current)
             => SourcePart.Position <= current && current < SourcePart.EndPosition;

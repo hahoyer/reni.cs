@@ -150,7 +150,7 @@ namespace ReniUI.Formatting
                         .ToArray()
                         .Indent(IndentDirection);
                     Dump(nameof(result), result);
-                    //Tracer.Assert(CheckMultilineExpectations(result), Target.Dump);
+                    //Tracer.Assert(CheckMultilineExpectations(result), Binary.Dump);
 
                     Tracer.ConditionalBreak(trace);
                     return ReturnMethodDump(result, trace);

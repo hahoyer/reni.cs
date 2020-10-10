@@ -154,7 +154,7 @@ namespace Reni.Struct
                 .Select((s, i) => s ?? Statements[i])
                 .ToArray();
             var newCleanupSection = cleanupSection ?? CleanupSection;
-            return new CompoundSyntax(newStatements, newCleanupSection, Target);
+            return new CompoundSyntax(newStatements, newCleanupSection, Binary);
         }
 
         internal Result Cleanup(ContextBase context, Category category)

@@ -10,11 +10,11 @@ namespace Reni.Helper
     abstract class BinaryTreeSyntaxWithParent<TResult> : TreeWithParentExtended<TResult, BinaryTree>
         where TResult : BinaryTreeSyntaxWithParent<TResult>
     {
-        protected BinaryTreeSyntaxWithParent(BinaryTree target, TResult parent)
-            : base(target, parent) { }
+        protected BinaryTreeSyntaxWithParent(BinaryTree flatItem, TResult parent)
+            : base(flatItem, parent) { }
 
         [DisableDump]
-        internal IToken Token => Target.Token;
+        internal IToken Token => FlatItem.Token;
 
         [EnableDumpExcept(null)]
         internal IEnumerable<IItem> WhiteSpaces => Token.PrecededWith;
@@ -39,7 +39,7 @@ namespace Reni.Helper
         public TResult Right => ((ITree<TResult>)this).GetDirectChild(1);
 
         [EnableDump]
-        internal ITokenClass TokenClass => Target.TokenClass;
+        internal ITokenClass TokenClass => FlatItem.TokenClass;
 
         internal bool Contains(int current)
             => SourcePart.Position <= current && current < SourcePart.EndPosition;

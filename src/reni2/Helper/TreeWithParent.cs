@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
@@ -10,31 +9,34 @@ namespace Reni.Helper
         where TResult : TreeWithParent<TResult, TTarget>
     {
         [DisableDump]
-        internal readonly TResult Parent;
-        [DisableDump]
-        internal readonly TTarget Target;
+        internal readonly TTarget FlatItem;
 
-        protected TreeWithParent(TTarget target, TResult parent)
+        [DisableDump]
+        internal readonly TResult Parent;
+
+        protected TreeWithParent(TTarget flatItem, TResult parent)
         {
-            Target = target;
+            FlatItem = flatItem;
             Parent = parent;
         }
 
-        internal IEnumerable<TResult> DirectChildren
-            => this.CachedValue(()=> Target.DirectChildCount.Select(GetDirectChild).Where(child => child != null));
+        internal TResult[] DirectChildren
+            => this.CachedValue(() => FlatItem.DirectChildCount.Select(CreateDirectChild).ToArray());
 
         [DisableDump]
         TResult Center => this as TResult;
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
+        TResult CreateDirectChild(int index)
+        {
+            var node = FlatItem.GetDirectChild(index);
+            return node == null? null : Create(node, Center);
+        }
+
         protected abstract TResult Create(TTarget target, TResult parent);
 
         protected TResult GetDirectChild(int index)
-        {
-            var node = Target.GetDirectChild(index);
-            return node == null? null :
-                this.CachedFunction(index, index => Create(node, Center));
-        }
+            => index < 0 || index >= FlatItem.DirectChildCount? null : DirectChildren[index];
     }
 }

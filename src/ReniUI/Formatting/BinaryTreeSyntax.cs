@@ -19,13 +19,13 @@ namespace ReniUI.Formatting
 
         readonly CacheContainer Cache = new CacheContainer();
 
-        internal BinaryTreeSyntax(BinaryTree target)
-            : this(target, null) { }
+        internal BinaryTreeSyntax(BinaryTree flatItem)
+            : this(flatItem, null) { }
 
-        BinaryTreeSyntax(BinaryTree target, BinaryTreeSyntax parent)
-            : base(target, parent)
+        BinaryTreeSyntax(BinaryTree flatItem, BinaryTreeSyntax parent)
+            : base(flatItem, parent)
         {
-            Tracer.Assert(Target != null);
+            Tracer.Assert(FlatItem != null);
             Cache.SplitItem = new ValueCache<SplitItem>(GetSplitItem);
             Cache.SplitMaster = new ValueCache<SplitMaster>(GetSplitMaster);
         }
@@ -164,6 +164,6 @@ namespace ReniUI.Formatting
         internal int? GetFlatLength(bool areEmptyLinesPossible)
             => FlatFormat<IntegerResult, int>(areEmptyLinesPossible)?.Value;
 
-        protected override string GetNodeDump() => base.GetNodeDump() + " " + Target.Token.Characters.Id;
+        protected override string GetNodeDump() => base.GetNodeDump() + " " + FlatItem.Token.Characters.Id;
     }
 }

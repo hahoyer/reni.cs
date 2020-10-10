@@ -119,9 +119,9 @@ namespace ReniUI.CompilationView
             => item switch
             {
                 Reni.Feature.ISourceProvider target => target.Value
-                , IChild<TypeBase> childType => GetSource(childType.Parent)
-                , IChild<ContextBase> hollowChildContext => GetSource(hollowChildContext.Parent)
-                , Child childContext => GetSource(childContext.Parent)
+                , IChild<TypeBase> target => GetSource(target.Parent)
+                , IChild<ContextBase> target => GetSource(target.Parent)
+                , Child target => GetSource(target.Parent)
                 , _ => null
             };
 
@@ -258,7 +258,7 @@ namespace ReniUI.CompilationView
             for(var i = 0; i < x.Length; i++)
             {
                 var control = ((i < viewPosition? "" : "?") + i).CreateView(1.5);
-                var sourcePart = compound.Syntax.PureStatements[i].Target.SourcePart;
+                var sourcePart = compound.Syntax.PureStatements[i].Binary.SourcePart;
                 control.Click += (a, b) => master.SelectSource(sourcePart);
                 result.Controls.Add(control, 0, i);
                 result.Controls.Add(x[i], 1, i);

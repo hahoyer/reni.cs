@@ -8,17 +8,17 @@ namespace Reni.Helper
         where TResult : TreeWithParentExtended<TResult, TTarget>
         where TTarget : class, ITree<TTarget>
     {
-        protected TreeWithParentExtended(TTarget target, TResult parent)
-            : base(target, parent) { }
+        protected TreeWithParentExtended(TTarget flatItem, TResult parent)
+            : base(flatItem, parent) { }
 
-        int DirectChildCount => Target.DirectChildCount;
-        int LeftDirectChildCount => Target.LeftDirectChildCount;
-
-        [DisableDump]
-        TResult[] LeftSiblings => this.CachedValue(() => LeftDirectChildCount.Select(GetDirectChild).ToArray());
+        int DirectChildCount => FlatItem.DirectChildCount;
+        int LeftDirectChildCount => FlatItem.LeftDirectChildCount;
 
         [DisableDump]
-        TResult[] RightSiblings => this.CachedValue(GetRightSiblings);
+        TResult[] LeftChildren => this.CachedValue(() => LeftDirectChildCount.Select(GetDirectChild).ToArray());
+
+        [DisableDump]
+        TResult[] RightChildren => this.CachedValue(GetRightChildren);
 
         [DisableDump]
         internal TResult LeftMost => this.GetNodesFromLeftToRight().First();
@@ -46,13 +46,13 @@ namespace Reni.Helper
 
         [DisableDump]
         TResult LeftParent
-            => Parent != null && Parent.LeftSiblings.Contains(this)
+            => Parent != null && Parent.LeftChildren.Contains(this)
                 ? Parent.LeftParent
                 : Parent;
 
         [DisableDump]
         TResult RightParent
-            => Parent != null && Parent.RightSiblings.Contains(this)
+            => Parent != null && Parent.RightChildren.Contains(this)
                 ? Parent.RightParent
                 : Parent;
 
@@ -62,9 +62,9 @@ namespace Reni.Helper
         TResult ITree<TResult>.GetDirectChild(int index) => GetDirectChild(index);
 
         [DisableDump]
-        int ITree<TResult>.LeftDirectChildCount => Target.LeftDirectChildCount;
+        int ITree<TResult>.LeftDirectChildCount => FlatItem.LeftDirectChildCount;
 
-        TResult[] GetRightSiblings()
+        TResult[] GetRightChildren()
             => (DirectChildCount - LeftDirectChildCount)
                 .Select(index => GetDirectChild(index + LeftDirectChildCount))
                 .ToArray();

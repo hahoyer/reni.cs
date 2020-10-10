@@ -53,6 +53,6 @@ namespace ReniUI.Classification
         public override string State => Syntax.Token.Characters.Id ?? "";
 
         public override IEnumerable<SourcePart> FindAllBelongings(CompilerBrowser compiler)
-            => compiler.FindAllBelongings(Syntax)?.Select(item => item.Target?.Token.Characters);
+            => compiler.FindAllBelongings(Syntax)?.Select(item => item.Binary?.Token.Characters);
     }
 }

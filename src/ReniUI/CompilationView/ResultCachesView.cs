@@ -10,7 +10,7 @@ namespace ReniUI.CompilationView
             : base(master, "ResultCaches: " + syntax.GetType().PrettyName() + "-" + syntax.ObjectId)
         {
             Client = syntax.ResultCache.CreateClient(Master);
-            SourcePart = syntax.Target.SourcePart;
+            SourcePart = syntax.Binary.SourcePart;
         }
 
         protected override SourcePart SourcePart {get;}

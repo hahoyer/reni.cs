@@ -26,7 +26,7 @@ namespace Reni.Parser
         internal long ToNumber => BitsConst.Convert(Id).ToInt64();
 
         [DisableDump]
-        internal SourcePart Token => Target.Token.Characters;
+        internal SourcePart Token => Binary.Token.Characters;
 
         internal override Result ResultForCache(ContextBase context, Category category)
             => Terminal.Result(context, category, this);
@@ -62,7 +62,7 @@ namespace Reni.Parser
             => new PrefixSyntax(prefix, right.Target, binaryTree).AddIssues<ValueSyntax>(right.Issues);
 
         internal override Result ResultForCache(ContextBase context, Category category) => Prefix
-            .Result(context, category, Right, Target);
+            .Result(context, category, Right, Binary);
 
         protected override string GetNodeDump() => Prefix.NodeDump() + "(" + Right.NodeDump + ")";
     }

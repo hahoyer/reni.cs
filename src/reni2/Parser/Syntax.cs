@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using hw.Scanner;
 using Reni.Helper;
 using Reni.Struct;
 using Reni.TokenClasses;
@@ -13,7 +14,7 @@ namespace Reni.Parser
     /// <summary>
     ///     Static syntax items
     /// </summary>
-    abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer
+    abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, Feature.ISourceProvider
     {
         internal abstract class NoChildren : Syntax
         {
@@ -33,13 +34,13 @@ namespace Reni.Parser
                 => throw new Exception($"Unexpected call: {nameof(GetDirectChild)}({index})");
         }
 
-        internal readonly BinaryTree Target;
+        internal readonly BinaryTree Binary;
 
-        protected Syntax(BinaryTree target) => Target = target;
+        protected Syntax(BinaryTree target) => Binary = target;
 
         protected Syntax(int objectId, BinaryTree target)
             : base(objectId)
-            => Target = target;
+            => Binary = target;
 
         [DisableDump]
         protected abstract int LeftChildCount { get; }
@@ -94,7 +95,7 @@ namespace Reni.Parser
 
         internal virtual void AssertValid(BinaryTree target = null)
         {
-            target ??= Target;
+            target ??= Binary;
             if(target == null)
                 return;
 
@@ -103,7 +104,7 @@ namespace Reni.Parser
 
             var nodesInSyntax = this
                 .GetNodesFromLeftToRight()
-                .Select(node => node?.Target)
+                .Select(node => node?.Binary)
                 .Where(node => node != null)
                 .ToArray();
 
@@ -125,5 +126,9 @@ namespace Reni.Parser
             }
 
         }
+
+        SourcePart Feature.ISourceProvider.Value => SourcePart;
+
+        SourcePart SourcePart => Binary?.SourcePart;
     }
 }

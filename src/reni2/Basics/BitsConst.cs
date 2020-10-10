@@ -197,7 +197,7 @@ namespace Reni.Basics
             Tracer.Assert
                 (SlagBits(Size).IsZero, () => "Size of object is not byte aligned: " + Dump());
             Tracer.Assert
-                (SlagBits(size).IsZero, () => "Target size is not byte aligned: " + size.Dump());
+                (SlagBits(size).IsZero, () => "Binary size is not byte aligned: " + size.Dump());
 
             var bytes = size.ByteCount;
             return Convert(Data.Length - bytes, Data, bytes);
