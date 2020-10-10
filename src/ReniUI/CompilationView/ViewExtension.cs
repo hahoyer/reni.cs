@@ -28,12 +28,12 @@ namespace ReniUI.CompilationView
 
         internal static Control CreateView(this Closures closures, SourceView master)
             => false.CreateLineupView
-                (
-                    closures
-                        .Data
-                        .Select(item => item.CreateLink(master))
-                        .ToArray()
-                );
+            (
+                closures
+                    .Data
+                    .Select(item => item.CreateLink(master))
+                    .ToArray()
+            );
 
         internal static Control CreateView(this Type target)
             => target.PrettyName().CreateView();
@@ -44,7 +44,7 @@ namespace ReniUI.CompilationView
         internal static Control CreateSizeView(this Result result)
         {
             var size = result.Type?.Size
-                ?? result.Size ?? (result.HasIsHollow ? Size.Zero : null);
+                       ?? result.Size ?? (result.HasIsHollow? Size.Zero : null);
             return size.CreateView();
         }
 
@@ -87,15 +87,13 @@ namespace ReniUI.CompilationView
         internal static Control CreateTypeLineView(this TypeBase target, SourceView master)
             => true.CreateLineupView(target.Size.CreateView(), target.CheckedCreateView(master));
 
-        internal static Control CreateClient
-            (this FunctionCache<ContextBase, ResultCache> target, SourceView master)
+        internal static Control CreateClient(this FunctionCache<ContextBase, ResultCache> target, SourceView master)
             =>
                 target.Count == 1
                     ? target.First().CreateView(master)
                     : new ResultCachesViewsPanel(target, master).Client;
 
-        internal static TableLayoutPanel CreateView
-            (this KeyValuePair<ContextBase, ResultCache> item, SourceView master)
+        internal static TableLayoutPanel CreateView(this KeyValuePair<ContextBase, ResultCache> item, SourceView master)
         {
             var control = false.ForceLineupView
                 (
@@ -118,25 +116,14 @@ namespace ReniUI.CompilationView
         }
 
         internal static SourcePart GetSource(this object item)
-        {
-            var target = item as Reni.Feature.ISourceProvider;
-            if(target != null)
-                return target.Value;
-
-            var chidType = item as IChild<TypeBase>;
-            if(chidType != null)
-                return GetSource(chidType.Parent);
-
-            var hollowChildContext = item as IChild<ContextBase>;
-            if(hollowChildContext != null)
-                return GetSource(hollowChildContext.Parent);
-
-            var childContext = item as Child;
-            if(childContext != null)
-                return GetSource(childContext.Parent);
-
-            return null;
-        }
+            => item switch
+            {
+                Reni.Feature.ISourceProvider target => target.Value
+                , IChild<TypeBase> childType => GetSource(childType.Parent)
+                , IChild<ContextBase> hollowChildContext => GetSource(hollowChildContext.Parent)
+                , Child childContext => GetSource(childContext.Parent)
+                , _ => null
+            };
 
         static IEnumerable<object> ParentChain(this object target)
         {
@@ -145,13 +132,14 @@ namespace ReniUI.CompilationView
             {
                 yield return current;
                 current = ObtainParent(current);
-            } while(current != null);
+            }
+            while(current != null);
         }
 
         static object ObtainParent(object target)
             => (target as Child)?.Parent
-                ?? (target as IChild<TypeBase>)?.Parent
-                    ?? (object) (target as IChild<ContextBase>)?.Parent;
+               ?? (target as IChild<TypeBase>)?.Parent
+               ?? (object)(target as IChild<ContextBase>)?.Parent;
 
         internal static Control CreateView(this object target, SourceView master)
             => target
@@ -165,20 +153,20 @@ namespace ReniUI.CompilationView
                 (GetSize(target)?.CreateView(), target.CreateLink(master));
 
             var childView = CreateChildView(target as FunctionBodyType)
-                ?? CreateChildView(target as AlignType)
-                    ?? CreateChildView(target as NumberType)
-                        ?? CreateChildView(target as FunctionType, master)
+                            ?? CreateChildView(target as AlignType)
+                            ?? CreateChildView(target as NumberType)
+                            ?? CreateChildView(target as FunctionType, master)
                             ?? CreateChildView(target as CompoundContext, master)
-                                ?? CreateChildView(target as Compound, master)
-                                    ?? CreateChildView(target as CompoundType)
-                                        ?? CreateChildView(target as ArrayType)
-                                            ?? CreateChildView(target as ArrayReferenceType)
-                                                ?? CreateChildView(target as PointerType)
-                                                    ?? CreateChildView
-                                                        (target as Reni.Context.Function, master)
-                                                        ?? CreateChildView(target as Root)
-                                                            ?? CreateChildView(target as BitType)
-                                                                ?? NotImplemented(target);
+                            ?? CreateChildView(target as Compound, master)
+                            ?? CreateChildView(target as CompoundType)
+                            ?? CreateChildView(target as ArrayType)
+                            ?? CreateChildView(target as ArrayReferenceType)
+                            ?? CreateChildView(target as PointerType)
+                            ?? CreateChildView
+                                (target as Reni.Context.Function, master)
+                            ?? CreateChildView(target as Root)
+                            ?? CreateChildView(target as BitType)
+                            ?? NotImplemented(target);
             return false.CreateLineupView(head, childView);
         }
 
@@ -200,33 +188,33 @@ namespace ReniUI.CompilationView
             var getterView = target.Getter.CreateView(master);
 
             return false.CreateLineupView
-                (
-                    true.CreateLineupView(indexView, argsTypeView, closuresView, valueTypeView),
-                    setterView?.CreateGroup("Set"),
-                    getterView?.CreateGroup("Get")
-                );
+            (
+                true.CreateLineupView(indexView, argsTypeView, closuresView, valueTypeView),
+                setterView?.CreateGroup("Set"),
+                getterView?.CreateGroup("Get")
+            );
         }
 
         static Control CreateChildView(this PointerType target)
-            => target == null ? null : _dummy;
+            => target == null? null : _dummy;
 
         static Control CreateChildView(this AlignType target)
-            => target == null ? null : _dummy;
+            => target == null? null : _dummy;
 
         static Control CreateChildView(this Root target)
-            => target == null ? null : _dummy;
+            => target == null? null : _dummy;
 
         static Control CreateChildView(this BitType target)
-            => target == null ? null : _dummy;
+            => target == null? null : _dummy;
 
         static Control CreateChildView(this NumberType target)
-            => target == null ? null : _dummy;
+            => target == null? null : _dummy;
 
         static Control CreateChildView(this Reni.Context.Function target, SourceView master)
             => target?.ArgsType.CreateLink(master).CreateGroup("Args");
 
         static Control CreateChildView(CompoundType target)
-            => target == null ? null : _dummy;
+            => target == null? null : _dummy;
 
         static Control CreateChildView(this CompoundContext target, SourceView master)
             => target?.View.CreateView(master);
@@ -240,8 +228,8 @@ namespace ReniUI.CompilationView
                 return null;
 
             var c = ("count=" + target.Count).CreateView();
-            var m = target.IsMutable ? "mutable".CreateView() : null;
-            var t = target.IsTextItem ? "text_item".CreateView() : null;
+            var m = target.IsMutable? "mutable".CreateView() : null;
+            var t = target.IsTextItem? "text_item".CreateView() : null;
 
             var result = true.ForceLineupView(c, m, t);
             result.CellBorderStyle = TableLayoutPanelCellBorderStyle.None;
@@ -263,16 +251,13 @@ namespace ReniUI.CompilationView
 
             var result = new TableLayoutPanel
             {
-                AutoSize = true,
-                AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                ColumnCount = 2,
-                RowCount = x.Length,
-                CellBorderStyle = TableLayoutPanelCellBorderStyle.Single
+                AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, ColumnCount = 2, RowCount = x.Length
+                , CellBorderStyle = TableLayoutPanelCellBorderStyle.Single
             };
 
             for(var i = 0; i < x.Length; i++)
             {
-                var control = ((i < viewPosition ? "" : "?") + i).CreateView(1.5);
+                var control = ((i < viewPosition? "" : "?") + i).CreateView(1.5);
                 var sourcePart = compound.Syntax.PureStatements[i].Target.SourcePart;
                 control.Click += (a, b) => master.SelectSource(sourcePart);
                 result.Controls.Add(control, 0, i);
