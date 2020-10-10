@@ -32,20 +32,22 @@ namespace ReniTest
         static void RunAllTests()
         {
             var configuration = TestRunner.Configuration;
+
+            configuration.IsBreakEnabled = Debugger.IsAttached;
+            
             if(Debugger.IsAttached)
             {
-                configuration.IsBreakEnabled = true;
                 //configuration.SkipSuccessfulMethods = true;
                 configuration.SaveResults = true;
                 PendingTests.Run();
-                configuration.TestsFileName = SmbFile.SourcePath().PathCombine("PendingTests.cs");
             }
             else
             {
                 //configuration.SkipSuccessfulMethods = true;
                 configuration.SaveResults = true;
-                configuration.TestsFileName = SmbFile.SourcePath().PathCombine("PendingTests.cs");
             }
+
+            configuration.TestsFileName = SmbFile.SourcePath().PathCombine("PendingTests.cs");
             Assembly.GetExecutingAssembly().RunTests();
 
         }
