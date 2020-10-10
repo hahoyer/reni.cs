@@ -1,10 +1,13 @@
-using System.CodeDom;
 using System.Collections.Generic;
+using System.Linq;
 using hw.DebugFormatter;
+using hw.Helper;
 using hw.Scanner;
 using hw.UnitTest;
 using NUnit.Framework;
+using Reni.Parser;
 using Reni.TokenClasses;
+// ReSharper disable StringLiteralTypo
 
 namespace ReniUI.Test
 {
@@ -19,7 +22,7 @@ namespace ReniUI.Test
         [UnitTest]
         public void ReformatPart()
         {
-            const string Text = @"systemdata:
+            const string text = @"systemdata:
 {
     1 type instance () Memory: ((0 type * ('100' to_number_of_base 64)) mutable) instance ();
     ! mutable FreePointer: Memory array_reference mutable;
@@ -30,18 +33,20 @@ namespace ReniUI.Test
 3;
 (Text ('H') << 'allo') dump_print";
 
-            var compiler = CompilerBrowser.FromText(Text);
+            var compiler = CompilerBrowser.FromText(text);
 
             for(var start = 0; start < compiler.Source.Length; start++)
             for(var end = start + 1; end < compiler.Source.Length; end++)
             {
                 var span = (compiler.Source + start).Span(end - start);
-                var reformat = compiler.Reformat(targetPart:span);
+                var reformat = compiler.Reformat(targetPart: span);
                 if(reformat != null)
                 {
                     var newCompiler = CompilerBrowser.FromText(reformat);
-                    Tracer.Assert(compiler.BinaryTreeSyntax.Target.IsEqual(newCompiler.BinaryTreeSyntax.Target, IgnoreWhiteSpaces),
-                        ()=>@$"origin: 
+                    Tracer.Assert(
+                        IsEqual(compiler.BinaryTreeSyntax.Target, newCompiler.BinaryTreeSyntax.Target
+                            , IgnoreWhiteSpaces),
+                        () => @$"origin: 
 {compiler.BinaryTreeSyntax.Target.Dump()} 
 
 new ({span.NodeDump}): 
@@ -51,6 +56,43 @@ new ({span.NodeDump}):
                     );
                 }
             }
+        }
+
+        static bool IsEqual(BinaryTree target, BinaryTree other, IComparator differenceHandler)
+        {
+            if(target.TokenClass.Id != other.TokenClass.Id)
+                return false;
+
+            if(target.Left == null && other.Left != null)
+                return false;
+
+            if(target.Left != null && other.Left == null)
+                return false;
+
+            if(target.Right == null && other.Right != null)
+                return false;
+
+            if(target.Right != null && other.Right == null)
+                return false;
+
+            if(target.Left != null && !IsEqual(target.Left, other.Left, differenceHandler))
+                return false;
+
+            if(target.Right != null && !IsEqual(target.Right, other.Right, differenceHandler))
+                return false;
+
+            return CompareWhiteSpaces(target.Token.PrecededWith, other.Token.PrecededWith, differenceHandler);
+        }
+
+        static bool CompareWhiteSpaces
+            (IEnumerable<IItem> target, IEnumerable<IItem> other, IComparator differenceHandler)
+        {
+            if(target.Where(item => item.IsComment()).SequenceEqual(other.Where(item => item.IsComment())
+                , differenceHandler.WhiteSpaceComparer))
+                return true;
+
+            Dumpable.NotImplementedFunction(target.Dump(), other.Dump(), differenceHandler);
+            return default;
         }
     }
 
@@ -66,13 +108,13 @@ new ({span.NodeDump}):
             if(other == null)
                 return false;
 
-            if(target.ScannerTokenType != other.ScannerTokenType )
+            if(target.ScannerTokenType != other.ScannerTokenType)
                 return false;
 
             if(target.SourcePart.Id == other.SourcePart.Id)
                 return true;
 
-            NotImplementedFunction(target,other);
+            NotImplementedFunction(target, other);
             return default;
         }
 

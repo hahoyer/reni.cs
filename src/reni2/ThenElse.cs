@@ -30,15 +30,16 @@ namespace Reni
             Else = elseSyntax;
         }
 
-        protected override int DirectNodeCount => 4;
+        protected override int LeftChildCount => Else == null? 1 : 2;
 
-        protected override Syntax GetDirectNode(int index)
+        protected override int DirectChildCount => 3;
+
+        protected override Syntax GetDirectChild(int index)
             => index switch
             {
                 0 => Cond
-                , 1 => Else == null ? this: Then
-                , 2 => Else == null ? Then: this
-                , 3 => Else 
+                , 1 => Then
+                , 2 => Else 
                 , _ => null
             };
 

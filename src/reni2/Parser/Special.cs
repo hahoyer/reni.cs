@@ -53,18 +53,13 @@ namespace Reni.Parser
             Right = right;
         }
 
-        protected override int DirectNodeCount => 2;
+        protected override int LeftChildCount => 0;
+        protected override int DirectChildCount => 1;
+
+        protected override Syntax GetDirectChild(int index) => index == 0? Right : null;
 
         public static Result<ValueSyntax> Create(IPrefix prefix, Result<ValueSyntax> right, BinaryTree binaryTree)
             => new PrefixSyntax(prefix, right.Target, binaryTree).AddIssues<ValueSyntax>(right.Issues);
-
-        protected override Syntax GetDirectNode(int index)
-            => index switch
-            {
-                0 => this
-                , 1 => Right
-                , _ => null
-            };
 
         internal override Result ResultForCache(ContextBase context, Category category) => Prefix
             .Result(context, category, Right, Target);
@@ -97,14 +92,14 @@ namespace Reni.Parser
 
         internal override IRecursionHandler RecursionHandler => Infix as IRecursionHandler;
 
-        protected override int DirectNodeCount => 3;
+        protected override int LeftChildCount => 1;
+        protected override int DirectChildCount => 2;
 
-        protected override Syntax GetDirectNode(int index)
+        protected override Syntax GetDirectChild(int index)
             => index switch
             {
                 0 => Left
-                , 1 => this
-                , 2 => Right
+                , 1 => Right
                 , _ => null
             };
 
@@ -153,15 +148,11 @@ namespace Reni.Parser
             Suffix = suffix;
         }
 
-        protected override int DirectNodeCount => 2;
+        protected override int LeftChildCount => 1;
+        protected override int DirectChildCount => 1;
 
-        protected override Syntax GetDirectNode(int index)
-            => index switch
-            {
-                0 => Left
-                , 1 => this
-                , _ => null
-            };
+        protected override Syntax GetDirectChild(int index)=> index==0? Left:null;
+
         public static Result<ValueSyntax> Create(Result<ValueSyntax> left, ISuffix suffix, BinaryTree binaryTree)
         {
             ValueSyntax syntax = new SuffixSyntax(left.Target, suffix, binaryTree);

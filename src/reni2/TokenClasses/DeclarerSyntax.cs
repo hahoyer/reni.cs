@@ -65,18 +65,14 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal bool IsMutableSyntax => Tags.Any(item => item.Value is MutableDeclarationToken);
 
-        protected override int DirectNodeCount => Tags.Length + 2;
+        protected override int LeftChildCount => Tags.Length;
+        protected override int DirectChildCount => Tags.Length + 1;
 
-        protected override Syntax GetDirectNode(int index)
+        protected override Syntax GetDirectChild(int index)
         {
-            var delta = index - Tags.Length;
-            return delta switch
-            {
-                0 => this
-                , 1 => Name
-                , _ => index >= 0 && delta < 0? Tags[index] : null
-            };
-
+            if(index >= 0 && index < Tags.Length)
+                return Tags[index];
+            return index == Tags.Length? Name : null;
         }
 
         internal static DeclarerSyntax FromTag

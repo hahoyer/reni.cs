@@ -38,6 +38,8 @@ namespace Reni
         internal static bool IsBelongingTo(this ITokenClass current, ITokenClass other)
             => (current as IBelongingsMatcher)?.IsBelongingTo(other) ?? false;
 
+
+        [Obsolete("",true)]
         internal static IEnumerable<BinaryTree> CheckedItemsAsLongAs
             (this BinaryTree target, Func<BinaryTree, bool> condition)
         {

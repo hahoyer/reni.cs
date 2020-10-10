@@ -37,14 +37,14 @@ namespace Reni.TokenClasses
 
         internal override bool IsLambda => true;
 
-        protected override int DirectNodeCount => 3;
+        protected override int LeftChildCount => 1;
+        protected override int DirectChildCount => 2;
 
-        protected override Syntax GetDirectNode(int index)
+        protected override Syntax GetDirectChild(int index)
             => index switch
             {
                 0 => Getter
-                , 1 => this
-                , 2 => Setter
+                , 1 => Setter
                 , _ => null
             };
 

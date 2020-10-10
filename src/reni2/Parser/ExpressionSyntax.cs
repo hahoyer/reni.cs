@@ -54,14 +54,14 @@ namespace Reni.Parser
             StopByObjectIds();
         }
 
-        protected override int DirectNodeCount => 3;
+        protected override int LeftChildCount => 1;
+        protected override int DirectChildCount => 2;
 
-        protected override Syntax GetDirectNode(int index)
+        protected override Syntax GetDirectChild(int index)
             => index switch
             {
                 0 => Left
-                , 1 => this
-                , 2 => Right
+                , 1 => Right
                 , _ => null
             };
 

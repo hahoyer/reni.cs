@@ -20,10 +20,10 @@ namespace Reni.Parser
             protected NoChildren(int objectId, BinaryTree target)
                 : base(objectId, target) { }
 
-            protected sealed override int DirectNodeCount => 0;
-
-            protected sealed override Syntax GetDirectNode(int index) 
-                => throw new Exception($"Unexpected call: {nameof(GetDirectNode)}({index})");
+            protected sealed override int LeftChildCount => 0;
+            protected sealed override int DirectChildCount => 0;
+            protected sealed override Syntax GetDirectChild(int index)
+                => throw new Exception($"Unexpected call: {nameof(GetDirectChild)}({index})");
         }
 
         internal readonly BinaryTree Target;
@@ -34,12 +34,16 @@ namespace Reni.Parser
             : base(objectId)
             => Target = target;
 
-        protected abstract int DirectNodeCount { get; }
+        protected abstract int LeftChildCount { get; }
+        protected abstract int DirectChildCount { get; }
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
-        int ITree<Syntax>.DirectNodeCount => DirectNodeCount;
-        Syntax ITree<Syntax>.GetDirectNode(int index) => GetDirectNode(index);
-        protected abstract Syntax GetDirectNode(int index);
+
+        int ITree<Syntax>.LeftDirectChildCount => LeftChildCount;
+        int ITree<Syntax>.DirectChildCount => DirectChildCount;
+        Syntax ITree<Syntax>.GetDirectChild(int index) => GetDirectChild(index);
+        
+        protected abstract Syntax GetDirectChild(int index);
 
         internal virtual Result<ValueSyntax> ToValueSyntax(BinaryTree target = null)
         {
@@ -66,5 +70,6 @@ namespace Reni.Parser
             NotImplementedMethod(target);
             return default;
         }
+
     }
 }

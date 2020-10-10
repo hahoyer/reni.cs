@@ -3,6 +3,7 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 using Reni.Helper;
+using Reni.TokenClasses;
 
 namespace ReniUI.Helper
 {
@@ -16,12 +17,10 @@ namespace ReniUI.Helper
 
         readonly CacheContainer Cache = new CacheContainer();
 
-        internal BinaryTreeSyntax(Reni.TokenClasses.BinaryTree target)
-            : this(target, null)
-        {
-        }
+        internal BinaryTreeSyntax(BinaryTree target)
+            : this(target, null) { }
 
-        BinaryTreeSyntax(Reni.TokenClasses.BinaryTree target, BinaryTreeSyntax parent)
+        BinaryTreeSyntax(BinaryTree target, BinaryTreeSyntax parent)
             : base(target, parent)
         {
             Cache.LocateByPosition = new FunctionCache<int, BinaryTreeSyntax>(LocateByPositionForCache);
@@ -45,8 +44,7 @@ namespace ReniUI.Helper
 
         public BinaryTreeSyntax LocateByPosition(int current) => Cache.LocateByPosition[current];
 
-        protected override BinaryTreeSyntax Create(Reni.TokenClasses.BinaryTree target, BinaryTreeSyntax parent)
-            => new BinaryTreeSyntax(target, parent);
+        protected override BinaryTreeSyntax Create(BinaryTree target, BinaryTreeSyntax parent) => new BinaryTreeSyntax(target, parent);
 
         internal BinaryTreeSyntax Locate(SourcePart part)
             => Left?.CheckedLocate(part) ??

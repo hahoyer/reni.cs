@@ -13,43 +13,20 @@ namespace Reni.TokenClasses
 {
     public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer, ITree<BinaryTree>
     {
-        interface IVisitor
-        {
-            void VisitMain(BinaryTree target);
-        }
-
-        class IssuesVisitor : DumpableObject, IVisitor
-        {
-            readonly List<Issue> ValueCollector = new List<Issue>();
-
-            [DisableDump]
-            internal IEnumerable<Issue> Value => ValueCollector;
-
-            void IVisitor.VisitMain(BinaryTree target)
-            {
-                var issue = (target.TokenClass as ScannerSyntaxError)
-                    ?.IssueId
-                    .Issue(target.Token.Characters);
-
-                if(issue != null)
-                    ValueCollector.Add(issue);
-            }
-        }
-
         static int NextObjectId;
 
         [EnableDump]
         [EnableDumpExcept(null)]
         internal BinaryTree Left { get; }
 
-        [EnableDump]
-        [EnableDumpExcept(null)]
-        internal BinaryTree Right { get; }
-
         [DisableDump]
         internal readonly IToken Token;
 
         internal ITokenClass TokenClass { get; }
+
+        [EnableDump]
+        [EnableDumpExcept(null)]
+        internal BinaryTree Right { get; }
 
         BinaryTree
         (
@@ -79,9 +56,17 @@ namespace Reni.TokenClasses
         {
             get
             {
-                var visitor = new IssuesVisitor();
-                Visit(visitor);
-                return visitor.Value;
+                if(Left != null)
+                    foreach(var issue in Left.Issues)
+                        yield return issue;
+
+                var issue1 = (TokenClass as ScannerSyntaxError)?.IssueId.Issue(Token.Characters);
+                if(issue1 != null)
+                    yield return issue1;
+
+                if(Right != null)
+                    foreach(var issue in Right.Issues)
+                        yield return issue;
             }
         }
 
@@ -90,49 +75,16 @@ namespace Reni.TokenClasses
         SourcePart ISyntax.All => SourcePart;
         SourcePart ISyntax.Main => Token.Characters;
 
-        int ITree<BinaryTree>.DirectNodeCount => 3;
+        int ITree<BinaryTree>.LeftDirectChildCount => 1;
+        int ITree<BinaryTree>.DirectChildCount => 2;
 
-        BinaryTree ITree<BinaryTree>.GetDirectNode(int index)
+        BinaryTree ITree<BinaryTree>.GetDirectChild(int index)
             => index switch
             {
                 0 => Left
-                , 1 => this
-                , 2 => Right
+                , 1 => Right
                 , _ => null
             };
-
-        void Visit(IVisitor visitor)
-        {
-            Left?.Visit(visitor);
-            visitor.VisitMain(this);
-            Right?.Visit(visitor);
-        }
-
-        public bool IsEqual(BinaryTree other, IComparator differenceHandler)
-        {
-            if(TokenClass.Id != other.TokenClass.Id)
-                return false;
-
-            if(Left == null && other.Left != null)
-                return false;
-
-            if(Left != null && other.Left == null)
-                return false;
-
-            if(Right == null && other.Right != null)
-                return false;
-
-            if(Right != null && other.Right == null)
-                return false;
-
-            if(Left != null && !Left.IsEqual(other.Left, differenceHandler))
-                return false;
-
-            if(Right != null && !Right.IsEqual(other.Right, differenceHandler))
-                return false;
-
-            return CompareWhiteSpaces(Token.PrecededWith, other.Token.PrecededWith, differenceHandler);
-        }
 
         protected override string GetNodeDump() => base.GetNodeDump() + $"({TokenClass.Id})";
 
@@ -145,90 +97,11 @@ namespace Reni.TokenClasses
         )
             => new BinaryTree(left, tokenClass, token, right);
 
-        internal IEnumerable<BinaryTree> Belongings(BinaryTree recent)
-        {
-            var root = RootOfBelongings(recent);
-
-            return root?.TokenClass is IBelongingsMatcher matcher
-                ? root
-                    .ItemsAsLongAs(item => matcher.IsBelongingTo(item.TokenClass))
-                    .ToArray()
-                : null;
-        }
-
+        [Obsolete("",true)]
         internal IEnumerable<BinaryTree> ItemsAsLongAs(Func<BinaryTree, bool> condition)
             => new[] {this}
                 .Concat(Left.CheckedItemsAsLongAs(condition))
                 .Concat(Right.CheckedItemsAsLongAs(condition));
-
-        BinaryTree Locate(SourcePart part)
-            => Left?.CheckedLocate(part) ??
-               Right?.CheckedLocate(part) ??
-               this;
-
-        BinaryTree CheckedLocate(SourcePart part)
-            => SourcePart.Contains(part)? Locate(part) : null;
-
-
-        BinaryTree RootOfBelongings(BinaryTree recent)
-        {
-            if(!(recent.TokenClass is IBelongingsMatcher matcher))
-                return null;
-
-            var sourceSyntaxList = BackChain(recent)
-                .ToArray();
-
-            return sourceSyntaxList
-                       .Skip(1)
-                       .TakeWhile(item => matcher.IsBelongingTo(item.TokenClass))
-                       .LastOrDefault() ??
-                   recent;
-        }
-
-        IEnumerable<BinaryTree> BackChain(BinaryTree recent)
-        {
-            var subChain = SubBackChain(recent);
-            if(subChain == null)
-                yield break;
-
-            foreach(var items in subChain)
-                yield return items;
-
-            yield return this;
-        }
-
-        BinaryTree[] SubBackChain(BinaryTree recent)
-        {
-            if(this == recent)
-                return new BinaryTree[0];
-
-            if(Left != null)
-            {
-                var result = Left.BackChain(recent).ToArray();
-                if(result.Any())
-                    return result;
-            }
-
-            if(Right != null)
-            {
-                var result = Right.BackChain(recent).ToArray();
-                if(result.Any())
-                    return result;
-            }
-
-            return null;
-        }
-
-        static bool CompareWhiteSpaces
-            (IEnumerable<IItem> target, IEnumerable<IItem> other, IComparator differenceHandler)
-        {
-            if(target.Where(item => item.IsComment()).SequenceEqual(other.Where(item => item.IsComment())
-                , differenceHandler.WhiteSpaceComparer))
-                return true;
-
-            NotImplementedFunction(target.Dump(), other.Dump(), differenceHandler);
-            return default;
-        }
 
         Result<BinaryTree> GetBracketKernel(int level)
         {

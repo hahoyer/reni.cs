@@ -27,14 +27,14 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal bool IsMutableSyntax => Declarer?.IsMutableSyntax ?? false;
 
-        protected override int DirectNodeCount => 3;
+        protected override int LeftChildCount => 1;
+        protected override int DirectChildCount => 2;
 
-        protected override Syntax GetDirectNode(int index)
+        protected override Syntax GetDirectChild(int index)
             => index switch
             {
                 0 => Declarer
-                , 1 => this
-                , 2 => Value
+                , 1 => Value
                 , _ => null
             };
 

@@ -19,7 +19,7 @@ namespace Reni.Helper
         }
 
         internal IEnumerable<TResult> DirectChildren
-            => Target.DirectNodeCount.Select(GetDirectNode).Where(child => child != null);
+            => Target.DirectChildCount.Select(GetDirectChild).Where(child => child != null);
 
         TResult Center => this as TResult;
 
@@ -27,11 +27,10 @@ namespace Reni.Helper
 
         protected abstract TResult Create(TTarget target, TResult parent);
 
-        protected TResult GetDirectNode(int index)
+        protected TResult GetDirectChild(int index)
         {
-            var node = Target.GetDirectNode(index);
+            var node = Target.GetDirectChild(index);
             return node == null? null :
-                ReferenceEquals(node, Target)? Center :
                 this.CachedFunction(index, index => Create(node, Center));
         }
     }

@@ -11,9 +11,10 @@ namespace Reni.Helper
         protected TreeWithParentExtended(TTarget target, TResult parent)
             : base(target, parent) { }
 
-        int DirectNodeCount => Target.DirectNodeCount;
-        int CenterIndex => this.CachedValue(GetCenterIndex);
-        TResult[] LeftSiblings => this.CachedValue(() => CenterIndex.Select(GetDirectNode).ToArray());
+        int DirectChildCount => Target.DirectChildCount;
+        int LeftDirectChildCount => Target.LeftDirectChildCount;
+
+        TResult[] LeftSiblings => this.CachedValue(() => LeftDirectChildCount.Select(GetDirectChild).ToArray());
         TResult[] RightSiblings => this.CachedValue(GetRightSiblings);
 
         [DisableDump]
@@ -29,10 +30,10 @@ namespace Reni.Helper
         internal TResult RightNeighbor => LeftMostRightSibling?.LeftMost ?? RightParent;
 
         [DisableDump]
-        internal TResult RightMostLeftSibling => GetDirectNode(CenterIndex - 1);
+        internal TResult RightMostLeftSibling => GetDirectChild(LeftDirectChildCount - 1);
 
         [DisableDump]
-        internal TResult LeftMostRightSibling => GetDirectNode(CenterIndex + 1);
+        internal TResult LeftMostRightSibling => GetDirectChild(LeftDirectChildCount);
 
         [DisableDump]
         internal bool IsLeftChild => Parent?.RightMostLeftSibling == this;
@@ -52,16 +53,15 @@ namespace Reni.Helper
                 ? Parent.RightParent
                 : Parent;
 
-        int ITree<TResult>.DirectNodeCount => DirectNodeCount;
-        TResult ITree<TResult>.GetDirectNode(int index) => GetDirectNode(index);
-
         TResult[] GetRightSiblings()
-            => (DirectNodeCount - CenterIndex - 1)
-                .Select(index => GetDirectNode(index + CenterIndex + 1))
+            => (DirectChildCount - LeftDirectChildCount)
+                .Select(index => GetDirectChild(index + LeftDirectChildCount))
                 .ToArray();
 
-        int GetCenterIndex() => DirectNodeCount
-            .Select()
-            .First(index => ReferenceEquals(GetDirectNode(index), this));
+        int ITree<TResult>.LeftDirectChildCount => Target.LeftDirectChildCount;
+
+        int ITree<TResult>.DirectChildCount => DirectChildCount;
+
+        TResult ITree<TResult>.GetDirectChild(int index) => GetDirectChild(index);
     }
 }

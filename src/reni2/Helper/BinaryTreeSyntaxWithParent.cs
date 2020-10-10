@@ -32,11 +32,11 @@ namespace Reni.Helper
 
         [EnableDump]
         [EnableDumpExcept(null)]
-        public TResult Left => ((ITree<TResult>)this).GetDirectNode(0);
+        public TResult Left => ((ITree<TResult>)this).GetDirectChild(0);
 
         [EnableDump]
         [EnableDumpExcept(null)]
-        public TResult Right => ((ITree<TResult>)this).GetDirectNode(2);
+        public TResult Right => ((ITree<TResult>)this).GetDirectChild(1);
 
         [EnableDump]
         internal ITokenClass TokenClass => Target.TokenClass;

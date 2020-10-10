@@ -334,9 +334,6 @@ namespace Reni
             if(Parameters.IsCodeRequired)
                 CodeContainerCache.IsValid = true;
         }
-
-        internal IEnumerable<BinaryTree> FindAllBelongings(BinaryTree binaryTree)
-            => BinaryTree.Belongings(binaryTree);
     }
 
     public sealed class TraceCollector : DumpableObject, ITraceCollector

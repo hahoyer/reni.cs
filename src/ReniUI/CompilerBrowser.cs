@@ -19,7 +19,7 @@ namespace ReniUI
     {
         class CacheContainer
         {
-            internal Formatting.BinaryTreeSyntax FomattingBinaryTreeSyntax;
+            internal BinaryTreeSyntax FormattingBinaryTreeSyntax;
             internal Helper.BinaryTreeSyntax HelperBinaryTreeSyntax;
             internal Helper.Syntax Syntax;
         }
@@ -31,11 +31,11 @@ namespace ReniUI
 
         readonly ValueCache<Compiler> ParentCache;
 
-        internal CompilerBrowser(Func<Compiler> parent) => ParentCache = new ValueCache<Compiler>(parent);
+        CompilerBrowser(Func<Compiler> parent) => ParentCache = new ValueCache<Compiler>(parent);
 
         public Source Source => Compiler.Source;
 
-        public Compiler Compiler => ParentCache.Value;
+        Compiler Compiler => ParentCache.Value;
 
         public StringStream Result
         {
@@ -52,9 +52,9 @@ namespace ReniUI
 
         internal IEnumerable<Issue> Issues => Compiler.Issues;
 
-        internal Formatting.BinaryTreeSyntax FormattingBinaryTreeSyntax
-            => Cache.FomattingBinaryTreeSyntax ??
-               (Cache.FomattingBinaryTreeSyntax = new Formatting.BinaryTreeSyntax(Compiler.BinaryTree));
+        internal BinaryTreeSyntax FormattingBinaryTreeSyntax
+            => Cache.FormattingBinaryTreeSyntax ??
+               (Cache.FormattingBinaryTreeSyntax = new BinaryTreeSyntax(Compiler.BinaryTree));
 
         internal Helper.BinaryTreeSyntax BinaryTreeSyntax
             => Cache.HelperBinaryTreeSyntax ?? (Cache.HelperBinaryTreeSyntax = GetHelperSyntax());
@@ -107,7 +107,7 @@ namespace ReniUI
                 : Function(result.Value);
         }
 
-        internal int? FindFunctionIndex(IFormalCodeItem codeBase)
+        int? FindFunctionIndex(IFormalCodeItem codeBase)
         {
             if(CodeToFunctionIndexCache.TryGetValue(codeBase, out var result))
                 return result;
@@ -131,8 +131,10 @@ namespace ReniUI
             return null;
         }
 
+
+        [Obsolete("", true)]
         internal IEnumerable<BinaryTree> FindAllBelongings(Helper.BinaryTreeSyntax binaryTreeSyntax)
-            => Compiler.BinaryTree.Belongings(binaryTreeSyntax.Target);
+            => Belongings(Compiler.BinaryTree, binaryTreeSyntax.Target);
 
         internal string Reformat(IFormatter formatter = null, SourcePart targetPart = null) =>
             (formatter ?? new Formatting.Configuration().Create())
@@ -175,8 +177,6 @@ namespace ReniUI
                 $"Syntax: Unexpected {e} \nText:\n{Source.Data}".Log();
                 throw;
             }
-
-            ;
         }
 
         Helper.Syntax GetValue()
@@ -190,8 +190,6 @@ namespace ReniUI
                 $"Syntax: Unexpected {e} \nText:\n{Source.Data}".Log();
                 throw;
             }
-
-            ;
         }
 
         Helper.Syntax LocateValueByPosition(int offset)
@@ -203,6 +201,65 @@ namespace ReniUI
             var tokenSyntax = token.Syntax;
             var position = tokenSyntax.Token.Characters.Position;
             return position <= 0? null : tokenSyntax.LocateByPosition(position - 1);
+        }
+
+        [Obsolete("", true)]
+        static IEnumerable<BinaryTree> Belongings(BinaryTree target, BinaryTree recent)
+        {
+            var root = RootOfBelongings(target, recent);
+
+            return root?.TokenClass is IBelongingsMatcher matcher
+                ? root
+                    .ItemsAsLongAs(item => matcher.IsBelongingTo(item.TokenClass)).ToArray()
+                : null;
+        }
+
+        static BinaryTree RootOfBelongings(BinaryTree target, BinaryTree recent)
+        {
+            if(!(recent.TokenClass is IBelongingsMatcher matcher))
+                return null;
+
+            var sourceSyntaxList = BackChain(target, recent).ToArray();
+
+            return sourceSyntaxList
+                       .Skip(1)
+                       .TakeWhile(item => matcher.IsBelongingTo(item.TokenClass))
+                       .LastOrDefault() ??
+                   recent;
+        }
+
+        static IEnumerable<BinaryTree> BackChain(BinaryTree target, BinaryTree recent)
+        {
+            var subChain = SubBackChain(target, recent);
+            if(subChain == null)
+                yield break;
+
+            foreach(var items in subChain)
+                yield return items;
+
+            yield return target;
+        }
+
+        static BinaryTree[] SubBackChain(BinaryTree target, BinaryTree recent)
+        {
+            if(target == recent)
+                return new BinaryTree[0];
+
+            if(target.Left != null)
+            {
+                var result = BackChain(target.Left, recent).ToArray();
+                if(result.Any())
+                    return result;
+            }
+
+            if(target.Right != null)
+            {
+                var result = BackChain(target.Right, recent).ToArray();
+                if(result.Any())
+                    return result;
+            }
+
+            return null;
         }
     }
 }

@@ -2,7 +2,8 @@ namespace Reni.Helper
 {
     interface ITree<out TTarget>
     {
-        int DirectNodeCount { get; }
-        TTarget GetDirectNode(int index);
+        int LeftDirectChildCount { get; }
+        int DirectChildCount { get; }
+        TTarget GetDirectChild(int index);
     }
 }

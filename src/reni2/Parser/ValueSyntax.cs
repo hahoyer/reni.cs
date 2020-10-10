@@ -23,10 +23,10 @@ namespace Reni.Parser
             protected NoChildren(int objectId, BinaryTree target)
                 : base(objectId, target) { }
 
-            protected sealed override int DirectNodeCount => 0;
-
-            protected sealed override Syntax GetDirectNode(int index) 
-                => throw new Exception($"Unexpected call: {nameof(GetDirectNode)}({index})");
+            protected sealed override int LeftChildCount => 0;
+            protected sealed override int DirectChildCount => 0;
+            protected sealed override Syntax GetDirectChild(int index)
+                => throw new Exception($"Unexpected call: {nameof(GetDirectChild)}({index})");
         }
 
         // Used for debug only

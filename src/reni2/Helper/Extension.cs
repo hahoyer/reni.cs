@@ -10,10 +10,10 @@ namespace Reni.Helper
             if(target == null)
                 yield break;
 
-            for(var index = 0; index < target.DirectNodeCount; index++)
+            for(var index = 0; index < target.DirectChildCount; index++)
             {
-                var node = target.GetDirectNode(index);
-                if(ReferenceEquals(node, target))
+                var node = target.GetDirectChild(index);
+                if(index == target.LeftDirectChildCount)
                     yield return node;
                 else if(node != null)
                     foreach(var child in node.GetNodesFromLeftToRight())
@@ -27,11 +27,11 @@ namespace Reni.Helper
             if(target == null)
                 yield break;
 
-            for(var index = target.DirectNodeCount; index > 0; )
+            for(var index = target.DirectChildCount; index > 0; )
             {
                 index--;
-                var node = target.GetDirectNode(index);
-                if(ReferenceEquals(node, target))
+                var node = target.GetDirectChild(index);
+                if(index == target.LeftDirectChildCount)
                     yield return node;
                 else if(node != null)
                     foreach(var child in node.GetNodesFromRightToLeft())
