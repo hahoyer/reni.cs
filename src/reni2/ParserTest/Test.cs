@@ -74,7 +74,7 @@ aa)#dump_print
                 LikeSyntax
                     .Expression(null, "<<", LikeSyntax.Number(5))
                     .Brackets()
-                    .Expression("()", LikeSyntax.Number(3))
+                    .Expression("()", LikeSyntax.Number(3).Brackets())
                     .Brackets()
                     .dump_print;
             Parameters.ParseOnly = true;
@@ -92,7 +92,7 @@ aa)#dump_print
             var syntaxPrototype =
                 LikeSyntax
                     .Expression(null, "this", LikeSyntax.Null)
-                    .Expression("()", LikeSyntax.Number(3))
+                    .Expression("()", LikeSyntax.Number(3).Brackets())
                     .dump_print;
             Parameters.ParseOnly = true;
             Parameters.TraceOptions.Parser = false;

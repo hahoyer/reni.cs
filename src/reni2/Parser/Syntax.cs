@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
@@ -24,6 +25,7 @@ namespace Reni.Parser
 
             [DisableDump]
             protected sealed override int LeftChildCount => 0;
+
             [DisableDump]
             protected sealed override int DirectChildCount => 0;
 
@@ -41,16 +43,23 @@ namespace Reni.Parser
 
         [DisableDump]
         protected abstract int LeftChildCount { get; }
+
+        [DisableDump]
+        IEnumerable<Syntax> Children => this.GetNodesFromLeftToRight();
+
         [DisableDump]
         protected abstract int DirectChildCount { get; }
 
         internal Syntax[] DirectChildren => this.CachedValue(() => DirectChildCount.Select(GetDirectChild).ToArray());
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        int ITree<Syntax>.LeftDirectChildCount => LeftChildCount;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         int ITree<Syntax>.DirectChildCount => DirectChildCount;
         Syntax ITree<Syntax>.GetDirectChild(int index) => GetDirectChild(index);
 
-        int ITree<Syntax>.LeftDirectChildCount => LeftChildCount;
 
         protected abstract Syntax GetDirectChild(int index);
 
@@ -83,5 +92,38 @@ namespace Reni.Parser
         internal IEnumerable<Syntax> ItemsAsLongAs(Func<Syntax, bool> condition)
             => this.GetNodesFromLeftToRight().SelectMany(node => node.CheckedItemsAsLongAs(condition));
 
+        internal virtual void AssertValid(BinaryTree target = null)
+        {
+            target ??= Target;
+            if(target == null)
+                return;
+
+            foreach(var node in this.GetNodesFromLeftToRight().Where(node=>node != this))
+                node?.AssertValid();
+
+            var nodesInSyntax = this
+                .GetNodesFromLeftToRight()
+                .Select(node => node?.Target)
+                .Where(node => node != null)
+                .ToArray();
+
+            var missingTargetNodes = target.GetNodesFromLeftToRight()
+                .Where(node => !(node?.TokenClass is IRightBracket))
+                .Where(node => !(node?.TokenClass is ILeftBracket))
+                .Where(node => !(node?.TokenClass is List))
+                .Where(node => !(node?.TokenClass is ThenToken))
+                .Where(node => !(node?.TokenClass is ExclamationBoxToken))
+                .Where(node => !nodesInSyntax.Contains(node))
+                .ToArray();
+
+            if(missingTargetNodes.Any())
+            {
+                var targetNodes = target.GetNodesFromLeftToRight()
+                    .ToArray();
+
+                NotImplementedMethod(target, nameof(missingTargetNodes), missingTargetNodes);
+            }
+
+        }
     }
 }

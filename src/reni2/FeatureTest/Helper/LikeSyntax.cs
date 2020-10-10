@@ -1,5 +1,6 @@
 using System;
 using hw.DebugFormatter;
+using Reni.Basics;
 using Reni.Parser;
 using Reni.Struct;
 using Reni.TokenClasses;
@@ -200,7 +201,10 @@ namespace Reni.FeatureTest.Helper
 
         internal override void AssertLike(BinaryTree target)
         {
-            NotImplementedMethod(target);
+            Tracer.Assert(target.Left == null);
+            Tracer.Assert(target.Right== null);
+            Tracer.Assert(target.TokenClass is TokenClasses.Number);
+            Tracer.Assert(BitsConst.Convert(target.Token.Characters.Id).ToInt64() == _i);
         }
 
         internal override void AssertLike(ValueSyntax syntax)

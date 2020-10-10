@@ -39,9 +39,10 @@ namespace Reni
         [DisableDump]
         internal readonly Source Source;
 
-        bool IsInExecutionPhase;
         readonly ValueCache<BinaryTree> BinaryTreeCache;
         readonly ValueCache<CodeContainer> CodeContainerCache;
+
+        bool IsInExecutionPhase;
 
         readonly MainTokenFactory MainTokenFactory;
         readonly string ModuleName;
@@ -248,7 +249,15 @@ namespace Reni
         }
 
         Result<ValueSyntax> GetValueSyntax()
-            => Parameters.IsSyntaxRequired? GetValueSyntax(BinaryTree).ToFrame() : null;
+            => Parameters.IsSyntaxRequired
+                ? GetValueSyntax(BinaryTree)
+                    .ToFrame()
+                    .Apply(target =>
+                    {
+                        target.AssertValid(BinaryTree);
+                        return target;
+                    })
+                : null;
 
         static Result<ValueSyntax> GetValueSyntax(BinaryTree target) => SyntaxFactory.Root.GetValueSyntax(target);
 
@@ -257,7 +266,7 @@ namespace Reni
         static string ModuleNameFromFileName(string fileName)
             => "_" + Path.GetFileName(fileName).Symbolize();
 
-        Result<ValueSyntax> ParsePredefinedItem(string sourceText) 
+        Result<ValueSyntax> ParsePredefinedItem(string sourceText)
             => GetValueSyntax(Parse(new Source(sourceText) + 0));
 
         [UsedImplicitly]

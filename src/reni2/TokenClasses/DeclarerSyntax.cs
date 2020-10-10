@@ -15,6 +15,8 @@ namespace Reni.TokenClasses
             internal TagSyntax(SyntaxFactory.IDeclarerToken value, BinaryTree target)
                 : base(target)
                 => Value = value;
+
+            internal override void AssertValid(BinaryTree target = null) { }
         }
 
         internal class NameSyntax : NoChildren
@@ -24,23 +26,28 @@ namespace Reni.TokenClasses
             internal NameSyntax([NotNull] BinaryTree target, [NotNull] string name)
                 : base(target)
                 => Value = name;
+
+            internal override void AssertValid(BinaryTree target = null) { }
         }
+
+        internal override void AssertValid(BinaryTree target = null) { }
 
         internal static readonly Result<DeclarerSyntax> Empty
             = new Result<DeclarerSyntax>(new DeclarerSyntax(new TagSyntax[0], null, null, null));
 
-        [DisableDump]
-        readonly IDefaultScopeProvider Container;
-
         internal readonly NameSyntax Name;
         internal readonly TagSyntax[] Tags;
+        readonly bool? MeansPublic;
 
-        DeclarerSyntax(TagSyntax[] tags, BinaryTree target, NameSyntax name, IDefaultScopeProvider container)
+        DeclarerSyntax(TagSyntax[] tags, BinaryTree target, NameSyntax name, bool? meansPublic)
             : base(target)
         {
             Tags = tags;
             Name = name;
-            Container = container;
+            MeansPublic = meansPublic;
+
+            Tracer.Assert(target == null);
+            StopByObjectIds();
         }
 
         public bool IsPublic
@@ -53,7 +60,7 @@ namespace Reni.TokenClasses
                 if(Tags.Any(item => item.Value is NonPublicDeclarationToken))
                     return false;
 
-                return Container.MeansPublic;
+                return MeansPublic ?? false;
             }
         }
 
@@ -79,20 +86,20 @@ namespace Reni.TokenClasses
         }
 
         internal static DeclarerSyntax FromTag
-            (DeclarationTagToken tag, BinaryTree target, IDefaultScopeProvider container)
-            => new DeclarerSyntax(new[] {new TagSyntax(tag, target)}, target, null, container);
+            (DeclarationTagToken tag, BinaryTree target, bool? meansPublic)
+            => new DeclarerSyntax(new[] {new TagSyntax(tag, target)}, null, null, meansPublic);
 
-        internal static DeclarerSyntax FromName(BinaryTree target, string name, IDefaultScopeProvider container)
-            => new DeclarerSyntax(new TagSyntax[0], target, new NameSyntax(target, name), container);
+        internal static DeclarerSyntax FromName(BinaryTree target, string name, bool? meansPublic)
+            => new DeclarerSyntax(new TagSyntax[0], null, new NameSyntax(target, name), meansPublic);
 
-        internal DeclarerSyntax Combine(DeclarerSyntax other, BinaryTree root)
+        internal DeclarerSyntax Combine(DeclarerSyntax other, BinaryTree root = null)
         {
             if(other == null)
                 return this;
             Tracer.Assert(Name == null || other.Name == null);
-            Tracer.Assert(Container == null || other.Container == null || Container == other.Container);
+            Tracer.Assert(MeansPublic == null || other.MeansPublic == null || MeansPublic == other.MeansPublic);
             return new DeclarerSyntax(Tags.Concat(other.Tags).ToArray(), root, Name ?? other.Name
-                , Container ?? other.Container);
+                , MeansPublic ?? other.MeansPublic);
         }
     }
 

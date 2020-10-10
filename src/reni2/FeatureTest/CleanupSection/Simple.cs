@@ -1,12 +1,14 @@
 using hw.UnitTest;
 using Reni.FeatureTest.Helper;
+using Reni.FeatureTest.Structure;
 
 namespace Reni.FeatureTest.CleanupSection
 {
     [UnitTest]
     [Basic]
-    [TargetSet(@"This: {(a:1;b:3) a; 5 ~~~'end' dump_print} dump_print ", "(1, 5)end")]
-    public sealed class Simple : CompilerTest {}
+    [AccessMember]
+    [TargetSet(@"This: {(aaaaa:1;b:3) aaaaa; 5 ~~~'end' dump_print} dump_print ", "(1, 5)end")]
+    public sealed class Simple : CompilerTest { }
 
     [UnitTest]
     [Simple]

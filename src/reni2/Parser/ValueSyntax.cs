@@ -25,8 +25,10 @@ namespace Reni.Parser
 
             [DisableDump]
             protected sealed override int LeftChildCount => 0;
+
             [DisableDump]
             protected sealed override int DirectChildCount => 0;
+
             protected sealed override Syntax GetDirectChild(int index)
                 => throw new Exception($"Unexpected call: {nameof(GetDirectChild)}({index})");
         }
@@ -98,6 +100,8 @@ namespace Reni.Parser
         protected override Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree target = null)
             => new DeclarationSyntax(null, target, this).ToCompoundSyntax();
 
-        internal override DeclarationSyntax[] ToDeclarationsSyntax(BinaryTree target = null) => T(new DeclarationSyntax(null, target, this));
+        internal override DeclarationSyntax[] ToDeclarationsSyntax
+            (BinaryTree target = null) => T(new DeclarationSyntax(null, target, this));
+
     }
 }

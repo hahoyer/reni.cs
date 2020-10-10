@@ -35,7 +35,7 @@ namespace ReniTest
             if(Debugger.IsAttached)
             {
                 configuration.IsBreakEnabled = true;
-                configuration.SkipSuccessfulMethods = true;
+                //configuration.SkipSuccessfulMethods = true;
                 configuration.SaveResults = true;
                 PendingTests.Run();
                 configuration.TestsFileName = SmbFile.SourcePath().PathCombine("PendingTests.cs");

@@ -1,3 +1,4 @@
+using hw.DebugFormatter;
 using hw.Parser;
 using Reni.Basics;
 using Reni.Context;
@@ -15,6 +16,7 @@ namespace Reni.TokenClasses
             (ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
         {
             var leftType = left.Type(context);
+            Tracer.Assert(leftType != null);
             return leftType
                 .InstanceResult(category, c => context.ResultAsReference(c, right));
         }

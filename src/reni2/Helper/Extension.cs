@@ -14,14 +14,25 @@ namespace Reni.Helper
             if(target == null)
                 yield break;
 
-            for(var index = 0; index < target.DirectChildCount; index++)
+            var index = 0;
+            while(index < target.LeftDirectChildCount)
             {
-                if(index == target.LeftDirectChildCount)
-                    yield return (TTarget)target;
                 var node = target.GetDirectChild(index);
                 if(node != null)
                     foreach(var child in node.GetNodesFromLeftToRight())
                         yield return child;
+                index++;
+            }
+
+            yield return (TTarget)target;
+
+            while(index < target.DirectChildCount)
+            {
+                var node = target.GetDirectChild(index);
+                if(node != null)
+                    foreach(var child in node.GetNodesFromLeftToRight())
+                        yield return child;
+                index++;
             }
         }
 
@@ -31,15 +42,27 @@ namespace Reni.Helper
             if(target == null)
                 yield break;
 
-            for(var index = target.DirectChildCount; index > 0; )
+            var index = target.DirectChildCount;
+            while(index > target.LeftDirectChildCount)
             {
                 index--;
-                if(index == target.LeftDirectChildCount)
-                    yield return (TTarget)target;
                 var node = target.GetDirectChild(index);
-                if(node != null)
-                    foreach(var child in node.GetNodesFromRightToLeft())
-                        yield return child;
+                if(node == null)
+                    continue;
+                foreach(var child in node.GetNodesFromRightToLeft())
+                    yield return child;
+            }
+
+            yield return (TTarget)target;
+
+            while(index > 0)
+            {
+                index--;
+                var node = target.GetDirectChild(index);
+                if(node == null)
+                    continue;
+                foreach(var child in node.GetNodesFromRightToLeft())
+                    yield return child;
             }
         }
 

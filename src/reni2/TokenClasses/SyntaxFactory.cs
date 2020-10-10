@@ -46,7 +46,7 @@ namespace Reni.TokenClasses
             Result<ValueSyntax> IValueProvider.Get(BinaryTree target, SyntaxFactory factory)
                 => target
                     .GetBracketKernel()
-                    .Apply(tree => factory.GetValueSyntax(tree, () => EmptyListIfNull(target)));
+                    .Apply(tree => factory.GetValueSyntax(tree, target, () => EmptyListIfNull(target)));
         }
 
         class ListHandler : DumpableObject, IDeclarationsProvider
@@ -98,7 +98,7 @@ namespace Reni.TokenClasses
                         factory.GetDeclarerSyntax(target.Left),
                         factory.ToDeclarer(target, target.Right)
                     )
-                    .Apply((left, other) => Combine(left, other, target));
+                    .Apply((left, other) => Combine(left, other));
             }
         }
 
@@ -263,7 +263,7 @@ namespace Reni.TokenClasses
                 i => i);
         }
 
-        internal Result<ValueSyntax> GetValueSyntax(BinaryTree target, Func<Result<ValueSyntax>> onNull = null)
+        internal Result<ValueSyntax> GetValueSyntax(BinaryTree target, BinaryTree parent = null, Func<Result<ValueSyntax>> onNull = null)
         {
             if(target == null)
                 return onNull?.Invoke();
@@ -271,7 +271,7 @@ namespace Reni.TokenClasses
             return GetSyntax(
                 target,
                 value => value,
-                list => (ValueSyntax)new CompoundSyntax(list, null, null));
+                list => (ValueSyntax)new CompoundSyntax(list, null, parent));
         }
 
         Result<TResult> GetSyntax<TResult>
@@ -308,10 +308,10 @@ namespace Reni.TokenClasses
 
         Result<DeclarerSyntax> ToDeclarer(Result<DeclarerSyntax> left, BinaryTree target, string name)
         {
-            var namePart = DeclarerSyntax.FromName(target, name, this);
+            var namePart = DeclarerSyntax.FromName(target, name, MeansPublic);
             return left == null
                 ? namePart
-                : left.Apply(left => left.Combine(namePart, target));
+                : left.Apply(left => left.Combine(namePart));
         }
 
         Result<DeclarerSyntax> ToDeclarer(BinaryTree root, BinaryTree target)
@@ -328,7 +328,7 @@ namespace Reni.TokenClasses
             Tracer.Assert(target.Right == null);
 
             var tag = target.TokenClass as DeclarationTagToken;
-            var result = DeclarerSyntax.FromTag(tag, target, this);
+            var result = DeclarerSyntax.FromTag(tag, target, MeansPublic);
 
             IEnumerable<Issue> GetIssues()
             {
@@ -340,7 +340,7 @@ namespace Reni.TokenClasses
         }
 
         static Result<DeclarerSyntax> Combine
-            (Result<DeclarerSyntax> target, Result<DeclarerSyntax> other, BinaryTree root)
+            (Result<DeclarerSyntax> target, Result<DeclarerSyntax> other, BinaryTree root = null)
             => (target, other)
                 .Apply((target, other) => target?.Combine(other, root) ?? other);
 
@@ -374,6 +374,6 @@ namespace Reni.TokenClasses
             => target
                 .GetNodesFromLeftToRight()
                 .Select(GetDeclarationTag)
-                .Aggregate(DeclarerSyntax.Empty, (left, right) => Combine(left, right, target));
+                .Aggregate(DeclarerSyntax.Empty, (left, right) => Combine(left, right));
     }
 }
