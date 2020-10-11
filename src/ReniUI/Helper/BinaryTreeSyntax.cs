@@ -6,7 +6,7 @@ using Reni.Helper;
 
 namespace ReniUI.Helper
 {
-    sealed class BinaryTree : BinaryTreeSyntaxWithParent<BinaryTree>
+    class BinaryTree : BinaryTreeSyntaxWithParent<BinaryTree>
     {
         class CacheContainer
         {
@@ -14,16 +14,27 @@ namespace ReniUI.Helper
             public FunctionCache<int, BinaryTree> LocateByPosition;
         }
 
+        [DisableDump]
+        internal readonly Syntax Syntax;
+
         readonly CacheContainer Cache = new CacheContainer();
 
-        internal BinaryTree(Reni.TokenClasses.BinaryTree flatItem)
-            : this(flatItem, null) { }
+        internal BinaryTree(Reni.TokenClasses.BinaryTree flatItem, Syntax syntax)
+            : this(flatItem, null,syntax ) { }
 
-        BinaryTree(Reni.TokenClasses.BinaryTree flatItem, BinaryTree parent)
+        BinaryTree(Reni.TokenClasses.BinaryTree flatItem, BinaryTree parent, Syntax syntax)
             : base(flatItem, parent)
         {
             Cache.LocateByPosition = new FunctionCache<int, BinaryTree>(LocateByPositionForCache);
             Cache.ExtendedLocateByPosition = new FunctionCache<int, BinaryTree>(ExtendedLocateByPositionForCache);
+
+            Syntax = FindAndLink(syntax);
+        }
+
+        Syntax FindAndLink(Syntax syntax)
+        {
+            NotImplementedMethod(syntax);
+            return syntax;
         }
 
         [DisableDump]
@@ -41,10 +52,11 @@ namespace ReniUI.Helper
             }
         }
 
+        protected override string GetNodeDump() => base.GetNodeDump() + $"({TokenClass.Id})";
+
         public BinaryTree LocateByPosition(int current) => Cache.LocateByPosition[current];
 
-        protected override BinaryTree Create
-            (Reni.TokenClasses.BinaryTree target, BinaryTree parent) => new BinaryTree(target, parent);
+        protected override BinaryTree Create(Reni.TokenClasses.BinaryTree flatItem) => new BinaryTree(flatItem, this, null);
 
         internal BinaryTree Locate(SourcePart part)
             => Left?.CheckedLocate(part) ??
@@ -79,5 +91,17 @@ namespace ReniUI.Helper
                 Contains(current)
                     ? LocatePositionExtended(current)
                     : null;
+
+        internal BinaryTree Find(Reni.TokenClasses.BinaryTree target)
+        {
+            if(FlatItem == target)
+                return this;
+
+            var targetSourcePart = target.SourcePart;
+            Tracer.Assert(FlatItem.SourcePart.Contains(targetSourcePart));
+            return targetSourcePart.EndPosition <= Token.Characters.Position
+                ? Left.Find(target)
+                : Right.Find(target);
+        }
     }
 }

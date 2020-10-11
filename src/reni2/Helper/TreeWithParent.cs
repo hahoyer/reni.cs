@@ -31,10 +31,10 @@ namespace Reni.Helper
         TResult CreateDirectChild(int index)
         {
             var node = FlatItem.GetDirectChild(index);
-            return node == null? null : Create(node, Center);
+            return node == null? null : Create(node);
         }
 
-        protected abstract TResult Create(TTarget target, TResult parent);
+        protected abstract TResult Create(TTarget flatItem);
 
         protected TResult GetDirectChild(int index)
             => index < 0 || index >= FlatItem.DirectChildCount? null : DirectChildren[index];

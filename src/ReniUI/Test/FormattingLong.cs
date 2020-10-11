@@ -44,13 +44,13 @@ namespace ReniUI.Test
                 {
                     var newCompiler = CompilerBrowser.FromText(reformat);
                     Tracer.Assert(
-                        IsEqual(compiler.BinaryTree.FlatItem, newCompiler.BinaryTree.FlatItem
+                        IsEqual(compiler.Binary.FlatItem, newCompiler.Binary.FlatItem
                             , IgnoreWhiteSpaces),
                         () => @$"origin: 
-{compiler.BinaryTree.FlatItem.Dump()} 
+{compiler.Binary.FlatItem.Dump()} 
 
 new ({span.NodeDump}): 
-{newCompiler.BinaryTree.FlatItem.Dump()} 
+{newCompiler.Binary.FlatItem.Dump()} 
 
 "
                     );

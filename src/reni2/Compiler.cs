@@ -254,7 +254,7 @@ namespace Reni
                     .ToFrame()
                     .Apply(target =>
                     {
-                        target.AssertValid(BinaryTree);
+                        target.AssertValid(target: BinaryTree);
                         return target;
                     })
                 : null;

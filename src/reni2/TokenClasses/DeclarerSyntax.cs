@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using JetBrains.Annotations;
@@ -16,7 +15,8 @@ namespace Reni.TokenClasses
                 : base(target)
                 => Value = value;
 
-            internal override void AssertValid(BinaryTree target = null) { }
+            internal override void AssertValid(Level level, BinaryTree target = null)
+                => base.AssertValid(level == null? null : new Level {IsCorrectOrder = level.IsCorrectOrder}, target);
         }
 
         internal class NameSyntax : NoChildren
@@ -27,10 +27,9 @@ namespace Reni.TokenClasses
                 : base(target)
                 => Value = name;
 
-            internal override void AssertValid(BinaryTree target = null) { }
+            internal override void AssertValid(Level level, BinaryTree target = null)
+                => base.AssertValid(level == null? null : new Level {IsCorrectOrder = level.IsCorrectOrder}, target);
         }
-
-        internal override void AssertValid(BinaryTree target = null) { }
 
         internal static readonly Result<DeclarerSyntax> Empty
             = new Result<DeclarerSyntax>(new DeclarerSyntax(new TagSyntax[0], null, null, null));
@@ -75,8 +74,12 @@ namespace Reni.TokenClasses
 
         [DisableDump]
         protected override int LeftChildCount => Tags.Length;
+
         [DisableDump]
         protected override int DirectChildCount => Tags.Length + 1;
+
+        internal override void AssertValid(Level level, BinaryTree target = null)
+            => base.AssertValid(level == null? null : new Level {IsCorrectOrder = level.IsCorrectOrder}, target);
 
         protected override Syntax GetDirectChild(int index)
         {
@@ -85,8 +88,7 @@ namespace Reni.TokenClasses
             return index == Tags.Length? Name : null;
         }
 
-        internal static DeclarerSyntax FromTag
-            (DeclarationTagToken tag, BinaryTree target, bool? meansPublic)
+        internal static DeclarerSyntax FromTag(DeclarationTagToken tag, BinaryTree target, bool? meansPublic)
             => new DeclarerSyntax(new[] {new TagSyntax(tag, target)}, null, null, meansPublic);
 
         internal static DeclarerSyntax FromName(BinaryTree target, string name, bool? meansPublic)
@@ -102,7 +104,4 @@ namespace Reni.TokenClasses
                 , MeansPublic ?? other.MeansPublic);
         }
     }
-
-
-
 }

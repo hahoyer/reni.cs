@@ -197,7 +197,7 @@ namespace ReniUI
 
         void SignalStyleNeeded(int position)
         {
-            var sourceSyntax = Compiler.Syntax;
+            var sourceSyntax = Compiler.Binary;
             while(TextBox.GetEndStyled() < position)
             {
                 var current = TextBox.GetEndStyled();
@@ -205,7 +205,7 @@ namespace ReniUI
                 var style = TextStyle.From(token, Compiler);
                 TextBox.StartStyling(token.StartPosition);
                 TextBox.SetStyling(token.SourcePart.Length, style);
-                sourceSyntax = token.Syntax;
+                sourceSyntax = token.Master;
             }
         }
 

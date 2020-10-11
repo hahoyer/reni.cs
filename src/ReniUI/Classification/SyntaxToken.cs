@@ -11,12 +11,12 @@ namespace ReniUI.Classification
 {
     sealed class SyntaxToken : Token
     {
-        internal override Syntax Syntax { get; }
-        internal SyntaxToken(Syntax syntax) => Syntax = syntax;
+        internal override Helper.BinaryTree Master { get; }
+        internal SyntaxToken(Helper.BinaryTree master) => Master = master;
 
-        TokenClass TokenClass => Syntax.TokenClass as TokenClass;
+        TokenClass TokenClass => Master.TokenClass as TokenClass;
 
-        public override SourcePart SourcePart => Syntax.Token.Characters;
+        public override SourcePart SourcePart => Master.Token.Characters;
 
         [EnableDumpExcept(false)]
         public override bool IsKeyword => !IsIdentifier && !IsNumber && !IsText && !IsBrace;
@@ -32,7 +32,7 @@ namespace ReniUI.Classification
 
         [EnableDumpExcept(false)]
         public override bool IsError
-            => Syntax.Issues?.Any(item => item.Position == SourcePart) ?? false;
+            => Issues?.Any(item => item.Position == SourcePart) ?? false;
 
         [EnableDumpExcept(false)]
         public override bool IsBraceLike => TokenClass is IBelongingsMatcher;
@@ -43,16 +43,19 @@ namespace ReniUI.Classification
 
         [EnableDumpExcept(false)]
         public override bool IsComment
-            => Syntax.Issues.Any(item => item.IssueId == IssueId.EOFInComment);
+            => Issues.Any(item => item.IssueId == IssueId.EOFInComment);
 
         [EnableDumpExcept(false)]
         public override bool IsLineComment
-            => Syntax.Issues.Any(item => item.IssueId == IssueId.EOFInLineComment);
+            => Issues.Any(item => item.IssueId == IssueId.EOFInLineComment);
 
         [DisableDump]
-        public override string State => Syntax.Token.Characters.Id ?? "";
+        Issue[] Issues => Master.Syntax.Issues;
+
+        [DisableDump]
+        public override string State => Master.Token.Characters.Id ?? "";
 
         public override IEnumerable<SourcePart> FindAllBelongings(CompilerBrowser compiler)
-            => compiler.FindAllBelongings(Syntax)?.Select(item => item.Binary?.Token.Characters);
+            => compiler.FindAllBelongings(Master.Syntax)?.Select(item => item.Binary?.Token.Characters);
     }
 }

@@ -220,9 +220,6 @@ namespace ReniUI.CompilationView
 
         internal DataGridView CreateTraceLogView() => TraceLog.CreateView();
 
-        internal void SignalClickedCode(IFormalCodeItem codeBase)
-            => SignalClickedObject(Compiler.FindFunction(codeBase));
-
         internal void SignalClickedSteps(Step[] target)
             => LogView.SignalClickedObject(target);
 

@@ -5,10 +5,8 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
-using Reni.Helper;
 using Reni.TokenClasses;
 using Reni.Validation;
-using ReniUI.CompilationView;
 
 namespace ReniUI.Helper
 {
@@ -20,20 +18,17 @@ namespace ReniUI.Helper
             public FunctionCache<int, Syntax> LocateByPosition;
         }
 
+        [DisableDump]
+        internal BinaryTree Binary;
+
         readonly CacheContainer Cache = new CacheContainer();
 
-        internal Syntax(Reni.Parser.Syntax flatItem)
-            : this(flatItem, null) { }
-
-        Syntax(Reni.Parser.Syntax flatItem, Syntax parent)
+        internal Syntax(Reni.Parser.Syntax flatItem, Syntax parent = null)
             : base(flatItem, parent)
         {
             Cache.LocateByPosition = new FunctionCache<int, Syntax>(LocateByPositionForCache);
             Cache.ExtendedLocateByPosition = new FunctionCache<int, Syntax>(ExtendedLocateByPositionForCache);
         }
-
-        BinaryTree Binary;
-
 
         [DisableDump]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -82,7 +77,8 @@ namespace ReniUI.Helper
 
         public Syntax LocateByPosition(int current) => Cache.LocateByPosition[current];
 
-        protected override Syntax Create(Reni.Parser.Syntax target, Syntax parent) => new Syntax(target, parent);
+        protected override Syntax Create(Reni.Parser.Syntax flatItem)
+            => new Syntax(flatItem, this);
 
         internal Syntax Locate(SourcePart part)
         {
@@ -95,23 +91,12 @@ namespace ReniUI.Helper
 
         Syntax LocatePositionExtended(int current) => Cache.ExtendedLocateByPosition[current];
 
-        Syntax LocateByPositionForCache(int current)
-        {
-            var s = SourcePart;
-            //var e = this.GetNodesFromLeftToRight().Select(target=>target.Binary.GetSource()?.EndPosition).ToArray();
-            var result = this
-                .GetNodesFromLeftToRight()
-                .FirstOrDefault(node=>Touches(current, node));
-            if(result == null)
-            {
-                NotImplementedMethod(current);
-                return default;
-
-            }
-            
-            Tracer.Assert(result.FlatItem.GetSource().Position <= current);
-            return result;
-        }
+        Syntax LocateByPositionForCache(int current) 
+            => Binary
+                .LocateByPosition(current)
+                .ParentChainIncludingThis
+                .First(node => node.Syntax != null)
+                .Syntax;
 
         static bool Touches(int targetPosition, Syntax target)
         {
@@ -143,6 +128,5 @@ namespace ReniUI.Helper
                 Contains(current)
                     ? LocatePositionExtended(current)
                     : null;
-
     }
 }

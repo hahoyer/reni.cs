@@ -263,7 +263,8 @@ namespace Reni.TokenClasses
                 i => i);
         }
 
-        internal Result<ValueSyntax> GetValueSyntax(BinaryTree target, BinaryTree parent = null, Func<Result<ValueSyntax>> onNull = null)
+        internal Result<ValueSyntax> GetValueSyntax
+            (BinaryTree target, BinaryTree parent = null, Func<Result<ValueSyntax>> onNull = null)
         {
             if(target == null)
                 return onNull?.Invoke();

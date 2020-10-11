@@ -1,10 +1,13 @@
-﻿using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
+﻿
 
-[assembly: AssemblyVersion("16.0.1.0")]
-[assembly: AssemblyFileVersion("16.0.1.0")]
-[assembly: AssemblyTitle("Reni Compiler: User Interface Library")]
+
+using System.Reflection;
+using System.Runtime.CompilerServices;
+
+[assembly: AssemblyVersion("20.1")]
+[assembly: AssemblyFileVersion("20.1.1012.0045")]
+[assembly: AssemblyTitle("Reni Compiler: Library")]
 [assembly: AssemblyCompany("HoyerWare")]
 [assembly: AssemblyProduct("Reni Compiler")]
-[assembly: AssemblyCopyright("Copyright © Harald Hoyer 2016")]
+[assembly: AssemblyCopyright("Copyright © Harald Hoyer 2020")]
+[assembly: InternalsVisibleTo("ReniUI")]

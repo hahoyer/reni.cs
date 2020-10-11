@@ -15,20 +15,8 @@ using ReniUI.Formatting;
 
 namespace ReniUI
 {
-    public sealed class CompilerBrowser : DumpableObject
+    public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
     {
-        class CacheContainer
-        {
-            internal Formatting.BinaryTreeSyntax FormattingBinaryTreeSyntax;
-            internal Helper.BinaryTree HelperBinaryTree;
-            internal Helper.Syntax Syntax;
-        }
-
-        readonly CacheContainer Cache = new CacheContainer();
-
-        readonly IDictionary<IFormalCodeItem, int> CodeToFunctionIndexCache =
-            new Dictionary<IFormalCodeItem, int>();
-
         readonly ValueCache<Compiler> ParentCache;
 
         CompilerBrowser(Func<Compiler> parent) => ParentCache = new ValueCache<Compiler>(parent);
@@ -52,14 +40,13 @@ namespace ReniUI
 
         internal IEnumerable<Issue> Issues => Compiler.Issues;
 
-        internal Formatting.BinaryTreeSyntax FormattingBinaryTreeSyntax
-            => Cache.FormattingBinaryTreeSyntax ??
-               (Cache.FormattingBinaryTreeSyntax = new Formatting.BinaryTreeSyntax(Compiler.BinaryTree));
+        internal Helper.BinaryTree Binary => this.CachedValue(GetBinary);
+        internal Helper.Syntax Syntax => this.CachedValue(GetSyntax);
 
-        internal Helper.BinaryTree BinaryTree
-            => Cache.HelperBinaryTree ?? (Cache.HelperBinaryTree = GetHelperSyntax());
+        internal Formatting.BinaryTree FormattingBinary
+            => this.CachedValue(() => new Formatting.BinaryTree(Compiler.BinaryTree));
 
-        internal Helper.Syntax Syntax => Cache.Syntax ?? (Cache.Syntax = GetValue());
+        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
 
         public static CompilerBrowser FromText
@@ -73,7 +60,7 @@ namespace ReniUI
             => new CompilerBrowser(() => Compiler.FromFile(fileName, parameters));
 
         public Token LocatePosition(int offset)
-            => Token.LocateByPosition(Syntax, offset);
+            => Token.LocateByPosition(Binary, offset);
 
         public Token LocatePosition(SourcePosition current)
         {
@@ -85,11 +72,11 @@ namespace ReniUI
             => open.FindAllBelongings(this);
 
         public string FlatFormat(bool areEmptyLinesPossible)
-            => FormattingBinaryTreeSyntax.FlatFormat(areEmptyLinesPossible);
+            => FormattingBinary.FlatFormat(areEmptyLinesPossible);
 
         internal IEnumerable<ValueSyntax> FindPosition(int offset)
             => LocatePosition(offset)
-                .Syntax
+                .Master
                 .ParentChainIncludingThis
                 .Select(item => item.FlatItem)
                 .OfType<ValueSyntax>()
@@ -97,39 +84,6 @@ namespace ReniUI
 
         internal FunctionType Function(int index)
             => Compiler.Root.Function(index);
-
-
-        internal object FindFunction(IFormalCodeItem codeBase)
-        {
-            var result = FindFunctionIndex(codeBase);
-            return result == null
-                ? (object)Compiler.CodeContainer.Main.Data
-                : Function(result.Value);
-        }
-
-        int? FindFunctionIndex(IFormalCodeItem codeBase)
-        {
-            if(CodeToFunctionIndexCache.TryGetValue(codeBase, out var result))
-                return result;
-
-            var results = Compiler
-                .Root
-                .FunctionCount
-                .Select()
-                .Where(item => !CodeToFunctionIndexCache.Values.Contains(item));
-
-            foreach(var index in results)
-            {
-                var codeItems = Function(index).CodeItems;
-                foreach(var item in codeItems)
-                    CodeToFunctionIndexCache.Add(item, index);
-
-                if(codeItems.Contains(codeBase))
-                    return index;
-            }
-
-            return null;
-        }
 
 
         internal IEnumerable<Syntax> FindAllBelongings(Helper.Syntax syntax)
@@ -153,11 +107,11 @@ namespace ReniUI
         internal string Reformat(IFormatter formatter = null, SourcePart targetPart = null) =>
             (formatter ?? new Formatting.Configuration().Create())
             .GetEditPieces(this, targetPart)
-            .Combine(BinaryTree.FlatItem.SourcePart);
+            .Combine(Binary.FlatItem.SourcePart);
 
         internal Helper.BinaryTree Locate(SourcePart span)
         {
-            var result = BinaryTree.Locate(span);
+            var result = Binary.Locate(span);
             if(result != null)
                 return result;
 
@@ -173,18 +127,18 @@ namespace ReniUI
         internal string[] DeclarationOptions(int offset)
         {
             Ensure();
-            return LocateValueByPosition(offset)?.DeclarationOptions ?? new string[0];
+            return LocateValueByPosition(offset)?.Syntax.DeclarationOptions ?? new string[0];
         }
 
         internal IEnumerable<Edit> GetEditPieces(SourcePart sourcePart, IFormatter formatter = null)
             => (formatter ?? new Formatting.Configuration().Create())
                 .GetEditPieces(this, sourcePart);
 
-        Helper.BinaryTree GetHelperSyntax()
+        Helper.BinaryTree GetBinary()
         {
             try
             {
-                return new Helper.BinaryTree(Compiler.BinaryTree);
+                return new Helper.BinaryTree(Compiler.BinaryTree, Syntax);
             }
             catch(Exception e)
             {
@@ -193,7 +147,7 @@ namespace ReniUI
             }
         }
 
-        Helper.Syntax GetValue()
+        Helper.Syntax GetSyntax()
         {
             try
             {
@@ -206,13 +160,13 @@ namespace ReniUI
             }
         }
 
-        Helper.Syntax LocateValueByPosition(int offset)
+        Helper.BinaryTree LocateValueByPosition(int offset)
         {
-            var token = Token.LocateByPosition(Syntax, offset);
+            var token = Token.LocateByPosition(Binary, offset);
             if(token.IsComment || token.IsLineComment)
                 return null;
 
-            var tokenSyntax = token.Syntax;
+            var tokenSyntax = token.Master;
             var position = tokenSyntax.Token.Characters.Position;
             return position <= 0? null : tokenSyntax.LocateByPosition(position - 1);
         }

@@ -17,7 +17,7 @@ namespace ReniUI.Formatting
             if(syntax == null)
                 return new Edit[0];
 
-            var item = new HierarchicalStructure.Frame {Target = compilerBrowser.FormattingBinaryTreeSyntax, Configuration = Configuration};
+            var item = new HierarchicalStructure.Frame {Target = compilerBrowser.FormattingBinary, Configuration = Configuration};
 
             var sourcePartEdits = item.Edits.ToArray();
             var editPieces = sourcePartEdits.GetEditPieces(Configuration);

@@ -59,8 +59,9 @@ namespace Reni.Parser
         int ITree<Syntax>.LeftDirectChildCount => LeftChildCount;
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         int ITree<Syntax>.DirectChildCount => DirectChildCount;
-        Syntax ITree<Syntax>.GetDirectChild(int index) => GetDirectChild(index);
 
+        Syntax ITree<Syntax>.GetDirectChild(int index) 
+            => index < 0 || index >= DirectChildCount? null : DirectChildren[index];
 
         protected abstract Syntax GetDirectChild(int index);
 
@@ -93,36 +94,57 @@ namespace Reni.Parser
         internal IEnumerable<Syntax> ItemsAsLongAs(Func<Syntax, bool> condition)
             => this.GetNodesFromLeftToRight().SelectMany(node => node.CheckedItemsAsLongAs(condition));
 
-        internal virtual void AssertValid(BinaryTree target = null)
+        internal class Level
         {
+            public bool IsCorrectOrder;
+            public bool IsCorrectMapping;
+        }
+
+
+        internal virtual void AssertValid(Level level = null, BinaryTree target = null)
+        {
+            level ??= new Level {IsCorrectOrder= true};
+
+            foreach(var node in DirectChildren.Where(node=>node != this))
+                node?.AssertValid(null);
+
             target ??= Binary;
             if(target == null)
                 return;
-
-            foreach(var node in this.GetNodesFromLeftToRight().Where(node=>node != this))
-                node?.AssertValid();
 
             var nodesInSyntax = this
                 .GetNodesFromLeftToRight()
                 .Select(node => node?.Binary)
                 .Where(node => node != null)
                 .ToArray();
-
-            var missingTargetNodes = target.GetNodesFromLeftToRight()
-                .Where(node => !(node?.TokenClass is IRightBracket))
-                .Where(node => !(node?.TokenClass is ILeftBracket))
-                .Where(node => !(node?.TokenClass is List))
-                .Where(node => !(node?.TokenClass is ThenToken))
-                .Where(node => !(node?.TokenClass is ExclamationBoxToken))
-                .Where(node => !nodesInSyntax.Contains(node))
-                .ToArray();
-
-            if(missingTargetNodes.Any())
+            
+            if(level.IsCorrectOrder)
+            for(var index = 1; index < nodesInSyntax.Length; index++)
             {
-                var targetNodes = target.GetNodesFromLeftToRight()
+                var last= nodesInSyntax[index-1].Token.Characters;
+                var current= nodesInSyntax[index].Token.Characters;
+                Tracer.Assert(last.Position < current.Position);
+            }
+
+            if(level.IsCorrectMapping)
+            {
+                var missingTargetNodes = target.GetNodesFromLeftToRight()
+                    .Where(node => !(node?.TokenClass is IRightBracket))
+                    .Where(node => !(node?.TokenClass is ILeftBracket))
+                    .Where(node => !(node?.TokenClass is List))
+                    .Where(node => !(node?.TokenClass is ThenToken))
+                    .Where(node => !(node?.TokenClass is ExclamationBoxToken))
+                    .Where(node => !nodesInSyntax.Contains(node))
                     .ToArray();
 
-                NotImplementedMethod(target, nameof(missingTargetNodes), missingTargetNodes);
+                if(missingTargetNodes.Any())
+                {
+                    var targetNodes = target.GetNodesFromLeftToRight()
+                        .ToArray();
+
+                    NotImplementedMethod(target, nameof(missingTargetNodes), missingTargetNodes);
+                }
+
             }
 
         }

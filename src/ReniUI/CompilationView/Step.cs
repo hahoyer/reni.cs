@@ -96,7 +96,9 @@ namespace ReniUI.CompilationView
                 master.SignalClickedStep(this);
 
             if(columnIndex == 2)
-                master.SignalClickedCode(CodeBase);
+            {
+                //master.SignalClickedCode(CodeBase);
+            }
         }
 
         internal Control CreateView(SourceView master)

@@ -49,7 +49,7 @@ namespace ReniUI.Formatting
         public static Helper.BinaryTree LocateAndFilter(this CompilerBrowser compiler, SourcePart targetPart)
         {
             if(targetPart == null)
-                return compiler.BinaryTree;
+                return compiler.Binary;
             var result = compiler.Locate(targetPart);
             return IsTooSmall(result.FlatItem.Token, targetPart) ? null : result;
         }

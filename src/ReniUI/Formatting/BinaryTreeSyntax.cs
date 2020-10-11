@@ -9,7 +9,7 @@ using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
-    sealed class BinaryTreeSyntax : BinaryTreeSyntaxWithParent<BinaryTreeSyntax>
+    sealed class BinaryTree : BinaryTreeSyntaxWithParent<BinaryTree>
     {
         class CacheContainer
         {
@@ -19,10 +19,10 @@ namespace ReniUI.Formatting
 
         readonly CacheContainer Cache = new CacheContainer();
 
-        internal BinaryTreeSyntax(BinaryTree flatItem)
+        internal BinaryTree(Reni.TokenClasses.BinaryTree flatItem)
             : this(flatItem, null) { }
 
-        BinaryTreeSyntax(BinaryTree flatItem, BinaryTreeSyntax parent)
+        BinaryTree(Reni.TokenClasses.BinaryTree flatItem, BinaryTree parent)
             : base(flatItem, parent)
         {
             Tracer.Assert(FlatItem != null);
@@ -49,12 +49,12 @@ namespace ReniUI.Formatting
         internal bool IsSeparatorRequired
             => !WhiteSpaces.HasComment() && SeparatorExtension.Get(LeftNeighbor?.TokenClass, TokenClass);
 
-        static TContainer FlatSubFormat<TContainer, TValue>(BinaryTreeSyntax left, bool areEmptyLinesPossible)
+        static TContainer FlatSubFormat<TContainer, TValue>(BinaryTree left, bool areEmptyLinesPossible)
             where TContainer : class, IFormatResult<TValue>, new()
             => left == null? new TContainer() : left.FlatFormat<TContainer, TValue>(areEmptyLinesPossible);
 
-        protected override BinaryTreeSyntax Create(BinaryTree target, BinaryTreeSyntax parent)
-            => new BinaryTreeSyntax(target, parent);
+        protected override BinaryTree Create(Reni.TokenClasses.BinaryTree flatItem)
+            => new BinaryTree(flatItem, this);
 
         SplitMaster GetSplitMaster()
         {

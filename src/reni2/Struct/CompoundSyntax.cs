@@ -24,10 +24,10 @@ namespace Reni.Struct
         static int NextObjectId;
 
         [EnableDump]
-        readonly ValueSyntax CleanupSection;
+        internal readonly ValueSyntax CleanupSection;
 
         [EnableDump]
-        readonly DeclarationSyntax[] Statements;
+        internal readonly DeclarationSyntax[] Statements;
 
         internal CompoundSyntax(DeclarationSyntax[] statements, ValueSyntax cleanupSection, BinaryTree target)
             : base(NextObjectId++, target)
@@ -35,6 +35,7 @@ namespace Reni.Struct
             Statements = statements;
             CleanupSection = cleanupSection;
 
+            AssertValid();
         }
 
         [DisableDump]
@@ -87,16 +88,7 @@ namespace Reni.Struct
 
         
         [DisableDump]
-        protected override int LeftChildCount 
-        {
-            get
-            {
-                var statementsLength = Statements.Length;
-                if(CleanupSection == null && statementsLength > 0)
-                    return 1;
-                return statementsLength;
-            }
-        }
+        protected override int LeftChildCount => Statements.Length;
 
         [DisableDump]
         protected override int DirectChildCount => Statements.Length + 1;

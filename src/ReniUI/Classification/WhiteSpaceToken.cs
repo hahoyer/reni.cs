@@ -1,18 +1,19 @@
 using System.Collections.Generic;
 using hw.Scanner;
 using Reni.Parser;
+using ReniUI.Helper;
 
 namespace ReniUI.Classification
 {
     sealed class WhiteSpaceToken : Token
     {
-        internal override Helper.Syntax Syntax { get; }
+        internal override BinaryTree Master { get; }
         readonly IItem Item;
 
-        internal WhiteSpaceToken(IItem item, Helper.Syntax parent)
+        internal WhiteSpaceToken(IItem item, BinaryTree master)
         {
             Item = item;
-            Syntax = parent;
+            Master = master;
         }
 
         public override SourcePart SourcePart => Item.SourcePart;

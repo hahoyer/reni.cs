@@ -18,7 +18,7 @@ namespace ReniUI.Formatting
         sealed class ColonFormatter : Formatter
         {
             public override Context RightSideLineBreakContext(Context context) => context.BodyOfColon;
-            internal override int GetLineBreaksForChild(BinaryTreeSyntax parent, BinaryTreeSyntax target) 
+            internal override int GetLineBreaksForChild(BinaryTree parent, BinaryTree target) 
                 => parent.LeftMost == target ? 0 : 1;
 
             public override bool HasLineBreaksAfterToken(Context context) => true;
@@ -60,10 +60,10 @@ namespace ReniUI.Formatting
         {
             public override Context RightSideLineBreakContext(Context context) => context.ForList;
 
-            public override Context BothSideContext(Context context, BinaryTreeSyntax binaryTreeSyntax) 
-                => context.MultiLineBreaksForList(binaryTreeSyntax.Left, binaryTreeSyntax.Right?.Left);
+            public override Context BothSideContext(Context context, BinaryTree binaryTree) 
+                => context.MultiLineBreaksForList(binaryTree.Left, binaryTree.Right?.Left);
 
-            internal override int GetLineBreaksForChild(BinaryTreeSyntax parent, BinaryTreeSyntax target) 
+            internal override int GetLineBreaksForChild(BinaryTree parent, BinaryTree target) 
                 => parent.LeftMost == target ? 0 : 1;
         }
 
@@ -73,8 +73,8 @@ namespace ReniUI.Formatting
 
         sealed class ListEndFormatter : ListItemFormatter 
         {
-            public override Context BothSideContext(Context context, BinaryTreeSyntax binaryTreeSyntax) 
-                => context.MultiLineBreaksForList(binaryTreeSyntax.Left, binaryTreeSyntax.Right);
+            public override Context BothSideContext(Context context, BinaryTree binaryTree) 
+                => context.MultiLineBreaksForList(binaryTree.Left, binaryTree.Right);
         }
 
         public static readonly Formatter Root = new RootFormatter();
@@ -89,13 +89,13 @@ namespace ReniUI.Formatting
         public static readonly Formatter Unknown = new UnknownFormatter();
 
 
-        public static Formatter CreateFormatter(BinaryTreeSyntax binaryTreeSyntax)
+        public static Formatter CreateFormatter(BinaryTree binaryTree)
         {
-            switch(binaryTreeSyntax.TokenClass)
+            switch(binaryTree.TokenClass)
             {
                 case BeginOfText _:
                 case EndOfText _: return Root;
-                case List _: return GetListTokenFormatter(binaryTreeSyntax);
+                case List _: return GetListTokenFormatter(binaryTree);
                 case RightParenthesis _: return RightParenthesis;
                 case LeftParenthesis _: return LeftParenthesis;
                 case Colon _: return Colon;
@@ -111,17 +111,17 @@ namespace ReniUI.Formatting
                 case Text _:
                 case Number _:
                 case TypeOperator _:
-                case InstanceToken _: return binaryTreeSyntax.Left == null ? Single : Chain;
+                case InstanceToken _: return binaryTree.Left == null ? Single : Chain;
             }
 
-            NotImplementedFunction(binaryTreeSyntax, "tokenClass", binaryTreeSyntax.TokenClass);
+            NotImplementedFunction(binaryTree, "tokenClass", binaryTree.TokenClass);
             return default;
         }
 
-        static Formatter GetListTokenFormatter(BinaryTreeSyntax binaryTreeSyntax)
-            => binaryTreeSyntax.Right == null
+        static Formatter GetListTokenFormatter(BinaryTree binaryTree)
+            => binaryTree.Right == null
                 ? LastList
-                : binaryTreeSyntax.Right.TokenClass == binaryTreeSyntax.TokenClass
+                : binaryTree.Right.TokenClass == binaryTree.TokenClass
                     ? List
                     : ListEnd;
 
@@ -136,12 +136,12 @@ namespace ReniUI.Formatting
         public virtual bool HasLineBreaksAfterToken(Context context) => false;
         public virtual Context LeftSideLineBreakContext(Context context) => context.None;
         public virtual Context RightSideLineBreakContext(Context context) => context.None;
-        public virtual Context BothSideContext(Context context, BinaryTreeSyntax binaryTreeSyntax) => context.None;
+        public virtual Context BothSideContext(Context context, BinaryTree binaryTree) => context.None;
         public virtual bool HasLineBreaksByContext(Context context) => false;
         public virtual bool IsTrace => false;
         public virtual bool HasMultipleLineBreaksOnRightSide(Context context) => false;
 
-        internal virtual int GetLineBreaksForChild(BinaryTreeSyntax parent, BinaryTreeSyntax target)
+        internal virtual int GetLineBreaksForChild(BinaryTree parent, BinaryTree target)
         {
             NotImplementedMethod(parent, target);
             return default;
