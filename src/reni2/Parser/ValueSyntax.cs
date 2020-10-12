@@ -98,10 +98,10 @@ namespace Reni.Parser
             => Type(context).DeclarationOptions;
 
         protected override Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree target = null)
-            => new DeclarationSyntax(null, target, this).ToCompoundSyntax();
+            => new StatementSyntax(null, target, this).ToCompoundSyntax();
 
-        internal override DeclarationSyntax[] ToDeclarationsSyntax
-            (BinaryTree target = null) => T(new DeclarationSyntax(null, target, this));
+        internal override StatementSyntax[] ToDeclarationsSyntax
+            (BinaryTree target = null) => T(new StatementSyntax(null, target, this));
 
     }
 }

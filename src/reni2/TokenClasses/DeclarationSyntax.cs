@@ -4,14 +4,14 @@ using Reni.Struct;
 
 namespace Reni.TokenClasses
 {
-    class DeclarationSyntax : Syntax
+    class StatementSyntax : Syntax
     {
         [EnableDumpExcept(null)]
         internal readonly DeclarerSyntax Declarer;
         [EnableDumpExcept(null)]
         internal readonly ValueSyntax Value;
 
-        public DeclarationSyntax(DeclarerSyntax declarer, BinaryTree target, ValueSyntax value)
+        public StatementSyntax(DeclarerSyntax declarer, BinaryTree target, ValueSyntax value)
             : base(target)
         {
             Tracer.ConditionalBreak(value == null &&
@@ -51,7 +51,7 @@ namespace Reni.TokenClasses
         internal bool IsDefining(string name, bool publicOnly)
             => name != null && NameOrNull == name && (!publicOnly || Declarer.IsPublic);
 
-        internal DeclarationSyntax Visit(ISyntaxVisitor visitor)
+        internal StatementSyntax Visit(ISyntaxVisitor visitor)
         {
             NotImplementedMethod(visitor);
             return default;

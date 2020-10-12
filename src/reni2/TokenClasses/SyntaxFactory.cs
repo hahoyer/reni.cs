@@ -28,7 +28,7 @@ namespace Reni.TokenClasses
 
         internal interface IDeclarationsProvider
         {
-            Result<DeclarationSyntax[]> Get(BinaryTree target, SyntaxFactory factory);
+            Result<StatementSyntax[]> Get(BinaryTree target, SyntaxFactory factory);
         }
 
         internal interface IValueProvider
@@ -51,7 +51,7 @@ namespace Reni.TokenClasses
 
         class ListHandler : DumpableObject, IDeclarationsProvider
         {
-            Result<DeclarationSyntax[]> IDeclarationsProvider.Get(BinaryTree target, SyntaxFactory factory)
+            Result<StatementSyntax[]> IDeclarationsProvider.Get(BinaryTree target, SyntaxFactory factory)
                 => (
                         factory.GetDeclarationsSyntax(target.Left),
                         factory.GetDeclarationsSyntax(target.Right)
@@ -61,7 +61,7 @@ namespace Reni.TokenClasses
 
         class ColonHandler : DumpableObject, IDeclarationsProvider
         {
-            Result<DeclarationSyntax[]> IDeclarationsProvider.Get(BinaryTree target, SyntaxFactory factory)
+            Result<StatementSyntax[]> IDeclarationsProvider.Get(BinaryTree target, SyntaxFactory factory)
                 =>
                     (
                         factory.GetDeclarerSyntax(target.Left),
@@ -69,7 +69,7 @@ namespace Reni.TokenClasses
                     )
                     .Apply
                     ((declarer, value)
-                        => T(new DeclarationSyntax(declarer, target, value))
+                        => T(new StatementSyntax(declarer, target, value))
                     );
         }
 
@@ -252,10 +252,10 @@ namespace Reni.TokenClasses
             return default;
         }
 
-        Result<DeclarationSyntax[]> GetDeclarationsSyntax(BinaryTree target)
+        Result<StatementSyntax[]> GetDeclarationsSyntax(BinaryTree target)
         {
             if(target == null)
-                return new DeclarationSyntax[0];
+                return new StatementSyntax[0];
 
             return GetSyntax(
                 target,
@@ -279,7 +279,7 @@ namespace Reni.TokenClasses
         (
             BinaryTree target
             , Func<ValueSyntax, TResult> fromValueSyntax
-            , Func<DeclarationSyntax[], TResult> fromDeclarationsSyntax
+            , Func<StatementSyntax[], TResult> fromDeclarationsSyntax
         )
             where TResult : class
         {

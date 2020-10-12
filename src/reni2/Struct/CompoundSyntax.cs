@@ -27,9 +27,9 @@ namespace Reni.Struct
         internal readonly ValueSyntax CleanupSection;
 
         [EnableDump]
-        internal readonly DeclarationSyntax[] Statements;
+        internal readonly StatementSyntax[] Statements;
 
-        internal CompoundSyntax(DeclarationSyntax[] statements, ValueSyntax cleanupSection, BinaryTree target)
+        internal CompoundSyntax(StatementSyntax[] statements, ValueSyntax cleanupSection, BinaryTree target)
             : base(NextObjectId++, target)
         {
             Statements = statements;
