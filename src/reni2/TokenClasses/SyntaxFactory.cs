@@ -53,8 +53,8 @@ namespace Reni.TokenClasses
         {
             Result<StatementSyntax[]> IDeclarationsProvider.Get(BinaryTree target, SyntaxFactory factory)
                 => (
-                        factory.GetDeclarationsSyntax(target.Left),
-                        factory.GetDeclarationsSyntax(target.Right)
+                        factory.GetStatementsSyntax(target.Left),
+                        factory.GetStatementsSyntax(target.Right)
                     )
                     .Apply((left, right) => left.Concat(right).ToArray());
         }
@@ -78,7 +78,7 @@ namespace Reni.TokenClasses
             Result<ValueSyntax> IValueProvider.Get(BinaryTree target, SyntaxFactory factory)
                 =>
                     (
-                        factory.GetDeclarationsSyntax(target.Left),
+                        factory.GetStatementsSyntax(target.Left),
                         factory.GetValueSyntax(target.Right)
                     )
                     .Apply
@@ -252,14 +252,14 @@ namespace Reni.TokenClasses
             return default;
         }
 
-        Result<StatementSyntax[]> GetDeclarationsSyntax(BinaryTree target)
+        Result<StatementSyntax[]> GetStatementsSyntax(BinaryTree target)
         {
             if(target == null)
                 return new StatementSyntax[0];
 
             return GetSyntax(
                 target,
-                value => value.ToDeclarationsSyntax(),
+                value => value.ToStatementsSyntax(),
                 i => i);
         }
 

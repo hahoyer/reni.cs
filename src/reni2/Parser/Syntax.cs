@@ -85,7 +85,7 @@ namespace Reni.Parser
             return default;
         }
 
-        internal virtual StatementSyntax[] ToDeclarationsSyntax(BinaryTree target = null)
+        internal virtual StatementSyntax[] ToStatementsSyntax(BinaryTree target = null)
         {
             NotImplementedMethod(target);
             return default;
