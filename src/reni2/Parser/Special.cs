@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.Basics;
@@ -10,7 +9,7 @@ namespace Reni.Parser
     sealed class TerminalSyntax : ValueSyntax.NoChildren
     {
         [Node]
-        [EnableDump]
+        [DisableDump]
         internal readonly ITerminal Terminal;
 
         internal TerminalSyntax(ITerminal terminal, BinaryTree target)
@@ -20,30 +19,29 @@ namespace Reni.Parser
             StopByObjectIds();
         }
 
+        [EnableDump]
+        [EnableDumpExcept(null)]
+        string Position => Token.GetDumpAroundCurrent(5);
+
         internal string Id => Token.Id;
+
+        internal SourcePart Token => Binary.Token.Characters;
 
         [DisableDump]
         internal long ToNumber => BitsConst.Convert(Id).ToInt64();
-
-        [DisableDump]
-        internal SourcePart Token => Binary.Token.Characters;
 
         internal override Result ResultForCache(ContextBase context, Category category)
             => Terminal.Result(context, category, this);
 
         internal override ValueSyntax Visit(ISyntaxVisitor visitor) => Terminal.Visit(visitor);
-
-        protected override string GetNodeDump() => Terminal.NodeDump();
     }
 
     sealed class PrefixSyntax : ValueSyntax
     {
         [Node]
-        [EnableDump]
         readonly IPrefix Prefix;
 
         [Node]
-        [EnableDump]
         readonly ValueSyntax Right;
 
         public PrefixSyntax(IPrefix prefix, ValueSyntax right, BinaryTree target)
@@ -52,6 +50,10 @@ namespace Reni.Parser
             Prefix = prefix;
             Right = right;
         }
+
+        [EnableDump]
+        [EnableDumpExcept(null)]
+        string Position => Binary?.Token.Characters.GetDumpAroundCurrent(5);
 
         protected override int LeftChildCount => 0;
         protected override int DirectChildCount => 1;
@@ -63,22 +65,17 @@ namespace Reni.Parser
 
         internal override Result ResultForCache(ContextBase context, Category category) => Prefix
             .Result(context, category, Right, Binary);
-
-        protected override string GetNodeDump() => Prefix.NodeDump() + "(" + Right.NodeDump + ")";
     }
 
     sealed class InfixSyntax : ValueSyntax
     {
         [Node]
-        [EnableDump]
         readonly IInfix Infix;
 
         [Node]
-        [EnableDump]
         readonly ValueSyntax Left;
 
         [Node]
-        [EnableDump]
         readonly ValueSyntax Right;
 
         public InfixSyntax(ValueSyntax left, IInfix infix, ValueSyntax right, BinaryTree target)
@@ -89,6 +86,10 @@ namespace Reni.Parser
             Right = right;
             StopByObjectIds();
         }
+
+        [EnableDump]
+        [EnableDumpExcept(null)]
+        string Position => Binary?.Token.Characters.GetDumpAroundCurrent(5);
 
         internal override IRecursionHandler RecursionHandler => Infix as IRecursionHandler;
 
@@ -112,18 +113,6 @@ namespace Reni.Parser
 
         internal override Result ResultForCache(ContextBase context, Category category) => Infix
             .Result(context, category, Left, Right);
-
-        protected override string GetNodeDump()
-        {
-            var result = "(";
-            result += Left.NodeDump;
-            result += ")";
-            result += Infix.NodeDump();
-            result += "(";
-            result += Right.NodeDump;
-            result += ")";
-            return result;
-        }
     }
 
     interface IPendingProvider
@@ -134,11 +123,9 @@ namespace Reni.Parser
     sealed class SuffixSyntax : ValueSyntax
     {
         [Node]
-        [EnableDump]
         readonly ValueSyntax Left;
 
         [Node]
-        [EnableDump]
         readonly ISuffix Suffix;
 
         internal SuffixSyntax(ValueSyntax left, ISuffix suffix, BinaryTree target)
@@ -148,10 +135,14 @@ namespace Reni.Parser
             Suffix = suffix;
         }
 
+        [EnableDump]
+        [EnableDumpExcept(null)]
+        string Position => Binary?.Token.Characters.GetDumpAroundCurrent(5);
+
         protected override int LeftChildCount => 1;
         protected override int DirectChildCount => 1;
 
-        protected override Syntax GetDirectChild(int index)=> index==0? Left:null;
+        protected override Syntax GetDirectChild(int index) => index == 0? Left : null;
 
         public static Result<ValueSyntax> Create(Result<ValueSyntax> left, ISuffix suffix, BinaryTree binaryTree)
         {
@@ -161,8 +152,6 @@ namespace Reni.Parser
 
         internal override Result ResultForCache(ContextBase context, Category category)
             => Suffix.Result(context, category, Left);
-
-        protected override string GetNodeDump() => "(" + Left.NodeDump + ")" + Suffix;
     }
 
     interface ITerminal

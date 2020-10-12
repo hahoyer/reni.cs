@@ -83,7 +83,7 @@ namespace Reni.TokenClasses
                     )
                     .Apply
                     ((statements, cleanup)
-                        => (ValueSyntax)new CompoundSyntax(statements, cleanup, target)
+                        => (ValueSyntax)new CompoundSyntax(statements, target, cleanup)
                     );
         }
 

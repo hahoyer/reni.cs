@@ -15,6 +15,10 @@ namespace Reni.TokenClasses
                 : base(target)
                 => Value = value;
 
+            [EnableDump]
+            [EnableDumpExcept(null)]
+            string Position => Binary?.Token.Characters.GetDumpAroundCurrent(5);
+
             internal override void AssertValid(Level level, BinaryTree target = null)
                 => base.AssertValid(level == null? null : new Level {IsCorrectOrder = level.IsCorrectOrder}, target);
         }
@@ -26,6 +30,10 @@ namespace Reni.TokenClasses
             internal NameSyntax([NotNull] BinaryTree target, [NotNull] string name)
                 : base(target)
                 => Value = name;
+
+            [EnableDump]
+            [EnableDumpExcept(null)]
+            string Position => Binary?.Token.Characters.GetDumpAroundCurrent(5);
 
             internal override void AssertValid(Level level, BinaryTree target = null)
                 => base.AssertValid(level == null? null : new Level {IsCorrectOrder = level.IsCorrectOrder}, target);
@@ -77,6 +85,10 @@ namespace Reni.TokenClasses
 
         [DisableDump]
         protected override int DirectChildCount => Tags.Length + 1;
+
+        [EnableDump]
+        [EnableDumpExcept(null)]
+        string Position => Binary?.Token.Characters.GetDumpAroundCurrent(5);
 
         internal override void AssertValid(Level level, BinaryTree target = null)
             => base.AssertValid(level == null? null : new Level {IsCorrectOrder = level.IsCorrectOrder}, target);

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
@@ -16,7 +15,7 @@ namespace Reni.Struct
     /// </summary>
     sealed class CompoundSyntax : ValueSyntax
     {
-        static bool NoFileDump = true;
+        static readonly bool NoFileDump = true;
         static bool IsInContainerDump;
 
         static readonly string RunId = Extension.GetFormattedNow() + "\n";
@@ -29,14 +28,19 @@ namespace Reni.Struct
         [EnableDump]
         internal readonly StatementSyntax[] Statements;
 
-        internal CompoundSyntax(StatementSyntax[] statements, ValueSyntax cleanupSection, BinaryTree target)
-            : base(NextObjectId++, target)
+        internal CompoundSyntax
+            (StatementSyntax[] statements, BinaryTree bracketTarget = null, ValueSyntax cleanupSection = null)
+            : base(NextObjectId++, bracketTarget)
         {
             Statements = statements;
             CleanupSection = cleanupSection;
 
             AssertValid();
         }
+
+        [EnableDump]
+        [EnableDumpExcept(null)]
+        string Position => Binary?.Token.Characters.GetDumpAroundCurrent(5);
 
         [DisableDump]
         public IEnumerable<FunctionSyntax> ConverterFunctions
@@ -86,7 +90,6 @@ namespace Reni.Struct
                 .ToArray();
 
 
-        
         [DisableDump]
         protected override int LeftChildCount => Statements.Length;
 
@@ -146,8 +149,10 @@ namespace Reni.Struct
                 .Select((s, i) => s ?? Statements[i])
                 .ToArray();
             var newCleanupSection = cleanupSection ?? CleanupSection;
-            return new CompoundSyntax(newStatements, newCleanupSection, Binary);
+            return new CompoundSyntax(newStatements, Binary, newCleanupSection);
         }
+
+        protected override Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree listTarget = null) => this;
 
         internal Result Cleanup(ContextBase context, Category category)
         {
