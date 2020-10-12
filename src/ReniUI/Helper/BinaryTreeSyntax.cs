@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
@@ -20,7 +22,7 @@ namespace ReniUI.Helper
         readonly CacheContainer Cache = new CacheContainer();
 
         internal BinaryTree(Reni.TokenClasses.BinaryTree flatItem, Syntax syntax)
-            : this(flatItem, null,syntax ) { }
+            : this(flatItem, null, syntax) { }
 
         BinaryTree(Reni.TokenClasses.BinaryTree flatItem, BinaryTree parent, Syntax syntax)
             : base(flatItem, parent)
@@ -29,12 +31,6 @@ namespace ReniUI.Helper
             Cache.ExtendedLocateByPosition = new FunctionCache<int, BinaryTree>(ExtendedLocateByPositionForCache);
 
             Syntax = FindAndLink(syntax);
-        }
-
-        Syntax FindAndLink(Syntax syntax)
-        {
-            NotImplementedMethod(syntax);
-            return syntax;
         }
 
         [DisableDump]
@@ -52,11 +48,54 @@ namespace ReniUI.Helper
             }
         }
 
+        Syntax FindAndLink(Syntax syntax)
+        {
+            syntax ??= Find();
+            syntax.Binary = this;
+            return syntax;
+        }
+
+
+        Syntax Find()
+        {
+            var result = Parent
+                .Syntax
+                .DirectChildren
+                .FirstOrDefault(node=> node?.FlatItem.Binary == FlatItem);
+            if(result != null)
+                return result;
+
+            nameof(FlatItem).IsSetTo(FlatItem).FlaggedLine();
+
+            var xx = Parent
+                .Syntax
+                .DirectChildren
+                .Where(node => node?.FlatItem.Binary != null)
+                .ToArray();
+
+            Parent
+                .Syntax
+                .DirectChildren
+                .Where(node => node?.FlatItem.Binary != null)
+                .Select(node=> node.FlatItem.Binary.Dump())
+                .Stringify("\n")
+                .Indent()
+                .Log();
+
+            Parent.Syntax.Dump().Log();
+
+
+            NotImplementedMethod();
+            var syntax = new Syntax(new LinkSyntax(FlatItem));
+            return syntax;
+        }
+
         protected override string GetNodeDump() => base.GetNodeDump() + $"({TokenClass.Id})";
 
         public BinaryTree LocateByPosition(int current) => Cache.LocateByPosition[current];
 
-        protected override BinaryTree Create(Reni.TokenClasses.BinaryTree flatItem) => new BinaryTree(flatItem, this, null);
+        protected override BinaryTree Create
+            (Reni.TokenClasses.BinaryTree flatItem) => new BinaryTree(flatItem, this, null);
 
         internal BinaryTree Locate(SourcePart part)
             => Left?.CheckedLocate(part) ??
@@ -103,5 +142,11 @@ namespace ReniUI.Helper
                 ? Left.Find(target)
                 : Right.Find(target);
         }
+    }
+
+    class LinkSyntax : Reni.Parser.Syntax.NoChildren
+    {
+        public LinkSyntax(Reni.TokenClasses.BinaryTree binary)
+            : base(binary) { }
     }
 }
