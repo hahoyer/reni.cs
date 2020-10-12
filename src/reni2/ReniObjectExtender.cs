@@ -5,6 +5,7 @@ using System.Reflection;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
+using JetBrains.Annotations;
 using Reni.Numeric;
 using Reni.Parser;
 using Reni.TokenClasses;
@@ -15,31 +16,29 @@ namespace Reni
     {
         // will throw an exception if not a ReniObject
         internal static int GetObjectId(this object reniObject)
-            => ((DumpableObject) reniObject).ObjectId;
+            => ((DumpableObject)reniObject).ObjectId;
 
         // will throw an exception if not a ReniObject
+        [PublicAPI]
         internal static int? GetObjectId<T>(this object reniObject)
         {
             if(reniObject is T)
-                return ((DumpableObject) reniObject).ObjectId;
+                return ((DumpableObject)reniObject).ObjectId;
 
             return null;
         }
 
-        internal static string NodeDump(this object o) 
-            => o is DumpableObject r ? r.NodeDump : o.ToString();
+        internal static string NodeDump(this object o)
+            => o is DumpableObject r? r.NodeDump : o.ToString();
 
-        internal static bool IsBelongingTo(this IBelongingsMatcher current, ITokenClass other)
-        {
-            var otherMatcher = other as IBelongingsMatcher;
-            return otherMatcher != null && current.IsBelongingTo(otherMatcher);
-        }
+        internal static bool IsBelongingTo(this IBelongingsMatcher current, ITokenClass other) 
+            => other is IBelongingsMatcher otherMatcher && current.IsBelongingTo(otherMatcher);
 
         internal static bool IsBelongingTo(this ITokenClass current, ITokenClass other)
             => (current as IBelongingsMatcher)?.IsBelongingTo(other) ?? false;
 
 
-        [Obsolete("",true)]
+        [Obsolete("", true)]
         internal static IEnumerable<BinaryTree> CheckedItemsAsLongAs
             (this BinaryTree target, Func<BinaryTree, bool> condition)
         {
@@ -50,8 +49,7 @@ namespace Reni
                 yield return result;
         }
 
-        internal static IEnumerable<Syntax> CheckedItemsAsLongAs
-            (this Syntax target, Func<Syntax, bool> condition)
+        internal static IEnumerable<Syntax> CheckedItemsAsLongAs(this Syntax target, Func<Syntax, bool> condition)
         {
             if(target == null || !condition(target))
                 yield break;
@@ -60,6 +58,7 @@ namespace Reni
                 yield return result;
         }
 
+        [PublicAPI]
         internal static IEnumerable<System.Type> DerivedClasses<T>()
             => TypeNameExtender.Types.Where(item => item.Is<T>());
 
@@ -80,8 +79,9 @@ namespace Reni
                         .DeclaringType
                         .GetAttributes<VariantAttribute>(false)
                         .Select
-                            (item => (string) ((MethodInfo) member).Invoke(null, item.CreationParameter));
-                case MemberTypes.Field: return new[] {(string) ((FieldInfo) member).GetValue(null)};
+                            (item => (string)((MethodInfo)member).Invoke(null, item.CreationParameter));
+                case MemberTypes.Field:
+                    return new[] {(string)((FieldInfo)member).GetValue(null)};
             }
 
             Dumpable.NotImplementedFunction(member.Name);
@@ -102,7 +102,5 @@ namespace Reni
             result += n.Millisecond.ToString("000");
             return result;
         }
-
-        public static IEnumerable<T> SingleToArray<T>(this T target) {yield return target;}
     }
 }
