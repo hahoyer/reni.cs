@@ -80,7 +80,7 @@ namespace ReniUI.CompilationView
         static void HandleErrors(CompilerErrorCollection cr)
         {
             for(var i = 0; i < cr.Count; i++)
-                Tracer.Log(cr[i].ToString());
+                cr[i].ToString().Log();
 
             throw new CSharpCompilerErrorException(cr);
         }

@@ -296,7 +296,7 @@ namespace Reni
             }
 
             if(Parameters.TraceOptions.CodeSequence && Parameters.IsCodeRequired)
-                Tracer.FlaggedLine("Code\n" + CodeContainer.Dump());
+                ("Code\n" + CodeContainer.Dump()).FlaggedLine();
 
             if(Parameters.RunFromCode)
             {
@@ -307,7 +307,7 @@ namespace Reni
             }
 
             if(Parameters.TraceOptions.ExecutedCode)
-                Tracer.FlaggedLine("ExecutedCode:\n" + CSharpString);
+                ("ExecutedCode:\n" + CSharpString).FlaggedLine();
 
             if(Parameters.OutStream != null)
                 foreach(var t in Issues)

@@ -39,12 +39,15 @@ namespace hw.DebugFormatter
             {
                 var stackTrace = new StackTrace(true);
 
+                var isLoggingLevel = false;
                 for(var frameDepth = 0; frameDepth < stackTrace.FrameCount - 1; frameDepth++)
                 {
                     var stackFrame = stackTrace.GetFrame(frameDepth);
                     var methodBase = stackFrame.GetMethod();
-                    if(methodBase == Method(Tracer.Log) || methodBase == Method(Tracer.LogLinePart))
-                        return stackTrace.GetFrame(frameDepth + 1);
+                    if(methodBase.GetAttribute<IsLoggingFunction>(true) != null)
+                        isLoggingLevel = true;
+                    else if(isLoggingLevel)
+                        return stackTrace.GetFrame(frameDepth);
                 }
 
                 return stackTrace.GetFrame(1);

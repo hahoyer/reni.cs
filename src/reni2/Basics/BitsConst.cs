@@ -19,7 +19,7 @@ namespace Reni.Basics
             [UnitTest]
             public void All()
             {
-                Tracer.FlaggedLine("Position of method tested", FilePositionTag.Test);
+                "Position of method tested".FlaggedLine(FilePositionTag.Test);
                 Tracer.Assert(Convert(0).ToInt64() == 0);
                 Tracer.Assert(Convert(11).ToInt64() == 11);
                 Tracer.Assert(Convert(-111).ToInt64() == -111);
@@ -50,7 +50,7 @@ namespace Reni.Basics
             [UnitTest]
             public void Resize()
             {
-                Tracer.FlaggedLine("Position of method tested", FilePositionTag.Test);
+                "Position of method tested".FlaggedLine(FilePositionTag.Test);
                 Tracer.Assert(Convert("100").Resize(Size.Create(6)).ToString(10) == "-28");
 
                 Tracer.Assert(Convert("1").Resize(Size.Create(1)).ToString(10) == "-1");

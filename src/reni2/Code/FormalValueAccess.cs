@@ -70,10 +70,10 @@ namespace Reni.Code
         {
             var ss = accesses.Select(x => x.Size).Distinct().ToArray();
             if(ss.Length != 1 || ss[0] != accesses.ToArray().Length)
-                Tracer.FlaggedLine("Size problem");
+                "Size problem".FlaggedLine();
             var ii = accesses.Select((x, i) => i - x.Index).Distinct().ToArray();
             if(ii.Length != 1 || ii[0] != 0)
-                Tracer.FlaggedLine("Consequtivity problem");
+                "Consequtivity problem".FlaggedLine();
         }
     }
 

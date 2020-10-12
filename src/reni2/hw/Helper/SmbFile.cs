@@ -317,7 +317,7 @@ namespace hw.Helper
             if(!IsDirectory)
                 yield break;
 
-            Tracer.Log(FullName);
+            FullName.Log();
             IEnumerable<string> filePaths = new[] {FullName};
             while(true)
             {

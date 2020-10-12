@@ -288,10 +288,28 @@ namespace hw.DebugFormatter
         /// <param name="flagText"> </param>
         /// <param name="showParam"></param>
         /// <param name="stackFrameDepth"> The stack frame depth. </param>
+        [IsLoggingFunction]
         public static void FlaggedLine
         (
-            string text,
+            this string text,
             FilePositionTag flagText = FilePositionTag.Debug,
+            bool showParam = false,
+            int stackFrameDepth = 0
+        )
+        {
+            var methodHeader = MethodHeader
+            (
+                flagText,
+                stackFrameDepth: stackFrameDepth + 1,
+                showParam: showParam);
+            Log(methodHeader + " " + text);
+        }
+
+        [IsLoggingFunction]
+        public static void Log
+        (
+            this string text,
+            FilePositionTag flagText,
             bool showParam = false,
             int stackFrameDepth = 0
         )
@@ -366,6 +384,7 @@ namespace hw.DebugFormatter
         /// <param name="stackFrameDepth"> The stack frame depth. </param>
         /// <returns> </returns>
         [DebuggerHidden]
+        [IsLoggingFunction]
         public static void ConditionalBreak(string cond, Func<string> getText = null, int stackFrameDepth = 0)
         {
             var result = "Conditional break: " + cond + "\nData: " + (getText == null? "" : getText());
@@ -410,6 +429,7 @@ namespace hw.DebugFormatter
         /// <param name="stackFrameDepth"> The stack frame depth. </param>
         /// <returns> </returns>
         [DebuggerHidden]
+        [IsLoggingFunction]
         public static string AssertionFailed(string cond, Func<string> getText = null, int stackFrameDepth = 0)
         {
             var result = "Assertion Failed: " + cond + "\nData: " + (getText == null? "" : getText());
@@ -463,8 +483,10 @@ namespace hw.DebugFormatter
         [Obsolete("Use LogLinePart")]
         public static void WriteLinePart(this string value) => LogLinePart(value);
 
+        [IsLoggingFunction]
         public static void Log(this string value) => Writer.ThreadSafeWrite(value, true);
 
+        [IsLoggingFunction]
         public static void LogLinePart(this string value) => Writer.ThreadSafeWrite(value, false);
 
         public static string DumpMethodWithData
@@ -535,4 +557,6 @@ namespace hw.DebugFormatter
     }
 
     public abstract class DumpAttributeBase : Attribute { }
+
+    public class IsLoggingFunction : Attribute { }
 }

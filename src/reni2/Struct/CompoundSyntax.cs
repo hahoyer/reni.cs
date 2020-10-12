@@ -16,8 +16,8 @@ namespace Reni.Struct
     /// </summary>
     sealed class CompoundSyntax : ValueSyntax
     {
-        [UsedImplicitly]
-        internal static bool IsInContainerDump;
+        static bool NoFileDump = true;
+        static bool IsInContainerDump;
 
         static readonly string RunId = Extension.GetFormattedNow() + "\n";
         static bool IsInsideFileDump;
@@ -99,7 +99,7 @@ namespace Reni.Struct
         {
             var isInsideFileDump = IsInsideFileDump;
             IsInsideFileDump = true;
-            var result = isInsideFileDump? DumpDataToString() : DumpDataToFile();
+            var result = NoFileDump || isInsideFileDump? DumpDataToString() : DumpDataToFile();
             IsInsideFileDump = isInsideFileDump;
             return result;
         }

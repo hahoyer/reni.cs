@@ -22,7 +22,7 @@ namespace Reni
             var st = new StackTrace(true);
             for(var i = 1; i < st.FrameCount; i++)
                 _l.Add(Tracer.MethodHeader(tag: FilePositionTag.Output, showParam: true, stackFrameDepth: i));
-            Tracer.FlaggedLine(text, FilePositionTag.Output);
+            text.FlaggedLine(FilePositionTag.Output);
             _text = text;
         }
     }
