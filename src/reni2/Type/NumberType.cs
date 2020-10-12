@@ -11,45 +11,90 @@ using Reni.TokenClasses;
 
 namespace Reni.Type
 {
-    sealed class NumberType :
-        Child<ArrayType>,
-        ISymbolProviderForPointer<DumpPrintToken>,
-        ISymbolProviderForPointer<Operation>,
-        ISymbolProviderForPointer<TokenClasses.EnableCut>,
-        ISymbolProviderForPointer<Negate>,
-        ISymbolProviderForPointer<TextItem>,
-        IForcedConversionProvider<NumberType>
+    sealed class NumberType
+        : Child<ArrayType>
+            , ISymbolProviderForPointer<DumpPrintToken>
+            , ISymbolProviderForPointer<Operation>
+            , ISymbolProviderForPointer<TokenClasses.EnableCut>
+            , ISymbolProviderForPointer<Negate>
+            , ISymbolProviderForPointer<TextItem>
+            , IForcedConversionProvider<NumberType>
     {
-        static readonly Minus _minusOperation = new Minus();
-        readonly ValueCache<Result> _zeroResult;
+        internal interface IOperation
+        {
+            [DisableDump]
+            string Name { get; }
+        }
+
+        internal interface ITransformation
+        {
+            int Signature(int objectBitCount, int argsBitCount);
+        }
+
+        static readonly Minus MinusOperation = new Minus();
+        readonly ValueCache<Result> ZeroResult;
 
         public NumberType(ArrayType parent)
             : base(parent)
-        {
-            _zeroResult = new ValueCache<Result>(GetZeroResult);
-        }
-
-        Result GetZeroResult()
-        {
-            return Root
-                .BitType
-                .Number(1)
-                .Result(Category.All, () => CodeBase.BitsConst(BitsConst.Convert(0)));
-        }
+            => ZeroResult = new ValueCache<Result>(GetZeroResult);
 
         [DisableDump]
         internal override Root Root => Parent.Root;
+
         [DisableDump]
         internal override bool IsHollow => Parent.IsHollow;
+
         [DisableDump]
         internal override string DumpPrintText => "number(bits:" + Bits + ")";
+
         [DisableDump]
         internal override bool IsCuttingPossible => true;
+
         [EnableDump]
         internal int Bits => Size.ToInt();
+
         [DisableDump]
         protected override IEnumerable<IGenericProviderForType> GenericList
             => this.GenericListFromType(base.GenericList);
+
+        [DisableDump]
+        internal override IEnumerable<string> DeclarationOptions
+            => base.DeclarationOptions.Concat(InternalDeclarationOptions);
+
+        static IEnumerable<string> InternalDeclarationOptions
+            => new[]
+                {
+                    DumpPrintToken.TokenId, TokenClasses.EnableCut.TokenId, Negate.TokenId, TextItem.TokenId
+                }
+                .Concat(Extension.GetTokenIds<Operation>());
+
+        IEnumerable<IConversion> IForcedConversionProvider<NumberType>.Result(NumberType destination)
+        {
+            if(Bits <= destination.Bits)
+                yield return
+                    Feature.Extension.Conversion
+                        (category => destination.FlatConversion(category, this), this);
+        }
+
+        IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
+            => Feature.Extension.Value(DumpPrintTokenResult, this);
+
+        IImplementation ISymbolProviderForPointer<TokenClasses.EnableCut>.Feature
+            (TokenClasses.EnableCut tokenClass) => Feature.Extension.Value(EnableCutTokenResult);
+
+        IImplementation ISymbolProviderForPointer<Negate>.Feature(Negate tokenClass)
+            => Feature.Extension.Value(NegationResult);
+
+        IImplementation ISymbolProviderForPointer<Operation>.Feature(Operation tokenClass)
+            => Feature.Extension.FunctionFeature(OperationResult, tokenClass);
+
+        IImplementation ISymbolProviderForPointer<TextItem>.Feature(TextItem tokenClass)
+            => Feature.Extension.Value(TextItemResult);
+
+        Result GetZeroResult() => Root
+            .BitType
+            .Number(1)
+            .Result(Category.All, () => CodeBase.BitsConst(BitsConst.Convert(0)));
 
         internal override IEnumerable<IConversion> CutEnabledConversion(NumberType destination)
         {
@@ -58,53 +103,10 @@ namespace Reni.Type
                     (category => CutEnabledBitCountConversion(category, destination), EnableCut);
         }
 
-        IImplementation ISymbolProviderForPointer<DumpPrintToken>.Feature
-            (DumpPrintToken tokenClass)
-            => Feature.Extension.Value(DumpPrintTokenResult, this);
-
-        IImplementation ISymbolProviderForPointer<Operation>.Feature(Operation tokenClass)
-            => Feature.Extension.FunctionFeature(OperationResult, tokenClass);
-
-        IImplementation ISymbolProviderForPointer<TokenClasses.EnableCut>.Feature
-            (TokenClasses.EnableCut tokenClass) => Feature.Extension.Value(EnableCutTokenResult);
-
-        IEnumerable<IConversion> IForcedConversionProvider<NumberType>.Result
-            (NumberType destination)
-        {
-            if(Bits <= destination.Bits)
-                yield return
-                    Feature.Extension.Conversion
-                        (category => destination.FlatConversion(category, this), this);
-        }
-
-        IImplementation ISymbolProviderForPointer<Negate>.Feature(Negate tokenClass)
-            => Feature.Extension.Value(NegationResult);
-
-        IImplementation ISymbolProviderForPointer<TextItem>.Feature(TextItem tokenClass)
-            => Feature.Extension.Value(TextItemResult);
-
         protected override Result ParentConversionResult(Category category)
             => Mutation(Parent) & category;
 
         protected override Size GetSize() => Parent.Size;
-
-        [DisableDump]
-        internal override IEnumerable<string> DeclarationOptions
-            => base.DeclarationOptions.Concat(InternalDeclarationOptions);
-
-        static IEnumerable<string> InternalDeclarationOptions
-        {
-            get
-            {
-                return new[]
-                {
-                    DumpPrintToken.TokenId,
-                    TokenClasses.EnableCut.TokenId,
-                    Negate.TokenId,TextItem.TokenId
-                }
-                    .Concat(Extension.GetTokenIds<Operation>());
-            }
-        }
 
         Result TextItemResult(Category category) => Parent
             .TextItem
@@ -116,12 +118,12 @@ namespace Reni.Type
                     .Pointer
                     .Result(category, ObjectResult(category.WithType)));
 
-        Result NegationResult(Category category) => ((NumberType) _zeroResult.Value.Type)
-            .OperationResult(category, _minusOperation, this)
+        Result NegationResult(Category category) => ((NumberType)ZeroResult.Value.Type)
+            .OperationResult(category, MinusOperation, this)
             .ReplaceAbsolute
             (
-                _zeroResult.Value.Type.ForcedReference,
-                c => _zeroResult.Value.LocalReferenceResult & c)
+                ZeroResult.Value.Type.ForcedReference,
+                c => ZeroResult.Value.LocalReferenceResult & c)
             .ReplaceArg(ObjectResult);
 
         protected override CodeBase DumpPrintCode() => Align.ArgCode.DumpPrintNumber(Align.Size);
@@ -150,20 +152,19 @@ namespace Reni.Type
         {
             var transformation = operation as ITransformation;
             var resultType = transformation == null
-                ? (TypeBase) Root.BitType
+                ? (TypeBase)Root.BitType
                 : Root.BitType.Number(transformation.Signature(Bits, right.Bits));
             return OperationResult(category, resultType, operation.Name, right);
         }
 
-        Result OperationResult
-            (Category category, TypeBase resultType, string operationName, NumberType right)
+        Result OperationResult(Category category, TypeBase resultType, string operationName, NumberType right)
         {
             var result = resultType.Result
-                (
-                    category,
-                    () => OperationCode(resultType.Size, operationName, right),
-                    Closures.Arg
-                );
+            (
+                category,
+                () => OperationCode(resultType.Size, operationName, right),
+                Closures.Arg
+            );
 
             var leftResult = ObjectResult(category.WithType)
                 .Conversion(Align);
@@ -187,11 +188,11 @@ namespace Reni.Type
                 return ArgResult(category.WithType);
 
             return Result
-                (
-                    category,
-                    () => source.ArgCode.BitCast(Size),
-                    Closures.Arg
-                );
+            (
+                category,
+                () => source.ArgCode.BitCast(Size),
+                Closures.Arg
+            );
         }
 
         Result CutEnabledBitCountConversion(Category category, NumberType destination)
@@ -206,17 +207,6 @@ namespace Reni.Type
                     () => EnableCut.ArgCode.BitCast(destination.Size),
                     Closures.Arg
                 );
-        }
-
-        internal interface IOperation
-        {
-            [DisableDump]
-            string Name { get; }
-        }
-
-        internal interface ITransformation
-        {
-            int Signature(int objectBitCount, int argsBitCount);
         }
     }
 }
