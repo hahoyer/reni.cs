@@ -12,6 +12,7 @@ using Reni.TokenClasses;
 using Reni.Validation;
 using ReniUI.Classification;
 using ReniUI.Formatting;
+using ReniUI.Helper;
 
 namespace ReniUI
 {
@@ -40,8 +41,9 @@ namespace ReniUI
 
         internal IEnumerable<Issue> Issues => Compiler.Issues;
 
-        internal Helper.BinaryTree Binary => this.CachedValue(GetBinary);
         internal Helper.Syntax Syntax => this.CachedValue(GetSyntax);
+        [Obsolete("",true)]
+        internal Helper.SyntaxOld SyntaxOld => this.CachedValue(GetSyntaxOld);
 
         internal Formatting.BinaryTree FormattingBinary
             => this.CachedValue(() => new Formatting.BinaryTree(Compiler.BinaryTree));
@@ -60,7 +62,7 @@ namespace ReniUI
             => new CompilerBrowser(() => Compiler.FromFile(fileName, parameters));
 
         public Token LocatePosition(int offset)
-            => Token.LocateByPosition(Binary, offset);
+            => Token.LocateByPosition(Syntax, offset);
 
         public Token LocatePosition(SourcePosition current)
         {
@@ -86,32 +88,33 @@ namespace ReniUI
             => Compiler.Root.Function(index);
 
 
-        internal IEnumerable<Syntax> FindAllBelongings(Helper.Syntax syntax)
+        internal IEnumerable<Helper.Syntax> FindAllBelongings(Helper.Syntax syntax)
         {
-            if(!(syntax.FlatItem.Binary.TokenClass is IBelongingsMatcher matcher))
+            if(!(syntax.TokenClass is IBelongingsMatcher matcher))
                 return null;
 
-            var sourceSyntaxList = Reni.Helper.Extension.BackChain(Compiler.Syntax, syntax.FlatItem).ToArray();
+            var sourceSyntaxList = 
+                Reni.Helper.Extension.BackChain(Syntax, syntax).ToArray();
 
             var root = sourceSyntaxList
                            .Skip(1)
-                           .TakeWhile(item => matcher.IsBelongingTo(item.Binary.TokenClass))
+                           .TakeWhile(item => matcher.IsBelongingTo(item.TokenClass))
                            .LastOrDefault() ??
-                       syntax.FlatItem;
+                       syntax;
 
             return root?.Binary.TokenClass is IBelongingsMatcher rootMatcher
-                ? root.ItemsAsLongAs(item => rootMatcher.IsBelongingTo(item.Binary.TokenClass)).ToArray()
+                ? root.ItemsAsLongAs(item => rootMatcher.IsBelongingTo(item.TokenClass)).ToArray()
                 : null;
         }
 
         internal string Reformat(IFormatter formatter = null, SourcePart targetPart = null) =>
             (formatter ?? new Formatting.Configuration().Create())
             .GetEditPieces(this, targetPart)
-            .Combine(Binary.FlatItem.SourcePart);
+            .Combine(Syntax.SourcePart);
 
-        internal Helper.BinaryTree Locate(SourcePart span)
+        internal Helper.Syntax Locate(SourcePart span)
         {
-            var result = Binary.Locate(span);
+            var result = Syntax.Locate(span);
             if(result != null)
                 return result;
 
@@ -127,31 +130,18 @@ namespace ReniUI
         internal string[] DeclarationOptions(int offset)
         {
             Ensure();
-            return LocateValueByPosition(offset)?.Syntax.DeclarationOptions ?? new string[0];
+            return LocateValueByPosition(offset)?.DeclarationOptions ?? new string[0];
         }
 
         internal IEnumerable<Edit> GetEditPieces(SourcePart sourcePart, IFormatter formatter = null)
             => (formatter ?? new Formatting.Configuration().Create())
                 .GetEditPieces(this, sourcePart);
 
-        Helper.BinaryTree GetBinary()
-        {
-            try
-            {
-                return new Helper.BinaryTree(Compiler.BinaryTree, Syntax);
-            }
-            catch(Exception e)
-            {
-                $"Syntax: Unexpected {e} \nText:\n{Source.Data}".Log();
-                throw;
-            }
-        }
-
         Helper.Syntax GetSyntax()
         {
             try
             {
-                return new Helper.Syntax(Compiler.Syntax);
+                return new Helper.Syntax(Compiler.Syntax, Compiler.BinaryTree, null);
             }
             catch(Exception e)
             {
@@ -160,9 +150,22 @@ namespace ReniUI
             }
         }
 
-        Helper.BinaryTree LocateValueByPosition(int offset)
+        Helper.SyntaxOld GetSyntaxOld()
         {
-            var token = Token.LocateByPosition(Binary, offset);
+            try
+            {
+                return new Helper.SyntaxOld(Syntax);
+            }
+            catch(Exception e)
+            {
+                $"Syntax: Unexpected {e} \nText:\n{Source.Data}".Log();
+                throw;
+            }
+        }
+
+        Helper.Syntax LocateValueByPosition(int offset)
+        {
+            var token = Token.LocateByPosition(Syntax, offset);
             if(token.IsComment || token.IsLineComment)
                 return null;
 

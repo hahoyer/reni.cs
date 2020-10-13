@@ -11,8 +11,8 @@ namespace ReniUI.Classification
 {
     sealed class SyntaxToken : Token
     {
-        internal override Helper.BinaryTree Master { get; }
-        internal SyntaxToken(Helper.BinaryTree master) => Master = master;
+        internal override Syntax Master { get; }
+        internal SyntaxToken(Syntax master) => Master = master;
 
         TokenClass TokenClass => Master.TokenClass as TokenClass;
 
@@ -50,12 +50,12 @@ namespace ReniUI.Classification
             => Issues.Any(item => item.IssueId == IssueId.EOFInLineComment);
 
         [DisableDump]
-        Issue[] Issues => Master.Syntax.Issues;
+        Issue[] Issues => Master.Issues;
 
         [DisableDump]
         public override string State => Master.Token.Characters.Id ?? "";
 
         public override IEnumerable<SourcePart> FindAllBelongings(CompilerBrowser compiler)
-            => compiler.FindAllBelongings(Master.Syntax)?.Select(item => item.Binary?.Token.Characters);
+            => compiler.FindAllBelongings(Master)?.Select(item => item.Token.Characters);
     }
 }

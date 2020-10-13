@@ -1,37 +1,80 @@
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
+using Reni.Helper;
+using Reni.Parser;
 using Reni.TokenClasses;
 using Reni.Validation;
 
 namespace ReniUI.Helper
 {
-    sealed class Syntax : SyntaxWithParent<Syntax>
+    sealed class Syntax : DumpableObject, ITree<Syntax>
     {
-        class CacheContainer
+        internal readonly BinaryTree Binary;
+        internal readonly Reni.Parser.Syntax FlatItem;
+        internal readonly Syntax Parent;
+
+        internal Syntax(Reni.Parser.Syntax flatItem, BinaryTree binary, Syntax parent)
         {
-            public FunctionCache<int, Syntax> ExtendedLocateByPosition;
-            public FunctionCache<int, Syntax> LocateByPosition;
+            FlatItem = flatItem;
+            Binary = binary;
+            Parent = parent;
         }
 
         [DisableDump]
-        internal BinaryTree Binary;
-
-        readonly CacheContainer Cache = new CacheContainer();
-
-        internal Syntax(Reni.Parser.Syntax flatItem, Syntax parent = null)
-            : base(flatItem, parent)
+        internal SourcePart SourcePart
         {
-            Cache.LocateByPosition = new FunctionCache<int, Syntax>(LocateByPositionForCache);
-            Cache.ExtendedLocateByPosition = new FunctionCache<int, Syntax>(ExtendedLocateByPositionForCache);
+            get
+            {
+                NotImplementedMethod();
+                return default;
+            }
         }
 
         [DisableDump]
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public IToken Token
+        {
+            get
+            {
+                NotImplementedMethod();
+                return default;
+            }
+        }
+
+        [DisableDump]
+        public ITokenClass TokenClass
+        {
+            get
+            {
+                NotImplementedMethod();
+                return default;
+            }
+        }
+
+        [DisableDump]
+        public Syntax Left
+        {
+            get
+            {
+                NotImplementedMethod();
+                return default;
+            }
+        }
+
+        [DisableDump]
+        public Syntax Right
+        {
+            get
+            {
+                NotImplementedMethod();
+                return default;
+            }
+        }
+
+        [DisableDump]
         public Issue[] Issues
         {
             get
@@ -42,7 +85,26 @@ namespace ReniUI.Helper
         }
 
         [DisableDump]
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public Syntax LeftMostRightSibling
+        {
+            get
+            {
+                NotImplementedMethod();
+                return default;
+            }
+        }
+
+        [DisableDump]
+        public IEnumerable<Syntax> ParentChainIncludingThis
+        {
+            get
+            {
+                NotImplementedMethod();
+                return default;
+            }
+        }
+
+        [DisableDump]
         public string[] DeclarationOptions
         {
             get
@@ -53,80 +115,39 @@ namespace ReniUI.Helper
         }
 
         [DisableDump]
-        internal IEnumerable<Syntax> ParentChainIncludingThis
+        int ITree<Syntax>.DirectChildCount
         {
             get
             {
-                yield return this;
-
-                if(Parent == null)
-                    yield break;
-
-                foreach(var other in Parent.ParentChainIncludingThis)
-                    yield return other;
+                NotImplementedMethod();
+                return default;
             }
         }
 
+        Syntax ITree<Syntax>.GetDirectChild(int index)
+        {
+            NotImplementedMethod(index);
+            return default;
+        }
+
         [DisableDump]
-        bool IsFunctionLevel => TokenClass is Function;
+        int ITree<Syntax>.LeftDirectChildCount => 0;
 
-        [EnableDump]
-        new Reni.Parser.Syntax FlatItem => base.FlatItem;
-
-        protected override string GetNodeDump() => $"{GetType().PrettyName()}({FlatItem.GetType().PrettyName()})";
-
-        public Syntax LocateByPosition(int current) => Cache.LocateByPosition[current];
-
-        protected override Syntax Create(Reni.Parser.Syntax flatItem)
-            => new Syntax(flatItem, this);
-
-        internal Syntax Locate(SourcePart part)
+        public Syntax LocateByPosition(int offset)
         {
-            NotImplementedMethod(part);
+            NotImplementedMethod(offset);
             return default;
         }
 
-        Syntax CheckedLocate(SourcePart part)
-            => SourcePart.Contains(part)? Locate(part) : null;
-
-        Syntax LocatePositionExtended(int current) => Cache.ExtendedLocateByPosition[current];
-
-        Syntax LocateByPositionForCache(int current) 
-            => Binary
-                .LocateByPosition(current)
-                .ParentChainIncludingThis
-                .First(node => node.Syntax != null)
-                .Syntax;
-
-        static bool Touches(int targetPosition, Syntax target)
+        public Syntax Locate(SourcePart span)
         {
-            var token = target.FlatItem.Binary?.Token;
-            if(token == null)
-                return false;
-            var sourcePart = token.SourcePart();
-            if(sourcePart.EndPosition < targetPosition)
-                return false;
-            Tracer.Assert(sourcePart.Position <= targetPosition);
-            return true;
-        }
-
-        Syntax ExtendedLocateByPositionForCache(int current)
-        {
-            NotImplementedMethod(current);
+            NotImplementedMethod(span);
             return default;
         }
 
-
-        Syntax LocateByPositionOrDefault(int current)
-            =>
-                Contains(current)
-                    ? LocateByPosition(current)
-                    : null;
-
-        Syntax ExtendedLocateByPositionOrDefault(int current)
-            =>
-                Contains(current)
-                    ? LocatePositionExtended(current)
-                    : null;
+        internal IEnumerable<Syntax> ItemsAsLongAs(Func<Syntax, bool> condition)
+            => this
+                .GetNodesFromLeftToRight()
+                .SelectMany(node => node?.ItemsAsLongAs(condition) ?? new Syntax[0]);
     }
 }

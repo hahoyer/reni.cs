@@ -7,6 +7,8 @@ using hw.UnitTest;
 using NUnit.Framework;
 using Reni.Parser;
 using Reni.TokenClasses;
+using ReniUI.Helper;
+
 // ReSharper disable StringLiteralTypo
 
 namespace ReniUI.Test
@@ -44,13 +46,13 @@ namespace ReniUI.Test
                 {
                     var newCompiler = CompilerBrowser.FromText(reformat);
                     Tracer.Assert(
-                        IsEqual(compiler.Binary.FlatItem, newCompiler.Binary.FlatItem
+                        IsEqual(compiler.Syntax, newCompiler.Syntax
                             , IgnoreWhiteSpaces),
                         () => @$"origin: 
-{compiler.Binary.FlatItem.Dump()} 
+{compiler.Syntax.Dump()} 
 
 new ({span.NodeDump}): 
-{newCompiler.Binary.FlatItem.Dump()} 
+{newCompiler.Syntax.Dump()} 
 
 "
                     );
@@ -58,7 +60,7 @@ new ({span.NodeDump}):
             }
         }
 
-        static bool IsEqual(BinaryTree target, BinaryTree other, IComparator differenceHandler)
+        static bool IsEqual(Helper.Syntax target, Helper.Syntax other, IComparator differenceHandler)
         {
             if(target.TokenClass.Id != other.TokenClass.Id)
                 return false;

@@ -57,7 +57,6 @@
     <Compile Include="Formatting\Context.cs" />
     <Compile Include="Formatting\HierarchicalStructure.cs" />
     <Compile Include="Formatting\SplitItem.cs" />
-    <Compile Include="Helper\BinaryTreeSyntax.cs" />
     <Compile Include="Formatting\WhiteSpaceView.cs" />
     <Compile Include="Formatting\IResultItem.cs" />
     <Compile Include="Formatting\ResultItems.cs" />
@@ -66,6 +65,7 @@
     <Compile Include="Formatting\ISourcePartEdit.cs" />
     <Compile Include="Formatting\BinaryTreeSyntax.cs" />
     <Compile Include="Formatting\WhiteSpace.cs" />
+    <Compile Include="Helper\SyntaxOld.cs" />
     <Compile Include="Helper\Syntax.cs" />
     <Compile Include="Helper\SyntaxWithParent.cs" />
     <Compile Include="hw\Forms\CursorUtil.cs" />

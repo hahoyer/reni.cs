@@ -7,10 +7,10 @@ namespace ReniUI.Classification
 {
     sealed class WhiteSpaceToken : Token
     {
-        internal override BinaryTree Master { get; }
+        internal override Helper.Syntax Master { get; }
         readonly IItem Item;
 
-        internal WhiteSpaceToken(IItem item, BinaryTree master)
+        internal WhiteSpaceToken(IItem item, Helper.Syntax master)
         {
             Item = item;
             Master = master;

@@ -4,6 +4,7 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
 using hw.Scanner;
+using ReniUI.Helper;
 
 namespace ReniUI.Formatting
 {
@@ -46,12 +47,12 @@ namespace ReniUI.Formatting
             return result;
         }
 
-        public static Helper.BinaryTree LocateAndFilter(this CompilerBrowser compiler, SourcePart targetPart)
+        public static Syntax LocateAndFilter(this CompilerBrowser compiler, SourcePart targetPart)
         {
             if(targetPart == null)
-                return compiler.Binary;
+                return compiler.Syntax;
             var result = compiler.Locate(targetPart);
-            return IsTooSmall(result.FlatItem.Token, targetPart) ? null : result;
+            return IsTooSmall(result.Binary.Token, targetPart) ? null : result;
         }
 
         static bool IsTooSmall(IToken token, SourcePart targetPart)
