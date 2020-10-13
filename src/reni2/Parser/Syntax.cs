@@ -65,12 +65,12 @@ namespace Reni.Parser
 
         protected abstract Syntax GetDirectChild(int index);
 
-        internal virtual Result<ValueSyntax> ToValueSyntax(BinaryTree target = null)
+        internal virtual Result<ValueSyntax> ToValueSyntax()
         {
             if(GetType().Is<ValueSyntax>())
                 return (ValueSyntax)this;
 
-            NotImplementedMethod(target);
+            NotImplementedMethod();
             return default;
         }
 

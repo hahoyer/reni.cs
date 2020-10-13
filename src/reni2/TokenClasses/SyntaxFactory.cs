@@ -272,7 +272,7 @@ namespace Reni.TokenClasses
             return GetSyntax(
                 target,
                 value => value,
-                list => (ValueSyntax)new CompoundSyntax(list, null, parent));
+                list => (ValueSyntax)new CompoundSyntax(list, parent));
         }
 
         Result<TResult> GetSyntax<TResult>
