@@ -102,7 +102,7 @@ namespace ReniUI
                            .LastOrDefault() ??
                        syntax;
 
-            return root?.Binary.TokenClass is IBelongingsMatcher rootMatcher
+            return root?.TokenClass is IBelongingsMatcher rootMatcher
                 ? root.ItemsAsLongAs(item => rootMatcher.IsBelongingTo(item.TokenClass)).ToArray()
                 : null;
         }

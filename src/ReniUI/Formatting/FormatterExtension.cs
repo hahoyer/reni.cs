@@ -52,7 +52,7 @@ namespace ReniUI.Formatting
             if(targetPart == null)
                 return compiler.Syntax;
             var result = compiler.Locate(targetPart);
-            return IsTooSmall(result.Binary.Token, targetPart) ? null : result;
+            return IsTooSmall(result.Token, targetPart) ? null : result;
         }
 
         static bool IsTooSmall(IToken token, SourcePart targetPart)
