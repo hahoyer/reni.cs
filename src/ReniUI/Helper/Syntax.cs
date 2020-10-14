@@ -118,9 +118,18 @@ namespace ReniUI.Helper
                 .SelectMany(node => node?.ItemsAsLongAs(condition) ?? new Syntax[0]);
 
         Syntax LocateByPositionForCache(int current)
-            => this
+        {
+            var nodes = this
                 .GetNodesFromLeftToRight()
-                .FirstOrDefault(node => node.Token.Characters.EndPosition > current);
+                .ToArray();
+            var ranges = nodes
+                .Select(node=> node.Token.Characters)
+                .ToArray();
+
+            return nodes
+                .Top(node => node.Token.Characters.EndPosition > current)
+                .AssertNotNull();
+        }
     }
 
     class ProxySyntax : Reni.Parser.Syntax.NoChildren

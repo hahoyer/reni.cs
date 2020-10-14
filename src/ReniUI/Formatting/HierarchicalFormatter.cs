@@ -13,8 +13,7 @@ namespace ReniUI.Formatting
 
         IEnumerable<Edit> IFormatter.GetEditPieces(CompilerBrowser compilerBrowser, SourcePart targetPart)
         {
-            var syntax = compilerBrowser.LocateAndFilter(targetPart);
-            if(syntax == null)
+            if(compilerBrowser.IsTooSmall(targetPart))
                 return new Edit[0];
 
             var item = new HierarchicalStructure.Frame {Target = compilerBrowser.FormattingBinary, Configuration = Configuration};

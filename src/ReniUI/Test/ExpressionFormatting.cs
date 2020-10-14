@@ -11,9 +11,9 @@ namespace ReniUI.Test
         [UnitTest]
         public void FromSourcePart()
         {
-            const string Text = @"(1,3,4,6)";
-            var compiler = CompilerBrowser.FromText(Text);
-            var span = (compiler.Source + 0).Span(Text.Length);
+            const string text = @"(1,3,4,6)";
+            var compiler = CompilerBrowser.FromText(text);
+            var span = (compiler.Source + 0).Span(text.Length);
             var x = compiler.Reformat(targetPart: span);
             Tracer.Assert(x == "(1, 3, 4, 6)", x);
         }
@@ -22,9 +22,9 @@ namespace ReniUI.Test
         [Test]
         public void BadArgDeclaration()
         {
-            const string Text = @"{^ : ^}";
-            var compiler = CompilerBrowser.FromText(Text);
-            var span = (compiler.Source + 0).Span(Text.Length);
+            const string text = @"{^ : ^}";
+            var compiler = CompilerBrowser.FromText(text);
+            var span = (compiler.Source + 0).Span(text.Length);
             var x = compiler.Reformat(targetPart: span);
 
             Tracer.Assert(x == "{^ : ^}", x);

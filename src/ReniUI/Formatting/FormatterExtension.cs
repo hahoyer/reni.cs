@@ -25,7 +25,7 @@ namespace ReniUI.Formatting
 
             var edits = pieces
                 .OrderBy(edit => edit.Location.Position)
-                .Where(edit=> edit.Location.Intersect(targetPart) != null)
+                .Where(edit => edit.Location.Intersect(targetPart) != null)
                 .ToArray();
             foreach(var edit in edits)
             {
@@ -52,7 +52,21 @@ namespace ReniUI.Formatting
             if(targetPart == null)
                 return compiler.Syntax;
             var result = compiler.Locate(targetPart);
-            return IsTooSmall(result.Token, targetPart) ? null : result;
+            return IsTooSmall(result.Token, targetPart)? null : result;
+        }
+
+        public static bool IsTooSmall(this CompilerBrowser compiler, SourcePart targetPart)
+        {
+            if(targetPart == null)
+                return false;
+
+            var start = compiler.LocatePosition(targetPart.Position);
+            var end = compiler.LocatePosition(targetPart.EndPosition-1);
+            if(start != null && end != null)
+                return start.Master == end.Master && IsTooSmall(start.Master.Token, targetPart);
+
+            Dumpable.NotImplementedFunction(compiler, targetPart);
+            return default;
         }
 
         static bool IsTooSmall(IToken token, SourcePart targetPart)

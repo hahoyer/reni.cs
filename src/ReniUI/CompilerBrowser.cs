@@ -151,5 +151,6 @@ namespace ReniUI
             var position = tokenSyntax.Token.Characters.Position;
             return position <= 0? null : tokenSyntax.LocateByPosition(position - 1);
         }
+
     }
 }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Scanner;
@@ -119,6 +120,7 @@ namespace ReniUI.Classification
         internal static Token LocateByPosition(Syntax target, int offset)
         {
             var result = target.LocateByPosition(offset);
+            Tracer.Assert(result != null);
             var resultToken = result.Token;
             if(offset < resultToken.Characters.Position)
                 return new WhiteSpaceToken
