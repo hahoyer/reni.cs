@@ -20,22 +20,23 @@ namespace ReniUI.Helper
 
         readonly CacheContainer Cache = new CacheContainer();
 
-        readonly Reni.Parser.Syntax FlatSyntaxRoot;
+        readonly Func<Reni.Parser.Syntax> GetFlatSyntaxRoot;
 
-        internal Syntax(Reni.Parser.Syntax flatSyntax, BinaryTree binary, Syntax parent)
+        internal Syntax(BinaryTree binary, Syntax parent = null, Func<Reni.Parser.Syntax> getFlatSyntax = null)
             : base(binary, parent)
         {
-            FlatSyntaxRoot = flatSyntax;
+            GetFlatSyntaxRoot = getFlatSyntax;
             Cache.LocateByPosition = new FunctionCache<int, Syntax>(LocateByPositionForCache);
         }
 
         [DisableDump]
-        internal Reni.Parser.Syntax FlatSyntax => this.CachedValue(() => FlatSyntaxRoot ?? GetFlatSyntax());
+        internal Reni.Parser.Syntax FlatSyntax
+            => this.CachedValue(() => GetFlatSyntaxRoot != null? GetFlatSyntaxRoot() : GetFlatSyntax());
 
         internal new BinaryTree FlatItem => base.FlatItem;
 
         [DisableDump]
-        public Issue[] Issues
+        internal Issue[] Issues
         {
             get
             {
@@ -45,17 +46,7 @@ namespace ReniUI.Helper
         }
 
         [DisableDump]
-        public IEnumerable<Syntax> ParentChainIncludingThis
-        {
-            get
-            {
-                NotImplementedMethod();
-                return default;
-            }
-        }
-
-        [DisableDump]
-        public string[] DeclarationOptions
+        internal string[] DeclarationOptions
         {
             get
             {
@@ -76,23 +67,38 @@ namespace ReniUI.Helper
             {
                 case ILeftBracket _ when matcher.IsBelongingTo(Parent.TokenClass):
                     yield return Parent;
-                    break;
+                    yield break;
                 case ILeftBracket _:
                     NotImplementedMethod();
-                    break;
+                    yield break;
                 case IRightBracket _ when Left != null && matcher.IsBelongingTo(Left.TokenClass):
                     yield return Left;
-                    break;
+                    yield break;
                 case IRightBracket _ when Parent.TokenClass is ILeftBracket:
                     yield return Parent;
-                    break;
+                    yield break;
                 case IRightBracket _:
                     NotImplementedMethod();
+                    yield break;
+                case List _:
                     break;
                 default:
                     NotImplementedMethod();
-                    break;
+                    yield break;
             }
+
+            Tracer.Assert(TokenClass is List);
+
+            var parents = Parent
+                .Chain(node => node.Parent)
+                .Where(node => matcher.IsBelongingTo(node.TokenClass));
+
+            var children = Right
+                .Chain(node => node.Right)
+                .TakeWhile(node => matcher.IsBelongingTo(node.TokenClass));
+
+            foreach(var node in parents.Concat(children))
+                yield return node;
         }
 
         Reni.Parser.Syntax GetFlatSyntax()
@@ -101,12 +107,12 @@ namespace ReniUI.Helper
             return default;
         }
 
-        protected override Syntax Create(BinaryTree flatItem) => new Syntax(null, flatItem, this);
+        protected override Syntax Create(BinaryTree flatItem) => new Syntax(flatItem, this);
 
 
         internal Syntax LocateByPosition(int offset) => Cache.LocateByPosition[offset];
 
-        public Syntax Locate(SourcePart span)
+        internal Syntax Locate(SourcePart span)
         {
             NotImplementedMethod(span);
             return default;
@@ -123,7 +129,7 @@ namespace ReniUI.Helper
                 .GetNodesFromLeftToRight()
                 .ToArray();
             var ranges = nodes
-                .Select(node=> node.Token.Characters)
+                .Select(node => node.Token.Characters)
                 .ToArray();
 
             return nodes

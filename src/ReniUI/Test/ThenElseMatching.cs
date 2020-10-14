@@ -1,5 +1,6 @@
 using hw.DebugFormatter;
 using hw.UnitTest;
+// ReSharper disable StringIndexOfIsCultureSpecific.1
 
 namespace ReniUI.Test
 {
@@ -9,21 +10,24 @@ namespace ReniUI.Test
         [UnitTest]
         public void Matching()
         {
-            const string Text = @"1 then 2 else 3";
-            var compiler = CompilerBrowser.FromText(Text);
-            var thenToken = compiler.LocatePosition(Text.IndexOf("then"));
-            var elseToken = compiler.LocatePosition(Text.IndexOf("else"));
-            Tracer.Assert(elseToken.Master.LeftMostRightSibling == thenToken.Master);
+            const string text = @"1 then 2 else 3";
+            var compiler = CompilerBrowser.FromText(text);
+            var thenToken = compiler.LocatePosition(text.IndexOf("then"));
+            var elseToken = compiler.LocatePosition(text.IndexOf("else"));
+            Tracer.Assert(elseToken.Master.Left == thenToken.Master,
+                ()=>$"elseToken.Master.Left = {elseToken.Master.Left.FlatItem.d}\n\n" +
+                    $"thenToken.Master = {thenToken.Master.FlatItem.d}"
+                );
         }
 
         [UnitTest]
         public void NestedMatching()
         {
-            const string Text = @"1 then 2 then 333 else 3";
-            var compiler = CompilerBrowser.FromText(Text);
-            var thenToken = compiler.LocatePosition(Text.IndexOf("then"));
-            var elseToken = compiler.LocatePosition(Text.IndexOf("else"));
-            Tracer.Assert(elseToken.Master.LeftMostRightSibling == thenToken.Master);
+            const string text = @"1 then 2 then 333 else 3";
+            var compiler = CompilerBrowser.FromText(text);
+            var thenToken = compiler.LocatePosition(text.IndexOf("then"));
+            var elseToken = compiler.LocatePosition(text.IndexOf("else"));
+            Tracer.Assert(elseToken.Master.Left == thenToken.Master);
         }
     }
 }

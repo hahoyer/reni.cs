@@ -76,7 +76,7 @@ namespace ReniUI
         internal IEnumerable<ValueSyntax> FindPosition(int offset)
             => LocatePosition(offset)
                 .Master
-                .ParentChainIncludingThis
+                .Chain(node => node.Parent)
                 .Select(item => item.FlatItem)
                 .OfType<ValueSyntax>()
                 .Where(item => item.ResultCache.Any());
@@ -119,7 +119,7 @@ namespace ReniUI
         {
             try
             {
-                return new Helper.Syntax(Compiler.Syntax, Compiler.BinaryTree, null);
+                return new Helper.Syntax(Compiler.BinaryTree, getFlatSyntax: ()=>Compiler.Syntax);
             }
             catch(Exception e)
             {

@@ -1,83 +1,72 @@
-using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using hw.Scanner;
 using hw.UnitTest;
-using ReniUI.Classification;
 
-namespace ReniUI.Test{
+namespace ReniUI.Test
+{
     [UnitTest]
     public sealed class ListMatching : DependenceProvider
     {
         [UnitTest]
         public void Matching()
         {
-            const string Text = @"(1,3,4,6)";
-            var compiler = CompilerBrowser.FromText(Text);
+            const string text = @"(1,3,4,6)";
+            var compiler = CompilerBrowser.FromText(text);
             var comma = compiler.LocatePosition(2);
             var commas = comma.ParserLevelBelongings.ToArray();
-            Tracer.Assert(commas.Length == 3);
+            Tracer.Assert(commas.Length == 2);
         }
 
         [UnitTest]
         public void CombinationsOfMatching()
         {
-            const string Text = @"(1,3,4,6)";
-            var compiler = CompilerBrowser.FromText(Text);
+            const string text = @"(1,3,4,6)";
+            var compiler = CompilerBrowser.FromText(text);
 
-            var commas = Text
+            var commas = text
                 .Select
                 (
                     (item, index) => new
                     {
-                        item,
-                        index
+                        item, index
                     })
                 .Where(item => item.item == ',')
                 .Select
-                (item => compiler.LocatePosition(item.index).ParserLevelBelongings.ToArray())
+                    (item => compiler.LocatePosition(item.index).ParserLevelBelongings.ToArray())
                 .ToArray();
 
             Tracer.Assert(commas.Length == 3);
-            var combis = commas
+            var tuples = commas
                 .Skip(1)
                 .Select(comma => comma.Merge(commas[0], item => item).ToArray())
                 .ToArray();
 
-            foreach(var combi in combis)
-                Tracer.Assert(combi.Length == 3);
+            foreach(var tuple in tuples)
+                Tracer.Assert(tuple.Length == 3);
         }
 
         [UnitTest]
         public void MixedMatching()
         {
-            const string Text = @"(1,3,4;2,6)";
-            var compiler = CompilerBrowser.FromText(Text);
+            const string text = @"(1,3,4;2,6)";
+            var compiler = CompilerBrowser.FromText(text);
 
-            var commas = Text
-                .Select
-                (
-                    (item, index) => new
-                    {
-                        item,
-                        index
-                    })
+            var commas = text
+                .Select((item, index) => new {item, index})
                 .Where(item => item.item == ',')
                 .Select
-                (item => compiler.LocatePosition(item.index).ParserLevelBelongings.ToArray())
+                    (item => compiler.LocatePosition(item.index).ParserLevelBelongings.ToArray())
                 .ToArray();
 
             Tracer.Assert(commas.Length == 3);
-            Tracer.Assert(commas[0].Length == 2);
-            Tracer.Assert(commas[1].Length == 2);
-            Tracer.Assert(commas[2].Length == 1);
+            Tracer.Assert(commas[0].Length == 1);
+            Tracer.Assert(commas[1].Length == 1);
+            Tracer.Assert(commas[2].Length == 0);
 
             var firstPart = commas[0].Merge(commas[1], item => item).ToArray();
 
             Tracer.Assert(firstPart.Length == 2);
         }
-        
     }
-
 }
