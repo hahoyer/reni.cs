@@ -9,9 +9,9 @@ namespace hw.UnitTest
             TestRunner.RunTest(new ReniUI.Test.TokenLocating().CompoundSourcePart);
             TestRunner.RunTest(new ReniUI.Test.TokenLocating().CommentFromSourcePart);
             TestRunner.RunTest(new ReniUI.Test.TokenLocating().NamedCompoundSourcePart);
-TestRunner.RunTest(new ReniUI.Test.BraceMatching().MatchingBraces);
-TestRunner.RunTest(new ReniUI.Test.BraceMatching().MoreMatchingBraces);
-TestRunner.RunTest(new ReniUI.Test.BraceMatching().NotMatchingBraces);
+TestRunner.RunTest(new ReniUI.Test.BracketMatching().MatchingBraces);
+TestRunner.RunTest(new ReniUI.Test.BracketMatching().MoreMatchingBraces);
+TestRunner.RunTest(new ReniUI.Test.BracketMatching().NotMatchingBraces);
 TestRunner.RunTest(new ReniUI.Test.ExpressionFormatting().FromSourcePart);
 TestRunner.RunTest(new ReniUI.Test.ExpressionFormatting().BadArgDeclaration);
 TestRunner.RunTest(new ReniUI.Test.ListMatching().Matching);

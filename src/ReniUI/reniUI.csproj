@@ -149,7 +149,7 @@
     <Compile Include="Test\AutoCompleteFunctionInCompound.cs" />
     <Compile Include="Test\AutoCompleteSimple.cs" />
     <Compile Include="Test\BadUserInterAction.cs" />
-    <Compile Include="Test\BraceMatching.cs" />
+    <Compile Include="Test\BracketMatching.cs" />
     <Compile Include="Test\ExpressionFormatting.cs" />
     <Compile Include="Test\Extension.cs" />
     <Compile Include="Test\Formatting.cs" />

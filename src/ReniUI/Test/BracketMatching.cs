@@ -9,7 +9,7 @@ using hw.UnitTest;
 namespace ReniUI.Test
 {
     [UnitTest]
-    public sealed class BraceMatching : DependenceProvider
+    public sealed class BracketMatching : DependenceProvider
     {
         [UnitTest]
         public void MatchingBraces()
