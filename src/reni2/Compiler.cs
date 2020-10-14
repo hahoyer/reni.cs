@@ -77,7 +77,7 @@ namespace Reni
             Root = new Root(this);
             CodeContainerCache = NewValueCache(GetCodeContainer);
             BinaryTreeCache = NewValueCache(() => Parse(Source + 0));
-            ValueSyntaxCache = NewValueCache(GetValueSyntax);
+            ValueSyntaxCache = NewValueCache(GetSyntax);
         }
 
         [Node]
@@ -248,10 +248,9 @@ namespace Reni
                 parameters);
         }
 
-        Result<ValueSyntax> GetValueSyntax()
+        Result<ValueSyntax> GetSyntax()
             => Parameters.IsSyntaxRequired
-                ? GetValueSyntax(BinaryTree)
-                    .ToFrame()
+                ? GetSyntax(BinaryTree)
                     .Apply(target =>
                     {
                         target.AssertValid(target: BinaryTree);
@@ -259,7 +258,7 @@ namespace Reni
                     })
                 : null;
 
-        static Result<ValueSyntax> GetValueSyntax(BinaryTree target) => SyntaxFactory.Root.GetValueSyntax(target);
+        static Result<ValueSyntax> GetSyntax(BinaryTree target) => SyntaxFactory.Root.GetValueSyntax(target);
 
         CodeContainer GetCodeContainer() => new CodeContainer(Syntax, Root, ModuleName, Source.Data);
 
@@ -267,7 +266,7 @@ namespace Reni
             => "_" + Path.GetFileName(fileName).Symbolize();
 
         Result<ValueSyntax> ParsePredefinedItem(string sourceText)
-            => GetValueSyntax(Parse(new Source(sourceText) + 0));
+            => GetSyntax(Parse(new Source(sourceText) + 0));
 
         [UsedImplicitly]
         public Compiler Empower()

@@ -15,8 +15,5 @@ namespace Reni.TokenClasses
                 .Where(b => !target.Any(p => p != b && p.SourcePart.Contains(b.SourcePart)))
                 .ToArray();
         }
-
-        internal static Result<ValueSyntax> ToFrame(this Result<ValueSyntax> target)
-            => Result<ValueSyntax>.From(target.Apply(expression => new CompoundSyntax(expression.ToStatementsSyntax())));
     }
 }
