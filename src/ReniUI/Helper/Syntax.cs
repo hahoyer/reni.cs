@@ -4,6 +4,7 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
+using Reni;
 using Reni.Helper;
 using Reni.TokenClasses;
 using Reni.Validation;
@@ -68,8 +69,30 @@ namespace ReniUI.Helper
 
         IEnumerable<Syntax> GetParserLevelBelongings()
         {
-            NotImplementedMethod();
-            return default;
+            if(!(TokenClass is IBelongingsMatcher matcher))
+                yield break;
+
+            switch(TokenClass)
+            {
+                case ILeftBracket _ when matcher.IsBelongingTo(Parent.TokenClass):
+                    yield return Parent;
+                    break;
+                case ILeftBracket _:
+                    NotImplementedMethod();
+                    break;
+                case IRightBracket _ when Left != null && matcher.IsBelongingTo(Left.TokenClass):
+                    yield return Left;
+                    break;
+                case IRightBracket _ when Parent.TokenClass is ILeftBracket:
+                    yield return Parent;
+                    break;
+                case IRightBracket _:
+                    NotImplementedMethod();
+                    break;
+                default:
+                    NotImplementedMethod();
+                    break;
+            }
         }
 
         Reni.Parser.Syntax GetFlatSyntax()

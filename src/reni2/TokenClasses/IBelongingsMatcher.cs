@@ -3,4 +3,5 @@ namespace Reni.TokenClasses {
     {
         bool IsBelongingTo(IBelongingsMatcher otherMatcher);
     }
+
 }

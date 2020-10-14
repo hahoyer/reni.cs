@@ -1,10 +1,7 @@
-using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using hw.Scanner;
 using hw.UnitTest;
-using ReniUI.Classification;
 
 // ReSharper disable StringIndexOfIsCultureSpecific.1
 // ReSharper disable StringIndexOfIsCultureSpecific.2
@@ -29,7 +26,7 @@ namespace ReniUI.Test
 
             var pairs = matchOpen.Merge(matchClose, item => item).ToArray();
 
-            Tracer.Assert(pairs.Length == 2);
+            Tracer.Assert(pairs.Length == 2, pairs.Dump);
         }
 
         [UnitTest]

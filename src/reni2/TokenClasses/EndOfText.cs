@@ -32,19 +32,19 @@ namespace Reni.TokenClasses
         [DisableDump]
         public override string Id => TokenId;
 
-        int IRightBracket.Level => -1;
-
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => otherMatcher is BeginOfText;
 
         IParserTokenType<BinaryTree> IBracketMatch<BinaryTree>.Value { get; } = new Matched();
         bool IDefaultScopeProvider.MeansPublic => true;
 
-        SyntaxFactory.IValueProvider SyntaxFactory.IValueToken.Provider => SyntaxFactory.Bracket;
+        int IRightBracket.Level => -1;
 
         IDefaultScopeProvider ISyntaxScope.DefaultScopeProvider => this;
 
         bool ISyntaxScope.IsDeclarationPart => false;
+
+        SyntaxFactory.IValueProvider SyntaxFactory.IValueToken.Provider => SyntaxFactory.Bracket;
     }
 
     sealed class BeginOfText : TokenClass, IBelongingsMatcher, ILeftBracket
@@ -54,9 +54,9 @@ namespace Reni.TokenClasses
         [DisableDump]
         public override string Id => TokenId;
 
-        int ILeftBracket.Level => -1;
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => otherMatcher is EndOfText;
-    }
 
+        int ILeftBracket.Level => -1;
+    }
 }
