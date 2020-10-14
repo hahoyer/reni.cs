@@ -18,7 +18,7 @@ namespace Reni.TokenClasses
 
         internal interface IDeclarationsToken
         {
-            IDeclarationsProvider Provider { get; }
+            IStatementsProvider Provider { get; }
         }
 
         internal interface IDeclarerProvider
@@ -26,7 +26,7 @@ namespace Reni.TokenClasses
             Result<DeclarerSyntax> Get(BinaryTree target, SyntaxFactory factory);
         }
 
-        internal interface IDeclarationsProvider
+        internal interface IStatementsProvider
         {
             Result<StatementSyntax[]> Get(BinaryTree target, SyntaxFactory factory);
         }
@@ -49,9 +49,17 @@ namespace Reni.TokenClasses
                     .Apply(tree => factory.GetValueSyntax(tree, target, () => EmptyListIfNull(target)));
         }
 
-        class ListHandler : DumpableObject, IDeclarationsProvider
+        class FrameHandler : DumpableObject, IStatementsProvider
         {
-            Result<StatementSyntax[]> IDeclarationsProvider.Get(BinaryTree target, SyntaxFactory factory)
+            Result<StatementSyntax[]> IStatementsProvider.Get(BinaryTree target, SyntaxFactory factory)
+                => target
+                    .GetBracketKernel()
+                    .Apply(factory.GetStatementsSyntax);
+        }
+
+        class ListHandler : DumpableObject, IStatementsProvider
+        {
+            Result<StatementSyntax[]> IStatementsProvider.Get(BinaryTree target, SyntaxFactory factory)
                 => (
                         factory.GetStatementsSyntax(target.Left),
                         factory.GetStatementsSyntax(target.Right)
@@ -59,9 +67,9 @@ namespace Reni.TokenClasses
                     .Apply((left, right) => left.Concat(right).ToArray());
         }
 
-        class ColonHandler : DumpableObject, IDeclarationsProvider
+        class ColonHandler : DumpableObject, IStatementsProvider
         {
-            Result<StatementSyntax[]> IDeclarationsProvider.Get(BinaryTree target, SyntaxFactory factory)
+            Result<StatementSyntax[]> IStatementsProvider.Get(BinaryTree target, SyntaxFactory factory)
                 =>
                     (
                         factory.GetDeclarerSyntax(target.Left),
@@ -220,8 +228,9 @@ namespace Reni.TokenClasses
         internal static readonly IValueProvider Else = new ElseHandler();
         internal static readonly IValueProvider Then = new ThenHandler();
 
-        internal static readonly IDeclarationsProvider List = new ListHandler();
-        internal static readonly IDeclarationsProvider Colon = new ColonHandler();
+        internal static readonly IStatementsProvider Frame = new FrameHandler();
+        internal static readonly IStatementsProvider List = new ListHandler();
+        internal static readonly IStatementsProvider Colon = new ColonHandler();
 
         internal static readonly IDeclarerProvider DeclarationMark = new DeclarationMarkHandler();
         internal static readonly IDeclarerProvider DefinableAsDeclarer = new DefinableHandler();

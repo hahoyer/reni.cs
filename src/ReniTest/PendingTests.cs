@@ -1,4 +1,4 @@
-//17:07:32.547 14.10.2020 ran 129 of 178 
+//17:53:55.766 14.10.2020 ran 135 of 178 
 
 namespace hw.UnitTest
 {
@@ -9,20 +9,9 @@ namespace hw.UnitTest
         
 // error 
 
-TestRunner.RunTest(new Reni.ParserTest.AlternativePrioTableTest().Converter);
-TestRunner.RunTest(new Reni.ParserTest.AlternativePrioTableTest().ConverterAndProperty);
-TestRunner.RunTest(new Reni.ParserTest.AlternativePrioTableTest().KeyWordAsUserObject);
-TestRunner.RunTest(new Reni.ParserTest.AlternativePrioTableTest().Run);
-TestRunner.RunTest(new Reni.FeatureTest.ComplexContext().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Structure.ContextOperatorPrint().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Structure.ContextOperatorAccess().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Function.Function().Run);
-TestRunner.RunTest(new Reni.FeatureTest.CleanupSection.Nested().Run);
-TestRunner.RunTest(new Reni.FeatureTest.CleanupSection.WithReference().Run);
-TestRunner.RunTest(new Reni.FeatureTest.BlogExamples.Post120617().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Reference.ArrayElementType1().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Reference.FunctionalDumpSimple().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Array.FromTypeAndFunction().Run);
+TestRunner.RunTest(new Reni.FeatureTest.BitArrayOp.BitArrayOp().NegativeNumber);
+TestRunner.RunTest(new Reni.FeatureTest.BitArrayOp.BitArrayOp().Run);
+TestRunner.RunTest(new Reni.FeatureTest.BitArrayOp.TwoNegativeNumbers().Run);
 TestRunner.RunTest(new ReniUI.Test.AutoCompleteSimple().GetDeclarationOptions);
 TestRunner.RunTest(new ReniUI.Test.TokenLocating().FromSourcePart);
 TestRunner.RunTest(new ReniUI.Test.TokenLocating().CommentFromSourcePart);
@@ -33,27 +22,30 @@ TestRunner.RunTest(new ReniUI.Test.UserInterAction3().GetTokenForPosition);
 
 // dependanterror 
 
-TestRunner.RunTest(new Reni.FeatureTest.UserObjects().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Structure.ContextOperatorFunctionAccess().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Structure.ContextOperatorPropertyAccess().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Structure.ContextOperatorAssign().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Structure.ContextOperator().Run);
-TestRunner.RunTest(new Reni.FeatureTest.MixIn.Simple().Run);
+TestRunner.RunTest(new Reni.FeatureTest.ThenElse.UseThen().Run);
+TestRunner.RunTest(new Reni.FeatureTest.ThenElse.UseElse().Run);
+TestRunner.RunTest(new Reni.FeatureTest.ThenElse.AutomaticDereferencing().Run);
+TestRunner.RunTest(new Reni.FeatureTest.Integer.Integer1().Run);
+TestRunner.RunTest(new Reni.FeatureTest.Integer.Integer2().Run);
+TestRunner.RunTest(new Reni.FeatureTest.Integer.Integer127().Run);
+TestRunner.RunTest(new Reni.FeatureTest.BitArrayOp.NegativeNumbers().Run);
+TestRunner.RunTest(new Reni.FeatureTest.TypeType.TypeOperatorWithVariable().Run);
+TestRunner.RunTest(new Reni.FeatureTest.Structure.AccessAndAddComplex().Run);
+TestRunner.RunTest(new Reni.FeatureTest.Structure.PropertyVariable().Run);
+TestRunner.RunTest(new Reni.FeatureTest.Structure.PropertyVariable().Run);
+TestRunner.RunTest(new Reni.FeatureTest.Structure.SomeVariables().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Function.ConstantFunction().Run);
+TestRunner.RunTest(new Reni.FeatureTest.Function.Function().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Function.FunctionVariable().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Function.FunctionWithNonLocal().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Function.FunctionWithRefArg().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Function.FunctionWithRefArg().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Function.FunctionAssignment().Run);
+TestRunner.RunTest(new Reni.FeatureTest.Function.ObjectFunction1().Run);
+TestRunner.RunTest(new Reni.FeatureTest.Function.ObjectFunction2().Run);
+TestRunner.RunTest(new Reni.FeatureTest.Function.ObjectProperty().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Function.SimpleFunction().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Function.SimpleFunctionWithNonLocal().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Reference.ArrayElementType().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Reference.ArrayReferenceAll().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Reference.ArrayReferenceByInstance().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Reference.ArrayReferenceCopy().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Reference.ArrayReferenceCopyAssign().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Reference.ArrayReferenceDumpLoop().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Reference.ArrayReferenceDumpSimple().Run);
 TestRunner.RunTest(new ReniUI.Test.AutoComplete().GetDeclarationOptions);
 TestRunner.RunTest(new ReniUI.Test.AutoCompleteFunctionInCompound().GetDeclarationOptions);
 
@@ -65,18 +57,9 @@ TestRunner.RunTest(new Reni.FeatureTest.Integer.IntegerPlusInteger().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Integer.IntegerPlusNumber().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Integer.Clone().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Integer.Create().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Integer.Integer1().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Integer.Integer2().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Integer.Integer127().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Structure.PropertyVariable().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Structure.PropertyVariable().Run);
-TestRunner.RunTest(new Reni.FeatureTest.MixIn.Function().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Function.FunctionOfFunction().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Function.FunctionArgument().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Function.ObjectFunction().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Function.ObjectFunction1().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Function.ObjectFunction2().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Function.ObjectProperty().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Function.PrimitiveRecursiveFunctionByteWithDump().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Function.PrimitiveRecursiveFunctionHuge().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Function.PrimitiveRecursiveFunctionSmall().Run);

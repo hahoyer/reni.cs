@@ -11,7 +11,7 @@ namespace Reni.TokenClasses
 
         public override string Id => TokenId;
 
-        SyntaxFactory.IDeclarationsProvider SyntaxFactory.IDeclarationsToken.Provider => SyntaxFactory.Colon;
+        SyntaxFactory.IStatementsProvider SyntaxFactory.IDeclarationsToken.Provider => SyntaxFactory.Colon;
     }
 
     [BelongsTo(typeof(MainTokenFactory))]

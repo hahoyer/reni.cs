@@ -10,8 +10,8 @@ namespace Reni.TokenClasses
             , IBracketMatch<BinaryTree>
             , ISyntaxScope
             , IBelongingsMatcher
-            , SyntaxFactory.IValueToken
             , IRightBracket
+            , SyntaxFactory.IDeclarationsToken
 
     {
         sealed class Matched : DumpableObject, IParserTokenType<BinaryTree>
@@ -36,6 +36,8 @@ namespace Reni.TokenClasses
             => otherMatcher is BeginOfText;
 
         IParserTokenType<BinaryTree> IBracketMatch<BinaryTree>.Value { get; } = new Matched();
+
+        SyntaxFactory.IStatementsProvider SyntaxFactory.IDeclarationsToken.Provider => SyntaxFactory.Frame;
         bool IDefaultScopeProvider.MeansPublic => true;
 
         int IRightBracket.Level => -1;
@@ -43,8 +45,6 @@ namespace Reni.TokenClasses
         IDefaultScopeProvider ISyntaxScope.DefaultScopeProvider => this;
 
         bool ISyntaxScope.IsDeclarationPart => false;
-
-        SyntaxFactory.IValueProvider SyntaxFactory.IValueToken.Provider => SyntaxFactory.Bracket;
     }
 
     sealed class BeginOfText : TokenClass, IBelongingsMatcher, ILeftBracket
