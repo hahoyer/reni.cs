@@ -266,7 +266,7 @@ namespace Reni
             => "_" + Path.GetFileName(fileName).Symbolize();
 
         Result<ValueSyntax> ParsePredefinedItem(string sourceText)
-            => GetSyntax(Parse(new Source(sourceText) + 0));
+            => GetSyntax(Parse(new Source(sourceText) + 0).GetBracketKernel().Target);
 
         [UsedImplicitly]
         public Compiler Empower()
