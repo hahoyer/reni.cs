@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.Helper;
 using Reni.Parser;
+using Reni.Struct;
 
 namespace Reni.TokenClasses
 {
@@ -16,6 +17,6 @@ namespace Reni.TokenClasses
         }
 
         internal static Result<ValueSyntax> ToFrame(this Result<ValueSyntax> target)
-            => Result<ValueSyntax>.From(target.Apply(expression => expression.ToCompoundSyntax()));
+            => Result<ValueSyntax>.From(target.Apply(expression => new CompoundSyntax(expression.ToStatementsSyntax())));
     }
 }

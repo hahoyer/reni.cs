@@ -30,7 +30,7 @@ namespace Reni
             Else = elseSyntax;
         }
 
-        protected override int LeftChildCount => Else == null? 1 : 2;
+        protected override int LeftDirectChildCount => Else == null? 1 : 2;
 
         protected override int DirectChildCount => 3;
 

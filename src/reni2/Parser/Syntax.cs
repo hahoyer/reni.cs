@@ -25,7 +25,7 @@ namespace Reni.Parser
                 : base(objectId, target) { }
 
             [DisableDump]
-            protected sealed override int LeftChildCount => 0;
+            protected sealed override int LeftDirectChildCount => 0;
 
             [DisableDump]
             protected sealed override int DirectChildCount => 0;
@@ -43,7 +43,7 @@ namespace Reni.Parser
             => Binary = target;
 
         [DisableDump]
-        protected abstract int LeftChildCount { get; }
+        protected abstract int LeftDirectChildCount { get; }
 
         [DisableDump]
         IEnumerable<Syntax> Children => this.GetNodesFromLeftToRight();
@@ -56,7 +56,7 @@ namespace Reni.Parser
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        int ITree<Syntax>.LeftDirectChildCount => LeftChildCount;
+        int ITree<Syntax>.LeftDirectChildCount => LeftDirectChildCount;
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         int ITree<Syntax>.DirectChildCount => DirectChildCount;
 
@@ -75,9 +75,7 @@ namespace Reni.Parser
         }
 
         internal Result<CompoundSyntax> ToCompoundSyntax(BinaryTree target = null)
-            => this is CompoundSyntax compoundSyntax
-                ? compoundSyntax
-                : ToCompoundSyntaxHandler(target);
+            => ToCompoundSyntaxHandler(target);
 
         protected virtual Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree target = null)
         {

@@ -55,7 +55,7 @@ namespace ReniUI.Classification
         [DisableDump]
         public override string State => Master.Token.Characters.Id ?? "";
 
-        public override IEnumerable<SourcePart> FindAllBelongings(CompilerBrowser compiler)
-            => compiler.FindAllBelongings(Master)?.Select(item => item.Token.Characters);
+        public override IEnumerable<SourcePart> ParserLevelBelongings
+            => Master.ParserLevelBelongings?.Select(item => item.Token.Characters);
     }
 }

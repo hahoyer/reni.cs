@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using hw.Helper;
+using hw.Scanner;
 using JetBrains.Annotations;
 using ReniUI.Classification;
 using ScintillaNET;
@@ -40,7 +41,7 @@ namespace ReniUI.CompilationView
             {
                 if(token.IsError)
                     return Error;
-                if(token.IsBraceLike && compiler.FindAllBelongings(token).Skip(1).Any())
+                if(token.IsBraceLike && token.ParserLevelBelongings.Skip(1).Any())
                     return token.IsBrace ? Brace : BraceLikeKeyWord;
                 if(token.IsKeyword)
                     return KeyWord;

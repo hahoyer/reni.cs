@@ -70,9 +70,6 @@ namespace ReniUI
             return LocatePosition(current.Position);
         }
 
-        public IEnumerable<SourcePart> FindAllBelongings(Token open)
-            => open.FindAllBelongings(this);
-
         public string FlatFormat(bool areEmptyLinesPossible)
             => FormattingBinary.FlatFormat(areEmptyLinesPossible);
 
@@ -87,25 +84,6 @@ namespace ReniUI
         internal FunctionType Function(int index)
             => Compiler.Root.Function(index);
 
-
-        internal IEnumerable<Helper.Syntax> FindAllBelongings(Helper.Syntax syntax)
-        {
-            if(!(syntax.TokenClass is IBelongingsMatcher matcher))
-                return null;
-
-            var sourceSyntaxList = 
-                Reni.Helper.Extension.BackChain(Syntax, syntax).ToArray();
-
-            var root = sourceSyntaxList
-                           .Skip(1)
-                           .TakeWhile(item => matcher.IsBelongingTo(item.TokenClass))
-                           .LastOrDefault() ??
-                       syntax;
-
-            return root?.TokenClass is IBelongingsMatcher rootMatcher
-                ? root.ItemsAsLongAs(item => rootMatcher.IsBelongingTo(item.TokenClass)).ToArray()
-                : null;
-        }
 
         internal string Reformat(IFormatter formatter = null, SourcePart targetPart = null) =>
             (formatter ?? new Formatting.Configuration().Create())

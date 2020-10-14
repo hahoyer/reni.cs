@@ -36,7 +36,7 @@ namespace Reni.TokenClasses
         internal bool IsMutableSyntax => Declarer?.IsMutableSyntax ?? false;
 
         [DisableDump]
-        protected override int LeftChildCount => 1;
+        protected override int LeftDirectChildCount => 1;
 
         [DisableDump]
         protected override int DirectChildCount => 2;

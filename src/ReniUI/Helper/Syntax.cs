@@ -17,17 +17,21 @@ namespace ReniUI.Helper
             public FunctionCache<int, Syntax> LocateByPosition;
         }
 
-        internal readonly Reni.Parser.Syntax FlatSyntax;
-        internal new BinaryTree FlatItem=>base.FlatItem;
-
         readonly CacheContainer Cache = new CacheContainer();
+
+        readonly Reni.Parser.Syntax FlatSyntaxRoot;
 
         internal Syntax(Reni.Parser.Syntax flatSyntax, BinaryTree binary, Syntax parent)
             : base(binary, parent)
         {
-            FlatSyntax = flatSyntax?? Parent.FindSyntax(FlatItem);
+            FlatSyntaxRoot = flatSyntax;
             Cache.LocateByPosition = new FunctionCache<int, Syntax>(LocateByPositionForCache);
         }
+
+        [DisableDump]
+        internal Reni.Parser.Syntax FlatSyntax => this.CachedValue(() => FlatSyntaxRoot ?? GetFlatSyntax());
+
+        internal new BinaryTree FlatItem => base.FlatItem;
 
         [DisableDump]
         public Issue[] Issues
@@ -59,17 +63,19 @@ namespace ReniUI.Helper
             }
         }
 
-        Reni.Parser.Syntax FindSyntax(BinaryTree target)
+        [DisableDump]
+        internal IEnumerable<Syntax> ParserLevelBelongings => this.CachedValue(GetParserLevelBelongings);
+
+        IEnumerable<Syntax> GetParserLevelBelongings()
         {
-            var result = FlatSyntax
-                .DirectChildren
-                .FirstOrDefault(node => node?.Binary == target);
-            if(result != null)
-                return result;
+            NotImplementedMethod();
+            return default;
+        }
 
-            Tracer.Assert(FlatSyntax.GetNodesFromLeftToRight().All(node => node?.Binary != target));
-
-            return new FillerSyntax(this, target);
+        Reni.Parser.Syntax GetFlatSyntax()
+        {
+            NotImplementedMethod();
+            return default;
         }
 
         protected override Syntax Create(BinaryTree flatItem) => new Syntax(null, flatItem, this);
@@ -91,15 +97,16 @@ namespace ReniUI.Helper
         Syntax LocateByPositionForCache(int current)
             => this
                 .GetNodesFromLeftToRight()
-                .FirstOrDefault(node => node.Token.Characters.EndPosition <= current);
+                .FirstOrDefault(node => node.Token.Characters.EndPosition > current);
     }
 
-    class FillerSyntax : Reni.Parser.Syntax.NoChildren
+    class ProxySyntax : Reni.Parser.Syntax.NoChildren
     {
-        readonly Syntax Parent;
+        [DisableDump]
+        internal readonly Syntax Client;
 
-        public FillerSyntax(Syntax parent, BinaryTree target)
+        public ProxySyntax(Syntax client, BinaryTree target)
             : base(target)
-            => Parent = parent;
+            => Client = client;
     }
 }

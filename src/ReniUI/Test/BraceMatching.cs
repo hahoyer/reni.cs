@@ -1,7 +1,10 @@
+using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using hw.Scanner;
 using hw.UnitTest;
+using ReniUI.Classification;
 
 // ReSharper disable StringIndexOfIsCultureSpecific.1
 // ReSharper disable StringIndexOfIsCultureSpecific.2
@@ -21,8 +24,8 @@ namespace ReniUI.Test
             var open = compiler.LocatePosition(0);
             var close = compiler.LocatePosition(text.IndexOf(")"));
 
-            var matchOpen = compiler.FindAllBelongings(open);
-            var matchClose = compiler.FindAllBelongings(close);
+            var matchOpen = open.ParserLevelBelongings;
+            var matchClose = close.ParserLevelBelongings;
 
             var pairs = matchOpen.Merge(matchClose, item => item).ToArray();
 
@@ -39,8 +42,8 @@ namespace ReniUI.Test
             var open = compiler.LocatePosition(0);
             var close = compiler.LocatePosition(text.IndexOf(")"));
 
-            var matchOpen = compiler.FindAllBelongings(open);
-            var matchClose = compiler.FindAllBelongings(close);
+            var matchOpen = open.ParserLevelBelongings;
+            var matchClose = close.ParserLevelBelongings;
 
             var pairs = matchOpen.Merge(matchClose, item => item).ToArray();
 
@@ -56,7 +59,7 @@ namespace ReniUI.Test
 
             var close = compiler.LocatePosition(text.IndexOf(")", text.IndexOf(")") + 1));
 
-            var matchClose = compiler.FindAllBelongings(close);
+            var matchClose = close.ParserLevelBelongings;
 
             Tracer.Assert(matchClose.Count() == 1);
         }

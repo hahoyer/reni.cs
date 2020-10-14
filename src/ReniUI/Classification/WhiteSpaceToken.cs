@@ -23,6 +23,9 @@ namespace ReniUI.Classification
         public override bool IsLineEnd => Lexer.IsLineEnd(Item);
         public override string State => Lexer.Instance.WhiteSpaceId(Item) ?? "";
 
-        public override IEnumerable<SourcePart> FindAllBelongings(CompilerBrowser compiler) { yield break; }
+        public override IEnumerable<SourcePart> ParserLevelBelongings
+        {
+            get { yield break; }
+        }
     }
 }

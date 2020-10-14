@@ -24,7 +24,7 @@ namespace Reni.Parser
                 : base(objectId, target) { }
 
             [DisableDump]
-            protected sealed override int LeftChildCount => 0;
+            protected sealed override int LeftDirectChildCount => 0;
 
             [DisableDump]
             protected sealed override int DirectChildCount => 0;

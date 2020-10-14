@@ -1,7 +1,10 @@
+using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using hw.Scanner;
 using hw.UnitTest;
+using ReniUI.Classification;
 
 namespace ReniUI.Test{
     [UnitTest]
@@ -13,7 +16,7 @@ namespace ReniUI.Test{
             const string Text = @"(1,3,4,6)";
             var compiler = CompilerBrowser.FromText(Text);
             var comma = compiler.LocatePosition(2);
-            var commas = compiler.FindAllBelongings(comma).ToArray();
+            var commas = comma.ParserLevelBelongings.ToArray();
             Tracer.Assert(commas.Length == 3);
         }
 
@@ -33,7 +36,7 @@ namespace ReniUI.Test{
                     })
                 .Where(item => item.item == ',')
                 .Select
-                (item => compiler.FindAllBelongings(compiler.LocatePosition(item.index)).ToArray())
+                (item => compiler.LocatePosition(item.index).ParserLevelBelongings.ToArray())
                 .ToArray();
 
             Tracer.Assert(commas.Length == 3);
@@ -62,7 +65,7 @@ namespace ReniUI.Test{
                     })
                 .Where(item => item.item == ',')
                 .Select
-                (item => compiler.FindAllBelongings(compiler.LocatePosition(item.index)).ToArray())
+                (item => compiler.LocatePosition(item.index).ParserLevelBelongings.ToArray())
                 .ToArray();
 
             Tracer.Assert(commas.Length == 3);

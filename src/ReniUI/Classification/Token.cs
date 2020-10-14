@@ -114,7 +114,7 @@ namespace ReniUI.Classification
 
         public override int GetHashCode() => SourcePart.GetHashCode();
 
-        public abstract IEnumerable<SourcePart> FindAllBelongings(CompilerBrowser compiler);
+        public abstract IEnumerable<SourcePart> ParserLevelBelongings { get; }
 
         internal static Token LocateByPosition(Syntax target, int offset)
         {
