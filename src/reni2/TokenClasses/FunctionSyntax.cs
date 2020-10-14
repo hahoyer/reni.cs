@@ -52,8 +52,8 @@ namespace Reni.TokenClasses
         protected override Syntax GetDirectChild(int index)
             => index switch
             {
-                0 => Getter
-                , 1 => Setter
+                0 => Setter
+                , 1 => Getter
                 , _ => null
             };
 
