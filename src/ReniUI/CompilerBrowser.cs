@@ -105,12 +105,6 @@ namespace ReniUI
 
         internal void Execute(DataStack dataStack) => Compiler.ExecuteFromCode(dataStack);
 
-        internal string[] DeclarationOptions(int offset)
-        {
-            Ensure();
-            return LocateValueByPosition(offset)?.DeclarationOptions ?? new string[0];
-        }
-
         internal IEnumerable<Edit> GetEditPieces(SourcePart sourcePart, IFormatter formatter = null)
             => (formatter ?? new Formatting.Configuration().Create())
                 .GetEditPieces(this, sourcePart);
@@ -152,5 +146,10 @@ namespace ReniUI
             return position <= 0? null : tokenSyntax.LocateByPosition(position - 1);
         }
 
+        internal string[] DeclarationOptions(int offset)
+        {
+            NotImplementedMethod(offset);
+            return default;
+        }
     }
 }
