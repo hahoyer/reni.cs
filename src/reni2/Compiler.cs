@@ -16,6 +16,7 @@ using Reni.Parser;
 using Reni.Runtime;
 using Reni.Struct;
 using Reni.TokenClasses;
+using Reni.Type;
 using Reni.Validation;
 using static hw.Helper.ValueCacheExtension;
 
@@ -82,7 +83,7 @@ namespace Reni
 
         [Node]
         [DisableDump]
-        public BinaryTree BinaryTree => BinaryTreeCache.Value;
+        internal BinaryTree BinaryTree => BinaryTreeCache.Value;
 
         [Node]
         [DisableDump]
@@ -90,7 +91,7 @@ namespace Reni
 
         [Node]
         [DisableDump]
-        public CodeContainer CodeContainer => Parameters.IsCodeRequired? CodeContainerCache.Value : null;
+        internal CodeContainer CodeContainer => Parameters.IsCodeRequired? CodeContainerCache.Value : null;
 
         [DisableDump]
         [Node]
@@ -213,6 +214,8 @@ namespace Reni
                 return result;
             }
         }
+
+        internal TypeBase MainType => this.CachedValue(() => Syntax.Type(Root));
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 

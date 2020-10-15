@@ -5,11 +5,12 @@ using hw.Helper;
 using Reni.Context;
 using Reni.Parser;
 using Reni.Struct;
+using Reni.Type;
 using Reni.Validation;
 
 namespace Reni.Code
 {
-    public sealed class CodeContainer : DumpableObject
+    public sealed class CodeContainer : DumpableObject, ValueCache.IContainer
     {
         [Node]
         readonly FunctionCache<int, FunctionContainer> _functions;
@@ -71,5 +72,7 @@ namespace Reni.Code
 
         string GetCSharpStringForCache()
             => ModuleName.CreateCSharpString(Main, Functions);
+
+        ValueCache ValueCache.IContainer.Cache => new ValueCache();
     }
 }

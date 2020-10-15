@@ -35,18 +35,6 @@ namespace Reni.Context
 
         internal Root(IParent parent) => Parent = parent;
 
-        static ContextMetaFunction GetCreateArrayFeature(bool isMutable) => new ContextMetaFunction
-        (
-            (context, category, argsType) => context.CreateArrayResult(category, argsType, isMutable)
-        );
-
-        IImplementation GetMinusFeature()
-        {
-            var metaDictionary = new FunctionCache<string, ValueSyntax>(CreateMetaDictionary);
-            return new ContextMetaFunctionFromSyntax
-                (metaDictionary[ArgToken.TokenId + " " + Negate.TokenId]);
-        }
-
         public IExecutionContext ExecutionContext => Parent.ExecutionContext;
 
         [DisableDump]
@@ -87,8 +75,20 @@ namespace Reni.Context
                 ? this.CachedValue(() => GetCreateArrayFeature(true))
                 : this.CachedValue(() => GetCreateArrayFeature(false));
 
-        IImplementation ISymbolProviderForPointer<Minus>.Feature(Minus tokenClass) 
+        IImplementation ISymbolProviderForPointer<Minus>.Feature(Minus tokenClass)
             => this.CachedValue(GetMinusFeature);
+
+        static ContextMetaFunction GetCreateArrayFeature(bool isMutable) => new ContextMetaFunction
+        (
+            (context, category, argsType) => context.CreateArrayResult(category, argsType, isMutable)
+        );
+
+        IImplementation GetMinusFeature()
+        {
+            var metaDictionary = new FunctionCache<string, ValueSyntax>(CreateMetaDictionary);
+            return new ContextMetaFunctionFromSyntax
+                (metaDictionary[ArgToken.TokenId + " " + Negate.TokenId]);
+        }
 
         ValueSyntax CreateMetaDictionary(string source)
         {
@@ -170,5 +170,5 @@ namespace Reni.Context
 
             return new Container(result, rawResult.Issues.ToArray(), description);
         }
-    }
+        }
 }

@@ -1,4 +1,4 @@
-//16:27:37.311 15.10.2020 run 175 of 178 ReniUI.Test.FormattingLong.ReformatPart
+//16:33:38.600 15.10.2020 ran 176 of 178 
 
 namespace hw.UnitTest
 {
@@ -7,16 +7,15 @@ namespace hw.UnitTest
         public static void Run()
         {
         
-// active 
-
-TestRunner.RunTest(new ReniUI.Test.FormattingLong().ReformatPart);
-
 // error 
 
 TestRunner.RunTest(new ReniUI.Test.AutoCompleteSimple().GetDeclarationOptions);
 
+// dependanterror 
+
+TestRunner.RunTest(new ReniUI.Test.AutoCompleteFunctionInCompound().GetDeclarationOptions);
+
 // notrun 
 
 TestRunner.RunTest(new ReniUI.Test.AutoComplete().GetDeclarationOptions);
-TestRunner.RunTest(new ReniUI.Test.AutoCompleteFunctionInCompound().GetDeclarationOptions);
 }}}
