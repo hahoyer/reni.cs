@@ -7,6 +7,7 @@ using hw.Helper;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Feature;
+using Reni.Parser;
 using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Type;
@@ -318,6 +319,17 @@ namespace Reni.Context
             var feature = provider?.Feature(tokenClass);
             if(feature != null)
                 yield return feature;
+        }
+
+        public Result CreateArrayResult(Category category, ValueSyntax argsType, bool isMutable)
+        {
+            var target = Result(category.WithType, argsType).SmartUn<PointerType>().Align;
+            return target
+                       .Type
+                       .Array(1, ArrayType.Options.Create().IsMutable.SetTo(isMutable))
+                       .Result(category.WithType, target)
+                       .LocalReferenceResult
+                   & category;
         }
     }
 

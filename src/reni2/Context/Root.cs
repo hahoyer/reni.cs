@@ -64,9 +64,7 @@ namespace Reni.Context
                 isMutable =>
                     new ContextMetaFunction
                     (
-                        (context, category, argsType) =>
-                            CreateArrayResult
-                                (context, category, argsType, isMutable)
+                        (context, category, argsType) => context.CreateArrayResult(category, argsType, isMutable)
                     )
             );
         }
@@ -120,17 +118,6 @@ namespace Reni.Context
         }
 
         public override string GetContextIdentificationDump() => "r";
-
-        static Result CreateArrayResult(ContextBase context, Category category, ValueSyntax argsType, bool isMutable)
-        {
-            var target = context.Result(category.WithType, argsType).SmartUn<PointerType>().Align;
-            return target
-                       .Type
-                       .Array(1, ArrayType.Options.Create().IsMutable.SetTo(isMutable))
-                       .Result(category.WithType, target)
-                       .LocalReferenceResult
-                   & category;
-        }
 
         internal FunctionType FunctionInstance(CompoundView compoundView, FunctionSyntax body, TypeBase argsType)
         {
