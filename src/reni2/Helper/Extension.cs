@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hw.DebugFormatter;
 using hw.Helper;
 using JetBrains.Annotations;
 
@@ -10,6 +9,26 @@ namespace Reni.Helper
     [PublicAPI]
     static class Extension
     {
+        internal static IEnumerable<TTarget> GetNodesFromTopToBottom<TTarget>
+            (this ITree<TTarget> target, Func<TTarget, bool> predicate)
+            where TTarget : ITree<TTarget>
+        {
+            if(target == null)
+                yield break;
+
+            var index = 0;
+            while(index < target.DirectChildCount)
+            {
+                var node = target.GetDirectChild(index);
+                if(predicate(node))
+                    yield return node;
+                else if(node != null)
+                    foreach(var result in node.GetNodesFromTopToBottom(predicate))
+                        yield return result;
+                index++;
+            }
+        }
+
         internal static IEnumerable<TTarget> GetNodesFromLeftToRight<TTarget>(this ITree<TTarget> target)
             where TTarget : ITree<TTarget>
         {
@@ -46,19 +65,18 @@ namespace Reni.Helper
 
             if(isMatch(container))
                 return new int[0];
-            
+
             return container
                 .DirectChildCount
                 .Select(container.GetDirectChild)
                 .Select((node, index) => GetSubPath(node, index, isMatch))
                 .FirstOrDefault(path => path != null);
-
         }
 
         static int[] GetSubPath<TTarget>(TTarget container, int index, Func<TTarget, bool> isMatch)
             where TTarget : ITree<TTarget>
         {
-            var subPath = GetPath<TTarget>(container, isMatch);
+            var subPath = GetPath(container, isMatch);
             return subPath == null? null : T(index).Concat(subPath).ToArray();
         }
 
@@ -117,6 +135,7 @@ namespace Reni.Helper
 
             yield return target;
         }
+
         public static TValue[] T<TValue>(params TValue[] value) => value;
     }
 }

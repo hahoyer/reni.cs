@@ -94,7 +94,7 @@ namespace Reni.Parser
             return null;
         }
 
-        internal IEnumerable<string> DeclarationOptions(ContextBase context)
+        internal IEnumerable<string> GetDeclarationOptions(ContextBase context)
             => Type(context).DeclarationOptions;
 
         protected override Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree target = null)

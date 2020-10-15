@@ -50,7 +50,7 @@ namespace ReniUI.Classification
             => Issues.Any(item => item.IssueId == IssueId.EOFInLineComment);
 
         [DisableDump]
-        Issue[] Issues => Master.Issues;
+        IEnumerable<Issue> Issues => Master.Issues;
 
         [DisableDump]
         public override string State => Master.Token.Characters.Id ?? "";

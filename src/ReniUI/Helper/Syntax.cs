@@ -5,9 +5,12 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 using Reni;
+using Reni.Context;
 using Reni.Helper;
+using Reni.Parser;
 using Reni.TokenClasses;
 using Reni.Validation;
+using static hw.Helper.ValueCacheExtension;
 
 namespace ReniUI.Helper
 {
@@ -15,6 +18,7 @@ namespace ReniUI.Helper
     {
         class CacheContainer
         {
+            public ValueCache<Reni.Parser.Syntax> FlatSyntax;
             public FunctionCache<int, Syntax> LocateByPosition;
         }
 
@@ -27,36 +31,24 @@ namespace ReniUI.Helper
         {
             GetFlatSyntaxRoot = getFlatSyntax;
             Cache.LocateByPosition = new FunctionCache<int, Syntax>(LocateByPositionForCache);
+            Cache.FlatSyntax = NewValueCache(() => GetFlatSyntaxRoot != null? GetFlatSyntaxRoot() : GetFlatSyntax());
         }
 
+        internal string FlatSyntaxDump => Cache.FlatSyntax.IsValid? FlatSyntax.Dump() : "<unknown>";
+
         [DisableDump]
-        internal Reni.Parser.Syntax FlatSyntax
-            => this.CachedValue(() => GetFlatSyntaxRoot != null? GetFlatSyntaxRoot() : GetFlatSyntax());
+        internal Reni.Parser.Syntax FlatSyntax => Cache.FlatSyntax.Value;
 
         internal new BinaryTree FlatItem => base.FlatItem;
 
         [DisableDump]
-        internal Issue[] Issues
-        {
-            get
-            {
-                NotImplementedMethod();
-                return default;
-            }
-        }
-
-        [DisableDump]
-        internal string[] DeclarationOptions
-        {
-            get
-            {
-                NotImplementedMethod();
-                return default;
-            }
-        }
+        internal IEnumerable<Issue> Issues => FlatItem.Issues;
 
         [DisableDump]
         internal IEnumerable<Syntax> ParserLevelBelongings => this.CachedValue(GetParserLevelBelongings);
+
+        internal string[] GetDeclarationOptions(ContextBase context)
+            => (FlatSyntax as ValueSyntax)?.GetDeclarationOptions(context).ToArray();
 
         IEnumerable<Syntax> GetParserLevelBelongings()
         {
@@ -103,6 +95,34 @@ namespace ReniUI.Helper
 
         Reni.Parser.Syntax GetFlatSyntax()
         {
+            var result = Parent
+                .FlatSyntax
+                .GetNodesFromTopToBottom(node => node?.Binary != null)
+                .SingleOrDefault(node=>node.Binary == FlatItem);
+
+            if(result != null)
+                return result;
+
+            if(TokenClass is ILeftBracket && TokenClass.IsBelongingTo(Parent.TokenClass))
+                return Parent.FlatSyntax;
+
+            if(TokenClass is List)
+            {
+                if(Parent.TokenClass is ILeftBracket)
+                    return Parent.FlatSyntax;
+
+                NotImplementedMethod();
+                return default;
+            }
+
+            if(TokenClass is Colon)
+            {
+                if(Parent.TokenClass is ILeftBracket)
+                    return Parent.FlatSyntax;
+                NotImplementedMethod();
+                return default;
+            }
+
             NotImplementedMethod();
             return default;
         }
@@ -138,12 +158,30 @@ namespace ReniUI.Helper
         }
     }
 
-    class ProxySyntax : Reni.Parser.Syntax.NoChildren
+    abstract class ProxySyntax : Reni.Parser.Syntax.NoChildren
     {
+        internal class ColonLevel : ProxySyntax
+        {
+            public ColonLevel(Syntax client, BinaryTree target)
+                : base(client, target) { }
+        }
+
+        internal class ListLevel : ProxySyntax
+        {
+            public ListLevel(Syntax client, BinaryTree target)
+                : base(client, target) { }
+        }
+
+        internal class LeftBracketOfRightBracket : ProxySyntax
+        {
+            public LeftBracketOfRightBracket(Syntax client, BinaryTree target)
+                : base(client, target) { }
+        }
+
         [DisableDump]
         internal readonly Syntax Client;
 
-        public ProxySyntax(Syntax client, BinaryTree target)
+        ProxySyntax(Syntax client, BinaryTree target)
             : base(target)
             => Client = client;
     }
