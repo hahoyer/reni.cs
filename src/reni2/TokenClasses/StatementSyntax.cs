@@ -1,6 +1,7 @@
 using hw.DebugFormatter;
 using Reni.Parser;
 using Reni.Struct;
+using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
@@ -12,7 +13,7 @@ namespace Reni.TokenClasses
         [EnableDumpExcept(null)]
         internal readonly ValueSyntax Value;
 
-        public StatementSyntax(DeclarerSyntax declarer, BinaryTree target, ValueSyntax value)
+        StatementSyntax(DeclarerSyntax declarer, BinaryTree target, ValueSyntax value)
             : base(target)
         {
             Tracer.ConditionalBreak(
@@ -62,6 +63,22 @@ namespace Reni.TokenClasses
         {
             NotImplementedMethod(visitor);
             return default;
+        }
+
+        internal static Result<StatementSyntax[]> Create(DeclarerSyntax declarer, BinaryTree target, ValueSyntax value)
+        {
+            var issue = (Issue)null;
+            if(value == null)
+            {
+                issue = IssueId.MissingRightExpression.Issue(target.Token.Characters);
+                value = new EmptyList(null);
+            }
+
+            var result = new Result<StatementSyntax[]>(T(new StatementSyntax(declarer, target, value)));
+            if(issue != null)
+                result = result.With(issue);
+
+            return result;
         }
     }
 }

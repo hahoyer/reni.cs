@@ -76,8 +76,7 @@ namespace Reni.TokenClasses
                         factory.GetValueSyntax(target.Right)
                     )
                     .Apply
-                    ((declarer, value)
-                        => T(new StatementSyntax(declarer, target, value))
+                    ((declarer, value) => (StatementSyntax.Create(declarer, target, value))
                     );
         }
 
@@ -280,14 +279,14 @@ namespace Reni.TokenClasses
 
             return GetSyntax(
                 target,
-                value => value,
+                value => new Result<ValueSyntax>(value),
                 list => (ValueSyntax)new CompoundSyntax(list, parent));
         }
 
         Result<TResult> GetSyntax<TResult>
         (
             BinaryTree target
-            , Func<ValueSyntax, TResult> fromValueSyntax
+            , Func<ValueSyntax, Result<TResult>> fromValueSyntax
             , Func<StatementSyntax[], TResult> fromDeclarationsSyntax
         )
             where TResult : class
@@ -306,8 +305,8 @@ namespace Reni.TokenClasses
                 return declarationsToken.Provider.Get(target, factory)
                     .Apply(fromDeclarationsSyntax);
 
-            return new Result<TResult>(fromValueSyntax(new EmptyList(target)), 
-                IssueId.InvalidExpression.Issue(target.Token.Characters));
+            return fromValueSyntax(new EmptyList(target))
+                .With(IssueId.InvalidExpression.Issue(target.Token.Characters));
         }
 
         SyntaxFactory GetCurrentFactory(ITokenClass tokenClass)

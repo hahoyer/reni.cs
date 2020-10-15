@@ -49,11 +49,11 @@ complex FromReal(2) dump_print;
         {
             for(var i = 0; i < text.Length; i++)
             {
-                var textFragement = text.Substring(0, i);
-                var compiler = Compiler.FromText(text: textFragement);
-                var syntax = compiler.BinaryTree;
-                var span = syntax.SourcePart;
-                Tracer.Assert(span.Id == textFragement, () => span.NodeDump);
+                var textFragment = text.Substring(0, i);
+                var compiler = Compiler.FromText(text: textFragment);
+                var syntax = compiler.Syntax;
+                var span = syntax.Binary.SourcePart;
+                Tracer.Assert(span.Id == textFragment, () => span.NodeDump);
             }
         }
 

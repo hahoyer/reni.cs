@@ -13,6 +13,18 @@ namespace ReniUI.Test
     {
         [Test]
         [UnitTest]
+        public void HalfList()
+        {
+            const string text = @"System:
+(
+    ssssss";
+            const string expectedText = text;
+
+            text.SimpleTest(expectedText, 12, 1);
+        }
+
+        [Test]
+        [UnitTest]
         public void LabeledList()
         {
             const string text = @"llll:(aaaaa;llll:bbbbb;ccccc)";

@@ -41,7 +41,7 @@ namespace ReniUI.CompilationView
             {
                 if(token.IsError)
                     return Error;
-                if(token.IsBraceLike && token.ParserLevelBelongings.Skip(1).Any())
+                if(token.IsBraceLike && token.ParserLevelBelongings.Any())
                     return token.IsBrace ? Brace : BraceLikeKeyWord;
                 if(token.IsKeyword)
                     return KeyWord;

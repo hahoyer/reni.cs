@@ -39,6 +39,7 @@ namespace ReniTest
             if(Debugger.IsAttached)
             {
                 configuration.SkipSuccessfulMethods = true;
+                configuration.SaveResults = false;
                 PendingTests.Run();
             }
 

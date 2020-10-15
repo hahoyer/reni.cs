@@ -54,20 +54,12 @@ namespace ReniUI.Helper
 
             switch(TokenClass)
             {
-                case ILeftBracket _ when matcher.IsBelongingTo(Parent.TokenClass):
-                    yield return Parent;
-                    yield break;
-                case ILeftBracket _:
-                    NotImplementedMethod();
-                    yield break;
-                case IRightBracket _ when Left != null && matcher.IsBelongingTo(Left.TokenClass):
-                    yield return Left;
-                    yield break;
+                case ILeftBracket _  when Parent.TokenClass is IRightBracket:
                 case IRightBracket _ when Parent.TokenClass is ILeftBracket:
                     yield return Parent;
                     yield break;
-                case IRightBracket _:
-                    NotImplementedMethod();
+                case IRightBracket _ when Left != null && matcher.IsBelongingTo(Left.TokenClass):
+                    yield return Left;
                     yield break;
                 case List _:
                     break;

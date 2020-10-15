@@ -9,7 +9,7 @@ namespace hw.UnitTest
         
 // active 
 
-TestRunner.RunTest(new ReniUI.Test.AutoCompleteSimple().GetDeclarationOptions);
+TestRunner.RunTest(new ReniUI.Test.Formatting().HalfList);
 
 // notrun 
 
