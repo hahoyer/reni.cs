@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using AutocompleteMenuNS;
+using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 using Reni;
@@ -166,8 +167,7 @@ namespace ReniUI
                 TextBox.Text,
                 new CompilerParameters
                 {
-                    OutStream = new StringStream(),
-                    ProcessErrors = true
+                    OutStream = new StringStream(), ProcessErrors = true, CompilationLevel = CompilationLevel.Code
                 },
                 Configuration.FileName);
 
@@ -197,11 +197,13 @@ namespace ReniUI
 
         void SignalStyleNeeded(int position)
         {
-            var sourceSyntax = Compiler.Syntax;
+            var sourceSyntax = Compiler.Syntax.LeftMost;
+            //Tracer.ConditionalBreak(sourceSyntax .ObjectId == 1859);
+            
             while(TextBox.GetEndStyled() < position)
             {
                 var current = TextBox.GetEndStyled();
-                var token = Token.LocateByPosition(sourceSyntax, current);
+                var token = Token.GetRightNeighbor(sourceSyntax, current);
                 var style = TextStyle.From(token, Compiler);
                 TextBox.StartStyling(token.StartPosition);
                 TextBox.SetStyling(token.SourcePart.Length, style);

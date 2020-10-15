@@ -9,7 +9,9 @@ namespace ReniUI.Test
     public sealed class UserInterAction : DependenceProvider
     {
         const string text = @"
-system: /!\
+System: 
+(
+/!\
 { MaxNumber8: /!\ '7f' to_number_of_base 16 
 . MaxNumber16: /!\ '7fff' to_number_of_base 16 
 . MaxNumber32: /!\ '7fffffff' to_number_of_base 16 

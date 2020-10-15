@@ -24,14 +24,11 @@ namespace ReniUI.Helper
 
         readonly CacheContainer Cache = new CacheContainer();
 
-        readonly Func<Reni.Parser.Syntax> GetFlatSyntaxRoot;
-
         internal Syntax(BinaryTree binary, Syntax parent = null, Func<Reni.Parser.Syntax> getFlatSyntax = null)
             : base(binary, parent)
         {
-            GetFlatSyntaxRoot = getFlatSyntax;
             Cache.LocateByPosition = new FunctionCache<int, Syntax>(LocateByPositionForCache);
-            Cache.FlatSyntax = NewValueCache(() => GetFlatSyntaxRoot != null? GetFlatSyntaxRoot() : GetFlatSyntax());
+            Cache.FlatSyntax = NewValueCache(() => getFlatSyntax != null? getFlatSyntax() : GetFlatSyntax());
         }
 
         internal string FlatSyntaxDump => Cache.FlatSyntax.IsValid? FlatSyntax.Dump() : "<unknown>";
@@ -98,7 +95,7 @@ namespace ReniUI.Helper
             var result = Parent
                 .FlatSyntax
                 .GetNodesFromTopToBottom(node => node?.Binary != null)
-                .SingleOrDefault(node=>node.Binary == FlatItem);
+                .SingleOrDefault(node => node.Binary == FlatItem);
 
             if(result != null)
                 return result;
@@ -164,6 +161,12 @@ namespace ReniUI.Helper
                 .Top(node => node.Token.Characters.EndPosition > current)
                 .AssertNotNull();
         }
+
+        internal Syntax GetRightNeighbor(int current)
+            => RightNeighbor
+                .Chain(node => node.RightNeighbor)
+                .Top(node => node.Token.Characters.EndPosition > current)
+                .AssertNotNull();
     }
 
     abstract class ProxySyntax : Reni.Parser.Syntax.NoChildren

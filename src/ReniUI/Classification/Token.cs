@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Helper;
+using hw.Parser;
 using hw.Scanner;
 using ReniUI.Helper;
 
@@ -121,6 +123,23 @@ namespace ReniUI.Classification
         {
             var result = target.LocateByPosition(offset);
             Tracer.Assert(result != null);
+            var resultToken = result.Token;
+            if(offset < resultToken.Characters.Position)
+                return new WhiteSpaceToken
+                (
+                    resultToken.PrecededWith.Last(item => offset >= item.SourcePart.Position),
+                    result
+                );
+
+            return new SyntaxToken(result);
+        }
+
+        internal static Token GetRightNeighbor(Syntax target, int offset)
+        {
+            var result = target
+                .Chain(node => node.RightNeighbor)
+                .First(node => node.Token.Characters.EndPosition > offset);
+
             var resultToken = result.Token;
             if(offset < resultToken.Characters.Position)
                 return new WhiteSpaceToken
