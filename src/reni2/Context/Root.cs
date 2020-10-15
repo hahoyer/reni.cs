@@ -25,48 +25,26 @@ namespace Reni.Context
             Result<ValueSyntax> ParsePredefinedItem(string source);
         }
 
-        class CacheContainer
-        {
-            public ValueCache<BitType> Bit;
-            public FunctionCache<bool, IImplementation> CreateArrayFeature;
-            public ValueCache<IImplementation> MinusFeature;
-
-            public ValueCache<RecursionType> RecursionType;
-            public ValueCache<VoidType> Void;
-        }
-
-
         [DisableDump]
         [Node]
         readonly FunctionList Functions = new FunctionList();
-
-        new readonly CacheContainer Cache = new CacheContainer();
 
         [DisableDump]
         [Node]
         readonly IParent Parent;
 
-        internal Root(IParent parent)
+        internal Root(IParent parent) => Parent = parent;
+
+        static ContextMetaFunction GetCreateArrayFeature(bool isMutable) => new ContextMetaFunction
+        (
+            (context, category, argsType) => context.CreateArrayResult(category, argsType, isMutable)
+        );
+
+        IImplementation GetMinusFeature()
         {
-            Parent = parent;
-            Cache.RecursionType = new ValueCache<RecursionType>(() => new RecursionType(this));
             var metaDictionary = new FunctionCache<string, ValueSyntax>(CreateMetaDictionary);
-            Cache.Bit = new ValueCache<BitType>(() => new BitType(this));
-            Cache.Void = new ValueCache<VoidType>(() => new VoidType(this));
-            Cache.MinusFeature = new ValueCache<IImplementation>
-            (
-                () =>
-                    new ContextMetaFunctionFromSyntax
-                        (metaDictionary[ArgToken.TokenId + " " + Negate.TokenId])
-            );
-            Cache.CreateArrayFeature = new FunctionCache<bool, IImplementation>
-            (
-                isMutable =>
-                    new ContextMetaFunction
-                    (
-                        (context, category, argsType) => context.CreateArrayResult(category, argsType, isMutable)
-                    )
-            );
+            return new ContextMetaFunctionFromSyntax
+                (metaDictionary[ArgToken.TokenId + " " + Negate.TokenId]);
         }
 
         public IExecutionContext ExecutionContext => Parent.ExecutionContext;
@@ -82,15 +60,15 @@ namespace Reni.Context
 
         [DisableDump]
         [Node]
-        internal BitType BitType => Cache.Bit.Value;
+        internal BitType BitType => this.CachedValue(() => new BitType(this));
 
         [DisableDump]
         [Node]
-        internal RecursionType RecursionType => Cache.RecursionType.Value;
+        internal RecursionType RecursionType => this.CachedValue(() => new RecursionType(this));
 
         [DisableDump]
         [Node]
-        internal VoidType VoidType => Cache.Void.Value;
+        internal VoidType VoidType => this.CachedValue(() => new VoidType(this));
 
         [DisableDump]
         internal int FunctionCount => Functions.Count;
@@ -104,11 +82,13 @@ namespace Reni.Context
         [DisableDump]
         internal IEnumerable<Definable> DefinedNames => Parent.DefinedNames;
 
-        IImplementation ISymbolProviderForPointer<ConcatArrays>.
-            Feature(ConcatArrays tokenClass)
-            => Cache.CreateArrayFeature[tokenClass.IsMutable];
+        IImplementation ISymbolProviderForPointer<ConcatArrays>.Feature(ConcatArrays tokenClass)
+            => tokenClass.IsMutable
+                ? this.CachedValue(() => GetCreateArrayFeature(true))
+                : this.CachedValue(() => GetCreateArrayFeature(false));
 
-        IImplementation ISymbolProviderForPointer<Minus>.Feature(Minus tokenClass) => Cache.MinusFeature.Value;
+        IImplementation ISymbolProviderForPointer<Minus>.Feature(Minus tokenClass) 
+            => this.CachedValue(GetMinusFeature);
 
         ValueSyntax CreateMetaDictionary(string source)
         {
@@ -126,8 +106,8 @@ namespace Reni.Context
             return functionInstance;
         }
 
-        internal IEnumerable<FunctionType> FunctionInstances
-            (CompoundView compoundView, FunctionSyntax body) => Functions.Find(body, compoundView);
+        internal IEnumerable<FunctionType> FunctionInstances(CompoundView compoundView, FunctionSyntax body)
+            => Functions.Find(body, compoundView);
 
         internal Result ConcatPrintResult(Category category, int count, Func<Category, int, Result> elemResults)
         {
