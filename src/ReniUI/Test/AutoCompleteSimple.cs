@@ -2,12 +2,12 @@ using hw.DebugFormatter;
 using hw.Scanner;
 using hw.UnitTest;
 using NUnit.Framework;
-using Reni;
 
 namespace ReniUI.Test
 {
     [UnitTest]
     [TestFixture]
+    [LowPriority]
     public sealed class AutoCompleteSimple : DependenceProvider
     {
         const string text = @"
@@ -36,6 +36,5 @@ namespace ReniUI.Test
                 }
             }
         }
-
     }
 }

@@ -134,8 +134,16 @@ namespace ReniUI.Helper
 
         internal Syntax Locate(SourcePart span)
         {
-            NotImplementedMethod(span);
-            return default;
+            var locateByPosition = LocateByPosition(span.Position);
+
+            var sourcePositions = locateByPosition
+                .Chain(node => node.Parent)
+                .Select(node => node.Token.Characters)
+                .ToArray();
+
+            return locateByPosition
+                .Chain(node => node.Parent)
+                .FirstOrDefault(node => span.Contains(node.Token.Characters));
         }
 
         internal IEnumerable<Syntax> ItemsAsLongAs(Func<Syntax, bool> condition)
