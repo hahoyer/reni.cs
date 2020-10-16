@@ -8,7 +8,6 @@ using Reni;
 using Reni.Code;
 using Reni.Parser;
 using Reni.Struct;
-using Reni.TokenClasses;
 using Reni.Validation;
 using ReniUI.Classification;
 using ReniUI.Formatting;
@@ -42,11 +41,12 @@ namespace ReniUI
         internal IEnumerable<Issue> Issues => Compiler.Issues;
 
         internal Helper.Syntax Syntax => this.CachedValue(GetSyntax);
-        [Obsolete("",true)]
-        internal Helper.SyntaxOld SyntaxOld => this.CachedValue(GetSyntaxOld);
 
-        internal Formatting.BinaryTree FormattingBinary
-            => this.CachedValue(() => new Formatting.BinaryTree(Compiler.BinaryTree));
+        [Obsolete("", true)]
+        internal SyntaxOld SyntaxOld => this.CachedValue(GetSyntaxOld);
+
+        internal Formatting.Syntax FormattingBinary
+            => this.CachedValue(() => new Formatting.Syntax(Compiler.BinaryTree, () => Compiler.Syntax));
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
@@ -113,7 +113,7 @@ namespace ReniUI
         {
             try
             {
-                return new Helper.Syntax(Compiler.BinaryTree, getFlatSyntax: ()=>Compiler.Syntax);
+                return new Helper.Syntax(Compiler.BinaryTree, getFlatSyntax: () => Compiler.Syntax);
             }
             catch(Exception e)
             {
@@ -122,11 +122,11 @@ namespace ReniUI
             }
         }
 
-        Helper.SyntaxOld GetSyntaxOld()
+        SyntaxOld GetSyntaxOld()
         {
             try
             {
-                return new Helper.SyntaxOld(Syntax);
+                return new SyntaxOld(Syntax);
             }
             catch(Exception e)
             {

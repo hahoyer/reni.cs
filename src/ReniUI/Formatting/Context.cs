@@ -54,16 +54,16 @@ namespace ReniUI.Formatting
 
             public override bool LineBreaksForList => true;
 
-            public override Context MultiLineBreaksForList(BinaryTree left, BinaryTree right)
+            public override Context MultiLineBreaksForList(Syntax left, Syntax right)
                 => new MultiLineBreaksForListContext(Configuration, left, right);
         }
 
         sealed class MultiLineBreaksForListContext : Context
         {
-            readonly BinaryTree Left;
-            readonly BinaryTree Right;
+            readonly Syntax Left;
+            readonly Syntax Right;
 
-            public MultiLineBreaksForListContext(Configuration configuration, BinaryTree left, BinaryTree right)
+            public MultiLineBreaksForListContext(Configuration configuration, Syntax left, Syntax right)
                 : base(configuration)
             {
                 Left = left;
@@ -105,9 +105,9 @@ namespace ReniUI.Formatting
         public virtual bool LineBreaksForList => false;
         public virtual bool HasMultipleLineBreaksOnRightSide => false;
 
-        public virtual Context MultiLineBreaksForList(BinaryTree left, BinaryTree right) => this;
+        public virtual Context MultiLineBreaksForList(Syntax left, Syntax right) => this;
 
-        public Context ChildContext(BinaryTree target)
+        public Context ChildContext(Syntax target)
         {
             switch(target.TokenClass)
             {

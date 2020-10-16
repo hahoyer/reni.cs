@@ -121,7 +121,7 @@ namespace ReniUI.Formatting
             }
         }
 
-        static bool GetIsSeparatorRequired(BinaryTree target)
+        static bool GetIsSeparatorRequired(Syntax target)
             => !target.WhiteSpaces.HasComment() &&
                SeparatorExtension.Get(target.LeftNeighbor?.TokenClass, target.TokenClass);
 
@@ -133,7 +133,7 @@ namespace ReniUI.Formatting
         bool ForceLineSplit;
 
         bool IsIndentRequired;
-        internal BinaryTree Target;
+        internal Syntax Target;
 
         [DisableDump]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -181,14 +181,14 @@ namespace ReniUI.Formatting
             => Target.Left == null && Target.Right == null && IsLineSplit ||
                result.Skip(1).Any(edit => edit.HasLines) == IsLineSplit;
 
-        IEnumerable<ISourcePartEdit> GetWhiteSpacesEdits(BinaryTree target)
+        IEnumerable<ISourcePartEdit> GetWhiteSpacesEdits(Syntax target)
         {
             if(target.WhiteSpaces.Any())
                 return T(new WhiteSpaceView(target.WhiteSpaces, Configuration, GetIsSeparatorRequired(target)));
             return T(new EmptyWhiteSpaceView(target.Token.Characters.Start, GetIsSeparatorRequired(target)));
         }
 
-        HierarchicalStructure CreateChild(BinaryTree target, bool isLast = false)
+        HierarchicalStructure CreateChild(Syntax target, bool isLast = false)
         {
             var child = Create(target.TokenClass, isLast);
             child.Configuration = Configuration;
@@ -207,7 +207,7 @@ namespace ReniUI.Formatting
             }
         }
 
-        bool GetHasAlreadyLineBreakOrIsTooLong(BinaryTree target)
+        bool GetHasAlreadyLineBreakOrIsTooLong(Syntax target)
         {
             var basicLineLength = target.GetFlatLength(Configuration.EmptyLineLimit != 0);
             return basicLineLength == null || basicLineLength > Configuration.MaxLineLength;
@@ -221,7 +221,7 @@ namespace ReniUI.Formatting
                 .Select(GetEdits<TSeparator>)
                 .SelectMany(i => i);
 
-        IEnumerable<IEnumerable<ISourcePartEdit>> GetEdits<TSeparator>(BinaryTree target)
+        IEnumerable<IEnumerable<ISourcePartEdit>> GetEdits<TSeparator>(Syntax target)
             where TSeparator : ITokenClass
         {
             yield return CreateChild(target.Left).Edits;
@@ -237,7 +237,7 @@ namespace ReniUI.Formatting
                 yield return CreateChild(target.Right, true).Edits;
         }
 
-        ISourcePartEdit GetLineSplitter(BinaryTree target, bool isInsideChain)
+        ISourcePartEdit GetLineSplitter(Syntax target, bool isInsideChain)
         {
             var second = target.Right;
             if(isInsideChain)

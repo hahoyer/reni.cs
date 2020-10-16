@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
@@ -9,7 +10,7 @@ using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
-    sealed class BinaryTree : BinaryTreeSyntaxWithParent<BinaryTree>
+    sealed class Syntax : BinaryTreeSyntaxWithParent<Syntax>
     {
         class CacheContainer
         {
@@ -19,11 +20,11 @@ namespace ReniUI.Formatting
 
         readonly CacheContainer Cache = new CacheContainer();
 
-        internal BinaryTree(Reni.TokenClasses.BinaryTree flatItem)
-            : this(flatItem, null) { }
+        internal Syntax(Reni.TokenClasses.BinaryTree flatItem, Func<Reni.Parser.Syntax> getFlatSyntax)
+            : this(flatItem, null, getFlatSyntax) { }
 
-        BinaryTree(Reni.TokenClasses.BinaryTree flatItem, BinaryTree parent)
-            : base(flatItem, parent)
+        Syntax(Reni.TokenClasses.BinaryTree flatItem, Syntax parent, Func<Reni.Parser.Syntax> getFlatSyntax)
+            : base(flatItem, parent, getFlatSyntax)
         {
             Tracer.Assert(FlatItem != null);
             Cache.SplitItem = new ValueCache<SplitItem>(GetSplitItem);
@@ -49,12 +50,12 @@ namespace ReniUI.Formatting
         internal bool IsSeparatorRequired
             => !WhiteSpaces.HasComment() && SeparatorExtension.Get(LeftNeighbor?.TokenClass, TokenClass);
 
-        static TContainer FlatSubFormat<TContainer, TValue>(BinaryTree left, bool areEmptyLinesPossible)
+        static TContainer FlatSubFormat<TContainer, TValue>(Syntax left, bool areEmptyLinesPossible)
             where TContainer : class, IFormatResult<TValue>, new()
             => left == null? new TContainer() : left.FlatFormat<TContainer, TValue>(areEmptyLinesPossible);
 
-        protected override BinaryTree Create(Reni.TokenClasses.BinaryTree flatItem)
-            => new BinaryTree(flatItem, this);
+        protected override Syntax Create(Reni.TokenClasses.BinaryTree flatItem)
+            => new Syntax(flatItem, this, null);
 
         SplitMaster GetSplitMaster()
         {
