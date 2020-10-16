@@ -1,5 +1,4 @@
 using hw.DebugFormatter;
-using hw.Helper;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
@@ -12,9 +11,11 @@ namespace Reni.TokenClasses
     {
         [EnableDumpExcept(null)]
         internal ValueSyntax Getter { get; }
+
         [EnableDump]
         [EnableDumpExcept(false)]
         internal bool IsImplicit { get; }
+
         [EnableDumpExcept(null)]
         internal ValueSyntax Setter { get; }
 
@@ -37,15 +38,15 @@ namespace Reni.TokenClasses
 
         [DisableDump]
         internal string Tag
-            => (IsMetaFunction? "{0}{0}" : "{0}")
-                .ReplaceArgs("/{0}\\")
-                .ReplaceArgs(IsImplicit? "!" : "");
+            => (IsMetaFunction? "\\\\" : "\\")
+               + (IsImplicit? "!" : "");
 
         [DisableDump]
         internal override bool IsLambda => true;
 
         [DisableDump]
-        protected override int LeftDirectChildCount => 1;
+        internal override int LeftDirectChildCount => 1;
+
         [DisableDump]
         protected override int DirectChildCount => 2;
 
