@@ -9,12 +9,12 @@ namespace Reni.FeatureTest.Function
 {
     [UnitTest]
     [Target(@"
-repeat: /\ ^() while then repeat(^);
+repeat: @ ^() while then repeat(^);
 
 count: 10;
 !mutable index: count type instance(0);
 repeat
-(/\(
+(@(
     while: index < count, 
     while then
     (
@@ -36,14 +36,14 @@ repeat
 
     [UnitTest]
     [Target(@"
-repeat: /\ ^ while() then(^ body(), repeat(^));
+repeat: @ ^ while() then(^ body(), repeat(^));
 
 count: 10;
 !mutable index: count type instance(0);
 repeat
 (
-    while: /\ index < count, 
-    body: /\
+    while: @ index < count, 
+    body: @
     (
         index dump_print, 
         ' ' dump_print, 

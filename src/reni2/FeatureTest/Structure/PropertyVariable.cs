@@ -33,7 +33,7 @@ namespace Reni.FeatureTest.Structure
     [FunctionAssignment]
     public sealed class PropertyVariable : CompilerTest
     {
-        protected override string Target => @"x: /!\11; x dump_print";
+        protected override string Target => @"x: @!11; x dump_print";
         protected override string Output => "11";
 
         [UnitTest]

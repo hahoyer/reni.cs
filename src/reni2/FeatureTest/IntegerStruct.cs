@@ -13,15 +13,15 @@ namespace Reni.FeatureTest.Integer
     {
         static string Definition() => @"
 Integer8: 
-/\{
+@{
     !public _data: 127 type instance(^ enable_cut);
 
-    !public create   : /\(Integer8(^));
-    !public dump_print: /\(_data dump_print);
-    !public +        :  /\create(_data + create(^) _data);
-    !public clone: /!\create(_data) ;
-    !public enable_cut: /!\_data enable_cut;
-    !converter: /\ _data ;
+    !public create   : @(Integer8(^));
+    !public dump_print: @(_data dump_print);
+    !public +        :  @create(_data + create(^) _data);
+    !public clone: @!create(_data) ;
+    !public enable_cut: @!_data enable_cut;
+    !converter: @ _data ;
 }
 ";
 

@@ -8,12 +8,12 @@ namespace Reni.FeatureTest.MixIn
     [ReferenceSimple]
     [ArrayReferenceAll]
     [TargetSet(@"
-Base: /\ 
+Base: @ 
 (
     a: 3;
 ); 
 
-This: /\ 
+This: @ 
 (
     !mix_in: #(  )# Base();
     aa: 2;

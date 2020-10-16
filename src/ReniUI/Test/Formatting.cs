@@ -293,7 +293,7 @@ ddddd";
         public void Reformat()
         {
             const string text =
-                @"systemdata:{1 type instance(); Memory:((0 type *('100' to_number_of_base 64)) mutable) instance(); !mutable FreePointer: Memory array_reference mutable; repeat: /\ ^ while() then
+                @"systemdata:{1 type instance(); Memory:((0 type *('100' to_number_of_base 64)) mutable) instance(); !mutable FreePointer: Memory array_reference mutable; repeat: @ ^ while() then
     (
         ^ body(),
         repeat(^)
@@ -305,7 +305,7 @@ ddddd";
     1 type instance();
     Memory: ((0 type *('100' to_number_of_base 64)) mutable) instance();
     !mutable FreePointer: Memory array_reference mutable;
-    repeat: /\ ^ while() then(^ body(), repeat(^));
+    repeat: @ ^ while() then(^ body(), repeat(^));
 };
 
 1 = 1 then 2 else 4;
@@ -321,7 +321,7 @@ ddddd";
         public void Reformat1_120()
         {
             const string text =
-                @"systemdata:{1 type instance(); Memory:((0 type *('100' to_number_of_base 64)) mutable) instance(); !mutable FreePointer: Memory array_reference mutable; repeat: /\ ^ while() then
+                @"systemdata:{1 type instance(); Memory:((0 type *('100' to_number_of_base 64)) mutable) instance(); !mutable FreePointer: Memory array_reference mutable; repeat: @ ^ while() then
     (
         ^ body(),
         repeat(^)
@@ -335,7 +335,7 @@ ddddd";
     !mutable FreePointer: Memory array_reference mutable;
 
     repeat:
-        /\ ^ while()
+        @ ^ while()
         then
         (
             ^ body(),

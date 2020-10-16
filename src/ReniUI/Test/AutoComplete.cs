@@ -19,17 +19,17 @@ namespace ReniUI.Test
 };
 
 
-repeat: /\ ^ while  () then(^ body(), repeat(^));
+repeat: @ ^ while  () then(^ body(), repeat(^));
 
 system:
 {
-    MaxNumber8: /!\ '7f' to_number_of_base 16.
-    MaxNumber16: /!\ '7fff' to_number_of_base 16.
-    MaxNumber32: /!\ '7fffffff' to_number_of_base 16.
-    MaxNumber64: /!\ '7fffffffffffffff' to_number_of_base 16.
-    TextItemType: /!\ MaxNumber8 text_item type.
+    MaxNumber8: @! '7f' to_number_of_base 16.
+    MaxNumber16: @! '7fff' to_number_of_base 16.
+    MaxNumber32: @! '7fffffff' to_number_of_base 16.
+    MaxNumber64: @! '7fffffffffffffff' to_number_of_base 16.
+    TextItemType: @! MaxNumber8 text_item type.
 
-    NewMemory: /\
+    NewMemory: @
     {
 
         result: (((^ elementType) * 1) array_reference mutable)
@@ -42,9 +42,9 @@ system:
 
         repeat
         (
-            while: /\ position < count,
+            while: @ position < count,
 
-            body: /\
+            body: @
             (
                 result(position) := initializer(position),
                 position :=(position + 1) enable_cut

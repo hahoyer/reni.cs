@@ -6,18 +6,18 @@ namespace Reni.FeatureTest.Reference
 {
     [UnitTest]
     [Target(@"
-NewMemory: /\ 
+NewMemory: @ 
 ( 
     result: (((^ elementType) * 1) array_reference mutable),
     count: ^ count
 );
 
-Text: /\
+Text: @
 ( 
     !mutable data: ^ array_reference;
     _elementType: ^() type;
     _count: ^ count;
-    AfterCopy: /\ NewMemory(elementType: _elementType, count: _count);
+    AfterCopy: @ NewMemory(elementType: _elementType, count: _count);
 );
 
 Text('Hallo') AfterCopy() result dump_print

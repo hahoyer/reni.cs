@@ -6,7 +6,7 @@ using Reni.FeatureTest.Structure;
 namespace Reni.FeatureTest.Function
 {
     [UnitTest]
-    [Target(@"x: 100;f: /\ ^ +x;f(2) dump_print;")]
+    [Target(@"x: 100;f: @ ^ +x;f(2) dump_print;")]
     [Output("102")]
     [InnerAccess]
     [SomeVariables]

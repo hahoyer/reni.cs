@@ -11,7 +11,7 @@ namespace Reni.Parser
             public SourcePart Characters;
         }
 
-        const string Symbols = "^!%&/=?\\*+~><|:-";
+        const string Symbols = "^!%&/=?\\*@+~><|:-";
         const string SingleCharSymbol = "({[)}];,.";
         internal static readonly Lexer Instance = new Lexer();
 

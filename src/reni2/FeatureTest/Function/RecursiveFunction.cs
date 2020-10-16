@@ -21,7 +21,7 @@ namespace Reni.FeatureTest.Function
     [TwoFunctions1]
     [FunctionWithRefArg]
     [Target(@"
-f: /\
+f: @
 {
     1000 type instance
     (

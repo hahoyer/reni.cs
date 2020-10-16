@@ -27,7 +27,7 @@ namespace Reni.Context
         int IContextReference.Order => _order;
 
         protected override string GetContextChildIdentificationDump()
-            => "/\\(." + ArgsType.ObjectId + "i)";
+            => "@(." + ArgsType.ObjectId + "i)";
 
         internal override IFunctionContext ObtainRecentFunctionContext() => this;
         [DisableDump]

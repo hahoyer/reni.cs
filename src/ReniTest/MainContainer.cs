@@ -14,7 +14,7 @@ namespace ReniTest
 {
     static class MainContainer
     {
-        const string Target = @"f: /\ ^(); x: 1; f(/\x) dump_print";
+        const string Target = @"f: @ ^(); x: 1; f(@x) dump_print";
         const string Output = "1";
 
         public static void Main()

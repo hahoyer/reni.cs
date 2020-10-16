@@ -10,7 +10,7 @@
 system:
 	{
 	!public NewMemory: 
-		/\
+		@
 		{
 		!public result:
 			(((^ elementType) * 1) array_reference mutable)
@@ -26,7 +26,7 @@ system:
 	};
 
 Text: 
-	/\
+	@
 	{
 	value: 
 		^.
@@ -34,10 +34,10 @@ Text:
 	!public result:
 		{
 		!mix_in: 
-			data(^) := new_value /\ data(^).
+			data(^) := new_value @ data(^).
 
    		this: 
-			/!\ ^^.
+			@! ^^.
 
 		!public count:	
 			^ count.
@@ -51,21 +51,21 @@ Text:
 				count: 
 					value count.
 				initializer: 
-					/\ value(^)
+					@ value(^)
 				).
 
 		!public dump_print: 
-			/!\
+			@!
 			{
 				data(0) dump_print,
 				data(1) dump_print,
 			}.
 
 		!public << : 
-			/\ concat(count: ^ count, data: ^).
+			@ concat(count: ^ count, data: ^).
 
 		concat: 
-			/\ Text
+			@ Text
 			(
 			other: 
 				^;
@@ -74,7 +74,7 @@ Text:
 				this count + other count;
 
 			!mix_in: 
-				/\ ^ < this count
+				@ ^ < this count
 				then this data(^ enable_cut)
 				else other data((^ - this count)enable_cut);        
 			)

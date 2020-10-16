@@ -215,6 +215,7 @@ namespace Reni
             }
         }
 
+        [DisableDump]
         internal TypeBase MainType => this.CachedValue(() => Syntax.Type(Root));
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();

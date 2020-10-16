@@ -10,9 +10,9 @@ namespace Reni.FeatureTest.Function
     {
         protected override string Target => @"
 x: 100;
-f1: /\((
+f1: @((
   y: 3;
-  f: /\ ^ * y + x;
+  f: @ ^ * y + x;
   f(2)
 ) _A_T_ 2);
 

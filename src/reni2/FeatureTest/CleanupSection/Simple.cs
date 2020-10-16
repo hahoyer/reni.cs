@@ -12,6 +12,6 @@ namespace Reni.FeatureTest.CleanupSection
 
     [UnitTest]
     [Simple]
-    [TargetSet(@"This: /\ {a: 3;~~~ a dump_print}; This() dump_print", "(3)3")]
+    [TargetSet(@"This: @ {a: 3;~~~ a dump_print}; This() dump_print", "(3)3")]
     public sealed class WithReference : CompilerTest { }
 }

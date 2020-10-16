@@ -12,7 +12,7 @@ namespace ReniUI.Test
     public sealed class AutoCompleteFunctionInCompound : DependenceProvider
     {
         const string text = @"
-    NewMemory: /\
+    NewMemory: @
     {
         result: ^
     }

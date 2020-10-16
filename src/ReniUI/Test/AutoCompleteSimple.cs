@@ -12,7 +12,7 @@ namespace ReniUI.Test
     {
         const string text = @"
 
-    NewMemory: /\
+    NewMemory: @
     (
 
         result: 1

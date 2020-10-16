@@ -8,12 +8,12 @@ namespace Reni.FeatureTest.BlogExamples
     [AccessSimple1]
     [TargetSet("\"Hello world\" dump_print", "Hello world")]
     [TargetSet(@"Viersich: 4;
-EinsDazu: /\ ^ + 1 ;
+EinsDazu: @ ^ + 1 ;
 Konstrukt: 
-/\(
+@(
     Simpel: ^; 
     !mutable Pelsim: EinsDazu(^) ; 
-    Fun: /\ Simpel+ EinsDazu(^)
+    Fun: @ Simpel+ EinsDazu(^)
 );
 lorum: Konstrukt(23);
 ipsum: Konstrukt(8);

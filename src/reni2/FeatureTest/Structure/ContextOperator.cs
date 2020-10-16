@@ -6,7 +6,7 @@ namespace Reni.FeatureTest.Structure
     [UnitTest]
     [InnerAccess]
     [TargetSet(@"
-x: /\ 
+x: @ 
 {
   256;
   this: ^^;
@@ -23,7 +23,7 @@ x() dump_print
     [Access]
     [NamedSimpleAssignment]
     [TargetSet(@"
-x: /\ 
+x: @ 
 (
   '12345';
   this: ^^;
@@ -43,10 +43,10 @@ xxx xxx dump_print
     [NamedSimpleAssignment]
     [ContextOperatorAccess]
     [TargetSet(@"
-x: /\ 
+x: @ 
 (
   '12345';
-  this: /\ ^^;
+  this: @ ^^;
   '12345678901';
   !mutable xxx: 257;
   '12345678901234567890123456789';
@@ -64,10 +64,10 @@ xx this() xxx dump_print
     [ContextOperatorFunctionAccess]
     [ContextOperatorAccess]
     [TargetSet(@"
-x: /\ 
+x: @ 
 (
   '12345';
-  this: /!\ ^^;
+  this: @! ^^;
   '12345678901';
   !mutable xxx: 257;
   '12345678901234567890123456789';
@@ -84,10 +84,10 @@ xx this xxx dump_print
     [NamedSimpleAssignment]
     [ContextOperatorPropertyAccess]
     [TargetSet(@"
-x: /\ 
+x: @ 
 (
   '12345';
-  this: /!\ ^^;
+  this: @! ^^;
   '12345678901';
   !mutable xxx: 257;
   '12345678901234567890123456789';
@@ -97,7 +97,7 @@ xx : x();
 xx this xxx := 2;
 xx dump_print
 
-", "(12345, /!\\, 12345678901, 2, 12345678901234567890123456789)")]
+", "(12345, @@!, 12345678901, 2, 12345678901234567890123456789)")]
     public sealed class ContextOperatorAssign : CompilerTest {}
 
     [UnitTest]

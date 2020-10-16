@@ -62,7 +62,9 @@ namespace Reni.Struct
         internal IEnumerable<ResultCache> CachedResults => Syntax.EndPosition.Select(CachedResult);
 
         int EndPosition => Syntax.EndPosition;
+        [DisableDump]
         public bool HasIssue => Issues.Any();
+        [DisableDump]
         public Issue[] Issues => GetIssues();
 
         public string GetCompoundIdentificationDump() => Syntax.GetCompoundIdentificationDump();
@@ -180,10 +182,10 @@ namespace Reni.Struct
 
         Result AccessResult(Category category, int accessPosition, int position)
         {
-            var trace = Syntax.ObjectId.In()
-                && accessPosition == 0
-                && position == 0
-                && category.HasCode
+            var trace = Syntax.ObjectId.In(2)
+                && accessPosition == 4
+                && position == 2
+                && category.HasType
                 ;
             StartMethodDump(trace, category, accessPosition, position);
             try

@@ -5,9 +5,9 @@ namespace Reni.FeatureTest.Function
 {
     [UnitTest]
     [Target(@"
-f1: /\((
+f1: @((
   y: 3;
-  f: /\y;
+  f: @y;
   f(2)
 ) _A_T_ 2);
 

@@ -7,11 +7,11 @@ namespace Reni.FeatureTest.Reference
     [AllScopeHandling]
     [Target(@"
 o: 
-/\
+@
 ( 
     data: ^ ;
     dump_print1: 
-    /!\ 
+    @! 
     {
         data (0) dump_print;
         data (1) dump_print;
@@ -31,11 +31,11 @@ o('abcdef') dump_print1
     [FunctionalDumpSimple]
     [Target(@"
 o: 
-/\
+@
 ( 
     data: ^ array_reference ;
     dump_print1: 
-    /!\ 
+    @! 
     {
         data (0) dump_print;
         data (3) dump_print;

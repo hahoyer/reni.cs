@@ -23,6 +23,6 @@ namespace Reni.TokenClasses
         SyntaxFactory.IValueProvider SyntaxFactory.IValueToken.Provider => SyntaxFactory.Function;
 
         public static string TokenId(bool isImplicit = false, bool isMetaFunction = false)
-            => "/" + (isImplicit? "!" : "") + "\\" + (isMetaFunction? "/\\" : "");
+            => "@" + (isMetaFunction? "@" : "")+ (isImplicit? "!" : "") ;
     }
 }

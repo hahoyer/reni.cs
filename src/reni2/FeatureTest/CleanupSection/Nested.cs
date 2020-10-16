@@ -6,14 +6,14 @@ namespace Reni.FeatureTest.CleanupSection
     [UnitTest]
     [Simple]
     [TargetSet(@"
-Base: /\ 
+Base: @ 
 {
     a: 1;
 ~~~
 '(base cleanup)' dump_print
 }; 
 
-This: /\ 
+This: @ 
 {
     !mix_in: Base();
     a: 3;
