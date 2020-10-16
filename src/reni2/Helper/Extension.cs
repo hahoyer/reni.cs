@@ -137,5 +137,43 @@ namespace Reni.Helper
         }
 
         public static TValue[] T<TValue>(params TValue[] value) => value;
+
+        internal static IEnumerable<TResult> GetNodesFromLeftToRight<TAspect, TResult>
+            (this TResult target, Func<TResult, TAspect> getAspect)
+            where TAspect : ITree<TResult>
+        {
+            var index = 0;
+            while(true)
+            {
+                if(index == getAspect(target).LeftDirectChildCount)
+                    yield return target;
+                if(index == getAspect(target).DirectChildCount)
+                    yield break;
+                var node = getAspect(target).GetDirectChild(index);
+                if(node != null)
+                    foreach(var child in node.GetNodesFromLeftToRight(getAspect))
+                        yield return child;
+                index++;
+            }
+        }
+
+        internal static IEnumerable<TResult> GetNodesFromRightToLeft<TAspect, TResult>
+            (this TResult target, Func<TResult, TAspect> getAspect)
+            where TAspect : ITree<TResult>
+        {
+            var index = getAspect(target).DirectChildCount;
+            while(true)
+            {
+                if(index == getAspect(target).LeftDirectChildCount)
+                    yield return target;
+                if(index == 0)
+                    yield break;
+                index--;
+                var node = getAspect(target).GetDirectChild(index);
+                if(node != null)
+                    foreach(var child in node.GetNodesFromRightToLeft(getAspect))
+                        yield return child;
+            }
+        }
     }
 }

@@ -91,7 +91,7 @@ namespace Reni.Struct
 
 
         [DisableDump]
-        protected override int LeftDirectChildCount => Statements.Length;
+        internal override int LeftDirectChildCount => Statements.Length;
 
         [DisableDump]
         protected override int DirectChildCount => Statements.Length + 1;

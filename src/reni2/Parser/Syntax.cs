@@ -25,7 +25,7 @@ namespace Reni.Parser
                 : base(objectId, target) { }
 
             [DisableDump]
-            protected sealed override int LeftDirectChildCount => 0;
+            internal sealed override int LeftDirectChildCount => 0;
 
             [DisableDump]
             protected sealed override int DirectChildCount => 0;
@@ -43,7 +43,7 @@ namespace Reni.Parser
             => Binary = target;
 
         [DisableDump]
-        protected abstract int LeftDirectChildCount { get; }
+        internal abstract int LeftDirectChildCount { get; }
 
         [DisableDump]
         IEnumerable<Syntax> Children => this.GetNodesFromLeftToRight();

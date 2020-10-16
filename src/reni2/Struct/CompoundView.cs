@@ -339,9 +339,14 @@ namespace Reni.Struct
             => CodeBase.ReferenceCode(Compound).ReferencePlus(CompoundViewSize * -1);
 
         internal TypeBase ValueType(int position)
-            => Compound
-                .AccessType(ViewPosition, position)
+        {
+            var accessType = Compound
+                .AccessType(ViewPosition, position);
+
+            return accessType
+                .AssertNotNull()
                 .TypeForStructureElement;
+        }
 
         internal IImplementation Find(Definable definable, bool publicOnly)
         {

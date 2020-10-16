@@ -57,7 +57,7 @@ namespace Reni.Parser
         }
 
         [DisableDump]
-        protected override int LeftDirectChildCount => 1;
+        internal override int LeftDirectChildCount => 1;
         [DisableDump]
         protected override int DirectChildCount => 2;
 

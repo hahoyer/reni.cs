@@ -65,9 +65,7 @@
     <Compile Include="Formatting\ISourcePartEdit.cs" />
     <Compile Include="Formatting\BinaryTreeSyntax.cs" />
     <Compile Include="Formatting\WhiteSpace.cs" />
-    <Compile Include="Helper\SyntaxOld.cs" />
     <Compile Include="Helper\Syntax.cs" />
-    <Compile Include="Helper\SyntaxWithParent.cs" />
     <Compile Include="hw\Forms\CursorUtil.cs" />
     <Compile Include="hw\Forms\Extender.cs" />
     <Compile Include="hw\Forms\IAdditionalNodeInfoProvider.cs" />

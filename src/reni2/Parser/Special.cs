@@ -55,7 +55,7 @@ namespace Reni.Parser
         [EnableDumpExcept(null)]
         string Position => Binary?.Token.Characters.GetDumpAroundCurrent(5);
 
-        protected override int LeftDirectChildCount => 0;
+        internal override int LeftDirectChildCount => 0;
         protected override int DirectChildCount => 1;
 
         protected override Syntax GetDirectChild(int index) => index == 0? Right : null;
@@ -93,7 +93,7 @@ namespace Reni.Parser
 
         internal override IRecursionHandler RecursionHandler => Infix as IRecursionHandler;
 
-        protected override int LeftDirectChildCount => 1;
+        internal override int LeftDirectChildCount => 1;
         protected override int DirectChildCount => 2;
 
         protected override Syntax GetDirectChild(int index)
@@ -139,7 +139,7 @@ namespace Reni.Parser
         [EnableDumpExcept(null)]
         string Position => Binary?.Token.Characters.GetDumpAroundCurrent(5);
 
-        protected override int LeftDirectChildCount => 1;
+        internal override int LeftDirectChildCount => 1;
         protected override int DirectChildCount => 1;
 
         protected override Syntax GetDirectChild(int index) => index == 0? Left : null;

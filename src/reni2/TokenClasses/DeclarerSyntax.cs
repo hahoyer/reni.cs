@@ -81,7 +81,7 @@ namespace Reni.TokenClasses
         internal bool IsMutableSyntax => Tags.Any(item => item.Value is MutableDeclarationToken);
 
         [DisableDump]
-        protected override int LeftDirectChildCount => Tags.Length;
+        internal override int LeftDirectChildCount => Tags.Length;
 
         [DisableDump]
         protected override int DirectChildCount => Tags.Length + 1;

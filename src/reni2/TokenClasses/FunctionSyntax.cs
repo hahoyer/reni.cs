@@ -38,7 +38,8 @@ namespace Reni.TokenClasses
 
         [DisableDump]
         internal string Tag
-            => (IsMetaFunction? "\\\\" : "\\")
+            => "@"
+               + (IsMetaFunction? "@" : "")
                + (IsImplicit? "!" : "");
 
         [DisableDump]

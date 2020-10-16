@@ -11,7 +11,6 @@ using Reni.Struct;
 using Reni.Validation;
 using ReniUI.Classification;
 using ReniUI.Formatting;
-using ReniUI.Helper;
 
 namespace ReniUI
 {
@@ -41,9 +40,6 @@ namespace ReniUI
         internal IEnumerable<Issue> Issues => Compiler.Issues;
 
         internal Helper.Syntax Syntax => this.CachedValue(GetSyntax);
-
-        [Obsolete("", true)]
-        internal SyntaxOld SyntaxOld => this.CachedValue(GetSyntaxOld);
 
         internal Formatting.Syntax FormattingBinary
             => this.CachedValue(() => new Formatting.Syntax(Compiler.BinaryTree, () => Compiler.Syntax));
@@ -76,7 +72,7 @@ namespace ReniUI
         internal IEnumerable<ValueSyntax> FindPosition(int offset)
             => LocatePosition(offset)
                 .Master
-                .Chain(node => node.Parent)
+                .Chain(node => node.Binary.Parent)
                 .Select(item => item.FlatItem)
                 .OfType<ValueSyntax>()
                 .Where(item => item.ResultCache.Any());
@@ -114,19 +110,6 @@ namespace ReniUI
             try
             {
                 return new Helper.Syntax(Compiler.BinaryTree, getFlatSyntax: () => Compiler.Syntax);
-            }
-            catch(Exception e)
-            {
-                $"Syntax: Unexpected {e} \nText:\n{Source.Data}".Log();
-                throw;
-            }
-        }
-
-        SyntaxOld GetSyntaxOld()
-        {
-            try
-            {
-                return new SyntaxOld(Syntax);
             }
             catch(Exception e)
             {

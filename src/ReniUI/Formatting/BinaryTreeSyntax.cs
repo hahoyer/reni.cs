@@ -10,7 +10,7 @@ using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
-    sealed class Syntax : BinaryTreeSyntaxWithParent<Syntax>
+    sealed class Syntax : PairView<Syntax>
     {
         class CacheContainer
         {
@@ -26,7 +26,7 @@ namespace ReniUI.Formatting
         Syntax(Reni.TokenClasses.BinaryTree flatItem, Syntax parent, Func<Reni.Parser.Syntax> getFlatSyntax)
             : base(flatItem, parent, getFlatSyntax)
         {
-            Tracer.Assert(FlatItem != null);
+            Tracer.Assert(Binary.FlatItem != null);
             Cache.SplitItem = new ValueCache<SplitItem>(GetSplitItem);
             Cache.SplitMaster = new ValueCache<SplitMaster>(GetSplitMaster);
         }
@@ -48,7 +48,7 @@ namespace ReniUI.Formatting
 
         [DisableDump]
         internal bool IsSeparatorRequired
-            => !WhiteSpaces.HasComment() && SeparatorExtension.Get(LeftNeighbor?.TokenClass, TokenClass);
+            => !WhiteSpaces.HasComment() && SeparatorExtension.Get(Binary.LeftNeighbor?.TokenClass, TokenClass);
 
         static TContainer FlatSubFormat<TContainer, TValue>(Syntax left, bool areEmptyLinesPossible)
             where TContainer : class, IFormatResult<TValue>, new()
@@ -62,21 +62,21 @@ namespace ReniUI.Formatting
             switch(TokenClass)
             {
                 case List tokenClass:
-                    switch(Parent.TokenClass)
+                    switch(Binary.Parent.TokenClass)
                     {
                         case BeginOfText _:
                         case EndOfText _:
                             return SplitMaster.List[tokenClass];
                         case List _:
-                            Tracer.Assert(tokenClass == Parent.TokenClass);
+                            Tracer.Assert(tokenClass == Binary.Parent.TokenClass);
                             return null;
                         default:
-                            NotImplementedMethod(nameof(Parent), Parent);
+                            NotImplementedMethod(nameof(Binary.Parent), Binary.Parent);
                             return default;
                     }
 
                 case Colon tokenClass:
-                    switch(Parent.TokenClass)
+                    switch(Binary.Parent.TokenClass)
                     {
                         case Colon _:
                             return null;
@@ -103,29 +103,29 @@ namespace ReniUI.Formatting
                 case EndOfText _:
                     return null;
                 case LeftParenthesis tokenClass:
-                    Tracer.Assert(Parent.TokenClass.IsBelongingTo(tokenClass));
+                    Tracer.Assert(Binary.Parent.TokenClass.IsBelongingTo(tokenClass));
                     return SplitItem.LeftParenthesis[tokenClass];
             }
 
-            switch(Parent.TokenClass)
+            switch(Binary.Parent.TokenClass)
             {
                 case BeginOfText _:
                 case EndOfText _:
                     return null;
                 case Colon tokenClass:
                     Tracer.Assert(!(TokenClass is Colon));
-                    return IsLeftChild? SplitItem.ColonLabel[tokenClass] : SplitItem.ColonBody[tokenClass];
+                    return Binary.IsLeftChild? SplitItem.ColonLabel[tokenClass] : SplitItem.ColonBody[tokenClass];
                 case LeftParenthesis tokenClass:
                     return SplitItem.List[tokenClass];
                 case List tokenClass:
-                    var master = Parent
-                        .Chain(target => target.Parent)
+                    var master = Binary.Parent
+                        .Chain(target => target.Binary.Parent)
                         .SkipWhile(target => target.TokenClass == tokenClass)
                         .First();
                     var masterTokenClass = master.TokenClass is LeftParenthesis? master.TokenClass : tokenClass;
                     return SplitItem.List[masterTokenClass];
                 default:
-                    NotImplementedMethod(nameof(Parent), Parent);
+                    NotImplementedMethod(nameof(Binary.Parent), Binary.Parent);
                     return default;
             }
         }

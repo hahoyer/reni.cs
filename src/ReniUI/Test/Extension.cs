@@ -14,7 +14,7 @@ namespace ReniUI.Test
             int? maxLineLength = null,
             int? emptyLineLimit = null)
         {
-            expected = expected ?? text;
+            expected ??= text;
             expected = expected.Replace(oldValue: "\r\n", newValue: "\n");
 
             var compiler = CompilerBrowser.FromText(text);

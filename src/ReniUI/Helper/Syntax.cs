@@ -1,32 +1,22 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Helper;
-using Reni;
 using Reni.Context;
 using Reni.Helper;
 using Reni.Parser;
 using Reni.TokenClasses;
-using Reni.Validation;
 
 namespace ReniUI.Helper
 {
-    sealed class Syntax : BinaryTreeSyntaxWithParent<Syntax>
+    sealed class Syntax : PairView<Syntax>
     {
         internal Syntax(BinaryTree binary, Syntax parent = null, Func<Reni.Parser.Syntax> getFlatSyntax = null)
             : base(binary, parent, getFlatSyntax) { }
 
-        internal new BinaryTree FlatItem => base.FlatItem;
-
-        [DisableDump]
-        internal IEnumerable<Issue> Issues => FlatItem.Issues;
-
         internal string[] GetDeclarationOptions(ContextBase context)
-            => (FlatSyntax as ValueSyntax)?.GetDeclarationOptions(context).ToArray();
+            => (Syntax.FlatItem as ValueSyntax)?.GetDeclarationOptions(context).ToArray();
 
         protected override Syntax Create(BinaryTree flatItem) => new Syntax(flatItem, this);
-
     }
 
     abstract class ProxySyntax : Reni.Parser.Syntax.NoChildren

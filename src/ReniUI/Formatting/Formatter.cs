@@ -19,7 +19,7 @@ namespace ReniUI.Formatting
         {
             public override Context RightSideLineBreakContext(Context context) => context.BodyOfColon;
             internal override int GetLineBreaksForChild(Syntax parent, Syntax target) 
-                => parent.LeftMost == target ? 0 : 1;
+                => parent.Binary.LeftMost == target ? 0 : 1;
 
             public override bool HasLineBreaksAfterToken(Context context) => true;
         }
@@ -64,7 +64,7 @@ namespace ReniUI.Formatting
                 => context.MultiLineBreaksForList(syntax.Left, syntax.Right?.Left);
 
             internal override int GetLineBreaksForChild(Syntax parent, Syntax target) 
-                => parent.LeftMost == target ? 0 : 1;
+                => parent.Binary.LeftMost == target ? 0 : 1;
         }
 
         sealed class LastListFormatter : ListItemFormatter 

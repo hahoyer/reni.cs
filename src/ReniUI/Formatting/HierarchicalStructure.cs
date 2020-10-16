@@ -123,7 +123,7 @@ namespace ReniUI.Formatting
 
         static bool GetIsSeparatorRequired(Syntax target)
             => !target.WhiteSpaces.HasComment() &&
-               SeparatorExtension.Get(target.LeftNeighbor?.TokenClass, target.TokenClass);
+               SeparatorExtension.Get(target.Binary.LeftNeighbor?.TokenClass, target.TokenClass);
 
         static bool True => true;
         static bool False => false;

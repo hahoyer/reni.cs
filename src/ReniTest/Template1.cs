@@ -23,25 +23,25 @@ namespace ReniTest
         //    FreePointer >> 64 := (-1) enable_cut
         //};
         //
-        //repeat: /\ ^ while() then(^ body(), repeat(^));
+        //repeat: @ ^ while() then(^ body(), repeat(^));
         //
-        //system: /!\
-        //{ MaxNumber8: /!\ '7f' to_number_of_base 16 
-        //. MaxNumber16: /!\ '7fff' to_number_of_base 16 
-        //. MaxNumber32: /!\ '7fffffff' to_number_of_base 16 
-        //. MaxNumber64: /!\ '7fffffffffffffff' to_number_of_base 16 
+        //system: @!
+        //{ MaxNumber8: @! '7f' to_number_of_base 16 
+        //. MaxNumber16: @! '7fff' to_number_of_base 16 
+        //. MaxNumber32: @! '7fffffff' to_number_of_base 16 
+        //. MaxNumber64: @! '7fffffffffffffff' to_number_of_base 16 
         //
-        //. TextItemType: /!\ MaxNumber8 text_item type 
+        //. TextItemType: @! MaxNumber8 text_item type 
         //
-        //. NewMemory: /\ 
+        //. NewMemory: @ 
         //    { result: (((^ elementType) * 1) array_reference mutable) instance (systemdata FreePointer enable_reinterpretation) 
         //    . initializer: ^ initializer
         //    . count: ^ count
         //    . !mutable position: count type instance (0) 
         //    . repeat
         //    (
-        //        while: /\ position < count,
-        //        body: /\ 
+        //        while: @ position < count,
+        //        body: @ 
         //        ( 
         //            (result >> position) := initializer(position), 
         //            position := (position + 1) enable_cut
@@ -54,23 +54,23 @@ namespace ReniTest
         //    } result 
         //};
         //
-        //Text: /\
+        //Text: @
         //{ !mutable data: ^ array_reference 
         //. _elementType: ^ type >>
         //. _count: ^ count
-        //. AfterCopy: /\ data:= system NewMemory
+        //. AfterCopy: @ data:= system NewMemory
         //    ( elementType: _elementType
         //    . count: _count
-        //    . initializer: /\ data >> ^
+        //    . initializer: @ data >> ^
         //    )
         //. AfterCopy()
-        //. dump_print: /!\ 
+        //. dump_print: @! 
         //    {
         //        !mutable position: _count type instance (0) ;
         //        repeat
         //        (
-        //            while: /\ position < _count,
-        //            body: /\ 
+        //            while: @ position < _count,
+        //            body: @ 
         //            ( 
         //                (data >> position) dump_print, 
         //                position := (position + 1) enable_cut
@@ -114,19 +114,19 @@ namespace ReniTest
         // { !mutable data: ^ array_reference 
         //. _elementType: ^ type >>
         //. _count: ^ count
-        //. AfterCopy: /\ data:= system NewMemory
+        //. AfterCopy: @ data:= system NewMemory
         //    ( elementType: _elementType
         //    . count: _count
-        //    . initializer: /\ data >> ^
+        //    . initializer: @ data >> ^
         //    )
         //. AfterCopy()
-        //. dump_print: /!\ 
+        //. dump_print: @! 
         //    {
         //        !mutable position: _count type instance (0) ;
         //        repeat
         //        (
-        //            while: /\ position < _count,
-        //            body: /\ 
+        //            while: @ position < _count,
+        //            body: @ 
         //            ( 
         //                (data >> position) dump_print, 
         //                position := (position + 1) enable_cut
@@ -149,7 +149,7 @@ namespace ReniTest
         // data:= system NewMemory
         //    ( elementType: _elementType
         //    . count: _count
-        //    . initializer: /\ data >> ^
+        //    . initializer: @ data >> ^
         //    ) 
         static Data GetFunction1(Data frame)
         {
@@ -168,22 +168,22 @@ namespace ReniTest
             return data;
         }
 
-        // { MaxNumber8: /!\ '7f' to_number_of_base 16 
-        //. MaxNumber16: /!\ '7fff' to_number_of_base 16 
-        //. MaxNumber32: /!\ '7fffffff' to_number_of_base 16 
-        //. MaxNumber64: /!\ '7fffffffffffffff' to_number_of_base 16 
+        // { MaxNumber8: @! '7f' to_number_of_base 16 
+        //. MaxNumber16: @! '7fff' to_number_of_base 16 
+        //. MaxNumber32: @! '7fffffff' to_number_of_base 16 
+        //. MaxNumber64: @! '7fffffffffffffff' to_number_of_base 16 
         //
-        //. TextItemType: /!\ MaxNumber8 text_item type 
+        //. TextItemType: @! MaxNumber8 text_item type 
         //
-        //. NewMemory: /\ 
+        //. NewMemory: @ 
         //    { result: (((^ elementType) * 1) array_reference mutable) instance (systemdata FreePointer enable_reinterpretation) 
         //    . initializer: ^ initializer
         //    . count: ^ count
         //    . !mutable position: count type instance (0) 
         //    . repeat
         //    (
-        //        while: /\ position < count,
-        //        body: /\ 
+        //        while: @ position < count,
+        //        body: @ 
         //        ( 
         //            (result >> position) := initializer(position), 
         //            position := (position + 1) enable_cut
@@ -209,8 +209,8 @@ namespace ReniTest
         //    . !mutable position: count type instance (0) 
         //    . repeat
         //    (
-        //        while: /\ position < count,
-        //        body: /\ 
+        //        while: @ position < count,
+        //        body: @ 
         //        ( 
         //            (result >> position) := initializer(position), 
         //            position := (position + 1) enable_cut
@@ -333,8 +333,8 @@ namespace ReniTest
         //        !mutable position: _count type instance (0) ;
         //        repeat
         //        (
-        //            while: /\ position < _count,
-        //            body: /\ 
+        //            while: @ position < _count,
+        //            body: @ 
         //            ( 
         //                (data >> position) dump_print, 
         //                position := (position + 1) enable_cut
