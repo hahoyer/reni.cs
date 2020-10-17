@@ -13,7 +13,10 @@ namespace Reni.TokenClasses
 
             internal TagSyntax(SyntaxFactory.IDeclarerToken value, BinaryTree anchor)
                 : base(anchor)
-                => Value = value;
+            {
+                Value = value;
+                Anchor.AssertIsNotNull();
+            }
 
             [EnableDump]
             [EnableDumpExcept(null)]
@@ -53,7 +56,7 @@ namespace Reni.TokenClasses
             Name = name;
             MeansPublic = meansPublic;
 
-            Tracer.Assert(anchor == null);
+            anchor.AssertIsNull();
             StopByObjectIds();
         }
 

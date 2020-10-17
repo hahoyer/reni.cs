@@ -11,8 +11,8 @@ namespace Reni.Helper
         internal readonly BinaryTree FlatItem;
         internal readonly TResult Left;
         internal readonly TResult Parent;
-        readonly TResult Master;
         internal readonly TResult Right;
+        readonly TResult Master;
 
         public BinaryView(BinaryTree flatItem, TResult left, TResult right, TResult parent, TResult master)
         {
@@ -24,10 +24,10 @@ namespace Reni.Helper
         }
 
         [DisableDump]
-        internal TResult LeftMost => Master.GetNodesFromLeftToRight(node=>node.Binary).First();
+        internal TResult LeftMost => Master.GetNodesFromLeftToRight(node => node.Binary).First();
 
         [DisableDump]
-        internal TResult RightMost => Master.GetNodesFromRightToLeft(node=>node.Binary).First();
+        internal TResult RightMost => Master.GetNodesFromRightToLeft(node => node.Binary).First();
 
         [DisableDump]
         internal TResult LeftNeighbor => Left?.Binary.RightMost ?? LeftParent;
@@ -68,5 +68,7 @@ namespace Reni.Helper
 
         [DisableDump]
         int ITree<TResult>.LeftDirectChildCount => 1;
+
+        protected override string GetNodeDump() => base.GetNodeDump() + $"({FlatItem.TokenClass.Id})";
     }
 }

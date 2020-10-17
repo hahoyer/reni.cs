@@ -17,12 +17,8 @@ namespace ReniUI.Helper
             => (Syntax.FlatItem as ValueSyntax)?.GetDeclarationOptions(context).ToArray();
 
         protected override Syntax Create(BinaryTree flatItem) => new Syntax(flatItem, this);
-
-        protected override Syntax Create(Reni.Parser.Syntax flatItem, int index)
-        {
-            NotImplementedMethod(flatItem, index);
-            return default;
-        }
+        protected override Syntax Create(Reni.Parser.Syntax flatItem)
+            => new Syntax(null, this, ()=>flatItem);
     }
 
     abstract class ProxySyntax : Reni.Parser.Syntax.NoChildren

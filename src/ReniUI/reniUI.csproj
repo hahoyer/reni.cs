@@ -49,7 +49,6 @@
   <ItemGroup>
     <Compile Include="FileConfiguration.cs" />
     <Compile Include="Formatting\EmptyWhiteSpaceView.cs" />
-    <Compile Include="Formatting\Formatter.cs" />
     <Compile Include="Formatting\Edit.cs" />
     <Compile Include="Formatting\EditPieceParameter.cs" />
     <Compile Include="Formatting\Extension.cs" />

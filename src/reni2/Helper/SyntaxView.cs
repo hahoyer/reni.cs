@@ -10,10 +10,12 @@ namespace Reni.Helper
     sealed class SyntaxView<TResult> : DumpableObject, ValueCache.IContainer, ITree<TResult>
         where TResult : PairView<TResult>
     {
-        public TResult Master { get; }
+        internal TResult Master { get; }
         internal readonly Syntax FlatItem;
         readonly TResult[] DirectChildren;
         readonly TResult Parent;
+
+        protected override string GetNodeDump() => base.GetNodeDump() + $"({FlatItem.Anchor?.TokenClass.Id})";
 
         public SyntaxView(Syntax flatItem, TResult[] directChildren, TResult parent, TResult master)
         {

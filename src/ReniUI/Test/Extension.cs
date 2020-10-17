@@ -26,8 +26,7 @@ namespace ReniUI.Test
 
             var lineCount = newSource.Count(item => item == '\n');
 
-            Tracer.Assert(newSource == expected, 
-                ()=> $@"
+            (newSource == expected).Assert(()=> $@"
 newSource:
 {newSource.Quote()}
 expected:

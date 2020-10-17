@@ -62,6 +62,7 @@ namespace Reni.Helper
         internal IEnumerable<TResult> ParserLevelBelongings => this.CachedValue(GetParserLevelBelongings);
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
+        protected override string GetNodeDump() => base.GetNodeDump() + $"({Binary.FlatItem?.TokenClass.Id})";
 
         TResult LocateByPositionForCache(int current)
         {
@@ -102,13 +103,37 @@ namespace Reni.Helper
         }
 
         protected abstract TResult Create(BinaryTree flatItem);
-        protected abstract TResult Create(Syntax flatItem, int index);
+        protected abstract TResult Create(Reni.Parser.Syntax flatItem);
+
+        TResult FindOrCreate(Syntax flatItem, int index)
+        {
+            if(flatItem == null)
+                return null;
+
+            if(flatItem.Anchor != null)
+            {
+                var path = Binary.FlatItem.GetPath(node => node == flatItem.Anchor);
+                path.AssertIsNotNull();
+                return (TResult)this.ApplyPath(path, node => node.Binary);
+            }
+
+            (flatItem is DeclarerSyntax).Assert();
+
+            return Create(flatItem);
+        }
 
         SyntaxView<TResult> GetSyntax(Func<Syntax> getFlatSyntax, TResult parent)
         {
-            var flatItem = getFlatSyntax?.Invoke();
+            var flatItem =
+                getFlatSyntax?.Invoke()
+                ?? parent
+                    .Syntax
+                    .FlatItem
+                    .DirectChildren
+                    .Single(pair => pair?.Anchor == Binary.FlatItem);
+
             flatItem.AssertIsNotNull();
-            var directChildren = flatItem.DirectChildren.Select(Create).ToArray();
+            var directChildren = flatItem.DirectChildren.Select(FindOrCreate).ToArray();
             return new SyntaxView<TResult>(flatItem, directChildren, parent, (TResult)this);
         }
 

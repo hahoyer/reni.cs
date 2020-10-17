@@ -19,6 +19,7 @@ namespace ReniUI.Formatting
                 get
                 {
                     var s = Target.Syntax;
+                    var ss = s.LeftMost;
 
                     Tracer.Assert(Target.Left != null);
                     Tracer.Assert(Target.Left.Left == null);

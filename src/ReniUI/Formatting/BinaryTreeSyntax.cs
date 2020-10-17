@@ -57,21 +57,8 @@ namespace ReniUI.Formatting
         protected override Syntax Create(BinaryTree flatItem)
             => new Syntax(flatItem, this, null);
 
-        protected override Syntax Create(Reni.Parser.Syntax flatItem, int index)
-        {
-            if(flatItem == null)
-                return null;
-
-            if(flatItem.Anchor != null)
-            {
-                var path = Binary.FlatItem.GetPath(node => node == flatItem.Anchor);
-                path.AssertIsNotNull();
-                return this.ApplyPath(path, node=>node.Binary);
-            }
-
-            NotImplementedMethod(flatItem, index);
-            return default;
-        }
+        protected override Syntax Create(Reni.Parser.Syntax flatItem)
+            => new Syntax(Binary.FlatItem, this, ()=>flatItem);
 
         SplitMaster GetSplitMaster()
         {

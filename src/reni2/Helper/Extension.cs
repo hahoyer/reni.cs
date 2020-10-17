@@ -142,17 +142,18 @@ namespace Reni.Helper
             (this TResult target, Func<TResult, TAspect> getAspect)
             where TAspect : ITree<TResult>
         {
+            var aspect = getAspect(target);
             var index = 0;
+            var right = new List<TResult>();
             while(true)
             {
-                if(index == getAspect(target).LeftDirectChildCount)
-                    yield return target;
-                if(index == getAspect(target).DirectChildCount)
-                    yield break;
-                var node = getAspect(target).GetDirectChild(index);
+                if(index == aspect.LeftDirectChildCount)
+                    right.Add(target);
+                if(index == aspect.DirectChildCount)
+                    return right;
+                var node = aspect.GetDirectChild(index);
                 if(node != null)
-                    foreach(var child in node.GetNodesFromLeftToRight(getAspect))
-                        yield return child;
+                    right.AddRange(node.GetNodesFromLeftToRight(getAspect));
                 index++;
             }
         }
@@ -161,15 +162,16 @@ namespace Reni.Helper
             (this TResult target, Func<TResult, TAspect> getAspect)
             where TAspect : ITree<TResult>
         {
-            var index = getAspect(target).DirectChildCount;
+            var aspect = getAspect(target);
+            var index = aspect.DirectChildCount;
             while(true)
             {
-                if(index == getAspect(target).LeftDirectChildCount)
+                if(index == aspect.LeftDirectChildCount)
                     yield return target;
                 if(index == 0)
                     yield break;
                 index--;
-                var node = getAspect(target).GetDirectChild(index);
+                var node = aspect.GetDirectChild(index);
                 if(node != null)
                     foreach(var child in node.GetNodesFromRightToLeft(getAspect))
                         yield return child;
