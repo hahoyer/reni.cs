@@ -137,7 +137,7 @@ namespace Reni.TokenClasses
         {
             Result<DeclarerSyntax> IDeclarerProvider.Get(BinaryTree target, SyntaxFactory factory)
             {
-                Tracer.Assert(target.Right == null);
+                target.Right.AssertIsNull();
 
                 return factory.ToDeclarer(factory.GetDeclarerSyntax(target.Left), target, target.Token.Characters.Id);
             }
@@ -147,6 +147,19 @@ namespace Reni.TokenClasses
                 => Result<ValueSyntax>.From(factory.GetExpressionSyntax(target));
         }
 
+        class InvalidTokenDeclarerHandler : DumpableObject, IDeclarerProvider
+        {
+            Result<DeclarerSyntax> IDeclarerProvider.Get(BinaryTree target, SyntaxFactory factory)
+            {
+                target.Right.AssertIsNull();
+
+                return factory
+                    .ToDeclarer(factory.GetDeclarerSyntax(target.Left), target, target.Token.Characters.Id)
+                    .With(IssueId.InvalidNameForDeclaration.Issue(target.Token.Characters));
+            }
+        }
+
+        
         class InfixHandler : DumpableObject, IValueProvider
         {
             readonly bool? HasLeft;
@@ -265,6 +278,8 @@ namespace Reni.TokenClasses
         internal static readonly IDeclarerProvider DefinableAsDeclarer = new DefinableHandler();
         internal static readonly IDeclarerProvider Declarer = new DeclarerHandler();
         internal static readonly IDeclarerProvider ComplexDeclarer = new ComplexDeclarerHandler();
+        internal static readonly IDeclarerProvider InvalidTokenDeclarer = new InvalidTokenDeclarerHandler();
+
 
         internal static readonly SyntaxFactory Root = new SyntaxFactory(false);
 
@@ -283,11 +298,9 @@ namespace Reni.TokenClasses
             if(target == null)
                 return onNull?.Invoke();
 
-            if(target.TokenClass is IDeclarerToken token)
-                return token.Provider.Get(target, GetCurrentFactory(target.TokenClass));
-
-            NotImplementedMethod(target, onNull);
-            return default;
+            return ((target.TokenClass as IDeclarerToken)?.Provider 
+                    ?? InvalidTokenDeclarer)
+                .Get(target, GetCurrentFactory(target.TokenClass));
         }
 
         Result<StatementSyntax[]> GetStatementsSyntax(BinaryTree anchor, BinaryTree target)
