@@ -45,7 +45,7 @@ namespace Reni.Struct
         [DisableDump]
         public IEnumerable<FunctionSyntax> ConverterFunctions
             => Statements
-                .Where(data => data.Content.Declarer.IsConverterSyntax)
+                .Where(data => data.Content.Declarer?.IsConverterSyntax??false)
                 .Select(data => (FunctionSyntax)data.Content.Value);
 
         [DisableDump]
