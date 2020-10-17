@@ -8,6 +8,7 @@ using Reni;
 using Reni.Code;
 using Reni.Parser;
 using Reni.Struct;
+using Reni.TokenClasses;
 using Reni.Validation;
 using ReniUI.Classification;
 using ReniUI.Formatting;
@@ -73,7 +74,7 @@ namespace ReniUI
             => LocatePosition(offset)
                 .Master
                 .Chain(node => node.Binary.Parent)
-                .Select(item => item.FlatItem)
+                .Select(item => item.Binary.FlatItem)
                 .OfType<ValueSyntax>()
                 .Where(item => item.ResultCache.Any());
 

@@ -58,8 +58,6 @@ namespace Reni.Helper
         internal TResult Left => Binary.Left;
         internal TResult Right => Binary.Right;
 
-        internal BinaryTree FlatItem => Binary.FlatItem;
-
         [DisableDump]
         internal IEnumerable<TResult> ParserLevelBelongings => this.CachedValue(GetParserLevelBelongings);
 
@@ -109,16 +107,9 @@ namespace Reni.Helper
         SyntaxView<TResult> GetSyntax(Func<Syntax> getFlatSyntax, TResult parent)
         {
             var flatItem = getFlatSyntax?.Invoke();
-            Tracer.Assert(flatItem != null);
-
+            flatItem.AssertNotEmpty();
             var directChildren = flatItem.DirectChildren.Select(Create).ToArray();
-
-            var result = new SyntaxView<TResult>(flatItem, directChildren, parent, (TResult)this);
-
-            var b = Binary;
-
-            NotImplementedMethod("getFlatSyntax", parent);
-            return default;
+            return new SyntaxView<TResult>(flatItem, directChildren, parent, (TResult)this);
         }
 
         IEnumerable<TResult> GetParserLevelBelongings()
@@ -142,7 +133,7 @@ namespace Reni.Helper
                     yield break;
             }
 
-            Tracer.Assert(TokenClass is List);
+            (TokenClass is List).Assert();
 
             var parents = Binary.Parent.Chain(node => node.Binary.Parent)
                 .Where(node => matcher.IsBelongingTo(node.TokenClass));

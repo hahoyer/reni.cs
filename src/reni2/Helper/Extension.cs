@@ -175,5 +175,11 @@ namespace Reni.Helper
                         yield return child;
             }
         }
+
+        internal static TTarget ApplyPath<TTarget, TAspect>(this TTarget container, int[] path, Func<TTarget, TAspect> getAspect)
+            where TAspect : class, ITree<TTarget>
+            => path.Aggregate(container, (node, index) => getAspect(node).GetDirectChild(index));
+
+
     }
 }

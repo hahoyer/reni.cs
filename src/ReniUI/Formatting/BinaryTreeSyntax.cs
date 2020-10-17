@@ -26,7 +26,7 @@ namespace ReniUI.Formatting
         Syntax(BinaryTree flatItem, Syntax parent, Func<Reni.Parser.Syntax> getFlatSyntax)
             : base(flatItem, parent, getFlatSyntax)
         {
-            Tracer.Assert(Binary.FlatItem != null);
+            Binary.FlatItem.AssertNotEmpty();
             Cache.SplitItem = new ValueCache<SplitItem>(GetSplitItem);
             Cache.SplitMaster = new ValueCache<SplitMaster>(GetSplitMaster);
         }
@@ -59,8 +59,18 @@ namespace ReniUI.Formatting
 
         protected override Syntax Create(Reni.Parser.Syntax flatItem, int index)
         {
+            if(flatItem == null)
+                return null;
+
+            if(flatItem.Anchor != null)
+            {
+                var path = Binary.FlatItem.GetPath(node => node == flatItem.Anchor);
+                path.AssertNotEmpty();
+                return this.ApplyPath(path, node=>node.Binary);
+            }
+
             NotImplementedMethod(flatItem, index);
-            return new Syntax(null, this, ()=>flatItem);
+            return default;
         }
 
         SplitMaster GetSplitMaster()
@@ -171,6 +181,6 @@ namespace ReniUI.Formatting
         internal int? GetFlatLength(bool areEmptyLinesPossible)
             => FlatFormat<IntegerResult, int>(areEmptyLinesPossible)?.Value;
 
-        protected override string GetNodeDump() => base.GetNodeDump() + " " + FlatItem.Token.Characters.Id;
+        protected override string GetNodeDump() => base.GetNodeDump() + " " + Binary.FlatItem.Token.Characters.Id;
     }
 }

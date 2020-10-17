@@ -448,9 +448,26 @@ namespace hw.DebugFormatter
         /// <param name="stackFrameDepth"> The stack frame depth. </param>
         [DebuggerHidden]
         [ContractAnnotation("b: false => halt")]
-        public static void Assert(bool b, Func<string> getText = null, int stackFrameDepth = 0)
+        public static void Assert(this bool b, Func<string> getText = null, int stackFrameDepth = 0)
         {
             if(b)
+                return;
+            AssertionFailed("", getText, stackFrameDepth + 1);
+        }
+
+        /// <summary>
+        ///     Check boolean expression
+        /// </summary>
+        /// <param name="b">
+        ///     if set to <c>true</c> [b].
+        /// </param>
+        /// <param name="getText"> The text. </param>
+        /// <param name="stackFrameDepth"> The stack frame depth. </param>
+        [DebuggerHidden]
+        [ContractAnnotation("b: null => halt")]
+        public static void AssertNotEmpty(this object b, Func<string> getText = null, int stackFrameDepth = 0)
+        {
+            if(b!= null)
                 return;
             AssertionFailed("", getText, stackFrameDepth + 1);
         }

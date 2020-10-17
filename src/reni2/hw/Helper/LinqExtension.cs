@@ -163,7 +163,7 @@ namespace hw.Helper
         public static TResult AssertNotNull<TResult>(this TResult target)
             where TResult : class
         {
-            Tracer.Assert(target != null, stackFrameDepth:1);
+            target.AssertNotEmpty(stackFrameDepth:1);
             return target;
         }
 
