@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using hw.DebugFormatter;
@@ -159,11 +158,10 @@ namespace hw.Helper
             return target.Value;
         }
 
-        [DebuggerHidden]
         public static TResult AssertNotNull<TResult>(this TResult target)
             where TResult : class
         {
-            target.AssertNotEmpty(stackFrameDepth:1);
+            Tracer.Assert(target != null);
             return target;
         }
 

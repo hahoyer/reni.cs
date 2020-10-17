@@ -455,26 +455,9 @@ namespace hw.DebugFormatter
             AssertionFailed("", getText, stackFrameDepth + 1);
         }
 
-        /// <summary>
-        ///     Check boolean expression
-        /// </summary>
-        /// <param name="b">
-        ///     if set to <c>true</c> [b].
-        /// </param>
-        /// <param name="getText"> The text. </param>
-        /// <param name="stackFrameDepth"> The stack frame depth. </param>
-        [DebuggerHidden]
-        [ContractAnnotation("b: null => halt")]
-        public static void AssertNotEmpty(this object b, Func<string> getText = null, int stackFrameDepth = 0)
-        {
-            if(b!= null)
-                return;
-            AssertionFailed("", getText, stackFrameDepth + 1);
-        }
-
         [DebuggerHidden]
         [ContractAnnotation("b: false => halt")]
-        public static void Assert(bool b, string s) => Assert(b, () => s, 1);
+        public static void Assert(this bool b, string s) => Assert(b, () => s, 1);
 
         [DebuggerHidden]
         public static void TraceBreak()
@@ -484,6 +467,40 @@ namespace hw.DebugFormatter
             if(IsBreakDisabled)
                 throw new BreakException();
             Debugger.Break();
+        }
+
+        /// <summary>
+        ///     Check expression
+        /// </summary>
+        /// <param name="b">
+        ///     if not null.
+        /// </param>
+        /// <param name="getText"> Message in case of fail. </param>
+        /// <param name="stackFrameDepth"> The stack frame depth. </param>
+        [DebuggerHidden]
+        [ContractAnnotation("b: null => halt")]
+        public static void AssertIsNotNull(this object b, Func<string> getText = null, int stackFrameDepth = 0)
+        {
+            if(b!= null)
+                return;
+            AssertionFailed("", getText, stackFrameDepth + 1);
+        }
+
+        /// <summary>
+        ///     Check expression
+        /// </summary>
+        /// <param name="b">
+        ///     if null.
+        /// </param>
+        /// <param name="getText"> Message in case of fail. </param>
+        /// <param name="stackFrameDepth"> The stack frame depth. </param>
+        [DebuggerHidden]
+        [ContractAnnotation("b: null => halt")]
+        public static void AssertIsNull(this object b, Func<string> getText = null, int stackFrameDepth = 0)
+        {
+            if(b== null)
+                return;
+            AssertionFailed("", getText, stackFrameDepth + 1);
         }
 
         public static int CurrentFrameCount(int stackFrameDepth) => new StackTrace(true).FrameCount - stackFrameDepth;

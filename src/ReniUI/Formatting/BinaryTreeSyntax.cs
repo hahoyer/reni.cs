@@ -26,7 +26,7 @@ namespace ReniUI.Formatting
         Syntax(BinaryTree flatItem, Syntax parent, Func<Reni.Parser.Syntax> getFlatSyntax)
             : base(flatItem, parent, getFlatSyntax)
         {
-            Binary.FlatItem.AssertNotEmpty();
+            Binary.FlatItem.AssertIsNotNull();
             Cache.SplitItem = new ValueCache<SplitItem>(GetSplitItem);
             Cache.SplitMaster = new ValueCache<SplitMaster>(GetSplitMaster);
         }
@@ -65,7 +65,7 @@ namespace ReniUI.Formatting
             if(flatItem.Anchor != null)
             {
                 var path = Binary.FlatItem.GetPath(node => node == flatItem.Anchor);
-                path.AssertNotEmpty();
+                path.AssertIsNotNull();
                 return this.ApplyPath(path, node=>node.Binary);
             }
 

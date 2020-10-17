@@ -107,7 +107,7 @@ namespace Reni.Helper
         SyntaxView<TResult> GetSyntax(Func<Syntax> getFlatSyntax, TResult parent)
         {
             var flatItem = getFlatSyntax?.Invoke();
-            flatItem.AssertNotEmpty();
+            flatItem.AssertIsNotNull();
             var directChildren = flatItem.DirectChildren.Select(Create).ToArray();
             return new SyntaxView<TResult>(flatItem, directChildren, parent, (TResult)this);
         }
