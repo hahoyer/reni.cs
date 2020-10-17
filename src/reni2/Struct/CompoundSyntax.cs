@@ -125,7 +125,7 @@ namespace Reni.Struct
                 return null;
 
             return Statements
-                .Select((data, index) => data.Content.Declarer.IsDefining(name, publicOnly)? index : (int?)null)
+                .Select((data, index) => data.IsDefining(name, publicOnly)? index : (int?)null)
                 .FirstOrDefault(data => data != null);
         }
 

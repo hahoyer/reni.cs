@@ -13,7 +13,7 @@ namespace Reni.TokenClasses
             : base(anchor)
         {
             Content = content;
-            
+
             AssertValid();
         }
 
@@ -30,7 +30,7 @@ namespace Reni.TokenClasses
         protected override Syntax GetDirectChild(int index)
             => index switch
             {
-                0 =>(Syntax) Content
+                0 => (Syntax)Content
                 , _ => null
             };
 
@@ -40,7 +40,9 @@ namespace Reni.TokenClasses
             return default;
         }
 
-        public static Result<StatementSyntax[]> Create(BinaryTree target, IStatementSyntax statement) 
+        internal static Result<StatementSyntax[]> Create(BinaryTree target, IStatementSyntax statement)
             => T(new StatementSyntax(target, statement));
+
+        internal bool IsDefining(string name, bool publicOnly) => Content.Declarer?.IsDefining(name, publicOnly) ?? false;
     }
 }
