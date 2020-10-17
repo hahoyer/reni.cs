@@ -62,7 +62,7 @@
     <Compile Include="Formatting\Skeleton.cs" />
     <Compile Include="Formatting\SourcePartEditExtension.cs" />
     <Compile Include="Formatting\ISourcePartEdit.cs" />
-    <Compile Include="Formatting\BinaryTreeSyntax.cs" />
+    <Compile Include="Formatting\Syntax.cs" />
     <Compile Include="Formatting\WhiteSpace.cs" />
     <Compile Include="Helper\Syntax.cs" />
     <Compile Include="hw\Forms\CursorUtil.cs" />
