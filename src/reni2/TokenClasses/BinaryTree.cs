@@ -128,7 +128,34 @@ namespace Reni.TokenClasses
             return null;
         }
 
+        Result<BinaryTree> GetBracketSubLevel(int level)
+        {
+            var rightParenthesis = TokenClass as IRightBracket;
+            Tracer.Assert(rightParenthesis != null);
+            Tracer.Assert(level == rightParenthesis.Level);
+
+            Tracer.Assert(Right == null);
+
+            if(!(Left.TokenClass is ILeftBracket leftParenthesis))
+                return new Result<BinaryTree>(Left, IssueId.ExtraRightBracket.Issue(SourcePart));
+
+            Tracer.Assert(Left.Left == null);
+
+            var levelDelta = leftParenthesis.Level - level;
+
+            if(levelDelta == 0)
+                return Left;
+
+            if(levelDelta > 0)
+                return new Result<BinaryTree>(Left, IssueId.ExtraLeftBracket.Issue(Left.SourcePart));
+
+            Left.NotImplementedMethod(level, this);
+            return null;
+        }
+
         internal Result<BinaryTree> GetBracketKernel()
             => GetBracketKernel(((IRightBracket)TokenClass).Level);
+        internal Result<BinaryTree> GetBracketSubLevel()
+            => GetBracketSubLevel(((IRightBracket)TokenClass).Level);
     }
 }

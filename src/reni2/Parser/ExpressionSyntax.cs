@@ -47,8 +47,8 @@ namespace Reni.Parser
 
         int CurrentResultDepth;
 
-        internal ExpressionSyntax(BinaryTree target, ValueSyntax left, Definable definable, ValueSyntax right)
-            : base(target)
+        internal ExpressionSyntax(BinaryTree anchor, ValueSyntax left, Definable definable, ValueSyntax right)
+            : base(anchor)
         {
             Left = left;
             Definable = definable;

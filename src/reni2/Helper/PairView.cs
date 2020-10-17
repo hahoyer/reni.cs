@@ -17,8 +17,8 @@ namespace Reni.Helper
         class CacheContainer
         {
             public ValueCache<BinaryView<TResult>> Binary;
-            public ValueCache<SyntaxView<TResult>> Syntax;
             public FunctionCache<int, TResult> LocateByPosition;
+            public ValueCache<SyntaxView<TResult>> Syntax;
         }
 
         readonly CacheContainer Cache = new CacheContainer();
@@ -29,36 +29,6 @@ namespace Reni.Helper
             Cache.Binary = ValueCacheExtension.NewValueCache(() => GetBinary(flatItem, parent));
             Cache.Syntax = ValueCacheExtension.NewValueCache(() => GetSyntax(getFlatSyntax, parent));
         }
-
-        TResult LocateByPositionForCache(int current)
-        {
-            var nodes = this
-                .GetNodesFromLeftToRight(node=>node.Binary)
-                .ToArray();
-            var ranges = nodes
-                .Select(node => node.Token.Characters)
-                .ToArray();
-
-            return (TResult)nodes
-                .Top(node => node.Token.Characters.EndPosition > current)
-                .AssertNotNull();
-        }
-
-        internal TResult Locate(SourcePart span)
-        {
-            var locateByPosition = LocateByPosition(span.Position);
-
-            var sourcePositions = locateByPosition
-                .Chain(node => node.Binary.Parent)
-                .Select(node => node.Token.Characters)
-                .ToArray();
-
-            return locateByPosition
-                .Chain(node => node.Binary.Parent)
-                .FirstOrDefault(node => span.Contains(node.Token.Characters));
-        }
-
-        internal TResult LocateByPosition(int offset) => Cache.LocateByPosition[offset];
 
 
         public ITokenClass TokenClass => Binary.FlatItem.TokenClass;
@@ -90,7 +60,40 @@ namespace Reni.Helper
 
         internal BinaryTree FlatItem => Binary.FlatItem;
 
+        [DisableDump]
+        internal IEnumerable<TResult> ParserLevelBelongings => this.CachedValue(GetParserLevelBelongings);
+
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
+
+        TResult LocateByPositionForCache(int current)
+        {
+            var nodes = this
+                .GetNodesFromLeftToRight(node => node.Binary)
+                .ToArray();
+            var ranges = nodes
+                .Select(node => node.Token.Characters)
+                .ToArray();
+
+            return (TResult)nodes
+                .Top(node => node.Token.Characters.EndPosition > current)
+                .AssertNotNull();
+        }
+
+        internal TResult Locate(SourcePart span)
+        {
+            var locateByPosition = LocateByPosition(span.Position);
+
+            var sourcePositions = locateByPosition
+                .Chain(node => node.Binary.Parent)
+                .Select(node => node.Token.Characters)
+                .ToArray();
+
+            return locateByPosition
+                .Chain(node => node.Binary.Parent)
+                .FirstOrDefault(node => span.Contains(node.Token.Characters));
+        }
+
+        internal TResult LocateByPosition(int offset) => Cache.LocateByPosition[offset];
 
         BinaryView<TResult> GetBinary(BinaryTree flatItem, TResult parent)
         {
@@ -101,15 +104,22 @@ namespace Reni.Helper
         }
 
         protected abstract TResult Create(BinaryTree flatItem);
+        protected abstract TResult Create(Syntax flatItem, int index);
 
         SyntaxView<TResult> GetSyntax(Func<Syntax> getFlatSyntax, TResult parent)
         {
+            var flatItem = getFlatSyntax?.Invoke();
+            Tracer.Assert(flatItem != null);
+
+            var directChildren = flatItem.DirectChildren.Select(Create).ToArray();
+
+            var result = new SyntaxView<TResult>(flatItem, directChildren, parent, (TResult)this);
+
+            var b = Binary;
+
             NotImplementedMethod("getFlatSyntax", parent);
             return default;
         }
-
-        [DisableDump]
-        internal IEnumerable<TResult> ParserLevelBelongings => this.CachedValue(GetParserLevelBelongings);
 
         IEnumerable<TResult> GetParserLevelBelongings()
         {
@@ -144,6 +154,5 @@ namespace Reni.Helper
             foreach(var node in parents.Concat(children))
                 yield return node;
         }
-
     }
 }

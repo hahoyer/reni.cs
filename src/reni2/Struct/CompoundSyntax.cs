@@ -29,8 +29,8 @@ namespace Reni.Struct
         internal readonly StatementSyntax[] Statements;
 
         internal CompoundSyntax
-            (StatementSyntax[] statements, BinaryTree bracketTarget = null, ValueSyntax cleanupSection = null)
-            : base(NextObjectId++, bracketTarget)
+            (StatementSyntax[] statements, BinaryTree anchor, ValueSyntax cleanupSection = null)
+            : base(NextObjectId++, anchor)
         {
             Statements = statements;
             CleanupSection = cleanupSection;
@@ -45,16 +45,16 @@ namespace Reni.Struct
         [DisableDump]
         public IEnumerable<FunctionSyntax> ConverterFunctions
             => Statements
-                .Where(data => data.IsConverterSyntax)
-                .Select(data => (FunctionSyntax)data.Value);
+                .Where(data => data.Content.Declarer.IsConverterSyntax)
+                .Select(data => (FunctionSyntax)data.Content.Value);
 
         [DisableDump]
-        internal ValueSyntax[] PureStatements => Statements.Select(s => s.Value).ToArray();
+        internal ValueSyntax[] PureStatements => Statements.Select(s => s.Content.Value).ToArray();
 
         [EnableDump]
         internal IDictionary<string, int> NameIndex
             => Statements
-                .Select((statement, index) => (Key: statement.NameOrNull, Value: index))
+                .Select((statement, index) => (Key: statement.Content.Declarer?.Name?.Value, Value: index))
                 .Where(pair => pair.Key != null)
                 .ToDictionary(item => item.Key, item => item.Value);
 
@@ -79,14 +79,14 @@ namespace Reni.Struct
 
         [DisableDump]
         internal string[] AllNames => Statements
-            .Select(s => s.NameOrNull)
+            .Select(s => s.Content.Declarer?.Name?.Value)
             .Where(name => name != null)
             .ToArray();
 
         [DisableDump]
         internal int[] ConverterStatementPositions
             => Statements
-                .SelectMany((s, i) => s.IsConverterSyntax? new[] {i} : new int[0])
+                .SelectMany((s, i) => s.Content.Declarer.IsConverterSyntax? new[] {i} : new int[0])
                 .ToArray();
 
 
@@ -117,7 +117,7 @@ namespace Reni.Struct
             return index == Statements.Length? CleanupSection : null;
         }
 
-        internal bool IsMutable(int position) => Statements[position].IsMutableSyntax;
+        internal bool IsMutable(int position) => Statements[position].Content.Declarer.IsMutableSyntax;
 
         internal int? Find(string name, bool publicOnly)
         {
@@ -125,16 +125,14 @@ namespace Reni.Struct
                 return null;
 
             return Statements
-                .Select((data, index) => data.IsDefining(name, publicOnly)? index : (int?)null)
+                .Select((data, index) => data.Content.Declarer.IsDefining(name, publicOnly)? index : (int?)null)
                 .FirstOrDefault(data => data != null);
         }
 
         internal override Result ResultForCache(ContextBase context, Category category)
         {
             var compound = context.Compound(this);
-            if(compound.HasIssue)
-                return Feature.Extension.Result(compound.Issues, category);
-            return compound.Result(category);
+            return compound.HasIssue? Feature.Extension.Result(compound.Issues, category) : compound.Result(category);
         }
 
         internal override ValueSyntax Visit(ISyntaxVisitor visitor)
@@ -169,7 +167,7 @@ namespace Reni.Struct
         {
             for(var index = 0; index < Statements.Length; index++)
             {
-                var declarer = Statements[index].Declarer;
+                var declarer = Statements[index].Content.Declarer;
                 if(declarer != null && selector(declarer))
                     yield return index;
             }
@@ -199,5 +197,11 @@ namespace Reni.Struct
             IsInContainerDump = isInDump;
             return result;
         }
+    }
+
+    interface IStatementSyntax
+    {
+        ValueSyntax Value { get; }
+        DeclarerSyntax Declarer { get; }
     }
 }

@@ -26,9 +26,9 @@ namespace Reni.TokenClasses
             ValueSyntax setter,
             bool isImplicit,
             bool isMetaFunction,
-            ValueSyntax getter, BinaryTree target
+            ValueSyntax getter, BinaryTree anchor
         )
-            : base(target)
+            : base(anchor)
         {
             Getter = getter;
             Setter = setter;

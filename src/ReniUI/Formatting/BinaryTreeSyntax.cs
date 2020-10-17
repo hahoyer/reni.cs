@@ -20,10 +20,10 @@ namespace ReniUI.Formatting
 
         readonly CacheContainer Cache = new CacheContainer();
 
-        internal Syntax(Reni.TokenClasses.BinaryTree flatItem, Func<Reni.Parser.Syntax> getFlatSyntax)
+        internal Syntax(BinaryTree flatItem, Func<Reni.Parser.Syntax> getFlatSyntax)
             : this(flatItem, null, getFlatSyntax) { }
 
-        Syntax(Reni.TokenClasses.BinaryTree flatItem, Syntax parent, Func<Reni.Parser.Syntax> getFlatSyntax)
+        Syntax(BinaryTree flatItem, Syntax parent, Func<Reni.Parser.Syntax> getFlatSyntax)
             : base(flatItem, parent, getFlatSyntax)
         {
             Tracer.Assert(Binary.FlatItem != null);
@@ -54,8 +54,14 @@ namespace ReniUI.Formatting
             where TContainer : class, IFormatResult<TValue>, new()
             => left == null? new TContainer() : left.FlatFormat<TContainer, TValue>(areEmptyLinesPossible);
 
-        protected override Syntax Create(Reni.TokenClasses.BinaryTree flatItem)
+        protected override Syntax Create(BinaryTree flatItem)
             => new Syntax(flatItem, this, null);
+
+        protected override Syntax Create(Reni.Parser.Syntax flatItem, int index)
+        {
+            NotImplementedMethod(flatItem, index);
+            return new Syntax(null, this, ()=>flatItem);
+        }
 
         SplitMaster GetSplitMaster()
         {

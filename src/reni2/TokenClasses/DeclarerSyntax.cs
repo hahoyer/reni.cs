@@ -11,8 +11,8 @@ namespace Reni.TokenClasses
         {
             internal readonly SyntaxFactory.IDeclarerToken Value;
 
-            internal TagSyntax(SyntaxFactory.IDeclarerToken value, BinaryTree target)
-                : base(target)
+            internal TagSyntax(SyntaxFactory.IDeclarerToken value, BinaryTree anchor)
+                : base(anchor)
                 => Value = value;
 
             [EnableDump]
@@ -27,8 +27,8 @@ namespace Reni.TokenClasses
         {
             internal readonly string Value;
 
-            internal NameSyntax([NotNull] BinaryTree target, [NotNull] string name)
-                : base(target)
+            internal NameSyntax([NotNull] BinaryTree anchor, [NotNull] string name)
+                : base(anchor)
                 => Value = name;
 
             [EnableDump]
@@ -46,14 +46,14 @@ namespace Reni.TokenClasses
         internal readonly TagSyntax[] Tags;
         readonly bool? MeansPublic;
 
-        DeclarerSyntax(TagSyntax[] tags, BinaryTree target, NameSyntax name, bool? meansPublic)
-            : base(target)
+        DeclarerSyntax(TagSyntax[] tags, BinaryTree anchor, NameSyntax name, bool? meansPublic)
+            : base(anchor)
         {
             Tags = tags;
             Name = name;
             MeansPublic = meansPublic;
 
-            Tracer.Assert(target == null);
+            Tracer.Assert(anchor == null);
             StopByObjectIds();
         }
 
@@ -115,5 +115,8 @@ namespace Reni.TokenClasses
             return new DeclarerSyntax(Tags.Concat(other.Tags).ToArray(), root, Name ?? other.Name
                 , MeansPublic ?? other.MeansPublic);
         }
+
+        public bool IsDefining(string name, bool publicOnly)
+            => name != null && Name?.Value == name && (!publicOnly || IsPublic);
     }
 }

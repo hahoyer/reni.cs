@@ -18,8 +18,8 @@ namespace Reni.Parser
     {
         internal abstract class NoChildren : Syntax
         {
-            protected NoChildren(BinaryTree target)
-                : base(target) { }
+            protected NoChildren(BinaryTree anchor)
+                : base(anchor) { }
 
             protected NoChildren(int objectId, BinaryTree target)
                 : base(objectId, target) { }
@@ -36,7 +36,7 @@ namespace Reni.Parser
 
         internal readonly BinaryTree Binary;
 
-        protected Syntax(BinaryTree target) => Binary = target;
+        protected Syntax(BinaryTree anchor) => Binary = anchor;
 
         protected Syntax(int objectId, BinaryTree target)
             : base(objectId)

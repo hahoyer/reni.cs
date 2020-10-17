@@ -22,8 +22,8 @@ namespace Reni
         [EnableDump]
         readonly ValueSyntax Else;
 
-        internal CondSyntax(ValueSyntax condSyntax, ValueSyntax thenSyntax, ValueSyntax elseSyntax, BinaryTree target)
-            : base(target)
+        internal CondSyntax(ValueSyntax condSyntax, ValueSyntax thenSyntax, ValueSyntax elseSyntax, BinaryTree anchor)
+            : base(anchor)
         {
             Cond = condSyntax;
             Then = thenSyntax;

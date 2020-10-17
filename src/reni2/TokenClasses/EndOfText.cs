@@ -11,7 +11,7 @@ namespace Reni.TokenClasses
             , ISyntaxScope
             , IBelongingsMatcher
             , IRightBracket
-            , SyntaxFactory.IDeclarationsToken
+            , SyntaxFactory.IStatementsToken
 
     {
         sealed class Matched : DumpableObject, IParserTokenType<BinaryTree>
@@ -37,7 +37,7 @@ namespace Reni.TokenClasses
 
         IParserTokenType<BinaryTree> IBracketMatch<BinaryTree>.Value { get; } = new Matched();
 
-        SyntaxFactory.IStatementsProvider SyntaxFactory.IDeclarationsToken.Provider => SyntaxFactory.Frame;
+        SyntaxFactory.IStatementsProvider SyntaxFactory.IStatementsToken.Provider => SyntaxFactory.Frame;
         bool IDefaultScopeProvider.MeansPublic => true;
 
         int IRightBracket.Level => -1;

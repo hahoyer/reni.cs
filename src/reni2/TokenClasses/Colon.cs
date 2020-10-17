@@ -5,13 +5,13 @@ using Reni.Parser;
 namespace Reni.TokenClasses
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class Colon : TokenClass, SyntaxFactory.IDeclarationsToken
+    sealed class Colon : TokenClass, SyntaxFactory.IDeclarationToken
     {
         public const string TokenId = ":";
 
         public override string Id => TokenId;
 
-        SyntaxFactory.IStatementsProvider SyntaxFactory.IDeclarationsToken.Provider => SyntaxFactory.Colon;
+        SyntaxFactory.IStatementProvider SyntaxFactory.IDeclarationToken.Provider => SyntaxFactory.Colon;
     }
 
     [BelongsTo(typeof(MainTokenFactory))]

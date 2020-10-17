@@ -17,33 +17,39 @@ namespace ReniUI.Helper
             => (Syntax.FlatItem as ValueSyntax)?.GetDeclarationOptions(context).ToArray();
 
         protected override Syntax Create(BinaryTree flatItem) => new Syntax(flatItem, this);
+
+        protected override Syntax Create(Reni.Parser.Syntax flatItem, int index)
+        {
+            NotImplementedMethod(flatItem, index);
+            return default;
+        }
     }
 
     abstract class ProxySyntax : Reni.Parser.Syntax.NoChildren
     {
         internal class ColonLevel : ProxySyntax
         {
-            public ColonLevel(Syntax client, BinaryTree target)
-                : base(client, target) { }
+            public ColonLevel(Syntax client, BinaryTree anchor)
+                : base(client, anchor) { }
         }
 
         internal class ListLevel : ProxySyntax
         {
-            public ListLevel(Syntax client, BinaryTree target)
-                : base(client, target) { }
+            public ListLevel(Syntax client, BinaryTree anchor)
+                : base(client, anchor) { }
         }
 
         internal class LeftBracketOfRightBracket : ProxySyntax
         {
-            public LeftBracketOfRightBracket(Syntax client, BinaryTree target)
-                : base(client, target) { }
+            public LeftBracketOfRightBracket(Syntax client, BinaryTree anchor)
+                : base(client, anchor) { }
         }
 
         [DisableDump]
         internal readonly Syntax Client;
 
-        ProxySyntax(Syntax client, BinaryTree target)
-            : base(target)
+        ProxySyntax(Syntax client, BinaryTree anchor)
+            : base(anchor)
             => Client = client;
     }
 }

@@ -333,6 +333,7 @@
     <Compile Include="TokenClasses\BraceMatchDumper.cs" />
     <Compile Include="TokenClasses\Cleanup.cs" />
     <Compile Include="TokenClasses\CompareOperation.cs" />
+    <Compile Include="TokenClasses\DeclarationSyntax.cs" />
     <Compile Include="TokenClasses\StatementSyntax.cs" />
     <Compile Include="TokenClasses\DeclarerSyntax.cs" />
     <Compile Include="TokenClasses\EndOfText.cs" />

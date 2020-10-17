@@ -18,6 +18,8 @@ namespace ReniUI.Formatting
             {
                 get
                 {
+                    var s = Target.Syntax;
+
                     Tracer.Assert(Target.Left != null);
                     Tracer.Assert(Target.Left.Left == null);
                     Tracer.Assert(Target.Left.TokenClass is BeginOfText);

@@ -1,26 +1,20 @@
 using hw.DebugFormatter;
 using Reni.Parser;
 using Reni.Struct;
-using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
-    class StatementSyntax : Syntax
+    sealed class StatementSyntax : Syntax
     {
         [EnableDumpExcept(null)]
-        internal readonly DeclarerSyntax Declarer;
+        internal readonly IStatementSyntax Content;
 
-        [EnableDumpExcept(null)]
-        internal readonly ValueSyntax Value;
-
-        StatementSyntax(DeclarerSyntax declarer, BinaryTree target, ValueSyntax value)
-            : base(target)
+        StatementSyntax(BinaryTree anchor, IStatementSyntax content)
+            : base(anchor)
         {
-            Tracer.ConditionalBreak(
-                value == null && (declarer == null || declarer.Tags == null && declarer.Name == null)
-            );
-            Declarer = declarer;
-            Value = value;
+            Content = content;
+            
+            AssertValid();
         }
 
         [EnableDump]
@@ -28,36 +22,17 @@ namespace Reni.TokenClasses
         string Position => Binary?.Token.Characters.GetDumpAroundCurrent(5);
 
         [DisableDump]
-        internal string NameOrNull => Declarer?.Name?.Value;
+        internal override int LeftDirectChildCount => 0;
 
         [DisableDump]
-        internal bool IsConverterSyntax => Declarer?.IsConverterSyntax ?? false;
-
-        [DisableDump]
-        internal bool IsMutableSyntax => Declarer?.IsMutableSyntax ?? false;
-
-        [DisableDump]
-        internal override int LeftDirectChildCount => 1;
-
-        [DisableDump]
-        protected override int DirectChildCount => 2;
+        protected override int DirectChildCount => 1;
 
         protected override Syntax GetDirectChild(int index)
             => index switch
             {
-                0 => Declarer
-                , 1 => Value
+                0 =>(Syntax) Content
                 , _ => null
             };
-
-        internal override Result<ValueSyntax> ToValueSyntax()
-            => new CompoundSyntax(T(this));
-
-        protected override Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree target)
-            => new CompoundSyntax(T(this));
-
-        internal bool IsDefining(string name, bool publicOnly)
-            => name != null && NameOrNull == name && (!publicOnly || Declarer.IsPublic);
 
         internal StatementSyntax Visit(ISyntaxVisitor visitor)
         {
@@ -65,20 +40,7 @@ namespace Reni.TokenClasses
             return default;
         }
 
-        internal static Result<StatementSyntax[]> Create(DeclarerSyntax declarer, BinaryTree target, ValueSyntax value)
-        {
-            var issue = (Issue)null;
-            if(value == null)
-            {
-                issue = IssueId.MissingRightExpression.Issue(target.Token.Characters);
-                value = new EmptyList(null);
-            }
-
-            var result = new Result<StatementSyntax[]>(T(new StatementSyntax(declarer, target, value)));
-            if(issue != null)
-                result = result.With(issue);
-
-            return result;
-        }
+        public static Result<StatementSyntax[]> Create(BinaryTree target, IStatementSyntax statement) 
+            => T(new StatementSyntax(target, statement));
     }
 }

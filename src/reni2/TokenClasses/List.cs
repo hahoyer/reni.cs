@@ -8,7 +8,7 @@ namespace Reni.TokenClasses
     [Variant(0)]
     [Variant(1)]
     [Variant(2)]
-    sealed class List : TokenClass, IBelongingsMatcher, SyntaxFactory.IDeclarationsToken
+    sealed class List : TokenClass, IBelongingsMatcher, SyntaxFactory.IStatementsToken
     {
         [DisableDump]
         internal readonly int Level;
@@ -20,7 +20,7 @@ namespace Reni.TokenClasses
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => otherMatcher == this;
 
-        SyntaxFactory.IStatementsProvider SyntaxFactory.IDeclarationsToken.Provider => SyntaxFactory.List;
+        SyntaxFactory.IStatementsProvider SyntaxFactory.IStatementsToken.Provider => SyntaxFactory.List;
         public static string TokenId(int level) => ",;.".Substring(level, 1);
     }
 }

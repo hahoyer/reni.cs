@@ -13,12 +13,12 @@ namespace Reni.Parser
     /// <summary>
     ///     Static syntax items that represent a value
     /// </summary>
-    abstract class ValueSyntax : Syntax
+    abstract class ValueSyntax : Syntax, IStatementSyntax
     {
         internal new abstract class NoChildren : ValueSyntax
         {
-            protected NoChildren(BinaryTree target)
-                : base(target) { }
+            protected NoChildren(BinaryTree anchor)
+                : base(anchor) { }
 
             protected NoChildren(int objectId, BinaryTree target)
                 : base(objectId, target) { }
@@ -39,8 +39,8 @@ namespace Reni.Parser
         internal readonly FunctionCache<ContextBase, ResultCache> ResultCache =
             new FunctionCache<ContextBase, ResultCache>();
 
-        protected ValueSyntax(BinaryTree target)
-            : base(target) { }
+        protected ValueSyntax(BinaryTree anchor)
+            : base(anchor) { }
 
         protected ValueSyntax(int objectId, BinaryTree target)
             : base(objectId, target) { }
@@ -53,6 +53,13 @@ namespace Reni.Parser
 
         [DisableDump]
         internal virtual IRecursionHandler RecursionHandler => null;
+
+        DeclarerSyntax IStatementSyntax.Declarer => null;
+
+        internal override Result<StatementSyntax[]> ToStatementsSyntax(BinaryTree target = null) 
+            => StatementSyntax.Create(target, this);
+
+        ValueSyntax IStatementSyntax.Value => this;
 
         //[DebuggerHidden]
         internal virtual Result ResultForCache(ContextBase context, Category category)
@@ -96,13 +103,6 @@ namespace Reni.Parser
 
         internal IEnumerable<string> GetDeclarationOptions(ContextBase context)
             => Type(context).DeclarationOptions;
-
-        protected override Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree target = null)
-            => StatementSyntax.Create(null, target, this)
-                .Apply(value=> new CompoundSyntax(value));
-
-        internal override Result<StatementSyntax[]> ToStatementsSyntax(BinaryTree target = null) 
-            => StatementSyntax.Create(null, target, this);
 
     }
 }
