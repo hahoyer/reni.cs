@@ -20,8 +20,8 @@ namespace Reni.Parser
             protected NoChildren(BinaryTree anchor)
                 : base(anchor) { }
 
-            protected NoChildren(int objectId, BinaryTree target)
-                : base(objectId, target) { }
+            protected NoChildren(int objectId, BinaryTree anchor)
+                : base(objectId, anchor) { }
 
             [DisableDump]
             internal sealed override int LeftDirectChildCount => 0;
@@ -42,8 +42,8 @@ namespace Reni.Parser
         protected ValueSyntax(BinaryTree anchor)
             : base(anchor) { }
 
-        protected ValueSyntax(int objectId, BinaryTree target)
-            : base(objectId, target) { }
+        protected ValueSyntax(int objectId, BinaryTree anchor)
+            : base(objectId, anchor) { }
 
         [DisableDump]
         internal virtual bool IsLambda => false;

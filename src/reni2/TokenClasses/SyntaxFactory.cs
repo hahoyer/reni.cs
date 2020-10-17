@@ -43,7 +43,8 @@ namespace Reni.TokenClasses
 
         internal interface IValueProvider
         {
-            Result<ValueSyntax> Get(BinaryTree target, SyntaxFactory factory);
+            Result<ValueSyntax> Get
+                (BinaryTree anchor, BinaryTree target, BinaryTree rightAnchor, SyntaxFactory factory);
         }
 
         internal interface IValueToken
@@ -53,10 +54,11 @@ namespace Reni.TokenClasses
 
         class BracketHandler : DumpableObject, IValueProvider
         {
-            Result<ValueSyntax> IValueProvider.Get(BinaryTree target, SyntaxFactory factory)
+            Result<ValueSyntax> IValueProvider.Get
+                (BinaryTree anchor, BinaryTree target, BinaryTree rightAnchor, SyntaxFactory factory)
                 => target
                     .GetBracketKernel()
-                    .Apply(tree => factory.GetValueSyntax(tree, target, () => EmptyListIfNull(target)));
+                    .Apply(kernel => factory.GetValueSyntax(kernel, anchor: target.Left, rightAnchor: target, onNull: () => EmptyListIfNull(target)));
         }
 
         class FrameHandler : DumpableObject, IStatementsProvider
@@ -97,15 +99,16 @@ namespace Reni.TokenClasses
 
         class CleanupHandler : DumpableObject, IValueProvider
         {
-            Result<ValueSyntax> IValueProvider.Get(BinaryTree target, SyntaxFactory factory)
+            Result<ValueSyntax> IValueProvider.Get
+                (BinaryTree anchor, BinaryTree target, BinaryTree rightAnchor, SyntaxFactory factory)
                 =>
                     (
-                        factory.GetStatementsSyntax(target, target.Left),
+                        factory.GetStatementsSyntax(anchor, target.Left),
                         factory.GetValueSyntax(target.Right)
                     )
                     .Apply
                     ((statements, cleanup)
-                        => (ValueSyntax)new CompoundSyntax(statements, target, cleanup)
+                        => (ValueSyntax)new CompoundSyntax(statements, new CleanupSyntax(target, cleanup), rightAnchor)
                     );
         }
 
@@ -133,7 +136,8 @@ namespace Reni.TokenClasses
                 return factory.ToDeclarer(factory.GetDeclarerSyntax(target.Left), target, target.Token.Characters.Id);
             }
 
-            Result<ValueSyntax> IValueProvider.Get(BinaryTree target, SyntaxFactory factory)
+            Result<ValueSyntax> IValueProvider.Get
+                (BinaryTree anchor, BinaryTree target, BinaryTree rightAnchor, SyntaxFactory factory)
                 => Result<ValueSyntax>.From(factory.GetExpressionSyntax(target));
         }
 
@@ -148,7 +152,8 @@ namespace Reni.TokenClasses
                 HasRight = hasRight;
             }
 
-            Result<ValueSyntax> IValueProvider.Get(BinaryTree target, SyntaxFactory factory)
+            Result<ValueSyntax> IValueProvider.Get
+                (BinaryTree anchor, BinaryTree target, BinaryTree rightAnchor, SyntaxFactory factory)
             {
                 if(HasLeft != null)
                     Tracer.Assert(target.Left == null != HasLeft);
@@ -161,7 +166,8 @@ namespace Reni.TokenClasses
 
         class FunctionHandler : DumpableObject, IValueProvider
         {
-            Result<ValueSyntax> IValueProvider.Get(BinaryTree target, SyntaxFactory factory)
+            Result<ValueSyntax> IValueProvider.Get
+                (BinaryTree anchor, BinaryTree target, BinaryTree rightAnchor, SyntaxFactory factory)
             {
                 var token = (Function)target.TokenClass;
                 return (
@@ -183,7 +189,8 @@ namespace Reni.TokenClasses
 
         class MatchedBracketHandler : DumpableObject, IValueProvider
         {
-            Result<ValueSyntax> IValueProvider.Get(BinaryTree target, SyntaxFactory factory)
+            Result<ValueSyntax> IValueProvider.Get
+                (BinaryTree anchor, BinaryTree target, BinaryTree rightAnchor, SyntaxFactory factory)
                 => (
                         factory.GetValueSyntax(target.Left),
                         factory.GetValueSyntax(target.Right)
@@ -194,7 +201,8 @@ namespace Reni.TokenClasses
 
         class ThenHandler : DumpableObject, IValueProvider
         {
-            Result<ValueSyntax> IValueProvider.Get(BinaryTree target, SyntaxFactory factory)
+            Result<ValueSyntax> IValueProvider.Get
+                (BinaryTree anchor, BinaryTree target, BinaryTree rightAnchor, SyntaxFactory factory)
                 => (
                         factory.GetValueSyntax(target.Left),
                         factory.GetValueSyntax(target.Right)
@@ -205,7 +213,8 @@ namespace Reni.TokenClasses
 
         class ElseHandler : DumpableObject, IValueProvider
         {
-            Result<ValueSyntax> IValueProvider.Get(BinaryTree target, SyntaxFactory factory)
+            Result<ValueSyntax> IValueProvider.Get
+                (BinaryTree anchor, BinaryTree target, BinaryTree rightAnchor, SyntaxFactory factory)
                 => (
                         factory.GetValueSyntax(target.Left?.Left),
                         factory.GetValueSyntax(target.Left?.Right),
@@ -280,24 +289,23 @@ namespace Reni.TokenClasses
             if(target == null)
                 return new StatementSyntax[0];
 
-            return GetSyntax(
-                target, anchor,
-                node => node.ToStatementsSyntax(),
-                node => StatementSyntax.Create(anchor, node),
-                node => node);
+            return GetSyntax(anchor,
+                target, null, node => node.ToStatementsSyntax(anchor), node => StatementSyntax.Create(anchor, node)
+                , node => node);
         }
 
         internal Result<ValueSyntax> GetValueSyntax
-            (BinaryTree target, BinaryTree parent = null, Func<Result<ValueSyntax>> onNull = null)
+            (BinaryTree target, bool _ = false, BinaryTree anchor= null , BinaryTree rightAnchor = null, Func<Result<ValueSyntax>> onNull = null)
         {
             if(target == null)
                 return onNull?.Invoke();
 
             return GetSyntax(
-                target,
-                parent,
-                value => new Result<ValueSyntax>(value), ToValue,
-                list => (ValueSyntax)new CompoundSyntax(list, parent));
+                anchor,
+                target, 
+                rightAnchor, 
+                value => new Result<ValueSyntax>(value), ToValue
+                , list => (ValueSyntax)new CompoundSyntax(list, null, rightAnchor));
         }
 
         Result<ValueSyntax> ToValue(IStatementSyntax target)
@@ -309,8 +317,9 @@ namespace Reni.TokenClasses
 
         Result<TResult> GetSyntax<TResult>
         (
-            BinaryTree target
-            , BinaryTree anchor
+            BinaryTree anchor
+            , BinaryTree target
+            , BinaryTree rightAnchor
             , Func<ValueSyntax, Result<TResult>> fromValueSyntax
             , Func<IStatementSyntax, Result<TResult>> fromDeclarationSyntax
             , Func<StatementSyntax[], TResult> fromStatementsSyntax
@@ -325,7 +334,7 @@ namespace Reni.TokenClasses
             Tracer.Assert(T((object)valueToken, statementsToken, declarationToken).Count(n => n != null) <= 1);
 
             if(valueToken != null)
-                return valueToken.Provider.Get(target, factory)
+                return valueToken.Provider.Get(anchor, target, rightAnchor, factory)
                     .Apply(fromValueSyntax);
 
             if(declarationToken != null)

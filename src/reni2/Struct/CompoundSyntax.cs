@@ -23,14 +23,13 @@ namespace Reni.Struct
         static int NextObjectId;
 
         [EnableDump]
-        internal readonly ValueSyntax CleanupSection;
+        internal readonly CleanupSyntax CleanupSection;
 
         [EnableDump]
         internal readonly StatementSyntax[] Statements;
 
-        internal CompoundSyntax
-            (StatementSyntax[] statements, BinaryTree anchor, ValueSyntax cleanupSection = null)
-            : base(NextObjectId++, anchor)
+        internal CompoundSyntax(StatementSyntax[] statements, CleanupSyntax cleanupSection, BinaryTree rightAnchor)
+            : base(NextObjectId++, rightAnchor)
         {
             Statements = statements;
             CleanupSection = cleanupSection;
@@ -91,7 +90,7 @@ namespace Reni.Struct
 
 
         [DisableDump]
-        internal override int LeftDirectChildCount => Statements.Length;
+        internal override int LeftDirectChildCount => DirectChildCount;
 
         [DisableDump]
         protected override int DirectChildCount => Statements.Length + 1;
@@ -138,7 +137,7 @@ namespace Reni.Struct
         internal override ValueSyntax Visit(ISyntaxVisitor visitor)
         {
             var statements = Statements.Select(s => s.Visit(visitor)).ToArray();
-            var cleanupSection = CleanupSection?.Visit(visitor);
+            var cleanupSection = CleanupSection?.Value.Visit(visitor);
 
             if(statements.All(s => s == null) && cleanupSection == null)
                 return null;
@@ -146,8 +145,13 @@ namespace Reni.Struct
             var newStatements = statements
                 .Select((s, i) => s ?? Statements[i])
                 .ToArray();
-            var newCleanupSection = cleanupSection ?? CleanupSection;
-            return new CompoundSyntax(newStatements, Binary, newCleanupSection);
+
+            var newCleanupSection 
+                = cleanupSection == null
+                    ? CleanupSection 
+                    : new CleanupSyntax(CleanupSection.Binary, cleanupSection);
+
+            return new CompoundSyntax(newStatements, newCleanupSection, Binary);
         }
 
         protected override Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree listTarget = null) => this;
@@ -156,7 +160,7 @@ namespace Reni.Struct
         {
             if(CleanupSection != null && (category.HasCode || category.HasClosures))
                 return context
-                    .Result(category.WithType, CleanupSection)
+                    .Result(category.WithType, CleanupSection.Value)
                     .Conversion(context.RootContext.VoidType)
                     .LocalBlock(category) & category;
 

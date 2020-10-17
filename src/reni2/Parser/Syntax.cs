@@ -14,15 +14,15 @@ namespace Reni.Parser
     /// <summary>
     ///     Static syntax items
     /// </summary>
-    abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, Feature.ISourceProvider
+    abstract class  Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, Feature.ISourceProvider
     {
         internal abstract class NoChildren : Syntax
         {
             protected NoChildren(BinaryTree anchor)
                 : base(anchor) { }
 
-            protected NoChildren(int objectId, BinaryTree target)
-                : base(objectId, target) { }
+            protected NoChildren(int objectId, BinaryTree anchor)
+                : base(objectId, anchor) { }
 
             [DisableDump]
             internal sealed override int LeftDirectChildCount => 0;
@@ -38,9 +38,9 @@ namespace Reni.Parser
 
         protected Syntax(BinaryTree anchor) => Binary = anchor;
 
-        protected Syntax(int objectId, BinaryTree target)
+        protected Syntax(int objectId, BinaryTree anchor)
             : base(objectId)
-            => Binary = target;
+            => Binary = anchor;
 
         [DisableDump]
         internal abstract int LeftDirectChildCount { get; }

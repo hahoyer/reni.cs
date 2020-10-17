@@ -8,7 +8,7 @@ namespace Reni.Parser
     {
         public EmptyList(BinaryTree anchor)
             : base(anchor)
-            => StopByObjectIds(220);
+            => StopByObjectIds();
 
         protected override string GetNodeDump() => "()";
 

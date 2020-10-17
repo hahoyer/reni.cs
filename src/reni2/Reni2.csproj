@@ -306,6 +306,7 @@
     <Compile Include="Numeric\Star.cs" />
     <Compile Include="Singleton.cs" />
     <Compile Include="StringStream.cs" />
+    <Compile Include="Struct\CleanupSyntax.cs" />
     <Compile Include="Struct\Compound.cs" />
     <Compile Include="Struct\CompoundContext.cs" />
     <Compile Include="Struct\FunctionBodyType.cs" />

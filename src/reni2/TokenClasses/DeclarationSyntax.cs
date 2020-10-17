@@ -16,6 +16,7 @@ namespace Reni.TokenClasses
         DeclarationSyntax(DeclarerSyntax declarer, BinaryTree anchor, ValueSyntax value)
             : base(anchor)
         {
+            Tracer.Assert(anchor != null);
             Tracer.ConditionalBreak(
                 value == null && (declarer == null || declarer.Tags == null && declarer.Name == null)
             );

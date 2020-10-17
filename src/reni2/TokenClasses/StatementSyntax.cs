@@ -13,6 +13,7 @@ namespace Reni.TokenClasses
             : base(anchor)
         {
             Content = content;
+            Tracer.Assert(anchor != null);
 
             AssertValid();
         }
