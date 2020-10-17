@@ -121,7 +121,7 @@ namespace Reni.Parser
             {
                 var last= nodesInSyntax[index-1].Token.Characters;
                 var current= nodesInSyntax[index].Token.Characters;
-                Tracer.Assert(last.Position < current.Position);
+                Tracer.Assert(last < current);
             }
 
             if(level.IsCorrectMapping)
