@@ -41,7 +41,7 @@ namespace Reni.TokenClasses
             return default;
         }
 
-        internal static Result<StatementSyntax[]> Create(BinaryTree target, IStatementSyntax statement)
+        internal static StatementSyntax[] Create(BinaryTree target, IStatementSyntax statement)
             => T(new StatementSyntax(target, statement));
 
         internal bool IsDefining(string name, bool publicOnly) => Content.Declarer?.IsDefining(name, publicOnly) ?? false;

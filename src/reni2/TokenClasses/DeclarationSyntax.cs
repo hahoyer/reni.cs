@@ -43,9 +43,12 @@ namespace Reni.TokenClasses
         [DisableDump]
         protected override int DirectChildCount => 2;
 
+        [DisableDump]
         DeclarerSyntax IStatementSyntax.Declarer => Declarer;
-
+        [DisableDump]
         ValueSyntax IStatementSyntax.Value => Value;
+
+        ValueSyntax IStatementSyntax.ToValueSyntax(BinaryTree leftAnchor, BinaryTree rightAnchor) => new CompoundSyntax(StatementSyntax.Create(leftAnchor, this), null, rightAnchor);
 
         protected override Syntax GetDirectChild(int index)
             => index switch
@@ -60,7 +63,7 @@ namespace Reni.TokenClasses
             var issue = (Issue)null;
             if(value == null)
             {
-                issue = IssueId.MissingRightExpression.Issue(target.Token.Characters);
+                issue = IssueId.MissingDeclarationValue.Issue(target.Token.Characters);
                 value = new EmptyList(null);
             }
 

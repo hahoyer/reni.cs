@@ -207,5 +207,6 @@ namespace Reni.Struct
     {
         ValueSyntax Value { get; }
         DeclarerSyntax Declarer { get; }
+        ValueSyntax ToValueSyntax(BinaryTree anchor, BinaryTree rightAnchor);
     }
 }

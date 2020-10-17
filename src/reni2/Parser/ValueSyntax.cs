@@ -56,6 +56,8 @@ namespace Reni.Parser
 
         DeclarerSyntax IStatementSyntax.Declarer => null;
 
+        ValueSyntax IStatementSyntax.ToValueSyntax(BinaryTree binaryTree, BinaryTree rightAnchor) => this;
+
         internal override Result<StatementSyntax[]> ToStatementsSyntax(BinaryTree target = null) 
             => StatementSyntax.Create(target, this);
 
