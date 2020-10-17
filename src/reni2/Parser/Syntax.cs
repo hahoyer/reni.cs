@@ -21,9 +21,6 @@ namespace Reni.Parser
             protected NoChildren(BinaryTree anchor)
                 : base(anchor) { }
 
-            protected NoChildren(int objectId, BinaryTree anchor)
-                : base(objectId, anchor) { }
-
             [DisableDump]
             internal sealed override int LeftDirectChildCount => 0;
 
@@ -91,6 +88,7 @@ namespace Reni.Parser
 
         internal IEnumerable<Syntax> ItemsAsLongAs(Func<Syntax, bool> condition)
             => this.GetNodesFromLeftToRight().SelectMany(node => node.CheckedItemsAsLongAs(condition));
+
 
         internal class Level
         {
