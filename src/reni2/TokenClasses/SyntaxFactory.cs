@@ -33,7 +33,7 @@ namespace Reni.TokenClasses
 
         internal interface IStatementsProvider
         {
-            Result<StatementSyntax[]> Get(BinaryTree target, SyntaxFactory factory);
+            Result<StatementSyntax[]> Get(BinaryTree anchor, BinaryTree target, SyntaxFactory factory);
         }
 
         internal interface IStatementProvider
@@ -61,18 +61,23 @@ namespace Reni.TokenClasses
 
         class FrameHandler : DumpableObject, IStatementsProvider
         {
-            Result<StatementSyntax[]> IStatementsProvider.Get(BinaryTree target, SyntaxFactory factory)
-                => target
+            Result<StatementSyntax[]> IStatementsProvider.Get
+                (BinaryTree anchor, BinaryTree target, SyntaxFactory factory)
+            {
+                Tracer.Assert(anchor == null);
+                return target
                     .GetBracketKernel()
-                    .Apply(tree => factory.GetStatementsSyntax(tree, target.Left));
+                    .Apply(kernel => factory.GetStatementsSyntax(target.Left, kernel));
+            }
         }
 
         class ListHandler : DumpableObject, IStatementsProvider
         {
-            Result<StatementSyntax[]> IStatementsProvider.Get(BinaryTree target, SyntaxFactory factory)
+            Result<StatementSyntax[]> IStatementsProvider.Get
+                (BinaryTree anchor, BinaryTree target, SyntaxFactory factory)
                 => (
-                        factory.GetStatementsSyntax(target.Left, target),
-                        factory.GetStatementsSyntax(target.Right, target)
+                        factory.GetStatementsSyntax(anchor, target.Left),
+                        factory.GetStatementsSyntax(target, target.Right)
                     )
                     .Apply((left, right) => left.Concat(right).ToArray());
         }
@@ -95,7 +100,7 @@ namespace Reni.TokenClasses
             Result<ValueSyntax> IValueProvider.Get(BinaryTree target, SyntaxFactory factory)
                 =>
                     (
-                        factory.GetStatementsSyntax(target.Left, target),
+                        factory.GetStatementsSyntax(target, target.Left),
                         factory.GetValueSyntax(target.Right)
                     )
                     .Apply
@@ -270,7 +275,7 @@ namespace Reni.TokenClasses
             return default;
         }
 
-        Result<StatementSyntax[]> GetStatementsSyntax(BinaryTree target, BinaryTree anchor)
+        Result<StatementSyntax[]> GetStatementsSyntax(BinaryTree anchor, BinaryTree target)
         {
             if(target == null)
                 return new StatementSyntax[0];
@@ -328,7 +333,7 @@ namespace Reni.TokenClasses
                     .Apply(fromDeclarationSyntax);
 
             if(statementsToken != null)
-                return statementsToken.Provider.Get(target, factory)
+                return statementsToken.Provider.Get(anchor, target, factory)
                     .Apply(fromStatementsSyntax);
 
             return fromValueSyntax(new EmptyList(target))
