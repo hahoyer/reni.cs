@@ -52,7 +52,7 @@ complex FromReal(2) dump_print;
                 var textFragment = text.Substring(0, i);
                 var compiler = Compiler.FromText(text: textFragment);
                 var syntax = compiler.Syntax;
-                var span = syntax.Binary.SourcePart;
+                var span = syntax.Anchor.SourcePart;
                 Tracer.Assert(span.Id == textFragment, () => span.NodeDump);
             }
         }

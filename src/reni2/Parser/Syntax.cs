@@ -34,13 +34,13 @@ namespace Reni.Parser
                 => throw new Exception($"Unexpected call: {nameof(GetDirectChild)}({index})");
         }
 
-        internal readonly BinaryTree Binary;
+        internal readonly BinaryTree Anchor;
 
-        protected Syntax(BinaryTree anchor) => Binary = anchor;
+        protected Syntax(BinaryTree anchor) => Anchor = anchor;
 
         protected Syntax(int objectId, BinaryTree anchor)
             : base(objectId)
-            => Binary = anchor;
+            => Anchor = anchor;
 
         [DisableDump]
         internal abstract int LeftDirectChildCount { get; }
@@ -106,13 +106,13 @@ namespace Reni.Parser
             foreach(var node in DirectChildren.Where(node=>node != this))
                 node?.AssertValid(null);
 
-            target ??= Binary;
+            target ??= Anchor;
             if(target == null)
                 return;
 
             var nodesInSyntax = this
                 .GetNodesFromLeftToRight()
-                .Select(node => node?.Binary)
+                .Select(node => node?.Anchor)
                 .Where(node => node != null)
                 .ToArray();
             
@@ -149,6 +149,6 @@ namespace Reni.Parser
 
         SourcePart Feature.ISourceProvider.Value => SourcePart;
 
-        SourcePart SourcePart => Binary?.SourcePart;
+        SourcePart SourcePart => Anchor?.SourcePart;
     }
 }

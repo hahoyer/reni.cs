@@ -26,7 +26,7 @@ namespace Reni.TokenClasses
 
         [EnableDump]
         [EnableDumpExcept(null)]
-        string Position => Binary?.Token.Characters.GetDumpAroundCurrent(5);
+        string Position => Anchor?.Token.Characters.GetDumpAroundCurrent(5);
 
         [DisableDump]
         internal string NameOrNull => Declarer?.Name?.Value;

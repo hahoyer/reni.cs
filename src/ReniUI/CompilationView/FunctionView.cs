@@ -9,7 +9,7 @@ namespace ReniUI.CompilationView
             : base(master, "Function: " + item.NodeDump)
         {
             Client = item.CreateView(Master);
-            SourcePart = item.Body.Binary.SourcePart;
+            SourcePart = item.Body.Anchor.SourcePart;
         }
 
         protected override SourcePart SourcePart {get;}

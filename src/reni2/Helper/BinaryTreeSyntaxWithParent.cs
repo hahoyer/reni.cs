@@ -62,8 +62,8 @@ namespace Reni.Helper
         {
             var result = Parent
                 .FlatSyntax
-                .GetNodesFromTopToBottom(node => node?.Binary != null)
-                .SingleOrDefault(node => node.Binary == FlatItem);
+                .GetNodesFromTopToBottom(node => node?.Anchor != null)
+                .SingleOrDefault(node => node.Anchor == FlatItem);
 
             if(result != null)
                 return result;

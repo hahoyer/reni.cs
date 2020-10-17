@@ -39,7 +39,7 @@ namespace Reni.Struct
 
         [EnableDump]
         [EnableDumpExcept(null)]
-        string Position => Binary?.Token.Characters.GetDumpAroundCurrent(5);
+        string Position => Anchor?.Token.Characters.GetDumpAroundCurrent(5);
 
         [DisableDump]
         public IEnumerable<FunctionSyntax> ConverterFunctions
@@ -149,9 +149,9 @@ namespace Reni.Struct
             var newCleanupSection 
                 = cleanupSection == null
                     ? CleanupSection 
-                    : new CleanupSyntax(CleanupSection.Binary, cleanupSection);
+                    : new CleanupSyntax(CleanupSection.Anchor, cleanupSection);
 
-            return new CompoundSyntax(newStatements, newCleanupSection, Binary);
+            return new CompoundSyntax(newStatements, newCleanupSection, Anchor);
         }
 
         protected override Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree listTarget = null) => this;

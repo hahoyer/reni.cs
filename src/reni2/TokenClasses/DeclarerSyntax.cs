@@ -17,7 +17,7 @@ namespace Reni.TokenClasses
 
             [EnableDump]
             [EnableDumpExcept(null)]
-            string Position => Binary?.Token.Characters.GetDumpAroundCurrent(5);
+            string Position => Anchor?.Token.Characters.GetDumpAroundCurrent(5);
 
             internal override void AssertValid(Level level, BinaryTree target = null)
                 => base.AssertValid(level == null? null : new Level {IsCorrectOrder = level.IsCorrectOrder}, target);
@@ -33,7 +33,7 @@ namespace Reni.TokenClasses
 
             [EnableDump]
             [EnableDumpExcept(null)]
-            string Position => Binary?.Token.Characters.GetDumpAroundCurrent(5);
+            string Position => Anchor?.Token.Characters.GetDumpAroundCurrent(5);
 
             internal override void AssertValid(Level level, BinaryTree target = null)
                 => base.AssertValid(level == null? null : new Level {IsCorrectOrder = level.IsCorrectOrder}, target);
@@ -88,7 +88,7 @@ namespace Reni.TokenClasses
 
         [EnableDump]
         [EnableDumpExcept(null)]
-        string Position => Binary?.Token.Characters.GetDumpAroundCurrent(5);
+        string Position => Anchor?.Token.Characters.GetDumpAroundCurrent(5);
 
         internal override void AssertValid(Level level, BinaryTree target = null)
             => base.AssertValid(level == null? null : new Level {IsCorrectOrder = level.IsCorrectOrder}, target);

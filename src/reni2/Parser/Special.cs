@@ -25,7 +25,7 @@ namespace Reni.Parser
 
         internal string Id => Token.Id;
 
-        internal SourcePart Token => Binary.Token.Characters;
+        internal SourcePart Token => Anchor.Token.Characters;
 
         [DisableDump]
         internal long ToNumber => BitsConst.Convert(Id).ToInt64();
@@ -53,7 +53,7 @@ namespace Reni.Parser
 
         [EnableDump]
         [EnableDumpExcept(null)]
-        string Position => Binary?.Token.Characters.GetDumpAroundCurrent(5);
+        string Position => Anchor?.Token.Characters.GetDumpAroundCurrent(5);
 
         internal override int LeftDirectChildCount => 0;
         protected override int DirectChildCount => 1;
@@ -64,7 +64,7 @@ namespace Reni.Parser
             => new PrefixSyntax(prefix, right.Target, binaryTree).AddIssues<ValueSyntax>(right.Issues);
 
         internal override Result ResultForCache(ContextBase context, Category category) => Prefix
-            .Result(context, category, Right, Binary);
+            .Result(context, category, Right, Anchor);
     }
 
     sealed class InfixSyntax : ValueSyntax
@@ -89,7 +89,7 @@ namespace Reni.Parser
 
         [EnableDump]
         [EnableDumpExcept(null)]
-        string Position => Binary?.Token.Characters.GetDumpAroundCurrent(5);
+        string Position => Anchor?.Token.Characters.GetDumpAroundCurrent(5);
 
         internal override IRecursionHandler RecursionHandler => Infix as IRecursionHandler;
 
@@ -137,7 +137,7 @@ namespace Reni.Parser
 
         [EnableDump]
         [EnableDumpExcept(null)]
-        string Position => Binary?.Token.Characters.GetDumpAroundCurrent(5);
+        string Position => Anchor?.Token.Characters.GetDumpAroundCurrent(5);
 
         internal override int LeftDirectChildCount => 1;
         protected override int DirectChildCount => 1;
