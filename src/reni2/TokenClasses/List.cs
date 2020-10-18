@@ -1,6 +1,7 @@
 using hw.DebugFormatter;
 using hw.Parser;
 using Reni.Parser;
+using Reni.SyntaxFactory;
 
 namespace Reni.TokenClasses
 {
@@ -8,7 +9,7 @@ namespace Reni.TokenClasses
     [Variant(0)]
     [Variant(1)]
     [Variant(2)]
-    sealed class List : TokenClass, IBelongingsMatcher, SyntaxFactory.IStatementsToken
+    sealed class List : TokenClass, IBelongingsMatcher, IStatementsToken
     {
         [DisableDump]
         internal readonly int Level;
@@ -20,7 +21,7 @@ namespace Reni.TokenClasses
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => otherMatcher == this;
 
-        SyntaxFactory.IStatementsProvider SyntaxFactory.IStatementsToken.Provider => SyntaxFactory.List;
+        IStatementsProvider IStatementsToken.Provider => Factory.List;
         public static string TokenId(int level) => ",;.".Substring(level, 1);
     }
 }

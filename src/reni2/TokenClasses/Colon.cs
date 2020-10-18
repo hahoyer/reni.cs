@@ -1,17 +1,18 @@
 using System.Collections.Generic;
 using hw.Parser;
 using Reni.Parser;
+using Reni.SyntaxFactory;
 
 namespace Reni.TokenClasses
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class Colon : TokenClass, SyntaxFactory.IDeclarationToken
+    sealed class Colon : TokenClass, IDeclarationToken
     {
         public const string TokenId = ":";
 
         public override string Id => TokenId;
 
-        SyntaxFactory.IStatementProvider SyntaxFactory.IDeclarationToken.Provider => SyntaxFactory.Colon;
+        IStatementProvider IDeclarationToken.Provider => Factory.Colon;
     }
 
     [BelongsTo(typeof(MainTokenFactory))]
@@ -37,7 +38,7 @@ namespace Reni.TokenClasses
 
     [BelongsTo(typeof(DeclarationTokenFactory))]
     abstract class DeclarationTagToken
-        : TerminalToken, SyntaxFactory.IDeclarerToken
+        : TerminalToken, IDeclarerToken
     {
         public static IEnumerable<string> DeclarationOptions
         {
@@ -53,7 +54,7 @@ namespace Reni.TokenClasses
             }
         }
 
-        SyntaxFactory.IDeclarerProvider SyntaxFactory.IDeclarerToken.Provider => SyntaxFactory.Declarer;
+        IDeclarerProvider IDeclarerToken.Provider => Factory.Declarer;
     }
 
     sealed class ConverterToken : DeclarationTagToken

@@ -3,6 +3,7 @@ using hw.Helper;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Parser;
+using Reni.SyntaxTree;
 using Reni.TokenClasses;
 
 namespace Reni.Validation
@@ -14,8 +15,6 @@ namespace Reni.Validation
         public static readonly IssueId EOFInComment = new IssueId();
         public static readonly IssueId EOFInLineComment = new IssueId();
         public static readonly IssueId EOLInString = new IssueId();
-        public static readonly IssueId ExtraLeftBracket = new IssueId();
-        public static readonly IssueId ExtraRightBracket = new IssueId();
         public static readonly IssueId InvalidCharacter = new IssueId();
         public static readonly IssueId InvalidDeclarationTag = new IssueId();
         public static readonly IssueId InvalidExpression = new IssueId();
@@ -25,6 +24,8 @@ namespace Reni.Validation
         public static readonly IssueId MissingDeclarationInContext = new IssueId();
         public static readonly IssueId MissingDeclarationTag = new IssueId();
         public static readonly IssueId MissingDeclarationValue = new IssueId();
+        public static readonly IssueId MissingLeftBracket = new IssueId();
+        public static readonly IssueId MissingRightBracket = new IssueId();
         public static readonly IssueId MissingRightExpression = new IssueId();
         public static readonly IssueId TerminalUsedAsSuffix = new IssueId();
         public static readonly IssueId UnknownDeclarationTag = new IssueId();

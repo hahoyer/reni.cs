@@ -2,6 +2,7 @@ using hw.Parser;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
+using Reni.SyntaxTree;
 using Reni.TokenClasses;
 
 namespace Reni.Struct

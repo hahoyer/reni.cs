@@ -1,14 +1,15 @@
 using hw.Parser;
 using Reni.Parser;
+using Reni.SyntaxFactory;
 
 namespace Reni.TokenClasses
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class ElseToken : TokenClass, SyntaxFactory.IValueToken
+    sealed class ElseToken : TokenClass, IValueToken
     {
         public const string TokenId = "else";
         public override string Id => TokenId;
 
-        SyntaxFactory.IValueProvider SyntaxFactory.IValueToken.Provider => SyntaxFactory.Else;
+        IValueProvider IValueToken.Provider => Factory.Else;
     }
 }

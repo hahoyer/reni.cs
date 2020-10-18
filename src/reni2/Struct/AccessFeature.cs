@@ -2,6 +2,7 @@ using hw.DebugFormatter;
 using hw.Helper;
 using Reni.Basics;
 using Reni.Feature;
+using Reni.SyntaxTree;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -65,7 +66,7 @@ namespace Reni.Struct
 
         Result Result(Category category) => View.AccessViaObject(category, Position);
 
-        Parser.ValueSyntax Statement => View
+        ValueSyntax Statement => View
             .Compound
             .Syntax
             .PureStatements[Position];

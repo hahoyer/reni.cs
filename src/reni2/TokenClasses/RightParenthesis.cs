@@ -1,19 +1,19 @@
 ﻿using hw.DebugFormatter;
 using hw.Parser;
 using Reni.Parser;
+using Reni.SyntaxFactory;
 
 namespace Reni.TokenClasses
 {
     [BelongsTo(typeof(MainTokenFactory))]
     sealed class RightParenthesis
         : RightParenthesisBase
-            , IDefaultScopeProvider
             , IBracketMatch<BinaryTree>
             , ISyntaxScope
-            , SyntaxFactory.IValueToken
+            , IValueToken
     {
         sealed class Matched
-            : DumpableObject, IParserTokenType<BinaryTree>, ITokenClass, SyntaxFactory.IValueToken
+            : DumpableObject, IParserTokenType<BinaryTree>, ITokenClass, IValueToken
         {
             static string Id => "()";
 
@@ -23,7 +23,7 @@ namespace Reni.TokenClasses
             string IParserTokenType<BinaryTree>.PrioTableId => Id;
             string ITokenClass.Id => Id;
 
-            SyntaxFactory.IValueProvider SyntaxFactory.IValueToken.Provider => SyntaxFactory.MatchedBracket;
+            IValueProvider IValueToken.Provider => Factory.MatchedBracket;
         }
 
         public RightParenthesis(int level)
@@ -34,10 +34,6 @@ namespace Reni.TokenClasses
 
         IParserTokenType<BinaryTree> IBracketMatch<BinaryTree>.Value { get; } = new Matched();
 
-        bool IDefaultScopeProvider.MeansPublic => Level == 3;
-        IDefaultScopeProvider ISyntaxScope.DefaultScopeProvider => this;
-        bool ISyntaxScope.IsDeclarationPart => false;
-
-        SyntaxFactory.IValueProvider SyntaxFactory.IValueToken.Provider => SyntaxFactory.Bracket;
+        IValueProvider IValueToken.Provider => Factory.Bracket;
     }
 }

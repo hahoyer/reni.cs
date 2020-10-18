@@ -2,9 +2,10 @@ using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Parser;
 using Reni.TokenClasses;
 
-namespace Reni.Parser
+namespace Reni.SyntaxTree
 {
     sealed class TerminalSyntax : ValueSyntax.NoChildren
     {
@@ -99,9 +100,7 @@ namespace Reni.Parser
         protected override Syntax GetDirectChild(int index)
             => index switch
             {
-                0 => Left
-                , 1 => Right
-                , _ => null
+                0 => Left, 1 => Right, _ => null
             };
 
         public static Result<ValueSyntax> Create

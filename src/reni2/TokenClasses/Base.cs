@@ -1,6 +1,8 @@
 ﻿using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
+using Reni.SyntaxFactory;
+using Reni.SyntaxTree;
 
 namespace Reni.TokenClasses
 {
@@ -14,7 +16,7 @@ namespace Reni.TokenClasses
 
     abstract class InfixToken : TokenClass {}
 
-    abstract class TerminalSyntaxToken : TerminalToken, ITerminal, SyntaxFactory.IValueToken
+    abstract class TerminalSyntaxToken : TerminalToken, ITerminal, IValueToken
     {
         Result ITerminal.Result(ContextBase context, Category category, TerminalSyntax token)
             => Result(context, category, token);
@@ -30,11 +32,11 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        SyntaxFactory.IValueProvider SyntaxFactory.IValueToken.Provider => SyntaxFactory.Terminal;
+        IValueProvider IValueToken.Provider => Factory.Terminal;
 
     }
 
-    abstract class InfixPrefixSyntaxToken : InfixPrefixToken, IInfix, IPrefix, SyntaxFactory.IValueToken
+    abstract class InfixPrefixSyntaxToken : InfixPrefixToken, IInfix, IPrefix, IValueToken
     {
         Result IInfix.Result
             (ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
@@ -50,10 +52,10 @@ namespace Reni.TokenClasses
         protected abstract Result Result
             (ContextBase context, Category category, ValueSyntax right);
 
-        SyntaxFactory.IValueProvider SyntaxFactory.IValueToken.Provider => SyntaxFactory.InfixPrefix;
+        IValueProvider IValueToken.Provider => Factory.InfixPrefix;
     }
 
-    abstract class NonSuffixSyntaxToken : NonSuffixToken, ITerminal, IPrefix, SyntaxFactory.IValueToken
+    abstract class NonSuffixSyntaxToken : NonSuffixToken, ITerminal, IPrefix, IValueToken
     {
         Result ITerminal.Result(ContextBase context, Category category, TerminalSyntax token)
             => Result(context, category);
@@ -76,20 +78,20 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        SyntaxFactory.IValueProvider SyntaxFactory.IValueToken.Provider => SyntaxFactory.NonSuffix;
+        IValueProvider IValueToken.Provider => Factory.NonSuffix;
     }
 
-    abstract class SuffixSyntaxToken : SuffixToken, ISuffix, SyntaxFactory.IValueToken
+    abstract class SuffixSyntaxToken : SuffixToken, ISuffix, IValueToken
     {
         Result ISuffix.Result(ContextBase context, Category category, ValueSyntax left)
             => Result(context, category, left);
 
         protected abstract Result Result(ContextBase context, Category category, ValueSyntax left);
 
-        SyntaxFactory.IValueProvider SyntaxFactory.IValueToken.Provider => SyntaxFactory.Suffix;
+        IValueProvider IValueToken.Provider => Factory.Suffix;
     }
 
-    abstract class InfixSyntaxToken : InfixToken, IInfix, SyntaxFactory.IValueToken
+    abstract class InfixSyntaxToken : InfixToken, IInfix, IValueToken
     {
         Result IInfix.Result
             (ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
@@ -98,6 +100,6 @@ namespace Reni.TokenClasses
         protected abstract Result Result
             (ContextBase callContext, Category category, ValueSyntax left, ValueSyntax right);
 
-        SyntaxFactory.IValueProvider SyntaxFactory.IValueToken.Provider => SyntaxFactory.Infix;
+        IValueProvider IValueToken.Provider => Factory.Infix;
     }
 }

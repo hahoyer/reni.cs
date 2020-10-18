@@ -1,8 +1,9 @@
 using hw.DebugFormatter;
 using Reni.Parser;
 using Reni.Struct;
+using Reni.TokenClasses;
 
-namespace Reni.TokenClasses
+namespace Reni.SyntaxTree
 {
     sealed class StatementSyntax : Syntax
     {
@@ -31,8 +32,7 @@ namespace Reni.TokenClasses
         protected override Syntax GetDirectChild(int index)
             => index switch
             {
-                0 => (Syntax)Content
-                , _ => null
+                0 => (Syntax)Content, _ => null
             };
 
         internal StatementSyntax Visit(ISyntaxVisitor visitor)
@@ -44,6 +44,7 @@ namespace Reni.TokenClasses
         internal static StatementSyntax[] Create(BinaryTree target, IStatementSyntax statement)
             => T(new StatementSyntax(target, statement));
 
-        internal bool IsDefining(string name, bool publicOnly) => Content.Declarer?.IsDefining(name, publicOnly) ?? false;
+        internal bool IsDefining
+            (string name, bool publicOnly) => Content.Declarer?.IsDefining(name, publicOnly) ?? false;
     }
 }

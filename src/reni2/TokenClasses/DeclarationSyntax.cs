@@ -1,6 +1,7 @@
 using hw.DebugFormatter;
 using Reni.Parser;
 using Reni.Struct;
+using Reni.SyntaxTree;
 using Reni.Validation;
 
 namespace Reni.TokenClasses
@@ -16,45 +17,47 @@ namespace Reni.TokenClasses
         DeclarationSyntax(DeclarerSyntax declarer, BinaryTree anchor, ValueSyntax value)
             : base(anchor)
         {
-            Tracer.Assert(anchor != null);
-            Tracer.ConditionalBreak(
-                value == null && (declarer == null || declarer.Tags == null && declarer.Name == null)
-            );
             Declarer = declarer;
             Value = value;
+
+            Anchor.AssertIsNotNull();
+            Declarer.AssertIsNotNull();
+            Value.AssertIsNotNull();
         }
 
         [EnableDump]
         [EnableDumpExcept(null)]
-        string Position => Anchor?.Token.Characters.GetDumpAroundCurrent(5);
+        string Position => Anchor.Token.Characters.GetDumpAroundCurrent(5);
 
         [DisableDump]
-        internal string NameOrNull => Declarer?.Name?.Value;
+        internal string NameOrNull => Declarer.Name?.Value;
 
         [DisableDump]
-        internal bool IsConverterSyntax => Declarer?.IsConverterSyntax ?? false;
+        internal bool IsConverterSyntax => Declarer.IsConverterSyntax;
 
         [DisableDump]
-        internal bool IsMutableSyntax => Declarer?.IsMutableSyntax ?? false;
+        internal bool IsMutableSyntax => Declarer.IsMutableSyntax;
 
         [DisableDump]
-        internal override int LeftDirectChildCount => 1;
+        internal override int LeftDirectChildCount => Declarer.DirectChildCount;
 
         [DisableDump]
-        protected override int DirectChildCount => 2;
+        protected override int DirectChildCount => LeftDirectChildCount + 1;
 
         [DisableDump]
         DeclarerSyntax IStatementSyntax.Declarer => Declarer;
+
+        ValueSyntax IStatementSyntax.ToValueSyntax(BinaryTree leftAnchor, BinaryTree rightAnchor)
+            => new CompoundSyntax(StatementSyntax.Create(leftAnchor, this), null, rightAnchor);
+
         [DisableDump]
         ValueSyntax IStatementSyntax.Value => Value;
-
-        ValueSyntax IStatementSyntax.ToValueSyntax(BinaryTree leftAnchor, BinaryTree rightAnchor) => new CompoundSyntax(StatementSyntax.Create(leftAnchor, this), null, rightAnchor);
 
         protected override Syntax GetDirectChild(int index)
             => index switch
             {
-                0 => Declarer
-                , 1 => Value
+                { } when index < LeftDirectChildCount => Declarer.GetDirectChild(index)
+                , { } when index == LeftDirectChildCount => Value
                 , _ => null
             };
 
@@ -67,7 +70,7 @@ namespace Reni.TokenClasses
                 value = new EmptyList(null);
             }
 
-            var result = new Result<IStatementSyntax>((new DeclarationSyntax(declarer, target, value)));
+            var result = new Result<IStatementSyntax>(new DeclarationSyntax(declarer, target, value));
             if(issue != null)
                 result = result.With(issue);
 

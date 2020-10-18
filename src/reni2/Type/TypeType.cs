@@ -5,6 +5,7 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.Numeric;
 using Reni.Struct;
+using Reni.SyntaxTree;
 using Reni.TokenClasses;
 
 namespace Reni.Type
@@ -78,7 +79,7 @@ namespace Reni.Type
             => Value.DumpPrintTypeNameResult(category);
 
         Result StarResult
-            (Category category, ResultCache left, ContextBase context, Parser.ValueSyntax right)
+            (Category category, ResultCache left, ContextBase context, ValueSyntax right)
         {
             var countResult = right.Result(context).AutomaticDereferenceResult;
             var count = countResult
@@ -92,7 +93,7 @@ namespace Reni.Type
         }
 
         Result SlashResult
-            (Category category, ResultCache left, ContextBase context, Parser.ValueSyntax right)
+            (Category category, ResultCache left, ContextBase context, ValueSyntax right)
         {
             var rightType = right
                 .Type(context)

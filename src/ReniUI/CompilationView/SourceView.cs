@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using hw.Helper;
@@ -7,8 +5,8 @@ using hw.Scanner;
 using Reni;
 using Reni.Code;
 using Reni.Context;
-using Reni.Parser;
 using Reni.Struct;
+using Reni.SyntaxTree;
 using Reni.Type;
 using ScintillaNET;
 
@@ -17,23 +15,22 @@ namespace ReniUI.CompilationView
     public sealed class SourceView : MainView, Extension.IClickHandler
     {
         int _lineNumberMarginLength;
-        readonly Scintilla TextBox;
-        readonly ValueCache<CompilerBrowser> CompilerCache;
-        readonly FunctionCache<ValueSyntax, ResultCachesView> ResultCachesViews;
         readonly FunctionCache<object, ChildView> ChildViews;
-        readonly BrowseTraceCollector TraceLog;
+        readonly ValueCache<CompilerBrowser> CompilerCache;
         readonly TraceLogView LogView;
+        readonly FunctionCache<ValueSyntax, ResultCachesView> ResultCachesViews;
+        readonly Scintilla TextBox;
+        readonly BrowseTraceCollector TraceLog;
 
         public SourceView(string text)
             : base("SourceView")
         {
             TextBox = new Scintilla
             {
-                Lexer = ScintillaNET.Lexer.Container,
-                VirtualSpaceOptions = VirtualSpace.UserAccessible
+                Lexer = Lexer.Container, VirtualSpaceOptions = VirtualSpace.UserAccessible
             };
 
-            foreach (var id in TextStyle.All)
+            foreach(var id in TextStyle.All)
                 StyleConfig(id);
 
             TextBox.StyleNeeded += (s, args) => SignalStyleNeeded(args.Position);
@@ -56,15 +53,34 @@ namespace ReniUI.CompilationView
             LogView = new TraceLogView(this);
         }
 
+        internal CompilerBrowser Compiler => CompilerCache.Value;
+
+        int LinenumberMarginLength
+        {
+            get => _lineNumberMarginLength;
+            set
+            {
+                if(_lineNumberMarginLength == value)
+                    return;
+
+                _lineNumberMarginLength = value;
+                const int Padding = 2;
+                TextBox.Margins[0].Width
+                    = TextBox.TextWidth(Style.LineNumber, new string('9', value + 1)) + Padding;
+            }
+        }
+
+        void Extension.IClickHandler.Signal(object target) => SignalClickedObject(target);
+
         CompilerBrowser CreateCompilerBrowser()
             => CompilerBrowser.FromText
-                (
-                    TextBox.Text,
-                    new CompilerParameters
-                    {
-                        OutStream = new StringStream()
-                    }
-                );
+            (
+                TextBox.Text,
+                new CompilerParameters
+                {
+                    OutStream = new StringStream()
+                }
+            );
 
         public new void Run()
         {
@@ -73,39 +89,35 @@ namespace ReniUI.CompilationView
         }
 
         FunctionView CreateView(FunctionType target)
-            => target == null ? null : new FunctionView(target, this);
+            => target == null? null : new FunctionView(target, this);
 
         ContextView CreateView(ContextBase target)
-            => target == null ? null : new ContextView(target, this);
+            => target == null? null : new ContextView(target, this);
 
         TypeView CreateView(TypeBase target)
-            => target == null ? null : new TypeView(target, this);
+            => target == null? null : new TypeView(target, this);
 
         CodeView CreateView(CodeBase target)
-            => target == null ? null : new CodeView(target, this);
+            => target == null? null : new CodeView(target, this);
 
         CompoundView CreateView(Compound target)
-            => target == null ? null : new CompoundView(target, this);
+            => target == null? null : new CompoundView(target, this);
 
         StepView CreateView(Step target)
-            => target == null ? null : new StepView(target, this);
+            => target == null? null : new StepView(target, this);
 
         ChildView CreateView(object target)
-            => CreateView(target as FunctionType)
-                ?? CreateView(target as ContextBase)
-                    ?? CreateView(target as TypeBase)
-                        ?? CreateView(target as CodeBase)
-                            ?? CreateView(target as Step)
-                                ?? CreateView(target as Compound)
-                                    ?? UnexpectedTarget(target);
+            => CreateView(target as FunctionType) ??
+               CreateView(target as ContextBase) ??
+               CreateView(target as TypeBase) ??
+               CreateView(target as CodeBase) ??
+               CreateView(target as Step) ?? CreateView(target as Compound) ?? UnexpectedTarget(target);
 
         ChildView UnexpectedTarget(object item)
         {
             NotImplementedMethod(item);
             return null;
         }
-
-        internal CompilerBrowser Compiler => CompilerCache.Value;
 
         void OnTextChanged()
         {
@@ -117,7 +129,7 @@ namespace ReniUI.CompilationView
         {
             var menuItems = TextBox.ContextMenu.MenuItems;
 
-            while (menuItems.Count > 0)
+            while(menuItems.Count > 0)
                 menuItems.RemoveAt(0);
 
             Compiler.Ensure();
@@ -136,7 +148,7 @@ namespace ReniUI.CompilationView
         {
             var text = syntax.GetType().PrettyName() + " " + syntax.ObjectId;
 
-            if (syntax.ResultCache.Count > 1)
+            if(syntax.ResultCache.Count > 1)
                 text += " (" + syntax.ResultCache.Count + ")";
 
             var menuItem = new MenuItem
@@ -156,7 +168,7 @@ namespace ReniUI.CompilationView
             StartMethodDump(trace, position);
             try
             {
-                while (TextBox.GetEndStyled() < position)
+                while(TextBox.GetEndStyled() < position)
                 {
                     var current = TextBox.GetEndStyled();
                     var tokens = Compiler.LocatePosition(current);
@@ -173,32 +185,14 @@ namespace ReniUI.CompilationView
             }
         }
 
-        int LinenumberMarginLength
-        {
-            get { return _lineNumberMarginLength; }
-            set
-            {
-                if (_lineNumberMarginLength == value)
-                    return;
-
-                _lineNumberMarginLength = value;
-                const int Padding = 2;
-                TextBox.Margins[0].Width
-                    = TextBox.TextWidth(Style.LineNumber, new string('9', value + 1))
-                        + Padding;
-            }
-        }
-
         void SignalClickedObject(object target) => ChildViews[target].Run();
-
-        void Extension.IClickHandler.Signal(object target) => SignalClickedObject(target);
 
         internal void SignalClickedFunction(int index)
             => SignalClickedObject(Compiler.Function(index));
 
         internal void SelectSource(SourcePart source)
         {
-            if (source == null)
+            if(source == null)
                 return;
             TextBox.SetSelection(source.Position, source.EndPosition);
         }
@@ -226,6 +220,7 @@ namespace ReniUI.CompilationView
         internal void SignalClickedStep(Step target)
             => SignalClickedObject(target);
     }
+
     interface ITraceLogItem
     {
         Control CreateLink();

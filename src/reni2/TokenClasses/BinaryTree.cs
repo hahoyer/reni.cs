@@ -103,18 +103,29 @@ namespace Reni.TokenClasses
                 .Concat(Left.CheckedItemsAsLongAs(condition))
                 .Concat(Right.CheckedItemsAsLongAs(condition));
 
-        Result<BinaryTree> GetBracketKernel(int level)
+        internal int? GetBracketLevel()
+        {
+            if(!(TokenClass is IRightBracket rightParenthesis))
+                return null;
+            var leftParenthesis = Left?.TokenClass as ILeftBracket;
+            return T(leftParenthesis?.Level ?? 0, rightParenthesis.Level).Max();
+
+        }
+
+
+        internal Result<BinaryTree> GetBracketKernel()
         {
             var rightParenthesis = TokenClass as IRightBracket;
-            Tracer.Assert(rightParenthesis != null);
-            Tracer.Assert(level == rightParenthesis.Level);
+            (rightParenthesis != null).Assert();
 
-            Tracer.Assert(Right == null);
+            var level = rightParenthesis.Level;
+
+            (Right == null).Assert();
 
             if(!(Left.TokenClass is ILeftBracket leftParenthesis))
-                return new Result<BinaryTree>(Left, IssueId.ExtraRightBracket.Issue(SourcePart));
+                return new Result<BinaryTree>(Left, IssueId.MissingLeftBracket.Issue(SourcePart));
 
-            Tracer.Assert(Left.Left == null);
+            (Left.Left == null).Assert();
 
             var levelDelta = leftParenthesis.Level - level;
 
@@ -122,40 +133,11 @@ namespace Reni.TokenClasses
                 return Left.Right;
 
             if(levelDelta > 0)
-                return new Result<BinaryTree>(Left.Right, IssueId.ExtraLeftBracket.Issue(Left.SourcePart));
+                return new Result<BinaryTree>(Left.Right, IssueId.MissingRightBracket.Issue(Left.SourcePart));
 
             Left.NotImplementedMethod(level, this);
             return null;
         }
 
-        Result<BinaryTree> GetBracketSubLevel(int level)
-        {
-            var rightParenthesis = TokenClass as IRightBracket;
-            Tracer.Assert(rightParenthesis != null);
-            Tracer.Assert(level == rightParenthesis.Level);
-
-            Tracer.Assert(Right == null);
-
-            if(!(Left.TokenClass is ILeftBracket leftParenthesis))
-                return new Result<BinaryTree>(Left, IssueId.ExtraRightBracket.Issue(SourcePart));
-
-            Tracer.Assert(Left.Left == null);
-
-            var levelDelta = leftParenthesis.Level - level;
-
-            if(levelDelta == 0)
-                return Left;
-
-            if(levelDelta > 0)
-                return new Result<BinaryTree>(Left, IssueId.ExtraLeftBracket.Issue(Left.SourcePart));
-
-            Left.NotImplementedMethod(level, this);
-            return null;
-        }
-
-        internal Result<BinaryTree> GetBracketKernel()
-            => GetBracketKernel(((IRightBracket)TokenClass).Level);
-        internal Result<BinaryTree> GetBracketSubLevel()
-            => GetBracketSubLevel(((IRightBracket)TokenClass).Level);
     }
 }

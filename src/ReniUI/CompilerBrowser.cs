@@ -6,9 +6,8 @@ using hw.Helper;
 using hw.Scanner;
 using Reni;
 using Reni.Code;
-using Reni.Parser;
 using Reni.Struct;
-using Reni.TokenClasses;
+using Reni.SyntaxTree;
 using Reni.Validation;
 using ReniUI.Classification;
 using ReniUI.Formatting;
@@ -63,7 +62,7 @@ namespace ReniUI
 
         public Token LocatePosition(SourcePosition current)
         {
-            Tracer.Assert(current.Source == Source);
+            (current.Source == Source).Assert();
             return LocatePosition(current.Position);
         }
 

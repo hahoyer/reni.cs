@@ -1,26 +1,26 @@
 ﻿using hw.DebugFormatter;
 using hw.Parser;
 using Reni.Parser;
+using Reni.SyntaxFactory;
 
 namespace Reni.TokenClasses
 {
     sealed class EndOfText
         : TokenClass
-            , IDefaultScopeProvider
             , IBracketMatch<BinaryTree>
             , ISyntaxScope
             , IBelongingsMatcher
             , IRightBracket
-            , SyntaxFactory.IStatementsToken
+            , IValueToken
 
     {
         sealed class Matched : DumpableObject, IParserTokenType<BinaryTree>
         {
             BinaryTree IParserTokenType<BinaryTree>.Create(BinaryTree left, IToken token, BinaryTree right)
             {
-                Tracer.Assert(right == null);
-                Tracer.Assert(left.Right == null);
-                Tracer.Assert(left.Left.Left == null);
+                (right == null).Assert();
+                (left.Right == null).Assert();
+                (left.Left.Left == null).Assert();
                 return left;
             }
 
@@ -36,15 +36,9 @@ namespace Reni.TokenClasses
             => otherMatcher is BeginOfText;
 
         IParserTokenType<BinaryTree> IBracketMatch<BinaryTree>.Value { get; } = new Matched();
+        int IRightBracket.Level => 0;
 
-        SyntaxFactory.IStatementsProvider SyntaxFactory.IStatementsToken.Provider => SyntaxFactory.Frame;
-        bool IDefaultScopeProvider.MeansPublic => true;
-
-        int IRightBracket.Level => -1;
-
-        IDefaultScopeProvider ISyntaxScope.DefaultScopeProvider => this;
-
-        bool ISyntaxScope.IsDeclarationPart => false;
+        IValueProvider IValueToken.Provider => Factory.Bracket;
     }
 
     sealed class BeginOfText : TokenClass, IBelongingsMatcher, ILeftBracket
@@ -57,6 +51,6 @@ namespace Reni.TokenClasses
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => otherMatcher is EndOfText;
 
-        int ILeftBracket.Level => -1;
+        int ILeftBracket.Level => 0;
     }
 }

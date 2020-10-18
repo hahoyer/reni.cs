@@ -5,7 +5,7 @@ using hw.Helper;
 using Reni.Context;
 using Reni.Parser;
 using Reni.Struct;
-using Reni.Type;
+using Reni.SyntaxTree;
 using Reni.Validation;
 
 namespace Reni.Code
@@ -52,6 +52,8 @@ namespace Reni.Code
             }
         }
 
+        ValueCache ValueCache.IContainer.Cache => new ValueCache();
+
         public override string DumpData()
         {
             var result = "main\n" + Main.Dump() + "\n";
@@ -72,7 +74,5 @@ namespace Reni.Code
 
         string GetCSharpStringForCache()
             => ModuleName.CreateCSharpString(Main, Functions);
-
-        ValueCache ValueCache.IContainer.Cache => new ValueCache();
     }
 }

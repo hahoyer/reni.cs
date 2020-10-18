@@ -3,6 +3,7 @@ using hw.DebugFormatter;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.SyntaxTree;
 using Reni.TokenClasses;
 
 namespace Reni.Struct
@@ -44,6 +45,6 @@ namespace Reni.Struct
         internal override IEnumerable<string> DeclarationOptions => View.DeclarationOptions;
 
         [EnableDump]
-        Parser.ValueSyntax[] Syntax => View.Compound.Syntax.PureStatements;
+        ValueSyntax[] Syntax => View.Compound.Syntax.PureStatements;
     }
 }

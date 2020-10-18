@@ -4,9 +4,10 @@ using hw.DebugFormatter;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Parser;
 using Reni.TokenClasses;
 
-namespace Reni.Parser
+namespace Reni.SyntaxTree
 {
     sealed class ExpressionSyntax : ValueSyntax
     {

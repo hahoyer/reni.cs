@@ -3,11 +3,13 @@ using hw.DebugFormatter;
 using hw.Parser;
 using Reni.Feature;
 using Reni.Parser;
+using Reni.SyntaxFactory;
+using Reni.SyntaxTree;
 
 namespace Reni.TokenClasses
 {
     abstract class Definable
-        : TokenClass, SyntaxFactory.IDeclarerToken, SyntaxFactory.IValueToken
+        : TokenClass, IDeclarerToken, IValueToken
     {
         [DisableDump]
         protected string DataFunctionName => Id.Symbolize();
@@ -16,9 +18,9 @@ namespace Reni.TokenClasses
         internal virtual IEnumerable<IDeclarationProvider> MakeGeneric
             => this.GenericListFromDefinable();
 
-        SyntaxFactory.IDeclarerProvider SyntaxFactory.IDeclarerToken.Provider => SyntaxFactory.DefinableAsDeclarer;
+        IDeclarerProvider IDeclarerToken.Provider => Factory.DefinableAsDeclarer;
 
-        SyntaxFactory.IValueProvider SyntaxFactory.IValueToken.Provider => SyntaxFactory.Definable;
+        IValueProvider IValueToken.Provider => Factory.Definable;
 
         internal Result<ValueSyntax> CreateForVisit(BinaryTree parent, ValueSyntax left, ValueSyntax right)
             => Result<ValueSyntax> .From(ExpressionSyntax.Create(parent, left, this, right));

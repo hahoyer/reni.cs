@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-
 using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.SyntaxTree;
 using Reni.TokenClasses;
 
 namespace Reni.Type
@@ -306,7 +306,7 @@ namespace Reni.Type
             => AccessType.Result(category, ObjectResult(category), right);
 
         Result ToNumberOfBaseResult
-            (Category category, ResultCache left, ContextBase context, Parser.ValueSyntax right)
+            (Category category, ResultCache left, ContextBase context, ValueSyntax right)
         {
             var target = (left & Category.All)
                 .AutomaticDereferencedAlignedResult()
@@ -319,7 +319,7 @@ namespace Reni.Type
         }
 
         Result CountResult
-            (Category category, ResultCache left, ContextBase context, Parser.ValueSyntax right)
+            (Category category, ResultCache left, ContextBase context, ValueSyntax right)
         {
             Tracer.Assert(right == null);
             return IndexType.Result

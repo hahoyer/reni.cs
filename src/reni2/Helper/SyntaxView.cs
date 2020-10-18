@@ -1,21 +1,17 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using Reni.Parser;
+using Reni.SyntaxTree;
 
 namespace Reni.Helper
 {
     sealed class SyntaxView<TResult> : DumpableObject, ValueCache.IContainer, ITree<TResult>
         where TResult : PairView<TResult>
     {
-        internal TResult Master { get; }
         internal readonly Syntax FlatItem;
+        internal TResult Master { get; }
         readonly TResult[] DirectChildren;
         readonly TResult Parent;
-
-        protected override string GetNodeDump() => base.GetNodeDump() + $"({FlatItem.Anchor?.TokenClass.Id})";
 
         public SyntaxView(Syntax flatItem, TResult[] directChildren, TResult parent, TResult master)
         {
@@ -35,10 +31,10 @@ namespace Reni.Helper
         int DirectChildCount => FlatItem.DirectChildren.Length;
 
         [DisableDump]
-        internal TResult LeftMost => Master.GetNodesFromLeftToRight(node=>node.Syntax).First();
+        internal TResult LeftMost => Master.GetNodesFromLeftToRight(node => node.Syntax).First();
 
         [DisableDump]
-        internal TResult RightMost => Master.GetNodesFromRightToLeft(node=>node.Syntax).First();
+        internal TResult RightMost => Master.GetNodesFromRightToLeft(node => node.Syntax).First();
 
         [DisableDump]
         internal TResult LeftNeighbor => RightMostLeftSibling?.Syntax.RightMost ?? LeftParent;
@@ -78,10 +74,11 @@ namespace Reni.Helper
         TResult ITree<TResult>.GetDirectChild(int index) => DirectChildren[index];
         int ITree<TResult>.LeftDirectChildCount => LeftDirectChildCount;
 
+        protected override string GetNodeDump() => base.GetNodeDump() + $"({FlatItem.Anchor?.TokenClass.Id})";
+
         TResult[] GetRightChildren()
             => (DirectChildCount - LeftDirectChildCount)
                 .Select(index => DirectChildren[index + LeftDirectChildCount])
                 .ToArray();
-
     }
 }

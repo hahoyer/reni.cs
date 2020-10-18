@@ -8,7 +8,7 @@ using Reni.Context;
 using Reni.Parser;
 using Reni.TokenClasses;
 
-namespace Reni.Struct
+namespace Reni.SyntaxTree
 {
     /// <summary>
     ///     Structured data, context free version
@@ -45,7 +45,7 @@ namespace Reni.Struct
         [DisableDump]
         public IEnumerable<FunctionSyntax> ConverterFunctions
             => Statements
-                .Where(data => data.Content.Declarer?.IsConverterSyntax??false)
+                .Where(data => data.Content.Declarer?.IsConverterSyntax ?? false)
                 .Select(data => (FunctionSyntax)data.Content.Value);
 
         [DisableDump]
@@ -147,9 +147,9 @@ namespace Reni.Struct
                 .Select((s, i) => s ?? Statements[i])
                 .ToArray();
 
-            var newCleanupSection 
+            var newCleanupSection
                 = cleanupSection == null
-                    ? CleanupSection 
+                    ? CleanupSection
                     : new CleanupSyntax(CleanupSection.Anchor, cleanupSection);
 
             return new CompoundSyntax(newStatements, newCleanupSection, Anchor);
@@ -161,9 +161,10 @@ namespace Reni.Struct
         {
             if(CleanupSection != null && (category.HasCode || category.HasClosures))
                 return context
-                    .Result(category.WithType, CleanupSection.Value)
-                    .Conversion(context.RootContext.VoidType)
-                    .LocalBlock(category) & category;
+                           .Result(category.WithType, CleanupSection.Value)
+                           .Conversion(context.RootContext.VoidType)
+                           .LocalBlock(category) &
+                       category;
 
             return context.RootContext.VoidType.Result(category);
         }
@@ -189,7 +190,7 @@ namespace Reni.Struct
                 dumpFile.String = oldResult;
             }
             else
-                Tracer.Assert(oldResult == newResult);
+                (oldResult == newResult).Assert();
 
             return Tracer.FilePosition(dumpFile.FullName, 1, 0, FilePositionTag.Debug) + "see there\n";
         }

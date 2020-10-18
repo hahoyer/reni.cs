@@ -20,10 +20,10 @@ namespace ReniUI.Formatting
 
         readonly CacheContainer Cache = new CacheContainer();
 
-        internal Syntax(BinaryTree flatItem, Func<Reni.Parser.Syntax> getFlatSyntax)
+        internal Syntax(BinaryTree flatItem, Func<Reni.SyntaxTree.Syntax> getFlatSyntax)
             : this(flatItem, null, getFlatSyntax) { }
 
-        Syntax(BinaryTree flatItem, Syntax parent, Func<Reni.Parser.Syntax> getFlatSyntax)
+        Syntax(BinaryTree flatItem, Syntax parent, Func<Reni.SyntaxTree.Syntax> getFlatSyntax)
             : base(flatItem, parent, getFlatSyntax)
         {
             Binary.FlatItem.AssertIsNotNull();
@@ -57,7 +57,7 @@ namespace ReniUI.Formatting
         protected override Syntax Create(BinaryTree flatItem)
             => new Syntax(flatItem, this, null);
 
-        protected override Syntax Create(Reni.Parser.Syntax flatItem)
+        protected override Syntax Create(Reni.SyntaxTree.Syntax flatItem)
             => new Syntax(Binary.FlatItem, this, ()=>flatItem);
 
         SplitMaster GetSplitMaster()
@@ -167,7 +167,5 @@ namespace ReniUI.Formatting
         /// <returns>The line length calculated or null if target contains line breaks.</returns>
         internal int? GetFlatLength(bool areEmptyLinesPossible)
             => FlatFormat<IntegerResult, int>(areEmptyLinesPossible)?.Value;
-
-        protected override string GetNodeDump() => base.GetNodeDump() + " " + Binary.FlatItem.Token.Characters.Id;
     }
 }

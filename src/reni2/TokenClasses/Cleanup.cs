@@ -1,15 +1,15 @@
 using hw.Parser;
 using Reni.Parser;
-using Reni.Struct;
+using Reni.SyntaxFactory;
 
 namespace Reni.TokenClasses
 {
     [BelongsTo(typeof(MainTokenFactory))]
-    sealed class Cleanup : TokenClass, SyntaxFactory.IValueToken
+    sealed class Cleanup : TokenClass, IValueToken
     {
         public const string TokenId = "~~~";
         public override string Id => TokenId;
 
-        SyntaxFactory.IValueProvider SyntaxFactory.IValueToken.Provider => SyntaxFactory.Cleanup;
+        IValueProvider IValueToken.Provider => Factory.Cleanup;
     }
 }

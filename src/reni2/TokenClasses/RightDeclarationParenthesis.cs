@@ -1,13 +1,14 @@
 ﻿using hw.DebugFormatter;
 using hw.Parser;
 using Reni.Parser;
+using Reni.SyntaxFactory;
 
 namespace Reni.TokenClasses
 {
     [BelongsTo(typeof(DeclarationTokenFactory))]
     sealed class RightDeclarationParenthesis
         : RightParenthesisBase
-            , IBracketMatch<BinaryTree>,SyntaxFactory.IDeclarerToken
+            , IBracketMatch<BinaryTree>,IDeclarerToken
 
     {
         sealed class Matched
@@ -28,6 +29,6 @@ namespace Reni.TokenClasses
 
         IParserTokenType<BinaryTree> IBracketMatch<BinaryTree>.Value { get; } = new Matched();
 
-        SyntaxFactory.IDeclarerProvider SyntaxFactory.IDeclarerToken.Provider => SyntaxFactory.ComplexDeclarer;
+        IDeclarerProvider IDeclarerToken.Provider => Factory.ComplexDeclarer;
     }
 }

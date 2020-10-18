@@ -15,6 +15,8 @@ using Reni.Numeric;
 using Reni.Parser;
 using Reni.Runtime;
 using Reni.Struct;
+using Reni.SyntaxFactory;
+using Reni.SyntaxTree;
 using Reni.TokenClasses;
 using Reni.Type;
 using Reni.Validation;
@@ -51,7 +53,7 @@ namespace Reni
 
         Compiler(Source source, string moduleName, CompilerParameters parameters)
         {
-            Tracer.Assert(source != null);
+            (source != null).Assert();
             Source = source;
             Parameters = parameters ?? new CompilerParameters();
             ModuleName = moduleName;
@@ -236,7 +238,7 @@ namespace Reni
 
         public static Compiler FromFile(string fileName, CompilerParameters parameters = null)
         {
-            Tracer.Assert(fileName != null);
+            (fileName != null).Assert();
             var moduleName = ModuleNameFromFileName(fileName);
             return new Compiler(new Source(fileName.ToSmbFile()), moduleName, parameters);
         }
@@ -244,7 +246,7 @@ namespace Reni
         public static Compiler FromText
             (string text, CompilerParameters parameters = null, string sourceIdentifier = null)
         {
-            Tracer.Assert(text != null);
+            (text != null).Assert();
             return new Compiler
             (
                 new Source(text, sourceIdentifier ?? DefaultSourceIdentifier),
@@ -262,15 +264,17 @@ namespace Reni
                     })
                 : null;
 
-        static Result<ValueSyntax> GetSyntax(BinaryTree target) => SyntaxFactory.Root.GetValueSyntax(target);
+        static Result<ValueSyntax> GetSyntax(BinaryTree target)
+            => Factory.Root.GetFrameSyntax(target);
 
-        CodeContainer GetCodeContainer() => new CodeContainer(Syntax, Root, ModuleName, Source.Data);
+        CodeContainer GetCodeContainer()
+            => new CodeContainer(Syntax, Root, ModuleName, Source.Data);
 
         static string ModuleNameFromFileName(string fileName)
             => "_" + Path.GetFileName(fileName).Symbolize();
 
         Result<ValueSyntax> ParsePredefinedItem(string sourceText)
-            => GetSyntax(Parse(new Source(sourceText) + 0).GetBracketKernel().Target);
+            => Factory.Root.GetValueSyntax(Parse(new Source(sourceText) + 0).GetBracketKernel().Target);
 
         [UsedImplicitly]
         public Compiler Empower()
@@ -353,7 +357,7 @@ namespace Reni
         internal static readonly ITraceCollector Instance = new TraceCollector();
 
         void ITraceCollector.AssertionFailed(Func<string> dumper, int depth)
-            => Tracer.Assert(false, dumper, depth + 1);
+            => false.Assert(dumper, depth + 1);
 
         void ITraceCollector.Call(StackData argsAndRefs, FunctionId functionId)
         {

@@ -1,9 +1,8 @@
-using System;
 using hw.DebugFormatter;
 using Reni.Parser;
 using Reni.TokenClasses;
 
-namespace Reni.Struct
+namespace Reni.SyntaxTree
 {
     sealed class CleanupSyntax : Syntax
     {
@@ -12,19 +11,19 @@ namespace Reni.Struct
         public CleanupSyntax(BinaryTree anchor, ValueSyntax value)
             : base(anchor)
         {
-            Value = value??new EmptyList(null);
+            Value = value ?? new EmptyList(null);
             AssertValid();
-        }
-
-        void AssertValid()
-        {
-            Tracer.Assert(Anchor != null);
-            Tracer.Assert(Value != null);
         }
 
         internal override int LeftDirectChildCount => 0;
         protected override int DirectChildCount => 1;
-        protected override Syntax GetDirectChild(int index) => Value;
 
+        void AssertValid()
+        {
+            (Anchor != null).Assert();
+            (Value != null).Assert();
+        }
+
+        protected override Syntax GetDirectChild(int index) => Value;
     }
 }

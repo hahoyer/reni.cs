@@ -3,6 +3,7 @@ using hw.DebugFormatter;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
+using Reni.SyntaxTree;
 using Reni.TokenClasses;
 using Reni.Type;
 

@@ -1,6 +1,7 @@
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using Reni;
 using ReniUI.Formatting;
 
 namespace ReniUI.Test

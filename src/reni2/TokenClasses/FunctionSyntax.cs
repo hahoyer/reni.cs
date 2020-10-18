@@ -4,6 +4,7 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.Parser;
 using Reni.Struct;
+using Reni.SyntaxTree;
 
 namespace Reni.TokenClasses
 {

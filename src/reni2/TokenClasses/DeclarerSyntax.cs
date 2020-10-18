@@ -2,16 +2,18 @@ using System.Linq;
 using hw.DebugFormatter;
 using JetBrains.Annotations;
 using Reni.Parser;
+using Reni.SyntaxFactory;
+using Reni.SyntaxTree;
 
 namespace Reni.TokenClasses
 {
-    sealed class DeclarerSyntax : Syntax
+    sealed class DeclarerSyntax : DumpableObject
     {
-        internal class TagSyntax : NoChildren
+        internal class TagSyntax : Syntax.NoChildren
         {
-            internal readonly SyntaxFactory.IDeclarerToken Value;
+            internal readonly IDeclarerToken Value;
 
-            internal TagSyntax(SyntaxFactory.IDeclarerToken value, BinaryTree anchor)
+            internal TagSyntax(IDeclarerToken value, BinaryTree anchor)
                 : base(anchor)
             {
                 Value = value;
@@ -26,13 +28,16 @@ namespace Reni.TokenClasses
                 => base.AssertValid(level == null? null : new Level {IsCorrectOrder = level.IsCorrectOrder}, target);
         }
 
-        internal class NameSyntax : NoChildren
+        internal class NameSyntax : Syntax.NoChildren
         {
             internal readonly string Value;
 
             internal NameSyntax([NotNull] BinaryTree anchor, [NotNull] string name)
                 : base(anchor)
-                => Value = name;
+            {
+                Value = name;
+                Anchor.AssertIsNotNull();
+            }
 
             [EnableDump]
             [EnableDumpExcept(null)]
@@ -43,20 +48,18 @@ namespace Reni.TokenClasses
         }
 
         internal static readonly Result<DeclarerSyntax> Empty
-            = new Result<DeclarerSyntax>(new DeclarerSyntax(new TagSyntax[0], null, null, null));
+            = new Result<DeclarerSyntax>(new DeclarerSyntax(new TagSyntax[0], null, null));
 
         internal readonly NameSyntax Name;
         internal readonly TagSyntax[] Tags;
         readonly bool? MeansPublic;
 
-        DeclarerSyntax(TagSyntax[] tags, BinaryTree anchor, NameSyntax name, bool? meansPublic)
-            : base(anchor)
+        DeclarerSyntax(TagSyntax[] tags, NameSyntax name, bool? meansPublic)
         {
             Tags = tags;
             Name = name;
             MeansPublic = meansPublic;
 
-            anchor.AssertIsNull();
             StopByObjectIds();
         }
 
@@ -84,19 +87,9 @@ namespace Reni.TokenClasses
         internal bool IsMutableSyntax => Tags.Any(item => item.Value is MutableDeclarationToken);
 
         [DisableDump]
-        internal override int LeftDirectChildCount => Tags.Length;
+        internal int DirectChildCount => Tags.Length + 1;
 
-        [DisableDump]
-        protected override int DirectChildCount => Tags.Length + 1;
-
-        [EnableDump]
-        [EnableDumpExcept(null)]
-        string Position => Anchor?.Token.Characters.GetDumpAroundCurrent(5);
-
-        internal override void AssertValid(Level level, BinaryTree target = null)
-            => base.AssertValid(level == null? null : new Level {IsCorrectOrder = level.IsCorrectOrder}, target);
-
-        protected override Syntax GetDirectChild(int index)
+        internal  Syntax GetDirectChild(int index)
         {
             if(index >= 0 && index < Tags.Length)
                 return Tags[index];
@@ -104,18 +97,18 @@ namespace Reni.TokenClasses
         }
 
         internal static DeclarerSyntax FromTag(DeclarationTagToken tag, BinaryTree target, bool? meansPublic)
-            => new DeclarerSyntax(new[] {new TagSyntax(tag, target)}, null, null, meansPublic);
+            => new DeclarerSyntax(new[] {new TagSyntax(tag, target)}, null, meansPublic);
 
         internal static DeclarerSyntax FromName(BinaryTree target, string name, bool? meansPublic)
-            => new DeclarerSyntax(new TagSyntax[0], null, new NameSyntax(target, name), meansPublic);
+            => new DeclarerSyntax(new TagSyntax[0], new NameSyntax(target, name), meansPublic);
 
-        internal DeclarerSyntax Combine(DeclarerSyntax other, BinaryTree root = null)
+        internal DeclarerSyntax Combine(DeclarerSyntax other)
         {
             if(other == null)
                 return this;
-            Tracer.Assert(Name == null || other.Name == null);
-            Tracer.Assert(MeansPublic == null || other.MeansPublic == null || MeansPublic == other.MeansPublic);
-            return new DeclarerSyntax(Tags.Concat(other.Tags).ToArray(), root, Name ?? other.Name
+            (Name == null || other.Name == null).Assert();
+            (MeansPublic == null || other.MeansPublic == null || MeansPublic == other.MeansPublic).Assert();
+            return new DeclarerSyntax(Tags.Concat(other.Tags).ToArray(), Name ?? other.Name
                 , MeansPublic ?? other.MeansPublic);
         }
 

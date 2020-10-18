@@ -1,8 +1,9 @@
 using Reni.Basics;
 using Reni.Context;
+using Reni.SyntaxTree;
 using Reni.TokenClasses;
 
-namespace Reni.Parser
+namespace Reni.SyntaxTree
 {
     sealed class EmptyList : ValueSyntax.NoChildren
     {

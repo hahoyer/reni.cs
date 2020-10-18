@@ -6,6 +6,7 @@ using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
 using Reni.Parser;
+using Reni.SyntaxTree;
 using Reni.TokenClasses;
 using Reni.Validation;
 
@@ -103,38 +104,58 @@ namespace Reni.Helper
         }
 
         protected abstract TResult Create(BinaryTree flatItem);
-        protected abstract TResult Create(Reni.Parser.Syntax flatItem);
+        protected abstract TResult Create(Syntax flatItem);
+
+        SyntaxView<TResult> GetSyntax(Func<Syntax> getFlatSyntax, TResult parent)
+        {
+            var flatItem = GetFlatSyntax(getFlatSyntax, parent);
+
+            flatItem.AssertIsNotNull();
+            var directChildren = flatItem.DirectChildren.Select(FindOrCreate).ToArray();
+            return new SyntaxView<TResult>(flatItem, directChildren, parent, (TResult)this);
+        }
 
         TResult FindOrCreate(Syntax flatItem, int index)
         {
             if(flatItem == null)
                 return null;
 
-            if(flatItem.Anchor != null)
-            {
-                var path = Binary.FlatItem.GetPath(node => node == flatItem.Anchor);
-                path.AssertIsNotNull();
-                return (TResult)this.ApplyPath(path, node => node.Binary);
-            }
+            if(flatItem.Anchor == null)
+                return Create(flatItem);
 
-            (flatItem is DeclarerSyntax).Assert();
-
-            return Create(flatItem);
+            var path = Binary.FlatItem.GetPath(node => node == flatItem.Anchor);
+            path.AssertIsNotNull();
+            return (TResult)this.ApplyPath(path, node => node.Binary);
         }
 
-        SyntaxView<TResult> GetSyntax(Func<Syntax> getFlatSyntax, TResult parent)
+        Syntax GetFlatSyntax(Func<Syntax> getFlatSyntax, TResult parent)
         {
-            var flatItem =
-                getFlatSyntax?.Invoke()
-                ?? parent
-                    .Syntax
-                    .FlatItem
-                    .DirectChildren
-                    .Single(pair => pair?.Anchor == Binary.FlatItem);
+            var flatItem = getFlatSyntax?.Invoke();
+            if(flatItem != null)
+                return flatItem;
 
-            flatItem.AssertIsNotNull();
-            var directChildren = flatItem.DirectChildren.Select(FindOrCreate).ToArray();
-            return new SyntaxView<TResult>(flatItem, directChildren, parent, (TResult)this);
+            var parentSyntax = parent.Syntax.FlatItem;
+
+            var flatItemDirectChildren = parentSyntax.DirectChildren;
+            flatItem = flatItemDirectChildren
+                .FirstOrDefault(syntax => IsPartner(syntax, parent));
+
+            if(flatItem == null)
+            {
+                (TokenClass is IRightBracket).Assert();
+                flatItem = new ProxySyntax.RightBracket(parentSyntax, Binary.FlatItem);
+            }
+            else
+                (!(TokenClass is IRightBracket)).Assert();
+
+            return flatItem;
+        }
+
+        bool IsPartner(Syntax pair, TResult parent)
+        {
+            NotImplementedMethod(pair, parent);
+            
+            return pair?.Anchor == Binary.FlatItem;
         }
 
         IEnumerable<TResult> GetParserLevelBelongings()
@@ -170,5 +191,37 @@ namespace Reni.Helper
             foreach(var node in parents.Concat(children))
                 yield return node;
         }
+    }
+
+    abstract class ProxySyntax : Syntax
+    {
+        internal class RightBracket : ProxySyntax
+        {
+            public RightBracket(Syntax client, BinaryTree anchor)
+                : base(client, anchor)
+                => (anchor.TokenClass is IRightBracket).Assert();
+        }
+
+        internal class LeftBracket : ProxySyntax
+        {
+            public LeftBracket(Syntax client, BinaryTree anchor)
+                : base(client, anchor)
+                => (anchor.TokenClass is ILeftBracket).Assert();
+        }
+
+        [DisableDump]
+        internal readonly Syntax Client;
+
+        ProxySyntax(Syntax client, BinaryTree anchor)
+            : base(anchor)
+            => Client = client;
+
+        [DisableDump]
+        internal override int LeftDirectChildCount => Client.LeftDirectChildCount;
+
+        [DisableDump]
+        protected override int DirectChildCount => Client.LeftDirectChildCount;
+
+        protected override Syntax GetDirectChild(int index) => Client.DirectChildren[index];
     }
 }

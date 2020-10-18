@@ -20,7 +20,8 @@ namespace Reni.TokenClasses
 
         int IRightBracket.Level => Level;
 
-        public static string TokenId(int level) => "}])".Substring(level - 1, 1);
+        public static string TokenId(int level)
+            => level == 0? PrioTable.EndOfText : "}])".Substring(level - 1, 1);
     }
 
     interface IRightBracket

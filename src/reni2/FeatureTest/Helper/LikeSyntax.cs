@@ -3,6 +3,7 @@ using hw.DebugFormatter;
 using Reni.Basics;
 using Reni.Parser;
 using Reni.Struct;
+using Reni.SyntaxTree;
 using Reni.TokenClasses;
 
 namespace Reni.FeatureTest.Helper
@@ -203,7 +204,7 @@ namespace Reni.FeatureTest.Helper
         {
             Tracer.Assert(target.Left == null);
             Tracer.Assert(target.Right== null);
-            Tracer.Assert(target.TokenClass is TokenClasses.Number);
+            Tracer.Assert(target.TokenClass is Reni.TokenClasses.Number);
             Tracer.Assert(BitsConst.Convert(target.Token.Characters.Id).ToInt64() == _i);
         }
 

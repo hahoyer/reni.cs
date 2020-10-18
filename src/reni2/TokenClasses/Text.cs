@@ -2,6 +2,7 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Parser;
+using Reni.SyntaxTree;
 
 namespace Reni.TokenClasses
 {

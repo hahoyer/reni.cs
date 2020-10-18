@@ -6,10 +6,11 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 using Reni.Helper;
+using Reni.Parser;
 using Reni.Struct;
 using Reni.TokenClasses;
 
-namespace Reni.Parser
+namespace Reni.SyntaxTree
 {
     /// <summary>
     ///     Static syntax items

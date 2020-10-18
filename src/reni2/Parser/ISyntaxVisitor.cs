@@ -1,4 +1,4 @@
-namespace Reni.Parser
+namespace Reni.SyntaxTree
 {
     interface ISyntaxVisitor
     {

@@ -2,6 +2,7 @@
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
+using Reni.SyntaxTree;
 using Reni.TokenClasses;
 
 namespace Reni.Feature
@@ -12,7 +13,7 @@ namespace Reni.Feature
         public const string TokenId = "type";
         public override string Id => TokenId;
 
-        protected override Result Result(ContextBase context, Category category, Parser.ValueSyntax left)
+        protected override Result Result(ContextBase context, Category category, ValueSyntax left)
         {
             if(category.HasType)
             {

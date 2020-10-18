@@ -3,6 +3,7 @@ using hw.Helper;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Struct;
+using Reni.SyntaxTree;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -52,7 +53,7 @@ namespace Reni.Feature
             ResultCache left,
             ISyntax currentTarget,
             ContextBase context,
-            Parser.ValueSyntax right)
+            ValueSyntax right)
         {
             var trace = ObjectId.In(-34) && category.HasCode;
             StartMethodDump(trace, category, left, currentTarget, context, right);

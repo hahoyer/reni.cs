@@ -8,6 +8,7 @@ using hw.Parser;
 using JetBrains.Annotations;
 using Reni.Numeric;
 using Reni.Parser;
+using Reni.SyntaxTree;
 using Reni.TokenClasses;
 
 namespace Reni

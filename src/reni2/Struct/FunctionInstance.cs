@@ -4,7 +4,7 @@ using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
-using Reni.Parser;
+using Reni.SyntaxTree;
 using Reni.Type;
 using Reni.Validation;
 
@@ -13,10 +13,6 @@ namespace Reni.Struct
     abstract class FunctionInstance
         : DumpableObject, ResultCache.IResultProvider, ValueCache.IContainer
     {
-        [Node]
-        [EnableDump]
-        readonly ValueSyntax Body;
-
         [DisableDump]
         protected readonly FunctionType Parent;
 
@@ -24,23 +20,15 @@ namespace Reni.Struct
 
         bool _isObtainBodyCodeActive;
 
+        [Node]
+        [EnableDump]
+        readonly ValueSyntax Body;
+
         protected FunctionInstance(FunctionType parent, ValueSyntax body)
         {
             Body = body;
             Parent = parent;
             ResultCache = new ResultCache(this);
-        }
-
-        ValueCache ValueCache.IContainer.Cache {get;} = new ValueCache();
-
-        Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
-        {
-            if(category.IsNone && pendingCategory == Category.Closures)
-                return new Result(Category.Closures, getClosures: Reni.Closures.Void);
-
-
-            Tracer.Assert(pendingCategory.IsNone);
-            return GetResult(category);
         }
 
         [Node]
@@ -54,7 +42,7 @@ namespace Reni.Struct
         Size ArgsPartSize => Parent.ArgsType.Size + RelevantValueSize;
 
         [DisableDump]
-        protected abstract Size RelevantValueSize {get;}
+        protected abstract Size RelevantValueSize { get; }
 
         string Description => Body.Anchor?.SourcePart.Id ?? "";
 
@@ -65,12 +53,12 @@ namespace Reni.Struct
             get
             {
                 var result = ResultCache.Closures;
-                Tracer.Assert(result != null);
+                (result != null).Assert();
                 return result;
             }
         }
 
-        protected abstract FunctionId FunctionId {get;}
+        protected abstract FunctionId FunctionId { get; }
 
         [Node]
         [DisableDump]
@@ -104,6 +92,18 @@ namespace Reni.Struct
         [DisableDump]
         internal IEnumerable<IFormalCodeItem> CodeItems => BodyCode.Visit(new ItemCollector());
 
+        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
+
+        Result ResultCache.IResultProvider.Execute(Category category, Category pendingCategory)
+        {
+            if(category.IsNone && pendingCategory == Category.Closures)
+                return new Result(Category.Closures, getClosures: Closures.Void);
+
+
+            pendingCategory.IsNone.Assert();
+            return GetResult(category);
+        }
+
         internal Result GetCallResult(Category category)
         {
             var result = ResultCache & category.FunctionCall;
@@ -132,9 +132,9 @@ namespace Reni.Struct
                 BreakExecution();
                 var rawResult = Context.Result(category.WithType, Body);
 
-                Tracer.Assert(rawResult.HasIssue || rawResult.CompleteCategory == category.WithType);
+                (rawResult.HasIssue || rawResult.CompleteCategory == category.WithType).Assert();
                 if(rawResult.FindClosures != null)
-                    Tracer.Assert(!rawResult.SmartClosures.Contains(Closures.Arg()), rawResult.Dump);
+                    (!rawResult.SmartClosures.Contains(Closures.Arg())).Assert(rawResult.Dump);
 
                 Dump("rawResult", rawResult);
                 BreakExecution();

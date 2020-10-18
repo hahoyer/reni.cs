@@ -6,6 +6,7 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.SyntaxTree;
 using Reni.Type;
 using Reni.Validation;
 

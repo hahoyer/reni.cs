@@ -10,6 +10,7 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.Parser;
 using Reni.Struct;
+using Reni.SyntaxTree;
 using Reni.TokenClasses;
 using Reni.Validation;
 

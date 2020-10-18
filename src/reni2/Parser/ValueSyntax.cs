@@ -4,11 +4,12 @@ using hw.DebugFormatter;
 using hw.Helper;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Parser;
 using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Type;
 
-namespace Reni.Parser
+namespace Reni.SyntaxTree
 {
     /// <summary>
     ///     Static syntax items that represent a value
@@ -58,10 +59,10 @@ namespace Reni.Parser
 
         ValueSyntax IStatementSyntax.ToValueSyntax(BinaryTree binaryTree, BinaryTree rightAnchor) => this;
 
-        internal override Result<StatementSyntax[]> ToStatementsSyntax(BinaryTree target = null) 
-            => StatementSyntax.Create(target, this);
-
         ValueSyntax IStatementSyntax.Value => this;
+
+        internal override Result<StatementSyntax[]> ToStatementsSyntax(BinaryTree target = null)
+            => StatementSyntax.Create(target, this);
 
         //[DebuggerHidden]
         internal virtual Result ResultForCache(ContextBase context, Category category)
@@ -105,6 +106,5 @@ namespace Reni.Parser
 
         internal IEnumerable<string> GetDeclarationOptions(ContextBase context)
             => Type(context).DeclarationOptions;
-
     }
 }
