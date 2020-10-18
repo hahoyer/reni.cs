@@ -40,6 +40,11 @@ namespace Reni.Struct
             int IContextReference.Order => Order;
         }
 
+        [DisableDump]
+        [EnableDump]
+        [Node]
+        internal override CompoundView FindRecentCompoundView { get; }
+
         [EnableDump]
         [Node]
         internal readonly FunctionSyntax Syntax;
@@ -49,11 +54,6 @@ namespace Reni.Struct
             FindRecentCompoundView = compoundView;
             Syntax = syntax;
         }
-
-        [DisableDump]
-        [field: EnableDump]
-        [field: Node]
-        internal override CompoundView FindRecentCompoundView { get; }
 
         [DisableDump]
         internal override Root Root => FindRecentCompoundView.Root;

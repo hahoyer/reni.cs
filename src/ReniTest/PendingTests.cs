@@ -1,4 +1,4 @@
-//16:07:26.227 18.10.2020 run 151 of 178 Reni.FeatureTest.Integer.Create.Run
+//16:12:25.450 18.10.2020 ran 169 of 178 
 
 namespace hw.UnitTest
 {
@@ -7,10 +7,6 @@ namespace hw.UnitTest
         public static void Run()
         {
         
-// active 
-
-TestRunner.RunTest(new Reni.FeatureTest.Integer.Create().Run);
-
 // error 
 
 TestRunner.RunTest(new ReniUI.Test.ExpressionFormatting().FromSourcePart);
@@ -62,23 +58,6 @@ TestRunner.RunTest(new ReniUI.Test.UserInterAction3().GetTokenForPosition);
 
 // notrun 
 
-TestRunner.RunTest(new Reni.FeatureTest.Text1().Run);
-TestRunner.RunTest(new Reni.FeatureTest.TextConcat().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Integer.IntegerPlusInteger().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Integer.IntegerPlusNumber().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Integer.Clone().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Function.FunctionOfFunction().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Function.FunctionArgument().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Function.ObjectFunction().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Function.PrimitiveRecursiveFunctionByteWithDump().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Function.PrimitiveRecursiveFunctionHuge().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Function.PrimitiveRecursiveFunctionSmall().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Function.PrimitiveRecursiveFunctionWithDump().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Function.RecursiveFunction().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Function.SimpleRepeater().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Function.Repeater().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Function.TwoFunctions().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Function.TwoFunctions1().Run);
 TestRunner.RunTest(new ReniUI.Test.AutoComplete().GetDeclarationOptions);
 TestRunner.RunTest(new ReniUI.Test.AutoCompleteFunctionInCompound().GetDeclarationOptions);
 TestRunner.RunTest(new ReniUI.Test.AutoCompleteSimple().GetDeclarationOptions);
