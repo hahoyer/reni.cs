@@ -7,7 +7,6 @@ using hw.Helper;
 using hw.Scanner;
 using Reni.Helper;
 using Reni.Parser;
-using Reni.Struct;
 using Reni.TokenClasses;
 
 namespace Reni.SyntaxTree
@@ -15,7 +14,7 @@ namespace Reni.SyntaxTree
     /// <summary>
     ///     Static syntax items
     /// </summary>
-    abstract class  Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, Feature.ISourceProvider
+    abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, Feature.ISourceProvider
     {
         internal abstract class NoChildren : Syntax
         {
@@ -30,6 +29,13 @@ namespace Reni.SyntaxTree
 
             protected sealed override Syntax GetDirectChild(int index)
                 => throw new Exception($"Unexpected call: {nameof(GetDirectChild)}({index})");
+        }
+
+
+        internal class Level
+        {
+            public bool IsCorrectMapping;
+            public bool IsCorrectOrder;
         }
 
         internal readonly BinaryTree Anchor;
@@ -51,15 +57,20 @@ namespace Reni.SyntaxTree
 
         internal Syntax[] DirectChildren => this.CachedValue(() => DirectChildCount.Select(GetDirectChild).ToArray());
 
+        SourcePart SourcePart => Anchor?.SourcePart;
+
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        int ITree<Syntax>.LeftDirectChildCount => LeftDirectChildCount;
+        SourcePart Feature.ISourceProvider.Value => SourcePart;
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         int ITree<Syntax>.DirectChildCount => DirectChildCount;
 
-        Syntax ITree<Syntax>.GetDirectChild(int index) 
+        Syntax ITree<Syntax>.GetDirectChild(int index)
             => index < 0 || index >= DirectChildCount? null : DirectChildren[index];
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        int ITree<Syntax>.LeftDirectChildCount => LeftDirectChildCount;
 
         protected abstract Syntax GetDirectChild(int index);
 
@@ -91,19 +102,12 @@ namespace Reni.SyntaxTree
             => this.GetNodesFromLeftToRight().SelectMany(node => node.CheckedItemsAsLongAs(condition));
 
 
-        internal class Level
-        {
-            public bool IsCorrectOrder;
-            public bool IsCorrectMapping;
-        }
-
-
         internal virtual void AssertValid(Level level = null, BinaryTree target = null)
         {
-            level ??= new Level {IsCorrectOrder= true};
+            level ??= new Level {IsCorrectOrder = true};
 
-            foreach(var node in DirectChildren.Where(node=>node != this))
-                node?.AssertValid(null);
+            foreach(var node in DirectChildren.Where(node => node != this))
+                node?.AssertValid();
 
             target ??= Anchor;
             if(target == null)
@@ -114,14 +118,14 @@ namespace Reni.SyntaxTree
                 .Select(node => node?.Anchor)
                 .Where(node => node != null)
                 .ToArray();
-            
+
             if(level.IsCorrectOrder)
-            for(var index = 1; index < nodesInSyntax.Length; index++)
-            {
-                var last= nodesInSyntax[index-1].Token.Characters;
-                var current= nodesInSyntax[index].Token.Characters;
-                Tracer.Assert(last < current);
-            }
+                for(var index = 1; index < nodesInSyntax.Length; index++)
+                {
+                    var last = nodesInSyntax[index - 1].Token.Characters;
+                    var current = nodesInSyntax[index].Token.Characters;
+                    (last < current).Assert();
+                }
 
             if(level.IsCorrectMapping)
             {
@@ -141,13 +145,7 @@ namespace Reni.SyntaxTree
 
                     NotImplementedMethod(target, nameof(missingTargetNodes), missingTargetNodes);
                 }
-
             }
-
         }
-
-        SourcePart Feature.ISourceProvider.Value => SourcePart;
-
-        SourcePart SourcePart => Anchor?.SourcePart;
     }
 }

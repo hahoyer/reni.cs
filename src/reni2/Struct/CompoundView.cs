@@ -7,59 +7,189 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.SyntaxTree;
 using Reni.TokenClasses;
 using Reni.Type;
 using Reni.Validation;
 
 namespace Reni.Struct
 {
-    sealed class CompoundView
-        : DumpableObject
-            ,
-            ValueCache.IContainer
+    sealed class CompoundView : DumpableObject, ValueCache.IContainer
     {
-        static int _nextObjectId;
+        sealed class RecursionWhileObtainingCompoundSizeException : Exception
+        {
+            [EnableDump]
+            readonly CompoundView CompoundView;
+
+            public RecursionWhileObtainingCompoundSizeException
+                (CompoundView compoundView) => CompoundView = compoundView;
+        }
+
+        sealed class ConverterAccess : DumpableObject, IConversion
+        {
+            [EnableDump]
+            readonly FunctionType Parent;
+
+            [EnableDump]
+            readonly CompoundType Type;
+
+            public ConverterAccess(FunctionType parent, CompoundType type)
+            {
+                Parent = parent;
+                Type = type;
+            }
+
+            Result IConversion.Execute(Category category)
+            {
+                var innerResult = ((IConversion)Parent).Execute(category);
+                var conversion = Type.Pointer.Mutation(Parent);
+                var result = innerResult.ReplaceArg(conversion);
+                return result;
+            }
+
+            TypeBase IConversion.Source => Type.Pointer;
+        }
+
+        static int NextObjectId;
+
         [EnableDump]
         [Node]
         internal readonly Compound Compound;
+
         [EnableDump]
         [Node]
         internal readonly int ViewPosition;
+
         [Node]
-        readonly ValueCache<CompoundType> _typeCache;
+        readonly FunctionCache<int, AccessFeature> AccessFeaturesCache;
+
         [Node]
-        readonly FunctionCache<int, AccessFeature> _accessFeaturesCache;
+        readonly FunctionCache<int, FieldAccessType> FieldAccessTypeCache;
+
         [Node]
-        readonly FunctionCache<int, FieldAccessType> _fieldAccessTypeCache;
+        readonly FunctionCache<FunctionSyntax, FunctionBodyType> FunctionBodyTypeCache;
+
+        bool IsObtainCompoundSizeActive;
+
         [Node]
-        readonly FunctionCache<FunctionSyntax, FunctionBodyType> _functionBodyTypeCache;
+        readonly ValueCache<CompoundType> TypeCache;
+
         [Node]
         readonly ValueCache<CompoundContext> CompoundContextCache;
 
+        bool IsDumpPrintResultViaObjectActive;
+
         internal CompoundView(Compound compound, int viewPosition)
-            : base(_nextObjectId++)
+            : base(NextObjectId++)
         {
             Compound = compound;
             ViewPosition = viewPosition;
             CompoundContextCache = new ValueCache<CompoundContext>
                 (() => new CompoundContext(this));
 
-            _typeCache = new ValueCache<CompoundType>(() => new CompoundType(this));
+            TypeCache = new ValueCache<CompoundType>(() => new CompoundType(this));
 
-            _accessFeaturesCache
+            AccessFeaturesCache
                 = new FunctionCache<int, AccessFeature>
                     (position => new AccessFeature(this, position));
 
-            _fieldAccessTypeCache
+            FieldAccessTypeCache
                 = new FunctionCache<int, FieldAccessType>
                     (position => new FieldAccessType(this, position));
 
-            _functionBodyTypeCache
+            FunctionBodyTypeCache
                 = new FunctionCache<FunctionSyntax, FunctionBodyType>
                     (syntax => new FunctionBodyType(this, syntax));
 
             StopByObjectIds();
         }
+
+        bool IsEndPosition => ViewPosition == Compound.Syntax.EndPosition;
+
+        [DisableDump]
+        internal ContextBase Context
+            => Compound.Parent.CompoundPositionContext(Compound.Syntax, ViewPosition);
+
+        [DisableDump]
+        internal CompoundType Type => TypeCache.Value;
+
+        [DisableDump]
+        TypeBase IndexType => Compound.IndexType;
+
+        [DisableDump]
+        internal CompoundContext CompoundContext => CompoundContextCache.Value;
+
+        [DisableDump]
+        internal Size CompoundViewSize
+        {
+            get
+            {
+                if(IsObtainCompoundSizeActive)
+                    throw new RecursionWhileObtainingCompoundSizeException(this);
+
+                try
+                {
+                    IsObtainCompoundSizeActive = true;
+                    var result = Compound.Size(ViewPosition);
+                    IsObtainCompoundSizeActive = false;
+                    return result;
+                }
+                catch(RecursionWhileObtainingCompoundSizeException)
+                {
+                    IsObtainCompoundSizeActive = false;
+                    return null;
+                }
+            }
+        }
+
+        [DisableDump]
+        internal bool IsHollow => Compound.IsHollow(ViewPosition);
+
+        [DisableDump]
+        internal Root Root => Compound.Root;
+
+        [DisableDump]
+        internal IEnumerable<IConversion> ConverterFeatures
+            => Compound
+                .Syntax
+                .ConverterFunctions
+                .Select(ConversionFunction);
+
+        [DisableDump]
+        internal string DumpPrintTextOfType
+            => Compound
+                .Syntax
+                .EndPosition
+                .Select(position => Compound.AccessType(ViewPosition, position)?.DumpPrintText ?? "?")
+                .Stringify(", ")
+                .Surround("(", ")");
+
+        [DisableDump]
+        internal IEnumerable<IConversion> MixinConversions
+            => Compound
+                .Syntax
+                .MixInDeclarations
+                .Select(AccessFeature);
+
+        [DisableDump]
+        ContextReferenceType ContextReferenceType
+            => this.CachedValue(() => new ContextReferenceType(this));
+
+        [DisableDump]
+        internal IEnumerable<string> DeclarationOptions
+        {
+            get
+            {
+                yield return DumpPrintToken.TokenId;
+                yield return AtToken.TokenId;
+
+                foreach(var name in Compound.Syntax.AllNames)
+                    yield return name;
+            }
+        }
+
+        internal Issue[] Issues => Compound.GetIssues(ViewPosition);
+        internal bool HasIssues => Issues.Any();
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
@@ -85,17 +215,8 @@ namespace Reni.Struct
             return ":" + names;
         }
 
-        bool IsEndPosition => ViewPosition == Compound.Syntax.EndPosition;
-
         public string GetCompoundIdentificationDump()
             => Context.GetContextIdentificationDump();
-
-        [DisableDump]
-        internal ContextBase Context
-            => Compound.Parent.CompoundPositionContext(Compound.Syntax, ViewPosition);
-
-        [DisableDump]
-        internal CompoundType Type => _typeCache.Value;
 
         protected override string GetNodeDump()
         {
@@ -106,80 +227,9 @@ namespace Reni.Struct
             return result;
         }
 
-        [DisableDump]
-        TypeBase IndexType => Compound.IndexType;
+        internal TypeBase FunctionalType(FunctionSyntax syntax) => FunctionBodyTypeCache[syntax];
 
-        bool _isObtainCompoundSizeActive;
-
-        [DisableDump]
-        internal CompoundContext CompoundContext => CompoundContextCache.Value;
-
-        [DisableDump]
-        internal Size CompoundViewSize
-        {
-            get
-            {
-                if(_isObtainCompoundSizeActive)
-                    throw new RecursionWhileObtainingCompoundSizeException(this);
-
-                try
-                {
-                    _isObtainCompoundSizeActive = true;
-                    var result = Compound.Size(ViewPosition);
-                    _isObtainCompoundSizeActive = false;
-                    return result;
-                }
-                catch(RecursionWhileObtainingCompoundSizeException)
-                {
-                    _isObtainCompoundSizeActive = false;
-                    return null;
-                }
-            }
-        }
-
-        [DisableDump]
-        internal bool IsHollow => Compound.IsHollow(ViewPosition);
-
-        [DisableDump]
-        internal Root Root => Compound.Root;
-
-        [DisableDump]
-        internal IEnumerable<IConversion> ConverterFeatures
-            => Compound
-                .Syntax
-                .ConverterFunctions
-                .Select(ConversionFunction);
-
-        [DisableDump]
-        internal string DumpPrintTextOfType
-            => Compound
-                .Syntax
-                .EndPosition
-                .Select(position => Compound.AccessType(ViewPosition, position)?.DumpPrintText?? "?")
-                .Stringify(", ")
-                .Surround("(", ")");
-
-        [DisableDump]
-        internal IEnumerable<IConversion> MixinConversions
-            => Compound
-                .Syntax
-                .MixInDeclarations
-                .Select(AccessFeature);
-
-        sealed class RecursionWhileObtainingCompoundSizeException : Exception
-        {
-            [EnableDump]
-            readonly CompoundView _compoundView;
-
-            public RecursionWhileObtainingCompoundSizeException(CompoundView compoundView)
-            {
-                _compoundView = compoundView;
-            }
-        }
-
-        internal TypeBase FunctionalType(FunctionSyntax syntax) => _functionBodyTypeCache[syntax];
-
-        internal AccessFeature AccessFeature(int position) => _accessFeaturesCache[position];
+        internal AccessFeature AccessFeature(int position) => AccessFeaturesCache[position];
 
         internal TypeBase AccessType(int position)
         {
@@ -187,7 +237,7 @@ namespace Reni.Struct
             if(result.IsHollow)
                 return result;
 
-            return _fieldAccessTypeCache[position];
+            return FieldAccessTypeCache[position];
         }
 
         internal Result AccessViaPositionExpression(Category category, Result rightResult)
@@ -203,8 +253,6 @@ namespace Reni.Struct
         internal Size FieldOffset(int position)
             => Compound.FieldOffsetFromAccessPoint(ViewPosition, position);
 
-        bool IsDumpPrintResultViaObjectActive;
-
         internal Result DumpPrintResultViaObject(Category category)
         {
             if(IsDumpPrintResultViaObjectActive)
@@ -212,11 +260,11 @@ namespace Reni.Struct
 
             IsDumpPrintResultViaObjectActive = true;
             var result = Root.ConcatPrintResult
-                (
-                    category,
-                    ViewPosition,
-                    DumpPrintResultViaObject
-                );
+            (
+                category,
+                ViewPosition,
+                DumpPrintResultViaObject
+            );
             IsDumpPrintResultViaObjectActive = false;
             return result;
         }
@@ -260,33 +308,9 @@ namespace Reni.Struct
         {
             IConversion result = new ConverterAccess(Function(body, Root.VoidType), Type);
             var source = result.Source;
-            Tracer.Assert(source == Type.Pointer, source.Dump);
-            Tracer.Assert(source == result.Result(Category.Code).Code.ArgType);
+            (source == Type.Pointer).Assert(source.Dump);
+            (source == result.Result(Category.Code).Code.ArgType).Assert();
             return result;
-        }
-
-        sealed class ConverterAccess : DumpableObject, IConversion
-        {
-            [EnableDump]
-            readonly FunctionType Parent;
-            [EnableDump]
-            readonly CompoundType Type;
-
-            public ConverterAccess(FunctionType parent, CompoundType type)
-            {
-                Parent = parent;
-                Type = type;
-            }
-
-            Result IConversion.Execute(Category category)
-            {
-                var innerResult = ((IConversion) Parent).Execute(category);
-                var conversion = Type.Pointer.Mutation(Parent);
-                var result = innerResult.ReplaceArg(conversion);
-                return result;
-            }
-
-            TypeBase IConversion.Source => Type.Pointer;
         }
 
         internal FunctionType Function(FunctionSyntax body, TypeBase argsType)
@@ -325,9 +349,9 @@ namespace Reni.Struct
                 Dump("genericDumpPrintResult", genericDumpPrintResult);
                 BreakExecution();
                 return ReturnMethodDump
-                    (
-                        genericDumpPrintResult.ReplaceAbsolute
-                            (accessType.CheckedReference, c => AccessValueViaObject(c, position)));
+                (
+                    genericDumpPrintResult.ReplaceAbsolute
+                        (accessType.CheckedReference, c => AccessValueViaObject(c, position)));
             }
             finally
             {
@@ -351,7 +375,7 @@ namespace Reni.Struct
         internal IImplementation Find(Definable definable, bool publicOnly)
         {
             var position = Compound.Syntax.Find(definable?.Id, publicOnly);
-            return position == null ? null : AccessFeature(position.Value);
+            return position == null? null : AccessFeature(position.Value);
         }
 
         internal Result AtTokenResult(Category category, Result rightResult)
@@ -367,25 +391,5 @@ namespace Reni.Struct
                 : CodeBase
                     .ReferenceCode(Type.ForcedReference)
                     .ReferencePlus(CompoundViewSize);
-
-        [DisableDump]
-        ContextReferenceType ContextReferenceType
-            => this.CachedValue(() => new ContextReferenceType(this));
-
-        [DisableDump]
-        internal IEnumerable<string> DeclarationOptions
-        {
-            get
-            {
-                yield return DumpPrintToken.TokenId;
-                yield return AtToken.TokenId;
-
-                foreach(var name in Compound.Syntax.AllNames)
-                    yield return name;
-            }
-        }
-
-        internal Issue[] Issues => Compound.GetIssues(ViewPosition);
-        internal bool HasIssues => Issues.Any();
     }
 }

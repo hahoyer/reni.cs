@@ -3,9 +3,9 @@ using hw.DebugFormatter;
 using JetBrains.Annotations;
 using Reni.Parser;
 using Reni.SyntaxFactory;
-using Reni.SyntaxTree;
+using Reni.TokenClasses;
 
-namespace Reni.TokenClasses
+namespace Reni.SyntaxTree
 {
     sealed class DeclarerSyntax : DumpableObject
     {

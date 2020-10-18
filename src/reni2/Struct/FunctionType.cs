@@ -6,6 +6,7 @@ using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
+using Reni.SyntaxTree;
 using Reni.TokenClasses;
 using Reni.Type;
 using Reni.Validation;

@@ -2,11 +2,10 @@ using hw.DebugFormatter;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Parser;
 using Reni.Struct;
-using Reni.SyntaxTree;
+using Reni.TokenClasses;
 
-namespace Reni.TokenClasses
+namespace Reni.SyntaxTree
 {
     sealed class FunctionSyntax : ValueSyntax
     {

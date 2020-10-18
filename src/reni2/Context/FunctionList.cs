@@ -4,7 +4,7 @@ using hw.DebugFormatter;
 using hw.Helper;
 using Reni.Code;
 using Reni.Struct;
-using Reni.TokenClasses;
+using Reni.SyntaxTree;
 using Reni.Type;
 
 namespace Reni.Context
@@ -14,42 +14,38 @@ namespace Reni.Context
         [Node]
         readonly
             FunctionCache<FunctionSyntax, FunctionCache<CompoundView, FunctionCache<TypeBase, int>>>
-            _dictionary;
+            Dictionary;
 
         [Node]
-        readonly List<FunctionType> _list = new List<FunctionType>();
+        readonly List<FunctionType> List = new List<FunctionType>();
 
-        public FunctionList()
-        {
-            _dictionary = new FunctionCache
-                <FunctionSyntax, FunctionCache<CompoundView, FunctionCache<TypeBase, int>>>
-                (
+        public FunctionList() => Dictionary = new FunctionCache
+            <FunctionSyntax, FunctionCache<CompoundView, FunctionCache<TypeBase, int>>>
+            (
                 syntax => new FunctionCache<CompoundView, FunctionCache<TypeBase, int>>
-                    (
+                (
                     structure => new FunctionCache<TypeBase, int>
                         (-1, args => CreateFunctionInstance(args, syntax, structure))));
-        }
 
-        internal int Count => _list.Count;
+        internal int Count => List.Count;
 
-        internal FunctionType Find
-            (FunctionSyntax syntax, CompoundView compoundView, TypeBase argsType)
+        internal FunctionType Find(FunctionSyntax syntax, CompoundView compoundView, TypeBase argsType)
         {
-            var index = _dictionary[syntax][compoundView][argsType];
-            return _list[index];
+            var index = Dictionary[syntax][compoundView][argsType];
+            return List[index];
         }
 
         internal IEnumerable<FunctionType> Find(FunctionSyntax syntax, CompoundView compoundView)
-            => _dictionary[syntax][compoundView].Select(item => _list[item.Value]);
+            => Dictionary[syntax][compoundView].Select(item => List[item.Value]);
 
-        internal FunctionContainer Container(int index) => _list[index].Container;
-        internal FunctionType Item(int index) => _list[index];
+        internal FunctionContainer Container(int index) => List[index].Container;
+        internal FunctionType Item(int index) => List[index];
 
         int CreateFunctionInstance(TypeBase args, FunctionSyntax syntax, CompoundView compoundView)
         {
-            var index = _list.Count;
+            var index = List.Count;
             var f = new FunctionType(index, syntax, compoundView, args);
-            _list.Add(f);
+            List.Add(f);
             return index;
         }
     }

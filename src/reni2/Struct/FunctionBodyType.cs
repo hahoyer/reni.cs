@@ -5,7 +5,7 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
-using Reni.TokenClasses;
+using Reni.SyntaxTree;
 using Reni.Type;
 
 namespace Reni.Struct
@@ -17,49 +17,67 @@ namespace Reni.Struct
             , IConversion
             , IImplementation
             , IChild<CompoundView>
-        , ISymbolProvider<DumpPrintToken>
+            , ISymbolProvider<DumpPrintToken>
     {
-        [EnableDump]
-        [Node]
-        readonly CompoundView CompoundView;
+        sealed class ContextReference : DumpableObject, IContextReference
+        {
+            readonly int Order;
+
+            [Node]
+            readonly FunctionBodyType Parent;
+
+            public ContextReference(FunctionBodyType parent)
+                : base(parent.ObjectId)
+            {
+                Order = Closures.NextOrder++;
+                Parent = parent;
+                StopByObjectIds(-5);
+            }
+
+            [EnableDump]
+            FunctionSyntax Syntax => Parent.Syntax;
+
+            int IContextReference.Order => Order;
+        }
+
         [EnableDump]
         [Node]
         internal readonly FunctionSyntax Syntax;
 
         public FunctionBodyType(CompoundView compoundView, FunctionSyntax syntax)
         {
-            CompoundView = compoundView;
+            FindRecentCompoundView = compoundView;
             Syntax = syntax;
         }
 
-        sealed class ContextReference : DumpableObject, IContextReference
-        {
-            [Node]
-            readonly FunctionBodyType _parent;
-            readonly int _order;
-
-            public ContextReference(FunctionBodyType parent)
-                : base(parent.ObjectId)
-            {
-                _order = Closures.NextOrder++;
-                _parent = parent;
-                StopByObjectIds(-5);
-            }
-
-            int IContextReference.Order => _order;
-            [EnableDump]
-            FunctionSyntax Syntax => _parent.Syntax;
-        }
+        [DisableDump]
+        [field: EnableDump]
+        [field: Node]
+        internal override CompoundView FindRecentCompoundView { get; }
 
         [DisableDump]
-        internal override CompoundView FindRecentCompoundView => CompoundView;
-        [DisableDump]
-        internal override Root Root => CompoundView.Root;
+        internal override Root Root => FindRecentCompoundView.Root;
+
         [DisableDump]
         internal override bool IsHollow => true;
 
         [DisableDump]
         internal override IImplementation FunctionDeclarationForType => this;
+
+        [DisableDump]
+        internal IEnumerable<FunctionType> Functions => FindRecentCompoundView.Functions(Syntax);
+
+        CompoundView IChild<CompoundView>.Parent => FindRecentCompoundView;
+
+        Result IConversion.Execute(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
+        }
+
+        TypeBase IConversion.Source => this;
+        IFunction IEvalImplementation.Function => this;
+        IValue IEvalImplementation.Value => this;
 
         bool IFunction.IsImplicit => Syntax.IsImplicit;
 
@@ -77,7 +95,7 @@ namespace Reni.Struct
                 BreakExecution();
 
                 var result = functionType.ApplyResult(category);
-                Tracer.Assert(category == result.CompleteCategory);
+                (category == result.CompleteCategory).Assert();
 
                 return ReturnMethodDump(result);
             }
@@ -87,8 +105,16 @@ namespace Reni.Struct
             }
         }
 
+        IMeta IMetaImplementation.Function => null;
+
         IImplementation ISymbolProvider<DumpPrintToken>.Feature(DumpPrintToken tokenClass)
             => Feature.Extension.Value(DumpPrintTokenResult, this);
+
+        Result IValue.Execute(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
+        }
 
         protected override CodeBase DumpPrintCode()
             => CodeBase.DumpPrintText(Syntax.Tag);
@@ -97,29 +123,6 @@ namespace Reni.Struct
             => VoidType
                 .Result(category, DumpPrintCode);
 
-        [DisableDump]
-        internal IEnumerable<FunctionType> Functions => CompoundView.Functions(Syntax);
-
-        FunctionType Function(TypeBase argsType) => CompoundView.Function(Syntax, argsType.AssertNotNull());
-
-        IMeta IMetaImplementation.Function => null;
-        IFunction IEvalImplementation.Function => this;
-        IValue IEvalImplementation.Value => this;
-
-        TypeBase IConversion.Source => this;
-
-        Result IConversion.Execute(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
-        }
-
-        Result IValue.Execute(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
-        }
-
-        CompoundView IChild<CompoundView>.Parent => CompoundView;
+        FunctionType Function(TypeBase argsType) => FindRecentCompoundView.Function(Syntax, argsType.AssertNotNull());
     }
 }

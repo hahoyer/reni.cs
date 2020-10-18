@@ -7,7 +7,7 @@ namespace Reni
     {
         readonly string _text;
 
-        public T4Compiler(string text) { _text = text; }
+        public T4Compiler(string text) => _text = text;
 
         public string Code()
         {

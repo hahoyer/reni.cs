@@ -1,10 +1,9 @@
 using hw.DebugFormatter;
 using Reni.Parser;
-using Reni.Struct;
-using Reni.SyntaxTree;
+using Reni.TokenClasses;
 using Reni.Validation;
 
-namespace Reni.TokenClasses
+namespace Reni.SyntaxTree
 {
     class DeclarationSyntax : Syntax, IStatementSyntax
     {
