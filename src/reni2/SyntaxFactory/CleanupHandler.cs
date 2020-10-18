@@ -16,7 +16,12 @@ namespace Reni.SyntaxFactory
                 )
                 .Apply
                 ((statements, cleanup)
-                    => (ValueSyntax)new CompoundSyntax(statements, new CleanupSyntax(target, cleanup), rightAnchor)
+                    => (ValueSyntax)new CompoundSyntax
+                    (
+                        statements,
+                        new CleanupSyntax(target, cleanup),
+                        rightAnchor
+                    )
                 );
     }
 }

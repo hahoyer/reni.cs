@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
@@ -50,7 +49,14 @@ namespace ReniUI.Classification
             => Issues.Any(item => item.IssueId == IssueId.EOFInLineComment);
 
         [DisableDump]
-        IEnumerable<Issue> Issues => Master.Issues;
+        IEnumerable<Issue> Issues
+        {
+            get
+            {
+                NotImplementedMethod();
+                return default;
+            }
+        }
 
         [DisableDump]
         public override string State => Master.Token.Characters.Id ?? "";

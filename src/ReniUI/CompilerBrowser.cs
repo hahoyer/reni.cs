@@ -6,6 +6,7 @@ using hw.Helper;
 using hw.Scanner;
 using Reni;
 using Reni.Code;
+using Reni.Helper;
 using Reni.Struct;
 using Reni.SyntaxTree;
 using Reni.Validation;
@@ -17,6 +18,7 @@ namespace ReniUI
     public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
     {
         readonly ValueCache<Compiler> ParentCache;
+        readonly PositionDictionary<Helper.Syntax> PositionDictionary = new PositionDictionary<Helper.Syntax>();
 
         CompilerBrowser(Func<Compiler> parent) => ParentCache = new ValueCache<Compiler>(parent);
 
@@ -41,8 +43,8 @@ namespace ReniUI
 
         internal Helper.Syntax Syntax => this.CachedValue(GetSyntax);
 
-        internal Formatting.Syntax FormattingBinary
-            => this.CachedValue(() => new Formatting.Syntax(Compiler.BinaryTree, () => Compiler.Syntax));
+        internal Formatting.Syntax FormattingSyntax
+            => this.CachedValue(() => new Formatting.Syntax(Compiler.Syntax));
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
@@ -67,13 +69,13 @@ namespace ReniUI
         }
 
         public string FlatFormat(bool areEmptyLinesPossible)
-            => FormattingBinary.FlatFormat(areEmptyLinesPossible);
+            => FormattingSyntax.FlatFormat(areEmptyLinesPossible);
 
         internal IEnumerable<ValueSyntax> FindPosition(int offset)
             => LocatePosition(offset)
                 .Master
-                .Chain(node => node.Binary.Parent)
-                .Select(item => item.Binary.FlatItem)
+                .Chain(node => node.Parent)
+                .Select(item => item.FlatItem)
                 .OfType<ValueSyntax>()
                 .Where(item => item.ResultCache.Any());
 
@@ -109,7 +111,9 @@ namespace ReniUI
         {
             try
             {
-                return new Helper.Syntax(Compiler.BinaryTree, getFlatSyntax: () => Compiler.Syntax);
+                var syntax = new Helper.Syntax(Compiler.Syntax, PositionDictionary);
+                PositionDictionary.AssertValid(Compiler.BinaryTree);
+                return syntax;
             }
             catch(Exception e)
             {

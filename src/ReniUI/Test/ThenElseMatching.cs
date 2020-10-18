@@ -1,6 +1,5 @@
 using hw.DebugFormatter;
 using hw.UnitTest;
-using Reni.TokenClasses;
 
 // ReSharper disable StringIndexOfIsCultureSpecific.1
 
@@ -16,9 +15,13 @@ namespace ReniUI.Test
             var compiler = CompilerBrowser.FromText(text);
             var thenToken = compiler.LocatePosition(text.IndexOf("then"));
             var elseToken = compiler.LocatePosition(text.IndexOf("else"));
-            Tracer.Assert(elseToken.Master.Left == thenToken.Master,
-                ()=>$"elseToken.Master.Left = {elseToken.Master.Left.Binary.FlatItem.d}\n\n" +
-                    $"thenToken.Master = {thenToken.Master.Binary.FlatItem.d}"
+            (elseToken.Master.Left == thenToken.Master)
+                .Assert
+                (
+                    () =>
+                        "elseToken.Master.Left = " +
+                        $"{elseToken.Master.Left.FlatItem.Anchor.d}\n\n" +
+                        $"thenToken.Master = {thenToken.Master.FlatItem.Anchor.d}"
                 );
         }
 
@@ -29,7 +32,7 @@ namespace ReniUI.Test
             var compiler = CompilerBrowser.FromText(text);
             var thenToken = compiler.LocatePosition(text.IndexOf("then"));
             var elseToken = compiler.LocatePosition(text.IndexOf("else"));
-            Tracer.Assert(elseToken.Master.Left == thenToken.Master);
+            (elseToken.Master.Left == thenToken.Master).Assert();
         }
     }
 }

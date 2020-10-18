@@ -4,7 +4,6 @@ using System.Linq;
 using hw.DebugFormatter;
 using Reni.Helper;
 using Reni.Parser;
-using Reni.Struct;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
 using Reni.Validation;
@@ -114,15 +113,21 @@ namespace Reni.SyntaxFactory
             (T((object)valueToken, statementsToken, declarationToken).Count(n => n != null) <= 1).Assert();
 
             if(valueToken != null)
-                return valueToken.Provider.Get(leftAnchor, target, rightAnchor, factory)
+                return valueToken
+                    .Provider
+                    .Get(leftAnchor, target, rightAnchor, factory)
                     .Apply(fromValueSyntax);
 
             if(declarationToken != null)
-                return declarationToken.Provider.Get(target, factory)
+                return declarationToken
+                    .Provider
+                    .Get(target, factory)
                     .Apply(fromDeclarationSyntax);
 
             if(statementsToken != null)
-                return statementsToken.Provider.Get(leftAnchor, target, factory)
+                return statementsToken
+                    .Provider
+                    .Get(leftAnchor, target, factory)
                     .Apply(fromStatementsSyntax);
 
             return fromValueSyntax(new EmptyList(target))

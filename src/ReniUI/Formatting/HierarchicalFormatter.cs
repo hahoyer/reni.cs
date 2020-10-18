@@ -16,7 +16,7 @@ namespace ReniUI.Formatting
             if(compilerBrowser.IsTooSmall(targetPart))
                 return new Edit[0];
 
-            var item = new HierarchicalStructure.Frame {Target = compilerBrowser.FormattingBinary, Configuration = Configuration};
+            var item = new HierarchicalStructure.Frame {Target = compilerBrowser.FormattingSyntax, Configuration = Configuration};
 
             var sourcePartEdits = item.Edits.ToArray();
             var editPieces = sourcePartEdits.GetEditPieces(Configuration);

@@ -137,7 +137,7 @@ namespace ReniUI.Classification
         internal static Token GetRightNeighbor(Syntax target, int offset)
         {
             var result = target
-                .Chain(node => node.Binary.RightNeighbor)
+                .Chain(node => node.RightNeighbor)
                 .First(node => node.Token.Characters.EndPosition > offset);
 
             var resultToken = result.Token;

@@ -40,11 +40,18 @@ namespace Reni.SyntaxTree
 
         internal readonly BinaryTree Anchor;
 
-        protected Syntax(BinaryTree anchor) => Anchor = anchor;
+        protected Syntax(BinaryTree anchor)
+        {
+            Anchor = anchor; 
+            Anchor.AssertIsNotNull();
+        }
 
         protected Syntax(int objectId, BinaryTree anchor)
             : base(objectId)
-            => Anchor = anchor;
+        {
+            Anchor = anchor; 
+            Anchor.AssertIsNotNull();
+        }
 
         [DisableDump]
         internal abstract int LeftDirectChildCount { get; }

@@ -21,9 +21,6 @@ namespace Reni.SyntaxTree
             protected NoChildren(BinaryTree anchor)
                 : base(anchor) { }
 
-            protected NoChildren(int objectId, BinaryTree anchor)
-                : base(objectId, anchor) { }
-
             [DisableDump]
             internal sealed override int LeftDirectChildCount => 0;
 

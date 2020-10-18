@@ -18,15 +18,15 @@ namespace ReniUI.Formatting
             {
                 get
                 {
-                    var s = Target.Syntax;
+                    var s = Target;
                     var ss = s.LeftMost;
 
-                    Tracer.Assert(Target.Left != null);
-                    Tracer.Assert(Target.Left.Left == null);
-                    Tracer.Assert(Target.Left.TokenClass is BeginOfText);
-                    Tracer.Assert(Target.Left.Right != null);
-                    Tracer.Assert(Target.TokenClass is EndOfText);
-                    Tracer.Assert(Target.Right == null);
+                    Target.Left.AssertIsNotNull();
+                    Target.Left.Left.AssertIsNull();
+                    (Target.Left.TokenClass is BeginOfText).Assert();
+                    Target.Left.Right.AssertIsNotNull();
+                    (Target.TokenClass is EndOfText).Assert();
+                    Target.Right.AssertIsNull();
 
                     return T
                     (
@@ -126,7 +126,7 @@ namespace ReniUI.Formatting
 
         static bool GetIsSeparatorRequired(Syntax target)
             => !target.WhiteSpaces.HasComment() &&
-               SeparatorExtension.Get(target.Binary.LeftNeighbor?.TokenClass, target.TokenClass);
+               SeparatorExtension.Get(target.LeftNeighbor?.TokenClass, target.TokenClass);
 
         static bool True => true;
         static bool False => false;

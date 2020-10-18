@@ -197,7 +197,7 @@ namespace ReniUI
 
         void SignalStyleNeeded(int position)
         {
-            var sourceSyntax = Compiler.Syntax.Binary.LeftMost;
+            var sourceSyntax = Compiler.Syntax.LeftMost;
             //Tracer.ConditionalBreak(sourceSyntax .ObjectId == 1859);
             
             while(TextBox.GetEndStyled() < position)

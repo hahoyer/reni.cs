@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
@@ -5,8 +6,9 @@ using Reni.TokenClasses;
 
 namespace Reni.Helper
 {
+    [Obsolete("",true)]
     sealed class BinaryView<TResult> : DumpableObject, ValueCache.IContainer, ITree<TResult>
-        where TResult : PairView<TResult>
+        where TResult : PairView1<TResult>
     {
         internal readonly BinaryTree FlatItem;
         internal readonly TResult Left;

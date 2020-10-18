@@ -18,9 +18,8 @@ namespace Reni.SyntaxFactory
                 .GetBracketKernel()
                 .Apply(kernel =>
                 {
-                    var result = factory.GetValueSyntax(target.Left, kernel, target
-                        , target.EmptyListIfNull);
-                    (result.Target != null).Assert();
+                    var result = factory.GetValueSyntax(target.Left, kernel, target, target.EmptyListIfNull);
+                    result.Target.AssertIsNotNull();
                     return result;
                 });
     }
