@@ -9,19 +9,10 @@ namespace Reni.SyntaxTree
 
         public CleanupSyntax(BinaryTree anchor, ValueSyntax value)
             : base(anchor)
-        {
-            Value = value ?? new EmptyList(null);
-            AssertValid();
-        }
+            => Value = value;
 
         internal override int LeftDirectChildCount => 0;
         protected override int DirectChildCount => 1;
-
-        void AssertValid()
-        {
-            (Anchor != null).Assert();
-            (Value != null).Assert();
-        }
 
         protected override Syntax GetDirectChild(int index) => Value;
     }
