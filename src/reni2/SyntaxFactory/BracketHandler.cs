@@ -14,13 +14,15 @@ namespace Reni.SyntaxFactory
             BinaryTree rightAnchor,
             Factory factory
         )
-            => target
-                .GetBracketKernel()
+        {
+            var bracketKernel = target.GetBracketKernel();
+            return bracketKernel
                 .Apply(kernel =>
                 {
-                    var result = factory.GetValueSyntax(target.Left, kernel, target, target.EmptyListIfNull);
+                    var result = factory.GetValueSyntax(kernel.Left, kernel.Center, target, target.EmptyListIfNull);
                     result.Target.AssertIsNotNull();
                     return result;
                 });
+        }
     }
 }

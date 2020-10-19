@@ -64,7 +64,7 @@ namespace Reni.SyntaxTree
 
         internal Syntax[] DirectChildren => this.CachedValue(() => DirectChildCount.Select(GetDirectChild).ToArray());
 
-        SourcePart SourcePart => Anchor?.SourcePart;
+        internal SourcePart SourcePart => Anchor?.SourcePart;
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 

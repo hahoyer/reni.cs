@@ -28,6 +28,7 @@ namespace Reni.Helper
 
         protected SyntaxView(Syntax flatItem, TResult parent, PositionDictionary<TResult> context, int index)
         {
+            flatItem.AssertIsNotNull();
             FlatItem = flatItem;
             Parent = parent;
             Context = context;
@@ -122,7 +123,11 @@ namespace Reni.Helper
 
         int ITree<TResult>.LeftDirectChildCount => LeftDirectChildCount;
 
-        TResult GetDirectChild(int index) => Create(FlatItem.DirectChildren[index], index);
+        TResult GetDirectChild(int index)
+        {
+            var child = FlatItem.DirectChildren[index];
+            return child == null? null : Create(child, index);
+        }
 
         protected abstract TResult Create(Syntax syntax, int index);
 

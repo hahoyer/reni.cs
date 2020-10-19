@@ -12,8 +12,6 @@ namespace Reni.SyntaxTree
             : base(anchor)
         {
             Content = content;
-            Tracer.Assert(anchor != null);
-
             AssertValid();
         }
 

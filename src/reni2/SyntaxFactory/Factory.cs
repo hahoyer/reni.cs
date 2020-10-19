@@ -50,17 +50,20 @@ namespace Reni.SyntaxFactory
                 .Get(target, GetCurrentFactory(target));
         }
 
-        internal Result<StatementSyntax[]> GetStatementsSyntax(BinaryTree anchor, BinaryTree target)
+        internal Result<StatementSyntax[]> GetStatementsSyntax(BinaryTree leftAnchor, BinaryTree target)
         {
             if(target == null)
                 return new StatementSyntax[0];
 
+            if(leftAnchor != null)
+                (leftAnchor.Token.Characters < target.Token.Characters).Assert();
+
             return GetSyntax(
-                anchor
+                leftAnchor
                 , target
                 , null
-                , node => node.ToStatementsSyntax(anchor)
-                , node => StatementSyntax.Create(anchor, node)
+                , node => node.ToStatementsSyntax(leftAnchor)
+                , node => StatementSyntax.Create(leftAnchor, node)
                 , node => node
             );
         }
@@ -68,7 +71,7 @@ namespace Reni.SyntaxFactory
         internal Result<ValueSyntax> GetFrameSyntax(BinaryTree target)
             => target
                 .GetBracketKernel()
-                .Apply(kernel => GetStatementsSyntax(target.Left, kernel))
+                .Apply(kernel => GetStatementsSyntax(kernel.Left, kernel.Center))
                 .Apply(statements => (ValueSyntax)new CompoundSyntax(statements, null, target));
 
         internal Result<ValueSyntax> GetValueSyntax(BinaryTree target) => GetValueSyntax(null, target, null, null);
@@ -83,6 +86,11 @@ namespace Reni.SyntaxFactory
         {
             if(target == null)
                 return onNull?.Invoke();
+
+            if(leftAnchor != null)
+                (leftAnchor.Token.Characters < target.Token.Characters).Assert();
+            if(rightAnchor != null)
+                (target.Token.Characters < rightAnchor.Token.Characters).Assert();
 
             return GetSyntax(
                 leftAnchor
@@ -105,6 +113,11 @@ namespace Reni.SyntaxFactory
         )
             where TResult : class
         {
+            if(leftAnchor != null)
+                (leftAnchor.Token.Characters < target.Token.Characters).Assert();
+            if(rightAnchor != null)
+                (target.Token.Characters < rightAnchor.Token.Characters).Assert();
+            
             var factory = GetCurrentFactory(target);
             var valueToken = target.TokenClass as IValueToken;
             var declarationToken = target.TokenClass as IDeclarationToken;
@@ -201,8 +214,9 @@ namespace Reni.SyntaxFactory
                 )
                 .Apply((left, right) => left.GetInfixSyntax(target, right));
 
-        internal Result<DeclarerSyntax> GetDeclarationTags(BinaryTree target)
+        internal Result<DeclarerSyntax> GetDeclarationTags(BinaryTree.BracketNodes target)
             => target
+                .Center
                 .GetNodesFromLeftToRight()
                 .Select(GetDeclarationTag)
                 .Aggregate(DeclarerSyntax.Empty, (left, right) => left.Combine(right));

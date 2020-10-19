@@ -13,20 +13,26 @@ namespace Reni.TokenClasses
 {
     public sealed class BinaryTree : DumpableObject, ISyntax, ValueCache.IContainer, ITree<BinaryTree>
     {
+        internal class BracketNodes
+        {
+            internal BinaryTree Center;
+            internal BinaryTree Left;
+        }
+
         static int NextObjectId;
 
         [EnableDump]
         [EnableDumpExcept(null)]
         internal BinaryTree Left { get; }
 
+        [EnableDump]
+        [EnableDumpExcept(null)]
+        internal BinaryTree Right { get; }
+
         [DisableDump]
         internal readonly IToken Token;
 
         internal ITokenClass TokenClass { get; }
-
-        [EnableDump]
-        [EnableDumpExcept(null)]
-        internal BinaryTree Right { get; }
 
         BinaryTree
         (
@@ -74,17 +80,15 @@ namespace Reni.TokenClasses
 
         SourcePart ISyntax.All => SourcePart;
         SourcePart ISyntax.Main => Token.Characters;
-
-        int ITree<BinaryTree>.LeftDirectChildCount => 1;
         int ITree<BinaryTree>.DirectChildCount => 2;
 
         BinaryTree ITree<BinaryTree>.GetDirectChild(int index)
             => index switch
             {
-                0 => Left
-                , 1 => Right
-                , _ => null
+                0 => Left, 1 => Right, _ => null
             };
+
+        int ITree<BinaryTree>.LeftDirectChildCount => 1;
 
         protected override string GetNodeDump() => base.GetNodeDump() + $"({TokenClass.Id})";
 
@@ -97,7 +101,7 @@ namespace Reni.TokenClasses
         )
             => new BinaryTree(left, tokenClass, token, right);
 
-        [Obsolete("",true)]
+        [Obsolete("", true)]
         internal IEnumerable<BinaryTree> ItemsAsLongAs(Func<BinaryTree, bool> condition)
             => new[] {this}
                 .Concat(Left.CheckedItemsAsLongAs(condition))
@@ -109,11 +113,9 @@ namespace Reni.TokenClasses
                 return null;
             var leftParenthesis = Left?.TokenClass as ILeftBracket;
             return T(leftParenthesis?.Level ?? 0, rightParenthesis.Level).Max();
-
         }
 
-
-        internal Result<BinaryTree> GetBracketKernel()
+        internal Result<BracketNodes> GetBracketKernel()
         {
             var rightParenthesis = TokenClass as IRightBracket;
             (rightParenthesis != null).Assert();
@@ -122,22 +124,28 @@ namespace Reni.TokenClasses
 
             (Right == null).Assert();
 
+            var result = new BracketNodes {Left = Left, Center = Left.Right};
+
             if(!(Left.TokenClass is ILeftBracket leftParenthesis))
-                return new Result<BinaryTree>(Left, IssueId.MissingLeftBracket.Issue(SourcePart));
+            {
+                var issues = IssueId.MissingLeftBracket.Issue(SourcePart);
+                result.Center = Left;
+                result.Left = ErrorToken.Create(LeftMost);
+                return new Result<BracketNodes>(result, issues);
+            }
 
             (Left.Left == null).Assert();
 
             var levelDelta = leftParenthesis.Level - level;
 
             if(levelDelta == 0)
-                return Left.Right;
+                return result;
 
             if(levelDelta > 0)
-                return new Result<BinaryTree>(Left.Right, IssueId.MissingRightBracket.Issue(Left.SourcePart));
+                return new Result<BracketNodes>(result, IssueId.MissingRightBracket.Issue(Left.SourcePart));
 
             Left.NotImplementedMethod(level, this);
             return null;
         }
-
     }
 }

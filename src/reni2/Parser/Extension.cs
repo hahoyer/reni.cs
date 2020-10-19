@@ -5,6 +5,7 @@ using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
 using JetBrains.Annotations;
+using Reni.TokenClasses;
 using Reni.Validation;
 
 namespace Reni.Parser
@@ -176,16 +177,19 @@ namespace Reni.Parser
             where TArg2 : class
             where TResult : class
             => creator(arg.arg1?.Target, arg.arg2?.Target)
-                .AddIssues(T(arg.arg1?.Issues, arg.arg2?.Issues).Concat().ToArray());
+                .AddIssues(T(arg.arg1?.Issues, arg.arg2?.Issues).ConcatMany().ToArray());
 
         internal static Result<TResult> Apply<TArg1, TArg2, TArg3, TResult>
-            (this(Result<TArg1> arg1, Result<TArg2> arg2, Result<TArg3> arg3) arg, Func<TArg1, TArg2, TArg3, TResult> creator)
+        (
+            this(Result<TArg1> arg1, Result<TArg2> arg2, Result<TArg3> arg3) arg
+            , Func<TArg1, TArg2, TArg3, TResult> creator
+        )
             where TArg1 : class
             where TArg2 : class
             where TResult : class
             where TArg3 : class
             => creator(arg.arg1?.Target, arg.arg2?.Target, arg.arg3?.Target)
-                .AddIssues(T(arg.arg1?.Issues, arg.arg2?.Issues, arg.arg3?.Issues).Concat().ToArray());
+                .AddIssues(T(arg.arg1?.Issues, arg.arg2?.Issues, arg.arg3?.Issues).ConcatMany().ToArray());
 
         internal static Result<TResult> Apply<TArg1, TResult>
             (this Result<TArg1> arg1, Func<TArg1, Result<TResult>> creator)
@@ -199,7 +203,7 @@ namespace Reni.Parser
             where TArg2 : class
             where TResult : class
             => creator(arg.arg1?.Target, arg.arg2?.Target)
-                .With(T(arg.arg1?.Issues, arg.arg2?.Issues).Concat().ToArray());
+                .With(T(arg.arg1?.Issues, arg.arg2?.Issues).ConcatMany().ToArray());
 
         internal static Result<TResult> Apply<TArg1, TArg2, TArg3, TResult>
         (
@@ -211,8 +215,16 @@ namespace Reni.Parser
             where TArg3 : class
             where TResult : class
             => creator(arg.arg1?.Target, arg.arg2?.Target, arg.arg3?.Target)
-                .With(T(arg.arg1?.Issues, arg.arg2?.Issues, arg.arg3?.Issues).Concat().ToArray());
+                .With(T(arg.arg1?.Issues, arg.arg2?.Issues, arg.arg3?.Issues).ConcatMany().ToArray());
 
         public static TValue[] T<TValue>(params TValue[] value) => value;
+
+        internal static BinaryTree[] Combine(this IEnumerable<IEnumerable<BinaryTree>> targets)
+        {
+            var target = targets.ConcatMany().ToArray();
+            return target
+                .Where(b => !target.Any(p => p != b && p.SourcePart.Contains(b.SourcePart)))
+                .ToArray();
+        }
     }
 }

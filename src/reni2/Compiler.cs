@@ -127,7 +127,7 @@ namespace Reni
 
         [DisableDump]
         internal IEnumerable<Issue> Issues
-            => T(BinaryTree.Issues, ValueSyntaxCache.Value?.Issues, CodeContainer?.Issues).Concat();
+            => T(BinaryTree.Issues, ValueSyntaxCache.Value?.Issues, CodeContainer?.Issues).ConcatMany();
 
         static PrioTable MainPriorityTable
         {
@@ -274,7 +274,7 @@ namespace Reni
             => "_" + Path.GetFileName(fileName).Symbolize();
 
         Result<ValueSyntax> ParsePredefinedItem(string sourceText)
-            => Factory.Root.GetValueSyntax(Parse(new Source(sourceText) + 0).GetBracketKernel().Target);
+            => Factory.Root.GetValueSyntax(Parse(new Source(sourceText) + 0).GetBracketKernel().Target.Center);
 
         [UsedImplicitly]
         public Compiler Empower()

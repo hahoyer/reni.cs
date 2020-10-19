@@ -1,9 +1,12 @@
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Helper;
+using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Parser;
 using Reni.SyntaxFactory;
 using Reni.TokenClasses;
+using Reni.Validation;
 
 namespace Reni.SyntaxTree
 {
@@ -48,14 +51,17 @@ namespace Reni.SyntaxTree
         }
 
         internal static readonly Result<DeclarerSyntax> Empty
-            = new Result<DeclarerSyntax>(new DeclarerSyntax(new TagSyntax[0], null, null));
+            = new Result<DeclarerSyntax>(new DeclarerSyntax(null, new TagSyntax[0], null, null));
 
         internal readonly NameSyntax Name;
         internal readonly TagSyntax[] Tags;
+
+        readonly DeclarerSyntax Hidden;
         readonly bool? MeansPublic;
 
-        DeclarerSyntax(TagSyntax[] tags, NameSyntax name, bool? meansPublic)
+        DeclarerSyntax(DeclarerSyntax hidden, TagSyntax[] tags, NameSyntax name, bool? meansPublic)
         {
+            Hidden = hidden;
             Tags = tags;
             Name = name;
             MeansPublic = meansPublic;
@@ -63,7 +69,14 @@ namespace Reni.SyntaxTree
             StopByObjectIds();
         }
 
-        public bool IsPublic
+        internal Issue Issue => Hidden == null? null : IssueId.StrangeDeclaration.Issue(Hidden.SourcePart);
+
+        internal SourcePart SourcePart
+            => T(T(Hidden?.SourcePart), Tags.Select(node => node.SourcePart), T(Name?.SourcePart))
+                .ConcatMany()
+                .Aggregate();
+
+        internal bool IsPublic
         {
             get
             {
@@ -87,9 +100,9 @@ namespace Reni.SyntaxTree
         internal bool IsMutableSyntax => Tags.Any(item => item.Value is MutableDeclarationToken);
 
         [DisableDump]
-        internal int DirectChildCount => Tags.Length + 1;
+        internal int DirectChildCount => (Hidden?.DirectChildCount ?? 0) + Tags.Length + 1;
 
-        internal  Syntax GetDirectChild(int index)
+        internal Syntax GetDirectChild(int index)
         {
             if(index >= 0 && index < Tags.Length)
                 return Tags[index];
@@ -97,18 +110,22 @@ namespace Reni.SyntaxTree
         }
 
         internal static DeclarerSyntax FromTag(DeclarationTagToken tag, BinaryTree target, bool? meansPublic)
-            => new DeclarerSyntax(new[] {new TagSyntax(tag, target)}, null, meansPublic);
+            => new DeclarerSyntax(null, new[] {new TagSyntax(tag, target)}, null, meansPublic);
 
         internal static DeclarerSyntax FromName(BinaryTree target, string name, bool? meansPublic)
-            => new DeclarerSyntax(new TagSyntax[0], new NameSyntax(target, name), meansPublic);
+            => new DeclarerSyntax(null, new TagSyntax[0], new NameSyntax(target, name), meansPublic);
 
         internal DeclarerSyntax Combine(DeclarerSyntax other)
         {
             if(other == null)
                 return this;
-            (Name == null || other.Name == null).Assert();
+
+            if(Name != null)
+                return new DeclarerSyntax(this, other.Tags, other.Name, other.MeansPublic);
+
+            Name.AssertIsNull();
             (MeansPublic == null || other.MeansPublic == null || MeansPublic == other.MeansPublic).Assert();
-            return new DeclarerSyntax(Tags.Concat(other.Tags).ToArray(), Name ?? other.Name
+            return new DeclarerSyntax(Hidden, Tags.Concat(other.Tags).ToArray(), other.Name
                 , MeansPublic ?? other.MeansPublic);
         }
 

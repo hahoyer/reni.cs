@@ -10,6 +10,6 @@ namespace Reni.SyntaxFactory
         Result<DeclarerSyntax> IDeclarerProvider.Get(BinaryTree target, Factory factory)
             => target
                 .GetBracketKernel()
-                .Apply(factory.GetDeclarationTags);
+                .Apply(triad => factory.GetDeclarationTags(triad));
     }
 }

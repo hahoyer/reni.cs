@@ -62,16 +62,15 @@ namespace Reni.SyntaxTree
 
         internal static Result<IStatementSyntax> Create(DeclarerSyntax declarer, BinaryTree target, ValueSyntax value)
         {
-            var issue = (Issue)null;
-            if(value == null)
-            {
-                issue = IssueId.MissingDeclarationValue.Issue(target.Token.Characters);
-                value = new EmptyList(null);
-            }
+            var result =
+                new Result<IStatementSyntax>(new DeclarationSyntax(declarer, target, value ?? new EmptyList(null)));
+            
+            var declarerIssue = declarer.Issue;
+            if(declarerIssue != null)
+                result = result.With(declarerIssue);
 
-            var result = new Result<IStatementSyntax>(new DeclarationSyntax(declarer, target, value));
-            if(issue != null)
-                result = result.With(issue);
+            if(value == null)
+                result = result.With(IssueId.MissingDeclarationValue.Issue(target.Token.Characters));
 
             return result;
         }

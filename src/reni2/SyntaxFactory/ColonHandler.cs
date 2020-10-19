@@ -1,6 +1,5 @@
 using hw.DebugFormatter;
 using Reni.Parser;
-using Reni.Struct;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
 

@@ -363,7 +363,7 @@
     <Compile Include="SyntaxTree\StatementSyntax.cs" />
     <Compile Include="SyntaxTree\DeclarerSyntax.cs" />
     <Compile Include="TokenClasses\EndOfText.cs" />
-    <Compile Include="TokenClasses\Extension.cs" />
+    <Compile Include="TokenClasses\ErrorToken.cs" />
     <Compile Include="TokenClasses\IBelongingsMatcher.cs" />
     <Compile Include="TokenClasses\IComparator.cs" />
     <Compile Include="TokenClasses\IDeclarationItem.cs" />
