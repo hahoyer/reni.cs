@@ -124,15 +124,12 @@
     <Compile Include="Feature\Function.cs" />
     <Compile Include="Feature\SearchResult.cs" />
     <Compile Include="Feature\Simple.cs" />
-    <Compile Include="Helper\BinaryView.cs" />
     <Compile Include="Helper\Extension.cs" />
     <Compile Include="Helper\ITree.cs" />
     <Compile Include="Helper\BinaryTreeSyntaxWithParent.cs" />
     <Compile Include="Helper\PairView.cs" />
-    <Compile Include="Helper\PairView1.cs" />
     <Compile Include="Helper\SyntaxView.cs" />
     <Compile Include="Helper\PositionDictionary.cs" />
-    <Compile Include="Helper\SyntaxView1.cs" />
     <Compile Include="Helper\TreeWithParent.cs" />
     <Compile Include="Helper\TreeWithParentExtended.cs" />
     <Compile Include="hw\DebugFormatter\Configuration.cs" />

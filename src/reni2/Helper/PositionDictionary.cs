@@ -8,14 +8,19 @@ namespace Reni.Helper
 {
     sealed class PositionDictionary<TResult> : DumpableObject
     {
-        readonly Dictionary<SourcePosition, TResult> Value = new Dictionary<SourcePosition, TResult>();
+        readonly Dictionary<SourcePart, TResult> Value = new Dictionary<SourcePart, TResult>();
 
-        internal TResult this[SourcePosition key]
+        internal TResult this[SourcePart key]
         {
             get => Value[key];
             set
             {
-                (!Value.ContainsKey(key)).Assert();
+                (!Value.ContainsKey(key)).Assert(() => $@"
+Key: {key.GetDumpAroundCurrent(5)} 
+
+First: {Tracer.Dump(Value[key])}
+
+This: {Tracer.Dump(value)}");
                 Value[key] = value;
             }
         }
@@ -26,17 +31,37 @@ namespace Reni.Helper
             set => this[KeyMap(key)] = value;
         }
 
-        static SourcePosition KeyMap(BinaryTree key) => key.Token.Characters.Start;
+        static SourcePart KeyMap(BinaryTree key) => key.Token.Characters;
+
+        static int Position;
 
         public void AssertValid(BinaryTree binary)
-            => binary.GetNodesFromLeftToRight().All(IsValidKey).Assert();
+        {
+            lock(this)
+            {
+                Position = 0;
+                binary
+                    .GetNodesFromLeftToRight()
+                    .Select(IsValidKey)
+                    .ToArray()
+                    .All(i => i)
+                    .Assert();
+            }
+        }
 
         bool IsValidKey(BinaryTree key)
         {
             var result = Value.ContainsKey(KeyMap(key));
-            if(!result)
-                key.Token.Characters.GetDumpAroundCurrent(5).Log();
-            return result;
+            if(result)
+                return true;
+            @$" 
+ -----
+/{Position++:D5}\
+Key: -----------------------------------------vv
+{key.Token.Characters.GetDumpAroundCurrent(25)}
+----------------------------------------------^^".Log();
+
+            return false;
         }
     }
 }

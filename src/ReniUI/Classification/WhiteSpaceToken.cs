@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.Parser;
 using ReniUI.Helper;
@@ -23,6 +24,7 @@ namespace ReniUI.Classification
         public override bool IsLineEnd => Lexer.IsLineEnd(Item);
         public override string State => Lexer.Instance.WhiteSpaceId(Item) ?? "";
 
+        [DisableDump]
         public override IEnumerable<SourcePart> ParserLevelBelongings
         {
             get { yield break; }

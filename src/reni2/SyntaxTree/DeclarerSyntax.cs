@@ -35,11 +35,12 @@ namespace Reni.SyntaxTree
         {
             internal readonly string Value;
 
-            internal NameSyntax([NotNull] BinaryTree anchor, [NotNull] string name)
+            internal NameSyntax(BinaryTree anchor, string name)
                 : base(anchor)
             {
                 Value = name;
                 Anchor.AssertIsNotNull();
+                (Value == Anchor.Token.Characters.Id).Assert();
             }
 
             [EnableDump]

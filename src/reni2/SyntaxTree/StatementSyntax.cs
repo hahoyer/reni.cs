@@ -13,6 +13,7 @@ namespace Reni.SyntaxTree
         {
             Content = content;
             AssertValid();
+            StopByObjectIds(649);
         }
 
         [EnableDump]
