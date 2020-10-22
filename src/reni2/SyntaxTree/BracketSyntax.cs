@@ -20,7 +20,7 @@ namespace Reni.SyntaxTree
             : base(rightAnchor)
         {
             Left = new LeftBracket(leftAnchor);
-            Kernel = kernel;
+            Kernel = kernel ;
         }
 
         internal override int LeftDirectChildCount => 2;
@@ -32,6 +32,6 @@ namespace Reni.SyntaxTree
         };
 
         internal override Result ResultForCache(ContextBase context, Category category)
-            => context.Result(category, Kernel);
+            => context.Result(category, Kernel?? new EmptyList(Anchor));
     }
 }
