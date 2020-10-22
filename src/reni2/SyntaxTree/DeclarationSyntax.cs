@@ -47,10 +47,9 @@ namespace Reni.SyntaxTree
         [DisableDump]
         DeclarerSyntax IStatementSyntax.Declarer => Declarer;
 
-        ValueSyntax IStatementSyntax.ToValueSyntax(BinaryTree leftAnchor, BinaryTree rightAnchor)
-            => new CompoundSyntax(StatementSyntax.Create(leftAnchor, this), null, rightAnchor);
-
-        UsageTree IStatementSyntax.ToUsageValue() => new UsageTree(){Left = true, Right = true};
+        ValueSyntax IStatementSyntax.ToValueSyntax
+            (BinaryTree leftAnchor, BinaryTree rightAnchor, FrameItemContainer brackets)
+            => CompoundSyntax.Create(T((IStatementSyntax)this), null, brackets);
 
         [DisableDump]
         ValueSyntax IStatementSyntax.Value => Value;

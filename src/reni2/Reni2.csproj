@@ -127,7 +127,6 @@
     <Compile Include="Helper\Extension.cs" />
     <Compile Include="Helper\ITree.cs" />
     <Compile Include="Helper\BinaryTreeSyntaxWithParent.cs" />
-    <Compile Include="Helper\PairView.cs" />
     <Compile Include="Helper\SyntaxView.cs" />
     <Compile Include="Helper\PositionDictionary.cs" />
     <Compile Include="Helper\TreeWithParent.cs" />
@@ -219,6 +218,7 @@
     <Compile Include="ParserTest\StrangeDeclarationSyntax.cs" />
     <Compile Include="Parser\IRecursionHandler.cs" />
     <Compile Include="Parser\ISyntaxScope.cs" />
+    <Compile Include="SyntaxTree\FrameItemContainer.cs" />
     <Compile Include="SyntaxTree\ISyntaxVisitor.cs" />
     <Compile Include="Parser\ReplaceArgVisitor.cs" />
     <Compile Include="Parser\Result.cs" />

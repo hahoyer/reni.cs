@@ -8,7 +8,10 @@ namespace Reni.SyntaxFactory
     class MatchedBracketHandler : DumpableObject, IValueProvider
     {
         Result<ValueSyntax> IValueProvider.Get
-            (BinaryTree leftAnchor, BinaryTree target, BinaryTree rightAnchor, Factory factory)
+        (
+            BinaryTree leftAnchor, BinaryTree target, BinaryTree rightAnchor, Factory factory
+            , FrameItemContainer brackets
+        )
             => (
                     factory.GetValueSyntax(target.Left),
                     factory.GetValueSyntax(target.Right)
@@ -21,8 +24,7 @@ namespace Reni.SyntaxFactory
                         left,
                         null,
                         right,
-                        rightAnchor
-                    )
+                        rightAnchor, null)
                 );
 
         UsageTree IValueProvider.GetUsage(BinaryTree leftAnchor, BinaryTree target, Factory factory)

@@ -21,9 +21,14 @@ namespace Reni.SyntaxTree
         [EnableDump]
         readonly ValueSyntax Then;
 
-        internal CondSyntax(ValueSyntax condSyntax, ValueSyntax thenSyntax, ValueSyntax elseSyntax, BinaryTree anchor)
-            : base(null,anchor, null)
+        internal CondSyntax
+        (
+            ValueSyntax condSyntax, ValueSyntax thenSyntax, ValueSyntax elseSyntax, BinaryTree anchor
+            , FrameItemContainer brackets
+        )
+            : base(null,anchor, null, brackets)
         {
+            anchor.AssertIsNotNull();
             Cond = condSyntax;
             Then = thenSyntax;
             Else = elseSyntax;

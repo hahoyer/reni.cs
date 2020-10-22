@@ -15,8 +15,11 @@ namespace Reni.SyntaxFactory
         }
 
         Result<ValueSyntax> IValueProvider.Get
-            (BinaryTree leftAnchor, BinaryTree target, BinaryTree rightAnchor, Factory factory)
-            => Result<ValueSyntax>.From(factory.GetExpressionSyntax(target));
+        (
+            BinaryTree leftAnchor, BinaryTree target, BinaryTree rightAnchor, Factory factory
+            , FrameItemContainer brackets
+        )
+            => Result<ValueSyntax>.From(factory.GetExpressionSyntax(target, null));
 
         UsageTree IValueProvider.GetUsage
             (BinaryTree leftAnchor, BinaryTree target, Factory factory)

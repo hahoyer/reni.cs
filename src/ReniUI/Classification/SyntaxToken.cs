@@ -63,6 +63,6 @@ namespace ReniUI.Classification
 
         [DisableDump]
         public override IEnumerable<SourcePart> ParserLevelBelongings
-            => Master.ParserLevelBelongings?.Select(item => item.Token.Characters);
+            => Master.ParserLevelBelongingers?.Select(item => item.Token.Characters);
     }
 }

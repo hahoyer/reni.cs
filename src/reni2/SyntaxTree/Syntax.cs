@@ -99,7 +99,7 @@ namespace Reni.SyntaxTree
             return default;
         }
 
-        internal virtual Result<StatementSyntax[]> ToStatementsSyntax(BinaryTree target = null)
+        internal virtual Result<IStatementSyntax[]> ToStatementsSyntax(BinaryTree target = null)
         {
             NotImplementedMethod(target);
             return default;

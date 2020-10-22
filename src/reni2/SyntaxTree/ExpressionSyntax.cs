@@ -49,16 +49,17 @@ namespace Reni.SyntaxTree
         int CurrentResultDepth;
 
         internal ExpressionSyntax
-            (
-            BinaryTree anchorLeft, 
-            BinaryTree anchor, 
-            ValueSyntax left, 
-            Definable definable, 
-            ValueSyntax right, 
-            BinaryTree anchorRight
-            )
-            : base(anchorLeft, anchor, anchorRight)
+        (
+            BinaryTree anchorLeft,
+            BinaryTree anchor,
+            ValueSyntax left,
+            Definable definable,
+            ValueSyntax right,
+            BinaryTree anchorRight, FrameItemContainer brackets
+        )
+            : base(anchorLeft, anchor, anchorRight, brackets)
         {
+            anchor.AssertIsNotNull();
             Left = left;
             Definable = definable;
             Right = right;
@@ -79,8 +80,8 @@ namespace Reni.SyntaxTree
             };
 
         internal static Result<ExpressionSyntax> Create
-            (BinaryTree target, ValueSyntax left, Definable definable, ValueSyntax right)
-            => new ExpressionSyntax(null, target, left, definable, right, null);
+            (BinaryTree target, ValueSyntax left, Definable definable, ValueSyntax right, FrameItemContainer brackets)
+            => new ExpressionSyntax(null, target, left, definable, right, null, brackets);
 
         internal override Result ResultForCache(ContextBase context, Category category)
         {
@@ -118,8 +119,8 @@ namespace Reni.SyntaxTree
             if(left == null && right == null)
                 return null;
 
-            var result = Definable.CreateForVisit(Anchor, left ?? Left, right ?? Right);
-            Tracer.Assert(!result.Issues.Any());
+            var result = Definable.CreateForVisit(Anchor, left ?? Left, right ?? Right, FrameItems);
+            (!result.Issues.Any()).Assert();
             return result.Target;
         }
 

@@ -7,7 +7,11 @@ namespace ReniUI.Test
     [UnitTest]
     public sealed class BadUserInterAction : DependenceProvider
     {
-        const string Text = @"systemdata:
+
+        [UnitTest]
+        public void GetTokenForPosition()
+        {
+            const string text = @"systemdata:
 { 1 type instance
 
 #  #(aa  Memory: ((0 type * ('100' to_number_of_base 64)) mutable) instance();
@@ -22,14 +26,24 @@ repeat: @ ^ while() then(^ body(), repeat(^));
 
 (Text('H') << 'allo') dump_print";
 
-        [UnitTest]
-        public void GetTokenForPosition()
-        {
-            var compiler = CompilerBrowser.FromText(Text);
-            for(var i = 0; i < Text.Length; i++)
+            var compiler = CompilerBrowser.FromText(text);
+            for(var i = 0; i < text.Length; i++)
             {
                 var t = compiler.LocatePosition(i);
-                (t != null).Assert(() => (new Source(Text) + i).Dump());
+                (t != null).Assert(() => (new Source(text) + i).Dump());
+            }
+        }
+
+        [UnitTest]
+        public void GetTokenForPositionSimple()
+        {
+            const string text = @"
+{ 1 }";
+            var compiler = CompilerBrowser.FromText(text);
+            for(var i = 0; i < text.Length; i++)
+            {
+                var t = compiler.LocatePosition(i);
+                (t != null).Assert(() => (new Source(text) + i).Dump());
             }
         }
     }

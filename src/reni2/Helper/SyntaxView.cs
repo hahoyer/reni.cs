@@ -61,13 +61,14 @@ namespace Reni.Helper
         internal TResult Right => Context[FlatItem.Anchor.Right];
 
         [DisableDump]
-        internal IEnumerable<TResult> ParserLevelBelongings => this.CachedValue(GetParserLevelBelongings);
-
-        [DisableDump]
         internal TResult LeftMost => this.GetNodesFromLeftToRight().First();
 
         [DisableDump]
         internal TResult RightMost => this.GetNodesFromRightToLeft().First();
+
+        [DisableDump]
+        internal IEnumerable<TResult> ParserLevelBelongingers 
+             => this.CachedValue(GetParserLevelBelongings);
 
         int LeftDirectChildCount => FlatItem.LeftDirectChildCount;
         int DirectChildCount => FlatItem.DirectChildren.Length;

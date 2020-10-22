@@ -7,6 +7,7 @@ using hw.Parser;
 using hw.Scanner;
 using Reni.Helper;
 using Reni.Parser;
+using Reni.SyntaxTree;
 using Reni.Validation;
 
 namespace Reni.TokenClasses
@@ -18,6 +19,8 @@ namespace Reni.TokenClasses
             internal BinaryTree Center;
             internal BinaryTree Left;
             internal BinaryTree Right;
+
+            internal FrameItemContainer ToFrameItems => FrameItemContainer.Create(Left,Right);
         }
 
         static int NextObjectId;
@@ -77,6 +80,45 @@ namespace Reni.TokenClasses
             }
         }
 
+        internal Result<BracketNodes> BracketKernel
+        {
+            get
+            {
+                if(!(TokenClass is IRightBracket rightParenthesis))
+                    return null;
+
+                var level = rightParenthesis.Level;
+
+                (Right == null).Assert();
+
+                var result = new BracketNodes {Left = Left, Center = Left.Right, Right = this};
+
+                if(!(Left.TokenClass is ILeftBracket leftParenthesis))
+                {
+                    var issues = IssueId.MissingLeftBracket.Issue(SourcePart);
+                    result.Center = Left;
+                    result.Left = ErrorToken.Create(Left.LeftMost);
+                    return new Result<BracketNodes>(result, issues);
+                }
+
+                (Left.Left == null).Assert();
+
+                var levelDelta = leftParenthesis.Level - level;
+
+                if(levelDelta == 0)
+                    return result;
+
+                if(levelDelta > 0)
+                {
+                    result.Right = ErrorToken.Create(RightMost);
+                    return new Result<BracketNodes>(result, IssueId.MissingRightBracket.Issue(Left.SourcePart));
+                }
+
+                Left.NotImplementedMethod(level, this);
+                return null;
+            }
+        }
+
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
         SourcePart ISyntax.All => SourcePart;
@@ -114,45 +156,6 @@ namespace Reni.TokenClasses
                 return null;
             var leftParenthesis = Left?.TokenClass as ILeftBracket;
             return T(leftParenthesis?.Level ?? 0, rightParenthesis.Level).Max();
-        }
-
-        internal Result<BracketNodes> BracketKernel
-        {
-            get
-            {
-                if(!(TokenClass is IRightBracket rightParenthesis))
-                    return null;
-
-                var level = rightParenthesis.Level;
-
-                (Right == null).Assert();
-
-                var result = new BracketNodes {Left = Left, Center = Left.Right, Right = this};
-
-                if(!(Left.TokenClass is ILeftBracket leftParenthesis))
-                {
-                    var issues = IssueId.MissingLeftBracket.Issue(SourcePart);
-                    result.Center = Left;
-                    result.Left = null;
-                    return new Result<BracketNodes>(result, issues);
-                }
-
-                (Left.Left == null).Assert();
-
-                var levelDelta = leftParenthesis.Level - level;
-
-                if(levelDelta == 0)
-                    return result;
-
-                if(levelDelta > 0)
-                {
-                    result.Right = null;
-                    return new Result<BracketNodes>(result, IssueId.MissingRightBracket.Issue(Left.SourcePart));
-                }
-
-                Left.NotImplementedMethod(level, this);
-                return null;
-            }
         }
     }
 }

@@ -111,7 +111,10 @@ namespace ReniUI
         {
             try
             {
-                var syntax = new Helper.Syntax(Compiler.Syntax, PositionDictionary);
+                var compilerSyntax = Compiler.Syntax;
+                compilerSyntax.Dump().Log();
+
+                var syntax = new Helper.Syntax(compilerSyntax, PositionDictionary);
                 var all = syntax.GetNodesFromLeftToRight().ToArray();
                 PositionDictionary.AssertValid(Compiler.BinaryTree);
                 return syntax;

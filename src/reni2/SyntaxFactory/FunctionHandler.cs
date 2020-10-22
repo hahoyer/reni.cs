@@ -8,7 +8,10 @@ namespace Reni.SyntaxFactory
     class FunctionHandler : DumpableObject, IValueProvider
     {
         Result<ValueSyntax> IValueProvider.Get
-            (BinaryTree leftAnchor, BinaryTree target, BinaryTree rightAnchor, Factory factory)
+        (
+            BinaryTree leftAnchor, BinaryTree target, BinaryTree rightAnchor, Factory factory
+            , FrameItemContainer brackets
+        )
         {
             var token = (Function)target.TokenClass;
             return (
@@ -22,8 +25,7 @@ namespace Reni.SyntaxFactory
                         , token.IsImplicit
                         , token.IsMetaFunction
                         , getter
-                        , target
-                    )
+                        , target, null)
                 );
         }
 

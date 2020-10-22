@@ -13,8 +13,8 @@ namespace Reni.SyntaxTree
         [DisableDump]
         internal readonly ITerminal Terminal;
 
-        internal TerminalSyntax(ITerminal terminal, BinaryTree anchor)
-            : base(anchor)
+        internal TerminalSyntax(ITerminal terminal, BinaryTree anchor, FrameItemContainer brackets)
+            : base(anchor, brackets)
         {
             Terminal = terminal;
             StopByObjectIds();
@@ -45,9 +45,10 @@ namespace Reni.SyntaxTree
         [Node]
         readonly ValueSyntax Right;
 
-        public PrefixSyntax(IPrefix prefix, ValueSyntax right, BinaryTree anchor)
-            : base(null, anchor, null)
+        public PrefixSyntax(IPrefix prefix, ValueSyntax right, BinaryTree anchor, FrameItemContainer brackets)
+            : base(null, anchor, null, brackets)
         {
+            anchor.AssertIsNotNull();
             Prefix = prefix;
             Right = right;
         }
@@ -61,8 +62,9 @@ namespace Reni.SyntaxTree
 
         protected override Syntax GetDirectChildKernel(int index) => index == 0? Right : null;
 
-        public static Result<ValueSyntax> Create(IPrefix prefix, Result<ValueSyntax> right, BinaryTree binaryTree)
-            => new PrefixSyntax(prefix, right.Target, binaryTree).AddIssues<ValueSyntax>(right.Issues);
+        public static Result<ValueSyntax> Create
+            (IPrefix prefix, Result<ValueSyntax> right, BinaryTree binaryTree, FrameItemContainer brackets)
+            => new PrefixSyntax(prefix, right.Target, binaryTree, brackets).AddIssues<ValueSyntax>(right.Issues);
 
         internal override Result ResultForCache(ContextBase context, Category category) => Prefix
             .Result(context, category, Right, Anchor);
@@ -79,9 +81,10 @@ namespace Reni.SyntaxTree
         [Node]
         readonly ValueSyntax Right;
 
-        public InfixSyntax(ValueSyntax left, IInfix infix, ValueSyntax right, BinaryTree anchor)
-            : base(null, anchor, null)
+        public InfixSyntax(ValueSyntax left, IInfix infix, ValueSyntax right, BinaryTree anchor, FrameItemContainer brackets)
+            : base(null, anchor, null, brackets)
         {
+            anchor.AssertIsNotNull();
             Left = left;
             Infix = infix;
             Right = right;
@@ -104,9 +107,12 @@ namespace Reni.SyntaxTree
             };
 
         public static Result<ValueSyntax> Create
-            (Result<ValueSyntax> left, IInfix infix, Result<ValueSyntax> right, BinaryTree binaryTree)
+        (
+            Result<ValueSyntax> left, IInfix infix, Result<ValueSyntax> right, BinaryTree binaryTree
+            , FrameItemContainer brackets
+        )
         {
-            ValueSyntax syntax = new InfixSyntax(left.Target, infix, right.Target, binaryTree);
+            ValueSyntax syntax = new InfixSyntax(left.Target, infix, right.Target, binaryTree, brackets);
             return syntax.AddIssues(left.Issues.plus(right.Issues));
         }
 
@@ -127,9 +133,10 @@ namespace Reni.SyntaxTree
         [Node]
         readonly ISuffix Suffix;
 
-        internal SuffixSyntax(ValueSyntax left, ISuffix suffix, BinaryTree anchor)
-            : base(null,anchor, null)
+        internal SuffixSyntax(ValueSyntax left, ISuffix suffix, BinaryTree anchor, FrameItemContainer brackets)
+            : base(null,anchor, null, brackets)
         {
+            anchor.AssertIsNotNull();
             Left = left;
             Suffix = suffix;
         }
@@ -143,9 +150,10 @@ namespace Reni.SyntaxTree
 
         protected override Syntax GetDirectChildKernel(int index) => index == 0? Left : null;
 
-        public static Result<ValueSyntax> Create(Result<ValueSyntax> left, ISuffix suffix, BinaryTree binaryTree)
+        public static Result<ValueSyntax> Create
+            (Result<ValueSyntax> left, ISuffix suffix, BinaryTree binaryTree, FrameItemContainer brackets)
         {
-            ValueSyntax syntax = new SuffixSyntax(left.Target, suffix, binaryTree);
+            ValueSyntax syntax = new SuffixSyntax(left.Target, suffix, binaryTree, brackets);
             return syntax.AddIssues(left.Issues);
         }
 

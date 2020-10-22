@@ -50,10 +50,18 @@ namespace Reni.SyntaxFactory
                 .Get(target, GetCurrentFactory(target));
         }
 
-        internal Result<StatementSyntax[]> GetStatementsSyntax(BinaryTree leftAnchor, BinaryTree target)
+        internal Result<ValueSyntax> GetFrameSyntax(BinaryTree target)
+        {
+            var kernel = target.BracketKernel;
+            return kernel
+                .Apply(kernel => GetStatementsSyntax(null, kernel.Center, null))
+                .Apply(statements=>(ValueSyntax)CompoundSyntax.Create(statements, null, kernel.Target.ToFrameItems));
+        }
+
+        internal Result<IStatementSyntax[]> GetStatementsSyntax(BinaryTree leftAnchor, BinaryTree target, FrameItemContainer brackets)
         {
             if(target == null)
-                return new StatementSyntax[0];
+                return new IStatementSyntax[0];
 
             if(leftAnchor != null)
                 (leftAnchor.Token.Characters < target.Token.Characters).Assert();
@@ -62,17 +70,12 @@ namespace Reni.SyntaxFactory
                 leftAnchor
                 , target
                 , null
-                , node => StatementSyntax.Create(leftAnchor, node)
-                , node => StatementSyntax.Create(leftAnchor, node)
-                , node => node
-            );
+                , (node, leftAnchor) => T((IStatementSyntax)node)
+                , (node, leftAnchor, rightAnchor) => T(node)
+                , (node, rightAnchor) => node
+                , brackets
+                );
         }
-
-
-        internal Result<ValueSyntax> GetFrameSyntax(BinaryTree target)
-            => target.BracketKernel
-                .Apply(kernel => GetStatementsSyntax(kernel.Left, kernel.Center))
-                .Apply(statements => (ValueSyntax)new CompoundSyntax(statements, null, target));
 
         internal Result<ValueSyntax> GetValueSyntax
         (
@@ -84,44 +87,28 @@ namespace Reni.SyntaxFactory
             if(target == null)
                 return new EmptyList(leftAnchor, rightAnchor);
 
-            if(leftAnchor != null)
-                (leftAnchor.Token.Characters < target.Token.Characters).Assert();
-            rightAnchor.AssertIsNotNull();
-            (target.Token.Characters < rightAnchor.Token.Characters).Assert();
-
+            var frameItems = FrameItemContainer.Create(leftAnchor, rightAnchor);
             return GetSyntax(
                 leftAnchor
                 , target
                 , rightAnchor
-                , node => node
-                , node => node.ToValueSyntax(leftAnchor, rightAnchor)
-                , node => (ValueSyntax)new CompoundSyntax(node, null, rightAnchor)
-            );
+                , (node, leftAnchor) => node
+                , (node, leftAnchor, rightAnchor) => node.ToValueSyntax(leftAnchor, rightAnchor, frameItems)
+                , (node, rightAnchor) => (ValueSyntax)CompoundSyntax.Create(node, null, null), frameItems);
         }
 
         internal Result<ValueSyntax> GetValueSyntax(BinaryTree target)
-        {
-            if(target == null)
-                return null;
-
-            return GetSyntax(
-                null
-                , target
-                , null
-                , node => node
-                , node => node.ToValueSyntax(null, null)
-                , node => (ValueSyntax)new CompoundSyntax(node, null, null)
-            );
-        }
+            => target == null? null : GetValueSyntax(null, target, null);
 
         Result<TResult> GetSyntax<TResult>
         (
             BinaryTree leftAnchor
             , BinaryTree target
             , BinaryTree rightAnchor
-            , Func<ValueSyntax, Result<TResult>> fromValueSyntax
-            , Func<IStatementSyntax, Result<TResult>> fromDeclarationSyntax
-            , Func<StatementSyntax[], TResult> fromStatementsSyntax
+            , Func<ValueSyntax, BinaryTree, Result<TResult>> fromValueSyntax
+            , Func<IStatementSyntax, BinaryTree, BinaryTree, Result<TResult>> fromDeclarationSyntax
+            , Func<IStatementSyntax[], BinaryTree, TResult> fromStatementsSyntax
+            , FrameItemContainer brackets
         )
             where TResult : class
         {
@@ -140,22 +127,22 @@ namespace Reni.SyntaxFactory
             if(valueToken != null)
                 return valueToken
                     .Provider
-                    .Get(leftAnchor, target, rightAnchor, factory)
-                    .Apply(fromValueSyntax);
+                    .Get(leftAnchor, target, rightAnchor, factory, brackets)
+                    .Apply(node => fromValueSyntax(node, leftAnchor));
 
             if(declarationToken != null)
                 return declarationToken
                     .Provider
                     .Get(target, factory)
-                    .Apply(fromDeclarationSyntax);
+                    .Apply(node => fromDeclarationSyntax(node, leftAnchor, rightAnchor));
 
             if(statementsToken != null)
                 return statementsToken
                     .Provider
                     .Get(leftAnchor, target, factory)
-                    .Apply(fromStatementsSyntax);
+                    .Apply(node => fromStatementsSyntax(node, rightAnchor));
 
-            return fromValueSyntax(new EmptyList(target))
+            return fromValueSyntax(new EmptyList(target), leftAnchor)
                 .With(IssueId.InvalidExpression.Issue(target.Token.Characters));
         }
 
@@ -207,7 +194,7 @@ namespace Reni.SyntaxFactory
             return new Result<DeclarerSyntax>(result, GetIssues().ToArray());
         }
 
-        internal Result<ExpressionSyntax> GetExpressionSyntax(BinaryTree target)
+        internal Result<ExpressionSyntax> GetExpressionSyntax(BinaryTree target, FrameItemContainer brackets)
         {
             var definable = target.TokenClass as Definable;
             (definable != null).Assert();
@@ -216,15 +203,16 @@ namespace Reni.SyntaxFactory
                     GetValueSyntax(target.Left),
                     GetValueSyntax(target.Right)
                 )
-                .Apply((left, right) => ExpressionSyntax.Create(target, left, definable, right));
+                .Apply((left, right) => ExpressionSyntax.Create(target, left, definable, right, brackets));
         }
 
-        internal Result<ValueSyntax> GetInfixSyntax(BinaryTree target)
+        internal Result<ValueSyntax> GetInfixSyntax
+            (BinaryTree leftAnchor, BinaryTree target, BinaryTree rightAnchor, FrameItemContainer brackets)
             => (
                     GetValueSyntax(target.Left),
                     GetValueSyntax(target.Right)
                 )
-                .Apply((left, right) => left.GetInfixSyntax(target, right));
+                .Apply((left, right) => left.GetInfixSyntax(target, right, brackets));
 
         internal Result<DeclarerSyntax> GetDeclarationTags(BinaryTree.BracketNodes target)
             => target

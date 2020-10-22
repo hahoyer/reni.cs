@@ -6,7 +6,6 @@ using hw.Helper;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
-using Reni.SyntaxFactory;
 using Reni.TokenClasses;
 
 namespace Reni.SyntaxTree
@@ -16,6 +15,8 @@ namespace Reni.SyntaxTree
     /// </summary>
     sealed class CompoundSyntax : ValueSyntax
     {
+        public static CompoundSyntax Create(IStatementSyntax[] statements, CleanupSyntax cleanupSection, FrameItemContainer frameItems) 
+            => new CompoundSyntax(statements, cleanupSection, frameItems.LeftMostRightItem, frameItems.WithoutLeftMostRightItem);
         static readonly bool NoFileDump = true;
         static bool IsInContainerDump;
 
@@ -27,15 +28,18 @@ namespace Reni.SyntaxTree
         internal readonly CleanupSyntax CleanupSection;
 
         [EnableDump]
-        internal readonly StatementSyntax[] Statements;
+        internal readonly IStatementSyntax[] Statements;
 
-        internal CompoundSyntax(StatementSyntax[] statements, CleanupSyntax cleanupSection, BinaryTree rightAnchor)
-            : base(NextObjectId++, null, rightAnchor, null)
+        CompoundSyntax
+        (
+            IStatementSyntax[] statements, CleanupSyntax cleanupSection, BinaryTree anchor
+            , FrameItemContainer frameItems
+        )
+            : base(NextObjectId++, null, anchor, null, frameItems)
         {
             Statements = statements;
             CleanupSection = cleanupSection;
 
-            Anchor.AssertIsNotNull();
             AssertValid();
         }
 
@@ -46,16 +50,16 @@ namespace Reni.SyntaxTree
         [DisableDump]
         public IEnumerable<FunctionSyntax> ConverterFunctions
             => Statements
-                .Where(data => data.Content.Declarer?.IsConverterSyntax ?? false)
-                .Select(data => (FunctionSyntax)data.Content.Value);
+                .Where(data => data.Declarer?.IsConverterSyntax ?? false)
+                .Select(data => (FunctionSyntax)data.Value);
 
         [DisableDump]
-        internal ValueSyntax[] PureStatements => Statements.Select(s => s.Content.Value).ToArray();
+        internal ValueSyntax[] PureStatements => Statements.Select(s => s.Value).ToArray();
 
         [EnableDump]
         internal IDictionary<string, int> NameIndex
             => Statements
-                .Select((statement, index) => (Key: statement.Content.Declarer?.Name?.Value, Value: index))
+                .Select((statement, index) => (Key: statement.Declarer?.Name?.Value, Value: index))
                 .Where(pair => pair.Key != null)
                 .ToDictionary(item => item.Key, item => item.Value);
 
@@ -80,14 +84,14 @@ namespace Reni.SyntaxTree
 
         [DisableDump]
         internal string[] AllNames => Statements
-            .Select(s => s.Content.Declarer?.Name?.Value)
+            .Select(s => s.Declarer?.Name?.Value)
             .Where(name => name != null)
             .ToArray();
 
         [DisableDump]
         internal int[] ConverterStatementPositions
             => Statements
-                .SelectMany((s, i) => s.Content.Declarer.IsConverterSyntax? new[] {i} : new int[0])
+                .SelectMany((s, i) => s.Declarer.IsConverterSyntax? new[] {i} : new int[0])
                 .ToArray();
 
 
@@ -114,11 +118,11 @@ namespace Reni.SyntaxTree
         protected override Syntax GetDirectChildKernel(int index)
         {
             if(index >= 0 && index < Statements.Length)
-                return Statements[index];
+                return (Syntax)Statements[index];
             return index == Statements.Length? CleanupSection : null;
         }
 
-        internal bool IsMutable(int position) => Statements[position].Content.Declarer.IsMutableSyntax;
+        internal bool IsMutable(int position) => Statements[position].Declarer.IsMutableSyntax;
 
         internal int? Find(string name, bool publicOnly)
         {
@@ -126,7 +130,7 @@ namespace Reni.SyntaxTree
                 return null;
 
             return Statements
-                .Select((data, index) => data.IsDefining(name, publicOnly)? index : (int?)null)
+                .Select((data, index) => data.Declarer?.IsDefining(name, publicOnly) ?? false? index : (int?)null)
                 .FirstOrDefault(data => data != null);
         }
 
@@ -138,7 +142,7 @@ namespace Reni.SyntaxTree
 
         internal override ValueSyntax Visit(ISyntaxVisitor visitor)
         {
-            var statements = Statements.Select(s => s.Visit(visitor)).ToArray();
+            var statements = Statements.Select(s => s.Value.Visit(visitor)).ToArray();
             var cleanupSection = CleanupSection?.Value.Visit(visitor);
 
             if(statements.All(s => s == null) && cleanupSection == null)
@@ -153,7 +157,7 @@ namespace Reni.SyntaxTree
                     ? CleanupSection
                     : new CleanupSyntax(CleanupSection.Anchor, cleanupSection);
 
-            return new CompoundSyntax(newStatements, newCleanupSection, Anchor);
+            return Create(newStatements, newCleanupSection, FrameItems);
         }
 
         protected override Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree listTarget = null) => this;
@@ -174,7 +178,7 @@ namespace Reni.SyntaxTree
         {
             for(var index = 0; index < Statements.Length; index++)
             {
-                var declarer = Statements[index].Content.Declarer;
+                var declarer = Statements[index].Declarer;
                 if(declarer != null && selector(declarer))
                     yield return index;
             }
@@ -210,7 +214,6 @@ namespace Reni.SyntaxTree
     {
         ValueSyntax Value { get; }
         DeclarerSyntax Declarer { get; }
-        ValueSyntax ToValueSyntax(BinaryTree leftAnchor, BinaryTree rightAnchor);
-        UsageTree ToUsageValue();
+        ValueSyntax ToValueSyntax(BinaryTree leftAnchor, BinaryTree rightAnchor, FrameItemContainer frameItems);
     }
 }

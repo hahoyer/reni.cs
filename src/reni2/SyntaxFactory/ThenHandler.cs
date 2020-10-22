@@ -8,13 +8,16 @@ namespace Reni.SyntaxFactory
     class ThenHandler : DumpableObject, IValueProvider
     {
         Result<ValueSyntax> IValueProvider.Get
-            (BinaryTree leftAnchor, BinaryTree target, BinaryTree rightAnchor, Factory factory)
+        (
+            BinaryTree leftAnchor, BinaryTree target, BinaryTree rightAnchor, Factory factory
+            , FrameItemContainer brackets
+        )
             => (
                     factory.GetValueSyntax(target.Left),
                     factory.GetValueSyntax(target.Right)
                 )
                 .Apply((condition, thenClause)
-                    => (ValueSyntax)new CondSyntax(condition, thenClause, null, target));
+                    => (ValueSyntax)new CondSyntax(condition, thenClause, null, target, null));
         UsageTree IValueProvider.GetUsage
             (BinaryTree leftAnchor, BinaryTree target, Factory factory)
             => new UsageTree {};

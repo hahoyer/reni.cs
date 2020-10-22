@@ -19,11 +19,13 @@ namespace Reni.SyntaxTree
     {
         internal new abstract class NoChildren : ValueSyntax
         {
-            protected NoChildren(BinaryTree anchor)
-                : base(null, anchor, null) { }
+            protected NoChildren(BinaryTree anchor, FrameItemContainer frameItems)
+                : base(null, anchor, null, frameItems) {             anchor.AssertIsNotNull();
+            }
 
             protected NoChildren(BinaryTree leftBracket, BinaryTree anchor, BinaryTree rightBracket)
-                : base(leftBracket, anchor, rightBracket) { }
+                : base(leftBracket, anchor, rightBracket) {             anchor.AssertIsNotNull();
+            }
 
             [DisableDump]
             protected sealed override int LeftDirectChildCountKernel => 0;
@@ -35,13 +37,7 @@ namespace Reni.SyntaxTree
                 => throw new Exception($"Unexpected call: {nameof(GetDirectChildKernel)}({index})");
         }
 
-        class BracketDummy : Syntax.NoChildren
-        {
-            BracketDummy(BinaryTree anchor)
-                : base(anchor) { }
-
-            internal static NoChildren Create(BinaryTree anchor) => anchor == null? null : new BracketDummy(anchor);
-        }
+        internal readonly FrameItemContainer FrameItems;
 
         // Used for debug only
         [DisableDump]
@@ -49,33 +45,30 @@ namespace Reni.SyntaxTree
         internal readonly FunctionCache<ContextBase, ResultCache> ResultCache =
             new FunctionCache<ContextBase, ResultCache>();
 
-        [EnableDump]
-        [EnableDumpExcept(null)]
-        readonly Syntax.NoChildren LeftBracket;
-        [EnableDump]
-        [EnableDumpExcept(null)]
-        readonly Syntax.NoChildren RightBracket;
-
-
-        protected ValueSyntax(BinaryTree leftBracket, BinaryTree anchor, BinaryTree rightBracket)
+        protected ValueSyntax
+            (BinaryTree leftBracket, BinaryTree anchor, BinaryTree rightBracket, FrameItemContainer frameItems = null)
             : base(anchor)
         {
-            LeftBracket = BracketDummy.Create(leftBracket);
-            RightBracket = BracketDummy.Create(rightBracket);
+            FrameItems = frameItems;
+            FrameItems.AssertIsNotNull();
         }
 
-        protected ValueSyntax(int objectId, BinaryTree leftBracket, BinaryTree anchor, BinaryTree rightBracket)
+        protected ValueSyntax
+        (
+            int objectId, BinaryTree leftBracket, BinaryTree anchor, BinaryTree rightBracket
+            , FrameItemContainer frameItems = null
+        )
             : base(objectId, anchor)
         {
-            LeftBracket = BracketDummy.Create(leftBracket);
-            RightBracket = BracketDummy.Create(rightBracket);
+            FrameItems = frameItems;
+            FrameItems.AssertIsNotNull();
         }
 
         protected abstract int LeftDirectChildCountKernel { get; }
         protected abstract int DirectChildCountKernel { get; }
 
-        internal sealed override int LeftDirectChildCount => LeftDirectChildCountKernel + 1;
-        protected sealed override int DirectChildCount => DirectChildCountKernel + 2;
+        internal sealed override int LeftDirectChildCount => LeftDirectChildCountKernel + FrameItems.LeftItemCount;
+        protected sealed override int DirectChildCount => DirectChildCountKernel + FrameItems.Items.Length;
 
 
         [DisableDump]
@@ -88,23 +81,25 @@ namespace Reni.SyntaxTree
         internal virtual IRecursionHandler RecursionHandler => null;
 
         DeclarerSyntax IStatementSyntax.Declarer => null;
-        UsageTree IStatementSyntax.ToUsageValue() => new UsageTree {Left = true, Right = true};
 
-        ValueSyntax IStatementSyntax.ToValueSyntax(BinaryTree binaryTree, BinaryTree rightAnchor) => this;
+        ValueSyntax IStatementSyntax.ToValueSyntax
+            (BinaryTree binaryTree, BinaryTree rightAnchor, FrameItemContainer frameItems) => this;
 
         ValueSyntax IStatementSyntax.Value => this;
 
         protected abstract Syntax GetDirectChildKernel(int index);
 
         protected sealed override Syntax GetDirectChild(int index)
-            => index == 0
-                ? LeftBracket
-                : index == DirectChildCount - 1
-                    ? RightBracket
-                    : GetDirectChildKernel(index - 1);
+            => index < FrameItems.LeftItemCount
+                ? FrameItems.Items[index]
+                : index < FrameItems.LeftItemCount + DirectChildCountKernel
+                    ? GetDirectChildKernel(index - FrameItems.LeftItemCount)
+                    : index < FrameItems.Items.Length + DirectChildCountKernel
+                        ? FrameItems.Items[index - DirectChildCountKernel]
+                        : null;
 
-        internal override Result<StatementSyntax[]> ToStatementsSyntax(BinaryTree target = null)
-            => StatementSyntax.Create(target, this);
+        internal override Result<IStatementSyntax[]> ToStatementsSyntax(BinaryTree target = null)
+            => T((IStatementSyntax)this);
 
         //[DebuggerHidden]
         internal virtual Result ResultForCache(ContextBase context, Category category)

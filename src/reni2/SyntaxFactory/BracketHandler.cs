@@ -12,7 +12,7 @@ namespace Reni.SyntaxFactory
             BinaryTree leftAnchor,
             BinaryTree target,
             BinaryTree rightAnchor,
-            Factory factory
+            Factory factory, FrameItemContainer brackets
         )
         {
             var bracketKernel = target.BracketKernel;

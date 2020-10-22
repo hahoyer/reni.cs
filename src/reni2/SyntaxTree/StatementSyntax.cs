@@ -1,8 +1,10 @@
+using System;
 using hw.DebugFormatter;
 using Reni.TokenClasses;
 
 namespace Reni.SyntaxTree
 {
+    [Obsolete("", true)]
     sealed class StatementSyntax : Syntax
     {
         [EnableDumpExcept(null)]
@@ -37,9 +39,6 @@ namespace Reni.SyntaxTree
             NotImplementedMethod(visitor);
             return default;
         }
-
-        internal static StatementSyntax[] Create(BinaryTree leftAnchor, IStatementSyntax statement)
-            => T(new StatementSyntax(leftAnchor, statement));
 
         internal bool IsDefining
             (string name, bool publicOnly) => Content.Declarer?.IsDefining(name, publicOnly) ?? false;

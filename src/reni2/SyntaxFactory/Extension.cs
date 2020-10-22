@@ -21,14 +21,14 @@ namespace Reni.SyntaxFactory
         (
             this ValueSyntax left,
             BinaryTree target,
-            ValueSyntax right
+            ValueSyntax right, FrameItemContainer frameItems
         )
             => left == null
                 ? right == null
-                    ? (Result<ValueSyntax>)new TerminalSyntax((ITerminal)target.TokenClass, target)
-                    : new PrefixSyntax((IPrefix)target.TokenClass, right, target)
+                    ? (Result<ValueSyntax>)new TerminalSyntax((ITerminal)target.TokenClass, target, frameItems)
+                    : new PrefixSyntax((IPrefix)target.TokenClass, right, target, frameItems)
                 : right == null
-                    ? (Result<ValueSyntax>)new SuffixSyntax(left, (ISuffix)target.TokenClass, target)
-                    : new InfixSyntax(left, (IInfix)target.TokenClass, right, target);
+                    ? (Result<ValueSyntax>)new SuffixSyntax(left, (ISuffix)target.TokenClass, target, frameItems)
+                    : new InfixSyntax(left, (IInfix)target.TokenClass, right, target, frameItems);
     }
 }
