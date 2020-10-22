@@ -1,3 +1,5 @@
+using Reni.Basics;
+using Reni.Context;
 using Reni.TokenClasses;
 
 namespace Reni.SyntaxTree
@@ -28,5 +30,8 @@ namespace Reni.SyntaxTree
         {
             0 => Left, 1 => Kernel, _ => null
         };
+
+        internal override Result ResultForCache(ContextBase context, Category category)
+            => context.Result(category, Kernel);
     }
 }
