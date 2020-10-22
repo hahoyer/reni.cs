@@ -22,16 +22,16 @@ namespace Reni.SyntaxTree
         readonly ValueSyntax Then;
 
         internal CondSyntax(ValueSyntax condSyntax, ValueSyntax thenSyntax, ValueSyntax elseSyntax, BinaryTree anchor)
-            : base(anchor)
+            : base(null,anchor, null)
         {
             Cond = condSyntax;
             Then = thenSyntax;
             Else = elseSyntax;
         }
 
-        internal override int LeftDirectChildCount => Else == null? 1 : 2;
+        protected override int LeftDirectChildCountKernel => Else == null? 1 : 2;
 
-        protected override int DirectChildCount => 3;
+        protected override int DirectChildCountKernel => 3;
 
         internal override IRecursionHandler RecursionHandler => this;
 
@@ -53,7 +53,7 @@ namespace Reni.SyntaxTree
             return null;
         }
 
-        protected override Syntax GetDirectChild(int index)
+        protected override Syntax GetDirectChildKernel(int index)
             => index switch
             {
                 0 => Cond, 1 => Then, 2 => Else, _ => null

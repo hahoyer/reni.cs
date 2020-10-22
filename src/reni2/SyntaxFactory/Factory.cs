@@ -82,7 +82,7 @@ namespace Reni.SyntaxFactory
         )
         {
             if(target == null)
-                return new BracketSyntax(leftAnchor, null, rightAnchor);
+                return new EmptyList(leftAnchor, target, rightAnchor);
 
             leftAnchor.AssertIsNotNull();
             rightAnchor.AssertIsNotNull();
@@ -93,7 +93,7 @@ namespace Reni.SyntaxFactory
                 leftAnchor
                 , target
                 , rightAnchor
-                , node => new BracketSyntax(leftAnchor, node, rightAnchor)
+                , node => node
                 , node => node.ToValueSyntax(leftAnchor, rightAnchor)
                 , node => (ValueSyntax)new CompoundSyntax(node, null, rightAnchor)
             );
@@ -108,7 +108,7 @@ namespace Reni.SyntaxFactory
                 null
                 , target
                 , null
-                , node => new Result<ValueSyntax>(node)
+                , node => node
                 , node => node.ToValueSyntax(null, null)
                 , node => (ValueSyntax)new CompoundSyntax(node, null, null)
             );

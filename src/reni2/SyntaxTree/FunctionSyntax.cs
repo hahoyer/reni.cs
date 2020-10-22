@@ -28,7 +28,7 @@ namespace Reni.SyntaxTree
             bool isMetaFunction,
             ValueSyntax getter, BinaryTree anchor
         )
-            : base(anchor)
+            : base(null, anchor, null)
         {
             Getter = getter;
             Setter = setter;
@@ -46,12 +46,12 @@ namespace Reni.SyntaxTree
         internal override bool IsLambda => true;
 
         [DisableDump]
-        internal override int LeftDirectChildCount => 1;
+        protected override int LeftDirectChildCountKernel => 1;
 
         [DisableDump]
-        protected override int DirectChildCount => 2;
+        protected override int DirectChildCountKernel => 2;
 
-        protected override Syntax GetDirectChild(int index)
+        protected override Syntax GetDirectChildKernel(int index)
             => index switch
             {
                 0 => Setter

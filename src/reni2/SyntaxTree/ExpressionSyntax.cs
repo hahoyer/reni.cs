@@ -48,8 +48,16 @@ namespace Reni.SyntaxTree
 
         int CurrentResultDepth;
 
-        internal ExpressionSyntax(BinaryTree anchor, ValueSyntax left, Definable definable, ValueSyntax right)
-            : base(anchor)
+        internal ExpressionSyntax
+            (
+            BinaryTree anchorLeft, 
+            BinaryTree anchor, 
+            ValueSyntax left, 
+            Definable definable, 
+            ValueSyntax right, 
+            BinaryTree anchorRight
+            )
+            : base(anchorLeft, anchor, anchorRight)
         {
             Left = left;
             Definable = definable;
@@ -58,11 +66,11 @@ namespace Reni.SyntaxTree
         }
 
         [DisableDump]
-        internal override int LeftDirectChildCount => 1;
+        protected override int LeftDirectChildCountKernel => 1;
         [DisableDump]
-        protected override int DirectChildCount => 2;
+        protected override int DirectChildCountKernel => 2;
 
-        protected override Syntax GetDirectChild(int index)
+        protected override Syntax GetDirectChildKernel(int index)
             => index switch
             {
                 0 => Left
@@ -72,7 +80,7 @@ namespace Reni.SyntaxTree
 
         internal static Result<ExpressionSyntax> Create
             (BinaryTree target, ValueSyntax left, Definable definable, ValueSyntax right)
-            => new ExpressionSyntax(target, left, definable, right);
+            => new ExpressionSyntax(null, target, left, definable, right, null);
 
         internal override Result ResultForCache(ContextBase context, Category category)
         {

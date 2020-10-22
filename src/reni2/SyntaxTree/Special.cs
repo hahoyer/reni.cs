@@ -46,7 +46,7 @@ namespace Reni.SyntaxTree
         readonly ValueSyntax Right;
 
         public PrefixSyntax(IPrefix prefix, ValueSyntax right, BinaryTree anchor)
-            : base(anchor)
+            : base(null, anchor, null)
         {
             Prefix = prefix;
             Right = right;
@@ -56,10 +56,10 @@ namespace Reni.SyntaxTree
         [EnableDumpExcept(null)]
         string Position => Anchor?.Token.Characters.GetDumpAroundCurrent(5);
 
-        internal override int LeftDirectChildCount => 0;
-        protected override int DirectChildCount => 1;
+        protected override int LeftDirectChildCountKernel => 0;
+        protected override int DirectChildCountKernel => 1;
 
-        protected override Syntax GetDirectChild(int index) => index == 0? Right : null;
+        protected override Syntax GetDirectChildKernel(int index) => index == 0? Right : null;
 
         public static Result<ValueSyntax> Create(IPrefix prefix, Result<ValueSyntax> right, BinaryTree binaryTree)
             => new PrefixSyntax(prefix, right.Target, binaryTree).AddIssues<ValueSyntax>(right.Issues);
@@ -80,7 +80,7 @@ namespace Reni.SyntaxTree
         readonly ValueSyntax Right;
 
         public InfixSyntax(ValueSyntax left, IInfix infix, ValueSyntax right, BinaryTree anchor)
-            : base(anchor)
+            : base(null, anchor, null)
         {
             Left = left;
             Infix = infix;
@@ -94,10 +94,10 @@ namespace Reni.SyntaxTree
 
         internal override IRecursionHandler RecursionHandler => Infix as IRecursionHandler;
 
-        internal override int LeftDirectChildCount => 1;
-        protected override int DirectChildCount => 2;
+        protected override int LeftDirectChildCountKernel => 1;
+        protected override int DirectChildCountKernel => 2;
 
-        protected override Syntax GetDirectChild(int index)
+        protected override Syntax GetDirectChildKernel(int index)
             => index switch
             {
                 0 => Left, 1 => Right, _ => null
@@ -128,7 +128,7 @@ namespace Reni.SyntaxTree
         readonly ISuffix Suffix;
 
         internal SuffixSyntax(ValueSyntax left, ISuffix suffix, BinaryTree anchor)
-            : base(anchor)
+            : base(null,anchor, null)
         {
             Left = left;
             Suffix = suffix;
@@ -138,10 +138,10 @@ namespace Reni.SyntaxTree
         [EnableDumpExcept(null)]
         string Position => Anchor?.Token.Characters.GetDumpAroundCurrent(5);
 
-        internal override int LeftDirectChildCount => 1;
-        protected override int DirectChildCount => 1;
+        protected override int LeftDirectChildCountKernel => 1;
+        protected override int DirectChildCountKernel => 1;
 
-        protected override Syntax GetDirectChild(int index) => index == 0? Left : null;
+        protected override Syntax GetDirectChildKernel(int index) => index == 0? Left : null;
 
         public static Result<ValueSyntax> Create(Result<ValueSyntax> left, ISuffix suffix, BinaryTree binaryTree)
         {

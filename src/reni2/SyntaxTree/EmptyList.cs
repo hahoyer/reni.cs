@@ -7,7 +7,10 @@ namespace Reni.SyntaxTree
     sealed class EmptyList : ValueSyntax.NoChildren
     {
         public EmptyList(BinaryTree anchor)
-            : base(anchor)
+            : base(null,anchor, null)
+            => StopByObjectIds();
+        public EmptyList(BinaryTree anchorLeft, BinaryTree anchor, BinaryTree anchorRight)
+            : base(anchorLeft, anchor, anchorRight)
             => StopByObjectIds();
 
         protected override string GetNodeDump() => "()";

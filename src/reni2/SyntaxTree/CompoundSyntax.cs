@@ -30,7 +30,7 @@ namespace Reni.SyntaxTree
         internal readonly StatementSyntax[] Statements;
 
         internal CompoundSyntax(StatementSyntax[] statements, CleanupSyntax cleanupSection, BinaryTree rightAnchor)
-            : base(NextObjectId++, rightAnchor)
+            : base(NextObjectId++, null, rightAnchor, null)
         {
             Statements = statements;
             CleanupSection = cleanupSection;
@@ -92,10 +92,10 @@ namespace Reni.SyntaxTree
 
 
         [DisableDump]
-        internal override int LeftDirectChildCount => DirectChildCount;
+        protected override int LeftDirectChildCountKernel => DirectChildCountKernel;
 
         [DisableDump]
-        protected override int DirectChildCount => Statements.Length + 1;
+        protected override int DirectChildCountKernel => Statements.Length + 1;
 
         public string GetCompoundIdentificationDump() => "." + ObjectId + "i";
 
@@ -111,7 +111,7 @@ namespace Reni.SyntaxTree
         protected override string GetNodeDump()
             => GetType().PrettyName() + "(" + GetCompoundIdentificationDump() + ")";
 
-        protected override Syntax GetDirectChild(int index)
+        protected override Syntax GetDirectChildKernel(int index)
         {
             if(index >= 0 && index < Statements.Length)
                 return Statements[index];
