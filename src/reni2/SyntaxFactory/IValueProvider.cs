@@ -10,11 +10,8 @@ namespace Reni.SyntaxFactory
         Result<ValueSyntax> Get
         (
             BinaryTree leftAnchor, BinaryTree target, BinaryTree rightAnchor, Factory factory
-            , FrameItemContainer brackets
+            , FrameItemContainer frameItems 
         );
-
-        UsageTree GetUsage
-            (BinaryTree leftAnchor, BinaryTree target, Factory factory);
     }
 
     class UsageTree

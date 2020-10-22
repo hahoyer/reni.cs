@@ -6,6 +6,7 @@ namespace Reni.SyntaxFactory
 {
     interface IStatementsProvider
     {
-        Result<IStatementSyntax[]> Get(BinaryTree leftAnchor, BinaryTree target, Factory factory);
+        Result<IStatementSyntax[]> Get
+            (BinaryTree leftAnchor, BinaryTree target, Factory factory, FrameItemContainer brackets);
     }
 }

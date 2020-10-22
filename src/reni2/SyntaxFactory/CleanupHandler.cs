@@ -11,25 +11,17 @@ namespace Reni.SyntaxFactory
             .Get
             (
                 BinaryTree leftAnchor, BinaryTree target, BinaryTree rightAnchor, Factory factory
-                , FrameItemContainer brackets
+                , FrameItemContainer frameItems
             )
-        {
-            NotImplementedMethod(leftAnchor, target, rightAnchor, factory);
-
-            return (
-                    factory.GetStatementsSyntax(leftAnchor, target.Left, null),
+            => (
+                    factory.GetStatementsSyntax(leftAnchor, target.Left, FrameItemContainer.Create()),
                     factory.GetValueSyntax(target.Right)
                 )
                 .Apply
                 ((statements, cleanup)
                     => (ValueSyntax)CompoundSyntax.Create(statements,
                         new CleanupSyntax(target, cleanup),
-                        null)
+                        frameItems)
                 );
-        }
-
-        UsageTree IValueProvider.GetUsage
-            (BinaryTree leftAnchor, BinaryTree target, Factory factory)
-            => new UsageTree {Right = true};
     }
 }

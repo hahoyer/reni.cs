@@ -55,9 +55,9 @@ namespace Reni.SyntaxTree
             ValueSyntax left,
             Definable definable,
             ValueSyntax right,
-            BinaryTree anchorRight, FrameItemContainer brackets
+            BinaryTree anchorRight, FrameItemContainer frameItems
         )
-            : base(anchorLeft, anchor, anchorRight, brackets)
+            : base(anchorLeft, anchor, anchorRight, frameItems)
         {
             anchor.AssertIsNotNull();
             Left = left;
@@ -80,8 +80,8 @@ namespace Reni.SyntaxTree
             };
 
         internal static Result<ExpressionSyntax> Create
-            (BinaryTree target, ValueSyntax left, Definable definable, ValueSyntax right, FrameItemContainer brackets)
-            => new ExpressionSyntax(null, target, left, definable, right, null, brackets);
+            (BinaryTree target, ValueSyntax left, Definable definable, ValueSyntax right, FrameItemContainer frameItems)
+            => new ExpressionSyntax(null, target, left, definable, right, null, frameItems);
 
         internal override Result ResultForCache(ContextBase context, Category category)
         {

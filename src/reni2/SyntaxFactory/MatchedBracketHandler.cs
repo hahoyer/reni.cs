@@ -27,7 +27,5 @@ namespace Reni.SyntaxFactory
                         rightAnchor, null)
                 );
 
-        UsageTree IValueProvider.GetUsage(BinaryTree leftAnchor, BinaryTree target, Factory factory)
-            => new UsageTree();
     }
 }

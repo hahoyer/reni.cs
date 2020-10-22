@@ -22,8 +22,5 @@ namespace Reni.SyntaxFactory
                     => (ValueSyntax)new CondSyntax(condition, thenClause, elseClause, target, null));
         }
 
-        UsageTree IValueProvider.GetUsage
-            (BinaryTree leftAnchor, BinaryTree target, Factory factory)
-            => new UsageTree {};
     }
 }

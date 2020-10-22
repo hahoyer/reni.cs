@@ -11,6 +11,7 @@ namespace Reni.SyntaxTree
             Dummy(BinaryTree anchor)
                 : base(anchor) { }
 
+            protected override string GetNodeDump() => Anchor.NodeDump;
             internal static Dummy Create(BinaryTree anchor) => anchor == null? null : new Dummy(anchor);
         }
 
@@ -19,13 +20,15 @@ namespace Reni.SyntaxTree
 
         internal int LeftItemCount { get; private set; }
 
+        [DisableDump]
         internal BinaryTree LeftMostRightItem
             => Items
                 .Skip(LeftItemCount)
                 .First(item => item != null)
                 .Anchor;
 
-        public FrameItemContainer WithoutLeftMostRightItem
+        [DisableDump]
+        internal FrameItemContainer WithoutLeftMostRightItem
             => new FrameItemContainer
             {
                 Items = Items
@@ -39,6 +42,20 @@ namespace Reni.SyntaxTree
             {
                 Items = T(Dummy.Create(leftAnchor), Dummy.Create(rightAnchor))
                 , LeftItemCount = 1
+            };
+
+        internal static FrameItemContainer Create(BinaryTree leftAnchor)
+            => new FrameItemContainer
+            {
+                Items = T(Dummy.Create(leftAnchor))
+                , LeftItemCount = 1
+            };
+
+        internal static FrameItemContainer Create()
+            => new FrameItemContainer
+            {
+                Items = new Dummy[0]
+                , LeftItemCount = 0
             };
     }
 }

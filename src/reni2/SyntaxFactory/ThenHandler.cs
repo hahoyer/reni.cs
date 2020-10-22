@@ -18,8 +18,5 @@ namespace Reni.SyntaxFactory
                 )
                 .Apply((condition, thenClause)
                     => (ValueSyntax)new CondSyntax(condition, thenClause, null, target, null));
-        UsageTree IValueProvider.GetUsage
-            (BinaryTree leftAnchor, BinaryTree target, Factory factory)
-            => new UsageTree {};
     }
 }

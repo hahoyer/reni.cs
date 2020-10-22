@@ -13,8 +13,8 @@ namespace Reni.SyntaxTree
         [DisableDump]
         internal readonly ITerminal Terminal;
 
-        internal TerminalSyntax(ITerminal terminal, BinaryTree anchor, FrameItemContainer brackets)
-            : base(anchor, brackets)
+        internal TerminalSyntax(ITerminal terminal, BinaryTree anchor, FrameItemContainer frameItems)
+            : base(anchor, frameItems)
         {
             Terminal = terminal;
             StopByObjectIds();

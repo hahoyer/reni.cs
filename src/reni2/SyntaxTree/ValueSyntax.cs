@@ -23,8 +23,9 @@ namespace Reni.SyntaxTree
                 : base(null, anchor, null, frameItems) {             anchor.AssertIsNotNull();
             }
 
-            protected NoChildren(BinaryTree leftBracket, BinaryTree anchor, BinaryTree rightBracket)
-                : base(leftBracket, anchor, rightBracket) {             anchor.AssertIsNotNull();
+            protected NoChildren
+                (BinaryTree leftBracket, BinaryTree anchor, BinaryTree rightBracket, FrameItemContainer frameItems)
+                : base(leftBracket, anchor, rightBracket, frameItems) {             anchor.AssertIsNotNull();
             }
 
             [DisableDump]
