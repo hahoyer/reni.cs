@@ -8,6 +8,7 @@ using Reni.Parser;
 using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Type;
+using Reni.Validation;
 
 namespace Reni.SyntaxTree
 {
@@ -18,7 +19,7 @@ namespace Reni.SyntaxTree
     {
         internal new abstract class NoChildren : ValueSyntax
         {
-            protected NoChildren(BinaryTree anchor, FrameItemContainer frameItems)
+            protected NoChildren(BinaryTree anchor, FrameItemContainer frameItems, Issue issue = null)
                 : base(anchor, frameItems)
                 => anchor.AssertIsNotNull();
 

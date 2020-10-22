@@ -51,8 +51,8 @@ namespace Reni.SyntaxTree
                 => base.AssertValid(level == null? null : new Level {IsCorrectOrder = level.IsCorrectOrder}, target);
         }
 
-        internal static readonly Result<DeclarerSyntax> Empty
-            = new Result<DeclarerSyntax>(new DeclarerSyntax(null, new TagSyntax[0], null, null));
+        internal static readonly DeclarerSyntax Empty
+            = new DeclarerSyntax(null, new TagSyntax[0], null, null);
 
         internal readonly NameSyntax Name;
         internal readonly TagSyntax[] Tags;
@@ -110,7 +110,8 @@ namespace Reni.SyntaxTree
             return index == Tags.Length? Name : null;
         }
 
-        internal static DeclarerSyntax FromTag(DeclarationTagToken tag, BinaryTree target, bool? meansPublic)
+        internal static DeclarerSyntax FromTag
+            (DeclarationTagToken tag, BinaryTree target, bool? meansPublic, Issue issue = null)
             => new DeclarerSyntax(null, new[] {new TagSyntax(tag, target)}, null, meansPublic);
 
         internal static DeclarerSyntax FromName(BinaryTree target, string name, bool? meansPublic)

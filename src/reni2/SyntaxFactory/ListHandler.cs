@@ -10,10 +10,10 @@ namespace Reni.SyntaxFactory
     {
         Result<IStatementSyntax[]> IStatementsProvider.Get
             (BinaryTree target, Factory factory, FrameItemContainer brackets)
-            => (
-                    factory.GetStatementsSyntax(target.Left, brackets),
-                    factory.GetStatementsSyntax(target.Right, FrameItemContainer.Create(target))
-                )
-                .Apply((left, right) => left.Concat(right).ToArray());
+        {
+            var left = factory.GetStatementsSyntax(target.Left, brackets);
+            var right = factory.GetStatementsSyntax(target.Right, FrameItemContainer.Create(target));
+            return left.Concat(right).ToArray();
+        }
     }
 }

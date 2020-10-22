@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
@@ -197,6 +198,16 @@ namespace Reni.Parser
             where TResult : class
             => creator(arg1?.Target).With(arg1?.Issues);
 
+        internal static TResult StripIssues<TArg1, TResult>
+            (this Result<TArg1> arg1, Func<TArg1, TResult> creator)
+            where TArg1 : class
+            where TResult : class
+        {
+            (arg1 == null || !arg1.Issues.Any()).Assert();
+            return creator(arg1?.Target);
+        }
+
+
         internal static Result<TResult> Apply<TArg1, TArg2, TResult>
             (this(Result<TArg1> arg1, Result<TArg2> arg2) arg, Func<TArg1, TArg2, Result<TResult>> creator)
             where TArg1 : class
@@ -217,7 +228,8 @@ namespace Reni.Parser
             => creator(arg.arg1?.Target, arg.arg2?.Target, arg.arg3?.Target)
                 .With(T(arg.arg1?.Issues, arg.arg2?.Issues, arg.arg3?.Issues).ConcatMany().ToArray());
 
-        public static TValue[] T<TValue>(params TValue[] value) => value;
+        [UsedImplicitly]
+        internal static TValue[] T<TValue>(params TValue[] value) => value;
 
         internal static BinaryTree[] Combine(this IEnumerable<IEnumerable<BinaryTree>> targets)
         {

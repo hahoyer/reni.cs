@@ -80,7 +80,7 @@ namespace Reni.TokenClasses
             }
         }
 
-        internal Result<BracketNodes> BracketKernel
+        internal BracketNodes BracketKernel
         {
             get
             {
@@ -97,8 +97,8 @@ namespace Reni.TokenClasses
                 {
                     var issues = IssueId.MissingLeftBracket.Issue(SourcePart);
                     result.Center = Left;
-                    result.Left = ErrorToken.Create(Left.LeftMost);
-                    return new Result<BracketNodes>(result, issues);
+                    result.Left = ErrorToken.Create(issues, Left.LeftMost);
+                    return result;
                 }
 
                 (Left.Left == null).Assert();
@@ -110,8 +110,9 @@ namespace Reni.TokenClasses
 
                 if(levelDelta > 0)
                 {
-                    result.Right = ErrorToken.Create(RightMost);
-                    return new Result<BracketNodes>(result, IssueId.MissingRightBracket.Issue(Left.SourcePart));
+                    var issues = IssueId.MissingRightBracket.Issue(Left.SourcePart);
+                    result.Right = ErrorToken.Create(issues, RightMost);
+                    return result;
                 }
 
                 Left.NotImplementedMethod(level, this);

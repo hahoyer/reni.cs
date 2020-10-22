@@ -7,7 +7,7 @@ namespace Reni.SyntaxFactory
 {
     class DeclarerHandler : DumpableObject, IDeclarerProvider
     {
-        Result<DeclarerSyntax> IDeclarerProvider.Get(BinaryTree target, Factory factory)
+        DeclarerSyntax IDeclarerProvider.Get(BinaryTree target, Factory factory)
             => factory.GetDeclarationTag(target);
     }
 }

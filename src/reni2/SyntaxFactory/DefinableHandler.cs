@@ -7,19 +7,13 @@ namespace Reni.SyntaxFactory
 {
     class DefinableHandler : DumpableObject, IDeclarerProvider, IValueProvider
     {
-        Result<DeclarerSyntax> IDeclarerProvider.Get(BinaryTree target, Factory factory)
+        DeclarerSyntax IDeclarerProvider.Get(BinaryTree target, Factory factory)
         {
             target.Right.AssertIsNull();
-
             return factory.ToDeclarer(factory.GetDeclarerSyntax(target.Left), target, target.Token.Characters.Id);
         }
 
-        Result<ValueSyntax> IValueProvider.Get
-        (
-            BinaryTree target, Factory factory
-            , FrameItemContainer frameItems
-        )
-            => Result<ValueSyntax>.From(factory.GetExpressionSyntax(target, frameItems));
-
+        ValueSyntax IValueProvider.Get(BinaryTree target, Factory factory, FrameItemContainer frameItems)
+            => factory.GetExpressionSyntax(target, frameItems);
     }
 }

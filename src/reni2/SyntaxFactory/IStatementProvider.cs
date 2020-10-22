@@ -6,6 +6,6 @@ namespace Reni.SyntaxFactory
 {
     interface IStatementProvider
     {
-        Result<IStatementSyntax> Get(BinaryTree target, Factory factory);
+        IStatementSyntax Get(BinaryTree target, Factory factory);
     }
 }

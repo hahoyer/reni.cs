@@ -22,9 +22,9 @@ namespace Reni.TokenClasses
 
         IValueProvider IValueToken.Provider => Factory.Definable;
 
-        internal Result<ValueSyntax> CreateForVisit
+        internal ValueSyntax CreateForVisit
             (BinaryTree parent, ValueSyntax left, ValueSyntax right, FrameItemContainer frameItems)
-            => Result<ValueSyntax> .From(ExpressionSyntax.Create(parent, left, this, right, frameItems));
+            => ExpressionSyntax.Create(parent, left, this, right, frameItems);
     }
 
     [BelongsTo(typeof(MainTokenFactory))]

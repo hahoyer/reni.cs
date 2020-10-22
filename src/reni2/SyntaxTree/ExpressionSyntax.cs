@@ -4,7 +4,6 @@ using hw.DebugFormatter;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Parser;
 using Reni.TokenClasses;
 
 namespace Reni.SyntaxTree
@@ -78,8 +77,14 @@ namespace Reni.SyntaxTree
                 0 => Left, 1 => Right, _ => null
             };
 
-        internal static Result<ExpressionSyntax> Create
-            (BinaryTree target, ValueSyntax left, Definable definable, ValueSyntax right, FrameItemContainer frameItems)
+        internal static ExpressionSyntax Create
+        (
+            BinaryTree target,
+            ValueSyntax left,
+            Definable definable,
+            ValueSyntax right,
+            FrameItemContainer frameItems
+        )
             => new ExpressionSyntax(target, left, definable, right, frameItems);
 
         internal override Result ResultForCache(ContextBase context, Category category)
@@ -118,9 +123,7 @@ namespace Reni.SyntaxTree
             if(left == null && right == null)
                 return null;
 
-            var result = Definable.CreateForVisit(Anchor, left ?? Left, right ?? Right, FrameItems);
-            (!result.Issues.Any()).Assert();
-            return result.Target;
+            return Definable.CreateForVisit(Anchor, left ?? Left, right ?? Right, FrameItems);
         }
 
         protected override string GetNodeDump()

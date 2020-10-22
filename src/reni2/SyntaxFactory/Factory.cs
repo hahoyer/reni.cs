@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using Reni.Helper;
@@ -41,7 +40,7 @@ namespace Reni.SyntaxFactory
 
         Factory(bool meansPublic) => MeansPublic = meansPublic;
 
-        internal Result<DeclarerSyntax> GetDeclarerSyntax(BinaryTree target, Func<Result<DeclarerSyntax>> onNull = null)
+        internal DeclarerSyntax GetDeclarerSyntax(BinaryTree target, Func<DeclarerSyntax> onNull = null)
         {
             if(target == null)
                 return onNull?.Invoke();
@@ -53,42 +52,41 @@ namespace Reni.SyntaxFactory
         internal Result<ValueSyntax> GetFrameSyntax(BinaryTree target)
         {
             var kernel = target.BracketKernel;
-            return kernel
-                .Apply(kernel => GetStatementsSyntax(kernel.Center, FrameItemContainer.Create()))
-                .Apply(statements=>(ValueSyntax)CompoundSyntax.Create(statements, null, kernel.Target.ToFrameItems));
+            var statements = GetStatementsSyntax(kernel.Center, FrameItemContainer.Create());
+            return CompoundSyntax.Create(statements, null, kernel.ToFrameItems);
         }
 
-        internal Result<IStatementSyntax[]> GetStatementsSyntax(BinaryTree target, FrameItemContainer frameItems)
+        internal IStatementSyntax[] GetStatementsSyntax(BinaryTree target, FrameItemContainer frameItems)
         {
             if(target == null)
                 return new IStatementSyntax[0];
 
             return GetSyntax(target, node => T((IStatementSyntax)node)
                 , (node, _) => T(node)
-                , (node,_) => node
+                , (node, _) => node
                 , frameItems
-                );
+            );
         }
 
-        internal Result<ValueSyntax> GetValueSyntax(BinaryTree target, FrameItemContainer frameItems)
+        internal ValueSyntax GetValueSyntax(BinaryTree target, FrameItemContainer frameItems)
         {
             if(target == null)
                 return new EmptyList(frameItems);
 
-            return GetSyntax(target, (node) => node
+            return GetSyntax(target, node => node
                 , (node, frameItems) => node.ToValueSyntax(frameItems)
-                , (node,frameItems) => (ValueSyntax)CompoundSyntax.Create(node, null, frameItems)
+                , (node, frameItems) => (ValueSyntax)CompoundSyntax.Create(node, null, frameItems)
                 , frameItems);
         }
 
-        internal Result<ValueSyntax> GetValueSyntax(BinaryTree target)
+        internal ValueSyntax GetValueSyntax(BinaryTree target)
             => target == null? null : GetValueSyntax(target, FrameItemContainer.Create(null, null));
 
-        Result<TResult> GetSyntax<TResult>
+        TResult GetSyntax<TResult>
         (
             BinaryTree target
-            , Func<ValueSyntax, Result<TResult>> fromValueSyntax
-            , Func<IStatementSyntax, FrameItemContainer, Result<TResult>> fromDeclarationSyntax
+            , Func<ValueSyntax, TResult> fromValueSyntax
+            , Func<IStatementSyntax, FrameItemContainer, TResult> fromDeclarationSyntax
             , Func<IStatementSyntax[], FrameItemContainer, TResult> fromStatementsSyntax
             , FrameItemContainer frameItems
         )
@@ -102,25 +100,19 @@ namespace Reni.SyntaxFactory
             (T((object)valueToken, statementsToken, declarationToken).Count(n => n != null) <= 1).Assert();
 
             if(valueToken != null)
-                return valueToken
-                    .Provider
-                    .Get(target, factory, frameItems)
-                    .Apply(fromValueSyntax);
+                return fromValueSyntax(valueToken.Provider.Get(target, factory, frameItems));
 
             if(declarationToken != null)
-                return declarationToken
-                    .Provider
-                    .Get(target, factory)
-                    .Apply(node => fromDeclarationSyntax(node, frameItems));
+                return fromDeclarationSyntax(declarationToken.Provider.Get(target, factory), frameItems);
 
             if(statementsToken != null)
                 return statementsToken
                     .Provider
                     .Get(target, factory, FrameItemContainer.Create())
-                    .Apply(node => fromStatementsSyntax(node, frameItems));
+                    .StripIssues(node => fromStatementsSyntax(node, frameItems));
 
-            return fromValueSyntax(new EmptyList(target, frameItems))
-                .With(IssueId.InvalidExpression.Issue(target.Token.Characters));
+            return fromValueSyntax(new EmptyList(target, frameItems
+                , IssueId.InvalidExpression.Issue(target.Token.Characters)));
         }
 
         Factory GetCurrentFactory(BinaryTree target)
@@ -138,15 +130,15 @@ namespace Reni.SyntaxFactory
                 : new Factory(!MeansPublic);
         }
 
-        internal Result<DeclarerSyntax> ToDeclarer(Result<DeclarerSyntax> left, BinaryTree target, string name)
+        internal DeclarerSyntax ToDeclarer(DeclarerSyntax left, BinaryTree target, string name, Issue issue = null)
         {
             var namePart = DeclarerSyntax.FromName(target, name, MeansPublic);
             return left == null
                 ? namePart
-                : left.Apply(left => left.Combine(namePart));
+                : left.Combine(namePart);
         }
 
-        internal Result<DeclarerSyntax> ToDeclarer(BinaryTree root, BinaryTree target)
+        internal DeclarerSyntax ToDeclarer(BinaryTree root, BinaryTree target, Issue issue = null)
         {
             if(target.TokenClass is IDeclarerToken token)
                 return token.Provider.Get(target, this);
@@ -155,42 +147,29 @@ namespace Reni.SyntaxFactory
             return default;
         }
 
-        internal Result<DeclarerSyntax> GetDeclarationTag(BinaryTree target)
+        internal DeclarerSyntax GetDeclarationTag(BinaryTree target)
         {
             (target.Right == null).Assert();
 
             var tag = target.TokenClass as DeclarationTagToken;
-            var result = DeclarerSyntax.FromTag(tag, target, MeansPublic);
 
-            IEnumerable<Issue> GetIssues()
-            {
-                if(tag == null)
-                    yield return IssueId.InvalidDeclarationTag.Issue(target.Token.Characters);
-            }
+            var issue = tag == null? null : IssueId.InvalidDeclarationTag.Issue(target.Token.Characters);
 
-            return new Result<DeclarerSyntax>(result, GetIssues().ToArray());
+            return DeclarerSyntax.FromTag(tag, target, MeansPublic, issue);
         }
 
-        internal Result<ExpressionSyntax> GetExpressionSyntax(BinaryTree target, FrameItemContainer frameItems)
+        internal ExpressionSyntax GetExpressionSyntax(BinaryTree target, FrameItemContainer frameItems)
         {
             var definable = target.TokenClass as Definable;
             (definable != null).Assert();
-            return
-                (
-                    GetValueSyntax(target.Left),
-                    GetValueSyntax(target.Right)
-                )
-                .Apply((left, right) => ExpressionSyntax.Create(target, left, definable, right, frameItems));
+            return ExpressionSyntax
+                .Create(target, GetValueSyntax(target.Left), definable, GetValueSyntax(target.Right), frameItems);
         }
 
-        internal Result<ValueSyntax> GetInfixSyntax(BinaryTree target, FrameItemContainer brackets)
-            => (
-                    GetValueSyntax(target.Left),
-                    GetValueSyntax(target.Right)
-                )
-                .Apply((left, right) => left.GetInfixSyntax(target, right, brackets));
+        internal ValueSyntax GetInfixSyntax(BinaryTree target, FrameItemContainer frameItems)
+            => GetValueSyntax(target.Left).GetInfixSyntax(target, GetValueSyntax(target.Right), frameItems);
 
-        internal Result<DeclarerSyntax> GetDeclarationTags(BinaryTree.BracketNodes target)
+        internal DeclarerSyntax GetDeclarationTags(BinaryTree.BracketNodes target)
             => target
                 .Center
                 .GetNodesFromLeftToRight()

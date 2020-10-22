@@ -3,6 +3,7 @@ using hw.DebugFormatter;
 using hw.Parser;
 using hw.Scanner;
 using Reni.Parser;
+using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
@@ -14,15 +15,21 @@ namespace Reni.TokenClasses
             public string Id => "<error>";
         }
 
+        readonly Issue Issue;
         readonly SourcePosition Position;
 
-        ErrorToken(SourcePosition position) => Position = position;
-        SourcePart IToken.Characters => Position.Span(0);
+        ErrorToken(Issue issue, SourcePosition position)
+        {
+            Issue = issue;
+            Position = position;
+        }
+
+        SourcePart IToken.Characters => Position?.Span(0) ?? Issue.Position;
         bool? IToken.IsBracketAndLeftBracket => true;
 
         IEnumerable<IItem> IToken.PrecededWith => new IItem[0];
 
-        public static BinaryTree Create(BinaryTree target)
-            => BinaryTree.Create(null, TokenClass.Instance, new ErrorToken(target.Token.SourcePart().Start), null);
+        internal static BinaryTree Create(Issue issue, BinaryTree target)
+            => BinaryTree.Create(null, TokenClass.Instance, new ErrorToken(issue, target.Token.SourcePart().Start), null);
     }
 }

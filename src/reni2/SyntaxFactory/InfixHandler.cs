@@ -16,19 +16,14 @@ namespace Reni.SyntaxFactory
             HasRight = hasRight;
         }
 
-        Result<ValueSyntax> IValueProvider.Get
-        (
-            BinaryTree target, Factory factory
-            , FrameItemContainer brackets
-        )
+        ValueSyntax IValueProvider.Get(BinaryTree target, Factory factory, FrameItemContainer frameItems)
         {
             if(HasLeft != null)
                 (target.Left == null != HasLeft).Assert();
             if(HasRight != null)
                 (target.Right == null != HasRight).Assert();
 
-            return factory.GetInfixSyntax(target, brackets);
+            return factory.GetInfixSyntax(target, frameItems);
         }
-
     }
 }

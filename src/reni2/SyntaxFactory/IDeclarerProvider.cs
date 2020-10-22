@@ -6,6 +6,6 @@ namespace Reni.SyntaxFactory
 {
     interface IDeclarerProvider
     {
-        Result<DeclarerSyntax> Get(BinaryTree target, Factory factory);
+        DeclarerSyntax Get(BinaryTree target, Factory factory);
     }
 }

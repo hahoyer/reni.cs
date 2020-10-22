@@ -1,6 +1,5 @@
 using hw.DebugFormatter;
 using Reni.Parser;
-using Reni.SyntaxFactory;
 using Reni.TokenClasses;
 using Reni.Validation;
 
@@ -47,8 +46,7 @@ namespace Reni.SyntaxTree
         [DisableDump]
         DeclarerSyntax IStatementSyntax.Declarer => Declarer;
 
-        ValueSyntax IStatementSyntax.ToValueSyntax
-            (FrameItemContainer brackets)
+        ValueSyntax IStatementSyntax.ToValueSyntax(FrameItemContainer brackets)
             => CompoundSyntax.Create(T((IStatementSyntax)this), null, brackets);
 
         [DisableDump]
@@ -62,19 +60,12 @@ namespace Reni.SyntaxTree
                 , _ => null
             };
 
-        internal static Result<IStatementSyntax> Create(DeclarerSyntax declarer, BinaryTree target, ValueSyntax value)
-        {
-            var result =
-                new Result<IStatementSyntax>(new DeclarationSyntax(declarer, target, value ?? new EmptyList(null)));
-            
-            var declarerIssue = declarer.Issue;
-            if(declarerIssue != null)
-                result = result.With(declarerIssue);
-
-            if(value == null)
-                result = result.With(IssueId.MissingDeclarationValue.Issue(target.Token.Characters));
-
-            return result;
-        }
+        internal static IStatementSyntax Create(DeclarerSyntax declarer, BinaryTree target, ValueSyntax value)
+            => new DeclarationSyntax
+            (
+                declarer,
+                target,
+                value ?? new EmptyList(null, issue: IssueId.MissingDeclarationValue.Issue(target.Token.Characters))
+            );
     }
 }

@@ -7,27 +7,22 @@ namespace Reni.SyntaxFactory
 {
     class FunctionHandler : DumpableObject, IValueProvider
     {
-        Result<ValueSyntax> IValueProvider.Get
+        ValueSyntax IValueProvider.Get
         (
             BinaryTree target, Factory factory
             , FrameItemContainer frameItems
         )
         {
             var token = (Function)target.TokenClass;
-            return (
-                    factory.GetValueSyntax(target.Left),
-                    factory.GetValueSyntax(target.Right)
-                )
-                .Apply((setter, getter)
-                    => (ValueSyntax)new FunctionSyntax
-                    (
-                        setter
-                        , token.IsImplicit
-                        , token.IsMetaFunction
-                        , getter
-                        , target, frameItems)
-                );
+            return new FunctionSyntax
+            (
+                factory.GetValueSyntax(target.Left)
+                , token.IsImplicit
+                , token.IsMetaFunction
+                , factory.GetValueSyntax(target.Right)
+                , target
+                , frameItems
+            );
         }
-
     }
 }
