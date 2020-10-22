@@ -64,19 +64,19 @@ namespace Reni.SyntaxTree
             Definable = definable;
             Right = right;
             StopByObjectIds();
+            Tracer.ConditionalBreak(frameItems.Items.FirstOrDefault()?.Anchor?.Token.Characters.Position == 826);
         }
 
         [DisableDump]
         protected override int LeftDirectChildCountKernel => 1;
+
         [DisableDump]
         protected override int DirectChildCountKernel => 2;
 
         protected override Syntax GetDirectChildKernel(int index)
             => index switch
             {
-                0 => Left
-                , 1 => Right
-                , _ => null
+                0 => Left, 1 => Right, _ => null
             };
 
         internal static Result<ExpressionSyntax> Create

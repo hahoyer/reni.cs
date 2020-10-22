@@ -9,7 +9,9 @@ namespace hw.UnitTest
         
 // active 
 
-TestRunner.RunTest(new Reni.FeatureTest.CleanupSection.Basic().Run);
+            TestRunner.RunTest(new Reni.FeatureTest.ComplexContext().Run);
+
+            TestRunner.RunTest(new Reni.FeatureTest.CleanupSection.Basic().Run);
 
 // error 
 
@@ -37,7 +39,6 @@ TestRunner.RunTest(new Reni.ParserTest.AlternativePrioTableTest().Converter);
 TestRunner.RunTest(new Reni.ParserTest.AlternativePrioTableTest().ConverterAndProperty);
 TestRunner.RunTest(new Reni.ParserTest.AlternativePrioTableTest().KeyWordAsUserObject);
 TestRunner.RunTest(new Reni.ParserTest.AlternativePrioTableTest().Run);
-TestRunner.RunTest(new Reni.FeatureTest.ComplexContext().Run);
 TestRunner.RunTest(new Reni.FeatureTest.PublicNonPublic1().Run);
 TestRunner.RunTest(new Reni.FeatureTest.PublicNonPublic2().Run);
 TestRunner.RunTest(new Reni.FeatureTest.AllScopeHandling().Run);

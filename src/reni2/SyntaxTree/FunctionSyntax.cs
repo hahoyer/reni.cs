@@ -26,9 +26,9 @@ namespace Reni.SyntaxTree
             ValueSyntax setter,
             bool isImplicit,
             bool isMetaFunction,
-            ValueSyntax getter, BinaryTree anchor, FrameItemContainer brackets
+            ValueSyntax getter, BinaryTree anchor, FrameItemContainer frameItems
         )
-            : base(null, anchor, null, brackets)
+            : base(null, anchor, null, frameItems)
         {
             anchor.AssertIsNotNull();
             Getter = getter;

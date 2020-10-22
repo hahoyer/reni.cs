@@ -124,6 +124,10 @@ namespace Reni.SyntaxTree
                 .GetNodesFromLeftToRight()
                 .ToArray();
 
+            var paths = nodes
+                .Select(node => this.GetPaths(child => node == child).ToArray())
+                .ToArray();
+
             var nodesInSyntax = this
                 .GetNodesFromLeftToRight()
                 .Select(node => node?.Anchor)
@@ -136,7 +140,10 @@ namespace Reni.SyntaxTree
                 {
                     var last = nodesInSyntax[index - 1].Token.Characters;
                     var current = nodesInSyntax[index].Token.Characters;
-                    (last < current).Assert();
+
+                    (last < current).Assert(()=> 
+                        $"Last: {Tracer.Dump(paths[index - 1])} {nodes[index - 1].Dump()} \n" +
+                        $"Current: {Tracer.Dump(paths[index])} {nodes[index].Dump()}");
                 }
 
             if(level.IsCorrectMapping)

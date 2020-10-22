@@ -6,8 +6,6 @@ namespace Reni.SyntaxFactory
 {
     static class Extension
     {
-        internal static Result<ValueSyntax> EmptyListIfNull(this BinaryTree target) => new EmptyList(target);
-
         internal static Result<DeclarerSyntax> Combine
         (
             this Result<DeclarerSyntax> target,

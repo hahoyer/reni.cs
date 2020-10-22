@@ -39,7 +39,7 @@ namespace Reni.Validation
             => new Result(category, Issue(position, message));
 
         internal Result<ValueSyntax> Value(BinaryTree binaryTree)
-            => new Result<ValueSyntax>(new EmptyList(binaryTree), Issue(binaryTree.SourcePart));
+            => new Result<ValueSyntax>(new EmptyList(binaryTree, null), Issue(binaryTree.SourcePart));
 
         internal Result<ValueSyntax> Value(ValueSyntax syntax)
             => new Result<ValueSyntax>(syntax, Issue(syntax.Anchor.SourcePart));

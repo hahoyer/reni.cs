@@ -6,6 +6,8 @@ namespace Reni.SyntaxTree
 {
     sealed class FrameItemContainer : DumpableObject
     {
+        protected override string GetNodeDump() => base.GetNodeDump() + $"[{Items.Length}]";
+
         internal class Dummy : Syntax.NoChildren
         {
             Dummy(BinaryTree anchor)

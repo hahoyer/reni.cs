@@ -73,11 +73,34 @@ namespace Reni.Helper
                 .FirstOrDefault(path => path != null);
         }
 
+        internal static IEnumerable<int[]> GetPaths<TTarget>(this TTarget container, Func<TTarget, bool> isMatch)
+            where TTarget : ITree<TTarget>
+        {
+            if(container == null)
+                return new int[0][];
+
+            if(isMatch(container))
+                return new[] {new int[0]};
+
+            return container
+                .DirectChildCount
+                .Select(container.GetDirectChild)
+                .SelectMany((node, index) => GetSubPaths(node, index, isMatch))
+                .Where(path => path != null);
+        }
+
         static int[] GetSubPath<TTarget>(TTarget container, int index, Func<TTarget, bool> isMatch)
             where TTarget : ITree<TTarget>
         {
             var subPath = GetPath(container, isMatch);
             return subPath == null? null : T(index).Concat(subPath).ToArray();
+        }
+
+        static IEnumerable<int[]> GetSubPaths<TTarget>(TTarget container, int index, Func<TTarget, bool> isMatch)
+            where TTarget : ITree<TTarget>
+        {
+            var subPath = GetPaths(container, isMatch);
+            return subPath.Select(subPath=> T(index).Concat(subPath).ToArray());
         }
 
         internal static IEnumerable<TTarget> GetNodesFromRightToLeft<TTarget>(this ITree<TTarget> target)

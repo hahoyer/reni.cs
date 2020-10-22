@@ -54,7 +54,7 @@ namespace Reni.SyntaxFactory
         {
             var kernel = target.BracketKernel;
             return kernel
-                .Apply(kernel => GetStatementsSyntax(null, kernel.Center, null))
+                .Apply(kernel => GetStatementsSyntax(null, kernel.Center, FrameItemContainer.Create()))
                 .Apply(statements=>(ValueSyntax)CompoundSyntax.Create(statements, null, kernel.Target.ToFrameItems));
         }
 
@@ -70,9 +70,9 @@ namespace Reni.SyntaxFactory
                 leftAnchor
                 , target
                 , null
-                , (node, leftAnchor) => T((IStatementSyntax)node)
-                , (node, leftAnchor, rightAnchor) => T(node)
-                , (node, rightAnchor) => node
+                , (node, _) => T((IStatementSyntax)node)
+                , (node, _, _,_) => T(node)
+                , (node, _,_) => node
                 , frameItems
                 );
         }
@@ -93,8 +93,9 @@ namespace Reni.SyntaxFactory
                 , target
                 , rightAnchor
                 , (node, leftAnchor) => node
-                , (node, leftAnchor, rightAnchor) => node.ToValueSyntax(leftAnchor, rightAnchor, frameItems)
-                , (node, rightAnchor) => (ValueSyntax)CompoundSyntax.Create(node, null, null), frameItems);
+                , (node, leftAnchor, rightAnchor,frameItems) => node.ToValueSyntax(leftAnchor, rightAnchor, frameItems)
+                , (node, rightAnchor,frameItems) => (ValueSyntax)CompoundSyntax.Create(node, null, frameItems)
+                , frameItems);
         }
 
         internal Result<ValueSyntax> GetValueSyntax(BinaryTree target)
@@ -106,8 +107,8 @@ namespace Reni.SyntaxFactory
             , BinaryTree target
             , BinaryTree rightAnchor
             , Func<ValueSyntax, BinaryTree, Result<TResult>> fromValueSyntax
-            , Func<IStatementSyntax, BinaryTree, BinaryTree, Result<TResult>> fromDeclarationSyntax
-            , Func<IStatementSyntax[], BinaryTree, TResult> fromStatementsSyntax
+            , Func<IStatementSyntax, BinaryTree, BinaryTree,FrameItemContainer, Result<TResult>> fromDeclarationSyntax
+            , Func<IStatementSyntax[], BinaryTree, FrameItemContainer, TResult> fromStatementsSyntax
             , FrameItemContainer frameItems
         )
             where TResult : class
@@ -134,15 +135,15 @@ namespace Reni.SyntaxFactory
                 return declarationToken
                     .Provider
                     .Get(target, factory)
-                    .Apply(node => fromDeclarationSyntax(node, leftAnchor, rightAnchor));
+                    .Apply(node => fromDeclarationSyntax(node, leftAnchor, rightAnchor, frameItems));
 
             if(statementsToken != null)
                 return statementsToken
                     .Provider
-                    .Get(leftAnchor, target, factory, frameItems)
-                    .Apply(node => fromStatementsSyntax(node, rightAnchor));
+                    .Get(leftAnchor, target, factory, FrameItemContainer.Create())
+                    .Apply(node => fromStatementsSyntax(node, rightAnchor,frameItems));
 
-            return fromValueSyntax(new EmptyList(target), leftAnchor)
+            return fromValueSyntax(new EmptyList(target, frameItems), leftAnchor)
                 .With(IssueId.InvalidExpression.Issue(target.Token.Characters));
         }
 

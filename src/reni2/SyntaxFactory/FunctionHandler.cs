@@ -10,7 +10,7 @@ namespace Reni.SyntaxFactory
         Result<ValueSyntax> IValueProvider.Get
         (
             BinaryTree leftAnchor, BinaryTree target, BinaryTree rightAnchor, Factory factory
-            , FrameItemContainer brackets
+            , FrameItemContainer frameItems
         )
         {
             var token = (Function)target.TokenClass;
@@ -25,7 +25,7 @@ namespace Reni.SyntaxFactory
                         , token.IsImplicit
                         , token.IsMetaFunction
                         , getter
-                        , target, null)
+                        , target, frameItems)
                 );
         }
 
