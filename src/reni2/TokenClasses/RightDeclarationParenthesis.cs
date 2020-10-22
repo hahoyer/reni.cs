@@ -8,7 +8,7 @@ namespace Reni.TokenClasses
     [BelongsTo(typeof(DeclarationTokenFactory))]
     sealed class RightDeclarationParenthesis
         : RightParenthesisBase
-            , IBracketMatch<BinaryTree>,IDeclarerToken
+            , IBracketMatch<BinaryTree>,IDeclarationTagToken
 
     {
         sealed class Matched
@@ -29,6 +29,6 @@ namespace Reni.TokenClasses
 
         IParserTokenType<BinaryTree> IBracketMatch<BinaryTree>.Value { get; } = new Matched();
 
-        IDeclarerProvider IDeclarerToken.Provider => Factory.ComplexDeclarer;
+        IDeclarerProvider IDeclarationTagToken.Provider => Factory.ComplexDeclarer;
     }
 }

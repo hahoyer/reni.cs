@@ -9,7 +9,14 @@ namespace Reni.SyntaxFactory
     {
         DeclarerSyntax IDeclarerProvider.Get(BinaryTree target, Factory factory)
         {
+            if(target.Left == null && target.Right == null)
+                return factory.GetDeclarationName(target);
+
+
+            
+            NotImplementedMethod(target, factory);
             target.Right.AssertIsNull();
+
             return factory.ToDeclarer(factory.GetDeclarerSyntax(target.Left), target, target.Token.Characters.Id);
         }
 

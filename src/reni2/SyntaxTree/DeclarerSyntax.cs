@@ -14,9 +14,9 @@ namespace Reni.SyntaxTree
     {
         internal class TagSyntax : Syntax.NoChildren
         {
-            internal readonly IDeclarerToken Value;
+            internal readonly IDeclarationTagToken Value;
 
-            internal TagSyntax(IDeclarerToken value, BinaryTree anchor)
+            internal TagSyntax(IDeclarationTagToken value, BinaryTree anchor)
                 : base(anchor)
             {
                 Value = value;

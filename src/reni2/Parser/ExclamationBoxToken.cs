@@ -6,12 +6,12 @@ using Reni.TokenClasses;
 namespace Reni.Parser
 {
     sealed class ExclamationBoxToken
-        : DumpableObject, IParserTokenType<BinaryTree>, ITokenClass, IDeclarerToken
+        : DumpableObject, IParserTokenType<BinaryTree>, ITokenClass, IDeclarationTagToken
     {
         BinaryTree Value { get; }
         internal ExclamationBoxToken(BinaryTree value) => Value = value;
 
-        IDeclarerProvider IDeclarerToken.Provider => Factory.DeclarationMark;
+        IDeclarerProvider IDeclarationTagToken.Provider => Factory.DeclarationMark;
 
         BinaryTree IParserTokenType<BinaryTree>.Create(BinaryTree left, IToken token, BinaryTree right)
         {

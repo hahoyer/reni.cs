@@ -8,6 +8,7 @@ using hw.Scanner;
 using Reni.Helper;
 using Reni.Parser;
 using Reni.TokenClasses;
+using Reni.Validation;
 
 namespace Reni.SyntaxTree
 {
@@ -39,17 +40,22 @@ namespace Reni.SyntaxTree
         }
 
         internal readonly BinaryTree Anchor;
+        
+        [EnableDumpExcept(null)]
+        internal readonly Issue Issue;
 
-        protected Syntax(BinaryTree anchor)
+        protected Syntax(BinaryTree anchor, Issue issue=null)
         {
-            Anchor = anchor; 
+            Anchor = anchor;
+            Issue = issue;
             Anchor.AssertIsNotNull();
         }
 
-        protected Syntax(int objectId, BinaryTree anchor)
+        protected Syntax(int objectId, BinaryTree anchor, Issue issue=null)
             : base(objectId)
         {
-            Anchor = anchor; 
+            Anchor = anchor;
+            Issue = issue;
             Anchor.AssertIsNotNull();
         }
 

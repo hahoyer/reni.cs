@@ -80,6 +80,8 @@ namespace Reni.TokenClasses
             }
         }
 
+        [EnableDump]
+        [EnableDumpExcept(null)]
         internal BracketNodes BracketKernel
         {
             get

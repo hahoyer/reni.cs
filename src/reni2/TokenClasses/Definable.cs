@@ -9,7 +9,7 @@ using Reni.SyntaxTree;
 namespace Reni.TokenClasses
 {
     abstract class Definable
-        : TokenClass, IDeclarerToken, IValueToken
+        : TokenClass, IDeclarationTagToken, IValueToken
     {
         [DisableDump]
         protected string DataFunctionName => Id.Symbolize();
@@ -18,7 +18,7 @@ namespace Reni.TokenClasses
         internal virtual IEnumerable<IDeclarationProvider> MakeGeneric
             => this.GenericListFromDefinable();
 
-        IDeclarerProvider IDeclarerToken.Provider => Factory.DefinableAsDeclarer;
+        IDeclarerProvider IDeclarationTagToken.Provider => Factory.DefinableAsDeclarer;
 
         IValueProvider IValueToken.Provider => Factory.Definable;
 

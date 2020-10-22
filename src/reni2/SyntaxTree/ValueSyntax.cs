@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Helper;
 using Reni.Parser;
 using Reni.Struct;
 using Reni.TokenClasses;
@@ -20,7 +22,7 @@ namespace Reni.SyntaxTree
         internal new abstract class NoChildren : ValueSyntax
         {
             protected NoChildren(BinaryTree anchor, FrameItemContainer frameItems, Issue issue = null)
-                : base(anchor, frameItems)
+                : base(anchor, frameItems, issue)
                 => anchor.AssertIsNotNull();
 
             [DisableDump]
@@ -41,15 +43,15 @@ namespace Reni.SyntaxTree
         internal readonly FunctionCache<ContextBase, ResultCache> ResultCache =
             new FunctionCache<ContextBase, ResultCache>();
 
-        protected ValueSyntax(BinaryTree anchor, FrameItemContainer frameItems = null)
-            : base(anchor)
+        protected ValueSyntax(BinaryTree anchor, FrameItemContainer frameItems = null, Issue issue = null)
+            : base(anchor, issue)
         {
             FrameItems = frameItems;
             FrameItems.AssertIsNotNull();
         }
 
-        protected ValueSyntax(int objectId, BinaryTree anchor, FrameItemContainer frameItems = null)
-            : base(objectId, anchor)
+        protected ValueSyntax(int objectId, BinaryTree anchor, FrameItemContainer frameItems = null, Issue issue = null)
+            : base(objectId, anchor, issue)
         {
             FrameItems = frameItems;
             FrameItems.AssertIsNotNull();
@@ -70,6 +72,14 @@ namespace Reni.SyntaxTree
 
         [DisableDump]
         internal virtual IRecursionHandler RecursionHandler => null;
+
+        [DisableDump]
+        internal IEnumerable<Issue> Issues
+            => this
+                .GetNodesFromLeftToRight()
+                .Select(node => node?.Issue)
+                .Where(issue => issue != null)
+                .ToArray();
 
         DeclarerSyntax IStatementSyntax.Declarer => null;
 

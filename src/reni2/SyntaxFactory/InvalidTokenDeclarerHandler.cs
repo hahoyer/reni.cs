@@ -10,6 +10,7 @@ namespace Reni.SyntaxFactory
     {
         DeclarerSyntax IDeclarerProvider.Get(BinaryTree target, Factory factory)
         {
+            NotImplementedMethod(target, factory);
             target.Right.AssertIsNull();
 
             return factory

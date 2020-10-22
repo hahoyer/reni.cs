@@ -38,7 +38,7 @@ namespace Reni.TokenClasses
 
     [BelongsTo(typeof(DeclarationTokenFactory))]
     abstract class DeclarationTagToken
-        : TerminalToken, IDeclarerToken
+        : TerminalToken, IDeclarationTagToken
     {
         public static IEnumerable<string> DeclarationOptions
         {
@@ -54,7 +54,7 @@ namespace Reni.TokenClasses
             }
         }
 
-        IDeclarerProvider IDeclarerToken.Provider => Factory.Declarer;
+        IDeclarerProvider IDeclarationTagToken.Provider => Factory.DeclarationTag;
     }
 
     sealed class ConverterToken : DeclarationTagToken

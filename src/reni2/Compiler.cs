@@ -49,7 +49,7 @@ namespace Reni
 
         readonly MainTokenFactory MainTokenFactory;
         readonly string ModuleName;
-        readonly ValueCache<Result<ValueSyntax>> ValueSyntaxCache;
+        readonly ValueCache<ValueSyntax> ValueSyntaxCache;
 
         Compiler(Source source, string moduleName, CompilerParameters parameters)
         {
@@ -89,7 +89,7 @@ namespace Reni
 
         [Node]
         [DisableDump]
-        internal ValueSyntax Syntax => ValueSyntaxCache.Value.Target;
+        internal ValueSyntax Syntax => ValueSyntaxCache.Value;
 
         [Node]
         [DisableDump]
@@ -254,18 +254,9 @@ namespace Reni
                 parameters);
         }
 
-        Result<ValueSyntax> GetSyntax()
-            => Parameters.IsSyntaxRequired
-                ? GetSyntax(BinaryTree)
-                    .Apply(target =>
-                    {
-                        target.AssertValid(target: BinaryTree);
-                        return target;
-                    })
-                : null;
+        ValueSyntax GetSyntax() => Parameters.IsSyntaxRequired? GetSyntax(BinaryTree) : null;
 
-        static Result<ValueSyntax> GetSyntax(BinaryTree target)
-            => Factory.Root.GetFrameSyntax(target);
+        static ValueSyntax GetSyntax(BinaryTree target) => Factory.Root.GetFrameSyntax(target);
 
         CodeContainer GetCodeContainer()
             => new CodeContainer(Syntax, Root, ModuleName, Source.Data);

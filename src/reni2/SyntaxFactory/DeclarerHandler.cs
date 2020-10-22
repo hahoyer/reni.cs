@@ -5,9 +5,12 @@ using Reni.TokenClasses;
 
 namespace Reni.SyntaxFactory
 {
-    class DeclarerHandler : DumpableObject, IDeclarerProvider
+    class DeclarationTagHandler : DumpableObject, IDeclarerProvider
     {
         DeclarerSyntax IDeclarerProvider.Get(BinaryTree target, Factory factory)
-            => factory.GetDeclarationTag(target);
+        {
+            NotImplementedMethod(target, factory);
+            return factory.GetDeclarationTag(target);
+        }
     }
 }

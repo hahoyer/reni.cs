@@ -14,12 +14,12 @@ namespace Reni.Parser
             => new InvalidDeclarationError(name);
     }
 
-    sealed class InvalidDeclarationError : DumpableObject, IParserTokenType<BinaryTree>, ITokenClass, IDeclarerToken
+    sealed class InvalidDeclarationError : DumpableObject, IParserTokenType<BinaryTree>, ITokenClass, IDeclarationTagToken
     {
         readonly string Name;
         public InvalidDeclarationError(string name) => Name = name;
 
-        IDeclarerProvider IDeclarerToken.Provider => Factory.Declarer;
+        IDeclarerProvider IDeclarationTagToken.Provider => Factory.DeclarationTag;
 
         BinaryTree IParserTokenType<BinaryTree>.Create(BinaryTree left, IToken token, BinaryTree right)
             => BinaryTree.Create(left, this, token, right);

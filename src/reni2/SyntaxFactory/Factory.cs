@@ -29,7 +29,7 @@ namespace Reni.SyntaxFactory
 
         internal static readonly IDeclarerProvider DeclarationMark = new DeclarationMarkHandler();
         internal static readonly IDeclarerProvider DefinableAsDeclarer = new DefinableHandler();
-        internal static readonly IDeclarerProvider Declarer = new DeclarerHandler();
+        internal static readonly IDeclarerProvider DeclarationTag = new DeclarationTagHandler();
         internal static readonly IDeclarerProvider ComplexDeclarer = new ComplexDeclarerHandler();
 
         internal static readonly Factory Root = new Factory(false);
@@ -40,16 +40,7 @@ namespace Reni.SyntaxFactory
 
         Factory(bool meansPublic) => MeansPublic = meansPublic;
 
-        internal DeclarerSyntax GetDeclarerSyntax(BinaryTree target, Func<DeclarerSyntax> onNull = null)
-        {
-            if(target == null)
-                return onNull?.Invoke();
-
-            return ((target.TokenClass as IDeclarerToken)?.Provider ?? InvalidTokenDeclarer)
-                .Get(target, GetCurrentFactory(target));
-        }
-
-        internal Result<ValueSyntax> GetFrameSyntax(BinaryTree target)
+        internal ValueSyntax GetFrameSyntax(BinaryTree target)
         {
             var kernel = target.BracketKernel;
             var statements = GetStatementsSyntax(kernel.Center, FrameItemContainer.Create());
@@ -138,23 +129,20 @@ namespace Reni.SyntaxFactory
                 : left.Combine(namePart);
         }
 
-        internal DeclarerSyntax ToDeclarer(BinaryTree root, BinaryTree target, Issue issue = null)
+        internal DeclarerSyntax GetDeclarerSyntax(BinaryTree target, Func<DeclarerSyntax> onNull = null)
         {
-            if(target.TokenClass is IDeclarerToken token)
-                return token.Provider.Get(target, this);
+            if(target == null)
+                return onNull?.Invoke();
 
-            NotImplementedMethod(root, target);
-            return default;
-        }
+            return ((target.TokenClass as IDeclarationTagToken)?.Provider ?? InvalidTokenDeclarer)
+                .Get(target, GetCurrentFactory(target));
+        }                                          
 
         internal DeclarerSyntax GetDeclarationTag(BinaryTree target)
         {
             (target.Right == null).Assert();
-
             var tag = target.TokenClass as DeclarationTagToken;
-
             var issue = tag == null? null : IssueId.InvalidDeclarationTag.Issue(target.Token.Characters);
-
             return DeclarerSyntax.FromTag(tag, target, MeansPublic, issue);
         }
 
@@ -175,5 +163,24 @@ namespace Reni.SyntaxFactory
                 .GetNodesFromLeftToRight()
                 .Select(GetDeclarationTag)
                 .Aggregate(DeclarerSyntax.Empty, (left, right) => left.Combine(right));
+
+        internal DeclarerSyntax GetDeclarationTags(BinaryTree target, FrameItemContainer frameItems)
+        {
+            if(target.Right == null)
+            {
+                if(target.TokenClass is DeclarationTagToken tag)
+                    return DeclarerSyntax.FromTag(tag, target, MeansPublic);
+//                var issue = tag == null? null : IssueId.InvalidDeclarationTag.Issue(target.Token.Characters);
+                NotImplementedMethod(target, frameItems);
+                return default;
+            }
+
+            
+            NotImplementedMethod(target, frameItems);
+            return default;
+        }
+
+        internal DeclarerSyntax GetDeclarationName(BinaryTree target) 
+            => DeclarerSyntax.FromName(target, target.Token.Characters.Id, MeansPublic);
     }
 }

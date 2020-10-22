@@ -7,6 +7,9 @@ namespace Reni.SyntaxFactory
     class ComplexDeclarerHandler : DumpableObject, IDeclarerProvider
     {
         DeclarerSyntax IDeclarerProvider.Get(BinaryTree target, Factory factory)
-            => factory.GetDeclarationTags(target.BracketKernel);
+        {
+            NotImplementedMethod(target, factory);
+            return factory.GetDeclarationTags(target.BracketKernel);
+        }
     }
 }

@@ -8,9 +8,12 @@ namespace Reni.SyntaxFactory
     {
         DeclarerSyntax IDeclarerProvider.Get(BinaryTree target, Factory factory)
         {
-            (target.Right != null).Assert();
-            return
-                factory.GetDeclarerSyntax(target.Left).Combine(factory.ToDeclarer(target, target.Right));
+            if(target.Left == null && target.Right != null)
+                return factory.GetDeclarationTags(target.Right, FrameItemContainer.Create(target));
+
+
+            NotImplementedMethod(target, factory);
+            return default;
         }
     }
 }
