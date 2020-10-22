@@ -2,8 +2,6 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
-using JetBrains.Annotations;
-using Reni.Parser;
 using Reni.SyntaxFactory;
 using Reni.TokenClasses;
 using Reni.Validation;
@@ -16,8 +14,8 @@ namespace Reni.SyntaxTree
         {
             internal readonly IDeclarationTagToken Value;
 
-            internal TagSyntax(IDeclarationTagToken value, BinaryTree anchor)
-                : base(anchor)
+            internal TagSyntax(IDeclarationTagToken value, BinaryTree anchor, Issue issue)
+                : base(anchor, issue)
             {
                 Value = value;
                 Anchor.AssertIsNotNull();
@@ -112,7 +110,7 @@ namespace Reni.SyntaxTree
 
         internal static DeclarerSyntax FromTag
             (DeclarationTagToken tag, BinaryTree target, bool? meansPublic, Issue issue = null)
-            => new DeclarerSyntax(null, new[] {new TagSyntax(tag, target)}, null, meansPublic);
+            => new DeclarerSyntax(null, new[] {new TagSyntax(tag, target, issue)}, null, meansPublic);
 
         internal static DeclarerSyntax FromName(BinaryTree target, string name, bool? meansPublic)
             => new DeclarerSyntax(null, new TagSyntax[0], new NameSyntax(target, name), meansPublic);
@@ -133,5 +131,11 @@ namespace Reni.SyntaxTree
 
         public bool IsDefining(string name, bool publicOnly)
             => name != null && Name?.Value == name && (!publicOnly || IsPublic);
+
+        protected override string GetNodeDump() 
+            => base.GetNodeDump() 
+                +"["
+               + Tags.Select(tag=>(tag?.Value?.NodeDump()??"?")+"!").Stringify("") 
+               + (Name?.Value??"")+"]";
     }
 }

@@ -12,6 +12,12 @@ namespace Reni.SyntaxFactory
             if(target.Left == null && target.Right == null)
                 return factory.GetDeclarationName(target);
 
+            if(target.Left != null && target.Right == null)
+            {
+                var left = factory.GetDeclarerSyntax(target.Left);
+                var center = factory.GetDeclarationName(target);
+                return left.Combine(center);
+            }
 
             
             NotImplementedMethod(target, factory);

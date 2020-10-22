@@ -170,7 +170,10 @@ namespace Reni.SyntaxFactory
             {
                 if(target.TokenClass is DeclarationTagToken tag)
                     return DeclarerSyntax.FromTag(tag, target, MeansPublic);
-//                var issue = tag == null? null : IssueId.InvalidDeclarationTag.Issue(target.Token.Characters);
+
+                if(target.TokenClass is InvalidDeclarationError error)
+                    return DeclarerSyntax.FromTag(null, target, MeansPublic, IssueId.InvalidDeclarationTag.Issue(target.Token.Characters));
+
                 NotImplementedMethod(target, frameItems);
                 return default;
             }

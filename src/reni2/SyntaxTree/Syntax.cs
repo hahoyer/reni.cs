@@ -19,8 +19,8 @@ namespace Reni.SyntaxTree
     {
         internal abstract class NoChildren : Syntax
         {
-            protected NoChildren(BinaryTree anchor)
-                : base(anchor) { }
+            protected NoChildren(BinaryTree anchor, Issue issue = null)
+                : base(anchor, issue) { }
 
             [DisableDump]
             internal sealed override int LeftDirectChildCount => 0;
@@ -40,18 +40,18 @@ namespace Reni.SyntaxTree
         }
 
         internal readonly BinaryTree Anchor;
-        
+
         [EnableDumpExcept(null)]
         internal readonly Issue Issue;
 
-        protected Syntax(BinaryTree anchor, Issue issue=null)
+        protected Syntax(BinaryTree anchor, Issue issue = null)
         {
             Anchor = anchor;
             Issue = issue;
             Anchor.AssertIsNotNull();
         }
 
-        protected Syntax(int objectId, BinaryTree anchor, Issue issue=null)
+        protected Syntax(int objectId, BinaryTree anchor, Issue issue = null)
             : base(objectId)
         {
             Anchor = anchor;
@@ -126,7 +126,7 @@ namespace Reni.SyntaxTree
             if(target == null)
                 return;
 
-            var nodes= this
+            var nodes = this
                 .GetNodesFromLeftToRight()
                 .ToArray();
 
@@ -147,7 +147,7 @@ namespace Reni.SyntaxTree
                     var last = nodesInSyntax[index - 1].Token.Characters;
                     var current = nodesInSyntax[index].Token.Characters;
 
-                    (last < current).Assert(()=> 
+                    (last < current).Assert(() =>
                         $"Last: {Tracer.Dump(paths[index - 1])} {nodes[index - 1].Dump()} \n" +
                         $"Current: {Tracer.Dump(paths[index])} {nodes[index].Dump()}");
                 }
