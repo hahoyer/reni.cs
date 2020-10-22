@@ -10,13 +10,13 @@ namespace Reni.SyntaxFactory
         Result<ValueSyntax> IValueProvider.Get
         (
             BinaryTree leftAnchor, BinaryTree target, BinaryTree rightAnchor, Factory factory
-            , FrameItemContainer brackets
+            , FrameItemContainer frameItems
         )
             => (
                     factory.GetValueSyntax(target.Left),
                     factory.GetValueSyntax(target.Right)
                 )
                 .Apply((condition, thenClause)
-                    => (ValueSyntax)new CondSyntax(condition, thenClause, null, target, null));
+                    => (ValueSyntax)new CondSyntax(condition, thenClause, null, target, frameItems));
     }
 }

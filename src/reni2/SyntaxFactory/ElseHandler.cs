@@ -10,7 +10,7 @@ namespace Reni.SyntaxFactory
         Result<ValueSyntax> IValueProvider.Get
         (
             BinaryTree leftAnchor, BinaryTree target, BinaryTree rightAnchor, Factory factory
-            , FrameItemContainer brackets
+            , FrameItemContainer frameItems
         )
         {
             return (
@@ -19,7 +19,7 @@ namespace Reni.SyntaxFactory
                     factory.GetValueSyntax(target.Right)
                 )
                 .Apply((condition, thenClause, elseClause)
-                    => (ValueSyntax)new CondSyntax(condition, thenClause, elseClause, target, null));
+                    => (ValueSyntax)new CondSyntax(condition, thenClause, elseClause, target, frameItems));
         }
 
     }

@@ -10,7 +10,7 @@ namespace Reni.SyntaxFactory
         Result<ValueSyntax> IValueProvider.Get
         (
             BinaryTree leftAnchor, BinaryTree target, BinaryTree rightAnchor, Factory factory
-            , FrameItemContainer brackets
+            , FrameItemContainer frameItems
         )
             => (
                     factory.GetValueSyntax(target.Left),
@@ -24,7 +24,7 @@ namespace Reni.SyntaxFactory
                         left,
                         null,
                         right,
-                        rightAnchor, null)
+                        rightAnchor, frameItems)
                 );
 
     }

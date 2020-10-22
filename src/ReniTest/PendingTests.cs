@@ -1,4 +1,4 @@
-//15:13:30.438 22.10.2020 run 22 of 178 Reni.FeatureTest.CleanupSection.Basic.Run
+//16:47:58.097 22.10.2020 run 30 of 178 Reni.FeatureTest.BlogExamples.Post120109.Run
 
 namespace hw.UnitTest
 {
@@ -9,29 +9,7 @@ namespace hw.UnitTest
         
 // active 
 
-            TestRunner.RunTest(new Reni.FeatureTest.ComplexContext().Run);
-
-            TestRunner.RunTest(new Reni.FeatureTest.CleanupSection.Basic().Run);
-
-// error 
-
-TestRunner.RunTest(new Reni.ParserTest.StrangeDeclarationSyntax().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Text.Hallo().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Validation.UndefinedContextSymbol().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Validation.UndefinedSymbol().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Validation.UnMatchedLeftParenthesis().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Validation.UnMatchedRightParenthesis().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Structure.TwoStatements().Run);
-
-// dependanterror 
-
-TestRunner.RunTest(new Reni.FeatureTest.Text.HalloApo().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Text.HalloApoApo().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Text.HalloApoQuoApo().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Text.ConvertFromNumber().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Validation.UseOfUndefinedContextSymbol().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Validation.IndirectUseOfUndefinedContextSymbol().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Validation.UnMatchedBrackets().Run);
+TestRunner.RunTest(new Reni.FeatureTest.BlogExamples.Post120109().Run);
 
 // notrun 
 
@@ -39,6 +17,7 @@ TestRunner.RunTest(new Reni.ParserTest.AlternativePrioTableTest().Converter);
 TestRunner.RunTest(new Reni.ParserTest.AlternativePrioTableTest().ConverterAndProperty);
 TestRunner.RunTest(new Reni.ParserTest.AlternativePrioTableTest().KeyWordAsUserObject);
 TestRunner.RunTest(new Reni.ParserTest.AlternativePrioTableTest().Run);
+TestRunner.RunTest(new Reni.FeatureTest.ComplexContext().Run);
 TestRunner.RunTest(new Reni.FeatureTest.PublicNonPublic1().Run);
 TestRunner.RunTest(new Reni.FeatureTest.PublicNonPublic2().Run);
 TestRunner.RunTest(new Reni.FeatureTest.AllScopeHandling().Run);
@@ -140,7 +119,6 @@ TestRunner.RunTest(new Reni.FeatureTest.Function.TwoFunctions1().Run);
 TestRunner.RunTest(new Reni.FeatureTest.CleanupSection.Nested().Run);
 TestRunner.RunTest(new Reni.FeatureTest.CleanupSection.Simple().Run);
 TestRunner.RunTest(new Reni.FeatureTest.CleanupSection.WithReference().Run);
-TestRunner.RunTest(new Reni.FeatureTest.BlogExamples.Post120109().Run);
 TestRunner.RunTest(new Reni.FeatureTest.BlogExamples.Post120617().Run);
 TestRunner.RunTest(new Reni.FeatureTest.BlogExamples.NestedCompound().Run);
 TestRunner.RunTest(new Reni.FeatureTest.BlogExamples.WikiExamples().Run);
