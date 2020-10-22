@@ -20,7 +20,7 @@ namespace Reni.SyntaxFactory
             return bracketKernel
                 .Apply(kernel =>
                 {
-                    var result = factory.GetValueSyntax(kernel.Left, kernel.Center, target);
+                    var result = factory.GetValueSyntax(kernel.Left, kernel.Center, kernel.Right);
                     result.Target.AssertIsNotNull();
                     return result;
                 });

@@ -17,13 +17,13 @@ namespace Reni.SyntaxTree
         readonly LeftBracket Left;
 
         public BracketSyntax(BinaryTree leftAnchor, ValueSyntax kernel, BinaryTree rightAnchor)
-            : base(rightAnchor)
+            : base(rightAnchor??leftAnchor)
         {
-            Left = new LeftBracket(leftAnchor);
+            Left = rightAnchor== null? null: new LeftBracket(leftAnchor);
             Kernel = kernel ;
         }
 
-        internal override int LeftDirectChildCount => 2;
+        internal override int LeftDirectChildCount => Left == null? 0 : 2;
         protected override int DirectChildCount => 2;
 
         protected override Syntax GetDirectChild(int index) => index switch

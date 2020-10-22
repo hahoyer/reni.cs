@@ -17,6 +17,7 @@ namespace Reni.TokenClasses
         {
             internal BinaryTree Center;
             internal BinaryTree Left;
+            internal BinaryTree Right;
         }
 
         static int NextObjectId;
@@ -126,7 +127,7 @@ namespace Reni.TokenClasses
 
                 (Right == null).Assert();
 
-                var result = new BracketNodes {Left = Left, Center = Left.Right};
+                var result = new BracketNodes {Left = Left, Center = Left.Right, Right = this};
 
                 if(!(Left.TokenClass is ILeftBracket leftParenthesis))
                 {
@@ -144,7 +145,10 @@ namespace Reni.TokenClasses
                     return result;
 
                 if(levelDelta > 0)
+                {
+                    result.Right = null;
                     return new Result<BracketNodes>(result, IssueId.MissingRightBracket.Issue(Left.SourcePart));
+                }
 
                 Left.NotImplementedMethod(level, this);
                 return null;

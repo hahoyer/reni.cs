@@ -120,11 +120,16 @@ namespace Reni.SyntaxTree
             if(target == null)
                 return;
 
+            var nodes= this
+                .GetNodesFromLeftToRight()
+                .ToArray();
+
             var nodesInSyntax = this
                 .GetNodesFromLeftToRight()
                 .Select(node => node?.Anchor)
                 .Where(node => node != null)
                 .ToArray();
+
 
             if(level.IsCorrectOrder)
                 for(var index = 1; index < nodesInSyntax.Length; index++)
