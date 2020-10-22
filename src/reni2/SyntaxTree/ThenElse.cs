@@ -26,7 +26,7 @@ namespace Reni.SyntaxTree
             ValueSyntax condSyntax, ValueSyntax thenSyntax, ValueSyntax elseSyntax, BinaryTree anchor
             , FrameItemContainer frameItems
         )
-            : base(null,anchor, null, frameItems)
+            : base(anchor, frameItems)
         {
             anchor.AssertIsNotNull();
             Cond = condSyntax;

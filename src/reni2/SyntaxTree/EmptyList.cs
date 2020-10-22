@@ -6,15 +6,15 @@ namespace Reni.SyntaxTree
 {
     sealed class EmptyList : ValueSyntax.NoChildren
     {
-        public EmptyList(BinaryTree anchor, FrameItemContainer frameItems)
-            : base(null,anchor, null, frameItems)
+        public EmptyList(BinaryTree anchor, FrameItemContainer frameItems= null)
+            : base(anchor, frameItems ?? FrameItemContainer.Create())
         {
             StopByObjectIds();
             AssertValid();
         }
 
-        public EmptyList(BinaryTree anchorLeft, BinaryTree anchorRight, FrameItemContainer frameItems)
-            : base(null, frameItems.LeftMostRightItem, null, frameItems.WithoutLeftMostRightItem)
+        public EmptyList(FrameItemContainer frameItems)
+            : base(frameItems.LeftMostRightItem, frameItems.WithoutLeftMostRightItem)
         {
             StopByObjectIds();
             AssertValid();

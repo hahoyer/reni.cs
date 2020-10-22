@@ -7,14 +7,11 @@ namespace Reni.SyntaxFactory
 {
     class CleanupHandler : DumpableObject, IValueProvider
     {
-        Result<ValueSyntax> IValueProvider
-            .Get
-            (
-                BinaryTree leftAnchor, BinaryTree target, BinaryTree rightAnchor, Factory factory
-                , FrameItemContainer frameItems
+        Result<ValueSyntax> IValueProvider.Get(
+            BinaryTree target, Factory factory, FrameItemContainer frameItems
             )
             => (
-                    factory.GetStatementsSyntax(leftAnchor, target.Left, FrameItemContainer.Create()),
+                    factory.GetStatementsSyntax(target.Left, FrameItemContainer.Create()),
                     factory.GetValueSyntax(target.Right)
                 )
                 .Apply

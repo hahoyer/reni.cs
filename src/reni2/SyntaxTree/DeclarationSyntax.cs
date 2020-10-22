@@ -48,7 +48,7 @@ namespace Reni.SyntaxTree
         DeclarerSyntax IStatementSyntax.Declarer => Declarer;
 
         ValueSyntax IStatementSyntax.ToValueSyntax
-            (BinaryTree leftAnchor, BinaryTree rightAnchor, FrameItemContainer brackets)
+            (FrameItemContainer brackets)
             => CompoundSyntax.Create(T((IStatementSyntax)this), null, brackets);
 
         [DisableDump]
@@ -65,7 +65,7 @@ namespace Reni.SyntaxTree
         internal static Result<IStatementSyntax> Create(DeclarerSyntax declarer, BinaryTree target, ValueSyntax value)
         {
             var result =
-                new Result<IStatementSyntax>(new DeclarationSyntax(declarer, target, value ?? new EmptyList(null,null)));
+                new Result<IStatementSyntax>(new DeclarationSyntax(declarer, target, value ?? new EmptyList(null)));
             
             var declarerIssue = declarer.Issue;
             if(declarerIssue != null)

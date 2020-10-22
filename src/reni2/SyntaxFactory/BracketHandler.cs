@@ -9,9 +9,7 @@ namespace Reni.SyntaxFactory
     {
         Result<ValueSyntax> IValueProvider.Get
         (
-            BinaryTree leftAnchor,
             BinaryTree target,
-            BinaryTree rightAnchor,
             Factory factory, FrameItemContainer brackets
         )
         {
@@ -20,7 +18,7 @@ namespace Reni.SyntaxFactory
             return bracketKernel
                 .Apply(kernel =>
                 {
-                    var result = factory.GetValueSyntax(kernel.Left, kernel.Center, kernel.Right);
+                    var result = factory.GetValueSyntax(kernel.Center, FrameItemContainer.Create(kernel.Left, kernel.Right));
                     result.Target.AssertIsNotNull();
                     return result;
                 });

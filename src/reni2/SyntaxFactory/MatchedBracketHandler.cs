@@ -9,7 +9,7 @@ namespace Reni.SyntaxFactory
     {
         Result<ValueSyntax> IValueProvider.Get
         (
-            BinaryTree leftAnchor, BinaryTree target, BinaryTree rightAnchor, Factory factory
+            BinaryTree target, Factory factory
             , FrameItemContainer frameItems
         )
             => (
@@ -18,13 +18,10 @@ namespace Reni.SyntaxFactory
                 )
                 .Apply((left, right)
                     => (ValueSyntax)new ExpressionSyntax
-                    (
-                        leftAnchor,
-                        target,
+                    (target,
                         left,
                         null,
-                        right,
-                        rightAnchor, frameItems)
+                        right, frameItems)
                 );
 
     }

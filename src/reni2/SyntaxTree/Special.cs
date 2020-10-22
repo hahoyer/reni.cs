@@ -46,7 +46,7 @@ namespace Reni.SyntaxTree
         readonly ValueSyntax Right;
 
         public PrefixSyntax(IPrefix prefix, ValueSyntax right, BinaryTree anchor, FrameItemContainer brackets)
-            : base(null, anchor, null, brackets)
+            : base(anchor, brackets)
         {
             anchor.AssertIsNotNull();
             Prefix = prefix;
@@ -82,7 +82,7 @@ namespace Reni.SyntaxTree
         readonly ValueSyntax Right;
 
         public InfixSyntax(ValueSyntax left, IInfix infix, ValueSyntax right, BinaryTree anchor, FrameItemContainer brackets)
-            : base(null, anchor, null, brackets)
+            : base(anchor, brackets)
         {
             anchor.AssertIsNotNull();
             Left = left;
@@ -134,7 +134,7 @@ namespace Reni.SyntaxTree
         readonly ISuffix Suffix;
 
         internal SuffixSyntax(ValueSyntax left, ISuffix suffix, BinaryTree anchor, FrameItemContainer brackets)
-            : base(null,anchor, null, brackets)
+            : base(anchor, brackets)
         {
             anchor.AssertIsNotNull();
             Left = left;

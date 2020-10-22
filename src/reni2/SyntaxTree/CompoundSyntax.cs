@@ -35,7 +35,7 @@ namespace Reni.SyntaxTree
             IStatementSyntax[] statements, CleanupSyntax cleanupSection, BinaryTree anchor
             , FrameItemContainer frameItems
         )
-            : base(NextObjectId++, null, anchor, null, frameItems)
+            : base(NextObjectId++, anchor, frameItems)
         {
             Statements = statements;
             CleanupSection = cleanupSection;
@@ -214,6 +214,6 @@ namespace Reni.SyntaxTree
     {
         ValueSyntax Value { get; }
         DeclarerSyntax Declarer { get; }
-        ValueSyntax ToValueSyntax(BinaryTree leftAnchor, BinaryTree rightAnchor, FrameItemContainer frameItems);
+        ValueSyntax ToValueSyntax(FrameItemContainer frameItems);
     }
 }

@@ -6,7 +6,6 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
 using Reni.Struct;
-using Reni.SyntaxFactory;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -20,13 +19,8 @@ namespace Reni.SyntaxTree
         internal new abstract class NoChildren : ValueSyntax
         {
             protected NoChildren(BinaryTree anchor, FrameItemContainer frameItems)
-                : base(null, anchor, null, frameItems) {             anchor.AssertIsNotNull();
-            }
-
-            protected NoChildren
-                (BinaryTree leftBracket, BinaryTree anchor, BinaryTree rightBracket, FrameItemContainer frameItems)
-                : base(leftBracket, anchor, rightBracket, frameItems) {             anchor.AssertIsNotNull();
-            }
+                : base(anchor, frameItems)
+                => anchor.AssertIsNotNull();
 
             [DisableDump]
             protected sealed override int LeftDirectChildCountKernel => 0;
@@ -46,19 +40,14 @@ namespace Reni.SyntaxTree
         internal readonly FunctionCache<ContextBase, ResultCache> ResultCache =
             new FunctionCache<ContextBase, ResultCache>();
 
-        protected ValueSyntax
-            (BinaryTree leftBracket, BinaryTree anchor, BinaryTree rightBracket, FrameItemContainer frameItems = null)
+        protected ValueSyntax(BinaryTree anchor, FrameItemContainer frameItems = null)
             : base(anchor)
         {
             FrameItems = frameItems;
             FrameItems.AssertIsNotNull();
         }
 
-        protected ValueSyntax
-        (
-            int objectId, BinaryTree leftBracket, BinaryTree anchor, BinaryTree rightBracket
-            , FrameItemContainer frameItems = null
-        )
+        protected ValueSyntax(int objectId, BinaryTree anchor, FrameItemContainer frameItems = null)
             : base(objectId, anchor)
         {
             FrameItems = frameItems;
@@ -83,8 +72,7 @@ namespace Reni.SyntaxTree
 
         DeclarerSyntax IStatementSyntax.Declarer => null;
 
-        ValueSyntax IStatementSyntax.ToValueSyntax
-            (BinaryTree binaryTree, BinaryTree rightAnchor, FrameItemContainer frameItems) => this;
+        ValueSyntax IStatementSyntax.ToValueSyntax(FrameItemContainer frameItems) => this;
 
         ValueSyntax IStatementSyntax.Value => this;
 
@@ -127,10 +115,7 @@ namespace Reni.SyntaxTree
                 return result.Value;
 
             var type = context.TypeIfKnown(this);
-            if(type != null)
-                return type.SmartUn<FunctionType>().IsHollow;
-
-            return Type(context).SmartUn<FunctionType>().IsHollow;
+            return (type ?? Type(context)).SmartUn<FunctionType>().IsHollow;
         }
 
         internal ValueSyntax ReplaceArg(ValueSyntax syntax)
