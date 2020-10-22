@@ -7,8 +7,8 @@ namespace Reni.SyntaxFactory
 {
     class CleanupHandler : DumpableObject, IValueProvider
     {
-        Result<ValueSyntax> IValueProvider.Get
-            (BinaryTree leftAnchor, BinaryTree target, BinaryTree rightAnchor, Factory factory)
+        Result<ValueSyntax> IValueProvider
+            .Get(BinaryTree leftAnchor, BinaryTree target, BinaryTree rightAnchor, Factory factory)
             =>
                 (
                     factory.GetStatementsSyntax(leftAnchor, target.Left),
@@ -23,5 +23,9 @@ namespace Reni.SyntaxFactory
                         rightAnchor
                     )
                 );
+
+        UsageTree IValueProvider.GetUsage
+            (BinaryTree leftAnchor, BinaryTree target, Factory factory)
+            => new UsageTree {Right = true};
     }
 }

@@ -38,8 +38,8 @@ namespace Reni.SyntaxTree
             return default;
         }
 
-        internal static StatementSyntax[] Create(BinaryTree target, IStatementSyntax statement)
-            => T(new StatementSyntax(target, statement));
+        internal static StatementSyntax[] Create(BinaryTree leftAnchor, IStatementSyntax statement)
+            => T(new StatementSyntax(leftAnchor, statement));
 
         internal bool IsDefining
             (string name, bool publicOnly) => Content.Declarer?.IsDefining(name, publicOnly) ?? false;

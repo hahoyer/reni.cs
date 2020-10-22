@@ -1,5 +1,6 @@
 using hw.DebugFormatter;
 using Reni.Parser;
+using Reni.SyntaxFactory;
 using Reni.TokenClasses;
 using Reni.Validation;
 
@@ -48,6 +49,8 @@ namespace Reni.SyntaxTree
 
         ValueSyntax IStatementSyntax.ToValueSyntax(BinaryTree leftAnchor, BinaryTree rightAnchor)
             => new CompoundSyntax(StatementSyntax.Create(leftAnchor, this), null, rightAnchor);
+
+        UsageTree IStatementSyntax.ToUsageValue() => new UsageTree(){Left = true, Right = true};
 
         [DisableDump]
         ValueSyntax IStatementSyntax.Value => Value;

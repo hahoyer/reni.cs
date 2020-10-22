@@ -26,5 +26,9 @@ namespace Reni.SyntaxFactory
 
             return factory.GetInfixSyntax(target);
         }
+
+        UsageTree IValueProvider.GetUsage
+            (BinaryTree leftAnchor, BinaryTree target, Factory factory)
+            => new UsageTree {};
     }
 }

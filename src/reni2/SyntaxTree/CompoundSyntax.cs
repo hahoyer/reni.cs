@@ -6,6 +6,7 @@ using hw.Helper;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
+using Reni.SyntaxFactory;
 using Reni.TokenClasses;
 
 namespace Reni.SyntaxTree
@@ -209,6 +210,7 @@ namespace Reni.SyntaxTree
     {
         ValueSyntax Value { get; }
         DeclarerSyntax Declarer { get; }
-        ValueSyntax ToValueSyntax(BinaryTree anchor, BinaryTree rightAnchor);
+        ValueSyntax ToValueSyntax(BinaryTree leftAnchor, BinaryTree rightAnchor);
+        UsageTree ToUsageValue();
     }
 }

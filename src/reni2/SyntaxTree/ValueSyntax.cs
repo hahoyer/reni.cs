@@ -6,6 +6,7 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
 using Reni.Struct;
+using Reni.SyntaxFactory;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -53,6 +54,7 @@ namespace Reni.SyntaxTree
         internal virtual IRecursionHandler RecursionHandler => null;
 
         DeclarerSyntax IStatementSyntax.Declarer => null;
+        UsageTree IStatementSyntax.ToUsageValue() => new UsageTree {Left = true, Right = true};
 
         ValueSyntax IStatementSyntax.ToValueSyntax(BinaryTree binaryTree, BinaryTree rightAnchor) => this;
 

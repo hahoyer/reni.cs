@@ -115,37 +115,40 @@ namespace Reni.TokenClasses
             return T(leftParenthesis?.Level ?? 0, rightParenthesis.Level).Max();
         }
 
-        internal Result<BracketNodes> GetBracketKernel()
+        internal Result<BracketNodes> BracketKernel
         {
-            var rightParenthesis = TokenClass as IRightBracket;
-            (rightParenthesis != null).Assert();
-
-            var level = rightParenthesis.Level;
-
-            (Right == null).Assert();
-
-            var result = new BracketNodes {Left = Left, Center = Left.Right};
-
-            if(!(Left.TokenClass is ILeftBracket leftParenthesis))
+            get
             {
-                var issues = IssueId.MissingLeftBracket.Issue(SourcePart);
-                result.Center = Left;
-                result.Left = ErrorToken.Create(LeftMost);
-                return new Result<BracketNodes>(result, issues);
+                if(!(TokenClass is IRightBracket rightParenthesis))
+                    return null;
+
+                var level = rightParenthesis.Level;
+
+                (Right == null).Assert();
+
+                var result = new BracketNodes {Left = Left, Center = Left.Right};
+
+                if(!(Left.TokenClass is ILeftBracket leftParenthesis))
+                {
+                    var issues = IssueId.MissingLeftBracket.Issue(SourcePart);
+                    result.Center = Left;
+                    result.Left = ErrorToken.Create(LeftMost);
+                    return new Result<BracketNodes>(result, issues);
+                }
+
+                (Left.Left == null).Assert();
+
+                var levelDelta = leftParenthesis.Level - level;
+
+                if(levelDelta == 0)
+                    return result;
+
+                if(levelDelta > 0)
+                    return new Result<BracketNodes>(result, IssueId.MissingRightBracket.Issue(Left.SourcePart));
+
+                Left.NotImplementedMethod(level, this);
+                return null;
             }
-
-            (Left.Left == null).Assert();
-
-            var levelDelta = leftParenthesis.Level - level;
-
-            if(levelDelta == 0)
-                return result;
-
-            if(levelDelta > 0)
-                return new Result<BracketNodes>(result, IssueId.MissingRightBracket.Issue(Left.SourcePart));
-
-            Left.NotImplementedMethod(level, this);
-            return null;
         }
     }
 }

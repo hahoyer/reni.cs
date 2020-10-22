@@ -8,9 +8,9 @@ namespace Reni.SyntaxFactory
 {
     class ListHandler : DumpableObject, IStatementsProvider
     {
-        Result<StatementSyntax[]> IStatementsProvider.Get(BinaryTree anchor, BinaryTree target, Factory factory)
+        Result<StatementSyntax[]> IStatementsProvider.Get(BinaryTree leftAnchor, BinaryTree target, Factory factory)
             => (
-                    factory.GetStatementsSyntax(anchor, target.Left),
+                    factory.GetStatementsSyntax(leftAnchor, target.Left),
                     factory.GetStatementsSyntax(target, target.Right)
                 )
                 .Apply((left, right) => left.Concat(right).ToArray());

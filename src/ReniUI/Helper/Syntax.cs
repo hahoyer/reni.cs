@@ -16,12 +16,6 @@ namespace ReniUI.Helper
         )
             : base(flatItem, parent, context, index)
         {
-
-            var c = parent?.ToString();
-
-            (!(Parent?.TokenClass is IRightBracket) || flatItem.Anchor.TokenClass is ILeftBracket)
-                .Assert(flatItem.Dump);
-            
         }
 
         [EnableDump]
