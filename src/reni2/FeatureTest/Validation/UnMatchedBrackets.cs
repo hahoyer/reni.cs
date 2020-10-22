@@ -22,9 +22,9 @@ namespace Reni.FeatureTest.Validation
             var issueArray = issues.ToArray();
             var i = 0;
             var issueBase = issueArray[i];
-            Tracer.Assert(issueBase.IssueId == IssueId.MissingRightBracket, issueBase.Dump);
+            (issueBase.IssueId == IssueId.MissingRightBracket).Assert(issueBase.Dump);
             i++;
-            Tracer.Assert(i == issueArray.Length, ()=>Tracer.Dump(issueArray));
+            (i == issueArray.Length).Assert(()=>Tracer.Dump(issueArray));
         }
     }
 
@@ -40,9 +40,9 @@ namespace Reni.FeatureTest.Validation
             var issueArray = issues.ToArray();
             var i = 0;
             var issueBase = issueArray[i];
-            Tracer.Assert(issueBase.IssueId == IssueId.MissingLeftBracket, issueBase.Dump);
+            (issueBase.IssueId == IssueId.MissingLeftBracket).Assert(issueBase.Dump);
             i++;
-            Tracer.Assert(i == issueArray.Length);
+            (i == issueArray.Length).Assert();
         }
     }
 
