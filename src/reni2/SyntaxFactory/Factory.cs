@@ -82,11 +82,11 @@ namespace Reni.SyntaxFactory
         )
         {
             if(target == null)
-                return new EmptyList(leftAnchor, target, rightAnchor);
+                return new EmptyList(leftAnchor, rightAnchor);
 
-            leftAnchor.AssertIsNotNull();
+            if(leftAnchor != null)
+                (leftAnchor.Token.Characters < target.Token.Characters).Assert();
             rightAnchor.AssertIsNotNull();
-            (leftAnchor.Token.Characters < target.Token.Characters).Assert();
             (target.Token.Characters < rightAnchor.Token.Characters).Assert();
 
             return GetSyntax(
@@ -232,6 +232,5 @@ namespace Reni.SyntaxFactory
                 .GetNodesFromLeftToRight()
                 .Select(GetDeclarationTag)
                 .Aggregate(DeclarerSyntax.Empty, (left, right) => left.Combine(right));
-
     }
 }

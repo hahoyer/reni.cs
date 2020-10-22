@@ -133,7 +133,7 @@ namespace Reni.TokenClasses
                 {
                     var issues = IssueId.MissingLeftBracket.Issue(SourcePart);
                     result.Center = Left;
-                    result.Left = ErrorToken.Create(LeftMost);
+                    result.Left = null;
                     return new Result<BracketNodes>(result, issues);
                 }
 

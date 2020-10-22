@@ -9,8 +9,9 @@ namespace Reni.SyntaxTree
         public EmptyList(BinaryTree anchor)
             : base(null,anchor, null)
             => StopByObjectIds();
-        public EmptyList(BinaryTree anchorLeft, BinaryTree anchor, BinaryTree anchorRight)
-            : base(anchorLeft, anchor, anchorRight)
+
+        public EmptyList(BinaryTree anchorLeft, BinaryTree anchorRight)
+            : base(anchorRight == null? null : anchorLeft, anchorRight ?? anchorLeft, null)
             => StopByObjectIds();
 
         protected override string GetNodeDump() => "()";
