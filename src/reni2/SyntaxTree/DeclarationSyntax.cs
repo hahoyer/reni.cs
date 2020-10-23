@@ -1,4 +1,6 @@
+using System.Linq;
 using hw.DebugFormatter;
+using hw.Scanner;
 using Reni.TokenClasses;
 using Reni.Validation;
 
@@ -46,11 +48,18 @@ namespace Reni.SyntaxTree
         [DisableDump]
         DeclarerSyntax IStatementSyntax.Declarer => Declarer;
 
-        ValueSyntax IStatementSyntax.ToValueSyntax(FrameItemContainer brackets)
-            => CompoundSyntax.Create(T((IStatementSyntax)this), null, brackets);
+        SourcePart IStatementSyntax.SourcePart => SourcePart;
+
+        ValueSyntax IStatementSyntax.ToValueSyntax(BinaryTree anchor)
+            => CompoundSyntax.Create(T((IStatementSyntax)this), anchor);
 
         [DisableDump]
         ValueSyntax IStatementSyntax.Value => Value;
+
+        IStatementSyntax IStatementSyntax.With(FrameItemContainer frameItems)
+            => frameItems == null || !frameItems.Items.Any()
+                ? this
+                : Create(Declarer, Anchor, Value, frameItems.Combine(FrameItems));
 
         protected override Syntax GetDirectChildKernel(int index)
             => index switch
@@ -61,12 +70,12 @@ namespace Reni.SyntaxTree
             };
 
         internal static IStatementSyntax Create
-            (DeclarerSyntax declarer, BinaryTree target, ValueSyntax value, FrameItemContainer frameItems)
+            (DeclarerSyntax declarer, BinaryTree anchor, ValueSyntax value, FrameItemContainer frameItems)
             => new DeclarationSyntax
             (
                 declarer,
-                target,
-                value ?? new EmptyList(null, issue: IssueId.MissingDeclarationValue.Issue(target.Token.Characters)),
+                anchor,
+                value ?? new EmptyList(null, issue: IssueId.MissingDeclarationValue.Issue(anchor.Token.Characters)),
                 frameItems
             );
     }

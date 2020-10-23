@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Helper;
@@ -47,7 +48,6 @@ namespace Reni.SyntaxTree
         protected ValueSyntax(int objectId, BinaryTree anchor, FrameItemContainer frameItems = null, Issue issue = null)
             : base(objectId, anchor, issue, frameItems) { }
 
-
         [DisableDump]
         internal virtual bool IsLambda => false;
 
@@ -62,9 +62,19 @@ namespace Reni.SyntaxTree
 
         DeclarerSyntax IStatementSyntax.Declarer => null;
 
-        ValueSyntax IStatementSyntax.ToValueSyntax(FrameItemContainer frameItems) => this;
+        SourcePart IStatementSyntax.SourcePart => SourcePart;
+
+        ValueSyntax IStatementSyntax.ToValueSyntax(BinaryTree anchor) => this;
 
         ValueSyntax IStatementSyntax.Value => this;
+
+        IStatementSyntax IStatementSyntax.With(FrameItemContainer frameItems)
+        {
+            if(frameItems == null || !frameItems.Items.Any())
+                return this;
+            NotImplementedMethod(frameItems);
+            return default;
+        }
 
         Issue[] GetAllIssues() => this
             .GetNodesFromLeftToRight()

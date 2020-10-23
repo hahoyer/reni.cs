@@ -28,15 +28,14 @@ namespace Reni.Helper
 
         protected SyntaxView(Syntax flatItem, TResult parent, PositionDictionary<TResult> context, int index)
         {
-            Tracer.ConditionalBreak(flatItem.ObjectId == 492);
             flatItem.AssertIsNotNull();
             FlatItem = flatItem;
             Parent = parent;
             Context = context;
             Index = index;
             Context[FlatItem.Anchor] = (TResult)this;
-            Cache.LocateByPosition =
-                new FunctionCache<int, TResult>(LocateByPositionForCache);
+            Cache.LocateByPosition = new FunctionCache<int, TResult>(LocateByPositionForCache);
+            Tracer.ConditionalBreak(flatItem.ObjectId == -492);
         }
 
         internal ITokenClass TokenClass => FlatItem.Anchor.TokenClass;

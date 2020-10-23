@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
@@ -15,8 +16,6 @@ namespace Reni.SyntaxTree
     /// </summary>
     sealed class CompoundSyntax : ValueSyntax
     {
-        public static CompoundSyntax Create(IStatementSyntax[] statements, CleanupSyntax cleanupSection, FrameItemContainer frameItems) 
-            => new CompoundSyntax(statements, cleanupSection, frameItems.LeftMostRightItem, frameItems.WithoutLeftMostRightItem);
         static readonly bool NoFileDump = true;
         static bool IsInContainerDump;
 
@@ -101,6 +100,21 @@ namespace Reni.SyntaxTree
         [DisableDump]
         protected override int DirectChildCountKernel => Statements.Length + 1;
 
+        public static CompoundSyntax Create
+        (
+            IStatementSyntax[] statements,
+            BinaryTree anchor,
+            CleanupSyntax cleanupSection = null,
+            FrameItemContainer frameItems = null
+        )
+            => new CompoundSyntax
+            (
+                statements,
+                cleanupSection,
+                anchor,
+                frameItems
+            );
+
         public string GetCompoundIdentificationDump() => "." + ObjectId + "i";
 
         public override string DumpData()
@@ -157,7 +171,7 @@ namespace Reni.SyntaxTree
                     ? CleanupSection
                     : new CleanupSyntax(CleanupSection.Anchor, cleanupSection);
 
-            return Create(newStatements, newCleanupSection, FrameItems);
+            return Create(newStatements, Anchor, newCleanupSection, FrameItems);
         }
 
         protected override Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree listTarget = null) => this;
@@ -214,6 +228,8 @@ namespace Reni.SyntaxTree
     {
         ValueSyntax Value { get; }
         DeclarerSyntax Declarer { get; }
-        ValueSyntax ToValueSyntax(FrameItemContainer frameItems);
+        SourcePart SourcePart { get; }
+        ValueSyntax ToValueSyntax(BinaryTree anchor);
+        IStatementSyntax With(FrameItemContainer frameItems);
     }
 }

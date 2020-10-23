@@ -360,7 +360,6 @@
     <Compile Include="TokenClasses\ErrorToken.cs" />
     <Compile Include="TokenClasses\IBelongingsMatcher.cs" />
     <Compile Include="TokenClasses\IComparator.cs" />
-    <Compile Include="TokenClasses\IDeclarationItem.cs" />
     <Compile Include="TokenClasses\IFormatItem.cs" />
     <Compile Include="TokenClasses\ISyntax.cs" />
     <Compile Include="TokenClasses\PreType.cs" />

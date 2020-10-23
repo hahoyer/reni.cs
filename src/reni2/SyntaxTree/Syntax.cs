@@ -144,7 +144,7 @@ namespace Reni.SyntaxTree
 
         internal virtual void AssertValid(Level level = null, BinaryTree target = null)
         {
-            level ??= new Level {IsCorrectOrder = true};
+            level ??= new Level {};
 
             foreach(var node in DirectChildren.Where(node => node != this))
                 node?.AssertValid();
@@ -158,7 +158,7 @@ namespace Reni.SyntaxTree
                 .ToArray();
 
             var paths = nodes
-                .Select(node => this.GetPaths(child => node == child).ToArray())
+                .Select(node => this.GetPaths(child => node == child).Stringify("."))
                 .ToArray();
 
             var nodesInSyntax = this

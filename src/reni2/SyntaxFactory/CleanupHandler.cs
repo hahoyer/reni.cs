@@ -11,7 +11,7 @@ namespace Reni.SyntaxFactory
         {
             var statements = factory.GetStatementsSyntax(target.Left, FrameItemContainer.Create());
             var cleanup = factory.GetValueSyntax(target.Right);
-            return CompoundSyntax.Create(statements, new CleanupSyntax(target, cleanup), frameItems);
+            return CompoundSyntax.Create(statements, target, new CleanupSyntax(target, cleanup), frameItems);
         }
     }
 }

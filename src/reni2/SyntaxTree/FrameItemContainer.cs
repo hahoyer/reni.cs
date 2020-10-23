@@ -1,19 +1,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Helper;
+using hw.Parser;
+using hw.Scanner;
 using Reni.TokenClasses;
 
 namespace Reni.SyntaxTree
 {
     sealed class FrameItemContainer : DumpableObject
     {
-        internal class Dummy : Syntax.NoChildren
+        internal sealed class Dummy : Syntax.NoChildren
         {
             Dummy(BinaryTree anchor)
                 : base(anchor) { }
 
             protected override string GetNodeDump() => Anchor.NodeDump;
-            internal static Dummy Create(BinaryTree anchor) => anchor == null? null : new Dummy(anchor);
+            internal static Dummy Create(BinaryTree anchor) => new Dummy(anchor.AssertNotNull());
+            internal new SourcePart SourcePart => Anchor.Token.SourcePart();
         }
 
         internal Dummy[] Items { get; private set; }
@@ -65,7 +69,7 @@ namespace Reni.SyntaxTree
         internal static FrameItemContainer Create(BinaryTree leftAnchor)
             => new FrameItemContainer
             {
-                Items = T(Dummy.Create(leftAnchor))
+                Items = T(Dummy.Create(leftAnchor.AssertNotNull()))
                 , LeftItemCount = 1
             };
 

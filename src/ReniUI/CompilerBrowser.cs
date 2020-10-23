@@ -112,7 +112,7 @@ namespace ReniUI
             try
             {
                 var compilerSyntax = Compiler.Syntax;
-                compilerSyntax.Dump().Log();
+                compilerSyntax.Dump().FlaggedLine();
 
                 var syntax = new Helper.Syntax(compilerSyntax, PositionDictionary);
                 var all = syntax.GetNodesFromLeftToRight().ToArray();

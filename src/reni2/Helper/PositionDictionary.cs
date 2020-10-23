@@ -1,12 +1,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Helper;
 using hw.Scanner;
 using Reni.TokenClasses;
 
 namespace Reni.Helper
 {
     sealed class PositionDictionary<TResult> : DumpableObject
+        where TResult : ITree<TResult>
     {
         readonly Dictionary<SourcePart, TResult> Value = new Dictionary<SourcePart, TResult>();
 
@@ -20,7 +22,13 @@ Key: {key.GetDumpAroundCurrent(5)}
 
 First: {Tracer.Dump(Value[key])}
 
-This: {Tracer.Dump(value)}");
+This: {Tracer.Dump(value)}
+
+First => This: {Value[key].GetPath(node=>ReferenceEquals(node, value)).Stringify(".")}
+This => First: {value.GetPath(node=>ReferenceEquals(node, Value[key])).Stringify(".")}
+
+
+");
                 Value[key] = value;
             }
         }
