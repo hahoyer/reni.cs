@@ -56,7 +56,7 @@ This: {Tracer.Dump(value)}");
                 return true;
             @$" 
  -----
-/{Position++:D5}\
+/{Position++:D5}\    BinaryTree.ObjectId={key.ObjectId}
 Key: -----------------------------------------vv
 {key.Token.Characters.GetDumpAroundCurrent(25)}
 ----------------------------------------------^^".Log();

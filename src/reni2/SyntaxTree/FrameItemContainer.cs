@@ -40,20 +40,18 @@ namespace Reni.SyntaxTree
             };
 
         [DisableDump]
-        internal FrameItemContainer Left
-            => new FrameItemContainer
-            {
-                Items = Items.Take(LeftItemCount).ToArray()
-                , LeftItemCount = LeftItemCount
-            };
+        internal FrameItemContainer Left => new FrameItemContainer {Items = LeftItems, LeftItemCount = LeftItemCount};
 
         [DisableDump]
-        internal FrameItemContainer Right
-            => new FrameItemContainer
-            {
-                Items = Items.Skip(LeftItemCount).ToArray()
-                , LeftItemCount = 0
-            };
+        internal FrameItemContainer Right => new FrameItemContainer {Items = RightItems, LeftItemCount = 0};
+
+
+        [DisableDump]
+        Dummy[] LeftItems => Items.Take(LeftItemCount).ToArray();
+
+        [DisableDump]
+        Dummy[] RightItems => Items.Skip(LeftItemCount).ToArray();
+
 
         protected override string GetNodeDump() => base.GetNodeDump() + $"[{Items.Length}]";
 
@@ -84,5 +82,17 @@ namespace Reni.SyntaxTree
                 Items = left.Select(Dummy.Create).ToArray()
                 , LeftItemCount = left.Count()
             };
+
+        public FrameItemContainer Combine(FrameItemContainer other)
+        {
+            if(other == null || !other.Items.Any())
+                return this;
+
+            return new FrameItemContainer
+            {
+                Items = other.LeftItems.Concat(Items).Concat(other.RightItems).ToArray()
+                , LeftItemCount = other.LeftItemCount + LeftItemCount
+            };
+        }
     }
 }
