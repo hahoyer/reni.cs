@@ -35,8 +35,6 @@ namespace Reni.SyntaxTree
                 => throw new Exception($"Unexpected call: {nameof(GetDirectChildKernel)}({index})");
         }
 
-        internal readonly FrameItemContainer FrameItems;
-
         // Used for debug only
         [DisableDump]
         [Node("Cache")]
@@ -44,18 +42,10 @@ namespace Reni.SyntaxTree
             new FunctionCache<ContextBase, ResultCache>();
 
         protected ValueSyntax(BinaryTree anchor, FrameItemContainer frameItems = null, Issue issue = null)
-            : base(anchor, issue)
-        {
-            FrameItems = frameItems;
-            FrameItems.AssertIsNotNull();
-        }
+            : base(anchor, issue, frameItems) { }
 
         protected ValueSyntax(int objectId, BinaryTree anchor, FrameItemContainer frameItems = null, Issue issue = null)
-            : base(objectId, anchor, issue)
-        {
-            FrameItems = frameItems;
-            FrameItems.AssertIsNotNull();
-        }
+            : base(objectId, anchor, issue, frameItems) { }
 
         protected abstract int LeftDirectChildCountKernel { get; }
         protected abstract int DirectChildCountKernel { get; }
@@ -74,18 +64,18 @@ namespace Reni.SyntaxTree
         internal virtual IRecursionHandler RecursionHandler => null;
 
         [DisableDump]
-        internal IEnumerable<Issue> Issues
-            => this
-                .GetNodesFromLeftToRight()
-                .Select(node => node?.Issue)
-                .Where(issue => issue != null)
-                .ToArray();
+        internal Issue[] AllIssues => this.CachedValue(GetAllIssues);
 
         DeclarerSyntax IStatementSyntax.Declarer => null;
 
         ValueSyntax IStatementSyntax.ToValueSyntax(FrameItemContainer frameItems) => this;
 
         ValueSyntax IStatementSyntax.Value => this;
+
+        Issue[] GetAllIssues() => this
+            .GetNodesFromLeftToRight()
+            .SelectMany(node => node?.Issues)
+            .ToArray();
 
         protected abstract Syntax GetDirectChildKernel(int index);
 

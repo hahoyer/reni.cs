@@ -19,8 +19,8 @@ namespace Reni.SyntaxTree
     {
         internal abstract class NoChildren : Syntax
         {
-            protected NoChildren(BinaryTree anchor, Issue issue = null)
-                : base(anchor, issue) { }
+            protected NoChildren(BinaryTree anchor, Issue issue = null, FrameItemContainer frameItems = null)
+                : base(anchor, issue, frameItems??FrameItemContainer.Create()) { }
 
             [DisableDump]
             internal sealed override int LeftDirectChildCount => 0;
@@ -40,22 +40,27 @@ namespace Reni.SyntaxTree
         }
 
         internal readonly BinaryTree Anchor;
+        internal readonly FrameItemContainer FrameItems;
 
         [EnableDumpExcept(null)]
-        internal readonly Issue Issue;
+        readonly Issue Issue;
 
-        protected Syntax(BinaryTree anchor, Issue issue = null)
+        protected Syntax(BinaryTree anchor, Issue issue = null, FrameItemContainer frameItems = null)
         {
+            FrameItems = frameItems;
             Anchor = anchor;
             Issue = issue;
+            FrameItems.AssertIsNotNull();
             Anchor.AssertIsNotNull();
         }
 
-        protected Syntax(int objectId, BinaryTree anchor, Issue issue = null)
+        protected Syntax(int objectId, BinaryTree anchor, Issue issue = null, FrameItemContainer frameItems = null)
             : base(objectId)
         {
+            FrameItems = frameItems;
             Anchor = anchor;
             Issue = issue;
+            FrameItems.AssertIsNotNull();
             Anchor.AssertIsNotNull();
         }
 
@@ -84,6 +89,16 @@ namespace Reni.SyntaxTree
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         int ITree<Syntax>.LeftDirectChildCount => LeftDirectChildCount;
+
+        internal Issue[] Issues => this.CachedValue(()=>GetIssues().ToArray());
+
+        IEnumerable<Issue> GetIssues()
+        {
+            if(Issue != null)
+                yield return Issue;
+            foreach(var issue in Anchor.Issues)
+                yield return issue;
+        }
 
         protected abstract Syntax GetDirectChild(int index);
 
