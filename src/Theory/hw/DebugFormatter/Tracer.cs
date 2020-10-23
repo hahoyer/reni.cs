@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using hw.Helper;
 using JetBrains.Annotations;
+// ReSharper disable CheckNamespace
 
 namespace hw.DebugFormatter
 {
@@ -479,7 +480,7 @@ namespace hw.DebugFormatter
         /// <param name="stackFrameDepth"> The stack frame depth. </param>
         [DebuggerHidden]
         [ContractAnnotation("b: null => halt")]
-        public static void AssertNotEmpty(this object b, Func<string> getText = null, int stackFrameDepth = 0)
+        public static void AssertIsNotNull(this object b, Func<string> getText = null, int stackFrameDepth = 0)
         {
             if(b!= null)
                 return;
@@ -495,8 +496,8 @@ namespace hw.DebugFormatter
         /// <param name="getText"> Message in case of fail. </param>
         /// <param name="stackFrameDepth"> The stack frame depth. </param>
         [DebuggerHidden]
-        [ContractAnnotation("b: null => halt")]
-        public static void AssertEmpty(this object b, Func<string> getText = null, int stackFrameDepth = 0)
+        [ContractAnnotation("b: notnull => halt")]
+        public static void AssertIsNull(this object b, Func<string> getText = null, int stackFrameDepth = 0)
         {
             if(b== null)
                 return;

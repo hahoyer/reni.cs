@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using hw.DebugFormatter;
 using JetBrains.Annotations;
+// ReSharper disable CheckNamespace
 
 namespace hw.Helper
 {
@@ -389,14 +390,28 @@ namespace hw.Helper
             }
         }
 
-        // taken from http://dotnet-snippets.de/snippet/linq-erweiterung-split/4893
-        public static IEnumerable<IEnumerable<T>> Split<T>(this IEnumerable<T> source, Func<T, bool> splitter)
+        internal static IEnumerable<IEnumerable<T>> Split<T>(this IEnumerable<T> target, Func<T, bool> isSeparator, bool?assignSeparatorAtTopOfList = null)
         {
-            using(var enumerator = source.GetEnumerator())
-            {
-                while(enumerator.MoveNext())
-                    yield return GetInnerSequence(enumerator, splitter).ToList();
-            }
+            var part = new List<T>();
+            foreach(var item in target)
+                if(isSeparator(item))
+                {
+                    if(assignSeparatorAtTopOfList == false)
+                        part.Add(item);
+
+                    if(part.Any())
+                        yield return part.ToArray();
+                    part = new List<T>();
+
+                    if(assignSeparatorAtTopOfList == true)
+                        part.Add(item);
+
+                }
+                else
+                    part.Add(item);
+
+            if (part.Any())
+                yield return part.ToArray();
         }
 
         public static int? MaxEx(this IEnumerable<int> values)
@@ -487,19 +502,7 @@ namespace hw.Helper
             return true;
         }
 
-        // taken from http://dotnet-snippets.de/snippet/linq-erweiterung-split/4893
-        static IEnumerable<T> GetInnerSequence<T>(IEnumerator<T> enumerator, Func<T, bool> splitter)
-        {
-            do
-            {
-                if(splitter(enumerator.Current))
-                    yield break;
-                yield return enumerator.Current;
-            }
-            while(enumerator.MoveNext());
-        }
-
-        public static IEnumerable<T> Concat<T>(this IEnumerable<IEnumerable<T>> target) 
+        public static IEnumerable<T> ConcatMany<T>(this IEnumerable<IEnumerable<T>> target) 
             => target
                 .Where(i=>i != null)
                 .SelectMany(i => i);
