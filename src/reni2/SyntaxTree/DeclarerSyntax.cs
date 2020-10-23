@@ -115,10 +115,10 @@ namespace Reni.SyntaxTree
             (target.Right == null).Assert();
             switch(target.TokenClass)
             {
-                case DeclarationTagToken:
-                case InvalidDeclarationError:
+                case DeclarationTagToken _:
+                case InvalidDeclarationError _:
                     return FromTag(target, meansPublic, frameItems);
-                case Definable:
+                case Definable _: 
                     return FromName(target, meansPublic, frameItems);
                 default:
                     NotImplementedFunction(target, frameItems);
