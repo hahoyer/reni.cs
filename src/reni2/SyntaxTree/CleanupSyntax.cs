@@ -8,7 +8,7 @@ namespace Reni.SyntaxTree
         internal readonly ValueSyntax Value;
 
         public CleanupSyntax(BinaryTree anchor, ValueSyntax value)
-            : base(anchor)
+            : base(anchor, frameItems:FrameItemContainer.Create())
             => Value = value;
 
         internal override int LeftDirectChildCount => 0;
