@@ -2,13 +2,14 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
+using Reni.Parser;
 using Reni.SyntaxFactory;
 using Reni.TokenClasses;
 using Reni.Validation;
 
 namespace Reni.SyntaxTree
 {
-    sealed class DeclarerSyntax : DumpableObject, IAggregateable<DeclarerSyntax >
+    sealed class DeclarerSyntax : DumpableObject, IAggregateable<DeclarerSyntax>
     {
         internal class TagSyntax : Syntax.NoChildren
         {
@@ -35,7 +36,7 @@ namespace Reni.SyntaxTree
             internal readonly string Value;
 
             internal NameSyntax(BinaryTree anchor, string name, FrameItemContainer frameItems)
-                : base(anchor, frameItems:frameItems)
+                : base(anchor, frameItems: frameItems)
             {
                 Value = name;
                 Anchor.AssertIsNotNull();
@@ -49,9 +50,6 @@ namespace Reni.SyntaxTree
             internal override void AssertValid(Level level, BinaryTree target = null)
                 => base.AssertValid(level == null? null : new Level {IsCorrectOrder = level.IsCorrectOrder}, target);
         }
-
-        internal static readonly DeclarerSyntax Empty
-            = new DeclarerSyntax(null, new TagSyntax[0], null, null);
 
         internal readonly NameSyntax Name;
         internal readonly TagSyntax[] Tags;
@@ -102,6 +100,8 @@ namespace Reni.SyntaxTree
         [DisableDump]
         internal int DirectChildCount => (Hidden?.DirectChildCount ?? 0) + Tags.Length + 1;
 
+        DeclarerSyntax IAggregateable<DeclarerSyntax>.Aggregate(DeclarerSyntax other) => Combine(other);
+
         internal Syntax GetDirectChild(int index)
         {
             if(index >= 0 && index < Tags.Length)
@@ -109,18 +109,42 @@ namespace Reni.SyntaxTree
             return index == Tags.Length? Name : null;
         }
 
-        internal static DeclarerSyntax FromTag
-        (
-            DeclarationTagToken tag, BinaryTree target, bool? meansPublic, FrameItemContainer frameItems = null
-            , Issue issue = null
-        )
-            => new DeclarerSyntax(null, new[] {new TagSyntax(tag, target, issue, frameItems)}, null, meansPublic);
+        internal static DeclarerSyntax GetDeclarationTag(BinaryTree target, bool meansPublic, FrameItemContainer frameItems)
+        {
+            (target.Right == null).Assert();
+            switch(target.TokenClass)
+            {
+                case DeclarationTagToken:
+                case InvalidDeclarationError:
+                    return FromTag(target, meansPublic, frameItems);
+                case Definable:
+                    return FromName(target, meansPublic, frameItems);
+                default:
+                    NotImplementedFunction(target, frameItems);
+                    return default;
+            }
+        }
 
-        internal static DeclarerSyntax FromName
-            (BinaryTree target, string name, bool? meansPublic, FrameItemContainer frameItems= null)
-            => new DeclarerSyntax(null, new TagSyntax[0], new NameSyntax(target, name, frameItems), meansPublic);
+        static DeclarerSyntax FromTag(BinaryTree target, bool meansPublic, FrameItemContainer frameItems)
+        {
+            var tagSyntax = GetTagSyntax(target, frameItems);
+            return new DeclarerSyntax(null, new[] {tagSyntax}, null, meansPublic);
+        }
 
-        internal DeclarerSyntax Combine(DeclarerSyntax other)
+        static TagSyntax GetTagSyntax(BinaryTree target, FrameItemContainer frameItems)
+        {
+            var tag = target.TokenClass as DeclarationTagToken;
+            var issue = tag == null? IssueId.InvalidDeclarationTag.Issue(target.Token.Characters) : null;
+            return new TagSyntax(tag, target, issue, frameItems);
+        }
+
+        static DeclarerSyntax FromName(BinaryTree target, bool meansPublic, FrameItemContainer frameItems = null)
+        {
+            var nameSyntax = new NameSyntax(target, target.Token.Characters.Id, frameItems);
+            return new DeclarerSyntax(null, new TagSyntax[0], nameSyntax, meansPublic);
+        }
+
+        DeclarerSyntax Combine(DeclarerSyntax other)
         {
             if(other == null)
                 return this;
@@ -137,12 +161,11 @@ namespace Reni.SyntaxTree
         public bool IsDefining(string name, bool publicOnly)
             => name != null && Name?.Value == name && (!publicOnly || IsPublic);
 
-        protected override string GetNodeDump() 
-            => base.GetNodeDump() 
-                +"["
-               + Tags.Select(tag=>(tag?.Value?.NodeDump()??"?")+"!").Stringify("") 
-               + (Name?.Value??"")+"]";
-
-        DeclarerSyntax IAggregateable<DeclarerSyntax>.Aggregate(DeclarerSyntax other) => Combine(other);
+        protected override string GetNodeDump()
+            => base.GetNodeDump() +
+               "[" +
+               Tags.Select(tag => (tag?.Value?.NodeDump() ?? "?") + "!").Stringify("") +
+               (Name?.Value ?? "") +
+               "]";
     }
 }
