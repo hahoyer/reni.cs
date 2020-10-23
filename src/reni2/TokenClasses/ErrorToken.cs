@@ -9,27 +9,26 @@ namespace Reni.TokenClasses
 {
     class ErrorToken : DumpableObject, IToken
     {
-        sealed class TokenClass : DumpableObject, ITokenClass
+        sealed class TokenClass : DumpableObject, ITokenClass, IErrorToken
         {
-            internal static readonly ITokenClass Instance = new TokenClass();
-            public string Id => "<error>";
+            public string Id => IssueId.Tag;
+            readonly IssueId IssueId;
+            public TokenClass(IssueId issueId) => IssueId = issueId;
+
+            IssueId IErrorToken.IssueId => IssueId;
         }
 
-        readonly Issue Issue;
         readonly SourcePosition Position;
 
-        ErrorToken(Issue issue, SourcePosition position)
-        {
-            Issue = issue;
-            Position = position;
-        }
+        ErrorToken(SourcePosition position) => Position = position;
 
-        SourcePart IToken.Characters => Position?.Span(0) ?? Issue.Position;
+        SourcePart IToken.Characters => Position.Span(0);
         bool? IToken.IsBracketAndLeftBracket => true;
 
         IEnumerable<IItem> IToken.PrecededWith => new IItem[0];
 
-        internal static BinaryTree Create(Issue issue, BinaryTree target)
-            => BinaryTree.Create(null, TokenClass.Instance, new ErrorToken(issue, target.Token.SourcePart().Start), null);
+        internal static BinaryTree Create(IssueId issueId, BinaryTree target)
+            => BinaryTree.Create(null, new TokenClass(issueId), new ErrorToken(target.Token.SourcePart().Start), null);
+
     }
 }

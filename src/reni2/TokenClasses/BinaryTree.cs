@@ -71,7 +71,7 @@ namespace Reni.TokenClasses
                     foreach(var issue in Left.Issues)
                         yield return issue;
 
-                var issue1 = (TokenClass as ScannerSyntaxError)?.IssueId.Issue(Token.Characters);
+                var issue1 = (TokenClass as IErrorToken)?.IssueId.Issue(Token.Characters);
                 if(issue1 != null)
                     yield return issue1;
 
@@ -98,9 +98,8 @@ namespace Reni.TokenClasses
 
                 if(!(Left.TokenClass is ILeftBracket leftParenthesis))
                 {
-                    var issues = IssueId.MissingLeftBracket.Issue(SourcePart);
                     result.Center = Left;
-                    result.Left = ErrorToken.Create(issues, Left.LeftMost);
+                    result.Left = ErrorToken.Create(IssueId.MissingLeftBracket, Left.LeftMost);
                     return result;
                 }
 
@@ -113,8 +112,7 @@ namespace Reni.TokenClasses
 
                 if(levelDelta > 0)
                 {
-                    var issues = IssueId.MissingRightBracket.Issue(Left.SourcePart);
-                    result.Right = ErrorToken.Create(issues, RightMost);
+                    result.Right = ErrorToken.Create(IssueId.MissingRightBracket, RightMost);
                     return result;
                 }
 
