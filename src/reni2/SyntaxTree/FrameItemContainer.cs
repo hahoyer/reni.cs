@@ -39,6 +39,7 @@ namespace Reni.SyntaxTree
                 , LeftItemCount = LeftItemCount
             };
 
+        [DisableDump]
         internal FrameItemContainer Left
             => new FrameItemContainer
             {
@@ -46,6 +47,7 @@ namespace Reni.SyntaxTree
                 , LeftItemCount = LeftItemCount
             };
 
+        [DisableDump]
         internal FrameItemContainer Right
             => new FrameItemContainer
             {
