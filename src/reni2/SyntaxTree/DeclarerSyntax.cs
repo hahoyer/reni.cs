@@ -72,6 +72,7 @@ namespace Reni.SyntaxTree
         internal SourcePart SourcePart
             => T(T(Hidden?.SourcePart), Tags.Select(node => node.SourcePart), T(Name?.SourcePart))
                 .ConcatMany()
+                .Where(i=>i!= null)
                 .Aggregate();
 
         internal bool IsPublic
