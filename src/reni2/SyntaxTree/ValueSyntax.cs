@@ -47,12 +47,6 @@ namespace Reni.SyntaxTree
         protected ValueSyntax(int objectId, BinaryTree anchor, FrameItemContainer frameItems = null, Issue issue = null)
             : base(objectId, anchor, issue, frameItems) { }
 
-        protected abstract int LeftDirectChildCountKernel { get; }
-        protected abstract int DirectChildCountKernel { get; }
-
-        internal sealed override int LeftDirectChildCount => LeftDirectChildCountKernel + FrameItems.LeftItemCount;
-        protected sealed override int DirectChildCount => DirectChildCountKernel + FrameItems.Items.Length;
-
 
         [DisableDump]
         internal virtual bool IsLambda => false;
@@ -76,17 +70,6 @@ namespace Reni.SyntaxTree
             .GetNodesFromLeftToRight()
             .SelectMany(node => node?.Issues)
             .ToArray();
-
-        protected abstract Syntax GetDirectChildKernel(int index);
-
-        protected sealed override Syntax GetDirectChild(int index)
-            => index < FrameItems.LeftItemCount
-                ? FrameItems.Items[index]
-                : index < FrameItems.LeftItemCount + DirectChildCountKernel
-                    ? GetDirectChildKernel(index - FrameItems.LeftItemCount)
-                    : index < FrameItems.Items.Length + DirectChildCountKernel
-                        ? FrameItems.Items[index - DirectChildCountKernel]
-                        : null;
 
         internal override Result<IStatementSyntax[]> ToStatementsSyntax(BinaryTree target = null)
             => T((IStatementSyntax)this);

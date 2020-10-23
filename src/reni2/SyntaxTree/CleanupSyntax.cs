@@ -11,9 +11,9 @@ namespace Reni.SyntaxTree
             : base(anchor, frameItems:FrameItemContainer.Create())
             => Value = value;
 
-        internal override int LeftDirectChildCount => 0;
-        protected override int DirectChildCount => 1;
+        protected override int LeftDirectChildCountKernel => 0;
+        protected override int DirectChildCountKernel => 1;
 
-        protected override Syntax GetDirectChild(int index) => Value;
+        protected override Syntax GetDirectChildKernel(int index) => Value;
     }
 }

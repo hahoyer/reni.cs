@@ -23,12 +23,12 @@ namespace Reni.SyntaxTree
                 : base(anchor, issue, frameItems??FrameItemContainer.Create()) { }
 
             [DisableDump]
-            internal sealed override int LeftDirectChildCount => 0;
+            protected sealed override int LeftDirectChildCountKernel => 0;
 
             [DisableDump]
-            protected sealed override int DirectChildCount => 0;
+            protected sealed override int DirectChildCountKernel => 0;
 
-            protected sealed override Syntax GetDirectChild(int index)
+            protected sealed override Syntax GetDirectChildKernel(int index)
                 => throw new Exception($"Unexpected call: {nameof(GetDirectChild)}({index})");
         }
 
@@ -47,31 +47,32 @@ namespace Reni.SyntaxTree
 
         protected Syntax(BinaryTree anchor, Issue issue = null, FrameItemContainer frameItems = null)
         {
-            FrameItems = frameItems;
+            FrameItems = frameItems?? FrameItemContainer.Create();
             Anchor = anchor;
             Issue = issue;
-            FrameItems.AssertIsNotNull();
             Anchor.AssertIsNotNull();
         }
 
         protected Syntax(int objectId, BinaryTree anchor, Issue issue = null, FrameItemContainer frameItems = null)
             : base(objectId)
         {
-            FrameItems = frameItems;
+            FrameItems = frameItems?? FrameItemContainer.Create();
             Anchor = anchor;
             Issue = issue;
-            FrameItems.AssertIsNotNull();
             Anchor.AssertIsNotNull();
         }
 
         [DisableDump]
-        internal abstract int LeftDirectChildCount { get; }
+        protected abstract int LeftDirectChildCountKernel { get; }
+        protected abstract int DirectChildCountKernel { get; }
+
+        [DisableDump]
+        internal int LeftDirectChildCount => LeftDirectChildCountKernel + FrameItems.LeftItemCount;
+        protected int DirectChildCount => DirectChildCountKernel + FrameItems.Items.Length;
+
 
         [DisableDump]
         IEnumerable<Syntax> Children => this.GetNodesFromLeftToRight();
-
-        [DisableDump]
-        protected abstract int DirectChildCount { get; }
 
         internal Syntax[] DirectChildren => this.CachedValue(() => DirectChildCount.Select(GetDirectChild).ToArray());
 
@@ -101,7 +102,17 @@ namespace Reni.SyntaxTree
                 yield return issue;
         }
 
-        protected abstract Syntax GetDirectChild(int index);
+        protected abstract Syntax GetDirectChildKernel(int index);
+
+        Syntax GetDirectChild(int index)
+            => index < FrameItems.LeftItemCount
+                ? FrameItems.Items[index]
+                : index < FrameItems.LeftItemCount + DirectChildCountKernel
+                    ? GetDirectChildKernel(index - FrameItems.LeftItemCount)
+                    : index < FrameItems.Items.Length + DirectChildCountKernel
+                        ? FrameItems.Items[index - DirectChildCountKernel]
+                        : null;
+
 
         internal virtual Result<ValueSyntax> ToValueSyntax()
         {

@@ -23,12 +23,12 @@ namespace Reni.SyntaxTree
         string Position => Anchor?.Token.Characters.GetDumpAroundCurrent(5);
 
         [DisableDump]
-        internal override int LeftDirectChildCount => 0;
+        protected override int LeftDirectChildCountKernel => 0;
 
         [DisableDump]
-        protected override int DirectChildCount => 1;
+        protected override int DirectChildCountKernel => 1;
 
-        protected override Syntax GetDirectChild(int index)
+        protected override Syntax GetDirectChildKernel(int index)
             => index switch
             {
                 0 => (Syntax)Content, _ => null

@@ -1,5 +1,4 @@
 using hw.DebugFormatter;
-using Reni.Parser;
 using Reni.TokenClasses;
 using Reni.Validation;
 
@@ -13,8 +12,9 @@ namespace Reni.SyntaxTree
         [EnableDumpExcept(null)]
         internal readonly ValueSyntax Value;
 
-        DeclarationSyntax(DeclarerSyntax declarer, BinaryTree anchor, ValueSyntax value, FrameItemContainer frameItems=null)
-            : base(anchor,frameItems:frameItems??FrameItemContainer.Create())
+        DeclarationSyntax
+            (DeclarerSyntax declarer, BinaryTree anchor, ValueSyntax value, FrameItemContainer frameItems = null)
+            : base(anchor, frameItems: frameItems ?? FrameItemContainer.Create())
         {
             Declarer = declarer;
             Value = value;
@@ -38,10 +38,10 @@ namespace Reni.SyntaxTree
         internal bool IsMutableSyntax => Declarer.IsMutableSyntax;
 
         [DisableDump]
-        internal override int LeftDirectChildCount => Declarer.DirectChildCount;
+        protected override int LeftDirectChildCountKernel => Declarer.DirectChildCount;
 
         [DisableDump]
-        protected override int DirectChildCount => LeftDirectChildCount + 1;
+        protected override int DirectChildCountKernel => LeftDirectChildCount + 1;
 
         [DisableDump]
         DeclarerSyntax IStatementSyntax.Declarer => Declarer;
@@ -52,7 +52,7 @@ namespace Reni.SyntaxTree
         [DisableDump]
         ValueSyntax IStatementSyntax.Value => Value;
 
-        protected override Syntax GetDirectChild(int index)
+        protected override Syntax GetDirectChildKernel(int index)
             => index switch
             {
                 { } when index < LeftDirectChildCount => Declarer.GetDirectChild(index)
