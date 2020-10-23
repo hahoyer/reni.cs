@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Helper;
 using Reni.Helper;
 using Reni.Parser;
 using Reni.SyntaxTree;
@@ -27,16 +29,11 @@ namespace Reni.SyntaxFactory
         internal static readonly IStatementsProvider List = new ListHandler();
         internal static readonly IStatementProvider Colon = new ColonHandler();
 
-        internal static readonly IDeclarerProvider DeclarationMark = new DeclarationMarkHandler();
-        internal static readonly IDeclarerProvider DefinableAsDeclarer = new DefinableHandler();
-        internal static readonly IDeclarerProvider DeclarationTag = new DeclarationTagHandler();
-        internal static readonly IDeclarerProvider ComplexDeclarer = new ComplexDeclarerHandler();
-
         internal static readonly Factory Root = new Factory(false);
         static readonly IDeclarerProvider InvalidTokenDeclarer = new InvalidTokenDeclarerHandler();
 
         [EnableDump]
-        readonly bool MeansPublic;
+        internal readonly bool MeansPublic;
 
         Factory(bool meansPublic) => MeansPublic = meansPublic;
 
@@ -129,21 +126,23 @@ namespace Reni.SyntaxFactory
                 : left.Combine(namePart);
         }
 
-        internal DeclarerSyntax GetDeclarerSyntax(BinaryTree target, Func<DeclarerSyntax> onNull = null)
-        {
-            if(target == null)
-                return onNull?.Invoke();
-
-            return ((target.TokenClass as IDeclarationTagToken)?.Provider ?? InvalidTokenDeclarer)
-                .Get(target, GetCurrentFactory(target));
-        }                                          
-
-        internal DeclarerSyntax GetDeclarationTag(BinaryTree target)
+        internal DeclarerSyntax GetDeclarationTag(BinaryTree target, FrameItemContainer frameItems)
         {
             (target.Right == null).Assert();
-            var tag = target.TokenClass as DeclarationTagToken;
-            var issue = tag == null? null : IssueId.InvalidDeclarationTag.Issue(target.Token.Characters);
-            return DeclarerSyntax.FromTag(tag, target, MeansPublic, issue);
+            switch(target.TokenClass)
+            {
+                case DeclarationTagToken tag:
+                    return DeclarerSyntax.FromTag(tag, target, MeansPublic, frameItems);
+                case TokenClasses.Definable:
+                    return DeclarerSyntax.FromName(target, target.Token.Characters.Id, MeansPublic, frameItems);
+                default:
+                    NotImplementedMethod(target, frameItems);
+                    return default;
+
+
+
+                    //var issue = tag == null? null : IssueId.InvalidDeclarationTag.Issue(target.Token.Characters);
+            }
         }
 
         internal ExpressionSyntax GetExpressionSyntax(BinaryTree target, FrameItemContainer frameItems)
@@ -161,29 +160,19 @@ namespace Reni.SyntaxFactory
             => target
                 .Center
                 .GetNodesFromLeftToRight()
-                .Select(GetDeclarationTag)
+                .Select(target1 => GetDeclarationTag(target1, null))
                 .Aggregate(DeclarerSyntax.Empty, (left, right) => left.Combine(right));
 
-        internal DeclarerSyntax GetDeclarationTags(BinaryTree target, FrameItemContainer frameItems)
-        {
-            if(target.Right == null)
-            {
-                if(target.TokenClass is DeclarationTagToken tag)
-                    return DeclarerSyntax.FromTag(tag, target, MeansPublic);
-
-                if(target.TokenClass is InvalidDeclarationError error)
-                    return DeclarerSyntax.FromTag(null, target, MeansPublic, IssueId.InvalidDeclarationTag.Issue(target.Token.Characters));
-
-                NotImplementedMethod(target, frameItems);
-                return default;
-            }
-
-            
-            NotImplementedMethod(target, frameItems);
-            return default;
-        }
-
-        internal DeclarerSyntax GetDeclarationName(BinaryTree target) 
+        internal DeclarerSyntax GetDeclarationName(BinaryTree target)
             => DeclarerSyntax.FromName(target, target.Token.Characters.Id, MeansPublic);
+
+        public DeclarerSyntax CombineWithSuffix(IEnumerable<BinaryTree> nodes)
+        {
+            var head = nodes.First();
+            var tag = head.TokenClass is IDeclarationTagToken;
+            tag.Assert();
+            var frameItems = FrameItemContainer.Create(nodes.Skip(1));
+            return GetDeclarationTag(head, frameItems);
+        }
     }
 }

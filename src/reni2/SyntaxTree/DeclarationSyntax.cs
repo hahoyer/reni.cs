@@ -13,8 +13,8 @@ namespace Reni.SyntaxTree
         [EnableDumpExcept(null)]
         internal readonly ValueSyntax Value;
 
-        DeclarationSyntax(DeclarerSyntax declarer, BinaryTree anchor, ValueSyntax value)
-            : base(anchor)
+        DeclarationSyntax(DeclarerSyntax declarer, BinaryTree anchor, ValueSyntax value, FrameItemContainer frameItems=null)
+            : base(anchor,frameItems:frameItems??FrameItemContainer.Create())
         {
             Declarer = declarer;
             Value = value;
@@ -60,12 +60,14 @@ namespace Reni.SyntaxTree
                 , _ => null
             };
 
-        internal static IStatementSyntax Create(DeclarerSyntax declarer, BinaryTree target, ValueSyntax value)
+        internal static IStatementSyntax Create
+            (DeclarerSyntax declarer, BinaryTree target, ValueSyntax value, FrameItemContainer frameItems)
             => new DeclarationSyntax
             (
                 declarer,
                 target,
-                value ?? new EmptyList(null, issue: IssueId.MissingDeclarationValue.Issue(target.Token.Characters))
+                value ?? new EmptyList(null, issue: IssueId.MissingDeclarationValue.Issue(target.Token.Characters)),
+                frameItems
             );
     }
 }

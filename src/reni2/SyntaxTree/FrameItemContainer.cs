@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using Reni.TokenClasses;
@@ -6,8 +7,6 @@ namespace Reni.SyntaxTree
 {
     sealed class FrameItemContainer : DumpableObject
     {
-        protected override string GetNodeDump() => base.GetNodeDump() + $"[{Items.Length}]";
-
         internal class Dummy : Syntax.NoChildren
         {
             Dummy(BinaryTree anchor)
@@ -17,10 +16,11 @@ namespace Reni.SyntaxTree
             internal static Dummy Create(BinaryTree anchor) => anchor == null? null : new Dummy(anchor);
         }
 
-
         internal Dummy[] Items { get; private set; }
 
         internal int LeftItemCount { get; private set; }
+
+        FrameItemContainer() { }
 
         [DisableDump]
         internal BinaryTree LeftMostRightItem
@@ -38,6 +38,22 @@ namespace Reni.SyntaxTree
                     .ToArray()
                 , LeftItemCount = LeftItemCount
             };
+
+        internal FrameItemContainer Left
+            => new FrameItemContainer
+            {
+                Items = Items.Take(LeftItemCount).ToArray()
+                , LeftItemCount = LeftItemCount
+            };
+
+        internal FrameItemContainer Right
+            => new FrameItemContainer
+            {
+                Items = Items.Skip(LeftItemCount).ToArray()
+                , LeftItemCount = 0
+            };
+
+        protected override string GetNodeDump() => base.GetNodeDump() + $"[{Items.Length}]";
 
         internal static FrameItemContainer Create(BinaryTree leftAnchor, BinaryTree rightAnchor)
             => new FrameItemContainer
@@ -58,6 +74,13 @@ namespace Reni.SyntaxTree
             {
                 Items = new Dummy[0]
                 , LeftItemCount = 0
+            };
+
+        public static FrameItemContainer Create(IEnumerable<BinaryTree> left)
+            => new FrameItemContainer
+            {
+                Items = left.Select(Dummy.Create).ToArray()
+                , LeftItemCount = left.Count()
             };
     }
 }

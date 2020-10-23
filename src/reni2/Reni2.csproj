@@ -318,9 +318,6 @@
     <Compile Include="Struct\FunctionInstance.cs" />
     <Compile Include="SyntaxFactory\CleanupHandler.cs" />
     <Compile Include="SyntaxFactory\ColonHandler.cs" />
-    <Compile Include="SyntaxFactory\ComplexDeclarerHandler.cs" />
-    <Compile Include="SyntaxFactory\DeclarationMarkHandler.cs" />
-    <Compile Include="SyntaxFactory\DeclarerHandler.cs" />
     <Compile Include="SyntaxFactory\DefinableHandler.cs" />
     <Compile Include="SyntaxFactory\ElseHandler.cs" />
     <Compile Include="SyntaxFactory\Extension.cs" />

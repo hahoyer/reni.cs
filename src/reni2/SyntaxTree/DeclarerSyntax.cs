@@ -8,14 +8,15 @@ using Reni.Validation;
 
 namespace Reni.SyntaxTree
 {
-    sealed class DeclarerSyntax : DumpableObject
+    sealed class DeclarerSyntax : DumpableObject, IAggregateable<DeclarerSyntax >
     {
         internal class TagSyntax : Syntax.NoChildren
         {
             internal readonly IDeclarationTagToken Value;
 
-            internal TagSyntax(IDeclarationTagToken value, BinaryTree anchor, Issue issue)
-                : base(anchor, issue)
+            internal TagSyntax
+                (IDeclarationTagToken value, BinaryTree anchor, Issue issue, FrameItemContainer frameItems)
+                : base(anchor, issue, frameItems)
             {
                 Value = value;
                 Anchor.AssertIsNotNull();
@@ -33,8 +34,8 @@ namespace Reni.SyntaxTree
         {
             internal readonly string Value;
 
-            internal NameSyntax(BinaryTree anchor, string name)
-                : base(anchor)
+            internal NameSyntax(BinaryTree anchor, string name, FrameItemContainer frameItems)
+                : base(anchor, frameItems:frameItems)
             {
                 Value = name;
                 Anchor.AssertIsNotNull();
@@ -109,11 +110,15 @@ namespace Reni.SyntaxTree
         }
 
         internal static DeclarerSyntax FromTag
-            (DeclarationTagToken tag, BinaryTree target, bool? meansPublic, Issue issue = null)
-            => new DeclarerSyntax(null, new[] {new TagSyntax(tag, target, issue)}, null, meansPublic);
+        (
+            DeclarationTagToken tag, BinaryTree target, bool? meansPublic, FrameItemContainer frameItems = null
+            , Issue issue = null
+        )
+            => new DeclarerSyntax(null, new[] {new TagSyntax(tag, target, issue, frameItems)}, null, meansPublic);
 
-        internal static DeclarerSyntax FromName(BinaryTree target, string name, bool? meansPublic)
-            => new DeclarerSyntax(null, new TagSyntax[0], new NameSyntax(target, name), meansPublic);
+        internal static DeclarerSyntax FromName
+            (BinaryTree target, string name, bool? meansPublic, FrameItemContainer frameItems= null)
+            => new DeclarerSyntax(null, new TagSyntax[0], new NameSyntax(target, name, frameItems), meansPublic);
 
         internal DeclarerSyntax Combine(DeclarerSyntax other)
         {
@@ -137,5 +142,7 @@ namespace Reni.SyntaxTree
                 +"["
                + Tags.Select(tag=>(tag?.Value?.NodeDump()??"?")+"!").Stringify("") 
                + (Name?.Value??"")+"]";
+
+        DeclarerSyntax IAggregateable<DeclarerSyntax>.Aggregate(DeclarerSyntax other) => Combine(other);
     }
 }

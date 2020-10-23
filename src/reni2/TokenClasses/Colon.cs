@@ -54,7 +54,6 @@ namespace Reni.TokenClasses
             }
         }
 
-        IDeclarerProvider IDeclarationTagToken.Provider => Factory.DeclarationTag;
     }
 
     sealed class ConverterToken : DeclarationTagToken

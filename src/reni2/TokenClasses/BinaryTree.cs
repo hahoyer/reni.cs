@@ -19,7 +19,8 @@ namespace Reni.TokenClasses
             internal BinaryTree Center;
             internal BinaryTree Left;
             internal BinaryTree Right;
-
+                       
+            [DisableDump]
             internal FrameItemContainer ToFrameItems => FrameItemContainer.Create(Left,Right);
         }
 

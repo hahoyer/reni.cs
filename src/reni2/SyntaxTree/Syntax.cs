@@ -90,7 +90,14 @@ namespace Reni.SyntaxTree
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         int ITree<Syntax>.LeftDirectChildCount => LeftDirectChildCount;
 
+        [DisableDump]
         internal Issue[] Issues => this.CachedValue(()=>GetIssues().ToArray());
+
+        public override string DumpData()
+        {
+            Tracer.ConditionalBreak(IsInDump);
+            return base.DumpData();
+        }
 
         IEnumerable<Issue> GetIssues()
         {

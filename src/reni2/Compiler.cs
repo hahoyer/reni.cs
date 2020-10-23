@@ -127,7 +127,7 @@ namespace Reni
 
         [DisableDump]
         internal IEnumerable<Issue> Issues
-            => T(BinaryTree.Issues, ValueSyntaxCache.Value?.Issues, CodeContainer?.Issues).ConcatMany();
+            => T(BinaryTree.Issues, ValueSyntaxCache.Value?.AllIssues, CodeContainer?.Issues).ConcatMany();
 
         static PrioTable MainPriorityTable
         {

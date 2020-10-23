@@ -18,8 +18,6 @@ namespace Reni.TokenClasses
         internal virtual IEnumerable<IDeclarationProvider> MakeGeneric
             => this.GenericListFromDefinable();
 
-        IDeclarerProvider IDeclarationTagToken.Provider => Factory.DefinableAsDeclarer;
-
         IValueProvider IValueToken.Provider => Factory.Definable;
 
         internal ValueSyntax CreateForVisit

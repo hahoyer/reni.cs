@@ -19,8 +19,6 @@ namespace Reni.Parser
         readonly string Name;
         public InvalidDeclarationError(string name) => Name = name;
 
-        IDeclarerProvider IDeclarationTagToken.Provider => Factory.DeclarationTag;
-
         BinaryTree IParserTokenType<BinaryTree>.Create(BinaryTree left, IToken token, BinaryTree right)
             => BinaryTree.Create(left, this, token, right);
 
