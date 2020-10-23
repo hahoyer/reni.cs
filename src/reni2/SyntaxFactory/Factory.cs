@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
+using Reni.Helper;
 using Reni.Parser;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
@@ -58,9 +59,11 @@ namespace Reni.SyntaxFactory
             if(target == null)
                 return new EmptyList(frameItems);
 
-            Tracer.ConditionalBreak(target.ObjectId == 34);
-            Tracer.ConditionalBreak(target.Left?.ObjectId == 34);
-            Tracer.ConditionalBreak(target.Right?.ObjectId == 34);
+            var n = target
+                .GetNodesFromLeftToRight()
+                .FirstOrDefault(node => node.ObjectId == 32);
+            var path = target.GetPath(node => node == n);
+            Tracer.ConditionalBreak(n!= null && path.Length ==0);
 
             return GetSyntax(target, node => node
                 , (node, frameItems) => node.ToValueSyntax(frameItems)
@@ -95,10 +98,9 @@ namespace Reni.SyntaxFactory
                 return fromDeclarationSyntax(declarationToken.Provider.Get(target, factory), frameItems);
 
             if(statementsToken != null)
-                return statementsToken
+                return fromStatementsSyntax(statementsToken
                     .Provider
-                    .Get(target, factory, FrameItemContainer.Create())
-                    .StripIssues(node => fromStatementsSyntax(node, frameItems));
+                    .Get(target, factory),frameItems);
 
             return fromValueSyntax(new EmptyList(target, frameItems
                 , IssueId.InvalidExpression.Issue(target.Token.Characters)));

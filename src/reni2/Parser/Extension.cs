@@ -198,16 +198,6 @@ namespace Reni.Parser
             where TResult : class
             => creator(arg1?.Target).With(arg1?.Issues);
 
-        internal static TResult StripIssues<TArg1, TResult>
-            (this Result<TArg1> arg1, Func<TArg1, TResult> creator)
-            where TArg1 : class
-            where TResult : class
-        {
-            (arg1 == null || !arg1.Issues.Any()).Assert();
-            return creator(arg1?.Target);
-        }
-
-
         internal static Result<TResult> Apply<TArg1, TArg2, TResult>
             (this(Result<TArg1> arg1, Result<TArg2> arg2) arg, Func<TArg1, TArg2, Result<TResult>> creator)
             where TArg1 : class
