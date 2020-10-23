@@ -93,12 +93,6 @@ namespace Reni.SyntaxTree
         [DisableDump]
         internal Issue[] Issues => this.CachedValue(()=>GetIssues().ToArray());
 
-        public override string DumpData()
-        {
-            Tracer.ConditionalBreak(IsInDump);
-            return base.DumpData();
-        }
-
         IEnumerable<Issue> GetIssues()
         {
             if(Issue != null)
