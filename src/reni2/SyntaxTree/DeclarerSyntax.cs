@@ -165,7 +165,7 @@ namespace Reni.SyntaxTree
         protected override string GetNodeDump()
             => base.GetNodeDump() +
                "[" +
-               Tags.Select(tag => (tag?.Value?.NodeDump() ?? "?") + "!").Stringify("") +
+               Tags.Select(tag => ((tag?.Value as TokenClass)?.Id ?? "?") + "!").Stringify("") +
                (Name?.Value ?? "") +
                "]";
     }

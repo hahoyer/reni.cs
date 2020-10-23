@@ -62,7 +62,6 @@ namespace Reni.SyntaxTree
             Definable = definable;
             Right = right;
             StopByObjectIds();
-            Tracer.ConditionalBreak(frameItems.Items.FirstOrDefault()?.Anchor?.Token.Characters.Position == 826);
         }
 
         [DisableDump]

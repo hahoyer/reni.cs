@@ -28,6 +28,7 @@ namespace Reni.Helper
 
         protected SyntaxView(Syntax flatItem, TResult parent, PositionDictionary<TResult> context, int index)
         {
+            Tracer.ConditionalBreak(flatItem.ObjectId == 492);
             flatItem.AssertIsNotNull();
             FlatItem = flatItem;
             Parent = parent;
@@ -67,18 +68,14 @@ namespace Reni.Helper
         internal TResult RightMost => this.GetNodesFromRightToLeft().First();
 
         [DisableDump]
-        internal IEnumerable<TResult> ParserLevelBelongingers 
-             => this.CachedValue(GetParserLevelBelongings);
+        internal IEnumerable<TResult> ParserLevelBelongingers
+            => this.CachedValue(GetParserLevelBelongings);
 
         int LeftDirectChildCount => FlatItem.LeftDirectChildCount;
         int DirectChildCount => FlatItem.DirectChildren.Length;
 
         internal TResult[] DirectChildren
-            => this.CachedValue
-            (
-                ()
-                    => DirectChildCount.Select(GetDirectChild).ToArray()
-            );
+            => this.CachedValue(() => DirectChildCount.Select(GetDirectChild).ToArray());
 
         [DisableDump]
         internal TResult LeftNeighbor => RightMostLeftSibling?.RightMost ?? LeftParent;
