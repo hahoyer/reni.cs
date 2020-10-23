@@ -58,6 +58,10 @@ namespace Reni.SyntaxFactory
             if(target == null)
                 return new EmptyList(frameItems);
 
+            Tracer.ConditionalBreak(target.ObjectId == 34);
+            Tracer.ConditionalBreak(target.Left?.ObjectId == 34);
+            Tracer.ConditionalBreak(target.Right?.ObjectId == 34);
+
             return GetSyntax(target, node => node
                 , (node, frameItems) => node.ToValueSyntax(frameItems)
                 , (node, frameItems) => (ValueSyntax)CompoundSyntax.Create(node, null, frameItems)
