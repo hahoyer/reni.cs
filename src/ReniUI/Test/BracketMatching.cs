@@ -22,8 +22,8 @@ namespace ReniUI.Test
             var open = compiler.LocatePosition(0);
             var close = compiler.LocatePosition(text.IndexOf(")"));
 
-            var matchOpen = open.ParserLevelBelongings;
-            var matchClose = close.ParserLevelBelongings;
+            var matchOpen = open.ParserLevelGroup;
+            var matchClose = close.ParserLevelGroup;
 
             var pairs = matchOpen.Merge(matchClose, item => item).ToArray();
 
@@ -40,8 +40,8 @@ namespace ReniUI.Test
             var open = compiler.LocatePosition(0);
             var close = compiler.LocatePosition(text.IndexOf(")"));
 
-            var matchOpen = open.ParserLevelBelongings;
-            var matchClose = close.ParserLevelBelongings;
+            var matchOpen = open.ParserLevelGroup;
+            var matchClose = close.ParserLevelGroup;
 
             var pairs = matchOpen.Merge(matchClose, item => item).ToArray();
 
@@ -57,7 +57,7 @@ namespace ReniUI.Test
 
             var close = compiler.LocatePosition(text.IndexOf(")", text.IndexOf(")") + 1));
 
-            var matchClose = close.ParserLevelBelongings;
+            var matchClose = close.ParserLevelGroup;
 
             (matchClose.Count() == 1).Assert();
         }

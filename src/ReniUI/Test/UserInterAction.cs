@@ -4,11 +4,11 @@ using hw.UnitTest;
 using Reni;
 
 namespace ReniUI.Test
-{              
+{
     [UnitTest]
     public sealed class UserInterAction : DependenceProvider
     {
-        const string text = @"
+        const string Text = @"
 System: 
 (
 \!
@@ -47,24 +47,24 @@ complex FromReal(2) dump_print;
         [UnitTest]
         public void TypingAProgram()
         {
-            for(var i = 0; i < text.Length; i++)
+            for(var i = 0; i < Text.Length; i++)
             {
-                var textFragment = text.Substring(0, i);
-                var compiler = Compiler.FromText(text: textFragment);
+                var textFragment = Text.Substring(0, i);
+                var compiler = Compiler.FromText(textFragment);
                 var syntax = compiler.Syntax;
-                var span = syntax.Anchor.SourcePart;
-                Tracer.Assert(span.Id == textFragment, () => span.NodeDump);
+                var span = syntax.FrameItems.SourcePart;
+                (span.Id == textFragment).Assert(() => span.NodeDump);
             }
         }
 
         [UnitTest]
         public void GetTokenForPosition()
         {
-            var compiler = CompilerBrowser.FromText(text: text);
-            for(var i = 0; i < text.Length; i++)
+            var compiler = CompilerBrowser.FromText(Text);
+            for(var i = 0; i < Text.Length; i++)
             {
                 var t = compiler.LocatePosition(i);
-                Tracer.Assert(t != null, () => (new Source(text) + i).Dump());
+                (t != null).Assert(() => (new Source(Text) + i).Dump());
             }
         }
     }

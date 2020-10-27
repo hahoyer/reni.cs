@@ -1,6 +1,6 @@
 using System;
-using System.Linq;
 using hw.DebugFormatter;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
@@ -12,13 +12,13 @@ namespace Reni.SyntaxTree
     {
         internal sealed class EvaluationDepthExhaustedException : Exception
         {
-            readonly BinaryTree BinaryTree;
             readonly ContextBase Context;
             readonly int Depth;
+            readonly SourcePart SourcePart;
 
-            public EvaluationDepthExhaustedException(BinaryTree binaryTree, ContextBase context, int depth)
+            public EvaluationDepthExhaustedException(SourcePart sourcePart, ContextBase context, int depth)
             {
-                BinaryTree = binaryTree;
+                SourcePart = sourcePart;
                 Context = context;
                 Depth = depth;
             }
@@ -28,7 +28,7 @@ namespace Reni.SyntaxTree
                    Depth +
                    " exhausted when evaluation expression.\n" +
                    "Expression: " +
-                   BinaryTree.SourcePart.GetDumpAroundCurrent(10) +
+                   SourcePart.GetDumpAroundCurrent(10) +
                    "\n" +
                    "Context: " +
                    Context.NodeDump;
@@ -49,15 +49,13 @@ namespace Reni.SyntaxTree
 
         internal ExpressionSyntax
         (
-            BinaryTree anchor,
             ValueSyntax left,
             Definable definable,
             ValueSyntax right,
             FrameItemContainer frameItems
         )
-            : base(anchor, frameItems)
+            : base(frameItems)
         {
-            anchor.AssertIsNotNull();
             Left = left;
             Definable = definable;
             Right = right;
@@ -65,12 +63,12 @@ namespace Reni.SyntaxTree
         }
 
         [DisableDump]
-        protected override int LeftDirectChildCountKernel => 1;
+        protected override int LeftDirectChildCountInternal => 1;
 
         [DisableDump]
-        protected override int DirectChildCountKernel => 2;
+        protected override int DirectChildCount => 2;
 
-        protected override Syntax GetDirectChildKernel(int index)
+        protected override Syntax GetDirectChild(int index)
             => index switch
             {
                 0 => Left, 1 => Right, _ => null
@@ -78,24 +76,23 @@ namespace Reni.SyntaxTree
 
         internal static ExpressionSyntax Create
         (
-            BinaryTree target,
             ValueSyntax left,
             Definable definable,
             ValueSyntax right,
             FrameItemContainer frameItems
         )
-            => new ExpressionSyntax(target, left, definable, right, frameItems);
+            => new ExpressionSyntax(left, definable, right, frameItems);
 
         internal override Result ResultForCache(ContextBase context, Category category)
         {
             if(CurrentResultDepth > 20)
-                throw new EvaluationDepthExhaustedException(Anchor, context, CurrentResultDepth);
+                throw new EvaluationDepthExhaustedException(FrameItems.SourcePart, context, CurrentResultDepth);
 
             try
             {
                 CurrentResultDepth++;
                 if(Left == null)
-                    return context.PrefixResult(category, Definable, Anchor, Right);
+                    return context.PrefixResult(category, Definable, FrameItems.SourcePart, Right);
 
                 var left = context.ResultAsReferenceCache(Left);
 
@@ -107,7 +104,7 @@ namespace Reni.SyntaxTree
                     return leftType.Issues.Result(category);
 
                 return leftType
-                    .Execute(category, left, Anchor, Definable, context, Right);
+                    .Execute(category, left, FrameItems.SourcePart, Definable, context, Right);
             }
             finally
             {
@@ -122,7 +119,7 @@ namespace Reni.SyntaxTree
             if(left == null && right == null)
                 return null;
 
-            return Definable.CreateForVisit(Anchor, left ?? Left, right ?? Right, FrameItems);
+            return Definable.CreateForVisit(left ?? Left, right ?? Right, FrameItems);
         }
 
         protected override string GetNodeDump()

@@ -35,21 +35,21 @@ namespace ReniUI.CompilationView
             isUnderlined: true);
 
         [UsedImplicitly]
-        public static TextStyle From(Token token, CompilerBrowser compiler)
+        public static TextStyle From(Syntax syntax, CompilerBrowser compiler)
         {
             try
             {
-                if(token.IsError)
+                if(syntax.IsError)
                     return Error;
-                if(token.IsBraceLike && token.ParserLevelBelongings.Any())
-                    return token.IsBrace ? Brace : BraceLikeKeyWord;
-                if(token.IsKeyword)
+                if(syntax.IsBraceLike && syntax.ParserLevelGroup.Any())
+                    return syntax.IsBrace ? Brace : BraceLikeKeyWord;
+                if(syntax.IsKeyword)
                     return KeyWord;
-                if(token.IsComment || token.IsLineComment)
+                if(syntax.IsComment || syntax.IsLineComment)
                     return Comment;
-                if(token.IsNumber)
+                if(syntax.IsNumber)
                     return Number;
-                if(token.IsText)
+                if(syntax.IsText)
                     return Text;
 
                 return Default;

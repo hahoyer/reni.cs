@@ -20,7 +20,6 @@ namespace Reni.SyntaxFactory
                 , token.IsImplicit
                 , token.IsMetaFunction
                 , factory.GetValueSyntax(target.Right)
-                , target
                 , frameItems
             );
         }

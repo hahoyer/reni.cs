@@ -7,15 +7,8 @@ namespace Reni.SyntaxTree
 {
     sealed class EmptyList : ValueSyntax.NoChildren
     {
-        public EmptyList(BinaryTree anchor, FrameItemContainer frameItems = null, Issue issue = null)
-            : base(anchor, frameItems ?? FrameItemContainer.Create(), issue)
-        {
-            StopByObjectIds();
-            AssertValid();
-        }
-
-        public EmptyList(FrameItemContainer frameItems)
-            : base(frameItems.LeftMostRightItem, frameItems.WithoutLeftMostRightItem)
+        public EmptyList(FrameItemContainer frameItems = null, Issue issue = null)
+            : base(frameItems ?? FrameItemContainer.Create(), issue)
         {
             StopByObjectIds();
             AssertValid();

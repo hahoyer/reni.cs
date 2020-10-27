@@ -6,16 +6,13 @@ using ReniUI.Helper;
 
 namespace ReniUI.Classification
 {
-    sealed class WhiteSpaceToken : Token
+    sealed class WhiteSpaceSyntax : Syntax
     {
-        internal override Helper.Syntax Master { get; }
         readonly IItem Item;
 
-        internal WhiteSpaceToken(IItem item, Helper.Syntax master)
-        {
-            Item = item;
-            Master = master;
-        }
+        internal WhiteSpaceSyntax(IItem item, Helper.Syntax master, int index)
+            : base(master, index)
+            => Item = item;
 
         public override SourcePart SourcePart => Item.SourcePart;
         public override bool IsComment => Lexer.IsMultiLineComment(Item);
@@ -25,7 +22,7 @@ namespace ReniUI.Classification
         public override string State => Lexer.Instance.WhiteSpaceId(Item) ?? "";
 
         [DisableDump]
-        public override IEnumerable<SourcePart> ParserLevelBelongings
+        public override IEnumerable<SourcePart> ParserLevelGroup
         {
             get { yield break; }
         }

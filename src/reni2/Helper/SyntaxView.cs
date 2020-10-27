@@ -2,21 +2,19 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using hw.Parser;
 using hw.Scanner;
-using Reni.Parser;
 using Reni.SyntaxTree;
-using Reni.TokenClasses;
 
 namespace Reni.Helper
 {
-    abstract class SyntaxView<TResult> : DumpableObject, ValueCache.IContainer, ITree<TResult>
+    public abstract class SyntaxView<TResult> : DumpableObject, ValueCache.IContainer, ITree<TResult>
         where TResult : SyntaxView<TResult>
     {
         class CacheContainer
         {
             public FunctionCache<int, TResult> DirectChildren;
-            public FunctionCache<int, TResult> LocateByPosition;
+            public FunctionCache<int, (TResult, int)> LocateByPosition;
+            public FunctionCache<int, (TResult, int)> LocateByPositionIncludingParent;
         }
 
         internal readonly PositionDictionary<TResult> Context;
@@ -33,32 +31,18 @@ namespace Reni.Helper
             Parent = parent;
             Context = context;
             Index = index;
-            Context[FlatItem.Anchor] = (TResult)this;
-            Cache.LocateByPosition = new FunctionCache<int, TResult>(LocateByPositionForCache);
+
+            foreach(var anchor in FlatItem.FrameItems.Items)
+                Context[anchor] = (TResult)this;
+
+            Cache.LocateByPosition = new FunctionCache<int, (TResult, int)>(i => LocateByPositionForCache(i, false));
+            Cache.LocateByPositionIncludingParent 
+                = new FunctionCache<int, (TResult, int)>(i=>LocateByPositionForCache(i, true));
             Tracer.ConditionalBreak(flatItem.ObjectId == -492);
         }
 
-        internal ITokenClass TokenClass => FlatItem.Anchor.TokenClass;
-
         [DisableDump]
-        internal IToken Token => FlatItem.Anchor.Token;
-
-        [EnableDumpExcept(null)]
-        internal IEnumerable<IItem> WhiteSpaces => Token.PrecededWith;
-
-        [DisableDump]
-        internal SourcePart SourcePart
-        {
-            get
-            {
-                var l = LeftMost.Token.SourcePart();
-                var r = RightMost.Token.SourcePart();
-                return l.Start.Span(r.End);
-            }
-        }
-
-        internal TResult Left => Context[FlatItem.Anchor.Left];
-        internal TResult Right => Context[FlatItem.Anchor.Right];
+        public SourcePart SourcePart => FlatItem.FrameItems.SourcePart;
 
         [DisableDump]
         internal TResult LeftMost => this.GetNodesFromLeftToRight().First();
@@ -67,8 +51,8 @@ namespace Reni.Helper
         internal TResult RightMost => this.GetNodesFromRightToLeft().First();
 
         [DisableDump]
-        internal IEnumerable<TResult> ParserLevelBelongingers
-            => this.CachedValue(GetParserLevelBelongings);
+        internal IEnumerable<int> ParserLevelGroup
+            => this.CachedValue(GetParserLevelGroup);
 
         int LeftDirectChildCount => FlatItem.LeftDirectChildCount;
         int DirectChildCount => FlatItem.DirectChildren.Length;
@@ -128,75 +112,19 @@ namespace Reni.Helper
 
         protected abstract TResult Create(Syntax syntax, int index);
 
-        protected override string GetNodeDump() => base.GetNodeDump() + $"({TokenClass.Id})";
-
-        TResult LocateByPositionForCache(int current)
+        (TResult, int) LocateByPositionForCache(int current, bool includingParent)
         {
-            var nodes = this
-                .GetNodesFromLeftToRight()
-                .ToArray();
-            var ranges = nodes
-                .Select(node => node.Token.Characters)
-                .ToArray();
-
-            if(current < nodes.Top(enableEmpty:false).Token.SourcePart().Position)
-                return null;
-
-            return nodes
-                .Top(node => node.Token.Characters.EndPosition > current);
+            NotImplementedMethod(current, includingParent);
+            return default;
         }
 
-        internal TResult Locate(SourcePart span)
+        internal(TResult Master, int Index) LocateByPosition(int offset, bool includingParent) 
+            => includingParent? Cache.LocateByPositionIncludingParent[offset] : Cache.LocateByPosition[offset];
+
+        IEnumerable<int> GetParserLevelGroup()
         {
-            var locateByPosition = LocateByPosition(span.Position);
-
-            var sourcePositions = locateByPosition
-                .Chain(node => node.Parent)
-                .Select(node => node.Token.Characters)
-                .ToArray();
-
-            return locateByPosition
-                .Chain(node => node.Parent)
-                .FirstOrDefault(node => span.Contains(node.Token.Characters));
-        }
-
-        internal TResult LocateByPosition(int offset) => Cache.LocateByPosition[offset];
-
-        IEnumerable<TResult> GetParserLevelBelongings()
-        {
-            if(!(TokenClass is IBelongingsMatcher matcher))
-                yield break;
-
-            switch(TokenClass)
-            {
-                case ILeftBracket _ when Parent.TokenClass is IRightBracket:
-                case IRightBracket _ when Parent.TokenClass is ILeftBracket:
-                    yield return Parent;
-                    yield break;
-                case ILeftBracket _ when Parent.RightMost.TokenClass is IRightBracket:
-                    yield return Parent.RightMost ;
-                    yield break;
-                case IRightBracket _ when Left != null && matcher.IsBelongingTo(Left.TokenClass):
-                    yield return Left;
-                    yield break;
-                case List _:
-                    break;
-                default:
-                    NotImplementedMethod();
-                    yield break;
-            }
-
-            (TokenClass is List).Assert();
-
-            var parents = Parent.Chain(node => node.Parent)
-                .Where(node => matcher.IsBelongingTo(node.TokenClass));
-
-            var children = Right
-                .Chain(node => node.Right)
-                .TakeWhile(node => matcher.IsBelongingTo(node.TokenClass));
-
-            foreach(var node in parents.Concat(children))
-                yield return node;
+            NotImplementedMethod();
+            return default;
         }
 
         TResult[] GetRightChildren()

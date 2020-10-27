@@ -31,10 +31,10 @@ namespace Reni.SyntaxTree
 
         CompoundSyntax
         (
-            IStatementSyntax[] statements, CleanupSyntax cleanupSection, BinaryTree anchor
+            IStatementSyntax[] statements, CleanupSyntax cleanupSection
             , FrameItemContainer frameItems
         )
-            : base(NextObjectId++, anchor, frameItems)
+            : base(NextObjectId++, frameItems)
         {
             Statements = statements;
             CleanupSection = cleanupSection;
@@ -44,7 +44,7 @@ namespace Reni.SyntaxTree
 
         [EnableDump]
         [EnableDumpExcept(null)]
-        string Position => Anchor?.Token.Characters.GetDumpAroundCurrent(5);
+        string Position => FrameItems.SourcePart.GetDumpAroundCurrent(5);
 
         [DisableDump]
         public IEnumerable<FunctionSyntax> ConverterFunctions
@@ -95,15 +95,14 @@ namespace Reni.SyntaxTree
 
 
         [DisableDump]
-        protected override int LeftDirectChildCountKernel => DirectChildCountKernel;
+        protected override int LeftDirectChildCountInternal => DirectChildCount;
 
         [DisableDump]
-        protected override int DirectChildCountKernel => Statements.Length + 1;
+        protected override int DirectChildCount => Statements.Length + 1;
 
         public static CompoundSyntax Create
         (
             IStatementSyntax[] statements,
-            BinaryTree anchor,
             CleanupSyntax cleanupSection = null,
             FrameItemContainer frameItems = null
         )
@@ -111,7 +110,6 @@ namespace Reni.SyntaxTree
             (
                 statements,
                 cleanupSection,
-                anchor,
                 frameItems
             );
 
@@ -129,7 +127,7 @@ namespace Reni.SyntaxTree
         protected override string GetNodeDump()
             => GetType().PrettyName() + "(" + GetCompoundIdentificationDump() + ")";
 
-        protected override Syntax GetDirectChildKernel(int index)
+        protected override Syntax GetDirectChild(int index)
         {
             if(index >= 0 && index < Statements.Length)
                 return (Syntax)Statements[index];
@@ -169,12 +167,12 @@ namespace Reni.SyntaxTree
             var newCleanupSection
                 = cleanupSection == null
                     ? CleanupSection
-                    : new CleanupSyntax(CleanupSection.Anchor, cleanupSection);
+                    : new CleanupSyntax(cleanupSection);
 
-            return Create(newStatements, Anchor, newCleanupSection, FrameItems);
+            return Create(newStatements, newCleanupSection, FrameItems);
         }
 
-        protected override Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree listTarget = null) => this;
+        internal override Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree listTarget = null) => this;
 
         internal Result Cleanup(ContextBase context, Category category)
         {
@@ -229,7 +227,7 @@ namespace Reni.SyntaxTree
         ValueSyntax Value { get; }
         DeclarerSyntax Declarer { get; }
         SourcePart SourcePart { get; }
-        ValueSyntax ToValueSyntax(BinaryTree anchor);
+        ValueSyntax ToValueSyntax();
         IStatementSyntax With(FrameItemContainer frameItems);
     }
 }

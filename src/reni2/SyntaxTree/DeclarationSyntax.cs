@@ -15,20 +15,19 @@ namespace Reni.SyntaxTree
         internal readonly ValueSyntax Value;
 
         DeclarationSyntax
-            (DeclarerSyntax declarer, BinaryTree anchor, ValueSyntax value, FrameItemContainer frameItems = null)
-            : base(anchor, frameItems: frameItems ?? FrameItemContainer.Create())
+            (DeclarerSyntax declarer, ValueSyntax value, FrameItemContainer frameItems = null)
+            : base(frameItems: frameItems ?? FrameItemContainer.Create())
         {
             Declarer = declarer;
             Value = value;
 
-            Anchor.AssertIsNotNull();
             Declarer.AssertIsNotNull();
             Value.AssertIsNotNull();
         }
 
         [EnableDump]
         [EnableDumpExcept(null)]
-        string Position => Anchor.Token.Characters.GetDumpAroundCurrent(5);
+        string Position => FrameItems.SourcePart.GetDumpAroundCurrent(5);
 
         [DisableDump]
         internal string NameOrNull => Declarer.Name?.Value;
@@ -40,18 +39,18 @@ namespace Reni.SyntaxTree
         internal bool IsMutableSyntax => Declarer.IsMutableSyntax;
 
         [DisableDump]
-        protected override int LeftDirectChildCountKernel => Declarer.DirectChildCount;
+        protected override int LeftDirectChildCountInternal => Declarer.DirectChildCount;
 
         [DisableDump]
-        protected override int DirectChildCountKernel => LeftDirectChildCount + 1;
+        protected override int DirectChildCount => LeftDirectChildCountInternal + 1;
 
         [DisableDump]
         DeclarerSyntax IStatementSyntax.Declarer => Declarer;
 
-        SourcePart IStatementSyntax.SourcePart => SourcePart;
+        SourcePart IStatementSyntax.SourcePart => FrameItems.SourcePart;
 
-        ValueSyntax IStatementSyntax.ToValueSyntax(BinaryTree anchor)
-            => CompoundSyntax.Create(T((IStatementSyntax)this), anchor);
+        ValueSyntax IStatementSyntax.ToValueSyntax()
+            => CompoundSyntax.Create(T((IStatementSyntax)this));
 
         [DisableDump]
         ValueSyntax IStatementSyntax.Value => Value;
@@ -59,23 +58,22 @@ namespace Reni.SyntaxTree
         IStatementSyntax IStatementSyntax.With(FrameItemContainer frameItems)
             => frameItems == null || !frameItems.Items.Any()
                 ? this
-                : Create(Declarer, Anchor, Value, frameItems.Combine(FrameItems));
+                : Create(Declarer, Value, frameItems.Combine(FrameItems));
 
-        protected override Syntax GetDirectChildKernel(int index)
+        protected override Syntax GetDirectChild(int index)
             => index switch
             {
-                { } when index < LeftDirectChildCount => Declarer.GetDirectChild(index)
-                , { } when index == LeftDirectChildCount => Value
+                { } when index < LeftDirectChildCountInternal => Declarer.GetDirectChild(index)
+                , { } when index == LeftDirectChildCountInternal => Value
                 , _ => null
             };
 
         internal static IStatementSyntax Create
-            (DeclarerSyntax declarer, BinaryTree anchor, ValueSyntax value, FrameItemContainer frameItems)
+            (DeclarerSyntax declarer, ValueSyntax value, FrameItemContainer frameItems)
             => new DeclarationSyntax
             (
                 declarer,
-                anchor,
-                value ?? new EmptyList(null, issue: IssueId.MissingDeclarationValue.Issue(anchor.Token.Characters)),
+                value ?? new EmptyList(null, issue: IssueId.MissingDeclarationValue.Issue(frameItems.SourcePart)),
                 frameItems
             );
     }

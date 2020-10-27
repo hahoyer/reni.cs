@@ -47,14 +47,6 @@ namespace ReniUI.Formatting
             return result;
         }
 
-        public static Helper.Syntax LocateAndFilter(this CompilerBrowser compiler, SourcePart targetPart)
-        {
-            if(targetPart == null)
-                return compiler.Syntax;
-            var result = compiler.Locate(targetPart);
-            return IsTooSmall(result.Token, targetPart)? null : result;
-        }
-
         public static bool IsTooSmall(this CompilerBrowser compiler, SourcePart targetPart)
         {
             if(targetPart == null)
@@ -63,7 +55,7 @@ namespace ReniUI.Formatting
             var start = compiler.LocatePosition(targetPart.Position);
             var end = compiler.LocatePosition(targetPart.EndPosition-1);
             if(start != null && end != null)
-                return start.Master == end.Master && IsTooSmall(start.Master.Token, targetPart);
+                return start.Master == end.Master && IsTooSmall(start.Token, targetPart);
 
             Dumpable.NotImplementedFunction(compiler, targetPart);
             return default;

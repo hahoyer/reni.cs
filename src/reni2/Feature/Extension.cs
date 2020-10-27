@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -113,7 +114,7 @@ namespace Reni.Feature
         (
             this IEvalImplementation feature,
             Category category,
-            ISyntax currentTarget,
+            SourcePart currentTarget,
             ContextBase context,
             ValueSyntax right)
         {
@@ -135,7 +136,7 @@ namespace Reni.Feature
 
                 return IssueId
                     .MissingRightExpression
-                    .IssueResult(category, currentTarget.All);
+                    .IssueResult(category, currentTarget);
             }
 
             if(valueResult == null)
@@ -187,7 +188,7 @@ namespace Reni.Feature
             this IImplementation feature,
             Category category,
             ResultCache left,
-            BinaryTree token,
+            SourcePart token,
             ContextBase context,
             ValueSyntax right)
         {

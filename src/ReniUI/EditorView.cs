@@ -203,7 +203,7 @@ namespace ReniUI
             while(TextBox.GetEndStyled() < position)
             {
                 var current = TextBox.GetEndStyled();
-                var token = Token.GetRightNeighbor(sourceSyntax, current);
+                var token = Classification.Syntax.GetRightNeighbor(sourceSyntax, current);
                 var style = TextStyle.From(token, Compiler);
                 TextBox.StartStyling(token.StartPosition);
                 TextBox.SetStyling(token.SourcePart.Length, style);

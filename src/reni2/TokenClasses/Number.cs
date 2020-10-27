@@ -1,6 +1,6 @@
-﻿using Reni.Basics;
+﻿using hw.Scanner;
+using Reni.Basics;
 using Reni.Context;
-using Reni.SyntaxTree;
 
 namespace Reni.TokenClasses
 {
@@ -8,7 +8,7 @@ namespace Reni.TokenClasses
     {
         public override string Id => "<number>";
 
-        protected override Result Result(ContextBase context, Category category, TerminalSyntax token)
+        protected override Result Result(ContextBase context, Category category, SourcePart token)
             => context.RootContext.BitType.Result(category, BitsConst.Convert(token.Id));
     }
 }

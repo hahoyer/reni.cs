@@ -16,11 +16,11 @@ namespace Reni.SyntaxFactory
         )
             => left == null
                 ? right == null
-                    ? (ValueSyntax)new TerminalSyntax((ITerminal)target.TokenClass, target, frameItems)
-                    : new PrefixSyntax((IPrefix)target.TokenClass, right, target, frameItems)
+                    ? (ValueSyntax)new TerminalSyntax((ITerminal)target.TokenClass, target.Token.Characters, frameItems)
+                    : new PrefixSyntax((IPrefix)target.TokenClass, right, target.Token.Characters, frameItems)
                 : right == null
-                    ? (ValueSyntax)new SuffixSyntax(left, (ISuffix)target.TokenClass, target, frameItems)
-                    : new InfixSyntax(left, (IInfix)target.TokenClass, right, target, frameItems);
+                    ? (ValueSyntax)new SuffixSyntax(left, (ISuffix)target.TokenClass, target.Token.Characters, frameItems)
+                    : new InfixSyntax(left, (IInfix)target.TokenClass, right, target.Token.Characters, frameItems);
 
         internal static IStatementSyntax[] With(this IStatementSyntax[] statements, FrameItemContainer frameItems)
         {

@@ -45,10 +45,7 @@ namespace ReniUI.Test
                 if(reformat != null)
                 {
                     var newCompiler = CompilerBrowser.FromText(reformat);
-                    Tracer.Assert(
-                        IsEqual(compiler.Syntax, newCompiler.Syntax
-                            , IgnoreWhiteSpaces),
-                        () => @$"origin: 
+                    Equals(compiler.Syntax, newCompiler.Syntax).Assert(() => @$"origin: 
 {compiler.Syntax.Dump()} 
 
 new ({span.NodeDump}): 
@@ -58,32 +55,6 @@ new ({span.NodeDump}):
                     );
                 }
             }
-        }
-
-        static bool IsEqual(Helper.Syntax target, Helper.Syntax other, IComparator differenceHandler)
-        {
-            if(target.TokenClass.Id != other.TokenClass.Id)
-                return false;
-
-            if(target.Left == null && other.Left != null)
-                return false;
-
-            if(target.Left != null && other.Left == null)
-                return false;
-
-            if(target.Right == null && other.Right != null)
-                return false;
-
-            if(target.Right != null && other.Right == null)
-                return false;
-
-            if(target.Left != null && !IsEqual(target.Left, other.Left, differenceHandler))
-                return false;
-
-            if(target.Right != null && !IsEqual(target.Right, other.Right, differenceHandler))
-                return false;
-
-            return CompareWhiteSpaces(target.Token.PrecededWith, other.Token.PrecededWith, differenceHandler);
         }
 
         static bool CompareWhiteSpaces

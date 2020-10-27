@@ -26,11 +26,10 @@ namespace Reni.SyntaxTree
             ValueSyntax setter,
             bool isImplicit,
             bool isMetaFunction,
-            ValueSyntax getter, BinaryTree anchor, FrameItemContainer frameItems
+            ValueSyntax getter, FrameItemContainer frameItems
         )
-            : base(anchor, frameItems)
+            : base(frameItems)
         {
-            anchor.AssertIsNotNull();
             Getter = getter;
             Setter = setter;
             IsImplicit = isImplicit;
@@ -47,12 +46,12 @@ namespace Reni.SyntaxTree
         internal override bool IsLambda => true;
 
         [DisableDump]
-        protected override int LeftDirectChildCountKernel => 1;
+        protected override int LeftDirectChildCountInternal => 1;
 
         [DisableDump]
-        protected override int DirectChildCountKernel => 2;
+        protected override int DirectChildCount => 2;
 
-        protected override Syntax GetDirectChildKernel(int index)
+        protected override Syntax GetDirectChild(int index)
             => index switch
             {
                 0 => Setter

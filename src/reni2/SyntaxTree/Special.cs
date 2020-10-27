@@ -13,11 +13,15 @@ namespace Reni.SyntaxTree
         [DisableDump]
         internal readonly ITerminal Terminal;
 
-        internal TerminalSyntax(ITerminal terminal, BinaryTree anchor, FrameItemContainer frameItems)
-            : base(anchor, frameItems)
+        readonly SourcePart Token;
+
+        internal TerminalSyntax(ITerminal terminal, SourcePart token, FrameItemContainer frameItems)
+            : base(frameItems)
         {
             Terminal = terminal;
+            Token = token;
             StopByObjectIds();
+            Token.AssertIsNotNull();
         }
 
         [EnableDump]
@@ -28,13 +32,10 @@ namespace Reni.SyntaxTree
         internal string Id => Token.Id;
 
         [DisableDump]
-        internal SourcePart Token => Anchor.Token.Characters;
-
-        [DisableDump]
         internal long ToNumber => BitsConst.Convert(Id).ToInt64();
 
         internal override Result ResultForCache(ContextBase context, Category category)
-            => Terminal.Result(context, category, this);
+            => Terminal.Result(context, category, Token);
 
         internal override ValueSyntax Visit(ISyntaxVisitor visitor) => Terminal.Visit(visitor);
     }
@@ -47,29 +48,32 @@ namespace Reni.SyntaxTree
         [Node]
         readonly ValueSyntax Right;
 
-        public PrefixSyntax(IPrefix prefix, ValueSyntax right, BinaryTree anchor, FrameItemContainer brackets)
-            : base(anchor, brackets)
+        readonly SourcePart Token;
+
+        public PrefixSyntax(IPrefix prefix, ValueSyntax right, SourcePart token, FrameItemContainer brackets)
+            : base(brackets)
         {
-            anchor.AssertIsNotNull();
             Prefix = prefix;
             Right = right;
+            Token = token;
+            Token.AssertIsNotNull();
         }
 
         [EnableDump]
         [EnableDumpExcept(null)]
-        string Position => Anchor?.Token.Characters.GetDumpAroundCurrent(5);
+        string Position => Token.GetDumpAroundCurrent(5);
 
-        protected override int LeftDirectChildCountKernel => 0;
-        protected override int DirectChildCountKernel => 1;
+        protected override int LeftDirectChildCountInternal => 0;
+        protected override int DirectChildCount => 1;
 
-        protected override Syntax GetDirectChildKernel(int index) => index == 0? Right : null;
+        protected override Syntax GetDirectChild(int index) => index == 0? Right : null;
 
         public static Result<ValueSyntax> Create
-            (IPrefix prefix, Result<ValueSyntax> right, BinaryTree binaryTree, FrameItemContainer brackets)
-            => new PrefixSyntax(prefix, right.Target, binaryTree, brackets).AddIssues<ValueSyntax>(right.Issues);
+            (IPrefix prefix, Result<ValueSyntax> right, SourcePart token, FrameItemContainer brackets)
+            => new PrefixSyntax(prefix, right.Target, token, brackets).AddIssues<ValueSyntax>(right.Issues);
 
-        internal override Result ResultForCache(ContextBase context, Category category) => Prefix
-            .Result(context, category, Right, Anchor);
+        internal override Result ResultForCache(ContextBase context, Category category) 
+            => Prefix.Result(context, category, Right, Token);
     }
 
     sealed class InfixSyntax : ValueSyntax
@@ -83,26 +87,29 @@ namespace Reni.SyntaxTree
         [Node]
         readonly ValueSyntax Right;
 
-        public InfixSyntax(ValueSyntax left, IInfix infix, ValueSyntax right, BinaryTree anchor, FrameItemContainer brackets)
-            : base(anchor, brackets)
+        readonly SourcePart Token;
+
+        public InfixSyntax(ValueSyntax left, IInfix infix, ValueSyntax right, SourcePart token, FrameItemContainer brackets)
+            : base(brackets)
         {
-            anchor.AssertIsNotNull();
             Left = left;
             Infix = infix;
             Right = right;
+            Token = token;
+            Token.AssertIsNotNull();
             StopByObjectIds();
         }
 
         [EnableDump]
         [EnableDumpExcept(null)]
-        string Position => Anchor?.Token.Characters.GetDumpAroundCurrent(5);
+        string Position => Token.GetDumpAroundCurrent(5);
 
         internal override IRecursionHandler RecursionHandler => Infix as IRecursionHandler;
 
-        protected override int LeftDirectChildCountKernel => 1;
-        protected override int DirectChildCountKernel => 2;
+        protected override int LeftDirectChildCountInternal => 1;
+        protected override int DirectChildCount => 2;
 
-        protected override Syntax GetDirectChildKernel(int index)
+        protected override Syntax GetDirectChild(int index)
             => index switch
             {
                 0 => Left, 1 => Right, _ => null
@@ -110,7 +117,7 @@ namespace Reni.SyntaxTree
 
         public static Result<ValueSyntax> Create
         (
-            Result<ValueSyntax> left, IInfix infix, Result<ValueSyntax> right, BinaryTree binaryTree
+            Result<ValueSyntax> left, IInfix infix, Result<ValueSyntax> right, SourcePart binaryTree
             , FrameItemContainer brackets
         )
         {
@@ -135,25 +142,28 @@ namespace Reni.SyntaxTree
         [Node]
         readonly ISuffix Suffix;
 
-        internal SuffixSyntax(ValueSyntax left, ISuffix suffix, BinaryTree anchor, FrameItemContainer brackets)
-            : base(anchor, brackets)
+        readonly SourcePart Token;
+
+        internal SuffixSyntax(ValueSyntax left, ISuffix suffix, SourcePart token, FrameItemContainer brackets)
+            : base(brackets)
         {
-            anchor.AssertIsNotNull();
             Left = left;
             Suffix = suffix;
+            Token = token;
+            Token.AssertIsNotNull();
         }
 
         [EnableDump]
         [EnableDumpExcept(null)]
-        string Position => Anchor?.Token.Characters.GetDumpAroundCurrent(5);
+        string Position => Token.GetDumpAroundCurrent(5);
 
-        protected override int LeftDirectChildCountKernel => 1;
-        protected override int DirectChildCountKernel => 1;
+        protected override int LeftDirectChildCountInternal => 1;
+        protected override int DirectChildCount => 1;
 
-        protected override Syntax GetDirectChildKernel(int index) => index == 0? Left : null;
+        protected override Syntax GetDirectChild(int index) => index == 0? Left : null;
 
         public static Result<ValueSyntax> Create
-            (Result<ValueSyntax> left, ISuffix suffix, BinaryTree binaryTree, FrameItemContainer brackets)
+            (Result<ValueSyntax> left, ISuffix suffix, SourcePart binaryTree, FrameItemContainer brackets)
         {
             ValueSyntax syntax = new SuffixSyntax(left.Target, suffix, binaryTree, brackets);
             return syntax.AddIssues(left.Issues);
@@ -165,13 +175,13 @@ namespace Reni.SyntaxTree
 
     interface ITerminal
     {
-        Result Result(ContextBase context, Category category, TerminalSyntax token);
+        Result Result(ContextBase context, Category category, SourcePart token);
         ValueSyntax Visit(ISyntaxVisitor visitor);
     }
 
     interface IPrefix
     {
-        Result Result(ContextBase context, Category category, ValueSyntax right, BinaryTree token);
+        Result Result(ContextBase context, Category category, ValueSyntax right, SourcePart token);
     }
 
     interface IInfix

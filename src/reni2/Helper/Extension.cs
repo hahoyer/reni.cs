@@ -10,7 +10,7 @@ namespace Reni.Helper
     static class Extension
     {
         internal static IEnumerable<TTarget> GetNodesFromTopToBottom<TTarget>
-            (this ITree<TTarget> target, Func<TTarget, bool> predicate)
+            (this ITree<TTarget> target, Func<TTarget, bool> predicate= null)
             where TTarget : ITree<TTarget>
         {
             if(target == null)
@@ -20,7 +20,7 @@ namespace Reni.Helper
             while(index < target.DirectChildCount)
             {
                 var node = target.GetDirectChild(index);
-                if(predicate(node))
+                if(predicate == null || predicate(node))
                     yield return node;
                 else if(node != null)
                     foreach(var result in node.GetNodesFromTopToBottom(predicate))

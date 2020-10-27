@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Feature;
@@ -67,9 +68,6 @@ namespace Reni.Context
 
             [EnableDump]
             int SyntaxObjectId => Syntax.ObjectId;
-
-            [EnableDump]
-            string SyntaxText => Syntax.Anchor.SourcePart.Id;
         }
 
         internal sealed class Cache : DumpableObject, IIconKeyProvider
@@ -261,8 +259,7 @@ namespace Reni.Context
         /// <param name="right"> the expression of the argument of the call. Must not be null </param>
         /// <param name="token"></param>
         /// <returns> </returns>
-        internal Result FunctionalArgResult
-            (Category category, ValueSyntax right, BinaryTree token)
+        internal Result FunctionalArgResult(Category category, ValueSyntax right, SourcePart token)
         {
             var argsType = FindRecentFunctionContextObject.ArgsType;
             return argsType
@@ -298,13 +295,13 @@ namespace Reni.Context
         }
 
         internal Result PrefixResult
-            (Category category, Definable definable, BinaryTree source, ValueSyntax right)
+            (Category category, Definable definable, SourcePart source, ValueSyntax right)
         {
             var searchResult = Declaration(definable);
             if(searchResult == null)
                 return IssueId
                     .MissingDeclarationInContext
-                    .IssueResult(category, source.Token.Characters, "Context: " + RootContext.Format);
+                    .IssueResult(category, source, "Context: " + RootContext.Format);
 
             var result = searchResult.Result(category, CacheObject.AsObject, source, this, right);
 

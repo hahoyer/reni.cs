@@ -15,14 +15,16 @@ namespace ReniUI.Test
             var compiler = CompilerBrowser.FromText(text);
             var thenToken = compiler.LocatePosition(text.IndexOf("then"));
             var elseToken = compiler.LocatePosition(text.IndexOf("else"));
-            (elseToken.Master.Left == thenToken.Master)
+            (elseToken.Master == thenToken.Master)
                 .Assert
                 (
                     () =>
-                        "elseToken.Master.Left = " +
-                        $"{elseToken.Master.Left.FlatItem.Anchor.d}\n\n" +
-                        $"thenToken.Master = {thenToken.Master.FlatItem.Anchor.d}"
+                        "elseToken.Master= " +
+                        $"{elseToken.Master.FlatItem.FrameItems.SourcePart.d}\n\n" +
+                        $"thenToken.Master = {thenToken.Master.FlatItem.FrameItems.SourcePart.d}"
                 );
+            (elseToken.Index == 2).Assert();
+            (thenToken.Index == 1).Assert();
         }
 
         [UnitTest]
@@ -32,7 +34,9 @@ namespace ReniUI.Test
             var compiler = CompilerBrowser.FromText(text);
             var thenToken = compiler.LocatePosition(text.IndexOf("then"));
             var elseToken = compiler.LocatePosition(text.IndexOf("else"));
-            (elseToken.Master.Left == thenToken.Master).Assert();
+            (elseToken.Master == thenToken.Master).Assert();
+            (elseToken.Index == 2).Assert();
+            (thenToken.Index == 1).Assert();
         }
     }
 }

@@ -1,26 +1,24 @@
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
-using ReniUI.Helper;
+using Reni.TokenClasses;
 
 namespace ReniUI.Classification
 {
-    public abstract class Token : DumpableObject
+    public abstract class Syntax : DumpableObject
     {
         public sealed class Trimmed : DumpableObject
         {
             public readonly SourcePart SourcePart;
-            public readonly Token Token;
+            public readonly Syntax Syntax;
 
-            internal Trimmed(Token token, SourcePart sourcePart)
+            internal Trimmed(Syntax syntax, SourcePart sourcePart)
             {
-                Token = token;
-                SourcePart = sourcePart.Intersect(Token.SourcePart)
-                             ?? Token.SourcePart.Start.Span(0);
+                Syntax = syntax;
+                SourcePart = sourcePart.Intersect(Syntax.SourcePart) ?? Syntax.SourcePart.Start.Span(0);
             }
 
             public IEnumerable<char> GetCharArray()
@@ -29,8 +27,22 @@ namespace ReniUI.Classification
                     .ToCharArray();
         }
 
+        internal readonly int Index;
+        internal readonly Helper.Syntax Master;
+
+
+        protected Syntax(Helper.Syntax master, int index)
+        {
+            Master = master;
+            Index = index;
+        }
+
+        BinaryTree Binary => Master.FlatItem.FrameItems.Items[Index];
+        internal TokenClass TokenClass => Binary.TokenClass as TokenClass;
+        internal IToken Token => Binary.Token;
+
         [DisableDump]
-        public abstract SourcePart SourcePart { get; }
+        public virtual SourcePart SourcePart => Binary.Token.Characters;
 
         [DisableDump]
         public virtual bool IsKeyword => false;
@@ -98,11 +110,13 @@ namespace ReniUI.Classification
 
         public int StartPosition => SourcePart.Position;
         public int EndPosition => SourcePart.EndPosition;
-        internal abstract Syntax Master { get; }
+
+        [DisableDump]
+        public abstract IEnumerable<SourcePart> ParserLevelGroup { get; }
 
         public Trimmed TrimLine(SourcePart span) => new Trimmed(this, span);
 
-        bool Equals(Token other) => SourcePart == other.SourcePart;
+        bool Equals(Syntax other) => SourcePart == other.SourcePart;
 
         public override bool Equals(object obj)
         {
@@ -112,44 +126,30 @@ namespace ReniUI.Classification
                 return true;
             if(obj.GetType() != GetType())
                 return false;
-            return Equals((Token)obj);
+            return Equals((Syntax)obj);
         }
 
         public override int GetHashCode() => SourcePart.GetHashCode();
 
-        [DisableDump]
-        public abstract IEnumerable<SourcePart> ParserLevelBelongings { get; }
-
-        internal static Token LocateByPosition(Syntax target, int offset)
+        internal static Syntax LocateByPosition(Helper.Syntax target, int offset, bool includingParent = false)
         {
-            var result = target.LocateByPosition(offset);
+            var result = target.LocateByPosition(offset, includingParent );
             result.AssertIsNotNull();
-            var resultToken = result.Token;
+            var resultToken = result.Item1.FlatItem.FrameItems.Items[result.Item2].Token;
             if(offset < resultToken.Characters.Position)
-                return new WhiteSpaceToken
+                return new WhiteSpaceSyntax
                 (
                     resultToken.PrecededWith.Last(item => offset >= item.SourcePart.Position),
-                    result
+                    result.Master, result.Index
                 );
 
-            return new SyntaxToken(result);
+            return new SyntaxToken(result.Master, result.Index);
         }
 
-        internal static Token GetRightNeighbor(Syntax target, int offset)
+        public static Syntax GetRightNeighbor(Helper.Syntax target, int current)
         {
-            var result = target
-                .Chain(node => node.RightNeighbor)
-                .First(node => node.Token.Characters.EndPosition > offset);
-
-            var resultToken = result.Token;
-            if(offset < resultToken.Characters.Position)
-                return new WhiteSpaceToken
-                (
-                    resultToken.PrecededWith.Last(item => offset >= item.SourcePart.Position),
-                    result
-                );
-
-            return new SyntaxToken(result);
+            NotImplementedFunction(target, current);
+            return default;
         }
     }
 }

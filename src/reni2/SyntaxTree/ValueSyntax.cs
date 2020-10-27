@@ -22,18 +22,17 @@ namespace Reni.SyntaxTree
     {
         internal new abstract class NoChildren : ValueSyntax
         {
-            protected NoChildren(BinaryTree anchor, FrameItemContainer frameItems, Issue issue = null)
-                : base(anchor, frameItems, issue)
-                => anchor.AssertIsNotNull();
+            protected NoChildren(FrameItemContainer frameItems, Issue issue = null)
+                : base(frameItems, issue){}
 
             [DisableDump]
-            protected sealed override int LeftDirectChildCountKernel => 0;
+            protected sealed override int LeftDirectChildCountInternal => 0;
 
             [DisableDump]
-            protected sealed override int DirectChildCountKernel => 0;
+            protected sealed override int DirectChildCount => 0;
 
-            protected sealed override Syntax GetDirectChildKernel(int index)
-                => throw new Exception($"Unexpected call: {nameof(GetDirectChildKernel)}({index})");
+            protected sealed override Syntax GetDirectChild(int index)
+                => throw new Exception($"Unexpected call: {nameof(GetDirectChild)}({index})");
         }
 
         // Used for debug only
@@ -42,11 +41,11 @@ namespace Reni.SyntaxTree
         internal readonly FunctionCache<ContextBase, ResultCache> ResultCache =
             new FunctionCache<ContextBase, ResultCache>();
 
-        protected ValueSyntax(BinaryTree anchor, FrameItemContainer frameItems = null, Issue issue = null)
-            : base(anchor, issue, frameItems) { }
+        protected ValueSyntax(FrameItemContainer frameItems = null, Issue issue = null)
+            : base(issue, frameItems) { }
 
-        protected ValueSyntax(int objectId, BinaryTree anchor, FrameItemContainer frameItems = null, Issue issue = null)
-            : base(objectId, anchor, issue, frameItems) { }
+        protected ValueSyntax(int objectId, FrameItemContainer frameItems = null, Issue issue = null)
+            : base(objectId, issue, frameItems) { }
 
         [DisableDump]
         internal virtual bool IsLambda => false;
@@ -62,9 +61,9 @@ namespace Reni.SyntaxTree
 
         DeclarerSyntax IStatementSyntax.Declarer => null;
 
-        SourcePart IStatementSyntax.SourcePart => SourcePart;
+        SourcePart IStatementSyntax.SourcePart => FrameItems.SourcePart;
 
-        ValueSyntax IStatementSyntax.ToValueSyntax(BinaryTree anchor) => this;
+        ValueSyntax IStatementSyntax.ToValueSyntax() => this;
 
         ValueSyntax IStatementSyntax.Value => this;
 

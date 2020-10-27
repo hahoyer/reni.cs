@@ -33,7 +33,7 @@ namespace Reni.SyntaxFactory
             }
 
             return DeclarationSyntax
-                .Create(result, target, factory.GetValueSyntax(target.Right), frameItems);
+                .Create(result, factory.GetValueSyntax(target.Right), frameItems);
         }
     }
 }

@@ -7,7 +7,7 @@ using Reni.TokenClasses;
 
 namespace Reni.Helper
 {
-    sealed class PositionDictionary<TResult> : DumpableObject
+    public sealed class PositionDictionary<TResult> : DumpableObject
         where TResult : ITree<TResult>
     {
         readonly Dictionary<SourcePart, TResult> Value = new Dictionary<SourcePart, TResult>();

@@ -1,11 +1,11 @@
-using System.Configuration;
+using System.Linq;
 using hw.DebugFormatter;
+using hw.Scanner;
 using Reni.Helper;
-using Reni.TokenClasses;
 
 namespace ReniUI.Helper
 {
-    sealed class Syntax : SyntaxView<Syntax>
+    public sealed class Syntax : SyntaxView<Syntax>
     {
         internal Syntax
         (
@@ -14,14 +14,23 @@ namespace ReniUI.Helper
             int index = 0,
             Syntax parent = null
         )
-            : base(flatItem, parent, context, index)
-        {
-        }
+            : base(flatItem, parent, context, index) { }
 
         [EnableDump]
         new Reni.SyntaxTree.Syntax FlatItem => base.FlatItem;
 
+        [EnableDump]
+        [EnableDumpExcept(null)]
+        string ParentToken => Parent?.SourcePart.GetDumpAroundCurrent(5);
+
+        [EnableDump(Order = 10)]
+        string[] Children => FlatItem
+            .Children
+            .Select(node=> node?.FrameItems.SourcePart.GetDumpAroundCurrent(5))
+            .ToArray();
+
         protected override Syntax Create(Reni.SyntaxTree.Syntax flatItem, int index)
             => new Syntax(flatItem, Context, index, this);
+
     }
 }

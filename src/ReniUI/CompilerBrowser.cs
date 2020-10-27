@@ -59,10 +59,10 @@ namespace ReniUI
         public static CompilerBrowser FromFile(string fileName, CompilerParameters parameters = null)
             => new CompilerBrowser(() => Compiler.FromFile(fileName, parameters));
 
-        public Token LocatePosition(int offset)
-            => Token.LocateByPosition(Syntax, offset);
+        public Classification.Syntax LocatePosition(int offset)
+            => Classification.Syntax.LocateByPosition(Syntax, offset);
 
-        public Token LocatePosition(SourcePosition current)
+        public Classification.Syntax LocatePosition(SourcePosition current)
         {
             (current.Source == Source).Assert();
             return LocatePosition(current.Position);
@@ -88,17 +88,6 @@ namespace ReniUI
             .GetEditPieces(this, targetPart)
             .Combine(Syntax.SourcePart);
 
-        internal Helper.Syntax Locate(SourcePart span)
-        {
-            var result = Syntax.Locate(span);
-            if(result != null)
-                return result;
-
-            Tracer.TraceBreak();
-            NotImplementedMethod(span);
-            return null;
-        }
-
         internal void Ensure() => Compiler.Execute();
 
         internal void Execute(DataStack dataStack) => Compiler.ExecuteFromCode(dataStack);
@@ -113,7 +102,7 @@ namespace ReniUI
             {
                 var compilerSyntax = Compiler.Syntax;
                 compilerSyntax.Dump().FlaggedLine();
-                compilerSyntax.Anchor.Dump().FlaggedLine();
+                compilerSyntax.FrameItems.Dump().FlaggedLine();
 
                 var syntax = new Helper.Syntax(compilerSyntax, PositionDictionary);
 
@@ -129,15 +118,22 @@ namespace ReniUI
             }
         }
 
-        Helper.Syntax LocateValueByPosition(int offset)
+        internal Classification.Syntax LocateIncludingParent(SourcePart span)
         {
-            var token = Token.LocateByPosition(Syntax, offset);
+            NotImplementedMethod(span);
+            return default;
+        }
+
+        Classification.Syntax LocateValueByPosition(int offset, bool includingParent)
+        {
+            var token = Classification.Syntax.LocateByPosition(Syntax, offset);
             if(token.IsComment || token.IsLineComment)
                 return null;
 
-            var tokenSyntax = token.Master;
-            var position = tokenSyntax.Token.Characters.Position;
-            return position <= 0? null : tokenSyntax.LocateByPosition(position - 1);
+            var position = token.Token.Characters.Position;
+            var result = position <= 0? default: token.Master.LocateByPosition(position - 1,includingParent);
+            NotImplementedMethod(offset);
+            return default;
         }
 
         internal string[] DeclarationOptions(int offset)

@@ -2,7 +2,6 @@ using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using Reni;
 using Reni.Helper;
 using Reni.Parser;
 using Reni.TokenClasses;
@@ -33,16 +32,13 @@ namespace ReniUI.Formatting
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal SplitMaster SplitMaster => Cache.SplitMaster.Value;
 
-        [EnableDump]
-        new ITokenClass TokenClass => base.TokenClass;
-
         [DisableDump]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal IndentDirection IndentDirection => SplitItem?.Indent ?? IndentDirection.NoIndent;
 
-        [DisableDump]
-        internal bool IsSeparatorRequired
-            => !WhiteSpaces.HasComment() && SeparatorExtension.Get(LeftNeighbor?.TokenClass, TokenClass);
+        static bool GetIsSeparatorRequired(BinaryTree leftNeighbor, BinaryTree current)
+            => !current.Token.PrecededWith.HasComment() &&
+               SeparatorExtension.Get(leftNeighbor?.TokenClass, current.TokenClass);
 
         protected override Syntax Create(Reni.SyntaxTree.Syntax flatItem, int index)
             => new Syntax(flatItem, Context, index, this);
@@ -131,7 +127,7 @@ namespace ReniUI.Formatting
             if(tokenString == null)
                 return null;
 
-            tokenString = (IsSeparatorRequired? " " : "") + tokenString;
+            tokenString = (GetIsSeparatorRequired()? " " : "") + tokenString;
 
             var leftResult = FlatSubFormat<TContainer, TValue>(Left, areEmptyLinesPossible);
             if(leftResult == null)

@@ -3,7 +3,6 @@ using hw.Helper;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Parser;
-using Reni.SyntaxTree;
 using Reni.TokenClasses;
 
 namespace Reni.Validation
@@ -37,12 +36,6 @@ namespace Reni.Validation
 
         internal Result IssueResult(Category category, SourcePart position, string message = null)
             => new Result(category, Issue(position, message));
-
-        internal Result<ValueSyntax> Value(BinaryTree binaryTree)
-            => new Result<ValueSyntax>(new EmptyList(binaryTree), Issue(binaryTree.SourcePart));
-
-        internal Result<ValueSyntax> Value(ValueSyntax syntax)
-            => new Result<ValueSyntax>(syntax, Issue(syntax.Anchor.SourcePart));
 
         internal Result<BinaryTree> Syntax(BinaryTree binaryTree)
             => new Result<BinaryTree>(binaryTree, Issue(binaryTree.SourcePart));

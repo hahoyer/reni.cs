@@ -8,14 +8,10 @@ using ReniUI.Helper;
 
 namespace ReniUI.Classification
 {
-    sealed class SyntaxToken : Token
+    sealed class SyntaxToken : Syntax
     {
-        internal override Syntax Master { get; }
-        internal SyntaxToken(Syntax master) => Master = master;
-
-        TokenClass TokenClass => Master.TokenClass as TokenClass;
-
-        public override SourcePart SourcePart => Master.Token.Characters;
+        internal SyntaxToken(Helper.Syntax master, int index)
+            : base(master, index) { }
 
         [EnableDumpExcept(false)]
         public override bool IsKeyword => !IsIdentifier && !IsNumber && !IsText && !IsBrace;
@@ -59,10 +55,10 @@ namespace ReniUI.Classification
         }
 
         [DisableDump]
-        public override string State => Master.Token.Characters.Id ?? "";
+        public override string State => Token.Characters.Id ?? "";
 
         [DisableDump]
-        public override IEnumerable<SourcePart> ParserLevelBelongings
-            => Master.ParserLevelBelongingers?.Select(item => item.Token.Characters);
+        public override IEnumerable<SourcePart> ParserLevelGroup
+            => Master.ParserLevelGroup?.Select(index => Master.FlatItem.FrameItems.Items[index].Token.Characters);
     }
 }

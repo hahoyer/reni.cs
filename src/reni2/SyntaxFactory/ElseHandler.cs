@@ -12,7 +12,6 @@ namespace Reni.SyntaxFactory
                 factory.GetValueSyntax(target.Left?.Left)
                 , factory.GetValueSyntax(target.Left?.Right)
                 , factory.GetValueSyntax(target.Right)
-                , target
                 , frameItems
             );
     }

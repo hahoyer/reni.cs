@@ -21,16 +21,9 @@ namespace ReniUI.Formatting
                     var s = Target;
                     var ss = s.LeftMost;
 
-                    Target.Left.AssertIsNotNull();
-                    Target.Left.Left.AssertIsNull();
-                    (Target.Left.TokenClass is BeginOfText).Assert();
-                    Target.Left.Right.AssertIsNotNull();
-                    (Target.TokenClass is EndOfText).Assert();
-                    Target.Right.AssertIsNull();
-
                     return T
                     (
-                        CreateChild(Target.Left.Right).Edits,
+                        CreateChild(Target).Edits,
                         GetWhiteSpacesEdits(Target)
                     );
                 }

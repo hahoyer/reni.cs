@@ -126,7 +126,6 @@
     <Compile Include="Feature\Simple.cs" />
     <Compile Include="Helper\Extension.cs" />
     <Compile Include="Helper\ITree.cs" />
-    <Compile Include="Helper\BinaryTreeSyntaxWithParent.cs" />
     <Compile Include="Helper\SyntaxView.cs" />
     <Compile Include="Helper\PositionDictionary.cs" />
     <Compile Include="Helper\TreeWithParent.cs" />
@@ -354,7 +353,6 @@
     <Compile Include="TokenClasses\CompareOperation.cs" />
     <Compile Include="SyntaxTree\DeclarationSyntax.cs" />
     <Compile Include="SyntaxFactory\IDeclarerToken.cs" />
-    <Compile Include="SyntaxTree\StatementSyntax.cs" />
     <Compile Include="SyntaxTree\DeclarerSyntax.cs" />
     <Compile Include="TokenClasses\EndOfText.cs" />
     <Compile Include="TokenClasses\ErrorToken.cs" />
@@ -467,8 +465,8 @@
     <Reference Include="JetBrains.Annotations, Version=2020.1.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <HintPath>..\..\bin\Packages\JetBrains.Annotations.2020.1.0\lib\net20\JetBrains.Annotations.dll</HintPath>
     </Reference>
-    <Reference Include="log4net, Version=2.0.11.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\..\bin\Packages\log4net.2.0.11\lib\net45\log4net.dll</HintPath>
+    <Reference Include="log4net, Version=2.0.12.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\..\bin\Packages\log4net.2.0.12\lib\net45\log4net.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework, Version=3.12.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>..\..\bin\Packages\NUnit.3.12.0\lib\net45\nunit.framework.dll</HintPath>

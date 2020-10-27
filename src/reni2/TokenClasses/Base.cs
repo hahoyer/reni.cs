@@ -1,4 +1,5 @@
-﻿using Reni.Basics;
+﻿using hw.Scanner;
+using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
 using Reni.SyntaxFactory;
@@ -18,11 +19,11 @@ namespace Reni.TokenClasses
 
     abstract class TerminalSyntaxToken : TerminalToken, ITerminal, IValueToken
     {
-        Result ITerminal.Result(ContextBase context, Category category, TerminalSyntax token)
+        Result ITerminal.Result(ContextBase context, Category category, SourcePart token)
             => Result(context, category, token);
 
         protected abstract Result Result
-            (ContextBase context, Category category, TerminalSyntax token);
+            (ContextBase context, Category category, SourcePart token);
 
         ValueSyntax ITerminal.Visit(ISyntaxVisitor visitor) => Visit(visitor);
 
@@ -43,7 +44,7 @@ namespace Reni.TokenClasses
             => Result(context, category, left, right);
 
         Result IPrefix.Result
-            (ContextBase context, Category category, ValueSyntax right, BinaryTree token)
+            (ContextBase context, Category category, ValueSyntax right, SourcePart token)
             => Result(context, category, right);
 
         protected abstract Result Result
@@ -57,18 +58,18 @@ namespace Reni.TokenClasses
 
     abstract class NonSuffixSyntaxToken : NonSuffixToken, ITerminal, IPrefix, IValueToken
     {
-        Result ITerminal.Result(ContextBase context, Category category, TerminalSyntax token)
+        Result ITerminal.Result(ContextBase context, Category category, SourcePart token)
             => Result(context, category);
 
         protected abstract Result Result
             (ContextBase context, Category category);
 
         Result IPrefix.Result
-            (ContextBase context, Category category, ValueSyntax right, BinaryTree token)
+            (ContextBase context, Category category, ValueSyntax right, SourcePart token)
             => Result(context, category, right, token);
 
         protected abstract Result Result
-            (ContextBase callContext, Category category, ValueSyntax right, BinaryTree token);
+            (ContextBase callContext, Category category, ValueSyntax right, SourcePart token);
 
         ValueSyntax ITerminal.Visit(ISyntaxVisitor visitor) => Visit(visitor);
 

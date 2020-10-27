@@ -2,7 +2,6 @@ using hw.DebugFormatter;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
-using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.SyntaxTree
@@ -22,21 +21,17 @@ namespace Reni.SyntaxTree
         readonly ValueSyntax Then;
 
         internal CondSyntax
-        (
-            ValueSyntax condSyntax, ValueSyntax thenSyntax, ValueSyntax elseSyntax, BinaryTree anchor
-            , FrameItemContainer frameItems
-        )
-            : base(anchor, frameItems)
+            (ValueSyntax condSyntax, ValueSyntax thenSyntax, ValueSyntax elseSyntax, FrameItemContainer frameItems)
+            : base(frameItems)
         {
-            anchor.AssertIsNotNull();
             Cond = condSyntax;
             Then = thenSyntax;
             Else = elseSyntax;
         }
 
-        protected override int LeftDirectChildCountKernel => Else == null? 1 : 2;
+        protected override int LeftDirectChildCountInternal => Else == null? 1 : 2;
 
-        protected override int DirectChildCountKernel => 3;
+        protected override int DirectChildCount => 3;
 
         internal override IRecursionHandler RecursionHandler => this;
 
@@ -58,7 +53,7 @@ namespace Reni.SyntaxTree
             return null;
         }
 
-        protected override Syntax GetDirectChildKernel(int index)
+        protected override Syntax GetDirectChild(int index)
             => index switch
             {
                 0 => Cond, 1 => Then, 2 => Else, _ => null
