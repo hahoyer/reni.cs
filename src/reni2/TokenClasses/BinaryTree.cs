@@ -19,24 +19,25 @@ namespace Reni.TokenClasses
             internal BinaryTree Center;
             internal BinaryTree Left;
             internal BinaryTree Right;
-                       
+
             [DisableDump]
-            internal FrameItemContainer ToFrameItems => FrameItemContainer.Create(Left,Right);
+            internal FrameItemContainer ToFrameItems => FrameItemContainer.Create(Left, Right);
         }
 
         static int NextObjectId;
 
-        [EnableDump]
+        [EnableDump(Order = 1)]
         [EnableDumpExcept(null)]
         internal BinaryTree Left { get; }
 
-        [EnableDump]
+        [EnableDump(Order = 3)]
         [EnableDumpExcept(null)]
         internal BinaryTree Right { get; }
 
         [DisableDump]
         internal readonly IToken Token;
 
+        [EnableDump(Order = 2)]
         internal ITokenClass TokenClass { get; }
 
         BinaryTree
@@ -81,8 +82,7 @@ namespace Reni.TokenClasses
             }
         }
 
-        [EnableDump]
-        [EnableDumpExcept(null)]
+        [DisableDump]
         internal BracketNodes BracketKernel
         {
             get

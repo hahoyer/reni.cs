@@ -24,8 +24,10 @@ namespace Reni.SyntaxTree
         [EnableDumpExcept(null)]
         string Position => Token.GetDumpAroundCurrent(5);
 
+        [DisableDump]
         internal string Id => Token.Id;
 
+        [DisableDump]
         internal SourcePart Token => Anchor.Token.Characters;
 
         [DisableDump]

@@ -139,9 +139,11 @@ namespace Reni.Helper
                 .Select(node => node.Token.Characters)
                 .ToArray();
 
+            if(current < nodes.Top(enableEmpty:false).Token.SourcePart().Position)
+                return null;
+
             return nodes
-                .Top(node => node.Token.Characters.EndPosition > current)
-                .AssertNotNull();
+                .Top(node => node.Token.Characters.EndPosition > current);
         }
 
         internal TResult Locate(SourcePart span)
@@ -170,6 +172,9 @@ namespace Reni.Helper
                 case ILeftBracket _ when Parent.TokenClass is IRightBracket:
                 case IRightBracket _ when Parent.TokenClass is ILeftBracket:
                     yield return Parent;
+                    yield break;
+                case ILeftBracket _ when Parent.RightMost.TokenClass is IRightBracket:
+                    yield return Parent.RightMost ;
                     yield break;
                 case IRightBracket _ when Left != null && matcher.IsBelongingTo(Left.TokenClass):
                     yield return Left;

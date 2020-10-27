@@ -113,10 +113,13 @@ namespace ReniUI
             {
                 var compilerSyntax = Compiler.Syntax;
                 compilerSyntax.Dump().FlaggedLine();
+                compilerSyntax.Anchor.Dump().FlaggedLine();
 
                 var syntax = new Helper.Syntax(compilerSyntax, PositionDictionary);
+
                 var all = syntax.GetNodesFromLeftToRight().ToArray();
                 PositionDictionary.AssertValid(Compiler.BinaryTree);
+                syntax.Dump().FlaggedLine();
                 return syntax;
             }
             catch(Exception e)

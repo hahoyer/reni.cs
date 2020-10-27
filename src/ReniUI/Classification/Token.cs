@@ -123,7 +123,7 @@ namespace ReniUI.Classification
         internal static Token LocateByPosition(Syntax target, int offset)
         {
             var result = target.LocateByPosition(offset);
-            Tracer.Assert(result != null);
+            result.AssertIsNotNull();
             var resultToken = result.Token;
             if(offset < resultToken.Characters.Position)
                 return new WhiteSpaceToken

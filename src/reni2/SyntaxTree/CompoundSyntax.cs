@@ -23,10 +23,10 @@ namespace Reni.SyntaxTree
         static bool IsInsideFileDump;
         static int NextObjectId;
 
-        [EnableDump]
+        [EnableDump(Order = 2)]
         internal readonly CleanupSyntax CleanupSection;
 
-        [EnableDump]
+        [EnableDump(Order = 1)]
         internal readonly IStatementSyntax[] Statements;
 
         CompoundSyntax
@@ -55,20 +55,20 @@ namespace Reni.SyntaxTree
         [DisableDump]
         internal ValueSyntax[] PureStatements => Statements.Select(s => s.Value).ToArray();
 
-        [EnableDump]
+        [EnableDump(Order = 100)]
         internal IDictionary<string, int> NameIndex
             => Statements
                 .Select((statement, index) => (Key: statement.Declarer?.Name?.Value, Value: index))
                 .Where(pair => pair.Key != null)
                 .ToDictionary(item => item.Key, item => item.Value);
 
-        [EnableDump]
+        [EnableDump(Order = 100)]
         internal int[] MutableDeclarations => IndexList(item => item.IsMutableSyntax).ToArray();
 
-        [EnableDump]
+        [EnableDump(Order = 100)]
         internal int[] Converters => IndexList(item => item.IsConverterSyntax).ToArray();
 
-        [EnableDump]
+        [EnableDump(Order = 100)]
         internal int[] MixInDeclarations => IndexList(item => item.IsMixInSyntax).ToArray();
 
         [DisableDump]
