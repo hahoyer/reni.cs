@@ -16,7 +16,7 @@ namespace Reni.SyntaxFactory
             HasRight = hasRight;
         }
 
-        ValueSyntax IValueProvider.Get(BinaryTree target, Factory factory, FrameItemContainer frameItems)
+        ValueSyntax IValueProvider.Get(BinaryTree target, Factory factory, Anchor frameItems)
         {
             if(HasLeft != null)
                 (target.Left == null != HasLeft).Assert();

@@ -5,7 +5,7 @@ namespace Reni.SyntaxTree
         internal readonly ValueSyntax Value;
 
         public CleanupSyntax(ValueSyntax value)
-            : base(frameItems: FrameItemContainer.Create())
+            : base(anchor: SyntaxTree.Anchor.Create())
             => Value = value;
 
         protected override int LeftDirectChildCountInternal => 0;

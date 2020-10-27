@@ -16,7 +16,7 @@ namespace Reni.SyntaxTree
             internal readonly IDeclarationTagToken Value;
 
             internal TagSyntax
-                (IDeclarationTagToken value, Issue issue, FrameItemContainer frameItems)
+                (IDeclarationTagToken value, Issue issue, Anchor frameItems)
                 : base(issue, frameItems)
             {
                 Value = value;
@@ -24,7 +24,7 @@ namespace Reni.SyntaxTree
 
             [EnableDump]
             [EnableDumpExcept(null)]
-            string Position => FrameItems.SourcePart.GetDumpAroundCurrent(5);
+            string Position => Anchor.SourcePart.GetDumpAroundCurrent(5);
 
             internal override void AssertValid(Level level, BinaryTree target = null)
                 => base.AssertValid(level == null? null : new Level {IsCorrectOrder = level.IsCorrectOrder}, target);
@@ -34,13 +34,13 @@ namespace Reni.SyntaxTree
         {
             internal readonly string Value;
 
-            internal NameSyntax(string name, FrameItemContainer frameItems)
+            internal NameSyntax(string name, Anchor frameItems)
                 : base(frameItems: frameItems)
                 => Value = name;
 
             [EnableDump]
             [EnableDumpExcept(null)]
-            string Position => FrameItems.SourcePart.GetDumpAroundCurrent(5);
+            string Position => Anchor.SourcePart.GetDumpAroundCurrent(5);
 
             internal override void AssertValid(Level level, BinaryTree target = null)
                 => base.AssertValid(level == null? null : new Level {IsCorrectOrder = level.IsCorrectOrder}, target);
@@ -65,7 +65,7 @@ namespace Reni.SyntaxTree
         internal Issue Issue => Hidden == null? null : IssueId.StrangeDeclaration.Issue(Hidden.SourcePart);
 
         internal SourcePart SourcePart
-            => T(T(Hidden?.SourcePart), Tags.Select(node => node.FrameItems.SourcePart), T(Name?.FrameItems.SourcePart))
+            => T(T(Hidden?.SourcePart), Tags.Select(node => node.Anchor.SourcePart), T(Name?.Anchor.SourcePart))
                 .ConcatMany()
                 .Where(i=>i!= null)
                 .Aggregate();
@@ -105,7 +105,7 @@ namespace Reni.SyntaxTree
             return index == Tags.Length? Name : null;
         }
 
-        internal static DeclarerSyntax GetDeclarationTag(BinaryTree target, bool meansPublic, FrameItemContainer frameItems)
+        internal static DeclarerSyntax GetDeclarationTag(BinaryTree target, bool meansPublic, Anchor frameItems)
         {
             (target.Right == null).Assert();
             switch(target.TokenClass)
@@ -121,20 +121,20 @@ namespace Reni.SyntaxTree
             }
         }
 
-        static DeclarerSyntax FromTag(BinaryTree target, bool meansPublic, FrameItemContainer frameItems)
+        static DeclarerSyntax FromTag(BinaryTree target, bool meansPublic, Anchor frameItems)
         {
             var tagSyntax = GetTagSyntax(target, frameItems);
             return new DeclarerSyntax(null, new[] {tagSyntax}, null, meansPublic);
         }
 
-        static TagSyntax GetTagSyntax(BinaryTree target, FrameItemContainer frameItems)
+        static TagSyntax GetTagSyntax(BinaryTree target, Anchor frameItems)
         {
             var tag = target.TokenClass as DeclarationTagToken;
             var issue = tag == null? IssueId.InvalidDeclarationTag.Issue(target.Token.Characters) : null;
             return new TagSyntax(tag, issue, frameItems);
         }
 
-        static DeclarerSyntax FromName(BinaryTree target, bool meansPublic, FrameItemContainer frameItems = null)
+        static DeclarerSyntax FromName(BinaryTree target, bool meansPublic, Anchor frameItems = null)
         {
             var nameSyntax = new NameSyntax(target.Token.Characters.Id, frameItems);
             return new DeclarerSyntax(null, new TagSyntax[0], nameSyntax, meansPublic);

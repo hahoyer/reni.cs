@@ -26,7 +26,7 @@ namespace ReniUI.Helper
         [EnableDump(Order = 10)]
         string[] Children => FlatItem
             .Children
-            .Select(node=> node?.FrameItems.SourcePart.GetDumpAroundCurrent(5))
+            .Select(node=> node?.Anchor.SourcePart.GetDumpAroundCurrent(5))
             .ToArray();
 
         protected override Syntax Create(Reni.SyntaxTree.Syntax flatItem, int index)

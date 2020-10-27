@@ -15,8 +15,8 @@ namespace Reni.SyntaxTree
         internal readonly ValueSyntax Value;
 
         DeclarationSyntax
-            (DeclarerSyntax declarer, ValueSyntax value, FrameItemContainer frameItems = null)
-            : base(frameItems: frameItems ?? FrameItemContainer.Create())
+            (DeclarerSyntax declarer, ValueSyntax value, Anchor frameItems = null)
+            : base(anchor: frameItems ?? SyntaxTree.Anchor.Create())
         {
             Declarer = declarer;
             Value = value;
@@ -27,7 +27,7 @@ namespace Reni.SyntaxTree
 
         [EnableDump]
         [EnableDumpExcept(null)]
-        string Position => FrameItems.SourcePart.GetDumpAroundCurrent(5);
+        string Position => Anchor.SourcePart.GetDumpAroundCurrent(5);
 
         [DisableDump]
         internal string NameOrNull => Declarer.Name?.Value;
@@ -47,7 +47,7 @@ namespace Reni.SyntaxTree
         [DisableDump]
         DeclarerSyntax IStatementSyntax.Declarer => Declarer;
 
-        SourcePart IStatementSyntax.SourcePart => FrameItems.SourcePart;
+        SourcePart IStatementSyntax.SourcePart => Anchor.SourcePart;
 
         ValueSyntax IStatementSyntax.ToValueSyntax()
             => CompoundSyntax.Create(T((IStatementSyntax)this));
@@ -55,10 +55,10 @@ namespace Reni.SyntaxTree
         [DisableDump]
         ValueSyntax IStatementSyntax.Value => Value;
 
-        IStatementSyntax IStatementSyntax.With(FrameItemContainer frameItems)
+        IStatementSyntax IStatementSyntax.With(Anchor frameItems)
             => frameItems == null || !frameItems.Items.Any()
                 ? this
-                : Create(Declarer, Value, frameItems.Combine(FrameItems));
+                : Create(Declarer, Value, frameItems.Combine(Anchor));
 
         protected override Syntax GetDirectChild(int index)
             => index switch
@@ -69,7 +69,7 @@ namespace Reni.SyntaxTree
             };
 
         internal static IStatementSyntax Create
-            (DeclarerSyntax declarer, ValueSyntax value, FrameItemContainer frameItems)
+            (DeclarerSyntax declarer, ValueSyntax value, Anchor frameItems)
             => new DeclarationSyntax
             (
                 declarer,

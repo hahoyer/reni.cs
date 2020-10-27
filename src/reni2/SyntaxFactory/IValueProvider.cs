@@ -5,6 +5,6 @@ namespace Reni.SyntaxFactory
 {
     interface IValueProvider
     {
-        ValueSyntax Get(BinaryTree target, Factory factory, FrameItemContainer frameItems);
+        ValueSyntax Get(BinaryTree target, Factory factory, Anchor frameItems);
     }
 }

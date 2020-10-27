@@ -37,7 +37,7 @@ namespace ReniUI.Classification
             Index = index;
         }
 
-        BinaryTree Binary => Master.FlatItem.FrameItems.Items[Index];
+        BinaryTree Binary => Master.FlatItem.Anchor.Items[Index];
         internal TokenClass TokenClass => Binary.TokenClass as TokenClass;
         internal IToken Token => Binary.Token;
 
@@ -135,7 +135,7 @@ namespace ReniUI.Classification
         {
             var result = target.LocateByPosition(offset, includingParent );
             result.AssertIsNotNull();
-            var resultToken = result.Item1.FlatItem.FrameItems.Items[result.Item2].Token;
+            var resultToken = result.Item1.FlatItem.Anchor.Items[result.Item2].Token;
             if(offset < resultToken.Characters.Position)
                 return new WhiteSpaceSyntax
                 (

@@ -20,8 +20,8 @@ namespace ReniUI.Test
                 (
                     () =>
                         "elseToken.Master= " +
-                        $"{elseToken.Master.FlatItem.FrameItems.SourcePart.d}\n\n" +
-                        $"thenToken.Master = {thenToken.Master.FlatItem.FrameItems.SourcePart.d}"
+                        $"{elseToken.Master.FlatItem.Anchor.SourcePart.d}\n\n" +
+                        $"thenToken.Master = {thenToken.Master.FlatItem.Anchor.SourcePart.d}"
                 );
             (elseToken.Index == 2).Assert();
             (thenToken.Index == 1).Assert();

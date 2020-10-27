@@ -32,7 +32,7 @@ namespace Reni.SyntaxTree
         CompoundSyntax
         (
             IStatementSyntax[] statements, CleanupSyntax cleanupSection
-            , FrameItemContainer frameItems
+            , Anchor frameItems
         )
             : base(NextObjectId++, frameItems)
         {
@@ -44,7 +44,7 @@ namespace Reni.SyntaxTree
 
         [EnableDump]
         [EnableDumpExcept(null)]
-        string Position => FrameItems.SourcePart.GetDumpAroundCurrent(5);
+        string Position => Anchor.SourcePart.GetDumpAroundCurrent(5);
 
         [DisableDump]
         public IEnumerable<FunctionSyntax> ConverterFunctions
@@ -104,7 +104,7 @@ namespace Reni.SyntaxTree
         (
             IStatementSyntax[] statements,
             CleanupSyntax cleanupSection = null,
-            FrameItemContainer frameItems = null
+            Anchor frameItems = null
         )
             => new CompoundSyntax
             (
@@ -169,7 +169,7 @@ namespace Reni.SyntaxTree
                     ? CleanupSection
                     : new CleanupSyntax(cleanupSection);
 
-            return Create(newStatements, newCleanupSection, FrameItems);
+            return Create(newStatements, newCleanupSection, Anchor);
         }
 
         internal override Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree listTarget = null) => this;
@@ -228,6 +228,6 @@ namespace Reni.SyntaxTree
         DeclarerSyntax Declarer { get; }
         SourcePart SourcePart { get; }
         ValueSyntax ToValueSyntax();
-        IStatementSyntax With(FrameItemContainer frameItems);
+        IStatementSyntax With(Anchor frameItems);
     }
 }

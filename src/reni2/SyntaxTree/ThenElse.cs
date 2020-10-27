@@ -21,8 +21,8 @@ namespace Reni.SyntaxTree
         readonly ValueSyntax Then;
 
         internal CondSyntax
-            (ValueSyntax condSyntax, ValueSyntax thenSyntax, ValueSyntax elseSyntax, FrameItemContainer frameItems)
-            : base(frameItems)
+            (ValueSyntax condSyntax, ValueSyntax thenSyntax, ValueSyntax elseSyntax, Anchor anchor)
+            : base(anchor)
         {
             Cond = condSyntax;
             Then = thenSyntax;

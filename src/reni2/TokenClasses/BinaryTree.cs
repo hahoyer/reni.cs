@@ -21,7 +21,7 @@ namespace Reni.TokenClasses
             internal BinaryTree Right;
 
             [DisableDump]
-            internal FrameItemContainer ToFrameItems => FrameItemContainer.Create(Left, Right);
+            internal Anchor ToFrameItems => Anchor.Create(Left, Right);
         }
 
         static int NextObjectId;

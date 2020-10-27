@@ -18,8 +18,8 @@ namespace Reni.SyntaxTree
     {
         internal abstract class NoChildren : Syntax
         {
-            protected NoChildren(Issue issue = null, FrameItemContainer frameItems = null)
-                : base(issue, frameItems ?? FrameItemContainer.Create()) { }
+            protected NoChildren(Issue issue = null, Anchor frameItems = null)
+                : base(issue, frameItems ?? SyntaxTree.Anchor.Create()) { }
 
             [DisableDump]
             protected sealed override int LeftDirectChildCountInternal => 0;
@@ -38,21 +38,22 @@ namespace Reni.SyntaxTree
             public bool IsCorrectOrder;
         }
 
-        internal readonly FrameItemContainer FrameItems;
+        internal readonly Anchor Anchor;
 
         [EnableDumpExcept(null)]
         readonly Issue Issue;
 
-        protected Syntax(Issue issue = null, FrameItemContainer frameItems = null)
+        protected Syntax(Issue issue = null, Anchor anchor = null)
         {
-            FrameItems = frameItems ?? FrameItemContainer.Create();
+            Anchor = anchor ?? Anchor.Create();
+            Anchor.SourcePart.AssertIsNotNull();
             Issue = issue;
         }
 
-        protected Syntax(int objectId, Issue issue = null, FrameItemContainer frameItems = null)
+        protected Syntax(int objectId, Issue issue = null, Anchor frameItems = null)
             : base(objectId)
         {
-            FrameItems = frameItems ?? FrameItemContainer.Create();
+            Anchor = frameItems ?? Anchor.Create();
             Issue = issue;
         }
 
@@ -88,8 +89,6 @@ namespace Reni.SyntaxTree
         {
             if(Issue != null)
                 yield return Issue;
-            foreach(var issue in FrameItems.Issues)
-                yield return issue;
         }
 
         protected abstract Syntax GetDirectChild(int index);

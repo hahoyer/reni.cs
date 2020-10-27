@@ -3,8 +3,8 @@ using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using Reni;
 using Reni.Parser;
+using Reni.SyntaxTree;
 using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
@@ -18,14 +18,8 @@ namespace ReniUI.Formatting
             {
                 get
                 {
-                    var s = Target;
-                    var ss = s.LeftMost;
-
-                    return T
-                    (
-                        CreateChild(Target).Edits,
-                        GetWhiteSpacesEdits(Target)
-                    );
+                    NotImplementedMethod();
+                    return default;
                 }
             }
         }
@@ -41,27 +35,16 @@ namespace ReniUI.Formatting
 
         class ExpressionFrame : HierarchicalStructure
         {
-            readonly ITokenClass TokenClass;
+            new readonly Reni.SyntaxTree.Syntax Target;
 
-            public ExpressionFrame(ITokenClass tokenClass) => TokenClass = tokenClass;
+            public ExpressionFrame(Reni.SyntaxTree.Syntax target) => Target = target;
 
             protected override IEnumerable<IEnumerable<ISourcePartEdit>> EditGroups
             {
                 get
                 {
-                    Tracer.Assert(Target.TokenClass == TokenClass, Target.Dump);
-
-                    if(Target.Left != null)
-                    {
-                        yield return CreateChild(Target.Left).Edits;
-                        if(IsLineSplit)
-                            yield return T(SourcePartEditExtension.MinimalLineBreak);
-                    }
-
-                    yield return GetWhiteSpacesEdits(Target);
-
-                    if(Target.Right != null)
-                        yield return CreateChild(Target.Right).Edits;
+                    NotImplementedMethod();
+                    return default;
                 }
             }
         }
@@ -72,7 +55,7 @@ namespace ReniUI.Formatting
             protected override IEnumerable<IEnumerable<ISourcePartEdit>> EditGroups
                 => GetEditGroupsForChains<Colon>();
 
-            protected override HierarchicalStructure Create(ITokenClass tokenClass, bool isLast)
+            protected override HierarchicalStructure Create(Reni.SyntaxTree.Syntax tokenClass, bool isLast)
             {
                 var result = base.Create(tokenClass, isLast);
                 if(isLast && result is ExpressionFrame)
@@ -88,48 +71,21 @@ namespace ReniUI.Formatting
             {
                 get
                 {
-                    Tracer.Assert(Target.Left != null);
-                    Tracer.Assert(Target.Left.Left == null);
-                    Tracer.Assert(Target.Left.TokenClass is LeftParenthesis);
-                    Tracer.Assert(Target.Left.TokenClass.IsBelongingTo(Target.TokenClass));
-                    Tracer.Assert(Target.TokenClass is RightParenthesis);
-                    Tracer.Assert(Target.Right == null);
-
-                    var isLineSplit = IsLineSplit;
-
-                    yield return GetWhiteSpacesEdits(Target.Left);
-
-                    if(isLineSplit)
-                        yield return T(SourcePartEditExtension.MinimalLineBreak);
-
-                    if(Target.Left.Right != null)
-                    {
-                        var child = CreateChild(Target.Left.Right);
-                        child.ForceLineSplit = isLineSplit;
-                        yield return child.Edits.Indent(IndentDirection.ToRight);
-
-                        if(isLineSplit)
-                            yield return T(SourcePartEditExtension.MinimalLineBreak);
-                    }
-
-                    yield return GetWhiteSpacesEdits(Target);
+                    NotImplementedMethod();
+                    return default;
                 }
             }
         }
 
-        static bool GetIsSeparatorRequired(Syntax target)
-            => !target.WhiteSpaces.HasComment() &&
-               SeparatorExtension.Get(target.LeftNeighbor?.TokenClass, target.TokenClass);
-
-        static bool True => true;
-        static bool False => false;
-        bool AdditionalLineBreaksForMultilineItems;
-
         internal Configuration Configuration;
+        internal Syntax Target;
+        bool AdditionalLineBreaksForMultilineItems;
         bool ForceLineSplit;
 
         bool IsIndentRequired;
-        internal Syntax Target;
+
+        static bool True => true;
+        static bool False => false;
 
         [DisableDump]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -158,8 +114,8 @@ namespace ReniUI.Formatting
             }
         }
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]                               
-        IndentDirection IndentDirection => IsIndentRequired ? IndentDirection.ToRight : IndentDirection.NoIndent;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        IndentDirection IndentDirection => IsIndentRequired? IndentDirection.ToRight : IndentDirection.NoIndent;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         protected virtual IEnumerable<IEnumerable<ISourcePartEdit>> EditGroups
@@ -173,33 +129,39 @@ namespace ReniUI.Formatting
 
         bool IsLineSplit => ForceLineSplit || GetHasAlreadyLineBreakOrIsTooLong(Target);
 
-        bool CheckMultilineExpectations(IEnumerable<ISourcePartEdit> result)
-            => Target.Left == null && Target.Right == null && IsLineSplit ||
-               result.Skip(1).Any(edit => edit.HasLines) == IsLineSplit;
+        bool GetIsSeparatorRequired(BinaryTree target)
+            => !target.Token.PrecededWith.HasComment() &&
+               SeparatorExtension.Get(Target.GetLeftNeighbor(target)?.TokenClass, target.TokenClass);
 
-        IEnumerable<ISourcePartEdit> GetWhiteSpacesEdits(Syntax target)
+        //bool CheckMultilineExpectations(IEnumerable<ISourcePartEdit> result)
+        //    => Target.Left == null && Target.Right == null && IsLineSplit ||
+        //       result.Skip(1).Any(edit => edit.HasLines) == IsLineSplit;
+
+        IEnumerable<ISourcePartEdit> GetWhiteSpacesEdits(BinaryTree target)
         {
-            if(target.WhiteSpaces.Any())
-                return T(new WhiteSpaceView(target.WhiteSpaces, Configuration, GetIsSeparatorRequired(target)));
+            if(target.Token.PrecededWith.Any())
+                return T(new WhiteSpaceView(target.Token.PrecededWith, Configuration, GetIsSeparatorRequired(target)));
             return T(new EmptyWhiteSpaceView(target.Token.Characters.Start, GetIsSeparatorRequired(target)));
         }
 
         HierarchicalStructure CreateChild(Syntax target, bool isLast = false)
         {
-            var child = Create(target.TokenClass, isLast);
+            var child = Create(target.FlatItem, isLast);
             child.Configuration = Configuration;
             child.Target = target;
             return child;
         }
 
-        protected virtual HierarchicalStructure Create(ITokenClass tokenClass, bool isLast)
+        protected virtual HierarchicalStructure Create(Reni.SyntaxTree.Syntax target, bool isLast)
         {
-            switch(tokenClass)
+            switch(target)
             {
-                case List _: return new ListFrame();
-                case Colon _: return new ColonFrame();
-                case RightParenthesis _: return new ParenthesisFrame();
-                default: return new ExpressionFrame(tokenClass);
+                case CompoundSyntax _:
+                    return new ListFrame();
+                case DeclarationSyntax _:
+                    return new ColonFrame();
+                default:
+                    return new ExpressionFrame(target);
             }
         }
 
@@ -211,43 +173,40 @@ namespace ReniUI.Formatting
 
         IEnumerable<IEnumerable<ISourcePartEdit>> GetEditGroupsForChains<TSeparator>()
             where TSeparator : ITokenClass
-            => Target
-                .Chain(target => target.Right)
-                .TakeWhile(target => target.TokenClass is TSeparator)
-                .Select(GetEdits<TSeparator>)
-                .SelectMany(i => i);
-
-        IEnumerable<IEnumerable<ISourcePartEdit>> GetEdits<TSeparator>(Syntax target)
-            where TSeparator : ITokenClass
         {
-            yield return CreateChild(target.Left).Edits;
-            yield return GetWhiteSpacesEdits(target);
-
-            if(target.Right == null)
-                yield break;
-            
-            if(IsLineSplit)
-                yield return T(GetLineSplitter(target, target.Right?.TokenClass is TSeparator));
-
-            if(!(target.Right.TokenClass is TSeparator))
-                yield return CreateChild(target.Right, true).Edits;
+            NotImplementedMethod();
+            return default;
         }
 
-        ISourcePartEdit GetLineSplitter(Syntax target, bool isInsideChain)
-        {
-            var second = target.Right;
-            if(isInsideChain)
-                second = second.Left;
+        //IEnumerable<IEnumerable<ISourcePartEdit>> GetEdits<TSeparator>(BinaryTree target)
+        //    where TSeparator : ITokenClass
+        //{
+        //    yield return CreateChild(target.Left).Edits;
+        //    yield return GetWhiteSpacesEdits(target);
 
-            if(!AdditionalLineBreaksForMultilineItems || second == null)
-                return SourcePartEditExtension.MinimalLineBreak;
+        //    if(target.Right == null)
+        //        yield break;
 
-            if(GetHasAlreadyLineBreakOrIsTooLong(target.Left) || GetHasAlreadyLineBreakOrIsTooLong(second))
-                return SourcePartEditExtension.MinimalLineBreaks;
+        //    if(IsLineSplit)
+        //        yield return T(GetLineSplitter(target, target.Right?.TokenClass is TSeparator));
 
-            return SourcePartEditExtension.MinimalLineBreak;
-        }
+        //    if(!(target.Right.TokenClass is TSeparator))
+        //        yield return CreateChild(target.Right, true).Edits;
+        //}
 
-        protected override string GetNodeDump() => base.GetNodeDump() + " " + Target.Token.Characters.Id;
+        //ISourcePartEdit GetLineSplitter(BinaryTree target, bool isInsideChain)
+        //{
+        //    var second = target.Right;
+        //    if(isInsideChain)
+        //        second = second.Left;
+
+        //    if(!AdditionalLineBreaksForMultilineItems || second == null)
+        //        return SourcePartEditExtension.MinimalLineBreak;
+
+        //    if(GetHasAlreadyLineBreakOrIsTooLong(target.Left) || GetHasAlreadyLineBreakOrIsTooLong(second))
+        //        return SourcePartEditExtension.MinimalLineBreaks;
+
+        //    return SourcePartEditExtension.MinimalLineBreak;
+        //}
     }
 }

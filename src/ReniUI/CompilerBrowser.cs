@@ -102,7 +102,7 @@ namespace ReniUI
             {
                 var compilerSyntax = Compiler.Syntax;
                 compilerSyntax.Dump().FlaggedLine();
-                compilerSyntax.FrameItems.Dump().FlaggedLine();
+                compilerSyntax.Anchor.Dump().FlaggedLine();
 
                 var syntax = new Helper.Syntax(compilerSyntax, PositionDictionary);
 

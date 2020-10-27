@@ -41,7 +41,7 @@ namespace ReniUI.Formatting
             => !current.Token.PrecededWith.HasComment() &&
                SeparatorExtension.Get(GetLeftNeighbor(current)?.TokenClass, current.TokenClass);
 
-        BinaryTree GetLeftNeighbor(BinaryTree current)
+        internal BinaryTree GetLeftNeighbor(BinaryTree current)
         {
             NotImplementedMethod(current);
             return default;
@@ -58,37 +58,8 @@ namespace ReniUI.Formatting
 
         SplitItem GetSplitItem()
         {
-            switch(TokenClass)
-            {
-                case BeginOfText _:
-                case EndOfText _:
-                    return null;
-                case LeftParenthesis tokenClass:
-                    Tracer.Assert(Parent.TokenClass.IsBelongingTo(tokenClass));
-                    return SplitItem.LeftParenthesis[tokenClass];
-            }
-
-            switch(Parent.TokenClass)
-            {
-                case BeginOfText _:
-                case EndOfText _:
-                    return null;
-                case Colon tokenClass:
-                    (!(TokenClass is Colon)).Assert();
-                    return IsLeftChild? SplitItem.ColonLabel[tokenClass] : SplitItem.ColonBody[tokenClass];
-                case LeftParenthesis tokenClass:
-                    return SplitItem.List[tokenClass];
-                case List tokenClass:
-                    var master = Parent
-                        .Chain(target => target.Parent)
-                        .SkipWhile(target => target.TokenClass == tokenClass)
-                        .First();
-                    var masterTokenClass = master.TokenClass is LeftParenthesis? master.TokenClass : tokenClass;
-                    return SplitItem.List[masterTokenClass];
-                default:
-                    NotImplementedMethod(nameof(Parent), Parent);
-                    return default;
-            }
+            NotImplementedMethod();
+            return default;
         }
 
         TContainer FlatSubFormat<TContainer, TValue>(BinaryTree left, bool areEmptyLinesPossible)
@@ -118,7 +89,7 @@ namespace ReniUI.Formatting
             where TContainer : class, IFormatResult<TResult>, new()
         {
             var results = FlatItem
-                .FrameItems
+                .Anchor
                 .Items
                 .Select(item => FlatFormat<TContainer, TResult>(item, areEmptyLinesPossible));
 

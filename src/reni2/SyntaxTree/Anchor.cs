@@ -1,21 +1,20 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using hw.Parser;
 using hw.Scanner;
 using Reni.TokenClasses;
-using Reni.Validation;
 
 namespace Reni.SyntaxTree
 {
-    public sealed class FrameItemContainer : DumpableObject
+    public sealed class Anchor : DumpableObject
     {
         internal BinaryTree[] Items { get; private set; }
 
         internal int LeftItemCount { get; private set; }
 
-        FrameItemContainer() { }
+        Anchor() { }
 
         [DisableDump]
         internal BinaryTree LeftMostRightItem
@@ -24,8 +23,8 @@ namespace Reni.SyntaxTree
                 .First(item => item != null);
 
         [DisableDump]
-        internal FrameItemContainer WithoutLeftMostRightItem
-            => new FrameItemContainer
+        internal Anchor WithoutLeftMostRightItem
+            => new Anchor
             {
                 Items = Items
                     .Where((item, index) => index != LeftItemCount)
@@ -34,10 +33,10 @@ namespace Reni.SyntaxTree
             };
 
         [DisableDump]
-        internal FrameItemContainer Left => new FrameItemContainer {Items = LeftItems, LeftItemCount = LeftItemCount};
+        internal Anchor Left => new Anchor {Items = LeftItems, LeftItemCount = LeftItemCount};
 
         [DisableDump]
-        internal FrameItemContainer Right => new FrameItemContainer {Items = RightItems, LeftItemCount = 0};
+        internal Anchor Right => new Anchor {Items = RightItems, LeftItemCount = 0};
 
 
         [DisableDump]
@@ -46,53 +45,45 @@ namespace Reni.SyntaxTree
         [DisableDump]
         BinaryTree[] RightItems => Items.Skip(LeftItemCount).ToArray();
 
-        internal IEnumerable<Issue> Issues
-        {
-            get { throw new System.NotImplementedException(); }
-        }
-
-        internal SourcePart SourcePart
-        {
-            get { throw new System.NotImplementedException(); }
-        }
+        internal SourcePart SourcePart => Items.Select(item=>item.SourcePart).Aggregate();
 
 
         protected override string GetNodeDump() => base.GetNodeDump() + $"[{Items.Length}]";
 
-        internal static FrameItemContainer Create(BinaryTree leftAnchor, BinaryTree rightAnchor)
-            => new FrameItemContainer
+        internal static Anchor Create(BinaryTree leftAnchor, BinaryTree rightAnchor)
+            => new Anchor
             {
                 Items = T(leftAnchor, rightAnchor)
                 , LeftItemCount = 1
             };
 
-        internal static FrameItemContainer Create(BinaryTree leftAnchor)
-            => new FrameItemContainer
+        internal static Anchor Create(BinaryTree leftAnchor)
+            => new Anchor
             {
                 Items = T(leftAnchor.AssertNotNull())
                 , LeftItemCount = 1
             };
 
-        internal static FrameItemContainer Create()
-            => new FrameItemContainer
+        internal static Anchor Create()
+            => new Anchor
             {
                 Items = new BinaryTree[0]
                 , LeftItemCount = 0
             };
 
-        public static FrameItemContainer Create(IEnumerable<BinaryTree> left)
-            => new FrameItemContainer
+        public static Anchor Create(IEnumerable<BinaryTree> left)
+            => new Anchor
             {
                 Items = left.ToArray()
                 , LeftItemCount = left.Count()
             };
 
-        public FrameItemContainer Combine(FrameItemContainer other)
+        public Anchor Combine(Anchor other)
         {
             if(other == null || !other.Items.Any())
                 return this;
 
-            return new FrameItemContainer
+            return new Anchor
             {
                 Items = other.LeftItems.Concat(Items).Concat(other.RightItems).ToArray()
                 , LeftItemCount = other.LeftItemCount + LeftItemCount

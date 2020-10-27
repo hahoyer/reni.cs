@@ -52,9 +52,9 @@ namespace Reni.SyntaxTree
             ValueSyntax left,
             Definable definable,
             ValueSyntax right,
-            FrameItemContainer frameItems
+            Anchor anchor
         )
-            : base(frameItems)
+            : base(anchor)
         {
             Left = left;
             Definable = definable;
@@ -79,20 +79,20 @@ namespace Reni.SyntaxTree
             ValueSyntax left,
             Definable definable,
             ValueSyntax right,
-            FrameItemContainer frameItems
+            Anchor frameItems
         )
             => new ExpressionSyntax(left, definable, right, frameItems);
 
         internal override Result ResultForCache(ContextBase context, Category category)
         {
             if(CurrentResultDepth > 20)
-                throw new EvaluationDepthExhaustedException(FrameItems.SourcePart, context, CurrentResultDepth);
+                throw new EvaluationDepthExhaustedException(Anchor.SourcePart, context, CurrentResultDepth);
 
             try
             {
                 CurrentResultDepth++;
                 if(Left == null)
-                    return context.PrefixResult(category, Definable, FrameItems.SourcePart, Right);
+                    return context.PrefixResult(category, Definable, Anchor.SourcePart, Right);
 
                 var left = context.ResultAsReferenceCache(Left);
 
@@ -104,7 +104,7 @@ namespace Reni.SyntaxTree
                     return leftType.Issues.Result(category);
 
                 return leftType
-                    .Execute(category, left, FrameItems.SourcePart, Definable, context, Right);
+                    .Execute(category, left, Anchor.SourcePart, Definable, context, Right);
             }
             finally
             {
@@ -119,7 +119,7 @@ namespace Reni.SyntaxTree
             if(left == null && right == null)
                 return null;
 
-            return Definable.CreateForVisit(left ?? Left, right ?? Right, FrameItems);
+            return Definable.CreateForVisit(left ?? Left, right ?? Right, Anchor);
         }
 
         protected override string GetNodeDump()

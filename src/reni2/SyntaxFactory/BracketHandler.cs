@@ -7,7 +7,7 @@ namespace Reni.SyntaxFactory
 {
     class BracketHandler : DumpableObject, IValueProvider
     {
-        ValueSyntax IValueProvider.Get(BinaryTree target, Factory factory, FrameItemContainer frameItems)
+        ValueSyntax IValueProvider.Get(BinaryTree target, Factory factory, Anchor frameItems)
         {
             var kernel = target.BracketKernel;
             var frameItemContainer = kernel.ToFrameItems.Combine(frameItems);

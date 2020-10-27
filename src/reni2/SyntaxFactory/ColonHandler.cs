@@ -10,7 +10,7 @@ namespace Reni.SyntaxFactory
 {
     class ColonHandler : DumpableObject, IStatementProvider
     {
-        IStatementSyntax IStatementProvider.Get(BinaryTree target, Factory factory, FrameItemContainer frameItems)
+        IStatementSyntax IStatementProvider.Get(BinaryTree target, Factory factory, Anchor frameItems)
         {
             var nodes = target
                 .Left
@@ -28,7 +28,7 @@ namespace Reni.SyntaxFactory
 
             if(hasPrefix)
             {
-                var prefixItems = FrameItemContainer.Create(nodes.First());
+                var prefixItems = Anchor.Create(nodes.First());
                 frameItems = frameItems == null? prefixItems : frameItems.Combine(prefixItems);
             }
 

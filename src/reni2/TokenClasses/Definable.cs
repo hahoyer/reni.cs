@@ -21,7 +21,7 @@ namespace Reni.TokenClasses
 
         IValueProvider IValueToken.Provider => Factory.Definable;
 
-        internal ValueSyntax CreateForVisit(ValueSyntax left, ValueSyntax right, FrameItemContainer frameItems)
+        internal ValueSyntax CreateForVisit(ValueSyntax left, ValueSyntax right, Anchor frameItems)
             => ExpressionSyntax.Create(left, this, right, frameItems);
     }
 

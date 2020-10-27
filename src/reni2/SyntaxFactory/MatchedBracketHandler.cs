@@ -6,7 +6,7 @@ namespace Reni.SyntaxFactory
 {
     class MatchedBracketHandler : DumpableObject, IValueProvider
     {
-        ValueSyntax IValueProvider.Get(BinaryTree target, Factory factory, FrameItemContainer frameItems)
+        ValueSyntax IValueProvider.Get(BinaryTree target, Factory factory, Anchor frameItems)
             => new ExpressionSyntax(factory.GetValueSyntax(target.Left), null
                 , factory.GetValueSyntax(target.Right), frameItems);
     }

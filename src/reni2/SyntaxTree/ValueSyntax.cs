@@ -22,8 +22,8 @@ namespace Reni.SyntaxTree
     {
         internal new abstract class NoChildren : ValueSyntax
         {
-            protected NoChildren(FrameItemContainer frameItems, Issue issue = null)
-                : base(frameItems, issue){}
+            protected NoChildren(Anchor anchor, Issue issue = null)
+                : base(anchor, issue){}
 
             [DisableDump]
             protected sealed override int LeftDirectChildCountInternal => 0;
@@ -41,10 +41,10 @@ namespace Reni.SyntaxTree
         internal readonly FunctionCache<ContextBase, ResultCache> ResultCache =
             new FunctionCache<ContextBase, ResultCache>();
 
-        protected ValueSyntax(FrameItemContainer frameItems = null, Issue issue = null)
-            : base(issue, frameItems) { }
+        protected ValueSyntax(Anchor anchor = null, Issue issue = null)
+            : base(issue, anchor) { }
 
-        protected ValueSyntax(int objectId, FrameItemContainer frameItems = null, Issue issue = null)
+        protected ValueSyntax(int objectId, Anchor frameItems = null, Issue issue = null)
             : base(objectId, issue, frameItems) { }
 
         [DisableDump]
@@ -61,13 +61,13 @@ namespace Reni.SyntaxTree
 
         DeclarerSyntax IStatementSyntax.Declarer => null;
 
-        SourcePart IStatementSyntax.SourcePart => FrameItems.SourcePart;
+        SourcePart IStatementSyntax.SourcePart => Anchor.SourcePart;
 
         ValueSyntax IStatementSyntax.ToValueSyntax() => this;
 
         ValueSyntax IStatementSyntax.Value => this;
 
-        IStatementSyntax IStatementSyntax.With(FrameItemContainer frameItems)
+        IStatementSyntax IStatementSyntax.With(Anchor frameItems)
         {
             if(frameItems == null || !frameItems.Items.Any())
                 return this;

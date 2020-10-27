@@ -32,7 +32,7 @@ namespace Reni.Helper
             Context = context;
             Index = index;
 
-            foreach(var anchor in FlatItem.FrameItems.Items)
+            foreach(var anchor in FlatItem.Anchor.Items)
                 Context[anchor] = (TResult)this;
 
             Cache.LocateByPosition = new FunctionCache<int, (TResult, int)>(i => LocateByPositionForCache(i, false));
@@ -42,7 +42,7 @@ namespace Reni.Helper
         }
 
         [DisableDump]
-        public SourcePart SourcePart => FlatItem.FrameItems.SourcePart;
+        public SourcePart SourcePart => FlatItem.Anchor.SourcePart;
 
         [DisableDump]
         internal TResult LeftMost => this.GetNodesFromLeftToRight().First();

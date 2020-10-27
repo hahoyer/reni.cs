@@ -12,7 +12,7 @@ namespace Reni.SyntaxFactory
         (
             this ValueSyntax left,
             BinaryTree target,
-            ValueSyntax right, FrameItemContainer frameItems
+            ValueSyntax right, Anchor frameItems
         )
             => left == null
                 ? right == null
@@ -22,7 +22,7 @@ namespace Reni.SyntaxFactory
                     ? (ValueSyntax)new SuffixSyntax(left, (ISuffix)target.TokenClass, target.Token.Characters, frameItems)
                     : new InfixSyntax(left, (IInfix)target.TokenClass, right, target.Token.Characters, frameItems);
 
-        internal static IStatementSyntax[] With(this IStatementSyntax[] statements, FrameItemContainer frameItems)
+        internal static IStatementSyntax[] With(this IStatementSyntax[] statements, Anchor frameItems)
         {
             if(frameItems == null || !frameItems.Items.Any())
                 return statements;

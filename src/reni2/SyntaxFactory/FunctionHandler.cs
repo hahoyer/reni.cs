@@ -10,7 +10,7 @@ namespace Reni.SyntaxFactory
         ValueSyntax IValueProvider.Get
         (
             BinaryTree target, Factory factory
-            , FrameItemContainer frameItems
+            , Anchor frameItems
         )
         {
             var token = (Function)target.TokenClass;

@@ -39,10 +39,10 @@ namespace Reni.SyntaxFactory
         {
             var kernel = target.BracketKernel;
             var statements = GetStatementsSyntax(kernel.Center);
-            return CompoundSyntax.Create(statements, null, FrameItemContainer.Create(kernel.Left));
+            return CompoundSyntax.Create(statements, null, Anchor.Create(kernel.Left));
         }
 
-        internal IStatementSyntax[] GetStatementsSyntax(BinaryTree target, FrameItemContainer frameItems = null)
+        internal IStatementSyntax[] GetStatementsSyntax(BinaryTree target, Anchor frameItems = null)
         {
             if(target == null)
                 return new IStatementSyntax[0];
@@ -54,7 +54,7 @@ namespace Reni.SyntaxFactory
             );
         }
 
-        internal ValueSyntax GetValueSyntax(BinaryTree target, FrameItemContainer frameItems)
+        internal ValueSyntax GetValueSyntax(BinaryTree target, Anchor frameItems)
         {
             if(target == null)
                 return new EmptyList(frameItems);
@@ -80,7 +80,7 @@ namespace Reni.SyntaxFactory
             , Func<ValueSyntax, TResult> fromValueSyntax
             , Func<IStatementSyntax, TResult> fromDeclarationSyntax
             , Func<IStatementSyntax[], TResult> fromStatementsSyntax
-            , FrameItemContainer frameItems
+            , Anchor frameItems
         )
             where TResult : class
         {
@@ -121,7 +121,7 @@ namespace Reni.SyntaxFactory
                 : new Factory(!MeansPublic);
         }
 
-        internal ExpressionSyntax GetExpressionSyntax(BinaryTree target, FrameItemContainer frameItems)
+        internal ExpressionSyntax GetExpressionSyntax(BinaryTree target, Anchor frameItems)
         {
             var definable = target.TokenClass as Definable;
             (definable != null).Assert();
@@ -129,7 +129,7 @@ namespace Reni.SyntaxFactory
                 .Create(GetValueSyntax(target.Left), definable, GetValueSyntax(target.Right), frameItems);
         }
 
-        internal ValueSyntax GetInfixSyntax(BinaryTree target, FrameItemContainer frameItems)
+        internal ValueSyntax GetInfixSyntax(BinaryTree target, Anchor frameItems)
             => GetValueSyntax(target.Left).GetInfixSyntax(target, GetValueSyntax(target.Right), frameItems);
 
         internal DeclarerSyntax CombineWithSuffix(IEnumerable<BinaryTree> nodes)
@@ -137,7 +137,7 @@ namespace Reni.SyntaxFactory
             var head = nodes.First();
             var tag = head.TokenClass is IDeclarationTagToken;
             tag.Assert();
-            var frameItems = FrameItemContainer.Create(nodes.Skip(1));
+            var frameItems = Anchor.Create(nodes.Skip(1));
             return DeclarerSyntax.GetDeclarationTag(head, MeansPublic, frameItems);
         }
     }
