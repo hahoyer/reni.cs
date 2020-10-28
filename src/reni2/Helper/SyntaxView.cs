@@ -13,8 +13,8 @@ namespace Reni.Helper
         class CacheContainer
         {
             public FunctionCache<int, TResult> DirectChildren;
-            public FunctionCache<int, (TResult, int)> LocateByPosition;
-            public FunctionCache<int, (TResult, int)> LocateByPositionIncludingParent;
+            public FunctionCache<SourcePosition, (TResult, int)> LocateByPosition;
+            public FunctionCache<SourcePosition, (TResult, int)> LocateByPositionIncludingParent;
         }
 
         internal readonly PositionDictionary<TResult> Context;
@@ -35,14 +35,18 @@ namespace Reni.Helper
             foreach(var anchor in FlatItem.Anchor.Items)
                 Context[anchor] = (TResult)this;
 
-            Cache.LocateByPosition = new FunctionCache<int, (TResult, int)>(i => LocateByPositionForCache(i, false));
-            Cache.LocateByPositionIncludingParent 
-                = new FunctionCache<int, (TResult, int)>(i=>LocateByPositionForCache(i, true));
+            Cache.LocateByPosition =
+                new FunctionCache<SourcePosition, (TResult, int)>(i => LocateByPositionForCache(i, false));
+            Cache.LocateByPositionIncludingParent
+                = new FunctionCache<SourcePosition, (TResult, int)>(i => LocateByPositionForCache(i, true));
             Tracer.ConditionalBreak(flatItem.ObjectId == -492);
         }
 
         [DisableDump]
-        public SourcePart[] SourcePart => FlatItem.Anchor.SourcePart;
+        public SourcePart[] Anchors => FlatItem.Anchor.SourceParts;
+
+        [DisableDump]
+        public SourcePart SourcePart => FlatItem.Anchor.SourcePart;
 
         [DisableDump]
         internal TResult LeftMost => this.GetNodesFromLeftToRight().First();
@@ -112,17 +116,33 @@ namespace Reni.Helper
 
         protected abstract TResult Create(Syntax syntax, int index);
 
-        (TResult, int) LocateByPositionForCache(int current, bool includingParent)
+        (TResult Master, int Index) LocateByPositionForCache(SourcePosition current, bool includingParent)
         {
+            if(SourcePart.Contains(current))
+            {
+                var result = Anchors
+                    .Select((anchor, index) => (anchor, index))
+                    .FirstOrDefault(node => node.anchor.Length > 0 && node.anchor.Contains(current));
+
+                if(result.anchor != null)
+                    return ((TResult)this, result.index);
+
+                return DirectChildren
+                    .Select(node => node.LocateByPosition(current, false))
+                    .FirstOrDefault(node => node.Master != null);
+            }
+
+
             NotImplementedMethod(current, includingParent);
             return default;
         }
 
-        internal(TResult Master, int Index) LocateByPosition(int offset, bool includingParent) 
+        internal(TResult Master, int Index) LocateByPosition(SourcePosition offset, bool includingParent)
             => includingParent? Cache.LocateByPositionIncludingParent[offset] : Cache.LocateByPosition[offset];
 
         IEnumerable<int> GetParserLevelGroup()
         {
+
             NotImplementedMethod();
             return default;
         }

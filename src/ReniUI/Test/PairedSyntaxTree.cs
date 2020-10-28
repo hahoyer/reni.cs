@@ -63,5 +63,23 @@ namespace ReniUI.Test
 
             (pairs.Length == 2).Assert();
         }
+
+        [UnitTest]
+        public void List3()
+        {
+            const string text = @"(1,2,3)";
+
+            var compiler = CompilerBrowser.FromText(text);
+
+            var open = compiler.LocatePosition(0);
+            var close = compiler.LocatePosition(text.IndexOf(")"));
+
+            var matchOpen = open.ParserLevelGroup;
+            var matchClose = close.ParserLevelGroup;
+
+            var pairs = matchOpen.Merge(matchClose, item => item).ToArray();
+
+            (pairs.Length == 2).Assert();
+        }
     }
 }

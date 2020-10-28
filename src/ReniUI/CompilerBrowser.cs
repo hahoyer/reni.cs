@@ -59,19 +59,16 @@ namespace ReniUI
         public static CompilerBrowser FromFile(string fileName, CompilerParameters parameters = null)
             => new CompilerBrowser(() => Compiler.FromFile(fileName, parameters));
 
-        public Classification.Syntax LocatePosition(int offset)
+        public Classification.Syntax LocatePosition(SourcePosition offset)
             => Classification.Syntax.LocateByPosition(Syntax, offset);
-
-        public Classification.Syntax LocatePosition(SourcePosition current)
-        {
-            (current.Source == Source).Assert();
-            return LocatePosition(current.Position);
-        }
 
         public string FlatFormat(bool areEmptyLinesPossible)
             => FormattingSyntax.FlatFormat(areEmptyLinesPossible);
 
-        internal IEnumerable<ValueSyntax> FindPosition(int offset)
+        public Classification.Syntax LocatePosition(int offset) => LocatePosition(Source + offset);
+        internal IEnumerable<ValueSyntax> FindPosition(int offset) => FindPosition(Source + offset);
+
+        internal IEnumerable<ValueSyntax> FindPosition(SourcePosition offset)
             => LocatePosition(offset)
                 .Master
                 .Chain(node => node.Parent)
@@ -86,7 +83,7 @@ namespace ReniUI
         internal string Reformat(IFormatter formatter = null, SourcePart targetPart = null) =>
             (formatter ?? new Formatting.Configuration().Create())
             .GetEditPieces(this, targetPart)
-            .Combine(Syntax.SourcePart.Combine());
+            .Combine(Syntax.Anchors.Combine());
 
         internal void Ensure() => Compiler.Execute();
 
@@ -124,14 +121,14 @@ namespace ReniUI
             return default;
         }
 
-        Classification.Syntax LocateValueByPosition(int offset, bool includingParent)
+        Classification.Syntax LocateValueByPosition(SourcePosition offset, bool includingParent)
         {
             var token = Classification.Syntax.LocateByPosition(Syntax, offset);
             if(token.IsComment || token.IsLineComment)
                 return null;
 
-            var position = token.Token.Characters.Position;
-            var result = position <= 0? default: token.Master.LocateByPosition(position - 1,includingParent);
+            var start = token.Token.Characters.Start;
+            var result = start.Position <= 0? default: token.Master.LocateByPosition(start+-1,includingParent);
             NotImplementedMethod(offset);
             return default;
         }
@@ -141,5 +138,6 @@ namespace ReniUI
             NotImplementedMethod(offset);
             return default;
         }
+
     }
 }
