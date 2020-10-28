@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
@@ -10,7 +9,7 @@ namespace Reni.SyntaxFactory
 {
     class ColonHandler : DumpableObject, IStatementProvider
     {
-        IStatementSyntax IStatementProvider.Get(BinaryTree target, Factory factory, Anchor frameItems)
+        IStatementSyntax IStatementProvider.Get(BinaryTree target, Factory factory, Anchor anchor)
         {
             var nodes = target
                 .Left
@@ -22,18 +21,22 @@ namespace Reni.SyntaxFactory
             var hasPrefix = !(nodes.First().First().TokenClass is IDeclarationTagToken);
 
             var result = nodes
-                .Skip(hasPrefix?1:0)
+                .Skip(hasPrefix? 1 : 0)
                 .Select(factory.CombineWithSuffix)
                 .Aggregate();
 
             if(hasPrefix)
             {
                 var prefixItems = Anchor.Create(nodes.First());
-                frameItems = frameItems == null? prefixItems : frameItems.Combine(prefixItems);
+                anchor = anchor == null? prefixItems : anchor.Combine(prefixItems);
             }
 
+            (anchor?.Right?.SourcePart).AssertIsNull();
+
+            var other = Anchor.Create(target);
+
             return DeclarationSyntax
-                .Create(result, factory.GetValueSyntax(target.Right), frameItems);
+                .Create(result, factory.GetValueSyntax(target.Right), anchor == null? other : anchor.Combine(other));
         }
     }
 }

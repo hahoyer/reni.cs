@@ -127,16 +127,17 @@ namespace Reni.SyntaxTree
             return new DeclarerSyntax(null, new[] {tagSyntax}, null, meansPublic);
         }
 
-        static TagSyntax GetTagSyntax(BinaryTree target, Anchor frameItems)
+        static TagSyntax GetTagSyntax(BinaryTree target, Anchor anchor)
         {
             var tag = target.TokenClass as DeclarationTagToken;
             var issue = tag == null? IssueId.InvalidDeclarationTag.Issue(target.Token.Characters) : null;
-            return new TagSyntax(tag, issue, frameItems);
+            return new TagSyntax(tag, issue, Anchor.Create(target).Combine(anchor));
         }
 
-        static DeclarerSyntax FromName(BinaryTree target, bool meansPublic, Anchor frameItems = null)
+        static DeclarerSyntax FromName(BinaryTree target, bool meansPublic, Anchor anchor = null)
         {
-            var nameSyntax = new NameSyntax(target.Token.Characters.Id, frameItems);
+            (anchor?.SourcePart).AssertIsNull();
+            var nameSyntax = new NameSyntax(target.Token.Characters.Id, Anchor.Create(target));
             return new DeclarerSyntax(null, new TagSyntax[0], nameSyntax, meansPublic);
         }
 

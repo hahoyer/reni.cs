@@ -12,15 +12,15 @@ namespace Reni.FeatureTest.Validation
     [Output("")]
     public sealed class UndefinedContextSymbol : CompilerTest
     {
-        public UndefinedContextSymbol() { Parameters.ProcessErrors = true; }
+        public UndefinedContextSymbol() => Parameters.ProcessErrors = true;
 
         protected override void Verify(IEnumerable<Issue> issues)
         {
             var issueArray = issues.ToArray();
             var i = 0;
-            Tracer.Assert(issueArray[i].IssueId == IssueId.MissingDeclarationInContext, issueArray[i].Dump);
+            (issueArray[i].IssueId == IssueId.MissingDeclarationInContext).Assert(issueArray[i].Dump);
             i++;
-            Tracer.Assert(i == issueArray.Length);
+            (i == issueArray.Length).Assert();
         }
     }
 
@@ -29,15 +29,15 @@ namespace Reni.FeatureTest.Validation
     [Output("")]
     public sealed class UndefinedSymbol : CompilerTest
     {
-        public UndefinedSymbol() { Parameters.ProcessErrors = true; }
+        public UndefinedSymbol() => Parameters.ProcessErrors = true;
 
         protected override void Verify(IEnumerable<Issue> issues)
         {
             var issueArray = issues.ToArray();
             var i = 0;
-            Tracer.Assert(issueArray[i].IssueId == IssueId.MissingDeclarationForType, issueArray[i].Dump);
+            (issueArray[i].IssueId == IssueId.MissingDeclarationForType).Assert(issueArray[i].Dump);
             i++;
-            Tracer.Assert(i == issueArray.Length);
+            (i == issueArray.Length).Assert();
         }
     }
 
@@ -47,15 +47,15 @@ namespace Reni.FeatureTest.Validation
     [UndefinedContextSymbol]
     public sealed class UseOfUndefinedContextSymbol : CompilerTest
     {
-        public UseOfUndefinedContextSymbol() { Parameters.ProcessErrors = true; }
+        public UseOfUndefinedContextSymbol() => Parameters.ProcessErrors = true;
 
         protected override void Verify(IEnumerable<Issue> issues)
         {
             var issueArray = issues.ToArray();
             var i = 0;
-            Tracer.Assert(issueArray[i].IssueId == IssueId.MissingDeclarationInContext, issueArray[i].Dump);
+            (issueArray[i].IssueId == IssueId.MissingDeclarationInContext).Assert(issueArray[i].Dump);
             i++;
-            Tracer.Assert(i == issueArray.Length);
+            (i == issueArray.Length).Assert();
         }
     }
 
@@ -65,15 +65,15 @@ namespace Reni.FeatureTest.Validation
     [UseOfUndefinedContextSymbol]
     public sealed class IndirectUseOfUndefinedContextSymbol : CompilerTest
     {
-        public IndirectUseOfUndefinedContextSymbol() { Parameters.ProcessErrors = true; }
+        public IndirectUseOfUndefinedContextSymbol() => Parameters.ProcessErrors = true;
 
         protected override void Verify(IEnumerable<Issue> issues)
         {
             var issueArray = issues.ToArray();
             var i = 0;
-            Tracer.Assert(issueArray[i].IssueId == IssueId.MissingDeclarationInContext, issueArray[i].Dump);
+            (issueArray[i].IssueId == IssueId.MissingDeclarationInContext).Assert(issueArray[i].Dump);
             i++;
-            Tracer.Assert(i == issueArray.Length);
+            (i == issueArray.Length).Assert();
         }
     }
 }

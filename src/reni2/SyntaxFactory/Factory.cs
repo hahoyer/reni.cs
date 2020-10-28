@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using Reni.Helper;
-using Reni.Parser;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
 using Reni.Validation;
@@ -48,8 +47,8 @@ namespace Reni.SyntaxFactory
                 return new IStatementSyntax[0];
 
             return GetSyntax(target, node => T((IStatementSyntax)node)
-                , (node) => T(node)
-                , (node) => node
+                , node => T(node)
+                , node => node
                 , frameItems
             );
         }
@@ -66,8 +65,8 @@ namespace Reni.SyntaxFactory
             //Tracer.ConditionalBreak(n!= null && path.Length ==0);
 
             return GetSyntax(target, node => node
-                , (node) => node.ToValueSyntax()
-                , (node) => (ValueSyntax)CompoundSyntax.Create(node)
+                , node => node.ToValueSyntax()
+                , node => (ValueSyntax)CompoundSyntax.Create(node)
                 , frameItems);
         }
 
@@ -100,7 +99,7 @@ namespace Reni.SyntaxFactory
             if(statementsToken != null)
                 return fromStatementsSyntax(statementsToken
                     .Provider
-                    .Get(target, factory,frameItems));
+                    .Get(target, factory, frameItems));
 
             return fromValueSyntax(new EmptyList(frameItems
                 , IssueId.InvalidExpression.Issue(target.Token.Characters)));
@@ -126,11 +125,18 @@ namespace Reni.SyntaxFactory
             var definable = target.TokenClass as Definable;
             (definable != null).Assert();
             return ExpressionSyntax
-                .Create(GetValueSyntax(target.Left), definable, GetValueSyntax(target.Right), frameItems);
+                .Create
+                (
+                    GetValueSyntax(target.Left),
+                    definable,
+                    GetValueSyntax(target.Right),
+                    Anchor.Create(target).Combine(frameItems)
+                );
         }
 
-        internal ValueSyntax GetInfixSyntax(BinaryTree target, Anchor frameItems)
-            => GetValueSyntax(target.Left).GetInfixSyntax(target, GetValueSyntax(target.Right), frameItems);
+        internal ValueSyntax GetInfixSyntax(BinaryTree target, Anchor anchor) 
+            => GetValueSyntax(target.Left)
+            .GetInfixSyntax(target, GetValueSyntax(target.Right), Anchor.Create(target).Combine(anchor));
 
         internal DeclarerSyntax CombineWithSuffix(IEnumerable<BinaryTree> nodes)
         {

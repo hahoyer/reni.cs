@@ -16,6 +16,7 @@ namespace Reni.ParserTest
         {
             // ReSharper disable once ArrangeConstructorOrDestructorBody
             Parameters.TraceOptions.Parser = false;
+            Parameters.CompilationLevel = CompilationLevel.Syntax;
             //Parameters.TraceOptions.Parser = true;
             //Parameters.ParseOnly = true;
         }
@@ -24,9 +25,9 @@ namespace Reni.ParserTest
         {
             var issueArray = issues.ToArray();
             var i = 0;
-            Tracer.Assert(issueArray[i].IssueId == IssueId.InvalidExpression, issueArray[i].Dump);
+            (issueArray[i].IssueId == IssueId.InvalidExpression).Assert(issueArray[i].Dump);
             i++;
-            Tracer.Assert(i == issueArray.Length);
+            (i == issueArray.Length).Assert();
         }
     }
 }
