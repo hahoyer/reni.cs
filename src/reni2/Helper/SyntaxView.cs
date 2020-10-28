@@ -54,9 +54,6 @@ namespace Reni.Helper
         [DisableDump]
         internal TResult RightMost => this.GetNodesFromRightToLeft().First();
 
-        [DisableDump]
-        internal IEnumerable<int> ParserLevelGroup
-            => this.CachedValue(GetParserLevelGroup);
 
         int LeftDirectChildCount => FlatItem.LeftDirectChildCount;
         int DirectChildCount => FlatItem.DirectChildren.Length;
@@ -140,11 +137,15 @@ namespace Reni.Helper
         internal(TResult Master, int Index) LocateByPosition(SourcePosition offset, bool includingParent)
             => includingParent? Cache.LocateByPositionIncludingParent[offset] : Cache.LocateByPosition[offset];
 
-        IEnumerable<int> GetParserLevelGroup()
+        internal IEnumerable<int> GetParserLevelGroup(int index)
         {
-
-            NotImplementedMethod();
-            return default;
+            var target = FlatItem.Anchor.Items[index];
+            return FlatItem
+                .Anchor
+                .Items
+                .Select((n, i) => (n, i))
+                .Where(item => target.TokenClass.IsBelongingTo(item.n.TokenClass))
+                .Select(item => item.i);
         }
 
         TResult[] GetRightChildren()

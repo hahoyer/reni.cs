@@ -59,6 +59,6 @@ namespace ReniUI.Classification
 
         [DisableDump]
         public override IEnumerable<SourcePart> ParserLevelGroup
-            => Master.ParserLevelGroup?.Select(index => Master.FlatItem.Anchor.Items[index].Token.Characters);
+            => Master.GetParserLevelGroup(Index)?.Select(index => Master.FlatItem.Anchor.Items[index].Token.Characters);
     }
 }
