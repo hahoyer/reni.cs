@@ -21,7 +21,7 @@ namespace Reni.TokenClasses
             internal BinaryTree Right;
 
             [DisableDump]
-            internal Anchor ToFrameItems => Anchor.Create(Left, Right);
+            internal Anchor ToAnchor => Anchor.Create(Left, Right);
         }
 
         static int NextObjectId;
@@ -65,22 +65,9 @@ namespace Reni.TokenClasses
 
         [DisableDump]
         internal IEnumerable<Issue> Issues
-        {
-            get
-            {
-                if(Left != null)
-                    foreach(var issue in Left.Issues)
-                        yield return issue;
-
-                var issue1 = (TokenClass as IErrorToken)?.IssueId.Issue(Token.Characters);
-                if(issue1 != null)
-                    yield return issue1;
-
-                if(Right != null)
-                    foreach(var issue in Right.Issues)
-                        yield return issue;
-            }
-        }
+            => T(Left?.Issues, T((TokenClass as IErrorToken)?.IssueId.Issue(Token.Characters)), Right?.Issues)
+                .ConcatMany()
+                .Where(node => node != null);
 
         [DisableDump]
         internal BracketNodes BracketKernel

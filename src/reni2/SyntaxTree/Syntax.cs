@@ -86,11 +86,7 @@ namespace Reni.SyntaxTree
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         int ITree<Syntax>.LeftDirectChildCount => LeftDirectChildCountInternal;
 
-        IEnumerable<Issue> GetIssues()
-        {
-            if(Issue != null)
-                yield return Issue;
-        }
+        IEnumerable<Issue> GetIssues() => T(Issue).Concat(Anchor.Issues).Where(node => node != null);
 
         protected abstract Syntax GetDirectChild(int index);
 

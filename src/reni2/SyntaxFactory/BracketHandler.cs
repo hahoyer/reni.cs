@@ -9,7 +9,7 @@ namespace Reni.SyntaxFactory
         ValueSyntax IValueProvider.Get(BinaryTree target, Factory factory, Anchor anchor)
         {
             var kernel = target.BracketKernel;
-            var result = factory.GetValueSyntax(kernel.Center, kernel.ToFrameItems.Combine(anchor));
+            var result = factory.GetValueSyntax(kernel.Center, kernel.ToAnchor.Combine(anchor));
             result.AssertIsNotNull();
             return result;
         }

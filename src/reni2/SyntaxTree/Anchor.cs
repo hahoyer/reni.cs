@@ -6,6 +6,7 @@ using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
 using Reni.TokenClasses;
+using Reni.Validation;
 
 namespace Reni.SyntaxTree
 {
@@ -48,6 +49,7 @@ namespace Reni.SyntaxTree
 
         internal SourcePart SourcePart => Items.Select(item=>item.Token.SourcePart()).Aggregate();
 
+        public IEnumerable<Issue> Issues => Items.SelectMany(node => node.Issues);
 
         protected override string GetNodeDump() => base.GetNodeDump() + $"[{Items.Length}]";
 
