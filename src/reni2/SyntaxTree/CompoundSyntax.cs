@@ -29,12 +29,8 @@ namespace Reni.SyntaxTree
         [EnableDump(Order = 1)]
         internal readonly IStatementSyntax[] Statements;
 
-        CompoundSyntax
-        (
-            IStatementSyntax[] statements, CleanupSyntax cleanupSection
-            , Anchor frameItems
-        )
-            : base(NextObjectId++, frameItems)
+        CompoundSyntax(IStatementSyntax[] statements, CleanupSyntax cleanupSection, Anchor anchor)
+            : base(NextObjectId++, anchor)
         {
             Statements = statements;
             CleanupSection = cleanupSection;
@@ -101,17 +97,8 @@ namespace Reni.SyntaxTree
         protected override int DirectChildCount => Statements.Length + 1;
 
         public static CompoundSyntax Create
-        (
-            IStatementSyntax[] statements,
-            CleanupSyntax cleanupSection = null,
-            Anchor frameItems = null
-        )
-            => new CompoundSyntax
-            (
-                statements,
-                cleanupSection,
-                frameItems
-            );
+            (IStatementSyntax[] statements, CleanupSyntax cleanupSection, Anchor anchor)
+            => new CompoundSyntax(statements, cleanupSection, anchor);
 
         public string GetCompoundIdentificationDump() => "." + ObjectId + "i";
 
@@ -167,7 +154,7 @@ namespace Reni.SyntaxTree
             var newCleanupSection
                 = cleanupSection == null
                     ? CleanupSection
-                    : new CleanupSyntax(cleanupSection);
+                    : new CleanupSyntax(cleanupSection, CleanupSection.Anchor);
 
             return Create(newStatements, newCleanupSection, Anchor);
         }
@@ -227,7 +214,7 @@ namespace Reni.SyntaxTree
         ValueSyntax Value { get; }
         DeclarerSyntax Declarer { get; }
         SourcePart SourcePart { get; }
-        ValueSyntax ToValueSyntax();
+        ValueSyntax ToValueSyntax(Anchor anchor);
         IStatementSyntax With(Anchor frameItems);
     }
 }

@@ -47,13 +47,7 @@ namespace Reni.SyntaxTree
 
         int CurrentResultDepth;
 
-        internal ExpressionSyntax
-        (
-            ValueSyntax left,
-            Definable definable,
-            ValueSyntax right,
-            Anchor anchor
-        )
+        internal ExpressionSyntax(ValueSyntax left, Definable definable, ValueSyntax right, Anchor anchor)
             : base(anchor)
         {
             Left = left;

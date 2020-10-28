@@ -18,8 +18,8 @@ namespace Reni.SyntaxTree
     {
         internal abstract class NoChildren : Syntax
         {
-            protected NoChildren(Issue issue = null, Anchor frameItems = null)
-                : base(issue, frameItems ?? SyntaxTree.Anchor.Create()) { }
+            protected NoChildren(Anchor anchor, Issue issue = null)
+                : base(anchor, issue) { }
 
             [DisableDump]
             protected sealed override int LeftDirectChildCountInternal => 0;
@@ -43,17 +43,18 @@ namespace Reni.SyntaxTree
         [EnableDumpExcept(null)]
         readonly Issue Issue;
 
-        protected Syntax(Issue issue = null, Anchor anchor = null)
+        protected Syntax(Anchor anchor, Issue issue = null)
         {
-            Anchor = anchor ?? Anchor.Create();
+            Anchor = anchor;
             Anchor.SourcePart.AssertIsNotNull();
             Issue = issue;
         }
 
-        protected Syntax(int objectId, Issue issue = null, Anchor frameItems = null)
+        protected Syntax(int objectId, Anchor anchor, Issue issue = null)
             : base(objectId)
         {
-            Anchor = frameItems ?? Anchor.Create();
+            Anchor = anchor;
+            Anchor.SourcePart.AssertIsNotNull();
             Issue = issue;
         }
 

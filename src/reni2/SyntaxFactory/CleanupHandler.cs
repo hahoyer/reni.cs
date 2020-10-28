@@ -1,5 +1,4 @@
 using hw.DebugFormatter;
-using Reni.Parser;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
 
@@ -9,9 +8,10 @@ namespace Reni.SyntaxFactory
     {
         ValueSyntax IValueProvider.Get(BinaryTree target, Factory factory, Anchor frameItems)
         {
-            var statements = factory.GetStatementsSyntax(target.Left, Anchor.Create());
+            var statements = factory.GetStatementsSyntax(target.Left, null);
             var cleanup = factory.GetValueSyntax(target.Right);
-            return CompoundSyntax.Create(statements, new CleanupSyntax(cleanup), frameItems);
+            var cleanupSection = new CleanupSyntax(cleanup, Anchor.Create(target));
+            return CompoundSyntax.Create(statements, cleanupSection, frameItems);
         }
     }
 }

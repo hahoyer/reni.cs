@@ -15,8 +15,8 @@ namespace Reni.SyntaxTree
         internal readonly ValueSyntax Value;
 
         DeclarationSyntax
-            (DeclarerSyntax declarer, ValueSyntax value, Anchor frameItems = null)
-            : base(anchor: frameItems ?? SyntaxTree.Anchor.Create())
+            (DeclarerSyntax declarer, ValueSyntax value, Anchor anchor)
+            : base(anchor )
         {
             Declarer = declarer;
             Value = value;
@@ -49,16 +49,16 @@ namespace Reni.SyntaxTree
 
         SourcePart IStatementSyntax.SourcePart => Anchor.SourcePart;
 
-        ValueSyntax IStatementSyntax.ToValueSyntax()
-            => CompoundSyntax.Create(T((IStatementSyntax)this));
+        ValueSyntax IStatementSyntax.ToValueSyntax(Anchor anchor)
+            => CompoundSyntax.Create(T((IStatementSyntax)this), null, anchor);
 
         [DisableDump]
         ValueSyntax IStatementSyntax.Value => Value;
 
-        IStatementSyntax IStatementSyntax.With(Anchor frameItems)
-            => frameItems == null || !frameItems.Items.Any()
+        IStatementSyntax IStatementSyntax.With(Anchor anchor)
+            => anchor == null || !anchor.Items.Any()
                 ? this
-                : Create(Declarer, Value, frameItems.Combine(Anchor));
+                : Create(Declarer, Value, anchor.Combine(Anchor));
 
         protected override Syntax GetDirectChild(int index)
             => index switch

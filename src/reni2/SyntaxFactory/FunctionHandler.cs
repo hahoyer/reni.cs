@@ -1,5 +1,4 @@
 using hw.DebugFormatter;
-using Reni.Parser;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
 
@@ -7,11 +6,7 @@ namespace Reni.SyntaxFactory
 {
     class FunctionHandler : DumpableObject, IValueProvider
     {
-        ValueSyntax IValueProvider.Get
-        (
-            BinaryTree target, Factory factory
-            , Anchor frameItems
-        )
+        ValueSyntax IValueProvider.Get(BinaryTree target, Factory factory, Anchor frameItems)
         {
             var token = (Function)target.TokenClass;
             return new FunctionSyntax
@@ -20,7 +15,7 @@ namespace Reni.SyntaxFactory
                 , token.IsImplicit
                 , token.IsMetaFunction
                 , factory.GetValueSyntax(target.Right)
-                , frameItems
+                , Anchor.Create(target).Combine(frameItems)
             );
         }
     }

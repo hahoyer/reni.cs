@@ -64,13 +64,6 @@ namespace Reni.SyntaxTree
                 , LeftItemCount = 1
             };
 
-        internal static Anchor Create()
-            => new Anchor
-            {
-                Items = new BinaryTree[0]
-                , LeftItemCount = 0
-            };
-
         public static Anchor Create(IEnumerable<BinaryTree> left)
             => new Anchor
             {

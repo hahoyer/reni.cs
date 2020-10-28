@@ -7,10 +7,10 @@ namespace Reni.SyntaxFactory
 {
     class ListHandler : DumpableObject, IStatementsProvider
     {
-        IStatementSyntax[] IStatementsProvider.Get(BinaryTree target, Factory factory, Anchor frameItems)
+        IStatementSyntax[] IStatementsProvider.Get(BinaryTree target, Factory factory, Anchor anchor)
         {
-            var left = factory.GetStatementsSyntax(target.Left, frameItems);
-            var right = factory.GetStatementsSyntax(target.Right, Anchor.Create(target));
+            var left = factory.GetStatementsSyntax(target.Left, anchor?.Left);
+            var right = factory.GetStatementsSyntax(target.Right, anchor?.Right);
             return left.Concat(right).ToArray();
         }
     }

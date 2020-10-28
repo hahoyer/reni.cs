@@ -16,8 +16,8 @@ namespace Reni.SyntaxTree
             internal readonly IDeclarationTagToken Value;
 
             internal TagSyntax
-                (IDeclarationTagToken value, Issue issue, Anchor frameItems)
-                : base(issue, frameItems)
+                (IDeclarationTagToken value, Issue issue, Anchor anchor)
+                : base(anchor, issue)
             {
                 Value = value;
             }
@@ -34,8 +34,8 @@ namespace Reni.SyntaxTree
         {
             internal readonly string Value;
 
-            internal NameSyntax(string name, Anchor frameItems)
-                : base(frameItems: frameItems)
+            internal NameSyntax(string name, Anchor anchor)
+                : base(anchor: anchor)
                 => Value = name;
 
             [EnableDump]

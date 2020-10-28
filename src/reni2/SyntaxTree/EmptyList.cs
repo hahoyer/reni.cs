@@ -1,14 +1,13 @@
 using Reni.Basics;
 using Reni.Context;
-using Reni.TokenClasses;
 using Reni.Validation;
 
 namespace Reni.SyntaxTree
 {
     sealed class EmptyList : ValueSyntax.NoChildren
     {
-        public EmptyList(Anchor frameItems = null, Issue issue = null)
-            : base(frameItems ?? SyntaxTree.Anchor.Create(), issue)
+        public EmptyList(Anchor anchor, Issue issue = null)
+            : base(anchor, issue)
         {
             StopByObjectIds();
             AssertValid();

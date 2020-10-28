@@ -23,7 +23,7 @@ namespace Reni.SyntaxTree
         internal new abstract class NoChildren : ValueSyntax
         {
             protected NoChildren(Anchor anchor, Issue issue = null)
-                : base(anchor, issue){}
+                : base(anchor, issue) { }
 
             [DisableDump]
             protected sealed override int LeftDirectChildCountInternal => 0;
@@ -41,11 +41,11 @@ namespace Reni.SyntaxTree
         internal readonly FunctionCache<ContextBase, ResultCache> ResultCache =
             new FunctionCache<ContextBase, ResultCache>();
 
-        protected ValueSyntax(Anchor anchor = null, Issue issue = null)
-            : base(issue, anchor) { }
+        protected ValueSyntax(Anchor anchor, Issue issue = null)
+            : base(anchor, issue) { }
 
-        protected ValueSyntax(int objectId, Anchor frameItems = null, Issue issue = null)
-            : base(objectId, issue, frameItems) { }
+        protected ValueSyntax(int objectId, Anchor anchor, Issue issue = null)
+            : base(objectId, anchor, issue) { }
 
         [DisableDump]
         internal virtual bool IsLambda => false;
@@ -63,7 +63,7 @@ namespace Reni.SyntaxTree
 
         SourcePart IStatementSyntax.SourcePart => Anchor.SourcePart;
 
-        ValueSyntax IStatementSyntax.ToValueSyntax() => this;
+        ValueSyntax IStatementSyntax.ToValueSyntax(Anchor anchor) => this;
 
         ValueSyntax IStatementSyntax.Value => this;
 
