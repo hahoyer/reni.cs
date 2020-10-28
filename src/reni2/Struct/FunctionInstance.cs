@@ -4,6 +4,7 @@ using hw.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
+using Reni.Parser;
 using Reni.SyntaxTree;
 using Reni.Type;
 using Reni.Validation;
@@ -44,7 +45,7 @@ namespace Reni.Struct
         [DisableDump]
         protected abstract Size RelevantValueSize { get; }
 
-        string Description => Body.Anchor.SourcePart.Id ?? "";
+        string Description => Body.Anchor.SourcePart.Combine().Id ?? "";
 
         [Node]
         [DisableDump]

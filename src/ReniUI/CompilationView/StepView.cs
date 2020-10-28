@@ -16,6 +16,6 @@ namespace ReniUI.CompilationView
             Client = item.CreateView(Master);
         }
 
-        protected override SourcePart SourcePart => null;
+        protected override SourcePart[] SourceParts => null;
     }
 }

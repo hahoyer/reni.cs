@@ -6,6 +6,7 @@ using hw.UnitTest;
 namespace ReniUI.Test
 {
     [UnitTest]
+    [PairedSyntaxTree]
     public sealed class ListMatching : DependenceProvider
     {
         [UnitTest]
@@ -15,7 +16,7 @@ namespace ReniUI.Test
             var compiler = CompilerBrowser.FromText(text);
             var comma = compiler.LocatePosition(2);
             var commas = comma.ParserLevelGroup.ToArray();
-            Tracer.Assert(commas.Length == 2);
+            (commas.Length == 2).Assert();
         }
 
         [UnitTest]
@@ -36,14 +37,14 @@ namespace ReniUI.Test
                     (item => compiler.LocatePosition(item.index).ParserLevelGroup.ToArray())
                 .ToArray();
 
-            Tracer.Assert(commas.Length == 3);
+            (commas.Length == 3).Assert();
             var tuples = commas
                 .Skip(1)
                 .Select(comma => comma.Merge(commas[0], item => item).ToArray())
                 .ToArray();
 
             foreach(var tuple in tuples)
-                Tracer.Assert(tuple.Length == 3);
+                (tuple.Length == 3).Assert();
         }
 
         [UnitTest]
@@ -59,14 +60,14 @@ namespace ReniUI.Test
                     (item => compiler.LocatePosition(item.index).ParserLevelGroup.ToArray())
                 .ToArray();
 
-            Tracer.Assert(commas.Length == 3);
-            Tracer.Assert(commas[0].Length == 1);
-            Tracer.Assert(commas[1].Length == 1);
-            Tracer.Assert(commas[2].Length == 0);
+            (commas.Length == 3).Assert();
+            (commas[0].Length == 1).Assert();
+            (commas[1].Length == 1).Assert();
+            (commas[2].Length == 0).Assert();
 
             var firstPart = commas[0].Merge(commas[1], item => item).ToArray();
 
-            Tracer.Assert(firstPart.Length == 2);
+            (firstPart.Length == 2).Assert();
         }
     }
 }

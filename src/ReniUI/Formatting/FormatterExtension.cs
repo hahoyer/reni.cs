@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Parser;
 using hw.Scanner;
-using ReniUI.Helper;
 
 namespace ReniUI.Formatting
 {
@@ -29,10 +27,10 @@ namespace ReniUI.Formatting
                 .ToArray();
             foreach(var edit in edits)
             {
-                Tracer.Assert(edit.Location.EndPosition <= originalEndPosition, "not implemented.");
+                (edit.Location.EndPosition <= originalEndPosition).Assert("not implemented.");
                 var newPosition = edit.Location.EndPosition - originalPosition;
                 if(currentPosition < 0)
-                    Tracer.Assert(newPosition <= 0);
+                    (newPosition <= 0).Assert();
                 else
                 {
                     var length = edit.Location.Position - originalPosition - currentPosition;
@@ -43,7 +41,7 @@ namespace ReniUI.Formatting
                 currentPosition = newPosition;
             }
 
-            result += original.Substring(Math.Max(0, currentPosition));
+            result += original.Substring(T(0, currentPosition).Max());
             return result;
         }
 
@@ -53,7 +51,7 @@ namespace ReniUI.Formatting
                 return false;
 
             var start = compiler.LocatePosition(targetPart.Position);
-            var end = compiler.LocatePosition(targetPart.EndPosition-1);
+            var end = compiler.LocatePosition(targetPart.EndPosition - 1);
             if(start != null && end != null)
                 return start.Master == end.Master && IsTooSmall(start.Token, targetPart);
 
@@ -65,5 +63,7 @@ namespace ReniUI.Formatting
             => token.Characters.Contains
                    (targetPart) ||
                token.PrecededWith.Any(part => part.SourcePart.Contains(targetPart));
+
+        public static TValue[] T<TValue>(params TValue[] value) => value;
     }
 }

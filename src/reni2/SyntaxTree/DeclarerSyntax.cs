@@ -24,7 +24,7 @@ namespace Reni.SyntaxTree
 
             [EnableDump]
             [EnableDumpExcept(null)]
-            string Position => Anchor.SourcePart.GetDumpAroundCurrent(5);
+            string Position => Anchor.SourcePart.DumpSource(5);
 
             internal override void AssertValid(Level level, BinaryTree target = null)
                 => base.AssertValid(level == null? null : new Level {IsCorrectOrder = level.IsCorrectOrder}, target);
@@ -40,7 +40,7 @@ namespace Reni.SyntaxTree
 
             [EnableDump]
             [EnableDumpExcept(null)]
-            string Position => Anchor.SourcePart.GetDumpAroundCurrent(5);
+            string Position => Anchor.SourcePart.DumpSource(5);
 
             internal override void AssertValid(Level level, BinaryTree target = null)
                 => base.AssertValid(level == null? null : new Level {IsCorrectOrder = level.IsCorrectOrder}, target);
@@ -65,7 +65,7 @@ namespace Reni.SyntaxTree
         internal Issue Issue => Hidden == null? null : IssueId.StrangeDeclaration.Issue(Hidden.SourcePart);
 
         internal SourcePart SourcePart
-            => T(T(Hidden?.SourcePart), Tags.Select(node => node.Anchor.SourcePart), T(Name?.Anchor.SourcePart))
+            => T(T(Hidden?.SourcePart), Tags.SelectMany(node => node.Anchor.SourcePart), Name?.Anchor.SourcePart)
                 .ConcatMany()
                 .Where(i=>i!= null)
                 .Aggregate();

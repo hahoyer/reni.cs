@@ -5,6 +5,7 @@ using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Parser;
 using Reni.TokenClasses;
 
 namespace Reni.SyntaxTree
@@ -84,7 +85,7 @@ namespace Reni.SyntaxTree
         internal override Result ResultForCache(ContextBase context, Category category)
         {
             if(CurrentResultDepth > 20)
-                throw new EvaluationDepthExhaustedException(Anchor.SourcePart, context, CurrentResultDepth);
+                throw new EvaluationDepthExhaustedException(Anchor.SourcePart.Combine(), context, CurrentResultDepth);
 
             try
             {

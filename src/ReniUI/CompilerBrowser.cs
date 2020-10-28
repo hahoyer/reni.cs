@@ -86,7 +86,7 @@ namespace ReniUI
         internal string Reformat(IFormatter formatter = null, SourcePart targetPart = null) =>
             (formatter ?? new Formatting.Configuration().Create())
             .GetEditPieces(this, targetPart)
-            .Combine(Syntax.SourcePart);
+            .Combine(Syntax.SourcePart.Combine());
 
         internal void Ensure() => Compiler.Execute();
 

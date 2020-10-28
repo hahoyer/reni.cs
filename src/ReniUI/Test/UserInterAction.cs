@@ -1,7 +1,9 @@
+using System.Linq;
 using hw.DebugFormatter;
 using hw.Scanner;
 using hw.UnitTest;
 using Reni;
+using Reni.Parser;
 
 namespace ReniUI.Test
 {
@@ -53,7 +55,7 @@ complex FromReal(2) dump_print;
                 var compiler = Compiler.FromText(textFragment);
                 var syntax = compiler.Syntax;
                 var span = syntax.Anchor.SourcePart;
-                (span.Id == textFragment).Assert(() => span.NodeDump);
+                span.Any(item=>item.Id == textFragment).Assert(() => span.DumpSource());
             }
         }
 

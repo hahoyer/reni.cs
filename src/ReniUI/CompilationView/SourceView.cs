@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Windows.Forms;
+using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 using Reni;
@@ -158,7 +159,8 @@ namespace ReniUI.CompilationView
         }
 
         void SignalContextMenuSelect(ValueSyntax syntax)
-            => TextBox.SetSelection(syntax.Anchor.SourcePart.Position, syntax.Anchor.SourcePart.EndPosition);
+            => TextBox.SetSelection(syntax.Anchor.SourcePart.First().Position
+                , syntax.Anchor.SourcePart.Last().EndPosition);
 
         void StyleConfig(TextStyle id) => id.Config(TextBox.Styles[id]);
 
@@ -190,11 +192,12 @@ namespace ReniUI.CompilationView
         internal void SignalClickedFunction(int index)
             => SignalClickedObject(Compiler.Function(index));
 
-        internal void SelectSource(SourcePart source)
+        internal void SelectSource(SourcePart[] source)
         {
             if(source == null)
                 return;
-            TextBox.SetSelection(source.Position, source.EndPosition);
+            (source.Length == 1).Assert();
+            TextBox.SetSelection(source.First().Position, source.First().EndPosition);
         }
 
         internal ITraceLogItem TraceLogItem(IFormalCodeItem target)

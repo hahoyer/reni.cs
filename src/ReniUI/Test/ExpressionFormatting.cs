@@ -6,6 +6,7 @@ namespace ReniUI.Test
 {
     [UnitTest]
     [TestFixture]
+    [PairedSyntaxTree]
     public sealed class ExpressionFormatting : DependenceProvider
     {
         [UnitTest]
@@ -15,7 +16,7 @@ namespace ReniUI.Test
             var compiler = CompilerBrowser.FromText(text);
             var span = (compiler.Source + 0).Span(text.Length);
             var x = compiler.Reformat(targetPart: span);
-            Tracer.Assert(x == "(1, 3, 4, 6)", x);
+            (x == "(1, 3, 4, 6)").Assert(x);
         }
 
         [UnitTest]
@@ -27,7 +28,7 @@ namespace ReniUI.Test
             var span = (compiler.Source + 0).Span(text.Length);
             var x = compiler.Reformat(targetPart: span);
 
-            Tracer.Assert(x == "{^ : ^}", x);
+            (x == "{^ : ^}").Assert(x);
         }
     }
 }

@@ -61,7 +61,7 @@ namespace Reni.SyntaxTree
 
         DeclarerSyntax IStatementSyntax.Declarer => null;
 
-        SourcePart IStatementSyntax.SourcePart => Anchor.SourcePart;
+        SourcePart IStatementSyntax.SourcePart => Anchor.SourcePart.Combine();
 
         ValueSyntax IStatementSyntax.ToValueSyntax(Anchor anchor) => this;
 

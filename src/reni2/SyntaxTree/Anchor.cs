@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
@@ -7,6 +6,7 @@ using hw.Parser;
 using hw.Scanner;
 using Reni.TokenClasses;
 using Reni.Validation;
+using Reni.Parser;
 
 namespace Reni.SyntaxTree
 {
@@ -47,7 +47,8 @@ namespace Reni.SyntaxTree
         [DisableDump]
         BinaryTree[] RightItems => Items.Skip(LeftItemCount).ToArray();
 
-        internal SourcePart SourcePart => Items.Select(item=>item.Token.SourcePart()).Aggregate();
+        internal SourcePart[] SourcePart => Items.Select(item=>item.Token.SourcePart()).ToArray();
+        internal SourcePart SourcePartA => SourcePart.Combine();
 
         public IEnumerable<Issue> Issues => Items.SelectMany(node => node.Issues);
 

@@ -1,7 +1,7 @@
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Scanner;
-using Reni.TokenClasses;
+using Reni.Parser;
 using Reni.Validation;
 
 namespace Reni.SyntaxTree
@@ -14,9 +14,8 @@ namespace Reni.SyntaxTree
         [EnableDumpExcept(null)]
         internal readonly ValueSyntax Value;
 
-        DeclarationSyntax
-            (DeclarerSyntax declarer, ValueSyntax value, Anchor anchor)
-            : base(anchor )
+        DeclarationSyntax(DeclarerSyntax declarer, ValueSyntax value, Anchor anchor)
+            : base(anchor)
         {
             Declarer = declarer;
             Value = value;
@@ -27,7 +26,7 @@ namespace Reni.SyntaxTree
 
         [EnableDump]
         [EnableDumpExcept(null)]
-        string Position => Anchor.SourcePart.GetDumpAroundCurrent(5);
+        string Position => Anchor.SourcePart.DumpSource();
 
         [DisableDump]
         internal string NameOrNull => Declarer.Name?.Value;
@@ -47,7 +46,7 @@ namespace Reni.SyntaxTree
         [DisableDump]
         DeclarerSyntax IStatementSyntax.Declarer => Declarer;
 
-        SourcePart IStatementSyntax.SourcePart => Anchor.SourcePart;
+        SourcePart IStatementSyntax.SourcePart => Anchor.SourcePartA;
 
         ValueSyntax IStatementSyntax.ToValueSyntax(Anchor anchor)
             => CompoundSyntax.Create(T((IStatementSyntax)this), null, anchor);
@@ -68,13 +67,12 @@ namespace Reni.SyntaxTree
                 , _ => null
             };
 
-        internal static IStatementSyntax Create
-            (DeclarerSyntax declarer, ValueSyntax value, Anchor frameItems)
+        internal static IStatementSyntax Create(DeclarerSyntax declarer, ValueSyntax value, Anchor anchor)
             => new DeclarationSyntax
             (
                 declarer,
-                value ?? new EmptyList(null, issue: IssueId.MissingDeclarationValue.Issue(frameItems.SourcePart)),
-                frameItems
+                value ?? new EmptyList(null, IssueId.MissingDeclarationValue.Issue(anchor.SourcePartA)),
+                anchor
             );
     }
 }

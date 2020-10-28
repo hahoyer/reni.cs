@@ -12,9 +12,9 @@ namespace ReniUI.CompilationView
             : base(master, "Context: "+ item.NodeDump)
         {
             Client = item.CreateView(Master);
-            SourcePart = item.GetSource();
+            SourceParts = T(item.GetSource());
         }
 
-        protected override SourcePart SourcePart { get; }
+        protected override SourcePart[] SourceParts { get; }
     }
 }

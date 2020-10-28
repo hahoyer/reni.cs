@@ -41,7 +41,7 @@ namespace ReniUI.Test
             const string text = @"(1,3,4,6)";
             var compiler = CompilerBrowser.FromText(text);
             var span = compiler.Source + text.IndexOf(',');
-            var x = compiler.LocatePosition(span).Master.SourcePart;
+            var x = compiler.LocatePosition(span).Master.SourcePart.Combine();
             Tracer.Assert(x.Id.Replace("\r", "") == "1,3,4,6", x.Dump);
         }
 
@@ -52,7 +52,7 @@ namespace ReniUI.Test
             const string text = @"(x:1,3,4,6)";
             var compiler = CompilerBrowser.FromText(text);
             var span = compiler.Source + text.IndexOf(',');
-            var x = compiler.LocatePosition(span).Master.SourcePart;
+            var x = compiler.LocatePosition(span).Master.SourcePart.Combine();
             Tracer.Assert(x.Id.Replace("\r", "") == "x:1,3,4,6", x.Dump);
         }
     }

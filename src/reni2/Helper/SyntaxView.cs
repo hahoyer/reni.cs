@@ -42,7 +42,7 @@ namespace Reni.Helper
         }
 
         [DisableDump]
-        public SourcePart SourcePart => FlatItem.Anchor.SourcePart;
+        public SourcePart[] SourcePart => FlatItem.Anchor.SourcePart;
 
         [DisableDump]
         internal TResult LeftMost => this.GetNodesFromLeftToRight().First();

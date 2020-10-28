@@ -5,9 +5,9 @@ using hw.UnitTest;
 namespace ReniUI.Test
 {
     [UnitTest]
+    [PairedSyntaxTree]
     public sealed class BadUserInterAction : DependenceProvider
     {
-
         [UnitTest]
         public void GetTokenForPosition()
         {

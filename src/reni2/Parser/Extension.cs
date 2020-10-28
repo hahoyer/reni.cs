@@ -228,5 +228,83 @@ namespace Reni.Parser
                 .Where(b => !target.Any(p => p != b && p.SourcePart.Contains(b.SourcePart)))
                 .ToArray();
         }
+
+        static string GetDumpAfterCurrent(this SourcePart target, int dumpWidth)
+        {
+            if(target.Source.IsEnd(target.EndPosition))
+                return "";
+
+            var length = Math.Min(dumpWidth, target.Source.Length - target.EndPosition);
+            var result = target.Source.SubString(target.EndPosition, length);
+            if(length == dumpWidth)
+                result += "...";
+            return result;
+        }
+
+        static string GetDumpBeforeCurrent(this SourcePart target, int dumpWidth)
+        {
+            var start = T(0, target.Position - dumpWidth).Max();
+            var result = target.Source.SubString(start, target.Position - start);
+            if(target.Position >= dumpWidth)
+                result = "..." + result;
+            return result;
+        }
+
+        public static string DumpSource(this SourcePart[] target, int dumpWidth = 5)
+        {
+            if(!target.Any())
+                return "";
+
+            target = target
+                .OrderBy(item => item.Position)
+                .ThenBy(item => item.EndPosition)
+                .ToArray();
+
+            var result = target[0].GetDumpBeforeCurrent(dumpWidth) + "[";
+            for(var index = 0; index < target.Length; index++)
+                result += DumpSource(target, index, dumpWidth);
+
+            return result;
+        }
+
+        static string DumpSource(SourcePart[] target, int index, int dumpWith)
+        {
+            var current = target[index];
+            var next = index + 1 < target.Length? target[index + 1] : null;
+
+            var result = current.Id;
+            var delta = (next == null? current.Source.Length : next.Position) - current.EndPosition;
+
+            if(next == null)
+            {
+                if(delta < dumpWith + 3)
+                    return result + current.End.Span(delta);
+                return result + "]" + current.End.Span(dumpWith) + "...";
+            }
+
+            (current.Source == next.Source).Assert();
+
+            if(delta < 0)
+                return current.Start.Span(next.Start).Id;
+
+            if(delta < 2 * dumpWith + 3)
+                return result + "]" + current.End.Span(next.Start) + "[";
+
+            return result + "]" + current.End.Span(dumpWith) + "..." + next[-dumpWith].Span(dumpWith) + "[";
+        }
+
+        internal static SourcePart Combine(this IEnumerable<SourcePart> target1)
+        {
+            var target = target1.ToArray();
+
+            if(!target.Any())
+                return null;
+
+            target.All(item => item.Source == target[0].Source).Assert();
+
+            var start = target.Select(item => item.Position).Min();
+            var end = target.Select(item => item.EndPosition).Max();
+            return new SourcePosition(target[0].Source, start).Span(end - start);
+        }
     }
 }

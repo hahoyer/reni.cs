@@ -1,7 +1,7 @@
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Scanner;
 using Reni.Helper;
+using Reni.Parser;
 
 namespace ReniUI.Helper
 {
@@ -21,16 +21,15 @@ namespace ReniUI.Helper
 
         [EnableDump]
         [EnableDumpExcept(null)]
-        string ParentToken => Parent?.SourcePart.GetDumpAroundCurrent(5);
+        string ParentToken => Parent?.SourcePart.DumpSource(5);
 
         [EnableDump(Order = 10)]
         string[] Children => FlatItem
             .Children
-            .Select(node=> node?.Anchor.SourcePart.GetDumpAroundCurrent(5))
+            .Select(node => node?.Anchor.SourcePart.DumpSource(5))
             .ToArray();
 
         protected override Syntax Create(Reni.SyntaxTree.Syntax flatItem, int index)
             => new Syntax(flatItem, Context, index, this);
-
     }
 }

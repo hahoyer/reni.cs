@@ -1,5 +1,6 @@
 using hw.DebugFormatter;
 using hw.UnitTest;
+using Reni.Parser;
 
 // ReSharper disable StringIndexOfIsCultureSpecific.1
 
@@ -20,8 +21,8 @@ namespace ReniUI.Test
                 (
                     () =>
                         "elseToken.Master= " +
-                        $"{elseToken.Master.FlatItem.Anchor.SourcePart.d}\n\n" +
-                        $"thenToken.Master = {thenToken.Master.FlatItem.Anchor.SourcePart.d}"
+                        $"{elseToken.Master.FlatItem.Anchor.SourcePart.DumpSource()}\n\n" +
+                        $"thenToken.Master = {thenToken.Master.FlatItem.Anchor.SourcePart.DumpSource()}"
                 );
             (elseToken.Index == 2).Assert();
             (thenToken.Index == 1).Assert();
