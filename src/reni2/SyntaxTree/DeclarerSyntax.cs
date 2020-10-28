@@ -136,8 +136,7 @@ namespace Reni.SyntaxTree
 
         static DeclarerSyntax FromName(BinaryTree target, bool meansPublic, Anchor anchor = null)
         {
-            (anchor?.SourcePart).AssertIsNull();
-            var nameSyntax = new NameSyntax(target.Token.Characters.Id, Anchor.Create(target));
+            var nameSyntax = new NameSyntax(target.Token.Characters.Id, Anchor.Create(target).Combine(anchor));
             return new DeclarerSyntax(null, new TagSyntax[0], nameSyntax, meansPublic);
         }
 
