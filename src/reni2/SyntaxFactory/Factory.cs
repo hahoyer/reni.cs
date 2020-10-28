@@ -75,13 +75,13 @@ namespace Reni.SyntaxFactory
                 case IValueToken valueToken:
                     return valueToken.Provider.Get(target, factory, anchor);
                 case IDeclarationToken declarationToken:
-                    return declarationToken.Provider.Get(target, factory, anchor.Left).ToValueSyntax(anchor.Right);
+                    return declarationToken.Provider.Get(target, factory, anchor.GetLeftOf(target)).ToValueSyntax(anchor.GetRightOf(target));
                 case IStatementsToken statementsToken:
                 {
                     var node = statementsToken
                         .Provider
-                        .Get(target, factory, anchor?.Left);
-                    return CompoundSyntax.Create(node, null, Anchor.Create(target).Combine(anchor?.Right));
+                        .Get(target, factory, anchor?.GetLeftOf(target));
+                    return CompoundSyntax.Create(node, null, Anchor.Create(target).Combine(anchor?.GetRightOf(target)));
                 }
                 default:
                     return new EmptyList

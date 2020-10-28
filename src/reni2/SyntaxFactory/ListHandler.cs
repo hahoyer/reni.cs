@@ -9,8 +9,8 @@ namespace Reni.SyntaxFactory
     {
         IStatementSyntax[] IStatementsProvider.Get(BinaryTree target, Factory factory, Anchor anchor)
         {
-            var left = factory.GetStatementsSyntax(target.Left, anchor?.Left);
-            var right = factory.GetStatementsSyntax(target.Right, anchor?.Right);
+            var left = factory.GetStatementsSyntax(target.Left, anchor?.GetLeftOf(target));
+            var right = factory.GetStatementsSyntax(target.Right, anchor?.GetRightOf(target));
             return left.Concat(right).ToArray();
         }
     }
