@@ -11,6 +11,7 @@ namespace Reni.SyntaxFactory
             (
                 factory.GetValueSyntax(target.Left)
                 , null
+                , target.Token
                 , factory.GetValueSyntax(target.Right)
                 , Anchor.Create(target).Combine(anchor) 
             );

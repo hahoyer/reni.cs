@@ -12,7 +12,7 @@ namespace Reni.Context
         public const string TokenId = "^^";
         public override string Id => TokenId;
 
-        protected override Result Result(ContextBase context, Category category, SourcePart token)
+        protected override Result Result(ContextBase context, Category category, IToken token)
             => context
                 .FindRecentCompoundView
                 .ContextOperatorResult(category);

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using hw.Helper;
+using hw.Parser;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Parser;
@@ -32,10 +33,11 @@ namespace Reni.Validation
 
         public static IEnumerable<IssueId> All => AllInstances<IssueId>();
 
+        internal Issue Issue(IToken position, string message = null) => new Issue(this, position.Characters, message);
         internal Issue Issue(SourcePart position, string message = null) => new Issue(this, position, message);
 
-        internal Result IssueResult(Category category, SourcePart position, string message = null)
-            => new Result(category, Issue(position, message));
+        internal Result IssueResult(Category category, IToken token, string message = null)
+            => new Result(category, Issue(token, message));
 
         internal Result<BinaryTree> Syntax(BinaryTree binaryTree)
             => new Result<BinaryTree>(binaryTree, Issue(binaryTree.SourcePart));

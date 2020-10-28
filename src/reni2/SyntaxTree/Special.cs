@@ -1,4 +1,5 @@
 using hw.DebugFormatter;
+using hw.Parser;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
@@ -13,9 +14,9 @@ namespace Reni.SyntaxTree
         [DisableDump]
         internal readonly ITerminal Terminal;
 
-        readonly SourcePart Token;
+        readonly IToken Token;
 
-        internal TerminalSyntax(ITerminal terminal, SourcePart token, Anchor anchor)
+        internal TerminalSyntax(ITerminal terminal, IToken token, Anchor anchor)
             : base(anchor)
         {
             Terminal = terminal;
@@ -26,10 +27,10 @@ namespace Reni.SyntaxTree
 
         [EnableDump]
         [EnableDumpExcept(null)]
-        string Position => Token.GetDumpAroundCurrent(5);
+        string Position => Token.Characters.GetDumpAroundCurrent(5);
 
         [DisableDump]
-        internal string Id => Token.Id;
+        internal string Id => Token.Characters.Id;
 
         [DisableDump]
         internal long ToNumber => BitsConst.Convert(Id).ToInt64();
@@ -48,9 +49,9 @@ namespace Reni.SyntaxTree
         [Node]
         readonly ValueSyntax Right;
 
-        readonly SourcePart Token;
+        readonly IToken Token;
 
-        public PrefixSyntax(IPrefix prefix, ValueSyntax right, SourcePart token, Anchor brackets)
+        public PrefixSyntax(IPrefix prefix, ValueSyntax right, IToken token, Anchor brackets)
             : base(brackets)
         {
             Prefix = prefix;
@@ -61,7 +62,7 @@ namespace Reni.SyntaxTree
 
         [EnableDump]
         [EnableDumpExcept(null)]
-        string Position => Token.GetDumpAroundCurrent(5);
+        string Position => Token.Characters.GetDumpAroundCurrent(5);
 
         protected override int LeftDirectChildCountInternal => 0;
         protected override int DirectChildCount => 1;
@@ -69,7 +70,7 @@ namespace Reni.SyntaxTree
         protected override Syntax GetDirectChild(int index) => index == 0? Right : null;
 
         public static Result<ValueSyntax> Create
-            (IPrefix prefix, Result<ValueSyntax> right, SourcePart token, Anchor brackets)
+            (IPrefix prefix, Result<ValueSyntax> right, IToken token, Anchor brackets)
             => new PrefixSyntax(prefix, right.Target, token, brackets).AddIssues<ValueSyntax>(right.Issues);
 
         internal override Result ResultForCache(ContextBase context, Category category) 
@@ -87,9 +88,9 @@ namespace Reni.SyntaxTree
         [Node]
         readonly ValueSyntax Right;
 
-        readonly SourcePart Token;
+        readonly IToken Token;
 
-        public InfixSyntax(ValueSyntax left, IInfix infix, ValueSyntax right, SourcePart token, Anchor brackets)
+        public InfixSyntax(ValueSyntax left, IInfix infix, ValueSyntax right, IToken token, Anchor brackets)
             : base(brackets)
         {
             Left = left;
@@ -102,7 +103,7 @@ namespace Reni.SyntaxTree
 
         [EnableDump]
         [EnableDumpExcept(null)]
-        string Position => Token.GetDumpAroundCurrent(5);
+        string Position => Token.Characters.GetDumpAroundCurrent(5);
 
         internal override IRecursionHandler RecursionHandler => Infix as IRecursionHandler;
 
@@ -117,11 +118,11 @@ namespace Reni.SyntaxTree
 
         public static Result<ValueSyntax> Create
         (
-            Result<ValueSyntax> left, IInfix infix, Result<ValueSyntax> right, SourcePart binaryTree
+            Result<ValueSyntax> left, IInfix infix, Result<ValueSyntax> right, IToken token
             , Anchor brackets
         )
         {
-            ValueSyntax syntax = new InfixSyntax(left.Target, infix, right.Target, binaryTree, brackets);
+            ValueSyntax syntax = new InfixSyntax(left.Target, infix, right.Target, token, brackets);
             return syntax.AddIssues(left.Issues.plus(right.Issues));
         }
 
@@ -142,9 +143,9 @@ namespace Reni.SyntaxTree
         [Node]
         readonly ISuffix Suffix;
 
-        readonly SourcePart Token;
+        readonly IToken Token;
 
-        internal SuffixSyntax(ValueSyntax left, ISuffix suffix, SourcePart token, Anchor brackets)
+        internal SuffixSyntax(ValueSyntax left, ISuffix suffix, IToken token, Anchor brackets)
             : base(brackets)
         {
             Left = left;
@@ -155,7 +156,7 @@ namespace Reni.SyntaxTree
 
         [EnableDump]
         [EnableDumpExcept(null)]
-        string Position => Token.GetDumpAroundCurrent(5);
+        string Position => Token.Characters.GetDumpAroundCurrent(5);
 
         protected override int LeftDirectChildCountInternal => 1;
         protected override int DirectChildCount => 1;
@@ -163,9 +164,9 @@ namespace Reni.SyntaxTree
         protected override Syntax GetDirectChild(int index) => index == 0? Left : null;
 
         public static Result<ValueSyntax> Create
-            (Result<ValueSyntax> left, ISuffix suffix, SourcePart binaryTree, Anchor brackets)
+            (Result<ValueSyntax> left, ISuffix suffix, IToken token, Anchor brackets)
         {
-            ValueSyntax syntax = new SuffixSyntax(left.Target, suffix, binaryTree, brackets);
+            ValueSyntax syntax = new SuffixSyntax(left.Target, suffix, token, brackets);
             return syntax.AddIssues(left.Issues);
         }
 
@@ -175,13 +176,13 @@ namespace Reni.SyntaxTree
 
     interface ITerminal
     {
-        Result Result(ContextBase context, Category category, SourcePart token);
+        Result Result(ContextBase context, Category category, IToken token);
         ValueSyntax Visit(ISyntaxVisitor visitor);
     }
 
     interface IPrefix
     {
-        Result Result(ContextBase context, Category category, ValueSyntax right, SourcePart token);
+        Result Result(ContextBase context, Category category, ValueSyntax right, IToken token);
     }
 
     interface IInfix

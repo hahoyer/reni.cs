@@ -1,5 +1,6 @@
 using System;
 using hw.DebugFormatter;
+using hw.Parser;
 using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
@@ -46,10 +47,12 @@ namespace Reni.SyntaxTree
         internal ValueSyntax Right { get; }
 
         int CurrentResultDepth;
+        IToken Token;
 
-        internal ExpressionSyntax(ValueSyntax left, Definable definable, ValueSyntax right, Anchor anchor)
+        internal ExpressionSyntax(ValueSyntax left, Definable definable, IToken token, ValueSyntax right, Anchor anchor)
             : base(anchor)
         {
+            Token = token;
             Left = left;
             Definable = definable;
             Right = right;
@@ -72,10 +75,11 @@ namespace Reni.SyntaxTree
         (
             ValueSyntax left,
             Definable definable,
+            IToken token,
             ValueSyntax right,
             Anchor frameItems
         )
-            => new ExpressionSyntax(left, definable, right, frameItems);
+            => new ExpressionSyntax(left, definable, token, right, frameItems);
 
         internal override Result ResultForCache(ContextBase context, Category category)
         {
@@ -86,7 +90,7 @@ namespace Reni.SyntaxTree
             {
                 CurrentResultDepth++;
                 if(Left == null)
-                    return context.PrefixResult(category, Definable, Anchor.SourcePart, Right);
+                    return context.PrefixResult(category, Definable, Token, Right);
 
                 var left = context.ResultAsReferenceCache(Left);
 
@@ -98,7 +102,7 @@ namespace Reni.SyntaxTree
                     return leftType.Issues.Result(category);
 
                 return leftType
-                    .Execute(category, left, Anchor.SourcePart, Definable, context, Right);
+                    .Execute(category, left, Token, Definable, context, Right);
             }
             finally
             {
@@ -113,7 +117,7 @@ namespace Reni.SyntaxTree
             if(left == null && right == null)
                 return null;
 
-            return Definable.CreateForVisit(left ?? Left, right ?? Right, Anchor);
+            return Definable.CreateForVisit(left ?? Left, right ?? Right, Anchor, Token);
         }
 
         protected override string GetNodeDump()

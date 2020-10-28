@@ -207,9 +207,13 @@ namespace Reni
         }
 
         internal Size FindSize
-            => HasSize? Size :
-                HasCode? Code.Size :
-                HasType? Type.Size : null;
+            => HasSize
+                ? Size
+                : HasCode
+                    ? Code.Size
+                    : HasType
+                        ? Type.Size
+                        : null;
 
         Size QuickFindSize
         {
@@ -241,8 +245,11 @@ namespace Reni
         }
 
         internal Closures FindClosures
-            => HasClosures? Closures :
-                HasCode? Code.Closures : null;
+            => HasClosures
+                ? Closures
+                : HasCode
+                    ? Code.Closures
+                    : null;
 
         [DisableDump]
         internal Closures SmartClosures
@@ -321,7 +328,7 @@ namespace Reni
                 var result = new Result
                 (
                     CompleteCategory,
-                    () => IsHollow.Value,
+                    () => IsHollow.AssertValue(),
                     () => alignedSize,
                     () => Type.Align,
                     () => Code.BitCast(alignedSize),
@@ -355,7 +362,7 @@ namespace Reni
                 if(HasIssue)
                     return this;
 
-                Tracer.Assert(HasType, () => "Dereference requires type category:\n " + Dump());
+                HasType.Assert(() => "Dereference requires type category:\n " + Dump());
 
                 var result = this;
                 while(!result.HasIssue && result.Type.IsWeakReference)
@@ -369,7 +376,7 @@ namespace Reni
         {
             get
             {
-                Tracer.Assert(HasType, () => "Dereference requires type category:\n " + Dump());
+                HasType.Assert(() => "Dereference requires type category:\n " + Dump());
                 var referenceType = Type.CheckedReference;
                 var converter = referenceType.Converter;
                 var result = converter.Result(CompleteCategory);
@@ -383,7 +390,7 @@ namespace Reni
         {
             get
             {
-                Tracer.Assert(HasType, () => "UnalignedResult requires type category:\n " + Dump());
+                HasType.Assert(() => "UnalignedResult requires type category:\n " + Dump());
                 return ((AlignType)Type)
                     .UnalignedResult(CompleteCategory)
                     .ReplaceArg(this);
@@ -459,7 +466,7 @@ namespace Reni
         )
         {
             var result = TryObtainSize(getIsHollow, getSize, getType, getCode);
-            Tracer.Assert(result != null, () => "Size cannot be determined " + ToString());
+            (result != null).Assert(() => "Size cannot be determined " + ToString());
             return result;
         }
 
@@ -601,35 +608,35 @@ namespace Reni
             if(IsDirty)
                 return;
 
-            Tracer.Assert((CompleteCategory & PendingCategory) == Category.None);
+            ((CompleteCategory & PendingCategory) == Category.None).Assert();
 
             if(HasIssue)
             {
-                Tracer.Assert(!HasIsHollow);
-                Tracer.Assert(!HasSize);
-                Tracer.Assert(!HasType);
-                Tracer.Assert(!HasCode);
+                (!HasIsHollow).Assert();
+                (!HasSize).Assert();
+                (!HasType).Assert();
+                (!HasCode).Assert();
                 return;
             }
 
             if(HasIsHollow && HasSize)
-                Tracer.Assert
-                    (Size.IsZero == IsHollow, () => "Size and IsHollow differ: " + Dump());
+                (Size.IsZero == IsHollow).Assert
+                    (() => "Size and IsHollow differ: " + Dump());
             if(HasIsHollow && HasType && Type.HasQuickSize)
-                Tracer.Assert
-                    (Type.IsHollow == IsHollow, () => "Type and IsHollow differ: " + Dump());
+                (Type.IsHollow == IsHollow).Assert
+                    (() => "Type and IsHollow differ: " + Dump());
             if(HasIsHollow && HasCode)
-                Tracer.Assert
-                    (Code.IsHollow == IsHollow, () => "Code and IsHollow differ: " + Dump());
+                (Code.IsHollow == IsHollow).Assert
+                    (() => "Code and IsHollow differ: " + Dump());
             if(HasSize && HasType && Type.HasQuickSize)
-                Tracer.Assert(Type.Size == Size, () => "Type and Size differ: " + Dump());
+                (Type.Size == Size).Assert(() => "Type and Size differ: " + Dump());
             if(HasSize && HasCode)
-                Tracer.Assert(Code.Size == Size, () => "Code and Size differ: " + Dump());
+                (Code.Size == Size).Assert(() => "Code and Size differ: " + Dump());
             if(HasType && HasCode && Type.HasQuickSize)
-                Tracer.Assert(Code.Size == Type.Size, () => "Code and Type differ: " + Dump());
+                (Code.Size == Type.Size).Assert(() => "Code and Type differ: " + Dump());
             if(HasClosures && HasCode)
-                Tracer.Assert
-                    (Code.Closures.IsEqual(Closures), () => "Code and Closures differ: " + Dump());
+                Code.Closures.IsEqual(Closures).Assert
+                    (() => "Code and Closures differ: " + Dump());
         }
 
         void Add(Result other) => Add(other, CompleteCategory);
@@ -651,16 +658,12 @@ namespace Reni
             }
             else
             {
-                Tracer.Assert
-                (
-                    category <= other.CompleteCategory,
-                    () => nameof(other).DumpValue(other) + ", " + nameof(category).DumpValue(category)
+                (category <= other.CompleteCategory).Assert
+                (() => nameof(other).DumpValue(other) + ", " + nameof(category).DumpValue(category)
                 );
 
-                Tracer.Assert
-                (
-                    category <= CompleteCategory,
-                    () => "this".DumpValue(this) + ", " + nameof(category).DumpValue(category)
+                (category <= CompleteCategory).Assert
+                (() => "this".DumpValue(this) + ", " + nameof(category).DumpValue(category)
                 );
 
                 if(category.HasIsHollow)
@@ -833,7 +836,7 @@ namespace Reni
         internal Result LocalBlock(Category category)
             => AutomaticDereferenceResult.InternalLocalBlock(category.WithType);
 
-        internal Result InternalLocalBlock(Category category)
+        Result InternalLocalBlock(Category category)
         {
             if(HasIssue)
                 return this;
@@ -858,7 +861,7 @@ namespace Reni
 
         internal BitsConst Evaluate(IExecutionContext context)
         {
-            Tracer.Assert(Closures.IsNone, Dump);
+            Closures.IsNone.Assert(Dump);
             var result = Align.LocalBlock(CompleteCategory);
             return result.Code.Evaluate(context);
         }
@@ -869,7 +872,7 @@ namespace Reni
         [DebuggerHidden]
         public static Result operator |(Result aResult, Result bResult)
         {
-            Tracer.Assert((aResult.CompleteCategory & bResult.CompleteCategory).IsNone);
+            (aResult.CompleteCategory & bResult.CompleteCategory).IsNone.Assert();
             var result = aResult.Clone;
             result.Update(bResult);
             return result;
@@ -882,16 +885,12 @@ namespace Reni
         {
             var size = FindSize;
             if(size != null)
-                Tracer.Assert
-                (
-                    size.IsZero || size == Root.DefaultRefAlignParam.RefSize,
-                    () => "Expected size: 0 or RefSize\n" + Dump());
+                (size.IsZero || size == Root.DefaultRefAlignParam.RefSize).Assert
+                    (() => "Expected size: 0 or RefSize\n" + Dump());
 
             if(HasType)
-                Tracer.Assert
-                (
-                    Type is VoidType || Type is PointerType,
-                    () => "Expected type: Void or PointerType\n" + Dump());
+                (Type is VoidType || Type is PointerType).Assert
+                    (() => "Expected type: Void or PointerType\n" + Dump());
         }
 
         [DebuggerHidden]
@@ -899,13 +898,11 @@ namespace Reni
         {
             var size = FindSize;
             if(size != null)
-                Tracer.Assert
-                (
-                    size == Root.DefaultRefAlignParam.RefSize,
-                    () => "Expected size: RefSize\n" + Dump());
+                (size == Root.DefaultRefAlignParam.RefSize).Assert
+                    (() => "Expected size: RefSize\n" + Dump());
 
             if(HasType)
-                Tracer.Assert(Type is PointerType, () => "Expected type: PointerType\n" + Dump());
+                (Type is PointerType).Assert(() => "Expected type: PointerType\n" + Dump());
         }
 
         [DebuggerHidden]
@@ -919,14 +916,12 @@ namespace Reni
             {
                 if(size.IsZero)
                     return;
-                Tracer.Assert
-                (
-                    size == Root.DefaultRefAlignParam.RefSize,
-                    () => "Expected size: 0 or RefSize\n" + Dump());
+                (size == Root.DefaultRefAlignParam.RefSize).Assert
+                    (() => "Expected size: 0 or RefSize\n" + Dump());
             }
 
             if(HasType)
-                Tracer.Assert(Type is PointerType, () => "Expected type: PointerType\n" + Dump());
+                (Type is PointerType).Assert(() => "Expected type: PointerType\n" + Dump());
         }
 
         internal Result AddToReference(Func<Size> func) => Change(code => code.ReferencePlus(func()));
@@ -963,8 +958,11 @@ namespace Reni
         }
 
         internal Result DereferencedAlignedResult(Size size)
-            => HasIssue? this :
-                HasCode? new Result(CompleteCategory - Category.Type, getCode: () => Code.DePointer(size)) : this;
+            => HasIssue
+                ? this
+                : HasCode
+                    ? new Result(CompleteCategory - Category.Type, getCode: () => Code.DePointer(size))
+                    : this;
 
         internal Result ConvertToConverter(TypeBase source)
             => source.IsHollow || !HasClosures && !HasCode

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using hw.Parser;
 using hw.Scanner;
 using Reni.TokenClasses;
 
@@ -45,7 +46,7 @@ namespace Reni.SyntaxTree
         [DisableDump]
         BinaryTree[] RightItems => Items.Skip(LeftItemCount).ToArray();
 
-        internal SourcePart SourcePart => Items.Select(item=>item.SourcePart).Aggregate();
+        internal SourcePart SourcePart => Items.Select(item=>item.Token.SourcePart()).Aggregate();
 
 
         protected override string GetNodeDump() => base.GetNodeDump() + $"[{Items.Length}]";

@@ -35,7 +35,7 @@ namespace Reni
 
             Result IResultProvider.Execute(Category category, Category pendingCategory)
             {
-                Tracer.Assert(pendingCategory.IsNone);
+                pendingCategory.IsNone.Assert();
                 return ObtainResult(category);
             }
         }
@@ -84,19 +84,23 @@ namespace Reni
         static int NextObjectId;
 
         [DisableDump]
+        internal Result Data { get; } = new Result();
+
+        [DisableDump]
         internal string FunctionDump = "";
 
-        ResultCache()
-            : base(NextObjectId++)
-        {
-            StopByObjectIds();
-        }
+        [DisableDump]
+        internal IResultProvider Provider { get; }
 
         internal ResultCache(IResultProvider obtainResult)
             : this() => Provider = obtainResult ?? NotSupported;
 
         internal ResultCache(Func<Category, Result> obtainResult)
             : this() => Provider = new SimpleProvider(obtainResult);
+
+        ResultCache()
+            : base(NextObjectId++)
+            => StopByObjectIds();
 
         ResultCache(Result data)
             : this()
@@ -106,13 +110,7 @@ namespace Reni
         }
 
         [DisableDump]
-        internal IResultProvider Provider { get; }
-
-        [DisableDump]
         static Call[] Calls => Current?.ToEnumerable.ToArray() ?? new Call[0];
-
-        [DisableDump]
-        internal Result Data { get; } = new Result();
 
         [DisableDump]
         internal TypeBase Type => GetCategories(Category.Type).Type;
@@ -137,6 +135,9 @@ namespace Reni
         //[DebuggerHidden]
         void Update(Category category)
         {
+            if(Data.HasIssue)
+                return;
+
             var localCategory = category - Data.CompleteCategory - Data.PendingCategory;
 
             if(localCategory.HasIsHollow && Data.FindIsHollow != null)
@@ -165,8 +166,9 @@ namespace Reni
             {
                 Data.PendingCategory |= localCategory;
                 var result = Provider.Execute(localCategory, oldPendingCategory & category);
-                Tracer.Assert(result != null, ()=>Tracer.Dump(Provider));
-                Tracer.Assert(result.IsValidOrIssue(localCategory));
+
+                (result != null).Assert(() => Tracer.Dump(Provider));
+                result.IsValidOrIssue(localCategory).Assert();
                 Data.Update(result);
             }
             finally
@@ -203,11 +205,9 @@ namespace Reni
             {
                 Current = new CallStack
                 {
-                    Former = Current,
-                    Item = new Call
+                    Former = Current, Item = new Call
                     {
-                        Category = category,
-                        Item = this
+                        Category = category, Item = this
                     }
                 };
 

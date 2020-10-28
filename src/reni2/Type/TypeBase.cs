@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using hw.Parser;
 using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Basics;
@@ -714,15 +715,15 @@ namespace Reni.Type
             return null;
         }
 
-        Result IssueResult(Category category, IssueId issueId, SourcePart currentTarget)
+        Result IssueResult(Category category, IssueId issueId, IToken token)
             => issueId
-                .IssueResult(category, currentTarget, "Type: " + DumpPrintText);
+                .IssueResult(category, token, "Type: " + DumpPrintText);
 
         internal Result Execute
         (
             Category category,
             ResultCache left,
-            SourcePart currentTarget,
+            IToken currentTarget,
             Definable definable,
             ContextBase context,
             ValueSyntax right

@@ -124,10 +124,7 @@ namespace Reni.SyntaxFactory
                 .Create
                 (
                     GetValueSyntax(target.Left),
-                    definable,
-                    GetValueSyntax(target.Right),
-                    Anchor.Create(target).Combine(anchor)
-                );
+                    definable, target.Token, GetValueSyntax(target.Right), Anchor.Create(target).Combine(anchor));
         }
 
         internal ValueSyntax GetInfixSyntax(BinaryTree target, Anchor anchor)

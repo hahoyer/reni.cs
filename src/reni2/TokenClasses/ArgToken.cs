@@ -18,7 +18,7 @@ namespace Reni.TokenClasses
 
         internal override ValueSyntax Visit(ISyntaxVisitor visitor) => visitor.Arg;
 
-        protected override Result Result(ContextBase context, Category category, ValueSyntax right, SourcePart token)
+        protected override Result Result(ContextBase context, Category category, ValueSyntax right, IToken token)
             => context.FunctionalArgResult(category, right, token);
     }
 }
