@@ -51,6 +51,8 @@ namespace Reni.SyntaxTree
 
         public IEnumerable<Issue> Issues => Items.SelectMany(node => node.Issues);
 
+        public bool IsEmpty => !Items.Any();
+
         protected override string GetNodeDump() => base.GetNodeDump() + $"[{Items.Length}]";
 
         internal static Anchor Create(BinaryTree leftAnchor, BinaryTree rightAnchor)

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
@@ -37,32 +36,31 @@ namespace Reni.SyntaxFactory
         {
             var kernel = target.BracketKernel;
             var statements = GetStatementsSyntax(kernel.Center, null);
-            return CompoundSyntax.Create(statements, null, Anchor.Create(kernel.Left));
+            return CompoundSyntax.Create(statements, null, kernel.ToAnchor);
         }
 
         internal IStatementSyntax[] GetStatementsSyntax(BinaryTree target, Anchor anchor)
         {
             if(target == null)
+            {
+                anchor.AssertIsNull();
                 return new IStatementSyntax[0];
+            }
 
             var factory = GetCurrentFactory(target);
-            var valueToken = target.TokenClass as IValueToken;
-            var declarationToken = target.TokenClass as IDeclarationToken;
-            var statementsToken = target.TokenClass as IStatementsToken;
 
-            (T((object)valueToken, statementsToken, declarationToken).Count(n => n != null) <= 1).Assert();
-
-            if(valueToken != null)
-                return T((IStatementSyntax)valueToken.Provider.Get(target, factory, anchor));
-
-            if(declarationToken != null)
-                return T(declarationToken.Provider.Get(target, factory, anchor));
-
-            if(statementsToken != null)
-                return statementsToken.Provider.Get(target, factory, anchor);
-
-            return T((IStatementSyntax)new EmptyList(Anchor.Create(target).Combine(anchor)
-                , IssueId.InvalidExpression.Issue(target.Token.Characters)));
+            switch(target.TokenClass)
+            {
+                case IValueToken valueToken:
+                    return T((IStatementSyntax)valueToken.Provider.Get(target, factory, anchor));
+                case IDeclarationToken declarationToken:
+                    return T(declarationToken.Provider.Get(target, factory, anchor));
+                case IStatementsToken statementsToken:
+                    return statementsToken.Provider.Get(target, factory, Anchor.Create(target).Combine(anchor));
+                default:
+                    return T((IStatementSyntax)new EmptyList(Anchor.Create(target).Combine(anchor)
+                        , IssueId.InvalidExpression.Issue(target.Token.Characters)));
+            }
         }
 
         internal ValueSyntax GetValueSyntax(BinaryTree target, Anchor anchor)
@@ -71,31 +69,27 @@ namespace Reni.SyntaxFactory
                 return new EmptyList(anchor);
 
             var factory = GetCurrentFactory(target);
-            var valueToken = target.TokenClass as IValueToken;
-            var declarationToken = target.TokenClass as IDeclarationToken;
-            var statementsToken = target.TokenClass as IStatementsToken;
 
-            (T((object)valueToken, statementsToken, declarationToken).Count(n => n != null) <= 1).Assert();
-
-            if(valueToken != null)
-                return valueToken.Provider.Get(target, factory, anchor);
-
-            if(declarationToken != null)
-                return declarationToken.Provider.Get(target, factory, anchor.Left).ToValueSyntax(anchor.Right);
-
-            if(statementsToken != null)
+            switch(target.TokenClass)
             {
-                var node = statementsToken
-                    .Provider
-                    .Get(target, factory, anchor?.Left);
-                return CompoundSyntax.Create(node, null, anchor?.Right);
+                case IValueToken valueToken:
+                    return valueToken.Provider.Get(target, factory, anchor);
+                case IDeclarationToken declarationToken:
+                    return declarationToken.Provider.Get(target, factory, anchor.Left).ToValueSyntax(anchor.Right);
+                case IStatementsToken statementsToken:
+                {
+                    var node = statementsToken
+                        .Provider
+                        .Get(target, factory, anchor?.Left);
+                    return CompoundSyntax.Create(node, null, Anchor.Create(target).Combine(anchor?.Right));
+                }
+                default:
+                    return new EmptyList
+                    (
+                        Anchor.Create(target).Combine(anchor)
+                        , IssueId.InvalidExpression.Issue(target.Token.Characters)
+                    );
             }
-
-            return new EmptyList
-            (
-                Anchor.Create(target).Combine(anchor)
-                , IssueId.InvalidExpression.Issue(target.Token.Characters)
-            );
         }
 
         internal ValueSyntax GetValueSyntax(BinaryTree target)
