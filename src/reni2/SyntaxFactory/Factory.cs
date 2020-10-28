@@ -43,7 +43,7 @@ namespace Reni.SyntaxFactory
         {
             if(target == null)
             {
-                anchor.IsEmpty.Assert();
+                (anchor == null || anchor.IsEmpty).Assert();
                 return new IStatementSyntax[0];
             }
 
