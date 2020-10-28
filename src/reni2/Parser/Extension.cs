@@ -278,8 +278,8 @@ namespace Reni.Parser
             if(next == null)
             {
                 if(delta < dumpWith + 3)
-                    return result + current.End.Span(delta);
-                return result + "]" + current.End.Span(dumpWith) + "...";
+                    return result + "]" + current.End.Span(delta).Id;
+                return result + "]" + current.End.Span(dumpWith).Id + "...";
             }
 
             (current.Source == next.Source).Assert();
@@ -288,9 +288,9 @@ namespace Reni.Parser
                 return current.Start.Span(next.Start).Id;
 
             if(delta < 2 * dumpWith + 3)
-                return result + "]" + current.End.Span(next.Start) + "[";
+                return result + "]" + current.End.Span(next.Start).Id + "[";
 
-            return result + "]" + current.End.Span(dumpWith) + "..." + next[-dumpWith].Span(dumpWith) + "[";
+            return result + "]" + current.End.Span(dumpWith).Id + "..." + next[-dumpWith].Span(dumpWith).Id + "[";
         }
 
         internal static SourcePart Combine(this IEnumerable<SourcePart> target1)
