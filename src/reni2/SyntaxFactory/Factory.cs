@@ -56,7 +56,7 @@ namespace Reni.SyntaxFactory
                 case IDeclarationToken declarationToken:
                     return T(declarationToken.Provider.Get(target, factory, anchor));
                 case IStatementsToken statementsToken:
-                    return statementsToken.Provider.Get(target, factory, Anchor.Create(target).Combine(anchor));
+                    return statementsToken.Provider.Get(target, factory, anchor);
                 default:
                     return T((IStatementSyntax)new EmptyList(Anchor.Create(target).Combine(anchor)
                         , IssueId.InvalidExpression.Issue(target.Token.Characters)));
@@ -80,8 +80,8 @@ namespace Reni.SyntaxFactory
                 {
                     var node = statementsToken
                         .Provider
-                        .Get(target, factory, anchor?.GetLeftOf(target));
-                    return CompoundSyntax.Create(node, null, Anchor.Create(target).Combine(anchor?.GetRightOf(target)));
+                        .Get(target, factory);
+                    return CompoundSyntax.Create(node, null, Anchor.Create(target).Combine(anchor));
                 }
                 default:
                     return new EmptyList
