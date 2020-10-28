@@ -81,7 +81,7 @@ namespace Reni.SyntaxFactory
                 return valueToken.Provider.Get(target, factory, anchor);
 
             if(declarationToken != null)
-                return declarationToken.Provider.Get(target, factory, anchor).ToValueSyntax(null);
+                return declarationToken.Provider.Get(target, factory, anchor.Left).ToValueSyntax(anchor.Right);
 
             if(statementsToken != null)
             {
