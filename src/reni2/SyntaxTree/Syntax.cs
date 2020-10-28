@@ -46,7 +46,7 @@ namespace Reni.SyntaxTree
         protected Syntax(Anchor anchor, Issue issue = null)
         {
             Anchor = anchor;
-            Anchor.SourcePart.AssertIsNotNull();
+            Anchor.SourceParts.AssertIsNotNull();
             Issue = issue;
         }
 
@@ -54,7 +54,7 @@ namespace Reni.SyntaxTree
             : base(objectId)
         {
             Anchor = anchor;
-            Anchor.SourcePart.AssertIsNotNull();
+            Anchor.SourceParts.AssertIsNotNull();
             Issue = issue;
         }
 

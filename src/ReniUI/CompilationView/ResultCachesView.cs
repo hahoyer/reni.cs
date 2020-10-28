@@ -12,7 +12,7 @@ namespace ReniUI.CompilationView
             : base(master, "ResultCaches: " + syntax.GetType().PrettyName() + "-" + syntax.ObjectId)
         {
             Client = syntax.ResultCache.CreateClient(Master);
-            SourceParts = syntax.Anchor.SourcePart;
+            SourceParts = syntax.Anchor.SourceParts;
         }
     }
 }

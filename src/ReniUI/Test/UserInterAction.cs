@@ -54,7 +54,7 @@ complex FromReal(2) dump_print;
                 var textFragment = Text.Substring(0, i);
                 var compiler = Compiler.FromText(textFragment);
                 var syntax = compiler.Syntax;
-                var span = syntax.Anchor.SourcePart;
+                var span = syntax.Anchor.SourceParts;
                 span.Any(item=>item.Id == textFragment).Assert(() => span.DumpSource());
             }
         }

@@ -131,15 +131,15 @@ namespace ReniUI.Classification
 
         public override int GetHashCode() => SourcePart.GetHashCode();
 
-        internal static Syntax LocateByPosition(Helper.Syntax target, int offset, bool includingParent = false)
+        internal static Syntax LocateByPosition(Helper.Syntax target, SourcePosition offset, bool includingParent = false)
         {
             var result = target.LocateByPosition(offset, includingParent );
             result.AssertIsNotNull();
             var resultToken = result.Item1.FlatItem.Anchor.Items[result.Item2].Token;
-            if(offset < resultToken.Characters.Position)
+            if(offset < resultToken.Characters)
                 return new WhiteSpaceSyntax
                 (
-                    resultToken.PrecededWith.Last(item => offset >= item.SourcePart.Position),
+                    resultToken.PrecededWith.Last(item => item.SourcePart.Contains(offset)),
                     result.Master, result.Index
                 );
 

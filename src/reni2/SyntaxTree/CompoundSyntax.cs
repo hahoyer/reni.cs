@@ -40,7 +40,7 @@ namespace Reni.SyntaxTree
 
         [EnableDump]
         [EnableDumpExcept(null)]
-        string Position => Anchor.SourcePart.DumpSource(5);
+        string Position => Anchor.SourceParts.DumpSource(5);
 
         [DisableDump]
         public IEnumerable<FunctionSyntax> ConverterFunctions

@@ -26,7 +26,7 @@ namespace Reni.SyntaxTree
 
         [EnableDump]
         [EnableDumpExcept(null)]
-        string Position => Anchor.SourcePart.DumpSource();
+        string Position => Anchor.SourceParts.DumpSource();
 
         [DisableDump]
         internal string NameOrNull => Declarer.Name?.Value;
@@ -46,7 +46,7 @@ namespace Reni.SyntaxTree
         [DisableDump]
         DeclarerSyntax IStatementSyntax.Declarer => Declarer;
 
-        SourcePart IStatementSyntax.SourcePart => Anchor.SourcePartA;
+        SourcePart IStatementSyntax.SourcePart => Anchor.SourcePart;
 
         ValueSyntax IStatementSyntax.ToValueSyntax(Anchor anchor)
             => CompoundSyntax.Create(T((IStatementSyntax)this), null, anchor);
@@ -71,7 +71,7 @@ namespace Reni.SyntaxTree
             => new DeclarationSyntax
             (
                 declarer,
-                value ?? new EmptyList(null, IssueId.MissingDeclarationValue.Issue(anchor.SourcePartA)),
+                value ?? new EmptyList(null, IssueId.MissingDeclarationValue.Issue(anchor.SourcePart)),
                 anchor
             );
     }

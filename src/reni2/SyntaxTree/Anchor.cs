@@ -47,8 +47,8 @@ namespace Reni.SyntaxTree
         [DisableDump]
         BinaryTree[] RightItems => Items.Skip(LeftItemCount).ToArray();
 
-        internal SourcePart[] SourcePart => Items.Select(item=>item.Token.SourcePart()).ToArray();
-        internal SourcePart SourcePartA => SourcePart.Combine();
+        internal SourcePart[] SourceParts => Items.Select(item=>item.Token.SourcePart()).ToArray();
+        internal SourcePart SourcePart => SourceParts.Combine();
 
         public IEnumerable<Issue> Issues => Items.SelectMany(node => node.Issues);
 
