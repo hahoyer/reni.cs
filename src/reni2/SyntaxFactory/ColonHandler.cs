@@ -31,12 +31,8 @@ namespace Reni.SyntaxFactory
                 anchor = anchor == null? prefixItems : anchor.Combine(prefixItems);
             }
 
-            (anchor?.Right?.SourcePart).AssertIsNull();
-
-            var other = Anchor.Create(target);
-
             return DeclarationSyntax
-                .Create(result, factory.GetValueSyntax(target.Right), anchor == null? other : anchor.Combine(other));
+                .Create(result, factory.GetValueSyntax(target.Right), Anchor.Create(target).Combine(anchor));
         }
     }
 }

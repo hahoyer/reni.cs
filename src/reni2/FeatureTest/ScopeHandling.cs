@@ -12,24 +12,24 @@ namespace Reni.FeatureTest
     [UnitTest]
     [Target(@"!public x: 1")]
     [Output("")]
-    public sealed class ScopeHandlingPublic : CompilerTest {}
+    public sealed class ScopeHandlingPublic : CompilerTest { }
 
     [UnitTest]
     [Target(@"!non_public x: 1")]
     [Output("")]
-    public sealed class ScopeHandlingNonPublic : CompilerTest {}
+    public sealed class ScopeHandlingNonPublic : CompilerTest { }
 
     [UnitTest]
     [Target(@"!(public mutable) x: 1")]
     [ScopeHandlingPublic]
     [Output("")]
-    public sealed class ScopeHandlingGroup : CompilerTest {}
+    public sealed class ScopeHandlingGroup : CompilerTest { }
 
     [UnitTest]
     [Target(@"!public !mutable x: 1")]
     [ScopeHandlingPublic]
     [Output("")]
-    public sealed class ScopeHandlingMultiple : CompilerTest {}
+    public sealed class ScopeHandlingMultiple : CompilerTest { }
 
     [UnitTest]
     [Target(@"!unkown x: 1")]
@@ -39,9 +39,9 @@ namespace Reni.FeatureTest
         protected override void Verify(IEnumerable<Issue> issues)
         {
             var issue = issues.Single();
-            Tracer.Assert(issue.IssueId == IssueId.InvalidDeclarationTag
-                , () => $"Issue of type {IssueId.InvalidDeclarationTag} expected. \n" +
-                        $"Found: {issues.Select(issue => issue.LogDump).Stringify("\n")}");
+            (issue.IssueId == IssueId.InvalidDeclarationTag).Assert(()
+                => $"Issue of type {IssueId.InvalidDeclarationTag} expected. \n" +
+                   $"Found: {issues.Select(issue => issue.LogDump).Stringify("\n")}");
         }
     }
 
@@ -52,19 +52,18 @@ namespace Reni.FeatureTest
     [ScopeHandlingNonPublic]
     public sealed class PublicNonPublic1 : CompilerTest
     {
-        public PublicNonPublic1() { Parameters.ProcessErrors = true; }
+        public PublicNonPublic1() => Parameters.ProcessErrors = true;
 
         protected override void Verify(IEnumerable<Issue> issues)
         {
             var issueArray = issues.ToArray();
             var i = 0;
             var issueBase = issueArray[i];
-            Tracer.Assert(issueBase.IssueId == IssueId.MissingDeclarationForType, issueBase.Dump);
-            Tracer.Assert(issueBase.Position.Id == "x", issueBase.Dump);
+            (issueBase.IssueId == IssueId.MissingDeclarationForType).Assert(issueBase.Dump);
+            (issueBase.Position.Id == "x").Assert(issueBase.Dump);
             i++;
-            Tracer.Assert(i == issueArray.Length);
+            (i == issueArray.Length).Assert();
         }
-
     }
 
     [UnitTest]
@@ -73,7 +72,7 @@ namespace Reni.FeatureTest
     [ScopeHandlingPublic]
     [ScopeHandlingNonPublic]
     [Output("2")]
-    public sealed class PublicNonPublic2 : CompilerTest {}
+    public sealed class PublicNonPublic2 : CompilerTest { }
 
     [UnitTest]
     [ScopeHandlingPublic]
@@ -83,5 +82,5 @@ namespace Reni.FeatureTest
     [ScopeHandlingGroup]
     [ScopeHandlingError]
     [ScopeHandlingMultiple]
-    public sealed class AllScopeHandling : CompilerTest {}
+    public sealed class AllScopeHandling : CompilerTest { }
 }

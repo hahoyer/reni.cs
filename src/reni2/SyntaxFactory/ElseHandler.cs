@@ -12,7 +12,7 @@ namespace Reni.SyntaxFactory
                 factory.GetValueSyntax(target.Left?.Left)
                 , factory.GetValueSyntax(target.Left?.Right)
                 , factory.GetValueSyntax(target.Right)
-                , frameItems
+                , Anchor.Create(target.Left,target).Combine(frameItems)
             );
     }
 }
