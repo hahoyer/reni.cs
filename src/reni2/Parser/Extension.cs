@@ -290,7 +290,7 @@ namespace Reni.Parser
             if(delta < 2 * dumpWith + 3)
                 return result + "]" + current.End.Span(next.Start).Id + "[";
 
-            return result + "]" + current.End.Span(dumpWith).Id + "..." + next[-dumpWith].Span(dumpWith).Id + "[";
+            return result + "]" + current.End.Span(dumpWith).Id + "..." + (next.Start+-dumpWith).Span(dumpWith).Id + "[";
         }
 
         internal static SourcePart Combine(this IEnumerable<SourcePart> target1)

@@ -5,6 +5,7 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using JetBrains.Annotations;
+// ReSharper disable CheckNamespace
 
 namespace hw.Scanner
 {
@@ -52,8 +53,6 @@ namespace hw.Scanner
 
         [UsedImplicitly]
         string DumpCurrent => Id;
-
-        public SourcePosition this[int offset] => new SourcePosition(Source, Position + offset);
 
         SourcePart IAggregateable<SourcePart>.Aggregate(SourcePart other) => Overlay(other);
 
