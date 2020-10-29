@@ -36,7 +36,8 @@ namespace Reni.SyntaxFactory
         {
             var kernel = target.BracketKernel;
             var statements = GetStatementsSyntax(kernel.Center, null);
-            return CompoundSyntax.Create(statements, null, kernel.ToAnchor);
+            var anchor = kernel.ToAnchor.Combine(statements.Length <= 1? null: Anchor.Create(kernel.Center.ParserLevelGroup));
+            return CompoundSyntax.Create(statements, null, anchor);
         }
 
         internal IStatementSyntax[] GetStatementsSyntax(BinaryTree target, Anchor anchor)
@@ -81,7 +82,8 @@ namespace Reni.SyntaxFactory
                     var node = statementsToken
                         .Provider
                         .Get(target, factory);
-                    return CompoundSyntax.Create(node, null, Anchor.Create(target).Combine(anchor));
+                    anchor = anchor.Combine(Anchor.Create(target.ParserLevelGroup));
+                    return CompoundSyntax.Create(node, null, anchor);
                 }
                 default:
                     return new EmptyList

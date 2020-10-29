@@ -108,6 +108,8 @@ namespace Reni.TokenClasses
             }
         }
 
+        public BinaryTree[] ParserLevelGroup => GetParserLevelGroup(TokenClass).ToArray();
+
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
         SourcePart ISyntax.All => SourcePart;
@@ -121,6 +123,20 @@ namespace Reni.TokenClasses
             };
 
         int ITree<BinaryTree>.LeftDirectChildCount => 1;
+
+        IEnumerable<BinaryTree> GetParserLevelGroup(ITokenClass tokenClass)
+        {
+            if(Left != null)
+                foreach(var node in Left.GetParserLevelGroup(tokenClass))
+                    yield return node;
+
+            if(tokenClass.IsBelongingTo(TokenClass))
+                yield return this;
+
+            if(Right != null)
+                foreach(var node in Right.GetParserLevelGroup(tokenClass))
+                    yield return node;
+        }
 
         protected override string GetNodeDump() => base.GetNodeDump() + $"({TokenClass.Id})";
 
