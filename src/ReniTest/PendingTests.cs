@@ -1,4 +1,4 @@
-//02:44:50.477 29.10.2020 ran 169 of 179 
+//09:20:58.678 29.10.2020 ran 169 of 179 
 
 namespace hw.UnitTest
 {
@@ -9,11 +9,6 @@ namespace hw.UnitTest
         
 // error 
 
-TestRunner.RunTest(new ReniUI.Test.BadUserInterAction().GetTokenForPosition);
-TestRunner.RunTest(new ReniUI.Test.BadUserInterAction().GetTokenForPositionSimple);
-TestRunner.RunTest(new ReniUI.Test.BracketMatching().MatchingBraces);
-TestRunner.RunTest(new ReniUI.Test.BracketMatching().MoreMatchingBraces);
-TestRunner.RunTest(new ReniUI.Test.BracketMatching().NotMatchingBraces);
 TestRunner.RunTest(new ReniUI.Test.ExpressionFormatting().FromSourcePart);
 TestRunner.RunTest(new ReniUI.Test.ExpressionFormatting().BadArgDeclaration);
 TestRunner.RunTest(new ReniUI.Test.ListMatching().Matching);

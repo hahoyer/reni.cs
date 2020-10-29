@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Helper;
+using hw.Parser;
+using hw.Scanner;
 using JetBrains.Annotations;
+using Reni.Parser;
 
 namespace Reni.Helper
 {
@@ -10,7 +13,7 @@ namespace Reni.Helper
     static class Extension
     {
         internal static IEnumerable<TTarget> GetNodesFromTopToBottom<TTarget>
-            (this ITree<TTarget> target, Func<TTarget, bool> predicate= null)
+            (this ITree<TTarget> target, Func<TTarget, bool> predicate = null)
             where TTarget : ITree<TTarget>
         {
             if(target == null)
@@ -100,7 +103,7 @@ namespace Reni.Helper
             where TTarget : ITree<TTarget>
         {
             var subPath = GetPaths(container, isMatch);
-            return subPath.Select(subPath=> T(index).Concat(subPath).ToArray());
+            return subPath.Select(subPath => T(index).Concat(subPath).ToArray());
         }
 
         internal static IEnumerable<TTarget> GetNodesFromRightToLeft<TTarget>(this ITree<TTarget> target)
@@ -201,10 +204,45 @@ namespace Reni.Helper
             }
         }
 
-        internal static TTarget ApplyPath<TTarget, TAspect>(this TTarget container, int[] path, Func<TTarget, TAspect> getAspect)
+        internal static TTarget ApplyPath<TTarget, TAspect>
+            (this TTarget container, int[] path, Func<TTarget, TAspect> getAspect)
             where TAspect : class, ITree<TTarget>
             => path.Aggregate(container, (node, index) => getAspect(node).GetDirectChild(index));
 
 
+        static string FlatFormat(this IToken target, int? emptyLineLimit)
+        {
+            if(target.PrecededWith.Any(item => item.IsComment() && item.HasLines()))
+                return null;
+
+            if(emptyLineLimit != 0 && target.PrecededWith.Any(item => item.IsLineBreak()))
+                return null;
+
+            var result = target
+                .PrecededWith
+                .Where(item => item.IsComment())
+                .Aggregate("", (current, item) => current + item.SourcePart.Id);
+
+            return result + target.Characters.Id;
+        }
+
+        internal static string FlatFormat
+            (this SourcePart target, IEnumerable<IItem> precede, bool areEmptyLinesPossible)
+        {
+            if(precede == null)
+                return target.Id;
+
+            if(precede.Any(item => item.IsComment() && item.HasLines()))
+                return null;
+
+            if(areEmptyLinesPossible && precede.Any(item => item.IsLineBreak()))
+                return null;
+
+            var result = precede
+                .Where(item => item.IsComment())
+                .Aggregate("", (current, item) => current + item.SourcePart.Id);
+
+            return result + target.Id;
+        }
     }
 }

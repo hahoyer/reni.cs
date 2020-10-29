@@ -10,7 +10,6 @@ using Reni.Helper;
 using Reni.Struct;
 using Reni.SyntaxTree;
 using Reni.Validation;
-using ReniUI.Classification;
 using ReniUI.Formatting;
 
 namespace ReniUI
@@ -43,9 +42,6 @@ namespace ReniUI
 
         internal Helper.Syntax Syntax => this.CachedValue(GetSyntax);
 
-        internal Formatting.Syntax FormattingSyntax
-            => this.CachedValue(() => new Formatting.Syntax(Compiler.Syntax));
-
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
 
@@ -63,7 +59,7 @@ namespace ReniUI
             => Classification.Syntax.LocateByPosition(Syntax, offset);
 
         public string FlatFormat(bool areEmptyLinesPossible)
-            => FormattingSyntax.FlatFormat(areEmptyLinesPossible);
+            => Syntax.FlatFormat(areEmptyLinesPossible);
 
         public Classification.Syntax LocatePosition(int offset) => LocatePosition(Source + offset);
         internal IEnumerable<ValueSyntax> FindPosition(int offset) => FindPosition(Source + offset);
@@ -128,7 +124,7 @@ namespace ReniUI
                 return null;
 
             var start = token.Token.Characters.Start;
-            var result = start.Position <= 0? default: token.Master.LocateByPosition(start+-1,includingParent);
+            var result = start.Position <= 0? default : token.Master.LocateByPosition(start + -1, includingParent);
             NotImplementedMethod(offset);
             return default;
         }
@@ -138,6 +134,5 @@ namespace ReniUI
             NotImplementedMethod(offset);
             return default;
         }
-
     }
 }

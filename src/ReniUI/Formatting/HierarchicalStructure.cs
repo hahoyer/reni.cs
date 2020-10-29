@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Helper;
 using Reni.Parser;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
@@ -18,6 +17,18 @@ namespace ReniUI.Formatting
             {
                 get
                 {
+
+
+                    var compoundSyntax = Target.FlatItem as CompoundSyntax;
+                    compoundSyntax.AssertIsNotNull();
+                    compoundSyntax.CleanupSection.AssertIsNull();
+                    compoundSyntax.Statements.AssertIsNotNull();
+                    (compoundSyntax.Statements.Length == 1).Assert();
+
+                    (Target.DirectChildren.Length == 2).Assert();
+                    (Target.DirectChildren[0].FlatItem == compoundSyntax.Statements[0]).Assert();
+                    (Target.DirectChildren[1]).AssertIsNull();
+
                     NotImplementedMethod();
                     return default;
                 }
