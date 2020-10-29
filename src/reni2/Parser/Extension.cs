@@ -243,11 +243,11 @@ namespace Reni.Parser
 
         static string GetDumpBeforeCurrent(this SourcePart target, int dumpWidth)
         {
-            var start = T(0, target.Position - dumpWidth).Max();
-            var result = target.Source.SubString(start, target.Position - start);
-            if(target.Position >= dumpWidth)
-                result = "..." + result;
-            return result;
+            var targetPosition = target.Position - dumpWidth;
+
+            if(targetPosition < 3)
+                return target.Source.SubString(0, target.Position);
+            return "..." + target.Source.SubString(targetPosition, target.Position - targetPosition);
         }
 
         public static string DumpSource(this SourcePart[] target, int dumpWidth = 5)
