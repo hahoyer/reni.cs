@@ -134,8 +134,8 @@ namespace ReniUI.Classification
         internal static Syntax LocateByPosition(Helper.Syntax target, SourcePosition offset, bool includingParent = false)
         {
             var result = target.LocateByPosition(offset, includingParent );
-            result.AssertIsNotNull();
-            var resultToken = result.Item1.FlatItem.Anchor.Items[result.Item2].Token;
+            result.Master.AssertIsNotNull();
+            var resultToken = result.Master.FlatItem.Anchor.Items[result.Index].Token;
             if(offset < resultToken.Characters)
                 return new WhiteSpaceSyntax
                 (

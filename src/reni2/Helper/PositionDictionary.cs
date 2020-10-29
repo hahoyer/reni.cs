@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Helper;
+using hw.Parser;
 using hw.Scanner;
 using Reni.TokenClasses;
 
@@ -10,26 +10,26 @@ namespace Reni.Helper
     public sealed class PositionDictionary<TResult> : DumpableObject
         where TResult : ITree<TResult>
     {
-        readonly Dictionary<SourcePart, TResult> Value = new Dictionary<SourcePart, TResult>();
+        static int Position;
 
-        internal TResult this[SourcePart key]
+        readonly IDictionary<SourcePosition, (int Length, TResult Node)[]> Value =
+            new Dictionary<SourcePosition, (int, TResult)[]>();
+
+        internal(int Length, TResult Node)[] this[SourcePosition key] => Value[key];
+
+        internal TResult this[SourcePart keyPart]
         {
-            get => Value[key];
+            get => Value[keyPart.Start].Single(node => node.Length == keyPart.Length).Node;
             set
             {
-                (!Value.ContainsKey(key)).Assert(() => $@"
-Key: {key.GetDumpAroundCurrent(5)} 
+                for(var offset = 0; offset <= keyPart.Length; offset++)
+                {
+                    var key = keyPart.Start + offset;
+                    if(!Value.TryGetValue(key, out var currentValue))
+                        currentValue = new (int, TResult)[0];
 
-First: {Tracer.Dump(Value[key])}
-
-This: {Tracer.Dump(value)}
-
-First => This: {Value[key].GetPath(node=>ReferenceEquals(node, value)).Stringify(".")}
-This => First: {value.GetPath(node=>ReferenceEquals(node, Value[key])).Stringify(".")}
-
-
-");
-                Value[key] = value;
+                    Value[key] = currentValue.Concat(T((keyPart.Length - offset, value))).ToArray();
+                }
             }
         }
 
@@ -39,9 +39,7 @@ This => First: {value.GetPath(node=>ReferenceEquals(node, Value[key])).Stringify
             set => this[KeyMap(key)] = value;
         }
 
-        static SourcePart KeyMap(BinaryTree key) => key.Token.Characters;
-
-        static int Position;
+        static SourcePart KeyMap(BinaryTree key) => key.Token.SourcePart();
 
         public void AssertValid(BinaryTree binary)
         {
@@ -59,7 +57,7 @@ This => First: {value.GetPath(node=>ReferenceEquals(node, Value[key])).Stringify
 
         bool IsValidKey(BinaryTree key)
         {
-            var result = Value.ContainsKey(KeyMap(key));
+            var result = Value.ContainsKey(KeyMap(key).Start);
             if(result)
                 return true;
             @$" 

@@ -115,22 +115,23 @@ namespace Reni.Helper
 
         (TResult Master, int Index) LocateByPositionForCache(SourcePosition current, bool includingParent)
         {
-            if(SourcePart.Contains(current))
-            {
-                var result = Anchors
-                    .Select((anchor, index) => (anchor, index))
-                    .FirstOrDefault(node => node.anchor.Length > 0 && node.anchor.Contains(current));
+            (!includingParent).Assert();
+            return Context[current]
+                .Single(node => node.Length > 0)
+                .Node
+                .LocateByPosition(current);
+        }
 
-                if(result.anchor != null)
-                    return ((TResult)this, result.index);
+        (TResult Master, int Index) LocateByPosition(SourcePosition current)
+        {
+            var result = Anchors
+                .Select((anchor, index) => (anchor, index))
+                .FirstOrDefault(node => node.anchor.Length > 0 && node.anchor.Contains(current));
 
-                return DirectChildren
-                    .Select(node => node.LocateByPosition(current, false))
-                    .FirstOrDefault(node => node.Master != null);
-            }
+            if(result.anchor != null)
+                return ((TResult)this, result.index);
 
-
-            NotImplementedMethod(current, includingParent);
+            NotImplementedMethod(current);
             return default;
         }
 

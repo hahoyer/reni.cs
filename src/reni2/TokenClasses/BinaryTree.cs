@@ -126,12 +126,14 @@ namespace Reni.TokenClasses
 
         IEnumerable<BinaryTree> GetParserLevelGroup(ITokenClass tokenClass)
         {
+            if(!tokenClass.IsBelongingTo(TokenClass))
+                yield break;
+
             if(Left != null)
                 foreach(var node in Left.GetParserLevelGroup(tokenClass))
                     yield return node;
 
-            if(tokenClass.IsBelongingTo(TokenClass))
-                yield return this;
+            yield return this;
 
             if(Right != null)
                 foreach(var node in Right.GetParserLevelGroup(tokenClass))
