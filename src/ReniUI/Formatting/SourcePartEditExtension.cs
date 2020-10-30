@@ -63,7 +63,7 @@ namespace ReniUI.Formatting
                     var edits = spe.Get(parameter).ToArray();
                     foreach(var edit in edits)
                     {
-                        Tracer.Assert(currentPosition <= edit.Location.Position);
+                        (currentPosition <= edit.Location.Position).Assert();
                         currentPosition = edit.Location.EndPosition;
                         result.Add(edit);
                     }

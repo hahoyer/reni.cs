@@ -15,11 +15,17 @@ namespace ReniUI.CompilationView
 {
     public sealed class SourceView : MainView, Extension.IClickHandler
     {
-        int _lineNumberMarginLength;
-        readonly FunctionCache<object, ChildView> ChildViews;
-        readonly ValueCache<CompilerBrowser> CompilerCache;
+        class CacheContainer
+        {
+            public FunctionCache<object, ChildView> ChildViews;
+            public ValueCache<CompilerBrowser> Compiler;
+            public int LineNumberMarginLength;
+            public FunctionCache<ValueSyntax, ResultCachesView> ResultCachesViews;
+        }
+
+        readonly CacheContainer Cache = new CacheContainer();
+
         readonly TraceLogView LogView;
-        readonly FunctionCache<ValueSyntax, ResultCachesView> ResultCachesViews;
         readonly Scintilla TextBox;
         readonly BrowseTraceCollector TraceLog;
 
@@ -34,17 +40,16 @@ namespace ReniUI.CompilationView
             foreach(var id in TextStyle.All)
                 StyleConfig(id);
 
-            TextBox.StyleNeeded += (s, args) => SignalStyleNeeded(args.Position);
+            TextBox.StyleNeeded += (s, args) => Compiler.SignalStyleNeeded(TextBox, args.Position);
             TextBox.TextChanged += (s, args) => OnTextChanged();
 
             TextBox.ContextMenu = new ContextMenu();
             TextBox.ContextMenu.Popup += (s, args) => OnContextMenuPopup();
 
-            CompilerCache = new ValueCache<CompilerBrowser>(CreateCompilerBrowser);
-
-            ResultCachesViews = new FunctionCache<ValueSyntax, ResultCachesView>
-                (item => new ResultCachesView(item, this));
-            ChildViews = new FunctionCache<object, ChildView>(CreateView);
+            Cache.Compiler = new ValueCache<CompilerBrowser>(CreateCompilerBrowser);
+            Cache.ResultCachesViews
+                = new FunctionCache<ValueSyntax, ResultCachesView>(item => new ResultCachesView(item, this));
+            Cache.ChildViews = new FunctionCache<object, ChildView>(CreateView);
 
             Client = TextBox;
 
@@ -54,17 +59,17 @@ namespace ReniUI.CompilationView
             LogView = new TraceLogView(this);
         }
 
-        internal CompilerBrowser Compiler => CompilerCache.Value;
+        internal CompilerBrowser Compiler => Cache.Compiler.Value;
 
-        int LinenumberMarginLength
+        int LineNumberMarginLength
         {
-            get => _lineNumberMarginLength;
+            get => Cache.LineNumberMarginLength;
             set
             {
-                if(_lineNumberMarginLength == value)
+                if(Cache.LineNumberMarginLength == value)
                     return;
 
-                _lineNumberMarginLength = value;
+                Cache.LineNumberMarginLength = value;
                 const int Padding = 2;
                 TextBox.Margins[0].Width
                     = TextBox.TextWidth(Style.LineNumber, new string('9', value + 1)) + Padding;
@@ -122,8 +127,8 @@ namespace ReniUI.CompilationView
 
         void OnTextChanged()
         {
-            LinenumberMarginLength = TextBox.Lines.Count.ToString().Length;
-            CompilerCache.IsValid = false;
+            LineNumberMarginLength = TextBox.Lines.Count.ToString().Length;
+            Cache.Compiler.IsValid = false;
         }
 
         void OnContextMenuPopup()
@@ -137,8 +142,8 @@ namespace ReniUI.CompilationView
 
             var p = TextBox.CurrentPosition;
 
-            var compileSyntaxs = Compiler.FindPosition(p);
-            var items = compileSyntaxs
+            var compileSyntaxList = Compiler.FindPosition(p);
+            var items = compileSyntaxList
                 .Select(CreateMenuItem)
                 .ToArray();
 
@@ -153,7 +158,7 @@ namespace ReniUI.CompilationView
                 text += " (" + syntax.ResultCache.Count + ")";
 
             var menuItem = new MenuItem
-                (text, (s, a) => ResultCachesViews[syntax].Run());
+                (text, (s, a) => Cache.ResultCachesViews[syntax].Run());
             menuItem.Select += (s, a) => SignalContextMenuSelect(syntax);
             return menuItem;
         }
@@ -164,30 +169,7 @@ namespace ReniUI.CompilationView
 
         void StyleConfig(TextStyle id) => id.Config(TextBox.Styles[id]);
 
-        void SignalStyleNeeded(int position)
-        {
-            var trace = false;
-            StartMethodDump(trace, position);
-            try
-            {
-                while(TextBox.GetEndStyled() < position)
-                {
-                    var current = TextBox.GetEndStyled();
-                    var tokens = Compiler.LocatePosition(current);
-                    var style = TextStyle.From(tokens, Compiler);
-                    TextBox.StartStyling(tokens.StartPosition);
-                    TextBox.SetStyling(tokens.SourcePart.Length, style);
-                }
-
-                ReturnVoidMethodDump(false);
-            }
-            finally
-            {
-                EndMethodDump();
-            }
-        }
-
-        void SignalClickedObject(object target) => ChildViews[target].Run();
+        void SignalClickedObject(object target) => Cache.ChildViews[target].Run();
 
         internal void SignalClickedFunction(int index)
             => SignalClickedObject(Compiler.Function(index));

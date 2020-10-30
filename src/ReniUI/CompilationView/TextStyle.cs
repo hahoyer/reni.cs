@@ -5,6 +5,7 @@ using System.Linq;
 using hw.Helper;
 using hw.Scanner;
 using JetBrains.Annotations;
+using Reni.TokenClasses;
 using ReniUI.Classification;
 using ScintillaNET;
 
@@ -35,7 +36,7 @@ namespace ReniUI.CompilationView
             isUnderlined: true);
 
         [UsedImplicitly]
-        public static TextStyle From(Syntax syntax, CompilerBrowser compiler)
+        public static TextStyle From(Syntax syntax)
         {
             try
             {

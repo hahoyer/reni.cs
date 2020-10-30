@@ -11,8 +11,9 @@ using Reni.Validation;
 
 namespace Reni.SyntaxTree
 {
-    public sealed class Anchor : DumpableObject
+    public sealed class Anchor : DumpableObject, ValueCache.IContainer
     {
+        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
         internal BinaryTree[] Items { get; private set; }
 
         Anchor() { }
@@ -65,5 +66,10 @@ namespace Reni.SyntaxTree
                 Items = other.Items.Concat(Items).ToArray()
             };
         }
+
+        public BinaryTree GetMain() => Items
+            .Single(node => Items.All(parent => node.Parent != parent));
+
+        internal BinaryTree Main => this.CachedValue(GetMain);
     }
 }

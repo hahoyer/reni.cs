@@ -6,7 +6,9 @@ using System.Linq;
 using System.Windows.Forms;
 using hw.DebugFormatter;
 using hw.Scanner;
+using Reni.TokenClasses;
 using ReniUI.CompilationView;
+using ScintillaNET;
 
 namespace ReniUI
 {

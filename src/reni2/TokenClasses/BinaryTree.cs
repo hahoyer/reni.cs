@@ -70,7 +70,7 @@ namespace Reni.TokenClasses
         internal SourcePart SourcePart =>
             LeftMost.Token.SourcePart().Start.Span(RightMost.Token.Characters.End);
 
-        BinaryTree LeftMost => Left?.LeftMost ?? this;
+        internal BinaryTree LeftMost => Left?.LeftMost ?? this;
         BinaryTree RightMost => Right?.RightMost ?? this;
 
         [DisableDump]
@@ -153,7 +153,7 @@ namespace Reni.TokenClasses
             }
         }
 
-        IEnumerable<BinaryTree> GetParserLevelGroup(ITokenClass tokenClass)
+        internal IEnumerable<BinaryTree> GetParserLevelGroup(ITokenClass tokenClass)
         {
             if(!tokenClass.IsBelongingTo(TokenClass))
                 yield break;
@@ -199,16 +199,31 @@ namespace Reni.TokenClasses
 
             tokenString = (IsSeparatorRequired? " " : "") + tokenString;
 
-            var leftResult = Left?.FlatSubFormat<TContainer, TValue>(areEmptyLinesPossible);
+            var leftResult = Left == null
+                ? new TContainer()
+                : Left.FlatSubFormat<TContainer, TValue>(areEmptyLinesPossible);
+
             if(leftResult == null)
                 return null;
 
-            var rightResult = Right?.FlatSubFormat<TContainer, TValue>(areEmptyLinesPossible);
-            return rightResult == null? null : leftResult.Concat(tokenString, rightResult);
+            var rightResult = Right == null
+                ? new TContainer()
+                : Right.FlatSubFormat<TContainer, TValue>(areEmptyLinesPossible);
+
+            if(rightResult == null)
+                return null;
+
+            return leftResult.Concat(tokenString, rightResult);
         }
 
         TContainer FlatSubFormat<TContainer, TValue>(bool areEmptyLinesPossible)
             where TContainer : class, IFormatResult<TValue>, new()
             => FlatFormat<TContainer, TValue>(areEmptyLinesPossible);
+
+        public BinaryTree GetRightNeighbor(int current)
+        {
+            NotImplementedMethod(current);
+            return default;
+        }
     }
 }

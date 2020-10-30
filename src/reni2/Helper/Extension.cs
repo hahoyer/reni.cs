@@ -215,7 +215,7 @@ namespace Reni.Helper
             if(target.PrecededWith.Any(item => item.IsComment() && item.HasLines()))
                 return null;
 
-            if(emptyLineLimit != 0 && target.PrecededWith.Any(item => item.IsLineBreak()))
+            if(emptyLineLimit != 0 && target.PrecededWith.Any(item => item.IsLineEnd()))
                 return null;
 
             var result = target
@@ -235,7 +235,7 @@ namespace Reni.Helper
             if(precede.Any(item => item.IsComment() && item.HasLines()))
                 return null;
 
-            if(areEmptyLinesPossible && precede.Any(item => item.IsLineBreak()))
+            if(areEmptyLinesPossible && precede.Any(item => item.IsLineEnd()))
                 return null;
 
             var result = precede

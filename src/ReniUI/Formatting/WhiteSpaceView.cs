@@ -143,11 +143,11 @@ namespace ReniUI.Formatting
             Tracer.Assert(Target.Any());
 
             var last = Target.Last();
-            if(!last.IsWhiteSpace())
+            if(!last.IsSpace())
                 return last.SourcePart.End.Span(0);
 
             return Target
-                .Split(item => !item.IsWhiteSpace())
+                .Split(item => !item.IsSpace())
                 .Last()
                 .SourcePart();
         }
@@ -170,8 +170,8 @@ namespace ReniUI.Formatting
                 .Last();
 
             return lastLineBreakGroup
-                .Split(item => item.IsLineBreak(), false)
-                .Where(group => group.Last().IsLineBreak())
+                .Split(item => item.IsLineEnd(), false)
+                .Where(group => group.Last().IsLineEnd())
                 .Select(group => group.SourcePart())
                 .ToArray();
         }

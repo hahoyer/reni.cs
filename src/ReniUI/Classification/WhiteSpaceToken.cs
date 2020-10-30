@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.Parser;
-using ReniUI.Helper;
 
 namespace ReniUI.Classification
 {

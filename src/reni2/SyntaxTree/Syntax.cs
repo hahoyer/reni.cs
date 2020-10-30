@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using hw.Scanner;
 using Reni.Helper;
 using Reni.Parser;
 using Reni.TokenClasses;
@@ -125,5 +126,12 @@ namespace Reni.SyntaxTree
             foreach(var node in DirectChildren.Where(node => node != this))
                 node?.AssertValid();
         }
+
+        public IEnumerable<SourcePart> GetParserLevelGroup(int index) 
+            => Anchor.Items
+            .Where(item => item.TokenClass.IsBelongingTo(Anchor.Items[index].TokenClass))
+            .Select(item => item.Token.Characters);
+
+        public BinaryTree MainAnchor => Anchor.Main;
     }
 }

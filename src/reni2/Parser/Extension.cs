@@ -76,10 +76,19 @@ namespace Reni.Parser
         internal static bool IsComment(this IItem item)
             => Lexer.IsMultiLineComment(item) || Lexer.IsLineComment(item);
 
-        internal static bool IsLineBreak(this IItem item)
+        internal static bool IsMultiLineComment(this IItem item)
+            => Lexer.IsMultiLineComment(item) ;
+
+        internal static bool IsLineComment(this IItem item)
+            => Lexer.IsLineComment(item);
+
+        internal static bool IsLineEnd(this IItem item)
             => Lexer.IsLineEnd(item);
 
-        internal static bool IsWhiteSpace(this IItem item)
+        internal static string State(this IItem item)
+            => Lexer.Instance.WhiteSpaceId(item);
+
+        internal static bool IsSpace(this IItem item)
             => Lexer.IsSpace(item);
 
         public static int Length(this IEnumerable<Lexer.WhiteSpaceToken> whiteSpaceTokens)

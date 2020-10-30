@@ -25,6 +25,7 @@ namespace ReniUI.Formatting
                 .OrderBy(edit => edit.Location.Position)
                 .Where(edit => edit.Location.Intersect(targetPart) != null)
                 .ToArray();
+
             foreach(var edit in edits)
             {
                 (edit.Location.EndPosition <= originalEndPosition).Assert("not implemented.");

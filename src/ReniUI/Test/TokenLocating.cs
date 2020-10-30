@@ -16,7 +16,7 @@ namespace ReniUI.Test
             var span = (compiler.Source + 2).Span(3);
             var x = compiler.LocateIncludingParent(span).SourcePart;
 
-            Tracer.Assert(x.Id == "1,3,4,6", x.Dump);
+            (x.Id == "1,3,4,6").Assert(x.Dump);
         }
 
 
@@ -30,7 +30,7 @@ namespace ReniUI.Test
             var span = compiler.Source + 2;
             var x = compiler.LocatePosition(span);
             var sourcePart = x.SourcePart;
-            Tracer.Assert(sourcePart.Id.Replace("\r", "") == "# Comment\n", x.Dump);
+            (sourcePart.Id.Replace("\r", "") == "# Comment\n").Assert(x.Dump);
         }
 
 
@@ -42,7 +42,7 @@ namespace ReniUI.Test
             var compiler = CompilerBrowser.FromText(text);
             var span = compiler.Source + text.IndexOf(',');
             var x = compiler.LocatePosition(span).Master.Anchors.Combine();
-            Tracer.Assert(x.Id.Replace("\r", "") == "1,3,4,6", x.Dump);
+            (x.Id.Replace("\r", "") == "1,3,4,6").Assert(x.Dump);
         }
 
         [UnitTest]
@@ -53,7 +53,7 @@ namespace ReniUI.Test
             var compiler = CompilerBrowser.FromText(text);
             var span = compiler.Source + text.IndexOf(',');
             var x = compiler.LocatePosition(span).Master.Anchors.Combine();
-            Tracer.Assert(x.Id.Replace("\r", "") == "x:1,3,4,6", x.Dump);
+            (x.Id.Replace("\r", "") == "x:1,3,4,6").Assert(x.Dump);
         }
     }
 }

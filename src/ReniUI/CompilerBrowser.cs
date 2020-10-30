@@ -7,12 +7,13 @@ using hw.Scanner;
 using Reni;
 using Reni.Code;
 using Reni.Helper;
-using Reni.Parser;
 using Reni.Struct;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
 using Reni.Validation;
+using ReniUI.CompilationView;
 using ReniUI.Formatting;
+using ScintillaNET;
 
 namespace ReniUI
 {
@@ -39,13 +40,13 @@ namespace ReniUI
         }
 
         internal IExecutionContext ExecutionContext => Compiler;
+        public BinaryTree LeftMost=>Compiler.BinaryTree.LeftMost;
 
         internal IEnumerable<Issue> Issues => Compiler.Issues;
 
         internal Helper.Syntax Syntax => this.CachedValue(GetSyntax);
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
-
 
         public static CompilerBrowser FromText
             (string text, CompilerParameters parameters, string sourceIdentifier = null)
@@ -81,7 +82,7 @@ namespace ReniUI
         internal string Reformat(IFormatter formatter = null, SourcePart targetPart = null) =>
             (formatter ?? new Formatting.Configuration().Create())
             .GetEditPieces(this, targetPart)
-            .Combine(Syntax.Anchors.Combine());
+            .Combine(Compiler.Source.All);
 
         internal void Ensure() => Compiler.Execute();
 
@@ -137,5 +138,17 @@ namespace ReniUI
             return default;
         }
 
+        public void SignalStyleNeeded(Scintilla textBox, int position)
+        {
+            var current = LeftMost;
+            while(textBox.GetEndStyled() < position)
+            {
+                var offset = textBox.GetEndStyled();
+                var syntax = LocatePosition(offset);
+                var style = TextStyle.From(syntax);
+                textBox.StartStyling(syntax.StartPosition);
+                textBox.SetStyling(syntax.SourcePart.Length, style);
+            }
+        }
     }
 }

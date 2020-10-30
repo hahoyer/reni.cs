@@ -5,7 +5,7 @@ using hw.DebugFormatter;
 using hw.Helper;
 using Reni.Helper;
 using Reni.Parser;
-using Reni.SyntaxTree;
+using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
@@ -19,28 +19,22 @@ namespace ReniUI.Formatting
 
         readonly CacheContainer Cache = new CacheContainer();
         readonly Configuration Configuration;
+        bool ForceLineSplit;
 
         bool IsIndentRequired;
-        bool ForceLineSplit;
 
         internal Syntax(Reni.SyntaxTree.Syntax flatItem, Configuration configuration)
             : this(flatItem, new PositionDictionary<Syntax>(), 0, null)
             => Configuration = configuration;
 
         Syntax(Reni.SyntaxTree.Syntax flatItem, PositionDictionary<Syntax> context, int index, Syntax parent)
-            : base(flatItem, parent, context, index)
+            : base(flatItem, parent, context)
         {
             if(parent != null)
                 Configuration = parent.Configuration;
         }
 
         bool IsLineSplit => ForceLineSplit || GetHasAlreadyLineBreakOrIsTooLong(this);
-
-        bool GetHasAlreadyLineBreakOrIsTooLong(Syntax target)
-        {
-            var basicLineLength = target.GetFlatLength(Configuration.EmptyLineLimit != 0);
-            return basicLineLength == null || basicLineLength > Configuration.MaxLineLength;
-        }
 
         [EnableDump]
         new Reni.SyntaxTree.Syntax FlatItem => base.FlatItem;
@@ -66,7 +60,6 @@ namespace ReniUI.Formatting
                 try
                 {
                     var result = EditGroups
-                        .SelectMany(i => i)
                         .ToArray()
                         .Indent(IndentDirection);
                     Dump(nameof(result), result);
@@ -86,29 +79,44 @@ namespace ReniUI.Formatting
         IndentDirection IndentDirection => IsIndentRequired? IndentDirection.ToRight : IndentDirection.NoIndent;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        IEnumerable<IEnumerable<ISourcePartEdit>> EditGroups
+        IEnumerable<ISourcePartEdit> EditGroups
         {
             get
             {
-                if(FlatItem is CompoundSyntax compound)
-                    return EditCompound;
-                NotImplementedMethod();
-                return default;
+                var anchorEdits
+                    = FlatItem.Anchor.Items
+                        .Select(node => (position: node.Token.Characters.Position, data: GetWhiteSpacesEdits(node)));
+                var childEdits
+                    = DirectChildren
+                        .Where(node => node != null)
+                        .Select(node
+                            =>
+                            (
+                                position: node.FlatItem.MainAnchor.Token.Characters.Position
+                                , data: node.Edits ?? new ISourcePartEdit[0]
+                            )
+                        );
+                return anchorEdits
+                    .Concat(childEdits)
+                    .OrderBy(node => node.position)
+                    .SelectMany(node => node.data);
             }
         }
 
-        IEnumerable<IEnumerable<ISourcePartEdit>> EditCompound
+        bool GetHasAlreadyLineBreakOrIsTooLong(Syntax target)
         {
-            get
-            {
-                FlatFormat()
-
-                NotImplementedMethod();
-                return default;
-            }
+            var basicLineLength = target.GetFlatLength(Configuration.EmptyLineLimit != 0);
+            return basicLineLength == null || basicLineLength > Configuration.MaxLineLength;
         }
 
         protected override Syntax Create(Reni.SyntaxTree.Syntax flatItem, int index)
             => new Syntax(flatItem, Context, index, this);
+
+        IEnumerable<ISourcePartEdit> GetWhiteSpacesEdits(BinaryTree target)
+        {
+            if(target.Token.PrecededWith.Any())
+                return T(new WhiteSpaceView(target.Token.PrecededWith, Configuration, target.IsSeparatorRequired));
+            return T(new EmptyWhiteSpaceView(target.Token.Characters.Start, target.IsSeparatorRequired));
+        }
     }
 }

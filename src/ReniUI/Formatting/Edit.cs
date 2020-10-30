@@ -17,5 +17,7 @@ namespace ReniUI.Formatting
             NewText = newText;
             Flag = flag;
         }
+
+        protected override string GetNodeDump() => Flag ?? base.GetNodeDump();
     }
 }

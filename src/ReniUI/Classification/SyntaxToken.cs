@@ -4,7 +4,6 @@ using hw.DebugFormatter;
 using hw.Scanner;
 using Reni.TokenClasses;
 using Reni.Validation;
-using ReniUI.Helper;
 
 namespace ReniUI.Classification
 {
@@ -57,8 +56,6 @@ namespace ReniUI.Classification
         [DisableDump]
         public override string State => Token.Characters.Id ?? "";
 
-        [DisableDump]
-        public override IEnumerable<SourcePart> ParserLevelGroup
-            => Master.GetParserLevelGroup(Index)?.Select(index => Master.FlatItem.Anchor.Items[index].Token.Characters);
+        public override IEnumerable<SourcePart> ParserLevelGroup => throw new System.NotImplementedException();
     }
 }

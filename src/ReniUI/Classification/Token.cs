@@ -112,7 +112,7 @@ namespace ReniUI.Classification
         public int EndPosition => SourcePart.EndPosition;
 
         [DisableDump]
-        public abstract IEnumerable<SourcePart> ParserLevelGroup { get; }
+        public virtual IEnumerable<SourcePart> ParserLevelGroup => null;
 
         public Trimmed TrimLine(SourcePart span) => new Trimmed(this, span);
 
@@ -136,14 +136,10 @@ namespace ReniUI.Classification
             var result = target.LocateByPosition(offset, includingParent );
             result.Master.AssertIsNotNull();
             var resultToken = result.Master.FlatItem.Anchor.Items[result.Index].Token;
-            if(offset < resultToken.Characters)
-                return new WhiteSpaceSyntax
-                (
-                    resultToken.PrecededWith.Last(item => item.SourcePart.Contains(offset)),
-                    result.Master, result.Index
-                );
-
-            return new SyntaxToken(result.Master, result.Index);
+            var item = resultToken.PrecededWith.LastOrDefault(item => item.SourcePart.Contains(offset));
+            if(item == null)
+                return new SyntaxToken(result.Master, result.Index);
+            return new WhiteSpaceSyntax(item, result.Master, result.Index);
         }
 
         public static Syntax GetRightNeighbor(Helper.Syntax target, int current)

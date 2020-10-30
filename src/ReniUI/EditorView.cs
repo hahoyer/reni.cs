@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using AutocompleteMenuNS;
-using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 using Reni;
+using Reni.TokenClasses;
 using Reni.Validation;
 using ReniUI.Classification;
 using ReniUI.Commands;
 using ReniUI.CompilationView;
-using ReniUI.Formatting;
 using ScintillaNET;
 
 namespace ReniUI
@@ -38,15 +37,15 @@ namespace ReniUI
 
         static readonly TimeSpan DelayForSave = TimeSpan.FromSeconds(1);
         static readonly TimeSpan NoPeriodicalActivation = TimeSpan.FromMilliseconds(-1);
+        internal readonly IStudioApplication Master;
+
+        int _lineNumberMarginLength;
+        SaveManager _saveManager;
         readonly AutocompleteMenu AutocompleteMenu;
         readonly ValueCache<CompilerBrowser> CompilerCache;
         readonly FileConfiguration Configuration;
         readonly IssuesView IssuesView;
-        internal readonly IStudioApplication Master;
         readonly Scintilla TextBox;
-
-        int _lineNumberMarginLength;
-        SaveManager _saveManager;
 
         internal EditorView(FileConfiguration configuration, IStudioApplication master)
             : base(master, configuration.PositionPath)
@@ -55,8 +54,7 @@ namespace ReniUI
             Master = master;
             TextBox = new Scintilla
             {
-                Lexer = Lexer.Container,
-                VirtualSpaceOptions = VirtualSpace.UserAccessible
+                Lexer = Lexer.Container, VirtualSpaceOptions = VirtualSpace.UserAccessible
             };
 
             TextBox.ClearCmdKey(Keys.Insert);
@@ -64,7 +62,7 @@ namespace ReniUI
             foreach(var id in TextStyle.All)
                 StyleConfig(id);
 
-            TextBox.StyleNeeded += (s, args) => SignalStyleNeeded(args.Position);
+            TextBox.StyleNeeded += (s, args) => Compiler.SignalStyleNeeded(TextBox, args.Position);
             TextBox.TextChanged += (s, args) => OnTextChanged();
             TextBox.KeyDown += (s, args) => OnKeyDown(args);
 
@@ -88,35 +86,20 @@ namespace ReniUI
 
             AutocompleteMenu = new AutocompleteMenu
             {
-                AutoPopup = true,
-                AppearInterval = 1,
-                MinFragmentLength = 1
+                AutoPopup = true, AppearInterval = 1, MinFragmentLength = 1
             };
 
             AutocompleteMenu.WrapperNeeded +=
-                (s, a) => a.Wrapper = new ScintillaWrapper((Scintilla) a.TargetControl);
+                (s, a) => a.Wrapper = new ScintillaWrapper((Scintilla)a.TargetControl);
             AutocompleteMenu.SetAutocompleteItems(Extension.Query(GetOptions));
         }
-
-        IEnumerable<Issue> IssuesView.IDataProvider.Data => Compiler.Issues;
-
-        IApplication IssuesView.IDataProvider.Master => Master;
-
-        void IssuesView.IDataProvider.SignalClicked(SourcePart part)
-        {
-            TextBox.SetSelection(part.Position, part.EndPosition);
-            TextBox.FirstVisibleLine = part.Source.LineIndex(part.Position);
-            TextBox.FirstVisibleLine = part.Source.LineIndex(part.EndPosition);
-        }
-
-        string IEditView.FileName => Configuration.FileName;
 
         CompilerBrowser Compiler => CompilerCache.Value;
 
         SourcePart SourcePart
             =>
                 (Compiler.Source + TextBox.SelectionStart).Span
-                (TextBox.SelectionEnd - TextBox.SelectionEnd);
+                    (TextBox.SelectionEnd - TextBox.SelectionEnd);
 
         int LineNumberMarginLength
         {
@@ -133,6 +116,19 @@ namespace ReniUI
                                            Padding;
             }
         }
+
+        IEnumerable<Issue> IssuesView.IDataProvider.Data => Compiler.Issues;
+
+        IApplication IssuesView.IDataProvider.Master => Master;
+
+        void IssuesView.IDataProvider.SignalClicked(SourcePart part)
+        {
+            TextBox.SetSelection(part.Position, part.EndPosition);
+            TextBox.FirstVisibleLine = part.Source.LineIndex(part.Position);
+            TextBox.FirstVisibleLine = part.Source.LineIndex(part.EndPosition);
+        }
+
+        string IEditView.FileName => Configuration.FileName;
 
         IEnumerable<AutocompleteItem> GetOptions()
             => Compiler
@@ -191,31 +187,15 @@ namespace ReniUI
             CompilerCache.IsValid = false;
         }
 
-        void AlignTitle() {Title = Configuration.FileName + (TextBox.Modified ? "*" : "");}
+        void AlignTitle() => Title = Configuration.FileName + (TextBox.Modified? "*" : "");
 
         void StyleConfig(TextStyle id) => id.Config(TextBox.Styles[id]);
-
-        void SignalStyleNeeded(int position)
-        {
-            var sourceSyntax = Compiler.Syntax.LeftMost;
-            //Tracer.ConditionalBreak(sourceSyntax .ObjectId == 1859);
-            
-            while(TextBox.GetEndStyled() < position)
-            {
-                var current = TextBox.GetEndStyled();
-                var token = Classification.Syntax.GetRightNeighbor(sourceSyntax, current);
-                var style = TextStyle.From(token, Compiler);
-                TextBox.StartStyling(token.StartPosition);
-                TextBox.SetStyling(token.SourcePart.Length, style);
-                sourceSyntax = token.Master;
-            }
-        }
 
         void Format(SourcePart sourcePart)
         {
             var reformat = Compiler
                 .GetEditPieces(sourcePart)
-                .OrderByDescending(p=>p.Location.EndPosition);
+                .OrderByDescending(p => p.Location.EndPosition);
 
             foreach(var piece in reformat)
             {

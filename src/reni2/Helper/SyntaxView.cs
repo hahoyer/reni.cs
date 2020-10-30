@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Forms;
 using hw.DebugFormatter;
 using hw.Helper;
-using hw.Parser;
 using hw.Scanner;
-using Reni.Parser;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
 
@@ -25,15 +24,13 @@ namespace Reni.Helper
         internal readonly Syntax FlatItem;
         internal readonly TTarget Parent;
         readonly CacheContainer Cache = new CacheContainer();
-        readonly int Index;
 
-        protected SyntaxView(Syntax flatItem, TTarget parent, PositionDictionary<TTarget> context, int index)
+        protected SyntaxView(Syntax flatItem, TTarget parent, PositionDictionary<TTarget> context)
         {
             flatItem.AssertIsNotNull();
             FlatItem = flatItem;
             Parent = parent;
             Context = context;
-            Index = index;
 
             foreach(var anchor in FlatItem.Anchor.Items)
                 Context[anchor] = (TTarget)this;
@@ -48,59 +45,11 @@ namespace Reni.Helper
         [DisableDump]
         public SourcePart[] Anchors => FlatItem.Anchor.SourceParts;
 
-        [DisableDump]
-        public SourcePart SourcePart => FlatItem.Anchor.SourcePart;
-
-        [DisableDump]
-        internal TTarget LeftMost => this.GetNodesFromLeftToRight().First();
-
-        [DisableDump]
-        internal TTarget RightMost => this.GetNodesFromRightToLeft().First();
-
-
         int LeftDirectChildCount => FlatItem.LeftDirectChildCount;
         int DirectChildCount => FlatItem.DirectChildren.Length;
 
         internal TTarget[] DirectChildren
             => this.CachedValue(() => DirectChildCount.Select(GetDirectChild).ToArray());
-
-        [DisableDump]
-        internal TTarget LeftNeighbor => RightMostLeftSibling?.RightMost ?? LeftParent;
-
-        [DisableDump]
-        internal TTarget RightNeighbor => LeftMostRightSibling?.LeftMost ?? RightParent;
-
-        [DisableDump]
-        internal TTarget RightMostLeftSibling => DirectChildren[LeftDirectChildCount - 1];
-
-
-        [DisableDump]
-        internal TTarget LeftMostRightSibling => DirectChildren[LeftDirectChildCount];
-
-        [DisableDump]
-        TTarget LeftParent
-            => Parent != null && Parent.LeftChildren.Any(node => node == this)
-                ? Parent.LeftParent
-                : Parent;
-
-        [DisableDump]
-        TTarget RightParent
-            => Parent != null && Parent.RightChildren.Any(node => node == this)
-                ? Parent.RightParent
-                : Parent;
-
-        [DisableDump]
-        TTarget[] LeftChildren
-            => this.CachedValue(() => LeftDirectChildCount.Select(index => DirectChildren[index]).ToArray());
-
-        [DisableDump]
-        TTarget[] RightChildren => this.CachedValue(GetRightChildren);
-
-        [DisableDump]
-        internal bool IsLeftChild => Parent?.RightMostLeftSibling == this;
-
-        [DisableDump]
-        internal bool IsRightChild => Parent?.LeftMostRightSibling == this;
 
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
         int ITree<TTarget>.DirectChildCount => DirectChildCount;
@@ -141,33 +90,11 @@ namespace Reni.Helper
         internal(TTarget Master, int Index) LocateByPosition(SourcePosition offset, bool includingParent)
             => includingParent? Cache.LocateByPositionIncludingParent[offset] : Cache.LocateByPosition[offset];
 
-        internal IEnumerable<int> GetParserLevelGroup(int index)
-        {
-            var target = FlatItem.Anchor.Items[index];
-            return FlatItem
-                .Anchor
-                .Items
-                .Select((n, i) => (n, i))
-                .Where(item => target.TokenClass.IsBelongingTo(item.n.TokenClass))
-                .Select(item => item.i);
-        }
-
-        TTarget[] GetRightChildren()
-            => (DirectChildCount - LeftDirectChildCount)
-                .Select(index => DirectChildren[index + LeftDirectChildCount])
-                .ToArray();
-
         IEnumerable<TResult> FlatFormat<TContainer, TResult>(bool areEmptyLinesPossible)
             where TContainer : class, IFormatResult<TResult>, new()
         {
-            var results = FlatItem
-                .Anchor
-                .Items
-                .Select(item => item.FlatFormat<TContainer, TResult>(areEmptyLinesPossible));
-
-            return results.Any(item => item == null)
-                ? null 
-                : results.Select(item=>item.Value);
+            var results = FlatItem.MainAnchor.FlatFormat<TContainer, TResult>(areEmptyLinesPossible);
+            return results == null? null : T(results.Value);
         }
 
         /// <summary>
@@ -175,7 +102,7 @@ namespace Reni.Helper
         /// </summary>
         /// <param name="areEmptyLinesPossible"></param>
         /// <returns>The formatted line or null if target contains line breaks.</returns>
-        internal string FlatFormat(bool areEmptyLinesPossible) 
+        internal string FlatFormat(bool areEmptyLinesPossible)
             => FlatFormat<StringResult, string>(areEmptyLinesPossible)?.Stringify("");
 
         /// <summary>
@@ -183,7 +110,8 @@ namespace Reni.Helper
         /// </summary>
         /// <param name="areEmptyLinesPossible"></param>
         /// <returns>The line length calculated or null if target contains line breaks.</returns>
-        internal int? GetFlatLength(bool areEmptyLinesPossible) 
+        internal int? GetFlatLength(bool areEmptyLinesPossible)
             => FlatFormat<IntegerResult, int>(areEmptyLinesPossible)?.Sum();
+
     }
 }

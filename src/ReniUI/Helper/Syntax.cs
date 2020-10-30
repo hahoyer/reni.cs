@@ -11,25 +11,24 @@ namespace ReniUI.Helper
         (
             Reni.SyntaxTree.Syntax flatItem,
             PositionDictionary<Syntax> context,
-            int index = 0,
             Syntax parent = null
         )
-            : base(flatItem, parent, context, index) { }
+            : base(flatItem, parent, context) { }
 
         [EnableDump]
         new Reni.SyntaxTree.Syntax FlatItem => base.FlatItem;
 
         [EnableDump]
         [EnableDumpExcept(null)]
-        string ParentToken => Parent?.Anchors.DumpSource(5);
+        string ParentToken => Parent?.Anchors.DumpSource();
 
         [EnableDump(Order = 10)]
         string[] Children => FlatItem
             .Children
-            .Select(node => node?.Anchor.SourceParts.DumpSource(5))
+            .Select(node => node?.Anchor.SourceParts.DumpSource())
             .ToArray();
 
         protected override Syntax Create(Reni.SyntaxTree.Syntax flatItem, int index)
-            => new Syntax(flatItem, Context, index, this);
+            => new Syntax(flatItem, Context, this);
     }
 }
