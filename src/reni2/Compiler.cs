@@ -11,6 +11,7 @@ using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Code;
 using Reni.Context;
+using Reni.Helper;
 using Reni.Numeric;
 using Reni.Parser;
 using Reni.Runtime;

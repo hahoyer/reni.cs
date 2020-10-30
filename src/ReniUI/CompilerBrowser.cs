@@ -7,8 +7,10 @@ using hw.Scanner;
 using Reni;
 using Reni.Code;
 using Reni.Helper;
+using Reni.Parser;
 using Reni.Struct;
 using Reni.SyntaxTree;
+using Reni.TokenClasses;
 using Reni.Validation;
 using ReniUI.Formatting;
 
@@ -134,5 +136,6 @@ namespace ReniUI
             NotImplementedMethod(offset);
             return default;
         }
+
     }
 }

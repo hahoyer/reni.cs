@@ -39,17 +39,6 @@ namespace Reni
             => (current as IBelongingsMatcher)?.IsBelongingTo(other) ?? false;
 
 
-        [Obsolete("", true)]
-        internal static IEnumerable<BinaryTree> CheckedItemsAsLongAs
-            (this BinaryTree target, Func<BinaryTree, bool> condition)
-        {
-            if(target == null || !condition(target))
-                yield break;
-
-            foreach(var result in target.ItemsAsLongAs(condition))
-                yield return result;
-        }
-
         internal static IEnumerable<Syntax> CheckedItemsAsLongAs(this Syntax target, Func<Syntax, bool> condition)
         {
             if(target == null || !condition(target))
