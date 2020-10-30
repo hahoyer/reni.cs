@@ -5,6 +5,7 @@ using hw.DebugFormatter;
 using hw.Helper;
 using Reni.Helper;
 using Reni.Parser;
+using Reni.SyntaxTree;
 
 namespace ReniUI.Formatting
 {
@@ -20,6 +21,7 @@ namespace ReniUI.Formatting
         readonly Configuration Configuration;
 
         bool IsIndentRequired;
+        bool ForceLineSplit;
 
         internal Syntax(Reni.SyntaxTree.Syntax flatItem, Configuration configuration)
             : this(flatItem, new PositionDictionary<Syntax>(), 0, null)
@@ -30,6 +32,14 @@ namespace ReniUI.Formatting
         {
             if(parent != null)
                 Configuration = parent.Configuration;
+        }
+
+        bool IsLineSplit => ForceLineSplit || GetHasAlreadyLineBreakOrIsTooLong(this);
+
+        bool GetHasAlreadyLineBreakOrIsTooLong(Syntax target)
+        {
+            var basicLineLength = target.GetFlatLength(Configuration.EmptyLineLimit != 0);
+            return basicLineLength == null || basicLineLength > Configuration.MaxLineLength;
         }
 
         [EnableDump]
@@ -80,6 +90,19 @@ namespace ReniUI.Formatting
         {
             get
             {
+                if(FlatItem is CompoundSyntax compound)
+                    return EditCompound;
+                NotImplementedMethod();
+                return default;
+            }
+        }
+
+        IEnumerable<IEnumerable<ISourcePartEdit>> EditCompound
+        {
+            get
+            {
+                FlatFormat()
+
                 NotImplementedMethod();
                 return default;
             }

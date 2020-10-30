@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
@@ -30,9 +29,18 @@ namespace Reni.TokenClasses
         [EnableDumpExcept(null)]
         internal BinaryTree Left { get; }
 
+        [DisableDump]
+        internal BinaryTree LeftNeighbor;
+
+        [DisableDump]
+        internal BinaryTree Parent;
+
         [EnableDump(Order = 3)]
         [EnableDumpExcept(null)]
         internal BinaryTree Right { get; }
+
+        [DisableDump]
+        internal BinaryTree RightNeighbor;
 
         [DisableDump]
         internal readonly IToken Token;
@@ -53,6 +61,8 @@ namespace Reni.TokenClasses
             Left = left;
             TokenClass = tokenClass;
             Right = right;
+
+            SetLinks();
         }
 
 
@@ -110,6 +120,10 @@ namespace Reni.TokenClasses
 
         public BinaryTree[] ParserLevelGroup => GetParserLevelGroup(TokenClass).ToArray();
 
+        [DisableDump]
+        public bool IsSeparatorRequired
+            => !Token.PrecededWith.HasComment() && SeparatorExtension.Get(LeftNeighbor?.TokenClass, TokenClass);
+
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
         SourcePart ISyntax.All => SourcePart;
@@ -123,6 +137,21 @@ namespace Reni.TokenClasses
             };
 
         int ITree<BinaryTree>.LeftDirectChildCount => 1;
+
+        void SetLinks()
+        {
+            if(Left != null)
+            {
+                Left.Parent = this;
+                Left.Chain(node => node.Right).Last().RightNeighbor = this;
+            }
+
+            if(Right != null)
+            {
+                Right.Parent = this;
+                Right.Chain(node => node.Left).Last().LeftNeighbor = this;
+            }
+        }
 
         IEnumerable<BinaryTree> GetParserLevelGroup(ITokenClass tokenClass)
         {
@@ -151,12 +180,6 @@ namespace Reni.TokenClasses
         )
             => new BinaryTree(left, tokenClass, token, right);
 
-        [Obsolete("", true)]
-        internal IEnumerable<BinaryTree> ItemsAsLongAs(Func<BinaryTree, bool> condition)
-            => new[] {this}
-                .Concat(Left.CheckedItemsAsLongAs(condition))
-                .Concat(Right.CheckedItemsAsLongAs(condition));
-
         internal int? GetBracketLevel()
         {
             if(!(TokenClass is IRightBracket rightParenthesis))
@@ -164,5 +187,28 @@ namespace Reni.TokenClasses
             var leftParenthesis = Left?.TokenClass as ILeftBracket;
             return T(leftParenthesis?.Level ?? 0, rightParenthesis.Level).Max();
         }
+
+        internal TContainer FlatFormat<TContainer, TValue>(bool areEmptyLinesPossible)
+            where TContainer : class, IFormatResult<TValue>, new()
+        {
+            var tokenString = Token.Characters
+                .FlatFormat(Left == null? null : Token.PrecededWith, areEmptyLinesPossible);
+
+            if(tokenString == null)
+                return null;
+
+            tokenString = (IsSeparatorRequired? " " : "") + tokenString;
+
+            var leftResult = Left?.FlatSubFormat<TContainer, TValue>(areEmptyLinesPossible);
+            if(leftResult == null)
+                return null;
+
+            var rightResult = Right?.FlatSubFormat<TContainer, TValue>(areEmptyLinesPossible);
+            return rightResult == null? null : leftResult.Concat(tokenString, rightResult);
+        }
+
+        TContainer FlatSubFormat<TContainer, TValue>(bool areEmptyLinesPossible)
+            where TContainer : class, IFormatResult<TValue>, new()
+            => FlatFormat<TContainer, TValue>(areEmptyLinesPossible);
     }
 }

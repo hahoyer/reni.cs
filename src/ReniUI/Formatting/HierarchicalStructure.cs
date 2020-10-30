@@ -140,9 +140,9 @@ namespace ReniUI.Formatting
 
         bool IsLineSplit => ForceLineSplit || GetHasAlreadyLineBreakOrIsTooLong(Target);
 
-        bool GetIsSeparatorRequired(BinaryTree target)
+        static bool GetIsSeparatorRequired(BinaryTree target)
             => !target.Token.PrecededWith.HasComment() &&
-               SeparatorExtension.Get(Target.GetLeftNeighbor(target)?.TokenClass, target.TokenClass);
+               SeparatorExtension.Get(target.LeftNeighbor?.TokenClass, target.TokenClass);
 
         //bool CheckMultilineExpectations(IEnumerable<ISourcePartEdit> result)
         //    => Target.Left == null && Target.Right == null && IsLineSplit ||

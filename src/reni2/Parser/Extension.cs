@@ -243,11 +243,9 @@ namespace Reni.Parser
 
         static string GetDumpBeforeCurrent(this SourcePart target, int dumpWidth)
         {
-            var targetPosition = target.Position - dumpWidth;
-
-            if(targetPosition < 3)
-                return target.Source.SubString(0, target.Position);
-            return "..." + target.Source.SubString(targetPosition, target.Position - targetPosition);
+            var delta = target.Position - dumpWidth;
+            var start = delta < 3? 0 : delta;
+            return (delta < 3? "" : "...") + target.Source.SubString(start, target.Position - start);
         }
 
         public static string DumpSource(this SourcePart[] target, int dumpWidth = 5)
@@ -272,14 +270,14 @@ namespace Reni.Parser
             var current = target[index];
             var next = index + 1 < target.Length? target[index + 1] : null;
 
-            var result = current.Id;
+            var result = current.Id +"]";
             var delta = (next == null? current.Source.Length : next.Position) - current.EndPosition;
 
             if(next == null)
             {
                 if(delta < dumpWith + 3)
-                    return result + "]" + current.End.Span(delta).Id;
-                return result + "]" + current.End.Span(dumpWith).Id + "...";
+                    return result + current.End.Span(delta).Id;
+                return result  + current.End.Span(dumpWith).Id + "...";
             }
 
             (current.Source == next.Source).Assert();
@@ -288,9 +286,13 @@ namespace Reni.Parser
                 return current.Start.Span(next.Start).Id;
 
             if(delta < 2 * dumpWith + 3)
-                return result + "]" + current.End.Span(next.Start).Id + "[";
+                return result + current.End.Span(next.Start).Id + "[";
 
-            return result + "]" + current.End.Span(dumpWith).Id + "..." + (next.Start+-dumpWith).Span(dumpWith).Id + "[";
+            return result +
+                   current.End.Span(dumpWith).Id +
+                   "..." +
+                   (next.Start + -dumpWith).Span(dumpWith).Id +
+                   "[";
         }
 
         internal static SourcePart Combine(this IEnumerable<SourcePart> target1)

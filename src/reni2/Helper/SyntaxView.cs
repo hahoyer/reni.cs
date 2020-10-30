@@ -157,36 +157,13 @@ namespace Reni.Helper
                 .Select(index => DirectChildren[index + LeftDirectChildCount])
                 .ToArray();
 
-        TContainer FlatSubFormat<TContainer, TValue>(BinaryTree left, bool areEmptyLinesPossible)
-            where TContainer : class, IFormatResult<TValue>, new()
-            => left == null? new TContainer() : FlatFormat<TContainer, TValue>(left, areEmptyLinesPossible);
-
-        TContainer FlatFormat<TContainer, TValue>(BinaryTree target, bool areEmptyLinesPossible)
-            where TContainer : class, IFormatResult<TValue>, new()
-        {
-            var tokenString = target.Token.Characters
-                .FlatFormat(target.Left == null? null : target.Token.PrecededWith, areEmptyLinesPossible);
-
-            if(tokenString == null)
-                return null;
-
-            tokenString = (GetIsSeparatorRequired(target)? " " : "") + tokenString;
-
-            var leftResult = FlatSubFormat<TContainer, TValue>(target.Left, areEmptyLinesPossible);
-            if(leftResult == null)
-                return null;
-
-            var rightResult = FlatSubFormat<TContainer, TValue>(target.Right, areEmptyLinesPossible);
-            return rightResult == null? null : leftResult.Concat(tokenString, rightResult);
-        }
-
         IEnumerable<TResult> FlatFormat<TContainer, TResult>(bool areEmptyLinesPossible)
             where TContainer : class, IFormatResult<TResult>, new()
         {
             var results = FlatItem
                 .Anchor
                 .Items
-                .Select(item => FlatFormat<TContainer, TResult>(item, areEmptyLinesPossible));
+                .Select(item => item.FlatFormat<TContainer, TResult>(areEmptyLinesPossible));
 
             return results.Any(item => item == null)
                 ? null 
@@ -199,8 +176,7 @@ namespace Reni.Helper
         /// <param name="areEmptyLinesPossible"></param>
         /// <returns>The formatted line or null if target contains line breaks.</returns>
         internal string FlatFormat(bool areEmptyLinesPossible) 
-            => FlatFormat<StringResult, string>(areEmptyLinesPossible)
-                ?.Stringify("");
+            => FlatFormat<StringResult, string>(areEmptyLinesPossible)?.Stringify("");
 
         /// <summary>
         ///     Get the line length of target when formatted as one line.
@@ -208,18 +184,6 @@ namespace Reni.Helper
         /// <param name="areEmptyLinesPossible"></param>
         /// <returns>The line length calculated or null if target contains line breaks.</returns>
         internal int? GetFlatLength(bool areEmptyLinesPossible) 
-            => FlatFormat<IntegerResult, int>(areEmptyLinesPossible)
-                ?.Sum();
-
-        bool GetIsSeparatorRequired(BinaryTree current)
-            => !current.Token.PrecededWith.HasComment() &&
-               SeparatorExtension.Get(GetLeftNeighbor(current)?.TokenClass, current.TokenClass);
-
-        internal BinaryTree GetLeftNeighbor(BinaryTree current)
-        {
-            NotImplementedMethod(current);
-            return default;
-        }
-
+            => FlatFormat<IntegerResult, int>(areEmptyLinesPossible)?.Sum();
     }
 }
