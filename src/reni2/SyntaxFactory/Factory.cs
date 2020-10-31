@@ -36,7 +36,7 @@ namespace Reni.SyntaxFactory
         internal ValueSyntax GetFrameSyntax(BinaryTree target)
         {
             var kernel = target.BracketKernel;
-            var statements = GetStatementsSyntax(kernel.Center, null, null);
+            var statements = GetStatementsSyntax(kernel.Center, null, kernel.Center.TokenClass);
             var anchor =
                 kernel.ToAnchor.Combine(statements.Length <= 1? null : Anchor.Create(kernel.Center.ParserLevelGroup));
             return CompoundSyntax.Create(statements, null, anchor);
@@ -50,23 +50,17 @@ namespace Reni.SyntaxFactory
                 return new IStatementSyntax[0];
             }
 
-            if(master != null && !target.TokenClass.IsBelongingTo(master))
-                return T((IStatementSyntax)GetValueSyntax(target, anchor));
-
             var factory = GetCurrentFactory(target);
 
             switch(target.TokenClass)
             {
-                case IValueToken valueToken:
-                    return T((IStatementSyntax)valueToken.Provider.Get(target, factory, anchor));
                 case IDeclarationToken declarationToken:
                     anchor.AssertIsNull(() => anchor.Dump());
                     return T(declarationToken.Provider.Get(target, factory));
-                case IStatementsToken statementsToken:
+                case IStatementsToken statementsToken when target.TokenClass.IsBelongingTo(master):
                     return statementsToken.Provider.Get(target, factory, anchor);
                 default:
-                    return T((IStatementSyntax)new EmptyList(Anchor.Create(target).Combine(anchor)
-                        , IssueId.InvalidExpression.Issue(target.Token.Characters)));
+                    return T((IStatementSyntax)GetValueSyntax(target, anchor));
             }
         }
 
