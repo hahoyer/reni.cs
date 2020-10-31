@@ -132,8 +132,6 @@ namespace Reni.SyntaxFactory
         internal DeclarerSyntax CombineWithSuffix(IEnumerable<BinaryTree> nodes)
         {
             var head = nodes.First();
-            var tag = head.TokenClass is IDeclarationTagToken;
-            tag.Assert();
             var anchorNodes = nodes.Skip(1);
             var anchor = anchorNodes.Any()? Anchor.Create(anchorNodes) : null;
             return DeclarerSyntax.GetDeclarationTag(head, MeansPublic, anchor);

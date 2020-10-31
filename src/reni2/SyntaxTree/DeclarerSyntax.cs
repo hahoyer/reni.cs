@@ -15,16 +15,13 @@ namespace Reni.SyntaxTree
         {
             internal readonly IDeclarationTagToken Value;
 
-            internal TagSyntax
-                (IDeclarationTagToken value, Issue issue, Anchor anchor)
+            internal TagSyntax(IDeclarationTagToken value, Issue issue, Anchor anchor)
                 : base(anchor, issue)
-            {
-                Value = value;
-            }
+                => Value = value;
 
             [EnableDump]
             [EnableDumpExcept(null)]
-            string Position => Anchor.SourceParts.DumpSource(5);
+            string Position => Anchor.SourceParts.DumpSource();
 
             internal override void AssertValid(Level level, BinaryTree target = null)
                 => base.AssertValid(level == null? null : new Level {IsCorrectOrder = level.IsCorrectOrder}, target);
@@ -35,12 +32,12 @@ namespace Reni.SyntaxTree
             internal readonly string Value;
 
             internal NameSyntax(string name, Anchor anchor)
-                : base(anchor: anchor)
+                : base(anchor)
                 => Value = name;
 
             [EnableDump]
             [EnableDumpExcept(null)]
-            string Position => Anchor.SourceParts.DumpSource(5);
+            string Position => Anchor.SourceParts.DumpSource();
 
             internal override void AssertValid(Level level, BinaryTree target = null)
                 => base.AssertValid(level == null? null : new Level {IsCorrectOrder = level.IsCorrectOrder}, target);
@@ -67,7 +64,7 @@ namespace Reni.SyntaxTree
         internal SourcePart SourcePart
             => T(T(Hidden?.SourcePart), Tags.SelectMany(node => node.Anchor.SourceParts), Name?.Anchor.SourceParts)
                 .ConcatMany()
-                .Where(i=>i!= null)
+                .Where(i => i != null)
                 .Aggregate();
 
         internal bool IsPublic
@@ -106,20 +103,10 @@ namespace Reni.SyntaxTree
         }
 
         internal static DeclarerSyntax GetDeclarationTag(BinaryTree target, bool meansPublic, Anchor frameItems)
-        {
-            (target.Right == null).Assert();
-            switch(target.TokenClass)
+            => target.TokenClass switch
             {
-                case DeclarationTagToken _:
-                case InvalidDeclarationError _:
-                    return FromTag(target, meansPublic, frameItems);
-                case Definable _: 
-                    return FromName(target, meansPublic, frameItems);
-                default:
-                    NotImplementedFunction(target, frameItems);
-                    return default;
-            }
-        }
+                Definable _ => FromName(target, meansPublic, frameItems), _ => FromTag(target, meansPublic, frameItems)
+            };
 
         static DeclarerSyntax FromTag(BinaryTree target, bool meansPublic, Anchor frameItems)
         {

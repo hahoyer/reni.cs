@@ -27,6 +27,16 @@ namespace Reni.SyntaxFactory
 
             var anchor = hasPrefix? Anchor.Create(nodes.First()) : null;
 
+            if(result == null)
+            {
+                if(nodes.Length == 1 && nodes.First().Count() == 1)
+                    result = factory.CombineWithSuffix(nodes.Single());
+                else
+                    NotImplementedMethod(target, factory, nameof(nodes), nodes);
+            }
+            
+            (result != null).Assert();
+
             return DeclarationSyntax
                 .Create(result, factory.GetValueSyntax(target.Right), Anchor.Create(target).Combine(anchor));
         }
