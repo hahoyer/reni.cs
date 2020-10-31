@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
@@ -48,7 +49,7 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal readonly IToken Token;
 
-        [EnableDump(Order = 2)]
+        [DisableDump]
         internal ITokenClass TokenClass { get; }
 
         int Depth;
@@ -75,7 +76,9 @@ namespace Reni.TokenClasses
         internal SourcePart SourcePart =>
             LeftMost.Token.SourcePart().Start.Span(RightMost.Token.Characters.End);
 
+        [DisableDump]
         internal BinaryTree LeftMost => Left?.LeftMost ?? this;
+        [DisableDump]
         BinaryTree RightMost => Right?.RightMost ?? this;
 
         [DisableDump]
@@ -123,7 +126,8 @@ namespace Reni.TokenClasses
             }
         }
 
-        public BinaryTree[] ParserLevelGroup => GetParserLevelGroup(TokenClass).ToArray();
+        [DisableDump]
+        public BinaryTree[] ParserLevelGroup => this.CachedValue(()=>GetParserLevelGroup(TokenClass).ToArray());
 
         [DisableDump]
         public bool IsSeparatorRequired
@@ -162,18 +166,27 @@ namespace Reni.TokenClasses
 
         IEnumerable<BinaryTree> GetParserLevelGroup(ITokenClass tokenClass)
         {
-            if(tokenClass != TokenClass && !tokenClass.IsBelongingTo(TokenClass))
-                yield break;
+            if(tokenClass is not IBelongingsMatcher)
+                return new BinaryTree[0];
+            
+            if(tokenClass is List)
+                return this
+                    .Chain(node => tokenClass.IsBelongingTo(node.Right?.TokenClass)? node.Right : null);
 
-            if(Left != null)
-                foreach(var node in Left.GetParserLevelGroup(tokenClass))
-                    yield return node;
+            if(tokenClass is IRightBracket)
+            {
+                NotImplementedMethod(tokenClass);
+                return default;
+            }
 
-            yield return this;
+            if(tokenClass is ILeftBracket)
+            {
+                NotImplementedMethod(tokenClass);
+                return default;
+            }
 
-            if(Right != null)
-                foreach(var node in Right.GetParserLevelGroup(tokenClass))
-                    yield return node;
+            NotImplementedMethod(tokenClass);
+            return default;
         }
 
         protected override string GetNodeDump() => base.GetNodeDump() + $"({TokenClass.Id})";

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Scanner;
+using Reni;
 using Reni.TokenClasses;
 using Reni.Validation;
 
@@ -57,6 +58,13 @@ namespace ReniUI.Classification
         public override string State => Token.Characters.Id ?? "";
 
         public override IEnumerable<SourcePart> ParserLevelGroup 
-            => Binary.ParserLevelGroup.Select(node=>node.Token.Characters);
+            => Anchors
+            .Where(node => Binary.TokenClass.IsBelongingTo(node.TokenClass))
+            .Select(node => node.Token.Characters);
+
+        BinaryTree[] Anchors => Master
+            .FlatItem
+            .Anchor
+            .Items;
     }
 }
