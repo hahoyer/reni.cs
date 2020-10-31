@@ -1,11 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Forms;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 using Reni.SyntaxTree;
-using Reni.TokenClasses;
 
 namespace Reni.Helper
 {
@@ -83,7 +81,7 @@ namespace Reni.Helper
             if(result.anchor != null)
                 return ((TTarget)this, result.index);
 
-            NotImplementedMethod(current);
+            NotImplementedMethod(current);                                                       
             return default;
         }
 
@@ -112,6 +110,5 @@ namespace Reni.Helper
         /// <returns>The line length calculated or null if target contains line breaks.</returns>
         internal int? GetFlatLength(bool areEmptyLinesPossible)
             => FlatFormat<IntegerResult, int>(areEmptyLinesPossible)?.Sum();
-
     }
 }
