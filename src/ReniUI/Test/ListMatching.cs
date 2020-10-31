@@ -16,7 +16,7 @@ namespace ReniUI.Test
             var compiler = CompilerBrowser.FromText(text);
             var comma = compiler.LocatePosition(2);
             var commas = comma.ParserLevelGroup.ToArray();
-            (commas.Length == 2).Assert();
+            (commas.Length == 3).Assert();
         }
 
         [UnitTest]
@@ -61,9 +61,9 @@ namespace ReniUI.Test
                 .ToArray();
 
             (commas.Length == 3).Assert();
-            (commas[0].Length == 1).Assert();
-            (commas[1].Length == 1).Assert();
-            (commas[2].Length == 0).Assert();
+            (commas[0].Length == 2).Assert();
+            (commas[1].Length == 2).Assert();
+            (commas[2].Length == 1).Assert();
 
             var firstPart = commas[0].Merge(commas[1], item => item).ToArray();
 

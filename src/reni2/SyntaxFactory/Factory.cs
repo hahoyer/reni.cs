@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
+using Reni.Parser;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
 using Reni.Validation;
@@ -35,19 +36,22 @@ namespace Reni.SyntaxFactory
         internal ValueSyntax GetFrameSyntax(BinaryTree target)
         {
             var kernel = target.BracketKernel;
-            var statements = GetStatementsSyntax(kernel.Center, null);
+            var statements = GetStatementsSyntax(kernel.Center, null, null);
             var anchor =
                 kernel.ToAnchor.Combine(statements.Length <= 1? null : Anchor.Create(kernel.Center.ParserLevelGroup));
             return CompoundSyntax.Create(statements, null, anchor);
         }
 
-        internal IStatementSyntax[] GetStatementsSyntax(BinaryTree target, Anchor anchor)
+        internal IStatementSyntax[] GetStatementsSyntax(BinaryTree target, Anchor anchor, ITokenClass master)
         {
             if(target == null)
             {
                 (anchor == null || anchor.IsEmpty).Assert();
                 return new IStatementSyntax[0];
             }
+
+            if(master != null && !target.TokenClass.IsBelongingTo(master))
+                return T((IStatementSyntax)GetValueSyntax(target, anchor));
 
             var factory = GetCurrentFactory(target);
 
@@ -84,7 +88,7 @@ namespace Reni.SyntaxFactory
                     var node = statementsToken
                         .Provider
                         .Get(target, factory);
-                    anchor = anchor.Combine(Anchor.Create(target.ParserLevelGroup));
+                    anchor = Anchor.Create(target.ParserLevelGroup).Combine(anchor);
                     return CompoundSyntax.Create(node, null, anchor);
                 }
                 default:
