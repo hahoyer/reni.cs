@@ -58,13 +58,13 @@ namespace ReniUI
         public static CompilerBrowser FromFile(string fileName, CompilerParameters parameters = null)
             => new CompilerBrowser(() => Compiler.FromFile(fileName, parameters));
 
-        public Classification.Syntax LocatePosition(SourcePosition offset)
-            => Classification.Syntax.LocateByPosition(Syntax, offset);
+        public Classification.Item LocatePosition(SourcePosition offset)
+            => Classification.Item.LocateByPosition(Syntax, offset);
 
         public string FlatFormat(bool areEmptyLinesPossible)
             => Syntax.FlatFormat(areEmptyLinesPossible);
 
-        public Classification.Syntax LocatePosition(int offset) => LocatePosition(Source + offset);
+        public Classification.Item LocatePosition(int offset) => LocatePosition(Source + offset);
         internal IEnumerable<ValueSyntax> FindPosition(int offset) => FindPosition(Source + offset);
 
         internal IEnumerable<ValueSyntax> FindPosition(SourcePosition offset)
@@ -114,15 +114,15 @@ namespace ReniUI
             }
         }
 
-        internal Classification.Syntax LocateIncludingParent(SourcePart span)
+        internal Classification.Item LocateIncludingParent(SourcePart span)
         {
             NotImplementedMethod(span);
             return default;
         }
 
-        Classification.Syntax LocateValueByPosition(SourcePosition offset, bool includingParent)
+        Classification.Item LocateValueByPosition(SourcePosition offset, bool includingParent)
         {
-            var token = Classification.Syntax.LocateByPosition(Syntax, offset);
+            var token = Classification.Item.LocateByPosition(Syntax, offset);
             if(token.IsComment || token.IsLineComment)
                 return null;
 

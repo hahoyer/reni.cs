@@ -47,8 +47,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Classification\Token.cs" />
-    <Compile Include="Classification\WhiteSpaceToken.cs" />
+    <Compile Include="Classification\Item.cs" />
+    <Compile Include="Classification\WhiteSpaceItem.cs" />
     <Compile Include="FileConfiguration.cs" />
     <Compile Include="Formatting\EmptyWhiteSpaceView.cs" />
     <Compile Include="Formatting\Edit.cs" />
@@ -163,7 +163,7 @@
     <Compile Include="Test\UserInterAction.cs" />
     <Compile Include="Test\UserInterAction2.cs" />
     <Compile Include="Test\UserInterAction3.cs" />
-    <Compile Include="Classification\SyntaxToken.cs" />
+    <Compile Include="Classification\Syntax.cs" />
     <Compile Include="View.cs" />
   </ItemGroup>
   <ItemGroup>

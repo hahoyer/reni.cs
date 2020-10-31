@@ -36,21 +36,21 @@ namespace ReniUI.CompilationView
             isUnderlined: true);
 
         [UsedImplicitly]
-        public static TextStyle From(Syntax syntax)
+        public static TextStyle From(Item item)
         {
             try
             {
-                if(syntax.IsError)
+                if(item.IsError)
                     return Error;
-                if(syntax.IsBraceLike && syntax.ParserLevelGroup.Any())
-                    return syntax.IsBrace ? Brace : BraceLikeKeyWord;
-                if(syntax.IsKeyword)
+                if(item.IsBraceLike && item.ParserLevelGroup.Any())
+                    return item.IsBrace ? Brace : BraceLikeKeyWord;
+                if(item.IsKeyword)
                     return KeyWord;
-                if(syntax.IsComment || syntax.IsLineComment)
+                if(item.IsComment || item.IsLineComment)
                     return Comment;
-                if(syntax.IsNumber)
+                if(item.IsNumber)
                     return Number;
-                if(syntax.IsText)
+                if(item.IsText)
                     return Text;
 
                 return Default;

@@ -5,11 +5,11 @@ using Reni.Parser;
 
 namespace ReniUI.Classification
 {
-    sealed class WhiteSpaceSyntax : Syntax
+    sealed class WhiteSpaceItem : Item
     {
         readonly IItem Item;
 
-        internal WhiteSpaceSyntax(IItem item, Helper.Syntax master, int index)
+        internal WhiteSpaceItem(IItem item, Helper.Syntax master, int index)
             : base(master, index)
             => Item = item;
 

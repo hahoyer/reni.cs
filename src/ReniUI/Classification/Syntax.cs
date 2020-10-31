@@ -7,9 +7,9 @@ using Reni.Validation;
 
 namespace ReniUI.Classification
 {
-    sealed class SyntaxToken : Syntax
+    sealed class Syntax : Item
     {
-        internal SyntaxToken(Helper.Syntax master, int index)
+        internal Syntax(Helper.Syntax master, int index)
             : base(master, index) { }
 
         [EnableDumpExcept(false)]

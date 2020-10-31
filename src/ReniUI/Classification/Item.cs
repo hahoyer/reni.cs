@@ -1,24 +1,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
 using Reni.TokenClasses;
 
 namespace ReniUI.Classification
 {
-    public abstract class Syntax : DumpableObject
+    public abstract class Item : DumpableObject
     {
         public sealed class Trimmed : DumpableObject
         {
             public readonly SourcePart SourcePart;
-            public readonly Syntax Syntax;
+            public readonly Item Item;
 
-            internal Trimmed(Syntax syntax, SourcePart sourcePart)
+            internal Trimmed(Item item, SourcePart sourcePart)
             {
-                Syntax = syntax;
-                SourcePart = sourcePart.Intersect(Syntax.SourcePart) ?? Syntax.SourcePart.Start.Span(0);
+                Item = item;
+                SourcePart = sourcePart.Intersect(Item.SourcePart) ?? Item.SourcePart.Start.Span(0);
             }
 
             public IEnumerable<char> GetCharArray()
@@ -31,7 +30,7 @@ namespace ReniUI.Classification
         internal readonly Helper.Syntax Master;
 
 
-        protected Syntax(Helper.Syntax master, int index)
+        protected Item(Helper.Syntax master, int index)
         {
             Master = master;
             Index = index;
@@ -116,7 +115,7 @@ namespace ReniUI.Classification
 
         public Trimmed TrimLine(SourcePart span) => new Trimmed(this, span);
 
-        bool Equals(Syntax other) => SourcePart == other.SourcePart;
+        bool Equals(Item other) => SourcePart == other.SourcePart;
 
         public override bool Equals(object obj)
         {
@@ -126,23 +125,24 @@ namespace ReniUI.Classification
                 return true;
             if(obj.GetType() != GetType())
                 return false;
-            return Equals((Syntax)obj);
+            return Equals((Item)obj);
         }
 
         public override int GetHashCode() => SourcePart.GetHashCode();
 
-        internal static Syntax LocateByPosition(Helper.Syntax target, SourcePosition offset, bool includingParent = false)
+        internal static Item LocateByPosition
+            (Helper.Syntax target, SourcePosition offset, bool includingParent = false)
         {
-            var result = target.LocateByPosition(offset, includingParent );
+            var result = target.LocateByPosition(offset, includingParent);
             result.Master.AssertIsNotNull();
             var resultToken = result.Master.FlatItem.Anchor.Items[result.Index].Token;
             var item = resultToken.PrecededWith.LastOrDefault(item => item.SourcePart.Contains(offset));
             if(item == null)
-                return new SyntaxToken(result.Master, result.Index);
-            return new WhiteSpaceSyntax(item, result.Master, result.Index);
+                return new Syntax(result.Master, result.Index);
+            return new WhiteSpaceItem(item, result.Master, result.Index);
         }
 
-        public static Syntax GetRightNeighbor(Helper.Syntax target, int current)
+        public static Item GetRightNeighbor(Helper.Syntax target, int current)
         {
             NotImplementedFunction(target, current);
             return default;
