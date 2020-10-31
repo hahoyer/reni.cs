@@ -9,7 +9,7 @@ namespace Reni.SyntaxFactory
 {
     class ColonHandler : DumpableObject, IStatementProvider
     {
-        IStatementSyntax IStatementProvider.Get(BinaryTree target, Factory factory, Anchor anchor)
+        IStatementSyntax IStatementProvider.Get(BinaryTree target, Factory factory)
         {
             var nodes = target
                 .Left
@@ -25,11 +25,7 @@ namespace Reni.SyntaxFactory
                 .Select(factory.CombineWithSuffix)
                 .Aggregate();
 
-            if(hasPrefix)
-            {
-                var prefixItems = Anchor.Create(nodes.First());
-                anchor = anchor == null? prefixItems : anchor.Combine(prefixItems);
-            }
+            var anchor = hasPrefix? Anchor.Create(nodes.First()) : null;
 
             return DeclarationSyntax
                 .Create(result, factory.GetValueSyntax(target.Right), Anchor.Create(target).Combine(anchor));

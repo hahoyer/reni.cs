@@ -36,7 +36,8 @@ namespace Reni.SyntaxFactory
         {
             var kernel = target.BracketKernel;
             var statements = GetStatementsSyntax(kernel.Center, null);
-            var anchor = kernel.ToAnchor.Combine(statements.Length <= 1? null: Anchor.Create(kernel.Center.ParserLevelGroup));
+            var anchor =
+                kernel.ToAnchor.Combine(statements.Length <= 1? null : Anchor.Create(kernel.Center.ParserLevelGroup));
             return CompoundSyntax.Create(statements, null, anchor);
         }
 
@@ -55,7 +56,8 @@ namespace Reni.SyntaxFactory
                 case IValueToken valueToken:
                     return T((IStatementSyntax)valueToken.Provider.Get(target, factory, anchor));
                 case IDeclarationToken declarationToken:
-                    return T(declarationToken.Provider.Get(target, factory, anchor));
+                    anchor.AssertIsNull(() => anchor.Dump());
+                    return T(declarationToken.Provider.Get(target, factory));
                 case IStatementsToken statementsToken:
                     return statementsToken.Provider.Get(target, factory, anchor);
                 default:
@@ -76,7 +78,7 @@ namespace Reni.SyntaxFactory
                 case IValueToken valueToken:
                     return valueToken.Provider.Get(target, factory, anchor);
                 case IDeclarationToken declarationToken:
-                    return declarationToken.Provider.Get(target, factory, anchor.GetLeftOf(target)).ToValueSyntax(anchor.GetRightOf(target));
+                    return declarationToken.Provider.Get(target, factory).ToValueSyntax(anchor);
                 case IStatementsToken statementsToken:
                 {
                     var node = statementsToken
@@ -132,7 +134,8 @@ namespace Reni.SyntaxFactory
             var head = nodes.First();
             var tag = head.TokenClass is IDeclarationTagToken;
             tag.Assert();
-            var anchor = Anchor.Create(nodes.Skip(1));
+            var anchorNodes = nodes.Skip(1);
+            var anchor = anchorNodes.Any()? Anchor.Create(anchorNodes) : null;
             return DeclarerSyntax.GetDeclarationTag(head, MeansPublic, anchor);
         }
     }
