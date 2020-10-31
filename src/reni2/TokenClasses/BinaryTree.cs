@@ -20,7 +20,10 @@ namespace Reni.TokenClasses
             internal BinaryTree Right;
 
             [DisableDump]
-            internal Anchor ToAnchor => Anchor.Create(Left, Right);
+            internal Anchor ToAnchor
+            {
+                get { return Anchor.Create(Left, Right); }
+            }
         }
 
         static int NextObjectId;
@@ -47,6 +50,8 @@ namespace Reni.TokenClasses
 
         [EnableDump(Order = 2)]
         internal ITokenClass TokenClass { get; }
+
+        int Depth;
 
         BinaryTree
         (
@@ -143,17 +148,19 @@ namespace Reni.TokenClasses
             if(Left != null)
             {
                 Left.Parent = this;
+                Left.Depth = Depth + 1;
                 Left.Chain(node => node.Right).Last().RightNeighbor = this;
             }
 
             if(Right != null)
             {
                 Right.Parent = this;
+                Right.Depth = Depth + 1;
                 Right.Chain(node => node.Left).Last().LeftNeighbor = this;
             }
         }
 
-        internal IEnumerable<BinaryTree> GetParserLevelGroup(ITokenClass tokenClass)
+        IEnumerable<BinaryTree> GetParserLevelGroup(ITokenClass tokenClass)
         {
             if(!tokenClass.IsBelongingTo(TokenClass))
                 yield break;
@@ -225,5 +232,10 @@ namespace Reni.TokenClasses
             NotImplementedMethod(current);
             return default;
         }
+
+        public bool HasAsParent(BinaryTree parent)
+            => Parent
+                .Chain(node => node.Depth >= parent.Depth? node.Parent : null)
+                .Any(node => node == parent);
     }
 }

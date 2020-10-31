@@ -1,4 +1,4 @@
-//09:20:58.678 29.10.2020 ran 169 of 179 
+//01:03:30.012 31.10.2020 ran 165 of 179 
 
 namespace hw.UnitTest
 {
@@ -9,11 +9,10 @@ namespace hw.UnitTest
         
 // error 
 
-TestRunner.RunTest(new ReniUI.Test.ExpressionFormatting().FromSourcePart);
-TestRunner.RunTest(new ReniUI.Test.ExpressionFormatting().BadArgDeclaration);
-TestRunner.RunTest(new ReniUI.Test.ListMatching().Matching);
-TestRunner.RunTest(new ReniUI.Test.ListMatching().CombinationsOfMatching);
-TestRunner.RunTest(new ReniUI.Test.ListMatching().MixedMatching);
+TestRunner.RunTest(new ReniUI.Test.PairedSyntaxTree().SimpleList);
+TestRunner.RunTest(new ReniUI.Test.PairedSyntaxTree().TopLevelList);
+TestRunner.RunTest(new ReniUI.Test.PairedSyntaxTree().List);
+TestRunner.RunTest(new ReniUI.Test.PairedSyntaxTree().List3);
 TestRunner.RunTest(new ReniUI.Test.StructFormatting().One);
 TestRunner.RunTest(new ReniUI.Test.StructFormatting().Two);
 TestRunner.RunTest(new ReniUI.Test.StructFormatting().BreakLine);
@@ -32,6 +31,13 @@ TestRunner.RunTest(new ReniUI.Test.UserInterAction().GetTokenForPosition);
 
 // dependanterror 
 
+TestRunner.RunTest(new ReniUI.Test.BadUserInterAction().GetTokenForPosition);
+TestRunner.RunTest(new ReniUI.Test.BadUserInterAction().GetTokenForPositionSimple);
+TestRunner.RunTest(new ReniUI.Test.BracketMatching().MatchingBraces);
+TestRunner.RunTest(new ReniUI.Test.BracketMatching().MoreMatchingBraces);
+TestRunner.RunTest(new ReniUI.Test.BracketMatching().NotMatchingBraces);
+TestRunner.RunTest(new ReniUI.Test.ExpressionFormatting().FromSourcePart);
+TestRunner.RunTest(new ReniUI.Test.ExpressionFormatting().BadArgDeclaration);
 TestRunner.RunTest(new ReniUI.Test.Formatting().HalfList);
 TestRunner.RunTest(new ReniUI.Test.Formatting().LabeledList);
 TestRunner.RunTest(new ReniUI.Test.Formatting().LabelsOnToLevel);
@@ -67,6 +73,9 @@ TestRunner.RunTest(new ReniUI.Test.Formatting().UseLineBreakBeforeParenthesis);
 TestRunner.RunTest(new ReniUI.Test.Formatting().UseSpaceWhenLineBreakIsRemoved);
 TestRunner.RunTest(new ReniUI.Test.FormattingMultiLines().ReformatComments);
 TestRunner.RunTest(new ReniUI.Test.FormattingSimple().ReformatComments);
+TestRunner.RunTest(new ReniUI.Test.ListMatching().Matching);
+TestRunner.RunTest(new ReniUI.Test.ListMatching().CombinationsOfMatching);
+TestRunner.RunTest(new ReniUI.Test.ListMatching().MixedMatching);
 TestRunner.RunTest(new ReniUI.Test.StructFormattingCurrent().Start);
 TestRunner.RunTest(new ReniUI.Test.StructFormattingCurrent().LabeledEntriesInList);
 TestRunner.RunTest(new ReniUI.Test.UserInterAction2().GetTokenForPosition);
