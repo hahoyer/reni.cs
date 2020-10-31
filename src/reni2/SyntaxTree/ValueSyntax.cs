@@ -80,9 +80,6 @@ namespace Reni.SyntaxTree
             .SelectMany(node => node?.Issues)
             .ToArray();
 
-        internal override Result<IStatementSyntax[]> ToStatementsSyntax(BinaryTree target = null)
-            => T((IStatementSyntax)this);
-
         //[DebuggerHidden]
         internal virtual Result ResultForCache(ContextBase context, Category category)
         {

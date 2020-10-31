@@ -109,12 +109,6 @@ namespace Reni.SyntaxTree
             return default;
         }
 
-        internal virtual Result<IStatementSyntax[]> ToStatementsSyntax(BinaryTree target = null)
-        {
-            NotImplementedMethod(target);
-            return default;
-        }
-
         internal IEnumerable<Syntax> ItemsAsLongAs(Func<Syntax, bool> condition)
             => this.GetNodesFromLeftToRight().SelectMany(node => node.CheckedItemsAsLongAs(condition));
 
