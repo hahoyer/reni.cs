@@ -18,9 +18,12 @@ namespace ReniUI.Helper
         [EnableDump]
         new Reni.SyntaxTree.Syntax FlatItem => base.FlatItem;
 
-        [EnableDump]
+        [EnableDump(Order = -2)]
         [EnableDumpExcept(null)]
-        string ParentToken => Parent?.Anchors.DumpSource();
+        string ParentDump => Parent?.ThisDump;
+        [EnableDump(Order = -1)]
+        [EnableDumpExcept(null)]
+        string ThisDump => Anchors.DumpSource();
 
         [EnableDump(Order = 10)]
         string[] Children => FlatItem
