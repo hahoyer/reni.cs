@@ -56,6 +56,7 @@ namespace ReniUI.Classification
         [DisableDump]
         public override string State => Token.Characters.Id ?? "";
 
-        public override IEnumerable<SourcePart> ParserLevelGroup => throw new System.NotImplementedException();
+        public override IEnumerable<SourcePart> ParserLevelGroup 
+            => Binary.ParserLevelGroup.Select(node=>node.Token.Characters);
     }
 }

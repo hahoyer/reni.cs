@@ -36,7 +36,7 @@ namespace ReniUI.Classification
             Index = index;
         }
 
-        BinaryTree Binary => Master.FlatItem.Anchor.Items[Index];
+        internal BinaryTree Binary => Master.FlatItem.Anchor.Items[Index];
         internal TokenClass TokenClass => Binary.TokenClass as TokenClass;
         internal IToken Token => Binary.Token;
 
