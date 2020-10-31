@@ -239,23 +239,10 @@ namespace Reni.Parser
         }
 
         static string GetDumpAfterCurrent(this SourcePart target, int dumpWidth)
-        {
-            if(target.Source.IsEnd(target.EndPosition))
-                return "";
+            => target.Source.GetDumpAfterCurrent(target.EndPosition, dumpWidth);
 
-            var length = Math.Min(dumpWidth, target.Source.Length - target.EndPosition);
-            var result = target.Source.SubString(target.EndPosition, length);
-            if(length == dumpWidth)
-                result += "...";
-            return result;
-        }
-
-        static string GetDumpBeforeCurrent(this SourcePart target, int dumpWidth)
-        {
-            var delta = target.Position - dumpWidth;
-            var start = delta < 3? 0 : delta;
-            return (delta < 3? "" : "...") + target.Source.SubString(start, target.Position - start);
-        }
+        static string GetDumpBeforeCurrent(this SourcePart target, int dumpWidth) 
+            => target.Source.GetDumpBeforeCurrent(target.Position, dumpWidth);
 
         public static string DumpSource(this SourcePart[] target, int dumpWidth = 5)
         {
@@ -276,6 +263,11 @@ namespace Reni.Parser
 
         static string DumpSource(SourcePart[] target, int index, int dumpWith)
         {
+            target = target
+                .OrderBy(node => node.Position)
+                .ThenBy(node => node.EndPosition)
+                .ToArray();
+
             var current = target[index];
             var next = index + 1 < target.Length? target[index + 1] : null;
 
