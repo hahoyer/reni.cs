@@ -23,9 +23,6 @@ namespace Reni.SyntaxTree
                 : base(anchor, issue) { }
 
             [DisableDump]
-            protected sealed override int LeftDirectChildCountInternal => 0;
-
-            [DisableDump]
             protected sealed override int DirectChildCount => 0;
 
             protected sealed override Syntax GetDirectChild(int index)
@@ -60,12 +57,6 @@ namespace Reni.SyntaxTree
         }
 
         [DisableDump]
-        internal int LeftDirectChildCount => LeftDirectChildCountInternal;
-
-        [DisableDump]
-        protected abstract int LeftDirectChildCountInternal { get; }
-
-        [DisableDump]
         protected abstract int DirectChildCount { get; }
 
         [DisableDump]
@@ -85,7 +76,7 @@ namespace Reni.SyntaxTree
             => index < 0 || index >= DirectChildCount? null : DirectChildren[index];
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        int ITree<Syntax>.LeftDirectChildCount => LeftDirectChildCountInternal;
+        int ITree<Syntax>.LeftDirectChildCount => 0;
 
         IEnumerable<Issue> GetIssues() => T(Issue).Concat(Anchor.Issues).Where(node => node != null);
 

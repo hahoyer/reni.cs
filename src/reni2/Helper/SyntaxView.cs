@@ -43,7 +43,6 @@ namespace Reni.Helper
         [DisableDump]
         public SourcePart[] Anchors => FlatItem.Anchor.SourceParts;
 
-        int LeftDirectChildCount => FlatItem.LeftDirectChildCount;
         int DirectChildCount => FlatItem.DirectChildren.Length;
 
         internal TTarget[] DirectChildren
@@ -53,7 +52,7 @@ namespace Reni.Helper
         int ITree<TTarget>.DirectChildCount => DirectChildCount;
         TTarget ITree<TTarget>.GetDirectChild(int index) => DirectChildren[index];
 
-        int ITree<TTarget>.LeftDirectChildCount => LeftDirectChildCount;
+        int ITree<TTarget>.LeftDirectChildCount => 0;
 
         TTarget GetDirectChild(int index)
         {

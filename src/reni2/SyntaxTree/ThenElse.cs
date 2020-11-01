@@ -29,8 +29,6 @@ namespace Reni.SyntaxTree
             Else = elseSyntax;
         }
 
-        protected override int LeftDirectChildCountInternal => Else == null? 1 : 2;
-
         protected override int DirectChildCount => 3;
 
         internal override IRecursionHandler RecursionHandler => this;

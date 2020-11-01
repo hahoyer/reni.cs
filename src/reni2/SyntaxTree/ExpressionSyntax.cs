@@ -23,8 +23,6 @@ namespace Reni.SyntaxTree
             : base(objectId, anchor, issue)
             => Wagon = wagon;
 
-        protected override int LeftDirectChildCountInternal => throw new NotImplementedException();
-
         protected override int DirectChildCount => Wagon.Length;
 
         protected override Syntax GetDirectChild(int index) 
@@ -59,8 +57,6 @@ namespace Reni.SyntaxTree
             Token = token;
             Argument = argument;
         }
-
-        protected override int LeftDirectChildCountInternal => throw new NotImplementedException();
 
         protected override int DirectChildCount => 1;
 
@@ -121,9 +117,6 @@ namespace Reni.SyntaxTree
             Right = right;
             StopByObjectIds();
         }
-
-        [DisableDump]
-        protected override int LeftDirectChildCountInternal => 1;
 
         [DisableDump]
         protected override int DirectChildCount => 2;

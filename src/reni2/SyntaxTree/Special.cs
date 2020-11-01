@@ -64,7 +64,6 @@ namespace Reni.SyntaxTree
         [EnableDumpExcept(null)]
         string Position => Token.Characters.GetDumpAroundCurrent(5);
 
-        protected override int LeftDirectChildCountInternal => 0;
         protected override int DirectChildCount => 1;
 
         protected override Syntax GetDirectChild(int index) => index == 0? Right : null;
@@ -107,7 +106,6 @@ namespace Reni.SyntaxTree
 
         internal override IRecursionHandler RecursionHandler => Infix as IRecursionHandler;
 
-        protected override int LeftDirectChildCountInternal => 1;
         protected override int DirectChildCount => 2;
 
         protected override Syntax GetDirectChild(int index)
@@ -158,7 +156,6 @@ namespace Reni.SyntaxTree
         [EnableDumpExcept(null)]
         string Position => Token.Characters.GetDumpAroundCurrent(5);
 
-        protected override int LeftDirectChildCountInternal => 1;
         protected override int DirectChildCount => 1;
 
         protected override Syntax GetDirectChild(int index) => index == 0? Left : null;

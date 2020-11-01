@@ -91,9 +91,6 @@ namespace Reni.SyntaxTree
 
 
         [DisableDump]
-        protected override int LeftDirectChildCountInternal => DirectChildCount;
-
-        [DisableDump]
         protected override int DirectChildCount => Statements.Length + 1;
 
         public static CompoundSyntax Create

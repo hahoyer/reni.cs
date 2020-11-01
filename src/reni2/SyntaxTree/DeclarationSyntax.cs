@@ -38,10 +38,7 @@ namespace Reni.SyntaxTree
         internal bool IsMutableSyntax => Declarer.IsMutableSyntax;
 
         [DisableDump]
-        protected override int LeftDirectChildCountInternal => Declarer.DirectChildCount;
-
-        [DisableDump]
-        protected override int DirectChildCount => LeftDirectChildCountInternal + 1;
+        protected override int DirectChildCount => Declarer.DirectChildCount + 1;
 
         [DisableDump]
         DeclarerSyntax IStatementSyntax.Declarer => Declarer;
@@ -62,8 +59,8 @@ namespace Reni.SyntaxTree
         protected override Syntax GetDirectChild(int index)
             => index switch
             {
-                { } when index < LeftDirectChildCountInternal => Declarer.GetDirectChild(index)
-                , { } when index == LeftDirectChildCountInternal => Value
+                { } when index < Declarer.DirectChildCount => Declarer.GetDirectChild(index)
+                , { } when index == Declarer.DirectChildCount => Value
                 , _ => null
             };
 

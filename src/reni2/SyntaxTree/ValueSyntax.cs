@@ -25,9 +25,6 @@ namespace Reni.SyntaxTree
                 : base(anchor, issue) { }
 
             [DisableDump]
-            protected sealed override int LeftDirectChildCountInternal => 0;
-
-            [DisableDump]
             protected sealed override int DirectChildCount => 0;
 
             protected sealed override Syntax GetDirectChild(int index)

@@ -46,9 +46,6 @@ namespace Reni.SyntaxTree
         internal override bool IsLambda => true;
 
         [DisableDump]
-        protected override int LeftDirectChildCountInternal => 1;
-
-        [DisableDump]
         protected override int DirectChildCount => 2;
 
         protected override Syntax GetDirectChild(int index)
