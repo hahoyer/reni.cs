@@ -7,9 +7,71 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.Parser;
 using Reni.TokenClasses;
+using Reni.Validation;
 
 namespace Reni.SyntaxTree
 {
+    sealed class TrainSyntax : ValueSyntax
+    {
+        readonly TrainWagonSyntax[] Wagon;
+
+        public TrainSyntax(TrainWagonSyntax[] wagon, Anchor anchor, Issue issue = null)
+            : base(anchor, issue)
+            => Wagon = wagon;
+
+        public TrainSyntax(TrainWagonSyntax[] wagon, int objectId, Anchor anchor, Issue issue = null)
+            : base(objectId, anchor, issue)
+            => Wagon = wagon;
+
+        protected override int LeftDirectChildCountInternal => throw new NotImplementedException();
+
+        protected override int DirectChildCount => Wagon.Length;
+
+        protected override Syntax GetDirectChild(int index) 
+            => index < 0 || index >= DirectChildCount? null : Wagon[index];
+    }
+
+    sealed class TrainWagonSyntax : Syntax
+    {
+        [Node]
+        public Definable Definable;
+
+        [Node]
+        [EnableDumpExcept(null)]
+        internal ValueSyntax Argument;
+
+        IToken Token;
+
+        public TrainWagonSyntax
+            (Definable definable, IToken token, ValueSyntax argument, Anchor anchor, Issue issue = null)
+            : base(anchor, issue)
+        {
+            Definable = definable;
+            Token = token;
+            Argument = argument;
+        }
+
+        public TrainWagonSyntax
+            (Definable definable, IToken token, ValueSyntax argument, int objectId, Anchor anchor, Issue issue = null)
+            : base(objectId, anchor, issue)
+        {
+            Definable = definable;
+            Token = token;
+            Argument = argument;
+        }
+
+        protected override int LeftDirectChildCountInternal => throw new NotImplementedException();
+
+        protected override int DirectChildCount => 1;
+
+        protected override Syntax GetDirectChild(int index)
+            => index switch
+            {
+                0 => Argument, _ => null
+            };
+    }
+
+
     sealed class ExpressionSyntax : ValueSyntax
     {
         internal sealed class EvaluationDepthExhaustedException : Exception
@@ -48,7 +110,7 @@ namespace Reni.SyntaxTree
         internal ValueSyntax Right { get; }
 
         int CurrentResultDepth;
-        IToken Token;
+        readonly IToken Token;
 
         internal ExpressionSyntax(ValueSyntax left, Definable definable, IToken token, ValueSyntax right, Anchor anchor)
             : base(anchor)
