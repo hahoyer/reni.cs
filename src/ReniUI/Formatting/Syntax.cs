@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using Reni;
 using Reni.Helper;
 using Reni.Parser;
 using Reni.TokenClasses;
@@ -19,7 +20,7 @@ namespace ReniUI.Formatting
 
         readonly CacheContainer Cache = new CacheContainer();
         readonly Configuration Configuration;
-        bool ForceLineSplit;
+        bool ForceLineSplit => Parent?.IsLineSplit ?? false;
 
         bool IsIndentRequired;
 
@@ -34,7 +35,16 @@ namespace ReniUI.Formatting
                 Configuration = parent.Configuration;
         }
 
-        bool IsLineSplit => ForceLineSplit || GetHasAlreadyLineBreakOrIsTooLong(this);
+        bool IsLineSplit
+        {
+            get
+            {
+                var master = FlatItem.MainAnchor;
+                if(master.TokenClass is EndOfText || master.TokenClass is BeginOfText)
+                    return false;
+                return ForceLineSplit || GetHasAlreadyLineBreakOrIsTooLong(master);
+            }
+        }
 
         [EnableDump]
         new Reni.SyntaxTree.Syntax FlatItem => base.FlatItem;
@@ -85,7 +95,15 @@ namespace ReniUI.Formatting
             {
                 var anchorEdits
                     = FlatItem.Anchor.Items
-                        .Select(node => (position: node.Token.Characters.Position, data: GetWhiteSpacesEdits(node)));
+                        .Select(node
+                            =>
+                            (
+                                position: node.Token.Characters.Position
+                                , data: GetMainEdits(node)
+                            )
+                        )
+                        .ToArray();
+
                 var childEdits
                     = DirectChildren
                         .Where(node => node != null)
@@ -95,7 +113,9 @@ namespace ReniUI.Formatting
                                 position: node.FlatItem.MainAnchor.Token.Characters.Position
                                 , data: node.Edits ?? new ISourcePartEdit[0]
                             )
-                        );
+                        )
+                        .ToArray();
+
                 return anchorEdits
                     .Concat(childEdits)
                     .OrderBy(node => node.position)
@@ -103,7 +123,7 @@ namespace ReniUI.Formatting
             }
         }
 
-        bool GetHasAlreadyLineBreakOrIsTooLong(Syntax target)
+        bool GetHasAlreadyLineBreakOrIsTooLong(BinaryTree target)
         {
             var basicLineLength = target.GetFlatLength(Configuration.EmptyLineLimit != 0);
             return basicLineLength == null || basicLineLength > Configuration.MaxLineLength;
@@ -112,11 +132,42 @@ namespace ReniUI.Formatting
         protected override Syntax Create(Reni.SyntaxTree.Syntax flatItem, int index)
             => new Syntax(flatItem, Context, index, this);
 
-        IEnumerable<ISourcePartEdit> GetWhiteSpacesEdits(BinaryTree target)
+        IEnumerable<ISourcePartEdit> GetMainEdits(BinaryTree target)
+        {
+            var result = GetWhiteSpaceEdits(target);
+            
+            if(IsLineSplit)
+            {
+                var isBelongingTo = target.Right?.TokenClass.IsBelongingTo(FlatItem.MainAnchor.TokenClass) ?? false;
+                result = result.Concat(T(GetLineSplitter(target, isBelongingTo))).ToArray();
+            }
+
+            return result;
+        }
+
+        IEnumerable<ISourcePartEdit> GetWhiteSpaceEdits(BinaryTree target)
         {
             if(target.Token.PrecededWith.Any())
                 return T(new WhiteSpaceView(target.Token.PrecededWith, Configuration, target.IsSeparatorRequired));
             return T(new EmptyWhiteSpaceView(target.Token.Characters.Start, target.IsSeparatorRequired));
         }
+
+        bool AdditionalLineBreaksForMultilineItems;
+        
+        ISourcePartEdit GetLineSplitter(BinaryTree target, bool isInsideChain)
+        {
+            var second = target.Right;
+            if(isInsideChain)
+                second = second.Left;
+
+            if(!AdditionalLineBreaksForMultilineItems || second == null)
+                return SourcePartEditExtension.MinimalLineBreak;
+
+            if(GetHasAlreadyLineBreakOrIsTooLong(target.Left) || GetHasAlreadyLineBreakOrIsTooLong(second))
+                return SourcePartEditExtension.MinimalLineBreaks;
+
+            return SourcePartEditExtension.MinimalLineBreak;
+        }
+
     }
 }

@@ -153,14 +153,18 @@ namespace Reni.TokenClasses
             {
                 Left.Parent = this;
                 Left.Depth = Depth + 1;
-                Left.Chain(node => node.Right).Last().RightNeighbor = this;
+                var binaryTree = Left.Chain(node => node.Right).Last();
+                binaryTree.RightNeighbor = this;
+                LeftNeighbor = binaryTree;
             }
 
             if(Right != null)
             {
                 Right.Parent = this;
                 Right.Depth = Depth + 1;
-                Right.Chain(node => node.Left).Last().LeftNeighbor = this;
+                var binaryTree = Right.Chain(node => node.Left).Last();
+                binaryTree.LeftNeighbor = this;
+                RightNeighbor = binaryTree;
             }
         }
 
@@ -221,14 +225,14 @@ namespace Reni.TokenClasses
 
             var leftResult = Left == null
                 ? new TContainer()
-                : Left.FlatSubFormat<TContainer, TValue>(areEmptyLinesPossible);
+                : Left.FlatFormat<TContainer, TValue>(areEmptyLinesPossible);
 
             if(leftResult == null)
                 return null;
 
             var rightResult = Right == null
                 ? new TContainer()
-                : Right.FlatSubFormat<TContainer, TValue>(areEmptyLinesPossible);
+                : Right.FlatFormat<TContainer, TValue>(areEmptyLinesPossible);
 
             if(rightResult == null)
                 return null;
@@ -236,19 +240,25 @@ namespace Reni.TokenClasses
             return leftResult.Concat(tokenString, rightResult);
         }
 
-        TContainer FlatSubFormat<TContainer, TValue>(bool areEmptyLinesPossible)
-            where TContainer : class, IFormatResult<TValue>, new()
-            => FlatFormat<TContainer, TValue>(areEmptyLinesPossible);
-
-        public BinaryTree GetRightNeighbor(int current)
-        {
-            NotImplementedMethod(current);
-            return default;
-        }
-
         public bool HasAsParent(BinaryTree parent)
             => Parent
                 .Chain(node => node.Depth >= parent.Depth? node.Parent : null)
                 .Any(node => node == parent);
+
+        /// <summary>
+        ///     Try to format target into one line.
+        /// </summary>
+        /// <param name="areEmptyLinesPossible"></param>
+        /// <returns>The formatted line or null if target contains line breaks.</returns>
+        internal string FlatFormat(bool areEmptyLinesPossible)
+            => FlatFormat<StringResult, string>(areEmptyLinesPossible)?.Value;
+
+        /// <summary>
+        ///     Get the line length of target when formatted as one line.
+        /// </summary>
+        /// <param name="areEmptyLinesPossible"></param>
+        /// <returns>The line length calculated or null if target contains line breaks.</returns>
+        internal int? GetFlatLength(bool areEmptyLinesPossible)
+            => FlatFormat<IntegerResult, int>(areEmptyLinesPossible)?.Value;
     }
 }

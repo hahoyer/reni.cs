@@ -35,26 +35,16 @@ namespace ReniUI.Formatting
         (
             IEnumerable<IItem> target,
             Configuration configuration,
-            bool isSeparatorRequired)
+            bool isSeparatorRequired
+        )
         {
-            Tracer.Assert(target != null);
-            Tracer.Assert(target.Any());
+            (target != null).Assert();
+            target.Any().Assert();
             Target = target;
             IsSeparatorRequired = isSeparatorRequired;
             Configuration = configuration;
-            Tracer.Assert(!(CommentGroups.Any() && IsSeparatorRequired));
+            (!(CommentGroups.Any() && IsSeparatorRequired)).Assert();
         }
-
-        /// <summary>
-        ///     Edits, i. e. pairs of old text/new text are generated to accomplish the target text.
-        ///     The goal is, to change only things necessary to allow editors to work smoothly
-        /// </summary>
-        /// <returns></returns>
-        IEnumerable<Edit> IEditPieces.Get(EditPieceParameter parameter) 
-            => GetLineBreakEdits(parameter.LineBreakCount)
-                .Concat(GetSpaceEdits(parameter.LineBreakCount, parameter.IndentCharacterCount));
-
-        bool ISourcePartEdit.HasLines => Target.HasLineComment() || GetTargetLineBreakCount(0) > 0;
 
         IEnumerable<IItem>[] CommentGroups
             => Cache.CommentGroups ?? (Cache.CommentGroups = GetCommentGroups());
@@ -69,6 +59,17 @@ namespace ReniUI.Formatting
 
         SourcePart[] LineBreakGroups
             => Cache.LineBreakGroups ?? (Cache.LineBreakGroups = GetLineBreakGroups());
+
+        /// <summary>
+        ///     Edits, i. e. pairs of old text/new text are generated to accomplish the target text.
+        ///     The goal is, to change only things necessary to allow editors to work smoothly
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<Edit> IEditPieces.Get(EditPieceParameter parameter)
+            => GetLineBreakEdits(parameter.LineBreakCount)
+                .Concat(GetSpaceEdits(parameter.LineBreakCount, parameter.IndentCharacterCount));
+
+        bool ISourcePartEdit.HasLines => Target.HasLineComment() || GetTargetLineBreakCount(0) > 0;
 
         /// <summary>
         ///     Get edits to ensure the correct number of line breaks.
@@ -100,13 +101,16 @@ namespace ReniUI.Formatting
 
         IEnumerable<Edit> GetSpaceEdits(int minimalLineBreakCount, int indentCharacterCount)
         {
-            Tracer.Assert
-                (GetTargetLineBreakCount(minimalLineBreakCount) == 0 || !GetTargetSeparator(minimalLineBreakCount));
-            Tracer.Assert(Spaces.Id.All(c => c == ' '));
+            (GetTargetLineBreakCount(minimalLineBreakCount) == 0 || !GetTargetSeparator(minimalLineBreakCount)).Assert
+                ();
+            Spaces.Id.All(c => c == ' ').Assert();
 
             var targetSpacesCount
-                = GetTargetLineBreakCount(minimalLineBreakCount) != 0 ? indentCharacterCount :
-                GetTargetSeparator(minimalLineBreakCount) ? 1 : 0;
+                = GetTargetLineBreakCount(minimalLineBreakCount) != 0
+                    ? indentCharacterCount
+                    : GetTargetSeparator(minimalLineBreakCount)
+                        ? 1
+                        : 0;
 
             var delta = targetSpacesCount - Spaces.Length;
             if(delta == 0)
@@ -140,7 +144,7 @@ namespace ReniUI.Formatting
         /// <returns></returns>
         SourcePart GetSpaces()
         {
-            Tracer.Assert(Target.Any());
+            Target.Any().Assert();
 
             var last = Target.Last();
             if(!last.IsSpace())

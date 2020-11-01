@@ -55,7 +55,6 @@
     <Compile Include="Formatting\EditPieceParameter.cs" />
     <Compile Include="Formatting\Extension.cs" />
     <Compile Include="Formatting\FormatterExtension.cs" />
-    <Compile Include="Formatting\HierarchicalStructure.cs" />
     <Compile Include="Formatting\SplitItem.cs" />
     <Compile Include="Formatting\WhiteSpaceView.cs" />
     <Compile Include="Formatting\IResultItem.cs" />

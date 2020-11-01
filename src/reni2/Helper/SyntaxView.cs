@@ -88,27 +88,5 @@ namespace Reni.Helper
         internal(TTarget Master, int Index) LocateByPosition(SourcePosition offset, bool includingParent)
             => includingParent? Cache.LocateByPositionIncludingParent[offset] : Cache.LocateByPosition[offset];
 
-        IEnumerable<TResult> FlatFormat<TContainer, TResult>(bool areEmptyLinesPossible)
-            where TContainer : class, IFormatResult<TResult>, new()
-        {
-            var results = FlatItem.MainAnchor.FlatFormat<TContainer, TResult>(areEmptyLinesPossible);
-            return results == null? null : T(results.Value);
-        }
-
-        /// <summary>
-        ///     Try to format target into one line.
-        /// </summary>
-        /// <param name="areEmptyLinesPossible"></param>
-        /// <returns>The formatted line or null if target contains line breaks.</returns>
-        internal string FlatFormat(bool areEmptyLinesPossible)
-            => FlatFormat<StringResult, string>(areEmptyLinesPossible)?.Stringify("");
-
-        /// <summary>
-        ///     Get the line length of target when formatted as one line.
-        /// </summary>
-        /// <param name="areEmptyLinesPossible"></param>
-        /// <returns>The line length calculated or null if target contains line breaks.</returns>
-        internal int? GetFlatLength(bool areEmptyLinesPossible)
-            => FlatFormat<IntegerResult, int>(areEmptyLinesPossible)?.Sum();
     }
 }
