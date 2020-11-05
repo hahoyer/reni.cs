@@ -1,11 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Scanner;
 
 namespace ReniUI.Formatting
 {
     static class SourcePartEditExtension
     {
+        [Obsolete("", true)]
         sealed class SpecialEdit : DumpableObject, ISourcePartEdit
         {
             readonly bool HasLines;
@@ -18,15 +21,32 @@ namespace ReniUI.Formatting
             }
 
             bool ISourcePartEdit.HasLines => HasLines;
+            ISourcePartEdit ISourcePartEdit.Indent(int count) => this.CreateIndent(count);
+
+            SourcePart ISourcePartEdit.SourcePart => throw new NotImplementedException();
+
             public override string ToString() => Id;
             protected override string GetNodeDump() => Id;
         }
 
-        internal static readonly ISourcePartEdit MinimalLineBreak = new SpecialEdit("MinimalLineBreak", true);
-        internal static readonly ISourcePartEdit MinimalLineBreaks = new SpecialEdit("MinimalLineBreaks", true);
+        [Obsolete("", true)]
+        internal static readonly ISourcePartEdit MinimalLineBreak
+            = new SpecialEdit("MinimalLineBreak", true);
+
+        [Obsolete("", true)]
+        internal static readonly ISourcePartEdit MinimalLineBreaks
+            = new SpecialEdit("MinimalLineBreaks", true);
+
+        [Obsolete("", true)]
         internal static readonly ISourcePartEdit EnsureSeparator = new SpecialEdit("EnsureSeparator");
+
+        [Obsolete("", true)]
         internal static readonly ISourcePartEdit ToRight = new SpecialEdit("ToRight");
+
+        [Obsolete("", true)]
         internal static readonly ISourcePartEdit ToLeft = new SpecialEdit("ToLeft");
+
+        [Obsolete("", true)]
         internal static readonly ISourcePartEdit EndOfFile = new SpecialEdit("EndOfFile");
 
         internal static IEnumerable<Edit>
@@ -38,40 +58,29 @@ namespace ReniUI.Formatting
             var parameter = new EditPieceParameter(configuration);
 
             var result = new List<Edit>();
-            foreach(var part in target)
+            foreach(var part in target
+                .OrderBy(node => node.SourcePart.Position)
+                .ThenBy(node => node.SourcePart.Length))
             {
-                if(part == ToRight)
-                    parameter.Indent++;
-                else if(part == ToLeft)
-                    --parameter.Indent;
-                else if(part == MinimalLineBreak)
+                switch(part)
                 {
-                    parameter.LineBreakCount = T(parameter.LineBreakCount, 1).Max();
-                    parameter.IsSeparatorRequired = false;
-                }
-                else if(part == MinimalLineBreaks)
-                {
-                    parameter.LineBreakCount = T(parameter.LineBreakCount, 2).Max();
-                    parameter.IsSeparatorRequired = false;
-                }
-                else if(part == EnsureSeparator)
-                    parameter.IsSeparatorRequired = true;
-                else if(part == EndOfFile)
-                    parameter.IsEndOfFile = true;
-                else if(part is IEditPieces spe)
-                {
-                    var edits = spe.Get(parameter).ToArray();
-                    foreach(var edit in edits)
+                    case IEditPieces spe:
                     {
-                        (currentPosition <= edit.Location.Position).Assert();
-                        currentPosition = edit.Location.EndPosition;
-                        result.Add(edit);
+                        var edits = spe.Get(parameter).ToArray();
+                        foreach(var edit in edits)
+                        {
+                            (currentPosition <= edit.Location.Position).Assert();
+                            currentPosition = edit.Location.EndPosition;
+                            result.Add(edit);
+                        }
+
+                        break;
                     }
 
-                    parameter.Reset();
+                    default:
+                        Dumpable.NotImplementedFunction(target.ToArray(), configuration);
+                        break;
                 }
-                else
-                    Dumpable.NotImplementedFunction(target.ToArray(), configuration);
 
                 currentIndex++;
             }
@@ -79,24 +88,40 @@ namespace ReniUI.Formatting
             return result;
         }
 
-        static IEnumerable<ISourcePartEdit> IndentRight(this IEnumerable<ISourcePartEdit> target)
-            => new[] {ToRight}.Concat(target).Concat(new[] {ToLeft});
-
-        static IEnumerable<ISourcePartEdit> IndentLeft(this IEnumerable<ISourcePartEdit> target)
-            => new[] {ToLeft}.Concat(target).Concat(new[] {ToRight});
-
         internal static IEnumerable<ISourcePartEdit>
-            Indent(this IEnumerable<ISourcePartEdit> target, IndentDirection direction)
-        {
-            switch(direction)
-            {
-                case IndentDirection.ToLeft: return IndentLeft(target);
-                case IndentDirection.ToRight: return IndentRight(target);
-                default: return target;
-            }
-        }
+            Indent(this IEnumerable<ISourcePartEdit> target, int direction)
+            => direction == 0? target : target.Select(node => node.Indent(direction));
 
         static IEnumerable<TValue> T<TValue>(params TValue[] value) => value;
+
+        public static ISourcePartEdit CreateIndent(this ISourcePartEdit target, int count)
+            => count != 0 && target.HasLines? new Indent(target, count) : target;
+
+        [Obsolete("", true)]
+        public static IEnumerable<ISourcePartEdit> Indent
+            (this IEnumerable<ISourcePartEdit> target, IndentDirection toRight) => throw new NotImplementedException();
+    }
+
+    class Indent : DumpableObject, ISourcePartEdit
+    {
+        readonly ISourcePartEdit Target;
+        readonly int Count;
+
+        public Indent(ISourcePartEdit target, int count)
+        {
+            Target = target;
+            Count = count;
+        }
+
+        bool ISourcePartEdit.HasLines => Target.HasLines;
+
+        ISourcePartEdit ISourcePartEdit.Indent(int count)
+        {
+            var newCount = count + Count;
+            return newCount == 0? Target : new Indent(Target, newCount);
+        }
+
+        SourcePart ISourcePartEdit.SourcePart => Target.SourcePart;
     }
 
     interface IEditPieces
@@ -104,10 +129,11 @@ namespace ReniUI.Formatting
         IEnumerable<Edit> Get(EditPieceParameter parameter);
     }
 
+    [Obsolete("", true)]
     enum IndentDirection
     {
-        ToLeft,
-        ToRight,
-        NoIndent
+        ToLeft
+        , ToRight
+        , NoIndent
     }
 }

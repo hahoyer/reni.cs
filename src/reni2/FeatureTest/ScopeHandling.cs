@@ -32,12 +32,6 @@ namespace Reni.FeatureTest
     public sealed class ScopeHandlingMultiple : CompilerTest { }
 
     [UnitTest]
-    [Target(@"x: y: z: 1")]
-    [ScopeHandlingMultiple]
-    [Output("")]
-    public sealed class ScopeHandlingMultipleDeclarations : CompilerTest { }
-
-    [UnitTest]
     [Target(@"!unkown x: 1")]
     [Output("")]
     public sealed class ScopeHandlingError : CompilerTest

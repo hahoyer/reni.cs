@@ -138,9 +138,13 @@ namespace hw.DebugFormatter
                 return true;
 
             if(memberInfo is FieldInfo fieldInfo)
-                return fieldInfo.IsPrivate;
+                return fieldInfo.IsPrivate || fieldInfo.IsFamily;
 
-            return !((PropertyInfo)memberInfo).CanRead || ((PropertyInfo)memberInfo).GetGetMethod(true).IsPrivate;
+            if(!((PropertyInfo)memberInfo).CanRead)
+                return true;
+
+            var propertyInfo = ((PropertyInfo)memberInfo).GetGetMethod(true);
+            return propertyInfo.IsPrivate || propertyInfo.IsFamily;
         }
 
         static string Format(MemberInfo memberInfo, object target)

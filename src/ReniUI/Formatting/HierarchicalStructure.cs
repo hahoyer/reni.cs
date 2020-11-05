@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace ReniUI.Formatting
     {
         internal class Frame : HierarchicalStructure
         {
+        [Obsolete("",true)]
             [DisableDump]
             protected override IEnumerable<IEnumerable<ISourcePartEdit>> EditGroups
             {
@@ -34,6 +36,7 @@ namespace ReniUI.Formatting
             }
         }
 
+        [Obsolete("",true)]
         class ListFrame : HierarchicalStructure
         {
             public ListFrame() => AdditionalLineBreaksForMultilineItems = true;
@@ -49,8 +52,9 @@ namespace ReniUI.Formatting
 
             public ExpressionFrame(ITokenClass tokenClass) => TokenClass = tokenClass;
 
+            [Obsolete("",true)]
             protected override IEnumerable<IEnumerable<ISourcePartEdit>> EditGroups
-            {                                
+            {
                 get
                 {
                     Tracer.Assert(Target.TokenClass == TokenClass, Target.Dump);
@@ -70,6 +74,7 @@ namespace ReniUI.Formatting
             }
         }
 
+        [Obsolete("",true)]
         class ColonFrame : HierarchicalStructure
         {
             [DisableDump]
@@ -87,6 +92,7 @@ namespace ReniUI.Formatting
 
         class ParenthesisFrame : HierarchicalStructure
         {
+            [Obsolete("",true)]
             [DisableDump]
             protected override IEnumerable<IEnumerable<ISourcePartEdit>> EditGroups
             {
@@ -122,7 +128,7 @@ namespace ReniUI.Formatting
         }
 
         static bool GetIsSeparatorRequired(BinaryTree target)
-            => !target.WhiteSpaces.HasComment() &&
+            => !target.Token.PrecededWith.HasComment() &&
                SeparatorExtension.Get(target.LeftNeighbor?.TokenClass, target.TokenClass);
 
         static bool True => true;
@@ -137,6 +143,7 @@ namespace ReniUI.Formatting
 
         [DisableDump]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Obsolete("",true)]
         internal IEnumerable<ISourcePartEdit> Edits
         {
             get
@@ -163,6 +170,7 @@ namespace ReniUI.Formatting
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]                               
+        [Obsolete("",true)]
         IndentDirection IndentDirection => IsIndentRequired ? IndentDirection.ToRight : IndentDirection.NoIndent;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -183,11 +191,12 @@ namespace ReniUI.Formatting
 
         IEnumerable<ISourcePartEdit> GetWhiteSpacesEdits(BinaryTree target)
         {
-            if(target.WhiteSpaces.Any())
-                return T(new WhiteSpaceView(target.WhiteSpaces, Configuration, GetIsSeparatorRequired(target)));
-            return T(new EmptyWhiteSpaceView(target.Token.Characters.Start, GetIsSeparatorRequired(target)));
+            if(target.Token.PrecededWith.Any())
+                return T(new WhiteSpaceView(target.Token.PrecededWith, Configuration, GetIsSeparatorRequired(target)));
+            return T(new EmptyWhiteSpaceView(target.Token.Characters, GetIsSeparatorRequired(target)));
         }
 
+        [Obsolete("",true)]
         HierarchicalStructure CreateChild(BinaryTree target, bool isLast = false)
         {
             var child = Create(target.TokenClass, isLast);
@@ -196,6 +205,7 @@ namespace ReniUI.Formatting
             return child;
         }
 
+        [Obsolete("",true)]
         protected virtual HierarchicalStructure Create(ITokenClass tokenClass, bool isLast)
         {
             switch(tokenClass)
@@ -213,6 +223,7 @@ namespace ReniUI.Formatting
             return basicLineLength == null || basicLineLength > Configuration.MaxLineLength;
         }
 
+        [Obsolete("",true)]
         IEnumerable<IEnumerable<ISourcePartEdit>> GetEditGroupsForChains<TSeparator>()
             where TSeparator : ITokenClass
             => Target
@@ -221,6 +232,7 @@ namespace ReniUI.Formatting
                 .Select(GetEdits<TSeparator>)
                 .SelectMany(i => i);
 
+        [Obsolete("",true)]
         IEnumerable<IEnumerable<ISourcePartEdit>> GetEdits<TSeparator>(BinaryTree target)
             where TSeparator : ITokenClass
         {
@@ -229,7 +241,7 @@ namespace ReniUI.Formatting
 
             if(target.Right == null)
                 yield break;
-                                                                
+            
             if(IsLineSplit)
                 yield return T(GetLineSplitter(target, target.Right?.TokenClass is TSeparator));
 
@@ -237,6 +249,7 @@ namespace ReniUI.Formatting
                 yield return CreateChild(target.Right, true).Edits;
         }
 
+        [Obsolete("",true)]
         ISourcePartEdit GetLineSplitter(BinaryTree target, bool isInsideChain)
         {
             var second = target.Right;

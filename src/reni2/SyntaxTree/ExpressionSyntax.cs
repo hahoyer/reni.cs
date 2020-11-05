@@ -12,7 +12,7 @@ namespace Reni.SyntaxTree
 {
     sealed class ExpressionSyntax : ValueSyntax
     {
-        internal sealed class EvaluationDepthExhaustedException : Exception
+        sealed class EvaluationDepthExhaustedException : Exception
         {
             readonly ContextBase Context;
             readonly int Depth;
@@ -40,15 +40,17 @@ namespace Reni.SyntaxTree
         public Definable Definable { get; }
 
         [Node]
+        [EnableDump(Order = -1)]
         [EnableDumpExcept(null)]
         internal ValueSyntax Left { get; }
 
         [Node]
+        [EnableDump(Order = 1)]
         [EnableDumpExcept(null)]
         internal ValueSyntax Right { get; }
 
         int CurrentResultDepth;
-        IToken Token;
+        readonly IToken Token;
 
         internal ExpressionSyntax(ValueSyntax left, Definable definable, IToken token, ValueSyntax right, Anchor anchor)
             : base(anchor)
@@ -116,16 +118,6 @@ namespace Reni.SyntaxTree
                 return null;
 
             return Definable.CreateForVisit(left ?? Left, right ?? Right, Anchor, Token);
-        }
-
-        protected override string GetNodeDump()
-        {
-            var result = Definable?.Id ?? "";
-            if(Left != null)
-                result = "(" + Left.NodeDump + ")" + result;
-            if(Right != null)
-                result += "(" + Right.NodeDump + ")";
-            return result;
         }
     }
 

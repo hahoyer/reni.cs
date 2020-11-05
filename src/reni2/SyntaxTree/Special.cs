@@ -82,10 +82,10 @@ namespace Reni.SyntaxTree
         readonly IInfix Infix;
 
         [Node]
-        readonly ValueSyntax Left;
+        internal readonly ValueSyntax Left;
 
         [Node]
-        readonly ValueSyntax Right;
+        internal readonly ValueSyntax Right;
 
         readonly IToken Token;
 
@@ -136,7 +136,7 @@ namespace Reni.SyntaxTree
     sealed class SuffixSyntax : ValueSyntax
     {
         [Node]
-        readonly ValueSyntax Left;
+        internal readonly ValueSyntax Left;
 
         [Node]
         readonly ISuffix Suffix;

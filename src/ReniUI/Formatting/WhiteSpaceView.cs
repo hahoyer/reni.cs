@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
@@ -28,23 +29,44 @@ namespace ReniUI.Formatting
         readonly Configuration Configuration;
 
         readonly bool IsSeparatorRequired;
+        readonly int MinimalLineBreakCount;
 
         readonly IEnumerable<IItem> Target;
 
         internal WhiteSpaceView
         (
-            IEnumerable<IItem> target,
-            Configuration configuration,
-            bool isSeparatorRequired
+            IEnumerable<IItem> target
+            , Configuration configuration
+            , bool isSeparatorRequired
+            , int minimalLineBreakCount = 0
         )
         {
             (target != null).Assert();
             target.Any().Assert();
             Target = target;
             IsSeparatorRequired = isSeparatorRequired;
+            MinimalLineBreakCount = minimalLineBreakCount;
             Configuration = configuration;
             (!(CommentGroups.Any() && IsSeparatorRequired)).Assert();
         }
+
+        /// <summary>
+        ///     Edits, i. e. pairs of old text/new text are generated to accomplish the target text.
+        ///     The goal is, to change only things necessary to allow editors to work smoothly
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<Edit> IEditPieces.Get(EditPieceParameter parameter)
+            => GetLineBreakEdits()
+                .Concat(GetSpaceEdits(parameter.IndentCharacterCount));
+
+        bool ISourcePartEdit.HasLines => Target.HasLineComment() || GetTargetLineBreakCount(0) > 0;
+
+        SourcePart ISourcePartEdit.SourcePart => Target.SourcePart();
+
+        ISourcePartEdit ISourcePartEdit.Indent(int count) => this.CreateIndent(count);
+
+        protected override string GetNodeDump() =>
+            Target.SourcePart().GetDumpAroundCurrent(10) + " " + base.GetNodeDump();
 
         IEnumerable<IItem>[] CommentGroups
             => Cache.CommentGroups ?? (Cache.CommentGroups = GetCommentGroups());
@@ -61,28 +83,16 @@ namespace ReniUI.Formatting
             => Cache.LineBreakGroups ?? (Cache.LineBreakGroups = GetLineBreakGroups());
 
         /// <summary>
-        ///     Edits, i. e. pairs of old text/new text are generated to accomplish the target text.
-        ///     The goal is, to change only things necessary to allow editors to work smoothly
-        /// </summary>
-        /// <returns></returns>
-        IEnumerable<Edit> IEditPieces.Get(EditPieceParameter parameter)
-            => GetLineBreakEdits(parameter.LineBreakCount)
-                .Concat(GetSpaceEdits(parameter.LineBreakCount, parameter.IndentCharacterCount));
-
-        bool ISourcePartEdit.HasLines => Target.HasLineComment() || GetTargetLineBreakCount(0) > 0;
-
-        /// <summary>
         ///     Get edits to ensure the correct number of line breaks.
         ///     Extra line breaks are added at first.
         ///     Then current line breaks are re-used from left to right.
         ///     For those line breaks edits might be generated if they had leading spaces.
         ///     Line breaks that are not used anymore are removed.
         /// </summary>
-        /// <param name="minimalLineBreakCount"></param>
         /// <returns></returns>
-        IEnumerable<Edit> GetLineBreakEdits(int minimalLineBreakCount)
+        IEnumerable<Edit> GetLineBreakEdits()
         {
-            var delta = GetTargetLineBreakCount(minimalLineBreakCount) - LineBreakCount;
+            var delta = GetTargetLineBreakCount(MinimalLineBreakCount) - LineBreakCount;
             if(delta > 0)
                 yield return Edit.Create("+LineBreaks", LineBreaksAnchor, "\n".Repeat(delta));
 
@@ -90,7 +100,7 @@ namespace ReniUI.Formatting
             {
                 var groupPart = LineBreakGroups[index];
 
-                if(index >= GetTargetLineBreakCount(minimalLineBreakCount))
+                if(index >= GetTargetLineBreakCount(MinimalLineBreakCount))
                     yield return Edit.Create("-AllLineBreaks", groupPart); // Remove spaces and line break
                 else if(groupPart.Length > 1)
                     yield return Edit.Create("-SomeLineBreaks", groupPart.Start.Span(groupPart.Length - 1));
@@ -99,16 +109,16 @@ namespace ReniUI.Formatting
             }
         }
 
-        IEnumerable<Edit> GetSpaceEdits(int minimalLineBreakCount, int indentCharacterCount)
+        IEnumerable<Edit> GetSpaceEdits(int indentCharacterCount)
         {
-            (GetTargetLineBreakCount(minimalLineBreakCount) == 0 || !GetTargetSeparator(minimalLineBreakCount)).Assert
+            (GetTargetLineBreakCount(MinimalLineBreakCount) == 0 || !GetTargetSeparator(MinimalLineBreakCount)).Assert
                 ();
             Spaces.Id.All(c => c == ' ').Assert();
 
             var targetSpacesCount
-                = GetTargetLineBreakCount(minimalLineBreakCount) != 0
+                = GetTargetLineBreakCount(MinimalLineBreakCount) != 0
                     ? indentCharacterCount
-                    : GetTargetSeparator(minimalLineBreakCount)
+                    : GetTargetSeparator(MinimalLineBreakCount)
                         ? 1
                         : 0;
 
@@ -134,8 +144,8 @@ namespace ReniUI.Formatting
             return T(minimalLineBreakCount, keepLineBreaks).Max();
         }
 
-        bool GetTargetSeparator
-            (int minimalLineBreakCount) => GetTargetLineBreakCount(minimalLineBreakCount) == 0 && IsSeparatorRequired;
+        bool GetTargetSeparator(int minimalLineBreakCount) 
+            => GetTargetLineBreakCount(minimalLineBreakCount) == 0 && IsSeparatorRequired;
 
         /// <summary>
         ///     If also comments or line breaks are existent
@@ -185,8 +195,5 @@ namespace ReniUI.Formatting
                 .Split(item => item.IsComment(), false)
                 .Where(group => group.Last().IsComment())
                 .ToArray();
-
-        protected override string GetNodeDump() =>
-            Target.SourcePart().GetDumpAroundCurrent(10) + " " + base.GetNodeDump();
     }
 }

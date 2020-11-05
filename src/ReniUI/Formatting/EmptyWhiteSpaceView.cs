@@ -7,30 +7,41 @@ namespace ReniUI.Formatting
 {
     sealed class EmptyWhiteSpaceView : DumpableObject, ISourcePartEdit, IEditPieces
     {
-        readonly SourcePosition Anchor;
+        readonly SourcePart Anchor;
         readonly bool IsSeparatorRequired;
+        readonly int MinimalLineBreakCount;
 
         internal EmptyWhiteSpaceView
         (
-            SourcePosition anchor,
-            bool isSeparatorRequired)
+            SourcePart anchor
+            , bool isSeparatorRequired
+            , int minimalLineBreakCount = 0
+        )
         {
             Anchor = anchor;
             IsSeparatorRequired = isSeparatorRequired;
+            MinimalLineBreakCount = minimalLineBreakCount;
+            StopByObjectIds();
         }
 
         IEnumerable<Edit> IEditPieces.Get(EditPieceParameter parameter)
         {
             var spaceCount
-                = parameter.LineBreakCount > 0 ? parameter.IndentCharacterCount :
-                IsSeparatorRequired ? 1 : 0;
-            var newText = "\n".Repeat(parameter.LineBreakCount) + " ".Repeat(spaceCount);
+                = MinimalLineBreakCount > 0
+                    ? parameter.IndentCharacterCount
+                    : IsSeparatorRequired
+                        ? 1
+                        : 0;
+            var newText = "\n".Repeat(MinimalLineBreakCount) + " ".Repeat(spaceCount);
 
             if(newText != "")
-                yield return Edit.Create("+LineBreaksSpaces", Anchor.Span(0), newText);
+                yield return Edit.Create("+LineBreaksSpaces", Anchor.Start.Span(0), newText);
         }
 
-        protected override string GetNodeDump() => Anchor.DebuggerDumpString + " " + base.GetNodeDump();
-        bool ISourcePartEdit.HasLines => false;
+        bool ISourcePartEdit.HasLines => MinimalLineBreakCount > 0;
+        SourcePart ISourcePartEdit.SourcePart => Anchor;
+        ISourcePartEdit ISourcePartEdit.Indent(int count) => this.CreateIndent(count);
+
+        protected override string GetNodeDump() => Anchor.GetDumpAroundCurrent(5) + " " + base.GetNodeDump();
     }
 }

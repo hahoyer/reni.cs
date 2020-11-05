@@ -1,9 +1,11 @@
+using System;
 using hw.DebugFormatter;
 using hw.Helper;
 using Reni.Parser;
 
 namespace ReniUI.Formatting
 {
+    [Obsolete("",true)]
     abstract class SplitItem : DumpableObject
     {
         internal static readonly FunctionCache<ITokenClass, SplitItem> List

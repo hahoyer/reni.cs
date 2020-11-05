@@ -23,12 +23,12 @@ namespace ReniUI.Test
         [Test]
         public void BadArgDeclaration()
         {
-            const string text = @"{^ : ^}";
+            const string text = @"{^   :   ^}";
             var compiler = CompilerBrowser.FromText(text);
             var span = (compiler.Source + 0).Span(text.Length);
             var x = compiler.Reformat(targetPart: span);
 
-            (x == "{^: ^}").Assert(x);
+            (x == "{^ : ^}").Assert(x);
         }
     }
 }

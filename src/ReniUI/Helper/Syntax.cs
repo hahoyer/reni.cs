@@ -7,12 +7,10 @@ namespace ReniUI.Helper
 {
     public sealed class Syntax : SyntaxView<Syntax>
     {
-        internal Syntax
-        (
-            Reni.SyntaxTree.Syntax flatItem,
-            PositionDictionary<Syntax> context,
-            Syntax parent = null
-        )
+        internal Syntax(Reni.SyntaxTree.Syntax flatItem, PositionDictionary<Syntax> context)
+            : base(flatItem, null, context) { }
+
+        Syntax(Reni.SyntaxTree.Syntax flatItem, PositionDictionary<Syntax> context, Syntax parent)
             : base(flatItem, parent, context) { }
 
         [EnableDump]
@@ -21,6 +19,7 @@ namespace ReniUI.Helper
         [EnableDump(Order = -2)]
         [EnableDumpExcept(null)]
         string ParentDump => Parent?.ThisDump;
+
         [EnableDump(Order = -1)]
         [EnableDumpExcept(null)]
         string ThisDump => Anchors.DumpSource();

@@ -1,150 +1,129 @@
 using System.Collections.Generic;
+using System.Linq;
+using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
-using Reni.Feature;
-using Reni.Parser;
+using Reni.SyntaxTree;
 using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
-    abstract class Formatter : EnumEx
+    abstract class Formatter : DumpableObject
     {
-        sealed class RootFormatter : Formatter {}
-
-        sealed class UnknownFormatter : Formatter {}
-
-        sealed class SingleFormatter : Formatter {}
-
-        sealed class ColonFormatter : Formatter
+        internal sealed class Child
         {
-            public override Context RightSideLineBreakContext(Context context) => context.BodyOfColon;
-            internal override int GetLineBreaksForChild(Syntax parent, Syntax target) 
-                => parent.Binary.LeftMost == target ? 0 : 1;
+            internal readonly SourcePosition Position;
+            internal readonly BinaryTree Head;
+            internal readonly Reni.SyntaxTree.Syntax FlatItem;
 
-            public override bool HasLineBreaksAfterToken(Context context) => true;
-        }
-
-        sealed class ChainFormatter : Formatter
-        {
-            public override bool HasLineBreaksBeforeToken(Context context) => true;
-        }
-
-        sealed class LeftParenthesisFormatter : Formatter
-        {
-            public override IndentDirection IndentRightSide => IndentDirection.ToRight;
-
-            public override bool HasLineBreaksBeforeToken(Context context)
-                => context.LineBreakBeforeLeftParenthesis;
-
-            public override bool HasLineBreaksAfterToken(Context context) => true;
-            public override bool HasLineBreaksRightOfAll => true;
-            public override Context RightSideLineBreakContext(Context context) => context.ForList;
-            public override bool HasLineBreaksByContext(Context context) => context.LineBreaksForLeftParenthesis;
-        }
-
-        sealed class RightParenthesisFormatter : Formatter
-        {
-            public override Context LeftSideLineBreakContext(Context context) => context.LeftSideOfRightParenthesis;
-            public override bool HasLineBreaksByContext(Context context) => context.LineBreaksForRightParenthesis;
-        }
-
-        abstract class ListItemFormatter : Formatter
-        {
-            public sealed override bool HasLineBreaksAfterToken(Context context) => true;
-            public sealed override bool HasLineBreaksByContext(Context context) => context.LineBreaksForList;
-            public sealed override bool HasMultipleLineBreaksOnRightSide(Context context) => context.HasMultipleLineBreaksOnRightSide;
-
-        }
-
-        sealed class ListFormatter : ListItemFormatter 
-        {
-            public override Context RightSideLineBreakContext(Context context) => context.ForList;
-
-            public override Context BothSideContext(Context context, Syntax syntax) 
-                => context.MultiLineBreaksForList(syntax.Left, syntax.Right?.Left);
-
-            internal override int GetLineBreaksForChild(Syntax parent, Syntax target) 
-                => parent.Binary.LeftMost == target ? 0 : 1;
-        }
-
-        sealed class LastListFormatter : ListItemFormatter 
-        {
-        }
-
-        sealed class ListEndFormatter : ListItemFormatter 
-        {
-            public override Context BothSideContext(Context context, Syntax syntax) 
-                => context.MultiLineBreaksForList(syntax.Left, syntax.Right);
-        }
-
-        public static readonly Formatter Root = new RootFormatter();
-        public static readonly Formatter List = new ListFormatter();
-        public static readonly Formatter ListEnd = new ListEndFormatter();
-        public static readonly Formatter LastList = new LastListFormatter();
-        public static readonly Formatter RightParenthesis = new RightParenthesisFormatter();
-        public static readonly Formatter LeftParenthesis = new LeftParenthesisFormatter();
-        public static readonly Formatter Colon = new ColonFormatter();
-        public static readonly Formatter Single = new SingleFormatter();
-        public static readonly Formatter Chain = new ChainFormatter();
-        public static readonly Formatter Unknown = new UnknownFormatter();
-
-
-        public static Formatter CreateFormatter(Syntax syntax)
-        {
-            switch(syntax.TokenClass)
+            public Child(BinaryTree head, Reni.SyntaxTree.Syntax flatItem, SourcePosition position = null)
             {
-                case BeginOfText _:
-                case EndOfText _: return Root;
-                case List _: return GetListTokenFormatter(syntax);
-                case RightParenthesis _: return RightParenthesis;
-                case LeftParenthesis _: return LeftParenthesis;
-                case Colon _: return Colon;
+                Position = head?.Token.Characters.Start ?? position;
+                Head = head;
+                FlatItem = flatItem;
+                Position.AssertIsNotNull();
+                //Tracer.ConditionalBreak(Head?.ObjectId == 0);
+            }
+        }
 
-                case ThenToken _:
-                case Reni.TokenClasses.Function _:
-                case ExclamationBoxToken _:
-                case MutableDeclarationToken _:
-                case ElseToken _: return Unknown;
-
-                case ArgToken _:
-                case Definable _:
-                case Text _:
-                case Number _:
-                case TypeOperator _:
-                case InstanceToken _: return syntax.Left == null ? Single : Chain;
+        sealed class TrainWreck : Formatter
+        {
+            protected internal override BinaryTree[] GetAnchors(Syntax target)
+            {
+                (target.Main.Anchor.Items.Length<=1 ).Assert();
+                return new BinaryTree[0];
             }
 
-            NotImplementedFunction(syntax, "tokenClass", syntax.TokenClass);
-            return default;
+            protected internal override IEnumerable<Child> GetChildren(Reni.SyntaxTree.Syntax target)
+                => GetWagons(target).Select(GetCargo);
+
+            static Child GetCargo(Reni.SyntaxTree.Syntax node)
+                => new Child
+                (node.MainAnchor,
+                    node switch
+                    {
+                        ExpressionSyntax expression => expression.Right
+                        , SuffixSyntax _ => null
+                        , InfixSyntax infix => infix.Right
+                        , _ => null
+                    });
         }
 
-        static Formatter GetListTokenFormatter(Syntax syntax)
-            => syntax.Right == null
-                ? LastList
-                : syntax.Right.TokenClass == syntax.TokenClass
-                    ? List
-                    : ListEnd;
-
-        public virtual IndentDirection IndentToken => IndentDirection.NoIndent;
-        public virtual IndentDirection IndentLeftSide => IndentDirection.NoIndent;
-        public virtual IndentDirection IndentRightSide => IndentDirection.NoIndent;
-
-        public virtual bool HasLineBreaksLeftOfLeft => false;
-        public virtual bool HasLineBreaksRightOfRight => false;
-        public virtual bool HasLineBreaksRightOfAll => false;
-        public virtual bool HasLineBreaksBeforeToken(Context context) => false;
-        public virtual bool HasLineBreaksAfterToken(Context context) => false;
-        public virtual Context LeftSideLineBreakContext(Context context) => context.None;
-        public virtual Context RightSideLineBreakContext(Context context) => context.None;
-        public virtual Context BothSideContext(Context context, Syntax syntax) => context.None;
-        public virtual bool HasLineBreaksByContext(Context context) => false;
-        public virtual bool IsTrace => false;
-        public virtual bool HasMultipleLineBreaksOnRightSide(Context context) => false;
-
-        internal virtual int GetLineBreaksForChild(Syntax parent, Syntax target)
+        sealed class Compound : Formatter
         {
-            NotImplementedMethod(parent, target);
-            return default;
+            protected internal override BinaryTree[] GetAnchors(Syntax target)
+                => target
+                    .Main
+                    .Anchor
+                    .Items
+                    .Where(node => node.TokenClass is IRightBracket || node.TokenClass is ILeftBracket)
+                    .ToArray();
+
+            protected internal override IEnumerable<Child> GetChildren(Reni.SyntaxTree.Syntax target)
+            {
+                var compound = (CompoundSyntax)target;
+
+                var listAnchors
+                    = compound.Anchor.Items
+                        .Where(node => node.TokenClass is List)
+                        .ToArray();
+
+                (listAnchors.Length + 1 == compound.Statements.Length).Assert();
+
+                var cleanupAnchor
+                    = compound.Anchor.Items
+                          .SingleOrDefault(node => node.TokenClass is Cleanup)
+                          ?? compound.RightMostAnchor.RightNeighbor;
+
+                var heads
+                    = T(T((BinaryTree)null), listAnchors, T(cleanupAnchor))
+                        .ConcatMany()
+                        .ToArray();
+
+
+                return compound
+                    .DirectChildren
+                    .Select((node, index) => new Child(heads[index], node, target.ChildSourcePart.Start))
+                    .ToArray();
+            }
         }
+
+        sealed class Terminal : Formatter
+        {
+            protected internal override BinaryTree[] GetAnchors(Syntax target) => new BinaryTree[0];
+            protected internal override IEnumerable<Child> GetChildren(Reni.SyntaxTree.Syntax target) => new Child[0];
+        }
+
+        protected internal abstract BinaryTree[] GetAnchors(Syntax target);
+        protected internal abstract IEnumerable<Child> GetChildren(Reni.SyntaxTree.Syntax target);
+
+        public static Formatter Create(Reni.SyntaxTree.Syntax flatItem)
+        {
+            switch(flatItem)
+            {
+                case CompoundSyntax compound:
+                    return new Compound();
+                case ExpressionSyntax expression:
+                    return new TrainWreck();
+                case null:
+                    return new Terminal();
+
+                default:
+                    NotImplementedFunction(flatItem);
+                    return default;
+            }
+        }
+
+        static IEnumerable<Reni.SyntaxTree.Syntax> GetWagons(Reni.SyntaxTree.Syntax syntax)
+            => syntax.Chain(GetWagon).Reverse();
+
+        static Reni.SyntaxTree.Syntax GetWagon(Reni.SyntaxTree.Syntax syntax)
+            => syntax switch
+            {
+                ExpressionSyntax expression => expression.Left
+                , SuffixSyntax suffix => suffix.Left
+                , InfixSyntax infix => infix.Left
+                , _ => null
+            };
     }
 }

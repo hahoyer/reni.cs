@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
@@ -21,10 +20,7 @@ namespace Reni.TokenClasses
             internal BinaryTree Right;
 
             [DisableDump]
-            internal Anchor ToAnchor
-            {
-                get { return Anchor.Create(Left, Right); }
-            }
+            internal Anchor ToAnchor => Anchor.Create(Left, Right);
         }
 
         static int NextObjectId;
@@ -78,6 +74,7 @@ namespace Reni.TokenClasses
 
         [DisableDump]
         internal BinaryTree LeftMost => Left?.LeftMost ?? this;
+
         [DisableDump]
         BinaryTree RightMost => Right?.RightMost ?? this;
 
@@ -127,7 +124,7 @@ namespace Reni.TokenClasses
         }
 
         [DisableDump]
-        public BinaryTree[] ParserLevelGroup => this.CachedValue(()=>GetParserLevelGroup(TokenClass).ToArray());
+        public BinaryTree[] ParserLevelGroup => this.CachedValue(() => GetParserLevelGroup(TokenClass).ToArray());
 
         [DisableDump]
         public bool IsSeparatorRequired
@@ -172,7 +169,7 @@ namespace Reni.TokenClasses
         {
             if(tokenClass is not IBelongingsMatcher)
                 return new BinaryTree[0];
-            
+
             if(tokenClass is List)
                 return this
                     .Chain(node => tokenClass.IsBelongingTo(node.Right?.TokenClass)? node.Right : null);
@@ -212,7 +209,7 @@ namespace Reni.TokenClasses
             return T(leftParenthesis?.Level ?? 0, rightParenthesis.Level).Max();
         }
 
-        internal TContainer FlatFormat<TContainer, TValue>(bool areEmptyLinesPossible)
+        internal TContainer GetFlatFormat<TContainer, TValue>(bool areEmptyLinesPossible)
             where TContainer : class, IFormatResult<TValue>, new()
         {
             var tokenString = Token.Characters
@@ -225,14 +222,14 @@ namespace Reni.TokenClasses
 
             var leftResult = Left == null
                 ? new TContainer()
-                : Left.FlatFormat<TContainer, TValue>(areEmptyLinesPossible);
+                : Left.GetFlatFormat<TContainer, TValue>(areEmptyLinesPossible);
 
             if(leftResult == null)
                 return null;
 
             var rightResult = Right == null
                 ? new TContainer()
-                : Right.FlatFormat<TContainer, TValue>(areEmptyLinesPossible);
+                : Right.GetFlatFormat<TContainer, TValue>(areEmptyLinesPossible);
 
             if(rightResult == null)
                 return null;
@@ -250,8 +247,8 @@ namespace Reni.TokenClasses
         /// </summary>
         /// <param name="areEmptyLinesPossible"></param>
         /// <returns>The formatted line or null if target contains line breaks.</returns>
-        internal string FlatFormat(bool areEmptyLinesPossible)
-            => FlatFormat<StringResult, string>(areEmptyLinesPossible)?.Value;
+        internal string GetFlatFormat(bool areEmptyLinesPossible)
+            => GetFlatFormat<StringResult, string>(areEmptyLinesPossible)?.Value;
 
         /// <summary>
         ///     Get the line length of target when formatted as one line.
@@ -259,6 +256,12 @@ namespace Reni.TokenClasses
         /// <param name="areEmptyLinesPossible"></param>
         /// <returns>The line length calculated or null if target contains line breaks.</returns>
         internal int? GetFlatLength(bool areEmptyLinesPossible)
-            => FlatFormat<IntegerResult, int>(areEmptyLinesPossible)?.Value;
+            => GetFlatFormat<IntegerResult, int>(areEmptyLinesPossible)?.Value;
+
+        /// <summary>
+        ///     Get the line length of target when formatted as one line.
+        /// </summary>
+        /// <value>The line length calculated or null if target contains line breaks.</value>
+        internal int FlatLengthOfToken => (IsSeparatorRequired? 1:0) + Token.Characters.Length;
     }
 }

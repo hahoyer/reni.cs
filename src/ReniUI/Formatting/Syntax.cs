@@ -3,171 +3,125 @@ using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using Reni;
+using hw.Scanner;
 using Reni.Helper;
-using Reni.Parser;
 using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
-    sealed class Syntax : SyntaxView<Syntax>
+    sealed class Syntax : DumpableObject, ValueCache.IContainer, ITree<Syntax>
     {
-        class CacheContainer
-        {
-            internal ValueCache<SplitItem> SplitItem;
-            internal ValueCache<SplitMaster> SplitMaster;
-        }
+        [DisableDump]
+        internal readonly Reni.SyntaxTree.Syntax Main;
 
-        readonly CacheContainer Cache = new CacheContainer();
         readonly Configuration Configuration;
-        bool ForceLineSplit => Parent?.IsLineSplit ?? false;
+
+        [EnableDump(Order = -1)]
+        readonly BinaryTree Head;
+
+        readonly Syntax Parent;
+        readonly Formatter Formatter;
 
         bool IsIndentRequired;
 
-        internal Syntax(Reni.SyntaxTree.Syntax flatItem, Configuration configuration)
-            : this(flatItem, new PositionDictionary<Syntax>(), 0, null)
-            => Configuration = configuration;
+        [EnableDump]
+        SourcePosition Position;
 
-        Syntax(Reni.SyntaxTree.Syntax flatItem, PositionDictionary<Syntax> context, int index, Syntax parent)
-            : base(flatItem, parent, context)
+        Syntax
+        (
+            SourcePosition position, BinaryTree head, Reni.SyntaxTree.Syntax main, Configuration configuration
+            , Syntax parent
+        )
         {
-            if(parent != null)
-                Configuration = parent.Configuration;
+            Position = position;
+            Head = head;
+            Main = main;
+            Configuration = configuration;
+            Parent = parent;
+            Formatter = Formatter.Create(Main);
+            StopByObjectIds();
         }
 
-        bool IsLineSplit
+        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
+        int ITree<Syntax>.DirectChildCount => Children.Length;
+        Syntax ITree<Syntax>.GetDirectChild(int index) => Children[index];
+        int ITree<Syntax>.LeftDirectChildCount => 0;
+
+        BinaryTree[] Anchors => Formatter.GetAnchors(this);
+        int IndentDirection => IsIndentRequired? 1 : 0;
+
+        [EnableDump(Order = -2)]
+        [EnableDumpExcept(false)]
+        bool IsLineSplit => HasAlreadyLineBreakOrIsTooLong;
+
+        bool HasAlreadyLineBreakOrIsTooLong
         {
             get
             {
-                var master = FlatItem.MainAnchor;
-                if(master.TokenClass is EndOfText || master.TokenClass is BeginOfText)
-                    return false;
-                return ForceLineSplit || GetHasAlreadyLineBreakOrIsTooLong(master);
+                var childrenInformation = Children.Any(child => child.HasAlreadyLineBreakOrIsTooLong);
+                if(childrenInformation)
+                    return true;
+
+                var basicLineLength =
+                    Main == null? 0 : Main.MainAnchor.GetFlatLength(Configuration.EmptyLineLimit != 0);
+                var mainLength = Head?.Token.Characters.Length ?? 0;
+                return basicLineLength == null || basicLineLength + mainLength > Configuration.MaxLineLength;
             }
         }
-
-        [EnableDump]
-        new Reni.SyntaxTree.Syntax FlatItem => base.FlatItem;
-
-        [EnableDump]
-        [EnableDumpExcept(null)]
-        string ParentToken => Parent?.Anchors.DumpSource();
-
-        [EnableDump(Order = 10)]
-        string[] Children => FlatItem
-            .Children
-            .Select(node => node?.Anchor.SourceParts.DumpSource())
-            .ToArray();
 
         [DisableDump]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        internal IEnumerable<ISourcePartEdit> Edits
+        internal ISourcePartEdit[] Edits => GetEdits();
+
+        [EnableDump]
+        Syntax[] Children => this.CachedValue(() => GetChildren().Select(Create).ToArray());
+
+        ISourcePartEdit[] ChildEdits
+            => GetChildEdits().ConcatMany().ToArray();
+
+        ISourcePartEdit[] AnchorEdits
+            => Anchors
+                .SelectMany(node => node.GetWhiteSpaceEdits(Configuration))
+                .ToArray();
+
+        ISourcePartEdit[] GetEdits(int lineBreakCount = 0)
+            => T(Head.GetWhiteSpaceEdits(Configuration, lineBreakCount), AnchorEdits, ChildEdits)
+                .ConcatMany()
+                .Indent(IndentDirection)
+                .ToArray();
+
+        int GetLineBreakCount(bool? leftLines, bool? rightLines)
+            => Parent == null || !Parent.IsLineSplit || leftLines == null
+                ? 0
+                : !Configuration.AdditionalLineBreaksForMultilineItems ||
+                  rightLines == null ||
+                  !(leftLines.Value || rightLines.Value)
+                    ? 1
+                    : 2;
+
+        IEnumerable<ISourcePartEdit[]> GetChildEdits()
         {
-            get
+            bool? leftLineBreaks = null;
+            foreach(var child in Children)
             {
-                var trace = ObjectId == -240;
-                StartMethodDump(trace);
-                try
+                var rightLineBreaks = child?.HasAlreadyLineBreakOrIsTooLong;
+
+                if(child != null)
                 {
-                    var result = EditGroups
-                        .ToArray()
-                        .Indent(IndentDirection);
-                    Dump(nameof(result), result);
-                    //Tracer.Assert(CheckMultilineExpectations(result), Anchor.Dump);
-
-                    Tracer.ConditionalBreak(trace);
-                    return ReturnMethodDump(result, trace);
+                    var lineBreakCount = child.GetLineBreakCount(leftLineBreaks, rightLineBreaks);
+                    yield return child.GetEdits(lineBreakCount).ToArray();
                 }
-                finally
-                {
-                    EndMethodDump();
-                }
+
+                leftLineBreaks = rightLineBreaks;
             }
         }
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        IndentDirection IndentDirection => IsIndentRequired? IndentDirection.ToRight : IndentDirection.NoIndent;
+        IEnumerable<Formatter.Child> GetChildren() => Formatter.GetChildren(Main);
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        IEnumerable<ISourcePartEdit> EditGroups
-        {
-            get
-            {
-                var anchorEdits
-                    = FlatItem.Anchor.Items
-                        .Select(node
-                            =>
-                            (
-                                position: node.Token.Characters.Position
-                                , data: GetMainEdits(node)
-                            )
-                        )
-                        .ToArray();
+        internal static Syntax Create(Reni.SyntaxTree.Syntax target, Configuration configuration)
+            => new Syntax(null, null, target, configuration, null);
 
-                var childEdits
-                    = DirectChildren
-                        .Where(node => node != null)
-                        .Select(node
-                            =>
-                            (
-                                position: node.FlatItem.MainAnchor.Token.Characters.Position
-                                , data: node.Edits ?? new ISourcePartEdit[0]
-                            )
-                        )
-                        .ToArray();
-
-                return anchorEdits
-                    .Concat(childEdits)
-                    .OrderBy(node => node.position)
-                    .SelectMany(node => node.data);
-            }
-        }
-
-        bool GetHasAlreadyLineBreakOrIsTooLong(BinaryTree target)
-        {
-            var basicLineLength = target.GetFlatLength(Configuration.EmptyLineLimit != 0);
-            return basicLineLength == null || basicLineLength > Configuration.MaxLineLength;
-        }
-
-        protected override Syntax Create(Reni.SyntaxTree.Syntax flatItem, int index)
-            => new Syntax(flatItem, Context, index, this);
-
-        IEnumerable<ISourcePartEdit> GetMainEdits(BinaryTree target)
-        {
-            var result = GetWhiteSpaceEdits(target);
-            
-            if(IsLineSplit)
-            {
-                var isBelongingTo = target.Right?.TokenClass.IsBelongingTo(FlatItem.MainAnchor.TokenClass) ?? false;
-                result = result.Concat(T(GetLineSplitter(target, isBelongingTo))).ToArray();
-            }
-
-            return result;
-        }
-
-        IEnumerable<ISourcePartEdit> GetWhiteSpaceEdits(BinaryTree target)
-        {
-            if(target.Token.PrecededWith.Any())
-                return T(new WhiteSpaceView(target.Token.PrecededWith, Configuration, target.IsSeparatorRequired));
-            return T(new EmptyWhiteSpaceView(target.Token.Characters.Start, target.IsSeparatorRequired));
-        }
-
-        bool AdditionalLineBreaksForMultilineItems;
-        
-        ISourcePartEdit GetLineSplitter(BinaryTree target, bool isInsideChain)
-        {
-            var second = target.Right;
-            if(isInsideChain)
-                second = second.Left;
-
-            if(!AdditionalLineBreaksForMultilineItems || second == null)
-                return SourcePartEditExtension.MinimalLineBreak;
-
-            if(GetHasAlreadyLineBreakOrIsTooLong(target.Left) || GetHasAlreadyLineBreakOrIsTooLong(second))
-                return SourcePartEditExtension.MinimalLineBreaks;
-
-            return SourcePartEditExtension.MinimalLineBreak;
-        }
-
+        Syntax Create(Formatter.Child child)
+            => new Syntax(child.Position, child.Head, child.FlatItem, Configuration, this);
     }
 }

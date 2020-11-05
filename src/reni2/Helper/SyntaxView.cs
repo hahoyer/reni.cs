@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
@@ -80,12 +79,11 @@ namespace Reni.Helper
             if(result.anchor != null)
                 return ((TTarget)this, result.index);
 
-            NotImplementedMethod(current);                                                       
+            NotImplementedMethod(current);
             return default;
         }
 
         internal(TTarget Master, int Index) LocateByPosition(SourcePosition offset, bool includingParent)
             => includingParent? Cache.LocateByPositionIncludingParent[offset] : Cache.LocateByPosition[offset];
-
     }
 }

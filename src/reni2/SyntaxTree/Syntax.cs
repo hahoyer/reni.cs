@@ -56,17 +56,6 @@ namespace Reni.SyntaxTree
             Issue = issue;
         }
 
-        [DisableDump]
-        protected abstract int DirectChildCount { get; }
-
-        [DisableDump]
-        internal IEnumerable<Syntax> Children => this.GetNodesFromLeftToRight();
-
-        internal Syntax[] DirectChildren => this.CachedValue(() => DirectChildCount.Select(GetDirectChild).ToArray());
-
-        [DisableDump]
-        internal Issue[] Issues => this.CachedValue(() => GetIssues().ToArray());
-
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -78,7 +67,8 @@ namespace Reni.SyntaxTree
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         int ITree<Syntax>.LeftDirectChildCount => 0;
 
-        IEnumerable<Issue> GetIssues() => T(Issue).Concat(Anchor.Issues).Where(node => node != null);
+        [DisableDump]
+        protected abstract int DirectChildCount { get; }
 
         protected abstract Syntax GetDirectChild(int index);
 
@@ -91,17 +81,11 @@ namespace Reni.SyntaxTree
             return default;
         }
 
-        internal Result<CompoundSyntax> ToCompoundSyntax(BinaryTree target = null)
-            => ToCompoundSyntaxHandler(target);
-
         internal virtual Result<CompoundSyntax> ToCompoundSyntaxHandler(BinaryTree target = null)
         {
             NotImplementedMethod(target);
             return default;
         }
-
-        internal IEnumerable<Syntax> ItemsAsLongAs(Func<Syntax, bool> condition)
-            => this.GetNodesFromLeftToRight().SelectMany(node => node.CheckedItemsAsLongAs(condition));
 
 
         internal virtual void AssertValid(Level level = null, BinaryTree target = null)
@@ -112,11 +96,57 @@ namespace Reni.SyntaxTree
                 node?.AssertValid();
         }
 
-        public IEnumerable<SourcePart> GetParserLevelGroup(int index) 
-            => Anchor.Items
-            .Where(item => item.TokenClass.IsBelongingTo(Anchor.Items[index].TokenClass))
-            .Select(item => item.Token.Characters);
+        [DisableDump]
+        internal IEnumerable<Syntax> Children => this.GetNodesFromLeftToRight();
+
+        internal Syntax[] DirectChildren => this.CachedValue(() => DirectChildCount.Select(GetDirectChild).ToArray());
+
+        [DisableDump]
+        internal Issue[] Issues => this.CachedValue(() => GetIssues().ToArray());
 
         public BinaryTree MainAnchor => Anchor.Main;
+
+        public BinaryTree LeftMostAnchor
+        {
+            get
+            {
+                var main = Anchor.Items.FirstOrDefault();
+                var mainPosition = main?.Token.Characters.Position;
+                var child = DirectChildren.FirstOrDefault()?.LeftMostAnchor;
+                var childPosition = child?.Token.Characters.Position;
+                return mainPosition!= null && (childPosition == null || mainPosition < childPosition)
+                    ? main
+                    : child;
+            }
+        }
+
+        public BinaryTree RightMostAnchor
+        {
+            get
+            {
+                var main = Anchor.Items.LastOrDefault();
+                var mainPosition = main?.Token.Characters.EndPosition;
+                var child = DirectChildren.LastOrDefault()?.RightMostAnchor;
+                var childPosition = child?.Token.Characters.Position;
+                return mainPosition!= null && (childPosition == null || mainPosition > childPosition)
+                    ? main
+                    : child;
+            }
+        }
+
+        public SourcePart ChildSourcePart => LeftMostAnchor.SourcePart.Start.Span(RightMostAnchor.SourcePart.End);
+
+        IEnumerable<Issue> GetIssues() => T(Issue).Concat(Anchor.Issues).Where(node => node != null);
+
+        internal Result<CompoundSyntax> ToCompoundSyntax(BinaryTree target = null)
+            => ToCompoundSyntaxHandler(target);
+
+        internal IEnumerable<Syntax> ItemsAsLongAs(Func<Syntax, bool> condition)
+            => this.GetNodesFromLeftToRight().SelectMany(node => node.CheckedItemsAsLongAs(condition));
+
+        public IEnumerable<SourcePart> GetParserLevelGroup(int index)
+            => Anchor.Items
+                .Where(item => item.TokenClass.IsBelongingTo(Anchor.Items[index].TokenClass))
+                .Select(item => item.Token.Characters);
     }
 }

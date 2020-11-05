@@ -209,23 +209,6 @@ namespace Reni.Helper
             where TAspect : class, ITree<TTarget>
             => path.Aggregate(container, (node, index) => getAspect(node).GetDirectChild(index));
 
-
-        static string FlatFormat(this IToken target, int? emptyLineLimit)
-        {
-            if(target.PrecededWith.Any(item => item.IsComment() && item.HasLines()))
-                return null;
-
-            if(emptyLineLimit != 0 && target.PrecededWith.Any(item => item.IsLineEnd()))
-                return null;
-
-            var result = target
-                .PrecededWith
-                .Where(item => item.IsComment())
-                .Aggregate("", (current, item) => current + item.SourcePart.Id);
-
-            return result + target.Characters.Id;
-        }
-
         internal static string FlatFormat
             (this SourcePart target, IEnumerable<IItem> precede, bool areEmptyLinesPossible)
         {

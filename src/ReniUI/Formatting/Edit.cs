@@ -3,10 +3,8 @@ using hw.Scanner;
 
 namespace ReniUI.Formatting
 {
-    public sealed class Edit : DumpableObject
+    public sealed class Edit : DumpableObject, ISourcePartEdit
     {
-        public static Edit Create(string flag, SourcePart location, string newText = "") 
-            => new Edit(location, newText, flag);
         public readonly SourcePart Location;
         public readonly string NewText;
         public readonly string Flag;
@@ -18,6 +16,14 @@ namespace ReniUI.Formatting
             Flag = flag;
         }
 
+        bool ISourcePartEdit.HasLines => NewText.Contains("\n");
+
+        SourcePart ISourcePartEdit.SourcePart => Location;
+        ISourcePartEdit ISourcePartEdit.Indent(int count) => this.CreateIndent(count);
+
         protected override string GetNodeDump() => Flag ?? base.GetNodeDump();
+
+        public static Edit Create(string flag, SourcePart location, string newText = "")
+            => new Edit(location, newText, flag);
     }
 }

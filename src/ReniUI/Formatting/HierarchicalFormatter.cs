@@ -16,7 +16,7 @@ namespace ReniUI.Formatting
             if(compilerBrowser.IsTooSmall(targetPart))
                 return new Edit[0];
 
-            var item = new Syntax(compilerBrowser.Syntax.FlatItem, Configuration);
+            var item = Syntax.Create(compilerBrowser.Syntax.FlatItem, Configuration);
 
             var sourcePartEdits = item.Edits.ToArray();
             var editPieces = sourcePartEdits.GetEditPieces(Configuration);

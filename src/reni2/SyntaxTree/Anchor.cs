@@ -17,19 +17,26 @@ namespace Reni.SyntaxTree
 
         Anchor(params BinaryTree[] items)
         {
-            Items = items;
+            Items = items.OrderBy(item=> item.Token.Characters.Position).ToArray();
             Items.Any().Assert();
             Main.AssertIsNotNull();
         }
 
+        [DisableDump]
         internal SourcePart[] SourceParts => Items.Select(item => item.Token.SourcePart()).ToArray();
+
+        [DisableDump]
         internal SourcePart SourcePart => SourceParts.Combine();
 
+        [DisableDump]
         public IEnumerable<Issue> Issues => Items.SelectMany(node => node.Issues);
 
+        [DisableDump]
         public bool IsEmpty => !Items.Any();
 
+        [DisableDump]
         internal BinaryTree Main => this.CachedValue(GetMain);
+
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
         internal Anchor GetLeftOf(BinaryTree target) => GetLeftOf(target.Token.SourcePart().Start);

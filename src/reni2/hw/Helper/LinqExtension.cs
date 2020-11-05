@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using hw.DebugFormatter;
@@ -159,6 +160,8 @@ namespace hw.Helper
             return target.Value;
         }
 
+        [DebuggerHidden]
+        [ContractAnnotation("target: null => halt")]
         public static TResult AssertNotNull<TResult>(this TResult target)
             where TResult : class
         {
