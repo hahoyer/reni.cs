@@ -48,6 +48,7 @@ namespace ReniUI.Formatting
             MinimalLineBreakCount = minimalLineBreakCount;
             Configuration = configuration;
             (!(CommentGroups.Any() && IsSeparatorRequired)).Assert();
+            StopByObjectIds();
         }
 
         /// <summary>

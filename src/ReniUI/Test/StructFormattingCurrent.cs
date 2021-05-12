@@ -1,8 +1,5 @@
-using System.Linq;
-using hw.DebugFormatter;
 using hw.UnitTest;
 using NUnit.Framework;
-using ReniUI.Formatting;
 
 namespace ReniUI.Test
 {
@@ -10,14 +7,13 @@ namespace ReniUI.Test
     [StructFormatting]
     public sealed class StructFormattingCurrent : DependenceProvider
     {
-
         [Test]
         [UnitTest]
-        public void Start() {@"aaaaa 
+        public void Start() => @"aaaaa 
 
-bbbbb".SimpleTest(expected: @"aaaaa
-bbbbb",
-            maxLineLength: 10, emptyLineLimit:1);}
+bbbbb".SimpleTest(@"aaaaa
+    bbbbb",
+            10, 1);
 
         [Test]
         [UnitTest]
@@ -33,24 +29,8 @@ bbbbb",
 
     label:
         bbbbb
-}"
-                    .Replace("\r\n", "\n");
-
-
-            var compiler = CompilerBrowser.FromText(Text);
-            var newSource = compiler.Reformat
-                (
-                    new ReniUI.Formatting.Configuration
-                    {
-                        MaxLineLength = 10,
-                        EmptyLineLimit = 0
-                    }.Create()
-                )
-                .Replace("\r\n", "\n");
-
-            var lineCount = newSource.Count(item => item == '\n');
-
-            Tracer.Assert(newSource == expectedText, "\n\"" + newSource + "\"");
+}";
+            Text.SimpleTest(expectedText, 10, 0);
         }
     }
 }

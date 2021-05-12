@@ -7,6 +7,7 @@ namespace ReniUI.Test
     [UnitTest]
     [TestFixture]
     [PairedSyntaxTree]
+    [StructFormattingCurrent]
     public sealed class ExpressionFormatting : DependenceProvider
     {
         [UnitTest]
