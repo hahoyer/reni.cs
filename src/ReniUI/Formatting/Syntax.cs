@@ -102,17 +102,22 @@ namespace ReniUI.Formatting
         IEnumerable<ISourcePartEdit[]> GetChildEdits()
         {
             bool? leftLineBreaks = null;
+            var isTail = false;
             foreach(var child in Children)
             {
+                var isIndentAtTailRequired = IsLineSplit && isTail && Formatter.IsIndentAtTailRequired;
+
                 var rightLineBreaks = child?.HasAlreadyLineBreakOrIsTooLong;
 
                 if(child != null)
                 {
                     var lineBreakCount = child.GetLineBreakCount(leftLineBreaks, rightLineBreaks);
-                    yield return child.GetEdits(lineBreakCount).ToArray();
+                    var edits = child.GetEdits(lineBreakCount).ToArray();
+                    yield return isIndentAtTailRequired? edits.Indent(1).ToArray() : edits;
                 }
 
                 leftLineBreaks = rightLineBreaks;
+                isTail = true;
             }
         }
 

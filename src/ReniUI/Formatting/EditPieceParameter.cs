@@ -4,8 +4,8 @@ namespace ReniUI.Formatting
 {
     sealed class EditPieceParameter : DumpableObject
     {
-        int Indent;
-        readonly Configuration Configuration;
+        internal int Indent;
+        internal readonly Configuration Configuration;
         public EditPieceParameter(Configuration configuration) => Configuration = configuration;
 
         public int IndentCharacterCount => Indent > 0? Indent * Configuration.IndentCount : 0;

@@ -37,6 +37,8 @@ namespace ReniUI.Formatting
             protected internal override IEnumerable<Child> GetChildren(Reni.SyntaxTree.Syntax target)
                 => GetWagons(target).Select(GetCargo);
 
+            protected internal override bool IsIndentAtTailRequired => true;
+
             static Child GetCargo(Reni.SyntaxTree.Syntax node)
                 => new Child
                 (node.MainAnchor,
@@ -96,6 +98,7 @@ namespace ReniUI.Formatting
 
         protected internal abstract BinaryTree[] GetAnchors(Syntax target);
         protected internal abstract IEnumerable<Child> GetChildren(Reni.SyntaxTree.Syntax target);
+        protected internal virtual bool IsIndentAtTailRequired => false;
 
         public static Formatter Create(Reni.SyntaxTree.Syntax flatItem)
         {
@@ -125,5 +128,6 @@ namespace ReniUI.Formatting
                 , InfixSyntax infix => infix.Left
                 , _ => null
             };
+
     }
 }
