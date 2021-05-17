@@ -40,14 +40,12 @@ namespace ReniUI.Test
 
         [Test]
         [UnitTest]
-        public void LabelsOnToLevel()
+        public void FlatList2()
         {
             const string text = @"aaaaa;ccccc";
             const string expectedText = @"aaaaa; ccccc";
 
-            var compiler = CompilerBrowser.FromText(text);
-            var newSource = compiler.FlatFormat(false);
-            Tracer.Assert(newSource == expectedText, "\n\"" + newSource + "\"");
+            text.SimpleTest(expectedText );
         }
 
         [Test]

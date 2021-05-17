@@ -60,7 +60,8 @@ namespace ReniUI.Formatting
             => GetLineBreakEdits()
                 .Concat(GetSpaceEdits(parameter.IndentCharacterCount));
 
-        bool ISourcePartEdit.HasLines => Target.HasLineComment() || GetTargetLineBreakCount(0) > 0;
+        bool ISourcePartEdit.HasLines 
+            => Target.HasLineComment() || GetTargetLineBreakCount(MinimalLineBreakCount) > 0;
 
         SourcePart ISourcePartEdit.SourcePart => Target.SourcePart();
 

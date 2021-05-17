@@ -7,7 +7,6 @@ namespace ReniUI.Test
 {
     [UnitTest]
     [TestFixture]
-
     public sealed class StructFormatting : DependenceProvider
     {
         [Test]
@@ -21,14 +20,20 @@ namespace ReniUI.Test
         [Test]
         [UnitTest]
         public void BreakLine() => @"aaaaa bbbbb".SimpleTest(maxLineLength: 10, expected: @"aaaaa
-bbbbb");
+    bbbbb");
+
+        [Test]
+        [UnitTest]
+        public void BreakLine3() => @"aaaaa bbbbb ccccc".SimpleTest(maxLineLength: 10, expected: @"aaaaa
+    bbbbb
+    ccccc");
 
         [Test]
         [UnitTest]
         public void BreakLineWithLimit1() => @"aaaaa 
 
 bbbbb".SimpleTest(@"aaaaa
-bbbbb",
+    bbbbb",
             emptyLineLimit: 1);
 
         [Test]
@@ -48,19 +53,10 @@ bbbbb".SimpleTest(@"aaaaa bbbbb",
 b";
 
             var expectedText = @"a
-b"
+    b"
                 .Replace("\r\n", "\n");
 
-
-            var compiler = CompilerBrowser.FromText(text);
-            var newSource = compiler.Reformat
-                (
-                    new ReniUI.Formatting.Configuration
-                        {EmptyLineLimit = null}.Create()
-                )
-                .Replace("\r\n", "\n");
-
-            (newSource == expectedText).Assert("\n\"" + newSource + "\"");
+            text.SimpleTest(expectedText);
         }
 
         [UnitTest]

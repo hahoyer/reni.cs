@@ -47,7 +47,7 @@ namespace ReniUI.Formatting
         Syntax ITree<Syntax>.GetDirectChild(int index) => Children[index];
         int ITree<Syntax>.LeftDirectChildCount => 0;
 
-        BinaryTree[] Anchors => Formatter.GetAnchors(this);
+        BinaryTree[] Anchors => Formatter.GetFrameAnchors(Main);
         int IndentDirection => IsIndentRequired? 1 : 0;
 
         [EnableDump(Order = -2)]
@@ -103,7 +103,9 @@ namespace ReniUI.Formatting
         {
             bool? leftLineBreaks = null;
             var isTail = false;
-            foreach(var child in Children)
+
+            var children = Children;
+            foreach(var child in children)
             {
                 var isIndentAtTailRequired = IsLineSplit && isTail && Formatter.IsIndentAtTailRequired;
 

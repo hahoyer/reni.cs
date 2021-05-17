@@ -1,4 +1,4 @@
-//10:38:57.713 12.05.2021 ran 169 of 179 
+//00:31:53.491 14.05.2021 ran 169 of 179 
 
 namespace hw.UnitTest
 {
@@ -9,8 +9,7 @@ namespace hw.UnitTest
         
 // error 
 
-TestRunner.RunTest(new ReniUI.Test.StructFormattingCurrent().Start);
-TestRunner.RunTest(new ReniUI.Test.StructFormattingCurrent().LabeledEntriesInList);
+TestRunner.RunTest(new ReniUI.Test.StructFormattingCurrent().FlatList2Long);
 TestRunner.RunTest(new ReniUI.Test.ThenElseMatching().Matching);
 TestRunner.RunTest(new ReniUI.Test.ThenElseMatching().NestedMatching);
 TestRunner.RunTest(new ReniUI.Test.TokenLocating().FromSourcePart);
@@ -26,7 +25,7 @@ TestRunner.RunTest(new ReniUI.Test.ExpressionFormatting().FromSourcePart);
 TestRunner.RunTest(new ReniUI.Test.ExpressionFormatting().BadArgDeclaration);
 TestRunner.RunTest(new ReniUI.Test.Formatting().HalfList);
 TestRunner.RunTest(new ReniUI.Test.Formatting().LabeledList);
-TestRunner.RunTest(new ReniUI.Test.Formatting().LabelsOnToLevel);
+TestRunner.RunTest(new ReniUI.Test.Formatting().FlatList2);
 TestRunner.RunTest(new ReniUI.Test.Formatting().ListEndsWithListToken);
 TestRunner.RunTest(new ReniUI.Test.Formatting().ListSeparatorAtEnd);
 TestRunner.RunTest(new ReniUI.Test.Formatting().ListLineBreakTest2);

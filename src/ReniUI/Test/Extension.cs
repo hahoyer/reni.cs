@@ -30,9 +30,13 @@ namespace ReniUI.Test
 
             (newSource == expected).Assert(() => $@"
 newSource:
-{newSource.Quote()}
+----------------------
+{newSource}
+----------------------
 expected:
-{expected.Quote()}
+----------------------
+{expected}
+----------------------
 ", 1);
         }
     }

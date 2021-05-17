@@ -52,55 +52,26 @@ namespace ReniUI.Formatting
         internal static IEnumerable<Edit>
             GetEditPieces(this IEnumerable<ISourcePartEdit> target, Configuration configuration)
         {
-            var currentPosition = 0;
-            var currentIndex = 0;
-
             var parameter = new EditPieceParameter(configuration);
 
-            var result = new List<Edit>();
-            foreach(var part in target
+            return target
                 .OrderBy(node => node.SourcePart.Position)
-                .ThenBy(node => node.SourcePart.Length))
-            {
-                result.AddRange(GetEditPieces(part, parameter, ref currentPosition));
-                currentIndex++;
-            }
-
-            return result;
+                .ThenBy(node => node.SourcePart.Length)
+                .SelectMany(part => part.GetEditPieces(parameter))
+                .ToArray();
         }
 
-        static IEnumerable<Edit> GetEditPieces
-            (ISourcePartEdit target, EditPieceParameter parameter, ref int currentPosition)
+        internal static IEnumerable<Edit> GetEditPieces(this ISourcePartEdit target, EditPieceParameter parameter)
         {
-            var result = new List<Edit>();
             switch(target)
             {
                 case IEditPieces spe:
-                {
-                    var edits = spe.Get(parameter).ToArray();
-                    foreach(var edit in edits)
-                    {
-                        (currentPosition <= edit.Location.Position).Assert();
-                        currentPosition = edit.Location.EndPosition;
-                        result.Add(edit);
-                    }
-
-                    break;
-                }
-
-                case IndentedSourcePartEdit indent:
-                    var currentIndent = parameter.Indent;
-                    parameter.Indent += indent.Count;
-                    result.AddRange(GetEditPieces(indent.Target, parameter, ref currentPosition));
-                    parameter.Indent = currentIndent;
-                    break;
+                    return spe.Get(parameter).ToArray();
 
                 default:
-                    Dumpable.NotImplementedFunction(target, parameter, currentPosition);
-                    break;
+                    Dumpable.NotImplementedFunction(target, parameter);
+                    return null;
             }
-
-            return result;
         }
 
         internal static IEnumerable<ISourcePartEdit>
@@ -117,7 +88,7 @@ namespace ReniUI.Formatting
             (this IEnumerable<ISourcePartEdit> target, IndentDirection toRight) => throw new NotImplementedException();
     }
 
-    class IndentedSourcePartEdit : DumpableObject, ISourcePartEdit
+    class IndentedSourcePartEdit : DumpableObject, ISourcePartEdit, IEditPieces
     {
         [EnableDump]
         internal readonly ISourcePartEdit Target;
@@ -129,6 +100,15 @@ namespace ReniUI.Formatting
         {
             Target = target;
             Count = count;
+        }
+
+        IEnumerable<Edit> IEditPieces.Get(EditPieceParameter parameter)
+        {
+            var currentIndent = parameter.Indent;
+            parameter.Indent += Count;
+            var result = Target.GetEditPieces(parameter);
+            parameter.Indent = currentIndent;
+            return result;
         }
 
         bool ISourcePartEdit.HasLines => Target.HasLines;

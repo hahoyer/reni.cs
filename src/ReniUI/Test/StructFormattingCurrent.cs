@@ -9,28 +9,24 @@ namespace ReniUI.Test
     {
         [Test]
         [UnitTest]
-        public void Start() => @"aaaaa 
+        public void FlatList2()
+        {
+            const string text = @"aaaaa;ccccc";
+            const string expectedText = @"aaaaa; ccccc";
 
-bbbbb".SimpleTest(@"aaaaa
-    bbbbb",
-            10, 1);
+            text.SimpleTest(expectedText );
+        }
 
         [Test]
         [UnitTest]
-        public void LabeledEntriesInList()
+        public void FlatList2Long()
         {
-            const string Text =
-                @"{aaaaa, label: bbbbb
-    }";
+            const string text = @"aaaaa;ccccc";
+            const string expectedText = @"aaaaa;
+ccccc";
 
-            var expectedText =
-                @"{
-    aaaaa,
-
-    label:
-        bbbbb
-}";
-            Text.SimpleTest(expectedText, 10, 0);
+            text.SimpleTest(expectedText, 10 );
         }
+
     }
 }
