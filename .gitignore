@@ -19,3 +19,6 @@ obj/
 /.sync
 /.sync
 /src/renisource/Debug
+_NCrunch*
+*.ncrunchproject
+*.ncrunchsolution

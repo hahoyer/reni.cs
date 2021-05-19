@@ -92,7 +92,7 @@ namespace Reni.Parser
 
             Number = Match.Digit.Repeat(1);
 
-            var varbatimText = "@(" +
+            var verbatimText = "@(" +
                                (Match.WhiteSpace + (Match.WhiteSpace + ")@").Find)
                                .Else(identifier.Value(id => (Match.WhiteSpace + id + ")@").Box().Find))
                                .Else(Match.End.Find + InvalidTextEnd)
@@ -106,7 +106,7 @@ namespace Reni.Parser
                         var textEnd = head.Else(LineEndOrEnd + InvalidTextEnd);
                         return textEnd.Find + (head + textEnd.Find).Repeat();
                     })
-                .Else(varbatimText);
+                .Else(verbatimText);
 
             LineCommentItem = new LexerItem(new WhiteSpaceTokenType("LineComment"), MatchLineComment);
             MultiLineCommentItem = new LexerItem(new WhiteSpaceTokenType("MultiLineComment"), MatchMultiLineComment);
