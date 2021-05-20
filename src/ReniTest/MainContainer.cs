@@ -1,7 +1,6 @@
 using System;
 using System.Diagnostics;
 using System.Reflection;
-using System.Windows.Forms;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.UnitTest;
@@ -21,9 +20,6 @@ namespace ReniTest
         {
             "Start".Log();
             Log4NetTextWriter.Register(false);
-
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
 
             RunAllTests();
             //ExecT4CompilerGeneratedTest();

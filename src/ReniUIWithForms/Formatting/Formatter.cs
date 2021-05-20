@@ -167,8 +167,7 @@ namespace ReniUI.Formatting
                 case ExpressionSyntax expression:
                     return new TrainWreck();
                 case null:
-                    return new Terminal();
-                case DeclarerSyntax.NameSyntax name:
+                case DeclarerSyntax.NameSyntax:
                     return new Terminal();
                 case DeclarationSyntax declaration:
                     return new Declaration();

@@ -1,35 +1,12 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <ProjectGuid>{54D4A90B-C3CF-4F72-B447-CBC08B6EF5AB}</ProjectGuid>
-    <AssemblyName>ReniExe</AssemblyName>
-    <TargetTypeEx>CSharp.Exe</TargetTypeEx>
-    <PlatformTarget>x86</PlatformTarget>
+    <TargetFramework>net5.0</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <LangVersion>8.0</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <LangVersion>8.0</LangVersion>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="System.Drawing" />
-    <ProjectReference Include="..\reni2\Reni2.csproj">
-      <Project>{EBB73C84-6622-4183-A28F-B0DFF606006B}</Project>
-      <Name>Reni2</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\reni2\reni2.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="MainContainer.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="sys.targets" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <Import Project="sys.targets" />
+
 </Project>

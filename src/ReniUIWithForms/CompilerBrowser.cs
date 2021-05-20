@@ -11,7 +11,9 @@ using Reni.Struct;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
 using Reni.Validation;
+using ReniUI.CompilationView;
 using ReniUI.Formatting;
+using ScintillaNET;
 
 namespace ReniUI
 {
@@ -136,6 +138,17 @@ namespace ReniUI
             return default;
         }
 
-
+        public void SignalStyleNeeded(Scintilla textBox, int position)
+        {
+            var current = LeftMost;
+            while(textBox.GetEndStyled() < position)
+            {
+                var offset = textBox.GetEndStyled();
+                var syntax = LocatePosition(offset);
+                var style = TextStyle.From(syntax);
+                textBox.StartStyling(syntax.StartPosition);
+                textBox.SetStyling(syntax.SourcePart.Length, style);
+            }
+        }
     }
 }

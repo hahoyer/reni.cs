@@ -56,24 +56,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{A045FCB3
 		..\build\sys.targets = ..\build\sys.targets
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reni2", "reni2\Reni2.csproj", "{EBB73C84-6622-4183-A28F-B0DFF606006B}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "reniTest", "ReniTest\reniTest.csproj", "{A639A515-D066-4C12-A4C5-07DA91C19A2C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReniExe", "ReniExe\ReniExe.csproj", "{54D4A90B-C3CF-4F72-B447-CBC08B6EF5AB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Theory", "Theory\Theory.csproj", "{9C9C2707-F251-4376-8940-A96A0E1688C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "reniBrowser", "ReniBrowser\reniBrowser.csproj", "{B639A515-D066-4C12-A4C5-07DA91C19A2C}"
-	ProjectSection(ProjectDependencies) = postProject
-		{C339A515-D066-4C12-A4C5-07DA91C19A2C} = {C339A515-D066-4C12-A4C5-07DA91C19A2C}
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "reniUI", "ReniUI\reniUI.csproj", "{C339A515-D066-4C12-A4C5-07DA91C19A2C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "reniStudio", "ReniStudio\reniStudio.csproj", "{DF39A515-D066-4C12-A4C5-07DA91C19A2C}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "renisource", "renisource\renisource.vcxproj", "{35E96DF4-0D75-49C3-A0EB-8E3D0EC39C8B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "reni2", "reni2\reni2.csproj", "{45D97DE4-67C3-4F10-98B4-6618CF7C7BB1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -83,14 +76,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{EBB73C84-6622-4183-A28F-B0DFF606006B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EBB73C84-6622-4183-A28F-B0DFF606006B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EBB73C84-6622-4183-A28F-B0DFF606006B}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{EBB73C84-6622-4183-A28F-B0DFF606006B}.Debug|x86.Build.0 = Debug|Any CPU
-		{EBB73C84-6622-4183-A28F-B0DFF606006B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EBB73C84-6622-4183-A28F-B0DFF606006B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EBB73C84-6622-4183-A28F-B0DFF606006B}.Release|x86.ActiveCfg = Release|Any CPU
-		{EBB73C84-6622-4183-A28F-B0DFF606006B}.Release|x86.Build.0 = Release|Any CPU
 		{A639A515-D066-4C12-A4C5-07DA91C19A2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A639A515-D066-4C12-A4C5-07DA91C19A2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A639A515-D066-4C12-A4C5-07DA91C19A2C}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -115,14 +100,6 @@ Global
 		{9C9C2707-F251-4376-8940-A96A0E1688C2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9C9C2707-F251-4376-8940-A96A0E1688C2}.Release|x86.ActiveCfg = Release|Any CPU
 		{9C9C2707-F251-4376-8940-A96A0E1688C2}.Release|x86.Build.0 = Release|Any CPU
-		{B639A515-D066-4C12-A4C5-07DA91C19A2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B639A515-D066-4C12-A4C5-07DA91C19A2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B639A515-D066-4C12-A4C5-07DA91C19A2C}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{B639A515-D066-4C12-A4C5-07DA91C19A2C}.Debug|x86.Build.0 = Debug|Any CPU
-		{B639A515-D066-4C12-A4C5-07DA91C19A2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B639A515-D066-4C12-A4C5-07DA91C19A2C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B639A515-D066-4C12-A4C5-07DA91C19A2C}.Release|x86.ActiveCfg = Release|Any CPU
-		{B639A515-D066-4C12-A4C5-07DA91C19A2C}.Release|x86.Build.0 = Release|Any CPU
 		{C339A515-D066-4C12-A4C5-07DA91C19A2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C339A515-D066-4C12-A4C5-07DA91C19A2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C339A515-D066-4C12-A4C5-07DA91C19A2C}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -131,27 +108,27 @@ Global
 		{C339A515-D066-4C12-A4C5-07DA91C19A2C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C339A515-D066-4C12-A4C5-07DA91C19A2C}.Release|x86.ActiveCfg = Release|Any CPU
 		{C339A515-D066-4C12-A4C5-07DA91C19A2C}.Release|x86.Build.0 = Release|Any CPU
-		{DF39A515-D066-4C12-A4C5-07DA91C19A2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DF39A515-D066-4C12-A4C5-07DA91C19A2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DF39A515-D066-4C12-A4C5-07DA91C19A2C}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{DF39A515-D066-4C12-A4C5-07DA91C19A2C}.Debug|x86.Build.0 = Debug|Any CPU
-		{DF39A515-D066-4C12-A4C5-07DA91C19A2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DF39A515-D066-4C12-A4C5-07DA91C19A2C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DF39A515-D066-4C12-A4C5-07DA91C19A2C}.Release|x86.ActiveCfg = Release|Any CPU
-		{DF39A515-D066-4C12-A4C5-07DA91C19A2C}.Release|x86.Build.0 = Release|Any CPU
 		{35E96DF4-0D75-49C3-A0EB-8E3D0EC39C8B}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{35E96DF4-0D75-49C3-A0EB-8E3D0EC39C8B}.Debug|x86.ActiveCfg = Debug|Win32
 		{35E96DF4-0D75-49C3-A0EB-8E3D0EC39C8B}.Debug|x86.Build.0 = Debug|Win32
 		{35E96DF4-0D75-49C3-A0EB-8E3D0EC39C8B}.Release|Any CPU.ActiveCfg = Release|Win32
 		{35E96DF4-0D75-49C3-A0EB-8E3D0EC39C8B}.Release|x86.ActiveCfg = Release|Win32
 		{35E96DF4-0D75-49C3-A0EB-8E3D0EC39C8B}.Release|x86.Build.0 = Release|Win32
+		{45D97DE4-67C3-4F10-98B4-6618CF7C7BB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45D97DE4-67C3-4F10-98B4-6618CF7C7BB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45D97DE4-67C3-4F10-98B4-6618CF7C7BB1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{45D97DE4-67C3-4F10-98B4-6618CF7C7BB1}.Debug|x86.Build.0 = Debug|Any CPU
+		{45D97DE4-67C3-4F10-98B4-6618CF7C7BB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45D97DE4-67C3-4F10-98B4-6618CF7C7BB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45D97DE4-67C3-4F10-98B4-6618CF7C7BB1}.Release|x86.ActiveCfg = Release|Any CPU
+		{45D97DE4-67C3-4F10-98B4-6618CF7C7BB1}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		VisualSVNWorkingCopyRoot = .
 		SolutionGuid = {16B1A750-4D72-48AD-A91D-23A7F10F4CDD}
+		VisualSVNWorkingCopyRoot = .
 	EndGlobalSection
 	GlobalSection(CodealikeProperties) = postSolution
 		SolutionGuid = eaf46459-7dac-4986-b4bb-bb69ffbc6141

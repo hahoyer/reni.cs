@@ -20,10 +20,6 @@
       <Name>reniUI</Name>
     </ProjectReference>
     <Reference Include="System.Drawing" />
-    <ProjectReference Include="..\reni2\Reni2.csproj">
-      <Project>{EBB73C84-6622-4183-A28F-B0DFF606006B}</Project>
-      <Name>Reni2</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs">
