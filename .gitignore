@@ -22,3 +22,4 @@ obj/
 _NCrunch*
 *.ncrunchproject
 *.ncrunchsolution
+/src/**/bin
