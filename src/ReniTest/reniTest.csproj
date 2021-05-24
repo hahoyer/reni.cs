@@ -1,23 +1,35 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <OutputType>Exe</OutputType>
+        <OutputType>WinExe</OutputType>
         <TargetFramework>net5.0</TargetFramework>
         <Version>21.1</Version>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <NoWarn>660,661,649,</NoWarn>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
         <NoWarn>660,661,649,</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\reni2\reni2.csproj" />
         <ProjectReference Include="..\ReniUI\reniUI.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Template1.tt">
+        <Generator>TextTemplatingFileGenerator</Generator>
+        <LastGenOutput>Template1.cs</LastGenOutput>
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Template1.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Template1.tt</DependentUpon>
+      </Compile>
     </ItemGroup>
 
 </Project>

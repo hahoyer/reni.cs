@@ -118,8 +118,8 @@ namespace Reni
                 }
                 catch(CSharpCompilerErrorException e)
                 {
-                    for(var i = 0; i < e.CompilerErrorCollection.Count; i++)
-                        Parameters.OutStream.AddLog(e.CompilerErrorCollection[i] + "\n");
+                    foreach(var error in e.Errors)
+                        Parameters.OutStream.AddLog(error + "\n");
 
                     return null;
                 }

@@ -1,6 +1,8 @@
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
+using System.Runtime;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.UnitTest;
@@ -21,6 +23,7 @@ namespace ReniTest
             "Start".Log();
             Log4NetTextWriter.Register(false);
 
+            ExecT4CompilerTest();
             RunAllTests();
             //ExecT4CompilerGeneratedTest();
         }
@@ -62,8 +65,19 @@ namespace ReniTest
         static void ExecT4CompilerGeneratedTest()
         {
             Data.OutStream = new OutStream();
-            T4CompilerGenerated.MainFunction();
+            //T4CompilerGenerated.MainFunction();
             Data.OutStream = null;
+        }
+
+        static void ExecT4CompilerTest()
+        {
+            var path = Path.GetDirectoryName(typeof(GCSettings).Assembly.Location);
+            var rt = path.PathCombine("System.Runtime.dll");
+            var a = Assembly.LoadFile(rt);
+            var ooo = Assembly.GetAssembly(typeof(System.Boolean)).Location;
+
+            var x = new T4Compiler("1").Code();
+            x.Log();
         }
 
         static void Run<TTarget>()

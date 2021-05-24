@@ -15,6 +15,7 @@ namespace Reni.FeatureTest.Helper
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
     [PublicAPI]
+    [CodeDomCompilation]
     public abstract class CompilerTest : DependenceProvider, ITestFixture
     {
         sealed class RunException : Exception
