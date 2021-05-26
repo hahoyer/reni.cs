@@ -9,7 +9,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\reni2\reni2.csproj" />
+        <ProjectReference Include="..\Reni\Reni.csproj" />
     </ItemGroup>
 
     <Import Project="sys.targets" />
