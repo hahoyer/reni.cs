@@ -33,7 +33,7 @@ namespace Reni.SyntaxTree
 
         // Used for debug only
         [DisableDump]
-        [Node("Cache")]
+        [Node]
         internal readonly FunctionCache<ContextBase, ResultCache> ResultCache =
             new FunctionCache<ContextBase, ResultCache>();
 

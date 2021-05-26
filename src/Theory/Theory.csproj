@@ -4,6 +4,7 @@
         <TargetFramework>net5.0</TargetFramework>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <NoWarn>660,661,649,</NoWarn>
+        <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
   <ItemGroup>

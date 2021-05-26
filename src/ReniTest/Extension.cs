@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using hw.Helper;
 
 namespace ReniTest
@@ -13,8 +10,8 @@ namespace ReniTest
                         .GetFrame(0)
                         .GetFileName()
                         .ToSmbFile()
-                        .DirectoryName
-                    + @"\..\..")
+                        .DirectoryName +
+                    @"\..\..")
                 .ToSmbFile()
                 .FullName;
     }

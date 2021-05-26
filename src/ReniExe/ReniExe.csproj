@@ -6,6 +6,7 @@
       <Version>21.1</Version>
       <UseWindowsForms>true</UseWindowsForms>
       <NoWarn>660,661,649,</NoWarn>
+      <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

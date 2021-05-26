@@ -6,6 +6,7 @@
         <Version>21.1</Version>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <NoWarn>660,661,649,</NoWarn>
+        <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -14,22 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="Template1.tt">
-        <Generator>TextTemplatingFileGenerator</Generator>
-        <LastGenOutput>Template1.cs</LastGenOutput>
-      </None>
-    </ItemGroup>
-
-    <ItemGroup>
       <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Update="Template1.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>Template1.tt</DependentUpon>
-      </Compile>
     </ItemGroup>
 
 </Project>

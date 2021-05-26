@@ -30,8 +30,41 @@ namespace Reni.Code
             Container main,
             FunctionCache<int, FunctionContainer> functions
         )
-            => new CSharp_Generated(moduleName, main, functions).TransformText();
+            => 
 
+        $@"
+using System;
+using Reni.Runtime;
+
+namespace ReniGeneratedCode
+{{
+    unsafe static public class {moduleName}
+    {{ 
+        {GetMainFunctionCode(main)}
+        {functions.Values.Select(pair => GetFunctionCode(pair.Getter) + GetFunctionCode(pair.Setter))}
+    }}
+}}
+";
+
+        static string GetMainFunctionCode(Container container) => $@"
+            // {container.Description.Replace("\n", "\n//")}
+            public static void {MainFunctionName}()
+            {{
+                {container.GetCSharpStatements(3)}
+                return data;
+            }}
+";
+
+        static string GetFunctionCode(Container container)
+            => container == null? "" : $@"
+            // {container.Description.Replace("\n", "\n//")}
+            public static Data {Generator.FunctionName(container.FunctionId)}(Data frame)
+            {{
+            Start:
+                {container.GetCSharpStatements(3)}
+                return data
+            }}
+";
         static void CodeToFile(string name, string result, bool traceFilePosition)
         {
             var streamWriter = new StreamWriter(name);
@@ -60,7 +93,8 @@ namespace Reni.Code
 
             var assemblyName = Path.GetRandomFileName();
             var references = T(
-                    Path.GetDirectoryName(typeof(GCSettings).GetTypeInfo().Assembly.Location).PathCombine("System.Runtime.dll"),
+                    Path.GetDirectoryName(typeof(GCSettings).GetTypeInfo().Assembly.Location)
+                        .PathCombine("System.Runtime.dll"),
                     Assembly.GetAssembly(typeof(Data)).Location,
                     Assembly.GetAssembly(typeof(object)).Location
                 )
@@ -103,18 +137,4 @@ namespace Reni.Code
     }
 
 // ReSharper disable InconsistentNaming
-    partial class CSharp_Generated
-// ReSharper restore InconsistentNaming
-    {
-        readonly FunctionCache<int, FunctionContainer> Functions;
-        readonly Container Main;
-        readonly string ModuleName;
-
-        internal CSharp_Generated(string moduleName, Container main, FunctionCache<int, FunctionContainer> functions)
-        {
-            ModuleName = moduleName;
-            Main = main;
-            Functions = functions;
-        }
-    }
 }

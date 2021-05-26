@@ -47,6 +47,13 @@ namespace Reni
             }
         }
 
+        /// <summary>
+        ///     Shows or hides syntax tree
+        /// </summary>
+        [Node]
+        [EnableDump]
+        public readonly TraceOptionsClass TraceOptions = new();
+
         public CompilationLevel CompilationLevel = CompilationLevel.Run;
         public bool? DebuggableGeneratedCode = false;
 
@@ -58,13 +65,6 @@ namespace Reni
 
         public bool RunFromCode;
 
-        /// <summary>
-        ///     Shows or hides syntax tree
-        /// </summary>
-        [Node]
-        [EnableDump]
-        public readonly TraceOptionsClass TraceOptions = new TraceOptionsClass();
-
         public bool IsParserRequired => CompilationLevel >= CompilationLevel.Parser;
         public bool IsSyntaxRequired => CompilationLevel >= CompilationLevel.Syntax;
         public bool IsCodeRequired => CompilationLevel >= CompilationLevel.Code;
@@ -74,7 +74,7 @@ namespace Reni
         {
             set
             {
-                Tracer.Assert(value);
+                value.Assert();
                 CompilationLevel = CompilationLevel.Scanner;
             }
         }
@@ -96,10 +96,5 @@ namespace Reni
         , Run = 4
     }
 
-    public class NodeAttribute : Attribute
-    {
-        string v;
-
-        public NodeAttribute(string v = null) => this.v = v;
-    }
+    public class NodeAttribute : Attribute { }
 }

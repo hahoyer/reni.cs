@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
@@ -24,7 +20,7 @@ namespace ReniTest
 
         static void Run(SmbFile file)
         {
-            (file.FullName.ToSmbFile().FilePosition(null, FilePositionTag.Test)).Log();
+            file.FullName.ToSmbFile().FilePosition(null, FilePositionTag.Test).Log();
             if(file.IsDirectory)
                 foreach(var item in file.Items)
                     Run(item);
@@ -32,9 +28,6 @@ namespace ReniTest
                 Run(new Source(file.FullName.ToSmbFile()));
         }
 
-        static void Run(Source file)
-        {
-             new FileTestCompiler(file).Run();
-        }
+        static void Run(Source file) => new FileTestCompiler(file).Run();
     }
 }
