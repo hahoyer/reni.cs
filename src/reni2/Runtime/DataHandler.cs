@@ -1,5 +1,5 @@
-using System.Linq;
 using System;
+using System.Linq;
 using System.Numerics;
 using hw.DebugFormatter;
 using JetBrains.Annotations;
@@ -9,7 +9,13 @@ namespace Reni.Runtime
 {
     static class DataHandler
     {
-        internal static unsafe int RefBytes 
+        internal sealed class RuntimeException : Exception
+        {
+            public RuntimeException(Exception exception)
+                : base("Runtime exception during Dereference.", exception) { }
+        }
+
+        internal static int RefBytes
             => Root.DefaultRefAlignParam.RefSize.SaveByteCount;
 
         /// <summary>
@@ -21,10 +27,10 @@ namespace Reni.Runtime
         /// <param name="source"> The source. </param>
         /// created 08.10.2006 17:43
         internal static unsafe void MoveBytes
-            (int count, byte[] destination, int destByte, Int64 source)
+            (int count, byte[] destination, int destByte, long source)
         {
             fixed(byte* destPtr = &destination[destByte])
-                MoveBytes(count, destPtr, (byte*) &source);
+                MoveBytes(count, destPtr, (byte*)&source);
         }
 
         /// <summary>
@@ -66,17 +72,19 @@ namespace Reni.Runtime
             while(bitsToCast >= 8)
             {
                 count--;
-                x[count] = (byte) (isNegative ? -1 : 0);
+                x[count] = (byte)(isNegative? -1 : 0);
                 bitsToCast -= 8;
             }
+
             if(bitsToCast > 0)
             {
                 count--;
-                var @sbyte = (int) (sbyte) x[count];
-                var sbyte1 = (@sbyte << bitsToCast);
-                var i = (sbyte1 >> bitsToCast);
-                x[count] = (byte) i;
+                var @sbyte = (int)(sbyte)x[count];
+                var sbyte1 = @sbyte << bitsToCast;
+                var i = sbyte1 >> bitsToCast;
+                x[count] = (byte)i;
             }
+
             if(bitsToCast < 0)
                 throw new NotImplementedException();
         }
@@ -92,11 +100,12 @@ namespace Reni.Runtime
             var result = new byte[bytes];
             fixed(byte* dataPointer = data)
             {
-                var intPointer = (long) (dataPointer + dataStart);
-                var bytePointer = (byte*) &intPointer;
+                var intPointer = (long)(dataPointer + dataStart);
+                var bytePointer = (byte*)&intPointer;
                 for(var i = 0; i < bytes; i++)
                     result[i] = bytePointer[i];
             }
+
             return result;
         }
 
@@ -104,14 +113,15 @@ namespace Reni.Runtime
         {
             try
             {
-                Tracer.Assert(data.Length >= dataStart + RefBytes);
+                (data.Length >= dataStart + RefBytes).Assert();
                 var result = new byte[bytes];
                 fixed(byte* dataPointer = &data[dataStart])
                 {
-                    var bytePointer = *(byte**) dataPointer;
+                    var bytePointer = *(byte**)dataPointer;
                     for(var i = 0; i < bytes; i++)
                         result[i] = bytePointer[i];
                 }
+
                 return result;
             }
             catch(AccessViolationException exception)
@@ -120,18 +130,12 @@ namespace Reni.Runtime
             }
         }
 
-        internal sealed class RuntimeException : Exception
-        {
-            public RuntimeException(Exception exception)
-                : base("Runtime exception during Dereference.", exception) {}
-        }
-
         internal static unsafe void DoRefPlus(this byte[] data, int dataStart, int offset)
         {
-            Tracer.Assert(data != null, "data != null");
+            (data != null).Assert("data != null");
             fixed(byte* dataPointer = &data[dataStart])
             {
-                var intPointer = (int*) dataPointer;
+                var intPointer = (int*)dataPointer;
                 *intPointer += offset;
             }
         }
@@ -154,17 +158,15 @@ namespace Reni.Runtime
         internal static void PrintNumber(this byte[] data) => PrintText(new BigInteger(data).ToString());
 
         internal static void PrintText(this string text) => Data.OutStream.AddData(text);
-        internal static void PrintText(this byte[] text)
-        {
-            new string(text.Select(x => (char) x).ToArray()).PrintText();
-        }
+
+        internal static void PrintText(this byte[] text) => new string(text.Select(x => (char)x).ToArray()).PrintText();
 
         internal static unsafe void AssignFromPointers
             (this byte[] leftData, byte[] rightData, int bytes)
         {
             fixed(byte* leftPointer = leftData)
             fixed(byte* rightPointer = rightData)
-                MoveBytes(bytes, *(byte**) leftPointer, *(byte**) rightPointer);
+                MoveBytes(bytes, *(byte**)leftPointer, *(byte**)rightPointer);
         }
 
         internal static bool IsLessEqual(byte[] left, byte[] right) => !IsGreater(left, right);
@@ -183,12 +185,12 @@ namespace Reni.Runtime
 
             for(var i = Math.Max(leftBytes, rightBytes) - 1; i >= 0; i--)
             {
-                var leftByte = (sbyte) (isLeftNegative ? -1 : 0);
-                var rightByte = (sbyte) (isRightNegative ? -1 : 0);
+                var leftByte = (sbyte)(isLeftNegative? -1 : 0);
+                var rightByte = (sbyte)(isRightNegative? -1 : 0);
                 if(i < leftBytes)
-                    leftByte = (sbyte) left[i];
+                    leftByte = (sbyte)left[i];
                 if(i < rightBytes)
-                    rightByte = (sbyte) right[i];
+                    rightByte = (sbyte)right[i];
                 if(leftByte < rightByte)
                     return false;
                 if(leftByte > rightByte)
@@ -206,24 +208,27 @@ namespace Reni.Runtime
             var i = 0;
             for(; i < leftBytes && i < rightBytes; i++)
             {
-                d = (sbyte) left[i];
-                if(d != (sbyte) right[i])
+                d = (sbyte)left[i];
+                if(d != (sbyte)right[i])
                     return false;
             }
+
             for(; i < leftBytes; i++)
             {
-                if(d < 0 && (sbyte) left[i] != -1)
+                if(d < 0 && (sbyte)left[i] != -1)
                     return false;
-                if(d >= 0 && (sbyte) left[i] != 0)
+                if(d >= 0 && (sbyte)left[i] != 0)
                     return false;
             }
+
             for(; i < rightBytes; i++)
             {
-                if(d < 0 && (sbyte) right[i] != -1)
+                if(d < 0 && (sbyte)right[i] != -1)
                     return false;
-                if(d >= 0 && (sbyte) right[i] != 0)
+                if(d >= 0 && (sbyte)right[i] != 0)
                     return false;
             }
+
             return true;
         }
 
@@ -238,35 +243,37 @@ namespace Reni.Runtime
             for(var i = 0; i < bytes; i++)
             {
                 if(i < leftBytes)
-                    carry += ((sbyte) left[i] & 0xff);
+                    carry += (sbyte)left[i] & 0xff;
                 if(i < rightBytes)
                 {
-                    d = (sbyte) right[i];
-                    carry += (d & 0xff);
+                    d = (sbyte)right[i];
+                    carry += d & 0xff;
                 }
                 else if(d < 0)
                     carry += 0xff;
 
-                result[i] = (byte) (carry & 0xff);
+                result[i] = (byte)(carry & 0xff);
                 carry >>= 8;
             }
+
             return result;
         }
 
         [UsedImplicitly]
         internal static byte[] PlusSimple(this byte[] left, byte[] right)
         {
-            Tracer.Assert(left.Length == right.Length);
+            (left.Length == right.Length).Assert();
             var bytes = left.Length;
             var result = new byte[bytes];
             var carry = 0;
             for(var i = 0; i < bytes; i++)
             {
-                carry += (sbyte) left[i] & 0xff;
-                carry += (sbyte) right[i] & 0xff;
-                result[i] = (byte) (carry & 0xff);
+                carry += (sbyte)left[i] & 0xff;
+                carry += (sbyte)right[i] & 0xff;
+                result[i] = (byte)(carry & 0xff);
                 carry >>= 8;
             }
+
             return result;
         }
 
@@ -275,15 +282,15 @@ namespace Reni.Runtime
             var carry = 1;
             for(var i = 0; i < data.Length; i++)
             {
-                data[i] = (byte) ((sbyte) (~(sbyte) data[i]) + carry);
-                carry = data[i] == 0 ? 1 : 0;
+                data[i] = (byte)((sbyte)~(sbyte)data[i] + carry);
+                carry = data[i] == 0? 1 : 0;
             }
         }
 
-        internal static byte[] Times(this byte[] left, byte[] right, int bytes) 
+        internal static byte[] Times(this byte[] left, byte[] right, int bytes)
             => (new BigInteger(left) * new BigInteger(right))
-            .ToByteArray()
-            .ByteAlign(bytes);
+                .ToByteArray()
+                .ByteAlign(bytes);
 
         static byte[] ByteAlign(this byte[] data, int bytes)
         {
@@ -295,7 +302,7 @@ namespace Reni.Runtime
                 result[i] = data[i];
             if(i < bytes)
             {
-                var sign = (byte) (data[i - 1] < 0 ? 127 : 0);
+                var sign = (byte)(data[i - 1] < 0? 127 : 0);
                 for(; i < bytes; i++)
                     result[i] = sign;
             }
@@ -305,7 +312,7 @@ namespace Reni.Runtime
 
         internal static byte[] Times(this byte[] left, int right, int bytes)
             => (new BigInteger(left) * new BigInteger(right))
-            .ToByteArray()
-            .ByteAlign(bytes);
+                .ToByteArray()
+                .ByteAlign(bytes);
     }
 }
