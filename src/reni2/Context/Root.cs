@@ -63,7 +63,7 @@ namespace Reni.Context
         internal int FunctionCount => Functions.Count;
 
         internal static RefAlignParam DefaultRefAlignParam
-            => new RefAlignParam(BitsConst.SegmentAlignBits, Size.Create(32));
+            => new RefAlignParam(BitsConst.SegmentAlignBits, Size.Create(64));
 
         [DisableDump]
         public bool ProcessErrors => Parent.ProcessErrors;

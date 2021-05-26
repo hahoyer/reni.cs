@@ -65,7 +65,7 @@ namespace ReniGeneratedCode
             {{
             Start:
                 {container.GetCSharpStatements(3)}
-                return data
+                return data;
             }}
 ";
         static void CodeToFile(string name, string result, bool traceFilePosition)

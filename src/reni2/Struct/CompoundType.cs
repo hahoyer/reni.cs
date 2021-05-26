@@ -22,8 +22,8 @@ namespace Reni.Struct
 
         internal CompoundType(CompoundView view)
         {
-            Tracer.Assert(!view.HasIssues, () => Tracer.Dump(view.Issues));
             View = view;
+            (!View.HasIssues).Assert(() => Tracer.Dump(View.Issues));
         }
 
         ContextBase IChild<ContextBase>.Parent => View.CompoundContext;

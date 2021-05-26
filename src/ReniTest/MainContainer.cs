@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.Reflection;
 using hw.DebugFormatter;
@@ -5,6 +6,7 @@ using hw.Helper;
 using hw.UnitTest;
 using Reni;
 using Reni.FeatureTest.Helper;
+using Reni.Runtime;
 using ReniUI;
 
 namespace ReniTest
@@ -18,6 +20,8 @@ namespace ReniTest
         {
             "Start".Log();
             Log4NetTextWriter.Register(false);
+            if(DateTime.Now.Year == 1)
+                TestRuntime();
             RunAllTests();
         }
 
@@ -57,5 +61,32 @@ namespace ReniTest
         static void Run<TTarget>()
             where TTarget : CompilerTest, new()
             => new TTarget().Run();
+
+        static void TestRuntime()
+        {
+            Data.OutStream = new OutStream();
+            TestRuntimeCode();
+            Data.OutStream = null;
+        }
+
+        static void TestRuntimeCode()
+        {
+            var data = Data.Create(18);
+            data.SizedPush(1, 10);
+            data.SizedPush(1, 4);
+            var p1 = data.Pointer(1);
+            data.Push(p1);
+            var p2 = data.Pointer(8);
+            data.Push(p2);
+            data.Assign(1);
+            data.Drop(1);
+            Data.PrintText("(");
+            data.Push(data.Get(1, 0).BitCast(5).BitCast(8));
+            data.Pull(1).PrintNumber();
+            Data.PrintText(", ");
+            Data.PrintText(")");
+            data.Drop(1);
+            ;
+        }
     }
 }

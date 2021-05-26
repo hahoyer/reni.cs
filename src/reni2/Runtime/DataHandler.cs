@@ -9,16 +9,8 @@ namespace Reni.Runtime
 {
     static class DataHandler
     {
-        internal static unsafe int RefBytes
-        {
-            get
-            {
-                var bytes = Root.DefaultRefAlignParam.RefSize.SaveByteCount;
-                Tracer.Assert(bytes == 4);
-                Tracer.Assert(sizeof(int) == 4);
-                return bytes;
-            }
-        }
+        internal static unsafe int RefBytes 
+            => Root.DefaultRefAlignParam.RefSize.SaveByteCount;
 
         /// <summary>
         ///     Moves the bytes.
@@ -100,7 +92,7 @@ namespace Reni.Runtime
             var result = new byte[bytes];
             fixed(byte* dataPointer = data)
             {
-                var intPointer = (int) (dataPointer + dataStart);
+                var intPointer = (long) (dataPointer + dataStart);
                 var bytePointer = (byte*) &intPointer;
                 for(var i = 0; i < bytes; i++)
                     result[i] = bytePointer[i];

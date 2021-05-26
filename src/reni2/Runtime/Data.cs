@@ -12,42 +12,88 @@ namespace Reni.Runtime
     [DebuggerDisplay("{Dump}")]
     public sealed class Data
     {
-        readonly byte[] _data;
-        int _length;
+        public interface IView { }
+
+        [PublicAPI]
+        public sealed class View : DumpableObject, IView
+        {
+            readonly Data Parent;
+            readonly int StartIndex;
+            readonly int Bytes;
+
+            public View(Data parent, int startIndex, int bytes)
+            {
+                Parent = parent;
+                StartIndex = startIndex;
+                Bytes = bytes;
+            }
+
+            protected override string GetNodeDump()
+                => Create(Parent.Content.Pointer(StartIndex)).AddressDump +
+                    ": " +
+                    Parent.DumpLengthAndRange(StartIndex, Bytes);
+        }
+
+        static readonly BiasCache BiasCache = new(100);
 
         public static IOutStream OutStream { internal get; set; }
+        readonly byte[] Content;
+        int Length;
 
-        public static Data Create(int bytes) => new Data(new byte[bytes]);
+        Data(byte[] result)
+        {
+            Content = result;
+            Length = 0;
+        }
 
-        public static Data Create(byte[] bytes) => new Data(bytes)
+        int StartIndex
+        {
+            get => Content.Length - Length;
+            set
+            {
+                Length = Content.Length - value;
+                EnsureLength();
+            }
+        }
+
+        string Dump => Pointer(0).AddressDump + ": " + DataDump;
+
+        string DataDump => DataDumpPart();
+
+        string AddressDump => BiasCache.AddressDump(this) + "=" + FlatDump;
+
+        string FlatDump => GetBytes().Select(i => i.ToString()).Stringify(" ");
+
+        public static Data Create(int bytes) => new(new byte[bytes]);
+
+        [PublicAPI]
+        public static Data Create(byte[] bytes) => new(bytes)
         {
             StartIndex = 0
         };
 
-        Data(byte[] result)
-        {
-            _data = result;
-            _length = 0;
-        }
-
+        [PublicAPI]
         public void Push(params byte[] bytes)
         {
             StartIndex -= bytes.Length;
-            bytes.CopyTo(_data, StartIndex);
+            bytes.CopyTo(Content, StartIndex);
         }
 
+        [PublicAPI]
         public void SizedPush(int byteCount, params byte[] bytes)
         {
             StartIndex -= byteCount;
             var i = 0;
             for(; i < byteCount && i < bytes.Length; i++)
-                _data[StartIndex + i] = bytes[i];
+                Content[StartIndex + i] = bytes[i];
             for(; i < byteCount; i++)
-                _data[StartIndex + i] = 0;
+                Content[StartIndex + i] = 0;
         }
 
-        public void Push(Data data) => Push(data.GetBytes(data._length));
+        [PublicAPI]
+        public void Push(Data data) => Push(data.GetBytes(data.Length));
 
+        [PublicAPI]
         public Data Pull(int bytes)
         {
             var result = new Data(GetBytes(bytes));
@@ -56,8 +102,10 @@ namespace Reni.Runtime
             return result;
         }
 
-        public void Drop(int bytes) { StartIndex += bytes; }
+        [PublicAPI]
+        public void Drop(int bytes) => StartIndex += bytes;
 
+        [PublicAPI]
         public void Drop(int bytesBefore, int bytesAfter)
         {
             var top = Pull(bytesAfter);
@@ -65,53 +113,58 @@ namespace Reni.Runtime
             Push(top);
         }
 
+        [PublicAPI]
         public byte[] GetBytes(int count)
         {
             var result = new byte[count];
             for(var i = 0; i < count; i++)
-                result[i] = _data[StartIndex + i];
+                result[i] = Content[StartIndex + i];
             return result;
         }
 
-        public byte[] GetBytes() => GetBytes(_length);
+        [PublicAPI]
+        public byte[] GetBytes() => GetBytes(Length);
 
-        int StartIndex
-        {
-            get { return _data.Length - _length; }
-            set
-            {
-                _length = _data.Length - value;
-                EnsureLength();
-            }
-        }
+        void EnsureLength() => (StartIndex >= 0).Assert();
 
-        void EnsureLength() => Tracer.Assert(StartIndex >= 0);
+        [PublicAPI]
+        public Data Pointer(int offset) => Create(Content.Pointer(StartIndex + offset));
 
-        public Data Pointer(int offset) => Create(_data.Pointer(StartIndex + offset));
-        public void PointerPlus(int offset) => _data.DoRefPlus(StartIndex, offset);
-        public Data DePointer(int bytes) => Create(_data.Dereference(StartIndex, bytes));
-        public Data Get(int bytes, int offset) => Create(_data.Get(StartIndex + offset, bytes));
+        [PublicAPI]
+        public void PointerPlus(int offset) => Content.DoRefPlus(StartIndex, offset);
 
+        [PublicAPI]
+        public Data DePointer(int bytes) => Create(Content.Dereference(StartIndex, bytes));
+
+        [PublicAPI]
+        public Data Get(int bytes, int offset) => Create(Content.Get(StartIndex + offset, bytes));
+
+        [PublicAPI]
         public Data GetFromBack(int bytes, int offset)
-            => Create(_data.Get(_data.Length + offset, bytes));
+            => Create(Content.Get(Content.Length + offset, bytes));
 
+        [PublicAPI]
         public void PrintNumber() => GetBytes().PrintNumber();
 
+        [PublicAPI]
         public void PrintText(int itemBytes)
         {
-            Tracer.Assert(itemBytes == 1);
-            GetBytes(_length).PrintText();
+            (itemBytes == 1).Assert();
+            GetBytes(Length).PrintText();
         }
 
+        [PublicAPI]
         public static void PrintText(string data) => data.PrintText();
 
+        [PublicAPI]
         public void Assign(int bytes)
         {
             var right = Pull(DataHandler.RefBytes);
             var left = Pull(DataHandler.RefBytes);
-            left._data.AssignFromPointers(right._data, bytes);
+            left.Content.AssignFromPointers(right.Content, bytes);
         }
 
+        [PublicAPI]
         public void ArrayGetter(int elementBytes, int indexBytes)
         {
             var offset = Pull(indexBytes).GetBytes().Times(elementBytes, DataHandler.RefBytes);
@@ -119,32 +172,30 @@ namespace Reni.Runtime
             Push(baseAddress.GetBytes().Plus(offset, DataHandler.RefBytes));
         }
 
+        [PublicAPI]
         public void ArraySetter(int elementBytes, int indexBytes)
         {
             var right = Pull(DataHandler.RefBytes);
             var offset = Pull(indexBytes).GetBytes().Times(elementBytes, DataHandler.RefBytes);
             var baseAddress = Pull(DataHandler.RefBytes);
             var left = baseAddress.GetBytes().Plus(offset, DataHandler.RefBytes);
-            left.AssignFromPointers(right._data, elementBytes);
+            left.AssignFromPointers(right.Content, elementBytes);
         }
 
+        [PublicAPI]
         public Data BitCast(int bits)
         {
-            var x = BitsConst.Convert(_data);
+            var x = BitsConst.Convert(Content);
             var y = x.Resize(Size.Create(bits));
             return Create(y.ToByteArray());
         }
-
-        string Dump => Pointer(0).AddressDump + ": " + DataDump;
-
-        string DataDump => DataDumpPart();
 
         string DataDumpPart()
         {
             var result = "";
             result += DumpRange(0, StartIndex);
             result += " ";
-            result += DumpLengthAndRange(StartIndex, _length);
+            result += DumpLengthAndRange(StartIndex, Length);
             return result;
         }
 
@@ -152,16 +203,16 @@ namespace Reni.Runtime
             => "[" + bytes + ": " + DumpRange(startIndex, bytes) + "]";
 
         string DumpRange(int startIndex, int bytes)
-            => bytes <= 0 ? "" : DumpRangeGenerator(startIndex, bytes).Stringify(" ");
+            => bytes <= 0? "" : DumpRangeGenerator(startIndex, bytes).Stringify(" ");
 
         IEnumerable<string> DumpRangeGenerator(int startIndex, int bytes)
         {
             for(var i = 0; i < bytes;)
             {
-                var address = _biasCache.Dump(_data, startIndex + i);
+                var address = BiasCache.Dump(Content, startIndex + i);
                 if(address == null)
                 {
-                    yield return _data[startIndex + i].ToString();
+                    yield return Content[startIndex + i].ToString();
                     i++;
                 }
                 else
@@ -172,56 +223,30 @@ namespace Reni.Runtime
             }
         }
 
-        static readonly BiasCache _biasCache = new BiasCache(100);
-        [UsedImplicitly]
-        string AddressDump => _biasCache.AddressDump(this) + "=" + FlatDump;
-
-        string FlatDump => GetBytes().Select(i => i.ToString()).Stringify(" ");
-
+        [PublicAPI]
         public IView GetCurrentView(int bytes) => new View(this, StartIndex, bytes);
 
-        public interface IView {}
-
-        public sealed class View : DumpableObject, IView
-        {
-            readonly Data _parent;
-            readonly int _startIndex;
-            readonly int _bytes;
-
-            public View(Data parent, int startIndex, int bytes)
-            {
-                _parent = parent;
-                _startIndex = startIndex;
-                _bytes = bytes;
-            }
-
-            protected override string GetNodeDump()
-                => Create(_parent._data.Pointer(_startIndex)).AddressDump
-                    + ": "
-                    + _parent.DumpLengthAndRange(_startIndex, _bytes);
-        }
-
-        [UsedImplicitly]
+        [PublicAPI]
         public void Equal(int sizeBytes, int leftBytes, int rightBytes)
             => Compare(sizeBytes, leftBytes, rightBytes, DataHandler.IsEqual);
 
-        [UsedImplicitly]
+        [PublicAPI]
         public void LessGreater(int sizeBytes, int leftBytes, int rightBytes)
             => Compare(sizeBytes, leftBytes, rightBytes, DataHandler.IsNotEqual);
 
-        [UsedImplicitly]
+        [PublicAPI]
         public void Less(int sizeBytes, int leftBytes, int rightBytes)
             => Compare(sizeBytes, leftBytes, rightBytes, DataHandler.IsLess);
 
-        [UsedImplicitly]
+        [PublicAPI]
         public void Greater(int sizeBytes, int leftBytes, int rightBytes)
             => Compare(sizeBytes, leftBytes, rightBytes, DataHandler.IsGreater);
 
-        [UsedImplicitly]
+        [PublicAPI]
         public void LessEqual(int sizeBytes, int leftBytes, int rightBytes)
             => Compare(sizeBytes, leftBytes, rightBytes, DataHandler.IsLessEqual);
 
-        [UsedImplicitly]
+        [PublicAPI]
         public void GreaterEqual(int sizeBytes, int leftBytes, int rightBytes)
             => Compare(sizeBytes, leftBytes, rightBytes, DataHandler.IsGreaterEqual);
 
@@ -230,42 +255,42 @@ namespace Reni.Runtime
         {
             var right = Pull(rightBytes);
             var left = Pull(leftBytes);
-            var value = (byte) (operation(left._data, right._data) ? -1 : 0);
+            var value = (byte)(operation(left.Content, right.Content)? -1 : 0);
             for(var i = 0; i < sizeBytes; i++)
                 Push(value);
         }
 
-        [UsedImplicitly]
+        [PublicAPI]
         public void MinusPrefix(int bytes)
         {
             var data = Pull(bytes);
-            data._data.MinusPrefix();
+            data.Content.MinusPrefix();
             Push(data);
         }
 
-        [UsedImplicitly]
+        [PublicAPI]
         public void Plus(int sizeBytes, int leftBytes, int rightBytes)
         {
             var right = Pull(rightBytes);
             var left = Pull(leftBytes);
-            Push(left._data.Plus(right._data, sizeBytes));
+            Push(left.Content.Plus(right.Content, sizeBytes));
         }
 
-        [UsedImplicitly]
+        [PublicAPI]
         public void Minus(int sizeBytes, int leftBytes, int rightBytes)
         {
             var right = Pull(rightBytes);
             var left = Pull(leftBytes);
             right.MinusPrefix(rightBytes);
-            Push(left._data.Plus(right._data, sizeBytes));
+            Push(left.Content.Plus(right.Content, sizeBytes));
         }
 
-        [UsedImplicitly]
+        [PublicAPI]
         public void Star(int sizeBytes, int leftBytes, int rightBytes)
         {
             var right = Pull(rightBytes);
             var left = Pull(leftBytes);
-            Push(left._data.Times(right._data, sizeBytes));
+            Push(left.Content.Times(right.Content, sizeBytes));
         }
     }
 }

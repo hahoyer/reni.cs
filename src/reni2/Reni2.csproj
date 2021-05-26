@@ -3,7 +3,12 @@
     <PropertyGroup>
         <TargetTypeEx>CSharp.Library</TargetTypeEx>
         <AssemblyName>Reni</AssemblyName>
+        <RootNamespace>Reni</RootNamespace>
     </PropertyGroup>
+
+    <ItemGroup>
+      <Compile Remove="FeatureTest\Structure\Destructor.cs" />
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="hw.CompilerTools" Version="20.0.9" />
@@ -14,6 +19,12 @@
     </ItemGroup>
 
     <ItemGroup>
+        <None Update="FeatureTest\ComplexContext.reni">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="FeatureTest\Text.reni">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
         <None Update="log4net.xml">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
