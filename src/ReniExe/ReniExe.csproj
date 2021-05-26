@@ -1,16 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+      <TargetTypeEx>CSharp.WinExe</TargetTypeEx>
       <OutputType>WinExe</OutputType>
     <TargetFramework>net5.0-windows</TargetFramework>
-      <Version>21.1</Version>
-      <UseWindowsForms>true</UseWindowsForms>
-      <NoWarn>660,661,649,</NoWarn>
-      <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\reni2\reni2.csproj" />
   </ItemGroup>
 
+    <Import Project="sys.targets" />
 </Project>

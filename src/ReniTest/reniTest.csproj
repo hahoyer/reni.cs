@@ -1,12 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <OutputType>WinExe</OutputType>
-        <TargetFramework>net5.0</TargetFramework>
-        <Version>21.1</Version>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <NoWarn>660,661,649,</NoWarn>
-        <LangVersion>latest</LangVersion>
+        <TargetTypeEx>CSharp.WinExe</TargetTypeEx>
     </PropertyGroup>
 
     <ItemGroup>
@@ -14,8 +9,5 @@
         <ProjectReference Include="..\ReniUI\reniUI.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-    </ItemGroup>
-
+    <Import Project="sys.targets" />
 </Project>
