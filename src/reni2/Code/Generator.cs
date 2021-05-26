@@ -41,7 +41,11 @@ namespace ReniGeneratedCode
     unsafe static public class {moduleName}
     {{ 
         {GetMainFunctionCode(main)}
-        {functions.Values.Select(pair => GetFunctionCode(pair.Getter) + GetFunctionCode(pair.Setter))}
+        {functions
+            .Values
+            .Select(pair => GetFunctionCode(pair.Getter) + GetFunctionCode(pair.Setter))
+            .Stringify("\n")
+        }
     }}
 }}
 ";
@@ -51,7 +55,6 @@ namespace ReniGeneratedCode
             public static void {MainFunctionName}()
             {{
                 {container.GetCSharpStatements(3)}
-                return data;
             }}
 ";
 
