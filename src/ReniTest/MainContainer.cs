@@ -74,10 +74,8 @@ namespace ReniTest
             var data = Data.Create(18);
             data.SizedPush(1, 10);
             data.SizedPush(1, 4);
-            var p1 = data.Pointer(1);
-            data.Push(p1);
-            var p2 = data.Pointer(8);
-            data.Push(p2);
+            data.Push(data.Pointer(1));
+            data.Push(data.Pointer(8));
             data.Assign(1);
             data.Drop(1);
             Data.PrintText("(");
