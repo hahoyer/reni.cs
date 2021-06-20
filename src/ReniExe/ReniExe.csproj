@@ -1,14 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-      <TargetTypeEx>CSharp.WinExe</TargetTypeEx>
-      <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0-windows</TargetFramework>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetTypeEx>CSharp.WinExe</TargetTypeEx>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net5.0-windows</TargetFramework>
+        <LangVersion>default</LangVersion>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Reni\Reni.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Reni\Reni.csproj" />
+    </ItemGroup>
 
     <Import Project="sys.targets" />
 </Project>

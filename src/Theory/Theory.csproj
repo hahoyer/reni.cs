@@ -4,11 +4,15 @@
         <TargetFramework>net5.0</TargetFramework>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <NoWarn>660,661,649,</NoWarn>
-        <LangVersion>latest</LangVersion>
+        <LangVersion>default</LangVersion>
     </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="hw.Helper.Core" Version="20.0.10" />
-    <PackageReference Include="hw.log4net" Version="20.0.1" />
-  </ItemGroup>
+    <ItemGroup>
+            <PackageReference Include="hw.log4net" Version="20.0.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\HWBase\HWBase.csproj" />
+    </ItemGroup>
+<Import Project="sys.targets" />    
 </Project>

@@ -2,8 +2,7 @@
 
     <PropertyGroup>
         <TargetTypeEx>CSharp.Library</TargetTypeEx>
-        <AssemblyName>Reni</AssemblyName>
-        <RootNamespace>Reni</RootNamespace>
+        <LangVersion>default</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -11,10 +10,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="hw.CompilerTools" Version="20.0.9" />
         <PackageReference Include="hw.log4net" Version="20.0.1" />
-        <PackageReference Include="hw.UnitTest" Version="20.0.6" />
-        <PackageReference Include="Microsoft.CodeAnalysis" Version="3.9.0" />
+        <PackageReference Include="JetBrains.Annotations" Version="2021.1.0" />
+        <PackageReference Include="Microsoft.CodeAnalysis" Version="3.10.0" />
         <PackageReference Include="NUnit" Version="3.13.2" />
     </ItemGroup>
 

@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <TargetTypeEx>CSharp.Library</TargetTypeEx>
+        <LangVersion>default</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
