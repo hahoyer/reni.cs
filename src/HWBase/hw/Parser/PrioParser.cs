@@ -39,7 +39,7 @@ namespace hw.Parser
         PrioTable.Relation GetRelation(PrioTable.ITargetItem newType, PrioTable.ITargetItem topType)
             => PrioTable.GetRelation(newType, topType);
 
-        PrioParserWorker CreateWorker(Stack<OpenItem<TSourcePart>> stack)
+        hw.Parser.PrioParser<TSourcePart>.PrioParserWorker CreateWorker(Stack<OpenItem<TSourcePart>> stack)
             => new PrioParserWorker(this, stack);
     }
 }

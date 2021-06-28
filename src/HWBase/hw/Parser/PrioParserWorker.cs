@@ -14,7 +14,7 @@ namespace hw.Parser
             ISubParser<TSourcePart> NextParser { get; }
         }
 
-        sealed class PrioParserWorker : DumpableObject
+        internal sealed class PrioParserWorker : DumpableObject
         {
             Item<TSourcePart> Current;
 

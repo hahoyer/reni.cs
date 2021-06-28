@@ -21,28 +21,26 @@ namespace hw.UnitTest
         }
 
 
-        public static readonly ConfigurationContainer Configuration = new ConfigurationContainer();
+        public static readonly ConfigurationContainer Configuration = new();
 
-        public static readonly List<IFramework> RegisteredFrameworks = new List<IFramework>();
-        int Complete;
+        public static readonly List<IFramework> RegisteredFrameworks = new();
 
         // ReSharper disable once StringLiteralTypo
         readonly SmbFile ConfigFile = "Test.HW.config".ToSmbFile();
-        string CurrentMethodName = "";
         readonly SmbFile PendingTestsFile = Configuration.TestsFileName?.ToSmbFile();
-        string Status = "Start";
 
         readonly Func<Type, bool>[] TestLevels;
         readonly TestType[] TestTypes;
+        int Complete;
+        string CurrentMethodName = "";
+        string Status = "Start";
 
         TestRunner(IEnumerable<TestType> testTypes)
         {
             TestLevels = new Func<Type, bool>[] {IsNormalPriority, IsLowPriority};
             TestTypes = testTypes.ToArray();
-            Tracer.Assert
-            (
-                TestTypes.IsCircuitFree(DependentTypes),
-                () => Tracer.Dump(TestTypes.Circuits(DependentTypes).ToArray()));
+            TestTypes.IsCircuitFree(DependentTypes).Assert
+                (() => Tracer.Dump(TestTypes.Circuits(DependentTypes).ToArray()));
             if(Configuration.SkipSuccessfulMethods)
                 LoadConfiguration();
         }
@@ -51,10 +49,10 @@ namespace hw.UnitTest
 
         string ConfigurationString
         {
-            get => HeaderText
-                   + "\n"
-                   + TestTypes.OrderBy(testType => testType.ConfigurationModePriority)
-                       .Aggregate("", (current, testType) => current + testType.ConfigurationString);
+            get => HeaderText +
+                "\n" +
+                TestTypes.OrderBy(testType => testType.ConfigurationModePriority)
+                    .Aggregate("", (current, testType) => current + testType.ConfigurationString);
             set
             {
                 if(value == null)
@@ -111,14 +109,25 @@ namespace hw.UnitTest
 
         string GeneratedTestCallsForMode(IGrouping<string, (TestType type, TestMethod method)> group)
             => $"\n// {group.Key} \n\n" +
-               group
-                   .Select(testType => $"{testType.method.RunString};")
-                   .Stringify("\n");
+                group
+                    .Select(testType => $"{testType.method.RunString};")
+                    .Stringify("\n");
 
         public static bool RunTests(Assembly rootAssembly)
         {
             var testRunner = new TestRunner(GetUnitTestTypes(rootAssembly));
             testRunner.Run();
+            return testRunner.AllIsFine;
+        }
+
+        public static bool RunTests(params Type[] types)
+        {
+            var testTypes = types
+                .Where(IsUnitTestType)
+                .Select(type => new TestType(type));
+            var testRunner = new TestRunner(testTypes);
+            testRunner.Run();
+
             return testRunner.AllIsFine;
         }
 
@@ -132,7 +141,7 @@ namespace hw.UnitTest
                 return new TestType[0];
             return
                 type.DependenceProviders.SelectMany
-                  (attribute => attribute.AsTestType(TestTypes).NullableToArray()).ToArray();
+                    (attribute => attribute.AsTestType(TestTypes).NullableToArray()).ToArray();
         }
 
         void Run()
