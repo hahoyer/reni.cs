@@ -29,18 +29,9 @@ namespace Reni.TokenClasses
         [EnableDumpExcept(null)]
         internal BinaryTree Left { get; }
 
-        [DisableDump]
-        internal BinaryTree LeftNeighbor;
-
-        [DisableDump]
-        internal BinaryTree Parent;
-
         [EnableDump(Order = 3)]
         [EnableDumpExcept(null)]
         internal BinaryTree Right { get; }
-
-        [DisableDump]
-        internal BinaryTree RightNeighbor;
 
         [DisableDump]
         internal readonly IToken Token;
@@ -48,7 +39,20 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal ITokenClass TokenClass { get; }
 
+        [DisableDump]
+        internal BinaryTree LeftNeighbor;
+
+        [DisableDump]
+        internal BinaryTree Parent;
+
+        [DisableDump]
+        internal BinaryTree RightNeighbor;
+
         int Depth;
+
+        readonly FunctionCache<bool, string> FlatFormatCache;
+        readonly FunctionCache<bool, int?> FlatLengthCache;
+
 
         BinaryTree
         (
@@ -63,9 +67,27 @@ namespace Reni.TokenClasses
             Left = left;
             TokenClass = tokenClass;
             Right = right;
+            FlatFormatCache = new FunctionCache<bool, string>(GetFlatStringValue);
+            FlatLengthCache = new FunctionCache<bool, int?>(GetFlatLengthValue);
 
             SetLinks();
         }
+
+        ValueCache ValueCache.IContainer.Cache { get; } = new();
+
+        SourcePart ISyntax.All => SourcePart;
+        SourcePart ISyntax.Main => Token.Characters;
+        int ITree<BinaryTree>.DirectChildCount => 2;
+
+        BinaryTree ITree<BinaryTree>.GetDirectChild(int index)
+            => index switch
+            {
+                0 => Left, 1 => Right, _ => null
+            };
+
+        int ITree<BinaryTree>.LeftDirectChildCount => 1;
+
+        protected override string GetNodeDump() => base.GetNodeDump() + $"({TokenClass.Id})";
 
 
         [DisableDump]
@@ -130,19 +152,11 @@ namespace Reni.TokenClasses
         public bool IsSeparatorRequired
             => !Token.PrecededWith.HasComment() && SeparatorExtension.Get(LeftNeighbor?.TokenClass, TokenClass);
 
-        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
-
-        SourcePart ISyntax.All => SourcePart;
-        SourcePart ISyntax.Main => Token.Characters;
-        int ITree<BinaryTree>.DirectChildCount => 2;
-
-        BinaryTree ITree<BinaryTree>.GetDirectChild(int index)
-            => index switch
-            {
-                0 => Left, 1 => Right, _ => null
-            };
-
-        int ITree<BinaryTree>.LeftDirectChildCount => 1;
+        /// <summary>
+        ///     Get the line length of target when formatted as one line.
+        /// </summary>
+        /// <value>The line length calculated or null if target contains line breaks.</value>
+        internal int FlatLengthOfToken => (IsSeparatorRequired? 1 : 0) + Token.Characters.Length;
 
         void SetLinks()
         {
@@ -190,8 +204,6 @@ namespace Reni.TokenClasses
             return default;
         }
 
-        protected override string GetNodeDump() => base.GetNodeDump() + $"({TokenClass.Id})";
-
         internal static BinaryTree Create
         (
             BinaryTree left,
@@ -199,7 +211,7 @@ namespace Reni.TokenClasses
             IToken token,
             BinaryTree right
         )
-            => new BinaryTree(left, tokenClass, token, right);
+            => new(left, tokenClass, token, right);
 
         internal int? GetBracketLevel()
         {
@@ -209,8 +221,7 @@ namespace Reni.TokenClasses
             return T(leftParenthesis?.Level ?? 0, rightParenthesis.Level).Max();
         }
 
-        internal TContainer GetFlatFormat<TContainer, TValue>(bool areEmptyLinesPossible)
-            where TContainer : class, IFormatResult<TValue>, new()
+        string GetFlatStringValue(bool areEmptyLinesPossible)
         {
             var tokenString = Token.Characters
                 .FlatFormat(Left == null? null : Token.PrecededWith, areEmptyLinesPossible);
@@ -221,20 +232,47 @@ namespace Reni.TokenClasses
             tokenString = (IsSeparatorRequired? " " : "") + tokenString;
 
             var leftResult = Left == null
-                ? new TContainer()
-                : Left.GetFlatFormat<TContainer, TValue>(areEmptyLinesPossible);
+                ? ""
+                : Left.FlatFormatCache[areEmptyLinesPossible];
 
             if(leftResult == null)
                 return null;
 
             var rightResult = Right == null
-                ? new TContainer()
-                : Right.GetFlatFormat<TContainer, TValue>(areEmptyLinesPossible);
+                ? ""
+                : Right.FlatFormatCache[areEmptyLinesPossible];
 
             if(rightResult == null)
                 return null;
 
-            return leftResult.Concat(tokenString, rightResult);
+            return leftResult + tokenString + rightResult;
+        }
+
+        int? GetFlatLengthValue(bool areEmptyLinesPossible)
+        {
+            var tokenString = Token.Characters
+                .FlatFormat(Left == null? null : Token.PrecededWith, areEmptyLinesPossible);
+
+            if(tokenString == null)
+                return null;
+
+            tokenString = (IsSeparatorRequired? " " : "") + tokenString;
+
+            var leftResult = Left == null
+                ? 0
+                : Left.FlatLengthCache[areEmptyLinesPossible];
+
+            if(leftResult == null)
+                return null;
+
+            var rightResult = Right == null
+                ? 0
+                : Right.FlatLengthCache[areEmptyLinesPossible];
+
+            if(rightResult == null)
+                return null;
+
+            return leftResult + tokenString.Length + rightResult;
         }
 
         public bool HasAsParent(BinaryTree parent)
@@ -247,21 +285,13 @@ namespace Reni.TokenClasses
         /// </summary>
         /// <param name="areEmptyLinesPossible"></param>
         /// <returns>The formatted line or null if target contains line breaks.</returns>
-        internal string GetFlatFormat(bool areEmptyLinesPossible)
-            => GetFlatFormat<StringResult, string>(areEmptyLinesPossible)?.Value;
+        public string GetFlatString(bool areEmptyLinesPossible) => FlatFormatCache[areEmptyLinesPossible];
 
         /// <summary>
         ///     Get the line length of target when formatted as one line.
         /// </summary>
         /// <param name="areEmptyLinesPossible"></param>
         /// <returns>The line length calculated or null if target contains line breaks.</returns>
-        internal int? GetFlatLength(bool areEmptyLinesPossible)
-            => GetFlatFormat<IntegerResult, int>(areEmptyLinesPossible)?.Value;
-
-        /// <summary>
-        ///     Get the line length of target when formatted as one line.
-        /// </summary>
-        /// <value>The line length calculated or null if target contains line breaks.</value>
-        internal int FlatLengthOfToken => (IsSeparatorRequired? 1:0) + Token.Characters.Length;
+        internal int? GetFlatLength(bool areEmptyLinesPossible) => FlatLengthCache[areEmptyLinesPossible];
     }
 }

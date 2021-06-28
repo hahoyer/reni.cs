@@ -2,16 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.Helper;
-using hw.Parser;
 using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Parser;
 
 namespace Reni.Helper
 {
-    [PublicAPI]
     static class Extension
     {
+        [PublicAPI]
         internal static IEnumerable<TTarget> GetNodesFromTopToBottom<TTarget>
             (this ITree<TTarget> target, Func<TTarget, bool> predicate = null)
             where TTarget : ITree<TTarget>
@@ -32,6 +31,7 @@ namespace Reni.Helper
             }
         }
 
+        [PublicAPI]
         internal static IEnumerable<TTarget> GetNodesFromLeftToRight<TTarget>(this ITree<TTarget> target)
             where TTarget : ITree<TTarget>
         {
@@ -60,6 +60,7 @@ namespace Reni.Helper
             }
         }
 
+        [PublicAPI]
         internal static int[] GetPath<TTarget>(this TTarget container, Func<TTarget, bool> isMatch)
             where TTarget : ITree<TTarget>
         {
@@ -76,6 +77,7 @@ namespace Reni.Helper
                 .FirstOrDefault(path => path != null);
         }
 
+        [PublicAPI]
         internal static IEnumerable<int[]> GetPaths<TTarget>(this TTarget container, Func<TTarget, bool> isMatch)
             where TTarget : ITree<TTarget>
         {
@@ -106,6 +108,7 @@ namespace Reni.Helper
             return subPath.Select(subPath => T(index).Concat(subPath).ToArray());
         }
 
+        [PublicAPI]
         internal static IEnumerable<TTarget> GetNodesFromRightToLeft<TTarget>(this ITree<TTarget> target)
             where TTarget : ITree<TTarget>
         {
@@ -162,8 +165,9 @@ namespace Reni.Helper
             yield return target;
         }
 
-        public static TValue[] T<TValue>(params TValue[] value) => value;
+        static TValue[] T<TValue>(params TValue[] value) => value;
 
+        [PublicAPI]
         internal static IEnumerable<TResult> GetNodesFromLeftToRight<TAspect, TResult>
             (this TResult target, Func<TResult, TAspect> getAspect)
             where TAspect : ITree<TResult>
@@ -184,6 +188,7 @@ namespace Reni.Helper
             }
         }
 
+        [PublicAPI]
         internal static IEnumerable<TResult> GetNodesFromRightToLeft<TAspect, TResult>
             (this TResult target, Func<TResult, TAspect> getAspect)
             where TAspect : ITree<TResult>
@@ -204,28 +209,30 @@ namespace Reni.Helper
             }
         }
 
+        [PublicAPI]
         internal static TTarget ApplyPath<TTarget, TAspect>
             (this TTarget container, int[] path, Func<TTarget, TAspect> getAspect)
             where TAspect : class, ITree<TTarget>
             => path.Aggregate(container, (node, index) => getAspect(node).GetDirectChild(index));
 
+        [PublicAPI]
         internal static string FlatFormat
             (this SourcePart target, IEnumerable<IItem> precede, bool areEmptyLinesPossible)
         {
             if(precede == null)
-                return target.Id;
+                return target.Id;   
 
-            if(precede.Any(item => item.IsComment() && item.HasLines()))
+            var results = precede
+                .Select(item => item.FlatFormat(areEmptyLinesPossible));
+
+            if(results.Any(result => result == null))
                 return null;
 
-            if(areEmptyLinesPossible && precede.Any(item => item.IsLineEnd()))
-                return null;
-
-            var result = precede
-                .Where(item => item.IsComment())
-                .Aggregate("", (current, item) => current + item.SourcePart.Id);
-
-            return result + target.Id;
+            return results
+                .Aggregate(target.Id, (result, item) => result + item);
         }
+
+        static string FlatFormat(this IItem item, bool areEmptyLinesPossible)
+            => item.HasLines() && (item.IsComment() || areEmptyLinesPossible)? null : item.SourcePart.Id;
     }
 }

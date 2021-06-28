@@ -60,7 +60,7 @@ namespace ReniUI
             => Classification.Item.LocateByPosition(Syntax, offset);
 
         public string FlatFormat(bool areEmptyLinesPossible)
-            => Syntax.FlatItem.MainAnchor.GetFlatFormat(areEmptyLinesPossible);
+            => Syntax.FlatItem.MainAnchor.GetFlatString(areEmptyLinesPossible);
 
         public Classification.Item LocatePosition(int offset) => LocatePosition(Source + offset);
         internal IEnumerable<ValueSyntax> FindPosition(int offset) => FindPosition(Source + offset);
