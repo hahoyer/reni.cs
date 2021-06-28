@@ -38,10 +38,6 @@ namespace Reni.SyntaxTree
             AssertValid();
         }
 
-        [EnableDump]
-        [EnableDumpExcept(null)]
-        string Position => Anchor.SourceParts.DumpSource(5);
-
         [DisableDump]
         public IEnumerable<FunctionSyntax> ConverterFunctions
             => Statements

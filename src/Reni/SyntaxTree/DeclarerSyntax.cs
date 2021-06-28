@@ -19,10 +19,6 @@ namespace Reni.SyntaxTree
                 : base(anchor, issue)
                 => Value = value;
 
-            [EnableDump]
-            [EnableDumpExcept(null)]
-            string Position => Anchor.SourceParts.DumpSource();
-
             internal override void AssertValid(Level level, BinaryTree target = null)
                 => base.AssertValid(level == null? null : new Level {IsCorrectOrder = level.IsCorrectOrder}, target);
         }
@@ -34,10 +30,6 @@ namespace Reni.SyntaxTree
             internal NameSyntax(string name, Anchor anchor)
                 : base(anchor)
                 => Value = name;
-
-            [EnableDump]
-            [EnableDumpExcept(null)]
-            string Position => Anchor.SourceParts.DumpSource();
 
             internal override void AssertValid(Level level, BinaryTree target = null)
                 => base.AssertValid(level == null? null : new Level {IsCorrectOrder = level.IsCorrectOrder}, target);

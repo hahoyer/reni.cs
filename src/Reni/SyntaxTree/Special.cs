@@ -25,10 +25,6 @@ namespace Reni.SyntaxTree
             Token.AssertIsNotNull();
         }
 
-        [EnableDump]
-        [EnableDumpExcept(null)]
-        string Position => Token.Characters.GetDumpAroundCurrent(5);
-
         [DisableDump]
         internal string Id => Token.Characters.Id;
 
@@ -59,10 +55,6 @@ namespace Reni.SyntaxTree
             Token = token;
             Token.AssertIsNotNull();
         }
-
-        [EnableDump]
-        [EnableDumpExcept(null)]
-        string Position => Token.Characters.GetDumpAroundCurrent(5);
 
         protected override int DirectChildCount => 1;
 
@@ -99,10 +91,6 @@ namespace Reni.SyntaxTree
             Token.AssertIsNotNull();
             StopByObjectIds();
         }
-
-        [EnableDump]
-        [EnableDumpExcept(null)]
-        string Position => Token.Characters.GetDumpAroundCurrent(5);
 
         internal override IRecursionHandler RecursionHandler => Infix as IRecursionHandler;
 
@@ -151,10 +139,6 @@ namespace Reni.SyntaxTree
             Token = token;
             Token.AssertIsNotNull();
         }
-
-        [EnableDump]
-        [EnableDumpExcept(null)]
-        string Position => Token.Characters.GetDumpAroundCurrent(5);
 
         protected override int DirectChildCount => 1;
 

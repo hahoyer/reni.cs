@@ -56,6 +56,10 @@ namespace Reni.SyntaxTree
             Issue = issue;
         }
 
+        [EnableDump]
+        [EnableDumpExcept(null)]
+        internal string Position => Anchor.SourceParts.DumpSource(5);
+
         ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]

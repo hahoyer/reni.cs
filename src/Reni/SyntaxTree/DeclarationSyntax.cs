@@ -24,10 +24,6 @@ namespace Reni.SyntaxTree
             Value.AssertIsNotNull();
         }
 
-        [EnableDump]
-        [EnableDumpExcept(null)]
-        string Position => Anchor.SourceParts.DumpSource();
-
         [DisableDump]
         internal string NameOrNull => Declarer.Name?.Value;
 
