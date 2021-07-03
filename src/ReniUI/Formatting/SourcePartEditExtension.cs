@@ -8,55 +8,16 @@ namespace ReniUI.Formatting
 {
     static class SourcePartEditExtension
     {
-        [Obsolete("", true)]
-        sealed class SpecialEdit : DumpableObject, ISourcePartEdit
-        {
-            readonly bool HasLines;
-            readonly string Id;
-
-            public SpecialEdit(string id, bool hasLines = false)
-            {
-                Id = id;
-                HasLines = hasLines;
-            }
-
-            bool ISourcePartEdit.HasLines => HasLines;
-            ISourcePartEdit ISourcePartEdit.Indent(int count) => this.CreateIndent(count);
-
-            SourcePart ISourcePartEdit.SourcePart => throw new NotImplementedException();
-
-            public override string ToString() => Id;
-            protected override string GetNodeDump() => Id;
-        }
-
-        [Obsolete("", true)]
-        internal static readonly ISourcePartEdit MinimalLineBreak
-            = new SpecialEdit("MinimalLineBreak", true);
-
-        [Obsolete("", true)]
-        internal static readonly ISourcePartEdit MinimalLineBreaks
-            = new SpecialEdit("MinimalLineBreaks", true);
-
-        [Obsolete("", true)]
-        internal static readonly ISourcePartEdit EnsureSeparator = new SpecialEdit("EnsureSeparator");
-
-        [Obsolete("", true)]
-        internal static readonly ISourcePartEdit ToRight = new SpecialEdit("ToRight");
-
-        [Obsolete("", true)]
-        internal static readonly ISourcePartEdit ToLeft = new SpecialEdit("ToLeft");
-
-        [Obsolete("", true)]
-        internal static readonly ISourcePartEdit EndOfFile = new SpecialEdit("EndOfFile");
-
         internal static IEnumerable<Edit>
             GetEditPieces(this IEnumerable<ISourcePartEdit> target, Configuration configuration)
         {
             var parameter = new EditPieceParameter(configuration);
 
-            return target
+            var sortedTargets = target
                 .OrderBy(node => node.SourcePart.Position)
                 .ThenBy(node => node.SourcePart.Length)
+                .ToArray();
+            return sortedTargets
                 .SelectMany(part => part.GetEditPieces(parameter))
                 .ToArray();
         }
@@ -77,6 +38,17 @@ namespace ReniUI.Formatting
         internal static IEnumerable<ISourcePartEdit>
             Indent(this IEnumerable<ISourcePartEdit> target, int direction)
             => direction == 0? target : target.Select(node => node.Indent(direction));
+
+        internal static IEnumerable<ISourcePartEdit>
+            AddLineBreaks(this IEnumerable<ISourcePartEdit> target, int count)
+        {
+            if(count == 0)
+                return target;
+
+            Tracer.TraceBreak();
+            return null;
+
+        }
 
         static IEnumerable<TValue> T<TValue>(params TValue[] value) => value;
 

@@ -11,30 +11,25 @@ namespace ReniUI.Formatting
 {
     sealed class Syntax : DumpableObject, ValueCache.IContainer, ITree<Syntax>
     {
-        [DisableDump]
-        internal readonly Reni.SyntaxTree.Syntax Main;
+        readonly Reni.SyntaxTree.Syntax Main;
 
         readonly Configuration Configuration;
 
-        [EnableDump(Order = -1)]
-        readonly BinaryTree Head;
-
         readonly Syntax Parent;
+
+        [EnableDump(Order = -1)]
         readonly Formatter Formatter;
 
         bool IsIndentRequired;
 
-        [EnableDump]
-        SourcePosition Position;
+        Syntax LeftNeighbor;
 
         Syntax
         (
-            SourcePosition position, BinaryTree head, Reni.SyntaxTree.Syntax main, Configuration configuration
+            Reni.SyntaxTree.Syntax main, Configuration configuration
             , Syntax parent
         )
         {
-            Position = position;
-            Head = head;
             Main = main;
             Configuration = configuration;
             Parent = parent;
@@ -42,15 +37,18 @@ namespace ReniUI.Formatting
             StopByObjectIds();
         }
 
-        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
+        ValueCache ValueCache.IContainer.Cache { get; } = new();
         int ITree<Syntax>.DirectChildCount => Children.Length;
         Syntax ITree<Syntax>.GetDirectChild(int index) => Children[index];
         int ITree<Syntax>.LeftDirectChildCount => 0;
 
+        [EnableDump(Order = -4)]
+        string MainPosition => Main?.Position;
+
         BinaryTree[] Anchors => Formatter.GetFrameAnchors(Main);
         int IndentDirection => IsIndentRequired? 1 : 0;
 
-        [EnableDump(Order = -2)]
+        [EnableDump(Order = 3)]
         [EnableDumpExcept(false)]
         bool IsLineSplit => HasAlreadyLineBreakOrIsTooLong;
 
@@ -64,8 +62,7 @@ namespace ReniUI.Formatting
 
                 var basicLineLength =
                     Main == null? 0 : Main.MainAnchor.GetFlatLength(Configuration.EmptyLineLimit != 0);
-                var mainLength = Head?.Token.Characters.Length ?? 0;
-                return basicLineLength == null || basicLineLength + mainLength > Configuration.MaxLineLength;
+                return basicLineLength == null || basicLineLength > Configuration.MaxLineLength;
             }
         }
 
@@ -73,62 +70,63 @@ namespace ReniUI.Formatting
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal ISourcePartEdit[] Edits => GetEdits();
 
-        [EnableDump]
-        Syntax[] Children => this.CachedValue(() => GetChildren().Select(Create).ToArray());
-
-        ISourcePartEdit[] ChildEdits
-            => GetChildEdits().ConcatMany().ToArray();
+        [EnableDump(Order = 4)]
+        Syntax[] Children => this.CachedValue(GetChildren);
 
         ISourcePartEdit[] AnchorEdits
             => Anchors
-                .SelectMany(node => node.GetWhiteSpaceEdits(Configuration))
+                .SelectMany(node => node.GetWhiteSpaceEdits(Configuration, 0))
                 .ToArray();
 
-        ISourcePartEdit[] GetEdits(int lineBreakCount = 0)
-            => T(Head.GetWhiteSpaceEdits(Configuration, lineBreakCount), AnchorEdits, ChildEdits)
-                .ConcatMany()
-                .Indent(IndentDirection)
+        ISourcePartEdit[] ChildrenEdits
+            => Children
+                .SelectMany(GetChildEdits)
                 .ToArray();
 
-        int GetLineBreakCount(bool? leftLines, bool? rightLines)
-            => Parent == null || !Parent.IsLineSplit || leftLines == null
-                ? 0
-                : !Configuration.AdditionalLineBreaksForMultilineItems ||
-                  rightLines == null ||
-                  !(leftLines.Value || rightLines.Value)
-                    ? 1
-                    : 2;
+        [EnableDump(Order = 5)]
+        int LineBreakCount
+            => this.CachedValue(()
+                => Parent == null || !Parent.IsLineSplit || LeftNeighbor == null || Main == null
+                    ? 0
+                    : Configuration.AdditionalLineBreaksForMultilineItems &&
+                    (LeftNeighbor.HasAlreadyLineBreakOrIsTooLong || HasAlreadyLineBreakOrIsTooLong)
+                        ? 2
+                        : 1);
 
-        IEnumerable<ISourcePartEdit[]> GetChildEdits()
+        Syntax[] GetChildren()
         {
-            bool? leftLineBreaks = null;
-            var isTail = false;
-
-            var children = Children;
-            foreach(var child in children)
-            {
-                var isIndentAtTailRequired = IsLineSplit && isTail && Formatter.IsIndentAtTailRequired;
-
-                var rightLineBreaks = child?.HasAlreadyLineBreakOrIsTooLong;
-
-                if(child != null)
-                {
-                    var lineBreakCount = child.GetLineBreakCount(leftLineBreaks, rightLineBreaks);
-                    var edits = child.GetEdits(lineBreakCount).ToArray();
-                    yield return isIndentAtTailRequired? edits.Indent(1).ToArray() : edits;
-                }
-
-                leftLineBreaks = rightLineBreaks;
-                isTail = true;
-            }
+            var result = Formatter.GetChildren(Main).Select(Create).ToArray();
+            for(var index = 0; index < result.Length - 1; index++)
+                result[index + 1].LeftNeighbor = result[index];
+            return result;
         }
 
-        IEnumerable<Formatter.Child> GetChildren() => Formatter.GetChildren(Main);
-
         internal static Syntax Create(Reni.SyntaxTree.Syntax target, Configuration configuration)
-            => new Syntax(null, null, target, configuration, null);
+            => new(target, configuration, null);
 
         Syntax Create(Formatter.Child child)
-            => new Syntax(child.Position, child.Head, child.FlatItem, Configuration, this);
+            => new(child.FlatItem, Configuration, this);
+
+        ISourcePartEdit[] GetEdits()
+        {
+            var sourcePartEdits = T(AnchorEdits, ChildrenEdits)
+                .ConcatMany().ToArray();
+            return sourcePartEdits
+                .AddLineBreaks(LineBreakCount)
+                .Indent(IndentDirection)
+                .ToArray();
+        }
+
+        IEnumerable<ISourcePartEdit> GetChildEdits(Syntax child)
+        {
+            if(child == null)
+                return new ISourcePartEdit[0];
+
+            var result = child.Edits;
+
+            if(IsLineSplit && child.LeftNeighbor != null && Formatter.IsIndentAtTailRequired)
+                result = result.Indent(1).ToArray();
+            return result;
+        }
     }
 }

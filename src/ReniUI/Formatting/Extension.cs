@@ -82,7 +82,7 @@ namespace ReniUI.Formatting
         }
 
         public static ISourcePartEdit[] GetWhiteSpaceEdits
-            (this BinaryTree target, Configuration configuration, int lineBreakCount= 0)
+            (this BinaryTree target, Configuration configuration, int lineBreakCount)
         {
             if(target == null)
                 return new ISourcePartEdit[0];

@@ -9,7 +9,9 @@ namespace hw.UnitTest
         
 // error 
 
-TestRunner.RunTest(new ReniUI.Test.StructFormattingCurrent().FlatList2Long);
+            TestRunner.RunTest(new ReniUI.Test.StructFormattingCurrent().FlatList2Long);
+
+            TestRunner.RunTest(new ReniUI.Test.StructFormattingCurrent().FlatList2Long);
 TestRunner.RunTest(new ReniUI.Test.ThenElseMatching().Matching);
 TestRunner.RunTest(new ReniUI.Test.ThenElseMatching().NestedMatching);
 TestRunner.RunTest(new ReniUI.Test.TokenLocating().FromSourcePart);

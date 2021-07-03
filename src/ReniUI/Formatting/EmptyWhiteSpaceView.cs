@@ -21,7 +21,7 @@ namespace ReniUI.Formatting
             Anchor = anchor;
             IsSeparatorRequired = isSeparatorRequired;
             MinimalLineBreakCount = minimalLineBreakCount;
-            StopByObjectIds();
+            //StopByObjectIds(276);
         }
 
         IEnumerable<Edit> IEditPieces.Get(EditPieceParameter parameter)
@@ -44,4 +44,5 @@ namespace ReniUI.Formatting
 
         protected override string GetNodeDump() => Anchor.GetDumpAroundCurrent(5) + " " + base.GetNodeDump();
     }
+
 }
