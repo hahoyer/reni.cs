@@ -11,16 +11,16 @@ namespace ReniUI.Test
     {
         [Test]
         [UnitTest]
+        public void BreakLine() => @"aaaaa bbbbb".SimpleTest(maxLineLength: 10, expected: @"aaaaa
+    bbbbb");
+
+        [Test]
+        [UnitTest]
         public void One() => @"aaaaa".SimpleTest();
 
         [Test]
         [UnitTest]
         public void Two() => @"aaaaa bbbbb".SimpleTest();
-
-        [Test]
-        [UnitTest]
-        public void BreakLine() => @"aaaaa bbbbb".SimpleTest(maxLineLength: 10, expected: @"aaaaa
-    bbbbb");
 
         [Test]
         [UnitTest]

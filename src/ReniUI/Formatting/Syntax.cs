@@ -3,20 +3,20 @@ using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using hw.Scanner;
+using hw.Parser;
+using JetBrains.Annotations;
 using Reni.Helper;
-using Reni.Parser;
 using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
 {
     sealed class Syntax : DumpableObject, ValueCache.IContainer, ITree<Syntax>
     {
+        readonly Syntax Parent;
+        readonly BinaryTree ParentDefinedHeadAnchor;
         readonly Reni.SyntaxTree.Syntax Main;
 
         readonly Configuration Configuration;
-
-        readonly Syntax Parent;
 
         [EnableDump(Order = -1)]
         readonly Formatter Formatter;
@@ -25,12 +25,17 @@ namespace ReniUI.Formatting
 
         Syntax LeftNeighbor;
 
+        [UsedImplicitly]
+        Syntax[] ChildrenForDebug;
+
         Syntax
         (
+            BinaryTree headAnchor,
             Reni.SyntaxTree.Syntax main, Configuration configuration
             , Syntax parent
         )
         {
+            ParentDefinedHeadAnchor = headAnchor;
             Main = main;
             Configuration = configuration;
             Parent = parent;
@@ -43,13 +48,15 @@ namespace ReniUI.Formatting
         Syntax ITree<Syntax>.GetDirectChild(int index) => Children[index];
         int ITree<Syntax>.LeftDirectChildCount => 0;
 
+        BinaryTree HeadAnchor => this.CachedValue(() => ParentDefinedHeadAnchor ?? Formatter.GetHeadAnchor(Main));
+
         [EnableDump(Order = -4)]
         string MainPosition => Main?.Position;
 
-        BinaryTree[] FrameAnchors => Formatter.GetFrameAnchors(Main);
-        int IndentDirection => IsIndentRequired? 1 : 0;
         [EnableDump(Order = -3)]
-        string FramePosition => FrameAnchors?.SourceParts().DumpSource();
+        string HeadAnchorPosition => HeadAnchor?.Token.SourcePart().GetDumpAroundCurrent(5);
+
+        int IndentDirection => IsIndentRequired? 1 : 0;
 
         [EnableDump(Order = 3)]
         [EnableDumpExcept(false)]
@@ -74,11 +81,11 @@ namespace ReniUI.Formatting
         internal ISourcePartEdit[] Edits => GetEdits();
 
         [EnableDump(Order = 4)]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         Syntax[] Children => this.CachedValue(GetChildren);
 
-        ISourcePartEdit[] FrameAnchorEdits
-            => FrameAnchors
-                .SelectMany(node => node.GetWhiteSpaceEdits(Configuration, 0))
+        ISourcePartEdit[] HeadAnchorEdits
+            => (HeadAnchor ?? Formatter.GetHeadAnchor(Main)).GetWhiteSpaceEdits(Configuration, 0)
                 .ToArray();
 
         ISourcePartEdit[] ChildrenEdits
@@ -89,7 +96,7 @@ namespace ReniUI.Formatting
         [EnableDump(Order = -5)]
         int LineBreakCount
             => this.CachedValue(()
-                => Parent == null || !Parent.IsLineSplit || LeftNeighbor == null || Main == null
+                => Parent == null || !Parent.IsLineSplit || LeftNeighbor == null
                     ? 0
                     : Configuration.AdditionalLineBreaksForMultilineItems &&
                     (LeftNeighbor.HasAlreadyLineBreakOrIsTooLong || HasAlreadyLineBreakOrIsTooLong)
@@ -101,18 +108,19 @@ namespace ReniUI.Formatting
             var result = Formatter.GetChildren(Main).Select(Create).ToArray();
             for(var index = 0; index < result.Length - 1; index++)
                 result[index + 1].LeftNeighbor = result[index];
+            ChildrenForDebug = result;
             return result;
         }
 
         internal static Syntax Create(Reni.SyntaxTree.Syntax target, Configuration configuration)
-            => new(target, configuration, null);
+            => new(null, target, configuration, null);
 
         Syntax Create(Formatter.Child child)
-            => new(child.FlatItem, Configuration, this);
+            => new(child.HeadAnchor, child.FlatItem, Configuration, this);
 
         ISourcePartEdit[] GetEdits()
         {
-            var sourcePartEdits = T(FrameAnchorEdits, ChildrenEdits)
+            var sourcePartEdits = T(HeadAnchorEdits, ChildrenEdits)
                 .ConcatMany().ToArray();
             return sourcePartEdits
                 .AddLineBreaks(LineBreakCount)

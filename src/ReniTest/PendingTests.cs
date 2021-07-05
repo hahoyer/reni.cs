@@ -1,4 +1,4 @@
-//17:50:57.188 26.05.2021 ran 170 of 180 
+//23:38:17.682 05.07.2021 ran 169 of 180 
 
 namespace hw.UnitTest
 {
@@ -9,9 +9,14 @@ namespace hw.UnitTest
         
 // error 
 
-            TestRunner.RunTest(new ReniUI.Test.StructFormattingCurrent().FlatList2Long);
-
-            TestRunner.RunTest(new ReniUI.Test.StructFormattingCurrent().FlatList2Long);
+TestRunner.RunTest(new ReniUI.Test.StructFormatting().One);
+TestRunner.RunTest(new ReniUI.Test.StructFormatting().Two);
+TestRunner.RunTest(new ReniUI.Test.StructFormatting().BreakLine);
+TestRunner.RunTest(new ReniUI.Test.StructFormatting().BreakLine3);
+TestRunner.RunTest(new ReniUI.Test.StructFormatting().BreakLineWithLimit1);
+TestRunner.RunTest(new ReniUI.Test.StructFormatting().BreakLineWithLimit0);
+TestRunner.RunTest(new ReniUI.Test.StructFormatting().OmitSpaceWhenLineBreakRemains);
+TestRunner.RunTest(new ReniUI.Test.StructFormatting().UseSpaceWhenLineBreakIsRemoved);
 TestRunner.RunTest(new ReniUI.Test.ThenElseMatching().Matching);
 TestRunner.RunTest(new ReniUI.Test.ThenElseMatching().NestedMatching);
 TestRunner.RunTest(new ReniUI.Test.TokenLocating().FromSourcePart);
@@ -60,6 +65,8 @@ TestRunner.RunTest(new ReniUI.Test.Formatting().UseLineBreakBeforeParenthesis);
 TestRunner.RunTest(new ReniUI.Test.Formatting().UseSpaceWhenLineBreakIsRemoved);
 TestRunner.RunTest(new ReniUI.Test.FormattingMultiLines().ReformatComments);
 TestRunner.RunTest(new ReniUI.Test.FormattingSimple().ReformatComments);
+TestRunner.RunTest(new ReniUI.Test.StructFormattingCurrent().FlatList2);
+TestRunner.RunTest(new ReniUI.Test.StructFormattingCurrent().FlatList2Long);
 TestRunner.RunTest(new ReniUI.Test.UserInterAction2().GetTokenForPosition);
 TestRunner.RunTest(new ReniUI.Test.UserInterAction3().GetTokenForPosition);
 

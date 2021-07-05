@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using hw.DebugFormatter;
 using hw.Helper;
 using Reni.SyntaxTree;
@@ -13,25 +14,21 @@ namespace ReniUI.Formatting
         internal sealed class Child
         {
             internal readonly Reni.SyntaxTree.Syntax FlatItem;
+            internal readonly BinaryTree HeadAnchor;
 
-            public Child(Reni.SyntaxTree.Syntax flatItem) => FlatItem = flatItem;
-
-            static BinaryTree GetHeadingAnchor(Reni.SyntaxTree.Syntax node)
+            public Child(BinaryTree headAnchor, Reni.SyntaxTree.Syntax flatItem)
             {
-                var result = node.Anchor.Items.First();
-                result.AssertIsNotNull();
-                result.Left.AssertIsNull();
-                return result;
+                HeadAnchor = headAnchor;
+                FlatItem = flatItem;
             }
+
+            public Child(Reni.SyntaxTree.Syntax flatItem)
+                : this(null, flatItem) { }
         }
 
         sealed class TrainWreck : Formatter
         {
-            protected internal override BinaryTree[] GetFrameAnchors(Reni.SyntaxTree.Syntax main)
-            {
-                (main.Anchor.Items.Length <= 1).Assert();
-                return new BinaryTree[0];
-            }
+            protected internal override BinaryTree GetHeadAnchor(Reni.SyntaxTree.Syntax target) => null;
 
             protected internal override IEnumerable<Child> GetChildren(Reni.SyntaxTree.Syntax target)
             {
@@ -43,7 +40,7 @@ namespace ReniUI.Formatting
             protected internal override bool IsIndentAtTailRequired => true;
 
             static Child GetCargo(Reni.SyntaxTree.Syntax node)
-                => new(
+                => new(node.MainAnchor,
                     node switch
                     {
                         ExpressionSyntax expression => expression.Right
@@ -67,17 +64,12 @@ namespace ReniUI.Formatting
 
         sealed class Compound : Formatter
         {
-            protected internal override BinaryTree[] GetFrameAnchors(Reni.SyntaxTree.Syntax main)
-                => main
-                    .Anchor
-                    .Items
-                    .Where(node => node.TokenClass is IRightBracket or ILeftBracket)
-                    .ToArray();
+            protected internal override BinaryTree GetHeadAnchor(Reni.SyntaxTree.Syntax target) => null;
 
             protected internal override IEnumerable<Child> GetChildren(Reni.SyntaxTree.Syntax target)
                 => ((CompoundSyntax)target)
                     .Statements
-                    .Select(node => new Child((Reni.SyntaxTree.Syntax)node))
+                    .Select(node => new Child(null, (Reni.SyntaxTree.Syntax)node))
                     .ToArray();
 
 
@@ -88,8 +80,7 @@ namespace ReniUI.Formatting
         class CompoundWithCleanup
             : Formatter
         {
-            protected internal override BinaryTree[] GetFrameAnchors(Reni.SyntaxTree.Syntax main) => throw
-                new NotImplementedException();
+            protected internal override BinaryTree GetHeadAnchor(Reni.SyntaxTree.Syntax target) => throw new NotImplementedException();
 
             protected internal override IEnumerable<Child> GetChildren
                 (Reni.SyntaxTree.Syntax target) => throw new NotImplementedException();
@@ -99,7 +90,7 @@ namespace ReniUI.Formatting
 
         sealed class Terminal : Formatter
         {
-            protected internal override BinaryTree[] GetFrameAnchors(Reni.SyntaxTree.Syntax main) => main.Anchor.Items;
+            protected internal override BinaryTree GetHeadAnchor(Reni.SyntaxTree.Syntax target) => target.MainAnchor;
             protected internal override IEnumerable<Child> GetChildren(Reni.SyntaxTree.Syntax target) => new Child[0];
 
             [DisableDump]
@@ -108,7 +99,7 @@ namespace ReniUI.Formatting
 
         sealed class Declaration : Formatter
         {
-            protected internal override BinaryTree[] GetFrameAnchors(Reni.SyntaxTree.Syntax main) => new BinaryTree[0];
+            protected internal override BinaryTree GetHeadAnchor(Reni.SyntaxTree.Syntax target) => throw new NotImplementedException();
 
             protected internal override IEnumerable<Child> GetChildren(Reni.SyntaxTree.Syntax target)
             {
@@ -145,7 +136,7 @@ namespace ReniUI.Formatting
                 (Reni.SyntaxTree.Syntax syntax) => (syntax as DeclarationSyntax)?.Value;
         }
 
-        protected internal abstract BinaryTree[] GetFrameAnchors(Reni.SyntaxTree.Syntax main);
+        protected internal abstract BinaryTree GetHeadAnchor(Reni.SyntaxTree.Syntax target);
         protected internal abstract IEnumerable<Child> GetChildren(Reni.SyntaxTree.Syntax target);
 
         [DisableDump]

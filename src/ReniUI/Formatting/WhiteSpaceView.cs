@@ -61,8 +61,9 @@ namespace ReniUI.Formatting
 
         ISourcePartEdit ISourcePartEdit.AddLineBreaks(int count)
         {
-            NotImplementedMethod(count);
-            return null;
+            (count > 0).Assert();
+            return new WhiteSpaceView(Target, Configuration, IsSeparatorRequired
+                , T(MinimalLineBreakCount, count).Max());
         }
 
         bool ISourcePartEdit.HasLines
