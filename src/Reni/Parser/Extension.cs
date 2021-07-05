@@ -77,7 +77,7 @@ namespace Reni.Parser
             => Lexer.IsMultiLineComment(item) || Lexer.IsLineComment(item);
 
         internal static bool IsMultiLineComment(this IItem item)
-            => Lexer.IsMultiLineComment(item) ;
+            => Lexer.IsMultiLineComment(item);
 
         internal static bool IsLineComment(this IItem item)
             => Lexer.IsLineComment(item);
@@ -174,7 +174,7 @@ namespace Reni.Parser
 
         internal static Result<TTarget> AddIssues<TTarget>(this TTarget target, params Issue[] issues)
             where TTarget : class
-            => new Result<TTarget>(target, issues);
+            => new(target, issues);
 
         internal static Result<TResult> Apply<TArg1, TResult>(this Result<TArg1> arg1, Func<TArg1, TResult> creator)
             where TArg1 : class
@@ -241,8 +241,11 @@ namespace Reni.Parser
         static string GetDumpAfterCurrent(this SourcePart target, int dumpWidth)
             => target.Source.GetDumpAfterCurrent(target.EndPosition, dumpWidth);
 
-        static string GetDumpBeforeCurrent(this SourcePart target, int dumpWidth) 
+        static string GetDumpBeforeCurrent(this SourcePart target, int dumpWidth)
             => target.Source.GetDumpBeforeCurrent(target.Position, dumpWidth);
+
+        public static SourcePart[] SourceParts(this BinaryTree[] targets)
+            => targets.Select(item => item.Token.SourcePart()).ToArray();
 
         public static string DumpSource(this SourcePart[] target, int dumpWidth = 5)
         {
@@ -271,14 +274,14 @@ namespace Reni.Parser
             var current = target[index];
             var next = index + 1 < target.Length? target[index + 1] : null;
 
-            var result = current.Id +"]";
+            var result = current.Id + "]";
             var delta = (next == null? current.Source.Length : next.Position) - current.EndPosition;
 
             if(next == null)
             {
                 if(delta < dumpWith + 3)
                     return result + current.End.Span(delta).Id;
-                return result  + current.End.Span(dumpWith).Id + "...";
+                return result + current.End.Span(dumpWith).Id + "...";
             }
 
             (current.Source == next.Source).Assert();
@@ -290,10 +293,10 @@ namespace Reni.Parser
                 return result + current.End.Span(next.Start).Id + "[";
 
             return result +
-                   current.End.Span(dumpWith).Id +
-                   "..." +
-                   (next.Start + -dumpWith).Span(dumpWith).Id +
-                   "[";
+                current.End.Span(dumpWith).Id +
+                "..." +
+                (next.Start + -dumpWith).Span(dumpWith).Id +
+                "[";
         }
 
         internal static SourcePart Combine(this IEnumerable<SourcePart> target1)

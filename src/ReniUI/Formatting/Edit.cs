@@ -16,14 +16,20 @@ namespace ReniUI.Formatting
             Flag = flag;
         }
 
+        ISourcePartEdit ISourcePartEdit.AddLineBreaks(int count)
+        {
+            NotImplementedMethod(count);
+            return null;
+        }
+
         bool ISourcePartEdit.HasLines => NewText.Contains("\n");
+        ISourcePartEdit ISourcePartEdit.Indent(int count) => this.CreateIndent(count);
 
         SourcePart ISourcePartEdit.SourcePart => Location;
-        ISourcePartEdit ISourcePartEdit.Indent(int count) => this.CreateIndent(count);
 
         protected override string GetNodeDump() => Flag ?? base.GetNodeDump();
 
         public static Edit Create(string flag, SourcePart location, string newText = "")
-            => new Edit(location, newText, flag);
+            => new(location, newText, flag);
     }
 }

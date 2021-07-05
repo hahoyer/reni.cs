@@ -23,7 +23,7 @@ namespace Reni.SyntaxTree
         }
 
         [DisableDump]
-        internal SourcePart[] SourceParts => Items.Select(item => item.Token.SourcePart()).ToArray();
+        internal SourcePart[] SourceParts => Items.SourceParts();
 
         [DisableDump]
         internal SourcePart SourcePart => SourceParts.Combine();

@@ -5,6 +5,7 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 using Reni.Helper;
+using Reni.Parser;
 using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
@@ -45,8 +46,10 @@ namespace ReniUI.Formatting
         [EnableDump(Order = -4)]
         string MainPosition => Main?.Position;
 
-        BinaryTree[] Anchors => Formatter.GetFrameAnchors(Main);
+        BinaryTree[] FrameAnchors => Formatter.GetFrameAnchors(Main);
         int IndentDirection => IsIndentRequired? 1 : 0;
+        [EnableDump(Order = -3)]
+        string FramePosition => FrameAnchors?.SourceParts().DumpSource();
 
         [EnableDump(Order = 3)]
         [EnableDumpExcept(false)]
@@ -73,8 +76,8 @@ namespace ReniUI.Formatting
         [EnableDump(Order = 4)]
         Syntax[] Children => this.CachedValue(GetChildren);
 
-        ISourcePartEdit[] AnchorEdits
-            => Anchors
+        ISourcePartEdit[] FrameAnchorEdits
+            => FrameAnchors
                 .SelectMany(node => node.GetWhiteSpaceEdits(Configuration, 0))
                 .ToArray();
 
@@ -83,7 +86,7 @@ namespace ReniUI.Formatting
                 .SelectMany(GetChildEdits)
                 .ToArray();
 
-        [EnableDump(Order = 5)]
+        [EnableDump(Order = -5)]
         int LineBreakCount
             => this.CachedValue(()
                 => Parent == null || !Parent.IsLineSplit || LeftNeighbor == null || Main == null
@@ -109,7 +112,7 @@ namespace ReniUI.Formatting
 
         ISourcePartEdit[] GetEdits()
         {
-            var sourcePartEdits = T(AnchorEdits, ChildrenEdits)
+            var sourcePartEdits = T(FrameAnchorEdits, ChildrenEdits)
                 .ConcatMany().ToArray();
             return sourcePartEdits
                 .AddLineBreaks(LineBreakCount)

@@ -75,9 +75,9 @@ namespace ReniUI.Formatting
                     .ToArray();
 
             protected internal override IEnumerable<Child> GetChildren(Reni.SyntaxTree.Syntax target)
-                => target
-                    .DirectChildren
-                    .Select(node => new Child(node))
+                => ((CompoundSyntax)target)
+                    .Statements
+                    .Select(node => new Child((Reni.SyntaxTree.Syntax)node))
                     .ToArray();
 
 
@@ -99,7 +99,7 @@ namespace ReniUI.Formatting
 
         sealed class Terminal : Formatter
         {
-            protected internal override BinaryTree[] GetFrameAnchors(Reni.SyntaxTree.Syntax main) => new BinaryTree[0];
+            protected internal override BinaryTree[] GetFrameAnchors(Reni.SyntaxTree.Syntax main) => main.Anchor.Items;
             protected internal override IEnumerable<Child> GetChildren(Reni.SyntaxTree.Syntax target) => new Child[0];
 
             [DisableDump]
@@ -158,7 +158,7 @@ namespace ReniUI.Formatting
                 case CompoundSyntax compound:
                     return compound.CleanupSection == null? new Compound() : new CompoundWithCleanup();
                 case ExpressionSyntax expression:
-                    return new TrainWreck();
+                    return expression.Left == null && expression.Right == null? new Terminal() : new TrainWreck();
                 case null:
                     return new Terminal();
                 case DeclarerSyntax.NameSyntax name:

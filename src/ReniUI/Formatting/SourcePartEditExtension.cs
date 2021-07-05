@@ -45,19 +45,16 @@ namespace ReniUI.Formatting
             if(count == 0)
                 return target;
 
-            Tracer.TraceBreak();
-            return null;
-
+            var result = target.Select(i => i).ToArray();
+            (result.Length > 0).Assert();
+            result[0] = result[0].AddLineBreaks(count);
+            return result;
         }
 
         static IEnumerable<TValue> T<TValue>(params TValue[] value) => value;
 
         public static ISourcePartEdit CreateIndent(this ISourcePartEdit target, int count)
             => count != 0 && target.HasLines? new IndentedSourcePartEdit(target, count) : target;
-
-        [Obsolete("", true)]
-        public static IEnumerable<ISourcePartEdit> Indent
-            (this IEnumerable<ISourcePartEdit> target, IndentDirection toRight) => throw new NotImplementedException();
     }
 
     class IndentedSourcePartEdit : DumpableObject, ISourcePartEdit, IEditPieces
@@ -81,6 +78,12 @@ namespace ReniUI.Formatting
             var result = Target.GetEditPieces(parameter);
             parameter.Indent = currentIndent;
             return result;
+        }
+
+        ISourcePartEdit ISourcePartEdit.AddLineBreaks(int count)
+        {
+            NotImplementedMethod(count);
+            return null;
         }
 
         bool ISourcePartEdit.HasLines => Target.HasLines;

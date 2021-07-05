@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
@@ -25,7 +24,7 @@ namespace ReniUI.Formatting
             public SourcePart Spaces;
         }
 
-        readonly CacheContainer Cache = new CacheContainer();
+        readonly CacheContainer Cache = new();
         readonly Configuration Configuration;
 
         readonly bool IsSeparatorRequired;
@@ -60,12 +59,18 @@ namespace ReniUI.Formatting
             => GetLineBreakEdits()
                 .Concat(GetSpaceEdits(parameter.IndentCharacterCount));
 
-        bool ISourcePartEdit.HasLines 
+        ISourcePartEdit ISourcePartEdit.AddLineBreaks(int count)
+        {
+            NotImplementedMethod(count);
+            return null;
+        }
+
+        bool ISourcePartEdit.HasLines
             => Target.HasLineComment() || GetTargetLineBreakCount(MinimalLineBreakCount) > 0;
 
-        SourcePart ISourcePartEdit.SourcePart => Target.SourcePart();
-
         ISourcePartEdit ISourcePartEdit.Indent(int count) => this.CreateIndent(count);
+
+        SourcePart ISourcePartEdit.SourcePart => Target.SourcePart();
 
         protected override string GetNodeDump() =>
             Target.SourcePart().GetDumpAroundCurrent(10) + " " + base.GetNodeDump();
@@ -146,7 +151,7 @@ namespace ReniUI.Formatting
             return T(minimalLineBreakCount, keepLineBreaks).Max();
         }
 
-        bool GetTargetSeparator(int minimalLineBreakCount) 
+        bool GetTargetSeparator(int minimalLineBreakCount)
             => GetTargetLineBreakCount(minimalLineBreakCount) == 0 && IsSeparatorRequired;
 
         /// <summary>

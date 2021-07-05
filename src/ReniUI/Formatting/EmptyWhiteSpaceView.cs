@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
@@ -38,11 +39,13 @@ namespace ReniUI.Formatting
                 yield return Edit.Create("+LineBreaksSpaces", Anchor.Start.Span(0), newText);
         }
 
+        ISourcePartEdit ISourcePartEdit.AddLineBreaks(int count)
+            => new EmptyWhiteSpaceView(Anchor, IsSeparatorRequired, T(MinimalLineBreakCount, count).Max());
+
         bool ISourcePartEdit.HasLines => MinimalLineBreakCount > 0;
-        SourcePart ISourcePartEdit.SourcePart => Anchor;
         ISourcePartEdit ISourcePartEdit.Indent(int count) => this.CreateIndent(count);
+        SourcePart ISourcePartEdit.SourcePart => Anchor;
 
         protected override string GetNodeDump() => Anchor.GetDumpAroundCurrent(5) + " " + base.GetNodeDump();
     }
-
 }
