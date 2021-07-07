@@ -10,20 +10,23 @@ namespace ReniUI.Formatting
 {
     abstract class Formatter : DumpableObject
     {
-        internal sealed class Child
+        internal sealed class Child : DumpableObject
         {
-            internal readonly Reni.SyntaxTree.Syntax FlatItem;
             internal readonly BinaryTree PrefixAnchor;
+            internal readonly Reni.SyntaxTree.Syntax FlatItem;
+            internal readonly bool HasAdditionalIndent;
             internal readonly Formatter Formatter;
 
             public Child
             (
                 BinaryTree prefixAnchor,
                 Reni.SyntaxTree.Syntax flatItem,
+                bool hasAdditionalIndent,
                 bool checkForBracketLevel = true
             )
             {
                 FlatItem = flatItem;
+                HasAdditionalIndent = hasAdditionalIndent;
                 PrefixAnchor = prefixAnchor;
                 Formatter = Create(flatItem, checkForBracketLevel);
             }
@@ -32,14 +35,15 @@ namespace ReniUI.Formatting
         class BracketLevel : Formatter
         {
             protected internal override IEnumerable<Child> GetChildren(Reni.SyntaxTree.Syntax target)
-                => T(new Child(null, target, false));
+                => T(new Child(null, target, false, false));
 
             internal override(BinaryTree begin, BinaryTree end) GetFrameAnchors(Reni.SyntaxTree.Syntax target)
                 => (target.LeftMostAnchor, target.Anchor.Items.First(item => item.TokenClass is RightParenthesis));
 
-            internal override void SetupLineBreaks(Syntax target) 
+            internal override void SetupLineBreaks(Syntax target)
                 => target.Anchors.End.EnsureLineBreaks(1);
 
+            [DisableDump]
             internal override bool IsIndentRequired => true;
         }
 
@@ -69,23 +73,26 @@ namespace ReniUI.Formatting
                 return wagons.Select(GetCargo);
             }
 
-            [DisableDump]
-            protected internal override bool IsIndentAtTailRequired => true;
-
             internal override(BinaryTree begin, BinaryTree end) GetFrameAnchors(Reni.SyntaxTree.Syntax target)
                 => (null, null);
 
             internal override void SetupLineBreaks(Syntax target)
-                => SetupLineBreaksForChildren(target, false, true);
+                => SetupLineBreaksForChildren(target, putLineBreaksBeforePrefix: true);
 
             static Child GetCargo(Reni.SyntaxTree.Syntax node)
-                => new(node.Anchor.Main, node switch
+            {
+                switch(node)
                 {
-                    ExpressionSyntax expression => expression.Right
-                    , SuffixSyntax => null
-                    , InfixSyntax infix => infix.Right
-                    , _ => null
-                });
+                    case ExpressionSyntax target:
+                        return new Child(node.Anchor.Main, target.Right, target.Left != null);
+                    case SuffixSyntax target:
+                        return new Child(node.Anchor.Main, null, target.Left != null);
+                    case InfixSyntax target:
+                        return new Child(node.Anchor.Main, target.Right, target.Left != null);
+                    default:
+                        return new Child(node.Anchor.Main, null, false);
+                }
+            }
 
             static IEnumerable<Reni.SyntaxTree.Syntax> GetWagons(Reni.SyntaxTree.Syntax syntax)
                 => syntax.Chain(GetWagon).Reverse();
@@ -113,27 +120,38 @@ namespace ReniUI.Formatting
 
             static Child GetChild
                 (Reni.SyntaxTree.Syntax target, IStatementSyntax node, int index)
-                => new(index == 0? null : target.Anchor.Items[index], (Reni.SyntaxTree.Syntax)node);
+                => new(index == 0? null : target.Anchor.Items[index], (Reni.SyntaxTree.Syntax)node, false);
         }
 
         abstract class CompoundWithCleanup : Formatter
         {
             protected internal override IEnumerable<Child> GetChildren
                 (Reni.SyntaxTree.Syntax target) => throw new NotImplementedException();
-
-            protected internal override bool IsIndentAtTailRequired => throw new NotImplementedException();
         }
 
         sealed class Declaration : Formatter
         {
             protected internal override IEnumerable<Child> GetChildren(Reni.SyntaxTree.Syntax target)
             {
+                var prefix = default(BinaryTree);
                 foreach(var syntax in GetList(target))
                     if(syntax is DeclarationSyntax declaration)
-                        yield return new Child(null, declaration.Declarer.Name);
+                    {
+                        yield return new Child(prefix, declaration.Declarer.Name, false);
+                        prefix = declaration.MainAnchor;
+                    }
                     else
-                        yield return new Child(null, syntax);
+                        yield return new Child(prefix, syntax, true);
             }
+
+            internal override(BinaryTree begin, BinaryTree end) GetFrameAnchors(Reni.SyntaxTree.Syntax target)
+                => (default, default);
+
+            internal override void SetupLineBreaks(Syntax target)
+                => SetupLineBreaksForChildren(target 
+                    , putLineBreaksBeforePrefix: target.Configuration.LineBreaksBeforeDeclarationToken
+                    , useAdditionalLineBreaksForMultilineItems:false
+                    );
 
             static IEnumerable<Reni.SyntaxTree.Syntax> GetList(Reni.SyntaxTree.Syntax syntax)
             {
@@ -160,15 +178,20 @@ namespace ReniUI.Formatting
 
         sealed class FlatChildCompound : FlatCompound
         {
-            internal override void SetupLineBreaks(Syntax target) 
-                => SetupLineBreaksForChildren(target, true, target.Configuration.LineBreaksBeforeListToken);
+            internal override void SetupLineBreaks(Syntax target)
+                => SetupLineBreaksForChildren(target
+                    , hasLineBreakAtTop: true
+                    , putLineBreaksBeforePrefix: target.Configuration.LineBreaksBeforeListToken
+                   );
         }
 
         sealed class FlatRootCompound : FlatCompound
         {
             internal override void SetupLineBreaks(Syntax target)
             {
-                SetupLineBreaksForChildren(target, false, target.Configuration.LineBreaksBeforeListToken);
+                SetupLineBreaksForChildren(target 
+                    , putLineBreaksBeforePrefix: target.Configuration.LineBreaksBeforeListToken
+                    );
 
                 if(target.Configuration.LineBreakAtEndOfText == null)
                     target.Anchors.End.EnsureLineBreaks(1);
@@ -182,7 +205,6 @@ namespace ReniUI.Formatting
 
             internal override(BinaryTree begin, BinaryTree end) GetFrameAnchors(Reni.SyntaxTree.Syntax target)
                 => (target.LeftMostAnchor, target.RightMostAnchor);
-
         }
 
         sealed class RootCompoundWithCleanup : CompoundWithCleanup
@@ -195,9 +217,6 @@ namespace ReniUI.Formatting
 
         protected internal abstract IEnumerable<Child> GetChildren(Reni.SyntaxTree.Syntax target);
 
-        [DisableDump]
-        protected internal virtual bool IsIndentAtTailRequired => false;
-
         internal virtual(BinaryTree begin, BinaryTree end) GetFrameAnchors(Reni.SyntaxTree.Syntax target)
         {
             NotImplementedMethod(target);
@@ -208,6 +227,7 @@ namespace ReniUI.Formatting
 
         public virtual void SetupUnconditionalLineBreaks(Syntax target) { }
 
+        [DisableDump]
         internal virtual bool IsIndentRequired => false;
 
         static Formatter Create(Reni.SyntaxTree.Syntax flatItem, bool checkForBracketLevel)
@@ -250,8 +270,18 @@ namespace ReniUI.Formatting
             return compound.CleanupSection == null? new FlatChildCompound() : new ChildCompoundWithCleanup();
         }
 
-        static void SetupLineBreaksForChildren(Syntax target, bool hasLineBreakAtTop, bool lineBreaksBeforeListToken)
+        static void SetupLineBreaksForChildren
+        (
+            Syntax target,
+            object _ = null,
+            bool hasLineBreakAtTop = false,
+            bool putLineBreaksBeforePrefix = false,
+            bool? useAdditionalLineBreaksForMultilineItems = null
+        )
         {
+            var useAdditionalLineBreaks 
+                = useAdditionalLineBreaksForMultilineItems ??
+                target.Configuration.AdditionalLineBreaksForMultilineItems; 
             Syntax leftNeighbor = null;
             foreach(var child in target.Children)
             {
@@ -259,11 +289,11 @@ namespace ReniUI.Formatting
                     ? hasLineBreakAtTop
                         ? 1
                         : 0
-                    : leftNeighbor.IsLineSplit || child.IsLineSplit
+                    : useAdditionalLineBreaks && (leftNeighbor.IsLineSplit || child.IsLineSplit)
                         ? 2
                         : 1;
 
-                child.EnsureLineBreaks(count, lineBreaksBeforeListToken);
+                child.EnsureLineBreaks(count, putLineBreaksBeforePrefix);
                 leftNeighbor = child;
             }
         }

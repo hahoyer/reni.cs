@@ -10,5 +10,6 @@
         public bool? LineBreakAtEndOfText = false;
         public bool AdditionalLineBreaksForMultilineItems = true;
         public bool LineBreaksBeforeListToken;
+        public bool LineBreaksBeforeDeclarationToken;
     }
 }

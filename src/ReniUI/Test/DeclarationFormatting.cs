@@ -11,6 +11,17 @@ namespace ReniUI.Test
     {
         [Test]
         [UnitTest]
+        public void ListWithDeclarationLineBreakTest1()
+        {
+            const string text = @"lllll:bbbbb";
+            const string expectedText = @"lllll:
+    bbbbb";
+
+            text.SimpleFormattingTest(expectedText, 10, 1);
+        }
+
+        [Test]
+        [UnitTest]
         public void LabeledList()
         {
             const string text = @"llll:(aaaaa;llll:bbbbb;ccccc)";
@@ -22,17 +33,6 @@ namespace ReniUI.Test
 )";
 
             text.SimpleFormattingTest(expectedText, 12, 1);
-        }
-
-        [Test]
-        [UnitTest]
-        public void ListWithDeclarationLineBreakTest1()
-        {
-            const string text = @"lllll:bbbbb";
-            const string expectedText = @"lllll:
-    bbbbb";
-
-            text.SimpleFormattingTest(expectedText, 10, 1);
         }
 
         [Test]

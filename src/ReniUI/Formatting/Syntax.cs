@@ -78,6 +78,8 @@ namespace ReniUI.Formatting
         [EnableDump(Order = -1)]
         readonly Formatter Formatter;
 
+        readonly bool HasAdditionalIndent;
+
         Syntax LeftNeighbor;
 
         [UsedImplicitly]
@@ -88,6 +90,7 @@ namespace ReniUI.Formatting
             Main = child.FlatItem;
             Configuration = configuration;
             Anchors.Prefix = Anchor.Create(child.PrefixAnchor);
+            HasAdditionalIndent = child.HasAdditionalIndent;
             Parent = parent;
             Formatter = child.Formatter;
             if(Main != null)
@@ -145,7 +148,7 @@ namespace ReniUI.Formatting
                 .ToArray();
 
         internal static Syntax Create(Reni.SyntaxTree.Syntax target, Configuration configuration)
-            => new(new Formatter.Child(null, target,false), configuration, null);
+            => new(new Formatter.Child(null, target, false), configuration, null);
 
         Syntax Create(Formatter.Child child) => new(child, Configuration, this);
 
@@ -168,7 +171,7 @@ namespace ReniUI.Formatting
             if(child == null)
                 return new ISourcePartEdit[0];
             var result = child.Edits;
-            if(IsLineSplit && child.LeftNeighbor != null && Formatter.IsIndentAtTailRequired)
+            if(IsLineSplit && child.HasAdditionalIndent && !(child.IsLineSplit && child.Formatter.IsIndentRequired))
                 result = result.Indent(1).ToArray();
             return result;
         }
