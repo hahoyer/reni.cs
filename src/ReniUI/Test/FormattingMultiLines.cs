@@ -39,10 +39,8 @@ namespace ReniUI.Test
 
             var lineCount = newSource.Count(item => item == '\n');
 
-            Tracer.Assert
-            (
-                newSource.Replace("\r\n", "\n") == ExpectedText.Replace("\r\n", "\n"),
-                "\n\"" + newSource + "\"");
+            (newSource.Replace("\r\n", "\n") == ExpectedText.Replace("\r\n", "\n")).Assert
+            ("\n\"" + newSource + "\"");
         }
     }
 }

@@ -115,9 +115,9 @@ namespace Reni.SyntaxTree
             get
             {
                 var main = Anchor.Items.FirstOrDefault();
-                var mainPosition = main?.Token.Characters.Position;
+                var mainPosition = main?.Token.Characters;
                 var child = DirectChildren.FirstOrDefault()?.LeftMostAnchor;
-                var childPosition = child?.Token.Characters.Position;
+                var childPosition = child?.Token.Characters;
                 return mainPosition!= null && (childPosition == null || mainPosition < childPosition)
                     ? main
                     : child;
@@ -129,9 +129,9 @@ namespace Reni.SyntaxTree
             get
             {
                 var main = Anchor.Items.LastOrDefault();
-                var mainPosition = main?.Token.Characters.EndPosition;
+                var mainPosition = main?.Token.Characters;
                 var child = DirectChildren.LastOrDefault()?.RightMostAnchor;
-                var childPosition = child?.Token.Characters.Position;
+                var childPosition = child?.Token.Characters;
                 return mainPosition!= null && (childPosition == null || mainPosition > childPosition)
                     ? main
                     : child;
