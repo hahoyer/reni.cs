@@ -14,6 +14,7 @@ namespace ReniUI.Formatting
             Location = location;
             NewText = newText;
             Flag = flag;
+            StopByObjectIds(238);
         }
 
         ISourcePartEdit ISourcePartEdit.AddLineBreaks(int count)

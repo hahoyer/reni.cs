@@ -1,13 +1,12 @@
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Helper;
 using ReniUI.Formatting;
 
 namespace ReniUI.Test
 {
     static class Extension
     {
-        public static void SimpleTest
+        public static void SimpleFormattingTest
         (
             this string text,
             string expected = null,

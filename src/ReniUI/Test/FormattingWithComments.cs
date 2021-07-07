@@ -1,7 +1,5 @@
-using System.Diagnostics;
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Helper;
 using hw.UnitTest;
 using NUnit.Framework;
 using ReniUI.Formatting;
@@ -10,8 +8,8 @@ namespace ReniUI.Test
 {
     [UnitTest]
     [TestFixture]
-    [StructFormattingCurrent]
-    public sealed class FormattingSimple : DependenceProvider
+    [Formatting]
+    public sealed class FormattingWithComments : DependenceProvider
     {
 
         [Test]

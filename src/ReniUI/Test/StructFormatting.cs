@@ -11,20 +11,20 @@ namespace ReniUI.Test
     {
         [Test]
         [UnitTest]
-        public void BreakLine() => @"aaaaa bbbbb".SimpleTest(maxLineLength: 10, expected: @"aaaaa
+        public void BreakLine() => @"aaaaa bbbbb".SimpleFormattingTest(maxLineLength: 10, expected: @"aaaaa
     bbbbb");
 
         [Test]
         [UnitTest]
-        public void One() => @"aaaaa".SimpleTest();
+        public void One() => @"aaaaa".SimpleFormattingTest();
 
         [Test]
         [UnitTest]
-        public void Two() => @"aaaaa bbbbb".SimpleTest();
+        public void Two() => @"aaaaa bbbbb".SimpleFormattingTest();
 
         [Test]
         [UnitTest]
-        public void BreakLine3() => @"aaaaa bbbbb ccccc".SimpleTest(maxLineLength: 10, expected: @"aaaaa
+        public void BreakLine3() => @"aaaaa bbbbb ccccc".SimpleFormattingTest(maxLineLength: 10, expected: @"aaaaa
     bbbbb
     ccccc");
 
@@ -32,7 +32,7 @@ namespace ReniUI.Test
         [UnitTest]
         public void BreakLineWithLimit1() => @"aaaaa 
 
-bbbbb".SimpleTest(@"aaaaa
+bbbbb".SimpleFormattingTest(@"aaaaa
     bbbbb",
             emptyLineLimit: 1);
 
@@ -40,7 +40,7 @@ bbbbb".SimpleTest(@"aaaaa
         [UnitTest]
         public void BreakLineWithLimit0() => @"aaaaa 
 
-bbbbb".SimpleTest(@"aaaaa bbbbb",
+bbbbb".SimpleFormattingTest(@"aaaaa bbbbb",
             emptyLineLimit: 0);
 
 
@@ -56,7 +56,7 @@ b";
     b"
                 .Replace("\r\n", "\n");
 
-            text.SimpleTest(expectedText);
+            text.SimpleFormattingTest(expectedText);
         }
 
         [UnitTest]

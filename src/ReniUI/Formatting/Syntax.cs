@@ -24,9 +24,10 @@ namespace ReniUI.Formatting
             Anchor(BinaryTree target)
             {
                 Target = target;
-                StopByObjectIds(243);
+                StopByObjectIds();
             }
 
+            [UsedImplicitly]
             internal string TargetPosition => Target.Token.SourcePart().GetDumpAroundCurrent(5);
 
             internal static Anchor Create(BinaryTree anchor) => anchor == null? null : new Anchor(anchor);
@@ -41,16 +42,33 @@ namespace ReniUI.Formatting
             }
         }
 
-        [EnableDump(Order = -2)]
-        [EnableDumpExcept(null)]
-        internal readonly Anchor EndAnchor;
+        internal sealed class AnchorsClass : DumpableObject
+        {
+            [EnableDump]
+            [EnableDumpExcept(null)]
+            internal Anchor Prefix;
+
+            [EnableDump]
+            [EnableDumpExcept(null)]
+            internal Anchor Begin;
+
+            [EnableDump]
+            [EnableDumpExcept(null)]
+            internal Anchor End;
+
+            internal ISourcePartEdit[] GetEdits(Configuration configuration)
+                => T(Prefix, Begin, End)
+                    .Select(anchor => anchor?.GetWhiteSpaceEdits(configuration))
+                    .ConcatMany()
+                    .ToArray();
+        }
 
         [DisableDump]
         internal readonly Configuration Configuration;
 
-        [EnableDump(Order = -4)]
-        [EnableDumpExcept(null)]
-        readonly Anchor BeginAnchor;
+        [EnableDump]
+        internal readonly AnchorsClass Anchors = new();
+
 
         [DisableDump]
         readonly Syntax Parent;
@@ -59,12 +77,6 @@ namespace ReniUI.Formatting
 
         [EnableDump(Order = -1)]
         readonly Formatter Formatter;
-
-        [EnableDump]
-        [EnableDumpExcept(null)]
-        readonly Anchor PrefixAnchor;
-
-        bool IsIndentRequired => Formatter.IsIndentRequired;
 
         Syntax LeftNeighbor;
 
@@ -75,12 +87,15 @@ namespace ReniUI.Formatting
         {
             Main = child.FlatItem;
             Configuration = configuration;
-            PrefixAnchor = Anchor.Create(child.PrefixAnchor);
+            Anchors.Prefix = Anchor.Create(child.PrefixAnchor);
             Parent = parent;
-            Formatter = Formatter.Create(Main);
-            var frameAnchors = Formatter.GetFrameAnchors(Main);
-            BeginAnchor = Anchor.Create(frameAnchors.begin);
-            EndAnchor = Anchor.Create(frameAnchors.end);
+            Formatter = child.Formatter;
+            if(Main != null)
+            {
+                var frameAnchors = Formatter.GetFrameAnchors(Main);
+                Anchors.Begin = Anchor.Create(frameAnchors.begin);
+                Anchors.End = Anchor.Create(frameAnchors.end);
+            }
 
             StopByObjectIds();
         }
@@ -90,6 +105,8 @@ namespace ReniUI.Formatting
         int ITree<Syntax>.DirectChildCount => Children.Length;
         Syntax ITree<Syntax>.GetDirectChild(int index) => Children[index];
         int ITree<Syntax>.LeftDirectChildCount => 0;
+
+        bool IsIndentRequired => Formatter.IsIndentRequired;
 
         [EnableDump(Order = -3)]
         string MainPosition => Main?.Position;
@@ -104,12 +121,12 @@ namespace ReniUI.Formatting
         {
             get
             {
+                if(Main == null)
+                    return false;
                 var lineLength = Main.MainAnchor.GetFlatLength(Configuration.EmptyLineLimit != 0);
                 return lineLength == null || lineLength > Configuration.MaxLineLength;
             }
         }
-
-        int ClosingLineBreakCount => IsLineSplit? Formatter.GetClosingLineBreakCount(this) : 0;
 
         [DisableDump]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -119,11 +136,7 @@ namespace ReniUI.Formatting
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal Syntax[] Children => this.CachedValue(GetChildren);
 
-        ISourcePartEdit[] AnchorEdits
-            => T(PrefixAnchor, BeginAnchor, EndAnchor)
-                .Select(anchor => anchor?.GetWhiteSpaceEdits(Configuration))
-                .ConcatMany()
-                .ToArray();
+        ISourcePartEdit[] AnchorEdits => Anchors.GetEdits(Configuration);
 
         ISourcePartEdit[] ChildrenEdits
             => Children
@@ -132,7 +145,7 @@ namespace ReniUI.Formatting
                 .ToArray();
 
         internal static Syntax Create(Reni.SyntaxTree.Syntax target, Configuration configuration)
-            => new(new Formatter.Child(null, target), configuration, null);
+            => new(new Formatter.Child(null, target,false), configuration, null);
 
         Syntax Create(Formatter.Child child) => new(child, Configuration, this);
 
@@ -174,10 +187,10 @@ namespace ReniUI.Formatting
 
         internal void EnsureLineBreaks(int count, bool beforePrefix)
         {
-            if(beforePrefix && PrefixAnchor != null)
-                PrefixAnchor.EnsureLineBreaks(count);
-            else if(BeginAnchor != null)
-                BeginAnchor.EnsureLineBreaks(count);
+            if(beforePrefix && Anchors.Prefix != null)
+                Anchors.Prefix.EnsureLineBreaks(count);
+            else if(Anchors.Begin != null)
+                Anchors.Begin.EnsureLineBreaks(count);
             else
             {
                 (Children.Length > 0).Assert();
