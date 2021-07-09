@@ -1,6 +1,7 @@
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using hw.Parser;
 using Reni.Helper;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
@@ -9,36 +10,34 @@ namespace Reni.SyntaxFactory
 {
     class ColonHandler : DumpableObject, IStatementProvider
     {
+        enum Kind
+        {
+            Anchor
+            , Tag
+            , Name
+        }
+
         IStatementSyntax IStatementProvider.Get(BinaryTree target, Factory factory)
         {
             var nodes = target
                 .Left
                 .GetNodesFromLeftToRight()
                 .Where(node => node != null)
-                .Split(node => node.TokenClass is IDeclarationTagToken, true)
-                .ToArray();
+                .GroupBy(Classification)
+                .ToDictionary(pair => pair.Key, pair => pair.ToArray());
 
-            var hasPrefix = !(nodes.First().First().TokenClass is IDeclarationTagToken);
+            nodes.TryGetValue(Kind.Tag, out var tags);
+            nodes.TryGetValue(Kind.Name, out var names);
 
-            var result = nodes
-                .Skip(hasPrefix? 1 : 0)
-                .Select(factory.CombineWithSuffix)
-                .Aggregate();
+            var declarer = DeclarerSyntax.Create(tags, names, factory.MeansPublic, target.Left);
 
-            var anchor = hasPrefix? Anchor.Create(nodes.First()) : null;
-
-            if(result == null)
-            {
-                if(nodes.Length == 1 && nodes.First().Count() == 1)
-                    result = factory.CombineWithSuffix(nodes.Single());
-                else
-                    NotImplementedMethod(target, factory, nameof(nodes), nodes);
-            }
-            
-            (result != null).Assert();
-
-            return DeclarationSyntax
-                .Create(result, factory.GetValueSyntax(target.Right), Anchor.Create(target).Combine(anchor));
+            return DeclarationSyntax.Create(declarer, factory.GetValueSyntax(target.Right), Anchor.Create(target));
         }
+
+        static Kind Classification(BinaryTree node)
+            => node.TokenClass switch
+            {
+                Definable => Kind.Name, IDeclarationTagToken => Kind.Tag, _ => Kind.Anchor
+            };
     }
 }

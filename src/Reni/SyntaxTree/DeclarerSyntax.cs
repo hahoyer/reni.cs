@@ -39,19 +39,21 @@ namespace Reni.SyntaxTree
 
         readonly DeclarerSyntax Hidden;
         readonly bool? MeansPublic;
+        readonly BinaryTree SpecialAnchor;
         readonly Anchor Anchor;
 
         readonly ValueCache<Syntax[]> DirectChildren;
 
-        DeclarerSyntax(DeclarerSyntax hidden, TagSyntax[] tags, NameSyntax name, bool? meansPublic)
+        DeclarerSyntax(DeclarerSyntax hidden, TagSyntax[] tags, NameSyntax name, bool? meansPublic, BinaryTree specialAnchor = null)
         {
             Hidden = hidden;
             Tags = tags;
             Name = name;
             MeansPublic = meansPublic;
+            SpecialAnchor = specialAnchor;
 
-            Anchor = Anchor.Create(T(hidden?.Anchor.Items, tags.SelectMany(t => t.Anchor.Items).ToArray()
-                , name?.Anchor.Items).ConcatMany());
+
+            Anchor = Anchor.Create(T(hidden?.Anchor.Items, T(specialAnchor)).ConcatMany());
 
             DirectChildren = new ValueCache<Syntax[]>(() => DirectChildCount.Select(GetDirectChild).ToArray());
 
@@ -62,6 +64,7 @@ namespace Reni.SyntaxTree
         DeclarerSyntax IAggregateable<DeclarerSyntax>.Aggregate(DeclarerSyntax other) => Combine(other);
 
         Anchor IItem.Anchor => Anchor;
+        BinaryTree IItem.SpecialAnchor => SpecialAnchor;
         Syntax[] IItem.DirectChildren => DirectChildren.Value;
 
         protected override string GetNodeDump()
@@ -118,13 +121,31 @@ namespace Reni.SyntaxTree
                 Definable _ => FromName(target, meansPublic, frameItems), _ => FromTag(target, meansPublic, frameItems)
             };
 
+        internal static DeclarerSyntax Create
+            (BinaryTree[] tags, BinaryTree[] names, bool meansPublic, BinaryTree specialAnchor)
+        {
+            (names.Length < 2).Assert("To do");//todo: Error handling if more than one name is provided
+            
+            var tagSyntax = tags?.Select(tag=>GetTagSyntax(tag)).ToArray();
+            var nameSyntax = GetNameSyntax(names);
+            return new DeclarerSyntax(null, tagSyntax, nameSyntax, meansPublic, specialAnchor);
+        }
+
+        static NameSyntax GetNameSyntax(BinaryTree[] names)
+        {
+            if(names == null || !names.Any())
+                return null;
+            var name = names[0];
+            return new NameSyntax(name.Token.Characters.Id, Anchor.Create(name));
+        }
+
         static DeclarerSyntax FromTag(BinaryTree target, bool meansPublic, Anchor frameItems)
         {
             var tagSyntax = GetTagSyntax(target, frameItems);
             return new DeclarerSyntax(null, new[] {tagSyntax}, null, meansPublic);
         }
 
-        static TagSyntax GetTagSyntax(BinaryTree target, Anchor anchor)
+        static TagSyntax GetTagSyntax(BinaryTree target, Anchor anchor= null)
         {
             var tag = target.TokenClass as DeclarationTagToken;
             var issue = tag == null? IssueId.InvalidDeclarationTag.Issue(target.Token.Characters) : null;
@@ -153,5 +174,6 @@ namespace Reni.SyntaxTree
 
         public bool IsDefining(string name, bool publicOnly)
             => name != null && Name?.Value == name && (!publicOnly || IsPublic);
+
     }
 }

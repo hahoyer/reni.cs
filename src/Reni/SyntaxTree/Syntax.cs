@@ -60,6 +60,7 @@ namespace Reni.SyntaxTree
 
         Anchor IItem.Anchor => Anchor;
         Syntax[] IItem.DirectChildren => DirectChildren;
+        BinaryTree IItem.SpecialAnchor => null;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         int ITree<Syntax>.DirectChildCount => DirectChildCount;
