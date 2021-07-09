@@ -124,9 +124,9 @@ namespace Reni.SyntaxTree
         internal static DeclarerSyntax Create
             (BinaryTree[] tags, BinaryTree[] names, bool meansPublic, BinaryTree specialAnchor)
         {
-            (names.Length < 2).Assert("To do");//todo: Error handling if more than one name is provided
+            (names == null || names.Length < 2).Assert("To do");//todo: Error handling if more than one name is provided
             
-            var tagSyntax = tags?.Select(tag=>GetTagSyntax(tag)).ToArray();
+            var tagSyntax = (tags??new BinaryTree[0]).Select(tag=>GetTagSyntax(tag)).ToArray();
             var nameSyntax = GetNameSyntax(names);
             return new DeclarerSyntax(null, tagSyntax, nameSyntax, meansPublic, specialAnchor);
         }
