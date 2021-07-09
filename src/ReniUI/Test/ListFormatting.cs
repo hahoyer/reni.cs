@@ -186,12 +186,18 @@ ccccc";
         {
             const string text =
                 @"1;
-!mutable FreePointer: Memory array_reference mutable;
-3;
-(Text('H') << 'allo') dump_print"
-;
 
-            text.SimpleFormattingTest(null, 70, 0);
+repeat:
+    @ ^ while()
+    then
+    (
+        ^ body(),
+        repeat(^)
+    );
+
+2";
+
+            text.SimpleFormattingTest(null, 20, 0);
         }
     }
 }

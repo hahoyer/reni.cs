@@ -260,11 +260,20 @@ namespace ReniUI.Formatting
             }
 
             internal override void SetupLineBreaks(Syntax target)
-                => SetupLineBreaksForChildren(
+            {
+                var thenClause = target.Children[1];
+                thenClause.Anchors.Prefix.EnsureLineBreaks(1);
+                if(thenClause.IsLineSplit)
+                    thenClause.Anchors.Begin.EnsureLineBreaks(1);
+                if(target.Children.Length == 2)
+                    return;
+                NotImplementedMethod(target);
+                SetupLineBreaksForChildren(
                     target
                     , putLineBreaksBeforePrefix: true
                     , useAdditionalLineBreaksForMultilineItems: false
                 );
+            }
         }
 
         sealed class Function : Formatter
@@ -279,22 +288,13 @@ namespace ReniUI.Formatting
                 yield return new Child(target.Anchor.Items[0], target.DirectChildren[1], false);
             }
 
-            internal override void SetupLineBreaks(Syntax target) => throw new NotImplementedException();
-        }
-
-        sealed class Declarer : Formatter
-        {
-            internal static readonly Formatter Instance = new Declarer();
-
-            protected internal override IEnumerable<Child> GetChildren(IItem target)
+            internal override void SetupLineBreaks(Syntax target)
             {
+                if(target.Children.Length == 1)
+                    return;
+
                 NotImplementedMethod(target);
-                return target.DirectChildren.Select(GetChild).ToArray();
             }
-
-            internal override void SetupLineBreaks(Syntax target) => throw new NotImplementedException();
-
-            static Child GetChild(Reni.SyntaxTree.Syntax node) => new(null, node, false);
         }
 
         sealed class Special : Formatter
@@ -305,7 +305,7 @@ namespace ReniUI.Formatting
             protected internal override IEnumerable<Child> GetChildren(IItem target)
                 => target.SpecialAnchor.GetNodesFromLeftToRight().Select(GetChild);
 
-            Child GetChild(BinaryTree target) => new Child(target, null, false);
+            static Child GetChild(BinaryTree target) => new Child(target, null, false);
         }
 
         protected internal abstract IEnumerable<Child> GetChildren(IItem target);
@@ -352,8 +352,6 @@ namespace ReniUI.Formatting
                     return Declaration.Instance;
                 case CondSyntax:
                     return Conditional.Instance;
-                case DeclarerSyntax:
-                    return Declarer.Instance;
                 case FunctionSyntax:
                     return Function.Instance;
 
