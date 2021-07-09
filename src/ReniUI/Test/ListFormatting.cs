@@ -185,12 +185,13 @@ ccccc";
         public void MultilineBreakTest11()
         {
             const string text =
-                    @"1 = 1 then 2 else 4;
+                @"1;
+!mutable FreePointer: Memory array_reference mutable;
 3;
 (Text('H') << 'allo') dump_print"
-                ;
+;
 
-            text.SimpleFormattingTest(null, 40, 0);
+            text.SimpleFormattingTest(null, 70, 0);
         }
     }
 }

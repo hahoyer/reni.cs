@@ -17,7 +17,7 @@ namespace ReniUI.Formatting
             internal readonly bool HasAdditionalIndent;
             internal readonly Formatter Formatter;
 
-            public Child
+            internal Child
             (
                 BinaryTree prefixAnchor,
                 IItem flatItem,
@@ -52,7 +52,7 @@ namespace ReniUI.Formatting
 
         sealed class Terminal : Formatter
         {
-            public static readonly Formatter Instance = new Terminal();
+            internal static readonly Formatter Instance = new Terminal();
             protected internal override IEnumerable<Child> GetChildren(IItem target) => new Child[0];
 
             internal override(BinaryTree begin, BinaryTree end) GetFrameAnchors(IItem target)
@@ -71,7 +71,7 @@ namespace ReniUI.Formatting
 
         sealed class TrainWreck : Formatter
         {
-            public static readonly Formatter Instance = new TrainWreck();
+            internal static readonly Formatter Instance = new TrainWreck();
 
             protected internal override IEnumerable<Child> GetChildren(IItem target)
             {
@@ -137,11 +137,13 @@ namespace ReniUI.Formatting
         {
             protected internal override IEnumerable<Child> GetChildren(IItem target)
                 => throw new NotImplementedException();
+
+            internal override void SetupLineBreaks(Syntax target) => throw new NotImplementedException();
         }
 
         sealed class Declaration : Formatter
         {
-            public static readonly Formatter Instance = new Declaration();
+            internal static readonly Formatter Instance = new Declaration();
 
             protected internal override IEnumerable<Child> GetChildren(IItem target)
             {
@@ -185,7 +187,7 @@ namespace ReniUI.Formatting
 
         sealed class FlatChildCompound : FlatCompound
         {
-            public static readonly Formatter Instance = new FlatChildCompound();
+            internal static readonly Formatter Instance = new FlatChildCompound();
 
             internal override void SetupLineBreaks(Syntax target)
                 => SetupLineBreaksForChildren(target
@@ -196,7 +198,7 @@ namespace ReniUI.Formatting
 
         sealed class FlatRootCompound : FlatCompound
         {
-            public static readonly Formatter Instance = new FlatRootCompound();
+            internal static readonly Formatter Instance = new FlatRootCompound();
 
             internal override void SetupLineBreaks(Syntax target)
             {
@@ -208,7 +210,7 @@ namespace ReniUI.Formatting
                     target.Anchors.End.EnsureLineBreaks(1);
             }
 
-            public override void SetupUnconditionalLineBreaks(Syntax target)
+            internal override void SetupUnconditionalLineBreaks(Syntax target)
             {
                 if(target.Configuration.LineBreakAtEndOfText == true)
                     target.Anchors.End.EnsureLineBreaks(1);
@@ -220,7 +222,7 @@ namespace ReniUI.Formatting
 
         sealed class RootCompoundWithCleanup : CompoundWithCleanup
         {
-            public static readonly Formatter Instance = new RootCompoundWithCleanup();
+            internal static readonly Formatter Instance = new RootCompoundWithCleanup();
 
             protected internal override IEnumerable<Child> GetChildren(IItem target)
             {
@@ -234,12 +236,12 @@ namespace ReniUI.Formatting
 
         sealed class ChildCompoundWithCleanup : CompoundWithCleanup
         {
-            public static readonly Formatter Instance = new ChildCompoundWithCleanup();
+            internal static readonly Formatter Instance = new ChildCompoundWithCleanup();
         }
 
         sealed class Conditional : Formatter
         {
-            public static readonly Formatter Instance = new Conditional();
+            internal static readonly Formatter Instance = new Conditional();
 
             protected internal override IEnumerable<Child> GetChildren(IItem target)
             {
@@ -265,7 +267,7 @@ namespace ReniUI.Formatting
 
         sealed class Function : Formatter
         {
-            public static readonly Formatter Instance = new Function();
+            internal static readonly Formatter Instance = new Function();
 
             protected internal override IEnumerable<Child> GetChildren(IItem target)
             {
@@ -274,16 +276,26 @@ namespace ReniUI.Formatting
 
                 yield return new Child(target.Anchor.Items[0], target.DirectChildren[1], false);
             }
+
+            internal override void SetupLineBreaks(Syntax target) => throw new NotImplementedException();
         }
 
         sealed class Declarer : Formatter
         {
-            public static readonly Formatter Instance = new Declarer();
+            internal static readonly Formatter Instance = new Declarer();
 
             protected internal override IEnumerable<Child> GetChildren(IItem target)
-                => target.DirectChildren.Select(GetChild).ToArray();
+            {
+                NotImplementedMethod(target);
+                return target.DirectChildren.Select(GetChild).ToArray();
+            }
 
-            static Child GetChild(Reni.SyntaxTree.Syntax node) => new(null, node, false);
+            static Child GetChild(Reni.SyntaxTree.Syntax node)
+            {
+                return new(null, node, false);
+            }
+
+            internal override void SetupLineBreaks(Syntax target) => throw new NotImplementedException();
         }
 
         protected internal abstract IEnumerable<Child> GetChildren(IItem target);
@@ -291,9 +303,9 @@ namespace ReniUI.Formatting
         internal virtual(BinaryTree begin, BinaryTree end) GetFrameAnchors(IItem target)
             => (default, default);
 
-        internal virtual void SetupLineBreaks(Syntax target) => NotImplementedMethod(target);
+        internal abstract void SetupLineBreaks(Syntax target);
 
-        public virtual void SetupUnconditionalLineBreaks(Syntax target) { }
+        internal virtual void SetupUnconditionalLineBreaks(Syntax target) { }
 
         [DisableDump]
         internal virtual bool IsIndentRequired => false;
