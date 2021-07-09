@@ -6,6 +6,7 @@ namespace ReniUI.Test
 {
     [UnitTest]
     [PairedSyntaxTree]
+    [UserInterAction]
     public sealed class BadUserInterAction : DependenceProvider
     {
         [UnitTest]

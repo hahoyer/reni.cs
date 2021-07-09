@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using Reni.Helper;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
 
@@ -22,7 +23,8 @@ namespace ReniUI.Formatting
                 BinaryTree prefixAnchor,
                 IItem flatItem,
                 bool hasAdditionalIndent,
-                bool checkForBracketLevel = true
+                bool checkForBracketLevel = true,
+                Formatter forcedFormatter = null
             )
             {
                 FlatItem = flatItem;
@@ -290,20 +292,28 @@ namespace ReniUI.Formatting
                 return target.DirectChildren.Select(GetChild).ToArray();
             }
 
-            static Child GetChild(Reni.SyntaxTree.Syntax node)
-            {
-                return new(null, node, false);
-            }
-
             internal override void SetupLineBreaks(Syntax target) => throw new NotImplementedException();
+
+            static Child GetChild(Reni.SyntaxTree.Syntax node) => new(null, node, false);
+        }
+
+        sealed class Special : Formatter
+        {
+            internal static readonly Formatter Instance = new Special();
+            internal override void SetupLineBreaks(Syntax target) => throw new NotImplementedException();
+
+            protected internal override IEnumerable<Child> GetChildren(IItem target)
+                => target.SpecialAnchor.GetNodesFromLeftToRight().Select(GetChild);
+
+            Child GetChild(BinaryTree target) => new Child(target, null, false);
         }
 
         protected internal abstract IEnumerable<Child> GetChildren(IItem target);
 
+        internal abstract void SetupLineBreaks(Syntax target);
+
         internal virtual(BinaryTree begin, BinaryTree end) GetFrameAnchors(IItem target)
             => (default, default);
-
-        internal abstract void SetupLineBreaks(Syntax target);
 
         internal virtual void SetupUnconditionalLineBreaks(Syntax target) { }
 
@@ -312,6 +322,9 @@ namespace ReniUI.Formatting
 
         static Formatter Create(IItem flatItem, bool checkForBracketLevel)
         {
+            if(flatItem?.SpecialAnchor != null)
+                return Special.Instance;
+
             if(checkForBracketLevel && HasBrackets(flatItem))
                 return BracketLevel.Instance;
 
