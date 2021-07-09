@@ -86,7 +86,7 @@ namespace ReniUI.Formatting
 
             static Child GetCargo(IItem node)
             {
-                var prefixAnchor = node.Anchor.Items.First();
+                var prefixAnchor = node.Anchor.Items.First(item=> item.TokenClass is not LeftParenthesis);
                 switch(node)
                 {
                     case ExpressionSyntax target:

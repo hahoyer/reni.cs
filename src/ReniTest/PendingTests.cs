@@ -1,4 +1,4 @@
-//16:56:17.484 09.07.2021 ran 172 of 181 
+//19:13:30.676 09.07.2021 ran 172 of 181 
 
 namespace hw.UnitTest
 {
@@ -8,8 +8,6 @@ namespace hw.UnitTest
         {
         
 // error 
-
-TestRunner.RunTest(new ReniUI.Test.ListFormatting().MultilineBreakTest11);TestRunner.RunTest(new ReniUI.Test.Formatting().Reformat1_120);
 
 TestRunner.RunTest(new ReniUI.Test.Formatting().Reformat1_120Temp);
 TestRunner.RunTest(new ReniUI.Test.Formatting().Reformat2);

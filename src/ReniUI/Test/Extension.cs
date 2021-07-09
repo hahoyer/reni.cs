@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Reflection.Emit;
 using hw.DebugFormatter;
 using ReniUI.Formatting;
 
@@ -14,10 +15,11 @@ namespace ReniUI.Test
             int? emptyLineLimit = null
         )
         {
-            expected ??= text;
+            var canonicalText = text.Replace("\r\n", "\n");
+            expected ??= canonicalText;
             expected = expected.Replace("\r\n", "\n");
 
-            var compiler = CompilerBrowser.FromText(text);
+            var compiler = CompilerBrowser.FromText(canonicalText);
             var newSource = compiler.Reformat
                 (
                     new ReniUI.Formatting.Configuration {MaxLineLength = maxLineLength, EmptyLineLimit = emptyLineLimit}

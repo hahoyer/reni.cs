@@ -5,16 +5,23 @@ namespace ReniUI.Formatting
 {
     public sealed class Edit : DumpableObject, ISourcePartEdit
     {
-        public readonly SourcePart Location;
-        public readonly string NewText;
-        public readonly string Flag;
+        [DisableDump]
+        internal readonly SourcePart Location;
+
+        [EnableDump(Order = 1)]
+        string Position => Location.NodeDump;
+
+        [EnableDump(Order = 2)]
+        internal readonly string NewText;
+
+        readonly string Flag;
 
         Edit(SourcePart location, string newText, string flag)
         {
             Location = location;
             NewText = newText;
             Flag = flag;
-            StopByObjectIds(238);
+            StopByObjectIds();
         }
 
         ISourcePartEdit ISourcePartEdit.AddLineBreaks(int count)
