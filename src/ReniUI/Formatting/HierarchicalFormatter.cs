@@ -17,7 +17,7 @@ namespace ReniUI.Formatting
                 return new Edit[0];
 
             var item = Syntax.Create(compilerBrowser.Syntax.FlatItem, Configuration);
-            item.t();
+            //item.t();
             item.SetupLineBreaks();
             item.t();
             var sourcePartEdits = item.Edits.ToArray();

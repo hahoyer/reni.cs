@@ -2,14 +2,13 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
-using Reni.Parser;
 using Reni.SyntaxFactory;
 using Reni.TokenClasses;
 using Reni.Validation;
 
 namespace Reni.SyntaxTree
 {
-    sealed class DeclarerSyntax : DumpableObject, IAggregateable<DeclarerSyntax>
+    sealed class DeclarerSyntax : DumpableObject, IAggregateable<DeclarerSyntax>, IItem
     {
         internal class TagSyntax : Syntax.NoChildren
         {
@@ -40,6 +39,9 @@ namespace Reni.SyntaxTree
 
         readonly DeclarerSyntax Hidden;
         readonly bool? MeansPublic;
+        readonly Anchor Anchor;
+
+        readonly ValueCache<Syntax[]> DirectChildren;
 
         DeclarerSyntax(DeclarerSyntax hidden, TagSyntax[] tags, NameSyntax name, bool? meansPublic)
         {
@@ -48,8 +50,26 @@ namespace Reni.SyntaxTree
             Name = name;
             MeansPublic = meansPublic;
 
+            Anchor = Anchor.Create(T(hidden?.Anchor.Items, tags.SelectMany(t => t.Anchor.Items).ToArray()
+                , name?.Anchor.Items).ConcatMany());
+
+            DirectChildren = new ValueCache<Syntax[]>(() => DirectChildCount.Select(GetDirectChild).ToArray());
+
             StopByObjectIds();
         }
+
+
+        DeclarerSyntax IAggregateable<DeclarerSyntax>.Aggregate(DeclarerSyntax other) => Combine(other);
+
+        Anchor IItem.Anchor => Anchor;
+        Syntax[] IItem.DirectChildren => DirectChildren.Value;
+
+        protected override string GetNodeDump()
+            => base.GetNodeDump() +
+                "[" +
+                Tags.Select(tag => ((tag?.Value as TokenClass)?.Id ?? "?") + "!").Stringify("") +
+                (Name?.Value ?? "") +
+                "]";
 
         internal Issue Issue => Hidden == null? null : IssueId.StrangeDeclaration.Issue(Hidden.SourcePart);
 
@@ -84,8 +104,6 @@ namespace Reni.SyntaxTree
 
         [DisableDump]
         internal int DirectChildCount => (Hidden?.DirectChildCount ?? 0) + Tags.Length + 1;
-
-        DeclarerSyntax IAggregateable<DeclarerSyntax>.Aggregate(DeclarerSyntax other) => Combine(other);
 
         internal Syntax GetDirectChild(int index)
         {
@@ -135,12 +153,5 @@ namespace Reni.SyntaxTree
 
         public bool IsDefining(string name, bool publicOnly)
             => name != null && Name?.Value == name && (!publicOnly || IsPublic);
-
-        protected override string GetNodeDump()
-            => base.GetNodeDump() +
-               "[" +
-               Tags.Select(tag => ((tag?.Value as TokenClass)?.Id ?? "?") + "!").Stringify("") +
-               (Name?.Value ?? "") +
-               "]";
     }
 }

@@ -6,6 +6,7 @@ using hw.Helper;
 using hw.Parser;
 using JetBrains.Annotations;
 using Reni.Helper;
+using Reni.SyntaxTree;
 using Reni.TokenClasses;
 
 namespace ReniUI.Formatting
@@ -73,7 +74,7 @@ namespace ReniUI.Formatting
         [DisableDump]
         readonly Syntax Parent;
 
-        readonly Reni.SyntaxTree.Syntax Main;
+        readonly Reni.SyntaxTree.IItem Main;
 
         [EnableDump(Order = -1)]
         readonly Formatter Formatter;
@@ -112,7 +113,7 @@ namespace ReniUI.Formatting
         bool IsIndentRequired => Formatter.IsIndentRequired;
 
         [EnableDump(Order = -3)]
-        string MainPosition => Main?.Position;
+        string MainPosition => (Main as Reni.SyntaxTree.Syntax)?.Position;
 
         int IndentDirection => IsIndentRequired? 1 : 0;
 
@@ -126,7 +127,7 @@ namespace ReniUI.Formatting
             {
                 if(Main == null)
                     return false;
-                var lineLength = Main.MainAnchor.GetFlatLength(Configuration.EmptyLineLimit != 0);
+                var lineLength = Main.Anchor.Main.GetFlatLength(Configuration.EmptyLineLimit != 0);
                 return lineLength == null || lineLength > Configuration.MaxLineLength;
             }
         }

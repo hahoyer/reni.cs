@@ -11,6 +11,7 @@ namespace ReniUI.Test
     [DeclarationFormatting]
     [StructFormatting]
     [ListFormatting]
+    [ThenElseFormatting]
     public sealed class Formatting : DependenceProvider
     {
         [Test]

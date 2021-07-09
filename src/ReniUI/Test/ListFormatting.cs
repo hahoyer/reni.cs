@@ -1,7 +1,6 @@
 using hw.DebugFormatter;
 using hw.UnitTest;
 using NUnit.Framework;
-using ReniUI.Formatting;
 
 namespace ReniUI.Test
 {
@@ -179,6 +178,19 @@ ccccc";
 )".Replace("\r\n", "\n");
 
             text.SimpleFormattingTest(expectedText, 10, 1);
+        }
+
+        [Test]
+        [UnitTest]
+        public void MultilineBreakTest11()
+        {
+            const string text =
+                    @"1 = 1 then 2 else 4;
+3;
+(Text('H') << 'allo') dump_print"
+                ;
+
+            text.SimpleFormattingTest(null, 40, 0);
         }
     }
 }

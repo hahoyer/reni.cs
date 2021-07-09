@@ -3,7 +3,6 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Struct;
-using Reni.TokenClasses;
 
 namespace Reni.SyntaxTree
 {
@@ -37,12 +36,6 @@ namespace Reni.SyntaxTree
         }
 
         [DisableDump]
-        internal string Tag
-            => "@"
-               + (IsMetaFunction? "@" : "")
-               + (IsImplicit? "!" : "");
-
-        [DisableDump]
         internal override bool IsLambda => true;
 
         [DisableDump]
@@ -51,9 +44,7 @@ namespace Reni.SyntaxTree
         protected override Syntax GetDirectChild(int index)
             => index switch
             {
-                0 => Setter
-                , 1 => Getter
-                , _ => null
+                0 => Setter, 1 => Getter, _ => null
             };
 
         internal override Result ResultForCache(ContextBase context, Category category)
@@ -61,6 +52,12 @@ namespace Reni.SyntaxTree
                 .FindRecentCompoundView
                 .FunctionalType(this)
                 .Result(category);
+
+        protected override string GetNodeDump() => Setter?.NodeDump ?? "" + Tag + Getter.NodeDump;
+
+        [DisableDump]
+        internal string Tag
+            => "@" + (IsMetaFunction? "@" : "") + (IsImplicit? "!" : "");
 
         internal IMeta MetaFunctionFeature(CompoundView compoundView)
         {
@@ -78,7 +75,5 @@ namespace Reni.SyntaxTree
 
             return new FunctionBodyType(compoundView, this);
         }
-
-        protected override string GetNodeDump() => Setter?.NodeDump ?? "" + Tag + Getter.NodeDump;
     }
 }

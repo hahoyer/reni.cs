@@ -43,7 +43,7 @@ namespace Reni.SyntaxTree
         readonly IPrefix Prefix;
 
         [Node]
-        readonly ValueSyntax Right;
+        internal readonly ValueSyntax Right;
 
         readonly IToken Token;
 

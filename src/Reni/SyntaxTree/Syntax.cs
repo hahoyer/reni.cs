@@ -15,7 +15,7 @@ namespace Reni.SyntaxTree
     /// <summary>
     ///     Static syntax items
     /// </summary>
-    public abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer
+    public abstract class Syntax : DumpableObject, ITree<Syntax>, ValueCache.IContainer, IItem
     {
         internal abstract class NoChildren : Syntax
         {
@@ -56,11 +56,10 @@ namespace Reni.SyntaxTree
             Issue = issue;
         }
 
-        [EnableDump]
-        [EnableDumpExcept(null)]
-        internal string Position => Anchor.SourceParts.DumpSource(5);
+        ValueCache ValueCache.IContainer.Cache { get; } = new();
 
-        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
+        Anchor IItem.Anchor => Anchor;
+        Syntax[] IItem.DirectChildren => DirectChildren;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         int ITree<Syntax>.DirectChildCount => DirectChildCount;
@@ -100,6 +99,12 @@ namespace Reni.SyntaxTree
                 node?.AssertValid();
         }
 
+        internal BinaryTree MainAnchor => Anchor.Main;
+
+        [EnableDump]
+        [EnableDumpExcept(null)]
+        internal string Position => Anchor.SourceParts.DumpSource();
+
         [DisableDump]
         internal IEnumerable<Syntax> Children => this.GetNodesFromLeftToRight();
 
@@ -107,8 +112,6 @@ namespace Reni.SyntaxTree
 
         [DisableDump]
         internal Issue[] Issues => this.CachedValue(() => GetIssues().ToArray());
-
-        public BinaryTree MainAnchor => Anchor.Main;
 
         public BinaryTree LeftMostAnchor
         {
@@ -118,7 +121,7 @@ namespace Reni.SyntaxTree
                 var mainPosition = main?.Token.Characters;
                 var child = DirectChildren.FirstOrDefault()?.LeftMostAnchor;
                 var childPosition = child?.Token.Characters;
-                return mainPosition!= null && (childPosition == null || mainPosition < childPosition)
+                return mainPosition != null && (childPosition == null || mainPosition < childPosition)
                     ? main
                     : child;
             }
@@ -132,7 +135,7 @@ namespace Reni.SyntaxTree
                 var mainPosition = main?.Token.Characters;
                 var child = DirectChildren.LastOrDefault()?.RightMostAnchor;
                 var childPosition = child?.Token.Characters;
-                return mainPosition!= null && (childPosition == null || mainPosition > childPosition)
+                return mainPosition != null && (childPosition == null || mainPosition > childPosition)
                     ? main
                     : child;
             }

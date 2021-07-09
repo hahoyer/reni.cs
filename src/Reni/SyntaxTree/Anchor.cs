@@ -58,10 +58,10 @@ namespace Reni.SyntaxTree
         internal static Anchor Create(BinaryTree leftAnchor)
             => new Anchor(leftAnchor.AssertNotNull());
 
-        public static Anchor Create(IEnumerable<BinaryTree> items)
+        internal static Anchor Create(IEnumerable<BinaryTree> items)
             => new Anchor(items.ToArray());
 
-        public Anchor Combine(Anchor other)
+        internal Anchor Combine(Anchor other)
         {
             if(other == null || !other.Items.Any())
                 return this;
