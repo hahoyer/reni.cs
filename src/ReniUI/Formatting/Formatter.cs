@@ -46,7 +46,10 @@ namespace ReniUI.Formatting
                     , target.Anchor.Items.First(item => item.TokenClass is RightParenthesis));
 
             internal override void SetupLineBreaks(Syntax target)
-                => target.Anchors.End.EnsureLineBreaks(1);
+            {
+                SetupLineBreaksForChildren(target,hasLineBreakAtTop:true);
+                target.Anchors.End.EnsureLineBreaks(1);
+            }
 
             [DisableDump]
             internal override bool IsIndentRequired => true;

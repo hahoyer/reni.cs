@@ -79,5 +79,25 @@ b";
 
             (newSource == expectedText).Assert("\n\"" + newSource + "\"");
         }
+            [UnitTest]
+        [Test]
+        public void EmptyBrackets()
+        {
+            const string text =
+                @"a()
+b";
+
+            var expectedText = @"a b".Replace("\r\n", "\n");
+
+            var compiler = CompilerBrowser.FromText(text);
+            var newSource = compiler.Reformat
+                (
+                    new ReniUI.Formatting.Configuration
+                        {EmptyLineLimit = 0}.Create()
+                )
+                .Replace("\r\n", "\n");
+
+            (newSource == expectedText).Assert("\n\"" + newSource + "\"");
+        }
     }
 }
