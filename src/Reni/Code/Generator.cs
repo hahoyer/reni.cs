@@ -88,6 +88,7 @@ namespace ReniGeneratedCode
                 "." +
                 Thread.CurrentThread.ManagedThreadId +
                 ".reni.cs";
+            name.ToSmbFile().EnsureDirectoryOfFileExists();
             CodeToFile(name, source, true);
 
 
