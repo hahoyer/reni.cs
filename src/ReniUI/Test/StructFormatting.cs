@@ -87,7 +87,7 @@ b";
                 @"a()
 b";
 
-            var expectedText = @"a b".Replace("\r\n", "\n");
+            var expectedText = @"a() b".Replace("\r\n", "\n");
 
             var compiler = CompilerBrowser.FromText(text);
             var newSource = compiler.Reformat
