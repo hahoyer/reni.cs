@@ -78,7 +78,7 @@ namespace ReniUI.Test
 
         [Test]
         [UnitTest]
-        public void Reformat1_120Temp()
+        public void Reformat1_120TopLineBreak()
         {
             const string text =
                 @"(aaaaa 
@@ -92,7 +92,20 @@ namespace ReniUI.Test
     )
 )".Replace("\r\n", "\n");
 
+
             text.SimpleFormattingTest(expectedText, 120, 1);
+        }
+        
+        [UnitTest]
+        public void Reformat1_120EmptyBrackets()
+        {
+            const string text =
+                @"(
+)";
+
+
+
+            text.SimpleFormattingTest(maxLineLength: 120, emptyLineLimit: 1);
         }
 
         [Test]

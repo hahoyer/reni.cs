@@ -39,7 +39,11 @@ namespace ReniUI.Formatting
             internal static readonly Formatter Instance = new BracketLevel();
 
             protected internal override IEnumerable<Child> GetChildren(IItem target)
-                => T(new Child(null, target, false, false));
+            {
+                if (target is EmptyList)
+                    return new Child[0];
+                return T(new Child(null, target, false, false));
+            }
 
             internal override(BinaryTree begin, BinaryTree end) GetFrameAnchors(IItem target)
                 => (target.Anchor.Items.First()
