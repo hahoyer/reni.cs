@@ -57,7 +57,7 @@ namespace ReniUI.Formatting
             => count != 0 && target.HasLines? new IndentedSourcePartEdit(target, count) : target;
     }
 
-    class IndentedSourcePartEdit : DumpableObject, ISourcePartEdit, IEditPieces
+    sealed class IndentedSourcePartEdit : DumpableObject, ISourcePartEdit, IEditPieces
     {
         [EnableDump]
         internal readonly ISourcePartEdit Target;

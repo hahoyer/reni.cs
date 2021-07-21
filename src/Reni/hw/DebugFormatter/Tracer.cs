@@ -329,6 +329,7 @@ namespace hw.DebugFormatter
         /// <param name="target"> the object to dump </param>
         /// <returns> </returns>
         public static string Dump(object target) => Dumper.Dump(target);
+        public static string LogDump(this object target) => Dumper.Dump(target);
 
 
         /// <summary>

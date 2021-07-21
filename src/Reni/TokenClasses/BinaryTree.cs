@@ -56,10 +56,10 @@ namespace Reni.TokenClasses
 
         BinaryTree
         (
-            BinaryTree left,
-            ITokenClass tokenClass,
-            IToken token,
-            BinaryTree right
+            BinaryTree left
+            , ITokenClass tokenClass
+            , IToken token
+            , BinaryTree right
         )
             : base(NextObjectId++)
         {
@@ -67,8 +67,8 @@ namespace Reni.TokenClasses
             Left = left;
             TokenClass = tokenClass;
             Right = right;
-            FlatFormatCache = new FunctionCache<bool, string>(GetFlatStringValue);
-            FlatLengthCache = new FunctionCache<bool, int?>(GetFlatLengthValue);
+            FlatFormatCache = new(GetFlatStringValue);
+            FlatLengthCache = new(GetFlatLengthValue);
 
             SetLinks();
         }
@@ -91,8 +91,7 @@ namespace Reni.TokenClasses
 
 
         [DisableDump]
-        internal SourcePart SourcePart =>
-            LeftMost.Token.SourcePart().Start.Span(RightMost.Token.Characters.End);
+        internal SourcePart SourcePart => LeftMost.Token.SourcePart().Start.Span(RightMost.Token.Characters.End);
 
         [DisableDump]
         internal BinaryTree LeftMost => Left?.LeftMost ?? this;
@@ -111,8 +110,20 @@ namespace Reni.TokenClasses
         {
             get
             {
-                if(!(TokenClass is IRightBracket rightParenthesis))
+                if (!(TokenClass is IRightBracket rightParenthesis))
+                {
+                    if (TokenClass is ILeftBracket leftBracket)
+                    {
+                        Left.AssertIsNull();
+                        return new()
+                        {
+                            Left = this, Center = Right
+                            , Right = ErrorToken.Create(IssueId.MissingRightBracket, RightMost)
+                        };
+                    }
+
                     return null;
+                }
 
                 var level = rightParenthesis.Level;
 
@@ -120,7 +131,7 @@ namespace Reni.TokenClasses
 
                 var result = new BracketNodes {Left = Left, Center = Left.Right, Right = this};
 
-                if(!(Left.TokenClass is ILeftBracket leftParenthesis))
+                if (!(Left.TokenClass is ILeftBracket leftParenthesis))
                 {
                     result.Center = Left;
                     result.Left = ErrorToken.Create(IssueId.MissingLeftBracket, Left.LeftMost);
@@ -131,10 +142,10 @@ namespace Reni.TokenClasses
 
                 var levelDelta = leftParenthesis.Level - level;
 
-                if(levelDelta == 0)
+                if (levelDelta == 0)
                     return result;
 
-                if(levelDelta > 0)
+                if (levelDelta > 0)
                 {
                     result.Right = ErrorToken.Create(IssueId.MissingRightBracket, RightMost);
                     return result;
@@ -156,11 +167,11 @@ namespace Reni.TokenClasses
         ///     Get the line length of target when formatted as one line.
         /// </summary>
         /// <value>The line length calculated or null if target contains line breaks.</value>
-        internal int FlatLengthOfToken => (IsSeparatorRequired? 1 : 0) + Token.Characters.Length;
+        internal int FlatLengthOfToken => (IsSeparatorRequired ? 1 : 0) + Token.Characters.Length;
 
         void SetLinks()
         {
-            if(Left != null)
+            if (Left != null)
             {
                 Left.Parent = this;
                 Left.Depth = Depth + 1;
@@ -169,7 +180,7 @@ namespace Reni.TokenClasses
                 LeftNeighbor = binaryTree;
             }
 
-            if(Right != null)
+            if (Right != null)
             {
                 Right.Parent = this;
                 Right.Depth = Depth + 1;
@@ -181,20 +192,20 @@ namespace Reni.TokenClasses
 
         IEnumerable<BinaryTree> GetParserLevelGroup(ITokenClass tokenClass)
         {
-            if(tokenClass is not IBelongingsMatcher)
+            if (tokenClass is not IBelongingsMatcher)
                 return new BinaryTree[0];
 
-            if(tokenClass is List)
+            if (tokenClass is List)
                 return this
-                    .Chain(node => tokenClass.IsBelongingTo(node.Right?.TokenClass)? node.Right : null);
+                    .Chain(node => tokenClass.IsBelongingTo(node.Right?.TokenClass) ? node.Right : null);
 
-            if(tokenClass is IRightBracket)
+            if (tokenClass is IRightBracket)
             {
                 NotImplementedMethod(tokenClass);
                 return default;
             }
 
-            if(tokenClass is ILeftBracket)
+            if (tokenClass is ILeftBracket)
             {
                 NotImplementedMethod(tokenClass);
                 return default;
@@ -206,16 +217,16 @@ namespace Reni.TokenClasses
 
         internal static BinaryTree Create
         (
-            BinaryTree left,
-            ITokenClass tokenClass,
-            IToken token,
-            BinaryTree right
+            BinaryTree left
+            , ITokenClass tokenClass
+            , IToken token
+            , BinaryTree right
         )
             => new(left, tokenClass, token, right);
 
         internal int? GetBracketLevel()
         {
-            if(!(TokenClass is IRightBracket rightParenthesis))
+            if (!(TokenClass is IRightBracket rightParenthesis))
                 return null;
             var leftParenthesis = Left?.TokenClass as ILeftBracket;
             return T(leftParenthesis?.Level ?? 0, rightParenthesis.Level).Max();
@@ -224,25 +235,25 @@ namespace Reni.TokenClasses
         string GetFlatStringValue(bool areEmptyLinesPossible)
         {
             var tokenString = Token.Characters
-                .FlatFormat(Left == null? null : Token.PrecededWith, areEmptyLinesPossible);
+                .FlatFormat(Left == null ? null : Token.PrecededWith, areEmptyLinesPossible);
 
-            if(tokenString == null)
+            if (tokenString == null)
                 return null;
 
-            tokenString = (IsSeparatorRequired? " " : "") + tokenString;
+            tokenString = (IsSeparatorRequired ? " " : "") + tokenString;
 
             var leftResult = Left == null
                 ? ""
                 : Left.FlatFormatCache[areEmptyLinesPossible];
 
-            if(leftResult == null)
+            if (leftResult == null)
                 return null;
 
             var rightResult = Right == null
                 ? ""
                 : Right.FlatFormatCache[areEmptyLinesPossible];
 
-            if(rightResult == null)
+            if (rightResult == null)
                 return null;
 
             return leftResult + tokenString + rightResult;
@@ -250,26 +261,27 @@ namespace Reni.TokenClasses
 
         int? GetFlatLengthValue(bool areEmptyLinesPossible)
         {
+            StopByObjectIds(1);
             var tokenString = Token.Characters
-                .FlatFormat(Left == null? null : Token.PrecededWith, areEmptyLinesPossible);
+                .FlatFormat(LeftNeighbor == null ? null : Token.PrecededWith, areEmptyLinesPossible);
 
-            if(tokenString == null)
+            if (tokenString == null)
                 return null;
 
-            tokenString = (IsSeparatorRequired? " " : "") + tokenString;
+            tokenString = (IsSeparatorRequired ? " " : "") + tokenString;
 
             var leftResult = Left == null
                 ? 0
                 : Left.FlatLengthCache[areEmptyLinesPossible];
 
-            if(leftResult == null)
+            if (leftResult == null)
                 return null;
 
             var rightResult = Right == null
                 ? 0
                 : Right.FlatLengthCache[areEmptyLinesPossible];
 
-            if(rightResult == null)
+            if (rightResult == null)
                 return null;
 
             return leftResult + tokenString.Length + rightResult;
@@ -277,7 +289,7 @@ namespace Reni.TokenClasses
 
         public bool HasAsParent(BinaryTree parent)
             => Parent
-                .Chain(node => node.Depth >= parent.Depth? node.Parent : null)
+                .Chain(node => node.Depth >= parent.Depth ? node.Parent : null)
                 .Any(node => node == parent);
 
         /// <summary>

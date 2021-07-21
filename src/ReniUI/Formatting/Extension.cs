@@ -90,8 +90,9 @@ namespace ReniUI.Formatting
             var token = target.Token;
             return T(
                 token.PrecededWith.Any()
-                    ? new WhiteSpaceView(token.PrecededWith, configuration, isSeparatorRequired, lineBreakCount)
-                    : (ISourcePartEdit)new EmptyWhiteSpaceView(token.Characters, isSeparatorRequired, lineBreakCount)
+                    ? new WhiteSpaceView(token.PrecededWith.ToArray(), configuration, isSeparatorRequired,
+                        lineBreakCount)
+                    : (ISourcePartEdit) new EmptyWhiteSpaceView(token.Characters, isSeparatorRequired, lineBreakCount)
             );
         }
 

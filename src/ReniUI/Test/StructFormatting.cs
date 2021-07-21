@@ -2,6 +2,7 @@ using hw.DebugFormatter;
 using hw.UnitTest;
 using NUnit.Framework;
 using ReniUI.Formatting;
+using Configuration = ReniUI.Formatting.Configuration;
 
 namespace ReniUI.Test
 {
@@ -11,37 +12,55 @@ namespace ReniUI.Test
     {
         [Test]
         [UnitTest]
-        public void BreakLine() => @"aaaaa bbbbb".SimpleFormattingTest(maxLineLength: 10, expected: @"aaaaa
+        public void BreakLine()
+        {
+            @"aaaaa bbbbb".SimpleFormattingTest(maxLineLength: 10, expected: @"aaaaa
     bbbbb");
+        }
 
         [Test]
         [UnitTest]
-        public void One() => @"aaaaa".SimpleFormattingTest();
+        public void One()
+        {
+            @"aaaaa".SimpleFormattingTest();
+        }
 
         [Test]
         [UnitTest]
-        public void Two() => @"aaaaa bbbbb".SimpleFormattingTest();
+        public void Two()
+        {
+            @"aaaaa bbbbb".SimpleFormattingTest();
+        }
 
         [Test]
         [UnitTest]
-        public void BreakLine3() => @"aaaaa bbbbb ccccc".SimpleFormattingTest(maxLineLength: 10, expected: @"aaaaa
+        public void BreakLine3()
+        {
+            @"aaaaa bbbbb ccccc".SimpleFormattingTest(maxLineLength: 10, expected: @"aaaaa
     bbbbb
     ccccc");
+        }
 
         [Test]
         [UnitTest]
-        public void BreakLineWithLimit1() => @"aaaaa 
+        public void BreakLineWithLimit1()
+        {
+            @"aaaaa 
 
 bbbbb".SimpleFormattingTest(@"aaaaa
     bbbbb",
-            emptyLineLimit: 1);
+                emptyLineLimit: 1);
+        }
 
         [Test]
         [UnitTest]
-        public void BreakLineWithLimit0() => @"aaaaa 
+        public void BreakLineWithLimit0()
+        {
+            @"aaaaa 
 
 bbbbb".SimpleFormattingTest(@"aaaaa bbbbb",
-            emptyLineLimit: 0);
+                emptyLineLimit: 0);
+        }
 
 
         [UnitTest]
@@ -72,14 +91,16 @@ b";
             var compiler = CompilerBrowser.FromText(text);
             var newSource = compiler.Reformat
                 (
-                    new ReniUI.Formatting.Configuration
+                    new Configuration
                         {EmptyLineLimit = 0}.Create()
                 )
                 .Replace("\r\n", "\n");
 
+
             (newSource == expectedText).Assert("\n\"" + newSource + "\"");
         }
-            [UnitTest]
+
+        [UnitTest]
         [Test]
         public void EmptyBrackets()
         {
@@ -92,12 +113,23 @@ b";
             var compiler = CompilerBrowser.FromText(text);
             var newSource = compiler.Reformat
                 (
-                    new ReniUI.Formatting.Configuration
+                    new Configuration
                         {EmptyLineLimit = 0}.Create()
                 )
                 .Replace("\r\n", "\n");
 
             (newSource == expectedText).Assert("\n\"" + newSource + "\"");
+        }
+
+        [UnitTest]
+        public void Reformat()
+        {
+             const string text = @"1 = 1 then 2 else 4;
+3;
+(Text('H') << 'allo') dump_print";
+            const string expectedText = @"1 = 1 then 2 else 4; 3; (Text('H') << 'allo') dump_print";
+
+            text.SimpleFormattingTest(expectedText, 100, 0);
         }
     }
 }
