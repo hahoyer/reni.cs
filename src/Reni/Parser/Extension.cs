@@ -50,6 +50,8 @@ namespace Reni.Parser
 
         internal static bool HasLines(this IItem item) => item.SourcePart.Id.Contains("\n");
 
+        internal static bool HasLineAtEnd(this IItem item) => item.IsLineEnd()||item.IsLineComment();
+
         internal static IEnumerable<IItem> OnlyComments(this IEnumerable<IItem> whiteSpaces)
             => whiteSpaces.Where(IsComment);
 

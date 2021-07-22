@@ -184,19 +184,25 @@ namespace ReniUI.Formatting
         /// <returns></returns>
         SourcePart[] GetLineBreakGroups()
         {
-            var lastItem = Target.Last();
-            if (lastItem.IsComment())
-                return new SourcePart[0];
-
             var lastLineBreakGroup = Target
-                .Split(item => item.IsComment())
+                .Split(item => item.IsComment(), true)
                 .Last();
 
             return lastLineBreakGroup
-                .Split(item => item.IsLineEnd(), false)
-                .Where(group => group.Last().IsLineEnd())
-                .Select(group => group.SourcePart())
+                .Split(item => item.HasLines(), false)
+                .Where(group => group.Last().HasLineAtEnd())
+                .Select(GetLineBreakPart)
                 .ToArray();
+        }
+
+        static SourcePart GetLineBreakPart(IEnumerable<IItem> group)
+        {
+            var last = group.Last();
+            last.HasLines().Assert();
+            if (last.IsLineEnd())
+                return group.SourcePart();
+            last.IsLineComment().Assert();
+            return (last.SourcePart.End ).Span(-1);
         }
 
         IEnumerable<IItem>[] GetCommentGroups()
