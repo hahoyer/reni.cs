@@ -1,4 +1,4 @@
-//18:16:33.821 22.07.2021 ran 174 of 183 
+//18:41:47.442 22.07.2021 ran 173 of 183 
 
 namespace hw.UnitTest
 {
@@ -9,21 +9,21 @@ namespace hw.UnitTest
         
 // error 
 
+TestRunner.RunTest(new ReniUI.Test.Classification.Basics().GetTokenForPosition);
+
+// dependanterror 
+
+TestRunner.RunTest(new ReniUI.Test.ThenElseMatching().Matching);
+TestRunner.RunTest(new ReniUI.Test.ThenElseMatching().NestedMatching);
 TestRunner.RunTest(new ReniUI.Test.TokenLocating().FromSourcePart);
 TestRunner.RunTest(new ReniUI.Test.TokenLocating().CommentFromSourcePart);
 TestRunner.RunTest(new ReniUI.Test.TokenLocating().CompoundSourcePart);
 TestRunner.RunTest(new ReniUI.Test.TokenLocating().NamedCompoundSourcePart);
-TestRunner.RunTest(new ReniUI.Test.Classification.UserInterAction().TypingAProgram);
-TestRunner.RunTest(new ReniUI.Test.Classification.UserInterAction().GetTokenForPosition);
-
-// dependanterror 
-
-TestRunner.RunTest(new ReniUI.Test.BadUserInterAction().GetTokenForPosition);
-TestRunner.RunTest(new ReniUI.Test.BadUserInterAction().GetTokenForPositionSimple);
-TestRunner.RunTest(new ReniUI.Test.ThenElseMatching().Matching);
-TestRunner.RunTest(new ReniUI.Test.ThenElseMatching().NestedMatching);
-TestRunner.RunTest(new ReniUI.Test.Classification.UserInterAction2().GetTokenForPosition);
-TestRunner.RunTest(new ReniUI.Test.Classification.UserInterAction3().GetTokenForPosition);
+TestRunner.RunTest(new ReniUI.Test.UserInteraction.BadUserInterAction().GetTokenForPosition);
+TestRunner.RunTest(new ReniUI.Test.UserInteraction.BadUserInterAction().GetTokenForPositionSimple);
+TestRunner.RunTest(new ReniUI.Test.UserInteraction.UserInterAction().TypingAProgram);
+TestRunner.RunTest(new ReniUI.Test.UserInteraction.UserInterAction().GetTokenForPosition);
+TestRunner.RunTest(new ReniUI.Test.UserInteraction.UserInterAction2().GetTokenForPosition);
 
 // notrun 
 

@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace ReniUI.Test
 {
     [UnitTest]
-    [TestFixture]
+    [TestFixture,Classification.All]
     public sealed class TokenLocating : DependenceProvider
     {
         [UnitTest]

@@ -4,8 +4,8 @@ using reniUI.Test.Classification;
 namespace ReniUI.Test.Classification
 {
     [UnitTest]
-    [UserInterAction]
-    public sealed class UserInterAction3 : DependenceProvider
+    
+    public sealed class Basics: DependenceProvider
     {
         [UnitTest]
         public void GetTokenForPosition()

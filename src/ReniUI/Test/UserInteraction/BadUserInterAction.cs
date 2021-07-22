@@ -1,9 +1,8 @@
 using hw.DebugFormatter;
 using hw.Scanner;
 using hw.UnitTest;
-using ReniUI.Test.Classification;
 
-namespace ReniUI.Test
+namespace ReniUI.Test.UserInteraction
 {
     [UnitTest]
     [PairedSyntaxTree]

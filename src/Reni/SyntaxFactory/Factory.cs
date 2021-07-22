@@ -36,7 +36,7 @@ namespace Reni.SyntaxFactory
         internal ValueSyntax GetFrameSyntax(BinaryTree target)
         {
             var kernel = target.BracketKernel;
-            var statements = GetStatementsSyntax(kernel.Center, null, kernel.Center.TokenClass);
+            var statements = GetStatementsSyntax(kernel.Center, null, kernel.Center?.TokenClass);
             var anchor =
                 kernel.ToAnchor.Combine(statements.Length <= 1? null : Anchor.Create(kernel.Center.ParserLevelGroup));
             return CompoundSyntax.Create(statements, null, anchor);

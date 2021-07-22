@@ -3,9 +3,6 @@ using hw.UnitTest;
 namespace ReniUI.Test.Classification
 {
     [UnitTest]
-    [UserInterAction]
-    [UserInterAction2]
-    [UserInterAction3]
-    [BadUserInterAction]
+    [Basics]
     public sealed class All : DependenceProvider {}
 }

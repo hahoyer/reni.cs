@@ -4,13 +4,15 @@ using hw.Scanner;
 using hw.UnitTest;
 using Reni;
 using Reni.Parser;
+using ReniUI.Test.Classification;
 
-namespace ReniUI.Test.Classification
+namespace ReniUI.Test.UserInteraction
 {
     [UnitTest]
+    [All]
     public sealed class UserInterAction : DependenceProvider
     {
-        const string Text = @"
+        readonly string Text = @"
 System: 
 (
 \!
@@ -43,7 +45,7 @@ complex:
 complex FromReal(2) dump_print;
 ' ' dump_print;
 (complex Create(0,1) * complex Create(0,1)) dump_print
-";
+".Replace("\r\n", "\n");
 
 
         [UnitTest]
@@ -54,8 +56,9 @@ complex FromReal(2) dump_print;
                 var textFragment = Text.Substring(0, i);
                 var compiler = Compiler.FromText(textFragment);
                 var syntax = compiler.Syntax;
+
                 var span = syntax.Anchor.SourceParts;
-                span.Any(item=>item.Id == textFragment).Assert(() => span.DumpSource());
+                span.Any(item => item.Id == textFragment).Assert(() => span.DumpSource());
             }
         }
 
@@ -63,10 +66,10 @@ complex FromReal(2) dump_print;
         public void GetTokenForPosition()
         {
             var compiler = CompilerBrowser.FromText(Text);
-            for(var i = 0; i < Text.Length; i++)
+            for(var offset = 0; offset < Text.Length; offset++)
             {
-                var t = compiler.LocatePosition(i);
-                (t != null).Assert(() => (new Source(Text) + i).Dump());
+                var t = compiler.LocatePosition(offset);
+                (t != null).Assert(() => (new Source(Text) + offset).Dump());
             }
         }
     }

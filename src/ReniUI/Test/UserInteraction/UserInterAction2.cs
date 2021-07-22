@@ -4,7 +4,7 @@ using hw.Helper;
 using hw.UnitTest;
 using NUnit.Framework;
 
-namespace ReniUI.Test.Classification
+namespace ReniUI.Test.UserInteraction
 {
     [TestFixture]
     [UnitTest]
@@ -24,7 +24,7 @@ namespace ReniUI.Test.Classification
             (
                 Text
                     .Length
-                    .Select(item => compiler.LocatePosition(item).TypeCharacter)
+                    .Select(item => compiler.LocatePosition((int) item).TypeCharacter)
                     .ToArray()
             );
             (Type == typeCharacters).Assert
