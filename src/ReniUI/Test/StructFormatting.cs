@@ -124,12 +124,23 @@ b";
         [UnitTest]
         public void Reformat()
         {
-             const string text = @"1 = 1 then 2 else 4;
-3;
-(Text('H') << 'allo') dump_print";
-            const string expectedText = @"1 = 1 then 2 else 4; 3; (Text('H') << 'allo') dump_print";
+             const string text = @"repeat:
+        @ ^ while()
+        then
+        (
+            ^ body(),
+            repeat(^)
+        );
+";
+            const string expectedText = @"repeat:
+    @ ^ while()
+    then
+    (
+        ^ body(),
+        repeat(^)
+    );";
 
-            text.SimpleFormattingTest(expectedText, 100, 0);
+            text.SimpleFormattingTest(expectedText, 10, 0);
         }
     }
 }

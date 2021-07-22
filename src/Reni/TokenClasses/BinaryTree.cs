@@ -51,8 +51,6 @@ namespace Reni.TokenClasses
         int Depth;
 
         readonly FunctionCache<bool, string> FlatFormatCache;
-        readonly FunctionCache<bool, int?> FlatLengthCache;
-
 
         BinaryTree
         (
@@ -68,7 +66,6 @@ namespace Reni.TokenClasses
             TokenClass = tokenClass;
             Right = right;
             FlatFormatCache = new(GetFlatStringValue);
-            FlatLengthCache = new(GetFlatLengthValue);
 
             SetLinks();
         }
@@ -169,6 +166,9 @@ namespace Reni.TokenClasses
         /// <value>The line length calculated or null if target contains line breaks.</value>
         internal int FlatLengthOfToken => (IsSeparatorRequired ? 1 : 0) + Token.Characters.Length;
 
+        internal string FlatStringWithLines => FlatFormatCache[false];
+        internal string FlatStringWithoutLines => FlatFormatCache[true];
+
         void SetLinks()
         {
             if (Left != null)
@@ -235,7 +235,7 @@ namespace Reni.TokenClasses
         string GetFlatStringValue(bool areEmptyLinesPossible)
         {
             var tokenString = Token.Characters
-                .FlatFormat(Left == null ? null : Token.PrecededWith, areEmptyLinesPossible);
+                .FlatFormat(LeftNeighbor == null ? null : Token.PrecededWith, areEmptyLinesPossible);
 
             if (tokenString == null)
                 return null;
@@ -259,33 +259,6 @@ namespace Reni.TokenClasses
             return leftResult + tokenString + rightResult;
         }
 
-        int? GetFlatLengthValue(bool areEmptyLinesPossible)
-        {
-            StopByObjectIds(1);
-            var tokenString = Token.Characters
-                .FlatFormat(LeftNeighbor == null ? null : Token.PrecededWith, areEmptyLinesPossible);
-
-            if (tokenString == null)
-                return null;
-
-            tokenString = (IsSeparatorRequired ? " " : "") + tokenString;
-
-            var leftResult = Left == null
-                ? 0
-                : Left.FlatLengthCache[areEmptyLinesPossible];
-
-            if (leftResult == null)
-                return null;
-
-            var rightResult = Right == null
-                ? 0
-                : Right.FlatLengthCache[areEmptyLinesPossible];
-
-            if (rightResult == null)
-                return null;
-
-            return leftResult + tokenString.Length + rightResult;
-        }
 
         public bool HasAsParent(BinaryTree parent)
             => Parent
@@ -304,6 +277,6 @@ namespace Reni.TokenClasses
         /// </summary>
         /// <param name="areEmptyLinesPossible"></param>
         /// <returns>The line length calculated or null if target contains line breaks.</returns>
-        internal int? GetFlatLength(bool areEmptyLinesPossible) => FlatLengthCache[areEmptyLinesPossible];
+        internal int? GetFlatLength(bool areEmptyLinesPossible) => FlatFormatCache[areEmptyLinesPossible]?.Length;
     }
 }

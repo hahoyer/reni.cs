@@ -233,6 +233,12 @@ namespace Reni.Helper
         }
 
         static string FlatFormat(this IItem item, bool areEmptyLinesPossible)
-            => item.HasLines() && (item.IsComment() || areEmptyLinesPossible)? null : item.SourcePart.Id;
+        {
+            var isComment = item.IsComment();
+
+            if (item.HasLines() && (isComment || areEmptyLinesPossible))
+                return null;
+            return isComment ? item.SourcePart.Id : "";
+        }
     }
 }
