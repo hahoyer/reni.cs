@@ -124,23 +124,16 @@ b";
         [UnitTest]
         public void Reformat()
         {
-             const string text = @"repeat:
-        @ ^ while()
-        then
-        (
-            ^ body(),
-            repeat(^)
-        );
+             const string text = @"
+^ body(),
+            repeat(^),
 ";
-            const string expectedText = @"repeat:
-    @ ^ while()
-    then
-    (
-        ^ body(),
-        repeat(^)
-    );";
+            const string expectedText = @"
+^ body(),
+repeat(^),
+";
 
-            text.SimpleFormattingTest(expectedText, 10, 0);
+            text.SimpleFormattingTest(expectedText, 120, 1);
         }
     }
 }

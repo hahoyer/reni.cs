@@ -22,11 +22,7 @@ namespace ReniUI.Formatting
             [EnableDumpExcept(0)]
             int LineBreakCount;
 
-            Anchor(BinaryTree target)
-            {
-                Target = target;
-                StopByObjectIds(244);
-            }
+            Anchor(BinaryTree target) => Target = target;
 
             [UsedImplicitly]
             internal string TargetPosition => Target.Token.SourcePart().GetDumpAroundCurrent(5);
@@ -153,7 +149,7 @@ namespace ReniUI.Formatting
         internal static Syntax Create(Reni.SyntaxTree.Syntax target, Configuration configuration)
             => new(new(null, target, false), configuration, null);
 
-        Syntax Create(Formatter.Child child) => new(child, Configuration, this);
+        Syntax Create(Formatter.Child child) => child == null ? null : new(child, Configuration, this);
 
         Syntax[] GetChildren()
         {
@@ -188,7 +184,7 @@ namespace ReniUI.Formatting
 
             Formatter.SetupLineBreaks(this);
             foreach (var child in Children)
-                child.SetupLineBreaks();
+                child?.SetupLineBreaks();
         }
 
         internal void EnsureLineBreaks(int count, bool beforePrefix)

@@ -94,7 +94,7 @@ namespace ReniUI.Formatting
             {
                 var result = target
                     .Chain(node => GetWagon(node, node != target))
-                    .Select(node => GetCargo(node,node != target))
+                    .Select(node => GetCargo(node, node != target))
                     .Reverse()
                     .ToArray();
                 result.All(child => child.FlatItem != target).Assert();
@@ -273,7 +273,7 @@ namespace ReniUI.Formatting
                 (anchorCount is 1 or 2).Assert();
                 var children = new List<Child>
                 {
-                    new(null, target.DirectChildren[0], false)
+                    target.DirectChildren[0] == null ? null : new(null, target.DirectChildren[0], false)
                     , new(target.Anchor.Items[0], target.DirectChildren[1], false)
                 };
                 if (anchorCount == 2)
@@ -284,7 +284,8 @@ namespace ReniUI.Formatting
             internal override void SetupLineBreaks(Syntax target)
             {
                 var thenClause = target.Children[1];
-                thenClause.Anchors.Prefix.EnsureLineBreaks(1);
+                if (target.Children[0] != null)
+                    thenClause.Anchors.Prefix.EnsureLineBreaks(1);
                 if (thenClause.IsLineSplit)
                     thenClause.Anchors.Begin.EnsureLineBreaks(1);
                 if (target.Children.Length == 2)
@@ -423,7 +424,8 @@ namespace ReniUI.Formatting
                         ? 2
                         : 1;
 
-                child.EnsureLineBreaks(count, putLineBreaksBeforePrefix);
+                if (count > 0)
+                    child.EnsureLineBreaks(count, putLineBreaksBeforePrefix);
                 leftNeighbor = child;
             }
         }

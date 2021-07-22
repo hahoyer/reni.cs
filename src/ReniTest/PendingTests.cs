@@ -1,4 +1,4 @@
-//12:27:44.213 22.07.2021 ran 172 of 181 
+//15:05:48.618 22.07.2021 ran 174 of 181 
 
 namespace hw.UnitTest
 {
@@ -9,14 +9,7 @@ namespace hw.UnitTest
         
 // error 
 
-TestRunner.RunTest(new ReniUI.Test.Formatting().Reformat);
-TestRunner.RunTest(new ReniUI.Test.Formatting().Reformat1_120);
-TestRunner.RunTest(new ReniUI.Test.Formatting().Reformat1_120TopLineBreak);
-TestRunner.RunTest(new ReniUI.Test.Formatting().Reformat1_120EmptyBrackets);
-TestRunner.RunTest(new ReniUI.Test.Formatting().Reformat2);
-TestRunner.RunTest(new ReniUI.Test.Formatting().TwoLevelParenthesis);
-TestRunner.RunTest(new ReniUI.Test.Formatting().UseLineBreakBeforeParenthesis);
-TestRunner.RunTest(new ReniUI.Test.Formatting().HalfList);
+TestRunner.RunTest(new ReniUI.Test.FormattingWithComments().ReformatComments);
 TestRunner.RunTest(new ReniUI.Test.ThenElseMatching().Matching);
 TestRunner.RunTest(new ReniUI.Test.ThenElseMatching().NestedMatching);
 TestRunner.RunTest(new ReniUI.Test.TokenLocating().FromSourcePart);
@@ -30,8 +23,6 @@ TestRunner.RunTest(new ReniUI.Test.UserInterAction().GetTokenForPosition);
 
 TestRunner.RunTest(new ReniUI.Test.BadUserInterAction().GetTokenForPosition);
 TestRunner.RunTest(new ReniUI.Test.BadUserInterAction().GetTokenForPositionSimple);
-TestRunner.RunTest(new ReniUI.Test.FormattingOfBadThings().BadArgDeclaration);
-TestRunner.RunTest(new ReniUI.Test.FormattingWithComments().ReformatComments);
 TestRunner.RunTest(new ReniUI.Test.UserInterAction2().GetTokenForPosition);
 TestRunner.RunTest(new ReniUI.Test.UserInterAction3().GetTokenForPosition);
 
