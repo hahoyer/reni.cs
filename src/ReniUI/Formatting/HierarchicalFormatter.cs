@@ -19,10 +19,10 @@ namespace ReniUI.Formatting
             var item = Syntax.Create(compilerBrowser.Syntax.FlatItem, Configuration);
             //item.t();
             item.SetupLineBreaks();
-            item.LogDump().Log(FilePositionTag.Debug);
+            //item.LogDump().Log(FilePositionTag.Debug);
             var sourcePartEdits = item.Edits.ToArray();
             var editPieces = sourcePartEdits.GetEditPieces(Configuration).ToArray();
-            editPieces.LogDump().Log(FilePositionTag.Debug);
+            //editPieces.LogDump().Log(FilePositionTag.Debug);
             return editPieces;
         }
     }
