@@ -1,9 +1,11 @@
 using hw.UnitTest;
+using ReniUI.Test;
+using ReniUI.Test.Formatting;
 
-namespace ReniUI.Test
+namespace reniUI.Test.Formatting
 {
     [UnitTest]
-    public sealed class ThenElseFormatting : DependenceProvider
+    public sealed class ThenElse : DependenceProvider
     {
         [UnitTest]
         public void SimpleThen()

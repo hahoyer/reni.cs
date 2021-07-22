@@ -1,4 +1,4 @@
-//17:01:57.195 22.07.2021 ran 174 of 181 
+//17:33:27.684 22.07.2021 ran 174 of 181 
 
 namespace hw.UnitTest
 {
@@ -27,8 +27,8 @@ TestRunner.RunTest(new ReniUI.Test.UserInterAction3().GetTokenForPosition);
 
 // notrun 
 
+TestRunner.RunTest(new reniUI.Test.Formatting.LongTest().ReformatPart);
 TestRunner.RunTest(new ReniUI.Test.AutoComplete().GetDeclarationOptions);
 TestRunner.RunTest(new ReniUI.Test.AutoCompleteFunctionInCompound().GetDeclarationOptions);
 TestRunner.RunTest(new ReniUI.Test.AutoCompleteSimple().GetDeclarationOptions);
-TestRunner.RunTest(new ReniUI.Test.FormattingLong().ReformatPart);
 }}}

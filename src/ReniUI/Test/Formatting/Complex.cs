@@ -2,17 +2,20 @@ using System.Linq;
 using hw.DebugFormatter;
 using hw.UnitTest;
 using NUnit.Framework;
+using ReniUI;
 using ReniUI.Formatting;
+using ReniUI.Test;
+using ReniUI.Test.Formatting;
 
-namespace ReniUI.Test
+namespace reniUI.Test.Formatting
 {
     [UnitTest]
     [TestFixture]
-    [DeclarationFormatting]
-    [StructFormatting]
-    [ListFormatting]
-    [ThenElseFormatting]
-    public sealed class Formatting : DependenceProvider
+    [Declaration]
+    [Basics]
+    [Lists]
+    [ThenElse]
+    public sealed class Complex : DependenceProvider
     {
         [Test]
         [UnitTest]

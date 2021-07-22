@@ -7,16 +7,16 @@ using hw.UnitTest;
 using NUnit.Framework;
 using Reni.Parser;
 using Reni.TokenClasses;
-using ReniUI.Helper;
+using ReniUI;
 
 // ReSharper disable StringLiteralTypo
 
-namespace ReniUI.Test
+namespace reniUI.Test.Formatting
 {
     [UnitTest]
     [TestFixture]
     [LowPriority]
-    public sealed class FormattingLong : DependenceProvider
+    public sealed class LongTest : DependenceProvider
     {
         static readonly IComparator IgnoreWhiteSpaces = new IgnoreWhiteSpacesComparator();
 

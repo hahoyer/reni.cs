@@ -1,18 +1,17 @@
 using System.Linq;
-using System.Reflection.Emit;
 using hw.DebugFormatter;
 using ReniUI.Formatting;
 
-namespace ReniUI.Test
+namespace ReniUI.Test.Formatting
 {
     static class Extension
     {
         public static void SimpleFormattingTest
         (
-            this string text,
-            string expected = null,
-            int? maxLineLength = null,
-            int? emptyLineLimit = null
+            this string text
+            , string expected = null
+            , int? maxLineLength = null
+            , int? emptyLineLimit = null
         )
         {
             var canonicalText = text.Replace("\r\n", "\n");
@@ -38,7 +37,8 @@ expected:
 ----------------------
 {expected}
 ----------------------
-", 1);
+", 1
+            );
         }
     }
 }

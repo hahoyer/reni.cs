@@ -1,12 +1,14 @@
 using hw.UnitTest;
 using NUnit.Framework;
+using ReniUI.Test;
+using ReniUI.Test.Formatting;
 
-namespace ReniUI.Test
+namespace reniUI.Test.Formatting
 {
     [UnitTest]
     [TestFixture]
-    [ListFormatting]
-    public sealed class DeclarationFormatting
+    [Lists]
+    public sealed class Declaration
         : DependenceProvider
     {
         [Test]

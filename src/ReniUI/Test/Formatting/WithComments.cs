@@ -1,15 +1,14 @@
-using System.Linq;
-using hw.DebugFormatter;
 using hw.UnitTest;
 using NUnit.Framework;
-using ReniUI.Formatting;
+using ReniUI.Test;
+using ReniUI.Test.Formatting;
 
-namespace ReniUI.Test
+namespace reniUI.Test.Formatting
 {
     [UnitTest]
     [TestFixture]
-    [Formatting]
-    public sealed class FormattingWithComments : DependenceProvider
+    [Complex]
+    public sealed class WithComments : DependenceProvider
     {
 
         [Test]

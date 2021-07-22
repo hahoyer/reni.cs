@@ -22,7 +22,7 @@ namespace ReniUI.Formatting
             item.LogDump().Log(FilePositionTag.Debug);
             var sourcePartEdits = item.Edits.ToArray();
             var editPieces = sourcePartEdits.GetEditPieces(Configuration).ToArray();
-            //editPieces.LogDump().Log(FilePositionTag.Debug);
+            editPieces.LogDump().Log(FilePositionTag.Debug);
             return editPieces;
         }
     }

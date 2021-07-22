@@ -2,13 +2,12 @@ using hw.DebugFormatter;
 using hw.UnitTest;
 using NUnit.Framework;
 using ReniUI.Formatting;
-using Configuration = ReniUI.Formatting.Configuration;
 
-namespace ReniUI.Test
+namespace ReniUI.Test.Formatting
 {
     [UnitTest]
     [TestFixture]
-    public sealed class StructFormatting : DependenceProvider
+    public sealed class Basics : DependenceProvider
     {
         [Test]
         [UnitTest]
@@ -91,13 +90,13 @@ b";
             var compiler = CompilerBrowser.FromText(text);
             var newSource = compiler.Reformat
                 (
-                    new Configuration
+                    new ReniUI.Formatting.Configuration
                         {EmptyLineLimit = 0}.Create()
                 )
                 .Replace("\r\n", "\n");
 
 
-            (newSource == expectedText).Assert("\n\"" + newSource + "\"");
+            Tracer.Assert((newSource == expectedText), "\n\"" + newSource + "\"");
         }
 
         [UnitTest]
@@ -113,7 +112,7 @@ b";
             var compiler = CompilerBrowser.FromText(text);
             var newSource = compiler.Reformat
                 (
-                    new Configuration
+                    new ReniUI.Formatting.Configuration
                         {EmptyLineLimit = 0}.Create()
                 )
                 .Replace("\r\n", "\n");

@@ -1,12 +1,15 @@
 using hw.DebugFormatter;
 using hw.UnitTest;
 using NUnit.Framework;
+using ReniUI;
+using ReniUI.Test;
+using ReniUI.Test.Formatting;
 
-namespace ReniUI.Test
+namespace reniUI.Test.Formatting
 {
     [UnitTest]
     [TestFixture]
-    public sealed class ListFormatting
+    public sealed class Lists
         : DependenceProvider
     {
         [Test]

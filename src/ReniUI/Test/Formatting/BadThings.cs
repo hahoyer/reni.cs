@@ -1,14 +1,16 @@
 using hw.DebugFormatter;
 using hw.UnitTest;
 using NUnit.Framework;
+using ReniUI;
+using ReniUI.Test;
 
-namespace ReniUI.Test
+namespace reniUI.Test.Formatting
 {
     [UnitTest]
     [TestFixture]
     [PairedSyntaxTree]
-    [Formatting]
-    public sealed class FormattingOfBadThings : DependenceProvider
+    [Complex]
+    public sealed class BadThings : DependenceProvider
     {
         [UnitTest]
         [Test]
