@@ -16,7 +16,7 @@ namespace ReniUI.Test
         [UnitTest]
         public void ReformatComments()
         {
-            const string Text =
+            const string text =
                 @"137;
 
 ################################################################
@@ -25,7 +25,7 @@ namespace ReniUI.Test
                    3
 ";
 
-            const string ExpectedText =
+            const string expectedText =
                 @"137;
 
 ################################################################
@@ -33,20 +33,8 @@ namespace ReniUI.Test
 ################################################################
 3
 ";
-            var compiler = CompilerBrowser.FromText(Text);
-            var newSource = compiler.Reformat
-            (
-                new ReniUI.Formatting.Configuration
-                        {EmptyLineLimit = 2}
-                    .Create()
-            );
-
-            var lineCount = newSource.Count(item => item == '\n');
-
-            Tracer.Assert
-            (
-                newSource.Replace("\r\n", "\n") == ExpectedText.Replace("\r\n", "\n"),
-                "\n\"" + newSource + "\"");
+           
+            text.SimpleFormattingTest(expectedText, 120, 1);
         }
     }
 }
