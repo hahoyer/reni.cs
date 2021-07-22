@@ -8,7 +8,7 @@ using Reni.Validation;
 
 namespace Reni.SyntaxFactory
 {
-    class Factory : DumpableObject
+    sealed class Factory : DumpableObject
     {
         internal static readonly IValueProvider Bracket = new BracketHandler();
         internal static readonly IValueProvider MatchedBracket = new MatchedBracketHandler();
