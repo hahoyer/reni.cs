@@ -11,7 +11,7 @@ using ReniUI;
 
 // ReSharper disable StringLiteralTypo
 
-namespace reniUI.Test.Formatting
+namespace ReniUI.Test.Formatting
 {
     [UnitTest]
     [TestFixture]

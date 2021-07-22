@@ -5,7 +5,7 @@ using hw.UnitTest;
 using Reni;
 using Reni.Parser;
 
-namespace ReniUI.Test
+namespace ReniUI.Test.Classification
 {
     [UnitTest]
     public sealed class UserInterAction : DependenceProvider

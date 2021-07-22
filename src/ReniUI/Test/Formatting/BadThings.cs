@@ -4,7 +4,7 @@ using NUnit.Framework;
 using ReniUI;
 using ReniUI.Test;
 
-namespace reniUI.Test.Formatting
+namespace ReniUI.Test.Formatting
 {
     [UnitTest]
     [TestFixture]

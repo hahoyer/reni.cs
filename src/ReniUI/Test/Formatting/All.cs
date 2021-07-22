@@ -1,7 +1,7 @@
 using hw.UnitTest;
 using ReniUI.Test.Formatting;
 
-namespace reniUI.Test.Formatting
+namespace ReniUI.Test.Formatting
 {
     [UnitTest]
     [BadThings]
@@ -11,5 +11,5 @@ namespace reniUI.Test.Formatting
     [Lists]
     [ThenElse]
     [WithComments]
-    public class All : DependenceProvider {}
+    public sealed class All : DependenceProvider {}
 }

@@ -6,7 +6,7 @@ using Reni.Parser;
 
 namespace ReniUI.Test
 {
-    [UnitTest]
+    [UnitTest,Classification.All]
     public sealed class ThenElseMatching : DependenceProvider
     {
         [UnitTest]

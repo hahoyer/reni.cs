@@ -2,7 +2,7 @@ using hw.UnitTest;
 using ReniUI.Test;
 using ReniUI.Test.Formatting;
 
-namespace reniUI.Test.Formatting
+namespace ReniUI.Test.Formatting
 {
     [UnitTest]
     public sealed class ThenElse : DependenceProvider

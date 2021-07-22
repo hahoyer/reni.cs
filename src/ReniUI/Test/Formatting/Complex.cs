@@ -7,7 +7,7 @@ using ReniUI.Formatting;
 using ReniUI.Test;
 using ReniUI.Test.Formatting;
 
-namespace reniUI.Test.Formatting
+namespace ReniUI.Test.Formatting
 {
     [UnitTest]
     [TestFixture]
