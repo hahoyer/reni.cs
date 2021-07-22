@@ -234,8 +234,8 @@ namespace Reni.TokenClasses
 
         string GetFlatStringValue(bool areEmptyLinesPossible)
         {
-            var tokenString = Token.Characters
-                .FlatFormat(LeftNeighbor == null ? null : Token.PrecededWith, areEmptyLinesPossible);
+            var tokenString = Token.Characters.Id
+                .FlatFormat(Left == null ? null : Token.PrecededWith, areEmptyLinesPossible);
 
             if (tokenString == null)
                 return null;
@@ -245,18 +245,21 @@ namespace Reni.TokenClasses
             var leftResult = Left == null
                 ? ""
                 : Left.FlatFormatCache[areEmptyLinesPossible];
-
             if (leftResult == null)
                 return null;
 
             var rightResult = Right == null
                 ? ""
                 : Right.FlatFormatCache[areEmptyLinesPossible];
-
             if (rightResult == null)
                 return null;
 
-            return leftResult + tokenString + rightResult;
+            var gapString =
+                Right == null ? "" : "".FlatFormat(Right.LeftMost.Token.PrecededWith, areEmptyLinesPossible);
+            if (gapString == null)
+                return null;
+
+            return leftResult + tokenString + gapString + rightResult;
         }
 
 

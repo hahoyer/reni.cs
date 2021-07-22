@@ -217,10 +217,10 @@ namespace Reni.Helper
 
         [PublicAPI]
         internal static string FlatFormat
-            (this SourcePart target, IEnumerable<IItem> precede, bool areEmptyLinesPossible)
+            (this string target, IEnumerable<IItem> precede, bool areEmptyLinesPossible)
         {
             if(precede == null)
-                return target.Id;   
+                return target;   
 
             var results = precede
                 .Select(item => item.FlatFormat(areEmptyLinesPossible));
@@ -229,7 +229,7 @@ namespace Reni.Helper
                 return null;
 
             return results
-                .Aggregate(target.Id, (result, item) => result + item);
+                .Aggregate(target, (result, item) => result + item);
         }
 
         static string FlatFormat(this IItem item, bool areEmptyLinesPossible)
