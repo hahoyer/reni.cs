@@ -10,8 +10,8 @@ namespace ReniUI.Classification
 {
     sealed class Syntax : Item
     {
-        internal Syntax(Helper.Syntax master, int index)
-            : base(master, index) { }
+        internal Syntax(BinaryTree anchor)
+            : base(anchor) { }
 
         [EnableDumpExcept(false)]
         public override bool IsKeyword => !IsIdentifier && !IsNumber && !IsText && !IsBrace;
@@ -59,11 +59,10 @@ namespace ReniUI.Classification
 
         public override IEnumerable<SourcePart> ParserLevelGroup 
             => Anchors
-            .Where(node => Binary.TokenClass.IsBelongingTo(node.TokenClass))
+            .Where(node => Anchor.TokenClass.IsBelongingTo(node.TokenClass))
             .Select(node => node.Token.Characters);
 
         BinaryTree[] Anchors => Master
-            .FlatItem
             .Anchor
             .Items;
     }

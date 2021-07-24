@@ -41,7 +41,7 @@ namespace Reni.SyntaxTree
             : base(anchor, issue) { }
 
         protected ValueSyntax(int objectId, Anchor anchor, Issue issue = null)
-            : base(objectId, anchor, issue) { }
+            : base(anchor, issue,objectId) { }
 
         [DisableDump]
         internal virtual bool IsLambda => false;

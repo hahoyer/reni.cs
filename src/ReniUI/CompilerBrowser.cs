@@ -8,7 +8,6 @@ using Reni;
 using Reni.Code;
 using Reni.Helper;
 using Reni.Struct;
-using Reni.SyntaxTree;
 using Reni.TokenClasses;
 using Reni.Validation;
 using ReniUI.Formatting;
@@ -57,21 +56,12 @@ namespace ReniUI
             => new CompilerBrowser(() => Compiler.FromFile(fileName, parameters));
 
         public Classification.Item LocatePosition(SourcePosition offset)
-            => Classification.Item.LocateByPosition(Syntax, offset);
+            => Classification.Item.LocateByPosition(Compiler.BinaryTree, offset);
 
         public string FlatFormat(bool areEmptyLinesPossible)
             => Syntax.FlatItem.MainAnchor.GetFlatString(areEmptyLinesPossible);
 
         public Classification.Item LocatePosition(int offset) => LocatePosition(Source + offset);
-        internal IEnumerable<ValueSyntax> FindPosition(int offset) => FindPosition(Source + offset);
-
-        internal IEnumerable<ValueSyntax> FindPosition(SourcePosition offset)
-            => LocatePosition(offset)
-                .Master
-                .Chain(node => node.Parent)
-                .Select(item => item.FlatItem)
-                .OfType<ValueSyntax>()
-                .Where(item => item.ResultCache.Any());
 
         internal FunctionType Function(int index)
             => Compiler.Root.Function(index);
@@ -118,19 +108,7 @@ namespace ReniUI
             return default;
         }
 
-        Classification.Item LocateValueByPosition(SourcePosition offset, bool includingParent)
-        {
-            var token = Classification.Item.LocateByPosition(Syntax, offset);
-            if(token.IsComment || token.IsLineComment)
-                return null;
-
-            var start = token.Token.Characters.Start;
-            var result = start.Position <= 0? default : token.Master.LocateByPosition(start + -1, includingParent);
-            NotImplementedMethod(offset);
-            return default;
-        }
-
-        internal string[] DeclarationOptions(int offset)
+         internal string[] DeclarationOptions(int offset)
         {
             NotImplementedMethod(offset);
             return default;

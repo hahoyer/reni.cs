@@ -27,21 +27,17 @@ namespace ReniUI.Classification
         }
 
         internal readonly int Index;
-        internal readonly Helper.Syntax Master;
+        internal readonly Reni.SyntaxTree.Syntax Master;
 
+        protected Item(BinaryTree anchor) => Anchor = anchor;
 
-        protected Item(Helper.Syntax master, int index)
-        {
-            Master = master;
-            Index = index;
-        }
+        internal BinaryTree Anchor { get; }
 
-        internal BinaryTree Binary => Master.FlatItem.Anchor.Items[Index];
-        internal TokenClass TokenClass => Binary.TokenClass as TokenClass;
-        internal IToken Token => Binary.Token;
+        internal TokenClass TokenClass => Anchor.TokenClass as TokenClass;
+        internal IToken Token => Anchor.Token;
 
         [DisableDump]
-        public virtual SourcePart SourcePart => Binary.Token.Characters;
+        public virtual SourcePart SourcePart => Anchor.Token.Characters;
 
         [DisableDump]
         public virtual bool IsKeyword => false;
@@ -113,7 +109,7 @@ namespace ReniUI.Classification
         [DisableDump]
         public virtual IEnumerable<SourcePart> ParserLevelGroup => null;
 
-        public Trimmed TrimLine(SourcePart span) => new Trimmed(this, span);
+        public Trimmed TrimLine(SourcePart span) => new(this, span);
 
         bool Equals(Item other) => SourcePart == other.SourcePart;
 
@@ -125,21 +121,21 @@ namespace ReniUI.Classification
                 return true;
             if(obj.GetType() != GetType())
                 return false;
-            return Equals((Item)obj);
+            return Equals((Item) obj);
         }
 
         public override int GetHashCode() => SourcePart.GetHashCode();
 
         internal static Item LocateByPosition
-            (Helper.Syntax target, SourcePosition offset, bool includingParent = false)
+            (BinaryTree target, SourcePosition offset)
         {
-            var result = target.LocateByPosition(offset, includingParent);
-            result.Master.AssertIsNotNull();
-            var resultToken = result.Master.FlatItem.Anchor.Items[result.Index].Token;
+            var result = target.LocateByPosition(offset);
+            result.AssertIsNotNull();
+            var resultToken = result.Token;
             var item = resultToken.PrecededWith.LastOrDefault(item => item.SourcePart.Contains(offset));
             if(item == null)
-                return new Syntax(result.Master, result.Index);
-            return new WhiteSpaceItem(item, result.Master, result.Index);
+                return new Syntax(result);
+            return new WhiteSpaceItem(item, result);
         }
 
         public static Item GetRightNeighbor(Helper.Syntax target, int current)

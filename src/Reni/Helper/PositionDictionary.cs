@@ -12,23 +12,29 @@ namespace Reni.Helper
     {
         static int Position;
 
-        readonly IDictionary<SourcePosition, (int Length, TResult Node)[]> Value =
-            new Dictionary<SourcePosition, (int, TResult)[]>();
+        readonly IDictionary<SourcePosition, (int Length, TResult Node)> Value =
+            new Dictionary<SourcePosition, (int, TResult)>();
 
-        internal(int Length, TResult Node)[] this[SourcePosition key] => Value[key];
+        internal (int Length, TResult Node) this[SourcePosition key] => Value[key];
 
         internal TResult this[SourcePart keyPart]
         {
-            get => Value[keyPart.Start].Single(node => node.Length == keyPart.Length).Node;
+            get
+            {
+                var result = Value[keyPart.Start];
+                (result.Length == keyPart.Length).Assert();
+                return result.Node;
+            }
             set
             {
                 for(var offset = 0; offset <= keyPart.Length; offset++)
                 {
-                    var key = keyPart.Start + offset;
-                    if(!Value.TryGetValue(key, out var currentValue))
-                        currentValue = new (int, TResult)[0];
 
-                    Value[key] = currentValue.Concat(T((keyPart.Length - offset, value))).ToArray();
+                    var key = keyPart.Start + offset;
+                    Value.TryGetValue(key, out var oldValue);
+                    (!Value.ContainsKey(key)).Assert(key.DebuggerDump);
+
+                    Value[key] = (keyPart.Length - offset, value);
                 }
             }
         }

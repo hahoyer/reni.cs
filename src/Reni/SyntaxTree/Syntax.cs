@@ -41,19 +41,13 @@ namespace Reni.SyntaxTree
         [EnableDumpExcept(null)]
         readonly Issue Issue;
 
-        protected Syntax(Anchor anchor, Issue issue = null)
-        {
-            Anchor = anchor;
-            Anchor.SourceParts.AssertIsNotNull();
-            Issue = issue;
-        }
-
-        protected Syntax(int objectId, Anchor anchor, Issue issue = null)
+        protected Syntax(Anchor anchor, Issue issue = null, int? objectId = null)
             : base(objectId)
         {
             Anchor = anchor;
             Anchor.SourceParts.AssertIsNotNull();
             Issue = issue;
+            Anchor.SetSyntax(this);
         }
 
         ValueCache ValueCache.IContainer.Cache { get; } = new();
@@ -152,9 +146,12 @@ namespace Reni.SyntaxTree
         internal IEnumerable<Syntax> ItemsAsLongAs(Func<Syntax, bool> condition)
             => this.GetNodesFromLeftToRight().SelectMany(node => node.CheckedItemsAsLongAs(condition));
 
-        public IEnumerable<SourcePart> GetParserLevelGroup(int index)
+        internal IEnumerable<SourcePart> GetParserLevelGroup(int index)
             => Anchor.Items
                 .Where(item => item.TokenClass.IsBelongingTo(Anchor.Items[index].TokenClass))
                 .Select(item => item.Token.Characters);
+        internal SourcePart[] Anchors => Anchor.SourceParts;
+
+
     }
 }

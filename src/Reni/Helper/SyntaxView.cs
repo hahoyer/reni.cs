@@ -65,7 +65,6 @@ namespace Reni.Helper
         {
             (!includingParent).Assert();
             return Context[current]
-                .Single(node => node.Length > 0)
                 .Node
                 .LocateByPosition(current);
         }

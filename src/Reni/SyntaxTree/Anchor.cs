@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
@@ -75,6 +76,14 @@ namespace Reni.SyntaxTree
             var enumerable = binaryTrees
                 .Where(node => Items.All(parent => !node.HasAsParent(parent))).ToArray();
             return enumerable.Single();
+        }
+
+        public void SetSyntax(Syntax syntax)
+        {
+            foreach(var item in Items)
+            {
+                item.SetSyntax(syntax);
+            }
         }
     }
 }
