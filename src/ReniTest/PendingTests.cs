@@ -1,4 +1,4 @@
-//19:46:15.502 25.07.2021 ran 45 of 183 
+//19:52:24.489 25.07.2021 ran 46 of 183 
 
 namespace hw.UnitTest
 {
@@ -9,18 +9,12 @@ namespace hw.UnitTest
         
 // error 
 
-TestRunner.RunTest(new Reni.ParserTest.AlternativePrioTableTest().Converter);
-TestRunner.RunTest(new Reni.ParserTest.AlternativePrioTableTest().ConverterAndProperty);
-TestRunner.RunTest(new Reni.ParserTest.AlternativePrioTableTest().KeyWordAsUserObject);
-TestRunner.RunTest(new Reni.ParserTest.AlternativePrioTableTest().Run);
 TestRunner.RunTest(new Reni.ParserTest.StrangeDeclarationSyntax().Run);
 TestRunner.RunTest(new Reni.FeatureTest.ScopeHandlingPublic().Run);
 TestRunner.RunTest(new Reni.FeatureTest.ScopeHandlingNonPublic().Run);
 TestRunner.RunTest(new Reni.FeatureTest.ScopeHandlingError().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Validation.UndefinedContextSymbol().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Validation.UndefinedSymbol().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Validation.UnMatchedLeftParenthesis().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Validation.UnMatchedRightParenthesis().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Text.Hallo().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Structure.TwoStatements().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Structure.List1().Run);
@@ -75,7 +69,6 @@ TestRunner.RunTest(new Reni.FeatureTest.UserObjects().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Validation.SyntaxErrorComment().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Validation.UseOfUndefinedContextSymbol().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Validation.IndirectUseOfUndefinedContextSymbol().Run);
-TestRunner.RunTest(new Reni.FeatureTest.Validation.UnMatchedBrackets().Run);
 TestRunner.RunTest(new Reni.FeatureTest.TypeType.ApplyTypeOperator().Run);
 TestRunner.RunTest(new Reni.FeatureTest.TypeType.ApplyTypeOperatorWithCut().Run);
 TestRunner.RunTest(new Reni.FeatureTest.TypeType.TypeOperator().Run);

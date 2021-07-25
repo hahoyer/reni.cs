@@ -24,15 +24,21 @@ namespace Reni.SyntaxFactory
             else
                 name = null;
 
+            var tags = GetDeclarationTags(exclamation);
+            var declarer = DeclarerSyntax.Create(tags, name, factory.MeansPublic, target.Left);
+
+            return DeclarationSyntax.Create(declarer, factory.GetValueSyntax(target.Right), Anchor.Create(target));
+        }
+
+        static(BinaryTree tagCandidates, BinaryTree Right)[] GetDeclarationTags(BinaryTree exclamation)
+        {
+            if(exclamation == null)
+                return null;
             exclamation.TokenClass.Assert<ExclamationBoxToken>();
             exclamation.Left.AssertIsNull();
             exclamation.Right.AssertIsNotNull();
             exclamation.Right.TokenClass.Assert<DeclarationTagToken>();
-
-            var tags = T((tagCandidates: exclamation, exclamation.Right));
-            var declarer = DeclarerSyntax.Create(tags, name, factory.MeansPublic, target.Left);
-
-            return DeclarationSyntax.Create(declarer, factory.GetValueSyntax(target.Right), Anchor.Create(target));
+            return T((tagCandidates: exclamation, exclamation.Right));
         }
 
         static Kind Classification(BinaryTree node)
