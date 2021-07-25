@@ -1,4 +1,7 @@
+using System.Linq;
 using hw.DebugFormatter;
+using hw.Helper;
+using Reni.Helper;
 using Reni.Parser;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
@@ -30,15 +33,27 @@ namespace Reni.SyntaxFactory
             return DeclarationSyntax.Create(declarer, factory.GetValueSyntax(target.Right), Anchor.Create(target));
         }
 
-        static(BinaryTree tagCandidates, BinaryTree Right)[] GetDeclarationTags(BinaryTree exclamation)
+        static(BinaryTree[] Anchors, BinaryTree tag)[] GetDeclarationTags(BinaryTree target) 
+            => target
+            .Chain(node => node.Left)
+            .SelectMany(GetDeclarationTag)
+            .ToArray();
+
+        static (BinaryTree[] Anchors, BinaryTree tag)[] GetDeclarationTag(BinaryTree target)
         {
-            if(exclamation == null)
-                return null;
-            exclamation.TokenClass.Assert<ExclamationBoxToken>();
-            exclamation.Left.AssertIsNull();
-            exclamation.Right.AssertIsNotNull();
-            exclamation.Right.TokenClass.Assert<DeclarationTagToken>();
-            return T((tagCandidates: exclamation, exclamation.Right));
+            target.AssertIsNotNull();
+            target.TokenClass.Assert<ExclamationBoxToken>();
+            target.Right.AssertIsNotNull();
+
+            var nodes = target
+                .Right
+                .GetNodesFromLeftToRight()
+                .GroupBy(node => node.TokenClass is IDeclarationTagToken)
+                .ToDictionary(group=>group.Key, group=>group.ToArray());
+            var tags = nodes.SingleOrDefault(node=>node.Key).Value;
+            var result = tags.Select(tag => (Anchors: new BinaryTree[0], tag)).ToArray();
+            result[0].Anchors = nodes.SingleOrDefault(node=>!node.Key).Value;
+            return result;
         }
 
         static Kind Classification(BinaryTree node)

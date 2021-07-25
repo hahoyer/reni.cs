@@ -121,7 +121,7 @@ namespace Reni.SyntaxTree
 
         internal static DeclarerSyntax Create
         (
-            (BinaryTree anchor, BinaryTree tag)[] tags, BinaryTree name, bool meansPublic
+            (BinaryTree[] Anchors, BinaryTree tag)[] tags, BinaryTree name, bool meansPublic
             , BinaryTree specialFormattingAnchor
         )
         {
@@ -132,14 +132,15 @@ namespace Reni.SyntaxTree
             return new DeclarerSyntax(null, tagSyntax, nameSyntax, meansPublic, specialFormattingAnchor);
         }
 
-        static NameSyntax GetNameSyntax(BinaryTree name) 
+        static NameSyntax GetNameSyntax(BinaryTree name)
             => name == null? null : new NameSyntax(name.Token.Characters.Id, Anchor.Create(name));
 
-        static TagSyntax GetTagSyntax((BinaryTree anchor, BinaryTree tag) target)
+        static TagSyntax GetTagSyntax((BinaryTree[] anchors, BinaryTree tag) target)
         {
             var tag = target.tag.TokenClass as DeclarationTagToken;
             var issue = tag == null? IssueId.InvalidDeclarationTag.Issue(target.tag.Token.Characters) : null;
-            return new TagSyntax(tag, issue, Anchor.Create(target.tag).Combine(SyntaxTree.Anchor.Create(target.anchor)));
+            return new TagSyntax(tag, issue
+                , Anchor.Create(target.tag).Combine(target.anchors));
         }
 
         static DeclarerSyntax FromName(BinaryTree target, bool meansPublic, Anchor anchor = null)
