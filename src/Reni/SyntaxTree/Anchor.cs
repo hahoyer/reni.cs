@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
@@ -18,10 +17,14 @@ namespace Reni.SyntaxTree
 
         Anchor(params BinaryTree[] items)
         {
-            Items = items.OrderBy(item=> item.Token.Characters.Position).ToArray();
+            Items = items.OrderBy(item => item.Token.Characters.Position).ToArray();
             Items.Any().Assert();
             Main.AssertIsNotNull();
         }
+
+        ValueCache ValueCache.IContainer.Cache { get; } = new();
+
+        protected override string GetNodeDump() => base.GetNodeDump() + $"[{Items.Length}]";
 
         [DisableDump]
         internal SourcePart[] SourceParts => Items.SourceParts();
@@ -38,35 +41,33 @@ namespace Reni.SyntaxTree
         [DisableDump]
         internal BinaryTree Main => this.CachedValue(GetMain);
 
-        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
-
         internal Anchor GetLeftOf(BinaryTree target) => GetLeftOf(target.Token.SourcePart().Start);
         internal Anchor GetRightOf(BinaryTree target) => GetRightOf(target.Token.SourcePart().End);
 
         [PublicAPI]
         internal Anchor GetLeftOf(SourcePosition position)
-            => new Anchor(Items.Where(item => item.Token.SourcePart() < position).ToArray());
+            => new(Items.Where(item => item.Token.SourcePart() < position).ToArray());
 
         [PublicAPI]
         internal Anchor GetRightOf(SourcePosition position)
-            => new Anchor(Items.Where(item => position < item.Token.SourcePart()).ToArray());
-
-        protected override string GetNodeDump() => base.GetNodeDump() + $"[{Items.Length}]";
+            => new(Items.Where(item => position < item.Token.SourcePart()).ToArray());
 
         internal static Anchor Create(BinaryTree leftAnchor, BinaryTree rightAnchor)
-            => new Anchor(leftAnchor, rightAnchor);
+            => new(leftAnchor, rightAnchor);
 
         internal static Anchor Create(BinaryTree leftAnchor)
-            => new Anchor(leftAnchor.AssertNotNull());
+            => new(leftAnchor.AssertNotNull());
 
         internal static Anchor Create(IEnumerable<BinaryTree> items)
-            => new Anchor(items.ToArray());
+            => new(items.ToArray());
 
-        internal Anchor Combine(Anchor other)
+        internal Anchor Combine(Anchor other) => Combine(other?.Items);
+
+        internal Anchor Combine(BinaryTree[] other)
         {
-            if(other == null || !other.Items.Any())
+            if(other == null || !other.Any())
                 return this;
-            return new Anchor(other.Items.Concat(Items).ToArray());
+            return new Anchor(other.Concat(Items).ToArray());
         }
 
         BinaryTree GetMain()
@@ -81,9 +82,8 @@ namespace Reni.SyntaxTree
         public void SetSyntax(Syntax syntax)
         {
             foreach(var item in Items)
-            {
                 item.SetSyntax(syntax);
-            }
         }
+
     }
 }

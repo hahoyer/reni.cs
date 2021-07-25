@@ -1,7 +1,4 @@
-using System.Linq;
 using hw.DebugFormatter;
-using NUnit.Framework;
-using Reni.Helper;
 using Reni.Parser;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
@@ -20,11 +17,19 @@ namespace Reni.SyntaxFactory
         IStatementSyntax IStatementProvider.Get(BinaryTree target, Factory factory)
         {
             var name = target.Left;
-            (name.TokenClass is Definable).Assert();
+            var exclamation = target.Left;
 
-            var tagCandidates = target.Left.Left;
-            (tagCandidates.TokenClass is ExclamationBoxToken).Assert();
-            var tags = T((tagCandidates, tagCandidates.Right));
+            if(target.Left.TokenClass is Definable)
+                exclamation = exclamation.Left;
+            else
+                name = null;
+
+            exclamation.TokenClass.Assert<ExclamationBoxToken>();
+            exclamation.Left.AssertIsNull();
+            exclamation.Right.AssertIsNotNull();
+            exclamation.Right.TokenClass.Assert<DeclarationTagToken>();
+
+            var tags = T((tagCandidates: exclamation, exclamation.Right));
             var declarer = DeclarerSyntax.Create(tags, name, factory.MeansPublic, target.Left);
 
             return DeclarationSyntax.Create(declarer, factory.GetValueSyntax(target.Right), Anchor.Create(target));

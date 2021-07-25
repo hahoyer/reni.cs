@@ -38,8 +38,8 @@ namespace Reni.SyntaxFactory
         {
             var kernel = target.BracketKernel;
             var statements = GetStatementsSyntax(kernel.Center, null, kernel.Center?.TokenClass);
-            var anchor =
-                kernel.ToAnchor.Combine(Anchor.Create(kernel.Center.AssertNotNull().ParserLevelGroup));
+            var listAnchors = kernel.Center.AssertNotNull().ParserLevelGroup;
+            var anchor = kernel.ToAnchor.Combine(listAnchors);
             return CompoundSyntax.Create(statements, null, anchor);
         }
 
