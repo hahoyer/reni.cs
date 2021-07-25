@@ -22,8 +22,8 @@ namespace ReniUI.Helper
             Context = context;
             Parent = parent;
 
-            foreach(var anchor in FlatItem.Anchor.Items)
-                Context[anchor] = this;
+            //foreach(var anchor in FlatItem.Anchor.Items)
+            //    Context[anchor] = this;
 
         }
 

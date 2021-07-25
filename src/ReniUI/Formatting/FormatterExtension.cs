@@ -54,7 +54,7 @@ namespace ReniUI.Formatting
             var start = compiler.LocatePosition(targetPart.Start);
             var end = compiler.LocatePosition(targetPart.End+- 1);
             if(start != null && end != null)
-                return start.Master == end.Master && IsTooSmall(start.Token, targetPart);
+                return start.Anchor == end.Anchor && IsTooSmall(start.Token, targetPart);
 
             Dumpable.NotImplementedFunction(compiler, targetPart);
             return default;

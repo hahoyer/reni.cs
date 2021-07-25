@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Helper;
 using Reni.Parser;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
@@ -38,7 +39,7 @@ namespace Reni.SyntaxFactory
             var kernel = target.BracketKernel;
             var statements = GetStatementsSyntax(kernel.Center, null, kernel.Center?.TokenClass);
             var anchor =
-                kernel.ToAnchor.Combine(statements.Length <= 1? null : Anchor.Create(kernel.Center.ParserLevelGroup));
+                kernel.ToAnchor.Combine(Anchor.Create(kernel.Center.AssertNotNull().ParserLevelGroup));
             return CompoundSyntax.Create(statements, null, anchor);
         }
 
@@ -127,12 +128,5 @@ namespace Reni.SyntaxFactory
             => GetValueSyntax(target.Left)
                 .GetInfixSyntax(target, GetValueSyntax(target.Right), Anchor.Create(target).Combine(anchor));
 
-        internal DeclarerSyntax CombineWithSuffix(IEnumerable<BinaryTree> nodes)
-        {
-            var head = nodes.First();
-            var anchorNodes = nodes.Skip(1);
-            var anchor = anchorNodes.Any()? Anchor.Create(anchorNodes) : null;
-            return DeclarerSyntax.GetDeclarationTag(head, MeansPublic, anchor);
-        }
     }
 }

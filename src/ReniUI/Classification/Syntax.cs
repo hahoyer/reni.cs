@@ -45,25 +45,24 @@ namespace ReniUI.Classification
             => Issues.Any(item => item.IssueId == IssueId.EOFInLineComment);
 
         [DisableDump]
+        public override string State => Token.Characters.Id ?? "";
+
+        public override IEnumerable<SourcePart> ParserLevelGroup
+            => Master
+                .Anchor
+                .Items
+                .Where(node => Anchor.TokenClass.IsBelongingTo(node.TokenClass))
+                .Select(node => node.Token.Characters);
+
+        [DisableDump]
         IEnumerable<Issue> Issues
         {
             get
             {
-                NotImplementedMethod();
-                return default;
+                if(Master.Issues.Any())
+                    NotImplementedMethod();
+                return new Issue[0];
             }
         }
-
-        [DisableDump]
-        public override string State => Token.Characters.Id ?? "";
-
-        public override IEnumerable<SourcePart> ParserLevelGroup 
-            => Anchors
-            .Where(node => Anchor.TokenClass.IsBelongingTo(node.TokenClass))
-            .Select(node => node.Token.Characters);
-
-        BinaryTree[] Anchors => Master
-            .Anchor
-            .Items;
     }
 }

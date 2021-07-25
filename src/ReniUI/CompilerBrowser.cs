@@ -61,7 +61,11 @@ namespace ReniUI
         public string FlatFormat(bool areEmptyLinesPossible)
             => Syntax.FlatItem.MainAnchor.GetFlatString(areEmptyLinesPossible);
 
-        public Classification.Item LocatePosition(int offset) => LocatePosition(Source + offset);
+        public Classification.Item LocatePosition(int offset)
+        {
+            this.CachedItem(GetSyntax).IsValid = true;
+            return LocatePosition(Source + offset);
+        }
 
         internal FunctionType Function(int index)
             => Compiler.Root.Function(index);
@@ -90,8 +94,8 @@ namespace ReniUI
 
                 var syntax = new Helper.Syntax(compilerSyntax, PositionDictionary);
 
-                var all = syntax.GetNodesFromLeftToRight().ToArray();
-                PositionDictionary.AssertValid(Compiler.BinaryTree);
+                //var all = syntax.GetNodesFromLeftToRight().ToArray();
+                //PositionDictionary.AssertValid(Compiler.BinaryTree);
                 //syntax.Dump().FlaggedLine();
                 return syntax;
             }

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
+using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
 using Reni.TokenClasses;
@@ -11,23 +12,16 @@ namespace ReniUI.Classification
     {
         public sealed class Trimmed : DumpableObject
         {
-            public readonly SourcePart SourcePart;
-            public readonly Item Item;
+            readonly SourcePart SourcePart;
 
-            internal Trimmed(Item item, SourcePart sourcePart)
-            {
-                Item = item;
-                SourcePart = sourcePart.Intersect(Item.SourcePart) ?? Item.SourcePart.Start.Span(0);
-            }
+            internal Trimmed(Item item, SourcePart sourcePart) 
+                => SourcePart = sourcePart.Intersect(item.SourcePart) ?? item.SourcePart.Start.Span(0);
 
             public IEnumerable<char> GetCharArray()
                 => SourcePart
                     .Id
                     .ToCharArray();
         }
-
-        internal readonly int Index;
-        internal readonly Reni.SyntaxTree.Syntax Master;
 
         protected Item(BinaryTree anchor) => Anchor = anchor;
 
@@ -108,6 +102,11 @@ namespace ReniUI.Classification
 
         [DisableDump]
         public virtual IEnumerable<SourcePart> ParserLevelGroup => null;
+
+        [DisableDump]
+        public Reni.SyntaxTree.Syntax Master => Anchor.Syntax;
+        [DisableDump]
+        public int Index => Master.Anchor.Items.IndexWhere(item => item == Anchor).AssertValue();
 
         public Trimmed TrimLine(SourcePart span) => new(this, span);
 

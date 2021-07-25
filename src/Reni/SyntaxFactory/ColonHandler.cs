@@ -1,8 +1,8 @@
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Helper;
-using hw.Parser;
+using NUnit.Framework;
 using Reni.Helper;
+using Reni.Parser;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
 
@@ -19,17 +19,13 @@ namespace Reni.SyntaxFactory
 
         IStatementSyntax IStatementProvider.Get(BinaryTree target, Factory factory)
         {
-            var nodes = target
-                .Left
-                .GetNodesFromLeftToRight()
-                .Where(node => node != null)
-                .GroupBy(Classification)
-                .ToDictionary(pair => pair.Key, pair => pair.ToArray());
+            var name = target.Left;
+            (name.TokenClass is Definable).Assert();
 
-            nodes.TryGetValue(Kind.Tag, out var tags);
-            nodes.TryGetValue(Kind.Name, out var names);
-
-            var declarer = DeclarerSyntax.Create(tags, names, factory.MeansPublic, target.Left);
+            var tagCandidates = target.Left.Left;
+            (tagCandidates.TokenClass is ExclamationBoxToken).Assert();
+            var tags = T((tagCandidates, tagCandidates.Right));
+            var declarer = DeclarerSyntax.Create(tags, name, factory.MeansPublic, target.Left);
 
             return DeclarationSyntax.Create(declarer, factory.GetValueSyntax(target.Right), Anchor.Create(target));
         }

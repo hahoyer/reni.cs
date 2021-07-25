@@ -40,19 +40,21 @@ namespace Reni.TokenClasses
         internal ITokenClass TokenClass { get; }
 
         [DisableDump]
-        internal BinaryTree LeftNeighbor;
+        BinaryTree LeftNeighbor;
 
         [DisableDump]
-        internal BinaryTree Parent;
+        BinaryTree Parent;
 
         [DisableDump]
-        internal BinaryTree RightNeighbor;
+        BinaryTree RightNeighbor;
 
-        int Depth;
+        [DisableDump]
+        internal Syntax Syntax;
 
         readonly FunctionCache<bool, string> FlatFormatCache;
-        Syntax Syntax;
         readonly FunctionCache<int, BinaryTree> LocationCache;
+
+        int Depth;
 
         BinaryTree
         (
@@ -67,25 +69,10 @@ namespace Reni.TokenClasses
             Left = left;
             TokenClass = tokenClass;
             Right = right;
-            FlatFormatCache = new(GetFlatStringValue);
-            LocationCache = new(GetItemByOffset);
+            FlatFormatCache = new FunctionCache<bool, string>(GetFlatStringValue);
+            LocationCache = new FunctionCache<int, BinaryTree>(GetItemByOffset);
 
             SetLinks();
-        }
-
-        BinaryTree GetItemByOffset(int position)
-        {
-            if(Token.Characters.EndPosition <= position)
-                return Right?.LocationCache[position];
-
-            if(Token.Characters.Position <= position)
-                return this;
-
-            var whiteSpaceStart = Token.PrecededWith.FirstOrDefault();
-            if(whiteSpaceStart != null && whiteSpaceStart.SourcePart.Position <= position)
-                return this;
-
-            return Left?.LocationCache[position];
         }
 
         ValueCache ValueCache.IContainer.Cache { get; } = new();
@@ -130,7 +117,7 @@ namespace Reni.TokenClasses
                     if(TokenClass is ILeftBracket leftBracket)
                     {
                         Left.AssertIsNull();
-                        return new()
+                        return new BracketNodes()
                         {
                             Left = this, Center = Right
                             , Right = ErrorToken.Create(IssueId.MissingRightBracket, RightMost)
@@ -177,6 +164,21 @@ namespace Reni.TokenClasses
         [DisableDump]
         public bool IsSeparatorRequired
             => !Token.PrecededWith.HasComment() && SeparatorExtension.Get(LeftNeighbor?.TokenClass, TokenClass);
+
+        BinaryTree GetItemByOffset(int position)
+        {
+            if(Token.Characters.EndPosition <= position)
+                return Right?.LocationCache[position];
+
+            if(Token.Characters.Position <= position)
+                return this;
+
+            var whiteSpaceStart = Token.PrecededWith.FirstOrDefault();
+            if(whiteSpaceStart != null && whiteSpaceStart.SourcePart.Position <= position)
+                return this;
+
+            return Left?.LocationCache[position];
+        }
 
         void SetLinks()
         {
