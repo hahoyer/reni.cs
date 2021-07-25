@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
@@ -27,7 +26,7 @@ namespace Reni.SyntaxFactory
         internal static readonly IStatementsProvider List = new ListHandler();
         internal static readonly IStatementProvider Colon = new ColonHandler();
 
-        internal static readonly Factory Root = new Factory(false);
+        internal static readonly Factory Root = new(false);
 
         [EnableDump]
         internal readonly bool MeansPublic;
@@ -39,6 +38,8 @@ namespace Reni.SyntaxFactory
             var kernel = target.BracketKernel;
             var statements = GetStatementsSyntax(kernel.Center, null, kernel.Center?.TokenClass);
             var listAnchors = kernel.Center.AssertNotNull().ParserLevelGroup;
+            if(listAnchors.Any() && listAnchors[0].TokenClass is not TokenClasses.List)
+                listAnchors = null;
             var anchor = kernel.ToAnchor.Combine(listAnchors);
             return CompoundSyntax.Create(statements, null, anchor);
         }
@@ -89,7 +90,7 @@ namespace Reni.SyntaxFactory
                 default:
                     return new EmptyList
                     (
-                        Anchor.Create(target).Combine(anchor)
+                        Anchor.CreateAll(target).Combine(anchor)
                         , IssueId.InvalidExpression.Issue(target.Token.Characters)
                     );
             }
@@ -105,12 +106,12 @@ namespace Reni.SyntaxFactory
                 return this;
 
             return level switch
-                   {
-                       0 => true, 3 => true, _ => false
-                   } ==
-                   MeansPublic
-                ? this
-                : new Factory(!MeansPublic);
+                {
+                    0 => true, 3 => true, _ => false
+                } ==
+                MeansPublic
+                    ? this
+                    : new Factory(!MeansPublic);
         }
 
         internal ExpressionSyntax GetExpressionSyntax(BinaryTree target, Anchor anchor)
@@ -127,6 +128,5 @@ namespace Reni.SyntaxFactory
         internal ValueSyntax GetInfixSyntax(BinaryTree target, Anchor anchor)
             => GetValueSyntax(target.Left)
                 .GetInfixSyntax(target, GetValueSyntax(target.Right), Anchor.Create(target).Combine(anchor));
-
     }
 }

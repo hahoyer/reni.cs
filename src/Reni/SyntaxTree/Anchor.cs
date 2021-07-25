@@ -5,6 +5,7 @@ using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
 using JetBrains.Annotations;
+using Reni.Helper;
 using Reni.Parser;
 using Reni.TokenClasses;
 using Reni.Validation;
@@ -85,5 +86,7 @@ namespace Reni.SyntaxTree
                 item.SetSyntax(syntax);
         }
 
+        public static Anchor CreateAll(BinaryTree target) 
+            => Create(target.GetNodesFromLeftToRight());
     }
 }

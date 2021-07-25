@@ -159,7 +159,8 @@ namespace Reni.TokenClasses
         }
 
         [DisableDump]
-        public BinaryTree[] ParserLevelGroup => this.CachedValue(() => GetParserLevelGroup(TokenClass).ToArray());
+        public BinaryTree[] ParserLevelGroup 
+            => this.CachedValue(() => GetParserLevelGroup(TokenClass).ToArray());
 
         [DisableDump]
         public bool IsSeparatorRequired
@@ -212,8 +213,9 @@ namespace Reni.TokenClasses
 
             if(tokenClass is IRightBracket)
             {
-                NotImplementedMethod(tokenClass);
-                return default;
+                if(BracketKernel == null)
+                    NotImplementedMethod(tokenClass);
+                return T(BracketKernel.Left, BracketKernel.Right);
             }
 
             if(tokenClass is ILeftBracket)

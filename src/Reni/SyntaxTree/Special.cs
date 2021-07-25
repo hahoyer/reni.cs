@@ -1,10 +1,8 @@
 using hw.DebugFormatter;
 using hw.Parser;
-using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
-using Reni.TokenClasses;
 
 namespace Reni.SyntaxTree
 {
@@ -25,25 +23,25 @@ namespace Reni.SyntaxTree
             Token.AssertIsNotNull();
         }
 
+        internal override Result ResultForCache(ContextBase context, Category category)
+            => Terminal.Result(context, category, Token);
+
+        internal override ValueSyntax Visit(ISyntaxVisitor visitor) => Terminal.Visit(visitor);
+
         [DisableDump]
         internal string Id => Token.Characters.Id;
 
         [DisableDump]
         internal long ToNumber => BitsConst.Convert(Id).ToInt64();
-
-        internal override Result ResultForCache(ContextBase context, Category category)
-            => Terminal.Result(context, category, Token);
-
-        internal override ValueSyntax Visit(ISyntaxVisitor visitor) => Terminal.Visit(visitor);
     }
 
     sealed class PrefixSyntax : ValueSyntax
     {
         [Node]
-        readonly IPrefix Prefix;
+        internal readonly ValueSyntax Right;
 
         [Node]
-        internal readonly ValueSyntax Right;
+        readonly IPrefix Prefix;
 
         readonly IToken Token;
 
@@ -60,24 +58,24 @@ namespace Reni.SyntaxTree
 
         protected override Syntax GetDirectChild(int index) => index == 0? Right : null;
 
+        internal override Result ResultForCache(ContextBase context, Category category)
+            => Prefix.Result(context, category, Right, Token);
+
         public static Result<ValueSyntax> Create
             (IPrefix prefix, Result<ValueSyntax> right, IToken token, Anchor brackets)
             => new PrefixSyntax(prefix, right.Target, token, brackets).AddIssues<ValueSyntax>(right.Issues);
-
-        internal override Result ResultForCache(ContextBase context, Category category) 
-            => Prefix.Result(context, category, Right, Token);
     }
 
     sealed class InfixSyntax : ValueSyntax
     {
         [Node]
-        readonly IInfix Infix;
-
-        [Node]
         internal readonly ValueSyntax Left;
 
         [Node]
         internal readonly ValueSyntax Right;
+
+        [Node]
+        readonly IInfix Infix;
 
         readonly IToken Token;
 
@@ -102,6 +100,9 @@ namespace Reni.SyntaxTree
                 0 => Left, 1 => Right, _ => null
             };
 
+        internal override Result ResultForCache(ContextBase context, Category category) => Infix
+            .Result(context, category, Left, Right);
+
         public static Result<ValueSyntax> Create
         (
             Result<ValueSyntax> left, IInfix infix, Result<ValueSyntax> right, IToken token
@@ -111,9 +112,6 @@ namespace Reni.SyntaxTree
             ValueSyntax syntax = new InfixSyntax(left.Target, infix, right.Target, token, brackets);
             return syntax.AddIssues(left.Issues.plus(right.Issues));
         }
-
-        internal override Result ResultForCache(ContextBase context, Category category) => Infix
-            .Result(context, category, Left, Right);
     }
 
     interface IPendingProvider
@@ -144,15 +142,15 @@ namespace Reni.SyntaxTree
 
         protected override Syntax GetDirectChild(int index) => index == 0? Left : null;
 
+        internal override Result ResultForCache(ContextBase context, Category category)
+            => Suffix.Result(context, category, Left);
+
         public static Result<ValueSyntax> Create
             (Result<ValueSyntax> left, ISuffix suffix, IToken token, Anchor brackets)
         {
             ValueSyntax syntax = new SuffixSyntax(left.Target, suffix, token, brackets);
             return syntax.AddIssues(left.Issues);
         }
-
-        internal override Result ResultForCache(ContextBase context, Category category)
-            => Suffix.Result(context, category, Left);
     }
 
     interface ITerminal
