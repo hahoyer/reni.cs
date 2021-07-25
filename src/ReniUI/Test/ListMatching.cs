@@ -14,7 +14,7 @@ namespace ReniUI.Test
         {
             const string text = @"(1,3,4,6)";
             var compiler = CompilerBrowser.FromText(text);
-            var comma = compiler.LocatePosition(2);
+            var comma = compiler.Locate(2);
             var commas = comma.ParserLevelGroup.ToArray();
             (commas.Length == 3).Assert();
         }
@@ -34,7 +34,7 @@ namespace ReniUI.Test
                     })
                 .Where(item => item.item == ',')
                 .Select
-                    (item => compiler.LocatePosition(item.index).ParserLevelGroup.ToArray())
+                    (item => compiler.Locate(item.index).ParserLevelGroup.ToArray())
                 .ToArray();
 
             (commas.Length == 3).Assert();
@@ -57,7 +57,7 @@ namespace ReniUI.Test
                 .Select((item, index) => new {item, index})
                 .Where(item => item.item == ',')
                 .Select
-                    (item => compiler.LocatePosition(item.index).ParserLevelGroup.ToArray())
+                    (item => compiler.Locate(item.index).ParserLevelGroup.ToArray())
                 .ToArray();
 
             (commas.Length == 3).Assert();

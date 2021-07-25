@@ -24,7 +24,7 @@ namespace ReniUI.Test.UserInteraction
             (
                 Text
                     .Length
-                    .Select(item => compiler.LocatePosition((int) item).TypeCharacter)
+                    .Select(item => compiler.Locate(item).TypeCharacter)
                     .ToArray()
             );
             (Type == typeCharacters).Assert

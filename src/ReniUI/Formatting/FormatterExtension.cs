@@ -51,8 +51,8 @@ namespace ReniUI.Formatting
             if(targetPart == null)
                 return false;
 
-            var start = compiler.LocatePosition(targetPart.Start);
-            var end = compiler.LocatePosition(targetPart.End+- 1);
+            var start = compiler.Locate(targetPart.Start);
+            var end = compiler.Locate(targetPart.End+- 1);
             if(start != null && end != null)
                 return start.Anchor == end.Anchor && IsTooSmall(start.Token, targetPart);
 

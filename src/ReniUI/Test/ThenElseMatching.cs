@@ -14,8 +14,8 @@ namespace ReniUI.Test
         {
             const string text = @"1 then 2 else 3";
             var compiler = CompilerBrowser.FromText(text);
-            var thenToken = compiler.LocatePosition(text.IndexOf("then"));
-            var elseToken = compiler.LocatePosition(text.IndexOf("else"));
+            var thenToken = compiler.Locate(text.IndexOf("then"));
+            var elseToken = compiler.Locate(text.IndexOf("else"));
             (elseToken.Master == thenToken.Master)
                 .Assert
                 (
@@ -33,8 +33,8 @@ namespace ReniUI.Test
         {
             const string text = @"1 then 2 then 333 else 3";
             var compiler = CompilerBrowser.FromText(text);
-            var thenToken = compiler.LocatePosition(text.IndexOf("then"));
-            var elseToken = compiler.LocatePosition(text.IndexOf("else"));
+            var thenToken = compiler.Locate(text.IndexOf("then"));
+            var elseToken = compiler.Locate(text.IndexOf("else"));
             (elseToken.Master == thenToken.Master).Assert();
             (elseToken.Index == 1).Assert();
             (thenToken.Index == 0).Assert();

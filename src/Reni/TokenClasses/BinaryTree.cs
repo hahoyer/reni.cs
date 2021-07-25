@@ -308,5 +308,21 @@ namespace Reni.TokenClasses
             (Token.Characters.Source == offset.Source).Assert();
             return LocationCache[offset.Position];
         }
+
+        internal BinaryTree CommonRoot(BinaryTree end)
+        {
+            var startParents = this.Chain(node => node.Parent).Reverse().ToArray();
+            var endParents = end.Chain(node => node.Parent).Reverse().ToArray();
+
+            var result = startParents[0];
+            for(var index = 1; index < startParents.Length && index < endParents .Length; index++)
+            {
+                var parent = startParents[index];
+                if(parent != endParents[index])
+                    return result;
+                result = parent;
+            }
+            return result;
+        }
     }
 }

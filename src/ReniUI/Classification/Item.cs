@@ -14,7 +14,7 @@ namespace ReniUI.Classification
         {
             readonly SourcePart SourcePart;
 
-            internal Trimmed(Item item, SourcePart sourcePart) 
+            internal Trimmed(Item item, SourcePart sourcePart)
                 => SourcePart = sourcePart.Intersect(item.SourcePart) ?? item.SourcePart.Start.Span(0);
 
             public IEnumerable<char> GetCharArray()
@@ -23,12 +23,9 @@ namespace ReniUI.Classification
                     .ToCharArray();
         }
 
-        protected Item(BinaryTree anchor) => Anchor = anchor;
-
         internal BinaryTree Anchor { get; }
 
-        internal TokenClass TokenClass => Anchor.TokenClass as TokenClass;
-        internal IToken Token => Anchor.Token;
+        protected Item(BinaryTree anchor) => Anchor = anchor;
 
         [DisableDump]
         public virtual SourcePart SourcePart => Anchor.Token.Characters;
@@ -69,6 +66,25 @@ namespace ReniUI.Classification
         [DisableDump]
         public virtual string State => "";
 
+        [DisableDump]
+        public virtual IEnumerable<SourcePart> ParserLevelGroup => null;
+
+        public override bool Equals(object obj)
+        {
+            if(ReferenceEquals(null, obj))
+                return false;
+            if(ReferenceEquals(this, obj))
+                return true;
+            if(obj.GetType() != GetType())
+                return false;
+            return Equals((Item)obj);
+        }
+
+        public override int GetHashCode() => SourcePart.GetHashCode();
+
+        internal TokenClass TokenClass => Anchor.TokenClass as TokenClass;
+        internal IToken Token => Anchor.Token;
+
         public char TypeCharacter
         {
             get
@@ -101,10 +117,8 @@ namespace ReniUI.Classification
         public int EndPosition => SourcePart.EndPosition;
 
         [DisableDump]
-        public virtual IEnumerable<SourcePart> ParserLevelGroup => null;
-
-        [DisableDump]
         public Reni.SyntaxTree.Syntax Master => Anchor.Syntax;
+
         [DisableDump]
         public int Index => Master.Anchor.Items.IndexWhere(item => item == Anchor).AssertValue();
 
@@ -112,21 +126,7 @@ namespace ReniUI.Classification
 
         bool Equals(Item other) => SourcePart == other.SourcePart;
 
-        public override bool Equals(object obj)
-        {
-            if(ReferenceEquals(null, obj))
-                return false;
-            if(ReferenceEquals(this, obj))
-                return true;
-            if(obj.GetType() != GetType())
-                return false;
-            return Equals((Item) obj);
-        }
-
-        public override int GetHashCode() => SourcePart.GetHashCode();
-
-        internal static Item LocateByPosition
-            (BinaryTree target, SourcePosition offset)
+        internal static Item LocateByPosition(BinaryTree target, SourcePosition offset)
         {
             var result = target.LocateByPosition(offset);
             result.AssertIsNotNull();
@@ -135,6 +135,15 @@ namespace ReniUI.Classification
             if(item == null)
                 return new Syntax(result);
             return new WhiteSpaceItem(item, result);
+        }
+
+        internal static BinaryTree Locate(BinaryTree target, SourcePart span)
+        {
+            var start = LocateByPosition(target, span.Start);
+            var end = LocateByPosition(target, span.End);
+            var result = start.Anchor.CommonRoot(end.Anchor);
+            result.AssertIsNotNull();
+            return (result);
         }
 
         public static Item GetRightNeighbor(Helper.Syntax target, int current)

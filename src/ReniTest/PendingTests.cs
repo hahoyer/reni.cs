@@ -1,4 +1,4 @@
-//00:01:25.728 26.07.2021 ran 177 of 183 
+//00:47:03.416 26.07.2021 run 174 of 183 Reni.FeatureTest.Function.PrimitiveRecursiveFunctionHuge.Run
 
 namespace hw.UnitTest
 {
@@ -7,6 +7,10 @@ namespace hw.UnitTest
         public static void Run()
         {
         
+// active 
+
+TestRunner.RunTest(new Reni.FeatureTest.Function.PrimitiveRecursiveFunctionHuge().Run);
+
 // error 
 
 TestRunner.RunTest(new ReniUI.Test.TokenLocating().FromSourcePart);
@@ -24,6 +28,8 @@ TestRunner.RunTest(new ReniUI.Test.UserInteraction.UserInterAction2().GetTokenFo
 
 // notrun 
 
+TestRunner.RunTest(new Reni.FeatureTest.Text1().Run);
+TestRunner.RunTest(new Reni.FeatureTest.TextConcat().Run);
 TestRunner.RunTest(new ReniUI.Test.AutoComplete().GetDeclarationOptions);
 TestRunner.RunTest(new ReniUI.Test.AutoCompleteFunctionInCompound().GetDeclarationOptions);
 TestRunner.RunTest(new ReniUI.Test.AutoCompleteSimple().GetDeclarationOptions);

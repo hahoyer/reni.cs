@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
@@ -10,6 +9,7 @@ using Reni.Helper;
 using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Validation;
+using ReniUI.Classification;
 using ReniUI.Formatting;
 
 namespace ReniUI
@@ -17,9 +17,11 @@ namespace ReniUI
     public sealed class CompilerBrowser : DumpableObject, ValueCache.IContainer
     {
         readonly ValueCache<Compiler> ParentCache;
-        readonly PositionDictionary<Helper.Syntax> PositionDictionary = new PositionDictionary<Helper.Syntax>();
+        readonly PositionDictionary<Helper.Syntax> PositionDictionary = new();
 
         CompilerBrowser(Func<Compiler> parent) => ParentCache = new ValueCache<Compiler>(parent);
+
+        ValueCache ValueCache.IContainer.Cache { get; } = new();
 
         public Source Source => Compiler.Source;
 
@@ -37,35 +39,35 @@ namespace ReniUI
         }
 
         internal IExecutionContext ExecutionContext => Compiler;
-        public BinaryTree LeftMost=>Compiler.BinaryTree.LeftMost;
+        public BinaryTree LeftMost => Compiler.BinaryTree.LeftMost;
 
         internal IEnumerable<Issue> Issues => Compiler.Issues;
 
         internal Helper.Syntax Syntax => this.CachedValue(GetSyntax);
 
-        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
-
         public static CompilerBrowser FromText
             (string text, CompilerParameters parameters, string sourceIdentifier = null)
-            => new CompilerBrowser(() => Compiler.FromText(text, parameters, sourceIdentifier));
+            => new(() => Compiler.FromText(text, parameters, sourceIdentifier));
 
         public static CompilerBrowser FromText(string text, string sourceIdentifier = null)
-            => new CompilerBrowser(() => Compiler.FromText(text, null, sourceIdentifier));
+            => new(() => Compiler.FromText(text, null, sourceIdentifier));
 
         public static CompilerBrowser FromFile(string fileName, CompilerParameters parameters = null)
-            => new CompilerBrowser(() => Compiler.FromFile(fileName, parameters));
+            => new(() => Compiler.FromFile(fileName, parameters));
 
-        public Classification.Item LocatePosition(SourcePosition offset)
-            => Classification.Item.LocateByPosition(Compiler.BinaryTree, offset);
+        public Item Locate(SourcePosition offset)
+        {
+            this.CachedItem(GetSyntax).IsValid = true;
+            return Item.LocateByPosition(Compiler.BinaryTree, offset);
+        }
 
         public string FlatFormat(bool areEmptyLinesPossible)
             => Syntax.FlatItem.MainAnchor.GetFlatString(areEmptyLinesPossible);
 
-        public Classification.Item LocatePosition(int offset)
-        {
-            this.CachedItem(GetSyntax).IsValid = true;
-            return LocatePosition(Source + offset);
-        }
+        public Item Locate(int offset) => Locate(Source + offset);
+
+        internal BinaryTree Locate(SourcePart span) 
+            => Item.Locate(Compiler.BinaryTree, span);
 
         internal FunctionType Function(int index)
             => Compiler.Root.Function(index);
@@ -106,18 +108,10 @@ namespace ReniUI
             }
         }
 
-        internal Classification.Item LocateIncludingParent(SourcePart span)
-        {
-            NotImplementedMethod(span);
-            return default;
-        }
-
-         internal string[] DeclarationOptions(int offset)
+        internal string[] DeclarationOptions(int offset)
         {
             NotImplementedMethod(offset);
             return default;
         }
-
-
     }
 }

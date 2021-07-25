@@ -30,7 +30,7 @@ repeat: @ ^ while() then(^ body(), repeat(^));
             var compiler = CompilerBrowser.FromText(text);
             for(var i = 0; i < text.Length; i++)
             {
-                var t = compiler.LocatePosition(i);
+                var t = compiler.Locate(i);
                 (t != null).Assert(() => (new Source(text) + i).Dump());
             }
         }
@@ -43,7 +43,7 @@ repeat: @ ^ while() then(^ body(), repeat(^));
             var compiler = CompilerBrowser.FromText(text);
             for(var i = 0; i < text.Length; i++)
             {
-                var t = compiler.LocatePosition(i);
+                var t = compiler.Locate(i);
                 (t != null).Assert(() => (new Source(text) + i).Dump());
             }
         }

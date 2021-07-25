@@ -15,7 +15,7 @@ namespace reniUI.Test.Classification
             (
                 text
                     .Length
-                    .Select(item => compiler.LocatePosition(item).TypeCharacter)
+                    .Select(item => compiler.Locate(item).TypeCharacter)
                     .ToArray()
             );
             (expected == typeCharacters).Assert

@@ -19,8 +19,8 @@ namespace ReniUI.Test
 
             var compiler = CompilerBrowser.FromText(text);
 
-            var open = compiler.LocatePosition(0);
-            var close = compiler.LocatePosition(text.IndexOf(")"));
+            var open = compiler.Locate(0);
+            var close = compiler.Locate(text.IndexOf(")"));
 
             var matchOpen = open.ParserLevelGroup;
             var matchClose = close.ParserLevelGroup;
@@ -37,8 +37,8 @@ namespace ReniUI.Test
 
             var compiler = CompilerBrowser.FromText(text);
 
-            var open = compiler.LocatePosition(0);
-            var close = compiler.LocatePosition(text.IndexOf(")"));
+            var open = compiler.Locate(0);
+            var close = compiler.Locate(text.IndexOf(")"));
 
             var matchOpen = open.ParserLevelGroup.ToArray();
             var matchClose = close.ParserLevelGroup.ToArray();
@@ -56,7 +56,7 @@ namespace ReniUI.Test
 
             var compiler = CompilerBrowser.FromText(text);
 
-            var close = compiler.LocatePosition(text.IndexOf(")", text.IndexOf(")") + 1));
+            var close = compiler.Locate(text.IndexOf(")", text.IndexOf(")") + 1));
 
             var matchClose = close.ParserLevelGroup;
 
