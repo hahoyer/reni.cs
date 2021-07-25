@@ -28,9 +28,13 @@ namespace Reni.SyntaxFactory
                 name = null;
 
             var tags = GetDeclarationTags(exclamation);
-            var declarer = DeclarerSyntax.Create(tags, name, factory.MeansPublic, target.Left);
+            var declarer 
+                = DeclarerSyntax
+                .Create(tags, name, factory.MeansPublic, target.Left);
 
-            return DeclarationSyntax.Create(declarer, factory.GetValueSyntax(target.Right), Anchor.Create(target));
+            var result = DeclarationSyntax
+                .Create(declarer, factory.GetValueSyntax(target.Right), Anchor.Create(target));
+            return result;
         }
 
         static(BinaryTree[] Anchors, BinaryTree tag)[] GetDeclarationTags(BinaryTree target) 
@@ -46,7 +50,6 @@ namespace Reni.SyntaxFactory
             target.Right.AssertIsNotNull();
 
             var nodes = target
-                .Right
                 .GetNodesFromLeftToRight()
                 .GroupBy(node => node.TokenClass is IDeclarationTagToken)
                 .ToDictionary(group=>group.Key, group=>group.ToArray());
