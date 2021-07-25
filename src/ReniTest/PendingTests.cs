@@ -1,4 +1,4 @@
-//23:18:45.344 25.07.2021 run 96 of 183 Reni.FeatureTest.ComplexContext.Run
+//23:24:20.332 25.07.2021 run 84 of 183 Reni.FeatureTest.Reference.ArrayReferenceDumpSimple.Run
 
 namespace hw.UnitTest
 {
@@ -9,26 +9,15 @@ namespace hw.UnitTest
         
 // active 
 
-TestRunner.RunTest(new Reni.FeatureTest.ComplexContext().Run);
+TestRunner.RunTest(new Reni.FeatureTest.Reference.ArrayReferenceDumpSimple().Run);
 
 // error 
 
 TestRunner.RunTest(new ReniUI.Test.Classification.Basics().GetTokenForPosition);
 
-// dependanterror 
-
-TestRunner.RunTest(new ReniUI.Test.ThenElseMatching().Matching);
-TestRunner.RunTest(new ReniUI.Test.ThenElseMatching().NestedMatching);
-TestRunner.RunTest(new ReniUI.Test.TokenLocating().FromSourcePart);
-TestRunner.RunTest(new ReniUI.Test.TokenLocating().CommentFromSourcePart);
-TestRunner.RunTest(new ReniUI.Test.TokenLocating().CompoundSourcePart);
-TestRunner.RunTest(new ReniUI.Test.TokenLocating().NamedCompoundSourcePart);
-TestRunner.RunTest(new ReniUI.Test.UserInteraction.UserInterAction().TypingAProgram);
-TestRunner.RunTest(new ReniUI.Test.UserInteraction.UserInterAction().GetTokenForPosition);
-TestRunner.RunTest(new ReniUI.Test.UserInteraction.UserInterAction2().GetTokenForPosition);
-
 // notrun 
 
+TestRunner.RunTest(new Reni.FeatureTest.ComplexContext().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Text1().Run);
 TestRunner.RunTest(new Reni.FeatureTest.TextConcat().Run);
 TestRunner.RunTest(new Reni.FeatureTest.UserObjects().Run);
@@ -104,14 +93,41 @@ TestRunner.RunTest(new Reni.FeatureTest.Reference.ArrayReferenceByInstance().Run
 TestRunner.RunTest(new Reni.FeatureTest.Reference.ArrayReferenceCopy().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Reference.ArrayReferenceCopyAssign().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Reference.ArrayReferenceDumpLoop().Run);
+TestRunner.RunTest(new Reni.FeatureTest.Array.ArrayFromPieces().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Array.TypeOfArrayFromPieces().Run);
+TestRunner.RunTest(new Reni.FeatureTest.Array.CombineArraysFromPieces().Run);
+TestRunner.RunTest(new Reni.FeatureTest.Array.TypeOfCombineArraysFromPieces().Run);
+TestRunner.RunTest(new Reni.FeatureTest.Array.ElementAccessSimple().Run);
+TestRunner.RunTest(new Reni.FeatureTest.Array.ElementAccess().Run);
+TestRunner.RunTest(new Reni.FeatureTest.Array.ArrayVariable().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Array.ElementAccessVariableSetterSimple().Run);
 TestRunner.RunTest(new Reni.FeatureTest.Array.ElementAccessVariableSetter().Run);
+TestRunner.RunTest(new Reni.FeatureTest.Array.ElementAccessVariable().Run);
+TestRunner.RunTest(new Reni.FeatureTest.Array.TypeOfSimpleArrayFromPiece().Run);
+TestRunner.RunTest(new Reni.FeatureTest.Array.TypeOfElementOfSimpleArrayFromPiece().Run);
 TestRunner.RunTest(new ReniUI.Test.AutoComplete().GetDeclarationOptions);
 TestRunner.RunTest(new ReniUI.Test.AutoCompleteFunctionInCompound().GetDeclarationOptions);
 TestRunner.RunTest(new ReniUI.Test.AutoCompleteSimple().GetDeclarationOptions);
+TestRunner.RunTest(new ReniUI.Test.ThenElseMatching().Matching);
+TestRunner.RunTest(new ReniUI.Test.ThenElseMatching().NestedMatching);
+TestRunner.RunTest(new ReniUI.Test.TokenLocating().FromSourcePart);
+TestRunner.RunTest(new ReniUI.Test.TokenLocating().CommentFromSourcePart);
+TestRunner.RunTest(new ReniUI.Test.TokenLocating().CompoundSourcePart);
+TestRunner.RunTest(new ReniUI.Test.TokenLocating().NamedCompoundSourcePart);
 TestRunner.RunTest(new ReniUI.Test.UserInteraction.BadUserInterAction().GetTokenForPosition);
 TestRunner.RunTest(new ReniUI.Test.UserInteraction.BadUserInterAction().GetTokenForPositionSimple);
+TestRunner.RunTest(new ReniUI.Test.UserInteraction.UserInterAction().TypingAProgram);
+TestRunner.RunTest(new ReniUI.Test.UserInteraction.UserInterAction().GetTokenForPosition);
+TestRunner.RunTest(new ReniUI.Test.UserInteraction.UserInterAction2().GetTokenForPosition);
 TestRunner.RunTest(new ReniUI.Test.Formatting.BadThings().BadArgDeclaration);
+TestRunner.RunTest(new ReniUI.Test.Formatting.Complex().Reformat);
+TestRunner.RunTest(new ReniUI.Test.Formatting.Complex().Reformat1_120);
+TestRunner.RunTest(new ReniUI.Test.Formatting.Complex().Reformat1_120TopLineBreak);
+TestRunner.RunTest(new ReniUI.Test.Formatting.Complex().Reformat1_120EmptyBrackets);
+TestRunner.RunTest(new ReniUI.Test.Formatting.Complex().Reformat2);
+TestRunner.RunTest(new ReniUI.Test.Formatting.Complex().TwoLevelParenthesis);
+TestRunner.RunTest(new ReniUI.Test.Formatting.Complex().UseLineBreakBeforeParenthesis);
+TestRunner.RunTest(new ReniUI.Test.Formatting.Complex().HalfList);
 TestRunner.RunTest(new ReniUI.Test.Formatting.LongTest().ReformatPart);
+TestRunner.RunTest(new ReniUI.Test.Formatting.WithComments().ReformatComments);
 }}}

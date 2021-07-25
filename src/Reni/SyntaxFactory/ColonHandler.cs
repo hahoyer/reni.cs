@@ -22,7 +22,7 @@ namespace Reni.SyntaxFactory
             var name = target.Left;
             var exclamation = target.Left;
 
-            if(target.Left.TokenClass is Definable)
+            if(target.Left.TokenClass is not ExclamationBoxToken)
                 exclamation = exclamation.Left;
             else
                 name = null;
