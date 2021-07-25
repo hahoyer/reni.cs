@@ -28,34 +28,38 @@ namespace Reni.SyntaxFactory
                 name = null;
 
             var tags = GetDeclarationTags(exclamation);
-            var declarer 
+            var declarer
                 = DeclarerSyntax
-                .Create(tags, name, factory.MeansPublic, target.Left);
+                    .Create(tags, name, factory.MeansPublic, target.Left);
 
             var result = DeclarationSyntax
                 .Create(declarer, factory.GetValueSyntax(target.Right), Anchor.Create(target));
             return result;
         }
 
-        static(BinaryTree[] Anchors, BinaryTree tag)[] GetDeclarationTags(BinaryTree target) 
+        static(BinaryTree[] Anchors, BinaryTree tag)[] GetDeclarationTags(BinaryTree target)
             => target
-            .Chain(node => node.Left)
-            .SelectMany(GetDeclarationTag)
-            .ToArray();
+                .Chain(node => node.Left)
+                .SelectMany(GetDeclarationTag)
+                .ToArray();
 
-        static (BinaryTree[] Anchors, BinaryTree tag)[] GetDeclarationTag(BinaryTree target)
+        static(BinaryTree[] Anchors, BinaryTree tag)[] GetDeclarationTag(BinaryTree target)
         {
             target.AssertIsNotNull();
             target.TokenClass.Assert<ExclamationBoxToken>();
             target.Right.AssertIsNotNull();
 
             var nodes = target
+                .Right
                 .GetNodesFromLeftToRight()
                 .GroupBy(node => node.TokenClass is IDeclarationTagToken)
-                .ToDictionary(group=>group.Key, group=>group.ToArray());
-            var tags = nodes.SingleOrDefault(node=>node.Key).Value;
+                .ToDictionary(group => group.Key, group => group.ToArray());
+            var tags = nodes.SingleOrDefault(node => node.Key).Value;
             var result = tags.Select(tag => (Anchors: new BinaryTree[0], tag)).ToArray();
-            result[0].Anchors = nodes.SingleOrDefault(node=>!node.Key).Value;
+            result[0].Anchors
+                = T(T(target), nodes.SingleOrDefault(node => !node.Key).Value)
+                    .ConcatMany()
+                    .ToArray();
             return result;
         }
 
