@@ -30,6 +30,7 @@ namespace Reni
     {
         const string DefaultSourceIdentifier = "source";
         const string DefaultModuleName = "ReniModule";
+        internal const string PredefinedSource = "?Predefined";
 
         [UsedImplicitly]
         public Exception Exception;
@@ -266,7 +267,7 @@ namespace Reni
             => "_" + Path.GetFileName(fileName).Symbolize();
 
         Result<ValueSyntax> ParsePredefinedItem(string sourceText)
-            => Factory.Root.GetValueSyntax(Parse(new Source(sourceText) + 0).BracketKernel.Center);
+            => Factory.Root.GetValueSyntax(Parse(new Source(sourceText, PredefinedSource) + 0).BracketKernel.Center);
 
         [UsedImplicitly]
         public Compiler Empower()

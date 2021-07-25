@@ -297,6 +297,8 @@ namespace Reni.TokenClasses
 
         internal void SetSyntax(Syntax syntax)
         {
+            if(Token.Characters.Source.Identifier == Compiler.PredefinedSource)
+                return;
             Syntax.AssertIsNull();
             Syntax = syntax;
         }
