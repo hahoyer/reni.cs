@@ -20,7 +20,7 @@ namespace Reni.SyntaxTree
         {
             Items = items.OrderBy(item => item.Token.Characters.Position).ToArray();
             Items.Any().Assert();
-            Main.AssertIsNotNull();
+            //Main.AssertIsNotNull();
         }
 
         ValueCache ValueCache.IContainer.Cache { get; } = new();
@@ -59,8 +59,7 @@ namespace Reni.SyntaxTree
         internal static Anchor Create(BinaryTree leftAnchor)
             => new(leftAnchor.AssertNotNull());
 
-        internal static Anchor Create(IEnumerable<BinaryTree> items)
-            => new(items.ToArray());
+        internal static Anchor Create(params BinaryTree[] items) => new(items);
 
         internal Anchor Combine(Anchor other) => Combine(other?.Items);
 
@@ -75,9 +74,8 @@ namespace Reni.SyntaxTree
         {
             var binaryTrees = Items
                 .Where(node => !(node.TokenClass is IErrorToken)).ToArray();
-            var enumerable = binaryTrees
-                .Where(node => Items.All(parent => !node.HasAsParent(parent))).ToArray();
-            return enumerable.Single();
+            return binaryTrees
+                .SingleOrDefault(node => Items.All(parent => !node.HasAsParent(parent)));
         }
 
         public void SetSyntax(Syntax syntax)
@@ -87,6 +85,6 @@ namespace Reni.SyntaxTree
         }
 
         public static Anchor CreateAll(BinaryTree target) 
-            => Create(target.GetNodesFromLeftToRight());
+            => Create(target.GetNodesFromLeftToRight().ToArray());
     }
 }

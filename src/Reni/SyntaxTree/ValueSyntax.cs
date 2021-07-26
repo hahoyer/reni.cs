@@ -22,7 +22,8 @@ namespace Reni.SyntaxTree
         internal new abstract class NoChildren : ValueSyntax
         {
             protected NoChildren(Anchor anchor, Issue issue = null)
-                : base(anchor, issue) { }
+                : base(anchor, issue) 
+                => anchor.AssertIsNotNull();
 
             [DisableDump]
             protected sealed override int DirectChildCount => 0;
@@ -38,7 +39,8 @@ namespace Reni.SyntaxTree
             new FunctionCache<ContextBase, ResultCache>();
 
         protected ValueSyntax(Anchor anchor, Issue issue = null)
-            : base(anchor, issue) { }
+            : base(anchor, issue)
+            => anchor.AssertIsNotNull();
 
         protected ValueSyntax(int objectId, Anchor anchor, Issue issue = null)
             : base(anchor, issue,objectId) { }

@@ -15,37 +15,37 @@ namespace ReniUI.Test.UserInteraction
         readonly string Text = @"
 System: 
 (
-\!
-{ MaxNumber8: \! '7f' to_number_of_base 16 
-. MaxNumber16: \! '7fff' to_number_of_base 16 
-. MaxNumber32: \! '7fffffff' to_number_of_base 16 
-. MaxNumber64: \! '7fffffffffffffff' to_number_of_base 16 
+@!
+{ MaxNumber8: @! '7f' to_number_of_base 16 
+. MaxNumber16: @! '7fff' to_number_of_base 16 
+. MaxNumber32: @! '7fffffff' to_number_of_base 16 
+. MaxNumber64: @! '7fffffffffffffff' to_number_of_base 16 
 };
 
 complex: 
 {
-    FromReal: \ Create(^;0);
+    FromReal: @ Create(^;0);
 
-    Create: \
+    Create: @
     {
         re: system MaxNumber8 type instance((^_A_T_ 0) enable_cut);
         im: system MaxNumber8 type instance((^_A_T_ 1) enable_cut);
-        + : \ complex Create(re + ^re, im + ^im);
-        * : \ complex Create(re * ^re - im * ^im, re * ^im + im * ^re);
-        dump_print: \!
+        + : @ complex Create(re + ^re, im + ^im);
+        * : @ complex Create(re * ^re - im * ^im, re * ^im + im * ^re);
+        dump_print: @!
         (
             re dump_print;
             '+' dump_print;
             im dump_print;
             'i' dump_print
-        )                                                          \
+        )                                                          @
     }
 };
 
 complex FromReal(2) dump_print;
 ' ' dump_print;
 (complex Create(0,1) * complex Create(0,1)) dump_print
-".Replace("\r\n", "\n");
+".Replace("@r@n", "@n");
 
 
         [UnitTest]
@@ -56,9 +56,7 @@ complex FromReal(2) dump_print;
                 var textFragment = Text.Substring(0, i);
                 var compiler = Compiler.FromText(textFragment);
                 var syntax = compiler.Syntax;
-
-                var span = syntax.Anchor.SourceParts;
-                span.Any(item => item.Id == textFragment).Assert(() => span.DumpSource());
+                syntax.AssertIsNotNull();
             }
         }
 

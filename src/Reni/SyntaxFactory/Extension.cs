@@ -12,15 +12,16 @@ namespace Reni.SyntaxFactory
         (
             this ValueSyntax left,
             BinaryTree target,
-            ValueSyntax right, Anchor frameItems
+            ValueSyntax right,
+            Anchor anchor
         )
             => left == null
                 ? right == null
-                    ? (ValueSyntax)new TerminalSyntax((ITerminal)target.TokenClass, target.Token, frameItems)
-                    : new PrefixSyntax((IPrefix)target.TokenClass, right, target.Token, frameItems)
+                    ? new TerminalSyntax((ITerminal)target.TokenClass, target.Token, anchor)
+                    : new PrefixSyntax((IPrefix)target.TokenClass, right, target.Token, anchor)
                 : right == null
-                    ? (ValueSyntax)new SuffixSyntax(left, (ISuffix)target.TokenClass, target.Token, frameItems)
-                    : new InfixSyntax(left, (IInfix)target.TokenClass, right, target.Token, frameItems);
+                    ? new SuffixSyntax(left, (ISuffix)target.TokenClass, target.Token, anchor)
+                    : new InfixSyntax(left, (IInfix)target.TokenClass, right, target.Token, anchor);
 
         internal static IStatementSyntax[] With(this IStatementSyntax[] statements, Anchor frameItems)
         {
@@ -32,17 +33,17 @@ namespace Reni.SyntaxFactory
 
             $@"{nameof(statements)}[{statements.Length}] = 
 ------------------
-{statements.Select(statement=>statement.SourcePart.GetDumpAroundCurrent(20)).Stringify("\n------------------\n")}
+{statements.Select(statement => statement.SourcePart.GetDumpAroundCurrent(20)).Stringify("\n------------------\n")}
 ------------------
 
 ------------------
 {nameof(frameItems)}[{frameItems.Items.Length}] = 
 ------------------
-{frameItems.Items.Select(item=>item.SourcePart.GetDumpAroundCurrent(20)).Stringify("\n------------------\n")}
+{frameItems.Items.Select(item => item.SourcePart.GetDumpAroundCurrent(20)).Stringify("\n------------------\n")}
 ------------------
 
 "
-            .Log();
+                .Log();
 
             Dumpable.NotImplementedFunction(statements, frameItems);
             return default;
@@ -50,5 +51,4 @@ namespace Reni.SyntaxFactory
 
         static TValue[] T<TValue>(params TValue[] value) => value;
     }
-
 }

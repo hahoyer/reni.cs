@@ -37,8 +37,8 @@ namespace Reni.SyntaxFactory
         {
             var kernel = target.BracketKernel;
             var statements = GetStatementsSyntax(kernel.Center, null, kernel.Center?.TokenClass);
-            var listAnchors = kernel.Center.AssertNotNull().ParserLevelGroup;
-            if(listAnchors.Any() && listAnchors[0].TokenClass is not TokenClasses.List)
+            var listAnchors = kernel.Center?.ParserLevelGroup;
+            if(listAnchors != null && listAnchors.Any() && listAnchors[0].TokenClass is not TokenClasses.List)
                 listAnchors = null;
             var anchor = kernel.ToAnchor.Combine(listAnchors);
             return CompoundSyntax.Create(statements, null, anchor);
@@ -124,9 +124,5 @@ namespace Reni.SyntaxFactory
                     GetValueSyntax(target.Left),
                     definable, target.Token, GetValueSyntax(target.Right), Anchor.Create(target).Combine(anchor));
         }
-
-        internal ValueSyntax GetInfixSyntax(BinaryTree target, Anchor anchor)
-            => GetValueSyntax(target.Left)
-                .GetInfixSyntax(target, GetValueSyntax(target.Right), Anchor.Create(target).Combine(anchor));
     }
 }

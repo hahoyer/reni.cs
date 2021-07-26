@@ -19,16 +19,19 @@ namespace Reni.Validation
         public static readonly IssueId InvalidDeclarationTag = new IssueId();
         public static readonly IssueId InvalidExpression = new IssueId();
         public static readonly IssueId InvalidNameForDeclaration = new IssueId();
+        public static readonly IssueId InvalidLeftOperand = new IssueId();
         public static readonly IssueId InvalidListOperandSequence = new IssueId();
+        public static readonly IssueId InvalidRightOperand = new IssueId();
         public static readonly IssueId MissingDeclarationForType = new IssueId();
         public static readonly IssueId MissingDeclarationInContext = new IssueId();
         public static readonly IssueId MissingDeclarationTag = new IssueId();
         public static readonly IssueId MissingDeclarationValue = new IssueId();
         public static readonly IssueId MissingLeftBracket = new IssueId();
+        public static readonly IssueId MissingLeftOperand = new IssueId();
         public static readonly IssueId MissingRightBracket = new IssueId();
         public static readonly IssueId MissingRightExpression = new IssueId();
+        public static readonly IssueId MissingRightOperand = new IssueId();
         public static readonly IssueId StrangeDeclaration = new IssueId();
-        public static readonly IssueId TerminalUsedAsSuffix = new IssueId();
         public static readonly IssueId UnknownDeclarationTag = new IssueId();
 
         public static IEnumerable<IssueId> All => AllInstances<IssueId>();

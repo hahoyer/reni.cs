@@ -1,3 +1,4 @@
+using hw.DebugFormatter;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Validation;
@@ -9,6 +10,7 @@ namespace Reni.SyntaxTree
         public EmptyList(Anchor anchor, Issue issue = null)
             : base(anchor, issue)
         {
+            anchor.AssertIsNotNull();
             StopByObjectIds();
             AssertValid();
         }

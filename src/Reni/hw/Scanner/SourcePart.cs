@@ -185,7 +185,10 @@ namespace hw.Scanner
             var currentValue = sortedValues[0];
 
             foreach(var value in sortedValues.Skip(1))
-                if(currentValue.EndPosition == value.Position)
+            {
+                var end = currentValue.EndPosition;
+                var start = value.Position;
+                if(end == start)
                     currentValue = currentValue.Combine(value);
                 else
                 {
@@ -193,6 +196,7 @@ namespace hw.Scanner
 
                     currentValue = value;
                 }
+            }
 
             yield return currentValue;
         }

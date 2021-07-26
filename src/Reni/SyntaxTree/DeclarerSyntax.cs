@@ -56,8 +56,7 @@ namespace Reni.SyntaxTree
             MeansPublic = meansPublic;
             SpecialFormattingAnchor = specialFormattingAnchor;
 
-
-            Anchor = Anchor.Create(T(hidden?.Anchor.Items, T(specialFormattingAnchor)).ConcatMany());
+            Anchor = Anchor.Create(T(hidden?.Anchor.Items, T(specialFormattingAnchor)).ConcatMany().ToArray());
 
             DirectChildren = new ValueCache<Syntax[]>(() => DirectChildCount.Select(GetDirectChild).ToArray());
 

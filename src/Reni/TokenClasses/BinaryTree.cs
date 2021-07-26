@@ -120,7 +120,7 @@ namespace Reni.TokenClasses
                         return new BracketNodes()
                         {
                             Left = this, Center = Right
-                            , Right = ErrorToken.Create(IssueId.MissingRightBracket, RightMost)
+                            , Right = ErrorToken.CreateTreeItem(IssueId.MissingRightBracket, RightMost)
                         };
                     }
 
@@ -136,7 +136,7 @@ namespace Reni.TokenClasses
                 if(!(Left.TokenClass is ILeftBracket leftParenthesis))
                 {
                     result.Center = Left;
-                    result.Left = ErrorToken.Create(IssueId.MissingLeftBracket, Left.LeftMost);
+                    result.Left = ErrorToken.CreateTreeItem(IssueId.MissingLeftBracket, Left.LeftMost);
                     return result;
                 }
 
@@ -149,7 +149,7 @@ namespace Reni.TokenClasses
 
                 if(levelDelta > 0)
                 {
-                    result.Right = ErrorToken.Create(IssueId.MissingRightBracket, RightMost);
+                    result.Right = ErrorToken.CreateTreeItem(IssueId.MissingRightBracket, RightMost);
                     return result;
                 }
 

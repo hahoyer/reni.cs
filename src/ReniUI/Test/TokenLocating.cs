@@ -33,28 +33,5 @@ namespace ReniUI.Test
             var sourcePart = x.SourcePart;
             (sourcePart.Id.Replace("\r", "") == "# Comment\n").Assert(x.Dump);
         }
-
-
-        [UnitTest]
-        [Test]
-        public void CompoundSourcePart()
-        {
-            const string text = @"(1,3,4,6)";
-            var compiler = CompilerBrowser.FromText(text);
-            var span = compiler.Source + text.IndexOf(',');
-            var x = compiler.Locate(span).Master.Anchors.Combine();
-            (x.Id.Replace("\r", "") == "1,3,4,6").Assert(x.Dump);
-        }
-
-        [UnitTest]
-        [Test]
-        public void NamedCompoundSourcePart()
-        {
-            const string text = @"(x:1,3,4,6)";
-            var compiler = CompilerBrowser.FromText(text);
-            var span = compiler.Source + text.IndexOf(',');
-            var x = compiler.Locate(span).Master.Anchors.Combine();
-            (x.Id.Replace("\r", "") == "x:1,3,4,6").Assert(x.Dump);
-        }
     }
 }

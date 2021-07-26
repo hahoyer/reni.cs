@@ -1,7 +1,7 @@
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Scanner;
-using Reni.Parser;
+using Reni.TokenClasses;
 using Reni.Validation;
 
 namespace Reni.SyntaxTree
@@ -25,18 +25,6 @@ namespace Reni.SyntaxTree
         }
 
         [DisableDump]
-        internal string NameOrNull => Declarer.Name?.Value;
-
-        [DisableDump]
-        internal bool IsConverterSyntax => Declarer.IsConverterSyntax;
-
-        [DisableDump]
-        internal bool IsMutableSyntax => Declarer.IsMutableSyntax;
-
-        [DisableDump]
-        protected override int DirectChildCount => Declarer.DirectChildCount + 1;
-
-        [DisableDump]
         DeclarerSyntax IStatementSyntax.Declarer => Declarer;
 
         SourcePart IStatementSyntax.SourcePart => Anchor.SourcePart;
@@ -52,6 +40,9 @@ namespace Reni.SyntaxTree
                 ? this
                 : Create(Declarer, Value, anchor.Combine(Anchor));
 
+        [DisableDump]
+        protected override int DirectChildCount => Declarer.DirectChildCount + 1;
+
         protected override Syntax GetDirectChild(int index)
             => index switch
             {
@@ -60,11 +51,21 @@ namespace Reni.SyntaxTree
                 , _ => null
             };
 
+        [DisableDump]
+        internal string NameOrNull => Declarer.Name?.Value;
+
+        [DisableDump]
+        internal bool IsConverterSyntax => Declarer.IsConverterSyntax;
+
+        [DisableDump]
+        internal bool IsMutableSyntax => Declarer.IsMutableSyntax;
+
         internal static IStatementSyntax Create(DeclarerSyntax declarer, ValueSyntax value, Anchor anchor)
             => new DeclarationSyntax
             (
                 declarer,
-                value ?? new EmptyList(null, IssueId.MissingDeclarationValue.Issue(anchor.SourcePart)),
+                value ??
+                ErrorToken.CreateSyntax(IssueId.MissingDeclarationValue, anchor.Main.SourcePart.End),
                 anchor
             );
     }
