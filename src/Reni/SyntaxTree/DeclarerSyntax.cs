@@ -120,7 +120,7 @@ namespace Reni.SyntaxTree
 
         internal static DeclarerSyntax Create
         (
-            (BinaryTree[] Anchors, BinaryTree tag)[] tags, BinaryTree name, bool meansPublic
+            (BinaryTree[] anchors, BinaryTree tag)[] tags, BinaryTree name, bool meansPublic
             , BinaryTree specialFormattingAnchor
         )
         {

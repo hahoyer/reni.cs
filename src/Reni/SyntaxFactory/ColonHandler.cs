@@ -43,10 +43,13 @@ namespace Reni.SyntaxFactory
                 .SelectMany(GetDeclarationTag)
                 .ToArray();
 
-        static(BinaryTree[] Anchors, BinaryTree tag)[] GetDeclarationTag(BinaryTree target)
+        static(BinaryTree[] anchors, BinaryTree tag)[] GetDeclarationTag(BinaryTree target)
         {
             target.AssertIsNotNull();
-            target.TokenClass.Assert<ExclamationBoxToken>();
+
+            if(target.TokenClass is not ExclamationBoxToken)
+                return T((anchors: T(target.Right), tag: target));
+
             target.Right.AssertIsNotNull();
 
             var nodes = target
@@ -55,8 +58,8 @@ namespace Reni.SyntaxFactory
                 .GroupBy(node => node.TokenClass is IDeclarationTagToken)
                 .ToDictionary(group => group.Key, group => group.ToArray());
             var tags = nodes.SingleOrDefault(node => node.Key).Value;
-            var result = tags.Select(tag => (Anchors: new BinaryTree[0], tag)).ToArray();
-            result[0].Anchors
+            var result = tags.Select(tag => (anchors: new BinaryTree[0], tag)).ToArray();
+            result[0].anchors
                 = T(T(target), nodes.SingleOrDefault(node => !node.Key).Value)
                     .ConcatMany()
                     .ToArray();

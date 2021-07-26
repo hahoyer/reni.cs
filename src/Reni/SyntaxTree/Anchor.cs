@@ -18,7 +18,9 @@ namespace Reni.SyntaxTree
 
         Anchor(params BinaryTree[] items)
         {
-            Items = items.OrderBy(item => item.Token.Characters.Position).ToArray();
+            Items = items
+                .Where(item => item != null)
+                .OrderBy(item => item.Token.Characters.Position).ToArray();
             Items.Any().Assert();
             //Main.AssertIsNotNull();
         }
@@ -84,7 +86,7 @@ namespace Reni.SyntaxTree
                 item.SetSyntax(syntax);
         }
 
-        public static Anchor CreateAll(BinaryTree target) 
+        public static Anchor CreateAll(BinaryTree target)
             => Create(target.GetNodesFromLeftToRight().ToArray());
     }
 }

@@ -299,7 +299,8 @@ namespace Reni.TokenClasses
         {
             if(Token.Characters.Source.Identifier == Compiler.PredefinedSource)
                 return;
-            Syntax.AssertIsNull();
+            (Syntax == null || Syntax == syntax).Assert(()=>@$"Current: {Syntax.Dump()}
+New: {syntax.Dump()}");
             Syntax = syntax;
         }
 
