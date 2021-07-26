@@ -21,9 +21,22 @@ namespace ReniUI.Formatting
             item.SetupLineBreaks();
             //item.LogDump().Log(FilePositionTag.Debug);
             var sourcePartEdits = item.Edits.ToArray();
-            var editPieces = sourcePartEdits.GetEditPieces(Configuration).ToArray();
+            var editPieces = sourcePartEdits
+                .GetEditPieces(Configuration)
+                .Where(editPiece=> IsRelevant(editPiece, targetPart))
+                .ToArray();
             //editPieces.LogDump().Log(FilePositionTag.Debug);
             return editPieces;
+        }
+
+        static bool IsRelevant(Edit editPiece, SourcePart targetPart)
+        {
+            if(targetPart == null)
+                return true;
+            var sourcePart = editPiece.Location;
+            return targetPart.Source == sourcePart.Source
+                && targetPart.Position <= sourcePart.EndPosition 
+                && sourcePart.Position <= targetPart.EndPosition;
         }
     }
 }

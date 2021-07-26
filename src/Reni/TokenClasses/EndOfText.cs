@@ -14,6 +14,7 @@ namespace Reni.TokenClasses
             , IValueToken
 
     {
+        public static readonly EndOfText Instance = new EndOfText();
         sealed class Matched : DumpableObject, IParserTokenType<BinaryTree>
         {
             BinaryTree IParserTokenType<BinaryTree>.Create(BinaryTree left, IToken token, BinaryTree right)
@@ -27,6 +28,7 @@ namespace Reni.TokenClasses
             string IParserTokenType<BinaryTree>.PrioTableId => "()";
         }
 
+        EndOfText() { }
         const string TokenId = PrioTable.EndOfText;
 
         [DisableDump]
@@ -43,6 +45,7 @@ namespace Reni.TokenClasses
 
     sealed class BeginOfText : TokenClass, IBelongingsMatcher, ILeftBracket
     {
+        public static readonly BeginOfText Instance = new BeginOfText();
         const string TokenId = PrioTable.BeginOfText;
 
         [DisableDump]

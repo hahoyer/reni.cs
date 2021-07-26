@@ -1,13 +1,7 @@
-using System.Collections.Generic;
-using System.Linq;
 using hw.DebugFormatter;
-using hw.Helper;
-using hw.Scanner;
 using hw.UnitTest;
 using NUnit.Framework;
-using Reni.Parser;
 using Reni.TokenClasses;
-using ReniUI;
 
 // ReSharper disable StringLiteralTypo
 
@@ -18,8 +12,6 @@ namespace ReniUI.Test.Formatting
     [LowPriority]
     public sealed class LongTest : DependenceProvider
     {
-        static readonly IComparator IgnoreWhiteSpaces = new IgnoreWhiteSpacesComparator();
-
         [Test]
         [UnitTest]
         public void ReformatPart()
@@ -38,42 +30,29 @@ namespace ReniUI.Test.Formatting
             var compiler = CompilerBrowser.FromText(text);
 
             for(var start = 0; start < compiler.Source.Length; start++)
-            for(var end = start + 1; end < compiler.Source.Length; end++)
             {
-                var span = (compiler.Source + start).Span(end - start);
-                var reformat = compiler.Reformat(targetPart: span);
-                if(reformat != null)
+                (start - compiler.Source.Length).LogDump().Log();
+                for(var end = start + 1; end < compiler.Source.Length; end++)
                 {
-                    var newCompiler = CompilerBrowser.FromText(reformat);
-                    Equals(compiler.Syntax, newCompiler.Syntax).Assert(() => @$"origin: 
+                    var span = (compiler.Source + start).Span(end - start);
+                    var reformat = compiler.Reformat(targetPart: span);
+                    if(reformat != null)
+                    {
+                        var newCompiler = CompilerBrowser.FromText(reformat);
+                        Compare(compiler.Compiler.BinaryTree, newCompiler.Compiler.BinaryTree).Assert(() => @$"origin: 
 {compiler.Syntax.Dump()} 
 
 new ({span.NodeDump}): 
 {newCompiler.Syntax.Dump()} 
 
 "
-                    );
+                        );
+                    }
                 }
             }
         }
 
-        static bool CompareWhiteSpaces
-            (IEnumerable<IItem> target, IEnumerable<IItem> other, IComparator differenceHandler)
-        {
-            if(target.Where(item => item.IsComment()).SequenceEqual(other.Where(item => item.IsComment())
-                , differenceHandler.WhiteSpaceComparer))
-                return true;
-
-            Dumpable.NotImplementedFunction(target.Dump(), other.Dump(), differenceHandler);
-            return default;
-        }
-    }
-
-    class IgnoreWhiteSpacesComparator : DumpableObject, IComparator, IEqualityComparer<IItem>
-    {
-        IEqualityComparer<IItem> IComparator.WhiteSpaceComparer => this;
-
-        bool IEqualityComparer<IItem>.Equals(IItem target, IItem other)
+        static bool Compare(BinaryTree target, BinaryTree other)
         {
             if(target == null)
                 return other == null;
@@ -81,20 +60,19 @@ new ({span.NodeDump}):
             if(other == null)
                 return false;
 
-            if(target.ScannerTokenType != other.ScannerTokenType)
+            if(target.TokenClass.Id != other.TokenClass.Id)
                 return false;
 
-            if(target.SourcePart.Id == other.SourcePart.Id)
-                return true;
+            if(target.Token.Characters.Id != other.Token.Characters.Id)
+                return false;
 
-            NotImplementedFunction(target, other);
-            return default;
-        }
+            if(!Compare(target.Left, other.Left))
+                return false;
 
-        int IEqualityComparer<IItem>.GetHashCode(IItem target)
-        {
-            NotImplementedFunction(target);
-            return default;
+            if(!Compare(target.Right, other.Right))
+                return false;
+
+            return true;
         }
     }
 }

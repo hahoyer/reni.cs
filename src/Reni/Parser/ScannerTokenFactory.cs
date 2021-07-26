@@ -16,8 +16,8 @@ namespace Reni.Parser
             set => Current = value;
         }
 
-        IParserTokenType<BinaryTree> ITokenFactory<BinaryTree>.BeginOfText => new BeginOfText();
-        IScannerTokenType ITokenFactory.EndOfText => new EndOfText();
+        IParserTokenType<BinaryTree> ITokenFactory<BinaryTree>.BeginOfText => BeginOfText.Instance;
+        IScannerTokenType ITokenFactory.EndOfText => EndOfText.Instance;
 
         IScannerTokenType ITokenFactory.InvalidCharacterError
             => new ScannerSyntaxError(IssueId.InvalidCharacter);

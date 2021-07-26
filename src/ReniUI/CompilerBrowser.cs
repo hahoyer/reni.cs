@@ -25,7 +25,7 @@ namespace ReniUI
 
         public Source Source => Compiler.Source;
 
-        Compiler Compiler => ParentCache.Value;
+        internal Compiler Compiler => ParentCache.Value;
 
         public StringStream Result
         {
