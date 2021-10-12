@@ -1,0 +1,97 @@
+# System definitions
+
+#(doc
+Basic things, 
+text class, ...
+doc)#
+
+systemdata:
+{
+    !public Memory:((0 type *(125)) mutable) instance();
+    ! (mutable public) FreePointer: Memory array_reference mutable;
+};
+
+repeat: @ ^ while() then(^ body(), repeat(^));
+
+system:
+{
+    MaxNumber8: @! '7f' to_number_of_base 16.
+    MaxNumber16: @! '7fff' to_number_of_base 16.
+    MaxNumber32: @! '7fffffff' to_number_of_base 16.
+    MaxNumber64: @! '7fffffffffffffff' to_number_of_base 16.
+    TextItemType: @! MaxNumber8 text_item type.
+
+    !    public NewMemory: @
+    {
+        ! public result:(((^ elementType) * 1) array_reference mutable)
+        instance(systemdata FreePointer enable_reinterpretation).
+
+        initializer: ^ initializer.
+        count: ^ count.
+        !mutable position: count type instance(0).
+
+        repeat
+        (
+            while: @ position < count,
+  
+            body: @
+            (
+                result(position) := initializer(position),
+                position :=(position + 1) enable_cut
+            )
+        ).
+
+        systemdata FreePointer :=(systemdata FreePointer type)
+        instance((result + count) mutable enable_reinterpretation)
+    }
+    result
+};
+
+Text: @
+{
+    value: ^.  
+
+    !public result:
+    {
+        !mix_in: data(^) := new_value @ data(^).
+        this: @! ^^.
+        !public count: ^ count.
+
+        !public data: system NewMemory
+        (
+            elementType: value(0) type.
+            count: value count^^^.
+            initializer: @ value(^)
+        ).
+
+        !public dump_print: @!
+        {
+            !mutable position: count type instance(0);
+
+            repeat
+            (
+                while: @ position < count,
+
+                body: @
+                (
+                    data(position) dump_print,
+                    position :=(position + 1) enable_cut
+                )
+            )
+        }.
+
+        !public << : @ concat(count: ^ count, data: ^).
+
+        concat: @
+        Text
+        (
+            other: ^;
+            count: this count + other count;
+
+            !mix_in: @ ^ < this count
+            then this data(^ enable_cut)
+            else other data((^ - this count)enable_cut);
+        )
+    }
+}
+result

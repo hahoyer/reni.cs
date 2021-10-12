@@ -1,0 +1,29 @@
+<!--EXTERNAL_PROPERTIES: PackagesDir-->
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <ProductDir>$(MSBuildProjectDirectory)\$(LevelDir)</ProductDir>
+    <BinDir>$(ProductDir)bin\</BinDir>
+    <OutputPath>$(ProductDir)out\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>$(ProductDir)intermediate\$(AssemblyName)\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+
+  <!-- TypeScript specific settings -->
+
+  <PropertyGroup>
+      <TargetFramework Condition=" '$(TargetFramework)' == '' ">net5.0</TargetFramework>
+      <RootNamespace Condition=" '$(RootNamespace)' == '' ">$(AssemblyName)</RootNamespace>
+      <SchemaVersion>2.0</SchemaVersion>
+      <ProjectHome>.</ProjectHome>
+      <StartupFile>app.ts</StartupFile>
+      <StartWebBrowser>False</StartWebBrowser>
+      <WorkingDirectory>$(IntermediateOutputPath)wjs</WorkingDirectory>
+      <OutputPath>$(IntermediateOutputPath)ojs</OutputPath>
+      <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+      <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
+      <EnableTypeScript>true</EnableTypeScript>
+      <StartWebBrowser>false</StartWebBrowser>
+      <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+</Project>

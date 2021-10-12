@@ -1,0 +1,46 @@
+{
+    "name": "reni",
+    "version": "0.0.1",
+    "description": "VSCode extension for programming language \"reni\"",
+    "main": "main.js",
+    "author": {
+        "name": "hahoyer",
+        "email": "hahoyer@gmail.com"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [
+            {
+                "id": "reni",
+                "aliases": [
+                    "Reni",
+                    "reni"
+                ],
+                "extensions": [
+                    ".reni"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "reni",
+                "scopeName": "source.reni",
+                "path": "./syntax-highlight.json"
+            }
+        ]
+    },
+    "scripts": {
+        "build": "tsc --build",
+        "clean": "tsc --build --clean"
+    },
+    "devDependencies": {
+        "@types/node": "^14.14.7",
+        "typescript": "^4.0.5"
+    },
+    "dependencies": {
+        "edge-js": "^16.6.0"
+    }
+}

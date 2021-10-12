@@ -29,6 +29,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Resources\String.ico = Resources\String.ico
 		Resources\Symbol.bmp = Resources\Symbol.bmp
 		Resources\Syntax.bmp = Resources\Syntax.bmp
+		..\sys.targets = ..\sys.targets
 		Resources\Type.ico = Resources\Type.ico
 		Resources\Unknown.bmp = Resources\Unknown.bmp
 		Resources\UnknownCache.bmp = Resources\UnknownCache.bmp
@@ -57,6 +58,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{A045FCB3
 		NuGet.Config = NuGet.Config
 		..\build\NuGetPackage.targets = ..\build\NuGetPackage.targets
 		..\build\sys.targets = ..\build\sys.targets
+		..\build\TypeScript.Exe.targets = ..\build\TypeScript.Exe.targets
+		..\build\TypeScript.Library.targets = ..\build\TypeScript.Library.targets
+		..\build\TypeScript.targets = ..\build\TypeScript.targets
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "reniTest", "ReniTest\reniTest.csproj", "{A639A515-D066-4C12-A4C5-07DA91C19A2C}"
@@ -130,8 +134,8 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {16B1A750-4D72-48AD-A91D-23A7F10F4CDD}
 		VisualSVNWorkingCopyRoot = .
+		SolutionGuid = {16B1A750-4D72-48AD-A91D-23A7F10F4CDD}
 	EndGlobalSection
 	GlobalSection(CodealikeProperties) = postSolution
 		SolutionGuid = eaf46459-7dac-4986-b4bb-bb69ffbc6141
