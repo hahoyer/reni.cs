@@ -19,7 +19,6 @@ namespace ReniTest
         public static void Main()
         {
             "Start".Log();
-            Log4NetTextWriter.Register(false);
             if(DateTime.Now.Year == 1)
                 TestRuntime();
             RunAllTests();

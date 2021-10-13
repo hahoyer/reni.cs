@@ -11,8 +11,10 @@
     <!-- CSharp specific settings -->
 
     <PropertyGroup>
+        <LangVersion>default</LangVersion>
         <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-        <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+        <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+        <PlatformTarget>x64</PlatformTarget>
         <AppDesignerFolder>Properties</AppDesignerFolder>
         <RootNamespace Condition=" '$(RootNamespace)' == '' ">$(AssemblyName)</RootNamespace>
     </PropertyGroup>
@@ -41,9 +43,7 @@
 
     <ItemGroup>
         <Reference Include="System" />
-        <Reference Include="System.Core">
-            <RequiredTargetFramework>3.5</RequiredTargetFramework>
-        </Reference>
+        <Reference Include="System.Core" />
     </ItemGroup>
 
     <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

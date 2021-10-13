@@ -1,77 +1,38 @@
 using System;
-using System.Collections.Immutable;
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime;
-using System.Runtime.Loader;
-using System.Text;
 using System.Threading;
 using hw.DebugFormatter;
 using hw.Helper;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Reni.Runtime;
+using Microsoft.CSharp;
 using Reni.Struct;
 
 namespace Reni.Code
 {
     static class Generator
     {
+        internal static readonly CSharpCodeProvider _provider = new CSharpCodeProvider();
+
         internal static string MainFunctionName => "MainFunction";
 
         internal static string FunctionName(FunctionId functionId)
-            => (functionId.IsGetter? "GetFunction" : "SetFunction") + functionId.Index;
+            => (functionId.IsGetter ? "GetFunction" : "SetFunction") + functionId.Index;
 
         internal static string CreateCSharpString
         (
             this string moduleName,
             Container main,
-            FunctionCache<int, FunctionContainer> functions
-        )
-            => 
+            FunctionCache<int, FunctionContainer> functions)
+            => new CSharp_Generated(moduleName, main, functions).TransformText();
 
-        $@"
-using System;
-using Reni.Runtime;
-
-namespace ReniGeneratedCode
-{{
-    unsafe static public class {moduleName}
-    {{ 
-        {GetMainFunctionCode(main)}
-        {functions
-            .Values
-            .Select(pair => GetFunctionCode(pair.Getter) + GetFunctionCode(pair.Setter))
-            .Stringify("\n")
-        }
-    }}
-}}
-";
-
-        static string GetMainFunctionCode(Container container) => $@"
-            // {container.Description.Replace("\n", "\n//")}
-            public static void {MainFunctionName}()
-            {{
-                {container.GetCSharpStatements(3)}
-            }}
-";
-
-        static string GetFunctionCode(Container container)
-            => container == null? "" : $@"
-            // {container.Description.Replace("\n", "\n//")}
-            public static Data {Generator.FunctionName(container.FunctionId)}(Data frame)
-            {{
-            Start:
-                {container.GetCSharpStatements(3)}
-                return data;
-            }}
-";
-        static void CodeToFile(string name, string result, bool traceFilePosition)
+        internal static void CodeToFile(string name, string result, bool traceFilePosn)
         {
             var streamWriter = new StreamWriter(name);
-            if(traceFilePosition)
+            if(traceFilePosn)
                 Tracer.FilePosition(name.ToSmbFile().FullName, 0, 0, FilePositionTag.Debug).Log
                     ();
             streamWriter.Write(result);
@@ -79,56 +40,54 @@ namespace ReniGeneratedCode
         }
 
         internal static Assembly CodeToAssembly
-            (this string source, bool traceFilePosition, bool includeDebugInformation)
+            (this string codeToString, bool traceFilePosition, bool includeDebugInformation)
         {
-            var name
-                = Environment.GetEnvironmentVariable("temp") +
-                "\\reni.compiler\\" +
-                Process.GetCurrentProcess().Id +
-                "." +
-                Thread.CurrentThread.ManagedThreadId +
-                ".reni.cs";
-            name.ToSmbFile().EnsureDirectoryOfFileExists();
-            CodeToFile(name, source, true);
+            var directoryName
+                = Environment.GetEnvironmentVariable
+                      ("temp") +
+                  "\\reni.compiler\\" +
+                  Process.GetCurrentProcess().Id +
+                  "." +
+                  Thread.CurrentThread.ManagedThreadId;
+            directoryName.ToSmbFile().EnsureIsExistentDirectory();
+            //nameof(directoryName).IsSetTo(directoryName).WriteLine();
+            var name = directoryName + ".reni.cs";
+            name.ToSmbFile().CheckedEnsureDirectoryOfFileExists();
 
+            CodeToFile(name, codeToString, traceFilePosition);
 
-            var syntaxTree = CSharpSyntaxTree.ParseText(source, CSharpParseOptions.Default, name, Encoding.Default
-                , CancellationToken.None);
+            // Build the parameters for source compilation.
+            var cp = new System.CodeDom.Compiler.CompilerParameters
+            {
+                GenerateInMemory = true,
+                CompilerOptions = "/unsafe",
+                IncludeDebugInformation = includeDebugInformation,
+                TempFiles = new TempFileCollection(directoryName, false)
+            };
+            var referencedAssemblies
+                = T
+                (
+                    Assembly.GetAssembly(typeof(Generator)).Location,
+                    Assembly.GetAssembly(typeof(SmbFile)).Location
+                );
+            cp.ReferencedAssemblies.AddRange(referencedAssemblies);
+            var cr = _provider.CompileAssemblyFromFile(cp, name);
 
-            var assemblyName = Path.GetRandomFileName();
-            var references = T(
-                    Path.GetDirectoryName(typeof(GCSettings).GetTypeInfo().Assembly.Location)
-                        .PathCombine("System.Runtime.dll"),
-                    Assembly.GetAssembly(typeof(Data)).Location,
-                    Assembly.GetAssembly(typeof(object)).Location
-                )
-                .Select(path => MetadataReference.CreateFromFile(path))
-                .ToArray();
+            if(!includeDebugInformation)
+                directoryName.ToSmbFile().Delete(true);
 
-            var compilation = CSharpCompilation
-                .Create(
-                    assemblyName,
-                    new[] {syntaxTree},
-                    references,
-                    new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, allowUnsafe: true));
+            if(cr.Errors.Count > 0)
+                HandleErrors(cr.Errors);
 
-            using var ms = new MemoryStream();
-            var result = compilation.Emit(ms);
-
-            if(!result.Success)
-                HandleErrors(result.Diagnostics);
-
-            ms.Seek(0, SeekOrigin.Begin);
-            return AssemblyLoadContext.Default.LoadFromStream(ms);
+            return cr.CompiledAssembly;
         }
 
-        static void HandleErrors(ImmutableArray<Diagnostic> errors)
+        internal static void HandleErrors(CompilerErrorCollection cr)
         {
-            var errorList = errors
-                .Select(error => error.ToString())
-                .ToArray();
-            errorList.Stringify("\n").Log();
-            throw new CSharpCompilerErrorException(errorList);
+            for(var i = 0; i < cr.Count; i++)
+                cr[i].ToString().Log();
+
+            throw new CSharpCompilerErrorException(cr);
         }
 
         static TValue[] T<TValue>(params TValue[] value) => value;
@@ -137,8 +96,31 @@ namespace ReniGeneratedCode
     sealed class CSharpCompilerErrorException : Exception
     {
         public string[] Errors { get; }
-        public CSharpCompilerErrorException(string[] errors) => Errors = errors;
+
+        public CSharpCompilerErrorException(CompilerErrorCollection errorCollection)
+        {
+            var errors = new List<string>();
+            for(var i = 0; i < errorCollection.Count; i++)
+                errors.Add(errorCollection[i].ToString());
+
+            Errors = errors.ToArray();
+        }
     }
 
 // ReSharper disable InconsistentNaming
+    partial class CSharp_Generated
+// ReSharper restore InconsistentNaming
+    {
+        readonly FunctionCache<int, FunctionContainer> _functions;
+        readonly Container _main;
+        readonly string ModuleName;
+
+        internal CSharp_Generated
+            (string moduleName, Container main, FunctionCache<int, FunctionContainer> functions)
+        {
+            ModuleName = moduleName;
+            _main = main;
+            _functions = functions;
+        }
+    }
 }

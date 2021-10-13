@@ -1,14 +1,63 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.0">
+  <Import Project="..\..\bin\Packages\NUnit.3.13.2\build\NUnit.props" Condition="Exists('..\..\bin\Packages\NUnit.3.13.2\build\NUnit.props')" />
+  <PropertyGroup>
+    <ProjectGuid>{A639A515-D066-4C12-A4C5-07DA91C19A2C}</ProjectGuid>
+    <AssemblyName>ReniTest</AssemblyName>
+    <TargetTypeEx>CSharp.WinExe.Legacy</TargetTypeEx>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ReniUI\reniUI.csproj">
+      <Project>{c339a515-d066-4c12-a4c5-07da91c19a2c}</Project>
+      <Name>ReniUI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Reni\Reni.csproj">
+      <Project>{EBB73C84-6622-4183-A28F-B0DFF606006B}</Project>
+      <Name>Reni</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AssemblyInfo.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Extension.cs" />
+    <Compile Include="FilebasedTests.cs" />
+    <Compile Include="FileTestCompiler.cs" />
+    <Compile Include="MainContainer.cs" />
+    <Compile Include="PendingTests.cs" />
+    <Compile Include="Template1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Template1.tt</DependentUpon>
+    </Compile>
+    <Compile Include="TypeNameExtenderTest.cs" />
+    <None Include="packages.config" />
+    <None Include="sys.targets" />
+    <None Include="Template1.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Template1.cs</LastGenOutput>
+    </None>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+    <Content Include=".gitignore" />
+    <Content Include="AssemblyInfo.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>AssemblyInfo.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="nunit.framework, Version=3.13.2.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\..\bin\Packages\NUnit.3.13.2\lib\net45\nunit.framework.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <Import Project="sys.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
-        <TargetTypeEx>CSharp.WinExe</TargetTypeEx>
-        <LangVersion>default</LangVersion>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\Reni\Reni.csproj" />
-        <ProjectReference Include="..\ReniUI\reniUI.csproj" />
-    </ItemGroup>
-
-    <Import Project="sys.targets" />
+    <Error Condition="!Exists('..\..\bin\Packages\NUnit.3.13.2\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\bin\Packages\NUnit.3.13.2\build\NUnit.props'))" />
+  </Target>
 </Project>

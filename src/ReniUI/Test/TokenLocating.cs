@@ -1,11 +1,9 @@
 using hw.DebugFormatter;
 using hw.UnitTest;
-using NUnit.Framework;
 
 namespace ReniUI.Test
 {
     [UnitTest]
-    [TestFixture,Classification.All]
     public sealed class TokenLocating : DependenceProvider
     {
         [UnitTest]
@@ -22,7 +20,6 @@ namespace ReniUI.Test
 
 
         [UnitTest]
-        [Test]
         public void CommentFromSourcePart()
         {
             const string text = @"( # Comment

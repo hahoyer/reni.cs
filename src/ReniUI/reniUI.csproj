@@ -1,17 +1,88 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.0">
+  <Import Project="..\..\bin\Packages\NUnit.3.13.2\build\NUnit.props" Condition="Exists('..\..\bin\Packages\NUnit.3.13.2\build\NUnit.props')" />
+  <PropertyGroup>
+    <ProjectGuid>{C339A515-D066-4C12-A4C5-07DA91C19A2C}</ProjectGuid>
+    <AssemblyName>ReniUI</AssemblyName>
+    <TargetTypeEx>CSharp.Library.Legacy</TargetTypeEx>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Reni\Reni.csproj">
+      <Project>{45d97de4-67c3-4f10-98b4-6618cf7c7bb1}</Project>
+      <Name>Reni</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Classification\Item.cs" />
+    <Compile Include="Classification\WhiteSpaceItem.cs" />
+    <Compile Include="Formatting\EmptyWhiteSpaceView.cs" />
+    <Compile Include="Formatting\Edit.cs" />
+    <Compile Include="Formatting\EditPieceParameter.cs" />
+    <Compile Include="Formatting\Extension.cs" />
+    <Compile Include="Formatting\Formatter.cs" />
+    <Compile Include="Formatting\FormatterExtension.cs" />
+    <Compile Include="Formatting\ISourcePosition.cs" />
+    <Compile Include="Formatting\SplitItem.cs" />
+    <Compile Include="Formatting\WhiteSpaceView.cs" />
+    <Compile Include="Formatting\IResultItem.cs" />
+    <Compile Include="Formatting\ResultItems.cs" />
+    <Compile Include="Formatting\Skeleton.cs" />
+    <Compile Include="Formatting\SourcePartEditExtension.cs" />
+    <Compile Include="Formatting\ISourcePartEdit.cs" />
+    <Compile Include="Formatting\Syntax.cs" />
+    <Compile Include="Formatting\WhiteSpace.cs" />
+    <Compile Include="Helper\Syntax.cs" />
+    <Compile Include="AssemblyInfo.cs">
+      <DependentUpon>AssemblyInfo.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="CompilerBrowser.cs" />
+    <Compile Include="Extension.cs" />
+    <Compile Include="Persister.cs" />
+    <Compile Include="Formatting\Configuration.cs" />
+    <Compile Include="Formatting\ContactType.cs" />
+    <Compile Include="Formatting\HierarchicalFormatter.cs" />
+    <Compile Include="Formatting\IChainLink.cs" />
+    <Compile Include="Formatting\IFormatter.cs" />
+    <Compile Include="Formatting\NewWhiteSpace.cs" />
+    <Compile Include="Formatting\SeparatorType.cs" />
+    <Compile Include="RestFul\Channel.cs" />
+    <Compile Include="RestFul\ChannelRepo.cs" />
+    <Compile Include="RestFul\IChannelRepo.cs" />
+    <Compile Include="RestFul\Issue.cs" />
+    <Compile Include="Test\BracketMatching.cs" />
+    <Compile Include="Test\ListMatching.cs" />
+    <Compile Include="Test\PairedSyntaxTree.cs" />
+    <Compile Include="Test\ThenElseMatching.cs" />
+    <Compile Include="Test\TokenLocating.cs" />
+    <Compile Include="Classification\Syntax.cs" />
+    <None Include="packages.config" />
+    <None Include="sys.targets" />
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+    <Content Include=".gitignore" />
+    <Content Include="AssemblyInfo.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>AssemblyInfo.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="JetBrains.Annotations, Version=2021.2.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\..\bin\Packages\JetBrains.Annotations.2021.2.0\lib\net20\JetBrains.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework, Version=3.13.2.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\..\bin\Packages\NUnit.3.13.2\lib\net45\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <Import Project="sys.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
-        <TargetTypeEx>CSharp.Library</TargetTypeEx>
-        <LangVersion>default</LangVersion>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-
-    <ItemGroup>
-        <PackageReference Include="NUnit" Version="3.13.2" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\Reni\Reni.csproj" />
-    </ItemGroup>
-
-    <Import Project="sys.targets" />
+    <Error Condition="!Exists('..\..\bin\Packages\NUnit.3.13.2\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\bin\Packages\NUnit.3.13.2\build\NUnit.props'))" />
+  </Target>
 </Project>

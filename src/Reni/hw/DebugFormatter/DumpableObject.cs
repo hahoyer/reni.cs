@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics;
 using hw.Helper;
 using JetBrains.Annotations;
-
 // ReSharper disable CheckNamespace
 
 namespace hw.DebugFormatter
@@ -21,23 +20,11 @@ namespace hw.DebugFormatter
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         readonly int? ObjectIdValue;
 
+        protected DumpableObject()
+            : this(NextObjectId++) { }
+
         [PublicAPI]
-        protected DumpableObject(int? nextObjectId = null) 
-            => ObjectIdValue = nextObjectId ?? NextObjectId++;
-
-        protected virtual string GetNodeDump() => GetType().PrettyName();
-
-        public override string ToString() => base.ToString() + " ObjectId=" + ObjectId;
-
-        public override string DebuggerDump() => base.DebuggerDump() + " ObjectId=" + ObjectId;
-
-        protected override string Dump(bool isRecursion)
-        {
-            var result = NodeDump;
-            if(!isRecursion)
-                result += DumpData().Surround("{", "}");
-            return result;
-        }
+        protected DumpableObject(int? nextObjectId) => ObjectIdValue = nextObjectId??(NextObjectId++);
 
         [DisableDump]
         [PublicAPI]
@@ -45,7 +32,7 @@ namespace hw.DebugFormatter
         {
             get
             {
-                ObjectIdValue.AssertIsNotNull();
+                Tracer.Assert(ObjectIdValue != null);
                 return ObjectIdValue.Value;
             }
         }
@@ -69,12 +56,26 @@ namespace hw.DebugFormatter
         [PublicAPI]
         public string NodeDumpForDebug() => Debugger.IsAttached? GetNodeDump() : "";
 
+        public override string ToString() => base.ToString() + " ObjectId=" + ObjectId;
+
+        public override string DebuggerDump() => base.DebuggerDump() + " ObjectId=" + ObjectId;
+
         [DebuggerHidden]
         [PublicAPI]
         public void StopByObjectIds(params int[] objectIds)
         {
             foreach(var objectId in objectIds)
                 StopByObjectId(1, objectId);
+        }
+
+        protected virtual string GetNodeDump() => GetType().PrettyName();
+
+        protected override string Dump(bool isRecursion)
+        {
+            var result = NodeDump;
+            if(!isRecursion)
+                result += DumpData().Surround("{", "}");
+            return result;
         }
 
         [DebuggerHidden]

@@ -1,15 +1,24 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-        <TargetTypeEx>CSharp.WinExe</TargetTypeEx>
-        <OutputType>WinExe</OutputType>
-        <TargetFramework>net5.0-windows</TargetFramework>
-        <LangVersion>default</LangVersion>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\Reni\Reni.csproj" />
-    </ItemGroup>
-
-    <Import Project="sys.targets" />
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.0">
+  <PropertyGroup>
+    <ProjectGuid>{54D4A90B-C3CF-4F72-B447-CBC08B6EF5AB}</ProjectGuid>
+    <AssemblyName>ReniExe</AssemblyName>
+    <TargetTypeEx>CSharp.Exe.Legacy</TargetTypeEx>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Reni\Reni.csproj">
+      <Project>{EBB73C84-6622-4183-A28F-B0DFF606006B}</Project>
+      <Name>Reni</Name>
+    </ProjectReference>
+    <Compile Include="MainContainer.cs" />
+    <None Include="packages.config" />
+    <None Include="sys.targets" />
+    <Reference Include="JetBrains.Annotations, Version=2021.2.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325">
+      <HintPath>..\..\bin\Packages\JetBrains.Annotations.2021.2.0\lib\net20\JetBrains.Annotations.dll</HintPath>
+      <Private>True</Private>
+      <SpecificVersion>True</SpecificVersion>
+    </Reference>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <Import Project="sys.targets" />
 </Project>

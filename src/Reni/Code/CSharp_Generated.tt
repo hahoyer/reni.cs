@@ -1,0 +1,48 @@
+﻿<#@ template language="C#" #>
+<#@ import namespace="Reni.Code" #>
+
+using System;
+using Reni;
+using Reni.Runtime;
+
+namespace ReniTest
+{
+	unsafe static public class <#= ModuleName #>
+	{<#
+        GenerateCSharpCode(_main);
+        for (var i = 0; i < _functions.Count; i++)
+        {
+	        if(_functions[i].Getter != null)
+	            GenerateCSharpFunctionCode(_functions[i].Getter);
+            if (_functions[i].Setter != null)
+	            GenerateCSharpFunctionCode(_functions[i].Setter);
+        }	     
+	#>}
+}
+
+<#+ 
+	void GenerateCSharpCode(Container container)
+	{#>
+	    
+        // <#= container.Description.Replace("\n", "\n//") #> 
+		unsafe static public void <#= Generator.MainFunctionName #>()
+		{
+	    	<#=container.GetCSharpStatements(3)#>
+        }
+	<#+}
+	
+    void GenerateCSharpFunctionCode(Container container)
+	{#>
+
+	    // <#= container.Description.Replace("\n", "\n//") #> 
+		unsafe static Data <#= Generator.FunctionName(container.FunctionId) #>(Data frame)
+		{
+		Start:
+            <#=container.GetCSharpStatements(3)#>
+            return data;
+		}
+	<#+}
+
+        // ReSharper disable FieldCanBeMadeReadOnly.Local
+
+#>
