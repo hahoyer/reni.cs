@@ -271,7 +271,7 @@ namespace hw.Helper
             });
 #pragma warning disable CA1416 //This call site is reachable on all platforms. 'Thread.SetApartmentState(ApartmentState)' is only supported on: 'windows'.
             thread.SetApartmentState(ApartmentState.STA);
-#pragma warning restore CA1416 
+#pragma warning restore CA1416
             thread.Start();
             return tcs.Task;
         }
@@ -282,7 +282,7 @@ namespace hw.Helper
             var thread = new Thread(result.Start);
 #pragma warning disable CA1416  //This call site is reachable on all platforms. 'Thread.SetApartmentState(ApartmentState)' is only supported on: 'windows'.
             thread.SetApartmentState(ApartmentState.STA);
-#pragma warning restore CA1416 
+#pragma warning restore CA1416
 
 
             thread.Start();

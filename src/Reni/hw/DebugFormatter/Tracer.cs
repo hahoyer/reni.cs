@@ -329,7 +329,6 @@ namespace hw.DebugFormatter
         /// <param name="target"> the object to dump </param>
         /// <returns> </returns>
         public static string Dump(object target) => Dumper.Dump(target);
-        public static string LogDump(this object target) => Dumper.Dump(target);
 
 
         /// <summary>
@@ -505,23 +504,20 @@ namespace hw.DebugFormatter
             AssertionFailed("", getText, stackFrameDepth + 1);
         }
 
-
         /// <summary>
-        ///     Check expression
+        ///     Check if expression has target type
         /// </summary>
-        /// <param name="b">
-        ///     if null.
+        /// <param name="target">
         /// </param>
         /// <param name="getText"> Message in case of fail. </param>
         /// <param name="stackFrameDepth"> The stack frame depth. </param>
         [DebuggerHidden]
-        public static void Assert<TTarget>(this object b, Func<string> getText = null, int stackFrameDepth = 0)
+        public static void Assert<TTargetType>(this object target, Func<string> getText = null, int stackFrameDepth = 0)
         {
-            if(b is TTarget)
+            if(target is TTargetType)
                 return;
-            AssertionFailed($"is {typeof(TTarget).PrettyName()}", getText, stackFrameDepth + 1);
+            AssertionFailed($"is {typeof(TTargetType).PrettyName()}", getText, stackFrameDepth + 1);
         }
-
 
         public static int CurrentFrameCount(int stackFrameDepth) => new StackTrace(true).FrameCount - stackFrameDepth;
 
