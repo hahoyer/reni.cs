@@ -82,6 +82,7 @@
     <Compile Include="FeatureTest\Function\SimpleFunctionWithNonLocal.cs" />
     <Compile Include="FeatureTest\Function\TwoFunctions.cs" />
     <Compile Include="FeatureTest\Function\TwoFunctions1.cs" />
+    <Compile Include="FeatureTest\Helper\CodeDomCompilation.cs" />
     <Compile Include="FeatureTest\Helper\CompilerTest.cs" />
     <Compile Include="FeatureTest\Helper\Extension.cs" />
     <Compile Include="FeatureTest\Helper\LikeSyntax.cs" />
@@ -228,6 +229,7 @@
     <Compile Include="Parser\IRecursionHandler.cs" />
     <Compile Include="Parser\ISyntaxScope.cs" />
     <Compile Include="SyntaxTree\Anchor.cs" />
+    <Compile Include="SyntaxTree\IItem.cs" />
     <Compile Include="SyntaxTree\ISyntaxVisitor.cs" />
     <Compile Include="Parser\ReplaceArgVisitor.cs" />
     <Compile Include="Parser\Result.cs" />
