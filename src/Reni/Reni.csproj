@@ -1,38 +1,499 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.0">
+  <Import Project="..\..\bin\Packages\NUnit.3.13.2\build\NUnit.props" Condition="Exists('..\..\bin\Packages\NUnit.3.13.2\build\NUnit.props')" />
+  <PropertyGroup>
+    <ProjectGuid>{EBB73C84-6622-4183-A28F-B0DFF606006B}</ProjectGuid>
+    <AssemblyName>Reni</AssemblyName>
+    <TargetTypeEx>CSharp.Library.Legacy</TargetTypeEx>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <LangVersion>default</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <LangVersion>default</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AssemblyInfo.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Basics\BitsConst.cs" />
+    <Compile Include="Basics\Category.cs" />
+    <Compile Include="Basics\RefAlignParam.cs" />
+    <Compile Include="Basics\Size.cs" />
+    <Compile Include="Code\ArgTypeVisitor.cs" />
+    <Compile Include="Code\CodeContainer.cs" />
+    <Compile Include="Code\CodeWithCleanup.cs" />
+    <Compile Include="Code\CSharp_Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CSharp_Generated.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Code\FunctionContainer.cs" />
+    <Compile Include="Code\Generator.cs" />
+    <Compile Include="Code\Holder.cs" />
+    <Compile Include="Code\InvalidConversionCode.cs" />
+    <Compile Include="Code\ItemCollector.cs" />
+    <Compile Include="Code\IVisitor.cs" />
+    <Compile Include="Code\None.cs" />
+    <Compile Include="Code\ArrayAccess.cs" />
+    <Compile Include="Code\UnknownStackData.cs" />
+    <Compile Include="CompilerParameters.cs" />
+    <Compile Include="Context\ContextReferenceType.cs" />
+    <Compile Include="Context\IRootProvider.cs" />
+    <Compile Include="DeclarationOptions\Typeoid.cs" />
+    <Compile Include="FeatureTest\Array\ArrayFromPieces.cs" />
+    <Compile Include="FeatureTest\Array\CombineArraysFromPieces.cs" />
+    <Compile Include="FeatureTest\Array\DefaultInitialized.cs" />
+    <Compile Include="FeatureTest\Array\ElementAccess.cs" />
+    <Compile Include="FeatureTest\Array\FromTypeAndFunction.cs" />
+    <Compile Include="FeatureTest\Array\ReferenceSimple.cs" />
+    <Compile Include="FeatureTest\Array\SimpleArrayFromPiece.cs" />
+    <Compile Include="FeatureTest\Array\TypeOfSimpleArrayFromPiece.cs" />
+    <Compile Include="FeatureTest\BlogExamples\Post120109.cs" />
+    <Compile Include="FeatureTest\BlogExamples\Post120617.cs" />
+    <Compile Include="FeatureTest\BlogExamples\WikiExample1.cs" />
+    <Compile Include="FeatureTest\CleanupSection\Basic.cs" />
+    <Compile Include="FeatureTest\CleanupSection\Nested.cs" />
+    <Compile Include="FeatureTest\CleanupSection\Simple.cs" />
+    <Compile Include="FeatureTest\ComplexContext.cs" />
+    <Compile Include="FeatureTest\ConversionService\Closure.cs" />
+    <Compile Include="FeatureTest\ConversionService\NumberExtensionConversion.cs" />
+    <Compile Include="FeatureTest\ConversionService\NumberPointerCutConversion.cs" />
+    <Compile Include="FeatureTest\Function\ConstantFunction.cs" />
+    <Compile Include="FeatureTest\Function\Function.cs" />
+    <Compile Include="FeatureTest\Function\FunctionOfFunction.cs" />
+    <Compile Include="FeatureTest\Function\FunctionVariable.cs" />
+    <Compile Include="FeatureTest\Function\FunctionWithNonLocal.cs" />
+    <Compile Include="FeatureTest\Function\FunctionWithRefArg.cs" />
+    <Compile Include="FeatureTest\Function\FunctionAssignment.cs" />
+    <Compile Include="FeatureTest\Function\ObjectFunction.cs" />
+    <Compile Include="FeatureTest\Function\ObjectFunction1.cs" />
+    <Compile Include="FeatureTest\Function\ObjectFunction2.cs" />
+    <Compile Include="FeatureTest\Function\ObjectProperty.cs" />
+    <Compile Include="FeatureTest\Function\PrimitiveRecursiveFunctionByteWithDump.cs" />
+    <Compile Include="FeatureTest\Function\PrimitiveRecursiveFunctionHuge.cs" />
+    <Compile Include="FeatureTest\Function\PrimitiveRecursiveFunctionSmall.cs" />
+    <Compile Include="FeatureTest\Function\PrimitiveRecursiveFunctionWithDump.cs" />
+    <Compile Include="FeatureTest\Function\RecursiveFunction.cs" />
+    <Compile Include="FeatureTest\Function\Repeater.cs" />
+    <Compile Include="FeatureTest\Function\SimpleFunction.cs" />
+    <Compile Include="FeatureTest\Function\SimpleFunctionWithNonLocal.cs" />
+    <Compile Include="FeatureTest\Function\TwoFunctions.cs" />
+    <Compile Include="FeatureTest\Function\TwoFunctions1.cs" />
+    <Compile Include="FeatureTest\Helper\CompilerTest.cs" />
+    <Compile Include="FeatureTest\Helper\Extension.cs" />
+    <Compile Include="FeatureTest\Helper\LikeSyntax.cs" />
+    <Compile Include="FeatureTest\Helper\TargetSetData.cs" />
+    <Compile Include="FeatureTest\MixIn\Function.cs" />
+    <Compile Include="FeatureTest\MixIn\Simple.cs" />
+    <Compile Include="FeatureTest\Reference\ArrayElementType.cs" />
+    <Compile Include="FeatureTest\Reference\ArrayElementType1.cs" />
+    <Compile Include="FeatureTest\Reference\ArrayReferenceAll.cs" />
+    <Compile Include="FeatureTest\Reference\ArrayReferenceByInstance.cs" />
+    <Compile Include="FeatureTest\Reference\ArrayReferenceCopy.cs" />
+    <Compile Include="FeatureTest\Reference\ArrayReferenceCopyAssign.cs" />
+    <Compile Include="FeatureTest\Reference\ArrayReferenceDumpLoop.cs" />
+    <Compile Include="FeatureTest\Reference\ArrayReferenceDumpSimple.cs" />
+    <Compile Include="FeatureTest\ScopeHandling.cs" />
+    <Compile Include="FeatureTest\Structure\Access.cs" />
+    <Compile Include="FeatureTest\Structure\AccessAndAdd.cs" />
+    <Compile Include="FeatureTest\Structure\AccessAndAddComplex.cs" />
+    <Compile Include="FeatureTest\Structure\AccessSimple.cs" />
+    <Compile Include="FeatureTest\Structure\AccessSimple1.cs" />
+    <Compile Include="FeatureTest\Structure\Assignments.cs" />
+    <Compile Include="FeatureTest\Structure\AssignmentWithCut.cs" />
+    <Compile Include="FeatureTest\Structure\DumpPrint.cs" />
+    <Compile Include="FeatureTest\Structure\InnerAccess.cs" />
+    <Compile Include="FeatureTest\Structure\NamedSimpleAssignment.cs" />
+    <Compile Include="FeatureTest\Structure\PropertyVariable.cs" />
+    <Compile Include="FeatureTest\Structure\SimpleAssignment.cs" />
+    <Compile Include="FeatureTest\Structure\SimpleAssignment1.cs" />
+    <Compile Include="FeatureTest\Structure\SomeVariables.cs" />
+    <Compile Include="FeatureTest\Structure\StrangeStructs.cs" />
+    <Compile Include="FeatureTest\Structure\AccessMember.cs" />
+    <Compile Include="FeatureTest\Structure\ContextOperator.cs" />
+    <Compile Include="FeatureTest\Sample\Sample200104.cs" />
+    <Compile Include="FeatureTest\TypeType\ApplyTypeOperator.cs" />
+    <Compile Include="FeatureTest\TypeType\ApplyTypeOperatorWithCut.cs" />
+    <Compile Include="FeatureTest\TypeType\TypeOperator.cs" />
+    <Compile Include="FeatureTest\TypeType\TypeOperatorWithVariable.cs" />
+    <Compile Include="FeatureTest\UserObjects.cs" />
+    <Compile Include="FeatureTest\Validation\SyntaxError.cs" />
+    <Compile Include="FeatureTest\Validation\UndefinedContextSymbol.cs" />
+    <Compile Include="FeatureTest\Validation\UnMatchedBrackets.cs" />
+    <Compile Include="Feature\Combination.cs" />
+    <Compile Include="Feature\Conversion.cs" />
+    <Compile Include="Feature\Extension.cs" />
+    <Compile Include="Feature\Function.cs" />
+    <Compile Include="Feature\SearchResult.cs" />
+    <Compile Include="Feature\Simple.cs" />
+    <Compile Include="Helper\ContactType.cs" />
+    <Compile Include="Helper\Extension.cs" />
+    <Compile Include="Helper\IFormatResult.cs" />
+    <Compile Include="Helper\IntegerResult.cs" />
+    <Compile Include="Helper\ITree.cs" />
+    <Compile Include="Helper\SeparatorExtension.cs" />
+    <Compile Include="Helper\StringResult.cs" />
+    <Compile Include="Helper\SyntaxView.cs" />
+    <Compile Include="Helper\PositionDictionary.cs" />
+    <Compile Include="Helper\TreeWithParent.cs" />
+    <Compile Include="Helper\TreeWithParentExtended.cs" />
+    <Compile Include="hw\DebugFormatter\Configuration.cs" />
+    <Compile Include="hw\DebugFormatter\DebugTextWriter.cs" />
+    <Compile Include="hw\DebugFormatter\DisableDumpAttribute.cs" />
+    <Compile Include="hw\DebugFormatter\Dumpable.cs" />
+    <Compile Include="hw\DebugFormatter\DumpableObject.cs" />
+    <Compile Include="hw\DebugFormatter\DumpAttribute.cs" />
+    <Compile Include="hw\DebugFormatter\DumpClassAttribute.cs" />
+    <Compile Include="hw\DebugFormatter\DumpDataClassAttribute.cs" />
+    <Compile Include="hw\DebugFormatter\DumpEnabledAttribute.cs" />
+    <Compile Include="hw\DebugFormatter\Dumper.cs" />
+    <Compile Include="hw\DebugFormatter\DumpToStringAttribute.cs" />
+    <Compile Include="hw\DebugFormatter\EnableDumpAttribute.cs" />
+    <Compile Include="hw\DebugFormatter\EnableDumpExceptAttribute.cs" />
+    <Compile Include="hw\DebugFormatter\EnableDumpWithExceptionPredicateAttribute.cs" />
+    <Compile Include="hw\DebugFormatter\Log4NetTextWriter.cs" />
+    <Compile Include="hw\DebugFormatter\Profiler.cs" />
+    <Compile Include="hw\DebugFormatter\TextWriters.cs" />
+    <Compile Include="hw\DebugFormatter\Tracer.cs" />
+    <Compile Include="hw\DebugFormatter\Writer.cs" />
+    <Compile Include="hw\Helper\Box.cs" />
+    <Compile Include="hw\Helper\DateRange.cs" />
+    <Compile Include="hw\Helper\DateTimeExtender.cs" />
+    <Compile Include="hw\Helper\EnumEx.cs" />
+    <Compile Include="hw\Helper\FunctionCache.cs" />
+    <Compile Include="hw\Helper\IUniqueIdProvider.cs" />
+    <Compile Include="hw\Helper\LinqExtension.cs" />
+    <Compile Include="hw\Helper\LocationProviderAttribute.cs" />
+    <Compile Include="hw\Helper\LongExtender.cs" />
+    <Compile Include="hw\Helper\ReflectionExtender.cs" />
+    <Compile Include="hw\Helper\SmbFile.cs" />
+    <Compile Include="hw\Helper\StringAligner.cs" />
+    <Compile Include="hw\Helper\StringExtender.cs" />
+    <Compile Include="hw\Helper\TextPart.cs" />
+    <Compile Include="hw\Helper\TypeLibrary.cs" />
+    <Compile Include="hw\Helper\TypeNameExtender.cs" />
+    <Compile Include="hw\Helper\ValueCache.cs" />
+    <Compile Include="hw\Helper\ValueCacheExtension.cs" />
+    <Compile Include="hw\Parser\BelongsToAttribute.cs" />
+    <Compile Include="hw\Parser\BracketContext.cs" />
+    <Compile Include="hw\Parser\CachingTokenFactory.cs" />
+    <Compile Include="hw\Parser\Compiler.cs" />
+    <Compile Include="hw\Parser\Extension.cs" />
+    <Compile Include="hw\Parser\GenericTokenFactory.cs" />
+    <Compile Include="hw\Parser\IBinaryTreeItem.cs" />
+    <Compile Include="hw\Parser\IOperator.cs" />
+    <Compile Include="hw\Parser\IParser.cs" />
+    <Compile Include="hw\Parser\IParserTokenType.cs" />
+    <Compile Include="hw\Parser\Item.cs" />
+    <Compile Include="hw\Parser\IToken.cs" />
+    <Compile Include="hw\Parser\ITokenFactory.cs" />
+    <Compile Include="hw\Parser\OpenItem.cs" />
+    <Compile Include="hw\Parser\ParserTokenType.cs" />
+    <Compile Include="hw\Parser\PredefinedTokenFactory.cs" />
+    <Compile Include="hw\Parser\PrioParser.cs" />
+    <Compile Include="hw\Parser\PrioParserWorker.cs" />
+    <Compile Include="hw\Parser\PrioTable.cs" />
+    <Compile Include="hw\Parser\ScannerTokenType.cs" />
+    <Compile Include="hw\Parser\SubParser.cs" />
+    <Compile Include="hw\Parser\VariantAttribute.cs" />
+    <Compile Include="hw\Scanner\FileSourceProvider.cs" />
+    <Compile Include="hw\Scanner\IScanner.cs" />
+    <Compile Include="hw\Scanner\ISourceProvider.cs" />
+    <Compile Include="hw\Scanner\ITokenFactory.cs" />
+    <Compile Include="hw\Scanner\LexerItem.cs" />
+    <Compile Include="hw\Scanner\Match.cs" />
+    <Compile Include="hw\Scanner\Match2TwoLayerScannerGuard.cs" />
+    <Compile Include="hw\Scanner\MatchExtension.cs" />
+    <Compile Include="hw\Scanner\Source.cs" />
+    <Compile Include="hw\Scanner\SourcePart.cs" />
+    <Compile Include="hw\Scanner\SourcePosition.cs" />
+    <Compile Include="hw\Scanner\StringSourceProvider.cs" />
+    <Compile Include="hw\Scanner\TwoLayerScanner.cs" />
+    <Compile Include="hw\Scanner\WhiteSpaceTokenType.cs" />
+    <Compile Include="hw\UnitTest\CategoryAttribute.cs" />
+    <Compile Include="hw\UnitTest\DependantAttribute.cs" />
+    <Compile Include="hw\UnitTest\DependenceProvider.cs" />
+    <Compile Include="hw\UnitTest\ITestFixture.cs" />
+    <Compile Include="hw\UnitTest\TestExtender.cs" />
+    <Compile Include="hw\UnitTest\TestMethod.cs" />
+    <Compile Include="hw\UnitTest\TestRunner.cs" />
+    <Compile Include="hw\UnitTest\TestType.cs" />
+    <Compile Include="IProxyType.cs" />
+    <Compile Include="ParserTest\AlternativePrioTableTest.cs" />
+    <Compile Include="ParserTest\VerbatimText.cs" />
+    <Compile Include="ParserTest\StrangeDeclarationSyntax.cs" />
+    <Compile Include="Parser\IRecursionHandler.cs" />
+    <Compile Include="Parser\ISyntaxScope.cs" />
+    <Compile Include="SyntaxTree\Anchor.cs" />
+    <Compile Include="SyntaxTree\ISyntaxVisitor.cs" />
+    <Compile Include="Parser\ReplaceArgVisitor.cs" />
+    <Compile Include="Parser\Result.cs" />
+    <Compile Include="Parser\ITokenClass.cs" />
+    <Compile Include="Parser\RecursionType.cs" />
+    <Compile Include="Parser\SavePartMatch.cs" />
+    <Compile Include="Parser\ScannerSyntaxError.cs" />
+    <Compile Include="Parser\ScannerTokenFactory.cs" />
+    <Compile Include="SyntaxTree\ValueSyntax.cs" />
+    <Compile Include="ReniObjectExtender.cs" />
+    <Compile Include="Parser\Extension.cs" />
+    <Compile Include="Parser\ExclamationBoxToken.cs" />
+    <Compile Include="Parser\Lexer.cs" />
+    <Compile Include="ResultCache.cs" />
+    <Compile Include="Code\Arg.cs" />
+    <Compile Include="Code\Assign.cs" />
+    <Compile Include="Code\BinaryOp.cs" />
+    <Compile Include="Code\BitArray.cs" />
+    <Compile Include="Code\BitArrayBinaryOp.cs" />
+    <Compile Include="Code\BitCast.cs" />
+    <Compile Include="Code\BitsStackData.cs" />
+    <Compile Include="Code\CodeBase.cs" />
+    <Compile Include="Code\CodeBaseException.cs" />
+    <Compile Include="Code\Container.cs" />
+    <Compile Include="Code\Call.cs" />
+    <Compile Include="Code\DataStack.cs" />
+    <Compile Include="Code\Drop.cs" />
+    <Compile Include="Code\EmptyStackData.cs" />
+    <Compile Include="Code\Fiber.cs" />
+    <Compile Include="Code\FiberHead.cs" />
+    <Compile Include="Code\FiberItem.cs" />
+    <Compile Include="Code\FormalMaschine.cs" />
+    <Compile Include="Code\FormalValueAccess.cs" />
+    <Compile Include="Code\FrameData.cs" />
+    <Compile Include="Code\HasArgVisitor.cs" />
+    <Compile Include="Code\IFormalValue.cs" />
+    <Compile Include="Code\List.cs" />
+    <Compile Include="Code\LocalReference.cs" />
+    <Compile Include="Code\IContextReference.cs" />
+    <Compile Include="Code\RemoveLocalReferences.cs" />
+    <Compile Include="Code\LocalStackReference.cs" />
+    <Compile Include="Code\ListStack.cs" />
+    <Compile Include="Code\RecursiveCall.cs" />
+    <Compile Include="Code\RecursiveCallCandidate.cs" />
+    <Compile Include="Code\ReferenceCode.cs" />
+    <Compile Include="Code\Ref.cs" />
+    <Compile Include="Code\ReferencePlusConstant.cs" />
+    <Compile Include="Code\ReplaceVisitor\ReplaceAbsoluteArg.cs" />
+    <Compile Include="Code\ReplaceVisitor\ReplaceArg.cs" />
+    <Compile Include="Code\ReplaceVisitor\Base.cs" />
+    <Compile Include="Code\ReplaceVisitor\ReplaceRelRefArg.cs" />
+    <Compile Include="Code\ReplaceVisitor\ReplaceContextRefWithArg.cs" />
+    <Compile Include="Code\CSharpGenerator.cs" />
+    <Compile Include="Code\StackData.cs" />
+    <Compile Include="Code\StackDataAddress.cs" />
+    <Compile Include="Code\ThenElse.cs" />
+    <Compile Include="Code\Top.cs" />
+    <Compile Include="Code\TopData.cs" />
+    <Compile Include="Code\TopRef.cs" />
+    <Compile Include="Code\DePointer.cs" />
+    <Compile Include="Code\Visitor.cs" />
+    <Compile Include="Compiler.cs" />
+    <Compile Include="Context\Child.cs" />
+    <Compile Include="Context\ContextBase.cs" />
+    <Compile Include="Context\ContextOperator.cs" />
+    <Compile Include="Context\FunctionList.cs" />
+    <Compile Include="Context\ReplacePrimitiveRecursivity.cs" />
+    <Compile Include="FeatureTest\BitArrayOp.cs" />
+    <Compile Include="Context\Function.cs" />
+    <Compile Include="Context\Root.cs" />
+    <Compile Include="FeatureTest\TextStruct.cs" />
+    <Compile Include="FeatureTest\Text.cs" />
+    <Compile Include="Feature\DumpPrintToken.cs" />
+    <Compile Include="Feature\Interfaces.cs" />
+    <Compile Include="Parser\DeclarationTokenFactory.cs" />
+    <Compile Include="Parser\DefinableToken.cs" />
+    <Compile Include="SyntaxTree\ExpressionSyntax.cs" />
+    <Compile Include="Parser\MainTokenFactory.cs" />
+    <Compile Include="Runtime\BiasCache.cs" />
+    <Compile Include="Runtime\DataHandler.cs" />
+    <Compile Include="Numeric\Operation.cs" />
+    <Compile Include="Numeric\Sign.cs" />
+    <Compile Include="Numeric\Slash.cs" />
+    <Compile Include="Numeric\Star.cs" />
+    <Compile Include="Singleton.cs" />
+    <Compile Include="StringStream.cs" />
+    <Compile Include="SyntaxTree\CleanupSyntax.cs" />
+    <Compile Include="Struct\Compound.cs" />
+    <Compile Include="Struct\CompoundContext.cs" />
+    <Compile Include="Struct\FunctionBodyType.cs" />
+    <Compile Include="Struct\FunctionId.cs" />
+    <Compile Include="Struct\FunctionType.cs" />
+    <Compile Include="Struct\GetterFunctionType.cs" />
+    <Compile Include="Struct\SetterFunctionType.cs" />
+    <Compile Include="Struct\CompoundView.cs" />
+    <Compile Include="Struct\CompoundType.cs" />
+    <Compile Include="Struct\FunctionInstance.cs" />
+    <Compile Include="SyntaxFactory\CleanupHandler.cs" />
+    <Compile Include="SyntaxFactory\ColonHandler.cs" />
+    <Compile Include="SyntaxFactory\DefinableHandler.cs" />
+    <Compile Include="SyntaxFactory\ElseHandler.cs" />
+    <Compile Include="SyntaxFactory\Extension.cs" />
+    <Compile Include="SyntaxFactory\Factory.cs" />
+    <Compile Include="SyntaxFactory\FunctionHandler.cs" />
+    <Compile Include="SyntaxFactory\IDeclarationToken.cs" />
+    <Compile Include="SyntaxFactory\IDeclarerProvider.cs" />
+    <Compile Include="SyntaxFactory\InfixHandler.cs" />
+    <Compile Include="SyntaxFactory\InvalidTokenDeclarerHandler.cs" />
+    <Compile Include="SyntaxFactory\IStatementProvider.cs" />
+    <Compile Include="SyntaxFactory\IStatementsProvider.cs" />
+    <Compile Include="SyntaxFactory\IStatementsToken.cs" />
+    <Compile Include="SyntaxFactory\IValueProvider.cs" />
+    <Compile Include="SyntaxFactory\IValueToken.cs" />
+    <Compile Include="SyntaxFactory\ListHandler.cs" />
+    <Compile Include="SyntaxFactory\MatchedBracketHandler.cs" />
+    <Compile Include="SyntaxFactory\ThenHandler.cs" />
+    <Compile Include="T4Compiler.cs" />
+    <Compile Include="Feature\TypeOperator.cs" />
+    <Compile Include="Struct\AtToken.cs" />
+    <Compile Include="FeatureTest\DefaultOperations.cs" />
+    <Compile Include="FeatureTest\IntegerStruct.cs" />
+    <Compile Include="FeatureTest\SimpleFiles.cs" />
+    <Compile Include="FeatureTest\ThenElse.cs" />
+    <Compile Include="ParserTest\Test.cs" />
+    <Compile Include="Struct\AccessFeature.cs" />
+    <Compile Include="SyntaxTree\Syntax.cs" />
+    <Compile Include="Runtime\OutStream.cs" />
+    <Compile Include="SyntaxTree\Special.cs" />
+    <Compile Include="SyntaxTree\EmptyList.cs" />
+    <Compile Include="TokenClasses\ArgToken.cs" />
+    <Compile Include="TokenClasses\BraceMatchDumper.cs" />
+    <Compile Include="TokenClasses\Cleanup.cs" />
+    <Compile Include="TokenClasses\CompareOperation.cs" />
+    <Compile Include="SyntaxTree\DeclarationSyntax.cs" />
+    <Compile Include="SyntaxFactory\IDeclarerToken.cs" />
+    <Compile Include="SyntaxTree\DeclarerSyntax.cs" />
+    <Compile Include="TokenClasses\EndOfText.cs" />
+    <Compile Include="TokenClasses\ErrorToken.cs" />
+    <Compile Include="TokenClasses\IBelongingsMatcher.cs" />
+    <Compile Include="TokenClasses\IComparator.cs" />
+    <Compile Include="TokenClasses\IFormatItem.cs" />
+    <Compile Include="TokenClasses\ISyntax.cs" />
+    <Compile Include="TokenClasses\PreType.cs" />
+    <Compile Include="TokenClasses\ReassignToken.cs" />
+    <Compile Include="TokenClasses\Base.cs" />
+    <Compile Include="TokenClasses\Colon.cs" />
+    <Compile Include="TokenClasses\EqualityOperation.cs" />
+    <Compile Include="TokenClasses\Definable.cs" />
+    <Compile Include="TokenClasses\ElseToken.cs" />
+    <Compile Include="TokenClasses\EnableCut.cs" />
+    <Compile Include="TokenClasses\Function.cs" />
+    <Compile Include="TokenClasses\FunctionInstanceToken.cs" />
+    <Compile Include="SyntaxTree\FunctionSyntax.cs" />
+    <Compile Include="TokenClasses\InstanceToken.cs" />
+    <Compile Include="TokenClasses\RightDeclarationParenthesis.cs" />
+    <Compile Include="TokenClasses\RightParenthesisBase.cs" />
+    <Compile Include="TokenClasses\BinaryTree.cs" />
+    <Compile Include="SyntaxFactory\BracketHandler.cs" />
+    <Compile Include="TokenClasses\TokenClass.cs" />
+    <Compile Include="TokenClasses\TokenItem.cs" />
+    <Compile Include="TokenClasses\ToNumberOfBase.cs" />
+    <Compile Include="TokenClasses\LeftParenthesis.cs" />
+    <Compile Include="TokenClasses\List.cs" />
+    <Compile Include="TokenClasses\Number.cs" />
+    <Compile Include="TokenClasses\RightParenthesis.cs" />
+    <Compile Include="TokenClasses\Text.cs" />
+    <Compile Include="TokenClasses\TextItem.cs" />
+    <Compile Include="TokenClasses\ThenToken.cs" />
+    <Compile Include="TokenClasses\UserSymbol.cs" />
+    <Compile Include="TokenClasses\NewValueToken.cs" />
+    <Compile Include="TokenClasses\WhiteItem.cs" />
+    <Compile Include="Type\ConversionPath.cs" />
+    <Compile Include="Type\ConversionService.cs" />
+    <Compile Include="Type\DataSetterTargetType.cs" />
+    <Compile Include="Type\FeaturePathBridge.cs" />
+    <Compile Include="Type\NumberType.cs" />
+    <Compile Include="Type\Flags.cs" />
+    <Compile Include="Type\ArrayReferenceType.cs" />
+    <Compile Include="Type\ReferenceExtension.cs" />
+    <Compile Include="Type\StableReferenceType.cs" />
+    <Compile Include="Type\RepeaterAccessType.cs" />
+    <Compile Include="Type\Child.cs" />
+    <Compile Include="Type\CreateArrayFromReferenceFeature.cs" />
+    <Compile Include="Type\EnableCut.cs" />
+    <Compile Include="Type\FieldAccessType.cs" />
+    <Compile Include="Type\FunctionInstanceType.cs" />
+    <Compile Include="CodeArgs.cs" />
+    <Compile Include="ReniException.cs" />
+    <Compile Include="Result.cs" />
+    <Compile Include="Runtime\Data.cs" />
+    <Compile Include="SyntaxTree\CompoundSyntax.cs" />
+    <Compile Include="SyntaxTree\ThenElse.cs" />
+    <Compile Include="Type\AlignType.cs" />
+    <Compile Include="Type\ArrayType.cs" />
+    <Compile Include="Type\BitType.cs" />
+    <Compile Include="Type\IReference.cs" />
+    <Compile Include="Type\Pair.cs" />
+    <Compile Include="Type\PointerType.cs" />
+    <Compile Include="Type\RepeaterType.cs" />
+    <Compile Include="Type\SetterTargetType.cs" />
+    <Compile Include="Type\SymmetricClosureService.cs" />
+    <Compile Include="Type\TagChild.cs" />
+    <Compile Include="Type\TypeBase.cs" />
+    <Compile Include="Type\TypeType.cs" />
+    <Compile Include="Type\VoidType.cs" />
+    <Compile Include="Validation\Issue.cs" />
+    <Compile Include="Validation\IssueId.cs" />
+    <Compile Include="Validation\SourceIssue.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Code\CSharp_Generated.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>CSharp_Generated.cs</LastGenOutput>
+    </None>
+    <None Include="FeatureTest\ComplexContext.reni">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="FeatureTest\Text.reni">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="packages.config" />
+    <None Include="Reni2.csproj.DotSettings" />
+    <None Include="sys.targets" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="FeatureTest\Enumeration\" />
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".gitignore" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="AssemblyInfo.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>AssemblyInfo.cs</LastGenOutput>
+    </Content>
+    <Content Include="log4net.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="JetBrains.Annotations, Version=2021.2.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\..\bin\Packages\JetBrains.Annotations.2021.2.0\lib\net20\JetBrains.Annotations.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="log4net, Version=2.0.12.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\..\bin\Packages\log4net.2.0.12\lib\net40\log4net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="nunit.framework, Version=3.13.2.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\..\bin\Packages\NUnit.3.13.2\lib\net40\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Web" />
+  </ItemGroup>
+  <Import Project="sys.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
-        <TargetTypeEx>CSharp.Library</TargetTypeEx>
-        <LangVersion>default</LangVersion>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-
-    <ItemGroup>
-      <Compile Remove="FeatureTest\Structure\Destructor.cs" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="hw.log4net" Version="20.0.1" />
-        <PackageReference Include="JetBrains.Annotations" Version="2021.1.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis" Version="3.10.0" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
-        <PackageReference Include="NUnit" Version="3.13.2" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <None Update="FeatureTest\ComplexContext.reni">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="FeatureTest\Text.reni">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="log4net.xml">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-    </ItemGroup>
-
-    <Import Project="sys.targets" />
-
+    <Error Condition="!Exists('..\..\bin\Packages\NUnit.3.13.2\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\bin\Packages\NUnit.3.13.2\build\NUnit.props'))" />
+  </Target>
 </Project>
