@@ -19,7 +19,7 @@ namespace ReniUI
         readonly ValueCache<Compiler> ParentCache;
         readonly PositionDictionary<Helper.Syntax> PositionDictionary = new();
 
-        CompilerBrowser(Func<Compiler> parent) => ParentCache = new ValueCache<Compiler>(parent);
+        CompilerBrowser(Func<Compiler> parent) => ParentCache = new(parent);
 
         ValueCache ValueCache.IContainer.Cache { get; } = new();
 
