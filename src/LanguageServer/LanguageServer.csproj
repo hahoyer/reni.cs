@@ -68,9 +68,6 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="hw.Helper.Core">
-      <Version>21.0.1</Version>
-    </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.LanguageServer.Client">
       <Version>16.10.1220</Version>
     </PackageReference>
@@ -80,6 +77,9 @@
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.0.5232">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="OmniSharp.Extensions.LanguageClient">
+      <Version>0.19.5</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

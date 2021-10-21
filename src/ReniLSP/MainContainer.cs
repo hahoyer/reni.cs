@@ -2,19 +2,23 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using hw.DebugFormatter;
 using Microsoft;
-using StreamJsonRpc;
+using OmniSharp.Extensions.JsonRpc;
+using OmniSharp.Extensions.LanguageServer.Server;
 
 namespace ReniLSP
 {
     static class MainContainer
     {
-        public static async Task<int> Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            var converter = JsonRpc.Attach(Console.OpenStandardOutput(), Console.OpenStandardInput(), new Target());
-            await converter.Completion;
-            return 0;
+            var server = await LanguageServer.From(options
+                => options
+                    .WithInput(Console.OpenStandardInput())
+                    .WithOutput(Console.OpenStandardOutput())
+                    .WithHandler<Target>()
+                );
+            await server.WaitForExit;
         }
     }
 }
