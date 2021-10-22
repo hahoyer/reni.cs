@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using hw.DebugFormatter;
+using JetBrains.Annotations;
 using MediatR;
 using OmniSharp.Extensions.LanguageServer.Protocol;
 using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
@@ -10,13 +11,14 @@ using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 
 namespace ReniLSP
 {
-    class Target : DumpableObject, ITextDocumentSyncHandler
+    [UsedImplicitly]
+    sealed class Target : DumpableObject, ITextDocumentSyncHandler
     {
         TextDocumentChangeRegistrationOptions
             IRegistration<TextDocumentChangeRegistrationOptions, SynchronizationCapability>.GetRegistrationOptions
             (SynchronizationCapability capability, ClientCapabilities clientCapabilities)
         {
-            NotImplementedMethod(request, cancellationToken);
+            NotImplementedMethod(capability, clientCapabilities);
             return null;
         }
 
@@ -24,7 +26,7 @@ namespace ReniLSP
             IRegistration<TextDocumentCloseRegistrationOptions, SynchronizationCapability>.GetRegistrationOptions
             (SynchronizationCapability capability, ClientCapabilities clientCapabilities)
         {
-            NotImplementedMethod(request, cancellationToken);
+            NotImplementedMethod(capability, clientCapabilities);
             return null;
         }
 
@@ -32,7 +34,7 @@ namespace ReniLSP
             IRegistration<TextDocumentOpenRegistrationOptions, SynchronizationCapability>.GetRegistrationOptions
             (SynchronizationCapability capability, ClientCapabilities clientCapabilities)
         {
-            NotImplementedMethod(request, cancellationToken);
+            NotImplementedMethod(capability, clientCapabilities);
             return null;
         }
 
@@ -40,7 +42,7 @@ namespace ReniLSP
             IRegistration<TextDocumentSaveRegistrationOptions, SynchronizationCapability>.GetRegistrationOptions
             (SynchronizationCapability capability, ClientCapabilities clientCapabilities)
         {
-            NotImplementedMethod(request, cancellationToken);
+            NotImplementedMethod(capability, clientCapabilities);
             return null;
         }
 
@@ -74,7 +76,7 @@ namespace ReniLSP
 
         TextDocumentAttributes ITextDocumentIdentifier.GetTextDocumentAttributes(DocumentUri uri)
         {
-            NotImplementedMethod(request, cancellationToken);
+            NotImplementedMethod(uri);
             return null;
         }
     }

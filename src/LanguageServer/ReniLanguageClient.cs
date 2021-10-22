@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Microsoft.VisualStudio.LanguageServer.Client;
 using Microsoft.VisualStudio.Threading;
 using Microsoft.VisualStudio.Utilities;
@@ -15,6 +15,13 @@ namespace LanguageServer
     [Export(typeof(ILanguageClient))]
     public class ReniLanguageClient : ILanguageClient
     {
+        public IEnumerable<string> ConfigurationSections => null;
+
+        public IEnumerable<string> FilesToWatch => null;
+
+        public object InitializationOptions => null;
+        public string Name => "Reni Language Extension";
+
         public async Task<Connection> ActivateAsync(CancellationToken token)
         {
             await Task.Yield();
@@ -36,13 +43,6 @@ namespace LanguageServer
                 ? new Connection(process.StandardOutput.BaseStream, process.StandardInput.BaseStream)
                 : null;
         }
-
-        public IEnumerable<string> ConfigurationSections => null;
-
-        public IEnumerable<string> FilesToWatch => null;
-
-        public object InitializationOptions => null;
-        public string Name => "Reni Language Extension";
 
         public async Task OnLoadedAsync() => await StartAsync.InvokeAsync(this, EventArgs.Empty);
 
