@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using hw.Helper;
 using JetBrains.Annotations;
 using Microsoft.VisualStudio.LanguageServer.Client;
 using Microsoft.VisualStudio.Threading;
@@ -15,6 +17,7 @@ namespace LanguageServer
     [Export(typeof(ILanguageClient))]
     public class ReniLanguageClient : ILanguageClient
     {
+        const string LocationRoot = "c:\\data\\develop\\git\\reni.cs";
         public IEnumerable<string> ConfigurationSections => null;
 
         public IEnumerable<string> FilesToWatch => null;
@@ -26,7 +29,7 @@ namespace LanguageServer
         {
             await Task.Yield();
 
-            var serverPath = "a:\\develop\\Reni\\dev\\out\\Debug\\ReniLSP.exe";
+            var serverPath = Path.Combine(LocationRoot, "out/Debug/ReniLSP.exe");
             var info = new ProcessStartInfo
             {
                 FileName = serverPath

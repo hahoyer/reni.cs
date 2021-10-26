@@ -10,6 +10,7 @@
   <ItemGroup>
     <Compile Include="Target.cs" />
     <Compile Include="MainContainer.cs" />
+    <Compile Include="TokenTarget.cs" />
     <None Include="packages.config" />
     <None Include="sys.targets" />
     <Reference Include="JetBrains.Annotations, Version=2021.2.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">

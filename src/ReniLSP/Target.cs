@@ -1,4 +1,5 @@
-using System;
+#nullable enable
+using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using hw.DebugFormatter;
@@ -12,72 +13,21 @@ using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 namespace ReniLSP
 {
     [UsedImplicitly]
-    sealed class Target : DumpableObject, ITextDocumentSyncHandler
+    sealed class Target : DumpableObject, IDidOpenTextDocumentHandler
     {
-        TextDocumentChangeRegistrationOptions
-            IRegistration<TextDocumentChangeRegistrationOptions, SynchronizationCapability>.GetRegistrationOptions
-            (SynchronizationCapability capability, ClientCapabilities clientCapabilities)
-        {
-            NotImplementedMethod(capability, clientCapabilities);
-            return null;
-        }
-
-        TextDocumentCloseRegistrationOptions
-            IRegistration<TextDocumentCloseRegistrationOptions, SynchronizationCapability>.GetRegistrationOptions
-            (SynchronizationCapability capability, ClientCapabilities clientCapabilities)
-        {
-            NotImplementedMethod(capability, clientCapabilities);
-            return null;
-        }
+        readonly ConcurrentDictionary<string, TextDocumentItem> Buffers = new();
 
         TextDocumentOpenRegistrationOptions
             IRegistration<TextDocumentOpenRegistrationOptions, SynchronizationCapability>.GetRegistrationOptions
             (SynchronizationCapability capability, ClientCapabilities clientCapabilities)
-        {
-            NotImplementedMethod(capability, clientCapabilities);
-            return null;
-        }
-
-        TextDocumentSaveRegistrationOptions
-            IRegistration<TextDocumentSaveRegistrationOptions, SynchronizationCapability>.GetRegistrationOptions
-            (SynchronizationCapability capability, ClientCapabilities clientCapabilities)
-        {
-            NotImplementedMethod(capability, clientCapabilities);
-            return null;
-        }
-
-        Task<Unit> IRequestHandler<DidChangeTextDocumentParams, Unit>.Handle
-            (DidChangeTextDocumentParams request, CancellationToken cancellationToken)
-        {
-            NotImplementedMethod(request, cancellationToken);
-            return null;
-        }
-
-        Task<Unit> IRequestHandler<DidCloseTextDocumentParams, Unit>.Handle
-            (DidCloseTextDocumentParams request, CancellationToken cancellationToken)
-        {
-            NotImplementedMethod(request, cancellationToken);
-            return null;
-        }
+            => new();
 
         Task<Unit> IRequestHandler<DidOpenTextDocumentParams, Unit>.Handle
             (DidOpenTextDocumentParams request, CancellationToken cancellationToken)
         {
-            NotImplementedMethod(request, cancellationToken);
-            return null;
-        }
-
-        Task<Unit> IRequestHandler<DidSaveTextDocumentParams, Unit>.Handle
-            (DidSaveTextDocumentParams request, CancellationToken cancellationToken)
-        {
-            NotImplementedMethod(request, cancellationToken);
-            return null;
-        }
-
-        TextDocumentAttributes ITextDocumentIdentifier.GetTextDocumentAttributes(DocumentUri uri)
-        {
-            NotImplementedMethod(uri);
-            return null;
+            var item = request.TextDocument;
+            Buffers[item.Uri.GetFileSystemPath()] = item;
+            return Unit.Task;
         }
     }
 }
