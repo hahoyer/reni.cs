@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using Microsoft.VisualStudio.Shell;
 
-namespace LanguageServer
+namespace ReniLanguageServer
 {
     /// <summary>
     ///     This is the class that implements the package exposed by this assembly.

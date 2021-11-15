@@ -73,9 +73,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReniUI", "ReniUI\ReniUI.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReniExe", "ReniExe\ReniExe.csproj", "{54D4A90B-C3CF-4F72-B447-CBC08B6EF5AB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LanguageServer", "LanguageServer\LanguageServer.csproj", "{D00E693E-EA98-4A05-BFC7-3AE74DAD7834}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReniLSP", "ReniLSP\ReniLSP.csproj", "{54D4A90B-C3CF-4F72-B447-CBC08B6EF5CD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReniVSIX", "ReniVSIX\ReniVSIX.csproj", "{5CB43648-99A1-40E6-8E5E-0A651D8E8EE7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -123,14 +123,6 @@ Global
 		{54D4A90B-C3CF-4F72-B447-CBC08B6EF5AB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{54D4A90B-C3CF-4F72-B447-CBC08B6EF5AB}.Release|x86.ActiveCfg = Release|Any CPU
 		{54D4A90B-C3CF-4F72-B447-CBC08B6EF5AB}.Release|x86.Build.0 = Release|Any CPU
-		{D00E693E-EA98-4A05-BFC7-3AE74DAD7834}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D00E693E-EA98-4A05-BFC7-3AE74DAD7834}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D00E693E-EA98-4A05-BFC7-3AE74DAD7834}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{D00E693E-EA98-4A05-BFC7-3AE74DAD7834}.Debug|x86.Build.0 = Debug|Any CPU
-		{D00E693E-EA98-4A05-BFC7-3AE74DAD7834}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D00E693E-EA98-4A05-BFC7-3AE74DAD7834}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D00E693E-EA98-4A05-BFC7-3AE74DAD7834}.Release|x86.ActiveCfg = Release|Any CPU
-		{D00E693E-EA98-4A05-BFC7-3AE74DAD7834}.Release|x86.Build.0 = Release|Any CPU
 		{54D4A90B-C3CF-4F72-B447-CBC08B6EF5CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{54D4A90B-C3CF-4F72-B447-CBC08B6EF5CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{54D4A90B-C3CF-4F72-B447-CBC08B6EF5CD}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -139,6 +131,14 @@ Global
 		{54D4A90B-C3CF-4F72-B447-CBC08B6EF5CD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{54D4A90B-C3CF-4F72-B447-CBC08B6EF5CD}.Release|x86.ActiveCfg = Release|Any CPU
 		{54D4A90B-C3CF-4F72-B447-CBC08B6EF5CD}.Release|x86.Build.0 = Release|Any CPU
+		{5CB43648-99A1-40E6-8E5E-0A651D8E8EE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CB43648-99A1-40E6-8E5E-0A651D8E8EE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CB43648-99A1-40E6-8E5E-0A651D8E8EE7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5CB43648-99A1-40E6-8E5E-0A651D8E8EE7}.Debug|x86.Build.0 = Debug|Any CPU
+		{5CB43648-99A1-40E6-8E5E-0A651D8E8EE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CB43648-99A1-40E6-8E5E-0A651D8E8EE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CB43648-99A1-40E6-8E5E-0A651D8E8EE7}.Release|x86.ActiveCfg = Release|Any CPU
+		{5CB43648-99A1-40E6-8E5E-0A651D8E8EE7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

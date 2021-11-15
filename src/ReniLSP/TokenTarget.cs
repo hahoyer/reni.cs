@@ -12,10 +12,7 @@ namespace ReniLSP
     [UsedImplicitly]
     sealed class TokenTarget : SemanticTokensHandlerBase
     {
-        public TokenTarget()
-        {
-            Debugger.Launch();
-        }
+        public TokenTarget() => Debugger.Launch();
 
         protected override SemanticTokensRegistrationOptions CreateRegistrationOptions
             (SemanticTokensCapability capability, ClientCapabilities clientCapabilities)
@@ -29,14 +26,34 @@ namespace ReniLSP
         )
         {
             Dumpable.NotImplementedFunction(builder, identifier, cancellationToken);
-            return null;
+            return Task.FromResult<SemanticTokens>(null);
         }
 
         protected override Task<SemanticTokensDocument> GetSemanticTokensDocument
             (ITextDocumentIdentifierParams @params, CancellationToken cancellationToken)
         {
             Dumpable.NotImplementedFunction(@params, cancellationToken);
-            return null;
+            return Task.FromResult<SemanticTokensDocument>(null);
+        }
+
+        public override Task<SemanticTokens> Handle(SemanticTokensParams request, CancellationToken cancellationToken)
+        {
+            Dumpable.NotImplementedFunction(request, cancellationToken);
+            return Task.FromResult<SemanticTokens>(null);
+        }
+
+        public override Task<SemanticTokensFullOrDelta> Handle
+            (SemanticTokensDeltaParams request, CancellationToken cancellationToken)
+        {
+            Dumpable.NotImplementedFunction(request, cancellationToken);
+            return Task.FromResult<SemanticTokensFullOrDelta>(null);
+        }
+
+        public override Task<SemanticTokens> Handle
+            (SemanticTokensRangeParams request, CancellationToken cancellationToken)
+        {
+            Dumpable.NotImplementedFunction(request, cancellationToken);
+            return Task.FromResult<SemanticTokens>(null);
         }
 
         static SemanticTokensRegistrationOptions GetSemanticTokensRegistrationOptions()
@@ -44,28 +61,12 @@ namespace ReniLSP
             {
                 DocumentSelector = DocumentSelector.ForLanguage("reni")
                 , Legend = new()
+                {
+                    TokenModifiers = new("type")
+                    , TokenTypes = new("local")
+                }
                 , Full = true
                 , Range = true
             };
-
-        public override Task<SemanticTokens?> Handle(SemanticTokensParams request, CancellationToken cancellationToken)
-        {
-            Dumpable.NotImplementedFunction(request, cancellationToken);
-            return null;
-        }
-
-        public override Task<SemanticTokensFullOrDelta?> Handle
-            (SemanticTokensDeltaParams request, CancellationToken cancellationToken)
-        {
-            Dumpable.NotImplementedFunction(request, cancellationToken);
-            return null;
-        }
-
-        public override Task<SemanticTokens?> Handle
-            (SemanticTokensRangeParams request, CancellationToken cancellationToken)
-        {
-            Dumpable.NotImplementedFunction(request, cancellationToken);
-            return null;
-        }
     }
 }
