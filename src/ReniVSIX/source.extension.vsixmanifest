@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="ReniVSIX.ad852a99-d35d-4940-8517-3c3aae2eeea2" Version="1.0" Language="en-US" Publisher="Harald Hoyer" />
+        <Identity Id="ReniVSIX.ad852a99-d35d-4940-8517-3c3aae2eeea2" Version="1.0.3" Language="en-US" Publisher="Harald Hoyer" />
         <DisplayName>ReniVSIX</DisplayName>
         <Description>Empty VSIX Project.</Description>
     </Metadata>
@@ -18,5 +18,6 @@
         <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
         <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%|" />
         <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="File" Path="reni.pkgdef" />
+        <Asset Type="Microsoft.VisualStudio.Assembly" d:Source="Project" d:ProjectName="ReniUI" Path="|ReniUI|" AssemblyName="|ReniUI;AssemblyName|" />
     </Assets>
 </PackageManifest>
