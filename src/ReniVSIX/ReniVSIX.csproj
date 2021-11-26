@@ -54,6 +54,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="TextMate\language-configuration.json" />
+    <Content Include="reni.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="TextMate\reni.tmLanguage.json">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

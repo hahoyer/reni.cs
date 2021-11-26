@@ -32,6 +32,7 @@ namespace ReniVSIX
 
         IList<ClassificationSpan> IClassifier.GetClassificationSpans(SnapshotSpan span)
         {
+            return Enumerable.Empty<ClassificationSpan>().ToList();
             var items = CompilerBrowser.FromText(span.GetText())
                 .GetClassification(span.Start.Position, span.End.Position).ToArray();
             var spans = items
