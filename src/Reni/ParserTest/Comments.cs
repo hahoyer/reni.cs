@@ -1,3 +1,5 @@
+using System;
+using hw.DebugFormatter;
 using hw.Scanner;
 using hw.UnitTest;
 using NUnit.Framework;
@@ -11,12 +13,16 @@ namespace Reni.ParserTest
     {
         [Test]
         [UnitTest]
-        public void MultiLineMinimal()
-        {
-            var text = " #()# outside";
-            var source = new Source(text) + 0;
+        public void MultiLineMinimal() => PerformTest("#()# outside", 4);
+        [Test]
+        [UnitTest]
+        public void MultiLineOneSpace() => PerformTest("#( )# outside", 5);
 
-            var xx = Lexer.Instance.MultiLineCommentItem.Match(source);
+        static void PerformTest(string text, int expectedLength)
+        {
+            var source = new Source(text) + 0;
+            var length = Lexer.Instance.MultiLineCommentItem.Match(source);
+            (length == expectedLength).Assert();
         }
     }
 }

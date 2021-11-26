@@ -83,8 +83,9 @@ namespace Reni.Parser
 
             Space = " \t".AnyChar();
             MultiLineComment = "#(" +
-                       (Match.WhiteSpace + (Match.WhiteSpace + ")#").Find)
-                       .Else(identifier.Value(id => (Match.WhiteSpace + id + ")#").Box().Find))
+                ")#"
+                .Else(Match.WhiteSpace + ")#".Else((Match.WhiteSpace + ")#").Find))
+                .Else(identifier.Value(id => (Match.WhiteSpace + id + ")#").Box().Find))
                        .Else(Match.End.Find + InvalidComment)
                 ;
 
