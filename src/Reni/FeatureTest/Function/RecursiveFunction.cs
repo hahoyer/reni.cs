@@ -1,5 +1,4 @@
 using hw.UnitTest;
-using NUnit.Framework;
 using Reni.FeatureTest.BitArrayOp;
 using Reni.FeatureTest.DefaultOperations;
 using Reni.FeatureTest.Helper;
@@ -36,10 +35,7 @@ f: @
 f(4)dump_print"
         )]
     [Output("24")]
-    [TestFixture]
     public sealed class RecursiveFunction : CompilerTest
     {
-        [Test]
-        public override void Run() => base.Run();
     }
 }

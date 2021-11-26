@@ -1,12 +1,10 @@
 using hw.UnitTest;
-using NUnit.Framework;
 using Reni.FeatureTest.Helper;
 
 namespace Reni.ParserTest
 {
     [UnitTest]
     [ParserTest]
-    [TestFixture]
     public sealed class AlternativePrioTableTest : CompilerTest
     {
         [UnitTest]
@@ -44,7 +42,6 @@ namespace Reni.ParserTest
         }
 
         [UnitTest]
-        [Test]
         public void KeyWordAsUserObject()
         {
             var syntaxPrototype = LikeSyntax.Compound

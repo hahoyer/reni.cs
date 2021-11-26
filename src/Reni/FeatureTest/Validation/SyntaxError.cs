@@ -4,7 +4,6 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 using hw.UnitTest;
-using NUnit.Framework;
 using Reni.FeatureTest.Helper;
 using Reni.Parser;
 using Reni.Validation;
@@ -12,7 +11,6 @@ using Reni.Validation;
 namespace Reni.FeatureTest.Validation
 {
     [UnitTest]
-    [TestFixture]
     [Target(@"1 #(x asdf y)# dump_print")]
     [Output("")]
     [UseOfUndefinedContextSymbol]
@@ -20,7 +18,6 @@ namespace Reni.FeatureTest.Validation
     {
         public SyntaxErrorComment() => Parameters.ParseOnly = true;
 
-        [Test]
         public new void Run() => base.Run();
 
         protected override void Verify(IEnumerable<Issue> issues)
