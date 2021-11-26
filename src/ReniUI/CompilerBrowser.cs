@@ -61,6 +61,20 @@ namespace ReniUI
             return Item.LocateByPosition(Compiler.BinaryTree, offset);
         }
 
+        public IEnumerable<Item> GetClassification(int start, int end)
+        {
+            var current = start;
+            while(current < end)
+            {
+                var result = Locate(current);
+                yield return result;
+                if(result.SourcePart.Length > 0)
+                    current = result.EndPosition;
+                else
+                    current++;
+            }
+        }
+
         public string FlatFormat(bool areEmptyLinesPossible)
             => Syntax.FlatItem.MainAnchor.GetFlatString(areEmptyLinesPossible);
 
@@ -113,5 +127,6 @@ namespace ReniUI
             NotImplementedMethod(offset);
             return default;
         }
+
     }
 }
