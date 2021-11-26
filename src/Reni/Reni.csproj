@@ -11,7 +11,15 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="AssemblyInfo.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AssemblyInfo.tt</DependentUpon>
+    </Compile>
+    <Content Include="AssemblyInfo.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>AssemblyInfo.cs</LastGenOutput>
+    </Content>
     <Compile Include="Basics\BitsConst.cs" />
     <Compile Include="Basics\Category.cs" />
     <Compile Include="Basics\RefAlignParam.cs" />
@@ -430,7 +438,7 @@
     <Compile Include="Validation\Issue.cs" />
     <Compile Include="Validation\IssueId.cs" />
     <Compile Include="Validation\SourceIssue.cs" />
-    <None Include="Code\CSharp_Generated.tt"> 
+    <None Include="Code\CSharp_Generated.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>CSharp_Generated.cs</LastGenOutput>
     </None>
