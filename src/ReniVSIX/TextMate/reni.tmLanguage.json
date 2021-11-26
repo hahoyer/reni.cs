@@ -1,7 +1,7 @@
 {
     "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
     "name": "Reni",
-    "fileTypes": ["reni"],
+    "fileTypes": ["reni2"],
     "patterns": [
         {"include": "#comment"},
         {"include": "#number"},
@@ -42,7 +42,7 @@
         "predefinedName": {"name": "keyword.control.reni", "match": "\\b(then|else|type|instance|new_value|_A_T_|function_instance)\\b"},
         "predefinedSymbol": {"name": "keyword.control.reni", "match": "(?<=(^|[\\s\\w({\\[)}\\];,.]))(:|~~~|\\^\\^|\\^)(?=([\\s\\w({\\[)}\\];,\\.])|$)"},
         "functionSymbol": {"name": "keyword.function.reni", "match": "(?<=(^|[\\s\\w({\\[)}\\];,.]))(@@!|@!|@@|@)(?=([\\s\\w({\\[)}\\];,\\.])|$)"},
-        "definedName": {"name": "entity.name.reni", "match": "\\w+"},
+        "definedName": {"name": "entity.text.reni", "match": "\\w+"},
         "definedSymbol": {"name": "entity.operator.reni", "match": "[\\^!%&/=?\\\\*@+~><|:-]+"},
         "structural": {"name": "keyword.structural.reni", "match": "[({\\[)}\\];,.]"},
         "stringDoubleQuote": {"name": "string.quoted.double.reni", "begin": "\"", "end": "\""},
