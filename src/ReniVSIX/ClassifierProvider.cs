@@ -15,6 +15,7 @@ namespace ReniVSIX
         IClassificationTypeRegistryService ClassificationRegistry;
 
         IClassifier IClassifierProvider.GetClassifier(ITextBuffer buffer)
-            => buffer.Properties.GetOrCreateSingletonProperty(() => new Classifier(ClassificationRegistry));
+            => buffer.Properties.GetOrCreateSingletonProperty(()
+                => new Classifier(buffer, ClassificationRegistry));
     }
 }

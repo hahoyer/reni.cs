@@ -55,14 +55,6 @@ namespace ReniUI.Classification
                 .Select(node => node.Token.Characters);
 
         [DisableDump]
-        IEnumerable<Issue> Issues
-        {
-            get
-            {
-                if(Master.Issues.Any())
-                    NotImplementedMethod();
-                return new Issue[0];
-            }
-        }
+        IEnumerable<Issue> Issues => Master.Issues.Any()? Master.Issues : new Issue[0];
     }
 }
