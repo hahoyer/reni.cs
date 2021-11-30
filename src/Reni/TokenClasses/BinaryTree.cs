@@ -235,7 +235,12 @@ namespace Reni.TokenClasses
             , IToken token
             , BinaryTree right
         )
-            => new(left, tokenClass, token, right);
+        {
+            var linked = token as ILinked<BinaryTree>;
+            linked.AssertIsNotNull();
+            linked.Container.AssertIsNull();
+            return new(left, tokenClass, token, right);
+        }
 
         internal int? GetBracketLevel()
         {
