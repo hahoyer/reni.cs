@@ -20,7 +20,7 @@ namespace Reni.Helper
 
         internal readonly Syntax FlatItem;
         internal readonly TTarget Parent;
-        readonly CacheContainer Cache = new CacheContainer();
+        readonly CacheContainer Cache = new();
 
         protected SyntaxView(Syntax flatItem, TTarget parent, PositionDictionary<TTarget> context)
         {
@@ -33,11 +33,19 @@ namespace Reni.Helper
                 Context[anchor] = (TTarget)this;
 
             Cache.LocateByPosition =
-                new FunctionCache<SourcePosition, (TTarget, int)>(i => LocateByPositionForCache(i, false));
+                new(i => LocateByPositionForCache(i, false));
             Cache.LocateByPositionIncludingParent
-                = new FunctionCache<SourcePosition, (TTarget, int)>(i => LocateByPositionForCache(i, true));
-            Tracer.ConditionalBreak(flatItem.ObjectId == -492);
+                = new(i => LocateByPositionForCache(i, true));
+            (flatItem.ObjectId == -492).ConditionalBreak();
         }
+
+        ValueCache ValueCache.IContainer.Cache { get; } = new();
+        int ITree<TTarget>.DirectChildCount => DirectChildCount;
+        TTarget ITree<TTarget>.GetDirectChild(int index) => DirectChildren[index];
+
+        int ITree<TTarget>.LeftDirectChildCount => 0;
+
+        protected abstract TTarget Create(Syntax syntax, int index);
 
         [DisableDump]
         public SourcePart[] Anchors => FlatItem.Anchor.SourceParts;
@@ -47,25 +55,16 @@ namespace Reni.Helper
         internal TTarget[] DirectChildren
             => this.CachedValue(() => DirectChildCount.Select(GetDirectChild).ToArray());
 
-        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
-        int ITree<TTarget>.DirectChildCount => DirectChildCount;
-        TTarget ITree<TTarget>.GetDirectChild(int index) => DirectChildren[index];
-
-        int ITree<TTarget>.LeftDirectChildCount => 0;
-
         TTarget GetDirectChild(int index)
         {
             var child = FlatItem.DirectChildren[index];
             return child == null? null : Create(child, index);
         }
 
-        protected abstract TTarget Create(Syntax syntax, int index);
-
         (TTarget Master, int Index) LocateByPositionForCache(SourcePosition current, bool includingParent)
         {
             (!includingParent).Assert();
             return Context[current]
-                .Node
                 .LocateByPosition(current);
         }
 

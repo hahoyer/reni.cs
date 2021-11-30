@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
@@ -80,17 +82,17 @@ namespace ReniUI
 
         public Item Locate(int offset) => Locate(Source + offset);
 
-        internal BinaryTree Locate(SourcePart span) 
+        internal BinaryTree Locate(SourcePart span)
             => Item.Locate(Compiler.BinaryTree, span);
 
         internal FunctionType Function(int index)
             => Compiler.Root.Function(index);
 
 
-        internal string Reformat(IFormatter formatter = null, SourcePart targetPart = null) =>
-            (formatter ?? new Formatting.Configuration().Create())
-            .GetEditPieces(this, targetPart)
-            .Combine(Compiler.Source.All);
+        internal string Reformat(IFormatter formatter = null, SourcePart targetPart = null)
+            => (formatter ?? new Formatting.Configuration().Create())
+                .GetEditPieces(this, targetPart)
+                .Combine(Compiler.Source.All);
 
         internal void Ensure() => Compiler.Execute();
 
@@ -104,15 +106,21 @@ namespace ReniUI
         {
             try
             {
+                var trace = Debugger.IsAttached && DateTime.MinValue == DateTime.MinValue + TimeSpan.FromDays(1);
+
                 var compilerSyntax = Compiler.Syntax;
-                //compilerSyntax.Dump().FlaggedLine();
-                //compilerSyntax.Anchor.Dump().FlaggedLine();
+                if(trace)
+                {
+                    compilerSyntax.Dump().FlaggedLine();
+                    compilerSyntax.Anchor.Dump().FlaggedLine();
+                }
 
                 var syntax = new Helper.Syntax(compilerSyntax, PositionDictionary);
 
-                //var all = syntax.GetNodesFromLeftToRight().ToArray();
-                //PositionDictionary.AssertValid(Compiler.BinaryTree);
-                //syntax.Dump().FlaggedLine();
+                var all = syntax.GetNodesFromLeftToRight().ToArray();
+                PositionDictionary.AssertValid(Compiler.BinaryTree);
+                if(trace)
+                    syntax.Dump().FlaggedLine();
                 return syntax;
             }
             catch(Exception e)
@@ -127,6 +135,5 @@ namespace ReniUI
             NotImplementedMethod(offset);
             return default;
         }
-
     }
 }

@@ -12,31 +12,29 @@ namespace Reni.Helper
     {
         static int Position;
 
-        readonly IDictionary<SourcePosition, (int Length, TResult Node)> Value =
-            new Dictionary<SourcePosition, (int, TResult)>();
+        readonly Dictionary<SourcePosition, TResult> InvisibleValues = new();
+        readonly Dictionary<SourcePosition, TResult> VisibleValues = new();
 
-        internal (int Length, TResult Node) this[SourcePosition key] => Value[key];
+        internal TResult this[SourcePosition key] => VisibleValues[key];
 
         internal TResult this[SourcePart keyPart]
         {
-            get
-            {
-                var result = Value[keyPart.Start];
-                (result.Length == keyPart.Length).Assert();
-                return result.Node;
-            }
-            set
-            {
-                for(var offset = 0; offset <= keyPart.Length; offset++)
-                {
+            get => keyPart.Length == 0? InvisibleValues[keyPart.Start] : VisibleValues[keyPart.Start];
+            set => Add(keyPart.Length == 0? InvisibleValues : VisibleValues, keyPart.Start, value);
+        }
 
-                    var key = keyPart.Start + offset;
-                    Value.TryGetValue(key, out var oldValue);
-                    (!Value.ContainsKey(key)).Assert(key.DebuggerDump);
-
-                    Value[key] = (keyPart.Length - offset, value);
-                }
-            }
+        static void Add(Dictionary<SourcePosition, TResult> values, SourcePosition key, TResult value)
+        {
+            values.TryGetValue(key, out var oldValue);
+            (!values.ContainsKey(key))
+                .Assert
+                (
+                    ()
+                        => $@"key = {key.DebuggerDump()}
+value = {value.LogDump()}
+oldValue = {oldValue.LogDump()}"
+                );
+            values[key] = value;
         }
 
         internal TResult this[BinaryTree key]
@@ -61,16 +59,16 @@ namespace Reni.Helper
             }
         }
 
-        bool IsValidKey(BinaryTree key)
+        bool IsValidKey(BinaryTree keyItem)
         {
-            var result = Value.ContainsKey(KeyMap(key).Start);
-            if(result)
+            var value = this[keyItem];
+            if(value != null)
                 return true;
             @$" 
  -----
-/{Position++:D5}\    BinaryTree.ObjectId={key.ObjectId}
+/{Position++:D5}\    BinaryTree.ObjectId={keyItem.ObjectId}
 Key: -----------------------------------------vv
-{key.Token.Characters.GetDumpAroundCurrent(25)}
+{keyItem.Token.Characters.GetDumpAroundCurrent(25)}
 ----------------------------------------------^^".Log();
 
             return false;

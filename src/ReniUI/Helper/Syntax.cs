@@ -1,7 +1,6 @@
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
-using hw.Scanner;
 using Reni.Helper;
 
 namespace ReniUI.Helper
@@ -9,11 +8,13 @@ namespace ReniUI.Helper
     public sealed class Syntax : DumpableObject, ValueCache.IContainer, ITree<Syntax>
     {
         internal readonly Reni.SyntaxTree.Syntax FlatItem;
+        [DisableDump]
+        readonly Syntax Parent;
+        [DisableDump]
         readonly PositionDictionary<Syntax> Context;
-        internal readonly Syntax Parent;
 
         internal Syntax(Reni.SyntaxTree.Syntax flatItem, PositionDictionary<Syntax> context)
-            : this(flatItem, context, null) {}
+            : this(flatItem, context, null) { }
 
 
         Syntax(Reni.SyntaxTree.Syntax flatItem, PositionDictionary<Syntax> context, Syntax parent)
@@ -22,22 +23,21 @@ namespace ReniUI.Helper
             Context = context;
             Parent = parent;
 
-            //foreach(var anchor in FlatItem.Anchor.Items)
-            //    Context[anchor] = this;
-
+            foreach(var anchor in FlatItem.Anchor.Items)
+                Context[anchor] = this;
         }
 
         ValueCache ValueCache.IContainer.Cache { get; } = new();
 
         int ITree<Syntax>.DirectChildCount => DirectChildCount;
 
-        int DirectChildCount => FlatItem.DirectChildren.Length;
-
-        internal Syntax[] DirectChildren => this.CachedValue(() => DirectChildCount.Select(GetDirectChild).ToArray());
+        Syntax ITree<Syntax>.GetDirectChild(int index) => DirectChildren[index];
         int ITree<Syntax>.LeftDirectChildCount => 0;
 
-        Syntax ITree<Syntax>.GetDirectChild(int index) => DirectChildren[index];
+        int DirectChildCount => FlatItem.DirectChildren.Length;
 
+        [DisableDump]
+        Syntax[] DirectChildren => this.CachedValue(() => DirectChildCount.Select(GetDirectChild).ToArray());
 
         Syntax GetDirectChild(int index)
         {
@@ -46,8 +46,5 @@ namespace ReniUI.Helper
         }
 
         Syntax Create(Reni.SyntaxTree.Syntax flatItem, int index) => new(flatItem, Context, this);
-
-
- 
     }
 }
