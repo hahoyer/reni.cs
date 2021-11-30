@@ -24,9 +24,9 @@ namespace ReniUI.Test
             (issue.Message == "(actual: terminal)").Assert();
 
             var x = compiler.Locate(text.IndexOf("som"));
-
-            var y = compiler.Locate(text.IndexOf("'"));
             x.AssertNotNull();
+            var y = compiler.Locate(text.IndexOf("'"));
+            y.AssertNotNull();
         }
     }
 }
