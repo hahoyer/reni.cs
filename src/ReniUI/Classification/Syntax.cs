@@ -36,14 +36,6 @@ namespace ReniUI.Classification
         public override bool IsBrace
             => TokenClass is LeftParenthesis || TokenClass is RightParenthesis;
 
-        [EnableDumpExcept(false)]
-        public override bool IsComment
-            => Issues.Any(item => item.IssueId == IssueId.EOFInComment);
-
-        [EnableDumpExcept(false)]
-        public override bool IsLineComment
-            => Issues.Any(item => item.IssueId == IssueId.EOFInLineComment);
-
         [DisableDump]
         public override string State => Token.Characters.Id ?? "";
 
@@ -55,6 +47,6 @@ namespace ReniUI.Classification
                 .Select(node => node.Token.Characters);
 
         [DisableDump]
-        IEnumerable<Issue> Issues => Master.Issues.Any()? Master.Issues : new Issue[0];
+        public override IEnumerable<Issue> Issues => Master.Issues.Any()? Master.Issues : new Issue[0];
     }
 }

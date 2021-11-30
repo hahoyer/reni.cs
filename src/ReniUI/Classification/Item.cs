@@ -5,6 +5,7 @@ using hw.Helper;
 using hw.Parser;
 using hw.Scanner;
 using Reni.TokenClasses;
+using Reni.Validation;
 
 namespace ReniUI.Classification
 {
@@ -112,6 +113,8 @@ namespace ReniUI.Classification
             }
         }
 
+        [DisableDump]
+        public virtual IEnumerable<Issue> Issues => new Issue[0];
 
         public int StartPosition => SourcePart.Position;
         public int EndPosition => SourcePart.EndPosition;
