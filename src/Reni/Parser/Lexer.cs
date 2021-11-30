@@ -42,7 +42,6 @@ namespace Reni.Parser
         readonly Match MultiLineComment;
         readonly Match CommentHead;
         readonly IssueId InvalidComment = IssueId.EOFInComment;
-        readonly IssueId InvalidLineComment = IssueId.EOFInLineComment;
         readonly IssueId InvalidTextEnd = IssueId.EOLInString;
         readonly IMatch LineComment;
         readonly Match LineEnd;
