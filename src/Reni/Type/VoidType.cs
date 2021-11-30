@@ -7,7 +7,7 @@ namespace Reni.Type
 {
     sealed class VoidType : TypeBase, ISymbolProvider<DumpPrintToken>
     {
-        internal VoidType(Root root) { Root = root; }
+        internal VoidType(Root root) => Root = root;
 
         [DisableDump]
         internal override Root Root { get; }

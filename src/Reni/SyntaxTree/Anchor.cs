@@ -20,7 +20,10 @@ namespace Reni.SyntaxTree
         {
             Items = items
                 .Where(item => item != null)
-                .OrderBy(item => item.Token.Characters.Position).ToArray();
+                .Distinct()
+                .OrderBy(item => item.Token.Characters.Position)
+                .ToArray();
+
             Items.Any().Assert();
             //Main.AssertIsNotNull();
         }

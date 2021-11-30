@@ -36,11 +36,5 @@ namespace Reni.TokenClasses
 
         internal static EmptyList CreateSyntax(IssueId issueId, SourcePosition position)
             => new(Anchor.Create(CreateTreeItem(issueId, position)));
-
-        internal static ValueSyntax CreateSyntax(IssueId issueId, ValueSyntax target)
-        {
-            NotImplementedFunction(issueId, target);
-            return target;
-        }
     }
 }
