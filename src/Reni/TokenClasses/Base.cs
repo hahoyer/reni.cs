@@ -23,7 +23,7 @@ namespace Reni.TokenClasses
 
         ValueSyntax ITerminal.Visit(ISyntaxVisitor visitor) => Visit(visitor);
 
-        IValueProvider IValueToken.Provider => Factory.Terminal;
+        IValueProvider IValueToken.Provider => Factory.Infix;
 
         protected abstract Result Result(ContextBase context, Category category, IToken token);
 
@@ -42,7 +42,7 @@ namespace Reni.TokenClasses
         Result IPrefix.Result(ContextBase context, Category category, ValueSyntax right, IToken token)
             => Result(context, category, right);
 
-        IValueProvider IValueToken.Provider => Factory.InfixPrefix;
+        IValueProvider IValueToken.Provider => Factory.Infix;
 
         protected abstract Result Result(ContextBase context, Category category, ValueSyntax left, ValueSyntax right);
 
@@ -59,7 +59,7 @@ namespace Reni.TokenClasses
 
         ValueSyntax ITerminal.Visit(ISyntaxVisitor visitor) => Visit(visitor);
 
-        IValueProvider IValueToken.Provider => Factory.NonSuffix;
+        IValueProvider IValueToken.Provider => Factory.Infix;
 
         protected abstract Result Result(ContextBase context, Category category);
 
@@ -77,7 +77,7 @@ namespace Reni.TokenClasses
         Result ISuffix.Result(ContextBase context, Category category, ValueSyntax left)
             => Result(context, category, left);
 
-        IValueProvider IValueToken.Provider => Factory.Suffix;
+        IValueProvider IValueToken.Provider => Factory.Infix;
 
         protected abstract Result Result(ContextBase context, Category category, ValueSyntax left);
     }

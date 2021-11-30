@@ -1,6 +1,8 @@
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
+using hw.Parser;
+using Reni.Parser;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
 
@@ -11,17 +13,17 @@ namespace Reni.SyntaxFactory
         internal static ValueSyntax GetInfixSyntax
         (
             this ValueSyntax left,
-            BinaryTree target,
+            ITokenClass tokenClass, IToken token,
             ValueSyntax right,
             Anchor anchor
         )
             => left == null
                 ? right == null
-                    ? new TerminalSyntax((ITerminal)target.TokenClass, target.Token, anchor)
-                    : new PrefixSyntax((IPrefix)target.TokenClass, right, target.Token, anchor)
+                    ? new TerminalSyntax((ITerminal)tokenClass, token, anchor)
+                    : new PrefixSyntax((IPrefix)tokenClass, right, token, anchor)
                 : right == null
-                    ? new SuffixSyntax(left, (ISuffix)target.TokenClass, target.Token, anchor)
-                    : new InfixSyntax(left, (IInfix)target.TokenClass, right, target.Token, anchor);
+                    ? new SuffixSyntax(left, (ISuffix)tokenClass, token, anchor)
+                    : new InfixSyntax(left, (IInfix)tokenClass, right, token, anchor);
 
         internal static IStatementSyntax[] With(this IStatementSyntax[] statements, Anchor frameItems)
         {

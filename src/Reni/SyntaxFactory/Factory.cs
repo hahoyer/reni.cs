@@ -13,11 +13,7 @@ namespace Reni.SyntaxFactory
         internal static readonly IValueProvider Bracket = new BracketHandler();
         internal static readonly IValueProvider MatchedBracket = new MatchedBracketHandler();
         internal static readonly IValueProvider Definable = new DefinableHandler();
-        internal static readonly IValueProvider Terminal = new InfixHandler(false, false);
-        internal static readonly IValueProvider Suffix = new InfixHandler(true, false);
-        internal static readonly IValueProvider NonSuffix = new InfixHandler(false);
-        internal static readonly IValueProvider InfixPrefix = new InfixHandler(hasRight: true);
-        internal static readonly IValueProvider Infix = new InfixHandler(true, true);
+        internal static readonly IValueProvider Infix = new InfixHandler();
         internal static readonly IValueProvider Function = new FunctionHandler();
         internal static readonly IValueProvider Cleanup = new CleanupHandler();
         internal static readonly IValueProvider Else = new ElseHandler();
