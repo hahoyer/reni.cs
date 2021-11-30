@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.0">
+  <Import Project="..\..\bin\Packages\NUnit.3.13.2\build\NUnit.props" Condition="Exists('..\..\bin\Packages\NUnit.3.13.2\build\NUnit.props')" />
   <PropertyGroup>
     <ProjectGuid>{C339A515-D066-4C12-A4C5-07DA91C19A2C}</ProjectGuid>
     <AssemblyName>ReniUI</AssemblyName>
@@ -19,6 +20,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>AssemblyInfo.tt</DependentUpon>
     </Compile>
+    <Compile Include="Test\StrangeExpressions.cs" />
+    <Compile Include="Test\UserInteraction\BadUserInterAction.cs" />
+    <Compile Include="Test\UserInteraction\UserInterAction.cs" />
+    <Compile Include="Test\UserInteraction\UserInterAction2.cs" />
     <Content Include="AssemblyInfo.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>AssemblyInfo.cs</LastGenOutput>
@@ -57,6 +62,19 @@
     <Compile Include="RestFul\IChannelRepo.cs" />
     <Compile Include="RestFul\Issue.cs" />
     <Compile Include="Test\BracketMatching.cs" />
+    <Compile Include="Test\Classification\All.cs" />
+    <Compile Include="Test\Classification\Basics.cs" />
+    <Compile Include="Test\Classification\Extension.cs" />
+    <Compile Include="Test\Formatting\All.cs" />
+    <Compile Include="Test\Formatting\BadThings.cs" />
+    <Compile Include="Test\Formatting\Basics.cs" />
+    <Compile Include="Test\Formatting\Complex.cs" />
+    <Compile Include="Test\Formatting\Declaration.cs" />
+    <Compile Include="Test\Formatting\Extension.cs" />
+    <Compile Include="Test\Formatting\Lists.cs" />
+    <Compile Include="Test\Formatting\LongTest.cs" />
+    <Compile Include="Test\Formatting\ThenElse.cs" />
+    <Compile Include="Test\Formatting\WithComments.cs" />
     <Compile Include="Test\ListMatching.cs" />
     <Compile Include="Test\PairedSyntaxTree.cs" />
     <Compile Include="Test\ThenElseMatching.cs" />
@@ -71,6 +89,15 @@
     <Reference Include="JetBrains.Annotations, Version=2021.3.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <HintPath>..\..\bin\Packages\JetBrains.Annotations.2021.3.0\lib\net20\JetBrains.Annotations.dll</HintPath>
     </Reference>
+    <Reference Include="nunit.framework, Version=3.13.2.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\..\bin\Packages\NUnit.3.13.2\lib\net45\nunit.framework.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Import Project="sys.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\bin\Packages\NUnit.3.13.2\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\bin\Packages\NUnit.3.13.2\build\NUnit.props'))" />
+  </Target>
 </Project>
