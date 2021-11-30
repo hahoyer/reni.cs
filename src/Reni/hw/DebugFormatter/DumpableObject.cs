@@ -24,7 +24,7 @@ namespace hw.DebugFormatter
             : this(NextObjectId++) { }
 
         [PublicAPI]
-        protected DumpableObject(int? nextObjectId) => ObjectIdValue = nextObjectId??(NextObjectId++);
+        protected DumpableObject(int? nextObjectId) => ObjectIdValue = nextObjectId;
 
         [DisableDump]
         [PublicAPI]
@@ -32,7 +32,7 @@ namespace hw.DebugFormatter
         {
             get
             {
-                Tracer.Assert(ObjectIdValue != null);
+                (ObjectIdValue != null).Assert();
                 return ObjectIdValue.Value;
             }
         }

@@ -5,6 +5,7 @@ using System.Reflection;
 using hw.DebugFormatter;
 using hw.Helper;
 using JetBrains.Annotations;
+// ReSharper disable CheckNamespace
 
 namespace hw.UnitTest
 {
@@ -20,7 +21,7 @@ namespace hw.UnitTest
             protected ActorBase(MethodInfo methodInfo, Type instanceType = null)
             {
                 InstanceType = instanceType ?? methodInfo.DeclaringType;
-                Tracer.Assert(InstanceType != null);
+                (InstanceType != null).Assert();
                 MethodInfo = methodInfo;
             }
 

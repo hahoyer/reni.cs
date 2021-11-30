@@ -160,7 +160,6 @@ namespace hw.Helper
             return target.Value;
         }
 
-        [NotNull]
         public static TResult AssertNotNull<TResult>(this TResult target)
             where TResult : class
         {

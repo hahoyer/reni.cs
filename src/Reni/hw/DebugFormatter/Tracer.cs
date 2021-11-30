@@ -402,7 +402,7 @@ namespace hw.DebugFormatter
         /// <param name="getText"> The text. </param>
         /// <param name="stackFrameDepth"> The stack frame depth. </param>
         [DebuggerHidden]
-        public static void ConditionalBreak(this bool b, Func<string> getText = null, int stackFrameDepth = 0)
+        public static void ConditionalBreak(bool b, Func<string> getText = null, int stackFrameDepth = 0)
         {
             if(b)
                 ConditionalBreak("", getText, stackFrameDepth + 1);
