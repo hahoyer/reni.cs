@@ -22,7 +22,7 @@ namespace Reni.Validation
             Message = message ?? "";
             Position = position;
             AssertValid();
-            StopByObjectIds(2,3,4);
+            StopByObjectIds();
         }
 
         bool IEquatable<Issue>.Equals(Issue other)

@@ -114,14 +114,7 @@ namespace Reni.TokenClasses
 
         Issue Issue => this.CachedValue(GetIssue);
 
-        Issue GetIssue()
-        {
-            var errorToken = TokenClass as IIssueTokenClass;
-            if(errorToken == null)
-                return null;
-            BracketIssueId.AssertIsNotNull();
-            return errorToken.IssueId.Issue(Token.Characters);
-        }
+        Issue GetIssue() => (TokenClass as IIssueTokenClass)?.IssueId.Issue(Token.Characters);
 
         [DisableDump]
         internal BracketNodes BracketKernel
