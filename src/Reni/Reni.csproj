@@ -228,6 +228,7 @@
     <Compile Include="ParserTest\Comments.cs" />
     <Compile Include="ParserTest\VerbatimText.cs" />
     <Compile Include="ParserTest\StrangeDeclarationSyntax.cs" />
+    <Compile Include="Parser\IIssueTokenClass.cs" />
     <Compile Include="Parser\IRecursionHandler.cs" />
     <Compile Include="Parser\ISyntaxScope.cs" />
     <Compile Include="SyntaxTree\Anchor.cs" />
@@ -369,7 +370,7 @@
     <Compile Include="SyntaxFactory\IDeclarerToken.cs" />
     <Compile Include="SyntaxTree\DeclarerSyntax.cs" />
     <Compile Include="TokenClasses\EndOfText.cs" />
-    <Compile Include="TokenClasses\ErrorToken.cs" />
+    <Compile Include="TokenClasses\IssueTokenClass.cs" />
     <Compile Include="TokenClasses\IBelongingsMatcher.cs" />
     <Compile Include="TokenClasses\IComparator.cs" />
     <Compile Include="TokenClasses\IFormatItem.cs" />

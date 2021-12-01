@@ -4,7 +4,7 @@ using Reni.Validation;
 
 namespace Reni.Parser
 {
-    sealed class ScannerSyntaxError : ParserTokenType<BinaryTree>, ITokenClass, IErrorToken
+    sealed class ScannerSyntaxError : ParserTokenType<BinaryTree>, IIssueTokenClass
     {
         internal readonly IssueId IssueId;
 
@@ -12,16 +12,11 @@ namespace Reni.Parser
 
         public override string Id => "<error>";
 
-        string ITokenClass.Id => Id;
+        string ITokenClass.Id => $"<error:{IssueId}>";
 
         protected override BinaryTree Create(BinaryTree left, IToken token, BinaryTree right)
             => BinaryTree.Create(left, this, token, right);
 
-        IssueId IErrorToken.IssueId => IssueId;
-    }
-
-    interface IErrorToken
-    {
-        IssueId IssueId { get; }
+        IssueId IIssueTokenClass.IssueId => IssueId;
     }
 }

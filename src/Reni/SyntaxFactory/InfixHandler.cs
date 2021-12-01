@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using hw.DebugFormatter;
 using hw.Helper;
 using hw.Parser;
+using hw.Scanner;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
@@ -14,77 +15,77 @@ namespace Reni.SyntaxFactory
 {
     class InfixHandler : DumpableObject, IValueProvider
     {
-        abstract class InfixTypeErrorToken : DumpableObject, ITokenClass, IErrorToken
+        abstract class InfixTypeErrorTokenClass : DumpableObject, IIssueTokenClass
         {
-            [EnableDump]
-            protected readonly Issue Issue;
+            readonly IssueId IssueId;
+            readonly ITokenClass ActualTokenClass;
 
-            protected InfixTypeErrorToken(BinaryTree target,  IssueId issueId) 
-                => Issue = new Issue(issueId, target.Token.Characters, GetMessage(target.TokenClass));
-
-            static string GetMessage(ITokenClass tokenClass)
+            protected InfixTypeErrorTokenClass(IssueId issueId, ITokenClass actualTokenClass)
             {
-                var types = new List<string>();
-                if(tokenClass is IInfix)
-                    types.Add("infix");
-                if(tokenClass is ISuffix)
-                    types.Add("suffix");
-                if(tokenClass is IPrefix)
-                    types.Add("prefix");
-                if(tokenClass is ITerminal)
-                    types.Add("terminal");
-
-                return $"(actual: {types.Stringify(", ")})";
+                IssueId = issueId;
+                ActualTokenClass = actualTokenClass;
             }
 
-            IssueId IErrorToken.IssueId => Issue.IssueId;
+            IssueId IIssueTokenClass.IssueId => IssueId;
+            string ITokenClass.Id => $"<error:{IssueId}/{ActualTokenClass}>";
 
-            string ITokenClass.Id => "InfixTypeErrorToken";
+
+            string Message
+            {
+                get
+                {
+                    var tokenClass = ActualTokenClass;
+                    var types = new List<string>();
+                    if(tokenClass is IInfix)
+                        types.Add("infix");
+                    if(tokenClass is ISuffix)
+                        types.Add("suffix");
+                    if(tokenClass is IPrefix)
+                        types.Add("prefix");
+                    if(tokenClass is ITerminal)
+                        types.Add("terminal");
+
+                    return $"(actual: {types.Stringify(",")})";
+                }
+            }
+
+            protected Issue GetIssue(SourcePart sourcePart) => IssueId.Issue(sourcePart, Message);
         }
 
-        sealed class InfixErrorToken : InfixTypeErrorToken, IInfix
+        sealed class InfixErrorTokenClass : InfixTypeErrorTokenClass, IInfix
         {
-            public InfixErrorToken(BinaryTree target)
-                : base(target, IssueId.InvalidInfixExpression) { }
+            public InfixErrorTokenClass(ITokenClass tokenClass)
+                : base(IssueId.InvalidInfixExpression, tokenClass) { }
 
             Result IInfix.Result(ContextBase context, Category category, ValueSyntax left, ValueSyntax right)
-            {
-                NotImplementedMethod(context, category, left, right);
-                return default;
-            }
+                => new(category, GetIssue(left.Anchor.SourcePart + right.Anchor.SourcePart));
         }
 
-        sealed class SuffixErrorToken : InfixTypeErrorToken, ISuffix
+        sealed class SuffixErrorTokenClass : InfixTypeErrorTokenClass, ISuffix
         {
-            public SuffixErrorToken(BinaryTree target)
-                : base(target, IssueId.InvalidSuffixExpression) { }
+            public SuffixErrorTokenClass(ITokenClass tokenClass)
+                : base(IssueId.InvalidSuffixExpression, tokenClass) { }
 
             Result ISuffix.Result(ContextBase context, Category category, ValueSyntax left)
-                => new Result(category, Issue);
+                => new(category, GetIssue(left.Anchor.SourcePart));
         }
 
-        sealed class PrefixErrorToken : InfixTypeErrorToken, IPrefix
+        sealed class PrefixErrorTokenClass : InfixTypeErrorTokenClass, IPrefix
         {
-            public PrefixErrorToken(BinaryTree target)
-                : base(target, IssueId.InvalidPrefixExpression) { }
+            public PrefixErrorTokenClass(ITokenClass tokenClass)
+                : base(IssueId.InvalidPrefixExpression, tokenClass) { }
 
             Result IPrefix.Result(ContextBase context, Category category, ValueSyntax right, IToken token)
-            {
-                NotImplementedMethod(context, category, right, token);
-                return default;
-            }
+                => new(category, GetIssue(right.Anchor.SourcePart));
         }
 
-        sealed class TerminalErrorToken : InfixTypeErrorToken, ITerminal
+        sealed class TerminalErrorTokenClass : InfixTypeErrorTokenClass, ITerminal
         {
-            public TerminalErrorToken(BinaryTree target)
-                : base(target, IssueId.InvalidTerminalExpression) { }
+            public TerminalErrorTokenClass(ITokenClass tokenClass)
+                : base(IssueId.InvalidTerminalExpression, tokenClass) { }
 
             Result ITerminal.Result(ContextBase context, Category category, IToken token)
-            {
-                NotImplementedMethod(context, category, token);
-                return default;
-            }
+                => new(category, GetIssue(token.Characters));
 
             ValueSyntax ITerminal.Visit(ISyntaxVisitor visitor)
             {
@@ -93,45 +94,47 @@ namespace Reni.SyntaxFactory
             }
         }
 
+        static readonly FunctionCache<System.Type, FunctionCache<ITokenClass, InfixTypeErrorTokenClass>>
+            From
+                = new(type => new(tokenClass
+                    => GetErrorTokenClass(type, tokenClass)));
+
         ValueSyntax IValueProvider.Get(BinaryTree target, Factory factory, Anchor anchor)
         {
             var left = factory.GetValueSyntax(target.Left);
             var right = factory.GetValueSyntax(target.Right);
 
-            var tokenClass = GetTokenClass(target, left != null, right != null);
+            var tokenClass = GetTokenClass(left != null, target.TokenClass, right != null);
 
             return left
                 .GetInfixSyntax(tokenClass, target.Token, right, Anchor.Create(target).Combine(anchor));
         }
 
-        static ITokenClass GetTokenClass(BinaryTree target, bool left, bool right)
+        static ITokenClass GetTokenClass(bool left, ITokenClass tokenClass, bool right)
             => left
                 ? right
-                    ? GetTokenClass<IInfix>(target)
-                    : GetTokenClass<ISuffix>(target)
+                    ? GetTokenClass<IInfix>(tokenClass)
+                    : GetTokenClass<ISuffix>(tokenClass)
                 : right
-                    ? GetTokenClass<IPrefix>(target)
-                    : GetTokenClass<ITerminal>(target);
+                    ? GetTokenClass<IPrefix>(tokenClass)
+                    : GetTokenClass<ITerminal>(tokenClass);
 
-        static ITokenClass GetTokenClass<TInfixType>(BinaryTree target)
+        static ITokenClass GetTokenClass<TInfixType>(ITokenClass tokenClass)
+            => tokenClass is TInfixType? tokenClass : GetErrorTokenClass<TInfixType>(tokenClass);
+
+        static ITokenClass GetErrorTokenClass<TInfixType>(ITokenClass tokenClass)
+            => From[typeof(TInfixType)][tokenClass];
+
+        static InfixTypeErrorTokenClass GetErrorTokenClass(System.Type type, ITokenClass tokenClass)
         {
-            var tokenClass = target.TokenClass;
-            if(tokenClass is TInfixType)
-                return tokenClass;
-
-            return GetErrorTokenClass<TInfixType>(target);
-        }
-
-        static ITokenClass GetErrorTokenClass<TInfixType>(BinaryTree target)
-        {
-            if(typeof(TInfixType).Is<IInfix>())
-                return new InfixErrorToken(target);
-            if(typeof(TInfixType).Is<ISuffix>())
-                return new SuffixErrorToken(target);
-            if(typeof(TInfixType).Is<IPrefix>())
-                return new PrefixErrorToken(target);
-            if(typeof(TInfixType).Is<ITerminal>())
-                return new TerminalErrorToken(target);
+            if(type.Is<IInfix>())
+                return new InfixErrorTokenClass(tokenClass);
+            if(type.Is<ISuffix>())
+                return new SuffixErrorTokenClass(tokenClass);
+            if(type.Is<IPrefix>())
+                return new PrefixErrorTokenClass(tokenClass);
+            if(type.Is<ITerminal>())
+                return new TerminalErrorTokenClass(tokenClass);
             throw new InvalidOperationException();
         }
     }

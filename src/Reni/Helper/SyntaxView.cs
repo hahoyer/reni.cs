@@ -36,7 +36,7 @@ namespace Reni.Helper
                 new(i => LocateByPositionForCache(i, false));
             Cache.LocateByPositionIncludingParent
                 = new(i => LocateByPositionForCache(i, true));
-            (flatItem.ObjectId == -492).ConditionalBreak();
+            Tracer.ConditionalBreak(flatItem.ObjectId == -492);
         }
 
         ValueCache ValueCache.IContainer.Cache { get; } = new();

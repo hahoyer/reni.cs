@@ -39,7 +39,7 @@ namespace Reni.SyntaxTree
         internal SourcePart SourcePart => SourceParts.Combine();
 
         [DisableDump]
-        public IEnumerable<Issue> Issues => Items.SelectMany(node => node.Issues);
+        public IEnumerable<Issue> Issues => Items.SelectMany(node => node.AllIssues);
 
         [DisableDump]
         public bool IsEmpty => !Items.Any();
@@ -78,7 +78,7 @@ namespace Reni.SyntaxTree
         BinaryTree GetMain()
         {
             var binaryTrees = Items
-                .Where(node => !(node.TokenClass is IErrorToken)).ToArray();
+                .Where(node => !(node.TokenClass is IIssueTokenClass)).ToArray();
             return binaryTrees
                 .SingleOrDefault(node => Items.All(parent => !node.HasAsParent(parent)));
         }

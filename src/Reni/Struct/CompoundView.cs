@@ -223,7 +223,7 @@ namespace Reni.Struct
             var result = base.GetNodeDump();
             result += "(" + (Context?.GetContextIdentificationDump() ?? "?") + ")";
             if(HasIssues)
-                result += ".Issues[" + Issues.Length + "]";
+                result += ".AllIssues[" + Issues.Length + "]";
             return result;
         }
 

@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Helper;
@@ -8,6 +10,7 @@ using Reni.Helper;
 using Reni.Parser;
 using Reni.SyntaxTree;
 using Reni.Validation;
+using static Reni.Validation.IssueId;
 
 namespace Reni.TokenClasses
 {
@@ -37,10 +40,10 @@ namespace Reni.TokenClasses
         internal readonly IToken Token;
 
         [DisableDump]
-        internal ITokenClass TokenClass { get; }
+        internal Syntax Syntax;
 
         [DisableDump]
-        internal Syntax Syntax;
+        readonly ITokenClass InnerTokenClass;
 
         readonly FunctionCache<bool, string> FlatFormatCache;
         readonly FunctionCache<int, BinaryTree> LocationCache;
@@ -67,7 +70,7 @@ namespace Reni.TokenClasses
         {
             Token = token;
             Left = left;
-            TokenClass = tokenClass;
+            InnerTokenClass = tokenClass;
             Right = right;
             FlatFormatCache = new(GetFlatStringValue);
             LocationCache = new(GetItemByOffset);
@@ -91,6 +94,8 @@ namespace Reni.TokenClasses
 
         protected override string GetNodeDump() => base.GetNodeDump() + $"({TokenClass.Id})";
 
+        [DisableDump]
+        internal ITokenClass TokenClass => this.CachedValue(GetTokenClass);
 
         [DisableDump]
         internal SourcePart SourcePart => LeftMost.Token.SourcePart().Start.Span(RightMost.Token.Characters.End);
@@ -102,69 +107,96 @@ namespace Reni.TokenClasses
         BinaryTree RightMost => Right?.RightMost ?? this;
 
         [DisableDump]
-        internal IEnumerable<Issue> Issues
-            => T(Left?.Issues, T((TokenClass as IErrorToken)?.IssueId.Issue(Token.Characters)), Right?.Issues)
+        internal IEnumerable<Issue> AllIssues
+            => T(Left?.AllIssues, T(Issue), Right?.AllIssues)
                 .ConcatMany()
                 .Where(node => node != null);
+
+        Issue Issue => this.CachedValue(GetIssue);
+
+        Issue GetIssue()
+        {
+            var errorToken = TokenClass as IIssueTokenClass;
+            if(errorToken == null)
+                return null;
+            BracketIssueId.AssertIsNotNull();
+            return errorToken.IssueId.Issue(Token.Characters);
+        }
 
         [DisableDump]
         internal BracketNodes BracketKernel
         {
             get
             {
-                if(!(TokenClass is IRightBracket rightParenthesis))
-                {
-                    if(TokenClass is ILeftBracket)
-                    {
-                        Left.AssertIsNull();
-                        return new()
-                        {
-                            Left = this, Center = Right
-                            , Right = ErrorToken.CreateTreeItem(IssueId.MissingRightBracket, RightMost)
-                        };
-                    }
+                if(TokenClass is not IIssueTokenClass errorToken)
+                    return TokenClass is IRightBracket
+                        ? new BracketNodes { Left = Left, Center = Left.Right, Right = this }
+                        : null;
 
-                    return null;
-                }
+                if(errorToken.IssueId == MissingRightBracket)
+                    return new() { Left = this, Center = Right, Right = RightMost };
+                if(errorToken.IssueId == MissingLeftBracket)
+                    return new() { Left = Left.LeftMost, Center = Left, Right = this};
+                if(errorToken.IssueId == MissingMatchingRightBracket)
+                    return new() { Left = Left, Center = Left.Right, Right = this};
 
-                var level = rightParenthesis.Level;
-
-                (Right == null).Assert();
-
-                var result = new BracketNodes { Left = Left, Center = Left.Right, Right = this };
-
-                if(!(Left.TokenClass is ILeftBracket leftParenthesis))
-                {
-                    result.Center = Left;
-                    result.Left = ErrorToken.CreateTreeItem(IssueId.MissingLeftBracket, Left.LeftMost);
-                    return result;
-                }
-
-                (Left.Left == null).Assert();
-
-                var levelDelta = leftParenthesis.Level - level;
-
-                if(levelDelta == 0)
-                    return result;
-
-                if(levelDelta > 0)
-                {
-                    result.Right = ErrorToken.CreateTreeItem(IssueId.MissingRightBracket, RightMost);
-                    return result;
-                }
-
-                Left.NotImplementedMethod(level, this);
-                return null;
+                throw new InvalidEnumArgumentException($"Unexpected Bracket issue: {errorToken.IssueId}");
             }
         }
 
         [DisableDump]
         public BinaryTree[] ParserLevelGroup
-            => this.CachedValue(() => GetParserLevelGroup(TokenClass).ToArray());
+            => this.CachedValue(() => GetParserLevelGroup().ToArray());
 
         [DisableDump]
         public bool IsSeparatorRequired
-            => !Token.PrecededWith.HasComment() && SeparatorExtension.Get(LeftNeighbor?.TokenClass, TokenClass);
+            => !Token.PrecededWith.HasComment() && SeparatorExtension.Get(LeftNeighbor?.InnerTokenClass, InnerTokenClass);
+
+        [DisableDump]
+        IssueId BracketIssueId
+        {
+            get
+            {
+                var left = Left;
+                var right = Right;
+                var tokenClass = InnerTokenClass;
+                var leftBracket = tokenClass as ILeftBracket;
+                var rightBracket = tokenClass as IRightBracket;
+
+                if(rightBracket == null && leftBracket == null)
+                    return null;
+
+                if(leftBracket != null)
+                {
+                    if(Parent.IsBracketLevel)
+                        return null;
+                    left.AssertIsNull();
+                    rightBracket.AssertIsNull();
+                    return MissingRightBracket;
+                }
+
+                rightBracket.AssertIsNotNull();
+                var level = rightBracket.Level;
+
+                right.AssertIsNull();
+
+                var innerLeftBracket = left.InnerTokenClass as ILeftBracket;
+                if(innerLeftBracket == null)
+                    return MissingLeftBracket;
+
+                left.Left.AssertIsNull();
+
+                return innerLeftBracket.Level > level? MissingMatchingRightBracket : null;
+            }
+        }
+
+        bool IsBracketLevel => BracketKernel != null;
+
+        ITokenClass GetTokenClass()
+        {
+            var issueId = BracketIssueId;
+            return issueId == null? InnerTokenClass : IssueTokenClass.From[issueId];
+        }
 
         BinaryTree GetItemByOffset(int position)
         {
@@ -202,14 +234,16 @@ namespace Reni.TokenClasses
             }
         }
 
-        IEnumerable<BinaryTree> GetParserLevelGroup(ITokenClass tokenClass)
+        IEnumerable<BinaryTree> GetParserLevelGroup()
         {
+            var tokenClass = InnerTokenClass;
+
             if(tokenClass is not IBelongingsMatcher)
                 return new BinaryTree[0];
 
             if(tokenClass is List)
                 return this
-                    .Chain(node => tokenClass.IsBelongingTo(node.Right?.TokenClass)? node.Right : null);
+                    .Chain(node => tokenClass.IsBelongingTo(node.Right?.InnerTokenClass)? node.Right : null);
 
             if(tokenClass is IRightBracket)
             {
@@ -244,9 +278,9 @@ namespace Reni.TokenClasses
 
         internal int? GetBracketLevel()
         {
-            if(!(TokenClass is IRightBracket rightParenthesis))
+            if(InnerTokenClass is not IRightBracket rightParenthesis)
                 return null;
-            var leftParenthesis = Left?.TokenClass as ILeftBracket;
+            var leftParenthesis = Left?.InnerTokenClass as ILeftBracket;
             return T(leftParenthesis?.Level ?? 0, rightParenthesis.Level).Max();
         }
 

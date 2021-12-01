@@ -31,6 +31,7 @@ namespace Reni.Validation
         public static readonly IssueId MissingDeclarationValue = new IssueId();
         public static readonly IssueId MissingLeftBracket = new IssueId();
         public static readonly IssueId MissingLeftOperand = new IssueId();
+        public static readonly IssueId MissingMatchingRightBracket = new IssueId();
         public static readonly IssueId MissingRightBracket = new IssueId();
         public static readonly IssueId MissingRightExpression = new IssueId();
         public static readonly IssueId MissingRightOperand = new IssueId();

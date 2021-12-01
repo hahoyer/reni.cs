@@ -60,13 +60,12 @@ namespace Reni.SyntaxTree
         [DisableDump]
         internal bool IsMutableSyntax => Declarer.IsMutableSyntax;
 
-        internal static IStatementSyntax Create(DeclarerSyntax declarer, ValueSyntax value, Anchor anchor)
-            => new DeclarationSyntax
-            (
-                declarer,
-                value ??
-                ErrorToken.CreateSyntax(IssueId.MissingDeclarationValue, anchor.Main.SourcePart.End),
-                anchor
-            );
+        internal static IStatementSyntax Create
+            (DeclarerSyntax declarer, ValueSyntax value, Anchor anchor) => new DeclarationSyntax
+        (
+            declarer,
+            value ?? new EmptyList(anchor, IssueId.MissingDeclarationValue.Issue(anchor.Main.SourcePart)),
+            anchor
+        );
     }
 }

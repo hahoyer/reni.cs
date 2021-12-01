@@ -83,6 +83,9 @@ namespace Reni.SyntaxFactory
                     anchor = Anchor.Create(target.ParserLevelGroup).Combine(anchor);
                     return CompoundSyntax.Create(node, null, anchor);
                 }
+                case IIssueTokenClass issue:
+                    return new EmptyList(Anchor.CreateAll(target).Combine(anchor));
+
                 default:
                     return new EmptyList
                     (

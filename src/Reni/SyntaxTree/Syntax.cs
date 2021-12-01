@@ -138,7 +138,7 @@ namespace Reni.SyntaxTree
 
         public SourcePart ChildSourcePart => LeftMostAnchor.SourcePart.Start.Span(RightMostAnchor.SourcePart.End);
 
-        IEnumerable<Issue> GetIssues() => T(Issue).Concat(Anchor.Issues).Where(node => node != null);
+        IEnumerable<Issue> GetIssues() => Issue.NullableToArray();
 
         internal Result<CompoundSyntax> ToCompoundSyntax(BinaryTree target = null)
             => ToCompoundSyntaxHandler(target);
