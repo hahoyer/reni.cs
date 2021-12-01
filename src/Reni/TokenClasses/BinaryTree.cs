@@ -40,6 +40,12 @@ namespace Reni.TokenClasses
         internal ITokenClass TokenClass { get; }
 
         [DisableDump]
+        internal Syntax Syntax;
+
+        readonly FunctionCache<bool, string> FlatFormatCache;
+        readonly FunctionCache<int, BinaryTree> LocationCache;
+
+        [DisableDump]
         BinaryTree LeftNeighbor;
 
         [DisableDump]
@@ -47,12 +53,6 @@ namespace Reni.TokenClasses
 
         [DisableDump]
         BinaryTree RightNeighbor;
-
-        [DisableDump]
-        internal Syntax Syntax;
-
-        readonly FunctionCache<bool, string> FlatFormatCache;
-        readonly FunctionCache<int, BinaryTree> LocationCache;
 
         int Depth;
 
@@ -69,8 +69,8 @@ namespace Reni.TokenClasses
             Left = left;
             TokenClass = tokenClass;
             Right = right;
-            FlatFormatCache = new FunctionCache<bool, string>(GetFlatStringValue);
-            LocationCache = new FunctionCache<int, BinaryTree>(GetItemByOffset);
+            FlatFormatCache = new(GetFlatStringValue);
+            LocationCache = new(GetItemByOffset);
 
             SetLinks();
         }
@@ -114,10 +114,10 @@ namespace Reni.TokenClasses
             {
                 if(!(TokenClass is IRightBracket rightParenthesis))
                 {
-                    if(TokenClass is ILeftBracket leftBracket)
+                    if(TokenClass is ILeftBracket)
                     {
                         Left.AssertIsNull();
-                        return new BracketNodes()
+                        return new()
                         {
                             Left = this, Center = Right
                             , Right = ErrorToken.CreateTreeItem(IssueId.MissingRightBracket, RightMost)
@@ -131,7 +131,7 @@ namespace Reni.TokenClasses
 
                 (Right == null).Assert();
 
-                var result = new BracketNodes {Left = Left, Center = Left.Right, Right = this};
+                var result = new BracketNodes { Left = Left, Center = Left.Right, Right = this };
 
                 if(!(Left.TokenClass is ILeftBracket leftParenthesis))
                 {
@@ -159,7 +159,7 @@ namespace Reni.TokenClasses
         }
 
         [DisableDump]
-        public BinaryTree[] ParserLevelGroup 
+        public BinaryTree[] ParserLevelGroup
             => this.CachedValue(() => GetParserLevelGroup(TokenClass).ToArray());
 
         [DisableDump]
@@ -304,7 +304,7 @@ namespace Reni.TokenClasses
         {
             if(Token.Characters.Source.Identifier == Compiler.PredefinedSource)
                 return;
-            (Syntax == null || Syntax == syntax).Assert(()=>@$"Current: {Syntax.Dump()}
+            (Syntax == null || Syntax == syntax).Assert(() => @$"Current: {Syntax.Dump()}
 New: {syntax.Dump()}");
             Syntax = syntax;
         }
@@ -321,13 +321,14 @@ New: {syntax.Dump()}");
             var endParents = end.Chain(node => node.Parent).Reverse().ToArray();
 
             var result = startParents[0];
-            for(var index = 1; index < startParents.Length && index < endParents .Length; index++)
+            for(var index = 1; index < startParents.Length && index < endParents.Length; index++)
             {
                 var parent = startParents[index];
                 if(parent != endParents[index])
                     return result;
                 result = parent;
             }
+
             return result;
         }
     }
