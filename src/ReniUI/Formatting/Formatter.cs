@@ -80,8 +80,9 @@ namespace ReniUI.Formatting
 
             internal override void SetupLineBreaks(Syntax target)
             {
-                target.Anchors.Prefix.AssertIsNull();
-                target.Anchors.Begin.AssertIsNotNull();
+                // Why this was there?:
+                // target.Anchors.Prefix.AssertIsNull(target.Dump);
+                target.Anchors.Begin.AssertIsNotNull(target.Dump);
                 target.Anchors.Begin.EnsureLineBreaks(1);
             }
         }
