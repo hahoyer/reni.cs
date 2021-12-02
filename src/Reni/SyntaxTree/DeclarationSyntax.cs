@@ -1,7 +1,6 @@
 using System.Linq;
 using hw.DebugFormatter;
 using hw.Scanner;
-using Reni.TokenClasses;
 using Reni.Validation;
 
 namespace Reni.SyntaxTree
@@ -14,14 +13,14 @@ namespace Reni.SyntaxTree
         [EnableDumpExcept(null)]
         internal readonly ValueSyntax Value;
 
-        DeclarationSyntax(DeclarerSyntax declarer, ValueSyntax value, Anchor anchor)
-            : base(anchor)
+        DeclarationSyntax(DeclarerSyntax declarer, ValueSyntax value, Anchor anchor,Issue issue = null)
+            : base(anchor,issue)
         {
             Declarer = declarer;
             Value = value;
 
             Declarer.AssertIsNotNull();
-            Value.AssertIsNotNull();
+            //Value.AssertIsNotNull();
         }
 
         [DisableDump]
@@ -60,12 +59,13 @@ namespace Reni.SyntaxTree
         [DisableDump]
         internal bool IsMutableSyntax => Declarer.IsMutableSyntax;
 
-        internal static IStatementSyntax Create
-            (DeclarerSyntax declarer, ValueSyntax value, Anchor anchor) => new DeclarationSyntax
-        (
-            declarer,
-            value ?? new EmptyList(anchor, IssueId.MissingDeclarationValue.Issue(anchor.Main.SourcePart)),
-            anchor
-        );
+        internal static IStatementSyntax Create(DeclarerSyntax declarer, ValueSyntax value, Anchor anchor)
+            => new DeclarationSyntax
+            (
+                declarer,
+                value ,
+                anchor,
+                IssueId.MissingDeclarationValue.Issue(anchor.Main.SourcePart)
+            );
     }
 }
