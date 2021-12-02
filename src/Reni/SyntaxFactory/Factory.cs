@@ -1,6 +1,5 @@
 using System.Linq;
 using hw.DebugFormatter;
-using hw.Helper;
 using Reni.Parser;
 using Reni.SyntaxTree;
 using Reni.TokenClasses;
@@ -76,15 +75,9 @@ namespace Reni.SyntaxFactory
                 case IDeclarationToken declarationToken:
                     return declarationToken.Provider.Get(target, factory).ToValueSyntax(anchor);
                 case IStatementsToken statementsToken:
-                {
-                    var node = statementsToken
-                        .Provider
-                        .Get(target, factory);
-                    anchor = Anchor.Create(target.ParserLevelGroup).Combine(anchor);
-                    return CompoundSyntax.Create(node, null, anchor);
-                }
+                    return factory.GetStatementsSyntax(target, anchor, statementsToken);
                 case IIssueTokenClass issue:
-                    return new EmptyList(Anchor.CreateAll(target).Combine(anchor));
+                    return GetIssueSyntax(issue.IssueId, target, anchor);
 
                 default:
                     return new EmptyList
@@ -93,6 +86,27 @@ namespace Reni.SyntaxFactory
                         , IssueId.InvalidExpression.Issue(target.Token.Characters)
                     );
             }
+        }
+
+        ValueSyntax GetStatementsSyntax(BinaryTree target, Anchor anchor, IStatementsToken tokenClass)
+        {
+            var node = tokenClass
+                .Provider
+                .Get(target, this);
+            anchor = Anchor.Create(target.ParserLevelGroup).Combine(anchor);
+            return CompoundSyntax.Create(node, null, anchor);
+        }
+
+        ValueSyntax GetIssueSyntax(IssueId issueId, BinaryTree target, Anchor anchor)
+        {
+            if(issueId == IssueId.MissingRightBracket)
+            {
+                target.Left.AssertIsNull();
+                return GetValueSyntax(target.Right, Anchor.Create(target).Combine(anchor));
+            }
+
+            NotImplementedMethod(issueId, target, anchor);
+            return new EmptyList(Anchor.CreateAll(target).Combine(anchor));
         }
 
         internal ValueSyntax GetValueSyntax(BinaryTree target)
@@ -110,7 +124,7 @@ namespace Reni.SyntaxFactory
                 } ==
                 MeansPublic
                     ? this
-                    : new Factory(!MeansPublic);
+                    : new(!MeansPublic);
         }
 
         internal ExpressionSyntax GetExpressionSyntax(BinaryTree target, Anchor anchor)

@@ -25,7 +25,7 @@ namespace Reni.SyntaxTree
                 .ToArray();
 
             Items.Any().Assert();
-            //Main.AssertIsNotNull();
+            Main.AssertIsNotNull();
         }
 
         ValueCache ValueCache.IContainer.Cache { get; } = new();
@@ -72,16 +72,12 @@ namespace Reni.SyntaxTree
         {
             if(other == null || !other.Any())
                 return this;
-            return new Anchor(other.Concat(Items).ToArray());
+            return new(other.Concat(Items).ToArray());
         }
 
         BinaryTree GetMain()
-        {
-            var binaryTrees = Items
-                .Where(node => !(node.TokenClass is IIssueTokenClass)).ToArray();
-            return binaryTrees
-                .SingleOrDefault(node => Items.All(parent => !node.HasAsParent(parent)));
-        }
+            => Items
+                .Single(node => Items.All(parent => !node.HasAsParent(parent)));
 
         public void SetSyntax(Syntax syntax)
         {

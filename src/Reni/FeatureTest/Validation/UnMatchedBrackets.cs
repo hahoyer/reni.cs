@@ -22,8 +22,8 @@ namespace Reni.FeatureTest.Validation
             var issueArray = issues.ToArray();
             var i = 0;
             var issueBase = issueArray[i];
-            (issueBase.IssueId == IssueId.MissingMatchingRightBracket).Assert(issueBase.Dump);
-            (issueBase.Position.Id == "}").Assert(issueBase.Dump);
+            (issueBase.IssueId == IssueId.MissingRightBracket).Assert(issueBase.Dump);
+            (issueBase.Position.GetDumpAroundCurrent(2) == "... ([] }...").Assert(issueBase.Dump);
             i++;
             (i == issueArray.Length).Assert(()=>Tracer.Dump(issueArray));
         }
