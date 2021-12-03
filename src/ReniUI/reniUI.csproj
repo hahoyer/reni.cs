@@ -22,6 +22,7 @@
     </Compile>
     <Compile Include="Test\StrangeExpressions.cs" />
     <Compile Include="Test\UserInteraction\BadUserInterAction.cs" />
+    <Compile Include="Test\UserInteraction\LocateByPositionTest.cs" />
     <Compile Include="Test\UserInteraction\UserInterAction.cs" />
     <Compile Include="Test\UserInteraction\UserInterAction2.cs" />
     <Content Include="AssemblyInfo.tt">

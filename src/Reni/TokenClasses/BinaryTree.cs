@@ -215,7 +215,7 @@ namespace Reni.TokenClasses
 
         BinaryTree GetItemByOffset(int position)
         {
-            if(Token.Characters.EndPosition <= position)
+            if(TokenClass is not EndOfText && Token.Characters.EndPosition <= position)
                 return Right?.LocationCache[position];
 
             if(Token.Characters.Position <= position)
