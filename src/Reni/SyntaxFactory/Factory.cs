@@ -12,6 +12,8 @@ namespace Reni.SyntaxFactory
         internal static readonly IValueProvider Bracket = new BracketHandler();
         internal static readonly IValueProvider MatchedBracket = new MatchedBracketHandler();
         internal static readonly IValueProvider Definable = new DefinableHandler();
+        internal static readonly IValueProvider ScannerError = new InfixHandler();
+
         internal static readonly IValueProvider Infix = new InfixHandler();
         internal static readonly IValueProvider Function = new FunctionHandler();
         internal static readonly IValueProvider Cleanup = new CleanupHandler();
@@ -21,10 +23,12 @@ namespace Reni.SyntaxFactory
         internal static readonly IStatementsProvider List = new ListHandler();
         internal static readonly IStatementProvider Colon = new ColonHandler();
 
+
         internal static readonly Factory Root = new(false);
 
         [EnableDump]
         internal readonly bool MeansPublic;
+
 
         Factory(bool meansPublic) => MeansPublic = meansPublic;
 
@@ -109,7 +113,6 @@ namespace Reni.SyntaxFactory
                 target.Right.AssertIsNull();
                 return GetValueSyntax(target.Left, Anchor.Create(target).Combine(anchor));
             }
-
             NotImplementedMethod(issueId, target, anchor);
             return new EmptyList(Anchor.CreateAll(target).Combine(anchor));
         }

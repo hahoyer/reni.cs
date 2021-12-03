@@ -1,10 +1,11 @@
 ﻿using hw.Parser;
+using Reni.SyntaxFactory;
 using Reni.TokenClasses;
 using Reni.Validation;
 
 namespace Reni.Parser
 {
-    sealed class ScannerSyntaxError : ParserTokenType<BinaryTree>, IIssueTokenClass
+    sealed class ScannerSyntaxError : ParserTokenType<BinaryTree>, IIssueTokenClass, IValueToken
     {
         internal readonly IssueId IssueId;
 
@@ -18,5 +19,7 @@ namespace Reni.Parser
             => BinaryTree.Create(left, this, token, right);
 
         IssueId IIssueTokenClass.IssueId => IssueId;
+
+        IValueProvider IValueToken.Provider => Factory.ScannerError;
     }
 }
