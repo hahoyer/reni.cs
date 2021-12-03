@@ -11,7 +11,6 @@ using hw.Scanner;
 using JetBrains.Annotations;
 using Reni.Code;
 using Reni.Context;
-using Reni.Helper;
 using Reni.Numeric;
 using Reni.Parser;
 using Reni.Runtime;
@@ -28,9 +27,9 @@ namespace Reni
     public sealed class Compiler
         : Compiler<BinaryTree>, ValueCache.IContainer, Root.IParent, IExecutionContext
     {
+        internal const string PredefinedSource = "?Predefined";
         const string DefaultSourceIdentifier = "source";
         const string DefaultModuleName = "ReniModule";
-        internal const string PredefinedSource = "?Predefined";
 
         [UsedImplicitly]
         public Exception Exception;
@@ -47,11 +46,11 @@ namespace Reni
         readonly ValueCache<BinaryTree> BinaryTreeCache;
         readonly ValueCache<CodeContainer> CodeContainerCache;
 
-        bool IsInExecutionPhase;
-
         readonly MainTokenFactory MainTokenFactory;
         readonly string ModuleName;
         readonly ValueCache<ValueSyntax> ValueSyntaxCache;
+
+        bool IsInExecutionPhase;
 
         Compiler(Source source, string moduleName, CompilerParameters parameters)
         {
@@ -63,14 +62,14 @@ namespace Reni
             var main = this["Main"];
             var declaration = this["Declaration"];
 
-            MainTokenFactory = new MainTokenFactory(declaration, "Main");
+            MainTokenFactory = new(declaration, "Main");
 
             main.PrioTable = MainPriorityTable;
             main.TokenFactory = new ScannerTokenFactory();
             main.Add<ScannerTokenType<BinaryTree>>(MainTokenFactory);
 
             declaration.PrioTable = DeclarationPriorityTable;
-            declaration.TokenFactory = new ScannerTokenFactory();
+            declaration.TokenFactory = new ScannerTokenFactory(true);
             declaration.BoxFunction = target => new ExclamationBoxToken(target);
             declaration.Add<ScannerTokenType<BinaryTree>>(new DeclarationTokenFactory("Declaration"));
 
@@ -79,11 +78,27 @@ namespace Reni
 
             //Tracer.FlaggedLine(PrettyDump);
 
-            Root = new Root(this);
+            Root = new(this);
             CodeContainerCache = NewValueCache(GetCodeContainer);
-            BinaryTreeCache = NewValueCache(() => Parse(Source + 0));
+            BinaryTreeCache = NewValueCache(() => Parse(Source));
             ValueSyntaxCache = NewValueCache(GetSyntax);
         }
+
+        ValueCache ValueCache.IContainer.Cache { get; } = new();
+
+        CodeBase IExecutionContext.Function(FunctionId functionId)
+            => CodeContainer.Function(functionId);
+
+        IOutStream IExecutionContext.OutStream => Parameters.OutStream;
+
+        IEnumerable<Definable> Root.IParent.DefinedNames
+            => MainTokenFactory.AllTokenClasses.OfType<Definable>();
+
+        IExecutionContext Root.IParent.ExecutionContext => this;
+
+        Result<ValueSyntax> Root.IParent.ParsePredefinedItem(string source) => ParsePredefinedItem(source);
+
+        bool Root.IParent.ProcessErrors => Parameters.ProcessErrors;
 
         [Node]
         [DisableDump]
@@ -133,8 +148,8 @@ namespace Reni
             get
             {
                 var binaryTree = BinaryTree.AllIssues.ToArray();
-                var syntax = ValueSyntaxCache.Value?.AllIssues.ToArray()??new Issue[0];
-                var code = CodeContainer?.Issues.ToArray()??new Issue[0];
+                var syntax = ValueSyntaxCache.Value?.AllIssues.ToArray() ?? new Issue[0];
+                var code = CodeContainer?.Issues.ToArray() ?? new Issue[0];
                 //$"binaryTree: {binaryTree.Length}, syntax: {syntax.Length}, code: {code.Length}".Log(FilePositionTag.Debug);
                 return T(binaryTree, syntax, code).ConcatMany();
             }
@@ -189,13 +204,17 @@ namespace Reni
                 (
                     new[]
                     {
-                        LeftParenthesis.TokenId(3), LeftParenthesis.TokenId(2), LeftParenthesis.TokenId(1)
+                        LeftParenthesis.TokenId(3)
+                        , LeftParenthesis.TokenId(2)
+                        , LeftParenthesis.TokenId(1)
                         , PrioTable.BeginOfText
                     },
                     new[]
                     {
-                        RightParenthesisBase.TokenId(3), RightParenthesisBase.TokenId(2)
-                        , RightParenthesisBase.TokenId(1), PrioTable.EndOfText
+                        RightParenthesisBase.TokenId(3)
+                        , RightParenthesisBase.TokenId(2)
+                        , RightParenthesisBase.TokenId(1)
+                        , PrioTable.EndOfText
                     }
                 );
 
@@ -214,13 +233,15 @@ namespace Reni
                 (
                     new[]
                     {
-                        LeftParenthesis.TokenId(3), LeftParenthesis.TokenId(2), LeftParenthesis.TokenId(1)
-                        , PrioTable.BeginOfText
+                        LeftParenthesis.TokenId(3)
+                        , LeftParenthesis.TokenId(2)
+                        , LeftParenthesis.TokenId(1)
                     },
                     new[]
                     {
-                        RightParenthesisBase.TokenId(3), RightParenthesisBase.TokenId(2)
-                        , RightParenthesisBase.TokenId(1), PrioTable.EndOfText
+                        RightParenthesisBase.TokenId(3)
+                        , RightParenthesisBase.TokenId(2)
+                        , RightParenthesisBase.TokenId(1)
                     }
                 );
                 result.Title = "Declaration";
@@ -231,36 +252,19 @@ namespace Reni
         [DisableDump]
         internal TypeBase MainType => this.CachedValue(() => Syntax.Type(Root));
 
-        ValueCache ValueCache.IContainer.Cache { get; } = new ValueCache();
-
-        CodeBase IExecutionContext.Function(FunctionId functionId)
-            => CodeContainer.Function(functionId);
-
-        IOutStream IExecutionContext.OutStream => Parameters.OutStream;
-
-        IEnumerable<Definable> Root.IParent.DefinedNames
-            => MainTokenFactory.AllTokenClasses.OfType<Definable>();
-
-        IExecutionContext Root.IParent.ExecutionContext => this;
-
-        Result<ValueSyntax> Root.IParent.ParsePredefinedItem(string source) => ParsePredefinedItem(source);
-
-        bool Root.IParent.ProcessErrors => Parameters.ProcessErrors;
-
         public static Compiler FromFile(string fileName, CompilerParameters parameters = null)
         {
             (fileName != null).Assert();
             var moduleName = ModuleNameFromFileName(fileName);
-            return new Compiler(new Source(fileName.ToSmbFile()), moduleName, parameters);
+            return new(new(fileName.ToSmbFile()), moduleName, parameters);
         }
 
         public static Compiler FromText
             (string text, CompilerParameters parameters = null, string sourceIdentifier = null)
         {
             (text != null).Assert();
-            return new Compiler
-            (
-                new Source(text, sourceIdentifier ?? DefaultSourceIdentifier),
+            return new(
+                new(text, sourceIdentifier ?? DefaultSourceIdentifier),
                 DefaultModuleName,
                 parameters);
         }
@@ -269,14 +273,13 @@ namespace Reni
 
         static ValueSyntax GetSyntax(BinaryTree target) => Factory.Root.GetFrameSyntax(target);
 
-        CodeContainer GetCodeContainer()
-            => new CodeContainer(Syntax, Root, ModuleName, Source.Data);
+        CodeContainer GetCodeContainer() => new(Syntax, Root, ModuleName, Source.Data);
 
         static string ModuleNameFromFileName(string fileName)
             => "_" + Path.GetFileName(fileName).Symbolize();
 
         Result<ValueSyntax> ParsePredefinedItem(string sourceText)
-            => Factory.Root.GetValueSyntax(Parse(new Source(sourceText, PredefinedSource) + 0).BracketKernel.Center);
+            => Factory.Root.GetValueSyntax(Parse(new(sourceText, PredefinedSource)).BracketKernel.Center);
 
         [UsedImplicitly]
         public Compiler Empower()
@@ -343,7 +346,7 @@ namespace Reni
             IsInExecutionPhase = false;
         }
 
-        BinaryTree Parse(SourcePosition source) => this["Main"].Parser.Execute(source);
+        BinaryTree Parse(Source source) => this["Main"].Parser.Execute(source);
 
         void RunFromCode() => CodeContainer.Execute(this, TraceCollector.Instance);
 

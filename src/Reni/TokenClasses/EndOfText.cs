@@ -14,7 +14,6 @@ namespace Reni.TokenClasses
             , IValueToken
 
     {
-        public static readonly EndOfText Instance = new EndOfText();
         sealed class Matched : DumpableObject, IParserTokenType<BinaryTree>
         {
             BinaryTree IParserTokenType<BinaryTree>.Create(BinaryTree left, IToken token, BinaryTree right)
@@ -28,11 +27,10 @@ namespace Reni.TokenClasses
             string IParserTokenType<BinaryTree>.PrioTableId => "()";
         }
 
-        EndOfText() { }
         const string TokenId = PrioTable.EndOfText;
+        public static readonly EndOfText Instance = new();
 
-        [DisableDump]
-        public override string Id => TokenId;
+        EndOfText() { }
 
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => otherMatcher is BeginOfText;
@@ -41,19 +39,36 @@ namespace Reni.TokenClasses
         int IRightBracket.Level => 0;
 
         IValueProvider IValueToken.Provider => Factory.Bracket;
+
+        [DisableDump]
+        public override string Id => TokenId;
+    }
+
+    sealed class EndOfSubText
+        : TokenClass
+            , ISyntaxScope
+
+    {
+        const string TokenId = PrioTable.EndOfText;
+        public static readonly EndOfSubText Instance = new();
+
+        EndOfSubText() { }
+
+        [DisableDump]
+        public override string Id => TokenId;
     }
 
     sealed class BeginOfText : TokenClass, IBelongingsMatcher, ILeftBracket
     {
-        public static readonly BeginOfText Instance = new BeginOfText();
         const string TokenId = PrioTable.BeginOfText;
-
-        [DisableDump]
-        public override string Id => TokenId;
+        public static readonly BeginOfText Instance = new();
 
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => otherMatcher is EndOfText;
 
         int ILeftBracket.Level => 0;
+
+        [DisableDump]
+        public override string Id => TokenId;
     }
 }

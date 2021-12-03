@@ -60,7 +60,7 @@ namespace Reni.SyntaxTree
 
             DirectChildren = new ValueCache<Syntax[]>(() => DirectChildCount.Select(GetDirectChild).ToArray());
 
-            StopByObjectIds();
+            StopByObjectIds(216);
         }
 
 

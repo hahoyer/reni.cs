@@ -363,14 +363,13 @@
     <Compile Include="SyntaxTree\Special.cs" />
     <Compile Include="SyntaxTree\EmptyList.cs" />
     <Compile Include="TokenClasses\ArgToken.cs" />
-    <Compile Include="TokenClasses\BraceMatchDumper.cs" />
     <Compile Include="TokenClasses\Cleanup.cs" />
     <Compile Include="TokenClasses\CompareOperation.cs" />
     <Compile Include="SyntaxTree\DeclarationSyntax.cs" />
     <Compile Include="SyntaxFactory\IDeclarerToken.cs" />
     <Compile Include="SyntaxTree\DeclarerSyntax.cs" />
     <Compile Include="TokenClasses\EndOfText.cs" />
-    <Compile Include="TokenClasses\IssueTokenClass.cs" />
+    <Compile Include="TokenClasses\IssueClass.cs" />
     <Compile Include="TokenClasses\IBelongingsMatcher.cs" />
     <Compile Include="TokenClasses\IComparator.cs" />
     <Compile Include="TokenClasses\IFormatItem.cs" />

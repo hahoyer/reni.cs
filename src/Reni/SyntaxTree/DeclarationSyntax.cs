@@ -65,7 +65,7 @@ namespace Reni.SyntaxTree
                 declarer,
                 value ,
                 anchor,
-                IssueId.MissingDeclarationValue.Issue(anchor.Main.SourcePart)
+                value == null? IssueId.MissingDeclarationValue.Issue(anchor.Main.SourcePart): null
             );
     }
 }

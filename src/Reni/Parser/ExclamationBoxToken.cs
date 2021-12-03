@@ -9,7 +9,12 @@ namespace Reni.Parser
         : DumpableObject, IParserTokenType<BinaryTree>, ITokenClass
     {
         BinaryTree Value { get; }
-        internal ExclamationBoxToken(BinaryTree value) => Value = value;
+
+        internal ExclamationBoxToken(BinaryTree value)
+        {
+            var t = value.TokenClass;
+            Value = value;
+        }
 
         BinaryTree IParserTokenType<BinaryTree>.Create(BinaryTree left, IToken token, BinaryTree right)
         {

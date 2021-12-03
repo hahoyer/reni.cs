@@ -8,6 +8,10 @@ namespace Reni.Parser
 {
     sealed class ScannerTokenFactory : DumpableObject, ITokenFactory<BinaryTree>, Compiler<BinaryTree>.IComponent
     {
+        bool IsSubParser { get; }
+
+        public ScannerTokenFactory(bool isSubParser = false) => IsSubParser = isSubParser;
+
         [EnableDump]
         Compiler<BinaryTree>.Component Current;
 
@@ -17,7 +21,7 @@ namespace Reni.Parser
         }
 
         IParserTokenType<BinaryTree> ITokenFactory<BinaryTree>.BeginOfText => BeginOfText.Instance;
-        IScannerTokenType ITokenFactory.EndOfText => EndOfText.Instance;
+        IScannerTokenType ITokenFactory.EndOfText => IsSubParser? EndOfSubText.Instance: EndOfText.Instance;
 
         IScannerTokenType ITokenFactory.InvalidCharacterError
             => new ScannerSyntaxError(IssueId.InvalidCharacter);

@@ -17,10 +17,22 @@ namespace Reni.Helper
 
         internal TResult this[SourcePosition key] => VisibleValues[key];
 
-        internal TResult this[SourcePart keyPart]
+        TResult this[SourcePart keyPart]
         {
-            get => keyPart.Length == 0? InvisibleValues[keyPart.Start] : VisibleValues[keyPart.Start];
+            get => GetItem(keyPart);
             set => Add(keyPart.Length == 0? InvisibleValues : VisibleValues, keyPart.Start, value);
+        }
+
+        internal TResult this[BinaryTree key]
+        {
+            get => this[KeyMap(key)];
+            set => this[KeyMap(key)] = value;
+        }
+
+        TResult GetItem(SourcePart keyPart)
+        {
+            (keyPart.Length == 0? InvisibleValues : VisibleValues).TryGetValue(keyPart.Start, out var result);
+            return result;
         }
 
         static void Add(Dictionary<SourcePosition, TResult> values, SourcePosition key, TResult value)
@@ -35,12 +47,6 @@ value = {value.LogDump()}
 oldValue = {oldValue.LogDump()}"
                 );
             values[key] = value;
-        }
-
-        internal TResult this[BinaryTree key]
-        {
-            get => this[KeyMap(key)];
-            set => this[KeyMap(key)] = value;
         }
 
         static SourcePart KeyMap(BinaryTree key) => key.Token.SourcePart();
