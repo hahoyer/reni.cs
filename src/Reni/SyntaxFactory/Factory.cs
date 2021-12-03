@@ -104,6 +104,11 @@ namespace Reni.SyntaxFactory
                 target.Left.AssertIsNull();
                 return GetValueSyntax(target.Right, Anchor.Create(target).Combine(anchor));
             }
+            if(issueId == IssueId.MissingLeftBracket)
+            {
+                target.Right.AssertIsNull();
+                return GetValueSyntax(target.Left, Anchor.Create(target).Combine(anchor));
+            }
 
             NotImplementedMethod(issueId, target, anchor);
             return new EmptyList(Anchor.CreateAll(target).Combine(anchor));
