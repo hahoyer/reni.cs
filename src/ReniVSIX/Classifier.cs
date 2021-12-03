@@ -44,6 +44,8 @@ namespace ReniVSIX
             var item = CompilerBrowser
                 .FromText(Buffer.CurrentSnapshot.GetText()).Locate(span.Start.Position);
 
+            if(!item.IsError)
+                return null;
             
             var snapshotSpan = new TagSpan<IErrorTag>(span,new 
                 ErrorTag("syntax error", item));
