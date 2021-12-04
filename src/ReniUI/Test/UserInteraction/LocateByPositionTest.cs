@@ -2,12 +2,12 @@ using hw.DebugFormatter;
 using hw.UnitTest;
 using Reni.TokenClasses;
 
-namespace ReniUI.Test.UserInteraction;
-
-[UnitTest]
-public sealed class LocateByPositionTest : DependenceProvider
+namespace ReniUI.Test.UserInteraction
 {
-    readonly string Text = @"
+    [UnitTest]
+    public sealed class LocateByPositionTest : DependenceProvider
+    {
+        readonly string Text = @"
 System: 
 (
 @!
@@ -43,12 +43,13 @@ complex FromReal(2) dump_print;
 ".Replace("@r@n", "@n");
 
 
-    [UnitTest]
-    public void ClickOnEnd()
-    {
-        var compiler = CompilerBrowser.FromText(Text);
-        var syntax = compiler.Syntax;
-        var item = compiler.Locate(compiler.Source.Length);
-        (item.TokenClass is EndOfText).Assert();
+        [UnitTest]
+        public void ClickOnEnd()
+        {
+            var compiler = CompilerBrowser.FromText(Text);
+            var syntax = compiler.Syntax;
+            var item = compiler.Locate(compiler.Source.Length);
+            (item.TokenClass is EndOfText).Assert();
+        }
     }
 }

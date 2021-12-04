@@ -1,10 +1,9 @@
 using hw.UnitTest;
 using NUnit.Framework;
-using ReniUI.Test;
-using ReniUI.Test.Formatting;
 
 namespace ReniUI.Test.Formatting
 {
+    [TestFixture]
     [UnitTest]
     [TestFixture]
     [Lists]
@@ -13,9 +12,29 @@ namespace ReniUI.Test.Formatting
     {
         [Test]
         [UnitTest]
+        public void NameIsLeftOfColon()
+        {
+            const string text = @"lllll  :bbbbb";
+            const string expectedText = @"lllll: bbbbb";
+
+            text.SimpleFormattingTest(expectedText);
+        }
+
+        [Test]
+        [UnitTest]
+        public void SymbolIsLeftOfColon()
+        {
+            const string text = @"***  :bbbbb";
+            const string expectedText = @"*** : bbbbb";
+
+            text.SimpleFormattingTest(expectedText);
+        }
+
+        [Test]
+        [UnitTest]
         public void ListWithDeclarationLineBreakTest1()
         {
-            const string text = @"lllll:bbbbb";
+            const string text = @"lllll  :bbbbb";
             const string expectedText = @"lllll:
     bbbbb";
 
