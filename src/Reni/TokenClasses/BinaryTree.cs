@@ -119,7 +119,8 @@ namespace Reni.TokenClasses
                 .ConcatMany()
                 .Where(node => node != null);
 
-        Issue Issue => this.CachedValue(GetIssue);
+        [DisableDump]
+        internal Issue Issue => this.CachedValue(GetIssue);
 
         Issue GetIssue()
         {

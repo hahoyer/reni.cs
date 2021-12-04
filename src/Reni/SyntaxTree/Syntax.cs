@@ -39,7 +39,7 @@ namespace Reni.SyntaxTree
         internal readonly Anchor Anchor;
 
         [EnableDumpExcept(null)]
-        readonly Issue Issue;
+        internal readonly Issue Issue;
 
         protected Syntax(Anchor anchor, Issue issue = null, int? objectId = null)
             : base(objectId)

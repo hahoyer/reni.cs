@@ -14,7 +14,7 @@ namespace ReniUI.RestFul
                 Start = arg.Position.Position,
                 Length = arg.Position.Length,
                 Id = arg.IssueId.Tag,
-                Message = arg.Message
+                Message = arg.AdditionalMessage
             };
 
         public string Source;

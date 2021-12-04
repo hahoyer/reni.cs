@@ -15,11 +15,11 @@ namespace Reni.Validation
         [EnableDump]
         internal readonly SourcePart Position;
 
-        internal Issue(IssueId issueId, SourcePart position, string message = null)
+        internal Issue(IssueId issueId, SourcePart position, string additionalMessage = null)
             : base(NextObjectId++)
         {
             IssueId = issueId;
-            Message = message ?? "";
+            AdditionalMessage = additionalMessage ?? "";
             Position = position;
             AssertValid();
             StopByObjectIds();
@@ -34,14 +34,14 @@ namespace Reni.Validation
             return
                 Equals(Position, other.Position) &&
                 Equals(IssueId, other.IssueId) &&
-                string.Equals(Message, other.Message);
+                string.Equals(AdditionalMessage, other.AdditionalMessage);
         }
 
         [DisableDump]
         internal IssueId IssueId { get; }
 
         [EnableDump]
-        internal string Message { get; }
+        internal string AdditionalMessage { get; }
 
         [DisableDump]
         internal string Tag => IssueId.Tag;
@@ -53,9 +53,19 @@ namespace Reni.Validation
                 var result = Position.Id == "("
                     ? Position.Start.FilePosition(Tag) + " Functional"
                     : Position.FileErrorPosition(Tag);
-                if(string.IsNullOrWhiteSpace(Message))
+                if(string.IsNullOrWhiteSpace(AdditionalMessage))
                     return result;
-                return result + " " + Message;
+                return result + " " + AdditionalMessage;
+            }
+        }
+
+        public string Message
+        {
+            get {                 
+                var result = IssueId.Tag;
+                if(string.IsNullOrWhiteSpace(AdditionalMessage))
+                    return result;
+                return result + " " + AdditionalMessage;
             }
         }
 
@@ -80,7 +90,7 @@ namespace Reni.Validation
             {
                 var hashCode = Position.GetHashCode();
                 hashCode = (hashCode * 397) ^ IssueId.GetHashCode();
-                hashCode = (hashCode * 397) ^ Message.GetHashCode();
+                hashCode = (hashCode * 397) ^ AdditionalMessage.GetHashCode();
                 return hashCode;
             }
         }

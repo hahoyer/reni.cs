@@ -74,7 +74,7 @@ oldValue = {oldValue.LogDump()}"
  -----
 /{Position++:D5}\    BinaryTree.ObjectId={keyItem.ObjectId}
 Key: -----------------------------------------vv
-{keyItem.Token.Characters.GetDumpAroundCurrent(25)}
+{keyItem.Token.Characters.GetDumpAroundCurrent(20)}
 ----------------------------------------------^^".Log();
 
             return false;

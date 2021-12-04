@@ -27,7 +27,7 @@ namespace ReniUI.Classification
 
         [EnableDumpExcept(false)]
         public override bool IsError
-            => Issues?.Any(item => item.Position == SourcePart) ?? false;
+            => Issue != null;
 
         [EnableDumpExcept(false)]
         public override bool IsBraceLike => TokenClass is IBelongingsMatcher;
@@ -47,6 +47,6 @@ namespace ReniUI.Classification
                 .Select(node => node.Token.Characters);
 
         [DisableDump]
-        public override IEnumerable<Issue> Issues => Master.Issues.Any()? Master.Issues : new Issue[0];
+        public override Issue Issue => Master.MainAnchor.Issue ?? Master.Issue;
     }
 }

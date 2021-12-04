@@ -114,7 +114,7 @@ namespace ReniUI.Classification
         }
 
         [DisableDump]
-        public virtual IEnumerable<Issue> Issues => new Issue[0];
+        public virtual Issue Issue => null;
 
         public int StartPosition => SourcePart.Position;
         public int EndPosition => SourcePart.EndPosition;
