@@ -328,7 +328,6 @@ namespace ReniUI.Formatting
                 => target
                     .Anchor
                     .Items
-                    .SelectMany(item => item.GetNodesFromLeftToRight())
                     .Select(GetChild);
 
             static Child GetChild(BinaryTree target) => new(target, null, false);

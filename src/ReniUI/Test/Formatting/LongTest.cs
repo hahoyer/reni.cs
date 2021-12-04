@@ -1,4 +1,5 @@
 using hw.DebugFormatter;
+using hw.Helper;
 using hw.UnitTest;
 using NUnit.Framework;
 using Reni.TokenClasses;
@@ -27,7 +28,7 @@ namespace ReniUI.Test.Formatting
 3;
 (Text ('H') << 'allo') dump_print";
 
-            var compiler = CompilerBrowser.FromText(text);
+            var compiler = CompilerBrowser.FromText(text.Replace("\r\n","\n"));
 
             for(var start = 0; start < compiler.Source.Length; start++)
             {
