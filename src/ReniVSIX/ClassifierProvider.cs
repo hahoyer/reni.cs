@@ -12,6 +12,7 @@ namespace ReniVSIX
     [Export(typeof(IClassifierProvider))]
     [Export(typeof(ITaggerProvider))]
     [TagType(typeof(IErrorTag))]
+    [TagType(typeof(ITextMarkerTag))]
     [ContentType("reni")]
     class ClassifierProvider : DumpableObject, IClassifierProvider, ITaggerProvider
     {
@@ -23,12 +24,7 @@ namespace ReniVSIX
             => buffer.Properties.GetOrCreateSingletonProperty(()
                 => new Classifier(buffer, ClassificationRegistry));
 
-        ITagger<T> ITaggerProvider.CreateTagger<T>(ITextBuffer buffer)
-        {
-            if(typeof(T).Is<IErrorTag>())
-                return (ITagger<T>)new Classifier(buffer, ClassificationRegistry);
-
-            return null;
-        }
+        ITagger<T> ITaggerProvider.CreateTagger<T>(ITextBuffer buffer) 
+            => new Classifier(buffer, ClassificationRegistry) as ITagger<T>;
     }
 }

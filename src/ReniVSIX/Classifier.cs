@@ -5,6 +5,7 @@ using hw.DebugFormatter;
 using hw.Helper;
 using hw.Scanner;
 using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Adornments;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Tagging;
 using ReniUI;
@@ -12,52 +13,65 @@ using ReniUI.Classification;
 
 namespace ReniVSIX
 {
-    class Classifier : DumpableObject, IClassifier, ITagger<IErrorTag>
+    class Classifier : DumpableObject, IClassifier, ITagger<IErrorTag>, ITagger<TextMarkerTag>
     {
         readonly ITextBuffer Buffer;
         readonly IClassificationTypeRegistryService Registry;
         readonly FunctionCache<string, IClassificationType> Types;
+
+        readonly ValueCache<CompilerBrowser> CompilerCache;
 
         internal Classifier(ITextBuffer buffer, IClassificationTypeRegistryService registry)
         {
             Buffer = buffer;
             Registry = registry;
             Types = new FunctionCache<string, IClassificationType>(GetClassificationType);
+            CompilerCache = new ValueCache<CompilerBrowser>(GetCompiler);
+            Buffer.Changed += (sender, args) => CompilerCache.IsValid = false;
         }
 
         public event EventHandler<ClassificationChangedEventArgs> ClassificationChanged;
 
         IList<ClassificationSpan> IClassifier.GetClassificationSpans(SnapshotSpan span)
-            => CompilerBrowser
-                .FromText(Buffer.CurrentSnapshot.GetText())
-                .GetClassification(span.Start.Position, span.End.Position).ToArray()
-                .Select(item => GetClassificationSpan(item, span)).ToArray()
+            => Compiler
+                .GetClassification(span.Start.Position, span.End.Position)
+                .Select(GetClassificationSpan)
                 .ToList();
 
-        IEnumerable<ITagSpan<IErrorTag>> ITagger<IErrorTag>.GetTags(NormalizedSnapshotSpanCollection spans) 
+        IEnumerable<ITagSpan<IErrorTag>> ITagger<IErrorTag>.GetTags(NormalizedSnapshotSpanCollection spans)
             => spans
-            .Select(GetTag)
-            .ToArray();
-
-        ITagSpan<IErrorTag> GetTag(SnapshotSpan span)
-        {
-            var item = CompilerBrowser
-                .FromText(Buffer.CurrentSnapshot.GetText()).Locate(span.Start.Position);
-
-            if(!item.IsError)
-                return null;
-            
-            var snapshotSpan = new TagSpan<IErrorTag>(span,new 
-                ErrorTag("syntax error", item));
-            
-            
-            throw new NotImplementedException();
-        }
-
-        SourcePart GetSourcePart(SnapshotSpan span) 
-            => (new Source(Buffer.CurrentSnapshot.GetText()) + span.Start.Position).Span(span.Length);
+                .SelectMany(span => Compiler.GetClassification(span.Start.Position, span.End.Position))
+                .SelectMany(GetErrorTag)
+                .ToArray();
 
         public event EventHandler<SnapshotSpanEventArgs> TagsChanged;
+
+        IEnumerable<ITagSpan<TextMarkerTag>> ITagger<TextMarkerTag>.GetTags(NormalizedSnapshotSpanCollection spans)
+            => spans
+                .SelectMany(span => Compiler.GetClassification(span.Start.Position, span.End.Position))
+                .SelectMany(GetTextMarkerTag)
+                .ToArray();
+
+        CompilerBrowser Compiler => CompilerCache.Value;
+
+        CompilerBrowser GetCompiler() => CompilerBrowser.FromText(Buffer.CurrentSnapshot.GetText());
+
+
+        IEnumerable<ITagSpan<TextMarkerTag>> GetTextMarkerTag(Item item)
+        {
+            if(item.IsBrace)
+                yield return new TagSpan<TextMarkerTag>(ToSpan(item.SourcePart), new TextMarkerTag("Brace"));
+        }
+
+        IEnumerable<ITagSpan<IErrorTag>> GetErrorTag(Item item)
+        {
+            if(item.IsError)
+                yield return new TagSpan<IErrorTag>(ToSpan(item.SourcePart)
+                    , new ErrorTag(PredefinedErrorTypeNames.SyntaxError, item.Issue.Message));
+        }
+
+        SourcePart GetSourcePart(SnapshotSpan span)
+            => (new Source(Buffer.CurrentSnapshot.GetText()) + span.Start.Position).Span(span.Length);
 
         IClassificationType GetClassificationType(string s) => Registry.GetClassificationType(s);
 
@@ -84,13 +98,17 @@ namespace ReniVSIX
             return Types["text"];
         }
 
-        ClassificationSpan GetClassificationSpan(Item item, SnapshotSpan all)
+        ClassificationSpan GetClassificationSpan(Item item)
         {
             var sourcePart = item.SourcePart;
-            var snapshotSpan = new SnapshotSpan(all.Snapshot, new Span(sourcePart.Position, sourcePart.Length));
+            var snapshotSpan = ToSpan(sourcePart);
             var formatTypeName = GetFormatTypeName(item);
             formatTypeName.AssertIsNotNull();
             return new ClassificationSpan(snapshotSpan, formatTypeName);
         }
+
+        SnapshotSpan ToSpan
+            (SourcePart sourcePart)
+            => new SnapshotSpan(Buffer.CurrentSnapshot, new Span(sourcePart.Position, sourcePart.Length));
     }
 }
