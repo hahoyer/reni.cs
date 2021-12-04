@@ -1,4 +1,4 @@
-//19:18:10.676 04.12.2021 ran 182 of 182 
+//20:32:24.624 04.12.2021 ran 182 of 182 
 
 namespace hw.UnitTest
 {
@@ -7,7 +7,4 @@ namespace hw.UnitTest
         public static void Run()
         {
         
-// error 
-
-TestRunner.RunTest(new ReniUI.Test.Formatting.LongTest().ReformatPart);
 }}}

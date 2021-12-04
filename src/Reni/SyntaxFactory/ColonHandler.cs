@@ -51,11 +51,9 @@ namespace Reni.SyntaxFactory
                 .ToDictionary(group => group.Key, group => group.ToArray());
             var tags = nodes.SingleOrDefault(node => node.Key).Value;
             var result = tags.Select(tag => (anchors: new BinaryTree[0], tag)).ToArray();
-            var issues = nodes.SingleOrDefault(node => !node.Key).Value;
-
-            Tracer.ConditionalBreak(issues?.Any() ?? false);
-
-            result[0].anchors = T(T(target), issues).ConcatMany().ToArray();
+            var other = nodes.SingleOrDefault(node => !node.Key).Value;
+            other?.All(item => item.TokenClass is IBracket).Assert();
+            result[0].anchors = T(T(target), other).ConcatMany().ToArray();
             return result;
         }
     }

@@ -21,7 +21,7 @@ namespace Reni.TokenClasses
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => (otherMatcher as RightParenthesis)?.Level == Level;
 
-        int ILeftBracket.Level => Level;
+        int IBracket.Level => Level;
 
         public static string TokenId(int level)
             => level == 0? PrioTable.BeginOfText : "{[(".Substring(level - 1, 1);

@@ -36,7 +36,7 @@ namespace Reni.TokenClasses
             => otherMatcher is BeginOfText;
 
         IParserTokenType<BinaryTree> IBracketMatch<BinaryTree>.Value { get; } = new Matched();
-        int IRightBracket.Level => 0;
+        int IBracket.Level => 0;
 
         IValueProvider IValueToken.Provider => Factory.Bracket;
 
@@ -66,7 +66,7 @@ namespace Reni.TokenClasses
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => otherMatcher is EndOfText;
 
-        int ILeftBracket.Level => 0;
+        int IBracket.Level => 0;
 
         [DisableDump]
         public override string Id => TokenId;

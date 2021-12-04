@@ -18,19 +18,22 @@ namespace Reni.TokenClasses
         bool IBelongingsMatcher.IsBelongingTo(IBelongingsMatcher otherMatcher)
             => (otherMatcher as LeftParenthesis)?.Level == Level;
 
-        int IRightBracket.Level => Level;
+        int IBracket.Level => Level;
 
         public static string TokenId(int level)
             => level == 0? PrioTable.EndOfText : "}])".Substring(level - 1, 1);
     }
 
-    interface IRightBracket
+    interface IBracket
     {
         int Level { get; }
     }
 
-    interface ILeftBracket
+    interface IRightBracket: IBracket
     {
-        int Level { get; }
+    }
+
+    interface ILeftBracket: IBracket
+    {
     }
 }
