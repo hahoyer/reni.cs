@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.LanguageServer.Client;
@@ -37,12 +36,9 @@ namespace ReniVSIX
                 : null;
         }
 
-
         IEnumerable<string> ILanguageClient.ConfigurationSections => null;
 
         IEnumerable<string> ILanguageClient.FilesToWatch => null;
-
-        bool ILanguageClient.ShowNotificationOnInitializeFailed => throw new NotImplementedException();
 
         object ILanguageClient.InitializationOptions => null;
         string ILanguageClient.Name => "Bar Language Extension";
@@ -51,8 +47,7 @@ namespace ReniVSIX
 
         Task ILanguageClient.OnServerInitializedAsync() => Task.CompletedTask;
 
-        async Task<InitializationFailureContext> ILanguageClient.OnServerInitializeFailedAsync
-            (ILanguageClientInitializationInfo initializationState) => default;
+        Task ILanguageClient.OnServerInitializeFailedAsync(Exception e) => Task.CompletedTask;
 
         public event AsyncEventHandler<EventArgs> StartAsync;
         public event AsyncEventHandler<EventArgs> StopAsync;
